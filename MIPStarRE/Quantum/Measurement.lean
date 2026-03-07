@@ -159,4 +159,28 @@ theorem inconsistency_add_diagOverlap (M N : α → Op d) :
 
 end Overlap
 
+namespace Measurement
+
+section Overlap
+
+variable {α : Type*} [Fintype α] [DecidableEq α] [Nonempty d]
+
+/--
+For normalized measurements, the diagonal and off-diagonal overlaps add up to `1`.
+This is the matrix-level counterpart of the paper's observation that consistency
+and agreement probabilities complement each other for complete measurements.
+-/
+theorem inconsistency_add_diagOverlap_eq_one (M N : Measurement α d) :
+    inconsistency M.effect N.effect + diagOverlap M.effect N.effect = 1 := by
+  rw [inconsistency_add_diagOverlap]
+  have hTotal :
+      normalizedTrace (M.toSubmeasurement.total * N.toSubmeasurement.total) = 1 := by
+    rw [M.total_eq_one, N.total_eq_one]
+    simp [normalizedTrace_one]
+  simpa [Submeasurement.total] using hTotal
+
+end Overlap
+
+end Measurement
+
 end MIPStarRE.Quantum
