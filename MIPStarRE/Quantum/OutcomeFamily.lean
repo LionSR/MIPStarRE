@@ -41,7 +41,11 @@ variable {Question Answer Answer' Effect Effect' : Type*}
 
 @[ext] theorem ext {M N : OutcomeFamily Question Answer Effect}
     (h : ∀ q a, M.effect q a = N.effect q a) : M = N := by
-  cases M; cases N; congr; funext q a; exact h q a
+  cases M
+  cases N
+  congr
+  funext q a
+  exact h q a
 
 /-- Evaluate the family at a fixed question. -/
 def atQuestion (M : OutcomeFamily Question Answer Effect) (q : Question) : Answer → Effect :=
@@ -121,5 +125,66 @@ theorem postprocess_total [Fintype Answer] [Fintype Answer']
   exact Finset.sum_fiberwise Finset.univ f (fun a => M.effect q a)
 
 end OutcomeFamily
+
+/-!
+## Off-diagonal sums and data processing
+
+This section captures the core combinatorial fact behind the data-processing
+inequality for consistency (Proposition 2.3 / `lem:data-processing` in
+arXiv:2111.08131): merging answer classes cannot increase the off-diagonal mass.
+
+We work with a generic kernel `w : α → α → R` and a relabeling map `f : α → β`.
+The relabeled off-diagonal sum only keeps ordered pairs with `f a ≠ f a'`, so it
+is a subsum of the full off-diagonal sum over `a ≠ a'`.
+-/
+
+section OffDiag
+
+/--
+The off-diagonal sum of a kernel `w : α → α → R` is
+`∑_{a} ∑_{a' ≠ a} w a a'`.
+-/
+def offDiagSum {α : Type*} [Fintype α] [DecidableEq α] {R : Type*} [AddCommMonoid R]
+    (w : α → α → R) : R :=
+  ∑ a : α, ∑ a' ∈ Finset.univ.filter (· ≠ a), w a a'
+
+/--
+The relabeled off-diagonal sum of a kernel `w : α → α → R` under `f : α → β` is
+`∑_{a} ∑_{a' : f a' ≠ f a} w a a'`.
+-/
+def offDiagSumRelabel {α β : Type*} [Fintype α] [DecidableEq α] [DecidableEq β]
+    {R : Type*} [AddCommMonoid R]
+    (w : α → α → R) (f : α → β) : R :=
+  ∑ a : α, ∑ a' ∈ Finset.univ.filter (fun a' => f a' ≠ f a), w a a'
+
+/--
+Data-processing inequality for off-diagonal sums.
+
+If `w` is pointwise nonnegative, then restricting the sum to pairs with
+`f a ≠ f a'` can only decrease the off-diagonal mass, because `f a ≠ f a'`
+implies `a ≠ a'`.
+-/
+theorem offDiagSumRelabel_le {α β : Type*} [Fintype α]
+    [DecidableEq α] [DecidableEq β] {R : Type*}
+    [AddCommMonoid R] [PartialOrder R] [AddLeftMono R]
+    (w : α → α → R) (f : α → β)
+    (hw : ∀ a a', 0 ≤ w a a') :
+    offDiagSumRelabel w f ≤ offDiagSum w := by
+  unfold offDiagSumRelabel offDiagSum
+  apply Finset.sum_le_sum
+  intro a _
+  apply Finset.sum_le_sum_of_subset_of_nonneg
+  · intro a' ha'
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at ha' ⊢
+    exact fun h => ha' (congrArg f h)
+  · intro a' _ _
+    exact hw a a'
+
+-- In the matrix-valued measurement layer, the next step will be to instantiate
+-- this theorem with a concrete nonnegative overlap kernel built from processed
+-- measurement effects. That requires a separate positivity lemma for the scalar
+-- overlap quantity, and is intentionally deferred to the next proof pass.
+
+end OffDiag
 
 end MIPStarRE.Quantum
