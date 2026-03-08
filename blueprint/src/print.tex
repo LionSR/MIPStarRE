@@ -1,0 +1,28 @@
+% PDF version of the blueprint.
+% Compiled via: leanblueprint pdf  (or: latexmk -output-directory=../print)
+
+\documentclass[a4paper]{report}
+
+\usepackage{geometry}
+
+\usepackage{expl3}
+
+\usepackage{amssymb, amsthm, mathtools}
+\usepackage[unicode,colorlinks=true,linkcolor=blue,urlcolor=magenta,citecolor=blue]{hyperref}
+
+\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+
+\input{macros/common}
+\input{macros/print}
+
+\title{Strict-Proof-Following Blueprint for arXiv:2111.08131\\
+\large\textit{Quantum Soundness of Testing Tensor Codes}}
+\author{MIPStarRE Project}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\input{content}
+\bibliographystyle{alpha}
+\bibliography{references}
+\end{document}

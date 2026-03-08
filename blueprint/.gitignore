@@ -1,0 +1,5 @@
+# leanblueprint build outputs
+print/
+web/
+lean_decls
+blueprint/src/web.paux
