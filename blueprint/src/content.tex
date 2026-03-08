@@ -6,8 +6,8 @@
 \label{chap:scope}
 
 This document is a \emph{strict-proof-following} blueprint for formalizing
-arXiv:2111.08131 (Natarajan--Vidick, ``Quantum soundness of testing tensor
-codes''~\cite{natarajan2024quantum}).
+arXiv:2111.08131 (Ji--Natarajan--Vidick--Wright--Yuen, ``Quantum soundness of
+testing tensor codes''~\cite{ji2024quantum}).
 It is \textbf{not} a pilot or a surrogate plan;
 it mirrors the proof in the paper as faithfully as possible.
 
@@ -17,8 +17,8 @@ it mirrors the proof in the paper as faithfully as possible.
   for synchronous/tracial strategies on a von Neumann algebra with a normal
   tracial state.
 \item[Secondary target]
-  \texttt{thm:main-bipartite} (Theorem~4.8): extension to general two-prover
-  (non-synchronous) strategies, using~\cite{vidick2021almost}.
+  \texttt{thm:main-bipartite} (Theorem~4.7): extension to general two-prover
+  (non-synchronous) strategies, using~\cite[Corollary~4.1]{vidick2021almost}.
 \item[Ambient setting]
   Throughout, $\algebra$ is a von Neumann algebra on a separable Hilbert space
   $\hilb$, and $\tau\colon\algebra\to\C$ is a normal tracial state.
@@ -47,14 +47,12 @@ it mirrors the proof in the paper as faithfully as possible.
 
 \begin{definition}[$\tau$-norm]\label{def:tau-norm}
   \uses{def:tracial-state}
-  \lean{MIPStarRE.tauNorm}
   For $A\in\algebra$,
   $\|A\|_\tau = \sqrt{\tau(A^*A)}$.
 \end{definition}
 
 \begin{proposition}[Triangle and H\"older inequalities]\label{prop:holder}
   \uses{def:tracial-state, def:tau-norm}
-  \lean{MIPStarRE.prop_holder}
   Let $\tau$ be a tracial state on a von Neumann algebra $\algebra$
   and let $A,B\in\algebra$. Then:
   \begin{enumerate}
@@ -69,12 +67,48 @@ it mirrors the proof in the paper as faithfully as possible.
   $(A,B)\mapsto\tau(A^*B)$.
 \end{proof}
 
-\begin{proposition}[Cauchy--Schwarz]\label{cor:cauchy-schwarz}
+\begin{proposition}[Basic Cauchy--Schwarz for a tracial state]\label{prop:basic-cauchy-schwarz}
   \uses{def:tracial-state}
   $|\tau(A^*B)|^2\le\tau(A^*A) \tau(B^*B)$ for all $A,B\in\algebra$.
 \end{proposition}
 \begin{proof}
   Immediate from the fact that $(A,B)\mapsto\tau(A^*B)$ is a semi-inner product.
+\end{proof}
+
+\begin{proposition}[Cauchy--Schwarz for operator sets]\label{prop:cs-operator-sets}
+  \uses{def:tau-norm, prop:basic-cauchy-schwarz}
+  Let $\{M_a\}_{a\in\mathcal{A}}$ and $\{N_a\}_{a\in\mathcal{A}}$ be sets
+  of operators (not necessarily submeasurements). Then
+  \[
+    \Bigl|\sum_{a\in\mathcal{A}}\tau(M_a \cdot N_a)\Bigr|^2
+    \le
+    \left(\sum_{a\in\mathcal{A}}\|M_a\|_\tau^2\right)
+    \cdot
+    \left(\sum_{a\in\mathcal{A}}\|N_a\|_\tau^2\right).
+  \]
+\end{proposition}
+\begin{proof}
+  Apply Cauchy--Schwarz for the trace twice: once for the inner product
+  $\tau(M_a M_a^*)\tau(N_a^* N_a)$, then for the sum over $a$.
+\end{proof}
+
+\begin{corollary}[Averaged Cauchy--Schwarz for operator sets --- Corollary~2.3]
+  \label{cor:cauchy-schwarz}
+  \uses{prop:cs-operator-sets}
+  Let $\{M^x_a\}$ and $\{N^x_a\}$ be sets of operators indexed by both
+  $\mathcal{X}$ and $\mathcal{A}$. Then
+  \[
+    \Bigl|\E_x\sum_{a\in\mathcal{A}}\tau(M^x_a\cdot N^x_a)\Bigr|^2
+    \le
+    \left(\E_x\sum_{a\in\mathcal{A}}\|M^x_a\|_\tau^2\right)
+    \cdot
+    \left(\E_x\sum_{a\in\mathcal{A}}\|N^x_a\|_\tau^2\right).
+  \]
+\end{corollary}
+\begin{proof}
+  Apply Cauchy--Schwarz twice: once using the proposition on operator sets for
+  each fixed $x$, then using the scalar Cauchy--Schwarz for the expectation
+  over $x$.
 \end{proof}
 
 \section{Measurements, consistency, and closeness}
@@ -475,7 +509,7 @@ for $x\in[n]$ and produces a single measurement with outcomes in
 $\code^{\otimes(m+1)}$. The paper gives two methods; Method~2 (with the
 Chernoff-based completeness bound) is the one used in the final proof.
 
-\section{Commutativity chain}
+\section{Commutativity chain (Method~1 prerequisites)}
 
 \begin{lemma}[Commutativity of $A$'s]\label{lem:a-comm}
   \uses{def:tracial-good, lem:consistency-consequences, lem:add-a-proj}
@@ -513,7 +547,147 @@ Chernoff-based completeness bound) is the one used in the final proof.
   the error from distinct codewords agreeing at the evaluation point.
 \end{proof}
 
-\begin{lemma}[Commutativity switcheroo]\label{lem:commutativity-switcheroo}
+\section{Method~1 consistency analysis}
+
+The Method~1 construction defines $H$ by sandwiching $t$ copies of the
+$G^{x_i}$ measurements over distinct coordinates
+$(x_1,\dots,x_t)\sim\mathrm{distinct}([n],t)$.
+The consistency analysis for Method~1 uses the following labeled intermediate
+results.
+
+\begin{proposition}[Total variation for distinct vs.\ i.i.d.\ tuples]
+  \label{prop:ld-dnoteq}
+  \uses{def:code}
+  Let $n,k\ge 1$ be integers. Let $x=(x_1,\dots,x_k)\sim[n]^k$ be
+  sampled uniformly at random and let $y=(y_1,\dots,y_k)\sim\mathrm{distinct}([n],k)$.
+  Then $d_{\mathrm{TV}}(x,y)\le k^2/n$.
+\end{proposition}
+\begin{proof}
+  Union-bound the probability that a uniformly random tuple from $[n]^k$ has
+  a collision.
+\end{proof}
+
+\begin{lemma}[Consistency of $H$ with $B$ (Method~1)]\label{lem:pasting-h-cons-b}
+  \uses{lem:g-comm, lem:switcheroo, prop:ld-dnoteq, lem:a-comm,
+        lem:consistency-consequences}
+  Let $\nu_3=t\cdot(t\cdot\nu_2+\sqrt{\zeta+\sqrt{2(m+1)\eps}})$.
+  On average over $u\sim[n]^m$,
+  \[
+    H_{[h\mapsto h|_u\mid f]}\simeq_{\nu_3} B^u_f,
+  \]
+  where the answer summation is over $f\in\code$.
+\end{lemma}
+\begin{proof}
+  Expand the inconsistency. For each index $i\in[t]$, commute the $i$-th
+  $G^{x_i}$ factor to expose the evaluation at $u$, incurring error
+  $i\cdot\nu_2$ per step by approximate commutativity. Then use the
+  points--lines consistency of $G^{x_i}_{g_i(u)}$ with $B^u_{f(x_i)}$.
+\end{proof}
+
+\begin{lemma}[Consistency of $H$ with $A$ (Method~1)]\label{lem:pasting-h-cons-a}
+  \uses{lem:pasting-h-cons-b, lem:transfer-cons, lem:consistency-consequences}
+  Let $\nu_4=\nu_3+\sqrt{2(m+1)\eps}$. On average over $(u,x)\sim[n]^m\times[n]$,
+  \[
+    H_{[h\mapsto h(u,x)\mid a]}\simeq_{\nu_4} A^{u,x}_a,
+  \]
+  where the answer summation is over $a\in\Sigma$.
+\end{lemma}
+\begin{proof}
+  Data-process the line consistency of Lemma~\ref{lem:pasting-h-cons-b} down
+  to a point evaluation, then transfer consistency using
+  Proposition~\ref{lem:transfer-cons} and the points--lines bound
+  $B^{u,x}_a\approx_{\sqrt{2(m+1)\eps}} A^{u,x}_a$.
+\end{proof}
+
+\begin{lemma}[$H$ close to $HG$]\label{lem:pasting-h-close-hg}
+  \uses{lem:pasting-h-cons-a, cor:cauchy-schwarz, lem:cons-sub-meas}
+  Let $\nu_5=\sqrt{\nu_4}+\sqrt{\zeta}$. Then
+  $\tau(H)\approx_{\nu_5}\tau(HG)$.
+\end{lemma}
+\begin{proof}
+  Bound $\tau(H(\id-G))=\E_x\sum_h\tau(H_h(\id-G^x))$.
+  Use Cauchy--Schwarz (Corollary~\ref{cor:cauchy-schwarz}) and the
+  consistency of $H$ with $A$ to control $\tau(H_h(\id-A^{u,x}_{h(u,x)})(\id-G^x))$;
+  the resulting bound involves $\sqrt{\nu_4}$ from consistency and
+  $\sqrt\zeta$ from the incomplete part of $G^x$.
+\end{proof}
+
+\begin{lemma}[From $\tau(H)$ to $\tau(G^t)$]\label{lem:nu-6}
+  \uses{prop:ld-dnoteq, lem:g-comm, lem:switcheroo, prop:interpolate-tuple}
+  Let $\nu_6=2t^2(\nu_2+n^{-1})$. Then
+  \[
+    \tau(H)\approx_{\nu_6}\tau(G^t)
+    \qquad\text{and}\qquad
+    \tau(HG)\approx_{\nu_6}\tau(G^{t+1}).
+  \]
+\end{lemma}
+\begin{proof}
+  Expand $\tau(H)$ using the pasting definition; rewrite the sum over $h$
+  using interpolation (Proposition~\ref{prop:interpolate-tuple}).
+  Replace distinct tuples by i.i.d.\ using Proposition~\ref{prop:ld-dnoteq}
+  (error $t^2/n$). Then peel off factors using cyclicity of the trace
+  and approximate commutativity (Lemma~\ref{lem:g-comm} and
+  Proposition~\ref{lem:switcheroo}), accumulating error
+  $\le t^2\nu_2$.
+\end{proof}
+
+\section{Method~2: Construction and definitions}
+
+\begin{definition}[$G$'s incomplete part and completed measurement]
+  \label{def:G-hat}
+  \uses{def:submeasurement}
+  For each $x\in[n]$ write $G^x=\sum_g G^x_g$ and $G^x_\bot=\id-G^x$.
+  The completed measurement $\widehat{G}^x$ has outcomes in
+  $\code^{\otimes m}\cup\{\bot\}$:
+  \[
+    \widehat{G}^x_g=
+    \begin{cases}
+      G^x_g & \text{if }g\in\code^{\otimes m},\\
+      G^x_\bot & \text{if }g=\bot.
+    \end{cases}
+  \]
+  Write $\code^+=\code^{\otimes m}\cup\{\bot\}$.
+\end{definition}
+
+\begin{definition}[Types]\label{def:types}
+  A \emph{type} $\tau\in\{0,1\}^k$ records which of $k$ successive outcomes
+  lie in $\code^{\otimes m}$ ($\tau_i=1$) versus $\bot$ ($\tau_i=0$).
+  The Hamming weight $|\tau|=\tau_1+\cdots+\tau_k$ counts the
+  number of valid outcomes.
+\end{definition}
+
+\begin{definition}[The pasted measurement (Method~2)]\label{def:pasted-meas}
+  \uses{def:G-hat, def:types, prop:tuple-to-code-correspondence,
+        prop:interpolate-tuple, def:interpolable}
+  Let $k\ge t$ be an integer.
+  \begin{enumerate}
+    \item \emph{(Sandwiching)} For $x_1,\dots,x_k\in[n]$, define
+      \[
+        \widehat{H}^{x_1,\dots,x_k}_{g_1,\dots,g_k}
+        =\widehat{G}^{x_1}_{g_1}\cdot\widehat{G}^{x_2}_{g_2}
+         \cdots\widehat{G}^{x_k}_{g_k}\cdots
+         \widehat{G}^{x_2}_{g_2}\cdot\widehat{G}^{x_1}_{g_1}.
+      \]
+    \item \emph{(Interpolation)} For $(x_1,\dots,x_k)\in\mathrm{distinct}([n],k)$,
+      $w\in\{0,1\}^k$, and $h\in\code^{\otimes(m+1)}$, let
+      $h_w=(g_1,\dots,g_k)\in(\code^+)^k$ where
+      $g_i=\bot$ if $w_i=0$ and $g_i=h|_{x_i}$ otherwise. Define
+      \[
+        H^{x_1,\dots,x_k}_h
+        =\sum_{w:|w|\ge t}\widehat{H}^{x_1,\dots,x_k}_{h_w}.
+      \]
+    \item \emph{(Averaging)} Define
+      \[
+        H_h=\E_{(x_1,\dots,x_k)\sim\mathrm{distinct}([n],k)}
+          H^{x_1,\dots,x_k}_h.
+      \]
+  \end{enumerate}
+\end{definition}
+
+\section{Commutativity of $\widehat{G}$ (Method~2 prerequisites)}
+
+\begin{lemma}[Commutativity with~$G_g^x$ implies commutativity with~$G^x$]
+  \label{lem:commutativity-switcheroo}
   \uses{lem:g-comm}
   Commutativity of $G^x_g$ with $G^y_h$ implies commutativity with
   $G^y=\sum_h G^y_h$.
@@ -531,7 +705,7 @@ Chernoff-based completeness bound) is the one used in the final proof.
 \end{proof}
 
 \begin{corollary}[Commutativity of $\widehat{G}$]\label{cor:G-hat-facts}
-  \uses{cor:g-comm, lem:g-comm}
+  \uses{cor:g-comm, lem:g-comm, def:G-hat}
   With $\nu'_2=27\nu_2^{1/4}$, the completed measurements
   $\widehat{G}^x_g$ (including the $\bot$ outcome) satisfy
   $\widehat{G}^x_g\,\widehat{G}^y_h\approx_{\nu'_2}\widehat{G}^y_h\,\widehat{G}^x_g$.
@@ -541,19 +715,11 @@ Chernoff-based completeness bound) is the one used in the final proof.
   reducing each term to existing commutation statements.
 \end{proof}
 
-\section{Pasting construction (Method~2)}
-
-The sandwiched measurement is defined as
-$\widehat{H}^{x_1,\dots,x_k}_{g_1,\dots,g_k}
-  =\widehat{G}^{x_1}_{g_1}\cdots\widehat{G}^{x_k}_{g_k}\cdots\widehat{G}^{x_1}_{g_1}$.
-Tuples of type $|\tau|\ge t$ are interpolated into a global codeword, then
-averaged over distinct $k$-tuples $(x_1,\dots,x_k)$.
-
-\section{Consistency of $H$}
+\section{Consistency of $H$ (Method~2)}
 
 \begin{lemma}[Consistency of $\widehat{H}$ with $B$ at one point]
   \label{lem:ld-sandwich-line-one-point}
-  \uses{cor:G-hat-facts, lem:switcheroo}
+  \uses{cor:G-hat-facts, lem:switcheroo, def:pasted-meas}
   Sandwiched products are approximately consistent with the line measurement
   at a single evaluation point.
 \end{lemma}
@@ -562,9 +728,10 @@ averaged over distinct $k$-tuples $(x_1,\dots,x_k)$.
   Proposition~\ref{lem:switcheroo} to commute factors.
 \end{proof}
 
-\begin{lemma}[Consistency of $H$ with $B$]\label{lem:h-b-consistency}
+\begin{lemma}[Consistency of $H$ with $B$ (Method~2)]\label{lem:h-b-consistency}
   \uses{lem:ld-sandwich-line-one-point, prop:interpolate-tuple,
-        prop:tuple-to-code-correspondence, lem:data-processing, lem:transfer-cons}
+        prop:tuple-to-code-correspondence, lem:data-processing,
+        lem:transfer-cons, def:pasted-meas}
   With error parameter $\nu'_3$, the pasted measurement $H$ is approximately
   consistent with the line measurement $B$.
 \end{lemma}
@@ -574,7 +741,7 @@ averaged over distinct $k$-tuples $(x_1,\dots,x_k)$.
   to identify inconsistent tuples and bound them.
 \end{proof}
 
-\begin{corollary}[Consistency of $H$ with $A$]\label{cor:ha-cons}
+\begin{corollary}[Consistency of $H$ with $A$ (Method~2)]\label{cor:ha-cons}
   \uses{lem:h-b-consistency, lem:data-processing, lem:transfer-cons}
   On average over $(u,x)\in[n]^m\times[n]$,
   $H_{[h\mapsto h(u,x)\mid a]}\simeq_{\nu'_4} A^{u,x}_a$.
@@ -583,11 +750,11 @@ averaged over distinct $k$-tuples $(x_1,\dots,x_k)$.
   Data-process the line answer down to a point and transfer consistency.
 \end{proof}
 
-\section{Completeness of $H$}
+\section{Completeness of $H$ (Method~2)}
 
 \begin{lemma}[Over all outcomes]\label{lem:over-all-outcomes}
   \uses{prop:tuple-to-code-correspondence, prop:distance,
-        lem:h-b-consistency, cor:G-hat-facts}
+        lem:h-b-consistency, cor:G-hat-facts, def:pasted-meas}
   With error $\nu'_5$:
   \[
     \tau(H)\approx_{\nu'_5}
@@ -604,7 +771,8 @@ averaged over distinct $k$-tuples $(x_1,\dots,x_k)$.
 \end{proof}
 
 \begin{lemma}[From $H$ to $G$ polynomial]\label{lem:from-H-to-G}
-  \uses{cor:G-hat-facts, lem:switcheroo, lem:closeness-to-close-ips}
+  \uses{cor:G-hat-facts, lem:switcheroo, lem:closeness-to-close-ips,
+        def:pasted-meas, def:G-hat}
   With error $\nu'_6=2k^2\nu'_2$:
   \[
     \E_{x_1,\dots,x_k}\sum_{\tau:|\tau|\ge t}
@@ -655,7 +823,8 @@ averaged over distinct $k$-tuples $(x_1,\dots,x_k)$.
 \section{The pasting lemma (combined)}
 
 \begin{lemma}[Pasting]\label{lem:pasting}
-  \uses{cor:ha-cons, cor:ld-pasting-N-completeness}
+  \uses{cor:ha-cons, cor:ld-pasting-N-completeness,
+        def:pasted-meas, lem:pasting-h-cons-a, lem:pasting-h-close-hg, lem:nu-6}
   There exists a function
   $\mu(\kappa,m,t,r,\eps,\delta,\zeta,n^{-1})
     =\kappa(1+\frac{1}{3m})+\poly(m,t,r)\cdot\poly(\eps,\delta,\zeta,n^{-1})+e^{-r/(72m^2)}$
@@ -737,7 +906,7 @@ averaged over distinct $k$-tuples $(x_1,\dots,x_k)$.
   (3)~the synchronicity test with probability $\ge 1-\xi$.
 \end{definition}
 
-\begin{theorem}[Two-prover extension --- Theorem~4.8]\label{thm:main-bipartite}
+\begin{theorem}[Two-prover extension --- Theorem~4.7]\label{thm:main-bipartite}
   \proves{thm:main-bipartite}
   \uses{thm:main, def:good-2}
   There exists
@@ -755,8 +924,15 @@ averaged over distinct $k$-tuples $(x_1,\dots,x_k)$.
   \textbf{This is the secondary formalization target.}
 \end{theorem}
 \begin{proof}
-  Uses \cite{vidick2021almost} to reduce to the synchronous setting of
-  Theorem~\ref{thm:main}. This is an \textbf{external dependency}.
+  Uses \cite[Corollary~4.1]{vidick2021almost} to reduce to the synchronous
+  setting of Theorem~\ref{thm:main}.
+  The reduction proceeds in three steps:
+  (1)~symmetrize the strategy to make it invariant under prover swap,
+  (2)~apply \cite[Corollary~4.1]{vidick2021almost} to the synchronous
+  result (Theorem~\ref{thm:main}) to obtain approximate consistency between
+  the two provers' measurements, and
+  (3)~transfer the synchronous global measurement to both provers.
+  This is an \textbf{external dependency}.
 \end{proof}
 
 
@@ -784,8 +960,12 @@ Reference: \cite{de2021orthogonalization}.
 
 Reference: \cite{vidick2021almost}.
 
-Used in the proof of Theorem~\ref{thm:main-bipartite} to reduce general
+\textbf{Corollary~4.1} (almost-synchronous-to-synchronous reduction):
+used in the proof of Theorem~\ref{thm:main-bipartite} to reduce general
 two-prover strategies to the synchronous setting.
+The corollary states that if a game has a quantum strategy with value $1-\eps$
+and the synchronous quantum value of the game is $1-\delta(\eps)$, then the
+original strategy is $O(\delta(\eps))$-close to a synchronous strategy.
 
 \section{Other background}
 
@@ -861,4 +1041,4 @@ Formalize the induction lemma, the main theorem (\texttt{thm:main}),
 the two-prover definitions, and the bipartite extension
 (\texttt{thm:main-bipartite}).
 The bipartite extension requires axiomatizing or formalizing
-\cite{vidick2021almost}.
+\cite[Corollary~4.1]{vidick2021almost}.
