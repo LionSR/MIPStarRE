@@ -39,6 +39,8 @@
 \newcommand{\hilb}{\mathcal{H}}
 \newcommand{\algebra}{\mathcal{A}}
 \newcommand{\eps}{\varepsilon}
+\newcommand{\ket}[1]{\lvert #1 \rangle}
+\newcommand{\bra}[1]{\langle #1 \rvert}
 
 \title{Strict-Proof-Following Blueprint for arXiv:2111.08131\\
 \large\textit{Quantum Soundness of Testing Tensor Codes}}
@@ -64,7 +66,7 @@ mirror the proof in the paper as faithfully as possible.
 	      for synchronous/tracial strategies on a von Neumann algebra with a normal
 	      tracial state.
 	\item[Secondary target]
-	      \texttt{thm:main-bipartite} (Theorem~4.8): extension to general two-prover
+	      \texttt{thm:main-bipartite} (Theorem~4.7): extension to general two-prover
 	      (non-synchronous) strategies, using~\cite{vidick2021almost}.
 	\item[Ambient setting]
 	      Throughout, $\algebra$ is a von Neumann algebra on a separable Hilbert space
@@ -711,7 +713,7 @@ over distinct $k$-tuples $(x_1,\dots,x_k)\in\mathrm{distinct}([n],k)$.
 	(3)~the synchronicity test with probability $\ge 1-\xi$.
 \end{definition}
 
-\begin{theorem}[Two-prover extension --- \texttt{thm:main-bipartite} (Theorem~4.8)]
+\begin{theorem}[Two-prover extension --- \texttt{thm:main-bipartite} (Theorem~4.7)]
 	\label{thm:main-bipartite}
 	\uses{thm:main, def:good-2}
 	\notready
