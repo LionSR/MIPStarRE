@@ -1,141 +1,265 @@
-import MIPStarRE.Quantum.Measurement
+import MIPStarRE.Quantum.OutcomeFamily
 import MIPStarRE.Codes.LinearCode
 import MIPStarRE.Games.TensorCodeTest
 
 /-!
-Paper-specific dependency skeleton for arXiv:2111.08131.
+Strict-proof-following roadmap for arXiv:2111.08131.
 
-Reusable mathematics belongs in `Quantum/`, `Codes/`, or `Games/`; this file is
-only a roadmap layer for the tensor-code-testing paper itself. We intentionally
-record later Sections 4--6 as TODO milestones rather than introducing fake
-axioms for hard results that are not yet formalized.
+This file is intentionally lightweight: it records the dependency skeleton for the
+current strict branch, whose source of truth is `blueprint/src/content.tex`.
+The strict target is the paper's own ambient setting (von Neumann algebra with a
+normal tracial state), so the legacy finite-dimensional pilot files should not be
+viewed as authoritative for this namespace.
 -/
 
 namespace MIPStarRE.Paper2111
 
-/-- The architectural home of a milestone in the pilot formalization. -/
+/-- Architectural home of a strict-proof-following node. -/
 inductive Home where
+  | operatorAlgebra
   | quantum
   | codes
   | games
+  | combinatorics
+  | external
   | paper
   deriving DecidableEq, Repr
 
-/-- Progress marker for the scaffold. -/
-inductive Progress where
-  | scaffolded
-  | planned
+/-- How much support the current repository already provides for a strict node. -/
+inductive Support where
+  | reusableNow
+  | legacyPilot
+  | missing
   deriving DecidableEq, Repr
 
 /--
-Early targets from Sections 2--3 and the appendix.
+Strict dependency nodes for arXiv:2111.08131.
 
-These are the statements and interfaces we want to tackle before attempting the
-hard self-improvement and pasting arguments.
+The primary target is `thm:main` (Theorem 4.1). The secondary target is
+`thm:main-bipartite` (Theorem 4.7). We keep separate nodes for reusable assets
+already present in the repository, the operator-algebra layer that is still
+missing, and the paper-labelled theorem blocks.
 -/
-inductive EarlyResult where
-  | measurementBookkeeping
-  | dataProcessingConsistency
-  | consistencyToCloseness
-  | closenessToConsistency
+inductive StrictNode where
+  | answerRelabelingBookkeeping
+  | tracialStateAPI
+  | measurementPreliminaries
   | codeUniquenessFromDistance
-  | interpolableCodeInterface
-  | tensorCodeDistance
-  | tupleToCodeCorrespondence
-  | interpolableTupleExtension
-  | tensorCodeTestQuestions
-  | goodStrategyDefinition
-  | expanderLocalToGlobal
+  | interpolationInterface
+  | testGeometry
+  | tensorCodeFacts
+  | tracialStrategyLayer
+  | appendixExpander
+  | gridGraphSpectralGap
+  | externalProjectivization
+  | externalDuality
+  | section5Variance
+  | selfImprovement
+  | section6Commutativity
+  | section6Method1
+  | section6Method2
+  | pasting
+  | induction
+  | main
+  | bipartiteStrategyLayer
+  | externalAlmostSynchronous
+  | mainBipartite
   deriving DecidableEq, Repr
 
-/-- Harder future milestones from Sections 4--6. These remain explicit TODOs. -/
-inductive FutureResult where
-  | section4SelfImprovement
-  | section5Pasting
-  | section6Soundness
-  deriving DecidableEq, Repr
-
-/-- Where each early target should ultimately live. -/
-def earlyHome : EarlyResult → Home
-  | .measurementBookkeeping => .quantum
-  | .dataProcessingConsistency => .quantum
-  | .consistencyToCloseness => .quantum
-  | .closenessToConsistency => .quantum
+/-- Where each strict node should ultimately live. -/
+def nodeHome : StrictNode → Home
+  | .answerRelabelingBookkeeping => .quantum
+  | .tracialStateAPI => .operatorAlgebra
+  | .measurementPreliminaries => .quantum
   | .codeUniquenessFromDistance => .codes
-  | .interpolableCodeInterface => .codes
-  | .tensorCodeDistance => .codes
-  | .tupleToCodeCorrespondence => .codes
-  | .interpolableTupleExtension => .codes
-  | .tensorCodeTestQuestions => .games
-  | .goodStrategyDefinition => .games
-  | .expanderLocalToGlobal => .quantum
+  | .interpolationInterface => .codes
+  | .testGeometry => .games
+  | .tensorCodeFacts => .codes
+  | .tracialStrategyLayer => .games
+  | .appendixExpander => .combinatorics
+  | .gridGraphSpectralGap => .combinatorics
+  | .externalProjectivization => .external
+  | .externalDuality => .external
+  | .section5Variance => .paper
+  | .selfImprovement => .paper
+  | .section6Commutativity => .paper
+  | .section6Method1 => .paper
+  | .section6Method2 => .paper
+  | .pasting => .paper
+  | .induction => .paper
+  | .main => .paper
+  | .bipartiteStrategyLayer => .games
+  | .externalAlmostSynchronous => .external
+  | .mainBipartite => .paper
 
-/-- Current scaffold status for the early targets. -/
-def earlyProgress : EarlyResult → Progress
-  | .measurementBookkeeping => .scaffolded
-  | .dataProcessingConsistency => .planned
-  | .consistencyToCloseness => .planned
-  | .closenessToConsistency => .planned
-  | .codeUniquenessFromDistance => .scaffolded
-  | .interpolableCodeInterface => .scaffolded
-  | .tensorCodeDistance => .planned
-  | .tupleToCodeCorrespondence => .planned
-  | .interpolableTupleExtension => .planned
-  | .tensorCodeTestQuestions => .scaffolded
-  | .goodStrategyDefinition => .planned
-  | .expanderLocalToGlobal => .planned
+/-- Current support status for the strict branch. -/
+def currentSupport : StrictNode → Support
+  | .answerRelabelingBookkeeping => .reusableNow
+  | .tracialStateAPI => .missing
+  | .measurementPreliminaries => .legacyPilot
+  | .codeUniquenessFromDistance => .reusableNow
+  | .interpolationInterface => .reusableNow
+  | .testGeometry => .reusableNow
+  | .tensorCodeFacts => .missing
+  | .tracialStrategyLayer => .missing
+  | .appendixExpander => .missing
+  | .gridGraphSpectralGap => .missing
+  | .externalProjectivization => .missing
+  | .externalDuality => .missing
+  | .section5Variance => .missing
+  | .selfImprovement => .missing
+  | .section6Commutativity => .missing
+  | .section6Method1 => .missing
+  | .section6Method2 => .missing
+  | .pasting => .missing
+  | .induction => .missing
+  | .main => .missing
+  | .bipartiteStrategyLayer => .missing
+  | .externalAlmostSynchronous => .missing
+  | .mainBipartite => .missing
 
-/-- Dependency graph for the early Section 2--3 / appendix milestones. -/
-def earlyDependencies : EarlyResult → List EarlyResult
-  | .measurementBookkeeping => []
-  | .dataProcessingConsistency => [.measurementBookkeeping]
-  | .consistencyToCloseness => [.measurementBookkeeping]
-  | .closenessToConsistency => [.measurementBookkeeping]
+/--
+Dependencies for the strict branch.
+
+This is the paper-complete dependency graph, not merely the shortest path to
+`thm:main`: Method 1 remains listed because it is part of the paper as written,
+even though the final completeness argument in Section 6 proceeds through Method 2.
+-/
+def dependencies : StrictNode → List StrictNode
+  | .answerRelabelingBookkeeping => []
+  | .tracialStateAPI => []
+  | .measurementPreliminaries =>
+      [ .answerRelabelingBookkeeping
+      , .tracialStateAPI
+      ]
   | .codeUniquenessFromDistance => []
-  | .interpolableCodeInterface => [.codeUniquenessFromDistance]
-  | .tensorCodeDistance => [.codeUniquenessFromDistance]
-  | .tupleToCodeCorrespondence => [.codeUniquenessFromDistance, .tensorCodeDistance]
-  | .interpolableTupleExtension => [.interpolableCodeInterface, .tupleToCodeCorrespondence]
-  | .tensorCodeTestQuestions => [.tensorCodeDistance]
-  | .goodStrategyDefinition => [.measurementBookkeeping, .tensorCodeTestQuestions]
-  | .expanderLocalToGlobal => []
-
-/-- References to either an early milestone or a later TODO milestone. -/
-abbrev ResultRef := EarlyResult ⊕ FutureResult
-
-/-- Dependencies for the harder future sections; this is a TODO roadmap only. -/
-def futureDependencies : FutureResult → List ResultRef
-  | .section4SelfImprovement =>
-      [ Sum.inl .dataProcessingConsistency
-      , Sum.inl .consistencyToCloseness
-      , Sum.inl .closenessToConsistency
-      , Sum.inl .tensorCodeDistance
-      , Sum.inl .goodStrategyDefinition
-      , Sum.inl .expanderLocalToGlobal
+  | .interpolationInterface => [.codeUniquenessFromDistance]
+  | .testGeometry => []
+  | .tensorCodeFacts =>
+      [ .codeUniquenessFromDistance
+      , .interpolationInterface
+      , .testGeometry
       ]
-  | .section5Pasting =>
-      [ Sum.inr .section4SelfImprovement
-      , Sum.inl .tupleToCodeCorrespondence
-      , Sum.inl .interpolableTupleExtension
+  | .tracialStrategyLayer =>
+      [ .measurementPreliminaries
+      , .tensorCodeFacts
+      , .testGeometry
       ]
-  | .section6Soundness =>
-      [ Sum.inr .section5Pasting
-      , Sum.inl .goodStrategyDefinition
+  | .appendixExpander => []
+  | .gridGraphSpectralGap =>
+      [ .appendixExpander
+      , .testGeometry
+      ]
+  | .externalProjectivization => [.tracialStateAPI]
+  | .externalDuality => [.tracialStateAPI]
+  | .section5Variance =>
+      [ .tracialStrategyLayer
+      , .tensorCodeFacts
+      , .appendixExpander
+      , .gridGraphSpectralGap
+      ]
+  | .selfImprovement =>
+      [ .measurementPreliminaries
+      , .externalProjectivization
+      , .externalDuality
+      , .section5Variance
+      ]
+  | .section6Commutativity =>
+      [ .measurementPreliminaries
+      , .tracialStrategyLayer
+      ]
+  | .section6Method1 =>
+      [ .measurementPreliminaries
+      , .tensorCodeFacts
+      , .section6Commutativity
+      ]
+  | .section6Method2 =>
+      [ .measurementPreliminaries
+      , .tensorCodeFacts
+      , .section6Commutativity
+      ]
+  | .pasting =>
+      [ .section6Method1
+      , .section6Method2
+      ]
+  | .induction =>
+      [ .selfImprovement
+      , .pasting
+      ]
+  | .main => [.induction]
+  | .bipartiteStrategyLayer => [.testGeometry]
+  | .externalAlmostSynchronous => []
+  | .mainBipartite =>
+      [ .main
+      , .bipartiteStrategyLayer
+      , .externalAlmostSynchronous
       ]
 
-/-- The concrete early milestones currently represented in the scaffold. -/
-def scaffoldedNow : List EarlyResult :=
-  [ .measurementBookkeeping
+/-- Assets already present that are expected to survive into the strict branch. -/
+def reusableNow : List StrictNode :=
+  [ .answerRelabelingBookkeeping
   , .codeUniquenessFromDistance
-  , .interpolableCodeInterface
-  , .tensorCodeTestQuestions
+  , .interpolationInterface
+  , .testGeometry
   ]
 
-/-- TODO milestones from the paper's harder Sections 4--6. -/
-def laterTodo : List FutureResult :=
-  [ .section4SelfImprovement
-  , .section5Pasting
-  , .section6Soundness
+/--
+Nodes on the recommended first strict implementation sprint.
+
+These are the pieces that should stabilize before Section 5--6 theorem work
+becomes productive.
+-/
+def firstStrictSprint : List StrictNode :=
+  [ .tracialStateAPI
+  , .measurementPreliminaries
+  , .tensorCodeFacts
+  , .tracialStrategyLayer
+  , .appendixExpander
+  , .gridGraphSpectralGap
+  , .externalProjectivization
+  , .externalDuality
+  ]
+
+/-- The strict critical path from reusable preliminaries to `thm:main`. -/
+def criticalPathToMain : List StrictNode :=
+  [ .tracialStateAPI
+  , .measurementPreliminaries
+  , .tensorCodeFacts
+  , .tracialStrategyLayer
+  , .appendixExpander
+  , .gridGraphSpectralGap
+  , .externalProjectivization
+  , .externalDuality
+  , .section5Variance
+  , .selfImprovement
+  , .section6Commutativity
+  , .section6Method2
+  , .pasting
+  , .induction
+  , .main
+  ]
+
+/-- Paper-complete strict targets that remain to be formalized. -/
+def remainingPaperTodo : List StrictNode :=
+  [ .tracialStateAPI
+  , .measurementPreliminaries
+  , .tensorCodeFacts
+  , .tracialStrategyLayer
+  , .appendixExpander
+  , .gridGraphSpectralGap
+  , .externalProjectivization
+  , .externalDuality
+  , .section5Variance
+  , .selfImprovement
+  , .section6Commutativity
+  , .section6Method1
+  , .section6Method2
+  , .pasting
+  , .induction
+  , .main
+  , .bipartiteStrategyLayer
+  , .externalAlmostSynchronous
+  , .mainBipartite
   ]
 
 end MIPStarRE.Paper2111
