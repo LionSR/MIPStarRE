@@ -1,0 +1,215 @@
+\section{The test}\label{sec:the-test}
+
+\begin{definition}[Roles]
+The low individual degree test will be played between two provers and a verifier.
+The two provers are named Player~$\mathrm{A}$ and Player~$\mathrm{B}$.
+A \emph{role} $r$ is an element of the set $\{\mathrm{A}, \mathrm{B}\}$.
+Given a role~$r$, we write $\overline{r}$ for the other element of the set $\{\mathrm{A}, \mathrm{B}\}$.
+\end{definition}
+
+\begin{definition}[Low individual degree test]
+Let~$m$ and~$d$ be nonnegative integers.
+Let $q$ be a prime power.
+Then the \emph{$(m,q,d)$-low individual degree test}
+is stated in \Cref{fig:test}.
+\end{definition}
+
+{
+\floatstyle{boxed} 
+\restylefloat{figure}
+\begin{figure}
+With probability~$\tfrac{1}{3}$ each, perform one of the following three tests.
+\begin{enumerate}
+	\item \textbf{Axis-parallel lines test:}
+		Pick a uniformly random role $\br \sim \{\mathrm{A},\mathrm{B}\}$.
+		Let $\bu \sim \F_q^m$ be a uniformly random point.
+		Select $\bi \sim \{1, \ldots, m\}$ uniformly at random,
+		and let $\bell = \{\bu + t \cdot e_{\bi} \mid t \in \F_q\}$
+		be the axis-parallel line which passes through~$\bu$ in the $\bi$-th direction.
+		\begin{itemize}
+		\item[$\circ$] Player~$\br$: 
+			Give $\bell$;
+			receive the univariate degree-$d$ polynomial $\boldf:\bell \rightarrow \F_q$.
+		\item[$\circ$] Player~$\overline{\br}$:
+			Give $\bu$;
+			receive $\ba \in \F_q$.
+		\end{itemize}
+		Accept if $\boldf(\bu) = \ba$.
+	\item \textbf{Self-consistency test:}
+		Let $\bu \sim \F_q^m$ be a uniformly random point.
+		\begin{itemize}
+		\item[$\circ$] Player~$\mathrm{A}$: 
+			Give $\bu$;
+			receive $\ba \in \F_q$.
+		\item[$\circ$] Player~$\mathrm{B}$:
+			Give $\bu$;
+			receive $\bb \in \F_q$.
+		\end{itemize}
+		Accept if $\ba = \bb$.
+	\item \textbf{Diagonal lines test:}
+		Pick a uniformly random role $\br \sim \{\mathrm{A},\mathrm{B}\}$.
+		Let $\bu \sim \F_q^m$ be a uniformly random point.
+		Select $\bi \sim \{1, \ldots, m\}$ uniformly at random,
+		and let $\bv \in \F_q^m$ be a uniformly random point whose last $m - \bi$ coordinates are~$0$.
+		Finally,
+		let $\bell = \{\bu + t \cdot \bv \mid t \in \F_q\}$
+		be the line which passes through~$\bu$ in direction~$\bv$.
+		\begin{itemize}
+		\item[$\circ$] Player~$\br$: 
+			Give $\bell$;
+			receive the univariate degree-$md$ polynomial $\boldf:\bell \rightarrow \F_q$.
+		\item[$\circ$] Player~$\overline{\br}$:
+			Give $\bu$;
+			receive $\ba \in \F_q$.
+		\end{itemize}
+		Accept if $\boldf(\bu) = \ba$.
+	\end{enumerate}
+	\caption{The $(m,q,d)$-low individual degree test.\label{fig:test}}
+\end{figure}
+}
+
+An important class of strategies are those which are \emph{symmetric}.
+In this case, the bipartite state $\ket{\psi}$ Alice and Bob share is symmetric.
+Furthermore, for any question Alice and Bob receive, they apply the same measurement to their share of the state.
+This means that rather than, for example, keeping track of a separate points measurement for Alice and Bob,
+we can use a single measurement to refer to both of their strategies,
+and similarly for the axis-parallel lines and diagonal lines measurements.
+This is formalized in the following definition, where we also consider strategies which are projective.
+
+\begin{definition}[Symmetric, projective strategy]
+A \emph{symmetric, projective strategy} for the $(m,q, d)$-low individual degree test
+is a tuple $(\psi, A, B, L)$ defined as follows.
+\begin{itemize}
+\item[$\circ$] $\ket{\psi} \in \calH \ot \calH$ is a bipartite, permutation-invariant state.
+\item[$\circ$] $A = \{A^u_a\}$ contains a matrix for each $u \in \F_q^m$ and $a \in \F_q$.
+			For each $u$, $A^u$ is a projective measurement on~$\calH$.
+\item[$\circ$] $B = \{B^{\ell}_f\}$ contains a matrix for each axis-parallel line~$\ell$ in $\F_q^m$
+			and univariate degree-$d$ polynomial $f:\ell\rightarrow \F_q$.
+			For each $\ell$, $B^{\ell}$ is a projective measurement on~$\calH$.
+\item[$\circ$] $L = \{L^{\ell}_f\}$ contains a matrix for each line~$\ell$ in $\F_q^m$
+			and univariate degree-$md$ polynomial $f:\ell\rightarrow \F_q$.
+			For each $\ell$, $L^{\ell}$ is a projective measurement on~$\calH$.
+\end{itemize}
+\end{definition}
+
+We can also consider more general strategies which are no longer assumed to be symmetric.
+In this case, Players~$\mathrm{A}$ and~$\mathrm{B}$ each have their own versions of the measurements~$A$, $B$, and~$L$.
+
+\begin{definition}[General projective strategy]
+A \emph{projective strategy} for the $(m,q, d)$-low individual degree test
+is a tuple $(\psi, A^{\mathrm{A}},B^{\mathrm{A}},L^{\mathrm{A}},A^{\mathrm{B}},B^{\mathrm{B}},L^{\mathrm{B}})$ defined as follows.
+\begin{itemize}
+\item[$\circ$] $\ket{\psi} \in \calH_{\mathrm{A}} \ot \calH_{\mathrm{B}}$ is a bipartite state.
+\end{itemize}
+Furthermore, for each~$w \in \{\mathrm{A}, \mathrm{B}\}$:
+\begin{itemize}
+\item[$\circ$] $A^{w} = \{A^{w,u}_a\}$ contains a matrix for each $u \in \F_q^m$ and $a \in \F_q$.
+			For each $u$, $A^{w,u}$ is a projective measurement on~$\calH_{w}$.
+\item[$\circ$] $B^{w} = \{B^{w,\ell}_f\}$ contains a matrix for each axis-parallel line~$\ell$ in $\F_q^m$
+			and univariate degree-$d$ polynomial $f:\ell\rightarrow \F_q$.
+			For each $\ell$, $B^{w,\ell}$ is a projective measurement on~$\calH_{w}$.
+\item[$\circ$] $L^w = \{L^{w,\ell}_f\}$ contains a matrix for each line~$\ell$ in $\F_q^m$
+			and univariate degree-$md$ polynomial $f:\ell\rightarrow \F_q$.
+			For each $\ell$, $L^{w,\ell}$ is a projective measurement on~$\calH_{w}$.
+\end{itemize}
+\end{definition}
+
+\begin{remark}
+Throughout this work, we will only consider projective strategies.
+So we will henceforth use the terms ``strategy" and ``symmetric strategy'' to refer exclusively to projective strategies and symmetric, projective strategies, respectively.
+
+In addition, we will spend the vast majority of this work dealing solely with symmetric strategies, as they are notationally simpler to work with.
+Much of this work will focus on proving~\Cref{thm:main-induction},
+a variant of our main theorem for symmetric strategies.
+Our main theorem for general strategies, \Cref{thm:main-formal} below, will be proven in \Cref{sec:induction} by a standard reduction to the symmetric case.
+We will only see these more cumbersome-to-write general strategies
+in this section, where we state \Cref{thm:main-formal},
+and in \Cref{sec:induction}, where we carry out the reduction.
+\end{remark}
+
+\begin{definition}[Good strategy]
+A strategy is $(\eps, \delta, \gamma)$-good if it
+passes the axis-parallel lines test with probability at least $1-\eps$,
+the self consistency test with probability at least~$1-\delta$,
+and the diagonal lines test with probability at least~$1-\gamma$.
+\end{definition}
+
+\begin{remark}\label{rem:good-strat-characterization}
+Using notation which will be introduced in \Cref{sec:comparing-measurements} below,
+a symmetric strategy is $(\eps, \delta, \gamma)$-good
+if and only if it satisfies the following three conditions.
+For $\bell$ and $\bu$ as in the axis-parallel lines test,
+\begin{equation*}
+A^u_a \ot I \simeq_{\eps} I \ot B^{\ell}_{[f(u)=a]},
+\quad
+\text{and}
+\quad
+A^u_a \ot I \simeq_{\delta} I \ot A^u_a.
+\end{equation*}
+And for $\bell$ and $\bu$ as in the diagonal lines test,
+\begin{equation*}
+A^u_a \ot I \simeq_{\gamma} I \ot L^{\ell}_{[f(u)=a]}.
+\end{equation*}
+\end{remark}
+
+\begin{notation}\label{not:conditioned-on-last-direction}
+Our proof will be via induction,
+i.e.\ proving soundness of the $(m+1,q,d)$-low individual degree test
+using the soundness of the $(m,q,d)$-low individual degree test.
+To do this, we will frequently use the axis-parallel line test in the specific case of $i = m+1$.
+Thus, it will be convenient to introduce the following notation.
+Let $(\psi, A, B, L)$ be a symmetric strategy for the $(m+1, q, d)$-low individual degree test,
+Then for each $u \in \F_q^m$ we will write $B^u_f$ as shorthand for $B^{\ell}_f$,
+where $\ell = \{(u, x) \mid x \in \F_q\}$.
+For a function $f:\ell \rightarrow \F_q$,
+we will also sometimes write $f(x)$ as shorthand for $f(u,x)$.
+\end{notation}
+
+\begin{definition}
+Consider the $(m,q,d)$-low individual degree test.
+For $j \in \{1, \ldots, m\}$,
+we refer to the \emph{$j$-restricted diagonal lines test}
+as the diagonal lines test conditioned on $\bi = j$.
+For example, in the $m$-restricted diagonal lines test,
+the line $\bell$ is simply a uniformly random line in $\F_q^m$.
+\end{definition}
+
+Now we state our main theorem using notation which will be introduced in \Cref{sec:prelims} below.
+This the formal version of \Cref{thm:main-informal}.
+
+\begin{theorem}[Main theorem; quantum soundness of the low individual degree test]\label{thm:main-formal}
+  Consider a projective strategy $(\psi, A^{\mathrm{A}},B^{\mathrm{A}},L^{\mathrm{A}},A^{\mathrm{B}},B^{\mathrm{B}},L^{\mathrm{B}})$ 
+   which passes the  $(m,q,d)$-low individual degree test with probability at least $1-\eps$.
+  Let $k \geq md$ be an integer.
+  Let
+  \begin{equation*}
+  \nu = 100000 k^2m^4 \cdot \Big(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\Big).
+  \end{equation*}
+Then there exists projective measurements $G^{\mathrm{A}}, G^{\mathrm{B}} \in \polymeas{m}{q}{d}$ with the following properties:
+\begin{enumerate}
+  \item (Consistency with~$A$):  On average over $\bu \sim \F_q^{m}$,
+	  \begin{align*}
+	  A^{\mathrm{A},u}_a \otimes I
+	  	&\simeq_{\nu} I \otimes G^{\mathrm{B}}_{[g(u)=a]},\\
+	I \otimes A^{\mathrm{B},u}_a
+	  	&\simeq_{\nu}  G^{\mathrm{A}}_{[g(u)=a]} \ot I.
+	  \end{align*}
+\item (Self-consistency):
+	\begin{equation*}
+	G^{\mathrm{A}}_g \ot I \simeq_{\nu} I \ot G^{\mathrm{B}}_g.
+	\end{equation*}
+\end{enumerate}
+\end{theorem}
+
+We note that there is a tradeoff in \Cref{thm:main-formal} specified by the parameter~$k$.
+As~$k$ increases, $\nu$'s prefactor $k^2$ increases.
+On the other hand, as $k$ increases, the term $e^{- k/(2560000m^2)}$ which also occurs in $\nu$ \emph{decreases}.
+Thus, when applying this theorem, one must select~$k$ to balance these competing demands.
+Typically, choosing $k = \poly(m)$ should be more than sufficient for applications.
+We believe that this parameter~$k$ is an artifact of our proof,
+and we hope that it will be removed in the future.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "multilinearity"
+%%% End:

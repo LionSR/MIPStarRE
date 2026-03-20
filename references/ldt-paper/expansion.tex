@@ -1,0 +1,365 @@
+
+\section{Expansion in the hypercube graph}
+\label{sec:expansion}
+
+\begin{definition}[Hypercube graph]
+The \emph{hypercube graph} $C = (V,E)$ is the graph with vertex set $V = \F_q^m$ and an edge between $u, v \in V$ whenever $u$ and $v$ disagree in at most one coordinate (so that every vertex is connected to itself).
+A random edge in~$C$, denoted $(\bu, \bv) \sim C$,
+is distributed as follows:
+draw $\bu \sim \F_q^m$, $\bi \sim \{1, \ldots, m\}$,  and $\bx \sim \F_q$, all uniformly at random, and set $\bv = \bu + \bx \cdot e_{\bi}$.
+\end{definition}
+
+We will use $M$ to denote the number of vertices in~$C$, i.e.\ $M = q^m$.
+\ignore{
+We note that $|E| =\frac{1}{2} \cdot n N$.
+The following proposition gives a second interpretation for a uniformly random edge in~$C$.
+
+\begin{proposition}\label{prop:rerandomize-coord}
+The following two distributions are identical.
+\begin{enumerate}
+    \item Output $(\bu, \bv) \sim C$.
+    \item Draw $\bu \sim \F_q^n$, $\bi \sim [n]$,  and $\bx \sim \F_q$, all uniformly at random, and output
+    $(\bu, \bu + \bx \cdot e_{\bi})$.
+\end{enumerate}
+\end{proposition}
+}
+\subsection{Eigenvalues of the hypercube graph}
+
+\begin{definition}[Adjacency matrix]
+The \emph{normalized adjacency matrix of~$C$} is the matrix~$K$ defined as
+\begin{equation*}
+K =  \E_{(\bu, \bv) \sim C} \ket{\bu}\bra{\bv}.
+\end{equation*}
+The \emph{Laplacian of~$C$} is the matrix
+\begin{equation*}
+L = \frac{1}{M} \cdot I - K.
+\end{equation*}
+\end{definition}
+
+The following proposition gives another convenient way of writing the Laplacian of~$C$.
+
+\begin{proposition}\label{prop:laplacian-rewrite}
+$\displaystyle L = \frac{1}{2} \cdot \E_{(\bu, \bv) \sim C} (\ket{\bu} - \ket{\bv}) \cdot (\bra{\bu} - \bra{\bv}).$
+\end{proposition}
+\begin{proof}
+If we draw $(\bu, \bv) \sim C$, then both $\bu$ and~$\bv$ are distributed as uniformly random elements of~$\F_q^m$. As a result,
+\begin{equation*}
+\frac{1}{M} \cdot I = \E_{\bu \in \F_q^m} \ket{\bu}\bra{\bu} = \frac{1}{2}\cdot\E_{(\bu, \bv) \sim C}  \ket{\bu}\bra{\bu} + \ket{\bv}\bra{\bv}.
+\end{equation*}
+In addition, $(\bu, \bv)$ is distributed identically to $(\bv, \bu)$. As a result,
+\begin{equation*}
+K =  \E_{(\bu, \bv) \sim C} \ket{\bu}\bra{\bv} = \frac{1}{2} \cdot \E_{(\bu, \bv) \sim C} \ket{\bu}\bra{\bv} + \ket{\bv}\bra{\bu}.
+\end{equation*}
+Combining these two,
+\begin{equation*}
+L = \frac{1}{2}\cdot\E_{(\bu, \bv) \sim C} \left[\ket{\bu}\bra{\bu} + \ket{\bv}\bra{\bv} - \ket{\bu}\bra{\bv} - \ket{\bv}\bra{\bu}\right]
+= \frac{1}{2} \cdot \E_{(\bu, \bv) \sim C} (\ket{\bu} - \ket{\bv}) \cdot (\bra{\bu} - \bra{\bv}).\qedhere
+\end{equation*}
+\end{proof}
+
+The most important properties of the adjacency matrix are its eigenvalues and eigenvectors. These are provided in the next proposition, which is standard in the literature.
+
+\begin{proposition}\label{prop:eigenvectors}
+For each $\alpha \in \F_q^m$, define the vector
+\begin{equation*}
+\ket{\varphi_\alpha} := \frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} \omega^{\mathrm{tr}[u \cdot \alpha]}\cdot \ket{u}.
+\end{equation*}
+Then the following two statements are true.
+\begin{enumerate}
+\item The $\ket{\varphi_\alpha}$'s form an orthonormal basis of $\C^V$.\label{item:orthonormal}
+\item For each $\alpha \in \F_q^m$, $\ket{\varphi_\alpha}$ is an eigenvector for~$K$ with eigenvalue~$\frac{1}{M} \cdot  \frac{m - |\alpha|}{m}$,
+	where $|\alpha|$ is the number of nonzero coordinates in~$\alpha$.\label{item:eigenvector}
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+First, we prove \Cref{item:orthonormal}.
+Given $\alpha, \beta \in \F_q^m$,
+\begin{equation*}
+\braket{\varphi_\alpha \mid \varphi_\beta}
+= \frac{1}{M} \sum_{u \in \F_q^m} \omega^{\mathrm{tr}[u \cdot (\beta-\alpha)]}
+= \left\{\begin{array}{rl}
+	1 & \text{if } \alpha = \beta,\\
+	0 & \text{otherwise}.
+	\end{array} \right.\tag{by~\Cref{prop:fourier-fact-vector}}
+\end{equation*}
+As a result, the $\ket{\varphi_\alpha}$ vectors form an orthonormal basis of~$\C^V$.
+
+Next, we prove \Cref{item:eigenvector}.
+Given $\alpha \in \F_q^m$,
+\begin{equation}\label{eq:eigenvector-calculation}
+K \cdot \ket{\varphi_\alpha}
+= \left(\E_{(\bu, \bv) \sim C} \ket{\bu}\bra{\bv}\right) \cdot \bigg(\frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} \omega^{\mathrm{tr}[u \cdot \alpha]}\cdot \ket{u}\bigg)\\
+= \frac{1}{M^{1/2}} \cdot \E_{(\bu, \bv) \sim C} \omega^{\mathrm{tr}[\bv \cdot \alpha]} \ket{\bu}.
+\end{equation}
+By definition of a random edge,
+we can replace~$\bv$ with $\bu + \bx \cdot e_{\bi}$, where $\bi$ is a uniformly random index in $\{1, \ldots, m\}$ and $\bx$ is a uniformly random element of $\F_q$.
+As a result,
+\begin{equation*}
+\eqref{eq:eigenvector-calculation} 
+= \frac{1}{M^{1/2}} \cdot \E_{\bu,\bi, \bx} \omega^{\mathrm{tr}[(\bu + \bx \cdot e_{\bi}) \cdot \alpha]} \ket{\bu}
+= \left(\E_{\bi, \bx}\omega^{\mathrm{tr}[(\bx \cdot e_{\bi}) \cdot \alpha]}\right)  \cdot \frac{1}{M^{1/2}} \cdot \E_{\bu} \omega^{\mathrm{tr}[\bu \cdot \alpha]} \ket{\bu}
+= \frac{1}{M}\left(\E_{\bi, \bx}\omega^{\mathrm{tr}[\bx \cdot \alpha_{\bi}]}\right)  \cdot \ket{\varphi_\alpha}.
+\end{equation*}
+Hence, $\ket{\varphi_\alpha}$ is an eigenvector of~$K$ with eigenvalue
+\begin{equation*}
+\frac{1}{M} \cdot \E_{\bi} \left[\E_{\bx}\omega^{\mathrm{tr}[\bx \cdot \alpha_{\bi}]}\right]
+= \frac{1}{M} \cdot \E_{\bi} \left[\bone[\alpha_{\bi} = 0]\right]
+= \frac{1}{M} \cdot  \frac{m - |\alpha|}{m}. \tag{by~\Cref{prop:fourier-fact-scalar}}
+\end{equation*}
+This concludes the proof.
+\end{proof}
+
+We will use the following corollary of \Cref{prop:eigenvectors}.
+
+\begin{corollary}\label{cor:laplacian-spectral-gap}
+Let $\lambda_1 \leq \lambda_2 \leq \cdots \leq \lambda_M$ be the eigenvalues of~$L$. Then $\lambda_1 = 0$ and $\lambda_2 = \frac{1}{m M}$.
+\end{corollary}
+\begin{proof}
+Let $\mu_1 \geq \mu_2 \geq \cdots \geq \mu_M$ be the eigenvalues of~$K$. Then $\mu_i = \frac{1}{M} - \lambda_i$.
+Thus, it suffices to show that $\mu_1 = \frac{1}{M}$ and $\mu_2 = \frac{1}{M} \cdot \frac{m-1}{m}$.
+By \Cref{prop:eigenvectors}, $\ket{\varphi_\alpha}$ has eigenvalue $\frac{1}{M}$ when $|\alpha| = 0$ and eigenvalue $\frac{1}{M} \cdot \frac{m-1}{m}$ when $|\alpha| =1$.
+\end{proof}
+
+
+
+\subsection{Local and global variance}
+
+In this section, $\ket{\psi}$ will denote a vector (not necessarily normalized) in $\calH_A \otimes \calH_B$,
+and for each $u \in \F_q^m$, $0 \leq A^u \leq I$ will be a matrix acting on $\calH_A$.
+
+\begin{definition}\label{def:local-and-variance}
+The \emph{local variance of~$A$ on $\ket{\psi}$} is defined as
+\begin{equation*}
+\mathbf{Var}_{\mathrm{local}}(A, \psi):=\frac{1}{2} \cdot\E_{(\bu, \bv) \sim C} \bra{\psi} (A^{\bu} - A^{\bv})^2 \otimes I \ket{\psi}.
+\end{equation*}
+The \emph{global variance of~$A$ on $\ket{\psi}$} is defined as
+\begin{equation*}
+\mathbf{Var}_{\mathrm{global}}(A, \psi):=\frac{1}{2} \cdot\E_{\bu, \bv \sim \F_q^m} \bra{\psi} (A^{\bu} - A^{\bv})^2 \otimes I \ket{\psi}.
+\end{equation*}
+\end{definition}
+
+The global variance differs from the local variance
+because $\bu, \bv$ are chosen independently from~$\F_q^m$
+rather than from the edges of $C$.
+A standard fact from spectral graph theory allows us to 
+use the expansion of $C$ to relate these two quantities.
+
+\begin{lemma}\label{lem:local-to-global}
+$\displaystyle
+\mathbf{Var}_{\mathrm{global}}(A, \psi) \leq  m \cdot \mathbf{Var}_{\mathrm{local}}(A,\psi).
+$
+\end{lemma}
+
+Before proving \Cref{lem:local-to-global},
+we will give nice expressions for the local and global variances.
+To begin, we show how to rewrite the local variance in terms of the Laplacian of~$C$.
+
+\begin{lemma}\label{lem:local-rewrite}
+Define the matrix
+\begin{equation*}
+A_{\mathrm{combine}} = \sum_{u \in \F_q^m} \ket{u} \otimes A^u \otimes I.
+\end{equation*}
+Then
+\begin{equation*}
+\mathrm{Tr}(A_{\mathrm{combine}}^\dagger \cdot (L \otimes \ket{\psi}\bra{\psi}) \cdot A_{\mathrm{combine}})= \mathbf{Var}_{\mathrm{local}}(A, \psi).
+\end{equation*}
+\end{lemma}
+\begin{proof}
+For any $u, v \in \F_q^m$,
+\begin{align}
+((\bra{u} - \bra{v}) \otimes \bra{\psi})\cdot A_{\mathrm{combine}}
+&= ((\bra{u} - \bra{v}) \otimes \bra{\psi})\cdot \sum_{w \in \F_q^m} \ket{w} \otimes A^w \otimes I\nonumber\\
+&=  \bra{\psi}\cdot  ((A^u- A^v) \otimes I).\label{eq:reader-probably-has-no-idea-whats-going-on-yet}
+\end{align}
+As a result,
+\begin{align*}
+&A_{\mathrm{combine}}^\dagger \cdot L \otimes \ket{\psi}\bra{\psi} \cdot A_{\mathrm{combine}}\\
+=~& \frac{1}{2} \cdot \E_{(\bu, \bv) \sim C} A_{\mathrm{combine}}^\dagger ((\ket{\bu} - \ket{\bv}) \cdot (\bra{\bu} - \bra{\bv})\otimes \ket{\psi} \bra{\psi})\cdot A_{\mathrm{combine}}\tag{by \Cref{prop:laplacian-rewrite}}\\
+=~&  \frac{1}{2} \cdot \E_{(\bu, \bv) \sim C} ((A^{\bu} - A^{\bv}) \otimes I) \cdot \ket{\psi}\bra{\psi} \cdot ((A^{\bu} - A^{\bv}) \otimes I). \tag{by \eqref{eq:reader-probably-has-no-idea-whats-going-on-yet}}
+\end{align*}
+Thus, if we take the trace,
+\begin{equation*}
+\mathrm{Tr}(A_{\mathrm{combine}}^\dagger \cdot (L \otimes \ket{\psi}\bra{\psi}) \cdot A_{\mathrm{combine}})
+= \frac{1}{2} \cdot \E_{(\bu, \bv) \sim C} \bra{\psi} (A^{\bu} - A^{\bv})^2 \otimes I \cdot \ket{\psi}
+= \mathbf{Var}_{\mathrm{local}}(A, \psi).
+\end{equation*}
+This completes the proof.
+\end{proof}
+
+Next, we give a simple expression for the global variance.
+
+\begin{lemma}\label{lem:global-rewrite}
+Expand $A_{\mathrm{combine}}$ as
+\begin{equation*}
+A_{\mathrm{combine}} = \ket{\varphi_0} \otimes A_0 + \ket{\varphi_{\perp}} \otimes A_{\perp},
+\end{equation*}
+where $\ket{\varphi_{\perp}}$ is orthogonal to $\ket{\varphi_0}$.
+(Here we are writing $\ket{\varphi_0}$ for the vector $\ket{\varphi_\alpha}$ from \Cref{prop:eigenvectors} in the case of $\alpha = (0, \ldots, 0)$.)
+Then
+\begin{equation*}
+\frac{1}{M} \cdot \mathrm{Tr}(\bra{\varphi_{\perp}} \otimes A_{\perp} \cdot (I \otimes \ket{\psi}\bra{\psi}) \cdot \ket{\varphi_{\perp}} \otimes A_{\perp})= \mathbf{Var}_{\mathrm{global}}(A, \psi).
+\end{equation*}
+\end{lemma}
+\begin{proof}
+We begin by computing~$A_0$:
+\begin{equation*}
+A_0
+= \bra{\varphi_0} \otimes I \cdot A_{\mathrm{combine}}
+= \bigg(\frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} \bra{u}\bigg) \otimes I \cdot \bigg(\sum_{u \in \F_q^m} \ket{u} \otimes A^u \otimes I\bigg)
+= \frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} A^u \otimes I.
+\end{equation*}
+Then
+\begin{align*}
+\ket{\varphi_0} \otimes A_0
+= \bigg(\frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} \ket{u}\bigg)\otimes \bigg(\frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} A^u \otimes I\bigg)
+&= \frac{1}{M} \sum_{u \in \F_q^m} \ket{u} \otimes \sum_{v \in \F_q^m} A^v \otimes I\\
+&= \sum_{u \in \F_q^m} \ket{u} \otimes A_{\mathrm{avg}} \otimes I,
+\end{align*}
+where we have written $A_{\mathrm{avg}} = \E_{\bu} A^{\bu}$.
+As a result,
+\begin{equation*}
+\ket{\varphi_{\perp}} \otimes A_{\perp}
+= A_{\mathrm{combine}} - \ket{\varphi_0} \otimes A_0
+= \sum_{u \in \F_q^n} \ket{u} \otimes (A^u - A_{\mathrm{avg}}) \otimes I.
+\end{equation*}
+Thus,
+\begin{align*}
+&\bra{\varphi_{\perp}} \otimes A_{\perp} \cdot (I \otimes \ket{\psi}\bra{\psi}) \cdot \ket{\varphi_{\perp}} \otimes A_{\perp}\\
+=&\sum_{u, v \in \F_q^m} \braket{u \mid v} \otimes ((A^u - A_{\mathrm{avg}}) \otimes I) \cdot \ket{\psi}\bra{\psi} \cdot ((A^v - A_{\mathrm{avg}}) \otimes I)\\
+=&\sum_{u \in \F_q^m}  ((A^u - A_{\mathrm{avg}}) \otimes I) \cdot \ket{\psi}\bra{\psi} \cdot ((A^u - A_{\mathrm{avg}}) \otimes I).
+\end{align*}
+As a result, if we take the trace,
+\begin{equation}\label{eq:just-took-trace}
+\frac{1}{M} \cdot \mathrm{Tr}(\bra{\varphi_{\perp}} \otimes A_{\perp} \cdot (I \otimes \ket{\psi}\bra{\psi}) \cdot \ket{\varphi_{\perp}} \otimes A_{\perp})
+= \E_{\bu \sim \F_q^m} \bra{\psi} (A^{\bu} - A_{\mathrm{avg}})^2 \otimes I \ket{\psi}.
+\end{equation}
+We can rewrite the squared expression as
+\begin{align*}
+\E_{\bu \sim \F_q^m}(A^{\bu} - A_{\mathrm{avg}})^2
+&= \E_{\bu \sim \F_q^m}((A^{\bu})^2 + (A_{\mathrm{avg}})^2 - A^{\bu} \cdot A_{\mathrm{avg}} - A_{\mathrm{avg}} \cdot A^{\bu})\\
+&= \E_{\bu \sim \F_q^m}((A^{\bu})^2 - (A_{\mathrm{avg}})^2)\\
+&= \frac{1}{2}\cdot\E_{\bu, \bv \sim \F_q^m}((A^{\bu})^2 + (A^{\bv})^2 - A^{\bu} \cdot A^{\bv} - A^{\bv} \cdot A^{\bu})\\
+&= \frac{1}{2}\cdot\E_{\bu, \bv \sim \F_q^m}(A^{\bu} - A^{\bv})^2.
+\end{align*}
+Thus,
+\begin{equation*}
+\eqref{eq:just-took-trace}
+= \frac{1}{2} \cdot\E_{\bu, \bv \sim \F_q^m} \bra{\psi} (A^{\bu} - A^{\bv})^2 \otimes I \ket{\psi}
+= \mathbf{Var}_{\mathrm{global}}(A, \psi).
+\end{equation*}
+This completes the proof.
+\end{proof}
+
+Now we prove \Cref{lem:local-to-global}.
+
+\begin{proof}[Proof of \Cref{lem:local-to-global}]
+We begin by computing
+\begin{align}
+A_{\mathrm{combine}}^\dagger \cdot L \otimes \ket{\psi}\bra{\psi} \cdot A_{\mathrm{combine}}
+ &=(\bra{\varphi_0} \otimes A_0 + \bra{\varphi_{\perp}} \otimes A_{\perp}) \cdot L \otimes \ket{\psi}\bra{\psi} \cdot (\ket{\varphi_0} \otimes A_0 + \ket{\varphi_{\perp}} \otimes A_{\perp})\nonumber\\
+  &=\bra{\varphi_{\perp}} \otimes A_{\perp} \cdot L \otimes \ket{\psi}\bra{\psi} \cdot \ket{\varphi_{\perp}} \otimes A_{\perp} \nonumber\\
+  & = \bra{\varphi_{\perp}} L \ket{\varphi_{\perp}} \cdot A_{\perp}  \ket{\psi}\bra{\psi}  A_{\perp} ,\label{eq:used-0-eigenvector}
+\end{align}
+where the second step follows from the fact that $\ket{\varphi_{0}}$ is a $0$-eigenvector for $L$.
+Note that because $\ket{\varphi_{\perp}}$ is orthogonal to $\ket{\varphi_0}$,
+\begin{equation*}
+\bra{\varphi_{\perp}} L \ket{\varphi_{\perp}} \geq \frac{1}{mM} \cdot \braket{\varphi_{\perp} \mid \varphi_{\perp}}
+\end{equation*}
+by \Cref{cor:laplacian-spectral-gap}.
+As a result,
+\begin{align*}
+ \mathbf{Var}_{\mathrm{local}}(A,\psi) 
+ & = \mathrm{Tr}(A_{\mathrm{combine}}^\dagger \cdot L \otimes \ket{\psi}\bra{\psi} \cdot A_{\mathrm{combine}}) \tag{by \Cref{lem:local-rewrite}}\\
+  & = \bra{\varphi_{\perp}} L \ket{\varphi_{\perp}} \cdot \mathrm{Tr}(A_{\perp} \cdot  \ket{\psi}\bra{\psi} \cdot  A_{\perp}) \tag{by \Cref{eq:used-0-eigenvector}}\\
+  & \geq \frac{1}{mM} \cdot \braket{\varphi_{\perp} \mid \varphi_{\perp}} \cdot \mathrm{Tr}(A_{\perp} \cdot  \ket{\psi}\bra{\psi} \cdot  A_{\perp})\\
+    & = \frac{1}{mM} \cdot \mathrm{Tr}(\bra{\varphi_{\perp}} \otimes A_{\perp} \cdot (I \otimes \ket{\psi}\bra{\psi}) \cdot \ket{\varphi_{\perp}} \otimes A_{\perp})\\
+    &=  \frac{1}{m} \cdot \mathbf{Var}_{\mathrm{global}}(A,\psi) . \tag{by \Cref{lem:global-rewrite}}
+\end{align*}
+This concludes the proof.
+\end{proof}
+
+\section{Global variance of the points measurements}
+\label{sec:variance}
+Throughout this section, $(\psi, A, B, L)$ will denote a fixed $(\eps, \delta, \gamma)$-good symmetric strategy for the $(m,q,d)$-low individual degree test.
+
+\begin{lemma}\label{lem:generalize-b}
+Let $G \in \polysub{m}{q}{d}$. Then
+\begin{equation*}
+B^\ell_{[f(u) = g(u)]} \otimes (G_g)^{1/2} \approx_{md/q} B^\ell_{g|_\ell} \otimes (G_g)^{1/2}
+\end{equation*}
+on the axis-parallel lines test distribution.
+\end{lemma}
+\begin{proof}
+We want to bound the quantity
+\begin{align*}
+&~\E_{\bu, \bell} \sum_{g \in \polyfunc{m}{d}{q}} \Vert (B^{\bell}_{[f(\bu) = g(\bu)]}  - B^{\bell}_{g|_{\bell}}) \otimes (G_g)^{1/2} \ket{\psi}\Vert^2\\
+=&~\E_{\bu, \bell} \sum_{g \in \polyfunc{m}{d}{q}} \bra{\psi} \bigg(\sum_{f : f \neq g|_{\bell}} \bone[f(\bu) = g(\bu)] \cdot B^{\bell}_f\bigg)^2 \otimes G_g \ket{\psi}\\
+\leq&~\E_{\bu, \bell} \sum_{g \in \polyfunc{m}{d}{q}} \bra{\psi} \bigg(\sum_{f : f \neq g|_{\bell}} \bone[f(\bu) = g(\bu)] \cdot B^{\bell}_f\bigg) \otimes G_g \ket{\psi} \\
+= &~\E_{\bell} \sum_{g \in \polyfunc{m}{d}{q}} \sum_{f : f \neq g|_{\bell}} \bra{\psi}  B^{\bell}_f \otimes G_g \ket{\psi} \cdot \left( \E_{\bu} \bone[f(\bu) = g(\bu)]\right)\\
+\leq &~\E_{\bell} \sum_{g \in \polyfunc{m}{d}{q}} \sum_{f : f \neq g|_{\bell}} \bra{\psi}  B^{\bell}_f \otimes G_g \ket{\psi} \cdot \frac{md}{q}\tag{by Schwartz-Zippel}\\
+\leq &~\frac{md}{q}.\qedhere
+\end{align*}
+\end{proof}
+
+\begin{lemma}\label{lem:local-variance-of-points}
+Let $G \in \polysub{m}{q}{d}$.  Then
+\begin{equation}\label{eq:local-variance-of-points-equation}
+A^u_{g(u)} \otimes (G_g)^{1/2} \approx_{24\cdot(\eps + \delta + \frac{md}{q})} A^v_{g(v)} \otimes (G_g)^{1/2}
+\end{equation}
+on the distribution $(\bu, \bv) \sim C$.
+\end{lemma}
+\begin{proof}
+Let $\bu$ and $\bell$ be distributed as in the axis-parallel lines test,
+and sample $\bv \sim \bell$.
+Then $\bv$ and $\bell$ are also distributed as in the axis-parallel lines test.
+As a result,
+\begin{align*}
+A^u_{g(u)} \otimes (G_g)^{1/2}
+&\approx_{2\delta} I \otimes (G_g)^{1/2} A^u_{g(u)}\tag{by \Cref{prop:simeq-to-approx}}\\
+&\approx_{2\eps} B^\ell_{[f(u) = g(u)]} \otimes (G_g)^{1/2}\tag{by \Cref{prop:simeq-to-approx}}\\
+&\approx_{\frac{md}{q}} B^\ell_{g|_{\ell}} \otimes (G_g)^{1/2}\tag{by \Cref{lem:generalize-b}}\\
+&\approx_{\frac{md}{q}} B^\ell_{[f(v) = g(v)]} \otimes (G_g)^{1/2}\tag{by \Cref{lem:generalize-b}}\\
+&\approx_{2\eps} I \otimes (G_g)^{1/2} A^v_{g(v)} \tag{by \Cref{prop:simeq-to-approx}}\\
+&\approx_{2\delta} A^v_{g(v)} \otimes (G_g)^{1/2}.\tag{by \Cref{prop:simeq-to-approx}}
+\end{align*}
+Steps 1, 2, 5, and 6 are also using \Cref{rem:good-strat-characterization,prop:cab-approx-delta}.
+The lemma now follows from \Cref{prop:triangle-inequality-for-approx_delta}.
+\end{proof}
+
+We note that \Cref{eq:local-variance-of-points-equation} is equivalent to the statement that
+\begin{equation}\label{eq:equivalent-local-variance}
+\sum_{g \in \polyfunc{m}{q}{d}}\E_{(\bu, \bv) \sim C} \bra{\psi} (A^{\bu}_{g(\bu)}  - A^{\bv}_{g(\bv)})^2 \otimes G_g \ket{\psi}
+\leq 24\left(\eps + \delta + \frac{md}{q}\right).
+\end{equation}
+This can be viewed as a form of local variance for the points measurements.
+We now derive the corresponding expression for the global variance of the points measurements.
+
+\begin{lemma}\label{lem:global-variance-of-points}
+Let $G \in \polysub{m}{q}{d}$.  Then
+\begin{equation}\label{eq:global-variance-of-points-equation}
+A^u_{g(u)} \otimes (G_g)^{1/2} \approx_{24m\cdot(\eps + \delta + \frac{md}{q})} A^v_{g(v)} \otimes (G_g)^{1/2}
+\end{equation}
+on the distribution $\bu, \bv \sim \F_q^m$.
+\end{lemma}
+\begin{proof}
+We want to bound 
+\begin{equation}\label{eq:TODO:bound-this!}
+\E_{\bu, \bv \sim \F_q^m} \sum_{g \in \polyfunc{m}{q}{d}} \Vert (A^{\bu}_{g(\bu)}  - A^{\bv}_{g(\bv)} ) \otimes (G_g)^{1/2} \ket{\psi}\Vert^2
+= \E_{\bu, \bv \sim \F_q^m} \sum_{g \in \polyfunc{m}{q}{d}} \bra{\psi} (A^{\bu}_{g(\bu)}  - A^{\bv}_{g(\bv)} )^2 \otimes G_g \ket{\psi}.
+\end{equation}
+For each $g \in \polyfunc{m}{q}{d}$, define
+\begin{equation*}
+\forall u \in \F_q^m, ~ A(g)^u := A^u_{g(u)}, \qquad \text{and} \qquad \ket{\psi_g} := I \otimes (G_g)^{1/2} \ket{\psi}.
+\end{equation*}
+Then
+\begin{align*}
+\eqref{eq:TODO:bound-this!}
+& = \sum_{g \in \polyfunc{m}{q}{d}}\E_{\bu, \bv \sim \F_q^n} \bra{\psi_g} (A(g)^{\bu}  - A(g)^{\bv})^2 \otimes I \ket{\psi_g}\\
+& = \sum_{g \in \polyfunc{m}{q}{d}}2\cdot  \mathbf{Var}_{\mathrm{global}}(A(g), \psi_g)\\
+& \leq \sum_{g \in \polyfunc{m}{q}{d}}2m\cdot \mathbf{Var}_{\mathrm{local}}(A(g), \psi_g)\tag{by \Cref{lem:local-to-global}}\\
+& = m \cdot \sum_{g \in \polyfunc{m}{q}{d}}\E_{(\bu, \bv) \sim C} \bra{\psi_g} (A(g)^{\bu}  - A(g)^{\bv})^2 \otimes I \ket{\psi_g}\\
+& = m \cdot \sum_{g \in \polyfunc{m}{q}{d}}\E_{(\bu, \bv) \sim C} \bra{\psi} (A^{\bu}_{g(\bu)}  - A^{\bv}_{g(\bv)})^2 \otimes G_g \ket{\psi}\\
+& \leq m \cdot 24\left(\eps + \delta + \frac{md}{q}\right).\tag{by \Cref{eq:equivalent-local-variance}}
+\end{align*}
+This concludes the proof.
+\end{proof}

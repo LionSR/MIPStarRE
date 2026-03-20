@@ -1,0 +1,272 @@
+\usepackage{amsmath,amssymb,amsthm,amsfonts,latexsym,bbm,xspace,graphicx,float,mathtools,braket,}
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage[backref,colorlinks,citecolor=blue,,linkcolor=magenta,bookmarks=true]{hyperref}
+\usepackage{enumitem}
+\usepackage[nameinlink,capitalize]{cleveref}
+%\usepackage[protrusion=true,expansion=true]{microtype}   % slows compilation a lot
+
+%\usepackage[T1]{fontenc}
+%\usepackage{fouriernc}
+%\usepackage[mathscr]{euscript}
+
+\usepackage[colorinlistoftodos]{todonotes}
+%\hfuzz2pt % Don't bother to report over-full boxes if over-edge is < 2pt
+
+
+% environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem*{namedtheorem}{\theoremname}
+\newcommand{\theoremname}{testing}
+\newenvironment{named}[1]{ \renewcommand{\theoremname}{#1} \begin{namedtheorem}} {\end{namedtheorem}}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{proposition}[theorem]{Proposition}
+%\newtheorem{fact}[theorem]{Fun Fact}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{infthm}[theorem]{Informal Theorem}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{infdef}[theorem]{Informal Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{examples}[theorem]{Examples}
+
+
+
+%%%%%%%%%%%% Generic math macros %%%%%%%%%%%%
+
+% probability and other mathops
+\renewcommand{\Pr}{\mathop{\bf Pr\/}}
+\newcommand{\E}{\mathop{\bf E\/}}
+\newcommand{\Ex}{\mathop{\bf E\/}}
+\newcommand{\Es}[1]{\mathop{\bf E\/}_{{\substack{#1}}}}            % any reason not to just shove this directly into \Ex?
+\newcommand{\Var}{\mathop{\bf Var\/}}
+\newcommand{\Cov}{\mathop{\bf Cov\/}}
+\newcommand{\stddev}{\mathop{\bf stddev\/}}
+\newcommand{\littlesum}{\mathop{{\textstyle \sum}}}
+\newcommand{\littleprod}{\mathop{{\textstyle \prod}}}
+\newcommand{\apx}{\mathop{\approx}}
+
+
+% mathrm terms           % should these be DeclareMathOperatored?
+\newcommand{\tr}{\mathrm{tr}} \newcommand{\Tr}{\tr} \newcommand{\trace}{\tr}
+\newcommand{\poly}{\mathrm{poly}}
+\newcommand{\polylog}{\mathrm{polylog}}
+\newcommand{\size}{\mathrm{size}}
+\newcommand{\avg}{\mathop{\mathrm{avg}}}
+\newcommand{\odd}{\mathrm{odd}}
+\newcommand{\even}{\mathrm{even}}
+\newcommand{\sgn}{\mathrm{sgn}}
+\newcommand{\dist}{\mathrm{dist}}
+\newcommand{\hamdist}{\mathrm{Dist}}
+\newcommand{\step}{\mathrm{step}}
+\newcommand{\spn}{\mathrm{span}}
+\newcommand{\supp}{\mathrm{supp}}
+\newcommand{\Aut}{\mathrm{Aut}}
+\newcommand{\codim}{\operatorname{codim}}
+
+
+% number systems
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\F}{\mathbb F}
+\newcommand{\Q}{\mathbb Q}
+
+% complexity classes
+\newcommand{\PTIME}{\mathsf{P}}
+\newcommand{\NP}{\mathsf{NP}} \newcommand{\np}{\NP}
+\newcommand{\TC}{\mathsf{TC}}
+\newcommand{\AC}{\mathsf{AC}}
+\newcommand{\EXP}{\mathsf{EXP}}
+\newcommand{\NEXP}{\mathsf{NEXP}} \newcommand{\nexp}{\NEXP}
+\newcommand{\NEEXP}{\mathsf{NEEXP}} \newcommand{\neexp}{\NEEXP}
+\newcommand{\NTIME}{\mathsf{NTIME}}\newcommand{\ntime}{\NTIME}
+\newcommand{\MIP}{\mathsf{MIP}} \newcommand{\mip}{\MIP}
+
+\newcommand{\QMA}{\mathsf{QMA}}
+\newcommand{\QIP}{\mathsf{QIP}}
+\newcommand{\IP}{\mathsf{IP}}
+\newcommand{\PSPACE}{\mathsf{PSPACE}}
+\newcommand{\PP}{\mathsf{PP}}
+
+% short forms
+\newcommand{\eps}{\epsilon}
+\newcommand{\lam}{\lambda}
+\newcommand{\dleta}{\delta}
+\newcommand{\vphi}{\varphi}
+\newcommand{\bdry}{\partial}
+\newcommand{\la}{\langle}
+\newcommand{\ra}{\rangle}
+\newcommand{\lv}{\lvert}
+\newcommand{\rv}{\rvert}
+\newcommand{\lV}{\lVert}
+\newcommand{\rV}{\rVert}
+\newcommand{\wt}[1]{\widetilde{#1}}
+\newcommand{\wh}[1]{\widehat{#1}}
+\newcommand{\ul}[1]{\underline{#1}}
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\ot}{\otimes}
+\newcommand{\Ra}{\Rightarrow}
+\newcommand{\zo}{\{0,1\}}
+\newcommand{\co}{:}                       %\newcommand{\co}{\colon}
+\newcommand{\half}{\tfrac{1}{2}}
+\newcommand{\bits}{\{-1,1\}}
+\newcommand{\tf}{\{\true, \false\}}
+
+% calligraphic letters
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calE}{\mathcal{E}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calI}{\mathcal{I}}
+\newcommand{\calJ}{\mathcal{J}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\calQ}{\mathcal{Q}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calT}{\mathcal{T}}
+\newcommand{\calU}{\mathcal{U}}
+\newcommand{\calV}{\mathcal{V}}
+\newcommand{\calW}{\mathcal{W}}
+\newcommand{\calX}{\mathcal{X}}
+\newcommand{\calY}{\mathcal{Y}}
+\newcommand{\calZ}{\mathcal{Z}}
+
+% bold
+\newcommand{\bone}{\boldsymbol{1}}
+\newcommand{\balpha}{\boldsymbol{\alpha}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\bdelta}{\boldsymbol{\delta}}
+\newcommand{\bgamma}{\boldsymbol{\gamma}}
+\newcommand{\bomega}{\boldsymbol{\omega}}
+\newcommand{\bpi}{\boldsymbol{\pi}}
+\newcommand{\bphi}{\boldsymbol{\phi}}
+\newcommand{\bvphi}{\boldsymbol{\varphi}}
+\newcommand{\blambda}{\boldsymbol{\lambda}}
+\newcommand{\bmu}{\boldsymbol{\mu}}
+\newcommand{\bnu}{\boldsymbol{\nu}}
+\newcommand{\bpsi}{\boldsymbol{\psi}}
+\newcommand{\bsigma}{\boldsymbol{\sigma}}
+\newcommand{\btau}{\boldsymbol{\tau}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\bxi}{\boldsymbol{\xi}}
+\newcommand{\bzeta}{\boldsymbol{\zeta}}
+\newcommand{\ba}{\boldsymbol{a}}
+\newcommand{\bb}{\boldsymbol{b}}
+\newcommand{\bc}{\boldsymbol{c}}
+\newcommand{\boldf}{\boldsymbol{f}}
+\newcommand{\bg}{\boldsymbol{g}}
+\newcommand{\bh}{\boldsymbol{h}}
+\newcommand{\bi}{\boldsymbol{i}}
+\newcommand{\bj}{\boldsymbol{j}}
+\newcommand{\bk}{\boldsymbol{k}}
+\newcommand{\bell}{\boldsymbol{\ell}}
+\newcommand{\bm}{\boldsymbol{m}}
+\newcommand{\bn}{\boldsymbol{n}}
+\newcommand{\bp}{\boldsymbol{p}}
+\newcommand{\bq}{\boldsymbol{q}}
+\newcommand{\br}{\boldsymbol{r}}
+\newcommand{\bs}{\boldsymbol{s}}
+\newcommand{\bt}{\boldsymbol{t}}
+\newcommand{\bu}{\boldsymbol{u}}
+\newcommand{\bv}{\boldsymbol{v}}
+\newcommand{\bw}{\boldsymbol{w}}
+\newcommand{\bx}{{\boldsymbol{x}}}
+\newcommand{\by}{\boldsymbol{y}}
+\newcommand{\bz}{\boldsymbol{z}}
+\newcommand{\bA}{\boldsymbol{A}}
+\newcommand{\bB}{\boldsymbol{B}}
+\newcommand{\bC}{\boldsymbol{C}}
+\newcommand{\bD}{\boldsymbol{D}}
+\newcommand{\bE}{\boldsymbol{E}}
+\newcommand{\bF}{\boldsymbol{F}}
+\newcommand{\bG}{\boldsymbol{G}}
+\newcommand{\bH}{\boldsymbol{H}}
+\newcommand{\bI}{\boldsymbol{I}}
+\newcommand{\bJ}{\boldsymbol{J}}
+\newcommand{\bL}{\boldsymbol{L}}
+\newcommand{\bM}{\boldsymbol{M}}
+\newcommand{\bN}{\boldsymbol{N}}
+\newcommand{\bP}{\boldsymbol{P}}
+\newcommand{\bQ}{\boldsymbol{Q}}
+\newcommand{\bR}{\boldsymbol{R}}
+\newcommand{\bS}{\boldsymbol{S}}
+\newcommand{\bT}{\boldsymbol{T}}
+\newcommand{\bU}{\boldsymbol{U}}
+\newcommand{\bV}{\boldsymbol{V}}
+\newcommand{\bW}{\boldsymbol{W}}
+\newcommand{\bX}{\boldsymbol{X}}
+\newcommand{\bY}{\boldsymbol{Y}}
+\newcommand{\bZ}{\boldsymbol{Z}}
+
+% bold calligraphic
+\newcommand{\bcalG}{\boldsymbol{\calG}} \newcommand{\calbG}{\bcalG}
+\newcommand{\bcalX}{\boldsymbol{\calX}} \newcommand{\calbX}{\bcalX}
+\newcommand{\bcalY}{\boldsymbol{\calY}} \newcommand{\calbY}{\bcalY}
+\newcommand{\bcalZ}{\boldsymbol{\calZ}} \newcommand{\calbZ}{\bcalZ}
+
+% barred letters
+\newcommand{\barJ}{{\overline{J}}}
+\newcommand{\barT}{{\overline{T}}}
+
+% more symbols
+\newcommand{\indic}[1]{1_{#1}}   %\dsmath, \mathbbmm other possibilities here
+\newcommand{\simplex}{\triangle}
+\newcommand{\grad}{\nabla}
+\newcommand{\symmdiff}{\triangle} \newcommand{\symdiff}{\symmdiff}
+\newcommand{\dotcup}{\ensuremath{\mathaccent\cdot\cup}}
+\newcommand{\qLRq}{\quad \Leftrightarrow \quad}
+\newcommand{\qRq}{\quad \Rightarrow \quad}
+\newcommand{\normal}{\mathrm{N}}
+
+% left-right wrappers
+\newcommand{\abs}[1]{\lvert #1 \rvert}
+\newcommand{\Abs}[1]{\Bigl\lvert #1 \Bigr\rvert}
+\newcommand{\ABS}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\lVert #1 \rVert}
+\newcommand{\Norm}[1]{\Bigl\lVert #1 \Bigr\rVert}
+\newcommand{\NORM}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\paren}[1]{( #1 )}
+\newcommand{\Paren}[1]{\Bigl( #1 \Bigr)}
+\newcommand{\PAREN}[1]{\left( #1 \right)}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+
+\newcommand{\dtv}[2]{d_{\mathrm{TV}}(#1,#2)}            % not really a wrapper
+\newcommand{\dkl}[2]{d_{KL}(#1,#2)}           % not really a wrapper
+\newcommand{\dchi}[2]{d_{\chi^2}(#1,#2)}           % not really a wrapper
+
+\newcommand{\true}{\mathsf{True}}       \newcommand{\True}{\true}
+\newcommand{\false}{\mathsf{False}}     \newcommand{\False}{\false}
+\newcommand{\sumS}{\sum_{S \subseteq [n]}}
+
+
+\newcommand{\Ent}{\mathbf{Ent}}
+\newcommand{\D}{\mathrm{D}}
+\newcommand{\uE}{\mathrm{E}}       % u for upright
+\newcommand{\uP}{\mathrm{P}}       % u for upright
+\newcommand{\uVar}{\mathrm{Var}}   % u for upright
+\newcommand{\Lap}{\mathrm{L}}
+
+\newcommand{\Holder}{H{\"o}lder\xspace}
+
+
+
+%%%%%%%%%%%% document-writing macros %%%%%%%%%%%%
+
+%\newcommand{\ignore}[1]{*\marginpar{\tiny \em ignored part}}
+\newcommand{\ignore}[1]{}
+
+
+\newcommand{\myfig}[4]{\begin{figure}[H] \centering \includegraphics[width=#1\textwidth]{#2} \caption{#3} \label{#4} \end{figure}}

@@ -1,0 +1,835 @@
+
+\section{Self-improvement}
+\label{sec:self-improvement}
+
+Throughout this section, $(\psi, A, B, L)$ will denote a fixed $(\eps, \delta, \gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
+The majority of this section will be devoted to proving \Cref{lem:self-improvement-helper} below,
+which is a slightly weaker form of \Cref{thm:self-improvement-in-induction-section}.
+The key difference is that the measurement~$H$ it outputs is allowed to be non-projective,
+rather than the projective measurement given by \Cref{thm:self-improvement-in-induction-section}.
+Having proven this, we can apply \Cref{thm:orthonormalization}
+to produce a projective measurement;
+this is done in \Cref{sec:self-improvement-projective} below,
+completing the proof of \Cref{thm:self-improvement-in-induction-section}.
+
+We now highlight other differences between \Cref{lem:self-improvement-helper}
+and \Cref{thm:self-improvement-in-induction-section}.
+Since~$H$ is non-projective, 
+we have stated its strong self-consistency in \Cref{item:self-improvement-self}
+in terms of \Cref{def:strong-self-consistency}; see \Cref{prop:two-notions-of-self-consistency}
+for a proof that these conditions are equivalent for projective sub-measurements.
+The other key difference is that the boundedness condition is modified slightly in \Cref{item:self-improvement-boundedness}.
+Finally, the error $\zeta$ is substantially smaller.
+
+\begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
+Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following property:
+\begin{enumerate}
+\ignore{
+\item (Completeness): \label{item:self-improvement-G-completeness}  If $G = \sum_g G_g$, then
+  	\begin{equation*}
+	\bra{\psi} G \otimes I \ket{\psi} \geq 1 - \kappa.
+	\end{equation*}
+}
+  \item (Consistency with~$A$): \label{item:self-improvement-G-consistency} On average over $\bu \sim \F_q^{m}$,
+	  \begin{equation*}
+	  A^{u}_a \otimes I \simeq_{\nu} I \otimes G_{[g(u)=a]}.
+	  \end{equation*}
+	  \end{enumerate}
+Let
+\begin{equation*}
+\zeta = 100m\cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big).
+\end{equation*}
+Then there exists $H \in \polysub{m}{q}{d}$ with the following properties:
+\begin{enumerate}
+    \item(Completeness):  \label{item:self-improvement-completeness} If $H =  \sum_h H_h$, then
+    \begin{equation*}
+    \bra{\psi} H \otimes I \ket{\psi} \geq (1-\nu)-\zeta.
+    \end{equation*}
+    \item(Consistency with~$A$):\label{item:self-improvement-A-consistency} On average over $\bu \sim \F_q^m$,
+        \begin{equation*}
+            A^u_a \otimes I \simeq_{\zeta} I \otimes H_{[h(u) = a]}.
+        \end{equation*}
+    \item(Strong self-consistency): \label{item:self-improvement-self}
+    	\begin{equation*}
+		\sum_{h} \bra{\psi} H_h \ot H_h \ket{\psi} \geq \bra{\psi} H \ot I \ket{\psi} - \zeta.
+		\ignore{H_h \otimes I \simeq_{\zeta} I \otimes H_h.}
+	\end{equation*}
+    \item(Boundedness): \label{item:self-improvement-boundedness} There exists a positive-semidefinite matrix~$Z$ such that
+    \begin{equation*}
+        \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_a \bra{\psi}  A^{\bu}_{a} \otimes H_{[h(\bu)=a]} \ket{\psi} \leq \zeta
+    \end{equation*}
+    and for each $h \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	Z \geq \left(\E_{\bu} A^{\bu}_{h(\bu)}\right).
+	\end{equation*}
+\end{enumerate}
+\end{lemma}
+
+\subsection{A semidefinite program}
+
+A key element in the proof of \Cref{lem:self-improvement-helper} will be a pair of primal and dual semidefinite programs. 
+To define them, it will be convenient to introduce the notational shorthand
+\begin{equation*}
+A_g = \E_{\bu \sim \F_q^m} A^{\bu}_{g(\bu)}.
+\end{equation*}
+Then the primal is
+\begin{align}
+ \sup &\quad \sum_g \,\Tr(T_g \cdot A_g) \label{eq:primal-objective}\\
+  \text{s.t.} &\quad   T_g \geq 0\qquad\forall g\in\polyfunc{m}{q}{d}\;,\notag\\
+	&\quad \sum_g T_g \leq I,\notag
+\end{align}
+and the dual is
+\begin{align}
+  \inf &\quad \Tr(Z) \label{eq:dual-objective}\\
+ \text{ s.t.} &\quad Z \geq A_g. \label{eq:dual-constraint}
+%	&\quad Z \geq 0\;.\notag
+\end{align}
+We will prove that these two program are indeed dual to each other in \Cref{lem:sdp} below.
+
+\begin{lemma}\label{lem:sdp}
+The semidefinite programs~\eqref{eq:primal-objective} and~\eqref{eq:dual-objective} are dual to each other. 
+Moreover there is an optimal pair of solutions $\{T_g\}$ to~\eqref{eq:primal-objective} and $Z$ to~\eqref{eq:dual-objective} such that $\sum_g T_g = I$ and  
+\begin{equation}\label{eq:slater}
+T_g Z  \,=\, T_g {A_g},\qquad\forall g\in \polyfunc{m}{q}{d}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+To show that~\eqref{eq:primal-objective} and~\eqref{eq:dual-objective} are dual to each other,
+we begin by rewriting the primal~\eqref{eq:primal-objective} in canonical form.
+Let $r$ be the dimension of the space on which~$A$ acts.
+Let $M = |\polyfunc{m}{q}{d}|$ be the number of polynomials with individual degree $d$. 
+We will assume some ordering of these polynomials $g_1, \ldots, g_M \in \polyfunc{m}{q}{d}$ which is allowed to be arbitrary.
+Consider the following semidefinite program:
+\begin{align}
+\sup &\quad \Tr(C^\dagger X) \label{eq:primal-canonical}\\
+  \text{s.t.} &\quad   \Tr(D_{ij}^\dagger X) = b_{ij} \qquad\forall i,j\in\{1,\ldots,r\},\nonumber\\
+	&\quad X \geq 0,\nonumber
+\end{align}
+where the variables~$C$, $D_{ij}$, and $b_{ij}$ are defined as follows:
+\begin{equation*}
+C = \sum_{i = 1}^M \ket{i}\bra{i} \otimes A_{g_i}
+\end{equation*}
+\begin{equation*}
+\forall i,j \in [r], \quad
+D_{ij} = \sum_{k=1}^{M+1} \ket{k}\bra{k} \otimes \ket{i}\bra{j},
+\qquad
+b_{ij}  = \left\{\begin{array}{rl}
+		1 & \text{if } i = j,\\
+		0 & \text{otherwise}.
+		\end{array}\right.
+\end{equation*}
+We claim that \eqref{eq:primal-canonical} is equivalent to \eqref{eq:primal-objective}.
+To see this, let
+\begin{equation*}
+X = \sum_{i, j =1}^{M+1} \ket{i}\bra{j} \otimes X_{ij}
+\end{equation*}
+be a feasible solution to \eqref{eq:primal-canonical}.
+Then because $X \geq 0$, $X_{i i} \geq 0$ for each $i \in [M+1]$. In addition
+\begin{align*}
+\Tr(D_{i_1 i_2}^\dagger X)
+&= \sum_k \sum_{j_1 j_2} \Tr((\ket{k}\bra{k} \otimes \ket{i_1}\bra{i_2})\cdot(\ket{j_1} \bra{j_2} \otimes X_{j_1 j_2}))\\
+&= \sum_k  \bra{i_2} X_{k k} \ket{i_1}\\
+&= \left\{\begin{array}{rl}
+		1 & \text{if } i_1 = i_2,\\
+		0 & \text{otherwise}.
+		\end{array}\right.
+\end{align*}
+This is equivalent to the statement $\sum_{i=1}^{M+1} X_{i i} = I$, which implies that $\sum_{i=1}^M X_{i i} \leq I$.
+Finally, the objective value \eqref{eq:primal-canonical} is
+\begin{align*}
+\Tr(C^\dagger X)
+& = \sum_{i = 1}^M  \sum_{j,k = 1}^{M+1} \Tr((\ket{i}\bra{i} \otimes A_{g_i}^\dagger) \cdot (\ket{j}\bra{k} \otimes X_{j, k}))\\
+&=  \sum_{i = 1}^M \Tr(A_{g_i}^\dagger \cdot  X_{i, i})\\
+&=  \sum_{i = 1}^M \Tr(A_{g_i} \cdot  X_{i, i}). \tag{because~$A$ is Hermitian}
+\end{align*}
+As a result, setting $T_{g_i} = X_{i i}$ for each $i \in [M]$ gives a feasible solution to the original semidefinite program~\eqref{eq:primal-objective}
+with a matching objective value. A similar transformation allows us to convert solutions of~\eqref{eq:primal-objective} to~\eqref{eq:primal-canonical}.
+
+The dual of \eqref{eq:primal-canonical} is 
+\begin{align}
+\inf &\quad \sum_i\, z_{ij} b_{ij} \label{eq:dual-canonical}\\
+  \text{s.t.} &\quad  \sum_{i,j} \,z_{ij} D_{ij} \geq C.\label{eq:dual-canonical-constraint}
+\end{align}
+We claim that \eqref{eq:dual-canonical} is equivalent to \eqref{eq:dual-objective}.
+To see this, we first calculate
+\begin{align*}
+\sum_{i,j=1}^r \,z_{ij} D_{ij}
+= \sum_{i,j=1}^r z_{ij} \cdot \sum_{k=1}^{M+1} \ket{k}\bra{k} \otimes \ket{i}\bra{j}
+&= \sum_{k=1}^{M+1} \ket{k}\bra{k} \otimes \left(\sum_{i, j=1}^r z_{ij}\ket{i}\bra{j}\right)\\
+&=: \sum_{k=1}^{M+1}\ket{k}\bra{k} \otimes Z.
+\end{align*}
+Then the constraint \eqref{eq:dual-canonical-constraint} states that
+\begin{equation*}
+\sum_{i=1}^{M+1}\ket{i}\bra{i} \otimes Z \geq C = \sum_{i = 1}^M \ket{i}\bra{i} \otimes A_{g_i},
+\end{equation*}
+which is equivalent to the statement that $Z \geq A_{g_i}$ for all $i \in [M]$ and $Z \geq 0$.
+In other words, $Z$ is a feasible solution to the original dual SDP \eqref{eq:dual-objective}, with value
+\begin{equation*}
+\Tr(Z) = \sum_{i=1}^r Z_{i i} = \sum_{i,j=1}^r b_{i j} Z_{i j} =  \sum_{i,j=1}^r b_{i j} z_{i j},
+\end{equation*}
+the same value as in \eqref{eq:dual-canonical}.
+Hence, the two dual programs are the same as well,
+which implies that \eqref{eq:primal-objective} and \eqref{eq:dual-objective} form a primal/dual pair.
+
+To show that a primal/dual pair satisfies \emph{strong duality}, i.e.\ that their optimum values are the same,
+we use Slater's condition~\cite[Section~5.2.3]{cvxbook} and show that they satisfy \emph{strict feasibility}, which means both have a feasible solution which is positive \emph{definite}
+that satisfies all constraints with a strict inequality.
+It can be checked that the following two solutions to \eqref{eq:primal-objective} and \eqref{eq:dual-objective} satisfy this property:
+\begin{equation*}
+\forall g \in \polyfunc{m}{q}{d}, \quad T_g = \frac{1}{2M} \cdot I,
+\qquad\qquad\qquad
+Z = 2I.
+\end{equation*}
+Because they satisfy strong duality, their optimal solutions satisfy the \emph{complementary slackness} condition (see~\cite{AHO97}).
+If $X$ and $(z_{ij})$ are an optimal pair of solutions to~\eqref{eq:primal-canonical} and~\eqref{eq:dual-canonical} respectively,  this implies that
+\begin{equation}\label{eq:complementary-slackness}
+X\Big( \sum_{i,j} \,z_{ij} D_{ij} - C \Big) \,=\, 0 \;.
+\end{equation}
+Clearly for any optimal pair $(X,z_{ij})$ we can assume without loss of generality that $X$ is block-diagonal.
+Then if we translate \eqref{eq:complementary-slackness} back to the variables $\{T_g\}$ and $Z$, we get
+\begin{align*}
+0 = X\Big( \sum_{i,j} \,z_{ij} D_{ij} - C \Big)
+&= \sum_{i=1}^{M+1} \ket{i}\bra{i} \otimes X_{ii} \cdot \bigg(\sum_{i=1}^{M+1} \ket{i}\bra{i} \otimes Z - \sum_{i=1}^M \ket{i}\bra{i}\otimes A_{g_i}\bigg)\\
+&= \sum_{i=1}^{M} \ket{i}\bra{i} \otimes (X_{ii} \cdot (Z - A_{g_i})) + \ket{M+1}\bra{M+1} \otimes (X_{M+1,M+1} \cdot Z).
+\end{align*}
+This implies that $X_{ii} \cdot (Z - A_{g_i}) = 0$ for $i \in [M]$ and $X_{M+1, M+1} = 0$.
+Translating back to the variables $\{T_g\}$ and $Z$, this gives $T_g(Z-A_g)=0$ for all $g\in\polyfunc{m}{q}{d}$ and $\sum_g T_g = I$. 
+\end{proof}
+
+
+\subsection{Proof of \Cref{lem:self-improvement-helper}}
+We let $T = \{T_g\}$ and $Z$ be the optimal solutions to the SDPs~\eqref{eq:primal-objective} and \eqref{eq:dual-objective} respectively
+given by \Cref{lem:sdp}.
+Then~$T$ is a measurement, and
+\begin{align}
+ \forall g \in \polyfunc{m}{q}{d}: \qquad
+ Z &\geq (\E_{\bu} A^{\bu}_{g(\bu)}),  \label{eq:Z-greater-than-A}\\
+T_g \cdot Z &= T_g \cdot (\E_{\bu} A^{\bu}_{g(\bu)}).\label{eq:swap-Z-for-A}
+\end{align}
+For each $u \in \F_q^m$, define $H^u = \{H^u_h\}_{h \in \polyfunc{m}{q}{d}}$ as
+\begin{equation*}
+    H^u_h := A^u_{h(u)}\cdot T_h \cdot A^u_{h(u)}.
+\end{equation*}
+Let $u \in \F_q^m$. Then
+\begin{align*}
+    \sum_{h \in \polyfunc{m}{q}{d}} H^u_h
+    & = \sum_{h \in \polyfunc{m}{q}{d}} A^u_{h(u)} \cdot T_h \cdot A^u_{h(u)}\\
+    & = \sum_{a \in \F_q}A^u_{a} \cdot \bigg(\sum_{h:h(u) = a}  T_h\bigg) \cdot A^u_{a}\\
+    & \leq \sum_{a \in \F_q} (A^u_{a})^2\tag{because~$T$ is a measurement}\\
+    & = \sum_{a \in \F_q} A^u_{a}\tag{$A$ is projective}\\
+    & = I.
+\end{align*}
+Hence, $H^u$ is a sub-measurement,
+and therefore $H^u \in \polysub{m}{q}{d}$.
+Next, define $H = \{H_h\}_{h \in \polyfunc{m}{q}{d}}$ as
+\begin{equation*}
+H_h := \E_{\bu \sim \F_q^m}H^{\bu}_h.
+\end{equation*}
+Then
+\begin{equation*}
+\sum_{h \in \polyfunc{m}{q}{d}} H_h
+= \E_{\bu \sim \F_q^m} \sum_{h \in \polyfunc{m}{q}{d}} H^{\bu}_h
+\leq I. \tag{$H^u$ is a sub-measurement}
+\end{equation*}
+Hence, $H$ is a sub-measurement,
+and therefore $H \in \polysub{m}{q}{d}$.
+
+Set
+\begin{equation*}
+\zeta_{\mathrm{variance}} = 24m\cdot\Big(\eps + \delta + \frac{md}{q}\Big)
+\end{equation*}
+to be the error in \Cref{eq:local-variance-of-points-equation}.
+Prior to showing that~$H$ satisfies \Cref{item:self-improvement-A-consistency,item:self-improvement-completeness,item:self-improvement-self,item:self-improvement-boundedness}, we will prove the following technical lemma.
+
+\begin{lemma}\label{lem:add-in-u}
+Suppose $M = \{M^u_o\}$ is a sub-measurement with outcomes in some set $\calO$.
+For each $u \in \F_q^m$, let $S_u$ be a subset of $\calO \otimes \polyfunc{m}{q}{d}$.
+Then
+\begin{equation*}
+\E_{\bu \sim \F_q^m} \sum_{(o, h) \in S_{\bu}} \bra{\psi} M^{\bu}_o \otimes H_h \ket{\psi}
+\approx_{4\sqrt{\zeta_{\mathrm{variance}}}} \E_{\bu \sim \F_q^m} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bu}_{h(\bu)} \cdot M^{\bu}_o \cdot A^{\bu}_{h(\bu)}) \otimes T_h \ket{\psi}.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+We begin by expanding
+\begin{align}
+\E_{\bu \sim \F_q^m} \sum_{(o, h) \in S_{\bu}} \bra{\psi} M^{\bu}_o \otimes H_h \ket{\psi}
+&= \E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} M^{\bu}_o \otimes H^{\bv}_h \ket{\psi}\nonumber\\
+&= \E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} M^{\bu}_o \otimes (A^{\bv}_{h(\bv)} \cdot T_h \cdot A^{\bv}_{h(\bv)}) \ket{\psi}.\label{eq:expand-that-H}
+\end{align}
+We claim that
+\begin{equation}\label{eq:move-one}
+\eqref{eq:expand-that-H}
+\approx_{\sqrt{2\delta}}
+\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bv}_{h(\bv)} \cdot M^{\bu}_o) \otimes (T_h \cdot A^{\bv}_{h(\bv)}) \ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{multline}
+\Big|\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bv}_{h(\bv)} \otimes I - I \otimes A^{\bv}_{h(\bv)}) \cdot (M^{\bu}_o \otimes (T_h \cdot A^{\bv}_{h(\bv)}))\ket{\psi}\Big|\\
+\leq
+\sqrt{\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bv}_{h(\bv)} \otimes I - I \otimes A^{\bv}_{h(\bv)}) \cdot (M^{\bu}_o \otimes T_h) \cdot (A^{\bv}_{h(\bv)} \otimes I - I \otimes A^{\bv}_{h(\bv)}) \ket{\psi}}\\
+\cdot \sqrt{\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi}  M^{\bu}_o \otimes (A^{\bv}_{h(\bv)} \cdot T_h\cdot  A^{\bv}_{h(\bv)}) \ket{\psi}}.\label{eq:move-one-cauchy-schwarz}
+\end{multline}
+The term inside the first square root is
+\begin{align*}
+&\E_{\bu, \bv} \sum_{a \in \F_q} \bra{\psi} (A^{\bv}_a \otimes I - I \otimes A^{\bv}_a) \cdot \bigg( \sum_{(o, h) \in S_{\bu},h(\bv) = a}M^{\bu}_o \otimes T_h\bigg) \cdot (A^{\bv}_a \otimes I - I \otimes A^{\bv}_a) \ket{\psi}\\
+\leq~&\E_{\bu, \bv} \sum_{a \in \F_q} \bra{\psi} (A^{\bv}_a \otimes I - I \otimes A^{\bv}_a)^2 \ket{\psi}, \tag{because $M^{\bu}$ and $T_h$ are sub-measurements}
+\end{align*}
+which is at most~$2\delta$ by \Cref{prop:simeq-to-approx} and because~$A$ is $\delta$-self-consistent.
+The term inside the second square root is
+\begin{equation*}
+\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi}  M^{\bu}_o \otimes H^{\bv}_h \ket{\psi},
+\end{equation*}
+which is at most~$1$ because $M^{\bu}$ and $H^{\bv}$ are sub-measurements.
+Next, we claim that
+\begin{equation}\label{eq:move-another}
+\eqref{eq:move-one}
+\approx_{\sqrt{2\delta}}
+\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bv}_{h(\bv)} \cdot M^{\bu}_o \cdot A^{\bv}_{h(\bv)}) \otimes T_h  \ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{align}\label{eq:move-another-cauchy-schwarz}
+&\Big|\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} ((A^{\bv}_{h(\bv)} \cdot M^{\bu}_o) \otimes T_h) \cdot (A^{\bv}_{h(\bv)} \otimes I - I \otimes A^{\bv}_{h(\bv)})  \ket{\psi}\Big|\nonumber\\
+&\leq\sqrt{\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bv}_{h(\bv)} \cdot M^{\bu}_o \cdot A^{\bv}_{h(\bv)}) \otimes T_h  \ket{\psi}}\nonumber\\
+&\quad\cdot \sqrt{\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bv}_{h(\bv)} \otimes I - I \otimes A^{\bv}_{h(\bv)}) \cdot (M^{\bu}_o \otimes T_h) \cdot (A^{\bv}_{h(\bv)} \otimes I - I \otimes A^{\bv}_{h(\bv)}) \ket{\psi}}.
+\end{align}
+The term inside the first square root is
+\begin{align*}
+&\E_{\bu, \bv} \sum_h \bra{\psi} (A^{\bv}_{h(\bv)} \cdot \bigg(\sum_{o:(o, h) \in S_{\bu}} M^{\bu}_o \bigg)\cdot A^{\bv}_{h(\bv)}) \otimes T_h  \ket{\psi}\\
+\leq~&\E_{\bu, \bv} \sum_h \bra{\psi} (A^{\bv}_{h(\bv)})^2 \otimes T_h  \ket{\psi}\tag{because~$M$ is a sub-measurement}\\
+\leq~&\E_{\bu, \bv} \sum_h \bra{\psi} I \otimes T_h  \ket{\psi}\tag{because~$A^{\bv}_{h(\bv)} \leq I$}\\
+=~&1.\tag{because~$T$ is a measurement}
+\end{align*}
+As for the term inside the second square root, it is equal to the term inside the first square root in \Cref{eq:move-one-cauchy-schwarz}, which we showed was at most $2\delta$.
+
+Having moved both $A$'s to the left-hand side, we want to show that
+\begin{equation}\label{eq:change-one}
+\eqref{eq:move-another}
+\approx_{\sqrt{\zeta_{\mathrm{variance}}}}
+\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bu}_{h(\bu)} \cdot M^{\bu}_o \cdot A^{\bv}_{h(\bv)}) \otimes T_h  \ket{\psi}.
+\end{equation} 
+To show this, we bound the magnitude of the difference.
+\begin{multline}\label{eq:change-one-cauchy-schwarz}
+\Big|\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} ((A^{\bv}_{h(\bv)} - A^{\bu}_{h(\bu)}) \cdot M^{\bu}_o \cdot A^{\bv}_{h(\bv)}) \otimes T_h  \ket{\psi}\Big|\\
+\leq
+\sqrt{\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} ((A^{\bv}_{h(\bv)} - A^{\bu}_{h(\bu)}) \cdot M^{\bu}_o \cdot (A^{\bv}_{h(\bv)} - A^{\bu}_{h(\bu)})) \otimes T_h  \ket{\psi}}\\
+\cdot \sqrt{\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bv}_{h(\bv)} \cdot M^{\bu}_o \cdot A^{\bv}_{h(\bv)}) \otimes T_h  \ket{\psi}}.
+\end{multline}
+The term inside the first square root is
+\begin{align*}
+&\E_{\bu, \bv} \sum_h \bra{\psi} ((A^{\bv}_{h(\bv)} - A^{\bu}_{h(\bu)}) \cdot \bigg( \sum_{o:(o, h) \in S_{\bu}}M^{\bu}_o\bigg) \cdot (A^{\bv}_{h(\bv)} - A^{\bu}_{h(\bu)})) \otimes T_h  \ket{\psi}\\
+\leq~&\E_{\bu, \bv} \sum_h \bra{\psi} (A^{\bv}_{h(\bv)} - A^{\bu}_{h(\bu)})^2 \otimes T_h  \ket{\psi}. \tag{because~$M^{\bu}$ is a sub-measurement}
+\end{align*}
+But $T \in \polysub{m}{q}{d}$, and so by \Cref{lem:global-variance-of-points} this expression is at most $\zeta_{\mathrm{variance}}$.
+As for the term inside the second square root, it is equal to the term inside the first square root in \Cref{eq:move-another-cauchy-schwarz}, which we showed was at most~$1$.
+Finally, we want to show that
+\begin{equation}\label{eq:change-another}
+\eqref{eq:change-one}
+\approx_{\sqrt{\zeta_{\mathrm{variance}}}}
+\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bu}_{h(\bu)} \cdot M^{\bu}_o \cdot A^{\bu}_{h(\bu)}) \otimes T_h  \ket{\psi}.
+\end{equation} 
+To show this, we bound the magnitude of the difference.
+\begin{multline*}
+\Big|
+\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bu}_{h(\bu)} \cdot M^{\bu}_o \cdot (A^{\bv}_{h(\bv)} - A^{\bu}_{h(\bu)})) \otimes T_h  \ket{\psi}\Big|\\
+\leq
+\sqrt{\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} (A^{\bu}_{h(\bu)} \cdot M^{\bu}_o \cdot A^{\bu}_{h(\bu)}) \otimes T_h  \ket{\psi}}\\
+\cdot \sqrt{\E_{\bu, \bv} \sum_{(o, h) \in S_{\bu}} \bra{\psi} ((A^{\bv}_{h(\bv)} - A^{\bu}_{h(\bu)}) \cdot M^{\bu}_o \cdot (A^{\bv}_{h(\bv)} - A^{\bu}_{h(\bu)})) \otimes T_h  \ket{\psi}}.
+\end{multline*}
+The term inside the first square root is
+\begin{align*}
+&\E_{\bu, \bv} \sum_h \bra{\psi} (A^{\bu}_{h(\bu)} \cdot \bigg(\sum_{o:(o, h) \in S_{\bu}} M^{\bu}_o \bigg)\cdot A^{\bu}_{h(\bu)}) \otimes T_h  \ket{\psi}\\
+\leq~&\E_{\bu, \bv} \sum_h \bra{\psi} (A^{\bu}_{h(\bu)})^2 \otimes T_h  \ket{\psi}\tag{because~$M$ is a sub-measurement}\\
+\leq~&\E_{\bu, \bv} \sum_h \bra{\psi} I \otimes T_h  \ket{\psi}\tag{because~$A^{\bu}_{h(\bu)} \leq I$}\\
+=~&1.\tag{because~$T$ is a measurement}
+\end{align*}
+As for the term inside the second square root, it is equal to the term inside the first square root in \Cref{eq:change-one-cauchy-schwarz}, which we showed was at most $\zeta_{\mathrm{variance}}$.
+This concludes the proof with an error of $2\sqrt{2\delta} + 2\sqrt{\zeta_{\mathrm{variance}}}$.
+The lemma now follows by observing that $2\delta \leq \zeta_{\mathrm{variance}}$.
+\end{proof}
+
+We now show that~$H$ satisfies \Cref{item:self-improvement-completeness,item:self-improvement-A-consistency,item:self-improvement-self,item:self-improvement-boundedness}.
+
+
+
+\vspace{\baselineskip}
+\noindent
+\emph{Proof of \Cref{item:self-improvement-completeness} (Completeness).}
+The completeness of~$H$ is
+\begin{align}
+\sum_h \bra{\psi} H_h \otimes I \ket{\psi}
+& = \E_{\bu} \sum_h \bra{\psi} H^{\bu}_h \otimes I \ket{\psi}\nonumber\\
+&= \E_{\bu} \sum_h \bra{\psi} (A^{\bu}_{h(\bu)} \cdot T_h \cdot A^{\bu}_{h(\bu)}) \otimes I \ket{\psi}\nonumber\\
+&= \E_{\bu} \sum_a \bra{\psi} (A^{\bu}_{a} \cdot T_{[h(\bu) = a]} \cdot A^{\bu}_{a}) \otimes I \ket{\psi}.\label{eq:bracketize-the-expression}
+\end{align}
+We claim that
+\begin{equation}\label{eq:yet-another-move-a}
+\eqref{eq:bracketize-the-expression}
+\approx_{2\sqrt{\delta}}
+\E_{\bu} \sum_a \bra{\psi} ( T_{[h(\bu)=a]} \cdot A^{\bu}_{a}) \otimes A^{\bu}_{a} \ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference
+\begin{multline*}
+\Big|\E_{\bu} \sum_a \bra{\psi} (A^{\bu}_{a} \otimes I - I \otimes A^{\bu}_{a}) \cdot (( T_{[h(\bu) = a]} \cdot A^{\bu}_{a}) \otimes I) \ket{\psi}\Big|\\
+\leq
+\sqrt{\E_{\bu} \sum_a \bra{\psi} (A^{\bu}_{a} \otimes I - I \otimes A^{\bu}_{a})^2 \ket{\psi}}
+\cdot \sqrt{\E_{\bu} \sum_a \bra{\psi} (A^{\bu}_{a} \cdot  T^2_{[h(\bu) = a]} \cdot A^{\bu}_{a}) \otimes I \ket{\psi}}.
+\end{multline*}
+The expression inside the first square root is at most $2\delta \leq 4 \delta$
+by \Cref{prop:simeq-to-approx} and the self-consistency of~$A$,
+and the expression inside the second square root is at most~$1$ because $T_{[h(\bu) = a]} \leq I$.
+Next, we claim that 
+\begin{equation}\label{eq:mysterious-case-of-the-disappearing-a}
+\eqref{eq:yet-another-move-a}
+\approx_{\sqrt{\delta}}
+\E_{\bu} \sum_a \bra{\psi} ( T_{[h(\bu)=a]} \cdot A^{\bu}_{a}) \otimes I \ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{multline*}
+\Big|\E_{\bu} \sum_a \bra{\psi} ( T_{[h(\bu)=a]} \cdot A^{\bu}_{a}) \otimes (I-A^{\bu}_{a}) \ket{\psi}\Big|\\
+\leq
+\sqrt{\E_{\bu} \sum_a \bra{\psi} ( T_{[h(\bu)=a]})^2 \otimes I \ket{\psi}}
+\cdot \sqrt{\E_{\bu} \sum_a \bra{\psi} ( A^{\bu}_{a})^2 \otimes (I-A^{\bu}_{a})^2 \ket{\psi}}.
+\end{multline*}
+The expression inside the first square root is at most~$1$ because~$T$ is a sub-measurement.
+By the projectivity of~$A$, the expression inside the second square root is equal to
+\begin{equation*}
+\E_{\bu} \sum_a \bra{\psi} ( A^{\bu}_{a}) \otimes (I-A^{\bu}_{a}) \ket{\psi}
+= \E_{\bu} \sum_{a\neq b} \bra{\psi} A^{\bu}_{a} \otimes A^{\bu}_{b} \ket{\psi},
+\end{equation*}
+which is at most~$\delta$ by the self-consistency of~$A$.
+We can rewrite \Cref{eq:mysterious-case-of-the-disappearing-a} as
+\begin{align*}
+&\E_{\bu} \sum_h \bra{\psi} ( T_{h} \cdot A^{\bu}_{h(\bu)}) \otimes I \ket{\psi}\\
+ =~&  \sum_h \bra{\psi} ( T_{h} \cdot\E_{\bu} A^{\bu}_{h(\bu)}) \otimes I \ket{\psi}\\
+ =~&  \sum_h \bra{\psi} ( T_{h} \cdot Z) \otimes I \ket{\psi}\tag{by \Cref{eq:swap-Z-for-A}}\\
+=~&  \bra{\psi}  Z \otimes I \ket{\psi}.\tag{because~$T$ is a measurement}
+\end{align*}
+We pause and record what we have shown so far:
+\begin{equation}\label{eq:gonna-use-this-later-H-versus-Z}
+\sum_h \bra{\psi} H_h \otimes I \ket{\psi} \geq \bra{\psi}  Z \otimes I \ket{\psi} - 3\sqrt{\delta}.
+\end{equation}
+At this point, we can lower-bound 
+\begin{align*}
+\bra{\psi}  Z \otimes I \ket{\psi}
+\geq~& \sum_g \bra{\psi} Z \otimes G_g \ket{\psi} \tag{because~$G$ is a sub-measurement}\\
+\geq~& \sum_g \bra{\psi} (\E_{\bu} A^{\bu}_{g(\bu)}) \otimes G_g \ket{\psi} \tag{by \Cref{eq:Z-greater-than-A}}\\
+=~& \E_{\bu} \sum_a \bra{\psi}  A^{\bu}_{a} \otimes G_{[g(\bu)=a]} \ket{\psi}\\
+\geq~& 1-\nu.\tag{by \Cref{item:self-improvement-G-consistency} and \Cref{prop:simeq-for-measurements}}
+\end{align*}
+Thus, the completeness is at least $1  - \nu - 3\sqrt{\delta}$. 
+The proof follows from noting that $3\sqrt{\delta} \leq \zeta$.
+
+\vspace{\baselineskip}
+\noindent
+\emph{Proof of \Cref{item:self-improvement-A-consistency} (Consistency with~$A$).}
+The inconsistency of~$H$ with~$A$ is
+\begin{equation}\label{eq:consistency-with-A-baby-step}
+\E_{\bu \sim \F_q^m} \sum_{a \neq b} \bra{\psi} A^{\bu}_a \otimes H_{[h(\bu) = b]} \ket{\psi}
+= \E_{\bu \sim \F_q^m} \sum_{a, h: h(\bu) \neq a} \bra{\psi} A^{\bu}_a \otimes H_h \ket{\psi}.
+\end{equation}
+We now apply \Cref{lem:add-in-u} to the right-hand side of \Cref{eq:consistency-with-A-baby-step}.
+To do so, we set $\calO = \F_q^m$, $M = A$, and $S_u = \{(a, h) : h(u) \neq a\}$.
+Then \Cref{lem:add-in-u} implies that
+\begin{equation*}
+\eqref{eq:consistency-with-A-baby-step}
+\approx_{4 \sqrt{\zeta_{\mathrm{variance}}}}
+\E_{\bu \sim \F_q^m} \sum_{a, h: h(\bu) \neq a} \bra{\psi} (A^{\bu}_{h(\bu)} \cdot A^{\bu}_a  \cdot A^{\bu}_{h(\bu)})\otimes T_h \ket{\psi},
+\end{equation*}
+which is equal to~$0$ because~$A$ is projective.
+This implies that
+\begin{equation}\label{eq:explicit-bound-for-A-consistency}
+\E_{\bu \sim \F_q^m} \sum_{a \neq b} \bra{\psi} A^{\bu}_a \otimes H_{[h(\bu) = b]} \ket{\psi} \leq 4 \sqrt{\zeta_{\mathrm{variance}}}.
+\end{equation}
+The proof follows from noting that
+\begin{align*}
+4\sqrt{\zeta_{\mathrm{variance}}}
+&= 4 \cdot \sqrt{24 m \cdot\Big(\eps + \delta + \frac{md}{q}\Big)}\\
+&\leq 20 m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)\\
+&\leq \zeta.
+\end{align*}
+
+\vspace{\baselineskip}
+\noindent
+\emph{Proof of \Cref{item:self-improvement-self} (Strong self-consistency).}
+We begin by recording the following facts which follow from the definition of $H^u_h$ and the projectivity of~$A$:
+\begin{align}
+H^u_h &= A^u_{h(u)} \cdot T_h \cdot A^u_{h(u)} = A^u_{h(u)} \cdot H^u_h \cdot A^u_{h(u)},\label{eq:h-sandwich}\\
+A^u_{h(u)} \cdot H^u_{h'} \cdot A^u_{h(u)} &=  H^u_{h'} \cdot A^u_{h(u)} = (A^u_{h(u)} \cdot T_{h'} \cdot A^u_{h(u)}) \cdot \bone[h(u) = h'(u)].\label{eq:h-blt}
+\end{align}
+The strong self-consistency of~$H$ is
+\begin{equation}\label{eq:self-consistency-baby-step}
+\sum_{h\in\polyfunc{m}{q}{d}} \bra{\psi} H_h \otimes H_h \ket{\psi}
+= \E_{\bu \sim \F_q^m} \sum_{h \in \polyfunc{m}{q}{d}} \bra{\psi} H_h^{\bu} \otimes H_h \ket{\psi}.
+\end{equation}
+We now apply \Cref{lem:add-in-u} to the right-hand side of \Cref{eq:self-consistency-baby-step}.
+To do so, we set
+\begin{equation*}
+\text{$\calO =\polyfunc{m}{q}{d}$, $M = H$, and $S_u = \{(h, h) : h \in \polyfunc{m}{q}{d}\}$.}
+\end{equation*}
+Then \Cref{lem:add-in-u} implies that
+\begin{equation}\label{eq:release-the-kraken}
+\eqref{eq:self-consistency-baby-step}
+\approx_{4 \sqrt{\zeta_{\mathrm{variance}}}}
+\E_{\bu \sim \F_q^m} \sum_{h \in \polyfunc{m}{q}{d}} \bra{\psi} (A^{\bu}_{h(\bu)} \cdot H_h^{\bu} \cdot A^{\bu}_{h(\bu)}) \otimes T_h \ket{\psi}.
+\end{equation}
+Having placed two $A$'s on the left-hand side, we want to show that
+\begin{equation}\label{eq:threw-in-h-prime}
+\eqref{eq:release-the-kraken}
+\approx_{2\sqrt{\zeta_{\mathrm{variance}}} + \frac{md}{q}}
+\E_{\bu \sim \F_q^m} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} (A^{\bu}_{h(\bu)} \cdot H^{\bu}_{h'} \cdot A^{\bu}_{h(\bu)}) \otimes T_h \ket{\psi}.
+\end{equation}
+We note that \eqref{eq:threw-in-h-prime} is at least as big as \eqref{eq:release-the-kraken}. Thus, we want to upper-bound
+\begin{align}
+\eqref{eq:threw-in-h-prime}-\eqref{eq:release-the-kraken}
+& = \E_{\bu \sim \F_q^m} \sum_{h \neq h'} \bra{\psi}  (A^{\bu}_{h(\bu)} \cdot H^{\bu}_{h'} \cdot A^{\bu}_{h(\bu)}) \otimes T_h \ket{\psi}\nonumber\\
+& = \E_{\bu \sim \F_q^m} \sum_{h \neq h'} \bra{\psi}  (A^{\bu}_{h(\bu)} \cdot T_{h'} \cdot A^{\bu}_{h(\bu)}) \otimes T_h \ket{\psi} \cdot \bone[h(\bu) = h'(\bu)],\label{eq:added-indicator}
+\end{align}
+where the second equality is by~\Cref{eq:h-blt}.
+To do this, we first show that
+\begin{equation}\label{eq:swapped-u-for-v}
+\eqref{eq:added-indicator}
+\approx_{\sqrt{\zeta_{\mathrm{variance}}}}
+\E_{\bu,\bv} \sum_{h \neq h'} \bra{\psi}  (A^{\bv}_{h(\bv)} \cdot T_{h'} \cdot A^{\bu}_{h(\bu)}) \otimes T_h \ket{\psi} \cdot \bone[h(\bu) = h'(\bu)].
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{multline}
+\Big|\E_{\bu,\bv} \sum_{h \neq h'} \bra{\psi} ( (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)}) \cdot T_{h'} \cdot A^{\bu}_{h(\bu)}) \otimes T_h \ket{\psi} \cdot \bone[h(\bu) = h'(\bu)]\Big|\\
+\leq
+\sqrt{\E_{\bu,\bv} \sum_{h \neq h'} \bra{\psi}  ( (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)}) \cdot T_{h'} \cdot (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)})) \otimes T_h\ket{\psi}}\\
+\cdot \sqrt{\E_{\bu,\bv} \sum_{h \neq h'} \bra{\psi} (A^{\bu}_{h(\bu)} \cdot T_{h'} \cdot A^{\bu}_{h(\bu)}) \otimes T_h\ket{\psi} \cdot \bone[h(\bu) = h'(\bu)]}. \label{eq:swapped-u-for-cauchy-schwarz}
+\end{multline}
+The term inside the first square root is
+\begin{align*}
+&\E_{\bu,\bv} \sum_{h} \bra{\psi} ( (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)}) \cdot \bigg(\sum_{h' \neq h} T_{h'}\bigg) \cdot (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)})) \otimes T_h\ket{\psi}\\
+\leq~& \E_{\bu,\bv} \sum_{h} \bra{\psi}  (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)})^2 \otimes T_h\ket{\psi},\tag{because $T$ is a sub-measurement}
+\end{align*}
+But $T \in \polyfunc{m}{q}{d}$, and so by \Cref{lem:global-variance-of-points} this expression is at most~$\zeta_{\mathrm{variance}}$.
+The term inside the second square root is equal to
+\begin{equation*}
+\E_{\bu,\bv} \sum_{h \neq h'} \bra{\psi}  H^{\bu}_{h'} \otimes T_h \ket{\psi} \cdot \bone[h(\bu) = h'(\bu)],
+\end{equation*}
+which is at most~$1$ because $T$ and $H^{\bu}$ are sub-measurements.
+Next, we show that
+\begin{equation}\label{eq:swapped-u-for-v-this-time-it's-personal}
+\eqref{eq:swapped-u-for-v}
+\approx_{\sqrt{\zeta_{\mathrm{variance}}}}
+\E_{\bu,\bv} \sum_{h \neq h'} \bra{\psi}  (A^{\bv}_{h(\bv)} \cdot T_{h'} \cdot A^{\bv}_{h(\bv)}) \otimes T_h \ket{\psi} \cdot \bone[h(\bu) = h'(\bu)].
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{multline*}
+\Big|\E_{\bu,\bv} \sum_{h \neq h'} \bra{\psi}  (A^{\bv}_{h(\bv)} \cdot T_{h'} \cdot (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)})) \otimes T_h \ket{\psi} \cdot \bone[h(\bu) = h'(\bu)]\Big|\\
+\leq
+\sqrt{\E_{\bu,\bv} \sum_{h \neq h'} \bra{\psi}  (A^{\bv}_{h(\bv)} \cdot T_{h'} \cdot A^{\bv}_{h(\bv)}) \otimes T_h\ket{\psi} \cdot \bone[h(\bu) = h'(\bu)]}\\
+\cdot \sqrt{\E_{\bu,\bv} \sum_{h \neq h'} \bra{\psi} ( (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)}) \cdot T_{h'} \cdot (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)}))\otimes T_h\ket{\psi}}.
+\end{multline*}
+The term inside the first square root is at most
+\begin{align}
+\E_{\bu,\bv} \sum_{h \neq h'} \bra{\psi}  (A^{\bv}_{h(\bv)} \cdot T_{h'} \cdot A^{\bv}_{h(\bv)})\otimes T_h\ket{\psi}
+& = \E_{\bu,\bv} \sum_{h} \bra{\psi}  (A^{\bv}_{h(\bv)} \cdot \bigg(\sum_{h' \neq h} T_{h'}\bigg) \cdot A^{\bv}_{h(\bv)}) \otimes T_h\ket{\psi}\\
+& \leq \E_{\bu,\bv} \sum_{h} \bra{\psi}   (A^{\bv}_{h(\bv)})^2\otimes T_h\ket{\psi}\tag{$T$ is a sub-measurement}\\
+& \leq \E_{\bu,\bv} \sum_{h} \bra{\psi}   I \otimes T_h\ket{\psi}\tag{because $A^{\bv}_{h(\bv)} \leq I$}\\
+& \leq 1, \label{eq:gonna-use-this-later}
+\end{align}
+where the last step again uses the fact that~$T$ is a sub-measurement.
+As for the term inside the second square root, it is equal to the term inside the first square root in \Cref{eq:swapped-u-for-cauchy-schwarz},
+which we showed was at most $\zeta_{\mathrm{variance}}$.
+Finally, \Cref{eq:swapped-u-for-v-this-time-it's-personal} is equal to
+\begin{align*}
+&\E_{\bv} \sum_{h \neq h'} \bra{\psi} (A^{\bv}_{h(\bv)} \cdot T_{h'} \cdot A^{\bv}_{h(\bv)}) \otimes T_h\ket{\psi} \cdot \E_{\bu}\bone[h(\bu) = h'(\bu)]\\
+\leq~& \E_{\bv} \sum_{h \neq h'} \bra{\psi} (A^{\bv}_{h(\bv)} \cdot T_{h'} \cdot A^{\bv}_{h(\bv)}) \otimes T_h \ket{\psi} \cdot \frac{md}{q} \tag{by Schwartz-Zippel}\\
+\leq~& \frac{md}{q}. \tag{by \Cref{eq:gonna-use-this-later}}
+\end{align*}
+
+By~\Cref{eq:h-blt}, \Cref{eq:threw-in-h-prime} is equal to
+\begin{equation}\label{eq:delete-an-A}
+\E_{\bu \sim \F_q^m} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} (H^{\bu}_{h'} \cdot A^{\bu}_{h(\bu)}) \otimes T_h \ket{\psi}.
+\end{equation}
+Now, we show that
+\begin{equation}\label{eq:swap-u-for-v-attack-of-the-clones}
+\eqref{eq:delete-an-A}
+\approx_{\sqrt{\zeta_{\mathrm{variance}}}}
+\E_{\bu, \bv} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} (H^{\bu}_{h'} \cdot A^{\bv}_{h(\bv)}) \otimes T_h \ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{align*}
+&\Big|\E_{\bu, \bv} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} (H^{\bu}_{h'} \cdot (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)})) \otimes T_h \ket{\psi}\Big|\\
+&\leq
+\sqrt{\E_{\bu, \bv} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} H^{\bu}_{h'} \otimes T_h\ket{\psi}}\\
+&\quad\cdot \sqrt{\E_{\bu, \bv} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} ((A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)}) \cdot H^{\bu}_{h'} \cdot (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)})) \otimes T_h\ket{\psi}}.
+\end{align*}
+The expression inside the first square root is at most~$1$ because~$T$ and~$H^{\bu}$ are sub-measurements.
+The term inside the second square root is
+\begin{align*}
+&\E_{\bu, \bv} \sum_{h} \bra{\psi} ((A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)}) \cdot \bigg( \sum_{h'} H^{\bu}_{h'}\bigg) \cdot (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)})) \otimes T_h \ket{\psi}\\
+\leq~& \E_{\bu, \bv} \sum_{h} \bra{\psi}  (A^{\bu}_{h(\bu)} - A^{\bv}_{h(\bv)})^2 \otimes T_h\ket{\psi}.
+\tag{because $H^{\bu}$ is a sub-measurement}
+\end{align*}
+But $T \in \polysub{m}{q}{d}$, and so by \Cref{lem:global-variance-of-points} this expression is at most~$\zeta_{\mathrm{variance}}$.
+Next, we show that
+\begin{equation}\label{eq:move-over-v}
+\eqref{eq:swap-u-for-v-attack-of-the-clones}
+\approx_{\sqrt{2\delta}}
+\E_{\bu, \bv} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} H^{\bu}_{h'}  \otimes (T_h \cdot A^{\bv}_{h(\bv)}) \ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{align*}
+&\Big|\E_{\bu, \bv} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi}  (H^{\bu}_{h'}\otimes T_h) \cdot (A^{\bv}_{h(\bv)} \otimes I - I \otimes A^{\bv}_{h(\bv)}) \ket{\psi}\Big|\\
+=~&\Big|\E_{\bu, \bv} \sum_{a \in \F_q}  \bra{\psi}  \bigg( \sum_{h'}H^{\bu}_{h'} \otimes \sum_{h:h(\bv) = a} T_h \bigg) \cdot (A^{\bv}_a \otimes I - I \otimes A^{\bv}_a) \ket{\psi}\Big|\\
+\leq~&
+\sqrt{\E_{\bu, \bv} \sum_{a \in \F_q}  \bra{\psi}  \bigg( \sum_{h'}H^{\bu}_{h'} \otimes \sum_{h:h(\bv) = a} T_h\bigg)^2\ket{\psi}}
+\cdot \sqrt{\E_{\bu, \bv} \sum_{a \in \F_q}  \bra{\psi}(A^{\bv}_a \otimes I - I \otimes A^{\bv}_a)^2 \ket{\psi}}.
+\end{align*}
+The expression inside the first square root is at most~$1$ because~$T$ and~$H^{\bu}$ are sub-measurements,
+and the expression inside the second square root is at most~$2\delta$ by \Cref{prop:simeq-to-approx} and the self-consistency of~$A$.
+Now, \Cref{eq:move-over-v} is equal to
+\begin{align*}
+&\E_{\bu} \sum_{h, h'} \bra{\psi} H^{\bu}_{h'} \otimes (T_h\cdot \E_{\bv} A^{\bv}_{h(\bv)}) \ket{\psi}\\
+=~& \E_{\bu} \sum_{h, h'} \bra{\psi} H^{\bu}_{h'} \otimes  (T_h\cdot Z)\ket{\psi} \tag{by \Cref{eq:swap-Z-for-A}}\\
+=~& \E_{\bu} \sum_{ h'} \bra{\psi} H^{\bu}_{h'}  \otimes Z\ket{\psi} \tag{because~$T$ is a measurement}\\
+\geq~& \E_{\bu} \sum_{ h'} \bra{\psi}  H^{\bu}_{h'} \otimes  \E_{\bv} A^{\bv}_{h'(\bv)} \ket{\psi} \tag{by \Cref{eq:Z-greater-than-A}}\\
+=~& \E_{\bu, \bv} \sum_{ h'} \bra{\psi}  H^{\bu}_{h'} \otimes  A^{\bv}_{h'(\bv)} \ket{\psi}\\
+=~& \E_{\bv} \sum_{a} \bra{\psi}  H_{[h(\bv)=a]} \otimes  A^{\bv}_{a} \ket{\psi}\\
+=~& \E_{\bv} \sum_{a} \bra{\psi}  H_{[h(\bv)=a]} \otimes  I \ket{\psi} - \E_{\bv} \sum_{a\neq b} \bra{\psi}  H_{[h(\bv)=a]} \otimes  A^{\bv}_{b} \ket{\psi}\tag{because~$A$ is a measurement}\\
+\geq~& \E_{\bv} \sum_{a} \bra{\psi}  H_{[h(\bv)=a]} \otimes  I \ket{\psi} - 4 \sqrt{\zeta_{\mathrm{variance}}} \tag{by \Cref{eq:explicit-bound-for-A-consistency}}\\
+=~&  \sum_{h} \bra{\psi}  H_h \otimes  I \ket{\psi} - 4 \sqrt{\zeta_{\mathrm{variance}}}.
+\end{align*}
+In total, we have shown that
+\begin{equation*}
+\sum_{h\in\polyfunc{m}{q}{d}} \bra{\psi} H_h \otimes H_h \ket{\psi} \geq  \sum_{h} \bra{\psi}  H_h \otimes  I \ket{\psi} - 7 \sqrt{\zeta_{\mathrm{variance}}} - \sqrt{2\delta} - \frac{md}{q} - 4\sqrt{\zeta_{\mathrm{variance}}}.
+\end{equation*}
+Because
+\begin{align*}
+11 \sqrt{\zeta_{\mathrm{variance}}} + \sqrt{2\delta} + \frac{md}{q}
+& = 11 \sqrt{24m\cdot\Big(\eps + \delta + \frac{md}{q}\Big)} + \sqrt{2\delta} + \frac{md}{q}\\
+&\leq  55 m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big) + 2\sqrt{\delta} + m \cdot (d/q)^{1/2}\\
+&\leq  57 m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)\\
+&\leq \zeta,
+\end{align*}
+this concludes the proof of \Cref{item:self-improvement-self}.
+
+\vspace{\baselineskip}
+\noindent
+\emph{Proof of \Cref{item:self-improvement-boundedness} (Boundedness).}
+The boundedness of~$H$ is
+\ignore{
+\begin{align*}
+&\bra{\psi} Z \otimes (I - H) \ket{\psi}\\
+=~& \bra{\psi} Z \otimes I \ket{\psi} - \sum_h \bra{\psi} Z \otimes H_h \ket{\psi}\\
+\leq~& \bra{\psi} Z \otimes I \ket{\psi} - \sum_h \bra{\psi} \E_{\bu} A^{\bu}_{h(\bu)} \otimes H_h \ket{\psi} \tag{by \Cref{eq:Z-greater-than-A}}\\
+=~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_h \bra{\psi}  A^{\bu}_{h(\bu)} \otimes H_h \ket{\psi}\\
+=~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_h \bra{\psi}  I \otimes H_h \ket{\psi} +\E_{\bu} \sum_{a, h:h(\bu)\neq a} \bra{\psi}  A^{\bu}_{a} \otimes H_h \ket{\psi} \tag{because~$A$ is a measurement}\\
+\leq~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_h \bra{\psi}  I \otimes H_h \ket{\psi} + 4 \sqrt{\zeta_{\mathrm{variance}}}\tag{by \Cref{eq:explicit-bound-for-A-consistency}}\\
+\leq~& 3 \sqrt{\delta} + 4 \sqrt{\zeta_{\mathrm{variance}}}.\tag{by \Cref{eq:gonna-use-this-later-H-versus-Z}}
+\end{align*}
+}
+\begin{align*}
+&\bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_a \bra{\psi}  A^{\bu}_{a} \otimes H_{[h(\bu)=a]} \ket{\psi} \\
+=~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_h \bra{\psi}  A^{\bu}_{h(\bu)} \otimes H_h \ket{\psi}\\
+=~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_h \bra{\psi}  I \otimes H_h \ket{\psi} +\E_{\bu} \sum_{a, h:h(\bu)\neq a} \bra{\psi}  A^{\bu}_{a} \otimes H_h \ket{\psi} \tag{because~$A$ is a measurement}\\
+\leq~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_h \bra{\psi}  I \otimes H_h \ket{\psi} + 4 \sqrt{\zeta_{\mathrm{variance}}}\tag{by \Cref{eq:explicit-bound-for-A-consistency}}\\
+\leq~& 3 \sqrt{\delta} + 4 \sqrt{\zeta_{\mathrm{variance}}}.\tag{by \Cref{eq:gonna-use-this-later-H-versus-Z}}
+\end{align*}
+We can bound the error by
+\begin{align*}
+ 3 \sqrt{\delta} + 4 \sqrt{\zeta_{\mathrm{variance}}}
+ & =  3 \sqrt{\delta} + 4 \sqrt{24m\cdot\Big(\eps + \delta + \frac{md}{q}\Big)}\\
+ & \leq 3 \sqrt{\delta} + 20 m\cdot\Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)\\
+ &\leq 23 m\cdot\Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)\\
+ & \leq \zeta.
+\end{align*}
+This completes the proof.
+\qed
+
+\subsection{Self-improving to a projective measurement}
+\label{sec:self-improvement-projective}
+
+We now prove the full self-improvement theorem, i.e.\ \Cref{thm:self-improvement-in-induction-section}.
+To do so, we will apply the orthonormalization lemma \Cref{thm:orthonormalization}
+to the output of \Cref{lem:self-improvement-helper} and argue that it maintains the four properties of~$H$.
+
+\begin{theorem}[Self-improvement; \Cref{thm:self-improvement-in-induction-section} restated]\label{thm:self-improvement}
+Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
+\begin{enumerate}
+\ignore{
+\item (Completeness): \label{item:self-improvement-projective-G-completeness}  If $G =  \sum_g G_g$, then
+  	\begin{equation*}
+	\bra{\psi} G \otimes I \ket{\psi} \geq 1 - \kappa.
+	\end{equation*}
+}
+  \item (Consistency with~$A$): \label{item:self-improvement-projective-G-consistency} On average over $\bu \sim \F_q^{m}$,
+	  \begin{equation*}
+	  A^{u}_a \otimes I \simeq_{\nu} I \otimes G_{[g(u)=a]}.
+	  \end{equation*}
+	  \end{enumerate}
+Let
+\begin{equation*}
+\zeta = 3000m\cdot \Big(\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32}\Big).
+\end{equation*}
+Then there exists a projective sub-measurement $H \in \polysub{m}{q}{d}$ with the following properties:
+\begin{enumerate}
+    \item(Completeness):  \label{item:self-improvement-projective-completeness} If $H =  \sum_h H_h$, then
+    \begin{equation*}
+    \bra{\psi} H \otimes I \ket{\psi} \geq (1-\nu)-\zeta.
+    \end{equation*}
+    \item(Consistency with~$A$):\label{item:self-improvement-projective-A-consistency} On average over $\bu \sim \F_q^m$,
+        \begin{equation*}
+            A^u_a \otimes I \simeq_{\zeta} I \otimes H_{[h(u) = a]}.
+        \end{equation*}
+    \item(Strong self-consistency): \label{item:self-improvement-projective-self}
+    	\begin{equation*}
+		H_h \otimes I \approx_{\zeta} I \otimes H_h.
+	\end{equation*}
+    \item(Boundedness): \label{item:self-improvement-projective-boundedness} There exists a positive-semidefinite matrix~$Z$ such that
+    \begin{equation*}
+        \bra{\psi} Z \otimes (I - H) \ket{\psi} \leq \zeta
+    \end{equation*}
+    and for each $h \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	Z \geq \left(\E_{\bu} A^{\bu}_{h(\bu)}\right).
+	\end{equation*}
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+We note that the bound we are proving is trivial when at least one of $\eps$, $\delta$, or $d/q$ is $\geq 1$.
+In this case, $\zeta \geq 3000$.
+Hence, we may assume that $\gamma, \zeta, d/q \leq 1$.
+This will aid us when carrying out the error calculations near the end of the proof,
+as it allows us to bound terms like $\eps^{1/2}$ by terms like $\eps^{1/4}$.
+
+To begin,  apply \Cref{lem:self-improvement-helper} to~$G$.
+Let $\widehat{H} \in \polysub{m}{q}{d}$ be the sub-measurement it outputs
+and let $\widehat{\zeta}$ be the error
+\begin{equation*}
+\widehat{\zeta} = 100m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big).
+\end{equation*}
+By \Cref{item:self-improvement-self} of \Cref{lem:self-improvement-helper},
+\begin{equation*}
+\sum_{h} \bra{\psi} \widehat{H}_h \ot \widehat{H}_h \ket{\psi}
+	\geq \bra{\psi} \widehat{H} \ot I \ket{\psi} - \widehat{\zeta}.
+\end{equation*}
+Thus, \Cref{thm:orthonormalization} implies the existence of a projective sub-measurement
+$H \in \polysub{m}{q}{d}$ such that
+\begin{equation}\label{eq:approx-between-H-with-and-without-hat}
+\widehat{H}_h \otimes I \approx_{\widehat{\zeta}_{\mathrm{ortho}}} H_{h} \otimes I,
+\end{equation}
+where
+\begin{equation*}
+\widehat{\zeta}_{\mathrm{ortho}} = 100 \widehat{\zeta}^{1/4}.
+\end{equation*}
+In addition, \Cref{prop:self-consistency-implies-data-processing} implies that
+\begin{equation}\label{eq:approx-data-processed}
+\widehat{H}_{[h(u)=a]} \otimes I \approx_{\widehat{\zeta}_{\mathrm{dataprocess}}} H_{[h(u)=a]} \otimes I,
+\end{equation}
+where
+\begin{equation*}
+\widehat{\zeta}_{\mathrm{dataprocess}} = 8 \widehat{\zeta} + 8 \sqrt{\widehat{\zeta}_{\mathrm{ortho}}}.
+\end{equation*}
+
+Now we prove the four properties of this theorem.
+We will show that each quantity is bounded by some error,
+and then at the end of this proof we will show that all four errors are bounded by~$\zeta$.
+\begin{enumerate}
+    \item(Completeness):
+\Cref{prop:completeness-transfer-self-consistent-A} implies that
+\begin{align*}
+ \bra{\psi} H \otimes I \ket{\psi}
+ & \geq  \bra{\psi} \widehat{H} \otimes I \ket{\psi} - \widehat{\zeta} - 2\sqrt{\widehat{\zeta}_{\mathrm{ortho}}}\\
+ & \geq  (1-\nu) -  2\widehat{\zeta} - 2\sqrt{\widehat{\zeta}_{\mathrm{ortho}}}. \tag{by \Cref{item:self-improvement-projective-completeness} of \Cref{lem:self-improvement-helper}}
+\end{align*}
+	\item (Consistency with~$A$):
+\Cref{prop:triangle-sub} applied to
+ \Cref{item:self-improvement-projective-A-consistency} of \Cref{lem:self-improvement-helper}
+implies that
+\begin{equation*}
+A^u_a \otimes I \simeq_{\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}}
+		I \otimes H_{[h(u) = a]}.
+\end{equation*}
+	\item (Strong self-consistency): \Cref{prop:two-notions-of-self-consistency} implies that
+		\begin{equation*}
+		\widehat{H}_h \otimes I \approx_{2\widehat{\zeta}} I \otimes \widehat{H}_h.
+		\end{equation*}
+		Thus,
+		\begin{equation*}
+			H_h \otimes I
+			\approx_{\widehat{\zeta}_{\mathrm{ortho}}} \widehat{H}_{h} \otimes I
+			\approx_{2\widehat{\zeta}} I \otimes \widehat{H}_{h}
+			\approx_{\widehat{\zeta}_{\mathrm{ortho}}} I \otimes H_h.
+		\end{equation*}
+		Hence, by \Cref{prop:triangle-inequality-for-approx_delta},
+		\begin{equation*}
+		H_h \otimes I \approx_{6 \widehat{\zeta} + 6\widehat{\zeta}_{\mathrm{ortho}}} I \otimes H_h.
+		\end{equation*}
+	\item (Boundedness):
+		The boundedness of~$H$ is
+		\begin{align}
+		&\bra{\psi} Z \otimes (I - H) \ket{\psi}\nonumber\\
+		=~& \bra{\psi} Z \otimes I \ket{\psi} - \sum_h \bra{\psi} Z \otimes H_h \ket{\psi}\nonumber\\
+		\leq~& \bra{\psi} Z \otimes I \ket{\psi} - \sum_h \bra{\psi} \E_{\bu} A^{\bu}_{h(\bu)} \otimes H_h \ket{\psi} \tag{by \Cref{item:self-improvement-projective-boundedness} of \Cref{lem:self-improvement-helper}}\\
+		=~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_h \bra{\psi}  A^{\bu}_{h(\bu)} \otimes H_h \ket{\psi}\nonumber\\
+		=~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_a \bra{\psi}  A^{\bu}_{a} \otimes H_{[h(\bu)=a]} \ket{\psi}. \label{eq:almost-there-self-improvement-edition}
+		\end{align}
+		By \Cref{prop:easy-approx-from-approx-delta},
+		\begin{equation*}
+		\E_{\bu} \sum_a \bra{\psi}  A^{\bu}_{a} \otimes H_{[h(\bu)=a]} \ket{\psi}
+		\approx_{\sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}} \E_{\bu} \sum_a \bra{\psi}  A^{\bu}_{a} \otimes \widehat{H}_{[h(\bu)=a]} \ket{\psi}.
+		\end{equation*}
+		Hence,
+		\begin{align*}
+		\eqref{eq:almost-there-self-improvement-edition}
+		& \leq \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_a \bra{\psi}  A^{\bu}_{a} \otimes \widehat{H}_{[h(\bu)=a]} \ket{\psi} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}\\
+		& \leq \widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}. \tag{by \Cref{item:self-improvement-boundedness} of \Cref{lem:self-improvement-helper}}
+		\end{align*}
+\end{enumerate}
+
+This shows the four properties hold with errors
+\begin{equation*}
+2\widehat{\zeta} + 2\sqrt{\widehat{\zeta}_{\mathrm{ortho}}},\quad
+\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}},\quad
+6 \widehat{\zeta} + 6\widehat{\zeta}_{\mathrm{ortho}},\quad
+\text{and} \quad \widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}},
+\end{equation*}
+respectively. We now show that these four are bounded by~$\zeta$.
+First, using the fact that $100^{1/4} \leq 4$, we note that
+\begin{align*}
+\widehat{\zeta}_{\mathrm{ortho}}
+= 100 \widehat{\zeta}^{1/4}
+&= 100 \Big(100m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)\Big)^{1/4}\\
+&\leq 400 m \cdot \Big(\eps^{1/8} + \delta^{1/8} + (d/q)^{1/8}\Big).
+\end{align*}
+Hence,
+\begin{align*}
+6 \widehat{\zeta} + 6\widehat{\zeta}_{\mathrm{ortho}}
+& \leq 6 \Big(100m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)\Big)
+	+ 6 \Big(400 m \cdot \Big(\eps^{1/8} + \delta^{1/8} + (d/q)^{1/8}\Big)\Big)\\
+&\leq 600m \cdot \Big(\eps^{1/8} + \delta^{1/8} + (d/q)^{1/8}\Big)
+	+2400 m \cdot \Big(\eps^{1/8} + \delta^{1/8} + (d/q)^{1/8}\Big)\\
+&= 3000m\cdot \Big(\eps^{1/8} + \delta^{1/8} + (d/q)^{1/8}\Big),
+\end{align*}
+which is less than~$\zeta$.
+In addition, using the fact that~$\sqrt{400} = 20$, we also note that
+\begin{align*}
+\widehat{\zeta}_{\mathrm{dataprocess}}
+&= 8 \widehat{\zeta} + 8 \sqrt{\widehat{\zeta}_{\mathrm{ortho}}}\\
+&\leq 8 \Big(100m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)\Big)
+	+ 8 \sqrt{400 m \cdot \Big(\eps^{1/8} + \delta^{1/8} + (d/q)^{1/8}\Big)}\\
+&\leq 800m \cdot \Big(\eps^{1/16} + \delta^{1/16} + (d/q)^{1/16}\Big)
+	+ 160m \cdot \Big(\eps^{1/16} + \delta^{1/16} + (d/q)^{1/16}\Big)\\
+&= 960m \cdot \Big(\eps^{1/16} + \delta^{1/16} + (d/q)^{1/16}\Big),
+\end{align*}
+which is clearly less than $\zeta$.
+Thus, $2\widehat{\zeta} + 2\sqrt{\widehat{\zeta}_{\mathrm{ortho}}} \leq \widehat{\zeta}_{\mathrm{dataprocess}} \leq \zeta$.
+Finally, using $\sqrt{960} \leq 31$,
+\begin{align*}
+\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}
+&\leq  100m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
+		+ \sqrt{960m \cdot \Big(\eps^{1/16} + \delta^{1/16} + (d/q)^{1/16}\Big)}\\
+&\leq  100m \cdot \Big(\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32}\Big)
+		+ 31 m \cdot \Big(\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32}\Big)\\
+&=  131m \cdot \Big(\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32}\Big),
+\end{align*}
+which is also less than~$\zeta$.
+This completes the proof.
+\end{proof}
+

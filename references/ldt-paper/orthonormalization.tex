@@ -1,0 +1,1279 @@
+
+\section{Making measurements projective}
+\label{sec:making-measurements-projective}
+
+A recurring theme in $\MIP^*$ research is that 
+projective measurements are significantly easier to manipulate
+than general POVM measurements.
+As just one example among many,
+when $A = \{A^x_a\}$ and $B = \{B^x_a\}$ are projective measurements,
+the ``$\approx_\delta$" and ``$\simeq_\delta$" distances are equivalent.
+In other words:
+\begin{equation*}
+A^x_a \ot I \simeq_{\delta} I \ot B^x_a
+\qquad
+\iff
+\qquad
+A^x_a \ot I \approx_{2\delta} I \ot B^x_a.
+\end{equation*}
+This is Fact~$4.13$ from~\cite{NW19}.
+On the other hand when~$A$ and~$B$
+are not projective,
+one can find examples of measurements
+where $A^x_a \ot I \approx_{\delta} I \ot B^x_a$
+for $\delta \rightarrow 0$
+but one can show $A^x_a \ot I \simeq_{\eps} I \ot B^x_a$
+only for $\eps \rightarrow 1$;
+this is Remark~$4.15$ from~\cite{NW19}.
+As a result, it is important to be able to convert
+POVM measurements to projective measurements
+whenever possible.
+
+In this section, we will survey two tools for doing so.
+The first of these is the textbook Naimark dilation theorem.
+In our setting, it states the following.
+
+\begin{theorem}[Naimark dilation]\label{thm:naimark}
+Let $\ket{\psi}$ be a state in $\calH_{\mathrm{A}} \ot \calH_{\mathrm{B}}$.
+Let $A = \{A^x_a\}$ be a sub-measurement acting on $\calH_{\mathrm{A}}$
+and $B=\{B^y_b\}$ be a sub-measurement acting on $\calH_{\mathrm{B}}$.
+Then there exists
+\begin{enumerate}
+\item Hilbert spaces $\calH_{\mathrm{A}_{\mathsf{aux}}}$ and $\calH_{\mathrm{B}_{\mathsf{aux}}}$,
+\item a state $\ket{\mathsf{aux}} \in \calH_{\mathrm{A}_{\mathsf{aux}}} \ot \calH_{\mathrm{B}_{\mathsf{aux}}}$,
+\item and two measurements  $\widehat{A} = \{\widehat{A}^x_a\}$ and $\widehat{B}=\{\widehat{B}^y_b\}$
+acting on $\calH_{\mathrm{A}} \ot \calH_{\mathrm{A}_{\mathsf{aux}}}$
+and $\calH_{\mathrm{B}} \ot \calH_{\mathrm{B}_{\mathsf{aux}}}$,
+respectively,
+\end{enumerate}
+such that the following is true.
+If we write $\ket{\widehat{\psi}} = \ket{\psi} \otimes \ket{\mathsf{aux}}$,
+then for all $x,y, a, b$,
+ \begin{equation*}
+ \bra{\psi} A^x_a \ot B^y_b \ket{\psi}
+ = \bra{\widehat{\psi}} \widehat{A}^x_a \ot \widehat{B}^y_b \ket{\widehat{\psi}}.
+ \end{equation*}
+ In addition, $\ket{\mathsf{aux}}$ is a \emph{product state},
+ meaning that we can write it as
+ \begin{equation*}
+ \ket{\mathsf{aux}}= \ket{\mathsf{aux}_{\mathrm{A}}} \ot \ket{\mathsf{aux}_{\mathrm{B}}},
+ \end{equation*}
+for $\ket{\mathsf{aux}_{\mathrm{A}}}$ in $\calH_{\mathrm{A}_{\mathsf{aux}}}$
+and $\ket{\mathsf{aux}_{\mathrm{B}}}$ in $\calH_{\mathrm{B}_{\mathsf{aux}}}$.
+\end{theorem}
+The second of these is the ``orthogonalization lemma" from~\cite{KV11}.
+In the setting of symmetric strategies, it states the following.
+
+\begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
+Let $\ket{\psi}$ be a permutation-invariant state,
+and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency
+\begin{equation*}
+\sum_a \bra{\psi} A_a \otimes A_a \ket{\psi} \geq \sum_a \bra{\psi} A_a \otimes I \ket{\psi} -\zeta.
+\end{equation*}
+Then there exists a projective sub-measurement $P = \{P_a\}$ such that
+\begin{equation*}
+A_a \otimes I \approx_{100 \zeta^{1/4}} P_a \otimes I.
+\end{equation*}
+\end{theorem}
+
+These two results serve largely the same purpose,
+and for our applications it will typically suffice to use either one.
+That said, there are tradeoffs when choosing to use one or the other.
+Naimark dilation is convenient because it can be applied to any family of sub-measurements
+and it preserves measurement outcome probabilities exactly.
+On the other hand, it requires swapping out the state $\ket{\psi}$ and measurements~$A$ and~$B$
+for $\ket{\widehat{\psi}}$ and $\widehat{A}$ and $\widehat{B}$, respectively,
+which can be notationally cumbersome.
+Most works opt to skip adding the hats,
+and instead say something to the effect of ``using Naimark, we can assume that~$A$ and~$B$ are projective."
+However, there is subtlety in doing so,
+which is that Naimark dilation does not necessarily preserve ``$\approx_{\delta}$" statements;
+in other words, $A^x_a \ot I \approx_{\delta} I \ot B^x_a$
+does not necessarily imply $\widehat{A}^x_a \ot I \approx_{\delta} I \ot \widehat{B}^x_a$.
+(As an example, \Cref{ex:easy-but-long} below
+provides a case in which $A^x_a \ot I \approx_{0} I \ot B^x_a$,
+but $\widehat{A}^x_a \ot I \approx_{\delta} I \ot \widehat{B}^x_a$ only holds for $\delta \geq 1$.)
+This can lead to trouble if the same notation is used for~$A, B$ and $\widehat{A}, \widehat{B}$,
+as ``$\approx_{\delta}$" statements derived before applying Naimark might not necessarily hold after applying Naimark.
+(That said, as pointed out at the end of Section~$4.4$ of~\cite{NW19},
+``$\approx_{\delta}$" statements are often derived as a consequence of ``$\simeq_{\delta}$" statements.
+And as Naimark preserves ``$\simeq_{\delta}$" statements,
+one could use them to simply rederive any ``$\approx_{\delta}$" statements post-Naimark.)
+
+The downsides of using the orthogonalization lemma
+are that it can only be applied to measurements which are strongly self-consistent
+and it introduces additional error.
+As we will see below, its proof is significantly more complicated than Naimark dilation.
+On the plus side, it has none of the notational baggage that Naimark brings,
+and so it is more concrete to use.
+In addition, it can lead to stronger results,
+as it does not require introducing an auxiliary state $\ket{\mathsf{aux}}$.
+
+In this work, we will opt to use the orthogonalization lemma rather than Naimark dilation.
+However, we will include proofs of both for completeness.
+We will prove \Cref{thm:naimark} in \Cref{sec:naimark}
+and then \Cref{thm:orthonormalization} in \Cref{sec:orthogonalization}.
+
+\subsection{Naimark dilation}\label{sec:naimark}
+
+To prove \Cref{thm:naimark}, we will first need the following lemma.
+
+\begin{lemma}
+  \label{lem:naimark-helper}
+  Let $A = \{A_{a}\}$ be a sub-measurement with $k$ distinct outcomes $a \in \calA$, and let $\ket{\mathsf{aux}} \in \C^{k+1}$ be any state. Then there exists a projective sub-measurement $\widehat{A} = \{\widehat{A}_{a}\}$ such that
+  for each outcome~$a$,
+  \[ (I \ot \bra{\mathsf{aux}} ) \cdot \widehat{A}_{a} \cdot (I \ot \ket{\mathsf{aux}}) =
+    A_{a}. \]
+\end{lemma}
+\begin{proof}
+We will consider an orthonormal basis for $\C^{k+1}$
+consisting of a vector $\ket{a}$ for each $a \in \calA$ and the vector $\ket{\bot}$.
+Let~$U$ be any unitary such that for each vector $\ket{\psi} \in \C^d$,
+\begin{align*}
+U \cdot (\ket{\psi} \ot \ket{\mathsf{aux}})
+&= \sum_{a \in \calA} ((A_{a})^{1/2} \ket{\psi}) \ot \ket{a} + ((1 - A)^{1/2}\ket{\psi}) \ot \ket{\bot}\\
+&= \Big(\sum_{a \in \calA} (A_{a})^{1/2} \ot \ket{a} + (1 - A)^{1/2} \ot \ket{\bot}\Big)
+		\cdot \ket{\psi}.
+\end{align*}
+This implies that
+\begin{equation*}
+U \cdot (I \ot \ket{\mathsf{aux}})
+= \sum_{a \in \calA} (A_{a})^{1/2} \ot \ket{a} + (1 - A)^{1/2} \ot \ket{\bot}.
+\end{equation*}
+Hence, for any $a \in \calA$,
+\begin{equation*}
+(I \ot \bra{a}) \cdot U \cdot (I \ot \ket{\mathsf{aux}})
+= (I \ot \bra{a}) \cdot \Big(\sum_{a \in \calA} (A_{a})^{1/2} \ot \ket{a} + (1 - A)^{1/2} \ot \ket{\bot}\Big)
+= (A_a)^{1/2}.
+\end{equation*}
+  Then the desired projective sub-measurement is
+  \[ \widehat{A}_a = U^{\dagger} \cdot (I \ot \ket{a} \bra{a}) \cdot U. \]
+  This is because
+\begin{align*}
+ (I \ot \bra{\mathsf{aux}} ) \cdot \widehat{A}_{a} \cdot (I \ot \ket{\mathsf{aux}})
+&=(I \ot \bra{\mathsf{aux}} ) \cdot (U^{\dagger} \cdot (I \ot \ket{a} \bra{a}) \cdot U) \cdot (I \ot \ket{\mathsf{aux}})\\
+&=(I \ot \bra{\mathsf{aux}} ) \cdot U^{\dagger} \cdot (I \ot \ket{a}) \cdot (I\ot \bra{a}) \cdot U \cdot (I \ot \ket{\mathsf{aux}})\\
+&= (A_a)^{1/2} \cdot (A_a)^{1/2} = A_a.
+\end{align*}
+This completes the proof.
+\end{proof}
+
+Now we prove \Cref{thm:naimark}.
+\begin{proof}[Proof of \Cref{thm:naimark}]
+For each $x$, let $k$ be the number of outcomes in $A^x$,
+and let $\ket{\mathsf{aux}_{\mathrm{A},x}}$ be a state of dimensionality $k+1$.
+Let $\widetilde{A}^x$ be the sub-measurement guaranteed by \Cref{lem:naimark-helper}.
+Define $\ket{\mathsf{aux}_{\mathrm{B},x}}$ and $\widetilde{B}^x$ similarly.
+We define
+\begin{equation*}
+\ket{\widehat{\psi}} = \ket{\psi} \ot \big(\ot_{x} \ket{\mathsf{aux}_{\mathrm{A},x}}\big)
+					\ot \big(\ot_{x} \ket{\mathsf{aux}_{\mathrm{B},x}}\big)
+\end{equation*}
+and
+\begin{align*}
+\widehat{A}^x_a
+&= \widetilde{A}^x_a \ot \big(\ot_{z \neq x} I_{\mathsf{aux}_{\mathrm{A},z}}\big)\\
+\widehat{B}^y_b
+&= \widetilde{B}^y_b \ot \big(\ot_{z\neq y} I_{\mathsf{aux}_{\mathrm{B},z}}\big).
+\end{align*}
+Then for all $x,y,z,b$,
+\begin{align*}
+\bra{\widehat{\psi}} \widehat{A}^x_a \ot \widehat{B}^y_b \ket{\widehat{\psi}}
+& = \bra{\psi} \ot \bra{\mathsf{aux}_{\mathrm{A},x}} \ot \bra{\mathsf{aux}_{\mathrm{B},y}}
+	\cdot \widetilde{A}^x_a \ot \widetilde{B}^y_b \cdot \ket{\psi} \ot \ket{\mathsf{aux}_{\mathrm{A},x}} \ot \ket{\mathsf{aux}_{\mathrm{B},y}}\\
+&= 	\bra{\psi} A^x_a \ot B^y_b \ket{\psi}.
+\end{align*}
+This completes the proof.
+\end{proof}
+
+\begin{example}[Naimark does not preserve ``$\approx_{\delta}$'']\label{ex:easy-but-long}
+We now carry out a simple example
+in which Naimark preserves ``$\simeq_\delta$'' statements without preserving ``$\approx_\delta$'' statements.
+Let $\ket{\psi}$ be an arbitrary state in $\calH_{\mathrm{A}} \ot \calH_{\mathrm{B}}$,
+where $\calH_{\mathrm{A}} = \calH_{\mathrm{B}} = \C^d$.
+In addition, let $A = \{A_0, A_1\}$ and $B = \{B_0, B_1\}$ be the two-outcome measurements
+in which $A_0 = A_1 = B_0 = B_1 = \frac{1}{2} \cdot I_{d \times d}$.
+Then
+\begin{align*}
+\sum_{a \neq b} \bra{\psi} A_a \ot B_b\ket{\psi}
+&= \bra{\psi} A_0 \ot B_1\ket{\psi} + \bra{\psi} A_1 \ot B_0\ket{\psi}\\
+&= \frac{1}{4} \cdot \bra{\psi} I \ot I \ket{\psi} + \frac{1}{4} \cdot \bra{\psi} I \ot I \ket{\psi}
+= \frac{1}{2},
+\end{align*}
+and so $A_a \ot I \simeq_{1/2} I \ot A_a$.
+In addition,
+\begin{equation*}
+\sum_a \Vert (A_a \ot I - I \ot B_a) \ket{\psi}\Vert^2
+= \sum_a \Big\Vert \Big(\frac{1}{2} \cdot I \ot I - \frac{1}{2} \cdot I \ot I\Big) \ket{\psi}\Big\Vert^2
+= 0,
+\end{equation*}
+and so $A_a \ot I \approx_0 I \ot B_a$.
+
+Now we carry out the steps of Naimark dilation.
+Because~$A$ and~$B$ are two-outcome,
+we will set $\calH_{\mathrm{A}_{\mathsf{aux}}} = \calH_{\mathrm{B}_{\mathsf{aux}}} = \C^2$,
+spanned by the basis vectors $\ket{0}$ and $\ket{1}$.
+(\Cref{lem:naimark-helper} actually asks that the auxiliary space have dimension $2+1 = 3$,
+where the third dimension is spanned by the basis vector $\ket{\bot}$.
+However, this is unnecessary for this example because~$A$ and~$B$
+are measurements rather than sub-measurements.)
+We will choose our two local auxiliary states
+to be
+\begin{equation*}
+\ket{\mathsf{aux}_{\mathrm{A}}} = \ket{\mathsf{aux}_{\mathrm{B}}}
+	= \ket{+} = \frac{1}{\sqrt{2}}\ket{0} + \frac{1}{\sqrt{2}}\ket{1}.
+\end{equation*}
+We first construct $\widehat{A}$ by following the proof of \Cref{lem:naimark-helper}.
+To begin, it asks for~$U$ to be a unitary such that for any $\ket{\phi}$ in $\calH_{\mathrm{A}}$,
+\begin{align*}
+U \cdot (\ket{\phi} \ot \ket{\mathsf{aux}_{\mathrm{A}}})
+&=U \cdot (\ket{\phi} \ot \ket{+})\\
+&=  ((A_{0})^{1/2} \ket{\phi}) \ot \ket{0} + ((A_{1})^{1/2} \ket{\phi}) \ot \ket{1}\\
+&= \Big(\Big(\frac{1}{2}\cdot I\Big)^{1/2} \ket{\phi}\Big) \ot \ket{0}
+	+ \Big(\Big(\frac{1}{2}\cdot I\Big)^{1/2} \ket{\phi}\Big) \ot \ket{1}\\
+&=\frac{1}{\sqrt{2}} \ket{\phi} \ot \ket{0} + \frac{1}{\sqrt{2}} \ket{\phi} \ot \ket{1}\\
+&= \ket{\phi} \ot \ket{+}.
+\end{align*}
+As a result, we can simply take~$U$ to be the identity matrix.
+Thus,
+\begin{equation*}
+\widehat{A}_a = U^{\dagger} \cdot (I \ot \ket{a} \bra{a}) \cdot U = I \ot \ket{a}\bra{a}.
+\end{equation*}
+By a similar argument, we can take $\widehat{B}_a = I \ot \ket{a}\bra{a}$ for $a \in \{0, 1\}$ as well.
+
+Now we set $\ket{\widehat{\psi}} = \ket{\psi}\ot \ket{\mathsf{aux}_{\mathrm{A}}} \ot \ket{\mathsf{aux}_{\mathrm{B}}}$.
+By \Cref{thm:naimark},
+we already know that $\widehat{A}_a \ot I \approx_0 I \ot \widehat{B}_a$
+on state $\ket{\widehat{\phi}}$ because this holds for the un-hatted state and measurements.
+On the other hand,
+we will now show that $\widehat{A}_a \ot I \approx_{\delta} I \ot \widehat{B}_a$
+only for $\delta \geq 1$, in contrast to the un-hatted case where it holds for $\delta = 0$.
+To see this, we calculate as follows.
+\begin{align}
+&\sum_a \Vert (\widehat{A}_a \ot I_{\mathrm{B}, \mathsf{aux}_{\mathrm{B}}}
+	- I_{\mathrm{A}, \mathsf{aux}_{\mathrm{A}}} \ot \widehat{B}_a) \ket{\widehat{\psi}}\Vert^2\nonumber\\
+ ={}& \sum_a \Vert ((I_{\mathrm{A}} \ot \ket{a}\bra{a}) \ot I_{\mathrm{B}, \mathsf{aux}_{\mathrm{B}}}
+	- I_{\mathrm{A}, \mathsf{aux}_{\mathrm{A}}} \ot (I_{\mathrm{B}} \ot \ket{a}\bra{a}))
+		\ket{\psi} \ot \ket{+} \ot \ket{+}\Vert^2\nonumber\\
+={}& \sum_a \Big\Vert \Big(\frac{1}{\sqrt{2}} \ket{\psi} \ot \ket{a}\ot\ket{+}
+			- \frac{1}{\sqrt{2}} \ket{\psi} \ot \ket{+} \ot \ket{a}\Big) \Big\Vert^2\nonumber\\
+={}& \sum_a \frac{1}{2} \cdot \braket{\psi \mid \psi} 
+	\cdot (\bra{a} \ot \bra{+}- \bra{+} \ot \bra{a}) \cdot (\ket{a} \ot \ket{+}- \ket{+} \ot \ket{a}).\label{eq:awefea}
+\end{align}
+For each~$a$, we have that
+\begin{align*}
+&(\bra{a} \ot \bra{+}- \bra{+} \ot \bra{a}) \cdot (\ket{a} \ot \ket{+}- \ket{+} \ot \ket{a})\\
+={}& 2 - \braket{a \mid +} \cdot \braket{+ \mid a} - \braket{+ \mid a} \cdot \braket{a \mid +}\\
+={}& 2 - \frac{1}{\sqrt{2}}\cdot \frac{1}{\sqrt{2}} - \frac{1}{\sqrt{2}} \cdot \frac{1}{\sqrt{2}}\\
+={}& 1.
+\end{align*}
+Plugging this into \Cref{eq:awefea}, we arrive at our bound.
+\end{example}
+
+\subsection{Orthogonalization lemma}\label{sec:orthogonalization}
+
+To show \Cref{thm:orthonormalization},
+we first show it for the case when~$A$ is a measurement, rather than a sub-measurement.
+Our proof of this case will even work in the more general setting
+when the strategy is not assumed to be symmetric,
+meaning that~$\ket{\psi}$ is not necessarily permutation-invariant and Player~$\mathrm{B}$'s measurement~$B$ may not be equal to Player~$\mathrm{A}$'s measurement.
+This is the content of the following lemma, whose proof we defer till later. 
+
+\begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
+Let $\ket{\psi}$ be a state (which is not necessarily permutation-invariant),
+and let $A = \{A_a\}$ and $B = \{B_a\}$ be measurements such that
+\begin{equation*}
+A_a \ot I \simeq_{\zeta} I \ot B_a
+\end{equation*}
+on state $\ket{\psi}$.
+Then there exists a projective sub-measurement $P = \{P_a\}$ such that
+\begin{equation*}
+A_a \otimes I \approx_{84 \zeta^{1/4}} P_a \otimes I.
+\end{equation*}
+\end{lemma}
+
+(Note that when $\ket{\psi}$ is permutation-invariant and $B = A$, the condition $A_a \ot I \simeq_{\zeta} I \ot B_a$
+is equivalent to~$A_a$ being $\zeta$-strongly self-consistent, by \Cref{prop:other-two-notions-of-self-consistency}.
+This is because~$A$ is a measurement.)
+
+\ignore{
+\begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
+Let $\ket{\psi}$ be a permutation-invariant state,
+and let $A = \{A_a\}$ be a measurement with strong self-consistency
+\begin{equation*}
+\sum_a \bra{\psi} A_a \otimes A_a \ket{\psi} \geq 1 -\zeta.
+\end{equation*}
+Then there exists a projective sub-measurement $P = \{P_a\}$ such that
+\begin{equation*}
+A_a \otimes I \approx_{76 \zeta^{1/4}} P_a \otimes I.
+\end{equation*}
+\end{lemma}
+}
+
+We now prove \Cref{thm:orthonormalization} by reducing the general (sub-measurement) case
+to the case when~$A$ is a measurement.
+
+\begin{proof}[Proof of \Cref{thm:orthonormalization} assuming \Cref{lem:orthonormalization-main-lemma}]
+Let $A = \{A_a\}$ be a sub-measurement with outcomes $a \in \calA$ whose strong self-consistency is
+\begin{equation*}
+\sum_a \bra{\psi} A_a \otimes A_a \ket{\psi} \geq \sum_a \bra{\psi} A_a \otimes I \ket{\psi} -\zeta.
+\end{equation*}
+Note that
+\begin{equation*}
+\bra{\psi} A \otimes A \ket{\psi}
+= \sum_{a, b} \bra{\psi} A_a \otimes A_b \ket{\psi}
+\geq \sum_{a} \bra{\psi} A_a \otimes A_a \ket{\psi}
+\geq  \bra{\psi} A \otimes I \ket{\psi} -\zeta.
+\end{equation*}
+Rearranging,
+\begin{align*}
+\bra{\psi} A \otimes (I - A)\ket{\psi}
+&= \bra{\psi} A \otimes I \ket{\psi} - \bra{\psi} A \otimes A \ket{\psi}\\
+&\leq (\bra{\psi} A \otimes A \ket{\psi} + \zeta) - \bra{\psi} A \otimes A \ket{\psi}
+ = \zeta.
+\end{align*}
+As a result,
+\begin{align*}
+\bra{\psi} (I-A) \otimes (I-A) \ket{\psi}
+&= \bra{\psi} (I-A) \otimes I \ket{\psi} - \bra{\psi} (I-A) \otimes A \ket{\psi}\\
+&\geq \bra{\psi} (I-A) \otimes I \ket{\psi} - \zeta.
+\end{align*}
+
+
+Let $\widehat{A}$ be the POVM measurement with outcomes in $\widehat{\calA} = \calA \cup \{\bot\}$ defined as
+\begin{equation*}
+\widehat{A}_a
+= \left\{\begin{array}{cl}
+		A_a & \text{if $a \in \calA$},\\
+		(I-A) & \text{if $a = \bot$.}
+		\end{array}\right.
+\end{equation*}
+Then the strong self-consistency of $\widehat{A}$ is
+\begin{align*}
+\sum_{a \in \widehat{\calA}} \bra{\psi} \widehat{A}_a \otimes \widehat{A}_a \ket{\psi}
+& = \sum_{a \in \calA} \bra{\psi} A_a \otimes A_a \ket{\psi}
+	+ \bra{\psi} \widehat{A}_{\bot} \otimes \widehat{A}_{\bot} \ket{\psi}\\
+& \geq \Big(\sum_{a \in \calA} \bra{\psi} A_a \otimes I \ket{\psi} - \zeta\Big)
+	+ \bra{\psi} (I-A) \otimes (I-A) \ket{\psi}\\
+& \geq \Big( \bra{\psi} A \otimes I \ket{\psi} - \zeta\Big)
+	+ \Big(\bra{\psi} (I-A) \otimes I \ket{\psi} - \zeta\Big)\\
+& = 1 - 2\zeta.
+\end{align*}
+Because $\widehat{A}$ is a measurement,
+\Cref{prop:other-two-notions-of-self-consistency} states that this is equivalent to
+\begin{equation*}
+\widehat{A}_a \ot I \simeq_{2\zeta} I \ot \widehat{A}_a.
+\end{equation*}
+As a result, \Cref{lem:orthonormalization-main-lemma} implies the existence of a projective sub-measurement
+$\widehat{P} = \{\widehat{P}_a\}_{a \in \widehat{\calA}}$ such that 
+\begin{equation*}
+\widehat{A}_a \ot I \approx_{84\cdot(2\zeta)^{1/4}} \widehat{P}_a \ot I.
+\end{equation*}
+If we define the projective sub-measurement $P = \{P_a\}_{a \in \calA}$
+by $P_a = \widehat{P}_a$ for all $a \in \calA$, then
+\begin{equation*}
+\sum_{a \in \calA} \Vert (A_a - P_a) \ot I \ket{\psi} \Vert^2
+\leq \sum_{a \in \widehat{\calA}} \Vert (\widehat{A}_a - \widehat{P}_a) \ot I \ket{\psi} \Vert^2
+\leq 84 \cdot (2\zeta)^{1/4}.
+\end{equation*}
+Thus, $A_a \ot I \approx_{84 \cdot (2\zeta)^{1/4}} P_a \ot I$.
+We conclude the proof by noting that $84 \cdot (2\zeta)^{1/4} \leq 100 \cdot \zeta^{1/4}$
+because $84 \cdot (2)^{1/4} \approx 99.89\leq100$.
+\end{proof}
+
+Now we prove \Cref{lem:orthonormalization-main-lemma}.
+
+\begin{proof}[Proof of~\Cref{lem:orthonormalization-main-lemma}]
+We note that the lemma as stated is trivial when $\zeta > 1/4$.
+As a result, we will assume that
+\begin{equation}\label{eq:assumption-on-zeta}
+\zeta \leq 1/4.
+\end{equation}
+Let $A = \{A_a\}$ and~$B = \{B_a\}$ be POVM measurements such that
+\begin{equation*}
+A_a \ot I \simeq_{\zeta} I \ot B_a.
+\end{equation*}
+\ignore{
+By \Cref{prop:two-notions-of-self-consistency},
+\begin{equation}\label{eq:A-approx-delta}
+A_a \otimes I\approx_{2\zeta} I\otimes A_a.
+\end{equation}
+}
+By \Cref{prop:simeq-for-measurements}, this implies that
+\begin{equation*}
+\sum_a \bra{\psi}A_a \ot B_a \ket{\psi} \geq 1 - \zeta.
+\end{equation*}
+Applying Cauchy-Schwarz, we have
+\begin{align*}
+\sum_a \bra{\psi} A_a \otimes B_a \ket{\psi}
+&= \sum_a \bra{\psi} (A_a \ot I) \cdot (I \ot B_a) \ket{\psi}\nonumber\\
+&\leq \sqrt{\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}} \cdot \sqrt{\sum_a \bra{\psi} I \ot (B_a)^2 \ket{\psi}}\nonumber\\
+& \leq \sqrt{\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}} \cdot 1.
+\end{align*}
+Taking the square of both sides,
+\begin{equation*}
+\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi} \geq \Big(\sum_a \bra{\psi} A_a \otimes B_a \ket{\psi}\Big)^2 \geq (1-\zeta)^2
+\geq 1 - 2\zeta
+= \sum_a \bra{\psi} A_a \ot I \ket{\psi} - 2\zeta. \tag{because~$A$ is a measurement}
+\end{equation*}
+\ignore{
+\begin{align}
+\sum_a \bra{\psi} A_a \otimes A_a \ket{\psi}
+&= \sum_a \bra{\psi} (A_a \ot I) \cdot (I \ot A_a) \ket{\psi}\nonumber\\
+&\leq \sqrt{\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}} \cdot \sqrt{\sum_a \bra{\psi} I \ot (A_a)^2 \ket{\psi}}\nonumber\\
+& = \sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}.\label{eq:As-on-same-side}
+\end{align}
+\ignore{We claim that
+\begin{equation}\label{eq:As-on-same-side}
+\sum_a \bra{\psi} A_a \otimes A_a \ket{\psi}
+\approx_{\sqrt{2\zeta}} \sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{align*}
+&\Big|\sum_a \bra{\psi} (A_a \otimes I) \cdot (A_a \otimes I - I \otimes A_a) \ket{\psi}\Big|\\
+\leq~&
+	\sqrt{\sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi}}
+	\cdot \sqrt{\sum_a \bra{\psi}(A_a \otimes I - I \otimes A_a)^2 \ket{\psi}}\\
+\leq~& 1 \cdot \sqrt{2\zeta}. \tag{by \Cref{eq:A-approx-delta}}
+\end{align*}}
+As a result,
+\begin{align*}
+\sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi}
+&\geq \sum_a \bra{\psi} A_a \otimes A_a \ket{\psi}\tag{by \Cref{eq:As-on-same-side}}\\
+&\geq \sum_a \bra{\psi} A_a \otimes I \ket{\psi} -\zeta. \tag{by self-consistency of~$A$}
+\end{align*}
+}
+Rearranging,
+\begin{equation}\label{eq:A-looks-projective}
+\sum_a \bra{\psi} (A_a - (A_a)^2) \otimes I \ket{\psi}
+\leq 2\zeta.
+\end{equation}
+This is all we need the~$B$ measurement for; henceforth, we will derive consequences of~\Cref{eq:A-looks-projective}.
+
+In our next lemma, we convert each~$A_a$ to a projective matrix~$R_a$
+by rounding each of $A_a$'s large eigenvalues to~$1$
+and small eigenvalues to~$0$.
+
+\begin{lemma}[Rounding to projectors]\label{lem:projective-non-measurement}
+There exists a set of projective matrices $\{R_a\}$ such that
+\begin{equation*}
+A_a \ot I \approx_{2\sqrt{\zeta}} R_a \ot I.
+\end{equation*}
+and
+\begin{equation*}
+R:= \sum_a R_a \leq (1+2\sqrt{\zeta}) \cdot I.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+For each~$a$, we write the eigendecomposition of $A_a$ as follows: 
+\begin{equation*}
+A_a = \sum_i \lambda_{a, i} \cdot\ket{u_{a, i}} \bra{u_{a, i}}.
+\end{equation*}
+Let
+\begin{equation}\label{eq:bound-on-delta}
+0 < \delta \leq 1/2
+\end{equation}
+be a number to be decided later.
+Let $\mathsf{trunc}_\delta:[0, 1] \rightarrow \{0, 1\}$ be the truncation function defined as
+\begin{equation*}
+\mathsf{trunc}_\delta(x) =
+\left\{\begin{array}{rl}
+	1 & \text{if } x \geq 1- \delta,\\
+	0 & \text{otherwise.}
+	\end{array}\right.
+\end{equation*}
+Then for each~$a$ we define the matrix $R_a$
+\begin{equation*}
+R_a = \mathsf{trunc}_\delta(A_a) = \sum_i \mathsf{trunc}_\delta(\lambda_{a, i}) \cdot \ket{u_{a, i}} \bra{u_{a, i}}.
+\end{equation*}
+To analyze this, we will require the following technical lemma.
+\begin{lemma}\label{lem:trunc-inequality}
+For any $x \in [0, 1]$,
+\begin{equation*}
+(x - \mathsf{trunc}_\delta(x))^2 \leq \frac{1}{\delta} \cdot (x - x^2).
+\end{equation*}
+\end{lemma}
+\begin{proof}
+This is proved by case analysis.
+First, suppose that $x \geq 1 - \delta$.
+This implies that $\mathsf{trunc}_\delta(x) = 1$.
+In addition, because $\delta \leq 1/2$ by \Cref{eq:bound-on-delta},
+$
+x \geq 1 - \delta \geq 1/2 \geq \delta.
+$
+Thus,
+\begin{align*}
+(x - \mathsf{trunc}_\delta(x))^2
+& = (1-x)^2\\
+ &\leq (1-x)\\
+&\leq (1-x) \cdot \frac{x}{\delta} \tag{because $x \geq \delta$}\\
+&= \frac{1}{\delta} \cdot (x - x^2).
+\end{align*}
+Next, suppose that $x < 1 -\delta$.
+This implies that $\mathsf{trunc}_\delta(x) = 0$.
+Thus,
+\begin{align*}
+(x - \mathsf{trunc}_\delta(x))^2
+& = x^2\\
+ &\leq x\\
+&\leq x \cdot \frac{(1-x)}{\delta} \tag{because $x \leq 1- \delta$}\\
+&= \frac{1}{\delta} \cdot (x - x^2).
+\end{align*}
+This concludes the proof.
+\end{proof}
+
+As a result, for each~$a$, \Cref{lem:trunc-inequality} implies that
+\begin{equation*}
+(A_a - R_a)^2 = (A_a - \mathsf{trunc}_\delta(A_a))^2 \leq \frac{1}{\delta} \cdot (A_a - (A_a)^2).
+\end{equation*}
+Thus,
+\begin{align*}
+\sum_a \Vert (A_a - R_a) \ot I \ket{\psi}\Vert^2
+= \sum_a \bra{\psi} (A_a - R_a)^2 \ot I\ket{\psi}
+&\leq \frac{1}{\delta} \cdot \sum_a \bra{\psi} (A_a - (A_a)^2) \ot I \ket{\psi}\\
+&\leq \frac{1}{\delta} \cdot 2\zeta. \tag{by \Cref{eq:A-looks-projective}}
+\end{align*}
+This implies that $A_a \otimes I \approx_{2\zeta/\delta} R_a \otimes I$.
+
+Next, for each $x \in [0, 1]$, it follows from the definition of $\mathsf{trunc}_\delta$ that
+\begin{equation*}
+\mathsf{trunc}_\delta(x) \leq \left(\frac{1}{1-\delta}\right) \cdot x.
+\end{equation*}
+Thus, for each~$a$
+\begin{equation*}
+R_a = \mathsf{trunc}_\delta(A_a) \leq \left(\frac{1}{1-\delta}\right) \cdot A_a.
+\end{equation*}
+Summing over all~$a$,
+\begin{equation*}
+R = \sum_a R_a \leq \left(\frac{1}{1-\delta}\right) \cdot \sum_a A_a = \left(\frac{1}{1-\delta}\right) \cdot A
+= \left(\frac{1}{1-\delta}\right) \cdot I,
+\end{equation*}
+because~$A$ is a measurement.
+We note that
+\begin{equation*}
+\frac{1}{1-\delta}
+= \frac{1}{1-\delta} \cdot \frac{1 + 2\delta}{1 + 2\delta}
+= \frac{1 + 2\delta}{1 + \delta - 2\delta^2}
+\leq 1 + 2\delta,
+\end{equation*}
+because
+\begin{equation*}
+1 + \delta - 2\delta^2 = 1 + \delta\cdot(1-2\delta)\geq 1
+\end{equation*}
+when $\delta \leq 1/2$,
+which we assumed in \Cref{eq:bound-on-delta}.
+Hence,
+\begin{equation*}
+R \leq (1+ 2\delta) \cdot I.
+\end{equation*}
+
+
+The lemma now follows by setting $\delta = \sqrt{\zeta}$. Note that we required that $\delta$ be at most $1/2$,
+which follows from our assumption that $\zeta \leq 1/4$ from \Cref{eq:assumption-on-zeta}.
+\ignore{
+Finally,
+\begin{align*}
+&\sum_a R_a (R - R_a) R_a\\
+=~&\sum_a R_a R R_a - \sum_a (R_a)^3\\
+\leq ~&\left(\frac{1}{1-\delta}\right) \cdot \sum_a R_a A R_a - \sum_a (R_a)^3 \tag{by XXX}\\
+\leq ~&\left(\frac{1}{1-\delta}\right) \cdot \sum_a  (R_a)^2 - \sum_a (R_a)^3 \tag{because~$A$ is a sub-measurement}\\
+= ~&\left(\frac{1}{1-\delta}\right) \cdot \sum_a  R_a - \sum_a R_a \tag{because the $R_a$'s are projectors}\\
+= ~&\left(\frac{1}{1-\delta}\right) \cdot R - R\\
+= ~&\left(\frac{1}{1-\delta} -  1\right) \cdot R\\
+\leq~& 2\delta \cdot R. \tag{because $\delta \leq 1/2$}
+\end{align*}
+The lemma now follows by setting $\delta = XXX$. Note that we required that $\delta$ be at most $1/2$,
+which follows from our assumption on $\zeta$ from XXX.
+}
+\end{proof}
+
+Write $d$ for the dimension of the~$A$ matrices.
+If the~$\{R_a\}$ matrices from \Cref{lem:projective-non-measurement} formed a projective sub-measurement,
+then their total rank would be at most~$d$.
+Even if this is not true,
+the next lemma shows that we can still post-process them
+to reduce their total rank to at most~$d$.
+
+\begin{lemma}[Rank reduction]\label{lem:projective-low-rank-sum}
+There exists a set of projection matrices $\{Q_a\}$ such that
+\begin{equation*}
+A_a \ot I \approx_{12\sqrt{\zeta}} Q_a \ot I.
+\end{equation*}
+and
+\begin{equation*}
+Q:= \sum_a Q_a \leq (1+2\sqrt{\zeta}) \cdot I.
+\end{equation*}
+Furthermore,  $Q$ has bounded total rank:
+\begin{equation*}
+\sum_a \mathrm{rank}(Q_a) \leq d.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+Let $\{R_a\}$ be the set of projective matrices given by \Cref{lem:projective-non-measurement}.
+For each $a$, let $r_a$ be the rank of $R_a$.
+Let $r = \sum_a r_a$.
+If $r \leq d$, then the lemma is trivially satisfied by taking $Q$ to be~$R$ and applying \Cref{lem:projective-non-measurement}.
+Henceforth, we will assume that $r > d$.
+We want to reduce~$r$ so that it is at most~$d$.
+Fortunately, it is already not too much larger than~$d$:
+\begin{equation}\label{eq:bound-on-r}
+r
+= \sum_{a} r_a
+= \sum_{a} \trace(R_a)
+= \trace(R)
+\leq (1 + 2\sqrt{\zeta}) \cdot \trace(I)
+= (1+2\sqrt{\zeta}) \cdot d.
+\end{equation}
+Let $\ket{v_{a, 1}}, \ldots, \ket{v_{a, r_a}}$ be an orthonormal basis for the range of $R_a$, so that
+\begin{equation*}
+R_a = \sum_{i=1}^{r_a} \ket{v_{a, i}}\bra{v_{a,i}}.
+\end{equation*}
+To reduce~$r$,
+we will throw out those $\ket{v_{a,i}}$'s whose overlap with $\ket{\psi}$ is small.
+For each $a$ and $1 \leq i \leq r_a$, we denote the overlap of $\ket{v_{a,i}}$ and $\ket{\psi}$ by
+\begin{equation*}
+o_{a, i} = \bra{\psi} \cdot (\ket{v_{a,i}}\bra {v_{a,i}} \ot I) \cdot\ket{\psi}.
+\end{equation*}
+The total overlap is given by
+\begin{align}
+\sum_a \sum_{i=1}^{r_a} o_{a, i}
+&= \sum_a \sum_{i=1}^{r_a} \bra{\psi} \cdot (\ket{v_{a,i}}\bra {v_{a,i}} \ot I) \cdot\ket{\psi}\nonumber\\
+&= \sum_a \bra{\psi} R_a \ot I \ket{\psi}\nonumber\\
+&= \bra{\psi} R \ot I \ket{\psi}\nonumber\\
+&\leq (1+2\sqrt{\zeta}) \cdot \bra{\psi} I \ot I \ket{\psi}\nonumber\\
+&= 1+2\sqrt{\zeta}.\label{eq:total-overlap}
+\end{align}
+Now we define $\mathsf{Large}$ to be the set of large overlaps:
+\begin{equation*}
+\mathsf{Large} = \{(a, i) \mid \text{$o_{a, i}$ is among the~$d$ largest of the $o_{b, j}$'s}\},
+\end{equation*}
+where we break ties arbitrarily,
+and we define $\mathsf{Small}$ to be the set containing the remaining $(a, i)$'s.
+We note that $\mathsf{Large}$ is well-defined and has size~$d$ because $r > d$.
+Hence, \Cref{eq:bound-on-r} implies that
+\begin{equation}\label{eq:size-of-small-is-small}
+|\mathsf{Small}|
+= r - |\mathsf{Large}| 
+= r - d
+\leq (1 + 2\sqrt{\zeta}) \cdot d - d
+= 2\sqrt{\zeta} \cdot d
+\leq 2\sqrt{\zeta} \cdot r.
+\end{equation}
+Thus, the small $(a,i)$'s have small total overlap:
+\begin{align}
+\sum_{(a, i) \in \mathsf{Small}} o_{a, i}
+\leq \frac{|\mathsf{Small}|}{r} \sum_{a, i} o_{a,i}
+&\leq 2\sqrt{\zeta} \cdot \sum_{a, i} o_{a,i} \tag{by \Cref{eq:size-of-small-is-small}}\\
+&\leq 2\sqrt{\zeta} \cdot (1+2\sqrt{\zeta}) \tag{by \Cref{eq:total-overlap}}\\
+& \leq 4\sqrt{\zeta}, \label{eq:small-overlaps}
+\end{align}
+where the final step uses the assumption that $\zeta \leq 1/4$ from \Cref{eq:assumption-on-zeta}.
+
+For each~$a$ we let $\mathsf{Large}_a$ to be set of $i$'s such that $(a,i)$ is contained in $\mathsf{Large}$,
+and we define $\mathsf{Small}_a$ similarly.
+We define the matrix
+\begin{equation*}
+Q_a = \sum_{i\in \mathsf{Large}_a} \ket{v_{a, i}}\bra{v_{a,i}}.
+\end{equation*}
+Then clearly
+\begin{equation*}
+\sum_a \mathrm{rank}(Q_a)
+= \sum_a |\mathsf{Large}_a|
+= |\mathsf{Large}|
+\leq d.
+\end{equation*}
+We can compute the difference
+\begin{equation*}
+R_a - Q_a
+= \sum_{i=1}^{r_a} \ket{v_{a, i}}\bra{v_{a,i}} - \sum_{i \in \mathsf{Large}_a}  \ket{v_{a, i}}\bra{v_{a,i}}
+= \sum_{i\in \mathsf{Small}_a} \ket{v_{a, i}}\bra{v_{a,i}}.
+\end{equation*}
+This is a projective Hermitian matrix, which implies that $Q_a \leq R_a$.
+As a result,
+\begin{equation*}
+Q = \sum_a Q_a \leq \sum_a R_a = R \leq (1+2\sqrt{\zeta}) \cdot I.
+\end{equation*}
+In addition,
+\begin{align*}
+\sum_a \Vert (R_a - Q_a) \ot I \ket{\psi} \Vert^2
+&= \sum_a \bra{\psi}(R_a - Q_a)^2 \ot I \ket{\psi}\\
+&= \sum_a \bra{\psi}(R_a - Q_a)\ot I \ket{\psi} \tag{because $R_a - Q_a$ is a projector}\\
+&= \sum_a \sum_{i \in \mathsf{Small}_a} \bra{\psi} \cdot (\ket{v_{a,i}}\bra {v_{a,i}} \ot I) \cdot\ket{\psi}\\
+&= \sum_a \sum_{i \in \mathsf{Small}_a} o_{a, i}\\
+&\leq 4\sqrt{\zeta}. \tag{by \Cref{eq:small-overlaps}}
+\end{align*}
+This means that
+\begin{equation*}
+R_a \ot I \approx_{4\sqrt{\zeta}} Q_a \ot I.
+\end{equation*}
+Since we know that $A_a \ot I \approx_{2\sqrt{\zeta}} R_a \ot I$ by \Cref{lem:projective-non-measurement},
+\Cref{prop:triangle-inequality-for-approx_delta} implies that
+\begin{equation*}
+A_a \ot I \approx_{12\sqrt{\zeta}} Q_a \ot I.
+\end{equation*}
+\ignore{
+Finally,
+\begin{align*}
+&\sum_a Q_a (Q - Q_a) Q_a\\
+=~&\sum_a Q_a Q Q_a - \sum_a (Q_a)^3\\
+\leq ~&XXX \cdot \sum_a Q_a A Q_a - \sum_a (Q_a)^3 \tag{by XXX}\\
+\leq ~&XXX \cdot \sum_a  (Q_a)^2 - \sum_a (Q_a)^3 \tag{because~$A$ is a sub-measurement}\\
+= ~&XXX \cdot \sum_a  Q_a - \sum_a Q_a \tag{because the $Q_a$'s are projectors}\\
+= ~&XXX \cdot Q - Q\\
+= ~&\left(XXX -  1\right) \cdot Q\\
+\leq~& 2\delta \cdot Q.
+\end{align*}
+}
+This completes the proof.
+\end{proof}
+
+Henceforth, we let $Q = \{Q_a\}$ be the set of projective matrices given by \Cref{lem:projective-low-rank-sum}.
+We now derive a few properties of~$Q$ that follow as a consequence of \Cref{lem:projective-low-rank-sum}.
+To begin, we show that~$Q$ is almost as complete as~$A$.
+
+\begin{lemma}[Completeness of~$Q$]\label{lem:Q-completeness}
+\begin{equation*}
+\bra{\psi} Q \otimes I \ket{\psi}
+\geq 1 - 11 \zeta^{1/4}.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+To begin, we claim that
+\begin{align}
+\bra{\psi} Q \otimes I \ket{\psi}
+& = \sum_a \bra{\psi} Q_a \otimes I \ket{\psi}\nonumber\\
+& = \sum_a \bra{\psi} (Q_a)^2 \otimes I \ket{\psi}\tag{because the $Q_a$'s are projective}\\
+& \approx_{5 \zeta^{1/4}} \sum_a \bra{\psi} (Q_a \cdot A_a) \otimes I \ket{\psi}. \label{eq:Q-for-an-A}
+\end{align}
+To show this, we bound the magnitude of the difference.
+\begin{align*}
+&\Big|\sum_a \bra{\psi} (Q_a \otimes I) \cdot ((Q_a - A_a) \otimes I) \ket{\psi}\Big|\\
+\leq~&\sqrt{\sum_a\bra{\psi} (Q_a)^2 \otimes I \ket{\psi}}
+	\cdot \sqrt{\sum_a \bra{\psi} (Q_a - A_a)^2 \otimes I \ket{\psi}}\\
+\leq~&  \sqrt{1+2\sqrt{\zeta}} \cdot \sqrt{12\sqrt{\zeta}} \tag{by \Cref{lem:projective-low-rank-sum}}\\
+\leq~& \sqrt{2} \cdot \sqrt{12\sqrt{\zeta}},
+\end{align*}
+where the last line uses the assumption that $\zeta \leq 1/4$ from \Cref{eq:assumption-on-zeta}.
+Next, we claim that
+\begin{equation}\label{eq:another-Q-for-A}
+\eqref{eq:Q-for-an-A}
+= \sum_a \bra{\psi} (Q_a \cdot A_a) \otimes I \ket{\psi}
+\approx_{4 \zeta^{1/4}} \sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{align*}
+&\Big|\sum_a \bra{\psi} ((Q_a - A_a) \otimes I) \cdot (A_a \otimes I) \ket{\psi}\Big|\\
+\leq~&\sqrt{\sum_a \bra{\psi} (Q_a - A_a)^2 \otimes I \ket{\psi}}
+	\cdot \sqrt{\sum_a\bra{\psi} (A_a)^2 \otimes I \ket{\psi}}\\
+\leq~& \sqrt{12 \sqrt{\zeta}} \cdot 1. \tag{by \Cref{lem:projective-low-rank-sum}}
+\end{align*}
+In conclusion,
+\begin{align*}
+\bra{\psi} Q \otimes I \ket{\psi}
+& \geq \sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi} - 9 \zeta^{1/4} \tag{by \Cref{eq:Q-for-an-A,eq:another-Q-for-A}}\\
+& \geq \sum_a \bra{\psi} A_a \otimes I \ket{\psi} - 2\zeta - 9\zeta^{1/4} \tag{by \Cref{eq:A-looks-projective}}\\
+& \geq \bra{\psi} A \otimes I \ket{\psi} - 11 \zeta^{1/4} \nonumber\\
+& = 1 - 11 \zeta^{1/4}.
+\end{align*}
+This completes the proof.
+\end{proof}
+
+We will also need the following bound on the completeness of the \emph{square root} of~$Q$.
+Note that such a bound follows trivially from \Cref{lem:Q-completeness}
+when~$Q$ is a sub-measurement because $\sqrt{Q} \geq Q$ when $Q \leq I$.
+
+\begin{lemma}[Completeness of~$\sqrt{Q}$]\label{lem:sqrt-Q-completeness}
+\begin{equation*}
+\bra{\psi} \sqrt{Q} \otimes I \ket{\psi}
+\geq 1 - 12 \zeta^{1/4}.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+Let $Q = \sum_i \nu_i \ket{u_i} \bra{u_i}$ be the eigendecomposition of~$Q$.
+Then because $Q \leq (1 + 2\sqrt{\zeta}) \cdot I$, each eigenvalue $\nu_i$ is at most $1+2\sqrt{\zeta}$.
+Thus,
+\begin{equation*}
+\sqrt{Q}
+= \sum_i \sqrt{\nu_i} \ket{u_i}\bra{u_i}
+\geq \frac{1}{\sqrt{1 + 2\sqrt{\zeta}}} \cdot \sum_i \nu_i \ket{u_i}\bra{u_i}
+= \frac{1}{\sqrt{1 + 2\sqrt{\zeta}}} \cdot Q.
+\end{equation*}
+We note that
+\begin{equation*}
+\frac{1}{\sqrt{1 + 2\sqrt{\zeta}}}
+\geq \frac{1}{\sqrt{1 + 2\sqrt{\zeta} + \zeta}}
+= \frac{1}{1 + \sqrt{\zeta}}
+= \frac{1}{1 + \sqrt{\zeta}} \cdot \Big(\frac{1-\sqrt{\zeta}}{1-\sqrt{\zeta}}\Big)
+= \frac{1-\sqrt{\zeta}}{1 - \zeta}
+\geq 1 - \sqrt{\zeta}.
+\end{equation*}
+Hence, $\sqrt{Q} \geq (1-\sqrt{\zeta}) \cdot Q$.
+As a result, \Cref{lem:Q-completeness} implies that
+\begin{equation*}
+\bra{\psi} \sqrt{Q} \otimes I \ket{\psi}
+\geq (1-\sqrt{\zeta}) \cdot\bra{\psi} Q \otimes I \ket{\psi}
+\geq (1-\sqrt{\zeta}) \cdot \left(1 - 11 \zeta^{1/4}\right)
+\geq 1 -\sqrt{\zeta} - 11 \zeta^{1/4}.
+\end{equation*}
+This concludes the proof.
+\end{proof}
+
+Finally, we show the following lemma,
+which quantifies a sense in which~$Q$ is ``almost projective".
+
+\begin{lemma}[$Q$ is almost projective]\label{lem:q-almost-projective}
+\begin{equation*}
+\sum_a (Q_a \cdot Q  \cdot Q_a - Q_a) \leq  4\sqrt{\zeta} \cdot I.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+\Cref{lem:projective-low-rank-sum} implies that $Q \leq (1 + 2\sqrt{\zeta}) \cdot I$. As a result,
+\begin{align*}
+&\sum_a Q_a \cdot Q  \cdot Q_a - \sum_a Q_a\\
+\leq ~&(1 + 2\sqrt{\zeta}) \cdot \sum_a Q_a \cdot I  \cdot Q_a - \sum_a Q_a \\
+= ~&(1+2\sqrt{\zeta}) \cdot \sum_a  Q_a - \sum_a Q_a \tag{because the $Q_a$'s are projectors}\\
+= ~&(1+2\sqrt{\zeta}) \cdot Q - Q\\
+= ~& 2\sqrt{\zeta} \cdot Q\\
+\leq~& 2\sqrt{\zeta} \cdot (1 + 2\sqrt{\zeta}) \cdot I\\
+\leq~& 2 \sqrt{\zeta} \cdot 2 \cdot I. \tag{by \Cref{eq:assumption-on-zeta}}
+\end{align*}
+This completes the proof.
+\end{proof}
+
+We now arrive at the most important definition in this proof,
+which is a natural matrix decomposition for the $Q_a$ matrices.
+
+\begin{definition}[Matrix decomposition of~$Q_a$]
+For each $a$, let $m_a$ be the rank of $Q_a$.
+Let $\ket{v_{a, 1}}, \ldots, \ket{v_{a, m_a}}$ be an orthonormal basis for the range of $Q_a$, so that
+\begin{equation*}
+Q_a = \sum_{i=1}^{m_a} \ket{v_{a, i}}\bra{v_{a,i}}.
+\end{equation*}
+Let $m = \sum_a m_a$, and consider an orthonormal basis of $\C^m$ consisting of vectors $\ket{a, i}$ for each $a$ and $1 \leq i \leq m_a$.
+For each $a$, define the matrix
+\begin{equation*}
+X_a = \sum_{i=1}^{m_a} \ket{a, i} \bra{v_{a, i}}.
+\end{equation*}
+In addition, define the matrix
+\begin{equation}\label{eq:looks-like-singular-value-decomposition}
+X = \sum_a X_a =  \sum_a \sum_{i=1}^{m_a} \ket{a, i} \bra{v_{a, i}}.
+\end{equation}
+Finally, we let $T = \{T_a\}$ be the projective measurement on $\C^m$ defined as
+\begin{equation*}
+T_a = \sum_{i=1}^{m_a} \ket{a, i}\bra{a, i}.
+\end{equation*}
+\end{definition}
+
+The next pair of lemmas will prove some basic properties of the~$X_a$ matrices.
+
+\begin{lemma}\label{lem:xa-t}
+For each~$a$, $\displaystyle
+X_a = T_a \cdot X.
+$
+\end{lemma}
+\begin{proof}
+This is a simple calculation:
+\begin{equation*}
+T_a \cdot X = \Big(\sum_i^{m_a} \ket{a, i} \bra{a,i}\Big)\cdot \Big( \sum_a \sum_{i=1}^{m_a}  \ket{a, i}\bra{v_{a, i}}\Big) 
+= \sum_{i=1}^{m_a} \ket{a, i}\bra{v_{a, i}} = X_a.\qedhere
+\end{equation*}
+\end{proof}
+
+\begin{lemma}[$Q_a$ restated]\label{lem:qa-restated}
+For each~$a$,
+\begin{equation*}
+Q_a = X^\dagger_a \cdot X_a = X^\dagger \cdot T_a \cdot X = X_a^\dagger \cdot X.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+The first equality follows from
+\begin{align*}
+X_a^\dagger \cdot X_a
+&= \Big(\sum_{i=1}^{m_a} \ket{v_{a, i}}\bra{a, i} \Big) \cdot \Big(\sum_{j=1}^{m_a} \ket{v_{a, j}}\bra{a, j} \Big)^\dagger\nonumber\\
+&= \sum_{i, j=1}^{m_a} \ket{v_{a, i}}\bra{a, i} \cdot \ket{a, j} \bra{v_{a, j}}
+= \sum_{i=1}^{m_a} \ket{v_{a,i}}\bra{v_{a,i}} = Q_a.
+\end{align*}
+The remaining equalities follow from \Cref{lem:xa-t} and the fact that~$T$ is a projective measurement.
+\begin{equation*}
+X_a^\dagger \cdot X_a
+= (X^\dagger \cdot T_a) \cdot (T_a  \cdot X)
+= X^\dagger \cdot T_a \cdot X = X_a^\dagger \cdot X.\qedhere
+\end{equation*}
+\end{proof}
+
+Now we introduce our main tool for studying~$X$, which is via its singular value decomposition.
+
+\begin{definition}[SVD of~$X$]
+Let $X = U \cdot \Sigma_{m \times d} \cdot V^\dagger$ be the singular value decomposition (SVD) of~$X$.
+Because~$X$ is an $m \times d$ matrix,
+the definition of the SVD states that
+$U$ is an $m \times m$ unitary matrix,
+$V$ is a $d \times d$ unitary matrix,
+and $\Sigma_{m\times d}$ is an $m \times d$ diagonal matrix
+with nonnegative real numbers on its diagonal.
+\end{definition}
+
+\begin{notation}
+For positive integers $h$ and~$w$,
+we will write $I_{h \times w}$ for the $h \times w$ matrix with $1$'s on its diagonal and $0$'s everywhere else.
+
+For integers $h, w \geq m$, we also write $\Sigma_{h \times w}$
+for the $h \times w$ diagonal matrix whose diagonal agrees with $\Sigma_{m \times d}$'s;
+namely, $(\Sigma_{h \times w})_{i, i} = (\Sigma_{m \times d})_{i,i}$ for all $1 \leq i \leq m$
+and $(\Sigma_{h \times w})_{i, i} = 0$ for all $i > m$.
+We note that because $\Sigma_{m \times d}$ is a real-valued diagonal matrix,
+$(\Sigma_{h \times w})^\dagger = \Sigma_{w \times h}$.
+\end{notation}
+
+With this definition,
+we can give a helpful expression for the square of~$X$.
+
+\begin{lemma}[$X$ squared]\label{lem:X-squared}
+\begin{equation*}
+X \cdot X^\dagger = U  \cdot (\Sigma_{m \times m})^2 \cdot U^\dagger,
+\quad
+\text{and}
+\quad
+X^\dagger \cdot X = Q = V \cdot (\Sigma_{d \times d})^2 \cdot V^\dagger.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+First,
+\begin{align*}
+X \cdot X^\dagger
+&= (U  \cdot \Sigma_{m \times d} \cdot V^\dagger) \cdot (U  \cdot \Sigma_{m \times d} \cdot V^\dagger)^\dagger\\
+&= U  \cdot \Sigma_{m \times d} \cdot V^\dagger \cdot V \cdot \Sigma_{d \times m} \cdot U^\dagger\\
+&= U  \cdot \Sigma_{m \times d} \cdot I_{d \times d} \cdot \Sigma_{d \times m} \cdot U^\dagger \tag{because~$V$ is a $d \times d$ unitary}\\
+&= U  \cdot (\Sigma_{m \times m})^2 \cdot U^\dagger \tag{because~$m \leq d$}.
+\end{align*}
+Second,
+\begin{align*}
+X^\dagger \cdot X
+& = \sum_a X^\dagger \cdot T_a X  \tag{because~$T$ is a measurement}\\
+&= \sum_a Q_a \tag{by \Cref{lem:qa-restated}}\\
+&= Q.
+\end{align*}
+In addition, we can rewrite $X^\dagger \cdot X$ as
+\begin{align*}
+X^\dagger \cdot X
+&= (U  \cdot \Sigma_{m \times d} \cdot V^\dagger)^\dagger \cdot (U  \cdot \Sigma_{m \times d} \cdot V^\dagger)\\
+&= V \cdot \Sigma_{d \times m} \cdot U^\dagger \cdot U \cdot \Sigma_{m \times d} \cdot V^\dagger\\
+&= V \cdot \Sigma_{d \times m} \cdot I_{m \times m} \cdot \Sigma_{m \times d} \cdot V^\dagger \tag{because~$U$ is an $m \times m$ unitary}\\
+&= V \cdot (\Sigma_{d \times d})^2 \cdot V^\dagger.
+\end{align*}
+This completes the proof.
+\end{proof}
+
+The following lemma relates an expression in the $X_a$'s
+with an expression in the~$Q_a$'s that appeared previously in \Cref{lem:q-almost-projective}.
+
+\begin{lemma}\label{lem:X-expression-to-Q-expression}
+For each~$a$,
+\begin{equation*}
+X_a^\dagger \cdot (X \cdot X^\dagger - I_{m \times m})^2 \cdot X_a
+= Q_a \cdot Q \cdot Q_a - Q_a.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+Using~\Cref{lem:X-squared} and~\Cref{lem:qa-restated},
+\begin{equation*}
+X_a^\dagger \cdot (X \cdot X^\dagger \cdot X \cdot X^\dagger) \cdot X_a
+= X_a^\dagger \cdot X \cdot Q \cdot X^\dagger \cdot X_a
+= Q_a \cdot Q \cdot Q_a.
+\end{equation*}
+Similarly, because $Q_a$ is projective,
+\begin{equation*}
+X_a^\dagger \cdot (X \cdot X^\dagger) \cdot X_a
+= (X_a^\dagger \cdot X) \cdot (X^\dagger \cdot X_a)
+= Q_a \cdot Q_a
+= Q_a.
+\end{equation*}
+Finally,
+\begin{equation*}
+X_a^\dagger \cdot (I_{m \times m}) \cdot X_a
+= X_a^\dagger \cdot X_a = Q_a.
+\end{equation*}
+Putting these together,
+\begin{align*}
+&X_a^\dagger \cdot (X \cdot X^\dagger - I_{m \times m})^2 \cdot X_a\\
+ =~& X_a^\dagger \cdot (X \cdot X^\dagger \cdot X \cdot X^\dagger  - 2 \cdot X\cdot X^\dagger + I_{m \times m}) \cdot X_a\\
+    =~& Q_a \cdot Q \cdot Q_a  - 2 \cdot Q_a  + Q_a\\
+    =~& Q_a \cdot Q \cdot Q_a  -  Q_a.
+\end{align*}
+This completes the proof.
+\end{proof}
+
+Now we are ready to state the projective sub-measurement~$P$
+which should approximate~$A$.
+Before doing so, we give some intuition for the construction.
+
+\begin{remark}
+Suppose that the $Q_a$'s actually formed a projective measurement.
+This would imply that the vectors $\ket{v_{a, i}}$, over all $a$ and $1 \leq i \leq m_a$ form an orthonormal set.
+Then the SVD would actually have already been provided in \Cref{eq:looks-like-singular-value-decomposition};
+for each $a$ and $1 \leq i \leq m_a$,
+the corresponding singular value would be~$1$ and the corresponding left- and right-singular vectors would be $\ket{a, i}$ and $\ket{v_{a, i}}$, respectively.
+In particular, we would have $\Sigma = I_{m \times d}$ and $X = U \cdot I_{m \times d}\cdot V^\dagger$.
+\end{remark}
+
+In reality, we don't know that $\Sigma = I_{m \times d}$.
+However, we will construct~$P = \{P_a\}$ as if it were.
+This motivates the following definition.
+
+\begin{definition}[Definition of~$P$]
+Define the matrix 
+\begin{equation*}
+\widehat{X} = U  \cdot I_{m \times d} \cdot V^\dagger.
+\end{equation*}
+In addition, for each $a$, define the matrices
+\begin{equation*}
+\widehat{X}_a  = T_a \cdot \widehat{X},
+\quad P_a  = \widehat{X}_a^\dagger \cdot \widehat{X}_a.
+\end{equation*}
+\end{definition}
+
+We now give analogues of \Cref{lem:qa-restated,lem:X-squared} for the~$P$ matrices.
+
+\begin{lemma}[$P_a$ restated]\label{lem:pa-restated}
+For each~$a$,
+\begin{equation*}
+P_a = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+This follows from the definition of $\widehat{X}^\dagger_a$ and the fact that $T$ is a projective measurement:
+\begin{equation*}
+P_a
+= \widehat{X}_a^\dagger \cdot \widehat{X}_a
+= (\widehat{X}^\dagger \cdot T_a) \cdot (T_a  \cdot \widehat{X})
+= \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.\qedhere
+\end{equation*}
+\end{proof}
+
+\begin{lemma}[$\widehat{X}$ squared]\label{lem:X-hat-squared}
+\begin{equation*}
+\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
+\ignore{
+\quad
+\text{and}
+\quad
+\widehat{X}^\dagger \cdot \widehat{X} = V \cdot I_{d \times m} \cdot I_{m \times d} \cdot V^\dagger.
+}
+\end{equation*}
+\end{lemma}
+\begin{proof}
+First,
+\begin{align*}
+\widehat{X} \cdot \widehat{X}^\dagger
+&= (U  \cdot I_{m \times d} \cdot V^\dagger) \cdot (U  \cdot I_{m \times d} \cdot V^\dagger)^\dagger\\
+&= U  \cdot I_{m \times d} \cdot V^\dagger \cdot V \cdot I_{d \times m} \cdot U^\dagger\\
+&= U  \cdot I_{m \times d} \cdot I_{d \times d} \cdot I_{d \times m} \cdot U^\dagger \tag{because~$V$ is a $d \times d$ unitary}\\
+&= U  \cdot I_{m \times m} \cdot U^\dagger \tag{because~$m \leq d$}\\
+&= I_{m \times m},
+\end{align*}
+where the last step uses the fact that~$U$ is an $m \times m$ unitary.
+\ignore{
+Second,
+\begin{align*}
+\widehat{X}^\dagger \cdot \widehat{X}
+& = (U  \cdot I_{m \times d} \cdot V^\dagger)^\dagger \cdot (U  \cdot I_{m \times d} \cdot V^\dagger)\\
+& = V \cdot I_{d \times m} \cdot U^\dagger \cdot U  \cdot I_{m \times d} \cdot V^\dagger\\
+& = V \cdot I_{d \times m} \cdot I_{m \times m}  \cdot I_{m \times d} \cdot V^\dagger \tag{because~$U$ is an $m \times m$ unitary}\\
+& = V \cdot I_{d \times m} \cdot I_{m \times d} \cdot V^\dagger.
+\end{align*}
+We note that $m \leq d$, and so $I_{d \times m} \cdot I_{m \times d}$ is not necessarily equal to $I_{d \times d}$.
+}
+\end{proof}
+
+Finally, we show two lemmas on quantities involving both $X$ and~$\widehat{X}$.
+
+\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
+\begin{equation*}
+X \cdot \widehat{X}^\dagger = U  \cdot \Sigma_{m \times m} \cdot U^\dagger,
+\quad
+\text{and}
+\quad
+X^\dagger \cdot \widehat{X} = \sqrt{Q}.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+First,
+\begin{align*}
+X \cdot \widehat{X}^\dagger
+&= (U  \cdot \Sigma_{m \times d} \cdot V^\dagger) \cdot (U  \cdot I_{m \times d} \cdot V^\dagger)^\dagger\\
+&= U  \cdot \Sigma_{m \times d} \cdot V^\dagger \cdot V \cdot I_{d \times m} \cdot U^\dagger\\
+&= U  \cdot \Sigma_{m \times d} \cdot I_{d \times d} \cdot I_{d \times m} \cdot U^\dagger \tag{because~$V$ is a $d \times d$ unitary}\\
+&= U  \cdot \Sigma_{m \times m} \cdot U^\dagger \tag{because~$m \leq d$}.
+\end{align*}
+Second,
+\begin{align*}
+X^\dagger \cdot \widehat{X}
+&= (U  \cdot \Sigma_{m \times d} \cdot V^\dagger)^\dagger \cdot (U  \cdot I_{m \times d} \cdot V^\dagger)\\
+&= V \cdot \Sigma_{d \times m} \cdot U^\dagger \cdot U \cdot I_{m \times d} \cdot V^\dagger\\
+&= V \cdot \Sigma_{d \times m} \cdot I_{m \times m} \cdot I_{m \times d} \cdot V^\dagger \tag{because~$U$ is an $m \times m$ unitary}\\
+&= V \cdot \Sigma_{d \times d} \cdot V^\dagger\\
+&= \sqrt{V \cdot (\Sigma_{d \times d})^2 \cdot V^\dagger}\\
+&= \sqrt{Q}. \tag{by \Cref{lem:X-squared}}
+\end{align*}
+This completes the proof.
+\end{proof}
+
+\begin{lemma}[Squared difference]\label{lem:squared-difference}
+\begin{equation*}
+(X - \widehat{X}) \cdot (X - \widehat{X})^\dagger \leq (X \cdot X^\dagger - I_{m \times m})^2.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+By~\Cref{lem:X-squared,lem:X-hat-squared,lem:X-times-X-hat},
+\begin{align*}
+(X - \widehat{X}) \cdot (X - \widehat{X})^\dagger
+& = X \cdot X^\dagger  - X\cdot \widehat{X}^\dagger - \widehat{X} \cdot X^\dagger + \widehat{X} \cdot \widehat{X}^\dagger\\
+& = U \cdot \Sigma_{m \times m}^2 \cdot U^\dagger  - 2 \cdot U \cdot \Sigma_{m \times m} \cdot U^\dagger+ I_{m \times m}\\
+& = U \cdot \left(\Sigma_{m \times m}^2   - 2 \cdot  \Sigma_{m \times m} +  I_{m \times m} \right) \cdot U^\dagger\\
+& = U \cdot \left(\Sigma_{m \times m}  -  I_{m \times m}\right)^2 \cdot U^\dagger.
+\end{align*}
+Because $\Sigma_{m \times m}$ and $I_{m \times m}$ are commuting,
+\begin{equation*}
+(\Sigma_{m \times m} - I_{m \times m})^2
+\leq (\Sigma_{m \times m} + I_{m \times m})^2 \cdot (\Sigma_{m \times m} - I_{m \times m})^2
+= (\Sigma_{m\times m}^2 - I_{m \times m})^2.
+\end{equation*}
+As a result,
+\begin{align*}
+U \cdot \left(\Sigma_{m \times m}  -  I_{m \times m}\right)^2 \cdot U^\dagger
+& \leq U \cdot \left(\Sigma_{m \times m}^2 -  I_{m \times m}\right)^2 \cdot U^\dagger\\
+& = \left(U \cdot \Sigma_{m \times m}^2 \cdot U^\dagger - I_{m \times m} \right)^2\\
+&= (X \cdot X^\dagger - I_{m \times m})^2. \tag{by \Cref{lem:X-squared}}
+\end{align*}
+This completes the proof.
+\end{proof}
+
+The first property we need of~$P$ is that it is a projective sub-measurement.
+This is shown in the following lemma.
+
+\begin{lemma}[Projectivity of~$P$]\label{lem:P-projectivity}
+$P = \{P_a\}$ forms a projective sub-measurement.
+\end{lemma}
+\begin{proof}
+Let $a, b$ be (possibly distinct) outcomes.
+Then
+\begin{align*}
+P_a \cdot P_b
+&= (\widehat{X}^\dagger \cdot T_a \cdot \widehat{X})
+	\cdot (\widehat{X}^\dagger \cdot T_b \cdot \widehat{X}) \tag{by \Cref{lem:pa-restated}}\\
+&= (\widehat{X}^\dagger \cdot T_a \cdot I_{m \times m} \cdot T_b \cdot \widehat{X}) \tag{by \Cref{lem:X-hat-squared}}\\
+&= (\widehat{X}^\dagger \cdot T_a  \cdot \widehat{X}) \cdot \bone[a = b] \tag{because~$T$ is a projective measurement}\\
+&= P_a  \cdot \bone[a=b]. \tag{by \Cref{lem:pa-restated}}
+\end{align*}
+This completes the proof.
+\end{proof}
+
+The second property we need of~$P$ is that it is close to~$A$.
+We will first show that it is close to~$Q$.
+
+\begin{lemma}[$P$ is close to~$Q$]\label{lem:P-Q-approx}
+\begin{equation*}
+Q_a \otimes I \approx_{30\zeta^{1/4}} P_a \otimes I.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+Our goal is to upper-bound the quantity
+\begin{align}
+&\sum_a \bra{\psi} (Q_a - P_a)^2 \otimes I \ket{\psi}\nonumber\\
+=~& \sum_a \bra{\psi} (Q_a)^2 \otimes I \ket{\psi} + \sum_a \bra{\psi} (P_a)^2 \otimes I \ket{\psi} - \sum_a \bra{\psi} Q_a P_a \otimes I \ket{\psi}
+	- \sum_a \bra{\psi} P_a Q_a \otimes I \ket{\psi}\nonumber\\
+=~& \bra{\psi} Q \otimes I \ket{\psi} +  \bra{\psi} P\otimes I \ket{\psi} - \sum_a \bra{\psi} Q_a P_a \otimes I \ket{\psi}
+	- \sum_a \bra{\psi} P_a Q_a \otimes I \ket{\psi},\label{eq:P-Q-thing-to-bound}
+\end{align}
+where the last step uses the projectivity of~$Q$ and~$P$.
+We bound the four terms in \Cref{eq:P-Q-thing-to-bound} separately.
+First, by \Cref{lem:projective-low-rank-sum},
+\begin{equation*}
+ \bra{\psi} Q \otimes I \ket{\psi}
+ \leq (1+2\sqrt{\zeta}) \cdot \bra{\psi} I \otimes I \ket{\psi} \leq 1+2\sqrt{\zeta}.
+\end{equation*}
+Second, because~$P$ is a sub-measurement,
+\begin{equation*}
+\bra{\psi} P \ot I\ket{\psi} \leq 1.
+\end{equation*}
+
+The third term and fourth terms are significantly more complicated to bound.
+As they are complex conjugates of each other, we can write their sum as
+\begin{equation}\label{eq:complex-conjugates}
+\sum_a \bra{\psi} Q_a P_a \otimes I \ket{\psi}
+	+ \sum_a \bra{\psi} P_a Q_a \otimes I \ket{\psi}
+= 2 \cdot \mathfrak{R}\Big(\sum_a \bra{\psi} Q_a P_a \otimes I \ket{\psi}\Big).
+\end{equation}
+We now focus on the expression on the right-hand side of \Cref{eq:complex-conjugates}.
+To begin, we use \Cref{lem:qa-restated} to rewrite it as
+\begin{equation*}
+\sum_a \bra{\psi} Q_a P_a \otimes I \ket{\psi}
+= \sum_a \bra{\psi} ((X_a^\dagger \cdot X) \cdot P_a)  \otimes I \ket{\psi}.
+\end{equation*}
+The main step will be to show that we can exchange the second $X$ for an $\widehat{X}$, i.e.
+\begin{equation}\label{eq:add-a-hat}
+\sum_a \bra{\psi} (X_a^\dagger \cdot X \cdot P_a) \otimes I \ket{\psi}
+\approx_{2\zeta^{1/4}} \sum_a \bra{\psi} (X_a^\dagger \cdot \widehat{X} \cdot P_a)  \otimes I \ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{multline*}
+\Big|\sum_a \bra{\psi} ((X_a^\dagger \cdot (X - \widehat{X})) \ot I) \cdot(P_a \ot I) \ket{\psi}\Big|\\
+\leq \sqrt{\sum_a \bra{\psi}(X_a^\dagger \cdot (X - \widehat{X})  \cdot (X - \widehat{X})^\dagger \cdot X_a) \ot I \ket{\psi}}\cdot \sqrt{\sum_a \bra{\psi} (P_a)^2 \ot I \ket{\psi}}.
+\end{multline*}
+The expression inside the first square root is
+\begin{align*}
+& \sum_a \bra{\psi}(X_a^\dagger \cdot (X - \widehat{X})  \cdot (X - \widehat{X})^\dagger \cdot X_a) \ot I \ket{\psi}\\
+\leq~&  \sum_a \bra{\psi} (X_a^\dagger \cdot (X \cdot X^\dagger - I_{m \times m})^2 \cdot X_a) \ot I \ket{\psi}\tag{by \Cref{lem:squared-difference}}\\
+=~&  \sum_a \bra{\psi} (Q_a \cdot Q \cdot Q_a - Q_a)  \ot I \ket{\psi}\tag{by \Cref{lem:X-expression-to-Q-expression}}\\
+\leq~& 4\sqrt{\zeta} \cdot \bra{\psi} I \ot I \ket{\psi} \tag{by~\Cref{lem:q-almost-projective}}\\
+=~& 4\sqrt{\zeta}.
+\end{align*}
+The expression inside the second square root is at most~$1$ because~$P$ is a sub-measurement.
+Next, we claim that the \Cref{eq:add-a-hat} is in fact a real-valued expression.
+To see this,
+\begin{align*}
+\eqref{eq:add-a-hat}
+& = \sum_a \bra{\psi} (X_a^\dagger \cdot \widehat{X} \cdot P_a)  \otimes I \ket{\psi}\\
+&= \sum_a \bra{\psi} (X^\dagger \cdot T_a \cdot \widehat{X} \cdot \widehat{X}^\dagger \cdot T_a \cdot \widehat{X}) \ot I \ket{\psi}
+			\tag{by \Cref{lem:xa-t,lem:pa-restated}}\\
+&= \sum_a \bra{\psi} (X^\dagger \cdot T_a \cdot I_{m \times m} \cdot T_a \cdot \widehat{X}) \ot I \ket{\psi} \tag{by \Cref{lem:X-hat-squared}}\\
+&= \sum_a \bra{\psi} (X^\dagger \cdot T_a  \cdot \widehat{X}) \ot I \ket{\psi}\\
+&=  \bra{\psi} (X^\dagger  \cdot \widehat{X}) \ot I \ket{\psi} \tag{because~$T$ is a measurement}\\
+&=  \bra{\psi} \sqrt{Q} \ot I \ket{\psi} \tag{by \Cref{lem:X-times-X-hat}},
+\end{align*}
+which is real-valued because~$Q$ is positive semidefinite.
+As a result, we have
+\begin{align*}
+\mathfrak{R}\Big(\sum_a \bra{\psi} Q_a P_a \otimes I \ket{\psi}\Big)
+& \geq \mathfrak{R}\Big(\sum_a \bra{\psi} (X_a^\dagger \cdot \widehat{X} \cdot P_a)  \otimes I \ket{\psi}\Big) - 2\zeta^{1/4} \tag{by \Cref{eq:add-a-hat}}\\
+& = \bra{\psi} \sqrt{Q} \ot I \ket{\psi}- 2\zeta^{1/4}\\
+& \geq (1 - 12 \zeta^{1/4}) - 2\zeta^{1/4}. \tag{by \Cref{lem:sqrt-Q-completeness}}
+\end{align*}
+In total, \Cref{eq:complex-conjugates} shows that
+\begin{equation*}
+\sum_a \bra{\psi} Q_a P_a \otimes I \ket{\psi}
+	+ \sum_a \bra{\psi} P_a Q_a \otimes I \ket{\psi}
+\geq 2 \cdot(1 - 14\zeta^{1/4}).
+\end{equation*}
+Putting everything together, we conclude that
+\begin{equation*}
+\eqref{eq:P-Q-thing-to-bound}
+\leq (1 + 2\sqrt{\zeta}) + 1 - 2\cdot (1-14\zeta^{1/4}) 
+= 2\sqrt{\zeta} + 28 \zeta^{1/4}
+\leq 30 \zeta^{1/4}.
+\end{equation*}
+This completes the proof.
+\end{proof}
+
+Finally, we have that
+\begin{align*}
+A_a \ot I
+&\approx_{12 \sqrt{\zeta}} Q_a \ot I \tag{by \Cref{lem:projective-low-rank-sum}}\\
+&\approx_{30 \zeta^{1/4}} P_a \ot I. \tag{by \Cref{lem:P-Q-approx}}
+\end{align*}
+Hence, \Cref{prop:triangle-inequality-for-approx_delta} implies that
+\begin{equation*}
+A_a \ot I \approx_{84 \zeta^{1/4}} P_a \ot I.
+\end{equation*}
+This completes the proof.
+\end{proof}

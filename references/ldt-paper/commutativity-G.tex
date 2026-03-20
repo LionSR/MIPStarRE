@@ -1,0 +1,472 @@
+
+\section{Commutativity}
+\label{sec:g-comm}
+
+Let $(\bu, \bx)$ and $(\bv, \by)$ be sampled independently and uniformly at random from $\F_q^{m+1}$.
+In \Cref{sec:G-commutes-after-evaluation},
+we will show that the $G$ measurements approximately commute ``after evaluation";
+namely, that $G^{\bx}_{[g(\bu)=a]}$ commutes with $G^{\by}_{[g(\bv)=b]}$.
+Then, in \Cref{sec:G-commutes},
+we will use this to show that $G^{\bx}_g$ approximately commutes with $G^{\by}_h$.
+This is necessary if we wish to ``paste" together several~$G^x$ measurements at different points~$x \in \F_q$
+to produce a single global measurement~$H \in \polysub{m+1}{q}{d}$, as we do in \Cref{sec:ld-pasting} below.
+
+\subsection{Commutativity of~$G$ after evaluation}\label{sec:G-commutes-after-evaluation}
+
+\begin{lemma}[Commutativity of~$G$ after evaluation]
+  \label{lem:comm-data-processed-g}
+  Let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
+  Let $\{G^x\} \in \polysub{m}{q}{d}$ be a collection of projective sub-measurements indexed by $x \in \F_q$ with the following properties:
+  \begin{enumerate}
+  \item (Consistency with~$A$): \label{item:data-processed-consistency} On average over $(\bu, \bx) \sim \F_q^{m+1}$,
+	  \begin{equation*}
+	  A^{u, x}_a \otimes I \simeq_{\zeta} I \otimes G^x_{[g(u)=a]}.
+	  \end{equation*}
+  \item (Strong self-consistency): \label{item:data-processed-self-consistency} On average over~$\bx \sim \F_q$,
+  	\begin{equation*}
+		G^x_g \otimes I \approx_{\zeta} I \otimes G^x_g.
+	\end{equation*}
+  \item (Boundedness): \label{item:data-processed-boundedness} There exists a positive-semidefinite matrix $Z^x$ for each $x \in \F_q$ such that
+  	\begin{equation*}
+		\E_{\bx} \bra{\psi} (I-G^{\bx})\otimes Z^{\bx} \ket{\psi} \leq \zeta
+	\end{equation*}
+	and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	 Z^x \geq \left(\E_{\bu} A^{\bu, x}_{g(\bu)}\right).
+	\end{equation*}
+  \end{enumerate}
+  Let
+  \begin{equation*}
+  \nu = 48 m \cdot (\gamma^{1/2} + \zeta^{1/2}).
+  \end{equation*}
+  Then on average over independent and uniformly random $(\bu,\bx), (\bv,\by) \sim \F_q^{m+1}$,
+  \begin{equation*}
+    G^x_{[g(u) = a]} G^y_{[h(v) = b]} \ot I \approx_{\nu} G^y_{[h(v) = b]}
+    G^x_{[g(u) = a]} \ot I.
+  \end{equation*}
+\end{lemma}
+
+\begin{proof}
+	For notational convenience we use the abbreviation $G^{u,x}_a = G^{x}_{[g(u) = a]}$ for all $(u,x) \in \F_q^{m+1}$. 
+We expand the square:
+\begin{align}
+	& \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} ( G^{\bu,\bx}_a G^{\bv,\by}_b - G^{\bv,\by}_b G^{\bu,\bx}_a )^\dagger \cdot( G^{\bu,\bx}_a G^{\bv,\by}_b - G^{\bv,\by}_b G^{\bu,\bx}_a ) \ot I \ket{\psi} \nonumber\\
+	=~& \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} ( G^{\bv,\by}_b G^{\bu,\bx}_a  - G^{\bu,\bx}_a G^{\bv,\by}_b  ) \cdot( G^{\bu,\bx}_a G^{\bv,\by}_b - G^{\bv,\by}_b G^{\bu,\bx}_a ) \ot I \ket{\psi} \nonumber\\
+	=~& 2\cdot \E_{\bu,\bv,\bx,\by} \sum_{a,b} \Big ( \bra{\psi} G^{\bv,\by}_b G^{\bu,\bx}_a G^{\bv,\by}_b \ot I \ket{\psi} -  \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bu,\bx}_a G^{\bv,\by}_b  \ot I \ket{\psi} \Big ),  \label{eq:gcom8}
+\end{align}
+where the last step uses the projectivity of~$G$.
+
+We will show that the second term of \Cref{eq:gcom8} is close to the first term.
+To begin, we note that for each $(u, x) \in \F_q^{m+1}$,
+\begin{equation}\label{eq:sum-of-gux}
+G^{u, x} = \sum_a G^{u, x}_a =  \sum_a G^{x}_{[g(u) = a]} = G^x.
+\end{equation}
+As a result, 
+ \Cref{item:data-processed-consistency} and \Cref{prop:cons-sub-meas} imply that
+\begin{align}
+G^{u,x}_a \ot I 
+&\approx_{4\zeta} G^{u, x} \otimes A^{u, x}_a \nonumber\\
+&= G^{x} \otimes A^{u, x}_a, \label{eq:add-an-a}
+\end{align}
+where the second step is by \Cref{eq:sum-of-gux}.
+We can therefore approximate the second term of \Cref{eq:gcom8}
+as
+\begin{align}
+&\E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bu,\bx}_a G^{\bv,\by}_b  \ot I \ket{\psi} \nonumber\\
+\approx_{2\sqrt{\zeta}}& \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bu,\bx}_a G^{\by}  \ot A^{\bv,\by}_b \ket{\psi}.\label{eq:apply-add-an-a-once}
+\end{align}
+using \Cref{prop:closeness-of-ip} and \Cref{eq:add-an-a}.
+Next, we claim that
+\begin{equation}
+\eqref{eq:apply-add-an-a-once}
+\approx_{\sqrt{\zeta}}\E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bu,\bx}_a  \ot A^{\bv,\by}_b \ket{\psi}. \label{eq:gcom9} 
+\end{equation}
+This is proved in \Cref{clm:g-comm-stability} below. Continuing, we have
+%The second approximation follows by adding the following quantity to the right hand side of \Cref{eq:gcom10}:
+%\begin{equation}
+%\label{eq:gcom11}
+%\E_{\bw,\bw',\bx,\by} \sum_{a,b} \bra{\psi} G^{\bx,\bw}_a  G^{\by,\bw'}_b G^{\bx,\bw}_a (G^{\by} - G^{\by,\bw'}_b)  \ot A^{\bw',\by}_b \ket{\psi}  
+%\end{equation}
+%Using the fact that the $\{G^y_h\}$ measurement is projective and then using Cauchy-Schwarz, the magnitude of the quantity in~\eqref{eq:gcom11} is at most
+%\begin{align}
+%	&\Big (\E_{\bw,\bw',\bx,\by} \sum_{b} \bra{\psi} (\sum_a G^{\bx,\bw}_a  G^{\by,\bw'}_b G^{\bx,\bw}_a)^2 \ket{\psi} \Big)^{1/2} \\ & \qquad \qquad \cdot \Big (\E_{\bw',\by} \sum_{b} \bra{\psi} \Big ( (G^{\by} - G^{\by,\bw'}_b)  \ot A^{\bw',\by}_b \Big)^2 \ket{\psi} \Big)^{1/2} \\
+%	&\leq \sqrt{\gamma}
+%\end{align}
+%where the first factor is bounded by $1$ (using the fact that the $\{G^{x,w}_a\}$ measurements are projective), and the second factor is bounded by $\sqrt{\gamma}$ (using the fact that the $\{G^{x,w}_a\}$ measurements are $\gamma$-consistent with the points measurements $\{A^{w,x}_a\}$).
+\begin{align}
+\eqref{eq:gcom9} &\approx_{2\sqrt{\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bx}  \ot A^{\bv,\by}_b A^{\bu,\bx}_a \ket{\psi} \nonumber\\
+&\approx_{6\sqrt{\gamma (m+1)}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b  G^{\bx}  \ot A^{\bu,\bx}_a A^{\bv,\by}_b \ket{\psi}. \label{eq:dunno-what-i-should-call-this}
+\end{align}
+The first approximation again uses  \Cref{prop:closeness-of-ip} and \Cref{eq:add-an-a}. The second approximation follows from  \Cref{prop:closeness-of-ip} and \Cref{thm:commutativity-points}.
+Next, we claim that
+\begin{equation}
+\eqref{eq:dunno-what-i-should-call-this}
+\approx_{\sqrt{\zeta}+6\sqrt{\gamma(m+1)}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu, \bx}_a  G^{\bv,\by}_b \ot A^{\bu,\bx}_a  A^{\bv,\by}_b \ket{\psi}.
+\label{eq:gcom10}
+\end{equation}
+This is proved in \Cref{clm:g-comm-stability2} below.
+We now apply \Cref{eq:add-an-a} twice with the help of \Cref{prop:closeness-of-ip}.
+\begin{align}
+\eqref{eq:gcom10}
+&= \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bx}G^{\bu, \bx}_a  G^{\bv,\by}_b \ot A^{\bu,\bx}_a  A^{\bv,\by}_b \ket{\psi} \tag{because~$G$ is projective}\nonumber\\
+&\approx_{2\sqrt{\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi}G^{\bu,\bx}_a G^{\bu,\bx}_a  G^{\bv,\by}_b \ot A^{\bv,\by}_b \ket{\psi} \nonumber\\
+&= \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b \ot A^{\bv,\by}_b \ket{\psi} \tag{because~$G$ is projective}\nonumber\\
+&= \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\by} \ot A^{\bv,\by}_b \ket{\psi} \tag{because~$G$ is projective}\nonumber\\
+&\approx_{2\sqrt{\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bv, \by}_b \ot I \ket{\psi}. \label{eq:gonna-cite-this-in-just-a-bit}
+\end{align} 
+Now, \Cref{item:data-processed-self-consistency} and the fact that~$G$ is projective allows us to apply \Cref{prop:two-notions-of-self-consistency}, which states that~$G$ is $\zeta/2$-strongly self-consistent. Hence, \Cref{prop:two-notions-of-self-consistency-after-evaluation} says that we can ``post-process'' its measurement outcomes:
+\begin{equation*}
+G^x_{[g(u)=a]} \ot I \approx_{\zeta} I \ot G^x_{[g(u)=a]}.
+\end{equation*}
+In other words, using our abbreviation,
+\begin{equation}\label{eq:new-fact-that-i-derived}
+G^{u,x}_a \ot I \approx_{\zeta} I \otimes G^{u,x}_a.
+\end{equation}
+Applying \Cref{eq:new-fact-that-i-derived} twice with the help of \Cref{prop:closeness-of-ip},
+we conclude that
+\begin{align*}
+\eqref{eq:gonna-cite-this-in-just-a-bit}
+&\approx_{\sqrt{\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b  \ot G^{\bv, \by}_b \ket{\psi}\\
+&\approx_{\sqrt{\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bv, \by}_b G^{\bu,\bx}_a  G^{\bv,\by}_b  \ot I \ket{\psi}.
+\end{align*}
+Hence we have shown that the second term of \Cref{eq:gcom8} is close to the first term.
+\ignore{
+\begin{align*}
+\labelcref{eq:gcom10} &\approx_{\sqrt{2\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi}G^{\bu,\bx}_a G^{\bu,\bx}_a  G^{\bv,\by}_b \ot A^{\bv,\by}_b \ket{\psi} \tag{by \Cref{item:data-processed-consistency} and \Cref{prop:simeq-to-approx}} \\
+&= \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b \ot A^{\bv,\by}_b \ket{\psi} \tag{because~$G$ is projective}\\
+&\approx_{\sqrt{\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bv,\by}_b G^{\bu,\bx}_a  G^{\bv,\by}_b \ot I \ket{\psi}. \tag{by \Cref{item:data-processed-consistency} and \Cref{prop:simeq-to-approx}}
+\end{align*} }
+
+Putting everything together, this shows that \Cref{eq:gcom8} is bounded by
+\begin{align*}
+&2\cdot\Big(2\sqrt{\zeta} + \sqrt{\zeta} + 2\sqrt{\zeta} +6\sqrt{\gamma(m+1)} + \sqrt{\zeta} + 6\sqrt{\gamma(m+1)} + 2\sqrt{\zeta} + 2\sqrt{\zeta} + \sqrt{\zeta} + \sqrt{\zeta}\Big)\\
+=~& 24 \cdot(\sqrt{\gamma(m+1)}+\sqrt{\zeta})\\
+\leq~& 24\sqrt{m+1} \cdot(\sqrt{\gamma}+\sqrt{\zeta})\\
+\leq~& 48 m \cdot (\sqrt{\gamma} + \sqrt{\zeta}),
+\end{align*}
+and this completes the proof of the lemma, modulo the proofs of  \Cref{clm:g-comm-stability} and \Cref{clm:g-comm-stability2}.
+We now prove these claims.
+\ignore{Prior to doing so, we will first require the following technical lemma.
+
+\begin{lemma}
+\label{lem:global-variance-of-points2}
+For all collections of sub-measurements $\{R^x\} \in \multisub{m}{q}$ indexed by $x \in \F_q$, we have that on average over $\bx \sim \F_q$, and $\bu,\bv \sim \F_q^m$,
+\[
+	A^{u,x}_{g(u)} \otimes \sqrt{R_g^x} \approx_{24m\cdot(\eps+\delta+\frac{d}{q})} A^{v,x}_{g(v)} \otimes \sqrt{R_g^x} \,.
+\]
+\end{lemma}
+\begin{proof}
+	For every $x \in \F_q$, define the \emph{$x$-restricted $(d,m+1,q)$-low degree test} to be the normal $(d,m+1,q)$-low degree test where the points player receives a point $(u,x) \in \F_q^{m+1}$. Let $\eps_x,\delta_x, \gamma_x$ be the minimum values such that $(\psi,A,B, L)$ is $(\eps_x,\delta_x, \gamma_x)$-good for the $x$-restricted $(d,m+1,q)$-low degree test. Note that $\E_{\bx} \eps_{\bx} \leq \eps$, $\E_{\by} \delta_{\by} \leq \delta$, and $\E_{\bz} \gamma_{\bz} \leq \gamma$.
+	
+	Now define the \emph{$x$-restricted $(d,m,q)$-low degree test} to be the $x$-restricted $(d,m+1,q)$-test where further the lines player receives a line that does not run through the $(m+1)$-st coordinate. Note that $(\psi,A,B,L)$ also yields a strategy for the $x$-restricted $(d,m,q)$-low degree test that is $(\eps_x',\delta_x', \gamma_x')$-good, where $\delta'_x = \delta_x$ and
+	\begin{equation}\label{eq:eps-to-eps-prime}
+		\eps_x \geq \left(\frac{m}{m+1}\right)\cdot \eps_x'
+	\end{equation}
+	The factor $1 - 1/(m+1)$ comes from the probability that the line does not run through the $(m+1)$-st coordinate. 
+	
+	By \Cref{lem:global-variance-of-points}, for every fixed $x \in \F_q$ and $R^x \in \multisub{m}{q}$ and on average over $\bu,\bv \in \F_q^m$, we have
+\begin{equation}\label{eq:referencing-a-really-old-equation}
+	A^{u,x}_{g(u)} \otimes \sqrt{R_g^x} \approx_{12m \cdot (\eps_y' + \delta_y' + \frac{d}{q})} A^{v,y}_{g(v)} \otimes \sqrt{R_g^x}.
+\end{equation}
+Averaging over $\bx$, we get
+\begin{align*}
+	\E_{\bu,\bv,\bx} \sum_g \bra{\psi} \Big ( A^{\bu,\bx}_{g(\bu)} - A^{\bv,\bx}_{g(\bv)} \Big)^2 \ot R^{\bx}_g \ket{\psi}
+	&\leq \E_{\bx}\left[12m\cdot\left(\eps_{\bx}' + \delta_{\bx}' + \frac{d}{q}\right)\right] \tag{by \Cref{eq:referencing-a-really-old-equation}}\\
+	&\leq 12(m+1) \cdot \left(\eps + \delta + \frac{d}{q}\right).\tag{by \Cref{eq:eps-to-eps-prime}}
+\end{align*}
+This concludes the proof.
+\end{proof}
+
+We now proceed to the proofs of \Cref{clm:g-comm-stability} and \Cref{clm:g-comm-stability2}.
+}
+\begin{claim}
+\label{clm:g-comm-stability}
+\begin{align*}
+	&\E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bu,\bx}_a G^{\by}  \ot A^{\bv,\by}_b \ket{\psi} \label{eq:g-comm-stab1} \\
+	\approx_{\sqrt{\zeta}}& \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bu,\bx}_a  \ot A^{\bv,\by}_b \ket{\psi}.
+\end{align*}
+\end{claim}
+\begin{proof}
+	Recall that $G_b^{v,y} = G^y_{[g(v)=b]}= \sum_{g : g(v) = b} G_g^y$. For all $y \in \F_q$ and $g \in \polyfunc{m}{q}{d}$, define the matrix
+	\[
+		R^y_g = \E_{\bu,\bx} \sum_a G^{\bu,\bx}_a G^y_g G^{\bu,\bx}_a.
+	\]
+	Then because~$G$ is a sub-measurement,
+	\begin{equation*}
+	\sum_{g} R^y_g
+		= \E_{\bu,\bx} \sum_a G^{\bu,\bx}_a\cdot \Big(\sum_g G^y_g\Big) \cdot G^{\bu,\bx}_a
+		\leq\E_{\bu,\bx} \sum_a G^{\bu,\bx}_a
+		\leq I.
+	\end{equation*}
+	As a result, $R^y$ is a sub-measurement in $\polysub{m}{q}{d}$.
+	
+	Our goal is to bound the magnitude of
+	\begin{align}
+	&\E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bu,\bx}_a (I-G^{\by})  \ot A^{\bv,\by}_b \ket{\psi}\nonumber\\
+	=&\E_{\bu,\bv,\bx,\by} \sum_{a,b} \sum_{g : g(\bv) = b} \bra{\psi} G^{\bu,\bx}_a  G^{\by}_g G^{\bu,\bx}_a (I-G^{\by})  \ot A^{\bv,\by}_b \ket{\psi}\nonumber\\
+	=&\E_{\bu,\bv,\bx,\by} \sum_{a,g}  \bra{\psi} G^{\bu,\bx}_a  G^{\by}_g G^{\bu,\bx}_a (I-G^{\by})  \ot A^{\bv,\by}_{g(\bv)} \ket{\psi}\nonumber\\
+	=& \E_{\bv,\by} \sum_{g} \bra{\psi}R^{\by}_g (I-G^{\by}) \otimes A^{\bv, \by}_{g(\bv)}  \ket{\psi}.\label{eq:bound-this-right-now!}
+	\end{align}
+	We can now bound the magnitude as follows.
+	\begin{multline*}
+	|\eqref{eq:bound-this-right-now!}|
+	= \Big| \E_{\bv,\by} \sum_{g} \bra{\psi}\Big(\sqrt{R^{\by}_g} \otimes I\Big)
+		\cdot  \Big(\sqrt{R^{\by}_g} (I-G^{\by}) \otimes A^{\bv, \by}_{g(\bv)}\Big)\ket{\psi}\Big|\\
+	\leq \sqrt{\E_{\bv,\by} \sum_{g} \bra{\psi}R^{\by}_g \otimes I\ket{\psi}}
+		\cdot \sqrt{\E_{\bv,\by} \sum_{g}\bra{\psi}(I-G^{\by}) R^{\by}_g (I-G^{\by}) \otimes A^{\bv, \by}_{g(\bv)}\ket{\psi}}.
+	\end{multline*}
+	The term inside the first square root is at most~$1$ because~$R^y$ is a sub-measurement.
+	The term inside the second square root is
+	\begin{align*}
+	&\E_{\bv,\by} \sum_{g}\bra{\psi}(I-G^{\by}) R^{\by}_g (I-G^{\by}) \otimes A^{\bv, \by}_{g(\bv)}\ket{\psi}\\
+	=~&\E_{\by} \sum_{g}\bra{\psi}(I-G^{\by}) R^{\by}_g (I-G^{\by}) \otimes \left(\E_{\bv} A^{\bv, \by}_{g(\bv)}\right)\ket{\psi}\\
+	\leq~&\E_{\by} \sum_{g}\bra{\psi}(I-G^{\by}) R^{\by}_g (I-G^{\by}) \otimes Z^{\by}\ket{\psi}\tag{by~\Cref{item:data-processed-boundedness}}\\
+	\leq~&\E_{\by} \bra{\psi}(I-G^{\by}) \otimes Z^{\by}\ket{\psi}\\
+	\leq~&\zeta.\tag{by~\Cref{item:data-processed-boundedness}}
+	\end{align*}
+	This concludes the proof.
+\end{proof}
+
+
+
+\begin{claim}
+\label{clm:g-comm-stability2}
+\begin{align*}
+	&\E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bx}  \ot A^{\bu,\bx}_a A^{\bv,\by}_b  \ket{\psi}  \\
+	\approx_{\sqrt{\zeta}+6\sqrt{\gamma(m+1)}}& \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b \ot A^{\bu,\bx}_a A^{\bv,\by}_b  \ket{\psi}.
+\end{align*}
+\end{claim}
+\begin{proof}
+	Our goal is to bound the magnitude of
+	\begin{align}
+	&\E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b (I-G^{\bx})  \ot A^{\bu,\bx}_a A^{\bv,\by}_b  \ket{\psi}\nonumber\\
+	\approx_{6\sqrt{\gamma(m+1)}} &\E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b (I-G^{\bx})  \ot  A^{\bv,\by}_b A^{\bu,\bx}_a \ket{\psi}.\label{eq:just-got-commuted}
+	\end{align}
+	where the second line follows from \Cref{prop:closeness-of-ip} and \Cref{thm:commutativity-points}.
+	We now proceed nearly identically to \Cref{clm:g-comm-stability}.
+	\begin{align}
+	\eqref{eq:just-got-commuted}
+	&=\E_{\bu,\bv,\bx,\by} \sum_{a,b}\sum_{g:g(\bu)=a} \bra{\psi} G^{\bx}_g  G^{\bv,\by}_b (I-G^{\bx})  \ot A^{\bv,\by}_b A^{\bu,\bx}_a \ket{\psi} \nonumber\\
+	&=\E_{\bu,\bv,\bx,\by} \sum_{g,b} \bra{\psi} G^{\bx}_g  G^{\bv,\by}_b (I-G^{\bx})  \ot A^{\bv,\by}_b A^{\bu,\bx}_{g(\bu)}   \ket{\psi}.\label{eq:g-comm-stab7}
+	\end{align}
+	Then we can bound the magnitude as follows.
+	\begin{multline*}
+	|\eqref{eq:g-comm-stab7}|
+	= \Big|\E_{\bu,\bv,\bx,\by} \sum_{g,b} \bra{\psi} \Big(\sqrt{G^{\bx}_g}\otimes A^{\bv,\by}_b\Big) \cdot \Big(\sqrt{G^{\bx}_g}  G^{\bv,\by}_b (I-G^{\bx})  \ot  A^{\bu,\bx}_{g(\bu)}\Big)\ket{\psi} \Big|\\
+	\leq \sqrt{\E_{\bu,\bv,\bx,\by} \sum_{g,b} \bra{\psi} G^{\bx}_g\otimes A^{\bv,\by}_b\ket{\psi}}
+		\cdot \sqrt{\E_{\bu,\bv,\bx,\by} \sum_{g,b} \bra{\psi}(I-G^{\bx}) G^{\bv,\by}_b G^{\bx}_g  G^{\bv,\by}_b (I-G^{\bx})  \ot  A^{\bu,\bx}_{g(\bu)}\ket{\psi}}.
+	\end{multline*}
+	The term inside the first square root is at most~$1$ because~$G$ and~$A$ are sub-measurements.
+	The term inside the second square root is
+	\begin{align*}
+	&\E_{\bu,\bv,\bx,\by} \sum_{g,b} \bra{\psi}(I-G^{\bx}) G^{\bv,\by}_b G^{\bx}_g  G^{\bv,\by}_b (I-G^{\bx})  \ot  A^{\bu,\bx}_{g(\bu)}\ket{\psi}\\
+	=~&\E_{\bv,\bx,\by} \sum_{g,b} \bra{\psi}(I-G^{\bx}) G^{\bv,\by}_b G^{\bx}_g  G^{\bv,\by}_b (I-G^{\bx})  \ot  \left(\E_{\bu} A^{\bu,\bx}_{g(\bu)}\right)\ket{\psi}\\
+	\leq~&\E_{\bv,\bx,\by} \sum_{g,b} \bra{\psi}(I-G^{\bx}) G^{\bv,\by}_b G^{\bx}_g  G^{\bv,\by}_b (I-G^{\bx})  \ot  Z^{\bx}\ket{\psi}\tag{by~\Cref{item:data-processed-boundedness}}\\
+	\leq~&\E_{\bv,\bx,\by} \sum_{b} \bra{\psi}(I-G^{\bx}) G^{\bv,\by}_b  (I-G^{\bx})  \ot  Z^{\bx}\ket{\psi}\\
+	\leq~&\E_{\bv,\bx,\by} \bra{\psi}(I-G^{\bx})  \ot  Z^{\bx}\ket{\psi}\\
+	\leq~&\zeta.\tag{by~\Cref{item:data-processed-boundedness}}
+	\end{align*}
+	This concludes the proof.
+	\end{proof}
+Having proved \Cref{clm:g-comm-stability} and \Cref{clm:g-comm-stability2}, we conclude the proof of \Cref{lem:comm-data-processed-g}.
+\end{proof}
+
+\subsection{Commutativity of~$G$}\label{sec:G-commutes}
+
+\begin{theorem}[Commutativity of~$G$]\label{thm:com-main}
+  Let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
+  Let $\{G^x\}_{x \in \F_q}$ denote a set of projective sub-measurements in $\polysub{m}{q}{d}$ with the following properties:
+  \begin{enumerate}
+  \item (Consistency with~$A$): \label{item:commuting-consistency} On average over $(\bu, \bx) \sim \F_q^{m+1}$,
+	  \begin{equation*}
+	  A^{u, x}_a \otimes I \simeq_{\zeta} I \otimes G^x_{[g(u)=a]}.
+	  \end{equation*}
+  \item (Strong self-consistency): \label{item:commuting-self-consistency} On average over~$\bx \sim \F_q$,
+  	\begin{equation*}
+		G^x_g \otimes I \approx_{\zeta} I \otimes G^x_g.
+	\end{equation*}
+  \item (Boundedness): \label{item:commuting-boundedness} There exists a positive-semidefinite matrix $Z^x$ for each $x \in \F_q$ such that
+  	\begin{equation*}
+		\E_{\bx} \bra{\psi} (I-G^{\bx})\otimes Z^{\bx} \ket{\psi} \leq \zeta
+	\end{equation*}
+	and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	Z^x \geq \left(\E_{\bu} A^{\bu, x}_{g(\bu)}\right).
+	\end{equation*}
+  \end{enumerate}
+  Let
+  \begin{equation*}
+  \nu = 30m \cdot \left(\gamma^{1/4}+ \zeta^{1/4} + (d/q)^{1/4}  \right).
+  \end{equation*}
+  Then on average over independent and uniformly random $(\bu,\bx), (\bv,\by) \sim \F_q^{m+1}$,
+  \begin{equation*}
+    G^{x}_{g} G^{y}_h \ot I \approx_{\nu} G^y_h G^x_g \ot I
+  \end{equation*}
+\end{theorem}
+
+\begin{proof}
+We note that the bound we are proving is trivial when at least one of $\gamma$, $\zeta$, or $d/q$ is $\geq 1$.
+In this case, $\nu \geq 30$.
+On the other hand,
+\begin{align*}
+&\E_{\bx,\by} \sum_{g, h} \Vert(G^{\bx}_g G^{\by}_h \ot I - G^{\by}_h G^{\bx}_g \ot I) \ket{\psi}\Vert^2\\
+=~&\E_{\bx,\by} \sum_{g, h} \Vert(G^{\bx}_g G^{\by}_h \ot I) \ket{\psi} + (- G^{\by}_h G^{\bx}_g \ot I) \ket{\psi}\Vert^2\\
+\leq~&\E_{\bx,\by} \sum_{g, h}
+	2\cdot \Big(\Vert(G^{\bx}_g G^{\by}_h \ot I) \ket{\psi} \Vert^2 + \Vert(G^{\by}_h G^{\bx}_g \ot I) \ket{\psi}\Vert^2\Big) \tag{by \Cref{prop:triangle-inequality-for-vectors-squared}}\\
+=~&\E_{\bx,\by} \sum_{g, h}
+	4\cdot \Vert(G^{\bx}_g G^{\by}_h \ot I) \ket{\psi} \Vert^2 \tag{by symmetry of the terms}\\
+=~&4 \cdot \E_{\bx, \by}\sum_{g, y} \bra{\psi} (G^{\by}_h G^{\bx}_g G^{\by}_h \ot I) \ket{\psi}\\
+\leq~&4, \tag{because~$G$ is a sub-measurement}
+\end{align*}
+which is therefore less than~$\nu$.
+Hence, we may assume that $\gamma, \zeta, d/q \leq 1$.
+This will aid us when carrying out the error calculations near the end of the proof,
+as it allows us to bound terms like $\zeta^{1/2}$ by terms like $\zeta^{1/4}$.
+
+Our goal is to bound
+\begin{align}
+&\E_{\bx, \by} \sum_{g, h} \bra{\psi} (G^{\bx}_{g} G^{\by}_h -
+    G^{\by}_h G^{\bx}_g)^\dagger \cdot(G^{\bx}_{g} G^{\by}_h - G^{\by}_h
+                   G^{\bx}_g) \ot I \ket{\psi}\nonumber\\
+=~&\E_{\bx, \by} \sum_{g, h} \bra{\psi} ( G^{\by}_h G^{\bx}_{g}-
+    G^{\bx}_g G^{\by}_h )\cdot (G^{\bx}_{g} G^{\by}_h - G^{\by}_h
+                   G^{\bx}_g) \ot I \ket{\psi}\nonumber\\
+=~&2\cdot\E_{\bx, \by} \sum_{g,h} \bra{\psi} G^\bx_g G^{\by}_h
+      G^{\bx}_g \ot I \ket{\psi}
+- 2\cdot \E_{\bx, \by} \sum_{g,h}
+      \bra{\psi} G^{\bx}_g G^{\by}_h G^{\bx}_g G^{\by}_h \ot I
+      \ket{\psi}.\label{eq:gcomterms}
+\end{align}
+  We will show that both terms in \Cref{eq:gcomterms} are close to $\bra{\psi} G \otimes G \ket{\psi}$, where we recall that $G = \E_\bx G^\bx$.
+  With the errors we derive, this will imply \Cref{thm:com-main}.
+  
+  For the first term in \Cref{eq:gcomterms}, we have
+  \begin{align*}
+   \E_{\bx, \by} \sum_{g,h} \bra{\psi} G^\bx_g G^{\by}_h
+      G^{\bx}_g \ot I \ket{\psi}&= \E_{\bx} \sum_{g}
+                                \bra{\psi}( G^{\bx}_g\cdot G\cdot G^{\bx}_g) \ot I \ket{\psi}
+    \\
+    &\approx_{2\sqrt{\zeta}} \E_{\bx}\sum_g \bra{\psi}
+      G \ot G^{\bx}_g \ket{\psi} \\
+     &= \bra{\psi} G \ot G \ket{\psi}, 
+  \end{align*}
+  where the approximation is by \Cref{prop:switch-sandwich} and \Cref{item:commuting-self-consistency}.
+  
+  
+  For the second term in \Cref{eq:gcomterms}, we begin with the following lemma.
+  \begin{lemma}\label{lem:normalization-condition}
+  Let $P = \{P_a\}$ be a sub-measurement and $Q = \{Q_b\}$ be a projective sub-measurement.
+  Define $C_{a, b} = Q_b \cdot P_a \cdot Q_b$. 
+  Then
+  $
+  \sum_a (\sum_b C_{a, b})^\dagger (\sum_b C_{a, b}) = \sum_a (\sum_b C_{a, b}) (\sum_b C_{a, b})^\dagger \leq I.
+  $
+  \end{lemma}
+  \begin{proof}
+  The first equality follows from the fact that $C_{a, b}$ is Hermitian.
+  As for the second equality,
+  \begin{align*}
+  \sum_a \Big(\sum_b C_{a, b}\Big) \Big(\sum_b C_{a, b}\Big)^\dagger
+  &= \sum_a \sum_{b, b'} C_{a, b} \cdot C_{a, b'}\tag{$C_{a, b'}$ is Hermitian}\\
+  &= \sum_a \sum_{b, b'} (Q_b \cdot P_a \cdot Q_b) \cdot (Q_{b'} \cdot P_a \cdot Q_{b'})\\
+  &= \sum_a \sum_{b} Q_b \cdot P_a \cdot Q_b \cdot P_a \cdot Q_{b}\tag{because $Q$ is projective}\\
+  &\leq \sum_a \sum_{b} Q_b \cdot P_a  \cdot Q_{b}\tag{because $Q_b \leq I$}\\
+  &\leq I,
+  \end{align*}
+  because~$P$ and~$Q$ are sub-measurements.
+  \end{proof}
+  
+   
+  First, we show that
+  \begin{equation}
+  	\E_{\bx,\by} \sum_{g,h} \bra{\psi} G^{\bx}_g G^{\by}_h G^{\bx}_g G^{\by}_h \ot I \ket{\psi} \approx_{\sqrt{\zeta}} \E_{\bx,\by} \sum_{g,h} \bra{\psi} G^{\by}_h G^{\bx}_g G^{\by}_h  \ot G^{\bx}_g \ket{\psi}
+	\label{eq:gcom4}
+\end{equation}
+This follows from \Cref{prop:closeness-of-ip} where we let ``$A^x_a$'' and ``$B^x_a$'' in the Proposition be $G^x_g \ot I$ and $I \ot G^x_g$, respectively, and let ``$C^x_{a,b}$'' denote $G^y_h G^x_g G^y_h$. The closeness between ``$A^x_a$'' and ``$B^x_a$'' follows from \Cref{item:commuting-self-consistency}, and the normalization condition on ``$C^x_{a,b}$'' follows from the projectivity of the~$\{G^y_h\}$ measurements and \Cref{lem:normalization-condition}. 
+Next, we show that
+\begin{align}\label{eq:evaluate-gcom-at-points}
+\eqref{eq:gcom4}
+= \E_{\bx,\by} \sum_{g,h} \bra{\psi} G^{\by}_h G^{\bx}_g G^{\by}_h  \ot G^{\bx}_g \ket{\psi}
+\approx_{\frac{dm}{q}} \E_{\bu,\bx,\by} \sum_{a,h} \bra{\psi} G^{\by}_h G^{\bx}_{[g(\bu) = a]} G^{\by}_h  \ot G^{\bx}_{[g(\bu) = a]} \ket{\psi}.
+\end{align}
+To do so, we first compute the difference as
+\begin{equation}\label{eq:gcom4-diff}
+\E_{\bu, \bx, \by} \sum_{g \neq g', h} \bone[g(\bu) = g'(\bu)] \cdot \bra{\psi} G^{\by}_h G^{\bx}_g G^{\by}_h  \ot G^{\bx}_{g'} \ket{\psi}.
+\end{equation}
+This is nonnegative and real, so it suffices to upper bound it, which we do as follows.
+\begin{align*}
+\eqref{eq:gcom4-diff}
+& = \E_{\bx, \by} \sum_{ g \neq g',h}   \bra{\psi} G^{\by}_h G^{\bx}_g G^{\by}_h  \ot G^{\bx}_{g'} \ket{\psi} \cdot \E_{\bu} \bone[g(\bu) = g'(\bu)]\\
+& \leq \E_{\bx, \by} \sum_{g \neq g', h}   \bra{\psi} G^{\by}_h G^{\bx}_g G^{\by}_h  \ot G^{\bx}_{g'} \ket{\psi} \cdot \frac{dm}{q} \tag{by Schwartz-Zippel}\\
+& \leq \frac{dm}{q}. \tag{because~$G$ is a sub-measurement}
+\end{align*}
+Next, we show that
+\begin{align}
+\eqref{eq:evaluate-gcom-at-points}
+&= \E_{\bu,\bx,\by} \sum_{a,h} \bra{\psi} G^{\by}_h G^{\bx}_{[g(\bu) = a]} G^{\by}_h  \ot G^{\bx}_{[g(\bu) = a]} \ket{\psi}\tag{\Cref{eq:evaluate-gcom-at-points} rewriten}\\
+&\approx_{\sqrt{\zeta}}\E_{\bu,\bx,\by} \sum_{a,h} \bra{\psi} G^{\bx}_{[g(\bu) = a]} G^{\by}_h G^{\bx}_{[g(\bu) = a]} G^{\by}_h  \ot I \ket{\psi}\nonumber\\
+&\approx_{\sqrt{\zeta}} \E_{\bu,\bx,\by} \sum_{a,h} \bra{\psi} G^{\bx}_{[g(\bu) = a]} G^{\by}_h G^{\bx}_{[g(\bu) = a]} \ot G^{\by}_h \ket{\psi}.\label{eq:don't-understand-the-numbering-system}
+\end{align}
+These two approximations are derived as follows.
+\begin{enumerate}
+\item
+In the first approximation we used \Cref{prop:closeness-of-ip} where we let ``$A^x_a$'' and ``$B^x_a$'' in the Proposition be $G^x_{[g(u)=a]} \ot I$ and $I \ot G^x_{[g(u) = a]}$, respectively, and let ``$C^x_{a,b}$'' denote $G^y_h G^x_{[g(u)=a]} G^y_h$. The closeness between ``$A^x_a$'' and ``$B^x_a$'' follows from \Cref{item:commuting-self-consistency}, and the normalization condition on ``$C^x_{a,b}$'' follows from the projectivity of the~$\{G^y_h\}$ measurements and \Cref{lem:normalization-condition}.
+\item
+In the second approximation we used \Cref{prop:closeness-of-ip} where we let ``$A^x_a$'' and ``$B^x_a$'' in the Proposition be $G^y_h \ot I$ and $I \ot G^y_h$, respectively, and let ``$C^x_{a,b}$'' denote $G^x_{[g(u)=a]} G^y_h G^x_{[g(u)=a]}$. The closeness between ``$A^x_a$'' and ``$B^x_a$'' follows from \Cref{item:commuting-self-consistency}, and the normalization condition on ``$C^x_{a,b}$'' follows from the projectivity of the~$\{G^x_{[g(u)=a]}\}$ measurements and \Cref{lem:normalization-condition}.
+\end{enumerate}
+Analogously to the derivation of \Cref{eq:evaluate-gcom-at-points}, we now show that
+\begin{align}
+\eqref{eq:don't-understand-the-numbering-system}
+& = \E_{\bu,\bx,\by} \sum_{a,h} \bra{\psi} G^{\bx}_{[g(\bu) = a]} G^{\by}_h G^{\bx}_{[g(\bu) = a]} \ot G^{\by}_h \ket{\psi} \tag{\Cref{eq:don't-understand-the-numbering-system} restated}\\
+& \approx_{\frac{dm}{q}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bx}_{[g(\bu) = a]} G^{\by}_{[h(\bv)=b]} G^{\bx}_{[g(\bu) = a]} \ot G^{\by}_{[h(\bv)=b]} \ket{\psi}.\label{eq:evaluate-gcom-at-points-part-dos}
+\end{align}
+To do so, we first compute the difference as
+\begin{equation}\label{eq:eq:don't-understand-the-numbering-system-diff}
+\E_{\bu,\bv, \bx,\by} \sum_{a,h\neq h'} \bone[h(\bv) = h'(\bv)] \cdot \bra{\psi} G^{\bx}_{[g(\bu) = a]} G^{\by}_h G^{\bx}_{[g(\bu) = a]} \ot G^{\by}_{h'} \ket{\psi}.
+\end{equation}
+This is nonnegative and real, so it suffices to upper bound it, which we do as follows.
+\begin{align*}
+\eqref{eq:eq:don't-understand-the-numbering-system-diff}
+& = \E_{\bu, \bx,\by} \sum_{a,h\neq h'} \bra{\psi} G^{\bx}_{[g(\bu) = a]} G^{\by}_h G^{\bx}_{[g(\bu) = a]} \ot G^{\by}_{h'} \ket{\psi} \cdot \E_{\bv} \bone[h(\bv) = h'(\bv)]\\
+& \leq \E_{\bu, \bx,\by} \sum_{a,h\neq h'} \bra{\psi} G^{\bx}_{[g(\bu) = a]} G^{\by}_h G^{\bx}_{[g(\bu) = a]} \ot G^{\by}_{h'} \ket{\psi} \cdot \frac{dm}{q} \tag{by Schwartz-Zippel}\\
+& \leq \frac{dm}{q}. \tag{because~$G$ is a sub-measurement}
+\end{align*}
+Now, we set
+\begin{equation*}
+\nu_{\mathrm{evaluation}} = 48 m \cdot (\gamma^{1/2} + \zeta^{1/2})
+\end{equation*}
+to be the approximation error from \Cref{lem:comm-data-processed-g}.
+We conclude by showing that
+\begin{align*}
+	\eqref{eq:evaluate-gcom-at-points-part-dos} &= \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bx}_{[g(\bu) = a]} G^{\by}_{[h(\bv) = b]} G^{\bx}_{[g(\bu) = a]} \ot G^{\by}_{[h(\bv) = b]} \ket{\psi} \tag{\Cref{eq:evaluate-gcom-at-points-part-dos} restated}\\
+	&\approx_{\sqrt{\nu_{\mathrm{evaluation}}}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bx}_{[g(\bu) = a]} G^{\bx}_{[g(\bu) = a]} G^{\by}_{[h(\bv) = b]}  \ot G^{\by}_{[h(\bv) = b]} \ket{\psi} \\
+	&= \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bx}_{[g(\bu) = a]} G^{\by}_{[h(\bv) = b]}  \ot G^{\by}_{[h(\bv) = b]} \ket{\psi} \\
+	&\approx_{\sqrt{\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bx}_{[g(\bu) = a]} \ot G^{\by}_{[h(\bv) = b]} G^{\by}_{[h(\bv) = b]} \ket{\psi} \\
+	&= \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bx}_{[g(\bu) = a]} \ot G^{\by}_{[h(\bv) = b]} \ket{\psi} \\
+	&= \bra{\psi} G \ot G \ket{\psi}.
+\end{align*}
+The third and fifth lines follow from the projectivity of the $G$ measurements.
+The two approximations are derived as follows.
+\begin{enumerate}
+\item
+In the first approximation we used \Cref{prop:closeness-of-ip} where we let ``$A^x_a$'' and ``$B^x_a$'' in the Proposition be $G^x_{[g(u)=a]} G^y_{[h(v)=b]} \ot I$ and $G^y_{[h(v)=b]}  G^x_{[g(u) = a]} \ot I$, respectively, and let ``$C^x_{a,b}$'' denote $G^x_{[g(u)=a]} \ot G^y_{[h(v)=b]}$. The closeness between ``$A^x_a$'' and ``$B^x_a$'' follows from \Cref{lem:comm-data-processed-g}, and the normalization condition on ``$C^x_{a,b}$'' follows from it being a sub-measurement.
+\item
+In the second approximation we used \Cref{prop:closeness-of-ip} where we let ``$A^x_a$'' and ``$B^x_a$'' in the Proposition be $G^y_{[h(v)=b]} \ot I$ and $I \ot G^y_{[h(v)=b]}$, respectively, and let ``$C^x_{a,b}$'' denote $G^x_{[g(u)=a]} \ot G^y_{[h(v)=b]}$. The closeness between ``$A^x_a$'' and ``$B^x_a$'' follows from \Cref{item:commuting-self-consistency}, and the normalization condition on ``$C^x_{a,b}$'' follows from it being a sub-measurement.
+\end{enumerate}
+This shows that the second term in \Cref{eq:gcomterms} is approximately $\bra{\psi} G \ot G \ket{\psi}$, as desired.
+In total, we have incurred an error of
+\begin{align*}
+&2\cdot\left(2\sqrt{\zeta} +\sqrt{\zeta} + \frac{dm}{q} + \sqrt{\zeta} + \sqrt{\zeta} + \frac{dm}{q} + \sqrt{\nu_{\mathrm{evaluation}}} + \sqrt{\zeta} \right)\\
+=~&12 \zeta^{1/2} + 2 m \cdot (d/q) + 2 \cdot \sqrt{48 m \cdot (\gamma^{1/2} + \zeta^{1/2})}\\
+\leq~&12 \zeta^{1/2} + 2 m \cdot (d/q) + 14m \cdot \left(\gamma^{1/4} + \zeta^{1/4}\right)\\
+\leq~& 12 \zeta^{1/4} + 2m \cdot (d/q)^{1/4} + 14m \cdot \left(\gamma^{1/4} + \zeta^{1/4}\right) \\
+\leq~& 30m \cdot \left(\gamma^{1/4}+ \zeta^{1/4} + (d/q)^{1/4}  \right).
+\end{align*}
+  This concludes the proof of \Cref{thm:com-main}.
+\end{proof}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "multilinearity"
+%%% End:

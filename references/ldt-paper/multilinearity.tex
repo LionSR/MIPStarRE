@@ -1,0 +1,126 @@
+\documentclass[11pt]{article}
+\usepackage{wright}
+
+\newcommand{\multi}[2]{\calM(#1, #2)}
+\newcommand{\multimeas}[2]{\mathrm{MultiMeas}(#1,#2)}
+\newcommand{\multisub}[2]{\mathrm{MultiSub}(#1,#2)}
+
+\newcommand{\polyfunc}[3]{\calP(#1, #2, #3)}
+\newcommand{\polymeas}[3]{\mathrm{PolyMeas}(#1, #2, #3)}
+\newcommand{\polysub}[3]{\mathrm{PolySub}(#1, #2, #3)}
+
+\DeclareMathOperator{\interp}{\mathbf{interp}}
+
+\newcommand{\anote}[1]{\footnote{{\color{blue} {\bf Anand}: {#1}}}}
+\newcommand{\jnote}[1]{\footnote{{\color{red} {\bf John}: {#1}}}}
+\newcommand{\hnote}[1]{\footnote{{\color{magenta} {\bf Henry}: {#1}}}}
+
+%inline notes
+\newcommand{\ainnote}[1]{({\color{blue} {\bf Anand}: {#1}})}
+\newcommand{\jinnote}[1]{({\color{red} {\bf John}: {#1}})}
+\newcommand{\hinnote}[1]{({\color{magenta} {\bf Henry}: {#1}})}
+\newcommand{\tnote}[1]{({\color{olive} {\bf Thomas}: {#1}})}
+\newcommand{\znote}[1]{({\color{cyan} {\bf Zhengfeng}: {#1}})}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \term definition
+% Usage:  \underbrace{<long-expression>}_{\term[optlabel]{labelname}}
+% Later on, use \cref{labelname} or \ref{labelname}
+% if [optlabel] is missing, a counter (A, B, C, ...) is used.
+% Source: https://tex.stackexchange.com/questions/53690/tagging-under-an-equation-using-underbrace
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcounter{termcounter}[equation]
+\renewcommand{\thetermcounter}{\the\numexpr\value{equation}+1\relax.\roman{termcounter}}
+\crefname{term}{term}{terms}
+\creflabelformat{term}{#2\textup{(#1)}#3}
+
+\makeatletter
+\def\term{\@ifnextchar[\term@optarg\term@noarg}%]
+\def\term@optarg[#1]#2{%
+  \textup{#1}%
+  \def\@currentlabel{#1}%
+  \def\cref@currentlabel{[][2147483647][]#1}%
+  \cref@label[term]{#2}}
+\def\term@noarg#1{%
+  \refstepcounter{termcounter}%
+  \textup{\thetermcounter}%
+  \cref@label[term]{#1}}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newcommand{\inconsistency}{\simeq}
+\newcommand{\simeqbot}{\overset{\bot}{\simeq}}
+\newcommand{\simeqplus}{\overset{+}{\simeq}}
+
+\newcommand{\rmaux}{\mathrm{aux}}
+\newcommand{\reg}[1]{{\mathsf{#1}}}
+
+\title{Quantum soundness of the classical low individual degree test}
+
+\author{
+Zhengfeng Ji\thanks{zhengfeng.ji@uts.edu.au}\\
+\small{\sl University of Technology Sydney}
+\and Anand Natarajan\thanks{anandn@caltech.edu}\\
+ \small{\sl California Institute of Technology}
+ \and Thomas Vidick\thanks{vidick@caltech.edu}\\
+ \small{\sl California Institute of Technology}
+ \and John Wright\thanks{wright@cs.utexas.edu}\\
+ \small{\sl California Institute of Technology}\\
+ \small{\sl University of Texas at Austin}
+ \and Henry Yuen\thanks{hyen@cs.toronto.edu}\\
+ \small{\sl University of Toronto}\vspace*{10pt}
+}
+
+\date{}
+
+
+\begin{document}
+
+\maketitle
+
+
+\begin{abstract}
+Low degree tests play an important role in classical complexity theory,
+serving as basic ingredients in foundational results such as $\MIP = \NEXP$~\cite{BFL91}
+and the PCP theorem~\cite{AS98,ALM+98}.
+Over the last ten years,
+versions of these tests which are sound against quantum provers
+have found increasing applications to the study of nonlocal games and the complexity class~$\MIP^*$.
+The culmination of this line of work is the result $\MIP^* = \mathsf{RE}$~\cite{JNV+20}.
+
+\tnote{edited starting here:}
+One of the key ingredients in the first reported proof of  $\MIP^* = \mathsf{RE}$ is a two-prover variant of the low degree test, initially  
+shown to be sound against multiple quantum provers in~\cite{Vid16}.
+Unfortunately a mistake was recently discovered in the latter result, invalidating the main result of~\cite{Vid16} as well as its use in subsequent works, including~\cite{JNV+20}
+
+We analyze a variant of the low degree test called the low individual degree test.
+Our main result is that the two-player version of this test is sound against quantum provers. This soundness result is sufficient to re-derive several bounds on~$\MIP^*$ that relied on~\cite{Vid16}, including $\MIP^* = \mathsf{RE}$.
+\end{abstract}
+
+\newpage
+
+\tableofcontents
+\vfill
+\thispagestyle{empty}
+\newpage
+
+\input{introduction.tex}
+\input{test_definition.tex}
+\input{preliminaries.tex}
+\input{orthonormalization.tex}
+%\input{naimark.tex}
+\input{inductive_step.tex}
+\input{expansion.tex}
+\input{self_improvement.tex}
+\input{commutativity-points.tex}
+\input{commutativity-G.tex}
+\ignore{\input{pasting.tex}}
+\input{ld-pasting.tex}
+
+
+%\bibliographystyle{alpha}
+\bibliographystyle{alpha}
+\bibliography{wright}
+
+\end{document}

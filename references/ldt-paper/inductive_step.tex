@@ -1,0 +1,664 @@
+\section{The main induction step}
+\label{sec:induction}
+
+We will now carry out the main inductive argument. 
+The inductive hypothesis is stated as follows.
+
+\begin{theorem}[Main induction]\label{thm:main-induction}
+  Let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy
+  for the $(m,q,d)$ low individual degree test. Let $k \geq md$ be an integer.
+  Then there exists a measurement $G \in \polymeas{m}{q}{d}$ such that on
+  average over $\bu \sim \F_q^{m}$,
+	\begin{equation*}
+	  A^{u}_a \otimes I \simeq_{\sigma} I \otimes G_{[g(u)=a]},
+	\end{equation*}
+  where $\sigma = m^2 \cdot \bigl(\nu + e^{-k/(80000m^2)}\bigr)$ and
+  $\nu = 1000k^2 m^2 \cdot\big(\eps^{1/1024} + \delta^{1/1024} + \gamma^{1/1024} + (d/q)^{1/1024}\big)$.
+  \ignore{
+\item (Completeness): \label{item:self-improvement-G-completeness}  If $G = \sum_g G_g$, then
+  	\begin{equation*}
+	\bra{\psi} G \otimes I \ket{\psi} \geq 1 - \kappa,
+	\end{equation*}
+	where
+	\begin{equation*}
+	\kappa = m^2 \cdot\Big(\nu + e^{- k/(80000m^2)}\Big).
+	\end{equation*}
+}
+\end{theorem}
+
+Comparing with our main theorem, \Cref{thm:main-formal},
+\Cref{thm:main-induction} produces a measurement which is consistent with~$A$,
+but it is not projective or self-consistent.
+In addition, the strategy is assumed to be symmetric.
+We correct these deficiencies in the following proof.
+
+\begin{proof}[Proof of~\Cref{thm:main-formal} assuming \Cref{thm:main-induction}]
+Suppose $(\psi, A^{\mathrm{A}},B^{\mathrm{A}},L^{\mathrm{A}},A^{\mathrm{B}},B^{\mathrm{B}},L^{\mathrm{B}})$
+is a (not necessarily symmetric) strategy
+ which passes the $(m, q, d)$-low individual degree test
+with probability $(1-\eps)$.
+Throughout this proof we will refer to this as the \emph{original strategy}.
+Then because each of the three subtests occurs with probability $1/3$,
+$(\psi, A^{\mathrm{A}},B^{\mathrm{A}},L^{\mathrm{A}},A^{\mathrm{B}},B^{\mathrm{B}},L^{\mathrm{B}})$ is a $(3\eps, 3\eps, 3\eps)$-good strategy.
+We now would like to apply \Cref{thm:main-induction},
+but it only applies to strategies which are symmetric.
+So we will apply a standard construction to ``symmetrize'' our strategy,
+apply \Cref{thm:main-induction},
+and then ``unsymmetrize'' the resulting $\{G_g\}$ measurement to obtain $\{G^{\mathrm{A}}_g\}$ and $\{G^{\mathrm{B}}_g\}$ measurements.
+
+For simplicity, we will assume that Player~$\mathrm{A}$ and~$\mathrm{B}$'s
+Hilbert spaces $\calH_{\mathrm{A}}$ and $\calH_{\mathrm{B}}$
+are both $\C^d$, for some~$d$.
+(This argument can be extended to the case of different dimensions in a straightforward manner.)
+We will introduce two additional registers, $\calH_{\mathrm{A}'} =\calH_{\mathrm{B'}} = \C^2$,
+referred to as the \emph{role registers}.
+Then the symmetrized state is given by
+\begin{equation*}
+\ket{\psi_{\mathrm{sym}}} = \ket{0}_{\mathrm{A}'}\ket{1}_{\mathrm{B}'} \ket{\psi}_{\mathrm{A},\mathrm{B}}
+					+\ket{1}_{\mathrm{A}'}\ket{0}_{\mathrm{B}'} \ket{\psi_{\mathrm{swap}}}_{\mathrm{A},\mathrm{B}}
+					\in (\C^2_{\mathrm{A}'} \ot \C^d_{\mathrm{A}}) \ot 
+						(\C^2_{\mathrm{B}'} \ot \C^d_{\mathrm{B}}),
+\end{equation*}
+where $\ket{\psi_{\mathrm{swap}}}$ denotes $\ket{\psi}$ with its two registers swapped.
+Note that the resulting state $\ket{\psi_{\mathrm{sym}}}$ is symmetric under the exchange of its two registers.
+Next, we define the symmetrized measurement $A_{\mathrm{sym}} = \{(A_{\mathrm{sym}})^u_a\}$ as follows
+\begin{equation*}
+(A_{\mathrm{sym}})^u_a = \ket{0}\bra{0} \ot A^{\mathrm{A},u}_a + \ket{1} \bra{1} \ot A^{\mathrm{B},u}_a,
+\end{equation*}
+and we define $B_{\mathrm{sym}}$ and $L_{\mathrm{sym}}$ similarly.
+The strategy $(\psi_{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})$
+is symmetric; we refer to it as the \emph{symmetrized strategy}.
+It has the following interpretation:
+the two players measure their respective role registers in the standard basis;
+the one that receives a ``$0$'' will act as Player~A in the original strategy,
+and the one that receives a ``$1$'' will act as Player~B in the original strategy.
+As a result, the symmetrized strategy is also a $(3\eps, 3\eps, 3\eps)$-good strategy.
+
+Now we apply \cref{thm:main-induction} to the symmetrized strategy.
+To do so, set
+\begin{align*}
+&1000k^2 m^2 \cdot\Big((3\eps)^{1/1024} + (3\eps)^{1/1024} + (3\eps)^{1/1024} + (d/q)^{1/1024}\Big)\\
+\leq{}& 10000 k^2 m^2 \cdot \Big(\eps^{1/1024} +  (d/q)^{1/1024}\Big)
+=: \nu,
+\end{align*}
+and set $\sigma = m^2\cdot\left(\nu + e^{-k/(80000m^2)}\right)$.
+Then \Cref{thm:main-induction} produces a measurement $G = \{G_g\} \in \polymeas{m}{q}{d}$ such that
+\begin{equation}\label{eq:just-applied-induction}
+(A_{\mathrm{sym}})^{u}_a \otimes I \simeq_{\sigma} I \otimes G_{[g(u)=a]}, \quad
+\text{and}
+\quad
+G_{[g(u)=a]} \otimes I \simeq_{\sigma} I \otimes (A_{\mathrm{sym}})^u_a.
+\end{equation}
+
+Now we unsymmetrize the symmetrized strategy
+to derive measurements $\{G^w_g\}$ for $w \in \{\mathrm{A},\mathrm{B}\}$.
+Letting $I_d$ denote the $d \times d$ identity operator, define the operators
+\begin{gather*}
+    G^{\mathrm{A}}_g = (\bra{0} \otimes I_d) \cdot G_g\cdot (\ket{0} \otimes I_d) \\
+    G^{\mathrm{B}}_g = (\bra{1} \otimes I_d) \cdot G_g\cdot (\ket{1} \otimes I_d),
+\end{gather*}
+where $\ket{0}$ and $\ket{1}$ act on the $\C^2$ part of $G_g$. Thus, $G^{\mathrm{A}}_g, G^{\mathrm{B}}_g$ are positive operators acting on $\C^d$, and furthermore they form POVMs:
+\[
+    \sum_g G^{\mathrm{A}}_g = \sum_g (\bra{0} \otimes I_d) \cdot G_g \cdot (\ket{0} \otimes I_d) = (\bra{0} \otimes I_d) \cdot \Big(\sum_g G_g\Big) \cdot (\ket{0} \otimes I_d) = I_d\;.
+\]
+The same derivation holds for $G^{\mathrm{B}}_g$. 
+
+Next we verify that the $\{G^{\mathrm{B}}_g\}$ measurements are consistent with the $\{A^{\mathrm{A},u}_a\}$ measurements:
+\begin{align*}
+    &\E_{\bu} \sum_{g,a \neq g(\bu)} \bra{\psi} A^{\mathrm{A},\bu}_a \otimes G^{\mathrm{B}}_g \ket{\psi} \notag \\
+    ={}& \E_{\bu} \sum_{g,a \neq g(\bu)} \bra{\psi} A^{\mathrm{A},\bu}_a \otimes (\bra{1} \otimes I_d) \cdot G_g \cdot (\ket{1} \otimes I_d) \ket{\psi} \notag \\
+    ={}& \E_{\bu} \sum_{g,a \neq g(\bu)} (\bra{0,1}_{\mathrm{A'B'}} \otimes \bra{\psi}_{\mathrm{AB}}) \cdot (A_{\mathrm{sym}})^{\bu}_a \otimes G_g \cdot (\ket{0,1}_{\mathrm{A'B'}} \otimes \ket{\psi}_{\mathrm{AB}}) \notag \\
+    \leq{}& 2 \cdot \E_{\bu} \sum_{g,a \neq g(\bu)} \bra{\psi_{\mathrm{sym}}} (A_{\mathrm{sym}})^{\bu}_a \otimes G_g \ket{\psi_{\mathrm{sym}}} \notag \\
+    \leq{}& 2\sigma. \tag{by \Cref{eq:just-applied-induction}}
+\end{align*}
+The first inequality follows from the fact that the cross-terms $\bra{0} (A_{\mathrm{sym}})_a^{u} \ket{1}$ and $\bra{1} (A_{\mathrm{sym}})_a^{u} \ket{0}$ vanish by construction of $A_{\mathrm{sym}}$.  Combined with a similar derivation for the $G^{\mathrm{A}}_g$ and $A^{\mathrm{B},u}_a$ operators, we deduce
+\begin{gather}
+    G^{\mathrm{A}}_{[g(u)=a]} \otimes I \simeq_{2\sigma} I \otimes A^{\mathrm{B},u}_a \label{eq:cons-a}\\
+    I \otimes G^{\mathrm{B}}_{[g(u)=a]} \simeq_{2\sigma}  A^{\mathrm{A},u}_a \otimes I \label{eq:cons-b}
+\end{gather}
+In addition, because the original strategy is $(3\eps, 3\eps, 3\eps)$-good,
+\begin{equation*}
+A^{\mathrm{A},u}_a \otimes I \simeq_{3\eps} I \otimes A^{\mathrm{B},u}_a.
+\end{equation*}
+Hence, \Cref{prop:simeq-triangle-inequality} implies that
+\begin{equation*}
+G^{\mathrm{A}}_{[g(u)=a]} \otimes I \simeq_{2\sigma + 2\sqrt{3\eps + 2\sigma}} I \otimes G^{\mathrm{B}}_{[g(u)=a]}.
+\end{equation*}
+This implies that
+\begin{align*}
+2\sigma + 2\sqrt{3\eps + 2\sigma}
+& \geq \E_{\bu} \sum_{a \neq b} \bra{\psi} G^{\mathrm{A}}_{[g(\bu) =a]} \ot G^{\mathrm{B}}_{[g(\bu) = b]} \ket{\psi}\\
+& = \E_{\bu} \sum_{g \neq h}  \bone[g(\bu) \neq h(\bu)] \cdot \bra{\psi} G^{\mathrm{A}}_{g} \ot G^{\mathrm{B}}_{h} \ket{\psi}\\
+& = \E_{\bu} \sum_{g \neq h}  \bra{\psi} G^{\mathrm{A}}_{g} \ot G^{\mathrm{B}}_{h} \ket{\psi}
+	- \E_{\bu} \sum_{g \neq h}  \bone[g(\bu) = h(\bu)] \cdot \bra{\psi} G^{\mathrm{A}}_{g} \ot G^{\mathrm{B}}_{h} \ket{\psi}\\
+& \geq \E_{\bu} \sum_{g \neq h}  \bra{\psi} G^{\mathrm{A}}_{g} \ot G^{\mathrm{B}}_{h} \ket{\psi}
+	-  \sum_{g \neq h}  \frac{md}{q}\cdot \bra{\psi} G^{\mathrm{A}}_{g} \ot G^{\mathrm{B}}_{h} \ket{\psi} \tag{by Schwartz-Zippel}\\
+& \geq \E_{\bu} \sum_{g \neq h}  \bra{\psi} G^{\mathrm{A}}_{g} \ot G^{\mathrm{B}}_{h} \ket{\psi} - \frac{md}{q}.
+\end{align*}
+Rearranging, we get
+\begin{equation}\label{eq:G-self-consistency}
+G^{\mathrm{A}}_g \otimes I \simeq_{\zeta_1} I \ot G^{\mathrm{B}}_g.
+\end{equation}
+where $\zeta_1 = 2\sigma + 2\sqrt{3\eps + 2\sigma} + md/q$.
+
+We have now derived everything we wanted, except that~$G$ is not necessarily projective.
+To remedy this, we apply the orthogonalization lemma for measurements (\Cref{lem:orthonormalization-main-lemma})
+to \Cref{eq:G-self-consistency}.
+It implies the existence of two projective sub-measurements $P^{\mathrm{A}} = \{P^{\mathrm{A}}\}, P^{\mathrm{B}} = \{P^{\mathrm{B}}\} \in \polysub{m}{q}{d}$ such that
+\begin{align*}
+G^{\mathrm{A}}_g \ot I &\approx_{100\zeta_1^{1/4}} P^{\mathrm{A}}_g \ot I,\\
+I \ot G^{\mathrm{B}}_g &\approx_{100\zeta_1^{1/4}} I \ot P^{\mathrm{B}}_g.
+\end{align*}
+Hence, \Cref{prop:completing-to-measurement} implies that we can complete $P^{\mathrm{A}}$ and~$P^{\mathrm{B}}$ to projective measurements
+$Q^{\mathrm{A}} = \{Q^{\mathrm{A}}\}, Q^{\mathrm{B}} = \{Q^{\mathrm{B}}\} \in \polymeas{m}{q}{d}$ such that
+\begin{align}
+G^{\mathrm{A}}_g \ot I &\approx_{\zeta_2} Q^{\mathrm{A}}_g \ot I,\label{eq:G-with-Q-A}\\
+I \ot G^{\mathrm{B}}_g &\approx_{\zeta_2} I \ot Q^{\mathrm{B}}_g.\nonumber
+\end{align}
+where $\zeta_2= 200\zeta_1^{1/4} + 40\zeta_1^{1/8}$.
+Now,  \Cref{eq:G-self-consistency} and \Cref{prop:simeq-to-approx} imply that
+\begin{equation*}
+G^{\mathrm{A}}_g \otimes I \approx_{2\zeta_1} I \ot G^{\mathrm{B}}_g.
+\end{equation*}
+By the triangle inequality (\Cref{prop:triangle-inequality-for-approx_delta}),
+\begin{equation*}
+Q_g^{\mathrm{A}} \ot I \approx_{\zeta_3} I \ot Q_g^{\mathrm{B}},
+\end{equation*}
+where $\zeta_3 = 6\zeta_1 + 6\zeta_2$.
+Because both of these measurements are projective, \Cref{prop:simeq-to-approx} then implies that
+\begin{equation}\label{eq:third-goal}
+Q_g^{\mathrm{A}} \ot I \simeq_{\zeta_3/2} I \ot Q_g^{\mathrm{B}},
+\end{equation}
+By the data processing inequality (\Cref{prop:simeq-data-processing}),
+\begin{equation}\label{eq:just-data-processed-the-heck-outta-this}
+Q_{[g(u)=a]}^{\mathrm{A}} \ot I \simeq_{\zeta_3/2} I \ot Q_{[g(u)=a]}^{\mathrm{B}},
+\end{equation}
+Next, \Cref{prop:triangle-sub}, applied to \Cref{eq:G-self-consistency} and \Cref{eq:G-with-Q-A} implies that
+\begin{equation*}
+Q^{\mathrm{A}}_g \otimes I \simeq_{\zeta_1} I \ot G^{\mathrm{B}}_g.
+\end{equation*}
+By data processing (\Cref{prop:simeq-data-processing}),
+\begin{equation}\label{eq:ok-almost-there-ok}
+Q^{\mathrm{A}}_{[g(u)=a]} \otimes I \simeq_{\zeta_1} I \ot G^{\mathrm{B}}_{[g(u)=a]}.
+\end{equation}
+Now we apply the triangle inequality (\Cref{prop:simeq-triangle-inequality})
+to \Cref{eq:cons-b,eq:ok-almost-there-ok,eq:just-data-processed-the-heck-outta-this},
+which implies that
+\begin{equation}\label{eq:one-goal}
+A^{\mathrm{A},u}_a \ot I \simeq_{\zeta_4} I \ot Q^{\mathrm{B}}_{[g(u)=a]},
+\end{equation}
+where $\zeta_4 = 2\sigma + 2 \sqrt{\zeta_1 + \zeta_3/2}$.
+A similar argument shows that
+\begin{equation}\label{eq:another-goal}
+I \ot A^{\mathrm{B},u}_a \simeq_{\zeta_4} Q^{\mathrm{A}}_{[g(u)=a]} \ot I.
+\end{equation}
+
+Now we calculate the error.
+First,
+\begin{align*}
+\sigma
+&= m^2\cdot\left(10000 k^2 m^2 \cdot \Big(\eps^{1/1024} +  (d/q)^{1/1024}\Big) + e^{-k/(80000m^2)}\right)\\
+&\leq 10000 k^2 m^4 \cdot \Big(\eps^{1/1024} +  (d/q)^{1/1024} + e^{-k/(80000m^2)}\Big).
+\end{align*}
+Next, using $10000^{1/2} = 100$,
+\begin{align*}
+\zeta_1 &= 2\sigma + 2\sqrt{3\eps + 2\sigma} + md/q\\
+& \leq 2\cdot\Big(10000 k^2 m^4 \cdot \Big(\eps^{1/1024} +  (d/q)^{1/1024} + e^{-k/(80000m^2)}\Big)\Big)\\
+&		\qquad\qquad+ 2\cdot \Big( 3 \eps + 10000 k^2 m^4 \cdot \Big(\eps^{1/1024} +  (d/q)^{1/1024} + e^{-k/(80000m^2)}\Big)\Big)^{1/2} + md/q\\
+& \leq 2\cdot\Big(10000 k^2 m^4 \cdot \Big(\eps^{1/1024} +  (d/q)^{1/1024} + e^{-k/(80000m^2)}\Big)\Big)\\
+&		\qquad\qquad+ 2\cdot \Big( 2 \eps^{1/2} + 100 k m^2 \cdot \Big(\eps^{1/2048} +  (d/q)^{1/2048} + e^{-k/(160000m^2)}\Big)\Big) + md/q\\
+& \leq 20204 k^2 m^4 \cdot \Big(\eps^{1/2048} +  (d/q)^{1/2048} + e^{-k/(160000m^2)}\Big).
+\end{align*}
+Next, using the fact that $20204^{1/4} \leq 12$ and $20204^{1/8} \leq 4$,
+\begin{align*}
+\zeta_2
+&= 200\zeta_1^{1/4} + 40\zeta_1^{1/8}\\
+& \leq 200 \Big(20204 k^2 m^4 \cdot \Big(\eps^{1/2048} +  (d/q)^{1/2048} + e^{-k/(160000m^2)}\Big)\Big)^{1/4}\\
+&		\qquad\qquad+ 40 \Big(20204 k^2 m^4 \cdot \Big(\eps^{1/2048} +  (d/q)^{1/2048} + e^{-k/(160000m^2)}\Big)\Big)^{1/8}\\
+& \leq 200 \Big(12 k m \cdot \Big(\eps^{1/8192} +  (d/q)^{1/8192} + e^{-k/(640000m^2)}\Big)\Big)\\
+&		\qquad\qquad+ 40 \Big(4 k m
+		\cdot \Big(\eps^{1/16384} +  (d/q)^{1/16384} + e^{-k/(1280000m^2)}\Big)\Big)\\
+& \leq 2560 km \cdot \Big(\eps^{1/16384} + (d/q)^{1/16384} + e^{-k/(1280000m^2)}\Big).
+\end{align*}
+Next, using $6\cdot 20204 + 6 \cdot 2560 \leq 150000$,
+\begin{equation*}
+\zeta_3 = 6 \zeta_1 + 6 \zeta_2
+\leq 150000 k^2 m^4 \cdot \Big(\eps^{1/16384} + (d/q)^{1/16384} + e^{-k/(1280000m^2)}\Big).
+\end{equation*}
+Next, using $\sqrt{20204} \leq 143$, $\sqrt{150000} \leq 388$, and $2 \cdot (10000+143+388) \leq 40000$,
+\begin{align*}
+\zeta_4  &= 2\sigma + 2 \sqrt{\zeta_1 + \zeta_3/2}\\
+& \leq 2 \cdot \Big(10000 k^2 m^4 \cdot \Big(\eps^{1/1024} +  (d/q)^{1/1024} + e^{-k/(80000m^2)}\Big)\Big)\\
+& \qquad \qquad + 2 \cdot \Big(20204 k^2 m^4 \cdot \Big(\eps^{1/2048} +  (d/q)^{1/2048} + e^{-k/(160000m^2)}\Big) \\
+& \qquad \qquad \qquad  \qquad+ 150000 k^2 m^4 \cdot \Big(\eps^{1/16384} + (d/q)^{1/16384} + e^{-k/(1280000m^2)}\Big)\Big)^{1/2}\\
+& \leq 2 \cdot \Big(10000 k^2 m^4 \cdot \Big(\eps^{1/1024} +  (d/q)^{1/1024} + e^{-k/(80000m^2)}\Big)\Big)\\
+& \qquad \qquad + 2 \cdot \Big(143 k m^2 \cdot \Big(\eps^{1/4096} +  (d/q)^{1/4096} + e^{-k/(320000m^2)}\Big) \\
+& \qquad \qquad \qquad  \qquad+ 388 k m^2 \cdot \Big(\eps^{1/32768} + (d/q)^{1/32768} + e^{-k/(2560000m^2)}\Big)\Big)\\
+& \leq 40000k^2m^4 \cdot\Big(\eps^{1/32768} + (d/q)^{1/32768} + e^{-k/(2560000m^2)}\Big)\Big).
+\end{align*}
+Both this and $\zeta_3/2$ are less than
+\begin{equation*}
+100000k^2m^4 \cdot\Big(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\Big)\Big).
+\end{equation*}
+Hence, \Cref{eq:one-goal,eq:another-goal,eq:third-goal} provide the three bounds we want.
+This concludes the proof.
+\end{proof}
+
+
+The remainder of this section is organized as follows:
+first, in \Cref{sec:self-improvement-and-pasting}, we define the two main steps in the proof of \Cref{thm:main-induction}
+known as self-improvement and pasting.
+Following that, we prove \Cref{thm:main-induction} in \Cref{sec:proof-of-main-induction}.
+
+\subsection{Self-improvement and pasting}\label{sec:self-improvement-and-pasting}
+
+There are two main steps in the proof of \Cref{thm:main-induction}.
+The first is self-improvement, which is stated as follows.
+
+\begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
+  Let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
+Let $G \in \polysub{m}{q}{d}$ be a sub-measurement with the following properties:
+\begin{enumerate}
+\ignore{
+\item (Completeness): \label{item:si-inductive-G-completeness}  If $G =  \sum_g G_g$, then
+  	\begin{equation*}
+	\bra{\psi} G \otimes I \ket{\psi} \geq 1 - \kappa.
+	\end{equation*}
+}
+  \item (Consistency with~$A$): \label{item:si-inductive-G-consistency} On average over $\bu \sim \F_q^{m}$,
+	  \begin{equation*}
+	  A^{u}_a \otimes I \simeq_{\nu} I \otimes G_{[g(u)=a]}.
+	  \end{equation*}
+	  \end{enumerate}
+Let
+\begin{equation*}
+\zeta = 3000m\cdot \Big(\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32}\Big).
+\end{equation*}
+Then there exists a projective sub-measurement $H \in \polysub{m}{q}{d}$ with the following properties:
+\begin{enumerate}
+    \item(Completeness):  \label{item:si-inductive-completeness} If $H =  \sum_h H_h$, then
+    \begin{equation*}
+    \bra{\psi} H \otimes I \ket{\psi} \geq (1-\nu)-\zeta.
+    \end{equation*}
+    \item(Consistency with~$A$):\label{item:si-inductive-A-consistency} On average over $\bu \sim \F_q^m$,
+        \begin{equation*}
+            A^u_a \otimes I \simeq_{\zeta} I \otimes H_{[h(u) = a]}.
+        \end{equation*}
+    \item(Strong self-consistency): \label{item:si-inductive-self}
+    	\begin{equation*}
+		H_h \otimes I \approx_{\zeta} I \otimes H_h.
+	\end{equation*}
+    \item(Boundedness): \label{item:si-inductive-boundedness} There exists a positive-semidefinite matrix~$Z$ such that
+    \begin{equation*}
+        \bra{\psi} Z \otimes (I - H) \ket{\psi} \leq \zeta
+    \end{equation*}
+    and for each $h \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	Z \geq \left(\E_{\bu} A^{\bu}_{h(\bu)}\right).
+	\end{equation*}
+\end{enumerate}
+\end{theorem}
+
+We note that by \Cref{prop:two-notions-of-self-consistency} the condition in \Cref{item:si-inductive-self}
+is equivalent to~$H$'s strong self-consistency because~$H$ is projective.
+Self-improvement states that we can take a measurement~$G$
+whose consistency error with~$A$ is~$\nu$
+and produce another measurement~$H$
+which has negligible consistency error with~$A$
+and incompleteness~$\nu$.
+Hence, we have ``moved'' $G$'s consistency error onto $H$'s incompleteness.
+
+The second main step is pasting, which is stated as follows.
+
+\begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
+  Let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
+  Let $\{G^x\}_{x \in \F_q}$ denote a set of projective sub-measurements in $\polysub{m}{q}{d}$ with the following properties:
+  \begin{enumerate}
+  \item (Completeness): \label{item:ld-pasting-inductive-completeness}  If $G = \E_{\bx} \sum_g G^{\bx}_g$, then
+  	\begin{equation*}
+	\bra{\psi} G \otimes I \ket{\psi} \geq 1 - \kappa.
+	\end{equation*}
+  \item (Consistency with~$A$): \label{item:ld-pasting-inductive-consistency} On average over $(\bu, \bx) \sim \F_q^{m+1}$,
+	  \begin{equation*}
+	  A^{u, x}_a \otimes I \simeq_{\zeta} I \otimes G^x_{[g(u)=a]}.
+	  \end{equation*}
+  \item (Strong self-consistency): \label{item:ld-pasting-inductive-self-consistency} On average over~$\bx \sim \F_q$,
+  	\begin{equation*}
+		G^x_g \otimes I \approx_{\zeta} I \otimes G^x_g.
+	\end{equation*}
+  \item (Boundedness): \label{item:ld-pasting-inductive-boundedness} There exists a positive-semidefinite matrix $Z^x$ for each $x \in \F_q$ such that
+  	\begin{equation*}
+		\E_{\bx} \bra{\psi} (I-G^{\bx})\otimes Z^{\bx} \ket{\psi} \leq \zeta
+	\end{equation*}
+	and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	Z^x \geq \left(\E_{\bu} A^{\bu, x}_{g(\bu)}\right).
+	\end{equation*}
+  \end{enumerate}
+  Let $k \geq 400md$ be an integer. Let
+ \begin{align*}
+ \nu &= 100 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} + \gamma^{1/32} + \zeta^{1/32} + (d/q)^{1/32}\right),\\
+ \sigma& = \kappa \cdot \left(1 + \frac{1}{100m}\right)
+    + 2\nu + e^{- k/(80000m^2)}.
+ \end{align*}
+  Then there exists a ``pasted" measurement $H \in \polymeas{m+1}{q}{d}$ which satisfies the following property.
+  \begin{enumerate}
+  \item (Consistency with~$A$): \label{item:ld-pasting-inductive-N-consistency} On average over $\bu \sim \F_q^{m+1}$,
+	  \begin{equation*}
+	  A^{u}_a \otimes I \simeq_{\sigma} I \otimes H_{[h(u)=a]}.
+	  \end{equation*}
+	  \ignore{
+  \item (Completeness): \label{item:ld-pasting-inductive-N-completeness} If $H =  \sum_h H_h$, then
+  	\begin{equation*}
+	\bra{\psi} H \otimes I \ket{\psi} \geq 1 - \kappa \cdot \left(1 + \frac{1}{100m}\right)
+    - \nu - e^{- k/(80000m^2)}.
+	\end{equation*}
+	}
+  \end{enumerate}
+\end{theorem}
+
+Intuitively, $\sigma$ should be thought of as being roughly~$\kappa$,
+plus a small amount of error which does not depend on~$\kappa$.
+Hence, pasting states that we can take a family of sub-measurements $\{G^x\}$ with incompleteness $\kappa$
+and produce a pasted measurement~$H$ whose consistency error with~$A$ is roughly~$\kappa$,
+plus a small amount of new error.
+Thus, the overall inductive step looks as follows:
+given a family of measurements with some inconsistency error,
+we ``move'' the error into the incompleteness using self-improvement,
+and then we paste the measurements together to form a single measurement whose error is roughly the same as the original error.
+
+We note that the main error term $\nu$ depends only on the ``small" parameters $\eps$, $\delta$, $\zeta$, $\gamma$, and $d/q$ and not on the ``large" parameter $\kappa$.
+
+\subsection{Proof of \Cref{thm:main-induction}}\label{sec:proof-of-main-induction}
+
+\begin{definition}
+Let $x \in \F_q$.
+For each line $\ell \in \F_q^m$,
+we define $\mathrm{append}_x(\ell)$ to be the line in $\F_q^{m+1}$ containing every point $(u, x)$ such that $u \in \ell$.
+In addition, for each function $f : \ell \rightarrow \F_q$,
+we define $\mathrm{append}_x(f) : \mathrm{append}_x(\ell) \rightarrow \F_q$
+such that for each $(u, x) \in \mathrm{append}_x(\ell)$, $\mathrm{append}_x(f)(u, x) = f(u)$.
+\end{definition}
+
+\begin{definition}[$x$-restricted low-degree strategy]
+Let $(\psi, A, B, L)$  be a symmetric strategy the $(m+1,q,d)$-low individual degree test.
+Given $x \in \F_q$, we define the \emph{$x$-restricted strategy}
+$(\psi, A^x, B^x, L^x)$ for the $(m,q,d)$-low individual degree test as follows.
+\begin{enumerate}
+\item For each $u \in \F_q^m$, $(A^x)^u_a = A^{u, x}_a$.
+\item For each axis parallel line $\ell \in \F_q^m$, $(B^x)^\ell_f = B^{\mathrm{append}_x(\ell)}_{\mathrm{append}_x(f)}$.
+\item For each  line $\ell \in \F_q^m$, $(L^x)^\ell_f = L^{\mathrm{append}_x(\ell)}_{\mathrm{append}_x(f)}$.
+\end{enumerate}
+\end{definition}
+
+\begin{lemma}\label{lem:restricted-probabilities}
+Let $(\psi, A, B, L)$ be  an $(\eps, \delta, \gamma)$-good symmetric strategy
+		for the $(m+1, d, q)$-low individual degree test.
+For each $x \in \F_q$, let $(\psi, A^x, B^x, L^x)$ be the corresponding $x$-restricted strategy.
+In addition, write $\eps_x$ for the probability that it fails the axis-parallel lines test,
+$\delta_x$ for the probability it fails the self-consistency test,
+and $\gamma_x$ for the probability it fails the diagonal lines test.
+Then
+\begin{equation*}
+\E_{\bx} \eps_{\bx} \leq \left(\frac{m+1}{m}\right) \cdot\eps,
+\quad
+\E_{\bx} \delta_{\bx} \leq  \delta,
+\quad
+\E_{\bx} \gamma_{\bx} \leq \left(\frac{m+1}{m}\right) \cdot \gamma.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+We begin with the self-consistency test.
+Here, both provers are given a uniformly random point $(\bu, \bx)$,
+they measure using $A^{\bu, \bx} = (A^{\bx})^{\bu}$, and they succeed if their outcomes are the same.
+This is equivalent to performing the self-consistency test on the $\bx$-restricted strategy, averaged over $\bx$,
+and so $\E_{\bx} \delta_{\bx} \leq  \delta$. (It is a ``$\leq$" rather than an ``$=$" because $\delta$ is just an upper-bound on the failure probability.)
+
+Next, we consider the axis-parallel lines test.
+Suppose the provers are sent the line $\bell$ and the point $(\bu, \bx) \in \bell$.
+With probability $\frac{1}{m+1}$, $\bell$ is parallel to the $(m+1)$-st direction.
+When it is not, then $\bell = \mathrm{append}_x(\bell')$, where $\bell'$ is an axis-parallel line in $\F_q^m$.
+In this case, the points prover measures with the measurement $A^{\bu, \bx} = (A^\bx)^{\bu}$ and receives an outcome $\ba$,
+the lines prover measures with the measurement $B^{\bell} = (B^{\bx})^{\bell'}$ and receives an outcome $\boldf = \mathrm{append}_{\bx}(\boldf')$, and they succeed if $\boldf(\bu, \bx) = \ba$, or, equivalently, if $\boldf'(\bu) = \ba$.
+Hence, the probability that they succeed is equal to the probability that the $\bx$-restricted strategy passes the $(m, q, d)$-low individual degree test, which is $\eps_{\bx}$. As a result,
+\begin{align*}
+\eps
+&\geq \Pr_{\bell, \bu, \bx}[\text{$A$ and $B$ succeed given $\bell$, $(\bu, \bx)$}]\\
+&\geq \left(\frac{m}{m+1}\right) \cdot \Pr_{\bell, \bu, \bx}[\text{$A$ and $B$ succeed given $\bell$, $(\bu, \bx)$} \mid \text{$\bell$ is not parallel to direction $m+1$}]\\
+& =  \left(\frac{m}{m+1}\right) \cdot\E_{\bx} \eps_{\bx}.
+\end{align*}
+
+Finally, the analysis of the diagonal lines test follows the same proof as the axis-parallel lines test, and we omit it here.
+\end{proof}
+
+\begin{proof}[Proof of \Cref{thm:main-induction}]
+We note that the bound we are proving is trivial when at least one of $\eps$, $\delta$, $\gamma$,  or $d/q$ is $\geq 1$, as $\nu$ is at least~$1$ in that case. Hence, we may assume that $\eps, \delta, \gamma, d/q \leq 1$. This will aid us when carrying out the error calculations, as it allows us to bound terms like $(d/q)^{1/2}$ by terms like $(d/q)^{1/4}$.
+
+The proof is by induction on~$m$.
+The base case is when $m = 1$.
+In this case, there is only one axis-parallel line~$\ell$ in $\F_q^m$,
+and so $B^\ell \in \polymeas{m}{q}{d}$.
+Because this strategy fails the axis-parallel line test with probability at most~$\eps$,
+\begin{equation*}
+A^u_a \ot I \simeq_{\eps} I \ot B^\ell_{[f(u) = a]},
+\end{equation*}
+on average over $\bu \sim \F_q$.
+We note that this bound holds independent of the value of~$k$.
+This is even better than the theorem demands, and so the theorem is proved.
+
+Now we perform the induction step.
+Assuming that \Cref{thm:main-induction} holds for~$m \geq 1$,
+we will show that it holds for~$m+1$ as well.
+Let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy
+			for the $(m+1,q,d)$ low individual degree test.
+Let $k \geq (m+1)d$ be an integer.
+
+For each $x \in \F_q$, let $(\psi, A^x, B^x, L^x)$ be the corresponding $x$-restricted strategy.
+In addition, write $\eps_x$ for the probability that it fails the axis-parallel lines test,
+$\delta_x$ for the probability it fails the self-consistency test,
+and $\gamma_x$ for the probability it fails the diagonal lines test.
+
+For each $x \in \F_q$, we apply the inductive hypothesis to the $x$-restricted strategy with the same integer~$k$.
+This is possible because $k \geq (m+1)d \geq md$.
+Let
+\begin{equation*}
+\nu_x = 1000k^2 m^2 \cdot\Big(\eps_x^{1/1024} + \delta_x^{1/1024} + \gamma_x^{1/1024} + (d/q)^{1/1024}\Big),
+\end{equation*}
+and
+\begin{equation*}
+\sigma_x =  m^2 \cdot\Big(\nu_x + e^{- k/(80000m^2)}\Big)
+\end{equation*}
+Then the inductive hypothesis states that there exists a measurement $G^x \in \polymeas{m}{q}{d}$ such that
+\begin{equation*}
+(A^x)^u_a\ot I \simeq_{\sigma_x} I \ot G^x_{[g(u)=a]}.
+\end{equation*}
+
+Next, we apply self-improvement to each~$G^x$.
+Let 
+\begin{equation*}
+\zeta_x = 3000m \cdot \Big(\eps_x^{1/32} + \delta_x^{1/32} + (d/q)^{1/32}\Big).
+\end{equation*}
+Then \Cref{thm:self-improvement-in-induction-section} produces
+a projective sub-measurement $\widehat{G}^x \in \polysub{m}{q}{d}$ such that
+for each $x \in \F_q$, the following statements hold.
+\begin{enumerate}
+    \item(Completeness): If $\widehat{G}^x =  \sum_g \widehat{G}^x_g$, then
+    \begin{equation*}
+    \bra{\psi} \widehat{G}^x \ot I \ket{\psi} \geq (1-\sigma_x) - \zeta_x.
+    \end{equation*}
+    \item(Consistency with~$A^x$): On average over $\bu \sim \F_q^m$,
+        \begin{equation*}
+            (A^x)^u_a \ot I \simeq_{\zeta_x} I \ot \widehat{G}^x_{[g(u) = a]}.
+        \end{equation*}
+    \item(Strong self-consistency):
+    	\begin{equation*}
+		\widehat{G}^x_g \ot I \approx_{\zeta_x} I \ot \widehat{G}^x_g.
+	\end{equation*}
+    \item(Boundedness): There exists a positive-semidefinite matrix~$Z^x$ such that
+    \begin{equation*}
+        \bra{\psi} Z^x \ot (I - \widehat{G}^x) \ket{\psi} \leq \zeta_x
+    \end{equation*}
+    and for each $g \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	Z^x \geq \Big( \E_{\bu} (A^x)^{\bu}_{g(\bu)}\Big).
+	\end{equation*}
+\end{enumerate}
+
+Having produced the $\widehat{G}^x$'s, we would like to paste them together.
+To do so, we need bounds for the above four properties
+which are stated on average over~$\bx \sim \F_q$ rather than for each $x \in \F_q$ individually.
+This involves computing ``averaged" versions of our error parameters  $\nu_x$, $\sigma_x$, and $\zeta_x$.
+In these derivations, we will crucially use the fact that $\alpha \mapsto \alpha^c$ is concave when $c \leq 1$,
+and hence $\E (\balpha)^c \leq (\E \balpha)^c$.
+\begin{align*}
+\E_{\bx} \nu_{\bx}
+& = \E_{\bx}\Big(1000k^2 m^2 \cdot\Big(\eps_{\bx}^{1/1024} + \delta_{\bx}^{1/1024} + \gamma_{\bx}^{1/1024} + (d/q)^{1/1024}\Big)\Big)\\
+& \leq1000k^2 m^2 \cdot\Big((\E_{\bx}\eps_{\bx})^{1/1024} + (\E_{\bx} \delta_{\bx})^{1/1024} + (\E_{\bx}\gamma_{\bx})^{1/1024} + (d/q)^{1/1024}\Big)\tag{by concavity}\\
+&\leq1000k^2 m^2 \cdot\Big(\Big(\frac{(m+1)}{m} \cdot \eps\Big)^{1/1024} + \delta^{1/1024} + \Big(\frac{(m+1)}{m} \cdot \gamma\Big)^{1/1024} + (d/q)^{1/1024}\Big) \tag{by \Cref{lem:restricted-probabilities}}\\ 
+&\leq 1000k^2 (m+1)^2 \cdot\Big(\eps^{1/1024} + \delta^{1/1024} + \gamma^{1/1024} + (d/q)^{1/1024}\Big).
+\end{align*}
+We call this value~$\nu$.
+Next, if we define
+\begin{equation*}
+\sigma = m^2 \cdot\Big(\nu + e^{- k/(80000m^2)}\Big),
+\end{equation*}
+then
+\begin{equation*}
+\sigma \geq m^2 \cdot\Big(\E_{\bx} \nu_{\bx} + e^{- k/(80000m^2)}\Big)
+	= \E_{\bx} \sigma_{\bx}.
+\end{equation*}
+Finally,
+\begin{align*}
+\E_{\bx} \zeta_{\bx}
+& = \E_{\bx} \Big(3000m \cdot \Big(\eps_{\bx}^{1/32} + \delta_{\bx}^{1/32} + (d/q)^{1/32}\Big)\Big)\\
+& \leq 3000m \cdot \Big((\E_{\bx}\eps_{\bx})^{1/32} + (\E_{\bx} \delta_{\bx})^{1/32} + (d/q)^{1/32}\Big)
+	\tag{by concavity}\\
+&\leq 3000 m \cdot \Big(\Big( \frac{(m+1)}{m} \cdot \eps\Big)^{1/32} + \delta^{1/32} + (d/q)^{1/32}\Big)
+	\tag{by \Cref{lem:restricted-probabilities}}\\
+&\leq3000 (m+1) \cdot \Big(\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32}\Big).
+\end{align*}
+We call this value~$\zeta$.
+We note for later that
+\begin{align}
+\zeta & = 3000 (m+1) \cdot \Big(\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32}\Big)\nonumber\\
+& \leq 1000 k^2 (m+1)^2\cdot \Big(\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32}\Big) \tag{because $m \geq 2$}\nonumber\\
+&\leq 1000k^2 (m+1)^2 \cdot\Big(\eps^{1/1024} + \delta^{1/1024} + \gamma^{1/1024} + (d/q)^{1/1024}\Big)\nonumber\\
+& = \nu. \label{eq:zeta-smaller-than-nu}
+\end{align}
+Having defined these, the following statements hold.
+\begin{enumerate}
+    \item(Completeness): If $\widehat{G} =  \E_{\bx} \sum_g \widehat{G}^{\bx}_g$, then
+    \begin{equation*}
+    \bra{\psi} \widehat{G} \ot I \ket{\psi} \geq (1-\sigma) - \zeta.
+    \end{equation*}
+    \item(Consistency with~$A$): On average over $(\bu,\bx) \sim \F_q^{m+1}$,
+        \begin{equation*}
+            A^{u,x}_a \ot I \simeq_{\zeta} I \ot \widehat{G}^x_{[g(u) = a]}.
+        \end{equation*}
+    \item(Strong self-consistency): On average over $\bx \sim \F_q$,
+    	\begin{equation*}
+		\widehat{G}^x_g \ot I \approx_{\zeta} I \ot \widehat{G}^x_g.
+	\end{equation*}
+    \item(Boundedness): There exists a positive-semidefinite matrix~$Z^x$ for each $x \in \F_q$ such that
+    \begin{equation*}
+        \E_{\bx} \bra{\psi} Z^{\bx} \ot (I - \widehat{G}^{\bx}) \ket{\psi} \leq \zeta
+    \end{equation*}
+    and for each $x \in\F_q$ and $g \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	Z^x \geq \Big( \E_{\bu} A^{\bu,x}_{g(\bu)}\Big).
+	\end{equation*}
+\end{enumerate}
+
+We are now ready to apply \Cref{thm:ld-pasting-in-induction-section}.
+To do so, we note that because $(3000)^{1/32} \leq 2$
+and $32 \cdot 32 = 1024$,
+\begin{align*}
+\zeta^{1/32}
+&= \Big(3000 (m+1) \cdot \Big(\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32}\Big)\Big)^{1/32}\\
+&\leq 2 (m+1) \cdot \Big(\eps^{1/1024} + \delta^{1/1024} + (d/q)^{1/1024}\Big).
+\end{align*}
+Hence,
+\begin{align*}
+&100 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} + \gamma^{1/32} + \zeta^{1/32} + (d/q)^{1/32}\right)\\
+\leq~&100 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} + \gamma^{1/32} + 2 (m+1) \cdot \Big(\eps^{1/1024} + \delta^{1/1024} + (d/q)^{1/1024}\Big)+ (d/q)^{1/32}\right)\\
+\leq~& 200 k^2 m(m+1) \cdot\left(\eps^{1/1024} + \delta^{1/1024} + \gamma^{1/1024} + \eps^{1/1024} + \delta^{1/1024} + (d/q)^{1/1024}+ (d/q)^{1/1024}\right)\\
+\leq~& 1000 k^2 (m+1)^2 \cdot\left(\eps^{1/1024} + \delta^{1/1024} + \gamma^{1/1024} + (d/q)^{1/1024}\right)\\
+=~& \nu.
+\end{align*}
+Then \Cref{thm:ld-pasting-in-induction-section} implies the existence of a
+pasted measurement $H \in \polysub{m+1}{q}{d}$ which satisfies the following
+property.
+On average over $\bu \sim \F_q^{m+1}$,
+\begin{equation*}
+  A^{u}_a \otimes I \simeq_{\sigma^*} I \otimes H_{[h(u)=a]},
+\end{equation*}
+where
+\begin{equation*}
+  \sigma^* = (\sigma + \zeta) \cdot \left(1 + \frac{1}{100m}\right)
+  + 2\nu + e^{- k/(80000m^2)}.
+\end{equation*}
+	  \ignore{
+  \item (Completeness): \label{item:ld-pasting-inductive-N-completeness} If $H =  \sum_h H_h$, then
+  	\begin{equation*}
+	\bra{\psi} H \otimes I \ket{\psi} \geq 1 - \kappa \cdot \left(1 + \frac{1}{100m}\right)
+    - \nu - e^{- k/(80000m^2)}.
+	\end{equation*}
+	}
+
+The consistency with~$A$ is as guaranteed in the theorem statement.
+Hence, we need only verify that the completeness bound implies the one in the theorem statement as well.
+\begin{align}
+\sigma^*
+&= (\sigma + \zeta) \cdot \left(1 + \frac{1}{100m}\right)
+						    + 2\nu + e^{- k/(80000m^2)}\nonumber\\
+&\leq  (\sigma + \nu) \cdot \left(1 + \frac{1}{100m}\right)
+						    + 2\nu + e^{- k/(80000m^2)} \tag{by \Cref{eq:zeta-smaller-than-nu}}\nonumber\\
+& = \left(1 + \frac{1}{100m}\right) \cdot \left(m^2 \cdot\Big(\nu + e^{- k/(80000m^2)}\Big) + \nu\right)
+		+ 2\nu + e^{- k/(80000m^2)}\nonumber\\
+&\leq \left(1 + \frac{1}{100m}\right) \cdot (m^2+3) \cdot\Big(\nu + e^{- k/(80000m^2)}\Big).\label{eq:gonna-bound-m-function}
+\end{align}
+Now, because $m \geq 2$,
+\begin{equation*}
+\frac{1}{100m} \cdot
+(m^2+3)
+\leq
+\frac{1}{100m}\cdot
+(m^2+4m-5)
+= 
+\frac{1}{100m}\cdot
+(m-1) (m+5)
+\leq m-1
+\leq 2(m-1).
+\end{equation*}
+Hence,
+\begin{equation*}
+\left(1 + \frac{1}{100m}\right) \cdot (m^2+3)
+= m^2 + 3 + \frac{1}{100m} \cdot
+(m^2+3)
+\leq m^2 + 3 + 2(m-1)
+= m^2 + 2m  + 1
+= (m+1)^2.
+\end{equation*}
+As a result,
+\begin{equation*}
+\eqref{eq:gonna-bound-m-function}
+\leq (m+1)^2\cdot\Big(\nu + e^{- k/(80000m^2)}\Big)
+\leq (m+1)^2\cdot\Big(\nu + e^{- k/(80000(m+1)^2)}\Big).
+\end{equation*}
+\ignore{
+\begin{align*}
+&\kappa \cdot \left(1 + \frac{1}{100m}\right) + \nu + e^{- k/(80000m^2)}\\
+=~&\left(1 + \frac{1}{100m}\right) \cdot m^2 \cdot\Big(\nu + e^{- k/(80000m^2)}\Big) + \nu+ e^{- k/(80000m^2)}\\
+\leq~&\left(1 + \frac{1}{m}\right) \cdot m^2 \cdot\Big(\nu + e^{- k/(80000m^2)}\Big) + \nu+ e^{- k/(80000m^2)}\\
+=~& m(m+1) \cdot\Big(\nu + e^{- k/(80000m^2)}\Big) + \nu+ e^{- k/(80000m^2)}\\
+\leq~& (m+1)^2 \cdot \Big(\nu + e^{- k/(80000m^2)}\Big)\\
+\leq~& (m+1)^2 \cdot \Big(\nu + e^{- k/(80000(m+1)^2)}\Big).
+\end{align*}
+}
+This is the bound guaranteed by the theorem and so it completes the proof.
+\end{proof}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "multilinearity"
+%%% End:

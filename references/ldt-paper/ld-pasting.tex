@@ -1,0 +1,2685 @@
+\newcommand{\rmcom}{\mathrm{commute}}
+\newcommand{\rmcons}{\mathrm{consistency}}
+\newcommand{\rmcomp}{\mathrm{completeness}}
+\newcommand{\distinct}[1]{\mathsf{Distinct}_{#1}}
+\newcommand{\outc}{\mathsf{Outcomes}}
+\newcommand{\sfO}{\mathsf{O}}
+\newcommand{\wH}{\widehat{H}}
+\newcommand{\wG}{\widehat{G}}
+
+\section{Pasting}\label{sec:ld-pasting}
+
+\begin{theorem}[Pasting]\label{thm:ld-pasting}
+  Let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
+  Let $\{G^x\}_{x \in \F_q}$ denote a set of projective sub-measurements in $\polysub{m}{q}{d}$ with the following properties:
+  \begin{enumerate}
+  \item (Completeness): \label{item:ld-pasting-completeness}  If $G = \E_{\bx}\sum_g G_g^{\bx}$, then
+  	\begin{equation*}
+	\bra{\psi} G \otimes I \ket{\psi} \geq 1 - \kappa.
+	\end{equation*}
+  \item (Consistency with~$A$): \label{item:ld-pasting-consistency} On average over $(\bu, \bx) \sim \F_q^{m+1}$,
+	  \begin{equation*}
+	  A^{u, x}_a \otimes I \simeq_{\zeta} I \otimes G^x_{[g(u)=a]}.
+	  \end{equation*}
+  \item (Strong self-consistency): \label{item:ld-pasting-self-consistency} On average over~$\bx \sim \F_q$,
+  	\begin{equation*}
+		G^x_g \otimes I \approx_{\zeta} I \otimes G^x_g.
+	\end{equation*}
+  \item (Boundedness): \label{item:ld-pasting-boundedness} There exists a positive-semidefinite matrix $Z^x$ for each $x \in \F_q$ such that
+  	\begin{equation*}
+		\E_{\bx} \bra{\psi} (I-G^{\bx})\otimes Z^{\bx} \ket{\psi} \leq \zeta
+	\end{equation*}
+	and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	Z^x \geq \left(\E_{\bu} A^{\bu, x}_{g(\bu)}\right).
+	\end{equation*}
+  \end{enumerate}
+  Let $k \geq 400md$ be an integer. Let
+ \begin{align*}
+ \nu &= 100 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} + \gamma^{1/32} + \zeta^{1/32} + (d/q)^{1/32}\right),\\
+ \sigma & = \kappa \cdot \left(1 + \frac{1}{100m}\right)
+    + 2\nu + e^{- k/(80000m^2)}.
+ \end{align*}
+  Then there exists a ``pasted" measurement $H \in \polymeas{m+1}{q}{d}$ which satisfies the following property.
+  \begin{enumerate}
+  \item (Consistency with~$A$): \label{item:ld-pasting-N-consistency} On average over $\bu \sim \F_q^{m+1}$,
+	  \begin{equation*}
+	  A^{u}_a \otimes I \simeq_{\sigma} I \otimes H_{[h(u)=a]}.
+	  \end{equation*}
+  \end{enumerate}
+\end{theorem}
+
+We note that the bound we are proving is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, or $d/q$ is $\geq 1$,
+as $\nu$ is at least~$1$ in that case.
+Hence, we may assume that $\eps,\delta,\gamma, \zeta, d/q \leq 1$.
+This will aid us when carrying out the error calculations,
+as it allows us to bound terms like $\zeta^{1/2}$ by terms like $\zeta^{1/4}$.
+
+It will be convenient to state
+certain consistency relations that follow easily from the hypotheses
+of the theorem.
+In this section, we will  only use the axis-parallel lines test in the $(m+1)$-st direction,
+		i.e.\ in the case when the line is of the form $\ell = \{(u, x) \mid x \in \F_q\}$.
+		Such a line is specified by a point $u \in \F_q^m$.
+		As a result, we can use the shorthand introduced in \Cref{not:conditioned-on-last-direction},
+		where instead of writing $B^\ell_f$ for such a line, we write $B^u_f$.
+		We will also make use of the other shorthand from \Cref{not:conditioned-on-last-direction}
+		in which for a function $f:\ell \rightarrow \F_q$,
+		we will sometimes write $f(x)$ instead of $f(u,x)$.
+		
+		We know that $(\psi, A, B, L)$ passes the axis-parallel lines test with probability $1-\eps$,
+		and so it passes this test with probability $1-(m+1) \cdot \eps$ conditioned on the random 		direction $\bi \in \{1, \ldots, m+1\}$ from the test
+		being equal to $m+1$.
+		This means the following: if $(\bu, \bx) \sim \F_q^{m+1}$ is drawn uniformly at random and $\bell = \{(\bu, y) \mid y \in \F_q\}$
+		is the line through it in the $(m+1)$-st direction, then
+		\begin{equation*}
+		A^{u, x}_a \ot I \simeq_{(m+1) \eps} I \ot B^{\ell}_{[f(x)=a]} = I \ot B^u_{[f(x)=a]}.
+		\end{equation*}
+		Hence, \Cref{prop:simeq-to-approx} and the fact that $(m+1) \leq 2m$ imply that
+		\begin{equation*}
+		A^{u, x}_a \ot I \approx_{4m \eps} I \ot B^u_{[f(x)=a]}.
+		\end{equation*}
+
+Next, from the assumption that the given strategy is $(\eps,
+\delta, \gamma)$-good, \Cref{prop:simeq-to-approx} implies that
+\begin{equation*}
+I \otimes A^{u, x}_a \approx_{2\delta} A^{u, x}_a \otimes I \approx_{4m\eps} I \otimes B^{u}_{[f(x)=a]}.
+\end{equation*}
+As a result, \Cref{prop:triangle-inequality-for-approx_delta} implies that
+\begin{equation}\label{eq:ld-abcon}
+I \otimes A^{u, x}_a \approx_{8m\eps + 4\delta} I\otimes B^{u}_{[f(x)=a]}.
+\end{equation}
+\Cref{prop:triangle-sub} applied to \Cref{item:ld-pasting-consistency} and \Cref{eq:ld-abcon} implies
+\begin{equation}\label{eq:ld-gbcon}
+G^x_{[g(u) = a]} \ot I \simeq_{\nu_1} I \ot B^{u}_{[f(x)=a]},
+\end{equation}
+where
+\begin{equation}\label{eq:ld-nu1-def}
+\nu_1 = \zeta + \sqrt{8 m\eps + 4\delta}.
+\end{equation}
+Finally, \Cref{thm:com-main} implies that
+\begin{equation}\label{eq:quote-com-main}
+G^x_g G^y_h \otimes I \approx_{\nu_{\rmcom}} G^y_h G^x_g \otimes I,
+\end{equation}
+where
+\begin{equation*}
+\nu_{\rmcom} = 30 m \cdot \left( \gamma^{1/4} +\zeta^{1/4} + (d/q)^{1/4}\right).
+\end{equation*}
+
+\ignore{
+\begin{proof}[Proof of \Cref{thm:ld-pasting}]
+  \ainnote{To be moved to the appropriate place!}
+  Let $k$ be $XXX$\anote{Probably should choose $k = 100 (100m +1)^2$.}, and $N$ be the measurement defined in \Cref{sec:ld-interpolation} with
+  parameter $k$. Then \Cref{item:ld-pasting-N-consistency} follows
+  from \Cref{lem:N-B-consistency}, with an error bound of $k \cdot
+  \delta_{\rmcons}$.
+  \begin{align}
+    \delta_{\rmcons} &= \nu_1 + k \cdot (8\zeta + 2
+                               \nu_{\rmcom}) + k^2/q \\
+                             &=  (\zeta + \sqrt{2m\eps + 2\delta}) + 8k \zeta + 2k \left( 13
+                               \zeta^{1/4} + 3(\gamma(m+1))^{1/4} + \left(\frac{dm}{q}\right)^{1/4}\right) + k^2/q \\
+                             &\leq  (\zeta + 2(m \eps)^{1/2} + 2\delta^{1/2}) + 40k \zeta^{1/4} + 6 k
+                               (\gamma(m+1))^{1/4} + 2k
+                               \left(\frac{dm}{q}\right)^{1/4} +
+                               \frac{k^2}{q} \\
+                             &= XXX.
+  \end{align}
+  For \Cref{item:ld-pasting-N-completeness}, it follows from
+  \Cref{lem:ld-pasting-N-completeness} that
+  \[ \bra{\psi} N \ot I \ket{\psi} \geq 1 - \kappa \cdot \frac{1}{1 -
+      \delta} - e^{-\delta^2 k/2} - \delta_{\rmcomp}. \]
+  Observe that if we set $\delta = 1/(100m +1)$, then $1/(1-\delta) = 1
+  + 1/(100m)$.
+  It remains to bound the other two terms.
+  \begin{align}
+    e^{-\delta^2k/2} &= XXX \\
+    \delta_{\rmcomp} &= \delta_{\rmcons} + \frac{d}{q} + \frac{k^2}{q}
+                       + \left(k (12 \zeta + \nu_{\rmcom})\right)^{1/2} \\
+    &= \left( \nu_1 + k \cdot(8\zeta + 2\nu_{\rmcom}) +
+      \frac{k^2}{q}\right) + \frac{d}{q} + \frac{k^2}{q} + (k(12\zeta
+      + \nu_{\rmcom}))^{1/2} \\
+    &\leq \nu_1 + \frac{d}{q} + \frac{2k^2}{q} + 20 k \zeta^{1/2} + 3k
+      \nu_{\rmcom}^{1/2} \\
+    &= (\zeta + 2(m\eps)^{1/2} + 2\delta^{1/2}) + \frac{d}{q} +
+      \frac{2k^2}{q} + 20k\zeta^{1/2} + 3k\left(13\zeta^{1/4} +
+      3(\gamma(m+1))^{1/4} + \left(\frac{dm}{q}\right)^{1/4}
+      \right)^{1/2} \\
+                     &\leq 2(m\eps)^{1/2} + 2\delta^{1/2} +
+                       \frac{d}{q} + \frac{2k^2}{q} + (60k  +1)
+                       \zeta^{1/4}  + 10k(\gamma(m+1))^{1/8} + 3k \left(\frac{dm}{q}\right)^{1/8}.
+  \end{align}
+  
+\end{proof}
+}
+
+\subsection{From measurements to sub-measurements}
+
+Rather than designing the pasted measurement guaranteed by \Cref{thm:ld-pasting},
+it is convenient to first design a pasted \emph{sub}-measurement,
+and then convert it to a measurement.
+The next lemma shows the bounds we achieve for this sub-measurement.
+
+\begin{lemma}\label{lem:ld-pasting-sub-measurement}
+There exists a ``pasted" sub-measurement $H \in \polysub{m+1}{q}{d}$ which satisfies the following properties.
+  \begin{enumerate}
+  \item (Consistency with~$A$): \label{item:ld-pasting-N-consistency-sub-measurement} On average over $\bu \sim \F_q^{m+1}$,
+	  \begin{equation*}
+	  A^{u}_a \otimes I \simeq_{\nu} I \otimes H_{[h(u)=a]}.
+	  \end{equation*}
+  \item (Completeness): \label{item:ld-pasting-N-completeness-sub-measurement} If $H =  \sum_h H_h$, then
+  	\begin{equation*}
+	\bra{\psi} H \otimes I \ket{\psi} \geq 1 - \kappa \cdot \left(1 + \frac{1}{100m}\right)
+    - \nu - e^{- k/(80000m^2)}.
+	\end{equation*}
+  \end{enumerate}
+\end{lemma}
+\begin{proof}[Proof of \Cref{thm:ld-pasting} assuming \Cref{lem:ld-pasting-sub-measurement}]
+Let~$H$ be the sub-measurement in $\polysub{m+1}{q}{d}$ guaranteed by \Cref{lem:ld-pasting-sub-measurement}.
+Let $h^*$ be an arbitrary polynomial in $\polyfunc{m+1}{q}{d}$.
+We define the measurement~$H_{\mathrm{meas}} \in \polymeas{m+1}{q}{d}$ as follows.
+\begin{equation*}
+(H_{\mathrm{meas}})_h
+= \left\{\begin{array}{cl}
+		H_{h^*} + (I- H) & \text{if $h = h^*$,}\\
+		H_h & \text{otherwise.}
+		\end{array}
+		\right.
+\end{equation*}
+This is clearly a measurement, as the sum of its POVM elements is $H + (I -H) = H$.
+In addition,
+\begin{align*}
+&\E_{\bu} \sum_{a \neq b} \bra{\psi} A^{\bu}_a \ot (H_{\mathrm{meas}})_{[h(\bu)=b]} \ket{\psi}\\
+ ={}& \E_{\bu} \sum_{a} \sum_{h:h(\bu) \neq a} \bra{\psi} A^{\bu}_a \ot (H_{\mathrm{meas}})_{h} \ket{\psi}\\
+ ={}& \E_{\bu} \sum_{a} \sum_{h:h(\bu) \neq a} \bra{\psi} A^{\bu}_a \ot H_{h} \ket{\psi}
+ 	+\E_{\bu} \sum_{a:h^*(\bu) \neq a}\bra{\psi} A^{\bu}_a \ot (I-H) \ket{\psi}\\
+ \leq{}& \E_{\bu} \sum_{a} \sum_{h:h(\bu) \neq a} \bra{\psi} A^{\bu}_a \ot H_{h} \ket{\psi}
+ 	+\E_{\bu} \bra{\psi} I \ot (I-H) \ket{\psi}\\
+\leq{}& (\nu) +  \left(\kappa \cdot \left(1 + \frac{1}{100m}\right)
+    				+ \nu + e^{- k/(80000m^2)}\right)
+					\tag{by \Cref{item:ld-pasting-N-consistency-sub-measurement,item:ld-pasting-N-completeness-sub-measurement}}\\
+={}& \sigma.
+\end{align*}
+Thus, $A^u_a \ot I \simeq_{\sigma} I \ot (H_{\mathrm{meas}})_{[h(u)=a]}$. This completes the proof.
+\end{proof}
+
+We will now spend the rest of this section proving \Cref{lem:ld-pasting-sub-measurement},
+i.e.\ designing the pasted sub-measurement~$H$.
+
+\subsection{The pasted sub-measurement}
+
+\begin{definition}
+For $k \geq 1$, we let $\distinct{k}$ be the set of tuples $(x_1, \ldots, x_k) \in \F_q^k$ such that $x_i \neq x_j$ for all $i \neq j$.
+We write $(\bx_1, \ldots, \bx_k) \sim \distinct{k}$ for a uniformly random element of this set.
+\end{definition}
+
+
+In manipulations involving our pasted measurement, it will often be useful to switch
+the expectation over $ \distinct{k}$ with an expectation over uniformly
+random $k$-tuples of elements of $\F_q$. The following proposition
+bounds the distance between these two distributions.
+
+\begin{proposition}\label{prop:ld-dnoteq}
+Let $\bx = (\bx_1, \ldots, \bx_k) \sim \F_q^k$ be sampled uniformly at random
+and let $\by = (\by_1, \ldots, \by_k) \sim \distinct{k}$.
+Then
+\begin{equation*}
+d_{\mathrm{TV}}(\bx, \by) \leq \frac{k^2}{q}.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+For any $z = (z_1, \ldots, z_k) \in \F_q^k$, 
+\begin{align*}
+\Pr[\bx = z] 
+& = \frac{1}{q^k},\\
+\Pr[\by = z] 
+& = \left\{\begin{array}{cl}
+		\frac{1}{\binom{q}{k} k!} & \text{if $z \in \distinct{k}$,}\\
+		0 & \text{otherwise.}
+		\end{array}\right.
+\end{align*}
+Because $\frac{1}{\binom{q}{k} k!} \geq \frac{1}{q^k}$, $\Pr[\bx = z] \geq \Pr[\by = z]$ if and only if $z \notin \distinct{k}$.
+Hence,
+\begin{align*}
+d_{\mathrm{TV}}(\bx, \by)
+&= \max_{S \subseteq \F_q^k}\{\Pr[\bx \in S] - \Pr[\by \in S]\}\\
+&= \Pr[\bx \in \overline{\distinct{k}}] - \Pr[\by \in \overline{\distinct{k}}]
+= \Pr[\bx \in \overline{\distinct{k}}].
+\end{align*}
+We can upper-bound this probability as follows.
+\begin{align*}
+\Pr[\bx \in \overline{\distinct{k}}]
+&= \Pr[\exists i : \bx_i \in \{\bx_1, \ldots, \bx_{i-1}\}]\\
+&\leq \sum_{i=2}^k \Pr[\bx_i \in \{\bx_1, \ldots, \bx_{i-1}\}]
+\leq \sum_{i=2}^k \left(\frac{i-1}{q}\right)
+= \frac{k(k-1)}{2q}.
+\end{align*}
+This concludes the proof.
+\end{proof}
+
+To begin, we will describe our construction of the global pasted measurement.
+In fact, we will consider \emph{two} separate constructions of the global pasted measurement.
+The first is given in \Cref{sec:construction-numba-one} below.
+It is the more natural of the two,
+but unfortunately we do not know how to prove that it works correctly.
+This motivates our second construction,
+given in \Cref{sec:construction-numba-two} below,
+which is designed to circumvent the problems in the first construction.
+
+\subsubsection{The first construction}\label{sec:construction-numba-one}
+
+The first construction of $H = \{H_h\}$ is conceptually simple:
+we perform the $G$ sub-measurement $d+1$ times to produce $d+1$ polynomials $g_1, \ldots, g_{d+1} \in \polyfunc{m}{q}{d}$.
+We then perform polynomial interpolation to produce a single global polynomial $h \in \polyfunc{m+1}{q}{d}$.
+In more detail, this construction involves three steps.
+
+\begin{enumerate}
+\item (Pasting):
+Let $x_1, \ldots, x_{d+1} \in \F_q$.
+We will define an initial ``sandwiched" measurement as follows:
+\begin{equation*}
+\widehat{H}^{x_1, \ldots, x_{d+1}}_{g_1, \ldots, g_{d+1}} = G^{x_1}_{g_1} \cdot G^{x_2}_{g_2} \cdots G^{x_{d+1}}_{g_{d+1}} \cdots G^{x_2}_{g_2} \cdot G^{x_1}_{g_1}.
+\end{equation*}
+$\widehat{H}^{x_1, \ldots, x_{d+1}}$ has a natural interpretation as the sub-measurement in which one performs the sub-measurements $G^{x_1}, G^{x_2}, \ldots, G^{x_{d+1}}$ one after another and outputs their results.
+\item (Interpolation)
+Next, let $(x_1, \ldots, x_{d+1}) \in \distinct{d+1}$.
+We define the interpolated measurement
+\begin{equation*}
+H^{x_1, \ldots, x_{d+1}}_{h}
+= \widehat{H}^{x_1, \ldots, x_{d+1}}_{h|_{x_1}, \ldots, h|_{x_{d+1}}}.
+\end{equation*}
+This performs the $\widehat{H}^{x_1, \ldots, x_{d+1}}$ measurement and outputs the~$h$
+which is consistent with the outcomes~$g_1, \ldots, g_{d+1}$ if one exists.
+(We note that this is not necessarily a sub-measurement if $(x_1, \ldots, x_{d+1}) \notin \distinct{d+1}$. This is because there may exist $h \neq h'$ for which $h|_{x_i} = (h')|_{x_i}$ for all $1 \leq i \leq d+1$.)
+\item (Averaging):
+Finally, we randomize over the choice of $(x_1, \ldots, x_{d+1})$. In other words, we define
+\begin{equation*}
+H_{h} = \E_{(\bx_1, \ldots, \bx_{d+1}) \sim \distinct{d+1}} H^{\bx_1, \ldots, \bx_{d+1}}_h.
+\end{equation*}
+\end{enumerate}
+
+To show that this construction works,
+we need to show two things: (i) that $H_h$ has good agreement with $A$,
+and (ii) that $H$'s completeness is close to~$G$'s.
+Showing (i) is simple and follows from
+the approximate commutativity of $G^{x}$ and $G^{y}$ established in \Cref{thm:com-main}.
+What we do not know how to do is to show (ii),
+at least for general~$d$.
+In fact, at first glance it even looks like it should be false!
+To see why,
+we note that it is possible to show that the completeness of~$H$ can be approximated as
+\begin{equation*}
+\bra{\psi} H \otimes I \ket{\psi} \approx \bra{\psi} G^{d+1} \otimes I \ket{\psi},
+\end{equation*}
+because~$H$ is performing the~$G$ measurement $d+1$ times.
+We would therefore like to show that
+\begin{equation}\label{eq:subtract-a-G}
+\bra{\psi} G^{d+1}\otimes I \ket{\psi}
+\approx \bra{\psi} G\otimes I \ket{\psi}.
+\end{equation}
+But if $\bra{\psi} G \otimes I \ket{\psi} = 1-\kappa$,
+a ``naive analysis" would lead to the conclusion that
+\begin{equation}\label{eq:dumbo-bound-for-idiots}
+\bra{\psi} G^{d+1}\otimes I \ket{\psi} \approx 1 - (d+1) \cdot \kappa,
+\end{equation}
+which would be too great of a loss in completeness for our proof strategy to work.
+
+However, we can show \Cref{eq:subtract-a-G} is actually correct
+and therefore this ``naive analysis" is incorrect,
+at least in the case of constant~$d$.
+To see how this is possible,
+note that \Cref{eq:dumbo-bound-for-idiots} is in fact correct when all of~$G$'s eigenvalues are equal to $1-\kappa$,
+in which case $G^{d+1} = (1-\kappa)^d \cdot G$.
+So we would like to show that, on the contrary,
+the fact that $G$'s incompleteness is equal to $1-\kappa$
+is because a ``$(1-\kappa)$ fraction" of its eigenvalues are equal to~$1$,
+and the remaining ``$\kappa$ fraction" of its eigenvalues are equal to~$0$.
+In this case, $G^{d+1} = G$, and so \Cref{eq:subtract-a-G} holds.
+
+We now sketch the argument that shows this holds, at least for constant~$d$.
+To do this, it is first possible to show that
+\begin{equation}\label{eq:step-one-of-grand-plan}
+\bra{\psi} G^{d+2} \otimes I \ket{\psi}
+\approx_{\Delta} \bra{\psi} G^{d+1} \otimes I \ket{\psi},
+\end{equation}
+where $\Delta = \poly(m) \cdot \poly(\eps, \delta, \gamma, \zeta, d/q)$ is small.
+Intuitively, this is because after performing $(d+1)$ $G$ measurements,
+the outcome of another $G$ measurement is essentially determined due to interpolation.
+(The proof is of this fact is slightly subtle and involves the $Z$-boundedness condition.)
+
+From here, it is possible to derive \Cref{eq:subtract-a-G} as follows.
+Write the eigendecomposition $G = \sum_i \lambda_i \ket{v_i}\bra{v_i}$ of~$G$.
+This defines a probability distribution $\mu$ over eigenvectors, where eigenvector~$i$ occurs with probability $\mu(i) = \bra{\psi} (\ket{v_i}\bra{v_i} \ot I) \ket{\psi}$.
+In this language, for any power~$k$ we can write
+\begin{equation*}
+\bra{\psi} G^k \ot I \ket{\psi}
+= \bra{\psi} \Big(\sum_i \lambda_i^k \ket{v_i}\bra{v_i}\Big) \ot I \ket{\psi}
+= \sum_i \lambda_i^k \cdot \mu(i)
+= \E_{\bi \sim \mu}[\lambda_{\bi}^k].
+\end{equation*}
+Thus, \Cref{eq:step-one-of-grand-plan} is equivalent to the statement that
+\begin{equation}\label{eq:equivalent-way-of-writing-grand-plan}
+\Delta
+\geq \bra{\psi} G^{d+1} \otimes I \ket{\psi} - \bra{\psi} G^{d+2} \otimes I \ket{\psi}
+= \E_{\bi \sim \mu}[\lambda_{\bi}^{d+1}] - \E_{\bi \sim \mu}[\lambda_{\bi}^{d+2}]
+= \E_{\bi \sim\mu}[\lambda_{\bi}^{d+1}(1-\lambda_{\bi})].
+\end{equation}
+By \Cref{eq:subtract-a-G}, our goal is to bound
+\begin{equation*}
+\bra{\psi} G \otimes I \ket{\psi} - \bra{\psi} G^{d+1} \otimes I \ket{\psi}
+= \E_{\bi \sim \mu}[\lambda_{\bi}] - \E_{\bi \sim \mu}[\lambda_{\bi}^{d+1}]
+= \E_{\bi \sim\mu}[\lambda_{\bi}(1-\lambda_{\bi}^d)].
+\end{equation*}
+To do so, we will use the following lemma.
+
+\begin{lemma}\label{lem:looks-easy-but-took-me-a-while}
+For any real number $0 \leq \lambda \leq 1$,
+\begin{equation*}
+\lambda (1-\lambda^d) \leq 2 \cdot \Big(\lambda^{d+1}(1-\lambda)\Big)^{1/(d+1)}.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+The lemma is trivial for $\lambda = 1$, and so we will assume that $\lambda \neq 1$.
+We note that
+\begin{align*}
+\lambda^{d+1} (1-\lambda^d)^{d+1}
+\leq \lambda^{d+1} (1-\lambda^d)
+&= \lambda^{d+1}(1-\lambda) \cdot \left(\frac{1-\lambda^d}{1-\lambda}\right)\\
+&= \lambda^{d+1}(1-\lambda) \cdot (1 + \lambda + \cdots + \lambda^{d-1})
+\leq d \cdot \lambda^{d+1}(1-\lambda).
+\end{align*}
+The lemma now follows by taking the $(d+1)$-st root of both sides and noting that $d^{1/(d+1)} \leq 2$ for all integers $d \geq 1$.
+\end{proof}
+
+Then \Cref{lem:looks-easy-but-took-me-a-while} implies that
+\begin{align*}
+\E_{\bi \sim\mu}[\lambda_{\bi}(1-\lambda_{\bi}^d)]
+&\leq 2\cdot \E_{\bi \sim\mu}\Big[\Big(\lambda_{\bi}^{d+1}(1-\lambda_{\bi})\Big)^{1/(d+1)}\Big]\\
+&\leq2\cdot \Big(\E_{\bi \sim\mu}[\lambda_{\bi}^{d+1}(1-\lambda_{\bi})]\Big)^{1/(d+1)}
+							\tag{because $a \mapsto a^{1/(d+1)}$ is concave}\\
+&\leq 2 \cdot \Delta^{1/(d+1)}. \tag{by \Cref{eq:equivalent-way-of-writing-grand-plan}}
+\end{align*}
+Thus, we have established the bound
+\begin{equation*}
+\bra{\psi}G \otimes I \ket{\psi}
+- \bra{\psi}G^{d+1} \otimes I \ket{\psi}
+\leq 2\cdot \Delta^{1/{d+1}}
+= 2\cdot ( \poly(m) \cdot \poly(\eps, \delta, \gamma, \zeta,d/q))^{1/{d+1}}.
+\end{equation*}
+For constant~$d$, this bound is suitable for our proof, as the right-hand side is still a polynomial in the relevant parameters.
+However, when~$d$ is larger, for this bound to be meaningful, we need $\eps$, $\delta$, etc. to be exponentially small in~$d$, which is a more stringent condition than we generally allow (unless, again, $d$ is a constant). 
+That said, we believe this large error may be an artifact of the proof strategy
+rather than something intrinsic to the construction.
+We leave this to future work.
+
+\ignore{
+For example, when $d = 1$, we have that
+\begin{multline*}
+\bra{\psi}G \otimes I \ket{\psi}
+- \bra{\psi}G^2 \otimes I \ket{\psi}
+= \bra{\psi}G (I - G) \otimes I \ket{\psi}
+= \bra{\psi}\sqrt{I-G} \cdot (\sqrt{I-G} \cdot G) \otimes I \ket{\psi}\\
+\leq \sqrt{\bra{\psi} (I - G) \otimes I \ket{\psi}} \cdot \sqrt{\bra{\psi} G^2 (I - G) \otimes I \ket{\psi}}
+\leq \sqrt{1} \cdot \sqrt{\Delta}.
+\end{multline*}
+This establishes \Cref{eq:subtract-a-G} with error $\sqrt{\Delta}$ when $d = 1$.
+
+For larger~$d$, however, this argument gives 
+\begin{align*}
+\bra{\psi}G \otimes I \ket{\psi}
+- \bra{\psi}G^{d+1} \otimes I \ket{\psi}
+&= \sum_{i=1}^d (\bra{\psi} G^i \ot I \ket{\psi} - \bra{\psi} G^{i+1} \ket{\psi})\\
+&=\sum_{i=1}^d \bra{\psi} G^i(I-G) \ot I \ket{\psi}\\
+&\leq \sum_{i=1}^d \bra{\psi} G(I-G) \ot I \ket{\psi}\\
+&= d \cdot \bra{\psi} G(I-G) \ot I \ket{\psi}.
+\end{align*}
+
+
+
+For larger $d$, however, this argument gives the bound
+\begin{equation*}
+\bra{\psi}G \otimes I \ket{\psi}
+- \bra{\psi}G^{d+1} \otimes I \ket{\psi}
+\leq \Delta^{1/{d+1}}
+= ( \poly(m) \cdot \poly(\eps, \delta, \gamma, \zeta,d/q))^{1/{d+1}}.
+\end{equation*}
+\znote{How is the $\Delta^{1/(d+1)}$ bound proved? For $d>1$, this does not seem
+  to hold even if G is a number between 0 and 1.}
+Thus, for this bound to be meaningful, we need $\eps$, $\delta$, etc. to be exponentially small in~$d$, which is a more stringent condition than we generally allow unless $d$ is a constant. 
+We still believe that this construction should work,
+and we leave its analysis to future work.
+\znote{Why do we believe that this construction should work?}
+}
+
+\subsubsection{The second construction}\label{sec:construction-numba-two}
+
+The second construction of $H = \{H_h\}$ 
+is designed to circumvent the problem of the first construction,
+which is that its completeness was difficult to analyze.
+Instead, we will design a pasted measurement
+in which the ``naive analysis" actually gets us the bound we want,
+which is that~$H$'s completeness is close to~$G$'s completeness.
+Before describing the construction, we need the following definitions.
+
+\begin{definition}[$G$'s incomplete part]
+For each $x \in \F_q$, we write $G^x = \sum_g G^x_g$ and $G^x_{\bot} = I - G^x$
+for the ``complete" and ``incomplete" parts of $G^x$, respectively.
+
+It will be convenient to sometimes regard $G^x$ as a complete measurement
+by throwing in the additional measurement outcome ``$\bot$".
+To distinguish this from $G^x$ as a sub-measurement,
+we will use the notation ``$\widehat{G}^x$".
+In other words, we let $\widehat{G} = \{\widehat{G}^x_g\}$
+be the projective measurement defined as
+\begin{equation*}
+\widehat{G}^x_g
+= \left\{\begin{array}{rl}
+	G^x_g & \text{if } g \in \polyfunc{m}{q}{d},\\
+	G^x_{\bot} & \text{if } g = \bot.
+	\end{array}\right.
+\end{equation*}
+This measurement has outcomes ranging over the set 
+$\calP^+(m,q,d) := \polyfunc{m}{q}{d} \cup \{\bot\}$.
+\end{definition}
+
+\begin{definition}[Types]
+A type $\tau$ is an element of $\{0, 1\}^k$ for some integer~$k$.
+We write $|\tau| = \tau_1 + \cdots + \tau_k$ for the Hamming weight of~$\tau$.
+We will also associate $\tau$ with the set $\{i \mid \tau_i = 1\}$ and write $i \in \tau$ if $\tau_i = 1$.
+\end{definition}
+
+Suppose we perform the $\wG$ measurement $k$ times in succession,
+generating the random outcomes $\bg_1, \ldots, \bg_k$.
+Let us write $\btau \in \{0, 1\}^k$ for the ``type" of these outcomes, where
+\begin{equation*}
+\btau_i =
+\left\{\begin{array}{rl}
+	1 & \text{if $\bg_i \in \polyfunc{m}{q}{d}$},\\
+	0 & \text{if $\bg_i = \bot$.}
+	\end{array}
+	\right.
+\end{equation*}
+Assuming the $\bg_i$'s are not inconsistent,
+then we can interpolate them to produce a global polynomial~$\bh$
+whenever $|\btau| \geq d+1$.
+Hence, we would like to understand the probability that $|\btau| \geq d+1$
+and ensure that it is as large as possible.
+The probability that the measurement $\wG$ returns a polynomial $g \in \polyfunc{m}{q}{d}$
+is equal to the completeness of~$G$, which is $1-\kappa$.
+This tells us that the probability that $\btau_1 = 1$ is $1-\kappa$.
+We might naively expect that the same holds for the other $\btau_i$'s as well.
+We might also naively expect that the $\btau_i$'s are independent.
+These two assumptions should not be expected to hold in general,
+as they ignore correlations between the measurements
+and the fact that each measurement perturbs the state $\ket{\psi}$ for subsequent measurements to use.
+However, if we make these assumptions, then we at least have a simple toy model
+for the measurement outcomes: $\btau \sim \mathrm{Binomial}(k, 1-\kappa)$.
+
+In this toy model,
+we expect $|\btau| \approx k \cdot (1-\kappa)$ on average.
+This was the problem with the ``naive analysis" from the first construction:
+if $k = d+1$ and $\kappa$ is reasonably large (say, on the order of $1/d$),
+then we don't expect $|\btau|$ to be $\geq d+1$ with high probability,
+and so we can't interpolate to produce a global polynomial.
+This suggests an alternative strategy:
+simply choose $k$ large enough so that $k \cdot (1 - \kappa) \gg d+1$.
+In fact, as we are aiming for $H$ to have completeness close to $1-\kappa$,
+we should choose~$k$ so large that $|\btau| \geq d+1$ with probability 
+roughly $1-\kappa$.
+This is easily done with a Chernoff bound,
+which is responsible for the exponential error term in \Cref{item:ld-pasting-N-completeness-sub-measurement}
+of \Cref{lem:ld-pasting-sub-measurement}.
+On the other hand, if we set $k$ \emph{too} large,
+then we increase the risk that our $k$ outcomes $g_1, \ldots, g_k$ are inconsistent with each other,
+which is an additional source of error.
+This is responsible for the tradeoff between ``large" and ``small" $k$ discussed in \Cref{sec:self-improvement-and-pasting} above.
+
+
+Although, this ``naive analysis" only holds in this toy model,
+it still motivates our second construction of~$H$,
+which we state below.
+We will show that the naive analysis,
+in which we treat $\btau$ as a binomial random variable
+and bound $|\btau|$ using a Chernoff bound,
+can actually be made formal.
+
+\begin{definition}[The pasted measurement]
+Let $k \geq d+1$ be an integer.
+\begin{enumerate}
+\item (Pasting):
+Let $x_1, \ldots, x_k \in \F_q$.
+We will define an initial ``sandwiched" measurement as follows:
+\begin{equation*}
+\widehat{H}^{x_1, \ldots, x_{k}}_{g_1, \ldots, g_{k}} = \widehat{G}^{x_1}_{g_1} \cdot \widehat{G}^{x_2}_{g_2} \cdots \widehat{G}^{x_{k}}_{g_{k}} \cdots \widehat{G}^{x_2}_{g_2} \cdot \widehat{G}^{x_1}_{g_1}.
+\end{equation*}
+\item (Interpolation):
+Next, let $(x_1, \ldots, x_{k}) \in \distinct{k}$.
+For any string $w \in \{0, 1\}^k$ and polynomial $h \in \polyfunc{m+1}{q}{d}$,
+we define $h_w$  to be the tuple $(g_1, \ldots, g_k)  \in \calP^+(m, q, d)^k$
+where $g_i = \bot$ if $w_i = 0$ and $g_i = h|_{x_i}$ otherwise.
+We define the interpolated measurement
+\begin{equation*}
+H^{x_1, \ldots, x_{k}}_{h}
+= \sum_{w : |w| \geq d+1} \widehat{H}^{x_1, \ldots, x_{k}}_{h_w}.
+\end{equation*}
+\item (Averaging):
+Finally, we randomize over the choice of $(x_1, \ldots, x_{k})$. In other words, we define
+\begin{equation*}
+H_{h} = \E_{(\bx_1, \ldots, \bx_{k}) \sim \distinct{k}} H^{\bx_1, \ldots, \bx_{k}}_h.
+\end{equation*}
+\end{enumerate}
+\end{definition}
+
+To analyze the second construction,
+we first need to show that the $\wG$ measurement
+satisfies some basic properties, like commutation with itself.
+These are shown in \Cref{sec:hat-consistency},
+where they follow from the fact that similar properties hold for $G$.
+Using this, we prove that $\widehat{H}$ is consistent with~$B$ in \Cref{sec:ld-sandwiching},
+which we use to prove that $H$ is consistent with~$A$ in \Cref{sec:consistency-of-h-with-a}.
+Finally, we analyze the completeness of~$H$ in \Cref{sec:completeness-of-h-low-degree}.
+
+
+\subsection{Strong self-consistency and commutation of $\widehat{G}$}
+\label{sec:hat-consistency}
+
+In this section, we show that $\wG$ is strongly self-consistent and commutes with itself.
+As we already know this holds for the sub-measurement~$G$,
+our task essentially reduces to showing that these properties also hold for $G$'s incomplete part,
+i.e.\ $G_{\perp}$.
+As it is more convenient to work with $G = I - G_{\perp}$ rather than $G_{\perp}$,
+we will first show that these properties hold for~$G$;
+the fact that they also hold for $G_{\perp}$ will then follow as an immediate corollary.
+
+\subsubsection{Strong self-consistency of $G_{\perp}$}
+
+\begin{lemma}[Strong self-consistency of $G$'s complete part]\label{lem:g-complete-self-consistency}
+\begin{equation*}
+G^{x} \ot I \approx_{\zeta}  I \ot G^{x}.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+Because~$G$ is a projective measurement, \Cref{prop:two-notions-of-self-consistency}
+implies that the strong self-consistency of~$G$ from \Cref{item:ld-pasting-self-consistency} is equivalent to 
+\begin{equation}\label{eq:ld-g-self-consistency}
+\E_{\bx} \sum_{g} \bra{\psi} G^{\bx}_{g} \ot G^{\bx}_{g}
+    \ket{\psi} \geq \E_{\bx} \sum_{g} \bra{\psi} G^{\bx}_{g} \ot
+                 I\ket{\psi} - \frac{1}{2}\cdot \zeta.
+\end{equation}
+Our goal is to bound
+\begin{align*}
+&\E_{\bx} \Vert (G^{\bx}\ot I - I \ot G^{\bx}) \ket{\psi} \Vert^2\\
+=~&2\cdot \E_{\bx} \bra{\psi} G^{\bx} \otimes I \ket{\psi} - 2\cdot \E_{\bx} \bra{\psi} G^{\bx} \otimes G^{\bx} \ket{\psi}\\
+=~&2\cdot \E_{\bx} \sum_{g_1} \bra{\psi} G^{\bx}_{g} \otimes I \ket{\psi} - 2\cdot \E_{\bx} \sum_{g, h} \bra{\psi} G^{\bx}_{g} \otimes G^{\bx}_{h} \ket{\psi}\\
+\leq~&2\cdot \E_{\bx} \sum_{g} \bra{\psi} G^{\bx}_{g} \otimes I \ket{\psi} - 2\cdot \E_{\bx} \sum_{g} \bra{\psi} G^{\bx}_{g} \otimes G^{\bx}_{g} \ket{\psi}.
+\end{align*}
+But this is at most~$\zeta$ by \Cref{eq:ld-g-self-consistency}.
+\end{proof}
+
+\begin{corollary}[Strong self-consistency of~$G$'s incomplete part]\label{cor:g-bot-self-consistency}
+\begin{equation*}
+G^{x}_{\bot} \ot I \approx_{\zeta}  I \ot G^{x}_{\bot}.
+\end{equation*}
+\end{corollary}
+\begin{proof}
+ For any~$x$,
+ \begin{equation*}
+ G^x_{\bot} \otimes I - I \otimes G^x_{\bot}
+ = (I - G^x) \otimes I - I \otimes (I - G^x)
+ = I \otimes G^x - G^x \otimes I.
+ \end{equation*}
+Thus,
+\begin{equation*}
+\E_{\bx}  \| (G^{\bx}_{\bot} \ot I -I \ot
+      G^{\bx}_{\bot}) \ket{\psi} \|^2
+= \E_{\bx}  \| (I \otimes G^{\bx} - G^{\bx} \otimes I) \ket{\psi} \|^2,
+\end{equation*}
+which is at most $\zeta$ by \Cref{lem:g-complete-self-consistency}.
+\end{proof}
+
+\subsubsection{Commutativity of $G_{\perp}$}
+
+\begin{lemma}[Commutativity with~$G_g^x$ implies commutativity with~$G^x$]\label{lem:commutativity-switcheroo}
+Let $M = \{M^x_o\}$ be a projective sub-measurement with outcomes in some set~$\calO$.
+Suppose that
+\begin{equation}\label{eq:M-self-consistent}
+M^x_o \otimes I \approx_{\omega} I \otimes M^x_o,
+\end{equation}
+and
+\begin{equation}\label{eq:M-commutes-with-G}
+G^x_g M^y_o \otimes I \approx_{\chi} M^y_o G^x_g \otimes I
+\end{equation}
+over independent and uniformly random $\bx, \by \sim \F_q$. Then
+\begin{equation*}
+G^x M^y_o \otimes I \approx_{6\sqrt{\zeta} + 6\sqrt{\omega} + 4\sqrt{\chi}} M^y_o G^x \otimes I.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+The error we wish to bound is
+\begin{align}
+&\E_{\bx} \sum_o \Vert (G^{\bx} M^{\by}_o - M^{\by}_o G^{\bx}) \otimes I \ket{\psi}\Vert^2\nonumber\\
+=~&\E_{\bx, \by} \sum_o \bra{\psi} M^{\by}_o (G^{\bx})^2 M^{\by}_o \otimes I \ket{\psi} + \E_{\bx, \by} \sum_o \bra{\psi} G^{\bx} (M^{\by}_o)^2 G^{\bx} \otimes I \ket{\psi}\nonumber\\
+& \qquad - \E_{\bx, \by} \sum_o  \bra{\psi} G^{\bx} M^{\by}_o
+        G^{\bx} M^{\by}_o \ot I \ket{\psi}
+        	- \E_{\bx, \by} \sum_g \bra{\psi}
+        M^{\by}_o G^{\bx} M^{\by}_o G^{\bx} \ot I \ket{\psi}.\label{eq:g-commute-with-gg-error}
+\end{align}
+We will show that all four terms in \Cref{eq:g-commute-with-gg-error} are close to $\bra{\psi} G \otimes M \ket{\psi}$,
+where $M = \E_{\by} \sum_o M^{\by}_o$.
+
+For the first term in \Cref{eq:g-commute-with-gg-error}, we have
+\begin{align*}
+\E_{\bx, \by} \sum_o \bra{\psi} M^{\by}_o (G^{\bx})^2 M^{\by}_o\ot I \ket{\psi}
+&= \E_{\bx, \by} \sum_o \bra{\psi} M^{\by}_o G^{\bx} M^{\by}_o\ot I \ket{\psi} \tag{because~$G$ is projective}\\
+&= \E_{\by}\sum_o \bra{\psi} M^{\by}_o G M^{\by}_o \ot I \ket{\psi}\\
+&\approx_{2\sqrt{\omega}} \E_{\by}\sum_o \bra{\psi} G \ot M^{\by}_o  \ket{\psi} \tag{by \Cref{prop:switch-sandwich} and \Cref{eq:M-self-consistent}}\\
+&= \bra{\psi} G \ot M \ket{\psi}.
+\end{align*}
+Similarly, for the second term in \Cref{eq:g-commute-with-gg-error}, we have
+\begin{align*}
+\E_{\bx, \by} \sum_o \bra{\psi} G^{\bx} (M^{\by}_o)^2 G^{\bx} \otimes I \ket{\psi}
+&=\E_{\bx, \by} \sum_o \bra{\psi} G^{\bx} M^{\by}_o G^{\bx} \otimes I \ket{\psi} \tag{because~$M$ is projective}\\
+&=\E_{\bx}  \bra{\psi} G^{\bx} M G^{\bx} \otimes I \ket{\psi}\\
+&\approx_{2\sqrt{\zeta}} \E_{\bx} \bra{\psi} M \ot G^{\bx}  \ket{\psi} \tag{by \Cref{prop:switch-sandwich} and \Cref{lem:g-complete-self-consistency}}\\
+&= \bra{\psi} M \ot G \ket{\psi}.
+\end{align*}
+
+For the third term in \Cref{eq:g-commute-with-gg-error}, we begin by claiming that
+\begin{align}
+\E_{\bx, \by} \sum_o \bra{\psi} G^{\bx} M^{\by}_o
+        G^{\bx} M^{\by}_o \ot I \ket{\psi}
+& = 
+\E_{\bx, \by} \sum_{o, g}  \bra{\psi} G^{\bx} M^{\by}_o
+        G^{\bx}_{g} M^{\by}_o \ot I \ket{\psi}\nonumber\\
+& = 
+\E_{\bx, \by} \sum_{o, g}  \bra{\psi} G^{\bx} M^{\by}_o G^{\bx}_g
+        G^{\bx}_{g} M^{\by}_o \ot I \ket{\psi} \tag{because~$G$ is projective}\\
+& \approx_{\sqrt{\chi}} 
+\E_{\bx, \by} \sum_{o, g}  \bra{\psi}  G^{\bx} M^{\by}_o G^{\bx}_g
+        M^{\by}_o G^{\bx}_{g}  \ot I \ket{\psi}.\label{eq:split-G-and-commute}
+\end{align}
+To show this, we bound the magnitude of the difference.
+\begin{multline*}
+\Big|\E_{\bx, \by} \sum_{o, g}  \bra{\psi}  (G^{\bx}
+        M^{\by}_{o} G^{\bx}_g \ot I) \cdot ((G^{\bx}_g M^{\by}_o - M^{\by}_o G^{\bx}_{g}) \otimes I)\ket{\psi}\Big|\\
+\leq \sqrt{\E_{\bx, \by} \sum_{o, g}  \bra{\psi} (G^{\bx} M^{\by}_o G^{\bx}_g
+        M^{\by}_{o} G^{\bx}) \ot I\ket{\psi}}\\
+\cdot \sqrt{\E_{\bx, \by} \sum_{o, g}  \bra{\psi}  ((M^{\by}_o G^{\bx}_g  -  G^{\bx}_{g} M^{\by}_o) \cdot (G^{\bx}_g M^{\by}_o - M^{\by}_o G^{\bx}_{g}) \otimes I) \ket{\psi}}.
+\end{multline*}
+The expression inside the first square root is at most~$1$ because~$G$ and~$M$ are sub-measurements.
+The expression inside the second square root is at most $\chi$ by \Cref{eq:M-commutes-with-G}.
+Next, we claim that
+\begin{equation}\label{eq:move-G-for-great-justice}
+\eqref{eq:split-G-and-commute}
+\approx_{\sqrt{\zeta}} \E_{\bx, \by} \sum_{o, g}  \bra{\psi}   G^{\bx} M^{\by}_o
+        G^{\bx}_{g} M^{\by}_o \ot G^{\bx}_g\ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{align*}
+&\Big|  \E_{\bx, \by} \sum_{o, g}  \bra{\psi} (G^{\bx} M^{\by}_{o} G^{\bx}_g \ot I)
+	\cdot ((M^{\by}_{o} \otimes I) \cdot(G^{\bx}_g \otimes I - I \otimes G^{\bx}_g))\ket{\psi}\Big|\\
+&\leq  \sqrt{\E_{\bx, \by} \sum_{o, g} \bra{\psi} (G^{\bx} M^{\by}_o G^{\bx}_g M^{\by}_{o} G^{\bx}) \ot I \ket{\psi}}\\
+&\quad \cdot \sqrt{ \E_{\bx, \by} \sum_{o, g}  \bra{\psi}   ((G^{\bx}_g \otimes I - I \otimes G^{\bx}_g) \cdot (M^{\by}_{o} \otimes I) \cdot (G^{\bx}_g \otimes I - I \otimes G^{\bx}_g)) \ket{\psi}}.
+\end{align*}
+The expression inside the first square root is at most~$1$ because~$G$ and~$M$ are sub-measurements.
+The expression inside the second square root is
+\begin{align*}
+& \E_{\bx}\sum_g \bra{\psi}(G^{\bx}_g \ot I - I \ot G^{\bx}_g) \cdot\Big(\E_{\by} \sum_o M^{\by}_{o} \ot I\Big) \cdot (G^{\bx}_g \ot I - I \ot G^{\bx}_g) \ket{\psi}\\
+\leq~&\E_{\bx}\sum_g \bra{\psi}(G^{\bx}_g \ot I - I \ot G^{\bx}_g)^2 \ket{\psi}. \tag{because~$M$ is a sub-measurement}
+\end{align*} 
+This is at most~$\zeta$ by \Cref{item:ld-pasting-self-consistency}.
+Next, we claim that
+\begin{equation}\label{eq:move-G-for-even-greater-justice}
+\eqref{eq:move-G-for-great-justice}
+\approx_{\sqrt{\zeta}} \E_{\bx, \by} \sum_{o, g}  \bra{\psi}  G^{\bx}_g  G^{\bx} M^{\by}_o
+        G^{\bx}_{g} M^{\by}_o \ot I\ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{align*}
+&\Big|  \E_{\bx, \by} \sum_{o, g}  \bra{\psi} ((G^{\bx}_g \ot I - I \ot G^{\bx}_g) \cdot (G^{\bx} M^{\by}_o \otimes I)) 
+	\cdot  (G^{\bx}_{g} M^{\by}_o \otimes I) 
+        \ket{\psi}\Big|\\
+&\leq \sqrt{ \E_{\bx, \by} \sum_{o, g}  \bra{\psi} ((G^{\bx}_g \ot I - I \ot G^{\bx}_g) \cdot (G^{\bx} M^{\by}_o G^{\bx} \ot I) \cdot (G^{\bx}_g \ot I - I \ot G^{\bx}_g))\ket{\psi}}\\
+&\quad \cdot \sqrt{ \E_{\bx, \by} \sum_{o, g}  \bra{\psi}  (M^{\by}_{o} G^{\bx}_g M^{\by}_o) \otimes I \ket{\psi}}.
+\end{align*}
+The expression inside the first square root is
+\begin{align*}
+& \E_{\bx} \sum_{g}  \bra{\psi} ((G^{\bx}_g \ot I - I \ot G^{\bx}_g) \cdot \Big(\E_{\by} \sum_o G^{\bx} M^{\by}_o G^{\bx} \ot I\Big) \cdot (G^{\bx}_g \ot I - I \ot G^{\bx}_g))\ket{\psi}\\
+\leq~&\E_{\bx} \sum_{g}  \bra{\psi} (G^{\bx}_g \ot I - I \ot G^{\bx}_g)^2\ket{\psi}. \tag{because~$G$ and~$M$ are sub-measurements}
+\end{align*} 
+This is at most~$\zeta$ by \Cref{item:ld-pasting-self-consistency}.
+The expression inside the second square root is at most~$1$ because~$G$ and~$M$ are sub-measurements.
+Next, we claim that
+\begin{align}
+\eqref{eq:move-G-for-even-greater-justice}
+& = \E_{\bx, \by} \sum_{o, g}  \bra{\psi}   G^{\bx}_{g} M^{\by}_o
+        G^{\bx}_{g} M^{\by}_o \ot I\ket{\psi} \tag{because~$G$ is projective}\\
+& \approx_{\sqrt{\chi}} 
+\E_{\bx, \by} \sum_{o,g}  \bra{\psi}   M^{\by}_{o} G^{\bx}_g G^{\bx}_g
+        M^{\by}_{o}  \ot I\ket{\psi}. \label{eq:commute-the-G-yet-again}
+\end{align}
+To show this, we bound the magnitude of the difference.
+\begin{multline*}
+\Big|\E_{\bx, \by} \sum_{o, g}  \bra{\psi} ((G^{\bx}_g
+        M^{\by}_{o} - M^{\by}_o G^{\bx}_g)  \ot I)  \cdot(G^{\bx}_{g} M^{\by}_o  \ot I ) \ket{\psi}\Big|\\
+\leq\sqrt{\E_{\bx, \by} \sum_{o, g} \bra{\psi} ((G^{\bx}_g M^{\by}_o - M^{\by}_o G^{\bx}_g) \cdot (M^{\by}_o
+        G^{\bx}_{g} - G^{\bx}_g M^{\by}_o)  \ot I)\ket{\psi}}\\
+        \cdot \sqrt{\E_{\bx, \by} \sum_{o, g}  \bra{\psi} (M^{\by}_o G^{\bx}_g M^{\by}_o) \otimes I \ket{\psi}}.
+\end{multline*}
+The expression inside the first square root is at most $\chi$ by \Cref{eq:M-commutes-with-G}.
+The expression inside the second square root is at most~$1$ because~$G$ and~$M$ are sub-measurements.
+Finally,
+\begin{align*}
+\eqref{eq:commute-the-G-yet-again}
+&=\E_{\bx, \by} \sum_{o, g}  \bra{\psi}   M^{\by}_{o} G^{\bx}_g
+        M^{\by}_{o}  \ot I\ket{\psi} \tag{because~$G$ is projective}\\
+&=\E_{\by} \sum_o \bra{\psi} M^{\by}_{o} G M^{\by}_{o} \otimes I \ket{\psi}\\
+&\approx_{2\sqrt{\omega}} \E_{\by} \sum_o \bra{\psi} G \ot M^{\by}_o  \ket{\psi} \tag{by \Cref{prop:switch-sandwich} and \Cref{eq:M-self-consistent}}\\
+&= \bra{\psi} G \ot M \ket{\psi}.
+\end{align*}
+In total, this shows that
+\begin{equation}\label{eq:term-three-for-use-right-now}
+\E_{\bx, \by} \sum_o  \bra{\psi} G^{\bx} M^{\by}_o
+        G^{\bx} M^{\by}_o \ot I \ket{\psi}
+        \approx_{2 \sqrt{\zeta} + 2 \sqrt{\omega} + 2 \sqrt{\chi}} \bra{\psi} G \ot M \ket{\psi}.
+\end{equation}
+The fourth term in \Cref{eq:g-commute-with-gg-error} is the Hermitian conjugate of the third term. As a result, \Cref{eq:term-three-for-use-right-now} implies that
+\begin{equation*}
+\E_{\bx, \by} \sum_o  \bra{\psi} M^{\by}_o G^{\bx} M^{\by}_o G^{\bx} \ot I \ket{\psi}
+        \approx_{2 \sqrt{\zeta} + 2 \sqrt{\omega} + 2 \sqrt{\chi}} \bra{\psi} G \ot M \ket{\psi}
+\end{equation*}
+as well.
+
+In total, this gives an error of
+\begin{equation*}
+2\sqrt{\omega}
++ 2\sqrt{\zeta}
++ 2 \cdot\left(2 \sqrt{\zeta} + 2 \sqrt{\omega} + 2 \sqrt{\chi}\right)
+= 6 \sqrt{\zeta} + 6 \sqrt{\omega} + 4 \sqrt{\chi}.
+\end{equation*}
+This proves the claimed bound.
+\end{proof}
+
+\begin{corollary}[Commutativity of~$G$'s complete part]\label{cor:commuting-with-G-complete}
+The following commutation relations hold.
+\begin{align*}
+G^x_g  G^y \ot I &\approx_{\nu_2}  G^y G^x_g \otimes I\\
+G^x G^y \ot I &\approx_{\nu_2}  G^y G^x \otimes I,
+\end{align*}
+where
+\begin{equation*}
+\nu_2 = 36 m \cdot \left(\gamma^{1/16} +  \zeta^{1/16} + (d/q)^{1/16}\right).
+\end{equation*}
+\end{corollary}
+\begin{proof}
+By \Cref{eq:quote-com-main},
+\begin{equation}\label{eq:com-main-copy}
+G^x_g G^y_h \otimes I \approx_{\nu_{\rmcom}} G^y_h G^x_g \otimes I.
+\end{equation}
+Now we apply \Cref{lem:commutativity-switcheroo} to \Cref{eq:com-main-copy}.
+To do so, we set the ``$\{M^y_o\}$" sub-measurement to be $\{G^x_g\}$,
+and therefore $\calO = \polyfunc{m}{q}{d}$.
+This implies that
+\begin{equation}\label{eq:applied-the-lemma-to-com-main-copy}
+G^x_g G^y \otimes I \approx_{\theta_1} G^y G^x_g \otimes I
+\end{equation}
+for $\theta_1 = 12 \sqrt{\zeta} + 4 \sqrt{\nu_{\rmcom}}$.
+
+Next, we apply \Cref{lem:commutativity-switcheroo} to \Cref{eq:applied-the-lemma-to-com-main-copy}.
+This time, we let $\calO$ be a set containing a single outcome,
+and for this outcome~$o$, we set $M^y_o = G^y$.
+This implies that
+\begin{equation*}
+G^x G^y \otimes I \approx_{\theta_2} G^y G^x \otimes I
+\end{equation*}
+for $\theta_2 = 12 \sqrt{\zeta} + 4 \sqrt{\theta_1}$.
+This uses \Cref{lem:g-complete-self-consistency} for the strong self-consistency of $\{M^y_o\}$.
+
+We now show that $\nu_2$ bounds $\theta_1$ and $\theta_2$.
+First, using $\sqrt{30} \leq 6$, we have
+\begin{align*}
+\theta_1 = 12 \sqrt{\zeta} + 4 \sqrt{\nu_{\rmcom}}
+&= 12 \sqrt{\zeta} + 4 \sqrt{30 m \cdot \left(\gamma^{1/4} + \zeta^{1/4} + (d/q)^{1/4}\right)}\\
+&\leq 12 \zeta^{1/8} + 24m \cdot \left(\gamma^{1/8} +\zeta^{1/8} +  (d/q)^{1/8}\right)\\
+&\leq 36 m \cdot \left(\gamma^{1/8} + \zeta^{1/8} +  (d/q)^{1/8}\right).
+\end{align*}
+This is clearly less than $\nu_2$.
+Next,  we have
+\begin{align*}
+\theta_2 = 12 \sqrt{\zeta} + 4 \sqrt{\theta_1}
+&\leq 12 \sqrt{\zeta} + 4 \sqrt{36 m \cdot \left(\gamma^{1/8} + \zeta^{1/8} +  (d/q)^{1/8}\right)}\\
+&\leq 12 \zeta^{1/16} + 24m \cdot \left(\gamma^{1/16} + \zeta^{1/16} + (d/q)^{1/16}\right)\\
+&\leq 36 m \cdot \left( \gamma^{1/16} + \zeta^{1/16} + (d/q)^{1/16}\right).
+\end{align*}
+This is equal to $\nu_2$, which completes the proof.
+\end{proof}
+
+\begin{corollary}[Commutativity of~$G$'s incomplete part]\label{cor:commuting-with-G-incomplete}
+The following commutation relations hold.
+\begin{align*}
+G^x_g  G^y_{\bot} \ot I &\approx_{\nu_2}  G^y_{\bot} G^x_g \otimes I\\
+G^x_{\bot} G^y_{\bot} \ot I &\approx_{\nu_2}  G^y_{\bot} G^x_{\bot} \otimes I,
+\end{align*}
+where $\nu_2$ is as in \Cref{cor:commuting-with-G-complete}.
+\end{corollary}
+\begin{proof}
+First, we note that
+\begin{equation*}
+G^x_g  G^y_{\bot} - G^y_{\bot} G^x_g
+= G^x_g  \cdot (I - G^y) - (I- G^y)\cdot G^x_g
+= G^y G^x_g - G^x_g G^y.
+\end{equation*}
+Hence, by \Cref{cor:commuting-with-G-complete},
+\begin{equation*}
+\E_{\bx, \by}\sum_g \Vert (G^{\bx}_g  G^{\by}_{\bot} - G^{\by}_{\bot} G^{\bx}_g) \otimes I \ket{\psi} \Vert^2
+= \E_{\bx, \by}\sum_g \Vert (G^{\by} G^{\bx}_g - G^{\bx}_g G^{\by}) \otimes I \ket{\psi} \Vert^2
+\leq \nu_2.
+\end{equation*}
+Next, we note that
+\begin{align*}
+G^x_{\bot} G^y_{\bot}
+- G^y_{\bot} G^x_{\bot}
+&= (I - G^x) \cdot (I - G^y) - (I - G^y) \cdot (I - G^x)\\
+& = (I - G^x - G^y + G^x G^y) - (I - G^y - G^x + G^y G^x)\\
+&= G^x G^y - G^y G^x.
+\end{align*}
+As a result, by \Cref{cor:commuting-with-G-complete},
+\begin{equation*}
+\E_{\bx, \by} \Vert (G^{\bx}_{\bot}  G^{\by}_{\bot} - G^{\by}_{\bot} G^{\bx}_{\bot}) \otimes I \ket{\psi} \Vert^2
+= \E_{\bx, \by} \Vert (G^{\by} G^{\bx} - G^{\bx} G^{\by}) \otimes I \ket{\psi} \Vert^2
+\leq \nu_2.\qedhere
+\end{equation*}
+\end{proof}
+
+\subsubsection{Putting everything together}
+
+Now we combine the results of the previous two sections
+to show our strong self-consistency and commutation results for~$\wG$.
+
+\begin{corollary}[Strong self-consistency and commutation of~$\wG$]\label{cor:G-hat-facts}
+  $\widehat{G}$ obeys the
+  following strong self-consistency and commutation properties.
+  \begin{align}
+    \widehat{G}^{x}_{g} \ot I &\approx_{2\zeta} I \ot \widehat{G}^{x}_{g}, \label{eq:gselfconall}\\
+    \widehat{G}^{x}_{g}\widehat{G}^{y}_{h} \ot I &\approx_{\nu_3} \widehat{G}^{y}_{h}
+                               \widehat{G}^{x}_{g} \ot I, \label{eq:gcomall}
+  \end{align}
+  where
+  \[ \nu_{3} = 138 m \cdot \left(\zeta^{1/16} + \gamma^{1/16} + (d/q)^{1/16}\right). \]
+\end{corollary}
+\begin{proof}
+We begin with \Cref{eq:gselfconall}. To prove this, we wish to bound
+\begin{align*}
+&\E_{\bx} \sum_{g} \Vert(\widehat{G}^{\bx}_g \otimes I - I \otimes \widehat{G}^{\bx}_g) \ket{\psi} \Vert^2\\
+=~&\E_{\bx} \sum_{g \in \polyfunc{m}{q}{d}} \Vert(G^{\bx}_g \otimes I - I \otimes G^{\bx}_g) \ket{\psi} \Vert^2
+	+ \E_{\bx} \Vert(G^{\bx}_{\bot} \otimes I - I \otimes G^{\bx}_{\bot}) \ket{\psi} \Vert^2\\
+\leq~& \zeta + \zeta = 2\zeta,
+\end{align*}
+by \Cref{item:ld-pasting-self-consistency} and \Cref{cor:g-bot-self-consistency}.
+
+Next, we show \Cref{eq:gcomall}.
+To prove this, we wish to bound
+\begin{align*}
+&\E_{\bx, \by} \sum_{g, h} \Vert(\widehat{G}^{\bx}_g \widehat{G}^{\by}_h - \widehat{G}^{\by}_h \widehat{G}^{\bx}_g) \otimes I \ket{\psi}\Vert^2\\
+=~&\E_{\bx, \by} \sum_{g, h \in \polyfunc{m}{q}{d}} \Vert(G^{\bx}_g G^{\by}_h - G^{\by}_h G^{\bx}_g) \otimes I \ket{\psi}\Vert^2
+	+ \E_{\bx, \by} \Vert(G^{\bx}_{\bot} G^{\by}_{\bot} - G^{\by}_{\bot} G^{\bx}_{\bot}) \otimes I \ket{\psi}\Vert^2\\
+& \quad + \E_{\bx, \by} \sum_{g\in \polyfunc{m}{q}{d}} \Vert(G^{\bx}_g G^{\by}_{\bot} - G^{\by}_{\bot} G^{\bx}_g) \otimes I \ket{\psi}\Vert^2
+	+ \E_{\bx, \by} \sum_{h\in \polyfunc{m}{q}{d}} \Vert(G^{\bx}_{\bot} G^{\by}_h - G^{\by}_h G^{\bx}_{\bot}) \otimes I \ket{\psi}\Vert^2\\
+\leq~& \nu_{\rmcom} + 3\nu_2,
+\end{align*}
+by \Cref{eq:quote-com-main} and \Cref{cor:commuting-with-G-incomplete}.
+We can therefore bound this by
+\begin{align*}
+\nu_{\rmcom} + 3\nu_2
+&= 30 m \cdot \left(\gamma^{1/4} +\zeta^{1/4} +  (d/q)^{1/4}\right)
+	+ 3 \cdot 36 m \cdot \left(\gamma^{1/16} + \zeta^{1/16} +  (d/q)^{1/16}\right)\\
+&\leq 30 m \cdot \left(\gamma^{1/16} + \zeta^{1/16} + (d/q)^{1/16}\right)
+	+ 3 \cdot 36 m \cdot \left(\gamma^{1/16} + \zeta^{1/16} +  (d/q)^{1/16}\right)\\
+&= 138 m \cdot \left( \gamma^{1/16} + \zeta^{1/16} +(d/q)^{1/16}\right).	
+\end{align*}
+This completes the proof.
+\end{proof}
+
+
+\subsection{Consistency of the sandwich $\widehat{H}$ with~$B$}
+\label{sec:ld-sandwiching}
+
+In the next lemmas, we will show that $\widehat{H}$ is consistent with the lines
+measurement $B$. To start, we show some self-consistency and
+commutativity properties of $\widehat{H}$.
+
+
+
+\begin{lemma}[Commuting past multiple $\widehat{G}$'s]
+\label{lem:commute-g-half-sandwich}
+For all $k \geq 2$,
+  \[ \widehat{G}^{x_1}_{g_1} \widehat{G}^{x_2}_{g_2} \cdots \widehat{G}^{x_k}_{g_k} \ot I \approx_{\nu_4}
+    \widehat{G}^{x_2}_{g_2} \cdots \widehat{G}^{x_k}_{g_k} \widehat{G}^{x_1}_{g_1} \ot I, \]
+where
+\begin{equation*}
+\nu_4 = 426 k^2 m \cdot \left(\gamma^{1/16} +\zeta^{1/16} +  (d/q)^{1/16}\right).
+\end{equation*}
+\end{lemma}
+\begin{proof}
+This proof will consist of multiple applications of \Cref{eq:gselfconall,eq:gcomall};
+for each line, we will specify which equation to apply.
+Each line will also involve an application of \Cref{prop:cab-approx-delta},
+which we will specify only implicitly.
+\begin{align*}
+&  \widehat{G}^{x_1}_{g_1} \widehat{G}^{x_2}_{g_2} \cdots \widehat{G}^{x_k}_{g_k} \ot I\\
+\approx_{2\zeta}~& \widehat{G}^{x_1}_{g_1} \widehat{G}^{x_2}_{g_2} \cdots \widehat{G}^{x_{k-1}}_{g_{k-1}} \ot \widehat{G}^{x_k}_{g_k} \tag{by \Cref{eq:gselfconall}}\\
+\cdots~&\\
+\approx_{2\zeta}~& \widehat{G}^{x_1}_{g_1} \widehat{G}^{x_2}_{g_2} \ot \widehat{G}^{x_k}_{g_k} \cdots \widehat{G}^{x_{3}}_{g_{3}}\tag{by \Cref{eq:gselfconall}}\\
+\approx_{\nu_{3}}~&  \widehat{G}^{x_2}_{g_2}G^{x_1}_{g_1} \ot \widehat{G}^{x_k}_{g_k} \cdots \widehat{G}^{x_{3}}_{g_{3}}\tag{by \Cref{eq:gcomall}}\\
+\approx_{2\zeta}~&  \widehat{G}^{x_2}_{g_2}\widehat{G}^{x_1}_{g_1} \widehat{G}^{x_3}_{g_3} \ot \widehat{G}^{x_k}_{g_k} \cdots \widehat{G}^{x_{4}}_{g_{4}}\tag{by \Cref{eq:gselfconall}}\\
+\approx_{\nu_{3}}~&  \widehat{G}^{x_2}_{g_2}\widehat{G}^{x_3}_{g_3} \widehat{G}^{x_1}_{g_1} \ot \widehat{G}^{x_k}_{g_k} \cdots \widehat{G}^{x_{4}}_{g_{4}}\tag{by \Cref{eq:gcomall}}\\
+\cdots~&\\
+\approx_{2\zeta}~&  \widehat{G}^{x_2}_{g_2}\cdots \widehat{G}^{x_{k-1}}_{g_{k-1}} \widehat{G}^{x_1}_{g_1} \widehat{G}^{x_k}_{g_k} \ot I\tag{by \Cref{eq:gselfconall}}\\
+\approx_{\nu_{3}}~&  \widehat{G}^{x_2}_{g_2}\cdots \widehat{G}^{x_{k-1}}_{g_{k-1}} \widehat{G}^{x_k}_{g_k} \widehat{G}^{x_1}_{g_1} \ot I.\tag{by \Cref{eq:gcomall}}
+\end{align*}
+In total, we have $(k-2) + (k-2) \leq 2k$ applications of \Cref{eq:gselfconall} with error $2\zeta$ each
+and $(k-1) \leq k$ applications of \Cref{eq:gcomall} with error $\nu_3$ each.
+By \Cref{prop:triangle-inequality-for-approx_delta}, this implies that 
+\begin{equation*}
+G^{x_1}_{g_1} G^{x_2}_{g_2} \cdots G^{x_k}_{g_k} \ot I
+\approx_{3k \cdot (4k \zeta + k\nu_3)} G^{x_2}_{g_2}\cdots G^{x_{k-1}}_{g_{k-1}} G^{x_k}_{g_k} G^{x_1}_{g_1} \ot I,
+\end{equation*}
+as claimed.
+We can bound this as follows.
+\begin{align*}
+3k \cdot (4k \zeta + k\nu_3)
+& = 12k^2 \zeta + 3k^2 \nu_3\\
+&= 12k^2 \zeta + 3 k^2 \cdot 138 m \cdot \left(\gamma^{1/16} + \zeta^{1/16} + (d/q)^{1/16}\right)\\
+&\leq 12k^2 \zeta^{1/16} + 414 k^2 m \cdot \left(\gamma^{1/16} + \zeta^{1/16} + (d/q)^{1/16}\right)\\
+&\leq 426 k^2 m \cdot \left(\gamma^{1/16} + \zeta^{1/16} + (d/q)^{1/16}\right).
+\end{align*}
+This completes the proof.
+\end{proof}
+
+\begin{lemma}[Consistency of $\widehat{H}$ with $B$]
+\label{lem:ld-sandwich-line-one-point}
+For any $1 \leq i \leq k$,
+\begin{equation*}
+\E_{\bu}  \E_{\bx_1, \dots, \bx_k} \sum_{g_1, \dots, g_k: g_i \neq \bot}  \sum_{a \neq
+    g_i(\bu)} \bra{\psi}
+  \widehat{H}^{\bx_1, \dots, \bx_k}_{g_1, \dots, g_k} \ot B^{\bu}_{[f(\bx_i) =
+    a]} \ket{\psi}  \leq \nu_5,
+ \end{equation*}
+where
+\begin{equation*}
+    \nu_5 = 43 km \cdot \left(\eps^{1/32} + \delta^{1/32} + \gamma^{1/32} + \zeta^{1/32} + (d/q)^{1/32}\right).
+\end{equation*}
+\end{lemma}
+\begin{proof}
+To begin, we note that
+\begin{align*}
+\sum_{g_{i+1}, \ldots, g_k} \widehat{H}^{x_1, \ldots, x_k}_{g_1, \ldots, g_k}
+& = \sum_{g_{i+1}, \ldots, g_k} \widehat{G}^{x_1}_{g_1} \cdots \widehat{G}^{x_k}_{g_k} \cdots \widehat{G}^{x_1}_{g_1}\\
+& = \sum_{g_{i+1}, \ldots, g_{k-1}} \widehat{G}^{x_1}_{g_1} \cdots \Big(\sum_{g_k} \widehat{G}^{x_k}_{g_k} \Big)\cdots \widehat{G}^{x_1}_{g_1}\\
+& = \sum_{g_{i+1}, \ldots, g_{k-1}} \widehat{G}^{x_1}_{g_1} \cdots \widehat{G}^{x_{k-1}}_{g_{k-1}} \cdot I \cdot \widehat{G}^{x_{k-1}}_{g_{k-1}}\cdots \widehat{G}^{x_1}_{g_1} \tag{because $\widehat{G}^{x_k}$ is a measurement}\\
+& = \sum_{g_{i+1}, \ldots, g_{k-1}} \widehat{G}^{x_1}_{g_1} \cdots \widehat{G}^{x_{k-1}}_{g_{k-1}} \cdots \widehat{G}^{x_1}_{g_1} \tag{because $\widehat{G}^{x_{k-1}}$ is projective}\\
+& \cdots \\
+& = \widehat{G}^{x_1}_{g_1} \cdots \widehat{G}^{x_{i}}_{g_{i}} \cdots \widehat{G}^{x_1}_{g_1}\\
+& = \widehat{H}^{x_1, \ldots, x_i}_{g_1, \ldots, g_i}.
+\end{align*}
+As a result,
+\begin{align}
+&\E_{\bu}  \E_{\bx_1, \dots, \bx_k} \sum_{g_1, \dots, g_k: g_i \neq \bot}  \sum_{a \neq
+    g_i(\bu)} \bra{\psi}
+  \widehat{H}^{\bx_1, \dots, \bx_k}_{g_1, \dots, g_k} \ot B^{\bu}_{[f(\bx_i) =
+    a]} \ket{\psi}\nonumber\\
+=~&\E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_1, \dots, g_i: g_i \neq \bot}  \sum_{a \neq
+    g_i(\bu)} \bra{\psi}
+  \widehat{H}^{\bx_1, \dots, \bx_i}_{g_1, \dots, g_i} \ot B^{\bu}_{[f(\bx_i) =
+    a]} \ket{\psi}.\label{eq:delete-extraneous-coordinates}
+\end{align}
+For shorthand, we write
+\begin{equation*}
+\widehat{G}^{x_{<i}}_{g_{<i}} = \widehat{G}^{x_1}_{g_1} \cdots \widehat{G}^{x_{i-1}}_{g_{i-1}}.
+\end{equation*}
+Then we claim that
+\begin{align}
+\eqref{eq:delete-extraneous-coordinates}
+& = \E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_1, \dots, g_i: g_i \neq \bot}   \bra{\psi}
+  \widehat{G}^{\bx_{<i}}_{g_{<i}}  \cdot \widehat{G}^{\bx_i}_{g_i} \cdot \widehat{G}^{\bx_i}_{g_i} \cdot (\widehat{G}^{\bx_{<i}}_{g_{<i}} )^\dagger \ot (I - B^{\bu}_{[f(\bx_i) =
+    g_i(\bu)]}) \ket{\psi}\nonumber\\
+& \approx_{\sqrt{\nu_4}} \E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_1, \dots, g_i: g_i \neq \bot} \bra{\psi}\widehat{G}^{\bx_i}_{g_i} \cdot
+  \widehat{G}^{\bx_{<i}}_{g_{<i}}  \cdot  \widehat{G}^{\bx_i}_{g_i}\cdot (\widehat{G}^{\bx_{<i}}_{g_{<i}} )^\dagger \ot (I - B^{\bu}_{[f(\bx_i) =
+    g_i(\bu)]}) \ket{\psi}.\label{eq:gonna-need-a-bigger-cauchy-schwarz}
+\end{align}
+To show this, we bound the magnitude of the difference.
+\begin{multline*}
+\E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_1, \dots, g_i: g_i \neq \bot}  \bra{\psi}
+  ((\widehat{G}^{\bx_{<i}}_{g_{<i}}  \cdot \widehat{G}^{\bx_i}_{g_i} - \widehat{G}^{\bx_i}_{g_i}  \cdot \widehat{G}^{\bx_{<i}}_{g_{<i}}) \otimes I) \cdot (\widehat{G}^{\bx_i}_{g_i} \cdot (\widehat{G}^{\bx_{<i}}_{g_{<i}} )^\dagger \ot (I - B^{\bu}_{[f(\bx_i) =
+    g_i(\bu)]})) \ket{\psi}\\
+    \leq 
+    \sqrt{\E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_1, \dots, g_i: g_i \neq \bot}   \bra{\psi}
+  ((\widehat{G}^{\bx_{<i}}_{g_{<i}}  \cdot \widehat{G}^{\bx_i}_{g_i} - \widehat{G}^{\bx_i}_{g_i}  \cdot \widehat{G}^{\bx_{<i}}_{g_{<i}})  \cdot  (\widehat{G}^{\bx_i}_{g_i}\cdot (\widehat{G}^{\bx_{<i}}_{g_{<i}})^\dagger - (\widehat{G}^{\bx_{<i}}_{g_{<i}})^\dagger \cdot \widehat{G}^{\bx_i}_{g_i})) \otimes I \ket{\psi}}\\
+  \cdot \sqrt{\E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_1, \dots, g_i: g_i \neq \bot}  \bra{\psi}
+  (\widehat{G}^{\bx_{<i}}_{g_{<i}}  \cdot \widehat{G}^{\bx_i}_{g_i} \cdot (\widehat{G}^{\bx_{<i}}_{g_{<i}} )^\dagger) \ot (I - B^{\bu}_{[f(\bx_i) =
+    g_i(\bu)]})^2 \ket{\psi}}.
+\end{multline*}
+The term inside the first square root is at most 
+\begin{equation}\label{eq:add-in-the-bot}
+\E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_1, \dots, g_i}   \bra{\psi}
+  ((\widehat{G}^{\bx_{<i}}_{g_{<i}}  \cdot \widehat{G}^{\bx_i}_{g_i} - \widehat{G}^{\bx_i}_{g_i}  \cdot \widehat{G}^{\bx_{<i}}_{g_{<i}})  \cdot  (\widehat{G}^{\bx_i}_{g_i}\cdot (\widehat{G}^{\bx_{<i}}_{g_{<i}})^\dagger - (\widehat{G}^{\bx_{<i}}_{g_{<i}})^\dagger \cdot \widehat{G}^{\bx_i}_{g_i})) \otimes I \ket{\psi},
+\end{equation}
+which is at most~$\nu_4$ by \Cref{lem:commute-g-half-sandwich}.
+The term inside the second square root is at most~$1$ because~$B$ and~$\widehat{G}$ are measurements.
+Next, we claim that
+\begin{equation}\label{eq:even-bigger-CS}
+\eqref{eq:gonna-need-a-bigger-cauchy-schwarz}
+\approx_{\sqrt{\nu_4}}
+\E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_1, \dots, g_i: g_i \neq \bot} \bra{\psi}\widehat{G}^{\bx_i}_{g_i} \cdot
+  \widehat{G}^{\bx_{<i}}_{g_{<i}}  \cdot (\widehat{G}^{\bx_{<i}}_{g_{<i}} )^\dagger \cdot  \widehat{G}^{\bx_i}_{g_i}\ot (I - B^{\bu}_{[f(\bx_i) =
+    g_i(\bu)]}) \ket{\psi}.
+\end{equation}
+To show this, we bound the magnitude of the difference.
+\begin{multline*}
+\E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_1, \dots, g_i: g_i \neq \bot}  \bra{\psi}
+   (\widehat{G}^{\bx_i}_{g_i} \cdot \widehat{G}^{\bx_{<i}}_{g_{<i}} \ot (I - B^{\bu}_{[f(\bx_i) =
+    g_i(\bu)]})) \cdot (((\widehat{G}^{\bx_{<i}}_{g_{<i}})^\dagger  \cdot \widehat{G}^{\bx_i}_{g_i} - \widehat{G}^{\bx_i}_{g_i}  \cdot (\widehat{G}^{\bx_{<i}}_{g_{<i}})^\dagger) \otimes I) \ket{\psi}\\
+    \leq 
+    \sqrt{\E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_1, \dots, g_i: g_i \neq \bot}  \bra{\psi}
+  (\widehat{G}^{\bx_i}_{g_i} \cdot\widehat{G}^{\bx_{<i}}_{g_{<i}}  \cdot  (\widehat{G}^{\bx_{<i}}_{g_{<i}} )^\dagger \cdot \widehat{G}^{\bx_i}_{g_i}) \ot (I - B^{\bu}_{[f(\bx_i) =
+    g_i(\bu)]})^2 \ket{\psi}}\\
+    \cdot
+    \sqrt{\E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_1, \dots, g_i: g_i \neq \bot}   \bra{\psi}
+  ((\widehat{G}^{\bx_{<i}}_{g_{<i}}  \cdot \widehat{G}^{\bx_i}_{g_i} - \widehat{G}^{\bx_i}_{g_i}  \cdot \widehat{G}^{\bx_{<i}}_{g_{<i}})  \cdot  ((\widehat{G}^{\bx_{<i}}_{g_{<i}})^\dagger  \cdot \widehat{G}^{\bx_i}_{g_i} - \widehat{G}^{\bx_i}_{g_i}  \cdot (\widehat{G}^{\bx_{<i}}_{g_{<i}}))^\dagger) \otimes I \ket{\psi}}.
+\end{multline*}
+The term inside the first square root is at most~$1$ because~$B$ and $\widehat{G}$ are measurements.
+The term inside the second square root is at most \Cref{eq:add-in-the-bot},
+which is at most~$\nu_4$ by \Cref{lem:commute-g-half-sandwich}.
+But
+\begin{align*}
+\sum_{g_1, \ldots, g_{i-1}} \widehat{G}^{x_{<i}}_{g_{<i}} \cdot (\widehat{G}^{x_{<i}}_{g_{<i}})^\dagger
+&= \sum_{g_1, \ldots, g_{i-1}} \widehat{G}^{x_1}_{g_1} \cdots \widehat{G}^{x_{i-1}}_{g_{i-1}} \cdot \widehat{G}^{x_{i-1}}_{g_{i-1}}  \cdots \widehat{G}^{x_{1}}_{g_{1}}\\
+&= \sum_{g_1, \ldots, g_{i-2}} \widehat{G}^{x_1}_{g_1} \cdots \Big(\sum_{g_{i-1}} \widehat{G}^{x_{i-1}}_{g_{i-1}} \Big)  \cdots \widehat{G}^{x_{1}}_{g_{1}}\\
+&= \sum_{g_1, \ldots, g_{i-2}} \widehat{G}^{x_1}_{g_1} \cdots I  \cdots \widehat{G}^{x_{1}}_{g_{1}}\\
+& \cdots\\
+& = I.
+\end{align*}
+Thus,
+\begin{equation*}
+\eqref{eq:even-bigger-CS}
+= 
+\E_{\bu}  \E_{\bx_1, \dots, \bx_i} \sum_{g_i: g_i \neq \bot} \bra{\psi}\widehat{G}^{\bx_i}_{g_i} \ot (I - B^{\bu}_{[f(\bx_i) =
+    g_i(\bu)]}) \ket{\psi} \leq \nu_1,
+\end{equation*}
+by \Cref{eq:ld-gbcon}.
+In total, using $\sqrt{426} \leq 21$, this gives an error of
+\begin{align*}
+\nu_1 + 2 \sqrt{\nu_4}
+& = \zeta + \sqrt{8m\eps + 4\delta} + 2\cdot \sqrt{426 k^2 m \cdot \left(\gamma^{1/16} + \zeta^{1/16} +  (d/q)^{1/16}\right)}\\
+& \leq \zeta^{1/32} + 3m \eps^{1/32} + 2 \delta^{1/32} + 42 km \cdot \left(\gamma^{1/32} + \zeta^{1/32} + (d/q)^{1/32}\right)\\
+& \leq 43 km \cdot \left(\eps^{1/32} + \delta^{1/32} +\gamma^{1/32} + \zeta^{1/32} +  (d/q)^{1/32}\right).
+\end{align*}
+This completes the proof.
+\end{proof}
+
+\subsection{Consistency of~$H$ with~$A$}
+\label{sec:consistency-of-h-with-a}
+
+\begin{lemma}[Consistency of~$H$ with~$B$]\label{lem:h-b-consistency}
+\begin{equation*}
+H_{[h|_u =f]} \otimes I \simeq_{\nu_6} I \otimes B^u_f,
+\end{equation*}
+where
+\begin{equation*}
+\nu_6 = 44 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} + \gamma^{1/32} + \zeta^{1/32} + (d/q)^{1/32}\right).
+\end{equation*}
+\end{lemma}
+\begin{proof}
+Let $\bx_1, \ldots, \bx_k \sim \F_q$ be independent and uniformly random.
+Our goal is to bound
+\begin{align}
+&\E_{\bu} \sum_{f \neq f'} \bra{\psi} H_{[h|_{\bu} = f']} \otimes B^{\bu}_f \ket{\psi}\nonumber\\
+=~&\E_{\bu} \sum_{h}\sum_{f \neq h|_{\bu}} \bra{\psi} H_{h} \otimes B^{\bu}_f \ket{\psi}\nonumber\\
+=~&\E_{\bu}\E_{\bx_1, \ldots, \bx_k} \sum_{h}\sum_{f \neq h|_{\bu}} \bra{\psi} H^{\bx_1, \ldots, \bx_k}_{h} \otimes B^{\bu}_f \ket{\psi}\nonumber\\
+=~&\E_{\bu}\E_{\bx_1, \ldots, \bx_k} \sum_{h} \sum_{w: |w| \geq d+1} \sum_{f \neq h|_{\bu}} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{h_w} \otimes B^{\bu}_f \ket{\psi}\nonumber\\
+=~&\E_{\bu}\E_{\bx_1, \ldots, \bx_k} \sum_{h} \sum_{w: |w| \geq d+1} \sum_{(g_1, \ldots, g_k) = h_w} \sum_{f \neq h|_{\bu}} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi}.\label{eq:keep-on-expandin}
+\end{align}
+We note that the sum over $(g_1, \ldots, g_k) = h_w$ in the final step is trivial
+because there is only ever one tuple $(g_1, \ldots, g_k)$ which is equal to $h_w$.
+Because $|w| \geq d+1$,
+there exist at least $(d+1)$ coordinates~$i$ such that $g_i \neq \bot$
+and hence $g_i = h|_{\bx_i}$.
+Since~$f$ is degree-$d$, if it is not equal to $h|_{\bu}$,
+then there must exist an $i$ such that $g_i \neq \bot$ and $g_i(\bu) \neq f(\bx_i)$.
+Thus,
+\begin{align}
+\eqref{eq:keep-on-expandin}
+~=~& \E_{\bu}\E_{\bx_1, \ldots, \bx_k} \sum_{h} \sum_{w: |w| \geq d+1} \sum_{(g_1, \ldots, g_k) = h_w} \sum_{\substack{f: \exists i: g_i \neq \bot, \\g_i(\bu) \neq f(\bx_i)} }\bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi}\nonumber\\
+\leq~&\E_{\bu}\E_{\bx_1, \ldots, \bx_k} \sum_{g_1, \ldots, g_k} \sum_{\substack{f: \exists i: g_i \neq \bot, \\g_i(\bu) \neq f(\bx_i)}} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi}.\label{eq:keep-on-contractin}
+\end{align}
+Let $(\by_1, \ldots, \by_k) \sim \distinct{k}$. Then by \Cref{prop:ld-dnoteq}, \Cref{eq:keep-on-contractin}
+is $(k^2/q)$-close to
+\begin{align*}
+&\E_{\bu}\E_{\by_1, \ldots, \by_k} \sum_{g_1, \ldots, g_k} \sum_{\substack{f: \exists i: g_i \neq \bot, \\g_i(\bu) \neq f(\by_i)}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi}\\
+\leq~&
+\sum_i \E_{\bu}\E_{\by_1, \ldots, \by_k} \sum_{g_1, \ldots, g_k} \sum_{\substack{f: g_i \neq \bot, \\g_i(\bu) \neq f(\by_i)}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi} \tag{by the union bound}\\
+=~&
+\sum_i \E_{\bu}\E_{\by_1, \ldots, \by_k} \sum_{g_1, \ldots, g_k:g_i \neq \bot} \sum_{a \neq g_i(\bu)} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_{[f(\by_i)=a]} \ket{\psi}\\
+\leq~& \sum_i \nu_5 \tag{by \Cref{lem:ld-sandwich-line-one-point}}\\
+=~& k \cdot \nu_5.
+\end{align*}
+In total, using $1/q \leq (d/q)^{1/32}$, this gives an error of
+\begin{align*}
+\frac{k^2}{q} + k \cdot \nu_5
+& = \frac{k^2}{q} + k \cdot 43 km \cdot \left(\eps^{1/32} + \delta^{1/32} + \gamma^{1/32} + \zeta^{1/32} + (d/q)^{1/32}\right)\\
+& = 44 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} + \gamma^{1/32} + \zeta^{1/32} + (d/q)^{1/32}\right).
+\end{align*}
+This completes the proof.
+\end{proof}
+
+\begin{corollary}[Consistency of~$H$ with~$A$; Proof of \Cref{item:ld-pasting-N-consistency-sub-measurement} in \Cref{lem:ld-pasting-sub-measurement}]
+\begin{equation*}
+H_{[h(u, x)=a]} \otimes I \simeq_{\nu} I \otimes A^{u,x}_a.
+\end{equation*}
+\end{corollary}
+\begin{proof}
+\Cref{lem:h-b-consistency} implies that
+\begin{equation}\label{eq:h-b-consistency-at-a-point}
+H_{[h(u, x)=a]} \otimes I \simeq_{\nu_6} I \otimes B^{u}_{[f(x)=a]}.
+\end{equation}
+\Cref{prop:triangle-sub} applied to \Cref{eq:h-b-consistency-at-a-point} and \Cref{eq:ld-abcon} implies that
+\begin{equation*}
+H_{[h(u, x)=a]} \otimes I \simeq_{\nu_6 + \sqrt{8m \eps + 4\delta}} I \otimes A^{u,x}_a.
+\end{equation*}
+We can bound this error by
+\begin{align*}
+\sqrt{8m \eps + 4\delta} + \nu_6
+& = \sqrt{8m \eps + 4\delta}
+	+ 44 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} +  \gamma^{1/32} +\zeta^{1/32} + (d/q)^{1/32}\right)\\
+& \leq 3m \eps^{1/32} + 2\delta^{1/32}
+	+ 44 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} +  \gamma^{1/32} + \zeta^{1/32} +(d/q)^{1/32}\right)\\
+& \leq  47 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} +  \gamma^{1/32} + \zeta^{1/32} +(d/q)^{1/32}\right).
+\end{align*}
+This is clearly at most~$\nu$, which completes the proof.
+\end{proof}
+
+\subsection{Completeness of~$H$}
+\label{sec:completeness-of-h-low-degree}
+
+\begin{definition}
+Let $\tau \in \{0, 1\}^k$ be a type.
+We define the following two subsets of $\calP^+(m,q,d)^k$.
+\begin{itemize}
+\item
+We define $\mathsf{Outcomes}_{\tau}$ to be the set of tuples $(g_1, \ldots, g_k)$ such that $g_i  \in \polyfunc{m}{q}{d}$ for each $i \in \tau$ and $g_i = \bot$ for each $i \notin \tau$.
+This is the set of possible outcomes of the $\widehat{H}$ measurement of type~$\tau$.
+\item
+Let $x_1, \ldots, x_k \in \F_q$.
+We define $\mathsf{Global}_{\tau}(x)$ to be the subset of $\mathsf{Outcomes}_{\tau}$ containing only those tuples which are consistent with a global polynomial. In other words, $(g_1, \ldots, g_k) \in \mathsf{Global}_{\tau}(x)$ if there exists an $h \in \polyfunc{m+1}{q}{d}$ such that $g_i = h|_{x_i}$ for each $i \in \tau$.
+Next, we define
+\begin{equation*}
+\overline{\mathsf{Global}_{\tau}(x)} = \mathsf{Outcomes}_{\tau} \setminus \mathsf{Global}_{\tau}(x).
+\end{equation*}
+This contains those tuples of type~$\tau$ with no consistent global polynomial.
+\end{itemize}
+\end{definition}
+
+\begin{lemma}
+\label{lem:over-all-outcomes}
+Let $\bx_1, \ldots, \bx_k \sim \F_q$ be sampled uniformly at random.
+Then
+\begin{equation*}
+\bra{\psi} H \otimes I \ket{\psi}
+\approx_{\nu_7}  \E_{\bx_1, \ldots, \bx_k} \sum_{\tau:|\tau| \geq d+1} \sum_{(g_1, \ldots, g_k) \in \mathsf{Outcomes}_{\tau}} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes I \ket{\psi},
+\end{equation*}
+where
+\begin{equation*}
+\nu_7 = 46 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} +\gamma^{1/32} +  \zeta^{1/32} + (d/q)^{1/32}\right).
+\end{equation*}
+\end{lemma}
+\begin{proof}
+Let $(\by_1, \ldots, \by_k) \sim \mathsf{Distinct}_k$.
+By definition,
+\begin{align}
+\bra{\psi} H \otimes I \ket{\psi}
+&= \sum_h \bra{\psi} H_h \otimes I \ket{\psi}\nonumber\\
+&= \E_{\by_1, \ldots, \by_k} \sum_h \bra{\psi} H^{\by_1, \ldots, \by_k}_h \otimes I \ket{\psi}\nonumber\\
+&= \E_{\by_1, \ldots, \by_k} \sum_h \sum_{\tau:|\tau| \geq d+1} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{h_{\tau}} \otimes I \ket{\psi}\nonumber\\
+&= \E_{\by_1, \ldots, \by_k} \sum_h \sum_{\tau:|\tau| \geq d+1} \sum_{(g_1, \ldots, g_k) = h_\tau} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes I \ket{\psi}\nonumber\\
+&= \E_{\by_1, \ldots, \by_k}  \sum_{\tau:|\tau| \geq d+1} \sum_{(g_1, \ldots, g_k) \in \mathsf{Global}_{\tau}(\by)} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes I \ket{\psi}. \label{eq:sum-restricted-to-global-polynomial}
+\end{align}
+The sum in \Cref{eq:sum-restricted-to-global-polynomial}
+is over $g_1, \ldots, g_k$ which are consistent with a global polynomial.
+We will now show that the value of this sum
+remains largely unchanged if we drop this condition.
+In particular, we claim that
+\begin{equation}\label{eq:remove-the-restriction}
+\eqref{eq:sum-restricted-to-global-polynomial}
+\approx_{\frac{k^2}{q} + k \cdot\nu_5 + \frac{md}{q}}
+\E_{\by_1, \ldots, \by_k}  \sum_{\tau:|\tau| \geq d+1} \sum_{(g_1, \ldots, g_k) \in \mathsf{Outcomes}_{\tau}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes I \ket{\psi}.
+\end{equation}
+To show this, we note that $\eqref{eq:remove-the-restriction} \geq \eqref{eq:sum-restricted-to-global-polynomial}$. Hence, it suffices to upper bound their difference.
+\begin{align}
+\eqref{eq:remove-the-restriction} - \eqref{eq:sum-restricted-to-global-polynomial}
+&= \E_{\by_1, \ldots, \by_k} \sum_{\tau:|\tau| \geq d+1} \sum_{(g_1, \ldots, g_k) \in \overline{\mathsf{Global}_{\tau}(\by)}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes I \ket{\psi}\nonumber\\
+&=  \E_{\bu} \E_{\by_1, \ldots, \by_k}  \sum_{\tau:|\tau| \geq d+1} \sum_f \sum_{(g_1, \ldots, g_k) \in \overline{\mathsf{Global}_{\tau}(\by)}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi},\label{eq:B-appears-out-of-thin-air}
+\end{align}
+because~$B$ is a measurement. Next, we claim that
+\begin{equation}\label{eq:add-in-indicator-for-f-and-g}
+\eqref{eq:B-appears-out-of-thin-air}
+\approx_{\frac{k^2}{q} + k \cdot\nu_5} 
+\E_{\bu} \E_{\by_1, \ldots, \by_k}   \sum_{\tau:|\tau| \geq d+1} \sum_f \sum_{(g_1, \ldots, g_k) \in \overline{\mathsf{Global}_{\tau}(\by)}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi} \cdot \bone[\forall i\in \tau, f(\by_i) = g_i(\bu)].
+\end{equation}
+To show this, we note that $\eqref{eq:B-appears-out-of-thin-air} \geq \eqref{eq:add-in-indicator-for-f-and-g}$.
+Thus, it suffices to upper bound their difference $\eqref{eq:B-appears-out-of-thin-air} - \eqref{eq:add-in-indicator-for-f-and-g}$. This is given by
+\begin{equation}\label{eq:about-to-swap-x-for-y}
+\E_{\bu} \E_{\by_1, \ldots, \by_k}  \sum_{\tau: |\tau|\geq d+1} \sum_f  \sum_{(g_1, \ldots, g_k) \in \overline{\mathsf{Global}_{\tau}(\by)}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi} \cdot \bone[\exists i \in \tau, f(\by_i) \neq g_i(\bu)].
+\end{equation}
+Recall that $\bx_1, \ldots, \bx_k \sim \F_q$ are sampled independently and uniformly at random.
+Then \Cref{prop:ld-dnoteq} implies that \Cref{eq:about-to-swap-x-for-y} is $(k^2/q)$-close to
+\begin{align*}
+ &\E_{\bu} \E_{\bx_1, \ldots, \bx_k}  \sum_{\tau: |\tau|\geq d+1} \sum_f  \sum_{(g_1, \ldots, g_k) \in \overline{\mathsf{Global}_{\tau}(\bx)}} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi} \cdot \bone[\exists i \in \tau, f(\bx_i) \neq g_i(\bu)]\\
+ \leq~& \E_{\bu} \E_{\bx_1, \ldots, \bx_k}   \sum_{\tau:|\tau| \geq d+1} \sum_f \sum_{(g_1, \ldots, g_k) \in \mathsf{Outcomes}_{\tau}} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi} \cdot \bone[\exists i \in \tau, f(\bx_i) \neq g_i(\bu)]\\
+ \leq~& \E_{\bu} \E_{\bx_1, \ldots, \bx_k}   \sum_{\tau} \sum_f \sum_{(g_1, \ldots, g_k) \in \mathsf{Outcomes}_{\tau}} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi} \cdot \bone[\exists i \in \tau, f(\bx_i) \neq g_i(\bu)]\\
+ \leq~&  \E_{\bu} \E_{\bx_1, \ldots, \bx_k}  \sum_{\tau} \sum_f \sum_{(g_1, \ldots, g_k) \in \mathsf{Outcomes}_{\tau}} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi} \cdot \Big(\sum_{i\in \tau} \bone[f(\bx_i) \neq g_i(\bu)]\Big)\\
+ =~& \sum_i  \E_{\bu} \E_{\bx_1, \ldots, \bx_k}  \sum_{g_1, \ldots, g_k : g_i \neq \bot} \sum_{f: f(\bx_i) \neq g_i(\bu)} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi}\\
+ =~& \sum_i  \E_{\bu} \E_{\bx_1, \ldots, \bx_k}  \sum_{g_1, \ldots, g_k : g_i \neq \bot} \sum_{a \neq g_i(\bu)} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_{[f(\bx_i)=a]} \ket{\psi}\\
+ \leq~& \sum_i (\nu_5) \tag{by \Cref{lem:ld-sandwich-line-one-point}}\\
+ =~& k \cdot \nu_5.
+\end{align*}
+
+Returning to \Cref{eq:add-in-indicator-for-f-and-g},
+we introduce the  notation $\mathsf{Consistent}_{\tau}(g, \by, \bu)$
+to indicate whether there is a consistent degree-$d$ polynomial
+interpolating the $g_i$'s along the line in direction~$u$.
+In other words,
+\begin{equation*}
+\mathsf{Consistent}_{\tau}(g, \by, \bu)
+= \left\{\begin{array}{rl}
+	1 & \text{if $\exists f$ such that $f(\by_i) = g_i(\bu)$ for all $i \in \tau$,}\\
+	0 & \text{otherwise.}
+	\end{array}\right.
+\end{equation*}
+Clearly, for any $f$,
+\begin{equation*}
+\bone[\forall i\in \tau, f(\by_i) = g_i(\bu)] \leq \bone[\mathsf{Consistent}_{\tau}(g, \by, \bu)]
+\end{equation*}
+because the left-hand side indicates whether~$f$ is the consistent degree-$d$ polynomial
+interpolating along direction~$u$.
+As a result,
+\begin{align}
+\eqref{eq:add-in-indicator-for-f-and-g}
+\leq~&
+\E_{\bu} \E_{\by_1, \ldots, \by_k} \sum_{\tau:|\tau|\geq d+1} \sum_f  \sum_{(g_1, \ldots, g_k) \in \overline{\mathsf{Global}_{\tau}(\by)}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes B^{\bu}_f \ket{\psi} \cdot \bone[\mathsf{Consistent}_{\tau}(g,\by,\bu)]\nonumber\\
+=~&
+\E_{\bu} \E_{\by_1, \ldots, \by_k} \sum_{\tau:|\tau|\geq d+1} \sum_{(g_1, \ldots, g_k) \in \overline{\mathsf{Global}_{\tau}(\by)}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes \Big(\sum_f B^{\bu}_f\Big) \ket{\psi} \cdot \bone[\mathsf{Consistent}_{\tau}(g,\by,\bu)]\nonumber\\
+=~&
+\E_{\bu} \E_{\by_1, \ldots, \by_k}   \sum_{\tau:|\tau|\geq d+1} \sum_{(g_1, \ldots, g_k)  \in \overline{\mathsf{Global}_{\tau}(\by)}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes I \ket{\psi} \cdot \bone[\mathsf{Consistent}_{\tau}(g,\by,\bu)]\nonumber\\
+=~&
+ \E_{\by_1, \ldots, \by_k}   \sum_{\tau:|\tau|\geq d+1} \sum_{(g_1, \ldots, g_k) \in \overline{\mathsf{Global}_{\tau}(\by)}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes I \ket{\psi} \cdot \Pr_{\bu}[\mathsf{Consistent}_{\tau}(g,\by,\bu)].\label{eq:consistent-indicator}
+\end{align}
+
+Let us now fix $(y_1, \ldots, y_k) \in \mathsf{Distinct}_k$,
+a type $\tau$ such that $|\tau| \geq d+1$,
+and $(g_1, \ldots, g_k) \in \overline{\mathsf{Global}_{\tau}(y)}$.
+Suppose without loss of generality that $\tau_1 = \cdots = \tau_{d+1} = 1$,
+so that $g_1, \ldots, g_{d+1} \in \polyfunc{m}{q}{d}$.
+Then there is a unique polynomial $h^* \in \polyfunc{m+1}{q}{d}$ which interpolates $g_1, \ldots, g_{d+1}$.
+In other words, for all $1 \leq i \leq d+1$,
+\begin{equation*}
+h^*(u, y_i) = g_i(u).
+\end{equation*}
+In addition, for any $u$, 
+$(h^*)|_u$ is the unique degree-$d$ polynomial
+which interpolates $g_1, \ldots, g_{d+1}$ along the line in direction~$u$.
+Thus, if there is a consistent degree-$d$ polynomial interpolating all the $g_i$'s along the line in direction~$u$,
+then it is $(h^*)|_u$.
+In math,
+\begin{equation*}
+\mathsf{Consistent}_{\tau}(g, y,u) = 1
+\qquad \text{if and only if} \qquad
+\forall i \in \tau, g_i(u) = h^*(u, y_i).
+\end{equation*}
+On the other hand, because $(g_1, \ldots, g_k) \in \overline{\mathsf{Global}_{\tau}(y)}$, 
+there exists an $i^* \in \tau$ such that $g_{i^*} \neq (h^*)|_{y_{i^*}}$.
+Hence,
+\begin{equation*}
+\Pr_{\bu}[\mathsf{Consistent}_{\tau}(g, y,\bu)]
+\leq \Pr_{\bu}[g_{i^*}(\bu) = h^*(\bu, y_{i^*})]
+= \Pr_{\bu}[g_{i^*}(\bu) = (h^*)|_{y_{i^*}}(\bu)]
+\leq \frac{md}{q},
+\end{equation*}
+by Schwartz-Zippel.
+As a result,
+\begin{align*}
+\eqref{eq:consistent-indicator}
+& \leq 
+ \E_{\by_1, \ldots, \by_k}   \sum_{\tau:|\tau|\geq d+1} \sum_{(g_1, \ldots, g_k) \in \overline{\mathsf{Global}_{\tau}(\by)}} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes I \ket{\psi} \cdot \frac{md}{q}\\
+ &\leq
+  \E_{\by_1, \ldots, \by_k}   \sum_{g_1, \ldots, g_k} \bra{\psi} \widehat{H}^{\by_1, \ldots, \by_k}_{g_1, \ldots, g_k} \otimes I \ket{\psi} \cdot \frac{md}{q}\\
+  & = \frac{md}{q}.
+\end{align*}
+This establishes \Cref{eq:remove-the-restriction}.
+Finally, \Cref{prop:ld-dnoteq} implies that \Cref{eq:remove-the-restriction} is $(k^2/q)$-close to
+\begin{equation*}
+\E_{\bx_1, \ldots, \bx_k}  \sum_{\tau:|\tau| \geq d+1} \sum_{(g_1, \ldots, g_k) \in \mathsf{Outcomes}_{\tau}} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes I \ket{\psi}.
+\end{equation*}
+In total, this gives an error of
+\begin{align*}
+2 \frac{k^2}{q}  + \frac{md}{q}+ k \cdot \nu_5
+& = 2 \frac{k^2}{q}  + \frac{md}{q} + k \cdot 43 km \cdot \left(\eps^{1/32} + \delta^{1/32} + \gamma^{1/32} + \zeta^{1/32} +  (d/q)^{1/32}\right)\\
+& \leq 3 \frac{k^2 md}{q}  +  43 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} +\gamma^{1/32} +\zeta^{1/32} +  (d/q)^{1/32}\right)\\
+& \leq 3 k^2 m (d/q)^{1/32}  +  43 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} +\gamma^{1/32} +  \zeta^{1/32} + (d/q)^{1/32}\right)\\
+& \leq  46 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} + \gamma^{1/32} +  \zeta^{1/32} +(d/q)^{1/32}\right).
+\end{align*}
+This completes the proof of the lemma.
+\end{proof}
+
+\ignore{
+
+\subsection{Interpolation}
+\label{sec:ld-interpolation}
+We define the measurement
+\[ N_{h} = \sum_{w: |w|  \geq d+1} \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}} H^{\bx_1,
+    \dots, \bx_k}_{h_w}, \]
+where $\calD_{\neq}$ is the uniform distribution over $k$-tuples of
+\emph{distinct} elements of $\F_q$, and the notation $h_w$ is shorthand for the tuple $(h_1, \dots,
+h_k)$ where $h_i = \bot$ if $w_i = 0$ and $= h_{|\bx_i}$
+otherwise. For a given $w$, we
+denote the set of such tuples $(h_1, \dots, h_k)$ by $T_w$. We will
+also denote the set of tuples $(h_1, \dots, h_k)$ where $h_i = \bot$
+if $w_i = 0$ and $h_i \neq \bot$ otherwise by $S_w$. Note that $T_w
+\subset S_w$, as $T_w$ only includes tuples where the non-$\bot$
+polynomials are consistent with a single global polynomial.
+
+For any tuple in $S_w$, define $\interp(h_1, \dots, h_k)$ to be the unique polynomial
+interpolating the first non-$\bot$ elements of the tuple $h_1, \dots, h_k$.
+
+
+
+
+
+\begin{lemma}
+Consistency with $B$: For all $i$, and for tuples $x_1, \dots, x_k$
+sampled according to the distribution $\calD_{\neq}$
+\[ H^{x_1, \dots, x_k}_{[g_i(w) = a]} \ot I \simeqbot_{\delta_{\rmcons}} I \ot
+  B^{w}_{[f(x_i) = a]}, \]
+where $\delta_{\rmcons} = \nu_1 + k\cdot(8\zeta + 2\nu_{\rmcom})
++ k^2/q$.
+\label{lem:ld-sandwich-line-one-point-neq}
+\end{lemma}
+\begin{proof}
+  We relate the inconsistency we wish to bound to the inconsistency in
+  \Cref{lem:ld-sandwich-line-one-point}, by using the closeness of
+  $\calD_{\neq}$ and the uniform distribution (\Cref{prop:ld-dnoteq}).
+  \ainnote{TODO: fill in details}
+\end{proof}
+
+\subsection{Consistency of the interpolated measurement}
+
+
+
+\begin{lemma}[\Cref{item:ld-pasting-N-consistency} of \Cref{thm:ld-pasting}]
+  \[ N_{h} \ot I \simeqbot_{k \cdot \delta_{\rmcons}} I \ot B^{u}_{h_{|u}}. \]
+  \label{lem:N-B-consistency}
+\end{lemma}
+\begin{proof}
+  We will apply \Cref{lem:ld-sandwich-line-one-point-neq}, which states that
+  \[ H^{x_1, \dots, x_k}_{[g_i(w) = a]} \ot I \simeqbot_{\delta_{\rmcons}} I \ot
+    B^{u}_{[f(x_i) = a]}, \]
+  where $x_1, \dots, x_k$ are sampled from $\calD_{\neq}$.
+Writing out the meaning of this consistency, we obtain that
+\[ \E_{\bu}  \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}} \sum_{g_1, \dots, g_k: g_i \neq \bot}  \sum_{a \neq
+    g_i(\bu)} \bra{\psi}
+  H^{\bx_1, \dots, \bx_k}_{g_1, \dots, g_k} \ot B^{\bu}_{[f(\bx_i) =
+    a]} \ket{\psi} \leq \delta_{\rmcons}. \]
+By a simple union bound, it thus follows that
+\[ \E_{\bu} \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}} \sum_{g_1, \dots, g_k} \sum_{f:
+    \exists i, g_{i} \neq \bot \wedge f(\bx_i) \neq g_i(\bu)} \bra{\psi}  H^{\bx_1, \dots, \bx_k}_{g_1,
+    \dots, b_k} \ot B^{\bu}_{f} \ket{\psi} \leq k \cdot \delta_{\rmcons}. \]
+
+Using this inconsistency bound, we may now calculate the inconsistency
+of $N_h$ with $B$:
+\begin{align}
+  &\E_{\bu} \sum_{h} \sum_{f \neq h_{|\bu}}  \bra{\psi}
+    N_{h} \ot B^{\bu}_{f} \ket{\psi} \\
+  =~&\E_{\bu} \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}} \sum_{w: |w|
+      \geq d+1} \sum_{(h_1, \dots, h_k) \in T_w}  \sum_{f \neq
+      \interp(h_1, \dots, h_k)_{|\bu}}  \bra{\psi}
+    H^{\bx_1, \dots, \bx_k}_{h_1, \dots, h_k} \ot B^{\bu}_{f}
+      \ket{\psi} \\
+  \leq~&\E_{\bu} \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}} \sum_{w: |w|
+      \geq d+1} \sum_{(h_1, \dots, h_k) \in T_w}  \sum_{f: \exists i
+            \in w,
+            h_i(\bu) \neq f(\bx_i) }  \bra{\psi}
+    H^{\bx_1, \dots, \bx_k}_{h_1, \dots, h_k} \ot B^{\bu}_{f} \ket{\psi} \\
+  \leq~& k \cdot \delta_{\rmcons}.
+\end{align}
+Here the notation $i \in w$ means an $i$ such that $w_i = 1$, and the
+first inequality follows from the fact that if $f \neq \interp(h_1,
+\dots, h_k)_{|\bu}$, then there must be at least one $i \in w$ such that
+$h_i(\bu) \neq f(\bx_i)$\anote{This follows from some sort of unique
+  interpolation fact which needs to be written up.}.
+\end{proof}
+
+
+\subsection{Stuff}
+}
+\ignore{
+\begin{lemma}[Self-consistency of multiple $\widehat{G}$'s]
+\label{lem:switch-g-half-sandwich}
+ For all $k \geq 2$,
+  \[ \widehat{G}^{x_1}_{g_1} \widehat{G}^{x_2}_{g_2} \dots \widehat{G}^{x_k}_{g_k} \ot I \approx_{2k^2\zeta} I \ot
+    \widehat{G}^{x_k}_{g_k} \dots \widehat{G}^{x_2}_{g_2} \widehat{G}^{x_1}_{g_1}. \]
+\end{lemma}
+\begin{proof}
+  The proof is by repeated application of \Cref{eq:gselfconall}
+  together with \Cref{prop:cab-approx-delta}:
+  \begin{align*}
+    \widehat{G}^{x_1}_{g_1} \widehat{G}^{x_2}_{g_2} \dots \widehat{G}^{x_k} _{g_k} \ot I
+    &\approx_{2\zeta}
+                                                             \widehat{G}^{x_1}_{g_1}
+                                                             \dots
+                                                             \widehat{G}^{x_{k-1}}_{g_{k-1}}
+                                                             \ot
+                                                             \widehat{G}^{x_k}_{g_k}
+    \\
+    &\approx_{2\zeta} \widehat{G}^{x_1}_{g_1} \dots \widehat{G}^{x_{k-2}}_{g_{k-2}} \ot
+      \widehat{G}^{x_k}_{g_k} \widehat{G}^{x_{k-1}}_{g_{k-1}} \\
+    &\dots \\
+    &\approx_{2\zeta} I \ot \widehat{G}^{x_k}_{g_k} \dots \widehat{G}^{x_1}_{g_1}.
+  \end{align*}
+  In total, we have $k$ applications of \Cref{eq:gselfconall} with error $2\zeta$ each.
+  By \Cref{prop:triangle-inequality-for-approx_delta}, this implies that
+  \begin{equation*}
+  \widehat{G}^{x_1}_{g_1} \widehat{G}^{x_2}_{g_2} \dots \widehat{G}^{x_k} _{g_k} \ot I
+  \approx_{2k^2 \zeta} I \ot \widehat{G}^{x_k}_{g_k} \dots \widehat{G}^{x_1}_{g_1},
+  \end{equation*}
+  as claimed.
+\end{proof}
+}
+
+\begin{lemma}
+\label{lem:from-H-to-G}
+Let $\bx_1, \ldots, \bx_k \sim \F_q$ be sampled uniformly at random.
+Then
+\begin{equation*}
+\E_{\bx_1, \dots, \bx_k} \sum_{\tau:|\tau| \geq d+1} 
+	\sum_{(g_1, \ldots, g_{k}) \in \outc_{\tau}} \bra{\psi} \widehat{H}^{\bx_1, \dots, \bx_k}_{g_1, \dots, g_k} \ot I \ket{\psi}
+\approx_{\nu_8}
+\sum_{i = d+1}^k \binom{k}{i} \bra{\psi} G^i (I-G)^{k-i} \otimes I \ket{\psi},
+\end{equation*}
+where
+\begin{equation*}
+\nu_8 = 46 k m \cdot \left( \gamma^{1/32} + \zeta^{1/32} +(d/q)^{1/32}\right).
+\end{equation*}
+\end{lemma}
+\begin{proof}
+We begin by introducing some notation that we will use throughout the proof.
+Let $\tau \in \{0, 1\}^k$ be a type.
+Then we define
+\begin{equation*}
+\tau_{< \ell}  = (\tau_1, \ldots, \tau_{\ell-1}) \in \{0, 1\}^{\ell-1},
+\quad
+\tau_{> \ell}  = (\tau_{\ell+1}, \ldots, \tau_{k}) \in \{0,1\}^{k-\ell},
+\end{equation*}
+and we define $\tau_{\leq \ell}$ and $\tau_{\geq \ell}$ similarly.
+In addition, given $(g_1, \ldots, g_k) \in \calP^+(m, q, d)^{k}$, we define
+\begin{equation*}
+g_{< \ell}  = (g_1, \ldots, g_{\ell-1}) \in \calP^+(m, q, d)^{\ell-1},
+\quad
+g_{> \ell}  = (g_{\ell+1}, \ldots, g_{k}) \in \calP^+(m, q, d)^{k-\ell}
+\end{equation*}
+and we define $g_{\leq \ell}$ and $g_{\geq \ell}$ similarly.
+Using this notation, we can write
+\begin{equation*}
+ \wH^{x_{\geq \ell}}_{g_{\geq \ell}} = \wH^{x_{\ell}, \ldots, x_k}_{g_{\ell}, \ldots, g_k}.
+\end{equation*}
+Next, we introduce the notation
+\begin{equation*}
+\wG^{x_{\geq \ell}}_{g_{\geq \ell}} = \wG^{x_{\ell}}_{g_{\ell}} \cdots \wG^{x_k}_{g_k}.
+\end{equation*}
+This satisfies the recurrence relation
+\begin{equation}\label{eq:G-recurrence}
+\wG^{x_{\geq \ell}}_{g_{\geq \ell}} = \wG^{x_{\ell}}_{g_{\ell}} \cdot \wG^{x_{> \ell}}_{g_{> \ell}}.
+\end{equation}
+Furthermore, we can write
+\begin{equation}\label{eq:split-H-into-two-Gs}
+ \wH^{x_{\geq \ell}}_{g_{\geq \ell}} = (\wG^{x_{\geq \ell}}_{g_{\geq \ell}}) \cdot (\wG^{x_{\geq \ell}}_{g_{\geq \ell}})^\dagger.
+\end{equation}
+Finally, we will write $\sfO_{\tau}$ as shorthand for $\outc_{\tau}$.
+
+
+
+To prove the lemma, we will show that for each $1 \leq \ell \leq k$,
+\begin{align}
+&\E_{\bx_{\geq \ell}} \sum_{\tau:|\tau| \geq d+1}  \sum_{g_{\geq \ell} \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} \widehat{H}^{\bx_{\geq \ell}}_{g_{\geq \ell}} \ot (G^{|\tau_{<\ell}|}\cdot (I-G)^{(\ell-1)-|\tau_{<\ell}|}) \ket{\psi}\nonumber\\
+\approx_{2\sqrt{2\zeta} + 2 \sqrt{\nu_4}}~&\E_{\bx_{>\ell}} \sum_{\tau:|\tau| \geq d+1} \sum_{g_{> \ell} \in \sfO_{\tau_{> \ell}}}
+	\bra{\psi} \widehat{H}^{\bx_{> \ell}}_{g_{> \ell}} \ot (G^{|\tau_{\leq \ell}|} \cdot (I-G)^{\ell-|\tau_{\leq\ell}|}) \ket{\psi}.
+	\label{eq:i-think-this-is-what-i'm-supposed-to-prove}
+\end{align}
+If we then repeatedly apply \Cref{eq:i-think-this-is-what-i'm-supposed-to-prove} for $\ell = 1, \ldots, k$,
+we derive
+\begin{align*}
+&\E_{\bx_1, \dots, \bx_k} \sum_{\tau:|\tau| \geq d+1} 
+	\sum_{(g_1, \ldots, g_{k}) \in \outc_{\tau}} \bra{\psi} \widehat{H}^{\bx_1, \dots, \bx_k}_{g_1, \dots, g_k} \ot I \ket{\psi}\\
+=~&\E_{\bx_{\geq 1}} \sum_{\tau:|\tau| \geq d+1} 
+	\sum_{g_{\geq 1} \in \sfO_{\tau}} \bra{\psi} \widehat{H}^{\bx_{\geq 1}}_{g_{\geq 1}} \ot I \ket{\psi}\\
+\approx_{2\sqrt{2\zeta} + 2 \sqrt{\nu_4}}~&\E_{\bx_{\geq 2}} \sum_{\tau:|\tau| \geq d+1} 
+	\sum_{g_{\geq 2} \in \sfO_{\tau_{\geq 2}}} \bra{\psi} \widehat{H}^{\bx_{\geq 2}}_{g_{\geq 2}} \ot (G^{|\tau_{\leq 1}|} \cdot (I-G)^{1-|\tau_{\leq1}|}) \ket{\psi}\\
+\approx_{2\sqrt{2\zeta} + 2 \sqrt{\nu_4}}~&\E_{\bx_{\geq 3}} \sum_{\tau:|\tau| \geq d+1} 
+	\sum_{g_{\geq 3} \in \sfO_{\tau_{\geq 3}}} \bra{\psi} \widehat{H}^{\bx_{\geq 3}}_{g_{\geq 3}} \ot (G^{|\tau_{\leq 2}|} \cdot (I-G)^{2-|\tau_{\leq2}|}) \ket{\psi}\\
+	\cdots&\\
+\approx_{2\sqrt{2\zeta} + 2 \sqrt{\nu_4}}~& \sum_{\tau:|\tau| \geq d+1} 
+	 \bra{\psi}I  \ot (G^{|\tau|} \cdot (I-G)^{k-|\tau|}) \ket{\psi}\\
+=~&\sum_{i = d+1}^k \binom{k}{i} \bra{\psi} I \otimes ( G^i (I-G)^{k-i} ) \ket{\psi}.
+\end{align*}
+In total, using $\sqrt{426}\leq 21$, this gives an error of
+\begin{align*}
+k \cdot(2\sqrt{2\zeta} + 2 \sqrt{\nu_4})
+& = k \cdot 2 \sqrt{2 \zeta} + 2 \cdot \sqrt{426 k^2 m \cdot \left( \gamma^{1/16} +\zeta^{1/16} + (d/q)^{1/16}\right)}\\
+& \leq 4k \cdot \zeta^{1/32} + 42 k m \cdot \left(\gamma^{1/32} + \zeta^{1/32} + (d/q)^{1/32}\right)\\
+& \leq 46 k m \cdot \left(\gamma^{1/32} +\zeta^{1/32} +  (d/q)^{1/32}\right).
+\end{align*}
+This proves the lemma.
+
+We now prove \Cref{eq:i-think-this-is-what-i'm-supposed-to-prove}.
+To begin, for each $1 \leq \ell \leq k+1$ and $\tau_{\geq \ell} \in \{0, 1\}^{k - \ell + 1}$,
+we define the matrix
+\begin{equation}\label{eq:S-def}
+S_{\tau_{\geq \ell}} = \sum_{\tau_{< \ell} : |\tau| \geq d+1} G^{|\tau_{<\ell}|}\cdot (I-G)^{(\ell-1)-|\tau_{<\ell}|}.
+\end{equation}
+Then the statement in \Cref{eq:i-think-this-is-what-i'm-supposed-to-prove} can be rewritten as
+\begin{align}
+&\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{g_{\geq \ell} \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} \widehat{H}^{\bx_{\geq \ell}}_{g_{\geq \ell}} \ot S_{\tau_{\geq \ell}}\ket{\psi}\nonumber\\
+\approx_{2\sqrt{2\zeta} + 2 \sqrt{\nu_4}}~&\E_{\bx_{> \ell}} \sum_{\tau_{>\ell}} \sum_{g_{>\ell} \in \sfO_{\tau_{> \ell}}}
+	\bra{\psi} \widehat{H}^{\bx_{>\ell}}_{g_{>\ell}} \ot S_{\tau_{>\ell}} \ket{\psi}.
+	\label{eq:i-think-this-is-what-i'm-supposed-to-prove-2}
+\end{align}
+To prove this, we will use several facts about $S_{\tau_{\geq \ell}}$.
+First, $S$ is Hermitian and positive semidefinite.
+This is because each term in \Cref{eq:S-def}
+is a product of~$G$ and $(I-G)$.
+These matrices commute with each other,
+and both are Hermitian and positive semidefinite.
+Next, $S$ is bounded:
+\begin{align}
+S_{\tau_{\geq \ell}}
+&= \sum_{\tau_{< \ell} : |\tau| \geq d+1} G^{|\tau_{<\ell}|}\cdot (I-G)^{(\ell-1)-|\tau_{<\ell}|}\nonumber\\
+&\leq \sum_{\tau_{< \ell} } G^{|\tau_{<\ell}|}\cdot (I-G)^{(\ell-1)-|\tau_{<\ell}|}\nonumber\\
+& = (G + (I-G))^{\ell-1}\nonumber\\
+& = I. \label{eq:S-bound}
+\end{align}
+In addition, for any $\tau_{\ell} \in \{0, 1\}$,
+\begin{align}
+\Big(\E_{\bx_{\ell}} \sum_{g_{\ell} \in \sfO_{\tau_{\ell}}} \wG^{\bx_{\ell}}_{g_{\ell}}\Big)
+& = \left\{ \begin{array}{cl}
+		G & \text{if } \tau_{\ell} = 1,\\
+		(I-G) & \text{if } \tau_{\ell} = 0,
+	\end{array}\right.\nonumber\\
+&= G^{\tau_{\ell}} \cdot (I - G)^{1 - \tau_{\ell}}.\label{eq:explicit-formula-for-G-expectation}
+\end{align}
+Thus, for any $\tau_{> \ell}$,
+\begin{align}
+\sum_{\tau_{\ell}} 
+	S_{\tau_{\geq \ell}} \cdot \Big(\E_{\bx_{\ell}} \sum_{g_{\ell} \in \sfO_{\tau_{\ell}}} \wG^{\bx_{\ell}}_{g_{\ell}}\Big)
+&= \sum_{\tau_{\ell}}  S_{\tau_{\geq \ell}} \cdot(G^{\tau_{\ell}} \cdot (I - G)^{1 - \tau_{\ell}})\nonumber\\
+&= \sum_{\tau_{\ell}}  \sum_{\tau_{< \ell} : |\tau| \geq d+1} G^{|\tau_{<\ell}|}\cdot (I-G)^{(\ell-1)-|\tau_{<\ell}|}
+	\cdot (G^{\tau_{\ell}} \cdot (I - G)^{1 - \tau_{\ell}})\nonumber\\
+&= \sum_{\tau_{\ell}}  \sum_{\tau_{< \ell} : |\tau| \geq d+1} G^{|\tau_{\leq \ell}|}\cdot (I-G)^{\ell-|\tau_{\leq\ell}|}\nonumber\\
+&= \sum_{\tau_{\leq \ell} : |\tau| \geq d+1} G^{|\tau_{\leq \ell}|}\cdot (I-G)^{\ell-|\tau_{\leq\ell}|}\nonumber\\
+&= S_{\tau_{> \ell}}.\label{eq:S-recurrence}
+\end{align}
+Finally, for any $\tau_{\geq \ell}$,
+\begin{align}
+&S_{\tau_{\geq \ell}}
+	\cdot \Big(\E_{\bx_{\ell}} \sum_{g_{\ell} \in \sfO_{\tau_{\ell}}} \wG^{\bx_{\ell}}_{g_{\ell}}\Big)
+	\cdot S_{\tau_{\geq \ell}}\nonumber\\
+ =~& S_{\tau_{\geq \ell}}
+	\cdot (G^{\tau_{\ell}} \cdot (I - G)^{1 - \tau_{\ell}})
+	\cdot S_{\tau_{\geq \ell}} \tag{by \Cref{eq:explicit-formula-for-G-expectation}}\\
+ =~& \sqrt{G^{\tau_{\ell}} \cdot (I - G)^{1 - \tau_{\ell}}} \cdot (S_{\tau_{\geq \ell}})^2
+	\cdot \sqrt{G^{\tau_{\ell}} \cdot (I - G)^{1 - \tau_{\ell}}}\tag{because $S_{\tau_{\geq \ell}}$ commutes with $G$ and $(I-G)$}\\
+\leq~& \sqrt{G^{\tau_{\ell}} \cdot (I - G)^{1 - \tau_{\ell}}} \cdot I
+	\cdot \sqrt{G^{\tau_{\ell}} \cdot (I - G)^{1 - \tau_{\ell}}} \tag{by \Cref{eq:S-bound}}\\
+=~& G^{\tau_{\ell}} \cdot (I - G)^{1 - \tau_{\ell}}\nonumber\\
+=~& \Big(\E_{\bx_{\ell}} \sum_{g_{\ell} \in \sfO_{\tau_{\ell}}} \wG^{\bx_{\ell}}_{g_{\ell}}\Big), \label{eq:S-sandwich}
+\end{align}
+where the last step uses \Cref{eq:explicit-formula-for-G-expectation} again.
+This concludes the set of facts we will need about $S_{\tau_{\geq \ell}}$.
+
+Now we prove \Cref{eq:i-think-this-is-what-i'm-supposed-to-prove-2}.
+To start, we write $\wH$ as a sandwich of $\wG$ operators, and move the
+rightmost $\wG^{\bx_{\ell}}_{g_{\ell}}$ to the second tensor factor.
+\begin{align}
+&\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, \ldots,g_k) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} \widehat{H}^{\bx_{\ell}, \dots, \bx_{k}}_{g_{\ell}, \dots, g_{k}} \ot S_{\tau_{\geq \ell}}\ket{\psi}\nonumber\\
+=~&\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, \ldots,g_k) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{\geq \ell}}_{g_{\geq \ell}} \cdot (\wG^{\bx_{\geq \ell}}_{g_{\geq \ell}})^\dagger) \ot S_{\tau_{\geq \ell}}\ket{\psi}\tag{by \Cref{eq:split-H-into-two-Gs}}\\
+=~&\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, \ldots,g_k) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{\geq \ell}}_{g_{\geq \ell}} \cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger \cdot \wG^{\bx_{\ell}}_{g_{\ell}}) \ot S_{\tau_{\geq \ell}}\ket{\psi}\tag{by \Cref{eq:G-recurrence}}\\
+\approx_{\sqrt{2\zeta}}~&\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, \ldots,g_k) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{\geq \ell}}_{g_{\geq \ell}} \cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger) \ot (S_{\tau_{\geq \ell}} \cdot \wG^{\bx_{\ell}}_{g_{\ell}})\ket{\psi}.\label{eq:move-g-over-there}
+\end{align}
+To justify the approximation, we bound the error.
+\begin{multline}\label{eq:call-again-later-part-tres}
+\Big|\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \mathsf{O}_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{\geq \ell}}_{g_{\geq \ell}}
+		\ot S_{\tau_{\geq \ell}}) \cdot (((\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger \ot I) \cdot (\wG^{\bx_{\ell}}_{g_{\ell}} \ot I - I \ot \wG^{\bx_{\ell}}_{g_{\ell}} ))\ket{\psi}\Big|\\
+\leq \sqrt{\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \mathsf{O}_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{\geq \ell}}_{g_{\geq \ell}} \cdot (\wG^{\bx_{\geq \ell}}_{g_{\geq \ell}})^\dagger)
+		\ot (S_{\tau_{\geq \ell}})^2 \ket{\psi}}\\
+\cdot \sqrt{\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{
+	(g_{\ell}, g_{>\ell}) \in \mathsf{O}_{\tau_{\geq \ell}}}
+		\bra{\psi} ((\wG^{\bx_{\ell}}_{g_{\ell}} \ot I - I \ot \wG^{\bx_{\ell}}_{g_{\ell}} )
+	\cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}} \cdot(\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger\ot I)
+	\cdot (\wG^{\bx_{\ell}}_{g_{\ell}} \ot I - I \ot \wG^{\bx_{\ell}}_{g_{\ell}} ))\ket{\psi}}.
+\end{multline}
+The expression inside the first square root is equal to 
+\begin{equation*}
+\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \mathsf{O}_{\tau_{\geq \ell}}}
+	\bra{\psi} \wH^{\bx_{\geq \ell}}_{g_{\geq \ell}}
+		\ot (S_{\tau_{\geq \ell}})^2 \ket{\psi},
+\end{equation*}
+which is at most~$1$ because $S_{\tau_{\geq \ell}} \leq I$ and $\widehat{H}$ is a sub-measurement.
+The expression inside the second square root is equal to
+\begin{align*}
+&\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{
+	(g_{\ell}, g_{>\ell}) \in \mathsf{O}_{\tau_{\geq \ell}}}
+		\bra{\psi} ((\wG^{\bx_{\ell}}_{g_{\ell}} \ot I - I \ot \wG^{\bx_{\ell}}_{g_{\ell}} )
+	\cdot (\wH^{\bx_{> \ell}}_{g_{> \ell}} \ot I)
+	\cdot (\wG^{\bx_{\ell}}_{g_{\ell}} \ot I - I \ot \wG^{\bx_{\ell}}_{g_{\ell}} ))\ket{\psi}\\
+\leq~&\E_{\bx_{\geq \ell}} \sum_{g_{\ell}, \ldots, g_{k}}
+		\bra{\psi} ((\wG^{\bx_{\ell}}_{g_{\ell}} \ot I - I \ot \wG^{\bx_{\ell}}_{g_{\ell}} )
+	\cdot (\wH^{\bx_{> \ell}}_{g_{> \ell}} \ot I)
+	\cdot (\wG^{\bx_{\ell}}_{g_{\ell}} \ot I - I \ot \wG^{\bx_{\ell}}_{g_{\ell}} ))\ket{\psi}\\
+\leq~& \E_{\bx_{\geq \ell}} \sum_{g_{\ell}}
+		\bra{\psi} (\wG^{\bx_{\ell}}_{g_{\ell}} \ot I - I \ot \wG^{\bx_{\ell}}_{g_{\ell}} )^2\ket{\psi}
+			\tag{because $\widehat{H}$ is a sub-measurement}\\
+\leq~& 2\zeta. \tag{by \Cref{cor:G-hat-facts}}
+\end{align*}
+We will now commute the leftmost $\wG^{x_\ell}_{g_\ell}$ in
+\Cref{eq:move-g-over-there} to the right in two stages. In the first stage, we have:
+\begin{align}
+\eqref{eq:move-g-over-there}
+&= \E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{\ell}}_{g_{\ell}} \cdot \wG^{\bx_{> \ell}}_{g_{> \ell}} \cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger) \ot (S_{\tau_{\geq \ell}} \cdot \wG^{\bx_{\ell}}_{g_{\ell}})\ket{\psi}\nonumber\\
+& \approx_{\sqrt{\nu_4}} \E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{> \ell}}_{g_{> \ell}} \cdot \wG^{\bx_{\ell}}_{g_{\ell}} \cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger) \ot (S_{\tau_{\geq \ell}} \cdot \wG^{\bx_{\ell}}_{g_{\ell}})\ket{\psi}.
+\label{eq:commute-g-part-one}
+\end{align}
+To justify the approximation, we bound the magnitude of the difference.
+\begin{multline}\label{eq:call-this-later}
+\Big|  \E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}
+  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+  \bra{\psi}     ([ \wG^{\bx_{>\ell}}_{g_{>\ell}},
+    \wG^{\bx_\ell}_{g_\ell} ] \otimes I) \cdot     ((\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger \ot
+    (S_{\tau_{\geq \ell}} \cdot
+  \wG^{\bx_\ell}_{g_\ell})) \ket{\psi} \Big|  \\
+  \leq \sqrt{ \E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}
+  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}} \bra{\psi} ([ \wG^{\bx_{>\ell}}_{g_{>\ell}},
+    \wG^{\bx_\ell}_{g_\ell} ]) \cdot ([ \wG^{\bx_{>\ell}}_{g_{>\ell}},
+    \wG^{\bx_\ell}_{g_\ell} ])^\dagger \ot I \ket{\psi}}  \\
+  \quad \cdot \sqrt{\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}
+   \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}} \bra{\psi}
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}}\cdot (
+    \wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger) \ot
+    (\wG^{\bx_{\ell}}_{g_\ell}  \cdot (S_{\tau_{\geq \ell}})^2
+    \cdot \wG^{\bx_{\ell}}_{g_\ell}) \ket{\psi}}.
+\end{multline}
+The quantity inside the first square root is at most
+\begin{equation*}
+\E_{\bx_{\geq \ell}} \sum_{g_{\ell}, \ldots, g_k} \bra{\psi} ([ \wG^{\bx_{>\ell}}_{g_{>\ell}},
+    \wG^{\bx_\ell}_{g_\ell} ]) \cdot ([ \wG^{\bx_{>\ell}}_{g_{>\ell}},
+    \wG^{\bx_\ell}_{g_\ell} ])^\dagger \ot I \ket{\psi},
+\end{equation*}
+which is at most~$\nu_4$ by~\Cref{lem:commute-g-half-sandwich}.
+The quantity inside the second square root is equal to
+\begin{align*}
+&\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}
+   \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}} \bra{\psi}
+    \wH^{\bx_{>\ell}}_{g_{>\ell}} \ot
+    (\wG^{\bx_{\ell}}_{g_\ell}  \cdot (S_{\tau_{\geq \ell}})^2
+    \cdot \wG^{\bx_{\ell}}_{g_\ell}) \ket{\psi}\\
+\leq~
+&\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}
+   \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}} \bra{\psi}
+    \wH^{\bx_{>\ell}}_{g_{>\ell}} \ot
+    (\wG^{\bx_{\ell}}_{g_\ell}  \cdot I
+    \cdot \wG^{\bx_{\ell}}_{g_\ell}) \ket{\psi} \tag{because $S_{\tau_{\geq \ell}} \leq I$}\\
+=~
+&\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}
+   \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}} \bra{\psi}
+    \wH^{\bx_{>\ell}}_{g_{>\ell}} \ot
+    \wG^{\bx_{\ell}}_{g_\ell} \ket{\psi} \\
+\leq~&  1. \tag{because $\wG$ and $\wH$ are sub-measurements}
+\end{align*}
+We continue commuting the leftmost $\wG^{x_{\ell}}_{g_\ell}$ to the
+right. 
+\begin{align}
+  \eqref{eq:commute-g-part-one} =&
+  \E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{> \ell}}_{g_{> \ell}} \cdot \wG^{\bx_{\ell}}_{g_{\ell}} \cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger) \ot (S_{\tau_{\geq \ell}} \cdot \wG^{\bx_{\ell}}_{g_{\ell}})\ket{\psi} \nonumber\\
+  \approx_{\sqrt{\nu_4}}~& 
+   \E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{> \ell}}_{g_{> \ell}} \cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger \cdot \wG^{\bx_{\ell}}_{g_{\ell}}) \ot (S_{\tau_{\geq \ell}} \cdot \wG^{\bx_{\ell}}_{g_{\ell}})\ket{\psi}. \label{eq:commute-g-part-two}
+\end{align}
+To justify the approximation, we will need to be slightly more
+clever this time. First, as always, we bound the magnitude of the
+difference:
+\begin{multline}\label{eq:call-again-later-part-dos}
+  \Big|  \E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+  \bra{\psi} (\wG^{\bx_{>\ell}}_{g_{>\ell}}         \ot
+    (S_{\tau_{\geq \ell}} \cdot
+  \wG^{\bx_\ell}_{g_\ell})) \cdot ([ (\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger,
+    \wG^{\bx_\ell}_{g_\ell} ] \ot I) \ket{\psi} \Big|\\
+  \leq   \sqrt{\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+    \bra{\psi}
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}})\cdot (
+    \wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger \ot (S_{\tau_{\geq \ell}} \cdot
+    \wG^{\bx_{\ell}}_{g_\ell}  \cdot S_{\tau_{\geq \ell}})
+    \ket{\psi}} \\
+  \cdot \sqrt{ \E_{\bx_{\geq \ell}}
+  \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+   \bra{\psi} ([ (\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger,
+    \wG^{\bx_\ell}_{g_\ell} ])^\dagger \cdot ([ (\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger,
+    \wG^{\bx_\ell}_{g_\ell} ]) \ot I \ket{\psi}}.
+\end{multline}
+The term inside the first square root is equal to
+\begin{align*}
+&\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+    \bra{\psi}
+    \wH^{\bx_{>\ell}}_{g_{>\ell}}
+     \ot (S_{\tau_{\geq \ell}} \cdot
+    \wG^{\bx_{\ell}}_{g_\ell}  \cdot S_{\tau_{\geq \ell}})
+    \ket{\psi}\\
+=~&\E_{\bx_{> \ell}} \sum_{\tau_{\geq \ell}}  \sum_{g_{>\ell} \in \sfO_{\tau_{> \ell}}}
+    \bra{\psi}
+    \wH^{\bx_{>\ell}}_{g_{>\ell}}
+     \ot (S_{\tau_{\geq \ell}} \cdot
+    \Big(\E_{\bx_{\ell}} \sum_{g_{\ell} \in \sfO_{\tau_{\ell}}}\wG^{\bx_{\ell}}_{g_\ell}  \Big)\cdot S_{\tau_{\geq \ell}})
+    \ket{\psi}\\
+\leq~&\E_{\bx_{> \ell}} \sum_{\tau_{\geq \ell}}  \sum_{g_{>\ell} \in \sfO_{\tau_{> \ell}}}
+    \bra{\psi}
+    \wH^{\bx_{>\ell}}_{g_{>\ell}}
+     \ot 
+    \Big(\E_{\bx_{\ell}} \sum_{g_{\ell} \in \sfO_{\tau_{\ell}}}\wG^{\bx_{\ell}}_{g_\ell}  \Big)
+    \ket{\psi} \tag{by~\Cref{eq:S-sandwich}}\\
+=~&\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+    \bra{\psi}
+    \wH^{\bx_{>\ell}}_{g_{>\ell}}
+     \ot
+    \wG^{\bx_{\ell}}_{g_\ell}  
+    \ket{\psi}\\
+\leq~& 1. \tag{because $\wG$ and $\wH$ are sub-measurements}
+\end{align*}
+The term inside the second square root is equal to the term inside the first square root of~\Cref{eq:call-this-later}, which we bounded by~$\nu_4$.
+We are now ready for the final step, which is to bring the leftmost
+$\wG^{x_\ell}_{g_\ell}$ over to the second tensor factor.
+\begin{align}
+  \eqref{eq:commute-g-part-two} &= 
+  \E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{> \ell}}_{g_{> \ell}} \cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger \cdot \wG^{\bx_{\ell}}_{g_{\ell}}) \ot (S_{\tau_{\geq \ell}} \cdot \wG^{\bx_{\ell}}_{g_{\ell}})\ket{\psi}\nonumber\\
+  &\approx_{\sqrt{2\zeta}} \E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{> \ell}}_{g_{> \ell}} \cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger) \ot (S_{\tau_{\geq \ell}} \cdot \wG^{\bx_{\ell}}_{g_{\ell}}\cdot \wG^{\bx_{\ell}}_{g_{\ell}})\ket{\psi}. \label{eq:h-ot-mgg}
+\end{align}
+To justify the approximation, we bound the magnitude of the
+difference.
+\begin{multline*}
+  \Big|\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}
+   \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+   	\bra{\psi} (\wG^{\bx_{> \ell}}_{g_{> \ell}}
+		\ot (S_{\tau_{\geq \ell}}
+		\cdot \wG^{\bx_{\ell}}_{g_{\ell}}))
+		\cdot
+		(((\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger \ot I)
+		\cdot (\wG^{\bx_{\ell}}_{g_{\ell}} \ot I - I \ot \wG^{\bx_{\ell}}_{g_{\ell}}))\ket{\psi}
+  \Big|  \\
+  \leq \sqrt{\E_{\bx_{\geq \ell}}\sum_{\tau_{\geq \ell}}
+   \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+   	\bra{\psi} (\wG^{\bx_{> \ell}}_{g_{> \ell}} \cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger)
+		\ot (S_{\tau_{\geq \ell}}
+		\cdot \wG^{\bx_{\ell}}_{g_{\ell}} \cdot S_{\tau_{\geq \ell}}) \ket{\psi}} \nonumber \\
+  \cdot \sqrt{\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}
+   \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}} \bra{\psi}
+   ( (\wG^{\bx_\ell}_{g_\ell} \ot I - I \ot \wG^{\bx_\ell}_{g_\ell})\cdot
+   (\wG^{\bx_{> \ell}}_{g_{> \ell}} \cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger \ot I)
+    \cdot (\wG^{\bx_\ell}_{g_\ell} \ot I - I \ot \wG^{\bx_\ell}_{g_\ell})).
+    \ket{\psi}}
+\end{multline*}
+The expression inside the first is equal to the expression inside the first square root in~\Cref{eq:call-again-later-part-dos},
+which we bounded by~$1$.
+The expression inside the second square root is equal to the expression inside the second square root in~\Cref{eq:call-again-later-part-tres},
+which we bounded by~$2\zeta$.
+We end by noting that
+\begin{align*}
+\eqref{eq:h-ot-mgg}
+& =
+\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} (\wG^{\bx_{> \ell}}_{g_{> \ell}} \cdot (\wG^{\bx_{> \ell}}_{g_{> \ell}})^\dagger) \ot (S_{\tau_{\geq \ell}} \cdot \wG^{\bx_{\ell}}_{g_{\ell}})\ket{\psi} \tag{because $\wG$ is projective}\\
+& =
+\E_{\bx_{\geq \ell}} \sum_{\tau_{\geq \ell}}  \sum_{(g_{\ell}, g_{>\ell}) \in \sfO_{\tau_{\geq \ell}}}
+	\bra{\psi} \wH^{\bx_{> \ell}}_{g_{> \ell}} \ot (S_{\tau_{\geq \ell}} \cdot \wG^{\bx_{\ell}}_{g_{\ell}})\ket{\psi}\\
+& =\E_{\bx_{> \ell}} \sum_{\tau_{> \ell}}  \sum_{g_{>\ell} \in \sfO_{\tau_{> \ell}}}
+	\bra{\psi} \wH^{\bx_{> \ell}}_{g_{> \ell}} \ot \Big(\sum_{\tau_{\ell}}S_{\tau_{\geq \ell}} \cdot
+		\Big(\E_{\bx_{\ell}} \sum_{g_\ell \in \sfO_{\tau_{\ell}}}\wG^{\bx_{\ell}}_{g_{\ell}}\Big)\Big)\ket{\psi}\\
+& =\E_{\bx_{> \ell}} \sum_{\tau_{> \ell}}  \sum_{g_{>\ell} \in \sfO_{\tau_{> \ell}}}
+	\bra{\psi} \wH^{\bx_{> \ell}}_{g_{> \ell}} \ot S_{\tau_{>\ell}}\ket{\psi}. \tag{by \Cref{eq:S-recurrence}}
+\end{align*}
+This concludes the proof of
+\Cref{eq:i-think-this-is-what-i'm-supposed-to-prove-2}
+and therefore proves the lemma.
+\end{proof}
+
+\ignore{
+
+\begin{lemma}
+  \label{lem:halve-a-sandwich}
+Let $\bx_1, \ldots, \bx_k \sim \F_q$ be sampled uniformly at random.
+Let $S \subseteq \calP^+(m,q,d)^k$ be the set of tuples of outcomes
+with at most $d$ instances of the $\bot$ symbol:
+\[ S = \bigcup_{\tau: |\tau| \geq d+1} \outc_{\tau}. \]
+Then
+\[
+    \E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S} \bra{\psi} \widehat{H}^{\bx_1, \dots, \bx_k}_{g_1, \dots, g_k} \ot I \ket{\psi}
+        \approx_{XXX} \E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S}
+    \bra{\psi} I \ot (\widehat{G}^{\bx_1}_{g_1} \dots \widehat{G}^{\bx_k}_{g_k}) 
+      \ket{\psi} .
+\]
+\end{lemma}
+\begin{proof}
+To prove the lemma, we will show that for each $0 \leq \ell \leq k$,
+\begin{align}
+&\E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S}
+	\bra{\psi} (
+		\widehat{H}^{\bx_{\ell}, \dots, \bx_{k}}_{g_{\ell}, \dots, g_{k}}) \ot \widehat{G}^{\bx_{1}}_{g_1} \cdots \widehat{G}^{\bx_{\ell-1}}_{g_{\ell-1}} \ket{\psi}\nonumber\\
+\approx_{XXX}~& \E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S}
+	\bra{\psi} (
+		\widehat{H}^{\bx_{\ell+1}, \dots, \bx_{k}}_{g_{\ell+1}, \dots, g_{k}}) \ot (\widehat{G}^{\bx_{1}}_{g_1} \cdots \widehat{G}^{\bx_{\ell-1}}_{g_{\ell-1}}
+		\cdot  \widehat{G}^{\bx_{\ell}}_{g_{\ell}} ) \ket{\psi}.
+			\label{eq:i-think-this-is-what-i'm-supposed-to-prove}
+\end{align}
+If we then repeatedly apply \Cref{eq:i-think-this-is-what-i'm-supposed-to-prove} for $\ell = 0, 1, \ldots, k$,
+we derive
+\begin{align*}
+&\E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S}
+	\bra{\psi} \widehat{H}^{\bx_{1}, \dots, \bx_{k}}_{g_{1}, \dots, g_{k}} \ot I \ket{\psi}\\
+\approx_{XXX}~& \E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S}
+	\bra{\psi} (
+                \widehat{H}^{\bx_{2}, \dots, \bx_{k}}_{g_{2}, \dots, g_{k}}) \ot \widehat{G}^{\bx_{1}}_{g_1} \ket{\psi}\\
+\approx_{XXX}~& \E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S}
+	\bra{\psi} (
+		 \widehat{H}^{\bx_{3}, \dots, \bx_{k}}_{g_{3}, \dots, g_{k}}) \ot (\widehat{G}^{\bx_{1}}_{g_1} \cdot \widehat{G}^{\bx_{2}}_{g_2}) \ket{\psi}\\
+\cdots~& \\
+\approx_{XXX}~& \E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S}
+    \bra{\psi} I \ot (\widehat{G}^{\bx_1}_{g_1} \dots \widehat{G}^{\bx_k}_{g_k}) 
+      \ket{\psi}.
+\end{align*}
+The total error is~XXX, proving the lemma.
+
+
+
+We now prove \Cref{eq:i-think-this-is-what-i'm-supposed-to-prove}.
+To begin, write $G = \sum_{g} \E_{\bx} G^{\bx}_g$, and write
+%To begin, for each $x_1, \ldots, x_k \in \F_q$ and $g_{\ell}, \ldots, g_{k} \in \calP^+(m, q, d)$, we write
+\begin{equation*}
+  M_{r, \ell} = G^{r} \cdot (I - G)^{\ell  - r}
+%= \E_{x_1, \dots, x_{\ell-1}} \sum_{g_1, \ldots, g_{\ell-1} : (g_1, \ldots, g_k) \in S} \widehat{G}^{x_1}_{g_1} \cdots \widehat{G}^{x_{\ell-1}}_{g_{\ell-1}}.
+\end{equation*}
+%(We note that this only depends on $x_1$ through $x_{\ell-1}$.)
+Then the statement in \Cref{eq:i-think-this-is-what-i'm-supposed-to-prove} can be rewritten as
+\begin{align}
+&\E_{\bx_{\ell}, \dots, \bx_k} \sum_{\tau: |\tau| \geq d+1}
+                \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}}
+	\bra{\psi} (\widehat{H}^{\bx_{\ell}, \dots,
+                \bx_{k}}_{g_{\ell}, \dots, g_{k}}) \ot M_{|\tau_{<
+                \ell}|, \ell-1} \ket{\psi}\nonumber\\
+\approx_{XXX}~& \E_{\bx_{\ell}, \dots, \bx_k} \sum_{\tau: |\tau| \geq
+                d+1} \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}}
+	\bra{\psi} (
+		 \widehat{H}^{\bx_{\ell+1}, \dots, \bx_{k}}_{g_{\ell+1}, \dots, g_{k}}) \ot  (M_{|\tau_{<
+                \ell}|, \ell-1} \cdot
+                \widehat{G}^{\bx_{\ell}}_{g_{\ell}})\ket{\psi}
+                \label{eq:i-think-this-is-what-i'm-supposed-to-prove-2} \\
+  =~&\E_{\bx_{\ell+1}, \dots, \bx_k} \sum_{\tau: |\tau| \geq d+1}
+      \sum_{g_{\ell+1}, \dots, g_k \in \outc_{\tau_{\geq \ell+1}}}
+      \bra{\psi} (\widehat{H}^{\bx_{\ell+1}, \dots,
+      \bx_{k}}_{g_{\ell+1}, \dots, g_{k}}) \ot M_{|\tau_{< \ell+1}|,
+      \ell} \ket{\psi}.
+\end{align}
+
+We will use two properties of $M_{r,\ell}$: for all $r, \ell$, $M_{r,
+  \ell}^\dagger M_{r,\ell} \leq I$ and $M_{r, \ell} \cdot G = G \cdot M_{r,
+  \ell}$. To start, we write $\wH$ as a sandwich of $\wG$ operators, and move the
+rightmost $\wG^{\bx_{\ell}}_{g_{\ell}}$ to the second tensor factor.
+\begin{align}
+  &\E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1} \sum_{g_\ell, \dots,
+  g_k \in \outc_{\tau_{\geq\ell}}}  \bra{\psi} \wH^{\bx_{\ell}, \dots, \bx_k}_{g_{\ell}, \dots,
+    g_k} \ot M_{|\tau_{< \ell}|, \ell-1} \ket{\psi} \nonumber \\
+    &= \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1} \sum_{g_\ell,
+      \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi} \wG^{\bx_\ell}_{g_{\ell}} \cdot \wH^{\bx_{\ell+1}, \dots, \bx_k}_{g_{\ell+1},
+      \dots, g_{k}} \cdot \wG^{\bx_\ell}_{g_{\ell}} \ot M_{|\tau_{< \ell}|, \ell-1} \ket{\psi}
+  \\
+  &\approx \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1} \sum_{g_{\ell},
+    \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi} \wG^{\bx_\ell}_{g_\ell} \cdot
+    \wH^{\bx_{\ell+1}, \dots, \bx_k}_{g_{\ell+1}, \dots, g_{k}} \ot M_{|\tau_{< \ell}|, \ell-1}
+    \cdot \wG^{\bx_{\ell}}_{g_{\ell}} \ket{\psi} \label{eq:gh-ot-mg}
+\end{align}
+To justify the approximation, we bound the error:
+\begin{align}
+&\left| \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi}
+  (\wG^{\bx_\ell}_{g_\ell} \cdot \wH^{\bx_{\ell+1}, \dots,
+  \bx_k}_{g_{\ell+1}, \dots, g_{k}} \ot M_{|\tau_{< \ell}|, \ell-1}) \cdot
+  (\wG^{\bx_\ell}_{g_\ell} \ot I - I \ot \wG^{\bx_\ell}_{g_\ell})
+  \ket{\psi}  \right|\nonumber \\
+&\leq \sqrt{\E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi}
+  \wG^{\bx_\ell}_{g_\ell} \cdot (\wH^{\bx_{\ell+1}, \dots,
+  \bx_k}_{g_{\ell+1}, \dots, g_{k}})^2 \cdot \wG^{\bx_\ell}_{g_\ell} \ot
+                                    (M_{|\tau_{< \ell}|,
+                                    \ell-1})^2 \ket{\psi} } \nonumber \\
+    &\quad                            \cdot  \sqrt{\E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi}
+  (\wG^{\bx_\ell}_{g_\ell} \ot I - I \ot \wG^{\bx_\ell}_{g_\ell})^2
+  \ket{\psi}} \\
+&\leq \sqrt{\E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi}
+  \wG^{\bx_\ell}_{g_\ell} \cdot \wH^{\bx_{\ell+1}, \dots,
+  \bx_k}_{g_{\ell+1}, \dots, g_{k}} \cdot \wG^{x_\ell}_{g_\ell} \ot I
+\ket{\psi}} \nonumber \\
+&\quad \cdot \sqrt{\E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi}
+  (\wG^{\bx_\ell}_{g_\ell} \ot I - I \ot \wG^{\bx_\ell}_{g_\ell})^2
+                 \ket{\psi}} \\
+  &\leq 1 \cdot (XXX)^{1/2}
+\end{align}
+
+To proceed, we introduce the shorthand
+
+\[
+\wG^{x_{>\ell}}_{g_{>\ell}} = \wG^{x_{\ell+1}}_{g_{\ell+1}} \cdots \wG^{x_{k}}_{g_{k}}.
+\]
+Recall that by \Cref{lem:commute-g-half-sandwich}, it holds that
+\[ \wG^{x_\ell}_{g_\ell} \cdot (\wG^{x_{> \ell}}_{g_{>\ell}} )^\dagger
+  \approx_{XXX} (\wG^{x_{>\ell}}_{g_{>\ell}}) \cdot \wG^{x_\ell}_{g_\ell}. \]
+Using this shorthand, we can write $\wH$ as a product of two $\wG$
+terms:
+\[ \wH^{x_{\ell+1}, \dots,
+  x_k}_{g_{\ell+1}, \dots, g_k} = (\wG^{x_{>\ell}}_{g_{>\ell}}) \cdot
+(\wG^{x_{>\ell}}_{g_{>\ell}})^\dagger. 
+\]
+We will now commute the leftmost $\wG^{x_\ell}_{g_\ell}$ in
+\Cref{eq:gh-ot-mg} to the right in two stages. In the first stage, we have:
+\begin{align}
+  \eqref{eq:gh-ot-mg} &= \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}}  \bra{\psi}
+                        \wG^{\bx_\ell}_{g_\ell} \cdot
+                        (\wG^{\bx_{>\ell}}_{g_{>\ell}}) \cdot
+                        (\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger \ot
+                        M_{|\tau_{<\ell}|, \ell-1} \cdot
+                        \wG^{\bx_\ell}_{g_\ell} \ket{\psi} \\
+  &\approx \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}}  \bra{\psi}
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}}) \cdot
+    \wG^{\bx_\ell}_{g_\ell}  \cdot
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger \ot
+    M_{|\tau_{<\ell}|, \ell-1} \cdot
+    \wG^{\bx_\ell}_{g_\ell} \ket{\psi}. \label{eq:ggg-ot-mg}
+\end{align}
+To justify the approximation, we bound the magnitude of the difference.
+\begin{align}
+&\left|  \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}}
+  \bra{\psi}     ([ \wG^{\bx_{>\ell}}_{g_{>\ell}},
+    \wG^{\bx_\ell}_{g_\ell} ] \cdot     (\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger \ot
+    M_{|\tau_{<\ell}|, \ell-1} \cdot
+  \wG^{\bx_\ell}_{g_\ell} \ket{\psi} \right| \nonumber \\
+  &\leq \sqrt{ \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi} ([ \wG^{\bx_{>\ell}}_{g_{>\ell}},
+    \wG^{\bx_\ell}_{g_\ell} ]) \cdot ([ \wG^{\bx_{>\ell}}_{g_{>\ell}},
+    \wG^{\bx_\ell}_{g_\ell} ])^\dagger \ot I \ket{\psi}} \nonumber \\
+  &\quad \cdot \sqrt{\E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}}  \bra{\psi}
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}})\cdot (
+    \wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger \ot
+    \wG^{\bx_{\ell}}_{g_\ell}  \cdot (M_{|\tau_{<\ell}|, \ell-1})^2
+    \cdot \wG^{\bx_{\ell}}_{g_\ell} \ket{\psi}} \\
+  &\leq (XXX)^{1/2} \cdot \sqrt{\E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}}  \bra{\psi}
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}})\cdot (
+    \wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger \ot
+    \wG^{\bx_{\ell}}_{g_\ell} \ket{\psi}} \\
+  &\leq (XXX)^{1/2} \cdot 1.
+\end{align}
+
+We continue commuting the leftmost $\wG^{x_{\ell}}_{g_\ell}$ to the
+right. 
+\begin{align}
+  \eqref{eq:ggg-ot-mg} &= \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}}  \bra{\psi}
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}}) \cdot
+    \wG^{\bx_\ell}_{g_\ell}  \cdot
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger \ot
+    M_{|\tau_{<\ell}|, \ell-1} \cdot
+                         \wG^{\bx_\ell}_{g_\ell} \ket{\psi} \\
+  &\approx \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}}  \bra{\psi}
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}}) \cdot
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger\cdot  \wG^{\bx_\ell}_{g_\ell}   \ot
+    M_{|\tau_{<\ell}|, \ell-1} \cdot
+    \wG^{\bx_\ell}_{g_\ell} \ket{\psi} \label{eq:hg-ot-mg}
+\end{align}
+To justify the approximation, we will need to be slightly more
+clever this time. First, as always, we bound the magnitude of the
+difference:
+\begin{align}
+  &\left|  \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}}
+  \bra{\psi} \wG^{\bx_{>\ell}}_{g_{>\ell}} \cdot    [ (\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger,
+    \wG^{\bx_\ell}_{g_\ell} ]     \ot
+    M_{|\tau_{<\ell}|, \ell-1} \cdot
+  \wG^{\bx_\ell}_{g_\ell} \ket{\psi} \right| \label{eq:second-com-bound} \\
+  &\leq  \cdot \sqrt{\E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}}  \bra{\psi}
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}})\cdot (
+    \wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger \ot (M_{|\tau_{<\ell}|,
+    \ell-1}) \cdot
+    \wG^{\bx_{\ell}}_{g_\ell}  \cdot (M_{|\tau_{<\ell}|, \ell-1})
+    \ket{\psi}} \label{eq:cs-nasty-little-termses-we-hates-it} \\
+  &\quad \sqrt{ \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi} ([ (\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger,
+    \wG^{\bx_\ell}_{g_\ell} ])^\dagger \cdot ([ (\wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger,
+    \wG^{\bx_\ell}_{g_\ell} ]) \ot I \ket{\psi}} \label{eq:cs-nice-precious-term}\\
+\end{align}
+The second square root term~\eqref{eq:cs-nice-precious-term}  is bounded
+by \Cref{lem:commute-g-half-sandwich}, and we would like to show that
+the first~\eqref{eq:cs-nasty-little-termses-we-hates-it} is bounded by
+$1$. To do this, we will need to make use of the fact that $M_{r,\ell}$
+commutes with $G$.
+\begin{align}
+  \eqref{eq:cs-nasty-little-termses-we-hates-it} &=  \Big( \E_{\bx_{\ell+1}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell+1}, \dots, g_k \in \outc_{\tau_{\geq \ell+1}}}  \bra{\psi}
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}})\cdot (
+                                                   \wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger
+                                                   \ot \nonumber \\
+  &\qquad\qquad\qquad (M_{|\tau_{<\ell}|,
+    \ell-1}) \cdot
+    (\E_{\bx_{\ell}} \sum_{g_\ell \in \outc_{\tau_\ell}} \wG^{\bx_{\ell}}_{g_\ell})  \cdot (M_{|\tau_{<\ell}|, \ell-1})
+                                                   \ket{\psi}\Big)^{1/2}
+  \\
+                                                 &= \Big(\E_{\bx_{\ell+1}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell+1}, \dots, g_k \in \outc_{\tau_{\geq \ell + 1}}}  \bra{\psi}
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}})\cdot (
+                                                   \wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger
+                                                   \ot \nonumber \\
+  &\qquad\qquad\qquad \underbrace{(M_{|\tau_{<\ell}|,
+    \ell-1}) \cdot ( G^{\tau_{\ell}} (I - G)^{1 - \tau_{\ell}}) \cdot
+    (M_{|\tau_{<\ell}|, \ell-1})}_{\leq I} \ket{\psi}
+    \Big)^{1/2} \label{eq:the-line-where-we-commute-m-and-g} \\
+  &\leq \Big(\E_{\bx_{\ell+1}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell+1}, \dots, g_k \in \outc_{\tau_{\geq \ell+1}}}  \bra{\psi}
+    (\wG^{\bx_{>\ell}}_{g_{>\ell}})\cdot (
+                                                   \wG^{\bx_{>\ell}}_{g_{>\ell}})^\dagger
+                                                   \ot I \ket{\psi}
+    \Big)^{1/2} \\
+  &\leq 1.
+\end{align}
+Observe that we were only able to bound the term in the brace in
+\Cref{eq:the-line-where-we-commute-m-and-g} because $M$ and $G$
+commute, and hence the entire term in the brace is PSD. Thus, the difference \eqref{eq:second-com-bound} is at most $1 \cdot
+(XXX)^{1/2}$.
+
+We are now ready for the final step, which is to bring the leftmost
+$\wG^{x_\ell}_{g_\ell}$ over to the second tensor factor.
+\begin{align}
+  \eqref{eq:hg-ot-mg} &= \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi}
+                        (\wH^{\bx_{\ell+1}, \dots, \bx_k}_{g_{\ell+1},
+                        \dots, g_k}) \cdot (\wG^{\bx_{\ell}}_{g_\ell}
+                        \ot M_{|\tau_{<\ell}|, \ell-1} \cdot
+                        \wG^{\bx_\ell}_{g_\ell} \ket{\psi} \\
+  &\approx \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi}
+                        (\wH^{\bx_{\ell+1}, \dots, \bx_k}_{g_{\ell+1},
+                        \dots, g_k}) 
+                        \ot M_{|\tau_{<\ell}|, \ell-1} \cdot
+                        (\wG^{\bx_\ell}_{g_\ell})^2 \ket{\psi}. \label{eq:h-ot-mgg}
+\end{align}
+To justify the approximation, we bound the magnitude of the
+difference, using the commutativity of $M$ and $G$ just as in the
+preceding calculation.
+\begin{align}
+  &\left| \E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi}
+  ((\wH^{\bx_{\ell+1}, \dots, \bx_k}_{g_{\ell+1},
+                        \dots, g_k}) 
+                        \ot M_{|\tau_{<\ell}|, \ell-1} \cdot
+                        \wG^{\bx_\ell}_{g_\ell}) \cdot
+  (\wG^{\bx_\ell}_{g_\ell} \ot I - I \ot \wG^{\bx_\ell}_{g_\ell}) \ket{\psi}
+  \right| \nonumber \\
+  &\leq \sqrt{\E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi}
+  (\wH^{\bx_{\ell+1}, \dots, \bx_k}_{g_{\ell+1},
+                        \dots, g_k})^2 
+                        \ot M_{|\tau_{<\ell}|, \ell-1} \cdot
+                        (\wG^{\bx_\ell}_{g_\ell})^2 \cdot
+    M_{|\tau_{<\ell}|, \ell-1} \ket{\psi} } \nonumber \\
+  &\quad\cdot \sqrt{\E_{\bx_{\ell}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi}
+    (\wG^{\bx_\ell}_{g_\ell} \ot I - I \ot \wG^{\bx_\ell}_{g_\ell})^2
+    \ket{\psi}} \\
+  &\leq \sqrt{\E_{\bx_{\ell+1}, \dots, \bx_{k}} \sum_{\tau: |\tau| \geq d+1}
+  \sum_{g_{\ell+1}, \dots, g_k \in \outc_{\tau_{\geq \ell}}} \bra{\psi}
+  (\wH^{\bx_{\ell+1}, \dots, \bx_k}_{g_{\ell+1},
+                        \dots, g_k})^2 
+                        \ot \underbrace{M_{|\tau_{<\ell}|, \ell-1} \cdot
+                        G^{\tau_{\ell}} (I - G)^{1 - \tau_{\ell}} \cdot
+    M_{|\tau_{<\ell}|, \ell-1}}_{\leq I} \ket{\psi} } \nonumber \\
+  &\quad \cdot \sqrt{XXX} \\
+  &\leq 1 \cdot \sqrt{XXX}.
+\end{align}
+This concludes the proof of
+\Cref{eq:i-think-this-is-what-i'm-supposed-to-prove-2}.
+
+\ainnote{Below is John's old writeup}
+
+
+XXXXXXXXXXX THINGS ARE INCORRECT BELOW XXXXXXXXXXXXX
+
+We will use one property of~$M_{g_{\ell}, \ldots, g_{k}}^{x_1, \ldots, x_k}$: for each $x_1, \ldots, x_k \in \F_q$,
+\begin{equation}
+(M_{g_{\ell}, \ldots, g_{k}}^{x_1, \ldots, x_k}) \cdot (M_{g_{\ell}, \ldots, g_{k}}^{x_1, \ldots, x_k})^\dagger \leq I.
+\end{equation}
+
+We note that $M_{g_{\ell}, \ldots, g_{k}}^{x_1, \ldots, x_k}$ satisfies the following property. For each $x_1, \ldots, x_k \in \F_q$,
+\begin{align}
+&(M_{g_{\ell}, \ldots, g_{k}}^{x_1, \ldots, x_k}) \cdot (M_{g_{\ell}, \ldots, g_{k}}^{x_1, \ldots, x_k})^\dagger\\
+=~&\sum_{\substack{g_1, \ldots, g_{\ell-1} : (g_1, \ldots, g_k) \in S
+	\\ g_1', \ldots, g_{\ell-1}' : (g_1', \ldots, g_{\ell-1}', g_{\ell}, \ldots, g_k) \in S}} 
+		\widehat{G}^{x_1}_{g_1} \cdots \widehat{G}^{x_{\ell-1}}_{g_{\ell-1}}
+		\cdot \widehat{G}^{x_{\ell-1}}_{g_{\ell-1}'} \cdots \widehat{G}^{x_{1}}_{g_{1}'}\nonumber
+\end{align}
+
+We introduce the shorthand
+\begin{equation*}
+\widehat{G}^{x_{>\ell}}_{g_{>\ell}} = \widehat{G}^{x_{\ell+1}}_{g_{\ell+1}} \cdots \widehat{G}^{x_{k}}_{g_{k}}.
+\end{equation*}
+We can therefore write
+\begin{align*}
+\widehat{H}^{\bx_{\ell}, \ldots, \bx_k}_{g_{\ell}, \cdots, g_k}
+&= \widehat{G}^{\bx_{\ell}}_{g_{\ell}}
+	\cdot \widehat{H}^{\bx_{\ell+1}, \ldots, \bx_k}_{g_{\ell+1}, \ldots, g_k}
+	\cdot \widehat{G}^{\bx_{\ell}}_{g_{\ell}} \tag{by the definition of $\widehat{H}$}\\
+&= \widehat{G}^{\bx_{\ell}}_{g_{\ell}}
+	\cdot \widehat{G}
+	\cdot \widehat{G}^{\bx_{\ell}}_{g_{\ell}}.
+\end{align*}
+Then
+\begin{align}
+&\E_{\bx_{\ell}, \dots, \bx_k} \sum_{g_{\ell}, \dots, g_k}
+	\bra{\psi} (M_{g_{\ell}, \ldots, g_k}
+		\cdot \widehat{H}^{\bx_{\ell}, \dots, \bx_{k}}_{g_{\ell}, \dots, g_{k}}) \ot I \ket{\psi}\nonumber\\
+=~&\E_{\bx_{\ell}, \dots, \bx_k} \sum_{g_{\ell}, \dots, g_k}
+	\bra{\psi} (M_{g_{\ell}, \ldots, g_k}
+		\cdot  \widehat{G}^{\bx_{\ell}}_{g_{\ell}}
+	\cdot \widehat{H}^{\bx_{\ell+1}, \ldots, \bx_k}_{g_{\ell+1}, \ldots, g_k}
+	\cdot \widehat{G}^{\bx_{\ell}}_{g_{\ell}}) \ot I \ket{\psi}.\label{eq:peel-off-a-G}
+\end{align}
+We claim that
+\begin{equation}
+\eqref{eq:peel-off-a-G}
+\approx_{XXX}
+\E_{\bx_{\ell}, \dots, \bx_k} \sum_{g_{\ell}, \dots, g_k}
+	\bra{\psi} (M_{g_{\ell}, \ldots, g_k}
+		\cdot  \widehat{G}^{\bx_{\ell}}_{g_{\ell}}
+	\cdot \widehat{H}^{\bx_{\ell+1}, \ldots, \bx_k}_{g_{\ell+1}, \ldots, g_k}
+	\cdot \widehat{G}^{\bx_{\ell}}_{g_{\ell}}) \ot I \ket{\psi}
+\end{equation}
+
+
+
+
+We begin by showing a related fact.
+Let $\{M^{x_{1}, \ldots, x_k}_{g_{\ell+1}, \ldots, g_k}\}$ be a set of matrices
+such that for all $x_{1}, \ldots, x_k$
+\begin{equation}\label{eq:boundedness-of-M}
+\sum_{g_{\ell+1}, \ldots, g_k} (M^{x_{1}, \ldots, x_k}_{g_{\ell+1}, \ldots, g_k}) \cdot (M^{x_{1}, \ldots, x_k}_{g_{\ell+1}, \ldots, g_k})^\dagger \leq I.
+\end{equation}
+Then for any $1 \leq \ell \leq k$,
+\begin{align*}
+&\E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S} \bra{\psi} (M^{\bx_{1}, \ldots, \bx_k}_{g_{\ell+1}, \ldots, g_k} \cdot \widehat{H}^{\bx_1, \dots, \bx_{\ell}}_{g_1, \dots, g_{\ell}}) \ot I \ket{\psi}\\
+\approx_{XXX}~& \E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S} \bra{\psi} (M^{\bx_{1}, \ldots, \bx_k}_{g_{\ell+1}, \ldots, g_k} \cdot \widehat{G}^{\bx_\ell}_{g_{\ell}} \cdot \widehat{H}^{\bx_1, \dots, \bx_{\ell-1}}_{g_1, \dots, g_{\ell-1}}) \ot I \ket{\psi}.
+\end{align*}
+To begin, we introduce the shorthand
+\begin{equation*}
+\widehat{G}^{\bx_{< \ell}}_{g_{< \ell}} = \widehat{G}^{\bx_1}_{g_1} \cdots \widehat{G}^{\bx_{\ell-1}}_{g_{\ell-1}}.
+\end{equation*}
+We first claim that
+\begin{align*}
+&\E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S} \bra{\psi} (M^{\bx_{1}, \ldots, \bx_k}_{g_{\ell+1}, \ldots, g_k} \cdot \widehat{H}^{\bx_1, \dots, \bx_{\ell}}_{g_1, \dots, g_{\ell}}) \ot I \ket{\psi}\\
+=~& \E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S} \bra{\psi} (M^{\bx_{1}, \ldots, \bx_k}_{g_{\ell+1}, \ldots, g_k} \cdot \widehat{G}^{\bx_{< \ell}}_{g_{<\ell}} \cdot \widehat{G}^{\bx_{\ell}}_{g_{\ell}} \cdot (\widehat{G}^{\bx_{<\ell}}_{g_{<\ell}})^\dagger) \ot I \ket{\psi}\\
+\approx_{XXX}~& \E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S} \bra{\psi} (M^{\bx_{1}, \ldots, \bx_k}_{g_{\ell+1}, \ldots, g_k} \cdot \widehat{G}^{\bx_{<\ell}}_{g_{<\ell}} \cdot \widehat{G}^{\bx_{\ell}}_{g_{\ell}}) \ot (\widehat{G}^{\bx_{<\ell}}_{g_{<\ell}}) \ket{\psi}.
+\end{align*}
+To show this, we bound the magnitude of the difference.
+\begin{multline*}
+\E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S} \bra{\psi}
+	((M^{\bx_{1}, \ldots, \bx_k}_{g_{\ell+1}, \ldots, g_k} \cdot \widehat{G}^{\bx_{<\ell}}_{g_{<\ell}} \cdot \widehat{G}^{\bx_{\ell}}_{g_{\ell}}) \ot I)
+	\cdot ((\widehat{G}^{\bx_{<\ell}}_{g_{<\ell}})^\dagger \ot I
+		- I \ot (\widehat{G}^{\bx_{<\ell}}_{g_{<\ell}})) \ket{\psi}\\
+\leq \sqrt{\E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S} \bra{\psi}
+	((M^{\bx_{1}, \ldots, \bx_k}_{g_{\ell+1}, \ldots, g_k} \cdot \widehat{G}^{\bx_{<\ell}}_{g_{<\ell}} \cdot \widehat{G}^{\bx_{\ell}}_{g_{\ell}} \cdot (\widehat{G}^{\bx_{<\ell}}_{g_{<\ell}})^\dagger \cdot (M^{\bx_{1}, \ldots, \bx_k}_{g_{\ell+1}, \ldots, g_k})^\dagger) \ot I)\ket{\psi}}\\
+\cdot \sqrt{\E_{\bx_1, \dots, \bx_k} \sum_{(g_1, \dots, g_k) \in S} \bra{\psi}
+	((\widehat{G}^{\bx_{<\ell}}_{g_{<\ell}}) \ot I
+		- I \ot (\widehat{G}^{\bx_{<\ell}}_{g_{<\ell}})^\dagger)
+	\cdot ((\widehat{G}^{\bx_{<\ell}}_{g_{<\ell}})^\dagger \ot I
+		- I \ot (\widehat{G}^{\bx_{<\ell}}_{g_{<\ell}}))\ket{\psi} }.
+\end{multline*}
+The term inside the first square root is at most~$1$ by \Cref{eq:boundedness-of-M}
+and the fact that~$\widehat{G}$ is a measurement.
+The term inside the second square root is at most
+by \Cref{lem:switch-g-half-sandwich}.
+
+\ignore{
+XXXXXXXXXXX THINGS ARE INCORRECT BELOW XXXXXXXXXXXXX
+  We actually show a somewhat stronger fact by induction. We show that
+  for any collection of matrices $A_{h_1, \dots, h_k}$ such that for
+  all $(h_1, \dots, h_k) \in S$, $A_{h_1, \dots, h_k}^\dagger A_{h_1,
+    \dots, h_k} \leq I$, it holds that
+  \begin{align*}
+    &\E_{\bx_1, \dots, \bx_k} \sum_{(h_1, \dots, h_k) \in S} \bra{\psi}
+    A_{h_1, \dots, h_k}
+    \cdot (H^{\bx_1, \dots, \bx_k}_{h_1, \dots, h_k} \ot I) \ket{\psi} \\
+    &\qquad \approx_{\sqrt{k(12\zeta + 2\nu_{\rmcom})}} \E_{\bx_1, \dots, \bx_k} \sum_{(h_1, \dots, h_k) \in S}
+    \bra{\psi} A_{h_1, \dots, h_k} \cdot (G^{\bx_1}_{h_1} \dots G^{\bx_k}_{g_k} \ot I)
+      \ket{\psi}.
+  \end{align*}
+  
+  The base case, $k=1$, is immediate. For the inductive step, assume
+  that the proposition holds for $k-1$. We now calculate for $k$, applying
+  \Cref{lem:commute-g-half-sandwich} and
+  \Cref{lem:switch-g-half-sandwich} to the terms inside the inner
+  product and using \Cref{prop:closeness-of-ip}:
+  \begin{align}
+        &\E_{\bx_1, \dots, \bx_k} \sum_{(h_1, \dots, h_k) \in S}  \bra{\psi} 
+      A_{h_1, \dots, h_k}\cdot (H^{\bx_1, \dots, \bx_k}_{h_1, \dots, h_k}
+    \ot I )\ket{\psi}  \notag \\
+    &\quad=\E_{\bx_1, \dots, \bx_k} \sum_{(h_1, \dots, h_k) \in S}  \bra{\psi} 
+      A_{h_1, \dots, h_k} \cdot (G^{\bx_1}_{h_1} \cdot  (G^{\bx_2}_{h_2} \dots G^{\bx_k}_{h_k})
+        \cdot (G^{\bx_k}_{h_k} \dots G^{\bx_2}_{h_2})
+        \cdot G^{\bx_1}_{h_1} 
+        \ot I) \ket{\psi}  \notag \\
+    &\quad\approx_{\sqrt{k(4\zeta + \nu_{\rmcom})}} \E_{\bx_1, \dots, \bx_k} \sum_{(h_1, \dots, h_k) \in S}  \bra{\psi} 
+             A_{h_1, \dots, h_k} \cdot ( G^{\bx_1}_{h_1} \cdot  (G^{\bx_2}_{h_2} \dots G^{\bx_k}_{h_k})
+              \cdot G^{\bx_1}_{h_1}   \cdot (G^{\bx_k}_{h_k} \dots G^{\bx_2}_{h_2})
+              \ot I)  \ket{\psi}  \tag{by
+                                   \Cref{lem:commute-g-half-sandwich}} \\
+    &\quad\approx_{\sqrt{2k\zeta}}\E_{\bx_1, \dots, \bx_k} \sum_{(h_1, \dots, h_k) \in S}  \bra{\psi} 
+              A_{h_1, \dots, h_k} \cdot (G^{\bx_1}_{h_1} \cdot  (G^{\bx_2}_{h_2} \dots G^{\bx_k}_{h_k})
+              \cdot G^{\bx_1}_{h_1} \ot   (G^{\bx_2}_{h_2} \dots
+              G^{\bx_k}_{h_k}) )
+              \ket{\psi} \tag{by
+                             \Cref{lem:switch-g-half-sandwich}} \\
+    &\quad\approx_{\sqrt{k(4\zeta + \nu_{\rmcom})}}\E_{\bx_1, \dots, \bx_k} \sum_{(h_1, \dots, h_k) \in S}  \bra{\psi} 
+             A_{h_1, \dots, h_k} \cdot ( (G^{\bx_1}_{h_1})^2 \cdot  (G^{\bx_2}_{h_2} \dots G^{\bx_k}_{h_k})
+              \ot   (G^{\bx_2}_{h_2} \dots G^{\bx_k}_{h_k}) )
+              \ket{\psi}  \tag{by
+                             \Cref{lem:commute-g-half-sandwich}} \\
+    &\quad\approx_{\sqrt{2k\zeta}}\E_{\bx_1, \dots, \bx_k} \sum_{(h_1, \dots, h_k) \in S}  \bra{\psi} 
+             A_{h_1, \dots, h_k} \cdot( G^{\bx_1}_{h_1} \cdot  (G^{\bx_2}_{h_2} \dots
+              G^{\bx_k}_{h_k}) \cdot (G^{\bx_k}_{h_k} \dots G^{\bx_2}_{h_2})
+              \ot I)
+              \ket{\psi}  \tag{by
+                             \Cref{lem:switch-g-half-sandwich}} \\
+    &\quad=\E_{\bx_2, \dots, \bx_k}\sum_{h_2, \dots, h_k: \exists h_1,
+        (h_1, \dots, h_k) \in S} \bra{\psi}
+        \underbrace{\Big(A \cdot (\E_{\bx_1} \sum_{h_1: (h_1, h_2,
+        \dots, h_k) \in S} G^{\bx_1}_{h_1} \ot I)\Big)}_{A'_{h_2,
+        \dots, h_k}} \cdot (H^{\bx_2, \dots, \bx_k}_{h_2, \dots,
+        h_k} \ot I) \ket{\psi}. \label{eq:sum-A-dot-Hk-before-induction}
+  \end{align}
+  Observe that $(A'_{h_2, \dots, h_k})^\dagger(A'_{h_2, \dots, h_k})
+  \leq I$ for every $h_2, \dots, h_k$ in the sum. Thus, we are now in a
+  position to apply the inductive hypothesis.
+  \begin{align}
+    \labelcref{eq:sum-A-dot-Hk-before-induction}
+    &\approx_{\sqrt{(k-1)(12\zeta + 2\nu_{\rmcom})}} \E_{\bx_2, \dots, \bx_k}\sum_{h_2, \dots, h_k} \bra{\psi}
+        \Big(A \cdot (\E_{\bx_1} \sum_{h_1} G^{\bx_1}_{h_1} \ot
+      I)\Big) \cdot (G^{\bx_2}_{h_2}  \dots G^{\bx_k}_{h_k}\ot I)
+      \ket{\psi} \\
+    &= \E_{\bx_1, \dots, \bx_k} \sum_{h_1, \dots, h_k} \bra{\psi} A
+      \cdot (
+      G^{\bx_1}_{h_1} \dots G^{\bx_k}_{h_k} \ot I) \ket{\psi}.
+  \end{align}
+  This proves the proposition. Summing the approximation errors
+  incurred and using the inequality $\sqrt{a + b} \leq \sqrt{a} +
+  \sqrt{b}$ for nonnegative $a,b$ yields the claimed error bound.\ainnote{TODO: double check this!}
+  % \ainnote{OLD PROOF}
+  % \begin{align}
+  %   &\E_{\bx_1, \dots, \bx_k} \sum_{h_1, \dots, h_k}  \bra{\psi} A
+  %     \cdot (H^{\bx_1, \dots, \bx_k}_{h_1, \dots, h_k}
+  %   \ot I) \ket{\psi} \label{eq:sum-A-dot-Hk} \\
+  %   =~&\E_{\bx_1, \dots, \bx_k} \sum_{h_1, \dots, h_k} \bra{\psi}
+  %       A\cdot ( G^{\bx_1}_{h_1}
+  %     \dots
+  %     G^{\bx_k}_{h_k} \dots G^{\bx_2}_{h_2} G^{\bx_1}_{h_1} \ot I) \ket{\psi} \\
+  %   \approx~&\E_{\bx_1, \dots, \bx_k} \sum_{h_1, \dots, h_k}
+  %             \bra{\psi} A \cdot ( G^{\bx_1}_{h_1}
+  %     \dots
+  %     G^{\bx_k}_{h_k} \dots G^{\bx_3}_{h_3}
+  %     G^{\bx_1}_{h_1}G^{\bx_2}_{h_2} \ot I )\ket{\psi} \\
+  %   \approx~& \E_{\bx_1, \dots, \bx_k} \sum_{h_1, \dots, h_k}
+  %     \bra{\psi} A \cdot (G^{\bx_1}_{h_1} \dots G^{\bx_k}_{h_k} \dots
+  %     G^{\bx_3}_{h_3} G^{\bx_1}_{h_1} \ot G^{\bx_2}_{h_2} ) \ket{\psi} \\
+  %   \approx~&\E_{\bx_1, \dots, \bx_k} \sum_{h_1, \dots, h_k}
+  %     \bra{\psi} A \cdot (G^{\bx_1}_{h_1} \dots G^{\bx_k}_{h_k} \dots G^{\bx_4}_{h_4}
+  %     G^{\bx_1}_{h_1} G^{\bx_3}_{h_3} \ot G^{\bx_2}_{h_2}) \ket{\psi}
+  %   \\
+  %       \approx~&\E_{\bx_1, \dots, \bx_k} \sum_{h_1, \dots, h_k}
+  %     \bra{\psi} A \cdot (G^{\bx_1}_{h_1} \dots G^{\bx_k}_{h_k} \dots G^{\bx_4}_{h_4}
+  %     G^{\bx_1}_{h_1}\ot G^{\bx_2}_{h_2} G^{\bx_3}_{h_3} ) \ket{\psi}
+  %   \\
+  %   &\dots \nonumber \\
+  %   \approx~& \E_{\bx_1, \dots, \bx_k} \sum_{h_1, \dots, h_k}
+  %             \bra{\psi} A \cdot( G^{\bx_1}_{h_1} G^{\bx_2}_{h_2} \ot
+  %             G^{\bx_2}_{h_2} H^{\bx_3, \dots, \bx_k}_{h_3, \dots,
+  %             h_k} )\ket{\psi} \\
+  %       \approx~& \E_{\bx_1, \dots, \bx_k} \sum_{h_1, \dots, h_k}
+  %             \bra{\psi} A \cdot( G^{\bx_1}_{h_1} G^{\bx_2}_{h_2} H^{\bx_3, \dots, \bx_k}_{h_3, \dots,
+  %             h_k}\ot
+  %                 G^{\bx_2}_{h_2} )\ket{\psi} \\
+  %           \approx~& \E_{\bx_1, \dots, \bx_k} \sum_{h_1, \dots, h_k}
+  %             \bra{\psi} A \cdot( G^{\bx_1}_{h_1} G^{\bx_2}_{h_2} H^{\bx_3, \dots, \bx_k}_{h_3, \dots,
+  %             h_k} G^{\bx_2}_{h_2}\ot I
+  %             )\ket{\psi}.
+  % \end{align}
+  % Now use the inductive hypothesis somewhere.
+  }
+\end{proof}
+
+
+\subsection{Completeness of the interpolated measurement}
+\begin{lemma}
+  \[\sum_{h} \bra{\psi} N_{h} \ot I \ket{\psi} \approx_{\delta_{\rmcomp}} \sum_{r =
+      d+1}^{k} \binom{k}{r} \bra{\psi} H^{r} (I - H)^{k-r} \ot I
+    \ket{\psi}, \]
+  where $\delta_{\rmcomp} = \delta_{\rmcons} + d/q + O(k^2/q)
+  + \sqrt{k(12\zeta + \nu_{\rmcom})}$.
+  \label{lem:N-sum-bernoulli}
+\end{lemma}
+\begin{proof}
+  Ultimately, we want to use \Cref{lem:halve-a-sandwich}. But first,
+  we need to modify the sum over $h$ to be a sum over all $k$-tuples
+  $(h_1, \dots, h_k)$ such that at least $d+1$ of the elements are not
+  equal to $\bot$, and those that are not $\bot$ are equal to
+  restrictions of a common global polynomial $h$. To do this, we will
+  argue that tuples of outcomes that are \emph{not} consistent with a
+  global polynomial are unlikely to occur, using \Cref{lem:N-B-consistency} and \Cref{lem:ld-sandwich-line-one-point}.
+  \begin{align}
+    &\sum_{h} \bra{\psi} N_h \ot I \ket{\psi} \\
+    % =~&\E_{\bu} \sum_f \sum_{h} \bra{\psi} N_h \ot B^{\bu}_{f}
+    %     \ket{\psi} && \text{(because $B$ is a complete measurement)}
+    % \\
+    % \approx~&\E_{\bu}\sum_{f}  \sum_{h: h_{|\bu} = f} \bra{\psi} N_h \ot B^{\bu}_{f}
+    %           \ket{\psi} && \text{(by \Cref{lem:N-B-consistency})} \\
+    =~& \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}} \sum_{h} \sum_{w:
+        |w| \geq d+1} \bra{\psi} H^{\bx_1, \dots, \bx_k}_{h_w} \ot
+        I \ket{\psi} \\
+    =~& \underbrace{\E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}}  \sum_{w: |w| \geq d+1}
+        \sum_{(h_1, \dots, h_k) \in S_{w}} \bra{\psi} H^{\bx_1, \dots,
+        \bx_k}_{h_1, \dots, h_k} \ot I \ket{\psi}}_{\term{tm:ld-interpolate-main}} \nonumber
+    \\
+    &\quad - \underbrace{ \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}} 
+      \sum_{w: |w| \geq d+1} \sum_{(h_1, \dots, h_k) \in S_{w}}
+      \bone[ \forall h, \exists i, h_{|\bx_i} \neq h_{i}] \cdot \bra{\psi}
+      H^{\bx_1, \dots, \bx_k}_{h_1, \dots, h_k} \ot I \ket{\psi}}_{\term{tm:ld-interpolate-error}}.
+  \end{align}
+  We will now bound \Cref{tm:ld-interpolate-error} using the
+  Schwarz-Zippel lemma together with the consistency between $H$ and
+  $B$.
+
+  \begin{alignat}{2}
+    &~~\labelcref{tm:ld-interpolate-error} \nonumber \\
+    &=~ \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}}  
+      \sum_{w: |w| \geq d+1} \sum_{(h_1, \dots, h_k) \in S_{w}}
+      \bone[ \exists i, \interp(h_1, \dots, h_k)_{|\bx_i} \neq h_{i}] \cdot \bra{\psi}
+      H^{\bx_1, \dots, \bx_k}_{h_1, \dots, h_k} \ot I
+        \ket{\psi} \\
+    &=~ \E_{\bu} \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}}  \sum_{f}
+      \sum_{w: |w| \geq d+1} \sum_{(h_1, \dots, h_k) \in S_{w}}
+      \bone[ \exists i, \interp(h_1, \dots, h_k)_{|\bx_i}  \neq h_{i}] \cdot \bra{\psi}
+      H^{\bx_1, \dots, \bx_k}_{h_1, \dots, h_k} \ot B^{\bu}_f
+        \ket{\psi} \\
+    &\approx_{k \cdot \delta_{\rmcons}}~\E_{\bu} \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}}  \sum_{f}
+      \sum_{w: |w| \geq d+1} \sum_{(h_1, \dots, h_k) \in S_{w}} \Big(
+      \bone[ \exists i, \interp(h_1, \dots, h_k)_{|\bx_i}  \neq h_{i}] \cdot \bone[
+        \forall i , f(\bx_i) = h_i(\bu)] \nonumber \\
+    &\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \cdot \bra{\psi}
+      H^{\bx_1, \dots, \bx_k}_{h_1, \dots, h_k} \ot B^{\bu}_f
+      \ket{\psi} \Big) \\
+      &\leq~\E_{\bu} \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}}  \sum_{f}
+      \sum_{w: |w| \geq d+1} \sum_{(h_1, \dots, h_k) \in S_{w}} \Big(
+      \bone[ \exists i, \interp(h_1, \dots, h_k)_{|\bx_i}  \neq h_{i}]
+             \nonumber \\
+    &\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \cdot \bone[
+        \forall i , \interp(h_1, \dots, h_k)(\bu, \bx_i) = h_i(\bu)] \nonumber \\
+    &\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \cdot \bra{\psi}
+      H^{\bx_1, \dots, \bx_k}_{h_1, \dots, h_k} \ot B^{\bu}_f
+      \ket{\psi} \Big) \\
+    &=~ \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}}  
+      \sum_{w: |w| \geq d+1} \sum_{(h_1, \dots, h_k) \in S_{w}} \Big( 
+      \bone[ \exists i, \interp(h_1, \dots, h_k)_{|\bx_i}  \neq h_{i}]
+             \nonumber \\
+    &\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \cdot \underbrace{\big( \E_{\bu} \bone[
+        \forall i , \interp(h_1, \dots, h_k)(\bu, \bx_i) = h_i(\bu)]
+      \big)}_{\leq d/q}  \nonumber \\
+    &\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \cdot \bra{\psi}
+      H^{\bx_1, \dots, \bx_k}_{h_1, \dots, h_k} \ot I
+      \ket{\psi} \Big) \\
+    &\leq~ d/q,
+  \end{alignat}
+  where the first approximation is due to the consistency between $B$
+  and $H$ (\Cref{lem:ld-sandwich-line-one-point-neq}), and the final
+  inequality is due to Schwarz-Zippel\anote{Write this up!}.
+
+  To complete the proof, we return to \Cref{tm:ld-interpolate-main}.
+  \begin{align}
+    \labelcref{tm:ld-interpolate-main}
+    &= \E_{\bx_1, \dots, \bx_k \sim \calD_{\neq}} \sum_{w: |w| \geq
+      d+1} \sum_{(h_1, \dots, h_k) \in S_w} \bra{\psi} H^{\bx_1,
+      \dots, \bx_k}_{h_1, \dots, h_k} \ot I \ket{\psi} \\
+    &\approx_{k^2/q} \E_{\bx_1, \dots, \bx_k } \sum_{w: |w| \geq
+      d+1} \sum_{(h_1, \dots, h_k) \in S_w} \bra{\psi} H^{\bx_1,
+      \dots, \bx_k}_{h_1, \dots, h_k} \ot I \ket{\psi} && \text{(by \Cref{prop:ld-dnoteq})}\\
+    &\approx_{\sqrt{k(12\zeta + 2\nu_{\rmcom})}} \E_{\bx_1, \dots, \bx_k} \sum_{w: |w| \geq d+1}
+      \sum_{(h_1, \dots,h_k) \in S_w} \bra{\psi} G^{\bx_1}_{h_1} \dots
+      G^{\bx_k}_{h_k} \ot I \ket{\psi} &&\text{(by \Cref{lem:halve-a-sandwich})}\\
+    &= \sum_{r = d+1}^{k} \binom{k}{r} \bra{\psi} (G)^{r} \cdot (I -
+      G)^{k-r} \ot I \ket{\psi}.
+  \end{align}
+  Chaining together the errors incurred in the approximations, we
+  obtain the conclusion of the lemma with an error of
+  $\delta_{\rmcons} + d/q + k^2/q + \sqrt{k(12\zeta + \nu_{\rmcom})}$.
+\end{proof}
+}
+
+\begin{lemma}
+  \label{lem:chernoff-bernoulli-matrix}
+  Let $0 < \theta < 1$ and let $k, d > 0$ be integers such that $k \geq 2d/\theta$.
+  Define the matrix-valued function $F$ by
+  \[ F(X) = \sum_{r = d+1}^{k} \binom{k}{r} X^r (I - X)^{r - k}. \]
+  Then for any Hermitian matrix $X$ such that $0 \leq X \leq I$ and $\bra{\psi} X \ot I
+  \ket{\psi} \geq 1 - \kappa$, it holds that
+  \[ \bra{\psi} F(X) \ot I \ket{\psi} \geq 1 - \frac{\kappa}{1 - \theta}
+    - e^{-\theta^2 k/2}. \]
+  \end{lemma}
+  \begin{proof}
+    Let $\rho$ be the reduced state of $\ket{\psi}$ on one prover's
+    subsystem (since the state is assumed to be symmetric, it does not
+    matter which prover we take).
+    Write the eigendecomposition $X = \sum_{i} \lambda_i
+    \ket{v_i}\bra{v_i}$ of $X$, where we allow some of the
+    eigenvalues to be $0$ so that the set of eigenvectors
+    $\{\ket{v_i}\}$ forms an orthonormal basis of the space. This defines a probability
+    distribution $\mu$ over eigenvectors, where eigenvector $i$
+    occurs with probability $\mu(i) = \bra{v_i} \rho \ket{v_i}$. The
+    given condition $\bra{\psi} X \ot I \ket{\psi} = \Tr(X \rho) \geq
+    1 -\kappa$ implies that
+    \begin{align*}
+      \E_{\bi \sim \mu} \lambda_{\bi}
+      = \sum_i \lambda_i \cdot \mu(i)
+       &= \sum_i \lambda_i \cdot \bra{v_i} \rho \ket{v_i}\\
+       &=\sum_i \lambda_i \cdot \tr(\ket{v_i} \bra{v_i}  \cdot \rho)\\
+       &=\tr \Big(\sum_i \lambda_i  \ket{v_i} \bra{v_i} \cdot\rho\Big)
+       = \tr(X \rho)
+       \geq 1 - \kappa.
+     \end{align*}
+     Or, equivalently,
+     \begin{equation*}
+      \E_{\bi \sim \mu} ( 1 -\lambda_{\bi}) \leq \kappa.
+    \end{equation*}
+      By Markov's inequality, for any $0 < \theta < 1$, we have
+     \begin{equation*}
+     \Pr_{\bi \sim \mu}[(1-\lambda_{\bi}) \geq (1 - \theta)]
+     \leq \frac{\E_{\bi \sim \mu} (1-\lambda_{\bi})}{1-\theta}
+     \leq \frac{\kappa}{1-\theta}.
+     \end{equation*} 
+     In other words,
+     \begin{equation}\label{eq:in-other-words}
+     \Pr_{\bi \sim \mu}[\lambda_{\bi} > \theta]
+     = \Pr_{\bi \sim \mu}[(1 - \lambda_{\bi}) < (1 - \theta)]
+     = 1 - \Pr_{\bi \sim \mu}[(1 - \lambda_{\bi}) \geq (1 - \theta)]
+     \geq 1 - \frac{\kappa}{1-\theta}.  
+     \end{equation}
+      Thus, it  holds that with probability at least $1 - \frac{\kappa}{1 - \theta}$ over $\bi \sim
+    \mu$, $\lambda_{\bi} > \theta$.
+
+    We now evaluate $\bra{\psi} F(X) \ot I \ket{\psi}$. We will
+    essentially do this eigenvalue by eigenvalue.
+    To begin, we consider a hypothetical eigenvalue $d/k \leq p \leq 1$.
+    Observe that $F(p)$ is precisely the
+    probability 
+    probability of observing at least $d+1$ successes out of $k$
+    i.i.d.\ Bernoulli trials, each of which succeeds with probability
+    $p$.
+    In other words, it is the probability that $\bY := \bY_1 + \cdots + \bY_k \geq d+1$,
+    where $\bY_1, \ldots, \bY_k \sim \mathrm{Bernoulli}(p)$.
+    We can bound this probability by the additive Chernoff bound (see the second additive bound in~\cite{Blu11}):
+    \begin{align*}
+    \Pr[\bY \leq d]
+    &= \Pr[\bY \leq p k - (pk - d)] \\
+    &=\Pr\Big[\bY \leq pk - \Big(p - \frac{d}{k}\Big)\cdot k\Big]\\
+    	&\leq  \exp\Big(-2 \Big(p - \frac{d}{k}\Big)^2 \cdot k\Big).
+    \end{align*}
+    Thus,
+    \begin{equation}\label{eq:by-chernoff}
+    F(p) = \Pr[\bY \geq d+1] = 1 - \Pr[\bY \leq d] \geq 1 - \exp\Big(-2 \Big(p - \frac{d}{k}\Big)^2 \cdot k\Big).
+    \end{equation}
+        Putting the pieces together, we compute $\bra{\psi} f(X) \ot I
+    \ket{\psi}$:
+    \begin{align}
+      \bra{\psi} F(X) \ot I \ket{\psi} &= \Tr(F(X) \rho) \nonumber\\
+                                       &= \sum_{i} F(\lambda_i)
+                                         \bra{v_i} \rho \ket{v_i} \nonumber\\
+                                       &=\E_{\bi \sim \mu}
+                                         F(\lambda_{\bi}) \nonumber\\
+                                       &\geq \Pr_{\bi \sim
+                                         \mu}[\lambda_{\bi} \geq \theta]
+                                         \cdot F(\theta) \nonumber\\
+                                       &\geq \Big( 1 - \frac{\kappa}{1 - \theta} \Big) \cdot F(\theta)  \tag{by \Cref{eq:in-other-words}}\\
+      &\geq \Big( 1 - \frac{\kappa}{1 - \theta} \Big) \cdot \Big(1 - \exp \Big(-2\Big(\theta -
+        \frac{d}{k}\Big)^2 \cdot k \Big) \Big) \label{eq:almost-done-with-this-giant-proof},
+        \end{align}
+        where the last step uses \Cref{eq:by-chernoff}.
+    Next, we claim that if $a, b, c \geq 0$ satisfy $a \geq (1-b) \cdot (1-c)$,
+    then $a \geq 1 - b - c$. This is because if either $b$ or $c$ is at least~$1$,
+    then the conclusion is trivially true, and if both are less than~$1$,
+    then
+    \begin{equation*}
+    (1-b) \cdot (1-c) = 1\cdot (1-c) -  b \cdot (1-c) \geq 1 \cdot (1-c) - b \cdot 1 = 1-c-b.
+    \end{equation*}
+    Since $\bra{\psi} F(X) \ot I \ket{\psi}$ is manifestly positive,
+    we can apply this to \Cref{eq:almost-done-with-this-giant-proof}, yielding
+    \begin{equation*}
+    \bra{\psi} F(X) \ot I \ket{\psi}
+    \geq  1 - \frac{\kappa}{1 - \theta} - \exp \Big(-2\Big(\theta -
+        \frac{d}{k}\Big)^2 \cdot k \Big).
+    \end{equation*}
+    Finally, we note that because $k \geq 2d/\theta$,
+    we have $\theta/2 \geq d/k$.
+    This implies that
+    $\theta-d/k \geq \theta - \theta/2 = \theta/2$,
+    and so    
+    $(\theta - d/k)^2 \geq (\theta/2)^2 = \theta^2/4$.
+    As a result,
+    \begin{equation*}
+    \exp \Big(2\Big(\theta -
+        \frac{d}{k}\Big)^2 \cdot k \Big)
+        \geq 
+        \exp \Big(\theta^2 k/2 \Big).
+    \end{equation*}
+    Equivalently,
+    \begin{equation*}
+    \exp \Big(-2\Big(\theta -
+        \frac{d}{k}\Big)^2 \cdot k \Big)
+        \leq 
+        \exp \Big(-\theta^2 k/2 \Big).
+    \end{equation*}
+    Thus, we conclude
+    \begin{equation*}
+     \bra{\psi} F(X) \ot I \ket{\psi}
+    \geq  1 - \frac{\kappa}{1 - \theta} - \exp \Big(-\theta^2 k/2 \Big).\qedhere
+    \end{equation*}
+  \end{proof}
+\begin{corollary}[Completeness of~$H$; Proof of \Cref{item:ld-pasting-N-completeness-sub-measurement} of \Cref{lem:ld-pasting-sub-measurement}]
+  \label{cor:ld-pasting-N-completeness}
+  Let $k \geq 400md$. Then
+  \[ \bra{\psi} H \otimes I \ket{\psi}
+\geq 1 - \kappa \cdot \left(1 + \frac{1}{100m}\right)
+    - \nu - e^{- k/(80000m^2)}. \]
+\end{corollary}
+\begin{proof}
+We begin by approximating the completeness as follows.
+\begin{align*}
+\bra{\psi} H \otimes I \ket{\psi}
+& \approx_{\nu_7} \E_{\bx_1, \ldots, \bx_k} \sum_{\tau:|\tau| \geq d+1} \sum_{(g_1, \ldots, g_k) \in \mathsf{Outcomes}_{\tau}} \bra{\psi} \widehat{H}^{\bx_1, \ldots, \bx_k}_{g_1, \ldots, g_k} \otimes I \ket{\psi} \tag{by \Cref{lem:over-all-outcomes}}\\
+& \approx_{\nu_8} \sum_{i = d+1}^k \binom{k}{i} \bra{\psi} G^i (I-G)^{k-i} \otimes I \ket{\psi} \tag{by \Cref{lem:from-H-to-G}}\\
+& = \bra{\psi} F(G) \ot I \ket{\psi}.
+\end{align*}
+We can bound the error incurred here by
+\begin{align*}
+\nu_7 + \nu_8
+&= 46 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} +  \gamma^{1/32} + \zeta^{1/32} +(d/q)^{1/32}\right)
+	+ 46 k m \cdot \left(\gamma^{1/32} + \zeta^{1/32} + (d/q)^{1/32}\right)\\
+&\leq 100 k^2m \cdot \left(\eps^{1/32} + \delta^{1/32} +  \gamma^{1/32} + \zeta^{1/32} +(d/q)^{1/32}\right)\\
+&= \nu.
+\end{align*}
+Let $\theta = 1/(200 m)$. Note that
+\begin{equation*}
+\frac{1}{1-\theta}
+= \frac{1}{1- 1/(200m)}
+= \frac{200m}{200m-1}
+= 1 + \frac{1}{200m-1}
+\leq 1 + \frac{1}{100m}.
+\end{equation*}
+Then $k \geq 2d/\theta$ and, therefore, $k \geq d+1$.
+As a result, $k$ and~$\theta$ satisfy the hypothesis of \Cref{lem:chernoff-bernoulli-matrix},
+namely that $k \geq \max\{d+1, 2d/\theta\}$.
+Thus, \Cref{lem:chernoff-bernoulli-matrix} implies that
+\begin{align*}
+\bra{\psi} F(G) \ot I \ket{\psi}
+&\geq 1 - \frac{\kappa}{1 - \theta}
+    - e^{-\theta^2 k/2}\\
+&= 1 - \frac{\kappa}{1 - \theta}
+    - e^{- k/(80000m^2)}\\
+&\geq 1 - \kappa \cdot \left(1 + \frac{1}{100m}\right)
+    - e^{- k/(80000m^2)}.
+\end{align*}
+In total, we have
+\begin{equation*}
+\bra{\psi} H \otimes I \ket{\psi}
+\geq 1 - \kappa \cdot \left(1 + \frac{1}{100m}\right)
+    - \nu - e^{- k/(80000m^2)}.
+\end{equation*}
+This completes the proof.
+\end{proof}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "multilinearity"
+%%% End:

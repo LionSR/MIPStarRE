@@ -1,0 +1,49 @@
+
+\section{Commutativity of the points measurements}
+\label{sec:commutativity-points}
+
+\begin{theorem}\label{thm:commutativity-points}
+Let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy for the
+$(m,q,d)$ low individual degree test.
+On average over independent and uniformly random $\bu, \bv \sim \F_q^m$,
+\begin{equation*}
+(A^{u}_a \cdot A^{v}_b) \otimes I \approx_{32\gamma m} (A^{v}_b\cdot A^{u}_a) \otimes I.
+\end{equation*}
+\end{theorem}
+\begin{proof}
+The strategy passes the diagonal lines test with probability $1-\gamma$.
+Therefore, it passes the $m$-restricted diagonal lines test with probability $1- \gamma\cdot m$.
+This means that
+\begin{equation*}
+A^{u}_a \otimes I \simeq_{\gamma \cdot m} I \otimes L^{\ell}_{[f(u)=a]},
+\end{equation*}
+on average over a uniformly random $\bu \sim \F_q^{m}$ and a uniformly random line $\bell$ in $\F_q^m$
+containing $\bu$.
+By~\Cref{prop:simeq-to-approx}, this implies that
+\begin{equation}\label{eq:point-diagonal-line-approx}
+A^{u}_a \otimes I \approx_{2\cdot \gamma \cdot m} I \otimes L^{\ell}_{[f(u)=a]}. 
+\end{equation}
+
+Let $\bu$ and $\bv$ be independent and uniformly random points in $\F_q^m$.
+Let $\bell$ be a uniformly random line in $\F_q^m$ containing both points.
+(If $\bu$ and $\bv$ are distinct, then $\bell$ is just the unique line that passes through both of them.
+Otherwise, $\bu = \bv$, and $\bell$ is a uniformly random line passing through $\bu$.)
+Then the marginal distribution on $\bu$ and $\bell$ is as in \Cref{eq:point-diagonal-line-approx},
+as is the marginal distribution on $\bv$ and $\bell$.
+As a result,
+\begin{align*}
+(A^{u}_a \cdot A^{v}_b) \otimes I
+&\approx_{2\cdot \gamma \cdot m} A^{u}_a \otimes L^{\ell}_{[f(v)=b]} \tag{by \Cref{eq:point-diagonal-line-approx}}\\
+&\approx_{2\cdot \gamma \cdot m} I \otimes (L^{\ell}_{[f(v)=b]} \cdot L^{\ell}_{[f'(u)=a]}) \tag{by \Cref{eq:point-diagonal-line-approx}}\\
+&= I \otimes (L^{\ell}_{[f'(u)=a]} \cdot L^{\ell}_{[f(v)=b]}) \tag{because~$L$ is projective}\\
+&\approx_{2\cdot \gamma \cdot m} A^{v}_b \otimes L^{\ell}_{[f'(u)=a]} \tag{by \Cref{eq:point-diagonal-line-approx}}\\
+&\approx_{2\cdot \gamma \cdot m} (A^{v}_b \cdot A^{u}_a) \otimes I. \tag{by \Cref{eq:point-diagonal-line-approx}}
+\end{align*}
+The theorem now follows from
+\Cref{prop:triangle-inequality-for-approx_delta}.
+\end{proof}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "multilinearity"
+%%% End:

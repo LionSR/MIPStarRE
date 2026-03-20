@@ -1,0 +1,1307 @@
+
+\section{Preliminaries}\label{sec:prelims}
+
+We use \textbf{boldface font} to denote random variables.
+For two complex numbers $\alpha, \beta \in \C$, we write
+$\alpha \approx_{\eps} \beta$ if
+\begin{equation*}
+|\alpha - \beta| \leq \eps.
+\end{equation*}
+We note the following triangle inequality for numbers, which we will use repeatedly:
+\begin{equation}\label{eq:triangle-inequality-for-numbers}
+\text{if $\alpha \approx_{\eps} \beta$ and $\beta \approx_{\delta} \gamma$, then $\alpha \approx_{\eps+\delta}\gamma$.}
+\end{equation}
+
+\subsection{Finite fields}
+
+A \emph{finite field} is a field with a finite number of elements.
+There is a unique finite field~$\F_q$ of~$q$ elements for each prime power $q = p^t$,
+and there are no other finite fields.
+We write $\omega$ for the $p$-th root of unity $\omega = e^{2 \pi i/p}$.
+
+\begin{definition}[Finite field trace]
+The \emph{finite field trace} is the function $\tr:\F_q \rightarrow \F_p$ defined as
+\begin{equation*}
+\tr[x] = \sum_{\ell=0}^{t-1} x^{p^{\ell}}.
+\end{equation*}
+\end{definition}
+
+\begin{proposition}
+\label{prop:fourier-fact-scalar}
+Let $a \in \F_q$. Then
+\begin{equation*}
+\E_{\bx \sim \F_q} \omega^{\tr[\bx \cdot a]}
+= \left\{\begin{array}{rl}
+	1 & \text{if $a = 0$},\\
+	0 & \text{otherwise}.
+	\end{array}\right.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+If $a = 0$, then $\tr[x \cdot a] = 0$ for all $x \in \F_q$.
+As a result,
+\begin{equation*}
+\E_{\bx \sim \F_q} \omega^{\tr[\bx \cdot a]}
+= \E_{\bx \sim \F_q} \omega^{0}
+= \E_{\bx \sim \F_q} 1
+= 1.
+\end{equation*}
+On the other hand, if $a \neq 0$, then there exists a $y \in \F_q$
+such that $\tr[a \cdot y] \neq 0$. As a result,
+\begin{equation*}
+C
+:= \E_{\bx \sim \F_q} \omega^{\tr[\bx \cdot a]}
+= \E_{\bx \sim \F_q} \omega^{\tr[(\bx+y) \cdot a]}
+= \E_{\bx \sim \F_q} (\omega^{\tr[\bx \cdot a]} \cdot \omega^{\tr[y \cdot a]})
+= C \cdot \omega^{\tr[y\cdot a]}.
+\end{equation*}
+But because $\tr[y \cdot a] \neq 0$,
+$\omega^{\tr[y\cdot a]} \neq 1$.
+This implies that $C = 0$.
+\end{proof}
+
+
+\begin{proposition}
+\label{prop:fourier-fact-vector}
+Let $v \in \F_q^m$. Then
+\begin{equation*}
+\E_{\bu \sim \F_q^m} \omega^{\tr[\bu \cdot v]}
+= \left\{\begin{array}{rl}
+	1 & \text{if $v = 0$},\\
+	0 & \text{otherwise}.
+	\end{array}\right.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+By the linearity of the trace,
+\begin{equation*}
+\E_{\bu \sim \F_q^m} \omega^{\tr[\bu \cdot v]}
+= \E_{\bu \sim \F_q^m} (\omega^{\tr[\bu_1 \cdot v_1]} \cdots \omega^{\tr[\bu_m \cdot v_m]})
+= \prod_{i=1}^m (\omega^{\tr[\bu_i \cdot v_i]}),
+\end{equation*}
+which by \Cref{prop:fourier-fact-scalar} is $1$ if $v_i = 0$ for all $i$ and $0$ otherwise.
+\end{proof}
+
+
+
+\subsection{Polynomials over finite fields}
+
+\begin{definition}[Polynomials of low individual degree]
+Let $q$ be a prime power,
+and let $m$ and $d$ be nonnegative integers.
+We define $\polyfunc{m}{q}{d}$ to be the set of polynomials in $\F_q^m$
+with individual degree~$d$.
+\end{definition}
+
+\begin{remark}
+Note that as defined in \Cref{sec:intro},
+in this work a polynomial with individual degree~$d$ is one in which the degree~$d_i$ of each coordinate~$i$
+is \emph{at most~$d$}.
+This allows us to say ``individual degree~$d$'' rather than the wordier ``individual degree at most~$d$''.
+For example, under this definition, $\polyfunc{m}{q}{d}$ is contained in $\polyfunc{m}{q}{d+1}$ for each~$d$.
+\end{remark}
+
+The most important fact about low-degree polynomials is that they have large distance from each other.
+This is shown by the following lemma.
+
+\begin{lemma}[Schwartz-Zippel lemma~\cite{Sch80,Zip79}]\label{lem:schwartz-zippel-total-degree}
+Let $g, h:\F_q^m \rightarrow \F_q$ be two distinct polynomials of total degree~$d$.
+Then
+\begin{equation*}
+\Pr_{\bx \sim \F_q^m}[g(\bx) = h(\bx)] \leq \frac{d}{q}.
+\end{equation*}
+\end{lemma}
+
+Since any polynomial with individual degree~$d$ has total degree~$md$,
+\Cref{lem:schwartz-zippel-total-degree} implies the following corollary.
+
+\begin{corollary}[Schwartz-Zippel for individual degree]
+Let $g, h \in \polyfunc{m}{q}{d}$ be distinct. Then
+\begin{equation*}
+\Pr_{\bx \sim \F_q^m}[g(\bx) = h(\bx)] \leq \frac{md}{q}.
+\end{equation*}
+\end{corollary}
+
+\subsection{Measurements}
+
+\begin{definition}[Measurements and sub-measurements]
+Let $\calH$ be a Hilbert space and $\calA$ be a set of outcomes.
+A \emph{sub-measurement}
+is a set of Hermitian, positive-semidefinite matrices
+$A = \{A_a\}_{a \in \calA}$
+acting on~$\calH$
+such that $\sum_a A_a \leq I$.
+The sub-measurement is \emph{projective} if $(A_a)^2 = A_a$ for each~$a$.
+It is a \emph{measurement}
+if it satisfies the stronger condition $\sum_a A_a = I$.
+\end{definition}
+
+An important class of sub-measurements
+are those that output polynomials~$g$ of individual degree~$d$.
+These are defined as follows.
+
+\begin{definition}[Low-degree polynomial measurements]
+We write $\polysub{m}{q}{d}$ for the set of sub-measurements $G=\{G_g\}$
+with outcomes $g \in \polyfunc{m}{q}{d}$.
+We write $\polymeas{m}{q}{d}$ for the subset of $\polysub{m}{q}{d}$
+containing only those $G = \{G_g\}$ which are measurements.
+\end{definition}
+
+\begin{definition}[Post-processing measurements]\label{def:post-processing}
+Let $A = \{A_a\}_{a \in \calA}$ be a set of matrices,
+and let $f:\calA \rightarrow \calB$ be a function.
+Then for each $b \in \calB$,
+we define the matrix
+\begin{equation*}
+A_{[f(a)=b]} = \sum_{a:f(a)=b} A_a.
+\end{equation*}
+\end{definition}
+
+\begin{remark}
+We note that \Cref{def:post-processing}
+agrees with the notation for post-processing measurements
+used in \cite{NW19},
+but it disagrees with the notation used in \cite{JNV+20}.
+That work uses the notation ``$A_{[f(\cdot)=b]}$'' rather
+than the notation ``$A_{[f(a)=b]}$'' that we use in this work. 
+\end{remark}
+
+An easy-to-prove fact is that measurements remain measurements after post-processing their outcomes.
+
+\begin{proposition}
+Let $A = \{A_a\}_{a \in \calA}$ be a set of matrices,
+and let $f:\calA \rightarrow \calB$ be a function.
+Then
+\begin{equation*}
+\sum_a A_a = \sum_b A_{[f(a)=b]}.
+\end{equation*}
+Thus, if~$\{A_a\}$ is a sub-measurement (respectively, measurement),
+then~$\{A_{[f(a)=b]}\}$ is also a sub-measurement (respectively, measurement).
+\end{proposition}
+
+\begin{remark}
+We note that there is some ambiguity in the notation $A_{[f(a)=b]}$
+because it requires one to know which of~$f$ or~$a$ is the measurement outcome
+and which is the function applied to it.
+For example, given a sub-measurement $G = \{G_g\} \in \polysub{m}{q}{d}$,
+we will often consider evaluating its outputs at a point $u \in \F_q^m$.
+This entails looking at the sub-measurement
+\begin{equation*}
+\{G_{[g(u)=a]}\}_{a \in \F_q},
+\quad
+\text{where}
+\quad
+G_{[g(u)=a]} = \sum_{g:g(u) = a} G_g.
+\end{equation*}
+Here, $g$ is the measurement outcome of~$G$,
+and the function being applied maps it to its evaluation on the point~$u$, i.e.\ $g(u)$.
+In general, it should always be clear from context
+what the measurement outcome and the function being applied to it are.
+\end{remark}
+
+\begin{notation}[Measurements indexed by questions]
+We will frequently encounter sets of sub-measurements $A^x= \{A^x_{a}\}$ indexed by elements~$x$ from a set of ``questions" $\calX$. We will write $A = \{A^x_a\}$ for this set. 
+We will typically refer to this set~$A$ as a sub-measurement,
+and we will refer to it as a measurement if each~$A^x$ is a measurement.
+In addition, we will refer to it as projective if each~$A^x$ is projective.
+\end{notation}
+
+\begin{notation}[Complete part of sub-measurement]
+Given a sub-measurement~$A = \{A_a\}$, we will write $A = \sum_a A_a$.
+Similarly, given a sub-measurement~$A = \{A^x_a\}$, we will write $A^x = \sum_a A^x_a$ and $A = \E_{\bx} A^{\bx}$.
+\end{notation}
+
+The complete part of a sub-measurement
+contrasts with its \emph{incomplete part},
+which is the matrix $I - A^x$.
+We will sometimes
+view~$A$ as a measurement
+by throwing in its incomplete part as an additional POVM element.
+This is formalized in the following definition.
+
+
+\begin{definition}[Completing a sub-measurement]\label{def:measurement-completion}
+Let $A = \{A^x_a\}_{a \in \calA}$ be a sub-measurement.
+We define the \emph{completion of~$A$},
+denoted $\mathrm{completion}(A)$,
+to be the measurement $\widehat{A} = \{\widehat{A}^x_a\}$
+with outcome set $\widehat{\calA} = \calA \cup \{\bot\}$ 
+such that for each $a \in \widehat{\calA}$,
+\begin{equation*}
+A^x_a
+= \left\{\begin{array}{cl}
+		A^x_a & \text{if $a \in \calA$,}\\
+		I - A^x & \text{if $a = \bot$}.
+		\end{array}\right.
+\end{equation*}
+\end{definition}
+
+\subsection{Comparing measurements}
+\label{sec:comparing-measurements}
+
+An central problem in this paper is recognizing when two measurements are close to each other. 
+We will survey two methods of doing so,
+using the \emph{consistency} and the \emph{state dependent distance}.
+This section largely mirrors Sections 4.4 and 4.5 of \cite{NW19},
+which prove numerous properties of these two distances.
+However, we are unable to cite their results directly
+because they are mostly stated and proven only for measurements,
+whereas we will need to apply them to sub-measurements as well.
+
+\subsubsection{Consistency between measurements}
+
+The most basic notion of similarity between two measurements is given by their \emph{consistency}.
+
+\begin{definition}[Consistency]\label{def:simeq}
+Let $\ket{\psi}$ be a state in $\calH_{\mathrm{A}} \ot \calH_{\mathrm{B}}$.
+Let $A = \{A^x_a\}$ be a sub-measurement acting on $\calH_{\mathrm{A}}$
+and $B = \{B^x_a\}$ be a sub-measurement acting on $\calH_{\mathrm{B}}$.
+Finally, let $\calD$ be a distribution on the question set~$\calX$.
+Then we say that
+ \begin{equation*}
+ A^x_a \ot I \simeq_{\delta} I \ot B^x_a
+ \end{equation*}
+  on state $\ket{\psi}$ and distribution $\calD$ if
+  \begin{equation}\label{eq:no-big-Oh}
+  \E_{\bx \sim \calD} \sum_{a \neq b} \bra{\psi} A^{\bx}_a \ot B^{\bx}_b
+    \ket{\psi} \leq \delta.
+    \end{equation}
+\end{definition}
+
+This is simply the probability that the provers receive different outcomes
+when they measure with~$A$ and~$B$,
+assuming the sub-measurements do return an outcome.
+
+\begin{notation}[Simplifying notation]
+Because the state $\ket{\psi}$ and distribution $\calD$ are typically clear from context,
+we will often write ``$ A^x_a \ot I \simeq_{\delta} I \ot B^x_a$"
+as shorthand for ``$ A^x_a \ot I \simeq_{\delta} I \ot B^x_a$ on state $\ket{\psi}$ and distribution $\calD$".
+In the case when $\calD$ is not clear by context,
+we might specify it implicitly in terms of a random variable~$\bx$ distributed according to~$\calD$.
+For example, suppose the distribution~$\calD$ is supposed to be uniform on the question set $\F_q$.
+Then we might say ``on average over $\bx \sim \F_q$,
+\begin{equation*}
+A^x_a \ot I \simeq_{\delta} I \ot B^x_a"
+\end{equation*}
+as shorthand for ``$ A^x_a \ot I \simeq_{\delta} I \ot B^x_a$ on distribution $\calD$".
+\end{notation}
+
+We note that there are two differences between the definition of consistency in \Cref{def:simeq}
+and the original definition of consistency given in \cite[Definition 4.11]{NW19}.
+The first of these is that the~\cite{NW19} definition
+allows the right-hand side of \Cref{eq:no-big-Oh} to be $O(\delta)$
+rather than strictly~$\delta$.
+The benefit of this is that they do not need to keep track of constant prefactors in their proofs;
+we have elected to use this more concrete definition
+to make our proofs more easily verifiable, at the expense of tracking these constant prefactors.
+The second difference is that is that they define their consistency as the quantity
+\begin{equation*}
+1 - \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot B^{\bx}_a \ket{\psi}.
+\end{equation*}
+As we show below in \Cref{prop:simeq-for-measurements},
+this agrees with \Cref{def:simeq}
+when~$A$ and~$B$ are both measurements.
+However, these two definitions disagree
+when~$A$ and~$B$ are \emph{sub}-measurements,
+which is a case we will frequently encounter throughout this paper.
+
+\begin{proposition}[Consistency for measurements]\label{prop:simeq-for-measurements}
+Let $A = \{A^x_a\}$ and $B = \{B^x_a\}$ be two measurements.
+Then
+\begin{equation*}
+A^x_a \ot I \simeq_{\delta} I \ot B^x_a
+\end{equation*}
+if and only if
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot B^{\bx}_a \ket{\psi} \geq 1 - \delta.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+We compute
+\begin{align*}
+&\E_{\bx} \sum_{a \neq b}\bra{\psi} A^{\bx}_a \ot B^{\bx}_b \ket{\psi}\\
+=~& \E_{\bx} \sum_b \bra{\psi} \Big(\sum_{a \neq b} A^{\bx}_a\Big) \ot B^{\bx}_b\ket{\psi}\\
+=~&\E_{\bx} \sum_b \bra{\psi} (I - A^{\bx}_b) \ot B^{\bx}_b\ket{\psi}
+	\tag{because~$A$ is a measurement}\\
+=~&\E_{\bx} \sum_b \bra{\psi} I \ot B^{\bx}_b\ket{\psi}
+	- \E_{\bx} \sum_b \bra{\psi} A^{\bx}_b \ot B^{\bx}_b\ket{\psi}\\
+=~&1
+	- \E_{\bx} \sum_b \bra{\psi} A^{\bx}_b \ot B^{\bx}_b\ket{\psi}. \tag{because~$B$ is a measurement}
+\end{align*}
+Hence, the first expression is at most~$\delta$ if and only if the last one is as well,
+and we are done.
+\end{proof}
+
+\subsubsection{The state-dependent distance}
+
+Suppose we have three measurements $\{A^x_a\}$, $\{B^x_a\}$, and $\{C^x_a\}$,
+and we know that
+\begin{equation*}
+A^x_a \ot I \simeq_{\eps} I \ot C^x_a.
+\end{equation*}
+What property of~$A$ and~$B$ allows us to conclude that
+\begin{equation}\label{eq:can-we-use-approx-delta-to-derive-this}
+B^x_a \ot I \simeq_{\eps} I \ot C^x_a?
+\end{equation}
+The answer is provided by the \emph{state-dependent distance}.
+
+\begin{definition}[The state-dependent distance]\label{def:approx_delta}
+Let $\ket{\psi}$ be a state in $\calH$.
+Let $A = \{A^x_a\}$ and $B = \{B^x_a\}$ be
+sets of matrices acting on $\calH$.
+Finally, let $\calD$ be a distribution on the question set~$\calX$.
+Then we say that
+  \begin{equation*}
+  A^x_a \approx_{\delta}  B^x_a
+  \end{equation*}
+ on state $\ket{\psi}$ and distribution $\calD$ if
+  \begin{equation*}
+  \E_{\bx \sim \calD} \sum_{a} \Vert (A^{\bx}_a - B^{\bx}_a) \ket{\psi} \Vert^2 \leq \delta.
+    \end{equation*}
+\end{definition}
+
+We note one odd feature of \Cref{def:approx_delta} in comparison to the consistency,
+which is that $\ket{\psi}$ is not assumed to have a bipartition $\calH_{\mathrm{A}} \ot \calH_{\mathrm{B}}$
+in which~$A$ and~$B$ are applied on opposite sides.
+We will address this in \Cref{sec:consistency-from-state-dependent-distance} below.
+Before doing so, we will answer our question above,
+even in the case when~$C$ is allowed to be a sub-measurement. 
+
+\begin{proposition}[Transfering ``$\simeq$" using ``$\approx$"]
+Let $\{A^x_a\}$ and $\{B^x_a\}$ be measurements,
+and let $\{C^x_a\}$ be a sub-measurement.
+Suppose that $A^x_a \ot I \simeq_{\delta} I \ot C^x_a$
+and $A^x_a \ot I \approx_{\eps} B^x_a \ot I$.
+Then $B^x_a \ot I \simeq_{\delta + \sqrt{\eps}} I \ot C^x_a$.
+  \label{prop:triangle-sub}
+\end{proposition}
+
+
+\begin{proof}
+  First, we can
+  rewrite the consistency between $A$ and $C$ as
+  \begin{align*}
+    \delta \geq \E_{\bx} \sum_{a \neq b} \bra{\psi} A^{\bx}_a \ot C^{\bx}_b
+    \ket{\psi} 
+    & = \E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_a \ot (C^{\bx} - C^{\bx}_a) \ket{\psi} \\
+    & =  \E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_a \ot C^{\bx} \ket{\psi}
+    			- \E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_a \ot C^{\bx}_a \ket{\psi} \\
+    & =  \E_{\bx} \bra{\psi} I \ot C^{\bx} \ket{\psi}
+    			- \E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_a \ot C^{\bx}_a \ket{\psi} \tag{because~$A$ is a measurement}\\
+    & = \bra{\psi} I \ot C \ket{\psi} - \E_{\bx} \sum_a
+                 \bra{\psi} A^{\bx}_a \ot C^{\bx}_a \ket{\psi}.
+  \end{align*}
+  Likewise, we can rewrite the
+  inconsistency between $B$ and $C$ as
+  \begin{align*}
+    \E_{\bx} \sum_{a \neq b} \bra{\psi} B^{\bx}_a \ot C^{\bx}_b
+    \ket{\psi} &= \bra{\psi} I \ot C \ket{\psi} - \E_{\bx} \sum_a
+                 \bra{\psi} B^{\bx}_a \ot C^{\bx}_a \ket{\psi}.
+  \end{align*}
+  We want to show that the inconsistency between~$B$ and~$C$ is close to the inconsistency between $A$
+  and $B$. In particular, we claim that
+  \begin{equation*}
+  \E_{\bx} \sum_{a \neq b} \bra{\psi} A^{\bx}_a \ot C^{\bx}_b
+    \ket{\psi}
+    \approx_{\sqrt{\eps}} \E_{\bx} \sum_{a \neq b} \bra{\psi} B^{\bx}_a \ot C^{\bx}_b
+    \ket{\psi}.
+  \end{equation*}
+  To show this, we bound the magnitude of the difference using Cauchy-Schwarz.
+  \begin{align*}
+   & \Big| \E_{\bx} \sum_{a } \bra{\psi} (A^{\bx}_a - B^{\bx}_a) \ot
+                     C^{\bx}_a\ket{\psi} \Big| \nonumber
+    \\
+    \leq~& \sqrt{ \E_{\bx} \sum_{a} \bra{\psi}
+                            (A^{\bx}_a - B^{\bx}_a)^2 \ot I \ket{\psi}}
+                            \cdot \sqrt{\E_{\bx} \sum_{a} \bra{\psi} I \ot (C^{\bx}_a)^2 \ket{\psi}} \\
+    \leq~& \sqrt{\eps} \cdot 1. \tag{because~$C$ is a sub-measurement}
+  \end{align*}
+  This completes the proof.
+\end{proof}
+
+
+Next, we show that in the case of measurements,
+the state-dependent distance is a weakening of the consistency.
+
+\begin{proposition}[``$\simeq$" implies ``$\approx$" for measurements]\label{prop:simeq-to-approx}
+Let $A = \{A^x_a\}$ and $B = \{B^x_a\}$ be two measurements such that
+\begin{equation*}
+A^x_a \ot I \simeq_{\delta} I \ot B^x_a.
+\end{equation*}
+Then
+\begin{equation*}
+A^x_a \ot I \approx_{2\delta} I \ot B^x_a.
+\end{equation*}
+This is an ``if and only if'' if~$A$ and~$B$ are both projective measurements.
+\end{proposition}
+\begin{proof}
+Our goal is to bound
+\begin{align*}
+&\E_{\bx} \sum_a\Vert (A^{\bx}_a \ot I - I \ot B^{\bx}_a) \ket{\psi} \Vert^2\\
+=~&\E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a \ot I - I \ot B^{\bx}_a)^2 \ket{\psi}\\
+=~&\E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a)^2 \ot I \ket{\psi}
+	+\E_{\bx} \sum_a \bra{\psi} I \ot (B^{\bx}_a)^2 \ket{\psi}
+	- 2 \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot B^{\bx}_a \ket{\psi}\\
+\leq~&\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot I \ket{\psi}
+	+\E_{\bx} \sum_a \bra{\psi} I \ot B^{\bx}_a \ket{\psi}
+	- 2 \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot B^{\bx}_a \ket{\psi}\\
+=~&2
+	- 2 \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot B^{\bx}_a \ket{\psi} \tag{because~$A$ and~$B$ are measurements}\\
+\leq~& 2 - 2 \cdot(1-\delta) \tag{by~\Cref{prop:simeq-for-measurements} and the fact that~$A$ and~$B$ are measurements}\\
+=~&2 \delta.
+\end{align*}
+This completes the proof.
+When  $A$ and~$B$ are projective, ``if and only if'' 
+follows from the first inequality becoming an equality.
+\end{proof}
+
+
+\begin{remark}
+We note that \Cref{prop:simeq-to-approx} certainly does \emph{not} hold for sub-measurements.
+For example, if $A^x_a = 0$ for all~$a$,
+then $A_a^x \ot I \simeq_{0} I \ot B_a^x$,
+but
+\begin{equation*}
+\E_{\bx} \sum_a \Vert (A^{\bx}_a \ot I - I \ot B^{\bx}_a)\ket{\psi} \Vert^2
+= \E_{\bx} \sum_a \Vert (I \ot B^{\bx}_a)\ket{\psi} \Vert^2,
+\end{equation*}
+which is nonzero unless $(I \ot B^x_a) \ket{\psi} = 0$ for all~$x$ and~$a$.
+\end{remark}
+
+
+\subsubsection{Deriving consistency relations from the state-dependent distance}
+\label{sec:consistency-from-state-dependent-distance}
+
+\Cref{prop:triangle-sub} shows the purpose of the state-dependent distance,
+which is to derive new consistency relations from old ones.
+In addition, its proof uses a strategy
+which will recur frequently throughout this paper.
+In this strategy, we would like to demonstrate a sequence of 
+expressions in which each expression is close to the previous one:
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} (A_0)^{\bx}_a (B_0)^{\bx}_a \ket{\psi}
+\approx_{\eps_1} \E_{\bx} \sum_a \bra{\psi} (A_1)^{\bx}_a (B_1)^{\bx}_a \ket{\psi}
+\approx_{\eps_2} \cdots
+\approx_{\eps_t} \E_{\bx} \sum_a \bra{\psi} (A_t)^{\bx}_a (B_t)^{\bx}_a \ket{\psi}.
+\end{equation*}
+By the triangle inequality, we can therefore conclude that the $0$-th expression
+is close to the $t$-th expression.
+To show that the $i$-th quantity is close to the $(i+1)$-st,
+we will typically arrange for $A_{i} = A_{i+1}$,
+and we will swap out $B_i$ for $B_{i+1}$
+using an approximation relation such as $(B_i)^x_a \approx (B_{i+1})^x_a$,
+with the help of the Cauchy-Schwarz inequality
+(or the same might occur with the roles of~$A$ and~$B$ reversed). 
+Even if $A_0$ and $B_0$ can be written as local measurements applied to either side of a bipartition,
+e.g.\ $(A_0)^x_a = A^x_a \ot I$ and $(B_0)^x_a = I \ot B^x_a$,
+and likewise for $A_t$ and $B_t$,
+the intermediate steps may feature matrices which do not decompose nicely across a bipartition.
+This is why \Cref{def:approx_delta} is phrased so broadly,
+with no mention of a bipartition.
+
+In general, the $A_i$'s and $B_i$'s encountered in this sequence of steps
+may be quite unstructured: for example, not sub-measurements,
+and possibly not even Hermitian.
+Thus, we are interested in determining which conditions
+to place on these measurements are sufficient to carry out this proof strategy.
+The following proposition gives a broad condition under which this can be accomplished.
+
+\begin{proposition}
+\label{prop:closeness-of-ip}
+	Let $\{A^x_a\}$, $\{B^x_a\}$, and $\{C^x_{a,b} \}$ be matrices.
+	Suppose that  $A^x_a \approx_\gamma B^x_a$ and that for all~$x$, $\sum_a (\sum_b C^x_{a,b}) (\sum_b C^x_{a,b})^\dagger  \leq I$. Then
+	\begin{equation}
+	\E_{\bx} \sum_{a,b} \bra{\psi} C^{\bx}_{a,b} A^{\bx}_a  \ket{\psi} \approx_{\sqrt{\gamma}} \E_{\bx} \sum_{a,b} \bra{\psi} C^{\bx}_{a,b} B^{\bx}_a  \ket{\psi} \,. \label{eq:closeness3}
+	\end{equation}
+	Similarly, suppose that  $(A^x_a)^\dagger \approx_\gamma (B^x_a)^\dagger$ and that for all~$x$, $\sum_a (\sum_b C^x_{a,b})^\dagger (\sum_b C^x_{a,b}) \leq I$. Then 
+	\begin{equation}
+	\E_{\bx} \sum_{a,b} \bra{\psi} A^{\bx}_a  C^{\bx}_{a,b} \ket{\psi} \approx_{\sqrt{\gamma}} \E_{\bx} \sum_{a,b} \bra{\psi} B^{\bx}_a  C^{\bx}_{a,b}  \ket{\psi} \,. \label{eq:closeness4}
+	\end{equation}	
+%	\begin{equation}
+%	\label{eq:closeness1}
+%		\sum_a (B^x_a)^\dagger B^x_a \leq I, \qquad \sum_a B^x_a (B^x_a)^\dagger \leq I,
+%	\end{equation}
+%	and on average over $x$ we have
+%	\begin{equation}
+%	\label{eq:closeness2}
+%		A^x_a \approx_\delta C^x_a \,.
+%	\end{equation}
+%	Then the following holds:
+%	\begin{gather}
+%		\E_x \sum_a \bra{\psi} B^x_a A^x_a  \ket{\psi} \approx_{\sqrt{\delta}} \E_x \sum_a \bra{\psi} B^x_a C^x_a  \ket{\psi} \label{eq:closeness3} \\
+%		\E_x \sum_a \bra{\psi} A^x_a B^x_a \ket{\psi} \approx_{\sqrt{\delta}} \E_x \sum_a \bra{\psi} C^x_a B^x_a \ket{\psi} \label{eq:closeness4}
+%	\end{gather}
+\end{proposition}
+\begin{proof}
+	We begin by showing~\Cref{eq:closeness3}.
+	\begin{align*}
+		&\Big | \E_{\bx} \sum_{a,b} \bra{\psi} C^{\bx}_{a,b} (A^{\bx}_a - B^{\bx}_a) \ket{\psi} \Big | \\
+		&= \Big | \E_{\bx} \sum_{a} \bra{\psi} \Big ( \sum_b C^{\bx}_{a,b} \Big ) \cdot (A^{\bx}_a - B^{\bx}_a) \ket{\psi} \Big |\\
+		&\leq \Big ( \E_{\bx} \sum_a \bra{\psi} \Big(\sum_b C^{\bx}_{a,b}\Big) \Big(\sum_b C^{\bx}_{a,b}\Big)^\dagger \ket{\psi} \Big )^{1/2} \cdot \Big ( \E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a - B^{\bx}_a)^\dagger  (A^{\bx}_a - B^{\bx}_a) \ket{\psi} \Big)^{1/2} \\
+		&\leq \sqrt{\gamma}.
+	\end{align*}
+	The third line uses Cauchy-Schwarz, and the fourth line uses the assumption $\sum_a (\sum_b C^x_{a,b}) (\sum_b C^x_{a,b})^\dagger  \leq I$ to bound the first factor by $1$ and  the assumption $A^x_a \approx_\gamma B^x_a$ to bound the second factor by $\sqrt{\gamma}$.
+	As for \Cref{eq:closeness4}, we want to bound
+	\begin{equation*}
+	\Big | \E_{\bx} \sum_{a,b} \bra{\psi} (A^{\bx}_a - B^{\bx}_a) C^{\bx}_{a,b}  \ket{\psi} \Big |
+	= \Big | \E_{\bx} \sum_{a,b} \bra{\psi} (C^{\bx}_{a,b})^\dagger ((A^{\bx}_a)^\dagger - (B^{\bx}_a)^\dagger) \ket{\psi} \Big |.
+      \end{equation*}
+      It then follows from \Cref{eq:closeness3} that this is at most $\sqrt{\gamma}$.
+    \end{proof}
+    
+\Cref{prop:closeness-of-ip} is broad enough to capture
+almost all of our applications of the state-dependent distance.
+Unfortunately, defining the $C^x_{a, b}$ matrices and showing that 
+they satisfy the inequality $\sum_a (\sum_b C^x_{a,b}) (\sum_b C^x_{a,b})^\dagger  \leq I$
+can be somewhat cumbersome.
+As a result, we will usually carry out these Cauchy-Schwarz calculations by hand.
+However, we will occasionally use the following proposition
+which simplifies \Cref{prop:closeness-of-ip}.
+
+\begin{proposition}\label{prop:easy-approx-from-approx-delta}
+Let $A = \{A^x_a\}$, $B = \{B^x_a\}$, and $C = \{C^x_a\}$ be sub-measurements
+such that $A^x_a \approx_{\delta} B^x_a$. Then
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a  C^{\bx}_a \ket{\psi}
+\approx_{\sqrt{\delta}} \E_{\bx} \sum_a \bra{\psi} B^{\bx}_a  C^{\bx}_a \ket{\psi}.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+To show this, we bound the magnitude of the difference.
+\begin{align*}
+&\Big| \E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a - B^{\bx}_a) \cdot (C^{\bx}_a) \ket{\psi}\Big|\\
+\leq~& \sqrt{\E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a - B^{\bx}_a)^2 \ket{\psi}}
+	\cdot \sqrt{\E_{\bx} \sum_a \bra{\psi} (C^{\bx}_a)^2 \ket{\psi}}\\
+\leq~& \sqrt{\delta} \cdot \sqrt{1}.
+\end{align*}
+This completes the proof.
+\end{proof}
+
+A proposition similar to \Cref{prop:closeness-of-ip},
+but for  ``$\approx$'',
+holds as well.
+    This is \cite[Fact~$4.20$]{NW19}.
+    \begin{proposition}
+      \label{prop:cab-approx-delta}
+      Let $\{A^x_a\}, \{B^x_a\},$ and $\{C^x_{a,b}\}$ be
+      matrices. Suppose that $A^{x}_a \approx_\delta B^{x}_a$ and that
+      for all $x$ and $a$, $\sum_b (C^{x}_{a,b})^\dagger
+      (C^{x}_{a,b}) \leq I$. Then
+      \[ C^{x}_{a,b} A^x_{a} \approx_{\delta} C^{x}_{a,b} B^{x}_a. \]
+    \end{proposition}
+    \begin{proof}
+      The error we wish to bound is
+      \begin{align*}
+        \E_{\bx} \sum_{a,b} \bra{\psi} 
+        (A^{\bx}_a - B^{\bx}_a)^\dagger
+        (C^{\bx}_{a,b})^\dagger C^{\bx}_{a,b} (A^{\bx}_a - 
+        B^{\bx}_a) \ket{\psi} &\leq \E_{\bx} \sum_{a} \bra{\psi}
+                                (A^{\bx}_a - B^{\bx}_a)^\dagger
+                                (A^{\bx}_a - B^{\bx}_a) \ket{\psi} \\
+                              &\leq \delta. \qedhere
+      \end{align*}
+    \end{proof}
+
+
+\subsubsection{Miscellaneous distance properties}
+
+We now state a few miscellaneous properties of our two distances.
+
+\begin{proposition}[Triangle inequality for vectors squared]\label{prop:triangle-inequality-for-vectors-squared}
+Let $\ket{\psi_1}, \ldots, \ket{\psi_k}$ be vectors.
+Then
+\begin{equation*}
+\Vert \ket{\psi_1} + \cdots + \ket{\psi_k} \Vert^2 \leq k \cdot(\Vert \ket{\psi_1}\Vert^2 + \cdots + \Vert \ket{\psi_k}\Vert^2).
+\end{equation*}
+\end{proposition}
+\begin{proof}
+First, if $x_1, \ldots, x_k \in \R$, then
+\begin{equation}\label{eq:prop-for-real-numbers}
+(x_1 + \cdots + x_k)^2 
+= \sum_{i, j= 1}^k x_i x_j
+\leq \sum_{i, j= 1}^k \frac{x_i^2 + x_j^2}{2}
+= \sum_{i, j= 1}^k x_i^2
+= \sum_{i=1}^k k \cdot x_i^2.
+\end{equation}
+Next, by the triangle inequality
+\begin{align*}
+\Vert \ket{\psi_1} + \cdots + \ket{\psi_k} \Vert^2
+& = (\Vert \ket{\psi_1} + \cdots + \ket{\psi_k} \Vert)^2\\
+& \leq (\Vert \ket{\psi_1}\Vert + \cdots + \Vert \ket{\psi_k} \Vert)^2\\
+& \leq k \cdot(\Vert \ket{\psi_1}\Vert^2 + \cdots + \Vert \ket{\psi_k}\Vert^2).
+\end{align*}
+where the last step uses \Cref{eq:prop-for-real-numbers} applied to the case of $x_i = \Vert \ket{\psi_i}\Vert$.
+\end{proof}
+
+\begin{proposition}[Triangle inequality for ``$\approx_{\delta}$"]
+\label{prop:triangle-inequality-for-approx_delta}
+Suppose $A_1 = \{(A_1)^x_a\}, \ldots, A_{k+1} = \{(A_{k+1})^x_a\}$ is a set of matrices such that
+\begin{equation*}
+(A_i)^x_a \approx_{\delta_i} (A_{i+1})^x_a
+\end{equation*}
+for all $i \in [k]$. Then
+\begin{equation*}
+(A_1)^x_a \approx_{k \cdot (\delta_1 + \cdots + \delta_{k})} (A_{k+1})^x_a.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+We want to bound
+\begin{align*}
+&~\E_\bx \sum_a \Vert ((A_1)^{\bx}_a - (A_{k+1})^{\bx}_a) \ket{\psi}\Vert^2\\
+= &~\E_\bx \sum_a \Vert (((A_1)^{\bx}_a - (A_2)^{\bx}_a) + \cdots.+ ((A_{k})^{\bx}_a - (A_{k+1})^{\bx}_a))\ket{\psi}\Vert^2\\
+\leq &~\E_\bx \sum_a k\cdot(\Vert ((A_1)^{\bx}_a - (A_2)^{\bx}_a) \ket{\psi}\Vert^2 + \cdots.+ \Vert((A_k)^{\bx}_a - (A_{k+1})^{\bx}_a)\ket{\psi}\Vert^2)\\
+\leq &~k\cdot(\delta_1 + \cdots + \delta_{k}),
+\end{align*}
+where the inequality uses \Cref{prop:triangle-inequality-for-vectors-squared} applied to the vectors $((A_i)^{\bx}_a - (A_{i+1})^{\bx}_a) \ket{\psi}$ for $i \in [k]$.
+\end{proof}
+
+We note that \Cref{prop:triangle-inequality-for-approx_delta}
+contrasts with the triangle inequality for ``$\approx_{\delta}$'' when applied to numbers,
+i.e.\ \Cref{eq:triangle-inequality-for-numbers},
+for which no multiplicative factor of~$k$ appears in the error.
+
+The following is Fact~$4.29$ from~\cite{NW19};
+however, they incorrectly claimed a final bound of $A^x_a \ot I \simeq_{\eps +\delta + \gamma} I \ot D^x_a$.
+We give a new proof of this statement, albeit with a slightly weaker quantitative bound.
+
+\begin{proposition}[Triangle inequality for ``$\simeq$"]\label{prop:simeq-triangle-inequality}
+		Suppose that $A$, $B$, $C$, and~$D$ are measurements such that
+		\begin{equation*}
+		A^x_a \ot I \simeq_{\eps} I \ot B^x_a,
+		\quad
+		C^x_a \ot I \simeq_{\delta} I \ot B^x_a,
+		\quad
+		C^x_a \ot I \simeq_{\gamma} I \ot D^x_a.
+		\end{equation*}
+		Then
+		\begin{equation*}
+		A^x_a \ot I \simeq_{\eps + 2\sqrt{\delta + \gamma}} I \ot D^x_a.
+		\end{equation*}
+		\end{proposition}
+\begin{proof}
+Because $B$, $C$, and~$D$ are measurements, \Cref{prop:simeq-to-approx} implies that
+\begin{equation*}
+C^x_a \ot I \approx_{2\delta} I \ot B^x_a,
+\quad
+C^x_a \ot I \approx_{2\gamma} I \ot D^x_a.
+\end{equation*}
+The triangle inequality, \Cref{prop:triangle-inequality-for-approx_delta}, then implies that
+\begin{equation*}
+I \ot B^x_a \approx_{4 \delta + 4 \gamma} I \ot D^x_a.
+\end{equation*}
+Finally, \Cref{prop:triangle-sub} implies that
+\begin{equation*}
+A^x_a \ot I
+\simeq_{\eps + \sqrt{4 \delta + 4 \gamma}} I \ot D^x_a.
+\end{equation*}
+This completes the proof.
+\end{proof}
+
+\begin{proposition}[Data processing for ``$\simeq$'']
+\label{prop:simeq-data-processing}
+Let $A = \{A^x_a\}$ and $B = \{B^x_a\}$ be two measurements such that
+\begin{equation*}
+A^x_a \ot I \simeq_{\delta} I \ot B^x_a.
+\end{equation*}
+Then for any function~$f$,
+\begin{equation*}
+A^x_{[f(a)=b]} \ot I \simeq_{\delta} I \ot B^x_{[f(a)=b]}.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+We want to bound
+\begin{align*}
+\E_{\bx} \sum_{b \neq b'} \bra{\psi} A^{\bx}_{[f(a)=b]} \ot B^{\bx}_{[f(a)=b']}\ket{\psi}
+& = \E_{\bx} \sum_{b \neq b'} \sum_{a: f(a) = b} \sum_{a': f(a') = b'} \bra{\psi} A^{\bx}_{a} \ot B^{\bx}_{a'}\ket{\psi}\\
+& \leq \E_{\bx} \sum_{a \neq a'} \bra{\psi} A^{\bx}_{a} \ot B^{\bx}_{a'}\ket{\psi}\\
+& \leq \delta.
+\end{align*}
+This completes the proof.
+\end{proof}
+    
+The following fact is useful for translating between statements about consistency and closeness between sub-measurements.
+\begin{proposition}
+\label{prop:cons-sub-meas} 
+Let $\{A^x_a\}$ be a sub-measurement and let $\{B^x_a\}$ be a measurement such that on average over $x$,
+\[
+	A^x_a \ot I \simeq_\gamma I \ot B^x_a \,.
+\]
+Then the following hold
+	\begin{gather}
+		A^x_a \ot I \approx_{\gamma} A^x_a \ot B^x_a \approx_{\gamma} A^x \ot B^x_a,
+		\label{eq:closeness5}
+	\end{gather}
+	where $A^x = \sum_a A^x_a$.
+	As a result, by \Cref{prop:triangle-inequality-for-approx_delta},
+	\begin{equation*}
+	A^x_a \ot I \approx_{4\gamma} A^x \ot B^x_a
+	\end{equation*}
+\end{proposition}
+\begin{proof}
+	We establish the first approximation in \Cref{eq:closeness5}:
+	\begin{align*}
+		&\E_{\bx} \sum_a \bra{\psi} \Big (A^{\bx}_a \ot (I - B^{\bx}_a) \Big)^2 \ket{\psi}  \\
+		&\leq \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot (I - B^{\bx}_a) \ket{\psi} \\
+		&= \E_{\bx} \sum_{\substack{a,b : \\ b \neq a}} \bra{\psi} A^{\bx}_a \ot B^{\bx}_b \ket{\psi} \\
+		&\leq \gamma \,.
+	\end{align*}
+	The first inequality folows from the fact that $A^x_a \ot (I - B^x_a)$ has operator norm at most $1$, and the third line follows from the fact that $\{B^x_b\}$ is a complete measurement, and the last line follows from the assumption of consistency between the $A$ and $B$ (sub-)measurements.
+	
+	To establish the second approximation in \Cref{eq:closeness5}, we compute the difference:
+	\begin{align*}
+	&\E_{\bx} \sum_a \bra{\psi} \Big ( (A^{\bx} - A^{\bx}_a) \ot B^{\bx}_a \Big)^2 \ket{\psi} \\
+	&\leq  \E_{\bx} \sum_a \bra{\psi} (A^{\bx} - A^{\bx}_a) \ot B^{\bx}_a  \ket{\psi} \\
+	&= \E_{\bx} \sum_{\substack{a,a' : \\ a \neq a'}} \bra{\psi} A^{\bx}_{a'} \ot B^{\bx}_a  \ket{\psi} \\
+	&\leq \gamma \,.
+	\end{align*}
+	The second line follows from the fact that  $(A^x - A^x_a) \ot B^x_a$ has operator norm at most $1$, and the last inequality follows from the consistency between the $A$ and $B$ (sub-)measurements.
+\end{proof}
+
+\ignore{
+The following fact is useful for working with sandwiches.
+\begin{proposition}  \label{prop:switch-sandwich}
+  Suppose $\{A^x_a\}$ is a projective sub-measurement
+  satisfying
+  \begin{equation}
+    \E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_{a} \ot A^{\bx}_a \ket{\psi}
+    \geq \E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_a \ot I \ket{\psi} -
+    \delta.
+    \label{eq:Asubcon}
+  \end{equation}
+  Then for any $0 \leq B \leq I$, the following holds:
+  \begin{equation}
+    \E_{\bx}\sum_a \bra{\psi} A^{\bx}_a B A^{\bx}_a \ot I \ket{\psi}
+    \approx_{2\sqrt{2\delta}} \E_{\bx} \sum_a \bra{\psi} B
+    \ot A^{\bx}_a
+    \ket{\psi} \approx_{\sqrt{2\delta}} \E_{\bx} \sum_a \bra{\psi}
+    BA^{\bx}_a \ot I \ket{\psi} \label{eq:switch-sandwich} \end{equation}
+
+\end{proposition}
+\begin{proof}
+  First, we show that \Cref{eq:Asubcon} implies that\anote{Actually
+    this should probably be how the condition is stated in general, it
+    seems easier to work with.}
+  \begin{equation}
+    A^x_a \ot I \approx_{2\delta} I \ot A^x_a. \label{eq:Aapproxd}
+  \end{equation}
+
+  This follows by direct calculation:
+  \begin{align*}
+    \E_{\bx} \sum_a \| (A^{\bx}_a \ot I - I \ot A^{\bx}_a)\ket{\psi}
+    \|^2 &= \E_{\bx} \sum_a \Big (2\bra{\psi} A^{\bx}_a \ot I
+           \ket{\psi} - 2 \bra{\psi} A^{\bx}_a \ot A^{\bx}_a
+           \ket{\psi} \Big) \\
+         &\leq 2 \delta,
+  \end{align*}
+  where the first equation follows by projectivity of $A$ and the
+  permutation-invariance of $\ket{\psi}$, and the second follows from \Cref{eq:Asubcon}.
+
+  We will show the first approximation in \Cref{eq:switch-sandwich} in two steps. First, we will start
+  from the left-hand side of \Cref{eq:switch-sandwich} and move the rightmost
+  $A^x_a$ to the other tensor factor.
+  \begin{equation}
+    \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a B A^{\bx}_a \ot I \ket{\psi} =
+    \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a B \ot A^{\bx}_a \ket{\psi}
+    + \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a B ( A^{\bx}_a \ot I - I \ot
+    A^{\bx}_a) \ket{\psi} \label{eq:shift-right-A}
+  \end{equation}
+  The second term on the right-hand side can be bounded using \Cref{eq:Aapproxd}.
+  \begin{align}
+    \E_{\bx}\sum_a \bra{\psi} A^{\bx}_a B (A^{\bx}_a \ot I  - I \ot
+    A^{\bx}_a) 
+    \ket{\psi} &\leq \Big( \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a
+                 B^2
+                 A^{\bx}_a \ket{\psi} \Big)^{1/2} \nonumber \\
+               &\quad \cdot \Big(\E_{\bx} \sum_a
+                 \bra{\psi} (A^{\bx}_a \ot I - I \ot A^{\bx}_a)^2
+                 \ket{\psi} \Big)^{1/2} \\
+               &\leq \sqrt{2\delta}.
+  \end{align}
+  We will now approximate the first term in the right-hand side of
+  \Cref{eq:shift-right-A} by moving the leftmost $A^x_a$ to the other
+  tensor factor.
+  \begin{equation}
+    \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a B \ot A^{\bx}_a \ket{\psi} =
+    \E_{\bx} \sum_ a\bra{\psi} B \ot A^{\bx}_a \ket{\psi} + \E_{\bx} \sum_a
+    \bra{\psi} (A^{\bx}_a \ot I - I \ot A^{\bx}_a) (B \ot A^{\bx}_a) \ket{\psi}.
+  \end{equation}
+  The second term on the right-hand side of this equation can be bounded as before
+  using \Cref{eq:Aapproxd}:
+  \begin{align}
+    \E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a \ot I - I \ot A^{\bx}_a) B
+    \ot A^{\bx}_a \ket{\psi} &\leq \Big( \E_{\bx} \sum_a \bra{\psi}
+                               (A^{\bx}_a \ot I - I \ot A^{\bx}_a)^2
+                               \ket{\psi} \Big)^{1/2} \nonumber \\
+                             &\quad \cdot \Big(\E_{\bx} \sum_a
+                               \bra{\psi} B^2 \ot A^{\bx}_a \ket{\psi}
+                               \Big)^{1/2} \\
+                             &\leq \sqrt{2\delta}.
+  \end{align}
+  Thus, the first approximation in \Cref{eq:switch-sandwich}
+  follows. To show the second approximation, we invoke
+  \Cref{eq:Asubcon} and the projectivity of $A$ to bound the difference
+  \begin{equation}
+    \E_{\bx} \bra{\psi} B \sum_a ( A^{\bx}_a \ot I - I \ot A^{\bx}_a )
+    \ket{\psi} \leq \Big( \E_{\bx} \bra{\psi} B^2 \ket{\psi} \Big)^{1/2}
+    \cdot \Big( \E_{\bx} \sum_{a,b} \bra{\psi}
+    (A^{\bx}_a \ot I - I \ot A^{\bx}_a) (A^{\bx}_b \ot I
+    - I \ot A^{\bx}_b) \ket{\psi} \Big)^{1/2}.
+  \end{equation}
+  The first term in the product is at most $1$, while the second term
+  can be expanded using the projectivity as
+  \begin{align*}
+    &\Big(\E_{\bx} \sum_{a,b} \bra{\psi}    (A^{\bx}_a \ot I - I \ot A^{\bx}_a) (A^{\bx}_b \ot I
+    - I \ot A^{\bx}_b) \ket{\psi} \Big)^{1/2} \\
+    &\quad= \Big(\E_{\bx} \big( 2\sum_a
+                                                \bra{\psi} A^{\bx}_a
+                                                \ot I \ket{\psi} -
+                                                2\sum_{a,b} A^{\bx}_a
+                                                \ot A^{\bx}_b
+                                                \ket{\psi} \big)
+                                                \Big)^{1/2} \\
+    &\quad \leq \Big(\E_{\bx} \big( 2\sum_a
+                                                \bra{\psi} A^{\bx}_a
+                                                \ot I \ket{\psi} -
+                                                2\sum_{a} A^{\bx}_a
+                                                \ot A^{\bx}_a
+                                                \ket{\psi} \big)
+      \Big)^{1/2} \\
+    &\quad\leq (2 \delta)^{1/2}
+  \end{align*}
+\end{proof}
+}
+
+\begin{proposition}  \label{prop:switch-sandwich}
+  Suppose $\{A^x_a\}$ is a projective sub-measurement
+  satisfying
+  \begin{equation}
+    A^x_a \ot I \approx_{\delta} I \ot A^x_a. \label{eq:Aapproxd}
+  \end{equation}
+  Then for any $0 \leq B \leq I$, the following holds:
+  \begin{equation}
+    \E_{\bx}\sum_a \bra{\psi} A^{\bx}_a B A^{\bx}_a \ot I \ket{\psi}
+    \approx_{2\sqrt{\delta}} \E_{\bx} \sum_a \bra{\psi} B
+    \ot A^{\bx}_a
+    \ket{\psi} \approx_{\sqrt{\delta}} \E_{\bx} \sum_a \bra{\psi}
+    BA^{\bx}_a \ot I \ket{\psi} \label{eq:switch-sandwich} \end{equation}
+
+\end{proposition}
+\begin{proof}
+  We will show the first approximation in \Cref{eq:switch-sandwich} in two steps. First, we show that
+  \begin{equation} \label{eq:shift-right-A}
+    \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a B A^{\bx}_a \ot I \ket{\psi} \approx_{\sqrt{\delta}}
+    \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a B \ot A^{\bx}_a \ket{\psi}.
+  \end{equation}
+  To do so, we bound the magnitude of the difference.
+  \begin{align*}
+   &\Big| \E_{\bx}\sum_a \bra{\psi} (A^{\bx}_a B \otimes I)\cdot (A^{\bx}_a \ot I  - I \ot A^{\bx}_a)  \ket{\psi} \Big|\\
+    \leq~&
+    \Big( \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a
+                 B^2
+                 A^{\bx}_a \otimes I \ket{\psi} \Big)^{1/2}  
+                \cdot \Big(\E_{\bx} \sum_a
+                 \bra{\psi} (A^{\bx}_a \ot I - I \ot A^{\bx}_a)^2
+                 \ket{\psi} \Big)^{1/2} \\
+               \leq~& \sqrt{\delta}.\tag{because $B \leq I$ and \eqref{eq:Aapproxd}}
+  \end{align*}
+  Next, we show that
+  \begin{equation*}
+  \eqref{eq:shift-right-A} =  \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a B \ot A^{\bx}_a \ket{\psi} \approx_{\sqrt{\delta}} \E_{\bx} \sum_ a\bra{\psi} B \ot A^{\bx}_a \ket{\psi}.
+  \end{equation*}
+  To do so, we bound the magnitude of the difference.
+  \begin{align*}
+    &\Big|\E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a \ot I - I \ot A^{\bx}_a) \cdot(B
+    \ot A^{\bx}_a) \ket{\psi}\Big| \tag{because~$A$ is projective}\\ \leq~& \Big( \E_{\bx} \sum_a \bra{\psi}
+                               (A^{\bx}_a \ot I - I \ot A^{\bx}_a)^2
+                               \ket{\psi} \Big)^{1/2}  
+                              \cdot \Big(\E_{\bx} \sum_a
+                               \bra{\psi} B^2 \ot A^{\bx}_a \ket{\psi}
+                               \Big)^{1/2} \\
+                             \leq~& \sqrt{\delta}.\tag{because $B \leq I$ and \eqref{eq:Aapproxd}}
+  \end{align*}
+  Thus, the first approximation in \Cref{eq:switch-sandwich}
+  follows. To show the second approximation, we bound the magnitude of the difference.
+  \begin{align*}
+  &\Big|\E_{\bx}\sum_a \bra{\psi} (B\otimes I)  \cdot ( A^{\bx}_a \ot I - I \ot A^{\bx}_a )
+    \ket{\psi}\Big|\\
+    =~&\Big|\E_{\bx} \bra{\psi} (B\otimes I)\cdot \sum_a ( A^{\bx}_a \ot I - I \ot A^{\bx}_a )
+    \ket{\psi}\Big|\\
+    \leq~& \Big( \E_{\bx} \bra{\psi} B^2 \otimes I \ket{\psi} \Big)^{1/2}
+    \cdot \Big( \E_{\bx} \sum_{a,b} \bra{\psi}
+    (A^{\bx}_a \ot I - I \ot A^{\bx}_a) \cdot(A^{\bx}_b \ot I
+    - I \ot A^{\bx}_b) \ket{\psi} \Big)^{1/2}.
+  \end{align*}
+  The first term in the product is at most $1$ because $B \leq I$.
+  We bound the expression inside the second square root as follows.
+  \begin{align*}
+    &\E_{\bx} \sum_{a,b} \bra{\psi}    (A^{\bx}_a \ot I - I \ot A^{\bx}_a) \cdot(A^{\bx}_b \ot I
+    - I \ot A^{\bx}_b) \ket{\psi}  \\
+    =~&\E_{\bx} \sum_{a, b} \bra{\psi}(A^{\bx}_a A^{\bx}_b \ot I + I \otimes A^{\bx}_a A^{\bx}_b - A^{\bx}_a \otimes A^{\bx}_b - A^{\bx}_b \otimes A^{\bx}_a)\ket{\psi}\\
+    =~& \E_{\bx}\sum_a
+                                                \bra{\psi} (A^{\bx}_a)^2
+                                                \ot I \ket{\psi} +
+                                                 \E_{\bx}\sum_a
+                                                \bra{\psi} I \ot (A^{\bx}_a)^2 \ket{\psi} -
+                                                 2\cdot\E_{\bx} \sum_{a,b} \bra{\psi}A^{\bx}_a
+                                                \ot A^{\bx}_b
+                                                \ket{\psi} \tag{because~$A$ is projective}
+                                                \\
+    \leq~& \E_{\bx}\sum_a
+                                                \bra{\psi} (A^{\bx}_a)^2
+                                                \ot I \ket{\psi} +
+                                                 \E_{\bx}\sum_a
+                                                \bra{\psi} I \ot (A^{\bx}_a)^2 \ket{\psi} -
+                                                 2\cdot\E_{\bx} \sum_{a} \bra{\psi}A^{\bx}_a
+                                                \ot A^{\bx}_a
+                                                \ket{\psi}
+                                                \\
+       =~& \E_{\bx}\sum_a
+                                                \bra{\psi} (A^{\bx}_a
+                                                \ot I  - I \ot A^{\bx}_a)^2
+                                                \ket{\psi}
+       \\
+   \leq~& \delta,
+  \end{align*}
+  where the last step uses \Cref{eq:Aapproxd}.
+\end{proof}
+
+\begin{proposition}\label{prop:completeness-transfer-projective-P}
+Let $A = \{A^x_a\}$ be a sub-measurement 
+and let $P$ be a projective sub-measurement such that $A^x_a \ot I \approx_{\eps} P_a^x \ot I$.
+Then
+\begin{equation*}
+\bra{\psi} A \ot I \ket{\psi}
+\geq  \bra{\psi} P \ot I \ket{\psi} - 2\sqrt{\eps}.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+We calculate:
+\begin{align*}
+\bra{\psi} P \ot I \ket{\psi}
+&= \E_{\bx} \sum_a \bra{\psi} P^{\bx}_a \ot I \ket{\psi} \\
+&= \E_{\bx} \sum_a \bra{\psi} (P^{\bx}_a)^2 \ot I \ket{\psi} \tag{because~$P$ is projective}\\
+&\approx_{\sqrt{\eps}} \E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a \cdot P^{\bx}_a) \ot I \ket{\psi}
+									\tag{by \Cref{prop:easy-approx-from-approx-delta}} \\
+&\approx_{\sqrt{\eps}} \E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a)^2 \ot I \ket{\psi}
+									\tag{by \Cref{prop:easy-approx-from-approx-delta}} \\
+&\leq \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot I \ket{\psi}\\
+& = \bra{\psi} A \ot I \ket{\psi}.
+\end{align*}
+This completes the proof.
+\end{proof}
+
+\subsubsection{Strong self-consistency}
+
+An important property of a sub-measurement~$A = \{A^x_a\}$
+is that if both provers measure using~$A$,
+then they receive the same outcome.
+It seems natural to study this using \emph{self-consistency} of~$A$, i.e. the number~$\delta$ such that
+\begin{equation*}
+A^x_a \ot I \simeq_{\delta} I \ot A^x_a.
+\end{equation*}
+However, when~$A$ is a sub-measurement,
+being $\delta$-self consistent
+only implies the following weaker condition:
+if both provers measure using~$A$ and one of them receives~$\ba$,
+then the other will most likely either receive~$\ba$ \emph{or not receive any outcome whatsoever}.
+This motivates defining the following stronger notion of self-consistency.
+
+\begin{definition}[Strong self consistency]\label{def:strong-self-consistency}
+Let $\ket{\psi}$ be a permutation-invariant state in $\calH \ot \calH$
+and let $A = \{A^x_a\}$ be a sub-measurement acting on~$\calH$.
+Then $A$ is \emph{$\delta$-strongly self consistent} if
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi}
+\geq
+\bra{\psi} A \otimes I \ket{\psi} -  \delta.
+\end{equation*}
+\end{definition}
+
+We now relate strong self-consistency to our two notions of similarity.
+First, we show that strong self-consistency is indeed
+a stronger condition than $A^x_a \ot I \simeq_{\delta} I \ot A^x_a$,
+at least for sub-measurements.
+
+\begin{proposition}\label{prop:other-two-notions-of-self-consistency}
+Let $\ket{\psi}$ be a permutation-invariant state,
+and let $A = \{A^x_a\}$ be a sub-measurement. If
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi} \geq \bra{\psi} A \otimes I \ket{\psi} - \delta
+\end{equation*}
+then $A^x_a \otimes I \simeq_{\delta} I \otimes A^x_a$.
+This is an ``if and only if" if $A$ is a measurement.
+\end{proposition}
+\begin{proof}
+For a sub-measurement~$A$,
+\begin{align*}
+&\E_{\bx} \sum_{a \neq b} \bra{\psi} A^{\bx}_a \ot A^{\bx}_b \ket{\psi}\\
+=~& \E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_a \ot (A^{\bx}- A^{\bx}_a) \ket{\psi}\\
+\leq~&\E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_a \ot (I- A^{\bx}_a) \ket{\psi}\\
+=~&\E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_a \ot I \ket{\psi}
+		- \E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_a \ot A^{\bx}_a \ket{\psi}\\
+=~& \bra{\psi} A \ot I \ket{\psi}
+		- \E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_a \ot A^{\bx}_a \ket{\psi}.
+\end{align*}
+This is at most~$\delta$ if $A$ is $\delta$-strongly self-consistent.
+On the other hand, if~$A$ is a measurement, then the inequality becomes an equality.
+Hence, if $A^x_a \ot I \simeq_{\delta} I \otimes A^x_a$,
+then $A$ is $\delta$-strongly self-consistent.
+\end{proof}
+
+Next, we show that strong self-consistency is also a stronger 
+condition than $A^x_a \ot I \approx_{2\delta} I \ot A^x_a$, at least for non-projective measurements.
+
+\begin{proposition}\label{prop:two-notions-of-self-consistency}
+Let $\ket{\psi}$ be a permutation-invariant state,
+and let $A = \{A^x_a\}$ be a sub-measurement. If
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi} \geq \bra{\psi} A \otimes I \ket{\psi} - \delta
+\end{equation*}
+then $A^x_a \otimes I \approx_{2\delta} I \otimes A^x_a$.
+This is an ``if and only if" if $A$ is projective.
+\end{proposition}
+\begin{proof}
+For general (i.e.\ not necessarily projective)~$A$
+\begin{align}
+&\E_{\bx} \sum_a \Vert(A^{\bx}_a \otimes I - I \otimes A^{\bx}_a) \ket{\psi}\Vert^2\nonumber\\
+=~&\E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a \otimes I - I \otimes A^{\bx}_a)^2 \ket{\psi}\nonumber\\
+=~&2\cdot \Big( \E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a)^2 \otimes I \ket{\psi} -  \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi}\Big)\nonumber\\
+\leq~&2\cdot \Big( \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes I \ket{\psi} -  \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi}\Big).\label{eq:here's-where-projectivity-would-help}
+\end{align}
+This is at most~$2\cdot \delta$ if
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi} \geq \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes I \ket{\psi} - \delta.
+\end{equation*}
+If~$A$ is projective, then \Cref{eq:here's-where-projectivity-would-help} becomes an equality,
+and so $A^x_a \otimes I \approx_{2\delta} I \otimes A^x_a$ implies that
+\begin{equation*}
+ \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes I \ket{\psi} -  \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi}
+ = \frac{1}{2} \cdot \left(\E_{\bx} \sum_a \Vert(A^{\bx}_a \otimes I - I \otimes A^{\bx}_a) \ket{\psi}\Vert^2\right) \leq \delta.\qedhere
+\end{equation*}
+\end{proof}
+
+Hence, we may also refer to the condition $A^x_a \ot I \approx_{2\delta} I \ot A^x_a$
+as ``strong self-consistency'' if~$A$ is projective.
+
+For the remainder of the section, we will prove various properties of strongly self-consistent sub-measurements.
+
+\begin{proposition}\label{prop:two-notions-of-self-consistency-after-evaluation}
+Let $\ket{\psi}$ be a permutation-invariant state,
+and let $A = \{A^x_a\}$ be a sub-measurement such that
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi} \geq  \bra{\psi} A \otimes I \ket{\psi} - \delta.
+\end{equation*}
+Then for any function~$f$,
+$A^x_{[f(a)=b]} \otimes I \approx_{2\delta} I \otimes A^x_{[f(a)=b]}$.
+\end{proposition}
+\begin{proof}
+Our goal is to bound
+\begin{align}
+&\E_{\bx} \sum_b \Vert(A^{\bx}_{[f(a)=b]} \otimes I - I \otimes A^{\bx}_{[f(a)=b]}) \ket{\psi}\Vert^2\nonumber\\
+=~&\E_{\bx} \sum_b \bra{\psi} (A^{\bx}_{[f(a)=b]} \otimes I - I \otimes A^{\bx}_{[f(a)=b]})^2 \ket{\psi}\nonumber\\
+=~&2\cdot \Big( \E_{\bx} \sum_b \bra{\psi} (A^{\bx}_{[f(a)=b]})^2 \otimes I \ket{\psi} -  \E_{\bx} \sum_b \bra{\psi} A^{\bx}_{[f(a)=b]} \otimes A^{\bx}_{[f(a)=b]} \ket{\psi}\Big)\nonumber\\
+\leq~&2\cdot \Big( \E_{\bx} \sum_b \bra{\psi} A^{\bx}_{[f(a)=b]} \otimes I \ket{\psi} -  \E_{\bx} \sum_b \bra{\psi} A^{\bx}_{[f(a)=b]} \otimes A^{\bx}_{[f(a)=b]} \ket{\psi}\Big).\nonumber\\
+=~&2\cdot \Big(  \bra{\psi} A \otimes I \ket{\psi} -  \E_{\bx} \sum_b \bra{\psi} A^{\bx}_{[f(a)=b]} \otimes A^{\bx}_{[f(a)=b]} \ket{\psi}\Big).\label{eq:finishing-this-up}
+\end{align}
+The second term in \Cref{eq:finishing-this-up} can be bounded by
+\begin{align*}
+ \E_{\bx} \sum_b \bra{\psi} A^{\bx}_{[f(a)=b]} \otimes A^{\bx}_{[f(a)=b]} \ket{\psi}
+ &=  \E_{\bx} \sum_{a, a': f(a) = f(a')} \bra{\psi} A^{\bx}_{a} \otimes A^{\bx}_{a'} \ket{\psi}\\
+ &\geq\E_{\bx} \sum_{a} \bra{\psi} A^{\bx}_{a} \otimes A^{\bx}_{a} \ket{\psi}\\
+ &\geq \bra{\psi} A \ot I \ket{\psi} -\delta.
+\end{align*}
+Hence,
+\begin{equation*}
+\eqref{eq:finishing-this-up} \leq 
+	2\cdot \Big( \bra{\psi} A \otimes I \ket{\psi} - (\bra{\psi} A \ot I \ket{\psi} -\delta)\Big)
+= 2\delta.
+\end{equation*}
+This concludes the proof.
+\end{proof}
+
+
+
+
+\begin{proposition}\label{prop:completeness-transfer-self-consistent-A}
+Let $\ket{\psi}$ be a permutation-invariant state,
+and let $A = \{A^x_a\}$ be a sub-measurement such that
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi} \geq  \bra{\psi} A \otimes I \ket{\psi} - \delta.
+\end{equation*}
+In addition, let $B$ be a sub-measurement such that $A^x_a \ot I \approx_{\eps} B_a^x \ot I$.
+Then
+\begin{equation*}
+\bra{\psi} B \ot I \ket{\psi}
+\geq \bra{\psi} A \ot I \ket{\psi} - \delta - 2\sqrt{\eps}.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+We calculate:
+\begin{align*}
+\bra{\psi} B \ot I \ket{\psi}
+&= \E_{\bx} \sum_a \bra{\psi} B^{\bx}_a \ot I \ket{\psi} \\
+&\geq \E_{\bx} \sum_a \bra{\psi} B^{\bx}_a \ot B^{\bx}_a \ket{\psi} \\
+& \geq \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot B^{\bx}_a \ket{\psi} - \sqrt{\eps}
+				\tag{by \Cref{prop:easy-approx-from-approx-delta}} \\
+& \geq \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot A^{\bx}_a \ket{\psi} - 2\sqrt{\eps}
+				\tag{by \Cref{prop:easy-approx-from-approx-delta}} \\
+& \geq  \bra{\psi} A \ot I \ket{\psi} - \delta - 2\sqrt{\eps}.
+\end{align*}
+This completes the proof.
+\end{proof}
+
+
+\begin{proposition}\label{prop:self-consistency-implies-data-processing}
+Let $\ket{\psi}$ be a permutation-invariant state,
+and let $A = \{A^x_a\}$ be a sub-measurement such that
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi} \geq  \bra{\psi} A \otimes I \ket{\psi} - \delta.
+\end{equation*}
+In addition, let $P$ be a projective sub-measurement such that $P^x_a \ot I \approx_{\eps} A_a^x \ot I$.
+Then for any function~$f$,
+\begin{equation*}
+P^x_{[f(a)=b]} \ot I \approx_{8\delta + 8\sqrt{\eps}} A_{[f(a)=b]}^x \ot I.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+We will begin by showing that
+\begin{equation}\label{eq;what-we-want-to-prove-but-on-wrong-side}
+P^x_{[f(a)=b]} \ot I \approx_{2\delta + 4\sqrt{\eps}} I \ot A_{[f(a)=b]}^x.
+\end{equation}
+To do so, our goal is to bound
+\begin{align}
+&\E_{\bx} \sum_b \Vert(P^{\bx}_{[f(a)=b]} \ot I - I \ot A_{[f(a)=b]}^{\bx}) \ket{\psi} \Vert^2\nonumber\\
+=~&\E_{\bx} \sum_b \bra{\psi} (P^{\bx}_{[f(a)=b]}  \ot I -  I \ot A_{[f(a)=b]}^{\bx})^2 \ket{\psi} \nonumber\\
+=~&\E_{\bx} \sum_b \bra{\psi} \Big((P^{\bx}_{[f(a)=b]})^2 \ot I 
+		+ I \ot (A^{\bx}_{[f(a)=b]})^2 
+		- 2\cdot P^{\bx}_{[f(a)=b]} \ot A^{\bx}_{[f(a)=b]}\Big) \ket{\psi}\nonumber\\
+\leq~&\E_{\bx} \sum_b \bra{\psi} \Big(P^{\bx}_{[f(a)=b]} \ot I 
+		+ I \ot A^{\bx}_{[f(a)=b]}
+		- 2\cdot P^{\bx}_{[f(a)=b]} \ot A^{\bx}_{[f(a)=b]}\Big) \ket{\psi}\nonumber\\
+=~&\bra{\psi} P \ot I \ket{\psi} + \bra{\psi} I \ot A \ket{\psi}
+		- 2\cdot \E_{\bx} \sum_b \bra{\psi}  P^{\bx}_{[f(a)=b]} \ot A^{\bx}_{[f(a)=b]} \ket{\psi}.
+				\label{eq:gonna-handle-third-term}
+\end{align}
+By \Cref{prop:completeness-transfer-projective-P}, the first term in \Cref{eq:gonna-handle-third-term} is at most
+\begin{equation*}
+\bra{\psi} P \ot I \ket{\psi}
+\leq \bra{\psi} A \ot I \ket{\psi} + 2\sqrt{\eps}.
+\end{equation*}
+As for the third term in \Cref{eq:gonna-handle-third-term}, we can bound it by
+\begin{align*}
+\E_{\bx} \sum_b \bra{\psi}  P^{\bx}_{[f(a)=b]} \ot A^{\bx}_{[f(a)=b]} \ket{\psi}
+&= \E_{\bx} \sum_{a, a': f(a) = f(a')} \bra{\psi}  P^{\bx}_{a} \ot A^{\bx}_{a'} \ket{\psi}\\
+&\geq \E_{\bx} \sum_{a} \bra{\psi}  P^{\bx}_{a} \ot A^{\bx}_{a} \ket{\psi}\\
+&\geq \E_{\bx} \sum_{a} \bra{\psi}  A^{\bx}_{a} \ot A^{\bx}_{a} \ket{\psi} - \sqrt{\eps}
+						\tag{by \Cref{prop:easy-approx-from-approx-delta}} \\
+&\geq \bra{\psi} A \otimes I \ket{\psi} - \delta - \sqrt{\eps}.
+\end{align*}
+Putting everything together,
+\begin{equation*}
+\eqref{eq:gonna-handle-third-term}
+\leq (\bra{\psi} A \ot I \ket{\psi} + 2\sqrt{\eps}) + \bra{\psi} A \ot I \ket{\psi}
+	- 2 \cdot(\bra{\psi} A \otimes I \ket{\psi} - \delta - \sqrt{\eps})
+= 2\delta + 4\sqrt{\eps}.
+\end{equation*}
+This proves \Cref{eq;what-we-want-to-prove-but-on-wrong-side}.
+
+
+\Cref{prop:two-notions-of-self-consistency-after-evaluation} implies that
+\begin{equation*}
+A^x_{[f(a)=b]} \ot I \approx_{2\delta} I \ot A^x_{[f(a)=b]}.
+\end{equation*}
+Hence, by \Cref{eq;what-we-want-to-prove-but-on-wrong-side},
+\begin{equation*}
+P^x_{[f(a)=b]} \ot I
+\approx_{2\delta + 4\sqrt{\eps}} I \ot A_{[f(a)=b]}^x
+\approx_{2\delta} A^x_{[f(a)=b]} \ot I.
+\end{equation*}
+Thus, by \Cref{prop:triangle-inequality-for-approx_delta},
+\begin{equation*}
+P^x_{[f(a)=b]} \ot I
+\approx_{8\delta + 8\sqrt{\eps}}A^x_{[f(a)=b]} \ot I.
+\end{equation*}
+This concludes the proof.
+\end{proof}
+
+\begin{proposition}\label{prop:completing-to-measurement}
+		Let $\ket{\psi}$ be a permutation-invariant state,
+		and let $A = \{A_a\}$ be a measurement such that
+		\begin{equation*}
+		\E_{\bx} \sum_a \bra{\psi} A_a \otimes A_a \ket{\psi} \geq  \bra{\psi} A \otimes I \ket{\psi} - \zeta.
+		\end{equation*}
+		Suppose $B = \{B_a\}$ is a sub-measurement such that
+		$A_a\ot I \approx_{\delta} B_a\ot I$.
+		Let $C = \{C_a\}$ be a measurement in which there is an~$a^*$
+		such that $C_{a^*} = B_{a^*} + (I-B)$ and $C_a = B_a$ for all $a \neq a^*$.
+		Then $A_a \ot I \approx_{2\delta + 4 \sqrt{\delta} + 2\zeta} C_a \ot I$.
+		\end{proposition}
+		
+		Before proving this, we need the following proposition.
+		\begin{proposition}\label{prop:cool-prop}
+		Let $\ket{\psi}$ be a permutation-invariant state,
+		and let $A = \{A_a\}$ be a sub-measurement such that
+		\begin{equation*}
+		\E_{\bx} \sum_a \bra{\psi} A_a \otimes A_a \ket{\psi} \geq  \bra{\psi} A \otimes I \ket{\psi} - \zeta.
+		\end{equation*}
+		Then
+		\begin{equation*}
+		\sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi} \geq \sum_a \bra{\psi} A_a \otimes I \ket{\psi} -\zeta.
+		\end{equation*}
+		\end{proposition}
+		\begin{proof}
+		Applying Cauchy-Schwarz, we have
+\begin{align}
+\sum_a \bra{\psi} A_a \otimes A_a \ket{\psi}
+&= \sum_a \bra{\psi} (A_a \ot I) \cdot (I \ot A_a) \ket{\psi}\nonumber\\
+&\leq \sqrt{\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}} \cdot \sqrt{\sum_a \bra{\psi} I \ot (A_a)^2 \ket{\psi}}\nonumber\\
+& = \sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}.\label{eq:As-on-same-side-rewrite}
+\end{align}
+As a result,
+\begin{align*}
+\sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi}
+&\geq \sum_a \bra{\psi} A_a \otimes A_a \ket{\psi}\tag{by \Cref{eq:As-on-same-side-rewrite}}\\
+&\geq \sum_a \bra{\psi} A_a \otimes I \ket{\psi} -\zeta. \tag{by self-consistency of~$A$}
+\end{align*}
+This completes the proof.
+\end{proof}
+		Now we prove \Cref{prop:completing-to-measurement}.
+		\begin{proof}[Proof of \Cref{prop:completing-to-measurement}]
+		By \Cref{prop:triangle-inequality-for-vectors-squared} (the triangle inequality for vectors squared),
+		\begin{align*}
+		&\phantom{=}\sum_a \Vert(A_a - C_a)\ot I \ket{\psi} \Vert^2\\
+		& = \sum_{a \neq a^*} \Vert(A_a - B_a)\ot I \ket{\psi} \Vert^2 + \Vert(A_{a^*}  - (I-B + B_{a^*}))\ot I\ket{\psi}\Vert^2\\
+		& \leq \sum_{a \neq a^*} \Vert(A_a - B_a)\ot I \ket{\psi} \Vert^2 + 2 \cdot \Vert(A_{a^*}  -  B_{a^*})\ot I\ket{\psi}\Vert^2 + 2 \cdot \Vert(I - B) \ot I\ket{\psi}\Vert^2\\
+		& \leq 2\sum_{a \neq a^*} \Vert(A_a - B_a)\ot I \ket{\psi} \Vert^2 + 2 \cdot \Vert(A_{a^*}  -  B_{a^*})\ot I\ket{\psi}\Vert^2 + 2 \cdot \Vert(I - B) \ot I\ket{\psi}\Vert^2\\
+		& = 2\sum_{a} \Vert(A_a - B_a)\ot I \ket{\psi} \Vert^2 + 2 \cdot \Vert(I - B)\ot I \ket{\psi}\Vert^2\\
+		& \leq 2 \delta + 2 \cdot \Vert(I - B)\ot I \ket{\psi}\Vert^2. \tag{because $A_a \ot I \approx_{\delta} B_a \ot I$}
+		\end{align*}
+		The second term we can bound as follows.
+		\begin{align}
+		\Vert(I - B) \ot I \ket{\psi}\Vert^2
+		& = \bra{\psi} (I-B)^2 \ot I \ket{\psi}\nonumber\\
+		& \leq \bra{\psi} (I-B)\ot I \ket{\psi} \tag{because~$B$ is a sub-measurement}\\
+		& = 1 - \bra{\psi} B\ot I \ket{\psi}\nonumber\\
+		& = 1 - \sum_a \bra{\psi} B_a \ot I \ket{\psi}\nonumber\\
+		& \leq 1 -\sum_a \bra{\psi} B_a^2 \ot I \ket{\psi}.\label{eq:to-return-later-whatevs}
+		\end{align}
+		Now, by \Cref{prop:easy-approx-from-approx-delta} and the fact that $A_a\ot I \approx_{\delta} B_a\ot I$,
+		\begin{align*}
+		\sum_a \bra{\psi} B_a^2 \ot I \ket{\psi}
+		& \approx_{\sqrt{\delta}} \sum_a \bra{\psi} (A_a \cdot B_a)\ot I \ket{\psi}\\
+		& \approx_{\sqrt{\delta}} \sum_a \bra{\psi} A_a^2\ot I \ket{\psi}\\
+		& \geq  \bra{\psi} A \ot I \ket{\psi}- \zeta \tag{by \Cref{prop:cool-prop}}\\
+		& = 1 - \zeta. \tag{because~$A$ is a measurement}
+		\end{align*}
+		Hence, by \Cref{eq:to-return-later-whatevs},
+		\begin{equation*}
+		\Vert(I - B) \ot I \ket{\psi}\Vert^2 \leq 1 -\sum_a \bra{\psi} B_a^2 \ot I \ket{\psi} \leq 2\sqrt{\delta} + \zeta.
+		\end{equation*}
+		This concludes the proof.
+		\end{proof}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "multilinearity"
+%%% End:
