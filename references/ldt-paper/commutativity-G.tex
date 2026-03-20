@@ -82,17 +82,6 @@ Next, we claim that
 \approx_{\sqrt{\zeta}}\E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bu,\bx}_a  \ot A^{\bv,\by}_b \ket{\psi}. \label{eq:gcom9} 
 \end{equation}
 This is proved in \Cref{clm:g-comm-stability} below. Continuing, we have
-%The second approximation follows by adding the following quantity to the right hand side of \Cref{eq:gcom10}:
-%\begin{equation}
-%\label{eq:gcom11}
-%\E_{\bw,\bw',\bx,\by} \sum_{a,b} \bra{\psi} G^{\bx,\bw}_a  G^{\by,\bw'}_b G^{\bx,\bw}_a (G^{\by} - G^{\by,\bw'}_b)  \ot A^{\bw',\by}_b \ket{\psi}  
-%\end{equation}
-%Using the fact that the $\{G^y_h\}$ measurement is projective and then using Cauchy-Schwarz, the magnitude of the quantity in~\eqref{eq:gcom11} is at most
-%\begin{align}
-%	&\Big (\E_{\bw,\bw',\bx,\by} \sum_{b} \bra{\psi} (\sum_a G^{\bx,\bw}_a  G^{\by,\bw'}_b G^{\bx,\bw}_a)^2 \ket{\psi} \Big)^{1/2} \\ & \qquad \qquad \cdot \Big (\E_{\bw',\by} \sum_{b} \bra{\psi} \Big ( (G^{\by} - G^{\by,\bw'}_b)  \ot A^{\bw',\by}_b \Big)^2 \ket{\psi} \Big)^{1/2} \\
-%	&\leq \sqrt{\gamma}
-%\end{align}
-%where the first factor is bounded by $1$ (using the fact that the $\{G^{x,w}_a\}$ measurements are projective), and the second factor is bounded by $\sqrt{\gamma}$ (using the fact that the $\{G^{x,w}_a\}$ measurements are $\gamma$-consistent with the points measurements $\{A^{w,x}_a\}$).
 \begin{align}
 \eqref{eq:gcom9} &\approx_{2\sqrt{\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b G^{\bx}  \ot A^{\bv,\by}_b A^{\bu,\bx}_a \ket{\psi} \nonumber\\
 &\approx_{6\sqrt{\gamma (m+1)}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b  G^{\bx}  \ot A^{\bu,\bx}_a A^{\bv,\by}_b \ket{\psi}. \label{eq:dunno-what-i-should-call-this}
@@ -429,7 +418,3 @@ In total, we have incurred an error of
 \end{proof}
 
 
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: "multilinearity"
-%%% End:
