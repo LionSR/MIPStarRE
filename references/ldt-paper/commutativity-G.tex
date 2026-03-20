@@ -130,12 +130,7 @@ we conclude that
 &\approx_{\sqrt{\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bv, \by}_b G^{\bu,\bx}_a  G^{\bv,\by}_b  \ot I \ket{\psi}.
 \end{align*}
 Hence we have shown that the second term of \Cref{eq:gcom8} is close to the first term.
-\ignore{
-\begin{align*}
-\labelcref{eq:gcom10} &\approx_{\sqrt{2\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi}G^{\bu,\bx}_a G^{\bu,\bx}_a  G^{\bv,\by}_b \ot A^{\bv,\by}_b \ket{\psi} \tag{by \Cref{item:data-processed-consistency} and \Cref{prop:simeq-to-approx}} \\
-&= \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bu,\bx}_a  G^{\bv,\by}_b \ot A^{\bv,\by}_b \ket{\psi} \tag{because~$G$ is projective}\\
-&\approx_{\sqrt{\zeta}} \E_{\bu,\bv,\bx,\by} \sum_{a,b} \bra{\psi} G^{\bv,\by}_b G^{\bu,\bx}_a  G^{\bv,\by}_b \ot I \ket{\psi}. \tag{by \Cref{item:data-processed-consistency} and \Cref{prop:simeq-to-approx}}
-\end{align*} }
+
 
 Putting everything together, this shows that \Cref{eq:gcom8} is bounded by
 \begin{align*}
@@ -146,39 +141,7 @@ Putting everything together, this shows that \Cref{eq:gcom8} is bounded by
 \end{align*}
 and this completes the proof of the lemma, modulo the proofs of  \Cref{clm:g-comm-stability} and \Cref{clm:g-comm-stability2}.
 We now prove these claims.
-\ignore{Prior to doing so, we will first require the following technical lemma.
 
-\begin{lemma}
-\label{lem:global-variance-of-points2}
-For all collections of sub-measurements $\{R^x\} \in \multisub{m}{q}$ indexed by $x \in \F_q$, we have that on average over $\bx \sim \F_q$, and $\bu,\bv \sim \F_q^m$,
-\[
-	A^{u,x}_{g(u)} \otimes \sqrt{R_g^x} \approx_{24m\cdot(\eps+\delta+\frac{d}{q})} A^{v,x}_{g(v)} \otimes \sqrt{R_g^x} \,.
-\]
-\end{lemma}
-\begin{proof}
-	For every $x \in \F_q$, define the \emph{$x$-restricted $(d,m+1,q)$-low degree test} to be the normal $(d,m+1,q)$-low degree test where the points player receives a point $(u,x) \in \F_q^{m+1}$. Let $\eps_x,\delta_x, \gamma_x$ be the minimum values such that $(\psi,A,B, L)$ is $(\eps_x,\delta_x, \gamma_x)$-good for the $x$-restricted $(d,m+1,q)$-low degree test. Note that $\E_{\bx} \eps_{\bx} \leq \eps$, $\E_{\by} \delta_{\by} \leq \delta$, and $\E_{\bz} \gamma_{\bz} \leq \gamma$.
-	
-	Now define the \emph{$x$-restricted $(d,m,q)$-low degree test} to be the $x$-restricted $(d,m+1,q)$-test where further the lines player receives a line that does not run through the $(m+1)$-st coordinate. Note that $(\psi,A,B,L)$ also yields a strategy for the $x$-restricted $(d,m,q)$-low degree test that is $(\eps_x',\delta_x', \gamma_x')$-good, where $\delta'_x = \delta_x$ and
-	\begin{equation}\label{eq:eps-to-eps-prime}
-		\eps_x \geq \left(\frac{m}{m+1}\right)\cdot \eps_x'
-	\end{equation}
-	The factor $1 - 1/(m+1)$ comes from the probability that the line does not run through the $(m+1)$-st coordinate. 
-	
-	By \Cref{lem:global-variance-of-points}, for every fixed $x \in \F_q$ and $R^x \in \multisub{m}{q}$ and on average over $\bu,\bv \in \F_q^m$, we have
-\begin{equation}\label{eq:referencing-a-really-old-equation}
-	A^{u,x}_{g(u)} \otimes \sqrt{R_g^x} \approx_{12m \cdot (\eps_y' + \delta_y' + \frac{d}{q})} A^{v,y}_{g(v)} \otimes \sqrt{R_g^x}.
-\end{equation}
-Averaging over $\bx$, we get
-\begin{align*}
-	\E_{\bu,\bv,\bx} \sum_g \bra{\psi} \Big ( A^{\bu,\bx}_{g(\bu)} - A^{\bv,\bx}_{g(\bv)} \Big)^2 \ot R^{\bx}_g \ket{\psi}
-	&\leq \E_{\bx}\left[12m\cdot\left(\eps_{\bx}' + \delta_{\bx}' + \frac{d}{q}\right)\right] \tag{by \Cref{eq:referencing-a-really-old-equation}}\\
-	&\leq 12(m+1) \cdot \left(\eps + \delta + \frac{d}{q}\right).\tag{by \Cref{eq:eps-to-eps-prime}}
-\end{align*}
-This concludes the proof.
-\end{proof}
-
-We now proceed to the proofs of \Cref{clm:g-comm-stability} and \Cref{clm:g-comm-stability2}.
-}
 \begin{claim}
 \label{clm:g-comm-stability}
 \begin{align*}

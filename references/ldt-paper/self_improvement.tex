@@ -24,12 +24,7 @@ Finally, the error $\zeta$ is substantially smaller.
 \begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
 Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following property:
 \begin{enumerate}
-\ignore{
-\item (Completeness): \label{item:self-improvement-G-completeness}  If $G = \sum_g G_g$, then
-  	\begin{equation*}
-	\bra{\psi} G \otimes I \ket{\psi} \geq 1 - \kappa.
-	\end{equation*}
-}
+
   \item (Consistency with~$A$): \label{item:self-improvement-G-consistency} On average over $\bu \sim \F_q^{m}$,
 	  \begin{equation*}
 	  A^{u}_a \otimes I \simeq_{\nu} I \otimes G_{[g(u)=a]}.
@@ -52,7 +47,7 @@ Then there exists $H \in \polysub{m}{q}{d}$ with the following properties:
     \item(Strong self-consistency): \label{item:self-improvement-self}
     	\begin{equation*}
 		\sum_{h} \bra{\psi} H_h \ot H_h \ket{\psi} \geq \bra{\psi} H \ot I \ket{\psi} - \zeta.
-		\ignore{H_h \otimes I \simeq_{\zeta} I \otimes H_h.}
+		
 	\end{equation*}
     \item(Boundedness): \label{item:self-improvement-boundedness} There exists a positive-semidefinite matrix~$Z$ such that
     \begin{equation*}
@@ -613,17 +608,7 @@ this concludes the proof of \Cref{item:self-improvement-self}.
 \noindent
 \emph{Proof of \Cref{item:self-improvement-boundedness} (Boundedness).}
 The boundedness of~$H$ is
-\ignore{
-\begin{align*}
-&\bra{\psi} Z \otimes (I - H) \ket{\psi}\\
-=~& \bra{\psi} Z \otimes I \ket{\psi} - \sum_h \bra{\psi} Z \otimes H_h \ket{\psi}\\
-\leq~& \bra{\psi} Z \otimes I \ket{\psi} - \sum_h \bra{\psi} \E_{\bu} A^{\bu}_{h(\bu)} \otimes H_h \ket{\psi} \tag{by \Cref{eq:Z-greater-than-A}}\\
-=~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_h \bra{\psi}  A^{\bu}_{h(\bu)} \otimes H_h \ket{\psi}\\
-=~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_h \bra{\psi}  I \otimes H_h \ket{\psi} +\E_{\bu} \sum_{a, h:h(\bu)\neq a} \bra{\psi}  A^{\bu}_{a} \otimes H_h \ket{\psi} \tag{because~$A$ is a measurement}\\
-\leq~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_h \bra{\psi}  I \otimes H_h \ket{\psi} + 4 \sqrt{\zeta_{\mathrm{variance}}}\tag{by \Cref{eq:explicit-bound-for-A-consistency}}\\
-\leq~& 3 \sqrt{\delta} + 4 \sqrt{\zeta_{\mathrm{variance}}}.\tag{by \Cref{eq:gonna-use-this-later-H-versus-Z}}
-\end{align*}
-}
+
 \begin{align*}
 &\bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_a \bra{\psi}  A^{\bu}_{a} \otimes H_{[h(\bu)=a]} \ket{\psi} \\
 =~&  \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_h \bra{\psi}  A^{\bu}_{h(\bu)} \otimes H_h \ket{\psi}\\
@@ -652,12 +637,7 @@ to the output of \Cref{lem:self-improvement-helper} and argue that it maintains 
 \begin{theorem}[Self-improvement; \Cref{thm:self-improvement-in-induction-section} restated]\label{thm:self-improvement}
 Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
 \begin{enumerate}
-\ignore{
-\item (Completeness): \label{item:self-improvement-projective-G-completeness}  If $G =  \sum_g G_g$, then
-  	\begin{equation*}
-	\bra{\psi} G \otimes I \ket{\psi} \geq 1 - \kappa.
-	\end{equation*}
-}
+
   \item (Consistency with~$A$): \label{item:self-improvement-projective-G-consistency} On average over $\bu \sim \F_q^{m}$,
 	  \begin{equation*}
 	  A^{u}_a \otimes I \simeq_{\nu} I \otimes G_{[g(u)=a]}.

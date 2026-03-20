@@ -14,16 +14,7 @@ The inductive hypothesis is stated as follows.
 	\end{equation*}
   where $\sigma = m^2 \cdot \bigl(\nu + e^{-k/(80000m^2)}\bigr)$ and
   $\nu = 1000k^2 m^2 \cdot\big(\eps^{1/1024} + \delta^{1/1024} + \gamma^{1/1024} + (d/q)^{1/1024}\big)$.
-  \ignore{
-\item (Completeness): \label{item:self-improvement-G-completeness}  If $G = \sum_g G_g$, then
-  	\begin{equation*}
-	\bra{\psi} G \otimes I \ket{\psi} \geq 1 - \kappa,
-	\end{equation*}
-	where
-	\begin{equation*}
-	\kappa = m^2 \cdot\Big(\nu + e^{- k/(80000m^2)}\Big).
-	\end{equation*}
-}
+  
 \end{theorem}
 
 Comparing with our main theorem, \Cref{thm:main-formal},
@@ -259,12 +250,7 @@ The first is self-improvement, which is stated as follows.
   Let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
 Let $G \in \polysub{m}{q}{d}$ be a sub-measurement with the following properties:
 \begin{enumerate}
-\ignore{
-\item (Completeness): \label{item:si-inductive-G-completeness}  If $G =  \sum_g G_g$, then
-  	\begin{equation*}
-	\bra{\psi} G \otimes I \ket{\psi} \geq 1 - \kappa.
-	\end{equation*}
-}
+
   \item (Consistency with~$A$): \label{item:si-inductive-G-consistency} On average over $\bu \sim \F_q^{m}$,
 	  \begin{equation*}
 	  A^{u}_a \otimes I \simeq_{\nu} I \otimes G_{[g(u)=a]}.
@@ -347,13 +333,7 @@ The second main step is pasting, which is stated as follows.
 	  \begin{equation*}
 	  A^{u}_a \otimes I \simeq_{\sigma} I \otimes H_{[h(u)=a]}.
 	  \end{equation*}
-	  \ignore{
-  \item (Completeness): \label{item:ld-pasting-inductive-N-completeness} If $H =  \sum_h H_h$, then
-  	\begin{equation*}
-	\bra{\psi} H \otimes I \ket{\psi} \geq 1 - \kappa \cdot \left(1 + \frac{1}{100m}\right)
-    - \nu - e^{- k/(80000m^2)}.
-	\end{equation*}
-	}
+	  
   \end{enumerate}
 \end{theorem}
 
@@ -597,13 +577,7 @@ where
   \sigma^* = (\sigma + \zeta) \cdot \left(1 + \frac{1}{100m}\right)
   + 2\nu + e^{- k/(80000m^2)}.
 \end{equation*}
-	  \ignore{
-  \item (Completeness): \label{item:ld-pasting-inductive-N-completeness} If $H =  \sum_h H_h$, then
-  	\begin{equation*}
-	\bra{\psi} H \otimes I \ket{\psi} \geq 1 - \kappa \cdot \left(1 + \frac{1}{100m}\right)
-    - \nu - e^{- k/(80000m^2)}.
-	\end{equation*}
-	}
+	  
 
 The consistency with~$A$ is as guaranteed in the theorem statement.
 Hence, we need only verify that the completeness bound implies the one in the theorem statement as well.
@@ -645,16 +619,7 @@ As a result,
 \leq (m+1)^2\cdot\Big(\nu + e^{- k/(80000m^2)}\Big)
 \leq (m+1)^2\cdot\Big(\nu + e^{- k/(80000(m+1)^2)}\Big).
 \end{equation*}
-\ignore{
-\begin{align*}
-&\kappa \cdot \left(1 + \frac{1}{100m}\right) + \nu + e^{- k/(80000m^2)}\\
-=~&\left(1 + \frac{1}{100m}\right) \cdot m^2 \cdot\Big(\nu + e^{- k/(80000m^2)}\Big) + \nu+ e^{- k/(80000m^2)}\\
-\leq~&\left(1 + \frac{1}{m}\right) \cdot m^2 \cdot\Big(\nu + e^{- k/(80000m^2)}\Big) + \nu+ e^{- k/(80000m^2)}\\
-=~& m(m+1) \cdot\Big(\nu + e^{- k/(80000m^2)}\Big) + \nu+ e^{- k/(80000m^2)}\\
-\leq~& (m+1)^2 \cdot \Big(\nu + e^{- k/(80000m^2)}\Big)\\
-\leq~& (m+1)^2 \cdot \Big(\nu + e^{- k/(80000(m+1)^2)}\Big).
-\end{align*}
-}
+
 This is the bound guaranteed by the theorem and so it completes the proof.
 \end{proof}
 

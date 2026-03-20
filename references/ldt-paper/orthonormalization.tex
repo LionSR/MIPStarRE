@@ -296,19 +296,7 @@ A_a \otimes I \approx_{84 \zeta^{1/4}} P_a \otimes I.
 is equivalent to~$A_a$ being $\zeta$-strongly self-consistent, by \Cref{prop:other-two-notions-of-self-consistency}.
 This is because~$A$ is a measurement.)
 
-\ignore{
-\begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
-Let $\ket{\psi}$ be a permutation-invariant state,
-and let $A = \{A_a\}$ be a measurement with strong self-consistency
-\begin{equation*}
-\sum_a \bra{\psi} A_a \otimes A_a \ket{\psi} \geq 1 -\zeta.
-\end{equation*}
-Then there exists a projective sub-measurement $P = \{P_a\}$ such that
-\begin{equation*}
-A_a \otimes I \approx_{76 \zeta^{1/4}} P_a \otimes I.
-\end{equation*}
-\end{lemma}
-}
+
 
 We now prove \Cref{thm:orthonormalization} by reducing the general (sub-measurement) case
 to the case when~$A$ is a measurement.
@@ -393,12 +381,7 @@ Let $A = \{A_a\}$ and~$B = \{B_a\}$ be POVM measurements such that
 \begin{equation*}
 A_a \ot I \simeq_{\zeta} I \ot B_a.
 \end{equation*}
-\ignore{
-By \Cref{prop:two-notions-of-self-consistency},
-\begin{equation}\label{eq:A-approx-delta}
-A_a \otimes I\approx_{2\zeta} I\otimes A_a.
-\end{equation}
-}
+
 By \Cref{prop:simeq-for-measurements}, this implies that
 \begin{equation*}
 \sum_a \bra{\psi}A_a \ot B_a \ket{\psi} \geq 1 - \zeta.
@@ -416,33 +399,7 @@ Taking the square of both sides,
 \geq 1 - 2\zeta
 = \sum_a \bra{\psi} A_a \ot I \ket{\psi} - 2\zeta. \tag{because~$A$ is a measurement}
 \end{equation*}
-\ignore{
-\begin{align}
-\sum_a \bra{\psi} A_a \otimes A_a \ket{\psi}
-&= \sum_a \bra{\psi} (A_a \ot I) \cdot (I \ot A_a) \ket{\psi}\nonumber\\
-&\leq \sqrt{\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}} \cdot \sqrt{\sum_a \bra{\psi} I \ot (A_a)^2 \ket{\psi}}\nonumber\\
-& = \sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}.\label{eq:As-on-same-side}
-\end{align}
-\ignore{We claim that
-\begin{equation}\label{eq:As-on-same-side}
-\sum_a \bra{\psi} A_a \otimes A_a \ket{\psi}
-\approx_{\sqrt{2\zeta}} \sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi}.
-\end{equation}
-To show this, we bound the magnitude of the difference.
-\begin{align*}
-&\Big|\sum_a \bra{\psi} (A_a \otimes I) \cdot (A_a \otimes I - I \otimes A_a) \ket{\psi}\Big|\\
-\leq~&
-	\sqrt{\sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi}}
-	\cdot \sqrt{\sum_a \bra{\psi}(A_a \otimes I - I \otimes A_a)^2 \ket{\psi}}\\
-\leq~& 1 \cdot \sqrt{2\zeta}. \tag{by \Cref{eq:A-approx-delta}}
-\end{align*}}
-As a result,
-\begin{align*}
-\sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi}
-&\geq \sum_a \bra{\psi} A_a \otimes A_a \ket{\psi}\tag{by \Cref{eq:As-on-same-side}}\\
-&\geq \sum_a \bra{\psi} A_a \otimes I \ket{\psi} -\zeta. \tag{by self-consistency of~$A$}
-\end{align*}
-}
+
 Rearranging,
 \begin{equation}\label{eq:A-looks-projective}
 \sum_a \bra{\psi} (A_a - (A_a)^2) \otimes I \ket{\psi}
@@ -570,21 +527,7 @@ R \leq (1+ 2\delta) \cdot I.
 
 The lemma now follows by setting $\delta = \sqrt{\zeta}$. Note that we required that $\delta$ be at most $1/2$,
 which follows from our assumption that $\zeta \leq 1/4$ from \Cref{eq:assumption-on-zeta}.
-\ignore{
-Finally,
-\begin{align*}
-&\sum_a R_a (R - R_a) R_a\\
-=~&\sum_a R_a R R_a - \sum_a (R_a)^3\\
-\leq ~&\left(\frac{1}{1-\delta}\right) \cdot \sum_a R_a A R_a - \sum_a (R_a)^3 \tag{by XXX}\\
-\leq ~&\left(\frac{1}{1-\delta}\right) \cdot \sum_a  (R_a)^2 - \sum_a (R_a)^3 \tag{because~$A$ is a sub-measurement}\\
-= ~&\left(\frac{1}{1-\delta}\right) \cdot \sum_a  R_a - \sum_a R_a \tag{because the $R_a$'s are projectors}\\
-= ~&\left(\frac{1}{1-\delta}\right) \cdot R - R\\
-= ~&\left(\frac{1}{1-\delta} -  1\right) \cdot R\\
-\leq~& 2\delta \cdot R. \tag{because $\delta \leq 1/2$}
-\end{align*}
-The lemma now follows by setting $\delta = XXX$. Note that we required that $\delta$ be at most $1/2$,
-which follows from our assumption on $\zeta$ from XXX.
-}
+
 \end{proof}
 
 Write $d$ for the dimension of the~$A$ matrices.
@@ -711,19 +654,7 @@ Since we know that $A_a \ot I \approx_{2\sqrt{\zeta}} R_a \ot I$ by \Cref{lem:pr
 \begin{equation*}
 A_a \ot I \approx_{12\sqrt{\zeta}} Q_a \ot I.
 \end{equation*}
-\ignore{
-Finally,
-\begin{align*}
-&\sum_a Q_a (Q - Q_a) Q_a\\
-=~&\sum_a Q_a Q Q_a - \sum_a (Q_a)^3\\
-\leq ~&XXX \cdot \sum_a Q_a A Q_a - \sum_a (Q_a)^3 \tag{by XXX}\\
-\leq ~&XXX \cdot \sum_a  (Q_a)^2 - \sum_a (Q_a)^3 \tag{because~$A$ is a sub-measurement}\\
-= ~&XXX \cdot \sum_a  Q_a - \sum_a Q_a \tag{because the $Q_a$'s are projectors}\\
-= ~&XXX \cdot Q - Q\\
-= ~&\left(XXX -  1\right) \cdot Q\\
-\leq~& 2\delta \cdot Q.
-\end{align*}
-}
+
 This completes the proof.
 \end{proof}
 
@@ -1053,12 +984,7 @@ P_a
 \begin{lemma}[$\widehat{X}$ squared]\label{lem:X-hat-squared}
 \begin{equation*}
 \widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
-\ignore{
-\quad
-\text{and}
-\quad
-\widehat{X}^\dagger \cdot \widehat{X} = V \cdot I_{d \times m} \cdot I_{m \times d} \cdot V^\dagger.
-}
+
 \end{equation*}
 \end{lemma}
 \begin{proof}
@@ -1072,17 +998,7 @@ First,
 &= I_{m \times m},
 \end{align*}
 where the last step uses the fact that~$U$ is an $m \times m$ unitary.
-\ignore{
-Second,
-\begin{align*}
-\widehat{X}^\dagger \cdot \widehat{X}
-& = (U  \cdot I_{m \times d} \cdot V^\dagger)^\dagger \cdot (U  \cdot I_{m \times d} \cdot V^\dagger)\\
-& = V \cdot I_{d \times m} \cdot U^\dagger \cdot U  \cdot I_{m \times d} \cdot V^\dagger\\
-& = V \cdot I_{d \times m} \cdot I_{m \times m}  \cdot I_{m \times d} \cdot V^\dagger \tag{because~$U$ is an $m \times m$ unitary}\\
-& = V \cdot I_{d \times m} \cdot I_{m \times d} \cdot V^\dagger.
-\end{align*}
-We note that $m \leq d$, and so $I_{d \times m} \cdot I_{m \times d}$ is not necessarily equal to $I_{d \times d}$.
-}
+
 \end{proof}
 
 Finally, we show two lemmas on quantities involving both $X$ and~$\widehat{X}$.

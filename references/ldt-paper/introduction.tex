@@ -150,16 +150,7 @@ which culminated in the proof that $\mathsf{MIP}^* = \mathsf{RE}$
 and the refutation of the Connes embedding conjecture in~\cite{JNV+20}.
 We summarize this line of research in \Cref{fig:research}.
 
-\ignore{
-Quantum soundness of a three-player variant of the multilinearity test was established by Ito and Vidick in~\cite{IV12}
-to prove that $\NEXP \subseteq \mathsf{MIP}^*$ with three provers.
-Next, Vidick~\cite{Vid16} proved quantum soundness of a three-player variant of the low-degree test
-to prove that $\NP \subseteq \mathsf{MIP}^*[O(\log(n)), O(1)]$ with three provers.
-Building on this work, Natarajan and Vidick~\cite{NV18b} proved quantum soundness of the two-player low-degree test.
-This result has led to a sequence of works achieving stronger and stronger results,
-culminating in the proof that $\mathsf{MIP}^* = \mathsf{RE}$
-and the refutation of the Connes embedding conjecture in~\cite{JNV+20}.
-}
+
 
 {
 \floatstyle{boxed} 
@@ -189,13 +180,13 @@ and the refutation of the Connes embedding conjecture in~\cite{JNV+20}.
 \end{figure}
 }
 
-\tnote{edited:}
+
 Subsequent to initial posting of~\cite{JNV+20} on the arXiv,
 an error was discovered in the analysis of the quantum-sound low degree test
 contained in~\cite{Vid16} which was propagated to~\cite{NV18b}. The error affects the proof in a manner that appears difficult to fix. As such, we currently do not know if the low-degree test is quantum-sound for any number of provers.
 The invalidation of this analysis affects every result in \Cref{fig:research} except for~\cite{IV12}.
 
-\tnote{edited:}
+
 The purpose of this work is to provide a different soundness analysis, for a variant of the low-degree test, that can nevertheless be used as a replacement for it in most subsequent works. 
 We do so by revisiting the three-player quantum-sound multilinearity test of~\cite{IV12}
 and improving this result in two ways.
@@ -302,9 +293,7 @@ Ultimately, however, this creates a cascade of Consolidation steps calling each 
 which at some point grows so large that the low-degree soundness can no longer be applied.
 This is the source of the bug.
 
-\ignore{
-The bug in their proofs is contained in this Consolidation section.
-}
+
 
 Fortunately, this work shows that the techniques of these prior works, 
 aside from Consolidation,
