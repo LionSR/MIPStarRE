@@ -1,5 +1,7 @@
 # MIPStarRE
 
+[![Lean Action CI](https://github.com/LionSR/MIPStarRE/actions/workflows/lean_action_ci.yml/badge.svg)](https://github.com/LionSR/MIPStarRE/actions/workflows/lean_action_ci.yml)
+
 Formalization project for mathematics around $\mathrm{MIP}^*=\mathrm{RE}$.
 
 ## Active paper track
