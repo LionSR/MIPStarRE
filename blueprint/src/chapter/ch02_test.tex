@@ -1,0 +1,45 @@
+\chapter{The low individual degree test}
+\label{chap:test}
+
+\section{The game and its strategies}
+
+\begin{definition}[Low individual degree test]\label{def:low-individual-degree-test}
+  Fix integers $m,d \ge 0$ and a prime power $q$. The $(m,q,d)$ low individual degree test has three equally likely subtests.
+  In the axis-parallel lines test, one prover receives a uniformly random axis-parallel line $\ell \subseteq \F_q^m$ and returns a degree-$d$ univariate polynomial on $\ell$, while the other prover receives a uniformly random point $u \in \ell$ and returns a field element $a \in \F_q$; the verifier accepts when $f(u)=a$. In the self-consistency test, both provers receive the same uniformly random point $u \in \F_q^m$ and must return the same value. In the diagonal lines test, one prover receives a uniformly random line through a uniformly random point whose direction may use the first $j$ coordinates for some random $j$, and must return a degree-$md$ univariate polynomial on that line; the other prover receives the base point and returns a field element. The verifier again accepts when the polynomial evaluates to the point answer.
+\end{definition}
+
+\begin{definition}[Symmetric projective strategy]\label{def:symmetric-projective-strategy}
+  A symmetric projective strategy for the $(m,q,d)$ low individual degree test consists of a permutation-invariant bipartite state $\ket{\psi} \in \mathcal H \ot \mathcal H$, a projective point measurement $A^u=\{A^u_a\}_{a \in \F_q}$ for each $u \in \F_q^m$, a projective axis-parallel line measurement $B^\ell=\{B^\ell_f\}$ for each axis-parallel line $\ell$, and a projective diagonal-line measurement $L^\ell=\{L^\ell_f\}$ for each line $\ell$.
+\end{definition}
+
+\begin{definition}[General projective strategy]\label{def:projective-strategy}
+  A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
+\end{definition}
+
+\begin{definition}[Good strategy]\label{def:good-strategy}
+  A strategy is $(\eps,\delta,\gamma)$-good if it passes the axis-parallel lines test with probability at least $1-\eps$, the self-consistency test with probability at least $1-\delta$, and the diagonal lines test with probability at least $1-\gamma$.
+\end{definition}
+
+\section{Formal soundness target}
+
+\begin{theorem}[Quantum soundness of the low individual degree test]\label{thm:main-formal}
+  \lean{MIPStarRE.Paper2009LDT.Section3Test.mainFormal}
+  \uses{def:projective-strategy}
+  Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that passes the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Let $k \ge md$ and set
+  \[
+    \nu = 100000 k^2 m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).
+  \]
+  Then there exist projective measurements $G^{\mathrm A}$ and $G^{\mathrm B}$ indexed by functions in $\polyfunc{m}{q}{d}$ such that
+  \begin{enumerate}
+    \item on average over $u \sim \F_q^m$,
+    \[
+      A^{\mathrm A,u}_a \ot I \simeq_{\nu} I \ot G^{\mathrm B}_{[g(u)=a]},
+      \qquad
+      I \ot A^{\mathrm B,u}_a \simeq_{\nu} G^{\mathrm A}_{[g(u)=a]} \ot I;
+    \]
+    \item the two global measurements are self-consistent in the sense that
+    \[
+      G^{\mathrm A}_g \ot I \simeq_{\nu} I \ot G^{\mathrm B}_g.
+    \]
+  \end{enumerate}
+\end{theorem}

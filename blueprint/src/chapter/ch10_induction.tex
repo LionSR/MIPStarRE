@@ -1,0 +1,98 @@
+\chapter{The main induction step}
+\label{chap:induction}
+
+\section{Restricting to one slice}
+
+\begin{definition}[Appending a line at height $x$]\label{def:append-x}
+  For $x \in \F_q$, let $\operatorname{append}_x(\ell)$ be the line in $\F_q^{m+1}$ obtained by appending the coordinate $x$ to every point of a line $\ell \subseteq \F_q^m$. If $f\colon \ell \to \F_q$, let $\operatorname{append}_x(f)$ be the polynomial on $\operatorname{append}_x(\ell)$ defined by $\operatorname{append}_x(f)(u,x)=f(u)$.
+\end{definition}
+
+\begin{definition}[$x$-restricted strategy]\label{def:restricted-strategy}
+  \uses{def:append-x, def:symmetric-projective-strategy}
+  Let $(\psi,A,B,L)$ be a symmetric strategy for the $(m+1,q,d)$ low individual degree test. For each $x \in \F_q$, the $x$-restricted strategy $(\psi,A^x,B^x,L^x)$ for the $(m,q,d)$ test is defined by
+  \[
+    (A^x)_a^u = A_a^{u,x},
+    \qquad
+    (B^x)_f^{\ell} = B_{\operatorname{append}_x(f)}^{\operatorname{append}_x(\ell)},
+    \qquad
+    (L^x)_f^{\ell} = L_{\operatorname{append}_x(f)}^{\operatorname{append}_x(\ell)}.
+  \]
+\end{definition}
+
+\begin{lemma}[Restricted success probabilities]\label{lem:restricted-probabilities}
+  \lean{MIPStarRE.Paper2009LDT.Section6MainInductionStep.restrictedProbabilities}
+  \uses{def:restricted-strategy, def:good-strategy}
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the restricted strategy and let $\eps_x,\delta_x,\gamma_x$ be its three failure probabilities. Then
+  \[
+    \E_x \eps_x \le \frac{m+1}{m} \eps,
+    \qquad
+    \E_x \delta_x \le \delta,
+    \qquad
+    \E_x \gamma_x \le \frac{m+1}{m} \gamma.
+  \]
+\end{lemma}
+\begin{proof}
+  The self-consistency test restricts exactly to the slice at height $x$. For the axis-parallel and diagonal-line tests, conditioning on the sampled line not being parallel to the last coordinate identifies the test with the corresponding restricted game.
+\end{proof}
+
+\section{The inductive construction}
+
+\begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
+  \lean{MIPStarRE.Paper2009LDT.Section6MainInductionStep.selfImprovementInInductionSection}
+  \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
+  Let $G \in \polysub{m}{q}{d}$ be a submeasurement such that, on average over $u \sim \F_q^m$,
+  \[
+    A_a^u \ot I \simeq_\nu I \ot G_{[g(u)=a]}.
+  \]
+  Set
+  \[
+    \zeta = 3000m\left(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right).
+  \]
+  Then there exists a projective submeasurement $H \in \polysub{m}{q}{d}$ such that:
+  \begin{enumerate}
+    \item if $H=\sum_h H_h$, then $\bra{\psi} H \ot I \ket{\psi} \ge (1-\nu)-\zeta$;
+    \item on average over $u \sim \F_q^m$,
+    \[
+      A_a^u \ot I \simeq_\zeta I \ot H_{[h(u)=a]};
+    \]
+    \item $H_h \ot I \approx_\zeta I \ot H_h$;
+    \item there exists a positive semidefinite operator $Z$ such that
+    \[
+      \bra{\psi} Z \ot (I-H) \ket{\psi} \le \zeta,
+    \]
+    and $Z \ge \E_u A_{h(u)}^u$ for every $h \in \polyfunc{m}{q}{d}$.
+  \end{enumerate}
+\end{theorem}
+\begin{proof}
+  \uses{thm:self-improvement, prop:completing-to-measurement, prop:triangle-sub, prop:simeq-data-processing}
+  This is the induction-level self-improvement statement recorded in \texttt{inductive\_step.tex}. Chapter~\ref{chap:self-improvement} proves the corresponding measurement-level theorem. The source keeps the stronger submeasurement-input form explicit, so the blueprint keeps a separate node for it instead of identifying it with Theorem~\ref{thm:self-improvement}.
+\end{proof}
+
+\begin{theorem}[Main induction]\label{thm:main-induction}
+  \lean{MIPStarRE.Paper2009LDT.Section6MainInductionStep.mainInduction}
+  \uses{def:good-strategy, def:polymeasurements, def:simeq}
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
+  \[
+    \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
+  \]
+  and
+  \[
+    \sigma = m^2\left(\nu + e^{-k/(80000m^2)}\right).
+  \]
+  Then there exists a measurement $G \in \polymeas{m}{q}{d}$ such that, on average over $u \sim \F_q^m$,
+  \[
+    A_a^u \ot I \simeq_\sigma I \ot G_{[g(u)=a]}.
+  \]
+\end{theorem}
+\begin{proof}
+  \uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting}
+  Proceed by induction on $m$. For $m=1$, the unique axis-parallel line measurement already gives the required global measurement. For the step from $m$ to $m+1$, apply the induction hypothesis to every restricted strategy from Definition~\ref{def:restricted-strategy}. Lemma~\ref{lem:restricted-probabilities} averages the resulting slice errors. Then apply Theorem~\ref{thm:self-improvement-in-induction-section} to each slice measurement and paste the improved slice family with Theorem~\ref{thm:ld-pasting}. The explicit constants are arranged so that the pasted error is bounded by the new value of $\sigma$.
+\end{proof}
+
+\section{Proof of the main formal theorem}
+
+\begin{proof}
+  \proves{thm:main-formal}
+  \uses{thm:main-induction, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, lem:schwartz-zippel-individual}
+  Start from an arbitrary two-prover strategy and symmetrize it by adjoining a classical role register that decides which prover plays the first or second role. Apply Theorem~\ref{thm:main-induction} to the resulting symmetric strategy to obtain a global measurement on the enlarged space. Projecting to the two role sectors gives candidate global measurements $G^{\mathrm A}$ and $G^{\mathrm B}$ for the original provers. Their post-processed point evaluations are approximately consistent with the original point measurements, and Schwartz--Zippel turns that pointwise agreement into approximate self-consistency of the global measurements. Apply Lemma~\ref{lem:orthonormalization-main-lemma} to make the global measurements projective, complete them using Lemma~\ref{prop:completing-to-measurement}, and transfer the consistency bounds back through the preliminary comparison lemmas.
+\end{proof}

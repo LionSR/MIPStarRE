@@ -1,0 +1,151 @@
+import MIPStarRE.Paper2009LDT.Section3Test
+
+/-!
+Matching scaffold for Section 4 of the low individual degree paper in
+`references/ldt-paper/preliminaries.tex`.
+
+This file introduces lightweight paper-local definitions for the measurement
+calculus of the paper and records the main proposition names with placeholder
+proofs.
+-/
+
+namespace MIPStarRE.Paper2009LDT.Section4Preliminaries
+
+open MIPStarRE.Paper2009LDT
+
+/-- `def:post-processing` in `preliminaries.tex`. -/
+def postProcessing {α β : Type _} (A : SubMeasurement α) (f : α → β) : SubMeasurement β :=
+  postprocess A f
+
+/-- `def:measurement-completion` in `preliminaries.tex`. -/
+def measurementCompletion {α : Type _} (A : SubMeasurement α) : Measurement (Option α) :=
+  completeSubMeasurement A
+
+/-- `def:simeq` in `preliminaries.tex`. -/
+def consistency {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
+  ConsistencyRel ψ 𝒟 A B δ
+
+/-- `def:approx_delta` in `preliminaries.tex`. -/
+def stateDependentDistance {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
+  StateDependentDistanceRel ψ 𝒟 A B δ
+
+/-- `def:strong-self-consistency` in `preliminaries.tex`. -/
+def strongSelfConsistency {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
+  StrongSelfConsistencyRel ψ 𝒟 A δ
+
+def consistencyAsAgreement {Question Outcome : Type _}
+    (_ψ : QuantumState) (_𝒟 : Distribution Question)
+    (_A _B : IndexedMeasurement Question Outcome) (_δ : Error) : Prop := True
+
+def postprocessIndexedSubMeasurement {Question α β : Type _}
+    (A : IndexedSubMeasurement Question α) (f : α → β) :
+    IndexedSubMeasurement Question β :=
+  fun q => postProcessing (A q) f
+
+def consSubMeasStatement {Question Outcome : Type _}
+    (_ψ : QuantumState) (_𝒟 : Distribution Question)
+    (_A : IndexedSubMeasurement Question Outcome)
+    (_B : IndexedMeasurement Question Outcome) (_γ : Error) : Prop := True
+
+def switchSandwichStatement {Question Outcome : Type _}
+    (_ψ : QuantumState) (_𝒟 : Distribution Question)
+    (_A : IndexedProjectiveSubMeasurement Question Outcome)
+    (_B : Operator) (_δ : Error) : Prop := True
+
+def completenessTransferProjectivePStatement {Question Outcome : Type _}
+    (_ψ : QuantumState) (_𝒟 : Distribution Question)
+    (_A : IndexedSubMeasurement Question Outcome)
+    (_P : IndexedProjectiveSubMeasurement Question Outcome) (_ε : Error) : Prop := True
+
+def completingToMeasurementStatement {Outcome : Type _}
+    (_ψ : QuantumState)
+    (_A : Measurement Outcome) (_B : SubMeasurement Outcome)
+    (_C : Measurement Outcome) (_a0 : Outcome) (_δ _ζ : Error) : Prop := True
+
+/-- `prop:simeq-for-measurements`. -/
+theorem simeqForMeasurements {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedMeasurement Question Outcome) (δ : Error) :
+    consistency ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
+        (IndexedMeasurement.toIndexedSubMeasurement B) δ ↔
+      consistencyAsAgreement ψ 𝒟 A B δ := by
+  sorry
+
+/-- `prop:simeq-to-approx`. -/
+theorem simeqToApprox {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedMeasurement Question Outcome) (δ : Error) :
+    consistency ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
+        (IndexedMeasurement.toIndexedSubMeasurement B) δ →
+      stateDependentDistance ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
+        (IndexedMeasurement.toIndexedSubMeasurement B) (2 * δ) := by
+  sorry
+
+/-- `prop:simeq-data-processing`. -/
+theorem simeqDataProcessing {Question α β : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedSubMeasurement Question α) (δ : Error) (f : α → β) :
+    consistency ψ 𝒟 A B δ →
+      consistency ψ 𝒟 (postprocessIndexedSubMeasurement A f)
+        (postprocessIndexedSubMeasurement B f) δ := by
+  sorry
+
+/-- `prop:cons-sub-meas`. -/
+theorem consSubMeas {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedSubMeasurement Question Outcome)
+    (B : IndexedMeasurement Question Outcome) (γ : Error) :
+    consistency ψ 𝒟 A (IndexedMeasurement.toIndexedSubMeasurement B) γ →
+      consSubMeasStatement ψ 𝒟 A B γ := by
+  sorry
+
+/-- `prop:switch-sandwich`. -/
+theorem switchSandwich {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedProjectiveSubMeasurement Question Outcome)
+    (B : Operator) (δ : Error) :
+    stateDependentDistance ψ 𝒟
+        (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
+        (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A) δ →
+      switchSandwichStatement ψ 𝒟 A B δ := by
+  sorry
+
+/-- `prop:completeness-transfer-projective-P`. -/
+theorem completenessTransferProjectiveP {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedSubMeasurement Question Outcome)
+    (P : IndexedProjectiveSubMeasurement Question Outcome) (ε : Error) :
+    stateDependentDistance ψ 𝒟 A
+        (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement P) ε →
+      completenessTransferProjectivePStatement ψ 𝒟 A P ε := by
+  sorry
+
+/-- `prop:two-notions-of-self-consistency`. -/
+theorem twoNotionsOfSelfConsistency {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedSubMeasurement Question Outcome) (δ : Error) :
+    strongSelfConsistency ψ 𝒟 A δ →
+      stateDependentDistance ψ 𝒟 A A (2 * δ) := by
+  sorry
+
+/-- `prop:completing-to-measurement`. -/
+theorem completingToMeasurement {Outcome : Type _}
+    (ψ : QuantumState)
+    (A : Measurement Outcome) (B : SubMeasurement Outcome)
+    (a0 : Outcome) (δ ζ : Error) :
+    strongSelfConsistency ψ (uniformDistribution Unit)
+        (constantSubMeasurementFamily A.toSubMeasurement) ζ →
+      stateDependentDistance ψ (uniformDistribution Unit)
+        (constantSubMeasurementFamily A.toSubMeasurement)
+        (constantSubMeasurementFamily B) δ →
+      ∃ C : Measurement Outcome,
+        completingToMeasurementStatement ψ A B C a0 δ ζ := by
+  sorry
+
+end MIPStarRE.Paper2009LDT.Section4Preliminaries

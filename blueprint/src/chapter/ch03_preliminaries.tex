@@ -1,0 +1,302 @@
+\chapter{Preliminaries}
+\label{chap:preliminaries}
+
+\section{Polynomials and measurements}
+
+\begin{definition}[Low individual degree polynomials]\label{def:polyfunc}
+  Let $\polyfunc{m}{q}{d}$ be the set of functions $g\colon \F_q^m \to \F_q$ that are represented by polynomials whose degree in each variable is at most $d$.
+\end{definition}
+
+\begin{lemma}[Schwartz--Zippel for individual degree]\label{lem:schwartz-zippel-individual}
+  \uses{def:polyfunc}
+  If $g,h \in \polyfunc{m}{q}{d}$ are distinct, then
+  \[
+    \Prb_{u \sim \F_q^m}[g(u)=h(u)] \le \frac{md}{q}.
+  \]
+\end{lemma}
+\begin{proof}
+  The difference $g-h$ is a nonzero polynomial of total degree at most $md$. Apply Schwartz--Zippel~\cite{Sch80,Zip79}.
+\end{proof}
+
+\begin{definition}[Measurements and submeasurements]\label{def:submeasurement}
+  Let $\mathcal H$ be a Hilbert space and let $\mathcal A$ be a finite outcome set. A submeasurement on $\mathcal A$ is a family $A=\{A_a\}_{a \in \mathcal A}$ of Hermitian positive semidefinite operators on $\mathcal H$ such that $\sum_a A_a \le I$. It is a measurement when $\sum_a A_a = I$, and it is projective when each $A_a$ is an idempotent projection.
+\end{definition}
+
+\begin{definition}[Low-degree polynomial measurements]\label{def:polymeasurements}
+  \uses{def:polyfunc, def:submeasurement}
+  We write $\polysub{m}{q}{d}$ for the submeasurements indexed by $\polyfunc{m}{q}{d}$, and $\polymeas{m}{q}{d}$ for the corresponding measurements.
+\end{definition}
+
+\begin{definition}[Post-processing]\label{def:post-processing}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.postProcessing}
+  \uses{def:submeasurement}
+  Let $A=\{A_a\}_{a \in \mathcal A}$ be a family of operators and let $f\colon \mathcal A \to \mathcal B$. The post-processed family $A_{[f(a)=b]}$ is defined by
+  \[
+    A_{[f(a)=b]} = \sum_{a\, :\, f(a)=b} A_a.
+  \]
+\end{definition}
+
+\begin{definition}[Completion of a submeasurement]\label{def:measurement-completion}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.measurementCompletion}
+  \uses{def:submeasurement}
+  Let $A=\{A_a^x\}_{a \in \mathcal A}$ be a submeasurement. Its completion is the measurement $\widehat A$ with outcome set $\widehat{\mathcal A}=\mathcal A \cup \{\bot\}$ given by $\widehat A_a^x=A_a^x$ for $a \in \mathcal A$ and $\widehat A_\bot^x = I-\sum_a A_a^x$.
+\end{definition}
+
+\section{Consistency and state-dependent distance}
+
+\begin{definition}[Consistency]\label{def:simeq}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.consistency}
+  Let $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$. Let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be submeasurements with the same answer set, and let $\mathcal D$ be a distribution on the question set. We write
+  \[
+    A_a^x \ot I \simeq_\delta I \ot B_a^x
+  \]
+  when
+  \[
+    \E_{x \sim \mathcal D} \sum_{a \ne b} \bra{\psi} A_a^x \ot B_b^x \ket{\psi} \le \delta.
+  \]
+\end{definition}
+
+\begin{lemma}[Characterization of a good symmetric strategy]\label{lem:good-strategy-characterization}
+  \uses{def:good-strategy, def:simeq, prop:simeq-for-measurements}
+  A symmetric projective strategy $(\psi,A,B,L)$ is $(\eps,\delta,\gamma)$-good if and only if the following hold on the relevant test distributions:
+  \[
+    A_a^u \ot I \simeq_\eps I \ot B^{\ell}_{[f(u)=a]},
+    \qquad
+    A_a^u \ot I \simeq_\delta I \ot A_a^u,
+    \qquad
+    A_a^u \ot I \simeq_\gamma I \ot L^{\ell}_{[f(u)=a]}.
+  \]
+\end{lemma}
+\begin{proof}
+  Each subtest accepts exactly when the two measurement outcomes agree. Because the relevant families are measurements, Lemma~\ref{prop:simeq-for-measurements} rewrites those acceptance probabilities as consistency bounds.
+\end{proof}
+
+\begin{lemma}[Consistency for measurements]\label{prop:simeq-for-measurements}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.simeqForMeasurements}
+  \uses{def:simeq}
+  If $A=\{A_a^x\}$ and $B=\{B_a^x\}$ are measurements, then
+  \[
+    A_a^x \ot I \simeq_\delta I \ot B_a^x
+    \qquad\text{if and only if}\qquad
+    \E_x \sum_a \bra{\psi} A_a^x \ot B_a^x \ket{\psi} \ge 1-\delta.
+  \]
+\end{lemma}
+\begin{proof}
+  Expand the off-diagonal sum by writing $\sum_{a \ne b} A_a^x \ot B_b^x = \sum_b (I-A_b^x) \ot B_b^x$.
+\end{proof}
+
+\begin{definition}[State-dependent distance]\label{def:approx_delta}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.stateDependentDistance}
+  Let $\ket{\psi} \in \mathcal H$, let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be families of operators on $\mathcal H$, and let $\mathcal D$ be a distribution on the question set. We write
+  \[
+    A_a^x \approx_\delta B_a^x
+  \]
+  when
+  \[
+    \E_{x \sim \mathcal D} \sum_a \lVert (A_a^x-B_a^x)\ket{\psi} \rVert^2 \le \delta.
+  \]
+\end{definition}
+
+\begin{lemma}[Transferring consistency through state-dependent distance]\label{prop:triangle-sub}
+  \uses{def:simeq, def:approx_delta, prop:simeq-for-measurements}
+  Let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be measurements and let $C=\{C_a^x\}$ be a submeasurement. If $A_a^x \ot I \simeq_\delta I \ot C_a^x$ and $A_a^x \ot I \approx_\eps B_a^x \ot I$, then
+  \[
+    B_a^x \ot I \simeq_{\delta+\sqrt\eps} I \ot C_a^x.
+  \]
+\end{lemma}
+\begin{proof}
+  Rewrite the inconsistency with $C$ as total mass minus diagonal overlap. The total mass is unchanged because $A$ and $B$ are measurements, and the diagonal overlap changes by at most $\sqrt\eps$ by Cauchy--Schwarz.
+\end{proof}
+
+\begin{lemma}[Consistency implies state-dependent distance for measurements]\label{prop:simeq-to-approx}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.simeqToApprox}
+  \uses{def:simeq, def:approx_delta, prop:simeq-for-measurements}
+  If $A$ and $B$ are measurements and $A_a^x \ot I \simeq_\delta I \ot B_a^x$, then
+  \[
+    A_a^x \ot I \approx_{2\delta} I \ot B_a^x.
+  \]
+  If both measurements are projective, the converse also holds.
+\end{lemma}
+\begin{proof}
+  Expand the squared norm of $(A_a^x \ot I - I \ot B_a^x)\ket{\psi}$ and use the diagonal-overlap formula from Lemma~\ref{prop:simeq-for-measurements}.
+\end{proof}
+
+\begin{lemma}[Closeness of inner products]\label{prop:closeness-of-ip}
+  \uses{def:approx_delta}
+  Let $\{A_a^x\}$, $\{B_a^x\}$, and $\{C_{a,b}^x\}$ be operator families. If $A_a^x \approx_\gamma B_a^x$ and $\sum_a (\sum_b C_{a,b}^x)(\sum_b C_{a,b}^x)^\dagger \le I$ for every $x$, then
+  \[
+    \E_x \sum_{a,b} \bra{\psi} C_{a,b}^x A_a^x \ket{\psi}
+    \approx_{\sqrt\gamma}
+    \E_x \sum_{a,b} \bra{\psi} C_{a,b}^x B_a^x \ket{\psi}.
+  \]
+  The analogous statement also holds when the $C_{a,b}^x$ act on the right.
+\end{lemma}
+\begin{proof}
+  Apply Cauchy--Schwarz to the difference of the two expressions and use the normalization hypothesis on the $C_{a,b}^x$.
+\end{proof}
+
+\begin{lemma}[Triangle inequality for vectors squared]\label{prop:triangle-inequality-for-vectors-squared}
+  For vectors $\ket{\psi_1},\dots,\ket{\psi_k}$,
+  \[
+    \bigl\lVert \ket{\psi_1}+\cdots+\ket{\psi_k} \bigr\rVert^2 \le k(\lVert\ket{\psi_1}\rVert^2+\cdots+\lVert\ket{\psi_k}\rVert^2).
+  \]
+\end{lemma}
+\begin{proof}
+  Apply the scalar inequality $(x_1+\cdots+x_k)^2 \le k(x_1^2+\cdots+x_k^2)$ to the norms and combine it with the triangle inequality.
+\end{proof}
+
+\begin{lemma}[Triangle inequality for $\approx_\delta$]\label{prop:triangle-inequality-for-approx_delta}
+  \uses{def:approx_delta, prop:triangle-inequality-for-vectors-squared}
+  Suppose $(A_i)_a^x \approx_{\delta_i} (A_{i+1})_a^x$ for $i=1,\dots,k$. Then
+  \[
+    (A_1)_a^x \approx_{k(\delta_1+\cdots+\delta_k)} (A_{k+1})_a^x.
+  \]
+\end{lemma}
+\begin{proof}
+  Expand $(A_1-A_{k+1})\ket{\psi}$ as a telescoping sum and apply Lemma~\ref{prop:triangle-inequality-for-vectors-squared}.
+\end{proof}
+
+\begin{lemma}[Triangle inequality for $\simeq_\delta$]\label{prop:simeq-triangle-inequality}
+  \uses{prop:simeq-to-approx, prop:triangle-inequality-for-approx_delta, prop:triangle-sub}
+  Suppose $A_a^x \ot I \simeq_\eps I \ot B_a^x$, $C_a^x \ot I \simeq_\delta I \ot B_a^x$, and $C_a^x \ot I \simeq_\gamma I \ot D_a^x$, where all four families are measurements. Then
+  \[
+    A_a^x \ot I \simeq_{\eps + 2\sqrt{\delta+\gamma}} I \ot D_a^x.
+  \]
+\end{lemma}
+\begin{proof}
+  Convert the two consistencies involving $C$ to state-dependent distance, compose them by the triangle inequality, and transfer the result back to consistency by Lemma~\ref{prop:triangle-sub}.
+\end{proof}
+
+\begin{lemma}[Data processing for consistency]\label{prop:simeq-data-processing}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.simeqDataProcessing}
+  \uses{def:post-processing, def:simeq}
+  If $A_a^x \ot I \simeq_\delta I \ot B_a^x$ and $f$ is a map on the answer set, then
+  \[
+    A_{[f(a)=b]}^x \ot I \simeq_\delta I \ot B_{[f(a)=b]}^x.
+  \]
+\end{lemma}
+\begin{proof}
+  Merging outcome classes can only decrease the off-diagonal mass.
+\end{proof}
+
+\begin{lemma}[Consistency controls a submeasurement]\label{prop:cons-sub-meas}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.consSubMeas}
+  \uses{def:simeq, def:approx_delta}
+  Let $A=\{A_a^x\}$ be a submeasurement and $B=\{B_a^x\}$ a measurement such that $A_a^x \ot I \simeq_\gamma I \ot B_a^x$. Then
+  \[
+    A_a^x \ot I \approx_\gamma A_a^x \ot B_a^x \approx_\gamma A^x \ot B_a^x,
+  \]
+  where $A^x=\sum_a A_a^x$. In particular,
+  \[
+    A_a^x \ot I \approx_{4\gamma} A^x \ot B_a^x.
+  \]
+\end{lemma}
+\begin{proof}
+  The inconsistency bound controls the mass of $A_a^x(I-B_a^x)$ and of $(A^x-A_a^x)B_a^x$. Combine the two estimates with the triangle inequality for $\approx_\delta$.
+\end{proof}
+
+\begin{lemma}[Switch-sandwich]\label{prop:switch-sandwich}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.switchSandwich}
+  \uses{def:approx_delta}
+  Suppose $A=\{A_a^x\}$ is a projective submeasurement satisfying $A_a^x \ot I \approx_\delta I \ot A_a^x$. Then for every operator $B$ with $0 \le B \le I$,
+  \[
+    \E_x \sum_a \bra{\psi} A_a^x B A_a^x \ot I \ket{\psi}
+    \approx_{2\sqrt\delta}
+    \E_x \sum_a \bra{\psi} B \ot A_a^x \ket{\psi}
+    \approx_{\sqrt\delta}
+    \E_x \sum_a \bra{\psi} BA_a^x \ot I \ket{\psi}.
+  \]
+\end{lemma}
+\begin{proof}
+  Move one copy of $A_a^x$ across the bipartition using the $\approx_\delta$ hypothesis, then use projectivity to collapse the resulting sandwich.
+\end{proof}
+
+\section{Strong self-consistency}
+
+\begin{lemma}[Completeness transfer to a projective approximation]\label{prop:completeness-transfer-projective-P}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.completenessTransferProjectiveP}
+  \uses{def:approx_delta}
+  Let $A=\{A_a^x\}$ be a submeasurement and $P=\{P_a^x\}$ a projective submeasurement such that $A_a^x \ot I \approx_\eps P_a^x \ot I$. Then
+  \[
+    \bra{\psi} A \ot I \ket{\psi} \ge \bra{\psi} P \ot I \ket{\psi} - 2\sqrt\eps.
+  \]
+\end{lemma}
+\begin{proof}
+  Compare the completeness of $P$ with the diagonal overlaps $\sum_a \bra{\psi} A_a^x P_a^x \ot I \ket{\psi}$ and $\sum_a \bra{\psi} (A_a^x)^2 \ot I \ket{\psi}$.
+\end{proof}
+
+\begin{definition}[Strong self-consistency]\label{def:strong-self-consistency}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.strongSelfConsistency}
+  Let $\ket{\psi}$ be permutation-invariant and let $A=\{A_a^x\}$ be a submeasurement. We say that $A$ is $\delta$-strongly self-consistent when
+  \[
+    \E_x \sum_a \bra{\psi} A_a^x \ot A_a^x \ket{\psi}
+    \ge
+    \bra{\psi} A \ot I \ket{\psi} - \delta.
+  \]
+\end{definition}
+
+\begin{lemma}[Strong self-consistency implies ordinary self-consistency]\label{prop:other-two-notions-of-self-consistency}
+  \uses{def:strong-self-consistency, def:simeq}
+  If $A$ is $\delta$-strongly self-consistent, then $A_a^x \ot I \simeq_\delta I \ot A_a^x$. If $A$ is a measurement, the converse also holds.
+\end{lemma}
+\begin{proof}
+  Rewrite the off-diagonal mass as the difference between the total mass of $A$ and the diagonal overlap in the strong self-consistency inequality.
+\end{proof}
+
+\begin{lemma}[Strong self-consistency and state-dependent distance]\label{prop:two-notions-of-self-consistency}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.twoNotionsOfSelfConsistency}
+  \uses{def:strong-self-consistency, def:approx_delta}
+  If $A$ is $\delta$-strongly self-consistent, then
+  \[
+    A_a^x \ot I \approx_{2\delta} I \ot A_a^x.
+  \]
+  If $A$ is projective, the converse also holds.
+\end{lemma}
+\begin{proof}
+  Expand the squared norm of $(A_a^x \ot I - I \ot A_a^x)\ket{\psi}$ and compare it with the diagonal overlap in the definition of strong self-consistency.
+\end{proof}
+
+\begin{lemma}[Post-processing preserves strong self-consistency]\label{prop:two-notions-of-self-consistency-after-evaluation}
+  \uses{def:post-processing, def:strong-self-consistency, prop:two-notions-of-self-consistency}
+  If $A$ is $\delta$-strongly self-consistent and $f$ is a function on its answer set, then
+  \[
+    A_{[f(a)=b]}^x \ot I \approx_{2\delta} I \ot A_{[f(a)=b]}^x.
+  \]
+\end{lemma}
+\begin{proof}
+  The post-processed diagonal overlap dominates the original diagonal overlap, so the same strong self-consistency bound applies. Then use Lemma~\ref{prop:two-notions-of-self-consistency}.
+\end{proof}
+
+\begin{lemma}[Completeness transfer for a strongly self-consistent approximation]\label{prop:completeness-transfer-self-consistent-A}
+  \uses{def:strong-self-consistency, def:approx_delta}
+  Let $A$ be a $\delta$-strongly self-consistent submeasurement and let $B$ be a submeasurement such that $A_a^x \ot I \approx_\eps B_a^x \ot I$. Then
+  \[
+    \bra{\psi} B \ot I \ket{\psi} \ge \bra{\psi} A \ot I \ket{\psi} - \delta - 2\sqrt\eps.
+  \]
+\end{lemma}
+\begin{proof}
+  Bound the completeness of $B$ from below by its diagonal overlap with $A$, then replace that overlap by the diagonal overlap of $A$ with itself.
+\end{proof}
+
+\begin{lemma}[Self-consistency implies data-processing closeness]\label{prop:self-consistency-implies-data-processing}
+  \uses{def:post-processing, def:strong-self-consistency, def:approx_delta, prop:two-notions-of-self-consistency-after-evaluation}
+  Let $A$ be a $\delta$-strongly self-consistent submeasurement and let $P$ be a projective submeasurement such that $P_a^x \ot I \approx_\eps A_a^x \ot I$. Then for every function $f$,
+  \[
+    P_{[f(a)=b]}^x \ot I \approx_{8\delta + 8\sqrt\eps} A_{[f(a)=b]}^x \ot I.
+  \]
+\end{lemma}
+\begin{proof}
+  First compare the post-processed family of $P$ to $I \ot A_{[f(a)=b]}^x$, using strong self-consistency of $A$ and closeness of $P$ to $A$. Then move back to the original side of the bipartition and compose the two bounds.
+\end{proof}
+
+\begin{lemma}[Completing a close submeasurement to a full measurement]\label{prop:completing-to-measurement}
+  \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.completingToMeasurement}
+  \uses{def:strong-self-consistency, def:approx_delta, prop:triangle-inequality-for-vectors-squared}
+  Let $A=\{A_a\}$ be a measurement that is $\zeta$-strongly self-consistent, let $B=\{B_a\}$ be a submeasurement such that $A_a \ot I \approx_\delta B_a \ot I$, and let $C$ be the measurement obtained by adding the missing mass $I-B$ to one distinguished answer $a^*$. Then
+  \[
+    A_a \ot I \approx_{2\delta + 4\sqrt\delta + 2\zeta} C_a \ot I.
+  \]
+\end{lemma}
+\begin{proof}
+  The squared triangle inequality reduces the problem to bounding the missing mass of $B$. Strong self-consistency of $A$ and the closeness of $B$ to $A$ show that this missing mass is small.
+\end{proof}

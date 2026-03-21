@@ -1,0 +1,1044 @@
+% Main blueprint content.
+% Imported by both print.tex and web.tex.
+% Uses \chapter (since documentclass is report).
+
+\chapter{Scope and design principles}
+\label{chap:scope}
+
+This document is a \emph{strict-proof-following} blueprint for formalizing
+arXiv:2111.08131 (Ji--Natarajan--Vidick--Wright--Yuen, ``Quantum soundness of
+testing tensor codes''~\cite{ji2024quantum}).
+It is \textbf{not} a pilot or a surrogate plan;
+it mirrors the proof in the paper as faithfully as possible.
+
+\begin{description}
+\item[Primary target]
+  \texttt{thm:main} (Theorem~4.1): quantum soundness of the tensor code test
+  for synchronous/tracial strategies on a von Neumann algebra with a normal
+  tracial state.
+\item[Secondary target]
+  \texttt{thm:main-bipartite} (Theorem~4.7): extension to general two-prover
+  (non-synchronous) strategies, using~\cite[Corollary~4.1]{vidick2021almost}.
+\item[Ambient setting]
+  Throughout, $\algebra$ is a von Neumann algebra on a separable Hilbert space
+  $\hilb$, and $\tau\colon\algebra\to\C$ is a normal tracial state.
+  All measurements take values in $\algebra$. This is the paper's ambient
+  setting; it is \textbf{not} replaced by a finite-dimensional matrix pilot.
+\item[Proof order]
+  The blueprint follows the paper's proof order:
+  Section~2 (preliminaries) $\to$ Section~3 (test definition) $\to$
+  Appendix~A (expander) $\to$ Section~5 (self-improvement) $\to$
+  Section~6 (pasting) $\to$ Section~4 (main induction, main theorems).
+\end{description}
+
+
+\chapter{Section~2: Preliminaries}
+\label{chap:prelims}
+
+\section{Von Neumann algebras and tracial states}
+
+\begin{definition}[Normal tracial state]\label{def:tracial-state}
+  Let $\algebra\subseteq\mathcal{B}(\hilb)$ be a von Neumann algebra.
+  A \emph{normal tracial state} is a positive linear functional
+  $\tau\colon\algebra\to\C$ that is unital ($\tau(\id)=1$),
+  normal (represented by a positive trace-class operator),
+  and tracial ($\tau(AB)=\tau(BA)$ for all $A,B\in\algebra$).
+\end{definition}
+
+\begin{definition}[$\tau$-norm]\label{def:tau-norm}
+  \uses{def:tracial-state}
+  For $A\in\algebra$,
+  $\|A\|_\tau = \sqrt{\tau(A^*A)}$.
+\end{definition}
+
+\begin{proposition}[Triangle and H\"older inequalities]\label{prop:holder}
+  \uses{def:tracial-state, def:tau-norm}
+  Let $\tau$ be a tracial state on a von Neumann algebra $\algebra$
+  and let $A,B\in\algebra$. Then:
+  \begin{enumerate}
+    \item $|\tau(A)|\le\tau(|A|)$.
+    \item (H\"older~1) $\tau(|AB|)\le\|A\|_\tau\cdot\|B\|_\tau$.
+    \item (H\"older~2) $\tau(|AB|)\le\|A\|\cdot\tau(|B|)$.
+    \item (Triangle for $1$-norm) $\tau(|A+B|)\le\tau(|A|)+\tau(|B|)$.
+  \end{enumerate}
+\end{proposition}
+\begin{proof}
+  Uses polar decomposition and Cauchy--Schwarz for the sesquilinear form
+  $(A,B)\mapsto\tau(A^*B)$.
+\end{proof}
+
+\begin{proposition}[Basic Cauchy--Schwarz for a tracial state]\label{prop:basic-cauchy-schwarz}
+  \uses{def:tracial-state}
+  $|\tau(A^*B)|^2\le\tau(A^*A) \tau(B^*B)$ for all $A,B\in\algebra$.
+\end{proposition}
+\begin{proof}
+  Immediate from the fact that $(A,B)\mapsto\tau(A^*B)$ is a semi-inner product.
+\end{proof}
+
+\begin{proposition}[Cauchy--Schwarz for operator sets]\label{prop:cs-operator-sets}
+  \uses{def:tau-norm, prop:basic-cauchy-schwarz}
+  Let $\{M_a\}_{a\in\mathcal{A}}$ and $\{N_a\}_{a\in\mathcal{A}}$ be sets
+  of operators (not necessarily submeasurements). Then
+  \[
+    \Bigl|\sum_{a\in\mathcal{A}}\tau(M_a \cdot N_a)\Bigr|^2
+    \le
+    \left(\sum_{a\in\mathcal{A}}\|M_a\|_\tau^2\right)
+    \cdot
+    \left(\sum_{a\in\mathcal{A}}\|N_a\|_\tau^2\right).
+  \]
+\end{proposition}
+\begin{proof}
+  Apply Cauchy--Schwarz for the trace twice: once for the inner product
+  $\tau(M_a M_a^*)\tau(N_a^* N_a)$, then for the sum over $a$.
+\end{proof}
+
+\begin{corollary}[Averaged Cauchy--Schwarz for operator sets --- Corollary~2.3]
+  \label{cor:cauchy-schwarz}
+  \uses{prop:cs-operator-sets}
+  Let $\{M^x_a\}$ and $\{N^x_a\}$ be sets of operators indexed by both
+  $\mathcal{X}$ and $\mathcal{A}$. Then
+  \[
+    \Bigl|\E_x\sum_{a\in\mathcal{A}}\tau(M^x_a\cdot N^x_a)\Bigr|^2
+    \le
+    \left(\E_x\sum_{a\in\mathcal{A}}\|M^x_a\|_\tau^2\right)
+    \cdot
+    \left(\E_x\sum_{a\in\mathcal{A}}\|N^x_a\|_\tau^2\right).
+  \]
+\end{corollary}
+\begin{proof}
+  Apply Cauchy--Schwarz twice: once using the proposition on operator sets for
+  each fixed $x$, then using the scalar Cauchy--Schwarz for the expectation
+  over $x$.
+\end{proof}
+
+\section{Measurements, consistency, and closeness}
+
+\begin{definition}[Submeasurement, measurement, projective measurement]
+  \label{def:submeasurement}
+  \uses{def:tracial-state}
+  Let $\mathcal{A}$ be a finite set.
+  A \emph{submeasurement} on $\mathcal{A}$ is a family
+  $\{M_a\}_{a\in\mathcal{A}}\subset\algebra$ with each $M_a\ge 0$ and
+  $\sum_a M_a\le\id$.
+  It is a \emph{measurement} if $\sum_a M_a=\id$,
+  and \emph{projective} if each $M_a$ is a projection.
+\end{definition}
+
+\begin{definition}[Processed measurement]\label{def:processed}
+  \uses{def:submeasurement}
+  If $f\colon\mathcal{A}\to\mathcal{B}$ is a map, the processed submeasurement
+  $M_{[f\mid b]}=\sum_{a:f(a)=b}M_a$.
+\end{definition}
+
+\begin{definition}[Consistency and closeness]\label{def:consistency}
+  \uses{def:submeasurement, def:tau-norm}
+  Let $\mu$ be a distribution on a finite question set $\mathcal{X}$
+  and let $M^x,N^x$ be submeasurements indexed by $x\in\mathcal{X}$
+  with a common finite answer set $\mathcal{A}$.
+  \begin{itemize}
+    \item $M^x_a\simeq_\delta N^x_a$ ($\delta$-consistent) iff
+      $\E_{x\sim\mu}\sum_{a\ne b}\tau(M^x_a N^x_b)\le\delta$.
+    \item $M^x_a\approx_\delta N^x_a$ ($\delta$-close) iff
+      $(\E_{x\sim\mu}\sum_a\|M^x_a-N^x_a\|_\tau^2)^{1/2}\le\delta$.
+  \end{itemize}
+\end{definition}
+
+\begin{proposition}[Data processing]\label{lem:data-processing}
+  \uses{def:processed, def:consistency}
+  If $M^x_a\simeq_\delta N^x_a$ and $f\colon\mathcal{A}\to\mathcal{B}$,
+  then $M^x_{[f\mid b]}\simeq_\delta N^x_{[f\mid b]}$.
+\end{proposition}
+\begin{proof}
+  Merging answer classes can only decrease off-diagonal mass.
+\end{proof}
+
+\begin{proposition}[Consistency to closeness]\label{lem:consistency-consequences}
+  \uses{def:consistency}
+  If $M^x$ and $N^x$ are measurements and $M^x_a\simeq_\delta N^x_a$,
+  then $M^x_a\approx_{\sqrt{2\delta}} N^x_a$.
+\end{proposition}
+\begin{proof}
+  Expand $\sum_a\|M^x_a-N^x_a\|_\tau^2$ using $\sum_a M^x_a=\sum_a N^x_a=\id$.
+\end{proof}
+
+\begin{proposition}[Closeness to consistency]\label{lem:closeness-to-consistency}
+  \uses{def:consistency}
+  If $M^x$ is a projective submeasurement and $N^x$ a submeasurement with
+  $M^x_a\approx_\delta N^x_a$, then $M^x_a\simeq_\delta N^x_a$.
+\end{proposition}
+\begin{proof}
+  Rewrite inconsistency using Cauchy--Schwarz and projectivity of $M^x$.
+\end{proof}
+
+\begin{proposition}[Closeness preserves inner products]\label{lem:closeness-to-close-ips}
+  \uses{def:consistency, cor:cauchy-schwarz}
+  If $A^x_a\approx_\delta B^x_a$ and $\sum_a M^x_a(M^x_a)^*\le\id$ for
+  every $x$, then
+  $\E_x\sum_a\tau(M^x_a A^x_a)\approx_\delta\E_x\sum_a\tau(M^x_a B^x_a)$.
+\end{proposition}
+\begin{proof}
+  Cauchy--Schwarz on the averaged pairing between $M^x_a$ and $A^x_a - B^x_a$.
+\end{proof}
+
+\begin{proposition}[Multiplication preserves closeness]\label{lem:add-a-proj}
+  \uses{def:consistency}
+  If $M_a\approx_\delta N_a$ and $\{R_b\}$ satisfies $\sum_b R_b^*R_b\le\id$
+  (or $\sum_b R_b R_b^*\le\id$), then left (resp.\ right) multiplication by the
+  $R_b$ preserves the same closeness bound.
+\end{proposition}
+\begin{proof}
+  Expand the squared $\tau$-norm after multiplication and use the contraction assumption.
+\end{proof}
+
+\begin{proposition}[Transfer consistency]\label{lem:transfer-cons}
+  \uses{def:consistency, lem:closeness-to-close-ips}
+  If $A^x_a\simeq_\delta C^x_a$ and $A^x_a\approx_\eps B^x_a$,
+  then $B^x_a\simeq_{\delta+\eps} C^x_a$.
+\end{proposition}
+\begin{proof}
+  Rewrite inconsistency as total mass minus diagonal overlap; the overlap
+  changes by at most $\eps$ by Proposition~\ref{lem:closeness-to-close-ips}.
+\end{proof}
+
+\begin{proposition}[Consistency controls a submeasurement]\label{lem:cons-sub-meas}
+  \uses{def:consistency}
+  If $A^x$ is a submeasurement, $B^x$ a measurement, and
+  $A^x_a\simeq_\gamma B^x_a$, then
+  $A^x_a\approx_{\sqrt\gamma} A^x_a B^x_a$
+  and $A^x_a\approx_{2\sqrt\gamma} A^x B^x_a$,
+  where $A^x=\sum_a A^x_a$.
+\end{proposition}
+\begin{proof}
+  The inconsistency bound controls the mass of $A^x_a(\id-B^x_a)$.
+\end{proof}
+
+\begin{proposition}[Switcheroo]\label{lem:switcheroo}
+  \uses{lem:add-a-proj}
+  If $A^x_a A^y_b\approx_\eps A^y_b A^x_a$ on average and $P^s_{\vec a}$ is
+  a length-$k$ product of operators drawn from the families $A^{s_i}$, then
+  $P^s_{\vec a}A^x_b\approx_{k\eps}A^x_b P^s_{\vec a}$.
+\end{proposition}
+\begin{proof}
+  Induction on the product length; each step uses the triangle inequality
+  and Proposition~\ref{lem:add-a-proj}.
+\end{proof}
+
+\section{Codes and tensor codes}
+
+\begin{definition}[Linear code]\label{def:code}
+  An $[n,k,d]_\Sigma$ code is a $k$-dimensional linear subspace
+  $\code\subseteq\Sigma^n$ with minimum distance $d$.
+\end{definition}
+
+\begin{proposition}[Uniqueness from distance]\label{prop:distance0}
+  \uses{def:code}
+  With $t=n-d+1$, any $t$ distinct coordinates determine at most one codeword.
+\end{proposition}
+\begin{proof}
+  Two codewords agreeing on $t$ coordinates would disagree on at most $d-1$
+  coordinates, contradicting the distance bound.
+\end{proof}
+
+\begin{definition}[Interpolable code]\label{def:interpolable}
+  \uses{def:code, prop:distance0}
+  $\code$ is interpolable if for every set of $t=n-d+1$ distinct coordinates
+  there is a \emph{linear} interpolation map $\Sigma^t\to\code$.
+\end{definition}
+
+\begin{definition}[Axis-parallel line]\label{def:axis-line}
+  An axis-parallel line in $[n]^m$ is obtained by fixing all but one
+  coordinate.
+\end{definition}
+
+\begin{definition}[Tensor code]\label{def:tensor-code}
+  \uses{def:axis-line, def:code}
+  $\code^{\otimes m}=\{c\colon[n]^m\to\Sigma : c|_\ell\in\code\text{ for every
+  axis-parallel line }\ell\}$.
+\end{definition}
+
+\begin{proposition}[Tensor-code distance]\label{prop:distance}
+  \uses{def:tensor-code, prop:distance0}
+  Two distinct $c,c'\in\code^{\otimes m}$ agree on at most
+  $\gamma_m=1-d^m/n^m\le mt/n$ fraction of coordinates.
+\end{proposition}
+\begin{proof}
+  Induction on $m$: the distance of $\code^{\otimes m}$ is at least $d^m$.
+  Then $\gamma_m\le mt/n$ by Bernoulli's inequality.
+\end{proof}
+
+\begin{proposition}[Tuple-to-code correspondence]\label{prop:tuple-to-code-correspondence}
+  \uses{def:tensor-code, prop:distance0}
+  Given $t$ distinct coordinates $x_1,\dots,x_t\in[n]$, a tuple
+  $(g_1,\dots,g_t)\in(\code^{\otimes m})^t$ comes from at most one
+  $h\in\code^{\otimes(m+1)}$ with $h|_{x_j}=g_j$.
+\end{proposition}
+\begin{proof}
+  Two such $h$'s would give distinct base-code codewords agreeing on $\ge t$ points.
+\end{proof}
+
+\begin{proposition}[Interpolation of tuples]\label{prop:interpolate-tuple}
+  \uses{def:interpolable, prop:tuple-to-code-correspondence}
+  If $\code$ is interpolable then every tuple
+  $(g_1,\dots,g_t)\in(\code^{\otimes m})^t$ extends to a codeword in
+  $\code^{\otimes(m+1)}$.
+\end{proposition}
+\begin{proof}
+  Apply the interpolation map pointwise in the last coordinate.
+\end{proof}
+
+
+\chapter{Section~3: The tensor code test}
+\label{chap:test}
+
+\begin{definition}[Tracial strategy]\label{def:tracial-strat}
+  \uses{def:tracial-state, def:submeasurement}
+  A tracial strategy $\mathcal{S}=(\tau,A,B,P)$ for the tensor code test
+  consists of a tracial state $\tau$ on a von Neumann algebra $\algebra$,
+  together with projective measurements $A^u$ (points), $B^\ell$ (lines),
+  $P^{u,v}$ (pairs), all taking values in $\algebra$.
+\end{definition}
+
+\begin{definition}[$(\eps,\delta)$-good strategy]\label{def:tracial-good}
+  \uses{def:tracial-strat, def:consistency, def:processed}
+  $\mathcal{S}$ is $(\eps,\delta)$-good if:
+  \begin{enumerate}
+    \item (Points--lines consistency)
+      $B^\ell_{[g\mapsto g(u)\mid a]}\simeq_\eps A^u_a$
+      on average over a uniformly random axis-parallel line $\ell$ and
+      a uniformly random point $u\in\ell$.
+    \item (Points--pairs consistency)
+      $P^{u,v}_{[(a,b)\mapsto a\mid a]}\simeq_\delta A^u_a$
+      and
+      $P^{u,v}_{[(a,b)\mapsto b\mid b]}\simeq_\delta A^v_b$
+      on average over a random subcube $H$ and uniformly random $u,v\in H$.
+  \end{enumerate}
+\end{definition}
+
+\begin{remark}[Test--goodness bookkeeping]\label{rmk:test-goodness}
+  \uses{def:tracial-good}
+  A strategy that is $(\eps,\delta)$-good passes the tensor code test with
+  probability $\ge 1-\frac12(\eps+\delta)$.
+  Conversely, passing with probability $1-\eta$ gives a
+  $(2\eta,4\eta)$-good strategy.
+\end{remark}
+
+
+\chapter{Appendix~A: Operators on expander graphs}
+\label{chap:appendix}
+
+\begin{proposition}[Laplacian as an edge average]\label{prop:laplacian-edge-form}
+  Let $G$ be a finite graph with a probability distribution on edges
+  whose vertex marginals are uniform. Define
+  $K=\E_{(u,v)\sim G}|u\rangle\langle v|$ and $L=\frac{1}{n}\id-K$. Then
+  $L=\frac12\E_{(u,v)\sim G}(|u\rangle-|v\rangle)(\langle u|-\langle v|)$.
+\end{proposition}
+\begin{proof}
+  Expand the edge average; the diagonal part equals $n^{-1}\id$ by the
+  uniform vertex marginal assumption.
+\end{proof}
+
+\begin{lemma}[Local-to-global expander inequality]\label{lem:local-to-global-expander}
+  \uses{prop:laplacian-edge-form}
+  Let $G$ be as above, let $\lambda_2$ be the second eigenvalue of the
+  normalized Laplacian, let $\{A^u\}_{u\in[n]}$ be bounded operators on a
+  Hilbert space $\hilb$, and let $\rho$ be a positive linear functional on
+  $\mathcal{B}(\hilb)$. Then
+  \[
+    \E_{u,v\sim[n]}\rho((A^u-A^v)^*(A^u-A^v))
+    \le
+    \frac{1}{n\lambda_2}
+    \E_{(u,v)\sim G}\rho((A^u-A^v)^*(A^u-A^v)).
+  \]
+\end{lemma}
+\begin{proof}
+  Form $V=\sum_u|u\rangle\otimes A^u$; compare $V^*(L\otimes\id)V$
+  with $\lambda_2\cdot V^*(\id-|\varphi_0\rangle\langle\varphi_0|)V$
+  where $|\varphi_0\rangle=n^{-1/2}\sum_u|u\rangle$.
+  Apply $\rho$ to both sides.
+\end{proof}
+
+
+\chapter{Section~5: Self-improvement}
+\label{chap:self-improvement}
+
+The self-improvement lemma relies on three ingredients: orthogonalization,
+duality (complementary slackness), and a local-to-global variance bound.
+
+\section{Ingredient 1: Orthogonalization}
+
+\begin{lemma}[Orthogonalization]\label{lem:projectivization}
+  \uses{def:submeasurement, def:tracial-state}
+  Let $\algebra$ be a von Neumann algebra with a normal state $\tau$ (not
+  necessarily tracial). Let $A=\{A_a\}$ be a submeasurement in $\algebra$
+  with $\sum_a\tau(A_a(\id-A_a))\le\zeta$. Then there exists a projective
+  submeasurement $\{P_a\}\subset\algebra$ with
+  $A_a\approx_{\sqrt{18\zeta}}P_a$.
+\end{lemma}
+\begin{proof}
+  Reduce to \cite[Theorem~1.2]{de2021orthogonalization} (de~Oliveira--Scholz).
+  The proof uses the polar decomposition in a von Neumann algebra.
+  This is an \textbf{external dependency}.
+\end{proof}
+
+\section{Ingredient 2: Complementary slackness (duality)}
+
+\begin{lemma}[Positive-map duality]\label{lem:duality}
+  \uses{def:tracial-state}
+  Let $\algebra$ be a von Neumann algebra and let
+  $\varphi_1,\dots,\varphi_k\colon\algebra\to\C$ be normal positive linear
+  maps. Then there is a unique normal linear map $\psi\colon\algebra\to\C$ of
+  minimal norm such that $\psi\ge\varphi_i$ for all $i$. Moreover, there
+  exists a measurement $\{T_i\}_{i\in[k]}$ such that for all $X\in\algebra$,
+  \[
+    \psi(X)=\sum_i\varphi_i(T_i X).
+  \]
+\end{lemma}
+\begin{proof}
+  This is \cite[Proposition~7.1]{de2021orthogonalization}.
+  The proof uses the Hahn--Banach theorem for operator systems.
+  This is an \textbf{external dependency}.
+\end{proof}
+
+\section{Ingredient 3: Variance bounds}
+
+\begin{lemma}[Local variance along a random line]\label{lem:local-variance}
+  \uses{def:tracial-good, lem:consistency-consequences, prop:distance}
+  Let $(\tau,A,B,P)$ be an $(\eps,\delta)$-good strategy and let $\{T_g\}$ be a
+  measurement with outcomes in $\code^{\otimes m}$. Then on average over
+  axis-parallel lines $\ell$ and points $x,y\in\ell$,
+  \[
+    A^x_{g(x)}T_g^{1/2}\approx_{\zeta_{\mathrm{local}}}
+    A^y_{g(y)}T_g^{1/2},
+    \quad
+    \zeta_{\mathrm{local}}=2\sqrt{2\eps}+2\sqrt{\gamma},
+    \quad
+    \gamma=1-d/n.
+  \]
+\end{lemma}
+\begin{proof}
+  Compare $A^x_{g(x)}T_g^{1/2}$ with the line measurement
+  $B^\ell_{[f:f(x)=g(x)]}T_g^{1/2}$ (error $\sqrt{2\eps}$ via
+  consistency-to-closeness);
+  then replace $B^\ell_{[f:f(x)=g(x)]}$ by $B^\ell_{g|_\ell}$
+  (error $\sqrt\gamma$ via code distance).
+  Reverse the chain from $y$.
+\end{proof}
+
+\begin{lemma}[Global variance]\label{lem:variance}
+  \uses{lem:local-variance, lem:local-to-global-expander}
+  Under the same hypotheses, on average over uniformly random
+  $x,y\in[n]^m$,
+  \[
+    A^x_{g(x)}T_g^{1/2}\approx_{\zeta_{\mathrm{var}}}
+    A^y_{g(y)}T_g^{1/2},
+    \quad
+    \zeta_{\mathrm{var}}=\sqrt{m} \zeta_{\mathrm{local}}.
+  \]
+\end{lemma}
+\begin{proof}
+  Apply Lemma~\ref{lem:local-to-global-expander} to the graph on $[n]^m$
+  connecting points that differ in at most one coordinate, with
+  $\lambda_2=1/(mn^m)$.
+\end{proof}
+
+\section{Self-improvement proof}
+
+\begin{lemma}[Technical helper]\label{lem:self-improvement-helper}
+  \uses{lem:variance, prop:holder}
+  Define $H^x_g=A^x_{g(x)}\cdot T_g\cdot A^x_{g(x)}$ and
+  $H_g=\E_x H^x_g$. Then
+  $\E_x\sum_g\tau(|H_g-A^x_{g(x)}T_gA^x_{g(x)}|)\le 2\zeta_{\mathrm{var}}$.
+\end{lemma}
+\begin{proof}
+  Triangle inequality for $1$-norm, H\"older inequality, Cauchy--Schwarz,
+  and Lemma~\ref{lem:variance}.
+\end{proof}
+
+\begin{lemma}[Consistency of $H$ with $A$]\label{lem:si-cons}
+  \uses{lem:self-improvement-helper}
+  On average over $x\sim[n]^m$,
+  $H_{[g\mapsto g(x)\mid a]}\simeq_{2\zeta_{\mathrm{var}}} A^x_a$.
+\end{lemma}
+\begin{proof}
+  Expand and apply Lemma~\ref{lem:self-improvement-helper};
+  the off-diagonal term vanishes by projectivity of $A^x$.
+\end{proof}
+
+\begin{lemma}[Projectivity of $H$]\label{lem:si-proj}
+  \uses{lem:self-improvement-helper, lem:si-cons, lem:variance, prop:distance}
+  $\sum_g\tau(H_g-H_g^2)\le 5\zeta_{\mathrm{var}}+\gamma_m$.
+\end{lemma}
+\begin{proof}
+  Expand $\sum_g\tau(H_g^2)$; use the helper lemma, code distance
+  ($\gamma_m$ term), variance, and the complementary slackness identity
+  to bound each piece.
+\end{proof}
+
+\begin{lemma}[Self-improvement]\label{lem:self-improvement}
+  \uses{lem:projectivization, lem:duality, lem:variance,
+        lem:self-improvement-helper, lem:si-cons, lem:si-proj,
+        lem:closeness-to-close-ips, lem:transfer-cons, lem:cons-sub-meas}
+  There exists $\zeta=\poly(m,t)\cdot\poly(\eps,n^{-1})$
+  such that:
+  given an $(\eps,\delta)$-good strategy and a measurement $\{G_g\}$ that is
+  $\nu$-consistent with $A$, there exists a projective submeasurement $\{H_h\}$ with
+  \begin{enumerate}
+    \item (Completeness) $\tau(H)\ge 1-\nu-\zeta$,
+    \item (Consistency) $H_{[h\mapsto h(x)\mid a]}\simeq_\zeta A^x_a$ on average,
+    \item (Boundedness) There exists a positive linear map $\psi$ with
+      $\psi(\id-H)\le\zeta$ and
+      $\psi(X)\ge\E_x\tau(X\cdot A^x_{h(x)})$ for all positive $X$.
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  Step 1: Apply Lemma~\ref{lem:duality} to the maps
+  $\varphi_g(X)=\tau(X\cdot\E_x A^x_{g(x)})$
+  to obtain $\{T_g\}$ and the dominating functional $\psi$.
+  Step 2: Define $H_g=\E_x A^x_{g(x)}T_g A^x_{g(x)}$; verify
+  completeness and consistency (Lemmas \ref{lem:si-cons}--\ref{lem:si-proj}).
+  Step 3: Apply Lemma~\ref{lem:projectivization} to make $H$ projective;
+  transfer consistency back via Proposition~\ref{lem:closeness-to-close-ips}.
+\end{proof}
+
+
+\chapter{Section~6: Pasting}
+\label{chap:pasting}
+
+Pasting takes ``slice'' submeasurements $\{G^x_g\}_{g\in\code^{\otimes m}}$
+for $x\in[n]$ and produces a single measurement with outcomes in
+$\code^{\otimes(m+1)}$. The paper gives two methods; Method~2 (with the
+Chernoff-based completeness bound) is the one used in the final proof.
+
+\section{Commutativity chain (Method~1 prerequisites)}
+
+\begin{lemma}[Commutativity of $A$'s]\label{lem:a-comm}
+  \uses{def:tracial-good, lem:consistency-consequences, lem:add-a-proj}
+  On average over uniform $(u,x),(v,y)\sim[n]^m\times[n]$,
+  \[
+    A^{u,x}_a A^{v,y}_b\approx_{\sqrt{32(m+1)\delta}} A^{v,y}_b A^{u,x}_a.
+  \]
+\end{lemma}
+\begin{proof}
+  From the subcube commutation test with $j=1$ (full space),
+  deduce $A^{u,x}_a\approx_{\sqrt{2(m+1)\delta}} P^{u,x,v,y}_{[(a,b)\mapsto a]}$.
+  Then commute via projectivity of the pair measurement.
+\end{proof}
+
+\begin{lemma}[Evaluated $G$'s commute]\label{lem:g-comm-after-eval}
+  \uses{lem:a-comm, lem:cons-sub-meas, lem:closeness-to-close-ips}
+  With $\nu_1=8(\sqrt\zeta+\sqrt{(m+1)\delta})$,
+  the evaluated operators $G^{u,x}_a=G^x_{[g\mapsto g(u)\mid a]}$ and
+  $G^{v,y}_b$ approximately commute on average:
+  $G^{u,x}_a G^{v,y}_b\approx_{\nu_1} G^{v,y}_b G^{u,x}_a$.
+\end{lemma}
+\begin{proof}
+  Replace evaluated $G$ by point measurements using consistency,
+  commute the point measurements by Lemma~\ref{lem:a-comm},
+  then transfer back.
+\end{proof}
+
+\begin{lemma}[Subspace measurements commute]\label{lem:g-comm}
+  \uses{lem:g-comm-after-eval, prop:distance}
+  With $\nu_2=4(\gamma_m+\nu_1)$, on average over $x,y\sim[n]$:
+  $G^x_g\,G^y_h\approx_{\nu_2}G^y_h\,G^x_g$.
+\end{lemma}
+\begin{proof}
+  Evaluate at random points $u,v$; use code distance $\gamma_m$ to control
+  the error from distinct codewords agreeing at the evaluation point.
+\end{proof}
+
+\section{Method~1 consistency analysis}
+
+The Method~1 construction defines $H$ by sandwiching $t$ copies of the
+$G^{x_i}$ measurements over distinct coordinates
+$(x_1,\dots,x_t)\sim\mathrm{distinct}([n],t)$.
+The consistency analysis for Method~1 uses the following labeled intermediate
+results.
+
+\begin{proposition}[Total variation for distinct vs.\ i.i.d.\ tuples]
+  \label{prop:ld-dnoteq}
+  \uses{def:code}
+  Let $n,k\ge 1$ be integers. Let $x=(x_1,\dots,x_k)\sim[n]^k$ be
+  sampled uniformly at random and let $y=(y_1,\dots,y_k)\sim\mathrm{distinct}([n],k)$.
+  Then $d_{\mathrm{TV}}(x,y)\le k^2/n$.
+\end{proposition}
+\begin{proof}
+  Union-bound the probability that a uniformly random tuple from $[n]^k$ has
+  a collision.
+\end{proof}
+
+\begin{lemma}[Consistency of $H$ with $B$ (Method~1)]\label{lem:pasting-h-cons-b}
+  \uses{lem:g-comm, lem:switcheroo, prop:ld-dnoteq, lem:a-comm,
+        lem:consistency-consequences}
+  Let $\nu_3=t\cdot(t\cdot\nu_2+\sqrt{\zeta+\sqrt{2(m+1)\eps}})$.
+  On average over $u\sim[n]^m$,
+  \[
+    H_{[h\mapsto h|_u\mid f]}\simeq_{\nu_3} B^u_f,
+  \]
+  where the answer summation is over $f\in\code$.
+\end{lemma}
+\begin{proof}
+  Expand the inconsistency. For each index $i\in[t]$, commute the $i$-th
+  $G^{x_i}$ factor to expose the evaluation at $u$, incurring error
+  $i\cdot\nu_2$ per step by approximate commutativity. Then use the
+  points--lines consistency of $G^{x_i}_{g_i(u)}$ with $B^u_{f(x_i)}$.
+\end{proof}
+
+\begin{lemma}[Consistency of $H$ with $A$ (Method~1)]\label{lem:pasting-h-cons-a}
+  \uses{lem:pasting-h-cons-b, lem:transfer-cons, lem:consistency-consequences}
+  Let $\nu_4=\nu_3+\sqrt{2(m+1)\eps}$. On average over $(u,x)\sim[n]^m\times[n]$,
+  \[
+    H_{[h\mapsto h(u,x)\mid a]}\simeq_{\nu_4} A^{u,x}_a,
+  \]
+  where the answer summation is over $a\in\Sigma$.
+\end{lemma}
+\begin{proof}
+  Data-process the line consistency of Lemma~\ref{lem:pasting-h-cons-b} down
+  to a point evaluation, then transfer consistency using
+  Proposition~\ref{lem:transfer-cons} and the points--lines bound
+  $B^{u,x}_a\approx_{\sqrt{2(m+1)\eps}} A^{u,x}_a$.
+\end{proof}
+
+\begin{lemma}[$H$ close to $HG$]\label{lem:pasting-h-close-hg}
+  \uses{lem:pasting-h-cons-a, cor:cauchy-schwarz, lem:cons-sub-meas}
+  Let $\nu_5=\sqrt{\nu_4}+\sqrt{\zeta}$. Then
+  $\tau(H)\approx_{\nu_5}\tau(HG)$.
+\end{lemma}
+\begin{proof}
+  Bound $\tau(H(\id-G))=\E_x\sum_h\tau(H_h(\id-G^x))$.
+  Use Cauchy--Schwarz (Corollary~\ref{cor:cauchy-schwarz}) and the
+  consistency of $H$ with $A$ to control $\tau(H_h(\id-A^{u,x}_{h(u,x)})(\id-G^x))$;
+  the resulting bound involves $\sqrt{\nu_4}$ from consistency and
+  $\sqrt\zeta$ from the incomplete part of $G^x$.
+\end{proof}
+
+\begin{lemma}[From $\tau(H)$ to $\tau(G^t)$]\label{lem:nu-6}
+  \uses{prop:ld-dnoteq, lem:g-comm, lem:switcheroo, prop:interpolate-tuple}
+  Let $\nu_6=2t^2(\nu_2+n^{-1})$. Then
+  \[
+    \tau(H)\approx_{\nu_6}\tau(G^t)
+    \qquad\text{and}\qquad
+    \tau(HG)\approx_{\nu_6}\tau(G^{t+1}).
+  \]
+\end{lemma}
+\begin{proof}
+  Expand $\tau(H)$ using the pasting definition; rewrite the sum over $h$
+  using interpolation (Proposition~\ref{prop:interpolate-tuple}).
+  Replace distinct tuples by i.i.d.\ using Proposition~\ref{prop:ld-dnoteq}
+  (error $t^2/n$). Then peel off factors using cyclicity of the trace
+  and approximate commutativity (Lemma~\ref{lem:g-comm} and
+  Proposition~\ref{lem:switcheroo}), accumulating error
+  $\le t^2\nu_2$.
+\end{proof}
+
+\section{Method~2: Construction and definitions}
+
+\begin{definition}[$G$'s incomplete part and completed measurement]
+  \label{def:G-hat}
+  \uses{def:submeasurement}
+  For each $x\in[n]$ write $G^x=\sum_g G^x_g$ and $G^x_\bot=\id-G^x$.
+  The completed measurement $\widehat{G}^x$ has outcomes in
+  $\code^{\otimes m}\cup\{\bot\}$:
+  \[
+    \widehat{G}^x_g=
+    \begin{cases}
+      G^x_g & \text{if }g\in\code^{\otimes m},\\
+      G^x_\bot & \text{if }g=\bot.
+    \end{cases}
+  \]
+  Write $\code^+=\code^{\otimes m}\cup\{\bot\}$.
+\end{definition}
+
+\begin{definition}[Types]\label{def:types}
+  A \emph{type} $\tau\in\{0,1\}^k$ records which of $k$ successive outcomes
+  lie in $\code^{\otimes m}$ ($\tau_i=1$) versus $\bot$ ($\tau_i=0$).
+  The Hamming weight $|\tau|=\tau_1+\cdots+\tau_k$ counts the
+  number of valid outcomes.
+\end{definition}
+
+\begin{definition}[The pasted measurement (Method~2)]\label{def:pasted-meas}
+  \uses{def:G-hat, def:types, prop:tuple-to-code-correspondence,
+        prop:interpolate-tuple, def:interpolable}
+  Let $k\ge t$ be an integer.
+  \begin{enumerate}
+    \item \emph{(Sandwiching)} For $x_1,\dots,x_k\in[n]$, define
+      \[
+        \widehat{H}^{x_1,\dots,x_k}_{g_1,\dots,g_k}
+        =\widehat{G}^{x_1}_{g_1}\cdot\widehat{G}^{x_2}_{g_2}
+         \cdots\widehat{G}^{x_k}_{g_k}\cdots
+         \widehat{G}^{x_2}_{g_2}\cdot\widehat{G}^{x_1}_{g_1}.
+      \]
+    \item \emph{(Interpolation)} For $(x_1,\dots,x_k)\in\mathrm{distinct}([n],k)$,
+      $w\in\{0,1\}^k$, and $h\in\code^{\otimes(m+1)}$, let
+      $h_w=(g_1,\dots,g_k)\in(\code^+)^k$ where
+      $g_i=\bot$ if $w_i=0$ and $g_i=h|_{x_i}$ otherwise. Define
+      \[
+        H^{x_1,\dots,x_k}_h
+        =\sum_{w:|w|\ge t}\widehat{H}^{x_1,\dots,x_k}_{h_w}.
+      \]
+    \item \emph{(Averaging)} Define
+      \[
+        H_h=\E_{(x_1,\dots,x_k)\sim\mathrm{distinct}([n],k)}
+          H^{x_1,\dots,x_k}_h.
+      \]
+  \end{enumerate}
+\end{definition}
+
+\section{Commutativity of $\widehat{G}$ (Method~2 prerequisites)}
+
+\begin{lemma}[Commutativity with~$G_g^x$ implies commutativity with~$G^x$]
+  \label{lem:commutativity-switcheroo}
+  \uses{lem:g-comm}
+  Commutativity of $G^x_g$ with $G^y_h$ implies commutativity with
+  $G^y=\sum_h G^y_h$.
+\end{lemma}
+\begin{proof}
+  Sum over $h$ and use $\sum_h G^y_h = G^y$.
+\end{proof}
+
+\begin{corollary}[Commutativity of $G$'s]\label{cor:g-comm}
+  \uses{lem:commutativity-switcheroo, lem:g-comm}
+  Full approximate commutativity: $G^x_g G^y\approx G^y G^x_g$.
+\end{corollary}
+\begin{proof}
+  Direct from Lemma~\ref{lem:commutativity-switcheroo}.
+\end{proof}
+
+\begin{corollary}[Commutativity of $\widehat{G}$]\label{cor:G-hat-facts}
+  \uses{cor:g-comm, lem:g-comm, def:G-hat}
+  With $\nu'_2=27\nu_2^{1/4}$, the completed measurements
+  $\widehat{G}^x_g$ (including the $\bot$ outcome) satisfy
+  $\widehat{G}^x_g\,\widehat{G}^y_h\approx_{\nu'_2}\widehat{G}^y_h\,\widehat{G}^x_g$.
+\end{corollary}
+\begin{proof}
+  Expand the commutator between complete and incomplete parts,
+  reducing each term to existing commutation statements.
+\end{proof}
+
+\section{Consistency of $H$ (Method~2)}
+
+\begin{lemma}[Consistency of $\widehat{H}$ with $B$ at one point]
+  \label{lem:ld-sandwich-line-one-point}
+  \uses{cor:G-hat-facts, lem:switcheroo, def:pasted-meas}
+  Sandwiched products are approximately consistent with the line measurement
+  at a single evaluation point.
+\end{lemma}
+\begin{proof}
+  Use Corollary~\ref{cor:G-hat-facts} and the switcheroo
+  Proposition~\ref{lem:switcheroo} to commute factors.
+\end{proof}
+
+\begin{lemma}[Consistency of $H$ with $B$ (Method~2)]\label{lem:h-b-consistency}
+  \uses{lem:ld-sandwich-line-one-point, prop:interpolate-tuple,
+        prop:tuple-to-code-correspondence, lem:data-processing,
+        lem:transfer-cons, def:pasted-meas}
+  With error parameter $\nu'_3$, the pasted measurement $H$ is approximately
+  consistent with the line measurement $B$.
+\end{lemma}
+\begin{proof}
+  Commute the $\widehat{G}$ factors to expose a single line answer,
+  then use interpolation uniqueness (Proposition~\ref{prop:interpolate-tuple})
+  to identify inconsistent tuples and bound them.
+\end{proof}
+
+\begin{corollary}[Consistency of $H$ with $A$ (Method~2)]\label{cor:ha-cons}
+  \uses{lem:h-b-consistency, lem:data-processing, lem:transfer-cons}
+  On average over $(u,x)\in[n]^m\times[n]$,
+  $H_{[h\mapsto h(u,x)\mid a]}\simeq_{\nu'_4} A^{u,x}_a$.
+\end{corollary}
+\begin{proof}
+  Data-process the line answer down to a point and transfer consistency.
+\end{proof}
+
+\section{Completeness of $H$ (Method~2)}
+
+\begin{lemma}[Over all outcomes]\label{lem:over-all-outcomes}
+  \uses{prop:tuple-to-code-correspondence, prop:distance,
+        lem:h-b-consistency, cor:G-hat-facts, def:pasted-meas}
+  With error $\nu'_5$:
+  \[
+    \tau(H)\approx_{\nu'_5}
+    \E_{x_1,\dots,x_k}\sum_{\tau:|\tau|\ge t}
+    \sum_{(g_1,\dots,g_k)\in\mathrm{Outcomes}_\tau}
+    \tau\!(\widehat{H}^{x_1,\dots,x_k}_{g_1,\dots,g_k}).
+  \]
+\end{lemma}
+\begin{proof}
+  The sum in the definition of $\tau(H)$ is restricted to
+  $\mathrm{Global}_\tau(y)$; show that the restriction to
+  $\mathrm{Outcomes}_\tau$ only introduces an error of $\nu'_5$,
+  using code distance and consistency with $B$.
+\end{proof}
+
+\begin{lemma}[From $H$ to $G$ polynomial]\label{lem:from-H-to-G}
+  \uses{cor:G-hat-facts, lem:switcheroo, lem:closeness-to-close-ips,
+        def:pasted-meas, def:G-hat}
+  With error $\nu'_6=2k^2\nu'_2$:
+  \[
+    \E_{x_1,\dots,x_k}\sum_{\tau:|\tau|\ge t}
+    \sum_{(g_1,\dots,g_k)\in\mathrm{Outcomes}_\tau}
+    \tau\!(\widehat{H}^{x_1,\dots,x_k}_{g_1,\dots,g_k})
+    \approx_{\nu'_6}
+    \sum_{i=t}^k\binom{k}{i}\tau\!(G^i(\id-G)^{k-i}).
+  \]
+\end{lemma}
+\begin{proof}
+  Peel off one coordinate at a time: commute the leftmost $\widehat{G}$
+  factor past the product (error $k\nu'_2$ per step from
+  Corollary~\ref{cor:G-hat-facts} and Proposition~\ref{lem:switcheroo}),
+  then use the recurrence $S_{\tau_{>\ell}}=\sum_{\tau_\ell}S_{\tau_{\ge\ell}}\cdot G^{\tau_\ell}(\id-G)^{1-\tau_\ell}$.
+\end{proof}
+
+\begin{lemma}[Matrix Chernoff for Bernoulli polynomial]
+  \label{lem:chernoff-bernoulli-matrix}
+  \uses{def:tracial-state}
+  Let $F(x)=\sum_{r=t}^k\binom{k}{r}x^r(1-x)^{k-r}$. If
+  $0\le X\le\id$ is self-adjoint in $\algebra$ with $\tau(X)\ge 1-\kappa$,
+  then for $k\ge 2t/\theta$ and $0<\theta<1$:
+  \[
+    \tau(F(X))\ge 1-\frac\kappa{1-\theta}-e^{-\theta^2 k/2}.
+  \]
+\end{lemma}
+\begin{proof}
+  Use the spectral theorem (functional calculus for bounded self-adjoint
+  operators in a von Neumann algebra) to decompose $X$ via a
+  projection-valued measure, then apply the scalar Chernoff bound
+  eigenvalue by eigenvalue.
+\end{proof}
+
+\begin{corollary}[Completeness of $H$]\label{cor:ld-pasting-N-completeness}
+  \uses{lem:over-all-outcomes, lem:from-H-to-G, lem:chernoff-bernoulli-matrix}
+  For $k\ge 12mt$ and $\theta=1/(6m)$:
+  \[
+    \tau(H)\ge 1-\kappa\!\left(1+\frac1{3m}\right)-\nu-e^{-k/(72m^2)},
+  \]
+  where $\nu=\nu'_5+\nu'_6=\poly(m,t,k)\cdot\poly(\eps,\delta,\zeta,n^{-1})$.
+\end{corollary}
+\begin{proof}
+  Combine Lemmas~\ref{lem:over-all-outcomes} and \ref{lem:from-H-to-G}
+  to reduce to $\tau(F(G))$; apply Lemma~\ref{lem:chernoff-bernoulli-matrix}
+  with $\theta = 1/(6m)$.
+\end{proof}
+
+\section{The pasting lemma (combined)}
+
+\begin{lemma}[Pasting]\label{lem:pasting}
+  \uses{cor:ha-cons, cor:ld-pasting-N-completeness,
+        def:pasted-meas, lem:pasting-h-cons-a, lem:pasting-h-close-hg, lem:nu-6}
+  There exists a function
+  $\mu(\kappa,m,t,r,\eps,\delta,\zeta,n^{-1})
+    =\kappa(1+\frac{1}{3m})+\poly(m,t,r)\cdot\poly(\eps,\delta,\zeta,n^{-1})+e^{-r/(72m^2)}$
+  such that: given an $(\eps,\delta)$-good strategy for $\code^{\otimes(m+1)}$
+  and slice submeasurements $\{G^x_g\}$ satisfying completeness, consistency,
+  and boundedness conditions, there exists a pasted measurement $\{H_h\}$
+  with outcomes in $\code^{\otimes(m+1)}$ satisfying
+  $H_{[h\mapsto h(u,x)\mid a]}\simeq_\mu A^{u,x}_a$ on average.
+\end{lemma}
+\begin{proof}
+  Consistency from Corollary~\ref{cor:ha-cons};
+  completeness from Corollary~\ref{cor:ld-pasting-N-completeness}.
+  Complete $H$ by adding the missing mass to a single lexicographically
+  first codeword.
+\end{proof}
+
+
+\chapter{Section~4: Main induction and main theorems}
+\label{chap:main-loop}
+
+\begin{lemma}[Induction lemma]\label{lem:induction}
+  \uses{lem:self-improvement, lem:pasting}
+  There exists
+  $\sigma(m,t,r,\eps,\delta,n^{-1})=\poly(m,t,r)\cdot(\poly(\eps,\delta,n^{-1})+e^{-\Omega(r/m^2)})$
+  such that for any $(\eps,\delta)$-good strategy and $r\ge 12mt$,
+  there exists a measurement $\{G_c\}\subset\algebra$ with outcomes in
+  $\code^{\otimes m}$ satisfying
+  \[
+    \E_{u\sim[n]^m}\sum_c\tau(G_c\,A^u_{c(u)})\ge 1-\sigma.
+  \]
+\end{lemma}
+\begin{proof}
+  Induction on $m$.
+  \textbf{Base case} ($m=1$): the line measurement $B^\ell$ directly
+  plays the role of the global measurement.
+  \textbf{Inductive step} ($m\to m+1$): apply the induction hypothesis
+  to each slice, apply Lemma~\ref{lem:self-improvement} to each slice
+  measurement, then apply Lemma~\ref{lem:pasting} to produce the
+  $(m+1)$-dimensional measurement.
+  The error analysis tracks explicit polynomial constants $c_0,c_1,c_2,c_3$
+  and a multiplicative factor $s_m$ through the induction.
+\end{proof}
+
+\begin{theorem}[Quantum soundness --- Theorem~4.1]\label{thm:main}
+  \proves{thm:main}
+  \uses{lem:induction, lem:self-improvement}
+  There exists
+  $\eta(m,t,r,\eps,n^{-1})=\poly(m,t,r)\cdot\poly(\eps,n^{-1},e^{-\Omega(r/m^2)})$
+  such that: if $\mathcal{S}=(\tau,A,B,P)$ is a synchronous strategy passing
+  the tensor code test for $\code^{\otimes m}$ with probability $1-\eps$ and
+  $r\ge 12mt$, then there exists a projective measurement
+  $\{G_c\}_{c\in\code^{\otimes m}}\subset\algebra$ with
+  \[
+    \E_{u\sim[n]^m}\sum_c\tau(G_c\,A^u_{c(u)})\ge 1-\eta.
+  \]
+
+  \textbf{This is the primary formalization target.}
+\end{theorem}
+\begin{proof}
+  Apply Lemma~\ref{lem:induction} to obtain a measurement $\{G_c\}$, then
+  apply Lemma~\ref{lem:self-improvement} one final time to make it projective.
+\end{proof}
+
+\section{Extension to general two-prover strategies (Section~4.1)}
+
+\begin{definition}[Two-prover strategy]\label{def:two-prover-strat}
+  A two-prover strategy
+  $\mathcal{S}=(|\psi\rangle,A,B,P,\tilde A,\tilde B,\tilde P)$ with
+  $|\psi\rangle\in\hilb_A\otimes\hilb_B$
+  ($\hilb_A,\hilb_B$ finite-dimensional)
+  and separate projective measurements for each prover.
+\end{definition}
+
+\begin{definition}[$(\eps,\delta,\xi)$-good two-prover strategy]\label{def:good-2}
+  \uses{def:two-prover-strat}
+  The strategy passes:
+  (1)~the axis-parallel line test with probability $\ge 1-\eps$,
+  (2)~the subcube commutation test with probability $\ge 1-\delta$,
+  (3)~the synchronicity test with probability $\ge 1-\xi$.
+\end{definition}
+
+\begin{theorem}[Two-prover extension --- Theorem~4.7]\label{thm:main-bipartite}
+  \proves{thm:main-bipartite}
+  \uses{thm:main, def:good-2}
+  There exists
+  $\eta'(m,t,k,\eps,n^{-1})=\poly(m,t,k)\cdot\poly(\eps,n^{-1},e^{-k/m^2})$
+  such that: if $\mathcal{S}$ is a two-prover strategy passing the two-prover
+  tensor code test with probability $1-\eps$ and $k\ge 12mt$, then there
+  exist projective measurements $\{G_c\}$ and $\{\tilde G_c\}$ on
+  $\hilb_A$ and $\hilb_B$ respectively, satisfying on average over
+  $u\sim[n]^m$ and a random line $\ell$:
+  \begin{align*}
+    A^u_a\otimes\id &\simeq_{\eta'}\id\otimes\tilde G_{[c\mapsto c(u)\mid a]},\\
+    G_{[c\mapsto c|_\ell\mid f]}\otimes\id &\simeq_{\eta'}\id\otimes\tilde B^\ell_f,\\
+    G_c\otimes\id &\simeq_{\eta'}\id\otimes\tilde G_c.
+  \end{align*}
+  \textbf{This is the secondary formalization target.}
+\end{theorem}
+\begin{proof}
+  Uses \cite[Corollary~4.1]{vidick2021almost} to reduce to the synchronous
+  setting of Theorem~\ref{thm:main}.
+  The reduction proceeds in three steps:
+  (1)~symmetrize the strategy to make it invariant under prover swap,
+  (2)~apply \cite[Corollary~4.1]{vidick2021almost} to the synchronous
+  result (Theorem~\ref{thm:main}) to obtain approximate consistency between
+  the two provers' measurements, and
+  (3)~transfer the synchronous global measurement to both provers.
+  This is an \textbf{external dependency}.
+\end{proof}
+
+
+\chapter{External dependencies}
+\label{chap:external}
+
+The paper directly invokes the following external results. They must either be
+formalized or introduced as axioms with careful type signatures.
+
+\section{de Oliveira--Scholz (2021)}
+
+Reference: \cite{de2021orthogonalization}.
+
+\begin{enumerate}
+  \item \textbf{Theorem~1.2} (orthogonalization): used for
+    Lemma~\ref{lem:projectivization}.
+    Proof uses polar decomposition in a von Neumann algebra.
+
+  \item \textbf{Proposition~7.1} (positive-map duality): used for
+    Lemma~\ref{lem:duality}.
+    Proof uses the Hahn--Banach theorem for operator systems.
+\end{enumerate}
+
+\section{Vidick (2021)}
+
+Reference: \cite{vidick2021almost}.
+
+\textbf{Corollary~4.1} (almost-synchronous-to-synchronous reduction):
+used in the proof of Theorem~\ref{thm:main-bipartite} to reduce general
+two-prover strategies to the synchronous setting.
+The corollary states that if a game has a quantum strategy with value $1-\eps$
+and the synchronous quantum value of the game is $1-\delta(\eps)$, then the
+original strategy is $O(\delta(\eps))$-close to a synchronous strategy.
+
+\section{Other background}
+
+\begin{itemize}
+  \item \textbf{Spectral theorem / functional calculus} for bounded
+    self-adjoint operators: used in Lemma~\ref{lem:chernoff-bernoulli-matrix}.
+  \item \textbf{Polar decomposition}: used indirectly via
+    \cite{de2021orthogonalization}.
+  \item \textbf{Additive Chernoff bound}: used inside
+    Lemma~\ref{lem:chernoff-bernoulli-matrix}.
+\end{itemize}
+
+
+\chapter{Non-goals (substitutes explicitly excluded)}
+\label{chap:nongoals}
+
+The following approaches are \textbf{not} faithful to the paper's proof and are
+explicitly excluded from this blueprint.
+
+\begin{enumerate}
+  \item \textbf{Finite-dimensional-only pilot replacements.}
+    The paper's ambient setting is a von Neumann algebra with a normal tracial
+    state, not $\Mat_D(\C)$ with normalized trace.
+    A finite-dimensional specialization may be pursued
+    separately as a warm-up, but it does not discharge the nodes in this blueprint.
+
+  \item \textbf{SDP reformulations replacing Lemma~\ref{lem:duality}.}
+    The paper's duality lemma is about normal positive linear maps on a von
+    Neumann algebra, proved via Hahn--Banach.
+    Replacing it with finite-dimensional SDP strong duality changes the proof.
+
+  \item \textbf{SVD replacements for Lemma~\ref{lem:projectivization}.}
+    The paper's orthogonalization uses polar decomposition in a von Neumann
+    algebra, citing \cite{de2021orthogonalization}.
+    A finite-dimensional SVD-based proof is different.
+
+  \item \textbf{Importing Paper~2 or Paper~1 machinery.}
+    This blueprint covers arXiv:2111.08131 as a standalone paper.
+    The only external references the paper uses are
+    \cite{de2021orthogonalization} and \cite{vidick2021almost}.
+\end{enumerate}
+
+
+\chapter{Suggested formalization order}
+\label{chap:order}
+
+\section{Phase~1: Definitions and Section~2 infrastructure}
+
+Formalize the tracial-state API, measurements, consistency/closeness, all
+Section~2 propositions, and the coding-theoretic definitions.
+
+\section{Phase~2: Section~3 test interface and Appendix~A}
+
+Formalize the tensor code test, tracial strategies,
+$(\eps,\delta)$-good strategies, and the expander lemma.
+
+\section{Phase~3: Section~5 self-improvement}
+
+Formalize the variance bounds, the self-improvement helper lemmas,
+and the full self-improvement lemma.
+Requires axiomatizing or formalizing external dependencies
+(Lemmas~\ref{lem:projectivization} and \ref{lem:duality}).
+
+\section{Phase~4: Section~6 pasting}
+
+Formalize the commutativity chain, the pasting construction (Method~2),
+the consistency analysis, the completeness analysis
+(including the matrix Chernoff bound), and the combined pasting lemma.
+
+\section{Phase~5: Section~4 main theorems}
+
+Formalize the induction lemma, the main theorem (\texttt{thm:main}),
+the two-prover definitions, and the bipartite extension
+(\texttt{thm:main-bipartite}).
+The bipartite extension requires axiomatizing or formalizing
+\cite[Corollary~4.1]{vidick2021almost}.

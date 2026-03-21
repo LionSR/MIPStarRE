@@ -1,0 +1,360 @@
+\chapter{Pasting}
+\label{chap:pasting}
+
+\begin{theorem}[Pasting]\label{thm:ld-pasting}
+  \lean{MIPStarRE.Paper2009LDT.Section6MainInductionStep.ldPastingInInductionSection, MIPStarRE.Paper2009LDT.Section12Pasting.ldPasting}
+  \uses{def:polymeasurements, def:simeq}
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ such that:
+  \begin{enumerate}
+    \item if $G = \E_x \sum_g G_g^x$, then $\bra{\psi} G \ot I \ket{\psi} \ge 1-\kappa$;
+    \item on average over $(u,x) \sim \F_q^{m+1}$,
+    \[
+      A_a^{u,x} \ot I \simeq_\zeta I \ot G_{[g(u)=a]}^x;
+    \]
+    \item on average over $x \sim \F_q$, one has $G_g^x \ot I \approx_\zeta I \ot G_g^x$;
+    \item there are positive semidefinite operators $Z^x$ such that
+    \[
+      \E_x \bra{\psi} (I-G^x) \ot Z^x \ket{\psi} \le \zeta,
+      \qquad
+      Z^x \ge \E_u A_{g(u)}^{u,x}.
+    \]
+  \end{enumerate}
+  Let $k \ge 400md$ and set
+  \[
+    \nu = 100k^2m\left(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right)
+  \]
+  and
+  \[
+    \sigma = \kappa\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)}.
+  \]
+  Then there exists a measurement $H \in \polymeas{m+1}{q}{d}$ such that, on average over $u \sim \F_q^{m+1}$,
+  \[
+    A_a^u \ot I \simeq_\sigma I \ot H_{[h(u)=a]}.
+  \]
+\end{theorem}
+\begin{proof}
+  \uses{lem:ld-pasting-sub-measurement}
+  First build a pasted submeasurement with the same consistency bound and with completeness at least $1-\kappa(1+1/(100m)) - \nu - e^{-k/(80000m^2)}$; this is Lemma~\ref{lem:ld-pasting-sub-measurement}. Then add the missing mass to one distinguished polynomial outcome.
+\end{proof}
+
+\begin{lemma}[Slice measurements are consistent with line answers]\label{lem:ld-gbcon}
+  \uses{lem:good-strategy-characterization, prop:simeq-to-approx, prop:triangle-sub}
+  Under the hypotheses of Theorem~\ref{thm:ld-pasting}, set
+  \[
+    \nu_1 = \zeta + \sqrt{8m\eps + 4\delta}.
+  \]
+  Then, on average over $(u,x) \sim \F_q^{m+1}$,
+  \[
+    G_{[g(u)=a]}^x \ot I \simeq_{\nu_1} I \ot B^u_{[f(x)=a]}.
+  \]
+\end{lemma}
+\begin{proof}
+  The good-strategy conditions first compare $A_a^{u,x}$ with the corresponding line answer $B_{[f(x)=a]}^u$. Convert that comparison to state-dependent distance and combine it with the assumed consistency of $G^x$ with $A^{u,x}$ by Lemma~\ref{prop:triangle-sub}.
+\end{proof}
+
+\begin{lemma}[Pasted submeasurement]\label{lem:ld-pasting-sub-measurement}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.ldPastingSubMeasurement}
+  \uses{def:polymeasurements, def:simeq}
+  Under the hypotheses of Theorem~\ref{thm:ld-pasting}, there exists a submeasurement $H \in \polysub{m+1}{q}{d}$ such that:
+  \begin{enumerate}
+    \item on average over $u \sim \F_q^{m+1}$,
+    \[
+      A_a^u \ot I \simeq_\nu I \ot H_{[h(u)=a]};
+    \]
+    \item if $H=\sum_h H_h$, then
+    \[
+      \bra{\psi} H \ot I \ket{\psi}
+      \ge
+      1 - \kappa\left(1+\frac{1}{100m}\right) - \nu - e^{-k/(80000m^2)}.
+    \]
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  \uses{lem:h-b-consistency, cor:ld-pasting-N-completeness, lem:good-strategy-characterization, prop:simeq-to-approx, prop:triangle-sub}
+  The explicit pasting construction gives a submeasurement $H$ whose restriction to any sampled line is consistent with the line measurement $B$ by Lemma~\ref{lem:h-b-consistency}. Transfer that consistency back to the point measurement $A$ using the test characterization and Lemma~\ref{prop:triangle-sub}. The completeness bound is Corollary~\ref{cor:ld-pasting-N-completeness}.
+\end{proof}
+
+\section{Preliminary bookkeeping}
+
+\begin{definition}[Distinct tuples]\label{def:distinct-tuples}
+  For $k \ge 1$, let $\mathsf{Distinct}_k \subseteq \F_q^k$ be the set of tuples $(x_1,\dots,x_k)$ with pairwise distinct coordinates.
+\end{definition}
+
+\begin{lemma}[Distinct tuples versus independent tuples]\label{prop:ld-dnoteq}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.ldDnoteq}
+  \uses{def:distinct-tuples}
+  If $x=(x_1,\dots,x_k)$ is uniformly random in $\F_q^k$ and $y=(y_1,\dots,y_k)$ is uniformly random in $\mathsf{Distinct}_k$, then
+  \[
+    d_{\mathrm{TV}}(x,y) \le \frac{k^2}{q}.
+  \]
+\end{lemma}
+\begin{proof}
+  A uniformly random tuple fails to be distinct only if some pair of coordinates collides. Bound that collision probability by a union bound.
+\end{proof}
+
+\begin{lemma}[A scalar inequality for the first construction]\label{lem:looks-easy-but-took-me-a-while}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.looksEasyButTookMeAWhile}
+  For every real number $0 \le \lambda \le 1$,
+  \[
+    \lambda(1-\lambda^d) \le 2(\lambda^{d+1}(1-\lambda))^{1/(d+1)}.
+  \]
+\end{lemma}
+\begin{proof}
+  Compare $1-\lambda^d$ with $(1-\lambda)(1+\lambda+\cdots+\lambda^{d-1})$ and use that $d^{1/(d+1)} \le 2$.
+\end{proof}
+
+\section{The completed slice measurements}
+
+\begin{definition}[The incomplete part and the completed measurement]\label{def:G-hat}
+  \uses{def:polymeasurements}
+  For each $x \in \F_q$, write $G^x = \sum_g G_g^x$ and define the incomplete outcome $G_\bot^x = I-G^x$. The completed measurement $\widehat G^x$ has outcome set $\polyfunc{m}{q}{d} \cup \{\bot\}$ and is given by
+  \[
+    \widehat G_g^x = G_g^x \quad (g \in \polyfunc{m}{q}{d}),
+    \qquad
+    \widehat G_\bot^x = G_\bot^x.
+  \]
+\end{definition}
+
+\begin{definition}[Types]\label{def:types}
+  A type is a vector $\tau \in \{0,1\}^k$. Its weight $|\tau|$ records how many of the $k$ outcomes belong to $\polyfunc{m}{q}{d}$ rather than to the extra outcome $\bot$.
+\end{definition}
+
+\begin{definition}[The pasted measurement]\label{def:pasted-measurement}
+  \uses{def:G-hat, def:types, def:distinct-tuples}
+  Fix $k \ge d+1$.
+  For $x_1,\dots,x_k \in \F_q$ and outcomes $g_1,\dots,g_k \in \polyfunc{m}{q}{d} \cup \{\bot\}$, define the sandwiched operator
+  \[
+    \widehat H_{g_1,\dots,g_k}^{x_1,\dots,x_k}
+    = \widehat G_{g_1}^{x_1} \widehat G_{g_2}^{x_2} \cdots \widehat G_{g_k}^{x_k} \cdots \widehat G_{g_2}^{x_2} \widehat G_{g_1}^{x_1}.
+  \]
+  If $(x_1,\dots,x_k) \in \mathsf{Distinct}_k$ and $h \in \polyfunc{m+1}{q}{d}$, define
+  \[
+    H_h^{x_1,\dots,x_k} = \sum_{\tau\, :\, |\tau| \ge d+1} \widehat H_{h_\tau}^{x_1,\dots,x_k},
+  \]
+  where $h_\tau$ is the tuple whose $i$-th entry is $h|_{x_i}$ when $\tau_i=1$ and $\bot$ when $\tau_i=0$. The pasted submeasurement is the average
+  \[
+    H_h = \E_{(x_1,\dots,x_k) \sim \mathsf{Distinct}_k} H_h^{x_1,\dots,x_k}.
+  \]
+\end{definition}
+
+\begin{lemma}[Strong self-consistency of the complete part]\label{lem:g-complete-self-consistency}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.gCompleteSelfConsistency}
+  \uses{prop:two-notions-of-self-consistency}
+  Under the hypotheses of Theorem~\ref{thm:ld-pasting},
+  \[
+    G^x \ot I \approx_\zeta I \ot G^x.
+  \]
+\end{lemma}
+\begin{proof}
+  Because each $G^x$ is projective, the assumed strong self-consistency of the outcome-level submeasurement is equivalent to the same estimate for the total projector $G^x$.
+\end{proof}
+
+\begin{lemma}[Strong self-consistency of the incomplete part]\label{cor:g-bot-self-consistency}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.gBotSelfConsistency}
+  \uses{lem:g-complete-self-consistency}
+  Under the hypotheses of Theorem~\ref{thm:ld-pasting},
+  \[
+    G_\bot^x \ot I \approx_\zeta I \ot G_\bot^x.
+  \]
+\end{lemma}
+\begin{proof}
+  This is immediate from $G_\bot^x = I-G^x$.
+\end{proof}
+
+\begin{lemma}[Commutativity with $G_g^x$ implies commutativity with $G^x$]\label{lem:commutativity-switcheroo}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.commutativitySwitcheroo}
+  \uses{prop:switch-sandwich}
+  Let $M=\{M_o^y\}$ be a projective submeasurement. Suppose
+  \[
+    M_o^y \ot I \approx_\omega I \ot M_o^y
+    \qquad\text{and}\qquad
+    G_g^x M_o^y \ot I \approx_\chi M_o^y G_g^x \ot I
+  \]
+  on average over independent $x,y$. Then
+  \[
+    G^x M_o^y \ot I \approx_{6\sqrt\zeta + 6\sqrt\omega + 4\sqrt\chi} M_o^y G^x \ot I.
+  \]
+\end{lemma}
+\begin{proof}
+  Expand the commutator norm into four terms and compare each with the mixed overlap $\bra{\psi} G \ot M \ket{\psi}$ using the two self-consistency assumptions together with the outcome-level commutation estimate.
+\end{proof}
+
+\begin{lemma}[Commutativity of the complete part]\label{cor:commuting-with-G-complete}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.commutingWithGComplete}
+  \uses{thm:com-main, lem:commutativity-switcheroo, lem:g-complete-self-consistency}
+  Under the hypotheses of Theorem~\ref{thm:ld-pasting}, the following relations hold on average over independent $x,y$:
+  \[
+    G_g^x G^y \ot I \approx_{\nu_2} G^y G_g^x \ot I,
+    \qquad
+    G^x G^y \ot I \approx_{\nu_2} G^y G^x \ot I,
+  \]
+  where
+  \[
+    \nu_2 = 36m(\gamma^{1/16}+\zeta^{1/16}+(d/q)^{1/16}).
+  \]
+\end{lemma}
+\begin{proof}
+  Start from Theorem~\ref{thm:com-main}, which commutes $G_g^x$ with each individual outcome of $G^y$. Apply Lemma~\ref{lem:commutativity-switcheroo} once to sum over the outcomes of $G^y$ and again to pass from $G_g^x$ to $G^x$.
+\end{proof}
+
+\begin{lemma}[Commutativity of the incomplete part]\label{cor:commuting-with-G-incomplete}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.commutingWithGIncomplete}
+  \uses{cor:commuting-with-G-complete}
+  Under the hypotheses of Theorem~\ref{thm:ld-pasting},
+  \[
+    G_g^x G_\bot^y \ot I \approx_{\nu_2} G_\bot^y G_g^x \ot I,
+    \qquad
+    G_\bot^x G_\bot^y \ot I \approx_{\nu_2} G_\bot^y G_\bot^x \ot I.
+  \]
+\end{lemma}
+\begin{proof}
+  Replace each incomplete projector by $I-G^x$ and use Lemma~\ref{cor:commuting-with-G-complete}.
+\end{proof}
+
+\begin{lemma}[Strong self-consistency and commutation of $\widehat G$]\label{cor:G-hat-facts}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.gHatFacts}
+  \uses{lem:g-complete-self-consistency, cor:g-bot-self-consistency, cor:commuting-with-G-complete, cor:commuting-with-G-incomplete}
+  The completed measurements $\widehat G^x$ satisfy
+  \[
+    \widehat G_g^x \ot I \approx_{2\zeta} I \ot \widehat G_g^x,
+    \qquad
+    \widehat G_g^x \widehat G_h^y \ot I \approx_{\nu_3} \widehat G_h^y \widehat G_g^x \ot I,
+  \]
+  where
+  \[
+    \nu_3 = 138m(\gamma^{1/16}+\zeta^{1/16}+(d/q)^{1/16}).
+  \]
+\end{lemma}
+\begin{proof}
+  Split the completed outcome set into the genuine polynomial outcomes and the extra outcome $\bot$. The complete-part and incomplete-part commutation estimates cover all four possible cases.
+\end{proof}
+
+\section{Consistency of the sandwich with the line measurement}
+
+\begin{lemma}[Commuting past multiple completed measurements]\label{lem:commute-g-half-sandwich}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.commuteGHalfSandwich}
+  \uses{cor:G-hat-facts, prop:triangle-inequality-for-approx_delta}
+  For every $k \ge 2$,
+  \[
+    \widehat G_{g_1}^{x_1} \widehat G_{g_2}^{x_2} \cdots \widehat G_{g_k}^{x_k} \ot I
+    \approx_{\nu_4}
+    \widehat G_{g_2}^{x_2} \cdots \widehat G_{g_k}^{x_k} \widehat G_{g_1}^{x_1} \ot I,
+  \]
+  where
+  \[
+    \nu_4 = 426k^2m(\gamma^{1/16}+\zeta^{1/16}+(d/q)^{1/16}).
+  \]
+\end{lemma}
+\begin{proof}
+  Repeatedly move the leftmost factor across the remaining product. Each step uses one instance of the self-consistency or commutation estimate from Lemma~\ref{cor:G-hat-facts}, and the total error is summed by the triangle inequality for $\approx_\delta$.
+\end{proof}
+
+\begin{lemma}[Consistency of the sandwiched measurement with one line value]\label{lem:ld-sandwich-line-one-point}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.ldSandwichLineOnePoint}
+  \uses{lem:commute-g-half-sandwich, lem:ld-gbcon}
+  For any $1 \le i \le k$,
+  \[
+    \E_u \E_{x_1,\dots,x_k} \sum_{g_1,\dots,g_k\, :\, g_i \ne \bot} \sum_{a \ne g_i(u)}
+    \bra{\psi} \widehat H_{g_1,\dots,g_k}^{x_1,\dots,x_k} \ot B_{[f(x_i)=a]}^u \ket{\psi}
+    \le \nu_5,
+  \]
+  where
+  \[
+    \nu_5 = 43km(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}).
+  \]
+\end{lemma}
+\begin{proof}
+  Sum out the coordinates to the right of the distinguished factor, commute the $i$-th completed measurement to the front by Lemma~\ref{lem:commute-g-half-sandwich}, and then apply Lemma~\ref{lem:ld-gbcon} to compare it with the line measurement at the sampled point.
+\end{proof}
+
+\begin{lemma}[Consistency of the pasted measurement with the line measurement]\label{lem:h-b-consistency}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.hBConsistency}
+  \uses{def:pasted-measurement, prop:ld-dnoteq, lem:ld-sandwich-line-one-point}
+  The pasted submeasurement satisfies
+  \[
+    H_{[h|_u=f]} \ot I \simeq_{\nu_6} I \ot B_f^u,
+  \]
+  where
+  \[
+    \nu_6 = 44k^2m(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}).
+  \]
+\end{lemma}
+\begin{proof}
+  Expand the inconsistency between $H$ and $B^u$ as a sum over sandwiched tuples. A tuple that is inconsistent with the line answer must already disagree at one of the sampled coordinates. Use a union bound over that coordinate, switch from distinct tuples to independent tuples with Lemma~\ref{prop:ld-dnoteq}, and apply Lemma~\ref{lem:ld-sandwich-line-one-point}.
+\end{proof}
+
+\section{Completeness of the pasted measurement}
+
+\begin{definition}[Outcomes of a fixed type]\label{def:outcomes-by-type}
+  \uses{def:types}
+  For a type $\tau \in \{0,1\}^k$, let $\mathsf{Outcomes}_\tau$ be the set of tuples $(g_1,\dots,g_k)$ such that $g_i \in \polyfunc{m}{q}{d}$ when $\tau_i=1$ and $g_i=\bot$ when $\tau_i=0$. If $x_1,\dots,x_k \in \F_q$, let $\mathsf{Global}_\tau(x)$ be the subset of $\mathsf{Outcomes}_\tau$ that arises from restrictions of a single polynomial in $\polyfunc{m+1}{q}{d}$.
+\end{definition}
+
+\begin{lemma}[Summing over all outcomes]\label{lem:over-all-outcomes}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.overAllOutcomes}
+  \uses{def:outcomes-by-type, prop:ld-dnoteq, lem:ld-sandwich-line-one-point, lem:schwartz-zippel-individual}
+  If $x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
+  \[
+    \bra{\psi} H \ot I \ket{\psi}
+    \approx_{\nu_7}
+    \E_{x_1,\dots,x_k} \sum_{\tau\, :\, |\tau| \ge d+1} \sum_{(g_1,\dots,g_k) \in \mathsf{Outcomes}_\tau}
+    \bra{\psi} \widehat H_{g_1,\dots,g_k}^{x_1,\dots,x_k} \ot I \ket{\psi},
+  \]
+  where
+  \[
+    \nu_7 = 46k^2m(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}).
+  \]
+\end{lemma}
+\begin{proof}
+  The definition of $H$ only sums over tuples compatible with a global polynomial. Insert the line measurement $B^u$, use Lemma~\ref{lem:h-b-consistency} to show that globally inconsistent tuples contribute little, and then replace distinct tuples by independent tuples with Lemma~\ref{prop:ld-dnoteq}.
+\end{proof}
+
+\begin{lemma}[From the pasted sum to a polynomial in $G$]\label{lem:from-H-to-G}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.fromHToG}
+  \uses{cor:G-hat-facts, lem:commute-g-half-sandwich, def:pasted-measurement}
+  If $x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
+  \[
+    \E_{x_1,\dots,x_k} \sum_{\tau\, :\, |\tau| \ge d+1} \sum_{(g_1,\dots,g_k) \in \mathsf{Outcomes}_\tau}
+    \bra{\psi} \widehat H_{g_1,\dots,g_k}^{x_1,\dots,x_k} \ot I \ket{\psi}
+    \approx_{\nu_8}
+    \sum_{r=d+1}^k \binom{k}{r} \bra{\psi} G^r (I-G)^{k-r} \ot I \ket{\psi},
+  \]
+  where
+  \[
+    \nu_8 = 46km(\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}).
+  \]
+\end{lemma}
+\begin{proof}
+  Peel off the $k$ completed measurements one at a time. The recurrence for the remaining type sum produces either a factor of $G$ or a factor of $I-G$, and Lemma~\ref{lem:commute-g-half-sandwich} controls the commutations needed to expose that recurrence.
+\end{proof}
+
+\begin{lemma}[Matrix Chernoff bound for the Bernoulli polynomial]\label{lem:chernoff-bernoulli-matrix}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.chernoffBernoulliMatrix}
+  Let $0<\theta<1$ and integers $k,d>0$ with $k \ge 2d/\theta$. Define
+  \[
+    F(X) = \sum_{r=d+1}^k \binom{k}{r} X^r (I-X)^{k-r}.
+  \]
+  If $X$ is Hermitian, $0 \le X \le I$, and $\bra{\psi} X \ot I \ket{\psi} \ge 1-\kappa$, then
+  \[
+    \bra{\psi} F(X) \ot I \ket{\psi}
+    \ge
+    1 - \frac{\kappa}{1-\theta} - e^{-\theta^2 k/2}.
+  \]
+\end{lemma}
+\begin{proof}
+  Diagonalize $X$, interpret the spectral measure of $X$ against the reduced state of $\ket{\psi}$ as a probability distribution on eigenvalues, and apply the scalar Chernoff bound to that distribution.
+\end{proof}
+
+\begin{lemma}[Completeness of the pasted submeasurement]\label{cor:ld-pasting-N-completeness}
+  \lean{MIPStarRE.Paper2009LDT.Section12Pasting.ldPastingNCompleteness}
+  \uses{lem:over-all-outcomes, lem:from-H-to-G, lem:chernoff-bernoulli-matrix}
+  If $k \ge 400md$, then
+  \[
+    \bra{\psi} H \ot I \ket{\psi}
+    \ge
+    1 - \kappa\left(1+\frac{1}{100m}\right) - \nu - e^{-k/(80000m^2)}.
+  \]
+\end{lemma}
+\begin{proof}
+  Lemma~\ref{lem:over-all-outcomes} reduces the completeness of $H$ to the unrestricted sandwiched sum, and Lemma~\ref{lem:from-H-to-G} turns that sum into the polynomial $F(G)$. Apply Lemma~\ref{lem:chernoff-bernoulli-matrix} with $\theta = 1/(200m)$.
+\end{proof}

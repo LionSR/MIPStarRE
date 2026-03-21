@@ -1,0 +1,118 @@
+\chapter{Self-improvement}
+\label{chap:self-improvement}
+
+Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
+
+\begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
+  \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.selfImprovementHelper}
+  \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
+  Let $G \in \polymeas{m}{q}{d}$ be a measurement such that, on average over $u \sim \F_q^m$,
+  \[
+    A_a^u \ot I \simeq_\nu I \ot G_{[g(u)=a]}.
+  \]
+  Set
+  \[
+    \zeta = 100m\left(\eps^{1/2}+\delta^{1/2}+(d/q)^{1/2}\right).
+  \]
+  Then there exists a submeasurement $H \in \polysub{m}{q}{d}$ such that:
+  \begin{enumerate}
+    \item if $H=\sum_h H_h$, then $\bra{\psi} H \ot I \ket{\psi} \ge (1-\nu)-\zeta$;
+    \item on average over $u \sim \F_q^m$,
+    \[
+      A_a^u \ot I \simeq_\zeta I \ot H_{[h(u)=a]};
+    \]
+    \item the family $H$ is $\zeta$-strongly self-consistent;
+    \item there exists a positive semidefinite operator $Z$ such that
+    \[
+      \bra{\psi} Z \ot I \ket{\psi} - \E_u \sum_a \bra{\psi} A_a^u \ot H_{[h(u)=a]} \ket{\psi} \le \zeta,
+    \]
+    and $Z \ge \E_u A_{h(u)}^u$ for every $h \in \polyfunc{m}{q}{d}$.
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  \uses{lem:sdp, lem:add-in-u, lem:global-variance-of-points, prop:simeq-to-approx}
+  Solve the semidefinite program from Lemma~\ref{lem:sdp} to obtain a measurement $T=\{T_h\}$ and define
+  \[
+    H_h = \E_u A^u_{h(u)} T_h A^u_{h(u)}.
+  \]
+  Lemma~\ref{lem:global-variance-of-points} controls how the point projectors change when the evaluation point moves, and Lemma~\ref{lem:add-in-u} inserts that averaging into expressions involving $H$. The four conclusions then follow by applying these two tools to the completeness, consistency, self-consistency, and boundedness expressions.
+\end{proof}
+
+\begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
+  \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.sdp}
+  Let
+  \[
+    A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
+  \]
+  Consider the primal program
+  \[
+    \sup \sum_g \Tr(T_g A_g)
+    \qquad\text{subject to } T_g \ge 0 \text{ for all } g, \sum_g T_g \le I,
+  \]
+  and the dual program
+  \[
+    \inf \Tr(Z)
+    \qquad\text{subject to } Z \ge A_g \text{ for all } g.
+  \]
+  These programs are dual to each other. Moreover there are optimal solutions with $\sum_g T_g = I$ and
+  \[
+    T_g Z = T_g A_g
+  \]
+  for every $g$.
+\end{lemma}
+\begin{proof}
+  Rewrite the primal in canonical block-matrix form, check Slater's condition, and apply complementary slackness to the optimal primal--dual pair.
+\end{proof}
+
+\begin{lemma}[Averaging over the evaluation point]\label{lem:add-in-u}
+  \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.addInU}
+  \uses{lem:global-variance-of-points, prop:simeq-to-approx}
+  Let $T=\{T_h\}$ be an optimal solution of the primal SDP, let
+  \[
+    H_h = \E_{u \sim \F_q^m} A^u_{h(u)} T_h A^u_{h(u)},
+  \]
+  and set
+  \[
+    \zeta_{\mathrm{var}} = 24m\left(\eps+\delta+\frac{md}{q}\right).
+  \]
+  If $M=\{M_o^u\}$ is any submeasurement and $S_u \subseteq \mathcal O \times \polyfunc{m}{q}{d}$ is any family of subsets, then
+  \[
+    \E_u \sum_{(o,h) \in S_u} \bra{\psi} M_o^u \ot H_h \ket{\psi}
+    \approx_{4\sqrt{\zeta_{\mathrm{var}}}}
+    \E_u \sum_{(o,h) \in S_u} \bra{\psi} A^u_{h(u)} M_o^u A^u_{h(u)} \ot T_h \ket{\psi}.
+  \]
+\end{lemma}
+\begin{proof}
+  Expand $H_h$ by averaging over a second point $v$, then use Lemma~\ref{lem:global-variance-of-points} to replace $A^v_{h(v)}$ by $A^u_{h(u)}$. The remaining terms are controlled by repeated Cauchy--Schwarz.
+\end{proof}
+
+\begin{theorem}[Self-improvement]\label{thm:self-improvement}
+  \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.selfImprovement}
+  \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
+  Let $G \in \polymeas{m}{q}{d}$ be a measurement such that, on average over $u \sim \F_q^m$,
+  \[
+    A_a^u \ot I \simeq_\nu I \ot G_{[g(u)=a]}.
+  \]
+  Set
+  \[
+    \zeta = 3000m\left(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right).
+  \]
+  Then there exists a projective submeasurement $H \in \polysub{m}{q}{d}$ such that:
+  \begin{enumerate}
+    \item if $H=\sum_h H_h$, then $\bra{\psi} H \ot I \ket{\psi} \ge (1-\nu)-\zeta$;
+    \item on average over $u \sim \F_q^m$,
+    \[
+      A_a^u \ot I \simeq_\zeta I \ot H_{[h(u)=a]};
+    \]
+    \item $H_h \ot I \approx_\zeta I \ot H_h$;
+    \item there exists a positive semidefinite operator $Z$ such that
+    \[
+      \bra{\psi} Z \ot (I-H) \ket{\psi} \le \zeta,
+    \]
+    and $Z \ge \E_u A_{h(u)}^u$ for every $h \in \polyfunc{m}{q}{d}$.
+  \end{enumerate}
+\end{theorem}
+\begin{proof}
+  \uses{lem:self-improvement-helper, thm:orthonormalization, prop:self-consistency-implies-data-processing, prop:completeness-transfer-self-consistent-A, prop:triangle-sub, prop:two-notions-of-self-consistency}
+  Apply Lemma~\ref{lem:self-improvement-helper} to obtain a strongly self-consistent submeasurement $\widehat H$. Theorem~\ref{thm:orthonormalization} replaces $\widehat H$ by a nearby projective submeasurement $H$. The preliminary transfer lemmas on strong self-consistency then show that consistency with $A$, completeness, and boundedness survive this replacement with the stated quantitative loss.
+\end{proof}

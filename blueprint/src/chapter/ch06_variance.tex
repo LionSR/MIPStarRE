@@ -1,0 +1,46 @@
+\chapter{Global variance of the points measurements}
+\label{chap:variance}
+
+Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
+
+\begin{lemma}[Replacing a line answer by a fixed polynomial]\label{lem:generalize-b}
+  \lean{MIPStarRE.Paper2009LDT.Section8GlobalVariance.generalizeB}
+  \uses{def:polymeasurements, lem:schwartz-zippel-individual}
+  Let $G \in \polysub{m}{q}{d}$. On the axis-parallel line-test distribution,
+  \[
+    B^{\ell}_{[f(u)=g(u)]} \ot (G_g)^{1/2}
+    \approx_{md/q}
+    B^{\ell}_{g|_{\ell}} \ot (G_g)^{1/2}.
+  \]
+\end{lemma}
+\begin{proof}
+  The two post-processed line outcomes differ only when a degree-$d$ polynomial on $\ell$ agrees with $g$ at the sampled point but is not equal to $g|_\ell$. By Lemma~\ref{lem:schwartz-zippel-individual}, this happens with probability at most $md/q$.
+\end{proof}
+
+\begin{lemma}[Local variance of the points measurements]\label{lem:local-variance-of-points}
+  \lean{MIPStarRE.Paper2009LDT.Section8GlobalVariance.localVarianceOfPoints}
+  \uses{lem:good-strategy-characterization, prop:simeq-to-approx, lem:generalize-b, prop:triangle-inequality-for-approx_delta}
+  Let $G \in \polysub{m}{q}{d}$. On the hypercube edge distribution $(u,v) \sim C$,
+  \[
+    A^u_{g(u)} \ot (G_g)^{1/2}
+    \approx_{24\left(\eps+\delta+\frac{md}{q}\right)}
+    A^v_{g(v)} \ot (G_g)^{1/2}.
+  \]
+\end{lemma}
+\begin{proof}
+  Move from the point measurement at $u$ to the line measurement on the sampled axis-parallel line, replace that line answer by the restriction $g|_\ell$ using Lemma~\ref{lem:generalize-b}, and then reverse the same steps at $v$. The six approximations compose by Lemma~\ref{prop:triangle-inequality-for-approx_delta}.
+\end{proof}
+
+\begin{lemma}[Global variance of the points measurements]\label{lem:global-variance-of-points}
+  \lean{MIPStarRE.Paper2009LDT.Section8GlobalVariance.globalVarianceOfPoints}
+  \uses{def:local-and-variance, lem:local-to-global, lem:local-variance-of-points}
+  Let $G \in \polysub{m}{q}{d}$. On the uniform distribution over independent $u,v \in \F_q^m$,
+  \[
+    A^u_{g(u)} \ot (G_g)^{1/2}
+    \approx_{24m\left(\eps+\delta+\frac{md}{q}\right)}
+    A^v_{g(v)} \ot (G_g)^{1/2}.
+  \]
+\end{lemma}
+\begin{proof}
+  For each polynomial $g$, regard $u \mapsto A^u_{g(u)}$ as a family of operators and apply Lemma~\ref{lem:local-to-global} to the vector $(I \ot (G_g)^{1/2})\ket{\psi}$. Lemma~\ref{lem:local-variance-of-points} supplies the local bound.
+\end{proof}

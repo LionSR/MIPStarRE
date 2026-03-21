@@ -1,0 +1,10 @@
+import MIPStarRE.Paper2009LDT.Section3Test
+import MIPStarRE.Paper2009LDT.Section4Preliminaries
+import MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective
+import MIPStarRE.Paper2009LDT.Section6MainInductionStep
+import MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
+import MIPStarRE.Paper2009LDT.Section8GlobalVariance
+import MIPStarRE.Paper2009LDT.Section9SelfImprovement
+import MIPStarRE.Paper2009LDT.Section10CommutativityPoints
+import MIPStarRE.Paper2009LDT.Section11Commutativity
+import MIPStarRE.Paper2009LDT.Section12Pasting
