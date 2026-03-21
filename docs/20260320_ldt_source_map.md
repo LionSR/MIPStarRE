@@ -1,3 +1,12 @@
+---
+title: LDT source map
+date: 2026-03-20
+status: current
+track: paper2009ldt
+kind: source-map
+origin: internal
+---
+
 # LDT source map (2026-03-20)
 
 Source mirror used: `MIPStarRE/references/ldt-paper/`.
@@ -110,16 +119,19 @@ It is more precisely
 
 ## Blueprint matching decisions
 
-The rebuilt blueprint under `MIPStarRE/blueprint/src/` keeps a single node for each mathematical result, even when the paper states it twice. In particular:
+The rebuilt blueprint under `MIPStarRE/blueprint/src/` now keeps separate nodes when duplicated source statements are not literally identical, and a shared node only when the mathematical statement is genuinely the same.
 
-- the blueprint theorem labeled `thm:self-improvement` carries both Lean links
-  `MIPStarRE.Paper2009LDT.Section6MainInductionStep.selfImprovementInInductionSection` and
-  `MIPStarRE.Paper2009LDT.Section9SelfImprovement.selfImprovement`;
-- the blueprint theorem labeled `thm:ld-pasting` carries both Lean links
+- the self-improvement theorem is now split:
+  - `thm:self-improvement` points to
+    `MIPStarRE.Paper2009LDT.Section9SelfImprovement.selfImprovement`;
+  - `thm:self-improvement-in-induction-section` points to
+    `MIPStarRE.Paper2009LDT.Section6MainInductionStep.selfImprovementInInductionSection`.
+  This avoids hiding the `\polysub` versus `\polymeas` hypothesis mismatch.
+- the blueprint theorem labeled `thm:ld-pasting` still carries both Lean links
   `MIPStarRE.Paper2009LDT.Section6MainInductionStep.ldPastingInInductionSection` and
-  `MIPStarRE.Paper2009LDT.Section12Pasting.ldPasting`.
+  `MIPStarRE.Paper2009LDT.Section12Pasting.ldPasting`, because that duplication is still treated as a single mathematical statement.
 
-This keeps the dependency graph from duplicating the same mathematical statement while still recording both planned Lean declarations.
+This keeps the dependency graph honest without duplicating nodes unnecessarily.
 
 ## Blueprint build status
 

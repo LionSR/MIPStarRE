@@ -6,7 +6,8 @@ import MIPStarRE.Games.TensorCodeTest
 Strict-proof-following roadmap for arXiv:2111.08131.
 
 This file is intentionally lightweight: it records the dependency skeleton for the
-current strict branch, whose source of truth is `blueprint/src/content.tex`.
+preserved strict 2111 branch, whose archived theorem DAG lives in
+`blueprint/legacy/content_2111_strict_20260320.tex`.
 The strict target is the paper's own ambient setting (von Neumann algebra with a
 normal tracial state), so the legacy finite-dimensional pilot files should not be
 viewed as authoritative for this namespace.

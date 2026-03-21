@@ -18,6 +18,7 @@
 *~
 .vscode/
 .vs/
+.claude/settings.local.json
 .texpadtmp/
 *.aux
 *.log

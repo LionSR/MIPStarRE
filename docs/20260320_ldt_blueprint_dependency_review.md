@@ -1,4 +1,15 @@
+---
+title: LDT blueprint dependency review
+date: 2026-03-20
+status: snapshot
+track: paper2009ldt
+kind: dependency-review
+origin: internal
+---
+
 # Structural strengths
+
+_Dated review snapshot: this note records the 2026-03-20 dependency review. Some flagged items were later fixed in the active blueprint, so use it as context rather than as the sole current-state guide._
 
 - The rebuilt blueprint is much closer to the **actual proof-dependency order** than the TeX input order in `references/ldt-paper/multilinearity.tex`. For this paper that is a real advantage, because `inductive_step.tex` states `thm:main-induction`, `thm:self-improvement-in-induction-section`, and `thm:ld-pasting-in-induction-section` before the later files `expansion.tex`, `self_improvement.tex`, `commutativity-points.tex`, `commutativity-G.tex`, and `ld-pasting.tex` supply the machinery needed to justify them.
 
@@ -9,7 +20,7 @@
   - `ch09_pasting.tex` correctly centralizes the `ld-pasting.tex` chain.
   - `ch10_induction.tex` correctly leaves `thm:main-induction` in the induction chapter rather than pretending it is proved where it is first stated in source order.
 
-- The source-map note `docs/ldt_source_map_20260320.md` is largely borne out by the blueprint: the visible route is
+- The source-map note `docs/20260320_ldt_source_map.md` is largely borne out by the blueprint: the visible route is
   `preliminaries -> projectivization -> expansion/variance -> self-improvement -> point commutativity -> slice commutativity -> pasting -> induction`.
   That is the right high-level picture for proof filling.
 
