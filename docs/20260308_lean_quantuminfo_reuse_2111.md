@@ -1,4 +1,15 @@
+---
+title: Lean-QuantumInfo reuse audit for strict 2111
+date: 2026-03-08
+status: archived
+track: paper2111
+kind: external-dependency-audit
+origin: external
+---
+
 # Repository snapshot
+
+_Archived 2111 note: this audit was written for the preserved strict-2111 planning track and is kept as an external-dependency reference, not as current Paper2009LDT guidance._
 
 - I inspected `Timeroot/Lean-QuantumInfo` at GitHub HEAD commit `fcd31bcea57e8280aa47f812dc4396af53cb9318` (latest commit dated 2026-03-07 in the cloned snapshot).
 - Package metadata:
@@ -61,7 +72,7 @@ So even where `Lean-QuantumInfo` has useful mathematics, it is not obviously a b
 # Mismatches and blockers
 
 - **Fundamental ambient mismatch.**
-  - The strict blueprint in `MIPStarRE/blueprint/src/content.tex` targets a von Neumann algebra with a normal tracial state and explicitly says this is **not** to be replaced by a finite-dimensional matrix pilot.
+  - The archived strict 2111 blueprint in `MIPStarRE/blueprint/legacy/content_2111_strict_20260320.tex` targets a von Neumann algebra with a normal tracial state and explicitly says this is **not** to be replaced by a finite-dimensional matrix pilot.
   - `Lean-QuantumInfo` explicitly restricts itself to finite-dimensional Hilbert spaces.
   - Its `QuantumInfo/InfiniteDim/QState.lean` file is essentially dead code, so there is no live infrastructure there for von Neumann algebras, normal states, trace-class operators, or normal positive maps.
 

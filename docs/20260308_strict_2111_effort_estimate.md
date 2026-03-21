@@ -1,4 +1,15 @@
+---
+title: Strict 2111 effort estimate
+date: 2026-03-08
+status: archived
+track: paper2111
+kind: effort-estimate
+origin: internal
+---
+
 # Strict proof-following effort estimate for arXiv:2111.08131
+
+_Archived 2111 note: this estimate is preserved as a point-in-time planning document for the strict 2111 track and should not be read as current Paper2009LDT guidance._
 
 _Date: 2026-03-08._
 
@@ -9,9 +20,9 @@ This note is an evidence-based estimate for a **strict proof-following Lean form
 I based this report on the current repository state at `MIPStarRE/` (HEAD `9901ceb`), and I read the files requested in the task:
 
 - `MIPStarRE/README.md`
-- `MIPStarRE/docs/roadmap.md`
-- `MIPStarRE/docs/mathlib_api_2111.md`
-- `MIPStarRE/blueprint/src/content.tex`
+- `MIPStarRE/docs/20260308_strict_2111_roadmap.md`
+- `MIPStarRE/docs/20260307_mathlib_api_2111.md`
+- `MIPStarRE/blueprint/legacy/content_2111_strict_20260320.tex`
 - `MIPStarRE/MIPStarRE/Quantum/OutcomeFamily.lean`
 - `MIPStarRE/MIPStarRE/Quantum/FiniteMatrix.lean`
 - `MIPStarRE/MIPStarRE/Quantum/Measurement.lean`
@@ -37,7 +48,7 @@ and confirmed that `cd MIPStarRE && lake build` currently succeeds, with only li
 
 ## Executive summary
 
-1. **The strict target is much larger than the current scaffold suggests.** The canonical strict target is the theorem DAG in `blueprint/src/content.tex`, centered on `thm:main` and secondarily `thm:main-bipartite`. The current Lean scaffold still mostly reflects a finite-dimensional pilot.
+1. **The strict target is much larger than the current scaffold suggests.** The canonical strict target is the theorem DAG in `blueprint/legacy/content_2111_strict_20260320.tex`, centered on `thm:main` and secondarily `thm:main-bipartite`. The current Lean scaffold still mostly reflects a finite-dimensional pilot.
 2. **The main underestimated cost is not coding theory; it is the ambient operator-algebra/tracial layer and the Section 5–6 theorem chain.** The decisive blockers are the von Neumann / normal tracial setting, `lem:duality`, `lem:projectivization`, and the Method 2 completeness chain ending in `lem:from-H-to-G`, `lem:chernoff-bernoulli-matrix`, and `lem:pasting`.
 3. **My central estimate for a strict 2111 formalization, assuming the external results are imported as trusted theorems with precise Lean interfaces, is about `81 person-weeks`.** An optimistic / central / pessimistic band is:
    - **54 / 81 / 124 person-weeks** for the paper itself with imported external dependencies.
@@ -74,7 +85,7 @@ The strict ambient setting is the paper’s own one:
   - Section 6 (`lem:pasting`),
   - then Section 4 (`lem:induction`, `thm:main`, `thm:main-bipartite`).
 
-That is exactly the order reflected by `MIPStarRE/blueprint/src/content.tex`, and it is the right backbone for the Lean plan.
+That is exactly the order reflected by `MIPStarRE/blueprint/legacy/content_2111_strict_20260320.tex`, and it is the right backbone for the Lean plan.
 
 ---
 
@@ -149,9 +160,9 @@ Important nuance: **Method 1 is not on the shortest path to the final proof of `
 | File | Verdict for strict 2111 | Notes |
 |---|---|---|
 | `README.md` | misaligned | It explicitly says the first milestone is a **finite-dimensional pilot formalization**. That is not the strict target. |
-| `docs/roadmap.md` | misaligned | Same issue: “Build a finite-dimensional measurement API” is the wrong top-level goal for the strict branch. |
-| `docs/mathlib_api_2111.md` | partially reusable | Useful for coding-theory, `hammingDist`, and weighted-kernel / expander ideas; misaligned for the operator-algebra core because it assumes finite matrices throughout. |
-| `blueprint/src/content.tex` | canonical strict guide | This is the right theorem DAG and phase ordering for the strict project. |
+| `docs/20260308_strict_2111_roadmap.md` | misaligned | Same issue: “Build a finite-dimensional measurement API” is the wrong top-level goal for the strict branch. |
+| `docs/20260307_mathlib_api_2111.md` | partially reusable | Useful for coding-theory, `hammingDist`, and weighted-kernel / expander ideas; misaligned for the operator-algebra core because it assumes finite matrices throughout. |
+| `blueprint/legacy/content_2111_strict_20260320.tex` | canonical strict guide | This is the right theorem DAG and phase ordering for the strict project. |
 | `Quantum/OutcomeFamily.lean` | genuinely reusable | Best current reusable component. It is already operator-agnostic and captures postprocessing / fiberwise bookkeeping needed for `lem:data-processing`. |
 | `Quantum/FiniteMatrix.lean` | mostly misaligned | Good pilot sandbox, but the strict project should not depend on matrix-only normalized trace or a local `IsProj` predicate. In the strict branch this should be treated as legacy or experimental. |
 | `Quantum/Measurement.lean` | design ideas reusable, implementation not | The file proves matrix-valued postprocessing and overlap identities. The strict project needs the same shape of API but over an abstract von Neumann / tracial setting. |
@@ -497,7 +508,7 @@ Only after these six are in place would I start budgeting Section 5 and Section 
 
 ## 8. Bottom-line recommendation
 
-- Use `blueprint/src/content.tex` and the actual paper sections as the source of truth.
+- Use `blueprint/legacy/content_2111_strict_20260320.tex` and the actual paper sections as the source of truth.
 - Treat the current matrix pilot as **legacy scaffolding**, not as the core strict branch.
 - Keep `2111.08131` inside `MIPStarRE`, but enforce a strong internal boundary between reusable strict library code and `Paper2111` theorem files.
 - Budget the strict paper itself at roughly **54 / 81 / 124 person-weeks**.

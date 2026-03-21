@@ -1,10 +1,21 @@
+---
+title: Strict 2111 roadmap
+date: 2026-03-08
+status: archived
+track: paper2111
+kind: roadmap
+origin: internal
+---
+
 # Strict roadmap for arXiv:2111.08131
+
+_Archived 2111 note: this roadmap is kept as legacy planning material for the preserved strict-2111 track, not as current Paper2009LDT guidance._
 
 ## Source of truth
 
-The canonical theorem DAG for the strict branch is:
+This note is an archived roadmap for the preserved 2111 track. The archived strict theorem DAG is:
 
-- `MIPStarRE/blueprint/src/content.tex`
+- `MIPStarRE/blueprint/legacy/content_2111_strict_20260320.tex`
 
 This roadmap follows the paper's actual proof order and labels. In particular, the primary target is `thm:main` (Theorem 4.1), and the secondary target is `thm:main-bipartite` (Theorem 4.7).
 

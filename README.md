@@ -21,8 +21,8 @@ For the active LDT track, use these files in this order:
 1. `references/ldt-paper/` — in-repo TeX source mirror for the paper
 2. `blueprint/src/` — active dependency-tracked blueprint
 3. `MIPStarRE/Paper2009LDT/` — Lean naming/matching scaffold
-4. `docs/ldt_source_map_20260320.md` — source-file / theorem-ownership map
-5. `docs/ldt_blueprint_dependency_review_20260320.md` — dependency and Mathlib audit
+4. `docs/20260320_ldt_source_map.md` — current source-file / theorem-ownership map
+5. `docs/20260320_ldt_blueprint_dependency_review.md` — dated dependency-review snapshot for context, not the canonical source of truth
 
 The current blueprint is organized by **theorem ownership and proof dependency**, not by raw TeX input order.
 
@@ -50,6 +50,7 @@ The repo now contains three distinct layers.
 - `blueprint/legacy/content_2111_strict_20260320.tex`
 - `blueprint/legacy/references_2111_strict_20260320.bib`
 - `MIPStarRE/Paper2111/`
+- archived 2111 notes under `docs/`, including `docs/20260308_strict_2111_roadmap.md`, `docs/20260308_strict_2111_effort_estimate.md`, `docs/20260308_lean_quantuminfo_reuse_2111.md`, and `docs/20260307_mathlib_api_2111.md`
 
 These preserve the earlier 2111 work and should not be treated as the active track.
 
@@ -71,7 +72,7 @@ This is the order suggested by the rebuilt blueprint and the independent depende
 
 A first dependency audit is recorded in:
 
-- `docs/ldt_blueprint_dependency_review_20260320.md`
+- `docs/20260320_ldt_blueprint_dependency_review.md`
 
 Short version:
 
