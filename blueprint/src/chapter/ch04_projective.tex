@@ -27,7 +27,7 @@
   \]
 \end{lemma}
 \begin{proof}
-  Follow the Kempe--Vidick orthogonalization argument~\cite{KV11}. The proof first shows that a consistent measurement is almost projective, then rounds it to nearby projections while controlling the loss in overlap. In the source this compression hides several intermediate operator inequalities and norm-comparison steps; during Lean proof filling these are expected to appear as explicit helper lemmas rather than a single black-box step.
+  Follow the Kempe--Vidick orthogonalization argument~\cite{KV11}. The proof first shows that a consistent measurement is almost projective, then rounds it to nearby projections while controlling the loss in overlap. In the source this compression hides several intermediate operator inequalities and norm-comparison steps; during Lean proof filling these are expected to appear as explicit helper lemmas (currently scaffolded as \lean{consistencyToAlmostProjective} and \lean{roundAlmostProjectiveMeasurement}) rather than a single black-box step.
 \end{proof}
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
