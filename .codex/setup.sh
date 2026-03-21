@@ -13,7 +13,8 @@ if ! command -v elan >/dev/null 2>&1; then
 fi
 
 # Make Lean tools available to later shells
-echo 'export PATH="$HOME/.elan/bin:$PATH"' >> "$HOME/.bashrc"
+grep -qxF 'export PATH="$HOME/.elan/bin:$PATH"' "$HOME/.bashrc" 2>/dev/null || \
+  echo 'export PATH="$HOME/.elan/bin:$PATH"' >> "$HOME/.bashrc"
 export PATH="$HOME/.elan/bin:$PATH"
 
 # Show versions for debugging
