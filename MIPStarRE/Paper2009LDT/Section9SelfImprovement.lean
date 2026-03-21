@@ -18,25 +18,78 @@ def averagedPointOperator (params : Parameters)
     (_strategy : SymmetricStrategy params) (_g : Polynomial params) : Operator :=
   { name := s!"Aavg({params.m},{params.q},{params.d})" }
 
-def sdpStatement (params : Parameters)
-    (_strategy : SymmetricStrategy params) : Prop := True
+/-- The quantitative error from `lem:self-improvement-helper`. -/
+noncomputable def selfImprovementHelperError (params : Parameters)
+    (eps delta : Error) : Error :=
+  100 * (params.m : Error) *
+    (Real.rpow eps (1 / (2 : Error)) +
+      Real.rpow delta (1 / (2 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (2 : Error)))
 
-def addInUStatement {Outcome : Type _} (params : Parameters)
+/-- The quantitative error from `thm:self-improvement`. -/
+noncomputable def selfImprovementError (params : Parameters)
+    (eps delta : Error) : Error :=
+  3000 * (params.m : Error) *
+    (Real.rpow eps (1 / (32 : Error)) +
+      Real.rpow delta (1 / (32 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)))
+
+/-- Output package for `lem:sdp`. -/
+structure SdpStatement (params : Parameters)
+    (_strategy : SymmetricStrategy params) : Prop where
+  dualityWitness : True
+  complementarySlacknessWitness : True
+
+/-- Output package for `lem:add-in-u`. -/
+structure AddInUStatement {Outcome : Type _} (params : Parameters)
     (_strategy : SymmetricStrategy params)
     (_M : IndexedSubMeasurement (Point params) Outcome)
-    (_H : SubMeasurement (Polynomial params)) : Prop := True
+    (_H : SubMeasurement (Polynomial params)) : Prop where
+  averagingTransfer : True
 
-def selfImprovementHelperConclusion (params : Parameters)
-    (_strategy : SymmetricStrategy params)
+/-- Output package for `lem:self-improvement-helper`. -/
+structure SelfImprovementHelperConclusion (params : Parameters)
+    (strategy : SymmetricStrategy params)
     (_G : Measurement (Polynomial params))
-    (_H : SubMeasurement (Polynomial params))
-    (_Z : Operator) (_nu : Error) : Prop := True
+    (H : SubMeasurement (Polynomial params))
+    (Z : Operator) (eps delta gamma nu : Error) : Prop where
+  completeness :
+    CompletenessAtLeast strategy.state H
+      ((1 - nu) - selfImprovementHelperError params eps delta)
+  pointConsistency :
+    ConsistentWithPolynomialEvaluation params strategy.state
+      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
+      H
+      (selfImprovementHelperError params eps delta)
+  strongSelfConsistency :
+    PolynomialMeasurementStronglySelfConsistent params strategy.state H
+      (selfImprovementHelperError params eps delta)
+  bounded :
+    BoundedByOperator strategy.state H Z
+      (selfImprovementHelperError params eps delta)
 
-def selfImprovementConclusion (params : Parameters)
-    (_strategy : SymmetricStrategy params)
+/-- Output package for `thm:self-improvement`. -/
+structure SelfImprovementConclusion (params : Parameters)
+    (strategy : SymmetricStrategy params)
     (_G : Measurement (Polynomial params))
-    (_H : ProjectiveSubMeasurement (Polynomial params))
-    (_Z : Operator) (_nu : Error) : Prop := True
+    (H : ProjectiveSubMeasurement (Polynomial params))
+    (Z : Operator) (eps delta gamma nu : Error) : Prop where
+  completeness :
+    CompletenessAtLeast strategy.state H.toSubMeasurement
+      ((1 - nu) - selfImprovementError params eps delta)
+  pointConsistency :
+    ConsistentWithPolynomialEvaluation params strategy.state
+      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
+      H.toSubMeasurement
+      (selfImprovementError params eps delta)
+  selfCloseness :
+    StateDependentDistanceRel strategy.state (uniformDistribution Unit)
+      (constantSubMeasurementFamily H.toSubMeasurement)
+      (constantSubMeasurementFamily H.toSubMeasurement)
+      (selfImprovementError params eps delta)
+  bounded :
+    BoundedByOperator strategy.state H.toSubMeasurement Z
+      (selfImprovementError params eps delta)
 
 /-- `lem:self-improvement-helper`. -/
 lemma selfImprovementHelper
@@ -49,14 +102,14 @@ lemma selfImprovementHelper
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
       G.toSubMeasurement nu) :
     ∃ H : SubMeasurement (Polynomial params), ∃ Z : Operator,
-      selfImprovementHelperConclusion params strategy G H Z nu := by
+      SelfImprovementHelperConclusion params strategy G H Z eps delta gamma nu := by
   sorry
 
 /-- `lem:sdp`. -/
 lemma sdp
     (params : Parameters)
     (strategy : SymmetricStrategy params) :
-    sdpStatement params strategy := by
+    SdpStatement params strategy := by
   sorry
 
 /-- `lem:add-in-u`. -/
@@ -65,7 +118,7 @@ lemma addInU {Outcome : Type _}
     (strategy : SymmetricStrategy params)
     (M : IndexedSubMeasurement (Point params) Outcome)
     (H : SubMeasurement (Polynomial params)) :
-    addInUStatement params strategy M H := by
+    AddInUStatement params strategy M H := by
   sorry
 
 /-- `thm:self-improvement`. -/
@@ -79,7 +132,7 @@ theorem selfImprovement
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
       G.toSubMeasurement nu) :
     ∃ H : ProjectiveSubMeasurement (Polynomial params), ∃ Z : Operator,
-      selfImprovementConclusion params strategy G H Z nu := by
+      SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
   sorry
 
 end MIPStarRE.Paper2009LDT.Section9SelfImprovement

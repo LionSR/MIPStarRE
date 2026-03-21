@@ -4,9 +4,9 @@ import MIPStarRE.Paper2009LDT.Section11Commutativity
 Matching scaffold for Section 12 of the low individual degree paper in
 `references/ldt-paper/ld-pasting.tex`.
 
-This file only matches the paper's declaration graph. Most propositions are kept
-as lightweight placeholders so that the blueprint can target stable Lean names
-before the proof details are implemented.
+This file only matches the paper's declaration graph. The current pass makes the
+main output packages explicit, while still leaving all proofs and most operator
+semantics for later work.
 -/
 
 namespace MIPStarRE.Paper2009LDT.Section12Pasting
@@ -29,69 +29,111 @@ abbrev GHatOutcome (params : Parameters) := Option (Polynomial params)
 def bernoulliTailOperator (_k _d : ℕ) (_X : Operator) : Operator :=
   { name := "BernoulliTail" }
 
-def ldPastingConclusion (params : Parameters)
-    (_strategy : SymmetricStrategy params.next)
+/-- Output package for `thm:ld-pasting`. -/
+structure LdPastingConclusion (params : Parameters)
+    (strategy : SymmetricStrategy params.next)
     (_family : IndexedPolynomialFamily params)
-    (_H : Measurement (Polynomial params.next))
-    (_kappa _zeta : Error) (_k : ℕ) : Prop := True
+    (H : Measurement (Polynomial params.next))
+    (_eps _delta _gamma _kappa _zeta : Error) (_k : ℕ) : Prop where
+  pointConsistency :
+    ConsistentWithPolynomialEvaluation params.next strategy.state
+      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
+      H.toSubMeasurement
+      (Section6MainInductionStep.ldPastingInInductionError params _k
+        _eps _delta _gamma _kappa _zeta)
 
-def ldPastingSubMeasurementConclusion (params : Parameters)
-    (_strategy : SymmetricStrategy params.next)
+/-- Output package for `lem:ld-pasting-sub-measurement`. -/
+structure LdPastingSubMeasurementConclusion (params : Parameters)
+    (strategy : SymmetricStrategy params.next)
     (_family : IndexedPolynomialFamily params)
-    (_H : SubMeasurement (Polynomial params.next))
-    (_kappa _zeta : Error) (_k : ℕ) : Prop := True
+    (H : SubMeasurement (Polynomial params.next))
+    (_eps _delta _gamma _kappa _zeta : Error) (_k : ℕ) : Prop where
+  pointConsistency :
+    ConsistentWithPolynomialEvaluation params.next strategy.state
+      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
+      H
+      (Section6MainInductionStep.ldPastingInInductionError params _k
+        _eps _delta _gamma _kappa _zeta)
+  completeness : CompletenessAtLeast strategy.state H _kappa
 
-def gCompleteSelfConsistencyStatement (params : Parameters)
-    (_family : IndexedPolynomialFamily params) (_zeta : Error) : Prop := True
+/-- Output package for `lem:g-complete-self-consistency`. -/
+structure GCompleteSelfConsistencyStatement (params : Parameters)
+    (_family : IndexedPolynomialFamily params) (_zeta : Error) : Prop where
+  completePartSelfConsistency : True
 
-def gBotSelfConsistencyStatement (params : Parameters)
-    (_family : IndexedPolynomialFamily params) (_zeta : Error) : Prop := True
+/-- Output package for `cor:g-bot-self-consistency`. -/
+structure GBotSelfConsistencyStatement (params : Parameters)
+    (_family : IndexedPolynomialFamily params) (_zeta : Error) : Prop where
+  incompletePartSelfConsistency : True
 
-def commutativitySwitcherooStatement {Outcome : Type _} (params : Parameters)
+/-- Output package for `lem:commutativity-switcheroo`. -/
+structure CommutativitySwitcherooStatement {Outcome : Type _} (params : Parameters)
     (_family : IndexedPolynomialFamily params)
     (_M : IndexedProjectiveSubMeasurement (Fq params) Outcome)
-    (_omega _chi : Error) : Prop := True
+    (_omega _chi : Error) : Prop where
+  aggregateCommutation : True
 
-def commutingWithGCompleteStatement (params : Parameters)
-    (_family : IndexedPolynomialFamily params) (_zeta : Error) : Prop := True
+/-- Output package for `cor:commuting-with-G-complete`. -/
+structure CommutingWithGCompleteStatement (params : Parameters)
+    (_family : IndexedPolynomialFamily params) (_zeta : Error) : Prop where
+  completePartCommutation : True
 
-def commutingWithGIncompleteStatement (params : Parameters)
-    (_family : IndexedPolynomialFamily params) (_zeta : Error) : Prop := True
+/-- Output package for `cor:commuting-with-G-incomplete`. -/
+structure CommutingWithGIncompleteStatement (params : Parameters)
+    (_family : IndexedPolynomialFamily params) (_zeta : Error) : Prop where
+  incompletePartCommutation : True
 
-def gHatFactsStatement (params : Parameters)
-    (_family : IndexedPolynomialFamily params) (_zeta : Error) : Prop := True
+/-- Output package for `cor:G-hat-facts`. -/
+structure GHatFactsStatement (params : Parameters)
+    (_family : IndexedPolynomialFamily params) (_zeta : Error) : Prop where
+  completedSelfConsistency : True
+  completedCommutation : True
 
-def commuteGHalfSandwichStatement (params : Parameters)
-    (_family : IndexedPolynomialFamily params) (_k : ℕ) : Prop := True
+/-- Output package for `lem:commute-g-half-sandwich`. -/
+structure CommuteGHalfSandwichStatement (params : Parameters)
+    (_family : IndexedPolynomialFamily params) (_k : ℕ) : Prop where
+  repeatedCommutation : True
 
-def ldSandwichLineOnePointStatement (params : Parameters)
+/-- Output package for `lem:ld-sandwich-line-one-point`. -/
+structure LdSandwichLineOnePointStatement (params : Parameters)
     (_strategy : SymmetricStrategy params.next)
     (_family : IndexedPolynomialFamily params)
-    (_k _i : ℕ) : Prop := True
+    (_k _i : ℕ) : Prop where
+  linePointComparison : True
 
-def hBConsistencyStatement (params : Parameters)
+/-- Output package for `lem:h-b-consistency`. -/
+structure HBConsistencyStatement (params : Parameters)
     (_strategy : SymmetricStrategy params.next)
     (_family : IndexedPolynomialFamily params)
-    (_H : SubMeasurement (Polynomial params.next)) (_k : ℕ) : Prop := True
+    (_H : SubMeasurement (Polynomial params.next)) (_k : ℕ) : Prop where
+  lineConsistency : True
 
-def overAllOutcomesStatement (params : Parameters)
+/-- Output package for `lem:over-all-outcomes`. -/
+structure OverAllOutcomesStatement (params : Parameters)
     (_strategy : SymmetricStrategy params.next)
     (_family : IndexedPolynomialFamily params)
-    (_H : SubMeasurement (Polynomial params.next)) (_k : ℕ) : Prop := True
+    (_H : SubMeasurement (Polynomial params.next)) (_k : ℕ) : Prop where
+  totalOutcomeExpansion : True
 
-def fromHToGStatement (params : Parameters)
+/-- Output package for `lem:from-H-to-G`. -/
+structure FromHToGStatement (params : Parameters)
     (_strategy : SymmetricStrategy params.next)
     (_family : IndexedPolynomialFamily params)
-    (_H : SubMeasurement (Polynomial params.next)) (_k : ℕ) : Prop := True
+    (_H : SubMeasurement (Polynomial params.next)) (_k : ℕ) : Prop where
+  bernoulliPolynomialRewrite : True
 
-def chernoffBernoulliMatrixStatement
-    (_theta : Error) (_k _d : ℕ) (_X : Operator) : Prop := True
+/-- Output package for `lem:chernoff-bernoulli-matrix`. -/
+structure ChernoffBernoulliMatrixStatement
+    (_theta : Error) (_k _d : ℕ) (_X : Operator) : Prop where
+  matrixTailBound : True
 
-def ldPastingNCompletenessStatement (params : Parameters)
+/-- Output package for `cor:ld-pasting-N-completeness`. -/
+structure LdPastingNCompletenessStatement (params : Parameters)
     (_strategy : SymmetricStrategy params.next)
     (_family : IndexedPolynomialFamily params)
     (_H : SubMeasurement (Polynomial params.next))
-    (_kappa _nu : Error) (_k : ℕ) : Prop := True
+    (_kappa _nu : Error) (_k : ℕ) : Prop where
+  completenessBound : True
 
 /-- `thm:ld-pasting`. -/
 theorem ldPasting
@@ -106,7 +148,7 @@ theorem ldPasting
     (hbound : family.Bounded strategy.state zeta)
     (k : ℕ) :
     ∃ H : Measurement (Polynomial params.next),
-      ldPastingConclusion params strategy family H kappa zeta k := by
+      LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   sorry
 
 /-- `lem:ld-pasting-sub-measurement`. -/
@@ -122,7 +164,7 @@ lemma ldPastingSubMeasurement
     (hbound : family.Bounded strategy.state zeta)
     (k : ℕ) :
     ∃ H : SubMeasurement (Polynomial params.next),
-      ldPastingSubMeasurementConclusion params strategy family H kappa zeta k := by
+      LdPastingSubMeasurementConclusion params strategy family H eps delta gamma kappa zeta k := by
   sorry
 
 /-- `prop:ld-dnoteq`. -/
@@ -146,7 +188,7 @@ lemma gCompleteSelfConsistency
     (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (zeta : Error) :
-    gCompleteSelfConsistencyStatement params family zeta := by
+    GCompleteSelfConsistencyStatement params family zeta := by
   sorry
 
 /-- `cor:g-bot-self-consistency`. -/
@@ -154,7 +196,7 @@ theorem gBotSelfConsistency
     (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (zeta : Error) :
-    gBotSelfConsistencyStatement params family zeta := by
+    GBotSelfConsistencyStatement params family zeta := by
   sorry
 
 /-- `lem:commutativity-switcheroo`. -/
@@ -163,7 +205,7 @@ lemma commutativitySwitcheroo {Outcome : Type _}
     (family : IndexedPolynomialFamily params)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome)
     (omega chi : Error) :
-    commutativitySwitcherooStatement params family M omega chi := by
+    CommutativitySwitcherooStatement params family M omega chi := by
   sorry
 
 /-- `cor:commuting-with-G-complete`. -/
@@ -171,7 +213,7 @@ theorem commutingWithGComplete
     (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (zeta : Error) :
-    commutingWithGCompleteStatement params family zeta := by
+    CommutingWithGCompleteStatement params family zeta := by
   sorry
 
 /-- `cor:commuting-with-G-incomplete`. -/
@@ -179,7 +221,7 @@ theorem commutingWithGIncomplete
     (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (zeta : Error) :
-    commutingWithGIncompleteStatement params family zeta := by
+    CommutingWithGIncompleteStatement params family zeta := by
   sorry
 
 /-- `cor:G-hat-facts`. -/
@@ -187,7 +229,7 @@ theorem gHatFacts
     (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (zeta : Error) :
-    gHatFactsStatement params family zeta := by
+    GHatFactsStatement params family zeta := by
   sorry
 
 /-- `lem:commute-g-half-sandwich`. -/
@@ -195,7 +237,7 @@ lemma commuteGHalfSandwich
     (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (k : ℕ) :
-    commuteGHalfSandwichStatement params family k := by
+    CommuteGHalfSandwichStatement params family k := by
   sorry
 
 /-- `lem:ld-sandwich-line-one-point`. -/
@@ -204,7 +246,7 @@ lemma ldSandwichLineOnePoint
     (strategy : SymmetricStrategy params.next)
     (family : IndexedPolynomialFamily params)
     (k i : ℕ) :
-    ldSandwichLineOnePointStatement params strategy family k i := by
+    LdSandwichLineOnePointStatement params strategy family k i := by
   sorry
 
 /-- `lem:h-b-consistency`. -/
@@ -214,7 +256,7 @@ lemma hBConsistency
     (family : IndexedPolynomialFamily params)
     (H : SubMeasurement (Polynomial params.next))
     (k : ℕ) :
-    hBConsistencyStatement params strategy family H k := by
+    HBConsistencyStatement params strategy family H k := by
   sorry
 
 /-- `lem:over-all-outcomes`. -/
@@ -224,7 +266,7 @@ lemma overAllOutcomes
     (family : IndexedPolynomialFamily params)
     (H : SubMeasurement (Polynomial params.next))
     (k : ℕ) :
-    overAllOutcomesStatement params strategy family H k := by
+    OverAllOutcomesStatement params strategy family H k := by
   sorry
 
 /-- `lem:from-H-to-G`. -/
@@ -234,14 +276,14 @@ lemma fromHToG
     (family : IndexedPolynomialFamily params)
     (H : SubMeasurement (Polynomial params.next))
     (k : ℕ) :
-    fromHToGStatement params strategy family H k := by
+    FromHToGStatement params strategy family H k := by
   sorry
 
 /-- `lem:chernoff-bernoulli-matrix`. -/
 lemma chernoffBernoulliMatrix
     (theta : Error) (k d : ℕ) (X : Operator)
     (hθ0 : 0 < theta) (hθ1 : theta < 1) :
-    chernoffBernoulliMatrixStatement theta k d X := by
+    ChernoffBernoulliMatrixStatement theta k d X := by
   sorry
 
 /-- `cor:ld-pasting-N-completeness`. -/
@@ -252,7 +294,7 @@ theorem ldPastingNCompleteness
     (H : SubMeasurement (Polynomial params.next))
     (kappa nu : Error)
     (k : ℕ) :
-    ldPastingNCompletenessStatement params strategy family H kappa nu k := by
+    LdPastingNCompletenessStatement params strategy family H kappa nu k := by
   sorry
 
 end MIPStarRE.Paper2009LDT.Section12Pasting

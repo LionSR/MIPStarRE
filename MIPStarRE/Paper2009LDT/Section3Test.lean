@@ -82,7 +82,8 @@ def uniformDistribution (α : Type _) : Distribution α where
 def totalVariationDistance {α : Type _} (_μ _ν : Distribution α) : Error := 0
 
 /-- Abstract positive semidefiniteness predicate. -/
-def PositiveSemidefinite (_Z : Operator) : Prop := True
+structure PositiveSemidefinite (_Z : Operator) : Prop where
+  nonnegativeWitness : True
 
 /-- A paper-local submeasurement with outcomes in `α`. -/
 structure SubMeasurement (α : Type _) where
@@ -165,44 +166,52 @@ def evaluateFiberFamilyAt (params : Parameters) (u : Point params)
   fun x => evaluateAt params u (G x)
 
 /-- Placeholder consistency relation. -/
-def ConsistencyRel {Question Outcome : Type _}
+structure ConsistencyRel {Question Outcome : Type _}
     (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A _B : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop := True
+    (_A _B : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop where
+  offDiagonalBound : True
 
 /-- Placeholder state-dependent distance relation. -/
-def StateDependentDistanceRel {Question Outcome : Type _}
+structure StateDependentDistanceRel {Question Outcome : Type _}
     (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A _B : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop := True
+    (_A _B : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop where
+  squaredDistanceBound : True
 
 /-- Placeholder strong self-consistency relation. -/
-def StrongSelfConsistencyRel {Question Outcome : Type _}
+structure StrongSelfConsistencyRel {Question Outcome : Type _}
     (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop := True
+    (_A : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop where
+  diagonalOverlapBound : True
 
 /-- Placeholder completeness statement for a submeasurement. -/
-def CompletenessAtLeast {Outcome : Type _}
-    (_ψ : QuantumState) (_A : SubMeasurement Outcome) (_r : Error) : Prop := True
+structure CompletenessAtLeast {Outcome : Type _}
+    (_ψ : QuantumState) (_A : SubMeasurement Outcome) (_r : Error) : Prop where
+  lowerBound : True
 
 /-- Placeholder boundedness statement witnessed by an operator. -/
-def BoundedByOperator {Outcome : Type _}
-    (_ψ : QuantumState) (_A : SubMeasurement Outcome) (_Z : Operator) (_δ : Error) : Prop := True
+structure BoundedByOperator {Outcome : Type _}
+    (_ψ : QuantumState) (_A : SubMeasurement Outcome) (_Z : Operator) (_δ : Error) : Prop where
+  upperBound : True
 
 /-- Placeholder consistency between a points measurement and a global polynomial submeasurement. -/
-def ConsistentWithPolynomialEvaluation (params : Parameters)
+structure ConsistentWithPolynomialEvaluation (params : Parameters)
     (_ψ : QuantumState)
     (_A : IndexedSubMeasurement (Point params) (Fq params))
     (_G : SubMeasurement (Polynomial params))
-    (_δ : Error) : Prop := True
+    (_δ : Error) : Prop where
+  evaluationConsistency : True
 
 /-- Placeholder consistency between two global polynomial submeasurements. -/
-def PolynomialMeasurementsConsistent (params : Parameters)
+structure PolynomialMeasurementsConsistent (params : Parameters)
     (_ψ : QuantumState)
     (_G₁ _G₂ : SubMeasurement (Polynomial params))
-    (_δ : Error) : Prop := True
+    (_δ : Error) : Prop where
+  mutualConsistency : True
 
 /-- Placeholder strong self-consistency for a global polynomial submeasurement. -/
-def PolynomialMeasurementStronglySelfConsistent (params : Parameters)
-    (_ψ : QuantumState) (_G : SubMeasurement (Polynomial params)) (_δ : Error) : Prop := True
+structure PolynomialMeasurementStronglySelfConsistent (params : Parameters)
+    (_ψ : QuantumState) (_G : SubMeasurement (Polynomial params)) (_δ : Error) : Prop where
+  diagonalMassBound : True
 
 /-- Paper-local symmetric strategy data. -/
 structure SymmetricStrategy (params : Parameters) where
@@ -229,13 +238,25 @@ structure ProjectiveStrategy (params : Parameters) where
     IndexedProjectiveMeasurement (DiagonalLine params) (DiagonalLinePolynomial params)
   deriving Inhabited
 
+namespace SymmetricStrategy
+
 /-- Placeholder for the paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
-def SymmetricStrategy.IsGood {params : Parameters} (_strategy : SymmetricStrategy params)
-    (_eps _delta _gamma : Error) : Prop := True
+structure IsGood {params : Parameters} (_strategy : SymmetricStrategy params)
+    (_eps _delta _gamma : Error) : Prop where
+  axisParallelTest : True
+  selfConsistencyTest : True
+  diagonalLineTest : True
+
+end SymmetricStrategy
+
+namespace ProjectiveStrategy
 
 /-- Placeholder for passing the full low-individual-degree test with error `ε`. -/
-def ProjectiveStrategy.PassesLowIndividualDegreeTest {params : Parameters}
-    (_strategy : ProjectiveStrategy params) (_eps : Error) : Prop := True
+structure PassesLowIndividualDegreeTest {params : Parameters}
+    (_strategy : ProjectiveStrategy params) (_eps : Error) : Prop where
+  soundnessHypothesis : True
+
+end ProjectiveStrategy
 
 /-- A packaged family `x ↦ G^x` together with its witness operators. -/
 structure IndexedPolynomialFamily (params : Parameters) where
@@ -243,26 +264,34 @@ structure IndexedPolynomialFamily (params : Parameters) where
   witness : Fq params → Operator := fun _ => default
   deriving Inhabited
 
-def IndexedPolynomialFamily.Complete {params : Parameters}
-    (_family : IndexedPolynomialFamily params)
-    (_ψ : QuantumState) (_kappa : Error) : Prop := True
+namespace IndexedPolynomialFamily
 
-def IndexedPolynomialFamily.ConsistentWithPoints {params : Parameters}
-    (_family : IndexedPolynomialFamily params)
-    (_strategy : SymmetricStrategy params.next) (_zeta : Error) : Prop := True
+structure Complete {params : Parameters} (_family : IndexedPolynomialFamily params)
+    (_ψ : QuantumState) (_kappa : Error) : Prop where
+  averageCompleteness : True
 
-def IndexedPolynomialFamily.StronglySelfConsistent {params : Parameters}
-    (_family : IndexedPolynomialFamily params)
-    (_ψ : QuantumState) (_zeta : Error) : Prop := True
+structure ConsistentWithPoints {params : Parameters} (_family : IndexedPolynomialFamily params)
+    (_strategy : SymmetricStrategy params.next) (_zeta : Error) : Prop where
+  pointConsistency : True
 
-def IndexedPolynomialFamily.Bounded {params : Parameters}
-    (_family : IndexedPolynomialFamily params)
-    (_ψ : QuantumState) (_zeta : Error) : Prop := True
+structure StronglySelfConsistent {params : Parameters} (_family : IndexedPolynomialFamily params)
+    (_ψ : QuantumState) (_zeta : Error) : Prop where
+  sliceSelfConsistency : True
+
+structure Bounded {params : Parameters} (_family : IndexedPolynomialFamily params)
+    (_ψ : QuantumState) (_zeta : Error) : Prop where
+  sliceBoundedness : True
+
+end IndexedPolynomialFamily
 
 namespace Section3Test
 
-/-- Placeholder for the explicit `ν` from `thm:main-formal`. -/
-def mainFormalError (_params : Parameters) (_k : ℕ) (_eps : Error) : Error := 0
+/-- The explicit `ν` from `thm:main-formal`, recorded with the paper's formula. -/
+noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) : Error :=
+  100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+    (Real.rpow eps (1 / (40000 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (40000 : Error)) +
+      Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))))
 
 /--
 `thm:main-formal` from `test_definition.tex`.

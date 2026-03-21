@@ -22,6 +22,8 @@
 
 \section{Formal soundness target}
 
+\criticize{`Section3Test.mainFormal` now carries the paper's explicit $\nu$ formula, but the input predicate `ProjectiveStrategy.PassesLowIndividualDegreeTest` and the output relations `ConsistentWithPolynomialEvaluation` / `PolynomialMeasurementsConsistent` in `Section3Test.lean` are still abstract placeholders. The theorem shape is present; the game semantics are not yet formalized.}{4}{5}
+
 \begin{theorem}[Quantum soundness of the low individual degree test]\label{thm:main-formal}
   \lean{MIPStarRE.Paper2009LDT.Section3Test.mainFormal}
   \uses{def:projective-strategy}

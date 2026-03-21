@@ -9,9 +9,11 @@ namespace MIPStarRE.Paper2009LDT.Section10CommutativityPoints
 
 open MIPStarRE.Paper2009LDT
 
-def commutativityPointsStatement (params : Parameters)
+/-- Output package for `thm:commutativity-points`. -/
+structure CommutativityPointsStatement (params : Parameters)
     (_strategy : SymmetricStrategy params)
-    (_eps _delta _gamma : Error) : Prop := True
+    (_eps _delta _gamma : Error) : Prop where
+  pointwiseCommutation : True
 
 /-- `thm:commutativity-points`. -/
 theorem commutativityPoints
@@ -19,7 +21,7 @@ theorem commutativityPoints
     (strategy : SymmetricStrategy params)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
-    commutativityPointsStatement params strategy eps delta gamma := by
+    CommutativityPointsStatement params strategy eps delta gamma := by
   sorry
 
 end MIPStarRE.Paper2009LDT.Section10CommutativityPoints

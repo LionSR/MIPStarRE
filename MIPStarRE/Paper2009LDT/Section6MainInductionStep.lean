@@ -18,33 +18,89 @@ def xRestrictedStrategy (params : Parameters)
     (_strategy : SymmetricStrategy params.next) (_x : Fq params) : SymmetricStrategy params :=
   default
 
-/-- Placeholder for the explicit `σ` of `thm:main-induction`. -/
-def mainInductionError (_params : Parameters) (_k : ℕ)
-    (_eps _delta _gamma : Error) : Error := 0
+/-- The intermediate `ν` from `thm:main-induction`. -/
+noncomputable def mainInductionNu (params : Parameters) (k : ℕ)
+    (eps delta gamma : Error) : Error :=
+  1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
+    (Real.rpow eps (1 / (1024 : Error)) +
+      Real.rpow delta (1 / (1024 : Error)) +
+      Real.rpow gamma (1 / (1024 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)))
 
-/-- Placeholder for the section-local self-improvement error. -/
-def selfImprovementInInductionError (_params : Parameters)
-    (_eps _delta _gamma : Error) : Error := 0
+/-- The explicit `σ` of `thm:main-induction`. -/
+noncomputable def mainInductionError (params : Parameters) (k : ℕ)
+    (eps delta gamma : Error) : Error :=
+  ((params.m : Error) ^ (2 : ℕ)) *
+    (mainInductionNu params k eps delta gamma +
+      Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))))
 
-/-- Placeholder for the section-local pasting consistency error. -/
-def ldPastingInInductionError (_params : Parameters) (_k : ℕ)
-    (_eps _delta _gamma _kappa _zeta : Error) : Error := 0
+/-- The section-local self-improvement error. -/
+noncomputable def selfImprovementInInductionError (params : Parameters)
+    (eps delta _gamma : Error) : Error :=
+  3000 * (params.m : Error) *
+    (Real.rpow eps (1 / (32 : Error)) +
+      Real.rpow delta (1 / (32 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)))
 
-def selfImprovementInInductionSectionConclusion (params : Parameters)
-    (_strategy : SymmetricStrategy params)
+/-- The intermediate `ν` from the section-local pasting theorem. -/
+noncomputable def ldPastingInInductionNu (params : Parameters) (k : ℕ)
+    (eps delta gamma zeta : Error) : Error :=
+  100 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+    (Real.rpow eps (1 / (32 : Error)) +
+      Real.rpow delta (1 / (32 : Error)) +
+      Real.rpow gamma (1 / (32 : Error)) +
+      Real.rpow zeta (1 / (32 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)))
+
+/-- The section-local pasting consistency error. -/
+noncomputable def ldPastingInInductionError (params : Parameters) (k : ℕ)
+    (eps delta gamma kappa zeta : Error) : Error :=
+  kappa * (1 + 1 / (100 * (params.m : Error))) +
+    2 * ldPastingInInductionNu params k eps delta gamma zeta +
+    Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))
+
+/-- Output package for the induction-level self-improvement theorem. -/
+structure SelfImprovementInInductionSectionConclusion (params : Parameters)
+    (strategy : SymmetricStrategy params)
     (_G : SubMeasurement (Polynomial params))
-    (_H : ProjectiveSubMeasurement (Polynomial params))
-    (_Z : Operator) (_nu : Error) : Prop := True
+    (H : ProjectiveSubMeasurement (Polynomial params))
+    (Z : Operator) (eps delta gamma nu : Error) : Prop where
+  completeness :
+    CompletenessAtLeast strategy.state H.toSubMeasurement
+      ((1 - nu) - selfImprovementInInductionError params eps delta gamma)
+  pointConsistency :
+    ConsistentWithPolynomialEvaluation params strategy.state
+      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
+      H.toSubMeasurement
+      (selfImprovementInInductionError params eps delta gamma)
+  selfCloseness :
+    StateDependentDistanceRel strategy.state (uniformDistribution Unit)
+      (constantSubMeasurementFamily H.toSubMeasurement)
+      (constantSubMeasurementFamily H.toSubMeasurement)
+      (selfImprovementInInductionError params eps delta gamma)
+  bounded :
+    BoundedByOperator strategy.state H.toSubMeasurement Z
+      (selfImprovementInInductionError params eps delta gamma)
 
-def ldPastingInInductionSectionConclusion (params : Parameters)
-    (_strategy : SymmetricStrategy params.next)
+/-- Output package for the section-local pasting theorem. -/
+structure LdPastingInInductionSectionConclusion (params : Parameters)
+    (strategy : SymmetricStrategy params.next)
     (_family : IndexedPolynomialFamily params)
-    (_H : Measurement (Polynomial params.next))
-    (_kappa _zeta : Error) (_k : ℕ) : Prop := True
+    (H : Measurement (Polynomial params.next))
+    (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
+  pointConsistency :
+    ConsistentWithPolynomialEvaluation params.next strategy.state
+      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
+      H.toSubMeasurement
+      (ldPastingInInductionError params k eps delta gamma kappa zeta)
 
-def restrictedProbabilitiesStatement (params : Parameters)
+/-- Bookkeeping package for the restricted-probabilities lemma. -/
+structure RestrictedProbabilitiesStatement (params : Parameters)
     (_strategy : SymmetricStrategy params.next)
-    (_eps _delta _gamma : Error) : Prop := True
+    (_eps _delta _gamma : Error) : Prop where
+  axisParallelAverage : True
+  selfConsistencyAverage : True
+  diagonalAverage : True
 
 /-- `thm:main-induction`. -/
 theorem mainInduction
@@ -70,7 +126,7 @@ theorem selfImprovementInInductionSection
     (hcons : ConsistentWithPolynomialEvaluation params strategy.state
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement) G nu) :
     ∃ H : ProjectiveSubMeasurement (Polynomial params), ∃ Z : Operator,
-      selfImprovementInInductionSectionConclusion params strategy G H Z nu := by
+      SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   sorry
 
 /-- `thm:ld-pasting-in-induction-section`. -/
@@ -86,7 +142,8 @@ theorem ldPastingInInductionSection
     (hbound : family.Bounded strategy.state zeta)
     (k : ℕ) :
     ∃ H : Measurement (Polynomial params.next),
-      ldPastingInInductionSectionConclusion params strategy family H kappa zeta k := by
+      LdPastingInInductionSectionConclusion params strategy family H
+        eps delta gamma kappa zeta k := by
   sorry
 
 /-- `lem:restricted-probabilities`. -/
@@ -95,7 +152,7 @@ lemma restrictedProbabilities
     (strategy : SymmetricStrategy params.next)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
-    restrictedProbabilitiesStatement params strategy eps delta gamma := by
+    RestrictedProbabilitiesStatement params strategy eps delta gamma := by
   sorry
 
 end MIPStarRE.Paper2009LDT.Section6MainInductionStep

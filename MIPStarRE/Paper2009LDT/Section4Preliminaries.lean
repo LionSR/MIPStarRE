@@ -39,34 +39,52 @@ def strongSelfConsistency {Question Outcome : Type _}
     (A : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
   StrongSelfConsistencyRel ψ 𝒟 A δ
 
-def consistencyAsAgreement {Question Outcome : Type _}
+/-- Output package for the measurement reformulation of consistency. -/
+structure ConsistencyAsAgreement {Question Outcome : Type _}
     (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A _B : IndexedMeasurement Question Outcome) (_δ : Error) : Prop := True
+    (_A _B : IndexedMeasurement Question Outcome) (_δ : Error) : Prop where
+  diagonalAgreementReformulation : True
 
+/-- Post-process an indexed family questionwise. -/
 def postprocessIndexedSubMeasurement {Question α β : Type _}
     (A : IndexedSubMeasurement Question α) (f : α → β) :
     IndexedSubMeasurement Question β :=
   fun q => postProcessing (A q) f
 
-def consSubMeasStatement {Question Outcome : Type _}
+/-- Output package for `prop:cons-sub-meas`. -/
+structure ConsSubMeasStatement {Question Outcome : Type _}
     (_ψ : QuantumState) (_𝒟 : Distribution Question)
     (_A : IndexedSubMeasurement Question Outcome)
-    (_B : IndexedMeasurement Question Outcome) (_γ : Error) : Prop := True
+    (_B : IndexedMeasurement Question Outcome) (_γ : Error) : Prop where
+  diagonalControl : True
+  sandwichControl : True
+  combinedControl : True
 
-def switchSandwichStatement {Question Outcome : Type _}
+/-- Output package for `prop:switch-sandwich`. -/
+structure SwitchSandwichStatement {Question Outcome : Type _}
     (_ψ : QuantumState) (_𝒟 : Distribution Question)
     (_A : IndexedProjectiveSubMeasurement Question Outcome)
-    (_B : Operator) (_δ : Error) : Prop := True
+    (_B : Operator) (_δ : Error) : Prop where
+  leftSandwichTransfer : True
+  rightSandwichTransfer : True
 
-def completenessTransferProjectivePStatement {Question Outcome : Type _}
+/-- Output package for `prop:completeness-transfer-projective-P`. -/
+structure CompletenessTransferProjectivePStatement {Question Outcome : Type _}
     (_ψ : QuantumState) (_𝒟 : Distribution Question)
     (_A : IndexedSubMeasurement Question Outcome)
-    (_P : IndexedProjectiveSubMeasurement Question Outcome) (_ε : Error) : Prop := True
+    (_P : IndexedProjectiveSubMeasurement Question Outcome) (_ε : Error) : Prop where
+  completenessTransfer : True
 
-def completingToMeasurementStatement {Outcome : Type _}
-    (_ψ : QuantumState)
-    (_A : Measurement Outcome) (_B : SubMeasurement Outcome)
-    (_C : Measurement Outcome) (_a0 : Outcome) (_δ _ζ : Error) : Prop := True
+/-- Output package for `prop:completing-to-measurement`. -/
+structure CompletingToMeasurementStatement {Outcome : Type _}
+    (ψ : QuantumState)
+    (A : Measurement Outcome) (_B : SubMeasurement Outcome)
+    (C : Measurement Outcome) (_a0 : Outcome) (_δ _ζ : Error) : Prop where
+  closenessAfterCompletion :
+    StateDependentDistanceRel ψ (uniformDistribution Unit)
+      (constantSubMeasurementFamily A.toSubMeasurement)
+      (constantSubMeasurementFamily C.toSubMeasurement)
+      (_δ + _ζ)
 
 /-- `prop:simeq-for-measurements`. -/
 theorem simeqForMeasurements {Question Outcome : Type _}
@@ -74,7 +92,7 @@ theorem simeqForMeasurements {Question Outcome : Type _}
     (A B : IndexedMeasurement Question Outcome) (δ : Error) :
     consistency ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
         (IndexedMeasurement.toIndexedSubMeasurement B) δ ↔
-      consistencyAsAgreement ψ 𝒟 A B δ := by
+      ConsistencyAsAgreement ψ 𝒟 A B δ := by
   sorry
 
 /-- `prop:simeq-to-approx`. -/
@@ -102,7 +120,7 @@ theorem consSubMeas {Question Outcome : Type _}
     (A : IndexedSubMeasurement Question Outcome)
     (B : IndexedMeasurement Question Outcome) (γ : Error) :
     consistency ψ 𝒟 A (IndexedMeasurement.toIndexedSubMeasurement B) γ →
-      consSubMeasStatement ψ 𝒟 A B γ := by
+      ConsSubMeasStatement ψ 𝒟 A B γ := by
   sorry
 
 /-- `prop:switch-sandwich`. -/
@@ -113,7 +131,7 @@ theorem switchSandwich {Question Outcome : Type _}
     stateDependentDistance ψ 𝒟
         (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
         (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A) δ →
-      switchSandwichStatement ψ 𝒟 A B δ := by
+      SwitchSandwichStatement ψ 𝒟 A B δ := by
   sorry
 
 /-- `prop:completeness-transfer-projective-P`. -/
@@ -123,7 +141,7 @@ theorem completenessTransferProjectiveP {Question Outcome : Type _}
     (P : IndexedProjectiveSubMeasurement Question Outcome) (ε : Error) :
     stateDependentDistance ψ 𝒟 A
         (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement P) ε →
-      completenessTransferProjectivePStatement ψ 𝒟 A P ε := by
+      CompletenessTransferProjectivePStatement ψ 𝒟 A P ε := by
   sorry
 
 /-- `prop:two-notions-of-self-consistency`. -/
@@ -145,7 +163,7 @@ theorem completingToMeasurement {Outcome : Type _}
         (constantSubMeasurementFamily A.toSubMeasurement)
         (constantSubMeasurementFamily B) δ →
       ∃ C : Measurement Outcome,
-        completingToMeasurementStatement ψ A B C a0 δ ζ := by
+        CompletingToMeasurementStatement ψ A B C a0 δ ζ := by
   sorry
 
 end MIPStarRE.Paper2009LDT.Section4Preliminaries

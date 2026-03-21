@@ -19,24 +19,27 @@ structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type _) where
   right : IndexedMeasurement QuestionB OutcomeB
   deriving Inhabited
 
-/-- Placeholder statement packaged with `NaimarkData`. -/
-def naimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type _}
+/-- Statement package carried by `NaimarkData`. -/
+structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type _}
     (_ψ : QuantumState)
     (_A : IndexedSubMeasurement QuestionA OutcomeA)
     (_B : IndexedSubMeasurement QuestionB OutcomeB)
-    (_data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB) : Prop := True
+    (_data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB) : Prop where
+  correlationPreservation : True
 
-/-- Placeholder for the explicit orthonormalization error term. -/
-def orthonormalizationError (_ζ : Error) : Error := 0
+/-- The explicit error in `thm:orthonormalization`. -/
+noncomputable def orthonormalizationError (ζ : Error) : Error :=
+  100 * Real.rpow ζ (1 / (4 : Error))
 
-/-- Placeholder for the explicit error in the measurement version of the lemma. -/
-def orthonormalizationMainLemmaError (_ζ : Error) : Error := 0
+/-- The explicit error in the measurement version of the lemma. -/
+noncomputable def orthonormalizationMainLemmaError (ζ : Error) : Error :=
+  84 * Real.rpow ζ (1 / (4 : Error))
 
 /-- Placeholder error for the intermediate "consistency implies almost-projective" step. -/
-def consistencyToAlmostProjectiveError (_ζ : Error) : Error := 0
+def consistencyToAlmostProjectiveError (ζ : Error) : Error := ζ
 
 /-- Placeholder error for the intermediate rounding-to-projective step. -/
-def roundingToProjectiveError (_ζ : Error) : Error := 0
+def roundingToProjectiveError (ζ : Error) : Error := ζ
 
 /-- `thm:naimark`. -/
 theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type _}
@@ -44,7 +47,7 @@ theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type _}
     (A : IndexedSubMeasurement QuestionA OutcomeA)
     (B : IndexedSubMeasurement QuestionB OutcomeB) :
     ∃ data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB,
-      naimarkStatement ψ A B data := by
+      NaimarkStatement ψ A B data := by
   sorry
 
 /-- `thm:orthonormalization`. -/

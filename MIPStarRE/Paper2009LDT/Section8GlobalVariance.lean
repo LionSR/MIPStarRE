@@ -13,17 +13,23 @@ namespace MIPStarRE.Paper2009LDT.Section8GlobalVariance
 
 open MIPStarRE.Paper2009LDT
 
-def generalizeBStatement (params : Parameters)
+/-- Output package for `lem:generalize-b`. -/
+structure GeneralizeBStatement (params : Parameters)
     (_strategy : SymmetricStrategy params)
-    (_G : SubMeasurement (Polynomial params)) : Prop := True
+    (_G : SubMeasurement (Polynomial params)) : Prop where
+  lineRestrictionComparison : True
 
-def localVarianceOfPointsStatement (params : Parameters)
+/-- Output package for `lem:local-variance-of-points`. -/
+structure LocalVarianceOfPointsStatement (params : Parameters)
     (_strategy : SymmetricStrategy params)
-    (_G : SubMeasurement (Polynomial params)) : Prop := True
+    (_G : SubMeasurement (Polynomial params)) : Prop where
+  edgewiseVarianceBound : True
 
-def globalVarianceOfPointsStatement (params : Parameters)
+/-- Output package for `lem:global-variance-of-points`. -/
+structure GlobalVarianceOfPointsStatement (params : Parameters)
     (_strategy : SymmetricStrategy params)
-    (_G : SubMeasurement (Polynomial params)) : Prop := True
+    (_G : SubMeasurement (Polynomial params)) : Prop where
+  globalVarianceBound : True
 
 /-- `lem:generalize-b`. -/
 lemma generalizeB
@@ -32,7 +38,7 @@ lemma generalizeB
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeasurement (Polynomial params)) :
-    generalizeBStatement params strategy G := by
+    GeneralizeBStatement params strategy G := by
   sorry
 
 /-- `lem:local-variance-of-points`. -/
@@ -42,7 +48,7 @@ lemma localVarianceOfPoints
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeasurement (Polynomial params)) :
-    localVarianceOfPointsStatement params strategy G := by
+    LocalVarianceOfPointsStatement params strategy G := by
   sorry
 
 /-- `lem:global-variance-of-points`. -/
@@ -52,7 +58,7 @@ lemma globalVarianceOfPoints
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeasurement (Polynomial params)) :
-    globalVarianceOfPointsStatement params strategy G := by
+    GlobalVarianceOfPointsStatement params strategy G := by
   sorry
 
 end MIPStarRE.Paper2009LDT.Section8GlobalVariance

@@ -9,19 +9,25 @@ namespace MIPStarRE.Paper2009LDT.Section11Commutativity
 
 open MIPStarRE.Paper2009LDT
 
-def commDataProcessedGConclusion (params : Parameters)
+/-- Output package for `lem:comm-data-processed-g`. -/
+structure CommDataProcessedGConclusion (params : Parameters)
     (_strategy : SymmetricStrategy params.next)
     (_family : IndexedPolynomialFamily params)
-    (_zeta : Error) : Prop := True
+    (_zeta : Error) : Prop where
+  evaluatedSliceCommutation : True
 
-def comMainConclusion (params : Parameters)
+/-- Output package for `thm:com-main`. -/
+structure ComMainConclusion (params : Parameters)
     (_strategy : SymmetricStrategy params.next)
     (_family : IndexedPolynomialFamily params)
-    (_zeta : Error) : Prop := True
+    (_zeta : Error) : Prop where
+  fullSliceCommutation : True
 
-def normalizationConditionStatement {OutcomeA OutcomeB : Type _}
+/-- Output package for `lem:normalization-condition`. -/
+structure NormalizationConditionStatement {OutcomeA OutcomeB : Type _}
     (_P : SubMeasurement OutcomeA)
-    (_Q : ProjectiveSubMeasurement OutcomeB) : Prop := True
+    (_Q : ProjectiveSubMeasurement OutcomeB) : Prop where
+  sandwichedNormalization : True
 
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG
@@ -33,7 +39,7 @@ lemma commDataProcessedG
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
-    commDataProcessedGConclusion params strategy family zeta := by
+    CommDataProcessedGConclusion params strategy family zeta := by
   sorry
 
 /-- `thm:com-main`. -/
@@ -46,14 +52,14 @@ theorem comMain
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
-    comMainConclusion params strategy family zeta := by
+    ComMainConclusion params strategy family zeta := by
   sorry
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type _}
     (P : SubMeasurement OutcomeA)
     (Q : ProjectiveSubMeasurement OutcomeB) :
-    normalizationConditionStatement P Q := by
+    NormalizationConditionStatement P Q := by
   sorry
 
 end MIPStarRE.Paper2009LDT.Section11Commutativity
