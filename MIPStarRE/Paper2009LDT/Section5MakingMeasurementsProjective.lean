@@ -11,6 +11,7 @@ shape while leaving all proofs for a later pass.
 namespace MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective
 
 open MIPStarRE.Paper2009LDT
+open MIPStarRE.Paper2009LDT.Section4Preliminaries
 
 /-- Output package for the paper's Naimark dilation theorem. -/
 structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type _) where
@@ -44,10 +45,10 @@ theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type _}
 /-- `thm:orthonormalization`. -/
 theorem orthonormalization {Outcome : Type _}
     (ψ : QuantumState) (A : SubMeasurement Outcome) (ζ : Error) :
-    StrongSelfConsistencyRel ψ (uniformDistribution Unit)
+    strongSelfConsistency ψ (uniformDistribution Unit)
         (constantSubMeasurementFamily A) ζ →
       ∃ P : ProjectiveSubMeasurement Outcome,
-        StateDependentDistanceRel ψ (uniformDistribution Unit)
+        stateDependentDistance ψ (uniformDistribution Unit)
           (constantSubMeasurementFamily A)
           (constantSubMeasurementFamily P.toSubMeasurement)
           (orthonormalizationError ζ) := by
@@ -57,11 +58,11 @@ theorem orthonormalization {Outcome : Type _}
 lemma orthonormalizationMainLemma {Outcome : Type _}
     (ψ : QuantumState)
     (A B : Measurement Outcome) (ζ : Error) :
-    ConsistencyRel ψ (uniformDistribution Unit)
+    consistency ψ (uniformDistribution Unit)
       (constantSubMeasurementFamily A.toSubMeasurement)
       (constantSubMeasurementFamily B.toSubMeasurement) ζ →
       ∃ P : ProjectiveSubMeasurement Outcome,
-        StateDependentDistanceRel ψ (uniformDistribution Unit)
+        stateDependentDistance ψ (uniformDistribution Unit)
           (constantSubMeasurementFamily A.toSubMeasurement)
           (constantSubMeasurementFamily P.toSubMeasurement)
           (orthonormalizationMainLemmaError ζ) := by

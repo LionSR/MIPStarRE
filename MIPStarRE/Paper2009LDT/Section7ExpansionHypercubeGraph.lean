@@ -36,11 +36,6 @@ def localVariance (params : Parameters)
 def globalVariance (params : Parameters)
     (_A : Point params → Operator) (_ψ : QuantumState) : Error := 0
 
-/-- Combined accessor for the local and global variance placeholders. -/
-def localAndVariance (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Error × Error :=
-  (localVariance params A ψ, globalVariance params A ψ)
-
 def eigenvectorsStatement (_params : Parameters) : Prop := True
 
 def laplacianSpectralGapStatement (_params : Parameters) : Prop := True

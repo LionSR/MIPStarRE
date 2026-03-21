@@ -108,6 +108,16 @@ abbrev IndexedProjectiveSubMeasurement (Question Outcome : Type _) :=
 abbrev IndexedProjectiveMeasurement (Question Outcome : Type _) :=
   Question → ProjectiveMeasurement Outcome
 
+/-! ### Coercions for the measurement type hierarchy -/
+
+instance : Coe (Measurement α) (SubMeasurement α) := ⟨Measurement.toSubMeasurement⟩
+instance : Coe (ProjectiveSubMeasurement α) (SubMeasurement α) :=
+  ⟨ProjectiveSubMeasurement.toSubMeasurement⟩
+instance : Coe (ProjectiveMeasurement α) (Measurement α) :=
+  ⟨ProjectiveMeasurement.toMeasurement⟩
+instance : Coe (ProjectiveMeasurement α) (SubMeasurement α) :=
+  ⟨fun p => p.toMeasurement.toSubMeasurement⟩
+
 namespace IndexedMeasurement
 
 def toIndexedSubMeasurement {Question Outcome : Type _}
@@ -279,16 +289,13 @@ theorem mainFormal
     (k : ℕ) :
     ∃ G_A G_B : ProjectiveMeasurement (Polynomial params),
       ConsistentWithPolynomialEvaluation params strategy.state
-          (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementA)
-          G_B.toSubMeasurement
-          (mainFormalError params k eps) ∧
+          strategy.pointMeasurementA.toIndexedSubMeasurement
+          G_B.toSubMeasurement (mainFormalError params k eps) ∧
         ConsistentWithPolynomialEvaluation params strategy.state
-          (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementB)
-          G_A.toSubMeasurement
-          (mainFormalError params k eps) ∧
+          strategy.pointMeasurementB.toIndexedSubMeasurement
+          G_A.toSubMeasurement (mainFormalError params k eps) ∧
         PolynomialMeasurementsConsistent params strategy.state
-          G_A.toSubMeasurement
-          G_B.toSubMeasurement
+          G_A.toSubMeasurement G_B.toSubMeasurement
           (mainFormalError params k eps) := by
   sorry
 

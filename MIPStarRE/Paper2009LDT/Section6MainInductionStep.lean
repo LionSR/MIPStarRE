@@ -55,7 +55,7 @@ theorem mainInduction
     (k : ℕ) :
     ∃ G : Measurement (Polynomial params),
       ConsistentWithPolynomialEvaluation params strategy.state
-        (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
+        strategy.pointMeasurement.toIndexedSubMeasurement
         G.toSubMeasurement
         (mainInductionError params k eps delta gamma) := by
   sorry
@@ -68,7 +68,7 @@ theorem selfImprovementInInductionSection
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeasurement (Polynomial params))
     (hcons : ConsistentWithPolynomialEvaluation params strategy.state
-      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement) G nu) :
+      strategy.pointMeasurement.toIndexedSubMeasurement G nu) :
     ∃ H : ProjectiveSubMeasurement (Polynomial params), ∃ Z : Operator,
       selfImprovementInInductionSectionConclusion params strategy G H Z nu := by
   sorry

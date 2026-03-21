@@ -46,8 +46,7 @@ lemma selfImprovementHelper
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params))
     (hcons : ConsistentWithPolynomialEvaluation params strategy.state
-      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
-      G.toSubMeasurement nu) :
+      strategy.pointMeasurement.toIndexedSubMeasurement G.toSubMeasurement nu) :
     ∃ H : SubMeasurement (Polynomial params), ∃ Z : Operator,
       selfImprovementHelperConclusion params strategy G H Z nu := by
   sorry
@@ -76,8 +75,7 @@ theorem selfImprovement
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params))
     (hcons : ConsistentWithPolynomialEvaluation params strategy.state
-      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
-      G.toSubMeasurement nu) :
+      strategy.pointMeasurement.toIndexedSubMeasurement G.toSubMeasurement nu) :
     ∃ H : ProjectiveSubMeasurement (Polynomial params), ∃ Z : Operator,
       selfImprovementConclusion params strategy G H Z nu := by
   sorry

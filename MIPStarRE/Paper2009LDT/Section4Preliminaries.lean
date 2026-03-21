@@ -72,8 +72,7 @@ def completingToMeasurementStatement {Outcome : Type _}
 theorem simeqForMeasurements {Question Outcome : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedMeasurement Question Outcome) (δ : Error) :
-    consistency ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
-        (IndexedMeasurement.toIndexedSubMeasurement B) δ ↔
+    consistency ψ 𝒟 A.toIndexedSubMeasurement B.toIndexedSubMeasurement δ ↔
       consistencyAsAgreement ψ 𝒟 A B δ := by
   sorry
 
@@ -81,10 +80,9 @@ theorem simeqForMeasurements {Question Outcome : Type _}
 theorem simeqToApprox {Question Outcome : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedMeasurement Question Outcome) (δ : Error) :
-    consistency ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
-        (IndexedMeasurement.toIndexedSubMeasurement B) δ →
-      stateDependentDistance ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
-        (IndexedMeasurement.toIndexedSubMeasurement B) (2 * δ) := by
+    consistency ψ 𝒟 A.toIndexedSubMeasurement B.toIndexedSubMeasurement δ →
+      stateDependentDistance ψ 𝒟 A.toIndexedSubMeasurement
+        B.toIndexedSubMeasurement (2 * δ) := by
   sorry
 
 /-- `prop:simeq-data-processing`. -/
@@ -101,7 +99,7 @@ theorem consSubMeas {Question Outcome : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome)
     (B : IndexedMeasurement Question Outcome) (γ : Error) :
-    consistency ψ 𝒟 A (IndexedMeasurement.toIndexedSubMeasurement B) γ →
+    consistency ψ 𝒟 A B.toIndexedSubMeasurement γ →
       consSubMeasStatement ψ 𝒟 A B γ := by
   sorry
 
@@ -110,9 +108,8 @@ theorem switchSandwich {Question Outcome : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedProjectiveSubMeasurement Question Outcome)
     (B : Operator) (δ : Error) :
-    stateDependentDistance ψ 𝒟
-        (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
-        (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A) δ →
+    stateDependentDistance ψ 𝒟 A.toIndexedSubMeasurement
+        A.toIndexedSubMeasurement δ →
       switchSandwichStatement ψ 𝒟 A B δ := by
   sorry
 
@@ -121,8 +118,7 @@ theorem completenessTransferProjectiveP {Question Outcome : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome)
     (P : IndexedProjectiveSubMeasurement Question Outcome) (ε : Error) :
-    stateDependentDistance ψ 𝒟 A
-        (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement P) ε →
+    stateDependentDistance ψ 𝒟 A P.toIndexedSubMeasurement ε →
       completenessTransferProjectivePStatement ψ 𝒟 A P ε := by
   sorry
 
