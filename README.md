@@ -1,71 +1,152 @@
 # MIPStarRE
 
-Formalization project for the mathematics around $\mathrm{MIP}^*=\mathrm{RE}$, currently focused on a **strict proof-following formalization of arXiv:2111.08131** (*Quantum Soundness of Testing Tensor Codes*).
+Formalization project for mathematics around $\mathrm{MIP}^*=\mathrm{RE}$.
+
+## Active paper track
+
+The current active proof-following track is:
+
+- arXiv:2009.12982, *Quantum soundness of the classical low individual degree test*
+
+Inside the repo, the working paper source for this track is the modular mirror:
+
+- `references/ldt-paper/`
+
+The older 2111 tensor-code track is **preserved**, but it is no longer the active source of truth.
 
 ## Current source of truth
 
-The canonical roadmap for the strict branch is:
+For the active LDT track, use these files in this order:
 
-- `blueprint/src/content.tex`
+1. `references/ldt-paper/` — in-repo TeX source mirror for the paper
+2. `blueprint/src/` — active dependency-tracked blueprint
+3. `MIPStarRE/Paper2009LDT/` — Lean naming/matching scaffold
+4. `docs/ldt_source_map_20260320.md` — source-file / theorem-ownership map
+5. `docs/ldt_blueprint_dependency_review_20260320.md` — dependency and Mathlib audit
 
-For arXiv:2111.08131 the main strict targets are:
+The current blueprint is organized by **theorem ownership and proof dependency**, not by raw TeX input order.
 
-- `thm:main` (Theorem 4.1): the synchronous / tracial soundness theorem,
-- `thm:main-bipartite` (Theorem 4.7): the later two-prover extension.
+## Current repository state
 
-The strict branch follows the paper's ambient setting:
+The repo now contains three distinct layers.
 
-- a von Neumann algebra,
-- a normal tracial state,
-- and projective measurements valued in that algebra.
+### 1. Active LDT blueprint
 
-A finite-dimensional matrix pilot may still be useful as reference material, but it is **not** the source of truth for the strict branch.
+- `blueprint/src/content.tex` is now a router.
+- The active chapter files live under `blueprint/src/chapter/`.
+- The blueprint targets the low-individual-degree paper and links to declarations in `MIPStarRE.Paper2009LDT.*`.
 
-## Repository status
+### 2. Active Lean matching scaffold
 
-The repository currently contains a mixture of:
+- `MIPStarRE/Paper2009LDT/` contains section-by-section Lean files for Sections 3--12.
+- This is currently a **matching scaffold**:
+  - lightweight paper-local definitions,
+  - theorem statements present,
+  - proofs mostly `by sorry`.
+- The purpose of this layer is to stabilize declaration names and match the blueprint before proof filling.
 
-- **strict assets that should survive** into the paper-faithful development,
-- and **legacy pilot scaffolding** from an earlier finite-dimensional warm-up.
+### 3. Preserved legacy material
 
-The main reusable assets already present are:
+- `blueprint/legacy/content_2111_strict_20260320.tex`
+- `blueprint/legacy/references_2111_strict_20260320.bib`
+- `MIPStarRE/Paper2111/`
 
-- `MIPStarRE/Quantum/OutcomeFamily.lean` for answer relabeling / data-processing bookkeeping,
-- `MIPStarRE/Codes/LinearCode.lean` for code uniqueness and interpolation interfaces,
-- `MIPStarRE/Games/TensorCodeTest.lean` for grid and axis-parallel-line geometry,
-- `blueprint/` for the strict dependency-tracked theorem DAG.
+These preserve the earlier 2111 work and should not be treated as the active track.
 
-Files such as `Quantum/FiniteMatrix.lean` and the current matrix-based `Quantum/Measurement.lean` should be treated as **legacy pilot references**, not as the strict ambient layer.
+## Recommended proof-filling order
+
+The source-file order is not the proof-dependency order. The recommended implementation order is:
+
+1. Sections 3--4: test setup and preliminaries
+2. Section 5: making measurements projective
+3. Sections 7--8: expansion and global variance
+4. Section 9: self-improvement
+5. Sections 10--11: commutativity
+6. Section 12: pasting
+7. Section 6: main induction wrapper
+
+This is the order suggested by the rebuilt blueprint and the independent dependency review.
+
+## Dependency picture
+
+A first dependency audit is recorded in:
+
+- `docs/ldt_blueprint_dependency_review_20260320.md`
+
+Short version:
+
+### Likely already supported reasonably well by Mathlib
+- finite-dimensional complex matrices
+- Hermitian / PSD operators
+- trace identities
+- Hermitian spectral theorem
+- positive square roots / continuous functional calculus
+- finite fields, Frobenius, trace
+- additive characters / finite-field Fourier ingredients
+- some scalar probability and binomial concentration tools
+
+### Likely requiring thin local wrappers
+- paper-specific measurement postprocessing and completion
+- the relations $\simeq_\delta$, $\approx_\delta$, and strong self-consistency
+- hypercube operator normalization
+- sandwiched-product constructions and completed families like $\widehat G$
+- operator-polynomial notation used in pasting
+
+### Likely requiring substantial local development
+- POVM / Naimark infrastructure
+- the SVD-based orthonormalization chain in Section 5
+- SDP duality / complementary slackness in Section 9
+- weighted hypercube spectral package in the paper's normalization
+- matrix Chernoff in Section 12
+- the paper's exact Schwartz--Zippel wrappers
+
+## Important architectural note
+
+The current `Paper2009LDT` Lean files are a **bridge layer**, not yet the final semantic foundation.
+
+The likely long-term direction is to rebase the semantic development onto the existing honest matrix/measurement layer already in the repo:
+
+- `MIPStarRE/Quantum/FiniteMatrix.lean`
+- `MIPStarRE/Quantum/Measurement.lean`
+- `MIPStarRE/Quantum/OutcomeFamily.lean`
+
+So the present scaffold should be read as:
+
+- blueprint-matching names first,
+- semantic rebase next,
+- proofs after that.
 
 ## Repository layout
 
-- `MIPStarRE/Quantum/` — reusable measurement bookkeeping and related infrastructure.
-- `MIPStarRE/Codes/` — code and tensor-code infrastructure.
-- `MIPStarRE/Games/` — tensor-code-test geometry and strategy interfaces.
-- `MIPStarRE/Paper2111/` — paper-specific theorem nodes and section skeletons for arXiv:2111.08131.
-- `blueprint/` — strict Lean blueprint and dependency-tracked notes.
-- `docs/` — estimates, audits, and planning notes.
-- `references/` — bibliographic or source-tracking material.
+- `MIPStarRE/Quantum/` — reusable matrix / measurement infrastructure
+- `MIPStarRE/Codes/` — coding-theoretic infrastructure
+- `MIPStarRE/Games/` — game/test geometry and related scaffolding
+- `MIPStarRE/Paper2009LDT/` — active paper-local scaffold for the LDT paper
+- `MIPStarRE/Paper2111/` — preserved older 2111 track
+- `blueprint/` — active blueprint and legacy blueprint snapshots
+- `docs/` — source maps, dependency reviews, and planning notes
+- `references/` — in-repo paper sources and bibliographic material
 
-## Immediate strict milestones
+## Build
 
-1. Choose the ambient von Neumann / normal tracial model for the strict branch.
-2. Rebuild the measurement layer abstractly in that setting.
-3. Finish the missing tensor-code layer.
-4. Formalize `def:tracial-strat` and `def:tracial-good`.
-5. Formalize Appendix A and the spectral-gap bridge used by `lem:variance`.
-6. Introduce precise external interfaces for `de2021orthogonalization` and `vidick2021almost`.
-
-## Getting started
+From the repo root:
 
 ```bash
 lake exe cache get
 lake build
 ```
 
-## GitHub configuration
+Blueprint commands are run from the repo root with the local Python tool path available, e.g.
 
-After creating the repository on GitHub, enable:
+```bash
+PATH="$HOME/Library/Python/3.9/bin:$PATH" leanblueprint pdf
+PATH="$HOME/Library/Python/3.9/bin:$PATH" leanblueprint web
+```
 
-1. **Actions → General → Allow GitHub Actions to create and approve pull requests**
-2. **Pages → Source → GitHub Actions**
+## Current status summary
+
+- active blueprint rebuilt for the LDT paper
+- `Paper2009LDT` Lean scaffold added
+- blueprint-to-Lean naming pass completed
+- `lake build` passes
+- next major step: semantic rebase of Sections 3--4, then dependency-ordered proof filling
