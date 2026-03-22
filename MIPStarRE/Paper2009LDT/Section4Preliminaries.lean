@@ -234,13 +234,11 @@ theorem simeqToApprox {Question Outcome : Type _}
 /-- `prop:simeq-data-processing`. -/
 theorem simeqDataProcessing {Question α β : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
-    (A B : IndexedMeasurement Question α) (δ : Error) (f : α → β) :
-    consistency ψ 𝒟
-        (IndexedMeasurement.toIndexedSubMeasurement A)
-        (IndexedMeasurement.toIndexedSubMeasurement B) δ →
+    (A B : IndexedSubMeasurement Question α) (δ : Error) (f : α → β) :
+    consistency ψ 𝒟 A B δ →
       consistency ψ 𝒟
-        (postprocessIndexedSubMeasurement (IndexedMeasurement.toIndexedSubMeasurement A) f)
-        (postprocessIndexedSubMeasurement (IndexedMeasurement.toIndexedSubMeasurement B) f) δ := by
+        (postprocessIndexedSubMeasurement A f)
+        (postprocessIndexedSubMeasurement B f) δ := by
   sorry
 
 /-- `prop:cons-sub-meas`. -/
