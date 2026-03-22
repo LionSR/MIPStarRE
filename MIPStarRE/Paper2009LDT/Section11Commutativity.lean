@@ -9,31 +9,12 @@ namespace MIPStarRE.Paper2009LDT.Section11Commutativity
 
 open MIPStarRE.Paper2009LDT
 open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
+open MIPStarRE.Paper2009LDT.Section10CommutativityPoints
 
 abbrev EvaluatedSliceQuestion (params : Parameters) := Point params.next × Point params.next
 abbrev EvaluatedSliceOutcome (params : Parameters) := Fq params × Fq params
 abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
 abbrev FullSliceOutcome (params : Parameters) := Polynomial params × Polynomial params
-
-/-- Place a submeasurement on the left tensor factor. -/
-def leftPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
-  name := s!"{A.name}.left"
-  outcomeOperator := fun a => leftTensor (A.outcomeOperator a)
-  totalOperator := leftTensor A.totalOperator
-
-/-- Place a submeasurement on the right tensor factor. -/
-def rightPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
-  name := s!"{A.name}.right"
-  outcomeOperator := fun a => rightTensor (A.outcomeOperator a)
-  totalOperator := rightTensor A.totalOperator
-
-/-- Ordered product of two paper-local submeasurements on the same tensor factor. -/
-def orderedProductSubMeasurement {α β : Type _}
-    (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
-    SubMeasurement (α × β) where
-  name := label
-  outcomeOperator := fun | (a, b) => formalProduct (A.outcomeOperator a) (B.outcomeOperator b)
-  totalOperator := formalProduct A.totalOperator B.totalOperator
 
 /-- Ordered product placed on the left tensor factor. -/
 def leftOrderedProductSubMeasurement {α β : Type _}

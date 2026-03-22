@@ -14,6 +14,7 @@ namespace MIPStarRE.Paper2009LDT.Section12Pasting
 
 open MIPStarRE.Paper2009LDT
 open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
+open MIPStarRE.Paper2009LDT.Section10CommutativityPoints
 
 /-- The set of `k`-tuples with distinct coordinates. -/
 def distinctTuples (params : Parameters) (k : ℕ) : Set (PointTuple params k) :=
@@ -42,26 +43,6 @@ def tagSubMeasurement {α : Type _} (tag : String) (A : SubMeasurement α) : Sub
   name := s!"{A.name}.{tag}"
   outcomeOperator := A.outcomeOperator
   totalOperator := A.totalOperator
-
-/-- Place a submeasurement on the left tensor factor. -/
-def leftPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
-  name := s!"{A.name}.left"
-  outcomeOperator := fun a => leftTensor (A.outcomeOperator a)
-  totalOperator := leftTensor A.totalOperator
-
-/-- Place a submeasurement on the right tensor factor. -/
-def rightPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
-  name := s!"{A.name}.right"
-  outcomeOperator := fun a => rightTensor (A.outcomeOperator a)
-  totalOperator := rightTensor A.totalOperator
-
-/-- Ordered product of two paper-local submeasurements on the same tensor factor. -/
-def orderedProductSubMeasurement {α β : Type _}
-    (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
-    SubMeasurement (α × β) where
-  name := label
-  outcomeOperator := fun | (a, b) => formalProduct (A.outcomeOperator a) (B.outcomeOperator b)
-  totalOperator := formalProduct A.totalOperator B.totalOperator
 
 /-- Multiply each outcome operator by a total operator on the right. -/
 def multiplyByTotalOnRight {α β : Type _}

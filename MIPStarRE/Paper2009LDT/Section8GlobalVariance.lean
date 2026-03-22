@@ -245,7 +245,7 @@ noncomputable def localVarianceDeviationAtPolynomial (params : Parameters)
     (strategy : SymmetricStrategy params)
     (G : SubMeasurement (Polynomial params))
     (g : Polynomial params) : Error :=
-  averageOverDistribution (rerandomizeCoord params)
+  placeholderAverageOverDistribution (rerandomizeCoord params)
     (fun uv =>
       operatorExpectation strategy.state
         (formalSquare
@@ -258,7 +258,7 @@ noncomputable def globalVarianceDeviationAtPolynomial (params : Parameters)
     (strategy : SymmetricStrategy params)
     (G : SubMeasurement (Polynomial params))
     (g : Polynomial params) : Error :=
-  averageOverDistribution (independentPointPair params)
+  placeholderAverageOverDistribution (independentPointPair params)
     (fun uv =>
       operatorExpectation strategy.state
         (formalSquare

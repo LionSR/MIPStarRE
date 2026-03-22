@@ -125,8 +125,9 @@ noncomputable def placeholderScalar (tag : String) : Error :=
 noncomputable def operatorExpectation (ψ : QuantumState) (X : Operator) : Error :=
   placeholderScalar s!"Exp[{ψ.name}|{X.name}]"
 
-/-- Placeholder for averaging a real-valued observable over a distribution. -/
-noncomputable def averageOverDistribution {α : Type _}
+/-- Placeholder for averaging a real-valued observable over a distribution.
+Named to avoid shadowing the honest `averageOverDistribution` in the base namespace. -/
+noncomputable def placeholderAverageOverDistribution {α : Type _}
     (𝒟 : Distribution α) (f : α → Error) : Error := by
   classical
   let base := placeholderScalar s!"Avg[{𝒟.name}]"
@@ -167,14 +168,14 @@ def pointDifferenceSquaredOperator {params : Parameters}
 noncomputable def localVarianceDifferenceForm (params : Parameters)
     (A : Point params → Operator) (ψ : QuantumState) : Error :=
   (1 / (2 : Error)) *
-    averageOverDistribution (rerandomizeCoord params)
+    placeholderAverageOverDistribution (rerandomizeCoord params)
       (fun uv => operatorExpectation ψ (pointDifferenceSquaredOperator A uv.1 uv.2))
 
 /-- The displayed global-variance formula from `def:local-and-variance`. -/
 noncomputable def globalVarianceDifferenceForm (params : Parameters)
     (A : Point params → Operator) (ψ : QuantumState) : Error :=
   (1 / (2 : Error)) *
-    averageOverDistribution (independentPointPair params)
+    placeholderAverageOverDistribution (independentPointPair params)
       (fun uv => operatorExpectation ψ (pointDifferenceSquaredOperator A uv.1 uv.2))
 
 /-- The local variance from `def:local-and-variance`. -/
