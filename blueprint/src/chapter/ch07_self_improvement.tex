@@ -3,7 +3,6 @@
 
 Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
 
-\criticize{`Section9SelfImprovement.lean` now exposes the helper and final theorem outputs as explicit packages carrying completeness, point-consistency, self-consistency/closeness, and boundedness fields. The remaining gap is no longer the shape of the outputs but the core inputs: `SdpStatement` and `AddInUStatement` are still abstract, so the actual self-improvement mechanism is not yet formalized.}{4}{5}
 
 \begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
   \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.selfImprovementHelper}
@@ -40,7 +39,6 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
   Lemma~\ref{lem:global-variance-of-points} controls how the point projectors change when the evaluation point moves, and Lemma~\ref{lem:add-in-u} inserts that averaging into expressions involving $H$. The four conclusions then follow by applying these two tools to the completeness, consistency, self-consistency, and boundedness expressions.
 \end{proof}
 
-\criticize{There is still no actual convex-duality layer behind `Section9SelfImprovement.sdp`. No current `Paper2009LDT` file imports a reusable SDP or complementary-slackness framework, so this lemma remains a standalone mathematical subproject rather than a routine proof fill.}{3}{4}
 
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
   \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.sdp}

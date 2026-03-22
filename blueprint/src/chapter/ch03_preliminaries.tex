@@ -3,7 +3,6 @@
 
 \section{Polynomials and measurements}
 
-\criticize{The active Lean scaffold still models the ambient finite field too coarsely. In `Section3Test.lean`, `Fq` is only `Fin q`, and the polynomial-like outcome types are plain function types, so honest field structure and individual-degree constraints are still missing.}{4}{5}
 
 \begin{definition}[Low individual degree polynomials]\label{def:polyfunc}
   Let $\polyfunc{m}{q}{d}$ be the set of functions $g\colon \F_q^m \to \F_q$ that are represented by polynomials whose degree in each variable is at most $d$.
@@ -46,7 +45,6 @@
 
 \section{Consistency and state-dependent distance}
 
-\criticize{`Section4Preliminaries.lean` now exposes named output packages for this comparison calculus, but the underlying relations `ConsistencyRel`, `StateDependentDistanceRel`, and `StrongSelfConsistencyRel` in `Section3Test.lean` are still abstract placeholders and are not yet tied to the honest matrix-level infrastructure in `MIPStarRE/Quantum/Measurement.lean` and `MIPStarRE/Quantum/OutcomeFamily.lean`.}{4}{5}
 
 \begin{definition}[Consistency]\label{def:simeq}
   \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.consistency}

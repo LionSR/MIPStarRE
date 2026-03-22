@@ -3,7 +3,6 @@
 
 \section{Restricting to one slice}
 
-\criticize{`Section6MainInductionStep.lean` now records the displayed induction and pasting error formulas explicitly, but the restriction bookkeeping itself is still not implemented: `xRestrictedStrategy` is still `default`, and the restricted-probability package is only an abstract interface. This is the main remaining semantic gap in the induction wrapper.}{4}{5}
 
 \begin{definition}[Appending a line at height $x$]\label{def:append-x}
   For $x \in \F_q$, let $\operatorname{append}_x(\ell)$ be the line in $\F_q^{m+1}$ obtained by appending the coordinate $x$ to every point of a line $\ell \subseteq \F_q^m$. If $f\colon \ell \to \F_q$, let $\operatorname{append}_x(f)$ be the polynomial on $\operatorname{append}_x(\ell)$ defined by $\operatorname{append}_x(f)(u,x)=f(u)$.
@@ -67,8 +66,7 @@
 \end{theorem}
 \begin{proof}
   \uses{thm:self-improvement, prop:completing-to-measurement, prop:triangle-sub, prop:simeq-data-processing}
-  \criticize{The Lean side now has an explicit output package for `selfImprovementInInductionSection`, so this proof sketch should eventually be rewritten in mathematical reduction form: complete the input submeasurement, apply `Section9SelfImprovement.selfImprovement`, then transfer back through completion and data processing.}{2}{5}
-  This is the induction-level self-improvement statement recorded in \texttt{inductive\_step.tex}. Chapter~\ref{chap:self-improvement} proves the corresponding measurement-level theorem. The source keeps the stronger submeasurement-input form explicit, so the blueprint keeps a separate node for it instead of identifying it with Theorem~\ref{thm:self-improvement}.
+  Complete the input submeasurement $G$ by adjoining the missing mass as an extra outcome. Apply Theorem~\ref{thm:self-improvement} to the resulting measurement, then restrict back to the original outcome set and transfer the consistency and boundedness estimates through completion and data processing. The source keeps this stronger submeasurement-input form explicit, so the blueprint keeps a separate node for it instead of identifying it with Theorem~\ref{thm:self-improvement}.
 \end{proof}
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
