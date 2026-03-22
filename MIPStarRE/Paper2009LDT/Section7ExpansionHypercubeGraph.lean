@@ -392,13 +392,19 @@ noncomputable def orthogonalModeProjectorMatrix (params : Parameters) :
     MatrixOperator (pointHilbertSpace params) :=
   1 - constantModeProjectorMatrix params
 
+/-- The paper's normalized adjacency weight for an ordered pair of vertices. -/
+noncomputable def hypercubeAdjacencyWeight (params : Parameters)
+    (u v : Point params) : ℂ :=
+  if h0 : coordinateDisagreementCount params u v = 0 then
+    ((params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹
+  else if h1 : coordinateDisagreementCount params u v = 1 then
+    ((params.m : ℂ) * (params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹
+  else 0
+
 /-- The actual adjacency matrix of the edge-graph on `F_q^m`. -/
 noncomputable def matrixAdjacencyOperator (params : Parameters) :
     MatrixOperator (pointHilbertSpace params) :=
-  fun u v =>
-    if h : IsHypercubeEdge params u v then
-      (hypercubeVertexCount params : ℂ)⁻¹
-    else 0
+  fun u v => hypercubeAdjacencyWeight params u v
 
 /-- The actual Laplacian matrix `(1 / M) I - K` on the vertex register. -/
 noncomputable def matrixLaplacianOperator (params : Parameters) :

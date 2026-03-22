@@ -677,8 +677,8 @@ structure LdPastingSubMeasurementConclusion (params : Parameters)
   completeness :
     CompletenessAtLeast strategy.state H
       (ldPastingCompletenessLowerBound params kappa
-        (Section6MainInductionStep.ldPastingInInductionError params k
-          eps delta gamma kappa zeta) k)
+        (Section6MainInductionStep.ldPastingInInductionNu params k
+          eps delta gamma zeta) k)
 
 /-- Output package for `lem:g-complete-self-consistency`. -/
 structure GCompleteSelfConsistencyStatement (params : Parameters)
