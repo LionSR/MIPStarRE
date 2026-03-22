@@ -3,6 +3,7 @@
 
 Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
 
+
 \begin{lemma}[Replacing a line answer by a fixed polynomial]\label{lem:generalize-b}
   \lean{MIPStarRE.Paper2009LDT.Section8GlobalVariance.generalizeB}
   \uses{def:polymeasurements, lem:schwartz-zippel-individual}
@@ -14,7 +15,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
   \]
 \end{lemma}
 \begin{proof}
-  The two post-processed line outcomes differ only when a degree-$d$ polynomial on $\ell$ agrees with $g$ at the sampled point but is not equal to $g|_\ell$. By Lemma~\ref{lem:schwartz-zippel-individual}, this happens with probability at most $md/q$.
+  Expand the $\approx_{md/q}$ norm on the weighted vector $(I\ot (G_g)^{1/2})\ket{\psi}$. Because $B^\ell$ is a projective measurement, only those line polynomials $f$ with $f\ne g|_\ell$ and $f(u)=g(u)$ contribute. Lemma~\ref{lem:schwartz-zippel-individual} bounds the probability of this event by $md/q$, and the remaining operator sum is bounded by the fact that $G$ is a submeasurement.
 \end{proof}
 
 \begin{lemma}[Local variance of the points measurements]\label{lem:local-variance-of-points}
@@ -28,7 +29,14 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
   \]
 \end{lemma}
 \begin{proof}
-  Move from the point measurement at $u$ to the line measurement on the sampled axis-parallel line, replace that line answer by the restriction $g|_\ell$ using Lemma~\ref{lem:generalize-b}, and then reverse the same steps at $v$. The six approximations compose by Lemma~\ref{prop:triangle-inequality-for-approx_delta}.
+  Fix $g$ and keep the weight $(G_g)^{1/2}$ on the second tensor factor throughout. On the vector $(I\ot (G_g)^{1/2})\ket{\psi}$ one has the six-step chain
+  \[
+    A^u_{g(u)} \ot (G_g)^{1/2}
+    \approx_{2\delta} I\ot (G_g)^{1/2} A^u_{g(u)}
+    \approx_{2\eps} B^\ell_{[f(u)=g(u)]} \ot (G_g)^{1/2}
+    \approx_{md/q} B^\ell_{g|_\ell} \ot (G_g)^{1/2},
+  \]
+  followed by the same three steps in reverse with $u$ replaced by $v$. The first, second, fifth, and sixth comparisons are the consistency-to-distance transports supplied by Lemma~\ref{prop:simeq-to-approx}; the middle pair is Lemma~\ref{lem:generalize-b}. Lemma~\ref{prop:triangle-inequality-for-approx_delta} sums these six weighted transports.
 \end{proof}
 
 \begin{lemma}[Global variance of the points measurements]\label{lem:global-variance-of-points}
@@ -42,5 +50,5 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
   \]
 \end{lemma}
 \begin{proof}
-  For each polynomial $g$, regard $u \mapsto A^u_{g(u)}$ as a family of operators and apply Lemma~\ref{lem:local-to-global} to the vector $(I \ot (G_g)^{1/2})\ket{\psi}$. Lemma~\ref{lem:local-variance-of-points} supplies the local bound.
+  For each polynomial $g$, set $A(g)^u=A^u_{g(u)}$ and work with the weighted state $\ket{\psi_g}=(I \ot (G_g)^{1/2})\ket{\psi}$. Lemma~\ref{lem:local-variance-of-points} is exactly the local-variance bound for the family $u \mapsto A(g)^u$ on $\ket{\psi_g}$, and Lemma~\ref{lem:local-to-global} transports that bound from hypercube edges to independent points.
 \end{proof}

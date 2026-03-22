@@ -3,6 +3,7 @@
 
 Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
 
+
 \begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
   \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.selfImprovementHelper}
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
@@ -31,12 +32,13 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{lemma}
 \begin{proof}
   \uses{lem:sdp, lem:add-in-u, lem:global-variance-of-points, prop:simeq-to-approx}
-  Solve the semidefinite program from Lemma~\ref{lem:sdp} to obtain a measurement $T=\{T_h\}$ and define
+  Solve the SDP from Lemma~\ref{lem:sdp} to obtain an optimal measurement $T=\{T_h\}$ and define
   \[
     H_h = \E_u A^u_{h(u)} T_h A^u_{h(u)}.
   \]
-  Lemma~\ref{lem:global-variance-of-points} controls how the point projectors change when the evaluation point moves, and Lemma~\ref{lem:add-in-u} inserts that averaging into expressions involving $H$. The four conclusions then follow by applying these two tools to the completeness, consistency, self-consistency, and boundedness expressions.
+  The four conclusions are proved separately. For completeness, apply Lemma~\ref{lem:add-in-u} with $M=A$ and the diagonal set $\{(a,h):h(u)=a\}$, then use the dual lower bound $Z\ge A_h$ together with complementary slackness. For consistency with $A$, apply Lemma~\ref{lem:add-in-u} with the off-diagonal set $\{(a,h):h(u)\ne a\}$; the right-hand side vanishes because the point measurements $A^u$ are projective. For strong self-consistency, apply Lemma~\ref{lem:add-in-u} with $M=H$ and then bound the off-diagonal polynomial pairs by global variance and Schwartz--Zippel. For boundedness, use the same averaged expression as in the completeness step but keep the dual witness $Z$ on the first tensor factor. Thus the source really branches into four quantitative estimates rather than a single uniform argument.
 \end{proof}
+
 
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
   \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.sdp}
@@ -61,7 +63,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
   for every $g$.
 \end{lemma}
 \begin{proof}
-  Rewrite the primal in canonical block-matrix form, check Slater's condition, and apply complementary slackness to the optimal primal--dual pair.
+  Rewrite the primal in block-matrix canonical form so that one block corresponds to each polynomial $g$. Slater's condition is immediate from a strictly feasible primal point and a sufficiently large dual matrix, so strong duality holds. Complementary slackness for the optimal pair then forces the slack block attached to $I-\sum_g T_g$ to vanish, giving $\sum_g T_g=I$, and also forces each block $T_g(Z-A_g)$ to be zero, which is the stated identity.
 \end{proof}
 
 \begin{lemma}[Averaging over the evaluation point]\label{lem:add-in-u}
@@ -83,7 +85,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
   \]
 \end{lemma}
 \begin{proof}
-  Expand $H_h$ by averaging over a second point $v$, then use Lemma~\ref{lem:global-variance-of-points} to replace $A^v_{h(v)}$ by $A^u_{h(u)}$. The remaining terms are controlled by repeated Cauchy--Schwarz.
+  Expand $H_h$ by introducing a second point $v$. Two Cauchy--Schwarz steps move the two factors $A^v_{h(v)}$ from Bob's side to Alice's side, paying only the self-consistency error of $A$. Then use Lemma~\ref{lem:global-variance-of-points} twice to replace $A^v_{h(v)}$ by $A^u_{h(u)}$ while keeping $T_h$ fixed. The resulting error is $2\sqrt{2\delta}+2\sqrt{\zeta_{\mathrm{var}}}$, which the source simplifies to $4\sqrt{\zeta_{\mathrm{var}}}$ because $2\delta\le \zeta_{\mathrm{var}}$.
 \end{proof}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
@@ -114,5 +116,15 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{theorem}
 \begin{proof}
   \uses{lem:self-improvement-helper, thm:orthonormalization, prop:self-consistency-implies-data-processing, prop:completeness-transfer-self-consistent-A, prop:triangle-sub, prop:two-notions-of-self-consistency}
-  Apply Lemma~\ref{lem:self-improvement-helper} to obtain a strongly self-consistent submeasurement $\widehat H$. Theorem~\ref{thm:orthonormalization} replaces $\widehat H$ by a nearby projective submeasurement $H$. The preliminary transfer lemmas on strong self-consistency then show that consistency with $A$, completeness, and boundedness survive this replacement with the stated quantitative loss.
+  Apply Lemma~\ref{lem:self-improvement-helper} to obtain a strongly self-consistent submeasurement $\widehat H$ with error
+  \[
+    \widehat\zeta = 100m\left(\eps^{1/2}+\delta^{1/2}+(d/q)^{1/2}\right).
+  \]
+  Orthogonalization gives a nearby projective submeasurement $H$ with error $\widehat\zeta_{\mathrm{ortho}}=100\widehat\zeta^{1/4}$, and Lemma~\ref{prop:self-consistency-implies-data-processing} upgrades this to a post-processed comparison error $\widehat\zeta_{\mathrm{dataprocess}}=8\widehat\zeta+8\sqrt{\widehat\zeta_{\mathrm{ortho}}}$. The four properties are then transferred one by one: completeness by Lemma~\ref{prop:completeness-transfer-self-consistent-A}, consistency by Lemma~\ref{prop:triangle-sub}, self-consistency by Lemma~\ref{prop:two-notions-of-self-consistency} plus the triangle inequality for $\approx_\delta$, and boundedness by replacing $\widehat H_{[h(u)=a]}$ with $H_{[h(u)=a]}$ in the helper bound. The source keeps the intermediate errors explicit and checks that each of
+  \[
+    2\widehat\zeta+2\sqrt{\widehat\zeta_{\mathrm{ortho}}}, \qquad
+    \widehat\zeta+\sqrt{\widehat\zeta_{\mathrm{dataprocess}}}, \qquad
+    6\widehat\zeta+6\widehat\zeta_{\mathrm{ortho}}
+  \]
+  is at most $3000m(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32})$.
 \end{proof}
