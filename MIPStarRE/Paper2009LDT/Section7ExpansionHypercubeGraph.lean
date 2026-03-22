@@ -96,10 +96,6 @@ def formalSquareRoot (X : Operator) : Operator :=
 def formalScale (_c : Error) (X : Operator) : Operator :=
   { name := s!"scalar•({X.name})" }
 
-/-- Formal tensor product of two operator expressions. -/
-def formalTensor (X Y : Operator) : Operator :=
-  { name := s!"({X.name})⊗({Y.name})" }
-
 /-- Tag an operator by the basis vector `|u⟩`. -/
 def pointTaggedOperator (params : Parameters)
     (u : Point params) (X : Operator) : Operator :=
