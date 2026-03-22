@@ -68,10 +68,6 @@ def independentPointPair (params : Parameters) : Distribution (Point params × P
 def formalZeroOperator : Operator :=
   { name := "0" }
 
-/-- A formal identity operator labelled by the ambient space. -/
-def identityOperator (label : String) : Operator :=
-  { name := s!"I[{label}]" }
-
 /-- Formal adjoint of an operator expression. -/
 def formalAdjoint (X : Operator) : Operator :=
   { name := s!"({X.name})^*" }

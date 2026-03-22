@@ -347,7 +347,7 @@ def gHatHalfProductOutcomeOperator (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Operator
   | 0, _xs, _gs =>
-      Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalf({params.m},{params.q},{params.d},0)"
+      identityOperator s!"ghatHalf({params.m},{params.q},{params.d},0)"
   | k + 1, xs, gs =>
       formalProduct
         (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).outcomeOperator (gs 0))
@@ -358,7 +358,7 @@ def gHatHalfProductTotalOperator (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     (k : ℕ) → PointTuple params k → Operator
   | 0, _xs =>
-      Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalfTotal({params.m},{params.q},{params.d},0)"
+      identityOperator s!"ghatHalfTotal({params.m},{params.q},{params.d},0)"
   | k + 1, xs =>
       formalProduct
         (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).totalOperator)
@@ -369,7 +369,7 @@ def gHatRotatedHalfProductOutcomeOperator (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Operator
   | 0, _xs, _gs =>
-      Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalfRot({params.m},{params.q},{params.d},0)"
+      identityOperator s!"ghatHalfRot({params.m},{params.q},{params.d},0)"
   | k + 1, xs, gs =>
       formalProduct
         (gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs))
@@ -380,7 +380,7 @@ def gHatRotatedHalfProductTotalOperator (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     (k : ℕ) → PointTuple params k → Operator
   | 0, _xs =>
-      Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalfRotTotal({params.m},{params.q},{params.d},0)"
+      identityOperator s!"ghatHalfRotTotal({params.m},{params.q},{params.d},0)"
   | k + 1, xs =>
       formalProduct
         (gHatHalfProductTotalOperator params family k (pointTupleTail xs))
@@ -461,7 +461,7 @@ def constructedPastedMeasurement (params : Parameters)
     name := s!"{(constructedPastedSubMeasurement params family k).name}.completion"
     outcomeOperator := (constructedPastedSubMeasurement params family k).outcomeOperator
     totalOperator :=
-      Section7ExpansionHypercubeGraph.identityOperator
+      identityOperator
         s!"{(constructedPastedSubMeasurement params family k).name}.completion" }
 
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/

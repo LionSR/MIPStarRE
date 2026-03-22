@@ -19,7 +19,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- The identity operator on the polynomial register. -/
 def polynomialIdentityOperator (params : Parameters) : Operator :=
-  Section7ExpansionHypercubeGraph.identityOperator s!"poly({params.m},{params.q},{params.d})"
+  identityOperator s!"poly({params.m},{params.q},{params.d})"
 
 /-- The pointwise operator `A^u_{g(u)}` entering the SDP average `A_g`. -/
 def averagedPointOperatorContribution (params : Parameters)
