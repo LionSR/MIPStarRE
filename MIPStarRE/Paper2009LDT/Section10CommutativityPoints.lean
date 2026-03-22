@@ -9,11 +9,35 @@ namespace MIPStarRE.Paper2009LDT.Section10CommutativityPoints
 
 open MIPStarRE.Paper2009LDT
 
+abbrev PointPairQuestion (params : Parameters) := Point params × Point params
+abbrev PointPairOutcome (params : Parameters) := Fq params × Fq params
+
+/-- Placeholder family encoding the ordered product `A_a^u A_b^v`. -/
+def pointMeasurementProductLeft (params : Parameters)
+    (_strategy : SymmetricStrategy params) :
+    IndexedSubMeasurement (PointPairQuestion params) (PointPairOutcome params) :=
+  fun _ => { name := s!"pointComm.left({params.m},{params.q},{params.d})" }
+
+/-- Placeholder family encoding the reversed product `A_b^v A_a^u`. -/
+def pointMeasurementProductRight (params : Parameters)
+    (_strategy : SymmetricStrategy params) :
+    IndexedSubMeasurement (PointPairQuestion params) (PointPairOutcome params) :=
+  fun _ => { name := s!"pointComm.right({params.m},{params.q},{params.d})" }
+
+/-- The displayed commutativity error from `thm:commutativity-points`. -/
+def commutativityPointsError (params : Parameters) (gamma : Error) : Error :=
+  32 * gamma * (params.m : Error)
+
 /-- Output package for `thm:commutativity-points`. -/
 structure CommutativityPointsStatement (params : Parameters)
-    (_strategy : SymmetricStrategy params)
-    (_eps _delta _gamma : Error) : Prop where
-  pointwiseCommutation : True
+    (strategy : SymmetricStrategy params)
+    (_eps _delta gamma : Error) : Prop where
+  pointwiseCommutation :
+    StateDependentDistanceRel strategy.state
+      (uniformDistribution (PointPairQuestion params))
+      (pointMeasurementProductLeft params strategy)
+      (pointMeasurementProductRight params strategy)
+      (commutativityPointsError params gamma)
 
 /-- `thm:commutativity-points`. -/
 theorem commutativityPoints

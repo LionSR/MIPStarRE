@@ -13,10 +13,29 @@ namespace MIPStarRE.Paper2009LDT.Section6MainInductionStep
 
 open MIPStarRE.Paper2009LDT
 
+/-- Restrict an axis-parallel line measurement to the slice at height `x`. -/
+def restrictAxisParallelMeasurement (params : Parameters)
+    (strategy : SymmetricStrategy params.next) (x : Fq params) :
+    IndexedProjectiveMeasurement (AxisParallelLine params) (AxisLinePolynomial params) :=
+  fun ℓ =>
+    let lifted := strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)
+    { toMeasurement := { toSubMeasurement := { name := s!"{lifted.toSubMeasurement.name}.restrict({x.1})" } } }
+
+/-- Restrict a diagonal-line measurement to the slice at height `x`. -/
+def restrictDiagonalMeasurement (params : Parameters)
+    (strategy : SymmetricStrategy params.next) (x : Fq params) :
+    IndexedProjectiveMeasurement (DiagonalLine params) (DiagonalLinePolynomial params) :=
+  fun ℓ =>
+    let lifted := strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)
+    { toMeasurement := { toSubMeasurement := { name := s!"{lifted.toSubMeasurement.name}.restrict({x.1})" } } }
+
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
 def xRestrictedStrategy (params : Parameters)
-    (_strategy : SymmetricStrategy params.next) (_x : Fq params) : SymmetricStrategy params :=
-  default
+    (strategy : SymmetricStrategy params.next) (x : Fq params) : SymmetricStrategy params where
+  state := strategy.state
+  pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
+  axisParallelMeasurement := restrictAxisParallelMeasurement params strategy x
+  diagonalMeasurement := restrictDiagonalMeasurement params strategy x
 
 /-- The intermediate `ν` from `thm:main-induction`. -/
 noncomputable def mainInductionNu (params : Parameters) (k : ℕ)
@@ -94,13 +113,30 @@ structure LdPastingInInductionSectionConclusion (params : Parameters)
       H.toSubMeasurement
       (ldPastingInInductionError params k eps delta gamma kappa zeta)
 
+/-- Placeholder average restricted axis-parallel error over slices. -/
+def averageRestrictedAxisParallelError (params : Parameters)
+    (_strategy : SymmetricStrategy params.next) : Error := 0
+
+/-- Placeholder average restricted self-consistency error over slices. -/
+def averageRestrictedSelfConsistencyError (params : Parameters)
+    (_strategy : SymmetricStrategy params.next) : Error := 0
+
+/-- Placeholder average restricted diagonal-line error over slices. -/
+def averageRestrictedDiagonalError (params : Parameters)
+    (_strategy : SymmetricStrategy params.next) : Error := 0
+
 /-- Bookkeeping package for the restricted-probabilities lemma. -/
 structure RestrictedProbabilitiesStatement (params : Parameters)
-    (_strategy : SymmetricStrategy params.next)
-    (_eps _delta _gamma : Error) : Prop where
-  axisParallelAverage : True
-  selfConsistencyAverage : True
-  diagonalAverage : True
+    (strategy : SymmetricStrategy params.next)
+    (eps delta gamma : Error) : Prop where
+  axisParallelAverage :
+    averageRestrictedAxisParallelError params strategy
+      ≤ (((params.m + 1 : ℕ) : Error) / (params.m : Error)) * eps
+  selfConsistencyAverage :
+    averageRestrictedSelfConsistencyError params strategy ≤ delta
+  diagonalAverage :
+    averageRestrictedDiagonalError params strategy
+      ≤ (((params.m + 1 : ℕ) : Error) / (params.m : Error)) * gamma
 
 /-- `thm:main-induction`. -/
 theorem mainInduction

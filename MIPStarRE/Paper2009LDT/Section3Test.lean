@@ -40,24 +40,87 @@ abbrev Fq (params : Parameters) := Fin params.q
 abbrev Point (params : Parameters) := Fin params.m → Fq params
 abbrev PointTuple (params : Parameters) (k : ℕ) := Fin k → Fq params
 
+/-- The zero coordinate extracted from any available field element witness. -/
+def zeroCoord {params : Parameters} (x : Fq params) : Fq params :=
+  let hq : 0 < params.q :=
+    Nat.lt_of_lt_of_le (Nat.zero_lt_succ x.1) (Nat.succ_le_of_lt x.isLt)
+  ⟨0, hq⟩
+
+/-- Append a final coordinate to a point in `F_q^m`. -/
+def appendPoint (params : Parameters) (u : Point params) (x : Fq params) : Point params.next :=
+  fun i => if h : i.1 < params.m then u ⟨i.1, h⟩ else x
+
+/-- Truncate the last coordinate of a point in `F_q^{m+1}`. -/
+def truncatePoint (params : Parameters) (u : Point params.next) : Point params :=
+  fun i => u ⟨i.1, Nat.lt_trans i.2 (Nat.lt_succ_self params.m)⟩
+
 /-- A lightweight encoding of an axis-parallel line in `F_q^m`. -/
 structure AxisParallelLine (params : Parameters) where
   base : Point params
   direction : Fin params.m
+
+/-- Embed an axis-parallel line into the slice at height `x`. -/
+def AxisParallelLine.appendAtHeight (params : Parameters)
+    (ℓ : AxisParallelLine params) (x : Fq params) : AxisParallelLine params.next where
+  base := appendPoint params ℓ.base x
+  direction := ⟨ℓ.direction.1, Nat.lt_trans ℓ.direction.2 (Nat.lt_succ_self params.m)⟩
 
 /-- A lightweight encoding of a diagonal line in `F_q^m`. -/
 structure DiagonalLine (params : Parameters) where
   base : Point params
   direction : Point params
 
+/-- Embed a diagonal line into the slice at height `x`. -/
+def DiagonalLine.appendAtHeight (params : Parameters)
+    (ℓ : DiagonalLine params) (x : Fq params) : DiagonalLine params.next where
+  base := appendPoint params ℓ.base x
+  direction := appendPoint params ℓ.direction (zeroCoord x)
+
 /-- Global low-individual-degree polynomial outcomes. -/
-abbrev Polynomial (params : Parameters) := Point params → Fq params
+structure Polynomial (params : Parameters) where
+  toFun : Point params → Fq params
+  lowIndividualDegree : True
 
-/-- Axis-parallel line answers are represented abstractly by functions on points. -/
-abbrev AxisLinePolynomial (params : Parameters) := Point params → Fq params
+instance {params : Parameters} : CoeFun (Polynomial params) (fun _ => Point params → Fq params) :=
+  ⟨Polynomial.toFun⟩
 
-/-- Diagonal line answers are represented abstractly by functions on points. -/
-abbrev DiagonalLinePolynomial (params : Parameters) := Point params → Fq params
+/-- Axis-parallel line answers with an explicit degree-bound witness slot. -/
+structure AxisLinePolynomial (params : Parameters) where
+  toFun : Point params → Fq params
+  supportedOnAxisLine : True
+  degreeBounded : True
+
+instance {params : Parameters} : CoeFun (AxisLinePolynomial params) (fun _ => Point params → Fq params) :=
+  ⟨AxisLinePolynomial.toFun⟩
+
+/-- Diagonal-line answers with an explicit degree-bound witness slot. -/
+structure DiagonalLinePolynomial (params : Parameters) where
+  toFun : Point params → Fq params
+  supportedOnDiagonalLine : True
+  degreeBounded : True
+
+instance {params : Parameters} : CoeFun (DiagonalLinePolynomial params) (fun _ => Point params → Fq params) :=
+  ⟨DiagonalLinePolynomial.toFun⟩
+
+/-- Extend a global polynomial to the slice at height `x`. -/
+def Polynomial.appendAtHeight (params : Parameters)
+    (g : Polynomial params) (x : Fq params) : Polynomial params.next where
+  toFun := fun u => g (truncatePoint params u)
+  lowIndividualDegree := trivial
+
+/-- Extend an axis-line answer to the slice at height `x`. -/
+def AxisLinePolynomial.appendAtHeight (params : Parameters)
+    (f : AxisLinePolynomial params) (x : Fq params) : AxisLinePolynomial params.next where
+  toFun := fun u => f (truncatePoint params u)
+  supportedOnAxisLine := trivial
+  degreeBounded := trivial
+
+/-- Extend a diagonal-line answer to the slice at height `x`. -/
+def DiagonalLinePolynomial.appendAtHeight (params : Parameters)
+    (f : DiagonalLinePolynomial params) (x : Fq params) : DiagonalLinePolynomial params.next where
+  toFun := fun u => f (truncatePoint params u)
+  supportedOnDiagonalLine := trivial
+  degreeBounded := trivial
 
 /-- Placeholder for a bipartite state. -/
 structure QuantumState where
