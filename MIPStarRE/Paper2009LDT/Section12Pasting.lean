@@ -49,16 +49,16 @@ def multiplyByTotalOnRight {α β : Type _}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement α where
   name := label
-  outcomeOperator := fun a => formalProduct (A.outcomeOperator a) B.totalOperator
-  totalOperator := formalProduct A.totalOperator B.totalOperator
+  outcomeOperator := fun a => operatorMul (A.outcomeOperator a) B.totalOperator
+  totalOperator := operatorMul A.totalOperator B.totalOperator
 
 /-- Multiply each outcome operator by a total operator on the left. -/
 def multiplyByTotalOnLeft {α β : Type _}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement β where
   name := label
-  outcomeOperator := fun b => formalProduct A.totalOperator (B.outcomeOperator b)
-  totalOperator := formalProduct A.totalOperator B.totalOperator
+  outcomeOperator := fun b => operatorMul A.totalOperator (B.outcomeOperator b)
+  totalOperator := operatorMul A.totalOperator B.totalOperator
 
 /-- Average an indexed family against a named distribution. -/
 def averageIndexedSubMeasurement {Question Outcome : Type _}
@@ -349,7 +349,7 @@ def gHatHalfProductOutcomeOperator (params : Parameters)
   | 0, _xs, _gs =>
       Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalf({params.m},{params.q},{params.d},0)"
   | k + 1, xs, gs =>
-      formalProduct
+      operatorMul
         (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).outcomeOperator (gs 0))
         (gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs))
 
@@ -360,7 +360,7 @@ def gHatHalfProductTotalOperator (params : Parameters)
   | 0, _xs =>
       Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalfTotal({params.m},{params.q},{params.d},0)"
   | k + 1, xs =>
-      formalProduct
+      operatorMul
         (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).totalOperator)
         (gHatHalfProductTotalOperator params family k (pointTupleTail xs))
 
@@ -371,7 +371,7 @@ def gHatRotatedHalfProductOutcomeOperator (params : Parameters)
   | 0, _xs, _gs =>
       Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalfRot({params.m},{params.q},{params.d},0)"
   | k + 1, xs, gs =>
-      formalProduct
+      operatorMul
         (gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs))
         (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).outcomeOperator (gs 0))
 
@@ -382,7 +382,7 @@ def gHatRotatedHalfProductTotalOperator (params : Parameters)
   | 0, _xs =>
       Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalfRotTotal({params.m},{params.q},{params.d},0)"
   | k + 1, xs =>
-      formalProduct
+      operatorMul
         (gHatHalfProductTotalOperator params family k (pointTupleTail xs))
         (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).totalOperator)
 
@@ -395,10 +395,10 @@ def gHatSandwichFamily (params : Parameters)
     { name := s!"ghat.sandwich({params.m},{params.q},{params.d},{k})"
       outcomeOperator := fun gs =>
         let half := gHatHalfProductOutcomeOperator params family k xs gs
-        formalProduct half (formalAdjoint half)
+        operatorMul half (formalAdjoint half)
       totalOperator :=
         let half := gHatHalfProductTotalOperator params family k xs
-        formalProduct half (formalAdjoint half) }
+        operatorMul half (formalAdjoint half) }
 
 /-- Concrete family for the half-sandwich product of `k` completed slices. -/
 def gHatHalfSandwichLeft (params : Parameters)
@@ -538,8 +538,8 @@ def fromHToGRecurrenceLeftFamily (params : Parameters)
     let base := allOutcomesExpansionFamily params strategy family k ()
     let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
     { name := s!"fromHToG.left({params.m},{params.q},{params.d},{k},{ℓ})"
-      outcomeOperator := fun _ => formalProduct base.totalOperator weight
-      totalOperator := formalProduct base.totalOperator weight }
+      outcomeOperator := fun _ => operatorMul base.totalOperator weight
+      totalOperator := operatorMul base.totalOperator weight }
 
 /-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`. -/
 def fromHToGRecurrenceRightFamily (params : Parameters)
@@ -550,8 +550,8 @@ def fromHToGRecurrenceRightFamily (params : Parameters)
     let base := bernoulliTailFromFamily params family k ()
     let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
     { name := s!"fromHToG.right({params.m},{params.q},{params.d},{k},{ℓ})"
-      outcomeOperator := fun _ => formalProduct base.totalOperator weight
-      totalOperator := formalProduct base.totalOperator weight }
+      outcomeOperator := fun _ => operatorMul base.totalOperator weight
+      totalOperator := operatorMul base.totalOperator weight }
 
 /-- The final completeness lower bound used in the pasting statements. -/
 noncomputable def ldPastingCompletenessLowerBound (params : Parameters)

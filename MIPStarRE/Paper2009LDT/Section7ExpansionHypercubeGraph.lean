@@ -76,10 +76,6 @@ def identityOperator (label : String) : Operator :=
 def formalAdjoint (X : Operator) : Operator :=
   { name := s!"({X.name})^*" }
 
-/-- Formal product of two operator expressions. -/
-def formalProduct (X Y : Operator) : Operator :=
-  { name := s!"({X.name})*({Y.name})" }
-
 /-- Formal difference of two operator expressions. -/
 def formalDifference (X Y : Operator) : Operator :=
   { name := s!"({X.name})-({Y.name})" }
@@ -225,9 +221,9 @@ noncomputable def orthogonalComponentOperator (params : Parameters)
 /-- The trace witness from `lem:local-rewrite`. -/
 noncomputable def localVarianceTraceWitness (params : Parameters)
     (A : Point params → Operator) (ψ : QuantumState) : Operator :=
-  formalProduct
+  operatorMul
     (formalAdjoint (combinedOperator params A))
-    (formalProduct
+    (operatorMul
       (formalTensor (laplacian params) (stateProjector ψ))
       (combinedOperator params A))
 
@@ -243,9 +239,9 @@ structure GlobalVarianceDecomposition (params : Parameters)
 def globalVarianceTraceWitness (params : Parameters)
     (_A : Point params → Operator) (ψ : QuantumState)
     (decomp : GlobalVarianceDecomposition params _A) : Operator :=
-  formalProduct
+  operatorMul
     { name := s!"<{decomp.orthogonalVector.name}|⊗{decomp.orthogonalOperator.name}" }
-    (formalProduct
+    (operatorMul
       (formalTensor (identityOperator s!"Fq^{params.m}") (stateProjector ψ))
       { name := s!"|{decomp.orthogonalVector.name}>⊗{decomp.orthogonalOperator.name}" })
 

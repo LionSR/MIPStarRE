@@ -38,7 +38,7 @@ noncomputable def sdpPrimalContributionOperator (params : Parameters)
     (strategy : SymmetricStrategy params)
     (T : Measurement (Polynomial params))
     (g : Polynomial params) : Operator :=
-  formalProduct (T.outcomeOperator g) (averagedPointOperator params strategy g)
+  operatorMul (T.outcomeOperator g) (averagedPointOperator params strategy g)
 
 /-- The formal primal objective operator `Σ_g T_g A_g`. -/
 noncomputable def sdpPrimalObjectiveOperator (params : Parameters)
@@ -68,8 +68,8 @@ def sdpComplementarySlacknessEquation (params : Parameters)
     (strategy : SymmetricStrategy params)
     (T : Measurement (Polynomial params))
     (Z : Operator) (g : Polynomial params) : Prop :=
-  formalProduct (T.outcomeOperator g) Z =
-    formalProduct (T.outcomeOperator g) (averagedPointOperator params strategy g)
+  operatorMul (T.outcomeOperator g) Z =
+    operatorMul (T.outcomeOperator g) (averagedPointOperator params strategy g)
 
 /-- The pointwise sandwiched operator `H^u_h = A^u_{h(u)} T_h A^u_{h(u)}`. -/
 def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
@@ -77,7 +77,7 @@ def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
     (T : Measurement (Polynomial params))
     (u : Point params) (h : Polynomial params) : Operator :=
   let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
-  formalProduct (formalProduct Au (T.outcomeOperator h)) Au
+  operatorMul (operatorMul Au (T.outcomeOperator h)) Au
 
 /-- The pointwise sandwiched submeasurement `H^u = {H^u_h}`. -/
 noncomputable def sandwichedPolynomialSubMeasurementAt (params : Parameters)
@@ -404,7 +404,7 @@ noncomputable def addInURightOperatorAtPoint {Outcome : Type _}
   | some (o, h) =>
       let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
       formalTensor
-        (formalProduct (formalProduct Au ((M u).outcomeOperator o)) Au)
+        (operatorMul (operatorMul Au ((M u).outcomeOperator o)) Au)
         (T.outcomeOperator h)
   | none => formalZeroOperator
 

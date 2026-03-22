@@ -26,8 +26,8 @@ def leftOrderedProductSubMeasurement {α β : Type _}
 def appendRightTotalSubMeasurement {α : Type _}
     (tag : String) (A : SubMeasurement α) (X : Operator) : SubMeasurement α where
   name := s!"{A.name}.{tag}"
-  outcomeOperator := fun a => formalProduct (A.outcomeOperator a) X
-  totalOperator := formalProduct A.totalOperator X
+  outcomeOperator := fun a => operatorMul (A.outcomeOperator a) X
+  totalOperator := operatorMul A.totalOperator X
 
 /-- Sandwiched product `A_a B_b A_a`. -/
 def sandwichByOuterSubMeasurement {α β : Type _}
@@ -37,10 +37,10 @@ def sandwichByOuterSubMeasurement {α β : Type _}
   outcomeOperator := fun ab =>
     match ab with
     | (a, b) =>
-        formalProduct (A.outcomeOperator a)
-          (formalProduct (B.outcomeOperator b) (A.outcomeOperator a))
-  totalOperator := formalProduct A.totalOperator
-    (formalProduct B.totalOperator A.totalOperator)
+        operatorMul (A.outcomeOperator a)
+          (operatorMul (B.outcomeOperator b) (A.outcomeOperator a))
+  totalOperator := operatorMul A.totalOperator
+    (operatorMul B.totalOperator A.totalOperator)
 
 /-- The full-slice question underlying an evaluated-slice sample. -/
 def fullSliceQuestionOfEvaluatedSlice (params : Parameters)
@@ -203,8 +203,8 @@ def commDataProcessedGStabilityTwoRight (params : Parameters)
 def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type _}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB)
     (a : OutcomeA) (b : OutcomeB) : Operator :=
-  formalProduct (Q.outcomeOperator b)
-    (formalProduct (P.outcomeOperator a) (Q.outcomeOperator b))
+  operatorMul (Q.outcomeOperator b)
+    (operatorMul (P.outcomeOperator a) (Q.outcomeOperator b))
 
 /-- The sandwiched family `b ↦ Q_b P_a Q_b`. -/
 def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Type _}
@@ -233,7 +233,7 @@ def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type _}
     SubMeasurement OutcomeA where
   name := s!"normSquareFamily({P.name},{Q.toSubMeasurement.name})"
   outcomeOperator := fun a =>
-    formalProduct
+    operatorMul
       (normalizationConditionSandwichedTotalOperator P Q a)
       (formalAdjoint (normalizationConditionSandwichedTotalOperator P Q a))
   totalOperator := { name := s!"normSquare({P.name},{Q.toSubMeasurement.name})" }
@@ -244,7 +244,7 @@ def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type _}
     SubMeasurement OutcomeA where
   name := s!"normAdjointSquareFamily({P.name},{Q.toSubMeasurement.name})"
   outcomeOperator := fun a =>
-    formalProduct
+    operatorMul
       (formalAdjoint (normalizationConditionSandwichedTotalOperator P Q a))
       (normalizationConditionSandwichedTotalOperator P Q a)
   totalOperator := { name := s!"normAdjointSquare({P.name},{Q.toSubMeasurement.name})" }

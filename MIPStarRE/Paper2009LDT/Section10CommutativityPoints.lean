@@ -33,16 +33,16 @@ def orderedProductSubMeasurement {α β : Type _}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement (α × β) where
   name := label
-  outcomeOperator := fun | (a, b) => formalProduct (A.outcomeOperator a) (B.outcomeOperator b)
-  totalOperator := formalProduct A.totalOperator B.totalOperator
+  outcomeOperator := fun | (a, b) => operatorMul (A.outcomeOperator a) (B.outcomeOperator b)
+  totalOperator := operatorMul A.totalOperator B.totalOperator
 
 /-- Reversed product of two paper-local submeasurements on the same tensor factor. -/
 def reversedProductSubMeasurement {α β : Type _}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement (α × β) where
   name := label
-  outcomeOperator := fun | (a, b) => formalProduct (B.outcomeOperator b) (A.outcomeOperator a)
-  totalOperator := formalProduct B.totalOperator A.totalOperator
+  outcomeOperator := fun | (a, b) => operatorMul (B.outcomeOperator b) (A.outcomeOperator a)
+  totalOperator := operatorMul B.totalOperator A.totalOperator
 
 /-- Tensor-product bridge `A_a ⊗ B_b`. -/
 def tensorProductSubMeasurement {α β : Type _}
@@ -52,8 +52,8 @@ def tensorProductSubMeasurement {α β : Type _}
   outcomeOperator := fun ab =>
     match ab with
     | (a, b) =>
-        formalProduct (leftTensor (A.outcomeOperator a)) (rightTensor (B.outcomeOperator b))
-  totalOperator := formalProduct (leftTensor A.totalOperator) (rightTensor B.totalOperator)
+        operatorMul (leftTensor (A.outcomeOperator a)) (rightTensor (B.outcomeOperator b))
+  totalOperator := operatorMul (leftTensor A.totalOperator) (rightTensor B.totalOperator)
 
 /-- Recover the sampled point from a diagonal-line/parameter sample. -/
 def sampledPointFromDiagonalQuestion (params : Parameters)
