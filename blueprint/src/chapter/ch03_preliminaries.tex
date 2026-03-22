@@ -172,7 +172,7 @@
 \begin{lemma}[Data processing for consistency]\label{prop:simeq-data-processing}
   \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.simeqDataProcessing}
   \uses{def:post-processing, def:simeq}
-  If $A_a^x \ot I \simeq_\delta I \ot B_a^x$ and $f$ is a map on the answer set, then
+  If $A=\{A_a^x\}$ and $B=\{B_a^x\}$ are measurements such that $A_a^x \ot I \simeq_\delta I \ot B_a^x$, and $f$ is a map on the answer set, then
   \[
     A_{[f(a)=b]}^x \ot I \simeq_\delta I \ot B_{[f(a)=b]}^x.
   \]
@@ -291,14 +291,48 @@
   First compare the post-processed family of $P$ to $I \ot A_{[f(a)=b]}^x$, using strong self-consistency of $A$ and closeness of $P$ to $A$. Then move back to the original side of the bipartition and compose the two bounds.
 \end{proof}
 
+\begin{lemma}[Self-consistency moves one copy to the same side]\label{lem:self-consistency-same-side-square}
+  \uses{def:strong-self-consistency}
+  Let $A=\{A_a\}$ be a $\zeta$-strongly self-consistent submeasurement. Then
+  \[
+    \sum_a \bra{\psi} A_a^2 \ot I \ket{\psi}
+    \ge
+    \sum_a \bra{\psi} A_a \ot I \ket{\psi} - \zeta.
+  \]
+\end{lemma}
+\begin{proof}
+  Apply Cauchy--Schwarz to the two-sided overlap $\sum_a \bra{\psi} A_a \ot A_a \ket{\psi}$ and compare it with the strong self-consistency lower bound.
+\end{proof}
+
+\begin{lemma}[Bounding the missing mass of a close submeasurement]\label{lem:completion-missing-mass-bound}
+  \uses{def:strong-self-consistency, def:approx_delta, lem:self-consistency-same-side-square}
+  Let $A=\{A_a\}$ be a measurement that is $\zeta$-strongly self-consistent, and let $B=\{B_a\}$ be a submeasurement such that $A_a \ot I \approx_\delta B_a \ot I$. Writing $B=\sum_a B_a$, one has
+  \[
+    \lVert (I-B) \ot I\ket{\psi} \rVert^2 \le 2\sqrt\delta + \zeta.
+  \]
+\end{lemma}
+\begin{proof}
+  Since $0 \le I-B \le I$, the left-hand side is at most $1-\bra{\psi} B \ot I \ket{\psi}$. Compare $\sum_a \bra{\psi} B_a^2 \ot I \ket{\psi}$ with $\sum_a \bra{\psi} A_a B_a \ot I \ket{\psi}$ and then with $\sum_a \bra{\psi} A_a^2 \ot I \ket{\psi}$ using the $\approx_\delta$ hypothesis, and finish with Lemma~\ref{lem:self-consistency-same-side-square}.
+\end{proof}
+
 \begin{lemma}[Completing a close submeasurement to a full measurement]\label{prop:completing-to-measurement}
   \lean{MIPStarRE.Paper2009LDT.Section4Preliminaries.completingToMeasurement}
-  \uses{def:strong-self-consistency, def:approx_delta, prop:triangle-inequality-for-vectors-squared}
+  \uses{def:strong-self-consistency, def:approx_delta, prop:triangle-inequality-for-vectors-squared, lem:completion-missing-mass-bound}
   Let $A=\{A_a\}$ be a measurement that is $\zeta$-strongly self-consistent, let $B=\{B_a\}$ be a submeasurement such that $A_a \ot I \approx_\delta B_a \ot I$, and let $C$ be the measurement obtained by adding the missing mass $I-B$ to one distinguished answer $a^*$. Then
   \[
     A_a \ot I \approx_{2\delta + 4\sqrt\delta + 2\zeta} C_a \ot I.
   \]
 \end{lemma}
 \begin{proof}
-  The squared triangle inequality reduces the problem to bounding the missing mass of $B$. Strong self-consistency of $A$ and the closeness of $B$ to $A$ show that this missing mass is small.
+  By the squared triangle inequality,
+  \[
+    \sum_a \lVert (A_a-C_a)\ot I\ket{\psi} \rVert^2
+    \le
+    2\delta + 2\lVert (I-B) \ot I\ket{\psi} \rVert^2.
+  \]
+  Lemma~\ref{lem:completion-missing-mass-bound} gives
+  \[
+    \lVert (I-B) \ot I\ket{\psi} \rVert^2 \le 2\sqrt\delta + \zeta,
+  \]
+  and substituting this yields the claimed bound.
 \end{proof}

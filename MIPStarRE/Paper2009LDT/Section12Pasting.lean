@@ -13,6 +13,7 @@ later pasting arguments.
 namespace MIPStarRE.Paper2009LDT.Section12Pasting
 
 open MIPStarRE.Paper2009LDT
+open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
 
 /-- The set of `k`-tuples with distinct coordinates. -/
 def distinctTuples (params : Parameters) (k : ℕ) : Set (PointTuple params k) :=
@@ -28,16 +29,63 @@ abbrev GHatOutcome (params : Parameters) := Option (Polynomial params)
 abbrev SliceQuestion (params : Parameters) := Fq params
 abbrev SlicePairQuestion (params : Parameters) := Fq params × Fq params
 abbrev GHatTupleOutcome (params : Parameters) (k : ℕ) := Fin k → GHatOutcome params
+abbrev GHatType (k : ℕ) := Fin k → Bool
 abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) := Point params × PointTuple params k
 abbrev VerticalLineQuestion (params : Parameters) := Point params
 
 /-- Placeholder matrix-valued Bernoulli tail operator from `lem:chernoff-bernoulli-matrix`. -/
-def bernoulliTailOperator (_k _d : ℕ) (_X : Operator) : Operator :=
-  { name := "BernoulliTail" }
+def bernoulliTailOperator (k d : ℕ) (X : Operator) : Operator :=
+  { name := s!"BernoulliTail(k={k},d={d}; {X.name}^r (I-{X.name})^(k-r))" }
 
 /-- Add a descriptive tag to a paper-local submeasurement placeholder. -/
 def tagSubMeasurement {α : Type _} (tag : String) (A : SubMeasurement α) : SubMeasurement α where
   name := s!"{A.name}.{tag}"
+  outcomeOperator := A.outcomeOperator
+  totalOperator := A.totalOperator
+
+/-- Place a submeasurement on the left tensor factor. -/
+def leftPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
+  name := s!"{A.name}.left"
+  outcomeOperator := fun a => leftTensor (A.outcomeOperator a)
+  totalOperator := leftTensor A.totalOperator
+
+/-- Place a submeasurement on the right tensor factor. -/
+def rightPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
+  name := s!"{A.name}.right"
+  outcomeOperator := fun a => rightTensor (A.outcomeOperator a)
+  totalOperator := rightTensor A.totalOperator
+
+/-- Ordered product of two paper-local submeasurements on the same tensor factor. -/
+def orderedProductSubMeasurement {α β : Type _}
+    (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
+    SubMeasurement (α × β) where
+  name := label
+  outcomeOperator := fun | (a, b) => formalProduct (A.outcomeOperator a) (B.outcomeOperator b)
+  totalOperator := formalProduct A.totalOperator B.totalOperator
+
+/-- Multiply each outcome operator by a total operator on the right. -/
+def multiplyByTotalOnRight {α β : Type _}
+    (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
+    SubMeasurement α where
+  name := label
+  outcomeOperator := fun a => formalProduct (A.outcomeOperator a) B.totalOperator
+  totalOperator := formalProduct A.totalOperator B.totalOperator
+
+/-- Multiply each outcome operator by a total operator on the left. -/
+def multiplyByTotalOnLeft {α β : Type _}
+    (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
+    SubMeasurement β where
+  name := label
+  outcomeOperator := fun b => formalProduct A.totalOperator (B.outcomeOperator b)
+  totalOperator := formalProduct A.totalOperator B.totalOperator
+
+/-- Average an indexed family against a named distribution. -/
+def averageIndexedSubMeasurement {Question Outcome : Type _}
+    (label : String) (_𝒟 : Distribution Question) (_A : IndexedSubMeasurement Question Outcome) :
+    SubMeasurement Outcome where
+  name := label
+  outcomeOperator := fun _ => { name := s!"{label}.avg.outcome" }
+  totalOperator := { name := s!"{label}.avg.total" }
 
 /-- Placeholder complement operator `I - X`. -/
 def operatorComplement (X : Operator) : Operator :=
@@ -45,11 +93,44 @@ def operatorComplement (X : Operator) : Operator :=
 
 /-- Regard an operator expression as a `Unit`-valued submeasurement placeholder. -/
 def operatorAsSubMeasurement (X : Operator) : SubMeasurement Unit :=
-  { name := s!"operator({X.name})" }
+  { name := s!"operator({X.name})"
+    outcomeOperator := fun _ => X
+    totalOperator := X }
 
 /-- Regard the Bernoulli tail operator as a `Unit`-valued submeasurement placeholder. -/
 def bernoulliTailSubMeasurement (k d : ℕ) (X : Operator) : SubMeasurement Unit :=
-  { name := s!"{(bernoulliTailOperator k d X).name}.sub" }
+  operatorAsSubMeasurement (bernoulliTailOperator k d X)
+
+/-- Record which completed-slice outcomes are genuine polynomial outcomes. -/
+def gHatTupleType {params : Parameters} {k : ℕ}
+    (gs : GHatTupleOutcome params k) : GHatType k :=
+  fun i => Option.isSome (gs i)
+
+/-- Remove the first coordinate from a tuple of slice questions. -/
+def pointTupleTail {params : Parameters} {k : ℕ}
+    (xs : PointTuple params (k + 1)) : PointTuple params k :=
+  fun i => xs i.succ
+
+/-- Remove the first coordinate from a tuple of completed slice outcomes. -/
+def gHatTupleOutcomeTail {params : Parameters} {k : ℕ}
+    (gs : GHatTupleOutcome params (k + 1)) : GHatTupleOutcome params k :=
+  fun i => gs i.succ
+
+/-- Fallback global polynomial used when all completed slice outcomes are `⊥`. -/
+noncomputable def fallbackInterpolatedPolynomial (params : Parameters) : Polynomial params.next where
+  poly := MvPolynomial.X ⟨params.m, Nat.lt_succ_self params.m⟩
+  lowIndividualDegree := by
+    intro i
+    sorry
+
+/-- Placeholder interpolation from completed slice outcomes to a global polynomial. -/
+noncomputable def interpolateCompletedSlices (params : Parameters) :
+    (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
+  | 0, _xs, _gs => fallbackInterpolatedPolynomial params
+  | k + 1, xs, gs =>
+      match gs 0 with
+      | some g => Polynomial.appendAtHeight params g (xs 0)
+      | none => interpolateCompletedSlices params k (pointTupleTail xs) (gHatTupleOutcomeTail gs)
 
 /-- Aggregate the polynomial outcomes of `G^x` into its complete part `G^x`. -/
 def completePartSubMeasurement (params : Parameters)
@@ -60,7 +141,7 @@ def completePartSubMeasurement (params : Parameters)
 /-- Placeholder for the incomplete part `G^x_⊥ = I - G^x`. -/
 def incompletePartSubMeasurement (params : Parameters)
     (family : IndexedPolynomialFamily params) (x : Fq params) : SubMeasurement Unit :=
-  { name := s!"{(family.meas x).toSubMeasurement.name}.incomplete" }
+  operatorAsSubMeasurement (operatorComplement (completePartSubMeasurement params family x).totalOperator)
 
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
 def gHatIndexedMeasurement (params : Parameters)
@@ -74,181 +155,335 @@ def gHatIndexedSubMeasurement (params : Parameters)
     IndexedSubMeasurement (Fq params) (GHatOutcome params) :=
   IndexedMeasurement.toIndexedSubMeasurement (gHatIndexedMeasurement params family)
 
-/-- Left tensor-placement placeholder for the complete part `G^x`. -/
+/-- Left tensor-placement for the complete part `G^x`. -/
 def completePartLeftFamily (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SliceQuestion params) Unit :=
-  fun x => tagSubMeasurement "left" (completePartSubMeasurement params family x)
+  fun x => leftPlacedSubMeasurement (completePartSubMeasurement params family x)
 
-/-- Right tensor-placement placeholder for the complete part `G^x`. -/
+/-- Right tensor-placement for the complete part `G^x`. -/
 def completePartRightFamily (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SliceQuestion params) Unit :=
-  fun x => tagSubMeasurement "right" (completePartSubMeasurement params family x)
+  fun x => rightPlacedSubMeasurement (completePartSubMeasurement params family x)
 
-/-- Left tensor-placement placeholder for the incomplete part `G^x_⊥`. -/
+/-- Left tensor-placement for the incomplete part `G^x_⊥`. -/
 def incompletePartLeftFamily (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SliceQuestion params) Unit :=
-  fun x => tagSubMeasurement "left" (incompletePartSubMeasurement params family x)
+  fun x => leftPlacedSubMeasurement (incompletePartSubMeasurement params family x)
 
-/-- Right tensor-placement placeholder for the incomplete part `G^x_⊥`. -/
+/-- Right tensor-placement for the incomplete part `G^x_⊥`. -/
 def incompletePartRightFamily (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SliceQuestion params) Unit :=
-  fun x => tagSubMeasurement "right" (incompletePartSubMeasurement params family x)
+  fun x => rightPlacedSubMeasurement (incompletePartSubMeasurement params family x)
 
-/-- Left tensor-placement placeholder for the auxiliary family `M^x_o`. -/
+/-- Left tensor-placement for the auxiliary family `M^x_o`. -/
 def switcherooSelfConsistencyLeft {Outcome : Type _} (params : Parameters)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SliceQuestion params) Outcome :=
-  fun x => tagSubMeasurement "left" ((M x).toSubMeasurement)
+  fun x => leftPlacedSubMeasurement ((M x).toSubMeasurement)
 
-/-- Right tensor-placement placeholder for the auxiliary family `M^x_o`. -/
+/-- Right tensor-placement for the auxiliary family `M^x_o`. -/
 def switcherooSelfConsistencyRight {Outcome : Type _} (params : Parameters)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SliceQuestion params) Outcome :=
-  fun x => tagSubMeasurement "right" ((M x).toSubMeasurement)
+  fun x => rightPlacedSubMeasurement ((M x).toSubMeasurement)
 
-/-- Placeholder family for the hypothesis `G^x_g M^y_o`. -/
+/-- Concrete hypothesis family for `G^x_g M^y_o`. -/
 def switcherooPointProductLeft {Outcome : Type _} (params : Parameters)
-    (_family : IndexedPolynomialFamily params)
-    (_M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
+    (family : IndexedPolynomialFamily params)
+    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params × Outcome) :=
-  fun _ => { name := s!"switcheroo.point.left({params.m},{params.q},{params.d})" }
+  fun q =>
+    leftPlacedSubMeasurement <|
+      orderedProductSubMeasurement
+        s!"switcheroo.point.left({params.m},{params.q},{params.d})"
+        ((family.meas q.1).toSubMeasurement)
+        ((M q.2).toSubMeasurement)
 
-/-- Placeholder family for the hypothesis `M^y_o G^x_g`. -/
+/-- Concrete hypothesis family for `M^y_o G^x_g`, reindexed to the same outcome type. -/
 def switcherooPointProductRight {Outcome : Type _} (params : Parameters)
-    (_family : IndexedPolynomialFamily params)
-    (_M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
+    (family : IndexedPolynomialFamily params)
+    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params × Outcome) :=
-  fun _ => { name := s!"switcheroo.point.right({params.m},{params.q},{params.d})" }
+  fun q =>
+    leftPlacedSubMeasurement <|
+      postprocess
+        (orderedProductSubMeasurement
+          s!"switcheroo.point.right({params.m},{params.q},{params.d})"
+          ((M q.2).toSubMeasurement)
+          ((family.meas q.1).toSubMeasurement))
+        (fun og => (og.2, og.1))
 
-/-- Placeholder family for the conclusion `G^x M^y_o`. -/
+/-- Concrete aggregate family for `G^x M^y_o`. -/
 def switcherooAggregateLeft {Outcome : Type _} (params : Parameters)
-    (_family : IndexedPolynomialFamily params)
+    (family : IndexedPolynomialFamily params)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SlicePairQuestion params) Outcome :=
-  fun ⟨x, y⟩ => tagSubMeasurement s!"withComplete({x.1})" ((M y).toSubMeasurement)
+  fun q =>
+    leftPlacedSubMeasurement <|
+      multiplyByTotalOnLeft
+        s!"switcheroo.aggregate.left({params.m},{params.q},{params.d})"
+        (completePartSubMeasurement params family q.1)
+        ((M q.2).toSubMeasurement)
 
-/-- Placeholder family for the conclusion `M^y_o G^x`. -/
+/-- Concrete aggregate family for `M^y_o G^x`. -/
 def switcherooAggregateRight {Outcome : Type _} (params : Parameters)
-    (_family : IndexedPolynomialFamily params)
+    (family : IndexedPolynomialFamily params)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SlicePairQuestion params) Outcome :=
-  fun ⟨x, y⟩ => tagSubMeasurement s!"completeOnRight({x.1})" ((M y).toSubMeasurement)
+  fun q =>
+    leftPlacedSubMeasurement <|
+      multiplyByTotalOnRight
+        s!"switcheroo.aggregate.right({params.m},{params.q},{params.d})"
+        ((M q.2).toSubMeasurement)
+        (completePartSubMeasurement params family q.1)
 
-/-- Placeholder family for the relation `G^x_g G^y`. -/
+/-- Concrete family for `G^x_g G^y`. -/
 def completePartPointProductLeft (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) :=
-  fun ⟨x, y⟩ =>
-    tagSubMeasurement s!"timesComplete({y.1})" ((family.meas x).toSubMeasurement)
+  fun q =>
+    leftPlacedSubMeasurement <|
+      multiplyByTotalOnRight
+        s!"complete.point.left({params.m},{params.q},{params.d})"
+        ((family.meas q.1).toSubMeasurement)
+        (completePartSubMeasurement params family q.2)
 
-/-- Placeholder family for the relation `G^y G^x_g`. -/
+/-- Concrete family for `G^y G^x_g`. -/
 def completePartPointProductRight (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) :=
-  fun ⟨x, _⟩ =>
-    tagSubMeasurement s!"completeTimes({x.1})" ((family.meas x).toSubMeasurement)
+  fun q =>
+    leftPlacedSubMeasurement <|
+      multiplyByTotalOnLeft
+        s!"complete.point.right({params.m},{params.q},{params.d})"
+        (completePartSubMeasurement params family q.2)
+        ((family.meas q.1).toSubMeasurement)
 
-/-- Placeholder family for the relation `G^x G^y`. -/
+/-- Concrete family for `G^x G^y`. -/
 def completePartTotalProductLeft (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SlicePairQuestion params) Unit :=
-  fun ⟨x, y⟩ =>
-    tagSubMeasurement s!"timesComplete({y.1})" (completePartSubMeasurement params family x)
+  fun q =>
+    leftPlacedSubMeasurement <|
+      multiplyByTotalOnRight
+        s!"complete.total.left({params.m},{params.q},{params.d})"
+        (completePartSubMeasurement params family q.1)
+        (completePartSubMeasurement params family q.2)
 
-/-- Placeholder family for the relation `G^y G^x`. -/
+/-- Concrete family for `G^y G^x`. -/
 def completePartTotalProductRight (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SlicePairQuestion params) Unit :=
-  fun ⟨x, y⟩ =>
-    tagSubMeasurement s!"completeTimes({x.1})" (completePartSubMeasurement params family y)
+  fun q =>
+    leftPlacedSubMeasurement <|
+      multiplyByTotalOnLeft
+        s!"complete.total.right({params.m},{params.q},{params.d})"
+        (completePartSubMeasurement params family q.2)
+        (completePartSubMeasurement params family q.1)
 
-/-- Placeholder family for the relation `G^x_g G^y_⊥`. -/
+/-- Concrete family for `G^x_g G^y_⊥`. -/
 def incompletePartPointProductLeft (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) :=
-  fun ⟨x, y⟩ =>
-    tagSubMeasurement s!"timesIncomplete({y.1})" ((family.meas x).toSubMeasurement)
+  fun q =>
+    leftPlacedSubMeasurement <|
+      multiplyByTotalOnRight
+        s!"incomplete.point.left({params.m},{params.q},{params.d})"
+        ((family.meas q.1).toSubMeasurement)
+        (incompletePartSubMeasurement params family q.2)
 
-/-- Placeholder family for the relation `G^y_⊥ G^x_g`. -/
+/-- Concrete family for `G^y_⊥ G^x_g`. -/
 def incompletePartPointProductRight (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) :=
-  fun ⟨x, _⟩ =>
-    tagSubMeasurement s!"incompleteTimes({x.1})" ((family.meas x).toSubMeasurement)
+  fun q =>
+    leftPlacedSubMeasurement <|
+      multiplyByTotalOnLeft
+        s!"incomplete.point.right({params.m},{params.q},{params.d})"
+        (incompletePartSubMeasurement params family q.2)
+        ((family.meas q.1).toSubMeasurement)
 
-/-- Placeholder family for the relation `G^x_⊥ G^y_⊥`. -/
+/-- Concrete family for `G^x_⊥ G^y_⊥`. -/
 def incompletePartTotalProductLeft (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SlicePairQuestion params) Unit :=
-  fun ⟨x, y⟩ =>
-    tagSubMeasurement s!"timesIncomplete({y.1})" (incompletePartSubMeasurement params family x)
+  fun q =>
+    leftPlacedSubMeasurement <|
+      multiplyByTotalOnRight
+        s!"incomplete.total.left({params.m},{params.q},{params.d})"
+        (incompletePartSubMeasurement params family q.1)
+        (incompletePartSubMeasurement params family q.2)
 
-/-- Placeholder family for the relation `G^y_⊥ G^x_⊥`. -/
+/-- Concrete family for `G^y_⊥ G^x_⊥`. -/
 def incompletePartTotalProductRight (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SlicePairQuestion params) Unit :=
-  fun ⟨x, y⟩ =>
-    tagSubMeasurement s!"incompleteTimes({x.1})" (incompletePartSubMeasurement params family y)
+  fun q =>
+    leftPlacedSubMeasurement <|
+      multiplyByTotalOnLeft
+        s!"incomplete.total.right({params.m},{params.q},{params.d})"
+        (incompletePartSubMeasurement params family q.2)
+        (incompletePartSubMeasurement params family q.1)
 
-/-- Left tensor-placement placeholder for `\widehat G^x_g`. -/
+/-- Left tensor-placement for `\widehat G^x_g`. -/
 def gHatSelfConsistencyLeftFamily (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SliceQuestion params) (GHatOutcome params) :=
-  fun x => tagSubMeasurement "left" ((gHatIndexedMeasurement params family x).toSubMeasurement)
+  fun x => leftPlacedSubMeasurement ((gHatIndexedMeasurement params family x).toSubMeasurement)
 
-/-- Right tensor-placement placeholder for `\widehat G^x_g`. -/
+/-- Right tensor-placement for `\widehat G^x_g`. -/
 def gHatSelfConsistencyRightFamily (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SliceQuestion params) (GHatOutcome params) :=
-  fun x => tagSubMeasurement "right" ((gHatIndexedMeasurement params family x).toSubMeasurement)
+  fun x => rightPlacedSubMeasurement ((gHatIndexedMeasurement params family x).toSubMeasurement)
 
-/-- Placeholder family for the pairwise product `\widehat G^x_g \widehat G^y_h`. -/
+/-- Concrete family for the pairwise product `\widehat G^x_g \widehat G^y_h`. -/
 def gHatPairProductLeft (params : Parameters)
-    (_family : IndexedPolynomialFamily params) :
+    (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) :=
-  fun _ => { name := s!"ghat.pair.left({params.m},{params.q},{params.d})" }
+  fun q =>
+    leftPlacedSubMeasurement <|
+      orderedProductSubMeasurement
+        s!"ghat.pair.left({params.m},{params.q},{params.d})"
+        ((gHatIndexedMeasurement params family q.1).toSubMeasurement)
+        ((gHatIndexedMeasurement params family q.2).toSubMeasurement)
 
-/-- Placeholder family for the reversed pairwise product `\widehat G^y_h \widehat G^x_g`. -/
+/-- Concrete family for the reversed pairwise product `\widehat G^y_h \widehat G^x_g`. -/
 def gHatPairProductRight (params : Parameters)
-    (_family : IndexedPolynomialFamily params) :
+    (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) :=
-  fun _ => { name := s!"ghat.pair.right({params.m},{params.q},{params.d})" }
+  fun q =>
+    leftPlacedSubMeasurement <|
+      orderedProductSubMeasurement
+        s!"ghat.pair.right({params.m},{params.q},{params.d})"
+        ((gHatIndexedMeasurement params family q.2).toSubMeasurement)
+        ((gHatIndexedMeasurement params family q.1).toSubMeasurement)
 
-/-- Placeholder family for the half-sandwich product of `k` completed slices. -/
+/-- The ordered half-product `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
+def gHatHalfProductOutcomeOperator (params : Parameters)
+    (family : IndexedPolynomialFamily params) :
+    (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Operator
+  | 0, _xs, _gs =>
+      Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalf({params.m},{params.q},{params.d},0)"
+  | k + 1, xs, gs =>
+      formalProduct
+        (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).outcomeOperator (gs 0))
+        (gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs))
+
+/-- The total half-product `\sum_{g_1,\dots,g_k} \widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
+def gHatHalfProductTotalOperator (params : Parameters)
+    (family : IndexedPolynomialFamily params) :
+    (k : ℕ) → PointTuple params k → Operator
+  | 0, _xs =>
+      Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalfTotal({params.m},{params.q},{params.d},0)"
+  | k + 1, xs =>
+      formalProduct
+        (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).totalOperator)
+        (gHatHalfProductTotalOperator params family k (pointTupleTail xs))
+
+/-- The cyclically rotated half-product `\widehat G^{x_2}_{g_2} \cdots \widehat G^{x_k}_{g_k} \widehat G^{x_1}_{g_1}`. -/
+def gHatRotatedHalfProductOutcomeOperator (params : Parameters)
+    (family : IndexedPolynomialFamily params) :
+    (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Operator
+  | 0, _xs, _gs =>
+      Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalfRot({params.m},{params.q},{params.d},0)"
+  | k + 1, xs, gs =>
+      formalProduct
+        (gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs))
+        (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).outcomeOperator (gs 0))
+
+/-- The total cyclically rotated half-product. -/
+def gHatRotatedHalfProductTotalOperator (params : Parameters)
+    (family : IndexedPolynomialFamily params) :
+    (k : ℕ) → PointTuple params k → Operator
+  | 0, _xs =>
+      Section7ExpansionHypercubeGraph.identityOperator s!"ghatHalfRotTotal({params.m},{params.q},{params.d},0)"
+  | k + 1, xs =>
+      formalProduct
+        (gHatHalfProductTotalOperator params family k (pointTupleTail xs))
+        (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).totalOperator)
+
+/-- Concrete family for the full sandwich
+`\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k} \cdots \widehat G^{x_1}_{g_1}`. -/
+def gHatSandwichFamily (params : Parameters)
+    (family : IndexedPolynomialFamily params) (k : ℕ) :
+    IndexedSubMeasurement (PointTuple params k) (GHatTupleOutcome params k) :=
+  fun xs =>
+    { name := s!"ghat.sandwich({params.m},{params.q},{params.d},{k})"
+      outcomeOperator := fun gs =>
+        let half := gHatHalfProductOutcomeOperator params family k xs gs
+        formalProduct half (formalAdjoint half)
+      totalOperator :=
+        let half := gHatHalfProductTotalOperator params family k xs
+        formalProduct half (formalAdjoint half) }
+
+/-- Concrete family for the half-sandwich product of `k` completed slices. -/
 def gHatHalfSandwichLeft (params : Parameters)
-    (_family : IndexedPolynomialFamily params) (k : ℕ) :
+    (family : IndexedPolynomialFamily params) (k : ℕ) :
     IndexedSubMeasurement (PointTuple params k) (GHatTupleOutcome params k) :=
-  fun _ => { name := s!"ghat.half.left({params.m},{params.q},{params.d},{k})" }
+  fun xs =>
+    leftPlacedSubMeasurement <|
+      { name := s!"ghat.half.left({params.m},{params.q},{params.d},{k})"
+        outcomeOperator := fun gs => gHatHalfProductOutcomeOperator params family k xs gs
+        totalOperator := gHatHalfProductTotalOperator params family k xs }
 
-/-- Placeholder family for the cyclically permuted half-sandwich product. -/
+/-- Concrete family for the cyclically permuted half-sandwich product. -/
 def gHatHalfSandwichRight (params : Parameters)
-    (_family : IndexedPolynomialFamily params) (k : ℕ) :
+    (family : IndexedPolynomialFamily params) (k : ℕ) :
     IndexedSubMeasurement (PointTuple params k) (GHatTupleOutcome params k) :=
-  fun _ => { name := s!"ghat.half.right({params.m},{params.q},{params.d},{k})" }
+  fun xs =>
+    leftPlacedSubMeasurement <|
+      { name := s!"ghat.half.right({params.m},{params.q},{params.d},{k})"
+        outcomeOperator := fun gs => gHatRotatedHalfProductOutcomeOperator params family k xs gs
+        totalOperator := gHatRotatedHalfProductTotalOperator params family k xs }
 
-/-- Placeholder family for the predicted value of the `i`-th sandwiched slice. -/
-def ldSandwichLineOnePointLeftFamily (params : Parameters)
-    (_strategy : SymmetricStrategy params.next)
-    (_family : IndexedPolynomialFamily params)
-    (k i : ℕ) : IndexedSubMeasurement (SandwichedLineQuestion params k) (Fq params) :=
-  fun _ => { name := s!"ldSandwich.left({params.m},{params.q},{params.d},{k},{i})" }
+/-- The type-dependent Bernoulli weight `S_{\tau_{\ge \ell}}` from `lem:from-H-to-G`. -/
+def suffixBernoulliWeightOperator (params : Parameters)
+    (_family : IndexedPolynomialFamily params) (k ℓ : ℕ) (_τ : GHatType k) : Operator :=
+  { name := s!"S_tau>=({params.m},{params.q},{params.d},{k},{ℓ})" }
 
-/-- Placeholder family for the corresponding line-value measurement from `B^u`. -/
-def ldSandwichLineOnePointRightFamily (params : Parameters)
-    (_strategy : SymmetricStrategy params.next)
-    (_family : IndexedPolynomialFamily params)
-    (k i : ℕ) : IndexedSubMeasurement (SandwichedLineQuestion params k) (Fq params) :=
-  fun _ => { name := s!"ldSandwich.right({params.m},{params.q},{params.d},{k},{i})" }
+/-- The default type used when packaging the recurrence step at the statement level. -/
+def emptyGHatType (k : ℕ) : GHatType k :=
+  fun _ => false
 
-/-- Placeholder family for the restriction `H_[h|_u = f]`. -/
-def hRestrictionToVerticalLine (params : Parameters)
-    (H : SubMeasurement (Polynomial params.next)) :
-    IndexedSubMeasurement (VerticalLineQuestion params) (AxisLinePolynomial params.next) :=
-  fun _ => { name := s!"{H.name}.verticalRestriction" }
+/-- Placeholder family for the interpolated operator `H^{x_1,\dots,x_k}_h`. -/
+def pastedInterpolationFamily (params : Parameters)
+    (family : IndexedPolynomialFamily params) (k : ℕ) :
+    IndexedSubMeasurement (PointTuple params k) (Polynomial params.next) :=
+  fun xs =>
+    postprocess (gHatSandwichFamily params family k xs)
+      (interpolateCompletedSlices params k xs)
+
+/-- The averaged sandwiched family before interpolation. -/
+def averagedSandwichSubMeasurement (params : Parameters)
+    (family : IndexedPolynomialFamily params) (k : ℕ) :
+    SubMeasurement (GHatTupleOutcome params k) :=
+  averageIndexedSubMeasurement
+    s!"ghat.sandwich.avg({params.m},{params.q},{params.d},{k})"
+    (distinctTupleDistribution params k)
+    (gHatSandwichFamily params family k)
+
+/-- The specific pasted submeasurement constructed from the sandwich/interpolation scheme. -/
+def constructedPastedSubMeasurement (params : Parameters)
+    (family : IndexedPolynomialFamily params) (k : ℕ) : SubMeasurement (Polynomial params.next) :=
+  averageIndexedSubMeasurement
+    s!"Hpasted({params.m},{params.q},{params.d},{k})"
+    (distinctTupleDistribution params k)
+    (pastedInterpolationFamily params family k)
+
+/-- The specific pasted measurement obtained by completing the constructed pasted submeasurement. -/
+def constructedPastedMeasurement (params : Parameters)
+    (family : IndexedPolynomialFamily params) (k : ℕ) : Measurement (Polynomial params.next) where
+  toSubMeasurement := {
+    name := s!"{(constructedPastedSubMeasurement params family k).name}.completion"
+    outcomeOperator := (constructedPastedSubMeasurement params family k).outcomeOperator
+    totalOperator :=
+      Section7ExpansionHypercubeGraph.identityOperator
+        s!"{(constructedPastedSubMeasurement params family k).name}.completion" }
 
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/
 def verticalLineMeasurementFamily (params : Parameters)
@@ -256,23 +491,88 @@ def verticalLineMeasurementFamily (params : Parameters)
     IndexedSubMeasurement (VerticalLineQuestion params) (AxisLinePolynomial params.next) :=
   fun _ => { name := s!"verticalLine.B({params.m},{params.q},{params.d})" }
 
+/-- Explicit value extracted from the `i`-th completed slice outcome at the test point. -/
+def ldSandwichLineOnePointLeftFamily (params : Parameters)
+    (_strategy : SymmetricStrategy params.next)
+    (family : IndexedPolynomialFamily params)
+    (k i : ℕ) : IndexedSubMeasurement (SandwichedLineQuestion params k) (Option (Fq params)) :=
+  fun q =>
+    postprocess (gHatSandwichFamily params family k q.2) (fun gs =>
+      if h : i < k then
+        Option.map (fun g => g q.1) (gs ⟨i, h⟩)
+      else
+        none)
+
+/-- Explicit value extracted from the vertical line measurement `B^u` at the slice height `x_i`. -/
+def ldSandwichLineOnePointRightFamily (params : Parameters)
+    (strategy : SymmetricStrategy params.next)
+    (_family : IndexedPolynomialFamily params)
+    (k i : ℕ) : IndexedSubMeasurement (SandwichedLineQuestion params k) (Option (Fq params)) :=
+  fun q =>
+    postprocess (verticalLineMeasurementFamily params strategy q.1) (fun f =>
+      if h : i < k then
+        some (f (q.2 ⟨i, h⟩))
+      else
+        none)
+
+/-- Restrict a global polynomial-valued submeasurement to the vertical line through `u`. -/
+def hRestrictionToVerticalLine (params : Parameters)
+    (H : SubMeasurement (Polynomial params.next)) :
+    IndexedSubMeasurement (VerticalLineQuestion params) (AxisLinePolynomial params.next) :=
+  fun u =>
+    let verticalLine : AxisParallelLine params.next :=
+      { base := appendPoint params u zeroCoord
+        direction := ⟨params.m, Nat.lt_succ_self params.m⟩ }
+    postprocess H (fun h => Polynomial.restrictToAxisParallelLine params.next h verticalLine)
+
 /-- Collapse a submeasurement to its `Unit`-valued total operator. -/
 def pastedMeasurementTotal {α : Type _} (H : SubMeasurement α) : IndexedSubMeasurement Unit Unit :=
   constantSubMeasurementFamily (postprocess H (fun _ => ()))
 
-/-- Placeholder family for the expansion over all outcome types `τ`. -/
+/-- The total operator of the specifically constructed pasted submeasurement. -/
+def constructedPastedMeasurementTotal (params : Parameters)
+    (family : IndexedPolynomialFamily params) (k : ℕ) :
+    IndexedSubMeasurement Unit Unit :=
+  pastedMeasurementTotal (constructedPastedSubMeasurement params family k)
+
+/-- The expansion over all outcome types `τ`, written as the total mass of the averaged sandwich family. -/
 def allOutcomesExpansionFamily (params : Parameters)
     (_strategy : SymmetricStrategy params.next)
-    (_family : IndexedPolynomialFamily params)
-    (_H : SubMeasurement (Polynomial params.next)) (k : ℕ) :
+    (family : IndexedPolynomialFamily params) (k : ℕ) :
     IndexedSubMeasurement Unit Unit :=
-  fun _ => { name := s!"allOutcomes({params.m},{params.q},{params.d},{k})" }
+  pastedMeasurementTotal (averagedSandwichSubMeasurement params family k)
 
-/-- Placeholder family for the Bernoulli-tail polynomial in the complete part `G`. -/
+/-- The Bernoulli-tail polynomial in the averaged complete operator `G = E_x \sum_g G^x_g`. -/
 def bernoulliTailFromFamily (params : Parameters)
-    (_family : IndexedPolynomialFamily params) (k : ℕ) :
+    (family : IndexedPolynomialFamily params) (k : ℕ) :
     IndexedSubMeasurement Unit Unit :=
-  fun _ => { name := s!"familyBernoulliTail({params.m},{params.q},{params.d},{k})" }
+  constantSubMeasurementFamily <|
+    bernoulliTailSubMeasurement k params.d
+      ((IndexedPolynomialFamily.averagedSubMeasurement family).totalOperator)
+
+/-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`. -/
+def fromHToGRecurrenceLeftFamily (params : Parameters)
+    (strategy : SymmetricStrategy params.next)
+    (family : IndexedPolynomialFamily params) (k ℓ : ℕ) :
+    IndexedSubMeasurement Unit Unit :=
+  fun _ =>
+    let base := allOutcomesExpansionFamily params strategy family k ()
+    let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
+    { name := s!"fromHToG.left({params.m},{params.q},{params.d},{k},{ℓ})"
+      outcomeOperator := fun _ => formalProduct base.totalOperator weight
+      totalOperator := formalProduct base.totalOperator weight }
+
+/-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`. -/
+def fromHToGRecurrenceRightFamily (params : Parameters)
+    (strategy : SymmetricStrategy params.next)
+    (family : IndexedPolynomialFamily params) (k ℓ : ℕ) :
+    IndexedSubMeasurement Unit Unit :=
+  fun _ =>
+    let base := bernoulliTailFromFamily params family k ()
+    let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
+    { name := s!"fromHToG.right({params.m},{params.q},{params.d},{k},{ℓ})"
+      outcomeOperator := fun _ => formalProduct base.totalOperator weight
+      totalOperator := formalProduct base.totalOperator weight }
 
 /-- The final completeness lower bound used in the pasting statements. -/
 noncomputable def ldPastingCompletenessLowerBound (params : Parameters)
@@ -358,12 +658,21 @@ noncomputable def fromHToGError (params : Parameters)
       Real.rpow zeta (1 / (32 : Error)) +
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)))
 
+/-- The per-step recurrence loss from the proof of `lem:from-H-to-G`. -/
+noncomputable def fromHToGRecurrenceError (params : Parameters)
+    (gamma zeta : Error) (k : ℕ) : Error :=
+  2 * Real.rpow (2 * zeta) (1 / (2 : Error)) +
+    2 * Real.rpow (commuteGHalfSandwichError params gamma zeta k) (1 / (2 : Error))
+
 /-- Output package for `thm:ld-pasting`. -/
 structure LdPastingConclusion (params : Parameters)
     (strategy : SymmetricStrategy params.next)
     (family : IndexedPolynomialFamily params)
     (H : Measurement (Polynomial params.next))
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
+  largeEnough : 400 * params.m * params.d ≤ k
+  constructedMeasurement :
+    H = constructedPastedMeasurement params family k
   pointConsistency :
     ConsistentWithPolynomialEvaluation params.next strategy.state
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
@@ -377,6 +686,9 @@ structure LdPastingSubMeasurementConclusion (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (H : SubMeasurement (Polynomial params.next))
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
+  largeEnough : 400 * params.m * params.d ≤ k
+  constructedSubMeasurement :
+    H = constructedPastedSubMeasurement params family k
   pointConsistency :
     ConsistentWithPolynomialEvaluation params.next strategy.state
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
@@ -404,6 +716,8 @@ structure GCompleteSelfConsistencyStatement (params : Parameters)
 structure GBotSelfConsistencyStatement (params : Parameters)
     (ψ : QuantumState)
     (family : IndexedPolynomialFamily params) (zeta : Error) : Prop where
+  completePartWitness :
+    GCompleteSelfConsistencyStatement params ψ family zeta
   incompletePartSelfConsistency :
     StateDependentDistanceRel ψ
       (uniformDistribution (SliceQuestion params))
@@ -447,6 +761,8 @@ structure CommutingWithGIncompleteStatement (params : Parameters)
     (ψ : QuantumState)
     (family : IndexedPolynomialFamily params)
     (gamma zeta : Error) : Prop where
+  completePartWitness :
+    CommutingWithGCompleteStatement params ψ family gamma zeta
   pointWithIncompletePartCommutation :
     StateDependentDistanceRel ψ
       (uniformDistribution (SlicePairQuestion params))
@@ -465,6 +781,14 @@ structure GHatFactsStatement (params : Parameters)
     (ψ : QuantumState)
     (family : IndexedPolynomialFamily params)
     (gamma zeta : Error) : Prop where
+  completePartSelfConsistencyWitness :
+    GCompleteSelfConsistencyStatement params ψ family zeta
+  incompletePartSelfConsistencyWitness :
+    GBotSelfConsistencyStatement params ψ family zeta
+  completePartCommutationWitness :
+    CommutingWithGCompleteStatement params ψ family gamma zeta
+  incompletePartCommutationWitness :
+    CommutingWithGIncompleteStatement params ψ family gamma zeta
   completedSelfConsistency :
     StateDependentDistanceRel ψ
       (uniformDistribution (SliceQuestion params))
@@ -507,12 +831,11 @@ structure LdSandwichLineOnePointStatement (params : Parameters)
 structure HBConsistencyStatement (params : Parameters)
     (strategy : SymmetricStrategy params.next)
     (family : IndexedPolynomialFamily params)
-    (H : SubMeasurement (Polynomial params.next))
     (eps delta gamma zeta : Error) (k : ℕ) : Prop where
   lineConsistency :
     ConsistencyRel strategy.state
       (uniformDistribution (VerticalLineQuestion params))
-      (hRestrictionToVerticalLine params H)
+      (hRestrictionToVerticalLine params (constructedPastedSubMeasurement params family k))
       (verticalLineMeasurementFamily params strategy)
       (hBConsistencyError params eps delta gamma zeta k)
 
@@ -520,23 +843,27 @@ structure HBConsistencyStatement (params : Parameters)
 structure OverAllOutcomesStatement (params : Parameters)
     (strategy : SymmetricStrategy params.next)
     (family : IndexedPolynomialFamily params)
-    (H : SubMeasurement (Polynomial params.next))
     (eps delta gamma zeta : Error) (k : ℕ) : Prop where
   totalOutcomeExpansion :
     StateDependentDistanceRel strategy.state (uniformDistribution Unit)
-      (pastedMeasurementTotal H)
-      (allOutcomesExpansionFamily params strategy family H k)
+      (constructedPastedMeasurementTotal params family k)
+      (allOutcomesExpansionFamily params strategy family k)
       (overAllOutcomesError params eps delta gamma zeta k)
 
 /-- Output package for `lem:from-H-to-G`. -/
 structure FromHToGStatement (params : Parameters)
     (strategy : SymmetricStrategy params.next)
     (family : IndexedPolynomialFamily params)
-    (H : SubMeasurement (Polynomial params.next))
     (gamma zeta : Error) (k : ℕ) : Prop where
+  recurrenceStep :
+    ∀ ℓ : ℕ, ℓ < k →
+      StateDependentDistanceRel strategy.state (uniformDistribution Unit)
+        (fromHToGRecurrenceLeftFamily params strategy family k ℓ)
+        (fromHToGRecurrenceRightFamily params strategy family k ℓ)
+        (fromHToGRecurrenceError params gamma zeta k)
   bernoulliPolynomialRewrite :
     StateDependentDistanceRel strategy.state (uniformDistribution Unit)
-      (allOutcomesExpansionFamily params strategy family H k)
+      (allOutcomesExpansionFamily params strategy family k)
       (bernoulliTailFromFamily params family k)
       (fromHToGError params gamma zeta k)
 
@@ -552,10 +879,11 @@ structure ChernoffBernoulliMatrixStatement
 structure LdPastingNCompletenessStatement (params : Parameters)
     (strategy : SymmetricStrategy params.next)
     (family : IndexedPolynomialFamily params)
-    (H : SubMeasurement (Polynomial params.next))
     (kappa nu : Error) (k : ℕ) : Prop where
+  largeEnough : 400 * params.m * params.d ≤ k
   completenessBound :
-    CompletenessAtLeast strategy.state H
+    CompletenessAtLeast strategy.state
+      (constructedPastedSubMeasurement params family k)
       (ldPastingCompletenessLowerBound params kappa nu k)
 
 /-- `thm:ld-pasting`. -/
@@ -569,7 +897,8 @@ theorem ldPasting
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
-    (k : ℕ) :
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next),
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   sorry
@@ -585,7 +914,8 @@ lemma ldPastingSubMeasurement
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
-    (k : ℕ) :
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : SubMeasurement (Polynomial params.next),
       LdPastingSubMeasurementConclusion params strategy family H eps delta gamma kappa zeta k := by
   sorry
@@ -595,7 +925,7 @@ theorem ldDnoteq
     (params : Parameters) (k : ℕ) :
     totalVariationDistance (uniformDistribution (PointTuple params k))
         (distinctTupleDistribution params k)
-      ≤ ((k : Error) ^ (2 : ℕ)) / ((params.q : Error) + 1) := by
+      ≤ ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
   sorry
 
 /-- `lem:looks-easy-but-took-me-a-while`. -/
@@ -676,6 +1006,7 @@ theorem gHatFacts
     (gamma zeta : Error)
     (hselfComplete : GCompleteSelfConsistencyStatement params ψ family zeta)
     (hselfIncomplete : GBotSelfConsistencyStatement params ψ family zeta)
+    (hcommComplete : CommutingWithGCompleteStatement params ψ family gamma zeta)
     (hcommIncomplete : CommutingWithGIncompleteStatement params ψ family gamma zeta) :
     GHatFactsStatement params ψ family gamma zeta := by
   sorry
@@ -718,9 +1049,10 @@ lemma hBConsistency
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
-    (H : SubMeasurement (Polynomial params.next))
-    (k : ℕ) :
-    HBConsistencyStatement params strategy family H eps delta gamma zeta k := by
+    (k : ℕ)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i) :
+    HBConsistencyStatement params strategy family eps delta gamma zeta k := by
   sorry
 
 /-- `lem:over-all-outcomes`. -/
@@ -729,9 +1061,8 @@ lemma overAllOutcomes
     (strategy : SymmetricStrategy params.next)
     (eps delta gamma zeta : Error)
     (family : IndexedPolynomialFamily params)
-    (H : SubMeasurement (Polynomial params.next))
     (k : ℕ) :
-    OverAllOutcomesStatement params strategy family H eps delta gamma zeta k := by
+    OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
   sorry
 
 /-- `lem:from-H-to-G`. -/
@@ -740,9 +1071,9 @@ lemma fromHToG
     (strategy : SymmetricStrategy params.next)
     (gamma zeta : Error)
     (family : IndexedPolynomialFamily params)
-    (H : SubMeasurement (Polynomial params.next))
-    (k : ℕ) :
-    FromHToGStatement params strategy family H gamma zeta k := by
+    (k : ℕ)
+    (hhalf : CommuteGHalfSandwichStatement params strategy.state family gamma zeta k) :
+    FromHToGStatement params strategy family gamma zeta k := by
   sorry
 
 /-- `lem:chernoff-bernoulli-matrix`. -/
@@ -762,11 +1093,10 @@ theorem ldPastingNCompleteness
     (params : Parameters)
     (strategy : SymmetricStrategy params.next)
     (family : IndexedPolynomialFamily params)
-    (H : SubMeasurement (Polynomial params.next))
     (kappa nu : Error)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k) :
-    LdPastingNCompletenessStatement params strategy family H kappa nu k := by
+    LdPastingNCompletenessStatement params strategy family kappa nu k := by
   sorry
 
 end MIPStarRE.Paper2009LDT.Section12Pasting

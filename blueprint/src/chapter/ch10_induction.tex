@@ -66,7 +66,7 @@
 \end{theorem}
 \begin{proof}
   \uses{thm:self-improvement, prop:completing-to-measurement, prop:triangle-sub, prop:simeq-data-processing}
-  Complete the input submeasurement $G$ by adjoining the missing mass as an extra outcome. Apply Theorem~\ref{thm:self-improvement} to the resulting measurement, then restrict back to the original outcome set and transfer the consistency and boundedness estimates through completion and data processing. The source keeps this stronger submeasurement-input form explicit, so the blueprint keeps a separate node for it instead of identifying it with Theorem~\ref{thm:self-improvement}.
+  Complete the input submeasurement $G$ by adjoining an extra outcome $\bot$ for its missing mass. Apply Theorem~\ref{thm:self-improvement} to this completed measurement. The output is still indexed by the enlarged answer set, so one then discards the $\bot$ outcome and transfers the estimates back to the original polynomial outcomes. The quantitative work is exactly the completion bookkeeping from Lemma~\ref{prop:completing-to-measurement}: the helper theorem supplies completeness, consistency, strong self-consistency, and boundedness for the completed family, and these pass to the original submeasurement after data processing and one final triangle-inequality step.
 \end{proof}
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
@@ -87,7 +87,15 @@
 \end{theorem}
 \begin{proof}
   \uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting}
-  Proceed by induction on $m$. For $m=1$, the unique axis-parallel line measurement already gives the required global measurement. For the step from $m$ to $m+1$, apply the induction hypothesis to every restricted strategy from Definition~\ref{def:restricted-strategy}. Lemma~\ref{lem:restricted-probabilities} averages the resulting slice errors. Then apply Theorem~\ref{thm:self-improvement-in-induction-section} to each slice measurement and paste the improved slice family with Theorem~\ref{thm:ld-pasting}. The explicit constants are arranged so that the pasted error is bounded by the new value of $\sigma$.
+  Proceed by induction on $m$. For $m=1$, the unique axis-parallel line measurement already gives the required global measurement. For the step from $m$ to $m+1$, restrict the strategy to each slice $x$ and apply the induction hypothesis with the same $k$, producing slice measurements $G^x$ with slice-dependent errors $\nu_x$ and $\sigma_x$. Next self-improve each $G^x$ to a projective submeasurement $\widehat G^x$ with a third slice-dependent parameter
+  \[
+    \zeta_x = 3000m\left(\eps_x^{1/32}+\delta_x^{1/32}+(d/q)^{1/32}\right).
+  \]
+  Lemma~\ref{lem:restricted-probabilities} and concavity of $\alpha \mapsto \alpha^c$ for $c\le 1$ give averaged bounds $\E_x\nu_x \le \nu$, $\E_x\sigma_x \le \sigma$, and $\E_x\zeta_x \le \zeta$, where here $\zeta$ is the explicit averaged self-improvement error from the source; in particular one shows $\zeta \le \nu$. Theorem~\ref{thm:ld-pasting} then pastes the family $\{\widehat G^x\}$ into a global measurement with error
+  \[
+    \sigma^* = (\sigma+\zeta)\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)}.
+  \]
+  The final arithmetic check is that $\sigma^* \le (m+1)^2\bigl(\nu+e^{-k/(80000(m+1)^2)}\bigr)$, which is exactly the next-stage value of $\sigma$. This exposes the quantitative cascade hidden behind the one-line induction summary.
 \end{proof}
 
 \section{Proof of the main formal theorem}
@@ -95,5 +103,25 @@
 \begin{proof}
   \proves{thm:main-formal}
   \uses{thm:main-induction, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, lem:schwartz-zippel-individual}
-  Start from an arbitrary two-prover strategy and symmetrize it by adjoining a classical role register that decides which prover plays the first or second role. Apply Theorem~\ref{thm:main-induction} to the resulting symmetric strategy to obtain a global measurement on the enlarged space. Projecting to the two role sectors gives candidate global measurements $G^{\mathrm A}$ and $G^{\mathrm B}$ for the original provers. Their post-processed point evaluations are approximately consistent with the original point measurements, and Schwartz--Zippel turns that pointwise agreement into approximate self-consistency of the global measurements. Apply Lemma~\ref{lem:orthonormalization-main-lemma} to make the global measurements projective, complete them using Lemma~\ref{prop:completing-to-measurement}, and transfer the consistency bounds back through the preliminary comparison lemmas.
+  Start from the original two-prover strategy and symmetrize it by adjoining a classical role register. The symmetrized strategy is still good, now with all three error parameters bounded by $3\eps$, so Theorem~\ref{thm:main-induction} gives a global measurement $G$ on the enlarged space with consistency error $\sigma$. Projecting $G$ to the two role sectors yields POVMs $G^{\mathrm A}$ and $G^{\mathrm B}$ for the original provers. Triangle inequalities together with the original point-measurement consistency show that the post-processed families $G^{\mathrm A}_{[g(u)=a]}$ and $G^{\mathrm B}_{[g(u)=a]}$ are mutually consistent. Schwartz--Zippel then turns this pointwise agreement into global self-consistency, introducing the first intermediate parameter
+  \[
+    \zeta_1 = 2\sigma + 2\sqrt{3\eps+2\sigma} + \frac{md}{q}.
+  \]
+  Apply Lemma~\ref{lem:orthonormalization-main-lemma} to obtain projective submeasurements $P^{\mathrm A}$ and $P^{\mathrm B}$, and then complete them to projective measurements $Q^{\mathrm A}$ and $Q^{\mathrm B}$ using Lemma~\ref{prop:completing-to-measurement}. This introduces
+  \[
+    \zeta_2 = 200\zeta_1^{1/4} + 40\zeta_1^{1/8}.
+  \]
+  Comparing $Q^{\mathrm A}$ and $Q^{\mathrm B}$ through the original $G^{\mathrm A},G^{\mathrm B}$ gives a second self-consistency parameter
+  \[
+    \zeta_3 = 6\zeta_1 + 6\zeta_2,
+  \]
+  and data processing plus one last triangle inequality with the original point measurements gives the final consistency error
+  \[
+    \zeta_4 = 2\sigma + 2\sqrt{\zeta_1 + \zeta_3/2}.
+  \]
+  The source then performs the explicit exponent bookkeeping showing that both $\zeta_3/2$ and $\zeta_4$ are bounded by
+  \[
+    100000k^2m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).
+  \]
+  Renaming the final projective measurements $Q^{\mathrm A},Q^{\mathrm B}$ as the theorem's $G^{\mathrm A},G^{\mathrm B}$ gives exactly the stated conclusion.
 \end{proof}

@@ -310,9 +310,37 @@
   The definition of $H$ only sums over tuples compatible with a global polynomial. Insert the line measurement $B^u$, use Lemma~\ref{lem:h-b-consistency} to show that globally inconsistent tuples contribute little, and then replace distinct tuples by independent tuples with Lemma~\ref{prop:ld-dnoteq}.
 \end{proof}
 
+\begin{definition}[Truncated type sums]\label{def:truncated-type-sums}
+  \uses{def:types}
+  For $1 \le \ell \le k+1$ and a tail type $\tau_{\ge \ell} \in \{0,1\}^{k-\ell+1}$, define
+  \[
+    S_{\tau_{\ge \ell}}
+    =
+    \sum_{\tau_{<\ell}\, :\, |\tau| \ge d+1} G^{|\tau_{<\ell}|}(I-G)^{(\ell-1)-|\tau_{<\ell}|}.
+  \]
+  This records the contribution of all prefixes that can still be completed to a type of weight at least $d+1$ once the tail $\tau_{\ge \ell}$ is fixed.
+\end{definition}
+
+\begin{lemma}[Recurrence for truncated type sums]\label{lem:truncated-type-sum-recurrence}
+  \uses{def:truncated-type-sums}
+  Each $S_{\tau_{\ge \ell}}$ is Hermitian, positive semidefinite, and bounded by $I$. Moreover, if $\tau_{>\ell}$ is a tail type of length $k-\ell$, then
+  \[
+    S_{\tau_{>\ell}}
+    =
+    \sum_{\tau_\ell \in \{0,1\}} S_{\tau_{\ge \ell}} G^{\tau_\ell}(I-G)^{1-\tau_\ell}.
+  \]
+\end{lemma}
+\begin{proof}
+  Every summand in $S_{\tau_{\ge \ell}}$ is a polynomial in the commuting positive operators $G$ and $I-G$, so $S_{\tau_{\ge \ell}}$ is Hermitian and positive. Summing over all prefixes gives
+  \[
+    S_{\tau_{\ge \ell}} \le (G+(I-G))^{\ell-1}=I.
+  \]
+  The recurrence is obtained by splitting the next type bit according to whether the $\ell$-th coordinate contributes a genuine slice polynomial or the extra outcome $\bot$.
+\end{proof}
+
 \begin{lemma}[From the pasted sum to a polynomial in $G$]\label{lem:from-H-to-G}
   \lean{MIPStarRE.Paper2009LDT.Section12Pasting.fromHToG}
-  \uses{cor:G-hat-facts, lem:commute-g-half-sandwich, def:pasted-measurement}
+  \uses{cor:G-hat-facts, lem:commute-g-half-sandwich, def:pasted-measurement, def:truncated-type-sums, lem:truncated-type-sum-recurrence}
   If $x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
   \[
     \E_{x_1,\dots,x_k} \sum_{\tau\, :\, |\tau| \ge d+1} \sum_{(g_1,\dots,g_k) \in \mathsf{Outcomes}_\tau}
@@ -326,7 +354,7 @@
   \]
 \end{lemma}
 \begin{proof}
-  Peel off the $k$ completed measurements one at a time. The recurrence for the remaining type sum produces either a factor of $G$ or a factor of $I-G$, and Lemma~\ref{lem:commute-g-half-sandwich} controls the commutations needed to expose that recurrence.
+  Rewrite the unrestricted sandwiched sum using the matrices $S_{\tau_{\ge \ell}}$ from Definition~\ref{def:truncated-type-sums}. For each stage $\ell$, move the rightmost factor $\widehat G_{g_\ell}^{x_\ell}$ from the left half of the sandwich to the second tensor factor, commute it past the remaining half-sandwich by Lemma~\ref{lem:commute-g-half-sandwich}, and then average over $x_\ell$. Lemma~\ref{lem:truncated-type-sum-recurrence} turns that average into multiplication by either $G$ or $I-G$, so one passes from $S_{\tau_{\ge \ell}}$ to $S_{\tau_{>\ell}}$. Iterating this recurrence for $\ell=1,\dots,k$ collapses the sandwiched expression to the Bernoulli polynomial $\sum_{r=d+1}^k \binom{k}{r} G^r(I-G)^{k-r}$.
 \end{proof}
 
 

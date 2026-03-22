@@ -1,13 +1,28 @@
 import Mathlib
+import Mathlib.FieldTheory.Finite.GaloisField
+import MIPStarRE.Quantum.FiniteMatrix
 
 /-!
 Matching scaffold for Section 3 of the low individual degree paper in
 `references/ldt-paper/test_definition.tex`.
 
-This file intentionally uses lightweight paper-local placeholders. The goal of the
-current pass is to mirror the paper's declarations closely enough that the
-blueprint can target stable Lean names before any proofs are attempted.
+This pass keeps the theorem statements lightweight, but it now makes three parts of
+Section 3 materially more honest:
+
+* the ambient alphabet carries a genuine finite-ring coding layer via `ZMod q`, and
+  the optional prime-power witness is wired to Mathlib's `GaloisField`;
+* global and line answers are represented by actual multivariate / univariate
+  polynomial data, not by arbitrary tagged functions;
+* the state / operator layer reuses the local finite-dimensional matrix API for the
+  ambient operator carrier and expectation values.
+
+The remaining gaps are recorded explicitly in the comparison-calculus layer and the
+later theorem proofs, which are still scaffolded with `sorry`.
 -/
+
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+noncomputable section
 
 namespace MIPStarRE.Paper2009LDT
 
@@ -30,21 +45,96 @@ structure Parameters where
   m : ℕ
   q : ℕ
   d : ℕ
-  deriving DecidableEq, Repr, Inhabited
+  hm : 0 < m
+  hq : 0 < q
+  deriving DecidableEq
+
+instance : Inhabited Parameters where
+  default :=
+    { m := 1
+      q := 2
+      d := 0
+      hm := by decide
+      hq := by decide }
 
 /-- The successor test obtained by appending one coordinate. -/
 def Parameters.next (params : Parameters) : Parameters :=
-  { params with m := params.m + 1 }
+  { m := params.m + 1
+    q := params.q
+    d := params.d
+    hm := Nat.succ_pos _
+    hq := params.hq }
+
+instance {params : Parameters} : NeZero params.q :=
+  ⟨Nat.ne_of_gt params.hq⟩
 
 abbrev Fq (params : Parameters) := Fin params.q
 abbrev Point (params : Parameters) := Fin params.m → Fq params
 abbrev PointTuple (params : Parameters) (k : ℕ) := Fin k → Fq params
+abbrev Scalar (params : Parameters) := ZMod params.q
+abbrev PolynomialModel (params : Parameters) := MvPolynomial (Fin params.m) (Scalar params)
+abbrev LinePolynomialModel (params : Parameters) := _root_.Polynomial (Scalar params)
+abbrev HilbertIndex (n : ℕ) := Fin n
 
-/-- The zero coordinate extracted from any available field element witness. -/
-def zeroCoord {params : Parameters} (x : Fq params) : Fq params :=
-  let hq : 0 < params.q :=
-    Nat.lt_of_lt_of_le (Nat.zero_lt_succ x.1) (Nat.succ_le_of_lt x.isLt)
-  ⟨0, hq⟩
+instance {params : Parameters} : Inhabited (Fin params.m) :=
+  ⟨⟨0, params.hm⟩⟩
+
+instance {params : Parameters} : Inhabited (Fq params) :=
+  ⟨⟨0, params.hq⟩⟩
+
+/-- Prime-power metadata exposing the genuine finite-field carrier `GaloisField p n`
+underlying the paper's notation `F_q` when such a witness is available. -/
+structure PrimePowerFieldSpec (params : Parameters) where
+  p : ℕ
+  n : ℕ
+  pPrime : Nat.Prime p
+  nPos : 0 < n
+  cardEq : params.q = p ^ n
+
+/-- An honest finite field of order `q`, obtained from a prime-power decomposition of `q`. -/
+noncomputable abbrev HonestFq (params : Parameters) (spec : PrimePowerFieldSpec params) :=
+  letI : Fact spec.p.Prime := ⟨spec.pPrime⟩
+  GaloisField spec.p spec.n
+
+/-- Interpret a coded coordinate in `Fin q` as a scalar in `ZMod q`. -/
+def decodeScalar {params : Parameters} (x : Fq params) : Scalar params :=
+  (x.1 : ZMod params.q)
+
+/-- Re-encode a scalar in `ZMod q` as its canonical representative in `Fin q`. -/
+def encodeScalar {params : Parameters} (x : Scalar params) : Fq params :=
+  ⟨x.val, ZMod.val_lt x⟩
+
+/-- The zero coordinate. -/
+def zeroCoord {params : Parameters} : Fq params :=
+  encodeScalar 0
+
+/-- Coordinate addition transported through the `Fin q` coding. -/
+def addCoord {params : Parameters} (x y : Fq params) : Fq params :=
+  encodeScalar (decodeScalar x + decodeScalar y)
+
+/-- Coordinate subtraction transported through the `Fin q` coding. -/
+def subCoord {params : Parameters} (x y : Fq params) : Fq params :=
+  encodeScalar (decodeScalar x - decodeScalar y)
+
+/-- Coordinate multiplication transported through the `Fin q` coding. -/
+def mulCoord {params : Parameters} (x y : Fq params) : Fq params :=
+  encodeScalar (decodeScalar x * decodeScalar y)
+
+/-- Pointwise addition in the coded ambient space. -/
+def addPoint {params : Parameters} (u v : Point params) : Point params :=
+  fun i => addCoord (u i) (v i)
+
+/-- Scalar multiplication in the coded ambient space. -/
+def smulPoint {params : Parameters} (t : Fq params) (u : Point params) : Point params :=
+  fun i => mulCoord t (u i)
+
+/-- The inclusion of the first `m` coordinates into `m + 1` coordinates. -/
+def embedCoord (params : Parameters) : Fin params.m → Fin params.next.m :=
+  fun i => ⟨i.1, Nat.lt_trans i.2 (Nat.lt_succ_self params.m)⟩
+
+/-- The last coordinate of `F_q^(m+1)`. -/
+def lastCoord (params : Parameters) : Fin params.next.m :=
+  ⟨params.m, Nat.lt_succ_self params.m⟩
 
 /-- Append a final coordinate to a point in `F_q^m`. -/
 def appendPoint (params : Parameters) (u : Point params) (x : Fq params) : Point params.next :=
@@ -56,7 +146,7 @@ def truncatePoint (params : Parameters) (u : Point params.next) : Point params :
 
 /-- Extract the final coordinate of a point in `F_q^{m+1}`. -/
 def pointHeight (params : Parameters) (u : Point params.next) : Fq params :=
-  u ⟨params.m, Nat.lt_succ_self params.m⟩
+  u (lastCoord params)
 
 @[simp] theorem truncatePoint_appendPoint (params : Parameters)
     (u : Point params) (x : Fq params) :
@@ -67,123 +157,390 @@ def pointHeight (params : Parameters) (u : Point params.next) : Fq params :=
 @[simp] theorem pointHeight_appendPoint (params : Parameters)
     (u : Point params) (x : Fq params) :
     pointHeight params (appendPoint params u x) = x := by
-  simp [pointHeight, appendPoint]
+  simp [pointHeight, lastCoord, appendPoint]
 
-/-- A lightweight encoding of an axis-parallel line in `F_q^m`. -/
+/-- Decode a coded point as a tuple of `ZMod q` scalars. -/
+def decodePoint {params : Parameters} (u : Point params) : Fin params.m → Scalar params :=
+  fun i => decodeScalar (u i)
+
+/-- Evaluate a multivariate `ZMod q` polynomial on a coded point. -/
+def evalPolynomialModel (params : Parameters)
+    (p : PolynomialModel params) (u : Point params) : Fq params :=
+  encodeScalar (MvPolynomial.eval (decodePoint u) p)
+
+/-- Evaluate a univariate `ZMod q` polynomial on a coded point. -/
+def evalLinePolynomialModel (params : Parameters)
+    (p : LinePolynomialModel params) (t : Fq params) : Fq params :=
+  encodeScalar (_root_.Polynomial.eval (decodeScalar t) p)
+
+/-- A genuinely axis-parallel affine line in `F_q^m`. -/
 structure AxisParallelLine (params : Parameters) where
   base : Point params
   direction : Fin params.m
+  deriving DecidableEq, Inhabited
+
+namespace AxisParallelLine
+
+/-- The canonical affine parameterization `t ↦ base + t e_i`. -/
+def pointAt {params : Parameters} (ℓ : AxisParallelLine params) : Fq params → Point params :=
+  fun t i =>
+    if i = ℓ.direction then
+      addCoord (ℓ.base i) t
+    else
+      ℓ.base i
 
 /-- Embed an axis-parallel line into the slice at height `x`. -/
-def AxisParallelLine.appendAtHeight (params : Parameters)
+def appendAtHeight (params : Parameters)
     (ℓ : AxisParallelLine params) (x : Fq params) : AxisParallelLine params.next where
   base := appendPoint params ℓ.base x
-  direction := ⟨ℓ.direction.1, Nat.lt_trans ℓ.direction.2 (Nat.lt_succ_self params.m)⟩
+  direction := embedCoord params ℓ.direction
 
-/-- A lightweight encoding of a diagonal line in `F_q^m`. -/
+end AxisParallelLine
+
+/-- A genuinely affine diagonal line in `F_q^m`. -/
 structure DiagonalLine (params : Parameters) where
   base : Point params
   direction : Point params
+  deriving DecidableEq, Inhabited
 
-/-- Embed a diagonal line into the slice at height `x`. -/
-def DiagonalLine.appendAtHeight (params : Parameters)
+namespace DiagonalLine
+
+/-- The canonical affine parameterization `t ↦ base + t · direction`. -/
+def pointAt {params : Parameters} (ℓ : DiagonalLine params) : Fq params → Point params :=
+  fun t => addPoint ℓ.base (smulPoint t ℓ.direction)
+
+/-- Embed a diagonal line into the slice at height `x`, keeping the new coordinate fixed. -/
+def appendAtHeight (params : Parameters)
     (ℓ : DiagonalLine params) (x : Fq params) : DiagonalLine params.next where
   base := appendPoint params ℓ.base x
-  direction := appendPoint params ℓ.direction (zeroCoord x)
+  direction := appendPoint params ℓ.direction zeroCoord
+
+end DiagonalLine
+
+/-- A coded function has low individual degree when it is represented by an actual
+multivariate polynomial over `ZMod q` whose degree in each variable is at most `d`. -/
+def HasLowIndividualDegree (params : Parameters) (g : Point params → Fq params) : Prop :=
+  ∃ p : PolynomialModel params,
+    (∀ i, MvPolynomial.degreeOf i p ≤ params.d) ∧
+      g = evalPolynomialModel params p
+
+/-- A coded univariate function has degree at most `bound` when it is represented by
+an actual polynomial over `ZMod q` of degree at most `bound`. -/
+def HasUnivariateDegreeAtMost (params : Parameters)
+    (bound : ℕ) (f : Fq params → Fq params) : Prop :=
+  ∃ p : LinePolynomialModel params,
+    p.natDegree ≤ bound ∧
+      f = evalLinePolynomialModel params p
+
+/-- Axis-parallel line answers are genuine univariate degree-`d` polynomials. -/
+structure AxisLinePolynomial (params : Parameters) where
+  poly : LinePolynomialModel params
+  degreeBounded : poly.natDegree ≤ params.d
+
+namespace AxisLinePolynomial
+
+/-- Evaluation of an axis-line answer on the line parameter. -/
+def toFun {params : Parameters} (f : AxisLinePolynomial params) : Fq params → Fq params :=
+  evalLinePolynomialModel params f.poly
+
+instance {params : Parameters} :
+    CoeFun (AxisLinePolynomial params) (fun _ => Fq params → Fq params) :=
+  ⟨AxisLinePolynomial.toFun⟩
+
+/-- The stored polynomial really witnesses the advertised degree bound. -/
+theorem hasUnivariateDegreeAtMost {params : Parameters} (f : AxisLinePolynomial params) :
+    HasUnivariateDegreeAtMost params params.d f := by
+  refine ⟨f.poly, f.degreeBounded, ?_⟩
+  funext t
+  rfl
+
+/-- Extend an axis-line answer to the slice at height `x`. -/
+def appendAtHeight (params : Parameters)
+    (f : AxisLinePolynomial params) (_x : Fq params) : AxisLinePolynomial params.next where
+  poly := f.poly
+  degreeBounded := by
+    simpa [Parameters.next] using f.degreeBounded
+
+/-- Restrict an axis-line answer in `m + 1` variables to the slice at height `x`. -/
+def restrictAtHeight (params : Parameters)
+    (f : AxisLinePolynomial params.next) (_x : Fq params) : AxisLinePolynomial params where
+  poly := f.poly
+  degreeBounded := by
+    simpa [Parameters.next] using f.degreeBounded
+
+end AxisLinePolynomial
+
+/-- Diagonal-line answers are genuine univariate degree-`md` polynomials. -/
+structure DiagonalLinePolynomial (params : Parameters) where
+  poly : LinePolynomialModel params
+  degreeBounded : poly.natDegree ≤ params.m * params.d
+
+namespace DiagonalLinePolynomial
+
+/-- Evaluation of a diagonal-line answer on the line parameter. -/
+def toFun {params : Parameters} (f : DiagonalLinePolynomial params) : Fq params → Fq params :=
+  evalLinePolynomialModel params f.poly
+
+instance {params : Parameters} :
+    CoeFun (DiagonalLinePolynomial params) (fun _ => Fq params → Fq params) :=
+  ⟨DiagonalLinePolynomial.toFun⟩
+
+/-- The stored polynomial really witnesses the advertised degree bound. -/
+theorem hasUnivariateDegreeAtMost {params : Parameters} (f : DiagonalLinePolynomial params) :
+    HasUnivariateDegreeAtMost params (params.m * params.d) f := by
+  refine ⟨f.poly, f.degreeBounded, ?_⟩
+  funext t
+  rfl
+
+/-- Extend a diagonal-line answer to the slice at height `x`. -/
+def appendAtHeight (params : Parameters)
+    (f : DiagonalLinePolynomial params) (_x : Fq params) : DiagonalLinePolynomial params.next where
+  poly := f.poly
+  degreeBounded := by
+    exact le_trans f.degreeBounded (Nat.mul_le_mul_right _ (Nat.le_succ _))
+
+/-- Restrict a diagonal-line answer in `m + 1` variables to the slice at height `x`.
+This interface now makes the stronger slice-wise degree requirement explicit. -/
+def restrictAtHeight (params : Parameters)
+    (f : DiagonalLinePolynomial params.next) (_x : Fq params)
+    (hdegree : f.poly.natDegree ≤ params.m * params.d) : DiagonalLinePolynomial params where
+  poly := f.poly
+  degreeBounded := hdegree
+
+end DiagonalLinePolynomial
 
 /-- Global low-individual-degree polynomial outcomes. -/
 structure Polynomial (params : Parameters) where
-  toFun : Point params → Fq params
-  lowIndividualDegree : True
+  poly : PolynomialModel params
+  lowIndividualDegree : ∀ i, MvPolynomial.degreeOf i poly ≤ params.d
+
+namespace Polynomial
+
+/-- Evaluation of the stored multivariate polynomial on a coded point. -/
+def toFun {params : Parameters} (g : Polynomial params) : Point params → Fq params :=
+  evalPolynomialModel params g.poly
 
 instance {params : Parameters} : CoeFun (Polynomial params) (fun _ => Point params → Fq params) :=
   ⟨Polynomial.toFun⟩
 
-/-- Axis-parallel line answers with an explicit degree-bound witness slot. -/
-structure AxisLinePolynomial (params : Parameters) where
-  toFun : Point params → Fq params
-  supportedOnAxisLine : True
-  degreeBounded : True
+/-- The stored polynomial indeed certifies low individual degree. -/
+theorem hasLowIndividualDegree {params : Parameters} (g : Polynomial params) :
+    HasLowIndividualDegree params g := by
+  refine ⟨g.poly, g.lowIndividualDegree, ?_⟩
+  funext u
+  rfl
 
-instance {params : Parameters} :
-    CoeFun (AxisLinePolynomial params) (fun _ => Point params → Fq params) :=
-  ⟨AxisLinePolynomial.toFun⟩
-
-/-- Diagonal-line answers with an explicit degree-bound witness slot. -/
-structure DiagonalLinePolynomial (params : Parameters) where
-  toFun : Point params → Fq params
-  supportedOnDiagonalLine : True
-  degreeBounded : True
-
-instance {params : Parameters} :
-    CoeFun (DiagonalLinePolynomial params) (fun _ => Point params → Fq params) :=
-  ⟨DiagonalLinePolynomial.toFun⟩
-
-/-- Extend a global polynomial to the slice at height `x`. -/
-def Polynomial.appendAtHeight (params : Parameters)
+/-- Extend a global polynomial to the slice at height `x` by ignoring the new variable. -/
+def appendAtHeight (params : Parameters)
     (g : Polynomial params) (_x : Fq params) : Polynomial params.next where
-  toFun := fun u => g (truncatePoint params u)
-  lowIndividualDegree := trivial
+  poly := MvPolynomial.rename (embedCoord params) g.poly
+  lowIndividualDegree := by
+    intro i
+    sorry
+
+/-- Coordinate map for restricting a polynomial in `m+1` variables to the slice `X_m = x`. -/
+def restrictAtHeightCoordinateMap (params : Parameters) (x : Fq params) :
+    Fin params.next.m → PolynomialModel params :=
+  fun i =>
+    if h : i.1 < params.m then
+      MvPolynomial.X ⟨i.1, h⟩
+    else
+      MvPolynomial.C (decodeScalar x)
 
 /-- Restrict a global polynomial in `m + 1` variables to the slice at height `x`. -/
-def Polynomial.restrictAtHeight (params : Parameters)
+def restrictAtHeight (params : Parameters)
     (g : Polynomial params.next) (x : Fq params) : Polynomial params where
-  toFun := fun u => g (appendPoint params u x)
-  lowIndividualDegree := trivial
+  poly := MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params x) g.poly
+  lowIndividualDegree := by
+    intro i
+    sorry
 
-/-- Extend an axis-line answer to the slice at height `x`. -/
-def AxisLinePolynomial.appendAtHeight (params : Parameters)
-    (f : AxisLinePolynomial params) (_x : Fq params) : AxisLinePolynomial params.next where
-  toFun := fun u => f (truncatePoint params u)
-  supportedOnAxisLine := trivial
-  degreeBounded := trivial
+/-- Coordinate polynomial for restricting to an axis-parallel affine line. -/
+def axisCoordinatePolynomial (params : Parameters) (ℓ : AxisParallelLine params) :
+    Fin params.m → LinePolynomialModel params :=
+  fun i =>
+    if i = ℓ.direction then
+      _root_.Polynomial.C (decodeScalar (ℓ.base i)) + _root_.Polynomial.X
+    else
+      _root_.Polynomial.C (decodeScalar (ℓ.base i))
 
-/-- Restrict an axis-line answer in `m + 1` variables to the slice at height `x`. -/
-def AxisLinePolynomial.restrictAtHeight (params : Parameters)
-    (f : AxisLinePolynomial params.next) (x : Fq params) : AxisLinePolynomial params where
-  toFun := fun u => f (appendPoint params u x)
-  supportedOnAxisLine := trivial
-  degreeBounded := trivial
+/-- Restrict a global polynomial to an axis-parallel line. -/
+def restrictToAxisParallelLine (params : Parameters)
+    (g : Polynomial params) (ℓ : AxisParallelLine params) : AxisLinePolynomial params where
+  poly := MvPolynomial.eval₂Hom _root_.Polynomial.C (axisCoordinatePolynomial params ℓ) g.poly
+  degreeBounded := by
+    sorry
 
-/-- Extend a diagonal-line answer to the slice at height `x`. -/
-def DiagonalLinePolynomial.appendAtHeight (params : Parameters)
-    (f : DiagonalLinePolynomial params) (_x : Fq params) : DiagonalLinePolynomial params.next where
-  toFun := fun u => f (truncatePoint params u)
-  supportedOnDiagonalLine := trivial
-  degreeBounded := trivial
+/-- Coordinate polynomial for restricting to a diagonal affine line. -/
+def diagonalCoordinatePolynomial (params : Parameters) (ℓ : DiagonalLine params) :
+    Fin params.m → LinePolynomialModel params :=
+  fun i =>
+    _root_.Polynomial.C (decodeScalar (ℓ.base i)) +
+      _root_.Polynomial.C (decodeScalar (ℓ.direction i)) * _root_.Polynomial.X
 
-/-- Restrict a diagonal-line answer in `m + 1` variables to the slice at height `x`. -/
-def DiagonalLinePolynomial.restrictAtHeight (params : Parameters)
-    (f : DiagonalLinePolynomial params.next) (x : Fq params) : DiagonalLinePolynomial params where
-  toFun := fun u => f (appendPoint params u x)
-  supportedOnDiagonalLine := trivial
-  degreeBounded := trivial
+/-- Restrict a global polynomial to a diagonal line. -/
+def restrictToDiagonalLine (params : Parameters)
+    (g : Polynomial params) (ℓ : DiagonalLine params) : DiagonalLinePolynomial params where
+  poly := MvPolynomial.eval₂Hom _root_.Polynomial.C (diagonalCoordinatePolynomial params ℓ) g.poly
+  degreeBounded := by
+    sorry
 
-/-- Placeholder for a bipartite state. -/
+end Polynomial
+
+/-- A finite-dimensional bipartite state placeholder carrying an actual density matrix. -/
 structure QuantumState where
   name : String := ""
-  deriving Inhabited, Repr
+  dim : ℕ := 1
+  density : MIPStarRE.Quantum.Op (HilbertIndex dim) := 1
 
-/-- Placeholder for an operator or matrix expression. -/
+instance : Inhabited QuantumState where
+  default := {}
+
+/-- Positivity of the concrete matrix carried by a state. -/
+def QuantumState.IsPositive (ψ : QuantumState) : Prop :=
+  0 ≤ ψ.density
+
+/-- Unit normalized trace for the concrete matrix carried by a state. -/
+def QuantumState.IsNormalized (ψ : QuantumState) : Prop :=
+  MIPStarRE.Quantum.normalizedTrace ψ.density = 1
+
+/-- A finite-dimensional operator placeholder carrying an actual matrix realization. -/
 structure Operator where
   name : String := ""
-  deriving Inhabited, Repr, DecidableEq
+  dim : ℕ := 1
+  matrix : MIPStarRE.Quantum.Op (HilbertIndex dim) := 0
 
-/-- Placeholder for a probability distribution. -/
+instance : Inhabited Operator where
+  default := {}
+
+/-- Cast an operator matrix along an equality of dimensions. -/
+def castOp {m n : ℕ} (h : m = n)
+    (A : MIPStarRE.Quantum.Op (HilbertIndex m)) :
+    MIPStarRE.Quantum.Op (HilbertIndex n) := by
+  cases h
+  simpa using A
+
+/-- The identity operator in the same dimension as `X`. -/
+def identityLike (X : Operator) : Operator where
+  name := "I"
+  dim := X.dim
+  matrix := 1
+
+/-- The expectation `Re τ(ψ X)` when the state and operator dimensions match. -/
+noncomputable def expectationValue (ψ : QuantumState) (X : Operator) : Error :=
+  if h : ψ.dim = X.dim then
+    Complex.re <| MIPStarRE.Quantum.normalizedTrace
+      (ψ.density * castOp h.symm X.matrix)
+  else
+    0
+
+/-- Placeholder for a probability distribution, now with an explicit finite support list
+and real-valued weights. -/
 structure Distribution (α : Type _) where
   name : String := ""
-  deriving Inhabited, Repr
+  support : List α := []
+  weight : α → Error := fun _ => 0
+  supportNodup : support.Nodup := by simp
+  nonnegative : ∀ a, 0 ≤ weight a := by intro _; positivity
+  outsideSupport : ∀ a, a ∉ support → weight a = 0 := by intro _ _; rfl
 
-/-- The uniform distribution placeholder on a given type. -/
-def uniformDistribution (α : Type _) : Distribution α where
+/-- Average a scalar function against the stored finite support of a distribution. -/
+def averageOverDistribution {α : Type _} (𝒟 : Distribution α) (f : α → Error) : Error :=
+  (𝒟.support.map fun a => 𝒟.weight a * f a).sum
+
+/-- The uniform distribution on a nonempty finite type. -/
+noncomputable def uniformDistribution (α : Type _)
+    [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α where
   name := "uniform"
+  support := (Finset.univ : Finset α).toList
+  weight := fun _ => 1 / (Fintype.card α : Error)
+  supportNodup := by
+    simpa using (Finset.nodup_toList (Finset.univ : Finset α))
+  nonnegative := by
+    intro _
+    positivity
+  outsideSupport := by
+    intro a ha
+    exfalso
+    apply ha
+    exact Finset.mem_toList.mpr (by simp : a ∈ (Finset.univ : Finset α))
 
-/-- Placeholder total variation distance. -/
+/-- Placeholder total variation distance. The distribution carrier is now explicit, but the
+full `L¹` bookkeeping is postponed to a later pass. -/
 def totalVariationDistance {α : Type _} (_μ _ν : Distribution α) : Error := 0
 
-/-- Abstract positive semidefiniteness predicate. -/
-structure PositiveSemidefinite (_Z : Operator) : Prop where
-  nonnegativeWitness : True
+/-- Positive semidefiniteness for the concrete matrix carried by an operator. -/
+structure PositiveSemidefinite (Z : Operator) : Prop where
+  nonnegative : 0 ≤ Z.matrix
+
+/-- The identity operator. -/
+def identityOperator : Operator where
+  name := "I"
+  matrix := 1
+
+/-- Operator difference, computed concretely when dimensions match. -/
+def operatorDifference (X Y : Operator) : Operator :=
+  if h : X.dim = Y.dim then
+    { name := s!"({X.name} - {Y.name})"
+      dim := X.dim
+      matrix := X.matrix - castOp h.symm Y.matrix }
+  else
+    { name := s!"({X.name} - {Y.name})"
+      dim := X.dim
+      matrix := X.matrix }
+
+/-- Operator addition, computed concretely when dimensions match. -/
+def operatorAdd (X Y : Operator) : Operator :=
+  if h : X.dim = Y.dim then
+    { name := s!"({X.name} + {Y.name})"
+      dim := X.dim
+      matrix := X.matrix + castOp h.symm Y.matrix }
+  else
+    { name := s!"({X.name} + {Y.name})"
+      dim := X.dim
+      matrix := X.matrix }
+
+/-- Operator multiplication, computed concretely when dimensions match. -/
+def operatorMul (X Y : Operator) : Operator :=
+  if h : X.dim = Y.dim then
+    { name := s!"({X.name} * {Y.name})"
+      dim := X.dim
+      matrix := X.matrix * castOp h.symm Y.matrix }
+  else
+    { name := s!"({X.name} * {Y.name})"
+      dim := X.dim
+      matrix := X.matrix }
+
+/-- A concrete sandwich operator `L X R`, computed when the dimensions align. -/
+def operatorSandwich (L X R : Operator) : Operator :=
+  if hLX : L.dim = X.dim then
+    if hXR : X.dim = R.dim then
+      { name := s!"({L.name} · {X.name} · {R.name})"
+        dim := L.dim
+        matrix :=
+          L.matrix * castOp hLX.symm X.matrix * castOp (hLX.trans hXR).symm R.matrix }
+    else
+      { name := s!"({L.name} · {X.name} · {R.name})"
+        dim := L.dim
+        matrix := L.matrix }
+  else
+    { name := s!"({L.name} · {X.name} · {R.name})"
+      dim := L.dim
+      matrix := L.matrix }
+
+/-- Placeholder left placement `X ⊗ I` on a bipartite space. -/
+def leftTensor (X : Operator) : Operator :=
+  { X with name := s!"({X.name} ⊗ I)" }
+
+/-- Placeholder right placement `I ⊗ X` on a bipartite space. -/
+def rightTensor (X : Operator) : Operator :=
+  { X with name := s!"(I ⊗ {X.name})" }
+
+/-- The domination relation `X ≥ Y`, encoded by PSD-ness of the concrete matrix gap
+whenever the dimensions match. -/
+structure DominatesOperator (X Y : Operator) : Prop where
+  sameDim : X.dim = Y.dim
+  dominationGapPositive : 0 ≤ X.matrix - castOp sameDim.symm Y.matrix
 
 /-- A paper-local submeasurement with outcomes in `α`. -/
 structure SubMeasurement (α : Type _) where
@@ -257,8 +614,14 @@ def completeSubMeasurement {α : Type _} (A : SubMeasurement α) : Measurement (
     name := s!"{A.name}.completion"
     outcomeOperator := fun
       | some a => A.outcomeOperator a
-      | none => { name := s!"{A.name}.failure" }
-    totalOperator := { name := s!"{A.name}.completion.total" }
+      | none =>
+          { name := s!"{A.name}.failure"
+            dim := A.totalOperator.dim
+            matrix := 1 - A.totalOperator.matrix }
+    totalOperator :=
+      { name := s!"{A.name}.completion.total"
+        dim := A.totalOperator.dim
+        matrix := 1 }
   }
 
 /-- Constant indexed family taking the same submeasurement on every question. -/
@@ -289,102 +652,135 @@ def evaluateFiberFamilyAtNextPoint (params : Parameters)
     IndexedSubMeasurement (Point params.next) (Fq params) :=
   fun u => evaluateAt params (truncatePoint params u) (G (pointHeight params u))
 
-/-- Placeholder averaged off-diagonal mass for consistency statements. -/
-def consistencyError {Question Outcome : Type _}
-    (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A _B : IndexedSubMeasurement Question Outcome) : Error := 0
+/-- Placeholder questionwise off-diagonal mass. The later overlap calculus still needs
+explicit finite-support measurement bookkeeping. -/
+def questionConsistencyDefect {Outcome : Type _}
+    (_ψ : QuantumState) (_A _B : SubMeasurement Outcome) : Error := 0
 
-/-- Placeholder averaged squared distance for `≈_δ`. -/
-def stateDependentDistanceError {Question Outcome : Type _}
-    (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A _B : IndexedSubMeasurement Question Outcome) : Error := 0
+/-- Placeholder questionwise squared-distance defect. -/
+def questionStateDependentDistanceDefect {Outcome : Type _}
+    (_ψ : QuantumState) (_A _B : SubMeasurement Outcome) : Error := 0
 
-/-- Placeholder defect in strong self-consistency. -/
-def strongSelfConsistencyError {Question Outcome : Type _}
-    (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A : IndexedSubMeasurement Question Outcome) : Error := 0
-
-/-- Placeholder total mass of a submeasurement on state `ψ`. -/
-def subMeasurementMass {Outcome : Type _}
+/-- Placeholder questionwise strong self-consistency defect. -/
+def questionStrongSelfConsistencyDefect {Outcome : Type _}
     (_ψ : QuantumState) (_A : SubMeasurement Outcome) : Error := 0
 
-/-- Placeholder averaged total mass of an indexed submeasurement. -/
+/-- Averaged off-diagonal mass for consistency statements. -/
+def consistencyError {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedSubMeasurement Question Outcome) : Error :=
+  averageOverDistribution 𝒟 (fun q => questionConsistencyDefect ψ (A q) (B q))
+
+/-- Averaged squared distance for `≈_δ`. -/
+def stateDependentDistanceError {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedSubMeasurement Question Outcome) : Error :=
+  averageOverDistribution 𝒟 (fun q => questionStateDependentDistanceDefect ψ (A q) (B q))
+
+/-- Averaged defect in strong self-consistency. -/
+def strongSelfConsistencyError {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedSubMeasurement Question Outcome) : Error :=
+  averageOverDistribution 𝒟 (fun q => questionStrongSelfConsistencyDefect ψ (A q))
+
+/-- Total mass of a submeasurement on state `ψ`, computed from the concrete total operator. -/
+def subMeasurementMass {Outcome : Type _}
+    (ψ : QuantumState) (A : SubMeasurement Outcome) : Error :=
+  expectationValue ψ A.totalOperator
+
+/-- Averaged total mass of an indexed submeasurement. -/
 def indexedSubMeasurementMass {Question Outcome : Type _}
-    (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A : IndexedSubMeasurement Question Outcome) : Error := 0
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedSubMeasurement Question Outcome) : Error :=
+  averageOverDistribution 𝒟 (fun q => subMeasurementMass ψ (A q))
 
-/-- Placeholder defect for domination by an operator witness. -/
+/-- Defect in domination by an operator witness, measured at the expectation-value level. -/
 def boundednessError {Outcome : Type _}
-    (_ψ : QuantumState) (_A : SubMeasurement Outcome) (_Z : Operator) : Error := 0
+    (ψ : QuantumState) (A : SubMeasurement Outcome) (Z : Operator) : Error :=
+  max 0 (subMeasurementMass ψ A - expectationValue ψ Z)
 
-/-- Placeholder consistency relation. -/
+/-- Consistency relation. -/
 structure ConsistencyRel {Question Outcome : Type _}
-    (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A _B : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop where
-  offDiagonalBound : consistencyError _ψ _𝒟 _A _B ≤ _δ
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop where
+  offDiagonalBound : consistencyError ψ 𝒟 A B ≤ δ
 
-/-- Placeholder state-dependent distance relation. -/
+/-- State-dependent distance relation. -/
 structure StateDependentDistanceRel {Question Outcome : Type _}
-    (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A _B : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop where
-  squaredDistanceBound : stateDependentDistanceError _ψ _𝒟 _A _B ≤ _δ
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop where
+  squaredDistanceBound : stateDependentDistanceError ψ 𝒟 A B ≤ δ
 
-/-- Placeholder strong self-consistency relation. -/
+/-- Strong self-consistency relation. -/
 structure StrongSelfConsistencyRel {Question Outcome : Type _}
-    (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop where
-  diagonalOverlapBound : strongSelfConsistencyError _ψ _𝒟 _A ≤ _δ
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop where
+  diagonalOverlapBound : strongSelfConsistencyError ψ 𝒟 A ≤ δ
 
-/-- Placeholder completeness statement for a submeasurement. -/
+/-- Completeness statement for a submeasurement. -/
 structure CompletenessAtLeast {Outcome : Type _}
-    (_ψ : QuantumState) (_A : SubMeasurement Outcome) (_r : Error) : Prop where
-  lowerBound : subMeasurementMass _ψ _A ≥ _r
+    (ψ : QuantumState) (A : SubMeasurement Outcome) (r : Error) : Prop where
+  lowerBound : subMeasurementMass ψ A ≥ r
 
-/-- Placeholder boundedness statement witnessed by an operator. -/
+/-- Boundedness statement witnessed by an operator. -/
 structure BoundedByOperator {Outcome : Type _}
-    (_ψ : QuantumState) (_A : SubMeasurement Outcome) (_Z : Operator) (_δ : Error) : Prop where
-  upperBound : boundednessError _ψ _A _Z ≤ _δ
+    (ψ : QuantumState) (A : SubMeasurement Outcome) (Z : Operator) (δ : Error) : Prop where
+  witnessPositiveSemidefinite : PositiveSemidefinite Z
+  upperBound : boundednessError ψ A Z ≤ δ
 
-/-- Placeholder consistency between a points measurement and a global polynomial submeasurement. -/
+/-- Consistency between a points measurement and a global polynomial submeasurement. -/
 structure ConsistentWithPolynomialEvaluation (params : Parameters)
-    (_ψ : QuantumState)
-    (_A : IndexedSubMeasurement (Point params) (Fq params))
-    (_G : SubMeasurement (Polynomial params))
-    (_δ : Error) : Prop where
+    (ψ : QuantumState)
+    (A : IndexedSubMeasurement (Point params) (Fq params))
+    (G : SubMeasurement (Polynomial params))
+    (δ : Error) : Prop where
   evaluationConsistency :
-    ConsistencyRel _ψ (uniformDistribution (Point params))
-      _A
-      (polynomialEvaluationFamily params _G)
-      _δ
+    ConsistencyRel ψ (uniformDistribution (Point params))
+      A
+      (polynomialEvaluationFamily params G)
+      δ
 
-/-- Placeholder consistency between two global polynomial submeasurements. -/
+/-- Consistency between two global polynomial submeasurements. -/
 structure PolynomialMeasurementsConsistent (params : Parameters)
-    (_ψ : QuantumState)
-    (_G₁ _G₂ : SubMeasurement (Polynomial params))
-    (_δ : Error) : Prop where
+    (ψ : QuantumState)
+    (G₁ G₂ : SubMeasurement (Polynomial params))
+    (δ : Error) : Prop where
   mutualConsistency :
-    ConsistencyRel _ψ (uniformDistribution Unit)
-      (constantSubMeasurementFamily _G₁)
-      (constantSubMeasurementFamily _G₂)
+    ConsistencyRel ψ (uniformDistribution Unit)
+      (constantSubMeasurementFamily G₁)
+      (constantSubMeasurementFamily G₂)
+      δ
+
+/-- Strong self-consistency for a global polynomial submeasurement. -/
+structure PolynomialMeasurementStronglySelfConsistent (params : Parameters)
+    (ψ : QuantumState) (G : SubMeasurement (Polynomial params)) (_δ : Error) : Prop where
+  diagonalMassBound :
+    StrongSelfConsistencyRel ψ (uniformDistribution Unit)
+      (constantSubMeasurementFamily G)
       _δ
 
-/-- Placeholder strong self-consistency for a global polynomial submeasurement. -/
-structure PolynomialMeasurementStronglySelfConsistent (params : Parameters)
-    (_ψ : QuantumState) (_G : SubMeasurement (Polynomial params)) (_δ : Error) : Prop where
-  diagonalMassBound :
-    StrongSelfConsistencyRel _ψ (uniformDistribution Unit)
-      (constantSubMeasurementFamily _G)
-      _δ
+/-- Invariance predicate for the symmetric shared state. -/
+structure PermutationInvariantState (_ψ : QuantumState) : Prop where
+  swapInvariant : True
 
 /-- Paper-local symmetric strategy data. -/
 structure SymmetricStrategy (params : Parameters) where
   state : QuantumState
+  statePermutationInvariant : PermutationInvariantState state := ⟨trivial⟩
   pointMeasurement : IndexedProjectiveMeasurement (Point params) (Fq params)
   axisParallelMeasurement :
     IndexedProjectiveMeasurement (AxisParallelLine params) (AxisLinePolynomial params)
   diagonalMeasurement :
     IndexedProjectiveMeasurement (DiagonalLine params) (DiagonalLinePolynomial params)
-  deriving Inhabited
+
+instance {params : Parameters} : Inhabited (SymmetricStrategy params) where
+  default := {
+    state := default
+    statePermutationInvariant := ⟨trivial⟩
+    pointMeasurement := default
+    axisParallelMeasurement := default
+    diagonalMeasurement := default
+  }
 
 /-- Paper-local (not necessarily symmetric) projective strategy data. -/
 structure ProjectiveStrategy (params : Parameters) where
@@ -415,7 +811,7 @@ def selfConsistencyFailureProbability {params : Parameters}
 def diagonalFailureProbability {params : Parameters}
     (_strategy : SymmetricStrategy params) : Error := 0
 
-/-- Placeholder for the paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
+/-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
 structure IsGood {params : Parameters} (strategy : SymmetricStrategy params)
     (eps delta gamma : Error) : Prop where
   axisParallelTest : strategy.axisParallelFailureProbability ≤ eps
@@ -430,17 +826,18 @@ namespace ProjectiveStrategy
 def lowIndividualDegreeFailureProbability {params : Parameters}
     (_strategy : ProjectiveStrategy params) : Error := 0
 
-/-- Placeholder for passing the full low-individual-degree test with error `ε`. -/
+/-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
     (strategy : ProjectiveStrategy params) (eps : Error) : Prop where
   soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
 
 end ProjectiveStrategy
 
-/-- A packaged family `x ↦ G^x` together with its witness operators. -/
+/-- A packaged family `x ↦ G^x` together with its witness operators and domination targets. -/
 structure IndexedPolynomialFamily (params : Parameters) where
   meas : IndexedProjectiveSubMeasurement (Fq params) (Polynomial params)
   witness : Fq params → Operator := fun _ => default
+  dominationTarget : Fq params → Polynomial params → Operator := fun _ _ => default
   deriving Inhabited
 
 namespace IndexedPolynomialFamily
@@ -485,6 +882,9 @@ structure Bounded {params : Parameters} (family : IndexedPolynomialFamily params
   slicePositiveSemidefinite : ∀ x, PositiveSemidefinite (family.witness x)
   sliceBoundedness :
     ∀ x, BoundedByOperator ψ ((family.meas x).toSubMeasurement) (family.witness x) zeta
+  sliceDominatesTarget :
+    ∀ x : Fq params, ∀ g : Polynomial params,
+      DominatesOperator (family.witness x) (family.dominationTarget x g)
 
 end IndexedPolynomialFamily
 
@@ -502,14 +902,15 @@ noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) 
 
 This matching declaration keeps the paper's main output shape: two global polynomial
 measurements, one for each prover, consistent with the point measurements and with
- each other.
+each other.
 -/
 theorem mainFormal
     (params : Parameters)
     (strategy : ProjectiveStrategy params)
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (k : ℕ) :
+    (k : ℕ)
+    (hk : params.m * params.d ≤ k) :
     ∃ G_A G_B : ProjectiveMeasurement (Polynomial params),
       ConsistentWithPolynomialEvaluation params strategy.state
           (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementA)

@@ -37,12 +37,32 @@ def stateDependentDistance {Question Outcome : Type _}
 def strongSelfConsistency {Question Outcome : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
-  StrongSelfConsistencyRel ψ 𝒟 A δ
+  PermutationInvariantState ψ ∧ StrongSelfConsistencyRel ψ 𝒟 A δ
+
+/-- Source-style left/right relation `A^x_a ⊗ I ≈_δ I ⊗ B^x_a`. -/
+structure BipartiteStateDependentDistanceRel {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop where
+  leftRightSquaredDistanceBound : stateDependentDistanceError ψ 𝒟 A B ≤ δ
+
+/-- Abbreviation for the bipartite state-dependent distance used in the source propositions. -/
+def bipartiteStateDependentDistance {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
+  BipartiteStateDependentDistanceRel ψ 𝒟 A B δ
+
+/-- Placeholder condition `0 ≤ B ≤ I` for the switch-sandwich argument. -/
+structure OperatorBetweenZeroAndOne (B : Operator) : Prop where
+  nonnegative : PositiveSemidefinite B
+  boundedByIdentity : DominatesOperator identityOperator B
 
 /-- Placeholder agreement probability from `prop:simeq-for-measurements`. -/
 def agreementProbability {Question Outcome : Type _}
-    (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A _B : IndexedMeasurement Question Outcome) : Error := 0
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedMeasurement Question Outcome) : Error :=
+  1 - consistencyError ψ 𝒟
+        (IndexedMeasurement.toIndexedSubMeasurement A)
+        (IndexedMeasurement.toIndexedSubMeasurement B)
 
 /-- Output package for the measurement reformulation of consistency. -/
 structure ConsistencyAsAgreement {Question Outcome : Type _}
@@ -56,26 +76,38 @@ def postprocessIndexedSubMeasurement {Question α β : Type _}
     IndexedSubMeasurement Question β :=
   fun q => postProcessing (A q) f
 
-/-- Placeholder family for the intermediate `A_a ⊗ B_a` sandwich. -/
-def diagonalSandwichFamily {Question Outcome : Type _}
+/-- The completion residual `I - Σ_a B_a` used when completing a submeasurement. -/
+noncomputable def completionResidualOperator {Outcome : Type _} (B : SubMeasurement Outcome) : Operator :=
+  operatorDifference (identityLike B.totalOperator) B.totalOperator
+
+/-- Family for the intermediate `A_a B_a A_a` sandwich. -/
+noncomputable def diagonalSandwichFamily {Question Outcome : Type _}
     (A : IndexedSubMeasurement Question Outcome)
     (B : IndexedMeasurement Question Outcome) :
     IndexedSubMeasurement Question Outcome :=
   fun q => {
     name := s!"{(A q).name}.diagSandwich({(B q).toSubMeasurement.name})"
-    outcomeOperator := fun _ => { name := s!"{(A q).name}.diagSandwich.outcome" }
-    totalOperator := { name := s!"{(A q).name}.diagSandwich.total" }
+    outcomeOperator := fun a =>
+      operatorSandwich
+        ((A q).outcomeOperator a)
+        ((B q).toSubMeasurement.outcomeOperator a)
+        ((A q).outcomeOperator a)
+    totalOperator := (A q).totalOperator
   }
 
-/-- Placeholder family for the intermediate `A ⊗ B_a` sandwich. -/
-def totalSandwichFamily {Question Outcome : Type _}
+/-- Family for the intermediate `A_a (Σ_b B_b) A_a` sandwich. -/
+noncomputable def totalSandwichFamily {Question Outcome : Type _}
     (A : IndexedSubMeasurement Question Outcome)
     (B : IndexedMeasurement Question Outcome) :
     IndexedSubMeasurement Question Outcome :=
   fun q => {
     name := s!"{(A q).name}.totalSandwich({(B q).toSubMeasurement.name})"
-    outcomeOperator := fun _ => { name := s!"{(A q).name}.totalSandwich.outcome" }
-    totalOperator := { name := s!"{(A q).name}.totalSandwich.total" }
+    outcomeOperator := fun a =>
+      operatorSandwich
+        ((A q).outcomeOperator a)
+        (B q).toSubMeasurement.totalOperator
+        ((A q).outcomeOperator a)
+    totalOperator := (A q).totalOperator
   }
 
 /-- Output package for `prop:cons-sub-meas`. -/
@@ -90,23 +122,41 @@ structure ConsSubMeasStatement {Question Outcome : Type _}
   combinedControl :
     StateDependentDistanceRel ψ 𝒟 A (totalSandwichFamily A B) (4 * γ)
 
-/-- Placeholder scalar on the left-hand side of `prop:switch-sandwich`. -/
-def leftSandwichExpectation {Question Outcome : Type _}
-    (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A : IndexedProjectiveSubMeasurement Question Outcome)
-    (_B : Operator) : Error := 0
+/-- Averaged left-placed sandwich scalar from `prop:switch-sandwich`. -/
+noncomputable def leftSandwichExpectation {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedProjectiveSubMeasurement Question Outcome)
+    (B : Operator) : Error :=
+  averageOverDistribution 𝒟 fun q =>
+    expectationValue ψ <|
+      operatorSandwich
+        ((A q).toSubMeasurement.totalOperator)
+        (leftTensor B)
+        ((A q).toSubMeasurement.totalOperator)
 
-/-- Placeholder scalar for the middle term of `prop:switch-sandwich`. -/
-def middleSandwichExpectation {Question Outcome : Type _}
-    (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A : IndexedProjectiveSubMeasurement Question Outcome)
-    (_B : Operator) : Error := 0
+/-- Averaged middle sandwich scalar from `prop:switch-sandwich`. -/
+noncomputable def middleSandwichExpectation {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedProjectiveSubMeasurement Question Outcome)
+    (B : Operator) : Error :=
+  averageOverDistribution 𝒟 fun q =>
+    expectationValue ψ <|
+      operatorSandwich
+        ((A q).toSubMeasurement.totalOperator)
+        B
+        ((A q).toSubMeasurement.totalOperator)
 
-/-- Placeholder scalar on the right-hand side of `prop:switch-sandwich`. -/
-def rightSandwichExpectation {Question Outcome : Type _}
-    (_ψ : QuantumState) (_𝒟 : Distribution Question)
-    (_A : IndexedProjectiveSubMeasurement Question Outcome)
-    (_B : Operator) : Error := 0
+/-- Averaged right-placed sandwich scalar from `prop:switch-sandwich`. -/
+noncomputable def rightSandwichExpectation {Question Outcome : Type _}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedProjectiveSubMeasurement Question Outcome)
+    (B : Operator) : Error :=
+  averageOverDistribution 𝒟 fun q =>
+    expectationValue ψ <|
+      operatorSandwich
+        ((A q).toSubMeasurement.totalOperator)
+        (rightTensor B)
+        ((A q).toSubMeasurement.totalOperator)
 
 /-- Output package for `prop:switch-sandwich`. -/
 structure SwitchSandwichStatement {Question Outcome : Type _}
@@ -131,19 +181,20 @@ structure CompletenessTransferProjectivePStatement {Question Outcome : Type _}
         (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement P)
         - 2 * Real.sqrt ε
 
-/-- Canonical completion of `B` by adjoining the failure mass to the distinguished outcome `a0`. -/
+/-- Canonical completion of `B` by adjoining the residual `I - Σ_a B_a` to the distinguished outcome `a0`. -/
 noncomputable def completeAtOutcome {Outcome : Type _}
     (B : SubMeasurement Outcome) (a0 : Outcome) : Measurement Outcome := by
   classical
+  let residual := completionResidualOperator B
   refine {
     toSubMeasurement := {
       name := s!"{B.name}.completed"
       outcomeOperator := fun a =>
         if h : a = a0 then
-          { name := s!"{B.name}.completed.main" }
+          operatorAdd (B.outcomeOperator a) residual
         else
           B.outcomeOperator a
-      totalOperator := { name := s!"{B.name}.completed.total" }
+      totalOperator := identityLike B.totalOperator
     }
   }
 
@@ -174,17 +225,22 @@ theorem simeqToApprox {Question Outcome : Type _}
     (A B : IndexedMeasurement Question Outcome) (δ : Error) :
     consistency ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
         (IndexedMeasurement.toIndexedSubMeasurement B) δ →
-      stateDependentDistance ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
-        (IndexedMeasurement.toIndexedSubMeasurement B) (2 * δ) := by
+      bipartiteStateDependentDistance ψ 𝒟
+        (IndexedMeasurement.toIndexedSubMeasurement A)
+        (IndexedMeasurement.toIndexedSubMeasurement B)
+        (2 * δ) := by
   sorry
 
 /-- `prop:simeq-data-processing`. -/
 theorem simeqDataProcessing {Question α β : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
-    (A B : IndexedSubMeasurement Question α) (δ : Error) (f : α → β) :
-    consistency ψ 𝒟 A B δ →
-      consistency ψ 𝒟 (postprocessIndexedSubMeasurement A f)
-        (postprocessIndexedSubMeasurement B f) δ := by
+    (A B : IndexedMeasurement Question α) (δ : Error) (f : α → β) :
+    consistency ψ 𝒟
+        (IndexedMeasurement.toIndexedSubMeasurement A)
+        (IndexedMeasurement.toIndexedSubMeasurement B) δ →
+      consistency ψ 𝒟
+        (postprocessIndexedSubMeasurement (IndexedMeasurement.toIndexedSubMeasurement A) f)
+        (postprocessIndexedSubMeasurement (IndexedMeasurement.toIndexedSubMeasurement B) f) δ := by
   sorry
 
 /-- `prop:cons-sub-meas`. -/
@@ -200,8 +256,8 @@ theorem consSubMeas {Question Outcome : Type _}
 theorem switchSandwich {Question Outcome : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedProjectiveSubMeasurement Question Outcome)
-    (B : Operator) (δ : Error) :
-    stateDependentDistance ψ 𝒟
+    (B : Operator) (_hB : OperatorBetweenZeroAndOne B) (δ : Error) :
+    bipartiteStateDependentDistance ψ 𝒟
         (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
         (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A) δ →
       SwitchSandwichStatement ψ 𝒟 A B δ := by
@@ -222,7 +278,7 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome) (δ : Error) :
     strongSelfConsistency ψ 𝒟 A δ →
-      stateDependentDistance ψ 𝒟 A A (2 * δ) := by
+      bipartiteStateDependentDistance ψ 𝒟 A A (2 * δ) := by
   sorry
 
 /-- `prop:completing-to-measurement`. -/

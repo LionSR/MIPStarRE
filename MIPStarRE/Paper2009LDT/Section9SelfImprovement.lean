@@ -4,9 +4,9 @@ import MIPStarRE.Paper2009LDT.Section8GlobalVariance
 Matching scaffold for Section 9 of the low individual degree paper in
 `references/ldt-paper/self_improvement.tex`.
 
-This file now exposes the paper's SDP witnesses, the `add-in-u` transfer
-identity, and the non-projective/projective self-improvement outputs through
-explicit named constructions and error terms.
+This file exposes the paper's SDP witnesses, the `add-in-u` transfer identity,
+and the non-projective/projective self-improvement outputs through explicit named
+constructions and error terms.
 -/
 
 namespace MIPStarRE.Paper2009LDT.Section9SelfImprovement
@@ -15,83 +15,99 @@ open MIPStarRE.Paper2009LDT
 open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
 open MIPStarRE.Paper2009LDT.Section8GlobalVariance
 open MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+/-- The identity operator on the polynomial register. -/
+def polynomialIdentityOperator (params : Parameters) : Operator :=
+  Section7ExpansionHypercubeGraph.identityOperator s!"poly({params.m},{params.q},{params.d})"
+
+/-- The pointwise operator `A^u_{g(u)}` entering the SDP average `A_g`. -/
+def averagedPointOperatorContribution (params : Parameters)
+    (strategy : SymmetricStrategy params)
+    (g : Polynomial params) (u : Point params) : Operator :=
+  pointConditionedOutcomeOperatorAtPolynomial params strategy g u
 
 /-- The averaged point operator `A_g = E_u A^u_{g(u)}`. -/
-def averagedPointOperator (params : Parameters)
-    (_strategy : SymmetricStrategy params) (_g : Polynomial params) : Operator :=
-  { name := s!"Aavg({params.m},{params.q},{params.d})" }
+noncomputable def averagedPointOperator (params : Parameters)
+    (strategy : SymmetricStrategy params) (g : Polynomial params) : Operator :=
+  averageOperatorOverDistribution (uniformDistribution (Point params))
+    (averagedPointOperatorContribution params strategy g)
 
-/-- The pointwise sandwiched submeasurement `H^u_h = A^u_{h(u)} T_h A^u_{h(u)}`. -/
-def sandwichedPolynomialSubMeasurementAt (params : Parameters)
+/-- The operator `T_g A_g` contributing to the primal SDP objective. -/
+noncomputable def sdpPrimalContributionOperator (params : Parameters)
     (strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params)) (u : Point params) :
-    SubMeasurement (Polynomial params) :=
-  { name :=
-      s!"Hslice[{(strategy.pointMeasurement u).toSubMeasurement.name}|{T.toSubMeasurement.name}]" }
+    (T : Measurement (Polynomial params))
+    (g : Polynomial params) : Operator :=
+  formalProduct (T.outcomeOperator g) (averagedPointOperator params strategy g)
 
-/-- The averaged sandwiched submeasurement `H_h = E_u H^u_h`. -/
-def averagedSandwichedPolynomialSubMeasurement (params : Parameters)
-    (_strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params)) : SubMeasurement (Polynomial params) :=
-  { name := s!"Havg[{T.toSubMeasurement.name}]" }
-
-/-- Evaluate a polynomial submeasurement at each point `u`. -/
-def polynomialEvaluationFamily (params : Parameters)
-    (H : SubMeasurement (Polynomial params)) :
-    IndexedSubMeasurement (Point params) (Fq params) :=
-  fun u => evaluateAt params u H
-
-/-- The formal primal objective operator of the self-improvement SDP. -/
-def sdpPrimalObjectiveOperator (params : Parameters)
-    (_strategy : SymmetricStrategy params)
+/-- The formal primal objective operator `Σ_g T_g A_g`. -/
+noncomputable def sdpPrimalObjectiveOperator (params : Parameters)
+    (strategy : SymmetricStrategy params)
     (T : Measurement (Polynomial params)) : Operator :=
-  { name := s!"PrimalObj({T.toSubMeasurement.name},{params.m},{params.q},{params.d})" }
+  averageOperatorOverDistribution (polynomialDistribution params)
+    (sdpPrimalContributionOperator params strategy T)
 
 /-- The primal objective value `Σ_g Tr(T_g A_g)`. -/
-def sdpPrimalObjective (params : Parameters)
+noncomputable def sdpPrimalObjective (params : Parameters)
     (strategy : SymmetricStrategy params)
     (T : Measurement (Polynomial params)) : Error :=
   operatorTrace (sdpPrimalObjectiveOperator params strategy T)
 
 /-- The dual objective value `Tr(Z)`. -/
-def sdpDualObjective (Z : Operator) : Error :=
+noncomputable def sdpDualObjective (Z : Operator) : Error :=
   operatorTrace Z
 
 /-- The dual slack operator `Z - A_g`. -/
-def sdpDualSlackOperator (params : Parameters)
+noncomputable def sdpDualSlackOperator (params : Parameters)
     (strategy : SymmetricStrategy params)
     (Z : Operator) (g : Polynomial params) : Operator :=
   formalDifference Z (averagedPointOperator params strategy g)
 
-/-- The complementary-slackness operator `T_g (Z - A_g)`. -/
-def sdpComplementarySlacknessOperator (params : Parameters)
+/-- The complementary-slackness equation `T_g Z = T_g A_g`. -/
+def sdpComplementarySlacknessEquation (params : Parameters)
     (strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params)) (Z : Operator)
-    (g : Polynomial params) : Operator :=
-  formalProduct
-    { name := s!"{T.toSubMeasurement.name}[g]" }
-    (sdpDualSlackOperator params strategy Z g)
+    (T : Measurement (Polynomial params))
+    (Z : Operator) (g : Polynomial params) : Prop :=
+  formalProduct (T.outcomeOperator g) Z =
+    formalProduct (T.outcomeOperator g) (averagedPointOperator params strategy g)
 
-/-- The operator measuring the helper-stage boundedness defect. -/
-def helperBoundednessOperator (params : Parameters)
-    (_strategy : SymmetricStrategy params)
-    (H : SubMeasurement (Polynomial params)) (Z : Operator) : Operator :=
-  formalDifference Z { name := s!"A-vs-{H.name}({params.m},{params.q},{params.d})" }
-
-/-- The helper-stage boundedness defect. -/
-def helperBoundednessGap (params : Parameters)
+/-- The pointwise sandwiched operator `H^u_h = A^u_{h(u)} T_h A^u_{h(u)}`. -/
+def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
     (strategy : SymmetricStrategy params)
-    (H : SubMeasurement (Polynomial params)) (Z : Operator) : Error :=
-  operatorExpectation strategy.state (helperBoundednessOperator params strategy H Z)
+    (T : Measurement (Polynomial params))
+    (u : Point params) (h : Polynomial params) : Operator :=
+  let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+  formalProduct (formalProduct Au (T.outcomeOperator h)) Au
 
-/-- The projective-stage boundedness defect. -/
-def projectiveBoundednessGap (params : Parameters)
+/-- The pointwise sandwiched submeasurement `H^u = {H^u_h}`. -/
+noncomputable def sandwichedPolynomialSubMeasurementAt (params : Parameters)
     (strategy : SymmetricStrategy params)
-    (H : ProjectiveSubMeasurement (Polynomial params)) (Z : Operator) : Error :=
-  let defect :=
-    formalDifference Z
-      { name := s!"A-vs-{H.toSubMeasurement.name}({params.m},{params.q},{params.d})" }
-  operatorExpectation strategy.state defect
+    (T : Measurement (Polynomial params)) (u : Point params) :
+    SubMeasurement (Polynomial params) :=
+  { name :=
+      s!"Hslice[{pointCode params u}|{(strategy.pointMeasurement u).toSubMeasurement.name}|{T.toSubMeasurement.name}]"
+    outcomeOperator := sandwichedPolynomialOutcomeOperatorAt params strategy T u
+    totalOperator :=
+      averageOperatorOverDistribution (polynomialDistribution params)
+        (sandwichedPolynomialOutcomeOperatorAt params strategy T u) }
+
+/-- The averaged sandwiched submeasurement `H_h = E_u H^u_h`. -/
+noncomputable def averagedSandwichedPolynomialSubMeasurement (params : Parameters)
+    (strategy : SymmetricStrategy params)
+    (T : Measurement (Polynomial params)) : SubMeasurement (Polynomial params) :=
+  { name := s!"Havg[{T.toSubMeasurement.name}]"
+    outcomeOperator := fun h =>
+      averageOperatorOverDistribution (uniformDistribution (Point params))
+        (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
+    totalOperator :=
+      averageOperatorOverDistribution (uniformDistribution (Point params))
+        (fun u => (sandwichedPolynomialSubMeasurementAt params strategy T u).totalOperator) }
+
+/-- Evaluate a polynomial submeasurement at each point `u`. -/
+abbrev polynomialEvaluationFamily (params : Parameters)
+    (H : SubMeasurement (Polynomial params)) :
+    IndexedSubMeasurement (Point params) (Fq params) :=
+  MIPStarRE.Paper2009LDT.polynomialEvaluationFamily params H
 
 /-- The variance error entering `lem:add-in-u`. -/
 noncomputable def selfImprovementVarianceError (params : Parameters)
@@ -128,10 +144,219 @@ noncomputable def selfImprovementError (params : Parameters)
     (eps delta : Error) : Error :=
   Section6MainInductionStep.selfImprovementInInductionError params eps delta 0
 
+/-- A concrete finite-dimensional matrix realization of the SDP data. -/
+structure MatrixSdpRealization (params : Parameters) where
+  space : FiniteHilbertSpace
+  state : PositiveMatrixState space
+  pointMeasurement : Point params → MatrixSubmeasurement (Fq params) space
+
+/-- The concrete operator `A^u_{g(u)}` entering the SDP average. -/
+def matrixAveragedPointOperatorContribution (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (g : Polynomial params) (u : Point params) : MatrixOperator model.space :=
+  (model.pointMeasurement u).effect (g u)
+
+/-- The concrete averaged operator `A_g = E_u A^u_{g(u)}`. -/
+noncomputable def matrixAveragedPointOperator (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (g : Polynomial params) : MatrixOperator model.space :=
+  matrixAverageOperator (matrixAveragedPointOperatorContribution params model g)
+
+/-- The concrete primal contribution `T_g A_g`. -/
+noncomputable def matrixSdpPrimalContributionOperator (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (g : Polynomial params) : MatrixOperator model.space :=
+  (T.effect g) * matrixAveragedPointOperator params model g
+
+/-- The concrete primal objective `E_g Re τ(ρ T_g A_g)`. -/
+noncomputable def matrixSdpPrimalObjective (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (T : MatrixMeasurement (Point params → Fq params) model.space) : Error :=
+  averageOverDistribution (polynomialDistribution params) (fun g =>
+    Complex.re (matrixExpectation model.state
+      (matrixSdpPrimalContributionOperator params model T g)))
+
+/-- The concrete dual objective `Re τ(Z)`. -/
+noncomputable def matrixSdpDualObjective {params : Parameters}
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space) : Error :=
+  Complex.re (MIPStarRE.Quantum.normalizedTrace Z)
+
+/-- The concrete dual slack operator `Z - A_g`. -/
+noncomputable def matrixSdpDualSlackOperator (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space)
+    (g : Polynomial params) : MatrixOperator model.space :=
+  Z - matrixAveragedPointOperator params model g
+
+/-- The concrete complementary-slackness defect `T_g (Z - A_g)`. -/
+noncomputable def matrixSdpComplementarySlacknessDefect (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (Z : MatrixOperator model.space)
+    (g : Polynomial params) : MatrixOperator model.space :=
+  (T.effect g) * matrixSdpDualSlackOperator params model Z g
+
+/-- Matrix-level witness for an optimal SDP pair. -/
+structure MatrixSdpOptimalWitness (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (Z : MatrixOperator model.space) : Prop where
+  dualPositive : 0 ≤ Z
+  dualFeasible :
+    ∀ g : Polynomial params,
+      0 ≤ matrixSdpDualSlackOperator params model Z g
+  strongDuality :
+    matrixSdpPrimalObjective params model T = matrixSdpDualObjective model Z
+  complementarySlackness :
+    ∀ g : Polynomial params,
+      matrixSdpComplementarySlacknessDefect params model T Z g = 0
+
+/-- The family of outcome/polynomial selections used in `lem:add-in-u`. -/
+abbrev AddInUSelection (params : Parameters) (Outcome : Type _) :=
+  Point params → Set (Outcome × Polynomial params)
+
+/-- Choose one representative pair from `S_u` when it is nonempty. -/
+noncomputable def addInUSelectionChoice {Outcome : Type _}
+    (params : Parameters)
+    (S : AddInUSelection params Outcome)
+    (u : Point params) : Option (Outcome × Polynomial params) := by
+  classical
+  by_cases h : (S u).Nonempty
+  · exact some (Classical.choose h)
+  · exact none
+
+/-- A raw point-indexed matrix outcome family used in the matrix `add-in-u` transfer. -/
+abbrev MatrixIndexedPointOutcomeFamily (params : Parameters)
+    (Outcome : Type _) (H : FiniteHilbertSpace) :=
+  Point params → Outcome → MatrixOperator H
+
+/-- The concrete sandwiched operator `A^u_{h(u)} T_h A^u_{h(u)}`. -/
+noncomputable def matrixSandwichedPolynomialOutcomeOperatorAt (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (u : Point params) (h : Polynomial params) : MatrixOperator model.space :=
+  let Au := matrixAveragedPointOperatorContribution params model h u
+  Au * (T.effect h) * Au
+
+/-- The averaged concrete sandwiched operator `E_u A^u_{h(u)} T_h A^u_{h(u)}`. -/
+noncomputable def matrixAveragedSandwichedPolynomialOutcomeOperator (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (h : Polynomial params) : MatrixOperator model.space :=
+  matrixAverageOperator (fun u : Point params =>
+    matrixSandwichedPolynomialOutcomeOperatorAt params model T u h)
+
+/-- The matrix left-hand operator in `add-in-u`. -/
+noncomputable def matrixAddInULeftOperatorAtPoint {Outcome : Type _}
+    (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
+    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (S : AddInUSelection params Outcome)
+    (u : Point params) : MatrixOperator model.space :=
+  match addInUSelectionChoice params S u with
+  | some (o, h) => (M u o) * (H.effect h)
+  | none => 0
+
+/-- The matrix right-hand operator in `add-in-u`. -/
+noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type _}
+    (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
+    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (S : AddInUSelection params Outcome)
+    (u : Point params) : MatrixOperator model.space :=
+  match addInUSelectionChoice params S u with
+  | some (o, h) =>
+      let Au := matrixAveragedPointOperatorContribution params model h u
+      Au * (M u o) * Au * (T.effect h)
+  | none => 0
+
+/-- The matrix left-hand expectation in `add-in-u`. -/
+noncomputable def matrixAddInULeftQuantity {Outcome : Type _}
+    (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
+    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (S : AddInUSelection params Outcome) : Error :=
+  finiteAverage (fun u : Point params =>
+    Complex.re (matrixExpectation model.state
+      (matrixAddInULeftOperatorAtPoint params model M H S u)))
+
+/-- The matrix right-hand expectation in `add-in-u`. -/
+noncomputable def matrixAddInURightQuantity {Outcome : Type _}
+    (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
+    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (S : AddInUSelection params Outcome) : Error :=
+  finiteAverage (fun u : Point params =>
+    Complex.re (matrixExpectation model.state
+      (matrixAddInURightOperatorAtPoint params model M T S u)))
+
+/-- The concrete evaluated polynomial family `H_[h(u)=a]`. -/
+noncomputable def matrixPolynomialEvaluationOutcomeOperatorAtPoint (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (u : Point params) (a : Fq params) : MatrixOperator model.space :=
+  let evalFamily :=
+    MIPStarRE.Quantum.Submeasurement.postprocess (M := H) (fun h => h u)
+  evalFamily.effect a
+
+/-- The concrete matched operator `E_a A^u_a H_[h(u)=a]`. -/
+noncomputable def matrixHelperAgreementOperatorAtPoint (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (u : Point params) : MatrixOperator model.space :=
+  matrixAverageOperator (fun a : Fq params =>
+    (model.pointMeasurement u).effect a *
+      matrixPolynomialEvaluationOutcomeOperatorAtPoint params model H u a)
+
+/-- The concrete averaged matched operator `E_u E_a A^u_a H_[h(u)=a]`. -/
+noncomputable def matrixHelperAgreementAverageOperator (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (H : MatrixSubmeasurement (Point params → Fq params) model.space) : MatrixOperator model.space :=
+  matrixAverageOperator (fun u : Point params =>
+    matrixHelperAgreementOperatorAtPoint params model H u)
+
+/-- The concrete helper boundedness gap `Re τ(ρ (Z - E_u Σ_a A^u_a H_[h(u)=a]))`. -/
+noncomputable def matrixHelperBoundednessGap (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (Z : MatrixOperator model.space) : Error :=
+  Complex.re (matrixExpectation model.state
+    (Z - matrixHelperAgreementAverageOperator params model H))
+
+/-- The concrete projective residual gap `Re τ(ρ (Z (I - Σ_h H_h)))`. -/
+noncomputable def matrixProjectiveResidualGap (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (Z : MatrixOperator model.space) : Error :=
+  let total := MIPStarRE.Quantum.Submeasurement.total H
+  Complex.re (matrixExpectation model.state (Z * (1 - total)))
+
+/-- Matrix-level version of the `add-in-u` transfer inequality. -/
+structure MatrixAddInUTransferStatement {Outcome : Type _}
+    (params : Parameters)
+    (model : MatrixSdpRealization params)
+    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
+    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (eps delta : Error) : Prop where
+  transfer :
+    ∀ S : AddInUSelection params Outcome,
+      |matrixAddInULeftQuantity params model M H S -
+          matrixAddInURightQuantity params model M T S| ≤
+        addInUError params eps delta
+
 /-- An optimal primal/dual pair for the section's semidefinite program. -/
 structure SdpOptimalPair (params : Parameters)
     (strategy : SymmetricStrategy params)
     (T : Measurement (Polynomial params)) (Z : Operator) : Prop where
+  primalTotalOperator :
+    T.totalOperator = polynomialIdentityOperator params
   dualPositive : PositiveSemidefinite Z
   dualFeasible :
     ∀ g : Polynomial params,
@@ -140,7 +365,12 @@ structure SdpOptimalPair (params : Parameters)
     sdpPrimalObjective params strategy T = sdpDualObjective Z
   complementarySlackness :
     ∀ g : Polynomial params,
-      sdpComplementarySlacknessOperator params strategy T Z g = formalZeroOperator
+      sdpComplementarySlacknessEquation params strategy T Z g
+  matrixWitness :
+    ∃ model : MatrixSdpRealization params,
+      ∃ Tm : MatrixMeasurement (Point params → Fq params) model.space,
+        ∃ Zm : MatrixOperator model.space,
+          MatrixSdpOptimalWitness params model Tm Zm
 
 /-- Output package for `lem:sdp`. -/
 structure SdpStatement (params : Parameters)
@@ -149,27 +379,107 @@ structure SdpStatement (params : Parameters)
     ∃ T : Measurement (Polynomial params), ∃ Z : Operator,
       SdpOptimalPair params strategy T Z
 
-/-- The family of outcome/polynomial selections used in `lem:add-in-u`. -/
-abbrev AddInUSelection (params : Parameters) (Outcome : Type _) :=
-  Point params → Set (Outcome × Polynomial params)
+/-- The operator inside the left-hand side of `lem:add-in-u` at a fixed point `u`. -/
+noncomputable def addInULeftOperatorAtPoint {Outcome : Type _}
+    (params : Parameters)
+    (strategy : SymmetricStrategy params)
+    (M : IndexedSubMeasurement (Point params) Outcome)
+    (H : SubMeasurement (Polynomial params))
+    (S : AddInUSelection params Outcome)
+    (u : Point params) : Operator :=
+  match addInUSelectionChoice params S u with
+  | some (o, h) =>
+      formalTensor ((M u).outcomeOperator o) (H.outcomeOperator h)
+  | none => formalZeroOperator
+
+/-- The operator inside the right-hand side of `lem:add-in-u` at a fixed point `u`. -/
+noncomputable def addInURightOperatorAtPoint {Outcome : Type _}
+    (params : Parameters)
+    (strategy : SymmetricStrategy params)
+    (M : IndexedSubMeasurement (Point params) Outcome)
+    (T : Measurement (Polynomial params))
+    (S : AddInUSelection params Outcome)
+    (u : Point params) : Operator :=
+  match addInUSelectionChoice params S u with
+  | some (o, h) =>
+      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+      formalTensor
+        (formalProduct (formalProduct Au ((M u).outcomeOperator o)) Au)
+        (T.outcomeOperator h)
+  | none => formalZeroOperator
 
 /-- The left-hand expectation in `lem:add-in-u`. -/
-def addInULeftQuantity {Outcome : Type _} (params : Parameters)
+noncomputable def addInULeftQuantity {Outcome : Type _} (params : Parameters)
     (strategy : SymmetricStrategy params)
-    (_M : IndexedSubMeasurement (Point params) Outcome)
+    (M : IndexedSubMeasurement (Point params) Outcome)
     (H : SubMeasurement (Polynomial params))
-    (_S : AddInUSelection params Outcome) : Error :=
-  operatorExpectation strategy.state
-    { name := s!"AddInU.left({params.m},{params.q},{params.d},{H.name})" }
+    (S : AddInUSelection params Outcome) : Error :=
+  averageOverDistribution (uniformDistribution (Point params))
+    (fun u =>
+      operatorExpectation strategy.state
+        (addInULeftOperatorAtPoint params strategy M H S u))
 
 /-- The right-hand expectation in `lem:add-in-u`. -/
-def addInURightQuantity {Outcome : Type _} (params : Parameters)
+noncomputable def addInURightQuantity {Outcome : Type _} (params : Parameters)
     (strategy : SymmetricStrategy params)
-    (_M : IndexedSubMeasurement (Point params) Outcome)
+    (M : IndexedSubMeasurement (Point params) Outcome)
     (T : Measurement (Polynomial params))
-    (_S : AddInUSelection params Outcome) : Error :=
+    (S : AddInUSelection params Outcome) : Error :=
+  averageOverDistribution (uniformDistribution (Point params))
+    (fun u =>
+      operatorExpectation strategy.state
+        (addInURightOperatorAtPoint params strategy M T S u))
+
+/-- The pointwise matched operator `Σ_a A^u_a ⊗ H_[h(u)=a]`. -/
+noncomputable def helperAgreementOperatorAtPoint (params : Parameters)
+    (strategy : SymmetricStrategy params)
+    (H : SubMeasurement (Polynomial params))
+    (u : Point params) : Operator :=
+  averageOperatorOverDistribution (uniformDistribution (Fq params))
+    (fun a =>
+      formalTensor
+        ((strategy.pointMeasurement u).toSubMeasurement.outcomeOperator a)
+        ((evaluateAt params u H).outcomeOperator a))
+
+/-- The average operator `E_u Σ_a A^u_a ⊗ H_[h(u)=a]`. -/
+noncomputable def helperAgreementAverageOperator (params : Parameters)
+    (strategy : SymmetricStrategy params)
+    (H : SubMeasurement (Polynomial params)) : Operator :=
+  averageOperatorOverDistribution (uniformDistribution (Point params))
+    (helperAgreementOperatorAtPoint params strategy H)
+
+/-- The helper-stage upper operator `Z ⊗ I`. -/
+def helperUpperOperator (params : Parameters) (Z : Operator) : Operator :=
+  formalTensor Z (polynomialIdentityOperator params)
+
+/-- The operator measuring the helper-stage boundedness defect. -/
+noncomputable def helperBoundednessOperator (params : Parameters)
+    (strategy : SymmetricStrategy params)
+    (H : SubMeasurement (Polynomial params)) (Z : Operator) : Operator :=
+  formalDifference
+    (helperUpperOperator params Z)
+    (helperAgreementAverageOperator params strategy H)
+
+/-- The helper-stage boundedness defect. -/
+noncomputable def helperBoundednessGap (params : Parameters)
+    (strategy : SymmetricStrategy params)
+    (H : SubMeasurement (Polynomial params)) (Z : Operator) : Error :=
   operatorExpectation strategy.state
-    { name := s!"AddInU.right({params.m},{params.q},{params.d},{T.toSubMeasurement.name})" }
+    (helperBoundednessOperator params strategy H Z)
+
+/-- The projective-stage residual operator `Z ⊗ (I - H)`. -/
+def projectiveResidualOperator (params : Parameters)
+    (H : ProjectiveSubMeasurement (Polynomial params))
+    (Z : Operator) : Operator :=
+  formalTensor Z
+    (formalDifference (polynomialIdentityOperator params) H.toSubMeasurement.totalOperator)
+
+/-- The projective-stage boundedness defect. -/
+noncomputable def projectiveBoundednessGap (params : Parameters)
+    (strategy : SymmetricStrategy params)
+    (H : ProjectiveSubMeasurement (Polynomial params)) (Z : Operator) : Error :=
+  operatorExpectation strategy.state
+    (projectiveResidualOperator params H Z)
 
 /-- Output package for `lem:add-in-u`. -/
 structure AddInUStatement {Outcome : Type _} (params : Parameters)
@@ -188,6 +498,12 @@ structure AddInUStatement {Outcome : Type _} (params : Parameters)
       |addInULeftQuantity params strategy M H S -
           addInURightQuantity params strategy M T S| ≤
         addInUError params eps delta
+  matrixWitness :
+    ∃ model : MatrixSdpRealization params,
+      ∃ Mmat : MatrixIndexedPointOutcomeFamily params Outcome model.space,
+        ∃ Hmat : MatrixSubmeasurement (Point params → Fq params) model.space,
+          ∃ Tm : MatrixMeasurement (Point params → Fq params) model.space,
+            MatrixAddInUTransferStatement params model Tm Mmat Hmat eps delta
 
 /-- Output package for `lem:self-improvement-helper`. -/
 structure SelfImprovementHelperConclusion (params : Parameters)
@@ -218,7 +534,7 @@ structure SelfImprovementHelperConclusion (params : Parameters)
   dualDominatesAveragedPoint :
     ∀ g : Polynomial params,
       PositiveSemidefinite (sdpDualSlackOperator params strategy Z g)
-  boundednessResidual :
+  helperResidualBound :
     helperBoundednessGap params strategy H Z ≤
       selfImprovementHelperError params eps delta
   bounded :
@@ -261,12 +577,23 @@ structure SelfImprovementConclusion (params : Parameters)
   dualDominatesAveragedPoint :
     ∀ g : Polynomial params,
       PositiveSemidefinite (sdpDualSlackOperator params strategy Z g)
-  boundednessResidual :
+  projectiveResidualBound :
     projectiveBoundednessGap params strategy H Z ≤
       selfImprovementError params eps delta
   bounded :
     BoundedByOperator strategy.state H.toSubMeasurement Z
       (selfImprovementError params eps delta)
+
+/-- Output package for the explicit bridge from measurement to submeasurement input. -/
+structure SelfImprovementSubMeasurementConclusion (params : Parameters)
+    (strategy : SymmetricStrategy params)
+    (G : SubMeasurement (Polynomial params))
+    (H : ProjectiveSubMeasurement (Polynomial params))
+    (Z : Operator) (eps delta gamma nu : Error) : Prop where
+  measurementBridge :
+    ∃ Gmeas : Measurement (Polynomial params),
+      Gmeas.toSubMeasurement = G ∧
+      SelfImprovementConclusion params strategy Gmeas H Z eps delta gamma nu
 
 /-- `lem:self-improvement-helper`. -/
 lemma selfImprovementHelper
@@ -303,7 +630,7 @@ lemma addInU {Outcome : Type _}
   sorry
 
 /-- `thm:self-improvement`. -/
-def selfImprovement
+theorem selfImprovement
     (params : Parameters)
     (strategy : SymmetricStrategy params)
     (eps delta gamma nu : Error)
@@ -312,8 +639,28 @@ def selfImprovement
     (hcons : ConsistentWithPolynomialEvaluation params strategy.state
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
       G.toSubMeasurement nu) :
-    Σ' H : ProjectiveSubMeasurement (Polynomial params), Σ' Z : Operator,
+    ∃ H : ProjectiveSubMeasurement (Polynomial params), ∃ Z : Operator,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
+  sorry
+
+/--
+Bridge from the measurement-input version in `self_improvement.tex` to the
+submeasurement-input version used in `inductive_step.tex`.
+-/
+theorem selfImprovementFromSubMeasurement
+    (params : Parameters)
+    (strategy : SymmetricStrategy params)
+    (eps delta gamma nu : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeasurement (Polynomial params))
+    (Gmeas : Measurement (Polynomial params))
+    (hbridge : Gmeas.toSubMeasurement = G)
+    (hcons : ConsistentWithPolynomialEvaluation params strategy.state
+      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
+      G nu) :
+    ∃ H : ProjectiveSubMeasurement (Polynomial params), ∃ Z : Operator,
+      SelfImprovementSubMeasurementConclusion params strategy G H Z
+        eps delta gamma nu := by
   sorry
 
 end MIPStarRE.Paper2009LDT.Section9SelfImprovement

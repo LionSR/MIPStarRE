@@ -41,7 +41,7 @@
   \]
 \end{lemma}
 \begin{proof}
-  Replace each evaluated $G$ by the corresponding point measurement using the consistency and boundedness hypotheses. The point measurements commute by Theorem~\ref{thm:commutativity-points}. Transfer the commutation estimate back to the evaluated $G$'s with the inner-product comparison lemma.
+  Write $G_a^{u,x}=G^x_{[g(u)=a]}$ and expand the commutator norm into the two quartic terms that appear in the source. The bridge to point measurements is not a single substitution: first use consistency to insert the evaluated point projector $A_a^{u,x}$, then use two boundedness-driven stability claims to show that inserting or deleting the total projector $G^x$ or $G^y$ only costs $O(\zeta^{1/2})$. After those internal stability steps, Theorem~\ref{thm:commutativity-points} commutes the point measurements, and the post-processed self-consistency of the $G^x$'s transfers the estimate back to the evaluated families $G_a^{u,x}$.
 \end{proof}
 
 \begin{lemma}[Normalization condition for a sandwiched family]\label{lem:normalization-condition}
@@ -68,5 +68,5 @@
   \]
 \end{theorem}
 \begin{proof}
-  Expand the commutator norm into two quartic terms. The first is compared with $\bra{\psi} G \ot G \ket{\psi}$ by Lemma~\ref{prop:switch-sandwich}. For the second, evaluate both slice measurements at random points, use Lemma~\ref{lem:comm-data-processed-g} together with the normalization condition from Lemma~\ref{lem:normalization-condition}, and then remove the evaluations by Schwartz--Zippel.
+  Expand the commutator norm into two quartic terms. The first is reduced to the mixed overlap $\bra{\psi} G\ot G\ket{\psi}$ by Lemma~\ref{prop:switch-sandwich}. For the second, the source passes to random evaluations $g(u)$ and $h(v)$, so that Lemma~\ref{lem:comm-data-processed-g} can commute the processed operators. Each application of the inner-product comparison lemma requires the normalization condition from Lemma~\ref{lem:normalization-condition} for sandwiched families such as $G_h^y G_{[g(u)=a]}^x G_h^y$. Finally one removes the two point evaluations by Schwartz--Zippel, paying one $md/q$ loss for each removal. This evaluated-to-polynomial lift is the main work in the theorem.
 \end{proof}

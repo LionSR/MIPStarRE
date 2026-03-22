@@ -12,7 +12,7 @@
   for every $x,y,a,b$.
 \end{theorem}
 \begin{proof}
-  For each local submeasurement, adjoin one extra outcome for the missing mass and realize the resulting measurement by a projective measurement on a larger space. Tensor the two local dilations together.
+  Apply one-measurement Naimark dilation separately to every family $A^x$ and $B^y$. For each question $x$ on Alice's side and $y$ on Bob's side, introduce an auxiliary register carrying the local dilation of that particular submeasurement, together with one extra outcome for the missing mass. Let $\ket{\mathrm{aux}}$ be the tensor product of all these auxiliary states. The dilated operator $\widehat A_a^x$ acts as the Naimark projector for $A^x$ on the $x$-th auxiliary register and as the identity on the other auxiliary factors, and similarly for $\widehat B_b^y$. Because the two sides use disjoint tensor factors, the correlation for any fixed pair $(x,y)$ reduces to the one-measurement Naimark identity on those two registers, which gives the stated equality.
 \end{proof}
 
 \begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
@@ -28,7 +28,7 @@
   \]
 \end{lemma}
 \begin{proof}
-  Follow the Kempe--Vidick orthogonalization argument~\cite{KV11}. The proof first shows that a consistent measurement is almost projective, then rounds it to nearby projections while controlling the loss in overlap. In the source this compression hides several intermediate operator inequalities and norm-comparison steps; during Lean proof filling these are expected to appear as explicit helper lemmas (currently scaffolded as \lean{MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective.consistencyToAlmostProjective} and \lean{MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective.roundAlmostProjectiveMeasurement}) rather than a single black-box step.
+  Follow the Kempe--Vidick orthogonalization argument~\cite{KV11}. First the consistency with $B$ is converted into an ``almost projective'' estimate for $A$, namely that $\sum_a \bra{\psi} (A_a-A_a^2) \ot I \ket{\psi}$ is small. Spectrally truncate each $A_a$ to a projector $R_a$, then discard the small singular directions to obtain lower-rank projectors $Q_a$ whose sum $Q=\sum_a Q_a$ is still close to a projector but may not equal the identity. The source then rewrites $Q_a$ as $X^\dagger T_a X$ for a genuine projective measurement $T$, replaces $X$ by the unitary part $\widehat X$ of its singular value decomposition, and defines $P_a=\widehat X^\dagger T_a \widehat X$. The main bookkeeping burden is to compare successively $A_a$, $R_a$, $Q_a$, and $P_a$ while controlling the completeness defects of $Q$ and $\sqrt Q$; in Lean these appear as several explicit helper lemmas rather than one black-box step.
 \end{proof}
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}

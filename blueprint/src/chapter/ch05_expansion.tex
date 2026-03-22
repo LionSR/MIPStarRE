@@ -42,9 +42,38 @@
   The two vertex marginals of a random edge are uniform on $\F_q^m$. Expanding the right-hand side yields $(1/M)I-K$.
 \end{proof}
 
+\begin{lemma}[Average of a nontrivial additive character]\label{lem:character-average-scalar}
+  For $\beta \in \F_q$,
+  \[
+    \E_{x \sim \F_q} \omega^{\operatorname{tr}(\beta x)} =
+    \begin{cases}
+      1 & \text{if } \beta=0,\\
+      0 & \text{if } \beta\ne 0.
+    \end{cases}
+  \]
+\end{lemma}
+\begin{proof}
+  If $\beta=0$ the character is constant. If $\beta\ne 0$, the map $x \mapsto \beta x$ permutes $\F_q$, so the average is the average of a nontrivial additive character, which vanishes.
+\end{proof}
+
+\begin{lemma}[Orthogonality of finite-field characters]\label{lem:character-average-vector}
+  \uses{lem:character-average-scalar}
+  For $\alpha,\beta \in \F_q^m$,
+  \[
+    \frac{1}{q^m}\sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot(\beta-\alpha))} =
+    \begin{cases}
+      1 & \text{if } \alpha=\beta,\\
+      0 & \text{if } \alpha\ne \beta.
+    \end{cases}
+  \]
+\end{lemma}
+\begin{proof}
+  Factor the sum over the $m$ coordinates and apply Lemma~\ref{lem:character-average-scalar} to each factor.
+\end{proof}
+
 \begin{lemma}[Eigenvectors of the hypercube graph]\label{prop:eigenvectors}
   \lean{MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph.eigenvectors}
-  \uses{def:adjacency-laplacian}
+  \uses{def:adjacency-laplacian, lem:character-average-vector, lem:character-average-scalar}
   For each $\alpha \in \F_q^m$, define
   \[
     \ket{\varphi_\alpha} = \frac{1}{q^{m/2}} \sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot \alpha)} \ket{u}.
@@ -56,7 +85,7 @@
   where $|\alpha|$ is the number of nonzero coordinates of $\alpha$.
 \end{lemma}
 \begin{proof}
-  The orthonormality is the finite-field Fourier orthogonality relation. The eigenvalue computation follows by substituting the edge-sampling rule into $K\ket{\varphi_\alpha}$ and averaging over the rerandomized coordinate.
+  The orthonormality is exactly Lemma~\ref{lem:character-average-vector}. For the eigenvalue, substitute the edge-sampling rule $v=u+x e_i$ into $K\ket{\varphi_\alpha}$, separate the average over $u$ from the average over the rerandomized coordinate, and use Lemma~\ref{lem:character-average-scalar} to replace $\E_x\,\omega^{\operatorname{tr}(x\alpha_i)}$ by $\mathbf 1_{\alpha_i=0}$. Averaging over $i$ leaves the factor $(m-|\alpha|)/m$.
 \end{proof}
 
 \begin{lemma}[Spectral gap of the Laplacian]\label{cor:laplacian-spectral-gap}

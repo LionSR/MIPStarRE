@@ -57,6 +57,33 @@ def xRestrictedStrategy (params : Parameters)
   axisParallelMeasurement := restrictAxisParallelMeasurement params strategy x
   diagonalMeasurement := restrictDiagonalMeasurement params strategy x
 
+@[simp] theorem xRestrictedStrategy_state (params : Parameters)
+    (strategy : SymmetricStrategy params.next) (x : Fq params) :
+    (xRestrictedStrategy params strategy x).state = strategy.state :=
+  rfl
+
+@[simp] theorem xRestrictedStrategy_pointMeasurement_apply (params : Parameters)
+    (strategy : SymmetricStrategy params.next) (x : Fq params) (u : Point params) :
+    (xRestrictedStrategy params strategy x).pointMeasurement u =
+      strategy.pointMeasurement (appendPoint params u x) :=
+  rfl
+
+@[simp] theorem restrictAxisParallelMeasurement_outcomeOperator (params : Parameters)
+    (strategy : SymmetricStrategy params.next) (x : Fq params)
+    (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
+    ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeasurement.outcomeOperator f) =
+      (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeasurement.outcomeOperator
+        (liftAxisAnswer params x f) :=
+  rfl
+
+@[simp] theorem restrictDiagonalMeasurement_outcomeOperator (params : Parameters)
+    (strategy : SymmetricStrategy params.next) (x : Fq params)
+    (ℓ : DiagonalLine params) (f : DiagonalLinePolynomial params) :
+    ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeasurement.outcomeOperator f) =
+      (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)).toSubMeasurement.outcomeOperator
+        (liftDiagonalAnswer params x f) :=
+  rfl
+
 /-- The intermediate `ν` from `thm:main-induction`. -/
 noncomputable def mainInductionNu (params : Parameters) (k : ℕ)
     (eps delta gamma : Error) : Error :=
@@ -98,6 +125,17 @@ noncomputable def ldPastingInInductionError (params : Parameters) (k : ℕ)
     2 * ldPastingInInductionNu params k eps delta gamma zeta +
     Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))
 
+/-- Placeholder for the averaged point operator `E_u A^u_{h(u)}` appearing in boundedness. -/
+def averagedPointEvaluationOperator (params : Parameters)
+    (_strategy : SymmetricStrategy params) (_h : Polynomial params) : Operator :=
+  { name := s!"Aavg({params.m},{params.q},{params.d})" }
+
+/-- Placeholder for the slice-wise averaged point operator `E_u A^{u,x}_{g(u)}`. -/
+def averagedSlicePointEvaluationOperator (params : Parameters)
+    (_strategy : SymmetricStrategy params.next)
+    (x : Fq params) (_g : Polynomial params) : Operator :=
+  { name := s!"AavgSlice({params.m},{params.q},{params.d},{x.1})" }
+
 /-- Output package for the induction-level self-improvement theorem. -/
 structure SelfImprovementInInductionSectionConclusion (params : Parameters)
     (strategy : SymmetricStrategy params)
@@ -123,6 +161,9 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
   bounded :
     BoundedByOperator strategy.state H.toSubMeasurement Z
       (selfImprovementInInductionError params eps delta gamma)
+  dominatesAveragePointOperator :
+    ∀ h : Polynomial params,
+      DominatesOperator Z (averagedPointEvaluationOperator params strategy h)
 
 /-- Output package for the section-local pasting theorem. -/
 structure LdPastingInInductionSectionConclusion (params : Parameters)
@@ -136,8 +177,26 @@ structure LdPastingInInductionSectionConclusion (params : Parameters)
       H.toSubMeasurement
       (ldPastingInInductionError params k eps delta gamma kappa zeta)
 
-/-- Placeholder average over the uniform choice of a slice height `x ∈ F_q`. -/
-def averageOverSlices (params : Parameters) (_f : Fq params → Error) : Error := 0
+/-- The uniform distribution on slice heights `x ∈ F_q`. -/
+noncomputable def sliceHeightDistribution (params : Parameters) : Distribution (Fq params) :=
+  uniformDistribution (Fq params)
+
+/-- Average over the uniform choice of a slice height `x ∈ F_q`. -/
+noncomputable def averageOverSlices (params : Parameters) (f : Fq params → Error) : Error :=
+  averageOverDistribution (sliceHeightDistribution params) f
+
+/-- Weighted average over uniformly chosen slice heights. -/
+noncomputable def weightedAverageOverSlices (params : Parameters)
+    (w : Error) (f : Fq params → Error) : Error :=
+  averageOverSlices params (fun x => w * f x)
+
+/-- Probability that a sampled test line in `F_q^{m+1}` is not parallel to the new axis. -/
+noncomputable def sliceTransverseDirectionWeight (params : Parameters) : Error :=
+  (params.m : Error) / (((params.m + 1 : ℕ) : Error))
+
+/-- Reciprocal loss incurred when conditioning away the new axis direction. -/
+noncomputable def sliceConditioningLoss (params : Parameters) : Error :=
+  (((params.m + 1 : ℕ) : Error) / (params.m : Error))
 
 /-- Bookkeeping data `x ↦ (ε_x, δ_x, γ_x)` for the restricted strategies. -/
 structure RestrictedFailureProfile (params : Parameters)
@@ -153,22 +212,32 @@ structure RestrictedFailureProfile (params : Parameters)
         (diagonal x)
 
 /-- Average restricted axis-parallel error over slices. -/
-def averageRestrictedAxisParallelError (params : Parameters)
+noncomputable def averageRestrictedAxisParallelError (params : Parameters)
     {strategy : SymmetricStrategy params.next}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   averageOverSlices params profile.axisParallel
 
 /-- Average restricted self-consistency error over slices. -/
-def averageRestrictedSelfConsistencyError (params : Parameters)
+noncomputable def averageRestrictedSelfConsistencyError (params : Parameters)
     {strategy : SymmetricStrategy params.next}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   averageOverSlices params profile.selfConsistency
 
 /-- Average restricted diagonal-line error over slices. -/
-def averageRestrictedDiagonalError (params : Parameters)
+noncomputable def averageRestrictedDiagonalError (params : Parameters)
     {strategy : SymmetricStrategy params.next}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   averageOverSlices params profile.diagonal
+
+/-- Source-style boundedness input for the induction-level pasting theorem. -/
+structure PastingBoundednessInput (params : Parameters)
+    (strategy : SymmetricStrategy params.next)
+    (family : IndexedPolynomialFamily params) (zeta : Error) : Prop where
+  bounded : family.Bounded strategy.state zeta
+  dominationTargetAgrees :
+    ∀ x : Fq params, ∀ g : Polynomial params,
+      family.dominationTarget x g =
+        averagedSlicePointEvaluationOperator params strategy x g
 
 /-- Bookkeeping package for the restricted-probabilities lemma. -/
 structure RestrictedProbabilitiesStatement (params : Parameters)
@@ -176,11 +245,19 @@ structure RestrictedProbabilitiesStatement (params : Parameters)
     (eps delta gamma : Error) : Prop where
   profileExists :
     ∃ profile : RestrictedFailureProfile params strategy,
-      averageRestrictedAxisParallelError params profile
-          ≤ (((params.m + 1 : ℕ) : Error) / (params.m : Error)) * eps ∧
+      weightedAverageOverSlices params
+          (sliceTransverseDirectionWeight params) profile.axisParallel ≤ eps ∧
+        averageRestrictedAxisParallelError params profile
+          ≤ sliceConditioningLoss params * eps ∧
         averageRestrictedSelfConsistencyError params profile ≤ delta ∧
+        weightedAverageOverSlices params
+          (sliceTransverseDirectionWeight params) profile.diagonal ≤ gamma ∧
         averageRestrictedDiagonalError params profile
-          ≤ (((params.m + 1 : ℕ) : Error) / (params.m : Error)) * gamma
+          ≤ sliceConditioningLoss params * gamma ∧
+        sliceTransverseDirectionWeight params *
+          averageRestrictedAxisParallelError params profile ≤ eps ∧
+        sliceTransverseDirectionWeight params *
+          averageRestrictedDiagonalError params profile ≤ gamma
 
 /-- `thm:main-induction`. -/
 theorem mainInduction
@@ -188,7 +265,8 @@ theorem mainInduction
     (strategy : SymmetricStrategy params)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (k : ℕ) :
+    (k : ℕ)
+    (hk : params.m * params.d ≤ k) :
     ∃ G : Measurement (Polynomial params),
       ConsistentWithPolynomialEvaluation params strategy.state
         (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
@@ -219,15 +297,16 @@ theorem ldPastingInInductionSection
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : family.Bounded strategy.state zeta)
-    (k : ℕ) :
+    (hbound : PastingBoundednessInput params strategy family zeta)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next),
       LdPastingInInductionSectionConclusion params strategy family H
         eps delta gamma kappa zeta k := by
   sorry
 
 /-- `lem:restricted-probabilities`. -/
-def restrictedProbabilities
+lemma restrictedProbabilities
     (params : Parameters)
     (strategy : SymmetricStrategy params.next)
     (eps delta gamma : Error)
