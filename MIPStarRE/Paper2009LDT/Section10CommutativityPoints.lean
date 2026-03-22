@@ -36,6 +36,14 @@ def orderedProductSubMeasurement {α β : Type _}
   outcomeOperator := fun | (a, b) => formalProduct (A.outcomeOperator a) (B.outcomeOperator b)
   totalOperator := formalProduct A.totalOperator B.totalOperator
 
+/-- Reversed product of two paper-local submeasurements on the same tensor factor. -/
+def reversedProductSubMeasurement {α β : Type _}
+    (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
+    SubMeasurement (α × β) where
+  name := label
+  outcomeOperator := fun | (a, b) => formalProduct (B.outcomeOperator b) (A.outcomeOperator a)
+  totalOperator := formalProduct B.totalOperator A.totalOperator
+
 /-- Tensor-product bridge `A_a ⊗ B_b`. -/
 def tensorProductSubMeasurement {α β : Type _}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
@@ -76,8 +84,8 @@ def pointMeasurementProductRight (params : Parameters)
     let Au := (strategy.pointMeasurement uv.1).toSubMeasurement
     let Av := (strategy.pointMeasurement uv.2).toSubMeasurement
     leftPlacedSubMeasurement <|
-      orderedProductSubMeasurement
-        s!"pointComm.right({Av.name},{Au.name})" Av Au
+      reversedProductSubMeasurement
+        s!"pointComm.right({Au.name},{Av.name})" Au Av
 
 /-- Distribution obtained by sampling a diagonal line together with a parameter on that line. -/
 def pointWithDiagonalLineDistribution (params : Parameters) :

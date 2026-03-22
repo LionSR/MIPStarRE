@@ -92,10 +92,11 @@ def evaluatedSliceProductRight (params : Parameters)
     (_strategy : SymmetricStrategy params.next) (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) :=
   fun q =>
-    leftOrderedProductSubMeasurement
-      s!"evalSlice.right({params.m},{params.q},{params.d})"
-      (evaluatedSliceSecondFactor params family q)
-      (evaluatedSliceFirstFactor params family q)
+    leftPlacedSubMeasurement <|
+      reversedProductSubMeasurement
+        s!"evalSlice.right({params.m},{params.q},{params.d})"
+        (evaluatedSliceFirstFactor params family q)
+        (evaluatedSliceSecondFactor params family q)
 
 /-- The sandwiched evaluated product `(G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`. -/
 def evaluatedSliceSandwichFirstFactor (params : Parameters)
@@ -135,10 +136,11 @@ def fullSliceProductRight (params : Parameters)
     (_strategy : SymmetricStrategy params.next) (family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (FullSliceQuestion params) (FullSliceOutcome params) :=
   fun q =>
-    leftOrderedProductSubMeasurement
-      s!"fullSlice.right({params.m},{params.q},{params.d})"
-      (fullSliceSecondFactor params family q)
-      (fullSliceFirstFactor params family q)
+    leftPlacedSubMeasurement <|
+      reversedProductSubMeasurement
+        s!"fullSlice.right({params.m},{params.q},{params.d})"
+        (fullSliceFirstFactor params family q)
+        (fullSliceSecondFactor params family q)
 
 /-- Evaluate a pair of full-slice outcomes at the sampled points `((u,x),(v,y))`. -/
 def evaluateFullSliceOutcomeAtQuestion (params : Parameters)

@@ -184,19 +184,17 @@ def switcherooPointProductLeft {Outcome : Type _} (params : Parameters)
         ((family.meas q.1).toSubMeasurement)
         ((M q.2).toSubMeasurement)
 
-/-- Concrete hypothesis family for `M^y_o G^x_g`, reindexed to the same outcome type. -/
+/-- Concrete hypothesis family for `M^y_o G^x_g` on the `Polynomial params × Outcome` outcome type. -/
 def switcherooPointProductRight {Outcome : Type _} (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params × Outcome) :=
   fun q =>
     leftPlacedSubMeasurement <|
-      postprocess
-        (orderedProductSubMeasurement
-          s!"switcheroo.point.right({params.m},{params.q},{params.d})"
-          ((M q.2).toSubMeasurement)
-          ((family.meas q.1).toSubMeasurement))
-        (fun og => (og.2, og.1))
+      reversedProductSubMeasurement
+        s!"switcheroo.point.right({params.m},{params.q},{params.d})"
+        ((family.meas q.1).toSubMeasurement)
+        ((M q.2).toSubMeasurement)
 
 /-- Concrete aggregate family for `G^x M^y_o`. -/
 def switcherooAggregateLeft {Outcome : Type _} (params : Parameters)
@@ -339,10 +337,10 @@ def gHatPairProductRight (params : Parameters)
     IndexedSubMeasurement (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) :=
   fun q =>
     leftPlacedSubMeasurement <|
-      orderedProductSubMeasurement
+      reversedProductSubMeasurement
         s!"ghat.pair.right({params.m},{params.q},{params.d})"
-        ((gHatIndexedMeasurement params family q.2).toSubMeasurement)
         ((gHatIndexedMeasurement params family q.1).toSubMeasurement)
+        ((gHatIndexedMeasurement params family q.2).toSubMeasurement)
 
 /-- The ordered half-product `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
 def gHatHalfProductOutcomeOperator (params : Parameters)
