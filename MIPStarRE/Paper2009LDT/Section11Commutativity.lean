@@ -13,6 +13,10 @@ abbrev EvaluatedSliceQuestion (params : Parameters) := Point params.next × Poin
 abbrev EvaluatedSliceOutcome (params : Parameters) := Fq params × Fq params
 abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
 
+/-- Add a descriptive tag to a paper-local submeasurement placeholder. -/
+def tagSubMeasurement {α : Type _} (tag : String) (A : SubMeasurement α) : SubMeasurement α where
+  name := s!"{A.name}.{tag}"
+
 /-- Placeholder family for the ordered evaluated-slice product. -/
 def evaluatedSliceProductLeft (params : Parameters)
     (_strategy : SymmetricStrategy params.next) (_family : IndexedPolynomialFamily params) :
@@ -36,6 +40,34 @@ def fullSliceProductRight (params : Parameters)
     (_strategy : SymmetricStrategy params.next) (_family : IndexedPolynomialFamily params) :
     IndexedSubMeasurement (FullSliceQuestion params) Unit :=
   fun _ => { name := s!"fullSlice.right({params.m},{params.q},{params.d})" }
+
+/-- Placeholder for the sandwiched family `C_{a,b} = Q_b P_a Q_b`. -/
+def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Type _}
+    (P : SubMeasurement OutcomeA)
+    (Q : ProjectiveSubMeasurement OutcomeB) :
+    IndexedSubMeasurement OutcomeA OutcomeB :=
+  fun _ => tagSubMeasurement s!"sandwich({P.name})" Q.toSubMeasurement
+
+/-- Placeholder for the aggregated family `∑_b C_{a,b}`. -/
+def normalizationConditionSandwichedTotal {OutcomeA OutcomeB : Type _}
+    (P : SubMeasurement OutcomeA)
+    (Q : ProjectiveSubMeasurement OutcomeB) :
+    IndexedSubMeasurement OutcomeA Unit :=
+  fun a =>
+    tagSubMeasurement "total"
+      (postprocess (normalizationConditionSandwichedFamily P Q a) (fun _ => ()))
+
+/-- Placeholder for the left-hand side family `a ↦ P_a`. -/
+def normalizationConditionLeftFamily {OutcomeA OutcomeB : Type _}
+    (P : SubMeasurement OutcomeA)
+    (_Q : ProjectiveSubMeasurement OutcomeB) :
+    IndexedSubMeasurement OutcomeA Unit :=
+  fun _ => { name := s!"{P.name}.left" }
+
+/-- Placeholder domination relation for indexed families. -/
+structure IndexedSubMeasurementDominatedBy {Question Outcome : Type _}
+    (_A _B : IndexedSubMeasurement Question Outcome) : Prop where
+  pointwiseDomination : True
 
 /-- Displayed error term for `lem:comm-data-processed-g`. -/
 noncomputable def commDataProcessedGError (params : Parameters) (gamma zeta : Error) : Error :=
@@ -74,9 +106,12 @@ structure ComMainConclusion (params : Parameters)
 
 /-- Output package for `lem:normalization-condition`. -/
 structure NormalizationConditionStatement {OutcomeA OutcomeB : Type _}
-    (_P : SubMeasurement OutcomeA)
-    (_Q : ProjectiveSubMeasurement OutcomeB) : Prop where
-  sandwichedNormalization : True
+    (P : SubMeasurement OutcomeA)
+    (Q : ProjectiveSubMeasurement OutcomeB) : Prop where
+  sandwichedNormalization :
+    IndexedSubMeasurementDominatedBy
+      (normalizationConditionSandwichedTotal P Q)
+      (normalizationConditionLeftFamily P Q)
 
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG

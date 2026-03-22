@@ -54,6 +54,21 @@ def appendPoint (params : Parameters) (u : Point params) (x : Fq params) : Point
 def truncatePoint (params : Parameters) (u : Point params.next) : Point params :=
   fun i => u ⟨i.1, Nat.lt_trans i.2 (Nat.lt_succ_self params.m)⟩
 
+/-- Extract the final coordinate of a point in `F_q^{m+1}`. -/
+def pointHeight (params : Parameters) (u : Point params.next) : Fq params :=
+  u ⟨params.m, Nat.lt_succ_self params.m⟩
+
+@[simp] theorem truncatePoint_appendPoint (params : Parameters)
+    (u : Point params) (x : Fq params) :
+    truncatePoint params (appendPoint params u x) = u := by
+  funext i
+  simp [truncatePoint, appendPoint, i.2]
+
+@[simp] theorem pointHeight_appendPoint (params : Parameters)
+    (u : Point params) (x : Fq params) :
+    pointHeight params (appendPoint params u x) = x := by
+  simp [pointHeight, appendPoint]
+
 /-- A lightweight encoding of an axis-parallel line in `F_q^m`. -/
 structure AxisParallelLine (params : Parameters) where
   base : Point params
@@ -90,7 +105,8 @@ structure AxisLinePolynomial (params : Parameters) where
   supportedOnAxisLine : True
   degreeBounded : True
 
-instance {params : Parameters} : CoeFun (AxisLinePolynomial params) (fun _ => Point params → Fq params) :=
+instance {params : Parameters} :
+    CoeFun (AxisLinePolynomial params) (fun _ => Point params → Fq params) :=
   ⟨AxisLinePolynomial.toFun⟩
 
 /-- Diagonal-line answers with an explicit degree-bound witness slot. -/
@@ -99,26 +115,47 @@ structure DiagonalLinePolynomial (params : Parameters) where
   supportedOnDiagonalLine : True
   degreeBounded : True
 
-instance {params : Parameters} : CoeFun (DiagonalLinePolynomial params) (fun _ => Point params → Fq params) :=
+instance {params : Parameters} :
+    CoeFun (DiagonalLinePolynomial params) (fun _ => Point params → Fq params) :=
   ⟨DiagonalLinePolynomial.toFun⟩
 
 /-- Extend a global polynomial to the slice at height `x`. -/
 def Polynomial.appendAtHeight (params : Parameters)
-    (g : Polynomial params) (x : Fq params) : Polynomial params.next where
+    (g : Polynomial params) (_x : Fq params) : Polynomial params.next where
   toFun := fun u => g (truncatePoint params u)
+  lowIndividualDegree := trivial
+
+/-- Restrict a global polynomial in `m + 1` variables to the slice at height `x`. -/
+def Polynomial.restrictAtHeight (params : Parameters)
+    (g : Polynomial params.next) (x : Fq params) : Polynomial params where
+  toFun := fun u => g (appendPoint params u x)
   lowIndividualDegree := trivial
 
 /-- Extend an axis-line answer to the slice at height `x`. -/
 def AxisLinePolynomial.appendAtHeight (params : Parameters)
-    (f : AxisLinePolynomial params) (x : Fq params) : AxisLinePolynomial params.next where
+    (f : AxisLinePolynomial params) (_x : Fq params) : AxisLinePolynomial params.next where
   toFun := fun u => f (truncatePoint params u)
+  supportedOnAxisLine := trivial
+  degreeBounded := trivial
+
+/-- Restrict an axis-line answer in `m + 1` variables to the slice at height `x`. -/
+def AxisLinePolynomial.restrictAtHeight (params : Parameters)
+    (f : AxisLinePolynomial params.next) (x : Fq params) : AxisLinePolynomial params where
+  toFun := fun u => f (appendPoint params u x)
   supportedOnAxisLine := trivial
   degreeBounded := trivial
 
 /-- Extend a diagonal-line answer to the slice at height `x`. -/
 def DiagonalLinePolynomial.appendAtHeight (params : Parameters)
-    (f : DiagonalLinePolynomial params) (x : Fq params) : DiagonalLinePolynomial params.next where
+    (f : DiagonalLinePolynomial params) (_x : Fq params) : DiagonalLinePolynomial params.next where
   toFun := fun u => f (truncatePoint params u)
+  supportedOnDiagonalLine := trivial
+  degreeBounded := trivial
+
+/-- Restrict a diagonal-line answer in `m + 1` variables to the slice at height `x`. -/
+def DiagonalLinePolynomial.restrictAtHeight (params : Parameters)
+    (f : DiagonalLinePolynomial params.next) (x : Fq params) : DiagonalLinePolynomial params where
+  toFun := fun u => f (appendPoint params u x)
   supportedOnDiagonalLine := trivial
   degreeBounded := trivial
 
@@ -151,19 +188,24 @@ structure PositiveSemidefinite (_Z : Operator) : Prop where
 /-- A paper-local submeasurement with outcomes in `α`. -/
 structure SubMeasurement (α : Type _) where
   name : String := ""
-  deriving Inhabited, Repr
+  outcomeOperator : α → Operator := fun _ => default
+  totalOperator : Operator := default
+  deriving Inhabited
 
 /-- A paper-local measurement. -/
 structure Measurement (α : Type _) extends SubMeasurement α where
-  deriving Inhabited, Repr
+  completeWitness : True := trivial
+  deriving Inhabited
 
 /-- A paper-local projective submeasurement. -/
 structure ProjectiveSubMeasurement (α : Type _) extends SubMeasurement α where
-  deriving Inhabited, Repr
+  projectiveWitness : True := trivial
+  deriving Inhabited
 
 /-- A paper-local projective measurement. -/
 structure ProjectiveMeasurement (α : Type _) extends Measurement α where
-  deriving Inhabited, Repr
+  projectiveWitness : True := trivial
+  deriving Inhabited
 
 abbrev IndexedSubMeasurement (Question Outcome : Type _) := Question → SubMeasurement Outcome
 abbrev IndexedMeasurement (Question Outcome : Type _) := Question → Measurement Outcome
@@ -206,13 +248,20 @@ end IndexedProjectiveMeasurement
 /-- Post-process the outcomes of a submeasurement. -/
 def postprocess {α β : Type _} (A : SubMeasurement α) (_f : α → β) : SubMeasurement β where
   name := s!"{A.name}.post"
+  outcomeOperator := fun _ => { name := s!"{A.name}.post.outcome" }
+  totalOperator := A.totalOperator
 
 /-- Complete a submeasurement by adjoining a distinguished failure outcome. -/
 def completeSubMeasurement {α : Type _} (A : SubMeasurement α) : Measurement (Option α) where
   toSubMeasurement := {
     name := s!"{A.name}.completion"
+    outcomeOperator := fun
+      | some a => A.outcomeOperator a
+      | none => { name := s!"{A.name}.failure" }
+    totalOperator := { name := s!"{A.name}.completion.total" }
   }
 
+/-- Constant indexed family taking the same submeasurement on every question. -/
 def constantSubMeasurementFamily {α : Type _} (A : SubMeasurement α) :
     IndexedSubMeasurement Unit α :=
   fun _ => A
@@ -222,39 +271,79 @@ def evaluateAt (params : Parameters) (u : Point params)
     (G : SubMeasurement (Polynomial params)) : SubMeasurement (Fq params) :=
   postprocess G (fun g => g u)
 
+/-- View a global polynomial submeasurement as a point-indexed answer family. -/
+def polynomialEvaluationFamily (params : Parameters)
+    (G : SubMeasurement (Polynomial params)) :
+    IndexedSubMeasurement (Point params) (Fq params) :=
+  fun u => evaluateAt params u G
+
 /-- Evaluate each member of an indexed polynomial family at the same point. -/
 def evaluateFiberFamilyAt (params : Parameters) (u : Point params)
     (G : IndexedSubMeasurement (Fq params) (Polynomial params)) :
     IndexedSubMeasurement (Fq params) (Fq params) :=
   fun x => evaluateAt params u (G x)
 
+/-- Evaluate an indexed slice family at a point `(u, x)` in `F_q^{m+1}`. -/
+def evaluateFiberFamilyAtNextPoint (params : Parameters)
+    (G : IndexedSubMeasurement (Fq params) (Polynomial params)) :
+    IndexedSubMeasurement (Point params.next) (Fq params) :=
+  fun u => evaluateAt params (truncatePoint params u) (G (pointHeight params u))
+
+/-- Placeholder averaged off-diagonal mass for consistency statements. -/
+def consistencyError {Question Outcome : Type _}
+    (_ψ : QuantumState) (_𝒟 : Distribution Question)
+    (_A _B : IndexedSubMeasurement Question Outcome) : Error := 0
+
+/-- Placeholder averaged squared distance for `≈_δ`. -/
+def stateDependentDistanceError {Question Outcome : Type _}
+    (_ψ : QuantumState) (_𝒟 : Distribution Question)
+    (_A _B : IndexedSubMeasurement Question Outcome) : Error := 0
+
+/-- Placeholder defect in strong self-consistency. -/
+def strongSelfConsistencyError {Question Outcome : Type _}
+    (_ψ : QuantumState) (_𝒟 : Distribution Question)
+    (_A : IndexedSubMeasurement Question Outcome) : Error := 0
+
+/-- Placeholder total mass of a submeasurement on state `ψ`. -/
+def subMeasurementMass {Outcome : Type _}
+    (_ψ : QuantumState) (_A : SubMeasurement Outcome) : Error := 0
+
+/-- Placeholder averaged total mass of an indexed submeasurement. -/
+def indexedSubMeasurementMass {Question Outcome : Type _}
+    (_ψ : QuantumState) (_𝒟 : Distribution Question)
+    (_A : IndexedSubMeasurement Question Outcome) : Error := 0
+
+/-- Placeholder defect for domination by an operator witness. -/
+def boundednessError {Outcome : Type _}
+    (_ψ : QuantumState) (_A : SubMeasurement Outcome) (_Z : Operator) : Error := 0
+
 /-- Placeholder consistency relation. -/
 structure ConsistencyRel {Question Outcome : Type _}
     (_ψ : QuantumState) (_𝒟 : Distribution Question)
     (_A _B : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop where
-  offDiagonalBound : True
+  offDiagonalBound : consistencyError _ψ _𝒟 _A _B ≤ _δ
 
 /-- Placeholder state-dependent distance relation. -/
 structure StateDependentDistanceRel {Question Outcome : Type _}
     (_ψ : QuantumState) (_𝒟 : Distribution Question)
     (_A _B : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop where
-  squaredDistanceBound : True
+  squaredDistanceBound : stateDependentDistanceError _ψ _𝒟 _A _B ≤ _δ
 
 /-- Placeholder strong self-consistency relation. -/
 structure StrongSelfConsistencyRel {Question Outcome : Type _}
     (_ψ : QuantumState) (_𝒟 : Distribution Question)
     (_A : IndexedSubMeasurement Question Outcome) (_δ : Error) : Prop where
-  diagonalOverlapBound : True
+  diagonalOverlapBound : strongSelfConsistencyError _ψ _𝒟 _A ≤ _δ
 
 /-- Placeholder completeness statement for a submeasurement. -/
 structure CompletenessAtLeast {Outcome : Type _}
     (_ψ : QuantumState) (_A : SubMeasurement Outcome) (_r : Error) : Prop where
-  lowerBound : True
+  lowerBound : subMeasurementMass _ψ _A ≥ _r
 
 /-- Placeholder boundedness statement witnessed by an operator. -/
 structure BoundedByOperator {Outcome : Type _}
     (_ψ : QuantumState) (_A : SubMeasurement Outcome) (_Z : Operator) (_δ : Error) : Prop where
-  upperBound : True
+  upperBound : boundednessError _ψ _A _Z ≤ _δ
 
 /-- Placeholder consistency between a points measurement and a global polynomial submeasurement. -/
 structure ConsistentWithPolynomialEvaluation (params : Parameters)
@@ -262,19 +351,30 @@ structure ConsistentWithPolynomialEvaluation (params : Parameters)
     (_A : IndexedSubMeasurement (Point params) (Fq params))
     (_G : SubMeasurement (Polynomial params))
     (_δ : Error) : Prop where
-  evaluationConsistency : True
+  evaluationConsistency :
+    ConsistencyRel _ψ (uniformDistribution (Point params))
+      _A
+      (polynomialEvaluationFamily params _G)
+      _δ
 
 /-- Placeholder consistency between two global polynomial submeasurements. -/
 structure PolynomialMeasurementsConsistent (params : Parameters)
     (_ψ : QuantumState)
     (_G₁ _G₂ : SubMeasurement (Polynomial params))
     (_δ : Error) : Prop where
-  mutualConsistency : True
+  mutualConsistency :
+    ConsistencyRel _ψ (uniformDistribution Unit)
+      (constantSubMeasurementFamily _G₁)
+      (constantSubMeasurementFamily _G₂)
+      _δ
 
 /-- Placeholder strong self-consistency for a global polynomial submeasurement. -/
 structure PolynomialMeasurementStronglySelfConsistent (params : Parameters)
     (_ψ : QuantumState) (_G : SubMeasurement (Polynomial params)) (_δ : Error) : Prop where
-  diagonalMassBound : True
+  diagonalMassBound :
+    StrongSelfConsistencyRel _ψ (uniformDistribution Unit)
+      (constantSubMeasurementFamily _G)
+      _δ
 
 /-- Paper-local symmetric strategy data. -/
 structure SymmetricStrategy (params : Parameters) where
@@ -303,21 +403,37 @@ structure ProjectiveStrategy (params : Parameters) where
 
 namespace SymmetricStrategy
 
+/-- Placeholder failure probability in the axis-parallel lines test. -/
+def axisParallelFailureProbability {params : Parameters}
+    (_strategy : SymmetricStrategy params) : Error := 0
+
+/-- Placeholder failure probability in the self-consistency test. -/
+def selfConsistencyFailureProbability {params : Parameters}
+    (_strategy : SymmetricStrategy params) : Error := 0
+
+/-- Placeholder failure probability in the diagonal lines test. -/
+def diagonalFailureProbability {params : Parameters}
+    (_strategy : SymmetricStrategy params) : Error := 0
+
 /-- Placeholder for the paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
-structure IsGood {params : Parameters} (_strategy : SymmetricStrategy params)
-    (_eps _delta _gamma : Error) : Prop where
-  axisParallelTest : True
-  selfConsistencyTest : True
-  diagonalLineTest : True
+structure IsGood {params : Parameters} (strategy : SymmetricStrategy params)
+    (eps delta gamma : Error) : Prop where
+  axisParallelTest : strategy.axisParallelFailureProbability ≤ eps
+  selfConsistencyTest : strategy.selfConsistencyFailureProbability ≤ delta
+  diagonalLineTest : strategy.diagonalFailureProbability ≤ gamma
 
 end SymmetricStrategy
 
 namespace ProjectiveStrategy
 
+/-- Placeholder failure probability for the full low-individual-degree test. -/
+def lowIndividualDegreeFailureProbability {params : Parameters}
+    (_strategy : ProjectiveStrategy params) : Error := 0
+
 /-- Placeholder for passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
-    (_strategy : ProjectiveStrategy params) (_eps : Error) : Prop where
-  soundnessHypothesis : True
+    (strategy : ProjectiveStrategy params) (eps : Error) : Prop where
+  soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
 
 end ProjectiveStrategy
 
@@ -329,21 +445,46 @@ structure IndexedPolynomialFamily (params : Parameters) where
 
 namespace IndexedPolynomialFamily
 
-structure Complete {params : Parameters} (_family : IndexedPolynomialFamily params)
-    (_ψ : QuantumState) (_kappa : Error) : Prop where
-  averageCompleteness : True
+/-- Placeholder averaged submeasurement `G = E_x G^x` from the paper. -/
+def averagedSubMeasurement {params : Parameters}
+    (_family : IndexedPolynomialFamily params) : SubMeasurement (Polynomial params) where
+  name := s!"Gavg({params.m},{params.q},{params.d})"
+  outcomeOperator := fun _ => { name := s!"Gavg({params.m},{params.q},{params.d}).outcome" }
+  totalOperator := { name := s!"Gavg({params.m},{params.q},{params.d}).total" }
 
-structure ConsistentWithPoints {params : Parameters} (_family : IndexedPolynomialFamily params)
-    (_strategy : SymmetricStrategy params.next) (_zeta : Error) : Prop where
-  pointConsistency : True
+/-- Evaluate the slice family at a point `(u, x)` in `F_q^{m+1}`. -/
+def evaluatedAtNextPoint {params : Parameters}
+    (family : IndexedPolynomialFamily params) :
+    IndexedSubMeasurement (Point params.next) (Fq params) :=
+  fun u =>
+    evaluateAt params (truncatePoint params u)
+      ((family.meas (pointHeight params u)).toSubMeasurement)
 
-structure StronglySelfConsistent {params : Parameters} (_family : IndexedPolynomialFamily params)
-    (_ψ : QuantumState) (_zeta : Error) : Prop where
-  sliceSelfConsistency : True
+structure Complete {params : Parameters} (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState) (kappa : Error) : Prop where
+  averageCompleteness :
+    CompletenessAtLeast ψ family.averagedSubMeasurement (1 - kappa)
 
-structure Bounded {params : Parameters} (_family : IndexedPolynomialFamily params)
-    (_ψ : QuantumState) (_zeta : Error) : Prop where
-  sliceBoundedness : True
+structure ConsistentWithPoints {params : Parameters} (family : IndexedPolynomialFamily params)
+    (strategy : SymmetricStrategy params.next) (zeta : Error) : Prop where
+  pointConsistency :
+    ConsistencyRel strategy.state (uniformDistribution (Point params.next))
+      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
+      family.evaluatedAtNextPoint
+      zeta
+
+structure StronglySelfConsistent {params : Parameters} (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState) (zeta : Error) : Prop where
+  sliceSelfConsistency :
+    StrongSelfConsistencyRel ψ (uniformDistribution (Fq params))
+      (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement family.meas)
+      zeta
+
+structure Bounded {params : Parameters} (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState) (zeta : Error) : Prop where
+  slicePositiveSemidefinite : ∀ x, PositiveSemidefinite (family.witness x)
+  sliceBoundedness :
+    ∀ x, BoundedByOperator ψ ((family.meas x).toSubMeasurement) (family.witness x) zeta
 
 end IndexedPolynomialFamily
 
@@ -361,7 +502,7 @@ noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) 
 
 This matching declaration keeps the paper's main output shape: two global polynomial
 measurements, one for each prover, consistent with the point measurements and with
-each other.
+ each other.
 -/
 theorem mainFormal
     (params : Parameters)
