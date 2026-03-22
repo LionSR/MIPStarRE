@@ -36,34 +36,41 @@ abbrev Op (d : Type*) := Matrix d d ℂ
 
 /-! ### Normalized trace -/
 
-variable {d : Type*} [Fintype d] [DecidableEq d]
+variable {d : Type*} [Fintype d]
 
 /-- The normalized trace `τ(A) = tr(A) / |d|`. -/
 def normalizedTrace (A : Op d) : ℂ :=
-  A.trace / (Fintype.card d : ℂ)
+  by
+    classical
+    exact A.trace / (Fintype.card d : ℂ)
 
 @[simp] theorem normalizedTrace_zero : normalizedTrace (0 : Op d) = 0 := by
   simp [normalizedTrace]
 
-@[simp] theorem normalizedTrace_one [Nonempty d] : normalizedTrace (1 : Op d) = 1 := by
+@[simp] theorem normalizedTrace_one [DecidableEq d] [Nonempty d] :
+    normalizedTrace (1 : Op d) = 1 := by
   unfold normalizedTrace
   rw [Matrix.trace_one]
   exact div_self (Nat.cast_ne_zero.mpr Fintype.card_ne_zero)
 
 theorem normalizedTrace_add (A B : Op d) :
     normalizedTrace (A + B) = normalizedTrace A + normalizedTrace B := by
+  classical
   simp [normalizedTrace, Matrix.trace_add, add_div]
 
 theorem normalizedTrace_sum {ι : Type*} (s : Finset ι) (f : ι → Op d) :
     normalizedTrace (∑ i ∈ s, f i) = ∑ i ∈ s, normalizedTrace (f i) := by
+  classical
   simp [normalizedTrace, Matrix.trace_sum, Finset.sum_div]
 
 theorem normalizedTrace_smul (c : ℂ) (A : Op d) :
     normalizedTrace (c • A) = c * normalizedTrace A := by
+  classical
   simp [normalizedTrace, Matrix.trace_smul]; ring
 
 theorem normalizedTrace_mul_comm (A B : Op d) :
     normalizedTrace (A * B) = normalizedTrace (B * A) := by
+  classical
   simp only [normalizedTrace]; rw [Matrix.trace_mul_comm]
 
 /-! ### Squared τ-norm -/
@@ -115,24 +122,28 @@ theorem isProj_zero : IsProj (0 : Op d) where
   idempotent := by simp
 
 /-- The identity matrix is a projection. -/
-theorem isProj_one : IsProj (1 : Op d) where
+theorem isProj_one [DecidableEq d] : IsProj (1 : Op d) where
   isHermitian := Matrix.isHermitian_one
   idempotent := by simp
 
 /-- 1 - P is also a projection when P is. -/
-theorem IsProj.one_sub {P : Op d} (h : IsProj P) : IsProj (1 - P) where
+theorem IsProj.one_sub [DecidableEq d] {P : Op d} (h : IsProj P) : IsProj (1 - P) where
   isHermitian := Matrix.isHermitian_one.sub h.isHermitian
   idempotent := by
-    simp only [mul_sub, sub_mul, mul_one, one_mul]; rw [h.idempotent]; abel
+    simp only [mul_sub, sub_mul, mul_one, one_mul]
+    rw [h.idempotent]
+    abel
 
 /-- Projections are positive semidefinite (in the matrix order). -/
 theorem IsProj.nonneg {P : Op d} (h : IsProj P) : 0 ≤ P := by
+  classical
   rw [Matrix.nonneg_iff_posSemidef]
   have := Matrix.posSemidef_conjTranspose_mul_self P
   rwa [h.conjTranspose_eq, h.idempotent] at this
 
 /-- A projection satisfies P ≤ 1 in the matrix order. -/
-theorem IsProj.le_one {P : Op d} (h : IsProj P) : P ≤ 1 := by
+theorem IsProj.le_one [DecidableEq d] {P : Op d} (h : IsProj P) : P ≤ 1 := by
+  classical
   rw [Matrix.le_iff]
   have := Matrix.posSemidef_conjTranspose_mul_self (1 - P)
   rwa [h.one_sub.conjTranspose_eq, h.one_sub.idempotent] at this
@@ -141,7 +152,9 @@ theorem IsProj.le_one {P : Op d} (h : IsProj P) : P ≤ 1 := by
 
 /-- The trace of a PSD matrix over ℂ is nonneg under ComplexOrder. -/
 theorem trace_nonneg_of_posSemidef {A : Op d} (h : A.PosSemidef) : 0 ≤ A.trace :=
-  h.trace_nonneg
+  by
+    classical
+    exact h.trace_nonneg
 
 /-! ### Summation identities for measurement bookkeeping -/
 
@@ -154,7 +167,9 @@ theorem sum_eq_diag_add_offDiag {α : Type*} [Fintype α] [DecidableEq α]
     arg 2; ext a
     rw [← Finset.sum_filter_add_sum_filter_not Finset.univ (· = a)]
   simp only [Finset.sum_add_distrib]
-  congr 1 <;> congr 1 with a <;> simp [Finset.sum_filter, eq_comm]
+  congr 1
+  congr 1 with a
+  simp [Finset.sum_filter, eq_comm]
 
 /-- Total trace over all answer pairs = total over same + total over different.
     Applied to `τ(Mₐ Nᵦ)`. -/
