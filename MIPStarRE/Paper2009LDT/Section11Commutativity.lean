@@ -201,12 +201,23 @@ def commDataProcessedGStabilityTwoRight (params : Parameters)
     IndexedSubMeasurement (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) :=
   fun q => evaluatedSliceProductLeft params strategy family q
 
-/-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`. -/
+/-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`.
+
+We propagate explicit `dim` and `matrix` from the input operators so that
+`operatorAdd`/`sumOperatorList` (which require matching dimensions) can
+accumulate the sum `∑_b C_{a,b}` correctly even when `dim ≠ 1`. -/
 def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type _}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB)
     (a : OutcomeA) (b : OutcomeB) : Operator :=
-  formalProduct (Q.outcomeOperator b)
-    (formalProduct (P.outcomeOperator a) (Q.outcomeOperator b))
+  let pa := P.outcomeOperator a
+  let qb := Q.outcomeOperator b
+  if h : qb.dim = pa.dim then
+    { name := s!"({qb.name})*({pa.name})*({qb.name})"
+      dim := pa.dim
+      matrix := (castOp h qb.matrix) * pa.matrix * (castOp h qb.matrix) }
+  else
+    { name := s!"({qb.name})*({pa.name})*({qb.name})"
+      dim := pa.dim }
 
 /-- The sandwiched family `b ↦ Q_b P_a Q_b`. -/
 noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Type _}

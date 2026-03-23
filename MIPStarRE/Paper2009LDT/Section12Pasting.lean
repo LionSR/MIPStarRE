@@ -457,17 +457,30 @@ def constructedPastedSubMeasurement (params : Parameters)
     (distinctTupleDistribution params k)
     (pastedInterpolationFamily params family k)
 
-/-- The specific pasted measurement obtained by completing the constructed pasted submeasurement. -/
+/-- The distinguished fallback polynomial `h₀` that receives the completion mass. -/
+noncomputable def pastedFallbackOutcome (params : Parameters) : Polynomial params.next :=
+  fallbackInterpolatedPolynomial params
+
+/-- The specific pasted measurement obtained by completing the constructed pasted submeasurement.
+
+The paper adds all missing mass `I - H_total` to a single distinguished polynomial
+outcome `h₀` (the fallback interpolant).  So the outcome operator for `h₀` becomes
+`H_{h₀} + (I - H_total)` while all other outcomes keep their original operators, and
+the total is genuinely the identity `I`. -/
 def constructedPastedMeasurement (params : Parameters)
     (family : IndexedPolynomialFamily params) (k : ℕ) : Measurement (Polynomial params.next) where
   toSubMeasurement :=
     let H := constructedPastedSubMeasurement params family k
+    let h₀ := pastedFallbackOutcome params
+    let completionMass := operatorComplement H.totalOperator
     { name := s!"{H.name}.completion"
-      outcomeOperator := H.outcomeOperator
-      totalOperator :=
-        -- TODO: the paper's completion adds the missing mass to a distinguished
-        -- failure outcome; this scaffold records it as `H + (I - H)`.
-        operatorAdd H.totalOperator (operatorComplement H.totalOperator) }
+      outcomeOperator := fun h => by
+        classical
+        exact if h = h₀ then
+          operatorAdd (H.outcomeOperator h) completionMass
+        else
+          H.outcomeOperator h
+      totalOperator := identityLike H.totalOperator }
 
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/
 def verticalLineMeasurementFamily (params : Parameters)

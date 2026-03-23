@@ -448,7 +448,22 @@ noncomputable def matrixAveragePointOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : MatrixOperator model.space :=
   matrixAverageOperator model.family
 
-/-- The matrix shadow of the source's column operator `∑_u |u⟩ ⊗ A^u ⊗ I`. -/
+/-- The matrix shadow of the source's column operator `∑_u |u⟩ ⊗ A^u ⊗ I`.
+
+**TODO(column-operator):** The paper defines the combined operator as the *column operator*
+`A_combine = ∑_u |u⟩ ⊗ A^u ⊗ I`, which is a rectangular map from the strategy space into
+`ℂ^{|U|} ⊗ strategy-space`.  Our current `MatrixOperator` API only supports square matrices
+(endomorphisms on a single `FiniteHilbertSpace`), so we approximate this with the
+*projector-valued* sum `∑_u |u⟩⟨u| ⊗ A^u`.  This loses the off-diagonal cross terms
+`|u⟩⟨v| ⊗ A^u (A^v)^*` that appear when expanding `A_combine^* · A_combine` in the
+variance rewrite lemmas.
+
+To close this gap we would need:
+1. A `RectangularMatrixOperator H K` type for maps between *different* Hilbert spaces.
+2. The column-operator constructor `∑_u |u⟩ ⊗ A^u ⊗ I : strategy-space → ℂ^{|U|} ⊗ strategy-space`.
+3. Adjoint/product lemmas for rectangular operators so `A_combine^* · (L ⊗ ρ) · A_combine`
+   correctly produces the cross terms needed by `matrixLocalVarianceTraceWitness` and
+   `matrixGlobalVarianceTraceWitness`. -/
 noncomputable def matrixCombinedOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     MatrixOperator (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
