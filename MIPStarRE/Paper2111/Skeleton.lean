@@ -54,11 +54,11 @@ inductive StrictNode where
   | gridGraphSpectralGap
   | externalProjectivization
   | externalDuality
-  | section5Variance
+  | varianceBound
   | selfImprovement
-  | section6Commutativity
-  | section6Method1
-  | section6Method2
+  | approximateCommutativity
+  | commutativityMethod1
+  | commutativityMethod2
   | pasting
   | induction
   | main
@@ -81,11 +81,11 @@ def nodeHome : StrictNode → Home
   | .gridGraphSpectralGap => .combinatorics
   | .externalProjectivization => .external
   | .externalDuality => .external
-  | .section5Variance => .paper
+  | .varianceBound => .paper
   | .selfImprovement => .paper
-  | .section6Commutativity => .paper
-  | .section6Method1 => .paper
-  | .section6Method2 => .paper
+  | .approximateCommutativity => .paper
+  | .commutativityMethod1 => .paper
+  | .commutativityMethod2 => .paper
   | .pasting => .paper
   | .induction => .paper
   | .main => .paper
@@ -107,11 +107,11 @@ def currentSupport : StrictNode → Support
   | .gridGraphSpectralGap => .missing
   | .externalProjectivization => .missing
   | .externalDuality => .missing
-  | .section5Variance => .missing
+  | .varianceBound => .missing
   | .selfImprovement => .missing
-  | .section6Commutativity => .missing
-  | .section6Method1 => .missing
-  | .section6Method2 => .missing
+  | .approximateCommutativity => .missing
+  | .commutativityMethod1 => .missing
+  | .commutativityMethod2 => .missing
   | .pasting => .missing
   | .induction => .missing
   | .main => .missing
@@ -153,7 +153,7 @@ def dependencies : StrictNode → List StrictNode
       ]
   | .externalProjectivization => [.tracialStateAPI]
   | .externalDuality => [.tracialStateAPI]
-  | .section5Variance =>
+  | .varianceBound =>
       [ .tracialStrategyLayer
       , .tensorCodeFacts
       , .appendixExpander
@@ -163,25 +163,25 @@ def dependencies : StrictNode → List StrictNode
       [ .measurementPreliminaries
       , .externalProjectivization
       , .externalDuality
-      , .section5Variance
+      , .varianceBound
       ]
-  | .section6Commutativity =>
+  | .approximateCommutativity =>
       [ .measurementPreliminaries
       , .tracialStrategyLayer
       ]
-  | .section6Method1 =>
+  | .commutativityMethod1 =>
       [ .measurementPreliminaries
       , .tensorCodeFacts
-      , .section6Commutativity
+      , .approximateCommutativity
       ]
-  | .section6Method2 =>
+  | .commutativityMethod2 =>
       [ .measurementPreliminaries
       , .tensorCodeFacts
-      , .section6Commutativity
+      , .approximateCommutativity
       ]
   | .pasting =>
-      [ .section6Method1
-      , .section6Method2
+      [ .commutativityMethod1
+      , .commutativityMethod2
       ]
   | .induction =>
       [ .selfImprovement
@@ -231,10 +231,10 @@ def criticalPathToMain : List StrictNode :=
   , .gridGraphSpectralGap
   , .externalProjectivization
   , .externalDuality
-  , .section5Variance
+  , .varianceBound
   , .selfImprovement
-  , .section6Commutativity
-  , .section6Method2
+  , .approximateCommutativity
+  , .commutativityMethod2
   , .pasting
   , .induction
   , .main
@@ -250,11 +250,11 @@ def remainingPaperTodo : List StrictNode :=
   , .gridGraphSpectralGap
   , .externalProjectivization
   , .externalDuality
-  , .section5Variance
+  , .varianceBound
   , .selfImprovement
-  , .section6Commutativity
-  , .section6Method1
-  , .section6Method2
+  , .approximateCommutativity
+  , .commutativityMethod1
+  , .commutativityMethod2
   , .pasting
   , .induction
   , .main

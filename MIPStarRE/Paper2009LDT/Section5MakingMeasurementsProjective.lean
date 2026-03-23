@@ -181,14 +181,14 @@ def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type _}
   { name := s!"{ψ.name}⊗{data.auxStateA.name}⊗{data.auxStateB.name}" }
 
 /-- Placeholder expectation value of an operator on a state. -/
-noncomputable def section5Expectation (ψ : QuantumState) (X : Operator) : Error :=
+noncomputable def placeholderExpectation (ψ : QuantumState) (X : Operator) : Error :=
   (s!"Exp[{ψ.name}|{X.name}]".length : Error)
 
 /-- The single-outcome probability `⟨ψ|A_a|ψ⟩`. -/
 noncomputable def singleOutcomeProbability {Outcome : Type _}
     (ψ : QuantumState)
     (A : SubMeasurement Outcome) (a : Outcome) : Error :=
-  section5Expectation ψ (A.outcomeOperator a)
+  placeholderExpectation ψ (A.outcomeOperator a)
 
 /-- The joint outcome probability `⟨ψ|A_a ⊗ B_b|ψ⟩`. -/
 noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type _}
@@ -196,7 +196,7 @@ noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type _}
     (A : SubMeasurement OutcomeA)
     (B : SubMeasurement OutcomeB)
     (a : OutcomeA) (b : OutcomeB) : Error :=
-  section5Expectation ψ (formalTensor (A.outcomeOperator a) (B.outcomeOperator b))
+  placeholderExpectation ψ (formalTensor (A.outcomeOperator a) (B.outcomeOperator b))
 
 /-- Statement package carried by `NaimarkData`.
 
