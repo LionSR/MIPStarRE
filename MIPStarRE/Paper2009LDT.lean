@@ -1,3 +1,7 @@
+import MIPStarRE.Paper2009LDT.Basic.Parameters
+import MIPStarRE.Paper2009LDT.Basic.Operator
+import MIPStarRE.Paper2009LDT.Basic.Distribution
+import MIPStarRE.Paper2009LDT.Basic.SubMeasurement
 import MIPStarRE.Paper2009LDT.Section3Test
 import MIPStarRE.Paper2009LDT.Section4Preliminaries
 import MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective
