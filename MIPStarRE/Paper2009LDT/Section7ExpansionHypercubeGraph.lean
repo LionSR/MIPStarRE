@@ -96,11 +96,6 @@ def formalSquareRoot (X : Operator) : Operator :=
 def formalScale (_c : Error) (X : Operator) : Operator :=
   { name := s!"scalar•({X.name})" }
 
-/-- Tag an operator by the basis vector `|u⟩`. -/
-def pointTaggedOperator (params : Parameters)
-    (u : Point params) (X : Operator) : Operator :=
-  { name := s!"|{pointCode params u}>⊗({X.name})" }
-
 /-- Apply a formal operator to a formal vector. -/
 def applyOperatorToVector (T : Operator) (v : HypercubeVector) : HypercubeVector :=
   { name := s!"({T.name})•{v.name}" }
