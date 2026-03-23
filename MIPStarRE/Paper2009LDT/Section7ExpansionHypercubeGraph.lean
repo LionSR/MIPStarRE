@@ -72,9 +72,6 @@ def formalZeroOperator : Operator :=
 def identityOperator (label : String) : Operator :=
   { name := s!"I[{label}]" }
 
-/-- Formal adjoint of an operator expression. -/
-def formalAdjoint (X : Operator) : Operator :=
-  { name := s!"({X.name})^*" }
 
 /-- Formal product of two operator expressions. -/
 def formalProduct (X Y : Operator) : Operator :=

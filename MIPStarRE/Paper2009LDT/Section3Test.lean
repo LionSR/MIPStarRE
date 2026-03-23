@@ -526,6 +526,12 @@ def operatorMul (X Y : Operator) : Operator :=
       dim := X.dim
       matrix := X.matrix }
 
+/-- Operator adjoint (conjugate transpose), computed concretely. -/
+def formalAdjoint (X : Operator) : Operator where
+  name := s!"({X.name})†"
+  dim := X.dim
+  matrix := X.matrixᴴ
+
 /-- A concrete sandwich operator `L X R`, computed when the dimensions align. -/
 def operatorSandwich (L X R : Operator) : Operator :=
   if hLX : L.dim = X.dim then
@@ -743,15 +749,18 @@ noncomputable def questionConsistencyDefect {Outcome : Type _}
   else
     exact coarseMismatch
 
-/-- Questionwise squared-distance defect. -/
+/-- Questionwise squared-distance defect.
+
+Uses `(A-B)†(A-B)` (adjoint-times-self) rather than `(A-B)²`, since operators
+may not be self-adjoint and these differ in general. -/
 noncomputable def questionStateDependentDistanceDefect {Outcome : Type _}
     (ψ : QuantumState) (A B : SubMeasurement Outcome) : Error :=
   let totalDiff := operatorDifference A.totalOperator B.totalOperator
   sumOverOutcomesOrElse
-    (expectationValue ψ (operatorMul totalDiff totalDiff))
+    (expectationValue ψ (operatorMul (formalAdjoint totalDiff) totalDiff))
     (fun a =>
       let diff := operatorDifference (A.outcomeOperator a) (B.outcomeOperator a)
-      expectationValue ψ (operatorMul diff diff))
+      expectationValue ψ (operatorMul (formalAdjoint diff) diff))
 
 /-- Questionwise strong self-consistency defect. -/
 noncomputable def questionStrongSelfConsistencyDefect {Outcome : Type _}
@@ -985,7 +994,11 @@ def rightAsSymmetric {params : Parameters} (strategy : ProjectiveStrategy params
   axisParallelMeasurement := strategy.axisParallelMeasurementB
   diagonalMeasurement := strategy.diagonalMeasurementB
 
-/-- Trace-based failure surrogate for the full low-individual-degree test. -/
+/-- Trace-based failure surrogate for the full low-individual-degree test.
+
+The paper defines three test branches (axis-parallel, self-consistency, diagonal),
+each chosen with probability 1/3, with a random role assignment (left/right prover)
+within each branch.  The point-agreement check is folded into the axis-parallel branch. -/
 noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
     (strategy : ProjectiveStrategy params) : Error :=
   let left := strategy.leftAsSymmetric
@@ -995,13 +1008,18 @@ noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
       (uniformDistribution (Point params))
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementA)
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementB)
-  (pointAgreement
+  -- Branch 1: axis-parallel (includes point-agreement check, role-randomized)
+  let axisParallelBranch :=
+    (pointAgreement
       + left.axisParallelFailureProbability
-      + right.axisParallelFailureProbability
-      + left.selfConsistencyFailureProbability
-      + right.selfConsistencyFailureProbability
-      + left.diagonalFailureProbability
-      + right.diagonalFailureProbability) / 7
+      + right.axisParallelFailureProbability) / 3
+  -- Branch 2: self-consistency (role-randomized)
+  let selfConsistencyBranch :=
+    (left.selfConsistencyFailureProbability + right.selfConsistencyFailureProbability) / 2
+  -- Branch 3: diagonal lines (role-randomized)
+  let diagonalBranch :=
+    (left.diagonalFailureProbability + right.diagonalFailureProbability) / 2
+  (axisParallelBranch + selfConsistencyBranch + diagonalBranch) / 3
 
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}

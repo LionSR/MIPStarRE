@@ -135,7 +135,10 @@ noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
     tensorProductSubMeasurement
       s!"pointComm.mixedLeft({Au.name},{Lv.name})" Au Lv
 
-/-- The bridge `I ⊗ (L^ℓ_[f(v)=b] L^ℓ_[f(u)=a])`. -/
+/-- The bridge `I ⊗ (L^ℓ_[f(v)=b] L^ℓ_[f(u)=a])`.
+
+For outcome pair `(a, b)`, produces `Lv_b * Lu_a` matching the paper's convention
+that `a` indexes `u`-outcomes and `b` indexes `v`-outcomes. -/
 noncomputable def diagonalLineProductOrdered (params : Parameters)
     (strategy : SymmetricStrategy params) :
     IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
@@ -146,10 +149,13 @@ noncomputable def diagonalLineProductOrdered (params : Parameters)
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
     rightPlacedSubMeasurement <|
-      orderedProductSubMeasurement
-        s!"pointComm.lineOrdered({Lv.name},{Lu.name})" Lv Lu
+      reversedProductSubMeasurement
+        s!"pointComm.lineOrdered({Lv.name},{Lu.name})" Lu Lv
 
-/-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] L^ℓ_[f(v)=b])`. -/
+/-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] L^ℓ_[f(v)=b])`.
+
+For outcome pair `(a, b)`, produces `Lu_a * Lv_b` — the projective swap of the
+ordered bridge. -/
 noncomputable def diagonalLineProductReversed (params : Parameters)
     (strategy : SymmetricStrategy params) :
     IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
@@ -163,7 +169,11 @@ noncomputable def diagonalLineProductReversed (params : Parameters)
       orderedProductSubMeasurement
         s!"pointComm.lineReversed({Lu.name},{Lv.name})" Lu Lv
 
-/-- The mixed bridge `A^v_b ⊗ L^ℓ_[f(u)=a]`. -/
+/-- The mixed bridge `A^v_b ⊗ L^ℓ_[f(u)=a]`.
+
+For outcome pair `(a, b)`, the left tensor factor carries `A^v_b` and the right
+tensor factor carries `L^ℓ_[f(u)=a]`, matching the paper's convention that `a`
+indexes `u`-outcomes and `b` indexes `v`-outcomes. -/
 noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
     (strategy : SymmetricStrategy params) :
     IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
@@ -173,8 +183,12 @@ noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
     let tv := q.2.2
     let Av := (strategy.pointMeasurement (ℓ.pointAt tv)).toSubMeasurement
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
-    tensorProductSubMeasurement
-      s!"pointComm.mixedRight({Av.name},{Lu.name})" Av Lu
+    { name := s!"pointComm.mixedRight({Av.name},{Lu.name})"
+      outcomeOperator := fun ab =>
+        match ab with
+        | (a, b) =>
+            formalProduct (leftTensor (Av.outcomeOperator b)) (rightTensor (Lu.outcomeOperator a))
+      totalOperator := formalProduct (leftTensor Av.totalOperator) (rightTensor Lu.totalOperator) }
 
 /-- The intermediate consistency loss coming from the `m`-restricted diagonal-lines test. -/
 def restrictedDiagonalLinesConsistencyError (params : Parameters) (gamma : Error) : Error :=
