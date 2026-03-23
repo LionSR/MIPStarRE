@@ -69,32 +69,46 @@ def formalZeroOperator : Operator :=
   { name := "0" }
 
 /-- A formal identity operator labelled by the ambient space. -/
-def identityOperator (label : String) : Operator :=
-  { name := s!"I[{label}]" }
+def identityOperator (label : String) : Operator where
+  name := s!"I[{label}]"
+  matrix := 1
 
-/-- Formal adjoint of an operator expression. -/
-def formalAdjoint (X : Operator) : Operator :=
-  { name := s!"({X.name})^*" }
+/-- Formal adjoint of an operator expression.
+Propagates `dim` from the input; matrix-level conjugate transpose
+is deferred to the concrete `operatorMul`/`castOp` layer. -/
+def formalAdjoint (X : Operator) : Operator where
+  name := s!"({X.name})^*"
+  dim := X.dim
 
-/-- Formal product of two operator expressions. -/
-def formalProduct (X Y : Operator) : Operator :=
-  { name := s!"({X.name})*({Y.name})" }
+/-- Formal product of two operator expressions.
+Propagates `dim` from the left operand. -/
+def formalProduct (X Y : Operator) : Operator where
+  name := s!"({X.name})*({Y.name})"
+  dim := X.dim
 
-/-- Formal difference of two operator expressions. -/
-def formalDifference (X Y : Operator) : Operator :=
-  { name := s!"({X.name})-({Y.name})" }
+/-- Formal difference of two operator expressions.
+Propagates `dim` from the left operand. -/
+def formalDifference (X Y : Operator) : Operator where
+  name := s!"({X.name})-({Y.name})"
+  dim := X.dim
 
-/-- Formal square of an operator expression. -/
-def formalSquare (X : Operator) : Operator :=
-  { name := s!"({X.name})^2" }
+/-- Formal square of an operator expression.
+Propagates `dim` from the input. -/
+def formalSquare (X : Operator) : Operator where
+  name := s!"({X.name})^2"
+  dim := X.dim
 
-/-- Formal square root of an operator expression. -/
-def formalSquareRoot (X : Operator) : Operator :=
-  { name := s!"sqrt({X.name})" }
+/-- Formal square root of an operator expression.
+Propagates `dim`; the matrix square root is not computed. -/
+def formalSquareRoot (X : Operator) : Operator where
+  name := s!"sqrt({X.name})"
+  dim := X.dim
 
-/-- Formal scalar multiplication of an operator expression. -/
-def formalScale (_c : Error) (X : Operator) : Operator :=
-  { name := s!"scalar•({X.name})" }
+/-- Formal scalar multiplication of an operator expression.
+Propagates `dim` from the input. -/
+def formalScale (_c : Error) (X : Operator) : Operator where
+  name := s!"scalar•({X.name})"
+  dim := X.dim
 
 /-- Apply a formal operator to a formal vector. -/
 def applyOperatorToVector (T : Operator) (v : HypercubeVector) : HypercubeVector :=
@@ -104,9 +118,11 @@ def applyOperatorToVector (T : Operator) (v : HypercubeVector) : HypercubeVector
 def scaleVector (_c : Error) (v : HypercubeVector) : HypercubeVector :=
   { name := s!"scalar•{v.name}" }
 
-/-- The rank-one projector onto a state vector. -/
-def stateProjector (ψ : QuantumState) : Operator :=
-  { name := s!"|{ψ.name}><{ψ.name}|" }
+/-- The rank-one projector onto a state vector, carrying the state's density matrix. -/
+def stateProjector (ψ : QuantumState) : Operator where
+  name := s!"|{ψ.name}><{ψ.name}|"
+  dim := ψ.dim
+  matrix := ψ.density
 
 /-- A nonzero placeholder scalar extracted from a string tag. -/
 noncomputable def placeholderScalar (tag : String) : Error :=
@@ -139,13 +155,56 @@ noncomputable def averageOperatorOverDistribution {α : Type _}
   | a :: _ =>
     weightedOperatorSumOnSupport (f a) 𝒟.support 𝒟.weight f
 
-/-- The normalized adjacency matrix of the hypercube graph. -/
-def adjacency (params : Parameters) : Operator :=
-  { name := s!"K({params.m},{params.q})" }
+/-- An honest finite matrix register for the hypercube vertices. -/
+def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
+  carrier := Point params
+  instFintype := inferInstance
+  instDecidableEq := inferInstance
+  instNonempty := inferInstance
 
-/-- The Laplacian `L = (1 / M) I - K`. -/
-def laplacian (params : Parameters) : Operator :=
-  { name := s!"L({params.m},{params.q})=(1/{hypercubeVertexCount params})I-K" }
+/-- The paper's normalized adjacency weight for an ordered pair of vertices. -/
+noncomputable def hypercubeAdjacencyWeight (params : Parameters)
+    (u v : Point params) : ℂ :=
+  if h0 : coordinateDisagreementCount params u v = 0 then
+    ((params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹
+  else if h1 : coordinateDisagreementCount params u v = 1 then
+    ((params.m : ℂ) * (params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹
+  else 0
+
+/-- The actual adjacency matrix of the edge-graph on `F_q^m`. -/
+noncomputable def matrixAdjacencyOperator (params : Parameters) :
+    MatrixOperator (pointHilbertSpace params) :=
+  fun u v => hypercubeAdjacencyWeight params u v
+
+/-- The actual Laplacian matrix `(1 / M) I - K` on the vertex register. -/
+noncomputable def matrixLaplacianOperator (params : Parameters) :
+    MatrixOperator (pointHilbertSpace params) :=
+  ((hypercubeVertexCount params : ℂ)⁻¹) • (1 : MatrixOperator (pointHilbertSpace params)) -
+    matrixAdjacencyOperator params
+
+/-- Convert a `MatrixOperator` on a finite Hilbert space to an `Operator` by reindexing
+the matrix through `Fintype.equivFin`. -/
+noncomputable def operatorOfMatrixOperator (H : FiniteHilbertSpace)
+    (name : String) (M : MatrixOperator H) : Operator where
+  name := name
+  dim := @Fintype.card H.carrier H.instFintype
+  matrix :=
+    let e := @Fintype.equivFin H.carrier H.instFintype
+    M.submatrix e.symm e.symm
+
+/-- The normalized adjacency matrix of the hypercube graph,
+carrying the actual matrix from `matrixAdjacencyOperator`. -/
+noncomputable def adjacency (params : Parameters) : Operator :=
+  operatorOfMatrixOperator (pointHilbertSpace params)
+    s!"K({params.m},{params.q})"
+    (matrixAdjacencyOperator params)
+
+/-- The Laplacian `L = (1 / M) I - K`,
+carrying the actual matrix from `matrixLaplacianOperator`. -/
+noncomputable def laplacian (params : Parameters) : Operator :=
+  operatorOfMatrixOperator (pointHilbertSpace params)
+    s!"L({params.m},{params.q})=(1/{hypercubeVertexCount params})I-K"
+    (matrixLaplacianOperator params)
 
 /-- The edge-difference form of the Laplacian from `prop:laplacian-rewrite`. -/
 def laplacianDifferenceForm (params : Parameters) : Operator :=
@@ -330,13 +389,6 @@ structure GlobalRewriteStatement (params : Parameters)
     ∃ decomp : GlobalVarianceDecomposition params A,
       globalVariance params A ψ = globalVarianceTraceForm params A ψ decomp
 
-/-- An honest finite matrix register for the hypercube vertices. -/
-def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
-  carrier := Point params
-  instFintype := inferInstance
-  instDecidableEq := inferInstance
-  instNonempty := inferInstance
-
 /-- Tensor two finite Hilbert spaces by taking the cartesian product of indices. -/
 def tensorHilbertSpace (H K : FiniteHilbertSpace) : FiniteHilbertSpace where
   carrier := H.carrier × K.carrier
@@ -392,26 +444,6 @@ noncomputable def constantModeProjectorMatrix (params : Parameters) :
 noncomputable def orthogonalModeProjectorMatrix (params : Parameters) :
     MatrixOperator (pointHilbertSpace params) :=
   1 - constantModeProjectorMatrix params
-
-/-- The paper's normalized adjacency weight for an ordered pair of vertices. -/
-noncomputable def hypercubeAdjacencyWeight (params : Parameters)
-    (u v : Point params) : ℂ :=
-  if h0 : coordinateDisagreementCount params u v = 0 then
-    ((params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹
-  else if h1 : coordinateDisagreementCount params u v = 1 then
-    ((params.m : ℂ) * (params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹
-  else 0
-
-/-- The actual adjacency matrix of the edge-graph on `F_q^m`. -/
-noncomputable def matrixAdjacencyOperator (params : Parameters) :
-    MatrixOperator (pointHilbertSpace params) :=
-  fun u v => hypercubeAdjacencyWeight params u v
-
-/-- The actual Laplacian matrix `(1 / M) I - K` on the vertex register. -/
-noncomputable def matrixLaplacianOperator (params : Parameters) :
-    MatrixOperator (pointHilbertSpace params) :=
-  ((hypercubeVertexCount params : ℂ)⁻¹) • (1 : MatrixOperator (pointHilbertSpace params)) -
-    matrixAdjacencyOperator params
 
 /-- The quadratic form `τ(ρ (X-Y)^*(X-Y))`. -/
 noncomputable def matrixSquaredDifferenceExpectation {H : FiniteHilbertSpace}
