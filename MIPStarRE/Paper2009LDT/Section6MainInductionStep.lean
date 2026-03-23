@@ -149,7 +149,9 @@ noncomputable def averagedSlicePointEvaluationOperator (params : Parameters)
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeasurement.outcomeOperator (g u))
 
 /-- TODO(tensor): replace this placeholder left placement by an honest tensor-product
-embedding once the bipartite matrix API is available. -/
+embedding once the bipartite matrix API is available.
+NOTE: duplicated from Section10CommutativityPoints; should be factored into a shared
+utility once the import graph permits it. -/
 def leftPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
   name := s!"{A.name}.left"
   outcomeOperator := fun a => leftTensor (A.outcomeOperator a)

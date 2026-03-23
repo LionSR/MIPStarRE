@@ -551,6 +551,10 @@ def leftTensor (X : Operator) : Operator :=
 def rightTensor (X : Operator) : Operator :=
   { X with name := s!"(I ⊗ {X.name})" }
 
+/-- Formal tensor product of two operator expressions. -/
+def formalTensor (X Y : Operator) : Operator :=
+  { name := s!"({X.name})⊗({Y.name})" }
+
 /-- The zero operator in the same dimension as `X`. -/
 def zeroLike (X : Operator) : Operator where
   name := "0"

@@ -96,10 +96,6 @@ def formalSquareRoot (X : Operator) : Operator :=
 def formalScale (_c : Error) (X : Operator) : Operator :=
   { name := s!"scalar•({X.name})" }
 
-/-- Formal tensor product of two operator expressions. -/
-def formalTensor (X Y : Operator) : Operator :=
-  { name := s!"({X.name})⊗({Y.name})" }
-
 /-- Tag an operator by the basis vector `|u⟩`. -/
 def pointTaggedOperator (params : Parameters)
     (u : Point params) (X : Operator) : Operator :=
@@ -139,13 +135,14 @@ noncomputable def placeholderAverageOverDistribution {α : Type _}
 noncomputable def operatorTrace (X : Operator) : Error :=
   placeholderScalar s!"Tr[{X.name}]"
 
-/-- Placeholder average of an operator-valued family over a distribution. -/
+/-- Weighted sum of operators over a distribution's finite support,
+using the same `support`/`weight` data as the scalar `averageOverDistribution`. -/
 noncomputable def averageOperatorOverDistribution {α : Type _}
-    (𝒟 : Distribution α) (f : α → Operator) : Operator := by
-  classical
-  by_cases h : Nonempty α
-  · exact { name := s!"AvgOp[{𝒟.name}]({(f (Classical.choice h)).name})" }
-  · exact { name := s!"AvgOp[{𝒟.name}](empty)" }
+    (𝒟 : Distribution α) (f : α → Operator) : Operator :=
+  match 𝒟.support with
+  | [] => { name := s!"AvgOp[{𝒟.name}](empty)" }
+  | a :: _ =>
+    weightedOperatorSumOnSupport (f a) 𝒟.support 𝒟.weight f
 
 /-- The normalized adjacency matrix of the hypercube graph. -/
 def adjacency (params : Parameters) : Operator :=
@@ -195,10 +192,13 @@ noncomputable def localAndVariance (params : Parameters)
 
 /-- The paper's combined operator `A_combine = ∑_u |u⟩ ⊗ A^u ⊗ I`.
 We do not normalize by `|U|` here; the surrounding trace identities carry the
-paper's convention. -/
+paper's convention.  Built as a formal sum referencing each `A u`. -/
 noncomputable def combinedOperator (params : Parameters)
     (A : Point params → Operator) : Operator :=
-  { name := s!"Σ_u |u>⊗A^u⊗I({params.m},{params.q})" }
+  weightedOperatorSumOnSupport (A default)
+    (Finset.univ (α := Point params)).toList
+    (fun _ => 1)
+    (fun u => A u)
 
 /-- The average operator `A_avg = E_u A^u`. -/
 noncomputable def averagePointOperator (params : Parameters)
@@ -423,13 +423,17 @@ noncomputable def matrixSquaredDifferenceExpectation {H : FiniteHilbertSpace}
     (ρ : PositiveMatrixState H) (X Y : MatrixOperator H) : Error :=
   Complex.re (matrixExpectation ρ (((X - Y)ᴴ) * (X - Y)))
 
-/-- The actual local variance, averaged over the nonuniform hypercube edge distribution. -/
+/-- The actual local variance, averaged over the hypercube edge set.
+We use `finiteAverage` over `(Point params × Fin params.m × Fq params)` encoding
+`(u, i, x)` with `v = rerand_i(u,x)`, matching the edge-sampling convention. -/
 noncomputable def matrixLocalVariance (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : Error :=
   (1 / (2 : Error)) *
-    placeholderAverageOverDistribution (matrixHypercubeEdgeDistribution params)
-      (fun uv => matrixSquaredDifferenceExpectation model.state
-        (model.family uv.1) (model.family uv.2))
+    finiteAverage (fun edge : Point params × Fin params.m × Fq params =>
+      let u := edge.1
+      let v := Function.update u edge.2.1 (u edge.2.1 + edge.2.2)
+      matrixSquaredDifferenceExpectation model.state
+        (model.family u) (model.family v))
 
 /-- The actual global variance, averaged over two independent points. -/
 noncomputable def matrixGlobalVariance (params : Parameters)

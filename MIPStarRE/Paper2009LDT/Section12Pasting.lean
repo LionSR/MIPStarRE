@@ -71,9 +71,9 @@ noncomputable def averageIndexedSubMeasurement {Question Outcome : Type _}
     averageOperatorOverDistribution 𝒟 (fun q => (A q).outcomeOperator a)
   totalOperator := averageOperatorOverDistribution 𝒟 (fun q => (A q).totalOperator)
 
-/-- Placeholder complement operator `I - X`. -/
+/-- Complement operator `I - X` in the same ambient space as `X`. -/
 def operatorComplement (X : Operator) : Operator :=
-  { name := s!"I - {X.name}" }
+  operatorDifference (identityLike X) X
 
 /-- Regard an operator expression as a `Unit`-valued submeasurement placeholder. -/
 def operatorAsSubMeasurement (X : Operator) : SubMeasurement Unit :=

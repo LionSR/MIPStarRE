@@ -9,8 +9,8 @@ namespace MIPStarRE.Paper2009LDT.Section10CommutativityPoints
 
 open MIPStarRE.Paper2009LDT
 open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
+open MIPStarRE.Paper2009LDT.Section8GlobalVariance (PointPairQuestion)
 
-abbrev PointPairQuestion (params : Parameters) := Point params × Point params
 abbrev PointPairOutcome (params : Parameters) := Fq params × Fq params
 abbrev PointDiagonalLineQuestion (params : Parameters) := DiagonalLine params × Fq params
 abbrev PointPairDiagonalLineQuestion (params : Parameters) :=
