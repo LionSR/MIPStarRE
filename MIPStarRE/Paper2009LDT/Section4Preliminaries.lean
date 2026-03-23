@@ -14,7 +14,8 @@ namespace MIPStarRE.Paper2009LDT.Section4Preliminaries
 open MIPStarRE.Paper2009LDT
 
 /-- `def:post-processing` in `preliminaries.tex`. -/
-def postProcessing {α β : Type _} (A : SubMeasurement α) (f : α → β) : SubMeasurement β :=
+noncomputable def postProcessing {α β : Type _} (A : SubMeasurement α) (f : α → β) :
+    SubMeasurement β :=
   postprocess A f
 
 /-- `def:measurement-completion` in `preliminaries.tex`. -/
@@ -39,7 +40,12 @@ def strongSelfConsistency {Question Outcome : Type _}
     (A : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
   PermutationInvariantState ψ ∧ StrongSelfConsistencyRel ψ 𝒟 A δ
 
-/-- Source-style left/right relation `A^x_a ⊗ I ≈_δ I ⊗ B^x_a`. -/
+/-- Source-style left/right relation `A^x_a ⊗ I ≈_δ I ⊗ B^x_a`.
+
+TODO(tensor): this currently reuses the single-register comparison layer from Section 3,
+so users should wrap `A` and `B` in the local `leftTensor` / `rightTensor` placements
+before invoking it. Replacing this by an honest tensor-product API remains future work.
+-/
 structure BipartiteStateDependentDistanceRel {Question Outcome : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop where
@@ -51,13 +57,14 @@ def bipartiteStateDependentDistance {Question Outcome : Type _}
     (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
   BipartiteStateDependentDistanceRel ψ 𝒟 A B δ
 
-/-- Placeholder condition `0 ≤ B ≤ I` for the switch-sandwich argument. -/
+/-- Condition `0 ≤ B ≤ I` for the switch-sandwich argument, with the identity taken in
+`B`'s ambient dimension. -/
 structure OperatorBetweenZeroAndOne (B : Operator) : Prop where
   nonnegative : PositiveSemidefinite B
-  boundedByIdentity : DominatesOperator identityOperator B
+  boundedByIdentity : DominatesOperator (identityLike B) B
 
 /-- Placeholder agreement probability from `prop:simeq-for-measurements`. -/
-def agreementProbability {Question Outcome : Type _}
+noncomputable def agreementProbability {Question Outcome : Type _}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedMeasurement Question Outcome) : Error :=
   1 - consistencyError ψ 𝒟
@@ -71,7 +78,7 @@ structure ConsistencyAsAgreement {Question Outcome : Type _}
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
 
 /-- Post-process an indexed family questionwise. -/
-def postprocessIndexedSubMeasurement {Question α β : Type _}
+noncomputable def postprocessIndexedSubMeasurement {Question α β : Type _}
     (A : IndexedSubMeasurement Question α) (f : α → β) :
     IndexedSubMeasurement Question β :=
   fun q => postProcessing (A q) f

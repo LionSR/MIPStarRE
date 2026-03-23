@@ -16,11 +16,13 @@ open MIPStarRE.Paper2009LDT
 open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
 open MIPStarRE.Paper2009LDT.Section10CommutativityPoints
 
+noncomputable section
+
 /-- The set of `k`-tuples with distinct coordinates. -/
 def distinctTuples (params : Parameters) (k : ℕ) : Set (PointTuple params k) :=
   { xs | Function.Injective xs }
 
-/-- Placeholder distribution on distinct tuples. -/
+/-- TODO: Should be uniform on pairwise-distinct `k`-tuples from `Fq`; currently a named placeholder. -/
 def distinctTupleDistribution (params : Parameters) (k : ℕ) :
     Distribution (PointTuple params k) where
   name := s!"Distinct({params.q},{k})"
@@ -34,7 +36,7 @@ abbrev GHatType (k : ℕ) := Fin k → Bool
 abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) := Point params × PointTuple params k
 abbrev VerticalLineQuestion (params : Parameters) := Point params
 
-/-- Placeholder matrix-valued Bernoulli tail operator from `lem:chernoff-bernoulli-matrix`. -/
+/-- TODO: this should be the operator-polynomial tail construction from `lem:chernoff-bernoulli-matrix`. -/
 def bernoulliTailOperator (k d : ℕ) (X : Operator) : Operator :=
   { name := s!"BernoulliTail(k={k},d={d}; {X.name}^r (I-{X.name})^(k-r))" }
 
@@ -61,16 +63,17 @@ def multiplyByTotalOnLeft {α β : Type _}
   totalOperator := formalProduct A.totalOperator B.totalOperator
 
 /-- Average an indexed family against a named distribution. -/
-def averageIndexedSubMeasurement {Question Outcome : Type _}
-    (label : String) (_𝒟 : Distribution Question) (_A : IndexedSubMeasurement Question Outcome) :
+noncomputable def averageIndexedSubMeasurement {Question Outcome : Type _}
+    (label : String) (𝒟 : Distribution Question) (A : IndexedSubMeasurement Question Outcome) :
     SubMeasurement Outcome where
   name := label
-  outcomeOperator := fun _ => { name := s!"{label}.avg.outcome" }
-  totalOperator := { name := s!"{label}.avg.total" }
+  outcomeOperator := fun a =>
+    averageOperatorOverDistribution 𝒟 (fun q => (A q).outcomeOperator a)
+  totalOperator := averageOperatorOverDistribution 𝒟 (fun q => (A q).totalOperator)
 
-/-- Placeholder complement operator `I - X`. -/
+/-- Complement operator `I - X` in the same ambient space as `X`. -/
 def operatorComplement (X : Operator) : Operator :=
-  { name := s!"I - {X.name}" }
+  operatorDifference (identityLike X) X
 
 /-- Regard an operator expression as a `Unit`-valued submeasurement placeholder. -/
 def operatorAsSubMeasurement (X : Operator) : SubMeasurement Unit :=
@@ -104,7 +107,7 @@ noncomputable def fallbackInterpolatedPolynomial (params : Parameters) : Polynom
     intro i
     sorry
 
-/-- Placeholder interpolation from completed slice outcomes to a global polynomial. -/
+/-- TODO: paper defines `H_h` by summing sandwiched outcomes with `|τ| ≥ d+1` and matching restriction; this recursively picks the first non-none slice as a stand-in. -/
 noncomputable def interpolateCompletedSlices (params : Parameters) :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
   | 0, _xs, _gs => fallbackInterpolatedPolynomial params
@@ -420,7 +423,7 @@ def gHatHalfSandwichRight (params : Parameters)
         outcomeOperator := fun gs => gHatRotatedHalfProductOutcomeOperator params family k xs gs
         totalOperator := gHatRotatedHalfProductTotalOperator params family k xs }
 
-/-- The type-dependent Bernoulli weight `S_{\tau_{\ge \ell}}` from `lem:from-H-to-G`. -/
+/-- TODO: this should carry the paper's operator-polynomial `S_{\tau_{\ge \ell}}` construction from `lem:from-H-to-G`. -/
 def suffixBernoulliWeightOperator (params : Parameters)
     (_family : IndexedPolynomialFamily params) (k ℓ : ℕ) (_τ : GHatType k) : Operator :=
   { name := s!"S_tau>=({params.m},{params.q},{params.d},{k},{ℓ})" }
@@ -454,21 +457,40 @@ def constructedPastedSubMeasurement (params : Parameters)
     (distinctTupleDistribution params k)
     (pastedInterpolationFamily params family k)
 
-/-- The specific pasted measurement obtained by completing the constructed pasted submeasurement. -/
+/-- The distinguished fallback polynomial `h₀` that receives the completion mass. -/
+noncomputable def pastedFallbackOutcome (params : Parameters) : Polynomial params.next :=
+  fallbackInterpolatedPolynomial params
+
+/-- The specific pasted measurement obtained by completing the constructed pasted submeasurement.
+
+The paper adds all missing mass `I - H_total` to a single distinguished polynomial
+outcome `h₀` (the fallback interpolant).  So the outcome operator for `h₀` becomes
+`H_{h₀} + (I - H_total)` while all other outcomes keep their original operators, and
+the total is genuinely the identity `I`. -/
 def constructedPastedMeasurement (params : Parameters)
     (family : IndexedPolynomialFamily params) (k : ℕ) : Measurement (Polynomial params.next) where
-  toSubMeasurement := {
-    name := s!"{(constructedPastedSubMeasurement params family k).name}.completion"
-    outcomeOperator := (constructedPastedSubMeasurement params family k).outcomeOperator
-    totalOperator :=
-      Section7ExpansionHypercubeGraph.identityOperator
-        s!"{(constructedPastedSubMeasurement params family k).name}.completion" }
+  toSubMeasurement :=
+    let H := constructedPastedSubMeasurement params family k
+    let h₀ := pastedFallbackOutcome params
+    let completionMass := operatorComplement H.totalOperator
+    { name := s!"{H.name}.completion"
+      outcomeOperator := fun h => by
+        classical
+        exact if h = h₀ then
+          operatorAdd (H.outcomeOperator h) completionMass
+        else
+          H.outcomeOperator h
+      totalOperator := identityLike H.totalOperator }
 
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/
 def verticalLineMeasurementFamily (params : Parameters)
-    (_strategy : SymmetricStrategy params.next) :
+    (strategy : SymmetricStrategy params.next) :
     IndexedSubMeasurement (VerticalLineQuestion params) (AxisLinePolynomial params.next) :=
-  fun _ => { name := s!"verticalLine.B({params.m},{params.q},{params.d})" }
+  fun u =>
+    let ℓ : AxisParallelLine params.next :=
+      { base := appendPoint params u zeroCoord
+        direction := lastCoord params }
+    (strategy.axisParallelMeasurement ℓ).toSubMeasurement
 
 /-- Explicit value extracted from the `i`-th completed slice outcome at the test point. -/
 def ldSandwichLineOnePointLeftFamily (params : Parameters)
@@ -1039,7 +1061,11 @@ lemma overAllOutcomes
     (params : Parameters)
     (strategy : SymmetricStrategy params.next)
     (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
     (family : IndexedPolynomialFamily params)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : family.Bounded strategy.state zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
   sorry
@@ -1048,8 +1074,12 @@ lemma overAllOutcomes
 lemma fromHToG
     (params : Parameters)
     (strategy : SymmetricStrategy params.next)
-    (gamma zeta : Error)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
     (family : IndexedPolynomialFamily params)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : family.Bounded strategy.state zeta)
     (k : ℕ)
     (hhalf : CommuteGHalfSandwichStatement params strategy.state family gamma zeta k) :
     FromHToGStatement params strategy family gamma zeta k := by
@@ -1071,11 +1101,19 @@ lemma chernoffBernoulliMatrix
 theorem ldPastingNCompleteness
     (params : Parameters)
     (strategy : SymmetricStrategy params.next)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
     (family : IndexedPolynomialFamily params)
-    (kappa nu : Error)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : family.Bounded strategy.state zeta)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k) :
-    LdPastingNCompletenessStatement params strategy family kappa nu k := by
+    LdPastingNCompletenessStatement params strategy family kappa
+      (Section6MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
   sorry
+
+end
 
 end MIPStarRE.Paper2009LDT.Section12Pasting

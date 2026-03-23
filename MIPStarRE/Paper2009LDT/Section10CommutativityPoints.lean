@@ -104,7 +104,7 @@ def sampledPointMeasurement (params : Parameters)
   fun q => (strategy.pointMeasurement (sampledPointFromDiagonalQuestion params q)).toSubMeasurement
 
 /-- Evaluate the diagonal-line measurement at the sampled parameter. -/
-def sampledDiagonalLineEvaluation (params : Parameters)
+noncomputable def sampledDiagonalLineEvaluation (params : Parameters)
     (strategy : SymmetricStrategy params) :
     IndexedSubMeasurement (PointDiagonalLineQuestion params) (Fq params) :=
   fun q =>
@@ -123,7 +123,7 @@ def pointMeasurementProductAlongSharedLineReversed (params : Parameters)
   fun q => pointMeasurementProductRight params strategy (sampledPointPairFromSharedDiagonalQuestion params q)
 
 /-- The mixed bridge `A^u_a ⊗ L^ℓ_[f(v)=b]`. -/
-def pointDiagonalLineMixedProductLeft (params : Parameters)
+noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
     (strategy : SymmetricStrategy params) :
     IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
   fun q =>
@@ -136,7 +136,7 @@ def pointDiagonalLineMixedProductLeft (params : Parameters)
       s!"pointComm.mixedLeft({Au.name},{Lv.name})" Au Lv
 
 /-- The bridge `I ⊗ (L^ℓ_[f(v)=b] L^ℓ_[f(u)=a])`. -/
-def diagonalLineProductOrdered (params : Parameters)
+noncomputable def diagonalLineProductOrdered (params : Parameters)
     (strategy : SymmetricStrategy params) :
     IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
   fun q =>
@@ -150,7 +150,7 @@ def diagonalLineProductOrdered (params : Parameters)
         s!"pointComm.lineOrdered({Lv.name},{Lu.name})" Lv Lu
 
 /-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] L^ℓ_[f(v)=b])`. -/
-def diagonalLineProductReversed (params : Parameters)
+noncomputable def diagonalLineProductReversed (params : Parameters)
     (strategy : SymmetricStrategy params) :
     IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
   fun q =>
@@ -164,7 +164,7 @@ def diagonalLineProductReversed (params : Parameters)
         s!"pointComm.lineReversed({Lu.name},{Lv.name})" Lu Lv
 
 /-- The mixed bridge `A^v_b ⊗ L^ℓ_[f(u)=a]`. -/
-def pointDiagonalLineMixedProductRight (params : Parameters)
+noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
     (strategy : SymmetricStrategy params) :
     IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
   fun q =>

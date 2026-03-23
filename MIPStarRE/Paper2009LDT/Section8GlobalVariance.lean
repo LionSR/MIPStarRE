@@ -23,6 +23,14 @@ abbrev AxisParallelLineQuestion (params : Parameters) :=
 abbrev PointPairQuestion (params : Parameters) :=
   Point params × Point params
 
+/-- TODO(degree): polynomial answers should be degree-bounded objects rather than raw functions. -/
+abbrev DegreeBoundedPolynomialAnswer (params : Parameters) :=
+  Point params → Fq params
+
+/-- TODO(degree): line answers should be degree-bounded objects rather than raw functions. -/
+abbrev DegreeBoundedLineAnswer (params : Parameters) :=
+  Fq params → Fq params
+
 /-- The distribution of an axis-parallel line together with a point queried on it. -/
 def axisParallelLineQuestionDistribution (params : Parameters) :
     Distribution (AxisParallelLineQuestion params) :=
@@ -364,21 +372,21 @@ structure MatrixVarianceTransferRealization (params : Parameters) where
   space : FiniteHilbertSpace
   state : PositiveMatrixState space
   pointMeasurement : Point params → MatrixSubmeasurement (Fq params) space
-  axisMeasurement : AxisParallelLine params → MatrixSubmeasurement (Fq params → Fq params) space
-  polynomialMeasurement : MatrixSubmeasurement (Point params → Fq params) space
+  axisMeasurement : AxisParallelLine params →
+    MatrixSubmeasurement (DegreeBoundedLineAnswer params) space
+  polynomialMeasurement :
+    MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) space
   axisQuestionParameter : AxisParallelLineQuestion params → Fq params
 
 /-- The concrete operator `G_g`. -/
 def matrixPolynomialWeightOperator (params : Parameters)
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : MatrixOperator model.space :=
-  model.polynomialMeasurement.effect (g : Point params → Fq params)
+  model.polynomialMeasurement.effect (g : DegreeBoundedPolynomialAnswer params)
 
 /--
-The concrete stand-in for `(G_g)^{1/2}`.
-
-At this scaffold stage we reuse `G_g` itself as the weighted operator witness,
-rather than invoking a full matrix functional-calculus square root.
+The concrete stand-in for `(G_g)^{1/2}`. The source uses the square root; this
+placeholder omits it and reuses `G_g` itself.
 -/
 noncomputable def matrixPolynomialWeightSqrtOperator (params : Parameters)
     (model : MatrixVarianceTransferRealization params)
@@ -446,7 +454,7 @@ noncomputable def matrixGeneralizeBRightOperatorAtPolynomial (params : Parameter
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) : MatrixOperator model.space :=
   (model.axisMeasurement qu.1).effect
-    ((Polynomial.restrictToAxisParallelLine params g qu.1 : Fq params → Fq params))
+    ((Polynomial.restrictToAxisParallelLine params g qu.1 : DegreeBoundedLineAnswer params))
 
 /-- The weighted left operator in the matrix-level `generalize-b` estimate. -/
 noncomputable def matrixWeightedGeneralizeBLeftOperatorAtPolynomial (params : Parameters)

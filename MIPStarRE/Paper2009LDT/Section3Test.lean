@@ -387,6 +387,21 @@ def restrictToDiagonalLine (params : Parameters)
 
 end Polynomial
 
+/-- TODO(finite-outcomes): replace these `sorry`-backed bounded-answer enumerations by
+explicit coefficient-vector models for the bounded polynomial answer spaces. They are
+used so postprocessing can aggregate outcome operators over actual finite fibers. -/
+noncomputable instance (params : Parameters) : Fintype (AxisLinePolynomial params) := by
+  classical
+  sorry
+
+noncomputable instance (params : Parameters) : Fintype (DiagonalLinePolynomial params) := by
+  classical
+  sorry
+
+noncomputable instance (params : Parameters) : Fintype (Polynomial params) := by
+  classical
+  sorry
+
 /-- A finite-dimensional bipartite state placeholder carrying an actual density matrix. -/
 structure QuantumState where
   name : String := ""
@@ -540,6 +555,40 @@ def rightTensor (X : Operator) : Operator :=
 def formalTensor (X Y : Operator) : Operator :=
   { name := s!"({X.name})⊗({Y.name})" }
 
+/-- The zero operator in the same dimension as `X`. -/
+def zeroLike (X : Operator) : Operator where
+  name := "0"
+  dim := X.dim
+  matrix := 0
+
+/-- Scale an operator by a real coefficient. -/
+def operatorScale (c : Error) (X : Operator) : Operator where
+  name := s!"scale({X.name})"
+  dim := X.dim
+  matrix := (c : ℂ) • X.matrix
+
+/-- Sum a finite list of operators, using a fixed dimension hint for the zero term. -/
+def sumOperatorList (dimHint : Operator) (ops : List Operator) : Operator :=
+  ops.foldl operatorAdd (zeroLike dimHint)
+
+/-- Sum a scalar quantity over an outcome space when a finite enumeration is available,
+falling back to a coarser surrogate otherwise. -/
+noncomputable def sumOverOutcomesOrElse {α : Type _}
+    (fallback : Error) (f : α → Error) : Error := by
+  classical
+  if h : Nonempty (Fintype α) then
+    letI : Fintype α := Classical.choice h
+    exact ∑ a, f a
+  else
+    exact fallback
+
+/-- Weighted sum of operators over an explicit finite support list. -/
+def weightedOperatorSumOnSupport {α : Type _} (dimHint : Operator)
+    (support : List α) (w : α → Error) (f : α → Operator) : Operator :=
+  support.foldl
+    (fun acc a => operatorAdd acc (operatorScale (w a) (f a)))
+    (zeroLike dimHint)
+
 /-- The domination relation `X ≥ Y`, encoded by PSD-ness of the concrete matrix gap
 whenever the dimensions match. -/
 structure DominatesOperator (X Y : Operator) : Prop where
@@ -606,11 +655,28 @@ def toIndexedSubMeasurement {Question Outcome : Type _}
 
 end IndexedProjectiveMeasurement
 
-/-- Post-process the outcomes of a submeasurement. -/
-def postprocess {α β : Type _} (A : SubMeasurement α) (_f : α → β) : SubMeasurement β where
-  name := s!"{A.name}.post"
-  outcomeOperator := fun _ => { name := s!"{A.name}.post.outcome" }
-  totalOperator := A.totalOperator
+/-- Post-process the outcomes of a submeasurement. When the outcome space is enumerable,
+the processed operator at `b` is the sum of the operators of all `a` with `f a = b`.
+Otherwise we fall back to the zero operator in the ambient space until the relevant
+bounded-answer enumeration is made explicit. -/
+noncomputable def postprocess {α β : Type _} (A : SubMeasurement α) (f : α → β) :
+    SubMeasurement β := by
+  classical
+  if h : Nonempty (Fintype α) then
+    letI : Fintype α := Classical.choice h
+    exact {
+      name := s!"{A.name}.post"
+      outcomeOperator := fun b =>
+        sumOperatorList A.totalOperator
+          (((Finset.univ.filter fun a => f a = b).toList).map A.outcomeOperator)
+      totalOperator := A.totalOperator
+    }
+  else
+    exact {
+      name := s!"{A.name}.post"
+      outcomeOperator := fun _ => zeroLike A.totalOperator
+      totalOperator := A.totalOperator
+    }
 
 /-- Complete a submeasurement by adjoining a distinguished failure outcome. -/
 def completeSubMeasurement {α : Type _} (A : SubMeasurement α) : Measurement (Option α) where
@@ -634,40 +700,68 @@ def constantSubMeasurementFamily {α : Type _} (A : SubMeasurement α) :
   fun _ => A
 
 /-- Evaluate a polynomial-valued submeasurement at a point. -/
-def evaluateAt (params : Parameters) (u : Point params)
+noncomputable def evaluateAt (params : Parameters) (u : Point params)
     (G : SubMeasurement (Polynomial params)) : SubMeasurement (Fq params) :=
   postprocess G (fun g => g u)
 
 /-- View a global polynomial submeasurement as a point-indexed answer family. -/
-def polynomialEvaluationFamily (params : Parameters)
+noncomputable def polynomialEvaluationFamily (params : Parameters)
     (G : SubMeasurement (Polynomial params)) :
     IndexedSubMeasurement (Point params) (Fq params) :=
   fun u => evaluateAt params u G
 
 /-- Evaluate each member of an indexed polynomial family at the same point. -/
-def evaluateFiberFamilyAt (params : Parameters) (u : Point params)
+noncomputable def evaluateFiberFamilyAt (params : Parameters) (u : Point params)
     (G : IndexedSubMeasurement (Fq params) (Polynomial params)) :
     IndexedSubMeasurement (Fq params) (Fq params) :=
   fun x => evaluateAt params u (G x)
 
 /-- Evaluate an indexed slice family at a point `(u, x)` in `F_q^{m+1}`. -/
-def evaluateFiberFamilyAtNextPoint (params : Parameters)
+noncomputable def evaluateFiberFamilyAtNextPoint (params : Parameters)
     (G : IndexedSubMeasurement (Fq params) (Polynomial params)) :
     IndexedSubMeasurement (Point params.next) (Fq params) :=
   fun u => evaluateAt params (truncatePoint params u) (G (pointHeight params u))
 
-/-- Placeholder questionwise off-diagonal mass. The later overlap calculus still needs
-explicit finite-support measurement bookkeeping. -/
-def questionConsistencyDefect {Outcome : Type _}
-    (_ψ : QuantumState) (_A _B : SubMeasurement Outcome) : Error := 0
+/-- Questionwise matching mass `∑_a ⟨ψ, A_a B_a ψ⟩`, summed over outcomes when the
+outcome space is enumerable. -/
+noncomputable def questionMatchingMass {Outcome : Type _}
+    (ψ : QuantumState) (A B : SubMeasurement Outcome) : Error :=
+  sumOverOutcomesOrElse
+    (expectationValue ψ (operatorMul A.totalOperator B.totalOperator))
+    (fun a => expectationValue ψ (operatorMul (A.outcomeOperator a) (B.outcomeOperator a)))
 
-/-- Placeholder questionwise squared-distance defect. -/
-def questionStateDependentDistanceDefect {Outcome : Type _}
-    (_ψ : QuantumState) (_A _B : SubMeasurement Outcome) : Error := 0
+/-- Questionwise off-diagonal mass surrogate for consistency. -/
+noncomputable def questionConsistencyDefect {Outcome : Type _}
+    (ψ : QuantumState) (A B : SubMeasurement Outcome) : Error := by
+  classical
+  let totalOverlap := expectationValue ψ (operatorMul A.totalOperator B.totalOperator)
+  let coarseMismatch :=
+    max 0
+      (expectationValue ψ A.totalOperator + expectationValue ψ B.totalOperator - 2 * totalOverlap)
+  if h : Nonempty (Fintype Outcome) then
+    exact max 0 (totalOverlap - questionMatchingMass ψ A B)
+  else
+    exact coarseMismatch
 
-/-- Placeholder questionwise strong self-consistency defect. -/
-def questionStrongSelfConsistencyDefect {Outcome : Type _}
-    (_ψ : QuantumState) (_A : SubMeasurement Outcome) : Error := 0
+/-- Questionwise squared-distance defect. -/
+noncomputable def questionStateDependentDistanceDefect {Outcome : Type _}
+    (ψ : QuantumState) (A B : SubMeasurement Outcome) : Error :=
+  let totalDiff := operatorDifference A.totalOperator B.totalOperator
+  sumOverOutcomesOrElse
+    (expectationValue ψ (operatorMul totalDiff totalDiff))
+    (fun a =>
+      let diff := operatorDifference (A.outcomeOperator a) (B.outcomeOperator a)
+      expectationValue ψ (operatorMul diff diff))
+
+/-- Questionwise strong self-consistency defect. -/
+noncomputable def questionStrongSelfConsistencyDefect {Outcome : Type _}
+    (ψ : QuantumState) (A : SubMeasurement Outcome) : Error :=
+  let totalMass := expectationValue ψ A.totalOperator
+  let coarseDiagonal := expectationValue ψ (operatorMul A.totalOperator A.totalOperator)
+  let diagonalMass :=
+    sumOverOutcomesOrElse coarseDiagonal
+      (fun a => expectationValue ψ (operatorMul (A.outcomeOperator a) (A.outcomeOperator a)))
+  max 0 (totalMass - diagonalMass)
 
 /-- Averaged off-diagonal mass for consistency statements. -/
 def consistencyError {Question Outcome : Type _}
@@ -786,6 +880,44 @@ instance {params : Parameters} : Inhabited (SymmetricStrategy params) where
     diagonalMeasurement := default
   }
 
+/-- Encoded samples `(u₀, i, t)` for the axis-parallel lines test. -/
+abbrev AxisParallelTestSample (params : Parameters) := Point params × (Fin params.m × Fq params)
+
+/-- Encoded samples `(u₀, v, t)` for the diagonal lines test. -/
+abbrev DiagonalTestSample (params : Parameters) := Point params × (Point params × Fq params)
+
+/-- Sampled point answers in the axis-parallel lines test. -/
+noncomputable def axisParallelPointAnswerFamily {params : Parameters}
+    (strategy : SymmetricStrategy params) :
+    IndexedSubMeasurement (AxisParallelTestSample params) (Fq params) :=
+  fun s =>
+    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
+    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeasurement
+
+/-- Sampled line answers, evaluated at the sampled parameter, in the axis-parallel lines test. -/
+noncomputable def axisParallelLineAnswerFamily {params : Parameters}
+    (strategy : SymmetricStrategy params) :
+    IndexedSubMeasurement (AxisParallelTestSample params) (Fq params) :=
+  fun s =>
+    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
+    postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeasurement) (fun g => g s.2.2)
+
+/-- Sampled point answers in the diagonal lines test. -/
+noncomputable def diagonalPointAnswerFamily {params : Parameters}
+    (strategy : SymmetricStrategy params) :
+    IndexedSubMeasurement (DiagonalTestSample params) (Fq params) :=
+  fun s =>
+    let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
+    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeasurement
+
+/-- Sampled diagonal-line answers, evaluated at the sampled parameter. -/
+noncomputable def diagonalLineAnswerFamily {params : Parameters}
+    (strategy : SymmetricStrategy params) :
+    IndexedSubMeasurement (DiagonalTestSample params) (Fq params) :=
+  fun s =>
+    let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
+    postprocess ((strategy.diagonalMeasurement ℓ).toSubMeasurement) (fun g => g s.2.2)
+
 /-- Paper-local (not necessarily symmetric) projective strategy data. -/
 structure ProjectiveStrategy (params : Parameters) where
   state : QuantumState
@@ -803,17 +935,28 @@ structure ProjectiveStrategy (params : Parameters) where
 
 namespace SymmetricStrategy
 
-/-- Placeholder failure probability in the axis-parallel lines test. -/
-def axisParallelFailureProbability {params : Parameters}
-    (_strategy : SymmetricStrategy params) : Error := 0
+/-- Trace-based failure surrogate for the axis-parallel lines test. -/
+noncomputable def axisParallelFailureProbability {params : Parameters}
+    (strategy : SymmetricStrategy params) : Error :=
+  consistencyError strategy.state
+    (uniformDistribution (AxisParallelTestSample params))
+    (axisParallelPointAnswerFamily strategy)
+    (axisParallelLineAnswerFamily strategy)
 
-/-- Placeholder failure probability in the self-consistency test. -/
-def selfConsistencyFailureProbability {params : Parameters}
-    (_strategy : SymmetricStrategy params) : Error := 0
+/-- Trace-based failure surrogate for the self-consistency test. -/
+noncomputable def selfConsistencyFailureProbability {params : Parameters}
+    (strategy : SymmetricStrategy params) : Error :=
+  strongSelfConsistencyError strategy.state
+    (uniformDistribution (Point params))
+    (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
 
-/-- Placeholder failure probability in the diagonal lines test. -/
-def diagonalFailureProbability {params : Parameters}
-    (_strategy : SymmetricStrategy params) : Error := 0
+/-- Trace-based failure surrogate for the diagonal lines test. -/
+noncomputable def diagonalFailureProbability {params : Parameters}
+    (strategy : SymmetricStrategy params) : Error :=
+  consistencyError strategy.state
+    (uniformDistribution (DiagonalTestSample params))
+    (diagonalPointAnswerFamily strategy)
+    (diagonalLineAnswerFamily strategy)
 
 /-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
 structure IsGood {params : Parameters} (strategy : SymmetricStrategy params)
@@ -826,9 +969,39 @@ end SymmetricStrategy
 
 namespace ProjectiveStrategy
 
-/-- Placeholder failure probability for the full low-individual-degree test. -/
-def lowIndividualDegreeFailureProbability {params : Parameters}
-    (_strategy : ProjectiveStrategy params) : Error := 0
+/-- View the left prover's local data as a symmetric-strategy-style package. -/
+def leftAsSymmetric {params : Parameters} (strategy : ProjectiveStrategy params) :
+    SymmetricStrategy params where
+  state := strategy.state
+  pointMeasurement := strategy.pointMeasurementA
+  axisParallelMeasurement := strategy.axisParallelMeasurementA
+  diagonalMeasurement := strategy.diagonalMeasurementA
+
+/-- View the right prover's local data as a symmetric-strategy-style package. -/
+def rightAsSymmetric {params : Parameters} (strategy : ProjectiveStrategy params) :
+    SymmetricStrategy params where
+  state := strategy.state
+  pointMeasurement := strategy.pointMeasurementB
+  axisParallelMeasurement := strategy.axisParallelMeasurementB
+  diagonalMeasurement := strategy.diagonalMeasurementB
+
+/-- Trace-based failure surrogate for the full low-individual-degree test. -/
+noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
+    (strategy : ProjectiveStrategy params) : Error :=
+  let left := strategy.leftAsSymmetric
+  let right := strategy.rightAsSymmetric
+  let pointAgreement :=
+    consistencyError strategy.state
+      (uniformDistribution (Point params))
+      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementA)
+      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementB)
+  (pointAgreement
+      + left.axisParallelFailureProbability
+      + right.axisParallelFailureProbability
+      + left.selfConsistencyFailureProbability
+      + right.selfConsistencyFailureProbability
+      + left.diagonalFailureProbability
+      + right.diagonalFailureProbability) / 7
 
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}

@@ -11,6 +11,8 @@ open MIPStarRE.Paper2009LDT
 open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
 open MIPStarRE.Paper2009LDT.Section10CommutativityPoints
 
+noncomputable section
+
 abbrev EvaluatedSliceQuestion (params : Parameters) := Point params.next × Point params.next
 abbrev EvaluatedSliceOutcome (params : Parameters) := Fq params × Fq params
 abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
@@ -199,21 +201,40 @@ def commDataProcessedGStabilityTwoRight (params : Parameters)
     IndexedSubMeasurement (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) :=
   fun q => evaluatedSliceProductLeft params strategy family q
 
-/-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`. -/
+/-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`.
+
+We propagate explicit `dim` and `matrix` from the input operators so that
+`operatorAdd`/`sumOperatorList` (which require matching dimensions) can
+accumulate the sum `∑_b C_{a,b}` correctly even when `dim ≠ 1`. -/
 def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type _}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB)
     (a : OutcomeA) (b : OutcomeB) : Operator :=
-  formalProduct (Q.outcomeOperator b)
-    (formalProduct (P.outcomeOperator a) (Q.outcomeOperator b))
+  let pa := P.outcomeOperator a
+  let qb := Q.outcomeOperator b
+  if h : qb.dim = pa.dim then
+    { name := s!"({qb.name})*({pa.name})*({qb.name})"
+      dim := pa.dim
+      matrix := (castOp h qb.matrix) * pa.matrix * (castOp h qb.matrix) }
+  else
+    { name := s!"({qb.name})*({pa.name})*({qb.name})"
+      dim := pa.dim }
 
 /-- The sandwiched family `b ↦ Q_b P_a Q_b`. -/
-def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Type _}
+noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Type _}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB) :
     IndexedSubMeasurement OutcomeA OutcomeB :=
   fun a =>
     { name := s!"sandwich({P.name},{Q.toSubMeasurement.name})"
       outcomeOperator := fun b => normalizationConditionSandwichedOperator P Q a b
-      totalOperator := { name := s!"sandwichTotal({P.name},{Q.toSubMeasurement.name})" } }
+      totalOperator := by
+        classical
+        if h : Nonempty (Fintype OutcomeB) then
+          letI : Fintype OutcomeB := Classical.choice h
+          exact sumOperatorList Q.totalOperator
+            (Finset.univ.toList.map
+              (fun b => normalizationConditionSandwichedOperator P Q a b))
+        else
+          exact Q.totalOperator }
 
 /-- The total family `a ↦ ∑_b C_{a,b}` from `lem:normalization-condition`. -/
 def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type _}
@@ -390,5 +411,7 @@ lemma normalizationCondition {OutcomeA OutcomeB : Type _}
     (Q : ProjectiveSubMeasurement OutcomeB) :
     NormalizationConditionStatement P Q := by
   sorry
+
+end
 
 end MIPStarRE.Paper2009LDT.Section11Commutativity
