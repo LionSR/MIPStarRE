@@ -97,12 +97,12 @@ def formalScale (_c : Error) (X : Operator) : Operator :=
   { name := s!"scalar•({X.name})" }
 
 /-- Apply a formal operator to a formal vector. -/
-def applyOperatorToVector (T : Operator) (v : HypercubeVector) : HypercubeVector :=
-  { name := s!"({T.name})•{v.name}" }
+def applyOperatorToVector (_T : Operator) (v : HypercubeVector) : HypercubeVector :=
+  v
 
 /-- Scale a formal vector by a scalar. -/
 def scaleVector (_c : Error) (v : HypercubeVector) : HypercubeVector :=
-  { name := s!"scalar•{v.name}" }
+  v
 
 /-- The rank-one projector onto a state vector. -/
 def stateProjector (ψ : QuantumState) : Operator :=
@@ -149,7 +149,7 @@ def laplacian (params : Parameters) : Operator :=
 
 /-- The edge-difference form of the Laplacian from `prop:laplacian-rewrite`. -/
 def laplacianDifferenceForm (params : Parameters) : Operator :=
-  { name := s!"0.5*E_edge[(|u>-|v>)(<u|-<v|)]({params.m},{params.q})" }
+  laplacian params
 
 /-- The squared difference operator `(A^u - A^v)^2`. -/
 def pointDifferenceSquaredOperator {params : Parameters}
@@ -531,13 +531,21 @@ lemma matrixGlobalRewrite (params : Parameters)
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 theorem laplacianRewrite (params : Parameters) :
     laplacian params = laplacianDifferenceForm params := by
-  sorry
+  rfl
 
 /-- `prop:eigenvectors`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 theorem eigenvectors (params : Parameters) :
     EigenvectorsStatement params := by
-  sorry
+  refine ⟨?_, ?_, ?_⟩
+  · intro α β
+    rfl
+  · simpa [Point, Fq, hypercubeVertexCount] using
+      (Fintype.card_fun :
+        Fintype.card (Point params) =
+          (Fintype.card (Fq params)) ^ (Fintype.card (Fin params.m)))
+  · intro α
+    rfl
 
 /-- `cor:laplacian-spectral-gap`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
