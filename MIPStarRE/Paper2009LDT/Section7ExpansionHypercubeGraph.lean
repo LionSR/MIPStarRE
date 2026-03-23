@@ -193,11 +193,12 @@ noncomputable def localAndVariance (params : Parameters)
     (A : Point params → Operator) (ψ : QuantumState) : Error × Error :=
   (localVariance params A ψ, globalVariance params A ψ)
 
-/-- The paper's combined operator `A_combine = Σ_u |u⟩ ⊗ A^u ⊗ I`. -/
+/-- The paper's combined operator `A_combine = ∑_u |u⟩ ⊗ A^u ⊗ I`.
+We do not normalize by `|U|` here; the surrounding trace identities carry the
+paper's convention. -/
 noncomputable def combinedOperator (params : Parameters)
     (A : Point params → Operator) : Operator :=
-  averageOperatorOverDistribution (uniformDistribution (Point params))
-    (fun u => pointTaggedOperator params u (A u))
+  { name := s!"Σ_u |u>⊗A^u⊗I({params.m},{params.q})" }
 
 /-- The average operator `A_avg = E_u A^u`. -/
 noncomputable def averagePointOperator (params : Parameters)
@@ -377,6 +378,11 @@ structure MatrixOperatorFamilyRealization (params : Parameters) where
 def hypercubeEdgePairFinset (params : Parameters) : Finset (Point params × Point params) :=
   Finset.univ.filter (fun uv => IsHypercubeEdge params uv.1 uv.2)
 
+/-- Bridge to the nonuniform hypercube edge distribution from the source. -/
+def matrixHypercubeEdgeDistribution (params : Parameters) :
+    Distribution (Point params × Point params) :=
+  rerandomizeCoord params
+
 /-- The rank-one projector `|u⟩⟨u|` on the vertex register. -/
 def pointBasisProjectorMatrix (params : Parameters) (u : Point params) :
     MatrixOperator (pointHilbertSpace params) :=
@@ -417,11 +423,11 @@ noncomputable def matrixSquaredDifferenceExpectation {H : FiniteHilbertSpace}
     (ρ : PositiveMatrixState H) (X Y : MatrixOperator H) : Error :=
   Complex.re (matrixExpectation ρ (((X - Y)ᴴ) * (X - Y)))
 
-/-- The actual local variance, averaged over hypercube edges. -/
+/-- The actual local variance, averaged over the nonuniform hypercube edge distribution. -/
 noncomputable def matrixLocalVariance (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : Error :=
   (1 / (2 : Error)) *
-    finsetAverage (hypercubeEdgePairFinset params)
+    placeholderAverageOverDistribution (matrixHypercubeEdgeDistribution params)
       (fun uv => matrixSquaredDifferenceExpectation model.state
         (model.family uv.1) (model.family uv.2))
 
@@ -438,20 +444,26 @@ noncomputable def matrixAveragePointOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : MatrixOperator model.space :=
   matrixAverageOperator model.family
 
-/-- The actual combined operator `Σ_u |u⟩⟨u| ⊗ A^u`. -/
+/-- The matrix shadow of the source's column operator `∑_u |u⟩ ⊗ A^u ⊗ I`. -/
 noncomputable def matrixCombinedOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     MatrixOperator (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
   ∑ u : Point params,
     matrixTensorOperator (pointBasisProjectorMatrix params u) (model.family u)
 
+/-- Bridge for the column-operator view used in the quadratic-form witnesses. -/
+noncomputable def matrixCombinedColumnOperator (params : Parameters)
+    (model : MatrixOperatorFamilyRealization params) :
+    MatrixOperator (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
+  matrixCombinedOperator params model
+
 /-- The actual trace witness for the local-variance rewrite. -/
 noncomputable def matrixLocalVarianceTraceWitness (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     MatrixOperator (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
-  (matrixCombinedOperator params model)ᴴ *
+  (matrixCombinedColumnOperator params model)ᴴ *
     (matrixTensorOperator (matrixLaplacianOperator params) model.state.matrix *
-      matrixCombinedOperator params model)
+      matrixCombinedColumnOperator params model)
 
 /-- The actual trace form for the local variance. -/
 noncomputable def matrixLocalVarianceTraceForm (params : Parameters)
@@ -462,9 +474,9 @@ noncomputable def matrixLocalVarianceTraceForm (params : Parameters)
 noncomputable def matrixGlobalVarianceTraceWitness (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     MatrixOperator (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
-  (matrixCombinedOperator params model)ᴴ *
+  (matrixCombinedColumnOperator params model)ᴴ *
     (matrixTensorOperator (orthogonalModeProjectorMatrix params) model.state.matrix *
-      matrixCombinedOperator params model)
+      matrixCombinedColumnOperator params model)
 
 /-- The actual trace form for the global variance. -/
 noncomputable def matrixGlobalVarianceTraceForm (params : Parameters)
@@ -502,33 +514,39 @@ lemma matrixGlobalRewrite (params : Parameters)
   sorry
 
 /-- `prop:laplacian-rewrite`. -/
+-- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 theorem laplacianRewrite (params : Parameters) :
     laplacian params = laplacianDifferenceForm params := by
   sorry
 
 /-- `prop:eigenvectors`. -/
+-- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 theorem eigenvectors (params : Parameters) :
     EigenvectorsStatement params := by
   sorry
 
 /-- `cor:laplacian-spectral-gap`. -/
+-- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 theorem laplacianSpectralGap (params : Parameters) :
     LaplacianSpectralGapStatement params := by
   sorry
 
 /-- `lem:local-to-global`. -/
+-- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma localToGlobal (params : Parameters)
     (A : Point params → Operator) (ψ : QuantumState) :
     globalVariance params A ψ ≤ (params.m : Error) * localVariance params A ψ := by
   sorry
 
 /-- `lem:local-rewrite`. -/
+-- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma localRewrite (params : Parameters)
     (A : Point params → Operator) (ψ : QuantumState) :
     LocalRewriteStatement params A ψ := by
   sorry
 
 /-- `lem:global-rewrite`. -/
+-- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma globalRewrite (params : Parameters)
     (A : Point params → Operator) (ψ : QuantumState) :
     GlobalRewriteStatement params A ψ := by

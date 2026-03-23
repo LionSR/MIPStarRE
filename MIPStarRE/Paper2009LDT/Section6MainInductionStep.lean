@@ -125,16 +125,51 @@ noncomputable def ldPastingInInductionError (params : Parameters) (k : ℕ)
     2 * ldPastingInInductionNu params k eps delta gamma zeta +
     Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))
 
-/-- Placeholder for the averaged point operator `E_u A^u_{h(u)}` appearing in boundedness. -/
-def averagedPointEvaluationOperator (params : Parameters)
-    (_strategy : SymmetricStrategy params) (_h : Polynomial params) : Operator :=
-  { name := s!"Aavg({params.m},{params.q},{params.d})" }
+/-- Averaged point operator `E_u A^u_{h(u)}` appearing in boundedness. -/
+noncomputable def averagedPointEvaluationOperator (params : Parameters)
+    (strategy : SymmetricStrategy params) (h : Polynomial params) : Operator := by
+  classical
+  let 𝒟 : Distribution (Point params) := uniformDistribution (Point params)
+  let u₀ : Point params := Classical.choice (inferInstance : Nonempty (Point params))
+  exact weightedOperatorSumOnSupport
+    ((strategy.pointMeasurement u₀).toSubMeasurement.outcomeOperator (h u₀))
+    𝒟.support 𝒟.weight
+    (fun u => (strategy.pointMeasurement u).toSubMeasurement.outcomeOperator (h u))
 
-/-- Placeholder for the slice-wise averaged point operator `E_u A^{u,x}_{g(u)}`. -/
-def averagedSlicePointEvaluationOperator (params : Parameters)
-    (_strategy : SymmetricStrategy params.next)
-    (x : Fq params) (_g : Polynomial params) : Operator :=
-  { name := s!"AavgSlice({params.m},{params.q},{params.d},{x.1})" }
+/-- Slice-wise averaged point operator `E_u A^{u,x}_{g(u)}`. -/
+noncomputable def averagedSlicePointEvaluationOperator (params : Parameters)
+    (strategy : SymmetricStrategy params.next)
+    (x : Fq params) (g : Polynomial params) : Operator := by
+  classical
+  let 𝒟 : Distribution (Point params) := uniformDistribution (Point params)
+  let u₀ : Point params := Classical.choice (inferInstance : Nonempty (Point params))
+  exact weightedOperatorSumOnSupport
+    ((strategy.pointMeasurement (appendPoint params u₀ x)).toSubMeasurement.outcomeOperator (g u₀))
+    𝒟.support 𝒟.weight
+    (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeasurement.outcomeOperator (g u))
+
+/-- TODO(tensor): replace this placeholder left placement by an honest tensor-product
+embedding once the bipartite matrix API is available. -/
+def leftPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
+  name := s!"{A.name}.left"
+  outcomeOperator := fun a => leftTensor (A.outcomeOperator a)
+  totalOperator := leftTensor A.totalOperator
+
+/-- TODO(tensor): replace this placeholder right placement by an honest tensor-product
+embedding once the bipartite matrix API is available. -/
+def rightPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
+  name := s!"{A.name}.right"
+  outcomeOperator := fun a => rightTensor (A.outcomeOperator a)
+  totalOperator := rightTensor A.totalOperator
+
+/-- TODO(tensor): this uses the placeholder `leftTensor` / `rightTensor` embeddings until
+the project has an honest bipartite operator API. -/
+noncomputable def tensorFailureExpectation {Outcome : Type _}
+    (ψ : QuantumState) (Z : Operator) (H : SubMeasurement Outcome) : Error :=
+  expectationValue ψ <|
+    operatorMul
+      (leftTensor Z)
+      (rightTensor (operatorDifference (identityLike H.totalOperator) H.totalOperator))
 
 /-- Output package for the induction-level self-improvement theorem. -/
 structure SelfImprovementInInductionSectionConclusion (params : Parameters)
@@ -154,13 +189,14 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
     PolynomialMeasurementStronglySelfConsistent params strategy.state H.toSubMeasurement
       (selfImprovementInInductionError params eps delta gamma)
   selfCloseness :
-    StateDependentDistanceRel strategy.state (uniformDistribution Unit)
-      (constantSubMeasurementFamily H.toSubMeasurement)
-      (constantSubMeasurementFamily H.toSubMeasurement)
+    MIPStarRE.Paper2009LDT.Section4Preliminaries.BipartiteStateDependentDistanceRel
+      strategy.state (uniformDistribution Unit)
+      (constantSubMeasurementFamily (leftPlacedSubMeasurement H.toSubMeasurement))
+      (constantSubMeasurementFamily (rightPlacedSubMeasurement H.toSubMeasurement))
       (selfImprovementInInductionError params eps delta gamma)
   bounded :
-    BoundedByOperator strategy.state H.toSubMeasurement Z
-      (selfImprovementInInductionError params eps delta gamma)
+    tensorFailureExpectation strategy.state Z H.toSubMeasurement
+      ≤ selfImprovementInInductionError params eps delta gamma
   dominatesAveragePointOperator :
     ∀ h : Polynomial params,
       DominatesOperator Z (averagedPointEvaluationOperator params strategy h)

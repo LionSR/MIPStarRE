@@ -104,7 +104,7 @@ noncomputable def averagedSandwichedPolynomialSubMeasurement (params : Parameter
         (fun u => (sandwichedPolynomialSubMeasurementAt params strategy T u).totalOperator) }
 
 /-- Evaluate a polynomial submeasurement at each point `u`. -/
-abbrev polynomialEvaluationFamily (params : Parameters)
+noncomputable abbrev polynomialEvaluationFamily (params : Parameters)
     (H : SubMeasurement (Polynomial params)) :
     IndexedSubMeasurement (Point params) (Fq params) :=
   MIPStarRE.Paper2009LDT.polynomialEvaluationFamily params H
@@ -165,14 +165,14 @@ noncomputable def matrixAveragedPointOperator (params : Parameters)
 /-- The concrete primal contribution `T_g A_g`. -/
 noncomputable def matrixSdpPrimalContributionOperator (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (g : Polynomial params) : MatrixOperator model.space :=
   (T.effect g) * matrixAveragedPointOperator params model g
 
 /-- The concrete primal objective `E_g Re τ(ρ T_g A_g)`. -/
 noncomputable def matrixSdpPrimalObjective (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (Point params → Fq params) model.space) : Error :=
+    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space) : Error :=
   averageOverDistribution (polynomialDistribution params) (fun g =>
     Complex.re (matrixExpectation model.state
       (matrixSdpPrimalContributionOperator params model T g)))
@@ -193,7 +193,7 @@ noncomputable def matrixSdpDualSlackOperator (params : Parameters)
 /-- The concrete complementary-slackness defect `T_g (Z - A_g)`. -/
 noncomputable def matrixSdpComplementarySlacknessDefect (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (Z : MatrixOperator model.space)
     (g : Polynomial params) : MatrixOperator model.space :=
   (T.effect g) * matrixSdpDualSlackOperator params model Z g
@@ -201,7 +201,7 @@ noncomputable def matrixSdpComplementarySlacknessDefect (params : Parameters)
 /-- Matrix-level witness for an optimal SDP pair. -/
 structure MatrixSdpOptimalWitness (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (Z : MatrixOperator model.space) : Prop where
   dualPositive : 0 ≤ Z
   dualFeasible :
@@ -235,7 +235,7 @@ abbrev MatrixIndexedPointOutcomeFamily (params : Parameters)
 /-- The concrete sandwiched operator `A^u_{h(u)} T_h A^u_{h(u)}`. -/
 noncomputable def matrixSandwichedPolynomialOutcomeOperatorAt (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (u : Point params) (h : Polynomial params) : MatrixOperator model.space :=
   let Au := matrixAveragedPointOperatorContribution params model h u
   Au * (T.effect h) * Au
@@ -243,7 +243,7 @@ noncomputable def matrixSandwichedPolynomialOutcomeOperatorAt (params : Paramete
 /-- The averaged concrete sandwiched operator `E_u A^u_{h(u)} T_h A^u_{h(u)}`. -/
 noncomputable def matrixAveragedSandwichedPolynomialOutcomeOperator (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (h : Polynomial params) : MatrixOperator model.space :=
   matrixAverageOperator (fun u : Point params =>
     matrixSandwichedPolynomialOutcomeOperatorAt params model T u h)
@@ -253,7 +253,7 @@ noncomputable def matrixAddInULeftOperatorAtPoint {Outcome : Type _}
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
-    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome)
     (u : Point params) : MatrixOperator model.space :=
   match addInUSelectionChoice params S u with
@@ -265,7 +265,7 @@ noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type _}
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
-    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome)
     (u : Point params) : MatrixOperator model.space :=
   match addInUSelectionChoice params S u with
@@ -279,7 +279,7 @@ noncomputable def matrixAddInULeftQuantity {Outcome : Type _}
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
-    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome) : Error :=
   finiteAverage (fun u : Point params =>
     Complex.re (matrixExpectation model.state
@@ -290,7 +290,7 @@ noncomputable def matrixAddInURightQuantity {Outcome : Type _}
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
-    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome) : Error :=
   finiteAverage (fun u : Point params =>
     Complex.re (matrixExpectation model.state
@@ -299,7 +299,7 @@ noncomputable def matrixAddInURightQuantity {Outcome : Type _}
 /-- The concrete evaluated polynomial family `H_[h(u)=a]`. -/
 noncomputable def matrixPolynomialEvaluationOutcomeOperatorAtPoint (params : Parameters)
     (model : MatrixSdpRealization params)
-    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (u : Point params) (a : Fq params) : MatrixOperator model.space :=
   let evalFamily :=
     MIPStarRE.Quantum.Submeasurement.postprocess (M := H) (fun h => h u)
@@ -308,7 +308,7 @@ noncomputable def matrixPolynomialEvaluationOutcomeOperatorAtPoint (params : Par
 /-- The concrete matched operator `E_a A^u_a H_[h(u)=a]`. -/
 noncomputable def matrixHelperAgreementOperatorAtPoint (params : Parameters)
     (model : MatrixSdpRealization params)
-    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (u : Point params) : MatrixOperator model.space :=
   matrixAverageOperator (fun a : Fq params =>
     (model.pointMeasurement u).effect a *
@@ -317,14 +317,14 @@ noncomputable def matrixHelperAgreementOperatorAtPoint (params : Parameters)
 /-- The concrete averaged matched operator `E_u E_a A^u_a H_[h(u)=a]`. -/
 noncomputable def matrixHelperAgreementAverageOperator (params : Parameters)
     (model : MatrixSdpRealization params)
-    (H : MatrixSubmeasurement (Point params → Fq params) model.space) : MatrixOperator model.space :=
+    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) : MatrixOperator model.space :=
   matrixAverageOperator (fun u : Point params =>
     matrixHelperAgreementOperatorAtPoint params model H u)
 
 /-- The concrete helper boundedness gap `Re τ(ρ (Z - E_u Σ_a A^u_a H_[h(u)=a]))`. -/
 noncomputable def matrixHelperBoundednessGap (params : Parameters)
     (model : MatrixSdpRealization params)
-    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (Z : MatrixOperator model.space) : Error :=
   Complex.re (matrixExpectation model.state
     (Z - matrixHelperAgreementAverageOperator params model H))
@@ -332,7 +332,7 @@ noncomputable def matrixHelperBoundednessGap (params : Parameters)
 /-- The concrete projective residual gap `Re τ(ρ (Z (I - Σ_h H_h)))`. -/
 noncomputable def matrixProjectiveResidualGap (params : Parameters)
     (model : MatrixSdpRealization params)
-    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (Z : MatrixOperator model.space) : Error :=
   let total := MIPStarRE.Quantum.Submeasurement.total H
   Complex.re (matrixExpectation model.state (Z * (1 - total)))
@@ -341,9 +341,9 @@ noncomputable def matrixProjectiveResidualGap (params : Parameters)
 structure MatrixAddInUTransferStatement {Outcome : Type _}
     (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (Point params → Fq params) model.space)
+    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
-    (H : MatrixSubmeasurement (Point params → Fq params) model.space)
+    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (eps delta : Error) : Prop where
   transfer :
     ∀ S : AddInUSelection params Outcome,
@@ -368,7 +368,7 @@ structure SdpOptimalPair (params : Parameters)
       sdpComplementarySlacknessEquation params strategy T Z g
   matrixWitness :
     ∃ model : MatrixSdpRealization params,
-      ∃ Tm : MatrixMeasurement (Point params → Fq params) model.space,
+      ∃ Tm : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space,
         ∃ Zm : MatrixOperator model.space,
           MatrixSdpOptimalWitness params model Tm Zm
 
@@ -501,8 +501,8 @@ structure AddInUStatement {Outcome : Type _} (params : Parameters)
   matrixWitness :
     ∃ model : MatrixSdpRealization params,
       ∃ Mmat : MatrixIndexedPointOutcomeFamily params Outcome model.space,
-        ∃ Hmat : MatrixSubmeasurement (Point params → Fq params) model.space,
-          ∃ Tm : MatrixMeasurement (Point params → Fq params) model.space,
+        ∃ Hmat : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
+          ∃ Tm : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space,
             MatrixAddInUTransferStatement params model Tm Mmat Hmat eps delta
 
 /-- Output package for `lem:self-improvement-helper`. -/

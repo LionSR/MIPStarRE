@@ -307,7 +307,7 @@
   \]
 \end{lemma}
 \begin{proof}
-  The definition of $H$ only sums over tuples compatible with a global polynomial. Insert the line measurement $B^u$, use Lemma~\ref{lem:h-b-consistency} to show that globally inconsistent tuples contribute little, and then replace distinct tuples by independent tuples with Lemma~\ref{prop:ld-dnoteq}.
+  The definition of $H$ sums over tuples $(g_1,\dots,g_k)$ that arise as restrictions of a single polynomial in $\polyfunc{m+1}{q}{d}$. To bound the contribution of the remaining tuples, fix any type $\tau$ with $|\tau|\ge d+1$ and any tuple $(g_1,\dots,g_k) \in \mathsf{Outcomes}_\tau$ that is \emph{not} globally consistent, meaning no $h \in \polyfunc{m+1}{q}{d}$ restricts to $(g_1,\dots,g_k)$ on the active coordinates. Among the $|\tau|\ge d+1$ active coordinates, at most $d$ can agree with the unique interpolant $h^*$ determined by any $d+1$ of them (by the Schwartz--Zippel bound, Lemma~\ref{lem:schwartz-zippel-individual}), so there exists an index $i^*$ with $\tau_{i^*}=1$ and $g_{i^*} \ne h^*|_{x_{i^*}}$. At that index, the linewise consistency from Lemma~\ref{lem:ld-sandwich-line-one-point} shows the sandwiched contribution is at most $\nu_5$, so the total globally-inconsistent mass is $O(k\nu_5)$. Finally, replace the distinct-tuple distribution by independent tuples using Lemma~\ref{prop:ld-dnoteq}, paying the TV cost $k^2/q$.
 \end{proof}
 
 \begin{definition}[Truncated type sums]\label{def:truncated-type-sums}

@@ -281,6 +281,7 @@ structure RoundedProjectiveMeasurementStatement {Outcome : Type _}
     Nonempty (MatrixRoundedProjectiveWitness (Outcome := Outcome) ζ)
 
 /-- `thm:naimark`. -/
+-- TODO(tensor): needs explicit bipartite tensor-product model.
 theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type _}
     [Fintype OutcomeA] [DecidableEq OutcomeA]
     [Fintype OutcomeB] [DecidableEq OutcomeB]
@@ -292,6 +293,7 @@ theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type _}
   sorry
 
 /-- `thm:orthonormalization`. -/
+-- Proof outline from the source: R_a → Q_a → X, X̂ / SVD chain before the final rounding step.
 theorem orthonormalization {Outcome : Type _}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState) (A : SubMeasurement Outcome) (ζ : Error) :
