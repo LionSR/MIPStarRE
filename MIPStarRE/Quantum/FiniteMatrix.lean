@@ -184,4 +184,45 @@ theorem normalizedTrace_product_split {α : Type*} [Fintype α] [DecidableEq α]
     rw [normalizedTrace_sum]
   exact sum_eq_diag_add_offDiag (fun a b => normalizedTrace (M a * N b))
 
+/-! ### Almost-projective predicate -/
+
+/--
+A matrix is almost-projective with defect `ζ` if its idempotence defect
+`‖P² − P‖²_τ` is at most `ζ`.
+-/
+structure IsAlmostProj (P : Op d) (ζ : ℝ) : Prop where
+  isHermitian : P.IsHermitian
+  idempotenceDefect : Complex.re (tauNormSq (P * P - P)) ≤ ζ
+
+/-- Every honest projection is almost-projective with defect 0. -/
+theorem IsProj.isAlmostProj {P : Op d} (h : IsProj P) : IsAlmostProj P 0 where
+  isHermitian := h.isHermitian
+  idempotenceDefect := by simp [h.idempotent]
+
+/-! ### Commutation defect -/
+
+/-- The squared τ-norm commutator `‖[A, B]‖²_τ = τ((AB − BA)⋆(AB − BA))`. -/
+def commutatorTauNormSq (A B : Op d) : ℂ :=
+  tauNormSq (A * B - B * A)
+
+/-- Commuting operators have vanishing commutator norm. -/
+theorem commutatorTauNormSq_zero_of_commute {A B : Op d}
+    (h : A * B = B * A) : commutatorTauNormSq A B = 0 := by
+  simp [commutatorTauNormSq, h]
+
+/-! ### Spectral truncation -/
+
+/--
+A spectral truncation witness records the passage from a Hermitian matrix `source`
+to a projection `target` by truncating the spectrum to `{0, 1}`: eigenvalues
+above `1/2` are rounded to `1`, those below are rounded to `0`.
+
+The key output is the τ-distance bound between source and target.
+-/
+structure SpectralTruncation (source target : Op d) : Prop where
+  sourceHermitian : source.IsHermitian
+  targetProj : IsProj target
+  tauDistanceBound : Complex.re (tauNormSq (source - target)) ≤
+    Complex.re (tauNormSq (source * source - source))
+
 end MIPStarRE.Quantum
