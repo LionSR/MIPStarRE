@@ -435,6 +435,19 @@ def castOp {m n : ℕ} (h : m = n)
   cases h
   simpa using A
 
+theorem castOp_add {m n : ℕ} (h : m = n) (A B : MIPStarRE.Quantum.Op (HilbertIndex m)) :
+    castOp h (A + B) = castOp h A + castOp h B := by
+  subst h; rfl
+
+theorem castOp_sub {m n : ℕ} (h : m = n) (A B : MIPStarRE.Quantum.Op (HilbertIndex m)) :
+    castOp h (A - B) = castOp h A - castOp h B := by
+  subst h; rfl
+
+theorem castOp_trans {l m n : ℕ} (h₁ : l = m) (h₂ : m = n)
+    (A : MIPStarRE.Quantum.Op (HilbertIndex l)) :
+    castOp h₂ (castOp h₁ A) = castOp (h₁.trans h₂) A := by
+  subst h₁; subst h₂; rfl
+
 /-- The identity operator in the same dimension as `X`. -/
 def identityLike (X : Operator) : Operator where
   name := "I"
@@ -603,6 +616,32 @@ whenever the dimensions match. -/
 structure DominatesOperator (X Y : Operator) : Prop where
   sameDim : X.dim = Y.dim
   dominationGapPositive : 0 ≤ X.matrix - castOp sameDim.symm Y.matrix
+
+/-! ### Bridging lemmas: expectation-value linearity -/
+
+/-- `expectationValue` distributes over `operatorAdd` when dimensions match. -/
+theorem expectationValue_add (ψ : QuantumState) (X Y : Operator)
+    (hψX : ψ.dim = X.dim) (hXY : X.dim = Y.dim) :
+    expectationValue ψ (operatorAdd X Y) =
+      expectationValue ψ X + expectationValue ψ Y := by
+  have hψY : ψ.dim = Y.dim := hψX.trans hXY
+  unfold expectationValue operatorAdd
+  rw [dif_pos hXY, dif_pos hψX, dif_pos hψX, dif_pos hψY,
+      castOp_add hψX.symm, castOp_trans hXY.symm hψX.symm,
+      show hXY.symm.trans hψX.symm = hψY.symm from Subsingleton.elim _ _,
+      mul_add, MIPStarRE.Quantum.normalizedTrace_add, Complex.add_re]
+
+/-- `expectationValue` distributes over `operatorDifference` when dimensions match. -/
+theorem expectationValue_sub (ψ : QuantumState) (X Y : Operator)
+    (hψX : ψ.dim = X.dim) (hXY : X.dim = Y.dim) :
+    expectationValue ψ (operatorDifference X Y) =
+      expectationValue ψ X - expectationValue ψ Y := by
+  have hψY : ψ.dim = Y.dim := hψX.trans hXY
+  unfold expectationValue operatorDifference
+  rw [dif_pos hXY, dif_pos hψX, dif_pos hψX, dif_pos hψY,
+      castOp_sub hψX.symm, castOp_trans hXY.symm hψX.symm,
+      show hXY.symm.trans hψX.symm = hψY.symm from Subsingleton.elim _ _,
+      mul_sub, MIPStarRE.Quantum.normalizedTrace_sub, Complex.sub_re]
 
 /-- A paper-local submeasurement with outcomes in `α`. -/
 structure SubMeasurement (α : Type _) where
