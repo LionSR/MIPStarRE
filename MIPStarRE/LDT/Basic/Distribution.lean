@@ -15,7 +15,7 @@ namespace MIPStarRE.LDT
 
 /-- Placeholder for a probability distribution, now with an explicit finite support list
 and real-valued weights. -/
-structure Distribution (α : Type _) where
+structure Distribution (α : Type*) where
   name : String := ""
   support : List α := []
   weight : α → Error := fun _ => 0
@@ -24,11 +24,11 @@ structure Distribution (α : Type _) where
   outsideSupport : ∀ a, a ∉ support → weight a = 0 := by intro _ _; rfl
 
 /-- Average a scalar function against the stored finite support of a distribution. -/
-def averageOverDistribution {α : Type _} (𝒟 : Distribution α) (f : α → Error) : Error :=
+def averageOverDistribution {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
   (𝒟.support.map fun a => 𝒟.weight a * f a).sum
 
 /-- The uniform distribution on a nonempty finite type. -/
-noncomputable def uniformDistribution (α : Type _)
+noncomputable def uniformDistribution (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α where
   name := "uniform"
   support := (Finset.univ : Finset α).toList
@@ -46,11 +46,11 @@ noncomputable def uniformDistribution (α : Type _)
 
 /-- Placeholder total variation distance. The distribution carrier is now explicit, but the
 full `L¹` bookkeeping is postponed to a later pass. -/
-def totalVariationDistance {α : Type _} (_μ _ν : Distribution α) : Error := 0
+def totalVariationDistance {α : Type*} (_μ _ν : Distribution α) : Error := 0
 
 /-- Sum a scalar quantity over an outcome space when a finite enumeration is available,
 falling back to a coarser surrogate otherwise. -/
-noncomputable def sumOverOutcomesOrElse {α : Type _}
+noncomputable def sumOverOutcomesOrElse {α : Type*}
     (fallback : Error) (f : α → Error) : Error := by
   classical
   if h : Nonempty (Fintype α) then

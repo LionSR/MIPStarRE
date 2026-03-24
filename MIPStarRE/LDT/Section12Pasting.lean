@@ -42,13 +42,13 @@ def bernoulliTailOperator (k d : ℕ) (X : Operator) : Operator where
   dim := X.dim
 
 /-- Add a descriptive tag to a paper-local submeasurement placeholder. -/
-def tagSubMeasurement {α : Type _} (tag : String) (A : SubMeasurement α) : SubMeasurement α where
+def tagSubMeasurement {α : Type*} (tag : String) (A : SubMeasurement α) : SubMeasurement α where
   name := s!"{A.name}.{tag}"
   outcomeOperator := A.outcomeOperator
   totalOperator := A.totalOperator
 
 /-- Multiply each outcome operator by a total operator on the right. -/
-def multiplyByTotalOnRight {α β : Type _}
+def multiplyByTotalOnRight {α β : Type*}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement α where
   name := label
@@ -56,7 +56,7 @@ def multiplyByTotalOnRight {α β : Type _}
   totalOperator := formalProduct A.totalOperator B.totalOperator
 
 /-- Multiply each outcome operator by a total operator on the left. -/
-def multiplyByTotalOnLeft {α β : Type _}
+def multiplyByTotalOnLeft {α β : Type*}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement β where
   name := label
@@ -64,7 +64,7 @@ def multiplyByTotalOnLeft {α β : Type _}
   totalOperator := formalProduct A.totalOperator B.totalOperator
 
 /-- Average an indexed family against a named distribution. -/
-noncomputable def averageIndexedSubMeasurement {Question Outcome : Type _}
+noncomputable def averageIndexedSubMeasurement {Question Outcome : Type*}
     (label : String) (𝒟 : Distribution Question) (A : IndexedSubMeasurement Question Outcome) :
     SubMeasurement Outcome where
   name := label
@@ -176,19 +176,19 @@ def incompletePartRightFamily (params : Parameters)
   fun x => rightPlacedSubMeasurement (incompletePartSubMeasurement params family x)
 
 /-- Left tensor-placement for the auxiliary family `M^x_o`. -/
-def switcherooSelfConsistencyLeft {Outcome : Type _} (params : Parameters)
+def switcherooSelfConsistencyLeft {Outcome : Type*} (params : Parameters)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SliceQuestion params) Outcome :=
   fun x => leftPlacedSubMeasurement ((M x).toSubMeasurement)
 
 /-- Right tensor-placement for the auxiliary family `M^x_o`. -/
-def switcherooSelfConsistencyRight {Outcome : Type _} (params : Parameters)
+def switcherooSelfConsistencyRight {Outcome : Type*} (params : Parameters)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SliceQuestion params) Outcome :=
   fun x => rightPlacedSubMeasurement ((M x).toSubMeasurement)
 
 /-- Concrete hypothesis family for `G^x_g M^y_o`. -/
-def switcherooPointProductLeft {Outcome : Type _} (params : Parameters)
+def switcherooPointProductLeft {Outcome : Type*} (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params × Outcome) :=
@@ -200,7 +200,7 @@ def switcherooPointProductLeft {Outcome : Type _} (params : Parameters)
         ((M q.2).toSubMeasurement)
 
 /-- Concrete hypothesis family for `M^y_o G^x_g` on the `Polynomial params × Outcome` outcome type. -/
-def switcherooPointProductRight {Outcome : Type _} (params : Parameters)
+def switcherooPointProductRight {Outcome : Type*} (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params × Outcome) :=
@@ -212,7 +212,7 @@ def switcherooPointProductRight {Outcome : Type _} (params : Parameters)
         ((M q.2).toSubMeasurement)
 
 /-- Concrete aggregate family for `G^x M^y_o`. -/
-def switcherooAggregateLeft {Outcome : Type _} (params : Parameters)
+def switcherooAggregateLeft {Outcome : Type*} (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SlicePairQuestion params) Outcome :=
@@ -224,7 +224,7 @@ def switcherooAggregateLeft {Outcome : Type _} (params : Parameters)
         ((M q.2).toSubMeasurement)
 
 /-- Concrete aggregate family for `M^y_o G^x`. -/
-def switcherooAggregateRight {Outcome : Type _} (params : Parameters)
+def switcherooAggregateRight {Outcome : Type*} (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
     IndexedSubMeasurement (SlicePairQuestion params) Outcome :=
@@ -539,7 +539,7 @@ def hRestrictionToVerticalLine (params : Parameters)
     postprocess H (fun h => Polynomial.restrictToAxisParallelLine params.next h verticalLine)
 
 /-- Collapse a submeasurement to its `Unit`-valued total operator. -/
-def pastedMeasurementTotal {α : Type _} (H : SubMeasurement α) : IndexedSubMeasurement Unit Unit :=
+def pastedMeasurementTotal {α : Type*} (H : SubMeasurement α) : IndexedSubMeasurement Unit Unit :=
   constantSubMeasurementFamily (postprocess H (fun _ => ()))
 
 /-- The total operator of the specifically constructed pasted submeasurement. -/
@@ -739,7 +739,7 @@ structure GBotSelfConsistencyStatement (params : Parameters)
       zeta
 
 /-- Output package for `lem:commutativity-switcheroo`. -/
-structure CommutativitySwitcherooStatement {Outcome : Type _} (params : Parameters)
+structure CommutativitySwitcherooStatement {Outcome : Type*} (params : Parameters)
     (ψ : QuantumState)
     (family : IndexedPolynomialFamily params)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome)
@@ -970,7 +970,7 @@ theorem gBotSelfConsistency
   sorry
 
 /-- `lem:commutativity-switcheroo`. -/
-lemma commutativitySwitcheroo {Outcome : Type _}
+lemma commutativitySwitcheroo {Outcome : Type*}
     (params : Parameters)
     (ψ : QuantumState)
     (family : IndexedPolynomialFamily params)

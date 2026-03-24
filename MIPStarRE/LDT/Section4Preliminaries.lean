@@ -14,28 +14,28 @@ namespace MIPStarRE.LDT.Section4Preliminaries
 open MIPStarRE.LDT
 
 /-- `def:post-processing` in `preliminaries.tex`. -/
-noncomputable def postProcessing {α β : Type _} (A : SubMeasurement α) (f : α → β) :
+noncomputable def postProcessing {α β : Type*} (A : SubMeasurement α) (f : α → β) :
     SubMeasurement β :=
   postprocess A f
 
 /-- `def:measurement-completion` in `preliminaries.tex`. -/
-def measurementCompletion {α : Type _} (A : SubMeasurement α) : Measurement (Option α) :=
+def measurementCompletion {α : Type*} (A : SubMeasurement α) : Measurement (Option α) :=
   completeSubMeasurement A
 
 /-- `def:simeq` in `preliminaries.tex`. -/
-def consistency {Question Outcome : Type _}
+def consistency {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
   ConsistencyRel ψ 𝒟 A B δ
 
 /-- `def:approx_delta` in `preliminaries.tex`. -/
-def stateDependentDistance {Question Outcome : Type _}
+def stateDependentDistance {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
   StateDependentDistanceRel ψ 𝒟 A B δ
 
 /-- `def:strong-self-consistency` in `preliminaries.tex`. -/
-def strongSelfConsistency {Question Outcome : Type _}
+def strongSelfConsistency {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
   PermutationInvariantState ψ ∧ StrongSelfConsistencyRel ψ 𝒟 A δ
@@ -46,13 +46,13 @@ TODO(tensor): this currently reuses the single-register comparison layer from Se
 so users should wrap `A` and `B` in the local `leftTensor` / `rightTensor` placements
 before invoking it. Replacing this by an honest tensor-product API remains future work.
 -/
-structure BipartiteStateDependentDistanceRel {Question Outcome : Type _}
+structure BipartiteStateDependentDistanceRel {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop where
   leftRightSquaredDistanceBound : stateDependentDistanceError ψ 𝒟 A B ≤ δ
 
 /-- Abbreviation for the bipartite state-dependent distance used in the source propositions. -/
-def bipartiteStateDependentDistance {Question Outcome : Type _}
+def bipartiteStateDependentDistance {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop :=
   BipartiteStateDependentDistanceRel ψ 𝒟 A B δ
@@ -64,7 +64,7 @@ structure OperatorBetweenZeroAndOne (B : Operator) : Prop where
   boundedByIdentity : DominatesOperator (identityLike B) B
 
 /-- Placeholder agreement probability from `prop:simeq-for-measurements`. -/
-noncomputable def agreementProbability {Question Outcome : Type _}
+noncomputable def agreementProbability {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedMeasurement Question Outcome) : Error :=
   1 - consistencyError ψ 𝒟
@@ -72,23 +72,23 @@ noncomputable def agreementProbability {Question Outcome : Type _}
         (IndexedMeasurement.toIndexedSubMeasurement B)
 
 /-- Output package for the measurement reformulation of consistency. -/
-structure ConsistencyAsAgreement {Question Outcome : Type _}
+structure ConsistencyAsAgreement {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedMeasurement Question Outcome) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
 
 /-- Post-process an indexed family questionwise. -/
-noncomputable def postprocessIndexedSubMeasurement {Question α β : Type _}
+noncomputable def postprocessIndexedSubMeasurement {Question α β : Type*}
     (A : IndexedSubMeasurement Question α) (f : α → β) :
     IndexedSubMeasurement Question β :=
   fun q => postProcessing (A q) f
 
 /-- The completion residual `I - Σ_a B_a` used when completing a submeasurement. -/
-noncomputable def completionResidualOperator {Outcome : Type _} (B : SubMeasurement Outcome) : Operator :=
+noncomputable def completionResidualOperator {Outcome : Type*} (B : SubMeasurement Outcome) : Operator :=
   operatorDifference (identityLike B.totalOperator) B.totalOperator
 
 /-- Family for the intermediate `A_a B_a A_a` sandwich. -/
-noncomputable def diagonalSandwichFamily {Question Outcome : Type _}
+noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
     (A : IndexedSubMeasurement Question Outcome)
     (B : IndexedMeasurement Question Outcome) :
     IndexedSubMeasurement Question Outcome :=
@@ -103,7 +103,7 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type _}
   }
 
 /-- Family for the intermediate `A_a (Σ_b B_b) A_a` sandwich. -/
-noncomputable def totalSandwichFamily {Question Outcome : Type _}
+noncomputable def totalSandwichFamily {Question Outcome : Type*}
     (A : IndexedSubMeasurement Question Outcome)
     (B : IndexedMeasurement Question Outcome) :
     IndexedSubMeasurement Question Outcome :=
@@ -118,7 +118,7 @@ noncomputable def totalSandwichFamily {Question Outcome : Type _}
   }
 
 /-- Output package for `prop:cons-sub-meas`. -/
-structure ConsSubMeasStatement {Question Outcome : Type _}
+structure ConsSubMeasStatement {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome)
     (B : IndexedMeasurement Question Outcome) (γ : Error) : Prop where
@@ -130,7 +130,7 @@ structure ConsSubMeasStatement {Question Outcome : Type _}
     StateDependentDistanceRel ψ 𝒟 A (totalSandwichFamily A B) (4 * γ)
 
 /-- Averaged left-placed sandwich scalar from `prop:switch-sandwich`. -/
-noncomputable def leftSandwichExpectation {Question Outcome : Type _}
+noncomputable def leftSandwichExpectation {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedProjectiveSubMeasurement Question Outcome)
     (B : Operator) : Error :=
@@ -142,7 +142,7 @@ noncomputable def leftSandwichExpectation {Question Outcome : Type _}
         ((A q).toSubMeasurement.totalOperator)
 
 /-- Averaged middle sandwich scalar from `prop:switch-sandwich`. -/
-noncomputable def middleSandwichExpectation {Question Outcome : Type _}
+noncomputable def middleSandwichExpectation {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedProjectiveSubMeasurement Question Outcome)
     (B : Operator) : Error :=
@@ -154,7 +154,7 @@ noncomputable def middleSandwichExpectation {Question Outcome : Type _}
         ((A q).toSubMeasurement.totalOperator)
 
 /-- Averaged right-placed sandwich scalar from `prop:switch-sandwich`. -/
-noncomputable def rightSandwichExpectation {Question Outcome : Type _}
+noncomputable def rightSandwichExpectation {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedProjectiveSubMeasurement Question Outcome)
     (B : Operator) : Error :=
@@ -166,7 +166,7 @@ noncomputable def rightSandwichExpectation {Question Outcome : Type _}
         ((A q).toSubMeasurement.totalOperator)
 
 /-- Output package for `prop:switch-sandwich`. -/
-structure SwitchSandwichStatement {Question Outcome : Type _}
+structure SwitchSandwichStatement {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedProjectiveSubMeasurement Question Outcome)
     (B : Operator) (δ : Error) : Prop where
@@ -178,7 +178,7 @@ structure SwitchSandwichStatement {Question Outcome : Type _}
       ≤ Real.sqrt δ
 
 /-- Output package for `prop:completeness-transfer-projective-P`. -/
-structure CompletenessTransferProjectivePStatement {Question Outcome : Type _}
+structure CompletenessTransferProjectivePStatement {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome)
     (P : IndexedProjectiveSubMeasurement Question Outcome) (ε : Error) : Prop where
@@ -189,7 +189,7 @@ structure CompletenessTransferProjectivePStatement {Question Outcome : Type _}
         - 2 * Real.sqrt ε
 
 /-- Canonical completion of `B` by adjoining the residual `I - Σ_a B_a` to the distinguished outcome `a0`. -/
-noncomputable def completeAtOutcome {Outcome : Type _}
+noncomputable def completeAtOutcome {Outcome : Type*}
     (B : SubMeasurement Outcome) (a0 : Outcome) : Measurement Outcome := by
   classical
   let residual := completionResidualOperator B
@@ -206,7 +206,7 @@ noncomputable def completeAtOutcome {Outcome : Type _}
   }
 
 /-- Output package for `prop:completing-to-measurement`. -/
-structure CompletingToMeasurementStatement {Outcome : Type _}
+structure CompletingToMeasurementStatement {Outcome : Type*}
     (ψ : QuantumState)
     (A : Measurement Outcome) (B : SubMeasurement Outcome)
     (C : Measurement Outcome) (a0 : Outcome) (δ ζ : Error) : Prop where
@@ -218,7 +218,7 @@ structure CompletingToMeasurementStatement {Outcome : Type _}
       (2 * δ + 4 * Real.sqrt δ + 2 * ζ)
 
 /-- `prop:simeq-for-measurements`. -/
-theorem simeqForMeasurements {Question Outcome : Type _}
+theorem simeqForMeasurements {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedMeasurement Question Outcome) (δ : Error) :
     consistency ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
@@ -227,7 +227,7 @@ theorem simeqForMeasurements {Question Outcome : Type _}
   sorry
 
 /-- `prop:simeq-to-approx`. -/
-theorem simeqToApprox {Question Outcome : Type _}
+theorem simeqToApprox {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedMeasurement Question Outcome) (δ : Error) :
     consistency ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
@@ -239,7 +239,7 @@ theorem simeqToApprox {Question Outcome : Type _}
   sorry
 
 /-- `prop:simeq-data-processing`. -/
-theorem simeqDataProcessing {Question α β : Type _}
+theorem simeqDataProcessing {Question α β : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedSubMeasurement Question α) (δ : Error) (f : α → β) :
     consistency ψ 𝒟 A B δ →
@@ -249,7 +249,7 @@ theorem simeqDataProcessing {Question α β : Type _}
   sorry
 
 /-- `prop:cons-sub-meas`. -/
-theorem consSubMeas {Question Outcome : Type _}
+theorem consSubMeas {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome)
     (B : IndexedMeasurement Question Outcome) (γ : Error) :
@@ -258,7 +258,7 @@ theorem consSubMeas {Question Outcome : Type _}
   sorry
 
 /-- `prop:switch-sandwich`. -/
-theorem switchSandwich {Question Outcome : Type _}
+theorem switchSandwich {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedProjectiveSubMeasurement Question Outcome)
     (B : Operator) (_hB : OperatorBetweenZeroAndOne B) (δ : Error) :
@@ -269,7 +269,7 @@ theorem switchSandwich {Question Outcome : Type _}
   sorry
 
 /-- `prop:completeness-transfer-projective-P`. -/
-theorem completenessTransferProjectiveP {Question Outcome : Type _}
+theorem completenessTransferProjectiveP {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome)
     (P : IndexedProjectiveSubMeasurement Question Outcome) (ε : Error) :
@@ -279,7 +279,7 @@ theorem completenessTransferProjectiveP {Question Outcome : Type _}
   sorry
 
 /-- `prop:two-notions-of-self-consistency`. -/
-theorem twoNotionsOfSelfConsistency {Question Outcome : Type _}
+theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome) (δ : Error) :
     strongSelfConsistency ψ 𝒟 A δ →
@@ -287,7 +287,7 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type _}
   sorry
 
 /-- `prop:completing-to-measurement`. -/
-theorem completingToMeasurement {Outcome : Type _}
+theorem completingToMeasurement {Outcome : Type*}
     (ψ : QuantumState)
     (A : Measurement Outcome) (B : SubMeasurement Outcome)
     (a0 : Outcome) (δ ζ : Error) :

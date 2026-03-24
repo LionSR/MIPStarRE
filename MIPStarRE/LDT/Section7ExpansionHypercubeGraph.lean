@@ -152,7 +152,7 @@ noncomputable def operatorExpectation (ψ : QuantumState) (X : Operator) : Error
 
 /-- Placeholder for averaging a real-valued observable over a distribution.
 Named to avoid shadowing the honest `averageOverDistribution` in the base namespace. -/
-noncomputable def placeholderAverageOverDistribution {α : Type _}
+noncomputable def placeholderAverageOverDistribution {α : Type*}
     (𝒟 : Distribution α) (f : α → Error) : Error := by
   classical
   let base := placeholderScalar s!"Avg[{𝒟.name}]"
@@ -166,7 +166,7 @@ noncomputable def operatorTrace (X : Operator) : Error :=
 
 /-- Weighted sum of operators over a distribution's finite support,
 using the same `support`/`weight` data as the scalar `averageOverDistribution`. -/
-noncomputable def averageOperatorOverDistribution {α : Type _}
+noncomputable def averageOperatorOverDistribution {α : Type*}
     (𝒟 : Distribution α) (f : α → Operator) : Operator :=
   match 𝒟.support with
   | [] => { name := s!"AvgOp[{𝒟.name}](empty)" }
@@ -426,15 +426,15 @@ def matrixTensorOperator {H K : FiniteHilbertSpace}
   Matrix.kronecker A B
 
 /-- Uniform average of a real-valued observable on a finite type. -/
-noncomputable def finiteAverage {α : Type _} [Fintype α] (f : α → Error) : Error :=
+noncomputable def finiteAverage {α : Type*} [Fintype α] (f : α → Error) : Error :=
   ((Fintype.card α : Error)⁻¹) * ∑ a, f a
 
 /-- Uniform average of a real-valued observable over a finite set. -/
-noncomputable def finsetAverage {α : Type _} (s : Finset α) (f : α → Error) : Error :=
+noncomputable def finsetAverage {α : Type*} (s : Finset α) (f : α → Error) : Error :=
   ((s.card : Error)⁻¹) * (s.sum f)
 
 /-- Uniform average of an operator-valued observable on a finite type. -/
-noncomputable def matrixAverageOperator {α : Type _} [Fintype α]
+noncomputable def matrixAverageOperator {α : Type*} [Fintype α]
     {H : FiniteHilbertSpace} (f : α → MatrixOperator H) : MatrixOperator H :=
   ((Fintype.card α : ℂ)⁻¹) • ∑ a, f a
 

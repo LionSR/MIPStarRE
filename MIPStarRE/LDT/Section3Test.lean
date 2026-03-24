@@ -52,14 +52,14 @@ noncomputable def evaluateFiberFamilyAtNextPoint (params : Parameters)
 
 /-- Questionwise matching mass `∑_a ⟨ψ, A_a B_a ψ⟩`, summed over outcomes when the
 outcome space is enumerable. -/
-noncomputable def questionMatchingMass {Outcome : Type _}
+noncomputable def questionMatchingMass {Outcome : Type*}
     (ψ : QuantumState) (A B : SubMeasurement Outcome) : Error :=
   sumOverOutcomesOrElse
     (expectationValue ψ (operatorMul A.totalOperator B.totalOperator))
     (fun a => expectationValue ψ (operatorMul (A.outcomeOperator a) (B.outcomeOperator a)))
 
 /-- Questionwise off-diagonal mass surrogate for consistency. -/
-noncomputable def questionConsistencyDefect {Outcome : Type _}
+noncomputable def questionConsistencyDefect {Outcome : Type*}
     (ψ : QuantumState) (A B : SubMeasurement Outcome) : Error := by
   classical
   let totalOverlap := expectationValue ψ (operatorMul A.totalOperator B.totalOperator)
@@ -72,7 +72,7 @@ noncomputable def questionConsistencyDefect {Outcome : Type _}
     exact coarseMismatch
 
 /-- Questionwise squared-distance defect. -/
-noncomputable def questionStateDependentDistanceDefect {Outcome : Type _}
+noncomputable def questionStateDependentDistanceDefect {Outcome : Type*}
     (ψ : QuantumState) (A B : SubMeasurement Outcome) : Error :=
   let totalDiff := operatorDifference A.totalOperator B.totalOperator
   sumOverOutcomesOrElse
@@ -82,7 +82,7 @@ noncomputable def questionStateDependentDistanceDefect {Outcome : Type _}
       expectationValue ψ (operatorMul (operatorAdjoint diff) diff))
 
 /-- Questionwise strong self-consistency defect. -/
-noncomputable def questionStrongSelfConsistencyDefect {Outcome : Type _}
+noncomputable def questionStrongSelfConsistencyDefect {Outcome : Type*}
     (ψ : QuantumState) (A : SubMeasurement Outcome) : Error :=
   let totalMass := expectationValue ψ A.totalOperator
   let coarseDiagonal := expectationValue ψ (operatorMul A.totalOperator A.totalOperator)
@@ -92,64 +92,64 @@ noncomputable def questionStrongSelfConsistencyDefect {Outcome : Type _}
   max 0 (totalMass - diagonalMass)
 
 /-- Averaged off-diagonal mass for consistency statements. -/
-def consistencyError {Question Outcome : Type _}
+def consistencyError {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedSubMeasurement Question Outcome) : Error :=
   averageOverDistribution 𝒟 (fun q => questionConsistencyDefect ψ (A q) (B q))
 
 /-- Averaged squared distance for `≈_δ`. -/
-def stateDependentDistanceError {Question Outcome : Type _}
+def stateDependentDistanceError {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedSubMeasurement Question Outcome) : Error :=
   averageOverDistribution 𝒟 (fun q => questionStateDependentDistanceDefect ψ (A q) (B q))
 
 /-- Averaged defect in strong self-consistency. -/
-def strongSelfConsistencyError {Question Outcome : Type _}
+def strongSelfConsistencyError {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome) : Error :=
   averageOverDistribution 𝒟 (fun q => questionStrongSelfConsistencyDefect ψ (A q))
 
 /-- Total mass of a submeasurement on state `ψ`, computed from the concrete total operator. -/
-def subMeasurementMass {Outcome : Type _}
+def subMeasurementMass {Outcome : Type*}
     (ψ : QuantumState) (A : SubMeasurement Outcome) : Error :=
   expectationValue ψ A.totalOperator
 
 /-- Averaged total mass of an indexed submeasurement. -/
-def indexedSubMeasurementMass {Question Outcome : Type _}
+def indexedSubMeasurementMass {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome) : Error :=
   averageOverDistribution 𝒟 (fun q => subMeasurementMass ψ (A q))
 
 /-- Defect in domination by an operator witness, measured at the expectation-value level. -/
-def boundednessError {Outcome : Type _}
+def boundednessError {Outcome : Type*}
     (ψ : QuantumState) (A : SubMeasurement Outcome) (Z : Operator) : Error :=
   max 0 (subMeasurementMass ψ A - expectationValue ψ Z)
 
 /-- Consistency relation. -/
-structure ConsistencyRel {Question Outcome : Type _}
+structure ConsistencyRel {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop where
   offDiagonalBound : consistencyError ψ 𝒟 A B ≤ δ
 
 /-- State-dependent distance relation. -/
-structure StateDependentDistanceRel {Question Outcome : Type _}
+structure StateDependentDistanceRel {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop where
   squaredDistanceBound : stateDependentDistanceError ψ 𝒟 A B ≤ δ
 
 /-- Strong self-consistency relation. -/
-structure StrongSelfConsistencyRel {Question Outcome : Type _}
+structure StrongSelfConsistencyRel {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome) (δ : Error) : Prop where
   diagonalOverlapBound : strongSelfConsistencyError ψ 𝒟 A ≤ δ
 
 /-- Completeness statement for a submeasurement. -/
-structure CompletenessAtLeast {Outcome : Type _}
+structure CompletenessAtLeast {Outcome : Type*}
     (ψ : QuantumState) (A : SubMeasurement Outcome) (r : Error) : Prop where
   lowerBound : subMeasurementMass ψ A ≥ r
 
 /-- Boundedness statement witnessed by an operator. -/
-structure BoundedByOperator {Outcome : Type _}
+structure BoundedByOperator {Outcome : Type*}
     (ψ : QuantumState) (A : SubMeasurement Outcome) (Z : Operator) (δ : Error) : Prop where
   witnessPositiveSemidefinite : PositiveSemidefinite Z
   upperBound : boundednessError ψ A Z ≤ δ

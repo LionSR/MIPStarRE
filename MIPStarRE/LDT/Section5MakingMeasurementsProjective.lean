@@ -24,7 +24,7 @@ open MIPStarRE.LDT
 
 /-- A finite-dimensional Hilbert space represented by a finite index type. -/
 structure FiniteHilbertSpace where
-  carrier : Type _
+  carrier : Type*
   instFintype : Fintype carrier
   instDecidableEq : DecidableEq carrier
   instNonempty : Nonempty carrier
@@ -48,12 +48,12 @@ structure DensityMatrixState (H : FiniteHilbertSpace)
   normalized : MIPStarRE.Quantum.normalizedTrace matrix = 1
 
 /-- Concrete submeasurements on a finite Hilbert space. -/
-abbrev MatrixSubmeasurement (Outcome : Type _)
+abbrev MatrixSubmeasurement (Outcome : Type*)
     [Fintype Outcome] [DecidableEq Outcome] (H : FiniteHilbertSpace) :=
   MIPStarRE.Quantum.Submeasurement Outcome H.carrier
 
 /-- Concrete measurements on a finite Hilbert space. -/
-abbrev MatrixMeasurement (Outcome : Type _)
+abbrev MatrixMeasurement (Outcome : Type*)
     [Fintype Outcome] [DecidableEq Outcome] (H : FiniteHilbertSpace) :=
   MIPStarRE.Quantum.Measurement Outcome H.carrier
 
@@ -63,7 +63,7 @@ noncomputable def matrixExpectation {H : FiniteHilbertSpace}
   MIPStarRE.Quantum.normalizedTrace (ρ.matrix * X)
 
 /-- The concrete single-outcome probability `τ(ρ A_a)`. -/
-noncomputable def matrixSingleOutcomeProbability {Outcome : Type _}
+noncomputable def matrixSingleOutcomeProbability {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     {H : FiniteHilbertSpace}
     (ρ : PositiveMatrixState H)
@@ -71,7 +71,7 @@ noncomputable def matrixSingleOutcomeProbability {Outcome : Type _}
   matrixExpectation ρ (A.effect a)
 
 /-- The concrete joint outcome probability `τ(ρ A_a B_b)` on one ambient algebra. -/
-noncomputable def matrixJointOutcomeProbability {OutcomeA OutcomeB : Type _}
+noncomputable def matrixJointOutcomeProbability {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [DecidableEq OutcomeA]
     [Fintype OutcomeB] [DecidableEq OutcomeB]
     {H : FiniteHilbertSpace}
@@ -82,21 +82,21 @@ noncomputable def matrixJointOutcomeProbability {OutcomeA OutcomeB : Type _}
   matrixExpectation ρ (A.effect a * B.effect b)
 
 /-- The concrete squared `τ`-distance between two effects. -/
-noncomputable def matrixOutcomeTauDistance {Outcome : Type _}
+noncomputable def matrixOutcomeTauDistance {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     {H : FiniteHilbertSpace}
     (A B : MatrixSubmeasurement Outcome H) (a : Outcome) : Error :=
   Complex.re (MIPStarRE.Quantum.tauNormSq (A.effect a - B.effect a))
 
 /-- The concrete idempotence defect `‖A_a^2 - A_a‖_τ^2`. -/
-noncomputable def matrixIdempotenceDefect {Outcome : Type _}
+noncomputable def matrixIdempotenceDefect {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     {H : FiniteHilbertSpace}
     (A : MatrixMeasurement Outcome H) (a : Outcome) : Error :=
   Complex.re (MIPStarRE.Quantum.tauNormSq (A.effect a * A.effect a - A.effect a))
 
 /-- Matrix-level witness for the Naimark dilation statement. -/
-structure MatrixNaimarkWitness (QuestionA OutcomeA QuestionB OutcomeB : Type _)
+structure MatrixNaimarkWitness (QuestionA OutcomeA QuestionB OutcomeB : Type*)
     [Fintype OutcomeA] [DecidableEq OutcomeA]
     [Fintype OutcomeB] [DecidableEq OutcomeB] where
   originalSpace : FiniteHilbertSpace
@@ -132,7 +132,7 @@ structure MatrixNaimarkWitness (QuestionA OutcomeA QuestionB OutcomeB : Type _)
             ((liftedLeft x).toSubmeasurement) ((liftedRight y).toSubmeasurement) a b
 
 /-- Matrix-level witness for the almost-projective stage. -/
-structure MatrixAlmostProjectiveWitness {Outcome : Type _}
+structure MatrixAlmostProjectiveWitness {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ζ : Error) where
   space : FiniteHilbertSpace
@@ -146,7 +146,7 @@ structure MatrixAlmostProjectiveWitness {Outcome : Type _}
       matrixIdempotenceDefect measurement a ≤ ζ
 
 /-- Matrix-level witness for the rounding-to-projective stage. -/
-structure MatrixRoundedProjectiveWitness {Outcome : Type _}
+structure MatrixRoundedProjectiveWitness {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ζ : Error) where
   space : FiniteHilbertSpace
@@ -161,7 +161,7 @@ structure MatrixRoundedProjectiveWitness {Outcome : Type _}
       matrixOutcomeTauDistance source.toSubmeasurement target a ≤ ζ
 
 /-- Output package for the paper's Naimark dilation theorem. -/
-structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type _) where
+structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*) where
   auxStateA : QuantumState
   auxStateB : QuantumState
   liftedState : QuantumState
@@ -170,12 +170,12 @@ structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type _) where
   deriving Inhabited
 
 /-- The product auxiliary state used in a Naimark dilation. -/
-def naimarkAuxiliaryState {QuestionA OutcomeA QuestionB OutcomeB : Type _}
+def naimarkAuxiliaryState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB) : QuantumState :=
   { name := s!"{data.auxStateA.name}⊗{data.auxStateB.name}" }
 
 /-- The lifted state `ψ ⊗ aux_A ⊗ aux_B` produced by Naimark dilation. -/
-def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type _}
+def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     (ψ : QuantumState)
     (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB) : QuantumState :=
   { name := s!"{ψ.name}⊗{data.auxStateA.name}⊗{data.auxStateB.name}" }
@@ -185,13 +185,13 @@ noncomputable def placeholderExpectation (ψ : QuantumState) (X : Operator) : Er
   (s!"Exp[{ψ.name}|{X.name}]".length : Error)
 
 /-- The single-outcome probability `⟨ψ|A_a|ψ⟩`. -/
-noncomputable def singleOutcomeProbability {Outcome : Type _}
+noncomputable def singleOutcomeProbability {Outcome : Type*}
     (ψ : QuantumState)
     (A : SubMeasurement Outcome) (a : Outcome) : Error :=
   placeholderExpectation ψ (A.outcomeOperator a)
 
 /-- The joint outcome probability `⟨ψ|A_a ⊗ B_b|ψ⟩`. -/
-noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type _}
+noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
     (ψ : QuantumState)
     (A : SubMeasurement OutcomeA)
     (B : SubMeasurement OutcomeB)
@@ -210,7 +210,7 @@ probability preservation:
    original dimension and the number of outcomes.
 4. **Matrix witness**: an honest finite-dimensional matrix realization exists.
 -/
-structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type _}
+structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     [Fintype OutcomeA] [DecidableEq OutcomeA]
     [Fintype OutcomeB] [DecidableEq OutcomeB]
     (ψ : QuantumState)
@@ -289,7 +289,7 @@ noncomputable def roundingToProjectiveError (ζ : Error) : Error :=
 This captures the passage from an almost-projective operator to a genuine projection
 by truncating the spectrum at `1/2`. The key bound is that the τ-distance between
 the source and target is controlled by the idempotence defect of the source. -/
-structure MatrixSpectralTruncationWitness {d : Type _}
+structure MatrixSpectralTruncationWitness {d : Type*}
     [Fintype d] [DecidableEq d] where
   source : MIPStarRE.Quantum.Op d
   target : MIPStarRE.Quantum.Op d
@@ -300,7 +300,7 @@ structure MatrixSpectralTruncationWitness {d : Type _}
 Each effect `A_a` is independently spectrally truncated to a projection `P_a`.
 The resulting family is not necessarily a measurement (the projections may not sum
 to the identity), but the τ-distance per outcome is controlled. -/
-structure MatrixSpectralTruncationMeasurementWitness {Outcome : Type _}
+structure MatrixSpectralTruncationMeasurementWitness {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome] (ζ : Error) where
   space : FiniteHilbertSpace
   source : MatrixMeasurement Outcome space
@@ -317,7 +317,7 @@ This exposes the semantic content of the consistency → almost-projectivity pas
 consistency of a measurement against itself implies that each effect `A_a` is
 close to idempotent in the τ-norm.  The matrix witness provides a concrete
 finite-dimensional realization with pointwise idempotence-defect bounds. -/
-structure AlmostProjectiveMeasurementStatement {Outcome : Type _}
+structure AlmostProjectiveMeasurementStatement {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState) (A : Measurement Outcome) (ζ : Error) : Prop where
   strongSelfConsistency :
@@ -339,7 +339,7 @@ This is the new intermediate between `AlmostProjectiveMeasurementStatement` and
 truncation that produces projections close to the source in τ-norm.
 The resulting projections do **not** yet form a valid submeasurement; the
 subsequent rounding step adjusts them to restore normalization. -/
-structure SpectralTruncationStatement {Outcome : Type _}
+structure SpectralTruncationStatement {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (_ψ : QuantumState) (_A : Measurement Outcome) (ζ : Error) : Prop where
   /-- A concrete matrix witness for the spectral truncation exists. -/
@@ -351,7 +351,7 @@ structure SpectralTruncationStatement {Outcome : Type _}
 This is the final stage of the orthonormalization chain: the spectrally truncated
 projections are adjusted to form a valid projective submeasurement while
 maintaining the τ-distance bound from the original measurement. -/
-structure RoundedProjectiveMeasurementStatement {Outcome : Type _}
+structure RoundedProjectiveMeasurementStatement {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState) (A : Measurement Outcome)
     (P : ProjectiveSubMeasurement Outcome) (ζ : Error) : Prop where
@@ -365,7 +365,7 @@ structure RoundedProjectiveMeasurementStatement {Outcome : Type _}
 
 /-- `thm:naimark`. -/
 -- TODO(tensor): needs explicit bipartite tensor-product model.
-theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type _}
+theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     [Fintype OutcomeA] [DecidableEq OutcomeA]
     [Fintype OutcomeB] [DecidableEq OutcomeB]
     (ψ : QuantumState)
@@ -377,7 +377,7 @@ theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type _}
 
 /-- `thm:orthonormalization`. -/
 -- Proof outline from the source: R_a → Q_a → X, X̂ / SVD chain before the final rounding step.
-theorem orthonormalization {Outcome : Type _}
+theorem orthonormalization {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState) (A : SubMeasurement Outcome) (ζ : Error) :
     StrongSelfConsistencyRel ψ (uniformDistribution Unit)
@@ -390,7 +390,7 @@ theorem orthonormalization {Outcome : Type _}
   sorry
 
 /-- `lem:orthonormalization-main-lemma`. -/
-lemma orthonormalizationMainLemma {Outcome : Type _}
+lemma orthonormalizationMainLemma {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState)
     (A B : Measurement Outcome) (ζ : Error) :
@@ -406,7 +406,7 @@ lemma orthonormalizationMainLemma {Outcome : Type _}
 Intermediate helper for `lem:orthonormalization-main-lemma`:
 consistency gives a quantitative almost-projectivity estimate.
 -/
-lemma consistencyToAlmostProjective {Outcome : Type _}
+lemma consistencyToAlmostProjective {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState) (A B : Measurement Outcome) (ζ : Error) :
     ConsistencyRel ψ (uniformDistribution Unit)
@@ -425,7 +425,7 @@ truncated to a projection `P_a` by setting eigenvalues above `1/2` to `1`
 and those below to `0`. The distance `‖A_a - P_a‖_τ` is bounded by `√ζ`
 where `ζ` bounds the idempotence defect `‖A_a² - A_a‖_τ`.
 -/
-lemma spectralTruncateAlmostProjective {Outcome : Type _}
+lemma spectralTruncateAlmostProjective {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState) (A : Measurement Outcome) (ζ : Error) :
     AlmostProjectiveMeasurementStatement ψ A ζ →
@@ -438,7 +438,7 @@ spectrally truncated projections can be adjusted to form a valid projective
 submeasurement. The adjustment accounts for the fact that the truncated
 projections may not sum to at most the identity.
 -/
-lemma adjustTruncatedProjections {Outcome : Type _}
+lemma adjustTruncatedProjections {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState) (A : Measurement Outcome) (ζ : Error) :
     SpectralTruncationStatement ψ A ζ →
@@ -455,7 +455,7 @@ This is now factored through the spectral-truncation step: first each effect is
 independently truncated to a projection, then the family is adjusted to form
 a valid submeasurement. The error compounds as `12 * √ζ`.
 -/
-lemma roundAlmostProjectiveMeasurement {Outcome : Type _}
+lemma roundAlmostProjectiveMeasurement {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState) (A : Measurement Outcome) (ζ : Error) :
     AlmostProjectiveMeasurementStatement ψ A ζ →

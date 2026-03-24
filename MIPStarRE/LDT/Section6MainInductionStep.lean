@@ -152,21 +152,21 @@ noncomputable def averagedSlicePointEvaluationOperator (params : Parameters)
 embedding once the bipartite matrix API is available.
 NOTE: duplicated from Section10CommutativityPoints; should be factored into a shared
 utility once the import graph permits it. -/
-def leftPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
+def leftPlacedSubMeasurement {α : Type*} (A : SubMeasurement α) : SubMeasurement α where
   name := s!"{A.name}.left"
   outcomeOperator := fun a => leftTensor (A.outcomeOperator a)
   totalOperator := leftTensor A.totalOperator
 
 /-- TODO(tensor): replace this placeholder right placement by an honest tensor-product
 embedding once the bipartite matrix API is available. -/
-def rightPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
+def rightPlacedSubMeasurement {α : Type*} (A : SubMeasurement α) : SubMeasurement α where
   name := s!"{A.name}.right"
   outcomeOperator := fun a => rightTensor (A.outcomeOperator a)
   totalOperator := rightTensor A.totalOperator
 
 /-- TODO(tensor): this uses the placeholder `leftTensor` / `rightTensor` embeddings until
 the project has an honest bipartite operator API. -/
-noncomputable def tensorFailureExpectation {Outcome : Type _}
+noncomputable def tensorFailureExpectation {Outcome : Type*}
     (ψ : QuantumState) (Z : Operator) (H : SubMeasurement Outcome) : Error :=
   expectationValue ψ <|
     operatorMul
