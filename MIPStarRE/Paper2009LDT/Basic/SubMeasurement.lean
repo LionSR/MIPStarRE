@@ -1,5 +1,4 @@
 import MIPStarRE.Paper2009LDT.Basic.Operator
-import MIPStarRE.Paper2009LDT.Basic.Distribution
 
 namespace MIPStarRE.Paper2009LDT
 
@@ -85,12 +84,6 @@ noncomputable def postprocess {α β : Type _} (A : SubMeasurement α) (f : α �
       outcomeOperator := fun _ => zeroLike A.totalOperator
       totalOperator := A.totalOperator
     }
-
-/-- Post-process an indexed family questionwise. -/
-noncomputable def postprocessIndexedSubMeasurement {Question α β : Type _}
-    (A : IndexedSubMeasurement Question α) (f : α → β) :
-    IndexedSubMeasurement Question β :=
-  fun q => postprocess (A q) f
 
 /-- Complete a submeasurement by adjoining a distinguished failure outcome. -/
 def completeSubMeasurement {α : Type _} (A : SubMeasurement α) : Measurement (Option α) where

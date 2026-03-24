@@ -1,5 +1,7 @@
 import MIPStarRE.Paper2009LDT.Basic.Parameters
 
+open scoped BigOperators
+
 namespace MIPStarRE.Paper2009LDT
 
 /-- Placeholder for a probability distribution, now with an explicit finite support list
