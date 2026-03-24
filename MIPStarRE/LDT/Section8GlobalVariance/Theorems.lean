@@ -8,6 +8,7 @@ open MIPStarRE.LDT.Section7ExpansionHypercubeGraph
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 
+/-- Output package for `lem:generalize-b`. -/
 structure GeneralizeBStatement (params : Parameters)
     (strategy : SymmetricStrategy params)
     (G : SubMeasurement (Polynomial params)) : Prop where
