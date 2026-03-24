@@ -147,7 +147,7 @@ noncomputable def diagonalLineProductOrdered (params : Parameters)
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
     rightPlacedSubMeasurement <|
       orderedProductSubMeasurement
-        s!"pointComm.lineOrdered({Lv.name},{Lu.name})" Lv Lu
+        s!"pointComm.lineOrdered({Lu.name},{Lv.name})" Lu Lv
 
 /-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] L^ℓ_[f(v)=b])`. -/
 noncomputable def diagonalLineProductReversed (params : Parameters)
@@ -173,8 +173,13 @@ noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
     let tv := q.2.2
     let Av := (strategy.pointMeasurement (ℓ.pointAt tv)).toSubMeasurement
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
-    tensorProductSubMeasurement
-      s!"pointComm.mixedRight({Av.name},{Lu.name})" Av Lu
+    { name := s!"pointComm.mixedRight({Av.name},{Lu.name})"
+      outcomeOperator := fun ab =>
+        formalProduct (leftTensor (Av.outcomeOperator ab.2))
+          (rightTensor (Lu.outcomeOperator ab.1))
+      totalOperator :=
+        formalProduct (leftTensor Av.totalOperator)
+          (rightTensor Lu.totalOperator) }
 
 /-- The intermediate consistency loss coming from the `m`-restricted diagonal-lines test. -/
 def restrictedDiagonalLinesConsistencyError (params : Parameters) (gamma : Error) : Error :=
