@@ -68,11 +68,6 @@ def independentPointPair (params : Parameters) : Distribution (Point params × P
 def formalZeroOperator : Operator :=
   { name := "0" }
 
-/-- A formal identity operator labelled by the ambient space. -/
-def identityOperator (label : String) (dim : ℕ := 1) : Operator where
-  name := s!"I[{label}]"
-  dim := dim
-  matrix := 1
 
 /-- Formal adjoint of an operator expression.
 Propagates `dim` from the input; matrix-level conjugate transpose

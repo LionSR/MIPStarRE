@@ -65,9 +65,10 @@ noncomputable def expectationValue (ψ : QuantumState) (X : Operator) : Error :=
 structure PositiveSemidefinite (Z : Operator) : Prop where
   nonnegative : 0 ≤ Z.matrix
 
-/-- The identity operator. -/
-def identityOperator : Operator where
-  name := "I"
+/-- The identity operator, optionally labelled by the ambient space. -/
+def identityOperator (label : String := "") (dim : ℕ := 1) : Operator where
+  name := if label == "" then "I" else s!"I[{label}]"
+  dim := dim
   matrix := 1
 
 /-- Operator difference, computed concretely when dimensions match. -/
