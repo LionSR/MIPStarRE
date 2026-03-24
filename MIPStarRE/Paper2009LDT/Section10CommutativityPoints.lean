@@ -174,9 +174,12 @@ noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
     let Av := (strategy.pointMeasurement (ℓ.pointAt tv)).toSubMeasurement
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
     { name := s!"pointComm.mixedRight({Av.name},{Lu.name})"
-      outcomeOperator := fun | (a, b) =>
-        formalProduct (leftTensor (Av.outcomeOperator b)) (rightTensor (Lu.outcomeOperator a))
-      totalOperator := formalProduct (leftTensor Av.totalOperator) (rightTensor Lu.totalOperator) }
+      outcomeOperator := fun ab =>
+        formalProduct (leftTensor (Av.outcomeOperator ab.2))
+          (rightTensor (Lu.outcomeOperator ab.1))
+      totalOperator :=
+        formalProduct (leftTensor Av.totalOperator)
+          (rightTensor Lu.totalOperator) }
 
 /-- The intermediate consistency loss coming from the `m`-restricted diagonal-lines test. -/
 def restrictedDiagonalLinesConsistencyError (params : Parameters) (gamma : Error) : Error :=
