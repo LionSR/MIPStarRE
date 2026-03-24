@@ -271,7 +271,18 @@ def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type _}
     formalProduct
       (normalizationConditionSandwichedTotalOperator P Q a)
       (formalAdjoint (normalizationConditionSandwichedTotalOperator P Q a))
-  totalOperator := { name := s!"normSquare({P.name},{Q.toSubMeasurement.name})" }
+  totalOperator := by
+    classical
+    if h : Nonempty (Fintype OutcomeA) then
+      letI : Fintype OutcomeA := Classical.choice h
+      exact sumOperatorList P.totalOperator
+        (Finset.univ.toList.map (fun a =>
+          formalProduct
+            (normalizationConditionSandwichedTotalOperator P Q a)
+            (formalAdjoint (normalizationConditionSandwichedTotalOperator P Q a))))
+    else
+      exact { name := s!"normSquare({P.name},{Q.toSubMeasurement.name})"
+              dim := P.totalOperator.dim }
 
 /-- The family `a ↦ (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
 def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type _}
@@ -282,7 +293,18 @@ def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type _}
     formalProduct
       (formalAdjoint (normalizationConditionSandwichedTotalOperator P Q a))
       (normalizationConditionSandwichedTotalOperator P Q a)
-  totalOperator := { name := s!"normAdjointSquare({P.name},{Q.toSubMeasurement.name})" }
+  totalOperator := by
+    classical
+    if h : Nonempty (Fintype OutcomeA) then
+      letI : Fintype OutcomeA := Classical.choice h
+      exact sumOperatorList P.totalOperator
+        (Finset.univ.toList.map (fun a =>
+          formalProduct
+            (formalAdjoint (normalizationConditionSandwichedTotalOperator P Q a))
+            (normalizationConditionSandwichedTotalOperator P Q a)))
+    else
+      exact { name := s!"normAdjointSquare({P.name},{Q.toSubMeasurement.name})"
+              dim := P.totalOperator.dim }
 
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type _}

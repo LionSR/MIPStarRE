@@ -37,8 +37,9 @@ abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) := Point params ×
 abbrev VerticalLineQuestion (params : Parameters) := Point params
 
 /-- TODO: this should be the operator-polynomial tail construction from `lem:chernoff-bernoulli-matrix`. -/
-def bernoulliTailOperator (k d : ℕ) (X : Operator) : Operator :=
-  { name := s!"BernoulliTail(k={k},d={d}; {X.name}^r (I-{X.name})^(k-r))" }
+def bernoulliTailOperator (k d : ℕ) (X : Operator) : Operator where
+  name := s!"BernoulliTail(k={k},d={d}; {X.name}^r (I-{X.name})^(k-r))"
+  dim := X.dim
 
 /-- Add a descriptive tag to a paper-local submeasurement placeholder. -/
 def tagSubMeasurement {α : Type _} (tag : String) (A : SubMeasurement α) : SubMeasurement α where
