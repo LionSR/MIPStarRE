@@ -47,12 +47,12 @@ def polynomialWeightOperator (params : Parameters)
   G.outcomeOperator g
 
 /-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`. -/
-def polynomialWeightSqrtOperator (params : Parameters)
+noncomputable def polynomialWeightSqrtOperator (params : Parameters)
     (G : SubMeasurement (Polynomial params)) (g : Polynomial params) : Operator :=
   formalSquareRoot (polynomialWeightOperator params G g)
 
 /-- The weighted state `|ψ_g⟩ = (I ⊗ G_g^{1/2}) |ψ⟩`. -/
-def weightedPolynomialState (params : Parameters)
+noncomputable def weightedPolynomialState (params : Parameters)
     (strategy : SymmetricStrategy params)
     (G : SubMeasurement (Polynomial params)) (g : Polynomial params) : QuantumState :=
   { name :=
@@ -71,7 +71,7 @@ def pointConditionedOperatorFamilyAtPolynomial (params : Parameters)
   fun u => pointConditionedOutcomeOperatorAtPolynomial params strategy g u
 
 /-- The paper's weighted operator `A^u_{g(u)} ⊗ (G_g)^{1/2}`. -/
-def weightedPointConditionedOperatorAtPolynomial (params : Parameters)
+noncomputable def weightedPointConditionedOperatorAtPolynomial (params : Parameters)
     (strategy : SymmetricStrategy params)
     (G : SubMeasurement (Polynomial params))
     (g : Polynomial params) (u : Point params) : Operator :=
@@ -131,7 +131,7 @@ def generalizeBRightOperatorAtPolynomial (params : Parameters)
   { name := s!"{(strategy.axisParallelMeasurement ℓ).toSubMeasurement.name}[g|ell]" }
 
 /-- The weighted left operator in `lem:generalize-b`. -/
-def weightedGeneralizeBLeftOperatorAtPolynomial (params : Parameters)
+noncomputable def weightedGeneralizeBLeftOperatorAtPolynomial (params : Parameters)
     (strategy : SymmetricStrategy params)
     (G : SubMeasurement (Polynomial params))
     (g : Polynomial params)
@@ -141,7 +141,7 @@ def weightedGeneralizeBLeftOperatorAtPolynomial (params : Parameters)
     (polynomialWeightSqrtOperator params G g)
 
 /-- The weighted right operator in `lem:generalize-b`. -/
-def weightedGeneralizeBRightOperatorAtPolynomial (params : Parameters)
+noncomputable def weightedGeneralizeBRightOperatorAtPolynomial (params : Parameters)
     (strategy : SymmetricStrategy params)
     (G : SubMeasurement (Polynomial params))
     (g : Polynomial params)

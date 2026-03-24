@@ -69,46 +69,63 @@ def formalZeroOperator : Operator :=
   { name := "0" }
 
 /-- A formal identity operator labelled by the ambient space. -/
-def identityOperator (label : String) : Operator where
+def identityOperator (label : String) (dim : ℕ := 1) : Operator where
   name := s!"I[{label}]"
+  dim := dim
   matrix := 1
 
 /-- Formal adjoint of an operator expression.
 Propagates `dim` from the input; matrix-level conjugate transpose
 is deferred to the concrete `operatorMul`/`castOp` layer. -/
-def formalAdjoint (X : Operator) : Operator where
+noncomputable def formalAdjoint (X : Operator) : Operator where
   name := s!"({X.name})^*"
   dim := X.dim
+  matrix := X.matrixᴴ
 
 /-- Formal product of two operator expressions.
-Propagates `dim` from the left operand. -/
-def formalProduct (X Y : Operator) : Operator where
-  name := s!"({X.name})*({Y.name})"
-  dim := X.dim
+Propagates `dim` from the left operand and computes the matrix product. -/
+noncomputable def formalProduct (X Y : Operator) : Operator :=
+  if h : X.dim = Y.dim then
+    { name := s!"({X.name})*({Y.name})"
+      dim := X.dim
+      matrix := X.matrix * castOp h.symm Y.matrix }
+  else
+    { name := s!"({X.name})*({Y.name})"
+      dim := X.dim
+      matrix := X.matrix }
 
 /-- Formal difference of two operator expressions.
-Propagates `dim` from the left operand. -/
-def formalDifference (X Y : Operator) : Operator where
-  name := s!"({X.name})-({Y.name})"
-  dim := X.dim
+Propagates `dim` from the left operand and computes the matrix difference. -/
+noncomputable def formalDifference (X Y : Operator) : Operator :=
+  if h : X.dim = Y.dim then
+    { name := s!"({X.name})-({Y.name})"
+      dim := X.dim
+      matrix := X.matrix - castOp h.symm Y.matrix }
+  else
+    { name := s!"({X.name})-({Y.name})"
+      dim := X.dim
+      matrix := X.matrix }
 
 /-- Formal square of an operator expression.
-Propagates `dim` from the input. -/
-def formalSquare (X : Operator) : Operator where
+Propagates `dim` from the input and computes the matrix square. -/
+noncomputable def formalSquare (X : Operator) : Operator where
   name := s!"({X.name})^2"
   dim := X.dim
+  matrix := X.matrix * X.matrix
 
 /-- Formal square root of an operator expression.
-Propagates `dim`; the matrix square root is not computed. -/
-def formalSquareRoot (X : Operator) : Operator where
+Propagates `dim` and matrix; the matrix square root is not computed. -/
+noncomputable def formalSquareRoot (X : Operator) : Operator where
   name := s!"sqrt({X.name})"
   dim := X.dim
+  matrix := X.matrix
 
 /-- Formal scalar multiplication of an operator expression.
-Propagates `dim` from the input. -/
-def formalScale (_c : Error) (X : Operator) : Operator where
+Propagates `dim` and matrix from the input. -/
+noncomputable def formalScale (_c : Error) (X : Operator) : Operator where
   name := s!"scalar•({X.name})"
   dim := X.dim
+  matrix := X.matrix
 
 /-- Apply a formal operator to a formal vector. -/
 def applyOperatorToVector (T : Operator) (v : HypercubeVector) : HypercubeVector :=
@@ -211,7 +228,7 @@ def laplacianDifferenceForm (params : Parameters) : Operator :=
   { name := s!"0.5*E_edge[(|u>-|v>)(<u|-<v|)]({params.m},{params.q})" }
 
 /-- The squared difference operator `(A^u - A^v)^2`. -/
-def pointDifferenceSquaredOperator {params : Parameters}
+noncomputable def pointDifferenceSquaredOperator {params : Parameters}
     (A : Point params → Operator) (u v : Point params) : Operator :=
   formalSquare (formalDifference (A u) (A v))
 
@@ -295,7 +312,7 @@ structure GlobalVarianceDecomposition (params : Parameters)
   deriving Inhabited
 
 /-- The trace witness from `lem:global-rewrite`. -/
-def globalVarianceTraceWitness (params : Parameters)
+noncomputable def globalVarianceTraceWitness (params : Parameters)
     (_A : Point params → Operator) (ψ : QuantumState)
     (decomp : GlobalVarianceDecomposition params _A) : Operator :=
   formalProduct

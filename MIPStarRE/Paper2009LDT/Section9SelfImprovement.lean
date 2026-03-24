@@ -72,7 +72,7 @@ def sdpComplementarySlacknessEquation (params : Parameters)
     formalProduct (T.outcomeOperator g) (averagedPointOperator params strategy g)
 
 /-- The pointwise sandwiched operator `H^u_h = A^u_{h(u)} T_h A^u_{h(u)}`. -/
-def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
+noncomputable def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
     (strategy : SymmetricStrategy params)
     (T : Measurement (Polynomial params))
     (u : Point params) (h : Polynomial params) : Operator :=
@@ -468,7 +468,7 @@ noncomputable def helperBoundednessGap (params : Parameters)
     (helperBoundednessOperator params strategy H Z)
 
 /-- The projective-stage residual operator `Z ⊗ (I - H)`. -/
-def projectiveResidualOperator (params : Parameters)
+noncomputable def projectiveResidualOperator (params : Parameters)
     (H : ProjectiveSubMeasurement (Polynomial params))
     (Z : Operator) : Operator :=
   formalTensor Z
