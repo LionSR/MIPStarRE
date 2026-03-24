@@ -49,7 +49,7 @@ def polynomialWeightOperator (params : Parameters)
 /-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`. -/
 noncomputable def polynomialWeightSqrtOperator (params : Parameters)
     (G : SubMeasurement (Polynomial params)) (g : Polynomial params) : Operator :=
-  formalSquareRoot (polynomialWeightOperator params G g)
+  operatorSquareRoot (polynomialWeightOperator params G g)
 
 /-- The weighted state `|ψ_g⟩ = (I ⊗ G_g^{1/2}) |ψ⟩`. -/
 noncomputable def weightedPolynomialState (params : Parameters)
@@ -158,8 +158,8 @@ noncomputable def generalizeBDeviationAtPolynomial (params : Parameters)
   averageOverDistribution (axisParallelLineQuestionDistribution params)
     (fun qu =>
       operatorExpectation strategy.state
-        (formalSquare
-          (formalDifference
+        (operatorSquare
+          (operatorDifference
             (weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu)
             (weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu))))
 
@@ -256,8 +256,8 @@ noncomputable def localVarianceDeviationAtPolynomial (params : Parameters)
   placeholderAverageOverDistribution (rerandomizeCoord params)
     (fun uv =>
       operatorExpectation strategy.state
-        (formalSquare
-          (formalDifference
+        (operatorSquare
+          (operatorDifference
             (weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
             (weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2))))
 
@@ -269,8 +269,8 @@ noncomputable def globalVarianceDeviationAtPolynomial (params : Parameters)
   placeholderAverageOverDistribution (independentPointPair params)
     (fun uv =>
       operatorExpectation strategy.state
-        (formalSquare
-          (formalDifference
+        (operatorSquare
+          (operatorDifference
             (weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
             (weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2))))
 
