@@ -258,20 +258,14 @@ noncomputable def globalVarianceTraceForm (params : Parameters)
     operatorTrace (globalVarianceTraceWitness params A ψ decomp)
 
 /-- The number of nonzero coordinates of a frequency `α ∈ F_q^m`. -/
-noncomputable def frequencyWeight (params : Parameters) (α : Point params) : ℕ := by
-  classical
-  by_cases hq : 0 < params.q
-  · exact (Finset.univ.filter (fun i : Fin params.m => α i ≠ ⟨0, hq⟩)).card
-  · exact 0
+noncomputable def frequencyWeight (params : Parameters) (α : Point params) : ℕ :=
+  (Finset.univ.filter (fun i : Fin params.m => α i ≠ ⟨0, params.hq⟩)).card
 
 /-- The number of nonzero coordinates of `α` is at most `m`. -/
 lemma frequencyWeight_le_m (params : Parameters) (α : Point params) :
     frequencyWeight params α ≤ params.m := by
-  unfold frequencyWeight
-  split_ifs with hq
-  · exact le_trans (Finset.card_filter_le _ _)
-      (by simp [Finset.card_univ, Fintype.card_fin])
-  · exact Nat.zero_le _
+  exact le_trans (Finset.card_filter_le _ _)
+    (by simp [Finset.card_univ, Fintype.card_fin])
 
 /-- The exact inner-product formula for the hypercube Fourier basis. -/
 def fourierBasisInnerProduct (params : Parameters)
@@ -563,7 +557,7 @@ theorem laplacianSpectralGap (params : Parameters) :
       exact_mod_cast (pow_pos params.hq params.m).ne'
     have hw := frequencyWeight_le_m params α
     rw [Nat.cast_sub hw]
-    field_simp
+    field_simp [hm, hM]
     ring
   positiveModesLowerBound := by
     intro α hα
