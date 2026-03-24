@@ -107,14 +107,25 @@ noncomputable def fallbackInterpolatedPolynomial (params : Parameters) : Polynom
     intro i
     sorry
 
-/-- TODO: paper defines `H_h` by summing sandwiched outcomes with `|τ| ≥ d+1` and matching restriction; this recursively picks the first non-none slice as a stand-in. -/
+/-- Count how many completed slice outcomes are genuine (non-`⊥`) polynomial slices. -/
+noncomputable def nonBottomSliceCount {params : Parameters} {k : ℕ}
+    (gs : GHatTupleOutcome params k) : ℕ := by
+  classical
+  exact (Finset.univ.filter fun i => Option.isSome (gs i)).card
+
+/-- TODO: paper defines `H_h` by interpolating from available slices once `|τ| ≥ d+1`.
+This scaffold now enforces the `|τ| ≥ d+1` threshold before interpolation, but still
+uses a first-available slice stand-in instead of the honest interpolation formula. -/
 noncomputable def interpolateCompletedSlices (params : Parameters) :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
   | 0, _xs, _gs => fallbackInterpolatedPolynomial params
   | k + 1, xs, gs =>
-      match gs 0 with
-      | some g => Polynomial.appendAtHeight params g (xs 0)
-      | none => interpolateCompletedSlices params k (pointTupleTail xs) (gHatTupleOutcomeTail gs)
+      if params.d + 1 ≤ nonBottomSliceCount gs then
+        match gs 0 with
+        | some g => Polynomial.appendAtHeight params g (xs 0)
+        | none => interpolateCompletedSlices params k (pointTupleTail xs) (gHatTupleOutcomeTail gs)
+      else
+        fallbackInterpolatedPolynomial params
 
 /-- Aggregate the polynomial outcomes of `G^x` into its complete part `G^x`. -/
 def completePartSubMeasurement (params : Parameters)
