@@ -47,9 +47,11 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
             ((data.left x).toSubMeasurement)
             ((data.right y).toSubMeasurement) a b
   /-- The lifted left measurements are projective (PVMs). -/
+  -- TODO: these are tautological placeholders, need real projectivity witnesses
   liftedLeftProjective :
     ∀ x : QuestionA, data.left x = data.left x
   /-- The lifted right measurements are projective (PVMs). -/
+  -- TODO: these are tautological placeholders, need real projectivity witnesses
   liftedRightProjective :
     ∀ y : QuestionB, data.right y = data.right y
   /-- Left and right lifted measurements commute on the lifted state, reflecting

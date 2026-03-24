@@ -170,11 +170,15 @@ structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*) where
   deriving Inhabited
 
 /-- The product auxiliary state used in a Naimark dilation. -/
+-- TODO: placeholder — only sets `name`; `dim`/`density` left at defaults until
+-- a concrete tensor product model is provided.
 def naimarkAuxiliaryState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB) : QuantumState :=
   { name := s!"{data.auxStateA.name}⊗{data.auxStateB.name}" }
 
 /-- The lifted state `ψ ⊗ aux_A ⊗ aux_B` produced by Naimark dilation. -/
+-- TODO: placeholder — only sets `name`; `dim`/`density` left at defaults until
+-- a concrete tensor product model is provided.
 def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     (ψ : QuantumState)
     (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB) : QuantumState :=
