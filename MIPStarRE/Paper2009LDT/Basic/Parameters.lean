@@ -1,5 +1,4 @@
 import Mathlib
-import Mathlib.FieldTheory.Finite.GaloisField
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
