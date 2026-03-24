@@ -164,6 +164,7 @@ noncomputable def diagonalLineProductReversed (params : Parameters)
     let tv := q.2.2
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
+    -- BUG: this is identical to diagonalLineProductOrdered, needs fix (see PR #46 review)
     rightPlacedSubMeasurement <|
       orderedProductSubMeasurement
         s!"pointComm.lineReversed({Lu.name},{Lv.name})" Lu Lv
