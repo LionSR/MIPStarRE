@@ -1,4 +1,4 @@
-import MIPStarRE.Paper2009LDT.Basic.Parameters
+import MIPStarRE.LDT.Basic.Parameters
 import MIPStarRE.Quantum.FiniteMatrix
 
 /-!
@@ -12,7 +12,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 noncomputable section
 
-namespace MIPStarRE.Paper2009LDT
+namespace MIPStarRE.LDT
 
 /-- A finite-dimensional bipartite state placeholder carrying an actual density matrix. -/
 structure QuantumState where
@@ -211,4 +211,4 @@ theorem expectationValue_sub (ψ : QuantumState) (X Y : Operator)
       show hXY.symm.trans hψX.symm = hψY.symm from Subsingleton.elim _ _,
       mul_sub, MIPStarRE.Quantum.normalizedTrace_sub, Complex.sub_re]
 
-end MIPStarRE.Paper2009LDT
+end MIPStarRE.LDT

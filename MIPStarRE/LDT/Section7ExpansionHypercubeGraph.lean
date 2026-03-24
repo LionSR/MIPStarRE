@@ -1,4 +1,4 @@
-import MIPStarRE.Paper2009LDT.Section6MainInductionStep
+import MIPStarRE.LDT.Section6MainInductionStep
 
 /-!
 Matching scaffold for Section 7 of the low individual degree paper in
@@ -9,10 +9,10 @@ variance comparison in a deliberately lightweight form, but now with explicit
 named quantities that mirror the formulas appearing in the paper.
 -/
 
-namespace MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
+namespace MIPStarRE.LDT.Section7ExpansionHypercubeGraph
 
-open MIPStarRE.Paper2009LDT
-open MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective
+open MIPStarRE.LDT
+open MIPStarRE.LDT.Section5MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- A lightweight placeholder for a vector in the hypercube Fourier basis. -/
@@ -642,4 +642,4 @@ lemma globalRewrite (params : Parameters)
     GlobalRewriteStatement params A ψ := by
   sorry
 
-end MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
+end MIPStarRE.LDT.Section7ExpansionHypercubeGraph

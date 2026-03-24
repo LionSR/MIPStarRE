@@ -1,4 +1,4 @@
-import MIPStarRE.Paper2009LDT.Section4Preliminaries
+import MIPStarRE.LDT.Section4Preliminaries
 import MIPStarRE.Quantum
 
 /-!
@@ -18,9 +18,9 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 noncomputable section
 
-namespace MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective
+namespace MIPStarRE.LDT.Section5MakingMeasurementsProjective
 
-open MIPStarRE.Paper2009LDT
+open MIPStarRE.LDT
 
 /-- A finite-dimensional Hilbert space represented by a finite index type. -/
 structure FiniteHilbertSpace where
@@ -464,4 +464,4 @@ lemma roundAlmostProjectiveMeasurement {Outcome : Type _}
           (roundingToProjectiveError ζ) := by
   sorry
 
-end MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective
+end MIPStarRE.LDT.Section5MakingMeasurementsProjective

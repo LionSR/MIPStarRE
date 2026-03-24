@@ -1,4 +1,4 @@
-import MIPStarRE.Paper2009LDT.Basic.Operator
+import MIPStarRE.LDT.Basic.Operator
 
 /-!
 # SubMeasurement infrastructure for the low individual degree test
@@ -9,7 +9,7 @@ indexed families, postprocessing, and completion.
 
 noncomputable section
 
-namespace MIPStarRE.Paper2009LDT
+namespace MIPStarRE.LDT
 
 /-- A paper-local submeasurement with outcomes in `α`. -/
 structure SubMeasurement (α : Type _) where
@@ -115,4 +115,4 @@ def constantSubMeasurementFamily {α : Type _} (A : SubMeasurement α) :
     IndexedSubMeasurement Unit α :=
   fun _ => A
 
-end MIPStarRE.Paper2009LDT
+end MIPStarRE.LDT

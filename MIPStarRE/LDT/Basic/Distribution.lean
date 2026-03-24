@@ -1,4 +1,4 @@
-import MIPStarRE.Paper2009LDT.Basic.Parameters
+import MIPStarRE.LDT.Basic.Parameters
 
 /-!
 # Distribution infrastructure for the low individual degree test
@@ -11,7 +11,7 @@ open scoped BigOperators
 
 noncomputable section
 
-namespace MIPStarRE.Paper2009LDT
+namespace MIPStarRE.LDT
 
 /-- Placeholder for a probability distribution, now with an explicit finite support list
 and real-valued weights. -/
@@ -59,4 +59,4 @@ noncomputable def sumOverOutcomesOrElse {α : Type _}
   else
     exact fallback
 
-end MIPStarRE.Paper2009LDT
+end MIPStarRE.LDT
