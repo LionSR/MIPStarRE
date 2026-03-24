@@ -435,16 +435,16 @@ def castOp {m n : ℕ} (h : m = n)
   cases h
   simpa using A
 
-theorem castOp_add {m n : ℕ} (h : m = n) (A B : Quantum.Op (HilbertIndex m)) :
+theorem castOp_add {m n : ℕ} (h : m = n) (A B : MIPStarRE.Quantum.Op (HilbertIndex m)) :
     castOp h (A + B) = castOp h A + castOp h B := by
   subst h; rfl
 
-theorem castOp_sub {m n : ℕ} (h : m = n) (A B : Quantum.Op (HilbertIndex m)) :
+theorem castOp_sub {m n : ℕ} (h : m = n) (A B : MIPStarRE.Quantum.Op (HilbertIndex m)) :
     castOp h (A - B) = castOp h A - castOp h B := by
   subst h; rfl
 
 theorem castOp_trans {l m n : ℕ} (h₁ : l = m) (h₂ : m = n)
-    (A : Quantum.Op (HilbertIndex l)) :
+    (A : MIPStarRE.Quantum.Op (HilbertIndex l)) :
     castOp h₂ (castOp h₁ A) = castOp (h₁.trans h₂) A := by
   subst h₁; subst h₂; rfl
 
@@ -629,7 +629,7 @@ theorem expectationValue_add (ψ : QuantumState) (X Y : Operator)
   rw [dif_pos hXY, dif_pos hψX, dif_pos hψX, dif_pos hψY,
       castOp_add hψX.symm, castOp_trans hXY.symm hψX.symm,
       show hXY.symm.trans hψX.symm = hψY.symm from Subsingleton.elim _ _,
-      mul_add, Quantum.normalizedTrace_add, Complex.add_re]
+      mul_add, MIPStarRE.Quantum.normalizedTrace_add, Complex.add_re]
 
 /-- `expectationValue` distributes over `operatorDifference` when dimensions match. -/
 theorem expectationValue_sub (ψ : QuantumState) (X Y : Operator)
@@ -641,7 +641,7 @@ theorem expectationValue_sub (ψ : QuantumState) (X Y : Operator)
   rw [dif_pos hXY, dif_pos hψX, dif_pos hψX, dif_pos hψY,
       castOp_sub hψX.symm, castOp_trans hXY.symm hψX.symm,
       show hXY.symm.trans hψX.symm = hψY.symm from Subsingleton.elim _ _,
-      mul_sub, Quantum.normalizedTrace_sub, Complex.sub_re]
+      mul_sub, MIPStarRE.Quantum.normalizedTrace_sub, Complex.sub_re]
 
 /-- A paper-local submeasurement with outcomes in `α`. -/
 structure SubMeasurement (α : Type _) where
