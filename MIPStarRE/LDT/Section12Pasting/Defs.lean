@@ -4,10 +4,10 @@ import MIPStarRE.LDT.Section11Commutativity
 Matching scaffold for Section 12 of the low individual degree paper in
 `references/ldt-paper/ld-pasting.tex`.
 
-This file still uses paper-local placeholders, but the main interfaces now name the
-relevant complete/incomplete parts of the slice family, the completed family
-`\widehat G`, the sandwich constructions, and the displayed error formulas that drive
-later pasting arguments.
+This file contains the core definitions, type abbreviations, utility operators, tuple
+helpers, interpolation, and basic `\widehat G` / part-family constructors used
+throughout the Section 12 pasting scaffold.  The displayed error formulas and
+statement structures live in `Section12Pasting/Statements.lean`.
 -/
 
 
