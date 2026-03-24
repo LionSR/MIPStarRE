@@ -1,15 +1,15 @@
-import MIPStarRE.Paper2009LDT.Section9SelfImprovement
+import MIPStarRE.LDT.Section9SelfImprovement
 
 /-!
 Matching scaffold for Section 10 of the low individual degree paper in
 `references/ldt-paper/commutativity-points.tex`.
 -/
 
-namespace MIPStarRE.Paper2009LDT.Section10CommutativityPoints
+namespace MIPStarRE.LDT.Section10CommutativityPoints
 
-open MIPStarRE.Paper2009LDT
-open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
-open MIPStarRE.Paper2009LDT.Section8GlobalVariance (PointPairQuestion)
+open MIPStarRE.LDT
+open MIPStarRE.LDT.Section7ExpansionHypercubeGraph
+open MIPStarRE.LDT.Section8GlobalVariance (PointPairQuestion)
 
 abbrev PointPairOutcome (params : Parameters) := Fq params × Fq params
 abbrev PointDiagonalLineQuestion (params : Parameters) := DiagonalLine params × Fq params
@@ -255,4 +255,4 @@ theorem commutativityPoints
     CommutativityPointsStatement params strategy eps delta gamma := by
   sorry
 
-end MIPStarRE.Paper2009LDT.Section10CommutativityPoints
+end MIPStarRE.LDT.Section10CommutativityPoints

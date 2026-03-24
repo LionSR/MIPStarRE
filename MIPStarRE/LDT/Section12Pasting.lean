@@ -1,4 +1,4 @@
-import MIPStarRE.Paper2009LDT.Section11Commutativity
+import MIPStarRE.LDT.Section11Commutativity
 
 /-!
 Matching scaffold for Section 12 of the low individual degree paper in
@@ -10,11 +10,11 @@ relevant complete/incomplete parts of the slice family, the completed family
 later pasting arguments.
 -/
 
-namespace MIPStarRE.Paper2009LDT.Section12Pasting
+namespace MIPStarRE.LDT.Section12Pasting
 
-open MIPStarRE.Paper2009LDT
-open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
-open MIPStarRE.Paper2009LDT.Section10CommutativityPoints
+open MIPStarRE.LDT
+open MIPStarRE.LDT.Section7ExpansionHypercubeGraph
+open MIPStarRE.LDT.Section10CommutativityPoints
 
 noncomputable section
 
@@ -1128,4 +1128,4 @@ theorem ldPastingNCompleteness
 
 end
 
-end MIPStarRE.Paper2009LDT.Section12Pasting
+end MIPStarRE.LDT.Section12Pasting

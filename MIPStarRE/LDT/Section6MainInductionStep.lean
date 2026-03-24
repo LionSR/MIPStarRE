@@ -1,4 +1,4 @@
-import MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective
+import MIPStarRE.LDT.Section5MakingMeasurementsProjective
 
 /-!
 Matching scaffold for Section 6 of the low individual degree paper in
@@ -9,9 +9,9 @@ section-local self-improvement theorem, the section-local pasting theorem, and t
 restricted-strategy bookkeeping lemma.
 -/
 
-namespace MIPStarRE.Paper2009LDT.Section6MainInductionStep
+namespace MIPStarRE.LDT.Section6MainInductionStep
 
-open MIPStarRE.Paper2009LDT
+open MIPStarRE.LDT
 
 /-- Lift an axis-line answer from the restricted slice back to the ambient space. -/
 def liftAxisAnswer (params : Parameters) (x : Fq params) :
@@ -191,7 +191,7 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
     PolynomialMeasurementStronglySelfConsistent params strategy.state H.toSubMeasurement
       (selfImprovementInInductionError params eps delta gamma)
   selfCloseness :
-    MIPStarRE.Paper2009LDT.Section4Preliminaries.BipartiteStateDependentDistanceRel
+    MIPStarRE.LDT.Section4Preliminaries.BipartiteStateDependentDistanceRel
       strategy.state (uniformDistribution Unit)
       (constantSubMeasurementFamily (leftPlacedSubMeasurement H.toSubMeasurement))
       (constantSubMeasurementFamily (rightPlacedSubMeasurement H.toSubMeasurement))
@@ -352,4 +352,4 @@ lemma restrictedProbabilities
     RestrictedProbabilitiesStatement params strategy eps delta gamma := by
   sorry
 
-end MIPStarRE.Paper2009LDT.Section6MainInductionStep
+end MIPStarRE.LDT.Section6MainInductionStep

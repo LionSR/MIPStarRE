@@ -1,15 +1,15 @@
-import MIPStarRE.Paper2009LDT.Section10CommutativityPoints
+import MIPStarRE.LDT.Section10CommutativityPoints
 
 /-!
 Matching scaffold for Section 11 of the low individual degree paper in
 `references/ldt-paper/commutativity-G.tex`.
 -/
 
-namespace MIPStarRE.Paper2009LDT.Section11Commutativity
+namespace MIPStarRE.LDT.Section11Commutativity
 
-open MIPStarRE.Paper2009LDT
-open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
-open MIPStarRE.Paper2009LDT.Section10CommutativityPoints
+open MIPStarRE.LDT
+open MIPStarRE.LDT.Section7ExpansionHypercubeGraph
+open MIPStarRE.LDT.Section10CommutativityPoints
 
 noncomputable section
 
@@ -450,4 +450,4 @@ lemma normalizationCondition {OutcomeA OutcomeB : Type _}
 
 end
 
-end MIPStarRE.Paper2009LDT.Section11Commutativity
+end MIPStarRE.LDT.Section11Commutativity

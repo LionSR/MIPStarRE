@@ -11,7 +11,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 noncomputable section
 
-namespace MIPStarRE.Paper2009LDT
+namespace MIPStarRE.LDT
 
 abbrev Error := ℝ
 
@@ -406,4 +406,4 @@ noncomputable instance (params : Parameters) : Fintype (Polynomial params) := by
   classical
   sorry
 
-end MIPStarRE.Paper2009LDT
+end MIPStarRE.LDT

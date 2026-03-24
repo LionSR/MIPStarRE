@@ -1,4 +1,4 @@
-import MIPStarRE.Paper2009LDT.Section3Test
+import MIPStarRE.LDT.Section3Test
 
 /-!
 Matching scaffold for Section 4 of the low individual degree paper in
@@ -9,9 +9,9 @@ calculus of the paper and records the main proposition names with placeholder
 proofs.
 -/
 
-namespace MIPStarRE.Paper2009LDT.Section4Preliminaries
+namespace MIPStarRE.LDT.Section4Preliminaries
 
-open MIPStarRE.Paper2009LDT
+open MIPStarRE.LDT
 
 /-- `def:post-processing` in `preliminaries.tex`. -/
 noncomputable def postProcessing {α β : Type _} (A : SubMeasurement α) (f : α → β) :
@@ -300,4 +300,4 @@ theorem completingToMeasurement {Outcome : Type _}
         CompletingToMeasurementStatement ψ A B C a0 δ ζ := by
   sorry
 
-end MIPStarRE.Paper2009LDT.Section4Preliminaries
+end MIPStarRE.LDT.Section4Preliminaries

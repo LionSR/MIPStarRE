@@ -1,4 +1,4 @@
-import MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
+import MIPStarRE.LDT.Section7ExpansionHypercubeGraph
 
 /-!
 Matching scaffold for Section 8 of the low individual degree paper in
@@ -10,11 +10,11 @@ $A(g)^u = A^u_{g(u)}$, the weighted states $|ψ_g⟩ = (I ⊗ G_g^{1/2})|ψ⟩$,
 variance-transfer quantities that the paper bounds.
 -/
 
-namespace MIPStarRE.Paper2009LDT.Section8GlobalVariance
+namespace MIPStarRE.LDT.Section8GlobalVariance
 
-open MIPStarRE.Paper2009LDT
-open MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective
-open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
+open MIPStarRE.LDT
+open MIPStarRE.LDT.Section5MakingMeasurementsProjective
+open MIPStarRE.LDT.Section7ExpansionHypercubeGraph
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 abbrev AxisParallelLineQuestion (params : Parameters) :=
@@ -590,4 +590,4 @@ lemma globalVarianceOfPoints
     GlobalVarianceOfPointsStatement params strategy G eps delta := by
   sorry
 
-end MIPStarRE.Paper2009LDT.Section8GlobalVariance
+end MIPStarRE.LDT.Section8GlobalVariance

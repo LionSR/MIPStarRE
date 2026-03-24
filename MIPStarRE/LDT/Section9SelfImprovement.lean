@@ -1,4 +1,4 @@
-import MIPStarRE.Paper2009LDT.Section8GlobalVariance
+import MIPStarRE.LDT.Section8GlobalVariance
 
 /-!
 Matching scaffold for Section 9 of the low individual degree paper in
@@ -9,12 +9,12 @@ and the non-projective/projective self-improvement outputs through explicit name
 constructions and error terms.
 -/
 
-namespace MIPStarRE.Paper2009LDT.Section9SelfImprovement
+namespace MIPStarRE.LDT.Section9SelfImprovement
 
-open MIPStarRE.Paper2009LDT
-open MIPStarRE.Paper2009LDT.Section7ExpansionHypercubeGraph
-open MIPStarRE.Paper2009LDT.Section8GlobalVariance
-open MIPStarRE.Paper2009LDT.Section5MakingMeasurementsProjective
+open MIPStarRE.LDT
+open MIPStarRE.LDT.Section7ExpansionHypercubeGraph
+open MIPStarRE.LDT.Section8GlobalVariance
+open MIPStarRE.LDT.Section5MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- The identity operator on the polynomial register. -/
@@ -107,7 +107,7 @@ noncomputable def averagedSandwichedPolynomialSubMeasurement (params : Parameter
 noncomputable abbrev polynomialEvaluationFamily (params : Parameters)
     (H : SubMeasurement (Polynomial params)) :
     IndexedSubMeasurement (Point params) (Fq params) :=
-  MIPStarRE.Paper2009LDT.polynomialEvaluationFamily params H
+  MIPStarRE.LDT.polynomialEvaluationFamily params H
 
 /-- The variance error entering `lem:add-in-u`. -/
 noncomputable def selfImprovementVarianceError (params : Parameters)
@@ -663,4 +663,4 @@ theorem selfImprovementFromSubMeasurement
         eps delta gamma nu := by
   sorry
 
-end MIPStarRE.Paper2009LDT.Section9SelfImprovement
+end MIPStarRE.LDT.Section9SelfImprovement

@@ -1,7 +1,7 @@
-import MIPStarRE.Paper2009LDT.Basic.Parameters
-import MIPStarRE.Paper2009LDT.Basic.Operator
-import MIPStarRE.Paper2009LDT.Basic.Distribution
-import MIPStarRE.Paper2009LDT.Basic.SubMeasurement
+import MIPStarRE.LDT.Basic.Parameters
+import MIPStarRE.LDT.Basic.Operator
+import MIPStarRE.LDT.Basic.Distribution
+import MIPStarRE.LDT.Basic.SubMeasurement
 
 /-!
 Matching scaffold for Section 3 of the low individual degree paper in
@@ -25,7 +25,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 noncomputable section
 
-namespace MIPStarRE.Paper2009LDT
+namespace MIPStarRE.LDT
 
 /-- Evaluate a polynomial-valued submeasurement at a point. -/
 noncomputable def evaluateAt (params : Parameters) (u : Point params)
@@ -434,4 +434,4 @@ theorem mainFormal
 
 end Section3Test
 
-end MIPStarRE.Paper2009LDT
+end MIPStarRE.LDT
