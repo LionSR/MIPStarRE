@@ -336,7 +336,24 @@ def appendAtHeight (params : Parameters)
   poly := MvPolynomial.rename (embedCoord params) g.poly
   lowIndividualDegree := by
     intro i
-    sorry
+    have hinj : Function.Injective (embedCoord params) := by
+      intro a b h
+      simp only [embedCoord, Fin.mk.injEq] at h
+      exact Fin.ext h
+    by_cases h : i.val < params.m
+    · -- i is in the range of embedCoord: transfer the degree bound
+      have hi : embedCoord params ⟨i.val, h⟩ = i := by
+        ext; simp [embedCoord]
+      rw [← hi, MvPolynomial.degreeOf_rename_of_injective hinj]
+      exact g.lowIndividualDegree _
+    · -- i is not in the range: degreeOf = 0
+      suffices MvPolynomial.degreeOf i (MvPolynomial.rename (embedCoord params) g.poly) = 0 by
+        omega
+      rw [MvPolynomial.degreeOf, MvPolynomial.degrees_rename_of_injective hinj]
+      simp only [Multiset.count_eq_zero, Multiset.mem_map]
+      rintro ⟨b, _, hb⟩
+      simp only [embedCoord, Fin.ext_iff] at hb
+      omega
 
 /-- Coordinate map for restricting a polynomial in `m+1` variables to the slice `X_m = x`. -/
 def restrictAtHeightCoordinateMap (params : Parameters) (x : Fq params) :
