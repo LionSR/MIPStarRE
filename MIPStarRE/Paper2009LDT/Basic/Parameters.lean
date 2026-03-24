@@ -1,6 +1,4 @@
 import Mathlib
-import Mathlib.FieldTheory.Finite.GaloisField
-import MIPStarRE.Quantum.FiniteMatrix
 
 /-!
 # Basic parameters and types for the low individual degree test

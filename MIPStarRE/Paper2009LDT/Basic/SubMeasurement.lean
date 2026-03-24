@@ -1,5 +1,4 @@
 import MIPStarRE.Paper2009LDT.Basic.Operator
-import MIPStarRE.Paper2009LDT.Basic.Distribution
 
 /-!
 # SubMeasurement infrastructure for the low individual degree test
