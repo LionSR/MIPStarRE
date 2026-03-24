@@ -28,8 +28,8 @@ def leftOrderedProductSubMeasurement {α β : Type _}
 def appendRightTotalSubMeasurement {α : Type _}
     (tag : String) (A : SubMeasurement α) (X : Operator) : SubMeasurement α where
   name := s!"{A.name}.{tag}"
-  outcomeOperator := fun a => formalProduct (A.outcomeOperator a) X
-  totalOperator := formalProduct A.totalOperator X
+  outcomeOperator := fun a => operatorMul (A.outcomeOperator a) X
+  totalOperator := operatorMul A.totalOperator X
 
 /-- Sandwiched product `A_a B_b A_a`.
 
@@ -42,16 +42,16 @@ noncomputable def sandwichByOuterSubMeasurement {α β : Type _}
   outcomeOperator := fun ab =>
     match ab with
     | (a, b) =>
-        formalProduct (A.outcomeOperator a)
-          (formalProduct (B.outcomeOperator b) (A.outcomeOperator a))
+        operatorMul (A.outcomeOperator a)
+          (operatorMul (B.outcomeOperator b) (A.outcomeOperator a))
   totalOperator := by
     classical
     if h : Nonempty (Fintype α) then
       letI : Fintype α := Classical.choice h
       exact sumOperatorList A.totalOperator
         (Finset.univ.toList.map fun a =>
-          formalProduct (A.outcomeOperator a)
-            (formalProduct B.totalOperator (A.outcomeOperator a)))
+          operatorMul (A.outcomeOperator a)
+            (operatorMul B.totalOperator (A.outcomeOperator a)))
     else
       exact
         { name := s!"TODO(sumSandwiches:{label})"
@@ -268,18 +268,18 @@ def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type _}
     SubMeasurement OutcomeA where
   name := s!"normSquareFamily({P.name},{Q.toSubMeasurement.name})"
   outcomeOperator := fun a =>
-    formalProduct
+    operatorMul
       (normalizationConditionSandwichedTotalOperator P Q a)
-      (formalAdjoint (normalizationConditionSandwichedTotalOperator P Q a))
+      (operatorAdjoint (normalizationConditionSandwichedTotalOperator P Q a))
   totalOperator := by
     classical
     if h : Nonempty (Fintype OutcomeA) then
       letI : Fintype OutcomeA := Classical.choice h
       exact sumOperatorList P.totalOperator
         (Finset.univ.toList.map (fun a =>
-          formalProduct
+          operatorMul
             (normalizationConditionSandwichedTotalOperator P Q a)
-            (formalAdjoint (normalizationConditionSandwichedTotalOperator P Q a))))
+            (operatorAdjoint (normalizationConditionSandwichedTotalOperator P Q a))))
     else
       exact { name := s!"normSquare({P.name},{Q.toSubMeasurement.name})"
               dim := P.totalOperator.dim }
@@ -290,8 +290,8 @@ def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type _}
     SubMeasurement OutcomeA where
   name := s!"normAdjointSquareFamily({P.name},{Q.toSubMeasurement.name})"
   outcomeOperator := fun a =>
-    formalProduct
-      (formalAdjoint (normalizationConditionSandwichedTotalOperator P Q a))
+    operatorMul
+      (operatorAdjoint (normalizationConditionSandwichedTotalOperator P Q a))
       (normalizationConditionSandwichedTotalOperator P Q a)
   totalOperator := by
     classical
@@ -299,8 +299,8 @@ def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type _}
       letI : Fintype OutcomeA := Classical.choice h
       exact sumOperatorList P.totalOperator
         (Finset.univ.toList.map (fun a =>
-          formalProduct
-            (formalAdjoint (normalizationConditionSandwichedTotalOperator P Q a))
+          operatorMul
+            (operatorAdjoint (normalizationConditionSandwichedTotalOperator P Q a))
             (normalizationConditionSandwichedTotalOperator P Q a)))
     else
       exact { name := s!"normAdjointSquare({P.name},{Q.toSubMeasurement.name})"

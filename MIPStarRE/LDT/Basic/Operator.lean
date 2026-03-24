@@ -109,6 +109,12 @@ def operatorAdjoint (X : Operator) : Operator :=
     dim := X.dim
     matrix := X.matrix.conjTranspose }
 
+/-- Operator square, computed concretely. -/
+def operatorSquare (X : Operator) : Operator :=
+  { name := s!"({X.name})²"
+    dim := X.dim
+    matrix := X.matrix * X.matrix }
+
 /-- A concrete sandwich operator `L X R`, computed when the dimensions align. -/
 def operatorSandwich (L X R : Operator) : Operator :=
   if hLX : L.dim = X.dim then
