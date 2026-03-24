@@ -58,6 +58,11 @@ theorem normalizedTrace_add (A B : Op d) :
   classical
   simp [normalizedTrace, Matrix.trace_add, add_div]
 
+theorem normalizedTrace_sub (A B : Op d) :
+    normalizedTrace (A - B) = normalizedTrace A - normalizedTrace B := by
+  classical
+  simp [normalizedTrace, Matrix.trace_sub, sub_div]
+
 theorem normalizedTrace_sum {ι : Type*} (s : Finset ι) (f : ι → Op d) :
     normalizedTrace (∑ i ∈ s, f i) = ∑ i ∈ s, normalizedTrace (f i) := by
   classical
