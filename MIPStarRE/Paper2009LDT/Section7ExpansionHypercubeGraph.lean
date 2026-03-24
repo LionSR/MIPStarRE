@@ -114,18 +114,19 @@ noncomputable def formalSquare (X : Operator) : Operator where
   matrix := X.matrix * X.matrix
 
 /-- Formal square root of an operator expression.
-Propagates `dim` and matrix; the matrix square root is not computed. -/
+Propagates `dim`; matrix square root is not computed (placeholder).
+TODO: compute actual matrix square root when Mathlib provides it. -/
 noncomputable def formalSquareRoot (X : Operator) : Operator where
   name := s!"sqrt({X.name})"
   dim := X.dim
   matrix := X.matrix
 
 /-- Formal scalar multiplication of an operator expression.
-Propagates `dim` and matrix from the input. -/
-noncomputable def formalScale (_c : Error) (X : Operator) : Operator where
+Propagates `dim` and applies the scalar to the matrix. -/
+noncomputable def formalScale (c : Error) (X : Operator) : Operator where
   name := s!"scalar•({X.name})"
   dim := X.dim
-  matrix := X.matrix
+  matrix := (c : ℂ) • X.matrix
 
 /-- Apply a formal operator to a formal vector. -/
 def applyOperatorToVector (T : Operator) (v : HypercubeVector) : HypercubeVector :=
