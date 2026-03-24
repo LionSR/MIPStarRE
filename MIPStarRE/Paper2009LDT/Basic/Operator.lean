@@ -1,4 +1,5 @@
 import MIPStarRE.Paper2009LDT.Basic.Parameters
+import MIPStarRE.Quantum.FiniteMatrix
 
 /-!
 # Operator infrastructure for the low individual degree test
