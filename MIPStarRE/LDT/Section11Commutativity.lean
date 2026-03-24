@@ -1,2 +1,1 @@
-import MIPStarRE.LDT.Section11Commutativity.Defs
 import MIPStarRE.LDT.Section11Commutativity.Theorems

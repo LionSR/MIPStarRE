@@ -229,6 +229,7 @@ def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type*}
       dim := pa.dim
       matrix := (castOp h qb.matrix) * pa.matrix * (castOp h qb.matrix) }
   else
+    -- TODO: dim-mismatch fallback is placeholder
     { name := s!"({qb.name})*({pa.name})*({qb.name})"
       dim := pa.dim }
 
@@ -318,6 +319,7 @@ def normalizationConditionAdjointSquareOperator {OutcomeA OutcomeB : Type*}
 /-- The identity bound appearing in `lem:normalization-condition`. -/
 def normalizationConditionIdentityBound {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB) : Operator :=
+  -- TODO: identityOperator dim should match normalizationConditionSquareOperator
   identityOperator s!"normalization({P.name},{Q.toSubMeasurement.name})"
 
 end
