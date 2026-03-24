@@ -1,5 +1,11 @@
 import MIPStarRE.LDT.Section7ExpansionHypercubeGraph.MatrixRealization
 
+/-!
+# Section 7 — Theorems
+
+Output structures and theorem statements for the expansion / variance lemmas.
+-/
+
 namespace MIPStarRE.LDT.Section7ExpansionHypercubeGraph
 
 open MIPStarRE.LDT

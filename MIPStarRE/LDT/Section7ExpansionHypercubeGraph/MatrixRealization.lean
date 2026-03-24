@@ -1,5 +1,12 @@
 import MIPStarRE.LDT.Section7ExpansionHypercubeGraph.Defs
 
+/-!
+# Section 7 — Matrix realization
+
+Concrete finite-dimensional matrix realizations of the hypercube
+variance operators and spectral structures from `Defs`.
+-/
+
 namespace MIPStarRE.LDT.Section7ExpansionHypercubeGraph
 
 open MIPStarRE.LDT
@@ -43,6 +50,7 @@ def hypercubeEdgePairFinset (params : Parameters) : Finset (Point params × Poin
   Finset.univ.filter (fun uv => IsHypercubeEdge params uv.1 uv.2)
 
 /-- Bridge to the nonuniform hypercube edge distribution from the source. -/
+-- TODO: placeholder — returns `rerandomizeCoord` but should be the actual nonuniform distribution
 def matrixHypercubeEdgeDistribution (params : Parameters) :
     Distribution (Point params × Point params) :=
   rerandomizeCoord params
