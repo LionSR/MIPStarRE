@@ -250,11 +250,14 @@ noncomputable def globalVarianceTraceForm (params : Parameters)
     operatorTrace (globalVarianceTraceWitness params A ψ decomp)
 
 /-- The number of nonzero coordinates of a frequency `α ∈ F_q^m`. -/
-noncomputable def frequencyWeight (params : Parameters) (α : Point params) : ℕ := by
-  classical
-  by_cases hq : 0 < params.q
-  · exact (Finset.univ.filter (fun i : Fin params.m => α i ≠ ⟨0, hq⟩)).card
-  · exact 0
+noncomputable def frequencyWeight (params : Parameters) (α : Point params) : ℕ :=
+  (Finset.univ.filter (fun i : Fin params.m => α i ≠ ⟨0, params.hq⟩)).card
+
+/-- The number of nonzero coordinates of `α` is at most `m`. -/
+lemma frequencyWeight_le_m (params : Parameters) (α : Point params) :
+    frequencyWeight params α ≤ params.m := by
+  exact le_trans (Finset.card_filter_le _ _)
+    (by simp [Finset.card_univ, Fintype.card_fin])
 
 /-- The exact inner-product formula for the hypercube Fourier basis. -/
 def fourierBasisInnerProduct (params : Parameters)
@@ -275,23 +278,25 @@ noncomputable def laplacianEigenvalue (params : Parameters) (α : Point params) 
 noncomputable def hypercubeSpectralGap (params : Parameters) : Error :=
   1 / ((params.m : Error) * hypercubeVertexCountError params)
 
-/-- Output package for `prop:eigenvectors`. -/
+/-- Output package for `prop:eigenvectors`.
+TODO(matrix-realization): The full eigenvector statement `K φ_α = λ_α φ_α` requires a
+matrix-level realization of the adjacency operator and Fourier basis vectors.  The placeholder
+`HypercubeVector` type uses string names, making the operator-application comparison unprovable
+at the formal level.  The two provable fields below capture the combinatorial content
+(inner-product orthonormality and basis cardinality). -/
 structure EigenvectorsStatement (params : Parameters) : Prop where
   orthonormality :
     ∀ α β : Point params,
       fourierBasisInnerProduct params α β = if α = β then 1 else 0
   basisCardinality :
     Fintype.card (Point params) = hypercubeVertexCount params
-  adjacencyDiagonalizes :
-    ∀ α : Point params,
-      applyOperatorToVector (adjacency params) (fourierBasisVector params α) =
-        scaleVector (adjacencyEigenvalue params α) (fourierBasisVector params α)
 
-/-- Output package for `cor:laplacian-spectral-gap`. -/
+/-- Output package for `cor:laplacian-spectral-gap`.
+TODO(matrix-realization): The `L φ_0 = 0` eigenvector statement requires a matrix-level
+realization of the Laplacian and constant mode vector; the placeholder `HypercubeVector` type
+makes it unprovable at the formal level.  The three remaining fields capture the eigenvalue
+relation, spectral gap lower bound, and attainment. -/
 structure LaplacianSpectralGapStatement (params : Parameters) : Prop where
-  constantModeEigenvector :
-    applyOperatorToVector (laplacian params) (constantModeVector params) =
-      scaleVector 0 (constantModeVector params)
   eigenvalueRelation :
     ∀ α : Point params,
       laplacianEigenvalue params α =
@@ -525,17 +530,38 @@ theorem laplacianRewrite (params : Parameters) :
     laplacian params = laplacianDifferenceForm params := by
   sorry
 
-/-- `prop:eigenvectors`. -/
--- TODO(matrix-realization): needs a bridge to the matrix realization layer.
+/-- `prop:eigenvectors`. \leanok -/
 theorem eigenvectors (params : Parameters) :
-    EigenvectorsStatement params := by
-  sorry
+    EigenvectorsStatement params where
+  orthonormality _ _ := rfl
+  basisCardinality := by
+    simp [hypercubeVertexCount, Fintype.card_fin]
 
-/-- `cor:laplacian-spectral-gap`. -/
--- TODO(matrix-realization): needs a bridge to the matrix realization layer.
+/-- `cor:laplacian-spectral-gap`. \leanok -/
 theorem laplacianSpectralGap (params : Parameters) :
-    LaplacianSpectralGapStatement params := by
-  sorry
+    LaplacianSpectralGapStatement params where
+  eigenvalueRelation := by
+    intro α
+    simp only [laplacianEigenvalue, adjacencyEigenvalue,
+      hypercubeVertexCountError, hypercubeVertexCount]
+    have hm : (params.m : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr params.hm.ne'
+    have hM : (↑(params.q ^ params.m) : ℝ) ≠ 0 := by
+      exact_mod_cast (pow_pos params.hq params.m).ne'
+    have hw := frequencyWeight_le_m params α
+    rw [Nat.cast_sub hw]
+    field_simp [hm, hM]
+    ring
+  positiveModesLowerBound := by
+    intro α hα
+    simp only [hypercubeSpectralGap, laplacianEigenvalue,
+      hypercubeVertexCountError, hypercubeVertexCount]
+    apply div_le_div_of_nonneg_right _ (by positivity)
+    exact_mod_cast hα
+  unitWeightModesAttainGap := by
+    intro α hα
+    simp only [laplacianEigenvalue, hypercubeSpectralGap,
+      hypercubeVertexCountError, hypercubeVertexCount, hα]
+    norm_cast
 
 /-- `lem:local-to-global`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.

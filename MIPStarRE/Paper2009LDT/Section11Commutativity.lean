@@ -31,8 +31,11 @@ def appendRightTotalSubMeasurement {α : Type _}
   outcomeOperator := fun a => formalProduct (A.outcomeOperator a) X
   totalOperator := formalProduct A.totalOperator X
 
-/-- Sandwiched product `A_a B_b A_a`. -/
-def sandwichByOuterSubMeasurement {α β : Type _}
+/-- Sandwiched product `A_a B_b A_a`.
+
+Its total operator should be the sum-of-sandwiches
+`∑_a A_a (∑_b B_b) A_a` whenever `α` is finitely enumerable. -/
+noncomputable def sandwichByOuterSubMeasurement {α β : Type _}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement (α × β) where
   name := label
@@ -41,8 +44,19 @@ def sandwichByOuterSubMeasurement {α β : Type _}
     | (a, b) =>
         formalProduct (A.outcomeOperator a)
           (formalProduct (B.outcomeOperator b) (A.outcomeOperator a))
-  totalOperator := formalProduct A.totalOperator
-    (formalProduct B.totalOperator A.totalOperator)
+  totalOperator := by
+    classical
+    if h : Nonempty (Fintype α) then
+      letI : Fintype α := Classical.choice h
+      exact sumOperatorList A.totalOperator
+        (Finset.univ.toList.map fun a =>
+          formalProduct (A.outcomeOperator a)
+            (formalProduct B.totalOperator (A.outcomeOperator a)))
+    else
+      exact
+        { name := s!"TODO(sumSandwiches:{label})"
+          dim := A.totalOperator.dim
+          matrix := A.totalOperator.matrix }
 
 /-- The full-slice question underlying an evaluated-slice sample. -/
 def fullSliceQuestionOfEvaluatedSlice (params : Parameters)

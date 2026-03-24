@@ -377,10 +377,10 @@ noncomputable def questionStateDependentDistanceDefect {Outcome : Type _}
     (ψ : QuantumState) (A B : SubMeasurement Outcome) : Error :=
   let totalDiff := operatorDifference A.totalOperator B.totalOperator
   sumOverOutcomesOrElse
-    (expectationValue ψ (operatorMul totalDiff totalDiff))
+    (expectationValue ψ (operatorMul (operatorAdjoint totalDiff) totalDiff))
     (fun a =>
       let diff := operatorDifference (A.outcomeOperator a) (B.outcomeOperator a)
-      expectationValue ψ (operatorMul diff diff))
+      expectationValue ψ (operatorMul (operatorAdjoint diff) diff))
 
 /-- Questionwise strong self-consistency defect. -/
 noncomputable def questionStrongSelfConsistencyDefect {Outcome : Type _}
@@ -624,13 +624,14 @@ noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
       (uniformDistribution (Point params))
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementA)
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementB)
-  (pointAgreement
-      + left.axisParallelFailureProbability
-      + right.axisParallelFailureProbability
-      + left.selfConsistencyFailureProbability
-      + right.selfConsistencyFailureProbability
-      + left.diagonalFailureProbability
-      + right.diagonalFailureProbability) / 7
+  let axisParallelBranch :=
+    pointAgreement
+      + (left.axisParallelFailureProbability + right.axisParallelFailureProbability) / 2
+  let selfConsistencyBranch :=
+    (left.selfConsistencyFailureProbability + right.selfConsistencyFailureProbability) / 2
+  let diagonalBranch :=
+    (left.diagonalFailureProbability + right.diagonalFailureProbability) / 2
+  (axisParallelBranch + selfConsistencyBranch + diagonalBranch) / 3
 
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
