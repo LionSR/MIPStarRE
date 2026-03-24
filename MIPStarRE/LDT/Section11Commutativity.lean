@@ -319,7 +319,7 @@ def normalizationConditionAdjointSquareOperator {OutcomeA OutcomeB : Type*}
 /-- The identity bound appearing in `lem:normalization-condition`. -/
 def normalizationConditionIdentityBound {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB) : Operator :=
-  Section7ExpansionHypercubeGraph.identityOperator s!"normalization({P.name},{Q.toSubMeasurement.name})"
+  identityOperator s!"normalization({P.name},{Q.toSubMeasurement.name})"
 
 /-- Operator domination, written in source order as `X ≤ Y`. -/
 abbrev OperatorDominatedBy (X Y : Operator) : Prop :=
