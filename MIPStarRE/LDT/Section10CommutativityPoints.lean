@@ -17,19 +17,19 @@ abbrev PointPairDiagonalLineQuestion (params : Parameters) :=
   DiagonalLine params × (Fq params × Fq params)
 
 /-- Place a submeasurement on the left tensor factor. -/
-def leftPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
+def leftPlacedSubMeasurement {α : Type*} (A : SubMeasurement α) : SubMeasurement α where
   name := s!"{A.name}.left"
   outcomeOperator := fun a => leftTensor (A.outcomeOperator a)
   totalOperator := leftTensor A.totalOperator
 
 /-- Place a submeasurement on the right tensor factor. -/
-def rightPlacedSubMeasurement {α : Type _} (A : SubMeasurement α) : SubMeasurement α where
+def rightPlacedSubMeasurement {α : Type*} (A : SubMeasurement α) : SubMeasurement α where
   name := s!"{A.name}.right"
   outcomeOperator := fun a => rightTensor (A.outcomeOperator a)
   totalOperator := rightTensor A.totalOperator
 
 /-- Ordered product of two paper-local submeasurements on the same tensor factor. -/
-noncomputable def orderedProductSubMeasurement {α β : Type _}
+noncomputable def orderedProductSubMeasurement {α β : Type*}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement (α × β) where
   name := label
@@ -37,7 +37,7 @@ noncomputable def orderedProductSubMeasurement {α β : Type _}
   totalOperator := formalProduct A.totalOperator B.totalOperator
 
 /-- Reversed product of two paper-local submeasurements on the same tensor factor. -/
-noncomputable def reversedProductSubMeasurement {α β : Type _}
+noncomputable def reversedProductSubMeasurement {α β : Type*}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement (α × β) where
   name := label
@@ -45,7 +45,7 @@ noncomputable def reversedProductSubMeasurement {α β : Type _}
   totalOperator := formalProduct B.totalOperator A.totalOperator
 
 /-- Tensor-product bridge `A_a ⊗ B_b`. -/
-noncomputable def tensorProductSubMeasurement {α β : Type _}
+noncomputable def tensorProductSubMeasurement {α β : Type*}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement (α × β) where
   name := label

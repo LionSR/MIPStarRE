@@ -12,37 +12,37 @@ noncomputable section
 namespace MIPStarRE.LDT
 
 /-- A paper-local submeasurement with outcomes in `α`. -/
-structure SubMeasurement (α : Type _) where
+structure SubMeasurement (α : Type*) where
   name : String := ""
   outcomeOperator : α → Operator := fun _ => default
   totalOperator : Operator := default
   deriving Inhabited
 
 /-- A paper-local measurement. -/
-structure Measurement (α : Type _) extends SubMeasurement α where
+structure Measurement (α : Type*) extends SubMeasurement α where
   completeWitness : True := trivial
   deriving Inhabited
 
 /-- A paper-local projective submeasurement. -/
-structure ProjectiveSubMeasurement (α : Type _) extends SubMeasurement α where
+structure ProjectiveSubMeasurement (α : Type*) extends SubMeasurement α where
   projectiveWitness : True := trivial
   deriving Inhabited
 
 /-- A paper-local projective measurement. -/
-structure ProjectiveMeasurement (α : Type _) extends Measurement α where
+structure ProjectiveMeasurement (α : Type*) extends Measurement α where
   projectiveWitness : True := trivial
   deriving Inhabited
 
-abbrev IndexedSubMeasurement (Question Outcome : Type _) := Question → SubMeasurement Outcome
-abbrev IndexedMeasurement (Question Outcome : Type _) := Question → Measurement Outcome
-abbrev IndexedProjectiveSubMeasurement (Question Outcome : Type _) :=
+abbrev IndexedSubMeasurement (Question Outcome : Type*) := Question → SubMeasurement Outcome
+abbrev IndexedMeasurement (Question Outcome : Type*) := Question → Measurement Outcome
+abbrev IndexedProjectiveSubMeasurement (Question Outcome : Type*) :=
   Question → ProjectiveSubMeasurement Outcome
-abbrev IndexedProjectiveMeasurement (Question Outcome : Type _) :=
+abbrev IndexedProjectiveMeasurement (Question Outcome : Type*) :=
   Question → ProjectiveMeasurement Outcome
 
 namespace IndexedMeasurement
 
-def toIndexedSubMeasurement {Question Outcome : Type _}
+def toIndexedSubMeasurement {Question Outcome : Type*}
     (A : IndexedMeasurement Question Outcome) : IndexedSubMeasurement Question Outcome :=
   fun q => (A q).toSubMeasurement
 
@@ -50,7 +50,7 @@ end IndexedMeasurement
 
 namespace IndexedProjectiveSubMeasurement
 
-def toIndexedSubMeasurement {Question Outcome : Type _}
+def toIndexedSubMeasurement {Question Outcome : Type*}
     (A : IndexedProjectiveSubMeasurement Question Outcome) :
     IndexedSubMeasurement Question Outcome :=
   fun q => (A q).toSubMeasurement
@@ -59,12 +59,12 @@ end IndexedProjectiveSubMeasurement
 
 namespace IndexedProjectiveMeasurement
 
-def toIndexedMeasurement {Question Outcome : Type _}
+def toIndexedMeasurement {Question Outcome : Type*}
     (A : IndexedProjectiveMeasurement Question Outcome) :
     IndexedMeasurement Question Outcome :=
   fun q => (A q).toMeasurement
 
-def toIndexedSubMeasurement {Question Outcome : Type _}
+def toIndexedSubMeasurement {Question Outcome : Type*}
     (A : IndexedProjectiveMeasurement Question Outcome) :
     IndexedSubMeasurement Question Outcome :=
   fun q => (A q).toSubMeasurement
@@ -75,7 +75,7 @@ end IndexedProjectiveMeasurement
 the processed operator at `b` is the sum of the operators of all `a` with `f a = b`.
 Otherwise we fall back to the zero operator in the ambient space until the relevant
 bounded-answer enumeration is made explicit. -/
-noncomputable def postprocess {α β : Type _} (A : SubMeasurement α) (f : α → β) :
+noncomputable def postprocess {α β : Type*} (A : SubMeasurement α) (f : α → β) :
     SubMeasurement β := by
   classical
   if h : Nonempty (Fintype α) then
@@ -95,7 +95,7 @@ noncomputable def postprocess {α β : Type _} (A : SubMeasurement α) (f : α �
     }
 
 /-- Complete a submeasurement by adjoining a distinguished failure outcome. -/
-def completeSubMeasurement {α : Type _} (A : SubMeasurement α) : Measurement (Option α) where
+def completeSubMeasurement {α : Type*} (A : SubMeasurement α) : Measurement (Option α) where
   toSubMeasurement := {
     name := s!"{A.name}.completion"
     outcomeOperator := fun
@@ -111,7 +111,7 @@ def completeSubMeasurement {α : Type _} (A : SubMeasurement α) : Measurement (
   }
 
 /-- Constant indexed family taking the same submeasurement on every question. -/
-def constantSubMeasurementFamily {α : Type _} (A : SubMeasurement α) :
+def constantSubMeasurementFamily {α : Type*} (A : SubMeasurement α) :
     IndexedSubMeasurement Unit α :=
   fun _ => A
 

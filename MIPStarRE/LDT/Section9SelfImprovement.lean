@@ -214,11 +214,11 @@ structure MatrixSdpOptimalWitness (params : Parameters)
       matrixSdpComplementarySlacknessDefect params model T Z g = 0
 
 /-- The family of outcome/polynomial selections used in `lem:add-in-u`. -/
-abbrev AddInUSelection (params : Parameters) (Outcome : Type _) :=
+abbrev AddInUSelection (params : Parameters) (Outcome : Type*) :=
   Point params → Set (Outcome × Polynomial params)
 
 /-- Choose one representative pair from `S_u` when it is nonempty. -/
-noncomputable def addInUSelectionChoice {Outcome : Type _}
+noncomputable def addInUSelectionChoice {Outcome : Type*}
     (params : Parameters)
     (S : AddInUSelection params Outcome)
     (u : Point params) : Option (Outcome × Polynomial params) := by
@@ -229,7 +229,7 @@ noncomputable def addInUSelectionChoice {Outcome : Type _}
 
 /-- A raw point-indexed matrix outcome family used in the matrix `add-in-u` transfer. -/
 abbrev MatrixIndexedPointOutcomeFamily (params : Parameters)
-    (Outcome : Type _) (H : FiniteHilbertSpace) :=
+    (Outcome : Type*) (H : FiniteHilbertSpace) :=
   Point params → Outcome → MatrixOperator H
 
 /-- The concrete sandwiched operator `A^u_{h(u)} T_h A^u_{h(u)}`. -/
@@ -249,7 +249,7 @@ noncomputable def matrixAveragedSandwichedPolynomialOutcomeOperator (params : Pa
     matrixSandwichedPolynomialOutcomeOperatorAt params model T u h)
 
 /-- The matrix left-hand operator in `add-in-u`. -/
-noncomputable def matrixAddInULeftOperatorAtPoint {Outcome : Type _}
+noncomputable def matrixAddInULeftOperatorAtPoint {Outcome : Type*}
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
@@ -261,7 +261,7 @@ noncomputable def matrixAddInULeftOperatorAtPoint {Outcome : Type _}
   | none => 0
 
 /-- The matrix right-hand operator in `add-in-u`. -/
-noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type _}
+noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type*}
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
@@ -275,7 +275,7 @@ noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type _}
   | none => 0
 
 /-- The matrix left-hand expectation in `add-in-u`. -/
-noncomputable def matrixAddInULeftQuantity {Outcome : Type _}
+noncomputable def matrixAddInULeftQuantity {Outcome : Type*}
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
@@ -286,7 +286,7 @@ noncomputable def matrixAddInULeftQuantity {Outcome : Type _}
       (matrixAddInULeftOperatorAtPoint params model M H S u)))
 
 /-- The matrix right-hand expectation in `add-in-u`. -/
-noncomputable def matrixAddInURightQuantity {Outcome : Type _}
+noncomputable def matrixAddInURightQuantity {Outcome : Type*}
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
@@ -338,7 +338,7 @@ noncomputable def matrixProjectiveResidualGap (params : Parameters)
   Complex.re (matrixExpectation model.state (Z * (1 - total)))
 
 /-- Matrix-level version of the `add-in-u` transfer inequality. -/
-structure MatrixAddInUTransferStatement {Outcome : Type _}
+structure MatrixAddInUTransferStatement {Outcome : Type*}
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
@@ -380,7 +380,7 @@ structure SdpStatement (params : Parameters)
       SdpOptimalPair params strategy T Z
 
 /-- The operator inside the left-hand side of `lem:add-in-u` at a fixed point `u`. -/
-noncomputable def addInULeftOperatorAtPoint {Outcome : Type _}
+noncomputable def addInULeftOperatorAtPoint {Outcome : Type*}
     (params : Parameters)
     (strategy : SymmetricStrategy params)
     (M : IndexedSubMeasurement (Point params) Outcome)
@@ -393,7 +393,7 @@ noncomputable def addInULeftOperatorAtPoint {Outcome : Type _}
   | none => formalZeroOperator
 
 /-- The operator inside the right-hand side of `lem:add-in-u` at a fixed point `u`. -/
-noncomputable def addInURightOperatorAtPoint {Outcome : Type _}
+noncomputable def addInURightOperatorAtPoint {Outcome : Type*}
     (params : Parameters)
     (strategy : SymmetricStrategy params)
     (M : IndexedSubMeasurement (Point params) Outcome)
@@ -409,7 +409,7 @@ noncomputable def addInURightOperatorAtPoint {Outcome : Type _}
   | none => formalZeroOperator
 
 /-- The left-hand expectation in `lem:add-in-u`. -/
-noncomputable def addInULeftQuantity {Outcome : Type _} (params : Parameters)
+noncomputable def addInULeftQuantity {Outcome : Type*} (params : Parameters)
     (strategy : SymmetricStrategy params)
     (M : IndexedSubMeasurement (Point params) Outcome)
     (H : SubMeasurement (Polynomial params))
@@ -420,7 +420,7 @@ noncomputable def addInULeftQuantity {Outcome : Type _} (params : Parameters)
         (addInULeftOperatorAtPoint params strategy M H S u))
 
 /-- The right-hand expectation in `lem:add-in-u`. -/
-noncomputable def addInURightQuantity {Outcome : Type _} (params : Parameters)
+noncomputable def addInURightQuantity {Outcome : Type*} (params : Parameters)
     (strategy : SymmetricStrategy params)
     (M : IndexedSubMeasurement (Point params) Outcome)
     (T : Measurement (Polynomial params))
@@ -482,7 +482,7 @@ noncomputable def projectiveBoundednessGap (params : Parameters)
     (projectiveResidualOperator params H Z)
 
 /-- Output package for `lem:add-in-u`. -/
-structure AddInUStatement {Outcome : Type _} (params : Parameters)
+structure AddInUStatement {Outcome : Type*} (params : Parameters)
     (strategy : SymmetricStrategy params)
     (T : Measurement (Polynomial params))
     (M : IndexedSubMeasurement (Point params) Outcome)
@@ -516,7 +516,7 @@ structure SelfImprovementHelperConclusion (params : Parameters)
   averagedConstruction :
     H = averagedSandwichedPolynomialSubMeasurement params strategy T
   addInUTransfer :
-    ∀ {Outcome : Type _} (M : IndexedSubMeasurement (Point params) Outcome),
+    ∀ {Outcome : Type*} (M : IndexedSubMeasurement (Point params) Outcome),
       AddInUStatement params strategy T M H eps delta
   completeness :
     CompletenessAtLeast strategy.state H
@@ -618,7 +618,7 @@ lemma sdp
   sorry
 
 /-- `lem:add-in-u`. -/
-lemma addInU {Outcome : Type _}
+lemma addInU {Outcome : Type*}
     (params : Parameters)
     (strategy : SymmetricStrategy params)
     (eps delta gamma : Error)

@@ -19,13 +19,13 @@ abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
 abbrev FullSliceOutcome (params : Parameters) := Polynomial params × Polynomial params
 
 /-- Ordered product placed on the left tensor factor. -/
-def leftOrderedProductSubMeasurement {α β : Type _}
+def leftOrderedProductSubMeasurement {α β : Type*}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement (α × β) :=
   leftPlacedSubMeasurement (orderedProductSubMeasurement label A B)
 
 /-- Append a total operator on the right of every outcome operator. -/
-def appendRightTotalSubMeasurement {α : Type _}
+def appendRightTotalSubMeasurement {α : Type*}
     (tag : String) (A : SubMeasurement α) (X : Operator) : SubMeasurement α where
   name := s!"{A.name}.{tag}"
   outcomeOperator := fun a => formalProduct (A.outcomeOperator a) X
@@ -35,7 +35,7 @@ def appendRightTotalSubMeasurement {α : Type _}
 
 Its total operator should be the sum-of-sandwiches
 `∑_a A_a (∑_b B_b) A_a` whenever `α` is finitely enumerable. -/
-noncomputable def sandwichByOuterSubMeasurement {α β : Type _}
+noncomputable def sandwichByOuterSubMeasurement {α β : Type*}
     (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
     SubMeasurement (α × β) where
   name := label
@@ -220,7 +220,7 @@ def commDataProcessedGStabilityTwoRight (params : Parameters)
 We propagate explicit `dim` and `matrix` from the input operators so that
 `operatorAdd`/`sumOperatorList` (which require matching dimensions) can
 accumulate the sum `∑_b C_{a,b}` correctly even when `dim ≠ 1`. -/
-def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type _}
+def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB)
     (a : OutcomeA) (b : OutcomeB) : Operator :=
   let pa := P.outcomeOperator a
@@ -234,7 +234,7 @@ def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type _}
       dim := pa.dim }
 
 /-- The sandwiched family `b ↦ Q_b P_a Q_b`. -/
-noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Type _}
+noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB) :
     IndexedSubMeasurement OutcomeA OutcomeB :=
   fun a =>
@@ -251,19 +251,19 @@ noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Ty
           exact Q.totalOperator }
 
 /-- The total family `a ↦ ∑_b C_{a,b}` from `lem:normalization-condition`. -/
-def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type _}
+def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB) :
     IndexedSubMeasurement OutcomeA Unit :=
   fun a => postprocess (normalizationConditionSandwichedFamily P Q a) (fun _ => ())
 
 /-- The formal operator `∑_b C_{a,b}` from `lem:normalization-condition`. -/
-def normalizationConditionSandwichedTotalOperator {OutcomeA OutcomeB : Type _}
+def normalizationConditionSandwichedTotalOperator {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB)
     (a : OutcomeA) : Operator :=
   (normalizationConditionSandwichedTotalFamily P Q a).totalOperator
 
 /-- The family `a ↦ (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
-def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type _}
+def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB) :
     SubMeasurement OutcomeA where
   name := s!"normSquareFamily({P.name},{Q.toSubMeasurement.name})"
@@ -285,7 +285,7 @@ def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type _}
               dim := P.totalOperator.dim }
 
 /-- The family `a ↦ (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
-def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type _}
+def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB) :
     SubMeasurement OutcomeA where
   name := s!"normAdjointSquareFamily({P.name},{Q.toSubMeasurement.name})"
@@ -307,17 +307,17 @@ def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type _}
               dim := P.totalOperator.dim }
 
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
-def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type _}
+def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB) : Operator :=
   (normalizationConditionSquareFamily P Q).totalOperator
 
 /-- The operator `∑_a (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
-def normalizationConditionAdjointSquareOperator {OutcomeA OutcomeB : Type _}
+def normalizationConditionAdjointSquareOperator {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB) : Operator :=
   (normalizationConditionAdjointSquareFamily P Q).totalOperator
 
 /-- The identity bound appearing in `lem:normalization-condition`. -/
-def normalizationConditionIdentityBound {OutcomeA OutcomeB : Type _}
+def normalizationConditionIdentityBound {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA) (Q : ProjectiveSubMeasurement OutcomeB) : Operator :=
   Section7ExpansionHypercubeGraph.identityOperator s!"normalization({P.name},{Q.toSubMeasurement.name})"
 
@@ -404,7 +404,7 @@ structure ComMainConclusion (params : Parameters)
       (comMainError params gamma zeta)
 
 /-- Output package for `lem:normalization-condition`. -/
-structure NormalizationConditionStatement {OutcomeA OutcomeB : Type _}
+structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA)
     (Q : ProjectiveSubMeasurement OutcomeB) : Prop where
   sandwichedHermitianSquare :
@@ -442,7 +442,7 @@ theorem comMain
   sorry
 
 /-- `lem:normalization-condition`. -/
-lemma normalizationCondition {OutcomeA OutcomeB : Type _}
+lemma normalizationCondition {OutcomeA OutcomeB : Type*}
     (P : SubMeasurement OutcomeA)
     (Q : ProjectiveSubMeasurement OutcomeB) :
     NormalizationConditionStatement P Q := by

@@ -158,7 +158,7 @@ def sumOperatorList (dimHint : Operator) (ops : List Operator) : Operator :=
   ops.foldl operatorAdd (zeroLike dimHint)
 
 /-- Weighted sum of operators over an explicit finite support list. -/
-def weightedOperatorSumOnSupport {α : Type _} (dimHint : Operator)
+def weightedOperatorSumOnSupport {α : Type*} (dimHint : Operator)
     (support : List α) (w : α → Error) (f : α → Operator) : Operator :=
   support.foldl
     (fun acc a => operatorAdd acc (operatorScale (w a) (f a)))
