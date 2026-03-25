@@ -75,6 +75,7 @@
 
 \begin{lemma}[Consistency for measurements]\label{prop:simeq-for-measurements}
   \lean{MIPStarRE.LDT.Preliminaries.simeqForMeasurements}
+  \leanok
   \uses{def:simeq}
   If $A=\{A_a^x\}$ and $B=\{B_a^x\}$ are measurements, then
   \[
@@ -100,6 +101,7 @@
 \end{definition}
 
 \begin{lemma}[Transferring consistency through state-dependent distance]\label{prop:triangle-sub}
+  \lean{MIPStarRE.LDT.Preliminaries.triangleSub}
   \uses{def:simeq, def:approx_delta, prop:simeq-for-measurements}
   Let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be measurements and let $C=\{C_a^x\}$ be a submeasurement. If $A_a^x \ot I \simeq_\delta I \ot C_a^x$ and $A_a^x \ot I \approx_\eps B_a^x \ot I$, then
   \[
@@ -124,6 +126,7 @@
 \end{proof}
 
 \begin{lemma}[Closeness of inner products]\label{prop:closeness-of-ip}
+  \lean{MIPStarRE.LDT.Preliminaries.closenessOfInnerProducts}
   \uses{def:approx_delta}
   Let $\{A_a^x\}$, $\{B_a^x\}$, and $\{C_{a,b}^x\}$ be operator families. If $A_a^x \approx_\gamma B_a^x$ and $\sum_a (\sum_b C_{a,b}^x)(\sum_b C_{a,b}^x)^\dagger \le I$ for every $x$, then
   \[
@@ -138,6 +141,7 @@
 \end{proof}
 
 \begin{lemma}[Triangle inequality for vectors squared]\label{prop:triangle-inequality-for-vectors-squared}
+  \lean{MIPStarRE.LDT.Preliminaries.triangleInequalityForVectorsSquared}
   For vectors $\ket{\psi_1},\dots,\ket{\psi_k}$,
   \[
     \bigl\lVert \ket{\psi_1}+\cdots+\ket{\psi_k} \bigr\rVert^2 \le k(\lVert\ket{\psi_1}\rVert^2+\cdots+\lVert\ket{\psi_k}\rVert^2).
@@ -148,6 +152,7 @@
 \end{proof}
 
 \begin{lemma}[Triangle inequality for $\approx_\delta$]\label{prop:triangle-inequality-for-approx_delta}
+  \lean{MIPStarRE.LDT.Preliminaries.triangleInequalityForApproxDelta}
   \uses{def:approx_delta, prop:triangle-inequality-for-vectors-squared}
   Suppose $(A_i)_a^x \approx_{\delta_i} (A_{i+1})_a^x$ for $i=1,\dots,k$. Then
   \[
@@ -159,6 +164,7 @@
 \end{proof}
 
 \begin{lemma}[Triangle inequality for $\simeq_\delta$]\label{prop:simeq-triangle-inequality}
+  \lean{MIPStarRE.LDT.Preliminaries.simeqTriangleInequality}
   \uses{prop:simeq-to-approx, prop:triangle-inequality-for-approx_delta, prop:triangle-sub}
   Suppose $A_a^x \ot I \simeq_\eps I \ot B_a^x$, $C_a^x \ot I \simeq_\delta I \ot B_a^x$, and $C_a^x \ot I \simeq_\gamma I \ot D_a^x$, where all four families are measurements. Then
   \[
