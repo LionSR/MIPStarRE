@@ -39,7 +39,7 @@ structure SdpStatement (params : Parameters)
 /-- The operator inside the left-hand side of `lem:add-in-u` at a fixed point `u`. -/
 noncomputable def addInULeftOperatorAtPoint {Outcome : Type*}
     (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (_strategy : SymmetricStrategy params)
     (M : IndexedSubMeasurement (Point params) Outcome)
     (H : SubMeasurement (Polynomial params))
     (S : AddInUSelection params Outcome)

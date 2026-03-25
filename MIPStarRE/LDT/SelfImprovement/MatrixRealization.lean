@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.SelfImprovement.Defs
+set_option linter.style.longLine false
 
 namespace MIPStarRE.LDT.SelfImprovement
 

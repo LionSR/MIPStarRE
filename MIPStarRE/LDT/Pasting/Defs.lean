@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Theorems
+set_option linter.style.longLine false
 
 /-!
 Matching scaffold for Section 12 of the low individual degree paper in

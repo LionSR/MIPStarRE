@@ -10,14 +10,6 @@ private def stringToName (s : String) : Name :=
       | none => Name.str acc component)
     Name.anonymous
 
-private def moduleNameOfDecl? (decl : String) : Option Name := do
-  let components := decl.splitOn "."
-  let revComponents := components.reverse
-  match revComponents with
-  | [] | [_] => none
-  | _declName :: revModule =>
-      some <| revModule.reverse.foldl (fun acc component => Name.str acc component) Name.anonymous
-
 private def parseDecls (contents : String) : Array (Nat × String) :=
   let lines := (contents.splitOn "\n").toArray
   let (decls, _) :=
@@ -27,7 +19,8 @@ private def parseDecls (contents : String) : Array (Nat × String) :=
         let lineNo := state.2
         let trimmed := line.trimAscii.toString
         let decls :=
-          if trimmed.isEmpty || trimmed.startsWith "#" || trimmed.startsWith "--" then
+          if trimmed.isEmpty || trimmed.startsWith "#" ||
+              trimmed.startsWith "--" then
             decls
           else
             decls.push (lineNo, trimmed)
@@ -35,22 +28,13 @@ private def parseDecls (contents : String) : Array (Nat × String) :=
       (#[], 1)
   decls
 
-private def inferredModules
-    (decls : Array (Nat × String)) : Except String (Array Import) := do
-  let mut modules : Array Import := #[]
-  for (_, decl) in decls do
-    let some module := moduleNameOfDecl? decl
-      | throw s!"Could not infer a module from declaration name {decl}."
-    if modules.any (fun imp => imp.module == module) then
-      continue
-    modules := modules.push { module := module }
-  return modules
-
 private def missingDecls
-    (env : Environment) (decls : Array (Nat × String)) : Array (Nat × String) :=
+    (env : Environment) (decls : Array (Nat × String)) :
+    Array (Nat × String) :=
   decls.filter fun (_, decl) => env.find? (stringToName decl) |>.isNone
 
-private def usage : String := "Usage: lake exe checkdecls blueprint/lean_decls"
+private def usage : String :=
+  "Usage: lake exe checkdecls blueprint/lean_decls"
 
 unsafe def main (args : List String) : IO UInt32 := do
   match args with
@@ -61,12 +45,8 @@ unsafe def main (args : List String) : IO UInt32 := do
         return 1
       let contents ← IO.FS.readFile path
       let decls := parseDecls contents
-      let modules ←
-        match inferredModules decls with
-        | .ok modules => pure modules
-        | .error err =>
-            IO.eprintln err
-            return 1
+      -- Import the root module to get all declarations.
+      let modules := #[{ module := `MIPStarRE : Import }]
       initSearchPath (← findSysroot)
       enableInitializersExecution
       let env ← importModules modules {} (trustLevel := 1024)
@@ -74,7 +54,8 @@ unsafe def main (args : List String) : IO UInt32 := do
       if missing.isEmpty then
         IO.println s!"All {decls.size} declarations from {path} resolved."
         return 0
-      IO.eprintln s!"Missing {missing.size} declaration(s) listed in {path}:"
+      IO.eprintln
+        s!"Missing {missing.size} declaration(s) listed in {path}:"
       for (lineNo, decl) in missing do
         IO.eprintln s!"  line {lineNo}: {decl}"
       return 1

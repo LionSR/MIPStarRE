@@ -140,24 +140,20 @@ def inconsistency (M N : α → Op d) : ℂ :=
 def diagOverlap (M N : α → Op d) : ℂ :=
   ∑ a, normalizedTrace (M a * N a)
 
+end Overlap
+
 /--
 The diagonal and off-diagonal parts together recover the total overlap
 `τ((∑_a M_a)(∑_b N_b))`.
 -/
-theorem inconsistency_add_diagOverlap (M N : α → Op d) :
+theorem inconsistency_add_diagOverlap
+    {d : Type*} [Fintype d] {α : Type*} [Fintype α] [DecidableEq α]
+    (M N : α → Op d) :
     inconsistency M N + diagOverlap M N =
       normalizedTrace ((∑ a, M a) * (∑ b, N b)) := by
   rw [normalizedTrace_product_split]
   unfold inconsistency diagOverlap
   ring
-
--- Section 2 data processing will eventually compare `inconsistency` before and
--- after `Submeasurement.postprocess`. The current repository milestone stops at
--- the exact splitting identity above; the monotonicity inequality needs an
--- additional nonnegativity argument over fibered sums and is left for the next
--- pass.
-
-end Overlap
 
 namespace Measurement
 

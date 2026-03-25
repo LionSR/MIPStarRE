@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems
+set_option linter.style.longLine false
 
 /-!
 Matching scaffold for Section 9 of the low individual degree paper in

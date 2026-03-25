@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Defs
+set_option linter.style.longLine false
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -410,7 +411,7 @@ def fromHToGRecurrenceLeftFamily (params : Parameters)
 
 /-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`. -/
 def fromHToGRecurrenceRightFamily (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (_strategy : SymmetricStrategy params.next)
     (family : IndexedPolynomialFamily params) (k ℓ : ℕ) :
     IndexedSubMeasurement Unit Unit :=
   fun _ =>

@@ -1,5 +1,7 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
 
+set_option linter.style.longLine false
+
 /-!
 Definitions for Section 6 of the low individual degree paper in
 `references/ldt-paper/inductive_step.tex`.
