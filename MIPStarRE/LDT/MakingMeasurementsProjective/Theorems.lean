@@ -20,9 +20,9 @@ theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
       NaimarkStatement ψ A B data := by
   sorry
 
-/-- `thm:orthonormalization`. -/
 -- Proof outline from the source: R_a → Q_a → X, X̂ / SVD chain before the final rounding step.
 set_option linter.all false in
+/-- `thm:orthonormalization`. -/
 theorem orthonormalization {Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState) (A : SubMeasurement Outcome) (ζ : Error) :
