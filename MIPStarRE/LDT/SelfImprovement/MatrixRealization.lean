@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.SelfImprovement.Defs
+set_option linter.style.longLine false
 
 namespace MIPStarRE.LDT.SelfImprovement
 
@@ -181,8 +182,7 @@ noncomputable def matrixHelperAgreementOperatorAtPoint (params : Parameters)
 /-- The concrete averaged matched operator `E_u E_a A^u_a H_[h(u)=a]`. -/
 noncomputable def matrixHelperAgreementAverageOperator (params : Parameters)
     (model : MatrixSdpRealization params)
-    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params)
-      model.space) : MatrixOperator model.space :=
+    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) : MatrixOperator model.space :=
   matrixAverageOperator (fun u : Point params =>
     matrixHelperAgreementOperatorAtPoint params model H u)
 

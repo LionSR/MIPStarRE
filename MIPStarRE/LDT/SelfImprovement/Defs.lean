@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems
+set_option linter.style.longLine false
 
 /-!
 Matching scaffold for Section 9 of the low individual degree paper in
@@ -85,9 +86,7 @@ noncomputable def sandwichedPolynomialSubMeasurementAt (params : Parameters)
     (T : Measurement (Polynomial params)) (u : Point params) :
     SubMeasurement (Polynomial params) :=
   { name :=
-      s!"Hslice[{pointCode params u}|" ++
-        s!"{(strategy.pointMeasurement u).toSubMeasurement.name}|" ++
-        s!"{T.toSubMeasurement.name}]"
+      s!"Hslice[{pointCode params u}|{(strategy.pointMeasurement u).toSubMeasurement.name}|{T.toSubMeasurement.name}]"
     outcomeOperator := sandwichedPolynomialOutcomeOperatorAt params strategy T u
     totalOperator :=
       averageOperatorOverDistribution (polynomialDistribution params)

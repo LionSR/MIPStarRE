@@ -1,5 +1,7 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
 
+set_option linter.style.longLine false
+
 /-!
 Definitions for Section 6 of the low individual degree paper in
 `references/ldt-paper/inductive_step.tex`.
@@ -70,23 +72,17 @@ def xRestrictedStrategy (params : Parameters)
 @[simp] theorem restrictAxisParallelMeasurement_outcomeOperator (params : Parameters)
     (strategy : SymmetricStrategy params.next) (x : Fq params)
     (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
-    ((restrictAxisParallelMeasurement params strategy x ℓ)
-      .toSubMeasurement.outcomeOperator f) =
-      (strategy.axisParallelMeasurement
-        (AxisParallelLine.appendAtHeight params ℓ x))
-        .toSubMeasurement.outcomeOperator
-          (liftAxisAnswer params x f) :=
+    ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeasurement.outcomeOperator f) =
+      (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeasurement.outcomeOperator
+        (liftAxisAnswer params x f) :=
   rfl
 
 @[simp] theorem restrictDiagonalMeasurement_outcomeOperator (params : Parameters)
     (strategy : SymmetricStrategy params.next) (x : Fq params)
     (ℓ : DiagonalLine params) (f : DiagonalLinePolynomial params) :
-    ((restrictDiagonalMeasurement params strategy x ℓ)
-      .toSubMeasurement.outcomeOperator f) =
-      (strategy.diagonalMeasurement
-        (DiagonalLine.appendAtHeight params ℓ x))
-        .toSubMeasurement.outcomeOperator
-          (liftDiagonalAnswer params x f) :=
+    ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeasurement.outcomeOperator f) =
+      (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)).toSubMeasurement.outcomeOperator
+        (liftDiagonalAnswer params x f) :=
   rfl
 
 /-- The intermediate `ν` from `thm:main-induction`. -/
@@ -149,12 +145,9 @@ noncomputable def averagedSlicePointEvaluationOperator (params : Parameters)
   let 𝒟 : Distribution (Point params) := uniformDistribution (Point params)
   let u₀ : Point params := Classical.choice (inferInstance : Nonempty (Point params))
   exact weightedOperatorSumOnSupport
-    ((strategy.pointMeasurement (appendPoint params u₀ x))
-      .toSubMeasurement.outcomeOperator (g u₀))
+    ((strategy.pointMeasurement (appendPoint params u₀ x)).toSubMeasurement.outcomeOperator (g u₀))
     𝒟.support 𝒟.weight
-    (fun u =>
-      (strategy.pointMeasurement (appendPoint params u x))
-        .toSubMeasurement.outcomeOperator (g u))
+    (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeasurement.outcomeOperator (g u))
 
 /-- TODO(tensor): replace this placeholder left placement by an honest tensor-product
 embedding once the bipartite matrix API is available.

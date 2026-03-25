@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Theorems
+set_option linter.style.longLine false
 
 /-!
 Matching scaffold for Section 12 of the low individual degree paper in
@@ -23,8 +24,7 @@ noncomputable section
 def distinctTuples (params : Parameters) (k : ℕ) : Set (PointTuple params k) :=
   { xs | Function.Injective xs }
 
-/-- TODO: Should be uniform on pairwise-distinct `k`-tuples
-from `Fq`; currently a named placeholder. -/
+/-- TODO: Should be uniform on pairwise-distinct `k`-tuples from `Fq`; currently a named placeholder. -/
 def distinctTupleDistribution (params : Parameters) (k : ℕ) :
     Distribution (PointTuple params k) where
   name := s!"Distinct({params.q},{k})"
@@ -38,8 +38,7 @@ abbrev GHatType (k : ℕ) := Fin k → Bool
 abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) := Point params × PointTuple params k
 abbrev VerticalLineQuestion (params : Parameters) := Point params
 
-/-- TODO: this should be the operator-polynomial tail
-construction from `lem:chernoff-bernoulli-matrix`. -/
+/-- TODO: this should be the operator-polynomial tail construction from `lem:chernoff-bernoulli-matrix`. -/
 def bernoulliTailOperator (k d : ℕ) (X : Operator) : Operator where
   name := s!"BernoulliTail(k={k},d={d}; {X.name}^r (I-{X.name})^(k-r))"
   dim := X.dim
@@ -105,8 +104,7 @@ def gHatTupleOutcomeTail {params : Parameters} {k : ℕ}
   fun i => gs i.succ
 
 /-- Fallback global polynomial used when all completed slice outcomes are `⊥`. -/
-noncomputable def fallbackInterpolatedPolynomial
-    (params : Parameters) : Polynomial params.next where
+noncomputable def fallbackInterpolatedPolynomial (params : Parameters) : Polynomial params.next where
   poly := MvPolynomial.X ⟨params.m, Nat.lt_succ_self params.m⟩
   lowIndividualDegree := by
     intro i
@@ -141,9 +139,7 @@ def completePartSubMeasurement (params : Parameters)
 /-- Placeholder for the incomplete part `G^x_⊥ = I - G^x`. -/
 def incompletePartSubMeasurement (params : Parameters)
     (family : IndexedPolynomialFamily params) (x : Fq params) : SubMeasurement Unit :=
-  operatorAsSubMeasurement
-    (operatorComplement
-      (completePartSubMeasurement params family x).totalOperator)
+  operatorAsSubMeasurement (operatorComplement (completePartSubMeasurement params family x).totalOperator)
 
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
 def gHatIndexedMeasurement (params : Parameters)

@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Defs
+set_option linter.style.longLine false
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -32,8 +33,7 @@ def switcherooPointProductLeft {Outcome : Type*} (params : Parameters)
         ((family.meas q.1).toSubMeasurement)
         ((M q.2).toSubMeasurement)
 
-/-- Concrete hypothesis family for `M^y_o G^x_g` on the
-`Polynomial params × Outcome` outcome type. -/
+/-- Concrete hypothesis family for `M^y_o G^x_g` on the `Polynomial params × Outcome` outcome type. -/
 def switcherooPointProductRight {Outcome : Type*} (params : Parameters)
     (family : IndexedPolynomialFamily params)
     (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
@@ -199,14 +199,10 @@ def gHatHalfProductOutcomeOperator (params : Parameters)
       identityOperator s!"ghatHalf({params.m},{params.q},{params.d},0)"
   | k + 1, xs, gs =>
       operatorMul
-        (((gHatIndexedMeasurement params family (xs 0))
-          .toSubMeasurement).outcomeOperator (gs 0))
-        (gHatHalfProductOutcomeOperator params family k
-          (pointTupleTail xs)
-          (gHatTupleOutcomeTail gs))
+        (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).outcomeOperator (gs 0))
+        (gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs))
 
-/-- The total half-product
-`\sum_{g_1,\dots,g_k} \widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
+/-- The total half-product `\sum_{g_1,\dots,g_k} \widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
 def gHatHalfProductTotalOperator (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     (k : ℕ) → PointTuple params k → Operator
@@ -217,8 +213,7 @@ def gHatHalfProductTotalOperator (params : Parameters)
         (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).totalOperator)
         (gHatHalfProductTotalOperator params family k (pointTupleTail xs))
 
-/-- The cyclically rotated half-product
-`\widehat G^{x_2}_{g_2} \cdots \widehat G^{x_k}_{g_k} \widehat G^{x_1}_{g_1}`. -/
+/-- The cyclically rotated half-product `\widehat G^{x_2}_{g_2} \cdots \widehat G^{x_k}_{g_k} \widehat G^{x_1}_{g_1}`. -/
 def gHatRotatedHalfProductOutcomeOperator (params : Parameters)
     (family : IndexedPolynomialFamily params) :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Operator
@@ -226,11 +221,8 @@ def gHatRotatedHalfProductOutcomeOperator (params : Parameters)
       identityOperator s!"ghatHalfRot({params.m},{params.q},{params.d},0)"
   | k + 1, xs, gs =>
       operatorMul
-        (gHatHalfProductOutcomeOperator params family k
-          (pointTupleTail xs)
-          (gHatTupleOutcomeTail gs))
-        (((gHatIndexedMeasurement params family (xs 0))
-          .toSubMeasurement).outcomeOperator (gs 0))
+        (gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs))
+        (((gHatIndexedMeasurement params family (xs 0)).toSubMeasurement).outcomeOperator (gs 0))
 
 /-- The total cyclically rotated half-product. -/
 def gHatRotatedHalfProductTotalOperator (params : Parameters)
@@ -277,8 +269,7 @@ def gHatHalfSandwichRight (params : Parameters)
         outcomeOperator := fun gs => gHatRotatedHalfProductOutcomeOperator params family k xs gs
         totalOperator := gHatRotatedHalfProductTotalOperator params family k xs }
 
-/-- TODO: this should carry the paper's operator-polynomial
-`S_{\tau_{\ge \ell}}` construction from `lem:from-H-to-G`. -/
+/-- TODO: this should carry the paper's operator-polynomial `S_{\tau_{\ge \ell}}` construction from `lem:from-H-to-G`. -/
 def suffixBernoulliWeightOperator (params : Parameters)
     (_family : IndexedPolynomialFamily params) (k ℓ : ℕ) (_τ : GHatType k) : Operator :=
   { name := s!"S_tau>=({params.m},{params.q},{params.d},{k},{ℓ})" }
@@ -391,8 +382,7 @@ def constructedPastedMeasurementTotal (params : Parameters)
     IndexedSubMeasurement Unit Unit :=
   pastedMeasurementTotal (constructedPastedSubMeasurement params family k)
 
-/-- The expansion over all outcome types `τ`, written as
-the total mass of the averaged sandwich family. -/
+/-- The expansion over all outcome types `τ`, written as the total mass of the averaged sandwich family. -/
 def allOutcomesExpansionFamily (params : Parameters)
     (_strategy : SymmetricStrategy params.next)
     (family : IndexedPolynomialFamily params) (k : ℕ) :
