@@ -132,9 +132,9 @@ def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
 /-- The paper's normalized adjacency weight for an ordered pair of vertices. -/
 noncomputable def hypercubeAdjacencyWeight (params : Parameters)
     (u v : Point params) : ℂ :=
-  if h0 : coordinateDisagreementCount params u v = 0 then
+  if _ : coordinateDisagreementCount params u v = 0 then
     ((params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹
-  else if h1 : coordinateDisagreementCount params u v = 1 then
+  else if _ : coordinateDisagreementCount params u v = 1 then
     ((params.m : ℂ) * (params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹
   else 0
 

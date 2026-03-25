@@ -144,6 +144,7 @@ def diagOverlap (M N : α → Op d) : ℂ :=
 The diagonal and off-diagonal parts together recover the total overlap
 `τ((∑_a M_a)(∑_b N_b))`.
 -/
+omit [DecidableEq d] in
 theorem inconsistency_add_diagOverlap (M N : α → Op d) :
     inconsistency M N + diagOverlap M N =
       normalizedTrace ((∑ a, M a) * (∑ b, N b)) := by
