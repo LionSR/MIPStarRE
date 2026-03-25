@@ -21,7 +21,7 @@ theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
   sorry
 
 -- Proof outline from the source: R_a → Q_a → X, X̂ / SVD chain before the final rounding step.
-set_option linter.all false in
+set_option linter.unusedFintypeInType false in
 /-- `thm:orthonormalization`. -/
 theorem orthonormalization {Outcome : Type*}
     [Fintype Outcome]
