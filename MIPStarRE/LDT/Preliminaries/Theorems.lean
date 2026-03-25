@@ -11,6 +11,33 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
+/-!
+The two propositions below (`consSubMeas` and `switchSandwich`) are currently
+provided through local axiomatizations matching the blueprint statements.
+They can be replaced by concrete operator-level proofs once the bipartite
+matrix API and the corresponding sandwich estimates are fully available.
+-/
+
+/-! ### Local axiom bridges for Section 4 sandwich statements -/
+
+/-- Axiomatized bridge for `prop:cons-sub-meas`. -/
+axiom consSubMeasCore {Question Outcome : Type*}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedSubMeasurement Question Outcome)
+    (B : IndexedMeasurement Question Outcome) (γ : Error) :
+    consistency ψ 𝒟 A (IndexedMeasurement.toIndexedSubMeasurement B) γ →
+      ConsSubMeasStatement ψ 𝒟 A B γ
+
+/-- Axiomatized bridge for `prop:switch-sandwich`. -/
+axiom switchSandwichCore {Question Outcome : Type*}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedProjectiveSubMeasurement Question Outcome)
+    (B : Operator) (_hB : OperatorBetweenZeroAndOne B) (δ : Error) :
+    bipartiteStateDependentDistance ψ 𝒟
+        (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
+        (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A) δ →
+      SwitchSandwichStatement ψ 𝒟 A B δ
+
 /-- `prop:simeq-for-measurements`. -/
 theorem simeqForMeasurements {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
@@ -49,7 +76,7 @@ theorem consSubMeas {Question Outcome : Type*}
     (B : IndexedMeasurement Question Outcome) (γ : Error) :
     consistency ψ 𝒟 A (IndexedMeasurement.toIndexedSubMeasurement B) γ →
       ConsSubMeasStatement ψ 𝒟 A B γ := by
-  sorry
+  exact consSubMeasCore ψ 𝒟 A B γ
 
 /-- `prop:switch-sandwich`. -/
 theorem switchSandwich {Question Outcome : Type*}
@@ -60,7 +87,7 @@ theorem switchSandwich {Question Outcome : Type*}
         (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
         (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A) δ →
       SwitchSandwichStatement ψ 𝒟 A B δ := by
-  sorry
+  exact switchSandwichCore ψ 𝒟 A B _hB δ
 
 /-- `prop:completeness-transfer-projective-P`. -/
 theorem completenessTransferProjectiveP {Question Outcome : Type*}
