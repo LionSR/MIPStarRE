@@ -32,10 +32,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Attach to PR branch
+        env:
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
           # Checkout put us in detached HEAD at the exact failing SHA.
           # Create a local branch tracking the PR branch so pushes work.
-          git checkout -B "${{ github.event.workflow_run.head_branch }}"
+          git checkout -B "$HEAD_BRANCH"
 
       - name: Check for previous auto-fix attempts
         id: loop_guard
