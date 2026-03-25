@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.CommutativityPoints
+import MIPStarRE.LDT.CommutativityPoints.Theorem
 
 /-!
 Definitions and operator constructions for Section 11 commutativity.

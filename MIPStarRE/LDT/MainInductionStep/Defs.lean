@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective
+import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
 
 /-!
 Definitions for Section 6 of the low individual degree paper in

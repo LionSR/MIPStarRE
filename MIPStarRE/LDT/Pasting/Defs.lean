@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Commutativity
+import MIPStarRE.LDT.Commutativity.Theorems
 
 /-!
 Matching scaffold for Section 12 of the low individual degree paper in

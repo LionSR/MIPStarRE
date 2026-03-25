@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.ExpansionHypercubeGraph
+import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems
 
 namespace MIPStarRE.LDT.GlobalVariance
 

@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.SelfImprovement
+import MIPStarRE.LDT.SelfImprovement.Theorems
 
 /-!
 Matching scaffold for Section 10 of the low individual degree paper in

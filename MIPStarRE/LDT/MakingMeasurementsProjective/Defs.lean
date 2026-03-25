@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Preliminaries
+import MIPStarRE.LDT.Preliminaries.Theorems
 import MIPStarRE.Quantum
 
 /-!

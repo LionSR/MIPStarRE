@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MainInductionStep
+import MIPStarRE.LDT.MainInductionStep.Theorems
 
 /-!
 Matching scaffold for Section 7 of the low individual degree paper in

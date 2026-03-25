@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test
+import MIPStarRE.LDT.Test.MainTheorem
 
 /-!
 Matching scaffold for Section 4 of the low individual degree paper in

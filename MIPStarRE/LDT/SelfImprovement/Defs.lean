@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.GlobalVariance
+import MIPStarRE.LDT.GlobalVariance.Theorems
 
 /-!
 Matching scaffold for Section 9 of the low individual degree paper in
