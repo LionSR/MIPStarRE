@@ -5,7 +5,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 
 
 \begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
-  \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.selfImprovementHelper}
+  \lean{MIPStarRE.LDT.Section9SelfImprovement.selfImprovementHelper}
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement such that, on average over $u \sim \F_q^m$,
   \[
@@ -41,7 +41,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 
 
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
-  \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.sdp}
+  \lean{MIPStarRE.LDT.Section9SelfImprovement.sdp}
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
@@ -67,7 +67,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{proof}
 
 \begin{lemma}[Averaging over the evaluation point]\label{lem:add-in-u}
-  \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.addInU}
+  \lean{MIPStarRE.LDT.Section9SelfImprovement.addInU}
   \uses{lem:global-variance-of-points, prop:simeq-to-approx}
   Let $T=\{T_h\}$ be an optimal solution of the primal SDP, let
   \[
@@ -89,7 +89,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{proof}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
-  \lean{MIPStarRE.Paper2009LDT.Section9SelfImprovement.selfImprovement}
+  \lean{MIPStarRE.LDT.Section9SelfImprovement.selfImprovement}
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement such that, on average over $u \sim \F_q^m$,
   \[

@@ -5,7 +5,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 
 
 \begin{lemma}[Replacing a line answer by a fixed polynomial]\label{lem:generalize-b}
-  \lean{MIPStarRE.Paper2009LDT.Section8GlobalVariance.generalizeB}
+  \lean{MIPStarRE.LDT.Section8GlobalVariance.generalizeB}
   \uses{def:polymeasurements, lem:schwartz-zippel-individual}
   Let $G \in \polysub{m}{q}{d}$. On the axis-parallel line-test distribution,
   \[
@@ -19,7 +19,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{proof}
 
 \begin{lemma}[Local variance of the points measurements]\label{lem:local-variance-of-points}
-  \lean{MIPStarRE.Paper2009LDT.Section8GlobalVariance.localVarianceOfPoints}
+  \lean{MIPStarRE.LDT.Section8GlobalVariance.localVarianceOfPoints}
   \uses{lem:good-strategy-characterization, prop:simeq-to-approx, lem:generalize-b, prop:triangle-inequality-for-approx_delta}
   Let $G \in \polysub{m}{q}{d}$. On the hypercube edge distribution $(u,v) \sim C$,
   \[
@@ -40,7 +40,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{proof}
 
 \begin{lemma}[Global variance of the points measurements]\label{lem:global-variance-of-points}
-  \lean{MIPStarRE.Paper2009LDT.Section8GlobalVariance.globalVarianceOfPoints}
+  \lean{MIPStarRE.LDT.Section8GlobalVariance.globalVarianceOfPoints}
   \uses{def:local-and-variance, lem:local-to-global, lem:local-variance-of-points}
   Let $G \in \polysub{m}{q}{d}$. On the uniform distribution over independent $u,v \in \F_q^m$,
   \[
