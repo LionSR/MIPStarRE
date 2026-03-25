@@ -1,5 +1,11 @@
 import MIPStarRE.LDT.Pasting.Sandwich
 
+/-!
+# Section 12 — Statements
+
+Output structures for the low-degree pasting lemmas.
+-/
+
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT

@@ -1,5 +1,11 @@
 import MIPStarRE.LDT.GlobalVariance.Defs
 
+/-!
+# Section 8 — Matrix realization
+
+Concrete finite-dimensional matrix realizations of the variance transfer data.
+-/
+
 namespace MIPStarRE.LDT.GlobalVariance
 
 open MIPStarRE.LDT

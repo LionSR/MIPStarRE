@@ -1,5 +1,12 @@
 import MIPStarRE.LDT.Test.Defs
 
+/-!
+# Section 3 — Strategy
+
+Symmetric and projective strategy structures for the low individual degree test,
+together with the test-passing and consistency predicates.
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 noncomputable section

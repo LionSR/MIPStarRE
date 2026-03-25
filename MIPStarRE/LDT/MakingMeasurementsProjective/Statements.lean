@@ -1,5 +1,11 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 
+/-!
+# Section 5 — Statements
+
+Output structures for Naimark dilation, orthonormalization, and projectivization.
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 noncomputable section

@@ -1,5 +1,11 @@
 import MIPStarRE.LDT.Pasting.Statements
 
+/-!
+# Section 12 — Theorems
+
+Theorem stubs for low-degree pasting.
+-/
+
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT

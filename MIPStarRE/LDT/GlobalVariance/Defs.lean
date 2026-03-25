@@ -1,5 +1,12 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems
 
+/-!
+# Section 8 — Definitions
+
+Definitions for the global variance analysis: axis-parallel line questions,
+point-pair questions, polynomial families, and variance transfer constructions.
+-/
+
 namespace MIPStarRE.LDT.GlobalVariance
 
 open MIPStarRE.LDT

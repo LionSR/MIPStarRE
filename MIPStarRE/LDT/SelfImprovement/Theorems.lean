@@ -1,5 +1,11 @@
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization
 
+/-!
+# Section 9 — Theorems
+
+Theorem stubs for the self-improvement argument.
+-/
+
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT

@@ -1,5 +1,11 @@
 import MIPStarRE.LDT.Test.Strategy
 
+/-!
+# Section 3 — Main theorem
+
+The main formal output of the low individual degree test (`thm:main-formal`).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 noncomputable section

@@ -1,5 +1,11 @@
 import MIPStarRE.LDT.CommutativityPoints.Defs
 
+/-!
+# Section 10 — Theorems
+
+Output structures and theorem statements for commutativity at points.
+-/
+
 namespace MIPStarRE.LDT.CommutativityPoints
 
 open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)

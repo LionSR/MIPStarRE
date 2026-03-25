@@ -1,5 +1,11 @@
 import MIPStarRE.LDT.GlobalVariance.MatrixRealization
 
+/-!
+# Section 8 — Theorems
+
+Output structures and theorem statements for the global variance lemmas.
+-/
+
 namespace MIPStarRE.LDT.GlobalVariance
 
 open MIPStarRE.LDT

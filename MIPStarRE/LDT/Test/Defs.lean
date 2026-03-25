@@ -3,6 +3,13 @@ import MIPStarRE.LDT.Basic.Operator
 import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Basic.SubMeasurement
 
+/-!
+# Section 3 — Definitions
+
+Core definitions for the low individual degree test: evaluation families,
+matching mass, consistency defect, and test-passing predicates.
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 noncomputable section

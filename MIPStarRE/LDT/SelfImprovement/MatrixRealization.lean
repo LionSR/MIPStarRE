@@ -1,6 +1,12 @@
 import MIPStarRE.LDT.SelfImprovement.Defs
 set_option linter.style.longLine false
 
+/-!
+# Section 9 — Matrix realization
+
+Concrete finite-dimensional matrix realizations of the self-improvement SDP data.
+-/
+
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT

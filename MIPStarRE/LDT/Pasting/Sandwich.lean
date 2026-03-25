@@ -1,6 +1,12 @@
 import MIPStarRE.LDT.Pasting.Defs
 set_option linter.style.longLine false
 
+/-!
+# Section 12 — Sandwich constructions
+
+Switcheroo and sandwich operator families for the pasting argument.
+-/
+
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT

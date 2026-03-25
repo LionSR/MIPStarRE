@@ -1,5 +1,11 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 
+/-!
+# Section 5 — Theorems
+
+Theorem stubs for Naimark dilation and orthonormalization.
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 noncomputable section
