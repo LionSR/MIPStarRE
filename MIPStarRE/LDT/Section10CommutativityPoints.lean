@@ -1,1 +1,0 @@
-import MIPStarRE.LDT.Section10CommutativityPoints.Theorem

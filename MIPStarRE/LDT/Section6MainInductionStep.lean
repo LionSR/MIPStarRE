@@ -1,3 +1,0 @@
-import MIPStarRE.LDT.Section6MainInductionStep.Defs
-import MIPStarRE.LDT.Section6MainInductionStep.Statements
-import MIPStarRE.LDT.Section6MainInductionStep.Theorems

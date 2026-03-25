@@ -5,7 +5,7 @@
 \section{Commutativity of the point measurements}
 
 \begin{theorem}[Commutativity of the point measurements]\label{thm:commutativity-points}
-  \lean{MIPStarRE.LDT.Section10CommutativityPoints.commutativityPoints}
+  \lean{MIPStarRE.LDT.CommutativityPoints.commutativityPoints}
   \uses{lem:good-strategy-characterization, prop:simeq-to-approx}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. On average over independent $u,v \sim \F_q^m$,
   \[
@@ -19,7 +19,7 @@
 \section{Commutativity of the slice measurements}
 
 \begin{lemma}[Commutativity after evaluation]\label{lem:comm-data-processed-g}
-  \lean{MIPStarRE.LDT.Section11Commutativity.commDataProcessedG}
+  \lean{MIPStarRE.LDT.Commutativity.commDataProcessedG}
   \uses{prop:cons-sub-meas, prop:closeness-of-ip, prop:two-notions-of-self-consistency-after-evaluation, thm:commutativity-points}
   Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ such that:
   \begin{enumerate}
@@ -45,7 +45,7 @@
 \end{proof}
 
 \begin{lemma}[Normalization condition for a sandwiched family]\label{lem:normalization-condition}
-  \lean{MIPStarRE.LDT.Section11Commutativity.normalizationCondition}
+  \lean{MIPStarRE.LDT.Commutativity.normalizationCondition}
   \uses{def:submeasurement}
   Let $P=\{P_a\}$ be a submeasurement and $Q=\{Q_b\}$ a projective submeasurement. Define $C_{a,b}=Q_b P_a Q_b$. Then
   \[
@@ -58,7 +58,7 @@
 \end{proof}
 
 \begin{theorem}[Commutativity of the slice measurements]\label{thm:com-main}
-  \lean{MIPStarRE.LDT.Section11Commutativity.comMain}
+  \lean{MIPStarRE.LDT.Commutativity.comMain}
   \uses{lem:comm-data-processed-g, lem:normalization-condition, prop:switch-sandwich, prop:closeness-of-ip, lem:schwartz-zippel-individual}
   Let $\{G^x\}_{x \in \F_q}$ satisfy the same hypotheses as in Lemma~\ref{lem:comm-data-processed-g}. Then, on average over independent $x,y \sim \F_q$,
   \[

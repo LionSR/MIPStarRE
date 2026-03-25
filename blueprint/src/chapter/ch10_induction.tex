@@ -21,7 +21,7 @@
 \end{definition}
 
 \begin{lemma}[Restricted success probabilities]\label{lem:restricted-probabilities}
-  \lean{MIPStarRE.LDT.Section6MainInductionStep.restrictedProbabilities}
+  \lean{MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}
   \uses{def:restricted-strategy, def:good-strategy}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the restricted strategy and let $\eps_x,\delta_x,\gamma_x$ be its three failure probabilities. Then
   \[
@@ -39,7 +39,7 @@
 \section{The inductive construction}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
-  \lean{MIPStarRE.LDT.Section6MainInductionStep.selfImprovementInInductionSection}
+  \lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
   Let $G \in \polysub{m}{q}{d}$ be a submeasurement such that, on average over $u \sim \F_q^m$,
   \[
@@ -70,7 +70,7 @@
 \end{proof}
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
-  \lean{MIPStarRE.LDT.Section6MainInductionStep.mainInduction}
+  \lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
   \uses{def:good-strategy, def:polymeasurements, def:simeq}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
   \[

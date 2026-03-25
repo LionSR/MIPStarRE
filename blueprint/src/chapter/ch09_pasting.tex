@@ -3,7 +3,7 @@
 
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting}
-  \lean{MIPStarRE.LDT.Section6MainInductionStep.ldPastingInInductionSection, MIPStarRE.LDT.Section12Pasting.ldPasting}
+  \lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection, MIPStarRE.LDT.Pasting.ldPasting}
   \uses{def:polymeasurements, def:simeq}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ such that:
   \begin{enumerate}
@@ -54,7 +54,7 @@
 \end{proof}
 
 \begin{lemma}[Pasted submeasurement]\label{lem:ld-pasting-sub-measurement}
-  \lean{MIPStarRE.LDT.Section12Pasting.ldPastingSubMeasurement}
+  \lean{MIPStarRE.LDT.Pasting.ldPastingSubMeasurement}
   \uses{def:polymeasurements, def:simeq}
   Under the hypotheses of Theorem~\ref{thm:ld-pasting}, there exists a submeasurement $H \in \polysub{m+1}{q}{d}$ such that:
   \begin{enumerate}
@@ -82,7 +82,7 @@
 \end{definition}
 
 \begin{lemma}[Distinct tuples versus independent tuples]\label{prop:ld-dnoteq}
-  \lean{MIPStarRE.LDT.Section12Pasting.ldDnoteq}
+  \lean{MIPStarRE.LDT.Pasting.ldDnoteq}
   \uses{def:distinct-tuples}
   If $x=(x_1,\dots,x_k)$ is uniformly random in $\F_q^k$ and $y=(y_1,\dots,y_k)$ is uniformly random in $\mathsf{Distinct}_k$, then
   \[
@@ -94,7 +94,7 @@
 \end{proof}
 
 \begin{lemma}[A scalar inequality for the first construction]\label{lem:looks-easy-but-took-me-a-while}
-  \lean{MIPStarRE.LDT.Section12Pasting.looksEasyButTookMeAWhile}
+  \lean{MIPStarRE.LDT.Pasting.looksEasyButTookMeAWhile}
   For every real number $0 \le \lambda \le 1$,
   \[
     \lambda(1-\lambda^d) \le 2(\lambda^{d+1}(1-\lambda))^{1/(d+1)}.
@@ -139,7 +139,7 @@
 \end{definition}
 
 \begin{lemma}[Strong self-consistency of the complete part]\label{lem:g-complete-self-consistency}
-  \lean{MIPStarRE.LDT.Section12Pasting.gCompleteSelfConsistency}
+  \lean{MIPStarRE.LDT.Pasting.gCompleteSelfConsistency}
   \uses{prop:two-notions-of-self-consistency}
   Under the hypotheses of Theorem~\ref{thm:ld-pasting},
   \[
@@ -151,7 +151,7 @@
 \end{proof}
 
 \begin{lemma}[Strong self-consistency of the incomplete part]\label{cor:g-bot-self-consistency}
-  \lean{MIPStarRE.LDT.Section12Pasting.gBotSelfConsistency}
+  \lean{MIPStarRE.LDT.Pasting.gBotSelfConsistency}
   \uses{lem:g-complete-self-consistency}
   Under the hypotheses of Theorem~\ref{thm:ld-pasting},
   \[
@@ -163,7 +163,7 @@
 \end{proof}
 
 \begin{lemma}[Commutativity with $G_g^x$ implies commutativity with $G^x$]\label{lem:commutativity-switcheroo}
-  \lean{MIPStarRE.LDT.Section12Pasting.commutativitySwitcheroo}
+  \lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo}
   \uses{prop:switch-sandwich}
   Let $M=\{M_o^y\}$ be a projective submeasurement. Suppose
   \[
@@ -181,7 +181,7 @@
 \end{proof}
 
 \begin{lemma}[Commutativity of the complete part]\label{cor:commuting-with-G-complete}
-  \lean{MIPStarRE.LDT.Section12Pasting.commutingWithGComplete}
+  \lean{MIPStarRE.LDT.Pasting.commutingWithGComplete}
   \uses{thm:com-main, lem:commutativity-switcheroo, lem:g-complete-self-consistency}
   Under the hypotheses of Theorem~\ref{thm:ld-pasting}, the following relations hold on average over independent $x,y$:
   \[
@@ -199,7 +199,7 @@
 \end{proof}
 
 \begin{lemma}[Commutativity of the incomplete part]\label{cor:commuting-with-G-incomplete}
-  \lean{MIPStarRE.LDT.Section12Pasting.commutingWithGIncomplete}
+  \lean{MIPStarRE.LDT.Pasting.commutingWithGIncomplete}
   \uses{cor:commuting-with-G-complete}
   Under the hypotheses of Theorem~\ref{thm:ld-pasting},
   \[
@@ -213,7 +213,7 @@
 \end{proof}
 
 \begin{lemma}[Strong self-consistency and commutation of $\widehat G$]\label{cor:G-hat-facts}
-  \lean{MIPStarRE.LDT.Section12Pasting.gHatFacts}
+  \lean{MIPStarRE.LDT.Pasting.gHatFacts}
   \uses{lem:g-complete-self-consistency, cor:g-bot-self-consistency, cor:commuting-with-G-complete, cor:commuting-with-G-incomplete}
   The completed measurements $\widehat G^x$ satisfy
   \[
@@ -233,7 +233,7 @@
 \section{Consistency of the sandwich with the line measurement}
 
 \begin{lemma}[Commuting past multiple completed measurements]\label{lem:commute-g-half-sandwich}
-  \lean{MIPStarRE.LDT.Section12Pasting.commuteGHalfSandwich}
+  \lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich}
   \uses{cor:G-hat-facts, prop:triangle-inequality-for-approx_delta}
   For every $k \ge 2$,
   \[
@@ -251,7 +251,7 @@
 \end{proof}
 
 \begin{lemma}[Consistency of the sandwiched measurement with one line value]\label{lem:ld-sandwich-line-one-point}
-  \lean{MIPStarRE.LDT.Section12Pasting.ldSandwichLineOnePoint}
+  \lean{MIPStarRE.LDT.Pasting.ldSandwichLineOnePoint}
   \uses{lem:commute-g-half-sandwich, lem:ld-gbcon}
   For any $1 \le i \le k$,
   \[
@@ -269,7 +269,7 @@
 \end{proof}
 
 \begin{lemma}[Consistency of the pasted measurement with the line measurement]\label{lem:h-b-consistency}
-  \lean{MIPStarRE.LDT.Section12Pasting.hBConsistency}
+  \lean{MIPStarRE.LDT.Pasting.hBConsistency}
   \uses{def:pasted-measurement, prop:ld-dnoteq, lem:ld-sandwich-line-one-point}
   The pasted submeasurement satisfies
   \[
@@ -292,7 +292,7 @@
 \end{definition}
 
 \begin{lemma}[Summing over all outcomes]\label{lem:over-all-outcomes}
-  \lean{MIPStarRE.LDT.Section12Pasting.overAllOutcomes}
+  \lean{MIPStarRE.LDT.Pasting.overAllOutcomes}
   \uses{def:outcomes-by-type, prop:ld-dnoteq, lem:ld-sandwich-line-one-point, lem:schwartz-zippel-individual}
   If $x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
   \[
@@ -339,7 +339,7 @@
 \end{proof}
 
 \begin{lemma}[From the pasted sum to a polynomial in $G$]\label{lem:from-H-to-G}
-  \lean{MIPStarRE.LDT.Section12Pasting.fromHToG}
+  \lean{MIPStarRE.LDT.Pasting.fromHToG}
   \uses{cor:G-hat-facts, lem:commute-g-half-sandwich, def:pasted-measurement, def:truncated-type-sums, lem:truncated-type-sum-recurrence}
   If $x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
   \[
@@ -359,7 +359,7 @@
 
 
 \begin{lemma}[Matrix Chernoff bound for the Bernoulli polynomial]\label{lem:chernoff-bernoulli-matrix}
-  \lean{MIPStarRE.LDT.Section12Pasting.chernoffBernoulliMatrix}
+  \lean{MIPStarRE.LDT.Pasting.chernoffBernoulliMatrix}
   Let $0<\theta<1$ and integers $k,d>0$ with $k \ge 2d/\theta$. Define
   \[
     F(X) = \sum_{r=d+1}^k \binom{k}{r} X^r (I-X)^{k-r}.
@@ -376,7 +376,7 @@
 \end{proof}
 
 \begin{lemma}[Completeness of the pasted submeasurement]\label{cor:ld-pasting-N-completeness}
-  \lean{MIPStarRE.LDT.Section12Pasting.ldPastingNCompleteness}
+  \lean{MIPStarRE.LDT.Pasting.ldPastingNCompleteness}
   \uses{lem:over-all-outcomes, lem:from-H-to-G, lem:chernoff-bernoulli-matrix}
   If $k \ge 400md$, then
   \[

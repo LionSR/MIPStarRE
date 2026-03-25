@@ -5,7 +5,7 @@
 
 
 \begin{definition}[Rerandomizing one coordinate]\label{def:rerandomize-coord}
-  \lean{MIPStarRE.LDT.Section7ExpansionHypercubeGraph.rerandomizeCoord}
+  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord}
   For $u \in \F_q^m$, an index $i \in \{1,\dots,m\}$, and $x \in \F_q$, let
   \[
     \operatorname{rerand}_i(u,x) = u + x e_i.
@@ -31,7 +31,7 @@
 \end{definition}
 
 \begin{lemma}[Laplacian rewrite]\label{prop:laplacian-rewrite}
-  \lean{MIPStarRE.LDT.Section7ExpansionHypercubeGraph.laplacianRewrite}
+  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianRewrite}
   \uses{def:adjacency-laplacian}
   The Laplacian can be written as
   \[
@@ -72,7 +72,7 @@
 \end{proof}
 
 \begin{lemma}[Eigenvectors of the hypercube graph]\label{prop:eigenvectors}
-  \lean{MIPStarRE.LDT.Section7ExpansionHypercubeGraph.eigenvectors}
+  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors}
   \uses{def:adjacency-laplacian, lem:character-average-vector, lem:character-average-scalar}
   For each $\alpha \in \F_q^m$, define
   \[
@@ -89,7 +89,7 @@
 \end{proof}
 
 \begin{lemma}[Spectral gap of the Laplacian]\label{cor:laplacian-spectral-gap}
-  \lean{MIPStarRE.LDT.Section7ExpansionHypercubeGraph.laplacianSpectralGap}
+  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGap}
   \uses{prop:eigenvectors}
   If $\lambda_1 \le \lambda_2 \le \cdots \le \lambda_{q^m}$ are the eigenvalues of $L$, then
   \[
@@ -105,7 +105,7 @@
 \section{Local and global variance}
 
 \begin{definition}[Local and global variance]\label{def:local-and-variance}
-  \lean{MIPStarRE.LDT.Section7ExpansionHypercubeGraph.localAndVariance}
+  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localAndVariance}
   Let $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ and let $0 \le A^u \le I$ be an operator for each $u \in \F_q^m$. The local variance is
   \[
     \mathbf{Var}_{\mathrm{local}}(A,\psi)
@@ -119,7 +119,7 @@
 \end{definition}
 
 \begin{lemma}[Local variance as a Laplacian form]\label{lem:local-rewrite}
-  \lean{MIPStarRE.LDT.Section7ExpansionHypercubeGraph.localRewrite}
+  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localRewrite}
   \uses{def:adjacency-laplacian, def:local-and-variance}
   Define
   \[
@@ -136,7 +136,7 @@
 \end{proof}
 
 \begin{lemma}[Global variance as the orthogonal Fourier mass]\label{lem:global-rewrite}
-  \lean{MIPStarRE.LDT.Section7ExpansionHypercubeGraph.globalRewrite}
+  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.globalRewrite}
   \uses{prop:eigenvectors, def:local-and-variance}
   Write
   \[
@@ -153,7 +153,7 @@
 \end{proof}
 
 \begin{lemma}[Local-to-global inequality]\label{lem:local-to-global}
-  \lean{MIPStarRE.LDT.Section7ExpansionHypercubeGraph.localToGlobal}
+  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localToGlobal}
   \uses{cor:laplacian-spectral-gap, lem:local-rewrite, lem:global-rewrite}
   For every family $\{A^u\}$,
   \[
