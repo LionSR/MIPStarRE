@@ -38,7 +38,7 @@
       <span class="site-footer-owner"><a href="{{ site.github.repository_url }}">{{ site.github.repository_name }}</a>
         is maintained by ... (to be filled).</span>
       {% endif %}
-      <span class="site-footer-credits">Last updated: {{ site.time | date: "%B %d, %Y" }}</span>
+      <span class="site-footer-credits">Last updated: <time datetime="{{ site.time | date_to_xmlschema }}">{{ site.time | date: "%B %d, %Y" }}</time></span>
     </footer>
   </main>
 </body>

@@ -6,4 +6,4 @@ A formal verification of the **low-degree test**, part of the proof of MIP\* = R
 
 Based on the paper: [Quantum soundness of the classical low individual degree test](https://arxiv.org/abs/2009.12982) by Ji, Natarajan, Vidick, Wright, and Yuen (2020).
 
-**Blueprint last updated:** {{ site.time | date: "%B %d, %Y" }}
+**Site generated:** {{ site.time | date: "%B %d, %Y" }}
