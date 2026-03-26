@@ -119,8 +119,10 @@ theorem averageOverDistribution_add {α : Type*} (𝒟 : Distribution α) (f g :
   exact list_weighted_sum_add 𝒟.support 𝒟.weight f g
 
 /-- Averaging commutes with scalar multiplication. -/
-theorem averageOverDistribution_const_mul {α : Type*} (𝒟 : Distribution α) (c : Error) (f : α → Error) :
-    averageOverDistribution 𝒟 (fun a => c * f a) = c * averageOverDistribution 𝒟 f := by
+theorem averageOverDistribution_const_mul {α : Type*} (𝒟 : Distribution α)
+    (c : Error) (f : α → Error) :
+    averageOverDistribution 𝒟 (fun a => c * f a) =
+      c * averageOverDistribution 𝒟 f := by
   unfold averageOverDistribution
   exact list_weighted_sum_const_mul 𝒟.support 𝒟.weight c f
 
