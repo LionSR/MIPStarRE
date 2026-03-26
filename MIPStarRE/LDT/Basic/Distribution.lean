@@ -78,8 +78,8 @@ private theorem list_weighted_sum_add {α : Type*} (l : List α) (w : α → Err
   induction l with
   | nil => simp
   | cons a l ih =>
-    simp only [List.map_cons, List.sum_cons, mul_add]
-    linarith [ih]
+    simp only [List.map_cons, List.sum_cons]
+    rw [mul_add, ih]; ring
 
 /-- Helper: scalar multiplication pulls out of weighted sum. -/
 private theorem list_weighted_sum_const_mul {α : Type*}

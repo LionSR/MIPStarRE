@@ -224,39 +224,39 @@ theorem expectationValue_sub (ψ : QuantumState) (X Y : Operator)
 @[simp] theorem castOp_rfl {n : ℕ} (A : MIPStarRE.Quantum.Op (HilbertIndex n)) :
     castOp rfl A = A := rfl
 
+@[simp] theorem castOp_zero {m n : ℕ} (h : m = n) :
+    castOp h (0 : MIPStarRE.Quantum.Op (HilbertIndex m)) = 0 := by subst h; rfl
+
+theorem castOp_mul {m n : ℕ} (h : m = n) (A B : MIPStarRE.Quantum.Op (HilbertIndex m)) :
+    castOp h (A * B) = castOp h A * castOp h B := by subst h; rfl
+
+theorem castOp_conjTranspose {m n : ℕ} (h : m = n)
+    (A : MIPStarRE.Quantum.Op (HilbertIndex m)) :
+    (castOp h A)ᴴ = castOp h Aᴴ := by subst h; rfl
+
 /-- The matrix of `operatorDifference X X` is zero. -/
 theorem operatorDifference_self_matrix (X : Operator) :
     (operatorDifference X X).matrix = 0 := by
-  unfold operatorDifference
-  simp [dif_pos (show X.dim = X.dim from rfl), castOp, sub_self]
+  unfold operatorDifference; rw [dif_pos rfl]; simp [sub_self]
 
 /-- The dim of `operatorDifference X X` equals `X.dim`. -/
 theorem operatorDifference_self_dim (X : Operator) :
     (operatorDifference X X).dim = X.dim := by
-  unfold operatorDifference
-  simp [dif_pos (show X.dim = X.dim from rfl)]
+  unfold operatorDifference; rw [dif_pos rfl]
 
 /-- `expectationValue` of an operator with zero matrix is zero. -/
 theorem expectationValue_zero_matrix (ψ : QuantumState) (X : Operator)
     (h : X.matrix = 0) : expectationValue ψ X = 0 := by
-  unfold expectationValue
-  split
-  · next hdim =>
-    simp only [h]
-    -- castOp maps 0 to 0
-    have : castOp hdim.symm (0 : MIPStarRE.Quantum.Op (HilbertIndex X.dim)) = 0 := by
-      cases hdim; rfl
-    rw [this, Matrix.mul_zero, MIPStarRE.Quantum.normalizedTrace_zero, Complex.zero_re]
-  · rfl
+  dsimp [expectationValue]; split_ifs <;> simp [h]
 
 /-- The `operatorMul` of two operators where the first has zero matrix gives zero matrix
 (when dimensions match). -/
 theorem operatorMul_zero_left_matrix (X Y : Operator) (h : X.matrix = 0) :
     (operatorMul X Y).matrix = 0 := by
   unfold operatorMul
-  split
-  · next hdim => simp [h]
-  · exact h
+  by_cases hdim : X.dim = Y.dim
+  · rw [dif_pos hdim]; simp [h]
+  · rw [dif_neg hdim]; exact h
 
 /-- The `operatorAdjoint` of an operator with zero matrix has zero matrix. -/
 theorem operatorAdjoint_zero_matrix (X : Operator) (h : X.matrix = 0) :
@@ -287,16 +287,17 @@ theorem expectationValue_adjoint_self_nonneg (ψ : QuantumState) (M : Operator)
   -- The cast commutes with matrix operations
   have hcst : castOp hdim.symm (M.matrixᴴ * M.matrix) =
       (castOp hdim.symm M.matrix)ᴴ * castOp hdim.symm M.matrix := by
-    cases hdim; simp [castOp]
+    rw [castOp_mul, castOp_conjTranspose]
   rw [hcst]
   set Mc := castOp hdim.symm M.matrix
   -- Goal: 0 ≤ Re(normalizedTrace(ψ.density * (Mcᴴ * Mc)))
   unfold MIPStarRE.Quantum.normalizedTrace
-  simp only [Complex.re_div_ofReal]
+  classical
+  simp only [Complex.div_natCast_re]
   apply div_nonneg
   · -- Re(tr(ρ * Mcᴴ * Mc)) ≥ 0
     -- By cyclicity: tr((ρ * Mcᴴ) * Mc) = tr(Mc * (ρ * Mcᴴ)) = tr((Mc * ρ) * Mcᴴ)
-    rw [Matrix.mul_assoc, Matrix.trace_mul_comm (ψ.density * Mcᴴ) Mc, ← Matrix.mul_assoc]
+    rw [← Matrix.mul_assoc, Matrix.trace_mul_comm (ψ.density * Mcᴴ) Mc, ← Matrix.mul_assoc]
     -- Goal: 0 ≤ (Mc * ψ.density * Mcᴴ).trace.re
     -- Mc * ψ.density * Mcᴴ is PSD by congruence
     unfold QuantumState.IsPositive at hψ
@@ -304,7 +305,7 @@ theorem expectationValue_adjoint_self_nonneg (ψ : QuantumState) (M : Operator)
     have hPSD : (Mc * ψ.density * Mcᴴ).PosSemidef := hψ.mul_mul_conjTranspose_same Mc
     -- trace of PSD matrix is nonneg (in ComplexOrder: re ≥ 0 ∧ im = 0)
     exact (Complex.nonneg_iff.mp hPSD.trace_nonneg).1
-  · exact Nat.cast_nonneg
+  · exact Nat.cast_nonneg _
 
 /-! ### Parallelogram inequality for normalized trace -/
 
@@ -315,13 +316,14 @@ theorem normalizedTrace_parallelogram {n : Type*} [Fintype n] [DecidableEq n]
     (ρ D₁ D₂ : Matrix n n ℂ) (hρ : ρ.PosSemidef) :
     0 ≤ Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ - D₂)ᴴ * (D₁ - D₂)))) := by
   unfold MIPStarRE.Quantum.normalizedTrace
-  simp only [Complex.re_div_ofReal]
+  classical
+  simp only [Complex.div_natCast_re]
   apply div_nonneg
   · -- By cyclicity: tr(ρ * (D₁-D₂)ᴴ * (D₁-D₂)) = tr((D₁-D₂) * ρ * (D₁-D₂)ᴴ)
-    rw [Matrix.mul_assoc, Matrix.trace_mul_comm (ρ * (D₁ - D₂)ᴴ) (D₁ - D₂),
+    rw [← Matrix.mul_assoc, Matrix.trace_mul_comm (ρ * (D₁ - D₂)ᴴ) (D₁ - D₂),
         ← Matrix.mul_assoc]
     exact (Complex.nonneg_iff.mp (hρ.mul_mul_conjTranspose_same (D₁ - D₂)).trace_nonneg).1
-  · exact Nat.cast_nonneg
+  · exact Nat.cast_nonneg _
 
 /-- Triangle inequality for normalized trace of PSD-weighted quadratic forms:
 `Re τ(ρ (D₁+D₂)ᴴ(D₁+D₂)) ≤ 2·(Re τ(ρ D₁ᴴD₁) + Re τ(ρ D₂ᴴD₂))` for PSD ρ.
@@ -337,7 +339,8 @@ theorem normalizedTrace_triangle {n : Type*} [Fintype n] [DecidableEq n]
   -- Step 1: Parallelogram identity at the matrix level
   have h_para : (D₁ + D₂)ᴴ * (D₁ + D₂) + (D₁ - D₂)ᴴ * (D₁ - D₂) =
       (D₁ᴴ * D₁ + D₂ᴴ * D₂) + (D₁ᴴ * D₁ + D₂ᴴ * D₂) := by
-    simp only [conjTranspose_add, conjTranspose_sub, add_mul, mul_add, sub_mul, mul_sub]
+    simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_sub,
+      add_mul, mul_add, sub_mul, mul_sub]
     abel
   -- Step 2: Apply normalizedTrace linearity to get the identity at trace level
   have h_trace_id :
@@ -354,14 +357,14 @@ theorem normalizedTrace_triangle {n : Type*} [Fintype n] [DecidableEq n]
       Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁ + D₂ᴴ * D₂))) +
       Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁ + D₂ᴴ * D₂))) := by
     have := congr_arg Complex.re h_trace_id
-    simp only [map_add] at this
+    simp only [Complex.add_re] at this
     exact this
   -- Step 4: Linearity of RHS
   have h_lin :
       Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁ + D₂ᴴ * D₂))) =
       Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁))) +
       Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₂ᴴ * D₂))) := by
-    rw [Matrix.mul_add, MIPStarRE.Quantum.normalizedTrace_add, map_add]
+    rw [Matrix.mul_add, MIPStarRE.Quantum.normalizedTrace_add, Complex.add_re]
   -- Step 5: PSD nonnegativity of the difference term
   have h_nonneg := normalizedTrace_parallelogram ρ D₁ D₂ hρ
   -- Step 6: Combine with linarith
@@ -379,8 +382,7 @@ theorem expectationValue_adjoint_self_nonneg' (ψ : QuantumState) (M : Operator)
   · exact expectationValue_adjoint_self_nonneg ψ M hψ hdim
   · -- When dims don't match, expectationValue returns 0
     suffices expectationValue ψ (operatorMul (operatorAdjoint M) M) = 0 by linarith
-    unfold expectationValue operatorMul operatorAdjoint
-    simp only [dif_pos (show M.dim = M.dim from rfl)]
-    exact dif_neg hdim
+    dsimp [expectationValue, operatorMul, operatorAdjoint]
+    split_ifs <;> simp_all
 
 end MIPStarRE.LDT
