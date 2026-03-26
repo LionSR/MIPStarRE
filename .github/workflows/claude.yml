@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -42,13 +42,15 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          allowed_bots: 'claude,chatgpt-codex-connector,cursor[bot]'
 
           # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
 
-          # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
-          # prompt: 'Update the pull request description to include a summary of changes.'
+          # Load Lean skills from the official leanprover skills repository
+          plugin_marketplaces: 'https://github.com/leanprover/skills.git'
+          plugins: 'lean@leanprover'
 
           # Optional: Add claude_args to customize behavior and configuration
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
@@ -58,5 +60,3 @@ jobs:
             --model claude-opus-4-6
             --allowed-tools "Bash(lake build),Bash(lake exe cache get),Bash(lake update),Bash(lake env),Bash(lean *),Bash(elan *),Bash(grep *),Bash(gh pr:*),Bash(gh issue:*)"
             --append-system-prompt "This is a Lean 4 / Mathlib repository. Prefer minimal diffs. Before changing theorem statements, first try to complete the proof using existing lemmas. Validate with: lake build. Do not leave unrelated new sorrys."
-
-          # TODO: Explore adding MCP servers (e.g. sequential-thinking for complex proofs)
