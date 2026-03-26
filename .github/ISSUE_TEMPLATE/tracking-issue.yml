@@ -1,0 +1,61 @@
+name: Tracking Issue
+description: Create a tracking issue to monitor progress across multiple issues and PRs
+labels: ["tracking"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Tracking Issue
+        Use this template to create an issue that tracks progress across multiple related issues and PRs.
+        List each sub-task inside a native tasklist block so GitHub shows "Tracked by" on child issues.
+
+  - type: input
+    id: area
+    attributes:
+      label: Area
+      description: Which area of the project does this track?
+      placeholder: e.g., MPS, Channel, Wielandt, Infrastructure
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the goal this tracking issue covers
+      placeholder: What is the overall objective?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tracked Tasks
+      description: |
+        List issues/PRs to track using a native tasklist block.
+        Each line must contain only the issue reference (no descriptions).
+        The workflow will automatically update checkboxes when issues are closed or PRs are merged.
+      value: |
+        ```[tasklist]
+        ### Tasks
+        - [ ] #
+        - [ ] #
+        - [ ] #
+        ```
+      placeholder: |
+        ```[tasklist]
+        ### Tasks
+        - [ ] #42
+        - [ ] #43
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any extra context, dependencies, or milestones
+      placeholder: Optional notes
+    validations:
+      required: false
