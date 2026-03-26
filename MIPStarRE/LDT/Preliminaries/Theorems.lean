@@ -42,25 +42,136 @@ theorem simeqDataProcessing {Question α β : Type*}
         (postprocessIndexedSubMeasurement B f) δ := by
   sorry
 
+/-! ### Bridge lemmas for `prop:cons-sub-meas`
+
+The following three lemmas isolate the key mathematical steps of
+Proposition 4.8: the inconsistency bound controls the diagonal
+sandwich, the sandwich-to-total comparison, and the combination
+via the triangle inequality for `≈_δ`. Full proofs require the
+honest tensor-product API (tracked in the `TODO(tensor)` note in
+`Defs.lean`). -/
+
+/-- The off-diagonal mass bound controls the distance from `A` to
+the diagonal sandwich `A_a B_a A_a`. -/
+private lemma consSubMeas_diagonalControl
+    {Question Outcome : Type*}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedSubMeasurement Question Outcome)
+    (B : IndexedMeasurement Question Outcome) (γ : Error) :
+    consistency ψ 𝒟 A
+      (IndexedMeasurement.toIndexedSubMeasurement B) γ →
+    StateDependentDistanceRel ψ 𝒟 A
+      (diagonalSandwichFamily A B) γ := by
+  sorry
+
+/-- The off-diagonal mass bound controls the distance from the
+diagonal sandwich `A_a B_a A_a` to the total sandwich
+`A_a (Σ_b B_b) A_a`. -/
+private lemma consSubMeas_sandwichControl
+    {Question Outcome : Type*}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedSubMeasurement Question Outcome)
+    (B : IndexedMeasurement Question Outcome) (γ : Error) :
+    consistency ψ 𝒟 A
+      (IndexedMeasurement.toIndexedSubMeasurement B) γ →
+    StateDependentDistanceRel ψ 𝒟
+      (diagonalSandwichFamily A B)
+      (totalSandwichFamily A B) γ := by
+  sorry
+
+/-- Combined bound from the triangle inequality for `≈_δ`:
+`dist(A, totalSandwich) ≤ 4γ`. -/
+private lemma consSubMeas_combinedControl
+    {Question Outcome : Type*}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedSubMeasurement Question Outcome)
+    (B : IndexedMeasurement Question Outcome) (γ : Error) :
+    StateDependentDistanceRel ψ 𝒟 A
+      (diagonalSandwichFamily A B) γ →
+    StateDependentDistanceRel ψ 𝒟
+      (diagonalSandwichFamily A B)
+      (totalSandwichFamily A B) γ →
+    StateDependentDistanceRel ψ 𝒟 A
+      (totalSandwichFamily A B) (4 * γ) := by
+  sorry
+
 /-- `prop:cons-sub-meas`. -/
 theorem consSubMeas {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome)
     (B : IndexedMeasurement Question Outcome) (γ : Error) :
-    consistency ψ 𝒟 A (IndexedMeasurement.toIndexedSubMeasurement B) γ →
-      ConsSubMeasStatement ψ 𝒟 A B γ := by
+    consistency ψ 𝒟 A
+      (IndexedMeasurement.toIndexedSubMeasurement B) γ →
+    ConsSubMeasStatement ψ 𝒟 A B γ := by
+  intro hcons
+  have hdc := consSubMeas_diagonalControl ψ 𝒟 A B γ hcons
+  have hsc := consSubMeas_sandwichControl ψ 𝒟 A B γ hcons
+  exact {
+    diagonalControl := hdc
+    sandwichControl := hsc
+    combinedControl :=
+      consSubMeas_combinedControl ψ 𝒟 A B γ hdc hsc
+  }
+
+/-! ### Bridge lemmas for `prop:switch-sandwich`
+
+The following two lemmas isolate the key steps of Proposition 4.9:
+moving one copy of `A_a^x` across the bipartition using the
+`≈_δ` hypothesis, and using projectivity to collapse the
+resulting sandwich. -/
+
+/-- Moving one copy of `A_a^x` across the bipartition gives the
+left sandwich transfer bound (error `2√δ`). -/
+private lemma switchSandwich_leftTransfer
+    {Question Outcome : Type*}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedProjectiveSubMeasurement Question Outcome)
+    (B : Operator) (_hB : OperatorBetweenZeroAndOne B)
+    (δ : Error) :
+    bipartiteStateDependentDistance ψ 𝒟
+      (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
+      (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
+      δ →
+    |leftSandwichExpectation ψ 𝒟 A B -
+      middleSandwichExpectation ψ 𝒟 A B| ≤
+      2 * Real.sqrt δ := by
+  sorry
+
+/-- Using projectivity `(A_a^x)² = A_a^x` to collapse the
+sandwich gives the right transfer bound (error `√δ`). -/
+private lemma switchSandwich_rightTransfer
+    {Question Outcome : Type*}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedProjectiveSubMeasurement Question Outcome)
+    (B : Operator) (_hB : OperatorBetweenZeroAndOne B)
+    (δ : Error) :
+    bipartiteStateDependentDistance ψ 𝒟
+      (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
+      (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
+      δ →
+    |middleSandwichExpectation ψ 𝒟 A B -
+      rightSandwichExpectation ψ 𝒟 A B| ≤
+      Real.sqrt δ := by
   sorry
 
 /-- `prop:switch-sandwich`. -/
 theorem switchSandwich {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedProjectiveSubMeasurement Question Outcome)
-    (B : Operator) (_hB : OperatorBetweenZeroAndOne B) (δ : Error) :
+    (B : Operator) (_hB : OperatorBetweenZeroAndOne B)
+    (δ : Error) :
     bipartiteStateDependentDistance ψ 𝒟
-        (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
-        (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A) δ →
-      SwitchSandwichStatement ψ 𝒟 A B δ := by
-  sorry
+      (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
+      (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
+      δ →
+    SwitchSandwichStatement ψ 𝒟 A B δ := by
+  intro happrox
+  exact {
+    leftSandwichTransfer :=
+      switchSandwich_leftTransfer ψ 𝒟 A B _hB δ happrox
+    rightSandwichTransfer :=
+      switchSandwich_rightTransfer ψ 𝒟 A B _hB δ happrox
+  }
 
 /-- `prop:completeness-transfer-projective-P`. -/
 theorem completenessTransferProjectiveP {Question Outcome : Type*}
