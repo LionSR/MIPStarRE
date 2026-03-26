@@ -11,14 +11,21 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-/-- `prop:simeq-for-measurements`. -/
+/-- `prop:simeq-for-measurements`. The equivalence is definitional:
+`agreementProbability = 1 - consistencyError`, so `consistencyError ≤ δ`
+iff `agreementProbability ≥ 1 - δ`. -/
 theorem simeqForMeasurements {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B : IndexedMeasurement Question Outcome) (δ : Error) :
     consistency ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
         (IndexedMeasurement.toIndexedSubMeasurement B) δ ↔
       ConsistencyAsAgreement ψ 𝒟 A B δ := by
-  sorry
+  unfold consistency ConsistencyAsAgreement agreementProbability
+  constructor
+  · intro ⟨h⟩
+    exact ⟨by linarith⟩
+  · intro ⟨h⟩
+    exact ⟨by linarith⟩
 
 /-- `prop:simeq-to-approx`. -/
 theorem simeqToApprox {Question Outcome : Type*}
@@ -123,8 +130,31 @@ moving one copy of `A_a^x` across the bipartition using the
 `≈_δ` hypothesis, and using projectivity to collapse the
 resulting sandwich. -/
 
+/-- At scaffold level, `leftTensor` only changes the `name` field of an operator,
+so the left and middle sandwich expectations are definitionally equal. -/
+private lemma leftSandwich_eq_middleSandwich
+    {Question Outcome : Type*}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedProjectiveSubMeasurement Question Outcome)
+    (B : Operator) :
+    leftSandwichExpectation ψ 𝒟 A B = middleSandwichExpectation ψ 𝒟 A B := by
+  unfold leftSandwichExpectation middleSandwichExpectation leftTensor
+  rfl
+
+/-- At scaffold level, `rightTensor` only changes the `name` field of an operator,
+so the middle and right sandwich expectations are definitionally equal. -/
+private lemma middleSandwich_eq_rightSandwich
+    {Question Outcome : Type*}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A : IndexedProjectiveSubMeasurement Question Outcome)
+    (B : Operator) :
+    middleSandwichExpectation ψ 𝒟 A B = rightSandwichExpectation ψ 𝒟 A B := by
+  unfold middleSandwichExpectation rightSandwichExpectation rightTensor
+  rfl
+
 /-- Moving one copy of `A_a^x` across the bipartition gives the
-left sandwich transfer bound (error `2√δ`). -/
+left sandwich transfer bound (error `2√δ`). At scaffold level this is
+trivial because `leftTensor` is a name-only operation. -/
 private lemma switchSandwich_leftTransfer
     {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
@@ -138,10 +168,13 @@ private lemma switchSandwich_leftTransfer
     |leftSandwichExpectation ψ 𝒟 A B -
       middleSandwichExpectation ψ 𝒟 A B| ≤
       2 * Real.sqrt δ := by
-  sorry
+  intro _
+  rw [leftSandwich_eq_middleSandwich, sub_self, abs_zero]
+  exact mul_nonneg (by norm_num) (Real.sqrt_nonneg δ)
 
 /-- Using projectivity `(A_a^x)² = A_a^x` to collapse the
-sandwich gives the right transfer bound (error `√δ`). -/
+sandwich gives the right transfer bound (error `√δ`). At scaffold level
+this is trivial because `rightTensor` is a name-only operation. -/
 private lemma switchSandwich_rightTransfer
     {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
@@ -155,7 +188,9 @@ private lemma switchSandwich_rightTransfer
     |middleSandwichExpectation ψ 𝒟 A B -
       rightSandwichExpectation ψ 𝒟 A B| ≤
       Real.sqrt δ := by
-  sorry
+  intro _
+  rw [middleSandwich_eq_rightSandwich, sub_self, abs_zero]
+  exact Real.sqrt_nonneg δ
 
 /-- `prop:switch-sandwich`. -/
 theorem switchSandwich {Question Outcome : Type*}
@@ -194,7 +229,8 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
       bipartiteStateDependentDistance ψ 𝒟 A A (2 * δ) := by
   sorry
 
-/-- `prop:completing-to-measurement`. -/
+/-- `prop:completing-to-measurement`. The witness is the canonical completion
+`completeAtOutcome B a0` which adds the residual `I - Σ_a B_a` to outcome `a0`. -/
 theorem completingToMeasurement {Outcome : Type*}
     (ψ : QuantumState)
     (A : Measurement Outcome) (B : SubMeasurement Outcome)
@@ -206,6 +242,10 @@ theorem completingToMeasurement {Outcome : Type*}
         (constantSubMeasurementFamily B) δ →
       ∃ C : Measurement Outcome,
         CompletingToMeasurementStatement ψ A B C a0 δ ζ := by
-  sorry
+  intro _hsc _hdist
+  exact ⟨completeAtOutcome B a0, {
+    completionFormula := rfl
+    closenessAfterCompletion := by sorry
+  }⟩
 
 end MIPStarRE.LDT.Preliminaries
