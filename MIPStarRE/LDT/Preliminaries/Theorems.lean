@@ -49,6 +49,38 @@ theorem simeqDataProcessing {Question α β : Type*}
         (postprocessIndexedSubMeasurement B f) δ := by
   sorry
 
+/-! ### Infrastructure: triangle inequality for `StateDependentDistanceRel`
+
+The squared-norm triangle inequality `‖u+v‖² ≤ 2(‖u‖² + ‖v‖²)` lifts to a
+triangle inequality for state-dependent distance: if `A ≈_δ₁ B` and
+`B ≈_δ₂ C`, then `A ≈_{2(δ₁+δ₂)} C`. This requires operator algebra
+infrastructure (matrix PSD inequalities) that the scaffold does not yet
+provide. -/
+
+/-- Triangle inequality for state-dependent distance. Requires proving
+`‖(A_a-C_a)|ψ⟩‖² ≤ 2(‖(A_a-B_a)|ψ⟩‖² + ‖(B_a-C_a)|ψ⟩‖²)` at the
+operator algebra level. -/
+private lemma stateDependentDistanceRel_triangle
+    {Question Outcome : Type*}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B C : IndexedSubMeasurement Question Outcome) (δ₁ δ₂ : Error) :
+    StateDependentDistanceRel ψ 𝒟 A B δ₁ →
+    StateDependentDistanceRel ψ 𝒟 B C δ₂ →
+    StateDependentDistanceRel ψ 𝒟 A C (2 * (δ₁ + δ₂)) := by
+  sorry
+
+/-- Monotonicity: if `StateDependentDistanceRel` holds for `δ`,
+it holds for any `δ' ≥ δ`. -/
+private lemma stateDependentDistanceRel_mono
+    {Question Outcome : Type*}
+    (ψ : QuantumState) (𝒟 : Distribution Question)
+    (A B : IndexedSubMeasurement Question Outcome) (δ δ' : Error)
+    (hle : δ ≤ δ') :
+    StateDependentDistanceRel ψ 𝒟 A B δ →
+    StateDependentDistanceRel ψ 𝒟 A B δ' := by
+  intro ⟨h⟩
+  exact ⟨le_trans h hle⟩
+
 /-! ### Bridge lemmas for `prop:cons-sub-meas`
 
 The following three lemmas isolate the key mathematical steps of
@@ -87,10 +119,8 @@ private lemma consSubMeas_sandwichControl
   sorry
 
 /-- Combined bound from the triangle inequality for `≈_δ`:
-`dist(A, totalSandwich) ≤ 4γ`. The `4γ` arises because the paper's proof
-of Prop 4.8 uses two applications of the triangle inequality, each contributing
-a `2γ` bound (one from the diagonal control and one from the sandwich control).
-The actual proof will need to show each `γ` input decomposes into a `2γ` bound. -/
+`dist(A, totalSandwich) ≤ 4γ`. Applies the triangle inequality
+`A ≈_{2(γ+γ)} totalSandwich` and simplifies `2(γ+γ) = 4γ`. -/
 private lemma consSubMeas_combinedControl
     {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
@@ -103,7 +133,11 @@ private lemma consSubMeas_combinedControl
       (totalSandwichFamily A B) γ →
     StateDependentDistanceRel ψ 𝒟 A
       (totalSandwichFamily A B) (4 * γ) := by
-  sorry
+  intro hAD hDT
+  have h := stateDependentDistanceRel_triangle ψ 𝒟 A
+    (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ hAD hDT
+  exact stateDependentDistanceRel_mono ψ 𝒟 A (totalSandwichFamily A B)
+    (2 * (γ + γ)) (4 * γ) (by ring_nf) h
 
 /-- `prop:cons-sub-meas`. -/
 theorem consSubMeas {Question Outcome : Type*}
@@ -221,7 +255,10 @@ theorem completenessTransferProjectiveP {Question Outcome : Type*}
       CompletenessTransferProjectivePStatement ψ 𝒟 A P ε := by
   sorry
 
-/-- `prop:two-notions-of-self-consistency`. -/
+/-- `prop:two-notions-of-self-consistency`. Requires showing
+`stateDependentDistanceError A A ≤ 2 * strongSelfConsistencyError A`
+via the expansion `‖(A_a ⊗ I - I ⊗ A_a)|ψ⟩‖²` and comparison with the
+diagonal overlap in the strong self-consistency definition. -/
 theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome) (δ : Error) :
