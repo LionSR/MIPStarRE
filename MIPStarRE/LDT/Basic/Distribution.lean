@@ -59,4 +59,75 @@ noncomputable def sumOverOutcomesOrElse {α : Type*}
   else
     exact fallback
 
+/-! ### Averaging infrastructure -/
+
+/-- Helper: weighted sum preserves `≤` when weights are nonneg. -/
+private theorem list_weighted_sum_le {α : Type*} (l : List α) (w : α → Error) (f g : α → Error)
+    (hw : ∀ a, 0 ≤ w a) (hfg : ∀ a, f a ≤ g a) :
+    (l.map fun a => w a * f a).sum ≤ (l.map fun a => w a * g a).sum := by
+  induction l with
+  | nil => simp
+  | cons a l ih =>
+    simp only [List.map_cons, List.sum_cons]
+    exact add_le_add (mul_le_mul_of_nonneg_left (hfg a) (hw a)) ih
+
+/-- Helper: weighted sum distributes over function addition. -/
+private theorem list_weighted_sum_add {α : Type*} (l : List α) (w : α → Error) (f g : α → Error) :
+    (l.map fun a => w a * (f a + g a)).sum =
+      (l.map fun a => w a * f a).sum + (l.map fun a => w a * g a).sum := by
+  induction l with
+  | nil => simp
+  | cons a l ih =>
+    simp only [List.map_cons, List.sum_cons, mul_add]
+    linarith [ih]
+
+/-- Helper: scalar multiplication pulls out of weighted sum. -/
+private theorem list_weighted_sum_const_mul {α : Type*}
+    (l : List α) (w : α → Error) (c : Error) (f : α → Error) :
+    (l.map fun a => w a * (c * f a)).sum = c * (l.map fun a => w a * f a).sum := by
+  induction l with
+  | nil => simp
+  | cons a l ih =>
+    simp only [List.map_cons, List.sum_cons]
+    rw [ih]; ring
+
+/-- Averaging the zero function gives zero. -/
+theorem averageOverDistribution_zero {α : Type*} (𝒟 : Distribution α) :
+    averageOverDistribution 𝒟 (fun _ => 0) = 0 := by
+  unfold averageOverDistribution
+  simp [mul_zero]
+
+/-- Averaging preserves order when weights are nonneg. -/
+theorem averageOverDistribution_mono {α : Type*} (𝒟 : Distribution α) (f g : α → Error)
+    (hfg : ∀ a, f a ≤ g a) :
+    averageOverDistribution 𝒟 f ≤ averageOverDistribution 𝒟 g := by
+  unfold averageOverDistribution
+  exact list_weighted_sum_le 𝒟.support 𝒟.weight f g 𝒟.nonnegative hfg
+
+/-- Averaging a nonneg function with nonneg weights gives a nonneg result. -/
+theorem averageOverDistribution_nonneg {α : Type*} (𝒟 : Distribution α) (f : α → Error)
+    (hf : ∀ a, 0 ≤ f a) :
+    0 ≤ averageOverDistribution 𝒟 f := by
+  rw [← averageOverDistribution_zero 𝒟]
+  exact averageOverDistribution_mono 𝒟 _ f (fun a => hf a)
+
+/-- Averaging distributes over addition. -/
+theorem averageOverDistribution_add {α : Type*} (𝒟 : Distribution α) (f g : α → Error) :
+    averageOverDistribution 𝒟 (fun a => f a + g a) =
+      averageOverDistribution 𝒟 f + averageOverDistribution 𝒟 g := by
+  unfold averageOverDistribution
+  exact list_weighted_sum_add 𝒟.support 𝒟.weight f g
+
+/-- Averaging commutes with scalar multiplication. -/
+theorem averageOverDistribution_const_mul {α : Type*} (𝒟 : Distribution α) (c : Error) (f : α → Error) :
+    averageOverDistribution 𝒟 (fun a => c * f a) = c * averageOverDistribution 𝒟 f := by
+  unfold averageOverDistribution
+  exact list_weighted_sum_const_mul 𝒟.support 𝒟.weight c f
+
+/-- If `f = g` pointwise, their averages agree. -/
+theorem averageOverDistribution_congr {α : Type*} (𝒟 : Distribution α)
+    (f g : α → Error) (h : ∀ a, f a = g a) :
+    averageOverDistribution 𝒟 f = averageOverDistribution 𝒟 g := by
+  congr 1; exact funext h
+
 end MIPStarRE.LDT

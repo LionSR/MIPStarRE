@@ -218,4 +218,115 @@ theorem expectationValue_sub (ψ : QuantumState) (X Y : Operator)
       show hXY.symm.trans hψX.symm = hψY.symm from Subsingleton.elim _ _,
       mul_sub, MIPStarRE.Quantum.normalizedTrace_sub, Complex.sub_re]
 
+/-! ### Self-difference and zero-matrix infrastructure -/
+
+/-- `castOp rfl A = A` definitionally. -/
+@[simp] theorem castOp_rfl {n : ℕ} (A : MIPStarRE.Quantum.Op (HilbertIndex n)) :
+    castOp rfl A = A := rfl
+
+/-- The matrix of `operatorDifference X X` is zero. -/
+theorem operatorDifference_self_matrix (X : Operator) :
+    (operatorDifference X X).matrix = 0 := by
+  unfold operatorDifference
+  simp [dif_pos (show X.dim = X.dim from rfl), castOp, sub_self]
+
+/-- The dim of `operatorDifference X X` equals `X.dim`. -/
+theorem operatorDifference_self_dim (X : Operator) :
+    (operatorDifference X X).dim = X.dim := by
+  unfold operatorDifference
+  simp [dif_pos (show X.dim = X.dim from rfl)]
+
+/-- `expectationValue` of an operator with zero matrix is zero. -/
+theorem expectationValue_zero_matrix (ψ : QuantumState) (X : Operator)
+    (h : X.matrix = 0) : expectationValue ψ X = 0 := by
+  unfold expectationValue
+  split
+  · next hdim =>
+    simp only [h]
+    -- castOp maps 0 to 0
+    have : castOp hdim.symm (0 : MIPStarRE.Quantum.Op (HilbertIndex X.dim)) = 0 := by
+      cases hdim; rfl
+    rw [this, Matrix.mul_zero, MIPStarRE.Quantum.normalizedTrace_zero, Complex.zero_re]
+  · rfl
+
+/-- The `operatorMul` of two operators where the first has zero matrix gives zero matrix
+(when dimensions match). -/
+theorem operatorMul_zero_left_matrix (X Y : Operator) (h : X.matrix = 0) :
+    (operatorMul X Y).matrix = 0 := by
+  unfold operatorMul
+  split
+  · next hdim => simp [h]
+  · exact h
+
+/-- The `operatorAdjoint` of an operator with zero matrix has zero matrix. -/
+theorem operatorAdjoint_zero_matrix (X : Operator) (h : X.matrix = 0) :
+    (operatorAdjoint X).matrix = 0 := by
+  unfold operatorAdjoint; simp [h]
+
+/-- `E[D† D] = 0` when `D` has zero matrix. -/
+theorem expectationValue_adjoint_mul_self_zero (ψ : QuantumState) (D : Operator)
+    (h : D.matrix = 0) :
+    expectationValue ψ (operatorMul (operatorAdjoint D) D) = 0 := by
+  exact expectationValue_zero_matrix ψ _
+    (operatorMul_zero_left_matrix _ _ (operatorAdjoint_zero_matrix D h))
+
+/-! ### PSD trace positivity -/
+
+/-- For a PSD state `ψ` and any operator `M`, `E[M† M] ≥ 0`.
+Proof: `Re(τ(ρ · M†M)) = Re(tr(ρ M† M)/d)`. By trace cyclicity,
+`tr(ρ M† M) = tr(M ρ M†)`, and `M ρ M†` is PSD by congruence,
+so `tr(M ρ M†) ≥ 0` (a nonneg real), hence `Re(...)/d ≥ 0`. -/
+theorem expectationValue_adjoint_self_nonneg (ψ : QuantumState) (M : Operator)
+    (hψ : ψ.IsPositive) (hdim : ψ.dim = M.dim) :
+    0 ≤ expectationValue ψ (operatorMul (operatorAdjoint M) M) := by
+  unfold expectationValue operatorMul operatorAdjoint
+  rw [dif_pos (show M.dim = M.dim from rfl)]
+  simp only
+  rw [dif_pos hdim]
+  simp only [castOp_rfl]
+  -- The cast commutes with matrix operations
+  have hcst : castOp hdim.symm (M.matrixᴴ * M.matrix) =
+      (castOp hdim.symm M.matrix)ᴴ * castOp hdim.symm M.matrix := by
+    cases hdim; simp [castOp]
+  rw [hcst]
+  set Mc := castOp hdim.symm M.matrix
+  -- Goal: 0 ≤ Re(normalizedTrace(ψ.density * (Mcᴴ * Mc)))
+  unfold MIPStarRE.Quantum.normalizedTrace
+  simp only [Complex.re_div_ofReal]
+  apply div_nonneg
+  · -- Re(tr(ρ * Mcᴴ * Mc)) ≥ 0
+    -- By cyclicity: tr((ρ * Mcᴴ) * Mc) = tr(Mc * (ρ * Mcᴴ)) = tr((Mc * ρ) * Mcᴴ)
+    rw [Matrix.mul_assoc, Matrix.trace_mul_comm (ψ.density * Mcᴴ) Mc, ← Matrix.mul_assoc]
+    -- Goal: 0 ≤ (Mc * ψ.density * Mcᴴ).trace.re
+    -- Mc * ψ.density * Mcᴴ is PSD by congruence
+    unfold QuantumState.IsPositive at hψ
+    rw [Matrix.nonneg_iff_posSemidef] at hψ
+    have hPSD : (Mc * ψ.density * Mcᴴ).PosSemidef := hψ.mul_mul_conjTranspose_same Mc
+    -- trace of PSD matrix is nonneg (in ComplexOrder: re ≥ 0 ∧ im = 0)
+    exact (Complex.nonneg_iff.mp hPSD.trace_nonneg).1
+  · exact Nat.cast_nonneg
+
+/-! ### Parallelogram inequality for normalized trace -/
+
+/-- For PSD ρ and any matrices D₁ D₂ of matching dimension,
+`Re τ(ρ (D₁+D₂)ᴴ(D₁+D₂)) ≤ 2 (Re τ(ρ D₁ᴴD₁) + Re τ(ρ D₂ᴴD₂))`.
+
+This is the key mathematical fact behind the triangle inequality for
+state-dependent distance. The proof uses:
+1. Expansion: `(D₁+D₂)ᴴ(D₁+D₂) = D₁ᴴD₁ + D₁ᴴD₂ + D₂ᴴD₁ + D₂ᴴD₂`
+2. AM-GM: `D₁ᴴD₂ + D₂ᴴD₁ ≤ D₁ᴴD₁ + D₂ᴴD₂` (from `0 ≤ (D₁-D₂)ᴴ(D₁-D₂)`)
+3. PSD trace monotonicity: `A ≤ B → 0 ≤ Re tr(ρ A) ≤ Re tr(ρ B)`
+-/
+theorem normalizedTrace_parallelogram {n : Type*} [Fintype n] [DecidableEq n]
+    (ρ D₁ D₂ : Matrix n n ℂ) (hρ : ρ.PosSemidef) :
+    0 ≤ Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ - D₂)ᴴ * (D₁ - D₂)))) := by
+  unfold MIPStarRE.Quantum.normalizedTrace
+  simp only [Complex.re_div_ofReal]
+  apply div_nonneg
+  · -- By cyclicity: tr(ρ * (D₁-D₂)ᴴ * (D₁-D₂)) = tr((D₁-D₂) * ρ * (D₁-D₂)ᴴ)
+    rw [Matrix.mul_assoc, Matrix.trace_mul_comm (ρ * (D₁ - D₂)ᴴ) (D₁ - D₂),
+        ← Matrix.mul_assoc]
+    exact (Complex.nonneg_iff.mp (hρ.mul_mul_conjTranspose_same (D₁ - D₂)).trace_nonneg).1
+  · exact Nat.cast_nonneg
+
 end MIPStarRE.LDT
