@@ -308,15 +308,9 @@ theorem expectationValue_adjoint_self_nonneg (ψ : QuantumState) (M : Operator)
 
 /-! ### Parallelogram inequality for normalized trace -/
 
-/-- For PSD ρ and any matrices D₁ D₂ of matching dimension,
-`Re τ(ρ (D₁+D₂)ᴴ(D₁+D₂)) ≤ 2 (Re τ(ρ D₁ᴴD₁) + Re τ(ρ D₂ᴴD₂))`.
-
-This is the key mathematical fact behind the triangle inequality for
-state-dependent distance. The proof uses:
-1. Expansion: `(D₁+D₂)ᴴ(D₁+D₂) = D₁ᴴD₁ + D₁ᴴD₂ + D₂ᴴD₁ + D₂ᴴD₂`
-2. AM-GM: `D₁ᴴD₂ + D₂ᴴD₁ ≤ D₁ᴴD₁ + D₂ᴴD₂` (from `0 ≤ (D₁-D₂)ᴴ(D₁-D₂)`)
-3. PSD trace monotonicity: `A ≤ B → 0 ≤ Re tr(ρ A) ≤ Re tr(ρ B)`
--/
+/-- PSD trace nonnegativity for difference quadratic:
+`0 ≤ Re τ(ρ (D₁ - D₂)ᴴ(D₁ - D₂))` for PSD ρ.
+Used by `normalizedTrace_triangle` to bound cross terms. -/
 theorem normalizedTrace_parallelogram {n : Type*} [Fintype n] [DecidableEq n]
     (ρ D₁ D₂ : Matrix n n ℂ) (hρ : ρ.PosSemidef) :
     0 ≤ Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ - D₂)ᴴ * (D₁ - D₂)))) := by
@@ -328,5 +322,65 @@ theorem normalizedTrace_parallelogram {n : Type*} [Fintype n] [DecidableEq n]
         ← Matrix.mul_assoc]
     exact (Complex.nonneg_iff.mp (hρ.mul_mul_conjTranspose_same (D₁ - D₂)).trace_nonneg).1
   · exact Nat.cast_nonneg
+
+/-- Triangle inequality for normalized trace of PSD-weighted quadratic forms:
+`Re τ(ρ (D₁+D₂)ᴴ(D₁+D₂)) ≤ 2·(Re τ(ρ D₁ᴴD₁) + Re τ(ρ D₂ᴴD₂))` for PSD ρ.
+
+Proof: the parallelogram identity gives
+  `(D₁+D₂)ᴴ(D₁+D₂) + (D₁-D₂)ᴴ(D₁-D₂) = 2·(D₁ᴴD₁ + D₂ᴴD₂)`
+and `Re τ(ρ·(D₁-D₂)ᴴ(D₁-D₂)) ≥ 0` by PSD trace positivity. -/
+theorem normalizedTrace_triangle {n : Type*} [Fintype n] [DecidableEq n]
+    (ρ D₁ D₂ : Matrix n n ℂ) (hρ : ρ.PosSemidef) :
+    Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ + D₂)ᴴ * (D₁ + D₂)))) ≤
+      2 * (Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁))) +
+           Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₂ᴴ * D₂)))) := by
+  -- Step 1: Parallelogram identity at the matrix level
+  have h_para : (D₁ + D₂)ᴴ * (D₁ + D₂) + (D₁ - D₂)ᴴ * (D₁ - D₂) =
+      (D₁ᴴ * D₁ + D₂ᴴ * D₂) + (D₁ᴴ * D₁ + D₂ᴴ * D₂) := by
+    simp only [conjTranspose_add, conjTranspose_sub, add_mul, mul_add, sub_mul, mul_sub]
+    abel
+  -- Step 2: Apply normalizedTrace linearity to get the identity at trace level
+  have h_trace_id :
+      MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ + D₂)ᴴ * (D₁ + D₂))) +
+      MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ - D₂)ᴴ * (D₁ - D₂))) =
+      MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁ + D₂ᴴ * D₂)) +
+      MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁ + D₂ᴴ * D₂)) := by
+    rw [← MIPStarRE.Quantum.normalizedTrace_add, ← Matrix.mul_add, h_para,
+        Matrix.mul_add, MIPStarRE.Quantum.normalizedTrace_add]
+  -- Step 3: Take Re of both sides
+  have h_re_id :
+      Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ + D₂)ᴴ * (D₁ + D₂)))) +
+      Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ - D₂)ᴴ * (D₁ - D₂)))) =
+      Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁ + D₂ᴴ * D₂))) +
+      Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁ + D₂ᴴ * D₂))) := by
+    have := congr_arg Complex.re h_trace_id
+    simp only [map_add] at this
+    exact this
+  -- Step 4: Linearity of RHS
+  have h_lin :
+      Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁ + D₂ᴴ * D₂))) =
+      Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁))) +
+      Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₂ᴴ * D₂))) := by
+    rw [Matrix.mul_add, MIPStarRE.Quantum.normalizedTrace_add, map_add]
+  -- Step 5: PSD nonnegativity of the difference term
+  have h_nonneg := normalizedTrace_parallelogram ρ D₁ D₂ hρ
+  -- Step 6: Combine with linarith
+  linarith
+
+/-! ### Operator-level expectation nonnegativity (dimension-agnostic) -/
+
+/-- `E[M†M] ≥ 0` for any state and operator, regardless of dimension matching.
+When `ψ.dim = M.dim`, this follows from PSD trace positivity.
+When dims don't match, `expectationValue` returns 0. -/
+theorem expectationValue_adjoint_self_nonneg' (ψ : QuantumState) (M : Operator)
+    (hψ : ψ.IsPositive) :
+    0 ≤ expectationValue ψ (operatorMul (operatorAdjoint M) M) := by
+  by_cases hdim : ψ.dim = M.dim
+  · exact expectationValue_adjoint_self_nonneg ψ M hψ hdim
+  · -- When dims don't match, expectationValue returns 0
+    suffices expectationValue ψ (operatorMul (operatorAdjoint M) M) = 0 by linarith
+    unfold expectationValue operatorMul operatorAdjoint
+    simp only [dif_pos (show M.dim = M.dim from rfl)]
+    exact dif_neg hdim
 
 end MIPStarRE.LDT

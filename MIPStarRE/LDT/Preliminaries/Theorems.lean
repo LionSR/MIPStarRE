@@ -239,7 +239,8 @@ private lemma consSubMeas_combinedControl
     (2 * (γ + γ)) (4 * γ) (by linarith) h
 
 /-- `prop:cons-sub-meas`. Requires PSD state for the triangle inequality
-used in `combinedControl`. -/
+used in `combinedControl`.
+-- TODO: derive hψ from QuantumState once IsPositive is bundled into the type. -/
 theorem consSubMeas {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome)
@@ -391,28 +392,23 @@ theorem completenessTransferProjectiveP {Question Outcome : Type*}
 
 /-- The self-distance defect `questionStateDependentDistanceDefect ψ M M` is zero
 because `operatorDifference X X` has zero matrix. Uses public
-`MIPStarRE.LDT.operatorDifference_self_matrix` and
-`MIPStarRE.LDT.expectationValue_zero_matrix` from `Basic/Operator.lean`. -/
+`operatorDifference_self_matrix` and `expectationValue_adjoint_mul_self_zero`
+from `Basic/Operator.lean`. -/
 private lemma questionStateDependentDistanceDefect_self
     {Outcome : Type*} (ψ : QuantumState) (M : SubMeasurement Outcome) :
     questionStateDependentDistanceDefect ψ M M = 0 := by
   unfold questionStateDependentDistanceDefect
-  have hzero : ∀ (X : Operator), X.matrix = 0 →
-      expectationValue ψ (operatorMul (operatorAdjoint X) X) = 0 := by
-    intro X hX
-    apply expectationValue_zero_matrix
-    unfold operatorMul operatorAdjoint
-    simp [hX, Matrix.conjTranspose_zero, Matrix.zero_mul]
-    split <;> simp [castOp, Matrix.conjTranspose_zero, Matrix.zero_mul]
   simp only
   have hfb : expectationValue ψ
       (operatorMul (operatorAdjoint (operatorDifference M.totalOperator M.totalOperator))
         (operatorDifference M.totalOperator M.totalOperator)) = 0 :=
-    hzero _ (operatorDifference_self_matrix M.totalOperator)
+    expectationValue_adjoint_mul_self_zero ψ _
+      (operatorDifference_self_matrix M.totalOperator)
   have hpo : ∀ a, (fun a => expectationValue ψ
       (operatorMul (operatorAdjoint (operatorDifference (M.outcomeOperator a) (M.outcomeOperator a)))
         (operatorDifference (M.outcomeOperator a) (M.outcomeOperator a)))) a = 0 :=
-    fun a => hzero _ (operatorDifference_self_matrix (M.outcomeOperator a))
+    fun a => expectationValue_adjoint_mul_self_zero ψ _
+      (operatorDifference_self_matrix (M.outcomeOperator a))
   unfold sumOverOutcomesOrElse
   split
   · simp [hpo]
