@@ -20,12 +20,12 @@ theorem simeqForMeasurements {Question Outcome : Type*}
     consistency ψ 𝒟 (IndexedMeasurement.toIndexedSubMeasurement A)
         (IndexedMeasurement.toIndexedSubMeasurement B) δ ↔
       ConsistencyAsAgreement ψ 𝒟 A B δ := by
-  unfold consistency ConsistencyAsAgreement agreementProbability
+  unfold consistency
   constructor
   · intro ⟨h⟩
-    exact ⟨by linarith⟩
+    exact ⟨by unfold agreementProbability; linarith⟩
   · intro ⟨h⟩
-    exact ⟨by linarith⟩
+    exact ⟨by unfold agreementProbability at h; linarith⟩
 
 /-- `prop:simeq-to-approx`. -/
 theorem simeqToApprox {Question Outcome : Type*}
@@ -137,7 +137,7 @@ private lemma consSubMeas_combinedControl
   have h := stateDependentDistanceRel_triangle ψ 𝒟 A
     (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ hAD hDT
   exact stateDependentDistanceRel_mono ψ 𝒟 A (totalSandwichFamily A B)
-    (2 * (γ + γ)) (4 * γ) (by ring_nf) h
+    (2 * (γ + γ)) (4 * γ) (by linarith) h
 
 /-- `prop:cons-sub-meas`. -/
 theorem consSubMeas {Question Outcome : Type*}
@@ -164,8 +164,13 @@ moving one copy of `A_a^x` across the bipartition using the
 `≈_δ` hypothesis, and using projectivity to collapse the
 resulting sandwich. -/
 
+/-- `expectationValue` depends only on `dim` and `matrix`, not on `name`. -/
+private lemma expectationValue_name_irrel (ψ : QuantumState)
+    (n₁ n₂ : String) (d : ℕ) (m : MIPStarRE.Quantum.Op (HilbertIndex d)) :
+    expectationValue ψ ⟨n₁, d, m⟩ = expectationValue ψ ⟨n₂, d, m⟩ := rfl
+
 /-- At scaffold level, `leftTensor` only changes the `name` field of an operator,
-so the left and middle sandwich expectations are definitionally equal. -/
+so the left and middle sandwich expectations are equal. -/
 private lemma leftSandwich_eq_middleSandwich
     {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
@@ -173,10 +178,12 @@ private lemma leftSandwich_eq_middleSandwich
     (B : Operator) :
     leftSandwichExpectation ψ 𝒟 A B = middleSandwichExpectation ψ 𝒟 A B := by
   unfold leftSandwichExpectation middleSandwichExpectation leftTensor
-  rfl
+  congr 1; funext q; rcases B with ⟨_, d, m⟩
+  unfold operatorSandwich
+  split <;> (try split) <;> exact expectationValue_name_irrel ψ _ _ _ _
 
 /-- At scaffold level, `rightTensor` only changes the `name` field of an operator,
-so the middle and right sandwich expectations are definitionally equal. -/
+so the middle and right sandwich expectations are equal. -/
 private lemma middleSandwich_eq_rightSandwich
     {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
@@ -184,7 +191,9 @@ private lemma middleSandwich_eq_rightSandwich
     (B : Operator) :
     middleSandwichExpectation ψ 𝒟 A B = rightSandwichExpectation ψ 𝒟 A B := by
   unfold middleSandwichExpectation rightSandwichExpectation rightTensor
-  rfl
+  congr 1; funext q; rcases B with ⟨_, d, m⟩
+  unfold operatorSandwich
+  split <;> (try split) <;> exact expectationValue_name_irrel ψ _ _ _ _
 
 /-- Moving one copy of `A_a^x` across the bipartition gives the
 left sandwich transfer bound (error `2√δ`). At scaffold level this is
