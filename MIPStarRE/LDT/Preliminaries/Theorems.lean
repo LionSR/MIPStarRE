@@ -80,7 +80,10 @@ private lemma consSubMeas_sandwichControl
   sorry
 
 /-- Combined bound from the triangle inequality for `≈_δ`:
-`dist(A, totalSandwich) ≤ 4γ`. -/
+`dist(A, totalSandwich) ≤ 4γ`. The `4γ` arises because the paper's proof
+of Prop 4.8 uses two applications of the triangle inequality, each contributing
+a `2γ` bound (one from the diagonal control and one from the sandwich control).
+The actual proof will need to show each `γ` input decomposes into a `2γ` bound. -/
 private lemma consSubMeas_combinedControl
     {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
@@ -126,7 +129,7 @@ private lemma switchSandwich_leftTransfer
     {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedProjectiveSubMeasurement Question Outcome)
-    (B : Operator) (_hB : OperatorBetweenZeroAndOne B)
+    (B : Operator) (hB : OperatorBetweenZeroAndOne B)
     (δ : Error) :
     bipartiteStateDependentDistance ψ 𝒟
       (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
@@ -143,7 +146,7 @@ private lemma switchSandwich_rightTransfer
     {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedProjectiveSubMeasurement Question Outcome)
-    (B : Operator) (_hB : OperatorBetweenZeroAndOne B)
+    (B : Operator) (hB : OperatorBetweenZeroAndOne B)
     (δ : Error) :
     bipartiteStateDependentDistance ψ 𝒟
       (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
@@ -158,7 +161,7 @@ private lemma switchSandwich_rightTransfer
 theorem switchSandwich {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedProjectiveSubMeasurement Question Outcome)
-    (B : Operator) (_hB : OperatorBetweenZeroAndOne B)
+    (B : Operator) (hB : OperatorBetweenZeroAndOne B)
     (δ : Error) :
     bipartiteStateDependentDistance ψ 𝒟
       (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement A)
@@ -168,9 +171,9 @@ theorem switchSandwich {Question Outcome : Type*}
   intro happrox
   exact {
     leftSandwichTransfer :=
-      switchSandwich_leftTransfer ψ 𝒟 A B _hB δ happrox
+      switchSandwich_leftTransfer ψ 𝒟 A B hB δ happrox
     rightSandwichTransfer :=
-      switchSandwich_rightTransfer ψ 𝒟 A B _hB δ happrox
+      switchSandwich_rightTransfer ψ 𝒟 A B hB δ happrox
   }
 
 /-- `prop:completeness-transfer-projective-P`. -/
