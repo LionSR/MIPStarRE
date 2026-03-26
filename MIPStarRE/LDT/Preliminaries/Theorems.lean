@@ -121,17 +121,20 @@ provide. -/
 `U†V + V†U ≤ U†U + V†V` (equivalently `0 ≤ (U-V)†(U-V)`),
 which requires PSD trace positivity `E[D†D] ≥ 0`. -/
 private lemma questionSDD_triangle {Outcome : Type*}
-    (ψ : QuantumState) (A B C : SubMeasurement Outcome) :
+    (ψ : QuantumState) (A B C : SubMeasurement Outcome)
+    (hψ : ψ.IsPositive) :
     questionStateDependentDistanceDefect ψ A C ≤
       2 * (questionStateDependentDistanceDefect ψ A B +
            questionStateDependentDistanceDefect ψ B C) := by
   sorry
 
-/-- Triangle inequality for state-dependent distance. -/
+/-- Triangle inequality for state-dependent distance. Requires PSD state for
+the parallelogram inequality `E[D†D] ≥ 0`. -/
 private lemma stateDependentDistanceRel_triangle
     {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
-    (A B C : IndexedSubMeasurement Question Outcome) (δ₁ δ₂ : Error) :
+    (A B C : IndexedSubMeasurement Question Outcome) (δ₁ δ₂ : Error)
+    (hψ : ψ.IsPositive) :
     StateDependentDistanceRel ψ 𝒟 A B δ₁ →
     StateDependentDistanceRel ψ 𝒟 B C δ₂ →
     StateDependentDistanceRel ψ 𝒟 A C (2 * (δ₁ + δ₂)) := by
@@ -145,7 +148,7 @@ private lemma stateDependentDistanceRel_triangle
                          questionStateDependentDistanceDefect ψ (B q) (C q))) := by
         apply averageOverDistribution_mono
         intro q
-        exact questionSDD_triangle ψ (A q) (B q) (C q)
+        exact questionSDD_triangle ψ (A q) (B q) (C q) hψ
     _ = 2 * averageOverDistribution 𝒟
           (fun q => questionStateDependentDistanceDefect ψ (A q) (B q) +
                      questionStateDependentDistanceDefect ψ (B q) (C q)) := by
@@ -220,7 +223,8 @@ private lemma consSubMeas_combinedControl
     {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome)
-    (B : IndexedMeasurement Question Outcome) (γ : Error) :
+    (B : IndexedMeasurement Question Outcome) (γ : Error)
+    (hψ : ψ.IsPositive) :
     StateDependentDistanceRel ψ 𝒟 A
       (diagonalSandwichFamily A B) γ →
     StateDependentDistanceRel ψ 𝒟
@@ -230,15 +234,17 @@ private lemma consSubMeas_combinedControl
       (totalSandwichFamily A B) (4 * γ) := by
   intro hAD hDT
   have h := stateDependentDistanceRel_triangle ψ 𝒟 A
-    (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ hAD hDT
+    (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ hψ hAD hDT
   exact stateDependentDistanceRel_mono ψ 𝒟 A (totalSandwichFamily A B)
     (2 * (γ + γ)) (4 * γ) (by linarith) h
 
-/-- `prop:cons-sub-meas`. -/
+/-- `prop:cons-sub-meas`. Requires PSD state for the triangle inequality
+used in `combinedControl`. -/
 theorem consSubMeas {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome)
-    (B : IndexedMeasurement Question Outcome) (γ : Error) :
+    (B : IndexedMeasurement Question Outcome) (γ : Error)
+    (hψ : ψ.IsPositive) :
     consistency ψ 𝒟 A
       (IndexedMeasurement.toIndexedSubMeasurement B) γ →
     ConsSubMeasStatement ψ 𝒟 A B γ := by
@@ -249,7 +255,7 @@ theorem consSubMeas {Question Outcome : Type*}
     diagonalControl := hdc
     sandwichControl := hsc
     combinedControl :=
-      consSubMeas_combinedControl ψ 𝒟 A B γ hdc hsc
+      consSubMeas_combinedControl ψ 𝒟 A B γ hψ hdc hsc
   }
 
 /-! ### Bridge lemmas for `prop:switch-sandwich`
@@ -383,35 +389,14 @@ theorem completenessTransferProjectiveP {Question Outcome : Type*}
   intro ⟨hε⟩
   exact { completenessTransfer := completenessTransfer_core ψ 𝒟 A P ε hε }
 
-/-- The matrix of `operatorDifference X X` is zero (self-difference). -/
-private lemma operatorDifference_self_matrix (X : Operator) :
-    (operatorDifference X X).matrix = 0 := by
-  unfold operatorDifference
-  rw [dif_pos rfl]
-  simp [castOp]
-
-/-- The dimension of `operatorDifference X X` equals `X.dim`. -/
-private lemma operatorDifference_self_dim (X : Operator) :
-    (operatorDifference X X).dim = X.dim := by
-  unfold operatorDifference
-  rw [dif_pos rfl]
-
-/-- `expectationValue` of an operator with zero matrix is zero. -/
-private lemma expectationValue_zero_matrix (ψ : QuantumState) (X : Operator)
-    (h : X.matrix = 0) : expectationValue ψ X = 0 := by
-  unfold expectationValue
-  split
-  · simp [h, castOp, Matrix.mul_zero, MIPStarRE.Quantum.normalizedTrace_zero]
-  · rfl
-
 /-- The self-distance defect `questionStateDependentDistanceDefect ψ M M` is zero
-because `operatorDifference X X` has zero matrix. -/
+because `operatorDifference X X` has zero matrix. Uses public
+`MIPStarRE.LDT.operatorDifference_self_matrix` and
+`MIPStarRE.LDT.expectationValue_zero_matrix` from `Basic/Operator.lean`. -/
 private lemma questionStateDependentDistanceDefect_self
     {Outcome : Type*} (ψ : QuantumState) (M : SubMeasurement Outcome) :
     questionStateDependentDistanceDefect ψ M M = 0 := by
   unfold questionStateDependentDistanceDefect
-  have hdiff : ∀ (X : Operator), (operatorDifference X X).matrix = 0 :=
-    operatorDifference_self_matrix
   have hzero : ∀ (X : Operator), X.matrix = 0 →
       expectationValue ψ (operatorMul (operatorAdjoint X) X) = 0 := by
     intro X hX
@@ -423,24 +408,19 @@ private lemma questionStateDependentDistanceDefect_self
   have hfb : expectationValue ψ
       (operatorMul (operatorAdjoint (operatorDifference M.totalOperator M.totalOperator))
         (operatorDifference M.totalOperator M.totalOperator)) = 0 :=
-    hzero _ (hdiff M.totalOperator)
+    hzero _ (operatorDifference_self_matrix M.totalOperator)
   have hpo : ∀ a, (fun a => expectationValue ψ
       (operatorMul (operatorAdjoint (operatorDifference (M.outcomeOperator a) (M.outcomeOperator a)))
         (operatorDifference (M.outcomeOperator a) (M.outcomeOperator a)))) a = 0 :=
-    fun a => hzero _ (hdiff (M.outcomeOperator a))
+    fun a => hzero _ (operatorDifference_self_matrix (M.outcomeOperator a))
   unfold sumOverOutcomesOrElse
   split
   · simp [hpo]
   · exact hfb
 
-/-- Averaging the zero function gives zero. -/
-private lemma averageOverDistribution_zero {α : Type*} (𝒟 : Distribution α) :
-    averageOverDistribution 𝒟 (fun _ => 0) = 0 := by
-  unfold averageOverDistribution
-  simp [mul_zero]
-
 /-- The self-distance `stateDependentDistanceError ψ 𝒟 A A` is zero at the
-scaffold level because `operatorDifference X X` has zero matrix. -/
+scaffold level because `operatorDifference X X` has zero matrix. Uses public
+`MIPStarRE.LDT.averageOverDistribution_zero` from `Basic/Distribution.lean`. -/
 private lemma stateDependentDistanceError_self {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A : IndexedSubMeasurement Question Outcome) :
