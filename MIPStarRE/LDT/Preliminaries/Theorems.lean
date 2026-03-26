@@ -460,6 +460,28 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
     le_trans (strongSelfConsistencyError_nonneg ψ 𝒟 A) hδ
   linarith
 
+/-- The closeness bound `2δ + 4√δ + 2ζ` for completing-to-measurement combines:
+(1) `hdist`: A ≈_δ B in state-dependent distance,
+(2) `hsc`: strong self-consistency of A with defect ζ,
+(3) Triangle inequality: A ≈_{2δ} C via completion,
+(4) Sandwich transfer: adds 4√δ from consSubMeas + switchSandwich,
+(5) Self-consistency contributes 2ζ from twoNotionsOfSelfConsistency.
+Requires the full consSubMeas, switchSandwich, and triangle machinery. -/
+private lemma closenessAfterCompletion_core {Outcome : Type*}
+    (ψ : QuantumState)
+    (A : Measurement Outcome) (B : SubMeasurement Outcome)
+    (a0 : Outcome) (δ ζ : Error) :
+    strongSelfConsistency ψ (uniformDistribution Unit)
+        (constantSubMeasurementFamily A.toSubMeasurement) ζ →
+    stateDependentDistance ψ (uniformDistribution Unit)
+        (constantSubMeasurementFamily A.toSubMeasurement)
+        (constantSubMeasurementFamily B) δ →
+    StateDependentDistanceRel ψ (uniformDistribution Unit)
+      (constantSubMeasurementFamily A.toSubMeasurement)
+      (constantSubMeasurementFamily (completeAtOutcome B a0).toSubMeasurement)
+      (2 * δ + 4 * Real.sqrt δ + 2 * ζ) := by
+  sorry
+
 /-- `prop:completing-to-measurement`. The witness is the canonical completion
 `completeAtOutcome B a0` which adds the residual `I - Σ_a B_a` to outcome `a0`. -/
 theorem completingToMeasurement {Outcome : Type*}
@@ -476,14 +498,8 @@ theorem completingToMeasurement {Outcome : Type*}
   intro hsc hdist
   exact ⟨completeAtOutcome B a0, {
     completionFormula := rfl
-    -- The bound `2δ + 4√δ + 2ζ` combines:
-    -- (1) `hdist`: A ≈_δ B in state-dependent distance,
-    -- (2) `hsc`: strong self-consistency of A with defect ζ,
-    -- (3) Triangle inequality: A ≈_{2δ} C via completion,
-    -- (4) Sandwich transfer: adds 4√δ from consSubMeas + switchSandwich,
-    -- (5) Self-consistency contributes 2ζ from twoNotionsOfSelfConsistency.
-    -- Requires the full consSubMeas, switchSandwich, and triangle machinery.
-    closenessAfterCompletion := sorry
+    closenessAfterCompletion :=
+      closenessAfterCompletion_core ψ A B a0 δ ζ hsc hdist
   }⟩
 
 end MIPStarRE.LDT.Preliminaries
