@@ -14,25 +14,15 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
 
-/-- Statement package carried by `NaimarkData`.
-
-This statement makes the following mathematical content explicit beyond mere
-probability preservation:
-
-1. **Projectivity**: the lifted measurements are genuinely projective.
-2. **Commutativity**: the lifted left and right measurements commute — i.e. they act
-   on separate tensor factors after the dilation.
-3. **Dimension bound**: the lifted Hilbert-space dimension is bounded in terms of the
-   original dimension and the number of outcomes.
-4. **Matrix witness**: an honest finite-dimensional matrix realization exists.
--/
+/-- Statement package carried by `NaimarkData`. -/
 structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype OutcomeA] [DecidableEq OutcomeA]
     [Fintype OutcomeB] [DecidableEq OutcomeB]
-    (ψ : QuantumState d)
-    (A : IdxSubMeas QuestionA OutcomeA d)
-    (B : IdxSubMeas QuestionB OutcomeB d)
-    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB d) : Prop where
+    (ψ : QuantumState ι)
+    (A : IdxSubMeas QuestionA OutcomeA ι)
+    (B : IdxSubMeas QuestionB OutcomeB ι)
+    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) : Prop where
   liftedStateFactorization :
     data.liftedState = naimarkLiftedState ψ data
   leftMarginalPreservation :
@@ -52,16 +42,11 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
           jointOutcomeProbability data.liftedState
             ((data.left x).toSubMeas)
             ((data.right y).toSubMeas) a b
-  /-- The lifted left measurements are projective (PVMs). -/
   -- TODO: these are tautological placeholders, need real projectivity witnesses
   liftedLeftProjective :
     ∀ x : QuestionA, data.left x = data.left x
-  /-- The lifted right measurements are projective (PVMs). -/
-  -- TODO: these are tautological placeholders, need real projectivity witnesses
   liftedRightProjective :
     ∀ y : QuestionB, data.right y = data.right y
-  /-- Left and right lifted measurements commute on the lifted state, reflecting
-      the tensor-factor separation produced by the Naimark dilation. -/
   liftedCommutativity :
     ∀ x : QuestionA, ∀ y : QuestionB,
       ∀ a : OutcomeA, ∀ b : OutcomeB,
@@ -71,20 +56,15 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
         jointOutcomeProbability data.liftedState
           ((data.right y).toSubMeas)
           ((data.left x).toSubMeas) b a
-  /-- Dimension bound placeholder (dimension is now a type parameter). -/
   dimensionBound : True
   matrixWitness :
     Nonempty (MatrixNaimarkWitness QuestionA OutcomeA QuestionB OutcomeB)
 
-/-- Output package for the intermediate almost-projective step.
-
-This exposes the semantic content of the consistency → almost-projectivity passage:
-consistency of a measurement against itself implies that each effect `A_a` is
-close to idempotent in the τ-norm.  The matrix witness provides a concrete
-finite-dimensional realization with pointwise idempotence-defect bounds. -/
+/-- Output package for the intermediate almost-projective step. -/
 structure AlmostProjMeasStatement {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState d) (A : Measurement Outcome d) (ζ : Error) : Prop where
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) : Prop where
   strongSelfConsistency :
     SSCRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas) ζ
@@ -93,33 +73,23 @@ structure AlmostProjMeasStatement {Outcome : Type*}
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily A.toSubMeas)
       (2 * ζ)
-  /-- The matrix witness carries per-outcome idempotence control. -/
   matrixWitness :
     Nonempty (MatrixAlmostProjectiveWitness (Outcome := Outcome) ζ)
 
-/-- Output package for the spectral-truncation step.
-
-This is the new intermediate between `AlmostProjMeasStatement` and
-`RoundedProjMeasStatement`: it captures the per-effect eigenvalue
-truncation that produces projections close to the source in τ-norm.
-The resulting projections do **not** yet form a valid submeasurement; the
-subsequent rounding step adjusts them to restore normalization. -/
+/-- Output package for the spectral-truncation step. -/
 structure SpectralTruncationStatement {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
-    (_ψ : QuantumState d) (_A : Measurement Outcome d) (ζ : Error) : Prop where
-  /-- A concrete matrix witness for the spectral truncation exists. -/
+    (_ψ : QuantumState ι) (_A : Measurement Outcome ι) (ζ : Error) : Prop where
   matrixWitness :
     Nonempty (MatrixSpectralTruncationMeasurementWitness (Outcome := Outcome) ζ)
 
-/-- Output package for the rounding-to-projective step.
-
-This is the final stage of the orthonormalization chain: the spectrally truncated
-projections are adjusted to form a valid projective submeasurement while
-maintaining the τ-distance bound from the original measurement. -/
+/-- Output package for the rounding-to-projective step. -/
 structure RoundedProjMeasStatement {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState d) (A : Measurement Outcome d)
-    (P : ProjSubMeas Outcome d) (ζ : Error) : Prop where
+    (ψ : QuantumState ι) (A : Measurement Outcome ι)
+    (P : ProjSubMeas Outcome ι) (ζ : Error) : Prop where
   closeness :
     SDDRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)

@@ -161,47 +161,57 @@ structure MatrixRoundedProjectiveWitness {Outcome : Type*}
       matrixOutcomeTauDistance source.toSubmeasurement target a ≤ ζ
 
 /-- Output package for the paper's Naimark dilation theorem. -/
-structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*) (d : ℕ) where
-  auxStateA : QuantumState d
-  auxStateB : QuantumState d
-  liftedState : QuantumState d
-  left : IdxProjMeas QuestionA OutcomeA d
-  right : IdxProjMeas QuestionB OutcomeB d
-  deriving Inhabited
+structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
+    (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  auxStateA : QuantumState ι
+  auxStateB : QuantumState ι
+  liftedState : QuantumState ι
+  left : IdxProjMeas QuestionA OutcomeA ι
+  right : IdxProjMeas QuestionB OutcomeB ι
+
+instance {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι] :
+    Inhabited (NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) where
+  default := { auxStateA := {}, auxStateB := {}, liftedState := {},
+               left := fun _ => default, right := fun _ => default }
 
 /-- The product auxiliary state used in a Naimark dilation. -/
--- TODO: placeholder — only sets `name`; `density` left at defaults until
+-- TODO: placeholder — `density` left at defaults until
 -- a concrete tensor product model is provided.
-def naimarkAuxiliaryState {QuestionA OutcomeA QuestionB OutcomeB : Type*} {d : ℕ}
-    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB d) : QuantumState d :=
-  { name := s!"{data.auxStateA.name}⊗{data.auxStateB.name}" }
+def naimarkAuxiliaryState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (_data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) : QuantumState ι :=
+  {}
 
 /-- The lifted state `ψ ⊗ aux_A ⊗ aux_B` produced by Naimark dilation. -/
--- TODO: placeholder — only sets `name`; `density` left at defaults until
+-- TODO: placeholder — `density` left at defaults until
 -- a concrete tensor product model is provided.
-def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type*} {d : ℕ}
-    (ψ : QuantumState d)
-    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB d) : QuantumState d :=
-  { name := s!"{ψ.name}⊗{data.auxStateA.name}⊗{data.auxStateB.name}" }
+def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (_ψ : QuantumState ι)
+    (_data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) : QuantumState ι :=
+  {}
 
 /-- Placeholder expectation value of an operator on a state. -/
-noncomputable def placeholderExpectation (ψ : QuantumState d) (X : Operator d) : Error :=
-  (s!"Exp[{ψ.name}|{X.name}]".length : Error)
+noncomputable def placeholderExpectation {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) : Error :=
+  ev ψ X
 
 /-- The single-outcome probability `⟨ψ|A_a|ψ⟩`. -/
-noncomputable def singleOutcomeProbability {Outcome : Type*}
-    (ψ : QuantumState d)
-    (A : SubMeas Outcome d) (a : Outcome) : Error :=
+noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι)
+    (A : SubMeas Outcome ι) (a : Outcome) : Error :=
   placeholderExpectation ψ (A.outcome a)
 
 /-- The joint outcome probability `⟨ψ|A_a ⊗ B_b|ψ⟩`. -/
-noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*} {d : ℕ}
-    (ψ : QuantumState d)
-    (A : SubMeas OutcomeA d)
-    (B : SubMeas OutcomeB d)
+noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι)
+    (A : SubMeas OutcomeA ι)
+    (B : SubMeas OutcomeB ι)
     (a : OutcomeA) (b : OutcomeB) : Error :=
-  -- Placeholder: uses string length rather than formalTensor (which changes dimension)
-  (s!"Exp[{ψ.name}|{(A.outcome a).name}⊗{(B.outcome b).name}]".length : Error)
+  -- Placeholder: uses ev rather than formalTensor (which changes dimension)
+  ev ψ (A.outcome a + B.outcome b)
 
 /-- The explicit error in `thm:orthonormalization`. -/
 noncomputable def orthonormalizationError (ζ : Error) : Error :=

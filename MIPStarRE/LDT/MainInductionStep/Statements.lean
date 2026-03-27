@@ -7,6 +7,9 @@ Statement containers for Section 6 of the low individual degree paper.
 namespace MIPStarRE.LDT.MainInductionStep
 
 open MIPStarRE.LDT
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Output package for the induction-level self-improvement theorem.
 
@@ -16,10 +19,10 @@ the `selfCloseness` and `bounded` fields should use `leftPlacedSubMeas` /
 structure.  For now we keep everything at the strategy's total dimension `d`
 and use `sddError` directly for the self-closeness placeholder. -/
 structure SelfImprovementInInductionSectionConclusion (params : Parameters)
-    (strategy : SymStrat params d)
-    (_G : SubMeas (Polynomial params) d)
-    (H : ProjSubMeas (Polynomial params) d)
-    (Z : Operator d) (eps delta gamma nu : Error) : Prop where
+    (strategy : SymStrat params ι)
+    (_G : SubMeas (Polynomial params) ι)
+    (H : ProjSubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
   completeness :
     CompletenessAtLeast strategy.state H.toSubMeas
       ((1 - nu) - selfImprovementInInductionError params eps delta gamma)
@@ -41,17 +44,17 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
   -- TODO(bipartite): use tensorFailureExpectation once SymStrat has dA/dB
   bounded :
     ev strategy.state
-        (opMul Z (opDiff (identityLike H.toSubMeas.total) H.toSubMeas.total))
+        (Z * (1 - H.toSubMeas.total))
       ≤ selfImprovementInInductionError params eps delta gamma
   dominatesAveragePointOperator :
     ∀ h : Polynomial params,
-      OpDominates Z (averagedPointEvaluationOperator params strategy h)
+      averagedPointEvaluationOperator params strategy h ≤ Z
 
 /-- Output package for the section-local pasting theorem. -/
 structure LdPastingInInductionSectionConclusion (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (_family : IdxPolyFamily params d)
-    (H : Measurement (Polynomial params.next) d)
+    (strategy : SymStrat params.next ι)
+    (_family : IdxPolyFamily params ι)
+    (H : Measurement (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   pointConsistency :
     ConsWithPolyEval params.next strategy.state
@@ -61,7 +64,7 @@ structure LdPastingInInductionSectionConclusion (params : Parameters)
 
 /-- Bookkeeping data `x ↦ (ε_x, δ_x, γ_x)` for the restricted strategies. -/
 structure RestrictedFailureProfile (params : Parameters)
-    (strategy : SymStrat params.next d) : Type where
+    (strategy : SymStrat params.next ι) : Type where
   axisParallel : Fq params → Error
   selfConsistency : Fq params → Error
   diagonal : Fq params → Error
@@ -74,26 +77,26 @@ structure RestrictedFailureProfile (params : Parameters)
 
 /-- Average restricted axis-parallel error over slices. -/
 noncomputable def averageRestrictedAxisParallelError (params : Parameters)
-    {strategy : SymStrat params.next d}
+    {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   averageOverSlices params profile.axisParallel
 
 /-- Average restricted self-consistency error over slices. -/
 noncomputable def averageRestrictedSelfConsistencyError (params : Parameters)
-    {strategy : SymStrat params.next d}
+    {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   averageOverSlices params profile.selfConsistency
 
 /-- Average restricted diagonal-line error over slices. -/
 noncomputable def averageRestrictedDiagonalError (params : Parameters)
-    {strategy : SymStrat params.next d}
+    {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   averageOverSlices params profile.diagonal
 
 /-- Source-style boundedness input for the induction-level pasting theorem. -/
 structure PastingBoundednessInput (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (family : IdxPolyFamily params d) (zeta : Error) : Prop where
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
   bounded : family.Bounded strategy.state zeta
   dominationTargetAgrees :
     ∀ x : Fq params, ∀ g : Polynomial params,
@@ -102,7 +105,7 @@ structure PastingBoundednessInput (params : Parameters)
 
 /-- Bookkeeping package for the restricted-probabilities lemma. -/
 structure RestrictedProbabilitiesStatement (params : Parameters)
-    (strategy : SymStrat params.next d)
+    (strategy : SymStrat params.next ι)
     (eps delta gamma : Error) : Prop where
   profileExists :
     ∃ profile : RestrictedFailureProfile params strategy,

@@ -14,6 +14,8 @@ namespace MIPStarRE.LDT.MainInductionStep
 
 open MIPStarRE.LDT
 
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
 /-- Lift an axis-line answer from the restricted slice back to the ambient space. -/
 def liftAxisAnswer (params : Parameters) (x : Fq params) :
     AxisLinePolynomial params → AxisLinePolynomial params.next :=
@@ -26,12 +28,11 @@ def liftDiagonalAnswer (params : Parameters) (x : Fq params) :
 
 /-- Restrict an axis-parallel line measurement to the slice at height `x`. -/
 def restrictAxisParallelMeasurement (params : Parameters)
-    (strategy : SymStrat params.next d) (x : Fq params) :
-    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) d :=
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι :=
   fun ℓ =>
     let lifted := strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)
     { toMeasurement := { toSubMeas := {
-        name := s!"{lifted.toSubMeas.name}.restrict({x.1})"
         outcome := fun f =>
           lifted.toSubMeas.outcome (liftAxisAnswer params x f)
         total := lifted.toSubMeas.total
@@ -39,12 +40,11 @@ def restrictAxisParallelMeasurement (params : Parameters)
 
 /-- Restrict a diagonal-line measurement to the slice at height `x`. -/
 def restrictDiagonalMeasurement (params : Parameters)
-    (strategy : SymStrat params.next d) (x : Fq params) :
-    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) d :=
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι :=
   fun ℓ =>
     let lifted := strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)
     { toMeasurement := { toSubMeas := {
-        name := s!"{lifted.toSubMeas.name}.restrict({x.1})"
         outcome := fun f =>
           lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
         total := lifted.toSubMeas.total
@@ -52,25 +52,25 @@ def restrictDiagonalMeasurement (params : Parameters)
 
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
 def xRestrictedStrategy (params : Parameters)
-    (strategy : SymStrat params.next d) (x : Fq params) : SymStrat params d where
+    (strategy : SymStrat params.next ι) (x : Fq params) : SymStrat params ι where
   state := strategy.state
   pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
   axisParallelMeasurement := restrictAxisParallelMeasurement params strategy x
   diagonalMeasurement := restrictDiagonalMeasurement params strategy x
 
 @[simp] theorem xRestrictedStrategy_state (params : Parameters)
-    (strategy : SymStrat params.next d) (x : Fq params) :
+    (strategy : SymStrat params.next ι) (x : Fq params) :
     (xRestrictedStrategy params strategy x).state = strategy.state :=
   rfl
 
 @[simp] theorem xRestrictedStrategy_pointMeasurement_apply (params : Parameters)
-    (strategy : SymStrat params.next d) (x : Fq params) (u : Point params) :
+    (strategy : SymStrat params.next ι) (x : Fq params) (u : Point params) :
     (xRestrictedStrategy params strategy x).pointMeasurement u =
       strategy.pointMeasurement (appendPoint params u x) :=
   rfl
 
 @[simp] theorem restrictAxisParallelMeasurement_outcome (params : Parameters)
-    (strategy : SymStrat params.next d) (x : Fq params)
+    (strategy : SymStrat params.next ι) (x : Fq params)
     (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
     ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas.outcome f) =
       (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas.outcome
@@ -78,7 +78,7 @@ def xRestrictedStrategy (params : Parameters)
   rfl
 
 @[simp] theorem restrictDiagonalMeasurement_outcome (params : Parameters)
-    (strategy : SymStrat params.next d) (x : Fq params)
+    (strategy : SymStrat params.next ι) (x : Fq params)
     (ℓ : DiagonalLine params) (f : DiagonalLinePolynomial params) :
     ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeas.outcome f) =
       (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas.outcome
@@ -126,58 +126,56 @@ noncomputable def ldPastingInInductionError (params : Parameters) (k : ℕ)
     2 * ldPastingInInductionNu params k eps delta gamma zeta +
     Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))
 
+/-- Weighted sum of operators over a distribution's finite support.
+Local copy to break import cycle with `ExpansionHypercubeGraph.Defs`. -/
+private noncomputable def averageOperatorOverDistribution' {α : Type*}
+    (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
+  (𝒟.support.map fun a => 𝒟.weight a • f a).sum
+
 /-- Averaged point operator `E_u A^u_{h(u)}` appearing in boundedness. -/
 noncomputable def averagedPointEvaluationOperator (params : Parameters)
-    (strategy : SymStrat params d) (h : Polynomial params) : Operator d := by
-  classical
-  let 𝒟 : Distribution (Point params) := uniformDistribution (Point params)
-  let u₀ : Point params := Classical.choice (inferInstance : Nonempty (Point params))
-  exact weightedOpSum
-    𝒟.support 𝒟.weight
+    (strategy : SymStrat params ι) (h : Polynomial params) : MIPStarRE.Quantum.Op ι :=
+  averageOperatorOverDistribution' (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement u).toSubMeas.outcome (h u))
 
 /-- Slice-wise averaged point operator `E_u A^{u,x}_{g(u)}`. -/
 noncomputable def averagedSlicePointEvaluationOperator (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (x : Fq params) (g : Polynomial params) : Operator d := by
-  classical
-  let 𝒟 : Distribution (Point params) := uniformDistribution (Point params)
-  let u₀ : Point params := Classical.choice (inferInstance : Nonempty (Point params))
-  exact weightedOpSum
-    𝒟.support 𝒟.weight
+    (strategy : SymStrat params.next ι)
+    (x : Fq params) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
+  averageOperatorOverDistribution' (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
 
 /-- Lift a submeasurement to the left tensor factor of a bipartite space `dA * dB`.
 
-Each outcome operator `A_a : Operator dA` becomes `A_a ⊗ I_{dB} : Operator (dA * dB)`.
+Each outcome operator `A_a : MIPStarRE.Quantum.Op ιA` becomes `A_a ⊗ I_{dB} : Operator (dA * dB)`.
 NOTE: duplicated from CommutativityPoints; should be factored into a shared
 utility once the import graph permits it. -/
-def leftPlacedSubMeas {α : Type*} {dA dB : ℕ} (A : SubMeas α dA) :
-    SubMeas α (dA * dB) where
-  name := s!"{A.name}.left"
-  outcome := fun a => leftTensor (d₂ := dB) (A.outcome a)
-  total := leftTensor (d₂ := dB) A.total
+def leftPlacedSubMeas {α : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : SubMeas α ιA) :
+    SubMeas α (ιA × ιB) where
+  outcome := fun a => leftTensor (ι₂ := ιB) (A.outcome a)
+  total := leftTensor (ι₂ := ιB) A.total
 
-/-- Lift a submeasurement to the right tensor factor of a bipartite space `dA * dB`.
-
-Each outcome operator `A_a : Operator dB` becomes `I_{dA} ⊗ A_a : Operator (dA * dB)`. -/
-def rightPlacedSubMeas {α : Type*} {dA dB : ℕ} (A : SubMeas α dB) :
-    SubMeas α (dA * dB) where
-  name := s!"{A.name}.right"
-  outcome := fun a => rightTensor (d₁ := dA) (A.outcome a)
-  total := rightTensor (d₁ := dA) A.total
+/-- Lift a submeasurement to the right tensor factor of a bipartite space `ιA × ιB`. -/
+def rightPlacedSubMeas {α : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : SubMeas α ιB) :
+    SubMeas α (ιA × ιB) where
+  outcome := fun a => rightTensor (ι₁ := ιA) (A.outcome a)
+  total := rightTensor (ι₁ := ιA) A.total
 
 /-- Tensor-failure expectation on a bipartite space.
 
 Computes `⟨ψ| (Z ⊗ I)(I ⊗ (I - Σ H_a)) |ψ⟩` where `Z` acts on the left register
-(dimension `dA`) and `H` acts on the right register (dimension `dB`). -/
-noncomputable def tensorFailureExpectation {Outcome : Type*} {dA dB : ℕ}
-    (ψ : QuantumState (dA * dB)) (Z : Operator dA) (H : SubMeas Outcome dB) :
+and `H` acts on the right register. -/
+noncomputable def tensorFailureExpectation {Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (Z : MIPStarRE.Quantum.Op ιA) (H : SubMeas Outcome ιB) :
     Error :=
   ev ψ <|
-    opMul
-      (leftTensor (d₂ := dB) Z)
-      (rightTensor (d₁ := dA) (opDiff (identityLike H.total) H.total))
+    leftTensor (ι₂ := ιB) Z *
+      rightTensor (ι₁ := ιA) (1 - H.total)
 
 /-- The uniform distribution on slice heights `x ∈ F_q`. -/
 noncomputable def sliceHeightDistribution (params : Parameters) : Distribution (Fq params) :=

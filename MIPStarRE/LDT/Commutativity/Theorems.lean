@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Commutativity.Defs
 /-!
 Statement packaging and scaffold theorems for Section 11 commutativity.
 
-In the bipartite model, `ψbi : QuantumState (d * d)` is the bipartite state
+In the bipartite model, `ψbi : QuantumState (ι × ι)` is the bipartite state
 on both registers.  Fields that involve bipartite-lifted operators (via
 `leftPlacedSubMeas` / `rightPlacedSubMeas` / `leftTensor`) use `ψbi`,
 while fields that stay on a single register use `strategy.state`.
@@ -16,12 +16,15 @@ namespace MIPStarRE.LDT.Commutativity
 open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 noncomputable section
 
 /-- Operator domination, written in source order as `X ≤ Y`. -/
-abbrev OperatorDominatedBy (X Y : Operator d) : Prop :=
-  OpDominates Y X
+abbrev OperatorDominatedBy (X Y : MIPStarRE.Quantum.Op ι) : Prop :=
+  X ≤ Y
 
 /-- Displayed error term for `lem:comm-data-processed-g`. -/
 noncomputable def commDataProcessedGError (params : Parameters) (gamma zeta : Error) : Error :=
@@ -50,9 +53,9 @@ noncomputable def comMainError (params : Parameters) (gamma zeta : Error) : Erro
 `ψbi` is the bipartite state on `d * d` used for fields involving
 tensor-placed operators.  Fields on a single register use `strategy.state`. -/
 structure CommDataProcessedGConclusion (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (ψbi : QuantumState (d * d))
-    (family : IdxPolyFamily params d)
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
   postprocessedPointConsistency :
     ConsRel strategy.state
@@ -87,9 +90,9 @@ structure CommDataProcessedGConclusion (params : Parameters)
 
 /-- Output package for `thm:com-main`. -/
 structure ComMainConclusion (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (ψbi : QuantumState (d * d))
-    (family : IdxPolyFamily params d)
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
   evaluatedCommutation :
     CommDataProcessedGConclusion params strategy ψbi family gamma zeta
@@ -109,8 +112,8 @@ structure ComMainConclusion (params : Parameters)
 /-- Output package for `lem:normalization-condition`. -/
 structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
-    (P : SubMeas OutcomeA d)
-    (Q : ProjSubMeas OutcomeB d) : Prop where
+    (P : SubMeas OutcomeA ι)
+    (Q : ProjSubMeas OutcomeB ι) : Prop where
   sandwichedHermitianSquare :
     normalizationConditionAdjointSquareOperator P Q =
       normalizationConditionSquareOperator P Q
@@ -122,11 +125,11 @@ structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG
     (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (ψbi : QuantumState (d * d))
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params d)
+    (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
@@ -136,11 +139,11 @@ lemma commDataProcessedG
 /-- `thm:com-main`. -/
 theorem comMain
     (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (ψbi : QuantumState (d * d))
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params d)
+    (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
@@ -150,8 +153,8 @@ theorem comMain
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
-    (P : SubMeas OutcomeA d)
-    (Q : ProjSubMeas OutcomeB d) :
+    (P : SubMeas OutcomeA ι)
+    (Q : ProjSubMeas OutcomeB ι) :
     NormalizationConditionStatement P Q := by
   sorry
 

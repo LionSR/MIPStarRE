@@ -8,6 +8,8 @@ import MIPStarRE.LDT.Basic.SubMeasurement
 
 Core definitions for the low individual degree test: evaluation families,
 matching mass, consistency defect, and test-passing predicates.
+
+All operator fields now use `Op ι` directly with a generic `Fintype` index `ι`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -17,120 +19,136 @@ noncomputable section
 namespace MIPStarRE.LDT
 
 /-- Evaluate a polynomial-valued submeasurement at a point. -/
-noncomputable def evaluateAt {d : ℕ} (params : Parameters) (u : Point params)
-    (G : SubMeas (Polynomial params) d) : SubMeas (Fq params) d :=
+noncomputable def evaluateAt {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) (u : Point params)
+    (G : SubMeas (Polynomial params) ι) : SubMeas (Fq params) ι :=
   postprocess G (fun g => g u)
 
 /-- View a global polynomial submeasurement as a point-indexed answer family. -/
-noncomputable def polynomialEvaluationFamily {d : ℕ} (params : Parameters)
-    (G : SubMeas (Polynomial params) d) :
-    IdxSubMeas (Point params) (Fq params) d :=
+noncomputable def polynomialEvaluationFamily {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters)
+    (G : SubMeas (Polynomial params) ι) :
+    IdxSubMeas (Point params) (Fq params) ι :=
   fun u => evaluateAt params u G
 
 /-- Evaluate each member of an indexed polynomial family at the same point. -/
-noncomputable def evaluateFiberFamilyAt {d : ℕ} (params : Parameters) (u : Point params)
-    (G : IdxSubMeas (Fq params) (Polynomial params) d) :
-    IdxSubMeas (Fq params) (Fq params) d :=
+noncomputable def evaluateFiberFamilyAt {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) (u : Point params)
+    (G : IdxSubMeas (Fq params) (Polynomial params) ι) :
+    IdxSubMeas (Fq params) (Fq params) ι :=
   fun x => evaluateAt params u (G x)
 
 /-- Evaluate an indexed slice family at a point `(u, x)` in `F_q^{m+1}`. -/
-noncomputable def evaluateFiberFamilyAtNextPoint {d : ℕ} (params : Parameters)
-    (G : IdxSubMeas (Fq params) (Polynomial params) d) :
-    IdxSubMeas (Point params.next) (Fq params) d :=
+noncomputable def evaluateFiberFamilyAtNextPoint {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters)
+    (G : IdxSubMeas (Fq params) (Polynomial params) ι) :
+    IdxSubMeas (Point params.next) (Fq params) ι :=
   fun u => evaluateAt params (truncatePoint params u) (G (pointHeight params u))
 
 /-- Questionwise matching mass `∑_a ⟨ψ, A_a B_a ψ⟩`, summed over outcomes. -/
-noncomputable def qMatchMass {Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (A B : SubMeas Outcome d) : Error :=
-  ∑ a, ev ψ (opMul (A.outcome a) (B.outcome a))
+noncomputable def qMatchMass {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A B : SubMeas Outcome ι) : Error :=
+  ∑ a, ev ψ (A.outcome a * B.outcome a)
 
 /-- Questionwise off-diagonal mass surrogate for consistency. -/
-noncomputable def qConsDefect {Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (A B : SubMeas Outcome d) : Error :=
-  let totalOverlap := ev ψ (opMul A.total B.total)
+noncomputable def qConsDefect {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A B : SubMeas Outcome ι) : Error :=
+  let totalOverlap := ev ψ (A.total * B.total)
   max 0 (totalOverlap - qMatchMass ψ A B)
 
 /-- Questionwise squared-distance defect. -/
-noncomputable def qSDD {Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (A B : SubMeas Outcome d) : Error :=
-  ∑ a, (let diff := opDiff (A.outcome a) (B.outcome a)
-        ev ψ (opMul (opAdj diff) diff))
+noncomputable def qSDD {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A B : SubMeas Outcome ι) : Error :=
+  ∑ a, ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))
 
 /-- Questionwise strong self-consistency defect. -/
-noncomputable def qSSCDefect {Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (A : SubMeas Outcome d) : Error :=
+noncomputable def qSSCDefect {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A : SubMeas Outcome ι) : Error :=
   let totalMass := ev ψ A.total
-  let diagonalMass := ∑ a, ev ψ (opMul (A.outcome a) (A.outcome a))
+  let diagonalMass := ∑ a, ev ψ (A.outcome a * A.outcome a)
   max 0 (totalMass - diagonalMass)
 
 /-- Averaged off-diagonal mass for consistency statements. -/
-def consError {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome d) : Error :=
+def consError {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question Outcome ι) : Error :=
   avgOver 𝒟 (fun q => qConsDefect ψ (A q) (B q))
 
 /-- Averaged squared distance for `≈_δ`. -/
-def sddError {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome d) : Error :=
+def sddError {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question Outcome ι) : Error :=
   avgOver 𝒟 (fun q => qSDD ψ (A q) (B q))
 
 /-- Averaged defect in strong self-consistency. -/
-def sscError {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IdxSubMeas Question Outcome d) : Error :=
+def sscError {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι) : Error :=
   avgOver 𝒟 (fun q => qSSCDefect ψ (A q))
 
 /-- Total mass of a submeasurement on state `ψ`, computed from the concrete total operator. -/
-def subMeasMass {Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (A : SubMeas Outcome d) : Error :=
+def subMeasMass {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A : SubMeas Outcome ι) : Error :=
   ev ψ A.total
 
 /-- Averaged total mass of an indexed submeasurement. -/
-def idxSubMeasMass {Question Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IdxSubMeas Question Outcome d) : Error :=
+def idxSubMeasMass {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι) : Error :=
   avgOver 𝒟 (fun q => subMeasMass ψ (A q))
 
 /-- Defect in domination by an operator witness, measured at the expectation-value level. -/
-def bndError {Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (A : SubMeas Outcome d) (Z : Operator d) : Error :=
+def bndError {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A : SubMeas Outcome ι)
+    (Z : MIPStarRE.Quantum.Op ι) : Error :=
   max 0 (subMeasMass ψ A - ev ψ Z)
 
 /-- Consistency relation. -/
-structure ConsRel {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop where
+structure ConsRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question Outcome ι) (δ : Error) : Prop where
   offDiagonalBound : consError ψ 𝒟 A B ≤ δ
 
 /-- State-dependent distance relation. -/
-structure SDDRel {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop where
+structure SDDRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question Outcome ι) (δ : Error) : Prop where
   squaredDistanceBound : sddError ψ 𝒟 A B ≤ δ
 
 /-- Strong self-consistency relation. -/
-structure SSCRel {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IdxSubMeas Question Outcome d) (δ : Error) : Prop where
+structure SSCRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι) (δ : Error) : Prop where
   diagonalOverlapBound : sscError ψ 𝒟 A ≤ δ
 
 /-- Completeness statement for a submeasurement. -/
-structure CompletenessAtLeast {Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (A : SubMeas Outcome d) (r : Error) : Prop where
+structure CompletenessAtLeast {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A : SubMeas Outcome ι) (r : Error) : Prop where
   lowerBound : subMeasMass ψ A ≥ r
 
 /-- Boundedness statement witnessed by an operator. -/
-structure BoundedByOperator {Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (A : SubMeas Outcome d) (Z : Operator d) (δ : Error) : Prop where
-  witnessOpPSD : OpPSD Z
+structure BoundedByOperator {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A : SubMeas Outcome ι)
+    (Z : MIPStarRE.Quantum.Op ι) (δ : Error) : Prop where
+  witnessOpPSD : 0 ≤ Z
   upperBound : bndError ψ A Z ≤ δ
 
 /-- Consistency between a points measurement and a global polynomial submeasurement. -/
-structure ConsWithPolyEval {d : ℕ} (params : Parameters)
-    (ψ : QuantumState d)
-    (A : IdxSubMeas (Point params) (Fq params) d)
-    (G : SubMeas (Polynomial params) d)
+structure ConsWithPolyEval {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters)
+    (ψ : QuantumState ι)
+    (A : IdxSubMeas (Point params) (Fq params) ι)
+    (G : SubMeas (Polynomial params) ι)
     (δ : Error) : Prop where
   evaluationConsistency :
     ConsRel ψ (uniformDistribution (Point params))
@@ -139,9 +157,10 @@ structure ConsWithPolyEval {d : ℕ} (params : Parameters)
       δ
 
 /-- Consistency between two global polynomial submeasurements. -/
-structure PolyMeasCons {d : ℕ} (params : Parameters)
-    (ψ : QuantumState d)
-    (G₁ G₂ : SubMeas (Polynomial params) d)
+structure PolyMeasCons {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters)
+    (ψ : QuantumState ι)
+    (G₁ G₂ : SubMeas (Polynomial params) ι)
     (δ : Error) : Prop where
   mutualConsistency :
     ConsRel ψ (uniformDistribution Unit)
@@ -150,8 +169,9 @@ structure PolyMeasCons {d : ℕ} (params : Parameters)
       δ
 
 /-- Strong self-consistency for a global polynomial submeasurement. -/
-structure PolyMeasSSC {d : ℕ} (params : Parameters)
-    (ψ : QuantumState d) (G : SubMeas (Polynomial params) d) (_δ : Error) : Prop where
+structure PolyMeasSSC {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters)
+    (ψ : QuantumState ι) (G : SubMeas (Polynomial params) ι) (_δ : Error) : Prop where
   diagonalMassBound :
     SSCRel ψ (uniformDistribution Unit)
       (constSubMeasFamily G)

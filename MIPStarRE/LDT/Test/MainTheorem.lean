@@ -23,19 +23,15 @@ noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) 
 
 /--
 `thm:main-formal` from `test_definition.tex`.
-
-This matching declaration keeps the paper's main output shape: two global polynomial
-measurements, one for each prover, consistent with the point measurements and with
-each other.
 -/
 theorem mainFormal
-    (params : Parameters) {d : ℕ}
-    (strategy : ProjStrat params d)
+    (params : Parameters) {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι)
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
     (hk : params.m * params.d ≤ k) :
-    ∃ G_A G_B : ProjMeas (Polynomial params) d,
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsWithPolyEval params strategy.state
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
           G_B.toSubMeas

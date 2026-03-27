@@ -13,6 +13,9 @@ namespace MIPStarRE.LDT.Commutativity
 open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 noncomputable section
 
@@ -21,37 +24,31 @@ abbrev EvaluatedSliceOutcome (params : Parameters) := Fq params × Fq params
 abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
 abbrev FullSliceOutcome (params : Parameters) := Polynomial params × Polynomial params
 
-/-- Ordered product placed on the left tensor factor of the bipartite space `d * d`. -/
-def leftOrderedProductSubMeas {α β : Type*} {d : ℕ}
-    (label : String) (A : SubMeas α d) (B : SubMeas β d) :
-    SubMeas (α × β) (d * d) :=
-  leftPlacedSubMeas (dB := d) (orderedProductSubMeas label A B)
+/-- Ordered product placed on the left tensor factor of the bipartite space `ι × ι`. -/
+def leftOrderedProductSubMeas {α β : Type*}
+    (label : String) (A : SubMeas α ι) (B : SubMeas β ι) :
+    SubMeas (α × β) (ι × ι) :=
+  leftPlacedSubMeas (ιB := ι) (orderedProductSubMeas label A B)
 
 /-- Append a total operator on the right of every outcome operator. -/
-def appendRightTotalSubMeas {α : Type*}
-    (tag : String) (A : SubMeas α d) (X : Operator d) : SubMeas α d where
-  name := s!"{A.name}.{tag}"
-  outcome := fun a => opMul (A.outcome a) X
-  total := opMul A.total X
+def appendRightTotalSubMeas {α : Type*} {κ : Type*} [Fintype κ] [DecidableEq κ]
+    (_tag : String) (A : SubMeas α κ) (X : MIPStarRE.Quantum.Op κ) : SubMeas α κ where
+  outcome := fun a => A.outcome a * X
+  total := A.total * X
 
 /-- Sandwiched product `A_a B_b A_a`.
 
 Its total operator should be the sum-of-sandwiches
 `∑_a A_a (∑_b B_b) A_a` whenever `α` is finitely enumerable. -/
 noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α]
-    (label : String) (A : SubMeas α d) (B : SubMeas β d) :
-    SubMeas (α × β) d where
-  name := label
+    (_label : String) (A : SubMeas α ι) (B : SubMeas β ι) :
+    SubMeas (α × β) ι where
   outcome := fun ab =>
     match ab with
     | (a, b) =>
-        opMul (A.outcome a)
-          (opMul (B.outcome b) (A.outcome a))
+        A.outcome a * B.outcome b * A.outcome a
   total :=
-    sumOpList
-      (Finset.univ.toList.map fun a =>
-        opMul (A.outcome a)
-          (opMul B.total (A.outcome a)))
+    ∑ a : α, A.outcome a * B.total * A.outcome a
 
 /-- The full-slice question underlying an evaluated-slice sample. -/
 def fullSliceQuestionOfEvaluatedSlice (params : Parameters)
@@ -60,41 +57,41 @@ def fullSliceQuestionOfEvaluatedSlice (params : Parameters)
 
 /-- The postprocessed family `((u,x) ↦ G^x_[g(u)=a])`. -/
 def evaluatedPointFamily (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (Point params.next) (Fq params) d :=
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (Point params.next) (Fq params) ι :=
   IdxPolyFamily.evaluatedAtNextPoint family
 
 /-- Left tensor-placement for the evaluated family `G^x_[g(u)=a]`
 on the bipartite space `d * d`. -/
 def evaluatedPointFamilyLeft (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (Point params.next) (Fq params) (d * d) :=
-  fun u => leftPlacedSubMeas (dB := d) (evaluatedPointFamily params family u)
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
+  fun u => leftPlacedSubMeas (ιB := ι) (evaluatedPointFamily params family u)
 
 /-- Right tensor-placement for the evaluated family `G^x_[g(u)=a]`
 on the bipartite space `d * d`. -/
 def evaluatedPointFamilyRight (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (Point params.next) (Fq params) (d * d) :=
-  fun u => rightPlacedSubMeas (dA := d) (evaluatedPointFamily params family u)
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
+  fun u => rightPlacedSubMeas (ιA := ι) (evaluatedPointFamily params family u)
 
 /-- The first evaluated factor `G^x_[g(u)=a]`. -/
 def evaluatedSliceFirstFactor (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (Fq params) d :=
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (Fq params) ι :=
   fun q => evaluatedPointFamily params family q.1
 
 /-- The second evaluated factor `G^y_[h(v)=b]`. -/
 def evaluatedSliceSecondFactor (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (Fq params) d :=
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (Fq params) ι :=
   fun q => evaluatedPointFamily params family q.2
 
 /-- The ordered evaluated-slice product `(G^x_[g(u)=a] G^y_[h(v)=b]) ⊗ I`
 on the bipartite space `d * d`. -/
 def evaluatedSliceProductLeft (params : Parameters)
-    (_strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
+    (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     leftOrderedProductSubMeas
       s!"evalSlice.left({params.m},{params.q},{params.d})"
@@ -104,10 +101,10 @@ def evaluatedSliceProductLeft (params : Parameters)
 /-- The reversed evaluated-slice product `(G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`
 on the bipartite space `d * d`. -/
 def evaluatedSliceProductRight (params : Parameters)
-    (_strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
+    (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
-    leftPlacedSubMeas (dB := d) <|
+    leftPlacedSubMeas (ιB := ι) <|
       reversedProductSubMeas
         s!"evalSlice.right({params.m},{params.q},{params.d})"
         (evaluatedSliceFirstFactor params family q)
@@ -116,10 +113,10 @@ def evaluatedSliceProductRight (params : Parameters)
 /-- The sandwiched evaluated product `(G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`
 on the bipartite space `d * d`. -/
 def evaluatedSliceSandwichFirstFactor (params : Parameters)
-    (_strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
+    (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
-    leftPlacedSubMeas (dB := d) <|
+    leftPlacedSubMeas (ιB := ι) <|
       sandwichByOuterSubMeas
         s!"evalSlice.sandwich({params.m},{params.q},{params.d})"
         (evaluatedSliceFirstFactor params family q)
@@ -127,21 +124,21 @@ def evaluatedSliceSandwichFirstFactor (params : Parameters)
 
 /-- The first full slice measurement `G^x`. -/
 def fullSliceFirstFactor (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (FullSliceQuestion params) (Polynomial params) d :=
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (FullSliceQuestion params) (Polynomial params) ι :=
   fun q => (family.meas q.1).toSubMeas
 
 /-- The second full slice measurement `G^y`. -/
 def fullSliceSecondFactor (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (FullSliceQuestion params) (Polynomial params) d :=
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (FullSliceQuestion params) (Polynomial params) ι :=
   fun q => (family.meas q.2).toSubMeas
 
 /-- The ordered full-slice product `(G^x_g G^y_h) ⊗ I`
 on the bipartite space `d * d`. -/
 def fullSliceProductLeft (params : Parameters)
-    (_strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) (d * d) :=
+    (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
   fun q =>
     leftOrderedProductSubMeas
       s!"fullSlice.left({params.m},{params.q},{params.d})"
@@ -151,10 +148,10 @@ def fullSliceProductLeft (params : Parameters)
 /-- The reversed full-slice product `(G^y_h G^x_g) ⊗ I`
 on the bipartite space `d * d`. -/
 def fullSliceProductRight (params : Parameters)
-    (_strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) (d * d) :=
+    (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
   fun q =>
-    leftPlacedSubMeas (dB := d) <|
+    leftPlacedSubMeas (ιB := ι) <|
       reversedProductSubMeas
         s!"fullSlice.right({params.m},{params.q},{params.d})"
         (fullSliceFirstFactor params family q)
@@ -170,8 +167,8 @@ def evaluateFullSliceOutcomeAtQuestion (params : Parameters)
 /-- Postprocess the full-slice ordered product at sampled points.
 On the bipartite space `d * d`. -/
 def evaluatedFromFullSliceProductLeft (params : Parameters)
-    (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
     postprocess (fullSliceProductLeft params strategy family xy)
@@ -180,8 +177,8 @@ def evaluatedFromFullSliceProductLeft (params : Parameters)
 /-- Postprocess the full-slice reversed product at sampled points.
 On the bipartite space `d * d`. -/
 def evaluatedFromFullSliceProductRight (params : Parameters)
-    (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
     postprocess (fullSliceProductRight params strategy family xy)
@@ -190,131 +187,115 @@ def evaluatedFromFullSliceProductRight (params : Parameters)
 /-- Internal stability family from the `G^y` insertion/removal step.
 On the bipartite space `d * d`. -/
 def commDataProcessedGStabilityOneLeft (params : Parameters)
-    (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
     appendRightTotalSubMeas "timesGy"
       (evaluatedSliceSandwichFirstFactor params strategy family q)
-      (leftTensor (d₂ := d) ((fullSliceSecondFactor params family xy).total))
+      (leftTensor (ι₂ := ι) ((fullSliceSecondFactor params family xy).total))
 
 /-- Internal stability family after removing the trailing `G^y`.
 On the bipartite space `d * d`. -/
 def commDataProcessedGStabilityOneRight (params : Parameters)
-    (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q => evaluatedSliceSandwichFirstFactor params strategy family q
 
 /-- Internal stability family from the `G^x` insertion/removal step.
 On the bipartite space `d * d`. -/
 def commDataProcessedGStabilityTwoLeft (params : Parameters)
-    (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
     appendRightTotalSubMeas "timesGx"
       (evaluatedSliceProductLeft params strategy family q)
-      (leftTensor (d₂ := d) ((fullSliceFirstFactor params family xy).total))
+      (leftTensor (ι₂ := ι) ((fullSliceFirstFactor params family xy).total))
 
 /-- Internal stability family after removing the trailing `G^x`.
 On the bipartite space `d * d`. -/
 def commDataProcessedGStabilityTwoRight (params : Parameters)
-    (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q => evaluatedSliceProductLeft params strategy family q
 
 /-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`.
 
-We propagate explicit `dim` and `matrix` from the input operators so that
-`opAdd`/`sumOpList` (which require matching dimensions) can
-accumulate the sum `∑_b C_{a,b}` correctly even when `dim ≠ 1`. -/
-def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type*} {d : ℕ}
-    (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d)
-    (a : OutcomeA) (b : OutcomeB) : Operator d :=
-  let pa := P.outcome a
-  let qb := Q.outcome b
-  { name := s!"({qb.name})*({pa.name})*({qb.name})"
-    matrix := qb.matrix * pa.matrix * qb.matrix }
+We propagate explicit `matrix` from the input operators so that
+the sum `∑_b C_{a,b}` accumulates correctly. -/
+def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type*}
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι)
+    (a : OutcomeA) (b : OutcomeB) : MIPStarRE.Quantum.Op ι :=
+  Q.outcome b * P.outcome a * Q.outcome b
 
 /-- The sandwiched family `b ↦ Q_b P_a Q_b`. -/
 noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeB]
-    (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) :
-    IdxSubMeas OutcomeA OutcomeB d :=
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) :
+    IdxSubMeas OutcomeA OutcomeB ι :=
   fun a =>
-    { name := s!"sandwich({P.name},{Q.toSubMeas.name})"
-      outcome := fun b => normalizationConditionSandwichedOperator P Q a b
+    { outcome := fun b => normalizationConditionSandwichedOperator P Q a b
       total :=
-        sumOpList
-          (Finset.univ.toList.map
-            (fun b => normalizationConditionSandwichedOperator P Q a b)) }
+        ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b }
 
 /-- The total family `a ↦ ∑_b C_{a,b}` from `lem:normalization-condition`. -/
 def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeB]
-    (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) :
-    IdxSubMeas OutcomeA Unit d :=
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) :
+    IdxSubMeas OutcomeA Unit ι :=
   fun a => postprocess (normalizationConditionSandwichedFamily P Q a) (fun _ => ())
 
 /-- The formal operator `∑_b C_{a,b}` from `lem:normalization-condition`. -/
 def normalizationConditionSandwichedTotalOperator {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeB]
-    (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d)
-    (a : OutcomeA) : Operator d :=
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι)
+    (a : OutcomeA) : MIPStarRE.Quantum.Op ι :=
   (normalizationConditionSandwichedTotalFamily P Q a).total
 
 /-- The family `a ↦ (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
-    (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) :
-    SubMeas OutcomeA d where
-  name := s!"normSquareFamily({P.name},{Q.toSubMeas.name})"
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) :
+    SubMeas OutcomeA ι where
   outcome := fun a =>
-    opMul
-      (normalizationConditionSandwichedTotalOperator P Q a)
-      (opAdj (normalizationConditionSandwichedTotalOperator P Q a))
+    normalizationConditionSandwichedTotalOperator P Q a *
+      (normalizationConditionSandwichedTotalOperator P Q a)ᴴ
   total :=
-    sumOpList
-      (Finset.univ.toList.map (fun a =>
-        opMul
-          (normalizationConditionSandwichedTotalOperator P Q a)
-          (opAdj (normalizationConditionSandwichedTotalOperator P Q a))))
+    ∑ a : OutcomeA,
+      normalizationConditionSandwichedTotalOperator P Q a *
+        (normalizationConditionSandwichedTotalOperator P Q a)ᴴ
 
 /-- The family `a ↦ (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
 def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
-    (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) :
-    SubMeas OutcomeA d where
-  name := s!"normAdjointSquareFamily({P.name},{Q.toSubMeas.name})"
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) :
+    SubMeas OutcomeA ι where
   outcome := fun a =>
-    opMul
-      (opAdj (normalizationConditionSandwichedTotalOperator P Q a))
-      (normalizationConditionSandwichedTotalOperator P Q a)
+    (normalizationConditionSandwichedTotalOperator P Q a)ᴴ *
+      normalizationConditionSandwichedTotalOperator P Q a
   total :=
-    sumOpList
-      (Finset.univ.toList.map (fun a =>
-        opMul
-          (opAdj (normalizationConditionSandwichedTotalOperator P Q a))
-          (normalizationConditionSandwichedTotalOperator P Q a)))
+    ∑ a : OutcomeA,
+      (normalizationConditionSandwichedTotalOperator P Q a)ᴴ *
+        normalizationConditionSandwichedTotalOperator P Q a
 
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
-    (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) : Operator d :=
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) : MIPStarRE.Quantum.Op ι :=
   (normalizationConditionSquareFamily P Q).total
 
 /-- The operator `∑_a (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
 def normalizationConditionAdjointSquareOperator {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
-    (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) : Operator d :=
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) : MIPStarRE.Quantum.Op ι :=
   (normalizationConditionAdjointSquareFamily P Q).total
 
 /-- The identity bound appearing in `lem:normalization-condition`. -/
 def normalizationConditionIdentityBound {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
-    (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) : Operator d :=
-  -- TODO: idOp dim should match normalizationConditionSquareOperator
-  idOp s!"normalization({P.name},{Q.toSubMeas.name})"
+    (_P : SubMeas OutcomeA ι) (_Q : ProjSubMeas OutcomeB ι) : MIPStarRE.Quantum.Op ι :=
+  1
 
 end
 

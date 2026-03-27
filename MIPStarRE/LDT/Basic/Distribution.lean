@@ -16,7 +16,6 @@ namespace MIPStarRE.LDT
 /-- Placeholder for a probability distribution, now with an explicit finite support list
 and real-valued weights. -/
 structure Distribution (α : Type*) where
-  name : String := ""
   support : List α := []
   weight : α → Error := fun _ => 0
   supportNodup : support.Nodup := by simp
@@ -30,7 +29,6 @@ def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
 /-- The uniform distribution on a nonempty finite type. -/
 noncomputable def uniformDistribution (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α where
-  name := "uniform"
   support := (Finset.univ : Finset α).toList
   weight := fun _ => 1 / (Fintype.card α : Error)
   supportNodup := by

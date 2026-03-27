@@ -10,6 +10,8 @@ namespace MIPStarRE.LDT.CommutativityPoints
 
 open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
 
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
 /-- Output package for `thm:commutativity-points`.
 
 In the bipartite model, the state lives on `d * d` (the tensor product of
@@ -18,8 +20,8 @@ parameter is this bipartite state; all SDDRel fields use it.
 TODO(bipartite): when `SymStrat` gains separate local/bipartite dimensions,
 `ψbi` should come from the strategy directly. -/
 structure CommutativityPointsStatement (params : Parameters)
-    (strategy : SymStrat params d)
-    (ψbi : QuantumState (d * d))
+    (strategy : SymStrat params ι)
+    (ψbi : QuantumState (ι × ι))
     (_eps _delta gamma : Error) : Prop where
   sampledDiagonalLineConsistency :
     ConsRel strategy.state
@@ -75,8 +77,8 @@ TODO(bipartite): when `SymStrat` gains bipartite dimensions, `ψbi` should be
 derived from the strategy and the hypothesis will bind the two. -/
 theorem commutativityPoints
     (params : Parameters)
-    (strategy : SymStrat params d)
-    (ψbi : QuantumState (d * d))
+    (strategy : SymStrat params ι)
+    (ψbi : QuantumState (ι × ι))
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     CommutativityPointsStatement params strategy ψbi eps delta gamma := by

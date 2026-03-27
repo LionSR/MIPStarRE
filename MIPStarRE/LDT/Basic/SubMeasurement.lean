@@ -5,116 +5,121 @@ import MIPStarRE.LDT.Basic.Operator
 
 Shared measurement definitions: submeasurements, measurements, projective variants,
 indexed families, postprocessing, and completion.
+
+All operator fields now use `Op ι` (i.e., `Matrix ι ι ℂ`) directly with
+a generic `Fintype` index `ι`.
 -/
 
 noncomputable section
 
 namespace MIPStarRE.LDT
 
-/-- A paper-local submeasurement with outcomes in `α` and Hilbert space dimension `d`. -/
-structure SubMeas (α : Type*) (d : ℕ) where
-  name : String := ""
-  outcome : α → Operator d := fun _ => default
-  total : Operator d := default
+/-- A paper-local submeasurement with outcomes in `α` and Hilbert space index `ι`. -/
+structure SubMeas (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  outcome : α → MIPStarRE.Quantum.Op ι := fun _ => 0
+  total : MIPStarRE.Quantum.Op ι := 0
 
-instance : Inhabited (SubMeas α d) where
+instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
+    Inhabited (SubMeas α ι) where
   default := {}
 
 /-- A paper-local measurement. -/
-structure Measurement (α : Type*) (d : ℕ) extends SubMeas α d where
+structure Measurement (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
+    extends SubMeas α ι where
   completePlaceholder : True := trivial
 
-instance : Inhabited (Measurement α d) where
+instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
+    Inhabited (Measurement α ι) where
   default := { toSubMeas := default }
 
 /-- A paper-local projective submeasurement. -/
-structure ProjSubMeas (α : Type*) (d : ℕ) extends SubMeas α d where
+structure ProjSubMeas (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
+    extends SubMeas α ι where
   projPlaceholder : True := trivial
 
-instance : Inhabited (ProjSubMeas α d) where
+instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
+    Inhabited (ProjSubMeas α ι) where
   default := { toSubMeas := default }
 
 /-- A paper-local projective measurement. -/
-structure ProjMeas (α : Type*) (d : ℕ) extends Measurement α d where
+structure ProjMeas (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
+    extends Measurement α ι where
   projPlaceholder : True := trivial
 
-instance : Inhabited (ProjMeas α d) where
+instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
+    Inhabited (ProjMeas α ι) where
   default := { toMeasurement := default }
 
-abbrev IdxSubMeas (Question Outcome : Type*) (d : ℕ) :=
-  Question → SubMeas Outcome d
-abbrev IdxMeas (Question Outcome : Type*) (d : ℕ) :=
-  Question → Measurement Outcome d
-abbrev IdxProjSubMeas (Question Outcome : Type*) (d : ℕ) :=
-  Question → ProjSubMeas Outcome d
-abbrev IdxProjMeas (Question Outcome : Type*) (d : ℕ) :=
-  Question → ProjMeas Outcome d
+abbrev IdxSubMeas (Question Outcome : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι] :=
+  Question → SubMeas Outcome ι
+abbrev IdxMeas (Question Outcome : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι] :=
+  Question → Measurement Outcome ι
+abbrev IdxProjSubMeas (Question Outcome : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι] :=
+  Question → ProjSubMeas Outcome ι
+abbrev IdxProjMeas (Question Outcome : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι] :=
+  Question → ProjMeas Outcome ι
 
 namespace IdxMeas
 
-def toIdxSubMeas {Question Outcome : Type*} {d : ℕ}
-    (A : IdxMeas Question Outcome d) :
-    IdxSubMeas Question Outcome d :=
+def toIdxSubMeas {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : IdxMeas Question Outcome ι) :
+    IdxSubMeas Question Outcome ι :=
   fun q => (A q).toSubMeas
 
 end IdxMeas
 
 namespace IdxProjSubMeas
 
-def toIdxSubMeas {Question Outcome : Type*} {d : ℕ}
-    (A : IdxProjSubMeas Question Outcome d) :
-    IdxSubMeas Question Outcome d :=
+def toIdxSubMeas {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : IdxProjSubMeas Question Outcome ι) :
+    IdxSubMeas Question Outcome ι :=
   fun q => (A q).toSubMeas
 
 end IdxProjSubMeas
 
 namespace IdxProjMeas
 
-def toIdxMeas {Question Outcome : Type*} {d : ℕ}
-    (A : IdxProjMeas Question Outcome d) :
-    IdxMeas Question Outcome d :=
+def toIdxMeas {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : IdxProjMeas Question Outcome ι) :
+    IdxMeas Question Outcome ι :=
   fun q => (A q).toMeasurement
 
-def toIdxSubMeas {Question Outcome : Type*} {d : ℕ}
-    (A : IdxProjMeas Question Outcome d) :
-    IdxSubMeas Question Outcome d :=
+def toIdxSubMeas {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : IdxProjMeas Question Outcome ι) :
+    IdxSubMeas Question Outcome ι :=
   fun q => (A q).toSubMeas
 
 end IdxProjMeas
 
+open scoped BigOperators
+
 /-- Post-process the outcomes of a submeasurement. The processed operator at `b` is the
 sum of the operators of all `a` with `f a = b`. -/
-noncomputable def postprocess {α β : Type*} {d : ℕ} [Fintype α]
-    (A : SubMeas α d) (f : α → β) :
-    SubMeas β d := by
+noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype α]
+    (A : SubMeas α ι) (f : α → β) :
+    SubMeas β ι := by
   classical
   exact {
-    name := s!"{A.name}.post"
     outcome := fun b =>
-      sumOpList
-        (((Finset.univ.filter fun a => f a = b).toList).map A.outcome)
+      ∑ a ∈ Finset.univ.filter (fun a => f a = b), A.outcome a
     total := A.total
   }
 
 /-- Complete a submeasurement by adjoining a distinguished failure outcome. -/
-def completeSubMeas {α : Type*} {d : ℕ}
-    (A : SubMeas α d) : Measurement (Option α) d where
+def completeSubMeas {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) : Measurement (Option α) ι where
   toSubMeas := {
-    name := s!"{A.name}.completion"
     outcome := fun
       | some a => A.outcome a
-      | none =>
-          { name := s!"{A.name}.failure"
-            matrix := 1 - A.total.matrix }
-    total :=
-      { name := s!"{A.name}.completion.total"
-        matrix := 1 }
+      | none => 1 - A.total
+    total := 1
   }
 
 /-- Constant indexed family taking the same submeasurement on every question. -/
-def constSubMeasFamily {α : Type*} {d : ℕ}
-    (A : SubMeas α d) :
-    IdxSubMeas Unit α d :=
+def constSubMeasFamily {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) :
+    IdxSubMeas Unit α ι :=
   fun _ => A
 
 end MIPStarRE.LDT

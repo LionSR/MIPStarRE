@@ -11,6 +11,9 @@ namespace MIPStarRE.LDT.Pasting
 open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 noncomputable section
 
@@ -106,9 +109,9 @@ noncomputable def fromHToGRecurrenceError (params : Parameters)
 
 /-- Output package for `thm:ld-pasting`. -/
 structure LdPastingConclusion (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (family : IdxPolyFamily params d)
-    (H : Measurement (Polynomial params.next) d)
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (H : Measurement (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   largeEnough : 400 * params.m * params.d ≤ k
   constructedMeasurement :
@@ -122,9 +125,9 @@ structure LdPastingConclusion (params : Parameters)
 
 /-- Output package for `lem:ld-pasting-sub-measurement`. -/
 structure LdPastingSubMeasConclusion (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (family : IdxPolyFamily params d)
-    (H : SubMeas (Polynomial params.next) d)
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (H : SubMeas (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   largeEnough : 400 * params.m * params.d ≤ k
   constructedSubMeas :
@@ -145,8 +148,8 @@ structure LdPastingSubMeasConclusion (params : Parameters)
 `ψbi` is the bipartite state on `d * d`.
 TODO(bipartite): derive from strategy once SymStrat has bipartite dims. -/
 structure GCompleteSelfConsistencyStatement (params : Parameters)
-    (ψbi : QuantumState (d * d))
-    (family : IdxPolyFamily params d) (zeta : Error) : Prop where
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
   completePartSelfConsistency :
     SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
@@ -156,8 +159,8 @@ structure GCompleteSelfConsistencyStatement (params : Parameters)
 
 /-- Output package for `cor:g-bot-self-consistency`. -/
 structure GBotSelfConsistencyStatement (params : Parameters)
-    (ψbi : QuantumState (d * d))
-    (family : IdxPolyFamily params d) (zeta : Error) : Prop where
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
   completePartWitness :
     GCompleteSelfConsistencyStatement params ψbi family zeta
   incompletePartSelfConsistency :
@@ -170,9 +173,9 @@ structure GBotSelfConsistencyStatement (params : Parameters)
 /-- Output package for `lem:commutativity-switcheroo`. -/
 structure CommutativitySwitcherooStatement {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
-    (ψbi : QuantumState (d * d))
-    (family : IdxPolyFamily params d)
-    (M : IdxProjSubMeas (Fq params) Outcome d)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta omega chi : Error) : Prop where
   aggregateCommutation :
     SDDRel ψbi
@@ -183,8 +186,8 @@ structure CommutativitySwitcherooStatement {Outcome : Type*} [Fintype Outcome]
 
 /-- Output package for `cor:commuting-with-G-complete`. -/
 structure CommutingWithGCompleteStatement (params : Parameters)
-    (ψbi : QuantumState (d * d))
-    (family : IdxPolyFamily params d)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
   pointWithCompletePartCommutation :
     SDDRel ψbi
@@ -201,8 +204,8 @@ structure CommutingWithGCompleteStatement (params : Parameters)
 
 /-- Output package for `cor:commuting-with-G-incomplete`. -/
 structure CommutingWithGIncompleteStatement (params : Parameters)
-    (ψbi : QuantumState (d * d))
-    (family : IdxPolyFamily params d)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
   completePartWitness :
     CommutingWithGCompleteStatement params ψbi family gamma zeta
@@ -221,8 +224,8 @@ structure CommutingWithGIncompleteStatement (params : Parameters)
 
 /-- Output package for `cor:G-hat-facts`. -/
 structure GHatFactsStatement (params : Parameters)
-    (ψbi : QuantumState (d * d))
-    (family : IdxPolyFamily params d)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
   completePartSelfConsistencyWitness :
     GCompleteSelfConsistencyStatement params ψbi family zeta
@@ -247,8 +250,8 @@ structure GHatFactsStatement (params : Parameters)
 
 /-- Output package for `lem:commute-g-half-sandwich`. -/
 structure CommuteGHalfSandwichStatement (params : Parameters)
-    (ψbi : QuantumState (d * d))
-    (family : IdxPolyFamily params d)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
   repeatedCommutation :
     SDDRel ψbi
@@ -259,8 +262,8 @@ structure CommuteGHalfSandwichStatement (params : Parameters)
 
 /-- Output package for `lem:ld-sandwich-line-one-point`. -/
 structure LdSandwichLineOnePointStatement (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (family : IdxPolyFamily params d)
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
     (eps delta gamma zeta : Error)
     (k i : ℕ) : Prop where
   linePointComparison :
@@ -272,8 +275,8 @@ structure LdSandwichLineOnePointStatement (params : Parameters)
 
 /-- Output package for `lem:h-b-consistency`. -/
 structure HBConsistencyStatement (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (family : IdxPolyFamily params d)
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
     (eps delta gamma zeta : Error) (k : ℕ) : Prop where
   lineConsistency :
     ConsRel strategy.state
@@ -284,8 +287,8 @@ structure HBConsistencyStatement (params : Parameters)
 
 /-- Output package for `lem:over-all-outcomes`. -/
 structure OverAllOutcomesStatement (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (family : IdxPolyFamily params d)
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
     (eps delta gamma zeta : Error) (k : ℕ) : Prop where
   totalOutcomeExpansion :
     SDDRel strategy.state (uniformDistribution Unit)
@@ -295,8 +298,8 @@ structure OverAllOutcomesStatement (params : Parameters)
 
 /-- Output package for `lem:from-H-to-G`. -/
 structure FromHToGStatement (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (family : IdxPolyFamily params d)
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceStep :
     ∀ ℓ : ℕ, ℓ < k →
@@ -311,17 +314,17 @@ structure FromHToGStatement (params : Parameters)
       (fromHToGError params gamma zeta k)
 
 /-- Output package for `lem:chernoff-bernoulli-matrix`. -/
-structure ChernoffBernoulliMatrixStatement {d : ℕ}
-    (ψ : QuantumState d)
-    (theta : Error) (k degree : ℕ) (X : Operator d) (kappa : Error) : Prop where
+structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι)
+    (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error) : Prop where
   matrixTailBound :
     CompletenessAtLeast ψ (bernoulliTailSubMeas k degree X)
       (1 - kappa / (1 - theta) - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2))
 
 /-- Output package for `cor:ld-pasting-N-completeness`. -/
 structure LdPastingNCompletenessStatement (params : Parameters)
-    (strategy : SymStrat params.next d)
-    (family : IdxPolyFamily params d)
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
     (kappa nu : Error) (k : ℕ) : Prop where
   largeEnough : 400 * params.m * params.d ≤ k
   completenessBound :

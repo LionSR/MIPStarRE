@@ -17,6 +17,9 @@ namespace MIPStarRE.LDT.Pasting
 open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 noncomputable section
 
@@ -27,7 +30,6 @@ def distinctTuples (params : Parameters) (k : ℕ) : Set (PointTuple params k) :
 /-- TODO: Should be uniform on pairwise-distinct `k`-tuples from `Fq`; currently a named placeholder. -/
 def distinctTupleDistribution (params : Parameters) (k : ℕ) :
     Distribution (PointTuple params k) where
-  name := s!"Distinct({params.q},{k})"
 
 /-- Placeholder outcome type for the completed family `\widehat G`. -/
 abbrev GHatOutcome (params : Parameters) := Option (Polynomial params)
@@ -39,52 +41,47 @@ abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) := Point params ×
 abbrev VerticalLineQuestion (params : Parameters) := Point params
 
 /-- TODO: this should be the operator-polynomial tail construction from `lem:chernoff-bernoulli-matrix`. -/
-def bernoulliTailOperator {d : ℕ} (k degree : ℕ) (X : Operator d) : Operator d where
-  name := s!"BernoulliTail(k={k},d={degree}; {X.name}^r (I-{X.name})^(k-r))"
+def bernoulliTailOperator (k _degree : ℕ) (X : MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
+  X ^ k  -- placeholder
 
 /-- Add a descriptive tag to a paper-local submeasurement placeholder. -/
-def tagSubMeas {α : Type*} (tag : String) (A : SubMeas α d) : SubMeas α d where
-  name := s!"{A.name}.{tag}"
+def tagSubMeas {α : Type*} (_tag : String) (A : SubMeas α ι) : SubMeas α ι where
   outcome := A.outcome
   total := A.total
 
 /-- Multiply each outcome operator by a total operator on the right. -/
 def multiplyByTotalOnRight {α β : Type*}
-    (label : String) (A : SubMeas α d) (B : SubMeas β d) :
-    SubMeas α d where
-  name := label
-  outcome := fun a => opMul (A.outcome a) B.total
-  total := opMul A.total B.total
+    (_label : String) (A : SubMeas α ι) (B : SubMeas β ι) :
+    SubMeas α ι where
+  outcome := fun a => A.outcome a * B.total
+  total := A.total * B.total
 
 /-- Multiply each outcome operator by a total operator on the left. -/
 def multiplyByTotalOnLeft {α β : Type*}
-    (label : String) (A : SubMeas α d) (B : SubMeas β d) :
-    SubMeas β d where
-  name := label
-  outcome := fun b => opMul A.total (B.outcome b)
-  total := opMul A.total B.total
+    (_label : String) (A : SubMeas α ι) (B : SubMeas β ι) :
+    SubMeas β ι where
+  outcome := fun b => A.total * B.outcome b
+  total := A.total * B.total
 
 /-- Average an indexed family against a named distribution. -/
 noncomputable def averageIdxSubMeas {Question Outcome : Type*}
-    (label : String) (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome d) :
-    SubMeas Outcome d where
-  name := label
+    (_label : String) (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome ι) :
+    SubMeas Outcome ι where
   outcome := fun a =>
     averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
   total := averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
 
 /-- Complement operator `I - X` in the same ambient space as `X`. -/
-def operatorComplement (X : Operator d) : Operator d :=
-  opDiff (identityLike X) X
+def operatorComplement (X : MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
+  1 - X
 
 /-- Regard an operator expression as a `Unit`-valued submeasurement placeholder. -/
-def operatorAsSubMeas (X : Operator d) : SubMeas Unit d :=
-  { name := s!"operator({X.name})"
-    outcome := fun _ => X
+def operatorAsSubMeas (X : MIPStarRE.Quantum.Op ι) : SubMeas Unit ι :=
+  { outcome := fun _ => X
     total := X }
 
 /-- Regard the Bernoulli tail operator as a `Unit`-valued submeasurement placeholder. -/
-def bernoulliTailSubMeas {d : ℕ} (k degree : ℕ) (X : Operator d) : SubMeas Unit d :=
+def bernoulliTailSubMeas (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) : SubMeas Unit ι :=
   operatorAsSubMeas (bernoulliTailOperator k degree X)
 
 /-- Record which completed-slice outcomes are genuine polynomial outcomes. -/
@@ -132,54 +129,54 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
 
 /-- Aggregate the polynomial outcomes of `G^x` into its complete part `G^x`. -/
 def completePartSubMeas (params : Parameters)
-    (family : IdxPolyFamily params d) (x : Fq params) : SubMeas Unit d :=
+    (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
   tagSubMeas "complete"
     (postprocess ((family.meas x).toSubMeas) (fun _ => ()))
 
 /-- Placeholder for the incomplete part `G^x_⊥ = I - G^x`. -/
 def incompletePartSubMeas (params : Parameters)
-    (family : IdxPolyFamily params d) (x : Fq params) : SubMeas Unit d :=
+    (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
   operatorAsSubMeas (operatorComplement (completePartSubMeas params family x).total)
 
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
 def gHatIdxMeas (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxMeas (Fq params) (GHatOutcome params) d :=
+    (family : IdxPolyFamily params ι) :
+    IdxMeas (Fq params) (GHatOutcome params) ι :=
   fun x => completeSubMeas ((family.meas x).toSubMeas)
 
 /-- The submeasurement view of the completed family `\widehat G`. -/
 def gHatIdxSubMeas (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (Fq params) (GHatOutcome params) d :=
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (Fq params) (GHatOutcome params) ι :=
   IdxMeas.toIdxSubMeas (gHatIdxMeas params family)
 
 /-- Left tensor-placement for the complete part `G^x`
 on the bipartite space `d * d`. -/
 def completePartLeftFamily (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (SliceQuestion params) Unit (d * d) :=
-  fun x => leftPlacedSubMeas (dB := d) (completePartSubMeas params family x)
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
+  fun x => leftPlacedSubMeas (ιB := ι) (completePartSubMeas params family x)
 
 /-- Right tensor-placement for the complete part `G^x`
 on the bipartite space `d * d`. -/
 def completePartRightFamily (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (SliceQuestion params) Unit (d * d) :=
-  fun x => rightPlacedSubMeas (dA := d) (completePartSubMeas params family x)
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
+  fun x => rightPlacedSubMeas (ιA := ι) (completePartSubMeas params family x)
 
 /-- Left tensor-placement for the incomplete part `G^x_⊥`
 on the bipartite space `d * d`. -/
 def incompletePartLeftFamily (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (SliceQuestion params) Unit (d * d) :=
-  fun x => leftPlacedSubMeas (dB := d) (incompletePartSubMeas params family x)
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
+  fun x => leftPlacedSubMeas (ιB := ι) (incompletePartSubMeas params family x)
 
 /-- Right tensor-placement for the incomplete part `G^x_⊥`
 on the bipartite space `d * d`. -/
 def incompletePartRightFamily (params : Parameters)
-    (family : IdxPolyFamily params d) :
-    IdxSubMeas (SliceQuestion params) Unit (d * d) :=
-  fun x => rightPlacedSubMeas (dA := d) (incompletePartSubMeas params family x)
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
+  fun x => rightPlacedSubMeas (ιA := ι) (incompletePartSubMeas params family x)
 
 
 end
