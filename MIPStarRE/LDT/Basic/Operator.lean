@@ -312,7 +312,7 @@ theorem expectationValue_adjoint_self_nonneg (ψ : QuantumState) (M : Operator)
 /-- PSD trace nonnegativity for difference quadratic:
 `0 ≤ Re τ(ρ (D₁ - D₂)ᴴ(D₁ - D₂))` for PSD ρ.
 Used by `normalizedTrace_triangle` to bound cross terms. -/
-theorem normalizedTrace_parallelogram {n : Type*} [Fintype n] [DecidableEq n]
+theorem normalizedTrace_diff_sq_nonneg {n : Type*} [Fintype n]
     (ρ D₁ D₂ : Matrix n n ℂ) (hρ : ρ.PosSemidef) :
     0 ≤ Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ - D₂)ᴴ * (D₁ - D₂)))) := by
   unfold MIPStarRE.Quantum.normalizedTrace
@@ -331,7 +331,7 @@ theorem normalizedTrace_parallelogram {n : Type*} [Fintype n] [DecidableEq n]
 Proof: the parallelogram identity gives
   `(D₁+D₂)ᴴ(D₁+D₂) + (D₁-D₂)ᴴ(D₁-D₂) = 2·(D₁ᴴD₁ + D₂ᴴD₂)`
 and `Re τ(ρ·(D₁-D₂)ᴴ(D₁-D₂)) ≥ 0` by PSD trace positivity. -/
-theorem normalizedTrace_triangle {n : Type*} [Fintype n] [DecidableEq n]
+theorem normalizedTrace_triangle {n : Type*} [Fintype n]
     (ρ D₁ D₂ : Matrix n n ℂ) (hρ : ρ.PosSemidef) :
     Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ + D₂)ᴴ * (D₁ + D₂)))) ≤
       2 * (Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁))) +
@@ -366,7 +366,7 @@ theorem normalizedTrace_triangle {n : Type*} [Fintype n] [DecidableEq n]
       Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₂ᴴ * D₂))) := by
     rw [Matrix.mul_add, MIPStarRE.Quantum.normalizedTrace_add, Complex.add_re]
   -- Step 5: PSD nonnegativity of the difference term
-  have h_nonneg := normalizedTrace_parallelogram ρ D₁ D₂ hρ
+  have h_nonneg := normalizedTrace_diff_sq_nonneg ρ D₁ D₂ hρ
   -- Step 6: Combine with linarith
   linarith
 
