@@ -20,37 +20,37 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- The identity operator on the polynomial register. -/
 def polynomialIdentityOperator (params : Parameters) : Operator d :=
-  identityOperator s!"poly({params.m},{params.q},{params.d})"
+  idOp s!"poly({params.m},{params.q},{params.d})"
 
 /-- The pointwise operator `A^u_{g(u)}` entering the SDP average `A_g`. -/
 def averagedPointOperatorContribution (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (g : Polynomial params) (u : Point params) : Operator d :=
   pointConditionedOutcomeOperatorAtPolynomial params strategy g u
 
 /-- The averaged point operator `A_g = E_u A^u_{g(u)}`. -/
 noncomputable def averagedPointOperator (params : Parameters)
-    (strategy : SymmetricStrategy params d) (g : Polynomial params) : Operator d :=
+    (strategy : SymStrat params d) (g : Polynomial params) : Operator d :=
   averageOperatorOverDistribution (uniformDistribution (Point params))
     (averagedPointOperatorContribution params strategy g)
 
 /-- The operator `T_g A_g` contributing to the primal SDP objective. -/
 noncomputable def sdpPrimalContributionOperator (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (T : Measurement (Polynomial params) d)
     (g : Polynomial params) : Operator d :=
-  operatorMul (T.outcomeOperator g) (averagedPointOperator params strategy g)
+  opMul (T.outcomeOperator g) (averagedPointOperator params strategy g)
 
 /-- The formal primal objective operator `Σ_g T_g A_g`. -/
 noncomputable def sdpPrimalObjectiveOperator (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (T : Measurement (Polynomial params) d) : Operator d :=
   averageOperatorOverDistribution (polynomialDistribution params)
     (sdpPrimalContributionOperator params strategy T)
 
 /-- The primal objective value `Σ_g Tr(T_g A_g)`. -/
 noncomputable def sdpPrimalObjective (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (T : Measurement (Polynomial params) d) : Error :=
   operatorTrace (sdpPrimalObjectiveOperator params strategy T)
 
@@ -60,54 +60,54 @@ noncomputable def sdpDualObjective (Z : Operator d) : Error :=
 
 /-- The dual slack operator `Z - A_g`. -/
 noncomputable def sdpDualSlackOperator (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (Z : Operator d) (g : Polynomial params) : Operator d :=
-  operatorDifference Z (averagedPointOperator params strategy g)
+  opDiff Z (averagedPointOperator params strategy g)
 
 /-- The complementary-slackness equation `T_g Z = T_g A_g`. -/
 def sdpComplementarySlacknessEquation (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (T : Measurement (Polynomial params) d)
     (Z : Operator d) (g : Polynomial params) : Prop :=
-  operatorMul (T.outcomeOperator g) Z =
-    operatorMul (T.outcomeOperator g) (averagedPointOperator params strategy g)
+  opMul (T.outcomeOperator g) Z =
+    opMul (T.outcomeOperator g) (averagedPointOperator params strategy g)
 
 /-- The pointwise sandwiched operator `H^u_h = A^u_{h(u)} T_h A^u_{h(u)}`. -/
 noncomputable def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (T : Measurement (Polynomial params) d)
     (u : Point params) (h : Polynomial params) : Operator d :=
   let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
-  operatorMul (operatorMul Au (T.outcomeOperator h)) Au
+  opMul (opMul Au (T.outcomeOperator h)) Au
 
 /-- The pointwise sandwiched submeasurement `H^u = {H^u_h}`. -/
-noncomputable def sandwichedPolynomialSubMeasurementAt (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
+    (strategy : SymStrat params d)
     (T : Measurement (Polynomial params) d) (u : Point params) :
-    SubMeasurement (Polynomial params) d :=
+    SubMeas (Polynomial params) d :=
   { name :=
-      s!"Hslice[{pointCode params u}|{(strategy.pointMeasurement u).toSubMeasurement.name}|{T.toSubMeasurement.name}]"
+      s!"Hslice[{pointCode params u}|{(strategy.pointMeasurement u).toSubMeas.name}|{T.toSubMeas.name}]"
     outcomeOperator := sandwichedPolynomialOutcomeOperatorAt params strategy T u
     totalOperator :=
       averageOperatorOverDistribution (polynomialDistribution params)
         (sandwichedPolynomialOutcomeOperatorAt params strategy T u) }
 
 /-- The averaged sandwiched submeasurement `H_h = E_u H^u_h`. -/
-noncomputable def averagedSandwichedPolynomialSubMeasurement (params : Parameters)
-    (strategy : SymmetricStrategy params d)
-    (T : Measurement (Polynomial params) d) : SubMeasurement (Polynomial params) d :=
-  { name := s!"Havg[{T.toSubMeasurement.name}]"
+noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
+    (strategy : SymStrat params d)
+    (T : Measurement (Polynomial params) d) : SubMeas (Polynomial params) d :=
+  { name := s!"Havg[{T.toSubMeas.name}]"
     outcomeOperator := fun h =>
       averageOperatorOverDistribution (uniformDistribution (Point params))
         (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
     totalOperator :=
       averageOperatorOverDistribution (uniformDistribution (Point params))
-        (fun u => (sandwichedPolynomialSubMeasurementAt params strategy T u).totalOperator) }
+        (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).totalOperator) }
 
 /-- Evaluate a polynomial submeasurement at each point `u`. -/
 noncomputable abbrev polynomialEvaluationFamily (params : Parameters)
-    (H : SubMeasurement (Polynomial params) d) :
-    IndexedSubMeasurement (Point params) (Fq params) d :=
+    (H : SubMeas (Polynomial params) d) :
+    IdxSubMeas (Point params) (Fq params) d :=
   MIPStarRE.LDT.polynomialEvaluationFamily params H
 
 /-- The variance error entering `lem:add-in-u`. -/

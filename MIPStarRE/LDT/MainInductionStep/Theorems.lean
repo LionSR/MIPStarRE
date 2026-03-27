@@ -11,38 +11,38 @@ open MIPStarRE.LDT
 /-- `thm:main-induction`. -/
 theorem mainInduction
     (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (k : ℕ)
     (hk : params.m * params.d ≤ k) :
     ∃ G : Measurement (Polynomial params) d,
-      ConsistentWithPolynomialEvaluation params strategy.state
-        (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
-        G.toSubMeasurement
+      ConsWithPolyEval params strategy.state
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        G.toSubMeas
         (mainInductionError params k eps delta gamma) := by
   sorry
 
 /-- `thm:self-improvement-in-induction-section`. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (eps delta gamma nu : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeasurement (Polynomial params) d)
-    (hcons : ConsistentWithPolynomialEvaluation params strategy.state
-      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement) G nu) :
-    ∃ H : ProjectiveSubMeasurement (Polynomial params) d, ∃ Z : Operator d,
+    (G : SubMeas (Polynomial params) d)
+    (hcons : ConsWithPolyEval params strategy.state
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) G nu) :
+    ∃ H : ProjSubMeas (Polynomial params) d, ∃ Z : Operator d,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   sorry
 
 /-- `thm:ld-pasting-in-induction-section`. -/
 theorem ldPastingInInductionSection
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next d)
+    (strategy : SymStrat params.next d)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IndexedPolynomialFamily params d)
+    (family : IdxPolyFamily params d)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -57,7 +57,7 @@ theorem ldPastingInInductionSection
 /-- `lem:restricted-probabilities`. -/
 lemma restrictedProbabilities
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next d)
+    (strategy : SymStrat params.next d)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     RestrictedProbabilitiesStatement params strategy eps delta gamma := by

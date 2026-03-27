@@ -26,62 +26,62 @@ def liftDiagonalAnswer (params : Parameters) (x : Fq params) :
 
 /-- Restrict an axis-parallel line measurement to the slice at height `x`. -/
 def restrictAxisParallelMeasurement (params : Parameters)
-    (strategy : SymmetricStrategy params.next d) (x : Fq params) :
-    IndexedProjectiveMeasurement (AxisParallelLine params) (AxisLinePolynomial params) d :=
+    (strategy : SymStrat params.next d) (x : Fq params) :
+    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) d :=
   fun ℓ =>
     let lifted := strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)
-    { toMeasurement := { toSubMeasurement := {
-        name := s!"{lifted.toSubMeasurement.name}.restrict({x.1})"
+    { toMeasurement := { toSubMeas := {
+        name := s!"{lifted.toSubMeas.name}.restrict({x.1})"
         outcomeOperator := fun f =>
-          lifted.toSubMeasurement.outcomeOperator (liftAxisAnswer params x f)
-        totalOperator := lifted.toSubMeasurement.totalOperator
+          lifted.toSubMeas.outcomeOperator (liftAxisAnswer params x f)
+        totalOperator := lifted.toSubMeas.totalOperator
       } } }
 
 /-- Restrict a diagonal-line measurement to the slice at height `x`. -/
 def restrictDiagonalMeasurement (params : Parameters)
-    (strategy : SymmetricStrategy params.next d) (x : Fq params) :
-    IndexedProjectiveMeasurement (DiagonalLine params) (DiagonalLinePolynomial params) d :=
+    (strategy : SymStrat params.next d) (x : Fq params) :
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) d :=
   fun ℓ =>
     let lifted := strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)
-    { toMeasurement := { toSubMeasurement := {
-        name := s!"{lifted.toSubMeasurement.name}.restrict({x.1})"
+    { toMeasurement := { toSubMeas := {
+        name := s!"{lifted.toSubMeas.name}.restrict({x.1})"
         outcomeOperator := fun f =>
-          lifted.toSubMeasurement.outcomeOperator (liftDiagonalAnswer params x f)
-        totalOperator := lifted.toSubMeasurement.totalOperator
+          lifted.toSubMeas.outcomeOperator (liftDiagonalAnswer params x f)
+        totalOperator := lifted.toSubMeas.totalOperator
       } } }
 
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
 def xRestrictedStrategy (params : Parameters)
-    (strategy : SymmetricStrategy params.next d) (x : Fq params) : SymmetricStrategy params d where
+    (strategy : SymStrat params.next d) (x : Fq params) : SymStrat params d where
   state := strategy.state
   pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
   axisParallelMeasurement := restrictAxisParallelMeasurement params strategy x
   diagonalMeasurement := restrictDiagonalMeasurement params strategy x
 
 @[simp] theorem xRestrictedStrategy_state (params : Parameters)
-    (strategy : SymmetricStrategy params.next d) (x : Fq params) :
+    (strategy : SymStrat params.next d) (x : Fq params) :
     (xRestrictedStrategy params strategy x).state = strategy.state :=
   rfl
 
 @[simp] theorem xRestrictedStrategy_pointMeasurement_apply (params : Parameters)
-    (strategy : SymmetricStrategy params.next d) (x : Fq params) (u : Point params) :
+    (strategy : SymStrat params.next d) (x : Fq params) (u : Point params) :
     (xRestrictedStrategy params strategy x).pointMeasurement u =
       strategy.pointMeasurement (appendPoint params u x) :=
   rfl
 
 @[simp] theorem restrictAxisParallelMeasurement_outcomeOperator (params : Parameters)
-    (strategy : SymmetricStrategy params.next d) (x : Fq params)
+    (strategy : SymStrat params.next d) (x : Fq params)
     (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
-    ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeasurement.outcomeOperator f) =
-      (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeasurement.outcomeOperator
+    ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas.outcomeOperator f) =
+      (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas.outcomeOperator
         (liftAxisAnswer params x f) :=
   rfl
 
 @[simp] theorem restrictDiagonalMeasurement_outcomeOperator (params : Parameters)
-    (strategy : SymmetricStrategy params.next d) (x : Fq params)
+    (strategy : SymStrat params.next d) (x : Fq params)
     (ℓ : DiagonalLine params) (f : DiagonalLinePolynomial params) :
-    ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeasurement.outcomeOperator f) =
-      (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)).toSubMeasurement.outcomeOperator
+    ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeas.outcomeOperator f) =
+      (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas.outcomeOperator
         (liftDiagonalAnswer params x f) :=
   rfl
 
@@ -128,37 +128,37 @@ noncomputable def ldPastingInInductionError (params : Parameters) (k : ℕ)
 
 /-- Averaged point operator `E_u A^u_{h(u)}` appearing in boundedness. -/
 noncomputable def averagedPointEvaluationOperator (params : Parameters)
-    (strategy : SymmetricStrategy params d) (h : Polynomial params) : Operator d := by
+    (strategy : SymStrat params d) (h : Polynomial params) : Operator d := by
   classical
   let 𝒟 : Distribution (Point params) := uniformDistribution (Point params)
   let u₀ : Point params := Classical.choice (inferInstance : Nonempty (Point params))
-  exact weightedOperatorSumOnSupport
+  exact weightedOpSum
     𝒟.support 𝒟.weight
-    (fun u => (strategy.pointMeasurement u).toSubMeasurement.outcomeOperator (h u))
+    (fun u => (strategy.pointMeasurement u).toSubMeas.outcomeOperator (h u))
 
 /-- Slice-wise averaged point operator `E_u A^{u,x}_{g(u)}`. -/
 noncomputable def averagedSlicePointEvaluationOperator (params : Parameters)
-    (strategy : SymmetricStrategy params.next d)
+    (strategy : SymStrat params.next d)
     (x : Fq params) (g : Polynomial params) : Operator d := by
   classical
   let 𝒟 : Distribution (Point params) := uniformDistribution (Point params)
   let u₀ : Point params := Classical.choice (inferInstance : Nonempty (Point params))
-  exact weightedOperatorSumOnSupport
+  exact weightedOpSum
     𝒟.support 𝒟.weight
-    (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeasurement.outcomeOperator (g u))
+    (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcomeOperator (g u))
 
 /-- TODO(tensor): replace this placeholder left placement by an honest tensor-product
 embedding once the bipartite matrix API is available.
 NOTE: duplicated from CommutativityPoints; should be factored into a shared
 utility once the import graph permits it. -/
-def leftPlacedSubMeasurement {α : Type*} {d : ℕ} (A : SubMeasurement α d) : SubMeasurement α d where
+def leftPlacedSubMeas {α : Type*} {d : ℕ} (A : SubMeas α d) : SubMeas α d where
   name := s!"{A.name}.left"
   outcomeOperator := fun a => leftTensor (A.outcomeOperator a)
   totalOperator := leftTensor A.totalOperator
 
 /-- TODO(tensor): replace this placeholder right placement by an honest tensor-product
 embedding once the bipartite matrix API is available. -/
-def rightPlacedSubMeasurement {α : Type*} {d : ℕ} (A : SubMeasurement α d) : SubMeasurement α d where
+def rightPlacedSubMeas {α : Type*} {d : ℕ} (A : SubMeas α d) : SubMeas α d where
   name := s!"{A.name}.right"
   outcomeOperator := fun a => rightTensor (A.outcomeOperator a)
   totalOperator := rightTensor A.totalOperator
@@ -166,11 +166,11 @@ def rightPlacedSubMeasurement {α : Type*} {d : ℕ} (A : SubMeasurement α d) :
 /-- TODO(tensor): this uses the placeholder `leftTensor` / `rightTensor` embeddings until
 the project has an honest bipartite operator API. -/
 noncomputable def tensorFailureExpectation {Outcome : Type*}
-    (ψ : QuantumState d) (Z : Operator d) (H : SubMeasurement Outcome d) : Error :=
-  expectationValue ψ <|
-    operatorMul
+    (ψ : QuantumState d) (Z : Operator d) (H : SubMeas Outcome d) : Error :=
+  ev ψ <|
+    opMul
       (leftTensor Z)
-      (rightTensor (operatorDifference (identityLike H.totalOperator) H.totalOperator))
+      (rightTensor (opDiff (identityLike H.totalOperator) H.totalOperator))
 
 /-- The uniform distribution on slice heights `x ∈ F_q`. -/
 noncomputable def sliceHeightDistribution (params : Parameters) : Distribution (Fq params) :=
@@ -178,7 +178,7 @@ noncomputable def sliceHeightDistribution (params : Parameters) : Distribution (
 
 /-- Average over the uniform choice of a slice height `x ∈ F_q`. -/
 noncomputable def averageOverSlices (params : Parameters) (f : Fq params → Error) : Error :=
-  averageOverDistribution (sliceHeightDistribution params) f
+  avgOver (sliceHeightDistribution params) f
 
 /-- Weighted average over uniformly chosen slice heights. -/
 noncomputable def weightedAverageOverSlices (params : Parameters)

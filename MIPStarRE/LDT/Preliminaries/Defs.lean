@@ -13,32 +13,32 @@ namespace MIPStarRE.LDT.Preliminaries
 open MIPStarRE.LDT
 
 /-- `def:post-processing` in `preliminaries.tex`. -/
-noncomputable def postProcessing {α β : Type*} {d : ℕ} (A : SubMeasurement α d) (f : α → β) :
-    SubMeasurement β d :=
+noncomputable def postProcessing {α β : Type*} {d : ℕ} (A : SubMeas α d) (f : α → β) :
+    SubMeas β d :=
   postprocess A f
 
 /-- `def:measurement-completion` in `preliminaries.tex`. -/
-def measurementCompletion {α : Type*} {d : ℕ} (A : SubMeasurement α d) :
+def measurementCompletion {α : Type*} {d : ℕ} (A : SubMeas α d) :
     Measurement (Option α) d :=
-  completeSubMeasurement A
+  completeSubMeas A
 
 /-- `def:simeq` in `preliminaries.tex`. -/
 def consistency {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A B : IndexedSubMeasurement Question Outcome d) (δ : Error) : Prop :=
-  ConsistencyRel ψ 𝒟 A B δ
+    (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop :=
+  ConsRel ψ 𝒟 A B δ
 
 /-- `def:approx_delta` in `preliminaries.tex`. -/
 def stateDependentDistance {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A B : IndexedSubMeasurement Question Outcome d) (δ : Error) : Prop :=
-  StateDependentDistanceRel ψ 𝒟 A B δ
+    (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop :=
+  SDDRel ψ 𝒟 A B δ
 
 /-- `def:strong-self-consistency` in `preliminaries.tex`. -/
 def strongSelfConsistency {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IndexedSubMeasurement Question Outcome d) (δ : Error) : Prop :=
-  PermutationInvariantState ψ ∧ StrongSelfConsistencyRel ψ 𝒟 A δ
+    (A : IdxSubMeas Question Outcome d) (δ : Error) : Prop :=
+  PermInvState ψ ∧ SSCRel ψ 𝒟 A δ
 
 /-- Source-style left/right relation `A^x_a ⊗ I ≈_δ I ⊗ B^x_a`.
 
@@ -46,131 +46,131 @@ TODO(tensor): this currently reuses the single-register comparison layer from Se
 so users should wrap `A` and `B` in the local `leftTensor` / `rightTensor` placements
 before invoking it. Replacing this by an honest tensor-product API remains future work.
 -/
-structure BipartiteStateDependentDistanceRel {Question Outcome : Type*} {d : ℕ}
+structure BipartiteSDDRel {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A B : IndexedSubMeasurement Question Outcome d) (δ : Error) : Prop where
-  leftRightSquaredDistanceBound : stateDependentDistanceError ψ 𝒟 A B ≤ δ
+    (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop where
+  leftRightSquaredDistanceBound : sddError ψ 𝒟 A B ≤ δ
 
 /-- Abbreviation for the bipartite state-dependent distance used in the source propositions. -/
 def bipartiteStateDependentDistance {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A B : IndexedSubMeasurement Question Outcome d) (δ : Error) : Prop :=
-  BipartiteStateDependentDistanceRel ψ 𝒟 A B δ
+    (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop :=
+  BipartiteSDDRel ψ 𝒟 A B δ
 
 /-- Condition `0 ≤ B ≤ I` for the switch-sandwich argument, with the identity taken in
 `B`'s ambient dimension. -/
-structure OperatorBetweenZeroAndOne {d : ℕ} (B : Operator d) : Prop where
-  nonnegative : PositiveSemidefinite B
-  boundedByIdentity : DominatesOperator (identityLike B) B
+structure OpBounded01 {d : ℕ} (B : Operator d) : Prop where
+  nonnegative : OpPSD B
+  boundedByIdentity : OpDominates (identityLike B) B
 
 /-- Placeholder agreement probability from `prop:simeq-for-measurements`. -/
 noncomputable def agreementProbability {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A B : IndexedMeasurement Question Outcome d) : Error :=
-  1 - consistencyError ψ 𝒟
-        (IndexedMeasurement.toIndexedSubMeasurement A)
-        (IndexedMeasurement.toIndexedSubMeasurement B)
+    (A B : IdxMeas Question Outcome d) : Error :=
+  1 - consError ψ 𝒟
+        (IdxMeas.toIdxSubMeas A)
+        (IdxMeas.toIdxSubMeas B)
 
 /-- Output package for the measurement reformulation of consistency. -/
-structure ConsistencyAsAgreement {Question Outcome : Type*} {d : ℕ}
+structure ConsAgreement {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A B : IndexedMeasurement Question Outcome d) (δ : Error) : Prop where
+    (A B : IdxMeas Question Outcome d) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
 
 /-- Post-process an indexed family questionwise. -/
-noncomputable def postprocessIndexedSubMeasurement {Question α β : Type*} {d : ℕ}
-    (A : IndexedSubMeasurement Question α d) (f : α → β) :
-    IndexedSubMeasurement Question β d :=
+noncomputable def postprocessIdxSubMeas {Question α β : Type*} {d : ℕ}
+    (A : IdxSubMeas Question α d) (f : α → β) :
+    IdxSubMeas Question β d :=
   fun q => postProcessing (A q) f
 
 /-- The completion residual `I - Σ_a B_a` used when completing a
 submeasurement. -/
 noncomputable def completionResidualOperator {Outcome : Type*} {d : ℕ}
-    (B : SubMeasurement Outcome d) : Operator d :=
-  operatorDifference (identityLike B.totalOperator) B.totalOperator
+    (B : SubMeas Outcome d) : Operator d :=
+  opDiff (identityLike B.totalOperator) B.totalOperator
 
 /-- Family for the intermediate `A_a B_a A_a` sandwich. -/
 noncomputable def diagonalSandwichFamily {Question Outcome : Type*} {d : ℕ}
-    (A : IndexedSubMeasurement Question Outcome d)
-    (B : IndexedMeasurement Question Outcome d) :
-    IndexedSubMeasurement Question Outcome d :=
+    (A : IdxSubMeas Question Outcome d)
+    (B : IdxMeas Question Outcome d) :
+    IdxSubMeas Question Outcome d :=
   fun q => {
-    name := s!"{(A q).name}.diagSandwich({(B q).toSubMeasurement.name})"
+    name := s!"{(A q).name}.diagSandwich({(B q).toSubMeas.name})"
     outcomeOperator := fun a =>
-      operatorSandwich
+      opSandwich
         ((A q).outcomeOperator a)
-        ((B q).toSubMeasurement.outcomeOperator a)
+        ((B q).toSubMeas.outcomeOperator a)
         ((A q).outcomeOperator a)
     totalOperator := (A q).totalOperator
   }
 
 /-- Family for the intermediate `A_a (Σ_b B_b) A_a` sandwich. -/
 noncomputable def totalSandwichFamily {Question Outcome : Type*} {d : ℕ}
-    (A : IndexedSubMeasurement Question Outcome d)
-    (B : IndexedMeasurement Question Outcome d) :
-    IndexedSubMeasurement Question Outcome d :=
+    (A : IdxSubMeas Question Outcome d)
+    (B : IdxMeas Question Outcome d) :
+    IdxSubMeas Question Outcome d :=
   fun q => {
-    name := s!"{(A q).name}.totalSandwich({(B q).toSubMeasurement.name})"
+    name := s!"{(A q).name}.totalSandwich({(B q).toSubMeas.name})"
     outcomeOperator := fun a =>
-      operatorSandwich
+      opSandwich
         ((A q).outcomeOperator a)
-        (B q).toSubMeasurement.totalOperator
+        (B q).toSubMeas.totalOperator
         ((A q).outcomeOperator a)
     totalOperator := (A q).totalOperator
   }
 
 /-- Output package for `prop:cons-sub-meas`. -/
-structure ConsSubMeasStatement {Question Outcome : Type*} {d : ℕ}
+structure ConsSubMeasStmt {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IndexedSubMeasurement Question Outcome d)
-    (B : IndexedMeasurement Question Outcome d) (γ : Error) : Prop where
+    (A : IdxSubMeas Question Outcome d)
+    (B : IdxMeas Question Outcome d) (γ : Error) : Prop where
   diagonalControl :
-    StateDependentDistanceRel ψ 𝒟 A (diagonalSandwichFamily A B) γ
+    SDDRel ψ 𝒟 A (diagonalSandwichFamily A B) γ
   sandwichControl :
-    StateDependentDistanceRel ψ 𝒟 (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ
+    SDDRel ψ 𝒟 (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ
   combinedControl :
-    StateDependentDistanceRel ψ 𝒟 A (totalSandwichFamily A B) (4 * γ)
+    SDDRel ψ 𝒟 A (totalSandwichFamily A B) (4 * γ)
 
 /-- Averaged left-placed sandwich scalar from `prop:switch-sandwich`. -/
 noncomputable def leftSandwichExpectation {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IndexedProjectiveSubMeasurement Question Outcome d)
+    (A : IdxProjSubMeas Question Outcome d)
     (B : Operator d) : Error :=
-  averageOverDistribution 𝒟 fun q =>
-    expectationValue ψ <|
-      operatorSandwich
-        ((A q).toSubMeasurement.totalOperator)
+  avgOver 𝒟 fun q =>
+    ev ψ <|
+      opSandwich
+        ((A q).toSubMeas.totalOperator)
         (leftTensor B)
-        ((A q).toSubMeasurement.totalOperator)
+        ((A q).toSubMeas.totalOperator)
 
 /-- Averaged middle sandwich scalar from `prop:switch-sandwich`. -/
 noncomputable def middleSandwichExpectation {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IndexedProjectiveSubMeasurement Question Outcome d)
+    (A : IdxProjSubMeas Question Outcome d)
     (B : Operator d) : Error :=
-  averageOverDistribution 𝒟 fun q =>
-    expectationValue ψ <|
-      operatorSandwich
-        ((A q).toSubMeasurement.totalOperator)
+  avgOver 𝒟 fun q =>
+    ev ψ <|
+      opSandwich
+        ((A q).toSubMeas.totalOperator)
         B
-        ((A q).toSubMeasurement.totalOperator)
+        ((A q).toSubMeas.totalOperator)
 
 /-- Averaged right-placed sandwich scalar from `prop:switch-sandwich`. -/
 noncomputable def rightSandwichExpectation {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IndexedProjectiveSubMeasurement Question Outcome d)
+    (A : IdxProjSubMeas Question Outcome d)
     (B : Operator d) : Error :=
-  averageOverDistribution 𝒟 fun q =>
-    expectationValue ψ <|
-      operatorSandwich
-        ((A q).toSubMeasurement.totalOperator)
+  avgOver 𝒟 fun q =>
+    ev ψ <|
+      opSandwich
+        ((A q).toSubMeas.totalOperator)
         (rightTensor B)
-        ((A q).toSubMeasurement.totalOperator)
+        ((A q).toSubMeas.totalOperator)
 
 /-- Output package for `prop:switch-sandwich`. -/
-structure SwitchSandwichStatement {Question Outcome : Type*} {d : ℕ}
+structure SwitchSandwichStmt {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IndexedProjectiveSubMeasurement Question Outcome d)
+    (A : IdxProjSubMeas Question Outcome d)
     (B : Operator d) (δ : Error) : Prop where
   leftSandwichTransfer :
     |leftSandwichExpectation ψ 𝒟 A B - middleSandwichExpectation ψ 𝒟 A B|
@@ -180,28 +180,28 @@ structure SwitchSandwichStatement {Question Outcome : Type*} {d : ℕ}
       ≤ Real.sqrt δ
 
 /-- Output package for `prop:completeness-transfer-projective-P`. -/
-structure CompletenessTransferProjectivePStatement {Question Outcome : Type*} {d : ℕ}
+structure CompTransferStmt {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IndexedSubMeasurement Question Outcome d)
-    (P : IndexedProjectiveSubMeasurement Question Outcome d) (ε : Error) : Prop where
+    (A : IdxSubMeas Question Outcome d)
+    (P : IdxProjSubMeas Question Outcome d) (ε : Error) : Prop where
   completenessTransfer :
-    indexedSubMeasurementMass ψ 𝒟 A ≥
-      indexedSubMeasurementMass ψ 𝒟
-        (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement P)
+    idxSubMeasMass ψ 𝒟 A ≥
+      idxSubMeasMass ψ 𝒟
+        (IdxProjSubMeas.toIdxSubMeas P)
         - 2 * Real.sqrt ε
 
 /-- Canonical completion of `B` by adjoining the residual `I - Σ_a B_a`
 to the distinguished outcome `a0`. -/
 noncomputable def completeAtOutcome {Outcome : Type*} {d : ℕ}
-    (B : SubMeasurement Outcome d) (a0 : Outcome) : Measurement Outcome d := by
+    (B : SubMeas Outcome d) (a0 : Outcome) : Measurement Outcome d := by
   classical
   let residual := completionResidualOperator B
   refine {
-    toSubMeasurement := {
+    toSubMeas := {
       name := s!"{B.name}.completed"
       outcomeOperator := fun a =>
         if h : a = a0 then
-          operatorAdd (B.outcomeOperator a) residual
+          opAdd (B.outcomeOperator a) residual
         else
           B.outcomeOperator a
       totalOperator := identityLike B.totalOperator
@@ -209,15 +209,15 @@ noncomputable def completeAtOutcome {Outcome : Type*} {d : ℕ}
   }
 
 /-- Output package for `prop:completing-to-measurement`. -/
-structure CompletingToMeasurementStatement {Outcome : Type*} {d : ℕ}
+structure CompletingToMeasStmt {Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d)
-    (A : Measurement Outcome d) (B : SubMeasurement Outcome d)
+    (A : Measurement Outcome d) (B : SubMeas Outcome d)
     (C : Measurement Outcome d) (a0 : Outcome) (δ ζ : Error) : Prop where
   completionFormula : C = completeAtOutcome B a0
   closenessAfterCompletion :
-    StateDependentDistanceRel ψ (uniformDistribution Unit)
-      (constantSubMeasurementFamily A.toSubMeasurement)
-      (constantSubMeasurementFamily C.toSubMeasurement)
+    SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily C.toSubMeas)
       (2 * δ + 4 * Real.sqrt δ + 2 * ζ)
 
 end MIPStarRE.LDT.Preliminaries

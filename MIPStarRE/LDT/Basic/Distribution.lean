@@ -24,7 +24,7 @@ structure Distribution (α : Type*) where
   outsideSupport : ∀ a, a ∉ support → weight a = 0 := by intro _ _; rfl
 
 /-- Average a scalar function against the stored finite support of a distribution. -/
-def averageOverDistribution {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
+def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
   (𝒟.support.map fun a => 𝒟.weight a * f a).sum
 
 /-- The uniform distribution on a nonempty finite type. -/
@@ -50,7 +50,7 @@ def totalVariationDistance {α : Type*} (_μ _ν : Distribution α) : Error := 0
 
 /-- Sum a scalar quantity over an outcome space when a finite enumeration is available,
 falling back to a coarser surrogate otherwise. -/
-noncomputable def sumOverOutcomesOrElse {α : Type*}
+noncomputable def sumOutcomes {α : Type*}
     (fallback : Error) (f : α → Error) : Error := by
   classical
   if h : Nonempty (Fintype α) then
@@ -92,44 +92,44 @@ private theorem list_weighted_sum_const_mul {α : Type*}
     rw [ih]; ring
 
 /-- Averaging the zero function gives zero. -/
-theorem averageOverDistribution_zero {α : Type*} (𝒟 : Distribution α) :
-    averageOverDistribution 𝒟 (fun _ => 0) = 0 := by
-  unfold averageOverDistribution
+theorem avgOver_zero {α : Type*} (𝒟 : Distribution α) :
+    avgOver 𝒟 (fun _ => 0) = 0 := by
+  unfold avgOver
   simp [mul_zero]
 
 /-- Averaging preserves order when weights are nonneg. -/
-theorem averageOverDistribution_mono {α : Type*} (𝒟 : Distribution α) (f g : α → Error)
+theorem avgOver_mono {α : Type*} (𝒟 : Distribution α) (f g : α → Error)
     (hfg : ∀ a, f a ≤ g a) :
-    averageOverDistribution 𝒟 f ≤ averageOverDistribution 𝒟 g := by
-  unfold averageOverDistribution
+    avgOver 𝒟 f ≤ avgOver 𝒟 g := by
+  unfold avgOver
   exact list_weighted_sum_le 𝒟.support 𝒟.weight f g 𝒟.nonnegative hfg
 
 /-- Averaging a nonneg function with nonneg weights gives a nonneg result. -/
-theorem averageOverDistribution_nonneg {α : Type*} (𝒟 : Distribution α) (f : α → Error)
+theorem avgOver_nonneg {α : Type*} (𝒟 : Distribution α) (f : α → Error)
     (hf : ∀ a, 0 ≤ f a) :
-    0 ≤ averageOverDistribution 𝒟 f := by
-  rw [← averageOverDistribution_zero 𝒟]
-  exact averageOverDistribution_mono 𝒟 _ f (fun a => hf a)
+    0 ≤ avgOver 𝒟 f := by
+  rw [← avgOver_zero 𝒟]
+  exact avgOver_mono 𝒟 _ f (fun a => hf a)
 
 /-- Averaging distributes over addition. -/
-theorem averageOverDistribution_add {α : Type*} (𝒟 : Distribution α) (f g : α → Error) :
-    averageOverDistribution 𝒟 (fun a => f a + g a) =
-      averageOverDistribution 𝒟 f + averageOverDistribution 𝒟 g := by
-  unfold averageOverDistribution
+theorem avgOver_add {α : Type*} (𝒟 : Distribution α) (f g : α → Error) :
+    avgOver 𝒟 (fun a => f a + g a) =
+      avgOver 𝒟 f + avgOver 𝒟 g := by
+  unfold avgOver
   exact list_weighted_sum_add 𝒟.support 𝒟.weight f g
 
 /-- Averaging commutes with scalar multiplication. -/
-theorem averageOverDistribution_const_mul {α : Type*} (𝒟 : Distribution α)
+theorem avgOver_const_mul {α : Type*} (𝒟 : Distribution α)
     (c : Error) (f : α → Error) :
-    averageOverDistribution 𝒟 (fun a => c * f a) =
-      c * averageOverDistribution 𝒟 f := by
-  unfold averageOverDistribution
+    avgOver 𝒟 (fun a => c * f a) =
+      c * avgOver 𝒟 f := by
+  unfold avgOver
   exact list_weighted_sum_const_mul 𝒟.support 𝒟.weight c f
 
 /-- If `f = g` pointwise, their averages agree. -/
-theorem averageOverDistribution_congr {α : Type*} (𝒟 : Distribution α)
+theorem avgOver_congr {α : Type*} (𝒟 : Distribution α)
     (f g : α → Error) (h : ∀ a, f a = g a) :
-    averageOverDistribution 𝒟 f = averageOverDistribution 𝒟 g := by
+    avgOver 𝒟 f = avgOver 𝒟 g := by
   congr 1; exact funext h
 
 end MIPStarRE.LDT

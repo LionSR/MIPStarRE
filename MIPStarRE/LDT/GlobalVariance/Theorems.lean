@@ -16,10 +16,10 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- Output package for `lem:generalize-b`. -/
 structure GeneralizeBStatement (params : Parameters)
-    (strategy : SymmetricStrategy params d)
-    (G : SubMeasurement (Polynomial params) d) : Prop where
+    (strategy : SymStrat params d)
+    (G : SubMeas (Polynomial params) d) : Prop where
   aggregateFamilyComparison :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (axisParallelLineQuestionDistribution params)
       (generalizeBLeftFamily params strategy G)
       (generalizeBRightFamily params strategy G)
@@ -32,10 +32,10 @@ structure GeneralizeBStatement (params : Parameters)
 
 /-- Output package for `lem:local-variance-of-points`. -/
 structure LocalVarianceOfPointsStatement (params : Parameters)
-    (strategy : SymmetricStrategy params d)
-    (G : SubMeasurement (Polynomial params) d) (eps delta : Error) : Prop where
+    (strategy : SymStrat params d)
+    (G : SubMeas (Polynomial params) d) (eps delta : Error) : Prop where
   aggregateEdgeComparison :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (rerandomizeCoord params)
       (localVarianceLeftFamily params strategy G)
       (localVarianceRightFamily params strategy G)
@@ -54,10 +54,10 @@ structure LocalVarianceOfPointsStatement (params : Parameters)
 
 /-- Output package for `lem:global-variance-of-points`. -/
 structure GlobalVarianceOfPointsStatement (params : Parameters)
-    (strategy : SymmetricStrategy params d)
-    (G : SubMeasurement (Polynomial params) d) (eps delta : Error) : Prop where
+    (strategy : SymStrat params d)
+    (G : SubMeas (Polynomial params) d) (eps delta : Error) : Prop where
   aggregateGlobalComparison :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (independentPointPair params)
       (globalVarianceLeftFamily params strategy G)
       (globalVarianceRightFamily params strategy G)
@@ -104,30 +104,30 @@ lemma matrixGlobalVarianceOfPoints
 /-- `lem:generalize-b`. -/
 lemma generalizeB
     (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeasurement (Polynomial params) d) :
+    (G : SubMeas (Polynomial params) d) :
     GeneralizeBStatement params strategy G := by
   sorry
 
 /-- `lem:local-variance-of-points`. -/
 lemma localVarianceOfPoints
     (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeasurement (Polynomial params) d) :
+    (G : SubMeas (Polynomial params) d) :
     LocalVarianceOfPointsStatement params strategy G eps delta := by
   sorry
 
 /-- `lem:global-variance-of-points`. -/
 lemma globalVarianceOfPoints
     (params : Parameters)
-    (strategy : SymmetricStrategy params d)
+    (strategy : SymStrat params d)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeasurement (Polynomial params) d) :
+    (G : SubMeas (Polynomial params) d) :
     GlobalVarianceOfPointsStatement params strategy G eps delta := by
   sorry
 

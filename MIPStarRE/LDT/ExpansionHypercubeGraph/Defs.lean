@@ -72,7 +72,7 @@ def formalZeroOperator : Operator d :=
 /-- Square root of an operator expression.
 Propagates `dim`; matrix square root is not computed (placeholder).
 TODO: compute actual matrix square root when Mathlib provides it. -/
-noncomputable def operatorSquareRoot (X : Operator d) : Operator d where
+noncomputable def opSqRoot (X : Operator d) : Operator d where
   name := s!"sqrt({X.name})"
   matrix := X.matrix
 
@@ -98,7 +98,7 @@ noncomputable def operatorExpectation (ψ : QuantumState d) (X : Operator d) : E
   placeholderScalar s!"Exp[{ψ.name}|{X.name}]"
 
 /-- Placeholder for averaging a real-valued observable over a distribution.
-Named to avoid shadowing the honest `averageOverDistribution` in the base namespace. -/
+Named to avoid shadowing the honest `avgOver` in the base namespace. -/
 noncomputable def placeholderAverageOverDistribution {α : Type*}
     (𝒟 : Distribution α) (f : α → Error) : Error := by
   classical
@@ -112,13 +112,13 @@ noncomputable def operatorTrace (X : Operator d) : Error :=
   placeholderScalar s!"Tr[{X.name}]"
 
 /-- Weighted sum of operators over a distribution's finite support,
-using the same `support`/`weight` data as the scalar `averageOverDistribution`. -/
+using the same `support`/`weight` data as the scalar `avgOver`. -/
 noncomputable def averageOperatorOverDistribution {α : Type*}
     (𝒟 : Distribution α) (f : α → Operator d) : Operator d :=
   match 𝒟.support with
   | [] => { name := s!"AvgOp[{𝒟.name}](empty)" }
   | a :: _ =>
-    weightedOperatorSumOnSupport 𝒟.support 𝒟.weight f
+    weightedOpSum 𝒟.support 𝒟.weight f
 
 /-- An honest finite matrix register for the hypercube vertices. -/
 def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
@@ -181,7 +181,7 @@ def laplacianDifferenceForm (params : Parameters) :
 /-- The squared difference operator `(A^u - A^v)^2`. -/
 noncomputable def pointDifferenceSquaredOperator {params : Parameters}
     (A : Point params → Operator d) (u v : Point params) : Operator d :=
-  operatorSquare (operatorDifference (A u) (A v))
+  opSq (opDiff (A u) (A v))
 
 /-- The displayed local-variance formula from `def:local-and-variance`. -/
 noncomputable def localVarianceDifferenceForm (params : Parameters)
@@ -217,7 +217,7 @@ We do not normalize by `|U|` here; the surrounding trace identities carry the
 paper's convention.  Built as a formal sum referencing each `A u`. -/
 noncomputable def combinedOperator (params : Parameters)
     (A : Point params → Operator d) : Operator d :=
-  weightedOperatorSumOnSupport
+  weightedOpSum
     (Finset.univ (α := Point params)).toList
     (fun _ => 1)
     (fun u => A u)
@@ -249,10 +249,10 @@ noncomputable def orthogonalComponentOperator (params : Parameters)
 TODO(tensor): uses placeholder product instead of formalTensor since dimensions differ. -/
 noncomputable def localVarianceTraceWitness (params : Parameters)
     (A : Point params → Operator d) (ψ : QuantumState d) : Operator d :=
-  operatorMul
-    (operatorAdjoint (combinedOperator params A))
-    (operatorMul
-      (operatorMul (stateProjector ψ) (stateProjector ψ))
+  opMul
+    (opAdj (combinedOperator params A))
+    (opMul
+      (opMul (stateProjector ψ) (stateProjector ψ))
       (combinedOperator params A))
 
 /-- A packaged orthogonal decomposition for `A_combine`. -/
@@ -268,10 +268,10 @@ noncomputable def globalVarianceTraceWitness (params : Parameters)
     (_A : Point params → Operator d) (ψ : QuantumState d)
     (decomp : GlobalVarianceDecomposition params _A) : Operator d :=
   -- TODO(tensor): uses placeholder product instead of formalTensor since dimensions differ
-  operatorMul
+  opMul
     { name := s!"<{decomp.orthogonalVector.name}|⊗{decomp.orthogonalOperator.name}" }
-    (operatorMul
-      (operatorMul (identityOperator (d := d) s!"Fq^{params.m}") (stateProjector ψ))
+    (opMul
+      (opMul (idOp (d := d) s!"Fq^{params.m}") (stateProjector ψ))
       { name := s!"|{decomp.orthogonalVector.name}>⊗{decomp.orthogonalOperator.name}" })
 
 /-- The local-variance trace expression from `lem:local-rewrite`. -/

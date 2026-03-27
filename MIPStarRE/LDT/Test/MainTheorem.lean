@@ -30,23 +30,23 @@ each other.
 -/
 theorem mainFormal
     (params : Parameters) {d : ℕ}
-    (strategy : ProjectiveStrategy params d)
+    (strategy : ProjStrat params d)
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
     (hk : params.m * params.d ≤ k) :
-    ∃ G_A G_B : ProjectiveMeasurement (Polynomial params) d,
-      ConsistentWithPolynomialEvaluation params strategy.state
-          (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementA)
-          G_B.toSubMeasurement
+    ∃ G_A G_B : ProjMeas (Polynomial params) d,
+      ConsWithPolyEval params strategy.state
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          G_B.toSubMeas
           (mainFormalError params k eps) ∧
-        ConsistentWithPolynomialEvaluation params strategy.state
-          (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementB)
-          G_A.toSubMeasurement
+        ConsWithPolyEval params strategy.state
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          G_A.toSubMeas
           (mainFormalError params k eps) ∧
-        PolynomialMeasurementsConsistent params strategy.state
-          G_A.toSubMeasurement
-          G_B.toSubMeasurement
+        PolyMeasCons params strategy.state
+          G_A.toSubMeas
+          G_B.toSubMeas
           (mainFormalError params k eps) := by
   sorry
 

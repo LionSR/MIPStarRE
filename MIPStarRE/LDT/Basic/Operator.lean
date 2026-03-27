@@ -54,45 +54,45 @@ def identityLike (_X : Operator d) : Operator d where
   matrix := 1
 
 /-- The expectation `Re τ(ψ X)`. Dimensions match by construction. -/
-noncomputable def expectationValue (ψ : QuantumState d) (X : Operator d) : Error :=
+noncomputable def ev (ψ : QuantumState d) (X : Operator d) : Error :=
   Complex.re <| MIPStarRE.Quantum.normalizedTrace (ψ.density * X.matrix)
 
 /-- Positive semidefiniteness for the concrete matrix carried by an operator. -/
-structure PositiveSemidefinite (Z : Operator d) : Prop where
+structure OpPSD (Z : Operator d) : Prop where
   nonnegative : 0 ≤ Z.matrix
 
 /-- The identity operator, optionally labelled by the ambient space. -/
-def identityOperator (label : String := "") : Operator d where
+def idOp (label : String := "") : Operator d where
   name := if label == "" then "I" else s!"I[{label}]"
   matrix := 1
 
 /-- Operator difference. -/
-def operatorDifference (X Y : Operator d) : Operator d where
+def opDiff (X Y : Operator d) : Operator d where
   name := s!"({X.name} - {Y.name})"
   matrix := X.matrix - Y.matrix
 
 /-- Operator addition. -/
-def operatorAdd (X Y : Operator d) : Operator d where
+def opAdd (X Y : Operator d) : Operator d where
   name := s!"({X.name} + {Y.name})"
   matrix := X.matrix + Y.matrix
 
 /-- Operator multiplication. -/
-def operatorMul (X Y : Operator d) : Operator d where
+def opMul (X Y : Operator d) : Operator d where
   name := s!"({X.name} * {Y.name})"
   matrix := X.matrix * Y.matrix
 
 /-- Operator adjoint (conjugate transpose). -/
-def operatorAdjoint (X : Operator d) : Operator d where
+def opAdj (X : Operator d) : Operator d where
   name := s!"({X.name})†"
   matrix := X.matrix.conjTranspose
 
 /-- Operator square. -/
-def operatorSquare (X : Operator d) : Operator d where
+def opSq (X : Operator d) : Operator d where
   name := s!"({X.name})²"
   matrix := X.matrix * X.matrix
 
 /-- A concrete sandwich operator `L X R`. -/
-def operatorSandwich (L X R : Operator d) : Operator d where
+def opSandwich (L X R : Operator d) : Operator d where
   name := s!"({L.name} · {X.name} · {R.name})"
   matrix := L.matrix * X.matrix * R.matrix
 
@@ -118,74 +118,74 @@ def zeroLike (_X : Operator d) : Operator d where
   matrix := 0
 
 /-- Scale an operator by a real coefficient. -/
-def operatorScale (c : Error) (X : Operator d) : Operator d where
+def opScale (c : Error) (X : Operator d) : Operator d where
   name := s!"scale({X.name})"
   matrix := (c : ℂ) • X.matrix
 
 /-- Sum a finite list of operators. -/
-def sumOperatorList (ops : List (Operator d)) : Operator d :=
-  ops.foldl operatorAdd (0 : Operator d)
+def sumOpList (ops : List (Operator d)) : Operator d :=
+  ops.foldl opAdd (0 : Operator d)
 
 /-- Weighted sum of operators over an explicit finite support list. -/
-def weightedOperatorSumOnSupport {α : Type*}
+def weightedOpSum {α : Type*}
     (support : List α) (w : α → Error) (f : α → Operator d) : Operator d :=
   support.foldl
-    (fun acc a => operatorAdd acc (operatorScale (w a) (f a)))
+    (fun acc a => opAdd acc (opScale (w a) (f a)))
     (0 : Operator d)
 
 /-- The domination relation `X ≥ Y`, encoded by PSD-ness of the concrete matrix gap. -/
-structure DominatesOperator (X Y : Operator d) : Prop where
+structure OpDominates (X Y : Operator d) : Prop where
   dominationGapPositive : 0 ≤ X.matrix - Y.matrix
 
 /-! ### Bridging lemmas: expectation-value linearity -/
 
-/-- `expectationValue` distributes over `operatorAdd`. -/
-theorem expectationValue_add (ψ : QuantumState d) (X Y : Operator d) :
-    expectationValue ψ (operatorAdd X Y) =
-      expectationValue ψ X + expectationValue ψ Y := by
-  simp [expectationValue, operatorAdd, mul_add,
+/-- `ev` distributes over `opAdd`. -/
+theorem ev_add (ψ : QuantumState d) (X Y : Operator d) :
+    ev ψ (opAdd X Y) =
+      ev ψ X + ev ψ Y := by
+  simp [ev, opAdd, mul_add,
     MIPStarRE.Quantum.normalizedTrace_add, Complex.add_re]
 
-/-- `expectationValue` distributes over `operatorDifference`. -/
-theorem expectationValue_sub (ψ : QuantumState d) (X Y : Operator d) :
-    expectationValue ψ (operatorDifference X Y) =
-      expectationValue ψ X - expectationValue ψ Y := by
-  simp [expectationValue, operatorDifference, mul_sub,
+/-- `ev` distributes over `opDiff`. -/
+theorem ev_sub (ψ : QuantumState d) (X Y : Operator d) :
+    ev ψ (opDiff X Y) =
+      ev ψ X - ev ψ Y := by
+  simp [ev, opDiff, mul_sub,
     MIPStarRE.Quantum.normalizedTrace_sub, Complex.sub_re]
 
 /-! ### Self-difference and zero-matrix infrastructure -/
 
-/-- The matrix of `operatorDifference X X` is zero. -/
-@[simp] theorem operatorDifference_self_matrix (X : Operator d) :
-    (operatorDifference X X).matrix = 0 := by
-  simp [operatorDifference, sub_self]
+/-- The matrix of `opDiff X X` is zero. -/
+@[simp] theorem opDiff_self_matrix (X : Operator d) :
+    (opDiff X X).matrix = 0 := by
+  simp [opDiff, sub_self]
 
-/-- `expectationValue` of an operator with zero matrix is zero. -/
-theorem expectationValue_zero_matrix (ψ : QuantumState d) (X : Operator d)
-    (h : X.matrix = 0) : expectationValue ψ X = 0 := by
-  simp [expectationValue, h]
+/-- `ev` of an operator with zero matrix is zero. -/
+theorem ev_zero_matrix (ψ : QuantumState d) (X : Operator d)
+    (h : X.matrix = 0) : ev ψ X = 0 := by
+  simp [ev, h]
 
-/-- The `operatorMul` of two operators where the first has zero matrix gives zero matrix. -/
-theorem operatorMul_zero_left_matrix (X Y : Operator d) (h : X.matrix = 0) :
-    (operatorMul X Y).matrix = 0 := by
-  simp [operatorMul, h]
+/-- The `opMul` of two operators where the first has zero matrix gives zero matrix. -/
+theorem opMul_zero_left_matrix (X Y : Operator d) (h : X.matrix = 0) :
+    (opMul X Y).matrix = 0 := by
+  simp [opMul, h]
 
-/-- The `operatorAdjoint` of an operator with zero matrix has zero matrix. -/
-theorem operatorAdjoint_zero_matrix (X : Operator d) (h : X.matrix = 0) :
-    (operatorAdjoint X).matrix = 0 := by
-  simp [operatorAdjoint, h]
+/-- The `opAdj` of an operator with zero matrix has zero matrix. -/
+theorem opAdj_zero_matrix (X : Operator d) (h : X.matrix = 0) :
+    (opAdj X).matrix = 0 := by
+  simp [opAdj, h]
 
 /-- `E[D† D] = 0` when `D` has zero matrix. -/
-theorem expectationValue_adjoint_mul_self_zero (ψ : QuantumState d) (D : Operator d)
+theorem ev_adjoint_mul_self_zero (ψ : QuantumState d) (D : Operator d)
     (h : D.matrix = 0) :
-    expectationValue ψ (operatorMul (operatorAdjoint D) D) = 0 :=
-  expectationValue_zero_matrix ψ _
-    (operatorMul_zero_left_matrix _ _ (operatorAdjoint_zero_matrix D h))
+    ev ψ (opMul (opAdj D) D) = 0 :=
+  ev_zero_matrix ψ _
+    (opMul_zero_left_matrix _ _ (opAdj_zero_matrix D h))
 
-/-- `expectationValue` depends only on the matrix, not the name. -/
-theorem expectationValue_name_irrel (ψ : QuantumState d)
+/-- `ev` depends only on the matrix, not the name. -/
+theorem ev_name_irrel (ψ : QuantumState d)
     (n₁ n₂ : String) (m : MIPStarRE.Quantum.Op (HilbertIndex d)) :
-    expectationValue ψ ⟨n₁, m⟩ = expectationValue ψ ⟨n₂, m⟩ := rfl
+    ev ψ ⟨n₁, m⟩ = ev ψ ⟨n₂, m⟩ := rfl
 
 /-! ### PSD trace positivity -/
 
@@ -193,10 +193,10 @@ theorem expectationValue_name_irrel (ψ : QuantumState d)
 Proof: `Re(τ(ρ · M†M)) = Re(tr(ρ M† M)/d)`. By trace cyclicity,
 `tr(ρ M† M) = tr(M ρ M†)`, and `M ρ M†` is PSD by congruence,
 so `tr(M ρ M†) ≥ 0` (a nonneg real), hence `Re(...)/d ≥ 0`. -/
-theorem expectationValue_adjoint_self_nonneg (ψ : QuantumState d) (M : Operator d)
+theorem ev_adjoint_self_nonneg (ψ : QuantumState d) (M : Operator d)
     (hψ : ψ.IsPositive) :
-    0 ≤ expectationValue ψ (operatorMul (operatorAdjoint M) M) := by
-  simp only [expectationValue, operatorMul, operatorAdjoint]
+    0 ≤ ev ψ (opMul (opAdj M) M) := by
+  simp only [ev, opMul, opAdj]
   unfold MIPStarRE.Quantum.normalizedTrace
   classical
   simp only [Complex.div_natCast_re]
@@ -269,15 +269,15 @@ theorem normalizedTrace_triangle {n : Type*} [Fintype n]
 
 With the parametric dimension design, this follows directly from
 `normalizedTrace_triangle` — no dimension hypotheses needed. -/
-theorem expectationValue_diff_triangle (ψ : QuantumState d) (X Y Z : Operator d)
+theorem ev_diff_triangle (ψ : QuantumState d) (X Y Z : Operator d)
     (hψ : ψ.IsPositive) :
-    expectationValue ψ (operatorMul (operatorAdjoint (operatorDifference X Z))
-        (operatorDifference X Z)) ≤
-    2 * (expectationValue ψ (operatorMul (operatorAdjoint (operatorDifference X Y))
-            (operatorDifference X Y)) +
-         expectationValue ψ (operatorMul (operatorAdjoint (operatorDifference Y Z))
-            (operatorDifference Y Z))) := by
-  simp only [expectationValue, operatorMul, operatorAdjoint, operatorDifference]
+    ev ψ (opMul (opAdj (opDiff X Z))
+        (opDiff X Z)) ≤
+    2 * (ev ψ (opMul (opAdj (opDiff X Y))
+            (opDiff X Y)) +
+         ev ψ (opMul (opAdj (opDiff Y Z))
+            (opDiff Y Z))) := by
+  simp only [ev, opMul, opAdj, opDiff]
   have hdecomp : X.matrix - Z.matrix = (X.matrix - Y.matrix) + (Y.matrix - Z.matrix) := by abel
   rw [hdecomp]
   exact normalizedTrace_triangle ψ.density (X.matrix - Y.matrix) (Y.matrix - Z.matrix)

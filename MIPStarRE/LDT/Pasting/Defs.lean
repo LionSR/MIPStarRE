@@ -43,31 +43,31 @@ def bernoulliTailOperator {d : ℕ} (k degree : ℕ) (X : Operator d) : Operator
   name := s!"BernoulliTail(k={k},d={degree}; {X.name}^r (I-{X.name})^(k-r))"
 
 /-- Add a descriptive tag to a paper-local submeasurement placeholder. -/
-def tagSubMeasurement {α : Type*} (tag : String) (A : SubMeasurement α d) : SubMeasurement α d where
+def tagSubMeas {α : Type*} (tag : String) (A : SubMeas α d) : SubMeas α d where
   name := s!"{A.name}.{tag}"
   outcomeOperator := A.outcomeOperator
   totalOperator := A.totalOperator
 
 /-- Multiply each outcome operator by a total operator on the right. -/
 def multiplyByTotalOnRight {α β : Type*}
-    (label : String) (A : SubMeasurement α d) (B : SubMeasurement β d) :
-    SubMeasurement α d where
+    (label : String) (A : SubMeas α d) (B : SubMeas β d) :
+    SubMeas α d where
   name := label
-  outcomeOperator := fun a => operatorMul (A.outcomeOperator a) B.totalOperator
-  totalOperator := operatorMul A.totalOperator B.totalOperator
+  outcomeOperator := fun a => opMul (A.outcomeOperator a) B.totalOperator
+  totalOperator := opMul A.totalOperator B.totalOperator
 
 /-- Multiply each outcome operator by a total operator on the left. -/
 def multiplyByTotalOnLeft {α β : Type*}
-    (label : String) (A : SubMeasurement α d) (B : SubMeasurement β d) :
-    SubMeasurement β d where
+    (label : String) (A : SubMeas α d) (B : SubMeas β d) :
+    SubMeas β d where
   name := label
-  outcomeOperator := fun b => operatorMul A.totalOperator (B.outcomeOperator b)
-  totalOperator := operatorMul A.totalOperator B.totalOperator
+  outcomeOperator := fun b => opMul A.totalOperator (B.outcomeOperator b)
+  totalOperator := opMul A.totalOperator B.totalOperator
 
 /-- Average an indexed family against a named distribution. -/
-noncomputable def averageIndexedSubMeasurement {Question Outcome : Type*}
-    (label : String) (𝒟 : Distribution Question) (A : IndexedSubMeasurement Question Outcome d) :
-    SubMeasurement Outcome d where
+noncomputable def averageIdxSubMeas {Question Outcome : Type*}
+    (label : String) (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome d) :
+    SubMeas Outcome d where
   name := label
   outcomeOperator := fun a =>
     averageOperatorOverDistribution 𝒟 (fun q => (A q).outcomeOperator a)
@@ -75,17 +75,17 @@ noncomputable def averageIndexedSubMeasurement {Question Outcome : Type*}
 
 /-- Complement operator `I - X` in the same ambient space as `X`. -/
 def operatorComplement (X : Operator d) : Operator d :=
-  operatorDifference (identityLike X) X
+  opDiff (identityLike X) X
 
 /-- Regard an operator expression as a `Unit`-valued submeasurement placeholder. -/
-def operatorAsSubMeasurement (X : Operator d) : SubMeasurement Unit d :=
+def operatorAsSubMeas (X : Operator d) : SubMeas Unit d :=
   { name := s!"operator({X.name})"
     outcomeOperator := fun _ => X
     totalOperator := X }
 
 /-- Regard the Bernoulli tail operator as a `Unit`-valued submeasurement placeholder. -/
-def bernoulliTailSubMeasurement {d : ℕ} (k degree : ℕ) (X : Operator d) : SubMeasurement Unit d :=
-  operatorAsSubMeasurement (bernoulliTailOperator k degree X)
+def bernoulliTailSubMeas {d : ℕ} (k degree : ℕ) (X : Operator d) : SubMeas Unit d :=
+  operatorAsSubMeas (bernoulliTailOperator k degree X)
 
 /-- Record which completed-slice outcomes are genuine polynomial outcomes. -/
 def gHatTupleType {params : Parameters} {k : ℕ}
@@ -130,51 +130,51 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
         fallbackInterpolatedPolynomial params
 
 /-- Aggregate the polynomial outcomes of `G^x` into its complete part `G^x`. -/
-def completePartSubMeasurement (params : Parameters)
-    (family : IndexedPolynomialFamily params d) (x : Fq params) : SubMeasurement Unit d :=
-  tagSubMeasurement "complete"
-    (postprocess ((family.meas x).toSubMeasurement) (fun _ => ()))
+def completePartSubMeas (params : Parameters)
+    (family : IdxPolyFamily params d) (x : Fq params) : SubMeas Unit d :=
+  tagSubMeas "complete"
+    (postprocess ((family.meas x).toSubMeas) (fun _ => ()))
 
 /-- Placeholder for the incomplete part `G^x_⊥ = I - G^x`. -/
-def incompletePartSubMeasurement (params : Parameters)
-    (family : IndexedPolynomialFamily params d) (x : Fq params) : SubMeasurement Unit d :=
-  operatorAsSubMeasurement (operatorComplement (completePartSubMeasurement params family x).totalOperator)
+def incompletePartSubMeas (params : Parameters)
+    (family : IdxPolyFamily params d) (x : Fq params) : SubMeas Unit d :=
+  operatorAsSubMeas (operatorComplement (completePartSubMeas params family x).totalOperator)
 
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
-def gHatIndexedMeasurement (params : Parameters)
-    (family : IndexedPolynomialFamily params d) :
-    IndexedMeasurement (Fq params) (GHatOutcome params) d :=
-  fun x => completeSubMeasurement ((family.meas x).toSubMeasurement)
+def gHatIdxMeas (params : Parameters)
+    (family : IdxPolyFamily params d) :
+    IdxMeas (Fq params) (GHatOutcome params) d :=
+  fun x => completeSubMeas ((family.meas x).toSubMeas)
 
 /-- The submeasurement view of the completed family `\widehat G`. -/
-def gHatIndexedSubMeasurement (params : Parameters)
-    (family : IndexedPolynomialFamily params d) :
-    IndexedSubMeasurement (Fq params) (GHatOutcome params) d :=
-  IndexedMeasurement.toIndexedSubMeasurement (gHatIndexedMeasurement params family)
+def gHatIdxSubMeas (params : Parameters)
+    (family : IdxPolyFamily params d) :
+    IdxSubMeas (Fq params) (GHatOutcome params) d :=
+  IdxMeas.toIdxSubMeas (gHatIdxMeas params family)
 
 /-- Left tensor-placement for the complete part `G^x`. -/
 def completePartLeftFamily (params : Parameters)
-    (family : IndexedPolynomialFamily params d) :
-    IndexedSubMeasurement (SliceQuestion params) Unit d :=
-  fun x => leftPlacedSubMeasurement (completePartSubMeasurement params family x)
+    (family : IdxPolyFamily params d) :
+    IdxSubMeas (SliceQuestion params) Unit d :=
+  fun x => leftPlacedSubMeas (completePartSubMeas params family x)
 
 /-- Right tensor-placement for the complete part `G^x`. -/
 def completePartRightFamily (params : Parameters)
-    (family : IndexedPolynomialFamily params d) :
-    IndexedSubMeasurement (SliceQuestion params) Unit d :=
-  fun x => rightPlacedSubMeasurement (completePartSubMeasurement params family x)
+    (family : IdxPolyFamily params d) :
+    IdxSubMeas (SliceQuestion params) Unit d :=
+  fun x => rightPlacedSubMeas (completePartSubMeas params family x)
 
 /-- Left tensor-placement for the incomplete part `G^x_⊥`. -/
 def incompletePartLeftFamily (params : Parameters)
-    (family : IndexedPolynomialFamily params d) :
-    IndexedSubMeasurement (SliceQuestion params) Unit d :=
-  fun x => leftPlacedSubMeasurement (incompletePartSubMeasurement params family x)
+    (family : IdxPolyFamily params d) :
+    IdxSubMeas (SliceQuestion params) Unit d :=
+  fun x => leftPlacedSubMeas (incompletePartSubMeas params family x)
 
 /-- Right tensor-placement for the incomplete part `G^x_⊥`. -/
 def incompletePartRightFamily (params : Parameters)
-    (family : IndexedPolynomialFamily params d) :
-    IndexedSubMeasurement (SliceQuestion params) Unit d :=
-  fun x => rightPlacedSubMeasurement (incompletePartSubMeasurement params family x)
+    (family : IdxPolyFamily params d) :
+    IdxSubMeas (SliceQuestion params) Unit d :=
+  fun x => rightPlacedSubMeas (incompletePartSubMeas params family x)
 
 
 end

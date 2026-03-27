@@ -165,8 +165,8 @@ structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*) (d : ℕ) 
   auxStateA : QuantumState d
   auxStateB : QuantumState d
   liftedState : QuantumState d
-  left : IndexedProjectiveMeasurement QuestionA OutcomeA d
-  right : IndexedProjectiveMeasurement QuestionB OutcomeB d
+  left : IdxProjMeas QuestionA OutcomeA d
+  right : IdxProjMeas QuestionB OutcomeB d
   deriving Inhabited
 
 /-- The product auxiliary state used in a Naimark dilation. -/
@@ -191,14 +191,14 @@ noncomputable def placeholderExpectation (ψ : QuantumState d) (X : Operator d) 
 /-- The single-outcome probability `⟨ψ|A_a|ψ⟩`. -/
 noncomputable def singleOutcomeProbability {Outcome : Type*}
     (ψ : QuantumState d)
-    (A : SubMeasurement Outcome d) (a : Outcome) : Error :=
+    (A : SubMeas Outcome d) (a : Outcome) : Error :=
   placeholderExpectation ψ (A.outcomeOperator a)
 
 /-- The joint outcome probability `⟨ψ|A_a ⊗ B_b|ψ⟩`. -/
 noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*} {d : ℕ}
     (ψ : QuantumState d)
-    (A : SubMeasurement OutcomeA d)
-    (B : SubMeasurement OutcomeB d)
+    (A : SubMeas OutcomeA d)
+    (B : SubMeas OutcomeB d)
     (a : OutcomeA) (b : OutcomeB) : Error :=
   -- Placeholder: uses string length rather than formalTensor (which changes dimension)
   (s!"Exp[{ψ.name}|{(A.outcomeOperator a).name}⊗{(B.outcomeOperator b).name}]".length : Error)
