@@ -7,6 +7,8 @@ set_option linter.style.longLine false
 Switcheroo and sandwich operator families for the pasting argument.
 -/
 
+noncomputable section
+
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
@@ -15,8 +17,6 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-
-noncomputable section
 
 /-- Left tensor-placement for the auxiliary family `M^x_o`. -/
 def switcherooSelfConsistencyLeft {Outcome : Type*} (params : Parameters)
@@ -31,7 +31,7 @@ def switcherooSelfConsistencyRight {Outcome : Type*} (params : Parameters)
   fun x => rightPlacedSubMeas (ιA := ι) ((M x).toSubMeas)
 
 /-- Concrete hypothesis family for `G^x_g M^y_o`. -/
-def switcherooPointProductLeft {Outcome : Type*} (params : Parameters)
+noncomputable def switcherooPointProductLeft {Outcome : Type*} (params : Parameters)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SlicePairQuestion params) (Polynomial params × Outcome) (ι × ι) :=
@@ -42,7 +42,7 @@ def switcherooPointProductLeft {Outcome : Type*} (params : Parameters)
         ((M q.2).toSubMeas)
 
 /-- Concrete hypothesis family for `M^y_o G^x_g` on the `Polynomial params × Outcome` outcome type. -/
-def switcherooPointProductRight {Outcome : Type*} (params : Parameters)
+noncomputable def switcherooPointProductRight {Outcome : Type*} (params : Parameters)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SlicePairQuestion params) (Polynomial params × Outcome) (ι × ι) :=
@@ -53,7 +53,7 @@ def switcherooPointProductRight {Outcome : Type*} (params : Parameters)
         ((M q.2).toSubMeas)
 
 /-- Concrete aggregate family for `G^x M^y_o`. -/
-def switcherooAggregateLeft {Outcome : Type*} (params : Parameters)
+noncomputable def switcherooAggregateLeft {Outcome : Type*} (params : Parameters)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SlicePairQuestion params) Outcome (ι × ι) :=
@@ -64,7 +64,7 @@ def switcherooAggregateLeft {Outcome : Type*} (params : Parameters)
         ((M q.2).toSubMeas)
 
 /-- Concrete aggregate family for `M^y_o G^x`. -/
-def switcherooAggregateRight {Outcome : Type*} (params : Parameters)
+noncomputable def switcherooAggregateRight {Outcome : Type*} (params : Parameters)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SlicePairQuestion params) Outcome (ι × ι) :=
@@ -75,7 +75,7 @@ def switcherooAggregateRight {Outcome : Type*} (params : Parameters)
         (completePartSubMeas params family q.1)
 
 /-- Concrete family for `G^x_g G^y`. -/
-def completePartPointProductLeft (params : Parameters)
+noncomputable def completePartPointProductLeft (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SlicePairQuestion params) (Polynomial params) (ι × ι) :=
   fun q =>
@@ -85,7 +85,7 @@ def completePartPointProductLeft (params : Parameters)
         (completePartSubMeas params family q.2)
 
 /-- Concrete family for `G^y G^x_g`. -/
-def completePartPointProductRight (params : Parameters)
+noncomputable def completePartPointProductRight (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SlicePairQuestion params) (Polynomial params) (ι × ι) :=
   fun q =>
@@ -95,7 +95,7 @@ def completePartPointProductRight (params : Parameters)
         ((family.meas q.1).toSubMeas)
 
 /-- Concrete family for `G^x G^y`. -/
-def completePartTotalProductLeft (params : Parameters)
+noncomputable def completePartTotalProductLeft (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SlicePairQuestion params) Unit (ι × ι) :=
   fun q =>
@@ -105,7 +105,7 @@ def completePartTotalProductLeft (params : Parameters)
         (completePartSubMeas params family q.2)
 
 /-- Concrete family for `G^y G^x`. -/
-def completePartTotalProductRight (params : Parameters)
+noncomputable def completePartTotalProductRight (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SlicePairQuestion params) Unit (ι × ι) :=
   fun q =>
@@ -115,7 +115,7 @@ def completePartTotalProductRight (params : Parameters)
         (completePartSubMeas params family q.1)
 
 /-- Concrete family for `G^x_g G^y_⊥`. -/
-def incompletePartPointProductLeft (params : Parameters)
+noncomputable def incompletePartPointProductLeft (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SlicePairQuestion params) (Polynomial params) (ι × ι) :=
   fun q =>
@@ -257,10 +257,17 @@ def gHatHalfSandwichRight (params : Parameters)
       { outcome := fun gs => gHatRotatedHalfProductOutcomeOperator params family k xs gs
         total := gHatRotatedHalfProductTotalOperator params family k xs }
 
-/-- TODO: this should carry the paper's operator-polynomial `S_{\tau_{\ge \ell}}` construction from `lem:from-H-to-G`. -/
-def suffixBernoulliWeightOperator (params : Parameters)
-    (_family : IdxPolyFamily params ι) (k ℓ : ℕ) (_τ : GHatType k) : MIPStarRE.Quantum.Op ι :=
-  0  -- placeholder
+/-- The operator-polynomial `S_{τ≥ℓ}` from `lem:from-H-to-G` (eq:S-def):
+`S_{τ≥ℓ} = ∑_{r : r + suffixWeight ≥ d+1} C(ℓ-1, r) · G^r · (I-G)^{(ℓ-1)-r}`
+where `G` is the averaged total operator. -/
+noncomputable def suffixBernoulliWeightOperator (params : Parameters)
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : MIPStarRE.Quantum.Op ι :=
+  let G := family.averagedSubMeas.total
+  let suffixWeight := (Finset.univ.filter fun i : Fin k => ℓ ≤ i.val ∧ τ i).card
+  ∑ r ∈ Finset.range ℓ,
+    if r + suffixWeight ≥ params.d + 1 then
+      (Nat.choose (ℓ - 1) r : ℂ) • (G ^ r * (1 - G) ^ (ℓ - 1 - r))
+    else 0
 
 /-- The default type used when packaging the recurrence step at the statement level. -/
 def emptyGHatType (k : ℕ) : GHatType k :=
@@ -404,8 +411,5 @@ def fromHToGRecurrenceRightFamily (params : Parameters)
     let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
     { outcome := fun _ => base.total * weight
       total := base.total * weight }
-
-
-end
 
 end MIPStarRE.LDT.Pasting

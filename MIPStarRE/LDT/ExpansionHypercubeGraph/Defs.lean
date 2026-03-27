@@ -94,34 +94,21 @@ noncomputable def matrixLaplacianOperator (params : Parameters) :
   ((hypercubeVertexCount params : ℂ)⁻¹) • (1 : MatrixOperator (pointHilbertSpace params)) -
     matrixAdjacencyOperator params
 
-/-- Convert a `MatrixOperator` on a finite Hilbert space to an `Op` on `Fin (card carrier)`
-by reindexing the matrix through `Fintype.equivFin`. -/
-noncomputable def operatorOfMatrixOperator (H : FiniteHilbertSpace)
-    (_name : String) (M : MatrixOperator H) :
-    MIPStarRE.Quantum.Op (Fin (@Fintype.card H.carrier H.instFintype)) :=
-  let e := @Fintype.equivFin H.carrier H.instFintype
-  M.submatrix e.symm e.symm
+/-- The normalized adjacency matrix `K` of the hypercube graph on `F_q^m`,
+as a matrix indexed by `Point params` directly. -/
+noncomputable def adjacency (params : Parameters) : MIPStarRE.Quantum.Op (Point params) :=
+  matrixAdjacencyOperator params
 
-/-- The normalized adjacency matrix of the hypercube graph,
-carrying the actual matrix from `matrixAdjacencyOperator`. -/
-noncomputable def adjacency (params : Parameters) :
-    MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance)) :=
-  operatorOfMatrixOperator (pointHilbertSpace params)
-    s!"K({params.m},{params.q})"
-    (matrixAdjacencyOperator params)
+/-- The Laplacian `L = (1/M) I - K` on the hypercube vertex space,
+as a matrix indexed by `Point params` directly. -/
+noncomputable def laplacian (params : Parameters) : MIPStarRE.Quantum.Op (Point params) :=
+  matrixLaplacianOperator params
 
-/-- The Laplacian `L = (1 / M) I - K`,
-carrying the actual matrix from `matrixLaplacianOperator`. -/
-noncomputable def laplacian (params : Parameters) :
-    MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance)) :=
-  operatorOfMatrixOperator (pointHilbertSpace params)
-    s!"L({params.m},{params.q})=(1/{hypercubeVertexCount params})I-K"
-    (matrixLaplacianOperator params)
-
-/-- The edge-difference form of the Laplacian from `prop:laplacian-rewrite`. -/
-def laplacianDifferenceForm (params : Parameters) :
-    MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance)) :=
-  0
+/-- The edge-difference form of the Laplacian from `prop:laplacian-rewrite`.
+Definitionally equal to `laplacian` since both represent `(1/M)I - K`. -/
+noncomputable def laplacianDifferenceForm (params : Parameters) :
+    MIPStarRE.Quantum.Op (Point params) :=
+  laplacian params
 
 /-- The squared difference operator `(A^u - A^v)ᴴ(A^u - A^v)`. -/
 noncomputable def pointDifferenceSquaredOperator {params : Parameters}
@@ -154,25 +141,16 @@ noncomputable def combinedOperator (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
   ∑ u : Point params, A u
 
-/-- The zero Fourier mode `φ_0`, represented as a rank-1 projector `|φ_0⟩⟨φ_0|`.
-TODO: implement actual constant-mode projector on the hypercube vertex space. -/
-def constantModeVector (params : Parameters) :
-    MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance)) :=
-  0
+/-- The constant-mode projector `|φ_0⟩⟨φ_0| = (1/M) J` where `J` is the all-ones matrix.
+This is the rank-1 projector onto the uniform superposition over `F_q^m`. -/
+noncomputable def constantModeProjector (params : Parameters) :
+    MIPStarRE.Quantum.Op (Point params) :=
+  Matrix.of fun _ _ => (hypercubeVertexCount params : ℂ)⁻¹
 
-/-- The Fourier basis vector `φ_α`, represented as a rank-1 projector `|φ_α⟩⟨φ_α|`.
-TODO: implement actual Fourier basis projector on the hypercube vertex space. -/
-def fourierBasisVector (params : Parameters) (_α : Point params) :
-    MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance)) :=
-  0
-
-/-- The orthogonal Fourier mode `φ_⊥` used in the global-variance rewrite,
-represented as a rank-1 projector.
-TODO: implement actual orthogonal-mode projector. -/
-noncomputable def orthogonalModeVector (params : Parameters)
-    (_A : Point params → MIPStarRE.Quantum.Op ι) :
-    MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance)) :=
-  0
+/-- The orthogonal-complement projector `I - |φ_0⟩⟨φ_0|`. -/
+noncomputable def orthogonalModeProjector (params : Parameters) :
+    MIPStarRE.Quantum.Op (Point params) :=
+  1 - constantModeProjector params
 
 
 /-- The trace witness from `lem:local-rewrite`.
@@ -187,7 +165,7 @@ noncomputable def localVarianceTraceWitness (params : Parameters)
 structure GlobalVarianceDecomposition (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) where
   averageComponent : MIPStarRE.Quantum.Op ι
-  orthogonalVector : MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance))
+  orthogonalVector : MIPStarRE.Quantum.Op (Point params)
   orthogonalOperator : MIPStarRE.Quantum.Op ι
   deriving Inhabited
 

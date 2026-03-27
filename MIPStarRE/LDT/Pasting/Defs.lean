@@ -21,8 +21,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-noncomputable section
-
 /-- The set of `k`-tuples with distinct coordinates. -/
 def distinctTuples (params : Parameters) (k : ℕ) : Set (PointTuple params k) :=
   { xs | Function.Injective xs }
@@ -40,19 +38,23 @@ abbrev GHatType (k : ℕ) := Fin k → Bool
 abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) := Point params × PointTuple params k
 abbrev VerticalLineQuestion (params : Parameters) := Point params
 
-/-- TODO: this should be the operator-polynomial tail construction from `lem:chernoff-bernoulli-matrix`. -/
-def bernoulliTailOperator (k _degree : ℕ) (X : MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  X ^ k  -- placeholder
+/-- The Bernoulli tail operator from `lem:chernoff-bernoulli-matrix`:
+`F(X) = ∑_{r=degree+1}^{k} C(k,r) · X^r · (I - X)^{k-r}`.
+This is the matrix-valued Bernoulli tail probability. -/
+noncomputable def bernoulliTailOperator (k degree : ℕ)
+    (X : MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
+  ∑ r ∈ Finset.Icc (degree + 1) k,
+    (Nat.choose k r : ℂ) • (X ^ r * (1 - X) ^ (k - r))
 
 /-- Multiply each outcome operator by a total operator on the right. -/
-def multiplyByTotalOnRight {α β : Type*}
+noncomputable def multiplyByTotalOnRight {α β : Type*}
     (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas α ι where
   outcome := fun a => A.outcome a * B.total
   total := A.total * B.total
 
 /-- Multiply each outcome operator by a total operator on the left. -/
-def multiplyByTotalOnLeft {α β : Type*}
+noncomputable def multiplyByTotalOnLeft {α β : Type*}
     (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas β ι where
   outcome := fun b => A.total * B.outcome b
@@ -110,12 +112,12 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
         fallbackInterpolatedPolynomial params
 
 /-- Aggregate the polynomial outcomes of `G^x` into its complete part `G^x`. -/
-def completePartSubMeas (params : Parameters)
+noncomputable def completePartSubMeas (params : Parameters)
     (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
   postprocess ((family.meas x).toSubMeas) (fun _ => ())
 
 /-- Placeholder for the incomplete part `G^x_⊥ = I - G^x`. -/
-def incompletePartSubMeas (params : Parameters)
+noncomputable def incompletePartSubMeas (params : Parameters)
     (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
   let X := 1 - (completePartSubMeas params family x).total
   { outcome := fun _ => X, total := X }
@@ -134,33 +136,30 @@ def gHatIdxSubMeas (params : Parameters)
 
 /-- Left tensor-placement for the complete part `G^x`
 on the bipartite space `d * d`. -/
-def completePartLeftFamily (params : Parameters)
+noncomputable def completePartLeftFamily (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
   fun x => leftPlacedSubMeas (ιB := ι) (completePartSubMeas params family x)
 
 /-- Right tensor-placement for the complete part `G^x`
 on the bipartite space `d * d`. -/
-def completePartRightFamily (params : Parameters)
+noncomputable def completePartRightFamily (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
   fun x => rightPlacedSubMeas (ιA := ι) (completePartSubMeas params family x)
 
 /-- Left tensor-placement for the incomplete part `G^x_⊥`
 on the bipartite space `d * d`. -/
-def incompletePartLeftFamily (params : Parameters)
+noncomputable def incompletePartLeftFamily (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
   fun x => leftPlacedSubMeas (ιB := ι) (incompletePartSubMeas params family x)
 
 /-- Right tensor-placement for the incomplete part `G^x_⊥`
 on the bipartite space `d * d`. -/
-def incompletePartRightFamily (params : Parameters)
+noncomputable def incompletePartRightFamily (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
   fun x => rightPlacedSubMeas (ιA := ι) (incompletePartSubMeas params family x)
-
-
-end
 
 end MIPStarRE.LDT.Pasting

@@ -149,6 +149,4 @@ lemma normalizationCondition {OutcomeA OutcomeB : Type*}
     NormalizationConditionStatement P Q := by
   sorry
 
-end
-
 end MIPStarRE.LDT.Commutativity

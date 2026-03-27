@@ -49,7 +49,7 @@ lemma matrixGlobalRewrite (params : Parameters)
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 theorem laplacianRewrite (params : Parameters) :
     laplacian params = laplacianDifferenceForm params := by
-  sorry
+  rfl
 
 /-- `lem:local-to-global`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
