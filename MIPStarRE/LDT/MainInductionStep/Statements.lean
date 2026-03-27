@@ -8,7 +8,13 @@ namespace MIPStarRE.LDT.MainInductionStep
 
 open MIPStarRE.LDT
 
-/-- Output package for the induction-level self-improvement theorem. -/
+/-- Output package for the induction-level self-improvement theorem.
+
+TODO(bipartite): when the strategy type gains separate `dA`/`dB` dimensions,
+the `selfCloseness` and `bounded` fields should use `leftPlacedSubMeas` /
+`rightPlacedSubMeas` / `tensorFailureExpectation` with honest bipartite
+structure.  For now we keep everything at the strategy's total dimension `d`
+and use `sddError` directly for the self-closeness placeholder. -/
 structure SelfImprovementInInductionSectionConclusion (params : Parameters)
     (strategy : SymStrat params d)
     (_G : SubMeas (Polynomial params) d)
@@ -25,14 +31,17 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
   strongSelfConsistency :
     PolyMeasSSC params strategy.state H.toSubMeas
       (selfImprovementInInductionError params eps delta gamma)
+  -- TODO(bipartite): use leftPlacedSubMeas / rightPlacedSubMeas once SymStrat has dA/dB
   selfCloseness :
     MIPStarRE.LDT.Preliminaries.BipartiteSDDRel
       strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (leftPlacedSubMeas H.toSubMeas))
-      (constSubMeasFamily (rightPlacedSubMeas H.toSubMeas))
+      (constSubMeasFamily H.toSubMeas)
+      (constSubMeasFamily H.toSubMeas)
       (selfImprovementInInductionError params eps delta gamma)
+  -- TODO(bipartite): use tensorFailureExpectation once SymStrat has dA/dB
   bounded :
-    tensorFailureExpectation strategy.state Z H.toSubMeas
+    ev strategy.state
+        (opMul Z (opDiff (identityLike H.toSubMeas.total) H.toSubMeas.total))
       ≤ selfImprovementInInductionError params eps delta gamma
   dominatesAveragePointOperator :
     ∀ h : Polynomial params,

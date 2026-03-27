@@ -2,6 +2,10 @@ import MIPStarRE.LDT.CommutativityPoints.Theorem
 
 /-!
 Definitions and operator constructions for Section 11 commutativity.
+
+In the bipartite model, functions that use `leftPlacedSubMeas` /
+`rightPlacedSubMeas` produce `SubMeas` at the bipartite dimension `d * d`,
+while functions that stay on a single register produce `SubMeas` at `d`.
 -/
 
 namespace MIPStarRE.LDT.Commutativity
@@ -17,11 +21,11 @@ abbrev EvaluatedSliceOutcome (params : Parameters) := Fq params × Fq params
 abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
 abbrev FullSliceOutcome (params : Parameters) := Polynomial params × Polynomial params
 
-/-- Ordered product placed on the left tensor factor. -/
-def leftOrderedProductSubMeas {α β : Type*}
+/-- Ordered product placed on the left tensor factor of the bipartite space `d * d`. -/
+def leftOrderedProductSubMeas {α β : Type*} {d : ℕ}
     (label : String) (A : SubMeas α d) (B : SubMeas β d) :
-    SubMeas (α × β) d :=
-  leftPlacedSubMeas (orderedProductSubMeas label A B)
+    SubMeas (α × β) (d * d) :=
+  leftPlacedSubMeas (dB := d) (orderedProductSubMeas label A B)
 
 /-- Append a total operator on the right of every outcome operator. -/
 def appendRightTotalSubMeas {α : Type*}
@@ -60,17 +64,19 @@ def evaluatedPointFamily (params : Parameters)
     IdxSubMeas (Point params.next) (Fq params) d :=
   IdxPolyFamily.evaluatedAtNextPoint family
 
-/-- Left tensor-placement for the evaluated family `G^x_[g(u)=a]`. -/
+/-- Left tensor-placement for the evaluated family `G^x_[g(u)=a]`
+on the bipartite space `d * d`. -/
 def evaluatedPointFamilyLeft (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (Point params.next) (Fq params) d :=
-  fun u => leftPlacedSubMeas (evaluatedPointFamily params family u)
+    IdxSubMeas (Point params.next) (Fq params) (d * d) :=
+  fun u => leftPlacedSubMeas (dB := d) (evaluatedPointFamily params family u)
 
-/-- Right tensor-placement for the evaluated family `G^x_[g(u)=a]`. -/
+/-- Right tensor-placement for the evaluated family `G^x_[g(u)=a]`
+on the bipartite space `d * d`. -/
 def evaluatedPointFamilyRight (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (Point params.next) (Fq params) d :=
-  fun u => rightPlacedSubMeas (evaluatedPointFamily params family u)
+    IdxSubMeas (Point params.next) (Fq params) (d * d) :=
+  fun u => rightPlacedSubMeas (dA := d) (evaluatedPointFamily params family u)
 
 /-- The first evaluated factor `G^x_[g(u)=a]`. -/
 def evaluatedSliceFirstFactor (params : Parameters)
@@ -84,33 +90,36 @@ def evaluatedSliceSecondFactor (params : Parameters)
     IdxSubMeas (EvaluatedSliceQuestion params) (Fq params) d :=
   fun q => evaluatedPointFamily params family q.2
 
-/-- The ordered evaluated-slice product `(G^x_[g(u)=a] G^y_[h(v)=b]) ⊗ I`. -/
+/-- The ordered evaluated-slice product `(G^x_[g(u)=a] G^y_[h(v)=b]) ⊗ I`
+on the bipartite space `d * d`. -/
 def evaluatedSliceProductLeft (params : Parameters)
     (_strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) d :=
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
   fun q =>
     leftOrderedProductSubMeas
       s!"evalSlice.left({params.m},{params.q},{params.d})"
       (evaluatedSliceFirstFactor params family q)
       (evaluatedSliceSecondFactor params family q)
 
-/-- The reversed evaluated-slice product `(G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`. -/
+/-- The reversed evaluated-slice product `(G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`
+on the bipartite space `d * d`. -/
 def evaluatedSliceProductRight (params : Parameters)
     (_strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) d :=
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       reversedProductSubMeas
         s!"evalSlice.right({params.m},{params.q},{params.d})"
         (evaluatedSliceFirstFactor params family q)
         (evaluatedSliceSecondFactor params family q)
 
-/-- The sandwiched evaluated product `(G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`. -/
+/-- The sandwiched evaluated product `(G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`
+on the bipartite space `d * d`. -/
 def evaluatedSliceSandwichFirstFactor (params : Parameters)
     (_strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) d :=
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       sandwichByOuterSubMeas
         s!"evalSlice.sandwich({params.m},{params.q},{params.d})"
         (evaluatedSliceFirstFactor params family q)
@@ -128,22 +137,24 @@ def fullSliceSecondFactor (params : Parameters)
     IdxSubMeas (FullSliceQuestion params) (Polynomial params) d :=
   fun q => (family.meas q.2).toSubMeas
 
-/-- The ordered full-slice product `(G^x_g G^y_h) ⊗ I`. -/
+/-- The ordered full-slice product `(G^x_g G^y_h) ⊗ I`
+on the bipartite space `d * d`. -/
 def fullSliceProductLeft (params : Parameters)
     (_strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) d :=
+    IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) (d * d) :=
   fun q =>
     leftOrderedProductSubMeas
       s!"fullSlice.left({params.m},{params.q},{params.d})"
       (fullSliceFirstFactor params family q)
       (fullSliceSecondFactor params family q)
 
-/-- The reversed full-slice product `(G^y_h G^x_g) ⊗ I`. -/
+/-- The reversed full-slice product `(G^y_h G^x_g) ⊗ I`
+on the bipartite space `d * d`. -/
 def fullSliceProductRight (params : Parameters)
     (_strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) d :=
+    IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       reversedProductSubMeas
         s!"fullSlice.right({params.m},{params.q},{params.d})"
         (fullSliceFirstFactor params family q)
@@ -156,54 +167,60 @@ def evaluateFullSliceOutcomeAtQuestion (params : Parameters)
   fun gh =>
     (gh.1 (truncatePoint params q.1), gh.2 (truncatePoint params q.2))
 
-/-- Postprocess the full-slice ordered product at sampled points. -/
+/-- Postprocess the full-slice ordered product at sampled points.
+On the bipartite space `d * d`. -/
 def evaluatedFromFullSliceProductLeft (params : Parameters)
     (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) d :=
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
     postprocess (fullSliceProductLeft params strategy family xy)
       (evaluateFullSliceOutcomeAtQuestion params q)
 
-/-- Postprocess the full-slice reversed product at sampled points. -/
+/-- Postprocess the full-slice reversed product at sampled points.
+On the bipartite space `d * d`. -/
 def evaluatedFromFullSliceProductRight (params : Parameters)
     (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) d :=
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
     postprocess (fullSliceProductRight params strategy family xy)
       (evaluateFullSliceOutcomeAtQuestion params q)
 
-/-- Internal stability family from the `G^y` insertion/removal step. -/
+/-- Internal stability family from the `G^y` insertion/removal step.
+On the bipartite space `d * d`. -/
 def commDataProcessedGStabilityOneLeft (params : Parameters)
     (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) d :=
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
     appendRightTotalSubMeas "timesGy"
       (evaluatedSliceSandwichFirstFactor params strategy family q)
-      (leftTensor ((fullSliceSecondFactor params family xy).total))
+      (leftTensor (d₂ := d) ((fullSliceSecondFactor params family xy).total))
 
-/-- Internal stability family after removing the trailing `G^y`. -/
+/-- Internal stability family after removing the trailing `G^y`.
+On the bipartite space `d * d`. -/
 def commDataProcessedGStabilityOneRight (params : Parameters)
     (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) d :=
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
   fun q => evaluatedSliceSandwichFirstFactor params strategy family q
 
-/-- Internal stability family from the `G^x` insertion/removal step. -/
+/-- Internal stability family from the `G^x` insertion/removal step.
+On the bipartite space `d * d`. -/
 def commDataProcessedGStabilityTwoLeft (params : Parameters)
     (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) d :=
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
     appendRightTotalSubMeas "timesGx"
       (evaluatedSliceProductLeft params strategy family q)
-      (leftTensor ((fullSliceFirstFactor params family xy).total))
+      (leftTensor (d₂ := d) ((fullSliceFirstFactor params family xy).total))
 
-/-- Internal stability family after removing the trailing `G^x`. -/
+/-- Internal stability family after removing the trailing `G^x`.
+On the bipartite space `d * d`. -/
 def commDataProcessedGStabilityTwoRight (params : Parameters)
     (strategy : SymStrat params.next d) (family : IdxPolyFamily params d) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) d :=
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (d * d) :=
   fun q => evaluatedSliceProductLeft params strategy family q
 
 /-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`.

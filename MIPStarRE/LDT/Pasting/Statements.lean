@@ -141,12 +141,14 @@ structure LdPastingSubMeasConclusion (params : Parameters)
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta) k)
 
-/-- Output package for `lem:g-complete-self-consistency`. -/
+/-- Output package for `lem:g-complete-self-consistency`.
+`ψbi` is the bipartite state on `d * d`.
+TODO(bipartite): derive from strategy once SymStrat has bipartite dims. -/
 structure GCompleteSelfConsistencyStatement (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d) (zeta : Error) : Prop where
   completePartSelfConsistency :
-    SDDRel ψ
+    SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
       (completePartLeftFamily params family)
       (completePartRightFamily params family)
@@ -154,12 +156,12 @@ structure GCompleteSelfConsistencyStatement (params : Parameters)
 
 /-- Output package for `cor:g-bot-self-consistency`. -/
 structure GBotSelfConsistencyStatement (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d) (zeta : Error) : Prop where
   completePartWitness :
-    GCompleteSelfConsistencyStatement params ψ family zeta
+    GCompleteSelfConsistencyStatement params ψbi family zeta
   incompletePartSelfConsistency :
-    SDDRel ψ
+    SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
       (incompletePartLeftFamily params family)
       (incompletePartRightFamily params family)
@@ -168,12 +170,12 @@ structure GBotSelfConsistencyStatement (params : Parameters)
 /-- Output package for `lem:commutativity-switcheroo`. -/
 structure CommutativitySwitcherooStatement {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (M : IdxProjSubMeas (Fq params) Outcome d)
     (zeta omega chi : Error) : Prop where
   aggregateCommutation :
-    SDDRel ψ
+    SDDRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (switcherooAggregateLeft params family M)
       (switcherooAggregateRight params family M)
@@ -181,17 +183,17 @@ structure CommutativitySwitcherooStatement {Outcome : Type*} [Fintype Outcome]
 
 /-- Output package for `cor:commuting-with-G-complete`. -/
 structure CommutingWithGCompleteStatement (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (gamma zeta : Error) : Prop where
   pointWithCompletePartCommutation :
-    SDDRel ψ
+    SDDRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (completePartPointProductLeft params family)
       (completePartPointProductRight params family)
       (commutingWithGCompleteError params gamma zeta)
   completePartCommutation :
-    SDDRel ψ
+    SDDRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (completePartTotalProductLeft params family)
       (completePartTotalProductRight params family)
@@ -199,19 +201,19 @@ structure CommutingWithGCompleteStatement (params : Parameters)
 
 /-- Output package for `cor:commuting-with-G-incomplete`. -/
 structure CommutingWithGIncompleteStatement (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (gamma zeta : Error) : Prop where
   completePartWitness :
-    CommutingWithGCompleteStatement params ψ family gamma zeta
+    CommutingWithGCompleteStatement params ψbi family gamma zeta
   pointWithIncompletePartCommutation :
-    SDDRel ψ
+    SDDRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (incompletePartPointProductLeft params family)
       (incompletePartPointProductRight params family)
       (commutingWithGIncompleteError params gamma zeta)
   incompletePartCommutation :
-    SDDRel ψ
+    SDDRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (incompletePartTotalProductLeft params family)
       (incompletePartTotalProductRight params family)
@@ -219,25 +221,25 @@ structure CommutingWithGIncompleteStatement (params : Parameters)
 
 /-- Output package for `cor:G-hat-facts`. -/
 structure GHatFactsStatement (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (gamma zeta : Error) : Prop where
   completePartSelfConsistencyWitness :
-    GCompleteSelfConsistencyStatement params ψ family zeta
+    GCompleteSelfConsistencyStatement params ψbi family zeta
   incompletePartSelfConsistencyWitness :
-    GBotSelfConsistencyStatement params ψ family zeta
+    GBotSelfConsistencyStatement params ψbi family zeta
   completePartCommutationWitness :
-    CommutingWithGCompleteStatement params ψ family gamma zeta
+    CommutingWithGCompleteStatement params ψbi family gamma zeta
   incompletePartCommutationWitness :
-    CommutingWithGIncompleteStatement params ψ family gamma zeta
+    CommutingWithGIncompleteStatement params ψbi family gamma zeta
   completedSelfConsistency :
-    SDDRel ψ
+    SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
       (gHatSelfConsistencyLeftFamily params family)
       (gHatSelfConsistencyRightFamily params family)
       (gHatSelfConsistencyError zeta)
   completedCommutation :
-    SDDRel ψ
+    SDDRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (gHatPairProductLeft params family)
       (gHatPairProductRight params family)
@@ -245,11 +247,11 @@ structure GHatFactsStatement (params : Parameters)
 
 /-- Output package for `lem:commute-g-half-sandwich`. -/
 structure CommuteGHalfSandwichStatement (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (gamma zeta : Error) (k : ℕ) : Prop where
   repeatedCommutation :
-    SDDRel ψ
+    SDDRel ψbi
       (uniformDistribution (PointTuple params k))
       (gHatHalfSandwichLeft params family k)
       (gHatHalfSandwichRight params family k)

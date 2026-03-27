@@ -10,9 +10,16 @@ namespace MIPStarRE.LDT.CommutativityPoints
 
 open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
 
-/-- Output package for `thm:commutativity-points`. -/
+/-- Output package for `thm:commutativity-points`.
+
+In the bipartite model, the state lives on `d * d` (the tensor product of
+two copies of the local Hilbert space of dimension `d`).  The `ψbi`
+parameter is this bipartite state; all SDDRel fields use it.
+TODO(bipartite): when `SymStrat` gains separate local/bipartite dimensions,
+`ψbi` should come from the strategy directly. -/
 structure CommutativityPointsStatement (params : Parameters)
     (strategy : SymStrat params d)
+    (ψbi : QuantumState (d * d))
     (_eps _delta gamma : Error) : Prop where
   sampledDiagonalLineConsistency :
     ConsRel strategy.state
@@ -27,49 +34,52 @@ structure CommutativityPointsStatement (params : Parameters)
       (sampledDiagonalLineEvaluation params strategy)
       (pointDiagonalLineApproxError params gamma)
   orderedLiftToMixedBridge :
-    SDDRel strategy.state
+    SDDRel ψbi
       (pointPairSharedDiagonalLineDistribution params)
       (pointMeasurementProductAlongSharedLine params strategy)
       (pointDiagonalLineMixedProductLeft params strategy)
       (pointDiagonalLineApproxError params gamma)
   orderedLiftToLineBridge :
-    SDDRel strategy.state
+    SDDRel ψbi
       (pointPairSharedDiagonalLineDistribution params)
       (pointDiagonalLineMixedProductLeft params strategy)
       (diagonalLineProductOrdered params strategy)
       (pointDiagonalLineApproxError params gamma)
   diagonalLineProjectiveSwap :
-    SDDRel strategy.state
+    SDDRel ψbi
       (pointPairSharedDiagonalLineDistribution params)
       (diagonalLineProductOrdered params strategy)
       (diagonalLineProductReversed params strategy)
       0
   reversedDropFromLineBridge :
-    SDDRel strategy.state
+    SDDRel ψbi
       (pointPairSharedDiagonalLineDistribution params)
       (diagonalLineProductReversed params strategy)
       (pointDiagonalLineMixedProductRight params strategy)
       (pointDiagonalLineApproxError params gamma)
   reversedDropToPointsBridge :
-    SDDRel strategy.state
+    SDDRel ψbi
       (pointPairSharedDiagonalLineDistribution params)
       (pointDiagonalLineMixedProductRight params strategy)
       (pointMeasurementProductAlongSharedLineReversed params strategy)
       (pointDiagonalLineApproxError params gamma)
   pointwiseCommutation :
-    SDDRel strategy.state
+    SDDRel ψbi
       (uniformDistribution (PointPairQuestion params))
       (pointMeasurementProductLeft params strategy)
       (pointMeasurementProductRight params strategy)
       (commutativityPointsError params gamma)
 
-/-- `thm:commutativity-points`. -/
+/-- `thm:commutativity-points`.
+TODO(bipartite): when `SymStrat` gains bipartite dimensions, `ψbi` should be
+derived from the strategy and the hypothesis will bind the two. -/
 theorem commutativityPoints
     (params : Parameters)
     (strategy : SymStrat params d)
+    (ψbi : QuantumState (d * d))
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
-    CommutativityPointsStatement params strategy eps delta gamma := by
+    CommutativityPointsStatement params strategy ψbi eps delta gamma := by
   sorry
 
 end MIPStarRE.LDT.CommutativityPoints

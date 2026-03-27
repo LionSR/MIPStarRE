@@ -147,30 +147,37 @@ noncomputable def averagedSlicePointEvaluationOperator (params : Parameters)
     𝒟.support 𝒟.weight
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
 
-/-- TODO(tensor): replace this placeholder left placement by an honest tensor-product
-embedding once the bipartite matrix API is available.
+/-- Lift a submeasurement to the left tensor factor of a bipartite space `dA * dB`.
+
+Each outcome operator `A_a : Operator dA` becomes `A_a ⊗ I_{dB} : Operator (dA * dB)`.
 NOTE: duplicated from CommutativityPoints; should be factored into a shared
 utility once the import graph permits it. -/
-def leftPlacedSubMeas {α : Type*} {d : ℕ} (A : SubMeas α d) : SubMeas α d where
+def leftPlacedSubMeas {α : Type*} {dA dB : ℕ} (A : SubMeas α dA) :
+    SubMeas α (dA * dB) where
   name := s!"{A.name}.left"
-  outcome := fun a => leftTensor (A.outcome a)
-  total := leftTensor A.total
+  outcome := fun a => leftTensor (d₂ := dB) (A.outcome a)
+  total := leftTensor (d₂ := dB) A.total
 
-/-- TODO(tensor): replace this placeholder right placement by an honest tensor-product
-embedding once the bipartite matrix API is available. -/
-def rightPlacedSubMeas {α : Type*} {d : ℕ} (A : SubMeas α d) : SubMeas α d where
+/-- Lift a submeasurement to the right tensor factor of a bipartite space `dA * dB`.
+
+Each outcome operator `A_a : Operator dB` becomes `I_{dA} ⊗ A_a : Operator (dA * dB)`. -/
+def rightPlacedSubMeas {α : Type*} {dA dB : ℕ} (A : SubMeas α dB) :
+    SubMeas α (dA * dB) where
   name := s!"{A.name}.right"
-  outcome := fun a => rightTensor (A.outcome a)
-  total := rightTensor A.total
+  outcome := fun a => rightTensor (d₁ := dA) (A.outcome a)
+  total := rightTensor (d₁ := dA) A.total
 
-/-- TODO(tensor): this uses the placeholder `leftTensor` / `rightTensor` embeddings until
-the project has an honest bipartite operator API. -/
-noncomputable def tensorFailureExpectation {Outcome : Type*}
-    (ψ : QuantumState d) (Z : Operator d) (H : SubMeas Outcome d) : Error :=
+/-- Tensor-failure expectation on a bipartite space.
+
+Computes `⟨ψ| (Z ⊗ I)(I ⊗ (I - Σ H_a)) |ψ⟩` where `Z` acts on the left register
+(dimension `dA`) and `H` acts on the right register (dimension `dB`). -/
+noncomputable def tensorFailureExpectation {Outcome : Type*} {dA dB : ℕ}
+    (ψ : QuantumState (dA * dB)) (Z : Operator dA) (H : SubMeas Outcome dB) :
+    Error :=
   ev ψ <|
     opMul
-      (leftTensor Z)
-      (rightTensor (opDiff (identityLike H.total) H.total))
+      (leftTensor (d₂ := dB) Z)
+      (rightTensor (d₁ := dA) (opDiff (identityLike H.total) H.total))
 
 /-- The uniform distribution on slice heights `x ∈ F_q`. -/
 noncomputable def sliceHeightDistribution (params : Parameters) : Distribution (Fq params) :=

@@ -93,21 +93,20 @@ def opSandwich (L X R : Operator d) : Operator d where
   name := s!"({L.name} · {X.name} · {R.name})"
   matrix := L.matrix * X.matrix * R.matrix
 
-/-- Placeholder left placement `X ⊗ I` on a bipartite space. -/
-def leftTensor (X : Operator d) : Operator d where
-  name := s!"({X.name} ⊗ I)"
-  matrix := X.matrix
-
-/-- Placeholder right placement `I ⊗ X` on a bipartite space. -/
-def rightTensor (X : Operator d) : Operator d where
-  name := s!"(I ⊗ {X.name})"
-  matrix := X.matrix
-
-/-- Formal tensor product of two operator expressions, carrying the Kronecker product. -/
-def formalTensor (X : Operator d₁) (Y : Operator d₂) : Operator (d₁ * d₂) where
+/-- Tensor product `X ⊗ Y` of two operators, using Mathlib's Kronecker product.
+The result lives in `Operator (d₁ * d₂)` via `Fin d₁ × Fin d₂ ≃ Fin (d₁ * d₂)`. -/
+def opTensor (X : Operator d₁) (Y : Operator d₂) : Operator (d₁ * d₂) where
   name := s!"({X.name})⊗({Y.name})"
   matrix := (Matrix.kronecker X.matrix Y.matrix).submatrix
     finProdFinEquiv.symm finProdFinEquiv.symm
+
+/-- Left placement `X ⊗ I` on a bipartite space `d₁ * d₂`. -/
+def leftTensor (X : Operator d₁) : Operator (d₁ * d₂) :=
+  opTensor X (idOp (d := d₂))
+
+/-- Right placement `I ⊗ X` on a bipartite space `d₁ * d₂`. -/
+def rightTensor (X : Operator d₂) : Operator (d₁ * d₂) :=
+  opTensor (idOp (d := d₁)) X
 
 /-- The zero operator in a given dimension. -/
 def zeroLike (_X : Operator d) : Operator d where

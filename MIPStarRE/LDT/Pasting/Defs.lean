@@ -153,29 +153,33 @@ def gHatIdxSubMeas (params : Parameters)
     IdxSubMeas (Fq params) (GHatOutcome params) d :=
   IdxMeas.toIdxSubMeas (gHatIdxMeas params family)
 
-/-- Left tensor-placement for the complete part `G^x`. -/
+/-- Left tensor-placement for the complete part `G^x`
+on the bipartite space `d * d`. -/
 def completePartLeftFamily (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SliceQuestion params) Unit d :=
-  fun x => leftPlacedSubMeas (completePartSubMeas params family x)
+    IdxSubMeas (SliceQuestion params) Unit (d * d) :=
+  fun x => leftPlacedSubMeas (dB := d) (completePartSubMeas params family x)
 
-/-- Right tensor-placement for the complete part `G^x`. -/
+/-- Right tensor-placement for the complete part `G^x`
+on the bipartite space `d * d`. -/
 def completePartRightFamily (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SliceQuestion params) Unit d :=
-  fun x => rightPlacedSubMeas (completePartSubMeas params family x)
+    IdxSubMeas (SliceQuestion params) Unit (d * d) :=
+  fun x => rightPlacedSubMeas (dA := d) (completePartSubMeas params family x)
 
-/-- Left tensor-placement for the incomplete part `G^x_⊥`. -/
+/-- Left tensor-placement for the incomplete part `G^x_⊥`
+on the bipartite space `d * d`. -/
 def incompletePartLeftFamily (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SliceQuestion params) Unit d :=
-  fun x => leftPlacedSubMeas (incompletePartSubMeas params family x)
+    IdxSubMeas (SliceQuestion params) Unit (d * d) :=
+  fun x => leftPlacedSubMeas (dB := d) (incompletePartSubMeas params family x)
 
-/-- Right tensor-placement for the incomplete part `G^x_⊥`. -/
+/-- Right tensor-placement for the incomplete part `G^x_⊥`
+on the bipartite space `d * d`. -/
 def incompletePartRightFamily (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SliceQuestion params) Unit d :=
-  fun x => rightPlacedSubMeas (incompletePartSubMeas params family x)
+    IdxSubMeas (SliceQuestion params) Unit (d * d) :=
+  fun x => rightPlacedSubMeas (dA := d) (incompletePartSubMeas params family x)
 
 
 end

@@ -132,52 +132,70 @@ structure ConsSubMeasStmt {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
   combinedControl :
     SDDRel ψ 𝒟 A (totalSandwichFamily A B) (4 * γ)
 
-/-- Averaged left-placed sandwich scalar from `prop:switch-sandwich`. -/
+/-- Averaged left-placed sandwich scalar from `prop:switch-sandwich`.
+
+In the bipartite model for symmetric strategies, `ψ` lives on `H ⊗ H`
+(dimension `d * d`), `A` is a projective sub-measurement family on `H`,
+and `B` is a bounded operator on `H`.  The left-placed sandwich puts
+`B` on the *left* register: `E_q ⟨ψ| (A_q ⊗ I)(B ⊗ I)(A_q ⊗ I) |ψ⟩`. -/
 noncomputable def leftSandwichExpectation {Question Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
+    (ψ : QuantumState (d * d)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome d)
     (B : Operator d) : Error :=
   avgOver 𝒟 fun q =>
     ev ψ <|
       opSandwich
-        ((A q).toSubMeas.total)
-        (leftTensor B)
-        ((A q).toSubMeas.total)
+        (leftTensor (d₂ := d) (A q).toSubMeas.total)
+        (leftTensor (d₂ := d) B)
+        (leftTensor (d₂ := d) (A q).toSubMeas.total)
 
-/-- Averaged middle sandwich scalar from `prop:switch-sandwich`. -/
+/-- Averaged middle sandwich scalar from `prop:switch-sandwich`.
+
+In the middle sandwich, `B` is an operator already on the full bipartite
+space `d * d`.  The measurement total is lifted:
+`E_q ⟨ψ| (A_q ⊗ I) B (A_q ⊗ I) |ψ⟩`. -/
 noncomputable def middleSandwichExpectation {Question Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
+    (ψ : QuantumState (d * d)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome d)
-    (B : Operator d) : Error :=
+    (B : Operator (d * d)) : Error :=
   avgOver 𝒟 fun q =>
     ev ψ <|
       opSandwich
-        ((A q).toSubMeas.total)
+        (leftTensor (d₂ := d) (A q).toSubMeas.total)
         B
-        ((A q).toSubMeas.total)
+        (leftTensor (d₂ := d) (A q).toSubMeas.total)
 
-/-- Averaged right-placed sandwich scalar from `prop:switch-sandwich`. -/
+/-- Averaged right-placed sandwich scalar from `prop:switch-sandwich`.
+
+In the bipartite model, the right-placed sandwich puts `B` on the
+*right* register: `E_q ⟨ψ| (A_q ⊗ I)(I ⊗ B)(A_q ⊗ I) |ψ⟩`. -/
 noncomputable def rightSandwichExpectation {Question Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
+    (ψ : QuantumState (d * d)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome d)
     (B : Operator d) : Error :=
   avgOver 𝒟 fun q =>
     ev ψ <|
       opSandwich
-        ((A q).toSubMeas.total)
-        (rightTensor B)
-        ((A q).toSubMeas.total)
+        (leftTensor (d₂ := d) (A q).toSubMeas.total)
+        (rightTensor (d₁ := d) B)
+        (leftTensor (d₂ := d) (A q).toSubMeas.total)
 
-/-- Output package for `prop:switch-sandwich`. -/
+/-- Output package for `prop:switch-sandwich`.
+
+In the bipartite model, `B : Operator d` is a local operator on one register,
+and we compare sandwiching by `B ⊗ I` (left) and `I ⊗ B` (right)
+around `A_q ⊗ I`. -/
 structure SwitchSandwichStmt {Question Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
+    (ψ : QuantumState (d * d)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome d)
     (B : Operator d) (δ : Error) : Prop where
   leftSandwichTransfer :
-    |leftSandwichExpectation ψ 𝒟 A B - middleSandwichExpectation ψ 𝒟 A B|
+    |leftSandwichExpectation ψ 𝒟 A B -
+      middleSandwichExpectation ψ 𝒟 A (leftTensor (d₂ := d) B)|
       ≤ 2 * Real.sqrt δ
   rightSandwichTransfer :
-    |middleSandwichExpectation ψ 𝒟 A B - rightSandwichExpectation ψ 𝒟 A B|
+    |middleSandwichExpectation ψ 𝒟 A (rightTensor (d₁ := d) B) -
+      rightSandwichExpectation ψ 𝒟 A B|
       ≤ Real.sqrt δ
 
 /-- Output package for `prop:completeness-transfer-projective-P`. -/

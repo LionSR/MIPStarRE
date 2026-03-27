@@ -18,22 +18,22 @@ noncomputable section
 /-- Left tensor-placement for the auxiliary family `M^x_o`. -/
 def switcherooSelfConsistencyLeft {Outcome : Type*} (params : Parameters)
     (M : IdxProjSubMeas (Fq params) Outcome d) :
-    IdxSubMeas (SliceQuestion params) Outcome d :=
-  fun x => leftPlacedSubMeas ((M x).toSubMeas)
+    IdxSubMeas (SliceQuestion params) Outcome (d * d) :=
+  fun x => leftPlacedSubMeas (dB := d) ((M x).toSubMeas)
 
 /-- Right tensor-placement for the auxiliary family `M^x_o`. -/
 def switcherooSelfConsistencyRight {Outcome : Type*} (params : Parameters)
     (M : IdxProjSubMeas (Fq params) Outcome d) :
-    IdxSubMeas (SliceQuestion params) Outcome d :=
-  fun x => rightPlacedSubMeas ((M x).toSubMeas)
+    IdxSubMeas (SliceQuestion params) Outcome (d * d) :=
+  fun x => rightPlacedSubMeas (dA := d) ((M x).toSubMeas)
 
 /-- Concrete hypothesis family for `G^x_g M^y_o`. -/
 def switcherooPointProductLeft {Outcome : Type*} (params : Parameters)
     (family : IdxPolyFamily params d)
     (M : IdxProjSubMeas (Fq params) Outcome d) :
-    IdxSubMeas (SlicePairQuestion params) (Polynomial params × Outcome) d :=
+    IdxSubMeas (SlicePairQuestion params) (Polynomial params × Outcome) (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       orderedProductSubMeas
         s!"switcheroo.point.left({params.m},{params.q},{params.d})"
         ((family.meas q.1).toSubMeas)
@@ -43,9 +43,9 @@ def switcherooPointProductLeft {Outcome : Type*} (params : Parameters)
 def switcherooPointProductRight {Outcome : Type*} (params : Parameters)
     (family : IdxPolyFamily params d)
     (M : IdxProjSubMeas (Fq params) Outcome d) :
-    IdxSubMeas (SlicePairQuestion params) (Polynomial params × Outcome) d :=
+    IdxSubMeas (SlicePairQuestion params) (Polynomial params × Outcome) (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       reversedProductSubMeas
         s!"switcheroo.point.right({params.m},{params.q},{params.d})"
         ((family.meas q.1).toSubMeas)
@@ -55,9 +55,9 @@ def switcherooPointProductRight {Outcome : Type*} (params : Parameters)
 def switcherooAggregateLeft {Outcome : Type*} (params : Parameters)
     (family : IdxPolyFamily params d)
     (M : IdxProjSubMeas (Fq params) Outcome d) :
-    IdxSubMeas (SlicePairQuestion params) Outcome d :=
+    IdxSubMeas (SlicePairQuestion params) Outcome (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       multiplyByTotalOnLeft
         s!"switcheroo.aggregate.left({params.m},{params.q},{params.d})"
         (completePartSubMeas params family q.1)
@@ -67,9 +67,9 @@ def switcherooAggregateLeft {Outcome : Type*} (params : Parameters)
 def switcherooAggregateRight {Outcome : Type*} (params : Parameters)
     (family : IdxPolyFamily params d)
     (M : IdxProjSubMeas (Fq params) Outcome d) :
-    IdxSubMeas (SlicePairQuestion params) Outcome d :=
+    IdxSubMeas (SlicePairQuestion params) Outcome (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       multiplyByTotalOnRight
         s!"switcheroo.aggregate.right({params.m},{params.q},{params.d})"
         ((M q.2).toSubMeas)
@@ -78,9 +78,9 @@ def switcherooAggregateRight {Outcome : Type*} (params : Parameters)
 /-- Concrete family for `G^x_g G^y`. -/
 def completePartPointProductLeft (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SlicePairQuestion params) (Polynomial params) d :=
+    IdxSubMeas (SlicePairQuestion params) (Polynomial params) (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       multiplyByTotalOnRight
         s!"complete.point.left({params.m},{params.q},{params.d})"
         ((family.meas q.1).toSubMeas)
@@ -89,9 +89,9 @@ def completePartPointProductLeft (params : Parameters)
 /-- Concrete family for `G^y G^x_g`. -/
 def completePartPointProductRight (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SlicePairQuestion params) (Polynomial params) d :=
+    IdxSubMeas (SlicePairQuestion params) (Polynomial params) (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       multiplyByTotalOnLeft
         s!"complete.point.right({params.m},{params.q},{params.d})"
         (completePartSubMeas params family q.2)
@@ -100,9 +100,9 @@ def completePartPointProductRight (params : Parameters)
 /-- Concrete family for `G^x G^y`. -/
 def completePartTotalProductLeft (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SlicePairQuestion params) Unit d :=
+    IdxSubMeas (SlicePairQuestion params) Unit (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       multiplyByTotalOnRight
         s!"complete.total.left({params.m},{params.q},{params.d})"
         (completePartSubMeas params family q.1)
@@ -111,9 +111,9 @@ def completePartTotalProductLeft (params : Parameters)
 /-- Concrete family for `G^y G^x`. -/
 def completePartTotalProductRight (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SlicePairQuestion params) Unit d :=
+    IdxSubMeas (SlicePairQuestion params) Unit (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       multiplyByTotalOnLeft
         s!"complete.total.right({params.m},{params.q},{params.d})"
         (completePartSubMeas params family q.2)
@@ -122,9 +122,9 @@ def completePartTotalProductRight (params : Parameters)
 /-- Concrete family for `G^x_g G^y_⊥`. -/
 def incompletePartPointProductLeft (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SlicePairQuestion params) (Polynomial params) d :=
+    IdxSubMeas (SlicePairQuestion params) (Polynomial params) (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       multiplyByTotalOnRight
         s!"incomplete.point.left({params.m},{params.q},{params.d})"
         ((family.meas q.1).toSubMeas)
@@ -133,9 +133,9 @@ def incompletePartPointProductLeft (params : Parameters)
 /-- Concrete family for `G^y_⊥ G^x_g`. -/
 def incompletePartPointProductRight (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SlicePairQuestion params) (Polynomial params) d :=
+    IdxSubMeas (SlicePairQuestion params) (Polynomial params) (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       multiplyByTotalOnLeft
         s!"incomplete.point.right({params.m},{params.q},{params.d})"
         (incompletePartSubMeas params family q.2)
@@ -144,9 +144,9 @@ def incompletePartPointProductRight (params : Parameters)
 /-- Concrete family for `G^x_⊥ G^y_⊥`. -/
 def incompletePartTotalProductLeft (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SlicePairQuestion params) Unit d :=
+    IdxSubMeas (SlicePairQuestion params) Unit (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       multiplyByTotalOnRight
         s!"incomplete.total.left({params.m},{params.q},{params.d})"
         (incompletePartSubMeas params family q.1)
@@ -155,9 +155,9 @@ def incompletePartTotalProductLeft (params : Parameters)
 /-- Concrete family for `G^y_⊥ G^x_⊥`. -/
 def incompletePartTotalProductRight (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SlicePairQuestion params) Unit d :=
+    IdxSubMeas (SlicePairQuestion params) Unit (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       multiplyByTotalOnLeft
         s!"incomplete.total.right({params.m},{params.q},{params.d})"
         (incompletePartSubMeas params family q.2)
@@ -166,21 +166,21 @@ def incompletePartTotalProductRight (params : Parameters)
 /-- Left tensor-placement for `\widehat G^x_g`. -/
 def gHatSelfConsistencyLeftFamily (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SliceQuestion params) (GHatOutcome params) d :=
-  fun x => leftPlacedSubMeas ((gHatIdxMeas params family x).toSubMeas)
+    IdxSubMeas (SliceQuestion params) (GHatOutcome params) (d * d) :=
+  fun x => leftPlacedSubMeas (dB := d) ((gHatIdxMeas params family x).toSubMeas)
 
 /-- Right tensor-placement for `\widehat G^x_g`. -/
 def gHatSelfConsistencyRightFamily (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SliceQuestion params) (GHatOutcome params) d :=
-  fun x => rightPlacedSubMeas ((gHatIdxMeas params family x).toSubMeas)
+    IdxSubMeas (SliceQuestion params) (GHatOutcome params) (d * d) :=
+  fun x => rightPlacedSubMeas (dA := d) ((gHatIdxMeas params family x).toSubMeas)
 
 /-- Concrete family for the pairwise product `\widehat G^x_g \widehat G^y_h`. -/
 def gHatPairProductLeft (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) d :=
+    IdxSubMeas (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       orderedProductSubMeas
         s!"ghat.pair.left({params.m},{params.q},{params.d})"
         ((gHatIdxMeas params family q.1).toSubMeas)
@@ -189,9 +189,9 @@ def gHatPairProductLeft (params : Parameters)
 /-- Concrete family for the reversed pairwise product `\widehat G^y_h \widehat G^x_g`. -/
 def gHatPairProductRight (params : Parameters)
     (family : IdxPolyFamily params d) :
-    IdxSubMeas (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) d :=
+    IdxSubMeas (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) (d * d) :=
   fun q =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       reversedProductSubMeas
         s!"ghat.pair.right({params.m},{params.q},{params.d})"
         ((gHatIdxMeas params family q.1).toSubMeas)
@@ -258,9 +258,9 @@ def gHatSandwichFamily (params : Parameters)
 /-- Concrete family for the half-sandwich product of `k` completed slices. -/
 def gHatHalfSandwichLeft (params : Parameters)
     (family : IdxPolyFamily params d) (k : ℕ) :
-    IdxSubMeas (PointTuple params k) (GHatTupleOutcome params k) d :=
+    IdxSubMeas (PointTuple params k) (GHatTupleOutcome params k) (d * d) :=
   fun xs =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       { name := s!"ghat.half.left({params.m},{params.q},{params.d},{k})"
         outcome := fun gs => gHatHalfProductOutcomeOperator params family k xs gs
         total := gHatHalfProductTotalOperator params family k xs }
@@ -268,9 +268,9 @@ def gHatHalfSandwichLeft (params : Parameters)
 /-- Concrete family for the cyclically permuted half-sandwich product. -/
 def gHatHalfSandwichRight (params : Parameters)
     (family : IdxPolyFamily params d) (k : ℕ) :
-    IdxSubMeas (PointTuple params k) (GHatTupleOutcome params k) d :=
+    IdxSubMeas (PointTuple params k) (GHatTupleOutcome params k) (d * d) :=
   fun xs =>
-    leftPlacedSubMeas <|
+    leftPlacedSubMeas (dB := d) <|
       { name := s!"ghat.half.right({params.m},{params.q},{params.d},{k})"
         outcome := fun gs => gHatRotatedHalfProductOutcomeOperator params family k xs gs
         total := gHatRotatedHalfProductTotalOperator params family k xs }

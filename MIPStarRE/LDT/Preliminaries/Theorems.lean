@@ -266,90 +266,76 @@ theorem consSubMeas {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
       consSubMeas_combinedControl ψ 𝒟 A B γ hdc hsc
   }
 
-/-! ### Bridge lemmas for `prop:switch-sandwich` -/
+/-! ### Bridge lemmas for `prop:switch-sandwich`
+
+With the honest bipartite tensor-product model, `leftTensor` / `rightTensor`
+change the underlying matrix (via Kronecker products), so the left/right
+sandwich expectations are no longer trivially equal to the middle one.
+The inequalities require `Matrix.mul_kronecker_mul` and related
+Kronecker-product algebra, which is tracked as `TODO(kron)`. -/
 
 /-- `ev` depends only on the matrix, not on `name`. -/
 private lemma ev_name_irrel' {d : ℕ} (ψ : QuantumState d)
     (n₁ n₂ : String) (m : MIPStarRE.Quantum.Op (HilbertIndex d)) :
     ev ψ ⟨n₁, m⟩ = ev ψ ⟨n₂, m⟩ := rfl
 
-/-- At scaffold level, `leftTensor` only changes the `name` field of an operator,
-so the left and middle sandwich expectations are equal. -/
-private lemma leftSandwich_eq_middleSandwich
-    {Question Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IdxProjSubMeas Question Outcome d)
-    (B : Operator d) :
-    leftSandwichExpectation ψ 𝒟 A B = middleSandwichExpectation ψ 𝒟 A B := by
-  unfold leftSandwichExpectation middleSandwichExpectation leftTensor opSandwich
-  congr 1
+/-- Left sandwich transfer bound.  Requires honest Kronecker-product
+algebra (`Matrix.mul_kronecker_mul`) to relate `(A_q ⊗ I)(B ⊗ I)(A_q ⊗ I)`
+to `(A_q B A_q) ⊗ I`.
 
-/-- At scaffold level, `rightTensor` only changes the `name` field of an operator,
-so the middle and right sandwich expectations are equal. -/
-private lemma middleSandwich_eq_rightSandwich
-    {Question Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A : IdxProjSubMeas Question Outcome d)
-    (B : Operator d) :
-    middleSandwichExpectation ψ 𝒟 A B = rightSandwichExpectation ψ 𝒟 A B := by
-  unfold middleSandwichExpectation rightSandwichExpectation rightTensor opSandwich
-  congr 1
-
-/-- Left sandwich transfer bound. At scaffold level this is
-trivial because `leftTensor` is a name-only operation. -/
+The hypothesis `Alifted` is the bipartite-lifted version of the local
+measurement family (each outcome tensored with identity on the second register).
+-/
+-- TODO(kron): needs Matrix.mul_kronecker_mul and Kronecker trace factorization
 private lemma switchSandwich_leftTransfer
     {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
+    (ψ : QuantumState (d * d)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome d)
-    (B : Operator d) (hB : OpBounded01 B)
+    (Alifted : IdxSubMeas Question Outcome (d * d))
+    (B : Operator d) (_hB : OpBounded01 B)
     (δ : Error) :
-    bipartiteStateDependentDistance ψ 𝒟
-      (IdxProjSubMeas.toIdxSubMeas A)
-      (IdxProjSubMeas.toIdxSubMeas A)
-      δ →
+    bipartiteStateDependentDistance ψ 𝒟 Alifted Alifted δ →
     |leftSandwichExpectation ψ 𝒟 A B -
-      middleSandwichExpectation ψ 𝒟 A B| ≤
+      middleSandwichExpectation ψ 𝒟 A (leftTensor (d₂ := d) B)| ≤
       2 * Real.sqrt δ := by
-  intro _
-  rw [leftSandwich_eq_middleSandwich, sub_self, abs_zero]
-  exact mul_nonneg (by norm_num) (Real.sqrt_nonneg δ)
+  sorry
 
-/-- Right sandwich transfer bound. At scaffold level
-this is trivial because `rightTensor` is a name-only operation. -/
+/-- Right sandwich transfer bound.  Requires honest Kronecker-product
+algebra to relate `(A_q ⊗ I)(I ⊗ B)(A_q ⊗ I)` to `(A_q² ⊗ B)`. -/
+-- TODO(kron): needs Matrix.mul_kronecker_mul and Kronecker trace factorization
 private lemma switchSandwich_rightTransfer
     {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
+    (ψ : QuantumState (d * d)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome d)
-    (B : Operator d) (hB : OpBounded01 B)
+    (Alifted : IdxSubMeas Question Outcome (d * d))
+    (B : Operator d) (_hB : OpBounded01 B)
     (δ : Error) :
-    bipartiteStateDependentDistance ψ 𝒟
-      (IdxProjSubMeas.toIdxSubMeas A)
-      (IdxProjSubMeas.toIdxSubMeas A)
-      δ →
-    |middleSandwichExpectation ψ 𝒟 A B -
+    bipartiteStateDependentDistance ψ 𝒟 Alifted Alifted δ →
+    |middleSandwichExpectation ψ 𝒟 A (rightTensor (d₁ := d) B) -
       rightSandwichExpectation ψ 𝒟 A B| ≤
       Real.sqrt δ := by
-  intro _
-  rw [middleSandwich_eq_rightSandwich, sub_self, abs_zero]
-  exact Real.sqrt_nonneg δ
+  sorry
 
-/-- `prop:switch-sandwich`. -/
+/-- `prop:switch-sandwich`.
+
+The hypothesis uses `Alifted`, the bipartite-lifted version of `A`.
+Callers should provide the result of lifting each `A_q` outcome via
+`leftTensor`. -/
+-- TODO(kron): proof needs real Kronecker algebra (was trivial when leftTensor was name-only)
 theorem switchSandwich {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
-    (ψ : QuantumState d) (𝒟 : Distribution Question)
+    (ψ : QuantumState (d * d)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome d)
+    (Alifted : IdxSubMeas Question Outcome (d * d))
     (B : Operator d) (hB : OpBounded01 B)
     (δ : Error) :
-    bipartiteStateDependentDistance ψ 𝒟
-      (IdxProjSubMeas.toIdxSubMeas A)
-      (IdxProjSubMeas.toIdxSubMeas A)
-      δ →
+    bipartiteStateDependentDistance ψ 𝒟 Alifted Alifted δ →
     SwitchSandwichStmt ψ 𝒟 A B δ := by
   intro happrox
   exact {
     leftSandwichTransfer :=
-      switchSandwich_leftTransfer ψ 𝒟 A B hB δ happrox
+      switchSandwich_leftTransfer ψ 𝒟 A Alifted B hB δ happrox
     rightSandwichTransfer :=
-      switchSandwich_rightTransfer ψ 𝒟 A B hB δ happrox
+      switchSandwich_rightTransfer ψ 𝒟 A Alifted B hB δ happrox
   }
 
 /-- Atomic fact: Cauchy-Schwarz at the operator level. -/

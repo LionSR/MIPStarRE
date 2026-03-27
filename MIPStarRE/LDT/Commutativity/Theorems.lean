@@ -2,6 +2,13 @@ import MIPStarRE.LDT.Commutativity.Defs
 
 /-!
 Statement packaging and scaffold theorems for Section 11 commutativity.
+
+In the bipartite model, `ψbi : QuantumState (d * d)` is the bipartite state
+on both registers.  Fields that involve bipartite-lifted operators (via
+`leftPlacedSubMeas` / `rightPlacedSubMeas` / `leftTensor`) use `ψbi`,
+while fields that stay on a single register use `strategy.state`.
+TODO(bipartite): when `SymStrat` gains separate local/bipartite dimensions,
+`ψbi` should come from the strategy directly.
 -/
 
 namespace MIPStarRE.LDT.Commutativity
@@ -38,9 +45,13 @@ noncomputable def comMainError (params : Parameters) (gamma zeta : Error) : Erro
       Real.rpow zeta (1 / (4 : Error)) +
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)))
 
-/-- Output package for `lem:comm-data-processed-g`. -/
+/-- Output package for `lem:comm-data-processed-g`.
+
+`ψbi` is the bipartite state on `d * d` used for fields involving
+tensor-placed operators.  Fields on a single register use `strategy.state`. -/
 structure CommDataProcessedGConclusion (params : Parameters)
     (strategy : SymStrat params.next d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (gamma zeta : Error) : Prop where
   postprocessedPointConsistency :
@@ -50,25 +61,25 @@ structure CommDataProcessedGConclusion (params : Parameters)
       (evaluatedPointFamily params family)
       zeta
   postprocessedSelfConsistency :
-    SDDRel strategy.state
+    SDDRel ψbi
       (uniformDistribution (Point params.next))
       (evaluatedPointFamilyLeft params family)
       (evaluatedPointFamilyRight params family)
       zeta
   stabilityOne :
-    SDDRel strategy.state
+    SDDRel ψbi
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityOneLeft params strategy family)
       (commDataProcessedGStabilityOneRight params strategy family)
       (commDataProcessedGStabilityOneError zeta)
   stabilityTwo :
-    SDDRel strategy.state
+    SDDRel ψbi
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityTwoLeft params strategy family)
       (commDataProcessedGStabilityTwoRight params strategy family)
       (commDataProcessedGStabilityTwoError params gamma zeta)
   evaluatedSliceCommutation :
-    SDDRel strategy.state
+    SDDRel ψbi
       (uniformDistribution (EvaluatedSliceQuestion params))
       (evaluatedSliceProductLeft params strategy family)
       (evaluatedSliceProductRight params strategy family)
@@ -77,18 +88,19 @@ structure CommDataProcessedGConclusion (params : Parameters)
 /-- Output package for `thm:com-main`. -/
 structure ComMainConclusion (params : Parameters)
     (strategy : SymStrat params.next d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (gamma zeta : Error) : Prop where
   evaluatedCommutation :
-    CommDataProcessedGConclusion params strategy family gamma zeta
+    CommDataProcessedGConclusion params strategy ψbi family gamma zeta
   evaluationSpecialization :
-    SDDRel strategy.state
+    SDDRel ψbi
       (uniformDistribution (EvaluatedSliceQuestion params))
       (evaluatedFromFullSliceProductLeft params strategy family)
       (evaluatedFromFullSliceProductRight params strategy family)
       (commDataProcessedGError params gamma zeta)
   fullSliceCommutation :
-    SDDRel strategy.state
+    SDDRel ψbi
       (uniformDistribution (FullSliceQuestion params))
       (fullSliceProductLeft params strategy family)
       (fullSliceProductRight params strategy family)
@@ -111,26 +123,28 @@ structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
 lemma commDataProcessedG
     (params : Parameters)
     (strategy : SymStrat params.next d)
+    (ψbi : QuantumState (d * d))
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params d)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
-    CommDataProcessedGConclusion params strategy family gamma zeta := by
+    CommDataProcessedGConclusion params strategy ψbi family gamma zeta := by
   sorry
 
 /-- `thm:com-main`. -/
 theorem comMain
     (params : Parameters)
     (strategy : SymStrat params.next d)
+    (ψbi : QuantumState (d * d))
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params d)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
-    ComMainConclusion params strategy family gamma zeta := by
+    ComMainConclusion params strategy ψbi family gamma zeta := by
   sorry
 
 /-- `lem:normalization-condition`. -/

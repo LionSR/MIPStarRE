@@ -67,101 +67,103 @@ lemma looksEasyButTookMeAWhile
 /-- `lem:g-complete-self-consistency`. -/
 lemma gCompleteSelfConsistency
     (params : Parameters)
-    (ψ : QuantumState d)
+    (ψ : QuantumState d) (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (zeta : Error)
     (hself : family.StronglySelfConsistent ψ zeta) :
-    GCompleteSelfConsistencyStatement params ψ family zeta := by
+    GCompleteSelfConsistencyStatement params ψbi family zeta := by
   sorry
 
 /-- `cor:g-bot-self-consistency`. -/
 theorem gBotSelfConsistency
     (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (zeta : Error)
-    (hcomplete : GCompleteSelfConsistencyStatement params ψ family zeta) :
-    GBotSelfConsistencyStatement params ψ family zeta := by
+    (hcomplete : GCompleteSelfConsistencyStatement params ψbi family zeta) :
+    GBotSelfConsistencyStatement params ψbi family zeta := by
   sorry
 
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (M : IdxProjSubMeas (Fq params) Outcome d)
     (zeta omega chi : Error)
-    (hselfG : GCompleteSelfConsistencyStatement params ψ family zeta)
-    (hselfM : SDDRel ψ
+    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta)
+    (hselfM : SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
       (switcherooSelfConsistencyLeft params M)
       (switcherooSelfConsistencyRight params M)
       omega)
-    (hcomm : SDDRel ψ
+    (hcomm : SDDRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (switcherooPointProductLeft params family M)
       (switcherooPointProductRight params family M)
       chi) :
-    CommutativitySwitcherooStatement params ψ family M zeta omega chi := by
+    CommutativitySwitcherooStatement params ψbi family M zeta omega chi := by
   sorry
 
 /-- `cor:commuting-with-G-complete`. -/
 theorem commutingWithGComplete
     (params : Parameters)
     (strategy : SymStrat params.next d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (gamma zeta : Error)
-    (hcom : Commutativity.ComMainConclusion params strategy family gamma zeta)
-    (hself : GCompleteSelfConsistencyStatement params strategy.state family zeta) :
-    CommutingWithGCompleteStatement params strategy.state family gamma zeta := by
+    (hcom : Commutativity.ComMainConclusion params strategy ψbi family gamma zeta)
+    (hself : GCompleteSelfConsistencyStatement params ψbi family zeta) :
+    CommutingWithGCompleteStatement params ψbi family gamma zeta := by
   sorry
 
 /-- `cor:commuting-with-G-incomplete`. -/
 theorem commutingWithGIncomplete
     (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (gamma zeta : Error)
-    (hcomm : CommutingWithGCompleteStatement params ψ family gamma zeta) :
-    CommutingWithGIncompleteStatement params ψ family gamma zeta := by
+    (hcomm : CommutingWithGCompleteStatement params ψbi family gamma zeta) :
+    CommutingWithGIncompleteStatement params ψbi family gamma zeta := by
   sorry
 
 /-- `cor:G-hat-facts`. -/
 theorem gHatFacts
     (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (gamma zeta : Error)
-    (hselfComplete : GCompleteSelfConsistencyStatement params ψ family zeta)
-    (hselfIncomplete : GBotSelfConsistencyStatement params ψ family zeta)
-    (hcommComplete : CommutingWithGCompleteStatement params ψ family gamma zeta)
-    (hcommIncomplete : CommutingWithGIncompleteStatement params ψ family gamma zeta) :
-    GHatFactsStatement params ψ family gamma zeta := by
+    (hselfComplete : GCompleteSelfConsistencyStatement params ψbi family zeta)
+    (hselfIncomplete : GBotSelfConsistencyStatement params ψbi family zeta)
+    (hcommComplete : CommutingWithGCompleteStatement params ψbi family gamma zeta)
+    (hcommIncomplete : CommutingWithGIncompleteStatement params ψbi family gamma zeta) :
+    GHatFactsStatement params ψbi family gamma zeta := by
   sorry
 
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
     (params : Parameters)
-    (ψ : QuantumState d)
+    (ψbi : QuantumState (d * d))
     (family : IdxPolyFamily params d)
     (gamma zeta : Error)
     (k : ℕ)
     (hk : 2 ≤ k)
-    (hfacts : GHatFactsStatement params ψ family gamma zeta) :
-    CommuteGHalfSandwichStatement params ψ family gamma zeta k := by
+    (hfacts : GHatFactsStatement params ψbi family gamma zeta) :
+    CommuteGHalfSandwichStatement params ψbi family gamma zeta k := by
   sorry
 
 /-- `lem:ld-sandwich-line-one-point`. -/
 lemma ldSandwichLineOnePoint
     (params : Parameters)
     (strategy : SymStrat params.next d)
+    (ψbi : QuantumState (d * d))
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params d)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
-    (hfacts : GHatFactsStatement params strategy.state family gamma zeta)
+    (hfacts : GHatFactsStatement params ψbi family gamma zeta)
     (k i : ℕ)
     (hi : i < k) :
     LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i := by
@@ -201,6 +203,7 @@ lemma overAllOutcomes
 lemma fromHToG
     (params : Parameters)
     (strategy : SymStrat params.next d)
+    (ψbi : QuantumState (d * d))
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params d)
@@ -208,7 +211,7 @@ lemma fromHToG
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
     (k : ℕ)
-    (hhalf : CommuteGHalfSandwichStatement params strategy.state family gamma zeta k) :
+    (hhalf : CommuteGHalfSandwichStatement params ψbi family gamma zeta k) :
     FromHToGStatement params strategy family gamma zeta k := by
   sorry
 
