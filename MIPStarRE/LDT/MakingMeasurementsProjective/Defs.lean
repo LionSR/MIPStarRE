@@ -16,8 +16,6 @@ not only tagged by placeholder operator names but also admit honest
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT

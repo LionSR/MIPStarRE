@@ -11,8 +11,6 @@ All operator fields now use `Op ι` directly with a generic `Fintype` index `ι`
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.LDT
 
 /-- Invariance predicate for the symmetric shared state.
@@ -201,7 +199,7 @@ def averagedSubMeas {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq
   total := 0
 
 /-- Evaluate the slice family at a point `(u, x)` in `F_q^{m+1}`. -/
-def evaluatedAtNextPoint {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def evaluatedAtNextPoint {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (Point params.next) (Fq params) ι :=
   fun u =>

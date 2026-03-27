@@ -174,10 +174,6 @@ noncomputable def orthogonalModeVector (params : Parameters)
     MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance)) :=
   0
 
-/-- The operator `A_⊥` from the decomposition of `A_combine`. -/
-noncomputable def orthogonalComponentOperator (params : Parameters)
-    (_A : Point params → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  0  -- placeholder
 
 /-- The trace witness from `lem:local-rewrite`.
 TODO(tensor): uses placeholder product instead of formalTensor since dimensions differ. -/

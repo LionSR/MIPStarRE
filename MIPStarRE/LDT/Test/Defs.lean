@@ -14,8 +14,6 @@ All operator fields now use `Op ι` directly with a generic `Fintype` index `ι`
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.LDT
 
 /-- Evaluate a polynomial-valued submeasurement at a point. -/
@@ -73,39 +71,39 @@ noncomputable def qSSCDefect {Outcome : Type*} {ι : Type*} [Fintype ι] [Decida
   max 0 (totalMass - diagonalMass)
 
 /-- Averaged off-diagonal mass for consistency statements. -/
-def consError {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def consError {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome ι) : Error :=
   avgOver 𝒟 (fun q => qConsDefect ψ (A q) (B q))
 
 /-- Averaged squared distance for `≈_δ`. -/
-def sddError {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def sddError {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome ι) : Error :=
   avgOver 𝒟 (fun q => qSDD ψ (A q) (B q))
 
 /-- Averaged defect in strong self-consistency. -/
-def sscError {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def sscError {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) : Error :=
   avgOver 𝒟 (fun q => qSSCDefect ψ (A q))
 
 /-- Total mass of a submeasurement on state `ψ`, computed from the concrete total operator. -/
-def subMeasMass {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def subMeasMass {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι) : Error :=
   ev ψ A.total
 
 /-- Averaged total mass of an indexed submeasurement. -/
-def idxSubMeasMass {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def idxSubMeasMass {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) : Error :=
   avgOver 𝒟 (fun q => subMeasMass ψ (A q))
 
 /-- Defect in domination by an operator witness, measured at the expectation-value level. -/
-def bndError {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def bndError {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι)
     (Z : MIPStarRE.Quantum.Op ι) : Error :=
   max 0 (subMeasMass ψ A - ev ψ Z)

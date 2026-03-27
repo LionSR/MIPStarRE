@@ -8,8 +8,6 @@ Output structures for Naimark dilation, orthonormalization, and projectivization
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT

@@ -8,8 +8,6 @@ The main formal output of the low individual degree test (`thm:main-formal`).
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.LDT
 
 namespace Test

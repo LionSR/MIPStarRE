@@ -16,7 +16,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-noncomputable section
 
 /-- Operator domination, written in source order as `X ≤ Y`. -/
 abbrev OperatorDominatedBy (X Y : MIPStarRE.Quantum.Op ι) : Prop :=

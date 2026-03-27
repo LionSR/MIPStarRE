@@ -9,8 +9,6 @@ finite field coding, coordinate arithmetic, lines, polynomial models, and answer
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.LDT
 
 abbrev Error := ℝ
@@ -318,7 +316,7 @@ theorem hasLowIndividualDegree {params : Parameters} (g : Polynomial params) :
   rfl
 
 /-- Extend a global polynomial to the slice at height `x` by ignoring the new variable. -/
-def appendAtHeight (params : Parameters)
+noncomputable def appendAtHeight (params : Parameters)
     (g : Polynomial params) (_x : Fq params) : Polynomial params.next where
   poly := MvPolynomial.rename (embedCoord params) g.poly
   lowIndividualDegree := by
@@ -343,7 +341,7 @@ def appendAtHeight (params : Parameters)
       omega
 
 /-- Coordinate map for restricting a polynomial in `m+1` variables to the slice `X_m = x`. -/
-def restrictAtHeightCoordinateMap (params : Parameters) (x : Fq params) :
+noncomputable def restrictAtHeightCoordinateMap (params : Parameters) (x : Fq params) :
     Fin params.next.m → PolynomialModel params :=
   fun i =>
     if h : i.1 < params.m then
@@ -352,7 +350,7 @@ def restrictAtHeightCoordinateMap (params : Parameters) (x : Fq params) :
       MvPolynomial.C (decodeScalar x)
 
 /-- Restrict a global polynomial in `m + 1` variables to the slice at height `x`. -/
-def restrictAtHeight (params : Parameters)
+noncomputable def restrictAtHeight (params : Parameters)
     (g : Polynomial params.next) (x : Fq params) : Polynomial params where
   poly := MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params x) g.poly
   lowIndividualDegree := by
@@ -360,7 +358,7 @@ def restrictAtHeight (params : Parameters)
     sorry
 
 /-- Coordinate polynomial for restricting to an axis-parallel affine line. -/
-def axisCoordinatePolynomial (params : Parameters) (ℓ : AxisParallelLine params) :
+noncomputable def axisCoordinatePolynomial (params : Parameters) (ℓ : AxisParallelLine params) :
     Fin params.m → LinePolynomialModel params :=
   fun i =>
     if i = ℓ.direction then
@@ -369,21 +367,21 @@ def axisCoordinatePolynomial (params : Parameters) (ℓ : AxisParallelLine param
       _root_.Polynomial.C (decodeScalar (ℓ.base i))
 
 /-- Restrict a global polynomial to an axis-parallel line. -/
-def restrictToAxisParallelLine (params : Parameters)
+noncomputable def restrictToAxisParallelLine (params : Parameters)
     (g : Polynomial params) (ℓ : AxisParallelLine params) : AxisLinePolynomial params where
   poly := MvPolynomial.eval₂Hom _root_.Polynomial.C (axisCoordinatePolynomial params ℓ) g.poly
   degreeBounded := by
     sorry
 
 /-- Coordinate polynomial for restricting to a diagonal affine line. -/
-def diagonalCoordinatePolynomial (params : Parameters) (ℓ : DiagonalLine params) :
+noncomputable def diagonalCoordinatePolynomial (params : Parameters) (ℓ : DiagonalLine params) :
     Fin params.m → LinePolynomialModel params :=
   fun i =>
     _root_.Polynomial.C (decodeScalar (ℓ.base i)) +
       _root_.Polynomial.C (decodeScalar (ℓ.direction i)) * _root_.Polynomial.X
 
 /-- Restrict a global polynomial to a diagonal line. -/
-def restrictToDiagonalLine (params : Parameters)
+noncomputable def restrictToDiagonalLine (params : Parameters)
     (g : Polynomial params) (ℓ : DiagonalLine params) : DiagonalLinePolynomial params where
   poly := MvPolynomial.eval₂Hom _root_.Polynomial.C (diagonalCoordinatePolynomial params ℓ) g.poly
   degreeBounded := by

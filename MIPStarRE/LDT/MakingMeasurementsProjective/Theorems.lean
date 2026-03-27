@@ -8,8 +8,6 @@ Theorem stubs for Naimark dilation and orthonormalization.
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT

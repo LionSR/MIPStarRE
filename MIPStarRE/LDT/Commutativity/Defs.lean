@@ -17,21 +17,19 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-noncomputable section
-
 abbrev EvaluatedSliceQuestion (params : Parameters) := Point params.next × Point params.next
 abbrev EvaluatedSliceOutcome (params : Parameters) := Fq params × Fq params
 abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
 abbrev FullSliceOutcome (params : Parameters) := Polynomial params × Polynomial params
 
 /-- Ordered product placed on the left tensor factor of the bipartite space `ι × ι`. -/
-def leftOrderedProductSubMeas {α β : Type*}
+noncomputable def leftOrderedProductSubMeas {α β : Type*}
     (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas (α × β) (ι × ι) :=
   leftPlacedSubMeas (ιB := ι) (orderedProductSubMeas A B)
 
 /-- Append a total operator on the right of every outcome operator. -/
-def appendRightTotalSubMeas {α : Type*} {κ : Type*} [Fintype κ] [DecidableEq κ]
+noncomputable def appendRightTotalSubMeas {α : Type*} {κ : Type*} [Fintype κ] [DecidableEq κ]
     (A : SubMeas α κ) (X : MIPStarRE.Quantum.Op κ) : SubMeas α κ where
   outcome := fun a => A.outcome a * X
   total := A.total * X
@@ -56,40 +54,40 @@ def fullSliceQuestionOfEvaluatedSlice (params : Parameters)
   (pointHeight params q.1, pointHeight params q.2)
 
 /-- The postprocessed family `((u,x) ↦ G^x_[g(u)=a])`. -/
-def evaluatedPointFamily (params : Parameters)
+noncomputable def evaluatedPointFamily (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (Point params.next) (Fq params) ι :=
   IdxPolyFamily.evaluatedAtNextPoint family
 
 /-- Left tensor-placement for the evaluated family `G^x_[g(u)=a]`
 on the bipartite space `d * d`. -/
-def evaluatedPointFamilyLeft (params : Parameters)
+noncomputable def evaluatedPointFamilyLeft (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
   fun u => leftPlacedSubMeas (ιB := ι) (evaluatedPointFamily params family u)
 
 /-- Right tensor-placement for the evaluated family `G^x_[g(u)=a]`
 on the bipartite space `d * d`. -/
-def evaluatedPointFamilyRight (params : Parameters)
+noncomputable def evaluatedPointFamilyRight (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
   fun u => rightPlacedSubMeas (ιA := ι) (evaluatedPointFamily params family u)
 
 /-- The first evaluated factor `G^x_[g(u)=a]`. -/
-def evaluatedSliceFirstFactor (params : Parameters)
+noncomputable def evaluatedSliceFirstFactor (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (Fq params) ι :=
   fun q => evaluatedPointFamily params family q.1
 
 /-- The second evaluated factor `G^y_[h(v)=b]`. -/
-def evaluatedSliceSecondFactor (params : Parameters)
+noncomputable def evaluatedSliceSecondFactor (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (Fq params) ι :=
   fun q => evaluatedPointFamily params family q.2
 
 /-- The ordered evaluated-slice product `(G^x_[g(u)=a] G^y_[h(v)=b]) ⊗ I`
 on the bipartite space `d * d`. -/
-def evaluatedSliceProductLeft (params : Parameters)
+noncomputable def evaluatedSliceProductLeft (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -99,7 +97,7 @@ def evaluatedSliceProductLeft (params : Parameters)
 
 /-- The reversed evaluated-slice product `(G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`
 on the bipartite space `d * d`. -/
-def evaluatedSliceProductRight (params : Parameters)
+noncomputable def evaluatedSliceProductRight (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -110,7 +108,7 @@ def evaluatedSliceProductRight (params : Parameters)
 
 /-- The sandwiched evaluated product `(G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`
 on the bipartite space `d * d`. -/
-def evaluatedSliceSandwichFirstFactor (params : Parameters)
+noncomputable def evaluatedSliceSandwichFirstFactor (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -133,7 +131,7 @@ def fullSliceSecondFactor (params : Parameters)
 
 /-- The ordered full-slice product `(G^x_g G^y_h) ⊗ I`
 on the bipartite space `d * d`. -/
-def fullSliceProductLeft (params : Parameters)
+noncomputable def fullSliceProductLeft (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -143,7 +141,7 @@ def fullSliceProductLeft (params : Parameters)
 
 /-- The reversed full-slice product `(G^y_h G^x_g) ⊗ I`
 on the bipartite space `d * d`. -/
-def fullSliceProductRight (params : Parameters)
+noncomputable def fullSliceProductRight (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -161,7 +159,7 @@ def evaluateFullSliceOutcomeAtQuestion (params : Parameters)
 
 /-- Postprocess the full-slice ordered product at sampled points.
 On the bipartite space `d * d`. -/
-def evaluatedFromFullSliceProductLeft (params : Parameters)
+noncomputable def evaluatedFromFullSliceProductLeft (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -171,7 +169,7 @@ def evaluatedFromFullSliceProductLeft (params : Parameters)
 
 /-- Postprocess the full-slice reversed product at sampled points.
 On the bipartite space `d * d`. -/
-def evaluatedFromFullSliceProductRight (params : Parameters)
+noncomputable def evaluatedFromFullSliceProductRight (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -181,7 +179,7 @@ def evaluatedFromFullSliceProductRight (params : Parameters)
 
 /-- Internal stability family from the `G^y` insertion/removal step.
 On the bipartite space `d * d`. -/
-def commDataProcessedGStabilityOneLeft (params : Parameters)
+noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -192,14 +190,14 @@ def commDataProcessedGStabilityOneLeft (params : Parameters)
 
 /-- Internal stability family after removing the trailing `G^y`.
 On the bipartite space `d * d`. -/
-def commDataProcessedGStabilityOneRight (params : Parameters)
+noncomputable def commDataProcessedGStabilityOneRight (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q => evaluatedSliceSandwichFirstFactor params strategy family q
 
 /-- Internal stability family from the `G^x` insertion/removal step.
 On the bipartite space `d * d`. -/
-def commDataProcessedGStabilityTwoLeft (params : Parameters)
+noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -210,7 +208,7 @@ def commDataProcessedGStabilityTwoLeft (params : Parameters)
 
 /-- Internal stability family after removing the trailing `G^x`.
 On the bipartite space `d * d`. -/
-def commDataProcessedGStabilityTwoRight (params : Parameters)
+noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q => evaluatedSliceProductLeft params strategy family q
@@ -219,7 +217,7 @@ def commDataProcessedGStabilityTwoRight (params : Parameters)
 
 We propagate explicit `matrix` from the input operators so that
 the sum `∑_b C_{a,b}` accumulates correctly. -/
-def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type*}
+noncomputable def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type*}
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι)
     (a : OutcomeA) (b : OutcomeB) : MIPStarRE.Quantum.Op ι :=
   Q.outcome b * P.outcome a * Q.outcome b
@@ -235,21 +233,21 @@ noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Ty
         ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b }
 
 /-- The total family `a ↦ ∑_b C_{a,b}` from `lem:normalization-condition`. -/
-def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type*}
+noncomputable def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) :
     IdxSubMeas OutcomeA Unit ι :=
   fun a => postprocess (normalizationConditionSandwichedFamily P Q a) (fun _ => ())
 
 /-- The formal operator `∑_b C_{a,b}` from `lem:normalization-condition`. -/
-def normalizationConditionSandwichedTotalOperator {OutcomeA OutcomeB : Type*}
+noncomputable def normalizationConditionSandwichedTotalOperator {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι)
     (a : OutcomeA) : MIPStarRE.Quantum.Op ι :=
   (normalizationConditionSandwichedTotalFamily P Q a).total
 
 /-- The family `a ↦ (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
-def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
+noncomputable def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) :
     SubMeas OutcomeA ι where
@@ -262,7 +260,7 @@ def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
         (normalizationConditionSandwichedTotalOperator P Q a)ᴴ
 
 /-- The family `a ↦ (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
-def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
+noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) :
     SubMeas OutcomeA ι where
@@ -275,13 +273,13 @@ def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
         normalizationConditionSandwichedTotalOperator P Q a
 
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
-def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type*}
+noncomputable def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) : MIPStarRE.Quantum.Op ι :=
   (normalizationConditionSquareFamily P Q).total
 
 /-- The operator `∑_a (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
-def normalizationConditionAdjointSquareOperator {OutcomeA OutcomeB : Type*}
+noncomputable def normalizationConditionAdjointSquareOperator {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) : MIPStarRE.Quantum.Op ι :=
   (normalizationConditionAdjointSquareFamily P Q).total
@@ -291,7 +289,5 @@ def normalizationConditionIdentityBound {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
     (_P : SubMeas OutcomeA ι) (_Q : ProjSubMeas OutcomeB ι) : MIPStarRE.Quantum.Op ι :=
   1
-
-end
 
 end MIPStarRE.LDT.Commutativity

@@ -17,8 +17,6 @@ formalization.
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.Quantum
 
 variable {d : Type*} [Fintype d] [DecidableEq d]
@@ -50,14 +48,14 @@ namespace Submeasurement
 variable {α β : Type*} [Fintype α] [Fintype β]
 
 /-- The total operator `∑ a, M_a`. -/
-def total (M : Submeasurement α d) : Op d :=
+noncomputable def total (M : Submeasurement α d) : Op d :=
   ∑ a, M.effect a
 
 /--
 Data processing: relabel the answer set by `f : α → β`, summing the effects over
 fibers.
 -/
-def postprocess [DecidableEq α] [DecidableEq β]
+noncomputable def postprocess [DecidableEq α] [DecidableEq β]
     (M : Submeasurement α d) (f : α → β) : Submeasurement β d where
   effect b := ∑ a ∈ Finset.univ.filter (fun a => f a = b), M.effect a
   pos b := Finset.sum_nonneg fun a _ => M.pos a
@@ -76,11 +74,11 @@ section Overlap
 variable {α : Type*} [Fintype α] [DecidableEq α]
 
 /-- The off-diagonal overlap mass `∑_{a ≠ b} τ(M_a N_b)`. -/
-def inconsistency (M N : α → Op d) : ℂ :=
+noncomputable def inconsistency (M N : α → Op d) : ℂ :=
   ∑ a, ∑ b ∈ Finset.univ.filter (fun b => b ≠ a), normalizedTrace (M a * N b)
 
 /-- The diagonal overlap mass `∑_a τ(M_a N_a)`. -/
-def diagOverlap (M N : α → Op d) : ℂ :=
+noncomputable def diagOverlap (M N : α → Op d) : ℂ :=
   ∑ a, normalizedTrace (M a * N a)
 
 end Overlap
