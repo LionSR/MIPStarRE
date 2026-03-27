@@ -15,8 +15,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-noncomputable section
-
 /-- The final completeness lower bound used in the pasting statements. -/
 noncomputable def ldPastingCompletenessLowerBound (params : Parameters)
     (kappa nu : Error) (k : ℕ) : Error :=
@@ -344,8 +342,5 @@ structure LdPastingNCompletenessStatement (params : Parameters)
     CompletenessAtLeast strategy.state
       (constructedPastedSubMeas params family k).liftLeft
       (ldPastingCompletenessLowerBound params kappa nu k)
-
-
-end
 
 end MIPStarRE.LDT.Pasting

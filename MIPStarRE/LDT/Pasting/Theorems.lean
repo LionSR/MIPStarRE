@@ -15,8 +15,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-noncomputable section
-
 /-- `thm:ld-pasting`. -/
 theorem ldPasting
     (params : Parameters)
@@ -246,7 +244,5 @@ theorem ldPastingNCompleteness
     LdPastingNCompletenessStatement params strategy family kappa
       (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
   sorry
-
-end
 
 end MIPStarRE.LDT.Pasting

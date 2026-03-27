@@ -192,11 +192,18 @@ structure IdxPolyFamily (params : Parameters) (ι : Type*) [Fintype ι] [Decidab
 
 namespace IdxPolyFamily
 
-/-- Placeholder averaged submeasurement `G = E_x G^x` from the paper. -/
-def averagedSubMeas {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (_family : IdxPolyFamily params ι) : SubMeas (Polynomial params) ι where
-  outcome := fun _ => 0
-  total := 0
+/-- The averaged submeasurement `G = E_x G^x`: average the slice
+measurements over the uniform distribution on slice heights `x ∈ F_q`. -/
+noncomputable def averagedSubMeas {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (family : IdxPolyFamily params ι) :
+    SubMeas (Polynomial params) ι where
+  outcome := fun g =>
+    let 𝒟 := uniformDistribution (Fq params)
+    ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.outcome g
+  total :=
+    let 𝒟 := uniformDistribution (Fq params)
+    ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.total
 
 /-- Evaluate the slice family at a point `(u, x)` in `F_q^{m+1}`. -/
 noncomputable def evaluatedAtNextPoint {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
