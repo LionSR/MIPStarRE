@@ -16,8 +16,8 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Output package for `lem:generalize-b`.
-`ψbi` is the bipartite state on `d * d`.
-TODO(bipartite): derive from strategy once SymStrat has bipartite dims. -/
+`ψbi` is the bipartite state on `d * d` (passed as `strategy.state`
+by callers). -/
 structure GeneralizeBStatement (params : Parameters)
     (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
     (G : SubMeas (Polynomial params) ι) : Prop where

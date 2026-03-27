@@ -70,10 +70,10 @@ lemma looksEasyButTookMeAWhile
 /-- `lem:g-complete-self-consistency`. -/
 lemma gCompleteSelfConsistency
     (params : Parameters)
-    (ψ : QuantumState ι) (ψbi : QuantumState (ι × ι))
+    (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (zeta : Error)
-    (hself : family.StronglySelfConsistent ψ zeta) :
+    (hself : family.StronglySelfConsistent ψbi zeta) :
     GCompleteSelfConsistencyStatement params ψbi family zeta := by
   sorry
 
@@ -115,7 +115,7 @@ theorem commutingWithGComplete
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
-    (hcom : Commutativity.ComMainConclusion params strategy ψbi family gamma zeta)
+    (hcom : Commutativity.ComMainConclusion params strategy family gamma zeta)
     (hself : GCompleteSelfConsistencyStatement params ψbi family zeta) :
     CommutingWithGCompleteStatement params ψbi family gamma zeta := by
   sorry
@@ -225,7 +225,7 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (hθ0 : 0 < theta) (hθ1 : theta < 1)
     (hk : (2 * (degree : Error)) / theta ≤ (k : Error))
     (hXpsd : 0 ≤ X)
-    (hXleOne : 0 ≤ operatorComplement X)
+    (hXleOne : 0 ≤ 1 - X)
     (hcomplete : CompletenessAtLeast ψ (operatorAsSubMeas X) (1 - kappa)) :
     ChernoffBernoulliMatrixStatement ψ theta k degree X kappa := by
   sorry

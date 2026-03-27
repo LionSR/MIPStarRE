@@ -118,8 +118,8 @@ structure LdPastingConclusion (params : Parameters)
     H = constructedPastedMeasurement params family k
   pointConsistency :
     ConsWithPolyEval params.next strategy.state
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      H.toSubMeas
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+      H.toSubMeas.liftLeft
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta)
 
@@ -134,19 +134,19 @@ structure LdPastingSubMeasConclusion (params : Parameters)
     H = constructedPastedSubMeas params family k
   pointConsistency :
     ConsWithPolyEval params.next strategy.state
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      H
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+      H.liftLeft
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta)
   completeness :
-    CompletenessAtLeast strategy.state H
+    CompletenessAtLeast strategy.state H.liftLeft
       (ldPastingCompletenessLowerBound params kappa
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta) k)
 
 /-- Output package for `lem:g-complete-self-consistency`.
-`ψbi` is the bipartite state on `d * d`.
-TODO(bipartite): derive from strategy once SymStrat has bipartite dims. -/
+`ψbi` is the bipartite state on `d * d` (passed as `strategy.state`
+by callers). -/
 structure GCompleteSelfConsistencyStatement (params : Parameters)
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
@@ -269,8 +269,10 @@ structure LdSandwichLineOnePointStatement (params : Parameters)
   linePointComparison :
     ConsRel strategy.state
       (uniformDistribution (SandwichedLineQuestion params k))
-      (ldSandwichLineOnePointLeftFamily params strategy family k i)
-      (ldSandwichLineOnePointRightFamily params strategy family k i)
+      (IdxSubMeas.liftLeft
+        (ldSandwichLineOnePointLeftFamily params strategy family k i))
+      (IdxSubMeas.liftLeft
+        (ldSandwichLineOnePointRightFamily params strategy family k i))
       (ldSandwichLineOnePointError params eps delta gamma zeta k)
 
 /-- Output package for `lem:h-b-consistency`. -/
@@ -281,8 +283,11 @@ structure HBConsistencyStatement (params : Parameters)
   lineConsistency :
     ConsRel strategy.state
       (uniformDistribution (VerticalLineQuestion params))
-      (hRestrictionToVerticalLine params (constructedPastedSubMeas params family k))
-      (verticalLineMeasurementFamily params strategy)
+      (IdxSubMeas.liftLeft
+        (hRestrictionToVerticalLine params
+          (constructedPastedSubMeas params family k)))
+      (IdxSubMeas.liftLeft
+        (verticalLineMeasurementFamily params strategy))
       (hBConsistencyError params eps delta gamma zeta k)
 
 /-- Output package for `lem:over-all-outcomes`. -/
@@ -292,8 +297,10 @@ structure OverAllOutcomesStatement (params : Parameters)
     (eps delta gamma zeta : Error) (k : ℕ) : Prop where
   totalOutcomeExpansion :
     SDDRel strategy.state (uniformDistribution Unit)
-      (constructedPastedMeasurementTotal params family k)
-      (allOutcomesExpansionFamily params strategy family k)
+      (IdxSubMeas.liftLeft
+        (constructedPastedMeasurementTotal params family k))
+      (IdxSubMeas.liftLeft
+        (allOutcomesExpansionFamily params strategy family k))
       (overAllOutcomesError params eps delta gamma zeta k)
 
 /-- Output package for `lem:from-H-to-G`. -/
@@ -304,13 +311,17 @@ structure FromHToGStatement (params : Parameters)
   recurrenceStep :
     ∀ ℓ : ℕ, ℓ < k →
       SDDRel strategy.state (uniformDistribution Unit)
-        (fromHToGRecurrenceLeftFamily params strategy family k ℓ)
-        (fromHToGRecurrenceRightFamily params strategy family k ℓ)
+        (IdxSubMeas.liftLeft
+          (fromHToGRecurrenceLeftFamily params strategy family k ℓ))
+        (IdxSubMeas.liftLeft
+          (fromHToGRecurrenceRightFamily params strategy family k ℓ))
         (fromHToGRecurrenceError params gamma zeta k)
   bernoulliPolynomialRewrite :
     SDDRel strategy.state (uniformDistribution Unit)
-      (allOutcomesExpansionFamily params strategy family k)
-      (bernoulliTailFromFamily params family k)
+      (IdxSubMeas.liftLeft
+        (allOutcomesExpansionFamily params strategy family k))
+      (IdxSubMeas.liftLeft
+        (bernoulliTailFromFamily params family k))
       (fromHToGError params gamma zeta k)
 
 /-- Output package for `lem:chernoff-bernoulli-matrix`. -/
@@ -329,7 +340,7 @@ structure LdPastingNCompletenessStatement (params : Parameters)
   largeEnough : 400 * params.m * params.d ≤ k
   completenessBound :
     CompletenessAtLeast strategy.state
-      (constructedPastedSubMeas params family k)
+      (constructedPastedSubMeas params family k).liftLeft
       (ldPastingCompletenessLowerBound params kappa nu k)
 
 

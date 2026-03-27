@@ -22,8 +22,7 @@ structure PermInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Paper-local symmetric strategy data. -/
 structure SymStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
-  state : QuantumState ι
-  statePermutationInvariant : PermInvState state := ⟨trivial⟩
+  state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurement :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
@@ -34,7 +33,6 @@ instance {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (SymStrat params ι) where
   default := {
     state := default
-    statePermutationInvariant := ⟨trivial⟩
     pointMeasurement := default
     axisParallelMeasurement := default
     diagonalMeasurement := default
@@ -84,7 +82,7 @@ noncomputable def diagonalLineAnswerFamily {params : Parameters}
 
 /-- Paper-local (not necessarily symmetric) projective strategy data. -/
 structure ProjStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
-  state : QuantumState ι
+  state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
   pointMeasurementA : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurementA :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
@@ -99,31 +97,34 @@ structure ProjStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq
 
 namespace SymStrat
 
-/-- Trace-based failure surrogate for the axis-parallel lines test. -/
+/-- Trace-based failure surrogate for the axis-parallel lines test.
+Measurements are lifted to the left tensor factor of the bipartite state. -/
 noncomputable def axisParallelFailureProbability {params : Parameters}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   consError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
-    (axisParallelPointAnswerFamily strategy)
-    (axisParallelLineAnswerFamily strategy)
+    (IdxSubMeas.liftLeft (axisParallelPointAnswerFamily strategy))
+    (IdxSubMeas.liftLeft (axisParallelLineAnswerFamily strategy))
 
-/-- Trace-based failure surrogate for the self-consistency test. -/
+/-- Trace-based failure surrogate for the self-consistency test.
+Measurements are lifted to the left tensor factor of the bipartite state. -/
 noncomputable def selfConsistencyFailureProbability {params : Parameters}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   sscError strategy.state
     (uniformDistribution (Point params))
-    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+    (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
 
-/-- Trace-based failure surrogate for the diagonal lines test. -/
+/-- Trace-based failure surrogate for the diagonal lines test.
+Measurements are lifted to the left tensor factor of the bipartite state. -/
 noncomputable def diagonalFailureProbability {params : Parameters}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   consError strategy.state
     (uniformDistribution (DiagonalTestSample params))
-    (diagonalPointAnswerFamily strategy)
-    (diagonalLineAnswerFamily strategy)
+    (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+    (IdxSubMeas.liftLeft (diagonalLineAnswerFamily strategy))
 
 /-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
 structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -164,8 +165,8 @@ noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
   let pointAgreement :=
     consError strategy.state
       (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementB)
   let axisParallelBranch :=
     pointAgreement
       + (left.axisParallelFailureProbability + right.axisParallelFailureProbability) / 2
@@ -208,34 +209,35 @@ def evaluatedAtNextPoint {params : Parameters} {ι : Type*} [Fintype ι] [Decida
 
 structure Complete {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
-    (ψ : QuantumState ι) (kappa : Error) : Prop where
+    (ψ : QuantumState (ι × ι)) (kappa : Error) : Prop where
   averageCompleteness :
-    CompletenessAtLeast ψ family.averagedSubMeas (1 - kappa)
+    CompletenessAtLeast ψ family.averagedSubMeas.liftLeft (1 - kappa)
 
 structure ConsistentWithPoints {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
     (strategy : SymStrat params.next ι) (zeta : Error) : Prop where
   pointConsistency :
     ConsRel strategy.state (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      family.evaluatedAtNextPoint
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+      (IdxSubMeas.liftLeft family.evaluatedAtNextPoint)
       zeta
 
 structure StronglySelfConsistent {params : Parameters}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
-    (ψ : QuantumState ι) (zeta : Error) : Prop where
+    (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop where
   sliceSelfConsistency :
     SSCRel ψ (uniformDistribution (Fq params))
-      (IdxProjSubMeas.toIdxSubMeas family.meas)
+      ((IdxProjSubMeas.toIdxSubMeas family.meas).liftLeft)
       zeta
 
 structure Bounded {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
-    (ψ : QuantumState ι) (zeta : Error) : Prop where
+    (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop where
   sliceOpPSD : ∀ x, 0 ≤ family.witness x
   sliceBoundedness :
-    ∀ x, BoundedByOperator ψ ((family.meas x).toSubMeas) (family.witness x) zeta
+    ∀ x, BoundedByOperator ψ ((family.meas x).toSubMeas.liftLeft)
+      (leftTensor (ι₂ := ι) (family.witness x)) zeta
   sliceDominatesTarget :
     ∀ x : Fq params, ∀ g : Polynomial params,
       0 ≤ family.witness x - family.dominationTarget x g

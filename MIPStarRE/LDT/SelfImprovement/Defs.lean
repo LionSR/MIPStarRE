@@ -20,9 +20,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- The identity operator on the polynomial register. -/
-def polynomialIdentityOperator (_params : Parameters) : MIPStarRE.Quantum.Op ι :=
-  1
+
 
 /-- The pointwise operator `A^u_{g(u)}` entering the SDP average `A_g`. -/
 def averagedPointOperatorContribution (params : Parameters)

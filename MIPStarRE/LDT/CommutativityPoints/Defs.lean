@@ -18,21 +18,7 @@ abbrev PointDiagonalLineQuestion (params : Parameters) := DiagonalLine params ×
 abbrev PointPairDiagonalLineQuestion (params : Parameters) :=
   DiagonalLine params × (Fq params × Fq params)
 
-/-- Place a submeasurement on the left tensor factor of `ιA × ιB`. -/
-def leftPlacedSubMeas {α : Type*}
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : SubMeas α ιA) :
-    SubMeas α (ιA × ιB) where
-  outcome := fun a => leftTensor (ι₂ := ιB) (A.outcome a)
-  total := leftTensor (ι₂ := ιB) A.total
-
-/-- Place a submeasurement on the right tensor factor of `ιA × ιB`. -/
-def rightPlacedSubMeas {α : Type*}
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : SubMeas α ιB) :
-    SubMeas α (ιA × ιB) where
-  outcome := fun a => rightTensor (ι₁ := ιA) (A.outcome a)
-  total := rightTensor (ι₁ := ιA) A.total
+-- leftPlacedSubMeas / rightPlacedSubMeas are defined in Basic/SubMeasurement.lean
 
 /-- Ordered product of two paper-local submeasurements on the same tensor factor. -/
 noncomputable def orderedProductSubMeas {α β : Type*}
@@ -163,9 +149,8 @@ noncomputable def diagonalLineProductReversed (params : Parameters)
     let tv := q.2.2
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
-    -- BUG: this is identical to diagonalLineProductOrdered, needs fix (see PR #46 review)
     rightPlacedSubMeas (ιA := ι) <|
-      orderedProductSubMeas Lu Lv
+      reversedProductSubMeas Lu Lv
 
 /-- The mixed bridge `A^v_b ⊗ L^ℓ_[f(u)=a]` on the bipartite space `ι × ι`. -/
 noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)

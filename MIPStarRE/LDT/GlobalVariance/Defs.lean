@@ -54,7 +54,8 @@ noncomputable def polynomialWeightSqrtOperator (params : Parameters)
 -- TODO: placeholder — density left at defaults until tensor product model is provided.
 noncomputable def weightedPolynomialState (params : Parameters)
     (strategy : SymStrat params ι)
-    (_G : SubMeas (Polynomial params) ι) (_g : Polynomial params) : QuantumState ι :=
+    (_G : SubMeas (Polynomial params) ι) (_g : Polynomial params) :
+    QuantumState (ι × ι) :=
   strategy.state
 
 /-- The concrete operator `A^u_{g(u)}` for a fixed polynomial `g`. -/
@@ -79,22 +80,26 @@ noncomputable def weightedPointConditionedOperatorAtPolynomial (params : Paramet
     (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
     (polynomialWeightSqrtOperator params G g)
 
-/-- The local variance of `A(g)` on the weighted state `|ψ_g⟩`. -/
+/-- The local variance of `A(g)` on the weighted state `|ψ_g⟩`.
+Operators are lifted to the left tensor factor of the bipartite state. -/
 noncomputable def pointConditionedLocalVarianceAtPolynomial (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) : Error :=
   localVariance params
-    (pointConditionedOperatorFamilyAtPolynomial params strategy g)
+    (fun u => leftTensor (ι₂ := ι)
+      (pointConditionedOperatorFamilyAtPolynomial params strategy g u))
     (weightedPolynomialState params strategy G g)
 
-/-- The global variance of `A(g)` on the weighted state `|ψ_g⟩`. -/
+/-- The global variance of `A(g)` on the weighted state `|ψ_g⟩`.
+Operators are lifted to the left tensor factor of the bipartite state. -/
 noncomputable def pointConditionedGlobalVarianceAtPolynomial (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) : Error :=
   globalVariance params
-    (pointConditionedOperatorFamilyAtPolynomial params strategy g)
+    (fun u => leftTensor (ι₂ := ι)
+      (pointConditionedOperatorFamilyAtPolynomial params strategy g u))
     (weightedPolynomialState params strategy G g)
 
 /-- The polynomial-averaged local variance of the conditioned points family. -/

@@ -20,8 +20,8 @@ theorem mainInduction
     (hk : params.m * params.d ≤ k) :
     ∃ G : Measurement (Polynomial params) ι,
       ConsWithPolyEval params strategy.state
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        G.toSubMeas
+        (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+        G.toSubMeas.liftLeft
         (mainInductionError params k eps delta gamma) := by
   sorry
 
@@ -33,7 +33,8 @@ theorem selfImprovementInInductionSection
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
     (hcons : ConsWithPolyEval params strategy.state
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) G nu) :
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+      G.liftLeft nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   sorry

@@ -33,16 +33,16 @@ theorem mainFormal
     (hk : params.m * params.d ≤ k) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsWithPolyEval params strategy.state
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-          G_B.toSubMeas
+          (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementA)
+          G_B.toSubMeas.liftLeft
           (mainFormalError params k eps) ∧
         ConsWithPolyEval params strategy.state
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-          G_A.toSubMeas
+          (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementB)
+          G_A.toSubMeas.liftLeft
           (mainFormalError params k eps) ∧
         PolyMeasCons params strategy.state
-          G_A.toSubMeas
-          G_B.toSubMeas
+          G_A.toSubMeas.liftLeft
+          G_B.toSubMeas.liftLeft
           (mainFormalError params k eps) := by
   sorry
 

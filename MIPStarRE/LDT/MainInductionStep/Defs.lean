@@ -145,26 +145,6 @@ noncomputable def averagedSlicePointEvaluationOperator (params : Parameters)
   averageOperatorOverDistribution' (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
 
-/-- Lift a submeasurement to the left tensor factor of a bipartite space `dA * dB`.
-
-Each outcome operator `A_a : MIPStarRE.Quantum.Op ιA` becomes `A_a ⊗ I_{dB} : Operator (dA * dB)`.
-NOTE: duplicated from CommutativityPoints; should be factored into a shared
-utility once the import graph permits it. -/
-def leftPlacedSubMeas {α : Type*}
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : SubMeas α ιA) :
-    SubMeas α (ιA × ιB) where
-  outcome := fun a => leftTensor (ι₂ := ιB) (A.outcome a)
-  total := leftTensor (ι₂ := ιB) A.total
-
-/-- Lift a submeasurement to the right tensor factor of a bipartite space `ιA × ιB`. -/
-def rightPlacedSubMeas {α : Type*}
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : SubMeas α ιB) :
-    SubMeas α (ιA × ιB) where
-  outcome := fun a => rightTensor (ι₁ := ιA) (A.outcome a)
-  total := rightTensor (ι₁ := ιA) A.total
-
 /-- Tensor-failure expectation on a bipartite space.
 
 Computes `⟨ψ| (Z ⊗ I)(I ⊗ (I - Σ H_a)) |ψ⟩` where `Z` acts on the left register

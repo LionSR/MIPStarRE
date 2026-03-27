@@ -42,9 +42,9 @@ noncomputable def uniformDistribution (α : Type*)
     apply ha
     exact Finset.mem_toList.mpr (by simp : a ∈ (Finset.univ : Finset α))
 
-/-- Placeholder total variation distance. The distribution carrier is now explicit, but the
-full `L¹` bookkeeping is postponed to a later pass. -/
-def totalVariationDistance {α : Type*} (_μ _ν : Distribution α) : Error := 0
+/-- Total variation distance between two distributions.
+TODO: implement honest `L¹` computation. -/
+noncomputable def totalVariationDistance {α : Type*} (_μ _ν : Distribution α) : Error := by sorry
 
 /-- Sum a scalar quantity over a finite outcome space. -/
 noncomputable def sumOutcomes {α : Type*} [Fintype α]

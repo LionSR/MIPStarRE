@@ -13,38 +13,33 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Output package for the induction-level self-improvement theorem.
 
-TODO(bipartite): when the strategy type gains separate `dA`/`dB` dimensions,
-the `selfCloseness` and `bounded` fields should use `leftPlacedSubMeas` /
+The strategy's state is bipartite (`QuantumState (ι × ι)`).  Fields that
+involve bipartite-lifted operators use `leftPlacedSubMeas` /
 `rightPlacedSubMeas` / `tensorFailureExpectation` with honest bipartite
-structure.  For now we keep everything at the strategy's total dimension `d`
-and use `sddError` directly for the self-closeness placeholder. -/
+structure. -/
 structure SelfImprovementInInductionSectionConclusion (params : Parameters)
     (strategy : SymStrat params ι)
     (_G : SubMeas (Polynomial params) ι)
     (H : ProjSubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
   completeness :
-    CompletenessAtLeast strategy.state H.toSubMeas
+    CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
       ((1 - nu) - selfImprovementInInductionError params eps delta gamma)
   pointConsistency :
     ConsWithPolyEval params strategy.state
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      H.toSubMeas
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+      H.toSubMeas.liftLeft
       (selfImprovementInInductionError params eps delta gamma)
   strongSelfConsistency :
-    PolyMeasSSC params strategy.state H.toSubMeas
+    PolyMeasSSC params strategy.state H.toSubMeas.liftLeft
       (selfImprovementInInductionError params eps delta gamma)
-  -- TODO(bipartite): use leftPlacedSubMeas / rightPlacedSubMeas once SymStrat has dA/dB
   selfCloseness :
-    MIPStarRE.LDT.Preliminaries.BipartiteSDDRel
-      strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily H.toSubMeas)
-      (constSubMeasFamily H.toSubMeas)
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
+      (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
       (selfImprovementInInductionError params eps delta gamma)
-  -- TODO(bipartite): use tensorFailureExpectation once SymStrat has dA/dB
   bounded :
-    ev strategy.state
-        (Z * (1 - H.toSubMeas.total))
+    tensorFailureExpectation strategy.state Z H.toSubMeas
       ≤ selfImprovementInInductionError params eps delta gamma
   dominatesAveragePointOperator :
     ∀ h : Polynomial params,
@@ -58,8 +53,8 @@ structure LdPastingInInductionSectionConclusion (params : Parameters)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   pointConsistency :
     ConsWithPolyEval params.next strategy.state
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      H.toSubMeas
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+      H.toSubMeas.liftLeft
       (ldPastingInInductionError params k eps delta gamma kappa zeta)
 
 /-- Bookkeeping data `x ↦ (ε_x, δ_x, γ_x)` for the restricted strategies. -/
