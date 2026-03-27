@@ -48,7 +48,7 @@ def polynomialWeightOperator (params : Parameters)
 /-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`. -/
 noncomputable def polynomialWeightSqrtOperator (params : Parameters)
     (G : SubMeas (Polynomial params) ι) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  opSqRoot (polynomialWeightOperator params G g)
+  polynomialWeightOperator params G g -- TODO: should be matrix square root
 
 /-- The weighted state `|ψ_g⟩ = (I ⊗ G_g^{1/2}) |ψ⟩`. -/
 -- TODO: placeholder — density left at defaults until tensor product model is provided.

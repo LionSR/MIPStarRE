@@ -76,9 +76,6 @@ def applyOperatorToVector (_T : MIPStarRE.Quantum.Op ι) (v : HypercubeVector) :
 def scaleVector (_c : Error) (v : HypercubeVector) : HypercubeVector :=
   { name := s!"scalar•{v.name}" }
 
-/-- The rank-one projector onto a state vector, carrying the state's density matrix. -/
-def stateProjector (ψ : QuantumState ι) : MIPStarRE.Quantum.Op ι :=
-  ψ.density
 
 /-- Weighted sum of operators over a distribution's finite support,
 using the same `support`/`weight` data as the scalar `avgOver`. -/
@@ -212,7 +209,7 @@ TODO(tensor): uses placeholder product instead of formalTensor since dimensions 
 noncomputable def localVarianceTraceWitness (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : MIPStarRE.Quantum.Op ι :=
   (combinedOperator params A) *
-    (stateProjector ψ * stateProjector ψ) *
+    (ψ.density * ψ.density) *
       (combinedOperator params A)
 
 /-- A packaged orthogonal decomposition for `A_combine`. -/
@@ -228,7 +225,7 @@ noncomputable def globalVarianceTraceWitness (params : Parameters)
     (_A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
     (decomp : GlobalVarianceDecomposition params _A) : MIPStarRE.Quantum.Op ι :=
   -- TODO(tensor): uses placeholder product instead of formalTensor since dimensions differ
-  decomp.orthogonalOperator * (stateProjector ψ * decomp.orthogonalOperator)
+  decomp.orthogonalOperator * (ψ.density * decomp.orthogonalOperator)
 
 /-- The local-variance trace expression from `lem:local-rewrite`. -/
 noncomputable def localVarianceTraceForm (params : Parameters)

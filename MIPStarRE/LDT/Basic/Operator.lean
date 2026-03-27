@@ -57,11 +57,6 @@ def rightTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Finty
     (B : MIPStarRE.Quantum.Op ι₂) : MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
   Matrix.kronecker 1 B
 
-/-- Square root of an operator expression.
-Propagates `dim`; matrix square root is not computed (placeholder).
-TODO: compute actual matrix square root when Mathlib provides it. -/
-noncomputable def opSqRoot {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (X : MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι := X
 
 /-! ### Bridging lemmas: expectation-value linearity -/
 
