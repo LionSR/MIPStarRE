@@ -19,72 +19,72 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- The identity operator on the polynomial register. -/
-def polynomialIdentityOperator (params : Parameters) : Operator :=
+def polynomialIdentityOperator (params : Parameters) : Operator d :=
   identityOperator s!"poly({params.m},{params.q},{params.d})"
 
 /-- The pointwise operator `A^u_{g(u)}` entering the SDP average `A_g`. -/
 def averagedPointOperatorContribution (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (g : Polynomial params) (u : Point params) : Operator :=
+    (strategy : SymmetricStrategy params d)
+    (g : Polynomial params) (u : Point params) : Operator d :=
   pointConditionedOutcomeOperatorAtPolynomial params strategy g u
 
 /-- The averaged point operator `A_g = E_u A^u_{g(u)}`. -/
 noncomputable def averagedPointOperator (params : Parameters)
-    (strategy : SymmetricStrategy params) (g : Polynomial params) : Operator :=
+    (strategy : SymmetricStrategy params d) (g : Polynomial params) : Operator d :=
   averageOperatorOverDistribution (uniformDistribution (Point params))
     (averagedPointOperatorContribution params strategy g)
 
 /-- The operator `T_g A_g` contributing to the primal SDP objective. -/
 noncomputable def sdpPrimalContributionOperator (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params))
-    (g : Polynomial params) : Operator :=
+    (strategy : SymmetricStrategy params d)
+    (T : Measurement (Polynomial params) d)
+    (g : Polynomial params) : Operator d :=
   operatorMul (T.outcomeOperator g) (averagedPointOperator params strategy g)
 
 /-- The formal primal objective operator `Σ_g T_g A_g`. -/
 noncomputable def sdpPrimalObjectiveOperator (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params)) : Operator :=
+    (strategy : SymmetricStrategy params d)
+    (T : Measurement (Polynomial params) d) : Operator d :=
   averageOperatorOverDistribution (polynomialDistribution params)
     (sdpPrimalContributionOperator params strategy T)
 
 /-- The primal objective value `Σ_g Tr(T_g A_g)`. -/
 noncomputable def sdpPrimalObjective (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params)) : Error :=
+    (strategy : SymmetricStrategy params d)
+    (T : Measurement (Polynomial params) d) : Error :=
   operatorTrace (sdpPrimalObjectiveOperator params strategy T)
 
 /-- The dual objective value `Tr(Z)`. -/
-noncomputable def sdpDualObjective (Z : Operator) : Error :=
+noncomputable def sdpDualObjective (Z : Operator d) : Error :=
   operatorTrace Z
 
 /-- The dual slack operator `Z - A_g`. -/
 noncomputable def sdpDualSlackOperator (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (Z : Operator) (g : Polynomial params) : Operator :=
+    (strategy : SymmetricStrategy params d)
+    (Z : Operator d) (g : Polynomial params) : Operator d :=
   operatorDifference Z (averagedPointOperator params strategy g)
 
 /-- The complementary-slackness equation `T_g Z = T_g A_g`. -/
 def sdpComplementarySlacknessEquation (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params))
-    (Z : Operator) (g : Polynomial params) : Prop :=
+    (strategy : SymmetricStrategy params d)
+    (T : Measurement (Polynomial params) d)
+    (Z : Operator d) (g : Polynomial params) : Prop :=
   operatorMul (T.outcomeOperator g) Z =
     operatorMul (T.outcomeOperator g) (averagedPointOperator params strategy g)
 
 /-- The pointwise sandwiched operator `H^u_h = A^u_{h(u)} T_h A^u_{h(u)}`. -/
 noncomputable def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params))
-    (u : Point params) (h : Polynomial params) : Operator :=
+    (strategy : SymmetricStrategy params d)
+    (T : Measurement (Polynomial params) d)
+    (u : Point params) (h : Polynomial params) : Operator d :=
   let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
   operatorMul (operatorMul Au (T.outcomeOperator h)) Au
 
 /-- The pointwise sandwiched submeasurement `H^u = {H^u_h}`. -/
 noncomputable def sandwichedPolynomialSubMeasurementAt (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params)) (u : Point params) :
-    SubMeasurement (Polynomial params) :=
+    (strategy : SymmetricStrategy params d)
+    (T : Measurement (Polynomial params) d) (u : Point params) :
+    SubMeasurement (Polynomial params) d :=
   { name :=
       s!"Hslice[{pointCode params u}|{(strategy.pointMeasurement u).toSubMeasurement.name}|{T.toSubMeasurement.name}]"
     outcomeOperator := sandwichedPolynomialOutcomeOperatorAt params strategy T u
@@ -94,8 +94,8 @@ noncomputable def sandwichedPolynomialSubMeasurementAt (params : Parameters)
 
 /-- The averaged sandwiched submeasurement `H_h = E_u H^u_h`. -/
 noncomputable def averagedSandwichedPolynomialSubMeasurement (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params)) : SubMeasurement (Polynomial params) :=
+    (strategy : SymmetricStrategy params d)
+    (T : Measurement (Polynomial params) d) : SubMeasurement (Polynomial params) d :=
   { name := s!"Havg[{T.toSubMeasurement.name}]"
     outcomeOperator := fun h =>
       averageOperatorOverDistribution (uniformDistribution (Point params))
@@ -106,8 +106,8 @@ noncomputable def averagedSandwichedPolynomialSubMeasurement (params : Parameter
 
 /-- Evaluate a polynomial submeasurement at each point `u`. -/
 noncomputable abbrev polynomialEvaluationFamily (params : Parameters)
-    (H : SubMeasurement (Polynomial params)) :
-    IndexedSubMeasurement (Point params) (Fq params) :=
+    (H : SubMeasurement (Polynomial params) d) :
+    IndexedSubMeasurement (Point params) (Fq params) d :=
   MIPStarRE.LDT.polynomialEvaluationFamily params H
 
 /-- The variance error entering `lem:add-in-u`. -/

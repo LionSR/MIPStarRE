@@ -106,9 +106,9 @@ noncomputable def fromHToGRecurrenceError (params : Parameters)
 
 /-- Output package for `thm:ld-pasting`. -/
 structure LdPastingConclusion (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params)
-    (H : Measurement (Polynomial params.next))
+    (strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d)
+    (H : Measurement (Polynomial params.next) d)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   largeEnough : 400 * params.m * params.d ≤ k
   constructedMeasurement :
@@ -122,9 +122,9 @@ structure LdPastingConclusion (params : Parameters)
 
 /-- Output package for `lem:ld-pasting-sub-measurement`. -/
 structure LdPastingSubMeasurementConclusion (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params)
-    (H : SubMeasurement (Polynomial params.next))
+    (strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d)
+    (H : SubMeasurement (Polynomial params.next) d)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   largeEnough : 400 * params.m * params.d ≤ k
   constructedSubMeasurement :
@@ -143,8 +143,8 @@ structure LdPastingSubMeasurementConclusion (params : Parameters)
 
 /-- Output package for `lem:g-complete-self-consistency`. -/
 structure GCompleteSelfConsistencyStatement (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params) (zeta : Error) : Prop where
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d) (zeta : Error) : Prop where
   completePartSelfConsistency :
     StateDependentDistanceRel ψ
       (uniformDistribution (SliceQuestion params))
@@ -154,8 +154,8 @@ structure GCompleteSelfConsistencyStatement (params : Parameters)
 
 /-- Output package for `cor:g-bot-self-consistency`. -/
 structure GBotSelfConsistencyStatement (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params) (zeta : Error) : Prop where
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d) (zeta : Error) : Prop where
   completePartWitness :
     GCompleteSelfConsistencyStatement params ψ family zeta
   incompletePartSelfConsistency :
@@ -167,9 +167,9 @@ structure GBotSelfConsistencyStatement (params : Parameters)
 
 /-- Output package for `lem:commutativity-switcheroo`. -/
 structure CommutativitySwitcherooStatement {Outcome : Type*} (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params)
-    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome)
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d)
+    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome d)
     (zeta omega chi : Error) : Prop where
   aggregateCommutation :
     StateDependentDistanceRel ψ
@@ -180,8 +180,8 @@ structure CommutativitySwitcherooStatement {Outcome : Type*} (params : Parameter
 
 /-- Output package for `cor:commuting-with-G-complete`. -/
 structure CommutingWithGCompleteStatement (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d)
     (gamma zeta : Error) : Prop where
   pointWithCompletePartCommutation :
     StateDependentDistanceRel ψ
@@ -198,8 +198,8 @@ structure CommutingWithGCompleteStatement (params : Parameters)
 
 /-- Output package for `cor:commuting-with-G-incomplete`. -/
 structure CommutingWithGIncompleteStatement (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d)
     (gamma zeta : Error) : Prop where
   completePartWitness :
     CommutingWithGCompleteStatement params ψ family gamma zeta
@@ -218,8 +218,8 @@ structure CommutingWithGIncompleteStatement (params : Parameters)
 
 /-- Output package for `cor:G-hat-facts`. -/
 structure GHatFactsStatement (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d)
     (gamma zeta : Error) : Prop where
   completePartSelfConsistencyWitness :
     GCompleteSelfConsistencyStatement params ψ family zeta
@@ -244,8 +244,8 @@ structure GHatFactsStatement (params : Parameters)
 
 /-- Output package for `lem:commute-g-half-sandwich`. -/
 structure CommuteGHalfSandwichStatement (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d)
     (gamma zeta : Error) (k : ℕ) : Prop where
   repeatedCommutation :
     StateDependentDistanceRel ψ
@@ -256,8 +256,8 @@ structure CommuteGHalfSandwichStatement (params : Parameters)
 
 /-- Output package for `lem:ld-sandwich-line-one-point`. -/
 structure LdSandwichLineOnePointStatement (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params)
+    (strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d)
     (eps delta gamma zeta : Error)
     (k i : ℕ) : Prop where
   linePointComparison :
@@ -269,8 +269,8 @@ structure LdSandwichLineOnePointStatement (params : Parameters)
 
 /-- Output package for `lem:h-b-consistency`. -/
 structure HBConsistencyStatement (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params)
+    (strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d)
     (eps delta gamma zeta : Error) (k : ℕ) : Prop where
   lineConsistency :
     ConsistencyRel strategy.state
@@ -281,8 +281,8 @@ structure HBConsistencyStatement (params : Parameters)
 
 /-- Output package for `lem:over-all-outcomes`. -/
 structure OverAllOutcomesStatement (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params)
+    (strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d)
     (eps delta gamma zeta : Error) (k : ℕ) : Prop where
   totalOutcomeExpansion :
     StateDependentDistanceRel strategy.state (uniformDistribution Unit)
@@ -292,8 +292,8 @@ structure OverAllOutcomesStatement (params : Parameters)
 
 /-- Output package for `lem:from-H-to-G`. -/
 structure FromHToGStatement (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params)
+    (strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d)
     (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceStep :
     ∀ ℓ : ℕ, ℓ < k →
@@ -308,17 +308,17 @@ structure FromHToGStatement (params : Parameters)
       (fromHToGError params gamma zeta k)
 
 /-- Output package for `lem:chernoff-bernoulli-matrix`. -/
-structure ChernoffBernoulliMatrixStatement
-    (ψ : QuantumState)
-    (theta : Error) (k d : ℕ) (X : Operator) (kappa : Error) : Prop where
+structure ChernoffBernoulliMatrixStatement {d : ℕ}
+    (ψ : QuantumState d)
+    (theta : Error) (k degree : ℕ) (X : Operator d) (kappa : Error) : Prop where
   matrixTailBound :
-    CompletenessAtLeast ψ (bernoulliTailSubMeasurement k d X)
+    CompletenessAtLeast ψ (bernoulliTailSubMeasurement k degree X)
       (1 - kappa / (1 - theta) - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2))
 
 /-- Output package for `cor:ld-pasting-N-completeness`. -/
 structure LdPastingNCompletenessStatement (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params)
+    (strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d)
     (kappa nu : Error) (k : ℕ) : Prop where
   largeEnough : 400 * params.m * params.d ≤ k
   completenessBound :

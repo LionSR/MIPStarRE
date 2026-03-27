@@ -29,13 +29,13 @@ measurements, one for each prover, consistent with the point measurements and wi
 each other.
 -/
 theorem mainFormal
-    (params : Parameters)
-    (strategy : ProjectiveStrategy params)
+    (params : Parameters) {d : ℕ}
+    (strategy : ProjectiveStrategy params d)
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
     (hk : params.m * params.d ≤ k) :
-    ∃ G_A G_B : ProjectiveMeasurement (Polynomial params),
+    ∃ G_A G_B : ProjectiveMeasurement (Polynomial params) d,
       ConsistentWithPolynomialEvaluation params strategy.state
           (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementA)
           G_B.toSubMeasurement

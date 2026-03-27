@@ -12,7 +12,7 @@ open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
 
 /-- Output package for `thm:commutativity-points`. -/
 structure CommutativityPointsStatement (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymmetricStrategy params d)
     (_eps _delta gamma : Error) : Prop where
   sampledDiagonalLineConsistency :
     ConsistencyRel strategy.state
@@ -66,7 +66,7 @@ structure CommutativityPointsStatement (params : Parameters)
 /-- `thm:commutativity-points`. -/
 theorem commutativityPoints
     (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymmetricStrategy params d)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     CommutativityPointsStatement params strategy eps delta gamma := by

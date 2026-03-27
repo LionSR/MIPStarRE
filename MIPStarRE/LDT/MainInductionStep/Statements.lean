@@ -10,10 +10,10 @@ open MIPStarRE.LDT
 
 /-- Output package for the induction-level self-improvement theorem. -/
 structure SelfImprovementInInductionSectionConclusion (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (_G : SubMeasurement (Polynomial params))
-    (H : ProjectiveSubMeasurement (Polynomial params))
-    (Z : Operator) (eps delta gamma nu : Error) : Prop where
+    (strategy : SymmetricStrategy params d)
+    (_G : SubMeasurement (Polynomial params) d)
+    (H : ProjectiveSubMeasurement (Polynomial params) d)
+    (Z : Operator d) (eps delta gamma nu : Error) : Prop where
   completeness :
     CompletenessAtLeast strategy.state H.toSubMeasurement
       ((1 - nu) - selfImprovementInInductionError params eps delta gamma)
@@ -40,9 +40,9 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
 
 /-- Output package for the section-local pasting theorem. -/
 structure LdPastingInInductionSectionConclusion (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (_family : IndexedPolynomialFamily params)
-    (H : Measurement (Polynomial params.next))
+    (strategy : SymmetricStrategy params.next d)
+    (_family : IndexedPolynomialFamily params d)
+    (H : Measurement (Polynomial params.next) d)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   pointConsistency :
     ConsistentWithPolynomialEvaluation params.next strategy.state
@@ -52,7 +52,7 @@ structure LdPastingInInductionSectionConclusion (params : Parameters)
 
 /-- Bookkeeping data `x ↦ (ε_x, δ_x, γ_x)` for the restricted strategies. -/
 structure RestrictedFailureProfile (params : Parameters)
-    (strategy : SymmetricStrategy params.next) : Type where
+    (strategy : SymmetricStrategy params.next d) : Type where
   axisParallel : Fq params → Error
   selfConsistency : Fq params → Error
   diagonal : Fq params → Error
@@ -65,26 +65,26 @@ structure RestrictedFailureProfile (params : Parameters)
 
 /-- Average restricted axis-parallel error over slices. -/
 noncomputable def averageRestrictedAxisParallelError (params : Parameters)
-    {strategy : SymmetricStrategy params.next}
+    {strategy : SymmetricStrategy params.next d}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   averageOverSlices params profile.axisParallel
 
 /-- Average restricted self-consistency error over slices. -/
 noncomputable def averageRestrictedSelfConsistencyError (params : Parameters)
-    {strategy : SymmetricStrategy params.next}
+    {strategy : SymmetricStrategy params.next d}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   averageOverSlices params profile.selfConsistency
 
 /-- Average restricted diagonal-line error over slices. -/
 noncomputable def averageRestrictedDiagonalError (params : Parameters)
-    {strategy : SymmetricStrategy params.next}
+    {strategy : SymmetricStrategy params.next d}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   averageOverSlices params profile.diagonal
 
 /-- Source-style boundedness input for the induction-level pasting theorem. -/
 structure PastingBoundednessInput (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params) (zeta : Error) : Prop where
+    (strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d) (zeta : Error) : Prop where
   bounded : family.Bounded strategy.state zeta
   dominationTargetAgrees :
     ∀ x : Fq params, ∀ g : Polynomial params,
@@ -93,7 +93,7 @@ structure PastingBoundednessInput (params : Parameters)
 
 /-- Bookkeeping package for the restricted-probabilities lemma. -/
 structure RestrictedProbabilitiesStatement (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (strategy : SymmetricStrategy params.next d)
     (eps delta gamma : Error) : Prop where
   profileExists :
     ∃ profile : RestrictedFailureProfile params strategy,

@@ -26,8 +26,8 @@ def liftDiagonalAnswer (params : Parameters) (x : Fq params) :
 
 /-- Restrict an axis-parallel line measurement to the slice at height `x`. -/
 def restrictAxisParallelMeasurement (params : Parameters)
-    (strategy : SymmetricStrategy params.next) (x : Fq params) :
-    IndexedProjectiveMeasurement (AxisParallelLine params) (AxisLinePolynomial params) :=
+    (strategy : SymmetricStrategy params.next d) (x : Fq params) :
+    IndexedProjectiveMeasurement (AxisParallelLine params) (AxisLinePolynomial params) d :=
   fun ℓ =>
     let lifted := strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)
     { toMeasurement := { toSubMeasurement := {
@@ -39,8 +39,8 @@ def restrictAxisParallelMeasurement (params : Parameters)
 
 /-- Restrict a diagonal-line measurement to the slice at height `x`. -/
 def restrictDiagonalMeasurement (params : Parameters)
-    (strategy : SymmetricStrategy params.next) (x : Fq params) :
-    IndexedProjectiveMeasurement (DiagonalLine params) (DiagonalLinePolynomial params) :=
+    (strategy : SymmetricStrategy params.next d) (x : Fq params) :
+    IndexedProjectiveMeasurement (DiagonalLine params) (DiagonalLinePolynomial params) d :=
   fun ℓ =>
     let lifted := strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)
     { toMeasurement := { toSubMeasurement := {
@@ -52,25 +52,25 @@ def restrictDiagonalMeasurement (params : Parameters)
 
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
 def xRestrictedStrategy (params : Parameters)
-    (strategy : SymmetricStrategy params.next) (x : Fq params) : SymmetricStrategy params where
+    (strategy : SymmetricStrategy params.next d) (x : Fq params) : SymmetricStrategy params d where
   state := strategy.state
   pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
   axisParallelMeasurement := restrictAxisParallelMeasurement params strategy x
   diagonalMeasurement := restrictDiagonalMeasurement params strategy x
 
 @[simp] theorem xRestrictedStrategy_state (params : Parameters)
-    (strategy : SymmetricStrategy params.next) (x : Fq params) :
+    (strategy : SymmetricStrategy params.next d) (x : Fq params) :
     (xRestrictedStrategy params strategy x).state = strategy.state :=
   rfl
 
 @[simp] theorem xRestrictedStrategy_pointMeasurement_apply (params : Parameters)
-    (strategy : SymmetricStrategy params.next) (x : Fq params) (u : Point params) :
+    (strategy : SymmetricStrategy params.next d) (x : Fq params) (u : Point params) :
     (xRestrictedStrategy params strategy x).pointMeasurement u =
       strategy.pointMeasurement (appendPoint params u x) :=
   rfl
 
 @[simp] theorem restrictAxisParallelMeasurement_outcomeOperator (params : Parameters)
-    (strategy : SymmetricStrategy params.next) (x : Fq params)
+    (strategy : SymmetricStrategy params.next d) (x : Fq params)
     (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
     ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeasurement.outcomeOperator f) =
       (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeasurement.outcomeOperator
@@ -78,7 +78,7 @@ def xRestrictedStrategy (params : Parameters)
   rfl
 
 @[simp] theorem restrictDiagonalMeasurement_outcomeOperator (params : Parameters)
-    (strategy : SymmetricStrategy params.next) (x : Fq params)
+    (strategy : SymmetricStrategy params.next d) (x : Fq params)
     (ℓ : DiagonalLine params) (f : DiagonalLinePolynomial params) :
     ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeasurement.outcomeOperator f) =
       (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)).toSubMeasurement.outcomeOperator
@@ -128,24 +128,22 @@ noncomputable def ldPastingInInductionError (params : Parameters) (k : ℕ)
 
 /-- Averaged point operator `E_u A^u_{h(u)}` appearing in boundedness. -/
 noncomputable def averagedPointEvaluationOperator (params : Parameters)
-    (strategy : SymmetricStrategy params) (h : Polynomial params) : Operator := by
+    (strategy : SymmetricStrategy params d) (h : Polynomial params) : Operator d := by
   classical
   let 𝒟 : Distribution (Point params) := uniformDistribution (Point params)
   let u₀ : Point params := Classical.choice (inferInstance : Nonempty (Point params))
   exact weightedOperatorSumOnSupport
-    ((strategy.pointMeasurement u₀).toSubMeasurement.outcomeOperator (h u₀))
     𝒟.support 𝒟.weight
     (fun u => (strategy.pointMeasurement u).toSubMeasurement.outcomeOperator (h u))
 
 /-- Slice-wise averaged point operator `E_u A^{u,x}_{g(u)}`. -/
 noncomputable def averagedSlicePointEvaluationOperator (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (x : Fq params) (g : Polynomial params) : Operator := by
+    (strategy : SymmetricStrategy params.next d)
+    (x : Fq params) (g : Polynomial params) : Operator d := by
   classical
   let 𝒟 : Distribution (Point params) := uniformDistribution (Point params)
   let u₀ : Point params := Classical.choice (inferInstance : Nonempty (Point params))
   exact weightedOperatorSumOnSupport
-    ((strategy.pointMeasurement (appendPoint params u₀ x)).toSubMeasurement.outcomeOperator (g u₀))
     𝒟.support 𝒟.weight
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeasurement.outcomeOperator (g u))
 
@@ -153,14 +151,14 @@ noncomputable def averagedSlicePointEvaluationOperator (params : Parameters)
 embedding once the bipartite matrix API is available.
 NOTE: duplicated from CommutativityPoints; should be factored into a shared
 utility once the import graph permits it. -/
-def leftPlacedSubMeasurement {α : Type*} (A : SubMeasurement α) : SubMeasurement α where
+def leftPlacedSubMeasurement {α : Type*} {d : ℕ} (A : SubMeasurement α d) : SubMeasurement α d where
   name := s!"{A.name}.left"
   outcomeOperator := fun a => leftTensor (A.outcomeOperator a)
   totalOperator := leftTensor A.totalOperator
 
 /-- TODO(tensor): replace this placeholder right placement by an honest tensor-product
 embedding once the bipartite matrix API is available. -/
-def rightPlacedSubMeasurement {α : Type*} (A : SubMeasurement α) : SubMeasurement α where
+def rightPlacedSubMeasurement {α : Type*} {d : ℕ} (A : SubMeasurement α d) : SubMeasurement α d where
   name := s!"{A.name}.right"
   outcomeOperator := fun a => rightTensor (A.outcomeOperator a)
   totalOperator := rightTensor A.totalOperator
@@ -168,7 +166,7 @@ def rightPlacedSubMeasurement {α : Type*} (A : SubMeasurement α) : SubMeasurem
 /-- TODO(tensor): this uses the placeholder `leftTensor` / `rightTensor` embeddings until
 the project has an honest bipartite operator API. -/
 noncomputable def tensorFailureExpectation {Outcome : Type*}
-    (ψ : QuantumState) (Z : Operator) (H : SubMeasurement Outcome) : Error :=
+    (ψ : QuantumState d) (Z : Operator d) (H : SubMeasurement Outcome d) : Error :=
   expectationValue ψ <|
     operatorMul
       (leftTensor Z)

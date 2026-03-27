@@ -17,37 +17,37 @@ abbrev PointPairDiagonalLineQuestion (params : Parameters) :=
   DiagonalLine params × (Fq params × Fq params)
 
 /-- Place a submeasurement on the left tensor factor. -/
-def leftPlacedSubMeasurement {α : Type*} (A : SubMeasurement α) : SubMeasurement α where
+def leftPlacedSubMeasurement {α : Type*} (A : SubMeasurement α d) : SubMeasurement α d where
   name := s!"{A.name}.left"
   outcomeOperator := fun a => leftTensor (A.outcomeOperator a)
   totalOperator := leftTensor A.totalOperator
 
 /-- Place a submeasurement on the right tensor factor. -/
-def rightPlacedSubMeasurement {α : Type*} (A : SubMeasurement α) : SubMeasurement α where
+def rightPlacedSubMeasurement {α : Type*} (A : SubMeasurement α d) : SubMeasurement α d where
   name := s!"{A.name}.right"
   outcomeOperator := fun a => rightTensor (A.outcomeOperator a)
   totalOperator := rightTensor A.totalOperator
 
 /-- Ordered product of two paper-local submeasurements on the same tensor factor. -/
 noncomputable def orderedProductSubMeasurement {α β : Type*}
-    (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
-    SubMeasurement (α × β) where
+    (label : String) (A : SubMeasurement α d) (B : SubMeasurement β d) :
+    SubMeasurement (α × β) d where
   name := label
   outcomeOperator := fun | (a, b) => operatorMul (A.outcomeOperator a) (B.outcomeOperator b)
   totalOperator := operatorMul A.totalOperator B.totalOperator
 
 /-- Reversed product of two paper-local submeasurements on the same tensor factor. -/
 noncomputable def reversedProductSubMeasurement {α β : Type*}
-    (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
-    SubMeasurement (α × β) where
+    (label : String) (A : SubMeasurement α d) (B : SubMeasurement β d) :
+    SubMeasurement (α × β) d where
   name := label
   outcomeOperator := fun | (a, b) => operatorMul (B.outcomeOperator b) (A.outcomeOperator a)
   totalOperator := operatorMul B.totalOperator A.totalOperator
 
 /-- Tensor-product bridge `A_a ⊗ B_b`. -/
 noncomputable def tensorProductSubMeasurement {α β : Type*}
-    (label : String) (A : SubMeasurement α) (B : SubMeasurement β) :
-    SubMeasurement (α × β) where
+    (label : String) (A : SubMeasurement α d) (B : SubMeasurement β d) :
+    SubMeasurement (α × β) d where
   name := label
   outcomeOperator := fun ab =>
     match ab with
@@ -67,8 +67,8 @@ def sampledPointPairFromSharedDiagonalQuestion (params : Parameters)
 
 /-- The ordered point product `(A^u_a A^v_b) ⊗ I`. -/
 noncomputable def pointMeasurementProductLeft (params : Parameters)
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (PointPairQuestion params) (PointPairOutcome params) :=
+    (strategy : SymmetricStrategy params d) :
+    IndexedSubMeasurement (PointPairQuestion params) (PointPairOutcome params) d :=
   fun uv =>
     let Au := (strategy.pointMeasurement uv.1).toSubMeasurement
     let Av := (strategy.pointMeasurement uv.2).toSubMeasurement
@@ -78,8 +78,8 @@ noncomputable def pointMeasurementProductLeft (params : Parameters)
 
 /-- The reversed point product `(A^v_b A^u_a) ⊗ I`. -/
 noncomputable def pointMeasurementProductRight (params : Parameters)
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (PointPairQuestion params) (PointPairOutcome params) :=
+    (strategy : SymmetricStrategy params d) :
+    IndexedSubMeasurement (PointPairQuestion params) (PointPairOutcome params) d :=
   fun uv =>
     let Au := (strategy.pointMeasurement uv.1).toSubMeasurement
     let Av := (strategy.pointMeasurement uv.2).toSubMeasurement
@@ -99,38 +99,38 @@ def pointPairSharedDiagonalLineDistribution (params : Parameters) :
 
 /-- The point measurement, reindexed by a sampled diagonal line and a parameter on it. -/
 def sampledPointMeasurement (params : Parameters)
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (PointDiagonalLineQuestion params) (Fq params) :=
+    (strategy : SymmetricStrategy params d) :
+    IndexedSubMeasurement (PointDiagonalLineQuestion params) (Fq params) d :=
   fun q =>
     (strategy.pointMeasurement (sampledPointFromDiagonalQuestion params q)).toSubMeasurement
 
 /-- Evaluate the diagonal-line measurement at the sampled parameter. -/
 noncomputable def sampledDiagonalLineEvaluation (params : Parameters)
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (PointDiagonalLineQuestion params) (Fq params) :=
+    (strategy : SymmetricStrategy params d) :
+    IndexedSubMeasurement (PointDiagonalLineQuestion params) (Fq params) d :=
   fun q =>
     postprocess ((strategy.diagonalMeasurement q.1).toSubMeasurement) (fun f => f q.2)
 
 /-- The ordered point product `(A^u_a A^v_b) ⊗ I`, indexed by a shared sampled line. -/
 noncomputable def pointMeasurementProductAlongSharedLine (params : Parameters)
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
+    (strategy : SymmetricStrategy params d) :
+    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) d :=
   fun q =>
     pointMeasurementProductLeft params strategy
       (sampledPointPairFromSharedDiagonalQuestion params q)
 
 /-- The reversed point product `(A^v_b A^u_a) ⊗ I`, indexed by a shared sampled line. -/
 noncomputable def pointMeasurementProductAlongSharedLineReversed (params : Parameters)
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
+    (strategy : SymmetricStrategy params d) :
+    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) d :=
   fun q =>
     pointMeasurementProductRight params strategy
       (sampledPointPairFromSharedDiagonalQuestion params q)
 
 /-- The mixed bridge `A^u_a ⊗ L^ℓ_[f(v)=b]`. -/
 noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
+    (strategy : SymmetricStrategy params d) :
+    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) d :=
   fun q =>
     let ℓ := q.1
     let tu := q.2.1
@@ -142,8 +142,8 @@ noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
 
 /-- The bridge `I ⊗ (L^ℓ_[f(v)=b] L^ℓ_[f(u)=a])`. -/
 noncomputable def diagonalLineProductOrdered (params : Parameters)
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
+    (strategy : SymmetricStrategy params d) :
+    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) d :=
   fun q =>
     let ℓ := q.1
     let tu := q.2.1
@@ -156,8 +156,8 @@ noncomputable def diagonalLineProductOrdered (params : Parameters)
 
 /-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] L^ℓ_[f(v)=b])`. -/
 noncomputable def diagonalLineProductReversed (params : Parameters)
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
+    (strategy : SymmetricStrategy params d) :
+    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) d :=
   fun q =>
     let ℓ := q.1
     let tu := q.2.1
@@ -171,8 +171,8 @@ noncomputable def diagonalLineProductReversed (params : Parameters)
 
 /-- The mixed bridge `A^v_b ⊗ L^ℓ_[f(u)=a]`. -/
 noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) :=
+    (strategy : SymmetricStrategy params d) :
+    IndexedSubMeasurement (PointPairDiagonalLineQuestion params) (PointPairOutcome params) d :=
   fun q =>
     let ℓ := q.1
     let tu := q.2.1

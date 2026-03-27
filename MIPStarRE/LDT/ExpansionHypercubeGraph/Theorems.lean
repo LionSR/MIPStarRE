@@ -14,7 +14,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- Output package for `lem:local-rewrite`. -/
 structure LocalRewriteStatement (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Prop where
+    (A : Point params → Operator d) (ψ : QuantumState d) : Prop where
   differenceFormula :
     localVariance params A ψ = localVarianceDifferenceForm params A ψ
   traceFormula :
@@ -22,7 +22,7 @@ structure LocalRewriteStatement (params : Parameters)
 
 /-- Output package for `lem:global-rewrite`. -/
 structure GlobalRewriteStatement (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Prop where
+    (A : Point params → Operator d) (ψ : QuantumState d) : Prop where
   differenceFormula :
     globalVariance params A ψ = globalVarianceDifferenceForm params A ψ
   decomposition :
@@ -56,21 +56,21 @@ theorem laplacianRewrite (params : Parameters) :
 /-- `lem:local-to-global`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma localToGlobal (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) :
+    (A : Point params → Operator d) (ψ : QuantumState d) :
     globalVariance params A ψ ≤ (params.m : Error) * localVariance params A ψ := by
   sorry
 
 /-- `lem:local-rewrite`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma localRewrite (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) :
+    (A : Point params → Operator d) (ψ : QuantumState d) :
     LocalRewriteStatement params A ψ := by
   sorry
 
 /-- `lem:global-rewrite`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma globalRewrite (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) :
+    (A : Point params → Operator d) (ψ : QuantumState d) :
     GlobalRewriteStatement params A ψ := by
   sorry
 

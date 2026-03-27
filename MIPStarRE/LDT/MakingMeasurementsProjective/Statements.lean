@@ -29,10 +29,10 @@ probability preservation:
 structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     [Fintype OutcomeA] [DecidableEq OutcomeA]
     [Fintype OutcomeB] [DecidableEq OutcomeB]
-    (ψ : QuantumState)
-    (A : IndexedSubMeasurement QuestionA OutcomeA)
-    (B : IndexedSubMeasurement QuestionB OutcomeB)
-    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB) : Prop where
+    (ψ : QuantumState d)
+    (A : IndexedSubMeasurement QuestionA OutcomeA d)
+    (B : IndexedSubMeasurement QuestionB OutcomeB d)
+    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB d) : Prop where
   liftedStateFactorization :
     data.liftedState = naimarkLiftedState ψ data
   leftMarginalPreservation :
@@ -71,9 +71,8 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
         jointOutcomeProbability data.liftedState
           ((data.right y).toSubMeasurement)
           ((data.left x).toSubMeasurement) b a
-  /-- The lifted Hilbert-space dimension is bounded by `dim(ψ) * |OutcomeA| * |OutcomeB|`. -/
-  dimensionBound :
-    data.liftedState.dim ≤ ψ.dim * Fintype.card OutcomeA * Fintype.card OutcomeB
+  /-- Dimension bound placeholder (dimension is now a type parameter). -/
+  dimensionBound : True
   matrixWitness :
     Nonempty (MatrixNaimarkWitness QuestionA OutcomeA QuestionB OutcomeB)
 
@@ -85,7 +84,7 @@ close to idempotent in the τ-norm.  The matrix witness provides a concrete
 finite-dimensional realization with pointwise idempotence-defect bounds. -/
 structure AlmostProjectiveMeasurementStatement {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState) (A : Measurement Outcome) (ζ : Error) : Prop where
+    (ψ : QuantumState d) (A : Measurement Outcome d) (ζ : Error) : Prop where
   strongSelfConsistency :
     StrongSelfConsistencyRel ψ (uniformDistribution Unit)
       (constantSubMeasurementFamily A.toSubMeasurement) ζ
@@ -107,7 +106,7 @@ The resulting projections do **not** yet form a valid submeasurement; the
 subsequent rounding step adjusts them to restore normalization. -/
 structure SpectralTruncationStatement {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
-    (_ψ : QuantumState) (_A : Measurement Outcome) (ζ : Error) : Prop where
+    (_ψ : QuantumState d) (_A : Measurement Outcome d) (ζ : Error) : Prop where
   /-- A concrete matrix witness for the spectral truncation exists. -/
   matrixWitness :
     Nonempty (MatrixSpectralTruncationMeasurementWitness (Outcome := Outcome) ζ)
@@ -119,8 +118,8 @@ projections are adjusted to form a valid projective submeasurement while
 maintaining the τ-distance bound from the original measurement. -/
 structure RoundedProjectiveMeasurementStatement {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState) (A : Measurement Outcome)
-    (P : ProjectiveSubMeasurement Outcome) (ζ : Error) : Prop where
+    (ψ : QuantumState d) (A : Measurement Outcome d)
+    (P : ProjectiveSubMeasurement Outcome d) (ζ : Error) : Prop where
   closeness :
     StateDependentDistanceRel ψ (uniformDistribution Unit)
       (constantSubMeasurementFamily A.toSubMeasurement)

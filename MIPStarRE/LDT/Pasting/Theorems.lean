@@ -17,34 +17,34 @@ noncomputable section
 /-- `thm:ld-pasting`. -/
 theorem ldPasting
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (strategy : SymmetricStrategy params.next d)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IndexedPolynomialFamily params)
+    (family : IndexedPolynomialFamily params d)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k) :
-    ∃ H : Measurement (Polynomial params.next),
+    ∃ H : Measurement (Polynomial params.next) d,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   sorry
 
 /-- `lem:ld-pasting-sub-measurement`. -/
 lemma ldPastingSubMeasurement
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (strategy : SymmetricStrategy params.next d)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IndexedPolynomialFamily params)
+    (family : IndexedPolynomialFamily params d)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k) :
-    ∃ H : SubMeasurement (Polynomial params.next),
+    ∃ H : SubMeasurement (Polynomial params.next) d,
       LdPastingSubMeasurementConclusion params strategy family H eps delta gamma kappa zeta k := by
   sorry
 
@@ -67,8 +67,8 @@ lemma looksEasyButTookMeAWhile
 /-- `lem:g-complete-self-consistency`. -/
 lemma gCompleteSelfConsistency
     (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d)
     (zeta : Error)
     (hself : family.StronglySelfConsistent ψ zeta) :
     GCompleteSelfConsistencyStatement params ψ family zeta := by
@@ -77,8 +77,8 @@ lemma gCompleteSelfConsistency
 /-- `cor:g-bot-self-consistency`. -/
 theorem gBotSelfConsistency
     (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d)
     (zeta : Error)
     (hcomplete : GCompleteSelfConsistencyStatement params ψ family zeta) :
     GBotSelfConsistencyStatement params ψ family zeta := by
@@ -87,9 +87,9 @@ theorem gBotSelfConsistency
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*}
     (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params)
-    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome)
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d)
+    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome d)
     (zeta omega chi : Error)
     (hselfG : GCompleteSelfConsistencyStatement params ψ family zeta)
     (hselfM : StateDependentDistanceRel ψ
@@ -108,8 +108,8 @@ lemma commutativitySwitcheroo {Outcome : Type*}
 /-- `cor:commuting-with-G-complete`. -/
 theorem commutingWithGComplete
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params)
+    (strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d)
     (gamma zeta : Error)
     (hcom : Commutativity.ComMainConclusion params strategy family gamma zeta)
     (hself : GCompleteSelfConsistencyStatement params strategy.state family zeta) :
@@ -119,8 +119,8 @@ theorem commutingWithGComplete
 /-- `cor:commuting-with-G-incomplete`. -/
 theorem commutingWithGIncomplete
     (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d)
     (gamma zeta : Error)
     (hcomm : CommutingWithGCompleteStatement params ψ family gamma zeta) :
     CommutingWithGIncompleteStatement params ψ family gamma zeta := by
@@ -129,8 +129,8 @@ theorem commutingWithGIncomplete
 /-- `cor:G-hat-facts`. -/
 theorem gHatFacts
     (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d)
     (gamma zeta : Error)
     (hselfComplete : GCompleteSelfConsistencyStatement params ψ family zeta)
     (hselfIncomplete : GBotSelfConsistencyStatement params ψ family zeta)
@@ -142,8 +142,8 @@ theorem gHatFacts
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
     (params : Parameters)
-    (ψ : QuantumState)
-    (family : IndexedPolynomialFamily params)
+    (ψ : QuantumState d)
+    (family : IndexedPolynomialFamily params d)
     (gamma zeta : Error)
     (k : ℕ)
     (hk : 2 ≤ k)
@@ -154,10 +154,10 @@ lemma commuteGHalfSandwich
 /-- `lem:ld-sandwich-line-one-point`. -/
 lemma ldSandwichLineOnePoint
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (strategy : SymmetricStrategy params.next d)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IndexedPolynomialFamily params)
+    (family : IndexedPolynomialFamily params d)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
@@ -170,10 +170,10 @@ lemma ldSandwichLineOnePoint
 /-- `lem:h-b-consistency`. -/
 lemma hBConsistency
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (strategy : SymmetricStrategy params.next d)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IndexedPolynomialFamily params)
+    (family : IndexedPolynomialFamily params d)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
@@ -186,10 +186,10 @@ lemma hBConsistency
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (strategy : SymmetricStrategy params.next d)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IndexedPolynomialFamily params)
+    (family : IndexedPolynomialFamily params d)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
@@ -200,10 +200,10 @@ lemma overAllOutcomes
 /-- `lem:from-H-to-G`. -/
 lemma fromHToG
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (strategy : SymmetricStrategy params.next d)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IndexedPolynomialFamily params)
+    (family : IndexedPolynomialFamily params d)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
@@ -213,24 +213,24 @@ lemma fromHToG
   sorry
 
 /-- `lem:chernoff-bernoulli-matrix`. -/
-lemma chernoffBernoulliMatrix
-    (ψ : QuantumState)
-    (theta : Error) (k d : ℕ) (X : Operator) (kappa : Error)
+lemma chernoffBernoulliMatrix {d : ℕ}
+    (ψ : QuantumState d)
+    (theta : Error) (k degree : ℕ) (X : Operator d) (kappa : Error)
     (hθ0 : 0 < theta) (hθ1 : theta < 1)
-    (hk : (2 * (d : Error)) / theta ≤ (k : Error))
+    (hk : (2 * (degree : Error)) / theta ≤ (k : Error))
     (hXpsd : PositiveSemidefinite X)
     (hXleOne : PositiveSemidefinite (operatorComplement X))
     (hcomplete : CompletenessAtLeast ψ (operatorAsSubMeasurement X) (1 - kappa)) :
-    ChernoffBernoulliMatrixStatement ψ theta k d X kappa := by
+    ChernoffBernoulliMatrixStatement ψ theta k degree X kappa := by
   sorry
 
 /-- `cor:ld-pasting-N-completeness`. -/
 theorem ldPastingNCompleteness
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (strategy : SymmetricStrategy params.next d)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IndexedPolynomialFamily params)
+    (family : IndexedPolynomialFamily params d)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)

@@ -17,21 +17,21 @@ noncomputable section
 
 /-- Left tensor-placement for the auxiliary family `M^x_o`. -/
 def switcherooSelfConsistencyLeft {Outcome : Type*} (params : Parameters)
-    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
-    IndexedSubMeasurement (SliceQuestion params) Outcome :=
+    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome d) :
+    IndexedSubMeasurement (SliceQuestion params) Outcome d :=
   fun x => leftPlacedSubMeasurement ((M x).toSubMeasurement)
 
 /-- Right tensor-placement for the auxiliary family `M^x_o`. -/
 def switcherooSelfConsistencyRight {Outcome : Type*} (params : Parameters)
-    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
-    IndexedSubMeasurement (SliceQuestion params) Outcome :=
+    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome d) :
+    IndexedSubMeasurement (SliceQuestion params) Outcome d :=
   fun x => rightPlacedSubMeasurement ((M x).toSubMeasurement)
 
 /-- Concrete hypothesis family for `G^x_g M^y_o`. -/
 def switcherooPointProductLeft {Outcome : Type*} (params : Parameters)
-    (family : IndexedPolynomialFamily params)
-    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
-    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params × Outcome) :=
+    (family : IndexedPolynomialFamily params d)
+    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome d) :
+    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params × Outcome) d :=
   fun q =>
     leftPlacedSubMeasurement <|
       orderedProductSubMeasurement
@@ -41,9 +41,9 @@ def switcherooPointProductLeft {Outcome : Type*} (params : Parameters)
 
 /-- Concrete hypothesis family for `M^y_o G^x_g` on the `Polynomial params × Outcome` outcome type. -/
 def switcherooPointProductRight {Outcome : Type*} (params : Parameters)
-    (family : IndexedPolynomialFamily params)
-    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
-    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params × Outcome) :=
+    (family : IndexedPolynomialFamily params d)
+    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome d) :
+    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params × Outcome) d :=
   fun q =>
     leftPlacedSubMeasurement <|
       reversedProductSubMeasurement
@@ -53,9 +53,9 @@ def switcherooPointProductRight {Outcome : Type*} (params : Parameters)
 
 /-- Concrete aggregate family for `G^x M^y_o`. -/
 def switcherooAggregateLeft {Outcome : Type*} (params : Parameters)
-    (family : IndexedPolynomialFamily params)
-    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
-    IndexedSubMeasurement (SlicePairQuestion params) Outcome :=
+    (family : IndexedPolynomialFamily params d)
+    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome d) :
+    IndexedSubMeasurement (SlicePairQuestion params) Outcome d :=
   fun q =>
     leftPlacedSubMeasurement <|
       multiplyByTotalOnLeft
@@ -65,9 +65,9 @@ def switcherooAggregateLeft {Outcome : Type*} (params : Parameters)
 
 /-- Concrete aggregate family for `M^y_o G^x`. -/
 def switcherooAggregateRight {Outcome : Type*} (params : Parameters)
-    (family : IndexedPolynomialFamily params)
-    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome) :
-    IndexedSubMeasurement (SlicePairQuestion params) Outcome :=
+    (family : IndexedPolynomialFamily params d)
+    (M : IndexedProjectiveSubMeasurement (Fq params) Outcome d) :
+    IndexedSubMeasurement (SlicePairQuestion params) Outcome d :=
   fun q =>
     leftPlacedSubMeasurement <|
       multiplyByTotalOnRight
@@ -77,8 +77,8 @@ def switcherooAggregateRight {Outcome : Type*} (params : Parameters)
 
 /-- Concrete family for `G^x_g G^y`. -/
 def completePartPointProductLeft (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) d :=
   fun q =>
     leftPlacedSubMeasurement <|
       multiplyByTotalOnRight
@@ -88,8 +88,8 @@ def completePartPointProductLeft (params : Parameters)
 
 /-- Concrete family for `G^y G^x_g`. -/
 def completePartPointProductRight (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) d :=
   fun q =>
     leftPlacedSubMeasurement <|
       multiplyByTotalOnLeft
@@ -99,8 +99,8 @@ def completePartPointProductRight (params : Parameters)
 
 /-- Concrete family for `G^x G^y`. -/
 def completePartTotalProductLeft (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SlicePairQuestion params) Unit :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SlicePairQuestion params) Unit d :=
   fun q =>
     leftPlacedSubMeasurement <|
       multiplyByTotalOnRight
@@ -110,8 +110,8 @@ def completePartTotalProductLeft (params : Parameters)
 
 /-- Concrete family for `G^y G^x`. -/
 def completePartTotalProductRight (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SlicePairQuestion params) Unit :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SlicePairQuestion params) Unit d :=
   fun q =>
     leftPlacedSubMeasurement <|
       multiplyByTotalOnLeft
@@ -121,8 +121,8 @@ def completePartTotalProductRight (params : Parameters)
 
 /-- Concrete family for `G^x_g G^y_⊥`. -/
 def incompletePartPointProductLeft (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) d :=
   fun q =>
     leftPlacedSubMeasurement <|
       multiplyByTotalOnRight
@@ -132,8 +132,8 @@ def incompletePartPointProductLeft (params : Parameters)
 
 /-- Concrete family for `G^y_⊥ G^x_g`. -/
 def incompletePartPointProductRight (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SlicePairQuestion params) (Polynomial params) d :=
   fun q =>
     leftPlacedSubMeasurement <|
       multiplyByTotalOnLeft
@@ -143,8 +143,8 @@ def incompletePartPointProductRight (params : Parameters)
 
 /-- Concrete family for `G^x_⊥ G^y_⊥`. -/
 def incompletePartTotalProductLeft (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SlicePairQuestion params) Unit :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SlicePairQuestion params) Unit d :=
   fun q =>
     leftPlacedSubMeasurement <|
       multiplyByTotalOnRight
@@ -154,8 +154,8 @@ def incompletePartTotalProductLeft (params : Parameters)
 
 /-- Concrete family for `G^y_⊥ G^x_⊥`. -/
 def incompletePartTotalProductRight (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SlicePairQuestion params) Unit :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SlicePairQuestion params) Unit d :=
   fun q =>
     leftPlacedSubMeasurement <|
       multiplyByTotalOnLeft
@@ -165,20 +165,20 @@ def incompletePartTotalProductRight (params : Parameters)
 
 /-- Left tensor-placement for `\widehat G^x_g`. -/
 def gHatSelfConsistencyLeftFamily (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SliceQuestion params) (GHatOutcome params) :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SliceQuestion params) (GHatOutcome params) d :=
   fun x => leftPlacedSubMeasurement ((gHatIndexedMeasurement params family x).toSubMeasurement)
 
 /-- Right tensor-placement for `\widehat G^x_g`. -/
 def gHatSelfConsistencyRightFamily (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SliceQuestion params) (GHatOutcome params) :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SliceQuestion params) (GHatOutcome params) d :=
   fun x => rightPlacedSubMeasurement ((gHatIndexedMeasurement params family x).toSubMeasurement)
 
 /-- Concrete family for the pairwise product `\widehat G^x_g \widehat G^y_h`. -/
 def gHatPairProductLeft (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) d :=
   fun q =>
     leftPlacedSubMeasurement <|
       orderedProductSubMeasurement
@@ -188,8 +188,8 @@ def gHatPairProductLeft (params : Parameters)
 
 /-- Concrete family for the reversed pairwise product `\widehat G^y_h \widehat G^x_g`. -/
 def gHatPairProductRight (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) :=
+    (family : IndexedPolynomialFamily params d) :
+    IndexedSubMeasurement (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) d :=
   fun q =>
     leftPlacedSubMeasurement <|
       reversedProductSubMeasurement
@@ -199,8 +199,8 @@ def gHatPairProductRight (params : Parameters)
 
 /-- The ordered half-product `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
 def gHatHalfProductOutcomeOperator (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Operator
+    (family : IndexedPolynomialFamily params d) :
+    (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Operator d
   | 0, _xs, _gs =>
       identityOperator s!"ghatHalf({params.m},{params.q},{params.d},0)"
   | k + 1, xs, gs =>
@@ -210,8 +210,8 @@ def gHatHalfProductOutcomeOperator (params : Parameters)
 
 /-- The total half-product `\sum_{g_1,\dots,g_k} \widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
 def gHatHalfProductTotalOperator (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    (k : ℕ) → PointTuple params k → Operator
+    (family : IndexedPolynomialFamily params d) :
+    (k : ℕ) → PointTuple params k → Operator d
   | 0, _xs =>
       identityOperator s!"ghatHalfTotal({params.m},{params.q},{params.d},0)"
   | k + 1, xs =>
@@ -221,8 +221,8 @@ def gHatHalfProductTotalOperator (params : Parameters)
 
 /-- The cyclically rotated half-product `\widehat G^{x_2}_{g_2} \cdots \widehat G^{x_k}_{g_k} \widehat G^{x_1}_{g_1}`. -/
 def gHatRotatedHalfProductOutcomeOperator (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Operator
+    (family : IndexedPolynomialFamily params d) :
+    (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Operator d
   | 0, _xs, _gs =>
       identityOperator s!"ghatHalfRot({params.m},{params.q},{params.d},0)"
   | k + 1, xs, gs =>
@@ -232,8 +232,8 @@ def gHatRotatedHalfProductOutcomeOperator (params : Parameters)
 
 /-- The total cyclically rotated half-product. -/
 def gHatRotatedHalfProductTotalOperator (params : Parameters)
-    (family : IndexedPolynomialFamily params) :
-    (k : ℕ) → PointTuple params k → Operator
+    (family : IndexedPolynomialFamily params d) :
+    (k : ℕ) → PointTuple params k → Operator d
   | 0, _xs =>
       identityOperator s!"ghatHalfRotTotal({params.m},{params.q},{params.d},0)"
   | k + 1, xs =>
@@ -244,8 +244,8 @@ def gHatRotatedHalfProductTotalOperator (params : Parameters)
 /-- Concrete family for the full sandwich
 `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k} \cdots \widehat G^{x_1}_{g_1}`. -/
 def gHatSandwichFamily (params : Parameters)
-    (family : IndexedPolynomialFamily params) (k : ℕ) :
-    IndexedSubMeasurement (PointTuple params k) (GHatTupleOutcome params k) :=
+    (family : IndexedPolynomialFamily params d) (k : ℕ) :
+    IndexedSubMeasurement (PointTuple params k) (GHatTupleOutcome params k) d :=
   fun xs =>
     { name := s!"ghat.sandwich({params.m},{params.q},{params.d},{k})"
       outcomeOperator := fun gs =>
@@ -257,8 +257,8 @@ def gHatSandwichFamily (params : Parameters)
 
 /-- Concrete family for the half-sandwich product of `k` completed slices. -/
 def gHatHalfSandwichLeft (params : Parameters)
-    (family : IndexedPolynomialFamily params) (k : ℕ) :
-    IndexedSubMeasurement (PointTuple params k) (GHatTupleOutcome params k) :=
+    (family : IndexedPolynomialFamily params d) (k : ℕ) :
+    IndexedSubMeasurement (PointTuple params k) (GHatTupleOutcome params k) d :=
   fun xs =>
     leftPlacedSubMeasurement <|
       { name := s!"ghat.half.left({params.m},{params.q},{params.d},{k})"
@@ -267,8 +267,8 @@ def gHatHalfSandwichLeft (params : Parameters)
 
 /-- Concrete family for the cyclically permuted half-sandwich product. -/
 def gHatHalfSandwichRight (params : Parameters)
-    (family : IndexedPolynomialFamily params) (k : ℕ) :
-    IndexedSubMeasurement (PointTuple params k) (GHatTupleOutcome params k) :=
+    (family : IndexedPolynomialFamily params d) (k : ℕ) :
+    IndexedSubMeasurement (PointTuple params k) (GHatTupleOutcome params k) d :=
   fun xs =>
     leftPlacedSubMeasurement <|
       { name := s!"ghat.half.right({params.m},{params.q},{params.d},{k})"
@@ -277,7 +277,7 @@ def gHatHalfSandwichRight (params : Parameters)
 
 /-- TODO: this should carry the paper's operator-polynomial `S_{\tau_{\ge \ell}}` construction from `lem:from-H-to-G`. -/
 def suffixBernoulliWeightOperator (params : Parameters)
-    (_family : IndexedPolynomialFamily params) (k ℓ : ℕ) (_τ : GHatType k) : Operator :=
+    (_family : IndexedPolynomialFamily params d) (k ℓ : ℕ) (_τ : GHatType k) : Operator d :=
   { name := s!"S_tau>=({params.m},{params.q},{params.d},{k},{ℓ})" }
 
 /-- The default type used when packaging the recurrence step at the statement level. -/
@@ -286,16 +286,16 @@ def emptyGHatType (k : ℕ) : GHatType k :=
 
 /-- Placeholder family for the interpolated operator `H^{x_1,\dots,x_k}_h`. -/
 def pastedInterpolationFamily (params : Parameters)
-    (family : IndexedPolynomialFamily params) (k : ℕ) :
-    IndexedSubMeasurement (PointTuple params k) (Polynomial params.next) :=
+    (family : IndexedPolynomialFamily params d) (k : ℕ) :
+    IndexedSubMeasurement (PointTuple params k) (Polynomial params.next) d :=
   fun xs =>
     postprocess (gHatSandwichFamily params family k xs)
       (interpolateCompletedSlices params k xs)
 
 /-- The averaged sandwiched family before interpolation. -/
 def averagedSandwichSubMeasurement (params : Parameters)
-    (family : IndexedPolynomialFamily params) (k : ℕ) :
-    SubMeasurement (GHatTupleOutcome params k) :=
+    (family : IndexedPolynomialFamily params d) (k : ℕ) :
+    SubMeasurement (GHatTupleOutcome params k) d :=
   averageIndexedSubMeasurement
     s!"ghat.sandwich.avg({params.m},{params.q},{params.d},{k})"
     (distinctTupleDistribution params k)
@@ -303,7 +303,7 @@ def averagedSandwichSubMeasurement (params : Parameters)
 
 /-- The specific pasted submeasurement constructed from the sandwich/interpolation scheme. -/
 def constructedPastedSubMeasurement (params : Parameters)
-    (family : IndexedPolynomialFamily params) (k : ℕ) : SubMeasurement (Polynomial params.next) :=
+    (family : IndexedPolynomialFamily params d) (k : ℕ) : SubMeasurement (Polynomial params.next) d :=
   averageIndexedSubMeasurement
     s!"Hpasted({params.m},{params.q},{params.d},{k})"
     (distinctTupleDistribution params k)
@@ -320,7 +320,7 @@ outcome `h₀` (the fallback interpolant).  So the outcome operator for `h₀` b
 `H_{h₀} + (I - H_total)` while all other outcomes keep their original operators, and
 the total is genuinely the identity `I`. -/
 def constructedPastedMeasurement (params : Parameters)
-    (family : IndexedPolynomialFamily params) (k : ℕ) : Measurement (Polynomial params.next) where
+    (family : IndexedPolynomialFamily params d) (k : ℕ) : Measurement (Polynomial params.next) d where
   toSubMeasurement :=
     let H := constructedPastedSubMeasurement params family k
     let h₀ := pastedFallbackOutcome params
@@ -336,8 +336,8 @@ def constructedPastedMeasurement (params : Parameters)
 
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/
 def verticalLineMeasurementFamily (params : Parameters)
-    (strategy : SymmetricStrategy params.next) :
-    IndexedSubMeasurement (VerticalLineQuestion params) (AxisLinePolynomial params.next) :=
+    (strategy : SymmetricStrategy params.next d) :
+    IndexedSubMeasurement (VerticalLineQuestion params) (AxisLinePolynomial params.next) d :=
   fun u =>
     let ℓ : AxisParallelLine params.next :=
       { base := appendPoint params u zeroCoord
@@ -346,9 +346,9 @@ def verticalLineMeasurementFamily (params : Parameters)
 
 /-- Explicit value extracted from the `i`-th completed slice outcome at the test point. -/
 def ldSandwichLineOnePointLeftFamily (params : Parameters)
-    (_strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params)
-    (k i : ℕ) : IndexedSubMeasurement (SandwichedLineQuestion params k) (Option (Fq params)) :=
+    (_strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d)
+    (k i : ℕ) : IndexedSubMeasurement (SandwichedLineQuestion params k) (Option (Fq params)) d :=
   fun q =>
     postprocess (gHatSandwichFamily params family k q.2) (fun gs =>
       if h : i < k then
@@ -358,9 +358,9 @@ def ldSandwichLineOnePointLeftFamily (params : Parameters)
 
 /-- Explicit value extracted from the vertical line measurement `B^u` at the slice height `x_i`. -/
 def ldSandwichLineOnePointRightFamily (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (_family : IndexedPolynomialFamily params)
-    (k i : ℕ) : IndexedSubMeasurement (SandwichedLineQuestion params k) (Option (Fq params)) :=
+    (strategy : SymmetricStrategy params.next d)
+    (_family : IndexedPolynomialFamily params d)
+    (k i : ℕ) : IndexedSubMeasurement (SandwichedLineQuestion params k) (Option (Fq params)) d :=
   fun q =>
     postprocess (verticalLineMeasurementFamily params strategy q.1) (fun f =>
       if h : i < k then
@@ -370,8 +370,8 @@ def ldSandwichLineOnePointRightFamily (params : Parameters)
 
 /-- Restrict a global polynomial-valued submeasurement to the vertical line through `u`. -/
 def hRestrictionToVerticalLine (params : Parameters)
-    (H : SubMeasurement (Polynomial params.next)) :
-    IndexedSubMeasurement (VerticalLineQuestion params) (AxisLinePolynomial params.next) :=
+    (H : SubMeasurement (Polynomial params.next) d) :
+    IndexedSubMeasurement (VerticalLineQuestion params) (AxisLinePolynomial params.next) d :=
   fun u =>
     let verticalLine : AxisParallelLine params.next :=
       { base := appendPoint params u zeroCoord
@@ -379,35 +379,35 @@ def hRestrictionToVerticalLine (params : Parameters)
     postprocess H (fun h => Polynomial.restrictToAxisParallelLine params.next h verticalLine)
 
 /-- Collapse a submeasurement to its `Unit`-valued total operator. -/
-def pastedMeasurementTotal {α : Type*} (H : SubMeasurement α) : IndexedSubMeasurement Unit Unit :=
+def pastedMeasurementTotal {α : Type*} {d : ℕ} (H : SubMeasurement α d) : IndexedSubMeasurement Unit Unit d :=
   constantSubMeasurementFamily (postprocess H (fun _ => ()))
 
 /-- The total operator of the specifically constructed pasted submeasurement. -/
 def constructedPastedMeasurementTotal (params : Parameters)
-    (family : IndexedPolynomialFamily params) (k : ℕ) :
-    IndexedSubMeasurement Unit Unit :=
+    (family : IndexedPolynomialFamily params d) (k : ℕ) :
+    IndexedSubMeasurement Unit Unit d :=
   pastedMeasurementTotal (constructedPastedSubMeasurement params family k)
 
 /-- The expansion over all outcome types `τ`, written as the total mass of the averaged sandwich family. -/
 def allOutcomesExpansionFamily (params : Parameters)
-    (_strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params) (k : ℕ) :
-    IndexedSubMeasurement Unit Unit :=
+    (_strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d) (k : ℕ) :
+    IndexedSubMeasurement Unit Unit d :=
   pastedMeasurementTotal (averagedSandwichSubMeasurement params family k)
 
 /-- The Bernoulli-tail polynomial in the averaged complete operator `G = E_x \sum_g G^x_g`. -/
 def bernoulliTailFromFamily (params : Parameters)
-    (family : IndexedPolynomialFamily params) (k : ℕ) :
-    IndexedSubMeasurement Unit Unit :=
+    (family : IndexedPolynomialFamily params d) (k : ℕ) :
+    IndexedSubMeasurement Unit Unit d :=
   constantSubMeasurementFamily <|
     bernoulliTailSubMeasurement k params.d
       ((IndexedPolynomialFamily.averagedSubMeasurement family).totalOperator)
 
 /-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`. -/
 def fromHToGRecurrenceLeftFamily (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params) (k ℓ : ℕ) :
-    IndexedSubMeasurement Unit Unit :=
+    (strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d) (k ℓ : ℕ) :
+    IndexedSubMeasurement Unit Unit d :=
   fun _ =>
     let base := allOutcomesExpansionFamily params strategy family k ()
     let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
@@ -417,9 +417,9 @@ def fromHToGRecurrenceLeftFamily (params : Parameters)
 
 /-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`. -/
 def fromHToGRecurrenceRightFamily (params : Parameters)
-    (_strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params) (k ℓ : ℕ) :
-    IndexedSubMeasurement Unit Unit :=
+    (_strategy : SymmetricStrategy params.next d)
+    (family : IndexedPolynomialFamily params d) (k ℓ : ℕ) :
+    IndexedSubMeasurement Unit Unit d :=
   fun _ =>
     let base := bernoulliTailFromFamily params family k ()
     let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)

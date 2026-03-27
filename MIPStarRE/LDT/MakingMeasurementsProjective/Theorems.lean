@@ -19,10 +19,10 @@ open MIPStarRE.LDT
 theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     [Fintype OutcomeA] [DecidableEq OutcomeA]
     [Fintype OutcomeB] [DecidableEq OutcomeB]
-    (ψ : QuantumState)
-    (A : IndexedSubMeasurement QuestionA OutcomeA)
-    (B : IndexedSubMeasurement QuestionB OutcomeB) :
-    ∃ data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB,
+    (ψ : QuantumState d)
+    (A : IndexedSubMeasurement QuestionA OutcomeA d)
+    (B : IndexedSubMeasurement QuestionB OutcomeB d) :
+    ∃ data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB d,
       NaimarkStatement ψ A B data := by
   sorry
 
@@ -31,10 +31,10 @@ set_option linter.unusedFintypeInType false in
 /-- `thm:orthonormalization`. -/
 theorem orthonormalization {Outcome : Type*}
     [Fintype Outcome]
-    (ψ : QuantumState) (A : SubMeasurement Outcome) (ζ : Error) :
+    (ψ : QuantumState d) (A : SubMeasurement Outcome d) (ζ : Error) :
     StrongSelfConsistencyRel ψ (uniformDistribution Unit)
         (constantSubMeasurementFamily A) ζ →
-      ∃ P : ProjectiveSubMeasurement Outcome,
+      ∃ P : ProjectiveSubMeasurement Outcome d,
         StateDependentDistanceRel ψ (uniformDistribution Unit)
           (constantSubMeasurementFamily A)
           (constantSubMeasurementFamily P.toSubMeasurement)
@@ -44,12 +44,12 @@ theorem orthonormalization {Outcome : Type*}
 /-- `lem:orthonormalization-main-lemma`. -/
 lemma orthonormalizationMainLemma {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState)
-    (A B : Measurement Outcome) (ζ : Error) :
+    (ψ : QuantumState d)
+    (A B : Measurement Outcome d) (ζ : Error) :
     ConsistencyRel ψ (uniformDistribution Unit)
       (constantSubMeasurementFamily A.toSubMeasurement)
       (constantSubMeasurementFamily B.toSubMeasurement) ζ →
-      ∃ P : ProjectiveSubMeasurement Outcome,
+      ∃ P : ProjectiveSubMeasurement Outcome d,
         RoundedProjectiveMeasurementStatement ψ A P
           (orthonormalizationMainLemmaError ζ) := by
   sorry
@@ -60,7 +60,7 @@ consistency gives a quantitative almost-projectivity estimate.
 -/
 lemma consistencyToAlmostProjective {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState) (A B : Measurement Outcome) (ζ : Error) :
+    (ψ : QuantumState d) (A B : Measurement Outcome d) (ζ : Error) :
     ConsistencyRel ψ (uniformDistribution Unit)
       (constantSubMeasurementFamily A.toSubMeasurement)
       (constantSubMeasurementFamily B.toSubMeasurement) ζ →
@@ -79,7 +79,7 @@ where `ζ` bounds the idempotence defect `‖A_a² - A_a‖_τ`.
 -/
 lemma spectralTruncateAlmostProjective {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState) (A : Measurement Outcome) (ζ : Error) :
+    (ψ : QuantumState d) (A : Measurement Outcome d) (ζ : Error) :
     AlmostProjectiveMeasurementStatement ψ A ζ →
       SpectralTruncationStatement ψ A ζ := by
   sorry
@@ -92,9 +92,9 @@ projections may not sum to at most the identity.
 -/
 lemma adjustTruncatedProjections {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState) (A : Measurement Outcome) (ζ : Error) :
+    (ψ : QuantumState d) (A : Measurement Outcome d) (ζ : Error) :
     SpectralTruncationStatement ψ A ζ →
-      ∃ P : ProjectiveSubMeasurement Outcome,
+      ∃ P : ProjectiveSubMeasurement Outcome d,
         RoundedProjectiveMeasurementStatement ψ A P
           (roundingToProjectiveError ζ) := by
   sorry
@@ -109,9 +109,9 @@ a valid submeasurement. The error compounds as `12 * √ζ`.
 -/
 lemma roundAlmostProjectiveMeasurement {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState) (A : Measurement Outcome) (ζ : Error) :
+    (ψ : QuantumState d) (A : Measurement Outcome d) (ζ : Error) :
     AlmostProjectiveMeasurementStatement ψ A ζ →
-      ∃ P : ProjectiveSubMeasurement Outcome,
+      ∃ P : ProjectiveSubMeasurement Outcome d,
         RoundedProjectiveMeasurementStatement ψ A P
           (roundingToProjectiveError ζ) := by
   sorry

@@ -41,46 +41,46 @@ def polynomialDistribution (params : Parameters) :
 
 /-- The operator `G_g` attached to the polynomial outcome `g`. -/
 def polynomialWeightOperator (params : Parameters)
-    (G : SubMeasurement (Polynomial params)) (g : Polynomial params) : Operator :=
+    (G : SubMeasurement (Polynomial params) d) (g : Polynomial params) : Operator d :=
   G.outcomeOperator g
 
 /-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`. -/
 noncomputable def polynomialWeightSqrtOperator (params : Parameters)
-    (G : SubMeasurement (Polynomial params)) (g : Polynomial params) : Operator :=
+    (G : SubMeasurement (Polynomial params) d) (g : Polynomial params) : Operator d :=
   operatorSquareRoot (polynomialWeightOperator params G g)
 
 /-- The weighted state `|ψ_g⟩ = (I ⊗ G_g^{1/2}) |ψ⟩`. -/
 noncomputable def weightedPolynomialState (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) (g : Polynomial params) : QuantumState :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) (g : Polynomial params) : QuantumState d :=
   { name :=
       s!"psi_g({strategy.state.name},{(polynomialWeightSqrtOperator params G g).name})" }
 
 /-- The concrete operator `A^u_{g(u)}` for a fixed polynomial `g`. -/
 def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (g : Polynomial params) (u : Point params) : Operator :=
+    (strategy : SymmetricStrategy params d)
+    (g : Polynomial params) (u : Point params) : Operator d :=
   (strategy.pointMeasurement u).toSubMeasurement.outcomeOperator (g u)
 
 /-- The operator family `u ↦ A(g)^u = A^u_{g(u)}` for a fixed polynomial `g`. -/
 def pointConditionedOperatorFamilyAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (g : Polynomial params) : Point params → Operator :=
+    (strategy : SymmetricStrategy params d)
+    (g : Polynomial params) : Point params → Operator d :=
   fun u => pointConditionedOutcomeOperatorAtPolynomial params strategy g u
 
 /-- The paper's weighted operator `A^u_{g(u)} ⊗ (G_g)^{1/2}`. -/
 noncomputable def weightedPointConditionedOperatorAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params))
-    (g : Polynomial params) (u : Point params) : Operator :=
-  formalTensor
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d)
+    (g : Polynomial params) (u : Point params) : Operator d :=
+  operatorMul -- TODO(tensor): placeholder for formalTensor
     (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
     (polynomialWeightSqrtOperator params G g)
 
 /-- The local variance of `A(g)` on the weighted state `|ψ_g⟩`. -/
 noncomputable def pointConditionedLocalVarianceAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params))
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d)
     (g : Polynomial params) : Error :=
   localVariance params
     (pointConditionedOperatorFamilyAtPolynomial params strategy g)
@@ -88,8 +88,8 @@ noncomputable def pointConditionedLocalVarianceAtPolynomial (params : Parameters
 
 /-- The global variance of `A(g)` on the weighted state `|ψ_g⟩`. -/
 noncomputable def pointConditionedGlobalVarianceAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params))
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d)
     (g : Polynomial params) : Error :=
   globalVariance params
     (pointConditionedOperatorFamilyAtPolynomial params strategy g)
@@ -97,23 +97,23 @@ noncomputable def pointConditionedGlobalVarianceAtPolynomial (params : Parameter
 
 /-- The polynomial-averaged local variance of the conditioned points family. -/
 noncomputable def pointConditionedLocalVariance (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) : Error :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) : Error :=
   averageOverDistribution (polynomialDistribution params)
     (fun g => pointConditionedLocalVarianceAtPolynomial params strategy G g)
 
 /-- The polynomial-averaged global variance of the conditioned points family. -/
 noncomputable def pointConditionedGlobalVariance (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) : Error :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) : Error :=
   averageOverDistribution (polynomialDistribution params)
     (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
 
 /-- The event operator `B^ℓ_[f(u)=g(u)]`. -/
 def generalizeBLeftOperatorAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymmetricStrategy params d)
     (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) : Operator :=
+    (qu : AxisParallelLineQuestion params) : Operator d :=
   let ℓ := qu.1
   let u := qu.2
   { name :=
@@ -122,36 +122,36 @@ def generalizeBLeftOperatorAtPolynomial (params : Parameters)
 
 /-- The event operator `B^ℓ_[f = g|_ℓ]`. -/
 def generalizeBRightOperatorAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymmetricStrategy params d)
     (_g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) : Operator :=
+    (qu : AxisParallelLineQuestion params) : Operator d :=
   let ℓ := qu.1
   { name := s!"{(strategy.axisParallelMeasurement ℓ).toSubMeasurement.name}[g|ell]" }
 
 /-- The weighted left operator in `lem:generalize-b`. -/
 noncomputable def weightedGeneralizeBLeftOperatorAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params))
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d)
     (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) : Operator :=
-  formalTensor
+    (qu : AxisParallelLineQuestion params) : Operator d :=
+  operatorMul -- TODO(tensor): placeholder for formalTensor
     (generalizeBLeftOperatorAtPolynomial params strategy g qu)
     (polynomialWeightSqrtOperator params G g)
 
 /-- The weighted right operator in `lem:generalize-b`. -/
 noncomputable def weightedGeneralizeBRightOperatorAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params))
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d)
     (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) : Operator :=
-  formalTensor
+    (qu : AxisParallelLineQuestion params) : Operator d :=
+  operatorMul -- TODO(tensor): placeholder for formalTensor
     (generalizeBRightOperatorAtPolynomial params strategy g qu)
     (polynomialWeightSqrtOperator params G g)
 
 /-- The squared norm expression controlled by `lem:generalize-b` for a fixed `g`. -/
 noncomputable def generalizeBDeviationAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params))
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d)
     (g : Polynomial params) : Error :=
   averageOverDistribution (axisParallelLineQuestionDistribution params)
     (fun qu =>
@@ -163,16 +163,16 @@ noncomputable def generalizeBDeviationAtPolynomial (params : Parameters)
 
 /-- The polynomial-averaged deviation controlled by `lem:generalize-b`. -/
 noncomputable def generalizeBDeviation (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) : Error :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) : Error :=
   averageOverDistribution (polynomialDistribution params)
     (fun g => generalizeBDeviationAtPolynomial params strategy G g)
 
 /-- Aggregated family for the left-hand side of `lem:generalize-b`. -/
 noncomputable def generalizeBLeftFamily (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) :
-    IndexedSubMeasurement (AxisParallelLineQuestion params) Unit :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) :
+    IndexedSubMeasurement (AxisParallelLineQuestion params) Unit d :=
   fun qu =>
     let op :=
       averageOperatorOverDistribution (polynomialDistribution params)
@@ -183,9 +183,9 @@ noncomputable def generalizeBLeftFamily (params : Parameters)
 
 /-- Aggregated family for the right-hand side of `lem:generalize-b`. -/
 noncomputable def generalizeBRightFamily (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) :
-    IndexedSubMeasurement (AxisParallelLineQuestion params) Unit :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) :
+    IndexedSubMeasurement (AxisParallelLineQuestion params) Unit d :=
   fun qu =>
     let op :=
       averageOperatorOverDistribution (polynomialDistribution params)
@@ -196,9 +196,9 @@ noncomputable def generalizeBRightFamily (params : Parameters)
 
 /-- Aggregated family for `A^u_[g(u)] ⊗ (G_g)^{1/2}`. -/
 noncomputable def localVarianceLeftFamily (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) :
-    IndexedSubMeasurement (PointPairQuestion params) Unit :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) :
+    IndexedSubMeasurement (PointPairQuestion params) Unit d :=
   fun uv =>
     let op :=
       averageOperatorOverDistribution (polynomialDistribution params)
@@ -209,9 +209,9 @@ noncomputable def localVarianceLeftFamily (params : Parameters)
 
 /-- Aggregated family for `A^v_[g(v)] ⊗ (G_g)^{1/2}`. -/
 noncomputable def localVarianceRightFamily (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) :
-    IndexedSubMeasurement (PointPairQuestion params) Unit :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) :
+    IndexedSubMeasurement (PointPairQuestion params) Unit d :=
   fun uv =>
     let op :=
       averageOperatorOverDistribution (polynomialDistribution params)
@@ -222,9 +222,9 @@ noncomputable def localVarianceRightFamily (params : Parameters)
 
 /-- The same weighted operator on the first independently sampled point. -/
 noncomputable def globalVarianceLeftFamily (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) :
-    IndexedSubMeasurement (PointPairQuestion params) Unit :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) :
+    IndexedSubMeasurement (PointPairQuestion params) Unit d :=
   fun uv =>
     let op :=
       averageOperatorOverDistribution (polynomialDistribution params)
@@ -235,9 +235,9 @@ noncomputable def globalVarianceLeftFamily (params : Parameters)
 
 /-- The same weighted operator on the second independently sampled point. -/
 noncomputable def globalVarianceRightFamily (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) :
-    IndexedSubMeasurement (PointPairQuestion params) Unit :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) :
+    IndexedSubMeasurement (PointPairQuestion params) Unit d :=
   fun uv =>
     let op :=
       averageOperatorOverDistribution (polynomialDistribution params)
@@ -248,8 +248,8 @@ noncomputable def globalVarianceRightFamily (params : Parameters)
 
 /-- The edgewise squared norm expression in `lem:local-variance-of-points`. -/
 noncomputable def localVarianceDeviationAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params))
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d)
     (g : Polynomial params) : Error :=
   placeholderAverageOverDistribution (rerandomizeCoord params)
     (fun uv =>
@@ -261,8 +261,8 @@ noncomputable def localVarianceDeviationAtPolynomial (params : Parameters)
 
 /-- The independently sampled squared norm expression in `lem:global-variance-of-points`. -/
 noncomputable def globalVarianceDeviationAtPolynomial (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params))
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d)
     (g : Polynomial params) : Error :=
   placeholderAverageOverDistribution (independentPointPair params)
     (fun uv =>
@@ -274,15 +274,15 @@ noncomputable def globalVarianceDeviationAtPolynomial (params : Parameters)
 
 /-- The polynomial-averaged local squared norm expression. -/
 noncomputable def localVarianceDeviation (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) : Error :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) : Error :=
   averageOverDistribution (polynomialDistribution params)
     (fun g => localVarianceDeviationAtPolynomial params strategy G g)
 
 /-- The polynomial-averaged global squared norm expression. -/
 noncomputable def globalVarianceDeviation (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) : Error :=
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d) : Error :=
   averageOverDistribution (polynomialDistribution params)
     (fun g => globalVarianceDeviationAtPolynomial params strategy G g)
 

@@ -16,8 +16,8 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- An optimal primal/dual pair for the section's semidefinite program. -/
 structure SdpOptimalPair (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params)) (Z : Operator) : Prop where
+    (strategy : SymmetricStrategy params d)
+    (T : Measurement (Polynomial params) d) (Z : Operator d) : Prop where
   primalTotalOperator :
     T.totalOperator = polynomialIdentityOperator params
   dualPositive : PositiveSemidefinite Z
@@ -37,45 +37,46 @@ structure SdpOptimalPair (params : Parameters)
 
 /-- Output package for `lem:sdp`. -/
 structure SdpStatement (params : Parameters)
-    (strategy : SymmetricStrategy params) : Prop where
+    (strategy : SymmetricStrategy params d) : Prop where
   witness :
-    ∃ T : Measurement (Polynomial params), ∃ Z : Operator,
+    ∃ T : Measurement (Polynomial params) d, ∃ Z : Operator d,
       SdpOptimalPair params strategy T Z
 
 /-- The operator inside the left-hand side of `lem:add-in-u` at a fixed point `u`. -/
 noncomputable def addInULeftOperatorAtPoint {Outcome : Type*}
     (params : Parameters)
-    (_strategy : SymmetricStrategy params)
-    (M : IndexedSubMeasurement (Point params) Outcome)
-    (H : SubMeasurement (Polynomial params))
+    (_strategy : SymmetricStrategy params d)
+    (M : IndexedSubMeasurement (Point params) Outcome d)
+    (H : SubMeasurement (Polynomial params) d)
     (S : AddInUSelection params Outcome)
-    (u : Point params) : Operator :=
+    (u : Point params) : Operator d :=
   match addInUSelectionChoice params S u with
   | some (o, h) =>
-      formalTensor ((M u).outcomeOperator o) (H.outcomeOperator h)
+      operatorMul -- TODO(tensor): placeholder for formalTensor
+        ((M u).outcomeOperator o) (H.outcomeOperator h)
   | none => formalZeroOperator
 
 /-- The operator inside the right-hand side of `lem:add-in-u` at a fixed point `u`. -/
 noncomputable def addInURightOperatorAtPoint {Outcome : Type*}
     (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (M : IndexedSubMeasurement (Point params) Outcome)
-    (T : Measurement (Polynomial params))
+    (strategy : SymmetricStrategy params d)
+    (M : IndexedSubMeasurement (Point params) Outcome d)
+    (T : Measurement (Polynomial params) d)
     (S : AddInUSelection params Outcome)
-    (u : Point params) : Operator :=
+    (u : Point params) : Operator d :=
   match addInUSelectionChoice params S u with
   | some (o, h) =>
       let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
-      formalTensor
+      operatorMul -- TODO(tensor): placeholder for formalTensor
         (operatorMul (operatorMul Au ((M u).outcomeOperator o)) Au)
         (T.outcomeOperator h)
   | none => formalZeroOperator
 
 /-- The left-hand expectation in `lem:add-in-u`. -/
 noncomputable def addInULeftQuantity {Outcome : Type*} (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (M : IndexedSubMeasurement (Point params) Outcome)
-    (H : SubMeasurement (Polynomial params))
+    (strategy : SymmetricStrategy params d)
+    (M : IndexedSubMeasurement (Point params) Outcome d)
+    (H : SubMeasurement (Polynomial params) d)
     (S : AddInUSelection params Outcome) : Error :=
   averageOverDistribution (uniformDistribution (Point params))
     (fun u =>
@@ -84,9 +85,9 @@ noncomputable def addInULeftQuantity {Outcome : Type*} (params : Parameters)
 
 /-- The right-hand expectation in `lem:add-in-u`. -/
 noncomputable def addInURightQuantity {Outcome : Type*} (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (M : IndexedSubMeasurement (Point params) Outcome)
-    (T : Measurement (Polynomial params))
+    (strategy : SymmetricStrategy params d)
+    (M : IndexedSubMeasurement (Point params) Outcome d)
+    (T : Measurement (Polynomial params) d)
     (S : AddInUSelection params Outcome) : Error :=
   averageOverDistribution (uniformDistribution (Point params))
     (fun u =>
@@ -95,61 +96,63 @@ noncomputable def addInURightQuantity {Outcome : Type*} (params : Parameters)
 
 /-- The pointwise matched operator `Σ_a A^u_a ⊗ H_[h(u)=a]`. -/
 noncomputable def helperAgreementOperatorAtPoint (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (H : SubMeasurement (Polynomial params))
-    (u : Point params) : Operator :=
+    (strategy : SymmetricStrategy params d)
+    (H : SubMeasurement (Polynomial params) d)
+    (u : Point params) : Operator d :=
   averageOperatorOverDistribution (uniformDistribution (Fq params))
     (fun a =>
-      formalTensor
+      operatorMul -- TODO(tensor): placeholder for formalTensor
         ((strategy.pointMeasurement u).toSubMeasurement.outcomeOperator a)
         ((evaluateAt params u H).outcomeOperator a))
 
 /-- The average operator `E_u Σ_a A^u_a ⊗ H_[h(u)=a]`. -/
 noncomputable def helperAgreementAverageOperator (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (H : SubMeasurement (Polynomial params)) : Operator :=
+    (strategy : SymmetricStrategy params d)
+    (H : SubMeasurement (Polynomial params) d) : Operator d :=
   averageOperatorOverDistribution (uniformDistribution (Point params))
     (helperAgreementOperatorAtPoint params strategy H)
 
 /-- The helper-stage upper operator `Z ⊗ I`. -/
-def helperUpperOperator (params : Parameters) (Z : Operator) : Operator :=
-  formalTensor Z (polynomialIdentityOperator params)
+noncomputable def helperUpperOperator (params : Parameters) (Z : Operator d) : Operator d :=
+  operatorMul -- TODO(tensor): placeholder for formalTensor
+        Z (polynomialIdentityOperator params)
 
 /-- The operator measuring the helper-stage boundedness defect. -/
 noncomputable def helperBoundednessOperator (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (H : SubMeasurement (Polynomial params)) (Z : Operator) : Operator :=
+    (strategy : SymmetricStrategy params d)
+    (H : SubMeasurement (Polynomial params) d) (Z : Operator d) : Operator d :=
   operatorDifference
     (helperUpperOperator params Z)
     (helperAgreementAverageOperator params strategy H)
 
 /-- The helper-stage boundedness defect. -/
 noncomputable def helperBoundednessGap (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (H : SubMeasurement (Polynomial params)) (Z : Operator) : Error :=
+    (strategy : SymmetricStrategy params d)
+    (H : SubMeasurement (Polynomial params) d) (Z : Operator d) : Error :=
   operatorExpectation strategy.state
     (helperBoundednessOperator params strategy H Z)
 
 /-- The projective-stage residual operator `Z ⊗ (I - H)`. -/
 noncomputable def projectiveResidualOperator (params : Parameters)
-    (H : ProjectiveSubMeasurement (Polynomial params))
-    (Z : Operator) : Operator :=
-  formalTensor Z
+    (H : ProjectiveSubMeasurement (Polynomial params) d)
+    (Z : Operator d) : Operator d :=
+  operatorMul -- TODO(tensor): placeholder for formalTensor
+        Z
     (operatorDifference (polynomialIdentityOperator params) H.toSubMeasurement.totalOperator)
 
 /-- The projective-stage boundedness defect. -/
 noncomputable def projectiveBoundednessGap (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (H : ProjectiveSubMeasurement (Polynomial params)) (Z : Operator) : Error :=
+    (strategy : SymmetricStrategy params d)
+    (H : ProjectiveSubMeasurement (Polynomial params) d) (Z : Operator d) : Error :=
   operatorExpectation strategy.state
     (projectiveResidualOperator params H Z)
 
 /-- Output package for `lem:add-in-u`. -/
 structure AddInUStatement {Outcome : Type*} (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (T : Measurement (Polynomial params))
-    (M : IndexedSubMeasurement (Point params) Outcome)
-    (H : SubMeasurement (Polynomial params))
+    (strategy : SymmetricStrategy params d)
+    (T : Measurement (Polynomial params) d)
+    (M : IndexedSubMeasurement (Point params) Outcome d)
+    (H : SubMeasurement (Polynomial params) d)
     (eps delta : Error) : Prop where
   averagedConstruction :
     H = averagedSandwichedPolynomialSubMeasurement params strategy T
@@ -170,16 +173,16 @@ structure AddInUStatement {Outcome : Type*} (params : Parameters)
 
 /-- Output package for `lem:self-improvement-helper`. -/
 structure SelfImprovementHelperConclusion (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : Measurement (Polynomial params))
-    (T : Measurement (Polynomial params))
-    (H : SubMeasurement (Polynomial params))
-    (Z : Operator) (eps delta gamma nu : Error) : Prop where
+    (strategy : SymmetricStrategy params d)
+    (G : Measurement (Polynomial params) d)
+    (T : Measurement (Polynomial params) d)
+    (H : SubMeasurement (Polynomial params) d)
+    (Z : Operator d) (eps delta gamma nu : Error) : Prop where
   sdpWitness : SdpOptimalPair params strategy T Z
   averagedConstruction :
     H = averagedSandwichedPolynomialSubMeasurement params strategy T
   addInUTransfer :
-    ∀ {Outcome : Type*} (M : IndexedSubMeasurement (Point params) Outcome),
+    ∀ {Outcome : Type*} (M : IndexedSubMeasurement (Point params) Outcome d),
       AddInUStatement params strategy T M H eps delta
   completeness :
     CompletenessAtLeast strategy.state H
@@ -206,13 +209,13 @@ structure SelfImprovementHelperConclusion (params : Parameters)
 
 /-- Output package for `thm:self-improvement`. -/
 structure SelfImprovementConclusion (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : Measurement (Polynomial params))
-    (H : ProjectiveSubMeasurement (Polynomial params))
-    (Z : Operator) (eps delta gamma nu : Error) : Prop where
+    (strategy : SymmetricStrategy params d)
+    (G : Measurement (Polynomial params) d)
+    (H : ProjectiveSubMeasurement (Polynomial params) d)
+    (Z : Operator d) (eps delta gamma nu : Error) : Prop where
   witness :
-    ∃ T : Measurement (Polynomial params),
-      ∃ Hhat : SubMeasurement (Polynomial params),
+    ∃ T : Measurement (Polynomial params) d,
+      ∃ Hhat : SubMeasurement (Polynomial params) d,
         SelfImprovementHelperConclusion params strategy G T Hhat Z eps delta gamma nu ∧
         StateDependentDistanceRel strategy.state (uniformDistribution Unit)
           (constantSubMeasurementFamily Hhat)
@@ -249,60 +252,60 @@ structure SelfImprovementConclusion (params : Parameters)
 
 /-- Output package for the explicit bridge from measurement to submeasurement input. -/
 structure SelfImprovementSubMeasurementConclusion (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params))
-    (H : ProjectiveSubMeasurement (Polynomial params))
-    (Z : Operator) (eps delta gamma nu : Error) : Prop where
+    (strategy : SymmetricStrategy params d)
+    (G : SubMeasurement (Polynomial params) d)
+    (H : ProjectiveSubMeasurement (Polynomial params) d)
+    (Z : Operator d) (eps delta gamma nu : Error) : Prop where
   measurementBridge :
-    ∃ Gmeas : Measurement (Polynomial params),
+    ∃ Gmeas : Measurement (Polynomial params) d,
       Gmeas.toSubMeasurement = G ∧
       SelfImprovementConclusion params strategy Gmeas H Z eps delta gamma nu
 
 /-- `lem:self-improvement-helper`. -/
 lemma selfImprovementHelper
     (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymmetricStrategy params d)
     (eps delta gamma nu : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : Measurement (Polynomial params))
+    (G : Measurement (Polynomial params) d)
     (hcons : ConsistentWithPolynomialEvaluation params strategy.state
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
       G.toSubMeasurement nu) :
-    ∃ T : Measurement (Polynomial params),
-      ∃ H : SubMeasurement (Polynomial params), ∃ Z : Operator,
+    ∃ T : Measurement (Polynomial params) d,
+      ∃ H : SubMeasurement (Polynomial params) d, ∃ Z : Operator d,
         SelfImprovementHelperConclusion params strategy G T H Z eps delta gamma nu := by
   sorry
 
 /-- `lem:sdp`. -/
 lemma sdp
     (params : Parameters)
-    (strategy : SymmetricStrategy params) :
+    (strategy : SymmetricStrategy params d) :
     SdpStatement params strategy := by
   sorry
 
 /-- `lem:add-in-u`. -/
 lemma addInU {Outcome : Type*}
     (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymmetricStrategy params d)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (T : Measurement (Polynomial params))
-    (M : IndexedSubMeasurement (Point params) Outcome)
-    (H : SubMeasurement (Polynomial params)) :
+    (T : Measurement (Polynomial params) d)
+    (M : IndexedSubMeasurement (Point params) Outcome d)
+    (H : SubMeasurement (Polynomial params) d) :
     AddInUStatement params strategy T M H eps delta := by
   sorry
 
 /-- `thm:self-improvement`. -/
 theorem selfImprovement
     (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymmetricStrategy params d)
     (eps delta gamma nu : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : Measurement (Polynomial params))
+    (G : Measurement (Polynomial params) d)
     (hcons : ConsistentWithPolynomialEvaluation params strategy.state
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
       G.toSubMeasurement nu) :
-    ∃ H : ProjectiveSubMeasurement (Polynomial params), ∃ Z : Operator,
+    ∃ H : ProjectiveSubMeasurement (Polynomial params) d, ∃ Z : Operator d,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
   sorry
 
@@ -312,16 +315,16 @@ submeasurement-input version used in `inductive_step.tex`.
 -/
 theorem selfImprovementFromSubMeasurement
     (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymmetricStrategy params d)
     (eps delta gamma nu : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeasurement (Polynomial params))
-    (Gmeas : Measurement (Polynomial params))
+    (G : SubMeasurement (Polynomial params) d)
+    (Gmeas : Measurement (Polynomial params) d)
     (hbridge : Gmeas.toSubMeasurement = G)
     (hcons : ConsistentWithPolynomialEvaluation params strategy.state
       (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
       G nu) :
-    ∃ H : ProjectiveSubMeasurement (Polynomial params), ∃ Z : Operator,
+    ∃ H : ProjectiveSubMeasurement (Polynomial params) d, ∃ Z : Operator d,
       SelfImprovementSubMeasurementConclusion params strategy G H Z
         eps delta gamma nu := by
   sorry

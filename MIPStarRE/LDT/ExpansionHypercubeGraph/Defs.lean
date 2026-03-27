@@ -65,20 +65,19 @@ def independentPointPair (params : Parameters) : Distribution (Point params × P
   { name := s!"independentPoints({params.m},{params.q})" }
 
 /-- A formal zero operator used in theorem-shape statements. -/
-def formalZeroOperator : Operator :=
+def formalZeroOperator : Operator d :=
   { name := "0" }
 
 
 /-- Square root of an operator expression.
 Propagates `dim`; matrix square root is not computed (placeholder).
 TODO: compute actual matrix square root when Mathlib provides it. -/
-noncomputable def operatorSquareRoot (X : Operator) : Operator where
+noncomputable def operatorSquareRoot (X : Operator d) : Operator d where
   name := s!"sqrt({X.name})"
-  dim := X.dim
   matrix := X.matrix
 
 /-- Apply a formal operator to a formal vector. -/
-def applyOperatorToVector (T : Operator) (v : HypercubeVector) : HypercubeVector :=
+def applyOperatorToVector (T : Operator d) (v : HypercubeVector) : HypercubeVector :=
   { name := s!"({T.name})•{v.name}" }
 
 /-- Scale a formal vector by a scalar. -/
@@ -86,9 +85,8 @@ def scaleVector (_c : Error) (v : HypercubeVector) : HypercubeVector :=
   { name := s!"scalar•{v.name}" }
 
 /-- The rank-one projector onto a state vector, carrying the state's density matrix. -/
-def stateProjector (ψ : QuantumState) : Operator where
+def stateProjector (ψ : QuantumState d) : Operator d where
   name := s!"|{ψ.name}><{ψ.name}|"
-  dim := ψ.dim
   matrix := ψ.density
 
 /-- A nonzero placeholder scalar extracted from a string tag. -/
@@ -96,7 +94,7 @@ noncomputable def placeholderScalar (tag : String) : Error :=
   (tag.length : Error)
 
 /-- Placeholder for taking the expectation of an operator on a state. -/
-noncomputable def operatorExpectation (ψ : QuantumState) (X : Operator) : Error :=
+noncomputable def operatorExpectation (ψ : QuantumState d) (X : Operator d) : Error :=
   placeholderScalar s!"Exp[{ψ.name}|{X.name}]"
 
 /-- Placeholder for averaging a real-valued observable over a distribution.
@@ -110,17 +108,17 @@ noncomputable def placeholderAverageOverDistribution {α : Type*}
   · exact base
 
 /-- Placeholder trace of a formal operator expression. -/
-noncomputable def operatorTrace (X : Operator) : Error :=
+noncomputable def operatorTrace (X : Operator d) : Error :=
   placeholderScalar s!"Tr[{X.name}]"
 
 /-- Weighted sum of operators over a distribution's finite support,
 using the same `support`/`weight` data as the scalar `averageOverDistribution`. -/
 noncomputable def averageOperatorOverDistribution {α : Type*}
-    (𝒟 : Distribution α) (f : α → Operator) : Operator :=
+    (𝒟 : Distribution α) (f : α → Operator d) : Operator d :=
   match 𝒟.support with
   | [] => { name := s!"AvgOp[{𝒟.name}](empty)" }
   | a :: _ =>
-    weightedOperatorSumOnSupport (f a) 𝒟.support 𝒟.weight f
+    weightedOperatorSumOnSupport 𝒟.support 𝒟.weight f
 
 /-- An honest finite matrix register for the hypercube vertices. -/
 def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
@@ -150,80 +148,83 @@ noncomputable def matrixLaplacianOperator (params : Parameters) :
     matrixAdjacencyOperator params
 
 /-- Convert a `MatrixOperator` on a finite Hilbert space to an `Operator` by reindexing
-the matrix through `Fintype.equivFin`. -/
+the matrix through `Fintype.equivFin`. The dimension is `Fintype.card H.carrier`. -/
 noncomputable def operatorOfMatrixOperator (H : FiniteHilbertSpace)
-    (name : String) (M : MatrixOperator H) : Operator where
+    (name : String) (M : MatrixOperator H) :
+    Operator (@Fintype.card H.carrier H.instFintype) where
   name := name
-  dim := @Fintype.card H.carrier H.instFintype
   matrix :=
     let e := @Fintype.equivFin H.carrier H.instFintype
     M.submatrix e.symm e.symm
 
 /-- The normalized adjacency matrix of the hypercube graph,
 carrying the actual matrix from `matrixAdjacencyOperator`. -/
-noncomputable def adjacency (params : Parameters) : Operator :=
+noncomputable def adjacency (params : Parameters) :
+    Operator (@Fintype.card (Point params) inferInstance) :=
   operatorOfMatrixOperator (pointHilbertSpace params)
     s!"K({params.m},{params.q})"
     (matrixAdjacencyOperator params)
 
 /-- The Laplacian `L = (1 / M) I - K`,
 carrying the actual matrix from `matrixLaplacianOperator`. -/
-noncomputable def laplacian (params : Parameters) : Operator :=
+noncomputable def laplacian (params : Parameters) :
+    Operator (@Fintype.card (Point params) inferInstance) :=
   operatorOfMatrixOperator (pointHilbertSpace params)
     s!"L({params.m},{params.q})=(1/{hypercubeVertexCount params})I-K"
     (matrixLaplacianOperator params)
 
 /-- The edge-difference form of the Laplacian from `prop:laplacian-rewrite`. -/
-def laplacianDifferenceForm (params : Parameters) : Operator :=
+def laplacianDifferenceForm (params : Parameters) :
+    Operator (@Fintype.card (Point params) inferInstance) :=
   { name := s!"0.5*E_edge[(|u>-|v>)(<u|-<v|)]({params.m},{params.q})" }
 
 /-- The squared difference operator `(A^u - A^v)^2`. -/
 noncomputable def pointDifferenceSquaredOperator {params : Parameters}
-    (A : Point params → Operator) (u v : Point params) : Operator :=
+    (A : Point params → Operator d) (u v : Point params) : Operator d :=
   operatorSquare (operatorDifference (A u) (A v))
 
 /-- The displayed local-variance formula from `def:local-and-variance`. -/
 noncomputable def localVarianceDifferenceForm (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Error :=
+    (A : Point params → Operator d) (ψ : QuantumState d) : Error :=
   (1 / (2 : Error)) *
     placeholderAverageOverDistribution (rerandomizeCoord params)
       (fun uv => operatorExpectation ψ (pointDifferenceSquaredOperator A uv.1 uv.2))
 
 /-- The displayed global-variance formula from `def:local-and-variance`. -/
 noncomputable def globalVarianceDifferenceForm (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Error :=
+    (A : Point params → Operator d) (ψ : QuantumState d) : Error :=
   (1 / (2 : Error)) *
     placeholderAverageOverDistribution (independentPointPair params)
       (fun uv => operatorExpectation ψ (pointDifferenceSquaredOperator A uv.1 uv.2))
 
 /-- The local variance from `def:local-and-variance`. -/
 noncomputable def localVariance (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Error :=
+    (A : Point params → Operator d) (ψ : QuantumState d) : Error :=
   localVarianceDifferenceForm params A ψ
 
 /-- The global variance from `def:local-and-variance`. -/
 noncomputable def globalVariance (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Error :=
+    (A : Point params → Operator d) (ψ : QuantumState d) : Error :=
   globalVarianceDifferenceForm params A ψ
 
 /-- Combined accessor for the local and global variances. -/
 noncomputable def localAndVariance (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Error × Error :=
+    (A : Point params → Operator d) (ψ : QuantumState d) : Error × Error :=
   (localVariance params A ψ, globalVariance params A ψ)
 
 /-- The paper's combined operator `A_combine = ∑_u |u⟩ ⊗ A^u ⊗ I`.
 We do not normalize by `|U|` here; the surrounding trace identities carry the
 paper's convention.  Built as a formal sum referencing each `A u`. -/
 noncomputable def combinedOperator (params : Parameters)
-    (A : Point params → Operator) : Operator :=
-  weightedOperatorSumOnSupport (A default)
+    (A : Point params → Operator d) : Operator d :=
+  weightedOperatorSumOnSupport
     (Finset.univ (α := Point params)).toList
     (fun _ => 1)
     (fun u => A u)
 
 /-- The average operator `A_avg = E_u A^u`. -/
 noncomputable def averagePointOperator (params : Parameters)
-    (A : Point params → Operator) : Operator :=
+    (A : Point params → Operator d) : Operator d :=
   averageOperatorOverDistribution (uniformDistribution (Point params)) A
 
 /-- The zero Fourier mode `φ_0`. -/
@@ -236,49 +237,51 @@ def fourierBasisVector (params : Parameters) (α : Point params) : HypercubeVect
 
 /-- The orthogonal Fourier mode `φ_⊥` used in the global-variance rewrite. -/
 noncomputable def orthogonalModeVector (params : Parameters)
-    (A : Point params → Operator) : HypercubeVector :=
+    (A : Point params → Operator d) : HypercubeVector :=
   { name := s!"phi_perp({(combinedOperator params A).name})" }
 
 /-- The operator `A_⊥` from the decomposition of `A_combine`. -/
 noncomputable def orthogonalComponentOperator (params : Parameters)
-    (A : Point params → Operator) : Operator :=
+    (A : Point params → Operator d) : Operator d :=
   { name := s!"Aperp({(combinedOperator params A).name})" }
 
-/-- The trace witness from `lem:local-rewrite`. -/
+/-- The trace witness from `lem:local-rewrite`.
+TODO(tensor): uses placeholder product instead of formalTensor since dimensions differ. -/
 noncomputable def localVarianceTraceWitness (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Operator :=
+    (A : Point params → Operator d) (ψ : QuantumState d) : Operator d :=
   operatorMul
     (operatorAdjoint (combinedOperator params A))
     (operatorMul
-      (formalTensor (laplacian params) (stateProjector ψ))
+      (operatorMul (stateProjector ψ) (stateProjector ψ))
       (combinedOperator params A))
 
 /-- A packaged orthogonal decomposition for `A_combine`. -/
 structure GlobalVarianceDecomposition (params : Parameters)
-    (A : Point params → Operator) where
-  averageComponent : Operator
+    (A : Point params → Operator d) where
+  averageComponent : Operator d
   orthogonalVector : HypercubeVector
-  orthogonalOperator : Operator
+  orthogonalOperator : Operator d
   deriving Inhabited
 
 /-- The trace witness from `lem:global-rewrite`. -/
 noncomputable def globalVarianceTraceWitness (params : Parameters)
-    (_A : Point params → Operator) (ψ : QuantumState)
-    (decomp : GlobalVarianceDecomposition params _A) : Operator :=
+    (_A : Point params → Operator d) (ψ : QuantumState d)
+    (decomp : GlobalVarianceDecomposition params _A) : Operator d :=
+  -- TODO(tensor): uses placeholder product instead of formalTensor since dimensions differ
   operatorMul
     { name := s!"<{decomp.orthogonalVector.name}|⊗{decomp.orthogonalOperator.name}" }
     (operatorMul
-      (formalTensor (identityOperator s!"Fq^{params.m}") (stateProjector ψ))
+      (operatorMul (identityOperator (d := d) s!"Fq^{params.m}") (stateProjector ψ))
       { name := s!"|{decomp.orthogonalVector.name}>⊗{decomp.orthogonalOperator.name}" })
 
 /-- The local-variance trace expression from `lem:local-rewrite`. -/
 noncomputable def localVarianceTraceForm (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Error :=
+    (A : Point params → Operator d) (ψ : QuantumState d) : Error :=
   operatorTrace (localVarianceTraceWitness params A ψ)
 
 /-- The global-variance trace expression from `lem:global-rewrite`. -/
 noncomputable def globalVarianceTraceForm (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState)
+    (A : Point params → Operator d) (ψ : QuantumState d)
     (decomp : GlobalVarianceDecomposition params A) : Error :=
   (1 / hypercubeVertexCountError params) *
     operatorTrace (globalVarianceTraceWitness params A ψ decomp)

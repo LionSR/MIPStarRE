@@ -161,46 +161,47 @@ structure MatrixRoundedProjectiveWitness {Outcome : Type*}
       matrixOutcomeTauDistance source.toSubmeasurement target a ≤ ζ
 
 /-- Output package for the paper's Naimark dilation theorem. -/
-structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*) where
-  auxStateA : QuantumState
-  auxStateB : QuantumState
-  liftedState : QuantumState
-  left : IndexedProjectiveMeasurement QuestionA OutcomeA
-  right : IndexedProjectiveMeasurement QuestionB OutcomeB
+structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*) (d : ℕ) where
+  auxStateA : QuantumState d
+  auxStateB : QuantumState d
+  liftedState : QuantumState d
+  left : IndexedProjectiveMeasurement QuestionA OutcomeA d
+  right : IndexedProjectiveMeasurement QuestionB OutcomeB d
   deriving Inhabited
 
 /-- The product auxiliary state used in a Naimark dilation. -/
--- TODO: placeholder — only sets `name`; `dim`/`density` left at defaults until
+-- TODO: placeholder — only sets `name`; `density` left at defaults until
 -- a concrete tensor product model is provided.
-def naimarkAuxiliaryState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB) : QuantumState :=
+def naimarkAuxiliaryState {QuestionA OutcomeA QuestionB OutcomeB : Type*} {d : ℕ}
+    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB d) : QuantumState d :=
   { name := s!"{data.auxStateA.name}⊗{data.auxStateB.name}" }
 
 /-- The lifted state `ψ ⊗ aux_A ⊗ aux_B` produced by Naimark dilation. -/
--- TODO: placeholder — only sets `name`; `dim`/`density` left at defaults until
+-- TODO: placeholder — only sets `name`; `density` left at defaults until
 -- a concrete tensor product model is provided.
-def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    (ψ : QuantumState)
-    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB) : QuantumState :=
+def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type*} {d : ℕ}
+    (ψ : QuantumState d)
+    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB d) : QuantumState d :=
   { name := s!"{ψ.name}⊗{data.auxStateA.name}⊗{data.auxStateB.name}" }
 
 /-- Placeholder expectation value of an operator on a state. -/
-noncomputable def placeholderExpectation (ψ : QuantumState) (X : Operator) : Error :=
+noncomputable def placeholderExpectation (ψ : QuantumState d) (X : Operator d) : Error :=
   (s!"Exp[{ψ.name}|{X.name}]".length : Error)
 
 /-- The single-outcome probability `⟨ψ|A_a|ψ⟩`. -/
 noncomputable def singleOutcomeProbability {Outcome : Type*}
-    (ψ : QuantumState)
-    (A : SubMeasurement Outcome) (a : Outcome) : Error :=
+    (ψ : QuantumState d)
+    (A : SubMeasurement Outcome d) (a : Outcome) : Error :=
   placeholderExpectation ψ (A.outcomeOperator a)
 
 /-- The joint outcome probability `⟨ψ|A_a ⊗ B_b|ψ⟩`. -/
-noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
-    (ψ : QuantumState)
-    (A : SubMeasurement OutcomeA)
-    (B : SubMeasurement OutcomeB)
+noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*} {d : ℕ}
+    (ψ : QuantumState d)
+    (A : SubMeasurement OutcomeA d)
+    (B : SubMeasurement OutcomeB d)
     (a : OutcomeA) (b : OutcomeB) : Error :=
-  placeholderExpectation ψ (formalTensor (A.outcomeOperator a) (B.outcomeOperator b))
+  -- Placeholder: uses string length rather than formalTensor (which changes dimension)
+  (s!"Exp[{ψ.name}|{(A.outcomeOperator a).name}⊗{(B.outcomeOperator b).name}]".length : Error)
 
 /-- The explicit error in `thm:orthonormalization`. -/
 noncomputable def orthonormalizationError (ζ : Error) : Error :=
