@@ -38,7 +38,6 @@ def switcherooPointProductLeft {Outcome : Type*} (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       orderedProductSubMeas
-        s!"switcheroo.point.left({params.m},{params.q},{params.d})"
         ((family.meas q.1).toSubMeas)
         ((M q.2).toSubMeas)
 
@@ -50,7 +49,6 @@ def switcherooPointProductRight {Outcome : Type*} (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       reversedProductSubMeas
-        s!"switcheroo.point.right({params.m},{params.q},{params.d})"
         ((family.meas q.1).toSubMeas)
         ((M q.2).toSubMeas)
 
@@ -62,7 +60,6 @@ def switcherooAggregateLeft {Outcome : Type*} (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       multiplyByTotalOnLeft
-        s!"switcheroo.aggregate.left({params.m},{params.q},{params.d})"
         (completePartSubMeas params family q.1)
         ((M q.2).toSubMeas)
 
@@ -74,7 +71,6 @@ def switcherooAggregateRight {Outcome : Type*} (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       multiplyByTotalOnRight
-        s!"switcheroo.aggregate.right({params.m},{params.q},{params.d})"
         ((M q.2).toSubMeas)
         (completePartSubMeas params family q.1)
 
@@ -85,7 +81,6 @@ def completePartPointProductLeft (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       multiplyByTotalOnRight
-        s!"complete.point.left({params.m},{params.q},{params.d})"
         ((family.meas q.1).toSubMeas)
         (completePartSubMeas params family q.2)
 
@@ -96,7 +91,6 @@ def completePartPointProductRight (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       multiplyByTotalOnLeft
-        s!"complete.point.right({params.m},{params.q},{params.d})"
         (completePartSubMeas params family q.2)
         ((family.meas q.1).toSubMeas)
 
@@ -107,7 +101,6 @@ def completePartTotalProductLeft (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       multiplyByTotalOnRight
-        s!"complete.total.left({params.m},{params.q},{params.d})"
         (completePartSubMeas params family q.1)
         (completePartSubMeas params family q.2)
 
@@ -118,7 +111,6 @@ def completePartTotalProductRight (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       multiplyByTotalOnLeft
-        s!"complete.total.right({params.m},{params.q},{params.d})"
         (completePartSubMeas params family q.2)
         (completePartSubMeas params family q.1)
 
@@ -129,7 +121,6 @@ def incompletePartPointProductLeft (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       multiplyByTotalOnRight
-        s!"incomplete.point.left({params.m},{params.q},{params.d})"
         ((family.meas q.1).toSubMeas)
         (incompletePartSubMeas params family q.2)
 
@@ -140,7 +131,6 @@ def incompletePartPointProductRight (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       multiplyByTotalOnLeft
-        s!"incomplete.point.right({params.m},{params.q},{params.d})"
         (incompletePartSubMeas params family q.2)
         ((family.meas q.1).toSubMeas)
 
@@ -151,7 +141,6 @@ def incompletePartTotalProductLeft (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       multiplyByTotalOnRight
-        s!"incomplete.total.left({params.m},{params.q},{params.d})"
         (incompletePartSubMeas params family q.1)
         (incompletePartSubMeas params family q.2)
 
@@ -162,7 +151,6 @@ def incompletePartTotalProductRight (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       multiplyByTotalOnLeft
-        s!"incomplete.total.right({params.m},{params.q},{params.d})"
         (incompletePartSubMeas params family q.2)
         (incompletePartSubMeas params family q.1)
 
@@ -185,7 +173,6 @@ def gHatPairProductLeft (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       orderedProductSubMeas
-        s!"ghat.pair.left({params.m},{params.q},{params.d})"
         ((gHatIdxMeas params family q.1).toSubMeas)
         ((gHatIdxMeas params family q.2).toSubMeas)
 
@@ -196,7 +183,6 @@ def gHatPairProductRight (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       reversedProductSubMeas
-        s!"ghat.pair.right({params.m},{params.q},{params.d})"
         ((gHatIdxMeas params family q.1).toSubMeas)
         ((gHatIdxMeas params family q.2).toSubMeas)
 
@@ -293,7 +279,6 @@ def averagedSandwichSubMeas (params : Parameters)
     (family : IdxPolyFamily params ι) (k : ℕ) :
     SubMeas (GHatTupleOutcome params k) ι :=
   averageIdxSubMeas
-    s!"ghat.sandwich.avg({params.m},{params.q},{params.d},{k})"
     (distinctTupleDistribution params k)
     (gHatSandwichFamily params family k)
 
@@ -301,7 +286,6 @@ def averagedSandwichSubMeas (params : Parameters)
 def constructedPastedSubMeas (params : Parameters)
     (family : IdxPolyFamily params ι) (k : ℕ) : SubMeas (Polynomial params.next) ι :=
   averageIdxSubMeas
-    s!"Hpasted({params.m},{params.q},{params.d},{k})"
     (distinctTupleDistribution params k)
     (pastedInterpolationFamily params family k)
 

@@ -54,11 +54,11 @@ noncomputable def sdpPrimalObjectiveOperator (params : Parameters)
 noncomputable def sdpPrimalObjective (params : Parameters)
     (strategy : SymStrat params ι)
     (T : Measurement (Polynomial params) ι) : Error :=
-  operatorTrace (sdpPrimalObjectiveOperator params strategy T)
+  Complex.re (MIPStarRE.Quantum.normalizedTrace (sdpPrimalObjectiveOperator params strategy T))
 
 /-- The dual objective value `Tr(Z)`. -/
 noncomputable def sdpDualObjective (Z : MIPStarRE.Quantum.Op ι) : Error :=
-  operatorTrace Z
+  Complex.re (MIPStarRE.Quantum.normalizedTrace Z)
 
 /-- The dual slack operator `Z - A_g`. -/
 noncomputable def sdpDualSlackOperator (params : Parameters)

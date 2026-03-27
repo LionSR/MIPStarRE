@@ -44,28 +44,23 @@ abbrev VerticalLineQuestion (params : Parameters) := Point params
 def bernoulliTailOperator (k _degree : ℕ) (X : MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
   X ^ k  -- placeholder
 
-/-- Add a descriptive tag to a paper-local submeasurement placeholder. -/
-def tagSubMeas {α : Type*} (_tag : String) (A : SubMeas α ι) : SubMeas α ι where
-  outcome := A.outcome
-  total := A.total
-
 /-- Multiply each outcome operator by a total operator on the right. -/
 def multiplyByTotalOnRight {α β : Type*}
-    (_label : String) (A : SubMeas α ι) (B : SubMeas β ι) :
+    (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas α ι where
   outcome := fun a => A.outcome a * B.total
   total := A.total * B.total
 
 /-- Multiply each outcome operator by a total operator on the left. -/
 def multiplyByTotalOnLeft {α β : Type*}
-    (_label : String) (A : SubMeas α ι) (B : SubMeas β ι) :
+    (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas β ι where
   outcome := fun b => A.total * B.outcome b
   total := A.total * B.total
 
 /-- Average an indexed family against a named distribution. -/
 noncomputable def averageIdxSubMeas {Question Outcome : Type*}
-    (_label : String) (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome ι) :
+    (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome ι) :
     SubMeas Outcome ι where
   outcome := fun a =>
     averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
@@ -130,8 +125,7 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
 /-- Aggregate the polynomial outcomes of `G^x` into its complete part `G^x`. -/
 def completePartSubMeas (params : Parameters)
     (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
-  tagSubMeas "complete"
-    (postprocess ((family.meas x).toSubMeas) (fun _ => ()))
+  postprocess ((family.meas x).toSubMeas) (fun _ => ())
 
 /-- Placeholder for the incomplete part `G^x_⊥ = I - G^x`. -/
 def incompletePartSubMeas (params : Parameters)

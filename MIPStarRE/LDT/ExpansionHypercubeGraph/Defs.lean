@@ -59,19 +59,14 @@ instance instDecidablePredHypercubeEdgePair (params : Parameters) :
   infer_instance
 
 /-- Edge sampling by rerandomizing a single coordinate. -/
+-- TODO: implement — needs sampling a uniform coordinate and rerandomizing it
 def rerandomizeCoord (params : Parameters) : Distribution (Point params × Point params) :=
   {}
 
 /-- Independent sampling of two uniformly random points. -/
+-- TODO: implement — needs uniform sampling of two independent points from F_q^m
 def independentPointPair (params : Parameters) : Distribution (Point params × Point params) :=
   {}
-
-/-- Square root of an operator expression.
-Propagates `dim`; matrix square root is not computed (placeholder).
-TODO: compute actual matrix square root when Mathlib provides it.
-Re-export of `MIPStarRE.LDT.opSqRoot` for local convenience. -/
-noncomputable def opSqRoot' (X : MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  MIPStarRE.LDT.opSqRoot X
 
 /-- Apply a formal operator to a formal vector. -/
 def applyOperatorToVector (_T : MIPStarRE.Quantum.Op ι) (v : HypercubeVector) : HypercubeVector :=
@@ -84,28 +79,6 @@ def scaleVector (_c : Error) (v : HypercubeVector) : HypercubeVector :=
 /-- The rank-one projector onto a state vector, carrying the state's density matrix. -/
 def stateProjector (ψ : QuantumState ι) : MIPStarRE.Quantum.Op ι :=
   ψ.density
-
-/-- A nonzero placeholder scalar extracted from a string tag. -/
-noncomputable def placeholderScalar (tag : String) : Error :=
-  (tag.length : Error)
-
-/-- Placeholder for taking the expectation of an operator on a state. -/
-noncomputable def operatorExpectation (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) : Error :=
-  ev ψ X
-
-/-- Placeholder for averaging a real-valued observable over a distribution.
-Named to avoid shadowing the honest `avgOver` in the base namespace. -/
-noncomputable def placeholderAverageOverDistribution {α : Type*}
-    (_𝒟 : Distribution α) (f : α → Error) : Error := by
-  classical
-  let base := placeholderScalar "Avg[Distribution]"
-  by_cases h : Nonempty α
-  · exact base + f (Classical.choice h)
-  · exact base
-
-/-- Placeholder trace of a formal operator expression. -/
-noncomputable def operatorTrace (_X : MIPStarRE.Quantum.Op ι) : Error :=
-  placeholderScalar "Tr[Op]"
 
 /-- Weighted sum of operators over a distribution's finite support,
 using the same `support`/`weight` data as the scalar `avgOver`. -/
@@ -179,15 +152,15 @@ noncomputable def pointDifferenceSquaredOperator {params : Parameters}
 noncomputable def localVarianceDifferenceForm (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error :=
   (1 / (2 : Error)) *
-    placeholderAverageOverDistribution (rerandomizeCoord params)
-      (fun uv => operatorExpectation ψ (pointDifferenceSquaredOperator A uv.1 uv.2))
+    avgOver (rerandomizeCoord params)
+      (fun uv => ev ψ (pointDifferenceSquaredOperator A uv.1 uv.2))
 
 /-- The displayed global-variance formula from `def:local-and-variance`. -/
 noncomputable def globalVarianceDifferenceForm (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error :=
   (1 / (2 : Error)) *
-    placeholderAverageOverDistribution (independentPointPair params)
-      (fun uv => operatorExpectation ψ (pointDifferenceSquaredOperator A uv.1 uv.2))
+    avgOver (independentPointPair params)
+      (fun uv => ev ψ (pointDifferenceSquaredOperator A uv.1 uv.2))
 
 /-- The local variance from `def:local-and-variance`. -/
 noncomputable def localVariance (params : Parameters)
@@ -260,14 +233,14 @@ noncomputable def globalVarianceTraceWitness (params : Parameters)
 /-- The local-variance trace expression from `lem:local-rewrite`. -/
 noncomputable def localVarianceTraceForm (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error :=
-  operatorTrace (localVarianceTraceWitness params A ψ)
+  Complex.re (MIPStarRE.Quantum.normalizedTrace (localVarianceTraceWitness params A ψ))
 
 /-- The global-variance trace expression from `lem:global-rewrite`. -/
 noncomputable def globalVarianceTraceForm (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
     (decomp : GlobalVarianceDecomposition params A) : Error :=
   (1 / hypercubeVertexCountError params) *
-    operatorTrace (globalVarianceTraceWitness params A ψ decomp)
+    Complex.re (MIPStarRE.Quantum.normalizedTrace (globalVarianceTraceWitness params A ψ decomp))
 
 /-- The number of nonzero coordinates of a frequency `α ∈ F_q^m`. -/
 noncomputable def frequencyWeight (params : Parameters) (α : Point params) : ℕ :=

@@ -36,21 +36,21 @@ def rightPlacedSubMeas {α : Type*}
 
 /-- Ordered product of two paper-local submeasurements on the same tensor factor. -/
 noncomputable def orderedProductSubMeas {α β : Type*}
-    (_label : String) (A : SubMeas α ι) (B : SubMeas β ι) :
+    (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas (α × β) ι where
   outcome := fun | (a, b) => A.outcome a * B.outcome b
   total := A.total * B.total
 
 /-- Reversed product of two paper-local submeasurements on the same tensor factor. -/
 noncomputable def reversedProductSubMeas {α β : Type*}
-    (_label : String) (A : SubMeas α ι) (B : SubMeas β ι) :
+    (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas (α × β) ι where
   outcome := fun | (a, b) => B.outcome b * A.outcome a
   total := B.total * A.total
 
 /-- Tensor-product bridge `A_a ⊗ B_b` on the bipartite space `ι × ι`. -/
 noncomputable def tensorProductSubMeas {α β : Type*}
-    (_label : String) (A : SubMeas α ι) (B : SubMeas β ι) :
+    (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas (α × β) (ι × ι) where
   outcome := fun ab =>
     match ab with
@@ -78,7 +78,7 @@ noncomputable def pointMeasurementProductLeft (params : Parameters)
     let Au := (strategy.pointMeasurement uv.1).toSubMeas
     let Av := (strategy.pointMeasurement uv.2).toSubMeas
     leftPlacedSubMeas (ιB := ι) <|
-      orderedProductSubMeas "pointComm.left" Au Av
+      orderedProductSubMeas Au Av
 
 /-- The reversed point product `(A^v_b A^u_a) ⊗ I` on the bipartite space `ι × ι`. -/
 noncomputable def pointMeasurementProductRight (params : Parameters)
@@ -88,7 +88,7 @@ noncomputable def pointMeasurementProductRight (params : Parameters)
     let Au := (strategy.pointMeasurement uv.1).toSubMeas
     let Av := (strategy.pointMeasurement uv.2).toSubMeas
     leftPlacedSubMeas (ιB := ι) <|
-      reversedProductSubMeas "pointComm.right" Au Av
+      reversedProductSubMeas Au Av
 
 /-- Distribution obtained by sampling a diagonal line together with a parameter on that line. -/
 def pointWithDiagonalLineDistribution (params : Parameters) :
@@ -138,7 +138,7 @@ noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
     let tv := q.2.2
     let Au := (strategy.pointMeasurement (ℓ.pointAt tu)).toSubMeas
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
-    tensorProductSubMeas "pointComm.mixedLeft" Au Lv
+    tensorProductSubMeas Au Lv
 
 /-- The bridge `I ⊗ (L^ℓ_[f(v)=b] L^ℓ_[f(u)=a])` on the bipartite space `d * d`. -/
 noncomputable def diagonalLineProductOrdered (params : Parameters)
@@ -151,7 +151,7 @@ noncomputable def diagonalLineProductOrdered (params : Parameters)
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
     rightPlacedSubMeas (ιA := ι) <|
-      orderedProductSubMeas "pointComm.lineOrdered" Lu Lv
+      orderedProductSubMeas Lu Lv
 
 /-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] L^ℓ_[f(v)=b])` on the bipartite space `ι × ι`. -/
 noncomputable def diagonalLineProductReversed (params : Parameters)
@@ -165,7 +165,7 @@ noncomputable def diagonalLineProductReversed (params : Parameters)
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
     -- BUG: this is identical to diagonalLineProductOrdered, needs fix (see PR #46 review)
     rightPlacedSubMeas (ιA := ι) <|
-      orderedProductSubMeas "pointComm.lineReversed" Lu Lv
+      orderedProductSubMeas Lu Lv
 
 /-- The mixed bridge `A^v_b ⊗ L^ℓ_[f(u)=a]` on the bipartite space `ι × ι`. -/
 noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
@@ -177,7 +177,7 @@ noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
     let tv := q.2.2
     let Av := (strategy.pointMeasurement (ℓ.pointAt tv)).toSubMeas
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
-    tensorProductSubMeas "pointComm.mixedRight" Av Lu
+    tensorProductSubMeas Av Lu
 
 /-- The intermediate consistency loss coming from the `m`-restricted diagonal-lines test. -/
 def restrictedDiagonalLinesConsistencyError (params : Parameters) (gamma : Error) : Error :=

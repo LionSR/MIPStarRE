@@ -79,7 +79,7 @@ noncomputable def addInULeftQuantity {Outcome : Type*} (params : Parameters)
     (S : AddInUSelection params Outcome) : Error :=
   avgOver (uniformDistribution (Point params))
     (fun u =>
-      operatorExpectation strategy.state
+      ev strategy.state
         (addInULeftOperatorAtPoint params strategy M H S u))
 
 /-- The right-hand expectation in `lem:add-in-u`. -/
@@ -90,7 +90,7 @@ noncomputable def addInURightQuantity {Outcome : Type*} (params : Parameters)
     (S : AddInUSelection params Outcome) : Error :=
   avgOver (uniformDistribution (Point params))
     (fun u =>
-      operatorExpectation strategy.state
+      ev strategy.state
         (addInURightOperatorAtPoint params strategy M T S u))
 
 /-- The pointwise matched operator `Σ_a A^u_a ⊗ H_[h(u)=a]`. -/
@@ -125,7 +125,7 @@ noncomputable def helperBoundednessOperator (params : Parameters)
 noncomputable def helperBoundednessGap (params : Parameters)
     (strategy : SymStrat params ι)
     (H : SubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Error :=
-  operatorExpectation strategy.state
+  ev strategy.state
     (helperBoundednessOperator params strategy H Z)
 
 /-- The projective-stage residual operator `Z ⊗ (I - H)`. -/
@@ -138,7 +138,7 @@ noncomputable def projectiveResidualOperator (params : Parameters)
 noncomputable def projectiveBoundednessGap (params : Parameters)
     (strategy : SymStrat params ι)
     (H : ProjSubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Error :=
-  operatorExpectation strategy.state
+  ev strategy.state
     (projectiveResidualOperator params H Z)
 
 /-- Output package for `lem:add-in-u`. -/

@@ -192,16 +192,11 @@ def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     (_data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) : QuantumState ι :=
   {}
 
-/-- Placeholder expectation value of an operator on a state. -/
-noncomputable def placeholderExpectation {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) : Error :=
-  ev ψ X
-
 /-- The single-outcome probability `⟨ψ|A_a|ψ⟩`. -/
 noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
     (A : SubMeas Outcome ι) (a : Outcome) : Error :=
-  placeholderExpectation ψ (A.outcome a)
+  ev ψ (A.outcome a)
 
 /-- The joint outcome probability `⟨ψ|A_a ⊗ B_b|ψ⟩`. -/
 noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}

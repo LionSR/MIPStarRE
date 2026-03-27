@@ -42,11 +42,14 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
           jointOutcomeProbability data.liftedState
             ((data.left x).toSubMeas)
             ((data.right y).toSubMeas) a b
-  -- TODO: these are tautological placeholders, need real projectivity witnesses
-  liftedLeftProjective :
-    ∀ x : QuestionA, data.left x = data.left x
-  liftedRightProjective :
-    ∀ y : QuestionB, data.right y = data.right y
+  -- TODO: should be actual projectivity:
+  -- ∀ x a, (data.left x).outcome a * (data.left x).outcome a
+  --   = (data.left x).outcome a
+  liftedLeftProjective : True := trivial
+  -- TODO: should be actual projectivity:
+  -- ∀ y b, (data.right y).outcome b * (data.right y).outcome b
+  --   = (data.right y).outcome b
+  liftedRightProjective : True := trivial
   liftedCommutativity :
     ∀ x : QuestionA, ∀ y : QuestionB,
       ∀ a : OutcomeA, ∀ b : OutcomeB,

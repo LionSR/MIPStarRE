@@ -26,13 +26,13 @@ abbrev FullSliceOutcome (params : Parameters) := Polynomial params × Polynomial
 
 /-- Ordered product placed on the left tensor factor of the bipartite space `ι × ι`. -/
 def leftOrderedProductSubMeas {α β : Type*}
-    (label : String) (A : SubMeas α ι) (B : SubMeas β ι) :
+    (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas (α × β) (ι × ι) :=
-  leftPlacedSubMeas (ιB := ι) (orderedProductSubMeas label A B)
+  leftPlacedSubMeas (ιB := ι) (orderedProductSubMeas A B)
 
 /-- Append a total operator on the right of every outcome operator. -/
 def appendRightTotalSubMeas {α : Type*} {κ : Type*} [Fintype κ] [DecidableEq κ]
-    (_tag : String) (A : SubMeas α κ) (X : MIPStarRE.Quantum.Op κ) : SubMeas α κ where
+    (A : SubMeas α κ) (X : MIPStarRE.Quantum.Op κ) : SubMeas α κ where
   outcome := fun a => A.outcome a * X
   total := A.total * X
 
@@ -41,7 +41,7 @@ def appendRightTotalSubMeas {α : Type*} {κ : Type*} [Fintype κ] [DecidableEq 
 Its total operator should be the sum-of-sandwiches
 `∑_a A_a (∑_b B_b) A_a` whenever `α` is finitely enumerable. -/
 noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α]
-    (_label : String) (A : SubMeas α ι) (B : SubMeas β ι) :
+    (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas (α × β) ι where
   outcome := fun ab =>
     match ab with
@@ -94,7 +94,6 @@ def evaluatedSliceProductLeft (params : Parameters)
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     leftOrderedProductSubMeas
-      s!"evalSlice.left({params.m},{params.q},{params.d})"
       (evaluatedSliceFirstFactor params family q)
       (evaluatedSliceSecondFactor params family q)
 
@@ -106,7 +105,6 @@ def evaluatedSliceProductRight (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       reversedProductSubMeas
-        s!"evalSlice.right({params.m},{params.q},{params.d})"
         (evaluatedSliceFirstFactor params family q)
         (evaluatedSliceSecondFactor params family q)
 
@@ -118,7 +116,6 @@ def evaluatedSliceSandwichFirstFactor (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       sandwichByOuterSubMeas
-        s!"evalSlice.sandwich({params.m},{params.q},{params.d})"
         (evaluatedSliceFirstFactor params family q)
         (evaluatedSliceSecondFactor params family q)
 
@@ -141,7 +138,6 @@ def fullSliceProductLeft (params : Parameters)
     IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
   fun q =>
     leftOrderedProductSubMeas
-      s!"fullSlice.left({params.m},{params.q},{params.d})"
       (fullSliceFirstFactor params family q)
       (fullSliceSecondFactor params family q)
 
@@ -153,7 +149,6 @@ def fullSliceProductRight (params : Parameters)
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       reversedProductSubMeas
-        s!"fullSlice.right({params.m},{params.q},{params.d})"
         (fullSliceFirstFactor params family q)
         (fullSliceSecondFactor params family q)
 
@@ -191,7 +186,7 @@ def commDataProcessedGStabilityOneLeft (params : Parameters)
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    appendRightTotalSubMeas "timesGy"
+    appendRightTotalSubMeas
       (evaluatedSliceSandwichFirstFactor params strategy family q)
       (leftTensor (ι₂ := ι) ((fullSliceSecondFactor params family xy).total))
 
@@ -209,7 +204,7 @@ def commDataProcessedGStabilityTwoLeft (params : Parameters)
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    appendRightTotalSubMeas "timesGx"
+    appendRightTotalSubMeas
       (evaluatedSliceProductLeft params strategy family q)
       (leftTensor (ι₂ := ι) ((fullSliceFirstFactor params family xy).total))
 

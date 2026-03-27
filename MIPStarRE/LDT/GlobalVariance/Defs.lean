@@ -160,7 +160,7 @@ noncomputable def generalizeBDeviationAtPolynomial (params : Parameters)
     (fun qu =>
       let D := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
                weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
-      operatorExpectation ψbi (D * D))
+      ev ψbi (D * D))
 
 /-- The polynomial-averaged deviation controlled by `lem:generalize-b`. -/
 noncomputable def generalizeBDeviation (params : Parameters)
@@ -255,11 +255,11 @@ noncomputable def localVarianceDeviationAtPolynomial (params : Parameters)
     (ψbi : QuantumState (ι × ι))
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) : Error :=
-  placeholderAverageOverDistribution (rerandomizeCoord params)
+  avgOver (rerandomizeCoord params)
     (fun uv =>
       let D := weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1 -
                weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2
-      operatorExpectation ψbi (D * D))
+      ev ψbi (D * D))
 
 /-- The independently sampled squared norm expression in `lem:global-variance-of-points`.
 Uses bipartite state `ψbi` on `d * d`. -/
@@ -268,11 +268,11 @@ noncomputable def globalVarianceDeviationAtPolynomial (params : Parameters)
     (ψbi : QuantumState (ι × ι))
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) : Error :=
-  placeholderAverageOverDistribution (independentPointPair params)
+  avgOver (independentPointPair params)
     (fun uv =>
       let D := weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1 -
                weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2
-      operatorExpectation ψbi (D * D))
+      ev ψbi (D * D))
 
 /-- The polynomial-averaged local squared norm expression. -/
 noncomputable def localVarianceDeviation (params : Parameters)
