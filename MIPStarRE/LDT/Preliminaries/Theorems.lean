@@ -119,14 +119,52 @@ provide. -/
 `questionStateDependentDistanceDefect`. Follows from
 `(X-Z) = (X-Y) + (Y-Z)` and the operator AM-GM inequality
 `U†V + V†U ≤ U†U + V†V` (equivalently `0 ≤ (U-V)†(U-V)`),
-which requires PSD trace positivity `E[D†D] ≥ 0`. -/
+which requires PSD trace positivity `E[D†D] ≥ 0`.
+
+Dimension hypotheses are needed because `operatorDifference` is dimension-guarded:
+when dims don't match, it returns the LHS matrix unchanged, breaking the
+algebraic decomposition `(X-Z) = (X-Y) + (Y-Z)`. -/
 private lemma questionSDD_triangle {Outcome : Type*}
     (ψ : QuantumState) (A B C : SubMeasurement Outcome)
-    (hψ : ψ.IsPositive) :
+    (hψ : ψ.IsPositive)
+    (hAB_total : A.totalOperator.dim = B.totalOperator.dim)
+    (hBC_total : B.totalOperator.dim = C.totalOperator.dim)
+    (hAB_outcome : ∀ a, (A.outcomeOperator a).dim = (B.outcomeOperator a).dim)
+    (hBC_outcome : ∀ a, (B.outcomeOperator a).dim = (C.outcomeOperator a).dim) :
     questionStateDependentDistanceDefect ψ A C ≤
       2 * (questionStateDependentDistanceDefect ψ A B +
            questionStateDependentDistanceDefect ψ B C) := by
-  sorry
+  -- Define shorthand for the per-outcome E[D†D] computation
+  let ev (X Y : Operator) := expectationValue ψ
+    (operatorMul (operatorAdjoint (operatorDifference X Y)) (operatorDifference X Y))
+  -- Pointwise triangle inequality from expectationValue_diff_triangle
+  have pointwise_outcome : ∀ a, ev (A.outcomeOperator a) (C.outcomeOperator a) ≤
+      2 * (ev (A.outcomeOperator a) (B.outcomeOperator a) +
+           ev (B.outcomeOperator a) (C.outcomeOperator a)) :=
+    fun a => expectationValue_diff_triangle ψ _ _ _ hψ (hAB_outcome a) (hBC_outcome a)
+  have total_ineq : ev A.totalOperator C.totalOperator ≤
+      2 * (ev A.totalOperator B.totalOperator + ev B.totalOperator C.totalOperator) :=
+    expectationValue_diff_triangle ψ _ _ _ hψ hAB_total hBC_total
+  -- Unfold the definition and handle both branches of sumOverOutcomesOrElse
+  unfold questionStateDependentDistanceDefect
+  simp only []
+  -- The three sumOverOutcomesOrElse calls all branch on the same Nonempty (Fintype Outcome)
+  unfold sumOverOutcomesOrElse
+  split_ifs with hfin
+  · -- Fintype case: use Finset.sum_le_sum + linearity
+    letI : Fintype Outcome := Classical.choice hfin
+    have h1 : ∑ a : Outcome, ev (A.outcomeOperator a) (C.outcomeOperator a) ≤
+        ∑ a : Outcome, (2 * (ev (A.outcomeOperator a) (B.outcomeOperator a) +
+                   ev (B.outcomeOperator a) (C.outcomeOperator a))) :=
+      Finset.sum_le_sum (fun a _ => pointwise_outcome a)
+    have h2 : ∑ a : Outcome, (2 * (ev (A.outcomeOperator a) (B.outcomeOperator a) +
+                          ev (B.outcomeOperator a) (C.outcomeOperator a))) =
+        2 * (∑ a : Outcome, ev (A.outcomeOperator a) (B.outcomeOperator a) +
+             ∑ a : Outcome, ev (B.outcomeOperator a) (C.outcomeOperator a)) := by
+      rw [← Finset.mul_sum, ← Finset.sum_add_distrib]
+    linarith
+  · -- Fallback case
+    exact total_ineq
 
 /-- Triangle inequality for state-dependent distance. Requires PSD state for
 the parallelogram inequality `E[D†D] ≥ 0`. -/
@@ -134,7 +172,11 @@ private lemma stateDependentDistanceRel_triangle
     {Question Outcome : Type*}
     (ψ : QuantumState) (𝒟 : Distribution Question)
     (A B C : IndexedSubMeasurement Question Outcome) (δ₁ δ₂ : Error)
-    (hψ : ψ.IsPositive) :
+    (hψ : ψ.IsPositive)
+    (hAB_total : ∀ q, (A q).totalOperator.dim = (B q).totalOperator.dim)
+    (hBC_total : ∀ q, (B q).totalOperator.dim = (C q).totalOperator.dim)
+    (hAB_outcome : ∀ q a, ((A q).outcomeOperator a).dim = ((B q).outcomeOperator a).dim)
+    (hBC_outcome : ∀ q a, ((B q).outcomeOperator a).dim = ((C q).outcomeOperator a).dim) :
     StateDependentDistanceRel ψ 𝒟 A B δ₁ →
     StateDependentDistanceRel ψ 𝒟 B C δ₂ →
     StateDependentDistanceRel ψ 𝒟 A C (2 * (δ₁ + δ₂)) := by
@@ -149,6 +191,7 @@ private lemma stateDependentDistanceRel_triangle
         apply averageOverDistribution_mono
         intro q
         exact questionSDD_triangle ψ (A q) (B q) (C q) hψ
+          (hAB_total q) (hBC_total q) (hAB_outcome q) (hBC_outcome q)
     _ = 2 * averageOverDistribution 𝒟
           (fun q => questionStateDependentDistanceDefect ψ (A q) (B q) +
                      questionStateDependentDistanceDefect ψ (B q) (C q)) := by
@@ -234,7 +277,17 @@ private lemma consSubMeas_combinedControl
       (totalSandwichFamily A B) (4 * γ) := by
   intro hAD hDT
   have h := stateDependentDistanceRel_triangle ψ 𝒟 A
-    (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ hψ hAD hDT
+    (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ hψ
+    -- Dimension hypotheses: A and diagSandwich share totalOperator by definition
+    (fun q => rfl)  -- A.total.dim = diagSandwich.total.dim (same totalOperator)
+    (fun q => rfl)  -- diagSandwich.total.dim = totalSandwich.total.dim (both are A.total)
+    (fun q a => by  -- outcome dim: A → diagSandwich
+      show _ = (operatorSandwich _ _ _).dim
+      unfold operatorSandwich; split_ifs <;> rfl)
+    (fun q a => by  -- outcome dim: diagSandwich → totalSandwich
+      show (operatorSandwich _ _ _).dim = (operatorSandwich _ _ _).dim
+      unfold operatorSandwich; split_ifs <;> rfl)
+    hAD hDT
   exact stateDependentDistanceRel_mono ψ 𝒟 A (totalSandwichFamily A B)
     (2 * (γ + γ)) (4 * γ) (by linarith) h
 

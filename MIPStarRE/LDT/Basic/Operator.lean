@@ -446,11 +446,23 @@ theorem expectationValue_diff_triangle (ψ : QuantumState) (X Y Z : Operator)
         Complex.re (MIPStarRE.Quantum.normalizedTrace
           (ψ.density * ((m₁ - m₂)ᴴ * (m₁ - m₂)))) := by
     intro n₁ n₂ m₁ m₂
-    -- This is a purely computational identity: the scaffold operators with matching
-    -- dimensions compute to the expected matrix expression. The proof requires
-    -- resolving nested dite/castOp chains through the dimension-guarded definitions.
-    -- Mathematically trivial; the complexity is in Lean's dependent type handling.
-    sorry
+    -- Reduce operatorDifference to a concrete operator with known dim and matrix
+    have hD : operatorDifference ⟨n₁, ψ.dim, m₁⟩ ⟨n₂, ψ.dim, m₂⟩ =
+        ⟨s!"({n₁} - {n₂})", ψ.dim, m₁ - m₂⟩ := by
+      unfold operatorDifference; split_ifs <;> [congr 1; exact absurd rfl ‹_›]
+    rw [hD]
+    -- Reduce operatorMul (operatorAdjoint D) D
+    set nm := s!"({n₁} - {n₂})"
+    have hP : operatorMul (operatorAdjoint ⟨nm, ψ.dim, m₁ - m₂⟩)
+        ⟨nm, ψ.dim, m₁ - m₂⟩ =
+        ⟨s!"({s!"({nm})†"} * {nm})", ψ.dim,
+          (m₁ - m₂).conjTranspose * (m₁ - m₂)⟩ := by
+      unfold operatorMul operatorAdjoint
+      split_ifs <;> [congr 1; exact absurd rfl ‹_›]
+    rw [hP]
+    -- Reduce expectationValue
+    unfold expectationValue
+    split_ifs <;> [congr 1; exact absurd rfl ‹_›]
   by_cases hψd : ψ.dim = dX
   · -- Dimensions match
     subst hψd
