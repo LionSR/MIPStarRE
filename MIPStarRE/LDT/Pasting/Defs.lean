@@ -102,12 +102,13 @@ def gHatTupleOutcomeTail {params : Parameters} {k : ℕ}
     (gs : GHatTupleOutcome params (k + 1)) : GHatTupleOutcome params k :=
   fun i => gs i.succ
 
-/-- Fallback global polynomial used when all completed slice outcomes are `⊥`. -/
+/-- Fallback global polynomial used when all completed slice outcomes are `⊥`.
+Uses the zero polynomial (trivially low individual degree). -/
 noncomputable def fallbackInterpolatedPolynomial (params : Parameters) : Polynomial params.next where
-  poly := MvPolynomial.X ⟨params.m, Nat.lt_succ_self params.m⟩
+  poly := 0
   lowIndividualDegree := by
     intro i
-    sorry
+    simp [MvPolynomial.degreeOf_zero]
 
 /-- Count how many completed slice outcomes are genuine (non-`⊥`) polynomial slices. -/
 noncomputable def nonBottomSliceCount {params : Parameters} {k : ℕ}

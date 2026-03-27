@@ -166,7 +166,8 @@ structure GBotSelfConsistencyStatement (params : Parameters)
       zeta
 
 /-- Output package for `lem:commutativity-switcheroo`. -/
-structure CommutativitySwitcherooStatement {Outcome : Type*} (params : Parameters)
+structure CommutativitySwitcherooStatement {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters)
     (ψ : QuantumState d)
     (family : IdxPolyFamily params d)
     (M : IdxProjSubMeas (Fq params) Outcome d)

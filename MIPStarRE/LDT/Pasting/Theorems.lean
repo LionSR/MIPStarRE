@@ -85,7 +85,7 @@ theorem gBotSelfConsistency
   sorry
 
 /-- `lem:commutativity-switcheroo`. -/
-lemma commutativitySwitcheroo {Outcome : Type*}
+lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (ψ : QuantumState d)
     (family : IdxPolyFamily params d)

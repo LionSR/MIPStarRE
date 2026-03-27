@@ -39,61 +39,44 @@ noncomputable def evaluateFiberFamilyAtNextPoint {d : ℕ} (params : Parameters)
     IdxSubMeas (Point params.next) (Fq params) d :=
   fun u => evaluateAt params (truncatePoint params u) (G (pointHeight params u))
 
-/-- Questionwise matching mass `∑_a ⟨ψ, A_a B_a ψ⟩`, summed over outcomes when the
-outcome space is enumerable. -/
-noncomputable def qMatchMass {Outcome : Type*} {d : ℕ}
+/-- Questionwise matching mass `∑_a ⟨ψ, A_a B_a ψ⟩`, summed over outcomes. -/
+noncomputable def qMatchMass {Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (A B : SubMeas Outcome d) : Error :=
-  sumOutcomes
-    (ev ψ (opMul A.total B.total))
-    (fun a => ev ψ (opMul (A.outcome a) (B.outcome a)))
+  ∑ a, ev ψ (opMul (A.outcome a) (B.outcome a))
 
 /-- Questionwise off-diagonal mass surrogate for consistency. -/
-noncomputable def qConsDefect {Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (A B : SubMeas Outcome d) : Error := by
-  classical
+noncomputable def qConsDefect {Outcome : Type*} {d : ℕ} [Fintype Outcome]
+    (ψ : QuantumState d) (A B : SubMeas Outcome d) : Error :=
   let totalOverlap := ev ψ (opMul A.total B.total)
-  let coarseMismatch :=
-    max 0
-      (ev ψ A.total + ev ψ B.total - 2 * totalOverlap)
-  if h : Nonempty (Fintype Outcome) then
-    exact max 0 (totalOverlap - qMatchMass ψ A B)
-  else
-    exact coarseMismatch
+  max 0 (totalOverlap - qMatchMass ψ A B)
 
 /-- Questionwise squared-distance defect. -/
-noncomputable def qSDD {Outcome : Type*} {d : ℕ}
+noncomputable def qSDD {Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (A B : SubMeas Outcome d) : Error :=
-  let totalDiff := opDiff A.total B.total
-  sumOutcomes
-    (ev ψ (opMul (opAdj totalDiff) totalDiff))
-    (fun a =>
-      let diff := opDiff (A.outcome a) (B.outcome a)
-      ev ψ (opMul (opAdj diff) diff))
+  ∑ a, (let diff := opDiff (A.outcome a) (B.outcome a)
+        ev ψ (opMul (opAdj diff) diff))
 
 /-- Questionwise strong self-consistency defect. -/
-noncomputable def qSSCDefect {Outcome : Type*} {d : ℕ}
+noncomputable def qSSCDefect {Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (A : SubMeas Outcome d) : Error :=
   let totalMass := ev ψ A.total
-  let coarseDiagonal := ev ψ (opMul A.total A.total)
-  let diagonalMass :=
-    sumOutcomes coarseDiagonal
-      (fun a => ev ψ (opMul (A.outcome a) (A.outcome a)))
+  let diagonalMass := ∑ a, ev ψ (opMul (A.outcome a) (A.outcome a))
   max 0 (totalMass - diagonalMass)
 
 /-- Averaged off-diagonal mass for consistency statements. -/
-def consError {Question Outcome : Type*} {d : ℕ}
+def consError {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome d) : Error :=
   avgOver 𝒟 (fun q => qConsDefect ψ (A q) (B q))
 
 /-- Averaged squared distance for `≈_δ`. -/
-def sddError {Question Outcome : Type*} {d : ℕ}
+def sddError {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome d) : Error :=
   avgOver 𝒟 (fun q => qSDD ψ (A q) (B q))
 
 /-- Averaged defect in strong self-consistency. -/
-def sscError {Question Outcome : Type*} {d : ℕ}
+def sscError {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d) : Error :=
   avgOver 𝒟 (fun q => qSSCDefect ψ (A q))
@@ -115,19 +98,19 @@ def bndError {Outcome : Type*} {d : ℕ}
   max 0 (subMeasMass ψ A - ev ψ Z)
 
 /-- Consistency relation. -/
-structure ConsRel {Question Outcome : Type*} {d : ℕ}
+structure ConsRel {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop where
   offDiagonalBound : consError ψ 𝒟 A B ≤ δ
 
 /-- State-dependent distance relation. -/
-structure SDDRel {Question Outcome : Type*} {d : ℕ}
+structure SDDRel {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop where
   squaredDistanceBound : sddError ψ 𝒟 A B ≤ δ
 
 /-- Strong self-consistency relation. -/
-structure SSCRel {Question Outcome : Type*} {d : ℕ}
+structure SSCRel {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d) (δ : Error) : Prop where
   diagonalOverlapBound : sscError ψ 𝒟 A ≤ δ

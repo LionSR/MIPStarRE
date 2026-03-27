@@ -14,7 +14,7 @@ open MIPStarRE.LDT
 /-- `prop:simeq-for-measurements`. The equivalence is definitional:
 `agreementProbability = 1 - consError`, so `consError ≤ δ`
 iff `agreementProbability ≥ 1 - δ`. -/
-theorem simeqForMeasurements {Question Outcome : Type*} {d : ℕ}
+theorem simeqForMeasurements {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome d) (δ : Error) :
     consistency ψ 𝒟 (IdxMeas.toIdxSubMeas A)
@@ -33,14 +33,14 @@ the squared-distance defect `∑_a E[(A_a-B_a)†(A_a-B_a)]` is at most
 (not yet enforced by the scaffold `Measurement` type) and the expansion
 `‖A_a - B_a‖² = E[A_a²] + E[B_a²] - E[A_a B_a] - E[B_a A_a]`
 combined with `Σ_a E[A_a²] ≤ Σ_a E[A_a] = 1`. -/
-private lemma questionSDD_le_two_questionConsistency {Outcome : Type*} {d : ℕ}
+private lemma questionSDD_le_two_questionConsistency {Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (A B : Measurement Outcome d) :
     qSDD ψ A.toSubMeas B.toSubMeas ≤
       2 * qConsDefect ψ A.toSubMeas B.toSubMeas := by
   sorry
 
 /-- `prop:simeq-to-approx`. -/
-theorem simeqToApprox {Question Outcome : Type*} {d : ℕ}
+theorem simeqToApprox {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome d) (δ : Error) :
     consistency ψ 𝒟 (IdxMeas.toIdxSubMeas A)
@@ -80,14 +80,14 @@ increases the matching mass `∑_b E[(Σ_{a:f(a)=b} A_a)(Σ_{a':f(a')=b} B_{a'})
 ≥ ∑_a E[A_a B_a]`, so `totalOverlap - matchingMass` decreases. The cross-term
 positivity `E[A_a B_{a'}] ≥ 0` requires PSD assumptions on the operators
 and the state. -/
-private lemma qConsDefect_postprocess_le {α β : Type*} {d : ℕ}
+private lemma qConsDefect_postprocess_le {α β : Type*} {d : ℕ} [Fintype α] [Fintype β]
     (ψ : QuantumState d) (A B : SubMeas α d) (f : α → β) :
     qConsDefect ψ (postprocess A f) (postprocess B f) ≤
       qConsDefect ψ A B := by
   sorry
 
 /-- `prop:simeq-data-processing`. -/
-theorem simeqDataProcessing {Question α β : Type*} {d : ℕ}
+theorem simeqDataProcessing {Question α β : Type*} {d : ℕ} [Fintype α] [Fintype β]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question α d) (δ : Error) (f : α → β) :
     consistency ψ 𝒟 A B δ →
@@ -119,7 +119,7 @@ no dimension hypotheses are needed. -/
 `(X-Z) = (X-Y) + (Y-Z)` and the operator AM-GM inequality
 `U†V + V†U ≤ U†U + V†V` (equivalently `0 ≤ (U-V)†(U-V)`),
 which requires PSD trace positivity `E[D†D] ≥ 0`. -/
-private lemma questionSDD_triangle {Outcome : Type*} {d : ℕ}
+private lemma questionSDD_triangle {Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (A B C : SubMeas Outcome d) :
     qSDD ψ A C ≤
       2 * (qSDD ψ A B +
@@ -132,34 +132,24 @@ private lemma questionSDD_triangle {Outcome : Type*} {d : ℕ}
       2 * (ev (A.outcome a) (B.outcome a) +
            ev (B.outcome a) (C.outcome a)) :=
     fun a => ev_diff_triangle ψ _ _ _
-  have total_ineq : ev A.total C.total ≤
-      2 * (ev A.total B.total + ev B.total C.total) :=
-    ev_diff_triangle ψ _ _ _
-  -- Unfold the definition and handle both branches of sumOutcomes
+  -- Unfold the definition and use Finset.sum_le_sum + linearity
   unfold qSDD
   simp only []
-  -- The three sumOutcomes calls all branch on the same Nonempty (Fintype Outcome)
-  unfold sumOutcomes
-  split_ifs with hfin
-  · -- Fintype case: use Finset.sum_le_sum + linearity
-    letI : Fintype Outcome := Classical.choice hfin
-    have h1 : ∑ a : Outcome, ev (A.outcome a) (C.outcome a) ≤
-        ∑ a : Outcome, (2 * (ev (A.outcome a) (B.outcome a) +
-                   ev (B.outcome a) (C.outcome a))) :=
-      Finset.sum_le_sum (fun a _ => pointwise_outcome a)
-    have h2 : ∑ a : Outcome, (2 * (ev (A.outcome a) (B.outcome a) +
-                          ev (B.outcome a) (C.outcome a))) =
-        2 * (∑ a : Outcome, ev (A.outcome a) (B.outcome a) +
-             ∑ a : Outcome, ev (B.outcome a) (C.outcome a)) := by
-      rw [← Finset.mul_sum, ← Finset.sum_add_distrib]
-    linarith
-  · -- Fallback case
-    exact total_ineq
+  have h1 : ∑ a : Outcome, ev (A.outcome a) (C.outcome a) ≤
+      ∑ a : Outcome, (2 * (ev (A.outcome a) (B.outcome a) +
+                 ev (B.outcome a) (C.outcome a))) :=
+    Finset.sum_le_sum (fun a _ => pointwise_outcome a)
+  have h2 : ∑ a : Outcome, (2 * (ev (A.outcome a) (B.outcome a) +
+                        ev (B.outcome a) (C.outcome a))) =
+      2 * (∑ a : Outcome, ev (A.outcome a) (B.outcome a) +
+           ∑ a : Outcome, ev (B.outcome a) (C.outcome a)) := by
+    rw [← Finset.mul_sum, ← Finset.sum_add_distrib]
+  linarith
 
 /-- Triangle inequality for state-dependent distance. Requires PSD state for
 the parallelogram inequality `E[D†D] ≥ 0`. -/
 private lemma stateDependentDistanceRel_triangle
-    {Question Outcome : Type*} {d : ℕ}
+    {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B C : IdxSubMeas Question Outcome d) (δ₁ δ₂ : Error) :
     SDDRel ψ 𝒟 A B δ₁ →
@@ -192,7 +182,7 @@ private lemma stateDependentDistanceRel_triangle
 /-- Monotonicity: if `SDDRel` holds for `δ`,
 it holds for any `δ' ≥ δ`. -/
 private lemma stateDependentDistanceRel_mono
-    {Question Outcome : Type*} {d : ℕ}
+    {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome d) (δ δ' : Error)
     (hle : δ ≤ δ') :
@@ -213,7 +203,7 @@ honest tensor-product API (tracked in the `TODO(tensor)` note in
 /-- Atomic fact: `∑_a E[(A_a - A_a B_a A_a)†(A_a - A_a B_a A_a)] ≤ γ`
 when `A ≈_γ B` in consistency. -/
 private lemma consSubMeas_diagonalControl
-    {Question Outcome : Type*} {d : ℕ}
+    {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d)
     (B : IdxMeas Question Outcome d) (γ : Error) :
@@ -226,7 +216,7 @@ private lemma consSubMeas_diagonalControl
 /-- Atomic fact: `∑_a E[(A_a B_a A_a - A_a(Σ B)A_a)†(...)] ≤ γ`
 when `A ≈_γ B` in consistency. -/
 private lemma consSubMeas_sandwichControl
-    {Question Outcome : Type*} {d : ℕ}
+    {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d)
     (B : IdxMeas Question Outcome d) (γ : Error) :
@@ -240,7 +230,7 @@ private lemma consSubMeas_sandwichControl
 /-- Combined bound from the triangle inequality for `≈_δ`:
 `dist(A, totalSandwich) ≤ 4γ`. -/
 private lemma consSubMeas_combinedControl
-    {Question Outcome : Type*} {d : ℕ}
+    {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d)
     (B : IdxMeas Question Outcome d) (γ : Error) :
@@ -259,7 +249,7 @@ private lemma consSubMeas_combinedControl
     (2 * (γ + γ)) (4 * γ) (by linarith) h
 
 /-- `prop:cons-sub-meas`. PSD state is bundled into `QuantumState`. -/
-theorem consSubMeas {Question Outcome : Type*} {d : ℕ}
+theorem consSubMeas {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d)
     (B : IdxMeas Question Outcome d) (γ : Error) :
@@ -308,7 +298,7 @@ private lemma middleSandwich_eq_rightSandwich
 /-- Left sandwich transfer bound. At scaffold level this is
 trivial because `leftTensor` is a name-only operation. -/
 private lemma switchSandwich_leftTransfer
-    {Question Outcome : Type*} {d : ℕ}
+    {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome d)
     (B : Operator d) (hB : OpBounded01 B)
@@ -327,7 +317,7 @@ private lemma switchSandwich_leftTransfer
 /-- Right sandwich transfer bound. At scaffold level
 this is trivial because `rightTensor` is a name-only operation. -/
 private lemma switchSandwich_rightTransfer
-    {Question Outcome : Type*} {d : ℕ}
+    {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome d)
     (B : Operator d) (hB : OpBounded01 B)
@@ -344,7 +334,7 @@ private lemma switchSandwich_rightTransfer
   exact Real.sqrt_nonneg δ
 
 /-- `prop:switch-sandwich`. -/
-theorem switchSandwich {Question Outcome : Type*} {d : ℕ}
+theorem switchSandwich {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome d)
     (B : Operator d) (hB : OpBounded01 B)
@@ -363,7 +353,7 @@ theorem switchSandwich {Question Outcome : Type*} {d : ℕ}
   }
 
 /-- Atomic fact: Cauchy-Schwarz at the operator level. -/
-private lemma completenessTransfer_core {Question Outcome : Type*} {d : ℕ}
+private lemma completenessTransfer_core {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d)
     (P : IdxProjSubMeas Question Outcome d) (ε : Error) :
@@ -376,7 +366,7 @@ private lemma completenessTransfer_core {Question Outcome : Type*} {d : ℕ}
   sorry
 
 /-- `prop:completeness-transfer-projective-P`. -/
-theorem completenessTransferProjectiveP {Question Outcome : Type*} {d : ℕ}
+theorem completenessTransferProjectiveP {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d)
     (P : IdxProjSubMeas Question Outcome d) (ε : Error) :
@@ -389,27 +379,20 @@ theorem completenessTransferProjectiveP {Question Outcome : Type*} {d : ℕ}
 /-- The self-distance defect `qSDD ψ M M` is zero
 because `opDiff X X` has zero matrix. -/
 private lemma qSDD_self
-    {Outcome : Type*} {d : ℕ} (ψ : QuantumState d) (M : SubMeas Outcome d) :
+    {Outcome : Type*} {d : ℕ} [Fintype Outcome]
+    (ψ : QuantumState d) (M : SubMeas Outcome d) :
     qSDD ψ M M = 0 := by
   unfold qSDD
   simp only
-  have hfb : ev ψ
-      (opMul (opAdj (opDiff M.total M.total))
-        (opDiff M.total M.total)) = 0 :=
-    ev_adjoint_mul_self_zero ψ _
-      (opDiff_self_matrix M.total)
   have hpo : ∀ a, (fun a => ev ψ
       (opMul (opAdj (opDiff (M.outcome a) (M.outcome a)))
         (opDiff (M.outcome a) (M.outcome a)))) a = 0 :=
     fun a => ev_adjoint_mul_self_zero ψ _
       (opDiff_self_matrix (M.outcome a))
-  unfold sumOutcomes
-  split
-  · simp [hpo]
-  · exact hfb
+  simp [hpo]
 
 /-- The self-distance `sddError ψ 𝒟 A A` is zero. -/
-private lemma sddError_self {Question Outcome : Type*} {d : ℕ}
+private lemma sddError_self {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d) :
     sddError ψ 𝒟 A A = 0 := by
@@ -421,7 +404,7 @@ private lemma sddError_self {Question Outcome : Type*} {d : ℕ}
 
 /-- `sscError` is nonneg since it averages `max 0 (...)` terms
 with nonneg weights. -/
-private lemma sscError_nonneg {Question Outcome : Type*} {d : ℕ}
+private lemma sscError_nonneg {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d) :
     0 ≤ sscError ψ 𝒟 A := by
@@ -436,7 +419,7 @@ private lemma sscError_nonneg {Question Outcome : Type*} {d : ℕ}
   exact le_max_left 0 _
 
 /-- `prop:two-notions-of-self-consistency`. -/
-theorem twoNotionsOfSelfConsistency {Question Outcome : Type*} {d : ℕ}
+theorem twoNotionsOfSelfConsistency {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d) (δ : Error) :
     strongSelfConsistency ψ 𝒟 A δ →
@@ -449,7 +432,7 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type*} {d : ℕ}
   linarith
 
 /-- Closeness bound `2δ + 4√δ + 2ζ` for completing-to-measurement. -/
-private lemma closenessAfterCompletion_core {Outcome : Type*} {d : ℕ}
+private lemma closenessAfterCompletion_core {Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d)
     (A : Measurement Outcome d) (B : SubMeas Outcome d)
     (a0 : Outcome) (δ ζ : Error) :
@@ -465,7 +448,7 @@ private lemma closenessAfterCompletion_core {Outcome : Type*} {d : ℕ}
   sorry
 
 /-- `prop:completing-to-measurement`. -/
-theorem completingToMeasurement {Outcome : Type*} {d : ℕ}
+theorem completingToMeasurement {Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d)
     (A : Measurement Outcome d) (B : SubMeas Outcome d)
     (a0 : Outcome) (δ ζ : Error) :

@@ -13,7 +13,8 @@ namespace MIPStarRE.LDT.Preliminaries
 open MIPStarRE.LDT
 
 /-- `def:post-processing` in `preliminaries.tex`. -/
-noncomputable def postProcessing {α β : Type*} {d : ℕ} (A : SubMeas α d) (f : α → β) :
+noncomputable def postProcessing {α β : Type*} {d : ℕ} [Fintype α]
+    (A : SubMeas α d) (f : α → β) :
     SubMeas β d :=
   postprocess A f
 
@@ -23,19 +24,19 @@ def measurementCompletion {α : Type*} {d : ℕ} (A : SubMeas α d) :
   completeSubMeas A
 
 /-- `def:simeq` in `preliminaries.tex`. -/
-def consistency {Question Outcome : Type*} {d : ℕ}
+def consistency {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop :=
   ConsRel ψ 𝒟 A B δ
 
 /-- `def:approx_delta` in `preliminaries.tex`. -/
-def stateDependentDistance {Question Outcome : Type*} {d : ℕ}
+def stateDependentDistance {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop :=
   SDDRel ψ 𝒟 A B δ
 
 /-- `def:strong-self-consistency` in `preliminaries.tex`. -/
-def strongSelfConsistency {Question Outcome : Type*} {d : ℕ}
+def strongSelfConsistency {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d) (δ : Error) : Prop :=
   PermInvState ψ ∧ SSCRel ψ 𝒟 A δ
@@ -46,13 +47,13 @@ TODO(tensor): this currently reuses the single-register comparison layer from Se
 so users should wrap `A` and `B` in the local `leftTensor` / `rightTensor` placements
 before invoking it. Replacing this by an honest tensor-product API remains future work.
 -/
-structure BipartiteSDDRel {Question Outcome : Type*} {d : ℕ}
+structure BipartiteSDDRel {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop where
   leftRightSquaredDistanceBound : sddError ψ 𝒟 A B ≤ δ
 
 /-- Abbreviation for the bipartite state-dependent distance used in the source propositions. -/
-def bipartiteStateDependentDistance {Question Outcome : Type*} {d : ℕ}
+def bipartiteStateDependentDistance {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome d) (δ : Error) : Prop :=
   BipartiteSDDRel ψ 𝒟 A B δ
@@ -64,7 +65,7 @@ structure OpBounded01 {d : ℕ} (B : Operator d) : Prop where
   boundedByIdentity : OpDominates (identityLike B) B
 
 /-- Placeholder agreement probability from `prop:simeq-for-measurements`. -/
-noncomputable def agreementProbability {Question Outcome : Type*} {d : ℕ}
+noncomputable def agreementProbability {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome d) : Error :=
   1 - consError ψ 𝒟
@@ -72,13 +73,13 @@ noncomputable def agreementProbability {Question Outcome : Type*} {d : ℕ}
         (IdxMeas.toIdxSubMeas B)
 
 /-- Output package for the measurement reformulation of consistency. -/
-structure ConsAgreement {Question Outcome : Type*} {d : ℕ}
+structure ConsAgreement {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome d) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
 
 /-- Post-process an indexed family questionwise. -/
-noncomputable def postprocessIdxSubMeas {Question α β : Type*} {d : ℕ}
+noncomputable def postprocessIdxSubMeas {Question α β : Type*} {d : ℕ} [Fintype α]
     (A : IdxSubMeas Question α d) (f : α → β) :
     IdxSubMeas Question β d :=
   fun q => postProcessing (A q) f
@@ -120,7 +121,7 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*} {d : ℕ}
   }
 
 /-- Output package for `prop:cons-sub-meas`. -/
-structure ConsSubMeasStmt {Question Outcome : Type*} {d : ℕ}
+structure ConsSubMeasStmt {Question Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d)
     (B : IdxMeas Question Outcome d) (γ : Error) : Prop where
@@ -209,7 +210,7 @@ noncomputable def completeAtOutcome {Outcome : Type*} {d : ℕ}
   }
 
 /-- Output package for `prop:completing-to-measurement`. -/
-structure CompletingToMeasStmt {Outcome : Type*} {d : ℕ}
+structure CompletingToMeasStmt {Outcome : Type*} {d : ℕ} [Fintype Outcome]
     (ψ : QuantumState d)
     (A : Measurement Outcome d) (B : SubMeas Outcome d)
     (C : Measurement Outcome d) (a0 : Outcome) (δ ζ : Error) : Prop where

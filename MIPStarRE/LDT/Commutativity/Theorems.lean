@@ -96,6 +96,7 @@ structure ComMainConclusion (params : Parameters)
 
 /-- Output package for `lem:normalization-condition`. -/
 structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA d)
     (Q : ProjSubMeas OutcomeB d) : Prop where
   sandwichedHermitianSquare :
@@ -134,6 +135,7 @@ theorem comMain
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA d)
     (Q : ProjSubMeas OutcomeB d) :
     NormalizationConditionStatement P Q := by

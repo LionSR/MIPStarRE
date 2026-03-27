@@ -34,7 +34,7 @@ def appendRightTotalSubMeas {α : Type*}
 
 Its total operator should be the sum-of-sandwiches
 `∑_a A_a (∑_b B_b) A_a` whenever `α` is finitely enumerable. -/
-noncomputable def sandwichByOuterSubMeas {α β : Type*}
+noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α]
     (label : String) (A : SubMeas α d) (B : SubMeas β d) :
     SubMeas (α × β) d where
   name := label
@@ -43,18 +43,11 @@ noncomputable def sandwichByOuterSubMeas {α β : Type*}
     | (a, b) =>
         opMul (A.outcome a)
           (opMul (B.outcome b) (A.outcome a))
-  total := by
-    classical
-    if h : Nonempty (Fintype α) then
-      letI : Fintype α := Classical.choice h
-      exact sumOpList
-        (Finset.univ.toList.map fun a =>
-          opMul (A.outcome a)
-            (opMul B.total (A.outcome a)))
-    else
-      exact
-        { name := s!"TODO(sumSandwiches:{label})"
-          matrix := A.total.matrix }
+  total :=
+    sumOpList
+      (Finset.univ.toList.map fun a =>
+        opMul (A.outcome a)
+          (opMul B.total (A.outcome a)))
 
 /-- The full-slice question underlying an evaluated-slice sample. -/
 def fullSliceQuestionOfEvaluatedSlice (params : Parameters)
@@ -228,35 +221,34 @@ def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type*} {d : �
 
 /-- The sandwiched family `b ↦ Q_b P_a Q_b`. -/
 noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeB]
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) :
     IdxSubMeas OutcomeA OutcomeB d :=
   fun a =>
     { name := s!"sandwich({P.name},{Q.toSubMeas.name})"
       outcome := fun b => normalizationConditionSandwichedOperator P Q a b
-      total := by
-        classical
-        if h : Nonempty (Fintype OutcomeB) then
-          letI : Fintype OutcomeB := Classical.choice h
-          exact sumOpList
-            (Finset.univ.toList.map
-              (fun b => normalizationConditionSandwichedOperator P Q a b))
-        else
-          exact Q.total }
+      total :=
+        sumOpList
+          (Finset.univ.toList.map
+            (fun b => normalizationConditionSandwichedOperator P Q a b)) }
 
 /-- The total family `a ↦ ∑_b C_{a,b}` from `lem:normalization-condition`. -/
 def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeB]
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) :
     IdxSubMeas OutcomeA Unit d :=
   fun a => postprocess (normalizationConditionSandwichedFamily P Q a) (fun _ => ())
 
 /-- The formal operator `∑_b C_{a,b}` from `lem:normalization-condition`. -/
 def normalizationConditionSandwichedTotalOperator {OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeB]
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d)
     (a : OutcomeA) : Operator d :=
   (normalizationConditionSandwichedTotalFamily P Q a).total
 
 /-- The family `a ↦ (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) :
     SubMeas OutcomeA d where
   name := s!"normSquareFamily({P.name},{Q.toSubMeas.name})"
@@ -264,20 +256,16 @@ def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
     opMul
       (normalizationConditionSandwichedTotalOperator P Q a)
       (opAdj (normalizationConditionSandwichedTotalOperator P Q a))
-  total := by
-    classical
-    if h : Nonempty (Fintype OutcomeA) then
-      letI : Fintype OutcomeA := Classical.choice h
-      exact sumOpList
-        (Finset.univ.toList.map (fun a =>
-          opMul
-            (normalizationConditionSandwichedTotalOperator P Q a)
-            (opAdj (normalizationConditionSandwichedTotalOperator P Q a))))
-    else
-      exact { name := s!"normSquare({P.name},{Q.toSubMeas.name})" }
+  total :=
+    sumOpList
+      (Finset.univ.toList.map (fun a =>
+        opMul
+          (normalizationConditionSandwichedTotalOperator P Q a)
+          (opAdj (normalizationConditionSandwichedTotalOperator P Q a))))
 
 /-- The family `a ↦ (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
 def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) :
     SubMeas OutcomeA d where
   name := s!"normAdjointSquareFamily({P.name},{Q.toSubMeas.name})"
@@ -285,30 +273,28 @@ def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
     opMul
       (opAdj (normalizationConditionSandwichedTotalOperator P Q a))
       (normalizationConditionSandwichedTotalOperator P Q a)
-  total := by
-    classical
-    if h : Nonempty (Fintype OutcomeA) then
-      letI : Fintype OutcomeA := Classical.choice h
-      exact sumOpList
-        (Finset.univ.toList.map (fun a =>
-          opMul
-            (opAdj (normalizationConditionSandwichedTotalOperator P Q a))
-            (normalizationConditionSandwichedTotalOperator P Q a)))
-    else
-      exact { name := s!"normAdjointSquare({P.name},{Q.toSubMeas.name})" }
+  total :=
+    sumOpList
+      (Finset.univ.toList.map (fun a =>
+        opMul
+          (opAdj (normalizationConditionSandwichedTotalOperator P Q a))
+          (normalizationConditionSandwichedTotalOperator P Q a)))
 
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) : Operator d :=
   (normalizationConditionSquareFamily P Q).total
 
 /-- The operator `∑_a (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
 def normalizationConditionAdjointSquareOperator {OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) : Operator d :=
   (normalizationConditionAdjointSquareFamily P Q).total
 
 /-- The identity bound appearing in `lem:normalization-condition`. -/
 def normalizationConditionIdentityBound {OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) : Operator d :=
   -- TODO: idOp dim should match normalizationConditionSquareOperator
   idOp s!"normalization({P.name},{Q.toSubMeas.name})"

@@ -48,16 +48,10 @@ noncomputable def uniformDistribution (α : Type*)
 full `L¹` bookkeeping is postponed to a later pass. -/
 def totalVariationDistance {α : Type*} (_μ _ν : Distribution α) : Error := 0
 
-/-- Sum a scalar quantity over an outcome space when a finite enumeration is available,
-falling back to a coarser surrogate otherwise. -/
-noncomputable def sumOutcomes {α : Type*}
-    (fallback : Error) (f : α → Error) : Error := by
-  classical
-  if h : Nonempty (Fintype α) then
-    letI : Fintype α := Classical.choice h
-    exact ∑ a, f a
-  else
-    exact fallback
+/-- Sum a scalar quantity over a finite outcome space. -/
+noncomputable def sumOutcomes {α : Type*} [Fintype α]
+    (f : α → Error) : Error :=
+  ∑ a, f a
 
 /-! ### Averaging infrastructure -/
 

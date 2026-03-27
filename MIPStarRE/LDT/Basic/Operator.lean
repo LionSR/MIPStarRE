@@ -150,6 +150,39 @@ theorem ev_sub (ψ : QuantumState d) (X Y : Operator d) :
   simp [ev, opDiff, mul_sub,
     MIPStarRE.Quantum.normalizedTrace_sub, Complex.sub_re]
 
+/-! ### Algebraic lemmas for operator expectation values -/
+
+/-- `ev` commutes with real scalar multiplication. -/
+theorem ev_scale (ψ : QuantumState d) (c : Error) (X : Operator d) :
+    ev ψ (opScale c X) = c * ev ψ X := by
+  simp only [ev, opScale]
+  rw [show ψ.density * ((c : ℂ) • X.matrix) = (c : ℂ) • (ψ.density * X.matrix)
+    from by rw [mul_smul_comm]]
+  rw [MIPStarRE.Quantum.normalizedTrace_smul]
+  simp [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
+
+/-- `opMul` is associative at the matrix level. -/
+@[simp] theorem opMul_matrix_assoc (X Y Z : Operator d) :
+    (opMul (opMul X Y) Z).matrix = (opMul X (opMul Y Z)).matrix := by
+  simp [opMul, Matrix.mul_assoc]
+
+/-- `ev` of `opAdj X` equals `ev X` when the operator is Hermitian. -/
+theorem ev_adj_eq (ψ : QuantumState d) (X : Operator d)
+    (hX : X.matrix.IsHermitian) :
+    ev ψ (opAdj X) = ev ψ X := by
+  simp [ev, opAdj, hX.eq]
+
+/-- Trace cyclicity: `τ(ρ · AB) = τ(B · ρA)`. Useful for rearranging
+expectation values under trace. -/
+theorem ev_trace_cyclic (ψ : QuantumState d) (X Y : Operator d) :
+    ev ψ (opMul X Y) =
+      Complex.re (MIPStarRE.Quantum.normalizedTrace
+        (Y.matrix * (ψ.density * X.matrix))) := by
+  simp only [ev, opMul]
+  congr 1
+  rw [← Matrix.mul_assoc]
+  exact MIPStarRE.Quantum.normalizedTrace_mul_comm (ψ.density * X.matrix) Y.matrix
+
 /-! ### Self-difference and zero-matrix infrastructure -/
 
 /-- The matrix of `opDiff X X` is zero. -/

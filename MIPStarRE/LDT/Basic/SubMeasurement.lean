@@ -82,29 +82,19 @@ def toIdxSubMeas {Question Outcome : Type*} {d : ℕ}
 
 end IdxProjMeas
 
-/-- Post-process the outcomes of a submeasurement. When the outcome space is enumerable,
-the processed operator at `b` is the sum of the operators of all `a` with `f a = b`.
-Otherwise we fall back to the zero operator in the ambient space until the relevant
-bounded-answer enumeration is made explicit. -/
-noncomputable def postprocess {α β : Type*} {d : ℕ}
+/-- Post-process the outcomes of a submeasurement. The processed operator at `b` is the
+sum of the operators of all `a` with `f a = b`. -/
+noncomputable def postprocess {α β : Type*} {d : ℕ} [Fintype α]
     (A : SubMeas α d) (f : α → β) :
     SubMeas β d := by
   classical
-  if h : Nonempty (Fintype α) then
-    letI : Fintype α := Classical.choice h
-    exact {
-      name := s!"{A.name}.post"
-      outcome := fun b =>
-        sumOpList
-          (((Finset.univ.filter fun a => f a = b).toList).map A.outcome)
-      total := A.total
-    }
-  else
-    exact {
-      name := s!"{A.name}.post"
-      outcome := fun _ => (0 : Operator d)
-      total := A.total
-    }
+  exact {
+    name := s!"{A.name}.post"
+    outcome := fun b =>
+      sumOpList
+        (((Finset.univ.filter fun a => f a = b).toList).map A.outcome)
+    total := A.total
+  }
 
 /-- Complete a submeasurement by adjoining a distinguished failure outcome. -/
 def completeSubMeas {α : Type*} {d : ℕ}

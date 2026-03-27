@@ -379,7 +379,8 @@ def hRestrictionToVerticalLine (params : Parameters)
     postprocess H (fun h => Polynomial.restrictToAxisParallelLine params.next h verticalLine)
 
 /-- Collapse a submeasurement to its `Unit`-valued total operator. -/
-def pastedMeasurementTotal {α : Type*} {d : ℕ} (H : SubMeas α d) : IdxSubMeas Unit Unit d :=
+def pastedMeasurementTotal {α : Type*} {d : ℕ} [Fintype α]
+    (H : SubMeas α d) : IdxSubMeas Unit Unit d :=
   constSubMeasFamily (postprocess H (fun _ => ()))
 
 /-- The total operator of the specifically constructed pasted submeasurement. -/
