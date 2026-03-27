@@ -15,7 +15,7 @@ namespace MIPStarRE.LDT
 
 /-- Invariance predicate for the symmetric shared state. -/
 structure PermInvState {d : ℕ} (_ψ : QuantumState d) : Prop where
-  swapInvariant : True
+  placeholder : True
 
 /-- Paper-local symmetric strategy data. -/
 structure SymStrat (params : Parameters) (d : ℕ) where
@@ -180,8 +180,8 @@ namespace IdxPolyFamily
 def averagedSubMeas {params : Parameters} {d : ℕ}
     (_family : IdxPolyFamily params d) : SubMeas (Polynomial params) d where
   name := s!"Gavg({params.m},{params.q},{params.d})"
-  outcomeOperator := fun _ => { name := s!"Gavg({params.m},{params.q},{params.d}).outcome" }
-  totalOperator := { name := s!"Gavg({params.m},{params.q},{params.d}).total" }
+  outcome := fun _ => { name := s!"Gavg({params.m},{params.q},{params.d}).outcome" }
+  total := { name := s!"Gavg({params.m},{params.q},{params.d}).total" }
 
 /-- Evaluate the slice family at a point `(u, x)` in `F_q^{m+1}`. -/
 def evaluatedAtNextPoint {params : Parameters} {d : ℕ}

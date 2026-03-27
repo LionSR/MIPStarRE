@@ -42,7 +42,7 @@ def polynomialDistribution (params : Parameters) :
 /-- The operator `G_g` attached to the polynomial outcome `g`. -/
 def polynomialWeightOperator (params : Parameters)
     (G : SubMeas (Polynomial params) d) (g : Polynomial params) : Operator d :=
-  G.outcomeOperator g
+  G.outcome g
 
 /-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`. -/
 noncomputable def polynomialWeightSqrtOperator (params : Parameters)
@@ -60,7 +60,7 @@ noncomputable def weightedPolynomialState (params : Parameters)
 def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters)
     (strategy : SymStrat params d)
     (g : Polynomial params) (u : Point params) : Operator d :=
-  (strategy.pointMeasurement u).toSubMeas.outcomeOperator (g u)
+  (strategy.pointMeasurement u).toSubMeas.outcome (g u)
 
 /-- The operator family `u ↦ A(g)^u = A^u_{g(u)}` for a fixed polynomial `g`. -/
 def pointConditionedOperatorFamilyAtPolynomial (params : Parameters)
@@ -178,8 +178,8 @@ noncomputable def generalizeBLeftFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu)
     { name := s!"generalizeB.left({params.m},{params.q},{params.d})"
-      outcomeOperator := fun _ => op
-      totalOperator := op }
+      outcome := fun _ => op
+      total := op }
 
 /-- Aggregated family for the right-hand side of `lem:generalize-b`. -/
 noncomputable def generalizeBRightFamily (params : Parameters)
@@ -191,8 +191,8 @@ noncomputable def generalizeBRightFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu)
     { name := s!"generalizeB.right({params.m},{params.q},{params.d})"
-      outcomeOperator := fun _ => op
-      totalOperator := op }
+      outcome := fun _ => op
+      total := op }
 
 /-- Aggregated family for `A^u_[g(u)] ⊗ (G_g)^{1/2}`. -/
 noncomputable def localVarianceLeftFamily (params : Parameters)
@@ -204,8 +204,8 @@ noncomputable def localVarianceLeftFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
     { name := s!"localVariance.left({params.m},{params.q},{params.d})"
-      outcomeOperator := fun _ => op
-      totalOperator := op }
+      outcome := fun _ => op
+      total := op }
 
 /-- Aggregated family for `A^v_[g(v)] ⊗ (G_g)^{1/2}`. -/
 noncomputable def localVarianceRightFamily (params : Parameters)
@@ -217,8 +217,8 @@ noncomputable def localVarianceRightFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)
     { name := s!"localVariance.right({params.m},{params.q},{params.d})"
-      outcomeOperator := fun _ => op
-      totalOperator := op }
+      outcome := fun _ => op
+      total := op }
 
 /-- The same weighted operator on the first independently sampled point. -/
 noncomputable def globalVarianceLeftFamily (params : Parameters)
@@ -230,8 +230,8 @@ noncomputable def globalVarianceLeftFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
     { name := s!"globalVariance.left({params.m},{params.q},{params.d})"
-      outcomeOperator := fun _ => op
-      totalOperator := op }
+      outcome := fun _ => op
+      total := op }
 
 /-- The same weighted operator on the second independently sampled point. -/
 noncomputable def globalVarianceRightFamily (params : Parameters)
@@ -243,8 +243,8 @@ noncomputable def globalVarianceRightFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)
     { name := s!"globalVariance.right({params.m},{params.q},{params.d})"
-      outcomeOperator := fun _ => op
-      totalOperator := op }
+      outcome := fun _ => op
+      total := op }
 
 /-- The edgewise squared norm expression in `lem:local-variance-of-points`. -/
 noncomputable def localVarianceDeviationAtPolynomial (params : Parameters)

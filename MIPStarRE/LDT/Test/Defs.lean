@@ -44,17 +44,17 @@ outcome space is enumerable. -/
 noncomputable def qMatchMass {Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (A B : SubMeas Outcome d) : Error :=
   sumOutcomes
-    (ev ψ (opMul A.totalOperator B.totalOperator))
-    (fun a => ev ψ (opMul (A.outcomeOperator a) (B.outcomeOperator a)))
+    (ev ψ (opMul A.total B.total))
+    (fun a => ev ψ (opMul (A.outcome a) (B.outcome a)))
 
 /-- Questionwise off-diagonal mass surrogate for consistency. -/
 noncomputable def qConsDefect {Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (A B : SubMeas Outcome d) : Error := by
   classical
-  let totalOverlap := ev ψ (opMul A.totalOperator B.totalOperator)
+  let totalOverlap := ev ψ (opMul A.total B.total)
   let coarseMismatch :=
     max 0
-      (ev ψ A.totalOperator + ev ψ B.totalOperator - 2 * totalOverlap)
+      (ev ψ A.total + ev ψ B.total - 2 * totalOverlap)
   if h : Nonempty (Fintype Outcome) then
     exact max 0 (totalOverlap - qMatchMass ψ A B)
   else
@@ -63,21 +63,21 @@ noncomputable def qConsDefect {Outcome : Type*} {d : ℕ}
 /-- Questionwise squared-distance defect. -/
 noncomputable def qSDD {Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (A B : SubMeas Outcome d) : Error :=
-  let totalDiff := opDiff A.totalOperator B.totalOperator
+  let totalDiff := opDiff A.total B.total
   sumOutcomes
     (ev ψ (opMul (opAdj totalDiff) totalDiff))
     (fun a =>
-      let diff := opDiff (A.outcomeOperator a) (B.outcomeOperator a)
+      let diff := opDiff (A.outcome a) (B.outcome a)
       ev ψ (opMul (opAdj diff) diff))
 
 /-- Questionwise strong self-consistency defect. -/
 noncomputable def qSSCDefect {Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (A : SubMeas Outcome d) : Error :=
-  let totalMass := ev ψ A.totalOperator
-  let coarseDiagonal := ev ψ (opMul A.totalOperator A.totalOperator)
+  let totalMass := ev ψ A.total
+  let coarseDiagonal := ev ψ (opMul A.total A.total)
   let diagonalMass :=
     sumOutcomes coarseDiagonal
-      (fun a => ev ψ (opMul (A.outcomeOperator a) (A.outcomeOperator a)))
+      (fun a => ev ψ (opMul (A.outcome a) (A.outcome a)))
   max 0 (totalMass - diagonalMass)
 
 /-- Averaged off-diagonal mass for consistency statements. -/
@@ -101,7 +101,7 @@ def sscError {Question Outcome : Type*} {d : ℕ}
 /-- Total mass of a submeasurement on state `ψ`, computed from the concrete total operator. -/
 def subMeasMass {Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (A : SubMeas Outcome d) : Error :=
-  ev ψ A.totalOperator
+  ev ψ A.total
 
 /-- Averaged total mass of an indexed submeasurement. -/
 def idxSubMeasMass {Question Outcome : Type*} {d : ℕ}

@@ -24,14 +24,11 @@ namespace MIPStarRE.LDT
 /-- A finite-dimensional bipartite state placeholder carrying an actual density matrix. -/
 structure QuantumState (d : ℕ) where
   name : String := ""
-  density : MIPStarRE.Quantum.Op (HilbertIndex d) := 1
+  density : MIPStarRE.Quantum.Op (HilbertIndex d) := 0
+  density_psd : 0 ≤ density := by positivity
 
 instance : Inhabited (QuantumState d) where
-  default := { density := 0 }
-
-/-- Positivity of the concrete matrix carried by a state. -/
-def QuantumState.IsPositive (ψ : QuantumState d) : Prop :=
-  0 ≤ ψ.density
+  default := {}
 
 /-- Unit normalized trace for the concrete matrix carried by a state. -/
 def QuantumState.IsNormalized (ψ : QuantumState d) : Prop :=
@@ -59,7 +56,7 @@ noncomputable def ev (ψ : QuantumState d) (X : Operator d) : Error :=
 
 /-- Positive semidefiniteness for the concrete matrix carried by an operator. -/
 structure OpPSD (Z : Operator d) : Prop where
-  nonnegative : 0 ≤ Z.matrix
+  psd : 0 ≤ Z.matrix
 
 /-- The identity operator, optionally labelled by the ambient space. -/
 def idOp (label : String := "") : Operator d where
@@ -135,7 +132,7 @@ def weightedOpSum {α : Type*}
 
 /-- The domination relation `X ≥ Y`, encoded by PSD-ness of the concrete matrix gap. -/
 structure OpDominates (X Y : Operator d) : Prop where
-  dominationGapPositive : 0 ≤ X.matrix - Y.matrix
+  psd : 0 ≤ X.matrix - Y.matrix
 
 /-! ### Bridging lemmas: expectation-value linearity -/
 
@@ -193,8 +190,7 @@ theorem ev_name_irrel (ψ : QuantumState d)
 Proof: `Re(τ(ρ · M†M)) = Re(tr(ρ M† M)/d)`. By trace cyclicity,
 `tr(ρ M† M) = tr(M ρ M†)`, and `M ρ M†` is PSD by congruence,
 so `tr(M ρ M†) ≥ 0` (a nonneg real), hence `Re(...)/d ≥ 0`. -/
-theorem ev_adjoint_self_nonneg (ψ : QuantumState d) (M : Operator d)
-    (hψ : ψ.IsPositive) :
+theorem ev_adjoint_self_nonneg (ψ : QuantumState d) (M : Operator d) :
     0 ≤ ev ψ (opMul (opAdj M) M) := by
   simp only [ev, opMul, opAdj]
   unfold MIPStarRE.Quantum.normalizedTrace
@@ -204,7 +200,7 @@ theorem ev_adjoint_self_nonneg (ψ : QuantumState d) (M : Operator d)
   · rw [← Matrix.mul_assoc, Matrix.trace_mul_comm (ψ.density * M.matrixᴴ) M.matrix,
         ← Matrix.mul_assoc]
     exact (Complex.nonneg_iff.mp
-      ((Matrix.nonneg_iff_posSemidef.mp hψ).mul_mul_conjTranspose_same M.matrix).trace_nonneg).1
+      ((Matrix.nonneg_iff_posSemidef.mp ψ.density_psd).mul_mul_conjTranspose_same M.matrix).trace_nonneg).1
   · exact Nat.cast_nonneg _
 
 /-! ### Parallelogram inequality for normalized trace -/
@@ -269,8 +265,7 @@ theorem normalizedTrace_triangle {n : Type*} [Fintype n]
 
 With the parametric dimension design, this follows directly from
 `normalizedTrace_triangle` — no dimension hypotheses needed. -/
-theorem ev_diff_triangle (ψ : QuantumState d) (X Y Z : Operator d)
-    (hψ : ψ.IsPositive) :
+theorem ev_diff_triangle (ψ : QuantumState d) (X Y Z : Operator d) :
     ev ψ (opMul (opAdj (opDiff X Z))
         (opDiff X Z)) ≤
     2 * (ev ψ (opMul (opAdj (opDiff X Y))
@@ -281,6 +276,6 @@ theorem ev_diff_triangle (ψ : QuantumState d) (X Y Z : Operator d)
   have hdecomp : X.matrix - Z.matrix = (X.matrix - Y.matrix) + (Y.matrix - Z.matrix) := by abel
   rw [hdecomp]
   exact normalizedTrace_triangle ψ.density (X.matrix - Y.matrix) (Y.matrix - Z.matrix)
-    (Matrix.nonneg_iff_posSemidef.mp hψ)
+    (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd)
 
 end MIPStarRE.LDT

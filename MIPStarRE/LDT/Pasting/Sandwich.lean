@@ -205,7 +205,7 @@ def gHatHalfProductOutcomeOperator (params : Parameters)
       idOp s!"ghatHalf({params.m},{params.q},{params.d},0)"
   | k + 1, xs, gs =>
       opMul
-        (((gHatIdxMeas params family (xs 0)).toSubMeas).outcomeOperator (gs 0))
+        (((gHatIdxMeas params family (xs 0)).toSubMeas).outcome (gs 0))
         (gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs))
 
 /-- The total half-product `\sum_{g_1,\dots,g_k} \widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
@@ -216,7 +216,7 @@ def gHatHalfProductTotalOperator (params : Parameters)
       idOp s!"ghatHalfTotal({params.m},{params.q},{params.d},0)"
   | k + 1, xs =>
       opMul
-        (((gHatIdxMeas params family (xs 0)).toSubMeas).totalOperator)
+        (((gHatIdxMeas params family (xs 0)).toSubMeas).total)
         (gHatHalfProductTotalOperator params family k (pointTupleTail xs))
 
 /-- The cyclically rotated half-product `\widehat G^{x_2}_{g_2} \cdots \widehat G^{x_k}_{g_k} \widehat G^{x_1}_{g_1}`. -/
@@ -228,7 +228,7 @@ def gHatRotatedHalfProductOutcomeOperator (params : Parameters)
   | k + 1, xs, gs =>
       opMul
         (gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs))
-        (((gHatIdxMeas params family (xs 0)).toSubMeas).outcomeOperator (gs 0))
+        (((gHatIdxMeas params family (xs 0)).toSubMeas).outcome (gs 0))
 
 /-- The total cyclically rotated half-product. -/
 def gHatRotatedHalfProductTotalOperator (params : Parameters)
@@ -239,7 +239,7 @@ def gHatRotatedHalfProductTotalOperator (params : Parameters)
   | k + 1, xs =>
       opMul
         (gHatHalfProductTotalOperator params family k (pointTupleTail xs))
-        (((gHatIdxMeas params family (xs 0)).toSubMeas).totalOperator)
+        (((gHatIdxMeas params family (xs 0)).toSubMeas).total)
 
 /-- Concrete family for the full sandwich
 `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k} \cdots \widehat G^{x_1}_{g_1}`. -/
@@ -248,10 +248,10 @@ def gHatSandwichFamily (params : Parameters)
     IdxSubMeas (PointTuple params k) (GHatTupleOutcome params k) d :=
   fun xs =>
     { name := s!"ghat.sandwich({params.m},{params.q},{params.d},{k})"
-      outcomeOperator := fun gs =>
+      outcome := fun gs =>
         let half := gHatHalfProductOutcomeOperator params family k xs gs
         opMul half (opAdj half)
-      totalOperator :=
+      total :=
         let half := gHatHalfProductTotalOperator params family k xs
         opMul half (opAdj half) }
 
@@ -262,8 +262,8 @@ def gHatHalfSandwichLeft (params : Parameters)
   fun xs =>
     leftPlacedSubMeas <|
       { name := s!"ghat.half.left({params.m},{params.q},{params.d},{k})"
-        outcomeOperator := fun gs => gHatHalfProductOutcomeOperator params family k xs gs
-        totalOperator := gHatHalfProductTotalOperator params family k xs }
+        outcome := fun gs => gHatHalfProductOutcomeOperator params family k xs gs
+        total := gHatHalfProductTotalOperator params family k xs }
 
 /-- Concrete family for the cyclically permuted half-sandwich product. -/
 def gHatHalfSandwichRight (params : Parameters)
@@ -272,8 +272,8 @@ def gHatHalfSandwichRight (params : Parameters)
   fun xs =>
     leftPlacedSubMeas <|
       { name := s!"ghat.half.right({params.m},{params.q},{params.d},{k})"
-        outcomeOperator := fun gs => gHatRotatedHalfProductOutcomeOperator params family k xs gs
-        totalOperator := gHatRotatedHalfProductTotalOperator params family k xs }
+        outcome := fun gs => gHatRotatedHalfProductOutcomeOperator params family k xs gs
+        total := gHatRotatedHalfProductTotalOperator params family k xs }
 
 /-- TODO: this should carry the paper's operator-polynomial `S_{\tau_{\ge \ell}}` construction from `lem:from-H-to-G`. -/
 def suffixBernoulliWeightOperator (params : Parameters)
@@ -324,15 +324,15 @@ def constructedPastedMeasurement (params : Parameters)
   toSubMeas :=
     let H := constructedPastedSubMeas params family k
     let h₀ := pastedFallbackOutcome params
-    let completionMass := operatorComplement H.totalOperator
+    let completionMass := operatorComplement H.total
     { name := s!"{H.name}.completion"
-      outcomeOperator := fun h => by
+      outcome := fun h => by
         classical
         exact if h = h₀ then
-          opAdd (H.outcomeOperator h) completionMass
+          opAdd (H.outcome h) completionMass
         else
-          H.outcomeOperator h
-      totalOperator := identityLike H.totalOperator }
+          H.outcome h
+      total := identityLike H.total }
 
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/
 def verticalLineMeasurementFamily (params : Parameters)
@@ -401,7 +401,7 @@ def bernoulliTailFromFamily (params : Parameters)
     IdxSubMeas Unit Unit d :=
   constSubMeasFamily <|
     bernoulliTailSubMeas k params.d
-      ((IdxPolyFamily.averagedSubMeas family).totalOperator)
+      ((IdxPolyFamily.averagedSubMeas family).total)
 
 /-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`. -/
 def fromHToGRecurrenceLeftFamily (params : Parameters)
@@ -412,8 +412,8 @@ def fromHToGRecurrenceLeftFamily (params : Parameters)
     let base := allOutcomesExpansionFamily params strategy family k ()
     let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
     { name := s!"fromHToG.left({params.m},{params.q},{params.d},{k},{ℓ})"
-      outcomeOperator := fun _ => opMul base.totalOperator weight
-      totalOperator := opMul base.totalOperator weight }
+      outcome := fun _ => opMul base.total weight
+      total := opMul base.total weight }
 
 /-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`. -/
 def fromHToGRecurrenceRightFamily (params : Parameters)
@@ -424,8 +424,8 @@ def fromHToGRecurrenceRightFamily (params : Parameters)
     let base := bernoulliTailFromFamily params family k ()
     let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
     { name := s!"fromHToG.right({params.m},{params.q},{params.d},{k},{ℓ})"
-      outcomeOperator := fun _ => opMul base.totalOperator weight
-      totalOperator := opMul base.totalOperator weight }
+      outcome := fun _ => opMul base.total weight
+      total := opMul base.total weight }
 
 
 end

@@ -39,7 +39,7 @@ noncomputable def sdpPrimalContributionOperator (params : Parameters)
     (strategy : SymStrat params d)
     (T : Measurement (Polynomial params) d)
     (g : Polynomial params) : Operator d :=
-  opMul (T.outcomeOperator g) (averagedPointOperator params strategy g)
+  opMul (T.outcome g) (averagedPointOperator params strategy g)
 
 /-- The formal primal objective operator `Σ_g T_g A_g`. -/
 noncomputable def sdpPrimalObjectiveOperator (params : Parameters)
@@ -69,8 +69,8 @@ def sdpComplementarySlacknessEquation (params : Parameters)
     (strategy : SymStrat params d)
     (T : Measurement (Polynomial params) d)
     (Z : Operator d) (g : Polynomial params) : Prop :=
-  opMul (T.outcomeOperator g) Z =
-    opMul (T.outcomeOperator g) (averagedPointOperator params strategy g)
+  opMul (T.outcome g) Z =
+    opMul (T.outcome g) (averagedPointOperator params strategy g)
 
 /-- The pointwise sandwiched operator `H^u_h = A^u_{h(u)} T_h A^u_{h(u)}`. -/
 noncomputable def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
@@ -78,7 +78,7 @@ noncomputable def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
     (T : Measurement (Polynomial params) d)
     (u : Point params) (h : Polynomial params) : Operator d :=
   let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
-  opMul (opMul Au (T.outcomeOperator h)) Au
+  opMul (opMul Au (T.outcome h)) Au
 
 /-- The pointwise sandwiched submeasurement `H^u = {H^u_h}`. -/
 noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
@@ -87,8 +87,8 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
     SubMeas (Polynomial params) d :=
   { name :=
       s!"Hslice[{pointCode params u}|{(strategy.pointMeasurement u).toSubMeas.name}|{T.toSubMeas.name}]"
-    outcomeOperator := sandwichedPolynomialOutcomeOperatorAt params strategy T u
-    totalOperator :=
+    outcome := sandwichedPolynomialOutcomeOperatorAt params strategy T u
+    total :=
       averageOperatorOverDistribution (polynomialDistribution params)
         (sandwichedPolynomialOutcomeOperatorAt params strategy T u) }
 
@@ -97,12 +97,12 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
     (strategy : SymStrat params d)
     (T : Measurement (Polynomial params) d) : SubMeas (Polynomial params) d :=
   { name := s!"Havg[{T.toSubMeas.name}]"
-    outcomeOperator := fun h =>
+    outcome := fun h =>
       averageOperatorOverDistribution (uniformDistribution (Point params))
         (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
-    totalOperator :=
+    total :=
       averageOperatorOverDistribution (uniformDistribution (Point params))
-        (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).totalOperator) }
+        (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total) }
 
 /-- Evaluate a polynomial submeasurement at each point `u`. -/
 noncomputable abbrev polynomialEvaluationFamily (params : Parameters)

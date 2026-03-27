@@ -19,7 +19,7 @@ structure SdpOptimalPair (params : Parameters)
     (strategy : SymStrat params d)
     (T : Measurement (Polynomial params) d) (Z : Operator d) : Prop where
   primalTotalOperator :
-    T.totalOperator = polynomialIdentityOperator params
+    T.total = polynomialIdentityOperator params
   dualPositive : OpPSD Z
   dualFeasible :
     ∀ g : Polynomial params,
@@ -53,7 +53,7 @@ noncomputable def addInULeftOperatorAtPoint {Outcome : Type*}
   match addInUSelectionChoice params S u with
   | some (o, h) =>
       opMul -- TODO(tensor): placeholder for formalTensor
-        ((M u).outcomeOperator o) (H.outcomeOperator h)
+        ((M u).outcome o) (H.outcome h)
   | none => formalZeroOperator
 
 /-- The operator inside the right-hand side of `lem:add-in-u` at a fixed point `u`. -/
@@ -68,8 +68,8 @@ noncomputable def addInURightOperatorAtPoint {Outcome : Type*}
   | some (o, h) =>
       let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
       opMul -- TODO(tensor): placeholder for formalTensor
-        (opMul (opMul Au ((M u).outcomeOperator o)) Au)
-        (T.outcomeOperator h)
+        (opMul (opMul Au ((M u).outcome o)) Au)
+        (T.outcome h)
   | none => formalZeroOperator
 
 /-- The left-hand expectation in `lem:add-in-u`. -/
@@ -102,8 +102,8 @@ noncomputable def helperAgreementOperatorAtPoint (params : Parameters)
   averageOperatorOverDistribution (uniformDistribution (Fq params))
     (fun a =>
       opMul -- TODO(tensor): placeholder for formalTensor
-        ((strategy.pointMeasurement u).toSubMeas.outcomeOperator a)
-        ((evaluateAt params u H).outcomeOperator a))
+        ((strategy.pointMeasurement u).toSubMeas.outcome a)
+        ((evaluateAt params u H).outcome a))
 
 /-- The average operator `E_u Σ_a A^u_a ⊗ H_[h(u)=a]`. -/
 noncomputable def helperAgreementAverageOperator (params : Parameters)
@@ -138,7 +138,7 @@ noncomputable def projectiveResidualOperator (params : Parameters)
     (Z : Operator d) : Operator d :=
   opMul -- TODO(tensor): placeholder for formalTensor
         Z
-    (opDiff (polynomialIdentityOperator params) H.toSubMeas.totalOperator)
+    (opDiff (polynomialIdentityOperator params) H.toSubMeas.total)
 
 /-- The projective-stage boundedness defect. -/
 noncomputable def projectiveBoundednessGap (params : Parameters)

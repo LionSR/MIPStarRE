@@ -19,41 +19,41 @@ abbrev PointPairDiagonalLineQuestion (params : Parameters) :=
 /-- Place a submeasurement on the left tensor factor. -/
 def leftPlacedSubMeas {α : Type*} (A : SubMeas α d) : SubMeas α d where
   name := s!"{A.name}.left"
-  outcomeOperator := fun a => leftTensor (A.outcomeOperator a)
-  totalOperator := leftTensor A.totalOperator
+  outcome := fun a => leftTensor (A.outcome a)
+  total := leftTensor A.total
 
 /-- Place a submeasurement on the right tensor factor. -/
 def rightPlacedSubMeas {α : Type*} (A : SubMeas α d) : SubMeas α d where
   name := s!"{A.name}.right"
-  outcomeOperator := fun a => rightTensor (A.outcomeOperator a)
-  totalOperator := rightTensor A.totalOperator
+  outcome := fun a => rightTensor (A.outcome a)
+  total := rightTensor A.total
 
 /-- Ordered product of two paper-local submeasurements on the same tensor factor. -/
 noncomputable def orderedProductSubMeas {α β : Type*}
     (label : String) (A : SubMeas α d) (B : SubMeas β d) :
     SubMeas (α × β) d where
   name := label
-  outcomeOperator := fun | (a, b) => opMul (A.outcomeOperator a) (B.outcomeOperator b)
-  totalOperator := opMul A.totalOperator B.totalOperator
+  outcome := fun | (a, b) => opMul (A.outcome a) (B.outcome b)
+  total := opMul A.total B.total
 
 /-- Reversed product of two paper-local submeasurements on the same tensor factor. -/
 noncomputable def reversedProductSubMeas {α β : Type*}
     (label : String) (A : SubMeas α d) (B : SubMeas β d) :
     SubMeas (α × β) d where
   name := label
-  outcomeOperator := fun | (a, b) => opMul (B.outcomeOperator b) (A.outcomeOperator a)
-  totalOperator := opMul B.totalOperator A.totalOperator
+  outcome := fun | (a, b) => opMul (B.outcome b) (A.outcome a)
+  total := opMul B.total A.total
 
 /-- Tensor-product bridge `A_a ⊗ B_b`. -/
 noncomputable def tensorProductSubMeas {α β : Type*}
     (label : String) (A : SubMeas α d) (B : SubMeas β d) :
     SubMeas (α × β) d where
   name := label
-  outcomeOperator := fun ab =>
+  outcome := fun ab =>
     match ab with
     | (a, b) =>
-        opMul (leftTensor (A.outcomeOperator a)) (rightTensor (B.outcomeOperator b))
-  totalOperator := opMul (leftTensor A.totalOperator) (rightTensor B.totalOperator)
+        opMul (leftTensor (A.outcome a)) (rightTensor (B.outcome b))
+  total := opMul (leftTensor A.total) (rightTensor B.total)
 
 /-- Recover the sampled point from a diagonal-line/parameter sample. -/
 def sampledPointFromDiagonalQuestion (params : Parameters)
@@ -180,12 +180,12 @@ noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
     let Av := (strategy.pointMeasurement (ℓ.pointAt tv)).toSubMeas
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
     { name := s!"pointComm.mixedRight({Av.name},{Lu.name})"
-      outcomeOperator := fun ab =>
-        opMul (leftTensor (Av.outcomeOperator ab.2))
-          (rightTensor (Lu.outcomeOperator ab.1))
-      totalOperator :=
-        opMul (leftTensor Av.totalOperator)
-          (rightTensor Lu.totalOperator) }
+      outcome := fun ab =>
+        opMul (leftTensor (Av.outcome ab.2))
+          (rightTensor (Lu.outcome ab.1))
+      total :=
+        opMul (leftTensor Av.total)
+          (rightTensor Lu.total) }
 
 /-- The intermediate consistency loss coming from the `m`-restricted diagonal-lines test. -/
 def restrictedDiagonalLinesConsistencyError (params : Parameters) (gamma : Error) : Error :=

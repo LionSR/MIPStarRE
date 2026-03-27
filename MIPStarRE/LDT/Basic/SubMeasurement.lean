@@ -14,29 +14,29 @@ namespace MIPStarRE.LDT
 /-- A paper-local submeasurement with outcomes in `α` and Hilbert space dimension `d`. -/
 structure SubMeas (α : Type*) (d : ℕ) where
   name : String := ""
-  outcomeOperator : α → Operator d := fun _ => default
-  totalOperator : Operator d := default
+  outcome : α → Operator d := fun _ => default
+  total : Operator d := default
 
 instance : Inhabited (SubMeas α d) where
   default := {}
 
 /-- A paper-local measurement. -/
 structure Measurement (α : Type*) (d : ℕ) extends SubMeas α d where
-  completeWitness : True := trivial
+  completePlaceholder : True := trivial
 
 instance : Inhabited (Measurement α d) where
   default := { toSubMeas := default }
 
 /-- A paper-local projective submeasurement. -/
 structure ProjSubMeas (α : Type*) (d : ℕ) extends SubMeas α d where
-  projectiveWitness : True := trivial
+  projPlaceholder : True := trivial
 
 instance : Inhabited (ProjSubMeas α d) where
   default := { toSubMeas := default }
 
 /-- A paper-local projective measurement. -/
 structure ProjMeas (α : Type*) (d : ℕ) extends Measurement α d where
-  projectiveWitness : True := trivial
+  projPlaceholder : True := trivial
 
 instance : Inhabited (ProjMeas α d) where
   default := { toMeasurement := default }
@@ -94,16 +94,16 @@ noncomputable def postprocess {α β : Type*} {d : ℕ}
     letI : Fintype α := Classical.choice h
     exact {
       name := s!"{A.name}.post"
-      outcomeOperator := fun b =>
+      outcome := fun b =>
         sumOpList
-          (((Finset.univ.filter fun a => f a = b).toList).map A.outcomeOperator)
-      totalOperator := A.totalOperator
+          (((Finset.univ.filter fun a => f a = b).toList).map A.outcome)
+      total := A.total
     }
   else
     exact {
       name := s!"{A.name}.post"
-      outcomeOperator := fun _ => (0 : Operator d)
-      totalOperator := A.totalOperator
+      outcome := fun _ => (0 : Operator d)
+      total := A.total
     }
 
 /-- Complete a submeasurement by adjoining a distinguished failure outcome. -/
@@ -111,12 +111,12 @@ def completeSubMeas {α : Type*} {d : ℕ}
     (A : SubMeas α d) : Measurement (Option α) d where
   toSubMeas := {
     name := s!"{A.name}.completion"
-    outcomeOperator := fun
-      | some a => A.outcomeOperator a
+    outcome := fun
+      | some a => A.outcome a
       | none =>
           { name := s!"{A.name}.failure"
-            matrix := 1 - A.totalOperator.matrix }
-    totalOperator :=
+            matrix := 1 - A.total.matrix }
+    total :=
       { name := s!"{A.name}.completion.total"
         matrix := 1 }
   }

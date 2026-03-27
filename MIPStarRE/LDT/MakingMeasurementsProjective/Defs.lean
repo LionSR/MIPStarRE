@@ -192,7 +192,7 @@ noncomputable def placeholderExpectation (ψ : QuantumState d) (X : Operator d) 
 noncomputable def singleOutcomeProbability {Outcome : Type*}
     (ψ : QuantumState d)
     (A : SubMeas Outcome d) (a : Outcome) : Error :=
-  placeholderExpectation ψ (A.outcomeOperator a)
+  placeholderExpectation ψ (A.outcome a)
 
 /-- The joint outcome probability `⟨ψ|A_a ⊗ B_b|ψ⟩`. -/
 noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*} {d : ℕ}
@@ -201,7 +201,7 @@ noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*} {d : ℕ}
     (B : SubMeas OutcomeB d)
     (a : OutcomeA) (b : OutcomeB) : Error :=
   -- Placeholder: uses string length rather than formalTensor (which changes dimension)
-  (s!"Exp[{ψ.name}|{(A.outcomeOperator a).name}⊗{(B.outcomeOperator b).name}]".length : Error)
+  (s!"Exp[{ψ.name}|{(A.outcome a).name}⊗{(B.outcome b).name}]".length : Error)
 
 /-- The explicit error in `thm:orthonormalization`. -/
 noncomputable def orthonormalizationError (ζ : Error) : Error :=

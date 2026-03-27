@@ -87,7 +87,7 @@ noncomputable def postprocessIdxSubMeas {Question α β : Type*} {d : ℕ}
 submeasurement. -/
 noncomputable def completionResidualOperator {Outcome : Type*} {d : ℕ}
     (B : SubMeas Outcome d) : Operator d :=
-  opDiff (identityLike B.totalOperator) B.totalOperator
+  opDiff (identityLike B.total) B.total
 
 /-- Family for the intermediate `A_a B_a A_a` sandwich. -/
 noncomputable def diagonalSandwichFamily {Question Outcome : Type*} {d : ℕ}
@@ -96,12 +96,12 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*} {d : ℕ}
     IdxSubMeas Question Outcome d :=
   fun q => {
     name := s!"{(A q).name}.diagSandwich({(B q).toSubMeas.name})"
-    outcomeOperator := fun a =>
+    outcome := fun a =>
       opSandwich
-        ((A q).outcomeOperator a)
-        ((B q).toSubMeas.outcomeOperator a)
-        ((A q).outcomeOperator a)
-    totalOperator := (A q).totalOperator
+        ((A q).outcome a)
+        ((B q).toSubMeas.outcome a)
+        ((A q).outcome a)
+    total := (A q).total
   }
 
 /-- Family for the intermediate `A_a (Σ_b B_b) A_a` sandwich. -/
@@ -111,12 +111,12 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*} {d : ℕ}
     IdxSubMeas Question Outcome d :=
   fun q => {
     name := s!"{(A q).name}.totalSandwich({(B q).toSubMeas.name})"
-    outcomeOperator := fun a =>
+    outcome := fun a =>
       opSandwich
-        ((A q).outcomeOperator a)
-        (B q).toSubMeas.totalOperator
-        ((A q).outcomeOperator a)
-    totalOperator := (A q).totalOperator
+        ((A q).outcome a)
+        (B q).toSubMeas.total
+        ((A q).outcome a)
+    total := (A q).total
   }
 
 /-- Output package for `prop:cons-sub-meas`. -/
@@ -139,9 +139,9 @@ noncomputable def leftSandwichExpectation {Question Outcome : Type*} {d : ℕ}
   avgOver 𝒟 fun q =>
     ev ψ <|
       opSandwich
-        ((A q).toSubMeas.totalOperator)
+        ((A q).toSubMeas.total)
         (leftTensor B)
-        ((A q).toSubMeas.totalOperator)
+        ((A q).toSubMeas.total)
 
 /-- Averaged middle sandwich scalar from `prop:switch-sandwich`. -/
 noncomputable def middleSandwichExpectation {Question Outcome : Type*} {d : ℕ}
@@ -151,9 +151,9 @@ noncomputable def middleSandwichExpectation {Question Outcome : Type*} {d : ℕ}
   avgOver 𝒟 fun q =>
     ev ψ <|
       opSandwich
-        ((A q).toSubMeas.totalOperator)
+        ((A q).toSubMeas.total)
         B
-        ((A q).toSubMeas.totalOperator)
+        ((A q).toSubMeas.total)
 
 /-- Averaged right-placed sandwich scalar from `prop:switch-sandwich`. -/
 noncomputable def rightSandwichExpectation {Question Outcome : Type*} {d : ℕ}
@@ -163,9 +163,9 @@ noncomputable def rightSandwichExpectation {Question Outcome : Type*} {d : ℕ}
   avgOver 𝒟 fun q =>
     ev ψ <|
       opSandwich
-        ((A q).toSubMeas.totalOperator)
+        ((A q).toSubMeas.total)
         (rightTensor B)
-        ((A q).toSubMeas.totalOperator)
+        ((A q).toSubMeas.total)
 
 /-- Output package for `prop:switch-sandwich`. -/
 structure SwitchSandwichStmt {Question Outcome : Type*} {d : ℕ}
@@ -199,12 +199,12 @@ noncomputable def completeAtOutcome {Outcome : Type*} {d : ℕ}
   refine {
     toSubMeas := {
       name := s!"{B.name}.completed"
-      outcomeOperator := fun a =>
+      outcome := fun a =>
         if h : a = a0 then
-          opAdd (B.outcomeOperator a) residual
+          opAdd (B.outcome a) residual
         else
-          B.outcomeOperator a
-      totalOperator := identityLike B.totalOperator
+          B.outcome a
+      total := identityLike B.total
     }
   }
 

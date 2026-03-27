@@ -120,8 +120,7 @@ no dimension hypotheses are needed. -/
 `U†V + V†U ≤ U†U + V†V` (equivalently `0 ≤ (U-V)†(U-V)`),
 which requires PSD trace positivity `E[D†D] ≥ 0`. -/
 private lemma questionSDD_triangle {Outcome : Type*} {d : ℕ}
-    (ψ : QuantumState d) (A B C : SubMeas Outcome d)
-    (hψ : ψ.IsPositive) :
+    (ψ : QuantumState d) (A B C : SubMeas Outcome d) :
     qSDD ψ A C ≤
       2 * (qSDD ψ A B +
            qSDD ψ B C) := by
@@ -129,13 +128,13 @@ private lemma questionSDD_triangle {Outcome : Type*} {d : ℕ}
   let ev (X Y : Operator d) := ev ψ
     (opMul (opAdj (opDiff X Y)) (opDiff X Y))
   -- Pointwise triangle inequality from ev_diff_triangle
-  have pointwise_outcome : ∀ a, ev (A.outcomeOperator a) (C.outcomeOperator a) ≤
-      2 * (ev (A.outcomeOperator a) (B.outcomeOperator a) +
-           ev (B.outcomeOperator a) (C.outcomeOperator a)) :=
-    fun a => ev_diff_triangle ψ _ _ _ hψ
-  have total_ineq : ev A.totalOperator C.totalOperator ≤
-      2 * (ev A.totalOperator B.totalOperator + ev B.totalOperator C.totalOperator) :=
-    ev_diff_triangle ψ _ _ _ hψ
+  have pointwise_outcome : ∀ a, ev (A.outcome a) (C.outcome a) ≤
+      2 * (ev (A.outcome a) (B.outcome a) +
+           ev (B.outcome a) (C.outcome a)) :=
+    fun a => ev_diff_triangle ψ _ _ _
+  have total_ineq : ev A.total C.total ≤
+      2 * (ev A.total B.total + ev B.total C.total) :=
+    ev_diff_triangle ψ _ _ _
   -- Unfold the definition and handle both branches of sumOutcomes
   unfold qSDD
   simp only []
@@ -144,14 +143,14 @@ private lemma questionSDD_triangle {Outcome : Type*} {d : ℕ}
   split_ifs with hfin
   · -- Fintype case: use Finset.sum_le_sum + linearity
     letI : Fintype Outcome := Classical.choice hfin
-    have h1 : ∑ a : Outcome, ev (A.outcomeOperator a) (C.outcomeOperator a) ≤
-        ∑ a : Outcome, (2 * (ev (A.outcomeOperator a) (B.outcomeOperator a) +
-                   ev (B.outcomeOperator a) (C.outcomeOperator a))) :=
+    have h1 : ∑ a : Outcome, ev (A.outcome a) (C.outcome a) ≤
+        ∑ a : Outcome, (2 * (ev (A.outcome a) (B.outcome a) +
+                   ev (B.outcome a) (C.outcome a))) :=
       Finset.sum_le_sum (fun a _ => pointwise_outcome a)
-    have h2 : ∑ a : Outcome, (2 * (ev (A.outcomeOperator a) (B.outcomeOperator a) +
-                          ev (B.outcomeOperator a) (C.outcomeOperator a))) =
-        2 * (∑ a : Outcome, ev (A.outcomeOperator a) (B.outcomeOperator a) +
-             ∑ a : Outcome, ev (B.outcomeOperator a) (C.outcomeOperator a)) := by
+    have h2 : ∑ a : Outcome, (2 * (ev (A.outcome a) (B.outcome a) +
+                          ev (B.outcome a) (C.outcome a))) =
+        2 * (∑ a : Outcome, ev (A.outcome a) (B.outcome a) +
+             ∑ a : Outcome, ev (B.outcome a) (C.outcome a)) := by
       rw [← Finset.mul_sum, ← Finset.sum_add_distrib]
     linarith
   · -- Fallback case
@@ -162,8 +161,7 @@ the parallelogram inequality `E[D†D] ≥ 0`. -/
 private lemma stateDependentDistanceRel_triangle
     {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
-    (A B C : IdxSubMeas Question Outcome d) (δ₁ δ₂ : Error)
-    (hψ : ψ.IsPositive) :
+    (A B C : IdxSubMeas Question Outcome d) (δ₁ δ₂ : Error) :
     SDDRel ψ 𝒟 A B δ₁ →
     SDDRel ψ 𝒟 B C δ₂ →
     SDDRel ψ 𝒟 A C (2 * (δ₁ + δ₂)) := by
@@ -177,7 +175,7 @@ private lemma stateDependentDistanceRel_triangle
                          qSDD ψ (B q) (C q))) := by
         apply avgOver_mono
         intro q
-        exact questionSDD_triangle ψ (A q) (B q) (C q) hψ
+        exact questionSDD_triangle ψ (A q) (B q) (C q)
     _ = 2 * avgOver 𝒟
           (fun q => qSDD ψ (A q) (B q) +
                      qSDD ψ (B q) (C q)) := by
@@ -245,8 +243,7 @@ private lemma consSubMeas_combinedControl
     {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d)
-    (B : IdxMeas Question Outcome d) (γ : Error)
-    (hψ : ψ.IsPositive) :
+    (B : IdxMeas Question Outcome d) (γ : Error) :
     SDDRel ψ 𝒟 A
       (diagonalSandwichFamily A B) γ →
     SDDRel ψ 𝒟
@@ -256,19 +253,16 @@ private lemma consSubMeas_combinedControl
       (totalSandwichFamily A B) (4 * γ) := by
   intro hAD hDT
   have h := stateDependentDistanceRel_triangle ψ 𝒟 A
-    (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ hψ
+    (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ
     hAD hDT
   exact stateDependentDistanceRel_mono ψ 𝒟 A (totalSandwichFamily A B)
     (2 * (γ + γ)) (4 * γ) (by linarith) h
 
-/-- `prop:cons-sub-meas`. Requires PSD state for the triangle inequality
-used in `combinedControl`.
--- TODO: derive hψ from QuantumState once IsPositive is bundled into the type. -/
+/-- `prop:cons-sub-meas`. PSD state is bundled into `QuantumState`. -/
 theorem consSubMeas {Question Outcome : Type*} {d : ℕ}
     (ψ : QuantumState d) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome d)
-    (B : IdxMeas Question Outcome d) (γ : Error)
-    (hψ : ψ.IsPositive) :
+    (B : IdxMeas Question Outcome d) (γ : Error) :
     consistency ψ 𝒟 A
       (IdxMeas.toIdxSubMeas B) γ →
     ConsSubMeasStmt ψ 𝒟 A B γ := by
@@ -279,7 +273,7 @@ theorem consSubMeas {Question Outcome : Type*} {d : ℕ}
     diagonalControl := hdc
     sandwichControl := hsc
     combinedControl :=
-      consSubMeas_combinedControl ψ 𝒟 A B γ hψ hdc hsc
+      consSubMeas_combinedControl ψ 𝒟 A B γ hdc hsc
   }
 
 /-! ### Bridge lemmas for `prop:switch-sandwich` -/
@@ -400,15 +394,15 @@ private lemma qSDD_self
   unfold qSDD
   simp only
   have hfb : ev ψ
-      (opMul (opAdj (opDiff M.totalOperator M.totalOperator))
-        (opDiff M.totalOperator M.totalOperator)) = 0 :=
+      (opMul (opAdj (opDiff M.total M.total))
+        (opDiff M.total M.total)) = 0 :=
     ev_adjoint_mul_self_zero ψ _
-      (opDiff_self_matrix M.totalOperator)
+      (opDiff_self_matrix M.total)
   have hpo : ∀ a, (fun a => ev ψ
-      (opMul (opAdj (opDiff (M.outcomeOperator a) (M.outcomeOperator a)))
-        (opDiff (M.outcomeOperator a) (M.outcomeOperator a)))) a = 0 :=
+      (opMul (opAdj (opDiff (M.outcome a) (M.outcome a)))
+        (opDiff (M.outcome a) (M.outcome a)))) a = 0 :=
     fun a => ev_adjoint_mul_self_zero ψ _
-      (opDiff_self_matrix (M.outcomeOperator a))
+      (opDiff_self_matrix (M.outcome a))
   unfold sumOutcomes
   split
   · simp [hpo]

@@ -27,8 +27,8 @@ def leftOrderedProductSubMeas {α β : Type*}
 def appendRightTotalSubMeas {α : Type*}
     (tag : String) (A : SubMeas α d) (X : Operator d) : SubMeas α d where
   name := s!"{A.name}.{tag}"
-  outcomeOperator := fun a => opMul (A.outcomeOperator a) X
-  totalOperator := opMul A.totalOperator X
+  outcome := fun a => opMul (A.outcome a) X
+  total := opMul A.total X
 
 /-- Sandwiched product `A_a B_b A_a`.
 
@@ -38,23 +38,23 @@ noncomputable def sandwichByOuterSubMeas {α β : Type*}
     (label : String) (A : SubMeas α d) (B : SubMeas β d) :
     SubMeas (α × β) d where
   name := label
-  outcomeOperator := fun ab =>
+  outcome := fun ab =>
     match ab with
     | (a, b) =>
-        opMul (A.outcomeOperator a)
-          (opMul (B.outcomeOperator b) (A.outcomeOperator a))
-  totalOperator := by
+        opMul (A.outcome a)
+          (opMul (B.outcome b) (A.outcome a))
+  total := by
     classical
     if h : Nonempty (Fintype α) then
       letI : Fintype α := Classical.choice h
       exact sumOpList
         (Finset.univ.toList.map fun a =>
-          opMul (A.outcomeOperator a)
-            (opMul B.totalOperator (A.outcomeOperator a)))
+          opMul (A.outcome a)
+            (opMul B.total (A.outcome a)))
     else
       exact
         { name := s!"TODO(sumSandwiches:{label})"
-          matrix := A.totalOperator.matrix }
+          matrix := A.total.matrix }
 
 /-- The full-slice question underlying an evaluated-slice sample. -/
 def fullSliceQuestionOfEvaluatedSlice (params : Parameters)
@@ -189,7 +189,7 @@ def commDataProcessedGStabilityOneLeft (params : Parameters)
     let xy := fullSliceQuestionOfEvaluatedSlice params q
     appendRightTotalSubMeas "timesGy"
       (evaluatedSliceSandwichFirstFactor params strategy family q)
-      (leftTensor ((fullSliceSecondFactor params family xy).totalOperator))
+      (leftTensor ((fullSliceSecondFactor params family xy).total))
 
 /-- Internal stability family after removing the trailing `G^y`. -/
 def commDataProcessedGStabilityOneRight (params : Parameters)
@@ -205,7 +205,7 @@ def commDataProcessedGStabilityTwoLeft (params : Parameters)
     let xy := fullSliceQuestionOfEvaluatedSlice params q
     appendRightTotalSubMeas "timesGx"
       (evaluatedSliceProductLeft params strategy family q)
-      (leftTensor ((fullSliceFirstFactor params family xy).totalOperator))
+      (leftTensor ((fullSliceFirstFactor params family xy).total))
 
 /-- Internal stability family after removing the trailing `G^x`. -/
 def commDataProcessedGStabilityTwoRight (params : Parameters)
@@ -221,8 +221,8 @@ accumulate the sum `∑_b C_{a,b}` correctly even when `dim ≠ 1`. -/
 def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type*} {d : ℕ}
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d)
     (a : OutcomeA) (b : OutcomeB) : Operator d :=
-  let pa := P.outcomeOperator a
-  let qb := Q.outcomeOperator b
+  let pa := P.outcome a
+  let qb := Q.outcome b
   { name := s!"({qb.name})*({pa.name})*({qb.name})"
     matrix := qb.matrix * pa.matrix * qb.matrix }
 
@@ -232,8 +232,8 @@ noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Ty
     IdxSubMeas OutcomeA OutcomeB d :=
   fun a =>
     { name := s!"sandwich({P.name},{Q.toSubMeas.name})"
-      outcomeOperator := fun b => normalizationConditionSandwichedOperator P Q a b
-      totalOperator := by
+      outcome := fun b => normalizationConditionSandwichedOperator P Q a b
+      total := by
         classical
         if h : Nonempty (Fintype OutcomeB) then
           letI : Fintype OutcomeB := Classical.choice h
@@ -241,7 +241,7 @@ noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Ty
             (Finset.univ.toList.map
               (fun b => normalizationConditionSandwichedOperator P Q a b))
         else
-          exact Q.totalOperator }
+          exact Q.total }
 
 /-- The total family `a ↦ ∑_b C_{a,b}` from `lem:normalization-condition`. -/
 def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type*}
@@ -253,18 +253,18 @@ def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type*}
 def normalizationConditionSandwichedTotalOperator {OutcomeA OutcomeB : Type*}
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d)
     (a : OutcomeA) : Operator d :=
-  (normalizationConditionSandwichedTotalFamily P Q a).totalOperator
+  (normalizationConditionSandwichedTotalFamily P Q a).total
 
 /-- The family `a ↦ (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) :
     SubMeas OutcomeA d where
   name := s!"normSquareFamily({P.name},{Q.toSubMeas.name})"
-  outcomeOperator := fun a =>
+  outcome := fun a =>
     opMul
       (normalizationConditionSandwichedTotalOperator P Q a)
       (opAdj (normalizationConditionSandwichedTotalOperator P Q a))
-  totalOperator := by
+  total := by
     classical
     if h : Nonempty (Fintype OutcomeA) then
       letI : Fintype OutcomeA := Classical.choice h
@@ -281,11 +281,11 @@ def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) :
     SubMeas OutcomeA d where
   name := s!"normAdjointSquareFamily({P.name},{Q.toSubMeas.name})"
-  outcomeOperator := fun a =>
+  outcome := fun a =>
     opMul
       (opAdj (normalizationConditionSandwichedTotalOperator P Q a))
       (normalizationConditionSandwichedTotalOperator P Q a)
-  totalOperator := by
+  total := by
     classical
     if h : Nonempty (Fintype OutcomeA) then
       letI : Fintype OutcomeA := Classical.choice h
@@ -300,12 +300,12 @@ def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type*}
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) : Operator d :=
-  (normalizationConditionSquareFamily P Q).totalOperator
+  (normalizationConditionSquareFamily P Q).total
 
 /-- The operator `∑_a (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
 def normalizationConditionAdjointSquareOperator {OutcomeA OutcomeB : Type*}
     (P : SubMeas OutcomeA d) (Q : ProjSubMeas OutcomeB d) : Operator d :=
-  (normalizationConditionAdjointSquareFamily P Q).totalOperator
+  (normalizationConditionAdjointSquareFamily P Q).total
 
 /-- The identity bound appearing in `lem:normalization-condition`. -/
 def normalizationConditionIdentityBound {OutcomeA OutcomeB : Type*}

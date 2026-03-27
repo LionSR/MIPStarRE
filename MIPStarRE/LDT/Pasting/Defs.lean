@@ -45,33 +45,33 @@ def bernoulliTailOperator {d : ℕ} (k degree : ℕ) (X : Operator d) : Operator
 /-- Add a descriptive tag to a paper-local submeasurement placeholder. -/
 def tagSubMeas {α : Type*} (tag : String) (A : SubMeas α d) : SubMeas α d where
   name := s!"{A.name}.{tag}"
-  outcomeOperator := A.outcomeOperator
-  totalOperator := A.totalOperator
+  outcome := A.outcome
+  total := A.total
 
 /-- Multiply each outcome operator by a total operator on the right. -/
 def multiplyByTotalOnRight {α β : Type*}
     (label : String) (A : SubMeas α d) (B : SubMeas β d) :
     SubMeas α d where
   name := label
-  outcomeOperator := fun a => opMul (A.outcomeOperator a) B.totalOperator
-  totalOperator := opMul A.totalOperator B.totalOperator
+  outcome := fun a => opMul (A.outcome a) B.total
+  total := opMul A.total B.total
 
 /-- Multiply each outcome operator by a total operator on the left. -/
 def multiplyByTotalOnLeft {α β : Type*}
     (label : String) (A : SubMeas α d) (B : SubMeas β d) :
     SubMeas β d where
   name := label
-  outcomeOperator := fun b => opMul A.totalOperator (B.outcomeOperator b)
-  totalOperator := opMul A.totalOperator B.totalOperator
+  outcome := fun b => opMul A.total (B.outcome b)
+  total := opMul A.total B.total
 
 /-- Average an indexed family against a named distribution. -/
 noncomputable def averageIdxSubMeas {Question Outcome : Type*}
     (label : String) (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome d) :
     SubMeas Outcome d where
   name := label
-  outcomeOperator := fun a =>
-    averageOperatorOverDistribution 𝒟 (fun q => (A q).outcomeOperator a)
-  totalOperator := averageOperatorOverDistribution 𝒟 (fun q => (A q).totalOperator)
+  outcome := fun a =>
+    averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
+  total := averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
 
 /-- Complement operator `I - X` in the same ambient space as `X`. -/
 def operatorComplement (X : Operator d) : Operator d :=
@@ -80,8 +80,8 @@ def operatorComplement (X : Operator d) : Operator d :=
 /-- Regard an operator expression as a `Unit`-valued submeasurement placeholder. -/
 def operatorAsSubMeas (X : Operator d) : SubMeas Unit d :=
   { name := s!"operator({X.name})"
-    outcomeOperator := fun _ => X
-    totalOperator := X }
+    outcome := fun _ => X
+    total := X }
 
 /-- Regard the Bernoulli tail operator as a `Unit`-valued submeasurement placeholder. -/
 def bernoulliTailSubMeas {d : ℕ} (k degree : ℕ) (X : Operator d) : SubMeas Unit d :=
@@ -138,7 +138,7 @@ def completePartSubMeas (params : Parameters)
 /-- Placeholder for the incomplete part `G^x_⊥ = I - G^x`. -/
 def incompletePartSubMeas (params : Parameters)
     (family : IdxPolyFamily params d) (x : Fq params) : SubMeas Unit d :=
-  operatorAsSubMeas (operatorComplement (completePartSubMeas params family x).totalOperator)
+  operatorAsSubMeas (operatorComplement (completePartSubMeas params family x).total)
 
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
 def gHatIdxMeas (params : Parameters)
