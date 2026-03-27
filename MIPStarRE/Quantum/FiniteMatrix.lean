@@ -28,7 +28,7 @@ abbrev Op (d : Type*) := Matrix d d ℂ
 variable {d : Type*} [Fintype d]
 
 /-- The normalized trace `τ(A) = tr(A) / |d|`. -/
-def normalizedTrace (A : Op d) : ℂ :=
+noncomputable def normalizedTrace (A : Op d) : ℂ :=
   A.trace / (Fintype.card d : ℂ)
 
 @[simp] theorem normalizedTrace_zero : normalizedTrace (0 : Op d) = 0 := by
@@ -63,7 +63,7 @@ The squared τ-norm: `‖A‖²_τ = τ(A⋆ A)`.
 In finite dimensions this is `(1/d) ∑ᵢⱼ |Aᵢⱼ|²`, the normalized squared
 Frobenius norm.
 -/
-def tauNormSq (A : Op d) : ℂ :=
+noncomputable def tauNormSq (A : Op d) : ℂ :=
   normalizedTrace (Aᴴ * A)
 
 @[simp] theorem tauNormSq_zero : tauNormSq (0 : Op d) = 0 := by simp [tauNormSq]

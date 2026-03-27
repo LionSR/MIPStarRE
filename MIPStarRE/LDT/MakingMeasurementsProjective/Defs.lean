@@ -198,17 +198,16 @@ noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*} [Finty
     (A : SubMeas Outcome ι) (a : Outcome) : Error :=
   ev ψ (A.outcome a)
 
-/-- The joint outcome probability `⟨ψ|A_a ⊗ B_b|ψ⟩`.
-Requires a bipartite state on `ι × ι`; the left factor acts on the first
-index and the right factor on the second. -/
+/-- The joint outcome probability `⟨ψ|A_a · B_b|ψ⟩`.
+Mirrors `matrixJointOutcomeProbability`: both measurements act on the same
+index space and the joint probability is computed via plain multiplication. -/
 noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι))
+    (ψ : QuantumState ι)
     (A : SubMeas OutcomeA ι)
     (B : SubMeas OutcomeB ι)
     (a : OutcomeA) (b : OutcomeB) : Error :=
-  ev ψ (leftTensor (ι₂ := ι) (A.outcome a) *
-        rightTensor (ι₁ := ι) (B.outcome b))
+  ev ψ (A.outcome a * B.outcome b)
 
 /-- The explicit error in `thm:orthonormalization`. -/
 noncomputable def orthonormalizationError (ζ : Error) : Error :=
