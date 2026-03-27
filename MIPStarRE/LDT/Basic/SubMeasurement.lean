@@ -10,8 +10,6 @@ All operator fields now use `Op ι` (i.e., `Matrix ι ι ℂ`) directly with
 a generic `Fintype` index `ι`.
 -/
 
-noncomputable section
-
 namespace MIPStarRE.LDT
 
 /-- A paper-local submeasurement with outcomes in `α` and Hilbert space index `ι`. -/

@@ -152,7 +152,9 @@ noncomputable def diagonalLineProductReversed (params : Parameters)
     rightPlacedSubMeas (ιA := ι) <|
       reversedProductSubMeas Lu Lv
 
-/-- The mixed bridge `A^v_b ⊗ L^ℓ_[f(u)=a]` on the bipartite space `ι × ι`. -/
+/-- The mixed bridge `A^v_b ⊗ L^ℓ_[f(u)=a]` on the bipartite space `ι × ι`.
+Outcome `(a, b)` maps to `leftTensor(A^v_b) * rightTensor(L^ℓ_[f(u)=a])`,
+i.e. `a` indexes the line evaluation and `b` indexes the point measurement. -/
 noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
     (strategy : SymStrat params ι) :
     IdxSubMeas (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
@@ -162,7 +164,11 @@ noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
     let tv := q.2.2
     let Av := (strategy.pointMeasurement (ℓ.pointAt tv)).toSubMeas
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
-    tensorProductSubMeas Av Lu
+    { outcome := fun (a, b) =>
+        leftTensor (ι₂ := ι) (Av.outcome b) *
+          rightTensor (ι₁ := ι) (Lu.outcome a)
+      total := leftTensor (ι₂ := ι) Av.total *
+                 rightTensor (ι₁ := ι) Lu.total }
 
 /-- The intermediate consistency loss coming from the `m`-restricted diagonal-lines test. -/
 def restrictedDiagonalLinesConsistencyError (params : Parameters) (gamma : Error) : Error :=

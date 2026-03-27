@@ -198,9 +198,10 @@ noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*} [Finty
     (A : SubMeas Outcome ι) (a : Outcome) : Error :=
   ev ψ (A.outcome a)
 
-/-- The joint outcome probability `⟨ψ|A_a · B_b|ψ⟩`.
-Mirrors `matrixJointOutcomeProbability`: both measurements act on the same
-index space and the joint probability is computed via plain multiplication. -/
+/-- The joint outcome probability `Tr(ρ · A_a · B_b)`.
+Uses the operator product on the shared algebra, matching `matrixJointOutcomeProbability`.
+When the measurements commute (as guaranteed after Naimark dilation), this
+equals the tensor-product formulation `⟨ψ| (A_a ⊗ B_b) |ψ⟩`. -/
 noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)

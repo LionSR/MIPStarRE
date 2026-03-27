@@ -177,4 +177,105 @@ structure PolyMeasSSC {ι : Type*} [Fintype ι] [DecidableEq ι]
       (constSubMeasFamily G)
       _δ
 
+/-! ### Nonnegativity lemmas for defect measures -/
+
+/-- The squared-distance defect is nonneg since each summand is `⟨ψ, M†M ψ⟩ ≥ 0`. -/
+theorem qSDD_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
+    0 ≤ qSDD ψ A B := by
+  unfold qSDD
+  exact Finset.sum_nonneg fun a _ => ev_adjoint_self_nonneg ψ _
+
+/-- The consistency defect is nonneg by definition (`max 0 _`). -/
+theorem qConsDefect_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
+    0 ≤ qConsDefect ψ A B := by
+  unfold qConsDefect; exact le_max_left 0 _
+
+/-- The strong self-consistency defect is nonneg by definition (`max 0 _`). -/
+theorem qSSCDefect_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A : SubMeas Outcome ι) :
+    0 ≤ qSSCDefect ψ A := by
+  unfold qSSCDefect; exact le_max_left 0 _
+
+/-- The averaged squared-distance error is nonneg. -/
+theorem sddError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question Outcome ι) :
+    0 ≤ sddError ψ 𝒟 A B := by
+  unfold sddError; exact avgOver_nonneg 𝒟 _ fun q => qSDD_nonneg ψ _ _
+
+/-- The averaged consistency error is nonneg. -/
+theorem consError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question Outcome ι) :
+    0 ≤ consError ψ 𝒟 A B := by
+  unfold consError; exact avgOver_nonneg 𝒟 _ fun q => qConsDefect_nonneg ψ _ _
+
+/-- The averaged self-consistency error is nonneg. -/
+theorem sscError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι) :
+    0 ≤ sscError ψ 𝒟 A := by
+  unfold sscError; exact avgOver_nonneg 𝒟 _ fun q => qSSCDefect_nonneg ψ _
+
+/-- The domination defect is nonneg by definition (`max 0 _`). -/
+theorem bndError_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A : SubMeas Outcome ι) (Z : MIPStarRE.Quantum.Op ι) :
+    0 ≤ bndError ψ A Z := by
+  unfold bndError; exact le_max_left 0 _
+
+/-! ### Postprocessing preserves totals -/
+
+/-- Postprocessing preserves the total operator. -/
+theorem postprocess_total {α β : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype α]
+    (A : SubMeas α ι) (f : α → β) :
+    (postprocess A f).total = A.total := by
+  simp [postprocess]
+
+/-- The self-distance `qSDD ψ A A` is zero. -/
+theorem qSDD_self {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A : SubMeas Outcome ι) :
+    qSDD ψ A A = 0 := by
+  unfold qSDD
+  apply Finset.sum_eq_zero
+  intro a _
+  simp [ev]
+
+/-- The averaged self-distance `sddError ψ 𝒟 A A` is zero. -/
+theorem sddError_self {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι) :
+    sddError ψ 𝒟 A A = 0 := by
+  unfold sddError
+  have : (fun q => qSDD ψ (A q) (A q)) = fun _ => 0 :=
+    funext fun q => qSDD_self ψ (A q)
+  rw [this]; exact avgOver_zero 𝒟
+
+/-- Data processing: postprocessing can only decrease the consistency defect. -/
+theorem qConsDefect_postprocess_le {α β : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype α] [Fintype β]
+    (ψ : QuantumState ι) (A B : SubMeas α ι) (f : α → β) :
+    qConsDefect ψ (postprocess A f) (postprocess B f) ≤
+      qConsDefect ψ A B := by
+  unfold qConsDefect
+  simp only [postprocess_total]
+  -- Suffices to show: matching mass increases under postprocessing
+  -- i.e., ∑_b ⟨ψ, (∑_{a:f(a)=b} A_a)(∑_{c:f(c)=b} B_c) ψ⟩ ≥ ∑_a ⟨ψ, A_a B_a ψ⟩
+  -- Then max(0, overlap - match') ≤ max(0, overlap - match) since match' ≥ match
+  apply max_le_max_left 0
+  apply sub_le_sub_left
+  -- Need: qMatchMass after postprocessing ≥ qMatchMass before
+  sorry
+
 end MIPStarRE.LDT

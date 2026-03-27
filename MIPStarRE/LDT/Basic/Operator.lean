@@ -19,8 +19,6 @@ from Mathlib.
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.LDT
 
 /-- A finite-dimensional bipartite state placeholder carrying an actual density matrix. -/

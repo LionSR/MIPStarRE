@@ -9,8 +9,6 @@ averaging, uniform distribution, and outcome summation.
 
 open scoped BigOperators
 
-noncomputable section
-
 namespace MIPStarRE.LDT
 
 /-- A probability distribution with explicit finite support and real-valued weights. -/

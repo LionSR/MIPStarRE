@@ -252,7 +252,7 @@ private lemma switchSandwich_leftTransfer
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
     (Alifted : IdxSubMeas Question Outcome (ι × ι))
-    (B : MIPStarRE.Quantum.Op ι) (_hB : OpBounded01 B)
+    (B : MIPStarRE.Quantum.Op ι) (hB : OpBounded01 B)
     (δ : Error) :
     BipartiteSDDRel ψ 𝒟 Alifted Alifted δ →
     |leftSandwichExpectation ψ 𝒟 A B -
@@ -266,7 +266,7 @@ private lemma switchSandwich_rightTransfer
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
     (Alifted : IdxSubMeas Question Outcome (ι × ι))
-    (B : MIPStarRE.Quantum.Op ι) (_hB : OpBounded01 B)
+    (B : MIPStarRE.Quantum.Op ι) (hB : OpBounded01 B)
     (δ : Error) :
     BipartiteSDDRel ψ 𝒟 Alifted Alifted δ →
     |middleSandwichExpectation ψ 𝒟 A (rightTensor (ι₁ := ι) B) -
