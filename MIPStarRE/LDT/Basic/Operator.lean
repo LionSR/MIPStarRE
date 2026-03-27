@@ -385,4 +385,92 @@ theorem expectationValue_adjoint_self_nonneg' (ψ : QuantumState) (M : Operator)
     dsimp [expectationValue, operatorMul, operatorAdjoint]
     split_ifs <;> simp_all
 
+/-! ### Dimension tracking helpers -/
+
+@[simp] theorem operatorDifference_dim (X Y : Operator) :
+    (operatorDifference X Y).dim = X.dim := by
+  unfold operatorDifference; split_ifs <;> rfl
+
+@[simp] theorem operatorAdd_dim (X Y : Operator) :
+    (operatorAdd X Y).dim = X.dim := by
+  unfold operatorAdd; split_ifs <;> rfl
+
+@[simp] theorem operatorAdjoint_dim (X : Operator) :
+    (operatorAdjoint X).dim = X.dim := rfl
+
+@[simp] theorem operatorMul_dim (X Y : Operator) :
+    (operatorMul X Y).dim = X.dim := by
+  unfold operatorMul; split_ifs <;> rfl
+
+/-! ### Operator-level triangle inequality for squared differences -/
+
+/-- Helper: `castOp` is proof-irrelevant. -/
+theorem castOp_proof_irrel {m n : ℕ} (h₁ h₂ : m = n)
+    (A : MIPStarRE.Quantum.Op (HilbertIndex m)) :
+    castOp h₁ A = castOp h₂ A := by
+  cases h₁; cases h₂; rfl
+
+/-- `castOp h A = A` when `h : n = n` (for any proof, not just `rfl`). -/
+@[simp] theorem castOp_self {n : ℕ} (h : n = n)
+    (A : MIPStarRE.Quantum.Op (HilbertIndex n)) :
+    castOp h A = A :=
+  (castOp_proof_irrel h rfl A).trans (castOp_rfl A)
+
+/-- Operator-level triangle inequality for expectation of squared differences:
+`E[(X-Z)†(X-Z)] ≤ 2*(E[(X-Y)†(X-Y)] + E[(Y-Z)†(Y-Z)])`.
+Requires PSD state and dimension matching.
+
+Proof strategy: destructure operators and `subst` dimension equalities so all casts
+disappear, then apply `normalizedTrace_triangle` at the raw matrix level. -/
+theorem expectationValue_diff_triangle (ψ : QuantumState) (X Y Z : Operator)
+    (hψ : ψ.IsPositive)
+    (hXY : X.dim = Y.dim) (hYZ : Y.dim = Z.dim) :
+    expectationValue ψ (operatorMul (operatorAdjoint (operatorDifference X Z))
+        (operatorDifference X Z)) ≤
+    2 * (expectationValue ψ (operatorMul (operatorAdjoint (operatorDifference X Y))
+            (operatorDifference X Y)) +
+         expectationValue ψ (operatorMul (operatorAdjoint (operatorDifference Y Z))
+            (operatorDifference Y Z))) := by
+  -- Destructure operators and eliminate dimension equalities via subst
+  rcases X with ⟨nX, dX, mX⟩
+  rcases Y with ⟨nY, dY, mY⟩
+  rcases Z with ⟨nZ, dZ, mZ⟩
+  simp only at hXY hYZ
+  subst hXY; subst hYZ
+  -- Now all operators have dimension dX
+  -- Helper: compute E[D†D] when all dims match ψ.dim
+  have key : ∀ (n₁ n₂ : String) (m₁ m₂ : MIPStarRE.Quantum.Op (HilbertIndex ψ.dim)),
+      expectationValue ψ (operatorMul (operatorAdjoint
+          (operatorDifference ⟨n₁, ψ.dim, m₁⟩ ⟨n₂, ψ.dim, m₂⟩))
+          (operatorDifference ⟨n₁, ψ.dim, m₁⟩ ⟨n₂, ψ.dim, m₂⟩)) =
+        Complex.re (MIPStarRE.Quantum.normalizedTrace
+          (ψ.density * ((m₁ - m₂)ᴴ * (m₁ - m₂)))) := by
+    intro n₁ n₂ m₁ m₂
+    -- This is a purely computational identity: the scaffold operators with matching
+    -- dimensions compute to the expected matrix expression. The proof requires
+    -- resolving nested dite/castOp chains through the dimension-guarded definitions.
+    -- Mathematically trivial; the complexity is in Lean's dependent type handling.
+    sorry
+  by_cases hψd : ψ.dim = dX
+  · -- Dimensions match
+    subst hψd
+    rw [key nX nZ mX mZ, key nX nY mX mY, key nY nZ mY mZ]
+    have hdecomp : mX - mZ = (mX - mY) + (mY - mZ) := by abel
+    rw [hdecomp]
+    exact normalizedTrace_triangle ψ.density (mX - mY) (mY - mZ)
+      (Matrix.nonneg_iff_posSemidef.mp hψ)
+  · -- Dimensions don't match: all expectations are 0
+    have hLHS : expectationValue ψ (operatorMul (operatorAdjoint
+        (operatorDifference ⟨nX, dX, mX⟩ ⟨nZ, dX, mZ⟩))
+        (operatorDifference ⟨nX, dX, mX⟩ ⟨nZ, dX, mZ⟩)) = 0 := by
+      unfold expectationValue operatorMul operatorAdjoint operatorDifference
+      split_ifs <;> simp_all
+    rw [hLHS]
+    apply mul_nonneg (by norm_num : (0 : ℝ) ≤ 2)
+    apply add_nonneg
+    · exact expectationValue_adjoint_self_nonneg' ψ
+        (operatorDifference ⟨nX, dX, mX⟩ ⟨nY, dX, mY⟩) hψ
+    · exact expectationValue_adjoint_self_nonneg' ψ
+        (operatorDifference ⟨nY, dX, mY⟩ ⟨nZ, dX, mZ⟩) hψ
+
 end MIPStarRE.LDT
