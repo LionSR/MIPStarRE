@@ -20,19 +20,11 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-
-
-/-- The pointwise operator `A^u_{g(u)}` entering the SDP average `A_g`. -/
-def averagedPointOperatorContribution (params : Parameters)
-    (strategy : SymStrat params ι)
-    (g : Polynomial params) (u : Point params) : MIPStarRE.Quantum.Op ι :=
-  pointConditionedOutcomeOperatorAtPolynomial params strategy g u
-
 /-- The averaged point operator `A_g = E_u A^u_{g(u)}`. -/
 noncomputable def averagedPointOperator (params : Parameters)
     (strategy : SymStrat params ι) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
   averageOperatorOverDistribution (uniformDistribution (Point params))
-    (averagedPointOperatorContribution params strategy g)
+    (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
 
 /-- The operator `T_g A_g` contributing to the primal SDP objective. -/
 noncomputable def sdpPrimalContributionOperator (params : Parameters)
@@ -100,12 +92,6 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
     total :=
       averageOperatorOverDistribution (uniformDistribution (Point params))
         (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total) }
-
-/-- Evaluate a polynomial submeasurement at each point `u`. -/
-noncomputable abbrev polynomialEvaluationFamily (params : Parameters)
-    (H : SubMeas (Polynomial params) ι) :
-    IdxSubMeas (Point params) (Fq params) ι :=
-  MIPStarRE.LDT.polynomialEvaluationFamily params H
 
 /-- The variance error entering `lem:add-in-u`. -/
 noncomputable def selfImprovementVarianceError (params : Parameters)

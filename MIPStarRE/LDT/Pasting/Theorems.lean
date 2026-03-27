@@ -225,8 +225,8 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (hθ0 : 0 < theta) (hθ1 : theta < 1)
     (hk : (2 * (degree : Error)) / theta ≤ (k : Error))
     (hXpsd : 0 ≤ X)
-    (hXleOne : 0 ≤ 1 - X)
-    (hcomplete : CompletenessAtLeast ψ (operatorAsSubMeas X) (1 - kappa)) :
+    (hXleOne : 0 ≤ (1 - X))
+    (hcomplete : CompletenessAtLeast ψ ({ outcome := fun _ => X, total := X } : SubMeas Unit ι) (1 - kappa)) :
     ChernoffBernoulliMatrixStatement ψ theta k degree X kappa := by
   sorry
 

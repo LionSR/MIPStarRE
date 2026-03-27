@@ -14,54 +14,12 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-/-- `def:post-processing` in `preliminaries.tex`. -/
-noncomputable def postProcessing {α β : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype α]
-    (A : SubMeas α ι) (f : α → β) :
-    SubMeas β ι :=
-  postprocess A f
-
-/-- `def:measurement-completion` in `preliminaries.tex`. -/
-def measurementCompletion {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (A : SubMeas α ι) :
-    Measurement (Option α) ι :=
-  completeSubMeas A
-
-/-- `def:simeq` in `preliminaries.tex`. -/
-def consistency {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome ι) (δ : Error) : Prop :=
-  ConsRel ψ 𝒟 A B δ
-
-/-- `def:approx_delta` in `preliminaries.tex`. -/
-def stateDependentDistance {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome ι) (δ : Error) : Prop :=
-  SDDRel ψ 𝒟 A B δ
-
-/-- `def:strong-self-consistency` in `preliminaries.tex`. -/
-def strongSelfConsistency {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A : IdxSubMeas Question Outcome ι) (δ : Error) : Prop :=
-  PermInvState ψ ∧ SSCRel ψ 𝒟 A δ
-
 /-- Source-style left/right relation `A^x_a ⊗ I ≈_δ I ⊗ B^x_a`. -/
 structure BipartiteSDDRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome ι) (δ : Error) : Prop where
   leftRightSquaredDistanceBound : sddError ψ 𝒟 A B ≤ δ
-
-/-- Abbreviation for the bipartite state-dependent distance. -/
-def bipartiteStateDependentDistance {Question Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome ι) (δ : Error) : Prop :=
-  BipartiteSDDRel ψ 𝒟 A B δ
 
 /-- Condition `0 ≤ B ≤ I` for the switch-sandwich argument. -/
 structure OpBounded01 {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -85,21 +43,6 @@ structure ConsAgreement {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome ι) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
-
-/-- Post-process an indexed family questionwise. -/
-noncomputable def postprocessIdxSubMeas {Question α β : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype α]
-    (A : IdxSubMeas Question α ι) (f : α → β) :
-    IdxSubMeas Question β ι :=
-  fun q => postProcessing (A q) f
-
-/-- The completion residual `I - Σ_a B_a` used when completing a
-submeasurement. -/
-noncomputable def completionResidualOp {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (B : SubMeas Outcome ι) : MIPStarRE.Quantum.Op ι :=
-  1 - B.total
 
 /-- Family for the intermediate `A_a B_a A_a` sandwich. -/
 noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
@@ -207,7 +150,7 @@ noncomputable def completeAtOutcome {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (B : SubMeas Outcome ι) (a0 : Outcome) : Measurement Outcome ι := by
   classical
-  let residual := completionResidualOp B
+  let residual := 1 - B.total
   refine {
     toSubMeas := {
       outcome := fun a =>

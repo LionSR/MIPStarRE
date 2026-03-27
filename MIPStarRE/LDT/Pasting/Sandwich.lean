@@ -304,7 +304,7 @@ def constructedPastedMeasurement (params : Parameters)
   toSubMeas :=
     let H := constructedPastedSubMeas params family k
     let h₀ := pastedFallbackOutcome params
-    let completionMass := operatorComplement H.total
+    let completionMass := 1 - H.total
     { outcome := fun h => by
         classical
         exact if h = h₀ then
@@ -380,8 +380,8 @@ def bernoulliTailFromFamily (params : Parameters)
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas Unit Unit ι :=
   constSubMeasFamily <|
-    bernoulliTailSubMeas k params.d
-      ((IdxPolyFamily.averagedSubMeas family).total)
+    let Y := bernoulliTailOperator k params.d ((IdxPolyFamily.averagedSubMeas family).total)
+    { outcome := fun _ => Y, total := Y }
 
 /-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`. -/
 def fromHToGRecurrenceLeftFamily (params : Parameters)

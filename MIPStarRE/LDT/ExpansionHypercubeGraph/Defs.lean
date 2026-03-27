@@ -17,18 +17,9 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- A lightweight placeholder for a vector in the hypercube Fourier basis. -/
-structure HypercubeVector where
-  name : String := ""
-  deriving Inhabited, Repr, DecidableEq
-
 /-- The number of vertices in the hypercube graph `C`. -/
 def hypercubeVertexCount (params : Parameters) : ℕ :=
   params.q ^ params.m
-
-/-- The real-valued vertex count `M = q^m`. -/
-def hypercubeVertexCountError (params : Parameters) : Error :=
-  (hypercubeVertexCount params : Error)
 
 /-- Encode a point `u ∈ F_q^m` by its base-`q` digit expansion. -/
 def pointCode (params : Parameters) (u : Point params) : ℕ :=
@@ -58,31 +49,23 @@ instance instDecidablePredHypercubeEdgePair (params : Parameters) :
   intro uv
   infer_instance
 
-/-- Edge sampling by rerandomizing a single coordinate. -/
--- TODO: implement — needs sampling a uniform coordinate and rerandomizing it
-def rerandomizeCoord (params : Parameters) : Distribution (Point params × Point params) :=
-  {}
+/-- Edge sampling by rerandomizing a single coordinate.
+TODO: should be the actual edge distribution of the hypercube graph, not uniform on all pairs. -/
+noncomputable def rerandomizeCoord (params : Parameters) :
+    Distribution (Point params × Point params) :=
+  uniformDistribution (Point params × Point params)
 
 /-- Independent sampling of two uniformly random points. -/
--- TODO: implement — needs uniform sampling of two independent points from F_q^m
-def independentPointPair (params : Parameters) : Distribution (Point params × Point params) :=
-  {}
-
-/-- Apply a formal operator to a formal vector. -/
-def applyOperatorToVector (_T : MIPStarRE.Quantum.Op ι) (v : HypercubeVector) : HypercubeVector :=
-  { name := s!"(Op)•{v.name}" }
-
-/-- Scale a formal vector by a scalar. -/
-def scaleVector (_c : Error) (v : HypercubeVector) : HypercubeVector :=
-  { name := s!"scalar•{v.name}" }
-
+noncomputable def independentPointPair (params : Parameters) :
+    Distribution (Point params × Point params) :=
+  uniformDistribution (Point params × Point params)
 
 /-- Weighted sum of operators over a distribution's finite support,
 using the same `support`/`weight` data as the scalar `avgOver`. -/
 noncomputable def averageOperatorOverDistribution {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  (𝒟.support.map fun a => 𝒟.weight a • f a).sum
+  ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
 
 /-- An honest finite matrix register for the hypercube vertices. -/
 def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
@@ -145,29 +128,19 @@ noncomputable def pointDifferenceSquaredOperator {params : Parameters}
     (A : Point params → MIPStarRE.Quantum.Op ι) (u v : Point params) : MIPStarRE.Quantum.Op ι :=
   (A u - A v)ᴴ * (A u - A v)
 
-/-- The displayed local-variance formula from `def:local-and-variance`. -/
-noncomputable def localVarianceDifferenceForm (params : Parameters)
+/-- The local variance from `def:local-and-variance`. -/
+noncomputable def localVariance (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error :=
   (1 / (2 : Error)) *
     avgOver (rerandomizeCoord params)
       (fun uv => ev ψ (pointDifferenceSquaredOperator A uv.1 uv.2))
 
-/-- The displayed global-variance formula from `def:local-and-variance`. -/
-noncomputable def globalVarianceDifferenceForm (params : Parameters)
+/-- The global variance from `def:local-and-variance`. -/
+noncomputable def globalVariance (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error :=
   (1 / (2 : Error)) *
     avgOver (independentPointPair params)
       (fun uv => ev ψ (pointDifferenceSquaredOperator A uv.1 uv.2))
-
-/-- The local variance from `def:local-and-variance`. -/
-noncomputable def localVariance (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error :=
-  localVarianceDifferenceForm params A ψ
-
-/-- The global variance from `def:local-and-variance`. -/
-noncomputable def globalVariance (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error :=
-  globalVarianceDifferenceForm params A ψ
 
 /-- Combined accessor for the local and global variances. -/
 noncomputable def localAndVariance (params : Parameters)
@@ -181,23 +154,25 @@ noncomputable def combinedOperator (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
   ∑ u : Point params, A u
 
-/-- The average operator `A_avg = E_u A^u`. -/
-noncomputable def averagePointOperator (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution (uniformDistribution (Point params)) A
+/-- The zero Fourier mode `φ_0`, represented as a rank-1 projector `|φ_0⟩⟨φ_0|`.
+TODO: implement actual constant-mode projector on the hypercube vertex space. -/
+def constantModeVector (params : Parameters) :
+    MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance)) :=
+  0
 
-/-- The zero Fourier mode `φ_0`. -/
-def constantModeVector (params : Parameters) : HypercubeVector :=
-  { name := s!"phi0({params.m},{params.q})" }
+/-- The Fourier basis vector `φ_α`, represented as a rank-1 projector `|φ_α⟩⟨φ_α|`.
+TODO: implement actual Fourier basis projector on the hypercube vertex space. -/
+def fourierBasisVector (params : Parameters) (_α : Point params) :
+    MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance)) :=
+  0
 
-/-- The Fourier basis vector `φ_α`. -/
-def fourierBasisVector (params : Parameters) (α : Point params) : HypercubeVector :=
-  { name := s!"phi[{pointCode params α}]({params.m},{params.q})" }
-
-/-- The orthogonal Fourier mode `φ_⊥` used in the global-variance rewrite. -/
+/-- The orthogonal Fourier mode `φ_⊥` used in the global-variance rewrite,
+represented as a rank-1 projector.
+TODO: implement actual orthogonal-mode projector. -/
 noncomputable def orthogonalModeVector (params : Parameters)
-    (_A : Point params → MIPStarRE.Quantum.Op ι) : HypercubeVector :=
-  { name := s!"phi_perp(A_combine)" }
+    (_A : Point params → MIPStarRE.Quantum.Op ι) :
+    MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance)) :=
+  0
 
 /-- The operator `A_⊥` from the decomposition of `A_combine`. -/
 noncomputable def orthogonalComponentOperator (params : Parameters)
@@ -216,7 +191,7 @@ noncomputable def localVarianceTraceWitness (params : Parameters)
 structure GlobalVarianceDecomposition (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) where
   averageComponent : MIPStarRE.Quantum.Op ι
-  orthogonalVector : HypercubeVector
+  orthogonalVector : MIPStarRE.Quantum.Op (Fin (@Fintype.card (Point params) inferInstance))
   orthogonalOperator : MIPStarRE.Quantum.Op ι
   deriving Inhabited
 
@@ -236,7 +211,7 @@ noncomputable def localVarianceTraceForm (params : Parameters)
 noncomputable def globalVarianceTraceForm (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
     (decomp : GlobalVarianceDecomposition params A) : Error :=
-  (1 / hypercubeVertexCountError params) *
+  (1 / (hypercubeVertexCount params : Error)) *
     Complex.re (MIPStarRE.Quantum.normalizedTrace (globalVarianceTraceWitness params A ψ decomp))
 
 /-- The number of nonzero coordinates of a frequency `α ∈ F_q^m`. -/
@@ -256,23 +231,22 @@ def fourierBasisInnerProduct (params : Parameters)
 
 /-- The eigenvalue of `K` on `φ_α`. -/
 noncomputable def adjacencyEigenvalue (params : Parameters) (α : Point params) : Error :=
-  (1 / hypercubeVertexCountError params) *
+  (1 / (hypercubeVertexCount params : Error)) *
     (((params.m - frequencyWeight params α : ℕ) : Error) / (params.m : Error))
 
 /-- The eigenvalue of `L` on `φ_α`. -/
 noncomputable def laplacianEigenvalue (params : Parameters) (α : Point params) : Error :=
   (frequencyWeight params α : Error) /
-    ((params.m : Error) * hypercubeVertexCountError params)
+    ((params.m : Error) * (hypercubeVertexCount params : Error))
 
 /-- The spectral gap `1 / (m M)` from `cor:laplacian-spectral-gap`. -/
 noncomputable def hypercubeSpectralGap (params : Parameters) : Error :=
-  1 / ((params.m : Error) * hypercubeVertexCountError params)
+  1 / ((params.m : Error) * (hypercubeVertexCount params : Error))
 
 /-- Output package for `prop:eigenvectors`.
 TODO(matrix-realization): The full eigenvector statement `K φ_α = λ_α φ_α` requires a
-matrix-level realization of the adjacency operator and Fourier basis vectors.  The placeholder
-`HypercubeVector` type uses string names, making the operator-application comparison unprovable
-at the formal level.  The two provable fields below capture the combinatorial content
+matrix-level realization of the adjacency operator and Fourier basis vectors acting on
+the same space.  The two provable fields below capture the combinatorial content
 (inner-product orthonormality and basis cardinality). -/
 structure EigenvectorsStatement (params : Parameters) : Prop where
   orthonormality :
@@ -283,14 +257,14 @@ structure EigenvectorsStatement (params : Parameters) : Prop where
 
 /-- Output package for `cor:laplacian-spectral-gap`.
 TODO(matrix-realization): The `L φ_0 = 0` eigenvector statement requires a matrix-level
-realization of the Laplacian and constant mode vector; the placeholder `HypercubeVector` type
-makes it unprovable at the formal level.  The three remaining fields capture the eigenvalue
-relation, spectral gap lower bound, and attainment. -/
+realization of the Laplacian and constant mode vector acting on the same space.
+The three remaining fields capture the eigenvalue relation, spectral gap lower bound,
+and attainment. -/
 structure LaplacianSpectralGapStatement (params : Parameters) : Prop where
   eigenvalueRelation :
     ∀ α : Point params,
       laplacianEigenvalue params α =
-        (1 / hypercubeVertexCountError params) - adjacencyEigenvalue params α
+        (1 / (hypercubeVertexCount params : Error)) - adjacencyEigenvalue params α
   positiveModesLowerBound :
     ∀ α : Point params,
       0 < frequencyWeight params α →
@@ -312,8 +286,7 @@ theorem laplacianSpectralGap (params : Parameters) :
     LaplacianSpectralGapStatement params where
   eigenvalueRelation := by
     intro α
-    simp only [laplacianEigenvalue, adjacencyEigenvalue,
-      hypercubeVertexCountError, hypercubeVertexCount]
+    simp only [laplacianEigenvalue, adjacencyEigenvalue, hypercubeVertexCount]
     have hm : (params.m : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr params.hm.ne'
     have hM : (↑(params.q ^ params.m) : ℝ) ≠ 0 := by
       exact_mod_cast (pow_pos params.hq params.m).ne'
@@ -323,14 +296,12 @@ theorem laplacianSpectralGap (params : Parameters) :
     ring
   positiveModesLowerBound := by
     intro α hα
-    simp only [hypercubeSpectralGap, laplacianEigenvalue,
-      hypercubeVertexCountError, hypercubeVertexCount]
+    simp only [hypercubeSpectralGap, laplacianEigenvalue, hypercubeVertexCount]
     apply div_le_div_of_nonneg_right _ (by positivity)
     exact_mod_cast hα
   unitWeightModesAttainGap := by
     intro α hα
-    simp only [laplacianEigenvalue, hypercubeSpectralGap,
-      hypercubeVertexCountError, hypercubeVertexCount, hα]
+    simp only [laplacianEigenvalue, hypercubeSpectralGap, hypercubeVertexCount, hα]
     norm_cast
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph

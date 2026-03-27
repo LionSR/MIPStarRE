@@ -42,14 +42,14 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
           jointOutcomeProbability data.liftedState
             ((data.left x).toSubMeas)
             ((data.right y).toSubMeas) a b
-  -- TODO: should be actual projectivity:
-  -- ∀ x a, (data.left x).outcome a * (data.left x).outcome a
-  --   = (data.left x).outcome a
-  liftedLeftProjective : True := trivial
-  -- TODO: should be actual projectivity:
-  -- ∀ y b, (data.right y).outcome b * (data.right y).outcome b
-  --   = (data.right y).outcome b
-  liftedRightProjective : True := trivial
+  liftedLeftProjective :
+    ∀ x : QuestionA, ∀ a : OutcomeA,
+      (data.left x).outcome a * (data.left x).outcome a =
+        (data.left x).outcome a := by sorry
+  liftedRightProjective :
+    ∀ y : QuestionB, ∀ b : OutcomeB,
+      (data.right y).outcome b * (data.right y).outcome b =
+        (data.right y).outcome b := by sorry
   liftedCommutativity :
     ∀ x : QuestionA, ∀ y : QuestionB,
       ∀ a : OutcomeA, ∀ b : OutcomeB,
@@ -59,7 +59,6 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
         jointOutcomeProbability data.liftedState
           ((data.right y).toSubMeas)
           ((data.left x).toSubMeas) b a
-  dimensionBound : True
   matrixWitness :
     Nonempty (MatrixNaimarkWitness QuestionA OutcomeA QuestionB OutcomeB)
 

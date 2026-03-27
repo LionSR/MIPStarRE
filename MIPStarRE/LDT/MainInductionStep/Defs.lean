@@ -130,7 +130,7 @@ noncomputable def ldPastingInInductionError (params : Parameters) (k : ℕ)
 Local copy to break import cycle with `ExpansionHypercubeGraph.Defs`. -/
 private noncomputable def averageOperatorOverDistribution' {α : Type*}
     (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  (𝒟.support.map fun a => 𝒟.weight a • f a).sum
+  ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
 
 /-- Averaged point operator `E_u A^u_{h(u)}` appearing in boundedness. -/
 noncomputable def averagedPointEvaluationOperator (params : Parameters)
@@ -156,19 +156,6 @@ noncomputable def tensorFailureExpectation {Outcome : Type*}
   ev ψ <|
     leftTensor (ι₂ := ιB) Z *
       rightTensor (ι₁ := ιA) (1 - H.total)
-
-/-- The uniform distribution on slice heights `x ∈ F_q`. -/
-noncomputable def sliceHeightDistribution (params : Parameters) : Distribution (Fq params) :=
-  uniformDistribution (Fq params)
-
-/-- Average over the uniform choice of a slice height `x ∈ F_q`. -/
-noncomputable def averageOverSlices (params : Parameters) (f : Fq params → Error) : Error :=
-  avgOver (sliceHeightDistribution params) f
-
-/-- Weighted average over uniformly chosen slice heights. -/
-noncomputable def weightedAverageOverSlices (params : Parameters)
-    (w : Error) (f : Fq params → Error) : Error :=
-  averageOverSlices params (fun x => w * f x)
 
 /-- Probability that a sampled test line in `F_q^{m+1}` is not parallel to the new axis. -/
 noncomputable def sliceTransverseDirectionWeight (params : Parameters) : Error :=

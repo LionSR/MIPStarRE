@@ -74,19 +74,19 @@ structure RestrictedFailureProfile (params : Parameters)
 noncomputable def averageRestrictedAxisParallelError (params : Parameters)
     {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
-  averageOverSlices params profile.axisParallel
+  avgOver (uniformDistribution (Fq params)) profile.axisParallel
 
 /-- Average restricted self-consistency error over slices. -/
 noncomputable def averageRestrictedSelfConsistencyError (params : Parameters)
     {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
-  averageOverSlices params profile.selfConsistency
+  avgOver (uniformDistribution (Fq params)) profile.selfConsistency
 
 /-- Average restricted diagonal-line error over slices. -/
 noncomputable def averageRestrictedDiagonalError (params : Parameters)
     {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
-  averageOverSlices params profile.diagonal
+  avgOver (uniformDistribution (Fq params)) profile.diagonal
 
 /-- Source-style boundedness input for the induction-level pasting theorem. -/
 structure PastingBoundednessInput (params : Parameters)
@@ -104,13 +104,13 @@ structure RestrictedProbabilitiesStatement (params : Parameters)
     (eps delta gamma : Error) : Prop where
   profileExists :
     ∃ profile : RestrictedFailureProfile params strategy,
-      weightedAverageOverSlices params
-          (sliceTransverseDirectionWeight params) profile.axisParallel ≤ eps ∧
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params * profile.axisParallel x) ≤ eps ∧
         averageRestrictedAxisParallelError params profile
           ≤ sliceConditioningLoss params * eps ∧
         averageRestrictedSelfConsistencyError params profile ≤ delta ∧
-        weightedAverageOverSlices params
-          (sliceTransverseDirectionWeight params) profile.diagonal ≤ gamma ∧
+        avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params * profile.diagonal x) ≤ gamma ∧
         averageRestrictedDiagonalError params profile
           ≤ sliceConditioningLoss params * gamma ∧
         sliceTransverseDirectionWeight params *

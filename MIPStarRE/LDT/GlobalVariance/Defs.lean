@@ -40,15 +40,10 @@ def polynomialDistribution (params : Parameters) :
     Distribution (Polynomial params) :=
   {}
 
-/-- The operator `G_g` attached to the polynomial outcome `g`. -/
-def polynomialWeightOperator (params : Parameters)
-    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  G.outcome g
-
 /-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`. -/
 noncomputable def polynomialWeightSqrtOperator (params : Parameters)
     (G : SubMeas (Polynomial params) ι) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  polynomialWeightOperator params G g -- TODO: should be matrix square root
+  G.outcome g -- TODO: should be matrix square root
 
 /-- The weighted state `|ψ_g⟩ = (I ⊗ G_g^{1/2}) |ψ⟩`. -/
 -- TODO: placeholder — density left at defaults until tensor product model is provided.
@@ -63,12 +58,6 @@ def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params) (u : Point params) : MIPStarRE.Quantum.Op ι :=
   (strategy.pointMeasurement u).toSubMeas.outcome (g u)
-
-/-- The operator family `u ↦ A(g)^u = A^u_{g(u)}` for a fixed polynomial `g`. -/
-def pointConditionedOperatorFamilyAtPolynomial (params : Parameters)
-    (strategy : SymStrat params ι)
-    (g : Polynomial params) : Point params → MIPStarRE.Quantum.Op ι :=
-  fun u => pointConditionedOutcomeOperatorAtPolynomial params strategy g u
 
 /-- The paper's weighted operator `A^u_{g(u)} ⊗ (G_g)^{1/2}`
 on the bipartite space `d * d`. -/
@@ -88,7 +77,7 @@ noncomputable def pointConditionedLocalVarianceAtPolynomial (params : Parameters
     (g : Polynomial params) : Error :=
   localVariance params
     (fun u => leftTensor (ι₂ := ι)
-      (pointConditionedOperatorFamilyAtPolynomial params strategy g u))
+      (pointConditionedOutcomeOperatorAtPolynomial params strategy g u))
     (weightedPolynomialState params strategy G g)
 
 /-- The global variance of `A(g)` on the weighted state `|ψ_g⟩`.
@@ -99,7 +88,7 @@ noncomputable def pointConditionedGlobalVarianceAtPolynomial (params : Parameter
     (g : Polynomial params) : Error :=
   globalVariance params
     (fun u => leftTensor (ι₂ := ι)
-      (pointConditionedOperatorFamilyAtPolynomial params strategy g u))
+      (pointConditionedOutcomeOperatorAtPolynomial params strategy g u))
     (weightedPolynomialState params strategy G g)
 
 /-- The polynomial-averaged local variance of the conditioned points family. -/
@@ -165,7 +154,7 @@ noncomputable def generalizeBDeviationAtPolynomial (params : Parameters)
     (fun qu =>
       let D := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
                weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
-      ev ψbi (D * D))
+      ev ψbi (Dᴴ * D))
 
 /-- The polynomial-averaged deviation controlled by `lem:generalize-b`. -/
 noncomputable def generalizeBDeviation (params : Parameters)
@@ -264,7 +253,7 @@ noncomputable def localVarianceDeviationAtPolynomial (params : Parameters)
     (fun uv =>
       let D := weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1 -
                weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2
-      ev ψbi (D * D))
+      ev ψbi (Dᴴ * D))
 
 /-- The independently sampled squared norm expression in `lem:global-variance-of-points`.
 Uses bipartite state `ψbi` on `d * d`. -/
@@ -277,7 +266,7 @@ noncomputable def globalVarianceDeviationAtPolynomial (params : Parameters)
     (fun uv =>
       let D := weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1 -
                weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2
-      ev ψbi (D * D))
+      ev ψbi (Dᴴ * D))
 
 /-- The polynomial-averaged local squared norm expression. -/
 noncomputable def localVarianceDeviation (params : Parameters)

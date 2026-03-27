@@ -66,19 +66,6 @@ noncomputable def averageIdxSubMeas {Question Outcome : Type*}
     averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
   total := averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
 
-/-- Complement operator `I - X` in the same ambient space as `X`. -/
-def operatorComplement (X : MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  1 - X
-
-/-- Regard an operator expression as a `Unit`-valued submeasurement placeholder. -/
-def operatorAsSubMeas (X : MIPStarRE.Quantum.Op ι) : SubMeas Unit ι :=
-  { outcome := fun _ => X
-    total := X }
-
-/-- Regard the Bernoulli tail operator as a `Unit`-valued submeasurement placeholder. -/
-def bernoulliTailSubMeas (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) : SubMeas Unit ι :=
-  operatorAsSubMeas (bernoulliTailOperator k degree X)
-
 /-- Record which completed-slice outcomes are genuine polynomial outcomes. -/
 def gHatTupleType {params : Parameters} {k : ℕ}
     (gs : GHatTupleOutcome params k) : GHatType k :=
@@ -130,7 +117,8 @@ def completePartSubMeas (params : Parameters)
 /-- Placeholder for the incomplete part `G^x_⊥ = I - G^x`. -/
 def incompletePartSubMeas (params : Parameters)
     (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
-  operatorAsSubMeas (operatorComplement (completePartSubMeas params family x).total)
+  let X := 1 - (completePartSubMeas params family x).total
+  { outcome := fun _ => X, total := X }
 
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
 def gHatIdxMeas (params : Parameters)

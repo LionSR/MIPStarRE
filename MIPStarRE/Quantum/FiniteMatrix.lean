@@ -16,8 +16,6 @@ An operator API around `Matrix d d ℂ` used by the LDT formalization.
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.Quantum
 
 /-! ### Basic operator type -/
@@ -31,9 +29,7 @@ variable {d : Type*} [Fintype d]
 
 /-- The normalized trace `τ(A) = tr(A) / |d|`. -/
 def normalizedTrace (A : Op d) : ℂ :=
-  by
-    classical
-    exact A.trace / (Fintype.card d : ℂ)
+  A.trace / (Fintype.card d : ℂ)
 
 @[simp] theorem normalizedTrace_zero : normalizedTrace (0 : Op d) = 0 := by
   simp [normalizedTrace]
@@ -46,22 +42,18 @@ def normalizedTrace (A : Op d) : ℂ :=
 
 theorem normalizedTrace_add (A B : Op d) :
     normalizedTrace (A + B) = normalizedTrace A + normalizedTrace B := by
-  classical
   simp [normalizedTrace, Matrix.trace_add, add_div]
 
 theorem normalizedTrace_sub (A B : Op d) :
     normalizedTrace (A - B) = normalizedTrace A - normalizedTrace B := by
-  classical
   simp [normalizedTrace, Matrix.trace_sub, sub_div]
 
 theorem normalizedTrace_smul (c : ℂ) (A : Op d) :
     normalizedTrace (c • A) = c * normalizedTrace A := by
-  classical
   simp [normalizedTrace, Matrix.trace_smul]; ring
 
 theorem normalizedTrace_mul_comm (A B : Op d) :
     normalizedTrace (A * B) = normalizedTrace (B * A) := by
-  classical
   simp only [normalizedTrace]; rw [Matrix.trace_mul_comm]
 
 /-! ### Squared τ-norm -/

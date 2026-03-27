@@ -329,7 +329,9 @@ structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableE
     (ψ : QuantumState ι)
     (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error) : Prop where
   matrixTailBound :
-    CompletenessAtLeast ψ (bernoulliTailSubMeas k degree X)
+    CompletenessAtLeast ψ
+      ({ outcome := fun _ => bernoulliTailOperator k degree X,
+         total := bernoulliTailOperator k degree X } : SubMeas Unit ι)
       (1 - kappa / (1 - theta) - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2))
 
 /-- Output package for `cor:ld-pasting-N-completeness`. -/

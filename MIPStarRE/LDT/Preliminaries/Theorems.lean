@@ -20,10 +20,9 @@ theorem simeqForMeasurements {Question Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome ι) (δ : Error) :
-    consistency ψ 𝒟 (IdxMeas.toIdxSubMeas A)
+    ConsRel ψ 𝒟 (IdxMeas.toIdxSubMeas A)
         (IdxMeas.toIdxSubMeas B) δ ↔
       ConsAgreement ψ 𝒟 A B δ := by
-  unfold consistency
   constructor
   · intro ⟨h⟩
     exact ⟨by unfold agreementProbability; linarith⟩
@@ -46,9 +45,9 @@ theorem simeqToApprox {Question Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome ι) (δ : Error) :
-    consistency ψ 𝒟 (IdxMeas.toIdxSubMeas A)
+    ConsRel ψ 𝒟 (IdxMeas.toIdxSubMeas A)
         (IdxMeas.toIdxSubMeas B) δ →
-      bipartiteStateDependentDistance ψ 𝒟
+      BipartiteSDDRel ψ 𝒟
         (IdxMeas.toIdxSubMeas A)
         (IdxMeas.toIdxSubMeas B)
         (2 * δ) := by
@@ -90,13 +89,13 @@ theorem simeqDataProcessing {Question α β : Type*}
     [Fintype α] [Fintype β]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question α ι) (δ : Error) (f : α → β) :
-    consistency ψ 𝒟 A B δ →
-      consistency ψ 𝒟
-        (postprocessIdxSubMeas A f)
-        (postprocessIdxSubMeas B f) δ := by
+    ConsRel ψ 𝒟 A B δ →
+      ConsRel ψ 𝒟
+        (fun q => postprocess (A q) f)
+        (fun q => postprocess (B q) f) δ := by
   intro ⟨hcons⟩
   constructor
-  unfold consError postprocessIdxSubMeas postProcessing at *
+  unfold consError at *
   calc avgOver 𝒟
         (fun q => qConsDefect ψ (postprocess (A q) f) (postprocess (B q) f))
       ≤ avgOver 𝒟
@@ -186,7 +185,7 @@ private lemma consSubMeas_diagonalControl
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) (γ : Error) :
-    consistency ψ 𝒟 A
+    ConsRel ψ 𝒟 A
       (IdxMeas.toIdxSubMeas B) γ →
     SDDRel ψ 𝒟 A
       (diagonalSandwichFamily A B) γ := by
@@ -198,7 +197,7 @@ private lemma consSubMeas_sandwichControl
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) (γ : Error) :
-    consistency ψ 𝒟 A
+    ConsRel ψ 𝒟 A
       (IdxMeas.toIdxSubMeas B) γ →
     SDDRel ψ 𝒟
       (diagonalSandwichFamily A B)
@@ -232,7 +231,7 @@ theorem consSubMeas {Question Outcome : Type*}
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) (γ : Error) :
-    consistency ψ 𝒟 A
+    ConsRel ψ 𝒟 A
       (IdxMeas.toIdxSubMeas B) γ →
     ConsSubMeasStmt ψ 𝒟 A B γ := by
   intro hcons
@@ -255,7 +254,7 @@ private lemma switchSandwich_leftTransfer
     (Alifted : IdxSubMeas Question Outcome (ι × ι))
     (B : MIPStarRE.Quantum.Op ι) (_hB : OpBounded01 B)
     (δ : Error) :
-    bipartiteStateDependentDistance ψ 𝒟 Alifted Alifted δ →
+    BipartiteSDDRel ψ 𝒟 Alifted Alifted δ →
     |leftSandwichExpectation ψ 𝒟 A B -
       middleSandwichExpectation ψ 𝒟 A (leftTensor (ι₂ := ι) B)| ≤
       2 * Real.sqrt δ := by
@@ -269,7 +268,7 @@ private lemma switchSandwich_rightTransfer
     (Alifted : IdxSubMeas Question Outcome (ι × ι))
     (B : MIPStarRE.Quantum.Op ι) (_hB : OpBounded01 B)
     (δ : Error) :
-    bipartiteStateDependentDistance ψ 𝒟 Alifted Alifted δ →
+    BipartiteSDDRel ψ 𝒟 Alifted Alifted δ →
     |middleSandwichExpectation ψ 𝒟 A (rightTensor (ι₁ := ι) B) -
       rightSandwichExpectation ψ 𝒟 A B| ≤
       Real.sqrt δ := by
@@ -284,7 +283,7 @@ theorem switchSandwich {Question Outcome : Type*}
     (Alifted : IdxSubMeas Question Outcome (ι × ι))
     (B : MIPStarRE.Quantum.Op ι) (hB : OpBounded01 B)
     (δ : Error) :
-    bipartiteStateDependentDistance ψ 𝒟 Alifted Alifted δ →
+    BipartiteSDDRel ψ 𝒟 Alifted Alifted δ →
     SwitchSandwichStmt ψ 𝒟 A B δ := by
   intro happrox
   exact {
@@ -315,7 +314,7 @@ theorem completenessTransferProjectiveP {Question Outcome : Type*}
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
     (P : IdxProjSubMeas Question Outcome ι) (ε : Error) :
-    stateDependentDistance ψ 𝒟 A
+    SDDRel ψ 𝒟 A
         (IdxProjSubMeas.toIdxSubMeas P) ε →
       CompTransferStmt ψ 𝒟 A P ε := by
   intro ⟨hε⟩
@@ -353,14 +352,7 @@ private lemma sscError_nonneg {Question Outcome : Type*}
     (A : IdxSubMeas Question Outcome ι) :
     0 ≤ sscError ψ 𝒟 A := by
   unfold sscError
-  unfold avgOver
-  apply List.sum_nonneg
-  intro x hx
-  rw [List.mem_map] at hx
-  obtain ⟨a, _, rfl⟩ := hx
-  apply mul_nonneg (𝒟.nonnegative a)
-  unfold qSSCDefect
-  exact le_max_left 0 _
+  exact avgOver_nonneg 𝒟 _ fun a => by unfold qSSCDefect; exact le_max_left 0 _
 
 /-- `prop:two-notions-of-self-consistency`. -/
 theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
@@ -368,8 +360,8 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error) :
-    strongSelfConsistency ψ 𝒟 A δ →
-      bipartiteStateDependentDistance ψ 𝒟 A A (2 * δ) := by
+    (PermInvState ψ ∧ SSCRel ψ 𝒟 A δ) →
+      BipartiteSDDRel ψ 𝒟 A A (2 * δ) := by
   intro ⟨_, ⟨hδ⟩⟩
   constructor
   rw [sddError_self]
@@ -383,9 +375,9 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (B : SubMeas Outcome ι)
     (a0 : Outcome) (δ ζ : Error) :
-    strongSelfConsistency ψ (uniformDistribution Unit)
-        (constSubMeasFamily A.toSubMeas) ζ →
-    stateDependentDistance ψ (uniformDistribution Unit)
+    (PermInvState ψ ∧ SSCRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A.toSubMeas) ζ) →
+    SDDRel ψ (uniformDistribution Unit)
         (constSubMeasFamily A.toSubMeas)
         (constSubMeasFamily B) δ →
     SDDRel ψ (uniformDistribution Unit)
@@ -401,9 +393,9 @@ theorem completingToMeasurement {Outcome : Type*}
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (B : SubMeas Outcome ι)
     (a0 : Outcome) (δ ζ : Error) :
-    strongSelfConsistency ψ (uniformDistribution Unit)
-        (constSubMeasFamily A.toSubMeas) ζ →
-      stateDependentDistance ψ (uniformDistribution Unit)
+    (PermInvState ψ ∧ SSCRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A.toSubMeas) ζ) →
+      SDDRel ψ (uniformDistribution Unit)
         (constSubMeasFamily A.toSubMeas)
         (constSubMeasFamily B) δ →
       ∃ C : Measurement Outcome ι,

@@ -51,7 +51,7 @@ def hypercubeEdgePairFinset (params : Parameters) : Finset (Point params × Poin
 
 /-- Bridge to the nonuniform hypercube edge distribution from the source. -/
 -- TODO: placeholder — returns `rerandomizeCoord` but should be the actual nonuniform distribution
-def matrixHypercubeEdgeDistribution (params : Parameters) :
+noncomputable def matrixHypercubeEdgeDistribution (params : Parameters) :
     Distribution (Point params × Point params) :=
   rerandomizeCoord params
 

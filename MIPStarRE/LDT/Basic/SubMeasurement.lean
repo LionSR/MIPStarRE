@@ -23,28 +23,28 @@ instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (SubMeas α ι) where
   default := {}
 
-/-- A paper-local measurement. -/
+/-- A paper-local measurement (submeasurement whose effects sum to the identity).
+TODO: add `[Fintype α]` and `sum_eq : total = ∑ a, outcome a` once downstream is ready. -/
 structure Measurement (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
-    extends SubMeas α ι where
-  completePlaceholder : True := trivial
+    extends SubMeas α ι
 
 instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (Measurement α ι) where
   default := { toSubMeas := default }
 
-/-- A paper-local projective submeasurement. -/
+/-- A paper-local projective submeasurement (each effect is idempotent).
+TODO: add `proj : ∀ a, outcome a * outcome a = outcome a` once downstream is ready. -/
 structure ProjSubMeas (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
-    extends SubMeas α ι where
-  projPlaceholder : True := trivial
+    extends SubMeas α ι
 
 instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (ProjSubMeas α ι) where
   default := { toSubMeas := default }
 
-/-- A paper-local projective measurement. -/
+/-- A paper-local projective measurement (complete + projective).
+TODO: add both `sum_eq` and `proj` conditions once downstream is ready. -/
 structure ProjMeas (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
-    extends Measurement α ι where
-  projPlaceholder : True := trivial
+    extends Measurement α ι
 
 instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (ProjMeas α ι) where

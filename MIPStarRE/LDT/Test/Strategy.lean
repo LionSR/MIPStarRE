@@ -15,10 +15,11 @@ noncomputable section
 
 namespace MIPStarRE.LDT
 
-/-- Invariance predicate for the symmetric shared state. -/
+/-- Invariance predicate for the symmetric shared state.
+TODO(bipartite): for `ψ : QuantumState (ι × ι)`, this should assert SWAP-invariance
+`ψ.density = (SWAP ψ).density` where SWAP permutes the two tensor factors. -/
 structure PermInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
     (_ψ : QuantumState ι) : Prop where
-  placeholder : True
 
 /-- Paper-local symmetric strategy data. -/
 structure SymStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where

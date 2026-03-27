@@ -17,16 +17,12 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- Output package for `lem:local-rewrite`. -/
 structure LocalRewriteStatement (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Prop where
-  differenceFormula :
-    localVariance params A ψ = localVarianceDifferenceForm params A ψ
   traceFormula :
     localVariance params A ψ = localVarianceTraceForm params A ψ
 
 /-- Output package for `lem:global-rewrite`. -/
 structure GlobalRewriteStatement (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Prop where
-  differenceFormula :
-    globalVariance params A ψ = globalVarianceDifferenceForm params A ψ
   decomposition :
     ∃ decomp : GlobalVarianceDecomposition params A,
       globalVariance params A ψ = globalVarianceTraceForm params A ψ decomp
