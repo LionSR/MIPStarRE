@@ -7,7 +7,7 @@ body:
     attributes:
       label: File(s) affected
       description: Path to the Lean file(s) with the issue
-      placeholder: "e.g., TNLean/MPS/Core/Transfer.lean"
+      placeholder: "e.g., MIPStarRE/LDT/Preliminaries.lean"
     validations:
       required: true
 

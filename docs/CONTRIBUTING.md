@@ -1,7 +1,7 @@
-# Contributing to MPSLean
+# Contributing to MIPStarRE
 
 This document codifies the conventions for pull requests, issues, code review,
-Lean style, and CI automation used in the MPSLean project.
+Lean style, and CI automation used in the MIPStarRE project.
 
 ---
 
@@ -24,13 +24,13 @@ type(scope): short description
 | `ci`       | CI/CD workflow changes                            |
 | `chore`    | Dependency bumps, linting, toolchain updates      |
 
-**Scope** is a shortened module path: `MPS/Symmetry`, `Channel`, `blueprint+docgen`,
-`MPS/Core`, etc. Omit the `TNLean/` prefix.
+**Scope** is a shortened module path: `LDT/SelfImprovement`, `Quantum`, `blueprint`,
+`LDT/Pasting`, etc. Omit the `MIPStarRE/` prefix.
 
 Examples:
-- `feat(MPS/Symmetry): add twistedTensor as MonoidHom`
-- `fix(blueprint+docgen): resolve broken labels and malformed docstring table`
-- `refactor(MPS): move Correlations.lean from ParentHamiltonian/ to Core/`
+- `feat(LDT/SelfImprovement): add self-improvement induction step`
+- `fix(blueprint): resolve broken labels in chapter 7`
+- `refactor(LDT): extract shared preliminaries into Basic module`
 
 ### Body template
 
@@ -46,8 +46,8 @@ Every PR body must contain three sections:
 
 ### Testing
 - What was verified and how.
-- Examples: `lake env lean TNLean/Foo/Bar.lean`, `lake build TNLean`,
-  `rg -n "sorry|axiom" TNLean/Foo/Bar.lean || true`.
+- Examples: `lake env lean MIPStarRE/LDT/Basic.lean`, `lake build MIPStarRE`,
+  `rg -n "sorry|axiom" MIPStarRE/LDT/Basic.lean || true`.
 
 ---
 Addresses #N
@@ -85,7 +85,7 @@ Three issue templates are available in `.github/ISSUE_TEMPLATE/`:
 Use a descriptive title that names the mathematical content:
 
 ```
-Symmetry/SPT 3/6 Definitions: twisted tensor and on-site symmetry
+LDT Section 7: self-improvement step for quantum strategies
 ```
 
 Label with **area** + **arXiv paper** + **topic** as applicable.
@@ -96,8 +96,8 @@ For work spanning multiple PRs, use the `Area K/N: title` pattern and create
 an umbrella **tracking issue**:
 
 ```
-RFP/MPDO 1/5 Pure-state RFP: definitions, ZCL <=> E^2=E, structural form
-RFP/MPDO 2/5 Commuting parent Hamiltonians and decorrelation theorem
+LDT 1/5: Preliminaries and basic definitions
+LDT 2/5: Self-improvement step
 ...
 ```
 
@@ -124,8 +124,9 @@ outside it.
 Use the **Tracking Issue** template (`.github/ISSUE_TEMPLATE/tracking-issue.yml`).
 Label with `tracking`. The `tracking-issue-sync` workflow will automatically:
 
-- Check boxes when referenced issues are closed or PRs are merged.
-- Uncheck boxes when issues are reopened or PRs are closed without merging.
+- Check boxes when referenced issues are closed (including auto-closure by merged PRs).
+- Uncheck boxes when referenced issues are reopened.
+- Post progress comments on linked issues when PRs merge (what was done, what remains).
 - Add the `all-resolved` label when every task is complete.
 
 ### Pinned issues
@@ -143,9 +144,8 @@ target date; remove it when the date no longer applies.
 ### Discussions
 
 GitHub Discussions is enabled for design questions, proof strategy debates, and
-topics that don't map to a single actionable issue (e.g., "Should MPDO live
-under MPS/?"). Use issues for concrete work items; use discussions for open-ended
-conversations.
+topics that don't map to a single actionable issue. Use issues for concrete work
+items; use discussions for open-ended conversations.
 
 ### Blueprint sync issues
 
@@ -178,28 +178,21 @@ needs `\lean{}` / `\leanok` tags.
 
 ### Paper labels
 
-| Label         | Description                                                   |
-|---------------|---------------------------------------------------------------|
-| `0802.0447`   | arXiv:0802.0447 -- String order and symmetries (PRL 2008)     |
-| `1606.00608`  | arXiv:1606.00608 -- MPDO RFP                                  |
-| `1708.00029`  | arXiv:1708.00029 -- Periodic FT for MPS (De las Cuevas et al.)|
-| `1804.04964`  | arXiv:1804.04964 -- FT for normal tensor networks             |
-| `2011.12127`  | arXiv:2011.12127 -- RMP review (Cirac--Perez-Garcia--Schuch--Verstraete) |
+| Label         | Description                                                        |
+|---------------|--------------------------------------------------------------------|
+| `2009.12982`  | arXiv:2009.12982 -- Quantum soundness of the classical low individual degree test |
 
 ### Topic labels
 
 | Label               | Description                                                           |
 |----------------------|-----------------------------------------------------------------------|
-| `parent-hamiltonian` | Parent Hamiltonian theory for MPS (RMP IV.C)                          |
-| `correlation-decay`  | Exponential decay of correlations in MPS                              |
-| `symmetry-SPT`       | MPS symmetries, projective representations, and SPT classification    |
-| `rfp-mpdo`           | Renormalization fixed points and MPDO theory                          |
-| `algebraic-FT`       | Algebraic approach to Fundamental Theorem                             |
-| `wolf-ch1`           | Wolf Lecture Notes -- Chapter 1: Deconstructing Quantum               |
-| `wolf-ch2`           | Wolf Lecture Notes -- Chapter 2: Representations                      |
-| `wolf-ch5`           | Wolf Lecture Notes -- Chapter 5: Schwarz Inequalities                 |
-| `wolf-ch6`           | Wolf Lecture Notes -- Chapter 6: Spectral Properties                  |
-| `wolf-ch7`           | Wolf Lecture Notes -- Chapter 7: Semigroup Structure                  |
+| `ldt-basic`          | LDT preliminaries and basic definitions                               |
+| `self-improvement`   | Self-improvement step for quantum strategies                          |
+| `pasting`            | Pasting lemma for quantum strategies                                  |
+| `main-induction`     | Main induction step of the LDT soundness proof                       |
+| `commutativity`      | Commutativity of quantum measurements                                 |
+| `expansion-graph`    | Expansion properties of hypercube graphs                              |
+| `quantum-foundations`| Quantum measurements, outcome families, finite matrices               |
 
 ### Workflow labels
 
@@ -207,8 +200,8 @@ needs `\lean{}` / `\leanok` tags.
 |------------------|------------------------------------------------|
 | `tracking`       | Tracking issue for a formalization area         |
 | `blueprint-sync` | Blueprint out of sync with Lean code            |
-| `codex`          | Created or modified by an AI coding agent       |
 | `automation`     | Automated documentation/sync PR                 |
+| `follow-up`      | Follow-up work identified from a merged PR      |
 
 ### Standard GitHub labels
 
@@ -244,6 +237,12 @@ Every PR touching Lean code should be reviewed against these criteria:
 7. **Blueprint sync** -- If the PR formalizes a statement from the blueprint,
    add `\lean{LeanDeclName}` and `\leanok` tags to the corresponding
    `blueprint/src/chapter/*.tex` file.
+
+8. **Scaffolding integrity** -- If the PR introduces or modifies scaffolded
+   definitions (types, theorem statements with `sorry` proofs), verify that
+   the types and API surface align with Mathlib. Scaffolding that uses custom
+   types incompatible with Mathlib blocks future proof work. See
+   [PROOF_INTEGRITY.md](PROOF_INTEGRITY.md) for details.
 
 ---
 
@@ -291,10 +290,11 @@ into logical sections.
 
 **Variable naming**: Follow the conventions in [naming.md](naming.md). For
 this project specifically:
-- `A`, `B` for MPS tensors
-- `E` for transfer matrices / quantum channels
-- `d` for physical dimension, `D` for bond dimension
-- `N`, `L` for chain length
+- `q` for alphabet size / finite field order
+- `n`, `m` for dimension parameters
+- `σ` for strategies
+- `P` for projective measurements
+- `G` for graphs (hypercube expansion)
 
 ---
 
@@ -306,14 +306,16 @@ The following workflows run automatically:
 |----------|---------|-------------|
 | **Lean CI** (`lean_action_ci.yml`) | Push to `main`, PRs touching `.lean`/`lakefile.toml`/`lean-toolchain` | Runs `lake build` with Mathlib cache |
 | **Claude Code Review** (`claude-code-review.yml`) | PR opened/synced/reopened touching `.lean`, `.tex`, `lakefile.toml`, `lean-toolchain` | Automated review for sorrys, Mathlib style, type safety, performance, modularity, documentation |
-| **Tracking Issue Sync** (`tracking-issue-sync.yml`) | Issue closed/reopened, PR closed/reopened | Updates checkboxes in tracking issues; adds `all-resolved` label when complete |
+| **Issue Tracker** (`tracking-issue-sync.yml`) | Issue closed/reopened; PR merged/opened; review submitted | Updates tracking-issue checkboxes (checks on close, unchecks on reopen), posts progress comments on linked issues when PRs merge, scans merged PRs for follow-ups (deferred review feedback, new `sorry` markers, missing blueprint tags), creates follow-up issues with `follow-up` label, adds `all-resolved` when all tasks complete |
 | **Blueprint Lint** (`lint-blueprint.yml`) | PRs touching blueprint files | Validates LaTeX blueprint for broken labels and references |
-| **Docs & Blueprint Sync** (`docs-blueprint-sync.lock.yml`) | Daily (weekdays) + manual dispatch | Detects stale documentation and opens a sync PR if needed |
+| **Docs & Blueprint Sync** (`docs-blueprint-sync.md`) | Daily (weekdays) + manual dispatch | Detects stale documentation and opens a sync PR if needed |
 | **Lean Audit** (`lean-audit.yml`) | On demand | Audits Lean code for style and correctness |
+| **PR Cleanup** (`pr-cleanup.yml`) | AI-generated PR opened (`claude/*` or `codex/*` branches) | Normalizes title to `type(scope): desc`, restructures body to PR template, copies labels from linked issue, adds `Addresses #N` reference, comments on the issue |
+| **Mathlib Scout** (`mathlib-scout.yml`) | Formalization issue opened/labeled | Scouts Mathlib for relevant lemmas and posts a scouting report |
 
 ### What CI checks before merge
 
-- `lake build TNLean` must succeed (no type errors, no broken imports).
+- `lake build MIPStarRE` must succeed (no type errors, no broken imports).
 - No new `sorry` without explicit justification.
 - Blueprint labels must resolve (no broken `\ref` or `\label`).
 - Claude Code Review should not flag critical issues (proof correctness,

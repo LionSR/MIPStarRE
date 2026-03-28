@@ -7,7 +7,7 @@ body:
     attributes:
       label: Mathematical statement
       description: Name and source of the result to formalize
-      placeholder: "e.g., Wolf Thm 6.15: conditional expectation from faithful fixed point"
+      placeholder: "e.g., Thm 5.1: quantum soundness of the low individual degree test"
     validations:
       required: true
 
@@ -16,7 +16,7 @@ body:
     attributes:
       label: Reference
       description: Paper or textbook citation
-      placeholder: "e.g., arXiv:1804.04964 Theorem 3.2, Wolf Lecture Notes Prop 7.4"
+      placeholder: "e.g., arXiv:2009.12982 Theorem 5.1"
     validations:
       required: true
 
@@ -25,7 +25,7 @@ body:
     attributes:
       label: Target Lean declaration
       description: Expected Lean name and file path
-      placeholder: "e.g., MPSTensor.fundamentalTheorem in TNLean/MPS/FundamentalTheorem.lean"
+      placeholder: "e.g., LDT.mainInductionStep in MIPStarRE/LDT/MainInductionStep.lean"
     validations:
       required: false
 
@@ -35,8 +35,8 @@ body:
       label: Dependencies
       description: Existing Lean declarations or issues this depends on
       placeholder: |
-        - `MPSTensor.transferMap` (exists)
-        - #191 (ground space definitions, in progress)
+        - `LDT.selfImprovement` (exists)
+        - #42 (pasting lemma, in progress)
     validations:
       required: false
 
@@ -54,6 +54,6 @@ body:
     attributes:
       label: Tracking issue
       description: Parent tracking issue if applicable
-      placeholder: "e.g., #190"
+      placeholder: "e.g., #10"
     validations:
       required: false

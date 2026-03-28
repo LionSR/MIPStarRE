@@ -30,7 +30,7 @@ tools:
     - "ls"
     - "find docs -type f"
     - "find blueprint -type f"
-    - "find TNLean -type f"
+    - "find MIPStarRE -type f"
     - "grep -R *"
     - "sed -n *"
     - "python3 *"
@@ -62,7 +62,7 @@ Prioritize files under:
 - `docs/`
 - `blueprint/`
 
-Use `TNLean/` and recent git history as the source of truth for current implementation status.
+Use `MIPStarRE/` and recent git history as the source of truth for current implementation status.
 
 ## Required process
 

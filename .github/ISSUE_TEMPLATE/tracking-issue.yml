@@ -14,7 +14,7 @@ body:
     attributes:
       label: Area
       description: Which area of the project does this track?
-      placeholder: e.g., MPS, Channel, Wielandt, Infrastructure
+      placeholder: e.g., LDT, Quantum, TensorCode, Infrastructure
     validations:
       required: true
 
