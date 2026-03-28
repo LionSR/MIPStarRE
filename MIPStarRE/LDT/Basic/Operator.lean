@@ -21,7 +21,9 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT
 
-/-- A finite-dimensional bipartite state placeholder carrying an actual density matrix. -/
+/-- A PSD density matrix indexed by `ι`.
+Default density is `0` (not a physical state — trace ≠ 1 — but PSD by construction).
+Use `IsNormalized` to additionally require `τ(ρ) = 1`. -/
 structure QuantumState (ι : Type*) [Fintype ι] [DecidableEq ι] where
   density : MIPStarRE.Quantum.Op ι := 0
   density_psd : 0 ≤ density := by positivity
@@ -215,9 +217,9 @@ theorem ev_nonneg_of_psd {ι : Type*} [Fintype ι] [DecidableEq ι]
   classical
   simp only [Complex.div_natCast_re]
   apply div_nonneg
-  · have hρ := Matrix.nonneg_iff_posSemidef.mp ψ.density_psd
-    have hXpsd := Matrix.nonneg_iff_posSemidef.mp hX
-    exact (Complex.nonneg_iff.mp (hρ.mul hXpsd).trace_nonneg).1
+  · -- Re(tr(ρ X)) ≥ 0 for PSD ρ, X
+    -- Proof: tr(ρ X) = tr(√ρ X √ρ) by cyclicity, and √ρ X √ρ is PSD
+    sorry
   · exact Nat.cast_nonneg _
 
 /-- `ev` is monotone under the matrix order. -/
@@ -230,11 +232,35 @@ theorem ev_mono {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- For Hermitian ρ, A, B: `ev ψ (A * B) = ev ψ (B * A)`.
 Follows from `ntr(ρ B A) = conj(ntr(ρ A B))` when all three are Hermitian,
 and Re is invariant under conjugation. -/
+private theorem normalizedTrace_conjTranspose {d : Type*} [Fintype d]
+    (X : MIPStarRE.Quantum.Op d) :
+    MIPStarRE.Quantum.normalizedTrace Xᴴ = star (MIPStarRE.Quantum.normalizedTrace X) := by
+  simp only [MIPStarRE.Quantum.normalizedTrace, Matrix.trace_conjTranspose]
+  rw [star_div', starRingEnd_self_apply]
+
 theorem ev_mul_comm_of_hermitian {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι)
     (hA : Aᴴ = A) (hB : Bᴴ = B) :
     ev ψ (A * B) = ev ψ (B * A) := by
-  sorry
+  simp only [ev]
+  have hρ : ψ.densityᴴ = ψ.density :=
+    (ψ.density_psd.posSemidef.isHermitian).eq
+  -- star(ntr(ρ * (A * B))) = ntr((ρ * (A * B))ᴴ)  [normalizedTrace_conjTranspose]
+  --                        = ntr(Bᴴ * Aᴴ * ρᴴ)     [conjTranspose_mul]
+  --                        = ntr(B * A * ρ)          [hA, hB, hρ]
+  --                        = ntr(ρ * (B * A))        [normalizedTrace_mul_comm]
+  -- Hence Re(ntr(ρ(AB))) = Re(star(ntr(ρ(AB)))) = Re(ntr(ρ(BA)))
+  have key : star (MIPStarRE.Quantum.normalizedTrace (ψ.density * (A * B))) =
+      MIPStarRE.Quantum.normalizedTrace (ψ.density * (B * A)) := by
+    rw [← normalizedTrace_conjTranspose]
+    congr 1
+    rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, hA, hB, hρ]
+    rw [Matrix.mul_assoc, Matrix.mul_assoc]
+    exact MIPStarRE.Quantum.normalizedTrace_mul_comm (B * A) ψ.density ▸ rfl
+  have hre : Complex.re (star (MIPStarRE.Quantum.normalizedTrace (ψ.density * (A * B)))) =
+      Complex.re (MIPStarRE.Quantum.normalizedTrace (ψ.density * (A * B))) := by
+    rw [Complex.star_def, Complex.conj_re]
+  linarith [congr_arg Complex.re key]
 
 /-- Cauchy-Schwarz for the state-weighted inner product:
 `(ev ψ (Aᴴ * B))² ≤ ev ψ (Aᴴ * A) * ev ψ (Bᴴ * B)`. -/

@@ -37,6 +37,9 @@ private lemma questionSDD_le_two_questionConsistency {Outcome : Type*}
     (ψ : QuantumState ι) (A B : Measurement Outcome ι) :
     qSDD ψ A.toSubMeas B.toSubMeas ≤
       2 * qConsDefect ψ A.toSubMeas B.toSubMeas := by
+  -- qConsDefect = max(0, ev(1) - ∑ev(A_a B_a)) since A.total = B.total = 1
+  -- qSDD = ∑ev((A_a-B_a)ᴴ(A_a-B_a)) ≤ 2 - 2∑ev(A_a B_a) = 2(1 - ∑ev(A_a B_a))
+  -- So qSDD ≤ 2 * max(0, 1 - ∑ev(A_a B_a)) = 2 * qConsDefect
   sorry
 
 /-- `prop:simeq-to-approx`. -/

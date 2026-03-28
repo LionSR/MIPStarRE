@@ -41,7 +41,7 @@ structure ProjSubMeas (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
 
 instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (ProjSubMeas α ι) where
-  default := { toSubMeas := default, proj := sorry }
+  default := { toSubMeas := default, proj := fun _ => by simp [SubMeas.outcome] }
 
 /-- A paper-local projective measurement (complete POVM + projective). -/
 structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [DecidableEq ι]
