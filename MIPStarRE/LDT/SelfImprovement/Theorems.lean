@@ -16,7 +16,13 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- An optimal primal/dual pair for the section's semidefinite program. -/
+/-- An optimal primal/dual pair for the section's semidefinite program.
+
+**Note on formulation:** The paper's SDP primal uses the weaker constraint `∑_g T_g ≤ I`,
+then proves `∑_g T_g = I` at optimality via the Slater condition. Our formalization
+takes `T : Measurement` (which enforces `total = 1`) directly — this is correct for
+the theorem statement (the optimum IS a measurement) but the proof will need the
+weaker `SubMeas` formulation internally. -/
 structure SdpOptimalPair (params : Parameters)
     (strategy : SymStrat params ι)
     (T : Measurement (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where

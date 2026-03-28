@@ -37,10 +37,12 @@ def restrictAxisParallelMeasurement (params : Parameters)
           outcome := fun f =>
             lifted.toSubMeas.outcome (liftAxisAnswer params x f)
           total := lifted.toSubMeas.total }
-        outcome_pos := sorry
-        total_eq_one := sorry
+        outcome_pos := fun f => lifted.outcome_pos (liftAxisAnswer params x f)
+        total_eq_one := lifted.total_eq_one
+        -- sorry: liftAxisAnswer is injective but not surjective; sum over restricted
+        -- domain does not equal sum over full domain
         sum_eq := sorry }
-      proj := sorry }
+      proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
 /-- Restrict a diagonal-line measurement to the slice at height `x`. -/
 def restrictDiagonalMeasurement (params : Parameters)
@@ -53,10 +55,12 @@ def restrictDiagonalMeasurement (params : Parameters)
           outcome := fun f =>
             lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
           total := lifted.toSubMeas.total }
-        outcome_pos := sorry
-        total_eq_one := sorry
+        outcome_pos := fun f => lifted.outcome_pos (liftDiagonalAnswer params x f)
+        total_eq_one := lifted.total_eq_one
+        -- sorry: liftDiagonalAnswer is injective but not surjective; sum over restricted
+        -- domain does not equal sum over full domain
         sum_eq := sorry }
-      proj := sorry }
+      proj := fun f => lifted.proj (liftDiagonalAnswer params x f) }
 
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
 def xRestrictedStrategy (params : Parameters)

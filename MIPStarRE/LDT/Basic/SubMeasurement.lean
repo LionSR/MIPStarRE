@@ -32,6 +32,8 @@ structure Measurement (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decid
 
 instance {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι] :
     Inhabited (Measurement α ι) where
+  -- sorry: default SubMeas has outcome=0 and total=0, but Measurement needs total=1
+  -- and outcome_pos/sum_eq for the zero submeasurement
   default := { outcome_pos := sorry, total_eq_one := sorry, sum_eq := sorry }
 
 /-- A paper-local projective submeasurement (each effect is idempotent). -/
@@ -50,6 +52,7 @@ structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decidabl
 
 instance {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι] :
     Inhabited (ProjMeas α ι) where
+  -- sorry: inherits from broken Measurement default (total=0 but needs total=1)
   default := { toMeasurement := default, proj := sorry }
 
 /-! ### Derived properties -/
@@ -152,8 +155,12 @@ noncomputable def completeSubMeas {α : Type*} {ι : Type*}
       | none => 1 - A.total
     total := 1
   }
+  -- sorry: SubMeas has no PSD/summation invariant; outcome_pos needs 0 ≤ A.outcome a
+  -- and 0 ≤ 1 - A.total, which require the submeasurement to actually be PSD
   outcome_pos := sorry
   total_eq_one := rfl
+  -- sorry: SubMeas has no PSD/summation invariant; proving ∑ a, outcome a = 1
+  -- requires knowing ∑ a, A.outcome a = A.total, which SubMeas does not guarantee
   sum_eq := sorry
 
 /-- Constant indexed family taking the same submeasurement on every question. -/

@@ -317,8 +317,12 @@ noncomputable def constructedPastedMeasurement (params : Parameters)
         else
           H.outcome h
       total := 1 }
+  -- sorry: underlying SubMeas has no PSD/summation invariant; outcome_pos needs
+  -- 0 ≤ H.outcome h (+ completionMass) which requires PSD of the sandwich construction
   outcome_pos := sorry
   total_eq_one := rfl
+  -- sorry: underlying SubMeas has no PSD/summation invariant; proving ∑ h, outcome h = 1
+  -- requires ∑ h, H.outcome h = H.total, which SubMeas does not guarantee
   sum_eq := sorry
 
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/

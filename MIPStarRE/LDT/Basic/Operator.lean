@@ -42,18 +42,18 @@ noncomputable def ev {ι : Type*} [Fintype ι] [DecidableEq ι]
   Complex.re <| MIPStarRE.Quantum.normalizedTrace (ψ.density * X)
 
 /-- Tensor product of two operators via Kronecker product. -/
-def opTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+abbrev opTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
     MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
   Matrix.kronecker A B
 
 /-- Left placement `A ⊗ I` on a bipartite space `ι₁ × ι₂`. -/
-def leftTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+abbrev leftTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (A : MIPStarRE.Quantum.Op ι₁) : MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
   Matrix.kronecker A 1
 
 /-- Right placement `I ⊗ B` on a bipartite space `ι₁ × ι₂`. -/
-def rightTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+abbrev rightTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (B : MIPStarRE.Quantum.Op ι₂) : MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
   Matrix.kronecker 1 B
 

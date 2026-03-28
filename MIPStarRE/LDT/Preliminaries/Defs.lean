@@ -162,8 +162,12 @@ noncomputable def completeAtOutcome {Outcome : Type*}
           B.outcome a
       total := 1
     }
+    -- sorry: same as completeSubMeas — SubMeas has no PSD/summation invariant;
+    -- outcome_pos needs 0 ≤ B.outcome a and 0 ≤ 1 - B.total
     outcome_pos := sorry
     total_eq_one := rfl
+    -- sorry: same as completeSubMeas — proving ∑ a, outcome a = 1
+    -- requires knowing ∑ a, B.outcome a = B.total, which SubMeas does not guarantee
     sum_eq := sorry
   }
 
