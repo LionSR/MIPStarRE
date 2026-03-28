@@ -41,7 +41,7 @@ structure ProjSubMeas (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
 
 instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (ProjSubMeas α ι) where
-  default := { toSubMeas := default, proj := fun _ => by simp [SubMeas.outcome] }
+  default := { toSubMeas := default, proj := fun _ => mul_zero _ }
 
 /-- A paper-local projective measurement (complete POVM + projective). -/
 structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [DecidableEq ι]
@@ -51,6 +51,37 @@ structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decidabl
 instance {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι] :
     Inhabited (ProjMeas α ι) where
   default := { toMeasurement := default, proj := sorry }
+
+/-! ### Derived properties -/
+
+/-- PSD outcomes are Hermitian. -/
+theorem Measurement.outcome_hermitian {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (M : Measurement α ι) (a : α) :
+    (M.outcome a)ᴴ = M.outcome a :=
+  (Matrix.nonneg_iff_posSemidef.mp (M.outcome_pos a)).isHermitian.eq
+
+/-- Each POVM element is bounded by the identity: `outcome a ≤ 1`.
+Proof: `outcome a = 1 - ∑_{b ≠ a} outcome b ≤ 1` since all terms are PSD. -/
+theorem Measurement.outcome_le_one {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (M : Measurement α ι) (a : α) :
+    M.outcome a ≤ 1 := by
+  sorry
+
+/-- Projective submeasurement outcomes are Hermitian (PSD from idempotence). -/
+theorem ProjSubMeas.outcome_hermitian {α : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι]
+    (P : ProjSubMeas α ι) (a : α) :
+    (P.outcome a)ᴴ = P.outcome a := by
+  sorry
+
+/-- Projective measurement outcomes are Hermitian (inherited from Measurement.outcome_pos). -/
+theorem ProjMeas.outcome_hermitian {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (P : ProjMeas α ι) (a : α) :
+    (P.outcome a)ᴴ = P.outcome a :=
+  Measurement.outcome_hermitian P.toMeasurement a
 
 abbrev IdxSubMeas (Question Outcome : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι] :=
   Question → SubMeas Outcome ι
