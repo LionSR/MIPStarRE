@@ -258,6 +258,15 @@ theorem ev_mul_comm_of_hermitian {ι : Type*} [Fintype ι] [DecidableEq ι]
     intro z; rw [Complex.star_def, Complex.conj_re]
   linarith [congr_arg Complex.re key, hre (MIPStarRE.Quantum.normalizedTrace (ψ.density * (A * B)))]
 
+/-- `ev` commutes on PSD operators (convenience wrapper). -/
+theorem ev_mul_comm_of_psd {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι)
+    (hA : 0 ≤ A) (hB : 0 ≤ B) :
+    ev ψ (A * B) = ev ψ (B * A) :=
+  ev_mul_comm_of_hermitian ψ A B
+    (Matrix.nonneg_iff_posSemidef.mp hA).isHermitian.eq
+    (Matrix.nonneg_iff_posSemidef.mp hB).isHermitian.eq
+
 /-- Cauchy-Schwarz for the state-weighted inner product:
 `(ev ψ (Aᴴ * B))² ≤ ev ψ (Aᴴ * A) * ev ψ (Bᴴ * B)`. -/
 theorem ev_cauchy_schwarz {ι : Type*} [Fintype ι] [DecidableEq ι]

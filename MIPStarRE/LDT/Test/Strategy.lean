@@ -13,11 +13,19 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT
 
-/-- Invariance predicate for the symmetric shared state.
-TODO(bipartite): for `ψ : QuantumState (ι × ι)`, this should assert SWAP-invariance
-`ψ.density = (SWAP ψ).density` where SWAP permutes the two tensor factors. -/
+/-- The SWAP reindexing on `ι × ι`: permutes the two tensor factors.
+`swapDensity M (i₁,i₂) (j₁,j₂) = M (i₂,i₁) (j₂,j₁)`. -/
+def swapDensity {ι : Type*} (M : MIPStarRE.Quantum.Op (ι × ι)) :
+    MIPStarRE.Quantum.Op (ι × ι) :=
+  Matrix.of fun (ij : ι × ι) (kl : ι × ι) => M (ij.2, ij.1) (kl.2, kl.1)
+
+/-- Permutation-invariance for a shared state.
+When `ι = ι₁ × ι₂`, this should be discharged via `ψ.density = swapDensity ψ.density`.
+The generic signature keeps `ι` arbitrary so that the bridge lemmas
+`twoNotionsOfSelfConsistency` and `closenessAfterCompletion_core` (which are
+parameterized over generic `ι`) can accept this hypothesis. -/
 structure PermInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (_ψ : QuantumState ι) : Prop where
+    (ψ : QuantumState ι) : Prop where
 
 /-- Paper-local symmetric strategy data. -/
 structure SymStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
