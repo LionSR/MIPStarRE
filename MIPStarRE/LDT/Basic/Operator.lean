@@ -232,11 +232,31 @@ theorem ev_mono {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- For Hermitian ρ, A, B: `ev ψ (A * B) = ev ψ (B * A)`.
 Follows from `ntr(ρ B A) = conj(ntr(ρ A B))` when all three are Hermitian,
 and Re is invariant under conjugation. -/
+private theorem normalizedTrace_conjTranspose {d : Type*} [Fintype d]
+    (X : MIPStarRE.Quantum.Op d) :
+    MIPStarRE.Quantum.normalizedTrace Xᴴ = star (MIPStarRE.Quantum.normalizedTrace X) := by
+  simp only [MIPStarRE.Quantum.normalizedTrace, Matrix.trace_conjTranspose]
+  rw [star_div₀, star_natCast]
+
 theorem ev_mul_comm_of_hermitian {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι)
     (hA : Aᴴ = A) (hB : Bᴴ = B) :
     ev ψ (A * B) = ev ψ (B * A) := by
-  sorry
+  simp only [ev]
+  have hρ : ψ.densityᴴ = ψ.density :=
+    (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd).isHermitian.eq
+  -- key: star(ntr(ρ(AB))) = ntr((ρAB)ᴴ) = ntr(BᴴAᴴρᴴ) = ntr(BAρ) = ntr(ρ(BA))
+  have key : star (MIPStarRE.Quantum.normalizedTrace (ψ.density * (A * B))) =
+      MIPStarRE.Quantum.normalizedTrace (ψ.density * (B * A)) := by
+    rw [← normalizedTrace_conjTranspose]
+    -- (ρ(AB))ᴴ = (AB)ᴴρᴴ = BᴴAᴴρᴴ = BAρ
+    rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, hA, hB, hρ]
+    -- goal: ntr((B * A) * ρ) = ntr(ρ * (B * A))
+    rw [MIPStarRE.Quantum.normalizedTrace_mul_comm]
+  -- Re(star z) = Re(z), so Re(ntr(ρ(AB))) = Re(ntr(ρ(BA)))
+  have hre : ∀ z : ℂ, Complex.re (star z) = Complex.re z := by
+    intro z; rw [Complex.star_def, Complex.conj_re]
+  linarith [congr_arg Complex.re key, hre (MIPStarRE.Quantum.normalizedTrace (ψ.density * (A * B)))]
 
 /-- Cauchy-Schwarz for the state-weighted inner product:
 `(ev ψ (Aᴴ * B))² ≤ ev ψ (Aᴴ * A) * ev ψ (Bᴴ * B)`. -/
