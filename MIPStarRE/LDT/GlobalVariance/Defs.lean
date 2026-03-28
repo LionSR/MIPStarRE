@@ -104,21 +104,31 @@ noncomputable def pointConditionedGlobalVariance (params : Parameters)
   avgOver (polynomialDistribution params)
     (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
 
-/-- The event operator `B^ℓ_[f(u)=g(u)]`.
-Placeholder: returns total of the line measurement. -/
-def generalizeBLeftOperatorAtPolynomial (params : Parameters)
+/-- The event operator `B^ℓ_{[f(u)=g(u)]}`: sum of axis-line measurement
+outcomes `f` that evaluate to the same value as `g` at point `u`. -/
+noncomputable def generalizeBLeftOperatorAtPolynomial (params : Parameters)
     (strategy : SymStrat params ι)
-    (_g : Polynomial params)
+    (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) : MIPStarRE.Quantum.Op ι :=
-  (strategy.axisParallelMeasurement qu.1).toSubMeas.total
+  let (ℓ, u) := qu
+  ∑ f : AxisLinePolynomial params,
+    if f.poly.eval (decodeScalar (u ℓ.direction)) =
+       decodeScalar (g u)
+    then (strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f
+    else 0
 
-/-- The event operator `B^ℓ_[f = g|_ℓ]`.
-Placeholder: returns total of the line measurement. -/
-def generalizeBRightOperatorAtPolynomial (params : Parameters)
+/-- The event operator `B^ℓ_{[f = g|_ℓ]}`: sum of axis-line measurement
+outcomes `f` that agree with `g` restricted to line `ℓ`. -/
+noncomputable def generalizeBRightOperatorAtPolynomial (params : Parameters)
     (strategy : SymStrat params ι)
-    (_g : Polynomial params)
+    (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) : MIPStarRE.Quantum.Op ι :=
-  (strategy.axisParallelMeasurement qu.1).toSubMeas.total
+  let ℓ := qu.1
+  let gRestricted := Polynomial.restrictToAxisParallelLine params g ℓ
+  ∑ f : AxisLinePolynomial params,
+    if f.poly = gRestricted.poly
+    then (strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f
+    else 0
 
 /-- The weighted left operator in `lem:generalize-b`
 on the bipartite space `d * d`. -/
