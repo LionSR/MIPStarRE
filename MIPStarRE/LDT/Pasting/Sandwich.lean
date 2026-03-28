@@ -317,6 +317,9 @@ noncomputable def constructedPastedMeasurement (params : Parameters)
         else
           H.outcome h
       total := 1 }
+  outcome_pos := sorry
+  total_eq_one := rfl
+  sum_eq := sorry
 
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/
 noncomputable def verticalLineMeasurementFamily (params : Parameters)

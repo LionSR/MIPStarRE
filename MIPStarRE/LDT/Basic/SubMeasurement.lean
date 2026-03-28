@@ -10,6 +10,8 @@ All operator fields now use `Op ι` (i.e., `Matrix ι ι ℂ`) directly with
 a generic `Fintype` index `ι`.
 -/
 
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
 namespace MIPStarRE.LDT
 
 /-- A paper-local submeasurement with outcomes in `α` and Hilbert space index `ι`. -/
@@ -21,45 +23,50 @@ instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (SubMeas α ι) where
   default := {}
 
-/-- A paper-local measurement (submeasurement whose effects sum to the identity).
-TODO: add `[Fintype α]` and `sum_eq : total = ∑ a, outcome a` once downstream is ready. -/
-structure Measurement (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
-    extends SubMeas α ι
+/-- A paper-local measurement: a POVM whose PSD effects sum to the identity. -/
+structure Measurement (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [DecidableEq ι]
+    extends SubMeas α ι where
+  outcome_pos : ∀ a, 0 ≤ outcome a
+  total_eq_one : total = 1
+  sum_eq : ∑ a, outcome a = 1
 
-instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
+instance {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι] :
     Inhabited (Measurement α ι) where
-  default := { toSubMeas := default }
+  default := { outcome_pos := sorry, total_eq_one := sorry, sum_eq := sorry }
 
-/-- A paper-local projective submeasurement (each effect is idempotent).
-TODO: add `proj : ∀ a, outcome a * outcome a = outcome a` once downstream is ready. -/
+/-- A paper-local projective submeasurement (each effect is idempotent). -/
 structure ProjSubMeas (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
-    extends SubMeas α ι
+    extends SubMeas α ι where
+  proj : ∀ a, outcome a * outcome a = outcome a
 
 instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (ProjSubMeas α ι) where
-  default := { toSubMeas := default }
+  default := { toSubMeas := default, proj := sorry }
 
-/-- A paper-local projective measurement (complete + projective).
-TODO: add both `sum_eq` and `proj` conditions once downstream is ready. -/
-structure ProjMeas (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
-    extends Measurement α ι
+/-- A paper-local projective measurement (complete POVM + projective). -/
+structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [DecidableEq ι]
+    extends Measurement α ι where
+  proj : ∀ a, outcome a * outcome a = outcome a
 
-instance {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] :
+instance {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι] :
     Inhabited (ProjMeas α ι) where
-  default := { toMeasurement := default }
+  default := { toMeasurement := default, proj := sorry }
 
 abbrev IdxSubMeas (Question Outcome : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι] :=
   Question → SubMeas Outcome ι
-abbrev IdxMeas (Question Outcome : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι] :=
+abbrev IdxMeas (Question Outcome : Type*) (ι : Type*)
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι] :=
   Question → Measurement Outcome ι
 abbrev IdxProjSubMeas (Question Outcome : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι] :=
   Question → ProjSubMeas Outcome ι
-abbrev IdxProjMeas (Question Outcome : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι] :=
+abbrev IdxProjMeas (Question Outcome : Type*) (ι : Type*)
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι] :=
   Question → ProjMeas Outcome ι
 
 namespace IdxMeas
 
-def toIdxSubMeas {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+def toIdxSubMeas {Question Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (A : IdxMeas Question Outcome ι) :
     IdxSubMeas Question Outcome ι :=
   fun q => (A q).toSubMeas
@@ -77,19 +84,19 @@ end IdxProjSubMeas
 
 namespace IdxProjMeas
 
-def toIdxMeas {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+def toIdxMeas {Question Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (A : IdxProjMeas Question Outcome ι) :
     IdxMeas Question Outcome ι :=
   fun q => (A q).toMeasurement
 
-def toIdxSubMeas {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+def toIdxSubMeas {Question Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (A : IdxProjMeas Question Outcome ι) :
     IdxSubMeas Question Outcome ι :=
   fun q => (A q).toSubMeas
 
 end IdxProjMeas
-
-open scoped BigOperators
 
 /-- Post-process the outcomes of a submeasurement. The processed operator at `b` is the
 sum of the operators of all `a` with `f a = b`. -/
@@ -105,7 +112,8 @@ noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [Decidab
   }
 
 /-- Complete a submeasurement by adjoining a distinguished failure outcome. -/
-def completeSubMeas {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def completeSubMeas {α : Type*} {ι : Type*}
+    [Fintype α] [DecidableEq α] [Fintype ι] [DecidableEq ι]
     (A : SubMeas α ι) : Measurement (Option α) ι where
   toSubMeas := {
     outcome := fun
@@ -113,6 +121,9 @@ def completeSubMeas {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
       | none => 1 - A.total
     total := 1
   }
+  outcome_pos := sorry
+  total_eq_one := rfl
+  sum_eq := sorry
 
 /-- Constant indexed family taking the same submeasurement on every question. -/
 def constSubMeasFamily {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -135,7 +146,7 @@ def IdxSubMeas.liftLeft {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
 /-- Lift an indexed projective measurement family to an indexed submeasurement family
 on the left tensor factor. -/
 def IdxProjMeas.toIdxSubMeasLeft {Question Outcome : Type*} {ι : Type*}
-    [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (A : IdxProjMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι) :=
   (IdxProjMeas.toIdxSubMeas A).liftLeft
 

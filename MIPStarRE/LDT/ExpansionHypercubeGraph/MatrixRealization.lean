@@ -50,10 +50,10 @@ def hypercubeEdgePairFinset (params : Parameters) : Finset (Point params × Poin
   Finset.univ.filter (fun uv => IsHypercubeEdge params uv.1 uv.2)
 
 /-- Bridge to the nonuniform hypercube edge distribution from the source. -/
--- TODO: placeholder — returns `rerandomizeCoord` but should be the actual nonuniform distribution
+-- TODO: placeholder — should be the actual nonuniform distribution
 noncomputable def matrixHypercubeEdgeDistribution (params : Parameters) :
     Distribution (Point params × Point params) :=
-  rerandomizeCoord params
+  sorry
 
 /-- The rank-one projector `|u⟩⟨u|` on the vertex register. -/
 def pointBasisProjectorMatrix (params : Parameters) (u : Point params) :

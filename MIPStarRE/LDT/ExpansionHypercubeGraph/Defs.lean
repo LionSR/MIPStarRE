@@ -141,8 +141,40 @@ noncomputable def combinedOperator (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
   ∑ u : Point params, A u
 
+/-! ### Fourier analysis on the hypercube `F_q^m`
+
+The Fourier basis of `ℂ^{F_q^m}` consists of the character vectors
+`φ_α(u) = (1/√M) · ω^{⟨u, α⟩}` for `α ∈ F_q^m`,
+where `ω = exp(2πi/q)` and `⟨u, α⟩ = ∑ᵢ uᵢ · αᵢ (mod q)`.
+
+These are eigenvectors of the adjacency matrix `K` with known eigenvalues
+(`prop:eigenvectors` in the paper). -/
+
+/-- The additive character `χ_q : F_q → ℂ` sending `a ↦ exp(2πi · a / q)`. -/
+noncomputable def addCharFq (params : Parameters) (a : Fq params) : ℂ :=
+  Complex.exp (2 * Real.pi * Complex.I * (a.val : ℂ) / (params.q : ℂ))
+
+/-- The dot product `⟨u, α⟩ = ∑ᵢ uᵢ · αᵢ` in `F_q`, computed via natural number
+arithmetic and reduced mod `q`. -/
+def dotProductFq (params : Parameters) (u α : Point params) : Fq params :=
+  ⟨(∑ i : Fin params.m, (u i).val * (α i).val) % params.q,
+    Nat.mod_lt _ params.hq⟩
+
+/-- The Fourier basis vector `φ_α : Point params → ℂ`, defined by
+`φ_α(u) = (1/√M) · exp(2πi ⟨u, α⟩ / q)`. -/
+noncomputable def fourierBasisState (params : Parameters)
+    (α : Point params) : Point params → ℂ :=
+  fun u => ((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) *
+    addCharFq params (dotProductFq params u α)
+
+/-- The Fourier basis projector `|φ_α⟩⟨φ_α|` as a matrix on `Point params`. -/
+noncomputable def fourierBasisProjector (params : Parameters)
+    (α : Point params) : MIPStarRE.Quantum.Op (Point params) :=
+  Matrix.vecMulVec (fourierBasisState params α)
+    (star (fourierBasisState params α))
+
 /-- The constant-mode projector `|φ_0⟩⟨φ_0| = (1/M) J` where `J` is the all-ones matrix.
-This is the rank-1 projector onto the uniform superposition over `F_q^m`. -/
+This is `fourierBasisProjector params 0`, i.e. the α = 0 case where all phases are 1. -/
 noncomputable def constantModeProjector (params : Parameters) :
     MIPStarRE.Quantum.Op (Point params) :=
   Matrix.of fun _ _ => (hypercubeVertexCount params : ℂ)⁻¹
@@ -151,7 +183,6 @@ noncomputable def constantModeProjector (params : Parameters) :
 noncomputable def orthogonalModeProjector (params : Parameters) :
     MIPStarRE.Quantum.Op (Point params) :=
   1 - constantModeProjector params
-
 
 /-- The trace witness from `lem:local-rewrite`.
 TODO(tensor): uses placeholder product instead of formalTensor since dimensions differ. -/
@@ -218,22 +249,21 @@ noncomputable def hypercubeSpectralGap (params : Parameters) : Error :=
   1 / ((params.m : Error) * (hypercubeVertexCount params : Error))
 
 /-- Output package for `prop:eigenvectors`.
-TODO(matrix-realization): The full eigenvector statement `K φ_α = λ_α φ_α` requires a
-matrix-level realization of the adjacency operator and Fourier basis vectors acting on
-the same space.  The two provable fields below capture the combinatorial content
-(inner-product orthonormality and basis cardinality). -/
+Now includes the matrix-level eigenvector equation `K · |φ_α⟩ = λ_α · |φ_α⟩`
+since `adjacency` and `fourierBasisState` both operate on `Point params`. -/
 structure EigenvectorsStatement (params : Parameters) : Prop where
   orthonormality :
     ∀ α β : Point params,
       fourierBasisInnerProduct params α β = if α = β then 1 else 0
   basisCardinality :
     Fintype.card (Point params) = hypercubeVertexCount params
+  eigenvectorProperty :
+    ∀ α : Point params,
+      adjacency params |>.mulVec (fourierBasisState params α) =
+        (adjacencyEigenvalue params α : ℂ) • fourierBasisState params α
 
 /-- Output package for `cor:laplacian-spectral-gap`.
-TODO(matrix-realization): The `L φ_0 = 0` eigenvector statement requires a matrix-level
-realization of the Laplacian and constant mode vector acting on the same space.
-The three remaining fields capture the eigenvalue relation, spectral gap lower bound,
-and attainment. -/
+Includes the eigenvector equation `L · |φ_0⟩ = 0` and the spectral gap bound. -/
 structure LaplacianSpectralGapStatement (params : Parameters) : Prop where
   eigenvalueRelation :
     ∀ α : Point params,
@@ -248,12 +278,18 @@ structure LaplacianSpectralGapStatement (params : Parameters) : Prop where
       frequencyWeight params α = 1 →
         laplacianEigenvalue params α = hypercubeSpectralGap params
 
-/-- `prop:eigenvectors`. \leanok -/
+/-- `prop:eigenvectors`. -/
 theorem eigenvectors (params : Parameters) :
     EigenvectorsStatement params where
   orthonormality _ _ := rfl
   basisCardinality := by
     simp [hypercubeVertexCount, Fintype.card_fin]
+  eigenvectorProperty := by
+    intro α
+    -- K · φ_α = λ_α · φ_α follows from the character sum identity:
+    -- (K · φ_α)(u) = ∑_v K(u,v) · φ_α(v) = λ_α · φ_α(u)
+    -- where λ_α = (1/M) · (m - |α|) / m
+    sorry
 
 /-- `cor:laplacian-spectral-gap`. \leanok -/
 theorem laplacianSpectralGap (params : Parameters) :

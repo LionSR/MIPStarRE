@@ -26,8 +26,8 @@ def distinctTuples (params : Parameters) (k : ℕ) : Set (PointTuple params k) :
   { xs | Function.Injective xs }
 
 /-- TODO: Should be uniform on pairwise-distinct `k`-tuples from `Fq`; currently a named placeholder. -/
-def distinctTupleDistribution (params : Parameters) (k : ℕ) :
-    Distribution (PointTuple params k) where
+noncomputable def distinctTupleDistribution (params : Parameters) (k : ℕ) :
+    Distribution (PointTuple params k) := sorry
 
 /-- Placeholder outcome type for the completed family `\widehat G`. -/
 abbrev GHatOutcome (params : Parameters) := Option (Polynomial params)
@@ -103,11 +103,9 @@ uses a first-available slice stand-in instead of the honest interpolation formul
 noncomputable def interpolateCompletedSlices (params : Parameters) :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
   | 0, _xs, _gs => fallbackInterpolatedPolynomial params
-  | k + 1, xs, gs =>
+  | k + 1, _xs, gs =>
       if params.d + 1 ≤ nonBottomSliceCount gs then
-        match gs 0 with
-        | some g => Polynomial.appendAtHeight params g (xs 0)
-        | none => interpolateCompletedSlices params k (pointTupleTail xs) (gHatTupleOutcomeTail gs)
+        sorry -- TODO: honest interpolation from available slices
       else
         fallbackInterpolatedPolynomial params
 

@@ -77,12 +77,12 @@ noncomputable def pointMeasurementProductRight (params : Parameters)
       reversedProductSubMeas Au Av
 
 /-- Distribution obtained by sampling a diagonal line together with a parameter on that line. -/
-def pointWithDiagonalLineDistribution (params : Parameters) :
-    Distribution (PointDiagonalLineQuestion params) where
+noncomputable def pointWithDiagonalLineDistribution (params : Parameters) :
+    Distribution (PointDiagonalLineQuestion params) := sorry
 
 /-- Distribution obtained by sampling a diagonal line together with two parameters on it. -/
-def pointPairSharedDiagonalLineDistribution (params : Parameters) :
-    Distribution (PointPairDiagonalLineQuestion params) where
+noncomputable def pointPairSharedDiagonalLineDistribution (params : Parameters) :
+    Distribution (PointPairDiagonalLineQuestion params) := sorry
 
 /-- The point measurement, reindexed by a sampled diagonal line and a parameter on it. -/
 def sampledPointMeasurement (params : Parameters)

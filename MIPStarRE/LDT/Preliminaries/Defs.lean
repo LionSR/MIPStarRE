@@ -47,6 +47,7 @@ structure ConsAgreement {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
 /-- Family for the intermediate `A_a B_a A_a` sandwich. -/
 noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) :
     IdxSubMeas Question Outcome ι :=
@@ -59,6 +60,7 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
 /-- Family for the intermediate `A_a (Σ_b B_b) A_a` sandwich. -/
 noncomputable def totalSandwichFamily {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) :
     IdxSubMeas Question Outcome ι :=
@@ -147,11 +149,11 @@ structure CompTransferStmt {Question Outcome : Type*}
 /-- Canonical completion of `B` by adjoining the residual `I - Σ_a B_a`
 to the distinguished outcome `a0`. -/
 noncomputable def completeAtOutcome {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (B : SubMeas Outcome ι) (a0 : Outcome) : Measurement Outcome ι := by
   classical
   let residual := 1 - B.total
-  refine {
+  exact {
     toSubMeas := {
       outcome := fun a =>
         if h : a = a0 then
@@ -160,6 +162,9 @@ noncomputable def completeAtOutcome {Outcome : Type*}
           B.outcome a
       total := 1
     }
+    outcome_pos := sorry
+    total_eq_one := rfl
+    sum_eq := sorry
   }
 
 /-- Output package for `prop:completing-to-measurement`. -/

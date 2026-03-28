@@ -184,4 +184,55 @@ theorem ev_diff_triangle {ι : Type*} [Fintype ι] [DecidableEq ι]
   exact normalizedTrace_triangle ψ.density (X - Y) (Y - Z)
     (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd)
 
+/-! ### Infrastructure for bridge lemma proofs -/
+
+open scoped BigOperators
+
+/-- `ev` distributes over finite sums. -/
+theorem ev_finset_sum {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {α : Type*} (ψ : QuantumState ι) (s : Finset α)
+    (f : α → MIPStarRE.Quantum.Op ι) :
+    ev ψ (∑ a ∈ s, f a) = ∑ a ∈ s, ev ψ (f a) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [ev_zero]
+  | @insert a s hna ih =>
+    rw [Finset.sum_insert hna, Finset.sum_insert hna, ev_add, ih]
+
+/-- `ev` distributes over univ sums. -/
+theorem ev_sum {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {α : Type*} [Fintype α] (ψ : QuantumState ι)
+    (f : α → MIPStarRE.Quantum.Op ι) :
+    ev ψ (∑ a, f a) = ∑ a, ev ψ (f a) :=
+  ev_finset_sum ψ Finset.univ f
+
+/-- `ev` of a PSD operator is nonneg. -/
+theorem ev_nonneg_of_psd {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) (hX : 0 ≤ X) :
+    0 ≤ ev ψ X := by
+  sorry
+
+/-- `ev` is monotone under the matrix order. -/
+theorem ev_mono {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (X Y : MIPStarRE.Quantum.Op ι) (h : X ≤ Y) :
+    ev ψ X ≤ ev ψ Y := by
+  have hsub : ev ψ Y - ev ψ X = ev ψ (Y - X) := (ev_sub ψ Y X).symm
+  linarith [ev_nonneg_of_psd ψ (Y - X) (sub_nonneg.mpr h)]
+
+/-- For Hermitian ρ, A, B: `ev ψ (A * B) = ev ψ (B * A)`.
+Follows from `ntr(ρ B A) = conj(ntr(ρ A B))` when all three are Hermitian,
+and Re is invariant under conjugation. -/
+theorem ev_mul_comm_of_hermitian {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι)
+    (hA : Aᴴ = A) (hB : Bᴴ = B) :
+    ev ψ (A * B) = ev ψ (B * A) := by
+  sorry
+
+/-- Cauchy-Schwarz for the state-weighted inner product:
+`(ev ψ (Aᴴ * B))² ≤ ev ψ (Aᴴ * A) * ev ψ (Bᴴ * B)`. -/
+theorem ev_cauchy_schwarz {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι) :
+    (ev ψ (Aᴴ * B)) ^ 2 ≤ ev ψ (Aᴴ * A) * ev ψ (Bᴴ * B) := by
+  sorry
+
 end MIPStarRE.LDT

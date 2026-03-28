@@ -31,27 +31,26 @@ abbrev DegreeBoundedLineAnswer (params : Parameters) :=
   Fq params → Fq params
 
 /-- The distribution of an axis-parallel line together with a point queried on it. -/
-def axisParallelLineQuestionDistribution (params : Parameters) :
+noncomputable def axisParallelLineQuestionDistribution (params : Parameters) :
     Distribution (AxisParallelLineQuestion params) :=
-  {}
+  sorry
 
 /-- A placeholder distribution over low-degree polynomials. -/
-def polynomialDistribution (params : Parameters) :
+noncomputable def polynomialDistribution (params : Parameters) :
     Distribution (Polynomial params) :=
-  {}
+  sorry
 
 /-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`. -/
 noncomputable def polynomialWeightSqrtOperator (params : Parameters)
     (G : SubMeas (Polynomial params) ι) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  G.outcome g -- TODO: should be matrix square root
+  sorry -- TODO: should be matrix square root of G.outcome g
 
 /-- The weighted state `|ψ_g⟩ = (I ⊗ G_g^{1/2}) |ψ⟩`. -/
--- TODO: placeholder — density left at defaults until tensor product model is provided.
 noncomputable def weightedPolynomialState (params : Parameters)
     (strategy : SymStrat params ι)
-    (_G : SubMeas (Polynomial params) ι) (_g : Polynomial params) :
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) :
     QuantumState (ι × ι) :=
-  strategy.state
+  sorry
 
 /-- The concrete operator `A^u_{g(u)}` for a fixed polynomial `g`. -/
 def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters)

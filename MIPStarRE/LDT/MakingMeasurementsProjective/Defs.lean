@@ -160,7 +160,7 @@ structure MatrixRoundedProjectiveWitness {Outcome : Type*}
 
 /-- Output package for the paper's Naimark dilation theorem. -/
 structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
-    (ι : Type*) [Fintype ι] [DecidableEq ι] where
+    (ι : Type*) [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι] where
   auxStateA : QuantumState ι
   auxStateB : QuantumState ι
   liftedState : QuantumState ι
@@ -168,7 +168,7 @@ structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
   right : IdxProjMeas QuestionB OutcomeB ι
 
 instance {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι] :
+    {ι : Type*} [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι] :
     Inhabited (NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) where
   default := { auxStateA := {}, auxStateB := {}, liftedState := {},
                left := fun _ => default, right := fun _ => default }
@@ -177,7 +177,7 @@ instance {QuestionA OutcomeA QuestionB OutcomeB : Type*}
 -- TODO: placeholder — `density` left at defaults until
 -- a concrete tensor product model is provided.
 def naimarkAuxiliaryState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ι : Type*} [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
     (_data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) : QuantumState ι :=
   {}
 
@@ -185,7 +185,7 @@ def naimarkAuxiliaryState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
 -- TODO: placeholder — `density` left at defaults until
 -- a concrete tensor product model is provided.
 def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ι : Type*} [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
     (_ψ : QuantumState ι)
     (_data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) : QuantumState ι :=
   {}
