@@ -153,13 +153,13 @@ noncomputable def incompletePartTotalProductRight (params : Parameters)
         (incompletePartSubMeas params family q.1)
 
 /-- Left tensor-placement for `\widehat G^x_g`. -/
-def gHatSelfConsistencyLeftFamily (params : Parameters)
+noncomputable def gHatSelfConsistencyLeftFamily (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) (GHatOutcome params) (ι × ι) :=
   fun x => leftPlacedSubMeas (ιB := ι) ((gHatIdxMeas params family x).toSubMeas)
 
 /-- Right tensor-placement for `\widehat G^x_g`. -/
-def gHatSelfConsistencyRightFamily (params : Parameters)
+noncomputable def gHatSelfConsistencyRightFamily (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) (GHatOutcome params) (ι × ι) :=
   fun x => rightPlacedSubMeas (ιA := ι) ((gHatIdxMeas params family x).toSubMeas)

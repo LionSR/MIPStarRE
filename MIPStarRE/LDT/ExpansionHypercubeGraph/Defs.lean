@@ -259,7 +259,7 @@ structure EigenvectorsStatement (params : Parameters) : Prop where
     Fintype.card (Point params) = hypercubeVertexCount params
   eigenvectorProperty :
     ∀ α : Point params,
-      adjacency params |>.mulVec (fourierBasisState params α) =
+      (adjacency params).mulVec (fourierBasisState params α) =
         (adjacencyEigenvalue params α : ℂ) • fourierBasisState params α
 
 /-- Output package for `cor:laplacian-spectral-gap`.

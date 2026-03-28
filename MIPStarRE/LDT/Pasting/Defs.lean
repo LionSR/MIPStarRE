@@ -18,7 +18,6 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
-
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- The set of `k`-tuples with distinct coordinates. -/
@@ -120,14 +119,16 @@ noncomputable def incompletePartSubMeas (params : Parameters)
   let X := 1 - (completePartSubMeas params family x).total
   { outcome := fun _ => X, total := X }
 
+open Classical in
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
-def gHatIdxMeas (params : Parameters)
+noncomputable def gHatIdxMeas (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxMeas (Fq params) (GHatOutcome params) ι :=
   fun x => completeSubMeas ((family.meas x).toSubMeas)
 
+open Classical in
 /-- The submeasurement view of the completed family `\widehat G`. -/
-def gHatIdxSubMeas (params : Parameters)
+noncomputable def gHatIdxSubMeas (params : Parameters)
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (Fq params) (GHatOutcome params) ι :=
   IdxMeas.toIdxSubMeas (gHatIdxMeas params family)
