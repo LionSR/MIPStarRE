@@ -32,12 +32,11 @@ def restrictAxisParallelMeasurement (params : Parameters)
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι :=
   fun ℓ =>
     let lifted := strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)
-    let sm : SubMeas (AxisLinePolynomial params) ι :=
-      { outcome := fun f =>
-          lifted.toSubMeas.outcome (liftAxisAnswer params x f)
-        total := lifted.toSubMeas.total }
-    { toMeasurement :=
-      { toSubMeas := sm
+    { toMeasurement := {
+        toSubMeas := {
+          outcome := fun f =>
+            lifted.toSubMeas.outcome (liftAxisAnswer params x f)
+          total := lifted.toSubMeas.total }
         outcome_pos := sorry
         total_eq_one := sorry
         sum_eq := sorry }
@@ -49,12 +48,11 @@ def restrictDiagonalMeasurement (params : Parameters)
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι :=
   fun ℓ =>
     let lifted := strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)
-    let sm : SubMeas (DiagonalLinePolynomial params) ι :=
-      { outcome := fun f =>
-          lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
-        total := lifted.toSubMeas.total }
-    { toMeasurement :=
-      { toSubMeas := sm
+    { toMeasurement := {
+        toSubMeas := {
+          outcome := fun f =>
+            lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
+          total := lifted.toSubMeas.total }
         outcome_pos := sorry
         total_eq_one := sorry
         sum_eq := sorry }

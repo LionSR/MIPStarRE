@@ -210,7 +210,15 @@ theorem ev_sum {ι : Type*} [Fintype ι] [DecidableEq ι]
 theorem ev_nonneg_of_psd {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) (hX : 0 ≤ X) :
     0 ≤ ev ψ X := by
-  sorry
+  simp only [ev]
+  unfold MIPStarRE.Quantum.normalizedTrace
+  classical
+  simp only [Complex.div_natCast_re]
+  apply div_nonneg
+  · have hρ := Matrix.nonneg_iff_posSemidef.mp ψ.density_psd
+    have hXpsd := Matrix.nonneg_iff_posSemidef.mp hX
+    exact (Complex.nonneg_iff.mp (hρ.mul hXpsd).trace_nonneg).1
+  · exact Nat.cast_nonneg _
 
 /-- `ev` is monotone under the matrix order. -/
 theorem ev_mono {ι : Type*} [Fintype ι] [DecidableEq ι]

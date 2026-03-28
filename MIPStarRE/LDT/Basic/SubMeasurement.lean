@@ -113,7 +113,7 @@ noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [Decidab
 
 /-- Complete a submeasurement by adjoining a distinguished failure outcome. -/
 noncomputable def completeSubMeas {α : Type*} {ι : Type*}
-    [Fintype α] [DecidableEq α] [Fintype ι] [DecidableEq ι]
+    [Fintype α] [Fintype ι] [DecidableEq ι]
     (A : SubMeas α ι) : Measurement (Option α) ι where
   toSubMeas := {
     outcome := fun
