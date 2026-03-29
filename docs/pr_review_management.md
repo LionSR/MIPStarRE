@@ -59,7 +59,7 @@ The REST API `line` field is unreliable for determining if a comment is addresse
 **Use GraphQL instead** — it has explicit `isResolved` and `isOutdated` fields:
 
 ```bash
-REPO_OWNER="LionSR"; REPO_NAME="TNLean"; PR=133
+REPO_OWNER="LionSR"; REPO_NAME="MIPStarRE"; PR=133
 gh api graphql -f query='{
   repository(owner: "'$REPO_OWNER'", name: "'$REPO_NAME'") {
     pullRequest(number: '$PR') {
@@ -108,7 +108,7 @@ Three SEPARATE places comments live on a PR. Must check ALL three.
 
 ### Quick check script for all comments on a PR:
 ```bash
-REPO="LionSR/TNLean"; PR=198
+REPO="LionSR/MIPStarRE"; PR=198
 # 1. Inline (Bugbot line-level findings)
 gh api "repos/$REPO/pulls/$PR/comments" --jq '.[] | "INLINE [\(.user.login)] \(.path):\(.line) — \(.body[:120])"'
 # 2. PR-level (Claude reviews, human comments)  

@@ -29,7 +29,7 @@ tools:
     - "git log --oneline"
     - "ls"
     - "find blueprint -type f"
-    - "find TNLean -type f -name *.lean"
+    - "find MIPStarRE -type f -name *.lean"
     - "grep -rn *"
     - "sed -n *"
     - "python3 *"
@@ -49,7 +49,7 @@ safe-outputs:
 
 # Blueprint ↔ Lean Sync
 
-Keep the blueprint `.tex` annotations (`\lean{}`, `\leanok`) in sync with the actual Lean 4 source code in `TNLean/`.
+Keep the blueprint `.tex` annotations (`\lean{}`, `\leanok`) in sync with the actual Lean 4 source code in `MIPStarRE/`.
 
 ## Background
 
@@ -84,11 +84,11 @@ Review the output carefully. It will report:
 For each reported issue, determine the root cause:
 
 1. **Renamed declaration**: The Lean decl was renamed but the `.tex` wasn't updated.
-   - Search for likely matches: `grep -rn "partial_old_name" TNLean/`
+   - Search for likely matches: `grep -rn "partial_old_name" MIPStarRE/`
    - Update the `\lean{OldName}` to `\lean{NewName}` in the `.tex` file.
 
 2. **Moved to different namespace**: The declaration moved namespaces.
-   - Search broadly: `grep -rn "short_name" TNLean/`
+   - Search broadly: `grep -rn "short_name" MIPStarRE/`
    - Update the fully-qualified name in `\lean{}`.
 
 3. **Deleted declaration**: The Lean declaration was intentionally removed.
@@ -113,7 +113,7 @@ python3 scripts/blueprint_lean_sync.py --root . --ci
 Look at recent commits (last 14 days) that added new Lean declarations:
 
 ```bash
-git log --since="14 days ago" --name-only --pretty=format: -- 'TNLean/**/*.lean' | sort -u
+git log --since="14 days ago" --name-only --pretty=format: -- 'MIPStarRE/**/*.lean' | sort -u
 ```
 
 For each new `.lean` file or significantly changed file, check if corresponding blueprint items should gain `\leanok` or `\lean{}` annotations. Specifically:
@@ -123,7 +123,7 @@ For each new `.lean` file or significantly changed file, check if corresponding 
 
 To check for `sorry` in declarations:
 ```bash
-grep -n "sorry" TNLean/path/to/file.lean
+grep -n "sorry" MIPStarRE/path/to/file.lean
 ```
 
 ## Scope rules

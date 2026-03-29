@@ -152,15 +152,15 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             You are a pure mathematician and Lean 4 formalization expert writing a daily
-            standup summary for the TNLean repository (${{ github.repository }}).
+            standup summary for the MIPStarRE repository (${{ github.repository }}).
 
-            TNLean is a formalization of results in quantum information theory, grounded
-            in the rigorous mathematical framework of operator algebras, tensor products,
-            and finite-dimensional Hilbert spaces. The project covers:
-            - The Fundamental Theorem of Matrix Product States (MPS) and their canonical forms
-            - Quantum Wielandt theory (convergence of quantum channel iterations)
-            - Quantum channel theory following Wolf's "Quantum Channels & Operations"
-            - Spectral theory, PEPS, and algebraic foundations in Mathlib
+            MIPStarRE is a formalization of results around MIP* = RE, grounded in quantum
+            complexity theory, nonlocal games, and the theory of operator algebras. The
+            project's current active track covers:
+            - Quantum soundness of the classical low individual degree test (arXiv:2009.12982)
+            - Self-improvement, pasting, and commutativity of quantum strategies
+            - Expansion properties of hypercube graphs
+            - Foundations of quantum measurements and finite-dimensional operator algebras
 
             Write with the voice of a working mathematician: precise, structurally aware,
             and attentive to the logical dependencies between results. When discussing
@@ -218,9 +218,8 @@ jobs:
             - Which `sorry` obligations were discharged, and what was the proof strategy?
             - Note the key Mathlib lemmas or tactics that made proofs go through
             - Identify any new definitions, structures, or type classes introduced
-            - Reference the relevant mathematical context (e.g., "proved that the
-              transfer matrix of an injective MPS has full rank, completing Lemma 3.2
-              of the blueprint")
+            - Reference the relevant mathematical context (e.g., "proved quantum soundness
+              of the self-improvement step, completing Theorem 7.2 of the blueprint")
 
             ## Proof Engineering & Refactors
             - API lemmas, simp lemmas, or coercions added to smooth future work
@@ -237,7 +236,7 @@ jobs:
             - Proof obligations (`sorry`) that remain and what approaches are being considered
             - Mathematical questions arising from the formalization
             - Decisions on proof strategy that need input (e.g., "should we formalize
-              the spectral theorem via Mathlib's eigenvalue API or build directly?")
+              the expansion lemma via Mathlib's spectral graph API or build directly?")
             - Dependencies between open tasks
 
             ## Activity Summary
@@ -249,13 +248,13 @@ jobs:
             Guidelines:
             - Be precise and mathematically literate — this is for a team of
               mathematicians and formalization experts
-            - Use proper mathematical terminology (e.g., "completely positive map"
-              not "channel function", "tensor product" not "combined space")
+            - Use proper mathematical terminology (e.g., "projective measurement"
+              not "measurement function", "nonlocal game" not "game protocol")
             - Reference PR/issue numbers (e.g., #123) and file paths where relevant
             - If there was no activity, state so briefly
             - Prioritize mathematical substance over engineering details
             - Demand clarity: every claim should be specific and verifiable. Do not
-              write vague summaries like "progress was made on MPS theory". Instead,
+              write vague summaries like "progress was made on LDT theory". Instead,
               state exactly which lemma was proved, what it says, and why it matters.
             - Write the issue as a self-contained document. The reader has no context
               about how you investigated — they only see the final summary. Do not
@@ -264,4 +263,4 @@ jobs:
 
           claude_args: |
             --model claude-opus-4-6
-            --allowed-tools "Read,Glob,Grep,Bash(git log *),Bash(git diff *),Bash(git show *),Bash(gh label create *),mcp__github__search_issues,mcp__github__issue_write,mcp__github__issue_read,mcp__github__add_issue_comment,mcp__github__get_label,mcp__github__list_issues,mcp__github__search_pull_requests,mcp__github__list_pull_requests,mcp__github__pull_request_read,mcp__github__list_commits"
+            --allowedTools "Read,Glob,Grep,Bash(git log *),Bash(git diff *),Bash(git show *),Bash(gh label create *),mcp__github__search_issues,mcp__github__issue_write,mcp__github__issue_read,mcp__github__add_issue_comment,mcp__github__get_label,mcp__github__list_issues,mcp__github__search_pull_requests,mcp__github__list_pull_requests,mcp__github__pull_request_read,mcp__github__list_commits"
