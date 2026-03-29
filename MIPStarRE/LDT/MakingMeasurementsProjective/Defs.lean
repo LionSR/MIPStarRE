@@ -16,8 +16,6 @@ not only tagged by placeholder operator names but also admit honest
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
@@ -161,46 +159,52 @@ structure MatrixRoundedProjectiveWitness {Outcome : Type*}
       matrixOutcomeTauDistance source.toSubmeasurement target a ≤ ζ
 
 /-- Output package for the paper's Naimark dilation theorem. -/
-structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*) where
-  auxStateA : QuantumState
-  auxStateB : QuantumState
-  liftedState : QuantumState
-  left : IndexedProjectiveMeasurement QuestionA OutcomeA
-  right : IndexedProjectiveMeasurement QuestionB OutcomeB
-  deriving Inhabited
+structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
+    (ι : Type*) [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι] where
+  auxStateA : QuantumState ι
+  auxStateB : QuantumState ι
+  liftedState : QuantumState ι
+  left : IdxProjMeas QuestionA OutcomeA ι
+  right : IdxProjMeas QuestionB OutcomeB ι
+
+-- NOTE: no global `Inhabited` instance for `NaimarkData`:
+-- constructing defaults for projective measurements is mathematically non-canonical
+-- and would require additional assumptions on outcome types.
 
 /-- The product auxiliary state used in a Naimark dilation. -/
--- TODO: placeholder — only sets `name`; `dim`/`density` left at defaults until
+-- TODO: placeholder — `density` left at defaults until
 -- a concrete tensor product model is provided.
 def naimarkAuxiliaryState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB) : QuantumState :=
-  { name := s!"{data.auxStateA.name}⊗{data.auxStateB.name}" }
+    {ι : Type*} [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
+    (_data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) : QuantumState ι :=
+  {}
 
 /-- The lifted state `ψ ⊗ aux_A ⊗ aux_B` produced by Naimark dilation. -/
--- TODO: placeholder — only sets `name`; `dim`/`density` left at defaults until
+-- TODO: placeholder — `density` left at defaults until
 -- a concrete tensor product model is provided.
 def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    (ψ : QuantumState)
-    (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB) : QuantumState :=
-  { name := s!"{ψ.name}⊗{data.auxStateA.name}⊗{data.auxStateB.name}" }
-
-/-- Placeholder expectation value of an operator on a state. -/
-noncomputable def placeholderExpectation (ψ : QuantumState) (X : Operator) : Error :=
-  (s!"Exp[{ψ.name}|{X.name}]".length : Error)
+    {ι : Type*} [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
+    (_ψ : QuantumState ι)
+    (_data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) : QuantumState ι :=
+  {}
 
 /-- The single-outcome probability `⟨ψ|A_a|ψ⟩`. -/
-noncomputable def singleOutcomeProbability {Outcome : Type*}
-    (ψ : QuantumState)
-    (A : SubMeasurement Outcome) (a : Outcome) : Error :=
-  placeholderExpectation ψ (A.outcomeOperator a)
+noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι)
+    (A : SubMeas Outcome ι) (a : Outcome) : Error :=
+  ev ψ (A.outcome a)
 
-/-- The joint outcome probability `⟨ψ|A_a ⊗ B_b|ψ⟩`. -/
+/-- The joint outcome probability `Tr(ρ · A_a · B_b)`.
+Uses the operator product on the shared algebra, matching `matrixJointOutcomeProbability`.
+When the measurements commute (as guaranteed after Naimark dilation), this
+equals the tensor-product formulation `⟨ψ| (A_a ⊗ B_b) |ψ⟩`. -/
 noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
-    (ψ : QuantumState)
-    (A : SubMeasurement OutcomeA)
-    (B : SubMeasurement OutcomeB)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι)
+    (A : SubMeas OutcomeA ι)
+    (B : SubMeas OutcomeB ι)
     (a : OutcomeA) (b : OutcomeB) : Error :=
-  placeholderExpectation ψ (formalTensor (A.outcomeOperator a) (B.outcomeOperator b))
+  ev ψ (A.outcome a * B.outcome b)
 
 /-- The explicit error in `thm:orthonormalization`. -/
 noncomputable def orthonormalizationError (ζ : Error) : Error :=

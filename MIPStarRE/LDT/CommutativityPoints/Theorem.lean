@@ -4,60 +4,67 @@ import MIPStarRE.LDT.CommutativityPoints.Defs
 # Section 10 — Theorems
 
 Output structures and theorem statements for commutativity at points.
+The strategy state is bipartite (`QuantumState (ι × ι)`), so all fields
+use `strategy.state` directly.
 -/
 
 namespace MIPStarRE.LDT.CommutativityPoints
 
 open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
 
-/-- Output package for `thm:commutativity-points`. -/
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- Output package for `thm:commutativity-points`.
+
+The strategy state is bipartite (`QuantumState (ι × ι)`).  Local-register
+fields lift measurements to the left tensor factor. -/
 structure CommutativityPointsStatement (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymStrat params ι)
     (_eps _delta gamma : Error) : Prop where
   sampledDiagonalLineConsistency :
-    ConsistencyRel strategy.state
+    ConsRel strategy.state
       (pointWithDiagonalLineDistribution params)
-      (sampledPointMeasurement params strategy)
-      (sampledDiagonalLineEvaluation params strategy)
+      (IdxSubMeas.liftLeft (sampledPointMeasurement params strategy))
+      (IdxSubMeas.liftLeft (sampledDiagonalLineEvaluation params strategy))
       (restrictedDiagonalLinesConsistencyError params gamma)
   sampledDiagonalLineApproximation :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (pointWithDiagonalLineDistribution params)
-      (sampledPointMeasurement params strategy)
-      (sampledDiagonalLineEvaluation params strategy)
+      (IdxSubMeas.liftLeft (sampledPointMeasurement params strategy))
+      (IdxSubMeas.liftLeft (sampledDiagonalLineEvaluation params strategy))
       (pointDiagonalLineApproxError params gamma)
   orderedLiftToMixedBridge :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (pointPairSharedDiagonalLineDistribution params)
       (pointMeasurementProductAlongSharedLine params strategy)
       (pointDiagonalLineMixedProductLeft params strategy)
       (pointDiagonalLineApproxError params gamma)
   orderedLiftToLineBridge :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (pointPairSharedDiagonalLineDistribution params)
       (pointDiagonalLineMixedProductLeft params strategy)
       (diagonalLineProductOrdered params strategy)
       (pointDiagonalLineApproxError params gamma)
   diagonalLineProjectiveSwap :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (pointPairSharedDiagonalLineDistribution params)
       (diagonalLineProductOrdered params strategy)
       (diagonalLineProductReversed params strategy)
       0
   reversedDropFromLineBridge :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (pointPairSharedDiagonalLineDistribution params)
       (diagonalLineProductReversed params strategy)
       (pointDiagonalLineMixedProductRight params strategy)
       (pointDiagonalLineApproxError params gamma)
   reversedDropToPointsBridge :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (pointPairSharedDiagonalLineDistribution params)
       (pointDiagonalLineMixedProductRight params strategy)
       (pointMeasurementProductAlongSharedLineReversed params strategy)
       (pointDiagonalLineApproxError params gamma)
   pointwiseCommutation :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (uniformDistribution (PointPairQuestion params))
       (pointMeasurementProductLeft params strategy)
       (pointMeasurementProductRight params strategy)
@@ -66,7 +73,7 @@ structure CommutativityPointsStatement (params : Parameters)
 /-- `thm:commutativity-points`. -/
 theorem commutativityPoints
     (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     CommutativityPointsStatement params strategy eps delta gamma := by

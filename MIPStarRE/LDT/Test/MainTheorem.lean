@@ -8,8 +8,6 @@ The main formal output of the low individual degree test (`thm:main-formal`).
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.LDT
 
 namespace Test
@@ -23,30 +21,26 @@ noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) 
 
 /--
 `thm:main-formal` from `test_definition.tex`.
-
-This matching declaration keeps the paper's main output shape: two global polynomial
-measurements, one for each prover, consistent with the point measurements and with
-each other.
 -/
 theorem mainFormal
-    (params : Parameters)
-    (strategy : ProjectiveStrategy params)
+    (params : Parameters) {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι)
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
     (hk : params.m * params.d ≤ k) :
-    ∃ G_A G_B : ProjectiveMeasurement (Polynomial params),
-      ConsistentWithPolynomialEvaluation params strategy.state
-          (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementA)
-          G_B.toSubMeasurement
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+      ConsWithPolyEval params strategy.state
+          (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementA)
+          G_B.toSubMeas.liftLeft
           (mainFormalError params k eps) ∧
-        ConsistentWithPolynomialEvaluation params strategy.state
-          (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementB)
-          G_A.toSubMeasurement
+        ConsWithPolyEval params strategy.state
+          (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementB)
+          G_A.toSubMeas.liftLeft
           (mainFormalError params k eps) ∧
-        PolynomialMeasurementsConsistent params strategy.state
-          G_A.toSubMeasurement
-          G_B.toSubMeasurement
+        PolyMeasCons params strategy.state
+          G_A.toSubMeas.liftLeft
+          G_B.toSubMeas.liftLeft
           (mainFormalError params k eps) := by
   sorry
 

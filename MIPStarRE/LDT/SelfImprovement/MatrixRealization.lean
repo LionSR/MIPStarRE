@@ -44,7 +44,7 @@ noncomputable def matrixSdpPrimalContributionOperator (params : Parameters)
 noncomputable def matrixSdpPrimalObjective (params : Parameters)
     (model : MatrixSdpRealization params)
     (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space) : Error :=
-  averageOverDistribution (polynomialDistribution params) (fun g =>
+  avgOver (polynomialDistribution params) (fun g =>
     Complex.re (matrixExpectation model.state
       (matrixSdpPrimalContributionOperator params model T g)))
 

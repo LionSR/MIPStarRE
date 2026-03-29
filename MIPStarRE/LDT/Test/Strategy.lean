@@ -5,36 +5,40 @@ import MIPStarRE.LDT.Test.Defs
 
 Symmetric and projective strategy structures for the low individual degree test,
 together with the test-passing and consistency predicates.
+
+All operator fields now use `Op ι` directly with a generic `Fintype` index `ι`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
-
 namespace MIPStarRE.LDT
 
-/-- Invariance predicate for the symmetric shared state. -/
-structure PermutationInvariantState (_ψ : QuantumState) : Prop where
-  swapInvariant : True
+/-- The SWAP reindexing on `ι × ι`: permutes the two tensor factors.
+`swapDensity M (i₁,i₂) (j₁,j₂) = M (i₂,i₁) (j₂,j₁)`. -/
+def swapDensity {ι : Type*} (M : MIPStarRE.Quantum.Op (ι × ι)) :
+    MIPStarRE.Quantum.Op (ι × ι) :=
+  Matrix.of fun (ij : ι × ι) (kl : ι × ι) => M (ij.2, ij.1) (kl.2, kl.1)
+
+/-- Permutation-invariance for a shared state.
+When `ι = ι₁ × ι₂`, this should be discharged via `ψ.density = swapDensity ψ.density`.
+The generic signature keeps `ι` arbitrary so that the bridge lemmas
+`twoNotionsOfSelfConsistency` and `closenessAfterCompletion_core` (which are
+parameterized over generic `ι`) can accept this hypothesis. -/
+structure PermInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) : Prop where
 
 /-- Paper-local symmetric strategy data. -/
-structure SymmetricStrategy (params : Parameters) where
-  state : QuantumState
-  statePermutationInvariant : PermutationInvariantState state := ⟨trivial⟩
-  pointMeasurement : IndexedProjectiveMeasurement (Point params) (Fq params)
+structure SymStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
+  pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurement :
-    IndexedProjectiveMeasurement (AxisParallelLine params) (AxisLinePolynomial params)
+    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurement :
-    IndexedProjectiveMeasurement (DiagonalLine params) (DiagonalLinePolynomial params)
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
 
-instance {params : Parameters} : Inhabited (SymmetricStrategy params) where
-  default := {
-    state := default
-    statePermutationInvariant := ⟨trivial⟩
-    pointMeasurement := default
-    axisParallelMeasurement := default
-    diagonalMeasurement := default
-  }
+-- NOTE: no global `Inhabited` instance for `SymStrat`; constructing default
+-- projective measurement families is non-canonical and requires additional
+-- assumptions on outcome types.
 
 /-- Encoded samples `(u₀, i, t)` for the axis-parallel lines test. -/
 abbrev AxisParallelTestSample (params : Parameters) := Point params × (Fin params.m × Fq params)
@@ -44,98 +48,110 @@ abbrev DiagonalTestSample (params : Parameters) := Point params × (Point params
 
 /-- Sampled point answers in the axis-parallel lines test. -/
 noncomputable def axisParallelPointAnswerFamily {params : Parameters}
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (AxisParallelTestSample params) (Fq params) :=
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) :
+    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
   fun s =>
     let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
-    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeasurement
+    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeas
 
 /-- Sampled line answers, evaluated at the sampled parameter, in the axis-parallel lines test. -/
 noncomputable def axisParallelLineAnswerFamily {params : Parameters}
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (AxisParallelTestSample params) (Fq params) :=
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) :
+    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
   fun s =>
     let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
-    postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeasurement) (fun g => g s.2.2)
+    postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
 
 /-- Sampled point answers in the diagonal lines test. -/
 noncomputable def diagonalPointAnswerFamily {params : Parameters}
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (DiagonalTestSample params) (Fq params) :=
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) :
+    IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
   fun s =>
     let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
-    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeasurement
+    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeas
 
 /-- Sampled diagonal-line answers, evaluated at the sampled parameter. -/
 noncomputable def diagonalLineAnswerFamily {params : Parameters}
-    (strategy : SymmetricStrategy params) :
-    IndexedSubMeasurement (DiagonalTestSample params) (Fq params) :=
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) :
+    IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
   fun s =>
     let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
-    postprocess ((strategy.diagonalMeasurement ℓ).toSubMeasurement) (fun g => g s.2.2)
+    postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
 
 /-- Paper-local (not necessarily symmetric) projective strategy data. -/
-structure ProjectiveStrategy (params : Parameters) where
-  state : QuantumState
-  pointMeasurementA : IndexedProjectiveMeasurement (Point params) (Fq params)
+structure ProjStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
+  pointMeasurementA : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurementA :
-    IndexedProjectiveMeasurement (AxisParallelLine params) (AxisLinePolynomial params)
+    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurementA :
-    IndexedProjectiveMeasurement (DiagonalLine params) (DiagonalLinePolynomial params)
-  pointMeasurementB : IndexedProjectiveMeasurement (Point params) (Fq params)
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+  pointMeasurementB : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurementB :
-    IndexedProjectiveMeasurement (AxisParallelLine params) (AxisLinePolynomial params)
+    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurementB :
-    IndexedProjectiveMeasurement (DiagonalLine params) (DiagonalLinePolynomial params)
-  deriving Inhabited
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
 
-namespace SymmetricStrategy
+namespace SymStrat
 
-/-- Trace-based failure surrogate for the axis-parallel lines test. -/
+/-- Trace-based failure surrogate for the axis-parallel lines test.
+Measurements are lifted to the left tensor factor of the bipartite state. -/
 noncomputable def axisParallelFailureProbability {params : Parameters}
-    (strategy : SymmetricStrategy params) : Error :=
-  consistencyError strategy.state
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) : Error :=
+  consError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
-    (axisParallelPointAnswerFamily strategy)
-    (axisParallelLineAnswerFamily strategy)
+    (IdxSubMeas.liftLeft (axisParallelPointAnswerFamily strategy))
+    (IdxSubMeas.liftLeft (axisParallelLineAnswerFamily strategy))
 
-/-- Trace-based failure surrogate for the self-consistency test. -/
+/-- Trace-based failure surrogate for the self-consistency test.
+Measurements are lifted to the left tensor factor of the bipartite state. -/
 noncomputable def selfConsistencyFailureProbability {params : Parameters}
-    (strategy : SymmetricStrategy params) : Error :=
-  strongSelfConsistencyError strategy.state
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) : Error :=
+  sscError strategy.state
     (uniformDistribution (Point params))
-    (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
+    (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
 
-/-- Trace-based failure surrogate for the diagonal lines test. -/
+/-- Trace-based failure surrogate for the diagonal lines test.
+Measurements are lifted to the left tensor factor of the bipartite state. -/
 noncomputable def diagonalFailureProbability {params : Parameters}
-    (strategy : SymmetricStrategy params) : Error :=
-  consistencyError strategy.state
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) : Error :=
+  consError strategy.state
     (uniformDistribution (DiagonalTestSample params))
-    (diagonalPointAnswerFamily strategy)
-    (diagonalLineAnswerFamily strategy)
+    (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+    (IdxSubMeas.liftLeft (diagonalLineAnswerFamily strategy))
 
 /-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
-structure IsGood {params : Parameters} (strategy : SymmetricStrategy params)
+structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι)
     (eps delta gamma : Error) : Prop where
   axisParallelTest : strategy.axisParallelFailureProbability ≤ eps
   selfConsistencyTest : strategy.selfConsistencyFailureProbability ≤ delta
   diagonalLineTest : strategy.diagonalFailureProbability ≤ gamma
 
-end SymmetricStrategy
+end SymStrat
 
-namespace ProjectiveStrategy
+namespace ProjStrat
 
 /-- View the left prover's local data as a symmetric-strategy-style package. -/
-def leftAsSymmetric {params : Parameters} (strategy : ProjectiveStrategy params) :
-    SymmetricStrategy params where
+def leftAsSymmetric {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    SymStrat params ι where
   state := strategy.state
   pointMeasurement := strategy.pointMeasurementA
   axisParallelMeasurement := strategy.axisParallelMeasurementA
   diagonalMeasurement := strategy.diagonalMeasurementA
 
 /-- View the right prover's local data as a symmetric-strategy-style package. -/
-def rightAsSymmetric {params : Parameters} (strategy : ProjectiveStrategy params) :
-    SymmetricStrategy params where
+def rightAsSymmetric {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    SymStrat params ι where
   state := strategy.state
   pointMeasurement := strategy.pointMeasurementB
   axisParallelMeasurement := strategy.axisParallelMeasurementB
@@ -143,14 +159,15 @@ def rightAsSymmetric {params : Parameters} (strategy : ProjectiveStrategy params
 
 /-- Trace-based failure surrogate for the full low-individual-degree test. -/
 noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
-    (strategy : ProjectiveStrategy params) : Error :=
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
   let left := strategy.leftAsSymmetric
   let right := strategy.rightAsSymmetric
   let pointAgreement :=
-    consistencyError strategy.state
+    consError strategy.state
       (uniformDistribution (Point params))
-      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementA)
-      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurementB)
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementB)
   let axisParallelBranch :=
     pointAgreement
       + (left.axisParallelFailureProbability + right.axisParallelFailureProbability) / 2
@@ -162,64 +179,77 @@ noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
 
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
-    (strategy : ProjectiveStrategy params) (eps : Error) : Prop where
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) : Prop where
   soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
 
-end ProjectiveStrategy
+end ProjStrat
 
 /-- A packaged family `x ↦ G^x` together with its witness operators and domination targets. -/
-structure IndexedPolynomialFamily (params : Parameters) where
-  meas : IndexedProjectiveSubMeasurement (Fq params) (Polynomial params)
-  witness : Fq params → Operator := fun _ => default
-  dominationTarget : Fq params → Polynomial params → Operator := fun _ _ => default
+structure IdxPolyFamily (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  meas : IdxProjSubMeas (Fq params) (Polynomial params) ι
+  witness : Fq params → MIPStarRE.Quantum.Op ι := fun _ => 0
+  dominationTarget : Fq params → Polynomial params → MIPStarRE.Quantum.Op ι := fun _ _ => 0
   deriving Inhabited
 
-namespace IndexedPolynomialFamily
+namespace IdxPolyFamily
 
-/-- Placeholder averaged submeasurement `G = E_x G^x` from the paper. -/
-def averagedSubMeasurement {params : Parameters}
-    (_family : IndexedPolynomialFamily params) : SubMeasurement (Polynomial params) where
-  name := s!"Gavg({params.m},{params.q},{params.d})"
-  outcomeOperator := fun _ => { name := s!"Gavg({params.m},{params.q},{params.d}).outcome" }
-  totalOperator := { name := s!"Gavg({params.m},{params.q},{params.d}).total" }
+/-- The averaged submeasurement `G = E_x G^x`: average the slice
+measurements over the uniform distribution on slice heights `x ∈ F_q`. -/
+noncomputable def averagedSubMeas {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (family : IdxPolyFamily params ι) :
+    SubMeas (Polynomial params) ι where
+  outcome := fun g =>
+    let 𝒟 := uniformDistribution (Fq params)
+    ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.outcome g
+  total :=
+    let 𝒟 := uniformDistribution (Fq params)
+    ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.total
 
 /-- Evaluate the slice family at a point `(u, x)` in `F_q^{m+1}`. -/
-def evaluatedAtNextPoint {params : Parameters}
-    (family : IndexedPolynomialFamily params) :
-    IndexedSubMeasurement (Point params.next) (Fq params) :=
+noncomputable def evaluatedAtNextPoint {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (Point params.next) (Fq params) ι :=
   fun u =>
     evaluateAt params (truncatePoint params u)
-      ((family.meas (pointHeight params u)).toSubMeasurement)
+      ((family.meas (pointHeight params u)).toSubMeas)
 
-structure Complete {params : Parameters} (family : IndexedPolynomialFamily params)
-    (ψ : QuantumState) (kappa : Error) : Prop where
+structure Complete {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (family : IdxPolyFamily params ι)
+    (ψ : QuantumState (ι × ι)) (kappa : Error) : Prop where
   averageCompleteness :
-    CompletenessAtLeast ψ family.averagedSubMeasurement (1 - kappa)
+    CompletenessAtLeast ψ family.averagedSubMeas.liftLeft (1 - kappa)
 
-structure ConsistentWithPoints {params : Parameters} (family : IndexedPolynomialFamily params)
-    (strategy : SymmetricStrategy params.next) (zeta : Error) : Prop where
+structure ConsistentWithPoints {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (family : IdxPolyFamily params ι)
+    (strategy : SymStrat params.next ι) (zeta : Error) : Prop where
   pointConsistency :
-    ConsistencyRel strategy.state (uniformDistribution (Point params.next))
-      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
-      family.evaluatedAtNextPoint
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+      (IdxSubMeas.liftLeft family.evaluatedAtNextPoint)
       zeta
 
-structure StronglySelfConsistent {params : Parameters} (family : IndexedPolynomialFamily params)
-    (ψ : QuantumState) (zeta : Error) : Prop where
+structure StronglySelfConsistent {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (family : IdxPolyFamily params ι)
+    (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop where
   sliceSelfConsistency :
-    StrongSelfConsistencyRel ψ (uniformDistribution (Fq params))
-      (IndexedProjectiveSubMeasurement.toIndexedSubMeasurement family.meas)
+    SSCRel ψ (uniformDistribution (Fq params))
+      ((IdxProjSubMeas.toIdxSubMeas family.meas).liftLeft)
       zeta
 
-structure Bounded {params : Parameters} (family : IndexedPolynomialFamily params)
-    (ψ : QuantumState) (zeta : Error) : Prop where
-  slicePositiveSemidefinite : ∀ x, PositiveSemidefinite (family.witness x)
+structure Bounded {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (family : IdxPolyFamily params ι)
+    (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop where
+  sliceOpPSD : ∀ x, 0 ≤ family.witness x
   sliceBoundedness :
-    ∀ x, BoundedByOperator ψ ((family.meas x).toSubMeasurement) (family.witness x) zeta
+    ∀ x, BoundedByOperator ψ ((family.meas x).toSubMeas.liftLeft)
+      (leftTensor (ι₂ := ι) (family.witness x)) zeta
   sliceDominatesTarget :
     ∀ x : Fq params, ∀ g : Polynomial params,
-      DominatesOperator (family.witness x) (family.dominationTarget x g)
+      0 ≤ family.witness x - family.dominationTarget x g
 
-end IndexedPolynomialFamily
+end IdxPolyFamily
 
 end MIPStarRE.LDT

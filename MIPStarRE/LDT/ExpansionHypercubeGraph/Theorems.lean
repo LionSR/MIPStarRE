@@ -12,19 +12,17 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
 /-- Output package for `lem:local-rewrite`. -/
 structure LocalRewriteStatement (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Prop where
-  differenceFormula :
-    localVariance params A ψ = localVarianceDifferenceForm params A ψ
+    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Prop where
   traceFormula :
     localVariance params A ψ = localVarianceTraceForm params A ψ
 
 /-- Output package for `lem:global-rewrite`. -/
 structure GlobalRewriteStatement (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) : Prop where
-  differenceFormula :
-    globalVariance params A ψ = globalVarianceDifferenceForm params A ψ
+    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Prop where
   decomposition :
     ∃ decomp : GlobalVarianceDecomposition params A,
       globalVariance params A ψ = globalVarianceTraceForm params A ψ decomp
@@ -51,26 +49,26 @@ lemma matrixGlobalRewrite (params : Parameters)
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 theorem laplacianRewrite (params : Parameters) :
     laplacian params = laplacianDifferenceForm params := by
-  sorry
+  rfl
 
 /-- `lem:local-to-global`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma localToGlobal (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) :
+    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     globalVariance params A ψ ≤ (params.m : Error) * localVariance params A ψ := by
   sorry
 
 /-- `lem:local-rewrite`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma localRewrite (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) :
+    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     LocalRewriteStatement params A ψ := by
   sorry
 
 /-- `lem:global-rewrite`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma globalRewrite (params : Parameters)
-    (A : Point params → Operator) (ψ : QuantumState) :
+    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     GlobalRewriteStatement params A ψ := by
   sorry
 

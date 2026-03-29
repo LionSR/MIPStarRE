@@ -13,36 +13,39 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Output package for `lem:generalize-b`. -/
+/-- Output package for `lem:generalize-b`.
+`ψbi` is the bipartite state on `d * d` (passed as `strategy.state`
+by callers). -/
 structure GeneralizeBStatement (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) : Prop where
+    (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
+    (G : SubMeas (Polynomial params) ι) : Prop where
   aggregateFamilyComparison :
-    StateDependentDistanceRel strategy.state
+    SDDRel ψbi
       (axisParallelLineQuestionDistribution params)
       (generalizeBLeftFamily params strategy G)
       (generalizeBRightFamily params strategy G)
       (generalizeBError params)
   pointwiseNormBound :
     ∀ g : Polynomial params,
-      generalizeBDeviationAtPolynomial params strategy G g ≤ generalizeBError params
+      generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params
   averagedNormBound :
-    generalizeBDeviation params strategy G ≤ generalizeBError params
+    generalizeBDeviation params strategy ψbi G ≤ generalizeBError params
 
 /-- Output package for `lem:local-variance-of-points`. -/
 structure LocalVarianceOfPointsStatement (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) (eps delta : Error) : Prop where
+    (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
+    (G : SubMeas (Polynomial params) ι) (eps delta : Error) : Prop where
   aggregateEdgeComparison :
-    StateDependentDistanceRel strategy.state
+    SDDRel ψbi
       (rerandomizeCoord params)
       (localVarianceLeftFamily params strategy G)
       (localVarianceRightFamily params strategy G)
       (localVarianceOfPointsError params eps delta)
   pointwiseEdgeNormBound :
     ∀ g : Polynomial params,
-      localVarianceDeviationAtPolynomial params strategy G g ≤
+      localVarianceDeviationAtPolynomial params strategy ψbi G g ≤
         localVarianceOfPointsError params eps delta
   pointwiseLocalVarianceBound :
     ∀ g : Polynomial params,
@@ -54,17 +57,17 @@ structure LocalVarianceOfPointsStatement (params : Parameters)
 
 /-- Output package for `lem:global-variance-of-points`. -/
 structure GlobalVarianceOfPointsStatement (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (G : SubMeasurement (Polynomial params)) (eps delta : Error) : Prop where
+    (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
+    (G : SubMeas (Polynomial params) ι) (eps delta : Error) : Prop where
   aggregateGlobalComparison :
-    StateDependentDistanceRel strategy.state
+    SDDRel ψbi
       (independentPointPair params)
       (globalVarianceLeftFamily params strategy G)
       (globalVarianceRightFamily params strategy G)
       (globalVarianceOfPointsError params eps delta)
   pointwiseGlobalNormBound :
     ∀ g : Polynomial params,
-      globalVarianceDeviationAtPolynomial params strategy G g ≤
+      globalVarianceDeviationAtPolynomial params strategy ψbi G g ≤
         globalVarianceOfPointsError params eps delta
   pointwiseExpansionTransfer :
     ∀ g : Polynomial params,
@@ -104,31 +107,34 @@ lemma matrixGlobalVarianceOfPoints
 /-- `lem:generalize-b`. -/
 lemma generalizeB
     (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeasurement (Polynomial params)) :
-    GeneralizeBStatement params strategy G := by
+    (G : SubMeas (Polynomial params) ι)
+    (ψbi : QuantumState (ι × ι)) :
+    GeneralizeBStatement params strategy ψbi G := by
   sorry
 
 /-- `lem:local-variance-of-points`. -/
 lemma localVarianceOfPoints
     (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeasurement (Polynomial params)) :
-    LocalVarianceOfPointsStatement params strategy G eps delta := by
+    (G : SubMeas (Polynomial params) ι)
+    (ψbi : QuantumState (ι × ι)) :
+    LocalVarianceOfPointsStatement params strategy ψbi G eps delta := by
   sorry
 
 /-- `lem:global-variance-of-points`. -/
 lemma globalVarianceOfPoints
     (params : Parameters)
-    (strategy : SymmetricStrategy params)
+    (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeasurement (Polynomial params)) :
-    GlobalVarianceOfPointsStatement params strategy G eps delta := by
+    (G : SubMeas (Polynomial params) ι)
+    (ψbi : QuantumState (ι × ι)) :
+    GlobalVarianceOfPointsStatement params strategy ψbi G eps delta := by
   sorry
 
 

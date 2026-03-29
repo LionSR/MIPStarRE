@@ -2,6 +2,9 @@ import MIPStarRE.LDT.Commutativity.Defs
 
 /-!
 Statement packaging and scaffold theorems for Section 11 commutativity.
+
+The strategy state is bipartite (`QuantumState (ι × ι)`).  All fields use
+`strategy.state` directly.
 -/
 
 namespace MIPStarRE.LDT.Commutativity
@@ -9,12 +12,14 @@ namespace MIPStarRE.LDT.Commutativity
 open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-noncomputable section
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
 
 /-- Operator domination, written in source order as `X ≤ Y`. -/
-abbrev OperatorDominatedBy (X Y : Operator) : Prop :=
-  DominatesOperator Y X
+abbrev OperatorDominatedBy (X Y : MIPStarRE.Quantum.Op ι) : Prop :=
+  X ≤ Y
 
 /-- Displayed error term for `lem:comm-data-processed-g`. -/
 noncomputable def commDataProcessedGError (params : Parameters) (gamma zeta : Error) : Error :=
@@ -38,37 +43,40 @@ noncomputable def comMainError (params : Parameters) (gamma zeta : Error) : Erro
       Real.rpow zeta (1 / (4 : Error)) +
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)))
 
-/-- Output package for `lem:comm-data-processed-g`. -/
+/-- Output package for `lem:comm-data-processed-g`.
+
+The strategy state is bipartite.  Local-register fields lift
+measurements to the left tensor factor. -/
 structure CommDataProcessedGConclusion (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params)
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
   postprocessedPointConsistency :
-    ConsistencyRel strategy.state
+    ConsRel strategy.state
       (uniformDistribution (Point params.next))
-      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
-      (evaluatedPointFamily params family)
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+      (IdxSubMeas.liftLeft (evaluatedPointFamily params family))
       zeta
   postprocessedSelfConsistency :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (uniformDistribution (Point params.next))
       (evaluatedPointFamilyLeft params family)
       (evaluatedPointFamilyRight params family)
       zeta
   stabilityOne :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityOneLeft params strategy family)
       (commDataProcessedGStabilityOneRight params strategy family)
       (commDataProcessedGStabilityOneError zeta)
   stabilityTwo :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityTwoLeft params strategy family)
       (commDataProcessedGStabilityTwoRight params strategy family)
       (commDataProcessedGStabilityTwoError params gamma zeta)
   evaluatedSliceCommutation :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (evaluatedSliceProductLeft params strategy family)
       (evaluatedSliceProductRight params strategy family)
@@ -76,19 +84,19 @@ structure CommDataProcessedGConclusion (params : Parameters)
 
 /-- Output package for `thm:com-main`. -/
 structure ComMainConclusion (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params)
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
   evaluatedCommutation :
     CommDataProcessedGConclusion params strategy family gamma zeta
   evaluationSpecialization :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (evaluatedFromFullSliceProductLeft params strategy family)
       (evaluatedFromFullSliceProductRight params strategy family)
       (commDataProcessedGError params gamma zeta)
   fullSliceCommutation :
-    StateDependentDistanceRel strategy.state
+    SDDRel strategy.state
       (uniformDistribution (FullSliceQuestion params))
       (fullSliceProductLeft params strategy family)
       (fullSliceProductRight params strategy family)
@@ -96,8 +104,9 @@ structure ComMainConclusion (params : Parameters)
 
 /-- Output package for `lem:normalization-condition`. -/
 structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
-    (P : SubMeasurement OutcomeA)
-    (Q : ProjectiveSubMeasurement OutcomeB) : Prop where
+    [Fintype OutcomeA] [Fintype OutcomeB]
+    (P : SubMeas OutcomeA ι)
+    (Q : ProjSubMeas OutcomeB ι) : Prop where
   sandwichedHermitianSquare :
     normalizationConditionAdjointSquareOperator P Q =
       normalizationConditionSquareOperator P Q
@@ -109,10 +118,10 @@ structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IndexedPolynomialFamily params)
+    (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
@@ -122,10 +131,10 @@ lemma commDataProcessedG
 /-- `thm:com-main`. -/
 theorem comMain
     (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IndexedPolynomialFamily params)
+    (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
@@ -134,11 +143,10 @@ theorem comMain
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}
-    (P : SubMeasurement OutcomeA)
-    (Q : ProjectiveSubMeasurement OutcomeB) :
+    [Fintype OutcomeA] [Fintype OutcomeB]
+    (P : SubMeas OutcomeA ι)
+    (Q : ProjSubMeas OutcomeB ι) :
     NormalizationConditionStatement P Q := by
   sorry
-
-end
 
 end MIPStarRE.LDT.Commutativity

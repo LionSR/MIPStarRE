@@ -7,52 +7,59 @@ Statement containers for Section 6 of the low individual degree paper.
 namespace MIPStarRE.LDT.MainInductionStep
 
 open MIPStarRE.LDT
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-/-- Output package for the induction-level self-improvement theorem. -/
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- Output package for the induction-level self-improvement theorem.
+
+The strategy's state is bipartite (`QuantumState (ι × ι)`).  Fields that
+involve bipartite-lifted operators use `leftPlacedSubMeas` /
+`rightPlacedSubMeas` / `tensorFailureExpectation` with honest bipartite
+structure. -/
 structure SelfImprovementInInductionSectionConclusion (params : Parameters)
-    (strategy : SymmetricStrategy params)
-    (_G : SubMeasurement (Polynomial params))
-    (H : ProjectiveSubMeasurement (Polynomial params))
-    (Z : Operator) (eps delta gamma nu : Error) : Prop where
+    (strategy : SymStrat params ι)
+    (_G : SubMeas (Polynomial params) ι)
+    (H : ProjSubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
   completeness :
-    CompletenessAtLeast strategy.state H.toSubMeasurement
+    CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
       ((1 - nu) - selfImprovementInInductionError params eps delta gamma)
   pointConsistency :
-    ConsistentWithPolynomialEvaluation params strategy.state
-      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
-      H.toSubMeasurement
+    ConsWithPolyEval params strategy.state
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+      H.toSubMeas.liftLeft
       (selfImprovementInInductionError params eps delta gamma)
   strongSelfConsistency :
-    PolynomialMeasurementStronglySelfConsistent params strategy.state H.toSubMeasurement
+    PolyMeasSSC params strategy.state H.toSubMeas.liftLeft
       (selfImprovementInInductionError params eps delta gamma)
   selfCloseness :
-    MIPStarRE.LDT.Preliminaries.BipartiteStateDependentDistanceRel
-      strategy.state (uniformDistribution Unit)
-      (constantSubMeasurementFamily (leftPlacedSubMeasurement H.toSubMeasurement))
-      (constantSubMeasurementFamily (rightPlacedSubMeasurement H.toSubMeasurement))
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
+      (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
       (selfImprovementInInductionError params eps delta gamma)
   bounded :
-    tensorFailureExpectation strategy.state Z H.toSubMeasurement
+    tensorFailureExpectation strategy.state Z H.toSubMeas
       ≤ selfImprovementInInductionError params eps delta gamma
   dominatesAveragePointOperator :
     ∀ h : Polynomial params,
-      DominatesOperator Z (averagedPointEvaluationOperator params strategy h)
+      averagedPointEvaluationOperator params strategy h ≤ Z
 
 /-- Output package for the section-local pasting theorem. -/
 structure LdPastingInInductionSectionConclusion (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (_family : IndexedPolynomialFamily params)
-    (H : Measurement (Polynomial params.next))
+    (strategy : SymStrat params.next ι)
+    (_family : IdxPolyFamily params ι)
+    (H : Measurement (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   pointConsistency :
-    ConsistentWithPolynomialEvaluation params.next strategy.state
-      (IndexedProjectiveMeasurement.toIndexedSubMeasurement strategy.pointMeasurement)
-      H.toSubMeasurement
+    ConsWithPolyEval params.next strategy.state
+      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+      H.toSubMeas.liftLeft
       (ldPastingInInductionError params k eps delta gamma kappa zeta)
 
 /-- Bookkeeping data `x ↦ (ε_x, δ_x, γ_x)` for the restricted strategies. -/
 structure RestrictedFailureProfile (params : Parameters)
-    (strategy : SymmetricStrategy params.next) : Type where
+    (strategy : SymStrat params.next ι) : Type where
   axisParallel : Fq params → Error
   selfConsistency : Fq params → Error
   diagonal : Fq params → Error
@@ -65,26 +72,26 @@ structure RestrictedFailureProfile (params : Parameters)
 
 /-- Average restricted axis-parallel error over slices. -/
 noncomputable def averageRestrictedAxisParallelError (params : Parameters)
-    {strategy : SymmetricStrategy params.next}
+    {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
-  averageOverSlices params profile.axisParallel
+  avgOver (uniformDistribution (Fq params)) profile.axisParallel
 
 /-- Average restricted self-consistency error over slices. -/
 noncomputable def averageRestrictedSelfConsistencyError (params : Parameters)
-    {strategy : SymmetricStrategy params.next}
+    {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
-  averageOverSlices params profile.selfConsistency
+  avgOver (uniformDistribution (Fq params)) profile.selfConsistency
 
 /-- Average restricted diagonal-line error over slices. -/
 noncomputable def averageRestrictedDiagonalError (params : Parameters)
-    {strategy : SymmetricStrategy params.next}
+    {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
-  averageOverSlices params profile.diagonal
+  avgOver (uniformDistribution (Fq params)) profile.diagonal
 
 /-- Source-style boundedness input for the induction-level pasting theorem. -/
 structure PastingBoundednessInput (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
-    (family : IndexedPolynomialFamily params) (zeta : Error) : Prop where
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
   bounded : family.Bounded strategy.state zeta
   dominationTargetAgrees :
     ∀ x : Fq params, ∀ g : Polynomial params,
@@ -93,17 +100,17 @@ structure PastingBoundednessInput (params : Parameters)
 
 /-- Bookkeeping package for the restricted-probabilities lemma. -/
 structure RestrictedProbabilitiesStatement (params : Parameters)
-    (strategy : SymmetricStrategy params.next)
+    (strategy : SymStrat params.next ι)
     (eps delta gamma : Error) : Prop where
   profileExists :
     ∃ profile : RestrictedFailureProfile params strategy,
-      weightedAverageOverSlices params
-          (sliceTransverseDirectionWeight params) profile.axisParallel ≤ eps ∧
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params * profile.axisParallel x) ≤ eps ∧
         averageRestrictedAxisParallelError params profile
           ≤ sliceConditioningLoss params * eps ∧
         averageRestrictedSelfConsistencyError params profile ≤ delta ∧
-        weightedAverageOverSlices params
-          (sliceTransverseDirectionWeight params) profile.diagonal ≤ gamma ∧
+        avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params * profile.diagonal x) ≤ gamma ∧
         averageRestrictedDiagonalError params profile
           ≤ sliceConditioningLoss params * gamma ∧
         sliceTransverseDirectionWeight params *

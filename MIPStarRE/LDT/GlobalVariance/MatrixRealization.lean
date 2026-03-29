@@ -75,13 +75,13 @@ noncomputable def matrixPointConditionedGlobalVarianceAtPolynomial (params : Par
 /-- The polynomial-averaged actual local variance. -/
 noncomputable def matrixPointConditionedLocalVariance (params : Parameters)
     (model : MatrixVarianceTransferRealization params) : Error :=
-  averageOverDistribution (polynomialDistribution params) (fun g =>
+  avgOver (polynomialDistribution params) (fun g =>
     matrixPointConditionedLocalVarianceAtPolynomial params model g)
 
 /-- The polynomial-averaged actual global variance. -/
 noncomputable def matrixPointConditionedGlobalVariance (params : Parameters)
     (model : MatrixVarianceTransferRealization params) : Error :=
-  averageOverDistribution (polynomialDistribution params) (fun g =>
+  avgOver (polynomialDistribution params) (fun g =>
     matrixPointConditionedGlobalVarianceAtPolynomial params model g)
 
 /-- The concrete left event operator `[f(u) = g(u)]`. -/
@@ -122,7 +122,7 @@ noncomputable def matrixWeightedGeneralizeBRightOperatorAtPolynomial (params : P
 noncomputable def matrixGeneralizeBDeviationAtPolynomial (params : Parameters)
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : Error :=
-  averageOverDistribution (axisParallelLineQuestionDistribution params) (fun qu =>
+  avgOver (axisParallelLineQuestionDistribution params) (fun qu =>
     matrixSquaredDifferenceExpectation model.state
       (matrixWeightedGeneralizeBLeftOperatorAtPolynomial params model g qu)
       (matrixWeightedGeneralizeBRightOperatorAtPolynomial params model g qu))
@@ -130,7 +130,7 @@ noncomputable def matrixGeneralizeBDeviationAtPolynomial (params : Parameters)
 /-- The polynomial-averaged actual `generalize-b` deviation. -/
 noncomputable def matrixGeneralizeBDeviation (params : Parameters)
     (model : MatrixVarianceTransferRealization params) : Error :=
-  averageOverDistribution (polynomialDistribution params) (fun g =>
+  avgOver (polynomialDistribution params) (fun g =>
     matrixGeneralizeBDeviationAtPolynomial params model g)
 
 /-- The matrix-level local deviation agrees with the concrete local variance. -/
