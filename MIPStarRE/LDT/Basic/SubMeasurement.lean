@@ -93,7 +93,10 @@ theorem Measurement.outcome_le_one {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
     (M : Measurement α ι) (a : α) :
     M.outcome a ≤ 1 := by
-  sorry
+  calc M.outcome a
+      ≤ ∑ i : α, M.outcome i :=
+        Finset.single_le_sum (fun i _ => M.outcome_pos i) (Finset.mem_univ a)
+    _ = 1 := M.sum_eq
 
 /-- Projective submeasurement outcomes are Hermitian (PSD from idempotence). -/
 theorem ProjSubMeas.outcome_hermitian {α : Type*} {ι : Type*}

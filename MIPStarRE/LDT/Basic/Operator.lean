@@ -217,9 +217,13 @@ theorem ev_nonneg_of_psd {ι : Type*} [Fintype ι] [DecidableEq ι]
   classical
   simp only [Complex.div_natCast_re]
   apply div_nonneg
-  · -- Re(tr(ρ X)) ≥ 0 for PSD ρ, X
-    -- Proof: tr(ρ X) = tr(√ρ X √ρ) by cyclicity, and √ρ X √ρ is PSD
-    sorry
+  · -- Factor X = star S * S via C*-algebra PSD factorization
+    obtain ⟨S, hS⟩ := CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hX
+    rw [hS, Matrix.star_eq_conjTranspose,
+        ← Matrix.mul_assoc, Matrix.trace_mul_comm (ψ.density * Sᴴ) S,
+        ← Matrix.mul_assoc]
+    have hρ := Matrix.nonneg_iff_posSemidef.mp ψ.density_psd
+    exact (Complex.nonneg_iff.mp (hρ.mul_mul_conjTranspose_same S).trace_nonneg).1
   · exact Nat.cast_nonneg _
 
 /-- `ev` is monotone under the matrix order. -/
@@ -272,6 +276,56 @@ theorem ev_mul_comm_of_psd {ι : Type*} [Fintype ι] [DecidableEq ι]
 theorem ev_cauchy_schwarz {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι) :
     (ev ψ (Aᴴ * B)) ^ 2 ≤ ev ψ (Aᴴ * A) * ev ψ (Bᴴ * B) := by
-  sorry
+  -- Cross-term identity: ev(BᴴA) = ev(AᴴB) (both equal Re of conjugate pair)
+  have hcross : ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B) := by
+    simp only [ev]
+    have hρ : ψ.densityᴴ = ψ.density :=
+      (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd).isHermitian.eq
+    have hstar : star (MIPStarRE.Quantum.normalizedTrace (ψ.density * (Aᴴ * B))) =
+        MIPStarRE.Quantum.normalizedTrace (ψ.density * (Bᴴ * A)) := by
+      rw [← normalizedTrace_conjTranspose]
+      -- (ρ(AᴴB))ᴴ = (AᴴB)ᴴ ρᴴ = BᴴA ρᴴ = BᴴA ρ = ρ (BᴴA)
+      simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
+      rw [hρ, MIPStarRE.Quantum.normalizedTrace_mul_comm]
+    have hre : ∀ z : ℂ, Complex.re (star z) = Complex.re z := by
+      intro z; rw [Complex.star_def, Complex.conj_re]
+    linarith [congr_arg Complex.re hstar,
+              hre (MIPStarRE.Quantum.normalizedTrace (ψ.density * (Aᴴ * B)))]
+  -- Scalar expansion helpers
+  have hscale_r : ∀ (t : ℝ) (X : MIPStarRE.Quantum.Op ι),
+      ev ψ (((↑t : ℂ) • Bᴴ) * X) = t * ev ψ (Bᴴ * X) := by
+    intro t X
+    rw [show ((↑t : ℂ) • Bᴴ) * X = (↑t : ℂ) • (Bᴴ * X) from smul_mul_assoc _ _ _]
+    exact ev_scale ψ t (Bᴴ * X)
+  have hscale_l : ∀ (t : ℝ) (X : MIPStarRE.Quantum.Op ι),
+      ev ψ (X * ((↑t : ℂ) • B)) = t * ev ψ (X * B) := by
+    intro t X
+    rw [show X * ((↑t : ℂ) • B) = (↑t : ℂ) • (X * B) from mul_smul_comm _ _ _]
+    exact ev_scale ψ t (X * B)
+  -- Quadratic: for all t, ev((A + tB)ᴴ(A + tB)) ≥ 0 expands to a quadratic
+  have hquad : ∀ t : ℝ, 0 ≤ ev ψ (Bᴴ * B) * (t * t) +
+      (2 * ev ψ (Aᴴ * B)) * t + ev ψ (Aᴴ * A) := by
+    intro t
+    have expand : ev ψ ((A + (↑t : ℂ) • B)ᴴ * (A + (↑t : ℂ) • B)) =
+        ev ψ (Aᴴ * A) + t * ev ψ (Aᴴ * B) + (t * ev ψ (Bᴴ * A) +
+        t * (t * ev ψ (Bᴴ * B))) := by
+      have hstar_t : star (↑t : ℂ) = (↑t : ℂ) := by
+        rw [Complex.star_def, Complex.conj_ofReal]
+      simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_smul, hstar_t]
+      rw [add_mul, mul_add, mul_add]
+      rw [ev_add, ev_add, ev_add]
+      rw [hscale_l t Aᴴ, hscale_r t A]
+      rw [show (↑t : ℂ) • Bᴴ * ((↑t : ℂ) • B) = (↑t : ℂ) • ((↑t : ℂ) • (Bᴴ * B))
+        from by rw [smul_mul_assoc, mul_smul_comm]]
+      rw [ev_scale, ev_scale]
+    rw [show ev ψ (Bᴴ * B) * (t * t) + (2 * ev ψ (Aᴴ * B)) * t + ev ψ (Aᴴ * A) =
+        ev ψ (Aᴴ * A) + t * ev ψ (Aᴴ * B) + (t * ev ψ (Bᴴ * A) +
+        t * (t * ev ψ (Bᴴ * B))) by rw [hcross]; ring]
+    rw [← expand]
+    exact ev_adjoint_self_nonneg ψ (A + (↑t : ℂ) • B)
+  -- Apply quadratic discriminant
+  have hdisc := discrim_le_zero hquad
+  unfold discrim at hdisc
+  nlinarith
 
 end MIPStarRE.LDT
