@@ -2,16 +2,40 @@ import MIPStarRE.LDT.Preliminaries.Theorems
 import MIPStarRE.Quantum
 
 /-!
-Matching scaffold for Section 5 of the low individual degree paper in
-`references/ldt-paper/orthonormalization.tex`.
+# Section 5 — Making measurements projective: definitions
 
-The declarations here preserve the paper's theorem names and now expose more of
-its intermediate theorem shape: Naimark data include explicit auxiliary factors,
-and the orthogonalization helpers separate the almost-projective and rounding
-steps. This second pass also adds a finite-dimensional matrix realization layer
-based on `MIPStarRE/Quantum/FiniteMatrix.lean`, so the Section 5 statements are
-not only tagged by placeholder operator names but also admit honest
-`Matrix d d ℂ` witnesses for their probability and overlap formulas.
+Definitions for Naimark dilation and orthonormalization, matching
+Section 5 of `references/ldt-paper/orthonormalization.tex` and
+Chapter 4 of the blueprint (`blueprint/src/chapter/ch04_projective.tex`).
+
+## Naimark dilation structure
+
+The key mathematical content is the **Naimark dilation theorem**: given
+submeasurements on a bipartite space, there exist auxiliary registers and
+projective measurements on the enlarged space that preserve all correlations
+exactly.
+
+### One-measurement Naimark (Lemma 5.2)
+
+The building block is the one-measurement Naimark lemma. Given a
+submeasurement `{M_a}_{a ∈ α}` on `Op d`, it produces a projective
+submeasurement on the enlarged space `Op (d × Option α)`. The auxiliary
+register has dimension `|α| + 1`, with the extra dimension absorbing the
+"missing mass" `I − ∑ M_a`. The construction uses the isometry
+`V|ψ⟩ = ∑_a √M_a |ψ⟩ ⊗ |a⟩ + √(I−M)|ψ⟩ ⊗ |⊥⟩` and defines
+`P̂_a = V† (I ⊗ |a⟩⟨a|) V`.
+
+### Full Naimark dilation (Theorem 5.1)
+
+For the full bipartite setting, one-measurement Naimark is applied
+independently to each question on each side. The lifted index type is
+`ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`,
+reflecting the tensor product of per-question auxiliary registers.
+
+## Matrix-level witnesses
+
+Concrete `Matrix d d ℂ` witnesses are provided alongside the abstract
+operator-algebra formulation, giving honest probability and overlap formulas.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -19,6 +43,8 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
+
+/-! ### Finite Hilbert space infrastructure -/
 
 /-- A finite-dimensional Hilbert space represented by a finite index type. -/
 structure FiniteHilbertSpace where
@@ -93,7 +119,67 @@ noncomputable def matrixIdempotenceDefect {Outcome : Type*}
     (A : MatrixMeasurement Outcome H) (a : Outcome) : Error :=
   Complex.re (MIPStarRE.Quantum.tauNormSq (A.effect a * A.effect a - A.effect a))
 
-/-- Matrix-level witness for the Naimark dilation statement. -/
+/-! ### One-measurement Naimark dilation (Lemma 5.2)
+
+The one-measurement Naimark dilation is the building block for the full
+theorem. Given a submeasurement `M` on space `d`, it produces a projective
+submeasurement on the enlarged space `d × Option α`, where `Option α`
+models the auxiliary register with one extra dimension `none = ⊥` for the
+missing mass `I − ∑ M_a`. -/
+
+/-- The auxiliary pure-state projector `|⊥⟩⟨⊥|` on `Option α`, where `⊥ = none`.
+This is the initial state of the auxiliary register before the Naimark
+isometry is applied. -/
+def naimarkAuxProjector (α : Type*) [Fintype α] [DecidableEq α] :
+    MIPStarRE.Quantum.Op (Option α) :=
+  Matrix.single none none 1
+
+/-- The lifted density matrix for one-measurement Naimark dilation:
+`ρ_lifted = |Option α| · (ρ ⊗ |⊥⟩⟨⊥|)`.
+The scaling by `|Option α|` ensures the normalized trace is preserved:
+`τ'(ρ_lifted) = τ(ρ)`, where `τ'` is the normalized trace on the enlarged space. -/
+noncomputable def oneMeasLiftedDensity {d : Type*} [Fintype d] [DecidableEq d]
+    (α : Type*) [Fintype α] [DecidableEq α]
+    (ρ : MIPStarRE.Quantum.Op d) :
+    MIPStarRE.Quantum.Op (d × Option α) :=
+  (Fintype.card (Option α) : ℂ) • Matrix.kronecker ρ (naimarkAuxProjector α)
+
+/-- One-measurement Naimark dilation data at the matrix level.
+
+Given a submeasurement `M : Submeasurement α d`, this witnesses the existence
+of a projective submeasurement on the enlarged space `d × Option α` that
+preserves all expectation values. This is Lemma 5.2 of the paper.
+
+The construction: let `V : H → H ⊗ ℂ^{|α|+1}` be the isometry
+`V|ψ⟩ = ∑_a √M_a |ψ⟩ ⊗ |a⟩ + √(I−M)|ψ⟩ ⊗ |⊥⟩`.
+Then `P̂_a = V† (I ⊗ |a⟩⟨a|) V` is a projection, and
+`⟨ψ|M_a|ψ⟩ = ⟨ψ⊗⊥|P̂_a|ψ⊗⊥⟩`. -/
+structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
+    (d : Type*) [Fintype d] [DecidableEq d] where
+  /-- The source submeasurement being dilated. -/
+  source : MIPStarRE.Quantum.Submeasurement α d
+  /-- The dilated projective effects on `d × Option α`.
+  For outcome `some a`, this is the Naimark projector `P̂_a`.
+  For outcome `none`, this is the projector for the "missing mass". -/
+  liftedEffect : Option α → MIPStarRE.Quantum.Op (d × Option α)
+  /-- Each lifted effect is a genuine orthogonal projection. -/
+  lifted_isProj : ∀ a, MIPStarRE.Quantum.IsProj (liftedEffect a)
+  /-- The lifted projections are mutually orthogonal and sum to at most identity. -/
+  lifted_sum_le_one : ∑ a, liftedEffect a ≤ 1
+  /-- **Expectation preservation**: for any density matrix `ρ` on `Op d`,
+  the probability of outcome `a` under the original submeasurement equals
+  the probability under the dilated projective submeasurement with the
+  Naimark-lifted state. This is the core content of the dilation. -/
+  expectation_preservation : ∀ (ρ : MIPStarRE.Quantum.Op d) (a : α),
+    MIPStarRE.Quantum.normalizedTrace (ρ * source.effect a) =
+      MIPStarRE.Quantum.normalizedTrace
+        (oneMeasLiftedDensity α ρ * liftedEffect (some a))
+
+/-- Matrix-level witness for the Naimark dilation statement.
+
+This carries separate `originalSpace` and `liftedSpace`, with the lifted
+space being larger. The witness includes projective measurements on the
+lifted space and the key probability preservation identities. -/
 structure MatrixNaimarkWitness (QuestionA OutcomeA QuestionB OutcomeB : Type*)
     [Fintype OutcomeA] [DecidableEq OutcomeA]
     [Fintype OutcomeB] [DecidableEq OutcomeB] where
@@ -129,6 +215,95 @@ structure MatrixNaimarkWitness (QuestionA OutcomeA QuestionB OutcomeB : Type*)
           matrixJointOutcomeProbability liftedState.toPositiveMatrixState
             ((liftedLeft x).toSubmeasurement) ((liftedRight y).toSubmeasurement) a b
 
+/-! ### Full Naimark dilation (Theorem 5.1)
+
+The full Naimark dilation applies one-measurement Naimark independently
+to each question on each side. The lifted index type is
+`ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`. -/
+
+/-- The lifted index type for Naimark dilation. For each question on each
+side, an auxiliary register of dimension `|Outcome| + 1` is tensored in.
+The type `QuestionA → Option OutcomeA` represents the tensor product
+`⊗_x ℂ^{|OutcomeA|+1}` of per-question Alice auxiliaries, and similarly
+for Bob. -/
+abbrev NaimarkLiftedIndex (ι : Type*) (QuestionA OutcomeA QuestionB OutcomeB : Type*) :=
+  ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)
+
+/-- Output package for the paper's Naimark dilation theorem.
+
+Given submeasurements on space `ι`, this carries the dilated projective
+measurements and lifted state on the enlarged space
+`NaimarkLiftedIndex ι QuestionA OutcomeA QuestionB OutcomeB`. -/
+structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
+    (ι : Type*)
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB]
+    [Fintype ι] [DecidableEq ι] where
+  /-- The lifted quantum state on the enlarged space
+  `ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`. -/
+  liftedState : QuantumState (NaimarkLiftedIndex ι QuestionA OutcomeA QuestionB OutcomeB)
+  /-- Projective measurements for Alice on the enlarged space. -/
+  left : IdxProjMeas QuestionA OutcomeA
+    (NaimarkLiftedIndex ι QuestionA OutcomeA QuestionB OutcomeB)
+  /-- Projective measurements for Bob on the enlarged space. -/
+  right : IdxProjMeas QuestionB OutcomeB
+    (NaimarkLiftedIndex ι QuestionA OutcomeA QuestionB OutcomeB)
+
+-- NOTE: no global `Inhabited` instance for `NaimarkData`:
+-- constructing defaults for projective measurements is mathematically non-canonical
+-- and would require additional assumptions on outcome types.
+
+/-! ### Abstract-level probability definitions -/
+
+/-- The single-outcome probability `⟨ψ|A_a|ψ⟩`. -/
+noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι)
+    (A : SubMeas Outcome ι) (a : Outcome) : Error :=
+  ev ψ (A.outcome a)
+
+/-- The joint outcome probability `Tr(ρ · A_a · B_b)`.
+Uses the operator product on the shared algebra, matching `matrixJointOutcomeProbability`.
+When the measurements commute (as guaranteed after Naimark dilation), this
+equals the tensor-product formulation `⟨ψ| (A_a ⊗ B_b) |ψ⟩`. -/
+noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι)
+    (A : SubMeas OutcomeA ι)
+    (B : SubMeas OutcomeB ι)
+    (a : OutcomeA) (b : OutcomeB) : Error :=
+  ev ψ (A.outcome a * B.outcome b)
+
+/-! ### Error functions for orthonormalization -/
+
+/-- The explicit error in `thm:orthonormalization`. -/
+noncomputable def orthonormalizationError (ζ : Error) : Error :=
+  100 * Real.rpow ζ (1 / (4 : Error))
+
+/-- The strong self-consistency error after completing a submeasurement to a measurement. -/
+def orthonormalizationCompletionError (ζ : Error) : Error :=
+  2 * ζ
+
+/-- The explicit error in the measurement version of the lemma. -/
+noncomputable def orthonormalizationMainLemmaError (ζ : Error) : Error :=
+  84 * Real.rpow ζ (1 / (4 : Error))
+
+/-- The almost-projective error extracted from a consistency hypothesis. -/
+def consistencyToAlmostProjectiveError (ζ : Error) : Error :=
+  2 * ζ
+
+/-- The spectral-truncation error when rounding one almost-projective effect to a
+    projection via eigenvalue truncation. Dominated by `√ζ`. -/
+noncomputable def spectralTruncationError (ζ : Error) : Error :=
+  Real.rpow ζ (1 / (2 : Error))
+
+/-- The rounding error when converting an almost-projective POVM to a projective submeasurement. -/
+noncomputable def roundingToProjectiveError (ζ : Error) : Error :=
+  12 * Real.rpow ζ (1 / (2 : Error))
+
+/-! ### Almost-projective and rounding witnesses -/
+
 /-- Matrix-level witness for the almost-projective stage. -/
 structure MatrixAlmostProjectiveWitness {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
@@ -158,78 +333,7 @@ structure MatrixRoundedProjectiveWitness {Outcome : Type*}
     ∀ a : Outcome,
       matrixOutcomeTauDistance source.toSubmeasurement target a ≤ ζ
 
-/-- Output package for the paper's Naimark dilation theorem. -/
-structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
-    (ι : Type*) [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι] where
-  auxStateA : QuantumState ι
-  auxStateB : QuantumState ι
-  liftedState : QuantumState ι
-  left : IdxProjMeas QuestionA OutcomeA ι
-  right : IdxProjMeas QuestionB OutcomeB ι
-
--- NOTE: no global `Inhabited` instance for `NaimarkData`:
--- constructing defaults for projective measurements is mathematically non-canonical
--- and would require additional assumptions on outcome types.
-
-/-- The product auxiliary state used in a Naimark dilation. -/
--- TODO: placeholder — `density` left at defaults until
--- a concrete tensor product model is provided.
-def naimarkAuxiliaryState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    {ι : Type*} [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
-    (_data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) : QuantumState ι :=
-  {}
-
-/-- The lifted state `ψ ⊗ aux_A ⊗ aux_B` produced by Naimark dilation. -/
--- TODO: placeholder — `density` left at defaults until
--- a concrete tensor product model is provided.
-def naimarkLiftedState {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    {ι : Type*} [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
-    (_ψ : QuantumState ι)
-    (_data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) : QuantumState ι :=
-  {}
-
-/-- The single-outcome probability `⟨ψ|A_a|ψ⟩`. -/
-noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι)
-    (A : SubMeas Outcome ι) (a : Outcome) : Error :=
-  ev ψ (A.outcome a)
-
-/-- The joint outcome probability `Tr(ρ · A_a · B_b)`.
-Uses the operator product on the shared algebra, matching `matrixJointOutcomeProbability`.
-When the measurements commute (as guaranteed after Naimark dilation), this
-equals the tensor-product formulation `⟨ψ| (A_a ⊗ B_b) |ψ⟩`. -/
-noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι)
-    (A : SubMeas OutcomeA ι)
-    (B : SubMeas OutcomeB ι)
-    (a : OutcomeA) (b : OutcomeB) : Error :=
-  ev ψ (A.outcome a * B.outcome b)
-
-/-- The explicit error in `thm:orthonormalization`. -/
-noncomputable def orthonormalizationError (ζ : Error) : Error :=
-  100 * Real.rpow ζ (1 / (4 : Error))
-
-/-- The strong self-consistency error after completing a submeasurement to a measurement. -/
-def orthonormalizationCompletionError (ζ : Error) : Error :=
-  2 * ζ
-
-/-- The explicit error in the measurement version of the lemma. -/
-noncomputable def orthonormalizationMainLemmaError (ζ : Error) : Error :=
-  84 * Real.rpow ζ (1 / (4 : Error))
-
-/-- The almost-projective error extracted from a consistency hypothesis. -/
-def consistencyToAlmostProjectiveError (ζ : Error) : Error :=
-  2 * ζ
-
-/-- The spectral-truncation error when rounding one almost-projective effect to a
-    projection via eigenvalue truncation. Dominated by `√ζ`. -/
-noncomputable def spectralTruncationError (ζ : Error) : Error :=
-  Real.rpow ζ (1 / (2 : Error))
-
-/-- The rounding error when converting an almost-projective POVM to a projective submeasurement. -/
-noncomputable def roundingToProjectiveError (ζ : Error) : Error :=
-  12 * Real.rpow ζ (1 / (2 : Error))
+/-! ### Spectral truncation witnesses -/
 
 /-- Matrix-level witness for spectral truncation of a single effect.
 
