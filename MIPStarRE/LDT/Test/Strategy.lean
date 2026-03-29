@@ -36,14 +36,9 @@ structure SymStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq 
   diagonalMeasurement :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
 
-instance {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι] :
-    Inhabited (SymStrat params ι) where
-  default := {
-    state := default
-    pointMeasurement := default
-    axisParallelMeasurement := default
-    diagonalMeasurement := default
-  }
+-- NOTE: no global `Inhabited` instance for `SymStrat`; constructing default
+-- projective measurement families is non-canonical and requires additional
+-- assumptions on outcome types.
 
 /-- Encoded samples `(u₀, i, t)` for the axis-parallel lines test. -/
 abbrev AxisParallelTestSample (params : Parameters) := Point params × (Fin params.m × Fq params)
@@ -100,7 +95,6 @@ structure ProjStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurementB :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
-  deriving Inhabited
 
 namespace SymStrat
 

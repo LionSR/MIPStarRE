@@ -30,11 +30,24 @@ structure Measurement (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decid
   total_eq_one : total = 1
   sum_eq : ∑ a, outcome a = 1
 
-instance {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι] :
+noncomputable instance {α : Type*} {ι : Type*}
+    [Inhabited α] [Fintype α] [Fintype ι] [DecidableEq ι] :
     Inhabited (Measurement α ι) where
-  -- sorry: default SubMeas has outcome=0 and total=0, but Measurement needs total=1
-  -- and outcome_pos/sum_eq for the zero submeasurement
-  default := { outcome_pos := sorry, total_eq_one := sorry, sum_eq := sorry }
+  default := by
+    classical
+    refine
+      { toSubMeas := {
+          outcome := fun a => if a = default then 1 else 0
+          total := 1
+        }
+        outcome_pos := ?_
+        total_eq_one := rfl
+        sum_eq := ?_ }
+    · intro a
+      by_cases h : a = default <;> simp [h]
+    · simpa using
+        (Finset.sum_ite_eq (s := Finset.univ) (a := default)
+          (b := (1 : MIPStarRE.Quantum.Op ι)))
 
 /-- A paper-local projective submeasurement (each effect is idempotent). -/
 structure ProjSubMeas (α : Type*) (ι : Type*) [Fintype ι] [DecidableEq ι]
@@ -50,10 +63,20 @@ structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decidabl
     extends Measurement α ι where
   proj : ∀ a, outcome a * outcome a = outcome a
 
-instance {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι] :
+noncomputable instance {α : Type*} {ι : Type*}
+    [Inhabited α] [Fintype α] [Fintype ι] [DecidableEq ι] :
     Inhabited (ProjMeas α ι) where
-  -- sorry: inherits from broken Measurement default (total=0 but needs total=1)
-  default := { toMeasurement := default, proj := sorry }
+  default := by
+    classical
+    refine
+      { toMeasurement := (default : Measurement α ι)
+        proj := ?_ }
+    intro a
+    change
+      (if a = default then (1 : MIPStarRE.Quantum.Op ι) else 0) *
+          (if a = default then (1 : MIPStarRE.Quantum.Op ι) else 0) =
+        (if a = default then (1 : MIPStarRE.Quantum.Op ι) else 0)
+    by_cases h : a = default <;> simp [h]
 
 /-! ### Derived properties -/
 

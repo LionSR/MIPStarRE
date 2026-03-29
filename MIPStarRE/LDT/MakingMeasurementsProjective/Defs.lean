@@ -167,11 +167,9 @@ structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
   left : IdxProjMeas QuestionA OutcomeA ι
   right : IdxProjMeas QuestionB OutcomeB ι
 
-instance {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    {ι : Type*} [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι] :
-    Inhabited (NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) where
-  default := { auxStateA := {}, auxStateB := {}, liftedState := {},
-               left := fun _ => default, right := fun _ => default }
+-- NOTE: no global `Inhabited` instance for `NaimarkData`:
+-- constructing defaults for projective measurements is mathematically non-canonical
+-- and would require additional assumptions on outcome types.
 
 /-- The product auxiliary state used in a Naimark dilation. -/
 -- TODO: placeholder — `density` left at defaults until
