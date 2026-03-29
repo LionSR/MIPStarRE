@@ -236,6 +236,9 @@ theorem ev_mono {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- For Hermitian ρ, A, B: `ev ψ (A * B) = ev ψ (B * A)`.
 Follows from `ntr(ρ B A) = conj(ntr(ρ A B))` when all three are Hermitian,
 and Re is invariant under conjugation. -/
+private theorem re_star (z : ℂ) : Complex.re (star z) = Complex.re z := by
+  rw [Complex.star_def, Complex.conj_re]
+
 private theorem normalizedTrace_conjTranspose {d : Type*} [Fintype d]
     (X : MIPStarRE.Quantum.Op d) :
     MIPStarRE.Quantum.normalizedTrace Xᴴ = star (MIPStarRE.Quantum.normalizedTrace X) := by
@@ -257,10 +260,8 @@ theorem ev_mul_comm_of_hermitian {ι : Type*} [Fintype ι] [DecidableEq ι]
     rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, hA, hB, hρ]
     -- goal: ntr((B * A) * ρ) = ntr(ρ * (B * A))
     rw [MIPStarRE.Quantum.normalizedTrace_mul_comm]
-  -- Re(star z) = Re(z), so Re(ntr(ρ(AB))) = Re(ntr(ρ(BA)))
-  have hre : ∀ z : ℂ, Complex.re (star z) = Complex.re z := by
-    intro z; rw [Complex.star_def, Complex.conj_re]
-  linarith [congr_arg Complex.re key, hre (MIPStarRE.Quantum.normalizedTrace (ψ.density * (A * B)))]
+  linarith [congr_arg Complex.re key,
+            re_star (MIPStarRE.Quantum.normalizedTrace (ψ.density * (A * B)))]
 
 /-- `ev` commutes on PSD operators (convenience wrapper). -/
 theorem ev_mul_comm_of_psd {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -287,10 +288,8 @@ theorem ev_cauchy_schwarz {ι : Type*} [Fintype ι] [DecidableEq ι]
       -- (ρ(AᴴB))ᴴ = (AᴴB)ᴴ ρᴴ = BᴴA ρᴴ = BᴴA ρ = ρ (BᴴA)
       simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
       rw [hρ, MIPStarRE.Quantum.normalizedTrace_mul_comm]
-    have hre : ∀ z : ℂ, Complex.re (star z) = Complex.re z := by
-      intro z; rw [Complex.star_def, Complex.conj_re]
     linarith [congr_arg Complex.re hstar,
-              hre (MIPStarRE.Quantum.normalizedTrace (ψ.density * (Aᴴ * B)))]
+              re_star (MIPStarRE.Quantum.normalizedTrace (ψ.density * (Aᴴ * B)))]
   -- Scalar expansion helpers
   have hscale_r : ∀ (t : ℝ) (X : MIPStarRE.Quantum.Op ι),
       ev ψ (((↑t : ℂ) • Bᴴ) * X) = t * ev ψ (Bᴴ * X) := by
