@@ -84,7 +84,7 @@ private lemma qConsDefect_postprocess_le {α β : Type*}
     (ψ : QuantumState ι) (A B : SubMeas α ι) (f : α → β) :
     qConsDefect ψ (postprocess A f) (postprocess B f) ≤
       qConsDefect ψ A B := by
-  sorry
+  simpa using MIPStarRE.LDT.qConsDefect_postprocess_le ψ A B f
 
 /-- `prop:simeq-data-processing`. -/
 theorem simeqDataProcessing {Question α β : Type*}
