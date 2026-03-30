@@ -164,6 +164,8 @@ structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
   liftedEffect : Option α → MIPStarRE.Quantum.Op (d × Option α)
   /-- Each lifted effect is a genuine orthogonal projection. -/
   lifted_isProj : ∀ a, MIPStarRE.Quantum.IsProj (liftedEffect a)
+  /-- Each lifted effect is positive semidefinite, so the family forms a submeasurement. -/
+  lifted_pos : ∀ a, 0 ≤ liftedEffect a
   /-- The lifted projections are mutually orthogonal and sum to at most identity. -/
   lifted_sum_le_one : ∑ a, liftedEffect a ≤ 1
   /-- **Expectation preservation**: for any density matrix `ρ` on `Op d`,

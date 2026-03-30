@@ -58,10 +58,16 @@ Define `P̂_a = V†(I ⊗ |a⟩⟨a|)V`. Then `P̂_a` is an orthogonal projecti
 The proof requires matrix square roots for PSD operators, which are
 available in principle via the spectral theorem but require nontrivial
 Mathlib infrastructure. -/
+/- TODO: The proof requires matrix square roots for PSD operators (via spectral theorem)
+   and Mathlib's `Matrix.PosSemidef.sqrt`. See #98 for tracking. The construction is:
+   1. Build isometry V using √M_a and √(I − ∑M_a)
+   2. Define P̂_a = V†(I ⊗ |a⟩⟨a|)V and verify IsProj
+   3. Verify compression identity: (I⊗⟨⊥|)P̂_a(I⊗|⊥⟩) = M_a
+   Blocked on: Mathlib `Matrix.PosSemidef.sqrt`, `Matrix.IsHermitian.spectral_theorem` -/
 theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
     (M : MIPStarRE.Quantum.Submeasurement α d) :
-    ∃ data : OneMeasNaimarkData α d, data.source = M := by
+    OneMeasNaimarkLemma α d M := by
   sorry
 
 /-! ### Full Naimark dilation (Theorem 5.1) -/
@@ -82,6 +88,9 @@ operator `Â^x_a` acts as the Naimark projector on the `x`-th auxiliary
 and as the identity on all others. Since different questions use disjoint
 auxiliary registers, the per-question identities compose to give the
 full joint-probability preservation. -/
+/- TODO: Proof applies `oneMeasNaimark` per question per player and composes
+   via tensor-product structure. Blocked on `oneMeasNaimark` proof above.
+   See #98 for tracking. -/
 theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
