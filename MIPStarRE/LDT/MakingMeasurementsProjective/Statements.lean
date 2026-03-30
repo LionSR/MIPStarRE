@@ -46,10 +46,10 @@ measurements act on disjoint tensor factors). -/
 structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
-    [Fintype ι] [DecidableEq ι]
     [Fintype OutcomeA] [DecidableEq OutcomeA]
-    [Fintype OutcomeB] [DecidableEq OutcomeB]
     [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB]
+    [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
     (A : IdxSubMeas QuestionA OutcomeA ι)
     (B : IdxSubMeas QuestionB OutcomeB ι)
@@ -95,7 +95,10 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
         jointOutcomeProbability data.liftedState
           ((data.right y).toSubMeas)
           ((data.left x).toSubMeas) b a
-  /-- A concrete matrix-level witness for the dilation exists. -/
+  /-- A concrete matrix-level witness for the dilation exists.
+  TODO: When filling in proofs, this should be connected to `data` so that the
+  matrix-level identities are guaranteed to witness the *same* dilation as the
+  abstract-level preservation fields above. See #98. -/
   matrixWitness :
     Nonempty (MatrixNaimarkWitness QuestionA OutcomeA QuestionB OutcomeB)
 

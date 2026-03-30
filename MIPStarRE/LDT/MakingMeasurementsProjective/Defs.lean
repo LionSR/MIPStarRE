@@ -164,14 +164,18 @@ structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
   liftedEffect : Option α → MIPStarRE.Quantum.Op (d × Option α)
   /-- Each lifted effect is a genuine orthogonal projection. -/
   lifted_isProj : ∀ a, MIPStarRE.Quantum.IsProj (liftedEffect a)
-  /-- Each lifted effect is positive semidefinite, so the family forms a submeasurement. -/
+  /-- Each lifted effect is positive semidefinite, so the family forms a submeasurement.
+  Note: this is mathematically redundant with `lifted_isProj` (projections are PSD),
+  but kept as a convenience field for downstream `Submeasurement` packaging until
+  `IsProj.pos` is available in Mathlib. -/
   lifted_pos : ∀ a, 0 ≤ liftedEffect a
   /-- The lifted projections are mutually orthogonal and sum to at most identity. -/
   lifted_sum_le_one : ∑ a, liftedEffect a ≤ 1
-  /-- **Expectation preservation**: for any density matrix `ρ` on `Op d`,
-  the probability of outcome `a` under the original submeasurement equals
-  the probability under the dilated projective submeasurement with the
-  Naimark-lifted state. This is the core content of the dilation. -/
+  /-- **Expectation preservation**: for any operator `ρ` on `Op d`,
+  the expectation of outcome `a` under the original submeasurement equals
+  the expectation under the dilated projective submeasurement with the
+  Naimark-lifted state. The identity is linear, so it holds for all operators,
+  not just density matrices. This is the core content of the dilation. -/
   expectation_preservation : ∀ (ρ : MIPStarRE.Quantum.Op d) (a : α),
     MIPStarRE.Quantum.normalizedTrace (ρ * source.effect a) =
       MIPStarRE.Quantum.normalizedTrace
@@ -228,6 +232,10 @@ side, an auxiliary register of dimension `|Outcome| + 1` is tensored in.
 The type `QuestionA → Option OutcomeA` represents the tensor product
 `⊗_x ℂ^{|OutcomeA|+1}` of per-question Alice auxiliaries, and similarly
 for Bob. -/
+-- Note: The `Fintype` instance for `QuestionA → Option OutcomeA` has cardinality
+-- `(|OutcomeA| + 1)^|QuestionA|`, which grows exponentially. This is fine for the
+-- abstract proofs but may cause performance issues with `decide`/`Finset.sum` when
+-- filling in real proofs. See #98 for tracking.
 abbrev NaimarkLiftedIndex (ι : Type*) (QuestionA OutcomeA QuestionB OutcomeB : Type*) :=
   ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)
 
