@@ -169,7 +169,8 @@ structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
   but kept as a convenience field for downstream `Submeasurement` packaging until
   `IsProj.pos` is available in Mathlib. -/
   lifted_pos : ∀ a, 0 ≤ liftedEffect a
-  /-- The lifted projections are mutually orthogonal and sum to at most identity. -/
+  /-- The lifted projections sum to at most identity (which together with
+  `lifted_isProj` implies mutual orthogonality). -/
   lifted_sum_le_one : ∑ a, liftedEffect a ≤ 1
   /-- **Expectation preservation**: for any operator `ρ` on `Op d`,
   the expectation of outcome `a` under the original submeasurement equals
