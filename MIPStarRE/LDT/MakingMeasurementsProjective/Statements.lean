@@ -40,9 +40,10 @@ def OneMeasNaimarkLemma (α : Type*) [Fintype α] [DecidableEq α]
 
 This captures the content of Theorem 5.1 (thm:naimark): the dilated
 projective measurements on the enlarged space preserve all single-outcome
-and joint-outcome probabilities, the dilated measurements are genuinely
-projective, and the joint probabilities commute (since the dilated
-measurements act on disjoint tensor factors). -/
+and joint-outcome probabilities, and the joint probabilities commute
+(since the dilated measurements act on disjoint tensor factors).
+Projectivity is already encoded in the types of `data.left` and
+`data.right`, which land in `IdxProjMeas`. -/
 structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
@@ -74,16 +75,6 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
           jointOutcomeProbability data.liftedState
             ((data.left x).toSubMeas)
             ((data.right y).toSubMeas) a b
-  /-- The dilated left measurements are projective (idempotent). -/
-  liftedLeftProjective :
-    ∀ x : QuestionA, ∀ a : OutcomeA,
-      (data.left x).outcome a * (data.left x).outcome a =
-        (data.left x).outcome a
-  /-- The dilated right measurements are projective (idempotent). -/
-  liftedRightProjective :
-    ∀ y : QuestionB, ∀ b : OutcomeB,
-      (data.right y).outcome b * (data.right y).outcome b =
-        (data.right y).outcome b
   /-- Joint probabilities commute: since the dilated measurements act on
   disjoint tensor factors, `⟨ψ̂|Â_a B̂_b|ψ̂⟩ = ⟨ψ̂|B̂_b Â_a|ψ̂⟩`. -/
   liftedCommutativity :

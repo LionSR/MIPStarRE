@@ -44,7 +44,7 @@ open MIPStarRE.LDT
 
 For any submeasurement `M : Submeasurement α d`, there exists a projective
 submeasurement on the enlarged space `d × Option α` such that for every
-density matrix `ρ` and outcome `a`:
+operator `ρ` on `Op d` and outcome `a`:
 `τ(ρ · M_a) = τ'(ρ_lifted · P̂_a)`
 where `ρ_lifted = |Option α| · (ρ ⊗ |⊥⟩⟨⊥|)` and `P̂_a` is the
 dilated projector.
