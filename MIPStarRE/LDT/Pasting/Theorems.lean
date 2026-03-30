@@ -63,19 +63,21 @@ lemma looksEasyButTookMeAWhile
     (h0 : 0 ≤ lambda) (h1 : lambda ≤ 1) :
     lambda * (1 - lambda ^ d)
       ≤ 2 * Real.rpow (lambda ^ (d + 1) * (1 - lambda)) (1 / ((d + 1 : ℕ) : Error)) := by
-  by_cases hl0 : lambda = 0
-  · subst hl0
+  by_cases hλ : lambda = 0 ∨ lambda = 1
+  · -- Boundary cases `lambda = 0` and `lambda = 1` share the same proof pattern.
     have hz : 0 ≤ (0 : Error) ^ (1 / ((d + 1 : ℕ) : Error)) := Real.zero_rpow_nonneg _
-    simpa using hz
-  by_cases hl1 : lambda = 1
-  · subst hl1
-    have hz : 0 ≤ (0 : Error) ^ (1 / ((d + 1 : ℕ) : Error)) := Real.zero_rpow_nonneg _
-    simpa using hz
-  have hlpos : 0 < lambda := lt_of_le_of_ne h0 (Ne.symm hl0)
-  have hllt : lambda < 1 := lt_of_le_of_ne h1 hl1
-  -- The interior case (`0 < λ < 1`) is the core analytic inequality.
-  -- We keep it as a separate placeholder so edge behavior is explicit.
-  sorry
+    rcases hλ with hλ | hλ
+    · subst hλ
+      simpa using hz
+    · subst hλ
+      simpa using hz
+  · -- Interior case: `lambda ≠ 0` and `lambda ≠ 1`, hence `0 < lambda < 1`.
+    push_neg at hλ
+    have hlpos : 0 < lambda := lt_of_le_of_ne h0 (Ne.symm hλ.1)
+    have hl_lt_one : lambda < 1 := lt_of_le_of_ne h1 hλ.2
+    -- The interior case (`0 < λ < 1`) is the core analytic inequality.
+    -- We keep it as a separate placeholder so edge behavior is explicit.
+    sorry
 
 /-- `lem:g-complete-self-consistency`. -/
 lemma gCompleteSelfConsistency
