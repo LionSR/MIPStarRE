@@ -20,6 +20,21 @@ abbrev PointPairDiagonalLineQuestion (params : Parameters) :=
 
 -- leftPlacedSubMeas / rightPlacedSubMeas are defined in Basic/SubMeasurement.lean
 
+/-- Diagonal lines form a finite type via their base point and direction vector. -/
+noncomputable instance (params : Parameters) : Fintype (DiagonalLine params) := by
+  let e : DiagonalLine params ≃ Point params × Point params :=
+    { toFun := fun ℓ => (ℓ.base, ℓ.direction)
+      invFun := fun bd => { base := bd.1, direction := bd.2 }
+      left_inv := by
+        intro ℓ
+        cases ℓ
+        rfl
+      right_inv := by
+        intro bd
+        cases bd
+        rfl }
+  exact Fintype.ofEquiv (Point params × Point params) e.symm
+
 /-- Ordered product of two paper-local submeasurements on the same tensor factor. -/
 noncomputable def orderedProductSubMeas {α β : Type*}
     (A : SubMeas α ι) (B : SubMeas β ι) :
@@ -79,34 +94,12 @@ noncomputable def pointMeasurementProductRight (params : Parameters)
 /-- Distribution obtained by sampling a diagonal line together with a parameter on that line. -/
 noncomputable def pointWithDiagonalLineDistribution (params : Parameters) :
     Distribution (PointDiagonalLineQuestion params) :=
-  let q0 : PointDiagonalLineQuestion params := (default, default)
-  { support := {q0}
-    weight := fun q => if q = q0 then 1 else 0
-    nonnegative := by
-      intro q
-      by_cases hq : q = q0 <;> simp [hq]
-    outsideSupport := by
-      intro q hq
-      by_cases hq0 : q = q0
-      · subst hq0
-        simp at hq
-      · simp [hq0] }
+  uniformDistribution (PointDiagonalLineQuestion params)
 
 /-- Distribution obtained by sampling a diagonal line together with two parameters on it. -/
 noncomputable def pointPairSharedDiagonalLineDistribution (params : Parameters) :
     Distribution (PointPairDiagonalLineQuestion params) :=
-  let q0 : PointPairDiagonalLineQuestion params := (default, (default, default))
-  { support := {q0}
-    weight := fun q => if q = q0 then 1 else 0
-    nonnegative := by
-      intro q
-      by_cases hq : q = q0 <;> simp [hq]
-    outsideSupport := by
-      intro q hq
-      by_cases hq0 : q = q0
-      · subst hq0
-        simp at hq
-      · simp [hq0] }
+  uniformDistribution (PointPairDiagonalLineQuestion params)
 
 /-- The point measurement, reindexed by a sampled diagonal line and a parameter on it. -/
 def sampledPointMeasurement (params : Parameters)
