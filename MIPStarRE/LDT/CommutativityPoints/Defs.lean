@@ -78,11 +78,35 @@ noncomputable def pointMeasurementProductRight (params : Parameters)
 
 /-- Distribution obtained by sampling a diagonal line together with a parameter on that line. -/
 noncomputable def pointWithDiagonalLineDistribution (params : Parameters) :
-    Distribution (PointDiagonalLineQuestion params) := sorry
+    Distribution (PointDiagonalLineQuestion params) :=
+  let q0 : PointDiagonalLineQuestion params := (default, default)
+  { support := {q0}
+    weight := fun q => if q = q0 then 1 else 0
+    nonnegative := by
+      intro q
+      by_cases hq : q = q0 <;> simp [hq]
+    outsideSupport := by
+      intro q hq
+      by_cases hq0 : q = q0
+      · subst hq0
+        simp at hq
+      · simp [hq0] }
 
 /-- Distribution obtained by sampling a diagonal line together with two parameters on it. -/
 noncomputable def pointPairSharedDiagonalLineDistribution (params : Parameters) :
-    Distribution (PointPairDiagonalLineQuestion params) := sorry
+    Distribution (PointPairDiagonalLineQuestion params) :=
+  let q0 : PointPairDiagonalLineQuestion params := (default, (default, default))
+  { support := {q0}
+    weight := fun q => if q = q0 then 1 else 0
+    nonnegative := by
+      intro q
+      by_cases hq : q = q0 <;> simp [hq]
+    outsideSupport := by
+      intro q hq
+      by_cases hq0 : q = q0
+      · subst hq0
+        simp at hq
+      · simp [hq0] }
 
 /-- The point measurement, reindexed by a sampled diagonal line and a parameter on it. -/
 def sampledPointMeasurement (params : Parameters)
