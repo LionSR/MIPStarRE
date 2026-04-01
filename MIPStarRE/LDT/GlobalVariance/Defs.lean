@@ -184,7 +184,14 @@ noncomputable def generalizeBLeftFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu)
     { outcome := fun _ => op
-      total := op }
+      total := op
+      outcome_pos := by
+        intro _
+        sorry
+      sum_eq_total := by
+        simp
+      total_le_one := by
+        sorry }
 
 /-- Aggregated family for the right-hand side of `lem:generalize-b`
 on the bipartite space `d * d`. -/
@@ -197,7 +204,14 @@ noncomputable def generalizeBRightFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu)
     { outcome := fun _ => op
-      total := op }
+      total := op
+      outcome_pos := by
+        intro _
+        sorry
+      sum_eq_total := by
+        simp
+      total_le_one := by
+        sorry }
 
 /-- Aggregated family for `A^u_[g(u)] ⊗ (G_g)^{1/2}`
 on the bipartite space `d * d`. -/
@@ -210,7 +224,14 @@ noncomputable def localVarianceLeftFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
     { outcome := fun _ => op
-      total := op }
+      total := op
+      outcome_pos := by
+        intro _
+        sorry
+      sum_eq_total := by
+        simp
+      total_le_one := by
+        sorry }
 
 /-- Aggregated family for `A^v_[g(v)] ⊗ (G_g)^{1/2}`
 on the bipartite space `d * d`. -/
@@ -223,7 +244,14 @@ noncomputable def localVarianceRightFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)
     { outcome := fun _ => op
-      total := op }
+      total := op
+      outcome_pos := by
+        intro _
+        sorry
+      sum_eq_total := by
+        simp
+      total_le_one := by
+        sorry }
 
 /-- The same weighted operator on the first independently sampled point.
 On the bipartite space `d * d`. -/
@@ -236,7 +264,14 @@ noncomputable def globalVarianceLeftFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
     { outcome := fun _ => op
-      total := op }
+      total := op
+      outcome_pos := by
+        intro _
+        sorry
+      sum_eq_total := by
+        simp
+      total_le_one := by
+        sorry }
 
 /-- The same weighted operator on the second independently sampled point.
 On the bipartite space `d * d`. -/
@@ -249,7 +284,14 @@ noncomputable def globalVarianceRightFamily (params : Parameters)
       averageOperatorOverDistribution (polynomialDistribution params)
         (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)
     { outcome := fun _ => op
-      total := op }
+      total := op
+      outcome_pos := by
+        intro _
+        sorry
+      sum_eq_total := by
+        simp
+      total_le_one := by
+        sorry }
 
 /-- The edgewise squared norm expression in `lem:local-variance-of-points`.
 Uses bipartite state `ψbi` on `d * d`. -/

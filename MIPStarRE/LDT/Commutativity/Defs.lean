@@ -23,22 +23,30 @@ abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
 abbrev FullSliceOutcome (params : Parameters) := Polynomial params × Polynomial params
 
 /-- Ordered product placed on the left tensor factor of the bipartite space `ι × ι`. -/
-noncomputable def leftOrderedProductSubMeas {α β : Type*}
+noncomputable def leftOrderedProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas (α × β) (ι × ι) :=
   leftPlacedSubMeas (ιB := ι) (orderedProductSubMeas A B)
 
 /-- Append a total operator on the right of every outcome operator. -/
-noncomputable def appendRightTotalSubMeas {α : Type*} {κ : Type*} [Fintype κ] [DecidableEq κ]
+noncomputable def appendRightTotalSubMeas {α : Type*} [Fintype α] {κ : Type*}
+    [Fintype κ] [DecidableEq κ]
     (A : SubMeas α κ) (X : MIPStarRE.Quantum.Op κ) : SubMeas α κ where
   outcome := fun a => A.outcome a * X
   total := A.total * X
+  outcome_pos := by
+    intro a
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 /-- Sandwiched product `A_a B_b A_a`.
 
 Its total operator should be the sum-of-sandwiches
 `∑_a A_a (∑_b B_b) A_a` whenever `α` is finitely enumerable. -/
-noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α]
+noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas (α × β) ι where
   outcome := fun ab =>
@@ -47,6 +55,14 @@ noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α]
         A.outcome a * B.outcome b * A.outcome a
   total :=
     ∑ a : α, A.outcome a * B.total * A.outcome a
+  outcome_pos := by
+    intro ab
+    cases ab
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 /-- The full-slice question underlying an evaluated-slice sample. -/
 def fullSliceQuestionOfEvaluatedSlice (params : Parameters)
@@ -218,30 +234,38 @@ noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters)
 We propagate explicit `matrix` from the input operators so that
 the sum `∑_b C_{a,b}` accumulates correctly. -/
 noncomputable def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι)
     (a : OutcomeA) (b : OutcomeB) : MIPStarRE.Quantum.Op ι :=
   Q.outcome b * P.outcome a * Q.outcome b
 
 /-- The sandwiched family `b ↦ Q_b P_a Q_b`. -/
 noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Type*}
-    [Fintype OutcomeB]
+    [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) :
     IdxSubMeas OutcomeA OutcomeB ι :=
   fun a =>
     { outcome := fun b => normalizationConditionSandwichedOperator P Q a b
       total :=
-        ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b }
+        ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b
+      outcome_pos := by
+        intro b
+        sorry
+      sum_eq_total := by
+        rfl
+      total_le_one := by
+        sorry }
 
 /-- The total family `a ↦ ∑_b C_{a,b}` from `lem:normalization-condition`. -/
 noncomputable def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type*}
-    [Fintype OutcomeB]
+    [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) :
     IdxSubMeas OutcomeA Unit ι :=
   fun a => postprocess (normalizationConditionSandwichedFamily P Q a) (fun _ => ())
 
 /-- The formal operator `∑_b C_{a,b}` from `lem:normalization-condition`. -/
 noncomputable def normalizationConditionSandwichedTotalOperator {OutcomeA OutcomeB : Type*}
-    [Fintype OutcomeB]
+    [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι)
     (a : OutcomeA) : MIPStarRE.Quantum.Op ι :=
   (normalizationConditionSandwichedTotalFamily P Q a).total
@@ -258,6 +282,13 @@ noncomputable def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
     ∑ a : OutcomeA,
       normalizationConditionSandwichedTotalOperator P Q a *
         (normalizationConditionSandwichedTotalOperator P Q a)ᴴ
+  outcome_pos := by
+    intro a
+    sorry
+  sum_eq_total := by
+    rfl
+  total_le_one := by
+    sorry
 
 /-- The family `a ↦ (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
 noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
@@ -271,6 +302,13 @@ noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB :
     ∑ a : OutcomeA,
       (normalizationConditionSandwichedTotalOperator P Q a)ᴴ *
         normalizationConditionSandwichedTotalOperator P Q a
+  outcome_pos := by
+    intro a
+    sorry
+  sum_eq_total := by
+    rfl
+  total_le_one := by
+    sorry
 
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 noncomputable def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type*}

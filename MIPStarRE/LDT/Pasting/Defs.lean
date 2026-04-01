@@ -57,26 +57,47 @@ noncomputable def bernoulliTailOperator (k degree : ℕ)
     (Nat.choose k r : ℂ) • (X ^ r * (1 - X) ^ (k - r))
 
 /-- Multiply each outcome operator by a total operator on the right. -/
-noncomputable def multiplyByTotalOnRight {α β : Type*}
+noncomputable def multiplyByTotalOnRight {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas α ι where
   outcome := fun a => A.outcome a * B.total
   total := A.total * B.total
+  outcome_pos := by
+    intro a
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 /-- Multiply each outcome operator by a total operator on the left. -/
-noncomputable def multiplyByTotalOnLeft {α β : Type*}
+noncomputable def multiplyByTotalOnLeft {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas β ι where
   outcome := fun b => A.total * B.outcome b
   total := A.total * B.total
+  outcome_pos := by
+    intro b
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 /-- Average an indexed family against a named distribution. -/
-noncomputable def averageIdxSubMeas {Question Outcome : Type*}
+noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
     (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome ι) :
     SubMeas Outcome ι where
   outcome := fun a =>
     averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
   total := averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
+  outcome_pos := by
+    intro a
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 /-- Record which completed-slice outcomes are genuine polynomial outcomes. -/
 def gHatTupleType {params : Parameters} {k : ℕ}
@@ -173,7 +194,15 @@ noncomputable def completePartSubMeas (params : Parameters)
 noncomputable def incompletePartSubMeas (params : Parameters)
     (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
   let X := 1 - (completePartSubMeas params family x).total
-  { outcome := fun _ => X, total := X }
+  { outcome := fun _ => X
+    total := X
+    outcome_pos := by
+      intro _
+      exact sub_nonneg.mpr (completePartSubMeas params family x).total_le_one
+    sum_eq_total := by
+      simp
+    total_le_one := by
+      sorry }
 
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
 noncomputable def gHatIdxMeas (params : Parameters)
