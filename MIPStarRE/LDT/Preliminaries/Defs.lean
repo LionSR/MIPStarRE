@@ -54,14 +54,15 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
   fun q => {
     outcome := fun a =>
       (A q).outcome a * (B q).toSubMeas.outcome a * (A q).outcome a
-    total := (A q).total
+    total := ∑ a : Outcome,
+      (A q).outcome a * (B q).toSubMeas.outcome a * (A q).outcome a
     outcome_pos := by
       intro a
       sorry
     sum_eq_total := by
-      sorry
+      rfl
     total_le_one := by
-      simpa using (A q).total_le_one
+      sorry
   }
 
 /-- Family for the intermediate `A_a (Σ_b B_b) A_a` sandwich. -/
@@ -74,14 +75,15 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*}
   fun q => {
     outcome := fun a =>
       (A q).outcome a * (B q).toSubMeas.total * (A q).outcome a
-    total := (A q).total
+    total := ∑ a : Outcome,
+      (A q).outcome a * (B q).toSubMeas.total * (A q).outcome a
     outcome_pos := by
       intro a
       sorry
     sum_eq_total := by
-      sorry
+      rfl
     total_le_one := by
-      simpa using (A q).total_le_one
+      sorry
   }
 
 /-- Output package for `prop:cons-sub-meas`. -/

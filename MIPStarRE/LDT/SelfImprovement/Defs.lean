@@ -78,14 +78,13 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
     (T : Measurement (Polynomial params) ι) (u : Point params) :
     SubMeas (Polynomial params) ι :=
   { outcome := sandwichedPolynomialOutcomeOperatorAt params strategy T u
-    total :=
-      averageOperatorOverDistribution (polynomialDistribution params)
-        (sandwichedPolynomialOutcomeOperatorAt params strategy T u)
+    total := ∑ h : Polynomial params,
+      sandwichedPolynomialOutcomeOperatorAt params strategy T u h
     outcome_pos := by
       intro h
       sorry
     sum_eq_total := by
-      sorry
+      rfl
     total_le_one := by
       sorry }
 
@@ -96,14 +95,14 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
   { outcome := fun h =>
       averageOperatorOverDistribution (uniformDistribution (Point params))
         (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
-    total :=
+    total := ∑ h : Polynomial params,
       averageOperatorOverDistribution (uniformDistribution (Point params))
-        (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total)
+        (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
     outcome_pos := by
       intro h
       sorry
     sum_eq_total := by
-      sorry
+      rfl
     total_le_one := by
       sorry }
 

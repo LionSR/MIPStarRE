@@ -33,7 +33,7 @@ instance {α : Type*} [Fintype α] {ι : Type*} [Fintype ι] [DecidableEq ι] :
     sum_eq_total := by
       simp
     total_le_one := by
-      sorry
+      exact (zero_le_one : (0 : MIPStarRE.Quantum.Op ι) ≤ 1)
   }
 
 /-- A paper-local measurement: a POVM whose PSD effects sum to the identity. -/
@@ -119,12 +119,29 @@ theorem Measurement.sum_eq {α : Type*} {ι : Type*}
     ∑ a, M.outcome a = 1 := by
   rw [M.sum_eq_total, M.total_eq_one]
 
+/-- Every submeasurement outcome is bounded by the total operator. -/
+theorem SubMeas.outcome_le_total {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) (a : α) :
+    A.outcome a ≤ A.total := by
+  calc A.outcome a
+      ≤ ∑ i : α, A.outcome i :=
+        Finset.single_le_sum (fun i _ => A.outcome_pos i) (Finset.mem_univ a)
+    _ = A.total := A.sum_eq_total
+
+/-- Every submeasurement outcome is bounded by the identity. -/
+theorem SubMeas.outcome_le_one {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) (a : α) :
+    A.outcome a ≤ 1 :=
+  le_trans (A.outcome_le_total a) A.total_le_one
+
 /-- Projective submeasurement outcomes are Hermitian (PSD from idempotence). -/
 theorem ProjSubMeas.outcome_hermitian {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
     (P : ProjSubMeas α ι) (a : α) :
     (P.outcome a)ᴴ = P.outcome a := by
-  sorry
+  exact (Matrix.nonneg_iff_posSemidef.mp (P.outcome_pos a)).isHermitian.eq
 
 /-- Projective measurement outcomes are Hermitian (inherited from Measurement.outcome_pos). -/
 theorem ProjMeas.outcome_hermitian {α : Type*} {ι : Type*}
@@ -220,7 +237,7 @@ noncomputable def completeSubMeas {α : Type*} {ι : Type*}
           exact A.outcome_pos a
     sum_eq_total := by
       classical
-      simp [A.sum_eq_total, add_comm, add_left_comm, add_assoc, sub_eq_add_neg]
+      simp [A.sum_eq_total, add_comm, sub_eq_add_neg]
     total_le_one := by
       exact le_rfl
   }
@@ -232,6 +249,102 @@ def constSubMeasFamily {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [Deci
     IdxSubMeas Unit α ι :=
   fun _ => A
 
+private theorem leftTensor_finset_sum {α : Type*}
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₁) :
+    Finset.sum s (fun a => leftTensor (ι₂ := ι₂) (f a)) =
+      leftTensor (ι₂ := ι₂) (Finset.sum s f) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty =>
+      simp [leftTensor]
+  | insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
+      simp [leftTensor, Matrix.add_kronecker]
+
+private theorem rightTensor_finset_sum {α : Type*}
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₂) :
+    Finset.sum s (fun a => rightTensor (ι₁ := ι₁) (f a)) =
+      rightTensor (ι₁ := ι₁) (Finset.sum s f) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty =>
+      simp [rightTensor]
+  | insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
+      simp [rightTensor, Matrix.kronecker_add]
+
+private theorem leftTensor_nonneg
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {A : MIPStarRE.Quantum.Op ι₁} (hA : 0 ≤ A) :
+    0 ≤ leftTensor (ι₂ := ι₂) A := by
+  change 0 ≤ Matrix.kronecker A (1 : MIPStarRE.Quantum.Op ι₂)
+  exact
+    (Matrix.PosSemidef.kronecker
+      (Matrix.nonneg_iff_posSemidef.mp hA)
+      (Matrix.nonneg_iff_posSemidef.mp
+        (zero_le_one : (0 : MIPStarRE.Quantum.Op ι₂) ≤ 1))).nonneg
+
+private theorem rightTensor_nonneg
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {A : MIPStarRE.Quantum.Op ι₂} (hA : 0 ≤ A) :
+    0 ≤ rightTensor (ι₁ := ι₁) A := by
+  change 0 ≤ Matrix.kronecker (1 : MIPStarRE.Quantum.Op ι₁) A
+  exact
+    (Matrix.PosSemidef.kronecker
+      (Matrix.nonneg_iff_posSemidef.mp
+        (zero_le_one : (0 : MIPStarRE.Quantum.Op ι₁) ≤ 1))
+      (Matrix.nonneg_iff_posSemidef.mp hA)).nonneg
+
+private theorem leftTensor_le_one
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {A : MIPStarRE.Quantum.Op ι₁} (hA : A ≤ 1) :
+    leftTensor (ι₂ := ι₂) A ≤ 1 := by
+  change (1 - leftTensor (ι₂ := ι₂) A).PosSemidef
+  have hrewrite : 1 - leftTensor (ι₂ := ι₂) A = leftTensor (ι₂ := ι₂) (1 - A) := by
+    ext i j
+    rcases i with ⟨i₁, i₂⟩
+    rcases j with ⟨j₁, j₂⟩
+    by_cases h₁ : i₁ = j₁
+    · by_cases h₂ : i₂ = j₂
+      · subst h₁
+        subst h₂
+        simp [leftTensor, sub_eq_add_neg]
+      · simp [leftTensor, h₁, h₂, sub_eq_add_neg]
+    · by_cases h₂ : i₂ = j₂
+      · simp [leftTensor, h₁, h₂, sub_eq_add_neg]
+      · simp [leftTensor, h₁, h₂, sub_eq_add_neg]
+  have hpsd :
+      Matrix.PosSemidef (leftTensor (ι₂ := ι₂) (1 - A)) :=
+    Matrix.nonneg_iff_posSemidef.mp <|
+      leftTensor_nonneg (ι₂ := ι₂) (sub_nonneg.mpr hA)
+  rwa [hrewrite]
+
+private theorem rightTensor_le_one
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {A : MIPStarRE.Quantum.Op ι₂} (hA : A ≤ 1) :
+    rightTensor (ι₁ := ι₁) A ≤ 1 := by
+  change (1 - rightTensor (ι₁ := ι₁) A).PosSemidef
+  have hrewrite : 1 - rightTensor (ι₁ := ι₁) A = rightTensor (ι₁ := ι₁) (1 - A) := by
+    ext i j
+    rcases i with ⟨i₁, i₂⟩
+    rcases j with ⟨j₁, j₂⟩
+    by_cases h₁ : i₁ = j₁
+    · by_cases h₂ : i₂ = j₂
+      · subst h₁
+        subst h₂
+        simp [rightTensor, sub_eq_add_neg]
+      · simp [rightTensor, h₁, h₂, sub_eq_add_neg]
+    · by_cases h₂ : i₂ = j₂
+      · simp [rightTensor, h₁, h₂, sub_eq_add_neg]
+      · simp [rightTensor, h₁, h₂, sub_eq_add_neg]
+  have hpsd :
+      Matrix.PosSemidef (rightTensor (ι₁ := ι₁) (1 - A)) :=
+    Matrix.nonneg_iff_posSemidef.mp <|
+      rightTensor_nonneg (ι₁ := ι₁) (sub_nonneg.mpr hA)
+  rwa [hrewrite]
+
 /-- Lift a submeasurement to the left tensor factor of a bipartite space `ι × ι`.
 Each outcome operator `A_a : Op ι` becomes `A_a ⊗ I : Op (ι × ι)`. -/
 def SubMeas.liftLeft {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι]
@@ -240,11 +353,11 @@ def SubMeas.liftLeft {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [Decida
   total := leftTensor (ι₂ := ι) A.total
   outcome_pos := by
     intro a
-    sorry
+    exact leftTensor_nonneg (ι₂ := ι) (A.outcome_pos a)
   sum_eq_total := by
-    sorry
+    rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ A.outcome, A.sum_eq_total]
   total_le_one := by
-    sorry
+    exact leftTensor_le_one (ι₂ := ι) A.total_le_one
 
 /-- Lift an indexed submeasurement family to the left tensor factor. -/
 def IdxSubMeas.liftLeft {Question Outcome : Type*} {ι : Type*}
@@ -269,11 +382,11 @@ def leftPlacedSubMeas {α : Type*}
   total := leftTensor (ι₂ := ιB) A.total
   outcome_pos := by
     intro a
-    sorry
+    exact leftTensor_nonneg (ι₂ := ιB) (A.outcome_pos a)
   sum_eq_total := by
-    sorry
+    rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ A.outcome, A.sum_eq_total]
   total_le_one := by
-    sorry
+    exact leftTensor_le_one (ι₂ := ιB) A.total_le_one
 
 /-- Place a submeasurement on the right tensor factor of `ιA × ιB`. -/
 def rightPlacedSubMeas {α : Type*}
@@ -285,10 +398,10 @@ def rightPlacedSubMeas {α : Type*}
   total := rightTensor (ι₁ := ιA) A.total
   outcome_pos := by
     intro a
-    sorry
+    exact rightTensor_nonneg (ι₁ := ιA) (A.outcome_pos a)
   sum_eq_total := by
-    sorry
+    rw [rightTensor_finset_sum (ι₁ := ιA) Finset.univ A.outcome, A.sum_eq_total]
   total_le_one := by
-    sorry
+    exact rightTensor_le_one (ι₁ := ιA) A.total_le_one
 
 end MIPStarRE.LDT

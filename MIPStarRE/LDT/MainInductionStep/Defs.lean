@@ -13,6 +13,7 @@ averaging operators, and temporary tensor-placement helpers.
 namespace MIPStarRE.LDT.MainInductionStep
 
 open MIPStarRE.LDT
+open scoped BigOperators MatrixOrder ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
@@ -112,26 +113,54 @@ structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι
 
 end RestrictedSymStrat
 
+private def axisLinePolynomialEquiv (params : Parameters) (x : Fq params) :
+    AxisLinePolynomial params ≃ AxisLinePolynomial params.next where
+  toFun := liftAxisAnswer params x
+  invFun := fun f => AxisLinePolynomial.restrictAtHeight params f x
+  left_inv := by
+    intro f
+    cases f
+    rfl
+  right_inv := by
+    intro f
+    cases f
+    rfl
+
 /-- Restrict an axis-parallel line measurement to the slice at height `x`. -/
 noncomputable def restrictAxisParallelMeasurement (params : Parameters)
     (strategy : SymStrat params.next ι) (x : Fq params) :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι :=
   fun ℓ =>
     let lifted := strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)
+    let restrictedTotal : MIPStarRE.Quantum.Op ι :=
+      ∑ f : AxisLinePolynomial params,
+        lifted.toSubMeas.outcome (liftAxisAnswer params x f)
+    have hrestrictedTotal :
+        restrictedTotal = 1 := by
+      calc
+        restrictedTotal
+          = ∑ g : AxisLinePolynomial params.next, lifted.toSubMeas.outcome g := by
+              simpa [restrictedTotal] using
+                (Fintype.sum_equiv (axisLinePolynomialEquiv params x)
+                  (fun f => lifted.toSubMeas.outcome (liftAxisAnswer params x f))
+                  (fun g => lifted.toSubMeas.outcome g)
+                  (by intro f; rfl))
+        _ = 1 := by
+            rw [lifted.toSubMeas.sum_eq_total, lifted.total_eq_one]
     { toMeasurement := {
         toSubMeas := {
           outcome := fun f =>
             lifted.toSubMeas.outcome (liftAxisAnswer params x f)
-          total := ∑ f : AxisLinePolynomial params,
-            lifted.toSubMeas.outcome (liftAxisAnswer params x f)
+          total := 1
           outcome_pos := fun f => lifted.outcome_pos (liftAxisAnswer params x f)
           sum_eq_total := by
-            rfl
+            simpa [restrictedTotal] using hrestrictedTotal
           total_le_one := by
-            sorry
+            change Matrix.PosSemidef ((1 : MIPStarRE.Quantum.Op ι) - 1)
+            simpa using (Matrix.PosSemidef.zero : Matrix.PosSemidef (0 : MIPStarRE.Quantum.Op ι))
         }
         total_eq_one := by
-          sorry }
+          rfl }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
 /-- Restrict a diagonal-line measurement to the slice at height `x`. -/
