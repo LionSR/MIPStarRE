@@ -92,18 +92,21 @@ noncomputable def sscError {Question Outcome : Type*} {ι : Type*} [Fintype ι] 
   avgOver 𝒟 (fun q => qSSCDefect ψ (A q))
 
 /-- Total mass of a submeasurement on state `ψ`, computed from the concrete total operator. -/
-noncomputable def subMeasMass {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def subMeasMass {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι) : Error :=
   ev ψ A.total
 
 /-- Averaged total mass of an indexed submeasurement. -/
-noncomputable def idxSubMeasMass {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def idxSubMeasMass {Question Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) : Error :=
   avgOver 𝒟 (fun q => subMeasMass ψ (A q))
 
 /-- Defect in domination by an operator witness, measured at the expectation-value level. -/
-noncomputable def bndError {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def bndError {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι)
     (Z : MIPStarRE.Quantum.Op ι) : Error :=
   max 0 (subMeasMass ψ A - ev ψ Z)
@@ -130,12 +133,14 @@ structure SSCRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [Decidable
   diagonalOverlapBound : sscError ψ 𝒟 A ≤ δ
 
 /-- Completeness statement for a submeasurement. -/
-structure CompletenessAtLeast {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+structure CompletenessAtLeast {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι) (r : Error) : Prop where
   lowerBound : subMeasMass ψ A ≥ r
 
 /-- Boundedness statement witnessed by an operator. -/
-structure BoundedByOperator {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+structure BoundedByOperator {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι)
     (Z : MIPStarRE.Quantum.Op ι) (δ : Error) : Prop where
   witnessOpPSD : 0 ≤ Z
@@ -225,6 +230,7 @@ theorem sscError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
 
 /-- The domination defect is nonneg by definition (`max 0 _`). -/
 theorem bndError_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι) (Z : MIPStarRE.Quantum.Op ι) :
     0 ≤ bndError ψ A Z := by
   unfold bndError; exact le_max_left 0 _
@@ -233,10 +239,10 @@ theorem bndError_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq
 
 /-- Postprocessing preserves the total operator. -/
 theorem postprocess_total {α β : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype α]
+    [Fintype α] [Fintype β]
     (A : SubMeas α ι) (f : α → β) :
     (postprocess A f).total = A.total := by
-  simp [postprocess]
+  rfl
 
 /-- The self-distance `qSDD ψ A A` is zero. -/
 theorem qSDD_self {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]

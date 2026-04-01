@@ -85,7 +85,7 @@ structure ConsSubMeasStmt {Question Outcome : Type*} {ι : Type*} [Fintype ι] [
 
 /-- Averaged left-placed sandwich scalar from `prop:switch-sandwich`. -/
 noncomputable def leftSandwichExpectation {Question Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
     (B : MIPStarRE.Quantum.Op ι) : Error :=
@@ -97,7 +97,7 @@ noncomputable def leftSandwichExpectation {Question Outcome : Type*}
 
 /-- Averaged middle sandwich scalar from `prop:switch-sandwich`. -/
 noncomputable def middleSandwichExpectation {Question Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
     (B : MIPStarRE.Quantum.Op (ι × ι)) : Error :=
@@ -109,7 +109,7 @@ noncomputable def middleSandwichExpectation {Question Outcome : Type*}
 
 /-- Averaged right-placed sandwich scalar from `prop:switch-sandwich`. -/
 noncomputable def rightSandwichExpectation {Question Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
     (B : MIPStarRE.Quantum.Op ι) : Error :=
@@ -121,7 +121,7 @@ noncomputable def rightSandwichExpectation {Question Outcome : Type*}
 
 /-- Output package for `prop:switch-sandwich`. -/
 structure SwitchSandwichStmt {Question Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
     (B : MIPStarRE.Quantum.Op ι) (δ : Error) : Prop where
@@ -136,7 +136,7 @@ structure SwitchSandwichStmt {Question Outcome : Type*}
 
 /-- Output package for `prop:completeness-transfer-projective-P`. -/
 structure CompTransferStmt {Question Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
     (P : IdxProjSubMeas Question Outcome ι) (ε : Error) : Prop where
@@ -161,14 +161,28 @@ noncomputable def completeAtOutcome {Outcome : Type*}
         else
           B.outcome a
       total := 1
+      outcome_pos := by
+        intro a
+        by_cases h : a = a0
+        · simpa [h, residual] using
+            add_nonneg (B.outcome_pos a0) (sub_nonneg.mpr B.total_le_one)
+        · simp [h, B.outcome_pos a]
+      sum_eq_total := by
+        have hsingle :
+            (∑ x : Outcome, if x = a0 then residual else 0) = residual := by
+          simpa using
+            (Finset.sum_ite_eq (s := Finset.univ) (a := a0) (b := residual))
+        have hrewrite :
+            (∑ a : Outcome, if h : a = a0 then B.outcome a + residual else B.outcome a) =
+              ∑ a : Outcome, (B.outcome a + if a = a0 then residual else 0) := by
+          apply Finset.sum_congr rfl
+          intro a _
+          by_cases h : a = a0 <;> simp [h]
+        rw [hrewrite, Finset.sum_add_distrib, B.sum_eq_total, hsingle]
+        simp [residual]
+      total_le_one := le_rfl
     }
-    -- sorry: same as completeSubMeas — SubMeas has no PSD/summation invariant;
-    -- outcome_pos needs 0 ≤ B.outcome a and 0 ≤ 1 - B.total
-    outcome_pos := sorry
     total_eq_one := rfl
-    -- sorry: same as completeSubMeas — proving ∑ a, outcome a = 1
-    -- requires knowing ∑ a, B.outcome a = B.total, which SubMeas does not guarantee
-    sum_eq := sorry
   }
 
 /-- Output package for `prop:completing-to-measurement`. -/

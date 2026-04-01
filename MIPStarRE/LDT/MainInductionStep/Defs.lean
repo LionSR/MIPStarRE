@@ -36,12 +36,14 @@ def restrictAxisParallelMeasurement (params : Parameters)
         toSubMeas := {
           outcome := fun f =>
             lifted.toSubMeas.outcome (liftAxisAnswer params x f)
-          total := lifted.toSubMeas.total }
-        outcome_pos := fun f => lifted.outcome_pos (liftAxisAnswer params x f)
-        total_eq_one := lifted.total_eq_one
-        -- sorry: liftAxisAnswer is injective but not surjective; sum over restricted
-        -- domain does not equal sum over full domain
-        sum_eq := sorry }
+          total := lifted.toSubMeas.total
+          outcome_pos := fun f => lifted.outcome_pos (liftAxisAnswer params x f)
+          sum_eq_total := by
+            sorry
+          total_le_one := by
+            simpa using lifted.toSubMeas.total_le_one
+        }
+        total_eq_one := lifted.total_eq_one }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
 /-- Restrict a diagonal-line measurement to the slice at height `x`. -/
@@ -54,12 +56,14 @@ def restrictDiagonalMeasurement (params : Parameters)
         toSubMeas := {
           outcome := fun f =>
             lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
-          total := lifted.toSubMeas.total }
-        outcome_pos := fun f => lifted.outcome_pos (liftDiagonalAnswer params x f)
-        total_eq_one := lifted.total_eq_one
-        -- sorry: liftDiagonalAnswer is injective but not surjective; sum over restricted
-        -- domain does not equal sum over full domain
-        sum_eq := sorry }
+          total := lifted.toSubMeas.total
+          outcome_pos := fun f => lifted.outcome_pos (liftDiagonalAnswer params x f)
+          sum_eq_total := by
+            sorry
+          total_le_one := by
+            simpa using lifted.toSubMeas.total_le_one
+        }
+        total_eq_one := lifted.total_eq_one }
       proj := fun f => lifted.proj (liftDiagonalAnswer params x f) }
 
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
@@ -163,6 +167,7 @@ Computes `⟨ψ| (Z ⊗ I)(I ⊗ (I - Σ H_a)) |ψ⟩` where `Z` acts on the lef
 and `H` acts on the right register. -/
 noncomputable def tensorFailureExpectation {Outcome : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
     (ψ : QuantumState (ιA × ιB)) (Z : MIPStarRE.Quantum.Op ιA) (H : SubMeas Outcome ιB) :
     Error :=
   ev ψ <|
