@@ -244,6 +244,26 @@ Every PR touching Lean code should be reviewed against these criteria:
    types incompatible with Mathlib blocks future proof work. See
    [PROOF_INTEGRITY.md](PROOF_INTEGRITY.md) for details.
 
+### Semantic scaffold checklist (required for core math objects)
+
+For semantic objects such as measurements, submeasurements, distributions,
+averaged operators, and packaged theorem outputs, reviewers should additionally
+verify:
+
+1. **Impossible states check** -- Does the structure admit states that are
+   impossible under the paper definition?
+2. **Derived-field check** -- If a field is mathematically derived
+   (e.g. `total = ∑ a, outcome a`), is it either derived on demand or stored
+   together with an equality proof (e.g. `sum_eq_total`)?
+3. **Invariant bundling check** -- Are core invariants (positivity,
+   boundedness/normalization, completeness where applicable) encoded directly
+   in the structure or constructor, rather than deferred to downstream lemmas?
+4. **Stress-test check** -- Is at least one nontrivial theorem in scope of the
+   PR provable/stated against the scaffold without adding ad hoc assumptions?
+
+If any answer is “no”, treat the scaffold as unsafe and request a follow-up
+before broad theorem layering continues.
+
 ---
 
 ## 6. Lean Code Style
