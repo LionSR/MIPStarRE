@@ -37,46 +37,34 @@ private lemma questionSDD_le_two_questionConsistency {Outcome : Type*}
     (ψ : QuantumState ι) (A B : Measurement Outcome ι) :
     qSDD ψ A.toSubMeas B.toSubMeas ≤
       2 * qConsDefect ψ A.toSubMeas B.toSubMeas := by
+  -- Helper: for any measurement `M`, each POVM element satisfies `E * E ≤ E`.
+  have h_sq_le : ∀ (M : Measurement Outcome ι) a,
+      M.outcome a * M.outcome a ≤ M.outcome a := by
+    intro M a
+    let s := CFC.sqrt (M.outcome a)
+    have hresid : 0 ≤ (1 : MIPStarRE.Quantum.Op ι) - M.outcome a := by
+      exact sub_nonneg.mpr (Measurement.outcome_le_one M a)
+    have hconj : 0 ≤ star s * ((1 : MIPStarRE.Quantum.Op ι) - M.outcome a) * s :=
+      star_left_conjugate_nonneg hresid s
+    have hs_star : star s = s :=
+      IsSelfAdjoint.star_eq (IsSelfAdjoint.of_nonneg (CFC.sqrt_nonneg (M.outcome a)))
+    have hs_sq : s * s = M.outcome a := by
+      simpa [s] using (CFC.sqrt_mul_sqrt_self (M.outcome a) (ha := M.outcome_pos a))
+    have hs_middle : s * (M.outcome a * s) = M.outcome a * M.outcome a := by
+      calc
+        s * (M.outcome a * s) = s * ((s * s) * s) := by rw [← hs_sq]
+        _ = (s * s) * (s * s) := by simp [mul_assoc]
+        _ = M.outcome a * M.outcome a := by rw [hs_sq]
+    calc
+      M.outcome a * M.outcome a = s * (M.outcome a * s) := hs_middle.symm
+      _ ≤ M.outcome a := by
+          simpa [sub_mul, mul_sub, sub_nonneg, mul_assoc, hs_star, hs_sq] using hconj
   have hA_sq_le : ∀ a, A.outcome a * A.outcome a ≤ A.outcome a := by
     intro a
-    let s := CFC.sqrt (A.outcome a)
-    have hresid : 0 ≤ (1 : MIPStarRE.Quantum.Op ι) - A.outcome a := by
-      exact sub_nonneg.mpr (Measurement.outcome_le_one A a)
-    have hconj : 0 ≤ star s * ((1 : MIPStarRE.Quantum.Op ι) - A.outcome a) * s :=
-      star_left_conjugate_nonneg hresid s
-    have hs_star : star s = s :=
-      IsSelfAdjoint.star_eq (IsSelfAdjoint.of_nonneg (CFC.sqrt_nonneg (A.outcome a)))
-    have hs_sq : s * s = A.outcome a := by
-      simpa [s] using (CFC.sqrt_mul_sqrt_self (A.outcome a) (ha := A.outcome_pos a))
-    have hs_middle : s * (A.outcome a * s) = A.outcome a * A.outcome a := by
-      calc
-        s * (A.outcome a * s) = s * ((s * s) * s) := by rw [← hs_sq]
-        _ = (s * s) * (s * s) := by simp [mul_assoc]
-        _ = A.outcome a * A.outcome a := by rw [hs_sq]
-    calc
-      A.outcome a * A.outcome a = s * (A.outcome a * s) := hs_middle.symm
-      _ ≤ A.outcome a := by
-          simpa [sub_mul, mul_sub, sub_nonneg, mul_assoc, hs_star, hs_sq] using hconj
+    exact h_sq_le A a
   have hB_sq_le : ∀ a, B.outcome a * B.outcome a ≤ B.outcome a := by
     intro a
-    let s := CFC.sqrt (B.outcome a)
-    have hresid : 0 ≤ (1 : MIPStarRE.Quantum.Op ι) - B.outcome a := by
-      exact sub_nonneg.mpr (Measurement.outcome_le_one B a)
-    have hconj : 0 ≤ star s * ((1 : MIPStarRE.Quantum.Op ι) - B.outcome a) * s :=
-      star_left_conjugate_nonneg hresid s
-    have hs_star : star s = s :=
-      IsSelfAdjoint.star_eq (IsSelfAdjoint.of_nonneg (CFC.sqrt_nonneg (B.outcome a)))
-    have hs_sq : s * s = B.outcome a := by
-      simpa [s] using (CFC.sqrt_mul_sqrt_self (B.outcome a) (ha := B.outcome_pos a))
-    have hs_middle : s * (B.outcome a * s) = B.outcome a * B.outcome a := by
-      calc
-        s * (B.outcome a * s) = s * ((s * s) * s) := by rw [← hs_sq]
-        _ = (s * s) * (s * s) := by simp [mul_assoc]
-        _ = B.outcome a * B.outcome a := by rw [hs_sq]
-    calc
-      B.outcome a * B.outcome a = s * (B.outcome a * s) := hs_middle.symm
-      _ ≤ B.outcome a := by
-          simpa [sub_mul, mul_sub, sub_nonneg, mul_assoc, hs_star, hs_sq] using hconj
+    exact h_sq_le B a
   have hA_sq_sum_le : ∑ a, ev ψ (A.outcome a * A.outcome a) ≤ ev ψ 1 := by
     calc
       ∑ a, ev ψ (A.outcome a * A.outcome a)
