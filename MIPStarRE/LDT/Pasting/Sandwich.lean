@@ -17,19 +17,19 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Left tensor-placement for the auxiliary family `M^x_o`. -/
-def switcherooSelfConsistencyLeft {Outcome : Type*} (params : Parameters)
+def switcherooSelfConsistencyLeft {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SliceQuestion params) Outcome (ι × ι) :=
   fun x => leftPlacedSubMeas (ιB := ι) ((M x).toSubMeas)
 
 /-- Right tensor-placement for the auxiliary family `M^x_o`. -/
-def switcherooSelfConsistencyRight {Outcome : Type*} (params : Parameters)
+def switcherooSelfConsistencyRight {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SliceQuestion params) Outcome (ι × ι) :=
   fun x => rightPlacedSubMeas (ιA := ι) ((M x).toSubMeas)
 
 /-- Concrete hypothesis family for `G^x_g M^y_o`. -/
-noncomputable def switcherooPointProductLeft {Outcome : Type*} (params : Parameters)
+noncomputable def switcherooPointProductLeft {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SlicePairQuestion params) (Polynomial params × Outcome) (ι × ι) :=
@@ -40,7 +40,7 @@ noncomputable def switcherooPointProductLeft {Outcome : Type*} (params : Paramet
         ((M q.2).toSubMeas)
 
 /-- Concrete hypothesis family for `M^y_o G^x_g` on the `Polynomial params × Outcome` outcome type. -/
-noncomputable def switcherooPointProductRight {Outcome : Type*} (params : Parameters)
+noncomputable def switcherooPointProductRight {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SlicePairQuestion params) (Polynomial params × Outcome) (ι × ι) :=
@@ -51,7 +51,7 @@ noncomputable def switcherooPointProductRight {Outcome : Type*} (params : Parame
         ((M q.2).toSubMeas)
 
 /-- Concrete aggregate family for `G^x M^y_o`. -/
-noncomputable def switcherooAggregateLeft {Outcome : Type*} (params : Parameters)
+noncomputable def switcherooAggregateLeft {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SlicePairQuestion params) Outcome (ι × ι) :=
@@ -62,7 +62,7 @@ noncomputable def switcherooAggregateLeft {Outcome : Type*} (params : Parameters
         ((M q.2).toSubMeas)
 
 /-- Concrete aggregate family for `M^y_o G^x`. -/
-noncomputable def switcherooAggregateRight {Outcome : Type*} (params : Parameters)
+noncomputable def switcherooAggregateRight {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SlicePairQuestion params) Outcome (ι × ι) :=
@@ -235,7 +235,14 @@ noncomputable def gHatSandwichFamily (params : Parameters)
         half * halfᴴ
       total :=
         let half := gHatHalfProductTotalOperator params family k xs
-        half * halfᴴ }
+        half * halfᴴ
+      outcome_pos := by
+        intro gs
+        sorry
+      sum_eq_total := by
+        sorry
+      total_le_one := by
+        sorry }
 
 /-- Concrete family for the half-sandwich product of `k` completed slices. -/
 noncomputable def gHatHalfSandwichLeft (params : Parameters)
@@ -244,7 +251,14 @@ noncomputable def gHatHalfSandwichLeft (params : Parameters)
   fun xs =>
     leftPlacedSubMeas (ιB := ι) <|
       { outcome := fun gs => gHatHalfProductOutcomeOperator params family k xs gs
-        total := gHatHalfProductTotalOperator params family k xs }
+        total := gHatHalfProductTotalOperator params family k xs
+        outcome_pos := by
+          intro gs
+          sorry
+        sum_eq_total := by
+          sorry
+        total_le_one := by
+          sorry }
 
 /-- Concrete family for the cyclically permuted half-sandwich product. -/
 noncomputable def gHatHalfSandwichRight (params : Parameters)
@@ -253,7 +267,14 @@ noncomputable def gHatHalfSandwichRight (params : Parameters)
   fun xs =>
     leftPlacedSubMeas (ιB := ι) <|
       { outcome := fun gs => gHatRotatedHalfProductOutcomeOperator params family k xs gs
-        total := gHatRotatedHalfProductTotalOperator params family k xs }
+        total := gHatRotatedHalfProductTotalOperator params family k xs
+        outcome_pos := by
+          intro gs
+          sorry
+        sum_eq_total := by
+          sorry
+        total_le_one := by
+          sorry }
 
 /-- The operator-polynomial `S_{τ≥ℓ}` from `lem:from-H-to-G` (eq:S-def):
 `S_{τ≥ℓ} = ∑_{r : r + suffixWeight ≥ d+1} C(ℓ-1, r) · G^r · (I-G)^{(ℓ-1)-r}`
@@ -306,24 +327,26 @@ outcome `h₀` (the fallback interpolant).  So the outcome operator for `h₀` b
 the total is genuinely the identity `I`. -/
 noncomputable def constructedPastedMeasurement (params : Parameters)
     (family : IdxPolyFamily params ι) (k : ℕ) : Measurement (Polynomial params.next) ι where
-  toSubMeas :=
+  toSubMeas := by
+    classical
     let H := constructedPastedSubMeas params family k
     let h₀ := pastedFallbackOutcome params
     let completionMass := 1 - H.total
-    { outcome := fun h => by
-        classical
-        exact if h = h₀ then
-          H.outcome h + completionMass
-        else
-          H.outcome h
-      total := 1 }
-  -- sorry: underlying SubMeas has no PSD/summation invariant; outcome_pos needs
-  -- 0 ≤ H.outcome h (+ completionMass) which requires PSD of the sandwich construction
-  outcome_pos := sorry
+    exact
+      { outcome := fun h =>
+          if h = h₀ then
+            H.outcome h + completionMass
+          else
+            H.outcome h
+        total := 1
+        outcome_pos := by
+          intro h
+          sorry
+        sum_eq_total := by
+          sorry
+        total_le_one := by
+          exact le_rfl }
   total_eq_one := rfl
-  -- sorry: underlying SubMeas has no PSD/summation invariant; proving ∑ h, outcome h = 1
-  -- requires ∑ h, H.outcome h = H.total, which SubMeas does not guarantee
-  sum_eq := sorry
 
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/
 noncomputable def verticalLineMeasurementFamily (params : Parameters)
@@ -393,7 +416,15 @@ noncomputable def bernoulliTailFromFamily (params : Parameters)
     IdxSubMeas Unit Unit ι :=
   constSubMeasFamily <|
     let Y := bernoulliTailOperator k params.d ((IdxPolyFamily.averagedSubMeas family).total)
-    { outcome := fun _ => Y, total := Y }
+    { outcome := fun _ => Y
+      total := Y
+      outcome_pos := by
+        intro _
+        sorry
+      sum_eq_total := by
+        simp
+      total_le_one := by
+        sorry }
 
 /-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`. -/
 noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters)
@@ -404,7 +435,14 @@ noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters)
     let base := allOutcomesExpansionFamily params strategy family k ()
     let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
     { outcome := fun _ => base.total * weight
-      total := base.total * weight }
+      total := base.total * weight
+      outcome_pos := by
+        intro _
+        sorry
+      sum_eq_total := by
+        simp
+      total_le_one := by
+        sorry }
 
 /-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`. -/
 noncomputable def fromHToGRecurrenceRightFamily (params : Parameters)
@@ -415,6 +453,13 @@ noncomputable def fromHToGRecurrenceRightFamily (params : Parameters)
     let base := bernoulliTailFromFamily params family k ()
     let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
     { outcome := fun _ => base.total * weight
-      total := base.total * weight }
+      total := base.total * weight
+      outcome_pos := by
+        intro _
+        sorry
+      sum_eq_total := by
+        simp
+      total_le_one := by
+        sorry }
 
 end MIPStarRE.LDT.Pasting

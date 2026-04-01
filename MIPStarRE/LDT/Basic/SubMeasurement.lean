@@ -18,12 +18,9 @@ namespace MIPStarRE.LDT
 structure SubMeas (α : Type*) [Fintype α] (ι : Type*) [Fintype ι] [DecidableEq ι] where
   outcome : α → MIPStarRE.Quantum.Op ι := fun _ => 0
   total : MIPStarRE.Quantum.Op ι := 0
-  outcome_pos : ∀ a, 0 ≤ outcome a := by
-    sorry
-  sum_eq_total : ∑ a, outcome a = total := by
-    sorry
-  total_le_one : total ≤ 1 := by
-    sorry
+  outcome_pos : ∀ a, 0 ≤ outcome a
+  sum_eq_total : ∑ a, outcome a = total
+  total_le_one : total ≤ 1
 
 instance {α : Type*} [Fintype α] {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (SubMeas α ι) where
@@ -241,6 +238,13 @@ def SubMeas.liftLeft {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [Decida
     (A : SubMeas α ι) : SubMeas α (ι × ι) where
   outcome := fun a => leftTensor (ι₂ := ι) (A.outcome a)
   total := leftTensor (ι₂ := ι) A.total
+  outcome_pos := by
+    intro a
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 /-- Lift an indexed submeasurement family to the left tensor factor. -/
 def IdxSubMeas.liftLeft {Question Outcome : Type*} {ι : Type*}
@@ -263,6 +267,13 @@ def leftPlacedSubMeas {α : Type*}
     SubMeas α (ιA × ιB) where
   outcome := fun a => leftTensor (ι₂ := ιB) (A.outcome a)
   total := leftTensor (ι₂ := ιB) A.total
+  outcome_pos := by
+    intro a
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 /-- Place a submeasurement on the right tensor factor of `ιA × ιB`. -/
 def rightPlacedSubMeas {α : Type*}
@@ -272,5 +283,12 @@ def rightPlacedSubMeas {α : Type*}
     SubMeas α (ιA × ιB) where
   outcome := fun a => rightTensor (ι₁ := ιA) (A.outcome a)
   total := rightTensor (ι₁ := ιA) A.total
+  outcome_pos := by
+    intro a
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 end MIPStarRE.LDT

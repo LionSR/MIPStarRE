@@ -80,7 +80,14 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
   { outcome := sandwichedPolynomialOutcomeOperatorAt params strategy T u
     total :=
       averageOperatorOverDistribution (polynomialDistribution params)
-        (sandwichedPolynomialOutcomeOperatorAt params strategy T u) }
+        (sandwichedPolynomialOutcomeOperatorAt params strategy T u)
+    outcome_pos := by
+      intro h
+      sorry
+    sum_eq_total := by
+      sorry
+    total_le_one := by
+      sorry }
 
 /-- The averaged sandwiched submeasurement `H_h = E_u H^u_h`. -/
 noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
@@ -91,7 +98,14 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
         (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
     total :=
       averageOperatorOverDistribution (uniformDistribution (Point params))
-        (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total) }
+        (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total)
+    outcome_pos := by
+      intro h
+      sorry
+    sum_eq_total := by
+      sorry
+    total_le_one := by
+      sorry }
 
 /-- The variance error entering `lem:add-in-u`. -/
 noncomputable def selfImprovementVarianceError (params : Parameters)

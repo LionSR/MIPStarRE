@@ -26,8 +26,94 @@ def liftDiagonalAnswer (params : Parameters) (x : Fq params) :
     DiagonalLinePolynomial params → DiagonalLinePolynomial params.next :=
   fun f => DiagonalLinePolynomial.appendAtHeight params f x
 
+/-- Restricted slice data keeps the point and axis-parallel measurements complete,
+but only records a projective submeasurement on diagonal lines. The ambient
+measurement type allows outcomes of degree up to `(m + 1) d`, while the honest
+slice pullback only sees the degree-`m d` image. -/
+structure RestrictedSymStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  state : QuantumState (ι × ι)
+  pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
+  axisParallelMeasurement :
+    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
+  diagonalMeasurement :
+    IdxProjSubMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+
+namespace RestrictedSymStrat
+
+/-- Sampled point answers in the axis-parallel lines test. -/
+noncomputable def axisParallelPointAnswerFamily {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : RestrictedSymStrat params ι) :
+    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
+  fun s =>
+    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
+    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeas
+
+/-- Sampled line answers, evaluated at the sampled parameter, in the axis-parallel lines test. -/
+noncomputable def axisParallelLineAnswerFamily {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : RestrictedSymStrat params ι) :
+    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
+  fun s =>
+    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
+    postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
+
+/-- Sampled point answers in the diagonal lines test. -/
+noncomputable def diagonalPointAnswerFamily {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : RestrictedSymStrat params ι) :
+    IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
+  fun s =>
+    let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
+    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeas
+
+/-- Sampled diagonal-line answers, evaluated at the sampled parameter. -/
+noncomputable def diagonalLineAnswerFamily {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : RestrictedSymStrat params ι) :
+    IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
+  fun s =>
+    let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
+    postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
+
+/-- Trace-based failure surrogate for the axis-parallel lines test. -/
+noncomputable def axisParallelFailureProbability {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : RestrictedSymStrat params ι) : Error :=
+  consError strategy.state
+    (uniformDistribution (AxisParallelTestSample params))
+    (IdxSubMeas.liftLeft (axisParallelPointAnswerFamily strategy))
+    (IdxSubMeas.liftLeft (axisParallelLineAnswerFamily strategy))
+
+/-- Trace-based failure surrogate for the self-consistency test. -/
+noncomputable def selfConsistencyFailureProbability {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : RestrictedSymStrat params ι) : Error :=
+  sscError strategy.state
+    (uniformDistribution (Point params))
+    (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+
+/-- Trace-based failure surrogate for the diagonal lines test. -/
+noncomputable def diagonalFailureProbability {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : RestrictedSymStrat params ι) : Error :=
+  consError strategy.state
+    (uniformDistribution (DiagonalTestSample params))
+    (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+    (IdxSubMeas.liftLeft (diagonalLineAnswerFamily strategy))
+
+/-- Goodness data for a restricted strategy. -/
+structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : RestrictedSymStrat params ι)
+    (eps delta gamma : Error) : Prop where
+  axisParallelTest : strategy.axisParallelFailureProbability ≤ eps
+  selfConsistencyTest : strategy.selfConsistencyFailureProbability ≤ delta
+  diagonalLineTest : strategy.diagonalFailureProbability ≤ gamma
+
+end RestrictedSymStrat
+
 /-- Restrict an axis-parallel line measurement to the slice at height `x`. -/
-def restrictAxisParallelMeasurement (params : Parameters)
+noncomputable def restrictAxisParallelMeasurement (params : Parameters)
     (strategy : SymStrat params.next ι) (x : Fq params) :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι :=
   fun ℓ =>
@@ -36,39 +122,40 @@ def restrictAxisParallelMeasurement (params : Parameters)
         toSubMeas := {
           outcome := fun f =>
             lifted.toSubMeas.outcome (liftAxisAnswer params x f)
-          total := lifted.toSubMeas.total
+          total := ∑ f : AxisLinePolynomial params,
+            lifted.toSubMeas.outcome (liftAxisAnswer params x f)
           outcome_pos := fun f => lifted.outcome_pos (liftAxisAnswer params x f)
           sum_eq_total := by
-            sorry
+            rfl
           total_le_one := by
-            simpa using lifted.toSubMeas.total_le_one
+            sorry
         }
-        total_eq_one := lifted.total_eq_one }
+        total_eq_one := by
+          sorry }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
 /-- Restrict a diagonal-line measurement to the slice at height `x`. -/
-def restrictDiagonalMeasurement (params : Parameters)
+noncomputable def restrictDiagonalMeasurement (params : Parameters)
     (strategy : SymStrat params.next ι) (x : Fq params) :
-    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι :=
+    IdxProjSubMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι :=
   fun ℓ =>
     let lifted := strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)
-    { toMeasurement := {
-        toSubMeas := {
-          outcome := fun f =>
-            lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
-          total := lifted.toSubMeas.total
-          outcome_pos := fun f => lifted.outcome_pos (liftDiagonalAnswer params x f)
-          sum_eq_total := by
-            sorry
-          total_le_one := by
-            simpa using lifted.toSubMeas.total_le_one
-        }
-        total_eq_one := lifted.total_eq_one }
+    { toSubMeas := {
+        outcome := fun f =>
+          lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
+        total := ∑ f : DiagonalLinePolynomial params,
+          lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
+        outcome_pos := fun f => lifted.outcome_pos (liftDiagonalAnswer params x f)
+        sum_eq_total := by
+          rfl
+        total_le_one := by
+          sorry
+      }
       proj := fun f => lifted.proj (liftDiagonalAnswer params x f) }
 
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
-def xRestrictedStrategy (params : Parameters)
-    (strategy : SymStrat params.next ι) (x : Fq params) : SymStrat params ι where
+noncomputable def xRestrictedStrategy (params : Parameters)
+    (strategy : SymStrat params.next ι) (x : Fq params) : RestrictedSymStrat params ι where
   state := strategy.state
   pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
   axisParallelMeasurement := restrictAxisParallelMeasurement params strategy x

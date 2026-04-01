@@ -36,21 +36,37 @@ noncomputable instance (params : Parameters) : Fintype (DiagonalLine params) := 
   exact Fintype.ofEquiv (Point params × Point params) e.symm
 
 /-- Ordered product of two paper-local submeasurements on the same tensor factor. -/
-noncomputable def orderedProductSubMeas {α β : Type*}
+noncomputable def orderedProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas (α × β) ι where
   outcome := fun | (a, b) => A.outcome a * B.outcome b
   total := A.total * B.total
+  outcome_pos := by
+    intro ab
+    cases ab
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 /-- Reversed product of two paper-local submeasurements on the same tensor factor. -/
-noncomputable def reversedProductSubMeas {α β : Type*}
+noncomputable def reversedProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas (α × β) ι where
   outcome := fun | (a, b) => B.outcome b * A.outcome a
   total := B.total * A.total
+  outcome_pos := by
+    intro ab
+    cases ab
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 /-- Tensor-product bridge `A_a ⊗ B_b` on the bipartite space `ι × ι`. -/
-noncomputable def tensorProductSubMeas {α β : Type*}
+noncomputable def tensorProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
     SubMeas (α × β) (ι × ι) where
   outcome := fun ab =>
@@ -60,6 +76,14 @@ noncomputable def tensorProductSubMeas {α β : Type*}
           rightTensor (ι₁ := ι) (B.outcome b)
   total := leftTensor (ι₂ := ι) A.total *
              rightTensor (ι₁ := ι) B.total
+  outcome_pos := by
+    intro ab
+    cases ab
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 /-- Recover the sampled point from a diagonal-line/parameter sample. -/
 def sampledPointFromDiagonalQuestion (params : Parameters)
@@ -185,7 +209,15 @@ noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
         leftTensor (ι₂ := ι) (Av.outcome b) *
           rightTensor (ι₁ := ι) (Lu.outcome a)
       total := leftTensor (ι₂ := ι) Av.total *
-                 rightTensor (ι₁ := ι) Lu.total }
+                 rightTensor (ι₁ := ι) Lu.total
+      outcome_pos := by
+        intro ab
+        cases ab
+        sorry
+      sum_eq_total := by
+        sorry
+      total_le_one := by
+        sorry }
 
 /-- The intermediate consistency loss coming from the `m`-restricted diagonal-lines test. -/
 def restrictedDiagonalLinesConsistencyError (params : Parameters) (gamma : Error) : Error :=

@@ -52,7 +52,7 @@ structure SdpStatement (params : Parameters)
 
 /-- The operator inside the left-hand side of `lem:add-in-u` at a fixed point `u`.
 Returns a bipartite operator `(M u).outcome o ⊗ H.outcome h`. -/
-noncomputable def addInULeftOperatorAtPoint {Outcome : Type*}
+noncomputable def addInULeftOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (_strategy : SymStrat params ι)
     (M : IdxSubMeas (Point params) Outcome ι)
@@ -66,7 +66,7 @@ noncomputable def addInULeftOperatorAtPoint {Outcome : Type*}
 
 /-- The operator inside the right-hand side of `lem:add-in-u` at a fixed point `u`.
 Returns a bipartite operator `(Au * (M u).outcome o * Au) ⊗ T.outcome h`. -/
-noncomputable def addInURightOperatorAtPoint {Outcome : Type*}
+noncomputable def addInURightOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (strategy : SymStrat params ι)
     (M : IdxSubMeas (Point params) Outcome ι)
@@ -80,7 +80,7 @@ noncomputable def addInURightOperatorAtPoint {Outcome : Type*}
   | none => 0
 
 /-- The left-hand expectation in `lem:add-in-u`. -/
-noncomputable def addInULeftQuantity {Outcome : Type*} (params : Parameters)
+noncomputable def addInULeftQuantity {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (strategy : SymStrat params ι)
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι)
@@ -91,7 +91,7 @@ noncomputable def addInULeftQuantity {Outcome : Type*} (params : Parameters)
         (addInULeftOperatorAtPoint params strategy M H S u))
 
 /-- The right-hand expectation in `lem:add-in-u`. -/
-noncomputable def addInURightQuantity {Outcome : Type*} (params : Parameters)
+noncomputable def addInURightQuantity {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (strategy : SymStrat params ι)
     (M : IdxSubMeas (Point params) Outcome ι)
     (T : Measurement (Polynomial params) ι)
@@ -161,7 +161,7 @@ noncomputable def projectiveBoundednessGap (params : Parameters)
     (projectiveResidualOperator params H Z)
 
 /-- Output package for `lem:add-in-u`. -/
-structure AddInUStatement {Outcome : Type*} (params : Parameters)
+structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (strategy : SymStrat params ι)
     (T : Measurement (Polynomial params) ι)
     (M : IdxSubMeas (Point params) Outcome ι)
@@ -195,7 +195,7 @@ structure SelfImprovementHelperConclusion (params : Parameters)
   averagedConstruction :
     H = averagedSandwichedPolynomialSubMeas params strategy T
   addInUTransfer :
-    ∀ {Outcome : Type*} (M : IdxSubMeas (Point params) Outcome ι),
+    ∀ {Outcome : Type*} [Fintype Outcome] (M : IdxSubMeas (Point params) Outcome ι),
       AddInUStatement params strategy T M H eps delta
   completeness :
     CompletenessAtLeast strategy.state H.liftLeft
@@ -302,7 +302,7 @@ lemma sdp
   sorry
 
 /-- `lem:add-in-u`. -/
-lemma addInU {Outcome : Type*}
+lemma addInU {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
@@ -348,4 +348,3 @@ theorem selfImprovementFromSubMeas
   sorry
 
 end MIPStarRE.LDT.SelfImprovement
-
