@@ -236,9 +236,8 @@ noncomputable def averagedSubMeas {params : Parameters}
       _ = (∑ x ∈ 𝒟.support, 𝒟.weight x) • (1 : MIPStarRE.Quantum.Op ι) := by
             rw [Finset.sum_smul]
       _ ≤ (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
-            have h𝒟 : ∑ x ∈ 𝒟.support, 𝒟.weight x ≤ 1 := by
-              simp [𝒟, uniformDistribution]
-            exact smul_le_smul_of_nonneg_right h𝒟 zero_le_one
+            exact smul_le_smul_of_nonneg_right
+              (uniformDistribution_weight_sum_le_one (Fq params)) zero_le_one
       _ = 1 := by simp
 
 /-- Evaluate the slice family at a point `(u, x)` in `F_q^{m+1}`. -/

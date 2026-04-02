@@ -81,3 +81,13 @@ theorem avgOver_congr {α : Type*} (𝒟 : Distribution α)
   simp only [avgOver]; exact Finset.sum_congr rfl fun a _ => by rw [h a]
 
 end MIPStarRE.LDT
+
+namespace MIPStarRE.LDT
+
+/-- The weights of a uniform distribution sum to at most 1. -/
+theorem uniformDistribution_weight_sum_le_one (α : Type*)
+    [Fintype α] [DecidableEq α] [Nonempty α] :
+    ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a ≤ 1 := by
+  simp [uniformDistribution]
+
+end MIPStarRE.LDT
