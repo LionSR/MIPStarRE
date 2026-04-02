@@ -104,16 +104,8 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*}
       (A q).outcome a * (B q).toSubMeas.total * (A q).outcome a
     outcome_pos := by
       intro a
-      have hBtotal : (B q).toSubMeas.total = (1 : MIPStarRE.Quantum.Op ι) := by
-        simpa using (B q).total_eq_one
-      have hBtotal_nonneg : 0 ≤ (B q).toSubMeas.total := by
-        rw [hBtotal]
-        exact zero_le_one
-      simpa using
-        sandwich_nonneg
-          (M := (A q).outcome a)
-          (P := (B q).toSubMeas.total)
-          hBtotal_nonneg
+      exact sandwich_nonneg
+          (SubMeas.total_nonneg (B q).toSubMeas)
           ((A q).outcome_hermitian a)
     sum_eq_total := by
       rfl
