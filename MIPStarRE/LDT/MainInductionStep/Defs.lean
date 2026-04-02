@@ -178,7 +178,26 @@ noncomputable def restrictDiagonalMeasurement (params : Parameters)
         sum_eq_total := by
           rfl
         total_le_one := by
-          sorry
+          classical
+          calc
+            ∑ f : DiagonalLinePolynomial params,
+                lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
+              = ∑ g ∈ (Finset.univ.image (liftDiagonalAnswer params x)),
+                  lifted.toSubMeas.outcome g := by
+                    symm
+                    exact Finset.sum_image (by
+                      intro f _ g _ hfg
+                      cases f
+                      cases g
+                      cases hfg
+                      rfl)
+            _ ≤ ∑ g : DiagonalLinePolynomial params.next, lifted.toSubMeas.outcome g := by
+                  exact Finset.sum_le_univ_sum_of_nonneg
+                    (s := Finset.univ.image (liftDiagonalAnswer params x))
+                    (w := fun g => lifted.outcome_pos g)
+            _ = lifted.toSubMeas.total := by
+                  rw [lifted.toSubMeas.sum_eq_total]
+            _ ≤ 1 := lifted.toSubMeas.total_le_one
       }
       proj := fun f => lifted.proj (liftDiagonalAnswer params x f) }
 

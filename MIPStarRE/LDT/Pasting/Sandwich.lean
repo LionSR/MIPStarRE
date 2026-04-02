@@ -307,6 +307,7 @@ noncomputable def averagedSandwichSubMeas (params : Parameters)
   averageIdxSubMeas
     (distinctTupleDistribution params k)
     (gHatSandwichFamily params family k)
+    (distinctTupleDistribution_weight_sum_le_one params k)
 
 /-- The specific pasted submeasurement constructed from the sandwich/interpolation scheme. -/
 noncomputable def constructedPastedSubMeas (params : Parameters)
@@ -314,6 +315,7 @@ noncomputable def constructedPastedSubMeas (params : Parameters)
   averageIdxSubMeas
     (distinctTupleDistribution params k)
     (pastedInterpolationFamily params family k)
+    (distinctTupleDistribution_weight_sum_le_one params k)
 
 /-- The distinguished fallback polynomial `h₀` that receives the completion mass. -/
 noncomputable def pastedFallbackOutcome (params : Parameters) : Polynomial params.next :=
