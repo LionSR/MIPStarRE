@@ -903,6 +903,253 @@ theorem consSubMeas {Question Outcome : Type*}
 
 /-! ### Bridge lemmas for `prop:switch-sandwich` -/
 
+private lemma weightedFinsetCauchySchwarz
+    {Question Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (𝒟 : Distribution Question)
+    (t x y : Question → Outcome → Error)
+    (ht : ∀ q a, |t q a| ≤ Real.sqrt (x q a) * Real.sqrt (y q a))
+    (hx : ∀ q a, 0 ≤ x q a)
+    (hy : ∀ q a, 0 ≤ y q a) :
+    |avgOver 𝒟 (fun q => ∑ a : Outcome, t q a)| ≤
+      Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, x q a)) *
+        Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, y q a)) := by
+  unfold avgOver
+  calc
+    |∑ q ∈ 𝒟.support, 𝒟.weight q * ∑ a : Outcome, t q a|
+      ≤ ∑ q ∈ 𝒟.support, |𝒟.weight q * ∑ a : Outcome, t q a| := by
+          exact Finset.abs_sum_le_sum_abs _ _
+    _ = ∑ q ∈ 𝒟.support, 𝒟.weight q * |∑ a : Outcome, t q a| := by
+          refine Finset.sum_congr rfl ?_
+          intro q _
+          rw [abs_mul, abs_of_nonneg (𝒟.nonnegative q)]
+    _ ≤ ∑ q ∈ 𝒟.support,
+          𝒟.weight q *
+            (Real.sqrt (∑ a : Outcome, x q a) *
+              Real.sqrt (∑ a : Outcome, y q a)) := by
+          refine Finset.sum_le_sum ?_
+          intro q _
+          have hq :
+              |∑ a : Outcome, t q a| ≤
+                Real.sqrt (∑ a : Outcome, x q a) *
+                  Real.sqrt (∑ a : Outcome, y q a) := by
+            calc
+              |∑ a : Outcome, t q a|
+                ≤ ∑ a : Outcome, |t q a| := by
+                    exact Finset.abs_sum_le_sum_abs _ _
+              _ ≤ ∑ a : Outcome, Real.sqrt (x q a) * Real.sqrt (y q a) := by
+                    refine Finset.sum_le_sum ?_
+                    intro a _
+                    exact ht q a
+              _ ≤ Real.sqrt (∑ a : Outcome, x q a) *
+                    Real.sqrt (∑ a : Outcome, y q a) := by
+                    exact Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
+                      (f := fun a => x q a) (g := fun a => y q a)
+                      (fun a => hx q a) (fun a => hy q a)
+          exact mul_le_mul_of_nonneg_left hq (𝒟.nonnegative q)
+    _ = ∑ q ∈ 𝒟.support,
+          Real.sqrt (𝒟.weight q * ∑ a : Outcome, x q a) *
+            Real.sqrt (𝒟.weight q * ∑ a : Outcome, y q a) := by
+          refine Finset.sum_congr rfl ?_
+          intro q _
+          have hsx : 0 ≤ ∑ a : Outcome, x q a := by
+            exact Finset.sum_nonneg fun a _ => hx q a
+          have hsy : 0 ≤ ∑ a : Outcome, y q a := by
+            exact Finset.sum_nonneg fun a _ => hy q a
+          rw [Real.sqrt_mul (x := 𝒟.weight q) (y := ∑ a : Outcome, x q a)
+                (𝒟.nonnegative q),
+              Real.sqrt_mul (x := 𝒟.weight q) (y := ∑ a : Outcome, y q a)
+                (𝒟.nonnegative q)]
+          ring_nf
+          rw [Real.sq_sqrt (𝒟.nonnegative q)]
+          simpa [mul_assoc, mul_left_comm, mul_comm]
+    _ ≤ Real.sqrt (∑ q ∈ 𝒟.support, 𝒟.weight q * ∑ a : Outcome, x q a) *
+          Real.sqrt (∑ q ∈ 𝒟.support, 𝒟.weight q * ∑ a : Outcome, y q a) := by
+            exact Real.sum_sqrt_mul_sqrt_le (s := 𝒟.support)
+              (f := fun q => 𝒟.weight q * ∑ a : Outcome, x q a)
+              (g := fun q => 𝒟.weight q * ∑ a : Outcome, y q a)
+              (fun q =>
+                mul_nonneg (𝒟.nonnegative q) <|
+                  Finset.sum_nonneg fun a _ => hx q a)
+              (fun q =>
+                mul_nonneg (𝒟.nonnegative q) <|
+                  Finset.sum_nonneg fun a _ => hy q a)
+    _ = Real.sqrt (∑ q ∈ 𝒟.support, 𝒟.weight q * ∑ a : Outcome, x q a) *
+          Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, y q a)) := by
+            rfl
+
+private lemma subMeas_diagMass_le_one
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι) (hψ : ψ.IsNormalized) (A : SubMeas Outcome ι) :
+    ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a) ≤ 1 := by
+  calc
+    ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a)
+      ≤ ∑ a : Outcome, ev ψ (A.outcome a) := by
+          refine Finset.sum_le_sum ?_
+          intro a _
+          exact ev_mono ψ _ _ <|
+            MIPStarRE.Quantum.sq_le_self
+              (A.outcome_pos a) (A.outcome_le_one a)
+    _ = ev ψ A.total := by
+          rw [← ev_sum ψ A.outcome, A.sum_eq_total]
+    _ ≤ ev ψ (1 : MIPStarRE.Quantum.Op ι) := by
+          exact ev_mono ψ _ _ A.total_le_one
+    _ = 1 := ev_one_of_isNormalized ψ hψ
+
+private lemma question_overlap_gap_left
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
+    (A B : SubMeas Outcome ι) :
+    |(∑ a : Outcome, ev ψ (A.outcome a * A.outcome a)) -
+        ∑ a : Outcome, ev ψ (A.outcome a * B.outcome a)| ≤
+      Real.sqrt (qSDD ψ A B) := by
+  let diagA : Error := ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a)
+  have hdiagA_le_one : diagA ≤ 1 := by
+    simpa [diagA] using subMeas_diagMass_le_one ψ hψ A
+  have haux :
+      |∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a) * A.outcome a)| ≤
+        Real.sqrt (qSDD ψ A B) * Real.sqrt diagA := by
+    calc
+      |∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a) * A.outcome a)|
+        ≤ ∑ a : Outcome, |ev ψ ((A.outcome a - B.outcome a) * A.outcome a)| := by
+            exact Finset.abs_sum_le_sum_abs _ _
+      _ ≤ ∑ a : Outcome,
+            Real.sqrt (ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))) *
+              Real.sqrt (ev ψ (A.outcome a * A.outcome a)) := by
+            refine Finset.sum_le_sum ?_
+            intro a _
+            have hherm : (A.outcome a - B.outcome a)ᴴ = A.outcome a - B.outcome a := by
+              simp [SubMeas.outcome_hermitian]
+            simpa [hherm, SubMeas.outcome_hermitian] using
+              ev_abs_mul_le_sqrt ψ (A.outcome a - B.outcome a) (A.outcome a)
+      _ ≤ Real.sqrt
+            (∑ a : Outcome,
+              ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))) *
+          Real.sqrt diagA := by
+            simpa [diagA] using
+              Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
+                (f := fun a =>
+                  ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a)))
+                (g := fun a => ev ψ (A.outcome a * A.outcome a))
+                (fun a => ev_adjoint_self_nonneg ψ _)
+                (fun a => by
+                  simpa [SubMeas.outcome_hermitian] using
+                    ev_adjoint_self_nonneg ψ (A.outcome a))
+      _ = Real.sqrt (qSDD ψ A B) * Real.sqrt diagA := by
+            simp [qSDD, qSDDCore, diagA]
+  have hsqrtA : Real.sqrt diagA ≤ 1 := by
+    simpa using Real.sqrt_le_sqrt hdiagA_le_one
+  have haux' :
+      |∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a) * A.outcome a)| ≤
+        Real.sqrt (qSDD ψ A B) := by
+    calc
+      |∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a) * A.outcome a)|
+        ≤ Real.sqrt (qSDD ψ A B) * Real.sqrt diagA := haux
+      _ ≤ Real.sqrt (qSDD ψ A B) * 1 := by
+            exact mul_le_mul_of_nonneg_left hsqrtA (Real.sqrt_nonneg _)
+      _ = Real.sqrt (qSDD ψ A B) := by ring
+  convert haux' using 1
+  refine congrArg abs ?_
+  calc
+    ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a) -
+        ∑ a : Outcome, ev ψ (A.outcome a * B.outcome a)
+      = ∑ a : Outcome,
+          (ev ψ (A.outcome a * A.outcome a) -
+            ev ψ (A.outcome a * B.outcome a)) := by
+              rw [← Finset.sum_sub_distrib]
+    _ = ∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a) * A.outcome a) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          have hcomm :
+              ev ψ (B.outcome a * A.outcome a) = ev ψ (A.outcome a * B.outcome a) := by
+            exact ev_mul_comm_of_psd ψ _ _ (B.outcome_pos a) (A.outcome_pos a)
+          calc
+            ev ψ (A.outcome a * A.outcome a) - ev ψ (A.outcome a * B.outcome a)
+              = ev ψ (A.outcome a * A.outcome a) - ev ψ (B.outcome a * A.outcome a) := by
+                  rw [hcomm]
+            _ 
+              = ev ψ (A.outcome a * A.outcome a - B.outcome a * A.outcome a) := by
+                  rw [(ev_sub ψ (A.outcome a * A.outcome a) (B.outcome a * A.outcome a)).symm]
+            _ = ev ψ ((A.outcome a - B.outcome a) * A.outcome a) := by
+                  simp [sub_mul]
+
+private lemma question_overlap_gap_right
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
+    (A B : SubMeas Outcome ι) :
+    |(∑ a : Outcome, ev ψ (A.outcome a * B.outcome a)) -
+        ∑ a : Outcome, ev ψ (B.outcome a * B.outcome a)| ≤
+      Real.sqrt (qSDD ψ A B) := by
+  let diagB : Error := ∑ a : Outcome, ev ψ (B.outcome a * B.outcome a)
+  have hdiagB_le_one : diagB ≤ 1 := by
+    simpa [diagB] using subMeas_diagMass_le_one ψ hψ B
+  have haux :
+      |∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a) * B.outcome a)| ≤
+        Real.sqrt (qSDD ψ A B) * Real.sqrt diagB := by
+    calc
+      |∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a) * B.outcome a)|
+        ≤ ∑ a : Outcome, |ev ψ ((A.outcome a - B.outcome a) * B.outcome a)| := by
+            exact Finset.abs_sum_le_sum_abs _ _
+      _ ≤ ∑ a : Outcome,
+            Real.sqrt (ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))) *
+              Real.sqrt (ev ψ (B.outcome a * B.outcome a)) := by
+            refine Finset.sum_le_sum ?_
+            intro a _
+            have hherm : (A.outcome a - B.outcome a)ᴴ = A.outcome a - B.outcome a := by
+              simp [SubMeas.outcome_hermitian]
+            simpa [hherm, SubMeas.outcome_hermitian] using
+              ev_abs_mul_le_sqrt ψ (A.outcome a - B.outcome a) (B.outcome a)
+      _ ≤ Real.sqrt
+            (∑ a : Outcome,
+              ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))) *
+          Real.sqrt diagB := by
+            simpa [diagB] using
+              Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
+                (f := fun a =>
+                  ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a)))
+                (g := fun a => ev ψ (B.outcome a * B.outcome a))
+                (fun a => ev_adjoint_self_nonneg ψ _)
+                (fun a => by
+                  simpa [SubMeas.outcome_hermitian] using
+                    ev_adjoint_self_nonneg ψ (B.outcome a))
+      _ = Real.sqrt (qSDD ψ A B) * Real.sqrt diagB := by
+            simp [qSDD, qSDDCore, diagB]
+  have hsqrtB : Real.sqrt diagB ≤ 1 := by
+    simpa using Real.sqrt_le_sqrt hdiagB_le_one
+  have haux' :
+      |∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a) * B.outcome a)| ≤
+        Real.sqrt (qSDD ψ A B) := by
+    calc
+      |∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a) * B.outcome a)|
+        ≤ Real.sqrt (qSDD ψ A B) * Real.sqrt diagB := haux
+      _ ≤ Real.sqrt (qSDD ψ A B) * 1 := by
+            exact mul_le_mul_of_nonneg_left hsqrtB (Real.sqrt_nonneg _)
+      _ = Real.sqrt (qSDD ψ A B) := by ring
+  convert haux' using 1
+  refine congrArg abs ?_
+  calc
+    ∑ a : Outcome, ev ψ (A.outcome a * B.outcome a) -
+        ∑ a : Outcome, ev ψ (B.outcome a * B.outcome a)
+      = ∑ a : Outcome,
+          (ev ψ (A.outcome a * B.outcome a) -
+            ev ψ (B.outcome a * B.outcome a)) := by
+              rw [← Finset.sum_sub_distrib]
+    _ = ∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a) * B.outcome a) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          have hcomm :
+              ev ψ (A.outcome a * B.outcome a) = ev ψ (B.outcome a * A.outcome a) := by
+            exact ev_mul_comm_of_psd ψ _ _ (A.outcome_pos a) (B.outcome_pos a)
+          calc
+            ev ψ (A.outcome a * B.outcome a) - ev ψ (B.outcome a * B.outcome a)
+              = ev ψ (A.outcome a * B.outcome a - B.outcome a * B.outcome a) := by
+                  rw [(ev_sub ψ (A.outcome a * B.outcome a) (B.outcome a * B.outcome a)).symm]
+            _ = ev ψ ((A.outcome a - B.outcome a) * B.outcome a) := by
+                  simp [sub_mul]
+
 private lemma switchSandwich_leftTransfer
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -924,9 +1171,13 @@ private lemma switchSandwich_leftTransfer
   projectivity of `A`, and the assumption `0 ≤ B ≤ I`.
 
   Lean status:
-  the remaining blocker is a weighted Cauchy-Schwarz lemma over the combined
-  `(q, a)` sum with the `avgOver` weights, together with a small amount of
-  tensor-placement algebra identifying the two difference terms from the paper.
+  the weighted Cauchy-Schwarz infrastructure is now available, but the current
+  Lean statement is still stronger than the paper statement: the paper works
+  with a normalized state and a probability distribution, while this theorem
+  assumes only `ψ.density_psd` and an arbitrary nonnegative `Distribution`.
+  Without a normalization hypothesis on `ψ` (and, for the averaging step, a
+  bound on the total distribution weight), the claimed `2 * sqrt δ` bound is
+  not derivable from the present hypotheses.
   -/
   sorry
 
@@ -951,8 +1202,12 @@ private lemma switchSandwich_rightTransfer
   the second factor back to the original `≈_δ` expression.
 
   Lean status:
-  this is mathematically straightforward after the statement fix, but it needs
-  the same weighted Cauchy-Schwarz infrastructure as the left-transfer lemma.
+  the weighted Cauchy-Schwarz step is no longer the issue. As in
+  `switchSandwich_leftTransfer`, the current formal statement omits the
+  normalization assumptions implicitly used in the paper: one needs a
+  normalized state, and the `avgOver` step needs the distribution weights to
+  sum to at most `1`. As written, the theorem is too strong for the paper proof
+  to go through.
   -/
   sorry
 
@@ -994,10 +1249,12 @@ private lemma completenessTransfer_core {Question Outcome : Type*}
   `⟨ψ, A_a P_a ψ⟩` and uses the easy `≈_δ`-to-expectation estimate twice.
 
   Lean status:
-  the normalization hypothesis is now exactly what is needed, but the missing
-  ingredient is a small weighted Cauchy-Schwarz lemma for the `avgOver` /
-  `Finset.sum` combination over `(q, a)` that converts the `sddError ≤ ε`
-  hypothesis into the expected `sqrt ε` overlap loss.
+  the necessary weighted Cauchy-Schwarz lemma is now in place. The remaining
+  issue is that the theorem averages over an arbitrary `Distribution`, whereas
+  the paper argument needs a genuine probability distribution (or at least an
+  explicit hypothesis `∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1`) to turn the averaged
+  squared-distance bound into the stated `2 * sqrt ε` loss. So the current
+  formal statement is too strong for the paper proof as written.
   -/
   sorry
 
@@ -1174,7 +1431,114 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
         ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
           ((1 : MIPStarRE.Quantum.Op ι) - B.total)) :=
     completion_self_distance ψ B a0
-  sorry
+  let diagA : Error :=
+    ∑ a : Outcome, ev ψ (A.toSubMeas.outcome a * A.toSubMeas.outcome a)
+  let diagB : Error :=
+    ∑ a : Outcome, ev ψ (B.outcome a * B.outcome a)
+  let overlap : Error :=
+    ∑ a : Outcome, ev ψ (A.toSubMeas.outcome a * B.outcome a)
+  have hgapA_raw :
+      |diagA - overlap| ≤ Real.sqrt (qSDD ψ A.toSubMeas B) := by
+    simpa [diagA, overlap] using
+      question_overlap_gap_left ψ hψ A.toSubMeas B
+  have hgapA :
+      diagA - overlap ≤ Real.sqrt δ := by
+    have hq_nonneg : 0 ≤ qSDD ψ A.toSubMeas B := qSDD_nonneg ψ A.toSubMeas B
+    have hsqrt :
+        Real.sqrt (qSDD ψ A.toSubMeas B) ≤ Real.sqrt δ := by
+      exact Real.sqrt_le_sqrt hδ'
+    have : diagA - overlap ≤ Real.sqrt (qSDD ψ A.toSubMeas B) := by
+      exact (abs_le.mp hgapA_raw).2
+    exact le_trans this hsqrt
+  have hgapB_raw :
+      |overlap - diagB| ≤ Real.sqrt (qSDD ψ A.toSubMeas B) := by
+    simpa [diagB, overlap] using
+      question_overlap_gap_right ψ hψ A.toSubMeas B
+  have hgapB :
+      overlap - diagB ≤ Real.sqrt δ := by
+    have hsqrt :
+        Real.sqrt (qSDD ψ A.toSubMeas B) ≤ Real.sqrt δ := by
+      exact Real.sqrt_le_sqrt hδ'
+    have : overlap - diagB ≤ Real.sqrt (qSDD ψ A.toSubMeas B) := by
+      exact (abs_le.mp hgapB_raw).2
+    exact le_trans this hsqrt
+  have hdiagA_lb : 1 - ζ ≤ diagA := by
+    have hssc :
+        max 0
+            (ev ψ A.toSubMeas.total -
+              ∑ a : Outcome, ev ψ (A.toSubMeas.outcome a * A.toSubMeas.outcome a))
+          ≤ ζ := by
+      simpa [qSSCDefect, diagA] using hζ'
+    have hinner :
+        ev ψ A.toSubMeas.total - diagA ≤ ζ := by
+      exact le_trans (le_max_right 0 (ev ψ A.toSubMeas.total - diagA)) hssc
+    have hmassA : ev ψ A.toSubMeas.total = 1 := by
+      simpa [A.total_eq_one] using ev_one_of_isNormalized ψ hψ
+    linarith
+  have hdiagB_lb : 1 - ζ - 2 * Real.sqrt δ ≤ diagB := by
+    linarith
+  have hresidual_le :
+      ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
+        ((1 : MIPStarRE.Quantum.Op ι) - B.total)) ≤
+        2 * Real.sqrt δ + ζ := by
+    let R : MIPStarRE.Quantum.Op ι := (1 : MIPStarRE.Quantum.Op ι) - B.total
+    have hR_nonneg : 0 ≤ R := by
+      dsimp [R]
+      exact sub_nonneg.mpr B.total_le_one
+    have hR_le_one : R ≤ 1 := by
+      dsimp [R]
+      exact sub_le_self (1 : MIPStarRE.Quantum.Op ι) B.total_nonneg
+    have hR_sq_le : R * R ≤ R := by
+      exact MIPStarRE.Quantum.sq_le_self hR_nonneg hR_le_one
+    have hR_ev :
+        ev ψ (R * R) ≤ ev ψ R := by
+      exact ev_mono ψ _ _ hR_sq_le
+    have hmassB_sq :
+        diagB ≤ ev ψ B.total := by
+      calc
+        diagB = ∑ a : Outcome, ev ψ (B.outcome a * B.outcome a) := by rfl
+        _ ≤ ∑ a : Outcome, ev ψ (B.outcome a) := by
+              refine Finset.sum_le_sum ?_
+              intro a _
+              exact ev_mono ψ _ _ <|
+                MIPStarRE.Quantum.sq_le_self
+                  (B.outcome_pos a) (B.outcome_le_one a)
+        _ = ev ψ B.total := by
+              rw [← ev_sum ψ B.outcome, B.sum_eq_total]
+    have hmassB :
+        ev ψ B.total ≥ diagB := by
+      exact hmassB_sq
+    have hR_ev' : ev ψ R ≤ 2 * Real.sqrt δ + ζ := by
+      have hR_eq :
+          ev ψ R = 1 - ev ψ B.total := by
+        dsimp [R]
+        rw [ev_sub]
+        simp [ev_one_of_isNormalized ψ hψ]
+      linarith
+    have hRR :
+        ev ψ (R * R) ≤ 2 * Real.sqrt δ + ζ := by
+      exact le_trans hR_ev hR_ev'
+    simpa [R] using hRR
+  constructor
+  rw [constFamily_sdd_unit]
+  calc
+    qSDD ψ A.toSubMeas (completeAtOutcome B a0).toSubMeas
+      ≤ 2 * (qSDD ψ A.toSubMeas B +
+          qSDD ψ B (completeAtOutcome B a0).toSubMeas) := by
+            exact questionSDD_triangle ψ A.toSubMeas B
+              (completeAtOutcome B a0).toSubMeas
+    _ = 2 * (qSDD ψ A.toSubMeas B +
+          ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
+            ((1 : MIPStarRE.Quantum.Op ι) - B.total))) := by
+              rw [hBC]
+    _ ≤ 2 * (δ +
+          ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
+            ((1 : MIPStarRE.Quantum.Op ι) - B.total))) := by
+              gcongr
+    _ ≤ 2 * (δ + (2 * Real.sqrt δ + ζ)) := by
+              gcongr
+    _ = 2 * δ + 4 * Real.sqrt δ + 2 * ζ := by
+          ring
 
 /-- `prop:completing-to-measurement`. -/
 theorem completingToMeasurement {Outcome : Type*}
