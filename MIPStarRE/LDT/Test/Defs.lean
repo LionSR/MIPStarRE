@@ -58,17 +58,26 @@ noncomputable def qConsDefect {Outcome : Type*} {ι : Type*} [Fintype ι] [Decid
   max 0 (totalOverlap - qMatchMass ψ A B)
 
 /-- Questionwise squared-distance defect. -/
+noncomputable def qSDDCore {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (A B : Outcome → MIPStarRE.Quantum.Op ι) : Error :=
+  ∑ a, ev ψ ((A a - B a)ᴴ * (A a - B a))
+
+/-- Questionwise squared-distance defect. -/
 noncomputable def qSDD {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (A B : SubMeas Outcome ι) : Error :=
-  ∑ a, ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))
+  qSDDCore ψ A.outcome B.outcome
 
 /-- State-dependent distance for raw operator families.
-Matches the paper's `≈_δ` for arbitrary matrix families. -/
+Matches the paper's `≈_δ` for arbitrary matrix families.
+This keeps the raw-family API separate while sharing the same core formula as
+`qSDD`. -/
 noncomputable def qSDDOp {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (A B : OpFamily Outcome ι) : Error :=
-  ∑ a, ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))
+  qSDDCore ψ A.outcome B.outcome
 
 /-- Questionwise strong self-consistency defect. -/
 noncomputable def qSSCDefect {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -209,7 +218,7 @@ theorem qSDD_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
     0 ≤ qSDD ψ A B := by
-  unfold qSDD
+  unfold qSDD qSDDCore
   exact Finset.sum_nonneg fun a _ => ev_adjoint_self_nonneg ψ _
 
 /-- The consistency defect is nonneg by definition (`max 0 _`). -/
@@ -271,7 +280,7 @@ theorem qSDD_self {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι) :
     qSDD ψ A A = 0 := by
-  unfold qSDD
+  unfold qSDD qSDDCore
   apply Finset.sum_eq_zero
   intro a _
   simp [ev]

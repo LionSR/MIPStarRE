@@ -322,24 +322,14 @@ structure FromHToGStatement (params : Parameters)
         (bernoulliTailFromFamily params family k))
       (fromHToGError params gamma zeta k)
 
-/-- Positivity of the Bernoulli tail operator for a PSD contraction. -/
-private theorem bernoulliTailOperator_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι)
-    (hXpsd : 0 ≤ X)
-    (hXleOne : X ≤ 1) :
-    0 ≤ bernoulliTailOperator k degree X := by
-  unfold bernoulliTailOperator
-  refine Finset.sum_nonneg fun r _ => ?_
-  simpa using binomialOperatorTerm_nonneg (G := X) k r hXpsd hXleOne
-
 /-- Output package for `lem:chernoff-bernoulli-matrix`. -/
 structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
     (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error)
     (hXpsd : 0 ≤ X)
     (hXleOne : X ≤ 1) : Prop where
-  /-- Temporary field while the Bernoulli-tail contraction bound is still supplied
-  separately by the theorem stub rather than proved from `hXpsd` and `hXleOne`. -/
+  /-- Temporary field while the Bernoulli-tail contraction bound is still
+  deferred rather than derived inside the matrix Chernoff proof. -/
   tail_le_one : bernoulliTailOperator k degree X ≤ 1
   matrixTailBound :
     CompletenessAtLeast ψ

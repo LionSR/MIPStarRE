@@ -7,6 +7,11 @@ This file introduces the paper-level notion of an indexed family of operators
 without positivity or boundedness requirements. These are used for `≈_δ`
 chains whose intermediate objects are arbitrary matrix families rather than
 honest submeasurements.
+
+## References
+
+- arXiv:2009.12982, Sections 9-12, where `≈_δ` chains pass through raw
+  operator families before they are upgraded back to honest submeasurements.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -54,12 +59,6 @@ end IdxSubMeas
 
 namespace OpFamily
 
-/-- Lift a raw operator family to the left tensor factor of `ι × ι`. -/
-def liftLeft {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (A : OpFamily α ι) : OpFamily α (ι × ι) where
-  outcome := fun a => leftTensor (ι₂ := ι) (A.outcome a)
-  total := leftTensor (ι₂ := ι) A.total
-
 /-- Place a raw operator family on the left tensor factor of `ιA × ιB`. -/
 def leftPlacedOpFamily {α : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -80,9 +79,8 @@ def rightPlacedOpFamily {α : Type*}
 noncomputable def postprocess {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
     (A : OpFamily α ι) (f : α → β) :
-    OpFamily β ι := by
-  classical
-  exact
+    OpFamily β ι :=
+  open Classical in
     { outcome := fun b =>
         ∑ a ∈ Finset.univ.filter (fun a => f a = b), A.outcome a
       total := A.total }
@@ -96,14 +94,7 @@ def liftLeft {Question Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι]
     (A : IdxOpFamily Question Outcome ι) :
     IdxOpFamily Question Outcome (ι × ι) :=
-  fun q => (A q).liftLeft
-
-/-- Forget the extra structure on an indexed submeasurement family after left placement. -/
-def ofIdxSubMeasLeft {Question Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (A : IdxSubMeas Question Outcome ι) :
-    IdxOpFamily Question Outcome (ι × ι) :=
-  (IdxSubMeas.toIdxOpFamily A).liftLeft
+  fun q => OpFamily.leftPlacedOpFamily (ιB := ι) (A q)
 
 end IdxOpFamily
 

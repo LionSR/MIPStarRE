@@ -478,6 +478,15 @@ lemma binomialOperatorTerm_nonneg {G : MIPStarRE.Quantum.Op ι} (n r : ℕ)
       (hcomm.pow_left r).pow_right (n - r)
     exact Commute.mul_nonneg hGr hIG hcommPow
 
+/-- Positivity of the Bernoulli tail operator for a PSD contraction. -/
+theorem bernoulliTailOperator_nonneg
+    (k degree : ℕ) (G : MIPStarRE.Quantum.Op ι)
+    (hG : 0 ≤ G) (hGle : G ≤ 1) :
+    0 ≤ bernoulliTailOperator k degree G := by
+  unfold bernoulliTailOperator
+  refine Finset.sum_nonneg fun r _ => ?_
+  simpa using binomialOperatorTerm_nonneg (G := G) k r hG hGle
+
 /-- Concrete family for the full sandwich
 `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k} \cdots \widehat G^{x_1}_{g_1}`. -/
 noncomputable def gHatSandwichFamily (params : Parameters)
@@ -796,11 +805,7 @@ noncomputable def bernoulliTailFromFamily (params : Parameters)
         let G := (IdxPolyFamily.averagedSubMeas family).total
         have hG : 0 ≤ G := (IdxPolyFamily.averagedSubMeas family).total_nonneg
         have hGle : G ≤ 1 := (IdxPolyFamily.averagedSubMeas family).total_le_one
-        change 0 ≤ bernoulliTailOperator k params.d G
-        unfold bernoulliTailOperator
-        refine Finset.sum_nonneg ?_
-        intro r _hr
-        exact binomialOperatorTerm_nonneg (G := G) k r hG hGle
+        simpa [G] using bernoulliTailOperator_nonneg k params.d G hG hGle
       sum_eq_total := by
         simp
       total_le_one := by

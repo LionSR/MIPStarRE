@@ -262,7 +262,6 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (hk : (2 * (degree : Error)) / theta ≤ (k : Error))
     (hXpsd : 0 ≤ X)
     (hXleOne : X ≤ 1)
-    (hTailLeOne : bernoulliTailOperator k degree X ≤ 1)
     (hcomplete : CompletenessAtLeast ψ
       ({ outcome := fun _ => X
          total := X

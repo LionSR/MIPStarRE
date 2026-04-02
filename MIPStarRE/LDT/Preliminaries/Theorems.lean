@@ -89,7 +89,7 @@ private lemma questionSDD_le_two_questionConsistency {Outcome : Type*}
       qSDD ψ A.toSubMeas B.toSubMeas ≤
         2 * (ev ψ (A.total * B.total) -
           qMatchMass ψ A.toSubMeas B.toSubMeas) := by
-    unfold qSDD qMatchMass
+    unfold qSDD qSDDCore qMatchMass
     calc
       ∑ a, ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))
         = ∑ a, (ev ψ (A.outcome a * A.outcome a) +
@@ -198,7 +198,7 @@ private lemma questionSDD_triangle {Outcome : Type*}
       2 * (ev' (A.outcome a) (B.outcome a) +
            ev' (B.outcome a) (C.outcome a)) :=
     fun a => ev_diff_triangle ψ _ _ _
-  unfold qSDD
+  unfold qSDD qSDDCore
   have h1 : ∑ a : Outcome, ev' (A.outcome a) (C.outcome a) ≤
       ∑ a : Outcome, (2 * (ev' (A.outcome a) (B.outcome a) +
                  ev' (B.outcome a) (C.outcome a))) :=
@@ -404,7 +404,7 @@ private lemma qSDD_self
     [Fintype Outcome]
     (ψ : QuantumState ι) (M : SubMeas Outcome ι) :
     qSDD ψ M M = 0 := by
-  unfold qSDD
+  unfold qSDD qSDDCore
   apply Finset.sum_eq_zero
   intro a _
   simp [ev]
