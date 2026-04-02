@@ -10,7 +10,7 @@ namespace MIPStarRE.LDT.CommutativityPoints
 open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
-open scoped MatrixOrder
+open scoped BigOperators MatrixOrder ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
@@ -111,7 +111,7 @@ private theorem opTensor_le_leftTensor
         simp [leftTensor, opTensor, sub_eq_add_neg, mul_add]
       · simp [leftTensor, opTensor, h₁, h₂, sub_eq_add_neg]
     · by_cases h₂ : i₂ = j₂
-      · simp [leftTensor, opTensor, h₁, h₂, sub_eq_add_neg]
+      · simp [leftTensor, opTensor, h₂, sub_eq_add_neg]; ring
       · simp [leftTensor, opTensor, h₁, h₂, sub_eq_add_neg]
   have hpsd : Matrix.PosSemidef (opTensor A (1 - B)) := by
     change Matrix.PosSemidef (Matrix.kronecker A (1 - B))

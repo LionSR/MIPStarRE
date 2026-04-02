@@ -17,6 +17,38 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+private theorem sandwich_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M P : MIPStarRE.Quantum.Op ι} (hM : 0 ≤ M) (hP : 0 ≤ P) :
+    0 ≤ M * P * M := by
+  have hMherm : Mᴴ = M :=
+    (Matrix.nonneg_iff_posSemidef.mp hM).isHermitian.eq
+  simpa [hMherm] using
+    (Matrix.PosSemidef.mul_mul_conjTranspose_same
+      (Matrix.nonneg_iff_posSemidef.mp hP) M).nonneg
+
+private theorem sandwich_le_sandwich_same {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M P Q : MIPStarRE.Quantum.Op ι} (hM : 0 ≤ M) (hPQ : P ≤ Q) :
+    M * P * M ≤ M * Q * M := by
+  apply sub_nonneg.mp
+  have hsand : 0 ≤ M * (Q - P) * M :=
+    sandwich_nonneg hM (sub_nonneg.mpr hPQ)
+  simpa [mul_sub, sub_mul] using hsand
+
+private theorem sq_le_self_of_nonneg_le_one {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {X : MIPStarRE.Quantum.Op ι} (hX : 0 ≤ X) (hXle : X ≤ 1) :
+    X * X ≤ X := by
+  have hcomm : Commute X (1 - X) :=
+    (Commute.one_right X).sub_right (Commute.refl X)
+  have hnonneg : 0 ≤ X * (1 - X) :=
+    Commute.mul_nonneg hX (sub_nonneg.mpr hXle) hcomm
+  exact sub_nonneg.mp <| by
+    simpa [mul_sub] using hnonneg
+
+private theorem subMeas_total_nonneg {α : Type*} [Fintype α]
+    (A : SubMeas α ι) : 0 ≤ A.total := by
+  rw [← A.sum_eq_total]
+  exact Finset.sum_nonneg fun a _ => A.outcome_pos a
+
 abbrev EvaluatedSliceQuestion (params : Parameters) := Point params.next × Point params.next
 abbrev EvaluatedSliceOutcome (params : Parameters) := Fq params × Fq params
 abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
@@ -62,7 +94,6 @@ noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α] [Fintype �
   total :=
     ∑ a : α, A.outcome a * B.total * A.outcome a
   outcome_pos := by
-    intro ab
     rintro ⟨a, b⟩
     have hA := Matrix.nonneg_iff_posSemidef.mp (A.outcome_pos a)
     simpa [hA.isHermitian.eq] using
@@ -79,8 +110,25 @@ noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α] [Fintype �
         intro a _
         rw [← Matrix.sum_mul, ← Matrix.mul_sum, B.sum_eq_total]
   total_le_one := by
-    -- Not provable in general without extra hypotheses controlling `∑ a, A_a B.total A_a`.
-    sorry
+    calc
+      ∑ a : α, A.outcome a * B.total * A.outcome a
+        ≤ ∑ a : α, A.outcome a := by
+            refine Finset.sum_le_sum ?_
+            intro a ha
+            exact le_trans
+              (by
+                simpa using
+                  sandwich_le_sandwich_same
+                    (A.outcome_pos a)
+                    B.total_le_one)
+              (by
+                simpa using
+                  sq_le_self_of_nonneg_le_one
+                    (A.outcome_pos a)
+                    (SubMeas.outcome_le_one A a))
+      _ = A.total := by
+          rw [A.sum_eq_total]
+      _ ≤ 1 := A.total_le_one
 
 /-- The full-slice question underlying an evaluated-slice sample. -/
 def fullSliceQuestionOfEvaluatedSlice (params : Parameters)
@@ -275,8 +323,18 @@ noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Ty
       sum_eq_total := by
         rfl
       total_le_one := by
-        -- Not provable in general from the current hypotheses alone.
-        sorry }
+        calc
+          ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b
+            ≤ ∑ b : OutcomeB, Q.outcome b := by
+                refine Finset.sum_le_sum ?_
+                intro b hb
+                simpa [normalizationConditionSandwichedOperator, Q.proj b] using
+                  sandwich_le_sandwich_same
+                    (Q.outcome_pos b)
+                    (SubMeas.outcome_le_one P a)
+          _ = Q.total := by
+              rw [Q.sum_eq_total]
+          _ ≤ 1 := Q.total_le_one }
 
 /-- The total family `a ↦ ∑_b C_{a,b}` from `lem:normalization-condition`. -/
 noncomputable def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type*}
@@ -312,8 +370,53 @@ noncomputable def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
   sum_eq_total := by
     rfl
   total_le_one := by
-    -- Not provable in general from the current hypotheses alone.
-    sorry
+    calc
+      ∑ a : OutcomeA,
+          normalizationConditionSandwichedTotalOperator P Q a *
+            (normalizationConditionSandwichedTotalOperator P Q a)ᴴ
+        ≤ ∑ a : OutcomeA, normalizationConditionSandwichedTotalOperator P Q a := by
+            refine Finset.sum_le_sum ?_
+            intro a ha
+            have hRnonneg : 0 ≤ normalizationConditionSandwichedTotalOperator P Q a := by
+              simpa [normalizationConditionSandwichedTotalOperator] using
+                subMeas_total_nonneg (normalizationConditionSandwichedTotalFamily P Q a)
+            have hRle : normalizationConditionSandwichedTotalOperator P Q a ≤ 1 := by
+              simpa [normalizationConditionSandwichedTotalOperator] using
+                (normalizationConditionSandwichedTotalFamily P Q a).total_le_one
+            have hRherm :
+                (normalizationConditionSandwichedTotalOperator P Q a)ᴴ =
+                  normalizationConditionSandwichedTotalOperator P Q a :=
+              (Matrix.nonneg_iff_posSemidef.mp hRnonneg).isHermitian.eq
+            simpa [hRherm] using
+              sq_le_self_of_nonneg_le_one hRnonneg hRle
+      _ = ∑ a : OutcomeA, ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b := by
+          simp [normalizationConditionSandwichedTotalOperator,
+            normalizationConditionSandwichedTotalFamily, postprocess,
+            normalizationConditionSandwichedFamily]
+      _ = ∑ ab : OutcomeA × OutcomeB, normalizationConditionSandwichedOperator P Q ab.1 ab.2 := by
+          simpa using
+            (Fintype.sum_prod_type' (f := fun a b =>
+              normalizationConditionSandwichedOperator P Q a b)).symm
+      _ = ∑ b : OutcomeB, ∑ a : OutcomeA, normalizationConditionSandwichedOperator P Q a b := by
+          simpa using
+            (Fintype.sum_prod_type_right' (f := fun a b =>
+              normalizationConditionSandwichedOperator P Q a b))
+      _ = ∑ b : OutcomeB, Q.outcome b * P.total * Q.outcome b := by
+          refine Finset.sum_congr rfl ?_
+          intro b hb
+          change ∑ a : OutcomeA, Q.outcome b * P.outcome a * Q.outcome b =
+            Q.outcome b * P.total * Q.outcome b
+          rw [← Matrix.sum_mul, ← Matrix.mul_sum, P.sum_eq_total]
+      _ ≤ ∑ b : OutcomeB, Q.outcome b := by
+          refine Finset.sum_le_sum ?_
+          intro b hb
+          simpa [Q.proj b] using
+            sandwich_le_sandwich_same
+              (Q.outcome_pos b)
+              P.total_le_one
+      _ = Q.total := by
+          rw [Q.sum_eq_total]
+      _ ≤ 1 := Q.total_le_one
 
 /-- The family `a ↦ (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
 noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
@@ -335,8 +438,53 @@ noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB :
   sum_eq_total := by
     rfl
   total_le_one := by
-    -- Not provable in general from the current hypotheses alone.
-    sorry
+    calc
+      ∑ a : OutcomeA,
+          (normalizationConditionSandwichedTotalOperator P Q a)ᴴ *
+            normalizationConditionSandwichedTotalOperator P Q a
+        ≤ ∑ a : OutcomeA, normalizationConditionSandwichedTotalOperator P Q a := by
+            refine Finset.sum_le_sum ?_
+            intro a ha
+            have hRnonneg : 0 ≤ normalizationConditionSandwichedTotalOperator P Q a := by
+              simpa [normalizationConditionSandwichedTotalOperator] using
+                subMeas_total_nonneg (normalizationConditionSandwichedTotalFamily P Q a)
+            have hRle : normalizationConditionSandwichedTotalOperator P Q a ≤ 1 := by
+              simpa [normalizationConditionSandwichedTotalOperator] using
+                (normalizationConditionSandwichedTotalFamily P Q a).total_le_one
+            have hRherm :
+                (normalizationConditionSandwichedTotalOperator P Q a)ᴴ =
+                  normalizationConditionSandwichedTotalOperator P Q a :=
+              (Matrix.nonneg_iff_posSemidef.mp hRnonneg).isHermitian.eq
+            simpa [hRherm] using
+              sq_le_self_of_nonneg_le_one hRnonneg hRle
+      _ = ∑ a : OutcomeA, ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b := by
+          simp [normalizationConditionSandwichedTotalOperator,
+            normalizationConditionSandwichedTotalFamily, postprocess,
+            normalizationConditionSandwichedFamily]
+      _ = ∑ ab : OutcomeA × OutcomeB, normalizationConditionSandwichedOperator P Q ab.1 ab.2 := by
+          simpa using
+            (Fintype.sum_prod_type' (f := fun a b =>
+              normalizationConditionSandwichedOperator P Q a b)).symm
+      _ = ∑ b : OutcomeB, ∑ a : OutcomeA, normalizationConditionSandwichedOperator P Q a b := by
+          simpa using
+            (Fintype.sum_prod_type_right' (f := fun a b =>
+              normalizationConditionSandwichedOperator P Q a b))
+      _ = ∑ b : OutcomeB, Q.outcome b * P.total * Q.outcome b := by
+          refine Finset.sum_congr rfl ?_
+          intro b hb
+          change ∑ a : OutcomeA, Q.outcome b * P.outcome a * Q.outcome b =
+            Q.outcome b * P.total * Q.outcome b
+          rw [← Matrix.sum_mul, ← Matrix.mul_sum, P.sum_eq_total]
+      _ ≤ ∑ b : OutcomeB, Q.outcome b := by
+          refine Finset.sum_le_sum ?_
+          intro b hb
+          simpa [Q.proj b] using
+            sandwich_le_sandwich_same
+              (Q.outcome_pos b)
+              P.total_le_one
+      _ = Q.total := by
+          rw [Q.sum_eq_total]
+      _ ≤ 1 := Q.total_le_one
 
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 noncomputable def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type*}
