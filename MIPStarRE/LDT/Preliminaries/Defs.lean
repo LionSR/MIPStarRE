@@ -59,7 +59,7 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
     outcome_pos := by
       intro a
       simpa using
-        SubMeas.sandwich_nonneg
+        sandwich_nonneg
           (M := (A q).outcome a)
           (P := (B q).toSubMeas.outcome a)
           ((B q).outcome_pos a)
@@ -75,13 +75,13 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
               exact le_trans
                 (by
                   simpa using
-                    SubMeas.sandwich_mono
+                    sandwich_mono
                       (M := (A q).outcome a)
                       (hMH := (A q).outcome_hermitian a)
                       (hPQ := Measurement.outcome_le_one (B q) a))
                 (by
                   simpa using
-                    SubMeas.sq_le_self
+                    sq_le_self
                       ((A q).outcome_pos a)
                       (SubMeas.outcome_le_one (A q) a))
         _ = (A q).total := by
@@ -109,7 +109,7 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*}
         rw [hBtotal]
         exact zero_le_one
       simpa using
-        SubMeas.sandwich_nonneg
+        sandwich_nonneg
           (M := (A q).outcome a)
           (P := (B q).toSubMeas.total)
           hBtotal_nonneg
@@ -125,7 +125,7 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*}
               refine Finset.sum_le_sum ?_
               intro a ha
               simpa [hBtotal] using
-                SubMeas.sq_le_self
+                sq_le_self
                   ((A q).outcome_pos a)
                   (SubMeas.outcome_le_one (A q) a)
         _ = (A q).total := by

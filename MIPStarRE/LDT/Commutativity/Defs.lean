@@ -64,7 +64,7 @@ noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α] [Fintype �
   outcome_pos := by
     rintro ⟨a, b⟩
     simpa using
-      SubMeas.sandwich_nonneg
+      sandwich_nonneg
         (M := A.outcome a)
         (P := B.outcome b)
         (B.outcome_pos b)
@@ -85,15 +85,15 @@ noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α] [Fintype �
             refine Finset.sum_le_sum ?_
             intro a ha
             exact le_trans
-              (by
-                simpa using
-                  SubMeas.sandwich_mono
+                (by
+                  simpa using
+                  sandwich_mono
                     (M := A.outcome a)
                     (hMH := A.outcome_hermitian a)
                     (hPQ := B.total_le_one))
               (by
                 simpa using
-                  SubMeas.sq_le_self
+                  sq_le_self
                     (A.outcome_pos a)
                     (SubMeas.outcome_le_one A a))
       _ = A.total := by
@@ -287,7 +287,7 @@ noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Ty
       outcome_pos := by
         intro b
         simpa [normalizationConditionSandwichedOperator] using
-          SubMeas.sandwich_nonneg
+          sandwich_nonneg
             (M := Q.outcome b)
             (P := P.outcome a)
             (P.outcome_pos a)
@@ -301,7 +301,7 @@ noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Ty
                 refine Finset.sum_le_sum ?_
                 intro b hb
                 simpa [normalizationConditionSandwichedOperator, Q.proj b] using
-                  SubMeas.sandwich_mono
+                  sandwich_mono
                     (M := Q.outcome b)
                     (hMH := Q.outcome_hermitian b)
                     (hPQ := SubMeas.outcome_le_one P a)
@@ -357,7 +357,7 @@ private theorem normalizationConditionSandwichedTotalSum_le_one
           refine Finset.sum_le_sum ?_
           intro b hb
           simpa [Q.proj b] using
-            SubMeas.sandwich_mono
+            sandwich_mono
               (M := Q.outcome b)
               (hMH := Q.outcome_hermitian b)
               (hPQ := P.total_le_one)
@@ -398,7 +398,7 @@ noncomputable def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
           normalizationConditionSandwichedTotalOperator P Q a :=
       (Matrix.nonneg_iff_posSemidef.mp hRnonneg).isHermitian.eq
     simpa [hRherm] using
-      (SubMeas.sq_le_self hRnonneg hRle)
+      (sq_le_self hRnonneg hRle)
 
 /-- The family `a ↦ (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
 noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
@@ -433,7 +433,7 @@ noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB :
           normalizationConditionSandwichedTotalOperator P Q a :=
       (Matrix.nonneg_iff_posSemidef.mp hRnonneg).isHermitian.eq
     simpa [hRherm] using
-      (SubMeas.sq_le_self hRnonneg hRle)
+      (sq_le_self hRnonneg hRle)
 
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 noncomputable def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type*}

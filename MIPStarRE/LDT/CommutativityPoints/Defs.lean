@@ -43,18 +43,17 @@ private theorem opTensor_le_leftTensor
     opTensor A B ≤ leftTensor (ι₂ := ι₂) A := by
   change (leftTensor (ι₂ := ι₂) A - opTensor A B).PosSemidef
   have hrewrite : leftTensor (ι₂ := ι₂) A - opTensor A B = opTensor A (1 - B) := by
-    ext i j
-    rcases i with ⟨i₁, i₂⟩
-    rcases j with ⟨j₁, j₂⟩
-    by_cases h₁ : i₁ = j₁
-    · by_cases h₂ : i₂ = j₂
-      · subst h₁
-        subst h₂
-        simp [leftTensor, opTensor, sub_eq_add_neg, mul_add]
-      · simp [leftTensor, opTensor, h₁, h₂, sub_eq_add_neg]
-    · by_cases h₂ : i₂ = j₂
-      · simp [leftTensor, opTensor, h₂, sub_eq_add_neg]; ring
-      · simp [leftTensor, opTensor, h₁, h₂, sub_eq_add_neg]
+    have hneg : Matrix.kronecker A (-B) = - Matrix.kronecker A B := by
+      simpa using (Matrix.kronecker_smul (-1 : ℂ) A B)
+    calc
+      leftTensor (ι₂ := ι₂) A - opTensor A B
+          = Matrix.kronecker A 1 + Matrix.kronecker A (-B) := by
+              rw [hneg]
+              simp [leftTensor, opTensor, sub_eq_add_neg]
+      _ = Matrix.kronecker A (1 - B) := by
+            simpa [sub_eq_add_neg] using (Matrix.kronecker_add A 1 (-B)).symm
+      _ = opTensor A (1 - B) := by
+            simp [opTensor]
   have hpsd : Matrix.PosSemidef (opTensor A (1 - B)) := by
     change Matrix.PosSemidef (Matrix.kronecker A (1 - B))
     exact
