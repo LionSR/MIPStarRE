@@ -26,6 +26,10 @@ def matrixTensorOperator {H K : FiniteHilbertSpace}
     MatrixOperator (tensorHilbertSpace H K) :=
   Matrix.kronecker A B
 
+/-- Rectangular operators from `H` into `K`, represented as concrete matrices. -/
+abbrev RectangularMatrixOperator (H K : FiniteHilbertSpace) :=
+  Matrix K.carrier H.carrier ℂ
+
 /-- Uniform average of a real-valued observable on a finite type. -/
 noncomputable def finiteAverage {α : Type*} [Fintype α] (f : α → Error) : Error :=
   ((Fintype.card α : Error)⁻¹) * ∑ a, f a
@@ -49,25 +53,10 @@ structure MatrixOperatorFamilyRealization (params : Parameters) where
 def hypercubeEdgePairFinset (params : Parameters) : Finset (Point params × Point params) :=
   Finset.univ.filter (fun uv => IsHypercubeEdge params uv.1 uv.2)
 
-/-- Placeholder edge distribution for the matrix model.
-This is currently the uniform distribution on `hypercubeEdgePairFinset params`;
-the paper's Section 7 distribution is nonuniform and weights self-loops
-differently, so this definition is only a temporary stand-in. -/
+/-- The Section 7.1 edge distribution used by the matrix model. -/
 noncomputable def matrixHypercubeEdgeDistribution (params : Parameters) :
     Distribution (Point params × Point params) :=
-  { support := hypercubeEdgePairFinset params
-    weight := fun uv =>
-      if uv ∈ hypercubeEdgePairFinset params then
-        1 / ((hypercubeEdgePairFinset params).card : Error)
-      else 0
-    nonnegative := by
-      intro uv
-      by_cases huv : uv ∈ hypercubeEdgePairFinset params
-      · simp [huv]
-      · simp [huv]
-    outsideSupport := by
-      intro uv huv
-      simp [huv] }
+  rerandomizeCoord params
 
 /-- The rank-one projector `|u⟩⟨u|` on the vertex register. -/
 def pointBasisProjectorMatrix (params : Parameters) (u : Point params) :
@@ -90,22 +79,19 @@ noncomputable def matrixSquaredDifferenceExpectation {H : FiniteHilbertSpace}
   Complex.re (matrixExpectation ρ (((X - Y)ᴴ) * (X - Y)))
 
 /-- The actual local variance, averaged over the hypercube edge set.
-We use `finiteAverage` over `(Point params × Fin params.m × Fq params)` encoding
-`(u, i, x)` with `v = rerand_i(u,x)`, matching the edge-sampling convention. -/
+This matches the Section 7.1 rerandomization distribution on ordered edges. -/
 noncomputable def matrixLocalVariance (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : Error :=
   (1 / (2 : Error)) *
-    finiteAverage (fun edge : Point params × Fin params.m × Fq params =>
-      let u := edge.1
-      let v := Function.update u edge.2.1 (u edge.2.1 + edge.2.2)
+    avgOver (matrixHypercubeEdgeDistribution params) (fun uv =>
       matrixSquaredDifferenceExpectation model.state
-        (model.family u) (model.family v))
+        (model.family uv.1) (model.family uv.2))
 
 /-- The actual global variance, averaged over two independent points. -/
 noncomputable def matrixGlobalVariance (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : Error :=
   (1 / (2 : Error)) *
-    finiteAverage (fun uv : Point params × Point params =>
+    avgOver (independentPointPair params) (fun uv =>
       matrixSquaredDifferenceExpectation model.state
         (model.family uv.1) (model.family uv.2))
 
@@ -114,38 +100,26 @@ noncomputable def matrixAveragePointOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : MatrixOperator model.space :=
   matrixAverageOperator model.family
 
-/-- The matrix shadow of the source's column operator `∑_u |u⟩ ⊗ A^u ⊗ I`.
-
-**TODO(column-operator):** The paper defines the combined operator as the *column operator*
-`A_combine = ∑_u |u⟩ ⊗ A^u ⊗ I`, which is a rectangular map from the strategy space into
-`ℂ^{|U|} ⊗ strategy-space`.  Our current `MatrixOperator` API only supports square matrices
-(endomorphisms on a single `FiniteHilbertSpace`), so we approximate this with the
-*projector-valued* sum `∑_u |u⟩⟨u| ⊗ A^u`.  This loses the off-diagonal cross terms
-`|u⟩⟨v| ⊗ A^u (A^v)^*` that appear when expanding `A_combine^* · A_combine` in the
-variance rewrite lemmas.
-
-To close this gap we would need:
-1. A `RectangularMatrixOperator H K` type for maps between *different* Hilbert spaces.
-2. The column-operator constructor `∑_u |u⟩ ⊗ A^u ⊗ I : strategy-space → ℂ^{|U|} ⊗ strategy-space`.
-3. Adjoint/product lemmas for rectangular operators so `A_combine^* · (L ⊗ ρ) · A_combine`
-   correctly produces the cross terms needed by `matrixLocalVarianceTraceWitness` and
-   `matrixGlobalVarianceTraceWitness`. -/
+/-- The matrix-level combined column operator `∑_u |u⟩ ⊗ A^u ⊗ I`.
+This is a rectangular block column from the strategy space into
+`ℂ^{|U|} ⊗ strategy-space`, with `u`-th block equal to `A^u`. -/
 noncomputable def matrixCombinedOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
-    MatrixOperator (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
-  ∑ u : Point params,
-    matrixTensorOperator (pointBasisProjectorMatrix params u) (model.family u)
+    RectangularMatrixOperator model.space
+      (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
+  fun ui j => model.family ui.1 ui.2 j
 
 /-- Bridge for the column-operator view used in the quadratic-form witnesses. -/
 noncomputable def matrixCombinedColumnOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
-    MatrixOperator (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
+    RectangularMatrixOperator model.space
+      (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
   matrixCombinedOperator params model
 
 /-- The actual trace witness for the local-variance rewrite. -/
 noncomputable def matrixLocalVarianceTraceWitness (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
-    MatrixOperator (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
+    MatrixOperator model.space :=
   (matrixCombinedColumnOperator params model)ᴴ *
     (matrixTensorOperator (matrixLaplacianOperator params) model.state.matrix *
       matrixCombinedColumnOperator params model)
@@ -158,7 +132,7 @@ noncomputable def matrixLocalVarianceTraceForm (params : Parameters)
 /-- The actual trace witness for the global-variance rewrite. -/
 noncomputable def matrixGlobalVarianceTraceWitness (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
-    MatrixOperator (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
+    MatrixOperator model.space :=
   (matrixCombinedColumnOperator params model)ᴴ *
     (matrixTensorOperator (orthogonalModeProjectorMatrix params) model.state.matrix *
       matrixCombinedColumnOperator params model)
@@ -166,7 +140,8 @@ noncomputable def matrixGlobalVarianceTraceWitness (params : Parameters)
 /-- The actual trace form for the global variance. -/
 noncomputable def matrixGlobalVarianceTraceForm (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : Error :=
-  Complex.re (MIPStarRE.Quantum.normalizedTrace (matrixGlobalVarianceTraceWitness params model))
+  (1 / (hypercubeVertexCount params : Error)) *
+    Complex.re (MIPStarRE.Quantum.normalizedTrace (matrixGlobalVarianceTraceWitness params model))
 
 /-- Matrix-level rewrite package for the local variance. -/
 structure MatrixLocalRewriteStatement (params : Parameters)

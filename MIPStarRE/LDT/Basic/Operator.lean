@@ -104,6 +104,13 @@ theorem ev_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) : ev ψ (0 : MIPStarRE.Quantum.Op ι) = 0 := by
   simp [ev]
 
+/-- A normalized state has unit expectation on the identity operator. -/
+@[simp] theorem ev_one_of_isNormalized {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (hψ : ψ.IsNormalized) :
+    ev ψ (1 : MIPStarRE.Quantum.Op ι) = 1 := by
+  have hψre := congrArg Complex.re hψ
+  simpa [ev] using hψre
+
 /-! ### PSD trace positivity -/
 
 /-- For a PSD state `ψ` and any operator `M`, `E[Mᴴ M] ≥ 0`. -/

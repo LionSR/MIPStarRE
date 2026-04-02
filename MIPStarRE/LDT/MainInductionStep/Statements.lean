@@ -109,13 +109,13 @@ structure RestrictedProbabilitiesStatement (params : Parameters)
         averageRestrictedAxisParallelError params profile
           ≤ sliceConditioningLoss params * eps ∧
         averageRestrictedSelfConsistencyError params profile ≤ delta ∧
-        avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params * profile.diagonal x) ≤ gamma ∧
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceDiagonalDirectionWeight params * profile.diagonal x) ≤ gamma ∧
         averageRestrictedDiagonalError params profile
-          ≤ sliceConditioningLoss params * gamma ∧
+          ≤ sliceDiagonalConditioningLoss params * gamma ∧
         sliceTransverseDirectionWeight params *
           averageRestrictedAxisParallelError params profile ≤ eps ∧
-        sliceTransverseDirectionWeight params *
+        sliceDiagonalDirectionWeight params *
           averageRestrictedDiagonalError params profile ≤ gamma
 
 end MIPStarRE.LDT.MainInductionStep

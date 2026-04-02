@@ -296,21 +296,12 @@ theorem sddError_self {Question Outcome : Type*} {ι : Type*} [Fintype ι] [Deci
     funext fun q => qSDD_self ψ (A q)
   rw [this]; exact avgOver_zero 𝒟
 
-/-- Data processing: postprocessing can only decrease the consistency defect. -/
-theorem qConsDefect_postprocess_le {α β : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype α] [Fintype β]
-    (ψ : QuantumState ι) (A B : SubMeas α ι) (f : α → β) :
-    qConsDefect ψ (postprocess A f) (postprocess B f) ≤
-      qConsDefect ψ A B := by
-  unfold qConsDefect
-  simp only [postprocess_total]
-  -- Suffices to show: matching mass increases under postprocessing
-  -- i.e., ∑_b ⟨ψ, (∑_{a:f(a)=b} A_a)(∑_{c:f(c)=b} B_c) ψ⟩ ≥ ∑_a ⟨ψ, A_a B_a ψ⟩
-  -- Then max(0, overlap - match') ≤ max(0, overlap - match) since match' ≥ match
-  apply max_le_max_left 0
-  apply sub_le_sub_left
-  -- Need: qMatchMass after postprocessing ≥ qMatchMass before
-  sorry
+/- The naive monotonicity statement
+`qConsDefect ψ (postprocess A f) (postprocess B f) ≤ qConsDefect ψ A B`
+is false for arbitrary submeasurements: without opposite-side / commuting
+hypotheses, the extra cross terms created by postprocessing need not be
+nonnegative. The paper's data-processing proposition is therefore recorded in
+the bipartite form `Preliminaries.simeqDataProcessing`, not as a generic fact
+about `qConsDefect`. -/
 
 end MIPStarRE.LDT

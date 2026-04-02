@@ -51,15 +51,45 @@ instance instDecidablePredHypercubeEdgePair (params : Parameters) :
   infer_instance
 
 /-- Edge sampling by rerandomizing a single coordinate.
-TODO: should be the actual edge distribution of the hypercube graph, not uniform on all pairs. -/
+This is the Section 7.1 distribution:
+pick `u ∈ F_q^m`, `i ∈ {1, ..., m}`, and `x ∈ F_q` uniformly,
+then set `v = u[i ↦ x]`. -/
+noncomputable def rerandomizeCoordWeight (params : Parameters)
+    (u v : Point params) : Error :=
+  (((∑ p : Fin params.m × Fq params,
+      if Function.update u p.1 p.2 = v then (1 : ℕ) else 0) : ℕ) : Error) /
+    (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)
+
 noncomputable def rerandomizeCoord (params : Parameters) :
     Distribution (Point params × Point params) :=
-  uniformDistribution (Point params × Point params)
+  { support := Finset.univ
+    weight := fun uv => rerandomizeCoordWeight params uv.1 uv.2
+    nonnegative := by
+      intro uv
+      have hden :
+          0 ≤ (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error) := by
+        positivity
+      exact div_nonneg (by positivity) hden
+    outsideSupport := by
+      intro uv huv
+      exact False.elim (huv (Finset.mem_univ uv)) }
 
 /-- Independent sampling of two uniformly random points. -/
+noncomputable def independentPointPairWeight (params : Parameters)
+    (_uv : Point params × Point params) : Error :=
+  ((hypercubeVertexCount params : Error)⁻¹) * ((hypercubeVertexCount params : Error)⁻¹)
+
 noncomputable def independentPointPair (params : Parameters) :
     Distribution (Point params × Point params) :=
-  uniformDistribution (Point params × Point params)
+  { support := Finset.univ
+    weight := independentPointPairWeight params
+    nonnegative := by
+      intro uv
+      simp only [independentPointPairWeight]
+      apply mul_nonneg <;> exact inv_nonneg.mpr (Nat.cast_nonneg _)
+    outsideSupport := by
+      intro uv huv
+      exact False.elim (huv (Finset.mem_univ uv)) }
 
 /-- Weighted sum of operators over a distribution's finite support,
 using the same `support`/`weight` data as the scalar `avgOver`. -/
@@ -137,12 +167,16 @@ noncomputable def localAndVariance (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error × Error :=
   (localVariance params A ψ, globalVariance params A ψ)
 
-/-- The paper's combined operator `A_combine = ∑_u |u⟩ ⊗ A^u ⊗ I`.
-We do not normalize by `|U|` here; the surrounding trace identities carry the
-paper's convention.  Built as a formal sum referencing each `A u`. -/
+/-- The column-space indices for `A_combine`. -/
+abbrev combinedColumnIndex (params : Parameters) (ι : Type*) := Point params × ι
+
+/-- The paper's combined column operator `A_combine = ∑_u |u⟩ ⊗ A^u ⊗ I`.
+In the current encoding the ambient index `ι` already carries any auxiliary
+registers, so this is the rectangular block column with `u`-th block `A^u`. -/
 noncomputable def combinedOperator (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  ∑ u : Point params, A u
+    (A : Point params → MIPStarRE.Quantum.Op ι) :
+    Matrix (combinedColumnIndex params ι) ι ℂ :=
+  fun ui j => A ui.1 ui.2 j
 
 /-! ### Fourier analysis on the hypercube `F_q^m`
 
@@ -315,13 +349,14 @@ noncomputable def orthogonalModeProjector (params : Parameters) :
     MIPStarRE.Quantum.Op (Point params) :=
   1 - constantModeProjector params
 
-/-- The trace witness from `lem:local-rewrite`.
-TODO(tensor): uses placeholder product instead of formalTensor since dimensions differ. -/
+/-- The trace witness from `lem:local-rewrite`. -/
 noncomputable def localVarianceTraceWitness (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : MIPStarRE.Quantum.Op ι :=
-  (combinedOperator params A) *
-    (ψ.density * ψ.density) *
-      (combinedOperator params A)
+  let Acombine := combinedOperator params A
+  let liftedLaplacianState :
+      Matrix (combinedColumnIndex params ι) (combinedColumnIndex params ι) ℂ :=
+    Matrix.kronecker (laplacian params) ψ.density
+  Acombineᴴ * (liftedLaplacianState * Acombine)
 
 /-- A packaged orthogonal decomposition for `A_combine`. -/
 structure GlobalVarianceDecomposition (params : Parameters)
@@ -331,12 +366,17 @@ structure GlobalVarianceDecomposition (params : Parameters)
   orthogonalOperator : MIPStarRE.Quantum.Op ι
   deriving Inhabited
 
-/-- The trace witness from `lem:global-rewrite`. -/
+/-- The trace witness from `lem:global-rewrite`.
+This uses the orthogonal projector onto the non-constant Fourier modes. -/
 noncomputable def globalVarianceTraceWitness (params : Parameters)
     (_A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
     (decomp : GlobalVarianceDecomposition params _A) : MIPStarRE.Quantum.Op ι :=
-  -- TODO(tensor): uses placeholder product instead of formalTensor since dimensions differ
-  decomp.orthogonalOperator * (ψ.density * decomp.orthogonalOperator)
+  let Acombine := combinedOperator params _A
+  let liftedOrthogonalState :
+      Matrix (combinedColumnIndex params ι) (combinedColumnIndex params ι) ℂ :=
+    Matrix.kronecker (orthogonalModeProjector params) ψ.density
+  let _ := decomp
+  Acombineᴴ * (liftedOrthogonalState * Acombine)
 
 /-- The local-variance trace expression from `lem:local-rewrite`. -/
 noncomputable def localVarianceTraceForm (params : Parameters)

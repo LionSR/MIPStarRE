@@ -18,9 +18,10 @@ open MIPStarRE.Quantum
 /-- Source-style left/right relation `A^x_a ⊗ I ≈_δ I ⊗ B^x_a`. -/
 structure BipartiteSDDRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome ι) (δ : Error) : Prop where
-  leftRightSquaredDistanceBound : sddError ψ 𝒟 A B ≤ δ
+  leftRightSquaredDistanceBound :
+    sddError ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftRight B) ≤ δ
 
 /-- Condition `0 ≤ B ≤ I` for the switch-sandwich argument. -/
 structure OpBounded01 {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -45,135 +46,184 @@ structure ConsAgreement {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
     (A B : IdxMeas Question Outcome ι) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
 
-/-- Family for the intermediate `A_a B_a A_a` sandwich. -/
+/-- `A_a ⊗ B_a`, the diagonal bipartite bridge from `prop:cons-sub-meas`. -/
 noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) :
-    IdxSubMeas Question Outcome ι :=
+    IdxSubMeas Question Outcome (ι × ι) :=
   fun q => {
     outcome := fun a =>
-      (A q).outcome a * (B q).toSubMeas.outcome a * (A q).outcome a
+      leftTensor (ι₂ := ι) ((A q).outcome a) *
+        rightTensor (ι₁ := ι) ((B q).outcome a)
     total := ∑ a : Outcome,
-      (A q).outcome a * (B q).toSubMeas.outcome a * (A q).outcome a
+      leftTensor (ι₂ := ι) ((A q).outcome a) *
+        rightTensor (ι₁ := ι) ((B q).outcome a)
     outcome_pos := by
       intro a
-      simpa using
-        sandwich_nonneg
-          (M := (A q).outcome a)
-          (P := (B q).toSubMeas.outcome a)
-          ((B q).outcome_pos a)
-          ((A q).outcome_hermitian a)
+      rw [show leftTensor (ι₂ := ι) ((A q).outcome a) *
+          rightTensor (ι₁ := ι) ((B q).outcome a) =
+            opTensor ((A q).outcome a) ((B q).outcome a) by
+              simpa [leftTensor, rightTensor, opTensor] using
+                (Matrix.mul_kronecker_mul
+                  ((A q).outcome a) (1 : MIPStarRE.Quantum.Op ι)
+                  (1 : MIPStarRE.Quantum.Op ι) ((B q).outcome a)).symm]
+      exact
+        (Matrix.PosSemidef.kronecker
+          (Matrix.nonneg_iff_posSemidef.mp ((A q).outcome_pos a))
+          (Matrix.nonneg_iff_posSemidef.mp ((B q).outcome_pos a))).nonneg
     sum_eq_total := by
       rfl
     total_le_one := by
       calc
-        ∑ a : Outcome, (A q).outcome a * (B q).toSubMeas.outcome a * (A q).outcome a
-          ≤ ∑ a : Outcome, (A q).outcome a := by
+        ∑ a : Outcome,
+            leftTensor (ι₂ := ι) ((A q).outcome a) *
+              rightTensor (ι₁ := ι) ((B q).outcome a)
+          ≤ ∑ a : Outcome, leftTensor (ι₂ := ι) ((A q).outcome a) := by
               refine Finset.sum_le_sum ?_
               intro a ha
-              exact le_trans
-                (by
-                  simpa using
-                    sandwich_mono
-                      (M := (A q).outcome a)
-                      (hMH := (A q).outcome_hermitian a)
-                      (hPQ := Measurement.outcome_le_one (B q) a))
-                (by
-                  simpa using
-                    sq_le_self
-                      ((A q).outcome_pos a)
-                      (SubMeas.outcome_le_one (A q) a))
-        _ = (A q).total := by
+              have hopTensor_le :
+                  opTensor ((A q).outcome a) ((B q).outcome a) ≤
+                    leftTensor (ι₂ := ι) ((A q).outcome a) := by
+                change
+                  (leftTensor (ι₂ := ι) ((A q).outcome a) -
+                    opTensor ((A q).outcome a) ((B q).outcome a)).PosSemidef
+                have hrewrite :
+                    leftTensor (ι₂ := ι) ((A q).outcome a) -
+                      opTensor ((A q).outcome a) ((B q).outcome a) =
+                    opTensor ((A q).outcome a) (1 - (B q).outcome a) := by
+                  have hneg :
+                      Matrix.kronecker ((A q).outcome a) (-((B q).outcome a)) =
+                        -Matrix.kronecker ((A q).outcome a) ((B q).outcome a) := by
+                    simpa using
+                      (Matrix.kronecker_smul (-1 : ℂ) ((A q).outcome a) ((B q).outcome a))
+                  calc
+                    leftTensor (ι₂ := ι) ((A q).outcome a) -
+                        opTensor ((A q).outcome a) ((B q).outcome a)
+                      =
+                        Matrix.kronecker ((A q).outcome a) 1 +
+                          Matrix.kronecker ((A q).outcome a) (-((B q).outcome a)) := by
+                            rw [hneg]
+                            simp [leftTensor, opTensor, sub_eq_add_neg]
+                    _ = Matrix.kronecker ((A q).outcome a) (1 - (B q).outcome a) := by
+                          simpa [sub_eq_add_neg] using
+                            (Matrix.kronecker_add ((A q).outcome a) 1 (-((B q).outcome a))).symm
+                    _ = opTensor ((A q).outcome a) (1 - (B q).outcome a) := by
+                          simp [opTensor]
+                have hpsd :
+                    Matrix.PosSemidef
+                      (opTensor ((A q).outcome a) (1 - (B q).outcome a)) := by
+                  change
+                    Matrix.PosSemidef
+                      (Matrix.kronecker ((A q).outcome a) (1 - (B q).outcome a))
+                  exact
+                    Matrix.PosSemidef.kronecker
+                      (Matrix.nonneg_iff_posSemidef.mp ((A q).outcome_pos a))
+                      (Matrix.nonneg_iff_posSemidef.mp
+                        (sub_nonneg.mpr (Measurement.outcome_le_one (B q) a)))
+                rwa [hrewrite]
+              rw [show leftTensor (ι₂ := ι) ((A q).outcome a) *
+                  rightTensor (ι₁ := ι) ((B q).outcome a) =
+                    opTensor ((A q).outcome a) ((B q).outcome a) by
+                      simpa [leftTensor, rightTensor, opTensor] using
+                        (Matrix.mul_kronecker_mul
+                          ((A q).outcome a) (1 : MIPStarRE.Quantum.Op ι)
+                          (1 : MIPStarRE.Quantum.Op ι) ((B q).outcome a)).symm]
+              exact hopTensor_le
+        _ = leftTensor (ι₂ := ι) ((A q).total) := by
+          rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a => (A q).outcome a)]
           rw [(A q).sum_eq_total]
-        _ ≤ 1 := (A q).total_le_one
+        _ ≤ 1 := leftTensor_le_one (ι₂ := ι) (A q).total_le_one
   }
 
-/-- Family for the intermediate `A_a (Σ_b B_b) A_a` sandwich. -/
+/-- `A ⊗ B_a`, the total bipartite bridge from `prop:cons-sub-meas`. -/
 noncomputable def totalSandwichFamily {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) :
-    IdxSubMeas Question Outcome ι :=
+    IdxSubMeas Question Outcome (ι × ι) :=
   fun q => {
     outcome := fun a =>
-      (A q).outcome a * (B q).toSubMeas.total * (A q).outcome a
+      leftTensor (ι₂ := ι) ((A q).total) *
+        rightTensor (ι₁ := ι) ((B q).outcome a)
     total := ∑ a : Outcome,
-      (A q).outcome a * (B q).toSubMeas.total * (A q).outcome a
+      leftTensor (ι₂ := ι) ((A q).total) *
+        rightTensor (ι₁ := ι) ((B q).outcome a)
     outcome_pos := by
       intro a
-      exact sandwich_nonneg
-          (SubMeas.total_nonneg (B q).toSubMeas)
-          ((A q).outcome_hermitian a)
+      rw [show leftTensor (ι₂ := ι) ((A q).total) *
+          rightTensor (ι₁ := ι) ((B q).outcome a) =
+            opTensor ((A q).total) ((B q).outcome a) by
+              simpa [leftTensor, rightTensor, opTensor] using
+                (Matrix.mul_kronecker_mul
+                  ((A q).total) (1 : MIPStarRE.Quantum.Op ι)
+                  (1 : MIPStarRE.Quantum.Op ι) ((B q).outcome a)).symm]
+      exact
+        (Matrix.PosSemidef.kronecker
+          (Matrix.nonneg_iff_posSemidef.mp (SubMeas.total_nonneg (A q)))
+          (Matrix.nonneg_iff_posSemidef.mp ((B q).outcome_pos a))).nonneg
     sum_eq_total := by
       rfl
     total_le_one := by
-      have hBtotal : (B q).toSubMeas.total = (1 : MIPStarRE.Quantum.Op ι) := by
-        simpa using (B q).total_eq_one
       calc
-        ∑ a : Outcome, (A q).outcome a * (B q).toSubMeas.total * (A q).outcome a
-          ≤ ∑ a : Outcome, (A q).outcome a := by
-              refine Finset.sum_le_sum ?_
-              intro a ha
-              simpa [hBtotal] using
-                sq_le_self
-                  ((A q).outcome_pos a)
-                  (SubMeas.outcome_le_one (A q) a)
-        _ = (A q).total := by
-          rw [(A q).sum_eq_total]
-        _ ≤ 1 := (A q).total_le_one
+        ∑ a : Outcome,
+            leftTensor (ι₂ := ι) ((A q).total) *
+              rightTensor (ι₁ := ι) ((B q).outcome a)
+          = leftTensor (ι₂ := ι) ((A q).total) := by
+              rw [← Finset.mul_sum]
+              rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ (fun a => (B q).outcome a)]
+              rw [(B q).sum_eq]
+              simp [leftTensor, rightTensor]
+        _ ≤ 1 := leftTensor_le_one (ι₂ := ι) (A q).total_le_one
   }
 
 /-- Output package for `prop:cons-sub-meas`. -/
 structure ConsSubMeasStmt {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) (γ : Error) : Prop where
   diagonalControl :
-    SDDRel ψ 𝒟 A (diagonalSandwichFamily A B) γ
+    SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A) (diagonalSandwichFamily A B) γ
   sandwichControl :
     SDDRel ψ 𝒟 (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ
   combinedControl :
-    SDDRel ψ 𝒟 A (totalSandwichFamily A B) (4 * γ)
+    SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A) (totalSandwichFamily A B) (4 * γ)
 
-/-- Averaged left-placed sandwich scalar from `prop:switch-sandwich`. -/
+/-- Averaged left term `E_x ∑_a ⟨ψ, (A_a B A_a ⊗ I) ψ⟩`. -/
 noncomputable def leftSandwichExpectation {Question Outcome : Type*}
     {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
     (B : MIPStarRE.Quantum.Op ι) : Error :=
   avgOver 𝒟 fun q =>
-    ev ψ <|
-      leftTensor (ι₂ := ι) (A q).toSubMeas.total *
+    ∑ a, ev ψ
+      (leftTensor (ι₂ := ι) ((A q).outcome a) *
         leftTensor (ι₂ := ι) B *
-        leftTensor (ι₂ := ι) (A q).toSubMeas.total
+        leftTensor (ι₂ := ι) ((A q).outcome a))
 
-/-- Averaged middle sandwich scalar from `prop:switch-sandwich`. -/
+/-- Averaged middle term `E_x ∑_a ⟨ψ, (B ⊗ A_a) ψ⟩`. -/
 noncomputable def middleSandwichExpectation {Question Outcome : Type*}
     {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
-    (B : MIPStarRE.Quantum.Op (ι × ι)) : Error :=
+    (B : MIPStarRE.Quantum.Op ι) : Error :=
   avgOver 𝒟 fun q =>
-    ev ψ <|
-      leftTensor (ι₂ := ι) (A q).toSubMeas.total *
-        B *
-        leftTensor (ι₂ := ι) (A q).toSubMeas.total
+    ∑ a, ev ψ
+      (leftTensor (ι₂ := ι) B *
+        rightTensor (ι₁ := ι) ((A q).outcome a))
 
-/-- Averaged right-placed sandwich scalar from `prop:switch-sandwich`. -/
+/-- Averaged right term `E_x ∑_a ⟨ψ, (B A_a ⊗ I) ψ⟩`. -/
 noncomputable def rightSandwichExpectation {Question Outcome : Type*}
     {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
     (B : MIPStarRE.Quantum.Op ι) : Error :=
   avgOver 𝒟 fun q =>
-    ev ψ <|
-      leftTensor (ι₂ := ι) (A q).toSubMeas.total *
-        rightTensor (ι₁ := ι) B *
-        leftTensor (ι₂ := ι) (A q).toSubMeas.total
+    ∑ a, ev ψ
+      (leftTensor (ι₂ := ι) (B * (A q).outcome a))
 
 /-- Output package for `prop:switch-sandwich`. -/
 structure SwitchSandwichStmt {Question Outcome : Type*}
@@ -183,10 +233,10 @@ structure SwitchSandwichStmt {Question Outcome : Type*}
     (B : MIPStarRE.Quantum.Op ι) (δ : Error) : Prop where
   leftSandwichTransfer :
     |leftSandwichExpectation ψ 𝒟 A B -
-      middleSandwichExpectation ψ 𝒟 A (leftTensor (ι₂ := ι) B)|
+      middleSandwichExpectation ψ 𝒟 A B|
       ≤ 2 * Real.sqrt δ
   rightSandwichTransfer :
-    |middleSandwichExpectation ψ 𝒟 A (rightTensor (ι₁ := ι) B) -
+    |middleSandwichExpectation ψ 𝒟 A B -
       rightSandwichExpectation ψ 𝒟 A B|
       ≤ Real.sqrt δ
 

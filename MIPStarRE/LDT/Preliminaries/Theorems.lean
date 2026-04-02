@@ -121,67 +121,35 @@ private lemma questionSDD_le_two_questionConsistency {Outcome : Type*}
 theorem simeqToApprox {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome ι) (δ : Error) :
-    ConsRel ψ 𝒟 (IdxMeas.toIdxSubMeas A)
-        (IdxMeas.toIdxSubMeas B) δ →
+    ConsRel ψ 𝒟
+        (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A))
+        (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) δ →
       BipartiteSDDRel ψ 𝒟
         (IdxMeas.toIdxSubMeas A)
         (IdxMeas.toIdxSubMeas B)
         (2 * δ) := by
-  intro ⟨hcons⟩
-  constructor
-  unfold sddError consError at *
-  calc avgOver 𝒟
-        (fun q => qSDD ψ
-          ((IdxMeas.toIdxSubMeas A) q)
-          ((IdxMeas.toIdxSubMeas B) q))
-      ≤ avgOver 𝒟
-          (fun q => 2 * qConsDefect ψ
-            ((IdxMeas.toIdxSubMeas A) q)
-            ((IdxMeas.toIdxSubMeas B) q)) := by
-        apply avgOver_mono
-        intro q
-        exact questionSDD_le_two_questionConsistency ψ (A q) (B q)
-    _ = 2 * avgOver 𝒟
-          (fun q => qConsDefect ψ
-            ((IdxMeas.toIdxSubMeas A) q)
-            ((IdxMeas.toIdxSubMeas B) q)) := by
-        rw [avgOver_const_mul]
-    _ ≤ 2 * δ := by
-        exact mul_le_mul_of_nonneg_left hcons (by norm_num)
+  sorry
 
-/-- Atomic mathematical fact: post-processing can only decrease the consistency
-defect. -/
-private lemma qConsDefect_postprocess_le {α β : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype α] [Fintype β]
-    (ψ : QuantumState ι) (A B : SubMeas α ι) (f : α → β) :
-    qConsDefect ψ (postprocess A f) (postprocess B f) ≤
-      qConsDefect ψ A B := by
-  simpa using MIPStarRE.LDT.qConsDefect_postprocess_le ψ A B f
+/-- `prop:simeq-data-processing`.
 
-/-- `prop:simeq-data-processing`. -/
+This is the paper-faithful opposite-side statement: the two families are first
+placed on opposite tensor factors of a bipartite state, and only then
+postprocessed. The generic same-side `qConsDefect` monotonicity statement is
+false for arbitrary noncommuting submeasurements. -/
 theorem simeqDataProcessing {Question α β : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype α] [Fintype β]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question α ι) (δ : Error) (f : α → β) :
-    ConsRel ψ 𝒟 A B δ →
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
+    (A B : IdxMeas Question α ι) (δ : Error) (f : α → β) :
+    ConsRel ψ 𝒟
+      (fun q => leftPlacedSubMeas (ιB := ι) ((A q).toSubMeas))
+      (fun q => rightPlacedSubMeas (ιA := ι) ((B q).toSubMeas)) δ →
       ConsRel ψ 𝒟
-        (fun q => postprocess (A q) f)
-        (fun q => postprocess (B q) f) δ := by
-  intro ⟨hcons⟩
-  constructor
-  unfold consError at *
-  calc avgOver 𝒟
-        (fun q => qConsDefect ψ (postprocess (A q) f) (postprocess (B q) f))
-      ≤ avgOver 𝒟
-          (fun q => qConsDefect ψ (A q) (B q)) := by
-        apply avgOver_mono
-        intro q
-        exact qConsDefect_postprocess_le ψ (A q) (B q) f
-    _ ≤ δ := hcons
+        (fun q => leftPlacedSubMeas (ιB := ι) (postprocess ((A q).toSubMeas) f))
+        (fun q => rightPlacedSubMeas (ιA := ι) (postprocess ((B q).toSubMeas) f)) δ := by
+  sorry
 
 /-! ### Infrastructure: triangle inequality for `SDDRel` -/
 
@@ -260,23 +228,25 @@ private lemma stateDependentDistanceRel_mono
 private lemma consSubMeas_diagonalControl
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) (γ : Error) :
-    ConsRel ψ 𝒟 A
-      (IdxMeas.toIdxSubMeas B) γ →
-    SDDRel ψ 𝒟 A
+    ConsRel ψ 𝒟
+      (IdxSubMeas.liftLeft A)
+      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) γ →
+    SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A)
       (diagonalSandwichFamily A B) γ := by
   sorry
 
 private lemma consSubMeas_sandwichControl
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) (γ : Error) :
-    ConsRel ψ 𝒟 A
-      (IdxMeas.toIdxSubMeas B) γ →
+    ConsRel ψ 𝒟
+      (IdxSubMeas.liftLeft A)
+      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) γ →
     SDDRel ψ 𝒟
       (diagonalSandwichFamily A B)
       (totalSandwichFamily A B) γ := by
@@ -285,32 +255,33 @@ private lemma consSubMeas_sandwichControl
 private lemma consSubMeas_combinedControl
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) (γ : Error) :
-    SDDRel ψ 𝒟 A
+    SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A)
       (diagonalSandwichFamily A B) γ →
     SDDRel ψ 𝒟
       (diagonalSandwichFamily A B)
       (totalSandwichFamily A B) γ →
-    SDDRel ψ 𝒟 A
+    SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A)
       (totalSandwichFamily A B) (4 * γ) := by
   intro hAD hDT
-  have h := stateDependentDistanceRel_triangle ψ 𝒟 A
+  have h := stateDependentDistanceRel_triangle ψ 𝒟 (IdxSubMeas.liftLeft A)
     (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ
     hAD hDT
-  exact stateDependentDistanceRel_mono ψ 𝒟 A (totalSandwichFamily A B)
+  exact stateDependentDistanceRel_mono ψ 𝒟 (IdxSubMeas.liftLeft A) (totalSandwichFamily A B)
     (2 * (γ + γ)) (4 * γ) (by linarith) h
 
 /-- `prop:cons-sub-meas`. -/
 theorem consSubMeas {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) (γ : Error) :
-    ConsRel ψ 𝒟 A
-      (IdxMeas.toIdxSubMeas B) γ →
+    ConsRel ψ 𝒟
+      (IdxSubMeas.liftLeft A)
+      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) γ →
     ConsSubMeasStmt ψ 𝒟 A B γ := by
   intro hcons
   have hdc := consSubMeas_diagonalControl ψ 𝒟 A B γ hcons
@@ -329,12 +300,13 @@ private lemma switchSandwich_leftTransfer
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
-    (Alifted : IdxSubMeas Question Outcome (ι × ι))
     (B : MIPStarRE.Quantum.Op ι) (hB : OpBounded01 B)
     (δ : Error) :
-    BipartiteSDDRel ψ 𝒟 Alifted Alifted δ →
+    BipartiteSDDRel ψ 𝒟
+      (IdxProjSubMeas.toIdxSubMeas A)
+      (IdxProjSubMeas.toIdxSubMeas A) δ →
     |leftSandwichExpectation ψ 𝒟 A B -
-      middleSandwichExpectation ψ 𝒟 A (leftTensor (ι₂ := ι) B)| ≤
+      middleSandwichExpectation ψ 𝒟 A B| ≤
       2 * Real.sqrt δ := by
   sorry
 
@@ -343,11 +315,12 @@ private lemma switchSandwich_rightTransfer
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
-    (Alifted : IdxSubMeas Question Outcome (ι × ι))
     (B : MIPStarRE.Quantum.Op ι) (hB : OpBounded01 B)
     (δ : Error) :
-    BipartiteSDDRel ψ 𝒟 Alifted Alifted δ →
-    |middleSandwichExpectation ψ 𝒟 A (rightTensor (ι₁ := ι) B) -
+    BipartiteSDDRel ψ 𝒟
+      (IdxProjSubMeas.toIdxSubMeas A)
+      (IdxProjSubMeas.toIdxSubMeas A) δ →
+    |middleSandwichExpectation ψ 𝒟 A B -
       rightSandwichExpectation ψ 𝒟 A B| ≤
       Real.sqrt δ := by
   sorry
@@ -358,23 +331,25 @@ theorem switchSandwich {Question Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxProjSubMeas Question Outcome ι)
-    (Alifted : IdxSubMeas Question Outcome (ι × ι))
     (B : MIPStarRE.Quantum.Op ι) (hB : OpBounded01 B)
     (δ : Error) :
-    BipartiteSDDRel ψ 𝒟 Alifted Alifted δ →
+    BipartiteSDDRel ψ 𝒟
+      (IdxProjSubMeas.toIdxSubMeas A)
+      (IdxProjSubMeas.toIdxSubMeas A) δ →
     SwitchSandwichStmt ψ 𝒟 A B δ := by
   intro happrox
   exact {
     leftSandwichTransfer :=
-      switchSandwich_leftTransfer ψ 𝒟 A Alifted B hB δ happrox
+      switchSandwich_leftTransfer ψ 𝒟 A B hB δ happrox
     rightSandwichTransfer :=
-      switchSandwich_rightTransfer ψ 𝒟 A Alifted B hB δ happrox
+      switchSandwich_rightTransfer ψ 𝒟 A B hB δ happrox
   }
 
 private lemma completenessTransfer_core {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (hψ : ψ.IsNormalized)
     (A : IdxSubMeas Question Outcome ι)
     (P : IdxProjSubMeas Question Outcome ι) (ε : Error) :
     sddError ψ 𝒟 A
@@ -390,13 +365,14 @@ theorem completenessTransferProjectiveP {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (hψ : ψ.IsNormalized)
     (A : IdxSubMeas Question Outcome ι)
     (P : IdxProjSubMeas Question Outcome ι) (ε : Error) :
     SDDRel ψ 𝒟 A
         (IdxProjSubMeas.toIdxSubMeas P) ε →
       CompTransferStmt ψ 𝒟 A P ε := by
   intro ⟨hε⟩
-  exact { completenessTransfer := completenessTransfer_core ψ 𝒟 A P ε hε }
+  exact { completenessTransfer := completenessTransfer_core ψ 𝒟 hψ A P ε hε }
 
 /-- The self-distance defect `qSDD ψ M M` is zero. -/
 private lemma qSDD_self
@@ -436,16 +412,11 @@ private lemma sscError_nonneg {Question Outcome : Type*}
 theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error) :
-    (PermInvState ψ ∧ SSCRel ψ 𝒟 A δ) →
+    (PermInvState ψ ∧ SSCRel ψ 𝒟 (IdxSubMeas.liftLeft A) δ) →
       BipartiteSDDRel ψ 𝒟 A A (2 * δ) := by
-  intro ⟨_, ⟨hδ⟩⟩
-  constructor
-  rw [sddError_self]
-  have hδ_nonneg : 0 ≤ δ :=
-    le_trans (sscError_nonneg ψ 𝒟 A) hδ
-  linarith
+  sorry
 
 private lemma constFamily_sdd_unit
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -514,6 +485,7 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι)
+    (hψ : ψ.IsNormalized)
     (A : Measurement Outcome ι) (B : SubMeas Outcome ι)
     (a0 : Outcome) (δ ζ : Error) :
     (PermInvState ψ ∧ SSCRel ψ (uniformDistribution Unit)
@@ -564,6 +536,7 @@ theorem completingToMeasurement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι)
+    (hψ : ψ.IsNormalized)
     (A : Measurement Outcome ι) (B : SubMeas Outcome ι)
     (a0 : Outcome) (δ ζ : Error) :
     (PermInvState ψ ∧ SSCRel ψ (uniformDistribution Unit)
@@ -577,7 +550,7 @@ theorem completingToMeasurement {Outcome : Type*}
   exact ⟨completeAtOutcome B a0, {
     completionFormula := rfl
     closenessAfterCompletion :=
-      closenessAfterCompletion_core ψ A B a0 δ ζ hsc hdist
+      closenessAfterCompletion_core ψ hψ A B a0 δ ζ hsc hdist
   }⟩
 
 end MIPStarRE.LDT.Preliminaries
