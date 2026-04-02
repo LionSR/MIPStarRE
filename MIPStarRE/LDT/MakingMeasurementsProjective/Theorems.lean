@@ -68,7 +68,64 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
     (M : MIPStarRE.Quantum.Submeasurement α d) :
     OneMeasNaimarkLemma α d M := by
-  sorry
+  classical
+  let remainder : MIPStarRE.Quantum.Op d := 1 - ∑ a, M.effect a
+  let sqrtEffect : α → MIPStarRE.Quantum.Op d := fun a => CFC.sqrt (M.effect a)
+  let sqrtRemainder : MIPStarRE.Quantum.Op d := CFC.sqrt remainder
+  let auxProj : Option α → MIPStarRE.Quantum.Op (Option α) :=
+    fun oa => Matrix.single oa oa 1
+  /-
+  The prescribed Naimark isometry column:
+    `V (|ψ⟩ ⊗ |⊥⟩)
+      = ∑_a √(M_a)|ψ⟩ ⊗ |a⟩ + √(I - ∑_a M_a)|ψ⟩ ⊗ |⊥⟩`.
+  Concretely, this matrix is supported only on the input `none = ⊥` slice.
+  -/
+  let V : MIPStarRE.Quantum.Op (d × Option α) := fun x y =>
+    match x.2, y.2 with
+    | some a, none => sqrtEffect a x.1 y.1
+    | none, none => sqrtRemainder x.1 y.1
+    | _, _ => 0
+  /-
+  Extend the isometry column `V` to a unitary `U` on the whole enlarged space.
+  The dilated projectors are then `U† (I ⊗ |oa⟩⟨oa|) U`.
+  -/
+  let U : MIPStarRE.Quantum.Op (d × Option α) := by
+    sorry
+  refine ⟨{
+    source := M
+    liftedEffect := fun oa =>
+      Uᴴ * Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa) * U
+    lifted_isProj := ?_
+    lifted_pos := ?_
+    lifted_sum_le_one := ?_
+    expectation_preservation := ?_
+  }, rfl⟩
+  · intro oa
+    /-
+    `U† (I ⊗ |oa⟩⟨oa|) U` is a projection because `I ⊗ |oa⟩⟨oa|` is, and
+    conjugation by a unitary preserves Hermitian idempotents.
+    -/
+    sorry
+  · intro oa
+    /-
+    Each `I ⊗ |oa⟩⟨oa|` is PSD, so its unitary conjugate is PSD as well.
+    -/
+    sorry
+  · /-
+    Since the auxiliary rank-one projectors sum to the identity on `Option α`,
+    the lifted family is actually a complete projective measurement, hence in
+    particular a submeasurement.
+    -/
+    sorry
+  · intro ρ a
+    /-
+    Write `Q_a = I ⊗ |a⟩⟨a|` and `Q_⊥ = I ⊗ |⊥⟩⟨⊥|`.  Using the defining action
+    of `U` on the `|⊥⟩` slice, we have
+      `Q_a * U * Q_⊥ = (√(M_a)) ⊗ |a⟩⟨⊥|`,
+    so after cycling the trace and using `√(M_a) * √(M_a) = M_a`, the right-hand
+    side reduces to `normalizedTrace (ρ * M.effect a)`.
+    -/
+    sorry
 
 /-! ### Full Naimark dilation (Theorem 5.1) -/
 

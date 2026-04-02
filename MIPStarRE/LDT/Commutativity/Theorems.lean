@@ -147,6 +147,23 @@ lemma normalizationCondition {OutcomeA OutcomeB : Type*}
     (P : SubMeas OutcomeA ι)
     (Q : ProjSubMeas OutcomeB ι) :
     NormalizationConditionStatement P Q := by
-  sorry
+  have hherm :
+      ∀ a : OutcomeA,
+        (normalizationConditionSandwichedTotalOperator P Q a)ᴴ =
+          normalizationConditionSandwichedTotalOperator P Q a := by
+    intro a
+    have hnonneg : 0 ≤ normalizationConditionSandwichedTotalOperator P Q a := by
+      simpa [normalizationConditionSandwichedTotalOperator] using
+        SubMeas.total_nonneg (normalizationConditionSandwichedTotalFamily P Q a)
+    exact (Matrix.nonneg_iff_posSemidef.mp hnonneg).isHermitian.eq
+  refine
+    { sandwichedHermitianSquare := ?_
+      sandwichedBoundedByIdentity := ?_ }
+  · simp [normalizationConditionAdjointSquareOperator,
+      normalizationConditionSquareOperator,
+      normalizationConditionAdjointSquareFamily,
+      normalizationConditionSquareFamily, hherm]
+  · simpa [normalizationConditionSquareOperator, normalizationConditionIdentityBound] using
+      (normalizationConditionSquareFamily P Q).total_le_one
 
 end MIPStarRE.LDT.Commutativity

@@ -49,7 +49,6 @@ lemma ldPastingSubMeas
       LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
   sorry
 
-/-- `prop:ld-dnoteq`. -/
 theorem ldDnoteq
     (params : Parameters) (k : ℕ) :
     totalVariationDistance (uniformDistribution (PointTuple params k))
@@ -57,27 +56,39 @@ theorem ldDnoteq
       ≤ ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
   classical
   /-
-  Birthday-paradox proof strategy:
+  A clean formal proof should follow the birthday-paradox outline.
 
-  1. Let `support := (distinctTupleDistribution params k).support`, i.e. the injective
-     `k`-tuples.
-  2. Split into cases on `support.Nonempty`.
-     - If `support = ∅`, then `k > q` (otherwise `Fin.castLE` gives an injective tuple),
-       and `distinctTupleDistribution` is the zero sub-distribution, so
-       `TV(uniform, distinct) = 1/2 ≤ k^2 / q`.
-     - If `support.Nonempty`, then `k ≤ q`, and a direct computation from the definition of
-       `totalVariationDistance` gives
-         `TV = 1 - support.card / q^k`.
-  3. Count injective tuples:
-       `support.card = q.descFactorial k`.
-     This is equivalent to the number of embeddings `Fin k ↪ Fin q`.
-  4. Rewrite
-       `q.descFactorial k / q^k = ∏ i < k, (1 - i / q)`.
-  5. Use the elementary product bound
-       `1 - ∏ i < k a_i ≤ ∑ i < k (1 - a_i)` for `0 ≤ a_i ≤ 1`,
-     with `a_i = 1 - i / q`.
-  6. Conclude
-       `TV ≤ ∑ i < k i / q = k (k - 1) / (2 q) ≤ k^2 / q`.
+  1. Let
+       `support := (Finset.univ.filter fun xs : PointTuple params k => Function.Injective xs)`.
+     This is exactly `(distinctTupleDistribution params k).support`.
+
+  2. If `k ≤ params.q`, then `support.Nonempty` via the injective tuple
+       `i ↦ ⟨i.1, lt_of_lt_of_le i.2 hk⟩`.
+     In that case:
+     - `support.card = params.q.descFactorial k`, by identifying injective tuples
+       `Fin k → Fin params.q` with embeddings `Fin k ↪ Fin params.q` and using
+       `Fintype.card_embedding_eq`.
+     - On `support`, the distinct-tuple distribution has weight `1 / support.card`;
+       off `support`, it has weight `0`.
+     - Since the uniform distribution on `PointTuple params k` has weight
+       `1 / params.q^k` everywhere, splitting the TV sum over `support` and its
+       complement gives
+         `TV = 1 - support.card / params.q^k
+              = 1 - params.q.descFactorial k / params.q^k`.
+
+  3. Prove the descending-factorial birthday bound
+       `1 - q.descFactorial k / q^k ≤ k^2 / q`
+     by induction on `k`, using
+       `q.descFactorial (k + 1) = (q - k) * q.descFactorial k`
+     and the recurrence
+       `1 - a_{k+1} = (1 - a_k) + a_k * (k / q)`,
+     together with `a_k ≤ 1`.
+
+  4. If `k > params.q`, then the right-hand side is already `> 1`, while
+     `totalVariationDistance` is at most `1`, so the claim is immediate.
+
+  The main missing work is bookkeeping the finite-sum split in step 2 and the
+  elementary real-algebra induction in step 3.
   -/
   sorry
 
@@ -99,9 +110,87 @@ lemma looksEasyButTookMeAWhile
     push_neg at hl_boundary
     have hlpos : 0 < lambda := lt_of_le_of_ne h0 (Ne.symm hl_boundary.1)
     have hl_lt_one : lambda < 1 := lt_of_le_of_ne h1 hl_boundary.2
-    -- The interior case (`0 < λ < 1`) is the core analytic inequality.
-    -- We keep it as a separate placeholder so edge behavior is explicit.
-    sorry
+    let e : Error := 1 / ((d + 1 : ℕ) : Error)
+    have hd1_ne : (((d + 1 : ℕ) : Error)) ≠ 0 := by positivity
+    have he_mul : (((d + 1 : ℕ) : Error)) * e = 1 := by
+      dsimp [e]
+      field_simp [hd1_ne]
+    have he_mul' : e * (((d + 1 : ℕ) : Error)) = 1 := by
+      simpa [mul_comm] using he_mul
+    have he_mul_succ : ((d : Error) + 1) * e = 1 := by
+      simpa using he_mul
+    have he_mul_succ' : e * ((d : Error) + 1) = 1 := by
+      simpa [mul_comm] using he_mul_succ
+    have hgeom :
+        (∑ i ∈ Finset.range d, lambda ^ i) * (1 - lambda) = 1 - lambda ^ d := by
+      simpa [mul_comm] using geom_sum_mul_neg lambda d
+    have hsum_le : ∑ i ∈ Finset.range d, lambda ^ i ≤ d := by
+      calc
+        ∑ i ∈ Finset.range d, lambda ^ i ≤ ∑ _i ∈ Finset.range d, (1 : Error) := by
+          refine Finset.sum_le_sum ?_
+          intro i hi
+          exact pow_le_one₀ h0 h1
+        _ = d := by simp
+    have hlin : 1 - lambda ^ d ≤ (d : Error) * (1 - lambda) := by
+      rw [← hgeom]
+      exact mul_le_mul_of_nonneg_right hsum_le (sub_nonneg.mpr h1)
+    have hone_sub_nonneg : 0 ≤ 1 - lambda ^ d := by
+      exact sub_nonneg.mpr (pow_le_one₀ h0 h1)
+    have hone_sub_le_one : 1 - lambda ^ d ≤ 1 := by
+      exact sub_le_self _ (pow_nonneg h0 _)
+    have hpow_small : (1 - lambda ^ d) ^ (d + 1) ≤ 1 - lambda ^ d := by
+      calc
+        (1 - lambda ^ d) ^ (d + 1) = (1 - lambda ^ d) ^ d * (1 - lambda ^ d) := by
+          rw [pow_succ]
+        _ ≤ 1 * (1 - lambda ^ d) := by
+          exact mul_le_mul_of_nonneg_right (pow_le_one₀ hone_sub_nonneg hone_sub_le_one)
+            hone_sub_nonneg
+        _ = 1 - lambda ^ d := by ring
+    have hd_nat : d ≤ 2 ^ (d + 1) := by
+      refine le_trans (Nat.le_of_lt d.lt_two_pow_self) ?_
+      rw [pow_succ]
+      exact Nat.le_mul_of_pos_right _ (by decide)
+    have hd_cast : (d : Error) ≤ (2 : Error) ^ (d + 1) := by
+      exact_mod_cast hd_nat
+    have hone_rpow_pow : (Real.rpow (1 - lambda) e) ^ (d + 1) = 1 - lambda := by
+      rw [← Real.rpow_natCast]
+      change ((1 - lambda) ^ e) ^ (((d + 1 : ℕ) : Error)) = 1 - lambda
+      rw [← Real.rpow_mul (sub_nonneg.mpr h1)]
+      change (1 - lambda) ^ (e * (((d + 1 : ℕ) : Error))) = 1 - lambda
+      rw [he_mul', Real.rpow_one]
+    have hmain_pow : (1 - lambda ^ d) ^ (d + 1) ≤ (2 * Real.rpow (1 - lambda) e) ^ (d + 1) := by
+      calc
+        (1 - lambda ^ d) ^ (d + 1) ≤ 1 - lambda ^ d := hpow_small
+        _ ≤ (d : Error) * (1 - lambda) := hlin
+        _ ≤ (2 : Error) ^ (d + 1) * (1 - lambda) := by
+          exact mul_le_mul_of_nonneg_right hd_cast (sub_nonneg.mpr h1)
+        _ = (2 * Real.rpow (1 - lambda) e) ^ (d + 1) := by
+          rw [mul_pow, hone_rpow_pow]
+    have hroot :
+        1 - lambda ^ d ≤ 2 * Real.rpow (1 - lambda) e := by
+      exact le_of_pow_le_pow_left₀ (Nat.succ_ne_zero d)
+        (mul_nonneg zero_le_two (Real.rpow_nonneg (sub_nonneg.mpr h1) _)) hmain_pow
+    have hlambda_rpow : Real.rpow (lambda ^ (d + 1)) e = lambda := by
+      rw [← Real.rpow_natCast]
+      change (lambda ^ (((d + 1 : ℕ) : Error))) ^ e = lambda
+      rw [← Real.rpow_mul h0]
+      change lambda ^ ((((d + 1 : ℕ) : Error)) * e) = lambda
+      rw [he_mul, Real.rpow_one]
+    have hmul_rpow :
+        Real.rpow (lambda ^ (d + 1) * (1 - lambda)) e =
+          Real.rpow (lambda ^ (d + 1)) e * Real.rpow (1 - lambda) e := by
+      exact Real.mul_rpow (pow_nonneg h0 _) (sub_nonneg.mpr h1)
+    calc
+      lambda * (1 - lambda ^ d) ≤ lambda * (2 * Real.rpow (1 - lambda) e) := by
+        exact mul_le_mul_of_nonneg_left hroot h0
+      _ = 2 * Real.rpow (lambda ^ (d + 1) * (1 - lambda)) e := by
+        calc
+          lambda * (2 * Real.rpow (1 - lambda) e) = 2 * (lambda * Real.rpow (1 - lambda) e) := by
+            ring
+          _ = 2 * (Real.rpow (lambda ^ (d + 1)) e * Real.rpow (1 - lambda) e) := by
+            nth_rw 1 [← hlambda_rpow]
+          _ = 2 * Real.rpow (lambda ^ (d + 1) * (1 - lambda)) e := by
+            rw [← hmul_rpow]
 
 /-- `lem:g-complete-self-consistency`. -/
 lemma gCompleteSelfConsistency

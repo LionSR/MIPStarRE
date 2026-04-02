@@ -447,6 +447,69 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
     le_trans (sscError_nonneg ψ 𝒟 A) hδ
   linarith
 
+private lemma constFamily_sdd_unit
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
+    sddError ψ (uniformDistribution Unit)
+      (constSubMeasFamily A) (constSubMeasFamily B) =
+      qSDD ψ A B := by
+  simp [sddError, avgOver, uniformDistribution, constSubMeasFamily]
+
+private lemma constFamily_ssc_unit
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A : SubMeas Outcome ι) :
+    sscError ψ (uniformDistribution Unit) (constSubMeasFamily A) =
+      qSSCDefect ψ A := by
+  simp [sscError, avgOver, uniformDistribution, constSubMeasFamily]
+
+private lemma completion_self_distance
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (B : SubMeas Outcome ι) (a0 : Outcome) :
+    qSDD ψ B (completeAtOutcome B a0).toSubMeas =
+      ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
+        ((1 : MIPStarRE.Quantum.Op ι) - B.total)) := by
+  classical
+  let R : MIPStarRE.Quantum.Op ι := 1 - B.total
+  have hsum :
+      ∑ a : Outcome,
+          ev ψ
+            ((B.outcome a -
+                (completeAtOutcome B a0).toSubMeas.outcome a)ᴴ *
+              (B.outcome a -
+                (completeAtOutcome B a0).toSubMeas.outcome a)) =
+        ev ψ (R * R) := by
+    have hBtotal_herm : B.totalᴴ = B.total := by
+      exact (Matrix.nonneg_iff_posSemidef.mp B.total_nonneg).isHermitian.eq
+    have hsingle :
+        ∑ a : Outcome,
+          (if a = a0 then ev ψ (R * R) else 0) =
+          ev ψ (R * R) := by
+      simpa using
+        (Finset.sum_ite_eq (s := Finset.univ) (a := a0) (b := ev ψ (R * R)))
+    calc
+      ∑ a : Outcome,
+          ev ψ
+            ((B.outcome a -
+                (completeAtOutcome B a0).toSubMeas.outcome a)ᴴ *
+              (B.outcome a -
+                (completeAtOutcome B a0).toSubMeas.outcome a))
+        = ∑ a : Outcome, if a = a0 then ev ψ (R * R) else 0 := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            by_cases ha : a = a0
+            · subst ha
+              have hRflip :
+                  (B.total - 1) * (B.total - 1) =
+                    (1 - B.total) * (1 - B.total) := by
+                noncomm_ring
+              simp [completeAtOutcome, R, hBtotal_herm, hRflip]
+            · simp [completeAtOutcome, ha, ev_zero]
+      _ = ev ψ (R * R) := hsingle
+  simpa [qSDD, qSDDCore, R] using hsum
+
 private lemma closenessAfterCompletion_core {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -462,6 +525,38 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily (completeAtOutcome B a0).toSubMeas)
       (2 * δ + 4 * Real.sqrt δ + 2 * ζ) := by
+  intro hsc hdist
+  rcases hsc with ⟨_, ⟨hζ⟩⟩
+  rcases hdist with ⟨hδ⟩
+  /-
+  Intended proof, following `prop:completing-to-measurement` in the paper:
+
+  1. Reduce the `Unit`-indexed hypotheses using `constFamily_sdd_unit` and
+     `constFamily_ssc_unit`.
+  2. Use the direct completion expansion
+       `qSDD(A, complete(B)) ≤ 2 * qSDD(A, B) + 2 * ev ((1 - B.total)^2)`.
+  3. Bound `ev ((1 - B.total)^2)` by
+       `2 * Real.sqrt δ + ζ`
+     from self-consistency of `A`.
+
+  The remaining Lean blocker is that the paper proof implicitly uses a
+  normalized state (`ev ψ 1 = 1`), while the local `QuantumState` structure
+  currently only records positivity. The algebraic comparison step therefore
+  needs to be reworked in a way that avoids normalization, or the statement
+  needs an explicit normalization hypothesis.
+  -/
+  have hζ' :
+      qSSCDefect ψ A.toSubMeas ≤ ζ := by
+    simpa [constFamily_ssc_unit] using hζ
+  have hδ' :
+      qSDD ψ A.toSubMeas B ≤ δ := by
+    simpa [constFamily_sdd_unit] using hδ
+  have hBC :
+      qSDD ψ B (completeAtOutcome B a0).toSubMeas =
+        ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
+          ((1 : MIPStarRE.Quantum.Op ι) - B.total)) :=
+    completion_self_distance ψ B a0
+  clear hζ' hδ' hBC
   sorry
 
 /-- `prop:completing-to-measurement`. -/
