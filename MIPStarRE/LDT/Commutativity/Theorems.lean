@@ -64,19 +64,19 @@ structure CommDataProcessedGConclusion (params : Parameters)
       (evaluatedPointFamilyRight params family)
       zeta
   stabilityOne :
-    SDDRel strategy.state
+    SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityOneLeft params strategy family)
-      (commDataProcessedGStabilityOneRight params strategy family)
+      (IdxSubMeas.toIdxOpFamily (commDataProcessedGStabilityOneRight params strategy family))
       (commDataProcessedGStabilityOneError zeta)
   stabilityTwo :
-    SDDRel strategy.state
+    SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityTwoLeft params strategy family)
       (commDataProcessedGStabilityTwoRight params strategy family)
       (commDataProcessedGStabilityTwoError params gamma zeta)
   evaluatedSliceCommutation :
-    SDDRel strategy.state
+    SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (evaluatedSliceProductLeft params strategy family)
       (evaluatedSliceProductRight params strategy family)
@@ -90,13 +90,13 @@ structure ComMainConclusion (params : Parameters)
   evaluatedCommutation :
     CommDataProcessedGConclusion params strategy family gamma zeta
   evaluationSpecialization :
-    SDDRel strategy.state
+    SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (evaluatedFromFullSliceProductLeft params strategy family)
       (evaluatedFromFullSliceProductRight params strategy family)
       (commDataProcessedGError params gamma zeta)
   fullSliceCommutation :
-    SDDRel strategy.state
+    SDDOpRel strategy.state
       (uniformDistribution (FullSliceQuestion params))
       (fullSliceProductLeft params strategy family)
       (fullSliceProductRight params strategy family)

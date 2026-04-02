@@ -55,6 +55,30 @@ theorem ldDnoteq
     totalVariationDistance (uniformDistribution (PointTuple params k))
         (distinctTupleDistribution params k)
       ≤ ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+  classical
+  /-
+  Birthday-paradox proof strategy:
+
+  1. Let `support := (distinctTupleDistribution params k).support`, i.e. the injective
+     `k`-tuples.
+  2. Split into cases on `support.Nonempty`.
+     - If `support = ∅`, then `k > q` (otherwise `Fin.castLE` gives an injective tuple),
+       and `distinctTupleDistribution` is the zero sub-distribution, so
+       `TV(uniform, distinct) = 1/2 ≤ k^2 / q`.
+     - If `support.Nonempty`, then `k ≤ q`, and a direct computation from the definition of
+       `totalVariationDistance` gives
+         `TV = 1 - support.card / q^k`.
+  3. Count injective tuples:
+       `support.card = q.descFactorial k`.
+     This is equivalent to the number of embeddings `Fin k ↪ Fin q`.
+  4. Rewrite
+       `q.descFactorial k / q^k = ∏ i < k, (1 - i / q)`.
+  5. Use the elementary product bound
+       `1 - ∏ i < k a_i ≤ ∑ i < k (1 - a_i)` for `0 ≤ a_i ≤ 1`,
+     with `a_i = 1 - i / q`.
+  6. Conclude
+       `TV ≤ ∑ i < k i / q = k (k - 1) / (2 q) ≤ k^2 / q`.
+  -/
   sorry
 
 /-- `lem:looks-easy-but-took-me-a-while`. -/
@@ -112,7 +136,7 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
       (switcherooSelfConsistencyLeft params M)
       (switcherooSelfConsistencyRight params M)
       omega)
-    (hcomm : SDDRel ψbi
+    (hcomm : SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (switcherooPointProductLeft params family M)
       (switcherooPointProductRight params family M)
@@ -237,7 +261,7 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (hθ0 : 0 < theta) (hθ1 : theta < 1)
     (hk : (2 * (degree : Error)) / theta ≤ (k : Error))
     (hXpsd : 0 ≤ X)
-    (hXleOne : 0 ≤ (1 - X))
+    (hXleOne : X ≤ 1)
     (hcomplete : CompletenessAtLeast ψ
       ({ outcome := fun _ => X
          total := X
@@ -247,9 +271,9 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
          sum_eq_total := by
            simp
          total_le_one := by
-           exact sub_nonneg.mp hXleOne } : SubMeas Unit ι)
+           exact hXleOne } : SubMeas Unit ι)
       (1 - kappa)) :
-    ChernoffBernoulliMatrixStatement ψ theta k degree X kappa := by
+    ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd hXleOne := by
   sorry
 
 /-- `cor:ld-pasting-N-completeness`. -/

@@ -49,11 +49,25 @@ structure MatrixOperatorFamilyRealization (params : Parameters) where
 def hypercubeEdgePairFinset (params : Parameters) : Finset (Point params × Point params) :=
   Finset.univ.filter (fun uv => IsHypercubeEdge params uv.1 uv.2)
 
-/-- Bridge to the nonuniform hypercube edge distribution from the source. -/
--- TODO: placeholder — should be the actual nonuniform distribution
+/-- Placeholder edge distribution for the matrix model.
+This is currently the uniform distribution on `hypercubeEdgePairFinset params`;
+the paper's Section 7 distribution is nonuniform and weights self-loops
+differently, so this definition is only a temporary stand-in. -/
 noncomputable def matrixHypercubeEdgeDistribution (params : Parameters) :
     Distribution (Point params × Point params) :=
-  sorry
+  { support := hypercubeEdgePairFinset params
+    weight := fun uv =>
+      if uv ∈ hypercubeEdgePairFinset params then
+        1 / ((hypercubeEdgePairFinset params).card : Error)
+      else 0
+    nonnegative := by
+      intro uv
+      by_cases huv : uv ∈ hypercubeEdgePairFinset params
+      · simp [huv]
+      · simp [huv]
+    outsideSupport := by
+      intro uv huv
+      simp [huv] }
 
 /-- The rank-one projector `|u⟩⟨u|` on the vertex register. -/
 def pointBasisProjectorMatrix (params : Parameters) (u : Point params) :

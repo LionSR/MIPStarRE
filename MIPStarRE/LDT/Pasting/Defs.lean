@@ -89,36 +89,16 @@ noncomputable def bernoulliTailOperator (k degree : ℕ)
 /-- Multiply each outcome operator by a total operator on the right. -/
 noncomputable def multiplyByTotalOnRight {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
-    SubMeas α ι where
+    OpFamily α ι where
   outcome := fun a => A.outcome a * B.total
   total := A.total * B.total
-  outcome_pos := by
-    intro a
-    sorry
-  sum_eq_total := by
-    calc
-      ∑ a, A.outcome a * B.total = (∑ a, A.outcome a) * B.total := by
-        simpa using (Finset.sum_mul Finset.univ (fun a => A.outcome a) B.total).symm
-      _ = A.total * B.total := by rw [A.sum_eq_total]
-  total_le_one := by
-    sorry
 
 /-- Multiply each outcome operator by a total operator on the left. -/
 noncomputable def multiplyByTotalOnLeft {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
-    SubMeas β ι where
+    OpFamily β ι where
   outcome := fun b => A.total * B.outcome b
   total := A.total * B.total
-  outcome_pos := by
-    intro b
-    sorry
-  sum_eq_total := by
-    calc
-      ∑ b, A.total * B.outcome b = A.total * ∑ b, B.outcome b := by
-        simpa using (Finset.mul_sum Finset.univ (fun b => B.outcome b) A.total).symm
-      _ = A.total * B.total := by rw [B.sum_eq_total]
-  total_le_one := by
-    sorry
 
 /-- Average an indexed family against a named distribution. -/
 noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
@@ -243,7 +223,56 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
             -- PrimePowerFieldSpec. For now, use Lagrange basis coefficient = 1
             -- as a structural placeholder; the degree bound is sorry'd regardless.
             slicePoly
-          lowIndividualDegree := sorry }
+          lowIndividualDegree := by
+            intro i
+            classical
+            have hinj : Function.Injective (embedCoord params) := by
+              intro a b h
+              simp only [embedCoord, Fin.mk.injEq] at h
+              exact Fin.ext h
+            by_cases h : i.1 < params.m
+            · have hi : embedCoord params ⟨i.1, h⟩ = i := by
+                ext
+                simp [embedCoord]
+              calc
+                MvPolynomial.degreeOf i
+                    (∑ j ∈ τ,
+                      MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) ≤
+                  τ.sup fun j =>
+                    MvPolynomial.degreeOf i
+                      (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) :=
+                  MvPolynomial.degreeOf_sum_le i τ _
+                _ ≤ params.d := by
+                  apply Finset.sup_le
+                  intro j hj
+                  cases hgj : gs j with
+                  | none =>
+                      simp [τ, genuineSliceIndices, hgj] at hj
+                  | some g =>
+                      simp only [extractSliceOr0]
+                      rw [← hi, MvPolynomial.degreeOf_rename_of_injective hinj]
+                      exact g.lowIndividualDegree _
+            · calc
+                MvPolynomial.degreeOf i
+                    (∑ j ∈ τ,
+                      MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) ≤
+                  τ.sup fun j =>
+                    MvPolynomial.degreeOf i
+                      (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) :=
+                  MvPolynomial.degreeOf_sum_le i τ _
+                _ ≤ 0 := by
+                  apply Finset.sup_le
+                  intro j _hj
+                  suffices
+                      MvPolynomial.degreeOf i
+                        (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) = 0 by
+                    omega
+                  rw [MvPolynomial.degreeOf, MvPolynomial.degrees_rename_of_injective hinj]
+                  simp only [Multiset.count_eq_zero, Multiset.mem_map]
+                  rintro ⟨b, _, hb⟩
+                  simp only [embedCoord, Fin.ext_iff] at hb
+                  omega
+                _ ≤ params.d := Nat.zero_le _ }
       else
         fallbackInterpolatedPolynomial params
 

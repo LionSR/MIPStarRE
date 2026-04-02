@@ -176,7 +176,7 @@ structure CommutativitySwitcherooStatement {Outcome : Type*} [Fintype Outcome]
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta omega chi : Error) : Prop where
   aggregateCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (switcherooAggregateLeft params family M)
       (switcherooAggregateRight params family M)
@@ -188,13 +188,13 @@ structure CommutingWithGCompleteStatement (params : Parameters)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
   pointWithCompletePartCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (completePartPointProductLeft params family)
       (completePartPointProductRight params family)
       (commutingWithGCompleteError params gamma zeta)
   completePartCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (completePartTotalProductLeft params family)
       (completePartTotalProductRight params family)
@@ -208,13 +208,13 @@ structure CommutingWithGIncompleteStatement (params : Parameters)
   completePartWitness :
     CommutingWithGCompleteStatement params ψbi family gamma zeta
   pointWithIncompletePartCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (incompletePartPointProductLeft params family)
       (incompletePartPointProductRight params family)
       (commutingWithGIncompleteError params gamma zeta)
   incompletePartCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (incompletePartTotalProductLeft params family)
       (incompletePartTotalProductRight params family)
@@ -240,7 +240,7 @@ structure GHatFactsStatement (params : Parameters)
       (gHatSelfConsistencyRightFamily params family)
       (gHatSelfConsistencyError zeta)
   completedCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (gHatPairProductLeft params family)
       (gHatPairProductRight params family)
@@ -252,7 +252,7 @@ structure CommuteGHalfSandwichStatement (params : Parameters)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
   repeatedCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (PointTuple params k))
       (gHatHalfSandwichLeft params family k)
       (gHatHalfSandwichRight params family k)
@@ -308,10 +308,10 @@ structure FromHToGStatement (params : Parameters)
     (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceStep :
     ∀ ℓ : ℕ, ℓ < k →
-      SDDRel strategy.state (uniformDistribution Unit)
-        (IdxSubMeas.liftLeft
+      SDDOpRel strategy.state (uniformDistribution Unit)
+        (IdxOpFamily.liftLeft
           (fromHToGRecurrenceLeftFamily params strategy family k ℓ))
-        (IdxSubMeas.liftLeft
+        (IdxOpFamily.liftLeft
           (fromHToGRecurrenceRightFamily params strategy family k ℓ))
         (fromHToGRecurrenceError params gamma zeta k)
   bernoulliPolynomialRewrite :
@@ -325,18 +325,23 @@ structure FromHToGStatement (params : Parameters)
 /-- Output package for `lem:chernoff-bernoulli-matrix`. -/
 structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
-    (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error) : Prop where
+    (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error)
+    (hXpsd : 0 ≤ X)
+    (hXleOne : X ≤ 1) : Prop where
+  /-- Temporary field while the Bernoulli-tail contraction bound is still
+  deferred rather than derived inside the matrix Chernoff proof. -/
+  tail_le_one : bernoulliTailOperator k degree X ≤ 1
   matrixTailBound :
     CompletenessAtLeast ψ
       ({ outcome := fun _ => bernoulliTailOperator k degree X
          total := bernoulliTailOperator k degree X
          outcome_pos := by
            intro _
-           sorry
+           exact bernoulliTailOperator_nonneg k degree X hXpsd hXleOne
          sum_eq_total := by
            simp
          total_le_one := by
-           sorry } : SubMeas Unit ι)
+           exact tail_le_one } : SubMeas Unit ι)
       (1 - kappa / (1 - theta) - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2))
 
 /-- Output package for `cor:ld-pasting-N-completeness`. -/

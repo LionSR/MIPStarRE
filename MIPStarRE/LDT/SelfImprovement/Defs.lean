@@ -89,8 +89,59 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
     sum_eq_total := by
       rfl
     total_le_one := by
-      -- requires regrouping by h(u) and using projective measurement structure
-      sorry }
+      let Au := (strategy.pointMeasurement u)
+      -- Regroup by evaluation value a = h(u)
+      calc
+        ∑ h : Polynomial params, sandwichedPolynomialOutcomeOperatorAt params strategy T u h
+          = ∑ a : Fq params,
+              ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                Au.toSubMeas.outcome a * T.outcome h * Au.toSubMeas.outcome a := by
+              rw [show ∑ h : Polynomial params,
+                    sandwichedPolynomialOutcomeOperatorAt params strategy T u h =
+                  ∑ a : Fq params,
+                    ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                      sandwichedPolynomialOutcomeOperatorAt params strategy T u h from by
+                simpa using (Finset.sum_fiberwise Finset.univ
+                  (fun h : Polynomial params => h u)
+                  (sandwichedPolynomialOutcomeOperatorAt params strategy T u)).symm]
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              refine Finset.sum_congr rfl ?_
+              intro h hh
+              simp only [sandwichedPolynomialOutcomeOperatorAt,
+                pointConditionedOutcomeOperatorAtPolynomial]
+              simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hh
+              simp [Au, hh]
+        _ = ∑ a : Fq params,
+              Au.toSubMeas.outcome a *
+                (∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                  T.outcome h) *
+                Au.toSubMeas.outcome a := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              rw [← Matrix.sum_mul, ← Matrix.mul_sum]
+        _ ≤ ∑ a : Fq params, Au.toSubMeas.outcome a := by
+              refine Finset.sum_le_sum ?_
+              intro a _
+              -- The filtered sum ∑_{h: h(u)=a} T_h ≤ ∑_h T_h = I, hence ≤ 1
+              have hfilt_le_one : ∑ h ∈ Finset.univ.filter
+                  (fun h : Polynomial params => h u = a), T.outcome h ≤ 1 := by
+                calc ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                        T.outcome h
+                    ≤ ∑ h : Polynomial params, T.outcome h :=
+                      Finset.sum_le_sum_of_subset_of_nonneg
+                        (Finset.filter_subset _ _) (fun h _ _ => T.outcome_pos h)
+                  _ = T.total := T.sum_eq_total
+                  _ = 1 := T.total_eq_one
+              simpa [Au.proj a] using
+                sandwich_mono
+                  (M := Au.toSubMeas.outcome a)
+                  (hMH := Au.outcome_hermitian a)
+                  (hPQ := hfilt_le_one)
+        _ = Au.toSubMeas.total := by
+              rw [Au.toSubMeas.sum_eq_total]
+        _ = 1 := by
+              simpa using Au.total_eq_one }
 
 /-- The averaged sandwiched submeasurement `H_h = E_u H^u_h`. -/
 noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
@@ -113,8 +164,36 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
     sum_eq_total := by
       rfl
     total_le_one := by
-      -- requires averaging argument over pointwise total_le_one bounds
-      sorry }
+      let 𝒟 := uniformDistribution (Point params)
+      calc
+        ∑ h : Polynomial params,
+            averageOperatorOverDistribution 𝒟
+              (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
+          = ∑ u ∈ 𝒟.support, 𝒟.weight u •
+              ∑ h : Polynomial params,
+                sandwichedPolynomialOutcomeOperatorAt
+                  params strategy T u h := by
+                simp only [averageOperatorOverDistribution]
+                rw [Finset.sum_comm]
+                refine Finset.sum_congr rfl ?_
+                intro u _
+                rw [← Finset.smul_sum]
+        _ = ∑ u ∈ 𝒟.support, 𝒟.weight u •
+              (sandwichedPolynomialSubMeasAt params strategy T u).total := by
+                refine Finset.sum_congr rfl ?_
+                intro u _
+                simp [sandwichedPolynomialSubMeasAt]
+        _ ≤ ∑ u ∈ 𝒟.support, 𝒟.weight u • (1 : MIPStarRE.Quantum.Op ι) := by
+              exact Finset.sum_le_sum fun u _ =>
+                smul_le_smul_of_nonneg_left
+                  (sandwichedPolynomialSubMeasAt params strategy T u).total_le_one
+                  (𝒟.nonnegative u)
+        _ = (∑ u ∈ 𝒟.support, 𝒟.weight u) • (1 : MIPStarRE.Quantum.Op ι) := by
+              rw [Finset.sum_smul]
+        _ ≤ (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
+              exact smul_le_smul_of_nonneg_right
+                (uniformDistribution_weight_sum_le_one (Point params)) zero_le_one
+        _ = 1 := by simp }
 
 /-- The variance error entering `lem:add-in-u`. -/
 noncomputable def selfImprovementVarianceError (params : Parameters)
