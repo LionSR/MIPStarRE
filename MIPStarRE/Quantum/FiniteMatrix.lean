@@ -23,9 +23,36 @@ namespace MIPStarRE.Quantum
 /-- Square complex matrices as the finite-dimensional operator algebra. -/
 abbrev Op (d : Type*) := Matrix d d ℂ
 
-/-! ### Normalized trace -/
+/-! ### Basic order lemmas -/
 
 variable {d : Type*} [Fintype d]
+
+/-- Sandwiching a PSD operator by a Hermitian operator preserves PSD. -/
+theorem sandwich_nonneg {M P : Op d} (hP : 0 ≤ P) (hMH : Mᴴ = M) :
+    0 ≤ M * P * M := by
+  simpa [hMH] using
+    (Matrix.PosSemidef.mul_mul_conjTranspose_same
+      (Matrix.nonneg_iff_posSemidef.mp hP) M).nonneg
+
+/-- Sandwiching is monotone in the middle factor for a fixed Hermitian outer operator. -/
+theorem sandwich_mono {M P Q : Op d} (hMH : Mᴴ = M) (hPQ : P ≤ Q) :
+    M * P * M ≤ M * Q * M := by
+  apply sub_nonneg.mp
+  have hsand : 0 ≤ M * (Q - P) * M :=
+    sandwich_nonneg (M := M) (P := Q - P) (sub_nonneg.mpr hPQ) hMH
+  simpa [mul_sub, sub_mul] using hsand
+
+/-- An operator between `0` and `1` dominates its square. -/
+theorem sq_le_self [DecidableEq d] {X : Op d} (hX : 0 ≤ X) (hXle : X ≤ 1) :
+    X * X ≤ X := by
+  have hcomm : Commute X (1 - X) :=
+    (Commute.one_right X).sub_right (Commute.refl X)
+  have hnonneg : 0 ≤ X * (1 - X) :=
+    Commute.mul_nonneg hX (sub_nonneg.mpr hXle) hcomm
+  exact sub_nonneg.mp <| by
+    simpa [mul_sub] using hnonneg
+
+/-! ### Normalized trace -/
 
 /-- The normalized trace `τ(A) = tr(A) / |d|`. -/
 noncomputable def normalizedTrace (A : Op d) : ℂ :=

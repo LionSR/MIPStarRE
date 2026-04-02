@@ -244,6 +244,8 @@ noncomputable def weightedGeneralizeBRightOperatorAtPolynomial (params : Paramet
     (generalizeBRightOperatorAtPolynomial params strategy g qu)
     (polynomialWeightSqrtOperator params G g)
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem pointConditionedOutcomeOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params) (u : Point params) :
@@ -251,6 +253,8 @@ private theorem pointConditionedOutcomeOperatorAtPolynomial_pos (params : Parame
   simpa [pointConditionedOutcomeOperatorAtPolynomial] using
     (strategy.pointMeasurement u).outcome_pos (g u)
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem pointConditionedOutcomeOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params) (u : Point params) :
@@ -258,6 +262,8 @@ private theorem pointConditionedOutcomeOperatorAtPolynomial_le_one (params : Par
   simpa [pointConditionedOutcomeOperatorAtPolynomial] using
     Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u)
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem generalizeBLeftOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -274,6 +280,8 @@ private theorem generalizeBLeftOperatorAtPolynomial_pos (params : Parameters)
         else
           none)).outcome_pos (some ())
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem generalizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -292,6 +300,8 @@ private theorem generalizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
             none))
       (some ())
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem generalizeBRightOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -308,6 +318,8 @@ private theorem generalizeBRightOperatorAtPolynomial_pos (params : Parameters)
         else
           none)).outcome_pos (some ())
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem generalizeBRightOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -326,6 +338,8 @@ private theorem generalizeBRightOperatorAtPolynomial_le_one (params : Parameters
             none))
       (some ())
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem weightedPointConditionedOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
@@ -335,6 +349,8 @@ private theorem weightedPointConditionedOperatorAtPolynomial_pos (params : Param
     (leftTensor_nonneg (ι₂ := ι)
       (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u))
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
@@ -344,6 +360,8 @@ private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Pa
     (leftTensor_le_one (ι₂ := ι)
       (pointConditionedOutcomeOperatorAtPolynomial_le_one params strategy g u))
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem weightedGeneralizeBLeftOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
@@ -354,6 +372,8 @@ private theorem weightedGeneralizeBLeftOperatorAtPolynomial_pos (params : Parame
     (leftTensor_nonneg (ι₂ := ι)
       (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu))
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem weightedGeneralizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
@@ -364,6 +384,8 @@ private theorem weightedGeneralizeBLeftOperatorAtPolynomial_le_one (params : Par
     (leftTensor_le_one (ι₂ := ι)
       (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu))
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem weightedGeneralizeBRightOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
@@ -374,6 +396,8 @@ private theorem weightedGeneralizeBRightOperatorAtPolynomial_pos (params : Param
     (leftTensor_nonneg (ι₂ := ι)
       (generalizeBRightOperatorAtPolynomial_pos params strategy g qu))
 
+-- PROVISIONAL:
+-- proof depends on polynomialWeightSqrtOperator = 1
 private theorem weightedGeneralizeBRightOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)

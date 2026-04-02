@@ -11,6 +11,7 @@ while functions that stay on a single register produce `SubMeas` at `d`.
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT
+open MIPStarRE.Quantum
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -365,6 +366,34 @@ private theorem normalizationConditionSandwichedTotalSum_le_one
           rw [Q.sum_eq_total]
     _ ≤ 1 := Q.total_le_one
 
+private theorem normalizationConditionSandwichedTotalOperator_nonneg
+    {OutcomeA OutcomeB : Type*} [Fintype OutcomeA] [Fintype OutcomeB]
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) (a : OutcomeA) :
+    0 ≤ normalizationConditionSandwichedTotalOperator P Q a := by
+  simpa [normalizationConditionSandwichedTotalOperator] using
+    SubMeas.total_nonneg (normalizationConditionSandwichedTotalFamily P Q a)
+
+private theorem normalizationConditionSandwichedTotalOperator_hermitian
+    {OutcomeA OutcomeB : Type*} [Fintype OutcomeA] [Fintype OutcomeB]
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) (a : OutcomeA) :
+    (normalizationConditionSandwichedTotalOperator P Q a)ᴴ =
+      normalizationConditionSandwichedTotalOperator P Q a :=
+  (Matrix.nonneg_iff_posSemidef.mp
+    (normalizationConditionSandwichedTotalOperator_nonneg P Q a)).isHermitian.eq
+
+private theorem normCondSandwichedTotal_sq_le
+    {OutcomeA OutcomeB : Type*} [Fintype OutcomeA] [Fintype OutcomeB]
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) (a : OutcomeA) :
+    normalizationConditionSandwichedTotalOperator P Q a *
+        normalizationConditionSandwichedTotalOperator P Q a ≤
+      normalizationConditionSandwichedTotalOperator P Q a := by
+  have hRle : normalizationConditionSandwichedTotalOperator P Q a ≤ 1 := by
+    simpa [normalizationConditionSandwichedTotalOperator] using
+      (normalizationConditionSandwichedTotalFamily P Q a).total_le_one
+  exact sq_le_self
+    (normalizationConditionSandwichedTotalOperator_nonneg P Q a)
+    hRle
+
 /-- The family `a ↦ (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 noncomputable def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
@@ -387,18 +416,8 @@ noncomputable def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
   total_le_one := by
     refine normalizationConditionSandwichedTotalSum_le_one P Q ?_
     intro a
-    have hRnonneg : 0 ≤ normalizationConditionSandwichedTotalOperator P Q a := by
-      simpa [normalizationConditionSandwichedTotalOperator] using
-        SubMeas.total_nonneg (normalizationConditionSandwichedTotalFamily P Q a)
-    have hRle : normalizationConditionSandwichedTotalOperator P Q a ≤ 1 := by
-      simpa [normalizationConditionSandwichedTotalOperator] using
-        (normalizationConditionSandwichedTotalFamily P Q a).total_le_one
-    have hRherm :
-        (normalizationConditionSandwichedTotalOperator P Q a)ᴴ =
-          normalizationConditionSandwichedTotalOperator P Q a :=
-      (Matrix.nonneg_iff_posSemidef.mp hRnonneg).isHermitian.eq
-    simpa [hRherm] using
-      (sq_le_self hRnonneg hRle)
+    simpa [normalizationConditionSandwichedTotalOperator_hermitian P Q a] using
+      normCondSandwichedTotal_sq_le P Q a
 
 /-- The family `a ↦ (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
 noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
@@ -422,18 +441,8 @@ noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB :
   total_le_one := by
     refine normalizationConditionSandwichedTotalSum_le_one P Q ?_
     intro a
-    have hRnonneg : 0 ≤ normalizationConditionSandwichedTotalOperator P Q a := by
-      simpa [normalizationConditionSandwichedTotalOperator] using
-        SubMeas.total_nonneg (normalizationConditionSandwichedTotalFamily P Q a)
-    have hRle : normalizationConditionSandwichedTotalOperator P Q a ≤ 1 := by
-      simpa [normalizationConditionSandwichedTotalOperator] using
-        (normalizationConditionSandwichedTotalFamily P Q a).total_le_one
-    have hRherm :
-        (normalizationConditionSandwichedTotalOperator P Q a)ᴴ =
-          normalizationConditionSandwichedTotalOperator P Q a :=
-      (Matrix.nonneg_iff_posSemidef.mp hRnonneg).isHermitian.eq
-    simpa [hRherm] using
-      (sq_le_self hRnonneg hRle)
+    simpa [normalizationConditionSandwichedTotalOperator_hermitian P Q a] using
+      normCondSandwichedTotal_sq_le P Q a
 
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 noncomputable def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type*}

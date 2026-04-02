@@ -13,6 +13,7 @@ constructions and error terms.
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT
+open MIPStarRE.Quantum
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
