@@ -62,11 +62,6 @@ private theorem rightTensor_finset_sum_cp {α : Type*}
       rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
       simp [rightTensor, Matrix.kronecker_add]
 
-private theorem subMeas_total_nonneg {α : Type*} [Fintype α]
-    (A : SubMeas α ι) : 0 ≤ A.total := by
-  rw [← A.sum_eq_total]
-  exact Finset.sum_nonneg fun a _ => A.outcome_pos a
-
 private theorem leftTensor_le_one_cp
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     {A : MIPStarRE.Quantum.Op ι₁} (hA : A ≤ 1) :
@@ -226,7 +221,7 @@ noncomputable def tensorProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
       _ ≤ leftTensor (ι₂ := ι) A.total :=
             opTensor_le_leftTensor
               (ι₂ := ι)
-              (subMeas_total_nonneg A)
+              (SubMeas.total_nonneg A)
               B.total_le_one
       _ ≤ 1 := leftTensor_le_one_cp (ι₂ := ι) A.total_le_one
 

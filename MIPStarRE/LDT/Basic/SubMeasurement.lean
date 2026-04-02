@@ -94,11 +94,18 @@ noncomputable instance {α : Type*} {ι : Type*}
 /-! ### Derived properties -/
 
 /-- PSD outcomes are Hermitian. -/
+theorem SubMeas.outcome_hermitian {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) (a : α) :
+    (A.outcome a)ᴴ = A.outcome a :=
+  (Matrix.nonneg_iff_posSemidef.mp (A.outcome_pos a)).isHermitian.eq
+
+/-- PSD outcomes are Hermitian. -/
 theorem Measurement.outcome_hermitian {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
     (M : Measurement α ι) (a : α) :
     (M.outcome a)ᴴ = M.outcome a :=
-  (Matrix.nonneg_iff_posSemidef.mp (M.outcome_pos a)).isHermitian.eq
+  SubMeas.outcome_hermitian M.toSubMeas a
 
 /-- Each POVM element is bounded by the identity: `outcome a ≤ 1`.
 Proof: `outcome a = 1 - ∑_{b ≠ a} outcome b ≤ 1` since all terms are PSD. -/
@@ -136,12 +143,47 @@ theorem SubMeas.outcome_le_one {α : Type*} {ι : Type*}
     A.outcome a ≤ 1 :=
   le_trans (A.outcome_le_total a) A.total_le_one
 
+/-- Sandwiching a PSD operator by a Hermitian operator preserves PSD. -/
+theorem SubMeas.sandwich_nonneg {ι : Type*} [Fintype ι]
+    {M P : MIPStarRE.Quantum.Op ι} (hP : 0 ≤ P) (hMH : Mᴴ = M) :
+    0 ≤ M * P * M := by
+  simpa [hMH] using
+    (Matrix.PosSemidef.mul_mul_conjTranspose_same
+      (Matrix.nonneg_iff_posSemidef.mp hP) M).nonneg
+
+/-- Sandwiching is monotone in the middle factor for a fixed Hermitian outer operator. -/
+theorem SubMeas.sandwich_mono {ι : Type*} [Fintype ι]
+    {M P Q : MIPStarRE.Quantum.Op ι} (hMH : Mᴴ = M) (hPQ : P ≤ Q) :
+    M * P * M ≤ M * Q * M := by
+  apply sub_nonneg.mp
+  have hsand : 0 ≤ M * (Q - P) * M :=
+    SubMeas.sandwich_nonneg (M := M) (P := Q - P) (sub_nonneg.mpr hPQ) hMH
+  simpa [mul_sub, sub_mul] using hsand
+
+/-- An operator between `0` and `1` dominates its square. -/
+theorem SubMeas.sq_le_self {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {X : MIPStarRE.Quantum.Op ι} (hX : 0 ≤ X) (hXle : X ≤ 1) :
+    X * X ≤ X := by
+  have hcomm : Commute X (1 - X) :=
+    (Commute.one_right X).sub_right (Commute.refl X)
+  have hnonneg : 0 ≤ X * (1 - X) :=
+    Commute.mul_nonneg hX (sub_nonneg.mpr hXle) hcomm
+  exact sub_nonneg.mp <| by
+    simpa [mul_sub] using hnonneg
+
+/-- The total operator of a submeasurement is PSD. -/
+theorem SubMeas.total_nonneg {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) : 0 ≤ A.total := by
+  rw [← A.sum_eq_total]
+  exact Finset.sum_nonneg fun a _ => A.outcome_pos a
+
 /-- Projective submeasurement outcomes are Hermitian (PSD from idempotence). -/
 theorem ProjSubMeas.outcome_hermitian {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
     (P : ProjSubMeas α ι) (a : α) :
-    (P.outcome a)ᴴ = P.outcome a := by
-  exact (Matrix.nonneg_iff_posSemidef.mp (P.outcome_pos a)).isHermitian.eq
+    (P.outcome a)ᴴ = P.outcome a :=
+  SubMeas.outcome_hermitian P.toSubMeas a
 
 /-- Projective measurement outcomes are Hermitian (inherited from Measurement.outcome_pos). -/
 theorem ProjMeas.outcome_hermitian {α : Type*} {ι : Type*}

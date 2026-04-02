@@ -482,11 +482,7 @@ noncomputable def globalVarianceLeftFamily (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (PointPairQuestion params) Unit (ι × ι) :=
-  fun uv =>
-    polynomialAverageUnitSubMeas params
-      (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
-      (fun g => weightedPointConditionedOperatorAtPolynomial_pos params strategy G g uv.1)
-      (fun g => weightedPointConditionedOperatorAtPolynomial_le_one params strategy G g uv.1)
+  localVarianceLeftFamily params strategy G
 
 /-- The same weighted operator on the second independently sampled point.
 On the bipartite space `d * d`. -/
@@ -494,11 +490,7 @@ noncomputable def globalVarianceRightFamily (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (PointPairQuestion params) Unit (ι × ι) :=
-  fun uv =>
-    polynomialAverageUnitSubMeas params
-      (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)
-      (fun g => weightedPointConditionedOperatorAtPolynomial_pos params strategy G g uv.2)
-      (fun g => weightedPointConditionedOperatorAtPolynomial_le_one params strategy G g uv.2)
+  localVarianceRightFamily params strategy G
 
 /-- The edgewise squared norm expression in `lem:local-variance-of-points`.
 Uses bipartite state `ψbi` on `d * d`. -/
