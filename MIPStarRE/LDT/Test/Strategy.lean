@@ -208,11 +208,38 @@ noncomputable def averagedSubMeas {params : Parameters}
     ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.total
   outcome_pos := by
     intro g
-    sorry
+    let 𝒟 := uniformDistribution (Fq params)
+    exact Finset.sum_nonneg fun x _ =>
+      smul_nonneg (𝒟.nonnegative x) ((family.meas x).outcome_pos g)
   sum_eq_total := by
-    sorry
+    classical
+    let 𝒟 := uniformDistribution (Fq params)
+    calc
+      ∑ g, ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.outcome g
+          = ∑ x ∈ 𝒟.support, ∑ g, 𝒟.weight x • (family.meas x).toSubMeas.outcome g := by
+              rw [Finset.sum_comm]
+      _ = ∑ x ∈ 𝒟.support, 𝒟.weight x • ∑ g, (family.meas x).toSubMeas.outcome g := by
+            apply Finset.sum_congr rfl
+            intro x _
+            rw [← Finset.smul_sum]
+      _ = ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.total := by
+            apply Finset.sum_congr rfl
+            intro x _
+            rw [(family.meas x).toSubMeas.sum_eq_total]
   total_le_one := by
-    sorry
+    let 𝒟 := uniformDistribution (Fq params)
+    calc
+      ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.total
+        ≤ ∑ x ∈ 𝒟.support, 𝒟.weight x • (1 : MIPStarRE.Quantum.Op ι) := by
+            exact Finset.sum_le_sum fun x _ =>
+              smul_le_smul_of_nonneg_left (family.meas x).toSubMeas.total_le_one (𝒟.nonnegative x)
+      _ = (∑ x ∈ 𝒟.support, 𝒟.weight x) • (1 : MIPStarRE.Quantum.Op ι) := by
+            rw [Finset.sum_smul]
+      _ ≤ (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
+            have h𝒟 : ∑ x ∈ 𝒟.support, 𝒟.weight x ≤ 1 := by
+              simp [𝒟, uniformDistribution]
+            exact smul_le_smul_of_nonneg_right h𝒟 zero_le_one
+      _ = 1 := by simp
 
 /-- Evaluate the slice family at a point `(u, x)` in `F_q^{m+1}`. -/
 noncomputable def evaluatedAtNextPoint {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
