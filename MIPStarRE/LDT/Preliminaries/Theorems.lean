@@ -37,10 +37,85 @@ private lemma questionSDD_le_two_questionConsistency {Outcome : Type*}
     (ψ : QuantumState ι) (A B : Measurement Outcome ι) :
     qSDD ψ A.toSubMeas B.toSubMeas ≤
       2 * qConsDefect ψ A.toSubMeas B.toSubMeas := by
-  -- qConsDefect = max(0, ev(1) - ∑ev(A_a B_a)) since A.total = B.total = 1
-  -- qSDD = ∑ev((A_a-B_a)ᴴ(A_a-B_a)) ≤ 2 - 2∑ev(A_a B_a) = 2(1 - ∑ev(A_a B_a))
-  -- So qSDD ≤ 2 * max(0, 1 - ∑ev(A_a B_a)) = 2 * qConsDefect
-  sorry
+  have hA_sq_sum_le : ∑ a, ev ψ (A.outcome a * A.outcome a) ≤ ev ψ 1 := by
+    calc
+      ∑ a, ev ψ (A.outcome a * A.outcome a)
+        ≤ ∑ a, ev ψ (A.outcome a) := by
+            exact Finset.sum_le_sum fun a _ =>
+              ev_mono ψ _ _ <|
+                MIPStarRE.Quantum.sq_le_self
+                  (A.outcome_pos a)
+                  (Measurement.outcome_le_one A a)
+      _ = ev ψ 1 := by
+            rw [← ev_sum ψ A.outcome, A.sum_eq]
+  have hB_sq_sum_le : ∑ a, ev ψ (B.outcome a * B.outcome a) ≤ ev ψ 1 := by
+    calc
+      ∑ a, ev ψ (B.outcome a * B.outcome a)
+        ≤ ∑ a, ev ψ (B.outcome a) := by
+            exact Finset.sum_le_sum fun a _ =>
+              ev_mono ψ _ _ <|
+                MIPStarRE.Quantum.sq_le_self
+                  (B.outcome_pos a)
+                  (Measurement.outcome_le_one B a)
+      _ = ev ψ 1 := by
+            rw [← ev_sum ψ B.outcome, B.sum_eq]
+  have h_expand : ∀ a,
+      ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a)) =
+        ev ψ (A.outcome a * A.outcome a) +
+          ev ψ (B.outcome a * B.outcome a) -
+          2 * ev ψ (A.outcome a * B.outcome a) := by
+    intro a
+    have hcomm :
+        ev ψ (B.outcome a * A.outcome a) =
+          ev ψ (A.outcome a * B.outcome a) :=
+      ev_mul_comm_of_psd ψ _ _ (B.outcome_pos a) (A.outcome_pos a)
+    calc
+      ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))
+        = ev ψ ((A.outcome a * A.outcome a - A.outcome a * B.outcome a) -
+            (B.outcome a * A.outcome a - B.outcome a * B.outcome a)) := by
+              congr 1
+              simp [sub_mul, mul_sub, Measurement.outcome_hermitian]
+              abel
+      _ = ev ψ (A.outcome a * A.outcome a) - ev ψ (A.outcome a * B.outcome a) -
+            (ev ψ (B.outcome a * A.outcome a) -
+              ev ψ (B.outcome a * B.outcome a)) := by
+              rw [ev_sub, ev_sub, ev_sub]
+      _ = ev ψ (A.outcome a * A.outcome a) +
+            ev ψ (B.outcome a * B.outcome a) -
+            2 * ev ψ (A.outcome a * B.outcome a) := by
+              rw [hcomm]
+              ring
+  have hbound :
+      qSDD ψ A.toSubMeas B.toSubMeas ≤
+        2 * (ev ψ (A.total * B.total) -
+          qMatchMass ψ A.toSubMeas B.toSubMeas) := by
+    unfold qSDD qMatchMass
+    calc
+      ∑ a, ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))
+        = ∑ a, (ev ψ (A.outcome a * A.outcome a) +
+            ev ψ (B.outcome a * B.outcome a) -
+            2 * ev ψ (A.outcome a * B.outcome a)) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              exact h_expand a
+      _ = (∑ a, ev ψ (A.outcome a * A.outcome a)) +
+            (∑ a, ev ψ (B.outcome a * B.outcome a)) -
+            2 * ∑ a, ev ψ (A.outcome a * B.outcome a) := by
+              rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.mul_sum]
+      _ ≤ ev ψ 1 + ev ψ 1 - 2 * ∑ a, ev ψ (A.outcome a * B.outcome a) := by
+              linarith
+      _ = 2 * (ev ψ (A.total * B.total) -
+            ∑ a, ev ψ (A.outcome a * B.outcome a)) := by
+              simp [A.total_eq_one, B.total_eq_one]
+              ring
+  have hinner_nonneg :
+      0 ≤ ev ψ (A.total * B.total) -
+        qMatchMass ψ A.toSubMeas B.toSubMeas := by
+    have hnonneg := qSDD_nonneg ψ A.toSubMeas B.toSubMeas
+    linarith
+  unfold qConsDefect
+  rw [max_eq_right hinner_nonneg]
+  exact hbound
 
 /-- `prop:simeq-to-approx`. -/
 theorem simeqToApprox {Question Outcome : Type*}
