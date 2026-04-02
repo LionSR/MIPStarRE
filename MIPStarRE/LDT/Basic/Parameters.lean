@@ -450,7 +450,9 @@ noncomputable def restrictAtHeight (params : Parameters)
                 · exact (hmem (h ▸ hj)).elim
                 · simp [h]
           _ ≤ params.d := by
-            exact (MvPolynomial.degreeOf_le_iff.mp (g.lowIndividualDegree (embedCoord params i))) n hn
+            exact
+              (MvPolynomial.degreeOf_le_iff.mp
+                (g.lowIndividualDegree (embedCoord params i))) n hn
 
 /-- Coordinate polynomial for restricting to an axis-parallel affine line. -/
 noncomputable def axisCoordinatePolynomial (params : Parameters) (ℓ : AxisParallelLine params) :
@@ -547,12 +549,15 @@ private theorem natDegree_diagonalCoordinatePolynomial_le (params : Parameters)
     calc
       (diagonalCoordinatePolynomial params ℓ i).natDegree ≤
           max (_root_.Polynomial.C (decodeScalar (ℓ.base i))).natDegree
-            ((_root_.Polynomial.C (decodeScalar (ℓ.direction i)) * _root_.Polynomial.X).natDegree) :=
+            ((_root_.Polynomial.C (decodeScalar (ℓ.direction i)) *
+              _root_.Polynomial.X).natDegree) :=
         Polynomial.natDegree_add_le _ _
       _ ≤ max 0 1 := by
         gcongr
         · exact (Polynomial.natDegree_C _).le
-        · exact (Polynomial.natDegree_C_mul_le _ (_root_.Polynomial.X : LinePolynomialModel params)).trans
+        · exact
+            (Polynomial.natDegree_C_mul_le
+              _ (_root_.Polynomial.X : LinePolynomialModel params)).trans
             Polynomial.natDegree_X.le
       _ = 1 := by simp
 
@@ -608,7 +613,9 @@ explicit coefficient-vector models for the bounded polynomial answer spaces. The
 used so postprocessing can aggregate outcome operators over actual finite fibers. -/
 noncomputable instance (params : Parameters) : Fintype (AxisLinePolynomial params) := by
   classical
-  let e : AxisLinePolynomial params ≃ {p : LinePolynomialModel params // p.natDegree ≤ params.d} := {
+  let e :
+      AxisLinePolynomial params ≃
+        {p : LinePolynomialModel params // p.natDegree ≤ params.d} := {
     toFun := fun f => ⟨f.poly, f.degreeBounded⟩
     invFun := fun f => ⟨f.1, f.2⟩
     left_inv := by intro f; cases f; rfl
@@ -628,7 +635,9 @@ noncomputable instance (params : Parameters) : Fintype (AxisLinePolynomial param
         have hf : (p : LinePolynomialModel params) ∈
             Polynomial.degreeLT (Scalar params) (params.d + 1) :=
           p.2
-        have hf' : (p : LinePolynomialModel params) ∈ Polynomial.degreeLE (Scalar params) params.d := by
+        have hf' :
+            (p : LinePolynomialModel params) ∈
+              Polynomial.degreeLE (Scalar params) params.d := by
           simpa [Polynomial.degreeLT_succ_eq_degreeLE] using hf
         exact Polynomial.natDegree_le_iff_degree_le.mpr (Polynomial.mem_degreeLE.mp hf')⟩
     left_inv := by
@@ -695,6 +704,11 @@ noncomputable instance (params : Parameters) : Fintype (Polynomial params) := by
   }
   let _ : Finite (MvPolynomial.restrictDegree (Fin params.m) (Scalar params) params.d) :=
     Module.finite_of_finite (Scalar params)
+  /-
+  `Fintype.ofFinite` keeps this instance definition short. If typeclass search
+  here ever becomes a bottleneck, replace it with an explicit coefficient-vector
+  enumeration as in the one-variable polynomial instances above.
+  -/
   letI : Fintype (MvPolynomial.restrictDegree (Fin params.m) (Scalar params) params.d) :=
     Fintype.ofFinite _
   exact Fintype.ofEquiv _ e.symm

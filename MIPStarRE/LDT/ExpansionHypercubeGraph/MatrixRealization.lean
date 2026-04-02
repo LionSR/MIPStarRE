@@ -49,8 +49,10 @@ structure MatrixOperatorFamilyRealization (params : Parameters) where
 def hypercubeEdgePairFinset (params : Parameters) : Finset (Point params × Point params) :=
   Finset.univ.filter (fun uv => IsHypercubeEdge params uv.1 uv.2)
 
-/-- Bridge to the nonuniform hypercube edge distribution from the source. -/
--- TODO: placeholder — should be the actual nonuniform distribution
+/-- Placeholder edge distribution for the matrix model.
+This is currently the uniform distribution on `hypercubeEdgePairFinset params`;
+the paper's Section 7 distribution is nonuniform and weights self-loops
+differently, so this definition is only a temporary stand-in. -/
 noncomputable def matrixHypercubeEdgeDistribution (params : Parameters) :
     Distribution (Point params × Point params) :=
   { support := hypercubeEdgePairFinset params

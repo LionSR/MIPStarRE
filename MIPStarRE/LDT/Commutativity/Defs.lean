@@ -24,30 +24,17 @@ abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
 abbrev FullSliceOutcome (params : Parameters) := Polynomial params × Polynomial params
 
 /-- Ordered product placed on the left tensor factor of the bipartite space `ι × ι`. -/
-noncomputable def leftOrderedProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
+noncomputable def leftOrderedProductOpFamily {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
-    SubMeas (α × β) (ι × ι) :=
-  leftPlacedSubMeas (ιB := ι) (orderedProductSubMeas A B)
+    OpFamily (α × β) (ι × ι) :=
+  OpFamily.leftPlacedOpFamily (ιB := ι) (orderedProductOpFamily A B)
 
 /-- Append a total operator on the right of every outcome operator. -/
-noncomputable def appendRightTotalSubMeas {α : Type*} [Fintype α] {κ : Type*}
+noncomputable def appendRightTotalOpFamily {α : Type*} [Fintype α] {κ : Type*}
     [Fintype κ] [DecidableEq κ]
-    (A : SubMeas α κ) (X : MIPStarRE.Quantum.Op κ) : SubMeas α κ where
+    (A : OpFamily α κ) (X : MIPStarRE.Quantum.Op κ) : OpFamily α κ where
   outcome := fun a => A.outcome a * X
   total := A.total * X
-  outcome_pos := by
-    intro a
-    -- Not provable in general: `A.outcome a * X` need not be PSD when `X` is arbitrary.
-    sorry
-  sum_eq_total := by
-    calc
-      ∑ a : α, A.outcome a * X = (∑ a : α, A.outcome a) * X := by
-        rw [← Matrix.sum_mul]
-      _ = A.total * X := by
-        rw [A.sum_eq_total]
-  total_le_one := by
-    -- Not provable in general from `A.total ≤ 1` when right-multiplying by an arbitrary `X`.
-    sorry
 
 /-- Sandwiched product `A_a B_b A_a`.
 
@@ -142,9 +129,9 @@ noncomputable def evaluatedSliceSecondFactor (params : Parameters)
 on the bipartite space `d * d`. -/
 noncomputable def evaluatedSliceProductLeft (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
-    leftOrderedProductSubMeas
+    leftOrderedProductOpFamily
       (evaluatedSliceFirstFactor params family q)
       (evaluatedSliceSecondFactor params family q)
 
@@ -152,10 +139,10 @@ noncomputable def evaluatedSliceProductLeft (params : Parameters)
 on the bipartite space `d * d`. -/
 noncomputable def evaluatedSliceProductRight (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
-    leftPlacedSubMeas (ιB := ι) <|
-      reversedProductSubMeas
+    OpFamily.leftPlacedOpFamily (ιB := ι) <|
+      reversedProductOpFamily
         (evaluatedSliceFirstFactor params family q)
         (evaluatedSliceSecondFactor params family q)
 
@@ -186,9 +173,9 @@ def fullSliceSecondFactor (params : Parameters)
 on the bipartite space `d * d`. -/
 noncomputable def fullSliceProductLeft (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
+    IdxOpFamily (FullSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
   fun q =>
-    leftOrderedProductSubMeas
+    leftOrderedProductOpFamily
       (fullSliceFirstFactor params family q)
       (fullSliceSecondFactor params family q)
 
@@ -196,10 +183,10 @@ noncomputable def fullSliceProductLeft (params : Parameters)
 on the bipartite space `d * d`. -/
 noncomputable def fullSliceProductRight (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (FullSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
+    IdxOpFamily (FullSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
   fun q =>
-    leftPlacedSubMeas (ιB := ι) <|
-      reversedProductSubMeas
+    OpFamily.leftPlacedOpFamily (ιB := ι) <|
+      reversedProductOpFamily
         (fullSliceFirstFactor params family q)
         (fullSliceSecondFactor params family q)
 
@@ -214,30 +201,30 @@ def evaluateFullSliceOutcomeAtQuestion (params : Parameters)
 On the bipartite space `d * d`. -/
 noncomputable def evaluatedFromFullSliceProductLeft (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    postprocess (fullSliceProductLeft params strategy family xy)
+    OpFamily.postprocess (fullSliceProductLeft params strategy family xy)
       (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- Postprocess the full-slice reversed product at sampled points.
 On the bipartite space `d * d`. -/
 noncomputable def evaluatedFromFullSliceProductRight (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    postprocess (fullSliceProductRight params strategy family xy)
+    OpFamily.postprocess (fullSliceProductRight params strategy family xy)
       (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- Internal stability family from the `G^y` insertion/removal step.
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    appendRightTotalSubMeas
+    appendRightTotalOpFamily
       (evaluatedSliceSandwichFirstFactor params strategy family q)
       (leftTensor (ι₂ := ι) ((fullSliceSecondFactor params family xy).total))
 
@@ -252,10 +239,10 @@ noncomputable def commDataProcessedGStabilityOneRight (params : Parameters)
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    appendRightTotalSubMeas
+    appendRightTotalOpFamily
       (evaluatedSliceProductLeft params strategy family q)
       (leftTensor (ι₂ := ι) ((fullSliceFirstFactor params family xy).total))
 
@@ -263,7 +250,7 @@ noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q => evaluatedSliceProductLeft params strategy family q
 
 /-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`.

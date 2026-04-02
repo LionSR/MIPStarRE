@@ -176,7 +176,7 @@ structure CommutativitySwitcherooStatement {Outcome : Type*} [Fintype Outcome]
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta omega chi : Error) : Prop where
   aggregateCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (switcherooAggregateLeft params family M)
       (switcherooAggregateRight params family M)
@@ -188,13 +188,13 @@ structure CommutingWithGCompleteStatement (params : Parameters)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
   pointWithCompletePartCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (completePartPointProductLeft params family)
       (completePartPointProductRight params family)
       (commutingWithGCompleteError params gamma zeta)
   completePartCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (completePartTotalProductLeft params family)
       (completePartTotalProductRight params family)
@@ -208,13 +208,13 @@ structure CommutingWithGIncompleteStatement (params : Parameters)
   completePartWitness :
     CommutingWithGCompleteStatement params ψbi family gamma zeta
   pointWithIncompletePartCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (incompletePartPointProductLeft params family)
       (incompletePartPointProductRight params family)
       (commutingWithGIncompleteError params gamma zeta)
   incompletePartCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (incompletePartTotalProductLeft params family)
       (incompletePartTotalProductRight params family)
@@ -240,7 +240,7 @@ structure GHatFactsStatement (params : Parameters)
       (gHatSelfConsistencyRightFamily params family)
       (gHatSelfConsistencyError zeta)
   completedCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (gHatPairProductLeft params family)
       (gHatPairProductRight params family)
@@ -252,7 +252,7 @@ structure CommuteGHalfSandwichStatement (params : Parameters)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
   repeatedCommutation :
-    SDDRel ψbi
+    SDDOpRel ψbi
       (uniformDistribution (PointTuple params k))
       (gHatHalfSandwichLeft params family k)
       (gHatHalfSandwichRight params family k)
@@ -308,10 +308,10 @@ structure FromHToGStatement (params : Parameters)
     (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceStep :
     ∀ ℓ : ℕ, ℓ < k →
-      SDDRel strategy.state (uniformDistribution Unit)
-        (IdxSubMeas.liftLeft
+      SDDOpRel strategy.state (uniformDistribution Unit)
+        (IdxOpFamily.liftLeft
           (fromHToGRecurrenceLeftFamily params strategy family k ℓ))
-        (IdxSubMeas.liftLeft
+        (IdxOpFamily.liftLeft
           (fromHToGRecurrenceRightFamily params strategy family k ℓ))
         (fromHToGRecurrenceError params gamma zeta k)
   bernoulliPolynomialRewrite :
@@ -326,45 +326,21 @@ structure FromHToGStatement (params : Parameters)
 private theorem bernoulliTailOperator_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
     (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι)
     (hXpsd : 0 ≤ X)
-    (hXleOne : 0 ≤ (1 - X)) :
+    (hXleOne : X ≤ 1) :
     0 ≤ bernoulliTailOperator k degree X := by
-  classical
   unfold bernoulliTailOperator
-  have hcomm : Commute X (1 - X) :=
-    (Commute.one_right X).sub_right (Commute.refl X)
-  have hXpow : ∀ n : ℕ, 0 ≤ X ^ n := by
-    intro n
-    induction n with
-    | zero =>
-        simp
-    | succ n ihn =>
-        simpa [pow_succ] using
-          Commute.mul_nonneg ihn hXpsd ((Commute.refl X).pow_left n)
-  have hOneSubPow : ∀ n : ℕ, 0 ≤ (1 - X) ^ n := by
-    intro n
-    induction n with
-    | zero =>
-        simp
-    | succ n ihn =>
-        simpa [pow_succ] using
-          Commute.mul_nonneg ihn hXleOne ((Commute.refl (1 - X)).pow_left n)
   refine Finset.sum_nonneg fun r _ => ?_
-  have hprod : 0 ≤ X ^ r * (1 - X) ^ (k - r) := by
-    exact Commute.mul_nonneg
-      (hXpow r)
-      (hOneSubPow (k - r))
-      (hcomm.pow_pow r (k - r))
-  have hsmul : 0 ≤ ((Nat.choose k r : ℝ) • (X ^ r * (1 - X) ^ (k - r))) := by
-    exact smul_nonneg (by positivity) hprod
-  simpa using hsmul
+  simpa using binomialOperatorTerm_nonneg (G := X) k r hXpsd hXleOne
 
 /-- Output package for `lem:chernoff-bernoulli-matrix`. -/
 structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
     (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error)
     (hXpsd : 0 ≤ X)
-    (hXleOne : 0 ≤ (1 - X))
-    (hTailLeOne : bernoulliTailOperator k degree X ≤ 1) : Prop where
+    (hXleOne : X ≤ 1) : Prop where
+  /-- Temporary field while the Bernoulli-tail contraction bound is still supplied
+  separately by the theorem stub rather than proved from `hXpsd` and `hXleOne`. -/
+  tail_le_one : bernoulliTailOperator k degree X ≤ 1
   matrixTailBound :
     CompletenessAtLeast ψ
       ({ outcome := fun _ => bernoulliTailOperator k degree X
@@ -375,7 +351,7 @@ structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableE
          sum_eq_total := by
            simp
          total_le_one := by
-           exact hTailLeOne } : SubMeas Unit ι)
+           exact tail_le_one } : SubMeas Unit ι)
       (1 - kappa / (1 - theta) - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2))
 
 /-- Output package for `cor:ld-pasting-N-completeness`. -/

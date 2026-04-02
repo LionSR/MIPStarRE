@@ -62,18 +62,18 @@ private theorem opTensor_le_leftTensor
         (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hB))
   rwa [hrewrite]
 
-/-- Ordered product of two paper-local submeasurements on the same tensor factor. -/
-noncomputable def orderedProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
+/-- Ordered product of two submeasurements viewed as a raw operator family. -/
+noncomputable def orderedProductOpFamily {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
-    SubMeas (α × β) ι where
+    OpFamily (α × β) ι where
   outcome := fun | (a, b) => A.outcome a * B.outcome b
   total := A.total * B.total
-  outcome_pos := by
-    intro ab
-    cases ab
-    -- requires commutativity; see scouting report WP2
-    sorry
-  sum_eq_total := by
+ 
+/-- The outcomes sum to the displayed total operator. -/
+theorem orderedProductOpFamily_sum_eq_total {α β : Type*} [Fintype α] [Fintype β]
+    (A : SubMeas α ι) (B : SubMeas β ι) :
+    ∑ ab : α × β, (orderedProductOpFamily A B).outcome ab =
+      (orderedProductOpFamily A B).total := by
     calc
       ∑ ab : α × β, A.outcome ab.1 * B.outcome ab.2
           = ∑ a : α, ∑ b : β, A.outcome a * B.outcome b := by
@@ -83,22 +83,19 @@ noncomputable def orderedProductSubMeas {α β : Type*} [Fintype α] [Fintype β
             rw [← Fintype.sum_mul_sum]
       _ = A.total * B.total := by
             rw [A.sum_eq_total, B.sum_eq_total]
-  total_le_one := by
-    -- requires commutativity; see scouting report WP2
-    sorry
 
-/-- Reversed product of two paper-local submeasurements on the same tensor factor. -/
-noncomputable def reversedProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
+/-- Reversed product of two submeasurements viewed as a raw operator family. -/
+noncomputable def reversedProductOpFamily {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
-    SubMeas (α × β) ι where
+    OpFamily (α × β) ι where
   outcome := fun | (a, b) => B.outcome b * A.outcome a
   total := B.total * A.total
-  outcome_pos := by
-    intro ab
-    cases ab
-    -- requires commutativity; see scouting report WP2
-    sorry
-  sum_eq_total := by
+
+/-- The reversed outcomes sum to the displayed total operator. -/
+theorem reversedProductOpFamily_sum_eq_total {α β : Type*} [Fintype α] [Fintype β]
+    (A : SubMeas α ι) (B : SubMeas β ι) :
+    ∑ ab : α × β, (reversedProductOpFamily A B).outcome ab =
+      (reversedProductOpFamily A B).total := by
     calc
       ∑ ab : α × β, B.outcome ab.2 * A.outcome ab.1
           = ∑ b : β, ∑ a : α, B.outcome b * A.outcome a := by
@@ -108,9 +105,6 @@ noncomputable def reversedProductSubMeas {α β : Type*} [Fintype α] [Fintype �
             rw [← Fintype.sum_mul_sum]
       _ = B.total * A.total := by
             rw [B.sum_eq_total, A.sum_eq_total]
-  total_le_one := by
-    -- requires commutativity; see scouting report WP2
-    sorry
 
 /-- Tensor-product bridge `A_a ⊗ B_b` on the bipartite space `ι × ι`. -/
 noncomputable def tensorProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
@@ -184,22 +178,22 @@ def sampledPointPairFromSharedDiagonalQuestion (params : Parameters)
 /-- The ordered point product `(A^u_a A^v_b) ⊗ I` on the bipartite space `d * d`. -/
 noncomputable def pointMeasurementProductLeft (params : Parameters)
     (strategy : SymStrat params ι) :
-    IdxSubMeas (PointPairQuestion params) (PointPairOutcome params) (ι × ι) :=
+    IdxOpFamily (PointPairQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun uv =>
     let Au := (strategy.pointMeasurement uv.1).toSubMeas
     let Av := (strategy.pointMeasurement uv.2).toSubMeas
-    leftPlacedSubMeas (ιB := ι) <|
-      orderedProductSubMeas Au Av
+    OpFamily.leftPlacedOpFamily (ιB := ι) <|
+      orderedProductOpFamily Au Av
 
 /-- The reversed point product `(A^v_b A^u_a) ⊗ I` on the bipartite space `ι × ι`. -/
 noncomputable def pointMeasurementProductRight (params : Parameters)
     (strategy : SymStrat params ι) :
-    IdxSubMeas (PointPairQuestion params) (PointPairOutcome params) (ι × ι) :=
+    IdxOpFamily (PointPairQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun uv =>
     let Au := (strategy.pointMeasurement uv.1).toSubMeas
     let Av := (strategy.pointMeasurement uv.2).toSubMeas
-    leftPlacedSubMeas (ιB := ι) <|
-      reversedProductSubMeas Au Av
+    OpFamily.leftPlacedOpFamily (ιB := ι) <|
+      reversedProductOpFamily Au Av
 
 /-- Distribution obtained by sampling a diagonal line together with a parameter on that line. -/
 noncomputable def pointWithDiagonalLineDistribution (params : Parameters) :
@@ -228,7 +222,7 @@ noncomputable def sampledDiagonalLineEvaluation (params : Parameters)
 /-- The ordered point product `(A^u_a A^v_b) ⊗ I`, indexed by a shared sampled line. -/
 noncomputable def pointMeasurementProductAlongSharedLine (params : Parameters)
     (strategy : SymStrat params ι) :
-    IdxSubMeas (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
+    IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun q =>
     pointMeasurementProductLeft params strategy
       (sampledPointPairFromSharedDiagonalQuestion params q)
@@ -236,7 +230,7 @@ noncomputable def pointMeasurementProductAlongSharedLine (params : Parameters)
 /-- The reversed point product `(A^v_b A^u_a) ⊗ I`, indexed by a shared sampled line. -/
 noncomputable def pointMeasurementProductAlongSharedLineReversed (params : Parameters)
     (strategy : SymStrat params ι) :
-    IdxSubMeas (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
+    IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun q =>
     pointMeasurementProductRight params strategy
       (sampledPointPairFromSharedDiagonalQuestion params q)
@@ -256,28 +250,28 @@ noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
 /-- The bridge `I ⊗ (L^ℓ_[f(v)=b] L^ℓ_[f(u)=a])` on the bipartite space `d * d`. -/
 noncomputable def diagonalLineProductOrdered (params : Parameters)
     (strategy : SymStrat params ι) :
-    IdxSubMeas (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
+    IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun q =>
     let ℓ := q.1
     let tu := q.2.1
     let tv := q.2.2
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
-    rightPlacedSubMeas (ιA := ι) <|
-      orderedProductSubMeas Lu Lv
+    OpFamily.rightPlacedOpFamily (ιA := ι) <|
+      orderedProductOpFamily Lu Lv
 
 /-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] L^ℓ_[f(v)=b])` on the bipartite space `ι × ι`. -/
 noncomputable def diagonalLineProductReversed (params : Parameters)
     (strategy : SymStrat params ι) :
-    IdxSubMeas (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
+    IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun q =>
     let ℓ := q.1
     let tu := q.2.1
     let tv := q.2.2
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
-    rightPlacedSubMeas (ιA := ι) <|
-      reversedProductSubMeas Lu Lv
+    OpFamily.rightPlacedOpFamily (ιA := ι) <|
+      reversedProductOpFamily Lu Lv
 
 /-- The mixed bridge `A^v_b ⊗ L^ℓ_[f(u)=a]` on the bipartite space `ι × ι`.
 Outcome `(a, b)` maps to `leftTensor(A^v_b) * rightTensor(L^ℓ_[f(u)=a])`,

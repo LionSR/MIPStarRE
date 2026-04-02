@@ -34,37 +34,37 @@ structure CommutativityPointsStatement (params : Parameters)
       (IdxSubMeas.liftLeft (sampledDiagonalLineEvaluation params strategy))
       (pointDiagonalLineApproxError params gamma)
   orderedLiftToMixedBridge :
-    SDDRel strategy.state
+    SDDOpRel strategy.state
       (pointPairSharedDiagonalLineDistribution params)
       (pointMeasurementProductAlongSharedLine params strategy)
-      (pointDiagonalLineMixedProductLeft params strategy)
+      (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductLeft params strategy))
       (pointDiagonalLineApproxError params gamma)
   orderedLiftToLineBridge :
-    SDDRel strategy.state
+    SDDOpRel strategy.state
       (pointPairSharedDiagonalLineDistribution params)
-      (pointDiagonalLineMixedProductLeft params strategy)
+      (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductLeft params strategy))
       (diagonalLineProductOrdered params strategy)
       (pointDiagonalLineApproxError params gamma)
   diagonalLineProjectiveSwap :
-    SDDRel strategy.state
+    SDDOpRel strategy.state
       (pointPairSharedDiagonalLineDistribution params)
       (diagonalLineProductOrdered params strategy)
       (diagonalLineProductReversed params strategy)
       0
   reversedDropFromLineBridge :
-    SDDRel strategy.state
+    SDDOpRel strategy.state
       (pointPairSharedDiagonalLineDistribution params)
       (diagonalLineProductReversed params strategy)
-      (pointDiagonalLineMixedProductRight params strategy)
+      (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductRight params strategy))
       (pointDiagonalLineApproxError params gamma)
   reversedDropToPointsBridge :
-    SDDRel strategy.state
+    SDDOpRel strategy.state
       (pointPairSharedDiagonalLineDistribution params)
-      (pointDiagonalLineMixedProductRight params strategy)
+      (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductRight params strategy))
       (pointMeasurementProductAlongSharedLineReversed params strategy)
       (pointDiagonalLineApproxError params gamma)
   pointwiseCommutation :
-    SDDRel strategy.state
+    SDDOpRel strategy.state
       (uniformDistribution (PointPairQuestion params))
       (pointMeasurementProductLeft params strategy)
       (pointMeasurementProductRight params strategy)

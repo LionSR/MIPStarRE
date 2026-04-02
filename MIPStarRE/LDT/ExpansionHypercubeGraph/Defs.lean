@@ -75,7 +75,11 @@ def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
   instDecidableEq := inferInstance
   instNonempty := inferInstance
 
-/-- The paper's normalized adjacency weight for an ordered pair of vertices. -/
+/-- The paper's normalized adjacency weight for an ordered pair of vertices.
+This update-sum is equivalent to the older case-split via
+`coordinateDisagreementCount`: when `u ≠ v`, each differing coordinate
+contributes the unique update sending `u i` to `v i`, while when `u = v`
+the `q` self-loop updates contribute once for each coordinate. -/
 noncomputable def hypercubeAdjacencyWeight (params : Parameters)
     (u v : Point params) : ℂ :=
   (((params.m : ℂ) * (params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹) *
@@ -166,16 +170,6 @@ noncomputable def fourierBasisState (params : Parameters)
   fun u => ((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) *
     addCharFq params (dotProductFq params u α)
 
-/-- Reindex `F_q` as `ZMod q` using the canonical representatives. -/
-noncomputable def finZModEquiv (q : ℕ) [NeZero q] : Fin q ≃ ZMod q where
-  toFun x := (x.val : ZMod q)
-  invFun z := ⟨z.val, z.val_lt⟩
-  left_inv x := by
-    ext
-    simp [Nat.mod_eq_of_lt x.2]
-  right_inv z := by
-    exact ZMod.natCast_zmod_val z
-
 /-- The same dot product as `dotProductFq`, but computed directly in `ZMod q`. -/
 noncomputable def dotProductZMod (params : Parameters) (u α : Point params) : ZMod params.q :=
   ∑ i : Fin params.m, ((u i).val : ZMod params.q) * ((α i).val : ZMod params.q)
@@ -220,13 +214,27 @@ lemma dotProductZMod_update (params : Parameters) (u α : Point params)
 lemma sum_stdAddChar_mul_fin (params : Parameters) (a : ZMod params.q) :
     ∑ x : Fq params, ZMod.stdAddChar (N := params.q) (((x.val : ZMod params.q) * a)) =
       if a = 0 then params.q else 0 := by
+  let e : Fq params ≃ ZMod params.q :=
+    { toFun := fun x => (x.val : ZMod params.q)
+      invFun := fun z => ⟨z.val, z.val_lt⟩
+      left_inv := by
+        intro x
+        ext
+        simp [Nat.mod_eq_of_lt x.2]
+      right_inv := by
+        intro z
+        exact ZMod.natCast_zmod_val z }
   calc
     ∑ x : Fq params, ZMod.stdAddChar (N := params.q) (((x.val : ZMod params.q) * a))
-      = ∑ z : ZMod params.q, ZMod.stdAddChar (N := params.q) (z * a) := by
-          exact Fintype.sum_equiv (finZModEquiv params.q)
-            (fun x => ZMod.stdAddChar (N := params.q) (((x.val : ZMod params.q) * a)))
+      = ∑ x : Fq params, ZMod.stdAddChar (N := params.q) ((e x) * a) := by
+          refine Finset.sum_congr rfl ?_
+          intro x _
+          simp [e]
+    _ = ∑ z : ZMod params.q, ZMod.stdAddChar (N := params.q) (z * a) := by
+          exact Fintype.sum_equiv e
+            (fun x => ZMod.stdAddChar (N := params.q) ((e x) * a))
             (fun z => ZMod.stdAddChar (N := params.q) (z * a))
-            (fun x => by simp [finZModEquiv])
+            (fun x => rfl)
     _ = if a = 0 then Fintype.card (ZMod params.q) else 0 := by
           simpa using (AddChar.sum_mulShift (R := ZMod params.q) (R' := ℂ)
             (ψ := ZMod.stdAddChar (N := params.q)) a (ZMod.isPrimitive_stdAddChar params.q))
@@ -266,7 +274,9 @@ lemma fourierBasisState_update_sum (params : Parameters) (u α : Point params)
     rw [← Finset.mul_sum]
     calc
       ((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) *
-          ∑ x : Fq params, ψ (dotProductZMod params u α - ui * ai) * ψ ((x.val : ZMod params.q) * ai)
+          ∑ x : Fq params,
+            ψ (dotProductZMod params u α - ui * ai) *
+              ψ ((x.val : ZMod params.q) * ai)
         = ((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) *
             (ψ (dotProductZMod params u α - ui * ai) *
               ∑ x : Fq params, ψ ((x.val : ZMod params.q) * ai)) := by

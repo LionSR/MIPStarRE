@@ -2,6 +2,7 @@ import MIPStarRE.LDT.Basic.Parameters
 import MIPStarRE.LDT.Basic.Operator
 import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Basic.SubMeasurement
+import MIPStarRE.LDT.Basic.OpFamily
 import MIPStarRE.LDT.Test.Defs
 import MIPStarRE.LDT.Test.Strategy
 import MIPStarRE.LDT.Test.MainTheorem

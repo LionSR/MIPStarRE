@@ -2,6 +2,7 @@ import MIPStarRE.LDT.Basic.Parameters
 import MIPStarRE.LDT.Basic.Operator
 import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Basic.SubMeasurement
+import MIPStarRE.LDT.Basic.OpFamily
 
 /-!
 # Section 3 — Definitions
@@ -62,6 +63,13 @@ noncomputable def qSDD {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq 
     (ψ : QuantumState ι) (A B : SubMeas Outcome ι) : Error :=
   ∑ a, ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))
 
+/-- State-dependent distance for raw operator families.
+Matches the paper's `≈_δ` for arbitrary matrix families. -/
+noncomputable def qSDDOp {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A B : OpFamily Outcome ι) : Error :=
+  ∑ a, ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))
+
 /-- Questionwise strong self-consistency defect. -/
 noncomputable def qSSCDefect {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -83,6 +91,13 @@ noncomputable def sddError {Question Outcome : Type*} {ι : Type*} [Fintype ι] 
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome ι) : Error :=
   avgOver 𝒟 (fun q => qSDD ψ (A q) (B q))
+
+/-- Averaged squared distance for raw operator families. -/
+noncomputable def sddErrorOp {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B : IdxOpFamily Question Outcome ι) : Error :=
+  avgOver 𝒟 (fun q => qSDDOp ψ (A q) (B q))
 
 /-- Averaged defect in strong self-consistency. -/
 noncomputable def sscError {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -124,6 +139,13 @@ structure SDDRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [Decidable
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A B : IdxSubMeas Question Outcome ι) (δ : Error) : Prop where
   squaredDistanceBound : sddError ψ 𝒟 A B ≤ δ
+
+/-- State-dependent distance relation for raw operator families. -/
+structure SDDOpRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B : IdxOpFamily Question Outcome ι) (δ : Error) : Prop where
+  squaredDistanceBound : sddErrorOp ψ 𝒟 A B ≤ δ
 
 /-- Strong self-consistency relation. -/
 structure SSCRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
