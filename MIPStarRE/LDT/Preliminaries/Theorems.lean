@@ -37,46 +37,26 @@ private lemma questionSDD_le_two_questionConsistency {Outcome : Type*}
     (ψ : QuantumState ι) (A B : Measurement Outcome ι) :
     qSDD ψ A.toSubMeas B.toSubMeas ≤
       2 * qConsDefect ψ A.toSubMeas B.toSubMeas := by
-  -- Helper: for any measurement `M`, each POVM element satisfies `E * E ≤ E`.
-  have h_sq_le : ∀ (M : Measurement Outcome ι) a,
-      M.outcome a * M.outcome a ≤ M.outcome a := by
-    intro M a
-    let s := CFC.sqrt (M.outcome a)
-    have hresid : 0 ≤ (1 : MIPStarRE.Quantum.Op ι) - M.outcome a := by
-      exact sub_nonneg.mpr (Measurement.outcome_le_one M a)
-    have hconj : 0 ≤ star s * ((1 : MIPStarRE.Quantum.Op ι) - M.outcome a) * s :=
-      star_left_conjugate_nonneg hresid s
-    have hs_star : star s = s :=
-      IsSelfAdjoint.star_eq (IsSelfAdjoint.of_nonneg (CFC.sqrt_nonneg (M.outcome a)))
-    have hs_sq : s * s = M.outcome a := by
-      simpa [s] using (CFC.sqrt_mul_sqrt_self (M.outcome a) (ha := M.outcome_pos a))
-    have hs_middle : s * (M.outcome a * s) = M.outcome a * M.outcome a := by
-      calc
-        s * (M.outcome a * s) = s * ((s * s) * s) := by rw [← hs_sq]
-        _ = (s * s) * (s * s) := by simp [mul_assoc]
-        _ = M.outcome a * M.outcome a := by rw [hs_sq]
-    calc
-      M.outcome a * M.outcome a = s * (M.outcome a * s) := hs_middle.symm
-      _ ≤ M.outcome a := by
-          simpa [sub_mul, mul_sub, sub_nonneg, mul_assoc, hs_star, hs_sq] using hconj
-  have hA_sq_le : ∀ a, A.outcome a * A.outcome a ≤ A.outcome a := by
-    intro a
-    exact h_sq_le A a
-  have hB_sq_le : ∀ a, B.outcome a * B.outcome a ≤ B.outcome a := by
-    intro a
-    exact h_sq_le B a
   have hA_sq_sum_le : ∑ a, ev ψ (A.outcome a * A.outcome a) ≤ ev ψ 1 := by
     calc
       ∑ a, ev ψ (A.outcome a * A.outcome a)
         ≤ ∑ a, ev ψ (A.outcome a) := by
-            exact Finset.sum_le_sum (fun a _ => ev_mono ψ _ _ (hA_sq_le a))
+            exact Finset.sum_le_sum fun a _ =>
+              ev_mono ψ _ _ <|
+                MIPStarRE.Quantum.sq_le_self
+                  (A.outcome_pos a)
+                  (Measurement.outcome_le_one A a)
       _ = ev ψ 1 := by
             rw [← ev_sum ψ A.outcome, A.sum_eq]
   have hB_sq_sum_le : ∑ a, ev ψ (B.outcome a * B.outcome a) ≤ ev ψ 1 := by
     calc
       ∑ a, ev ψ (B.outcome a * B.outcome a)
         ≤ ∑ a, ev ψ (B.outcome a) := by
-            exact Finset.sum_le_sum (fun a _ => ev_mono ψ _ _ (hB_sq_le a))
+            exact Finset.sum_le_sum fun a _ =>
+              ev_mono ψ _ _ <|
+                MIPStarRE.Quantum.sq_le_self
+                  (B.outcome_pos a)
+                  (Measurement.outcome_le_one B a)
       _ = ev ψ 1 := by
             rw [← ev_sum ψ B.outcome, B.sum_eq]
   have h_expand : ∀ a,
