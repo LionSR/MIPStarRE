@@ -206,6 +206,13 @@ noncomputable def averagedSubMeas {params : Parameters}
   total :=
     let 𝒟 := uniformDistribution (Fq params)
     ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.total
+  outcome_pos := by
+    intro g
+    sorry
+  sum_eq_total := by
+    sorry
+  total_le_one := by
+    sorry
 
 /-- Evaluate the slice family at a point `(u, x)` in `F_q^{m+1}`. -/
 noncomputable def evaluatedAtNextPoint {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]

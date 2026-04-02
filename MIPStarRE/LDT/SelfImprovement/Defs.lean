@@ -13,6 +13,7 @@ constructions and error terms.
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT
+open MIPStarRE.Quantum
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
@@ -78,9 +79,18 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
     (T : Measurement (Polynomial params) ι) (u : Point params) :
     SubMeas (Polynomial params) ι :=
   { outcome := sandwichedPolynomialOutcomeOperatorAt params strategy T u
-    total :=
-      averageOperatorOverDistribution (polynomialDistribution params)
-        (sandwichedPolynomialOutcomeOperatorAt params strategy T u) }
+    total := ∑ h : Polynomial params,
+      sandwichedPolynomialOutcomeOperatorAt params strategy T u h
+    outcome_pos := by
+      intro h
+      simp only [sandwichedPolynomialOutcomeOperatorAt, pointConditionedOutcomeOperatorAtPolynomial]
+      exact sandwich_nonneg (T.outcome_pos h)
+        (SubMeas.outcome_hermitian (strategy.pointMeasurement u).toSubMeas (h u))
+    sum_eq_total := by
+      rfl
+    total_le_one := by
+      -- requires regrouping by h(u) and using projective measurement structure
+      sorry }
 
 /-- The averaged sandwiched submeasurement `H_h = E_u H^u_h`. -/
 noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
@@ -89,9 +99,22 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
   { outcome := fun h =>
       averageOperatorOverDistribution (uniformDistribution (Point params))
         (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
-    total :=
+    total := ∑ h : Polynomial params,
       averageOperatorOverDistribution (uniformDistribution (Point params))
-        (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total) }
+        (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
+    outcome_pos := by
+      intro h
+      simp only [averageOperatorOverDistribution]
+      apply Finset.sum_nonneg
+      intro u _
+      exact smul_nonneg
+        ((uniformDistribution (Point params)).nonnegative u)
+        ((sandwichedPolynomialSubMeasAt params strategy T u).outcome_pos h)
+    sum_eq_total := by
+      rfl
+    total_le_one := by
+      -- requires averaging argument over pointwise total_le_one bounds
+      sorry }
 
 /-- The variance error entering `lem:add-in-u`. -/
 noncomputable def selfImprovementVarianceError (params : Parameters)

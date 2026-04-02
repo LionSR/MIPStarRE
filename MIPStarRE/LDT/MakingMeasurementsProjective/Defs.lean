@@ -269,7 +269,8 @@ structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
 /-! ### Abstract-level probability definitions -/
 
 /-- The single-outcome probability `⟨ψ|A_a|ψ⟩`. -/
-noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
     (A : SubMeas Outcome ι) (a : Outcome) : Error :=
   ev ψ (A.outcome a)
@@ -279,7 +280,7 @@ Uses the operator product on the shared algebra, matching `matrixJointOutcomePro
 When the measurements commute (as guaranteed after Naimark dilation), this
 equals the tensor-product formulation `⟨ψ| (A_a ⊗ B_b) |ψ⟩`. -/
 noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ι : Type*} [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
     (A : SubMeas OutcomeA ι)
     (B : SubMeas OutcomeB ι)
