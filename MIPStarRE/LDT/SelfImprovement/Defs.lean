@@ -83,16 +83,8 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
     outcome_pos := by
       intro h
       simp only [sandwichedPolynomialOutcomeOperatorAt, pointConditionedOutcomeOperatorAtPolynomial]
-      have hT := Matrix.nonneg_iff_posSemidef.mp (T.outcome_pos h)
-      have hAH := (Matrix.nonneg_iff_posSemidef.mp
-        ((strategy.pointMeasurement u).outcome_pos (h u))).isHermitian.eq
-      rw [show (strategy.pointMeasurement u).toSubMeas.outcome (h u) *
-            T.outcome h * (strategy.pointMeasurement u).toSubMeas.outcome (h u) =
-          (strategy.pointMeasurement u).toSubMeas.outcome (h u) *
-            T.outcome h *
-            ((strategy.pointMeasurement u).toSubMeas.outcome (h u))ᴴ from by rw [hAH]]
-      exact (hT.mul_mul_conjTranspose_same
-        ((strategy.pointMeasurement u).toSubMeas.outcome (h u))).nonneg
+      exact sandwich_nonneg (T.outcome_pos h)
+        (SubMeas.outcome_hermitian (strategy.pointMeasurement u).toSubMeas (h u))
     sum_eq_total := by
       rfl
     total_le_one := by
