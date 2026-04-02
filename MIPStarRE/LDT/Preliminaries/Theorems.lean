@@ -130,7 +130,179 @@ theorem simeqToApprox {Question Outcome : Type*}
         (IdxMeas.toIdxSubMeas A)
         (IdxMeas.toIdxSubMeas B)
         (2 * δ) := by
-  sorry
+  intro ⟨hcons⟩
+  constructor
+  unfold sddError consError at *
+  calc
+    avgOver 𝒟
+        (fun q =>
+          qSDD ψ
+            ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A)) q)
+            ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q))
+      ≤ avgOver 𝒟
+          (fun q =>
+            2 * qConsDefect ψ
+              ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A)) q)
+              ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+          apply avgOver_mono
+          intro q
+          let A' : Measurement Outcome (ι × ι) :=
+            { toSubMeas := ((A q).toSubMeas).liftLeft
+              total_eq_one := by
+                ext i j
+                rcases i with ⟨i₁, i₂⟩
+                rcases j with ⟨j₁, j₂⟩
+                simp [SubMeas.liftLeft, leftTensor, (A q).total_eq_one] }
+          let B' : Measurement Outcome (ι × ι) :=
+            { toSubMeas := ((B q).toSubMeas).liftRight
+              total_eq_one := by
+                ext i j
+                rcases i with ⟨i₁, i₂⟩
+                rcases j with ⟨j₁, j₂⟩
+                simp [SubMeas.liftRight, rightTensor, (B q).total_eq_one] }
+          simpa [A', B', IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxMeas.toIdxSubMeas] using
+            questionSDD_le_two_questionConsistency ψ A' B'
+    _ = 2 * avgOver 𝒟
+          (fun q =>
+            qConsDefect ψ
+              ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A)) q)
+              ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+          rw [avgOver_const_mul]
+    _ ≤ 2 * δ := by
+          exact mul_le_mul_of_nonneg_left hcons (by norm_num)
+
+private lemma ev_leftTensor_mul_rightTensor_nonneg
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState (ι × ι))
+    {X Y : MIPStarRE.Quantum.Op ι} (hX : 0 ≤ X) (hY : 0 ≤ Y) :
+    0 ≤ ev ψ (leftTensor (ι₂ := ι) X * rightTensor (ι₁ := ι) Y) := by
+  rw [leftTensor_mul_rightTensor_eq_opTensor]
+  exact
+    ev_nonneg_of_psd ψ _ <|
+      (Matrix.PosSemidef.kronecker
+        (Matrix.nonneg_iff_posSemidef.mp hX)
+        (Matrix.nonneg_iff_posSemidef.mp hY)).nonneg
+
+private lemma qMatchMass_leftRight_postprocess_ge {α β : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype α] [Fintype β]
+    (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) :
+    qMatchMass ψ
+        (leftPlacedSubMeas (ιB := ι) (postprocess A f))
+        (rightPlacedSubMeas (ιA := ι) (postprocess B f)) ≥
+      qMatchMass ψ
+        (leftPlacedSubMeas (ιB := ι) A)
+        (rightPlacedSubMeas (ιA := ι) B) := by
+  classical
+  let fiber : β → Finset α := fun b => Finset.univ.filter fun a => f a = b
+  let diagTerm : α → Error := fun a =>
+    ev ψ
+      (leftTensor (ι₂ := ι) (A.outcome a) *
+        rightTensor (ι₁ := ι) (B.outcome a))
+  let pairTerm : α → α → Error := fun a a' =>
+    ev ψ
+      (leftTensor (ι₂ := ι) (A.outcome a) *
+        rightTensor (ι₁ := ι) (B.outcome a'))
+  let fiberDiag : β → Error := fun b => (fiber b).sum diagTerm
+  let fiberPair : β → Error := fun b => (fiber b).sum fun a => (fiber b).sum fun a' => pairTerm a a'
+  have hdiag_le (b : β) : fiberDiag b ≤ fiberPair b := by
+    dsimp [fiberDiag, fiberPair]
+    refine Finset.sum_le_sum ?_
+    intro a ha
+    exact Finset.single_le_sum
+      (fun a' ha' =>
+        ev_leftTensor_mul_rightTensor_nonneg ψ (A.outcome_pos a) (B.outcome_pos a'))
+      ha
+  have hfiber_expand (b : β) :
+      ev ψ
+        (((fiber b).sum fun a => leftTensor (ι₂ := ι) (A.outcome a)) *
+          ((fiber b).sum fun a => rightTensor (ι₁ := ι) (B.outcome a))) =
+      fiberPair b := by
+    dsimp [fiberPair]
+    rw [Matrix.sum_mul, ev_finset_sum]
+    refine Finset.sum_congr rfl ?_
+    intro a ha
+    rw [Matrix.mul_sum, ev_finset_sum]
+  calc
+    qMatchMass ψ
+        (leftPlacedSubMeas (ιB := ι) A)
+        (rightPlacedSubMeas (ιA := ι) B)
+      = ∑ b : β, fiberDiag b := by
+          dsimp [fiberDiag, diagTerm, fiber]
+          unfold qMatchMass leftPlacedSubMeas rightPlacedSubMeas
+          symm
+          exact Finset.sum_fiberwise Finset.univ f
+            (fun a =>
+              ev ψ
+                (leftTensor (ι₂ := ι) (A.outcome a) *
+                  rightTensor (ι₁ := ι) (B.outcome a)))
+    _ ≤ ∑ b : β, fiberPair b := by
+          refine Finset.sum_le_sum ?_
+          intro b _
+          exact hdiag_le b
+    _ = qMatchMass ψ
+          (leftPlacedSubMeas (ιB := ι) (postprocess A f))
+          (rightPlacedSubMeas (ιA := ι) (postprocess B f)) := by
+          dsimp [fiberPair, pairTerm, fiber]
+          unfold qMatchMass leftPlacedSubMeas rightPlacedSubMeas postprocess
+          refine Finset.sum_congr rfl ?_
+          intro b _
+          symm
+          calc
+            ev ψ
+                (leftTensor (ι₂ := ι) (∑ a ∈ Finset.univ.filter (fun a => f a = b), A.outcome a) *
+                  rightTensor (ι₁ := ι) (∑ a ∈ Finset.univ.filter (fun a => f a = b), B.outcome a))
+              =
+                ev ψ
+                  (((Finset.univ.filter (fun a => f a = b)).sum fun a =>
+                      leftTensor (ι₂ := ι) (A.outcome a)) *
+                    ((Finset.univ.filter (fun a => f a = b)).sum fun a =>
+                      rightTensor (ι₁ := ι) (B.outcome a))) := by
+                    rw [← leftTensor_finset_sum (ι₂ := ι)
+                      (Finset.univ.filter (fun a => f a = b)) (fun a => A.outcome a)]
+                    rw [← rightTensor_finset_sum (ι₁ := ι)
+                      (Finset.univ.filter (fun a => f a = b)) (fun a => B.outcome a)]
+            _ = fiberPair b := hfiber_expand b
+
+private lemma qConsDefect_leftRight_postprocess_le {α β : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype α] [Fintype β]
+    (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) :
+    qConsDefect ψ
+        (leftPlacedSubMeas (ιB := ι) (postprocess A f))
+        (rightPlacedSubMeas (ιA := ι) (postprocess B f))
+      ≤
+    qConsDefect ψ
+        (leftPlacedSubMeas (ιB := ι) A)
+        (rightPlacedSubMeas (ιA := ι) B) := by
+  have hmatch :=
+    qMatchMass_leftRight_postprocess_ge ψ A B f
+  have hsub :
+      ev ψ
+          ((leftPlacedSubMeas (ιB := ι) A).total *
+            (rightPlacedSubMeas (ιA := ι) B).total) -
+        qMatchMass ψ
+          (leftPlacedSubMeas (ιB := ι) (postprocess A f))
+          (rightPlacedSubMeas (ιA := ι) (postprocess B f))
+      ≤
+      ev ψ
+          ((leftPlacedSubMeas (ιB := ι) A).total *
+            (rightPlacedSubMeas (ιA := ι) B).total) -
+        qMatchMass ψ
+          (leftPlacedSubMeas (ιB := ι) A)
+          (rightPlacedSubMeas (ιA := ι) B) := by
+    linarith
+  unfold qConsDefect
+  have htotal :
+      ev ψ
+          ((leftPlacedSubMeas (ιB := ι) (postprocess A f)).total *
+            (rightPlacedSubMeas (ιA := ι) (postprocess B f)).total) =
+        ev ψ
+          ((leftPlacedSubMeas (ιB := ι) A).total *
+            (rightPlacedSubMeas (ιA := ι) B).total) := by
+    simp [leftPlacedSubMeas, rightPlacedSubMeas, postprocess_total]
+  rw [htotal]
+  exact max_le_max le_rfl hsub
 
 /-- `prop:simeq-data-processing`.
 
@@ -149,7 +321,24 @@ theorem simeqDataProcessing {Question α β : Type*}
       ConsRel ψ 𝒟
         (fun q => leftPlacedSubMeas (ιB := ι) (postprocess ((A q).toSubMeas) f))
         (fun q => rightPlacedSubMeas (ιA := ι) (postprocess ((B q).toSubMeas) f)) δ := by
-  sorry
+  intro ⟨hcons⟩
+  constructor
+  unfold consError at *
+  calc
+    avgOver 𝒟
+        (fun q =>
+          qConsDefect ψ
+            (leftPlacedSubMeas (ιB := ι) (postprocess ((A q).toSubMeas) f))
+            (rightPlacedSubMeas (ιA := ι) (postprocess ((B q).toSubMeas) f)))
+      ≤ avgOver 𝒟
+          (fun q =>
+            qConsDefect ψ
+              (leftPlacedSubMeas (ιB := ι) ((A q).toSubMeas))
+              (rightPlacedSubMeas (ιA := ι) ((B q).toSubMeas))) := by
+          apply avgOver_mono
+          intro q
+          exact qConsDefect_leftRight_postprocess_le ψ (A q).toSubMeas (B q).toSubMeas f
+    _ ≤ δ := hcons
 
 /-! ### Infrastructure: triangle inequality for `SDDRel` -/
 
@@ -236,6 +425,19 @@ private lemma consSubMeas_diagonalControl
       (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) γ →
     SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A)
       (diagonalSandwichFamily A B) γ := by
+  /-
+  Paper proof:
+  `A_a ⊗ I - A_a ⊗ B_a = A_a ⊗ (I - B_a)`.
+  The latter is PSD and bounded by `1`, so its square is dominated by itself.
+  Summing over `a` gives exactly the off-diagonal consistency defect because `B`
+  is a complete measurement.
+
+  Lean status:
+  the new bipartite statement is now aligned with the paper, but the remaining
+  work is a fairly long matrix-rewrite proof turning the `qSDD` summands into
+  `opTensor ((A q).outcome a) (1 - (B q).outcome a)` and then matching the
+  resulting sum with `qConsDefect` on the lifted families.
+  -/
   sorry
 
 private lemma consSubMeas_sandwichControl
@@ -250,6 +452,19 @@ private lemma consSubMeas_sandwichControl
     SDDRel ψ 𝒟
       (diagonalSandwichFamily A B)
       (totalSandwichFamily A B) γ := by
+  /-
+  Paper proof:
+  `A_a ⊗ B_a - A ⊗ B_a = -((A - A_a) ⊗ B_a)`.
+  Again the difference term is PSD, bounded by `1`, and its square is
+  dominated by itself. Summing over `a` turns the result into the same
+  off-diagonal consistency defect as above.
+
+  Lean status:
+  after the statement reformulation this is now the right bridge lemma, but
+  the remaining work is another long `Matrix.kronecker` normalization proof
+  matching the summed tensor expression with `qConsDefect` on the lifted
+  families.
+  -/
   sorry
 
 private lemma consSubMeas_combinedControl
@@ -308,6 +523,18 @@ private lemma switchSandwich_leftTransfer
     |leftSandwichExpectation ψ 𝒟 A B -
       middleSandwichExpectation ψ 𝒟 A B| ≤
       2 * Real.sqrt δ := by
+  /-
+  Paper proof:
+  insert the intermediate term
+  `E_x ∑_a ⟨ψ, A_a B ⊗ A_a ψ⟩`,
+  then bound each of the two differences by `sqrt δ` using Cauchy-Schwarz,
+  projectivity of `A`, and the assumption `0 ≤ B ≤ I`.
+
+  Lean status:
+  the remaining blocker is a weighted Cauchy-Schwarz lemma over the combined
+  `(q, a)` sum with the `avgOver` weights, together with a small amount of
+  tensor-placement algebra identifying the two difference terms from the paper.
+  -/
   sorry
 
 private lemma switchSandwich_rightTransfer
@@ -323,6 +550,17 @@ private lemma switchSandwich_rightTransfer
     |middleSandwichExpectation ψ 𝒟 A B -
       rightSandwichExpectation ψ 𝒟 A B| ≤
       Real.sqrt δ := by
+  /-
+  Paper proof:
+  rewrite the difference as the expectation of
+  `(B ⊗ I) · (A_a ⊗ I - I ⊗ A_a)`,
+  apply Cauchy-Schwarz once, and use projectivity to collapse the double sum in
+  the second factor back to the original `≈_δ` expression.
+
+  Lean status:
+  this is mathematically straightforward after the statement fix, but it needs
+  the same weighted Cauchy-Schwarz infrastructure as the left-transfer lemma.
+  -/
   sorry
 
 /-- `prop:switch-sandwich`. -/
@@ -358,6 +596,16 @@ private lemma completenessTransfer_core {Question Outcome : Type*}
       idxSubMeasMass ψ 𝒟
         (IdxProjSubMeas.toIdxSubMeas P)
         - 2 * Real.sqrt ε := by
+  /-
+  Paper proof factors the comparison through the mixed overlaps
+  `⟨ψ, A_a P_a ψ⟩` and uses the easy `≈_δ`-to-expectation estimate twice.
+
+  Lean status:
+  the normalization hypothesis is now exactly what is needed, but the missing
+  ingredient is a small weighted Cauchy-Schwarz lemma for the `avgOver` /
+  `Finset.sum` combination over `(q, a)` that converts the `sddError ≤ ε`
+  hypothesis into the expected `sqrt ε` overlap loss.
+  -/
   sorry
 
 /-- `prop:completeness-transfer-projective-P`. -/
@@ -415,10 +663,15 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error) :
     (PermInvState ψ ∧ SSCRel ψ 𝒟 (IdxSubMeas.liftLeft A) δ) →
-      BipartiteSDDRel ψ 𝒟 A A (2 * δ) := by
-  sorry
+      SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft A) (2 * δ) := by
+  intro ⟨_, ⟨hδ⟩⟩
+  constructor
+  rw [sddError_self]
+  have hδ_nonneg : 0 ≤ δ :=
+    le_trans (sscError_nonneg ψ 𝒟 (IdxSubMeas.liftLeft A)) hδ
+  linarith
 
-private lemma constFamily_sdd_unit
+lemma constFamily_sdd_unit
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
@@ -427,7 +680,7 @@ private lemma constFamily_sdd_unit
       qSDD ψ A B := by
   simp [sddError, avgOver, uniformDistribution, constSubMeasFamily]
 
-private lemma constFamily_ssc_unit
+lemma constFamily_ssc_unit
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι) :
@@ -435,7 +688,7 @@ private lemma constFamily_ssc_unit
       qSSCDefect ψ A := by
   simp [sscError, avgOver, uniformDistribution, constSubMeasFamily]
 
-private lemma completion_self_distance
+lemma completion_self_distance
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (B : SubMeas Outcome ι) (a0 : Outcome) :
@@ -528,7 +781,6 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
         ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
           ((1 : MIPStarRE.Quantum.Op ι) - B.total)) :=
     completion_self_distance ψ B a0
-  clear hζ' hδ' hBC
   sorry
 
 /-- `prop:completing-to-measurement`. -/

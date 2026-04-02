@@ -370,12 +370,11 @@ structure GlobalVarianceDecomposition (params : Parameters)
 This uses the orthogonal projector onto the non-constant Fourier modes. -/
 noncomputable def globalVarianceTraceWitness (params : Parameters)
     (_A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
-    (decomp : GlobalVarianceDecomposition params _A) : MIPStarRE.Quantum.Op ι :=
+    (_decomp : GlobalVarianceDecomposition params _A) : MIPStarRE.Quantum.Op ι :=
   let Acombine := combinedOperator params _A
   let liftedOrthogonalState :
       Matrix (combinedColumnIndex params ι) (combinedColumnIndex params ι) ℂ :=
     Matrix.kronecker (orthogonalModeProjector params) ψ.density
-  let _ := decomp
   Acombineᴴ * (liftedOrthogonalState * Acombine)
 
 /-- The local-variance trace expression from `lem:local-rewrite`. -/

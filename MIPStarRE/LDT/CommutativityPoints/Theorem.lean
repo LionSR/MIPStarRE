@@ -77,6 +77,53 @@ theorem commutativityPoints
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     CommutativityPointsStatement params strategy eps delta gamma := by
-  sorry
+  refine
+    { sampledDiagonalLineConsistency := by
+        /-
+        This is the diagonal-lines test, rewritten in the
+        `PointDiagonalLineQuestion` indexing used in this section.
+        -/
+        sorry
+      sampledDiagonalLineApproximation := by
+        /-
+        Apply `prop:simeq-to-approx` to the previous consistency statement.
+        -/
+        sorry
+      orderedLiftToMixedBridge := by
+        /-
+        First replacement step in the paper:
+        `(A^u_a A^v_b) ⊗ I ≈ A^u_a ⊗ L^ℓ_[f(v)=b]`.
+        -/
+        sorry
+      orderedLiftToLineBridge := by
+        /-
+        Second replacement step:
+        `A^u_a ⊗ L^ℓ_[f(v)=b] ≈ I ⊗ (L^ℓ_[f(v)=b] L^ℓ_[f(u)=a])`.
+        -/
+        sorry
+      diagonalLineProjectiveSwap := by
+        /-
+        The middle exact equality uses projectivity of the diagonal-line
+        measurement on the common sampled line.
+        -/
+        sorry
+      reversedDropFromLineBridge := by
+        /-
+        Third replacement step:
+        `I ⊗ (L^ℓ_[f(u)=a] L^ℓ_[f(v)=b]) ≈ A^v_b ⊗ L^ℓ_[f(u)=a]`.
+        -/
+        sorry
+      reversedDropToPointsBridge := by
+        /-
+        Final replacement step:
+        `A^v_b ⊗ L^ℓ_[f(u)=a] ≈ (A^v_b A^u_a) ⊗ I`.
+        -/
+        sorry
+      pointwiseCommutation := by
+        /-
+        This is the final triangle-inequality assembly of the four
+        `≈_{2γm}` steps plus the exact projective swap.
+        -/
+        sorry }
 
 end MIPStarRE.LDT.CommutativityPoints

@@ -292,6 +292,12 @@ lemma selfImprovementHelper
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusion params strategy G T H Z eps delta gamma nu := by
+  /-
+  This wrapper theorem depends on `sdp`, `addInU`, and the downstream
+  bookkeeping lemmas that are themselves still placeholders in this file.
+  Keeping the wrapper as an explicit placeholder avoids unrelated ordering and
+  elaboration failures during repository builds.
+  -/
   sorry
 
 /-- `lem:sdp`. -/
@@ -299,6 +305,12 @@ lemma sdp
     (params : Parameters)
     (strategy : SymStrat params ι) :
     SdpStatement params strategy := by
+  /-
+  This is the full SDP duality/Slater/complementary-slackness argument from
+  `references/ldt-paper/self_improvement.tex`. It is a standalone proof rather
+  than a wrapper around earlier formalized lemmas, so I am leaving the theorem
+  body as the focused remaining blocker for this file.
+  -/
   sorry
 
 /-- `lem:add-in-u`. -/
@@ -311,6 +323,12 @@ lemma addInU {Outcome : Type*} [Fintype Outcome]
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι) :
     AddInUStatement params strategy T M H eps delta := by
+  /-
+  This is the long Cauchy-Schwarz / variance-transfer estimate from
+  `lem:add-in-u`. The statement is not purely compositional because it must
+  recover the displayed equality `H = averagedSandwichedPolynomialSubMeas ...`
+  and the transfer bound for an arbitrary selection family `S`.
+  -/
   sorry
 
 /-- `thm:self-improvement`. -/
@@ -325,6 +343,11 @@ theorem selfImprovement
       G.toSubMeas.liftLeft nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
+  /-
+  This theorem packages `selfImprovementHelper` with `orthonormalization`.
+  Since both components remain placeholders in the current development, the
+  wrapper is left as a placeholder as well to keep `lake build` green.
+  -/
   sorry
 
 /--
@@ -345,6 +368,10 @@ theorem selfImprovementFromSubMeas
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementSubMeasConclusion params strategy G H Z
         eps delta gamma nu := by
-  sorry
+  rcases selfImprovement params strategy eps delta gamma nu hgood Gmeas
+      (by simpa [hbridge] using hcons) with ⟨H, Z, hH⟩
+  refine ⟨H, Z, ?_⟩
+  exact
+    { measurementBridge := ⟨Gmeas, hbridge, hH⟩ }
 
 end MIPStarRE.LDT.SelfImprovement

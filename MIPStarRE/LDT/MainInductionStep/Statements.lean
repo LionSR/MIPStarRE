@@ -109,7 +109,7 @@ structure RestrictedProbabilitiesStatement (params : Parameters)
         averageRestrictedAxisParallelError params profile
           ≤ sliceConditioningLoss params * eps ∧
         averageRestrictedSelfConsistencyError params profile ≤ delta ∧
-      avgOver (uniformDistribution (Fq params))
+        avgOver (uniformDistribution (Fq params))
           (fun x => sliceDiagonalDirectionWeight params * profile.diagonal x) ≤ gamma ∧
         averageRestrictedDiagonalError params profile
           ≤ sliceDiagonalConditioningLoss params * gamma ∧

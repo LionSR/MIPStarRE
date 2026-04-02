@@ -160,6 +160,13 @@ theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     (B : IdxSubMeas QuestionB OutcomeB ι) :
     ∃ data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι,
       NaimarkStatement ψ A B data := by
+  /-
+  This theorem really is a tensor-product assembly of one-measurement Naimark
+  dilations, but the local proof is still blocked on constructing the combined
+  lifted state and per-question projective families from `oneMeasNaimark`.
+  I am leaving the full composition as a focused blocker rather than fabricating
+  a dummy witness.
+  -/
   sorry
 
 /-! ### Orthonormalization (Theorem 5.4 / thm:orthonormalization) -/
@@ -177,6 +184,11 @@ theorem orthonormalization {Outcome : Type*}
           (constSubMeasFamily A)
           (constSubMeasFamily P.toSubMeas)
           (orthonormalizationError ζ) := by
+  /-
+  This theorem still needs the completion-to-measurement bridge and the final
+  error bookkeeping around `orthonormalizationMainLemma`. It is not just a thin
+  wrapper around the already-formalized lemmas yet.
+  -/
   sorry
 
 /-! ### Orthonormalization helper lemmas -/
@@ -193,6 +205,12 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
       ∃ P : ProjSubMeas Outcome ι,
         RoundedProjMeasStatement ψ A P
           (orthonormalizationMainLemmaError ζ) := by
+  /-
+  This is compositionally `consistencyToAlmostProjective` followed by
+  `roundAlmostProjMeas`, but in the current file order those helper lemmas are
+  declared later. Rather than reorder the section wholesale in this pass, I am
+  leaving the wrapper theorem itself as the local placeholder.
+  -/
   sorry
 
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
@@ -239,6 +257,8 @@ lemma roundAlmostProjMeas {Outcome : Type*}
       ∃ P : ProjSubMeas Outcome ι,
         RoundedProjMeasStatement ψ A P
           (roundingToProjectiveError ζ) := by
+  -- Composition of spectralTruncateAlmostProjective and adjustTruncatedProjections.
+  -- Currently hits universe metavariable issue in elaboration.
   sorry
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

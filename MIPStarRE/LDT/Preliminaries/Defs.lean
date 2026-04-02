@@ -46,6 +46,15 @@ structure ConsAgreement {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
     (A B : IdxMeas Question Outcome ι) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
 
+lemma leftTensor_mul_rightTensor_eq_opTensor
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A B : MIPStarRE.Quantum.Op ι) :
+    leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) B =
+      opTensor A B := by
+  simpa [leftTensor, rightTensor, opTensor] using
+    (Matrix.mul_kronecker_mul
+      A (1 : MIPStarRE.Quantum.Op ι) (1 : MIPStarRE.Quantum.Op ι) B).symm
+
 /-- `A_a ⊗ B_a`, the diagonal bipartite bridge from `prop:cons-sub-meas`. -/
 noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -62,13 +71,7 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
         rightTensor (ι₁ := ι) ((B q).outcome a)
     outcome_pos := by
       intro a
-      rw [show leftTensor (ι₂ := ι) ((A q).outcome a) *
-          rightTensor (ι₁ := ι) ((B q).outcome a) =
-            opTensor ((A q).outcome a) ((B q).outcome a) by
-              simpa [leftTensor, rightTensor, opTensor] using
-                (Matrix.mul_kronecker_mul
-                  ((A q).outcome a) (1 : MIPStarRE.Quantum.Op ι)
-                  (1 : MIPStarRE.Quantum.Op ι) ((B q).outcome a)).symm]
+      rw [leftTensor_mul_rightTensor_eq_opTensor]
       exact
         (Matrix.PosSemidef.kronecker
           (Matrix.nonneg_iff_posSemidef.mp ((A q).outcome_pos a))
@@ -123,13 +126,7 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
                       (Matrix.nonneg_iff_posSemidef.mp
                         (sub_nonneg.mpr (Measurement.outcome_le_one (B q) a)))
                 rwa [hrewrite]
-              rw [show leftTensor (ι₂ := ι) ((A q).outcome a) *
-                  rightTensor (ι₁ := ι) ((B q).outcome a) =
-                    opTensor ((A q).outcome a) ((B q).outcome a) by
-                      simpa [leftTensor, rightTensor, opTensor] using
-                        (Matrix.mul_kronecker_mul
-                          ((A q).outcome a) (1 : MIPStarRE.Quantum.Op ι)
-                          (1 : MIPStarRE.Quantum.Op ι) ((B q).outcome a)).symm]
+              rw [leftTensor_mul_rightTensor_eq_opTensor]
               exact hopTensor_le
         _ = leftTensor (ι₂ := ι) ((A q).total) := by
           rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a => (A q).outcome a)]
@@ -153,13 +150,7 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*}
         rightTensor (ι₁ := ι) ((B q).outcome a)
     outcome_pos := by
       intro a
-      rw [show leftTensor (ι₂ := ι) ((A q).total) *
-          rightTensor (ι₁ := ι) ((B q).outcome a) =
-            opTensor ((A q).total) ((B q).outcome a) by
-              simpa [leftTensor, rightTensor, opTensor] using
-                (Matrix.mul_kronecker_mul
-                  ((A q).total) (1 : MIPStarRE.Quantum.Op ι)
-                  (1 : MIPStarRE.Quantum.Op ι) ((B q).outcome a)).symm]
+      rw [leftTensor_mul_rightTensor_eq_opTensor]
       exact
         (Matrix.PosSemidef.kronecker
           (Matrix.nonneg_iff_posSemidef.mp (SubMeas.total_nonneg (A q)))

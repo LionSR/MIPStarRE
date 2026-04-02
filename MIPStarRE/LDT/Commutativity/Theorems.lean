@@ -126,7 +126,17 @@ lemma commDataProcessedG
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
     CommDataProcessedGConclusion params strategy family gamma zeta := by
-  sorry
+  refine
+    { postprocessedPointConsistency := ?_
+      postprocessedSelfConsistency := by
+        sorry
+      stabilityOne := by
+        sorry
+      stabilityTwo := by
+        sorry
+      evaluatedSliceCommutation := by
+        sorry }
+  simpa [evaluatedPointFamily] using hcons.pointConsistency
 
 /-- `thm:com-main`. -/
 theorem comMain
@@ -139,7 +149,14 @@ theorem comMain
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
     ComMainConclusion params strategy family gamma zeta := by
-  sorry
+  let hEval :=
+    commDataProcessedG params strategy eps delta gamma zeta hgood family hcons hself hbound
+  refine
+    { evaluatedCommutation := hEval
+      evaluationSpecialization := by
+        sorry
+      fullSliceCommutation := by
+        sorry }
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}

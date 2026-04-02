@@ -49,6 +49,7 @@ lemma ldPastingSubMeas
       LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
   sorry
 
+/-- `prop:ld-dnoteq`. -/
 theorem ldDnoteq
     (params : Parameters) (k : ℕ) :
     totalVariationDistance (uniformDistribution (PointTuple params k))
@@ -109,7 +110,6 @@ lemma looksEasyButTookMeAWhile
   · -- Interior case: `lambda ≠ 0` and `lambda ≠ 1`, hence `0 < lambda < 1`.
     push_neg at hl_boundary
     have hlpos : 0 < lambda := lt_of_le_of_ne h0 (Ne.symm hl_boundary.1)
-    have hl_lt_one : lambda < 1 := lt_of_le_of_ne h1 hl_boundary.2
     let e : Error := 1 / ((d + 1 : ℕ) : Error)
     have hd1_ne : (((d + 1 : ℕ) : Error)) ≠ 0 := by positivity
     have he_mul : (((d + 1 : ℕ) : Error)) * e = 1 := by
@@ -117,10 +117,6 @@ lemma looksEasyButTookMeAWhile
       field_simp [hd1_ne]
     have he_mul' : e * (((d + 1 : ℕ) : Error)) = 1 := by
       simpa [mul_comm] using he_mul
-    have he_mul_succ : ((d : Error) + 1) * e = 1 := by
-      simpa using he_mul
-    have he_mul_succ' : e * ((d : Error) + 1) = 1 := by
-      simpa [mul_comm] using he_mul_succ
     have hgeom :
         (∑ i ∈ Finset.range d, lambda ^ i) * (1 - lambda) = 1 - lambda ^ d := by
       simpa [mul_comm] using geom_sum_mul_neg lambda d
@@ -200,6 +196,12 @@ lemma gCompleteSelfConsistency
     (zeta : Error)
     (hself : family.StronglySelfConsistent ψbi zeta) :
     GCompleteSelfConsistencyStatement params ψbi family zeta := by
+  /-
+  Paper reference: `lem:g-complete-self-consistency` in
+  `references/ldt-paper/ld-pasting.tex`.
+  This should convert slice strong self-consistency into self-consistency of the
+  complete part `G^x = ∑_g G^x_g`.
+  -/
   sorry
 
 /-- `cor:g-bot-self-consistency`. -/
@@ -231,6 +233,12 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
       (switcherooPointProductRight params family M)
       chi) :
     CommutativitySwitcherooStatement params ψbi family M zeta omega chi := by
+  /-
+  Paper reference: `lem:commutativity-switcheroo` in
+  `references/ldt-paper/ld-pasting.tex`.
+  This is the main aggregate-commutation step upgrading commutation with each
+  `G^x_g` to commutation with the total `G^x`.
+  -/
   sorry
 
 /-- `cor:commuting-with-G-complete`. -/
@@ -278,6 +286,11 @@ lemma commuteGHalfSandwich
     (hk : 2 ≤ k)
     (hfacts : GHatFactsStatement params ψbi family gamma zeta) :
     CommuteGHalfSandwichStatement params ψbi family gamma zeta k := by
+  /-
+  Deferred core argument from `lem:commute-g-half-sandwich` in
+  `references/ldt-paper/ld-pasting.tex`.
+  The proof iterates the `\widehat G` commutation bound across the half-sandwich.
+  -/
   sorry
 
 /-- `lem:ld-sandwich-line-one-point`. -/
@@ -295,6 +308,12 @@ lemma ldSandwichLineOnePoint
     (k i : ℕ)
     (hi : i < k) :
     LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i := by
+  /-
+  Deferred core argument from `lem:ld-sandwich-line-one-point` in
+  `references/ldt-paper/ld-pasting.tex`.
+  This is the one-point comparison between the sandwiched completed-slice outcome
+  and the vertical-line measurement.
+  -/
   sorry
 
 /-- `lem:h-b-consistency`. -/
@@ -311,6 +330,11 @@ lemma hBConsistency
     (hline : ∀ i : ℕ, i < k →
       LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i) :
     HBConsistencyStatement params strategy family eps delta gamma zeta k := by
+  /-
+  Deferred packaging argument after `lem:ld-sandwich-line-one-point` in
+  `references/ldt-paper/ld-pasting.tex`; this is the `lem:h-b-consistency`
+  aggregation over all slice locations.
+  -/
   sorry
 
 /-- `lem:over-all-outcomes`. -/
@@ -325,6 +349,12 @@ lemma overAllOutcomes
     (hbound : family.Bounded strategy.state zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
+  /-
+  Deferred core argument from `lem:over-all-outcomes` in
+  `references/ldt-paper/ld-pasting.tex`.
+  The proof expands the total mass of the pasted measurement across all completed
+  outcome types `τ`.
+  -/
   sorry
 
 /-- `lem:from-H-to-G`. -/
@@ -341,6 +371,12 @@ lemma fromHToG
     (k : ℕ)
     (hhalf : CommuteGHalfSandwichStatement params ψbi family gamma zeta k) :
     FromHToGStatement params strategy family gamma zeta k := by
+  /-
+  Deferred core argument from `lem:from-H-to-G` in
+  `references/ldt-paper/ld-pasting.tex`.
+  This is the Bernoulli-tail recurrence converting the all-outcomes expansion to
+  the averaged complete operator `G`.
+  -/
   sorry
 
 /-- `lem:chernoff-bernoulli-matrix`. -/
@@ -363,6 +399,10 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
            exact hXleOne } : SubMeas Unit ι)
       (1 - kappa)) :
     ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd hXleOne := by
+  /-
+  Deferred matrix Chernoff/Bernoulli-tail contraction argument from
+  `lem:chernoff-bernoulli-matrix` in `references/ldt-paper/ld-pasting.tex`.
+  -/
   sorry
 
 /-- `cor:ld-pasting-N-completeness`. -/
@@ -380,6 +420,11 @@ theorem ldPastingNCompleteness
     (hk : 400 * params.m * params.d ≤ k) :
     LdPastingNCompletenessStatement params strategy family kappa
       (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
+  /-
+  Paper reference: `cor:ld-pasting-N-completeness` in
+  `references/ldt-paper/ld-pasting.tex`.
+  This combines `overAllOutcomes`, `fromHToG`, and the matrix Chernoff bound.
+  -/
   sorry
 
 end MIPStarRE.LDT.Pasting
