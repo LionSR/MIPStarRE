@@ -120,10 +120,15 @@ private noncomputable def uniformAverageUnitSubMeas {α : Type*}
       simpa [averageOperatorOverDistribution, uniformDistribution] using
         le_trans hsum (le_of_eq hconst) }
 
-/-- The distribution of an axis-parallel line together with a point queried on it. -/
+/-- The distribution of an axis-parallel line together with a point queried on it.
+
+**Provisional placeholder**: uses the uniform distribution over all `(ℓ, u)` pairs,
+including pairs where `u` is not on `ℓ`. The paper samples `ℓ` uniformly and then
+`u` uniformly from `ℓ`. Replace with the correct conditional distribution once the
+line-point sampling infrastructure is available. -/
 noncomputable def axisParallelLineQuestionDistribution (params : Parameters) :
     Distribution (AxisParallelLineQuestion params) :=
-  uniformDistribution (AxisParallelLineQuestion params)
+  uniformDistribution (AxisParallelLineQuestion params) -- PROVISIONAL: see docstring
 
 /-- A placeholder distribution over low-degree polynomials. -/
 noncomputable def polynomialDistribution (params : Parameters) :
@@ -138,17 +143,27 @@ private noncomputable def polynomialAverageUnitSubMeas (params : Parameters)
   simpa [polynomialDistribution] using
     (uniformAverageUnitSubMeas (α := Polynomial params) f hpsd hle)
 
-/-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`. -/
+/-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`.
+
+**Provisional placeholder**: returns `1` (identity) for all inputs. This collapses
+all weighted operators to their unweighted variants and makes downstream variance
+quantities insensitive to the measurement family `G`. Replace with `matrixSqrt (G.outcome g)`
+once Mathlib provides a matrix square root API for PSD operators. -/
 noncomputable def polynomialWeightSqrtOperator (params : Parameters)
     (_G : SubMeas (Polynomial params) ι) (_g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  1 -- TODO: replace the neutral placeholder by the matrix square root of `G.outcome g`
+  1 -- PROVISIONAL: identity placeholder; see docstring
 
-/-- The weighted state `|ψ_g⟩ = (I ⊗ G_g^{1/2}) |ψ⟩`. -/
+/-- The weighted state `|ψ_g⟩ = (I ⊗ G_g^{1/2}) |ψ⟩`.
+
+**Provisional placeholder**: returns the unweighted strategy state for all inputs,
+ignoring both `G` and `g`. This breaks the intended per-polynomial weighting pipeline.
+Replace with `(I ⊗ polynomialWeightSqrtOperator G g) |ψ⟩` once the square root
+operator is implemented. -/
 noncomputable def weightedPolynomialState (params : Parameters)
     (strategy : SymStrat params ι)
     (_G : SubMeas (Polynomial params) ι) (_g : Polynomial params) :
     QuantumState (ι × ι) :=
-  strategy.state
+  strategy.state -- PROVISIONAL: unweighted; see docstring
 
 /-- The concrete operator `A^u_{g(u)}` for a fixed polynomial `g`. -/
 def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters)

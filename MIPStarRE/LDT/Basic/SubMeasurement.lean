@@ -291,7 +291,7 @@ def constSubMeasFamily {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [Deci
     IdxSubMeas Unit α ι :=
   fun _ => A
 
-private theorem leftTensor_finset_sum {α : Type*}
+theorem leftTensor_finset_sum {α : Type*}
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₁) :
     Finset.sum s (fun a => leftTensor (ι₂ := ι₂) (f a)) =
@@ -304,7 +304,7 @@ private theorem leftTensor_finset_sum {α : Type*}
       rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
       simp [leftTensor, Matrix.add_kronecker]
 
-private theorem rightTensor_finset_sum {α : Type*}
+theorem rightTensor_finset_sum {α : Type*}
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₂) :
     Finset.sum s (fun a => rightTensor (ι₁ := ι₁) (f a)) =
@@ -317,7 +317,7 @@ private theorem rightTensor_finset_sum {α : Type*}
       rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
       simp [rightTensor, Matrix.kronecker_add]
 
-private theorem leftTensor_nonneg
+theorem leftTensor_nonneg
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     {A : MIPStarRE.Quantum.Op ι₁} (hA : 0 ≤ A) :
     0 ≤ leftTensor (ι₂ := ι₂) A := by
@@ -328,7 +328,7 @@ private theorem leftTensor_nonneg
       (Matrix.nonneg_iff_posSemidef.mp
         (zero_le_one : (0 : MIPStarRE.Quantum.Op ι₂) ≤ 1))).nonneg
 
-private theorem rightTensor_nonneg
+theorem rightTensor_nonneg
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     {A : MIPStarRE.Quantum.Op ι₂} (hA : 0 ≤ A) :
     0 ≤ rightTensor (ι₁ := ι₁) A := by
@@ -339,7 +339,7 @@ private theorem rightTensor_nonneg
         (zero_le_one : (0 : MIPStarRE.Quantum.Op ι₁) ≤ 1))
       (Matrix.nonneg_iff_posSemidef.mp hA)).nonneg
 
-private theorem leftTensor_le_one
+theorem leftTensor_le_one
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     {A : MIPStarRE.Quantum.Op ι₁} (hA : A ≤ 1) :
     leftTensor (ι₂ := ι₂) A ≤ 1 := by
@@ -363,7 +363,7 @@ private theorem leftTensor_le_one
       leftTensor_nonneg (ι₂ := ι₂) (sub_nonneg.mpr hA)
   rwa [hrewrite]
 
-private theorem rightTensor_le_one
+theorem rightTensor_le_one
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     {A : MIPStarRE.Quantum.Op ι₂} (hA : A ≤ 1) :
     rightTensor (ι₁ := ι₁) A ≤ 1 := by

@@ -36,59 +36,6 @@ noncomputable instance (params : Parameters) : Fintype (DiagonalLine params) := 
         rfl }
   exact Fintype.ofEquiv (Point params × Point params) e.symm
 
-private theorem leftTensor_finset_sum_cp {α : Type*}
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₁) :
-    Finset.sum s (fun a => leftTensor (ι₂ := ι₂) (f a)) =
-      leftTensor (ι₂ := ι₂) (Finset.sum s f) := by
-  classical
-  induction s using Finset.induction_on with
-  | empty =>
-      simp [leftTensor]
-  | insert a s ha ih =>
-      rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
-      simp [leftTensor, Matrix.add_kronecker]
-
-private theorem rightTensor_finset_sum_cp {α : Type*}
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₂) :
-    Finset.sum s (fun a => rightTensor (ι₁ := ι₁) (f a)) =
-      rightTensor (ι₁ := ι₁) (Finset.sum s f) := by
-  classical
-  induction s using Finset.induction_on with
-  | empty =>
-      simp [rightTensor]
-  | insert a s ha ih =>
-      rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
-      simp [rightTensor, Matrix.kronecker_add]
-
-private theorem leftTensor_le_one_cp
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    {A : MIPStarRE.Quantum.Op ι₁} (hA : A ≤ 1) :
-    leftTensor (ι₂ := ι₂) A ≤ 1 := by
-  change (1 - leftTensor (ι₂ := ι₂) A).PosSemidef
-  have hrewrite : 1 - leftTensor (ι₂ := ι₂) A = leftTensor (ι₂ := ι₂) (1 - A) := by
-    ext i j
-    rcases i with ⟨i₁, i₂⟩
-    rcases j with ⟨j₁, j₂⟩
-    by_cases h₁ : i₁ = j₁
-    · by_cases h₂ : i₂ = j₂
-      · subst h₁
-        subst h₂
-        simp [leftTensor, sub_eq_add_neg]
-      · simp [leftTensor, h₁, h₂, sub_eq_add_neg]
-    · by_cases h₂ : i₂ = j₂
-      · simp [leftTensor, h₁, h₂, sub_eq_add_neg]
-      · simp [leftTensor, h₁, h₂, sub_eq_add_neg]
-  have hpsd : Matrix.PosSemidef (leftTensor (ι₂ := ι₂) (1 - A)) := by
-    change Matrix.PosSemidef (Matrix.kronecker (1 - A) (1 : MIPStarRE.Quantum.Op ι₂))
-    exact
-      Matrix.PosSemidef.kronecker
-        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hA))
-        (Matrix.nonneg_iff_posSemidef.mp
-          (zero_le_one : (0 : MIPStarRE.Quantum.Op ι₂) ≤ 1))
-  rwa [hrewrite]
-
 private theorem opTensor_le_leftTensor
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     {A : MIPStarRE.Quantum.Op ι₁} {B : MIPStarRE.Quantum.Op ι₂}
@@ -207,8 +154,8 @@ noncomputable def tensorProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
             ∑ b : β, rightTensor (ι₁ := ι) (B.outcome b) := by
               rw [← Fintype.sum_mul_sum]
       _ = leftTensor (ι₂ := ι) A.total * rightTensor (ι₁ := ι) B.total := by
-            rw [leftTensor_finset_sum_cp (ι₂ := ι) Finset.univ A.outcome]
-            rw [rightTensor_finset_sum_cp (ι₁ := ι) Finset.univ B.outcome]
+            rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ A.outcome]
+            rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ B.outcome]
             rw [A.sum_eq_total, B.sum_eq_total]
   total_le_one := by
     calc
@@ -223,7 +170,7 @@ noncomputable def tensorProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
               (ι₂ := ι)
               (SubMeas.total_nonneg A)
               B.total_le_one
-      _ ≤ 1 := leftTensor_le_one_cp (ι₂ := ι) A.total_le_one
+      _ ≤ 1 := leftTensor_le_one (ι₂ := ι) A.total_le_one
 
 /-- Recover the sampled point from a diagonal-line/parameter sample. -/
 def sampledPointFromDiagonalQuestion (params : Parameters)
