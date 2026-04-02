@@ -95,20 +95,6 @@ private lemma matrixCombinedOperator_mul_conjTranspose_apply
       ((model.family u)ᴴ * model.family v) i j := by
   simp [matrixCombinedOperator, Matrix.mul_apply]
 
-private lemma rerandomizeCoordWeight_first_marginal (params : Parameters)
-    (u : Point params) :
-    ∑ v : Point params, rerandomizeCoordWeight params u v =
-      (hypercubeVertexCount params : Error)⁻¹ := by
-  sorry
-
-private lemma matrixLocalVarianceTraceWitness_trace_expand
-    (params : Parameters) (model : MatrixOperatorFamilyRealization params) :
-    Matrix.trace (matrixLocalVarianceTraceWitness params model) =
-      ∑ u : Point params, ∑ v : Point params,
-        matrixLaplacianOperator params u v *
-          Matrix.trace (model.state.matrix * ((model.family v)ᴴ * model.family u)) := by
-  sorry
-
 /-- The concrete matrix-level counterpart of `lem:local-to-global`. -/
 lemma matrixLocalToGlobal (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
