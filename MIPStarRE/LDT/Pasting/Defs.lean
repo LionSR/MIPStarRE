@@ -94,6 +94,16 @@ noncomputable def multiplyByTotalOnRight {α β : Type*} [Fintype α] [Fintype �
   total := A.total * B.total
   outcome_pos := by
     intro a
+    /-
+    This is false for arbitrary submeasurements without an extra commutativity
+    hypothesis. Even when `0 ≤ A.outcome a` and `0 ≤ B.total`, the product
+    `A.outcome a * B.total` need not be Hermitian, hence need not be PSD.
+    For example in dimension `2`, take
+      X = [[1, 0], [0, 0]]
+      Y = (1 / 2) * [[1, 1], [1, 1]];
+    then `0 ≤ X`, `0 ≤ Y`, but `X * Y = (1 / 2) * [[1, 1], [0, 0]]` is not
+    Hermitian.
+    -/
     sorry
   sum_eq_total := by
     calc
@@ -101,6 +111,13 @@ noncomputable def multiplyByTotalOnRight {α β : Type*} [Fintype α] [Fintype �
         simpa using (Finset.sum_mul Finset.univ (fun a => A.outcome a) B.total).symm
       _ = A.total * B.total := by rw [A.sum_eq_total]
   total_le_one := by
+    /-
+    This is also false without commutativity. From `A.total ≤ 1` and
+    `B.total ≤ 1` we cannot conclude `A.total * B.total ≤ 1` in the Loewner
+    order unless the factors commute (or one has a stronger structural
+    relation, such as a sandwich form). The same `2 x 2` example above shows
+    that the product of two PSD contractions need not even be Hermitian.
+    -/
     sorry
 
 /-- Multiply each outcome operator by a total operator on the left. -/
@@ -111,6 +128,11 @@ noncomputable def multiplyByTotalOnLeft {α β : Type*} [Fintype α] [Fintype β
   total := A.total * B.total
   outcome_pos := by
     intro b
+    /-
+    This has the same obstruction as `multiplyByTotalOnRight.outcome_pos`:
+    the product of two PSD operators need not be PSD without commutativity.
+    In general `A.total * B.outcome b` need not even be Hermitian.
+    -/
     sorry
   sum_eq_total := by
     calc
@@ -118,6 +140,11 @@ noncomputable def multiplyByTotalOnLeft {α β : Type*} [Fintype α] [Fintype β
         simpa using (Finset.mul_sum Finset.univ (fun b => B.outcome b) A.total).symm
       _ = A.total * B.total := by rw [B.sum_eq_total]
   total_le_one := by
+    /-
+    As above, `A.total ≤ 1` and `B.total ≤ 1` do not imply
+    `A.total * B.total ≤ 1` for arbitrary PSD contractions. A commutativity
+    hypothesis is needed to use the standard product bound.
+    -/
     sorry
 
 /-- Average an indexed family against a named distribution. -/

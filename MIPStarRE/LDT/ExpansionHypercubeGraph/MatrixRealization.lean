@@ -53,7 +53,19 @@ def hypercubeEdgePairFinset (params : Parameters) : Finset (Point params × Poin
 -- TODO: placeholder — should be the actual nonuniform distribution
 noncomputable def matrixHypercubeEdgeDistribution (params : Parameters) :
     Distribution (Point params × Point params) :=
-  sorry
+  { support := hypercubeEdgePairFinset params
+    weight := fun uv =>
+      if uv ∈ hypercubeEdgePairFinset params then
+        1 / ((hypercubeEdgePairFinset params).card : Error)
+      else 0
+    nonnegative := by
+      intro uv
+      by_cases huv : uv ∈ hypercubeEdgePairFinset params
+      · simp [huv]
+      · simp [huv]
+    outsideSupport := by
+      intro uv huv
+      simp [huv] }
 
 /-- The rank-one projector `|u⟩⟨u|` on the vertex register. -/
 def pointBasisProjectorMatrix (params : Parameters) (u : Point params) :

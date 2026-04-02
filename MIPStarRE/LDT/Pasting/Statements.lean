@@ -322,21 +322,60 @@ structure FromHToGStatement (params : Parameters)
         (bernoulliTailFromFamily params family k))
       (fromHToGError params gamma zeta k)
 
+/-- Positivity of the Bernoulli tail operator for a PSD contraction. -/
+private theorem bernoulliTailOperator_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι)
+    (hXpsd : 0 ≤ X)
+    (hXleOne : 0 ≤ (1 - X)) :
+    0 ≤ bernoulliTailOperator k degree X := by
+  classical
+  unfold bernoulliTailOperator
+  have hcomm : Commute X (1 - X) :=
+    (Commute.one_right X).sub_right (Commute.refl X)
+  have hXpow : ∀ n : ℕ, 0 ≤ X ^ n := by
+    intro n
+    induction n with
+    | zero =>
+        simp
+    | succ n ihn =>
+        simpa [pow_succ] using
+          Commute.mul_nonneg ihn hXpsd ((Commute.refl X).pow_left n)
+  have hOneSubPow : ∀ n : ℕ, 0 ≤ (1 - X) ^ n := by
+    intro n
+    induction n with
+    | zero =>
+        simp
+    | succ n ihn =>
+        simpa [pow_succ] using
+          Commute.mul_nonneg ihn hXleOne ((Commute.refl (1 - X)).pow_left n)
+  refine Finset.sum_nonneg fun r _ => ?_
+  have hprod : 0 ≤ X ^ r * (1 - X) ^ (k - r) := by
+    exact Commute.mul_nonneg
+      (hXpow r)
+      (hOneSubPow (k - r))
+      (hcomm.pow_pow r (k - r))
+  have hsmul : 0 ≤ ((Nat.choose k r : ℝ) • (X ^ r * (1 - X) ^ (k - r))) := by
+    exact smul_nonneg (by positivity) hprod
+  simpa using hsmul
+
 /-- Output package for `lem:chernoff-bernoulli-matrix`. -/
 structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
-    (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error) : Prop where
+    (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error)
+    (hXpsd : 0 ≤ X)
+    (hXleOne : 0 ≤ (1 - X))
+    (hTailLeOne : bernoulliTailOperator k degree X ≤ 1) : Prop where
   matrixTailBound :
     CompletenessAtLeast ψ
       ({ outcome := fun _ => bernoulliTailOperator k degree X
          total := bernoulliTailOperator k degree X
          outcome_pos := by
            intro _
-           sorry
+           exact bernoulliTailOperator_nonneg k degree X hXpsd hXleOne
          sum_eq_total := by
            simp
          total_le_one := by
-           sorry } : SubMeas Unit ι)
+           exact hTailLeOne } : SubMeas Unit ι)
       (1 - kappa / (1 - theta) - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2))
 
 /-- Output package for `cor:ld-pasting-N-completeness`. -/

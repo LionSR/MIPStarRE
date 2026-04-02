@@ -224,6 +224,155 @@ noncomputable def gHatRotatedHalfProductTotalOperator (params : Parameters)
       gHatHalfProductTotalOperator params family k (pointTupleTail xs) *
         ((gHatIdxMeas params family (xs 0)).toSubMeas).total
 
+lemma gHatHalfProductTotalOperator_eq_one (params : Parameters)
+    (family : IdxPolyFamily params ι) :
+    ∀ k (xs : PointTuple params k), gHatHalfProductTotalOperator params family k xs = 1
+  | 0, _xs => by
+      simp [gHatHalfProductTotalOperator]
+  | k + 1, xs => by
+      rw [gHatHalfProductTotalOperator]
+      simp [gHatIdxMeas, completeSubMeas,
+        gHatHalfProductTotalOperator_eq_one params family k (pointTupleTail xs)]
+
+lemma gHatRotatedHalfProductTotalOperator_eq_one (params : Parameters)
+    (family : IdxPolyFamily params ι) :
+    ∀ k (xs : PointTuple params k), gHatRotatedHalfProductTotalOperator params family k xs = 1
+  | 0, _xs => by
+      simp [gHatRotatedHalfProductTotalOperator]
+  | k + 1, xs => by
+      rw [gHatRotatedHalfProductTotalOperator]
+      simp [gHatIdxMeas, completeSubMeas,
+        gHatHalfProductTotalOperator_eq_one params family k (pointTupleTail xs)]
+
+lemma gHatHalfProduct_sum_eq_total (params : Parameters)
+    (family : IdxPolyFamily params ι) :
+    ∀ k (xs : PointTuple params k),
+      (∑ gs : GHatTupleOutcome params k,
+        gHatHalfProductOutcomeOperator params family k xs gs) =
+          gHatHalfProductTotalOperator params family k xs
+  | 0, _xs => by
+      simp [gHatHalfProductOutcomeOperator, gHatHalfProductTotalOperator]
+  | k + 1, xs => by
+      let α : Fin (k + 1) → Type := fun _ => GHatOutcome params
+      have hsplit :
+          (∑ gs : GHatTupleOutcome params (k + 1),
+              gHatHalfProductOutcomeOperator params family (k + 1) xs gs) =
+            ∑ p : GHatOutcome params × GHatTupleOutcome params k,
+              gHatHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2) := by
+        symm
+        exact Fintype.sum_equiv (Fin.consEquiv α)
+          (fun p =>
+            gHatHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2))
+          (fun gs => gHatHalfProductOutcomeOperator params family (k + 1) xs gs)
+          (by intro p; rfl)
+      rw [hsplit]
+      simp [gHatHalfProductOutcomeOperator]
+      rw [← Finset.univ_product_univ, Finset.sum_product]
+      calc
+        ∑ g : GHatOutcome params,
+            ∑ gs : GHatTupleOutcome params k,
+              (gHatIdxMeas params family (xs 0)).outcome g *
+                gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs
+          = ∑ g : GHatOutcome params,
+              (gHatIdxMeas params family (xs 0)).outcome g *
+                ∑ gs : GHatTupleOutcome params k,
+                  gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs := by
+              apply Finset.sum_congr rfl
+              intro g _hg
+              rw [Matrix.mul_sum]
+        _ = ∑ g : GHatOutcome params,
+              (gHatIdxMeas params family (xs 0)).outcome g *
+                gHatHalfProductTotalOperator params family k (pointTupleTail xs) := by
+              apply Finset.sum_congr rfl
+              intro g _hg
+              rw [gHatHalfProduct_sum_eq_total params family k (pointTupleTail xs)]
+        _ = (∑ g : GHatOutcome params, (gHatIdxMeas params family (xs 0)).outcome g) *
+              gHatHalfProductTotalOperator params family k (pointTupleTail xs) := by
+              symm
+              exact
+                Finset.sum_mul Finset.univ
+                  (fun g => (gHatIdxMeas params family (xs 0)).outcome g)
+                  (gHatHalfProductTotalOperator params family k (pointTupleTail xs))
+        _ = gHatHalfProductTotalOperator params family (k + 1) xs := by
+              rw [(gHatIdxMeas params family (xs 0)).sum_eq_total]
+              simp [gHatHalfProductTotalOperator]
+
+lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters)
+    (family : IdxPolyFamily params ι) :
+    ∀ k (xs : PointTuple params k),
+      (∑ gs : GHatTupleOutcome params k,
+        gHatRotatedHalfProductOutcomeOperator params family k xs gs) =
+          gHatRotatedHalfProductTotalOperator params family k xs
+  | 0, _xs => by
+      simp [gHatRotatedHalfProductOutcomeOperator, gHatRotatedHalfProductTotalOperator]
+  | k + 1, xs => by
+      let α : Fin (k + 1) → Type := fun _ => GHatOutcome params
+      have hsplit :
+          (∑ gs : GHatTupleOutcome params (k + 1),
+              gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs gs) =
+            ∑ p : GHatOutcome params × GHatTupleOutcome params k,
+              gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2) := by
+        symm
+        exact Fintype.sum_equiv (Fin.consEquiv α)
+          (fun p =>
+            gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2))
+          (fun gs => gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs gs)
+          (by intro p; rfl)
+      rw [hsplit]
+      simp [gHatRotatedHalfProductOutcomeOperator]
+      rw [← Finset.univ_product_univ, Finset.sum_product]
+      calc
+        ∑ g : GHatOutcome params,
+            ∑ gs : GHatTupleOutcome params k,
+              gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs *
+                (gHatIdxMeas params family (xs 0)).outcome g
+          = ∑ gs : GHatTupleOutcome params k,
+              ∑ g : GHatOutcome params,
+                gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs *
+                  (gHatIdxMeas params family (xs 0)).outcome g := by
+              rw [Finset.sum_comm]
+        _ = ∑ gs : GHatTupleOutcome params k,
+              gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs *
+                ∑ g : GHatOutcome params, (gHatIdxMeas params family (xs 0)).outcome g := by
+              apply Finset.sum_congr rfl
+              intro gs _hgs
+              rw [Matrix.mul_sum]
+        _ = ∑ gs : GHatTupleOutcome params k,
+              gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs *
+                (gHatIdxMeas params family (xs 0)).total := by
+              apply Finset.sum_congr rfl
+              intro gs _hgs
+              rw [(gHatIdxMeas params family (xs 0)).sum_eq_total]
+        _ = (∑ gs : GHatTupleOutcome params k,
+              gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs) *
+                (gHatIdxMeas params family (xs 0)).total := by
+              symm
+              exact
+                Finset.sum_mul Finset.univ
+                  (fun gs =>
+                    gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs)
+                  ((gHatIdxMeas params family (xs 0)).total)
+        _ = gHatRotatedHalfProductTotalOperator params family (k + 1) xs := by
+              rw [gHatHalfProduct_sum_eq_total params family k (pointTupleTail xs)]
+              simp [gHatRotatedHalfProductTotalOperator]
+
+lemma binomialOperatorTerm_nonneg {G : MIPStarRE.Quantum.Op ι} (n r : ℕ)
+    (hG : 0 ≤ G) (hGle : G ≤ 1) :
+    0 ≤ (Nat.choose n r : ℂ) • (G ^ r * (1 - G) ^ (n - r)) := by
+  have hcomm : Commute G (1 - G) :=
+    (Commute.one_right G).sub_right (Commute.refl G)
+  refine smul_nonneg ?_ ?_
+  · positivity
+  · have hGr : 0 ≤ G ^ r := by
+      exact (Matrix.PosSemidef.pow (Matrix.nonneg_iff_posSemidef.mp hG) r).nonneg
+    have hIG : 0 ≤ (1 - G) ^ (n - r) := by
+      exact
+        (Matrix.PosSemidef.pow
+          (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hGle)) (n - r)).nonneg
+    have hcommPow : Commute (G ^ r) ((1 - G) ^ (n - r)) :=
+      (hcomm.pow_left r).pow_right (n - r)
+    exact Commute.mul_nonneg hGr hIG hcommPow
+
 /-- Concrete family for the full sandwich
 `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k} \cdots \widehat G^{x_1}_{g_1}`. -/
 noncomputable def gHatSandwichFamily (params : Parameters)
@@ -246,9 +395,7 @@ noncomputable def gHatSandwichFamily (params : Parameters)
         -- the projectivity/completeness of the completed slice measurements.
         sorry
       total_le_one := by
-        -- This should follow once `sum_eq_total` identifies the total with a
-        -- completed measurement total and then squares an operator bounded by `1`.
-        sorry }
+        simp [gHatHalfProductTotalOperator_eq_one] }
 
 /-- Concrete family for the half-sandwich product of `k` completed slices. -/
 noncomputable def gHatHalfSandwichLeft (params : Parameters)
@@ -264,11 +411,9 @@ noncomputable def gHatHalfSandwichLeft (params : Parameters)
           -- expected to be PSD without extra commutativity hypotheses.
           sorry
         sum_eq_total := by
-          -- This should be a recursive regrouping identity over tuple outcomes.
-          sorry
+          exact gHatHalfProduct_sum_eq_total params family k xs
         total_le_one := by
-          -- This would need a separate operator-norm or monotonicity argument.
-          sorry }
+          simp [gHatHalfProductTotalOperator_eq_one] }
 
 /-- Concrete family for the cyclically permuted half-sandwich product. -/
 noncomputable def gHatHalfSandwichRight (params : Parameters)
@@ -284,11 +429,9 @@ noncomputable def gHatHalfSandwichRight (params : Parameters)
           -- expected to be PSD without extra commutativity hypotheses.
           sorry
         sum_eq_total := by
-          -- This should be a recursive regrouping identity over tuple outcomes.
-          sorry
+          exact gHatRotatedHalfProduct_sum_eq_total params family k xs
         total_le_one := by
-          -- This would need a separate operator-norm or monotonicity argument.
-          sorry }
+          simp [gHatRotatedHalfProductTotalOperator_eq_one] }
 
 /-- The operator-polynomial `S_{τ≥ℓ}` from `lem:from-H-to-G` (eq:S-def):
 `S_{τ≥ℓ} = ∑_{r : r + suffixWeight ≥ d+1} C(ℓ-1, r) · G^r · (I-G)^{(ℓ-1)-r}`
@@ -453,9 +596,14 @@ noncomputable def bernoulliTailFromFamily (params : Parameters)
       total := Y
       outcome_pos := by
         intro _
-        -- Each summand should be PSD because `G` and `1 - G` commute and are PSD,
-        -- but the matrix-power commutativity proof is still missing here.
-        sorry
+        let G := (IdxPolyFamily.averagedSubMeas family).total
+        have hG : 0 ≤ G := (IdxPolyFamily.averagedSubMeas family).total_nonneg
+        have hGle : G ≤ 1 := (IdxPolyFamily.averagedSubMeas family).total_le_one
+        change 0 ≤ bernoulliTailOperator k params.d G
+        unfold bernoulliTailOperator
+        refine Finset.sum_nonneg ?_
+        intro r _hr
+        exact binomialOperatorTerm_nonneg (G := G) k r hG hGle
       sum_eq_total := by
         simp
       total_le_one := by
