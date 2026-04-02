@@ -261,7 +261,7 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (hθ0 : 0 < theta) (hθ1 : theta < 1)
     (hk : (2 * (degree : Error)) / theta ≤ (k : Error))
     (hXpsd : 0 ≤ X)
-    (hXleOne : 0 ≤ (1 - X))
+    (hXleOne : X ≤ 1)
     (hTailLeOne : bernoulliTailOperator k degree X ≤ 1)
     (hcomplete : CompletenessAtLeast ψ
       ({ outcome := fun _ => X
@@ -272,9 +272,9 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
          sum_eq_total := by
            simp
          total_le_one := by
-           exact sub_nonneg.mp hXleOne } : SubMeas Unit ι)
+           exact hXleOne } : SubMeas Unit ι)
       (1 - kappa)) :
-    ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd (sub_nonneg.mp hXleOne) := by
+    ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd hXleOne := by
   sorry
 
 /-- `cor:ld-pasting-N-completeness`. -/

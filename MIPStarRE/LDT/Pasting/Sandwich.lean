@@ -29,7 +29,8 @@ def switcherooSelfConsistencyRight {Outcome : Type*} [Fintype Outcome] (params :
   fun x => rightPlacedSubMeas (ιA := ι) ((M x).toSubMeas)
 
 /-- Concrete hypothesis family for `G^x_g M^y_o`. -/
-noncomputable def switcherooPointProductLeft {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+noncomputable def switcherooPointProductLeft
+    {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxOpFamily (SlicePairQuestion params) (Polynomial params × Outcome) (ι × ι) :=
@@ -39,8 +40,10 @@ noncomputable def switcherooPointProductLeft {Outcome : Type*} [Fintype Outcome]
         ((family.meas q.1).toSubMeas)
         ((M q.2).toSubMeas)
 
-/-- Concrete hypothesis family for `M^y_o G^x_g` on the `Polynomial params × Outcome` outcome type. -/
-noncomputable def switcherooPointProductRight {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+/-- Concrete hypothesis family for `M^y_o G^x_g` on the
+`Polynomial params × Outcome` outcome type. -/
+noncomputable def switcherooPointProductRight
+    {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxOpFamily (SlicePairQuestion params) (Polynomial params × Outcome) (ι × ι) :=
@@ -194,7 +197,8 @@ noncomputable def gHatHalfProductOutcomeOperator (params : Parameters)
       ((gHatIdxMeas params family (xs 0)).toSubMeas).outcome (gs 0) *
         gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs)
 
-/-- The total half-product `\sum_{g_1,\dots,g_k} \widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
+/-- The total half-product
+`\sum_{g_1,\dots,g_k} \widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
 noncomputable def gHatHalfProductTotalOperator (params : Parameters)
     (family : IdxPolyFamily params ι) :
     (k : ℕ) → PointTuple params k → MIPStarRE.Quantum.Op ι
@@ -204,7 +208,8 @@ noncomputable def gHatHalfProductTotalOperator (params : Parameters)
       ((gHatIdxMeas params family (xs 0)).toSubMeas).total *
         gHatHalfProductTotalOperator params family k (pointTupleTail xs)
 
-/-- The cyclically rotated half-product `\widehat G^{x_2}_{g_2} \cdots \widehat G^{x_k}_{g_k} \widehat G^{x_1}_{g_1}`. -/
+/-- The cyclically rotated half-product
+`\widehat G^{x_2}_{g_2} \cdots \widehat G^{x_k}_{g_k} \widehat G^{x_1}_{g_1}`. -/
 noncomputable def gHatRotatedHalfProductOutcomeOperator (params : Parameters)
     (family : IdxPolyFamily params ι) :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → MIPStarRE.Quantum.Op ι
@@ -311,7 +316,8 @@ lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters)
           (∑ gs : GHatTupleOutcome params (k + 1),
               gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs gs) =
             ∑ p : GHatOutcome params × GHatTupleOutcome params k,
-              gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2) := by
+              gHatRotatedHalfProductOutcomeOperator
+                params family (k + 1) xs (Fin.cons p.1 p.2) := by
         symm
         exact Fintype.sum_equiv (Fin.consEquiv α)
           (fun p =>
@@ -758,7 +764,8 @@ noncomputable def hRestrictionToVerticalLine (params : Parameters)
     postprocess H (fun h => Polynomial.restrictToAxisParallelLine params.next h verticalLine)
 
 /-- Collapse a submeasurement to its `Unit`-valued total operator. -/
-noncomputable def pastedMeasurementTotal {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype α]
+noncomputable def pastedMeasurementTotal
+    {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype α]
     (H : SubMeas α ι) : IdxSubMeas Unit Unit ι :=
   constSubMeasFamily (postprocess H (fun _ => ()))
 
@@ -768,7 +775,8 @@ noncomputable def constructedPastedMeasurementTotal (params : Parameters)
     IdxSubMeas Unit Unit ι :=
   pastedMeasurementTotal (constructedPastedSubMeas params family k)
 
-/-- The expansion over all outcome types `τ`, written as the total mass of the averaged sandwich family. -/
+/-- The expansion over all outcome types `τ`, written as the
+total mass of the averaged sandwich family. -/
 noncomputable def allOutcomesExpansionFamily (params : Parameters)
     (_strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k : ℕ) :

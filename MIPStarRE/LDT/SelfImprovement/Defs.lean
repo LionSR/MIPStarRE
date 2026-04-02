@@ -170,7 +170,9 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
             averageOperatorOverDistribution 𝒟
               (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
           = ∑ u ∈ 𝒟.support, 𝒟.weight u •
-              ∑ h : Polynomial params, sandwichedPolynomialOutcomeOperatorAt params strategy T u h := by
+              ∑ h : Polynomial params,
+                sandwichedPolynomialOutcomeOperatorAt
+                  params strategy T u h := by
                 simp only [averageOperatorOverDistribution]
                 rw [Finset.sum_comm]
                 refine Finset.sum_congr rfl ?_
