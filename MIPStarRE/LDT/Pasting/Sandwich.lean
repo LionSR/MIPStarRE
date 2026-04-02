@@ -238,10 +238,16 @@ noncomputable def gHatSandwichFamily (params : Parameters)
         half * halfᴴ
       outcome_pos := by
         intro gs
-        sorry
+        simpa using
+          (Matrix.posSemidef_self_mul_conjTranspose
+            (gHatHalfProductOutcomeOperator params family k xs gs)).nonneg
       sum_eq_total := by
+        -- This requires a recursive regrouping over tuple outcomes together with
+        -- the projectivity/completeness of the completed slice measurements.
         sorry
       total_le_one := by
+        -- This should follow once `sum_eq_total` identifies the total with a
+        -- completed measurement total and then squares an operator bounded by `1`.
         sorry }
 
 /-- Concrete family for the half-sandwich product of `k` completed slices. -/
@@ -254,10 +260,14 @@ noncomputable def gHatHalfSandwichLeft (params : Parameters)
         total := gHatHalfProductTotalOperator params family k xs
         outcome_pos := by
           intro gs
+          -- The ordered half-product is not Hermitian in general, so this is not
+          -- expected to be PSD without extra commutativity hypotheses.
           sorry
         sum_eq_total := by
+          -- This should be a recursive regrouping identity over tuple outcomes.
           sorry
         total_le_one := by
+          -- This would need a separate operator-norm or monotonicity argument.
           sorry }
 
 /-- Concrete family for the cyclically permuted half-sandwich product. -/
@@ -270,10 +280,14 @@ noncomputable def gHatHalfSandwichRight (params : Parameters)
         total := gHatRotatedHalfProductTotalOperator params family k xs
         outcome_pos := by
           intro gs
+          -- The rotated half-product is not Hermitian in general, so this is not
+          -- expected to be PSD without extra commutativity hypotheses.
           sorry
         sum_eq_total := by
+          -- This should be a recursive regrouping identity over tuple outcomes.
           sorry
         total_le_one := by
+          -- This would need a separate operator-norm or monotonicity argument.
           sorry }
 
 /-- The operator-polynomial `S_{τ≥ℓ}` from `lem:from-H-to-G` (eq:S-def):
@@ -343,9 +357,26 @@ noncomputable def constructedPastedMeasurement (params : Parameters)
         total := 1
         outcome_pos := by
           intro h
-          sorry
+          by_cases hh : h = h₀
+          · simpa [hh, completionMass] using
+              add_nonneg (H.outcome_pos h₀) (sub_nonneg.mpr H.total_le_one)
+          · simp [hh, H.outcome_pos h]
         sum_eq_total := by
-          sorry
+          have hsingle :
+              (∑ x : Polynomial params.next,
+                  if x = h₀ then completionMass else 0) = completionMass := by
+            simpa using
+              (Finset.sum_ite_eq (s := Finset.univ) (a := h₀) (b := completionMass))
+          have hrewrite :
+              (∑ a : Polynomial params.next,
+                  if a = h₀ then H.outcome a + completionMass else H.outcome a) =
+                ∑ a : Polynomial params.next,
+                  (H.outcome a + if a = h₀ then completionMass else 0) := by
+            apply Finset.sum_congr rfl
+            intro a _
+            by_cases h : a = h₀ <;> simp [h]
+          rw [hrewrite, Finset.sum_add_distrib, H.sum_eq_total, hsingle]
+          simp [completionMass]
         total_le_one := by
           exact le_rfl }
   total_eq_one := rfl
@@ -422,10 +453,13 @@ noncomputable def bernoulliTailFromFamily (params : Parameters)
       total := Y
       outcome_pos := by
         intro _
+        -- Each summand should be PSD because `G` and `1 - G` commute and are PSD,
+        -- but the matrix-power commutativity proof is still missing here.
         sorry
       sum_eq_total := by
         simp
       total_le_one := by
+        -- This needs the Bernoulli-tail upper bound from the matrix Chernoff step.
         sorry }
 
 /-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`. -/
@@ -440,10 +474,14 @@ noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters)
       total := base.total * weight
       outcome_pos := by
         intro _
+        -- Expected from a commuting-product PSD argument once the recurrence
+        -- operators are connected to the Bernoulli polynomial rewrite.
         sorry
       sum_eq_total := by
         simp
       total_le_one := by
+        -- This is the substantive recurrence inequality, not just a bookkeeping
+        -- identity, so we leave it for the theorem-level argument.
         sorry }
 
 /-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`. -/
@@ -458,10 +496,14 @@ noncomputable def fromHToGRecurrenceRightFamily (params : Parameters)
       total := base.total * weight
       outcome_pos := by
         intro _
+        -- Expected from a commuting-product PSD argument once the recurrence
+        -- operators are connected to the Bernoulli polynomial rewrite.
         sorry
       sum_eq_total := by
         simp
       total_le_one := by
+        -- This is the substantive recurrence inequality, not just a bookkeeping
+        -- identity, so we leave it for the theorem-level argument.
         sorry }
 
 end MIPStarRE.LDT.Pasting
