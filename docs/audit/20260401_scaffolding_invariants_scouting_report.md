@@ -148,7 +148,7 @@ Why this matters:
 
 ## Execution plan (split into small PRs)
 
-## WP1 — semantic inventory PR
+### WP1 — semantic inventory PR
 
 Deliverables:
 
@@ -160,7 +160,7 @@ Definition of done:
 
 - each structure has owner file + one follow-up ticket/PR pointer.
 
-## WP2 — Tier-1 constructor hardening PRs
+### WP2 — Tier-1 constructor hardening PRs
 
 Deliverables:
 
@@ -172,7 +172,7 @@ Definition of done:
 
 - no Tier-1 constructor leaves core semantic obligations as placeholder proof holes.
 
-## WP3 — theorem stress-test PRs
+### WP3 — theorem stress-test PRs
 
 Deliverables:
 
@@ -185,7 +185,7 @@ Definition of done:
 - each hardened object has at least one theorem that would have failed under the
   old drift-prone scaffold shape.
 
-## WP4 — policy + guardrail PR
+### WP4 — policy + guardrail PR
 
 Deliverables:
 

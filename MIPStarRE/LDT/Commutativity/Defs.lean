@@ -36,10 +36,16 @@ noncomputable def appendRightTotalSubMeas {α : Type*} [Fintype α] {κ : Type*}
   total := A.total * X
   outcome_pos := by
     intro a
+    -- Not provable in general: `A.outcome a * X` need not be PSD when `X` is arbitrary.
     sorry
   sum_eq_total := by
-    sorry
+    calc
+      ∑ a : α, A.outcome a * X = (∑ a : α, A.outcome a) * X := by
+        rw [← Matrix.sum_mul]
+      _ = A.total * X := by
+        rw [A.sum_eq_total]
   total_le_one := by
+    -- Not provable in general from `A.total ≤ 1` when right-multiplying by an arbitrary `X`.
     sorry
 
 /-- Sandwiched product `A_a B_b A_a`.
@@ -57,11 +63,23 @@ noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α] [Fintype �
     ∑ a : α, A.outcome a * B.total * A.outcome a
   outcome_pos := by
     intro ab
-    cases ab
-    sorry
+    rintro ⟨a, b⟩
+    have hA := Matrix.nonneg_iff_posSemidef.mp (A.outcome_pos a)
+    simpa [hA.isHermitian.eq] using
+      (Matrix.PosSemidef.mul_mul_conjTranspose_same
+        (Matrix.nonneg_iff_posSemidef.mp (B.outcome_pos b))
+        (A.outcome a)).nonneg
   sum_eq_total := by
-    sorry
+    calc
+      ∑ ab : α × β, A.outcome ab.1 * B.outcome ab.2 * A.outcome ab.1 =
+          ∑ a : α, ∑ b : β, A.outcome a * B.outcome b * A.outcome a := by
+            rw [Fintype.sum_prod_type]
+      _ = ∑ a : α, A.outcome a * B.total * A.outcome a := by
+        refine Finset.sum_congr rfl ?_
+        intro a _
+        rw [← Matrix.sum_mul, ← Matrix.mul_sum, B.sum_eq_total]
   total_le_one := by
+    -- Not provable in general without extra hypotheses controlling `∑ a, A_a B.total A_a`.
     sorry
 
 /-- The full-slice question underlying an evaluated-slice sample. -/
@@ -250,10 +268,14 @@ noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Ty
         ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b
       outcome_pos := by
         intro b
-        sorry
+        simpa [normalizationConditionSandwichedOperator, ProjSubMeas.outcome_hermitian Q b] using
+          (Matrix.PosSemidef.mul_mul_conjTranspose_same
+            (Matrix.nonneg_iff_posSemidef.mp (P.outcome_pos a))
+            (Q.outcome b)).nonneg
       sum_eq_total := by
         rfl
       total_le_one := by
+        -- Not provable in general from the current hypotheses alone.
         sorry }
 
 /-- The total family `a ↦ ∑_b C_{a,b}` from `lem:normalization-condition`. -/
@@ -284,10 +306,13 @@ noncomputable def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
         (normalizationConditionSandwichedTotalOperator P Q a)ᴴ
   outcome_pos := by
     intro a
-    sorry
+    simpa using
+      (Matrix.posSemidef_self_mul_conjTranspose
+        (normalizationConditionSandwichedTotalOperator P Q a)).nonneg
   sum_eq_total := by
     rfl
   total_le_one := by
+    -- Not provable in general from the current hypotheses alone.
     sorry
 
 /-- The family `a ↦ (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
@@ -304,10 +329,13 @@ noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB :
         normalizationConditionSandwichedTotalOperator P Q a
   outcome_pos := by
     intro a
-    sorry
+    simpa using
+      (Matrix.posSemidef_conjTranspose_mul_self
+        (normalizationConditionSandwichedTotalOperator P Q a)).nonneg
   sum_eq_total := by
     rfl
   total_le_one := by
+    -- Not provable in general from the current hypotheses alone.
     sorry
 
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/

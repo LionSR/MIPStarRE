@@ -30,27 +30,125 @@ abbrev DegreeBoundedPolynomialAnswer (params : Parameters) :=
 abbrev DegreeBoundedLineAnswer (params : Parameters) :=
   Fq params → Fq params
 
+/-- Axis-parallel lines are finitely enumerable via their base point and direction. -/
+noncomputable instance (params : Parameters) : Fintype (AxisParallelLine params) := by
+  classical
+  let e : AxisParallelLine params ≃ Point params × Fin params.m :=
+    { toFun := fun ℓ => (ℓ.base, ℓ.direction)
+      invFun := fun bd => { base := bd.1, direction := bd.2 }
+      left_inv := by
+        intro ℓ
+        cases ℓ
+        rfl
+      right_inv := by
+        intro bd
+        cases bd
+        rfl }
+  exact Fintype.ofEquiv (Point params × Fin params.m) e.symm
+
+/-- The placeholder finite polynomial model uses classical equality on the bundled witness. -/
+noncomputable instance (params : Parameters) : DecidableEq (Polynomial params) :=
+  Classical.decEq _
+
+/-- A default low-degree polynomial used so uniform placeholder distributions are inhabited. -/
+instance (params : Parameters) : Nonempty (Polynomial params) := by
+  refine ⟨⟨0, ?_⟩⟩
+  intro i
+  simp
+
+/-- Package a single bounded operator as a `Unit`-valued submeasurement. -/
+private noncomputable def unitSubMeasOfBoundedOp
+    (X : MIPStarRE.Quantum.Op ι) (hXpsd : 0 ≤ X) (hXle : X ≤ 1) :
+    SubMeas Unit ι :=
+  { outcome := fun _ => X
+    total := X
+    outcome_pos := by
+      intro _
+      exact hXpsd
+    sum_eq_total := by
+      simp
+    total_le_one := by
+      exact hXle }
+
+/-- Left tensoring preserves positivity and boundedness for a bounded operator. -/
+private theorem leftTensor_of_boundedOp_pos
+    (X : MIPStarRE.Quantum.Op ι) (hXpsd : 0 ≤ X) (hXle : X ≤ 1) :
+    0 ≤ leftTensor (ι₂ := ι) X := by
+  simpa [unitSubMeasOfBoundedOp] using
+    (leftPlacedSubMeas (ιB := ι) (unitSubMeasOfBoundedOp X hXpsd hXle)).outcome_pos ()
+
+/-- Left tensoring preserves the `≤ 1` bound for a bounded operator. -/
+private theorem leftTensor_of_boundedOp_le_one
+    (X : MIPStarRE.Quantum.Op ι) (hXpsd : 0 ≤ X) (hXle : X ≤ 1) :
+    leftTensor (ι₂ := ι) X ≤ 1 := by
+  simpa [unitSubMeasOfBoundedOp] using
+    SubMeas.outcome_le_one
+      (leftPlacedSubMeas (ιB := ι) (unitSubMeasOfBoundedOp X hXpsd hXle)) ()
+
+/-- Uniformly average a family of bounded operators into a `Unit`-valued submeasurement. -/
+private noncomputable def uniformAverageUnitSubMeas {α : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    (f : α → MIPStarRE.Quantum.Op ι)
+    (hpsd : ∀ a, 0 ≤ f a) (hle : ∀ a, f a ≤ 1) :
+    SubMeas Unit ι :=
+  { outcome := fun _ => averageOperatorOverDistribution (uniformDistribution α) f
+    total := averageOperatorOverDistribution (uniformDistribution α) f
+    outcome_pos := by
+      intro _
+      simp [averageOperatorOverDistribution, uniformDistribution]
+      apply Finset.sum_nonneg
+      intro a ha
+      exact smul_nonneg (by positivity) (hpsd a)
+    sum_eq_total := by
+      simp
+    total_le_one := by
+      have hsum :
+          ∑ a : α, (1 / (Fintype.card α : Error)) • f a ≤
+            ∑ a : α, (1 / (Fintype.card α : Error)) • (1 : MIPStarRE.Quantum.Op ι) := by
+        apply Finset.sum_le_sum
+        intro a ha
+        exact smul_le_smul_of_nonneg_left (hle a) (by positivity)
+      have hconst :
+          (∑ a : α, (1 / (Fintype.card α : Error)) • (1 : MIPStarRE.Quantum.Op ι)) =
+            (1 : MIPStarRE.Quantum.Op ι) := by
+        have hcard : (Fintype.card α : Error) ≠ 0 := by positivity
+        ext i j
+        by_cases hij : i = j
+        · subst hij
+          simp [Finset.sum_const, nsmul_eq_mul]
+        · simp [Finset.sum_const, hij]
+      simpa [averageOperatorOverDistribution, uniformDistribution] using
+        le_trans hsum (le_of_eq hconst) }
+
 /-- The distribution of an axis-parallel line together with a point queried on it. -/
 noncomputable def axisParallelLineQuestionDistribution (params : Parameters) :
     Distribution (AxisParallelLineQuestion params) :=
-  sorry
+  uniformDistribution (AxisParallelLineQuestion params)
 
 /-- A placeholder distribution over low-degree polynomials. -/
 noncomputable def polynomialDistribution (params : Parameters) :
     Distribution (Polynomial params) :=
-  sorry
+  uniformDistribution (Polynomial params)
+
+/-- Specialization of `uniformAverageUnitSubMeas` to the project's polynomial placeholder distribution. -/
+private noncomputable def polynomialAverageUnitSubMeas (params : Parameters)
+    (f : Polynomial params → MIPStarRE.Quantum.Op ι)
+    (hpsd : ∀ g, 0 ≤ f g) (hle : ∀ g, f g ≤ 1) :
+    SubMeas Unit ι := by
+  simpa [polynomialDistribution] using
+    (uniformAverageUnitSubMeas (α := Polynomial params) f hpsd hle)
 
 /-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`. -/
 noncomputable def polynomialWeightSqrtOperator (params : Parameters)
-    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  sorry -- TODO: should be matrix square root of G.outcome g
+    (_G : SubMeas (Polynomial params) ι) (_g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
+  1 -- TODO: replace the neutral placeholder by the matrix square root of `G.outcome g`
 
 /-- The weighted state `|ψ_g⟩ = (I ⊗ G_g^{1/2}) |ψ⟩`. -/
 noncomputable def weightedPolynomialState (params : Parameters)
     (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) :
+    (_G : SubMeas (Polynomial params) ι) (_g : Polynomial params) :
     QuantumState (ι × ι) :=
-  sorry
+  strategy.state
 
 /-- The concrete operator `A^u_{g(u)}` for a fixed polynomial `g`. -/
 def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters)
@@ -111,11 +209,13 @@ noncomputable def generalizeBLeftOperatorAtPolynomial (params : Parameters)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) : MIPStarRE.Quantum.Op ι :=
   let (ℓ, u) := qu
-  ∑ f : AxisLinePolynomial params,
-    if f.poly.eval (decodeScalar (u ℓ.direction)) =
-       decodeScalar (g u)
-    then (strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f
-    else 0
+  (postprocess
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+      (fun f : AxisLinePolynomial params =>
+        if f.poly.eval (decodeScalar (u ℓ.direction)) = decodeScalar (g u) then
+          some ()
+        else
+          none)).outcome (some ())
 
 /-- The event operator `B^ℓ_{[f = g|_ℓ]}`: sum of axis-line measurement
 outcomes `f` that agree with `g` restricted to line `ℓ`. -/
@@ -125,10 +225,13 @@ noncomputable def generalizeBRightOperatorAtPolynomial (params : Parameters)
     (qu : AxisParallelLineQuestion params) : MIPStarRE.Quantum.Op ι :=
   let ℓ := qu.1
   let gRestricted := Polynomial.restrictToAxisParallelLine params g ℓ
-  ∑ f : AxisLinePolynomial params,
-    if f.poly = gRestricted.poly
-    then (strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f
-    else 0
+  (postprocess
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+      (fun f : AxisLinePolynomial params =>
+        if f.poly = gRestricted.poly then
+          some ()
+        else
+          none)).outcome (some ())
 
 /-- The weighted left operator in `lem:generalize-b`
 on the bipartite space `d * d`. -/
@@ -151,6 +254,158 @@ noncomputable def weightedGeneralizeBRightOperatorAtPolynomial (params : Paramet
   opTensor
     (generalizeBRightOperatorAtPolynomial params strategy g qu)
     (polynomialWeightSqrtOperator params G g)
+
+private theorem pointConditionedOutcomeOperatorAtPolynomial_pos (params : Parameters)
+    (strategy : SymStrat params ι)
+    (g : Polynomial params) (u : Point params) :
+    0 ≤ pointConditionedOutcomeOperatorAtPolynomial params strategy g u := by
+  simpa [pointConditionedOutcomeOperatorAtPolynomial] using
+    (strategy.pointMeasurement u).outcome_pos (g u)
+
+private theorem pointConditionedOutcomeOperatorAtPolynomial_le_one (params : Parameters)
+    (strategy : SymStrat params ι)
+    (g : Polynomial params) (u : Point params) :
+    pointConditionedOutcomeOperatorAtPolynomial params strategy g u ≤ 1 := by
+  simpa [pointConditionedOutcomeOperatorAtPolynomial] using
+    Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u)
+
+private theorem generalizeBLeftOperatorAtPolynomial_pos (params : Parameters)
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    0 ≤ generalizeBLeftOperatorAtPolynomial params strategy g qu := by
+  classical
+  rcases qu with ⟨ℓ, u⟩
+  simpa [generalizeBLeftOperatorAtPolynomial] using
+    (postprocess
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+      (fun f : AxisLinePolynomial params =>
+        if f.poly.eval (decodeScalar (u ℓ.direction)) = decodeScalar (g u) then
+          some ()
+        else
+          none)).outcome_pos (some ())
+
+private theorem generalizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    generalizeBLeftOperatorAtPolynomial params strategy g qu ≤ 1 := by
+  classical
+  rcases qu with ⟨ℓ, u⟩
+  simpa [generalizeBLeftOperatorAtPolynomial] using
+    SubMeas.outcome_le_one
+      (postprocess
+        ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+        (fun f : AxisLinePolynomial params =>
+          if f.poly.eval (decodeScalar (u ℓ.direction)) = decodeScalar (g u) then
+            some ()
+          else
+            none))
+      (some ())
+
+private theorem generalizeBRightOperatorAtPolynomial_pos (params : Parameters)
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    0 ≤ generalizeBRightOperatorAtPolynomial params strategy g qu := by
+  classical
+  rcases qu with ⟨ℓ, u⟩
+  simpa [generalizeBRightOperatorAtPolynomial] using
+    (postprocess
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+      (fun f : AxisLinePolynomial params =>
+        if f.poly = (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
+          some ()
+        else
+          none)).outcome_pos (some ())
+
+private theorem generalizeBRightOperatorAtPolynomial_le_one (params : Parameters)
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    generalizeBRightOperatorAtPolynomial params strategy g qu ≤ 1 := by
+  classical
+  rcases qu with ⟨ℓ, u⟩
+  simpa [generalizeBRightOperatorAtPolynomial] using
+    SubMeas.outcome_le_one
+      (postprocess
+        ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+        (fun f : AxisLinePolynomial params =>
+          if f.poly = (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
+            some ()
+          else
+            none))
+      (some ())
+
+private theorem weightedPointConditionedOperatorAtPolynomial_pos (params : Parameters)
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) (u : Point params) :
+    0 ≤ weightedPointConditionedOperatorAtPolynomial params strategy G g u := by
+  simpa [weightedPointConditionedOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+    leftTensor_of_boundedOp_pos
+      (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
+      (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u)
+      (pointConditionedOutcomeOperatorAtPolynomial_le_one params strategy g u)
+
+private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Parameters)
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) (u : Point params) :
+    weightedPointConditionedOperatorAtPolynomial params strategy G g u ≤ 1 := by
+  simpa [weightedPointConditionedOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+    leftTensor_of_boundedOp_le_one
+      (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
+      (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u)
+      (pointConditionedOutcomeOperatorAtPolynomial_le_one params strategy g u)
+
+private theorem weightedGeneralizeBLeftOperatorAtPolynomial_pos (params : Parameters)
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    0 ≤ weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu := by
+  simpa [weightedGeneralizeBLeftOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+    leftTensor_of_boundedOp_pos
+      (generalizeBLeftOperatorAtPolynomial params strategy g qu)
+      (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)
+      (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu)
+
+private theorem weightedGeneralizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu ≤ 1 := by
+  simpa [weightedGeneralizeBLeftOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+    leftTensor_of_boundedOp_le_one
+      (generalizeBLeftOperatorAtPolynomial params strategy g qu)
+      (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)
+      (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu)
+
+private theorem weightedGeneralizeBRightOperatorAtPolynomial_pos (params : Parameters)
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    0 ≤ weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu := by
+  simpa [weightedGeneralizeBRightOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+    leftTensor_of_boundedOp_pos
+      (generalizeBRightOperatorAtPolynomial params strategy g qu)
+      (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)
+      (generalizeBRightOperatorAtPolynomial_le_one params strategy g qu)
+
+private theorem weightedGeneralizeBRightOperatorAtPolynomial_le_one (params : Parameters)
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu ≤ 1 := by
+  simpa [weightedGeneralizeBRightOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+    leftTensor_of_boundedOp_le_one
+      (generalizeBRightOperatorAtPolynomial params strategy g qu)
+      (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)
+      (generalizeBRightOperatorAtPolynomial_le_one params strategy g qu)
 
 /-- The squared norm expression controlled by `lem:generalize-b` for a fixed `g`.
 Uses bipartite state `ψbi` on `d * d`. -/
@@ -180,18 +435,10 @@ noncomputable def generalizeBLeftFamily (params : Parameters)
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (AxisParallelLineQuestion params) Unit (ι × ι) :=
   fun qu =>
-    let op :=
-      averageOperatorOverDistribution (polynomialDistribution params)
-        (fun g => weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu)
-    { outcome := fun _ => op
-      total := op
-      outcome_pos := by
-        intro _
-        sorry
-      sum_eq_total := by
-        simp
-      total_le_one := by
-        sorry }
+    polynomialAverageUnitSubMeas params
+      (fun g => weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu)
+      (fun g => weightedGeneralizeBLeftOperatorAtPolynomial_pos params strategy G g qu)
+      (fun g => weightedGeneralizeBLeftOperatorAtPolynomial_le_one params strategy G g qu)
 
 /-- Aggregated family for the right-hand side of `lem:generalize-b`
 on the bipartite space `d * d`. -/
@@ -200,18 +447,10 @@ noncomputable def generalizeBRightFamily (params : Parameters)
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (AxisParallelLineQuestion params) Unit (ι × ι) :=
   fun qu =>
-    let op :=
-      averageOperatorOverDistribution (polynomialDistribution params)
-        (fun g => weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu)
-    { outcome := fun _ => op
-      total := op
-      outcome_pos := by
-        intro _
-        sorry
-      sum_eq_total := by
-        simp
-      total_le_one := by
-        sorry }
+    polynomialAverageUnitSubMeas params
+      (fun g => weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu)
+      (fun g => weightedGeneralizeBRightOperatorAtPolynomial_pos params strategy G g qu)
+      (fun g => weightedGeneralizeBRightOperatorAtPolynomial_le_one params strategy G g qu)
 
 /-- Aggregated family for `A^u_[g(u)] ⊗ (G_g)^{1/2}`
 on the bipartite space `d * d`. -/
@@ -220,18 +459,10 @@ noncomputable def localVarianceLeftFamily (params : Parameters)
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (PointPairQuestion params) Unit (ι × ι) :=
   fun uv =>
-    let op :=
-      averageOperatorOverDistribution (polynomialDistribution params)
-        (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
-    { outcome := fun _ => op
-      total := op
-      outcome_pos := by
-        intro _
-        sorry
-      sum_eq_total := by
-        simp
-      total_le_one := by
-        sorry }
+    polynomialAverageUnitSubMeas params
+      (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
+      (fun g => weightedPointConditionedOperatorAtPolynomial_pos params strategy G g uv.1)
+      (fun g => weightedPointConditionedOperatorAtPolynomial_le_one params strategy G g uv.1)
 
 /-- Aggregated family for `A^v_[g(v)] ⊗ (G_g)^{1/2}`
 on the bipartite space `d * d`. -/
@@ -240,18 +471,10 @@ noncomputable def localVarianceRightFamily (params : Parameters)
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (PointPairQuestion params) Unit (ι × ι) :=
   fun uv =>
-    let op :=
-      averageOperatorOverDistribution (polynomialDistribution params)
-        (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)
-    { outcome := fun _ => op
-      total := op
-      outcome_pos := by
-        intro _
-        sorry
-      sum_eq_total := by
-        simp
-      total_le_one := by
-        sorry }
+    polynomialAverageUnitSubMeas params
+      (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)
+      (fun g => weightedPointConditionedOperatorAtPolynomial_pos params strategy G g uv.2)
+      (fun g => weightedPointConditionedOperatorAtPolynomial_le_one params strategy G g uv.2)
 
 /-- The same weighted operator on the first independently sampled point.
 On the bipartite space `d * d`. -/
@@ -260,18 +483,10 @@ noncomputable def globalVarianceLeftFamily (params : Parameters)
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (PointPairQuestion params) Unit (ι × ι) :=
   fun uv =>
-    let op :=
-      averageOperatorOverDistribution (polynomialDistribution params)
-        (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
-    { outcome := fun _ => op
-      total := op
-      outcome_pos := by
-        intro _
-        sorry
-      sum_eq_total := by
-        simp
-      total_le_one := by
-        sorry }
+    polynomialAverageUnitSubMeas params
+      (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
+      (fun g => weightedPointConditionedOperatorAtPolynomial_pos params strategy G g uv.1)
+      (fun g => weightedPointConditionedOperatorAtPolynomial_le_one params strategy G g uv.1)
 
 /-- The same weighted operator on the second independently sampled point.
 On the bipartite space `d * d`. -/
@@ -280,18 +495,10 @@ noncomputable def globalVarianceRightFamily (params : Parameters)
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (PointPairQuestion params) Unit (ι × ι) :=
   fun uv =>
-    let op :=
-      averageOperatorOverDistribution (polynomialDistribution params)
-        (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)
-    { outcome := fun _ => op
-      total := op
-      outcome_pos := by
-        intro _
-        sorry
-      sum_eq_total := by
-        simp
-      total_le_one := by
-        sorry }
+    polynomialAverageUnitSubMeas params
+      (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)
+      (fun g => weightedPointConditionedOperatorAtPolynomial_pos params strategy G g uv.2)
+      (fun g => weightedPointConditionedOperatorAtPolynomial_le_one params strategy G g uv.2)
 
 /-- The edgewise squared norm expression in `lem:local-variance-of-points`.
 Uses bipartite state `ψbi` on `d * d`. -/

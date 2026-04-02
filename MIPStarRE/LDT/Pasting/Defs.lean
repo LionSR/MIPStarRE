@@ -39,6 +39,36 @@ noncomputable def distinctTupleDistribution (params : Parameters) (k : ℕ) :
     outsideSupport := by intro xs hxs; simp_all
   }
 
+theorem distinctTupleDistribution_weight_sum_le_one (params : Parameters) (k : ℕ) :
+    ∑ xs ∈ (distinctTupleDistribution params k).support,
+      (distinctTupleDistribution params k).weight xs ≤ 1 := by
+  classical
+  let support := Finset.univ.filter (fun xs : PointTuple params k => Function.Injective xs)
+  have hsupport :
+      (distinctTupleDistribution params k).support = support := by
+    simp [distinctTupleDistribution, support]
+  have hweight :
+      ∀ xs, (distinctTupleDistribution params k).weight xs =
+        if xs ∈ support then 1 / (support.card : Error) else 0 := by
+    intro xs
+    simp [distinctTupleDistribution, support]
+  rw [hsupport]
+  simp_rw [hweight]
+  by_cases hs : support.Nonempty
+  · have hcard_nat : support.card ≠ 0 := Finset.card_ne_zero.mpr hs
+    have hcard : (support.card : Error) ≠ 0 := by
+      exact_mod_cast hcard_nat
+    have hsum :
+        (∑ xs ∈ support, if xs ∈ support then 1 / (support.card : Error) else 0) =
+          ∑ xs ∈ support, 1 / (support.card : Error) := by
+      apply Finset.sum_congr rfl
+      intro xs hxs
+      simp [hxs]
+    rw [hsum]
+    simp [Finset.sum_const, hcard]
+  · have hempty : support = ∅ := Finset.not_nonempty_iff_eq_empty.mp hs
+    simp [hempty]
+
 /-- Placeholder outcome type for the completed family `\widehat G`. -/
 abbrev GHatOutcome (params : Parameters) := Option (Polynomial params)
 abbrev SliceQuestion (params : Parameters) := Fq params
@@ -66,7 +96,10 @@ noncomputable def multiplyByTotalOnRight {α β : Type*} [Fintype α] [Fintype �
     intro a
     sorry
   sum_eq_total := by
-    sorry
+    calc
+      ∑ a, A.outcome a * B.total = (∑ a, A.outcome a) * B.total := by
+        simpa using (Finset.sum_mul Finset.univ (fun a => A.outcome a) B.total).symm
+      _ = A.total * B.total := by rw [A.sum_eq_total]
   total_le_one := by
     sorry
 
@@ -80,24 +113,53 @@ noncomputable def multiplyByTotalOnLeft {α β : Type*} [Fintype α] [Fintype β
     intro b
     sorry
   sum_eq_total := by
-    sorry
+    calc
+      ∑ b, A.total * B.outcome b = A.total * ∑ b, B.outcome b := by
+        simpa using (Finset.mul_sum Finset.univ (fun b => B.outcome b) A.total).symm
+      _ = A.total * B.total := by rw [B.sum_eq_total]
   total_le_one := by
     sorry
 
 /-- Average an indexed family against a named distribution. -/
 noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
-    (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome ι) :
+    (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome ι)
+    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1) :
     SubMeas Outcome ι where
   outcome := fun a =>
     averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
   total := averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
   outcome_pos := by
     intro a
-    sorry
+    exact Finset.sum_nonneg fun q _ => smul_nonneg (𝒟.nonnegative q) ((A q).outcome_pos a)
   sum_eq_total := by
-    sorry
+    classical
+    calc
+      ∑ a, averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
+          = ∑ q ∈ 𝒟.support, ∑ a, 𝒟.weight q • (A q).outcome a := by
+              simp_rw [averageOperatorOverDistribution]
+              rw [Finset.sum_comm]
+      _ = ∑ q ∈ 𝒟.support, 𝒟.weight q • ∑ a, (A q).outcome a := by
+            apply Finset.sum_congr rfl
+            intro q _
+            rw [← Finset.smul_sum]
+      _ = ∑ q ∈ 𝒟.support, 𝒟.weight q • (A q).total := by
+            apply Finset.sum_congr rfl
+            intro q _
+            rw [(A q).sum_eq_total]
+      _ = averageOperatorOverDistribution 𝒟 (fun q => (A q).total) := by
+            simp [averageOperatorOverDistribution]
   total_le_one := by
-    sorry
+    calc
+      averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
+        ≤ ∑ q ∈ 𝒟.support, 𝒟.weight q • (1 : MIPStarRE.Quantum.Op ι) := by
+            simp only [averageOperatorOverDistribution]
+            exact Finset.sum_le_sum fun q _ =>
+              smul_le_smul_of_nonneg_left (A q).total_le_one (𝒟.nonnegative q)
+      _ = (∑ q ∈ 𝒟.support, 𝒟.weight q) • (1 : MIPStarRE.Quantum.Op ι) := by
+            rw [Finset.sum_smul]
+      _ ≤ (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
+            exact smul_le_smul_of_nonneg_right h𝒟 zero_le_one
+      _ = 1 := by simp
 
 /-- Record which completed-slice outcomes are genuine polynomial outcomes. -/
 def gHatTupleType {params : Parameters} {k : ℕ}
@@ -202,7 +264,11 @@ noncomputable def incompletePartSubMeas (params : Parameters)
     sum_eq_total := by
       simp
     total_le_one := by
-      sorry }
+      have hnonneg : 0 ≤ (completePartSubMeas params family x).total := by
+        rw [← (completePartSubMeas params family x).sum_eq_total]
+        exact Finset.sum_nonneg fun _ _ =>
+          (completePartSubMeas params family x).outcome_pos ()
+      exact sub_le_self _ hnonneg }
 
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
 noncomputable def gHatIdxMeas (params : Parameters)

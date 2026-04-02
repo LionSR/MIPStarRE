@@ -14,6 +14,33 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
+private theorem sandwich_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M P : MIPStarRE.Quantum.Op ι} (hM : 0 ≤ M) (hP : 0 ≤ P) :
+    0 ≤ M * P * M := by
+  have hMherm : Mᴴ = M :=
+    (Matrix.nonneg_iff_posSemidef.mp hM).isHermitian.eq
+  simpa [hMherm] using
+    (Matrix.PosSemidef.mul_mul_conjTranspose_same
+      (Matrix.nonneg_iff_posSemidef.mp hP) M).nonneg
+
+private theorem sandwich_le_sandwich_same {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M P Q : MIPStarRE.Quantum.Op ι} (hM : 0 ≤ M) (hPQ : P ≤ Q) :
+    M * P * M ≤ M * Q * M := by
+  apply sub_nonneg.mp
+  have hsand : 0 ≤ M * (Q - P) * M :=
+    sandwich_nonneg hM (sub_nonneg.mpr hPQ)
+  simpa [mul_sub, sub_mul] using hsand
+
+private theorem sq_le_self_of_nonneg_le_one {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {X : MIPStarRE.Quantum.Op ι} (hX : 0 ≤ X) (hXle : X ≤ 1) :
+    X * X ≤ X := by
+  have hcomm : Commute X (1 - X) :=
+    (Commute.one_right X).sub_right (Commute.refl X)
+  have hnonneg : 0 ≤ X * (1 - X) :=
+    Commute.mul_nonneg hX (sub_nonneg.mpr hXle) hcomm
+  exact sub_nonneg.mp <| by
+    simpa [mul_sub] using hnonneg
+
 /-- Source-style left/right relation `A^x_a ⊗ I ≈_δ I ⊗ B^x_a`. -/
 structure BipartiteSDDRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -58,11 +85,29 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
       (A q).outcome a * (B q).toSubMeas.outcome a * (A q).outcome a
     outcome_pos := by
       intro a
-      sorry
+      simpa using sandwich_nonneg ((A q).outcome_pos a) ((B q).outcome_pos a)
     sum_eq_total := by
       rfl
     total_le_one := by
-      sorry
+      calc
+        ∑ a : Outcome, (A q).outcome a * (B q).toSubMeas.outcome a * (A q).outcome a
+          ≤ ∑ a : Outcome, (A q).outcome a := by
+              refine Finset.sum_le_sum ?_
+              intro a ha
+              exact le_trans
+                (by
+                  simpa using
+                    sandwich_le_sandwich_same
+                      ((A q).outcome_pos a)
+                      (Measurement.outcome_le_one (B q) a))
+                (by
+                  simpa using
+                    sq_le_self_of_nonneg_le_one
+                      ((A q).outcome_pos a)
+                      (SubMeas.outcome_le_one (A q) a))
+        _ = (A q).total := by
+          rw [(A q).sum_eq_total]
+        _ ≤ 1 := (A q).total_le_one
   }
 
 /-- Family for the intermediate `A_a (Σ_b B_b) A_a` sandwich. -/
@@ -79,11 +124,29 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*}
       (A q).outcome a * (B q).toSubMeas.total * (A q).outcome a
     outcome_pos := by
       intro a
-      sorry
+      have hBtotal : (B q).toSubMeas.total = (1 : MIPStarRE.Quantum.Op ι) := by
+        simpa using (B q).total_eq_one
+      have hBtotal_nonneg : 0 ≤ (B q).toSubMeas.total := by
+        rw [hBtotal]
+        exact zero_le_one
+      simpa using sandwich_nonneg ((A q).outcome_pos a) hBtotal_nonneg
     sum_eq_total := by
       rfl
     total_le_one := by
-      sorry
+      have hBtotal : (B q).toSubMeas.total = (1 : MIPStarRE.Quantum.Op ι) := by
+        simpa using (B q).total_eq_one
+      calc
+        ∑ a : Outcome, (A q).outcome a * (B q).toSubMeas.total * (A q).outcome a
+          ≤ ∑ a : Outcome, (A q).outcome a := by
+              refine Finset.sum_le_sum ?_
+              intro a ha
+              simpa [hBtotal] using
+                sq_le_self_of_nonneg_le_one
+                  ((A q).outcome_pos a)
+                  (SubMeas.outcome_le_one (A q) a)
+        _ = (A q).total := by
+          rw [(A q).sum_eq_total]
+        _ ≤ 1 := (A q).total_le_one
   }
 
 /-- Output package for `prop:cons-sub-meas`. -/

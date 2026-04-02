@@ -250,7 +250,7 @@ For semantic objects such as measurements, submeasurements, distributions,
 averaged operators, and packaged theorem outputs, reviewers should additionally
 verify:
 
-1. **Impossible states check** -- Does the structure admit states that are
+1. **Impossible states check** -- Does the structure exclude states that are
    impossible under the paper definition?
 2. **Derived-field check** -- If a field is mathematically derived
    (e.g. `total = ∑ a, outcome a`), is it either derived on demand or stored
@@ -261,7 +261,7 @@ verify:
 4. **Stress-test check** -- Is at least one nontrivial theorem in scope of the
    PR provable/stated against the scaffold without adding ad hoc assumptions?
 
-If any answer is “no”, treat the scaffold as unsafe and request a follow-up
+If any answer is "no", treat the scaffold as unsafe and request a follow-up
 before broad theorem layering continues.
 
 ---
