@@ -14,6 +14,40 @@ open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+private def pointDiagonalLineQuestionEquiv (params : Parameters) :
+    PointDiagonalLineQuestion params ≃ DiagonalTestSample params where
+  toFun := fun q => (q.1.base, (q.1.direction, q.2))
+  invFun := fun s =>
+    ({ base := s.1, direction := s.2.1 }, s.2.2)
+  left_inv := by
+    intro q
+    rcases q with ⟨⟨base, direction⟩, t⟩
+    rfl
+  right_inv := by
+    intro s
+    rcases s with ⟨base, direction, t⟩
+    rfl
+
+private lemma avgOver_uniform_equiv
+    {α β : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (e : α ≃ β) (f : α → Error) :
+    avgOver (uniformDistribution α) f =
+      avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
+  calc
+    avgOver (uniformDistribution α) f
+      = (1 / (Fintype.card α : Error)) * ∑ a : α, f a := by
+          simp [avgOver, uniformDistribution, Finset.mul_sum]
+    _ = (1 / (Fintype.card β : Error)) * ∑ a : α, f a := by
+          rw [Fintype.card_congr e]
+    _ = (1 / (Fintype.card β : Error)) * ∑ b : β, f (e.symm b) := by
+          congr 1
+          exact Fintype.sum_equiv e f (fun b => f (e.symm b)) (by
+            intro a
+            simp)
+    _ = avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
+          simp [avgOver, uniformDistribution, Finset.mul_sum]
+
 /-- Output package for `thm:commutativity-points`.
 
 The strategy state is bipartite (`QuantumState (ι × ι)`).  Local-register
@@ -83,7 +117,42 @@ theorem commutativityPoints
         This is the diagonal-lines test, rewritten in the
         `PointDiagonalLineQuestion` indexing used in this section.
         -/
-        sorry
+        let e := pointDiagonalLineQuestionEquiv params
+        have hrewrite :
+            consError strategy.state
+              (pointWithDiagonalLineDistribution params)
+              (IdxSubMeas.liftLeft (sampledPointMeasurement params strategy))
+              (IdxSubMeas.liftLeft (sampledDiagonalLineEvaluation params strategy)) =
+            consError strategy.state
+              (uniformDistribution (DiagonalTestSample params))
+              (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+              (IdxSubMeas.liftLeft (diagonalLineAnswerFamily strategy)) := by
+          unfold consError
+          simpa [e, pointWithDiagonalLineDistribution, sampledPointMeasurement,
+            sampledDiagonalLineEvaluation, sampledPointFromDiagonalQuestion,
+            diagonalPointAnswerFamily, diagonalLineAnswerFamily] using
+            avgOver_uniform_equiv e
+              (fun q =>
+                qConsDefect strategy.state
+                  ((IdxSubMeas.liftLeft (sampledPointMeasurement params strategy)) q)
+                  ((IdxSubMeas.liftLeft (sampledDiagonalLineEvaluation params strategy)) q))
+        constructor
+        rw [hrewrite]
+        have hγ : 0 ≤ gamma := by
+          exact le_trans (consError_nonneg strategy.state
+            (uniformDistribution (DiagonalTestSample params))
+            (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+            (IdxSubMeas.liftLeft (diagonalLineAnswerFamily strategy)))
+            hgood.diagonalLineTest
+        have hm : (1 : Error) ≤ params.m := by
+          exact_mod_cast params.hm
+        calc
+          consError strategy.state
+              (uniformDistribution (DiagonalTestSample params))
+              (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+              (IdxSubMeas.liftLeft (diagonalLineAnswerFamily strategy))
+            ≤ gamma := hgood.diagonalLineTest
+          _ ≤ gamma * (params.m : Error) := by nlinarith
       sampledDiagonalLineApproximation := by
         /-
         Apply `prop:simeq-to-approx` to the previous consistency statement.

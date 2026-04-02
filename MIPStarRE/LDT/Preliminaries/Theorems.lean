@@ -425,20 +425,199 @@ private lemma consSubMeas_diagonalControl
       (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) γ →
     SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A)
       (diagonalSandwichFamily A B) γ := by
-  /-
-  Paper proof:
-  `A_a ⊗ I - A_a ⊗ B_a = A_a ⊗ (I - B_a)`.
-  The latter is PSD and bounded by `1`, so its square is dominated by itself.
-  Summing over `a` gives exactly the off-diagonal consistency defect because `B`
-  is a complete measurement.
-
-  Lean status:
-  the new bipartite statement is now aligned with the paper, but the remaining
-  work is a fairly long matrix-rewrite proof turning the `qSDD` summands into
-  `opTensor ((A q).outcome a) (1 - (B q).outcome a)` and then matching the
-  resulting sum with `qConsDefect` on the lifted families.
-  -/
-  sorry
+  intro ⟨hcons⟩
+  constructor
+  unfold sddError consError at *
+  calc
+    avgOver 𝒟
+        (fun q => qSDD ψ ((IdxSubMeas.liftLeft A) q) ((diagonalSandwichFamily A B) q))
+      ≤ avgOver 𝒟
+          (fun q =>
+            qConsDefect ψ
+              ((IdxSubMeas.liftLeft A) q)
+              ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+          apply avgOver_mono
+          intro q
+          let Aq := A q
+          let Bq := B q
+          let Dq := (diagonalSandwichFamily A B) q
+          have hsummand :
+              ∀ a : Outcome,
+                ev ψ
+                    ((((IdxSubMeas.liftLeft A) q).outcome a -
+                        ((diagonalSandwichFamily A B) q).outcome a)ᴴ *
+                      (((IdxSubMeas.liftLeft A) q).outcome a -
+                        ((diagonalSandwichFamily A B) q).outcome a))
+                  ≤
+                ev ψ
+                  (((IdxSubMeas.liftLeft A) q).outcome a -
+                    ((diagonalSandwichFamily A B) q).outcome a) := by
+            intro a
+            let X : MIPStarRE.Quantum.Op (ι × ι) :=
+              ((IdxSubMeas.liftLeft A) q).outcome a -
+                ((diagonalSandwichFamily A B) q).outcome a
+            have hX_nonneg : 0 ≤ X := by
+              dsimp [X, Aq, Bq, Dq]
+              simp [IdxSubMeas.liftLeft, SubMeas.liftLeft, diagonalSandwichFamily,
+                MIPStarRE.LDT.leftTensor_mul_rightTensor_eq_opTensor]
+              exact MIPStarRE.LDT.opTensor_le_leftTensor
+                ((A q).outcome_pos a)
+                (Measurement.outcome_le_one (B q) a)
+            have hX_le_one : X ≤ 1 := by
+              have hX_le_left :
+                  X ≤ ((IdxSubMeas.liftLeft A) q).outcome a := by
+                dsimp [X]
+                exact sub_le_self _ ((diagonalSandwichFamily A B q).outcome_pos a)
+              exact le_trans hX_le_left <|
+                leftTensor_le_one (ι₂ := ι) ((A q).outcome_le_one a)
+            have hXh : Xᴴ = X :=
+              (Matrix.nonneg_iff_posSemidef.mp hX_nonneg).isHermitian.eq
+            calc
+              ev ψ (((((IdxSubMeas.liftLeft A) q).outcome a -
+                        ((diagonalSandwichFamily A B) q).outcome a)ᴴ) *
+                      (((IdxSubMeas.liftLeft A) q).outcome a -
+                        ((diagonalSandwichFamily A B) q).outcome a))
+                = ev ψ (X * X) := by simp [X, hXh]
+              _ ≤ ev ψ X := ev_mono ψ _ _ (MIPStarRE.Quantum.sq_le_self hX_nonneg hX_le_one)
+          have hnonneg :
+              0 ≤
+                ev ψ
+                    ((((IdxSubMeas.liftLeft A) q).total) *
+                      (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                  qMatchMass ψ
+                    (((IdxSubMeas.liftLeft A) q))
+                    (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+            unfold qMatchMass
+            calc
+              0 ≤ ∑ a : Outcome,
+                    ev ψ
+                      (((IdxSubMeas.liftLeft A) q).outcome a -
+                        ((diagonalSandwichFamily A B) q).outcome a) := by
+                    exact Finset.sum_nonneg fun a _ =>
+                      ev_nonneg_of_psd ψ _ <| by
+                        let X : MIPStarRE.Quantum.Op (ι × ι) :=
+                          ((IdxSubMeas.liftLeft A) q).outcome a -
+                            ((diagonalSandwichFamily A B) q).outcome a
+                        change 0 ≤ X
+                        dsimp [X, diagonalSandwichFamily]
+                        simp [IdxSubMeas.liftLeft, SubMeas.liftLeft,
+                          MIPStarRE.LDT.leftTensor_mul_rightTensor_eq_opTensor]
+                        exact MIPStarRE.LDT.opTensor_le_leftTensor
+                          ((A q).outcome_pos a)
+                          (Measurement.outcome_le_one (B q) a)
+              _ =
+                ev ψ
+                    ((((IdxSubMeas.liftLeft A) q).total) *
+                      (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                  qMatchMass ψ
+                    (((IdxSubMeas.liftLeft A) q))
+                    (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                    have hleft :
+                        ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) ((A q).outcome a)) =
+                          ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
+                      rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ι) ((A q).outcome a))]
+                      simp [SubMeas.liftLeft, leftTensor_finset_sum, (A q).sum_eq_total]
+                    calc
+                      ∑ a : Outcome,
+                          ev ψ
+                            (((IdxSubMeas.liftLeft A) q).outcome a -
+                              ((diagonalSandwichFamily A B) q).outcome a)
+                        = ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) ((A q).outcome a)) -
+                            ∑ a : Outcome,
+                              ev ψ
+                                (leftTensor (ι₂ := ι) ((A q).outcome a) *
+                                  rightTensor (ι₁ := ι) ((B q).outcome a)) := by
+                              simp [IdxSubMeas.liftLeft, SubMeas.liftLeft, diagonalSandwichFamily, ev_sub]
+                      _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) -
+                            qMatchMass ψ
+                              (((IdxSubMeas.liftLeft A) q))
+                              (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                              unfold qMatchMass
+                              simp [hleft, IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
+                                SubMeas.liftLeft, SubMeas.liftRight, IdxMeas.toIdxSubMeas]
+                      _ = ev ψ
+                            ((((IdxSubMeas.liftLeft A) q).total) *
+                              (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                          qMatchMass ψ
+                            (((IdxSubMeas.liftLeft A) q))
+                            (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                              have htotalOverlap :
+                                  ev ψ
+                                      ((((IdxSubMeas.liftLeft A) q).total) *
+                                        (((IdxSubMeas.liftRight
+                                            (IdxMeas.toIdxSubMeas B)) q).total)) =
+                                    ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
+                                rw [show (((IdxSubMeas.liftLeft A) q).total) *
+                                    (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total) =
+                                      leftTensor (ι₂ := ι) ((A q).total) *
+                                        rightTensor (ι₁ := ι) ((B q).total) by rfl]
+                                rw [(B q).total_eq_one]
+                                simp [leftTensor, rightTensor]
+                              rw [htotalOverlap]
+          unfold qSDD qSDDCore qConsDefect
+          rw [max_eq_right hnonneg]
+          calc
+            ∑ a : Outcome,
+                ev ψ
+                  ((((IdxSubMeas.liftLeft A) q).outcome a -
+                      ((diagonalSandwichFamily A B) q).outcome a)ᴴ *
+                    (((IdxSubMeas.liftLeft A) q).outcome a -
+                      ((diagonalSandwichFamily A B) q).outcome a))
+              ≤ ∑ a : Outcome,
+                    ev ψ
+                      (((IdxSubMeas.liftLeft A) q).outcome a -
+                        ((diagonalSandwichFamily A B) q).outcome a) := by
+                    exact Finset.sum_le_sum fun a _ => hsummand a
+            _ =
+              ev ψ
+                  ((((IdxSubMeas.liftLeft A) q).total) *
+                    (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                qMatchMass ψ
+                  (((IdxSubMeas.liftLeft A) q))
+                  (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                    have hleft :
+                        ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) ((A q).outcome a)) =
+                          ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
+                      rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ι) ((A q).outcome a))]
+                      simp [SubMeas.liftLeft, leftTensor_finset_sum, (A q).sum_eq_total]
+                    calc
+                      ∑ a : Outcome,
+                          ev ψ
+                            (((IdxSubMeas.liftLeft A) q).outcome a -
+                              ((diagonalSandwichFamily A B) q).outcome a)
+                        = ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) ((A q).outcome a)) -
+                            ∑ a : Outcome,
+                              ev ψ
+                                (leftTensor (ι₂ := ι) ((A q).outcome a) *
+                                  rightTensor (ι₁ := ι) ((B q).outcome a)) := by
+                              simp [IdxSubMeas.liftLeft, SubMeas.liftLeft, diagonalSandwichFamily, ev_sub]
+                      _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) -
+                            qMatchMass ψ
+                              (((IdxSubMeas.liftLeft A) q))
+                              (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                              unfold qMatchMass
+                              simp [hleft, IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
+                                SubMeas.liftLeft, SubMeas.liftRight, IdxMeas.toIdxSubMeas]
+                      _ = ev ψ
+                            ((((IdxSubMeas.liftLeft A) q).total) *
+                              (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                          qMatchMass ψ
+                            (((IdxSubMeas.liftLeft A) q))
+                            (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                              have htotalOverlap :
+                                  ev ψ
+                                      ((((IdxSubMeas.liftLeft A) q).total) *
+                                        (((IdxSubMeas.liftRight
+                                            (IdxMeas.toIdxSubMeas B)) q).total)) =
+                                    ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
+                                rw [show (((IdxSubMeas.liftLeft A) q).total) *
+                                    (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total) =
+                                      leftTensor (ι₂ := ι) ((A q).total) *
+                                        rightTensor (ι₁ := ι) ((B q).total) by rfl]
+                                rw [(B q).total_eq_one]
+                                simp [leftTensor, rightTensor]
+                              rw [htotalOverlap]
+    _ ≤ γ := hcons
 
 private lemma consSubMeas_sandwichControl
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -452,20 +631,234 @@ private lemma consSubMeas_sandwichControl
     SDDRel ψ 𝒟
       (diagonalSandwichFamily A B)
       (totalSandwichFamily A B) γ := by
-  /-
-  Paper proof:
-  `A_a ⊗ B_a - A ⊗ B_a = -((A - A_a) ⊗ B_a)`.
-  Again the difference term is PSD, bounded by `1`, and its square is
-  dominated by itself. Summing over `a` turns the result into the same
-  off-diagonal consistency defect as above.
-
-  Lean status:
-  after the statement reformulation this is now the right bridge lemma, but
-  the remaining work is another long `Matrix.kronecker` normalization proof
-  matching the summed tensor expression with `qConsDefect` on the lifted
-  families.
-  -/
-  sorry
+  intro ⟨hcons⟩
+  constructor
+  unfold sddError consError at *
+  calc
+    avgOver 𝒟
+        (fun q => qSDD ψ ((diagonalSandwichFamily A B) q) ((totalSandwichFamily A B) q))
+      ≤ avgOver 𝒟
+          (fun q =>
+            qConsDefect ψ
+              ((IdxSubMeas.liftLeft A) q)
+              ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+          apply avgOver_mono
+          intro q
+          have hsummand :
+              ∀ a : Outcome,
+                ev ψ
+                    ((((diagonalSandwichFamily A B) q).outcome a -
+                        ((totalSandwichFamily A B) q).outcome a)ᴴ *
+                      (((diagonalSandwichFamily A B) q).outcome a -
+                        ((totalSandwichFamily A B) q).outcome a))
+                  ≤
+                ev ψ
+                  (((totalSandwichFamily A B) q).outcome a -
+                    ((diagonalSandwichFamily A B) q).outcome a) := by
+            intro a
+            let X : MIPStarRE.Quantum.Op (ι × ι) :=
+              ((totalSandwichFamily A B) q).outcome a -
+                ((diagonalSandwichFamily A B) q).outcome a
+            have hX_nonneg : 0 ≤ X := by
+              dsimp [X]
+              simp [diagonalSandwichFamily, totalSandwichFamily,
+                MIPStarRE.LDT.leftTensor_mul_rightTensor_eq_opTensor]
+              exact MIPStarRE.LDT.opTensor_mono_left
+                ((A q).outcome_le_total a)
+                ((B q).outcome_pos a)
+            have hX_le_one : X ≤ 1 := by
+              have hX_le_total :
+                  X ≤ ((totalSandwichFamily A B) q).outcome a := by
+                dsimp [X]
+                exact sub_le_self _ ((diagonalSandwichFamily A B q).outcome_pos a)
+              have htotal_le :
+                  ((totalSandwichFamily A B) q).outcome a ≤ 1 := by
+                dsimp [totalSandwichFamily]
+                have hop :
+                    opTensor ((A q).total) ((B q).outcome a) ≤
+                      leftTensor (ι₂ := ι) ((A q).total) := by
+                  exact MIPStarRE.LDT.opTensor_le_leftTensor
+                    ((A q).total_nonneg)
+                    (Measurement.outcome_le_one (B q) a)
+                simpa [MIPStarRE.LDT.leftTensor_mul_rightTensor_eq_opTensor] using
+                  le_trans hop (leftTensor_le_one (ι₂ := ι) (A q).total_le_one)
+              exact le_trans hX_le_total htotal_le
+            have hXh : Xᴴ = X :=
+              (Matrix.nonneg_iff_posSemidef.mp hX_nonneg).isHermitian.eq
+            calc
+              ev ψ
+                  ((((diagonalSandwichFamily A B) q).outcome a -
+                      ((totalSandwichFamily A B) q).outcome a)ᴴ *
+                    (((diagonalSandwichFamily A B) q).outcome a -
+                      ((totalSandwichFamily A B) q).outcome a))
+                = ev ψ (X * X) := by
+                    have hneg : ((diagonalSandwichFamily A B) q).outcome a -
+                        ((totalSandwichFamily A B) q).outcome a = -X := by
+                      simp [X]
+                    rw [hneg]
+                    simp [hXh]
+              _ ≤ ev ψ X := ev_mono ψ _ _ (MIPStarRE.Quantum.sq_le_self hX_nonneg hX_le_one)
+          have hnonneg :
+              0 ≤
+                ev ψ
+                    ((((IdxSubMeas.liftLeft A) q).total) *
+                      (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                  qMatchMass ψ
+                    (((IdxSubMeas.liftLeft A) q))
+                    (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+            unfold qMatchMass
+            calc
+              0 ≤ ∑ a : Outcome,
+                    ev ψ
+                      (((totalSandwichFamily A B) q).outcome a -
+                        ((diagonalSandwichFamily A B) q).outcome a) := by
+                    exact Finset.sum_nonneg fun a _ =>
+                      ev_nonneg_of_psd ψ _ <| by
+                        let X : MIPStarRE.Quantum.Op (ι × ι) :=
+                          ((totalSandwichFamily A B) q).outcome a -
+                            ((diagonalSandwichFamily A B) q).outcome a
+                        change 0 ≤ X
+                        dsimp [X]
+                        simp [diagonalSandwichFamily, totalSandwichFamily,
+                          MIPStarRE.LDT.leftTensor_mul_rightTensor_eq_opTensor]
+                        exact MIPStarRE.LDT.opTensor_mono_left
+                          ((A q).outcome_le_total a)
+                          ((B q).outcome_pos a)
+              _ =
+                ev ψ
+                    ((((IdxSubMeas.liftLeft A) q).total) *
+                      (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                  qMatchMass ψ
+                    (((IdxSubMeas.liftLeft A) q))
+                    (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                    have htotal :
+                        ∑ a : Outcome,
+                            ev ψ
+                              (((totalSandwichFamily A B) q).outcome a) =
+                          ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
+                      rw [← ev_sum ψ (fun a : Outcome => ((totalSandwichFamily A B) q).outcome a)]
+                      calc
+                        ev ψ (∑ a : Outcome, ((totalSandwichFamily A B) q).outcome a)
+                          =
+                            ev ψ
+                              (∑ a : Outcome,
+                                leftTensor (ι₂ := ι) ((A q).total) *
+                                  rightTensor (ι₁ := ι) ((B q).outcome a)) := by
+                                  simp [totalSandwichFamily]
+                        _ = ev ψ
+                              (leftTensor (ι₂ := ι) ((A q).total) *
+                                ∑ a : Outcome, rightTensor (ι₁ := ι) ((B q).outcome a)) := by
+                                  rw [← Finset.mul_sum]
+                        _ = ev ψ
+                              (leftTensor (ι₂ := ι) ((A q).total) *
+                                rightTensor (ι₁ := ι) (∑ a : Outcome, (B q).outcome a)) := by
+                                  rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ
+                                    (fun a : Outcome => (B q).outcome a)]
+                        _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total) * rightTensor (ι₁ := ι) 1) := by
+                                  rw [(B q).sum_eq]
+                        _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
+                                  simp [leftTensor, rightTensor]
+                    calc
+                      ∑ a : Outcome,
+                          ev ψ
+                            (((totalSandwichFamily A B) q).outcome a -
+                              ((diagonalSandwichFamily A B) q).outcome a)
+                        = ∑ a : Outcome, ev ψ (((totalSandwichFamily A B) q).outcome a) -
+                            ∑ a : Outcome, ev ψ (((diagonalSandwichFamily A B) q).outcome a) := by
+                              simp [ev_sub]
+                      _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) -
+                            qMatchMass ψ
+                              (((IdxSubMeas.liftLeft A) q))
+                              (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                              unfold qMatchMass
+                              simp [htotal, diagonalSandwichFamily, IdxSubMeas.liftLeft,
+                                IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight,
+                                IdxMeas.toIdxSubMeas]
+                      _ = ev ψ
+                            ((((IdxSubMeas.liftLeft A) q).total) *
+                              (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                          qMatchMass ψ
+                            (((IdxSubMeas.liftLeft A) q))
+                            (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                              rw [show ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total =
+                                  rightTensor (ι₁ := ι) ((B q).total) by rfl]
+                              rw [(B q).total_eq_one]
+                              simp [IdxSubMeas.liftLeft, SubMeas.liftLeft, rightTensor, leftTensor]
+          unfold qSDD qSDDCore qConsDefect
+          rw [max_eq_right hnonneg]
+          calc
+            ∑ a : Outcome,
+                ev ψ
+                  ((((diagonalSandwichFamily A B) q).outcome a -
+                      ((totalSandwichFamily A B) q).outcome a)ᴴ *
+                    (((diagonalSandwichFamily A B) q).outcome a -
+                      ((totalSandwichFamily A B) q).outcome a))
+              ≤ ∑ a : Outcome,
+                    ev ψ
+                      (((totalSandwichFamily A B) q).outcome a -
+                        ((diagonalSandwichFamily A B) q).outcome a) := by
+                    exact Finset.sum_le_sum fun a _ => hsummand a
+            _ =
+              ev ψ
+                  ((((IdxSubMeas.liftLeft A) q).total) *
+                    (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                qMatchMass ψ
+                  (((IdxSubMeas.liftLeft A) q))
+                  (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                    have htotal :
+                        ∑ a : Outcome,
+                            ev ψ
+                              (((totalSandwichFamily A B) q).outcome a) =
+                          ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
+                      rw [← ev_sum ψ (fun a : Outcome => ((totalSandwichFamily A B) q).outcome a)]
+                      calc
+                        ev ψ (∑ a : Outcome, ((totalSandwichFamily A B) q).outcome a)
+                          =
+                            ev ψ
+                              (∑ a : Outcome,
+                                leftTensor (ι₂ := ι) ((A q).total) *
+                                  rightTensor (ι₁ := ι) ((B q).outcome a)) := by
+                                  simp [totalSandwichFamily]
+                        _ = ev ψ
+                              (leftTensor (ι₂ := ι) ((A q).total) *
+                                ∑ a : Outcome, rightTensor (ι₁ := ι) ((B q).outcome a)) := by
+                                  rw [← Finset.mul_sum]
+                        _ = ev ψ
+                              (leftTensor (ι₂ := ι) ((A q).total) *
+                                rightTensor (ι₁ := ι) (∑ a : Outcome, (B q).outcome a)) := by
+                                  rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ
+                                    (fun a : Outcome => (B q).outcome a)]
+                        _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total) * rightTensor (ι₁ := ι) 1) := by
+                                  rw [(B q).sum_eq]
+                        _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
+                                  simp [leftTensor, rightTensor]
+                    calc
+                      ∑ a : Outcome,
+                          ev ψ
+                            (((totalSandwichFamily A B) q).outcome a -
+                              ((diagonalSandwichFamily A B) q).outcome a)
+                        = ∑ a : Outcome, ev ψ (((totalSandwichFamily A B) q).outcome a) -
+                            ∑ a : Outcome, ev ψ (((diagonalSandwichFamily A B) q).outcome a) := by
+                              simp [ev_sub]
+                      _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) -
+                            qMatchMass ψ
+                              (((IdxSubMeas.liftLeft A) q))
+                              (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                              unfold qMatchMass
+                              simp [htotal, diagonalSandwichFamily, IdxSubMeas.liftLeft,
+                                IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight,
+                                IdxMeas.toIdxSubMeas]
+                      _ = ev ψ
+                            ((((IdxSubMeas.liftLeft A) q).total) *
+                              (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                          qMatchMass ψ
+                            (((IdxSubMeas.liftLeft A) q))
+                            (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                              rw [show ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total =
+                                  rightTensor (ι₁ := ι) ((B q).total) by rfl]
+                              rw [(B q).total_eq_one]
+                              simp [IdxSubMeas.liftLeft, SubMeas.liftLeft, rightTensor, leftTensor]
+    _ ≤ γ := hcons
 
 private lemma consSubMeas_combinedControl
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]

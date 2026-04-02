@@ -170,13 +170,13 @@ noncomputable def localAndVariance (params : Parameters)
 /-- The column-space indices for `A_combine`. -/
 abbrev combinedColumnIndex (params : Parameters) (ι : Type*) := Point params × ι
 
-/-- The paper's combined column operator `A_combine = ∑_u |u⟩ ⊗ A^u ⊗ I`.
-In the current encoding the ambient index `ι` already carries any auxiliary
-registers, so this is the rectangular block column with `u`-th block `A^u`. -/
+/-- The paper's combined column operator `A_combine = ∑_u |u⟩ ⊗ (A^u)† ⊗ I`.
+With our matrix convention and the variance witness `Dᴴ D`, the `u`-th block must
+be `(A^u)ᴴ` so that the resulting trace expands to `τ(ρ · Dᴴ D)`. -/
 noncomputable def combinedOperator (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) :
     Matrix (combinedColumnIndex params ι) ι ℂ :=
-  fun ui j => A ui.1 ui.2 j
+  fun ui j => star (A ui.1 j ui.2)
 
 /-! ### Fourier analysis on the hypercube `F_q^m`
 

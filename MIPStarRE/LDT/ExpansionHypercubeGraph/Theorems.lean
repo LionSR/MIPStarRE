@@ -81,6 +81,34 @@ private lemma globalVarianceTraceForm_eq_zero_of_isEmpty (hι : ¬ Nonempty ι)
   haveI : IsEmpty ι := not_nonempty_iff.mp hι
   simp [globalVarianceTraceForm, globalVarianceTraceWitness, MIPStarRE.Quantum.normalizedTrace]
 
+private lemma matrixAdjacencyOperator_eq_weight (params : Parameters)
+    (u v : Point params) :
+    matrixAdjacencyOperator params u v =
+      (rerandomizeCoordWeight params u v : ℂ) := by
+  simp [matrixAdjacencyOperator, hypercubeAdjacencyWeight, rerandomizeCoordWeight, div_eq_mul_inv,
+    mul_assoc, mul_left_comm, mul_comm]
+
+private lemma matrixCombinedOperator_mul_conjTranspose_apply
+    (params : Parameters) (model : MatrixOperatorFamilyRealization params)
+    (u v : Point params) (i j : model.space.carrier) :
+    (matrixCombinedOperator params model * (matrixCombinedOperator params model)ᴴ) (u, i) (v, j) =
+      ((model.family u)ᴴ * model.family v) i j := by
+  simp [matrixCombinedOperator, Matrix.mul_apply]
+
+private lemma rerandomizeCoordWeight_first_marginal (params : Parameters)
+    (u : Point params) :
+    ∑ v : Point params, rerandomizeCoordWeight params u v =
+      (hypercubeVertexCount params : Error)⁻¹ := by
+  sorry
+
+private lemma matrixLocalVarianceTraceWitness_trace_expand
+    (params : Parameters) (model : MatrixOperatorFamilyRealization params) :
+    Matrix.trace (matrixLocalVarianceTraceWitness params model) =
+      ∑ u : Point params, ∑ v : Point params,
+        matrixLaplacianOperator params u v *
+          Matrix.trace (model.state.matrix * ((model.family v)ᴴ * model.family u)) := by
+  sorry
+
 /-- The concrete matrix-level counterpart of `lem:local-to-global`. -/
 lemma matrixLocalToGlobal (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :

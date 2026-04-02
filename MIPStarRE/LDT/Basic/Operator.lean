@@ -57,6 +57,40 @@ abbrev rightTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fi
     (B : MIPStarRE.Quantum.Op ι₂) : MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
   Matrix.kronecker 1 B
 
+/-- Local tensor placements multiply to the full Kronecker product. -/
+theorem leftTensor_mul_rightTensor_eq_opTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) B = opTensor A B := by
+  simpa [leftTensor, rightTensor, opTensor] using
+    (Matrix.mul_kronecker_mul
+      A (1 : MIPStarRE.Quantum.Op ι₁) (1 : MIPStarRE.Quantum.Op ι₂) B).symm
+
+/-- Positivity is preserved by `opTensor`. -/
+theorem opTensor_nonneg
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {A : MIPStarRE.Quantum.Op ι₁} {B : MIPStarRE.Quantum.Op ι₂}
+    (hA : 0 ≤ A) (hB : 0 ≤ B) :
+    0 ≤ opTensor A B := by
+  simpa [opTensor] using MIPStarRE.Quantum.kronecker_nonneg hA hB
+
+/-- If `0 ≤ A` and `B ≤ 1`, then `A ⊗ B ≤ A ⊗ I`. -/
+theorem opTensor_le_leftTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {A : MIPStarRE.Quantum.Op ι₁} {B : MIPStarRE.Quantum.Op ι₂}
+    (hA : 0 ≤ A) (hB : B ≤ 1) :
+    opTensor A B ≤ leftTensor (ι₂ := ι₂) A := by
+  simpa [leftTensor, opTensor] using
+    MIPStarRE.Quantum.kronecker_le_kronecker_right_one hA hB
+
+/-- `opTensor` is monotone in the left factor against a PSD right factor. -/
+theorem opTensor_mono_left
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {A₁ A₂ : MIPStarRE.Quantum.Op ι₁} {B : MIPStarRE.Quantum.Op ι₂}
+    (hA : A₁ ≤ A₂) (hB : 0 ≤ B) :
+    opTensor A₁ B ≤ opTensor A₂ B := by
+  simpa [opTensor] using MIPStarRE.Quantum.kronecker_mono_left hA hB
+
 
 /-! ### Bridging lemmas: expectation-value linearity -/
 
@@ -103,6 +137,24 @@ theorem ev_trace_cyclic {ι : Type*} [Fintype ι] [DecidableEq ι]
 theorem ev_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) : ev ψ (0 : MIPStarRE.Quantum.Op ι) = 0 := by
   simp [ev]
+
+/-- Expectation of a tensor product can be written using left/right placements. -/
+theorem ev_opTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState (ι₁ × ι₂))
+    (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    ev ψ (opTensor A B) =
+      ev ψ (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) B) := by
+  rw [leftTensor_mul_rightTensor_eq_opTensor]
+
+/-- The tensor-product expectation rewrite used throughout the bipartite arguments. -/
+theorem ev_leftTensor_rightTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState (ι₁ × ι₂))
+    (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    ev ψ (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) B) =
+      ev ψ (opTensor A B) := by
+  rw [leftTensor_mul_rightTensor_eq_opTensor]
 
 /-- A normalized state has unit expectation on the identity operator. -/
 @[simp] theorem ev_one_of_isNormalized {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -328,5 +380,26 @@ theorem ev_cauchy_schwarz {ι : Type*} [Fintype ι] [DecidableEq ι]
   have hdisc := discrim_le_zero hquad
   unfold discrim at hdisc
   nlinarith
+
+/-- Absolute-value form of Cauchy-Schwarz for `ev`. -/
+theorem ev_abs_mul_le_sqrt
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι) :
+    |ev ψ (A * B)| ≤
+      Real.sqrt (ev ψ (A * Aᴴ)) * Real.sqrt (ev ψ (Bᴴ * B)) := by
+  have hsq :
+      (ev ψ (A * B)) ^ 2 ≤ ev ψ (A * Aᴴ) * ev ψ (Bᴴ * B) := by
+    simpa using ev_cauchy_schwarz ψ Aᴴ B
+  have hA_nonneg : 0 ≤ ev ψ (A * Aᴴ) := by
+    simpa using ev_adjoint_self_nonneg ψ Aᴴ
+  have hB_nonneg : 0 ≤ ev ψ (Bᴴ * B) := ev_adjoint_self_nonneg ψ B
+  refine abs_le_of_sq_le_sq' ?_ (mul_nonneg (Real.sqrt_nonneg _) (Real.sqrt_nonneg _)) |>.2
+  calc
+    |ev ψ (A * B)| ^ 2 = (ev ψ (A * B)) ^ 2 := by rw [sq_abs]
+    _ ≤ ev ψ (A * Aᴴ) * ev ψ (Bᴴ * B) := hsq
+    _ = (Real.sqrt (ev ψ (A * Aᴴ)) * Real.sqrt (ev ψ (Bᴴ * B))) ^ 2 := by
+          rw [sq]
+          ring_nf
+          rw [Real.sq_sqrt hA_nonneg, Real.sq_sqrt hB_nonneg]
 
 end MIPStarRE.LDT

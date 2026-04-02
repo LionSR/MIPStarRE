@@ -52,6 +52,60 @@ theorem sq_le_self [DecidableEq d] {X : Op d} (hX : 0 ≤ X) (hXle : X ≤ 1) :
   exact sub_nonneg.mp <| by
     simpa [mul_sub] using hnonneg
 
+/-- Kronecker products preserve positivity. -/
+theorem kronecker_nonneg
+    {d₁ d₂ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    {A : Op d₁} {B : Op d₂} (hA : 0 ≤ A) (hB : 0 ≤ B) :
+    0 ≤ Matrix.kronecker A B := by
+  exact
+    (Matrix.PosSemidef.kronecker
+      (Matrix.nonneg_iff_posSemidef.mp hA)
+      (Matrix.nonneg_iff_posSemidef.mp hB)).nonneg
+
+/-- If `0 ≤ A` and `B ≤ 1`, then `A ⊗ B ≤ A ⊗ 1`. -/
+theorem kronecker_le_kronecker_right_one
+    {d₁ d₂ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    {A : Op d₁} {B : Op d₂} (hA : 0 ≤ A) (hB : B ≤ 1) :
+    Matrix.kronecker A B ≤ Matrix.kronecker A (1 : Op d₂) := by
+  change (Matrix.kronecker A (1 : Op d₂) - Matrix.kronecker A B).PosSemidef
+  have hrewrite :
+      Matrix.kronecker A (1 : Op d₂) - Matrix.kronecker A B =
+        Matrix.kronecker A (1 - B) := by
+    have hneg : Matrix.kronecker A (-B) = -Matrix.kronecker A B := by
+      simpa using (Matrix.kronecker_smul (-1 : ℂ) A B)
+    calc
+      Matrix.kronecker A (1 : Op d₂) - Matrix.kronecker A B
+          = Matrix.kronecker A (1 : Op d₂) + Matrix.kronecker A (-B) := by
+              rw [hneg]
+              simp [sub_eq_add_neg]
+      _ = Matrix.kronecker A (1 - B) := by
+            simpa [sub_eq_add_neg] using (Matrix.kronecker_add A 1 (-B)).symm
+  have hpsd : Matrix.PosSemidef (Matrix.kronecker A (1 - B)) := by
+    exact Matrix.nonneg_iff_posSemidef.mp <| kronecker_nonneg hA (sub_nonneg.mpr hB)
+  rwa [hrewrite]
+
+/-- Kronecker product is monotone in the left factor against a PSD right factor. -/
+theorem kronecker_mono_left
+    {d₁ d₂ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    {A₁ A₂ : Op d₁} {B : Op d₂} (hA : A₁ ≤ A₂) (hB : 0 ≤ B) :
+    Matrix.kronecker A₁ B ≤ Matrix.kronecker A₂ B := by
+  change (Matrix.kronecker A₂ B - Matrix.kronecker A₁ B).PosSemidef
+  have hrewrite :
+      Matrix.kronecker A₂ B - Matrix.kronecker A₁ B =
+        Matrix.kronecker (A₂ - A₁) B := by
+    have hneg : Matrix.kronecker (-A₁) B = -Matrix.kronecker A₁ B := by
+      simpa using (Matrix.smul_kronecker (-1 : ℂ) A₁ B)
+    calc
+      Matrix.kronecker A₂ B - Matrix.kronecker A₁ B
+          = Matrix.kronecker A₂ B + Matrix.kronecker (-A₁) B := by
+              rw [hneg]
+              simp [sub_eq_add_neg]
+      _ = Matrix.kronecker (A₂ - A₁) B := by
+            simpa [sub_eq_add_neg] using (Matrix.add_kronecker A₂ (-A₁) B).symm
+  have hpsd : Matrix.PosSemidef (Matrix.kronecker (A₂ - A₁) B) := by
+    exact Matrix.nonneg_iff_posSemidef.mp <| kronecker_nonneg (sub_nonneg.mpr hA) hB
+  rwa [hrewrite]
+
 /-! ### Normalized trace -/
 
 /-- The normalized trace `τ(A) = tr(A) / |d|`. -/
