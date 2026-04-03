@@ -271,7 +271,7 @@ lemma gHatHalfProduct_sum_eq_total (params : Parameters)
           (fun gs => gHatHalfProductOutcomeOperator params family (k + 1) xs gs)
           (by intro p; rfl)
       rw [hsplit]
-      simp [gHatHalfProductOutcomeOperator]
+      simp only [gHatHalfProductOutcomeOperator, Fin.cons_zero]
       rw [← Finset.univ_product_univ, Finset.sum_product]
       calc
         ∑ g : GHatOutcome params,
@@ -325,7 +325,7 @@ lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters)
           (fun gs => gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs gs)
           (by intro p; rfl)
       rw [hsplit]
-      simp [gHatRotatedHalfProductOutcomeOperator]
+      simp only [gHatRotatedHalfProductOutcomeOperator, Fin.cons_zero]
       rw [← Finset.univ_product_univ, Finset.sum_product]
       calc
         ∑ g : GHatOutcome params,
@@ -712,8 +712,7 @@ noncomputable def constructedPastedMeasurement (params : Parameters)
           have hsingle :
               (∑ x : Polynomial params.next,
                   if x = h₀ then completionMass else 0) = completionMass := by
-            simpa using
-              (Finset.sum_ite_eq (s := Finset.univ) (a := h₀) (b := completionMass))
+            simp
           have hrewrite :
               (∑ a : Polynomial params.next,
                   if a = h₀ then H.outcome a + completionMass else H.outcome a) =

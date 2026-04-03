@@ -57,27 +57,39 @@ theorem ldDnoteq
       ≤ ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
   classical
   /-
-  Birthday-paradox proof strategy:
+  A clean formal proof should follow the birthday-paradox outline.
 
-  1. Let `support := (distinctTupleDistribution params k).support`, i.e. the injective
-     `k`-tuples.
-  2. Split into cases on `support.Nonempty`.
-     - If `support = ∅`, then `k > q` (otherwise `Fin.castLE` gives an injective tuple),
-       and `distinctTupleDistribution` is the zero sub-distribution, so
-       `TV(uniform, distinct) = 1/2 ≤ k^2 / q`.
-     - If `support.Nonempty`, then `k ≤ q`, and a direct computation from the definition of
-       `totalVariationDistance` gives
-         `TV = 1 - support.card / q^k`.
-  3. Count injective tuples:
-       `support.card = q.descFactorial k`.
-     This is equivalent to the number of embeddings `Fin k ↪ Fin q`.
-  4. Rewrite
-       `q.descFactorial k / q^k = ∏ i < k, (1 - i / q)`.
-  5. Use the elementary product bound
-       `1 - ∏ i < k a_i ≤ ∑ i < k (1 - a_i)` for `0 ≤ a_i ≤ 1`,
-     with `a_i = 1 - i / q`.
-  6. Conclude
-       `TV ≤ ∑ i < k i / q = k (k - 1) / (2 q) ≤ k^2 / q`.
+  1. Let
+       `support := (Finset.univ.filter fun xs : PointTuple params k => Function.Injective xs)`.
+     This is exactly `(distinctTupleDistribution params k).support`.
+
+  2. If `k ≤ params.q`, then `support.Nonempty` via the injective tuple
+       `i ↦ ⟨i.1, lt_of_lt_of_le i.2 hk⟩`.
+     In that case:
+     - `support.card = params.q.descFactorial k`, by identifying injective tuples
+       `Fin k → Fin params.q` with embeddings `Fin k ↪ Fin params.q` and using
+       `Fintype.card_embedding_eq`.
+     - On `support`, the distinct-tuple distribution has weight `1 / support.card`;
+       off `support`, it has weight `0`.
+     - Since the uniform distribution on `PointTuple params k` has weight
+       `1 / params.q^k` everywhere, splitting the TV sum over `support` and its
+       complement gives
+         `TV = 1 - support.card / params.q^k
+              = 1 - params.q.descFactorial k / params.q^k`.
+
+  3. Prove the descending-factorial birthday bound
+       `1 - q.descFactorial k / q^k ≤ k^2 / q`
+     by induction on `k`, using
+       `q.descFactorial (k + 1) = (q - k) * q.descFactorial k`
+     and the recurrence
+       `1 - a_{k+1} = (1 - a_k) + a_k * (k / q)`,
+     together with `a_k ≤ 1`.
+
+  4. If `k > params.q`, then the right-hand side is already `> 1`, while
+     `totalVariationDistance` is at most `1`, so the claim is immediate.
+
+  The main missing work is bookkeeping the finite-sum split in step 2 and the
+  elementary real-algebra induction in step 3.
   -/
   sorry
 
@@ -98,10 +110,83 @@ lemma looksEasyButTookMeAWhile
   · -- Interior case: `lambda ≠ 0` and `lambda ≠ 1`, hence `0 < lambda < 1`.
     push_neg at hl_boundary
     have hlpos : 0 < lambda := lt_of_le_of_ne h0 (Ne.symm hl_boundary.1)
-    have hl_lt_one : lambda < 1 := lt_of_le_of_ne h1 hl_boundary.2
-    -- The interior case (`0 < λ < 1`) is the core analytic inequality.
-    -- We keep it as a separate placeholder so edge behavior is explicit.
-    sorry
+    let e : Error := 1 / ((d + 1 : ℕ) : Error)
+    have hd1_ne : (((d + 1 : ℕ) : Error)) ≠ 0 := by positivity
+    have he_mul : (((d + 1 : ℕ) : Error)) * e = 1 := by
+      dsimp [e]
+      field_simp [hd1_ne]
+    have he_mul' : e * (((d + 1 : ℕ) : Error)) = 1 := by
+      simpa [mul_comm] using he_mul
+    have hgeom :
+        (∑ i ∈ Finset.range d, lambda ^ i) * (1 - lambda) = 1 - lambda ^ d := by
+      simpa [mul_comm] using geom_sum_mul_neg lambda d
+    have hsum_le : ∑ i ∈ Finset.range d, lambda ^ i ≤ d := by
+      calc
+        ∑ i ∈ Finset.range d, lambda ^ i ≤ ∑ _i ∈ Finset.range d, (1 : Error) := by
+          refine Finset.sum_le_sum ?_
+          intro i hi
+          exact pow_le_one₀ h0 h1
+        _ = d := by simp
+    have hlin : 1 - lambda ^ d ≤ (d : Error) * (1 - lambda) := by
+      rw [← hgeom]
+      exact mul_le_mul_of_nonneg_right hsum_le (sub_nonneg.mpr h1)
+    have hone_sub_nonneg : 0 ≤ 1 - lambda ^ d := by
+      exact sub_nonneg.mpr (pow_le_one₀ h0 h1)
+    have hone_sub_le_one : 1 - lambda ^ d ≤ 1 := by
+      exact sub_le_self _ (pow_nonneg h0 _)
+    have hpow_small : (1 - lambda ^ d) ^ (d + 1) ≤ 1 - lambda ^ d := by
+      calc
+        (1 - lambda ^ d) ^ (d + 1) = (1 - lambda ^ d) ^ d * (1 - lambda ^ d) := by
+          rw [pow_succ]
+        _ ≤ 1 * (1 - lambda ^ d) := by
+          exact mul_le_mul_of_nonneg_right (pow_le_one₀ hone_sub_nonneg hone_sub_le_one)
+            hone_sub_nonneg
+        _ = 1 - lambda ^ d := by ring
+    have hd_nat : d ≤ 2 ^ (d + 1) := by
+      refine le_trans (Nat.le_of_lt d.lt_two_pow_self) ?_
+      rw [pow_succ]
+      exact Nat.le_mul_of_pos_right _ (by decide)
+    have hd_cast : (d : Error) ≤ (2 : Error) ^ (d + 1) := by
+      exact_mod_cast hd_nat
+    have hone_rpow_pow : (Real.rpow (1 - lambda) e) ^ (d + 1) = 1 - lambda := by
+      rw [← Real.rpow_natCast]
+      change ((1 - lambda) ^ e) ^ (((d + 1 : ℕ) : Error)) = 1 - lambda
+      rw [← Real.rpow_mul (sub_nonneg.mpr h1)]
+      change (1 - lambda) ^ (e * (((d + 1 : ℕ) : Error))) = 1 - lambda
+      rw [he_mul', Real.rpow_one]
+    have hmain_pow : (1 - lambda ^ d) ^ (d + 1) ≤ (2 * Real.rpow (1 - lambda) e) ^ (d + 1) := by
+      calc
+        (1 - lambda ^ d) ^ (d + 1) ≤ 1 - lambda ^ d := hpow_small
+        _ ≤ (d : Error) * (1 - lambda) := hlin
+        _ ≤ (2 : Error) ^ (d + 1) * (1 - lambda) := by
+          exact mul_le_mul_of_nonneg_right hd_cast (sub_nonneg.mpr h1)
+        _ = (2 * Real.rpow (1 - lambda) e) ^ (d + 1) := by
+          rw [mul_pow, hone_rpow_pow]
+    have hroot :
+        1 - lambda ^ d ≤ 2 * Real.rpow (1 - lambda) e := by
+      exact le_of_pow_le_pow_left₀ (Nat.succ_ne_zero d)
+        (mul_nonneg zero_le_two (Real.rpow_nonneg (sub_nonneg.mpr h1) _)) hmain_pow
+    have hlambda_rpow : Real.rpow (lambda ^ (d + 1)) e = lambda := by
+      rw [← Real.rpow_natCast]
+      change (lambda ^ (((d + 1 : ℕ) : Error))) ^ e = lambda
+      rw [← Real.rpow_mul h0]
+      change lambda ^ ((((d + 1 : ℕ) : Error)) * e) = lambda
+      rw [he_mul, Real.rpow_one]
+    have hmul_rpow :
+        Real.rpow (lambda ^ (d + 1) * (1 - lambda)) e =
+          Real.rpow (lambda ^ (d + 1)) e * Real.rpow (1 - lambda) e := by
+      exact Real.mul_rpow (pow_nonneg h0 _) (sub_nonneg.mpr h1)
+    calc
+      lambda * (1 - lambda ^ d) ≤ lambda * (2 * Real.rpow (1 - lambda) e) := by
+        exact mul_le_mul_of_nonneg_left hroot h0
+      _ = 2 * Real.rpow (lambda ^ (d + 1) * (1 - lambda)) e := by
+        calc
+          lambda * (2 * Real.rpow (1 - lambda) e) = 2 * (lambda * Real.rpow (1 - lambda) e) := by
+            ring
+          _ = 2 * (Real.rpow (lambda ^ (d + 1)) e * Real.rpow (1 - lambda) e) := by
+            nth_rw 1 [← hlambda_rpow]
+          _ = 2 * Real.rpow (lambda ^ (d + 1) * (1 - lambda)) e := by
+            rw [← hmul_rpow]
 
 /-- `lem:g-complete-self-consistency`. -/
 lemma gCompleteSelfConsistency
@@ -111,6 +196,12 @@ lemma gCompleteSelfConsistency
     (zeta : Error)
     (hself : family.StronglySelfConsistent ψbi zeta) :
     GCompleteSelfConsistencyStatement params ψbi family zeta := by
+  /-
+  Paper reference: `lem:g-complete-self-consistency` in
+  `references/ldt-paper/ld-pasting.tex`.
+  This should convert slice strong self-consistency into self-consistency of the
+  complete part `G^x = ∑_g G^x_g`.
+  -/
   sorry
 
 /-- `cor:g-bot-self-consistency`. -/
@@ -142,6 +233,12 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
       (switcherooPointProductRight params family M)
       chi) :
     CommutativitySwitcherooStatement params ψbi family M zeta omega chi := by
+  /-
+  Paper reference: `lem:commutativity-switcheroo` in
+  `references/ldt-paper/ld-pasting.tex`.
+  This is the main aggregate-commutation step upgrading commutation with each
+  `G^x_g` to commutation with the total `G^x`.
+  -/
   sorry
 
 /-- `cor:commuting-with-G-complete`. -/
@@ -189,6 +286,11 @@ lemma commuteGHalfSandwich
     (hk : 2 ≤ k)
     (hfacts : GHatFactsStatement params ψbi family gamma zeta) :
     CommuteGHalfSandwichStatement params ψbi family gamma zeta k := by
+  /-
+  Deferred core argument from `lem:commute-g-half-sandwich` in
+  `references/ldt-paper/ld-pasting.tex`.
+  The proof iterates the `\widehat G` commutation bound across the half-sandwich.
+  -/
   sorry
 
 /-- `lem:ld-sandwich-line-one-point`. -/
@@ -206,6 +308,12 @@ lemma ldSandwichLineOnePoint
     (k i : ℕ)
     (hi : i < k) :
     LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i := by
+  /-
+  Deferred core argument from `lem:ld-sandwich-line-one-point` in
+  `references/ldt-paper/ld-pasting.tex`.
+  This is the one-point comparison between the sandwiched completed-slice outcome
+  and the vertical-line measurement.
+  -/
   sorry
 
 /-- `lem:h-b-consistency`. -/
@@ -222,6 +330,11 @@ lemma hBConsistency
     (hline : ∀ i : ℕ, i < k →
       LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i) :
     HBConsistencyStatement params strategy family eps delta gamma zeta k := by
+  /-
+  Deferred packaging argument after `lem:ld-sandwich-line-one-point` in
+  `references/ldt-paper/ld-pasting.tex`; this is the `lem:h-b-consistency`
+  aggregation over all slice locations.
+  -/
   sorry
 
 /-- `lem:over-all-outcomes`. -/
@@ -236,6 +349,12 @@ lemma overAllOutcomes
     (hbound : family.Bounded strategy.state zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
+  /-
+  Deferred core argument from `lem:over-all-outcomes` in
+  `references/ldt-paper/ld-pasting.tex`.
+  The proof expands the total mass of the pasted measurement across all completed
+  outcome types `τ`.
+  -/
   sorry
 
 /-- `lem:from-H-to-G`. -/
@@ -252,6 +371,12 @@ lemma fromHToG
     (k : ℕ)
     (hhalf : CommuteGHalfSandwichStatement params ψbi family gamma zeta k) :
     FromHToGStatement params strategy family gamma zeta k := by
+  /-
+  Deferred core argument from `lem:from-H-to-G` in
+  `references/ldt-paper/ld-pasting.tex`.
+  This is the Bernoulli-tail recurrence converting the all-outcomes expansion to
+  the averaged complete operator `G`.
+  -/
   sorry
 
 /-- `lem:chernoff-bernoulli-matrix`. -/
@@ -274,6 +399,10 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
            exact hXleOne } : SubMeas Unit ι)
       (1 - kappa)) :
     ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd hXleOne := by
+  /-
+  Deferred matrix Chernoff/Bernoulli-tail contraction argument from
+  `lem:chernoff-bernoulli-matrix` in `references/ldt-paper/ld-pasting.tex`.
+  -/
   sorry
 
 /-- `cor:ld-pasting-N-completeness`. -/
@@ -291,6 +420,11 @@ theorem ldPastingNCompleteness
     (hk : 400 * params.m * params.d ≤ k) :
     LdPastingNCompletenessStatement params strategy family kappa
       (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
+  /-
+  Paper reference: `cor:ld-pasting-N-completeness` in
+  `references/ldt-paper/ld-pasting.tex`.
+  This combines `overAllOutcomes`, `fromHToG`, and the matrix Chernoff bound.
+  -/
   sorry
 
 end MIPStarRE.LDT.Pasting

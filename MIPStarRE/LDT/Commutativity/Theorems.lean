@@ -16,6 +16,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-! ## Error terms and packaged conclusions -/
 
 /-- Operator domination, written in source order as `X ≤ Y`. -/
 abbrev OperatorDominatedBy (X Y : MIPStarRE.Quantum.Op ι) : Prop :=
@@ -115,6 +116,8 @@ structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
       (normalizationConditionSquareOperator P Q)
       (normalizationConditionIdentityBound P Q)
 
+/-! ## Scaffold theorem statements -/
+
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG
     (params : Parameters)
@@ -126,7 +129,31 @@ lemma commDataProcessedG
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
     CommDataProcessedGConclusion params strategy family gamma zeta := by
-  sorry
+  refine
+    { postprocessedPointConsistency := ?_
+      postprocessedSelfConsistency := by
+        -- TODO: Derive self-consistency of the postprocessed left/right
+        -- evaluated point families from `hself` (`lem:comm-data-processed-g`);
+        -- blocked on the exact `evaluatedPointFamily` rewriting bridge.
+        sorry
+      stabilityOne := by
+        -- TODO: Prove the first insertion/removal stability step for the
+        -- appended `G^y` total operator (`lem:comm-data-processed-g`); blocked
+        -- on `SDDOpRel` append/postprocess bridge lemmas.
+        sorry
+      stabilityTwo := by
+        -- TODO: Prove the second insertion/removal stability step for the
+        -- appended `G^x` total operator (`lem:comm-data-processed-g`); blocked
+        -- on the corresponding `SDDOpRel` bridge from the evaluated slice
+        -- product scaffold.
+        sorry
+      evaluatedSliceCommutation := by
+        -- TODO: Show approximate commutation of the ordered and reversed
+        -- evaluated-slice products (`lem:comm-data-processed-g`); blocked on
+        -- chaining the two stability estimates with the processed-point
+        -- comparison.
+        sorry }
+  simpa [evaluatedPointFamily] using hcons.pointConsistency
 
 /-- `thm:com-main`. -/
 theorem comMain
@@ -139,7 +166,21 @@ theorem comMain
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
     ComMainConclusion params strategy family gamma zeta := by
-  sorry
+  let hEval :=
+    commDataProcessedG params strategy eps delta gamma zeta hgood family hcons hself hbound
+  refine
+    { evaluatedCommutation := hEval
+      evaluationSpecialization := by
+        -- TODO: Specialize full-slice product commutation to evaluated slices
+        -- by postprocessing sampled points (`thm:com-main`); blocked on an
+        -- `SDDOpRel` postprocess-specialization lemma.
+        sorry
+      fullSliceCommutation := by
+        -- TODO: Lift evaluated-slice commutation to the full-slice statement
+        -- with the displayed `comMainError` (`thm:com-main`); blocked on
+        -- comparison between full-slice and evaluated families plus averaging
+        -- infrastructure.
+        sorry }
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}
@@ -147,6 +188,25 @@ lemma normalizationCondition {OutcomeA OutcomeB : Type*}
     (P : SubMeas OutcomeA ι)
     (Q : ProjSubMeas OutcomeB ι) :
     NormalizationConditionStatement P Q := by
-  sorry
+  have hherm :
+      ∀ a : OutcomeA,
+        (normalizationConditionSandwichedTotalOperator P Q a)ᴴ =
+          normalizationConditionSandwichedTotalOperator P Q a := by
+    intro a
+    exact
+      (Matrix.nonneg_iff_posSemidef.mp <|
+        by
+          simpa [normalizationConditionSandwichedTotalOperator] using
+            SubMeas.total_nonneg (normalizationConditionSandwichedTotalFamily P Q a)
+      ).isHermitian.eq
+  refine
+    { sandwichedHermitianSquare := ?_
+      sandwichedBoundedByIdentity := ?_ }
+  · simp [normalizationConditionAdjointSquareOperator,
+      normalizationConditionSquareOperator,
+      normalizationConditionAdjointSquareFamily,
+      normalizationConditionSquareFamily, hherm]
+  · simpa [normalizationConditionSquareOperator, normalizationConditionIdentityBound] using
+      (normalizationConditionSquareFamily P Q).total_le_one
 
 end MIPStarRE.LDT.Commutativity

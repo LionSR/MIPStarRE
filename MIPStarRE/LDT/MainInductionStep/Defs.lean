@@ -317,4 +317,15 @@ noncomputable def sliceTransverseDirectionWeight (params : Parameters) : Error :
 noncomputable def sliceConditioningLoss (params : Parameters) : Error :=
   (((params.m + 1 : ℕ) : Error) / (params.m : Error))
 
+/-- In the current diagonal-test encoding, restricting to the slice at height
+`x` corresponds to conditioning on the sampled ambient diagonal direction having
+last coordinate `0`. This event has probability `1 / q`. -/
+noncomputable def sliceDiagonalDirectionWeight (params : Parameters) : Error :=
+  1 / (params.q : Error)
+
+/-- Reciprocal loss incurred when conditioning the diagonal test onto a fixed
+slice in the current encoding. -/
+noncomputable def sliceDiagonalConditioningLoss (params : Parameters) : Error :=
+  (params.q : Error)
+
 end MIPStarRE.LDT.MainInductionStep

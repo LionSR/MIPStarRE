@@ -51,15 +51,109 @@ instance instDecidablePredHypercubeEdgePair (params : Parameters) :
   infer_instance
 
 /-- Edge sampling by rerandomizing a single coordinate.
-TODO: should be the actual edge distribution of the hypercube graph, not uniform on all pairs. -/
+This is the Section 7.1 distribution:
+pick `u ∈ F_q^m`, `i ∈ {1, ..., m}`, and `x ∈ F_q` uniformly,
+then set `v = u[i ↦ x]`. -/
+noncomputable def rerandomizeCoordWeight (params : Parameters)
+    (u v : Point params) : Error :=
+  (((∑ p : Fin params.m × Fq params,
+      if Function.update u p.1 p.2 = v then (1 : ℕ) else 0) : ℕ) : Error) /
+    (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)
+
 noncomputable def rerandomizeCoord (params : Parameters) :
     Distribution (Point params × Point params) :=
-  uniformDistribution (Point params × Point params)
+  { support := Finset.univ
+    weight := fun uv => rerandomizeCoordWeight params uv.1 uv.2
+    -- Normalization: `∑ uv, weight uv = 1`. Each triple `(u, i, x)`
+    -- contributes to exactly one pair `(u, Function.update u i x)`, so the
+    -- total count is `q^m * m * q = hypercubeVertexCount * m * q`, matching
+    -- the denominator. `Distribution` doesn't carry a mass field; the
+    -- normalization should be proved as a standalone lemma when needed.
+    nonnegative := by
+      intro uv
+      have hden :
+          0 ≤ (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error) := by
+        positivity
+      exact div_nonneg (by positivity) hden
+    outsideSupport := by
+      intro uv huv
+      exact False.elim (huv (Finset.mem_univ uv)) }
+
+theorem rerandomizeCoord_mass_eq_one (params : Parameters) :
+    ∑ uv ∈ (rerandomizeCoord params).support, (rerandomizeCoord params).weight uv = 1 := by
+  classical
+  have hvertex_pos : 0 < hypercubeVertexCount params := by
+    simp [hypercubeVertexCount, pow_pos params.hq]
+  have hden_ne :
+      ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)) ≠ 0 := by
+    exact_mod_cast (Nat.ne_of_gt (Nat.mul_pos (Nat.mul_pos hvertex_pos params.hm) params.hq))
+  have hcount :
+      (∑ uv : Point params × Point params,
+        ∑ p : Fin params.m × Fq params,
+          if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) =
+        hypercubeVertexCount params * params.m * params.q := by
+    calc
+      (∑ uv : Point params × Point params,
+          ∑ p : Fin params.m × Fq params,
+            if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0)
+        = ∑ p : Fin params.m × Fq params,
+            ∑ uv : Point params × Point params,
+              if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0 := by
+                rw [Finset.sum_comm]
+      _ = ∑ p : Fin params.m × Fq params, hypercubeVertexCount params := by
+            refine Finset.sum_congr rfl ?_
+            intro p hp
+            rw [Fintype.sum_prod_type]
+            simp [hypercubeVertexCount, Fintype.card_fin]
+      _ = hypercubeVertexCount params * params.m * params.q := by
+            simp [hypercubeVertexCount, Fintype.card_fin]
+            ring_nf
+  have hcount_cast :
+      (∑ uv : Point params × Point params,
+        (((∑ p : Fin params.m × Fq params,
+            if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) : Error)) =
+        ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)) := by
+    simpa using congrArg (fun n : ℕ => (n : Error)) hcount
+  simp only [rerandomizeCoord, rerandomizeCoordWeight]
+  simp_rw [div_eq_mul_inv]
+  calc
+    ∑ uv : Point params × Point params,
+        (((∑ p : Fin params.m × Fq params,
+            if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) : Error) *
+          ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)⁻¹)
+      = (∑ uv : Point params × Point params,
+          (((∑ p : Fin params.m × Fq params,
+              if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) : Error)) *
+            ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)⁻¹) := by
+              simpa using
+                (Finset.sum_mul
+                  (s := (Finset.univ : Finset (Point params × Point params)))
+                  (f := fun uv =>
+                    (((∑ p : Fin params.m × Fq params,
+                        if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) :
+                      Error))
+                  (a := ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) :
+                    Error)⁻¹))).symm
+    _ = 1 := by
+          rw [hcount_cast]
+          exact mul_inv_cancel₀ hden_ne
 
 /-- Independent sampling of two uniformly random points. -/
+noncomputable def independentPointPairWeight (params : Parameters)
+    (_uv : Point params × Point params) : Error :=
+  ((hypercubeVertexCount params : Error)⁻¹) * ((hypercubeVertexCount params : Error)⁻¹)
+
 noncomputable def independentPointPair (params : Parameters) :
     Distribution (Point params × Point params) :=
-  uniformDistribution (Point params × Point params)
+  { support := Finset.univ
+    weight := independentPointPairWeight params
+    nonnegative := by
+      intro uv
+      simp only [independentPointPairWeight]
+      apply mul_nonneg <;> exact inv_nonneg.mpr (Nat.cast_nonneg _)
+    outsideSupport := by
+      intro uv huv
+      exact False.elim (huv (Finset.mem_univ uv)) }
 
 /-- Weighted sum of operators over a distribution's finite support,
 using the same `support`/`weight` data as the scalar `avgOver`. -/
@@ -137,12 +231,16 @@ noncomputable def localAndVariance (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error × Error :=
   (localVariance params A ψ, globalVariance params A ψ)
 
-/-- The paper's combined operator `A_combine = ∑_u |u⟩ ⊗ A^u ⊗ I`.
-We do not normalize by `|U|` here; the surrounding trace identities carry the
-paper's convention.  Built as a formal sum referencing each `A u`. -/
+/-- The column-space indices for `A_combine`. -/
+abbrev combinedColumnIndex (params : Parameters) (ι : Type*) := Point params × ι
+
+/-- The paper's combined column operator `A_combine = ∑_u |u⟩ ⊗ (A^u)† ⊗ I`.
+With our matrix convention and the variance witness `Dᴴ D`, the `u`-th block must
+be `(A^u)ᴴ` so that the resulting trace expands to `τ(ρ · Dᴴ D)`. -/
 noncomputable def combinedOperator (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  ∑ u : Point params, A u
+    (A : Point params → MIPStarRE.Quantum.Op ι) :
+    Matrix (combinedColumnIndex params ι) ι ℂ :=
+  fun ui j => star (A ui.1 j ui.2)
 
 /-! ### Fourier analysis on the hypercube `F_q^m`
 
@@ -315,13 +413,14 @@ noncomputable def orthogonalModeProjector (params : Parameters) :
     MIPStarRE.Quantum.Op (Point params) :=
   1 - constantModeProjector params
 
-/-- The trace witness from `lem:local-rewrite`.
-TODO(tensor): uses placeholder product instead of formalTensor since dimensions differ. -/
+/-- The trace witness from `lem:local-rewrite`. -/
 noncomputable def localVarianceTraceWitness (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : MIPStarRE.Quantum.Op ι :=
-  (combinedOperator params A) *
-    (ψ.density * ψ.density) *
-      (combinedOperator params A)
+  let Acombine := combinedOperator params A
+  let liftedLaplacianState :
+      Matrix (combinedColumnIndex params ι) (combinedColumnIndex params ι) ℂ :=
+    Matrix.kronecker (laplacian params) ψ.density
+  Acombineᴴ * (liftedLaplacianState * Acombine)
 
 /-- A packaged orthogonal decomposition for `A_combine`. -/
 structure GlobalVarianceDecomposition (params : Parameters)
@@ -331,12 +430,16 @@ structure GlobalVarianceDecomposition (params : Parameters)
   orthogonalOperator : MIPStarRE.Quantum.Op ι
   deriving Inhabited
 
-/-- The trace witness from `lem:global-rewrite`. -/
+/-- The trace witness from `lem:global-rewrite`.
+This uses the orthogonal projector onto the non-constant Fourier modes. -/
 noncomputable def globalVarianceTraceWitness (params : Parameters)
     (_A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
-    (decomp : GlobalVarianceDecomposition params _A) : MIPStarRE.Quantum.Op ι :=
-  -- TODO(tensor): uses placeholder product instead of formalTensor since dimensions differ
-  decomp.orthogonalOperator * (ψ.density * decomp.orthogonalOperator)
+    (_decomp : GlobalVarianceDecomposition params _A) : MIPStarRE.Quantum.Op ι :=
+  let Acombine := combinedOperator params _A
+  let liftedOrthogonalState :
+      Matrix (combinedColumnIndex params ι) (combinedColumnIndex params ι) ℂ :=
+    Matrix.kronecker (orthogonalModeProjector params) ψ.density
+  Acombineᴴ * (liftedOrthogonalState * Acombine)
 
 /-- The local-variance trace expression from `lem:local-rewrite`. -/
 noncomputable def localVarianceTraceForm (params : Parameters)
@@ -347,6 +450,8 @@ noncomputable def localVarianceTraceForm (params : Parameters)
 noncomputable def globalVarianceTraceForm (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
     (decomp : GlobalVarianceDecomposition params A) : Error :=
+  -- TODO(#136): document/verify the `1 / |U|` normalization convention against
+  -- Section 7 (`lem:global-rewrite`) to avoid silent constant-factor drift.
   (1 / (hypercubeVertexCount params : Error)) *
     Complex.re (MIPStarRE.Quantum.normalizedTrace (globalVarianceTraceWitness params A ψ decomp))
 
@@ -366,7 +471,7 @@ lemma zeroCoordinateCount_eq (params : Parameters) (α : Point params) :
   rw [frequencyWeight]
   have h := Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin params.m)))
     (p := fun i : Fin params.m => α i ≠ (0 : Fq params))
-  simp at h
+  simp only [ne_eq, Decidable.not_not, Finset.card_univ, Fintype.card_fin] at h
   exact Nat.eq_sub_of_add_eq (by simpa [add_comm] using h)
 
 lemma zeroCoordinateContributionSum (params : Parameters) (α : Point params) :
@@ -495,10 +600,7 @@ theorem eigenvectors (params : Parameters) :
                         fourierBasisState params α (Function.update u p.1 p.2) := by
                             refine Finset.sum_congr rfl ?_
                             intro p _
-                            simpa [eq_comm] using
-                              (Finset.sum_ite_eq (s := Finset.univ)
-                                (a := Function.update u p.1 p.2)
-                                (b := fourierBasisState params α))
+                            simp [eq_comm]
         _ = c * ∑ i : Fin params.m, ∑ x : Fq params,
               fourierBasisState params α (Function.update u i x) := by
                 rw [Fintype.sum_prod_type]
@@ -510,7 +612,9 @@ theorem eigenvectors (params : Parameters) :
       exact_mod_cast params.hq.ne'
     have hM : (hypercubeVertexCount params : ℂ) ≠ 0 := by
       exact_mod_cast (pow_pos params.hq params.m).ne'
-    simp [adjacencyEigenvalue, c]
+    simp only [mul_inv_rev, adjacencyEigenvalue, one_div, Complex.ofReal_mul,
+      Complex.ofReal_inv, Complex.ofReal_natCast, Complex.ofReal_div, Pi.smul_apply,
+      smul_eq_mul, c]
     rw [Nat.cast_sub hw]
     field_simp [hm, hq, hM]
 

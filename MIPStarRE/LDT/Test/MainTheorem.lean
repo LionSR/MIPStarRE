@@ -21,6 +21,13 @@ noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) 
 
 /--
 `thm:main-formal` from `test_definition.tex`.
+
+The bipartite tensor placement follows the paper:
+- **1a**: `A^A_u ⊗ I ≈_ν I ⊗ G^B_{[g(u)=a]}` — G_B on **right**
+- **1b**: `I ⊗ A^B_u ≈_ν G^A_{[g(u)=a]} ⊗ I` — A^B on **right**
+- **2**: `G^A_g ⊗ I ≈_ν I ⊗ G^B_g` — G_B on **right**
+
+Fixes #137.
 -/
 theorem mainFormal
     (params : Parameters) {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -32,15 +39,15 @@ theorem mainFormal
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsWithPolyEval params strategy.state
           (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementA)
-          G_B.toSubMeas.liftLeft
+          G_B.toSubMeas.liftRight
           (mainFormalError params k eps) ∧
         ConsWithPolyEval params strategy.state
-          (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementB)
+          (IdxProjMeas.toIdxSubMeasRight strategy.pointMeasurementB)
           G_A.toSubMeas.liftLeft
           (mainFormalError params k eps) ∧
         PolyMeasCons params strategy.state
           G_A.toSubMeas.liftLeft
-          G_B.toSubMeas.liftLeft
+          G_B.toSubMeas.liftRight
           (mainFormalError params k eps) := by
   sorry
 

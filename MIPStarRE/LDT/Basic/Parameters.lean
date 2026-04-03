@@ -474,8 +474,7 @@ private theorem natDegree_axisCoordinatePolynomial_le (params : Parameters)
       have hX : (_root_.Polynomial.X : LinePolynomialModel params) = 0 := Subsingleton.elim _ _
       simp [axisCoordinatePolynomial, hX]
     · letI := hnontriv
-      simpa [axisCoordinatePolynomial, add_comm] using
-        (Polynomial.natDegree_X_add_C (decodeScalar (ℓ.base ℓ.direction))).le
+      simp [axisCoordinatePolynomial, add_comm]
   · simp [axisCoordinatePolynomial, hi, Polynomial.natDegree_C]
 
 /-- Restrict a global polynomial to an axis-parallel line. -/
@@ -597,8 +596,7 @@ noncomputable def restrictToDiagonalLine (params : Parameters)
             exact Nat.mul_le_mul_left _ (natDegree_diagonalCoordinatePolynomial_le params ℓ j)
           _ = n j := by simp
       _ ≤ n.sum fun _ e => e := by
-        simpa [Finsupp.sum] using
-          (le_rfl : (∑ j ∈ n.support, n j) ≤ ∑ j ∈ n.support, n j)
+        simp [Finsupp.sum]
       _ ≤ ∑ j : Fin params.m, params.d := by
         simpa [Finsupp.sum_fintype] using
           (Finset.sum_le_sum fun j (_ : j ∈ Finset.univ) =>

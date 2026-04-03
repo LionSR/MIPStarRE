@@ -135,7 +135,14 @@ noncomputable def bndError {Outcome : Type*} {ι : Type*}
     (Z : MIPStarRE.Quantum.Op ι) : Error :=
   max 0 (subMeasMass ψ A - ev ψ Z)
 
-/-- Consistency relation. -/
+/-- Consistency relation.
+
+This is intentionally just a one-field wrapper around `consError ψ 𝒟 A B ≤ δ`.
+The extra layer does not add mathematical content; it mainly keeps consistency
+statements parallel to the sibling relations `SDDRel`, `SSCRel`, etc., and gives
+the bound a stable named projection (`offDiagonalBound`) for downstream proofs.
+In practice many lemmas still immediately destruct `ConsRel` with `⟨h⟩`, so this
+is more of an API/readability wrapper than a deep abstraction barrier. -/
 structure ConsRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
@@ -162,6 +169,37 @@ structure SSCRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [Decidable
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error) : Prop where
   diagonalOverlapBound : sscError ψ 𝒟 A ≤ δ
+
+/-- Bipartite questionwise strong self-consistency defect.
+This is the paper's SSC condition (Definition 4.3/4.4):
+  `max 0 (∑ₐ ev ψ (Aₐ ⊗ I) − ∑ₐ ev ψ (Aₐ ⊗ Aₐ))`.
+It measures the gap between the total mass on one register and the
+diagonal cross-register overlap. -/
+noncomputable def qBipartiteSSCDefect
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) : Error :=
+  let totalMass := ev ψ (leftTensor (ι₂ := ι) A.total)
+  let overlapMass := ∑ a, ev ψ (opTensor (A.outcome a) (A.outcome a))
+  max 0 (totalMass - overlapMass)
+
+/-- Averaged bipartite SSC defect. -/
+noncomputable def bipartiteSSCError
+    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι) : Error :=
+  avgOver 𝒟 (fun q => qBipartiteSSCDefect ψ (A q))
+
+/-- Bipartite strong self-consistency relation (paper's definition).
+Uses the cross-register overlap `∑ₐ ev ψ (Aₐ ⊗ Aₐ)` rather than
+the local square `∑ₐ ev ψ (Aₐ² ⊗ I)`. -/
+structure BipartiteSSCRel
+    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι) (δ : Error) : Prop where
+  overlapBound : bipartiteSSCError ψ 𝒟 A ≤ δ
 
 /-- Completeness statement for a submeasurement. -/
 structure CompletenessAtLeast {Outcome : Type*} {ι : Type*}
@@ -190,7 +228,13 @@ structure ConsWithPolyEval {ι : Type*} [Fintype ι] [DecidableEq ι]
       (polynomialEvaluationFamily params G)
       δ
 
-/-- Consistency between two global polynomial submeasurements. -/
+/-- Consistency between two global polynomial submeasurements.
+
+This is a thin wrapper over `ConsRel` specialized to the trivial question
+distribution `uniformDistribution Unit` and constant families
+`constSubMeasFamily G₁`, `constSubMeasFamily G₂`. It exists mostly to make
+high-level statements read closer to the paper; if it stops helping readability,
+it could be inlined at use sites without changing the underlying notion. -/
 structure PolyMeasCons {ι : Type*} [Fintype ι] [DecidableEq ι]
     (params : Parameters)
     (ψ : QuantumState ι)
@@ -296,21 +340,12 @@ theorem sddError_self {Question Outcome : Type*} {ι : Type*} [Fintype ι] [Deci
     funext fun q => qSDD_self ψ (A q)
   rw [this]; exact avgOver_zero 𝒟
 
-/-- Data processing: postprocessing can only decrease the consistency defect. -/
-theorem qConsDefect_postprocess_le {α β : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype α] [Fintype β]
-    (ψ : QuantumState ι) (A B : SubMeas α ι) (f : α → β) :
-    qConsDefect ψ (postprocess A f) (postprocess B f) ≤
-      qConsDefect ψ A B := by
-  unfold qConsDefect
-  simp only [postprocess_total]
-  -- Suffices to show: matching mass increases under postprocessing
-  -- i.e., ∑_b ⟨ψ, (∑_{a:f(a)=b} A_a)(∑_{c:f(c)=b} B_c) ψ⟩ ≥ ∑_a ⟨ψ, A_a B_a ψ⟩
-  -- Then max(0, overlap - match') ≤ max(0, overlap - match) since match' ≥ match
-  apply max_le_max_left 0
-  apply sub_le_sub_left
-  -- Need: qMatchMass after postprocessing ≥ qMatchMass before
-  sorry
+/- The naive monotonicity statement
+`qConsDefect ψ (postprocess A f) (postprocess B f) ≤ qConsDefect ψ A B`
+is false for arbitrary submeasurements: without opposite-side / commuting
+hypotheses, the extra cross terms created by postprocessing need not be
+nonnegative. The paper's data-processing proposition is therefore recorded in
+the bipartite form `Preliminaries.simeqDataProcessing`, not as a generic fact
+about `qConsDefect`. -/
 
 end MIPStarRE.LDT
