@@ -1158,6 +1158,64 @@ private lemma question_overlap_gap_right
             _ = ev ψ ((A.outcome a - B.outcome a) * B.outcome a) := by
                   simp [sub_mul]
 
+private lemma sum_ev_mul_leftBounded_le_of_leftHermitian
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (LB : MIPStarRE.Quantum.Op ι)
+    (X Y : Outcome → MIPStarRE.Quantum.Op ι)
+    (hLB_herm : LBᴴ = LB)
+    (hLB_sq_le_one : LB * LB ≤ 1)
+    (hXherm : ∀ a, (X a)ᴴ = X a)
+    (hYherm : ∀ a, (Y a)ᴴ = Y a) :
+    |∑ a : Outcome, ev ψ (X a * (LB * Y a))| ≤
+      Real.sqrt (∑ a : Outcome, ev ψ (X a * X a)) *
+        Real.sqrt (∑ a : Outcome, ev ψ ((Y a)ᴴ * Y a)) := by
+  calc
+    |∑ a : Outcome, ev ψ (X a * (LB * Y a))|
+      ≤ ∑ a : Outcome, |ev ψ (X a * (LB * Y a))| := by
+          exact Finset.abs_sum_le_sum_abs _ _
+    _ ≤ ∑ a : Outcome,
+          Real.sqrt (ev ψ (X a * X a)) *
+            Real.sqrt (ev ψ (((LB * Y a)ᴴ) * (LB * Y a))) := by
+          refine Finset.sum_le_sum ?_
+          intro a _
+          simpa [hXherm a] using
+            ev_abs_mul_le_sqrt ψ (X a) (LB * Y a)
+    _ ≤ Real.sqrt
+          (∑ a : Outcome, ev ψ (X a * X a)) *
+        Real.sqrt
+          (∑ a : Outcome,
+            ev ψ (((LB * Y a)ᴴ) * (LB * Y a))) := by
+          exact
+            Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
+              (f := fun a => ev ψ (X a * X a))
+              (g := fun a => ev ψ (((LB * Y a)ᴴ) * (LB * Y a)))
+              (fun a => by
+                simpa [hXherm a] using ev_adjoint_self_nonneg ψ ((X a)ᴴ))
+              (fun a => by
+                exact ev_adjoint_self_nonneg ψ (LB * Y a))
+    _ ≤ Real.sqrt
+          (∑ a : Outcome, ev ψ (X a * X a)) *
+        Real.sqrt
+          (∑ a : Outcome, ev ψ ((Y a)ᴴ * Y a)) := by
+          apply mul_le_mul
+          · exact le_rfl
+          · exact Real.sqrt_le_sqrt <| Finset.sum_le_sum fun a _ => by
+              have hsand :
+                  Y a * (LB * LB) * Y a ≤ Y a * 1 * Y a := by
+                exact MIPStarRE.Quantum.sandwich_mono (hYherm a) hLB_sq_le_one
+              have hev := ev_mono ψ _ _ hsand
+              simpa [hLB_herm, hYherm a, Matrix.conjTranspose_mul, mul_assoc] using hev
+          · exact Real.sqrt_nonneg _
+          · exact Real.sqrt_nonneg _
+
+-- NOTE: `question_switchSandwich_left_gap` and `question_switchSandwich_middle_gap`
+-- are each ~330 lines. The shared OpBounded01 setup has been extracted into
+-- `leftTensor_opBounded01_*` helpers above. The shared
+-- `sum_ev_mul_leftBounded_le_of_leftHermitian` lemma now packages the
+-- Cauchy-Schwarz application plus the `LB * LB ≤ 1` sandwich contraction,
+-- while the two long proofs keep their distinct rewrite skeletons.
 private lemma question_switchSandwich_left_gap
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
@@ -1186,6 +1244,30 @@ private lemma question_switchSandwich_left_gap
     exact opBounded01_hermitian hLB
   have hLB_sq_le_one : LB * LB ≤ 1 := by
     exact opBounded01_sq_le_one hLB
+  have hLAherm :
+      ∀ a : Outcome,
+        (leftTensor (ι₂ := ι) (A.outcome a))ᴴ =
+          leftTensor (ι₂ := ι) (A.outcome a) := by
+    intro a
+    exact
+      (Matrix.nonneg_iff_posSemidef.mp
+        (leftTensor_nonneg (ι₂ := ι) (A.outcome_pos a))).isHermitian.eq
+  have hRAherm :
+      ∀ a : Outcome,
+        (rightTensor (ι₁ := ι) (A.outcome a))ᴴ =
+          rightTensor (ι₁ := ι) (A.outcome a) := by
+    intro a
+    exact
+      (Matrix.nonneg_iff_posSemidef.mp
+        (rightTensor_nonneg (ι₁ := ι) (A.outcome_pos a))).isHermitian.eq
+  have hDherm :
+      ∀ a : Outcome,
+        (leftTensor (ι₂ := ι) (A.outcome a) -
+          rightTensor (ι₁ := ι) (A.outcome a))ᴴ =
+          leftTensor (ι₂ := ι) (A.outcome a) -
+            rightTensor (ι₁ := ι) (A.outcome a) := by
+    intro a
+    simp [hLAherm a, hRAherm a]
   have haux :
       |∑ a : Outcome,
           ev ψ
@@ -1206,135 +1288,13 @@ private lemma question_switchSandwich_left_gap
                     rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
                 (leftTensor (ι₂ := ι) (A.outcome a) -
                   rightTensor (ι₁ := ι) (A.outcome a)))) := by
-    calc
-      |∑ a : Outcome,
-          ev ψ
-            (leftTensor (ι₂ := ι) (A.outcome a) *
-              (LB *
-                (leftTensor (ι₂ := ι) (A.outcome a) -
-                  rightTensor (ι₁ := ι) (A.outcome a))))|
-        ≤ ∑ a : Outcome,
-            |ev ψ
-              (leftTensor (ι₂ := ι) (A.outcome a) *
-                (LB *
-                  (leftTensor (ι₂ := ι) (A.outcome a) -
-                    rightTensor (ι₁ := ι) (A.outcome a))))| := by
-            exact Finset.abs_sum_le_sum_abs _ _
-      _ ≤ ∑ a : Outcome,
-            Real.sqrt
-              (ev ψ
-                (leftTensor (ι₂ := ι) (A.outcome a) *
-                  (leftTensor (ι₂ := ι) (A.outcome a))ᴴ)) *
-              Real.sqrt
-                (ev ψ
-                  (((LB *
-                        (leftTensor (ι₂ := ι) (A.outcome a) -
-                          rightTensor (ι₁ := ι) (A.outcome a)))ᴴ) *
-                    (LB *
-                      (leftTensor (ι₂ := ι) (A.outcome a) -
-                        rightTensor (ι₁ := ι) (A.outcome a))))) := by
-            refine Finset.sum_le_sum ?_
-            intro a _
-            exact ev_abs_mul_le_sqrt ψ
-              (leftTensor (ι₂ := ι) (A.outcome a))
-              (LB *
-                (leftTensor (ι₂ := ι) (A.outcome a) -
-                  rightTensor (ι₁ := ι) (A.outcome a)))
-      _ ≤ Real.sqrt
-            (∑ a : Outcome,
-              ev ψ
-                (leftTensor (ι₂ := ι) (A.outcome a) *
-                  (leftTensor (ι₂ := ι) (A.outcome a))ᴴ)) *
-          Real.sqrt
-            (∑ a : Outcome,
-              ev ψ
-                (((LB *
-                      (leftTensor (ι₂ := ι) (A.outcome a) -
-                        rightTensor (ι₁ := ι) (A.outcome a)))ᴴ) *
-                  (LB *
-                    (leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a))))) := by
-            exact
-              Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
-                (f := fun a =>
-                  ev ψ
-                    (leftTensor (ι₂ := ι) (A.outcome a) *
-                      (leftTensor (ι₂ := ι) (A.outcome a))ᴴ))
-                (g := fun a =>
-                  ev ψ
-                    (((LB *
-                          (leftTensor (ι₂ := ι) (A.outcome a) -
-                            rightTensor (ι₁ := ι) (A.outcome a)))ᴴ) *
-                      (LB *
-                        (leftTensor (ι₂ := ι) (A.outcome a) -
-                          rightTensor (ι₁ := ι) (A.outcome a)))))
-                (fun a => by
-                  simpa [SubMeas.outcome_hermitian] using
-                    ev_adjoint_self_nonneg ψ
-                      ((leftTensor (ι₂ := ι) (A.outcome a))ᴴ)
-                )
-                (fun a => by
-                  exact ev_adjoint_self_nonneg ψ
-                    (LB *
-                      (leftTensor (ι₂ := ι) (A.outcome a) -
-                        rightTensor (ι₁ := ι) (A.outcome a))))
-      _ ≤ Real.sqrt
-            (∑ a : Outcome,
-              ev ψ
-                (leftTensor (ι₂ := ι) (A.outcome a) *
-                  leftTensor (ι₂ := ι) (A.outcome a))) *
-          Real.sqrt
-            (∑ a : Outcome,
-              ev ψ
-                (((leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
-                  (leftTensor (ι₂ := ι) (A.outcome a) -
-                    rightTensor (ι₁ := ι) (A.outcome a)))) := by
-            apply mul_le_mul
-            · exact Real.sqrt_le_sqrt <| Finset.sum_le_sum fun a _ => by
-                have hAherm :
-                    (leftTensor (ι₂ := ι) (A.outcome a))ᴴ =
-                      leftTensor (ι₂ := ι) (A.outcome a) := by
-                  exact
-                    (Matrix.nonneg_iff_posSemidef.mp
-                      (leftTensor_nonneg (ι₂ := ι) (A.outcome_pos a))).isHermitian.eq
-                simp [hAherm]
-            · exact Real.sqrt_le_sqrt <| Finset.sum_le_sum fun a _ => by
-                have hLAherm :
-                    (leftTensor (ι₂ := ι) (A.outcome a))ᴴ =
-                      leftTensor (ι₂ := ι) (A.outcome a) := by
-                  exact
-                    (Matrix.nonneg_iff_posSemidef.mp
-                      (leftTensor_nonneg (ι₂ := ι) (A.outcome_pos a))).isHermitian.eq
-                have hRAherm :
-                    (rightTensor (ι₁ := ι) (A.outcome a))ᴴ =
-                      rightTensor (ι₁ := ι) (A.outcome a) := by
-                  exact
-                    (Matrix.nonneg_iff_posSemidef.mp
-                      (rightTensor_nonneg (ι₁ := ι) (A.outcome_pos a))).isHermitian.eq
-                have hDherm :
-                    (leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a))ᴴ =
-                      leftTensor (ι₂ := ι) (A.outcome a) -
-                        rightTensor (ι₁ := ι) (A.outcome a) := by
-                  simp [hLAherm, hRAherm]
-                have hsand :
-                    ((leftTensor (ι₂ := ι) (A.outcome a) -
-                          rightTensor (ι₁ := ι) (A.outcome a)) *
-                      (LB * LB) *
-                      (leftTensor (ι₂ := ι) (A.outcome a) -
-                        rightTensor (ι₁ := ι) (A.outcome a)))
-                    ≤
-                    ((leftTensor (ι₂ := ι) (A.outcome a) -
-                          rightTensor (ι₁ := ι) (A.outcome a)) *
-                      1 *
-                      (leftTensor (ι₂ := ι) (A.outcome a) -
-                        rightTensor (ι₁ := ι) (A.outcome a))) := by
-                  exact MIPStarRE.Quantum.sandwich_mono hDherm hLB_sq_le_one
-                have hev := ev_mono ψ _ _ hsand
-                simpa [LB, hLB_herm, hDherm, Matrix.conjTranspose_mul, mul_assoc] using hev
-            · exact Real.sqrt_nonneg _
-            · exact Real.sqrt_nonneg _
+    simpa using
+      sum_ev_mul_leftBounded_le_of_leftHermitian ψ LB
+        (fun a => leftTensor (ι₂ := ι) (A.outcome a))
+        (fun a =>
+          leftTensor (ι₂ := ι) (A.outcome a) -
+            rightTensor (ι₁ := ι) (A.outcome a))
+        hLB_herm hLB_sq_le_one hLAherm hDherm
   have hdiag_le_one :
       ∑ a : Outcome,
         ev ψ
@@ -1512,6 +1472,30 @@ private lemma question_switchSandwich_middle_gap
     exact opBounded01_hermitian hLB
   have hLB_sq_le_one : LB * LB ≤ 1 := by
     exact opBounded01_sq_le_one hLB
+  have hLAherm :
+      ∀ a : Outcome,
+        (leftTensor (ι₂ := ι) (A.outcome a))ᴴ =
+          leftTensor (ι₂ := ι) (A.outcome a) := by
+    intro a
+    exact
+      (Matrix.nonneg_iff_posSemidef.mp
+        (leftTensor_nonneg (ι₂ := ι) (A.outcome_pos a))).isHermitian.eq
+  have hRAherm :
+      ∀ a : Outcome,
+        (rightTensor (ι₁ := ι) (A.outcome a))ᴴ =
+          rightTensor (ι₁ := ι) (A.outcome a) := by
+    intro a
+    exact
+      (Matrix.nonneg_iff_posSemidef.mp
+        (rightTensor_nonneg (ι₁ := ι) (A.outcome_pos a))).isHermitian.eq
+  have hDherm :
+      ∀ a : Outcome,
+        (leftTensor (ι₂ := ι) (A.outcome a) -
+          rightTensor (ι₁ := ι) (A.outcome a))ᴴ =
+          leftTensor (ι₂ := ι) (A.outcome a) -
+            rightTensor (ι₁ := ι) (A.outcome a) := by
+    intro a
+    simp [hLAherm a, hRAherm a]
   have haux :
       |∑ a : Outcome,
           ev ψ
@@ -1522,8 +1506,8 @@ private lemma question_switchSandwich_middle_gap
       Real.sqrt
         (∑ a : Outcome,
           ev ψ
-            (((leftTensor (ι₂ := ι) (A.outcome a) -
-                  rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
+            ((leftTensor (ι₂ := ι) (A.outcome a) -
+                rightTensor (ι₁ := ι) (A.outcome a)) *
               (leftTensor (ι₂ := ι) (A.outcome a) -
                 rightTensor (ι₁ := ι) (A.outcome a)))) *
         Real.sqrt
@@ -1531,120 +1515,13 @@ private lemma question_switchSandwich_middle_gap
             ev ψ
               (rightTensor (ι₁ := ι) (A.outcome a) *
                 rightTensor (ι₁ := ι) (A.outcome a))) := by
-    calc
-      |∑ a : Outcome,
-          ev ψ
-            ((leftTensor (ι₂ := ι) (A.outcome a) -
-                rightTensor (ι₁ := ι) (A.outcome a)) *
-              (LB * rightTensor (ι₁ := ι) (A.outcome a)))|
-        ≤ ∑ a : Outcome,
-            |ev ψ
-              ((leftTensor (ι₂ := ι) (A.outcome a) -
-                  rightTensor (ι₁ := ι) (A.outcome a)) *
-                (LB * rightTensor (ι₁ := ι) (A.outcome a)))| := by
-            exact Finset.abs_sum_le_sum_abs _ _
-      _ ≤ ∑ a : Outcome,
-            Real.sqrt
-              (ev ψ
-                (((leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a)) *
-                    ((leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a)))ᴴ))) *
-              Real.sqrt
-                (ev ψ
-                  (((LB * rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
-                    (LB * rightTensor (ι₁ := ι) (A.outcome a)))) := by
-            refine Finset.sum_le_sum ?_
-            intro a _
-            exact ev_abs_mul_le_sqrt ψ
-              (leftTensor (ι₂ := ι) (A.outcome a) -
-                rightTensor (ι₁ := ι) (A.outcome a))
-              (LB * rightTensor (ι₁ := ι) (A.outcome a))
-      _ ≤ Real.sqrt
-            (∑ a : Outcome,
-              ev ψ
-                (((leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a)) *
-                    ((leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a)))ᴴ))) *
-          Real.sqrt
-            (∑ a : Outcome,
-              ev ψ
-                (((LB * rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
-                  (LB * rightTensor (ι₁ := ι) (A.outcome a)))) := by
-            exact
-              Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
-                (f := fun a =>
-                  ev ψ
-                    (((leftTensor (ι₂ := ι) (A.outcome a) -
-                          rightTensor (ι₁ := ι) (A.outcome a)) *
-                        ((leftTensor (ι₂ := ι) (A.outcome a) -
-                          rightTensor (ι₁ := ι) (A.outcome a)))ᴴ)))
-                (g := fun a =>
-                  ev ψ
-                    (((LB * rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
-                      (LB * rightTensor (ι₁ := ι) (A.outcome a))))
-                (fun a => by
-                  simpa [SubMeas.outcome_hermitian, leftTensor, rightTensor] using
-                    ev_adjoint_self_nonneg ψ
-                      ((leftTensor (ι₂ := ι) (A.outcome a) -
-                          rightTensor (ι₁ := ι) (A.outcome a))ᴴ))
-                (fun a => by
-                  exact ev_adjoint_self_nonneg ψ
-                    (LB * rightTensor (ι₁ := ι) (A.outcome a)))
-      _ ≤ Real.sqrt
-            (∑ a : Outcome,
-              ev ψ
-                (((leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
-                  (leftTensor (ι₂ := ι) (A.outcome a) -
-                    rightTensor (ι₁ := ι) (A.outcome a)))) *
-          Real.sqrt
-            (∑ a : Outcome,
-              ev ψ
-                (rightTensor (ι₁ := ι) (A.outcome a) *
-                  rightTensor (ι₁ := ι) (A.outcome a))) := by
-            apply mul_le_mul
-            · exact Real.sqrt_le_sqrt <| Finset.sum_le_sum fun a _ => by
-                have hLAherm :
-                    (leftTensor (ι₂ := ι) (A.outcome a))ᴴ =
-                      leftTensor (ι₂ := ι) (A.outcome a) := by
-                  exact
-                    (Matrix.nonneg_iff_posSemidef.mp
-                      (leftTensor_nonneg (ι₂ := ι) (A.outcome_pos a))).isHermitian.eq
-                have hRAherm :
-                    (rightTensor (ι₁ := ι) (A.outcome a))ᴴ =
-                      rightTensor (ι₁ := ι) (A.outcome a) := by
-                  exact
-                    (Matrix.nonneg_iff_posSemidef.mp
-                      (rightTensor_nonneg (ι₁ := ι) (A.outcome_pos a))).isHermitian.eq
-                have hDherm :
-                    (leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a))ᴴ =
-                      leftTensor (ι₂ := ι) (A.outcome a) -
-                        rightTensor (ι₁ := ι) (A.outcome a) := by
-                  simp [hLAherm, hRAherm]
-                simp [hDherm]
-            · exact Real.sqrt_le_sqrt <| Finset.sum_le_sum fun a _ => by
-                have hRherm :
-                    (rightTensor (ι₁ := ι) (A.outcome a))ᴴ =
-                      rightTensor (ι₁ := ι) (A.outcome a) := by
-                  exact
-                    (Matrix.nonneg_iff_posSemidef.mp
-                      (rightTensor_nonneg (ι₁ := ι) (A.outcome_pos a))).isHermitian.eq
-                have hsand :
-                    rightTensor (ι₁ := ι) (A.outcome a) *
-                        (LB * LB) *
-                        rightTensor (ι₁ := ι) (A.outcome a)
-                    ≤
-                    rightTensor (ι₁ := ι) (A.outcome a) *
-                        1 *
-                        rightTensor (ι₁ := ι) (A.outcome a) := by
-                  exact MIPStarRE.Quantum.sandwich_mono hRherm hLB_sq_le_one
-                have hev := ev_mono ψ _ _ hsand
-                simpa [LB, hLB_herm, hRherm, Matrix.conjTranspose_mul, mul_assoc] using hev
-            · exact Real.sqrt_nonneg _
-            · exact Real.sqrt_nonneg _
+    simpa [hRAherm] using
+      sum_ev_mul_leftBounded_le_of_leftHermitian ψ LB
+        (fun a =>
+          leftTensor (ι₂ := ι) (A.outcome a) -
+            rightTensor (ι₁ := ι) (A.outcome a))
+        (fun a => rightTensor (ι₁ := ι) (A.outcome a))
+        hLB_herm hLB_sq_le_one hDherm hRAherm
   have hdiag_le_one :
       ∑ a : Outcome,
         ev ψ
@@ -1669,8 +1546,8 @@ private lemma question_switchSandwich_middle_gap
       Real.sqrt
         (∑ a : Outcome,
           ev ψ
-            (((leftTensor (ι₂ := ι) (A.outcome a) -
-                  rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
+            ((leftTensor (ι₂ := ι) (A.outcome a) -
+                rightTensor (ι₁ := ι) (A.outcome a)) *
               (leftTensor (ι₂ := ι) (A.outcome a) -
                 rightTensor (ι₁ := ι) (A.outcome a)))) := by
     calc
@@ -1683,8 +1560,8 @@ private lemma question_switchSandwich_middle_gap
           Real.sqrt
             (∑ a : Outcome,
               ev ψ
-                (((leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
+                ((leftTensor (ι₂ := ι) (A.outcome a) -
+                    rightTensor (ι₁ := ι) (A.outcome a)) *
                   (leftTensor (ι₂ := ι) (A.outcome a) -
                     rightTensor (ι₁ := ι) (A.outcome a)))) *
             Real.sqrt
@@ -1696,8 +1573,8 @@ private lemma question_switchSandwich_middle_gap
           Real.sqrt
             (∑ a : Outcome,
               ev ψ
-                (((leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
+                ((leftTensor (ι₂ := ι) (A.outcome a) -
+                    rightTensor (ι₁ := ι) (A.outcome a)) *
                   (leftTensor (ι₂ := ι) (A.outcome a) -
                     rightTensor (ι₁ := ι) (A.outcome a)))) * 1 := by
             exact mul_le_mul_of_nonneg_left hsqrt_diag (Real.sqrt_nonneg _)
@@ -1705,8 +1582,8 @@ private lemma question_switchSandwich_middle_gap
           Real.sqrt
             (∑ a : Outcome,
               ev ψ
-                (((leftTensor (ι₂ := ι) (A.outcome a) -
-                      rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
+                ((leftTensor (ι₂ := ι) (A.outcome a) -
+                    rightTensor (ι₁ := ι) (A.outcome a)) *
                   (leftTensor (ι₂ := ι) (A.outcome a) -
                     rightTensor (ι₁ := ι) (A.outcome a)))) := by
             ring
@@ -1840,12 +1717,12 @@ private lemma question_switchSandwich_middle_gap
     _ ≤ Real.sqrt
           (∑ a : Outcome,
             ev ψ
-              (((leftTensor (ι₂ := ι) (A.outcome a) -
-                    rightTensor (ι₁ := ι) (A.outcome a))ᴴ) *
+              ((leftTensor (ι₂ := ι) (A.outcome a) -
+                  rightTensor (ι₁ := ι) (A.outcome a)) *
                 (leftTensor (ι₂ := ι) (A.outcome a) -
                   rightTensor (ι₁ := ι) (A.outcome a)))) := haux'
     _ = Real.sqrt (qSDD ψ A.toSubMeas.liftLeft A.toSubMeas.liftRight) := by
-          simp [qSDD, qSDDCore, SubMeas.liftLeft, SubMeas.liftRight]
+          simp [qSDD, qSDDCore, SubMeas.liftLeft, SubMeas.liftRight, hDherm]
 
 
 private lemma switchSandwich_leftTransfer
@@ -2430,9 +2307,127 @@ private lemma completenessTransfer_core {Question Outcome : Type*}
       idxSubMeasMass ψ 𝒟
         (IdxProjSubMeas.toIdxSubMeas P)
         - 2 * Real.sqrt ε := by
-  -- TODO: factor through mixed overlaps `⟨ψ, A_a P_a ψ⟩`,
-  -- apply weighted Cauchy-Schwarz (using `hψ` + `h𝒟`).
-  sorry
+  intro hε
+  let gap : Question → Error := fun q =>
+    subMeasMass ψ ((IdxProjSubMeas.toIdxSubMeas P) q) - subMeasMass ψ (A q)
+  let sdd : Question → Error := fun q =>
+    qSDD ψ (A q) ((IdxProjSubMeas.toIdxSubMeas P) q)
+  have hgap_pointwise : ∀ q, gap q ≤ 2 * Real.sqrt (sdd q) := by
+    intro q
+    let diagA : Error := ∑ a : Outcome, ev ψ ((A q).outcome a * (A q).outcome a)
+    let diagP : Error := ∑ a : Outcome, ev ψ ((P q).outcome a * (P q).outcome a)
+    let overlap : Error := ∑ a : Outcome, ev ψ ((A q).outcome a * (P q).outcome a)
+    have hmassP_eq_diagP :
+        subMeasMass ψ ((IdxProjSubMeas.toIdxSubMeas P) q) = diagP := by
+      simpa [subMeasMass, IdxProjSubMeas.toIdxSubMeas, diagP] using
+        (projSubMeas_diagMass_eq_mass ψ (P q)).symm
+    have hdiagA_le_massA :
+        diagA ≤ subMeasMass ψ (A q) := by
+      simpa [subMeasMass, diagA] using subMeas_diagMass_le_mass ψ (A q)
+    have hgap_left_raw :
+        |diagA - overlap| ≤ Real.sqrt (sdd q) := by
+      simpa [diagA, overlap, sdd, IdxProjSubMeas.toIdxSubMeas] using
+        question_overlap_gap_left ψ hψ (A q) ((P q).toSubMeas)
+    have hgap_left :
+        overlap - diagA ≤ Real.sqrt (sdd q) := by
+      linarith [abs_le.mp hgap_left_raw]
+    have hgap_right_raw :
+        |overlap - diagP| ≤ Real.sqrt (sdd q) := by
+      simpa [diagP, overlap, sdd, IdxProjSubMeas.toIdxSubMeas] using
+        question_overlap_gap_right ψ hψ (A q) ((P q).toSubMeas)
+    have hgap_right :
+        diagP - overlap ≤ Real.sqrt (sdd q) := by
+      linarith [abs_le.mp hgap_right_raw]
+    have hmass_gap :
+        gap q ≤ diagP - diagA := by
+      have hmassP_eq_diagP' :
+          ev ψ ((IdxProjSubMeas.toIdxSubMeas P q).total) = diagP := by
+        simpa [subMeasMass] using hmassP_eq_diagP
+      dsimp [gap, subMeasMass]
+      calc
+        ev ψ ((IdxProjSubMeas.toIdxSubMeas P q).total) - ev ψ (A q).total
+          ≤ ev ψ ((IdxProjSubMeas.toIdxSubMeas P q).total) - diagA := by
+              exact sub_le_sub_left hdiagA_le_massA _
+        _ = diagP - diagA := by rw [hmassP_eq_diagP']
+    have hdiag_gap : diagP - diagA ≤ 2 * Real.sqrt (sdd q) := by
+      linarith
+    exact le_trans hmass_gap hdiag_gap
+  have hgap_avg :
+      avgOver 𝒟 gap ≤ avgOver 𝒟 (fun q => 2 * Real.sqrt (sdd q)) := by
+    unfold avgOver
+    refine Finset.sum_le_sum ?_
+    intro q hq
+    exact mul_le_mul_of_nonneg_left (hgap_pointwise q) (𝒟.nonnegative q)
+  have hsqrt_avg_abs :
+      |avgOver 𝒟 (fun q => Real.sqrt (sdd q))| ≤
+        Real.sqrt (avgOver 𝒟 sdd) := by
+    exact
+      avgOver_abs_le_sqrt_of_pointwise 𝒟
+        (fun q => Real.sqrt (sdd q))
+        sdd
+        (by
+          intro q
+          rw [abs_of_nonneg (Real.sqrt_nonneg _)])
+        (by
+          intro q
+          exact qSDD_nonneg ψ (A q) ((IdxProjSubMeas.toIdxSubMeas P) q))
+        h𝒟
+  have hsqrt_avg_nonneg :
+      0 ≤ avgOver 𝒟 (fun q => Real.sqrt (sdd q)) := by
+    unfold avgOver
+    exact Finset.sum_nonneg fun q hq =>
+      mul_nonneg (𝒟.nonnegative q) (Real.sqrt_nonneg _)
+  have hsqrt_avg :
+      avgOver 𝒟 (fun q => Real.sqrt (sdd q)) ≤
+        Real.sqrt (avgOver 𝒟 sdd) := by
+    simpa [abs_of_nonneg hsqrt_avg_nonneg] using hsqrt_avg_abs
+  have hscale_avg :
+      avgOver 𝒟 (fun q => 2 * Real.sqrt (sdd q)) =
+        2 * avgOver 𝒟 (fun q => Real.sqrt (sdd q)) := by
+    unfold avgOver
+    calc
+      ∑ q ∈ 𝒟.support, 𝒟.weight q * (2 * Real.sqrt (sdd q))
+        = ∑ q ∈ 𝒟.support, 2 * (𝒟.weight q * Real.sqrt (sdd q)) := by
+            refine Finset.sum_congr rfl ?_
+            intro q hq
+            ring
+      _ = 2 * ∑ q ∈ 𝒟.support, 𝒟.weight q * Real.sqrt (sdd q) := by
+            rw [← Finset.mul_sum]
+  have hsdd_sqrt :
+      avgOver 𝒟 (fun q => 2 * Real.sqrt (sdd q)) ≤
+        2 * Real.sqrt (sddError ψ 𝒟 A (IdxProjSubMeas.toIdxSubMeas P)) := by
+    rw [hscale_avg]
+    calc
+      2 * avgOver 𝒟 (fun q => Real.sqrt (sdd q))
+        ≤ 2 * Real.sqrt (avgOver 𝒟 sdd) := by
+            exact mul_le_mul_of_nonneg_left hsqrt_avg (by positivity)
+      _ = 2 * Real.sqrt (sddError ψ 𝒟 A (IdxProjSubMeas.toIdxSubMeas P)) := by
+            simp [sddError, sdd]
+  have hgap_total :
+      idxSubMeasMass ψ 𝒟 (IdxProjSubMeas.toIdxSubMeas P) -
+          idxSubMeasMass ψ 𝒟 A
+        ≤ 2 * Real.sqrt (sddError ψ 𝒟 A (IdxProjSubMeas.toIdxSubMeas P)) := by
+    calc
+      idxSubMeasMass ψ 𝒟 (IdxProjSubMeas.toIdxSubMeas P) -
+          idxSubMeasMass ψ 𝒟 A
+        = avgOver 𝒟 gap := by
+            unfold idxSubMeasMass subMeasMass avgOver gap
+            rw [← Finset.sum_sub_distrib]
+            refine Finset.sum_congr rfl ?_
+            intro q hq
+            simp [mul_sub, subMeasMass]
+      _ ≤ avgOver 𝒟 (fun q => 2 * Real.sqrt (sdd q)) := hgap_avg
+      _ ≤ 2 * Real.sqrt (sddError ψ 𝒟 A (IdxProjSubMeas.toIdxSubMeas P)) := hsdd_sqrt
+  have hsqrt_ε :
+      Real.sqrt (sddError ψ 𝒟 A (IdxProjSubMeas.toIdxSubMeas P)) ≤ Real.sqrt ε := by
+    exact Real.sqrt_le_sqrt hε
+  have hgap_total' :
+      idxSubMeasMass ψ 𝒟 (IdxProjSubMeas.toIdxSubMeas P) -
+          idxSubMeasMass ψ 𝒟 A
+        ≤ 2 * Real.sqrt ε := by
+    exact le_trans hgap_total <| by
+      exact mul_le_mul_of_nonneg_left hsqrt_ε (by positivity)
+  linarith
 
 /-- `prop:completeness-transfer-projective-P`.
 

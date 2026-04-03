@@ -64,9 +64,11 @@ noncomputable def rerandomizeCoord (params : Parameters) :
     Distribution (Point params × Point params) :=
   { support := Finset.univ
     weight := fun uv => rerandomizeCoordWeight params uv.1 uv.2
-    -- TODO(#136): prove normalization `∑ uv, rerandomizeCoordWeight params uv.1 uv.2 = 1`.
-    -- `Distribution` currently tracks nonnegativity/support only; downstream proofs that
-    -- need probability-mass semantics should use an explicit normalization lemma.
+    -- Normalization: `∑ uv, weight uv = 1`. Each triple `(u, i, x)`
+    -- contributes to exactly one pair `(u, Function.update u i x)`, so the
+    -- total count is `q^m * m * q = hypercubeVertexCount * m * q`, matching
+    -- the denominator. `Distribution` doesn't carry a mass field; the
+    -- normalization should be proved as a standalone lemma when needed.
     nonnegative := by
       intro uv
       have hden :
@@ -76,6 +78,65 @@ noncomputable def rerandomizeCoord (params : Parameters) :
     outsideSupport := by
       intro uv huv
       exact False.elim (huv (Finset.mem_univ uv)) }
+
+theorem rerandomizeCoord_mass_eq_one (params : Parameters) :
+    ∑ uv ∈ (rerandomizeCoord params).support, (rerandomizeCoord params).weight uv = 1 := by
+  classical
+  have hvertex_pos : 0 < hypercubeVertexCount params := by
+    simp [hypercubeVertexCount, pow_pos params.hq]
+  have hden_ne :
+      ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)) ≠ 0 := by
+    exact_mod_cast (Nat.ne_of_gt (Nat.mul_pos (Nat.mul_pos hvertex_pos params.hm) params.hq))
+  have hcount :
+      (∑ uv : Point params × Point params,
+        ∑ p : Fin params.m × Fq params,
+          if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) =
+        hypercubeVertexCount params * params.m * params.q := by
+    calc
+      (∑ uv : Point params × Point params,
+          ∑ p : Fin params.m × Fq params,
+            if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0)
+        = ∑ p : Fin params.m × Fq params,
+            ∑ uv : Point params × Point params,
+              if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0 := by
+                rw [Finset.sum_comm]
+      _ = ∑ p : Fin params.m × Fq params, hypercubeVertexCount params := by
+            refine Finset.sum_congr rfl ?_
+            intro p hp
+            rw [Fintype.sum_prod_type]
+            simp [hypercubeVertexCount, Fintype.card_fin]
+      _ = hypercubeVertexCount params * params.m * params.q := by
+            simp [hypercubeVertexCount, Fintype.card_fin]
+            ring_nf
+  have hcount_cast :
+      (∑ uv : Point params × Point params,
+        (((∑ p : Fin params.m × Fq params,
+            if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) : Error)) =
+        ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)) := by
+    simpa using congrArg (fun n : ℕ => (n : Error)) hcount
+  simp only [rerandomizeCoord, rerandomizeCoordWeight]
+  simp_rw [div_eq_mul_inv]
+  calc
+    ∑ uv : Point params × Point params,
+        (((∑ p : Fin params.m × Fq params,
+            if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) : Error) *
+          ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)⁻¹)
+      = (∑ uv : Point params × Point params,
+          (((∑ p : Fin params.m × Fq params,
+              if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) : Error)) *
+            ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)⁻¹) := by
+              simpa using
+                (Finset.sum_mul
+                  (s := (Finset.univ : Finset (Point params × Point params)))
+                  (f := fun uv =>
+                    (((∑ p : Fin params.m × Fq params,
+                        if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) :
+                      Error))
+                  (a := ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) :
+                    Error)⁻¹))).symm
+    _ = 1 := by
+          rw [hcount_cast]
+          exact mul_inv_cancel₀ hden_ne
 
 /-- Independent sampling of two uniformly random points. -/
 noncomputable def independentPointPairWeight (params : Parameters)
