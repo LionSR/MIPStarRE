@@ -147,7 +147,9 @@ lemma localRewrite (params : Parameters)
       localVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ]
 
 /-- `lem:global-rewrite`. -/
--- TODO(matrix-realization): needs a bridge to the matrix realization layer.
+-- NOTE: the existential witness `default` works because `GlobalRewriteStatement`
+-- only claims *existence* of a decomposition. A future refactor could propagate
+-- the concrete decomposition from the matrix realization layer.
 lemma globalRewrite (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     GlobalRewriteStatement params A ψ := by

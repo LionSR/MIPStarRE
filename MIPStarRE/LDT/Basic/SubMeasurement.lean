@@ -404,6 +404,13 @@ def IdxProjMeas.toIdxSubMeasLeft {Question Outcome : Type*} {ι : Type*}
     (A : IdxProjMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι) :=
   (IdxProjMeas.toIdxSubMeas A).liftLeft
 
+/-- Lift an indexed projective measurement family to an indexed submeasurement family
+on the right tensor factor. -/
+def IdxProjMeas.toIdxSubMeasRight {Question Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    (A : IdxProjMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι) :=
+  (IdxProjMeas.toIdxSubMeas A).liftRight
+
 /-- Lift an indexed projective submeasurement family to an indexed submeasurement family
 on the right tensor factor. -/
 def IdxProjSubMeas.toIdxSubMeasRight {Question Outcome : Type*} {ι : Type*}

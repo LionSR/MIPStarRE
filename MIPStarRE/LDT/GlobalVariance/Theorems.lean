@@ -198,7 +198,11 @@ lemma localVarianceOfPoints
           _ = localVarianceOfPointsError params eps delta := by
                 simp [polynomialDistribution, avgOver, uniformDistribution] }
 
-/-- `lem:global-variance-of-points`. -/
+/-- `lem:global-variance-of-points`.
+Depends on `localVarianceOfPoints` (which has sorry sub-goals for
+the local variance bound). The overall proof structure is complete:
+`localToGlobal` lifts pointwise local bounds to global bounds,
+and the averaging step is fully proved. -/
 lemma globalVarianceOfPoints
     (params : Parameters)
     (strategy : SymStrat params ι)
