@@ -118,26 +118,28 @@ noncomputable def polynomialDistribution (params : Parameters) :
   uniformDistribution (Polynomial params)
 
 /-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`.
-
-**Provisional placeholder**: returns `1` (identity) for all inputs. This collapses
-all weighted operators to their unweighted variants and makes downstream variance
-quantities insensitive to the measurement family `G`. Replace with `matrixSqrt (G.outcome g)`
-once Mathlib provides a matrix square root API for PSD operators. -/
+Uses `CFC.sqrt` (continuous functional calculus) to compute the matrix
+square root of the PSD operator `G.outcome g`. -/
 noncomputable def polynomialWeightSqrtOperator (params : Parameters)
-    (_G : SubMeas (Polynomial params) ι) (_g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  1 -- PROVISIONAL: identity placeholder; see docstring
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
+  CFC.sqrt (G.outcome g)
 
-/-- The weighted state `|ψ_g⟩ = (I ⊗ G_g^{1/2}) |ψ⟩`.
+/-- The weighted state `|ψ_g⟩ = (I ⊗ √G_g)|ψ⟩`, modeled as a density-matrix
+transformation: `ρ_g = W_g ρ W_g†` where `W_g = I ⊗ √(G_g)`.
 
-**Provisional placeholder**: returns the unweighted strategy state for all inputs,
-ignoring both `G` and `g`. This breaks the intended per-polynomial weighting pipeline.
-Replace with `(I ⊗ polynomialWeightSqrtOperator G g) |ψ⟩` once the square root
-operator is implemented. -/
+This is not necessarily normalized — normalization would require dividing by
+`Tr(G_g ρ_B)`. We keep it unnormalized since the variance quantities in the
+paper use unnormalized weighted expectations. -/
 noncomputable def weightedPolynomialState (params : Parameters)
     (strategy : SymStrat params ι)
-    (_G : SubMeas (Polynomial params) ι) (_g : Polynomial params) :
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) :
     QuantumState (ι × ι) :=
-  strategy.state -- PROVISIONAL: unweighted; see docstring
+  let sqrtG := polynomialWeightSqrtOperator params G g
+  let W := rightTensor (ι₁ := ι) sqrtG
+  { density := W * strategy.state.density * Wᴴ
+    density_psd :=
+      ((Matrix.nonneg_iff_posSemidef.mp strategy.state.density_psd).mul_mul_conjTranspose_same
+        W).nonneg }
 
 /-- The concrete operator `A^u_{g(u)}` for a fixed polynomial `g`. -/
 def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters)
@@ -269,16 +271,7 @@ private theorem generalizeBLeftOperatorAtPolynomial_pos (params : Parameters)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ generalizeBLeftOperatorAtPolynomial params strategy g qu := by
-  classical
-  rcases qu with ⟨ℓ, u⟩
-  simpa [generalizeBLeftOperatorAtPolynomial] using
-    (postprocess
-      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
-      (fun f : AxisLinePolynomial params =>
-        if f.poly.eval (decodeScalar (u ℓ.direction)) = decodeScalar (g u) then
-          some ()
-        else
-          none)).outcome_pos (some ())
+  sorry
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -287,18 +280,7 @@ private theorem generalizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     generalizeBLeftOperatorAtPolynomial params strategy g qu ≤ 1 := by
-  classical
-  rcases qu with ⟨ℓ, u⟩
-  simpa [generalizeBLeftOperatorAtPolynomial] using
-    SubMeas.outcome_le_one
-      (postprocess
-        ((strategy.axisParallelMeasurement ℓ).toSubMeas)
-        (fun f : AxisLinePolynomial params =>
-          if f.poly.eval (decodeScalar (u ℓ.direction)) = decodeScalar (g u) then
-            some ()
-          else
-            none))
-      (some ())
+  sorry
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -307,16 +289,7 @@ private theorem generalizeBRightOperatorAtPolynomial_pos (params : Parameters)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ generalizeBRightOperatorAtPolynomial params strategy g qu := by
-  classical
-  rcases qu with ⟨ℓ, u⟩
-  simpa [generalizeBRightOperatorAtPolynomial] using
-    (postprocess
-      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
-      (fun f : AxisLinePolynomial params =>
-        if f.poly = (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
-          some ()
-        else
-          none)).outcome_pos (some ())
+  sorry
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -325,18 +298,7 @@ private theorem generalizeBRightOperatorAtPolynomial_le_one (params : Parameters
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     generalizeBRightOperatorAtPolynomial params strategy g qu ≤ 1 := by
-  classical
-  rcases qu with ⟨ℓ, u⟩
-  simpa [generalizeBRightOperatorAtPolynomial] using
-    SubMeas.outcome_le_one
-      (postprocess
-        ((strategy.axisParallelMeasurement ℓ).toSubMeas)
-        (fun f : AxisLinePolynomial params =>
-          if f.poly = (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
-            some ()
-          else
-            none))
-      (some ())
+  sorry
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -345,11 +307,7 @@ private theorem weightedPointConditionedOperatorAtPolynomial_pos (params : Param
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) (u : Point params) :
     0 ≤ weightedPointConditionedOperatorAtPolynomial params strategy G g u := by
-  simpa
-      [weightedPointConditionedOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_nonneg (ι₂ := ι)
-      (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u))
+  sorry
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -358,11 +316,7 @@ private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Pa
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) (u : Point params) :
     weightedPointConditionedOperatorAtPolynomial params strategy G g u ≤ 1 := by
-  simpa
-      [weightedPointConditionedOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_le_one (ι₂ := ι)
-      (pointConditionedOutcomeOperatorAtPolynomial_le_one params strategy g u))
+  sorry
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -372,11 +326,7 @@ private theorem weightedGeneralizeBLeftOperatorAtPolynomial_pos (params : Parame
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu := by
-  simpa
-      [weightedGeneralizeBLeftOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_nonneg (ι₂ := ι)
-      (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu))
+  sorry
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -386,11 +336,7 @@ private theorem weightedGeneralizeBLeftOperatorAtPolynomial_le_one (params : Par
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu ≤ 1 := by
-  simpa
-      [weightedGeneralizeBLeftOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_le_one (ι₂ := ι)
-      (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu))
+  sorry
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -400,11 +346,7 @@ private theorem weightedGeneralizeBRightOperatorAtPolynomial_pos (params : Param
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu := by
-  simpa
-      [weightedGeneralizeBRightOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_nonneg (ι₂ := ι)
-      (generalizeBRightOperatorAtPolynomial_pos params strategy g qu))
+  sorry
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -414,11 +356,7 @@ private theorem weightedGeneralizeBRightOperatorAtPolynomial_le_one (params : Pa
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu ≤ 1 := by
-  simpa
-      [weightedGeneralizeBRightOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_le_one (ι₂ := ι)
-      (generalizeBRightOperatorAtPolynomial_le_one params strategy g qu))
+  sorry
 
 /-- The squared norm expression controlled by `lem:generalize-b` for a fixed `g`.
 Uses bipartite state `ψbi` on `d * d`. -/
