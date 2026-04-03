@@ -28,7 +28,7 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
   pointConsistency :
     ConsWithPolyEval params strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      H.toSubMeas.liftLeft
+      H.toSubMeas.liftRight
       (selfImprovementInInductionError params eps delta gamma)
   strongSelfConsistency :
     PolyMeasSSC params strategy.state H.toSubMeas.liftLeft
@@ -54,7 +54,7 @@ structure LdPastingInInductionSectionConclusion (params : Parameters)
   pointConsistency :
     ConsWithPolyEval params.next strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      H.toSubMeas.liftLeft
+      H.toSubMeas.liftRight
       (ldPastingInInductionError params k eps delta gamma kappa zeta)
 
 /-- Bookkeeping data `x ↦ (ε_x, δ_x, γ_x)` for the restricted strategies. -/

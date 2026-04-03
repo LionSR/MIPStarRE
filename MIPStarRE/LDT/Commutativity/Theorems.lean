@@ -56,7 +56,7 @@ structure CommDataProcessedGConclusion (params : Parameters)
     ConsRel strategy.state
       (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (IdxSubMeas.liftLeft (evaluatedPointFamily params family))
+      (IdxSubMeas.liftRight (evaluatedPointFamily params family))
       zeta
   postprocessedSelfConsistency :
     SDDRel strategy.state

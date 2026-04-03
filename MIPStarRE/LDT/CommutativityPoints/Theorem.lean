@@ -50,8 +50,9 @@ private lemma avgOver_uniform_equiv
 
 /-- Output package for `thm:commutativity-points`.
 
-The strategy state is bipartite (`QuantumState (ι × ι)`).  Local-register
-fields lift measurements to the left tensor factor. -/
+The strategy state is bipartite (`QuantumState (ι × ι)`).  Alice's local
+measurements are lifted to the left tensor factor (`liftLeft`); Bob's
+diagonal-line measurements are lifted to the right (`liftRight`). -/
 structure CommutativityPointsStatement (params : Parameters)
     (strategy : SymStrat params ι)
     (_eps _delta gamma : Error) : Prop where
@@ -59,13 +60,13 @@ structure CommutativityPointsStatement (params : Parameters)
     ConsRel strategy.state
       (pointWithDiagonalLineDistribution params)
       (IdxSubMeas.liftLeft (sampledPointMeasurement params strategy))
-      (IdxSubMeas.liftLeft (sampledDiagonalLineEvaluation params strategy))
+      (IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy))
       (restrictedDiagonalLinesConsistencyError params gamma)
   sampledDiagonalLineApproximation :
     SDDRel strategy.state
       (pointWithDiagonalLineDistribution params)
       (IdxSubMeas.liftLeft (sampledPointMeasurement params strategy))
-      (IdxSubMeas.liftLeft (sampledDiagonalLineEvaluation params strategy))
+      (IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy))
       (pointDiagonalLineApproxError params gamma)
   orderedLiftToMixedBridge :
     SDDOpRel strategy.state
@@ -116,17 +117,19 @@ theorem commutativityPoints
         /-
         This is the diagonal-lines test, rewritten in the
         `PointDiagonalLineQuestion` indexing used in this section.
+        Alice's point measurement is on the left factor, Bob's diagonal-line
+        measurement is on the right factor.
         -/
         let e := pointDiagonalLineQuestionEquiv params
         have hrewrite :
             consError strategy.state
               (pointWithDiagonalLineDistribution params)
               (IdxSubMeas.liftLeft (sampledPointMeasurement params strategy))
-              (IdxSubMeas.liftLeft (sampledDiagonalLineEvaluation params strategy)) =
+              (IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy)) =
             consError strategy.state
               (uniformDistribution (DiagonalTestSample params))
               (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-              (IdxSubMeas.liftLeft (diagonalLineAnswerFamily strategy)) := by
+              (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)) := by
           unfold consError
           simpa [e, pointWithDiagonalLineDistribution, sampledPointMeasurement,
             sampledDiagonalLineEvaluation, sampledPointFromDiagonalQuestion,
@@ -135,14 +138,14 @@ theorem commutativityPoints
               (fun q =>
                 qConsDefect strategy.state
                   ((IdxSubMeas.liftLeft (sampledPointMeasurement params strategy)) q)
-                  ((IdxSubMeas.liftLeft (sampledDiagonalLineEvaluation params strategy)) q))
+                  ((IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy)) q))
         constructor
         rw [hrewrite]
         have hγ : 0 ≤ gamma := by
           exact le_trans (consError_nonneg strategy.state
             (uniformDistribution (DiagonalTestSample params))
             (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-            (IdxSubMeas.liftLeft (diagonalLineAnswerFamily strategy)))
+            (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)))
             hgood.diagonalLineTest
         have hm : (1 : Error) ≤ params.m := by
           exact_mod_cast params.hm
@@ -150,7 +153,7 @@ theorem commutativityPoints
           consError strategy.state
               (uniformDistribution (DiagonalTestSample params))
               (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-              (IdxSubMeas.liftLeft (diagonalLineAnswerFamily strategy))
+              (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy))
             ≤ gamma := hgood.diagonalLineTest
           _ ≤ gamma * (params.m : Error) := by nlinarith
       sampledDiagonalLineApproximation := by
