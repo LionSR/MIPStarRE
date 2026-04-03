@@ -64,6 +64,9 @@ noncomputable def rerandomizeCoord (params : Parameters) :
     Distribution (Point params × Point params) :=
   { support := Finset.univ
     weight := fun uv => rerandomizeCoordWeight params uv.1 uv.2
+    -- TODO(#136): prove normalization `∑ uv, rerandomizeCoordWeight params uv.1 uv.2 = 1`.
+    -- `Distribution` currently tracks nonnegativity/support only; downstream proofs that
+    -- need probability-mass semantics should use an explicit normalization lemma.
     nonnegative := by
       intro uv
       have hden :
@@ -386,6 +389,8 @@ noncomputable def localVarianceTraceForm (params : Parameters)
 noncomputable def globalVarianceTraceForm (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
     (decomp : GlobalVarianceDecomposition params A) : Error :=
+  -- TODO(#136): document/verify the `1 / |U|` normalization convention against
+  -- Section 7 (`lem:global-rewrite`) to avoid silent constant-factor drift.
   (1 / (hypercubeVertexCount params : Error)) *
     Complex.re (MIPStarRE.Quantum.normalizedTrace (globalVarianceTraceWitness params A ψ decomp))
 

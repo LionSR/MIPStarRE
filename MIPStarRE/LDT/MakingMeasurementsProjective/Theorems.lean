@@ -89,6 +89,9 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
   Extend the isometry column `V` to a unitary `U` on the whole enlarged space.
   The dilated projectors are then `U† (I ⊗ |oa⟩⟨oa|) U`.
   -/
+  -- TODO(#118): 5 sorry sites below are blocked on unitary extension infrastructure.
+  --   (1) define `U`, (2) `lifted_isProj`, (3) `lifted_pos`,
+  --   (4) `lifted_sum_le_one`, (5) `expectation_preservation`.
   let U : MIPStarRE.Quantum.Op (d × Option α) := by
     sorry
   refine ⟨{

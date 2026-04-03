@@ -633,6 +633,8 @@ private lemma consSubMeas_sandwichControl
     SDDRel ψ 𝒟
       (diagonalSandwichFamily A B)
       (totalSandwichFamily A B) γ := by
+  -- TODO(#136): this proof and `consSubMeas_diagonalControl` share the same
+  -- `0 ≤ X ≤ 1` + `sq_le_self` + `qMatchMass` bookkeeping pattern; factor common core.
   intro ⟨hcons⟩
   constructor
   unfold sddError consError at *
@@ -2163,6 +2165,8 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
     (PermInvState ψ ∧ SSCRel ψ 𝒟 (IdxSubMeas.liftLeft A) δ) →
       SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A)
         (IdxSubMeas.liftRight A) (2 * δ) := by
+  -- TODO(#136): prove the left-vs-right bridge from `PermInvState` + SSC,
+  -- i.e. `A ⊗ I ≈ I ⊗ A` in SDD, per `prop:two-notions-of-self-consistency`.
   sorry
 
 lemma constFamily_sdd_unit
