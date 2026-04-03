@@ -206,7 +206,7 @@ structure SelfImprovementHelperConclusion (params : Parameters)
       H.liftRight
       (selfImprovementHelperError params eps delta)
   strongSelfConsistency :
-    PolyMeasSSC params strategy.state H.liftLeft
+    PolyMeasSSC params strategy.state H
       (selfImprovementHelperError params eps delta)
   positiveSemidefiniteWitness :
     0 ≤ Z

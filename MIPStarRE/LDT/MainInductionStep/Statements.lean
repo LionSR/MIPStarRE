@@ -31,7 +31,7 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
       H.toSubMeas.liftRight
       (selfImprovementInInductionError params eps delta gamma)
   strongSelfConsistency :
-    PolyMeasSSC params strategy.state H.toSubMeas.liftLeft
+    PolyMeasSSC params strategy.state H.toSubMeas
       (selfImprovementInInductionError params eps delta gamma)
   selfCloseness :
     SDDRel strategy.state (uniformDistribution Unit)

@@ -198,13 +198,13 @@ set_option linter.unusedFintypeInType false in
 theorem orthonormalization {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (A : SubMeas Outcome ι) (ζ : Error) :
-    SSCRel ψ (uniformDistribution Unit)
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) :
+    BipartiteSSCRel ψ (uniformDistribution Unit)
         (constSubMeasFamily A) ζ →
       ∃ P : ProjSubMeas Outcome ι,
         SDDRel ψ (uniformDistribution Unit)
-          (constSubMeasFamily A)
-          (constSubMeasFamily P.toSubMeas)
+          (constSubMeasFamily A.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
   /-
   This theorem still needs the completion-to-measurement bridge and the final
