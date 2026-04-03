@@ -458,8 +458,8 @@ private lemma consSubMeas_diagonalControl
                 ((diagonalSandwichFamily A B) q).outcome a
             have hX_nonneg : 0 ≤ X := by
               dsimp [X, Aq, Bq, Dq]
-              simp [IdxSubMeas.liftLeft, SubMeas.liftLeft, diagonalSandwichFamily,
-                MIPStarRE.LDT.leftTensor_mul_rightTensor_eq_opTensor]
+              simp only [IdxSubMeas.liftLeft, SubMeas.liftLeft, diagonalSandwichFamily,
+                LDT.leftTensor_mul_rightTensor_eq_opTensor, sub_nonneg]
               exact MIPStarRE.LDT.opTensor_le_leftTensor
                 ((A q).outcome_pos a)
                 (Measurement.outcome_le_one (B q) a)
@@ -500,8 +500,8 @@ private lemma consSubMeas_diagonalControl
                             ((diagonalSandwichFamily A B) q).outcome a
                         change 0 ≤ X
                         dsimp [X, diagonalSandwichFamily]
-                        simp [IdxSubMeas.liftLeft, SubMeas.liftLeft,
-                          MIPStarRE.LDT.leftTensor_mul_rightTensor_eq_opTensor]
+                        simp only [IdxSubMeas.liftLeft, SubMeas.liftLeft,
+                          LDT.leftTensor_mul_rightTensor_eq_opTensor, sub_nonneg]
                         exact MIPStarRE.LDT.opTensor_le_leftTensor
                           ((A q).outcome_pos a)
                           (Measurement.outcome_le_one (B q) a)
@@ -516,7 +516,7 @@ private lemma consSubMeas_diagonalControl
                         ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) ((A q).outcome a)) =
                           ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
                       rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ι) ((A q).outcome a))]
-                      simp [SubMeas.liftLeft, leftTensor_finset_sum, (A q).sum_eq_total]
+                      simp [leftTensor_finset_sum, (A q).sum_eq_total]
                     calc
                       ∑ a : Outcome,
                           ev ψ
@@ -527,7 +527,8 @@ private lemma consSubMeas_diagonalControl
                               ev ψ
                                 (leftTensor (ι₂ := ι) ((A q).outcome a) *
                                   rightTensor (ι₁ := ι) ((B q).outcome a)) := by
-                              simp [IdxSubMeas.liftLeft, SubMeas.liftLeft, diagonalSandwichFamily, ev_sub]
+                              simp [IdxSubMeas.liftLeft, SubMeas.liftLeft,
+                                diagonalSandwichFamily, ev_sub]
                       _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) -
                             qMatchMass ψ
                               (((IdxSubMeas.liftLeft A) q))
@@ -579,7 +580,7 @@ private lemma consSubMeas_diagonalControl
                         ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) ((A q).outcome a)) =
                           ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
                       rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ι) ((A q).outcome a))]
-                      simp [SubMeas.liftLeft, leftTensor_finset_sum, (A q).sum_eq_total]
+                      simp [leftTensor_finset_sum, (A q).sum_eq_total]
                     calc
                       ∑ a : Outcome,
                           ev ψ
@@ -590,7 +591,8 @@ private lemma consSubMeas_diagonalControl
                               ev ψ
                                 (leftTensor (ι₂ := ι) ((A q).outcome a) *
                                   rightTensor (ι₁ := ι) ((B q).outcome a)) := by
-                              simp [IdxSubMeas.liftLeft, SubMeas.liftLeft, diagonalSandwichFamily, ev_sub]
+                              simp [IdxSubMeas.liftLeft, SubMeas.liftLeft,
+                                diagonalSandwichFamily, ev_sub]
                       _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) -
                             qMatchMass ψ
                               (((IdxSubMeas.liftLeft A) q))
@@ -661,8 +663,8 @@ private lemma consSubMeas_sandwichControl
                 ((diagonalSandwichFamily A B) q).outcome a
             have hX_nonneg : 0 ≤ X := by
               dsimp [X]
-              simp [diagonalSandwichFamily, totalSandwichFamily,
-                MIPStarRE.LDT.leftTensor_mul_rightTensor_eq_opTensor]
+              simp only [totalSandwichFamily, LDT.leftTensor_mul_rightTensor_eq_opTensor,
+                diagonalSandwichFamily, sub_nonneg]
               exact MIPStarRE.LDT.opTensor_mono_left
                 ((A q).outcome_le_total a)
                 ((B q).outcome_pos a)
@@ -719,8 +721,9 @@ private lemma consSubMeas_sandwichControl
                             ((diagonalSandwichFamily A B) q).outcome a
                         change 0 ≤ X
                         dsimp [X]
-                        simp [diagonalSandwichFamily, totalSandwichFamily,
-                          MIPStarRE.LDT.leftTensor_mul_rightTensor_eq_opTensor]
+                        simp only [totalSandwichFamily,
+                          LDT.leftTensor_mul_rightTensor_eq_opTensor,
+                          diagonalSandwichFamily, sub_nonneg]
                         exact MIPStarRE.LDT.opTensor_mono_left
                           ((A q).outcome_le_total a)
                           ((B q).outcome_pos a)
@@ -754,7 +757,10 @@ private lemma consSubMeas_sandwichControl
                                 rightTensor (ι₁ := ι) (∑ a : Outcome, (B q).outcome a)) := by
                                   rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ
                                     (fun a : Outcome => (B q).outcome a)]
-                        _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total) * rightTensor (ι₁ := ι) 1) := by
+                        _ =
+                            ev ψ
+                              (leftTensor (ι₂ := ι) ((A q).total) *
+                                rightTensor (ι₁ := ι) 1) := by
                                   rw [(B q).sum_eq]
                         _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
                                   simp [leftTensor, rightTensor]
@@ -828,7 +834,10 @@ private lemma consSubMeas_sandwichControl
                                 rightTensor (ι₁ := ι) (∑ a : Outcome, (B q).outcome a)) := by
                                   rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ
                                     (fun a : Outcome => (B q).outcome a)]
-                        _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total) * rightTensor (ι₁ := ι) 1) := by
+                        _ =
+                            ev ψ
+                              (leftTensor (ι₂ := ι) ((A q).total) *
+                                rightTensor (ι₁ := ι) 1) := by
                                   rw [(B q).sum_eq]
                         _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) := by
                                   simp [leftTensor, rightTensor]
@@ -904,8 +913,8 @@ theorem consSubMeas {Question Outcome : Type*}
 /-! ### Bridge lemmas for `prop:switch-sandwich` -/
 
 private lemma weightedFinsetCauchySchwarz
-    {Question Outcome : Type*} {ι : Type*}
-    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    {Question Outcome : Type*}
+    [Fintype Outcome]
     (𝒟 : Distribution Question)
     (t x y : Question → Outcome → Error)
     (ht : ∀ q a, |t q a| ≤ Real.sqrt (x q a) * Real.sqrt (y q a))
@@ -962,7 +971,7 @@ private lemma weightedFinsetCauchySchwarz
                 (𝒟.nonnegative q)]
           ring_nf
           rw [Real.sq_sqrt (𝒟.nonnegative q)]
-          simpa [mul_assoc, mul_left_comm, mul_comm]
+          simp [mul_assoc, mul_left_comm, mul_comm]
     _ ≤ Real.sqrt (∑ q ∈ 𝒟.support, 𝒟.weight q * ∑ a : Outcome, x q a) *
           Real.sqrt (∑ q ∈ 𝒟.support, 𝒟.weight q * ∑ a : Outcome, y q a) := by
             exact Real.sum_sqrt_mul_sqrt_le (s := 𝒟.support)
@@ -978,7 +987,7 @@ private lemma weightedFinsetCauchySchwarz
           Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, y q a)) := by
             rfl
 
-private lemma subMeas_diagMass_le_mass
+lemma subMeas_diagMass_le_mass
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι) :
@@ -994,7 +1003,7 @@ private lemma subMeas_diagMass_le_mass
     _ = ev ψ A.total := by
           rw [← ev_sum ψ A.outcome, A.sum_eq_total]
 
-private lemma subMeas_diagMass_le_one
+lemma subMeas_diagMass_le_one
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (ψ : QuantumState ι) (hψ : ψ.IsNormalized) (A : SubMeas Outcome ι) :
@@ -1006,7 +1015,7 @@ private lemma subMeas_diagMass_le_one
           exact ev_mono ψ _ _ A.total_le_one
     _ = 1 := ev_one_of_isNormalized ψ hψ
 
-private lemma projSubMeas_diagMass_eq_mass
+lemma projSubMeas_diagMass_eq_mass
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (ψ : QuantumState ι) (A : ProjSubMeas Outcome ι) :
@@ -1020,7 +1029,7 @@ private lemma projSubMeas_diagMass_eq_mass
     _ = ev ψ A.total := by
           rw [← ev_sum ψ A.outcome, A.sum_eq_total]
 
-private lemma projSubMeas_outcome_mul_total_eq_outcome
+lemma projSubMeas_outcome_mul_total_eq_outcome
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (A : ProjSubMeas Outcome ι) (a : Outcome) :
@@ -1084,7 +1093,7 @@ private lemma projSubMeas_outcome_mul_total_eq_outcome
           simp [this]
     _ = A.outcome a := by rfl
 
-private lemma projSubMeas_total_proj
+lemma projSubMeas_total_proj
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (A : ProjSubMeas Outcome ι) :
@@ -1109,7 +1118,7 @@ private lemma avgOver_abs_le_sqrt_of_pointwise
     |avgOver 𝒟 f| ≤ Real.sqrt (avgOver 𝒟 g) := by
   have hcs :=
     weightedFinsetCauchySchwarz
-      (Question := Question) (Outcome := Unit) (ι := Unit) 𝒟
+      (Question := Question) (Outcome := Unit) 𝒟
       (t := fun q _ => f q)
       (x := fun q _ => g q)
       (y := fun _ _ => 1)
@@ -1937,7 +1946,7 @@ private lemma question_switchSandwich_middle_gap
                             (1 : MIPStarRE.Quantum.Op ι)
                             (1 : MIPStarRE.Quantum.Op ι)
                             (A.outcome a) (A.outcome a)).symm
-                      simpa [hRAproj]
+                      simp [hRAproj]
             calc
               leftTensor (ι₂ := ι) (A.outcome a) *
                   leftTensor (ι₂ := ι) B *
@@ -2116,7 +2125,7 @@ private lemma qSDD_self
   simp [ev]
 
 /-- The self-distance `sddError ψ 𝒟 A A` is zero. -/
-private lemma sddError_self {Question Outcome : Type*}
+lemma sddError_self {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
@@ -2129,7 +2138,7 @@ private lemma sddError_self {Question Outcome : Type*}
   exact avgOver_zero 𝒟
 
 /-- `sscError` is nonneg since it averages `max 0 (...)` terms. -/
-private lemma sscError_nonneg {Question Outcome : Type*}
+lemma sscError_nonneg {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
@@ -2138,20 +2147,23 @@ private lemma sscError_nonneg {Question Outcome : Type*}
   unfold sscError
   exact avgOver_nonneg 𝒟 _ fun a => by unfold qSSCDefect; exact le_max_left 0 _
 
-/-- `prop:two-notions-of-self-consistency`. -/
+/-- `prop:two-notions-of-self-consistency`.
+If the indexed sub-measurement `A` is strongly self-consistent on the
+permutation-invariant state `ψ` (i.e., SSCRel ψ 𝒟 (liftLeft A) δ),
+then the left and right lifts are close in state-dependent distance:
+  SDDRel ψ 𝒟 (liftLeft A) (liftRight A) (2 * δ).
+
+The paper proof expands ∑ₐ ‖(Aₐ⊗I − I⊗Aₐ)|ψ⟩‖² using permutation
+invariance and the sub-measurement bound Aₐ² ≤ Aₐ. -/
 theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error) :
     (PermInvState ψ ∧ SSCRel ψ 𝒟 (IdxSubMeas.liftLeft A) δ) →
-      SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft A) (2 * δ) := by
-  intro ⟨_, ⟨hδ⟩⟩
-  constructor
-  rw [sddError_self]
-  have hδ_nonneg : 0 ≤ δ :=
-    le_trans (sscError_nonneg ψ 𝒟 (IdxSubMeas.liftLeft A)) hδ
-  linarith
+      SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A)
+        (IdxSubMeas.liftRight A) (2 * δ) := by
+  sorry
 
 lemma constFamily_sdd_unit
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -2193,8 +2205,7 @@ lemma completion_self_distance
         ∑ a : Outcome,
           (if a = a0 then ev ψ (R * R) else 0) =
           ev ψ (R * R) := by
-      simpa using
-        (Finset.sum_ite_eq (s := Finset.univ) (a := a0) (b := ev ψ (R * R)))
+      simp
     calc
       ∑ a : Outcome,
           ev ψ

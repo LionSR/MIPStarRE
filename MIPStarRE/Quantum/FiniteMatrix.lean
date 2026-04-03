@@ -54,9 +54,11 @@ theorem sq_le_self [DecidableEq d] {X : Op d} (hX : 0 ≤ X) (hXle : X ≤ 1) :
 
 /-- Kronecker products preserve positivity. -/
 theorem kronecker_nonneg
-    {d₁ d₂ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    {d₁ d₂ : Type*} [hd₁ : Finite d₁] [hd₂ : Finite d₂]
     {A : Op d₁} {B : Op d₂} (hA : 0 ≤ A) (hB : 0 ≤ B) :
     0 ≤ Matrix.kronecker A B := by
+  letI := hd₁
+  letI := hd₂
   exact
     (Matrix.PosSemidef.kronecker
       (Matrix.nonneg_iff_posSemidef.mp hA)
@@ -64,9 +66,11 @@ theorem kronecker_nonneg
 
 /-- If `0 ≤ A` and `B ≤ 1`, then `A ⊗ B ≤ A ⊗ 1`. -/
 theorem kronecker_le_kronecker_right_one
-    {d₁ d₂ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    {d₁ d₂ : Type*} [hd₁ : Finite d₁] [hd₂ : Finite d₂] [DecidableEq d₂]
     {A : Op d₁} {B : Op d₂} (hA : 0 ≤ A) (hB : B ≤ 1) :
     Matrix.kronecker A B ≤ Matrix.kronecker A (1 : Op d₂) := by
+  letI := hd₁
+  letI := hd₂
   change (Matrix.kronecker A (1 : Op d₂) - Matrix.kronecker A B).PosSemidef
   have hrewrite :
       Matrix.kronecker A (1 : Op d₂) - Matrix.kronecker A B =
@@ -86,9 +90,11 @@ theorem kronecker_le_kronecker_right_one
 
 /-- Kronecker product is monotone in the left factor against a PSD right factor. -/
 theorem kronecker_mono_left
-    {d₁ d₂ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    {d₁ d₂ : Type*} [hd₁ : Finite d₁] [hd₂ : Finite d₂]
     {A₁ A₂ : Op d₁} {B : Op d₂} (hA : A₁ ≤ A₂) (hB : 0 ≤ B) :
     Matrix.kronecker A₁ B ≤ Matrix.kronecker A₂ B := by
+  letI := hd₁
+  letI := hd₂
   change (Matrix.kronecker A₂ B - Matrix.kronecker A₁ B).PosSemidef
   have hrewrite :
       Matrix.kronecker A₂ B - Matrix.kronecker A₁ B =

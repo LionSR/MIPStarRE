@@ -54,9 +54,7 @@ noncomputable instance {α : Type*} {ι : Type*}
             intro a
             by_cases h : a = default <;> simp [h]
           sum_eq_total := by
-            simpa using
-              (Finset.sum_ite_eq (s := Finset.univ) (a := default)
-                (b := (1 : MIPStarRE.Quantum.Op ι)))
+            simp
           total_le_one := by
             exact le_rfl
         }

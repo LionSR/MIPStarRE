@@ -46,14 +46,9 @@ structure ConsAgreement {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
     (A B : IdxMeas Question Outcome ι) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
 
-lemma leftTensor_mul_rightTensor_eq_opTensor
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (A B : MIPStarRE.Quantum.Op ι) :
-    leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) B =
-      opTensor A B := by
-  simpa [leftTensor, rightTensor, opTensor] using
-    (Matrix.mul_kronecker_mul
-      A (1 : MIPStarRE.Quantum.Op ι) (1 : MIPStarRE.Quantum.Op ι) B).symm
+-- `leftTensor_mul_rightTensor_eq_opTensor` is now in `Basic/Operator.lean`
+-- (namespace `MIPStarRE.LDT`). We re-export for backwards compatibility.
+-- Local alias removed per PR review to avoid duplication.
 
 /-- `A_a ⊗ B_a`, the diagonal bipartite bridge from `prop:cons-sub-meas`. -/
 noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
@@ -267,8 +262,7 @@ noncomputable def completeAtOutcome {Outcome : Type*}
       sum_eq_total := by
         have hsingle :
             (∑ x : Outcome, if x = a0 then residual else 0) = residual := by
-          simpa using
-            (Finset.sum_ite_eq (s := Finset.univ) (a := a0) (b := residual))
+          simp
         have hrewrite :
             (∑ a : Outcome, if h : a = a0 then B.outcome a + residual else B.outcome a) =
               ∑ a : Outcome, (B.outcome a + if a = a0 then residual else 0) := by

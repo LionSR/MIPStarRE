@@ -67,7 +67,7 @@ private noncomputable def uniformAverageUnitSubMeas {α : Type*}
     total := averageOperatorOverDistribution (uniformDistribution α) f
     outcome_pos := by
       intro _
-      simp [averageOperatorOverDistribution, uniformDistribution]
+      simp only [averageOperatorOverDistribution, uniformDistribution, one_div]
       apply Finset.sum_nonneg
       intro a ha
       exact smul_nonneg (by positivity) (hpsd a)
@@ -345,7 +345,9 @@ private theorem weightedPointConditionedOperatorAtPolynomial_pos (params : Param
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) (u : Point params) :
     0 ≤ weightedPointConditionedOperatorAtPolynomial params strategy G g u := by
-  simpa [weightedPointConditionedOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+  simpa
+      [weightedPointConditionedOperatorAtPolynomial, polynomialWeightSqrtOperator,
+        opTensor, leftTensor] using
     (leftTensor_nonneg (ι₂ := ι)
       (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u))
 
@@ -356,7 +358,9 @@ private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Pa
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) (u : Point params) :
     weightedPointConditionedOperatorAtPolynomial params strategy G g u ≤ 1 := by
-  simpa [weightedPointConditionedOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+  simpa
+      [weightedPointConditionedOperatorAtPolynomial, polynomialWeightSqrtOperator,
+        opTensor, leftTensor] using
     (leftTensor_le_one (ι₂ := ι)
       (pointConditionedOutcomeOperatorAtPolynomial_le_one params strategy g u))
 
@@ -368,7 +372,9 @@ private theorem weightedGeneralizeBLeftOperatorAtPolynomial_pos (params : Parame
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu := by
-  simpa [weightedGeneralizeBLeftOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+  simpa
+      [weightedGeneralizeBLeftOperatorAtPolynomial, polynomialWeightSqrtOperator,
+        opTensor, leftTensor] using
     (leftTensor_nonneg (ι₂ := ι)
       (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu))
 
@@ -380,7 +386,9 @@ private theorem weightedGeneralizeBLeftOperatorAtPolynomial_le_one (params : Par
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu ≤ 1 := by
-  simpa [weightedGeneralizeBLeftOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+  simpa
+      [weightedGeneralizeBLeftOperatorAtPolynomial, polynomialWeightSqrtOperator,
+        opTensor, leftTensor] using
     (leftTensor_le_one (ι₂ := ι)
       (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu))
 
@@ -392,7 +400,9 @@ private theorem weightedGeneralizeBRightOperatorAtPolynomial_pos (params : Param
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu := by
-  simpa [weightedGeneralizeBRightOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+  simpa
+      [weightedGeneralizeBRightOperatorAtPolynomial, polynomialWeightSqrtOperator,
+        opTensor, leftTensor] using
     (leftTensor_nonneg (ι₂ := ι)
       (generalizeBRightOperatorAtPolynomial_pos params strategy g qu))
 
@@ -404,7 +414,9 @@ private theorem weightedGeneralizeBRightOperatorAtPolynomial_le_one (params : Pa
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu ≤ 1 := by
-  simpa [weightedGeneralizeBRightOperatorAtPolynomial, polynomialWeightSqrtOperator, opTensor, leftTensor] using
+  simpa
+      [weightedGeneralizeBRightOperatorAtPolynomial, polynomialWeightSqrtOperator,
+        opTensor, leftTensor] using
     (leftTensor_le_one (ι₂ := ι)
       (generalizeBRightOperatorAtPolynomial_le_one params strategy g qu))
 

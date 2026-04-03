@@ -405,7 +405,7 @@ lemma zeroCoordinateCount_eq (params : Parameters) (α : Point params) :
   rw [frequencyWeight]
   have h := Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin params.m)))
     (p := fun i : Fin params.m => α i ≠ (0 : Fq params))
-  simp at h
+  simp only [ne_eq, Decidable.not_not, Finset.card_univ, Fintype.card_fin] at h
   exact Nat.eq_sub_of_add_eq (by simpa [add_comm] using h)
 
 lemma zeroCoordinateContributionSum (params : Parameters) (α : Point params) :
@@ -534,10 +534,7 @@ theorem eigenvectors (params : Parameters) :
                         fourierBasisState params α (Function.update u p.1 p.2) := by
                             refine Finset.sum_congr rfl ?_
                             intro p _
-                            simpa [eq_comm] using
-                              (Finset.sum_ite_eq (s := Finset.univ)
-                                (a := Function.update u p.1 p.2)
-                                (b := fourierBasisState params α))
+                            simp [eq_comm]
         _ = c * ∑ i : Fin params.m, ∑ x : Fq params,
               fourierBasisState params α (Function.update u i x) := by
                 rw [Fintype.sum_prod_type]
@@ -549,7 +546,9 @@ theorem eigenvectors (params : Parameters) :
       exact_mod_cast params.hq.ne'
     have hM : (hypercubeVertexCount params : ℂ) ≠ 0 := by
       exact_mod_cast (pow_pos params.hq params.m).ne'
-    simp [adjacencyEigenvalue, c]
+    simp only [mul_inv_rev, adjacencyEigenvalue, one_div, Complex.ofReal_mul,
+      Complex.ofReal_inv, Complex.ofReal_natCast, Complex.ofReal_div, Pi.smul_apply,
+      smul_eq_mul, c]
     rw [Nat.cast_sub hw]
     field_simp [hm, hq, hM]
 
