@@ -811,6 +811,7 @@ private lemma weightedFinsetCauchySchwarz
           Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, y q a)) := by
             rfl
 
+/-- The diagonal mass of a sub-measurement is bounded by its total mass. -/
 lemma subMeas_diagMass_le_mass
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
@@ -827,6 +828,7 @@ lemma subMeas_diagMass_le_mass
     _ = ev ψ A.total := by
           rw [← ev_sum ψ A.outcome, A.sum_eq_total]
 
+/-- The diagonal mass of a sub-measurement is at most `1` on a normalized state. -/
 lemma subMeas_diagMass_le_one
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
@@ -839,6 +841,7 @@ lemma subMeas_diagMass_le_one
           exact ev_mono ψ _ _ A.total_le_one
     _ = 1 := ev_one_of_isNormalized ψ hψ
 
+/-- Projective outcomes satisfy `P_a^2 = P_a`, so diagonal mass equals total mass. -/
 lemma projSubMeas_diagMass_eq_mass
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
@@ -853,6 +856,7 @@ lemma projSubMeas_diagMass_eq_mass
     _ = ev ψ A.total := by
           rw [← ev_sum ψ A.outcome, A.sum_eq_total]
 
+/-- Each projective outcome is absorbed by the total projector. -/
 lemma projSubMeas_outcome_mul_total_eq_outcome
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
@@ -917,6 +921,7 @@ lemma projSubMeas_outcome_mul_total_eq_outcome
           simp [this]
     _ = A.outcome a := by rfl
 
+/-- The total operator of a projective sub-measurement is itself a projector. -/
 lemma projSubMeas_total_proj
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
@@ -932,6 +937,38 @@ lemma projSubMeas_total_proj
       intro a _
       exact projSubMeas_outcome_mul_total_eq_outcome A a
     _ = A.total := A.sum_eq_total
+
+/-- Any `OpBounded01` operator is bounded above by the identity. -/
+private lemma opBounded01_le_one
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {B : MIPStarRE.Quantum.Op ι} (hB : OpBounded01 B) :
+    B ≤ 1 :=
+  sub_nonneg.mp hB.boundedByIdentity
+
+/-- Any `OpBounded01` operator is Hermitian. -/
+private lemma opBounded01_hermitian
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {B : MIPStarRE.Quantum.Op ι} (hB : OpBounded01 B) :
+    Bᴴ = B :=
+  (Matrix.nonneg_iff_posSemidef.mp hB.nonnegative).isHermitian.eq
+
+/-- Any `OpBounded01` operator satisfies `B * B ≤ 1`. -/
+private lemma opBounded01_sq_le_one
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {B : MIPStarRE.Quantum.Op ι} (hB : OpBounded01 B) :
+    B * B ≤ 1 := by
+  exact le_trans
+    (MIPStarRE.Quantum.sq_le_self hB.nonnegative (opBounded01_le_one hB))
+    (opBounded01_le_one hB)
+
+/-- Left tensoring preserves the `0 ≤ B ≤ 1` bounds. -/
+private lemma leftTensor_opBounded01
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {B : MIPStarRE.Quantum.Op ι₁} (hB : OpBounded01 B) :
+    OpBounded01 (leftTensor (ι₂ := ι₂) B) := by
+  constructor
+  · exact leftTensor_nonneg (ι₂ := ι₂) hB.nonnegative
+  · exact sub_nonneg.mpr (leftTensor_le_one (ι₂ := ι₂) (opBounded01_le_one hB))
 
 private lemma avgOver_abs_le_sqrt_of_pointwise
     {Question : Type*}
@@ -1140,17 +1177,15 @@ private lemma question_switchSandwich_left_gap
       Real.sqrt
         (qSDD ψ A.toSubMeas.liftLeft A.toSubMeas.liftRight) := by
   let LB : MIPStarRE.Quantum.Op (ι × ι) := leftTensor (ι₂ := ι) B
-  have hB_le_one : B ≤ 1 := sub_nonneg.mp hB.boundedByIdentity
+  have hLB : OpBounded01 LB := by
+    dsimp [LB]
+    exact leftTensor_opBounded01 (ι₂ := ι) hB
   have hLB_nonneg : 0 ≤ LB := by
-    dsimp [LB]
-    exact leftTensor_nonneg (ι₂ := ι) hB.nonnegative
-  have hLB_le_one : LB ≤ 1 := by
-    dsimp [LB]
-    exact leftTensor_le_one (ι₂ := ι) hB_le_one
+    exact hLB.nonnegative
   have hLB_herm : LBᴴ = LB := by
-    exact (Matrix.nonneg_iff_posSemidef.mp hLB_nonneg).isHermitian.eq
+    exact opBounded01_hermitian hLB
   have hLB_sq_le_one : LB * LB ≤ 1 := by
-    exact le_trans (MIPStarRE.Quantum.sq_le_self hLB_nonneg hLB_le_one) hLB_le_one
+    exact opBounded01_sq_le_one hLB
   have haux :
       |∑ a : Outcome,
           ev ψ
@@ -1468,17 +1503,15 @@ private lemma question_switchSandwich_middle_gap
       Real.sqrt
         (qSDD ψ A.toSubMeas.liftLeft A.toSubMeas.liftRight) := by
   let LB : MIPStarRE.Quantum.Op (ι × ι) := leftTensor (ι₂ := ι) B
-  have hB_le_one : B ≤ 1 := sub_nonneg.mp hB.boundedByIdentity
+  have hLB : OpBounded01 LB := by
+    dsimp [LB]
+    exact leftTensor_opBounded01 (ι₂ := ι) hB
   have hLB_nonneg : 0 ≤ LB := by
-    dsimp [LB]
-    exact leftTensor_nonneg (ι₂ := ι) hB.nonnegative
-  have hLB_le_one : LB ≤ 1 := by
-    dsimp [LB]
-    exact leftTensor_le_one (ι₂ := ι) hB_le_one
+    exact hLB.nonnegative
   have hLB_herm : LBᴴ = LB := by
-    exact (Matrix.nonneg_iff_posSemidef.mp hLB_nonneg).isHermitian.eq
+    exact opBounded01_hermitian hLB
   have hLB_sq_le_one : LB * LB ≤ 1 := by
-    exact le_trans (MIPStarRE.Quantum.sq_le_self hLB_nonneg hLB_le_one) hLB_le_one
+    exact opBounded01_sq_le_one hLB
   have haux :
       |∑ a : Outcome,
           ev ψ
@@ -1968,17 +2001,15 @@ private lemma switchSandwich_rightTransfer
     let LB : MIPStarRE.Quantum.Op (ι × ι) := leftTensor (ι₂ := ι) B
     let LT : MIPStarRE.Quantum.Op (ι × ι) := leftTensor (ι₂ := ι) ((A q).total)
     let RT : MIPStarRE.Quantum.Op (ι × ι) := rightTensor (ι₁ := ι) ((A q).total)
-    have hB_le_one : B ≤ 1 := sub_nonneg.mp hB.boundedByIdentity
+    have hLB : OpBounded01 LB := by
+      dsimp [LB]
+      exact leftTensor_opBounded01 (ι₂ := ι) hB
     have hLB_nonneg : 0 ≤ LB := by
-      dsimp [LB]
-      exact leftTensor_nonneg (ι₂ := ι) hB.nonnegative
-    have hLB_le_one : LB ≤ 1 := by
-      dsimp [LB]
-      exact leftTensor_le_one (ι₂ := ι) hB_le_one
+      exact hLB.nonnegative
     have hLB_herm : LBᴴ = LB := by
-      exact (Matrix.nonneg_iff_posSemidef.mp hLB_nonneg).isHermitian.eq
+      exact opBounded01_hermitian hLB
     have hLB_sq_le_one : LB * LB ≤ 1 := by
-      exact le_trans (MIPStarRE.Quantum.sq_le_self hLB_nonneg hLB_le_one) hLB_le_one
+      exact opBounded01_sq_le_one hLB
     have hLT_nonneg : 0 ≤ LT := by
       dsimp [LT]
       exact leftTensor_nonneg (ι₂ := ι) (SubMeas.total_nonneg (A q).toSubMeas)
@@ -2731,6 +2762,7 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
             simpa [bipartiteSSCError] using hssc
           exact mul_le_mul_of_nonneg_left hssc' (by norm_num)
 
+/-- For a constant `Unit`-indexed family, `sddError` reduces to `qSDD`. -/
 lemma constFamily_sdd_unit
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -2740,6 +2772,7 @@ lemma constFamily_sdd_unit
       qSDD ψ A B := by
   simp [sddError, avgOver, uniformDistribution, constSubMeasFamily]
 
+/-- For a constant `Unit`-indexed family, `sscError` reduces to `qSSCDefect`. -/
 lemma constFamily_ssc_unit
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -2748,6 +2781,8 @@ lemma constFamily_ssc_unit
       qSSCDefect ψ A := by
   simp [sscError, avgOver, uniformDistribution, constSubMeasFamily]
 
+/-- Completing `B` at `a0` changes only the missing mass, so the self-distance is
+exactly the squared residual mass. -/
 lemma completion_self_distance
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -2851,7 +2886,6 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
       question_overlap_gap_left ψ hψ A.toSubMeas B
   have hgapA :
       diagA - overlap ≤ Real.sqrt δ := by
-    have hq_nonneg : 0 ≤ qSDD ψ A.toSubMeas B := qSDD_nonneg ψ A.toSubMeas B
     have hsqrt :
         Real.sqrt (qSDD ψ A.toSubMeas B) ≤ Real.sqrt δ := by
       exact Real.sqrt_le_sqrt hδ'

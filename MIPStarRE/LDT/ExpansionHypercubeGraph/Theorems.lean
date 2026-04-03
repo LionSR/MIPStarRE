@@ -14,6 +14,8 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-! ## Statement packages and matrix realization bridge -/
+
 /-- Output package for `lem:local-rewrite`. -/
 structure LocalRewriteStatement (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Prop where
@@ -81,20 +83,6 @@ private lemma globalVarianceTraceForm_eq_zero_of_isEmpty (hι : ¬ Nonempty ι)
   haveI : IsEmpty ι := not_nonempty_iff.mp hι
   simp [globalVarianceTraceForm, globalVarianceTraceWitness, MIPStarRE.Quantum.normalizedTrace]
 
-private lemma matrixAdjacencyOperator_eq_weight (params : Parameters)
-    (u v : Point params) :
-    matrixAdjacencyOperator params u v =
-      (rerandomizeCoordWeight params u v : ℂ) := by
-  simp [matrixAdjacencyOperator, hypercubeAdjacencyWeight, rerandomizeCoordWeight, div_eq_mul_inv,
-    mul_assoc, mul_left_comm, mul_comm]
-
-private lemma matrixCombinedOperator_mul_conjTranspose_apply
-    (params : Parameters) (model : MatrixOperatorFamilyRealization params)
-    (u v : Point params) (i j : model.space.carrier) :
-    (matrixCombinedOperator params model * (matrixCombinedOperator params model)ᴴ) (u, i) (v, j) =
-      ((model.family u)ᴴ * model.family v) i j := by
-  simp [matrixCombinedOperator, Matrix.mul_apply]
-
 /-- The concrete matrix-level counterpart of `lem:local-to-global`. -/
 lemma matrixLocalToGlobal (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
@@ -119,6 +107,8 @@ theorem laplacianRewrite (params : Parameters) :
     laplacian params = laplacianDifferenceForm params := by
   rfl
 
+/-! ## Public theorem wrappers -/
+
 /-- `lem:local-to-global`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma localToGlobal (params : Parameters)
@@ -139,12 +129,12 @@ lemma localRewrite (params : Parameters)
     LocalRewriteStatement params A ψ := by
   by_cases hι : Nonempty ι
   · letI := hι
-    refine ⟨?_⟩
-    simpa [abstractMatrixModel] using
-      (matrixLocalRewrite params (abstractMatrixModel params A ψ)).traceFormula
-  · refine ⟨?_⟩
-    rw [localVariance_eq_zero_of_isEmpty hι params A ψ,
-      localVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ]
+    exact ⟨by
+      simpa [abstractMatrixModel] using
+        (matrixLocalRewrite params (abstractMatrixModel params A ψ)).traceFormula⟩
+  · exact ⟨by
+      rw [localVariance_eq_zero_of_isEmpty hι params A ψ,
+        localVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ]⟩
 
 /-- `lem:global-rewrite`. -/
 -- NOTE: the existential witness `default` works because `GlobalRewriteStatement`
@@ -155,11 +145,11 @@ lemma globalRewrite (params : Parameters)
     GlobalRewriteStatement params A ψ := by
   by_cases hι : Nonempty ι
   · letI := hι
-    refine ⟨default, ?_⟩
-    simpa [abstractMatrixModel] using
-      (matrixGlobalRewrite params (abstractMatrixModel params A ψ)).traceFormula
-  · refine ⟨default, ?_⟩
-    rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
-      globalVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ default]
+    exact ⟨default, by
+      simpa [abstractMatrixModel] using
+        (matrixGlobalRewrite params (abstractMatrixModel params A ψ)).traceFormula⟩
+  · exact ⟨default, by
+      rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
+        globalVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ default]⟩
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph

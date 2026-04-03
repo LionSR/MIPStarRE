@@ -16,6 +16,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-! ## Error terms and packaged conclusions -/
 
 /-- Operator domination, written in source order as `X ≤ Y`. -/
 abbrev OperatorDominatedBy (X Y : MIPStarRE.Quantum.Op ι) : Prop :=
@@ -115,6 +116,8 @@ structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
       (normalizationConditionSquareOperator P Q)
       (normalizationConditionIdentityBound P Q)
 
+/-! ## Scaffold theorem statements -/
+
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG
     (params : Parameters)
@@ -190,10 +193,12 @@ lemma normalizationCondition {OutcomeA OutcomeB : Type*}
         (normalizationConditionSandwichedTotalOperator P Q a)ᴴ =
           normalizationConditionSandwichedTotalOperator P Q a := by
     intro a
-    have hnonneg : 0 ≤ normalizationConditionSandwichedTotalOperator P Q a := by
-      simpa [normalizationConditionSandwichedTotalOperator] using
-        SubMeas.total_nonneg (normalizationConditionSandwichedTotalFamily P Q a)
-    exact (Matrix.nonneg_iff_posSemidef.mp hnonneg).isHermitian.eq
+    exact
+      (Matrix.nonneg_iff_posSemidef.mp <|
+        by
+          simpa [normalizationConditionSandwichedTotalOperator] using
+            SubMeas.total_nonneg (normalizationConditionSandwichedTotalFamily P Q a)
+      ).isHermitian.eq
   refine
     { sandwichedHermitianSquare := ?_
       sandwichedBoundedByIdentity := ?_ }

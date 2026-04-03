@@ -135,7 +135,14 @@ noncomputable def bndError {Outcome : Type*} {ι : Type*}
     (Z : MIPStarRE.Quantum.Op ι) : Error :=
   max 0 (subMeasMass ψ A - ev ψ Z)
 
-/-- Consistency relation. -/
+/-- Consistency relation.
+
+This is intentionally just a one-field wrapper around `consError ψ 𝒟 A B ≤ δ`.
+The extra layer does not add mathematical content; it mainly keeps consistency
+statements parallel to the sibling relations `SDDRel`, `SSCRel`, etc., and gives
+the bound a stable named projection (`offDiagonalBound`) for downstream proofs.
+In practice many lemmas still immediately destruct `ConsRel` with `⟨h⟩`, so this
+is more of an API/readability wrapper than a deep abstraction barrier. -/
 structure ConsRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
@@ -221,7 +228,13 @@ structure ConsWithPolyEval {ι : Type*} [Fintype ι] [DecidableEq ι]
       (polynomialEvaluationFamily params G)
       δ
 
-/-- Consistency between two global polynomial submeasurements. -/
+/-- Consistency between two global polynomial submeasurements.
+
+This is a thin wrapper over `ConsRel` specialized to the trivial question
+distribution `uniformDistribution Unit` and constant families
+`constSubMeasFamily G₁`, `constSubMeasFamily G₂`. It exists mostly to make
+high-level statements read closer to the paper; if it stops helping readability,
+it could be inlined at use sites without changing the underlying notion. -/
 structure PolyMeasCons {ι : Type*} [Fintype ι] [DecidableEq ι]
     (params : Parameters)
     (ψ : QuantumState ι)
