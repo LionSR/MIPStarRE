@@ -86,6 +86,9 @@ lemma matrixGeneralizeB
     (params : Parameters)
     (model : MatrixVarianceTransferRealization params) :
     MatrixGeneralizeBStatement params model := by
+  -- TODO: Prove the concrete matrix realization of `lem:generalize-b`
+  -- (`matrixGeneralizeB`); blocked on the matrix-model transfer proof from
+  -- `MatrixVarianceTransferRealization`.
   sorry
 
 /-- The concrete matrix-level counterpart of `lem:local-variance-of-points`. -/
@@ -94,6 +97,9 @@ lemma matrixLocalVarianceOfPoints
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) :
     MatrixLocalVarianceOfPointsStatement params model eps delta := by
+  -- TODO: Prove the concrete matrix realization of
+  -- `lem:local-variance-of-points`; blocked on the matrix-model
+  -- local-variance transfer argument.
   sorry
 
 /-- The concrete matrix-level counterpart of `lem:global-variance-of-points`. -/
@@ -102,6 +108,9 @@ lemma matrixGlobalVarianceOfPoints
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) :
     MatrixGlobalVarianceOfPointsStatement params model eps delta := by
+  -- TODO: Prove the concrete matrix realization of
+  -- `lem:global-variance-of-points`; blocked on the matrix-model
+  -- global-variance transfer argument.
   sorry
 
 /-- `lem:generalize-b`. -/
@@ -117,9 +126,16 @@ lemma generalizeB
       ∀ g : Polynomial params,
         generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params := by
     intro g
+    -- TODO: Bound `generalizeBDeviationAtPolynomial` by `generalizeBError` for
+    -- each `g` (`lem:generalize-b`); blocked on instantiating the matrix
+    -- realization / transfer lemma.
     sorry
   refine
     { aggregateFamilyComparison := by
+        -- TODO: Package the per-polynomial `generalize-b` comparison into the
+        -- aggregate `SDDRel` between `generalizeBLeftFamily` and
+        -- `generalizeBRightFamily` (`lem:generalize-b`); blocked on
+        -- `uniformAverageUnitSubMeas` comparison infrastructure.
         sorry
       pointwiseNormBound := hpoint
       averagedNormBound := by
@@ -149,12 +165,24 @@ lemma localVarianceOfPoints
         pointConditionedLocalVarianceAtPolynomial params strategy G g ≤
           localVarianceOfPointsError params eps delta := by
     intro g
+    -- TODO: Bound `pointConditionedLocalVarianceAtPolynomial` by
+    -- `localVarianceOfPointsError` for each `g`
+    -- (`lem:local-variance-of-points`); blocked on the matrix/local-variance
+    -- transfer lemma.
     sorry
   refine
     { aggregateEdgeComparison := by
+        -- TODO: Package the rerandomized local-variance comparison into the
+        -- aggregate `SDDRel` (`lem:local-variance-of-points`); blocked on
+        -- lifting the pointwise matrix/local bound to averaged families.
         sorry
       pointwiseEdgeNormBound := by
         intro g
+        -- TODO: Bound `localVarianceDeviationAtPolynomial` by
+        -- `localVarianceOfPointsError` for each `g`
+        -- (`lem:local-variance-of-points`); blocked on relating the
+        -- rerandomized deviation to the point-conditioned local variance
+        -- estimate.
         sorry
       pointwiseLocalVarianceBound := hlocal
       averagedLocalVarianceBound := by
@@ -206,9 +234,16 @@ lemma globalVarianceOfPoints
             ring
   refine
     { aggregateGlobalComparison := by
+        -- TODO: Package the independent-point comparison into the aggregate
+        -- `SDDRel` for `lem:global-variance-of-points`; blocked on lifting the
+        -- pointwise global estimate to averaged families.
         sorry
       pointwiseGlobalNormBound := by
         intro g
+        -- TODO: Bound `globalVarianceDeviationAtPolynomial` by
+        -- `globalVarianceOfPointsError` for each `g`
+        -- (`lem:global-variance-of-points`); blocked on combining
+        -- `localToGlobal` with the local-variance estimate.
         sorry
       pointwiseExpansionTransfer := by
         intro g

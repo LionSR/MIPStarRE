@@ -137,11 +137,17 @@ noncomputable def matrixGlobalVarianceTraceWitness (params : Parameters)
     (matrixTensorOperator (orthogonalModeProjectorMatrix params) model.state.matrix *
       matrixCombinedColumnOperator params model)
 
-/-- The actual trace form for the global variance. -/
+/-- The actual trace form for the global variance.
+
+The `1 / hypercubeVertexCount` factor (= `1 / M` where `M = q^m`) matches the paper's
+`lem:global-rewrite`: the global variance equals
+  `(1/M) · Tr(⟨φ⊥| ⊗ A⊥ · (I ⊗ |ψ⟩⟨ψ|) · |φ⊥⟩ ⊗ A⊥)`,
+which in turn equals `(1/2) · E_{u,v} ⟨ψ| (Aᵘ − Aᵛ)² ⊗ I |ψ⟩`. -/
 noncomputable def matrixGlobalVarianceTraceForm (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : Error :=
   (1 / (hypercubeVertexCount params : Error)) *
-    Complex.re (MIPStarRE.Quantum.normalizedTrace (matrixGlobalVarianceTraceWitness params model))
+    Complex.re (MIPStarRE.Quantum.normalizedTrace
+      (matrixGlobalVarianceTraceWitness params model))
 
 /-- Matrix-level rewrite package for the local variance. -/
 structure MatrixLocalRewriteStatement (params : Parameters)

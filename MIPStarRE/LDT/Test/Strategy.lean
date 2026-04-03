@@ -19,13 +19,22 @@ def swapDensity {ι : Type*} (M : MIPStarRE.Quantum.Op (ι × ι)) :
     MIPStarRE.Quantum.Op (ι × ι) :=
   Matrix.of fun (ij : ι × ι) (kl : ι × ι) => M (ij.2, ij.1) (kl.2, kl.1)
 
-/-- Permutation-invariance for a shared state.
-When `ι = ι₁ × ι₂`, this should be discharged via `ψ.density = swapDensity ψ.density`.
-The generic signature keeps `ι` arbitrary so that the bridge lemmas
-`twoNotionsOfSelfConsistency` and `closenessAfterCompletion_core` (which are
-parameterized over generic `ι`) can accept this hypothesis. -/
+/-- Permutation-invariance for a bipartite state on `ι × ι`.
+
+The key property (`swap_ev`) is that expectation values are symmetric
+under swapping the two tensor factors:
+  `ev ψ (leftTensor M) = ev ψ (rightTensor M)`.
+This is the formal content of "ψ is permutation-invariant" in the paper
+(see Section 3).
+
+For concrete strategies, this should be discharged via
+`ψ.density = swapDensity ψ.density`. -/
 structure PermInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) : Prop where
+    (ψ : QuantumState (ι × ι)) : Prop where
+  /-- Swapping tensor factors preserves expectation values. -/
+  swap_ev : ∀ (M : MIPStarRE.Quantum.Op ι),
+    ev ψ (leftTensor (ι₂ := ι) M) =
+      ev ψ (rightTensor (ι₁ := ι) M)
 
 /-- Paper-local symmetric strategy data. -/
 structure SymStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where

@@ -129,12 +129,26 @@ lemma commDataProcessedG
   refine
     { postprocessedPointConsistency := ?_
       postprocessedSelfConsistency := by
+        -- TODO: Derive self-consistency of the postprocessed left/right
+        -- evaluated point families from `hself` (`lem:comm-data-processed-g`);
+        -- blocked on the exact `evaluatedPointFamily` rewriting bridge.
         sorry
       stabilityOne := by
+        -- TODO: Prove the first insertion/removal stability step for the
+        -- appended `G^y` total operator (`lem:comm-data-processed-g`); blocked
+        -- on `SDDOpRel` append/postprocess bridge lemmas.
         sorry
       stabilityTwo := by
+        -- TODO: Prove the second insertion/removal stability step for the
+        -- appended `G^x` total operator (`lem:comm-data-processed-g`); blocked
+        -- on the corresponding `SDDOpRel` bridge from the evaluated slice
+        -- product scaffold.
         sorry
       evaluatedSliceCommutation := by
+        -- TODO: Show approximate commutation of the ordered and reversed
+        -- evaluated-slice products (`lem:comm-data-processed-g`); blocked on
+        -- chaining the two stability estimates with the processed-point
+        -- comparison.
         sorry }
   simpa [evaluatedPointFamily] using hcons.pointConsistency
 
@@ -154,8 +168,15 @@ theorem comMain
   refine
     { evaluatedCommutation := hEval
       evaluationSpecialization := by
+        -- TODO: Specialize full-slice product commutation to evaluated slices
+        -- by postprocessing sampled points (`thm:com-main`); blocked on an
+        -- `SDDOpRel` postprocess-specialization lemma.
         sorry
       fullSliceCommutation := by
+        -- TODO: Lift evaluated-slice commutation to the full-slice statement
+        -- with the displayed `comMainError` (`thm:com-main`); blocked on
+        -- comparison between full-slice and evaluated families plus averaging
+        -- infrastructure.
         sorry }
 
 /-- `lem:normalization-condition`. -/

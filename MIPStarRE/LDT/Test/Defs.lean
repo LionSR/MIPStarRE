@@ -163,6 +163,37 @@ structure SSCRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [Decidable
     (A : IdxSubMeas Question Outcome ι) (δ : Error) : Prop where
   diagonalOverlapBound : sscError ψ 𝒟 A ≤ δ
 
+/-- Bipartite questionwise strong self-consistency defect.
+This is the paper's SSC condition (Definition 4.3/4.4):
+  `max 0 (∑ₐ ev ψ (Aₐ ⊗ I) − ∑ₐ ev ψ (Aₐ ⊗ Aₐ))`.
+It measures the gap between the total mass on one register and the
+diagonal cross-register overlap. -/
+noncomputable def qBipartiteSSCDefect
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) : Error :=
+  let totalMass := ev ψ (leftTensor (ι₂ := ι) A.total)
+  let overlapMass := ∑ a, ev ψ (opTensor (A.outcome a) (A.outcome a))
+  max 0 (totalMass - overlapMass)
+
+/-- Averaged bipartite SSC defect. -/
+noncomputable def bipartiteSSCError
+    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι) : Error :=
+  avgOver 𝒟 (fun q => qBipartiteSSCDefect ψ (A q))
+
+/-- Bipartite strong self-consistency relation (paper's definition).
+Uses the cross-register overlap `∑ₐ ev ψ (Aₐ ⊗ Aₐ)` rather than
+the local square `∑ₐ ev ψ (Aₐ² ⊗ I)`. -/
+structure BipartiteSSCRel
+    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι) (δ : Error) : Prop where
+  overlapBound : bipartiteSSCError ψ 𝒟 A ≤ δ
+
 /-- Completeness statement for a submeasurement. -/
 structure CompletenessAtLeast {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]

@@ -93,6 +93,9 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
   --   (1) define `U`, (2) `lifted_isProj`, (3) `lifted_pos`,
   --   (4) `lifted_sum_le_one`, (5) `expectation_preservation`.
   let U : MIPStarRE.Quantum.Op (d × Option α) := by
+    -- TODO(#118): Define the Naimark unitary extension `U` from the isometry
+    -- column `V` using `CFC.sqrt` data (Lemma 5.2); blocked on a
+    -- unitary-completion lemma for the enlarged space.
     sorry
   refine ⟨{
     source := M
@@ -108,17 +111,26 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     `U† (I ⊗ |oa⟩⟨oa|) U` is a projection because `I ⊗ |oa⟩⟨oa|` is, and
     conjugation by a unitary preserves Hermitian idempotents.
     -/
+    -- TODO(#118): Prove each lifted effect is a projection by unitary
+    -- conjugation of `I ⊗ |oa⟩⟨oa|` (Lemma 5.2); blocked on
+    -- conjugation-preserves-`IsProj` lemmas.
     sorry
   · intro oa
     /-
     Each `I ⊗ |oa⟩⟨oa|` is PSD, so its unitary conjugate is PSD as well.
     -/
+    -- TODO(#118): Prove positivity of each lifted effect from PSD auxiliary
+    -- projectors under unitary conjugation (Lemma 5.2); blocked on PSD
+    -- conjugation infrastructure.
     sorry
   · /-
     Since the auxiliary rank-one projectors sum to the identity on `Option α`,
     the lifted family is actually a complete projective measurement, hence in
     particular a submeasurement.
     -/
+    -- TODO(#118): Show the lifted family sums to `1` and hence is a
+    -- submeasurement (Lemma 5.2); blocked on auxiliary-projector sum and
+    -- Kronecker/unitary simplification lemmas.
     sorry
   · intro ρ a
     /-
@@ -128,6 +140,9 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     so after cycling the trace and using `√(M_a) * √(M_a) = M_a`, the right-hand
     side reduces to `normalizedTrace (ρ * M.effect a)`.
     -/
+    -- TODO(#118): Prove the compression/trace identity preserving expectations
+    -- after dilation (Lemma 5.2); blocked on the `U`-action-on-`|⊥⟩` slice
+    -- and `CFC.sqrt` simplification lemmas.
     sorry
 
 /-! ### Full Naimark dilation (Theorem 5.1) -/
@@ -170,6 +185,10 @@ theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
   I am leaving the full composition as a focused blocker rather than fabricating
   a dummy witness.
   -/
+  -- TODO: Assemble the per-question one-measurement dilations into the full
+  -- tensor-product Naimark witness preserving correlations (Theorem 5.1 /
+  -- `thm:naimark`); blocked on `oneMeasNaimark` and lifted-state assembly
+  -- infrastructure.
   sorry
 
 /-! ### Orthonormalization (Theorem 5.4 / thm:orthonormalization) -/
@@ -192,6 +211,10 @@ theorem orthonormalization {Outcome : Type*}
   error bookkeeping around `orthonormalizationMainLemma`. It is not just a thin
   wrapper around the already-formalized lemmas yet.
   -/
+  -- TODO: Complete the orthonormalization wrapper by converting SSC to the
+  -- rounded projective witness with final error bookkeeping (Theorem 5.4 /
+  -- `thm:orthonormalization`); blocked on the completion-to-measurement bridge
+  -- and wrapper composition lemmas.
   sorry
 
 /-! ### Orthonormalization helper lemmas -/
@@ -214,6 +237,10 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
   declared later. Rather than reorder the section wholesale in this pass, I am
   leaving the wrapper theorem itself as the local placeholder.
   -/
+  -- TODO: Compose consistency-to-almost-projective with rounding to produce the
+  -- main orthonormalization witness
+  -- (`lem:orthonormalization-main-lemma`); blocked on helper-ordering and
+  -- wrapper composition infrastructure.
   sorry
 
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
@@ -227,6 +254,9 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
       (constSubMeasFamily B.toSubMeas) ζ →
       AlmostProjMeasStatement ψ A
         (consistencyToAlmostProjectiveError ζ) := by
+  -- TODO: Show consistency implies almost-projectivity with the stated error in
+  -- the orthonormalization proof; blocked on bridge lemmas from `ConsRel` to
+  -- `AlmostProjMeasStatement`.
   sorry
 
 /-- Spectral truncation of an almost-projective measurement. -/
@@ -236,6 +266,9 @@ lemma spectralTruncateAlmostProjective {Outcome : Type*}
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
     AlmostProjMeasStatement ψ A ζ →
       SpectralTruncationStatement ψ A ζ := by
+  -- TODO: Formalize the spectral truncation step from an almost-projective
+  -- measurement to `SpectralTruncationStatement` in the orthonormalization
+  -- proof; blocked on spectral-cutoff infrastructure.
   sorry
 
 /-- Adjust truncated projections to form a genuine projective
@@ -248,6 +281,9 @@ lemma adjustTruncatedProjections {Outcome : Type*}
       ∃ P : ProjSubMeas Outcome ι,
         RoundedProjMeasStatement ψ A P
           (roundingToProjectiveError ζ) := by
+  -- TODO: Adjust the truncated spectral pieces into a genuine projective
+  -- submeasurement with controlled error in the orthonormalization proof;
+  -- blocked on projection-rounding infrastructure.
   sorry
 
 /-- Compose spectral truncation and adjustment to round an
@@ -262,6 +298,9 @@ lemma roundAlmostProjMeas {Outcome : Type*}
           (roundingToProjectiveError ζ) := by
   -- Composition of spectralTruncateAlmostProjective and adjustTruncatedProjections.
   -- Currently hits universe metavariable issue in elaboration.
+  -- TODO: Compose spectral truncation with adjustment to obtain a rounded
+  -- projective submeasurement in the orthonormalization proof; currently
+  -- blocked by a universe-metavariable elaboration issue.
   sorry
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
