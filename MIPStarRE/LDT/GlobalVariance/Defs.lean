@@ -118,26 +118,28 @@ noncomputable def polynomialDistribution (params : Parameters) :
   uniformDistribution (Polynomial params)
 
 /-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`.
-
-**Provisional placeholder**: returns `1` (identity) for all inputs. This collapses
-all weighted operators to their unweighted variants and makes downstream variance
-quantities insensitive to the measurement family `G`. Replace with `matrixSqrt (G.outcome g)`
-once Mathlib provides a matrix square root API for PSD operators. -/
+Uses `CFC.sqrt` (continuous functional calculus) to compute the matrix
+square root of the PSD operator `G.outcome g`. -/
 noncomputable def polynomialWeightSqrtOperator (params : Parameters)
-    (_G : SubMeas (Polynomial params) ι) (_g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  1 -- PROVISIONAL: identity placeholder; see docstring
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
+  CFC.sqrt (G.outcome g)
 
-/-- The weighted state `|ψ_g⟩ = (I ⊗ G_g^{1/2}) |ψ⟩`.
+/-- The weighted state `|ψ_g⟩ = (I ⊗ √G_g)|ψ⟩`, modeled as a density-matrix
+transformation: `ρ_g = W_g ρ W_g†` where `W_g = I ⊗ √(G_g)`.
 
-**Provisional placeholder**: returns the unweighted strategy state for all inputs,
-ignoring both `G` and `g`. This breaks the intended per-polynomial weighting pipeline.
-Replace with `(I ⊗ polynomialWeightSqrtOperator G g) |ψ⟩` once the square root
-operator is implemented. -/
+This is not necessarily normalized — normalization would require dividing by
+`Tr(G_g ρ_B)`. We keep it unnormalized since the variance quantities in the
+paper use unnormalized weighted expectations. -/
 noncomputable def weightedPolynomialState (params : Parameters)
     (strategy : SymStrat params ι)
-    (_G : SubMeas (Polynomial params) ι) (_g : Polynomial params) :
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) :
     QuantumState (ι × ι) :=
-  strategy.state -- PROVISIONAL: unweighted; see docstring
+  let sqrtG := polynomialWeightSqrtOperator params G g
+  let W := rightTensor (ι₁ := ι) sqrtG
+  { density := W * strategy.state.density * Wᴴ
+    density_psd :=
+      ((Matrix.nonneg_iff_posSemidef.mp strategy.state.density_psd).mul_mul_conjTranspose_same
+        W).nonneg }
 
 /-- The concrete operator `A^u_{g(u)}` for a fixed polynomial `g`. -/
 def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters)
@@ -244,8 +246,6 @@ noncomputable def weightedGeneralizeBRightOperatorAtPolynomial (params : Paramet
     (generalizeBRightOperatorAtPolynomial params strategy g qu)
     (polynomialWeightSqrtOperator params G g)
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
 private theorem pointConditionedOutcomeOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params) (u : Point params) :
@@ -253,8 +253,6 @@ private theorem pointConditionedOutcomeOperatorAtPolynomial_pos (params : Parame
   simpa [pointConditionedOutcomeOperatorAtPolynomial] using
     (strategy.pointMeasurement u).outcome_pos (g u)
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
 private theorem pointConditionedOutcomeOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params) (u : Point params) :
@@ -262,8 +260,6 @@ private theorem pointConditionedOutcomeOperatorAtPolynomial_le_one (params : Par
   simpa [pointConditionedOutcomeOperatorAtPolynomial] using
     Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u)
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
 private theorem generalizeBLeftOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -280,8 +276,6 @@ private theorem generalizeBLeftOperatorAtPolynomial_pos (params : Parameters)
         else
           none)).outcome_pos (some ())
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
 private theorem generalizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -300,8 +294,6 @@ private theorem generalizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
             none))
       (some ())
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
 private theorem generalizeBRightOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -318,8 +310,6 @@ private theorem generalizeBRightOperatorAtPolynomial_pos (params : Parameters)
         else
           none)).outcome_pos (some ())
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
 private theorem generalizeBRightOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -338,87 +328,98 @@ private theorem generalizeBRightOperatorAtPolynomial_le_one (params : Parameters
             none))
       (some ())
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
 private theorem weightedPointConditionedOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) (u : Point params) :
     0 ≤ weightedPointConditionedOperatorAtPolynomial params strategy G g u := by
-  simpa
-      [weightedPointConditionedOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_nonneg (ι₂ := ι)
-      (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u))
+  exact opTensor_nonneg
+    (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u)
+    (CFC.sqrt_nonneg (G.outcome g))
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
+/-- `CFC.sqrt (G.outcome g) ≤ 1` when `G` is a submeasurement.
+Proved via the NNReal CFC spectrum API: `G.outcome g ≤ 1` means all
+spectral values satisfy `λ ≤ 1`, so `√λ ≤ 1` as well. -/
+private lemma cfc_sqrt_outcome_le_one (params : Parameters)
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) :
+    CFC.sqrt (G.outcome g) ≤ 1 := by
+  have hspec_le : ∀ x, x ∈ spectrum NNReal (G.outcome g) → x ≤ 1 := by
+    have hle : G.outcome g ≤ 1 := G.outcome_le_one g
+    rw [← cfc_id' NNReal (G.outcome g) (ha := G.outcome_pos g),
+      ← cfc_const_one (R := NNReal) (G.outcome g) (ha := G.outcome_pos g),
+      cfc_nnreal_le_iff _ _ _ (SpectrumRestricts.nnreal_of_nonneg (G.outcome_pos g))
+        (ha := G.outcome_pos g)] at hle
+    exact hle
+  rw [CFC.sqrt_eq_cfc, ← cfc_const_one (R := NNReal) (G.outcome g) (ha := G.outcome_pos g),
+    cfc_nnreal_le_iff _ _ _ (SpectrumRestricts.nnreal_of_nonneg (G.outcome_pos g))
+      (ha := G.outcome_pos g)]
+  intro x hx
+  -- √x ≤ 1 follows from x ≤ 1 for NNReal (NNReal.sqrt_le_one)
+  simpa using hspec_le x hx
+
 private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) (u : Point params) :
     weightedPointConditionedOperatorAtPolynomial params strategy G g u ≤ 1 := by
-  simpa
-      [weightedPointConditionedOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_le_one (ι₂ := ι)
-      (pointConditionedOutcomeOperatorAtPolynomial_le_one params strategy g u))
+  calc weightedPointConditionedOperatorAtPolynomial params strategy G g u
+      ≤ leftTensor (ι₂ := ι)
+          (pointConditionedOutcomeOperatorAtPolynomial params strategy g u) :=
+        opTensor_le_leftTensor
+          (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u)
+          (cfc_sqrt_outcome_le_one params G g)
+    _ ≤ 1 := leftTensor_le_one
+          (pointConditionedOutcomeOperatorAtPolynomial_le_one params strategy g u)
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
 private theorem weightedGeneralizeBLeftOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu := by
-  simpa
-      [weightedGeneralizeBLeftOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_nonneg (ι₂ := ι)
-      (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu))
+  exact opTensor_nonneg
+    (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)
+    (CFC.sqrt_nonneg (G.outcome g))
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
 private theorem weightedGeneralizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu ≤ 1 := by
-  simpa
-      [weightedGeneralizeBLeftOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_le_one (ι₂ := ι)
-      (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu))
+  calc weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu
+      ≤ leftTensor (ι₂ := ι)
+          (generalizeBLeftOperatorAtPolynomial params strategy g qu) :=
+        opTensor_le_leftTensor
+          (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)
+          (cfc_sqrt_outcome_le_one params G g)
+    _ ≤ 1 := leftTensor_le_one
+          (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu)
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
 private theorem weightedGeneralizeBRightOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu := by
-  simpa
-      [weightedGeneralizeBRightOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_nonneg (ι₂ := ι)
-      (generalizeBRightOperatorAtPolynomial_pos params strategy g qu))
+  exact opTensor_nonneg
+    (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)
+    (CFC.sqrt_nonneg (G.outcome g))
 
--- PROVISIONAL:
--- proof depends on polynomialWeightSqrtOperator = 1
 private theorem weightedGeneralizeBRightOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu ≤ 1 := by
-  simpa
-      [weightedGeneralizeBRightOperatorAtPolynomial, polynomialWeightSqrtOperator,
-        opTensor, leftTensor] using
-    (leftTensor_le_one (ι₂ := ι)
-      (generalizeBRightOperatorAtPolynomial_le_one params strategy g qu))
+  calc weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
+      ≤ leftTensor (ι₂ := ι)
+          (generalizeBRightOperatorAtPolynomial params strategy g qu) :=
+        opTensor_le_leftTensor
+          (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)
+          (cfc_sqrt_outcome_le_one params G g)
+    _ ≤ 1 := leftTensor_le_one
+          (generalizeBRightOperatorAtPolynomial_le_one params strategy g qu)
 
 /-- The squared norm expression controlled by `lem:generalize-b` for a fixed `g`.
 Uses bipartite state `ψbi` on `d * d`. -/
