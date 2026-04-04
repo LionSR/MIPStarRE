@@ -2841,8 +2841,7 @@ private lemma bipartiteSSC_implies_localSSC_liftLeft {Question Outcome : Type*}
     (ψ : QuantumState (ι × ι))
     (hperm : PermInvState ψ)
     (𝒟 : Distribution Question)
-    (A : IdxSubMeas Question Outcome ι) (δ : Error)
-    (_hle : ∀ q a, (A q).outcome a ≤ 1) :
+    (A : IdxSubMeas Question Outcome ι) (δ : Error) :
     BipartiteSSCRel ψ 𝒟 A δ →
     SSCRel ψ 𝒟 (IdxSubMeas.liftLeft A) δ := by
   intro ⟨hssc⟩
@@ -3145,7 +3144,6 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
       (constSubMeasFamily A.toSubMeas.liftLeft) ζ :=
     bipartiteSSC_implies_localSSC_liftLeft ψ hperm (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas) ζ
-      (fun _ a => Measurement.outcome_le_one A a)
       (by simpa [constSubMeasFamily, IdxSubMeas.liftLeft] using hbipartite)
   let A_lifted : Measurement Outcome (ι × ι) :=
     { toSubMeas := A.toSubMeas.liftLeft
