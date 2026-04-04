@@ -271,7 +271,16 @@ private theorem generalizeBLeftOperatorAtPolynomial_pos (params : Parameters)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ generalizeBLeftOperatorAtPolynomial params strategy g qu := by
-  sorry
+  classical
+  rcases qu with ⟨ℓ, u⟩
+  simpa [generalizeBLeftOperatorAtPolynomial] using
+    (postprocess
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+      (fun f : AxisLinePolynomial params =>
+        if f.poly.eval (decodeScalar (u ℓ.direction)) = decodeScalar (g u) then
+          some ()
+        else
+          none)).outcome_pos (some ())
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -280,7 +289,18 @@ private theorem generalizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     generalizeBLeftOperatorAtPolynomial params strategy g qu ≤ 1 := by
-  sorry
+  classical
+  rcases qu with ⟨ℓ, u⟩
+  simpa [generalizeBLeftOperatorAtPolynomial] using
+    SubMeas.outcome_le_one
+      (postprocess
+        ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+        (fun f : AxisLinePolynomial params =>
+          if f.poly.eval (decodeScalar (u ℓ.direction)) = decodeScalar (g u) then
+            some ()
+          else
+            none))
+      (some ())
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -289,7 +309,16 @@ private theorem generalizeBRightOperatorAtPolynomial_pos (params : Parameters)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ generalizeBRightOperatorAtPolynomial params strategy g qu := by
-  sorry
+  classical
+  rcases qu with ⟨ℓ, u⟩
+  simpa [generalizeBRightOperatorAtPolynomial] using
+    (postprocess
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+      (fun f : AxisLinePolynomial params =>
+        if f.poly = (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
+          some ()
+        else
+          none)).outcome_pos (some ())
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -298,7 +327,18 @@ private theorem generalizeBRightOperatorAtPolynomial_le_one (params : Parameters
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     generalizeBRightOperatorAtPolynomial params strategy g qu ≤ 1 := by
-  sorry
+  classical
+  rcases qu with ⟨ℓ, u⟩
+  simpa [generalizeBRightOperatorAtPolynomial] using
+    SubMeas.outcome_le_one
+      (postprocess
+        ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+        (fun f : AxisLinePolynomial params =>
+          if f.poly = (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
+            some ()
+          else
+            none))
+      (some ())
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -307,7 +347,9 @@ private theorem weightedPointConditionedOperatorAtPolynomial_pos (params : Param
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) (u : Point params) :
     0 ≤ weightedPointConditionedOperatorAtPolynomial params strategy G g u := by
-  sorry
+  exact opTensor_nonneg
+    (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u)
+    (CFC.sqrt_nonneg (G.outcome g))
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -326,7 +368,9 @@ private theorem weightedGeneralizeBLeftOperatorAtPolynomial_pos (params : Parame
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu := by
-  sorry
+  exact opTensor_nonneg
+    (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)
+    (CFC.sqrt_nonneg (G.outcome g))
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
@@ -346,7 +390,9 @@ private theorem weightedGeneralizeBRightOperatorAtPolynomial_pos (params : Param
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     0 ≤ weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu := by
-  sorry
+  exact opTensor_nonneg
+    (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)
+    (CFC.sqrt_nonneg (G.outcome g))
 
 -- PROVISIONAL:
 -- proof depends on polynomialWeightSqrtOperator = 1
