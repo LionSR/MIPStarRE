@@ -51,8 +51,9 @@ private lemma avgOver_uniform_equiv
 /-- Output package for `thm:commutativity-points`.
 
 The strategy state is bipartite (`QuantumState (ι × ι)`).  Alice's local
-measurements are lifted to the left tensor factor (`liftLeft`); Bob's
-diagonal-line measurements are lifted to the right (`liftRight`). -/
+measurements are lifted to the left tensor factor (`liftLeft`), while
+Bob's diagonal-line evaluations are lifted to the right tensor factor
+(`liftRight`). -/
 structure CommutativityPointsStatement (params : Parameters)
     (strategy : SymStrat params ι)
     (_eps _delta gamma : Error) : Prop where

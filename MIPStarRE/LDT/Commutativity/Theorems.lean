@@ -46,8 +46,9 @@ noncomputable def comMainError (params : Parameters) (gamma zeta : Error) : Erro
 
 /-- Output package for `lem:comm-data-processed-g`.
 
-The strategy state is bipartite.  Local-register fields lift
-measurements to the left tensor factor. -/
+The strategy state is bipartite.  Alice-side measurements are lifted to
+the left tensor factor, while Bob-side postprocessed point measurements
+are lifted to the right tensor factor. -/
 structure CommDataProcessedGConclusion (params : Parameters)
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)

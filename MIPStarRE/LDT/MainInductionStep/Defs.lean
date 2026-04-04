@@ -78,8 +78,8 @@ noncomputable def diagonalLineAnswerFamily {params : Parameters}
     postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
 
 /-- Trace-based failure surrogate for the axis-parallel lines test.
-Alice's point measurement is on the left tensor factor; Bob's line
-measurement is on the right tensor factor. -/
+Alice's point answers are lifted to the left tensor factor, and Bob's
+line answers are lifted to the right tensor factor. -/
 noncomputable def axisParallelFailureProbability {params : Parameters}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) : Error :=
@@ -98,8 +98,8 @@ noncomputable def selfConsistencyFailureProbability {params : Parameters}
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
 
 /-- Trace-based failure surrogate for the diagonal lines test.
-Alice's point measurement is on the left tensor factor; Bob's diagonal-line
-measurement is on the right tensor factor. -/
+Alice's point answers are lifted to the left tensor factor, and Bob's
+diagonal-line answers are lifted to the right tensor factor. -/
 noncomputable def diagonalFailureProbability {params : Parameters}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) : Error :=
