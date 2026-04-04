@@ -87,18 +87,42 @@ private lemma globalVarianceTraceForm_eq_zero_of_isEmpty (hι : ¬ Nonempty ι)
 lemma matrixLocalToGlobal (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     matrixGlobalVariance params model ≤ (params.m : Error) * matrixLocalVariance params model := by
+  /-
+  Proof plan (to be formalized):
+  1. Rewrite both sides into quadratic forms over `matrixCombinedColumnOperator`.
+  2. Use `matrixGlobalRewrite`/`matrixLocalRewrite` forms with
+     `orthogonalModeProjectorMatrix` and `matrixLaplacianOperator`.
+  3. Apply the Laplacian spectral-gap lower bound
+     `orthogonalModeProjector ≤ (params.m : Error) • matrixLaplacianOperator`
+     in Loewner order and push through `X ↦ Re(tr(A† X A))`.
+  -/
   sorry
 
 /-- The concrete matrix-level counterpart of `lem:local-rewrite`. -/
 lemma matrixLocalRewrite (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     MatrixLocalRewriteStatement params model := by
+  /-
+  Proof plan (to be formalized):
+  expand `matrixLocalVariance` using the rerandomization distribution,
+  convert `(Aᵘ - Aᵛ)†(Aᵘ - Aᵛ)` sums into a Laplacian quadratic form,
+  then identify the result with
+  `matrixLocalVarianceTraceWitness` by unfolding
+  `matrixCombinedColumnOperator` and `matrixTensorOperator`.
+  -/
   sorry
 
 /-- The concrete matrix-level counterpart of `lem:global-rewrite`. -/
 lemma matrixGlobalRewrite (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     MatrixGlobalRewriteStatement params model := by
+  /-
+  Proof plan (to be formalized):
+  decompose `matrixCombinedColumnOperator` into constant/orthogonal modes on
+  the point register and use orthogonality (`constant ⟂ orthogonal`) to cancel
+  cross terms, leaving exactly the witness using
+  `orthogonalModeProjectorMatrix`.
+  -/
   sorry
 
 /-- `prop:laplacian-rewrite`. -/
