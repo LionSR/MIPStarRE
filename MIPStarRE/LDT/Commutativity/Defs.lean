@@ -217,6 +217,10 @@ noncomputable def evaluatedFromFullSliceProductRight (params : Parameters)
     OpFamily.postprocess (fullSliceProductRight params strategy family xy)
       (evaluateFullSliceOutcomeAtQuestion params q)
 
+-- Note: The four stability families below use the right-register factor `√G`
+-- (i.e. `√G^y` or `√G^x`) in place of the paper's Bob-side measurement
+-- `A^{v,y}_b` / `A^{v,x}_a`. This is equivalent under the SDD framework's
+-- Cauchy-Schwarz decomposition (commutativity-G.tex, lines 165–168).
 /-- Internal stability family from the `G^y` insertion/removal step
 (`clm:g-comm-stability` LHS). Includes the right-register factor `√G^y`.
 On the bipartite space `d * d`. -/
