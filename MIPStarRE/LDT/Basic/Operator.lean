@@ -346,11 +346,26 @@ theorem ev_mono {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- For Hermitian ρ, A, B: `ev ψ (A * B) = ev ψ (B * A)`.
 Follows from `ntr(ρ B A) = conj(ntr(ρ A B))` when all three are Hermitian,
 and Re is invariant under conjugation. -/
-private theorem normalizedTrace_conjTranspose {d : Type*} [Fintype d]
+theorem normalizedTrace_conjTranspose {d : Type*} [Fintype d]
     (X : MIPStarRE.Quantum.Op d) :
     MIPStarRE.Quantum.normalizedTrace Xᴴ = star (MIPStarRE.Quantum.normalizedTrace X) := by
   simp only [MIPStarRE.Quantum.normalizedTrace, Matrix.trace_conjTranspose]
   rw [star_div₀, star_natCast]
+
+/-- Taking the adjoint does not change `ev`. -/
+theorem ev_conjTranspose {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) :
+    ev ψ Xᴴ = ev ψ X := by
+  unfold ev
+  have hρ : ψ.densityᴴ = ψ.density :=
+    (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd).isHermitian.eq
+  have hstar :
+      star (MIPStarRE.Quantum.normalizedTrace (ψ.density * X)) =
+        MIPStarRE.Quantum.normalizedTrace (ψ.density * Xᴴ) := by
+    rw [← normalizedTrace_conjTranspose]
+    rw [Matrix.conjTranspose_mul, hρ]
+    exact MIPStarRE.Quantum.normalizedTrace_mul_comm Xᴴ ψ.density
+  simpa [Complex.star_def, Complex.conj_re] using congrArg Complex.re hstar.symm
 
 theorem ev_mul_comm_of_hermitian {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι)

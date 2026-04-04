@@ -736,7 +736,7 @@ theorem consSubMeas {Question Outcome : Type*}
 
 /-! ### Bridge lemmas for `prop:switch-sandwich` -/
 
-private lemma weightedFinsetCauchySchwarz
+lemma weightedFinsetCauchySchwarz
     {Question Outcome : Type*}
     [Fintype Outcome]
     (𝒟 : Distribution Question)
@@ -970,7 +970,7 @@ private lemma leftTensor_opBounded01
   · exact leftTensor_nonneg (ι₂ := ι₂) hB.nonnegative
   · exact sub_nonneg.mpr (leftTensor_le_one (ι₂ := ι₂) (opBounded01_le_one hB))
 
-private lemma avgOver_abs_le_sqrt_of_pointwise
+lemma avgOver_abs_le_sqrt_of_pointwise
     {Question : Type*}
     (𝒟 : Distribution Question) (f g : Question → Error)
     (hf : ∀ q, |f q| ≤ Real.sqrt (g q))
