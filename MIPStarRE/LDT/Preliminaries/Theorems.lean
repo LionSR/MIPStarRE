@@ -2823,14 +2823,25 @@ lemma completion_self_distance
       _ = ev ψ (R * R) := hsingle
   simpa [qSDD, qSDDCore, R] using hsum
 
-/-- Bridge lemma: bipartite SSC on local families implies local SSC on the
-left-lifted families. This is the only gap in the completion proof.
-TODO(#139): prove from the definition of `qBipartiteSSCDefect` vs `qSSCDefect`
-using `A_a ⊗ A_a ≤ A_a² ⊗ I` (which holds when `A_a ≤ I`). -/
+/-- Bridge lemma: for a permutation-invariant bipartite state, bipartite SSC
+on local families implies local SSC on the left-lifted families.
+
+Requires `PermInvState ψ` because the bipartite defect
+`∑ ev(A_a ⊗ A_a)` and local defect `∑ ev(A_a² ⊗ I)` are generally
+incomparable without symmetry; the permutation-invariance bridge
+`ev(M ⊗ I) = ev(I ⊗ M)` makes the two notions equivalent.
+
+TODO(#139): prove using the Kronecker algebra identity
+`ev ψ (A_a² ⊗ I) ≥ ev ψ (A_a ⊗ A_a)` for submeasurement effects
+(`0 ≤ A_a ≤ I`), which holds because `A_a² ⊗ I - A_a ⊗ A_a =
+A_a ⊗ (I - A_a) + (A_a² - A_a) ⊗ A_a` and both terms are PSD
+under permutation-invariance. -/
 private lemma bipartiteSSC_implies_localSSC_liftLeft {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι))
+    (_hperm : PermInvState ψ)
+    (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error)
     (_hle : ∀ q a, (A q).outcome a ≤ 1) :
     BipartiteSSCRel ψ 𝒟 A δ →
