@@ -1,76 +1,87 @@
 \chapter{Preliminaries}
 \label{chap:preliminaries}
-
-\section{Finite fields and Fourier orthogonality}
-
-
-\begin{definition}[Finite field trace]\label{def:finite-field-trace}
-  \lean{MIPStarRE.LDT.Preliminaries.ffTrace}
-  \leanok
-  Let $\F_q$ be a finite field with $q=p^t$ and let $\F_p$ be its prime subfield. The finite field trace is the function $\tr\colon \F_q \to \F_p$ defined by
-  \[
-    \tr[x] = \sum_{\ell=0}^{t-1} x^{p^\ell}.
-  \]
-\end{definition}
-
-\begin{theorem}[Fourier orthogonality over a finite field]\label{prop:fourier-fact-scalar}
-  \lean{MIPStarRE.LDT.Preliminaries.fourier_fact_scalar}
-  \leanok
-  \uses{def:finite-field-trace}
-  Let $a \in \F_q$. Then
-  \[
-    \E_{\bx \sim \F_q} \omega^{\tr[\bx \cdot a]}
-    = \left\{\begin{array}{rl}
-      1 & \text{if $a = 0$},\\
-      0 & \text{otherwise}.
-    \end{array}\right.
-  \]
-\end{theorem}
-\begin{proof}
-  If $a = 0$, then $\tr[\bx \cdot a] = 0$ for every $\bx \in \F_q$, so the expectation is $1$. If $a \neq 0$, choose $y \in \F_q$ such that $\tr[a \cdot y] \neq 0$. Translating $\bx$ by $y$ shows that the expectation is unchanged after multiplication by the nontrivial phase $\omega^{\tr[y \cdot a]}$, hence it must vanish.
-\end{proof}
-
-\begin{theorem}[Fourier orthogonality over $\F_q^m$]\label{prop:fourier-fact-vector}
-  \lean{MIPStarRE.LDT.Preliminaries.fourier_fact_vector}
-  \leanok
-  \uses{def:finite-field-trace}
-  Let $v \in \F_q^m$. Then
-  \[
-    \E_{\bu \sim \F_q^m} \omega^{\tr[\bu \cdot v]}
-    = \left\{\begin{array}{rl}
-      1 & \text{if $v = 0$},\\
-      0 & \text{otherwise}.
-    \end{array}\right.
-  \]
-\end{theorem}
-\begin{proof}
-  Apply the scalar orthogonality relation coordinatewise to the additive character $\bu \mapsto \omega^{\tr[\bu \cdot v]}$. The expectation factors over the coordinates, so it is $1$ exactly when every coordinate of $v$ vanishes and $0$ otherwise.
-\end{proof}
+\label{sec:prelims}
 
 \section{Polynomials and measurements}
 
+For complex numbers $\alpha,\beta \in \C$, write $\alpha \approx_\eps \beta$ when $|\alpha-\beta|\le \eps$. In particular,
+\begin{equation}\label{eq:triangle-inequality-for-numbers}
+  \text{if $\alpha \approx_{\eps} \beta$ and $\beta \approx_{\delta} \gamma$, then $\alpha \approx_{\eps+\delta}\gamma$.}
+\end{equation}
+
+Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p$ denote the finite-field trace.
+
+\begin{proposition}\label{prop:fourier-fact-scalar}
+  Let $a \in \F_q$. Then
+  \begin{equation*}
+    \E_{\bx \sim \F_q} \omega^{\tr[\bx \cdot a]}
+    = \left\{\begin{array}{rl}
+    	1 & \text{if $a = 0$},\\
+    	0 & \text{otherwise}.
+    	\end{array}\right.
+  \end{equation*}
+\end{proposition}
+\begin{proof}
+  If $a=0$, then $\tr[\bx\cdot a]=0$ for every $\bx$, so the average is $1$. If $a\neq 0$, choose $y \in \F_q$ such that $\tr[a\cdot y]\neq 0$, and set
+  \[
+    C=\E_{\bx \sim \F_q} \omega^{\tr[\bx \cdot a]}.
+  \]
+  Translation invariance of the uniform distribution gives
+  \[
+    C=\E_{\bx \sim \F_q} \omega^{\tr[(\bx+y)\cdot a]}
+    = C \cdot \omega^{\tr[y\cdot a]}.
+  \]
+  Since $\omega^{\tr[y\cdot a]}\neq 1$, it follows that $C=0$.
+\end{proof}
+
+\begin{proposition}\label{prop:fourier-fact-vector}
+  \uses{prop:fourier-fact-scalar}
+  Let $v \in \F_q^m$. Then
+  \begin{equation*}
+    \E_{\bu \sim \F_q^m} \omega^{\tr[\bu \cdot v]}
+    = \left\{\begin{array}{rl}
+    	1 & \text{if $v = 0$},\\
+    	0 & \text{otherwise}.
+    	\end{array}\right.
+  \end{equation*}
+\end{proposition}
+\begin{proof}
+  By linearity of the trace and independence of the coordinates,
+  \[
+    \E_{\bu \sim \F_q^m} \omega^{\tr[\bu \cdot v]}
+    = \prod_{i=1}^m \E_{\bu_i \sim \F_q} \omega^{\tr[\bu_i \cdot v_i]}.
+  \]
+  Proposition~\ref{prop:fourier-fact-scalar} shows that the $i$-th factor is $1$ when $v_i=0$ and $0$ otherwise, so the product is $1$ exactly when $v=0$.
+\end{proof}
 
 \begin{definition}[Low individual degree polynomials]\label{def:polyfunc}
-  \lean{MIPStarRE.LDT.Preliminaries.polyFunc}
-  \leanok
-  Let $\polyfunc{m}{q}{d}$ be the set of functions $g\colon \F_q^m \to \F_q$ that are represented by polynomials whose degree in each variable is at most $d$.
+  Let $\polyfunc{m}{q}{d}$ be the set of polynomials $g \in \F_q[x_1,\dots,x_m]$ whose degree in each variable is at most $d$, viewed as functions $\F_q^m \to \F_q$ via evaluation. (Over finite fields, distinct low-degree polynomials can induce the same function; we identify elements of $\polyfunc{m}{q}{d}$ with their polynomial representatives, not their functional equivalence classes.)
 \end{definition}
 
+\begin{lemma}[Schwartz--Zippel lemma~\cite{Sch80,Zip79}]\label{lem:schwartz-zippel-total-degree}
+  Let $g, h:\F_q^m \rightarrow \F_q$ be two distinct polynomials of total degree~$d$.
+  Then
+  \begin{equation*}
+    \Prb_{\bx \sim \F_q^m}[g(\bx) = h(\bx)] \leq \frac{d}{q}.
+  \end{equation*}
+\end{lemma}
+\begin{proof}
+  Apply the Schwartz--Zippel lemma to the nonzero polynomial $g-h$, which has total degree at most $d$.
+\end{proof}
+
 \begin{lemma}[Schwartz--Zippel for individual degree]\label{lem:schwartz-zippel-individual}
-  \lean{MIPStarRE.LDT.Preliminaries.schwartzZippel_individualDegree}
-  \leanok
-  \uses{def:polyfunc}
+  \uses{def:polyfunc, lem:schwartz-zippel-total-degree}
   If $g,h \in \polyfunc{m}{q}{d}$ are distinct, then
   \[
     \Prb_{u \sim \F_q^m}[g(u)=h(u)] \le \frac{md}{q}.
   \]
 \end{lemma}
 \begin{proof}
-  The difference $g-h$ is a nonzero polynomial of total degree at most $md$. Apply Schwartz--Zippel~\cite{Sch80,Zip79}.
+  The difference $g-h$ is a nonzero polynomial of total degree at most $md$. Apply Lemma~\ref{lem:schwartz-zippel-total-degree}.
 \end{proof}
 
 \begin{definition}[Measurements and submeasurements]\label{def:submeasurement}
-  Let $\mathcal H$ be a Hilbert space and let $\mathcal A$ be a finite outcome set. A submeasurement on $\mathcal A$ is a family $A=\{A_a\}_{a \in \mathcal A}$ of Hermitian positive semidefinite operators on $\mathcal H$ such that $\sum_a A_a \le I$. It is a measurement when $\sum_a A_a = I$, and it is projective when each $A_a$ is an idempotent projection.
+  Let $\mathcal H$ be a Hilbert space and let $\mathcal A$ be a set of outcomes. A submeasurement on $\mathcal A$ is a family $A=\{A_a\}_{a \in \mathcal A}$ of Hermitian positive semidefinite operators on $\mathcal H$ such that $\sum_a A_a \le I$. It is a measurement when $\sum_a A_a = I$, and it is projective when each $A_a$ is an idempotent projection. (In the Lean formalization, outcome sets are assumed finite throughout.)
 \end{definition}
 
 \begin{definition}[Low-degree polynomial measurements]\label{def:polymeasurements}
@@ -79,7 +90,7 @@
 \end{definition}
 
 \begin{definition}[Post-processing]\label{def:post-processing}
-  \lean{MIPStarRE.LDT.Preliminaries.postProcessing}
+  % \lean tag removed: no matching declaration
   \uses{def:submeasurement}
   Let $A=\{A_a\}_{a \in \mathcal A}$ be a family of operators and let $f\colon \mathcal A \to \mathcal B$. The post-processed family $A_{[f(a)=b]}$ is defined by
   \[
@@ -88,24 +99,25 @@
 \end{definition}
 
 \begin{definition}[Completion of a submeasurement]\label{def:measurement-completion}
-  \lean{MIPStarRE.LDT.Preliminaries.measurementCompletion}
+  \lean{MIPStarRE.LDT.Preliminaries.completeAtOutcome}
   \uses{def:submeasurement}
   Let $A=\{A_a^x\}_{a \in \mathcal A}$ be a submeasurement. Its completion is the measurement $\widehat A$ with outcome set $\widehat{\mathcal A}=\mathcal A \cup \{\bot\}$ given by $\widehat A_a^x=A_a^x$ for $a \in \mathcal A$ and $\widehat A_\bot^x = I-\sum_a A_a^x$.
 \end{definition}
 
 \section{Consistency and state-dependent distance}
+\label{sec:comparing-measurements}
 
 
 \begin{definition}[Consistency]\label{def:simeq}
-  \lean{MIPStarRE.LDT.Preliminaries.consistency}
+  \lean{MIPStarRE.LDT.Test.ConsRel}
   Let $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$. Let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be submeasurements with the same answer set, and let $\mathcal D$ be a distribution on the question set. We write
   \[
     A_a^x \ot I \simeq_\delta I \ot B_a^x
   \]
   when
-  \[
+  \begin{equation}\label{eq:no-big-Oh}
     \E_{x \sim \mathcal D} \sum_{a \ne b} \bra{\psi} A_a^x \ot B_b^x \ket{\psi} \le \delta.
-  \]
+  \end{equation}
 \end{definition}
 
 \begin{lemma}[Characterization of a good symmetric strategy]\label{lem:good-strategy-characterization}
@@ -138,7 +150,7 @@
 \end{proof}
 
 \begin{definition}[State-dependent distance]\label{def:approx_delta}
-  \lean{MIPStarRE.LDT.Preliminaries.stateDependentDistance}
+  \lean{MIPStarRE.LDT.Test.SDDRel}
   Let $\ket{\psi} \in \mathcal H$, let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be families of operators on $\mathcal H$, and let $\mathcal D$ be a distribution on the question set. We write
   \[
     A_a^x \approx_\delta B_a^x
@@ -148,6 +160,11 @@
     \E_{x \sim \mathcal D} \sum_a \lVert (A_a^x-B_a^x)\ket{\psi} \rVert^2 \le \delta.
   \]
 \end{definition}
+
+In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what hypothesis on $A$ and $B$ allows one to conclude that
+\begin{equation}\label{eq:can-we-use-approx-delta-to-derive-this}
+  B^x_a \ot I \simeq_{\eps} I \ot C^x_a.
+\end{equation}
 
 \begin{lemma}[Transferring consistency through state-dependent distance]\label{prop:triangle-sub}
   \uses{def:simeq, def:approx_delta, prop:simeq-for-measurements}
@@ -173,18 +190,90 @@
   Expand the squared norm of $(A_a^x \ot I - I \ot B_a^x)\ket{\psi}$ and use the diagonal-overlap formula from Lemma~\ref{prop:simeq-for-measurements}.
 \end{proof}
 
-\begin{lemma}[Closeness of inner products]\label{prop:closeness-of-ip}
+\begin{proposition}[Closeness of inner products]\label{prop:closeness-of-ip}
+\label{sec:consistency-from-state-dependent-distance}
   \uses{def:approx_delta}
-  Let $\{A_a^x\}$, $\{B_a^x\}$, and $\{C_{a,b}^x\}$ be operator families. If $A_a^x \approx_\gamma B_a^x$ and $\sum_a (\sum_b C_{a,b}^x)(\sum_b C_{a,b}^x)^\dagger \le I$ for every $x$, then
+  Let $\{A^x_a\}$, $\{B^x_a\}$, and $\{C^x_{a,b}\}$ be matrices. Suppose that $A^x_a \approx_\gamma B^x_a$ and that for all~$x$,
   \[
-    \E_x \sum_{a,b} \bra{\psi} C_{a,b}^x A_a^x \ket{\psi}
-    \approx_{\sqrt\gamma}
-    \E_x \sum_{a,b} \bra{\psi} C_{a,b}^x B_a^x \ket{\psi}.
+    \sum_a \Big(\sum_b C^x_{a,b}\Big) \Big(\sum_b C^x_{a,b}\Big)^\dagger \le I.
   \]
-  The analogous statement also holds when the $C_{a,b}^x$ act on the right.
-\end{lemma}
+  Then
+  \begin{equation}
+    \E_{\bx} \sum_{a,b} \bra{\psi} C^{\bx}_{a,b} A^{\bx}_a  \ket{\psi} \approx_{\sqrt{\gamma}} \E_{\bx} \sum_{a,b} \bra{\psi} C^{\bx}_{a,b} B^{\bx}_a  \ket{\psi}. \label{eq:closeness3}
+  \end{equation}
+  Similarly, suppose that $(A^x_a)^\dagger \approx_\gamma (B^x_a)^\dagger$ and that for all~$x$,
+  \[
+    \sum_a \Big(\sum_b C^x_{a,b}\Big)^\dagger \Big(\sum_b C^x_{a,b}\Big) \le I.
+  \]
+  Then
+  \begin{equation}
+    \E_{\bx} \sum_{a,b} \bra{\psi} A^{\bx}_a  C^{\bx}_{a,b} \ket{\psi} \approx_{\sqrt{\gamma}} \E_{\bx} \sum_{a,b} \bra{\psi} B^{\bx}_a  C^{\bx}_{a,b}  \ket{\psi}. \label{eq:closeness4}
+  \end{equation}
+\end{proposition}
 \begin{proof}
-  Apply Cauchy--Schwarz to the difference of the two expressions and use the normalization hypothesis on the $C_{a,b}^x$.
+  To prove \eqref{eq:closeness3}, write the difference as
+  \[
+    \E_{\bx} \sum_a \bra{\psi} \Big(\sum_b C^\bx_{a,b}\Big) (A^\bx_a-B^\bx_a) \ket{\psi}.
+  \]
+  Cauchy--Schwarz bounds its magnitude by
+  \[
+    \Big( \E_{\bx} \sum_a \bra{\psi} \Big(\sum_b C^{\bx}_{a,b}\Big)\Big(\sum_b C^{\bx}_{a,b}\Big)^\dagger \ket{\psi} \Big)^{1/2}
+    \Big( \E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a - B^{\bx}_a)^\dagger (A^{\bx}_a - B^{\bx}_a) \ket{\psi} \Big)^{1/2},
+  \]
+  and the two hypotheses bound these factors by $1$ and $\sqrt{\gamma}$ respectively. For \eqref{eq:closeness4}, rewrite the difference as
+  \[
+    \E_{\bx} \sum_{a,b} \bra{\psi} (C^{\bx}_{a,b})^\dagger \big((A^{\bx}_a)^\dagger-(B^{\bx}_a)^\dagger\big) \ket{\psi},
+  \]
+  and apply \eqref{eq:closeness3} to the adjoint families.
+\end{proof}
+
+\begin{proposition}\label{prop:easy-approx-from-approx-delta}
+  \uses{def:submeasurement, def:approx_delta}
+  Let $A = \{A^x_a\}$, $B = \{B^x_a\}$, and $C = \{C^x_a\}$ be submeasurements such that $A^x_a \approx_{\delta} B^x_a$. Then
+  \begin{equation*}
+    \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a  C^{\bx}_a \ket{\psi}
+    \approx_{\sqrt{\delta}} \E_{\bx} \sum_a \bra{\psi} B^{\bx}_a  C^{\bx}_a \ket{\psi}.
+  \end{equation*}
+\end{proposition}
+\begin{proof}
+  The difference has magnitude
+  \[
+    \Big| \E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a - B^{\bx}_a) C^{\bx}_a \ket{\psi}\Big|.
+  \]
+  By Cauchy--Schwarz this is at most
+  \[
+    \Big(\E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a - B^{\bx}_a)^2 \ket{\psi}\Big)^{1/2}
+    \Big(\E_{\bx} \sum_a \bra{\psi} (C^{\bx}_a)^2 \ket{\psi}\Big)^{1/2}.
+  \]
+  The first factor is at most $\sqrt{\delta}$ by hypothesis, and the second is at most $1$ because $C$ is a submeasurement.
+\end{proof}
+
+\begin{proposition}\label{prop:cab-approx-delta}
+  \uses{def:approx_delta}
+  Let $\{A^x_a\}$, $\{B^x_a\}$, and $\{C^x_{a,b}\}$ be matrices. Suppose that $A^{x}_a \approx_\delta B^{x}_a$ and that for all $x$ and $a$,
+  \[
+    \sum_b (C^{x}_{a,b})^\dagger (C^{x}_{a,b}) \leq I.
+  \]
+  Then
+  \[
+    C^{x}_{a,b} A^x_{a} \approx_{\delta} C^{x}_{a,b} B^{x}_a.
+  \]
+\end{proposition}
+\begin{proof}
+  The error term is
+  \[
+    \E_{\bx} \sum_{a,b} \bra{\psi}
+    (A^{\bx}_a - B^{\bx}_a)^\dagger
+    (C^{\bx}_{a,b})^\dagger C^{\bx}_{a,b}
+    (A^{\bx}_a - B^{\bx}_a) \ket{\psi}.
+  \]
+  Using $\sum_b (C^{x}_{a,b})^\dagger (C^{x}_{a,b}) \le I$, this is bounded by
+  \[
+    \E_{\bx} \sum_a \bra{\psi}
+    (A^{\bx}_a - B^{\bx}_a)^\dagger
+    (A^{\bx}_a - B^{\bx}_a) \ket{\psi}
+    \le \delta.
+  \]
 \end{proof}
 
 \begin{lemma}[Triangle inequality for vectors squared]\label{prop:triangle-inequality-for-vectors-squared}
@@ -194,7 +283,11 @@
   \]
 \end{lemma}
 \begin{proof}
-  Apply the scalar inequality $(x_1+\cdots+x_k)^2 \le k(x_1^2+\cdots+x_k^2)$ to the norms and combine it with the triangle inequality.
+  First,
+  \begin{equation}\label{eq:prop-for-real-numbers}
+    (x_1+\cdots+x_k)^2 \le k(x_1^2+\cdots+x_k^2)
+  \end{equation}
+  for all real numbers $x_1,\dots,x_k$. Apply \eqref{eq:prop-for-real-numbers} to $x_i=\lVert\ket{\psi_i}\rVert$ and combine it with the triangle inequality.
 \end{proof}
 
 \begin{lemma}[Triangle inequality for $\approx_\delta$]\label{prop:triangle-inequality-for-approx_delta}
@@ -235,50 +328,77 @@
   \lean{MIPStarRE.LDT.Preliminaries.consSubMeas}
   \uses{def:simeq, def:approx_delta}
   Let $A=\{A_a^x\}$ be a submeasurement and $B=\{B_a^x\}$ a measurement such that $A_a^x \ot I \simeq_\gamma I \ot B_a^x$. Then
-  \[
+  \begin{equation}
     A_a^x \ot I \approx_\gamma A_a^x \ot B_a^x \approx_\gamma A^x \ot B_a^x,
-  \]
+    \label{eq:closeness5}
+  \end{equation}
   where $A^x=\sum_a A_a^x$. In particular,
   \[
     A_a^x \ot I \approx_{4\gamma} A^x \ot B_a^x.
   \]
 \end{lemma}
 \begin{proof}
-  The inconsistency bound controls the mass of $A_a^x(I-B_a^x)$ and of $(A^x-A_a^x)B_a^x$. Combine the two estimates with the triangle inequality for $\approx_\delta$.
+  For the first approximation in \eqref{eq:closeness5}, bound
+  \[
+    \E_{\bx} \sum_a \bra{\psi} \bigl(A^{\bx}_a \ot (I-B^{\bx}_a)\bigr)^2 \ket{\psi}
+  \]
+  by the inconsistency between $A$ and $B$. The second approximation is identical, applied to
+  \[
+    \E_{\bx} \sum_a \bra{\psi} \bigl((A^\bx-A^\bx_a)\ot B^\bx_a\bigr)^2 \ket{\psi}.
+  \]
+  Then compose the two bounds with Lemma~\ref{prop:triangle-inequality-for-approx_delta}.
 \end{proof}
 
 \begin{lemma}[Switch-sandwich]\label{prop:switch-sandwich}
   \lean{MIPStarRE.LDT.Preliminaries.switchSandwich}
   \uses{def:approx_delta}
-  Suppose $A=\{A_a^x\}$ is a projective submeasurement satisfying $A_a^x \ot I \approx_\delta I \ot A_a^x$. Then for every operator $B$ with $0 \le B \le I$,
-  \[
+  Suppose $A=\{A_a^x\}$ is a projective submeasurement satisfying
+  \begin{equation}
+    A_a^x \ot I \approx_\delta I \ot A_a^x.
+    \label{eq:Aapproxd}
+  \end{equation}
+  Then for every operator $B$ with $0 \le B \le I$,
+  \begin{equation}
     \E_x \sum_a \bra{\psi} A_a^x B A_a^x \ot I \ket{\psi}
     \approx_{2\sqrt\delta}
     \E_x \sum_a \bra{\psi} B \ot A_a^x \ket{\psi}
     \approx_{\sqrt\delta}
     \E_x \sum_a \bra{\psi} BA_a^x \ot I \ket{\psi}.
-  \]
+    \label{eq:switch-sandwich}
+  \end{equation}
 \end{lemma}
 \begin{proof}
-  Move one copy of $A_a^x$ across the bipartition using the $\approx_\delta$ hypothesis, then use projectivity to collapse the resulting sandwich.
+  We prove the first approximation in \eqref{eq:switch-sandwich} in two steps. First,
+  \begin{equation}
+    \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a B A^{\bx}_a \ot I \ket{\psi}
+    \approx_{\sqrt{\delta}}
+    \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a B \ot A^{\bx}_a \ket{\psi}.
+    \label{eq:shift-right-A}
+  \end{equation}
+  This is obtained by applying Cauchy--Schwarz to the difference and using $B^2 \le B \le I$ together with \eqref{eq:Aapproxd}. For the second step, move the remaining left copy of $A^\bx_a$ across the bipartition in the same way; projectivity then collapses the sandwich and yields the first approximation in \eqref{eq:switch-sandwich}. The second approximation in \eqref{eq:switch-sandwich} is the same argument with the rightmost factor $A_a^\bx$ omitted.
 \end{proof}
 
 \section{Strong self-consistency}
 
 \begin{lemma}[Completeness transfer to a projective approximation]\label{prop:completeness-transfer-projective-P}
   \lean{MIPStarRE.LDT.Preliminaries.completenessTransferProjectiveP}
-  \uses{def:approx_delta}
+  \uses{def:approx_delta, prop:easy-approx-from-approx-delta}
   Let $A=\{A_a^x\}$ be a submeasurement and $P=\{P_a^x\}$ a projective submeasurement such that $A_a^x \ot I \approx_\eps P_a^x \ot I$. Then
   \[
     \bra{\psi} A \ot I \ket{\psi} \ge \bra{\psi} P \ot I \ket{\psi} - 2\sqrt\eps.
   \]
 \end{lemma}
 \begin{proof}
-  Compare the completeness of $P$ with the diagonal overlaps $\sum_a \bra{\psi} A_a^x P_a^x \ot I \ket{\psi}$ and $\sum_a \bra{\psi} (A_a^x)^2 \ot I \ket{\psi}$.
+  Since $P$ is projective,
+  \[
+    \bra{\psi} P \ot I \ket{\psi}
+    = \E_{\bx} \sum_a \bra{\psi} (P^{\bx}_a)^2 \ot I \ket{\psi}.
+  \]
+  Apply Proposition~\ref{prop:easy-approx-from-approx-delta} twice to replace $(P^\bx_a)^2$ first by $A^\bx_aP^\bx_a$ and then by $(A^\bx_a)^2$, and conclude with $(A_a^\bx)^2 \le A_a^\bx$.
 \end{proof}
 
 \begin{definition}[Strong self-consistency]\label{def:strong-self-consistency}
-  \lean{MIPStarRE.LDT.Preliminaries.strongSelfConsistency}
+  % \lean tag: BipartiteSSCRel used in Theorems, no standalone def
   Let $\ket{\psi}$ be permutation-invariant and let $A=\{A_a^x\}$ be a submeasurement. We say that $A$ is $\delta$-strongly self-consistent when
   \[
     \E_x \sum_a \bra{\psi} A_a^x \ot A_a^x \ket{\psi}
@@ -305,7 +425,14 @@
   If $A$ is projective, the converse also holds.
 \end{lemma}
 \begin{proof}
-  Expand the squared norm of $(A_a^x \ot I - I \ot A_a^x)\ket{\psi}$ and compare it with the diagonal overlap in the definition of strong self-consistency.
+  Expanding the squared norm gives
+  \begin{align}
+    &\E_{\bx} \sum_a \lVert(A^{\bx}_a \otimes I - I \otimes A^{\bx}_a)\ket{\psi}\rVert^2 \nonumber\\
+    =~&2\cdot \Big( \E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a)^2 \otimes I \ket{\psi} -  \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi}\Big) \nonumber\\
+    \leq~&2\cdot \Big( \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes I \ket{\psi} -  \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi}\Big).
+    \label{eq:here's-where-projectivity-would-help}
+  \end{align}
+  The strong self-consistency bound controls the last line by $2\delta$. If $A$ is projective, then \eqref{eq:here's-where-projectivity-would-help} is an equality, which gives the converse.
 \end{proof}
 
 \begin{lemma}[Post-processing preserves strong self-consistency]\label{prop:two-notions-of-self-consistency-after-evaluation}
@@ -316,29 +443,51 @@
   \]
 \end{lemma}
 \begin{proof}
-  The post-processed diagonal overlap dominates the original diagonal overlap, so the same strong self-consistency bound applies. Then use Lemma~\ref{prop:two-notions-of-self-consistency}.
+  The same computation as in Lemma~\ref{prop:two-notions-of-self-consistency} gives
+  \begin{align}
+    &\E_{\bx} \sum_b \lVert(A^{\bx}_{[f(a)=b]} \otimes I - I \otimes A^{\bx}_{[f(a)=b]}) \ket{\psi}\rVert^2 \nonumber\\
+    \leq~&2\cdot \Big( \bra{\psi} A \otimes I \ket{\psi} -  \E_{\bx} \sum_b \bra{\psi} A^{\bx}_{[f(a)=b]} \otimes A^{\bx}_{[f(a)=b]} \ket{\psi}\Big).
+    \label{eq:finishing-this-up}
+  \end{align}
+  The post-processed diagonal term dominates $\E_{\bx} \sum_a \bra{\psi} A^\bx_a \otimes A^\bx_a \ket{\psi}$, so strong self-consistency bounds \eqref{eq:finishing-this-up} by $2\delta$.
 \end{proof}
 
 \begin{lemma}[Completeness transfer for a strongly self-consistent approximation]\label{prop:completeness-transfer-self-consistent-A}
-  \uses{def:strong-self-consistency, def:approx_delta}
+  \uses{def:strong-self-consistency, def:approx_delta, prop:easy-approx-from-approx-delta}
   Let $A$ be a $\delta$-strongly self-consistent submeasurement and let $B$ be a submeasurement such that $A_a^x \ot I \approx_\eps B_a^x \ot I$. Then
   \[
     \bra{\psi} B \ot I \ket{\psi} \ge \bra{\psi} A \ot I \ket{\psi} - \delta - 2\sqrt\eps.
   \]
 \end{lemma}
 \begin{proof}
-  Bound the completeness of $B$ from below by its diagonal overlap with $A$, then replace that overlap by the diagonal overlap of $A$ with itself.
+  Bound $\bra{\psi} B \ot I \ket{\psi}$ from below by $\E_{\bx}\sum_a \bra{\psi} B^\bx_a \ot B^\bx_a \ket{\psi}$. Then apply Proposition~\ref{prop:easy-approx-from-approx-delta} twice to replace this by $\E_{\bx}\sum_a \bra{\psi} A^\bx_a \ot A^\bx_a \ket{\psi}$, and finish with strong self-consistency of $A$.
 \end{proof}
 
 \begin{lemma}[Self-consistency implies data-processing closeness]\label{prop:self-consistency-implies-data-processing}
-  \uses{def:post-processing, def:strong-self-consistency, def:approx_delta, prop:two-notions-of-self-consistency-after-evaluation}
+  \uses{def:post-processing, def:strong-self-consistency, def:approx_delta, prop:two-notions-of-self-consistency-after-evaluation, prop:completeness-transfer-projective-P, prop:easy-approx-from-approx-delta, prop:triangle-inequality-for-approx_delta}
   Let $A$ be a $\delta$-strongly self-consistent submeasurement and let $P$ be a projective submeasurement such that $P_a^x \ot I \approx_\eps A_a^x \ot I$. Then for every function $f$,
   \[
     P_{[f(a)=b]}^x \ot I \approx_{8\delta + 8\sqrt\eps} A_{[f(a)=b]}^x \ot I.
   \]
 \end{lemma}
 \begin{proof}
-  First compare the post-processed family of $P$ to $I \ot A_{[f(a)=b]}^x$, using strong self-consistency of $A$ and closeness of $P$ to $A$. Then move back to the original side of the bipartition and compose the two bounds.
+  First prove
+  \begin{equation}
+    P^x_{[f(a)=b]} \ot I \approx_{2\delta + 4\sqrt{\eps}} I \ot A_{[f(a)=b]}^x.
+    \label{eq;what-we-want-to-prove-but-on-wrong-side}
+  \end{equation}
+  Expanding the squared norm and using projectivity gives
+  \begin{align}
+    &\E_{\bx} \sum_b \lVert(P^{\bx}_{[f(a)=b]} \ot I - I \ot A_{[f(a)=b]}^{\bx}) \ket{\psi} \rVert^2 \nonumber\\
+    \leq~&\bra{\psi} P \ot I \ket{\psi} + \bra{\psi} I \ot A \ket{\psi}
+    		- 2\cdot \E_{\bx} \sum_b \bra{\psi}  P^{\bx}_{[f(a)=b]} \ot A^{\bx}_{[f(a)=b]} \ket{\psi}.
+    \label{eq:gonna-handle-third-term}
+  \end{align}
+  Proposition~\ref{prop:completeness-transfer-projective-P} bounds the first term by $\bra{\psi} A \ot I \ket{\psi}+2\sqrt{\eps}$, and Proposition~\ref{prop:easy-approx-from-approx-delta} together with strong self-consistency bounds the third term below by $\bra{\psi} A \ot I \ket{\psi}-\delta-\sqrt{\eps}$. Substituting into \eqref{eq:gonna-handle-third-term} yields \eqref{eq;what-we-want-to-prove-but-on-wrong-side}. Now combine \eqref{eq;what-we-want-to-prove-but-on-wrong-side} with
+  \[
+    A^x_{[f(a)=b]} \ot I \approx_{2\delta} I \ot A^x_{[f(a)=b]}
+  \]
+  from Lemma~\ref{prop:two-notions-of-self-consistency-after-evaluation}, and conclude by Lemma~\ref{prop:triangle-inequality-for-approx_delta}.
 \end{proof}
 
 \begin{lemma}[Self-consistency moves one copy to the same side]\label{lem:self-consistency-same-side-square}
@@ -367,22 +516,56 @@
 
 \begin{lemma}[Completing a close submeasurement to a full measurement]\label{prop:completing-to-measurement}
   \lean{MIPStarRE.LDT.Preliminaries.completingToMeasurement}
-  \uses{def:strong-self-consistency, def:approx_delta, prop:triangle-inequality-for-vectors-squared, lem:completion-missing-mass-bound}
+  \uses{def:strong-self-consistency, def:approx_delta, prop:triangle-inequality-for-vectors-squared, prop:easy-approx-from-approx-delta, prop:cool-prop}
   Let $A=\{A_a\}$ be a measurement that is $\zeta$-strongly self-consistent, let $B=\{B_a\}$ be a submeasurement such that $A_a \ot I \approx_\delta B_a \ot I$, and let $C$ be the measurement obtained by adding the missing mass $I-B$ to one distinguished answer $a^*$. Then
   \[
     A_a \ot I \approx_{2\delta + 4\sqrt\delta + 2\zeta} C_a \ot I.
   \]
 \end{lemma}
+
+\begin{proposition}\label{prop:cool-prop}
+  \uses{def:strong-self-consistency}
+  Let $A = \{A_a\}$ be a $\zeta$-strongly self-consistent submeasurement. Then
+  \begin{equation*}
+    \sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi} \geq \sum_a \bra{\psi} A_a \otimes I \ket{\psi} -\zeta.
+  \end{equation*}
+\end{proposition}
 \begin{proof}
-  By the squared triangle inequality,
+  Cauchy--Schwarz gives
+  \begin{align}
+    \sum_a \bra{\psi} A_a \otimes A_a \ket{\psi}
+    &\leq \sqrt{\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}} \cdot \sqrt{\sum_a \bra{\psi} I \ot (A_a)^2 \ket{\psi}} \nonumber\\
+    &= \sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}.
+    \label{eq:As-on-same-side-rewrite}
+  \end{align}
+  Combine \eqref{eq:As-on-same-side-rewrite} with the strong self-consistency inequality.
+\end{proof}
+
+\begin{proof}[Proof of \ref{prop:completing-to-measurement}]
+  By Lemma~\ref{prop:triangle-inequality-for-vectors-squared},
   \[
-    \sum_a \lVert (A_a-C_a)\ot I\ket{\psi} \rVert^2
-    \le
-    2\delta + 2\lVert (I-B) \ot I\ket{\psi} \rVert^2.
+    \sum_a \lVert(A_a-C_a)\ot I \ket{\psi} \rVert^2
+    \leq 2\delta + 2 \cdot \lVert(I-B)\ot I \ket{\psi}\rVert^2.
   \]
-  Lemma~\ref{lem:completion-missing-mass-bound} gives
+  It remains to bound the residual term. Since $0 \le I-B \le I$,
+  \begin{align}
+    \lVert(I-B) \ot I \ket{\psi}\rVert^2
+    &\leq 1 -\sum_a \bra{\psi} B_a^2 \ot I \ket{\psi}.
+    \label{eq:to-return-later-whatevs}
+  \end{align}
+  By Proposition~\ref{prop:easy-approx-from-approx-delta},
   \[
-    \lVert (I-B) \ot I\ket{\psi} \rVert^2 \le 2\sqrt\delta + \zeta,
+    \sum_a \bra{\psi} B_a^2 \ot I \ket{\psi}
+    \approx_{\sqrt{\delta}} \sum_a \bra{\psi} (A_a B_a)\ot I \ket{\psi}
+    \approx_{\sqrt{\delta}} \sum_a \bra{\psi} A_a^2\ot I \ket{\psi}.
   \]
-  and substituting this yields the claimed bound.
+  Proposition~\ref{prop:cool-prop} gives
+  \[
+    \sum_a \bra{\psi} A_a^2\ot I \ket{\psi} \geq \bra{\psi} A \ot I \ket{\psi} - \zeta = 1-\zeta.
+  \]
+  Hence \eqref{eq:to-return-later-whatevs} implies
+  \[
+    \lVert(I-B) \ot I \ket{\psi}\rVert^2 \le 2\sqrt\delta + \zeta.
+  \]
+  Substituting this into the first bound proves the claim.
 \end{proof}
