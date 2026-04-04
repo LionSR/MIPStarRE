@@ -69,7 +69,7 @@ structure CommDataProcessedGConclusion (params : Parameters)
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityOneLeft params strategy family)
-      (IdxSubMeas.toIdxOpFamily (commDataProcessedGStabilityOneRight params strategy family))
+      (commDataProcessedGStabilityOneRight params strategy family)
       (commDataProcessedGStabilityOneError zeta)
   stabilityTwo :
     SDDOpRel strategy.state
