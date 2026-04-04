@@ -344,13 +344,32 @@ private theorem weightedPointConditionedOperatorAtPolynomial_pos (params : Param
     (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u)
     (CFC.sqrt_nonneg (G.outcome g))
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
+/-- `CFC.sqrt (G.outcome g) ≤ 1` when `G` is a submeasurement.
+Follows from `(CFC.sqrt G)² = G ≤ 1` and `CFC.sqrt G ≥ 0`.
+TODO: close the inner sorry via spectral decomposition. -/
+private lemma cfc_sqrt_outcome_le_one (params : Parameters)
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) :
+    CFC.sqrt (G.outcome g) ≤ 1 := by
+  suffices h : CFC.sqrt (G.outcome g) * CFC.sqrt (G.outcome g) ≤ 1 by
+    -- 0 ≤ P and P² ≤ 1 implies P ≤ 1 for Hermitian PSD matrices
+    sorry
+  rw [show CFC.sqrt (G.outcome g) * CFC.sqrt (G.outcome g) = G.outcome g from
+    CFC.sqrt_mul_sqrt_self (G.outcome g) (G.outcome_pos g)]
+  exact G.outcome_le_one g
+
 private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) (u : Point params) :
     weightedPointConditionedOperatorAtPolynomial params strategy G g u ≤ 1 := by
-  sorry
+  calc weightedPointConditionedOperatorAtPolynomial params strategy G g u
+      ≤ leftTensor (ι₂ := ι)
+          (pointConditionedOutcomeOperatorAtPolynomial params strategy g u) :=
+        opTensor_le_leftTensor
+          (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u)
+          (cfc_sqrt_outcome_le_one params G g)
+    _ ≤ 1 := leftTensor_le_one
+          (pointConditionedOutcomeOperatorAtPolynomial_le_one params strategy g u)
 
 -- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem weightedGeneralizeBLeftOperatorAtPolynomial_pos (params : Parameters)
@@ -363,14 +382,20 @@ private theorem weightedGeneralizeBLeftOperatorAtPolynomial_pos (params : Parame
     (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)
     (CFC.sqrt_nonneg (G.outcome g))
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem weightedGeneralizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu ≤ 1 := by
-  sorry
+  calc weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu
+      ≤ leftTensor (ι₂ := ι)
+          (generalizeBLeftOperatorAtPolynomial params strategy g qu) :=
+        opTensor_le_leftTensor
+          (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)
+          (cfc_sqrt_outcome_le_one params G g)
+    _ ≤ 1 := leftTensor_le_one
+          (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu)
 
 -- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem weightedGeneralizeBRightOperatorAtPolynomial_pos (params : Parameters)
@@ -383,14 +408,20 @@ private theorem weightedGeneralizeBRightOperatorAtPolynomial_pos (params : Param
     (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)
     (CFC.sqrt_nonneg (G.outcome g))
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem weightedGeneralizeBRightOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) :
     weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu ≤ 1 := by
-  sorry
+  calc weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
+      ≤ leftTensor (ι₂ := ι)
+          (generalizeBRightOperatorAtPolynomial params strategy g qu) :=
+        opTensor_le_leftTensor
+          (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)
+          (cfc_sqrt_outcome_le_one params G g)
+    _ ≤ 1 := leftTensor_le_one
+          (generalizeBRightOperatorAtPolynomial_le_one params strategy g qu)
 
 /-- The squared norm expression controlled by `lem:generalize-b` for a fixed `g`.
 Uses bipartite state `ψbi` on `d * d`. -/
