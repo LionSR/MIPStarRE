@@ -338,17 +338,23 @@ private theorem weightedPointConditionedOperatorAtPolynomial_pos (params : Param
     (CFC.sqrt_nonneg (G.outcome g))
 
 /-- `CFC.sqrt (G.outcome g) ≤ 1` when `G` is a submeasurement.
-Follows from `(CFC.sqrt G)² = G ≤ 1` and `CFC.sqrt G ≥ 0`.
-TODO: close the inner sorry via spectral decomposition. -/
+Proved via the NNReal CFC spectrum API: `G.outcome g ≤ 1` means all
+spectral values satisfy `λ ≤ 1`, so `√λ ≤ 1` as well. -/
 private lemma cfc_sqrt_outcome_le_one (params : Parameters)
     (G : SubMeas (Polynomial params) ι) (g : Polynomial params) :
     CFC.sqrt (G.outcome g) ≤ 1 := by
-  suffices h : CFC.sqrt (G.outcome g) * CFC.sqrt (G.outcome g) ≤ 1 by
-    -- 0 ≤ P and P² ≤ 1 implies P ≤ 1 for Hermitian PSD matrices
-    sorry
-  rw [show CFC.sqrt (G.outcome g) * CFC.sqrt (G.outcome g) = G.outcome g from
-    CFC.sqrt_mul_sqrt_self (G.outcome g) (G.outcome_pos g)]
-  exact G.outcome_le_one g
+  have hspec_le : ∀ x, x ∈ spectrum NNReal (G.outcome g) → x ≤ 1 := by
+    have hle : G.outcome g ≤ 1 := G.outcome_le_one g
+    rw [← cfc_id' NNReal (G.outcome g) (ha := G.outcome_pos g),
+      ← cfc_const_one (R := NNReal) (G.outcome g) (ha := G.outcome_pos g),
+      cfc_nnreal_le_iff _ _ _ (SpectrumRestricts.nnreal_of_nonneg (G.outcome_pos g))
+        (ha := G.outcome_pos g)] at hle
+    exact hle
+  rw [CFC.sqrt_eq_cfc, ← cfc_const_one (R := NNReal) (G.outcome g) (ha := G.outcome_pos g),
+    cfc_nnreal_le_iff _ _ _ (SpectrumRestricts.nnreal_of_nonneg (G.outcome_pos g))
+      (ha := G.outcome_pos g)]
+  intro x hx
+  simpa using hspec_le x hx
 
 private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
