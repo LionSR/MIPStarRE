@@ -246,7 +246,6 @@ noncomputable def weightedGeneralizeBRightOperatorAtPolynomial (params : Paramet
     (generalizeBRightOperatorAtPolynomial params strategy g qu)
     (polynomialWeightSqrtOperator params G g)
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem pointConditionedOutcomeOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params) (u : Point params) :
@@ -254,7 +253,6 @@ private theorem pointConditionedOutcomeOperatorAtPolynomial_pos (params : Parame
   simpa [pointConditionedOutcomeOperatorAtPolynomial] using
     (strategy.pointMeasurement u).outcome_pos (g u)
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem pointConditionedOutcomeOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params) (u : Point params) :
@@ -262,7 +260,6 @@ private theorem pointConditionedOutcomeOperatorAtPolynomial_le_one (params : Par
   simpa [pointConditionedOutcomeOperatorAtPolynomial] using
     Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u)
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem generalizeBLeftOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -279,7 +276,6 @@ private theorem generalizeBLeftOperatorAtPolynomial_pos (params : Parameters)
         else
           none)).outcome_pos (some ())
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem generalizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -298,7 +294,6 @@ private theorem generalizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
             none))
       (some ())
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem generalizeBRightOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -315,7 +310,6 @@ private theorem generalizeBRightOperatorAtPolynomial_pos (params : Parameters)
         else
           none)).outcome_pos (some ())
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem generalizeBRightOperatorAtPolynomial_le_one (params : Parameters)
     (strategy : SymStrat params ι)
     (g : Polynomial params)
@@ -334,7 +328,6 @@ private theorem generalizeBRightOperatorAtPolynomial_le_one (params : Parameters
             none))
       (some ())
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem weightedPointConditionedOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
@@ -371,7 +364,6 @@ private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Pa
     _ ≤ 1 := leftTensor_le_one
           (pointConditionedOutcomeOperatorAtPolynomial_le_one params strategy g u)
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem weightedGeneralizeBLeftOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
@@ -397,7 +389,6 @@ private theorem weightedGeneralizeBLeftOperatorAtPolynomial_le_one (params : Par
     _ ≤ 1 := leftTensor_le_one
           (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu)
 
--- TODO: blocked on CFC.sqrt monotonicity (CFC.sqrt G ≤ 1 when G ≤ 1)
 private theorem weightedGeneralizeBRightOperatorAtPolynomial_pos (params : Parameters)
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
