@@ -7,9 +7,9 @@ Additional proposition statements from
 `references/ldt-paper/preliminaries.tex`.
 
 The long paper-faithful Lean proofs for these extensions are still pending.
-Per the task fallback, this file records the exact signatures together with
-proof-sketch comments so downstream files can import the intended API without
-`sorry`.
+This file records the exact signatures together with proof-sketch comments
+as statement stubs; the theorem bodies use `sorry` placeholders until the
+full proofs are formalized.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -18,14 +18,14 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-/-- `prop:cool-prop`.
+/-- `prop:cool-prop` — Squared mass lower bound from bipartite SSC.
 
 Proof sketch:
 1. Apply Cauchy-Schwarz to the families `A_a ⊗ I` and `I ⊗ A_a`.
 2. Use permutation invariance to identify the two square-mass factors.
 3. Conclude `∑ₐ ⟨ψ|(A_a)^2 ⊗ I|ψ⟩ ≥ ∑ₐ ⟨ψ|A_a ⊗ A_a|ψ⟩`.
 4. Combine with `BipartiteSSCRel` on the constant `Unit`-indexed family. -/
-theorem coolProp {Outcome : Type*}
+theorem bipartiteSSCSquaredMass {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
@@ -33,7 +33,8 @@ theorem coolProp {Outcome : Type*}
     (A : SubMeas Outcome ι) (ζ : Error) :
     BipartiteSSCRel ψ (uniformDistribution Unit) (constSubMeasFamily A) ζ →
       ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a * A.outcome a)) ≥
-        ev ψ (leftTensor (ι₂ := ι) A.total) - ζ := by sorry
+        ev ψ (leftTensor (ι₂ := ι) A.total) - ζ := by
+    sorry -- TODO(sorry)
 
 /-- `prop:other-two-notions-of-self-consistency`.
 
@@ -51,7 +52,8 @@ theorem otherTwoNotionsOfSelfConsistency {Question Outcome : Type*}
     (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error) :
     BipartiteSSCRel ψ 𝒟 A δ →
-      ConsRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftRight A) δ := by sorry
+      ConsRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftRight A) δ := by
+    sorry -- TODO(sorry)
 
 /-- `prop:two-notions-of-self-consistency-after-evaluation`.
 
@@ -71,7 +73,8 @@ theorem twoNotionsOfSelfConsistencyAfterEvaluation
       SDDRel ψ 𝒟
         (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
         (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
-        (2 * δ) := by sorry
+        (2 * δ) := by
+    sorry -- TODO(sorry)
 
 /-- `prop:completeness-transfer-self-consistent-A`.
 
@@ -96,7 +99,8 @@ theorem completenessTransferSelfConsistentA
     BipartiteSSCRel ψ 𝒟 A δ →
     SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft B) ε →
       idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft B) ≥
-        idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) - δ - 2 * Real.sqrt ε := by sorry
+        idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) - δ - 2 * Real.sqrt ε := by
+    sorry -- TODO(sorry)
 
 /-- `prop:self-consistency-implies-data-processing`.
 
@@ -129,6 +133,7 @@ theorem selfConsistencyImpliesDataProcessing
       SDDRel ψ 𝒟
         (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
         (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
-        (8 * δ + 8 * Real.sqrt ε) := by sorry
+        (8 * δ + 8 * Real.sqrt ε) := by
+    sorry -- TODO(sorry)
 
 end MIPStarRE.LDT.Preliminaries
