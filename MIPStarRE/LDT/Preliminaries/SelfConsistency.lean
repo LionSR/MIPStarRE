@@ -34,7 +34,7 @@ theorem bipartiteSSCSquaredMass {Outcome : Type*}
     BipartiteSSCRel ψ (uniformDistribution Unit) (constSubMeasFamily A) ζ →
       ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a * A.outcome a)) ≥
         ev ψ (leftTensor (ι₂ := ι) A.total) - ζ := by
-    sorry -- TODO(sorry)
+  sorry -- TODO(sorry)
 
 /-- `prop:other-two-notions-of-self-consistency`.
 
@@ -53,7 +53,7 @@ theorem otherTwoNotionsOfSelfConsistency {Question Outcome : Type*}
     (A : IdxSubMeas Question Outcome ι) (δ : Error) :
     BipartiteSSCRel ψ 𝒟 A δ →
       ConsRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftRight A) δ := by
-    sorry -- TODO(sorry)
+  sorry -- TODO(sorry)
 
 /-- `prop:two-notions-of-self-consistency-after-evaluation`.
 
@@ -74,7 +74,7 @@ theorem twoNotionsOfSelfConsistencyAfterEvaluation
         (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
         (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
         (2 * δ) := by
-    sorry -- TODO(sorry)
+  sorry -- TODO(sorry)
 
 /-- `prop:completeness-transfer-self-consistent-A`.
 
@@ -100,7 +100,7 @@ theorem completenessTransferSelfConsistentA
     SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft B) ε →
       idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft B) ≥
         idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) - δ - 2 * Real.sqrt ε := by
-    sorry -- TODO(sorry)
+  sorry -- TODO(sorry)
 
 /-- `prop:self-consistency-implies-data-processing`.
 
@@ -134,6 +134,6 @@ theorem selfConsistencyImpliesDataProcessing
         (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
         (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
         (8 * δ + 8 * Real.sqrt ε) := by
-    sorry -- TODO(sorry)
+  sorry -- TODO(sorry)
 
 end MIPStarRE.LDT.Preliminaries
