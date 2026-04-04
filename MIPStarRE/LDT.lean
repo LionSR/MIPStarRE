@@ -6,6 +6,7 @@ import MIPStarRE.LDT.Basic.OpFamily
 import MIPStarRE.LDT.Test.Defs
 import MIPStarRE.LDT.Test.Strategy
 import MIPStarRE.LDT.Test.MainTheorem
+import MIPStarRE.LDT.Preliminaries.FiniteFields
 import MIPStarRE.LDT.Preliminaries.Defs
 import MIPStarRE.LDT.Preliminaries.Theorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
