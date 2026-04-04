@@ -247,7 +247,8 @@ noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
     tensorProductSubMeas Au Lv
 
-/-- The bridge `I ⊗ (L^ℓ_[f(v)=b] L^ℓ_[f(u)=a])` on the bipartite space `d * d`. -/
+/-- The bridge `I ⊗ (L^ℓ_[f(v)=b] · L^ℓ_[f(u)=a])` on the bipartite space.
+Paper's "ordered" step: `Lv * Lu` (line measurement at v times line measurement at u). -/
 noncomputable def diagonalLineProductOrdered (params : Parameters)
     (strategy : SymStrat params ι) :
     IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
@@ -258,9 +259,10 @@ noncomputable def diagonalLineProductOrdered (params : Parameters)
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
     OpFamily.rightPlacedOpFamily (ιA := ι) <|
-      orderedProductOpFamily Lu Lv
+      reversedProductOpFamily Lu Lv
 
-/-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] L^ℓ_[f(v)=b])` on the bipartite space `ι × ι`. -/
+/-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] · L^ℓ_[f(v)=b])` on the bipartite space.
+Paper's "reversed" step: `Lu * Lv` (projectively swapped from ordered). -/
 noncomputable def diagonalLineProductReversed (params : Parameters)
     (strategy : SymStrat params ι) :
     IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
@@ -271,7 +273,7 @@ noncomputable def diagonalLineProductReversed (params : Parameters)
     let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
     let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
     OpFamily.rightPlacedOpFamily (ιA := ι) <|
-      reversedProductOpFamily Lu Lv
+      orderedProductOpFamily Lu Lv
 
 /-- The mixed bridge `A^v_b ⊗ L^ℓ_[f(u)=a]` on the bipartite space `ι × ι`.
 Outcome `(a, b)` maps to `leftTensor(A^v_b) * rightTensor(L^ℓ_[f(u)=a])`,

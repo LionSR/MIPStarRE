@@ -219,6 +219,7 @@ noncomputable def evaluatedFromFullSliceProductRight (params : Parameters)
 
 /-- Internal stability family from the `G^y` insertion/removal step.
 On the bipartite space `d * d`. -/
+-- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
 noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
@@ -230,6 +231,7 @@ noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters)
 
 /-- Internal stability family after removing the trailing `G^y`.
 On the bipartite space `d * d`. -/
+-- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
 noncomputable def commDataProcessedGStabilityOneRight (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
@@ -237,6 +239,7 @@ noncomputable def commDataProcessedGStabilityOneRight (params : Parameters)
 
 /-- Internal stability family from the `G^x` insertion/removal step.
 On the bipartite space `d * d`. -/
+-- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
 noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
@@ -248,6 +251,7 @@ noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
 
 /-- Internal stability family after removing the trailing `G^x`.
 On the bipartite space `d * d`. -/
+-- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
 noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
