@@ -313,12 +313,12 @@ structure FromHToGStatement (params : Parameters)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceStep :
-    ∀ ℓ : ℕ, ℓ < k →
+    ∀ ℓ : ℕ, ℓ < k → ∀ (τ : GHatType k),
       SDDOpRel strategy.state (uniformDistribution Unit)
         (IdxOpFamily.liftLeft
-          (fromHToGRecurrenceLeftFamily params strategy family k ℓ))
+          (fromHToGRecurrenceLeftFamily params strategy family k ℓ τ))
         (IdxOpFamily.liftLeft
-          (fromHToGRecurrenceRightFamily params strategy family k ℓ))
+          (fromHToGRecurrenceRightFamily params strategy family k ℓ τ))
         (fromHToGRecurrenceError params gamma zeta k)
   bernoulliPolynomialRewrite :
     SDDRel strategy.state (uniformDistribution Unit)
