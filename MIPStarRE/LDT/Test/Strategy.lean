@@ -120,7 +120,7 @@ noncomputable def axisParallelFailureProbability {params : Parameters}
 
 /-- Trace-based failure surrogate for the self-consistency test.
 Uses the bipartite SSC defect (cross-register overlap `∑ ev(A ⊗ A)`),
-matching Definition 4.3/4.4 of the paper. -/
+matching `def:strong-self-consistency` in `preliminaries.tex`. -/
 noncomputable def selfConsistencyFailureProbability {params : Parameters}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
