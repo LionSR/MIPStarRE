@@ -30,7 +30,13 @@ def liftDiagonalAnswer (params : Parameters) (x : Fq params) :
 /-- Restricted slice data keeps the point and axis-parallel measurements complete,
 but only records a projective submeasurement on diagonal lines. The ambient
 measurement type allows outcomes of degree up to `(m + 1) d`, while the honest
-slice pullback only sees the degree-`m d` image. -/
+slice pullback only sees the degree-`m d` image.
+
+TODO(#195): The paper's restricted strategy treats the diagonal branch as a
+genuine projective measurement and derives the `((m + 1) / m)` averaging bound
+from that. Matching the paper requires refactoring the diagonal-test encoding so
+that restricting an ambient diagonal answer to a slice lands in a total
+measurement on the `(m, q, d)` diagonal answer space. -/
 structure RestrictedSymStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
@@ -168,7 +174,13 @@ noncomputable def restrictAxisParallelMeasurement (params : Parameters)
           rfl }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
-/-- Restrict a diagonal-line measurement to the slice at height `x`. -/
+/-- Restrict a diagonal-line measurement to the slice at height `x`.
+
+TODO(#195): This currently drops ambient outcomes whose restriction is not
+represented in `DiagonalLinePolynomial params`, so it only produces a
+submeasurement. A paper-faithful replacement needs a total restricted diagonal
+measurement, not just a submeasurement, which in turn requires changing the
+ambient diagonal-test answer encoding. -/
 noncomputable def restrictDiagonalMeasurement (params : Parameters)
     (strategy : SymStrat params.next ι) (x : Fq params) :
     IdxProjSubMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι :=
@@ -324,12 +336,19 @@ noncomputable def sliceConditioningLoss (params : Parameters) : Error :=
 
 /-- In the current diagonal-test encoding, restricting to the slice at height
 `x` corresponds to conditioning on the sampled ambient diagonal direction having
-last coordinate `0`. This event has probability `1 / q`. -/
+last coordinate `0`. This event has probability `1 / q`.
+
+TODO(#195): Once the diagonal-test sampling/answer encoding matches the paper,
+this should be replaced by the same `m / (m + 1)` transverse-direction weight
+used for the axis-parallel branch. -/
 noncomputable def sliceDiagonalDirectionWeight (params : Parameters) : Error :=
   1 / (params.q : Error)
 
 /-- Reciprocal loss incurred when conditioning the diagonal test onto a fixed
-slice in the current encoding. -/
+slice in the current encoding.
+
+TODO(#195): Once the restricted diagonal strategy is genuine, this should be
+`(m + 1) / m` rather than `q`. -/
 noncomputable def sliceDiagonalConditioningLoss (params : Parameters) : Error :=
   (params.q : Error)
 

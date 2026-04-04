@@ -69,7 +69,7 @@ structure CommDataProcessedGConclusion (params : Parameters)
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityOneLeft params strategy family)
-      (IdxSubMeas.toIdxOpFamily (commDataProcessedGStabilityOneRight params strategy family))
+      (commDataProcessedGStabilityOneRight params strategy family)
       (commDataProcessedGStabilityOneError zeta)
   stabilityTwo :
     SDDOpRel strategy.state
@@ -139,14 +139,15 @@ lemma commDataProcessedG
         sorry
       stabilityOne := by
         -- TODO: Prove the first insertion/removal stability step for the
-        -- appended `G^y` total operator (`lem:comm-data-processed-g`); blocked
-        -- on `SDDOpRel` append/postprocess bridge lemmas.
+        -- trailing `G^y` factor while keeping Bob's right-register point
+        -- measurement (`lem:comm-data-processed-g`); blocked on the needed
+        -- `SDDOpRel` bridge lemmas for these paired tensor-product families.
         sorry
       stabilityTwo := by
         -- TODO: Prove the second insertion/removal stability step for the
-        -- appended `G^x` total operator (`lem:comm-data-processed-g`); blocked
-        -- on the corresponding `SDDOpRel` bridge from the evaluated slice
-        -- product scaffold.
+        -- trailing `G^x` factor while keeping Bob's ordered point-measurement
+        -- product (`lem:comm-data-processed-g`); blocked on the corresponding
+        -- `SDDOpRel` bridge from the evaluated-slice product scaffold.
         sorry
       evaluatedSliceCommutation := by
         -- TODO: Show approximate commutation of the ordered and reversed

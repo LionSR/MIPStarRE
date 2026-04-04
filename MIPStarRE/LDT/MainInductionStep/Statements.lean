@@ -98,7 +98,13 @@ structure PastingBoundednessInput (params : Parameters)
       family.dominationTarget x g =
         averagedSlicePointEvaluationOperator params strategy x g
 
-/-- Bookkeeping package for the restricted-probabilities lemma. -/
+/-- Bookkeeping package for the restricted-probabilities lemma.
+
+TODO(#195): The paper/blueprint statement uses the same `((m + 1) / m)` loss
+for the diagonal and axis-parallel branches. The extra diagonal-specific
+`q`-based terms here are a temporary consequence of the current diagonal slice
+encoding in `RestrictedSymStrat`; they should disappear once that encoding is
+refactored to produce a genuine restricted diagonal strategy. -/
 structure RestrictedProbabilitiesStatement (params : Parameters)
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error) : Prop where
