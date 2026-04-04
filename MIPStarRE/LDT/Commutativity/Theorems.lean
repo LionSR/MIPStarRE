@@ -45,6 +45,11 @@ noncomputable def comMainError (params : Parameters) (gamma zeta : Error) : Erro
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)))
 
 -- TODO: Add hypothesis linking G to family (e.g., G = family.meas.toSubMeas)
+-- TODO: In the paper the stability argument instantiates `G` with the slice
+-- submeasurement coming from `family` (for the relevant `x` or `y`). We keep
+-- `G` explicit in this scaffold so the operator families can already record the
+-- correct weighted bodies, but the eventual proof will need hypotheses tying
+-- this parameter back to `family` or `strategy`.
 
 /-- Output package for `lem:comm-data-processed-g`.
 

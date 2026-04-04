@@ -22,7 +22,6 @@ abbrev EvaluatedSliceQuestion (params : Parameters) := Point params.next × Poin
 abbrev EvaluatedSliceOutcome (params : Parameters) := Fq params × Fq params
 abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
 abbrev FullSliceOutcome (params : Parameters) := Polynomial params × Polynomial params
-
 /-- Outcomes for the `G^y` stability step.
 
 We keep the first coordinate evaluated at `u`, but retain the full second
@@ -35,8 +34,9 @@ abbrev StabilityOneOutcome (params : Parameters) := Fq params × Polynomial para
 
 We retain the full first polynomial `g` because the right-register weight is
 `√(G_g)`, while the second coordinate is already evaluated at `v`. This keeps
-the `.1`/`.2` indexing aligned with the paper's `G^x` versus `G^y` roles. -/
+the `.1`/`.2` usage aligned with the paper's `G^x` versus `G^y` roles. -/
 abbrev StabilityTwoOutcome (params : Parameters) := Polynomial params × Fq params
+
 
 /-- Ordered product placed on the left tensor factor of the bipartite space `ι × ι`. -/
 noncomputable def leftOrderedProductOpFamily {α β : Type*} [Fintype α] [Fintype β]
