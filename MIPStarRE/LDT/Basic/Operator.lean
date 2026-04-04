@@ -92,6 +92,57 @@ theorem opTensor_mono_left
   simpa [opTensor] using MIPStarRE.Quantum.kronecker_mono_left hA hB
 
 
+/-- `rightTensor B * leftTensor A = opTensor A B`. -/
+theorem rightTensor_mul_leftTensor_eq_opTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    rightTensor (ι₁ := ι₁) B * leftTensor (ι₂ := ι₂) A = opTensor A B := by
+  simpa [leftTensor, rightTensor, opTensor] using
+    (Matrix.mul_kronecker_mul
+      (1 : MIPStarRE.Quantum.Op ι₁) A B (1 : MIPStarRE.Quantum.Op ι₂)).symm
+
+/-- `leftTensor A * leftTensor B = leftTensor (A * B)`. -/
+theorem leftTensor_mul_leftTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A B : MIPStarRE.Quantum.Op ι₁) :
+    leftTensor (ι₂ := ι₂) A * leftTensor (ι₂ := ι₂) B =
+      leftTensor (ι₂ := ι₂) (A * B) := by
+  simpa [leftTensor, opTensor] using
+    (Matrix.mul_kronecker_mul
+      A B (1 : MIPStarRE.Quantum.Op ι₂) (1 : MIPStarRE.Quantum.Op ι₂)).symm
+
+/-- `rightTensor A * rightTensor B = rightTensor (A * B)`. -/
+theorem rightTensor_mul_rightTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A B : MIPStarRE.Quantum.Op ι₂) :
+    rightTensor (ι₁ := ι₁) A * rightTensor (ι₁ := ι₁) B =
+      rightTensor (ι₁ := ι₁) (A * B) := by
+  simpa [rightTensor, opTensor] using
+    (Matrix.mul_kronecker_mul
+      (1 : MIPStarRE.Quantum.Op ι₁) (1 : MIPStarRE.Quantum.Op ι₁) A B).symm
+
+/-- Conjugate transpose distributes over `opTensor`. -/
+theorem conjTranspose_opTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    (opTensor A B)ᴴ = opTensor Aᴴ Bᴴ := by
+  exact Matrix.conjTranspose_kronecker A B
+
+/-- `opTensor` distributes over multiplication. -/
+theorem opTensor_mul
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A₁ A₂ : MIPStarRE.Quantum.Op ι₁) (B₁ B₂ : MIPStarRE.Quantum.Op ι₂) :
+    opTensor A₁ B₁ * opTensor A₂ B₂ = opTensor (A₁ * A₂) (B₁ * B₂) := by
+  exact (Matrix.mul_kronecker_mul A₁ A₂ B₁ B₂).symm
+
+/-- `opTensor` is linear in the left factor: subtraction. -/
+theorem opTensor_sub_left
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A B : MIPStarRE.Quantum.Op ι₁) (C : MIPStarRE.Quantum.Op ι₂) :
+    opTensor A C - opTensor B C = opTensor (A - B) C := by
+  ext i j
+  simp [opTensor, Matrix.sub_apply, sub_mul]
+
 /-! ### Bridging lemmas: expectation-value linearity -/
 
 /-- `ev` distributes over addition. -/
