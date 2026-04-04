@@ -279,14 +279,14 @@ noncomputable def completeAtOutcome {Outcome : Type*}
 /-- Output package for `prop:completing-to-measurement`. -/
 structure CompletingToMeasStmt {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι)
+    (ψ : QuantumState (ι × ι))
     (A : Measurement Outcome ι) (B : SubMeas Outcome ι)
     (C : Measurement Outcome ι) (a0 : Outcome) (δ ζ : Error) : Prop where
   completionFormula : C = completeAtOutcome B a0
   closenessAfterCompletion :
     SDDRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily A.toSubMeas)
-      (constSubMeasFamily C.toSubMeas)
+      (constSubMeasFamily A.toSubMeas.liftLeft)
+      (constSubMeasFamily C.toSubMeas.liftLeft)
       (2 * δ + 4 * Real.sqrt δ + 2 * ζ)
 
 end MIPStarRE.LDT.Preliminaries

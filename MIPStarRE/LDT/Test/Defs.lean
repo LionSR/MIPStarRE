@@ -249,9 +249,9 @@ structure PolyMeasCons {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- Strong self-consistency for a global polynomial submeasurement. -/
 structure PolyMeasSSC {ι : Type*} [Fintype ι] [DecidableEq ι]
     (params : Parameters)
-    (ψ : QuantumState ι) (G : SubMeas (Polynomial params) ι) (_δ : Error) : Prop where
+    (ψ : QuantumState (ι × ι)) (G : SubMeas (Polynomial params) ι) (_δ : Error) : Prop where
   diagonalMassBound :
-    SSCRel ψ (uniformDistribution Unit)
+    BipartiteSSCRel ψ (uniformDistribution Unit)
       (constSubMeasFamily G)
       _δ
 
