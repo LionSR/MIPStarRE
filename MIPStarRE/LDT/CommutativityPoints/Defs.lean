@@ -248,7 +248,12 @@ noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
     tensorProductSubMeas Au Lv
 
 /-- The bridge `I ⊗ (L^ℓ_[f(v)=b] · L^ℓ_[f(u)=a])` on the bipartite space.
-Paper's "ordered" step: `Lv * Lu` (line measurement at v times line measurement at u). -/
+Paper's "ordered" step: `Lv * Lu` (line measurement at v times line measurement at u).
+
+Note: uses `reversedProductOpFamily Lu Lv` because that combinator reverses the
+*argument* order, giving `Lv.outcome b * Lu.outcome a = Lv * Lu`, which IS the
+paper's ordered product. The naming is consistent with the paper, not with the
+combinator name. -/
 noncomputable def diagonalLineProductOrdered (params : Parameters)
     (strategy : SymStrat params ι) :
     IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
@@ -262,7 +267,11 @@ noncomputable def diagonalLineProductOrdered (params : Parameters)
       reversedProductOpFamily Lu Lv
 
 /-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] · L^ℓ_[f(v)=b])` on the bipartite space.
-Paper's "reversed" step: `Lu * Lv` (projectively swapped from ordered). -/
+Paper's "reversed" step: `Lu * Lv` (projectively swapped from ordered).
+
+Note: uses `orderedProductOpFamily Lu Lv` because that combinator preserves the
+*argument* order, giving `Lu.outcome a * Lv.outcome b = Lu * Lv`, which is the
+paper's reversed (projectively swapped) product. -/
 noncomputable def diagonalLineProductReversed (params : Parameters)
     (strategy : SymStrat params ι) :
     IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=

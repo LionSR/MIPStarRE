@@ -1,0 +1,94 @@
+From b0c854f79a0e473abc9a661cb08ee6c640744c5d Mon Sep 17 00:00:00 2001
+From: "Sirui@MPQ" <divergence_lu@icloud.com>
+Date: Sat, 4 Apr 2026 12:46:12 +0200
+Subject: [PATCH] chore: remove dead code per review (nonBottomSliceCount,
+ averagedSandwichSubMeas)
+
+---
+ MIPStarRE/LDT/Pasting/Defs.lean     | 18 ++++--------------
+ MIPStarRE/LDT/Pasting/Sandwich.lean | 11 +----------
+ 2 files changed, 5 insertions(+), 24 deletions(-)
+
+diff --git a/MIPStarRE/LDT/Pasting/Defs.lean b/MIPStarRE/LDT/Pasting/Defs.lean
+index 5b9399f..1936ad4 100644
+--- a/MIPStarRE/LDT/Pasting/Defs.lean
++++ b/MIPStarRE/LDT/Pasting/Defs.lean
+@@ -183,26 +183,16 @@ noncomputable def fallbackInterpolatedPolynomial (params : Parameters) : Polynom
+     intro i
+     simp [MvPolynomial.degreeOf_zero]
+ 
+-/-- Count how many completed slice outcomes are genuine (non-`⊥`) polynomial slices. -/
+-noncomputable def nonBottomSliceCount {params : Parameters} {k : ℕ}
+-    (gs : GHatTupleOutcome params k) : ℕ := by
+-  exact gHatTupleHammingWeight gs
+-
+-/-- The set of genuine (non-⊥) slice indices. -/
+-noncomputable def genuineSliceIndices {params : Parameters} {k : ℕ}
+-    (gs : GHatTupleOutcome params k) : Finset (Fin k) := by
+-  exact gHatTupleSupport gs
+-
+ /-- Extract the polynomial from a genuine slice outcome. -/
+ noncomputable def extractSlicePoly {params : Parameters} {k : ℕ}
+     (gs : GHatTupleOutcome params k) (i : Fin k)
+-    (hi : i ∈ genuineSliceIndices gs) : Polynomial params := by
++    (hi : i ∈ gHatTupleSupport gs) : Polynomial params := by
+   classical
+   exact (gs i).get (by
+     cases hgi : gs i with
+     | none =>
+         have hisSome : (gs i).isSome = true := by
+-          simpa [genuineSliceIndices, gHatTupleSupport] using hi
++          simpa [gHatTupleSupport] using hi
+         simp [Option.isSome, hgi] at hisSome
+     | some p =>
+         simpa [hgi])
+@@ -230,7 +220,7 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
+       classical
+       exact if interpolationEligibleTuple params gs then
+         -- Genuine slice indices
+-        let τ := genuineSliceIndices gs
++        let τ := gHatTupleSupport gs
+         -- Evaluation points in the scalar field
+         let v : Fin (k + 1) → Scalar params := fun i => decodeScalar (xs i)
+         -- The interpolated polynomial: ∑_{i ∈ τ} L_i(X_m) · g_i(u₁,...,u_m)
+@@ -270,7 +260,7 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
+                   cases hgj : gs j with
+                   | none =>
+                       have hsome : (gs j).isSome = true := by
+-                        simpa [τ, genuineSliceIndices, gHatTupleSupport] using hj
++                        simpa [τ, gHatTupleSupport] using hj
+                       simp [Option.isSome, hgj] at hsome
+                   | some g =>
+                       simp only [extractSliceOr0]
+diff --git a/MIPStarRE/LDT/Pasting/Sandwich.lean b/MIPStarRE/LDT/Pasting/Sandwich.lean
+index 9d892ad..41025eb 100644
+--- a/MIPStarRE/LDT/Pasting/Sandwich.lean
++++ b/MIPStarRE/LDT/Pasting/Sandwich.lean
+@@ -619,7 +619,7 @@ noncomputable def gHatSandwichFamily (params : Parameters)
+ 
+ /-- Restrict a submeasurement to the outcomes satisfying `p`, dropping all other
+ mass from the total operator. -/
+-private noncomputable def restrictSubMeas {α : Type*} [Fintype α]
++noncomputable def restrictSubMeas {α : Type*} [Fintype α]
+     (A : SubMeas α ι) (p : α → Prop) [DecidablePred p] :
+     SubMeas α ι := by
+   classical
+@@ -704,15 +704,6 @@ noncomputable def pastedInterpolationFamily (params : Parameters)
+     postprocess (interpolationEligibleSandwichFamily params family k xs)
+       (interpolateCompletedSlices params k xs)
+ 
+-/-- The averaged sandwiched family before interpolation. -/
+-noncomputable def averagedSandwichSubMeas (params : Parameters)
+-    (family : IdxPolyFamily params ι) (k : ℕ) :
+-    SubMeas (GHatTupleOutcome params k) ι :=
+-  averageIdxSubMeas
+-    (distinctTupleDistribution params k)
+-    (gHatSandwichFamily params family k)
+-    (distinctTupleDistribution_weight_sum_le_one params k)
+-
+ /-- The averaged sandwiched family restricted to outcome tuples of type `τ`
+ with `|τ| ≥ d+1`, as in `lem:over-all-outcomes`. -/
+ noncomputable def averagedEligibleSandwichSubMeas (params : Parameters)
+-- 
+2.50.1 (Apple Git-155)
+

@@ -1,0 +1,37 @@
+From 5aecbeb73e27e6de1f4f16ed4beb61f08271ff0f Mon Sep 17 00:00:00 2001
+From: "Sirui@MPQ" <divergence_lu@icloud.com>
+Date: Sat, 4 Apr 2026 12:47:54 +0200
+Subject: [PATCH] docs: clarify diagonalLineProduct naming indirection per
+ review
+
+---
+ MIPStarRE/LDT/CommutativityPoints/Defs.lean | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/MIPStarRE/LDT/CommutativityPoints/Defs.lean b/MIPStarRE/LDT/CommutativityPoints/Defs.lean
+index 6890ebe..9044ad9 100644
+--- a/MIPStarRE/LDT/CommutativityPoints/Defs.lean
++++ b/MIPStarRE/LDT/CommutativityPoints/Defs.lean
+@@ -249,6 +249,9 @@ noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
+ 
+ /-- The bridge `I ⊗ (L^ℓ_[f(v)=b] · L^ℓ_[f(u)=a])` on the bipartite space.
+ Paper's "ordered" step: `Lv * Lu` (line measurement at v times line measurement at u). -/
++-- Note: `reversedProductOpFamily Lu Lv` gives `Lv * Lu` (reversed order of arguments),
++-- which IS the paper's "ordered" step (L_v · L_u). The apparent naming mismatch is because
++-- `reversedProductOpFamily` reverses the order of its two SubMeas arguments.
+ noncomputable def diagonalLineProductOrdered (params : Parameters)
+     (strategy : SymStrat params ι) :
+     IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
+@@ -263,6 +266,9 @@ noncomputable def diagonalLineProductOrdered (params : Parameters)
+ 
+ /-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] · L^ℓ_[f(v)=b])` on the bipartite space.
+ Paper's "reversed" step: `Lu * Lv` (projectively swapped from ordered). -/
++-- Note: `orderedProductOpFamily Lu Lv` keeps the argument order as `Lu * Lv`,
++-- so this realizes the paper's "reversed" step relative to `diagonalLineProductOrdered`.
++-- The apparent naming mismatch comes from comparing product order with argument order.
+ noncomputable def diagonalLineProductReversed (params : Parameters)
+     (strategy : SymStrat params ι) :
+     IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
+-- 
+2.50.1 (Apple Git-155)
+
