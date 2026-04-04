@@ -343,7 +343,7 @@ theorem simeqDataProcessing {Question α β : Type*}
 /-! ### Infrastructure: triangle inequality for `SDDRel` -/
 
 /-- Atomic mathematical fact: the parallelogram-style inequality for `qSDD`. -/
-private lemma questionSDD_triangle {Outcome : Type*}
+lemma questionSDD_triangle {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (A B C : SubMeas Outcome ι) :
@@ -368,7 +368,7 @@ private lemma questionSDD_triangle {Outcome : Type*}
   linarith
 
 /-- Triangle inequality for state-dependent distance. -/
-private lemma stateDependentDistanceRel_triangle
+lemma stateDependentDistanceRel_triangle
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
@@ -401,7 +401,7 @@ private lemma stateDependentDistanceRel_triangle
         exact add_le_add h₁ h₂
 
 /-- Monotonicity: if `SDDRel` holds for `δ`, it holds for any `δ' ≥ δ`. -/
-private lemma stateDependentDistanceRel_mono
+lemma stateDependentDistanceRel_mono
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
@@ -736,7 +736,7 @@ theorem consSubMeas {Question Outcome : Type*}
 
 /-! ### Bridge lemmas for `prop:switch-sandwich` -/
 
-private lemma weightedFinsetCauchySchwarz
+lemma weightedFinsetCauchySchwarz
     {Question Outcome : Type*}
     [Fintype Outcome]
     (𝒟 : Distribution Question)
@@ -970,7 +970,7 @@ private lemma leftTensor_opBounded01
   · exact leftTensor_nonneg (ι₂ := ι₂) hB.nonnegative
   · exact sub_nonneg.mpr (leftTensor_le_one (ι₂ := ι₂) (opBounded01_le_one hB))
 
-private lemma avgOver_abs_le_sqrt_of_pointwise
+lemma avgOver_abs_le_sqrt_of_pointwise
     {Question : Type*}
     (𝒟 : Distribution Question) (f g : Question → Error)
     (hf : ∀ q, |f q| ≤ Real.sqrt (g q))
