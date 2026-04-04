@@ -146,6 +146,25 @@ def gHatTupleType {params : Parameters} {k : ℕ}
     (gs : GHatTupleOutcome params k) : GHatType k :=
   fun i => Option.isSome (gs i)
 
+/-- The support of a completed-slice tuple, i.e. the indices whose outcomes are
+genuine polynomials rather than `⊥`. This matches the paper's support of the type
+`τ ∈ {0,1}^k`. -/
+noncomputable def gHatTupleSupport {params : Parameters} {k : ℕ}
+    (gs : GHatTupleOutcome params k) : Finset (Fin k) := by
+  classical
+  exact Finset.univ.filter fun i => (gs i).isSome
+
+/-- The Hamming weight of a completed-slice tuple. -/
+noncomputable def gHatTupleHammingWeight {params : Parameters} {k : ℕ}
+    (gs : GHatTupleOutcome params k) : ℕ :=
+  (gHatTupleSupport gs).card
+
+/-- A completed-slice tuple is eligible for interpolation exactly when its type has
+Hamming weight at least `d + 1`, matching the paper's `|w| ≥ d+1` filter. -/
+def interpolationEligibleTuple (params : Parameters) {k : ℕ}
+    (gs : GHatTupleOutcome params k) : Prop :=
+  params.d + 1 ≤ gHatTupleHammingWeight gs
+
 /-- Remove the first coordinate from a tuple of slice questions. -/
 def pointTupleTail {params : Parameters} {k : ℕ}
     (xs : PointTuple params (k + 1)) : PointTuple params k :=
@@ -167,14 +186,12 @@ noncomputable def fallbackInterpolatedPolynomial (params : Parameters) : Polynom
 /-- Count how many completed slice outcomes are genuine (non-`⊥`) polynomial slices. -/
 noncomputable def nonBottomSliceCount {params : Parameters} {k : ℕ}
     (gs : GHatTupleOutcome params k) : ℕ := by
-  classical
-  exact (Finset.univ.filter fun i => Option.isSome (gs i)).card
+  exact gHatTupleHammingWeight gs
 
 /-- The set of genuine (non-⊥) slice indices. -/
 noncomputable def genuineSliceIndices {params : Parameters} {k : ℕ}
     (gs : GHatTupleOutcome params k) : Finset (Fin k) := by
-  classical
-  exact Finset.univ.filter fun i => (gs i).isSome
+  exact gHatTupleSupport gs
 
 /-- Extract the polynomial from a genuine slice outcome. -/
 noncomputable def extractSlicePoly {params : Parameters} {k : ℕ}
@@ -182,8 +199,13 @@ noncomputable def extractSlicePoly {params : Parameters} {k : ℕ}
     (hi : i ∈ genuineSliceIndices gs) : Polynomial params := by
   classical
   exact (gs i).get (by
-    simp only [genuineSliceIndices, Finset.mem_filter] at hi
-    exact hi.2)
+    cases hgi : gs i with
+    | none =>
+        have hisSome : (gs i).isSome = true := by
+          simpa [genuineSliceIndices, gHatTupleSupport] using hi
+        simp [Option.isSome, hgi] at hisSome
+    | some p =>
+        simp [hgi])
 
 /-- Extract the polynomial from a genuine (Some) slice outcome, or fallback to zero. -/
 noncomputable def extractSliceOr0 {params : Parameters}
@@ -206,7 +228,7 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
   | 0, _xs, _gs => fallbackInterpolatedPolynomial params
   | k + 1, xs, gs => by
       classical
-      exact if params.d + 1 ≤ nonBottomSliceCount gs then
+      exact if interpolationEligibleTuple params gs then
         -- Genuine slice indices
         let τ := genuineSliceIndices gs
         -- Evaluation points in the scalar field
@@ -247,7 +269,9 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
                   intro j hj
                   cases hgj : gs j with
                   | none =>
-                      simp [τ, genuineSliceIndices, hgj] at hj
+                      have hsome : (gs j).isSome = true := by
+                        simpa [τ, genuineSliceIndices, gHatTupleSupport] using hj
+                      simp [Option.isSome, hgj] at hsome
                   | some g =>
                       simp only [extractSliceOr0]
                       rw [← hi, MvPolynomial.degreeOf_rename_of_injective hinj]
