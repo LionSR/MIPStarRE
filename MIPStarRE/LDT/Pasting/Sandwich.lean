@@ -683,23 +683,41 @@ noncomputable def suffixBernoulliWeightOperator (params : Parameters)
       (Nat.choose (ℓ - 1) r : ℂ) • (G ^ r * (1 - G) ^ (ℓ - 1 - r))
     else 0
 
-/-- The default type used when packaging the recurrence step at the statement level. -/
-def emptyGHatType (k : ℕ) : GHatType k :=
-  fun _ => false
+/-- A completed-slice tuple `gs` is **globally consistent** at evaluation points `xs`
+if there exists a single polynomial `h` in `m+1` variables whose restriction to
+each slice height `xᵢ` agrees with the genuine slice polynomial `gᵢ` for every
+index `i` in the support of `gs`.  This matches the paper's `Global_τ(x)` predicate
+from `references/ldt-paper/ld-pasting.tex` lines 1123–1131. -/
+def IsGloballyConsistent (params : Parameters) {k : ℕ}
+    (xs : PointTuple params k) (gs : GHatTupleOutcome params k) : Prop :=
+  ∃ h : Polynomial params.next,
+    ∀ i : Fin k, ∀ (hi : (gs i).isSome),
+      (Polynomial.restrictAtHeight params h (xs i)).poly =
+        ((gs i).get hi).poly
 
--- MISMATCH: see #141
--- TODO: the paper's definition of `H^{x_1,\dots,x_k}_h` sums only the tuples `h_τ`
--- that are globally consistent with a single polynomial `h`; see the pasted-measurement
--- definition in `references/ldt-paper/ld-pasting.tex` around lines 474-495 and the
--- `Global_τ(x)` discussion around lines 1123-1162. The current scaffold now matches the
--- paper's `|τ| ≥ d+1` eligibility filter, but it still postprocesses every eligible tuple
--- through `interpolateCompletedSlices` instead of explicitly filtering by `h_τ`.
-/-- Partial Lean model of the interpolated operator `H^{x_1,\dots,x_k}_h`. -/
+/-- `IsGloballyConsistent params xs` is decidable (classically), needed for
+`restrictSubMeas` filtering. -/
+noncomputable instance isGloballyConsistent_decidablePred
+    (params : Parameters) {k : ℕ} (xs : PointTuple params k) :
+    DecidablePred (IsGloballyConsistent params xs) :=
+  fun _gs => Classical.dec _
+
+/-- The interpolated operator `H^{x_1,\dots,x_k}_h` restricted to tuples that are
+globally consistent with a single polynomial.
+
+The paper's definition (`references/ldt-paper/ld-pasting.tex` lines 474–495) sums
+only tuples `(g_1,…,g_k)` in `Global_τ(x)` — those consistent with a single
+polynomial `h` — and then interpolates.  The `|τ| ≥ d+1` eligibility filter is
+applied by `interpolationEligibleSandwichFamily`; this definition additionally
+restricts to globally consistent tuples via `IsGloballyConsistent`. -/
 noncomputable def pastedInterpolationFamily (params : Parameters)
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas (PointTuple params k) (Polynomial params.next) ι :=
   fun xs =>
-    postprocess (interpolationEligibleSandwichFamily params family k xs)
+    postprocess
+      (restrictSubMeas
+        (interpolationEligibleSandwichFamily params family k xs)
+        (IsGloballyConsistent params xs))
       (interpolateCompletedSlices params k xs)
 
 /-- The averaged sandwiched family restricted to outcome tuples of type `τ`
@@ -853,37 +871,36 @@ noncomputable def bernoulliTailFromFamily (params : Parameters)
         -- This needs the Bernoulli-tail upper bound from the matrix Chernoff step.
         sorry }
 
-/-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`. -/
--- MISMATCH: see #141
--- TODO: in `references/ldt-paper/ld-pasting.tex` around lines 1380-1425, the
--- recurrence is indexed by the suffix type `τ_{\ge ℓ}` and uses the operator
--- `S_{τ_{\ge ℓ}}`. The current Lean scaffold still packages the recurrence over `Unit`
--- and plugs in `emptyGHatType k`, so it forgets the τ-dependence entirely. Repairing
--- this will require threading a suffix-type index through these families and the
--- corresponding statement containers in `Pasting/Statements.lean`.
+/-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`,
+parameterised by the suffix type `τ ∈ {0,1}^k`.
+
+For each step `ℓ`, the paper (`references/ldt-paper/ld-pasting.tex` lines 1380–1425)
+forms the product `Ĥ^{x_{≥ℓ}}_{g_{≥ℓ}} ⊗ S_{τ_{≥ℓ}}` where `S_{τ_{≥ℓ}}` is the
+Bernoulli weight operator depending on the suffix type `τ`. -/
 noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters)
     (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ)
+    (τ : GHatType k) :
     IdxOpFamily Unit Unit ι :=
   fun _ =>
     let base := allOutcomesExpansionFamily params strategy family k ()
-    let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
+    let weight := suffixBernoulliWeightOperator params family k ℓ τ
     { outcome := fun _ => base.total * weight
       total := base.total * weight }
 
-/-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`. -/
--- MISMATCH: see #141
--- TODO: mirror the `τ_{\ge ℓ}`-indexed recurrence from `ld-pasting.tex`
--- lines 1380-1425 on the right-hand side as well. The present `Unit`-indexed
--- placeholder only tracks the Bernoulli tail operator and loses the paper's
--- suffix-type bookkeeping.
+/-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`,
+parameterised by the suffix type `τ ∈ {0,1}^k`.
+
+Mirror of `fromHToGRecurrenceLeftFamily` on the Bernoulli-tail side.
+See `references/ldt-paper/ld-pasting.tex` lines 1380–1425. -/
 noncomputable def fromHToGRecurrenceRightFamily (params : Parameters)
     (_strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ)
+    (τ : GHatType k) :
     IdxOpFamily Unit Unit ι :=
   fun _ =>
     let base := bernoulliTailFromFamily params family k ()
-    let weight := suffixBernoulliWeightOperator params family k ℓ (emptyGHatType k)
+    let weight := suffixBernoulliWeightOperator params family k ℓ τ
     { outcome := fun _ => base.total * weight
       total := base.total * weight }
 
