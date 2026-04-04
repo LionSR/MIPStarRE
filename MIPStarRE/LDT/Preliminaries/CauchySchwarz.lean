@@ -33,21 +33,6 @@ private lemma avgOver_sub {Question : Type*}
           intro q hq
           ring
 
-private lemma ev_conjTranspose
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) :
-    ev ψ Xᴴ = ev ψ X := by
-  unfold ev
-  have hρ : ψ.densityᴴ = ψ.density :=
-    (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd).isHermitian.eq
-  have hstar :
-      star (MIPStarRE.Quantum.normalizedTrace (ψ.density * X)) =
-        MIPStarRE.Quantum.normalizedTrace (ψ.density * Xᴴ) := by
-    rw [← normalizedTrace_conjTranspose]
-    rw [Matrix.conjTranspose_mul, hρ]
-    exact MIPStarRE.Quantum.normalizedTrace_mul_comm Xᴴ ψ.density
-  simpa [Complex.star_def, Complex.conj_re] using congrArg Complex.re hstar.symm
-
 private lemma sum_ev_mul_le_sqrt
     {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
@@ -250,14 +235,15 @@ private lemma question_closenessOfIPAdjoint
               refine Finset.sum_congr rfl ?_
               intro b hb
               simpa [Matrix.conjTranspose_mul] using
-                (ev_conjTranspose ψ (A a * C a b)).symm
+                (MIPStarRE.LDT.ev_conjTranspose ψ (A a * C a b)).symm
             · refine Finset.sum_congr rfl ?_
               intro a ha
               refine Finset.sum_congr rfl ?_
               intro b hb
               simpa [Matrix.conjTranspose_mul] using
-                (ev_conjTranspose ψ (B a * C a b)).symm
+                (MIPStarRE.LDT.ev_conjTranspose ψ (B a * C a b)).symm
 
+-- Mathlib provides PSD preservation for `Mᴴ * P * M`, but not this monotonicity wrapper.
 private lemma adjoint_sandwich_mono
     {ι : Type*} [Fintype ι]
     (M P Q : MIPStarRE.Quantum.Op ι) (hPQ : P ≤ Q) :
