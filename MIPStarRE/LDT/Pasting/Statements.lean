@@ -114,6 +114,9 @@ structure LdPastingConclusion (params : Parameters)
   largeEnough : 400 * params.m * params.d ≤ k
   constructedMeasurement :
     H = constructedPastedMeasurement params family k
+  -- Naming note: this is not a `ν` field from the paper. The point-consistency
+  -- bound here continues to use the induction-section error term, while `ν`
+  -- tracks the completeness loss below.
   pointConsistency :
     ConsWithPolyEval params.next strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
@@ -130,6 +133,9 @@ structure LdPastingSubMeasConclusion (params : Parameters)
   largeEnough : 400 * params.m * params.d ≤ k
   constructedSubMeas :
     H = constructedPastedSubMeas params family k
+  -- Naming note: this is not a `ν` field from the paper. The point-consistency
+  -- bound here continues to use the induction-section error term, while `ν`
+  -- only appears in the completeness lower bound.
   pointConsistency :
     ConsWithPolyEval params.next strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
