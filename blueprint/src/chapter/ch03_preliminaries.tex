@@ -5,10 +5,14 @@
 
 
 \begin{definition}[Low individual degree polynomials]\label{def:polyfunc}
+  \lean{MIPStarRE.LDT.Preliminaries.polyFunc}
+  \leanok
   Let $\polyfunc{m}{q}{d}$ be the set of functions $g\colon \F_q^m \to \F_q$ that are represented by polynomials whose degree in each variable is at most $d$.
 \end{definition}
 
 \begin{lemma}[Schwartz--Zippel for individual degree]\label{lem:schwartz-zippel-individual}
+  \lean{MIPStarRE.LDT.Preliminaries.schwartzZippel_individualDegree}
+  \leanok
   \uses{def:polyfunc}
   If $g,h \in \polyfunc{m}{q}{d}$ are distinct, then
   \[
