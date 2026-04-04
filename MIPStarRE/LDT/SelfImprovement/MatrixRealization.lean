@@ -171,11 +171,11 @@ noncomputable def matrixHelperAgreementOperatorAtPoint (params : Parameters)
     (model : MatrixSdpRealization params)
     (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (u : Point params) : MatrixOperator model.space :=
-  matrixAverageOperator (fun a : Fq params =>
+  ∑ a : Fq params,
     (model.pointMeasurement u).effect a *
-      matrixPolynomialEvaluationOutcomeOperatorAtPoint params model H u a)
+      matrixPolynomialEvaluationOutcomeOperatorAtPoint params model H u a
 
-/-- The concrete averaged matched operator `E_u E_a A^u_a H_[h(u)=a]`. -/
+/-- The concrete averaged matched operator `E_u Σ_a A^u_a H_[h(u)=a]`. -/
 noncomputable def matrixHelperAgreementAverageOperator (params : Parameters)
     (model : MatrixSdpRealization params)
     (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) : MatrixOperator model.space :=

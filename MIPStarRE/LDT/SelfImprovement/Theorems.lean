@@ -58,9 +58,8 @@ noncomputable def addInULeftOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι)
     (S : AddInUSelection params Outcome)
-    (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) := by
-  classical
-  exact
+    (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
+  open Classical in
     ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
       opTensor ((M u).outcome ah.1) (H.outcome ah.2)
 
@@ -72,9 +71,8 @@ noncomputable def addInURightOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (M : IdxSubMeas (Point params) Outcome ι)
     (T : Measurement (Polynomial params) ι)
     (S : AddInUSelection params Outcome)
-    (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) := by
-  classical
-  exact
+    (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
+  open Classical in
     ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
       let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 u
       opTensor (Au * (M u).outcome ah.1 * Au) (T.outcome ah.2)
