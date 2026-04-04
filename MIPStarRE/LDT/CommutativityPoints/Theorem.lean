@@ -14,6 +14,8 @@ open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+open scoped Matrix MatrixOrder ComplexOrder BigOperators
+
 private def pointDiagonalLineQuestionEquiv (params : Parameters) :
     PointDiagonalLineQuestion params ≃ DiagonalTestSample params where
   toFun := fun q => (q.1.base, (q.1.direction, q.2))
@@ -168,10 +170,14 @@ theorem commutativityPoints
         Apply `prop:simeq-to-approx` to the previous consistency statement.
         -/
         let A : IdxMeas (PointDiagonalLineQuestion params) (Fq params) ι :=
-          fun q => (strategy.pointMeasurement (sampledPointFromDiagonalQuestion params q)).toMeasurement
+          fun q => (strategy.pointMeasurement
+            (sampledPointFromDiagonalQuestion
+              params q)).toMeasurement
         let B : IdxMeas (PointDiagonalLineQuestion params) (Fq params) ι :=
           fun q =>
-            { toSubMeas := postprocess ((strategy.diagonalMeasurement q.1).toSubMeas) (fun f => f q.2)
+            { toSubMeas := postprocess
+                ((strategy.diagonalMeasurement
+                  q.1).toSubMeas) (fun f => f q.2)
               total_eq_one := by
                 simpa [postprocess_total] using
                   (strategy.diagonalMeasurement q.1).toMeasurement.total_eq_one }
@@ -204,10 +210,44 @@ theorem commutativityPoints
         sorry
       diagonalLineProjectiveSwap := by
         /-
-        The middle exact equality uses projectivity of the diagonal-line
-        measurement on the common sampled line.
+        The middle exact equality uses projectivity of
+        the diagonal-line measurement on the common
+        sampled line: postprocessed outcomes from the
+        same ProjMeas commute.
         -/
-        sorry
+        constructor
+        show sddErrorOp _ _ _ _ ≤ 0
+        have heq : ∀ q ab,
+            (diagonalLineProductOrdered params
+              strategy q).outcome ab =
+            (diagonalLineProductReversed params
+              strategy q).outcome ab := by
+          intro q ⟨a, b⟩
+          simp only [diagonalLineProductOrdered,
+            diagonalLineProductReversed,
+            OpFamily.rightPlacedOpFamily,
+            reversedProductOpFamily,
+            orderedProductOpFamily,
+            sampledDiagonalLineEvaluation]
+          congr 1
+          exact (strategy.diagonalMeasurement
+            q.1).postprocess_outcome_commute
+            (fun f => f q.2.2)
+            (fun f => f q.2.1) b a
+        have hzero : ∀ q, qSDDOp strategy.state
+            (diagonalLineProductOrdered params
+              strategy q)
+            (diagonalLineProductReversed params
+              strategy q) = 0 := by
+          intro q
+          unfold qSDDOp qSDDCore
+          apply Finset.sum_eq_zero
+          intro ab _
+          rw [heq q ab, sub_self,
+            Matrix.conjTranspose_zero, Matrix.zero_mul,
+            ev_zero]
+        simp only [sddErrorOp, hzero]
+        rw [MIPStarRE.LDT.avgOver_zero]
       reversedDropFromLineBridge := by
         /-
         Third replacement step:
