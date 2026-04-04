@@ -40,19 +40,18 @@ noncomputable def matrixSdpPrimalContributionOperator (params : Parameters)
     (g : Polynomial params) : MatrixOperator model.space :=
   (T.effect g) * matrixAveragedPointOperator params model g
 
-/-- The concrete primal objective `E_g Re τ(ρ T_g A_g)`. -/
+/-- The concrete primal objective `Σ_g Re Tr(T_g A_g)`. -/
 noncomputable def matrixSdpPrimalObjective (params : Parameters)
     (model : MatrixSdpRealization params)
     (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space) : Error :=
-  avgOver (polynomialDistribution params) (fun g =>
-    Complex.re (matrixExpectation model.state
-      (matrixSdpPrimalContributionOperator params model T g)))
+  Complex.re (Matrix.trace (∑ g : Polynomial params,
+    matrixSdpPrimalContributionOperator params model T g))
 
-/-- The concrete dual objective `Re τ(Z)`. -/
+/-- The concrete dual objective `Re Tr(Z)`. -/
 noncomputable def matrixSdpDualObjective {params : Parameters}
     (model : MatrixSdpRealization params)
     (Z : MatrixOperator model.space) : Error :=
-  Complex.re (MIPStarRE.Quantum.normalizedTrace Z)
+  Complex.re (Matrix.trace Z)
 
 /-- The concrete dual slack operator `Z - A_g`. -/
 noncomputable def matrixSdpDualSlackOperator (params : Parameters)
@@ -88,16 +87,6 @@ structure MatrixSdpOptimalWitness (params : Parameters)
 abbrev AddInUSelection (params : Parameters) (Outcome : Type*) :=
   Point params → Set (Outcome × Polynomial params)
 
-/-- Choose one representative pair from `S_u` when it is nonempty. -/
-noncomputable def addInUSelectionChoice {Outcome : Type*}
-    (params : Parameters)
-    (S : AddInUSelection params Outcome)
-    (u : Point params) : Option (Outcome × Polynomial params) := by
-  classical
-  by_cases h : (S u).Nonempty
-  · exact some (Classical.choose h)
-  · exact none
-
 /-- A raw point-indexed matrix outcome family used in the matrix `add-in-u` transfer. -/
 abbrev MatrixIndexedPointOutcomeFamily (params : Parameters)
     (Outcome : Type*) (H : FiniteHilbertSpace) :=
@@ -120,33 +109,32 @@ noncomputable def matrixAveragedSandwichedPolynomialOutcomeOperator (params : Pa
     matrixSandwichedPolynomialOutcomeOperatorAt params model T u h)
 
 /-- The matrix left-hand operator in `add-in-u`. -/
-noncomputable def matrixAddInULeftOperatorAtPoint {Outcome : Type*}
+noncomputable def matrixAddInULeftOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
     (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome)
     (u : Point params) : MatrixOperator model.space :=
-  match addInUSelectionChoice params S u with
-  | some (o, h) => (M u o) * (H.effect h)
-  | none => 0
+  open Classical in
+    ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
+      (M u ah.1) * (H.effect ah.2)
 
 /-- The matrix right-hand operator in `add-in-u`. -/
-noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type*}
+noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
     (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome)
     (u : Point params) : MatrixOperator model.space :=
-  match addInUSelectionChoice params S u with
-  | some (o, h) =>
-      let Au := matrixAveragedPointOperatorContribution params model h u
-      Au * (M u o) * Au * (T.effect h)
-  | none => 0
+  open Classical in
+    ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
+      let Au := matrixAveragedPointOperatorContribution params model ah.2 u
+      Au * (M u ah.1) * Au * (T.effect ah.2)
 
 /-- The matrix left-hand expectation in `add-in-u`. -/
-noncomputable def matrixAddInULeftQuantity {Outcome : Type*}
+noncomputable def matrixAddInULeftQuantity {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
@@ -157,7 +145,7 @@ noncomputable def matrixAddInULeftQuantity {Outcome : Type*}
       (matrixAddInULeftOperatorAtPoint params model M H S u)))
 
 /-- The matrix right-hand expectation in `add-in-u`. -/
-noncomputable def matrixAddInURightQuantity {Outcome : Type*}
+noncomputable def matrixAddInURightQuantity {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
@@ -176,16 +164,16 @@ noncomputable def matrixPolynomialEvaluationOutcomeOperatorAtPoint (params : Par
     MIPStarRE.Quantum.Submeasurement.postprocess (M := H) (fun h => h u)
   evalFamily.effect a
 
-/-- The concrete matched operator `E_a A^u_a H_[h(u)=a]`. -/
+/-- The concrete matched operator `Σ_a A^u_a H_[h(u)=a]`. -/
 noncomputable def matrixHelperAgreementOperatorAtPoint (params : Parameters)
     (model : MatrixSdpRealization params)
     (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (u : Point params) : MatrixOperator model.space :=
-  matrixAverageOperator (fun a : Fq params =>
+  ∑ a : Fq params,
     (model.pointMeasurement u).effect a *
-      matrixPolynomialEvaluationOutcomeOperatorAtPoint params model H u a)
+      matrixPolynomialEvaluationOutcomeOperatorAtPoint params model H u a
 
-/-- The concrete averaged matched operator `E_u E_a A^u_a H_[h(u)=a]`. -/
+/-- The concrete averaged matched operator `E_u Σ_a A^u_a H_[h(u)=a]`. -/
 noncomputable def matrixHelperAgreementAverageOperator (params : Parameters)
     (model : MatrixSdpRealization params)
     (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) : MatrixOperator model.space :=
@@ -209,7 +197,7 @@ noncomputable def matrixProjectiveResidualGap (params : Parameters)
   Complex.re (matrixExpectation model.state (Z * (1 - total)))
 
 /-- Matrix-level version of the `add-in-u` transfer inequality. -/
-structure MatrixAddInUTransferStatement {Outcome : Type*}
+structure MatrixAddInUTransferStatement {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
