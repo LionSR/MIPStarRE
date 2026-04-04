@@ -115,9 +115,8 @@ noncomputable def matrixAddInULeftOperatorAtPoint {Outcome : Type*} [Fintype Out
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
     (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome)
-    (u : Point params) : MatrixOperator model.space := by
-  classical
-  exact
+    (u : Point params) : MatrixOperator model.space :=
+  open Classical in
     ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
       (M u ah.1) * (H.effect ah.2)
 
@@ -128,9 +127,8 @@ noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type*} [Fintype Ou
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
     (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome)
-    (u : Point params) : MatrixOperator model.space := by
-  classical
-  exact
+    (u : Point params) : MatrixOperator model.space :=
+  open Classical in
     ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
       let Au := matrixAveragedPointOperatorContribution params model ah.2 u
       Au * (M u ah.1) * Au * (T.effect ah.2)
@@ -166,7 +164,7 @@ noncomputable def matrixPolynomialEvaluationOutcomeOperatorAtPoint (params : Par
     MIPStarRE.Quantum.Submeasurement.postprocess (M := H) (fun h => h u)
   evalFamily.effect a
 
-/-- The concrete matched operator `E_a A^u_a H_[h(u)=a]`. -/
+/-- The concrete matched operator `Σ_a A^u_a H_[h(u)=a]`. -/
 noncomputable def matrixHelperAgreementOperatorAtPoint (params : Parameters)
     (model : MatrixSdpRealization params)
     (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
