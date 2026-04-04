@@ -198,7 +198,9 @@ set_option linter.unusedFintypeInType false in
 theorem orthonormalization {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) :
+    (ψ : QuantumState (ι × ι))
+    (_hperm : PermInvState ψ)
+    (A : SubMeas Outcome ι) (ζ : Error) :
     BipartiteSSCRel ψ (uniformDistribution Unit)
         (constSubMeasFamily A) ζ →
       ∃ P : ProjSubMeas Outcome ι,
