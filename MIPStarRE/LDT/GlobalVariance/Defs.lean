@@ -354,6 +354,7 @@ private lemma cfc_sqrt_outcome_le_one (params : Parameters)
     cfc_nnreal_le_iff _ _ _ (SpectrumRestricts.nnreal_of_nonneg (G.outcome_pos g))
       (ha := G.outcome_pos g)]
   intro x hx
+  -- √x ≤ 1 follows from x ≤ 1 for NNReal (NNReal.sqrt_le_one)
   simpa using hspec_le x hx
 
 private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Parameters)
