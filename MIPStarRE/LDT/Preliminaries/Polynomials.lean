@@ -13,6 +13,8 @@ multivariate polynomial theorems.
 
 open Finset Fintype
 
+open scoped BigOperators
+
 namespace MIPStarRE.LDT.Preliminaries
 
 open MvPolynomial
@@ -23,25 +25,24 @@ abbrev polyFunc (m : ℕ) (K : Type*) [CommSemiring K] (d : ℕ) :
     Submodule K (MvPolynomial (Fin m) K) :=
   MvPolynomial.restrictDegree (Fin m) K d
 
-private theorem degreeOf_le_of_mem_polyFunc {m d : ℕ} {K : Type*} [CommSemiring K]
+/-- If `p ∈ polyFunc m K d`, then `p.degreeOf i ≤ d` for every variable `i`. -/
+theorem degreeOf_le_of_mem_polyFunc {m d : ℕ} {K : Type*} [CommSemiring K]
     {p : MvPolynomial (Fin m) K} (hp : p ∈ polyFunc m K d) (i : Fin m) :
-    p.degreeOf i ≤ d := by
-  exact MvPolynomial.degreeOf_le_iff.mpr fun s hs =>
+    p.degreeOf i ≤ d :=
+  MvPolynomial.degreeOf_le_iff.mpr fun s hs =>
     (MvPolynomial.mem_restrictDegree (σ := Fin m) (R := K) p d).mp hp s hs i
-
-private abbrev allPoints (m : ℕ) (K : Type*) [Fintype K] : Finset (Fin m → K) :=
-  Fintype.piFinset fun _ : Fin m => (Finset.univ : Finset K)
 
 /-- The uniform agreement probability of two polynomials on `K^m`, written as a
 finite cardinality ratio over `K^m`. -/
 noncomputable def polynomialAgreementProbability (m : ℕ) (K : Type*) [Field K] [Fintype K]
     [DecidableEq K] (g h : MvPolynomial (Fin m) K) : ℚ≥0 :=
-  #{x ∈ allPoints m K | MvPolynomial.eval x g = MvPolynomial.eval x h} /
+  #{x ∈ (Finset.univ : Finset (Fin m → K)) |
+      MvPolynomial.eval x g = MvPolynomial.eval x h} /
     (Fintype.card K ^ m : ℚ≥0)
 
 /-- If every individual degree of `p` is at most `d`, then the total degree of
 `p` is at most `m * d`. -/
-theorem totalDegree_le_card_mul_max_degreeOf {m d : ℕ} {K : Type*} [CommSemiring K]
+theorem totalDegree_le_mul_of_degreeOf_le {m d : ℕ} {K : Type*} [CommSemiring K]
     {p : MvPolynomial (Fin m) K} (hdeg : ∀ i, p.degreeOf i ≤ d) :
     p.totalDegree ≤ m * d := by
   rw [MvPolynomial.totalDegree]
@@ -54,16 +55,16 @@ theorem totalDegree_le_card_mul_max_degreeOf {m d : ℕ} {K : Type*} [CommSemiri
       rfl
     _ ≤ ∑ _i : Fin m, d := by
       refine Finset.sum_le_sum ?_
-      intro i hi
+      intro i _
       exact (MvPolynomial.degreeOf_le_iff.mp (hdeg i)) s hs
     _ = m * d := by
       simp [Fintype.card_fin]
 
 private theorem agreementEvent_eq_zeroEvent_sub {m : ℕ} {K : Type*} [Field K] [Fintype K]
     [DecidableEq K] (g h : MvPolynomial (Fin m) K) :
-    {x ∈ allPoints m K |
+    {x ∈ (Finset.univ : Finset (Fin m → K)) |
         MvPolynomial.eval x g = MvPolynomial.eval x h} =
-      {x ∈ allPoints m K |
+      {x ∈ (Finset.univ : Finset (Fin m → K)) |
         MvPolynomial.eval x (g - h) = 0} := by
   ext x
   simp [MvPolynomial.eval_sub, sub_eq_zero]
@@ -82,7 +83,7 @@ theorem schwartzZippel_totalDegree {m d : ℕ} {K : Type*} [Field K] [Fintype K]
   unfold polynomialAgreementProbability
   rw [agreementEvent_eq_zeroEvent_sub g h]
   calc
-    #{x ∈ allPoints m K |
+    #{x ∈ (Finset.univ : Finset (Fin m → K)) |
         MvPolynomial.eval x (g - h) = 0} /
         (Fintype.card K ^ m : ℚ≥0)
       ≤ (g - h).totalDegree / Fintype.card K := by
@@ -106,7 +107,7 @@ theorem schwartzZippel_individualDegree {m d : ℕ} {K : Type*} [Field K] [Finty
   have hh_degOf : ∀ i, h.1.degreeOf i ≤ d :=
     degreeOf_le_of_mem_polyFunc h.property
   exact schwartzZippel_totalDegree (g := g.1) (h := h.1) hval_ne
-    (totalDegree_le_card_mul_max_degreeOf hg_degOf)
-    (totalDegree_le_card_mul_max_degreeOf hh_degOf)
+    (totalDegree_le_mul_of_degreeOf_le hg_degOf)
+    (totalDegree_le_mul_of_degreeOf_le hh_degOf)
 
 end MIPStarRE.LDT.Preliminaries

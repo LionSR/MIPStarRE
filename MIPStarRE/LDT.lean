@@ -31,3 +31,4 @@ import MIPStarRE.LDT.Pasting.Defs
 import MIPStarRE.LDT.Pasting.Sandwich
 import MIPStarRE.LDT.Pasting.Statements
 import MIPStarRE.LDT.Pasting.Theorems
+import MIPStarRE.LDT.Preliminaries.Polynomials
