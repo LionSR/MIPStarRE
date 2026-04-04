@@ -183,26 +183,16 @@ noncomputable def fallbackInterpolatedPolynomial (params : Parameters) : Polynom
     intro i
     simp [MvPolynomial.degreeOf_zero]
 
-/-- Count how many completed slice outcomes are genuine (non-`⊥`) polynomial slices. -/
-noncomputable def nonBottomSliceCount {params : Parameters} {k : ℕ}
-    (gs : GHatTupleOutcome params k) : ℕ := by
-  exact gHatTupleHammingWeight gs
-
-/-- The set of genuine (non-⊥) slice indices. -/
-noncomputable def genuineSliceIndices {params : Parameters} {k : ℕ}
-    (gs : GHatTupleOutcome params k) : Finset (Fin k) := by
-  exact gHatTupleSupport gs
-
 /-- Extract the polynomial from a genuine slice outcome. -/
 noncomputable def extractSlicePoly {params : Parameters} {k : ℕ}
     (gs : GHatTupleOutcome params k) (i : Fin k)
-    (hi : i ∈ genuineSliceIndices gs) : Polynomial params := by
+    (hi : i ∈ gHatTupleSupport gs) : Polynomial params := by
   classical
   exact (gs i).get (by
     cases hgi : gs i with
     | none =>
         have hisSome : (gs i).isSome = true := by
-          simpa [genuineSliceIndices, gHatTupleSupport] using hi
+          simpa [gHatTupleSupport] using hi
         simp [Option.isSome, hgi] at hisSome
     | some p =>
         simpa [hgi])
@@ -230,7 +220,7 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
       classical
       exact if interpolationEligibleTuple params gs then
         -- Genuine slice indices
-        let τ := genuineSliceIndices gs
+        let τ := gHatTupleSupport gs
         -- Evaluation points in the scalar field
         let v : Fin (k + 1) → Scalar params := fun i => decodeScalar (xs i)
         -- The interpolated polynomial: ∑_{i ∈ τ} L_i(X_m) · g_i(u₁,...,u_m)
@@ -270,7 +260,7 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
                   cases hgj : gs j with
                   | none =>
                       have hsome : (gs j).isSome = true := by
-                        simpa [τ, genuineSliceIndices, gHatTupleSupport] using hj
+                        simpa [τ, gHatTupleSupport] using hj
                       simp [Option.isSome, hgj] at hsome
                   | some g =>
                       simp only [extractSliceOr0]

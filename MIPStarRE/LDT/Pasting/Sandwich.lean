@@ -619,7 +619,7 @@ noncomputable def gHatSandwichFamily (params : Parameters)
 
 /-- Restrict a submeasurement to the outcomes satisfying `p`, dropping all other
 mass from the total operator. -/
-private noncomputable def restrictSubMeas {α : Type*} [Fintype α]
+noncomputable def restrictSubMeas {α : Type*} [Fintype α]
     (A : SubMeas α ι) (p : α → Prop) [DecidablePred p] :
     SubMeas α ι := by
   classical
@@ -703,15 +703,6 @@ noncomputable def pastedInterpolationFamily (params : Parameters)
   fun xs =>
     postprocess (interpolationEligibleSandwichFamily params family k xs)
       (interpolateCompletedSlices params k xs)
-
-/-- The averaged sandwiched family before interpolation. -/
-noncomputable def averagedSandwichSubMeas (params : Parameters)
-    (family : IdxPolyFamily params ι) (k : ℕ) :
-    SubMeas (GHatTupleOutcome params k) ι :=
-  averageIdxSubMeas
-    (distinctTupleDistribution params k)
-    (gHatSandwichFamily params family k)
-    (distinctTupleDistribution_weight_sum_le_one params k)
 
 /-- The averaged sandwiched family restricted to outcome tuples of type `τ`
 with `|τ| ≥ d+1`, as in `lem:over-all-outcomes`. -/
