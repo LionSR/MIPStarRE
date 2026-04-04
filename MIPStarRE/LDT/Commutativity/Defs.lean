@@ -219,43 +219,85 @@ noncomputable def evaluatedFromFullSliceProductRight (params : Parameters)
 
 /-- Internal stability family from the `G^y` insertion/removal step.
 On the bipartite space `d * d`. -/
--- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
 noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    appendRightTotalOpFamily
-      (evaluatedSliceSandwichFirstFactor params strategy family q)
-      (leftTensor (ι₂ := ι) ((fullSliceSecondFactor params family xy).total))
+    let A : OpFamily (FullSliceOutcome params) (ι × ι) :=
+      appendRightTotalOpFamily
+        (leftPlacedSubMeas (ιB := ι) <|
+          sandwichByOuterSubMeas
+            (fullSliceFirstFactor params family xy)
+            (fullSliceSecondFactor params family xy))
+        (leftTensor (ι₂ := ι) ((fullSliceSecondFactor params family xy).total))
+    let B : OpFamily (FullSliceOutcome params) (ι × ι) :=
+      { outcome := fun gh =>
+          A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.2))
+        total :=
+          ∑ gh : FullSliceOutcome params,
+            A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.2)) }
+    OpFamily.postprocess B (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- Internal stability family after removing the trailing `G^y`.
 On the bipartite space `d * d`. -/
--- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
 noncomputable def commDataProcessedGStabilityOneRight (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
-  fun q => evaluatedSliceSandwichFirstFactor params strategy family q
-
-/-- Internal stability family from the `G^x` insertion/removal step.
-On the bipartite space `d * d`. -/
--- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
-noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    appendRightTotalOpFamily
-      (evaluatedSliceProductLeft params strategy family q)
-      (leftTensor (ι₂ := ι) ((fullSliceFirstFactor params family xy).total))
+    let A : OpFamily (FullSliceOutcome params) (ι × ι) :=
+      leftPlacedSubMeas (ιB := ι) <|
+        sandwichByOuterSubMeas
+          (fullSliceFirstFactor params family xy)
+          (fullSliceSecondFactor params family xy)
+    let B : OpFamily (FullSliceOutcome params) (ι × ι) :=
+      { outcome := fun gh =>
+          A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.2))
+        total :=
+          ∑ gh : FullSliceOutcome params,
+            A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.2)) }
+    OpFamily.postprocess B (evaluateFullSliceOutcomeAtQuestion params q)
+
+/-- Internal stability family from the `G^x` insertion/removal step.
+On the bipartite space `d * d`. -/
+noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι) :
+    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+  fun q =>
+    let xy := fullSliceQuestionOfEvaluatedSlice params q
+    let A : OpFamily (FullSliceOutcome params) (ι × ι) :=
+      appendRightTotalOpFamily
+        (fullSliceProductLeft params strategy family xy)
+        (leftTensor (ι₂ := ι) ((fullSliceFirstFactor params family xy).total))
+    let B : OpFamily (FullSliceOutcome params) (ι × ι) :=
+      { outcome := fun gh =>
+          A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.1))
+        total :=
+          ∑ gh : FullSliceOutcome params,
+            A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.1)) }
+    OpFamily.postprocess B (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- Internal stability family after removing the trailing `G^x`.
 On the bipartite space `d * d`. -/
--- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
 noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
-  fun q => evaluatedSliceProductLeft params strategy family q
+  fun q =>
+    let xy := fullSliceQuestionOfEvaluatedSlice params q
+    let A : OpFamily (FullSliceOutcome params) (ι × ι) :=
+      fullSliceProductLeft params strategy family xy
+    let B : OpFamily (FullSliceOutcome params) (ι × ι) :=
+      { outcome := fun gh =>
+          A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.1))
+        total :=
+          ∑ gh : FullSliceOutcome params,
+            A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.1)) }
+    OpFamily.postprocess B (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`.
 

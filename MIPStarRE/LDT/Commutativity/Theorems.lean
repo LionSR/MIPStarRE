@@ -52,6 +52,7 @@ are lifted to the right tensor factor. -/
 structure CommDataProcessedGConclusion (params : Parameters)
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι)
     (gamma zeta : Error) : Prop where
   postprocessedPointConsistency :
     ConsRel strategy.state
@@ -68,14 +69,14 @@ structure CommDataProcessedGConclusion (params : Parameters)
   stabilityOne :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
-      (commDataProcessedGStabilityOneLeft params strategy family)
-      (IdxSubMeas.toIdxOpFamily (commDataProcessedGStabilityOneRight params strategy family))
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
       (commDataProcessedGStabilityOneError zeta)
   stabilityTwo :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
-      (commDataProcessedGStabilityTwoLeft params strategy family)
-      (commDataProcessedGStabilityTwoRight params strategy family)
+      (commDataProcessedGStabilityTwoLeft params strategy family G)
+      (commDataProcessedGStabilityTwoRight params strategy family G)
       (commDataProcessedGStabilityTwoError params gamma zeta)
   evaluatedSliceCommutation :
     SDDOpRel strategy.state
@@ -88,9 +89,10 @@ structure CommDataProcessedGConclusion (params : Parameters)
 structure ComMainConclusion (params : Parameters)
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι)
     (gamma zeta : Error) : Prop where
   evaluatedCommutation :
-    CommDataProcessedGConclusion params strategy family gamma zeta
+    CommDataProcessedGConclusion params strategy family G gamma zeta
   evaluationSpecialization :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
@@ -126,10 +128,11 @@ lemma commDataProcessedG
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
-    CommDataProcessedGConclusion params strategy family gamma zeta := by
+    CommDataProcessedGConclusion params strategy family G gamma zeta := by
   refine
     { postprocessedPointConsistency := ?_
       postprocessedSelfConsistency := by
@@ -163,12 +166,13 @@ theorem comMain
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
-    ComMainConclusion params strategy family gamma zeta := by
+    ComMainConclusion params strategy family G gamma zeta := by
   let hEval :=
-    commDataProcessedG params strategy eps delta gamma zeta hgood family hcons hself hbound
+    commDataProcessedG params strategy eps delta gamma zeta hgood family G hcons hself hbound
   refine
     { evaluatedCommutation := hEval
       evaluationSpecialization := by
