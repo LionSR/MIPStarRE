@@ -73,6 +73,9 @@ end Trace
 
 section Fourier
 
+-- The Fourier section uses `[Fintype F]` (rather than `[Finite F]` as in the Trace section)
+-- because `AddChar.expect_eq_ite` requires a `Fintype` instance. Downstream users with
+-- only `[Finite F]` can obtain `Fintype` via `Fintype.ofFinite`.
 variable {p : ℕ} [Fact p.Prime]
 variable {F : Type*} [Field F] [Fintype F] [DecidableEq F] [Algebra (ZMod p) F]
 
@@ -104,15 +107,19 @@ private theorem ffChar_ne_zero : ffChar (p := p) (F := F) ≠ 0 := by
   intro h
   exact ha ((AddChar.IsPrimitive.zmod_char_eq_one_iff p (ZMod.isPrimitive_stdAddChar p) _).mp h)
 
-private theorem ff_char_isPrimitive : (ffChar (p := p) (F := F)).IsPrimitive := by
+private theorem ff_char_is_primitive : (ffChar (p := p) (F := F)).IsPrimitive := by
   apply AddChar.IsPrimitive.of_ne_one
   simpa using (ffChar_ne_zero (p := p) (F := F))
 
 private theorem ff_char_mulShift_ne_zero {a : F} (ha : a ≠ 0) :
     (ffChar (p := p) (F := F)).mulShift a ≠ 0 := by
-  simpa using (ff_char_isPrimitive (p := p) (F := F) ha)
+  simpa using (ff_char_is_primitive (p := p) (F := F) ha)
 
-/-- Paper label `prop:fourier-fact-scalar`. -/
+/-- Paper label `prop:fourier-fact-scalar`.
+
+The Fourier orthogonality relation for the finite field `F`: the expectation
+of the additive character `ω^{tr[x·a]}` over `x ∈ F` equals `1` when `a = 0`
+and `0` otherwise. -/
 theorem fourier_fact_scalar (a : F) :
     𝔼 x : F, ffChar (p := p) (F := F) (x * a) =
       if a = 0 then (1 : ℂ) else 0 := by
@@ -134,6 +141,8 @@ section Vector
 
 variable {m : ℕ}
 
+-- We define `ffDotProduct` directly rather than reusing `Matrix.dotProduct` to avoid
+-- pulling in the full `Mathlib.Data.Matrix.Basic` import. The definitions are identical.
 /-- The standard dot product on `F^m`. -/
 def ffDotProduct (u v : Fin m → F) : F :=
   ∑ i, u i * v i
@@ -152,12 +161,9 @@ noncomputable def ffVecChar (v : Fin m → F) : AddChar (Fin m → F) ℂ :=
       ffChar (p := p) (F := F) (ffDotProduct u v) :=
   rfl
 
-private def Pi.single_vec (i : Fin m) (a : F) : Fin m → F :=
-  Pi.single i a
-
-private theorem ff_dotProduct_Pi.single_vec (i : Fin m) (a : F) (v : Fin m → F) :
-    ffDotProduct (Pi.single_vec i a) v = a * v i := by
-  unfold ffDotProduct Pi.single_vec
+private theorem ff_dotProduct_single (i : Fin m) (a : F) (v : Fin m → F) :
+    ffDotProduct (Pi.single i a) v = a * v i := by
+  unfold ffDotProduct
   rw [Finset.sum_eq_single i]
   · simp
   · intro j _ hji
@@ -182,12 +188,16 @@ private theorem ffVecChar_ne_zero {v : Fin m → F} (hv : v ≠ 0) :
     ffTrace_nondegenerate (p := p) (F := F) (a := v i) hi
   have hb : ffTrace (p := p) (F := F) (b * v i) ≠ 0 := by
     simpa [mul_comm] using hb0
-  refine ⟨Pi.single_vec i b, ?_⟩
-  rw [ffVecChar_apply, ff_dotProduct_Pi.single_vec, ffChar_apply]
+  refine ⟨Pi.single i b, ?_⟩
+  rw [ffVecChar_apply, ff_dotProduct_single, ffChar_apply]
   intro h
   exact hb ((AddChar.IsPrimitive.zmod_char_eq_one_iff p (ZMod.isPrimitive_stdAddChar p) _).mp h)
 
-/-- Paper label `prop:fourier-fact-vector`. -/
+/-- Paper label `prop:fourier-fact-vector`.
+
+The vector version of Fourier orthogonality: the expectation of the additive
+character `ω^{tr[⟨u, v⟩]}` over `u ∈ F^m` equals `1` when `v = 0`
+and `0` otherwise. -/
 theorem fourier_fact_vector (v : Fin m → F) :
     𝔼 u : (Fin m → F), ffVecChar (p := p) (F := F) v u =
       if v = 0 then (1 : ℂ) else 0 := by
