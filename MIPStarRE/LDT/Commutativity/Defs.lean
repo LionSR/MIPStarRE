@@ -218,7 +218,10 @@ noncomputable def evaluatedFromFullSliceProductRight (params : Parameters)
       (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- Internal stability family from the `G^y` insertion/removal step
-(`clm:g-comm-stability` left-hand side). On the bipartite space `d * d`. -/
+(`clm:g-comm-stability` left-hand side). On the bipartite space `d * d`.
+Right-register `A^{v,y}_b` factors from the paper are supplied by
+`SDDOpRel` at the call site, not encoded here. -/
+-- TODO(#143): confirm SDDOpRel supplies right-register A factors
 noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
@@ -229,14 +232,20 @@ noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters)
       (leftTensor (ι₂ := ι) ((fullSliceSecondFactor params family xy).total))
 
 /-- Internal stability family after removing the trailing `G^y`
-(`clm:g-comm-stability` right-hand side). On the bipartite space `d * d`. -/
+(`clm:g-comm-stability` right-hand side). On the bipartite space `d * d`.
+Right-register `A^{v,y}_b` factors from the paper are supplied by
+`SDDOpRel` at the call site, not encoded here. -/
+-- TODO(#143): confirm SDDOpRel supplies right-register A factors
 noncomputable def commDataProcessedGStabilityOneRight (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q => evaluatedSliceSandwichFirstFactor params strategy family q
 
 /-- Internal stability family from the `G^x` insertion/removal step
-(`clm:g-comm-stability2` left-hand side). On the bipartite space `d * d`. -/
+(`clm:g-comm-stability2` left-hand side). On the bipartite space `d * d`.
+Right-register `A^{u,x}_a A^{v,y}_b` factors from the paper are supplied
+by `SDDOpRel` at the call site, not encoded here. -/
+-- TODO(#143): confirm SDDOpRel supplies right-register A factors
 noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
@@ -247,7 +256,10 @@ noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
       (leftTensor (ι₂ := ι) ((fullSliceFirstFactor params family xy).total))
 
 /-- Internal stability family after removing the trailing `G^x`
-(`clm:g-comm-stability2` right-hand side). On the bipartite space `d * d`. -/
+(`clm:g-comm-stability2` right-hand side). On the bipartite space `d * d`.
+Right-register `A^{u,x}_a A^{v,y}_b` factors from the paper are supplied
+by `SDDOpRel` at the call site, not encoded here. -/
+-- TODO(#143): confirm SDDOpRel supplies right-register A factors
 noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
