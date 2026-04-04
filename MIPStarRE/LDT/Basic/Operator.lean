@@ -295,7 +295,7 @@ theorem ev_mono {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- For Hermitian ρ, A, B: `ev ψ (A * B) = ev ψ (B * A)`.
 Follows from `ntr(ρ B A) = conj(ntr(ρ A B))` when all three are Hermitian,
 and Re is invariant under conjugation. -/
-private theorem normalizedTrace_conjTranspose {d : Type*} [Fintype d]
+theorem normalizedTrace_conjTranspose {d : Type*} [Fintype d]
     (X : MIPStarRE.Quantum.Op d) :
     MIPStarRE.Quantum.normalizedTrace Xᴴ = star (MIPStarRE.Quantum.normalizedTrace X) := by
   simp only [MIPStarRE.Quantum.normalizedTrace, Matrix.trace_conjTranspose]

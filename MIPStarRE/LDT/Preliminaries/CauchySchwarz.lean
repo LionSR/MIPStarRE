@@ -1,5 +1,19 @@
 import MIPStarRE.LDT.Preliminaries.Theorems
 
+/-!
+# Cauchy–Schwarz Inequalities for Approximate Measurements
+
+Formalizes Cauchy–Schwarz-style propositions from Section 3
+(Preliminaries) of the LDT paper:
+- `easyApproxFromApproxDelta` — Proposition `prop:easy-approx-from-approx-delta`
+- `closenessOfIP` / `closenessOfIPAdjoint` — Proposition `prop:closeness-of-ip`
+  (`eq:closeness3` / `eq:closeness4`)
+- `cabApproxDelta` — Proposition `prop:cab-approx-delta`
+
+## References
+* arXiv:2009.12982, Section 3 (Preliminaries)
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries
@@ -18,122 +32,6 @@ private lemma avgOver_sub {Question : Type*}
           refine Finset.sum_congr rfl ?_
           intro q hq
           ring
-
-private lemma weightedFinsetCauchySchwarz
-    {Question Outcome : Type*}
-    [Fintype Outcome]
-    (𝒟 : Distribution Question)
-    (t x y : Question → Outcome → Error)
-    (ht : ∀ q a, |t q a| ≤ Real.sqrt (x q a) * Real.sqrt (y q a))
-    (hx : ∀ q a, 0 ≤ x q a)
-    (hy : ∀ q a, 0 ≤ y q a) :
-    |avgOver 𝒟 (fun q => ∑ a : Outcome, t q a)| ≤
-      Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, x q a)) *
-        Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, y q a)) := by
-  unfold avgOver
-  calc
-    |∑ q ∈ 𝒟.support, 𝒟.weight q * ∑ a : Outcome, t q a|
-      ≤ ∑ q ∈ 𝒟.support, |𝒟.weight q * ∑ a : Outcome, t q a| := by
-          exact Finset.abs_sum_le_sum_abs _ _
-    _ = ∑ q ∈ 𝒟.support, 𝒟.weight q * |∑ a : Outcome, t q a| := by
-          refine Finset.sum_congr rfl ?_
-          intro q hq
-          rw [abs_mul, abs_of_nonneg (𝒟.nonnegative q)]
-    _ ≤ ∑ q ∈ 𝒟.support,
-          𝒟.weight q *
-            (Real.sqrt (∑ a : Outcome, x q a) *
-              Real.sqrt (∑ a : Outcome, y q a)) := by
-          refine Finset.sum_le_sum ?_
-          intro q hq
-          have hq' :
-              |∑ a : Outcome, t q a| ≤
-                Real.sqrt (∑ a : Outcome, x q a) *
-                  Real.sqrt (∑ a : Outcome, y q a) := by
-            calc
-              |∑ a : Outcome, t q a|
-                ≤ ∑ a : Outcome, |t q a| := by
-                    exact Finset.abs_sum_le_sum_abs _ _
-              _ ≤ ∑ a : Outcome, Real.sqrt (x q a) * Real.sqrt (y q a) := by
-                    refine Finset.sum_le_sum ?_
-                    intro a ha
-                    exact ht q a
-              _ ≤ Real.sqrt (∑ a : Outcome, x q a) *
-                    Real.sqrt (∑ a : Outcome, y q a) := by
-                    exact Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
-                      (f := fun a => x q a) (g := fun a => y q a)
-                      (fun a => hx q a) (fun a => hy q a)
-          exact mul_le_mul_of_nonneg_left hq' (𝒟.nonnegative q)
-    _ = ∑ q ∈ 𝒟.support,
-          Real.sqrt (𝒟.weight q * ∑ a : Outcome, x q a) *
-            Real.sqrt (𝒟.weight q * ∑ a : Outcome, y q a) := by
-          refine Finset.sum_congr rfl ?_
-          intro q hq
-          have hsx : 0 ≤ ∑ a : Outcome, x q a := by
-            exact Finset.sum_nonneg fun a ha => hx q a
-          have hsy : 0 ≤ ∑ a : Outcome, y q a := by
-            exact Finset.sum_nonneg fun a ha => hy q a
-          rw [Real.sqrt_mul (x := 𝒟.weight q) (y := ∑ a : Outcome, x q a)
-                (𝒟.nonnegative q),
-              Real.sqrt_mul (x := 𝒟.weight q) (y := ∑ a : Outcome, y q a)
-                (𝒟.nonnegative q)]
-          ring_nf
-          rw [Real.sq_sqrt (𝒟.nonnegative q)]
-          simp [mul_assoc, mul_left_comm, mul_comm]
-    _ ≤ Real.sqrt (∑ q ∈ 𝒟.support, 𝒟.weight q * ∑ a : Outcome, x q a) *
-          Real.sqrt (∑ q ∈ 𝒟.support, 𝒟.weight q * ∑ a : Outcome, y q a) := by
-          exact Real.sum_sqrt_mul_sqrt_le (s := 𝒟.support)
-            (f := fun q => 𝒟.weight q * ∑ a : Outcome, x q a)
-            (g := fun q => 𝒟.weight q * ∑ a : Outcome, y q a)
-            (fun q =>
-              mul_nonneg (𝒟.nonnegative q) <|
-                Finset.sum_nonneg fun a ha => hx q a)
-            (fun q =>
-              mul_nonneg (𝒟.nonnegative q) <|
-                Finset.sum_nonneg fun a ha => hy q a)
-    _ = Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, x q a)) *
-          Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, y q a)) := by
-          rfl
-
-private lemma avgOver_abs_le_sqrt_of_pointwise
-    {Question : Type*}
-    (𝒟 : Distribution Question) (f g : Question → Error)
-    (hf : ∀ q, |f q| ≤ Real.sqrt (g q))
-    (hg : ∀ q, 0 ≤ g q)
-    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1) :
-    |avgOver 𝒟 f| ≤ Real.sqrt (avgOver 𝒟 g) := by
-  have hcs :=
-    weightedFinsetCauchySchwarz
-      (Question := Question) (Outcome := Unit) 𝒟
-      (t := fun q _ => f q)
-      (x := fun q _ => g q)
-      (y := fun _ _ => 1)
-      (ht := by
-        intro q a
-        simpa using hf q)
-      (hx := by
-        intro q a
-        exact hg q)
-      (hy := by
-        intro q a
-        positivity)
-  have hmass : avgOver 𝒟 (fun _ => (1 : Error)) ≤ 1 := by
-    simpa [avgOver] using h𝒟
-  have hsqrt_mass : Real.sqrt (avgOver 𝒟 (fun _ => (1 : Error))) ≤ 1 := by
-    simpa using Real.sqrt_le_sqrt hmass
-  calc
-    |avgOver 𝒟 f|
-      ≤ Real.sqrt (avgOver 𝒟 g) *
-          Real.sqrt (avgOver 𝒟 (fun _ => (1 : Error))) := by
-            simpa using hcs
-    _ ≤ Real.sqrt (avgOver 𝒟 g) * 1 := by
-          exact mul_le_mul_of_nonneg_left hsqrt_mass (Real.sqrt_nonneg _)
-    _ = Real.sqrt (avgOver 𝒟 g) := by ring
-
-private theorem normalizedTrace_conjTranspose {d : Type*} [Fintype d]
-    (X : MIPStarRE.Quantum.Op d) :
-    MIPStarRE.Quantum.normalizedTrace Xᴴ = star (MIPStarRE.Quantum.normalizedTrace X) := by
-  simp only [MIPStarRE.Quantum.normalizedTrace, Matrix.trace_conjTranspose]
-  rw [star_div₀, star_natCast]
 
 private lemma ev_conjTranspose
     {ι : Type*} [Fintype ι] [DecidableEq ι]
