@@ -2823,6 +2823,170 @@ lemma completion_self_distance
       _ = ev ψ (R * R) := hsingle
   simpa [qSDD, qSDDCore, R] using hsum
 
+/-- Bridge lemma: bipartite SSC on local families implies local SSC on the
+left-lifted families. This is the only gap in the completion proof.
+TODO(#139): prove from the definition of `qBipartiteSSCDefect` vs `qSSCDefect`
+using `A_a ⊗ A_a ≤ A_a² ⊗ I` (which holds when `A_a ≤ I`). -/
+private lemma bipartiteSSC_implies_localSSC_liftLeft {Question Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι) (δ : Error)
+    (_hle : ∀ q a, (A q).outcome a ≤ 1) :
+    BipartiteSSCRel ψ 𝒟 A δ →
+    SSCRel ψ 𝒟 (IdxSubMeas.liftLeft A) δ := by
+  sorry
+
+/-- Local (single-register) version of the completion bound.
+This is the original proof, preserved verbatim so it can be called
+by the bipartite wrapper below. -/
+private lemma closenessAfterCompletion_core_local {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ι) (B : SubMeas Outcome ι)
+    (a0 : Outcome) (δ ζ : Error) :
+    SSCRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A.toSubMeas) ζ →
+    SDDRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A.toSubMeas)
+        (constSubMeasFamily B) δ →
+    SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily (completeAtOutcome B a0).toSubMeas)
+      (2 * δ + 4 * Real.sqrt δ + 2 * ζ) := by
+  intro ⟨hζ⟩ hdist
+  rcases hdist with ⟨hδ⟩
+  have hζ' :
+      qSSCDefect ψ A.toSubMeas ≤ ζ := by
+    simpa [constFamily_ssc_unit] using hζ
+  have hδ' :
+      qSDD ψ A.toSubMeas B ≤ δ := by
+    simpa [constFamily_sdd_unit] using hδ
+  have hBC :
+      qSDD ψ B (completeAtOutcome B a0).toSubMeas =
+        ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
+          ((1 : MIPStarRE.Quantum.Op ι) - B.total)) :=
+    completion_self_distance ψ B a0
+  let diagA : Error :=
+    ∑ a : Outcome, ev ψ (A.toSubMeas.outcome a * A.toSubMeas.outcome a)
+  let diagB : Error :=
+    ∑ a : Outcome, ev ψ (B.outcome a * B.outcome a)
+  let overlap : Error :=
+    ∑ a : Outcome, ev ψ (A.toSubMeas.outcome a * B.outcome a)
+  have hgapA_raw :
+      |diagA - overlap| ≤ Real.sqrt (qSDD ψ A.toSubMeas B) := by
+    simpa [diagA, overlap] using
+      question_overlap_gap_left ψ hψ A.toSubMeas B
+  have hgapA :
+      diagA - overlap ≤ Real.sqrt δ := by
+    have hsqrt :
+        Real.sqrt (qSDD ψ A.toSubMeas B) ≤ Real.sqrt δ := by
+      exact Real.sqrt_le_sqrt hδ'
+    have : diagA - overlap ≤ Real.sqrt (qSDD ψ A.toSubMeas B) := by
+      exact (abs_le.mp hgapA_raw).2
+    exact le_trans this hsqrt
+  have hgapB_raw :
+      |overlap - diagB| ≤ Real.sqrt (qSDD ψ A.toSubMeas B) := by
+    simpa [diagB, overlap] using
+      question_overlap_gap_right ψ hψ A.toSubMeas B
+  have hgapB :
+      overlap - diagB ≤ Real.sqrt δ := by
+    have hsqrt :
+        Real.sqrt (qSDD ψ A.toSubMeas B) ≤ Real.sqrt δ := by
+      exact Real.sqrt_le_sqrt hδ'
+    have : overlap - diagB ≤ Real.sqrt (qSDD ψ A.toSubMeas B) := by
+      exact (abs_le.mp hgapB_raw).2
+    exact le_trans this hsqrt
+  have hdiagA_lb : 1 - ζ ≤ diagA := by
+    have hssc :
+        max 0
+            (ev ψ A.toSubMeas.total -
+              ∑ a : Outcome, ev ψ (A.toSubMeas.outcome a * A.toSubMeas.outcome a))
+          ≤ ζ := by
+      simpa [qSSCDefect, diagA] using hζ'
+    have hinner :
+        ev ψ A.toSubMeas.total - diagA ≤ ζ := by
+      exact le_trans (le_max_right 0 (ev ψ A.toSubMeas.total - diagA)) hssc
+    have hmassA : ev ψ A.toSubMeas.total = 1 := by
+      simpa [A.total_eq_one] using ev_one_of_isNormalized ψ hψ
+    linarith
+  have hdiagB_lb : 1 - ζ - 2 * Real.sqrt δ ≤ diagB := by
+    linarith
+  have hresidual_le :
+      ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
+        ((1 : MIPStarRE.Quantum.Op ι) - B.total)) ≤
+        2 * Real.sqrt δ + ζ := by
+    let R : MIPStarRE.Quantum.Op ι := (1 : MIPStarRE.Quantum.Op ι) - B.total
+    have hR_nonneg : 0 ≤ R := by
+      dsimp [R]
+      exact sub_nonneg.mpr B.total_le_one
+    have hR_le_one : R ≤ 1 := by
+      dsimp [R]
+      exact sub_le_self (1 : MIPStarRE.Quantum.Op ι) B.total_nonneg
+    have hR_sq_le : R * R ≤ R := by
+      exact MIPStarRE.Quantum.sq_le_self hR_nonneg hR_le_one
+    have hR_ev :
+        ev ψ (R * R) ≤ ev ψ R := by
+      exact ev_mono ψ _ _ hR_sq_le
+    have hmassB_sq :
+        diagB ≤ ev ψ B.total := by
+      calc
+        diagB = ∑ a : Outcome, ev ψ (B.outcome a * B.outcome a) := by rfl
+        _ ≤ ∑ a : Outcome, ev ψ (B.outcome a) := by
+              refine Finset.sum_le_sum ?_
+              intro a _
+              exact ev_mono ψ _ _ <|
+                MIPStarRE.Quantum.sq_le_self
+                  (B.outcome_pos a) (B.outcome_le_one a)
+        _ = ev ψ B.total := by
+              rw [← ev_sum ψ B.outcome, B.sum_eq_total]
+    have hmassB :
+        ev ψ B.total ≥ diagB := by
+      exact hmassB_sq
+    have hR_ev' : ev ψ R ≤ 2 * Real.sqrt δ + ζ := by
+      have hR_eq :
+          ev ψ R = 1 - ev ψ B.total := by
+        dsimp [R]
+        rw [ev_sub]
+        simp [ev_one_of_isNormalized ψ hψ]
+      linarith
+    have hRR :
+        ev ψ (R * R) ≤ 2 * Real.sqrt δ + ζ := by
+      exact le_trans hR_ev hR_ev'
+    simpa [R] using hRR
+  constructor
+  rw [constFamily_sdd_unit]
+  calc
+    qSDD ψ A.toSubMeas (completeAtOutcome B a0).toSubMeas
+      ≤ 2 * (qSDD ψ A.toSubMeas B +
+          qSDD ψ B (completeAtOutcome B a0).toSubMeas) := by
+            exact questionSDD_triangle ψ A.toSubMeas B
+              (completeAtOutcome B a0).toSubMeas
+    _ = 2 * (qSDD ψ A.toSubMeas B +
+          ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
+            ((1 : MIPStarRE.Quantum.Op ι) - B.total))) := by
+              rw [hBC]
+    _ ≤ 2 * (δ +
+          ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
+            ((1 : MIPStarRE.Quantum.Op ι) - B.total))) := by
+              gcongr
+    _ ≤ 2 * (δ + (2 * Real.sqrt δ + ζ)) := by
+              gcongr
+    _ = 2 * δ + 4 * Real.sqrt δ + 2 * ζ := by
+          ring
+
+/-- Bipartite wrapper for the completion bound.
+
+The proof strategy: convert `BipartiteSSCRel` to local `SSCRel` on
+left-lifted families via `bipartiteSSC_implies_localSSC_liftLeft`, then
+invoke `closenessAfterCompletion_core_local` instantiated at `ι × ι`.
+
+The remaining gap is constructing a `Measurement Outcome (ι × ι)` from
+the left-lifted `Measurement Outcome ι` (which requires showing the
+lifted effects sum to `leftTensor 1 = 1` on `ι × ι`). This is deferred
+to a focused follow-up. -/
 private lemma closenessAfterCompletion_core {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -2839,12 +3003,10 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
       (constSubMeasFamily A.toSubMeas.liftLeft)
       (constSubMeasFamily (completeAtOutcome B a0).toSubMeas.liftLeft)
       (2 * δ + 4 * Real.sqrt δ + 2 * ζ) := by
-  /-
-  The local proof below established the single-register version of the
-  completion bound. After switching the SSC input to the bipartite notion and
-  lifting the SDD families to the left register, the surrounding bookkeeping
-  needs to be re-threaded through the bipartite lemmas.
-  -/
+  intro hbipartite hsdd
+  -- TODO(#139): Complete the bipartite-to-local bridge and Measurement.liftLeft
+  -- construction. The mathematical content is in closenessAfterCompletion_core_local
+  -- above; only the type-level plumbing remains.
   sorry
 
 /-- `prop:completing-to-measurement`.
