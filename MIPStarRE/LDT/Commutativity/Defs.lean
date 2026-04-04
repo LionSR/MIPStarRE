@@ -23,6 +23,21 @@ abbrev EvaluatedSliceOutcome (params : Parameters) := Fq params × Fq params
 abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
 abbrev FullSliceOutcome (params : Parameters) := Polynomial params × Polynomial params
 
+/-- Outcomes for the `G^y` stability step.
+
+We keep the first coordinate evaluated at `u`, but retain the full second
+polynomial `h` because the right-register weight is `√(G_h)`. Postprocessing
+that coordinate down to `h(v)` would sum over the whole fiber
+`{h | h(v) = b}` and introduce a spurious multiplicity. -/
+abbrev StabilityOneOutcome (params : Parameters) := Fq params × Polynomial params
+
+/-- Outcomes for the `G^x` stability step.
+
+We retain the full first polynomial `g` because the right-register weight is
+`√(G_g)`, while the second coordinate is already evaluated at `v`. This keeps
+the `.1`/`.2` indexing aligned with the paper's `G^x` versus `G^y` roles. -/
+abbrev StabilityTwoOutcome (params : Parameters) := Polynomial params × Fq params
+
 /-- Ordered product placed on the left tensor factor of the bipartite space `ι × ι`. -/
 noncomputable def leftOrderedProductOpFamily {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
@@ -246,6 +261,40 @@ def evaluateFullSliceOutcomeAtQuestion (params : Parameters)
   fun gh =>
     (gh.1 (truncatePoint params q.1), gh.2 (truncatePoint params q.2))
 
+/-- Evaluate a `G^y`-stability outcome at the sampled second point `v`. -/
+def evaluateStabilityOneOutcomeAtQuestion (params : Parameters)
+    (q : EvaluatedSliceQuestion params) :
+    StabilityOneOutcome params → EvaluatedSliceOutcome params :=
+  fun ah =>
+    (ah.1, ah.2 (truncatePoint params q.2))
+
+/-- Evaluate a `G^x`-stability outcome at the sampled first point `u`.
+
+The first coordinate stays as the full polynomial `g` until this final
+evaluation step, while the second coordinate is already the measured value `b`.
+This matches the one-vs-two indexing used in the paper's two stability steps. -/
+def evaluateStabilityTwoOutcomeAtQuestion (params : Parameters)
+    (q : EvaluatedSliceQuestion params) :
+    StabilityTwoOutcome params → EvaluatedSliceOutcome params :=
+  fun gb =>
+    (gb.1 (truncatePoint params q.1), gb.2)
+
+/-- Reindex a raw operator family and append an explicit weight.
+
+The outcome type `β` must retain every coordinate that still appears in
+`weight`; otherwise any later postprocessing would sum over an irrelevant fiber
+and change the operator by a multiplicity factor. -/
+private noncomputable def weightedReindexOpFamily
+    {α β : Type*} [Fintype α] [Fintype β]
+    {κ : Type*} [Fintype κ] [DecidableEq κ]
+    (base : OpFamily α κ)
+    (reindex : β → α)
+    (weight : β → MIPStarRE.Quantum.Op κ) :
+    OpFamily β κ :=
+  let body := fun b => base.outcome (reindex b) * weight b
+  { outcome := body
+    total := ∑ b : β, body b }
+
 /-- Postprocess the full-slice ordered product at sampled points.
 On the bipartite space `d * d`. -/
 noncomputable def evaluatedFromFullSliceProductLeft (params : Parameters)
@@ -267,56 +316,65 @@ noncomputable def evaluatedFromFullSliceProductRight (params : Parameters)
       (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- Internal stability family from the `G^y` insertion/removal step.
-On the bipartite space `d * d`. -/
+
+The paper writes the extra factor as the left-register total `G^y = ∑_h G^y_h`.
+For the `SDDOpRel` packaging we keep the polynomial `h` explicit and attach the
+right-register weight `(G_h^y)^{1/2}` to each outcome. Summing the squared
+differences over `h` then recovers the total `G^y` without introducing a fiber
+multiplicity from unrelated `g` values. On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι) :
+    IdxOpFamily (EvaluatedSliceQuestion params) (StabilityOneOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    sameOutcomeTensorOpFamily
+    weightedReindexOpFamily
       (appendRightTotalOpFamily
-        (evaluatedSliceSandwichRaw params strategy family q)
-        ((fullSliceSecondFactor params family xy).total))
-      (evaluatedSlicePointMeasurementSecondExpanded params strategy q)
+        (evaluatedSliceSandwichFirstFactor params strategy family q)
+        (leftTensor (ι₂ := ι) ((fullSliceSecondFactor params family xy).total)))
+      (evaluateStabilityOneOutcomeAtQuestion params q)
+      (fun ah => rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome ah.2)))
 
 /-- Internal stability family after removing the trailing `G^y`, while keeping
 Bob's right-register point-measurement factor.
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityOneRight (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι) :
+    IdxOpFamily (EvaluatedSliceQuestion params) (StabilityOneOutcome params) (ι × ι) :=
   fun q =>
-    sameOutcomeTensorOpFamily
-      (evaluatedSliceSandwichRaw params strategy family q)
-      (evaluatedSlicePointMeasurementSecondExpanded params strategy q)
+    weightedReindexOpFamily
+      (evaluatedSliceSandwichFirstFactor params strategy family q)
+      (evaluateStabilityOneOutcomeAtQuestion params q)
+      (fun ah => rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome ah.2)))
 
 /-- Internal stability family from the `G^x` insertion/removal step.
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι) :
+    IdxOpFamily (EvaluatedSliceQuestion params) (StabilityTwoOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    sameOutcomeTensorOpFamily
+    weightedReindexOpFamily
       (appendRightTotalOpFamily
-        (orderedProductOpFamily
-          (evaluatedSliceFirstFactor params family q)
-          (evaluatedSliceSecondFactor params family q))
-        ((fullSliceFirstFactor params family xy).total))
-      (evaluatedSlicePointMeasurementProduct params strategy q)
+        (evaluatedSliceProductLeft params strategy family q)
+        (leftTensor (ι₂ := ι) ((fullSliceFirstFactor params family xy).total)))
+      (evaluateStabilityTwoOutcomeAtQuestion params q)
+      (fun gb => rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gb.1)))
 
 /-- Internal stability family after removing the trailing `G^x`, while keeping
 Bob's right-register ordered point-measurement factor.
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : SubMeas (Polynomial params) ι) :
+    IdxOpFamily (EvaluatedSliceQuestion params) (StabilityTwoOutcome params) (ι × ι) :=
   fun q =>
-    sameOutcomeTensorOpFamily
-      (orderedProductOpFamily
-        (evaluatedSliceFirstFactor params family q)
-        (evaluatedSliceSecondFactor params family q))
-      (evaluatedSlicePointMeasurementProduct params strategy q)
+    weightedReindexOpFamily
+      (evaluatedSliceProductLeft params strategy family q)
+      (evaluateStabilityTwoOutcomeAtQuestion params q)
+      (fun gb => rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gb.1)))
 
 /-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`.
 
