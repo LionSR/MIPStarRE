@@ -8,6 +8,7 @@ import MIPStarRE.LDT.Test.Strategy
 import MIPStarRE.LDT.Test.MainTheorem
 import MIPStarRE.LDT.Preliminaries.Defs
 import MIPStarRE.LDT.Preliminaries.Theorems
+import MIPStarRE.LDT.Preliminaries.Triangles
 import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
