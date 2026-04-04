@@ -102,15 +102,31 @@ private noncomputable def uniformAverageUnitSubMeas {α : Type*}
       simpa [averageOperatorOverDistribution, uniformDistribution] using
         le_trans hsum (le_of_eq hconst) }
 
+/-- A valid axis-parallel line question pairs a line with a point lying on it. -/
+def pointOnLine {params : Parameters} (qu : AxisParallelLineQuestion params) : Prop :=
+  ∃ t : Fq params, qu.1.pointAt t = qu.2
+
 /-- The distribution of an axis-parallel line together with a point queried on it.
 
-**Provisional placeholder**: uses the uniform distribution over all `(ℓ, u)` pairs,
-including pairs where `u` is not on `ℓ`. The paper samples `ℓ` uniformly and then
-`u` uniformly from `ℓ`. Replace with the correct conditional distribution once the
-line-point sampling infrastructure is available. -/
+The paper samples `u ∈ F_q^m` uniformly, then samples a direction `i` uniformly,
+and finally takes the axis-parallel line through `u` in direction `i`. Since
+`AxisParallelLineQuestion params` is represented as a pair `(ℓ, u)`, we realize
+this as the normalized uniform distribution on the finite set of incident pairs,
+i.e. those with `u ∈ ℓ`. -/
 noncomputable def axisParallelLineQuestionDistribution (params : Parameters) :
-    Distribution (AxisParallelLineQuestion params) :=
-  uniformDistribution (AxisParallelLineQuestion params) -- PROVISIONAL: see docstring
+    Distribution (AxisParallelLineQuestion params) := by
+  classical
+  let support : Finset (AxisParallelLineQuestion params) :=
+    Finset.univ.filter (pointOnLine (params := params))
+  exact
+    { support := support
+      weight := fun qu => if qu ∈ support then 1 / (support.card : Error) else 0
+      nonnegative := by
+        intro qu
+        by_cases hqu : qu ∈ support <;> simp [hqu]
+      outsideSupport := by
+        intro qu hqu
+        simp [hqu] }
 
 /-- A placeholder distribution over low-degree polynomials. -/
 noncomputable def polynomialDistribution (params : Parameters) :
