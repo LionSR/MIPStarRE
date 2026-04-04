@@ -691,7 +691,7 @@ from `references/ldt-paper/ld-pasting.tex` lines 1123–1131. -/
 def IsGloballyConsistent (params : Parameters) {k : ℕ}
     (xs : PointTuple params k) (gs : GHatTupleOutcome params k) : Prop :=
   ∃ h : Polynomial params.next,
-    ∀ i : Fin k, ∀ (hi : (gs i).isSome),
+    ∀ i : Fin k, ∀ (hi : (gs i).isSome = true),
       (Polynomial.restrictAtHeight params h (xs i)).poly =
         ((gs i).get hi).poly
 
