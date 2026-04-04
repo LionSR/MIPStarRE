@@ -1,4 +1,6 @@
 MIPStarRE.LDT.Test.mainFormal
+MIPStarRE.LDT.Preliminaries.polyFunc
+MIPStarRE.LDT.Preliminaries.schwartzZippel_individualDegree
 MIPStarRE.LDT.Preliminaries.postProcessing
 MIPStarRE.LDT.Preliminaries.measurementCompletion
 MIPStarRE.LDT.Preliminaries.consistency

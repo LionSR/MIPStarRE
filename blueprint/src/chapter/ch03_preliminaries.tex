@@ -55,7 +55,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{proof}
 
 \begin{definition}[Low individual degree polynomials]\label{def:polyfunc}
-  Let $\polyfunc{m}{q}{d}$ be the set of functions $g\colon \F_q^m \to \F_q$ that are represented by polynomials whose degree in each variable is at most $d$.
+  Let $\polyfunc{m}{q}{d}$ be the set of polynomials $g \in \F_q[x_1,\dots,x_m]$ whose degree in each variable is at most $d$, viewed as functions $\F_q^m \to \F_q$ via evaluation. (Over finite fields, distinct low-degree polynomials can induce the same function; we identify elements of $\polyfunc{m}{q}{d}$ with their polynomial representatives, not their functional equivalence classes.)
 \end{definition}
 
 \begin{lemma}[Schwartz--Zippel lemma~\cite{Sch80,Zip79}]\label{lem:schwartz-zippel-total-degree}
@@ -81,7 +81,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{proof}
 
 \begin{definition}[Measurements and submeasurements]\label{def:submeasurement}
-  Let $\mathcal H$ be a Hilbert space and let $\mathcal A$ be a finite outcome set. A submeasurement on $\mathcal A$ is a family $A=\{A_a\}_{a \in \mathcal A}$ of Hermitian positive semidefinite operators on $\mathcal H$ such that $\sum_a A_a \le I$. It is a measurement when $\sum_a A_a = I$, and it is projective when each $A_a$ is an idempotent projection.
+  Let $\mathcal H$ be a Hilbert space and let $\mathcal A$ be a set of outcomes. A submeasurement on $\mathcal A$ is a family $A=\{A_a\}_{a \in \mathcal A}$ of Hermitian positive semidefinite operators on $\mathcal H$ such that $\sum_a A_a \le I$. It is a measurement when $\sum_a A_a = I$, and it is projective when each $A_a$ is an idempotent projection. (In the Lean formalization, outcome sets are assumed finite throughout.)
 \end{definition}
 
 \begin{definition}[Low-degree polynomial measurements]\label{def:polymeasurements}
@@ -90,7 +90,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{definition}
 
 \begin{definition}[Post-processing]\label{def:post-processing}
-  \lean{MIPStarRE.LDT.Preliminaries.postProcessing}
+  % \lean tag removed: no matching declaration
   \uses{def:submeasurement}
   Let $A=\{A_a\}_{a \in \mathcal A}$ be a family of operators and let $f\colon \mathcal A \to \mathcal B$. The post-processed family $A_{[f(a)=b]}$ is defined by
   \[
@@ -99,7 +99,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{definition}
 
 \begin{definition}[Completion of a submeasurement]\label{def:measurement-completion}
-  \lean{MIPStarRE.LDT.Preliminaries.measurementCompletion}
+  \lean{MIPStarRE.LDT.Preliminaries.completeAtOutcome}
   \uses{def:submeasurement}
   Let $A=\{A_a^x\}_{a \in \mathcal A}$ be a submeasurement. Its completion is the measurement $\widehat A$ with outcome set $\widehat{\mathcal A}=\mathcal A \cup \{\bot\}$ given by $\widehat A_a^x=A_a^x$ for $a \in \mathcal A$ and $\widehat A_\bot^x = I-\sum_a A_a^x$.
 \end{definition}
@@ -109,7 +109,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 
 
 \begin{definition}[Consistency]\label{def:simeq}
-  \lean{MIPStarRE.LDT.Preliminaries.consistency}
+  \lean{MIPStarRE.LDT.Test.ConsRel}
   Let $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$. Let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be submeasurements with the same answer set, and let $\mathcal D$ be a distribution on the question set. We write
   \[
     A_a^x \ot I \simeq_\delta I \ot B_a^x
@@ -150,7 +150,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{proof}
 
 \begin{definition}[State-dependent distance]\label{def:approx_delta}
-  \lean{MIPStarRE.LDT.Preliminaries.stateDependentDistance}
+  \lean{MIPStarRE.LDT.Test.SDDRel}
   Let $\ket{\psi} \in \mathcal H$, let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be families of operators on $\mathcal H$, and let $\mathcal D$ be a distribution on the question set. We write
   \[
     A_a^x \approx_\delta B_a^x
@@ -398,7 +398,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{definition}[Strong self-consistency]\label{def:strong-self-consistency}
-  \lean{MIPStarRE.LDT.Preliminaries.strongSelfConsistency}
+  % \lean tag: BipartiteSSCRel used in Theorems, no standalone def
   Let $\ket{\psi}$ be permutation-invariant and let $A=\{A_a^x\}$ be a submeasurement. We say that $A$ is $\delta$-strongly self-consistent when
   \[
     \E_x \sum_a \bra{\psi} A_a^x \ot A_a^x \ket{\psi}
