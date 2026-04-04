@@ -2484,31 +2484,6 @@ lemma sscError_nonneg {Question Outcome : Type*}
   unfold sscError
   exact avgOver_nonneg 𝒟 _ fun a => by unfold qSSCDefect; exact le_max_left 0 _
 
-private lemma rightTensor_mul_leftTensor_eq_opTensor
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
-    rightTensor (ι₁ := ι₁) B * leftTensor (ι₂ := ι₂) A = opTensor A B := by
-  simpa [rightTensor, leftTensor, opTensor] using
-    (Matrix.mul_kronecker_mul
-      (1 : MIPStarRE.Quantum.Op ι₁) A B (1 : MIPStarRE.Quantum.Op ι₂)).symm
-
-private lemma leftTensor_mul_leftTensor
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (A B : MIPStarRE.Quantum.Op ι₁) :
-    leftTensor (ι₂ := ι₂) A * leftTensor (ι₂ := ι₂) B =
-      leftTensor (ι₂ := ι₂) (A * B) := by
-  simpa [leftTensor] using
-    (Matrix.mul_kronecker_mul
-      A B (1 : MIPStarRE.Quantum.Op ι₂) (1 : MIPStarRE.Quantum.Op ι₂)).symm
-
-private lemma rightTensor_mul_rightTensor
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (A B : MIPStarRE.Quantum.Op ι₂) :
-    rightTensor (ι₁ := ι₁) A * rightTensor (ι₁ := ι₁) B =
-      rightTensor (ι₁ := ι₁) (A * B) := by
-  simpa [rightTensor] using
-    (Matrix.mul_kronecker_mul
-      (1 : MIPStarRE.Quantum.Op ι₁) (1 : MIPStarRE.Quantum.Op ι₁) A B).symm
 
 private lemma leftTensor_mono
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
