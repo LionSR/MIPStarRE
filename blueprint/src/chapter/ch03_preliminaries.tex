@@ -1,6 +1,52 @@
 \chapter{Preliminaries}
 \label{chap:preliminaries}
 
+\section{Finite fields and Fourier orthogonality}
+
+
+\begin{definition}[Finite field trace]\label{def:finite-field-trace}
+  \lean{MIPStarRE.LDT.Preliminaries.ffTrace}
+  \leanok
+  Let $\F_q$ be a finite field with $q=p^t$ and let $\F_p$ be its prime subfield. The finite field trace is the function $\tr\colon \F_q \to \F_p$ defined by
+  \[
+    \tr[x] = \sum_{\ell=0}^{t-1} x^{p^\ell}.
+  \]
+\end{definition}
+
+\begin{theorem}[Fourier orthogonality over a finite field]\label{prop:fourier-fact-scalar}
+  \lean{MIPStarRE.LDT.Preliminaries.fourier_fact_scalar}
+  \leanok
+  \uses{def:finite-field-trace}
+  Let $a \in \F_q$. Then
+  \[
+    \E_{\bx \sim \F_q} \omega^{\tr[\bx \cdot a]}
+    = \left\{\begin{array}{rl}
+      1 & \text{if $a = 0$},\\
+      0 & \text{otherwise}.
+    \end{array}\right.
+  \]
+\end{theorem}
+\begin{proof}
+  If $a = 0$, then $\tr[\bx \cdot a] = 0$ for every $\bx \in \F_q$, so the expectation is $1$. If $a \neq 0$, choose $y \in \F_q$ such that $\tr[a \cdot y] \neq 0$. Translating $\bx$ by $y$ shows that the expectation is unchanged after multiplication by the nontrivial phase $\omega^{\tr[y \cdot a]}$, hence it must vanish.
+\end{proof}
+
+\begin{theorem}[Fourier orthogonality over $\F_q^m$]\label{prop:fourier-fact-vector}
+  \lean{MIPStarRE.LDT.Preliminaries.fourier_fact_vector}
+  \leanok
+  \uses{def:finite-field-trace}
+  Let $v \in \F_q^m$. Then
+  \[
+    \E_{\bu \sim \F_q^m} \omega^{\tr[\bu \cdot v]}
+    = \left\{\begin{array}{rl}
+      1 & \text{if $v = 0$},\\
+      0 & \text{otherwise}.
+    \end{array}\right.
+  \]
+\end{theorem}
+\begin{proof}
+  Apply the scalar orthogonality relation coordinatewise to the additive character $\bu \mapsto \omega^{\tr[\bu \cdot v]}$. The expectation factors over the coordinates, so it is $1$ exactly when every coordinate of $v$ vanishes and $0$ otherwise.
+\end{proof}
+
 \section{Polynomials and measurements}
 
 
