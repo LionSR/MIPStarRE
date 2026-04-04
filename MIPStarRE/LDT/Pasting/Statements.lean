@@ -117,7 +117,7 @@ structure LdPastingConclusion (params : Parameters)
   pointConsistency :
     ConsWithPolyEval params.next strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      H.toSubMeas.liftLeft
+      H.toSubMeas.liftRight
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta)
 
@@ -133,7 +133,7 @@ structure LdPastingSubMeasConclusion (params : Parameters)
   pointConsistency :
     ConsWithPolyEval params.next strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      H.liftLeft
+      H.liftRight
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta)
   completeness :
@@ -269,7 +269,7 @@ structure LdSandwichLineOnePointStatement (params : Parameters)
       (uniformDistribution (SandwichedLineQuestion params k))
       (IdxSubMeas.liftLeft
         (ldSandwichLineOnePointLeftFamily params strategy family k i))
-      (IdxSubMeas.liftLeft
+      (IdxSubMeas.liftRight
         (ldSandwichLineOnePointRightFamily params strategy family k i))
       (ldSandwichLineOnePointError params eps delta gamma zeta k)
 
@@ -284,7 +284,7 @@ structure HBConsistencyStatement (params : Parameters)
       (IdxSubMeas.liftLeft
         (hRestrictionToVerticalLine params
           (constructedPastedSubMeas params family k)))
-      (IdxSubMeas.liftLeft
+      (IdxSubMeas.liftRight
         (verticalLineMeasurementFamily params strategy))
       (hBConsistencyError params eps delta gamma zeta k)
 

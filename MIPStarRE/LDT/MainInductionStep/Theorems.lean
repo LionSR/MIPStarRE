@@ -21,7 +21,7 @@ theorem mainInduction
     ∃ G : Measurement (Polynomial params) ι,
       ConsWithPolyEval params strategy.state
         (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-        G.toSubMeas.liftLeft
+        G.toSubMeas.liftRight
         (mainInductionError params k eps delta gamma) := by
   /-
   This is the full inductive argument from `inductive_step.tex`: it combines the
@@ -41,7 +41,7 @@ theorem selfImprovementInInductionSection
     (G : SubMeas (Polynomial params) ι)
     (hcons : ConsWithPolyEval params strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      G.liftLeft nu) :
+      G.liftRight nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   /-

@@ -108,33 +108,36 @@ structure ProjStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq
 namespace SymStrat
 
 /-- Trace-based failure surrogate for the axis-parallel lines test.
-Measurements are lifted to the left tensor factor of the bipartite state. -/
+Alice's point answers are lifted to the left tensor factor, and Bob's
+line answers are lifted to the right tensor factor. -/
 noncomputable def axisParallelFailureProbability {params : Parameters}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   consError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
     (IdxSubMeas.liftLeft (axisParallelPointAnswerFamily strategy))
-    (IdxSubMeas.liftLeft (axisParallelLineAnswerFamily strategy))
+    (IdxSubMeas.liftRight (axisParallelLineAnswerFamily strategy))
 
 /-- Trace-based failure surrogate for the self-consistency test.
-Measurements are lifted to the left tensor factor of the bipartite state. -/
+Uses the bipartite SSC defect (cross-register overlap `∑ ev(A ⊗ A)`),
+matching `def:strong-self-consistency` in `preliminaries.tex`. -/
 noncomputable def selfConsistencyFailureProbability {params : Parameters}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
-  sscError strategy.state
+  bipartiteSSCError strategy.state
     (uniformDistribution (Point params))
-    (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
 
 /-- Trace-based failure surrogate for the diagonal lines test.
-Measurements are lifted to the left tensor factor of the bipartite state. -/
+Alice's point answers are lifted to the left tensor factor, and Bob's
+diagonal-line answers are lifted to the right tensor factor. -/
 noncomputable def diagonalFailureProbability {params : Parameters}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   consError strategy.state
     (uniformDistribution (DiagonalTestSample params))
     (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-    (IdxSubMeas.liftLeft (diagonalLineAnswerFamily strategy))
+    (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy))
 
 /-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
 structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -176,7 +179,7 @@ noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
     consError strategy.state
       (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementB)
+      (IdxProjMeas.toIdxSubMeasRight strategy.pointMeasurementB)
   let axisParallelBranch :=
     pointAgreement
       + (left.axisParallelFailureProbability + right.axisParallelFailureProbability) / 2
@@ -269,7 +272,7 @@ structure ConsistentWithPoints {params : Parameters} {ι : Type*} [Fintype ι] [
   pointConsistency :
     ConsRel strategy.state (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (IdxSubMeas.liftLeft family.evaluatedAtNextPoint)
+      (IdxSubMeas.liftRight family.evaluatedAtNextPoint)
       zeta
 
 structure StronglySelfConsistent {params : Parameters}
@@ -277,8 +280,8 @@ structure StronglySelfConsistent {params : Parameters}
     (family : IdxPolyFamily params ι)
     (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop where
   sliceSelfConsistency :
-    SSCRel ψ (uniformDistribution (Fq params))
-      ((IdxProjSubMeas.toIdxSubMeas family.meas).liftLeft)
+    BipartiteSSCRel ψ (uniformDistribution (Fq params))
+      (IdxProjSubMeas.toIdxSubMeas family.meas)
       zeta
 
 structure Bounded {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]

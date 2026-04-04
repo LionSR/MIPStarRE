@@ -203,7 +203,7 @@ structure SelfImprovementHelperConclusion (params : Parameters)
   pointConsistency :
     ConsWithPolyEval params strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      H.liftLeft
+      H.liftRight
       (selfImprovementHelperError params eps delta)
   strongSelfConsistency :
     PolyMeasSSC params strategy.state H.liftLeft
@@ -246,7 +246,7 @@ structure SelfImprovementConclusion (params : Parameters)
   pointConsistency :
     ConsWithPolyEval params strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      H.toSubMeas.liftLeft
+      H.toSubMeas.liftRight
       (selfImprovementError params eps delta)
   selfCloseness :
     SDDRel strategy.state (uniformDistribution Unit)
@@ -288,7 +288,7 @@ lemma selfImprovementHelper
     (G : Measurement (Polynomial params) ι)
     (hcons : ConsWithPolyEval params strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      G.toSubMeas.liftLeft nu) :
+      G.toSubMeas.liftRight nu) :
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusion params strategy G T H Z eps delta gamma nu := by
@@ -340,7 +340,7 @@ theorem selfImprovement
     (G : Measurement (Polynomial params) ι)
     (hcons : ConsWithPolyEval params strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      G.toSubMeas.liftLeft nu) :
+      G.toSubMeas.liftRight nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
   /-
@@ -364,7 +364,7 @@ theorem selfImprovementFromSubMeas
     (hbridge : Gmeas.toSubMeas = G)
     (hcons : ConsWithPolyEval params strategy.state
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      G.liftLeft nu) :
+      G.liftRight nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementSubMeasConclusion params strategy G H Z
         eps delta gamma nu := by
