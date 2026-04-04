@@ -125,15 +125,15 @@ theorem rightTensor_mul_rightTensor
 theorem conjTranspose_opTensor
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
-    (opTensor A B)ᴴ = opTensor Aᴴ Bᴴ := by
-  exact Matrix.conjTranspose_kronecker A B
+    (opTensor A B)ᴴ = opTensor Aᴴ Bᴴ :=
+  Matrix.conjTranspose_kronecker A B
 
 /-- `opTensor` distributes over multiplication. -/
 theorem opTensor_mul
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (A₁ A₂ : MIPStarRE.Quantum.Op ι₁) (B₁ B₂ : MIPStarRE.Quantum.Op ι₂) :
-    opTensor A₁ B₁ * opTensor A₂ B₂ = opTensor (A₁ * A₂) (B₁ * B₂) := by
-  exact (Matrix.mul_kronecker_mul A₁ A₂ B₁ B₂).symm
+    opTensor A₁ B₁ * opTensor A₂ B₂ = opTensor (A₁ * A₂) (B₁ * B₂) :=
+  (Matrix.mul_kronecker_mul A₁ A₂ B₁ B₂).symm
 
 /-- `opTensor` is linear in the left factor: subtraction. -/
 theorem opTensor_sub_left
