@@ -100,14 +100,12 @@ noncomputable def matrixAveragePointOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : MatrixOperator model.space :=
   matrixAverageOperator model.family
 
-/-- The matrix-level combined column operator `∑_u |u⟩ ⊗ (A^u)† ⊗ I`.
-With our row/column convention this is the rectangular block column whose `u`-th
-block is `(A^u)ᴴ`, matching the `Dᴴ D` variance convention. -/
+/-- The matrix-level combined column operator `∑_u |u⟩ ⊗ A^u`. -/
 noncomputable def matrixCombinedOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     RectangularMatrixOperator model.space
       (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
-  fun ui j => star (model.family ui.1 j ui.2)
+  fun ui j => model.family ui.1 ui.2 j
 
 /-- Bridge for the column-operator view used in the quadratic-form witnesses. -/
 noncomputable def matrixCombinedColumnOperator (params : Parameters)

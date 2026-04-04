@@ -234,13 +234,11 @@ noncomputable def localAndVariance (params : Parameters)
 /-- The column-space indices for `A_combine`. -/
 abbrev combinedColumnIndex (params : Parameters) (ι : Type*) := Point params × ι
 
-/-- The paper's combined column operator `A_combine = ∑_u |u⟩ ⊗ (A^u)† ⊗ I`.
-With our matrix convention and the variance witness `Dᴴ D`, the `u`-th block must
-be `(A^u)ᴴ` so that the resulting trace expands to `τ(ρ · Dᴴ D)`. -/
+/-- The paper's combined column operator `A_combine = ∑_u |u⟩ ⊗ A^u`. -/
 noncomputable def combinedOperator (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) :
     Matrix (combinedColumnIndex params ι) ι ℂ :=
-  fun ui j => star (A ui.1 j ui.2)
+  fun ui j => A ui.1 ui.2 j
 
 /-! ### Fourier analysis on the hypercube `F_q^m`
 
@@ -428,7 +426,16 @@ structure GlobalVarianceDecomposition (params : Parameters)
   averageComponent : MIPStarRE.Quantum.Op ι
   orthogonalVector : MIPStarRE.Quantum.Op (Point params)
   orthogonalOperator : MIPStarRE.Quantum.Op ι
-  deriving Inhabited
+  orthogonal_to_constant :
+    constantModeProjector params * orthogonalVector = 0
+
+instance (params : Parameters) (A : Point params → MIPStarRE.Quantum.Op ι) :
+    Inhabited (GlobalVarianceDecomposition params A) where
+  default :=
+    { averageComponent := 0
+      orthogonalVector := 0
+      orthogonalOperator := 0
+      orthogonal_to_constant := by simp }
 
 /-- The trace witness from `lem:global-rewrite`.
 This uses the orthogonal projector onto the non-constant Fourier modes. -/
