@@ -2831,22 +2831,148 @@ Requires `PermInvState ψ` because the bipartite defect
 incomparable without symmetry; the permutation-invariance bridge
 `ev(M ⊗ I) = ev(I ⊗ M)` makes the two notions equivalent.
 
-TODO(#139): prove using the Kronecker algebra identity
-`ev ψ (A_a² ⊗ I) ≥ ev ψ (A_a ⊗ A_a)` for submeasurement effects
-(`0 ≤ A_a ≤ I`), which holds because `A_a² ⊗ I - A_a ⊗ A_a =
-A_a ⊗ (I - A_a) + (A_a² - A_a) ⊗ A_a` and both terms are PSD
-under permutation-invariance. -/
+The proof expands `qSDD ψ A.liftLeft A.liftRight`, uses
+`PermInvState.swap_ev` to identify the left and right square terms, and
+then reads off `∑ ev(A_a² ⊗ I) ≥ ∑ ev(A_a ⊗ A_a)` from
+`qSDD_nonneg`. -/
 private lemma bipartiteSSC_implies_localSSC_liftLeft {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
-    (_hperm : PermInvState ψ)
+    (hperm : PermInvState ψ)
     (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error)
     (_hle : ∀ q a, (A q).outcome a ≤ 1) :
     BipartiteSSCRel ψ 𝒟 A δ →
     SSCRel ψ 𝒟 (IdxSubMeas.liftLeft A) δ := by
-  sorry
+  intro ⟨hssc⟩
+  constructor
+  unfold sscError bipartiteSSCError at *
+  calc
+    avgOver 𝒟 (fun q => qSSCDefect ψ ((IdxSubMeas.liftLeft A) q))
+      ≤ avgOver 𝒟 (fun q => qBipartiteSSCDefect ψ (A q)) := by
+          apply avgOver_mono
+          intro q
+          let M := A q
+          let diagSq : Error :=
+            ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (M.outcome a * M.outcome a))
+          let overlap : Error :=
+            ∑ a : Outcome, ev ψ (opTensor (M.outcome a) (M.outcome a))
+          have h_expand :
+              ∀ a : Outcome,
+                ev ψ
+                    (((leftTensor (ι₂ := ι) (M.outcome a) -
+                          rightTensor (ι₁ := ι) (M.outcome a))ᴴ) *
+                      (leftTensor (ι₂ := ι) (M.outcome a) -
+                        rightTensor (ι₁ := ι) (M.outcome a))) =
+                  ev ψ (leftTensor (ι₂ := ι) (M.outcome a * M.outcome a)) +
+                    ev ψ (rightTensor (ι₁ := ι) (M.outcome a * M.outcome a)) -
+                    2 * ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
+            intro a
+            have hLherm :
+                (leftTensor (ι₂ := ι) (M.outcome a))ᴴ =
+                  leftTensor (ι₂ := ι) (M.outcome a) := by
+              exact
+                (Matrix.nonneg_iff_posSemidef.mp
+                  (leftTensor_nonneg (ι₂ := ι) (M.outcome_pos a))).isHermitian.eq
+            have hRherm :
+                (rightTensor (ι₁ := ι) (M.outcome a))ᴴ =
+                  rightTensor (ι₁ := ι) (M.outcome a) := by
+              exact
+                (Matrix.nonneg_iff_posSemidef.mp
+                  (rightTensor_nonneg (ι₁ := ι) (M.outcome_pos a))).isHermitian.eq
+            calc
+              ev ψ
+                  (((leftTensor (ι₂ := ι) (M.outcome a) -
+                        rightTensor (ι₁ := ι) (M.outcome a))ᴴ) *
+                    (leftTensor (ι₂ := ι) (M.outcome a) -
+                      rightTensor (ι₁ := ι) (M.outcome a)))
+                =
+                  ev ψ
+                    (((leftTensor (ι₂ := ι) (M.outcome a) *
+                          leftTensor (ι₂ := ι) (M.outcome a) -
+                        leftTensor (ι₂ := ι) (M.outcome a) *
+                          rightTensor (ι₁ := ι) (M.outcome a)) -
+                      (rightTensor (ι₁ := ι) (M.outcome a) *
+                          leftTensor (ι₂ := ι) (M.outcome a) -
+                        rightTensor (ι₁ := ι) (M.outcome a) *
+                          rightTensor (ι₁ := ι) (M.outcome a)))) := by
+                    congr 1
+                    simp [hLherm, hRherm, sub_mul, mul_sub]
+                    abel
+              _ =
+                  ev ψ
+                    (leftTensor (ι₂ := ι) (M.outcome a) *
+                      leftTensor (ι₂ := ι) (M.outcome a)) -
+                    ev ψ
+                      (leftTensor (ι₂ := ι) (M.outcome a) *
+                        rightTensor (ι₁ := ι) (M.outcome a)) -
+                    (ev ψ
+                        (rightTensor (ι₁ := ι) (M.outcome a) *
+                          leftTensor (ι₂ := ι) (M.outcome a)) -
+                      ev ψ
+                        (rightTensor (ι₁ := ι) (M.outcome a) *
+                          rightTensor (ι₁ := ι) (M.outcome a))) := by
+                    rw [ev_sub, ev_sub, ev_sub]
+              _ =
+                  ev ψ (leftTensor (ι₂ := ι) (M.outcome a * M.outcome a)) +
+                    ev ψ (rightTensor (ι₁ := ι) (M.outcome a * M.outcome a)) -
+                    2 * ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
+                    rw [leftTensor_mul_leftTensor,
+                      leftTensor_mul_rightTensor_eq_opTensor,
+                      rightTensor_mul_leftTensor_eq_opTensor,
+                      rightTensor_mul_rightTensor]
+                    ring
+          have hdiag_ge_overlap : overlap ≤ diagSq := by
+            have hnonneg := qSDD_nonneg ψ M.liftLeft M.liftRight
+            have hq :
+                qSDD ψ M.liftLeft M.liftRight = 2 * (diagSq - overlap) := by
+              unfold qSDD qSDDCore diagSq overlap
+              calc
+                ∑ a : Outcome,
+                    ev ψ
+                      (((M.liftLeft.outcome a - M.liftRight.outcome a)ᴴ) *
+                        (M.liftLeft.outcome a - M.liftRight.outcome a))
+                  =
+                    ∑ a : Outcome,
+                      (ev ψ (leftTensor (ι₂ := ι) (M.outcome a * M.outcome a)) +
+                        ev ψ (rightTensor (ι₁ := ι) (M.outcome a * M.outcome a)) -
+                        2 * ev ψ (opTensor (M.outcome a) (M.outcome a))) := by
+                      refine Finset.sum_congr rfl ?_
+                      intro a _
+                      simpa [SubMeas.liftLeft, SubMeas.liftRight] using h_expand a
+                _ =
+                    ∑ a : Outcome,
+                      (2 *
+                        (ev ψ (leftTensor (ι₂ := ι) (M.outcome a * M.outcome a)) -
+                          ev ψ (opTensor (M.outcome a) (M.outcome a)))) := by
+                      refine Finset.sum_congr rfl ?_
+                      intro a _
+                      rw [hperm.swap_ev (M.outcome a * M.outcome a)]
+                      ring
+                _ = 2 *
+                    ∑ a : Outcome,
+                      (ev ψ (leftTensor (ι₂ := ι) (M.outcome a * M.outcome a)) -
+                        ev ψ (opTensor (M.outcome a) (M.outcome a))) := by
+                      rw [← Finset.mul_sum]
+                _ = 2 * (diagSq - overlap) := by
+                      rw [show
+                        (∑ a : Outcome,
+                            (ev ψ (leftTensor (ι₂ := ι) (M.outcome a * M.outcome a)) -
+                              ev ψ (opTensor (M.outcome a) (M.outcome a)))) =
+                          diagSq - overlap by
+                            simp [diagSq, overlap, Finset.sum_sub_distrib]]
+            rw [hq] at hnonneg
+            nlinarith
+          unfold qSSCDefect qBipartiteSSCDefect
+          apply max_le_max le_rfl
+          have :
+              ev ψ (leftTensor (ι₂ := ι) M.total) - diagSq ≤
+                ev ψ (leftTensor (ι₂ := ι) M.total) - overlap := by
+            linarith
+          simpa [M, IdxSubMeas.liftLeft, SubMeas.liftLeft, diagSq,
+            leftTensor_mul_leftTensor] using this
+    _ ≤ δ := hssc
 
 /-- Local (single-register) version of the completion bound.
 This is the original proof, preserved verbatim so it can be called
@@ -2993,11 +3119,9 @@ private lemma closenessAfterCompletion_core_local {Outcome : Type*}
 The proof strategy: convert `BipartiteSSCRel` to local `SSCRel` on
 left-lifted families via `bipartiteSSC_implies_localSSC_liftLeft`, then
 invoke `closenessAfterCompletion_core_local` instantiated at `ι × ι`.
-
-The remaining gap is constructing a `Measurement Outcome (ι × ι)` from
-the left-lifted `Measurement Outcome ι` (which requires showing the
-lifted effects sum to `leftTensor 1 = 1` on `ι × ι`). This is deferred
-to a focused follow-up. -/
+The wrapper builds the lifted measurement directly and rewrites the
+completed lifted submeasurement back to the statement's
+`(completeAtOutcome B a0).toSubMeas.liftLeft` form outcomewise. -/
 private lemma closenessAfterCompletion_core {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -3023,9 +3147,50 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
       (constSubMeasFamily A.toSubMeas) ζ
       (fun _ a => Measurement.outcome_le_one A a)
       (by simpa [constSubMeasFamily, IdxSubMeas.liftLeft] using hbipartite)
-  -- Call the local proof instantiated at ι × ι with lifted families
-  -- The local proof needs a Measurement on ι × ι; we construct it from A.liftLeft
-  sorry -- TODO(#139): construct Measurement.liftLeft and call closenessAfterCompletion_core_local
+  let A_lifted : Measurement Outcome (ι × ι) :=
+    { toSubMeas := A.toSubMeas.liftLeft
+      total_eq_one := by
+        ext i j
+        rcases i with ⟨i₁, i₂⟩
+        rcases j with ⟨j₁, j₂⟩
+        simp [SubMeas.liftLeft, leftTensor, A.total_eq_one] }
+  have hlocal :=
+    closenessAfterCompletion_core_local ψ hψ A_lifted B.liftLeft a0 δ ζ
+      hlocal_ssc hsdd
+  rcases hlocal with ⟨hlocal_bound⟩
+  have hlocal' :
+      qSDD ψ A.toSubMeas.liftLeft (completeAtOutcome B.liftLeft a0).toSubMeas ≤
+        2 * δ + 4 * Real.sqrt δ + 2 * ζ := by
+    simpa [A_lifted, constFamily_sdd_unit] using hlocal_bound
+  have hcomplete_outcome :
+      ∀ a : Outcome,
+        (completeAtOutcome B.liftLeft a0).toSubMeas.outcome a =
+          ((completeAtOutcome B a0).toSubMeas.liftLeft).outcome a := by
+    intro a
+    by_cases h : a = a0
+    · subst h
+      ext i j
+      rcases i with ⟨i₁, i₂⟩
+      rcases j with ⟨j₁, j₂⟩
+      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
+        simp [completeAtOutcome, SubMeas.liftLeft, leftTensor, sub_eq_add_neg,
+          h₁, h₂, add_comm, add_assoc]
+    · ext i j
+      rcases i with ⟨i₁, i₂⟩
+      rcases j with ⟨j₁, j₂⟩
+      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
+        simp [completeAtOutcome, SubMeas.liftLeft, leftTensor, h, h₁, h₂]
+  have hcomplete_q :
+      qSDD ψ A.toSubMeas.liftLeft (completeAtOutcome B.liftLeft a0).toSubMeas =
+        qSDD ψ A.toSubMeas.liftLeft (completeAtOutcome B a0).toSubMeas.liftLeft := by
+    unfold qSDD qSDDCore
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    rw [hcomplete_outcome a]
+  constructor
+  rw [constFamily_sdd_unit]
+  rw [← hcomplete_q]
+  exact hlocal'
 
 /-- `prop:completing-to-measurement`.
 
