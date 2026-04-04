@@ -162,6 +162,78 @@ theorem ProjMeas.outcome_hermitian {α : Type*} {ι : Type*}
     (P.outcome a)ᴴ = P.outcome a :=
   Measurement.outcome_hermitian P.toMeasurement a
 
+/-- Distinct outcomes of a projective measurement are orthogonal. -/
+theorem ProjMeas.outcome_orthogonal {α : Type*}
+    {ι : Type*} [Fintype α] [Fintype ι]
+    [DecidableEq ι]
+    (P : ProjMeas α ι) (a b : α) (hab : a ≠ b) :
+    P.outcome a * P.outcome b = 0 := by
+  classical
+  set Pa := P.outcome a
+  set Pb := P.outcome b
+  have hPa_herm : Paᴴ = Pa := P.outcome_hermitian a
+  have hPb_herm : Pbᴴ = Pb := P.outcome_hermitian b
+  have hPb_le : Pb ≤ 1 - Pa := by
+    have hsum : Pa + Pb ≤ ∑ i, P.outcome i := by
+      calc Pa + Pb
+          = ∑ i ∈ ({a, b} : Finset α),
+              P.outcome i := by
+              simp [Pa, Pb, hab]
+        _ ≤ ∑ i, P.outcome i :=
+              Finset.sum_le_sum_of_subset_of_nonneg
+                (Finset.subset_univ _)
+                (fun i _ _ =>
+                  P.toMeasurement.outcome_pos i)
+    rw [P.toMeasurement.sum_eq_total,
+      P.total_eq_one] at hsum
+    calc Pb = Pa + Pb - Pa := by abel
+      _ ≤ 1 - Pa := by
+          exact sub_le_sub_right hsum Pa
+  have hPaPbPa_nonneg : 0 ≤ Pa * Pb * Pa :=
+    MIPStarRE.Quantum.sandwich_nonneg
+      (P.toMeasurement.outcome_pos b) hPa_herm
+  have hPa_idem : Pa * (1 - Pa) * Pa = 0 := by
+    calc Pa * (1 - Pa) * Pa
+        = (Pa * 1 - Pa * Pa) * Pa := by
+          rw [mul_sub]
+      _ = 0 := by simp [Pa, P.proj a]
+  have hPaPbPa_eq_zero : Pa * Pb * Pa = 0 := by
+    apply le_antisymm
+    · calc Pa * Pb * Pa
+          ≤ Pa * (1 - Pa) * Pa :=
+            MIPStarRE.Quantum.sandwich_mono
+              hPa_herm hPb_le
+        _ = 0 := hPa_idem
+    · exact hPaPbPa_nonneg
+  have hPbPa_eq_zero : Pb * Pa = 0 := by
+    apply Matrix.conjTranspose_mul_self_eq_zero.mp
+    calc (Pb * Pa)ᴴ * (Pb * Pa)
+        = (Paᴴ * Pbᴴ) * (Pb * Pa) := by
+          simp [Matrix.conjTranspose_mul]
+      _ = Pa * (Pb * Pb) * Pa := by
+          simp [hPa_herm, hPb_herm, mul_assoc]
+      _ = Pa * Pb * Pa := by
+          simp [Pb, P.proj b]
+      _ = 0 := hPaPbPa_eq_zero
+  calc Pa * Pb
+      = (Pb * Pa)ᴴ := by
+        simp [Matrix.conjTranspose_mul,
+          hPa_herm, hPb_herm]
+    _ = 0 := by rw [hPbPa_eq_zero]; simp
+
+/-- Any two outcomes of a ProjMeas commute. -/
+theorem ProjMeas.outcome_commute {α : Type*}
+    {ι : Type*} [Fintype α] [Fintype ι]
+    [DecidableEq ι]
+    (P : ProjMeas α ι) (a b : α) :
+    P.outcome a * P.outcome b =
+      P.outcome b * P.outcome a := by
+  classical
+  by_cases hab : a = b
+  · subst hab; rfl
+  · rw [P.outcome_orthogonal a b hab,
+        P.outcome_orthogonal b a (Ne.symm hab)]
+
 abbrev IdxSubMeas (Question Outcome : Type*) (ι : Type*)
     [Fintype Outcome] [Fintype ι] [DecidableEq ι] :=
   Question → SubMeas Outcome ι
@@ -230,6 +302,25 @@ noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [Decidab
       simpa using Finset.sum_fiberwise Finset.univ f A.outcome
     total_le_one := A.total_le_one
   }
+
+/-- Postprocessed outcomes from the same ProjMeas commute. -/
+theorem ProjMeas.postprocess_outcome_commute
+    {α β γ : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype γ]
+    [Fintype ι] [DecidableEq ι]
+    (P : ProjMeas α ι) (f : α → β) (g : α → γ)
+    (b : β) (c : γ) :
+    (postprocess P.toSubMeas f).outcome b *
+      (postprocess P.toSubMeas g).outcome c =
+    (postprocess P.toSubMeas g).outcome c *
+      (postprocess P.toSubMeas f).outcome b := by
+  classical
+  simp only [postprocess]
+  simp_rw [Finset.sum_mul, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  refine Finset.sum_congr rfl fun y _ => ?_
+  exact P.outcome_commute y x
 
 /-- Complete a submeasurement by adjoining a distinguished failure outcome. -/
 noncomputable def completeSubMeas {α : Type*} {ι : Type*}
