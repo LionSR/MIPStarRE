@@ -617,6 +617,42 @@ noncomputable def gHatSandwichFamily (params : Parameters)
       total_le_one := by
         simp [gHatHalfProductTotalOperator_eq_one] }
 
+/-- Restrict a submeasurement to the outcomes satisfying `p`, dropping all other
+mass from the total operator. -/
+private noncomputable def restrictSubMeas {α : Type*} [Fintype α]
+    (A : SubMeas α ι) (p : α → Prop) [DecidablePred p] :
+    SubMeas α ι := by
+  classical
+  exact
+    { outcome := fun a => if p a then A.outcome a else 0
+      total := ∑ a ∈ Finset.univ.filter p, A.outcome a
+      outcome_pos := by
+        intro a
+        by_cases ha : p a <;> simp [ha, A.outcome_pos a]
+      sum_eq_total := by
+        simp [Finset.sum_filter]
+      total_le_one := by
+        calc
+          ∑ a ∈ Finset.univ.filter p, A.outcome a ≤ ∑ a : α, A.outcome a := by
+            exact Finset.sum_le_univ_sum_of_nonneg
+              (s := Finset.univ.filter p)
+              (w := fun a => A.outcome_pos a)
+          _ = A.total := by
+            rw [A.sum_eq_total]
+          _ ≤ 1 := A.total_le_one }
+
+/-- Restrict the sandwiched completed-slice family to tuples with support of size at
+least `d + 1`, matching the `|τ| ≥ d+1` filter in the paper before interpolation. -/
+noncomputable def interpolationEligibleSandwichFamily (params : Parameters)
+    (family : IdxPolyFamily params ι) (k : ℕ) :
+    IdxSubMeas (PointTuple params k) (GHatTupleOutcome params k) ι :=
+  fun xs => by
+    classical
+    exact
+      restrictSubMeas
+        (gHatSandwichFamily params family k xs)
+        (interpolationEligibleTuple params)
+
 /-- Concrete family for the half-sandwich product of `k` completed slices. -/
 noncomputable def gHatHalfSandwichLeft (params : Parameters)
     (family : IdxPolyFamily params ι) (k : ℕ) :
@@ -653,12 +689,19 @@ noncomputable def suffixBernoulliWeightOperator (params : Parameters)
 def emptyGHatType (k : ℕ) : GHatType k :=
   fun _ => false
 
-/-- Placeholder family for the interpolated operator `H^{x_1,\dots,x_k}_h`. -/
+-- MISMATCH: see #141
+-- TODO: the paper's definition of `H^{x_1,\dots,x_k}_h` sums only the tuples `h_τ`
+-- that are globally consistent with a single polynomial `h`; see the pasted-measurement
+-- definition in `references/ldt-paper/ld-pasting.tex` around lines 474-495 and the
+-- `Global_τ(x)` discussion around lines 1123-1162. The current scaffold now matches the
+-- paper's `|τ| ≥ d+1` eligibility filter, but it still postprocesses every eligible tuple
+-- through `interpolateCompletedSlices` instead of explicitly filtering by `h_τ`.
+/-- Partial Lean model of the interpolated operator `H^{x_1,\dots,x_k}_h`. -/
 noncomputable def pastedInterpolationFamily (params : Parameters)
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas (PointTuple params k) (Polynomial params.next) ι :=
   fun xs =>
-    postprocess (gHatSandwichFamily params family k xs)
+    postprocess (interpolationEligibleSandwichFamily params family k xs)
       (interpolateCompletedSlices params k xs)
 
 /-- The averaged sandwiched family before interpolation. -/
@@ -668,6 +711,16 @@ noncomputable def averagedSandwichSubMeas (params : Parameters)
   averageIdxSubMeas
     (distinctTupleDistribution params k)
     (gHatSandwichFamily params family k)
+    (distinctTupleDistribution_weight_sum_le_one params k)
+
+/-- The averaged sandwiched family restricted to outcome tuples of type `τ`
+with `|τ| ≥ d+1`, as in `lem:over-all-outcomes`. -/
+noncomputable def averagedEligibleSandwichSubMeas (params : Parameters)
+    (family : IdxPolyFamily params ι) (k : ℕ) :
+    SubMeas (GHatTupleOutcome params k) ι :=
+  averageIdxSubMeas
+    (distinctTupleDistribution params k)
+    (interpolationEligibleSandwichFamily params family k)
     (distinctTupleDistribution_weight_sum_le_one params k)
 
 /-- The specific pasted submeasurement constructed from the sandwich/interpolation scheme. -/
@@ -784,12 +837,12 @@ noncomputable def constructedPastedMeasurementTotal (params : Parameters)
   pastedMeasurementTotal (constructedPastedSubMeas params family k)
 
 /-- The expansion over all outcome types `τ`, written as the
-total mass of the averaged sandwich family. -/
+total mass of the averaged sandwich family restricted to `|τ| ≥ d+1`. -/
 noncomputable def allOutcomesExpansionFamily (params : Parameters)
     (_strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas Unit Unit ι :=
-  pastedMeasurementTotal (averagedSandwichSubMeas params family k)
+  pastedMeasurementTotal (averagedEligibleSandwichSubMeas params family k)
 
 /-- The Bernoulli-tail polynomial in the averaged complete operator `G = E_x \sum_g G^x_g`. -/
 noncomputable def bernoulliTailFromFamily (params : Parameters)
@@ -812,6 +865,13 @@ noncomputable def bernoulliTailFromFamily (params : Parameters)
         sorry }
 
 /-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`. -/
+-- MISMATCH: see #141
+-- TODO: in `references/ldt-paper/ld-pasting.tex` around lines 1380-1425, the
+-- recurrence is indexed by the suffix type `τ_{\ge ℓ}` and uses the operator
+-- `S_{τ_{\ge ℓ}}`. The current Lean scaffold still packages the recurrence over `Unit`
+-- and plugs in `emptyGHatType k`, so it forgets the τ-dependence entirely. Repairing
+-- this will require threading a suffix-type index through these families and the
+-- corresponding statement containers in `Pasting/Statements.lean`.
 noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters)
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
@@ -823,6 +883,11 @@ noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters)
       total := base.total * weight }
 
 /-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`. -/
+-- MISMATCH: see #141
+-- TODO: mirror the `τ_{\ge ℓ}`-indexed recurrence from `ld-pasting.tex`
+-- lines 1380-1425 on the right-hand side as well. The present `Unit`-indexed
+-- placeholder only tracks the Bernoulli tail operator and loses the paper's
+-- suffix-type bookkeeping.
 noncomputable def fromHToGRecurrenceRightFamily (params : Parameters)
     (_strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
