@@ -1,72 +1,374 @@
 \chapter{Commutativity}
 \label{chap:commutativity}
-
+\label{sec:g-comm}
 
 \section{Commutativity of the point measurements}
+\label{sec:commutativity-points}
 
 \begin{theorem}[Commutativity of the point measurements]\label{thm:commutativity-points}
   \lean{MIPStarRE.LDT.CommutativityPoints.commutativityPoints}
-  \uses{lem:good-strategy-characterization, prop:simeq-to-approx}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. On average over independent $u,v \sim \F_q^m$,
+  \uses{def:good-strategy, def:approx_delta}
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
+  On average over independent and uniformly random $u,v \sim \F_q^m$,
   \[
     (A_a^u A_b^v) \ot I \approx_{32\gamma m} (A_b^v A_a^u) \ot I.
   \]
 \end{theorem}
 \begin{proof}
-  Use the diagonal-line test restricted to the full set of coordinates to compare each point measurement with the common diagonal-line answer. After converting those consistencies to state-dependent distance, commute through the shared diagonal-line measurement and transfer back.
+  \uses{lem:good-strategy-characterization, prop:simeq-to-approx, prop:triangle-inequality-for-approx_delta}
+  The strategy passes the diagonal lines test with probability $1-\gamma$, so it passes the $m$-restricted diagonal lines test with probability $1-\gamma m$. Hence
+  \[
+    A_a^u \otimes I \simeq_{\gamma m} I \otimes L^\ell_{[f(u)=a]}
+  \]
+  on average over uniformly random $u \sim \F_q^m$ and a uniformly random line $\ell$ in $\F_q^m$ containing $u$. By \ref{prop:simeq-to-approx},
+  \begin{equation}\label{eq:point-diagonal-line-approx}
+    A_a^u \otimes I \approx_{2\gamma m} I \otimes L^\ell_{[f(u)=a]}.
+  \end{equation}
+  Let $u$ and $v$ be independent uniformly random points in $\F_q^m$, and let $\ell$ be a uniformly random line containing both points. The marginal distribution on $(u,\ell)$ and on $(v,\ell)$ is the same as above, so
+  \begin{align*}
+    (A_a^u A_b^v) \ot I
+    &\approx_{2\gamma m} A_a^u \otimes L^\ell_{[f(v)=b]} \tag{by \ref{eq:point-diagonal-line-approx}}\\
+    &\approx_{2\gamma m} I \otimes \bigl(L^\ell_{[f(v)=b]} L^\ell_{[f(u)=a]}\bigr) \tag{by \ref{eq:point-diagonal-line-approx}}\\
+    &= I \otimes \bigl(L^\ell_{[f(u)=a]} L^\ell_{[f(v)=b]}\bigr) \tag{because~$L$ is projective}\\
+    &\approx_{2\gamma m} A_b^v \otimes L^\ell_{[f(u)=a]} \tag{by \ref{eq:point-diagonal-line-approx}}\\
+    &\approx_{2\gamma m} (A_b^v A_a^u) \ot I. \tag{by \ref{eq:point-diagonal-line-approx}}
+  \end{align*}
+  The theorem follows from \ref{prop:triangle-inequality-for-approx_delta}.
 \end{proof}
 
-\section{Commutativity of the slice measurements}
+\section{Commutativity of~$G$ after evaluation}
+\label{sec:G-commutes-after-evaluation}
 
-\begin{lemma}[Commutativity after evaluation]\label{lem:comm-data-processed-g}
+\begin{lemma}[Commutativity of~$G$ after evaluation]\label{lem:comm-data-processed-g}
   \lean{MIPStarRE.LDT.Commutativity.commDataProcessedG}
-  \uses{prop:cons-sub-meas, prop:closeness-of-ip, prop:two-notions-of-self-consistency-after-evaluation, thm:commutativity-points}
-  Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ such that:
+  \uses{def:good-strategy, def:polymeasurements, def:approx_delta, def:strong-self-consistency}
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
+  Let $\{G^x\} \in \polysub{m}{q}{d}$ be a collection of projective sub-measurements indexed by $x \in \F_q$ with the following properties:
   \begin{enumerate}
-    \item on average over $(u,x) \sim \F_q^{m+1}$,
+    \item (Consistency with~$A$)\label{item:data-processed-consistency}
+    On average over $(u,x) \sim \F_q^{m+1}$,
     \[
-      A_a^{u,x} \ot I \simeq_\zeta I \ot G^x_{[g(u)=a]};
+      A_a^{u,x} \ot I \simeq_\zeta I \ot G^x_{[g(u)=a]}.
     \]
-    \item on average over $x \sim \F_q$, one has $G_g^x \ot I \approx_\zeta I \ot G_g^x$;
-    \item there are positive semidefinite operators $Z^x$ with
+    \item (Strong self-consistency)\label{item:data-processed-self-consistency}
+    On average over $x \sim \F_q$,
     \[
-      \E_x \bra{\psi} (I-G^x) \ot Z^x \ket{\psi} \le \zeta,
-      \qquad
-      Z^x \ge \E_u A_{g(u)}^{u,x}.
+      G_g^x \ot I \approx_\zeta I \ot G_g^x.
+    \]
+    \item (Boundedness)\label{item:data-processed-boundedness}
+    There exists a positive-semidefinite matrix $Z^x$ for each $x \in \F_q$ such that
+    \[
+      \E_x \bra{\psi} (I-G^x) \ot Z^x \ket{\psi} \le \zeta
+    \]
+    and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
+    \[
+      Z^x \ge \left(\E_u A_{g(u)}^{u,x}\right).
     \]
   \end{enumerate}
-  Write $G_a^{u,x}=G_{[g(u)=a]}^x$. Then, on average over independent $(u,x),(v,y) \sim \F_q^{m+1}$,
+  Let
   \[
-    G_a^{u,x} G_b^{v,y} \ot I \approx_{48m(\gamma^{1/2}+\zeta^{1/2})} G_b^{v,y} G_a^{u,x} \ot I.
+    \nu = 48m\bigl(\gamma^{1/2}+\zeta^{1/2}\bigr).
+  \]
+  Then on average over independent and uniformly random $(u,x),(v,y) \sim \F_q^{m+1}$,
+  \[
+    G^x_{[g(u)=a]} G^y_{[h(v)=b]} \ot I \approx_\nu G^y_{[h(v)=b]} G^x_{[g(u)=a]} \ot I.
   \]
 \end{lemma}
 \begin{proof}
-  Write $G_a^{u,x}=G^x_{[g(u)=a]}$ and expand the commutator norm into the two quartic terms that appear in the source. The bridge to point measurements is not a single substitution: first use consistency to insert the evaluated point projector $A_a^{u,x}$, then use two boundedness-driven stability claims to show that inserting or deleting the total projector $G^x$ or $G^y$ only costs $O(\zeta^{1/2})$. After those internal stability steps, Theorem~\ref{thm:commutativity-points} commutes the point measurements, and the post-processed self-consistency of the $G^x$'s transfers the estimate back to the evaluated families $G_a^{u,x}$.
+  \uses{prop:cons-sub-meas, prop:closeness-of-ip, prop:two-notions-of-self-consistency, prop:two-notions-of-self-consistency-after-evaluation, thm:commutativity-points}
+  Write $G_a^{u,x}=G^x_{[g(u)=a]}$. Expanding the commutator square gives
+  \begin{align}
+    &\E_{u,v,x,y} \sum_{a,b} \bra{\psi}
+      \bigl(G_a^{u,x} G_b^{v,y} - G_b^{v,y} G_a^{u,x}\bigr)^\dagger
+      \bigl(G_a^{u,x} G_b^{v,y} - G_b^{v,y} G_a^{u,x}\bigr)
+      \ot I \ket{\psi}\nonumber\\
+    &= 2 \E_{u,v,x,y} \sum_{a,b}
+      \Bigl(\bra{\psi} G_b^{v,y} G_a^{u,x} G_b^{v,y} \ot I \ket{\psi}
+      - \bra{\psi} G_a^{u,x} G_b^{v,y} G_a^{u,x} G_b^{v,y} \ot I \ket{\psi}\Bigr),
+      \label{eq:gcom8}
+  \end{align}
+  using the projectivity of~$G$. To compare the two quartic terms, first note that
+  \begin{equation}\label{eq:sum-of-gux}
+    G^{u,x} = \sum_a G_a^{u,x} = \sum_a G^x_{[g(u)=a]} = G^x.
+  \end{equation}
+  By \ref{item:data-processed-consistency,prop:cons-sub-meas},
+  \begin{align}
+    G_a^{u,x} \ot I
+    &\approx_{4\zeta} G^{u,x} \ot A_a^{u,x}\nonumber\\
+    &= G^x \ot A_a^{u,x}, \label{eq:add-an-a}
+  \end{align}
+  where the last equality is \ref{eq:sum-of-gux}. Applying \ref{prop:closeness-of-ip} once to the second term in \ref{eq:gcom8} gives
+  \begin{align}
+    &\E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} G_a^{u,x} G_b^{v,y} \ot I \ket{\psi}\nonumber\\
+    \approx_{2\sqrt{\zeta}}&
+      \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} G_a^{u,x} G^y \ot A_b^{v,y} \ket{\psi}.
+      \label{eq:apply-add-an-a-once}
+  \end{align}
+  The first boundedness-driven stability step is
+  \begin{equation}
+    \eqref{eq:apply-add-an-a-once}
+    \approx_{\sqrt{\zeta}}
+    \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} G_a^{u,x} \ot A_b^{v,y} \ket{\psi},
+    \label{eq:gcom9}
+  \end{equation}
+  which is \ref{clm:g-comm-stability}. Applying \ref{eq:add-an-a} once more and then \ref{thm:commutativity-points}, we obtain
+  \begin{align}
+    \eqref{eq:gcom9}
+    &\approx_{2\sqrt{\zeta}}
+      \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} G^x \ot A_a^{u,x} A_b^{v,y} \ket{\psi}\nonumber\\
+    &\approx_{6\sqrt{\gamma(m+1)}}
+      \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} G^x \ot A_b^{v,y} A_a^{u,x} \ket{\psi}.
+      \label{eq:dunno-what-i-should-call-this}
+  \end{align}
+  The second boundedness-driven stability step is
+  \begin{equation}
+    \eqref{eq:dunno-what-i-should-call-this}
+    \approx_{\sqrt{\zeta}+6\sqrt{\gamma(m+1)}}
+    \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} \ot A_a^{u,x} A_b^{v,y} \ket{\psi},
+    \label{eq:gcom10}
+  \end{equation}
+  which is \ref{clm:g-comm-stability2}. Using \ref{eq:add-an-a} twice more and \ref{prop:closeness-of-ip},
+  \begin{align}
+    \eqref{eq:gcom10}
+    &\approx_{2\sqrt{\zeta}}
+      \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} \ot A_b^{v,y} \ket{\psi}\nonumber\\
+    &\approx_{2\sqrt{\zeta}}
+      \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} G_b^{v,y} \ot I \ket{\psi}.
+      \label{eq:gonna-cite-this-in-just-a-bit}
+  \end{align}
+  Next, \ref{item:data-processed-self-consistency} and the projectivity of~$G$ imply via \ref{prop:two-notions-of-self-consistency,prop:two-notions-of-self-consistency-after-evaluation} that
+  \begin{equation}\label{eq:new-fact-that-i-derived}
+    G_a^{u,x} \ot I \approx_\zeta I \ot G_a^{u,x}.
+  \end{equation}
+  Applying \ref{eq:new-fact-that-i-derived} twice with \ref{prop:closeness-of-ip} turns \ref{eq:gonna-cite-this-in-just-a-bit} into
+  \[
+    \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_b^{v,y} G_a^{u,x} G_b^{v,y} \ot I \ket{\psi},
+  \]
+  which is the first quartic term from \ref{eq:gcom8}. Collecting the ten approximation steps appearing between \ref{eq:gcom8} and \ref{eq:new-fact-that-i-derived} yields the bound
+  \[
+    48m\bigl(\gamma^{1/2}+\zeta^{1/2}\bigr),
+  \]
+  so the commutator norm is at most~$\nu$.
 \end{proof}
+
+\begin{lemma}\label{clm:g-comm-stability}
+  \uses{def:approx_delta}
+  \begin{align}
+    &\E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} G_a^{u,x} G^y \ot A_b^{v,y} \ket{\psi}
+      \label{eq:g-comm-stab1}\\
+    \approx_{\sqrt{\zeta}}&
+      \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} G_a^{u,x} \ot A_b^{v,y} \ket{\psi}.
+      \nonumber
+  \end{align}
+\end{lemma}
+\begin{proof}
+  For each $y \in \F_q$ and $g \in \polyfunc{m}{q}{d}$, define
+  \[
+    R_g^y = \E_{u,x} \sum_a G_a^{u,x} G_g^y G_a^{u,x}.
+  \]
+  Since $G$ is a sub-measurement, $R^y=\{R_g^y\}$ is also a sub-measurement. The difference between the two sides of the lemma is
+  \begin{align}
+    &\E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} G_a^{u,x} (I-G^y) \ot A_b^{v,y} \ket{\psi}\nonumber\\
+    &= \E_{v,y} \sum_g
+      \bra{\psi} R_g^y (I-G^y) \ot A_{g(v)}^{v,y} \ket{\psi}.
+      \label{eq:bound-this-right-now!}
+  \end{align}
+  Apply Cauchy--Schwarz to \ref{eq:bound-this-right-now!}. The first factor is at most~$1$ because $R^y$ is a sub-measurement. For the second factor, average over~$v$ and use \ref{item:data-processed-boundedness} to replace $\E_v A_{g(v)}^{v,y}$ by $Z^y$; the resulting quantity is at most
+  \[
+    \E_y \bra{\psi} (I-G^y) \ot Z^y \ket{\psi} \le \zeta.
+  \]
+  Hence the difference has magnitude at most $\sqrt{\zeta}$.
+\end{proof}
+
+\begin{lemma}\label{clm:g-comm-stability2}
+  \uses{def:approx_delta}
+  \begin{align*}
+    &\E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} G^x \ot A_a^{u,x} A_b^{v,y} \ket{\psi}\\
+    \approx_{\sqrt{\zeta}+6\sqrt{\gamma(m+1)}}&
+      \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} \ot A_a^{u,x} A_b^{v,y} \ket{\psi}.
+  \end{align*}
+\end{lemma}
+\begin{proof}
+  \uses{thm:commutativity-points}
+  The difference between the two sides is
+  \begin{align}
+    &\E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} (I-G^x) \ot A_a^{u,x} A_b^{v,y} \ket{\psi}\nonumber\\
+    \approx_{6\sqrt{\gamma(m+1)}}&
+      \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi} G_a^{u,x} G_b^{v,y} (I-G^x) \ot A_b^{v,y} A_a^{u,x} \ket{\psi},
+      \label{eq:just-got-commuted}
+  \end{align}
+  where \ref{thm:commutativity-points} commutes the point measurements on the right register. Expanding $G_a^{u,x}=\sum_{g:g(u)=a} G_g^x$, we rewrite
+  \begin{align}
+    \eqref{eq:just-got-commuted}
+    &= \E_{u,v,x,y} \sum_{g,b}
+      \bra{\psi} G_g^x G_b^{v,y} (I-G^x) \ot A_b^{v,y} A_{g(u)}^{u,x} \ket{\psi}.
+      \label{eq:g-comm-stab7}
+  \end{align}
+  Apply Cauchy--Schwarz to \ref{eq:g-comm-stab7}. The first factor is at most~$1$ because both $G$ and~$A$ are sub-measurements. In the second factor, average over~$u$ and use \ref{item:data-processed-boundedness} to replace $\E_u A_{g(u)}^{u,x}$ by $Z^x$; then sum over~$g$ and~$b$ using the sub-measurement property. This leaves
+  \[
+    \E_x \bra{\psi} (I-G^x) \ot Z^x \ket{\psi} \le \zeta.
+  \]
+  Hence \ref{eq:g-comm-stab7} has magnitude at most $\sqrt{\zeta}$, and the total loss is $\sqrt{\zeta}+6\sqrt{\gamma(m+1)}$.
+\end{proof}
+
+\section{Commutativity of~$G$}
+\label{sec:G-commutes}
 
 \begin{lemma}[Normalization condition for a sandwiched family]\label{lem:normalization-condition}
   \lean{MIPStarRE.LDT.Commutativity.normalizationCondition}
   \uses{def:submeasurement}
-  Let $P=\{P_a\}$ be a submeasurement and $Q=\{Q_b\}$ a projective submeasurement. Define $C_{a,b}=Q_b P_a Q_b$. Then
+  Let $P=\{P_a\}$ be a sub-measurement and $Q=\{Q_b\}$ be a projective sub-measurement.
+  Define $C_{a,b}=Q_b P_a Q_b$.
+  Then
   \[
-    \sum_a \left(\sum_b C_{a,b}\right)^\dagger \left(\sum_b C_{a,b}\right) = \sum_a \left(\sum_b C_{a,b}\right) \left(\sum_b C_{a,b}\right)^\dagger
+    \sum_a \left(\sum_b C_{a,b}\right)^\dagger \left(\sum_b C_{a,b}\right)
+    =
+    \sum_a \left(\sum_b C_{a,b}\right)\left(\sum_b C_{a,b}\right)^\dagger
     \le I.
   \]
 \end{lemma}
 \begin{proof}
-  Expand the squares, use the orthogonality of the projectors $Q_b$, and sum over the submeasurement $P$.
+  Expand the square, use the orthogonality $Q_b Q_{b'}=0$ for $b \neq b'$, and then sum over the sub-measurement~$P$.
 \end{proof}
 
-\begin{theorem}[Commutativity of the slice measurements]\label{thm:com-main}
+\begin{theorem}[Commutativity of~$G$]\label{thm:com-main}
   \lean{MIPStarRE.LDT.Commutativity.comMain}
-  \uses{lem:comm-data-processed-g, lem:normalization-condition, prop:switch-sandwich, prop:closeness-of-ip, lem:schwartz-zippel-individual}
-  Let $\{G^x\}_{x \in \F_q}$ satisfy the same hypotheses as in Lemma~\ref{lem:comm-data-processed-g}. Then, on average over independent $x,y \sim \F_q$,
+  \uses{def:good-strategy, def:polymeasurements, def:approx_delta, def:strong-self-consistency}
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
+  Let $\{G^x\}_{x \in \F_q}$ denote a set of projective sub-measurements in $\polysub{m}{q}{d}$ with the following properties:
+  \begin{enumerate}
+    \item (Consistency with~$A$)\label{item:commuting-consistency}
+    On average over $(u,x) \sim \F_q^{m+1}$,
+    \[
+      A_a^{u,x} \ot I \simeq_\zeta I \ot G^x_{[g(u)=a]}.
+    \]
+    \item (Strong self-consistency)\label{item:commuting-self-consistency}
+    On average over $x \sim \F_q$,
+    \[
+      G_g^x \ot I \approx_\zeta I \ot G_g^x.
+    \]
+    \item (Boundedness)\label{item:commuting-boundedness}
+    There exists a positive-semidefinite matrix $Z^x$ for each $x \in \F_q$ such that
+    \[
+      \E_x \bra{\psi} (I-G^x) \ot Z^x \ket{\psi} \le \zeta
+    \]
+    and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
+    \[
+      Z^x \ge \left(\E_u A_{g(u)}^{u,x}\right).
+    \]
+  \end{enumerate}
+  Let
   \[
-    G_g^x G_h^y \ot I
-    \approx_{30m(\gamma^{1/4}+\zeta^{1/4}+(d/q)^{1/4})}
-    G_h^y G_g^x \ot I.
+    \nu = 30m\left(\gamma^{1/4}+\zeta^{1/4}+(d/q)^{1/4}\right).
+  \]
+  Then on average over independent and uniformly random $(u,x),(v,y) \sim \F_q^{m+1}$,
+  \[
+    G_g^x G_h^y \ot I \approx_\nu G_h^y G_g^x \ot I.
   \]
 \end{theorem}
 \begin{proof}
-  Expand the commutator norm into two quartic terms. The first is reduced to the mixed overlap $\bra{\psi} G\ot G\ket{\psi}$ by Lemma~\ref{prop:switch-sandwich}. For the second, the source passes to random evaluations $g(u)$ and $h(v)$, so that Lemma~\ref{lem:comm-data-processed-g} can commute the processed operators. Each application of the inner-product comparison lemma requires the normalization condition from Lemma~\ref{lem:normalization-condition} for sandwiched families such as $G_h^y G_{[g(u)=a]}^x G_h^y$. Finally one removes the two point evaluations by Schwartz--Zippel, paying one $md/q$ loss for each removal. This evaluated-to-polynomial lift is the main work in the theorem.
+  \uses{lem:comm-data-processed-g, lem:normalization-condition, prop:switch-sandwich, prop:closeness-of-ip, prop:triangle-inequality-for-vectors-squared, lem:schwartz-zippel-individual}
+  If at least one of $\gamma$, $\zeta$, or $d/q$ is at least~$1$, then $\nu \ge 30$ and the estimate is trivial from \ref{prop:triangle-inequality-for-vectors-squared}. We therefore assume $\gamma,\zeta,d/q \le 1$.
+
+  Expanding the commutator square gives
+  \begin{align}
+    &\E_{x,y} \sum_{g,h}
+      \bra{\psi}
+      \bigl(G_g^x G_h^y - G_h^y G_g^x\bigr)^\dagger
+      \bigl(G_g^x G_h^y - G_h^y G_g^x\bigr)
+      \ot I \ket{\psi}\nonumber\\
+    &= 2 \E_{x,y} \sum_{g,h}
+      \bra{\psi} G_g^x G_h^y G_g^x \ot I \ket{\psi}
+      - 2 \E_{x,y} \sum_{g,h}
+      \bra{\psi} G_g^x G_h^y G_g^x G_h^y \ot I \ket{\psi}.
+      \label{eq:gcomterms}
+  \end{align}
+  The first term is close to $\bra{\psi} G \ot G \ket{\psi}$, where $G=\E_x G^x$, by \ref{prop:switch-sandwich} and \ref{item:commuting-self-consistency}. For the second term, \ref{prop:closeness-of-ip} and \ref{lem:normalization-condition} yield
+  \begin{equation}
+    \E_{x,y} \sum_{g,h}
+      \bra{\psi} G_g^x G_h^y G_g^x G_h^y \ot I \ket{\psi}
+    \approx_{\sqrt{\zeta}}
+    \E_{x,y} \sum_{g,h}
+      \bra{\psi} G_h^y G_g^x G_h^y \ot G_g^x \ket{\psi}.
+    \label{eq:gcom4}
+  \end{equation}
+  The first Schwartz--Zippel reduction evaluates the left factor at a random point:
+  \begin{align}
+    \eqref{eq:gcom4}
+    &= \E_{x,y} \sum_{g,h}
+      \bra{\psi} G_h^y G_g^x G_h^y \ot G_g^x \ket{\psi}\nonumber\\
+    &\approx_{\frac{dm}{q}}
+      \E_{u,x,y} \sum_{a,h}
+      \bra{\psi} G_h^y G^x_{[g(u)=a]} G_h^y \ot G^x_{[g(u)=a]} \ket{\psi}.
+      \label{eq:evaluate-gcom-at-points}
+  \end{align}
+  Indeed, the difference is
+  \begin{equation}\label{eq:gcom4-diff}
+    \E_{u,x,y} \sum_{g \neq g',h}
+      \bone[g(u)=g'(u)]
+      \bra{\psi} G_h^y G_g^x G_h^y \ot G_{g'}^x \ket{\psi},
+  \end{equation}
+  and \ref{lem:schwartz-zippel-individual} bounds this by $dm/q$.
+
+  Next, apply \ref{prop:closeness-of-ip} twice:
+  \begin{align}
+    \eqref{eq:evaluate-gcom-at-points}
+    &= \E_{u,x,y} \sum_{a,h}
+      \bra{\psi} G_h^y G^x_{[g(u)=a]} G_h^y \ot G^x_{[g(u)=a]} \ket{\psi}\nonumber\\
+    &\approx_{\sqrt{\zeta}}
+      \E_{u,x,y} \sum_{a,h}
+      \bra{\psi} G^x_{[g(u)=a]} G_h^y G^x_{[g(u)=a]} G_h^y \ot I \ket{\psi}\nonumber\\
+    &\approx_{\sqrt{\zeta}}
+      \E_{u,x,y} \sum_{a,h}
+      \bra{\psi} G^x_{[g(u)=a]} G_h^y G^x_{[g(u)=a]} \ot G_h^y \ket{\psi}.
+      \label{eq:don't-understand-the-numbering-system}
+  \end{align}
+  A second Schwartz--Zippel reduction evaluates the right factor at an independent point:
+  \begin{align}
+    \eqref{eq:don't-understand-the-numbering-system}
+    &= \E_{u,x,y} \sum_{a,h}
+      \bra{\psi} G^x_{[g(u)=a]} G_h^y G^x_{[g(u)=a]} \ot G_h^y \ket{\psi}\nonumber\\
+    &\approx_{\frac{dm}{q}}
+      \E_{u,v,x,y} \sum_{a,b}
+      \bra{\psi}
+      G^x_{[g(u)=a]} G^y_{[h(v)=b]} G^x_{[g(u)=a]}
+      \ot G^y_{[h(v)=b]} \ket{\psi}.
+      \label{eq:evaluate-gcom-at-points-part-dos}
+  \end{align}
+  The difference is
+  \begin{equation}\label{eq:eq:don't-understand-the-numbering-system-diff}
+    \E_{u,v,x,y} \sum_{a,h \neq h'}
+      \bone[h(v)=h'(v)]
+      \bra{\psi}
+      G^x_{[g(u)=a]} G_h^y G^x_{[g(u)=a]} \ot G_{h'}^y \ket{\psi},
+  \end{equation}
+  and the same Schwartz--Zippel estimate again gives the loss $dm/q$.
+
+  Now set
+  \[
+    \nu_{\mathrm{evaluation}} = 48m\bigl(\gamma^{1/2}+\zeta^{1/2}\bigr),
+  \]
+  the error from \ref{lem:comm-data-processed-g}. Apply \ref{lem:comm-data-processed-g} to commute the evaluated families in \ref{eq:evaluate-gcom-at-points-part-dos}; after one more use of \ref{prop:closeness-of-ip} with \ref{item:commuting-self-consistency}, the resulting quantity is $\bra{\psi} G \ot G \ket{\psi}$. Thus the second term in \ref{eq:gcomterms} is also close to $\bra{\psi} G \ot G \ket{\psi}$.
+
+  Combining the first-term estimate, \ref{eq:gcom4}, the two Schwartz--Zippel losses, the two intermediate $\sqrt{\zeta}$ losses, and the evaluated commutation error $\nu_{\mathrm{evaluation}}^{1/2}$ gives
+  \[
+    30m\left(\gamma^{1/4}+\zeta^{1/4}+(d/q)^{1/4}\right),
+  \]
+  exactly as in the paper. This proves \ref{thm:com-main}.
 \end{proof}

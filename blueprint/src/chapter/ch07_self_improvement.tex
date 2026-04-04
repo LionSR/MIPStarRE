@@ -3,42 +3,261 @@
 
 Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
 
+\section{Non-projective Output}
+\label{sec:self-improvement}
 
 \begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelper}
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
-  Let $G \in \polymeas{m}{q}{d}$ be a measurement such that, on average over $u \sim \F_q^m$,
-  \[
-    A_a^u \ot I \simeq_\nu I \ot G_{[g(u)=a]}.
-  \]
-  Set
-  \[
-    \zeta = 100m\left(\eps^{1/2}+\delta^{1/2}+(d/q)^{1/2}\right).
-  \]
-  Then there exists a submeasurement $H \in \polysub{m}{q}{d}$ such that:
+  Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following property:
   \begin{enumerate}
-    \item if $H=\sum_h H_h$, then $\bra{\psi} H \ot I \ket{\psi} \ge (1-\nu)-\zeta$;
-    \item on average over $u \sim \F_q^m$,
+    \item (Consistency with~$A$): \label{item:self-improvement-G-consistency} On average over $u \sim \F_q^{m}$,
     \[
-      A_a^u \ot I \simeq_\zeta I \ot H_{[h(u)=a]};
+      A^{u}_a \ot I \simeq_{\nu} I \ot G_{[g(u)=a]}.
     \]
-    \item the family $H$ is $\zeta$-strongly self-consistent;
-    \item there exists a positive semidefinite operator $Z$ such that
+  \end{enumerate}
+  Let
+  \[
+    \zeta = 100m\cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big).
+  \]
+  Then there exists $H \in \polysub{m}{q}{d}$ with the following properties:
+  \begin{enumerate}
+    \item (Completeness): \label{item:self-improvement-completeness} If $H = \sum_h H_h$, then
     \[
-      \bra{\psi} Z \ot I \ket{\psi} - \E_u \sum_a \bra{\psi} A_a^u \ot H_{[h(u)=a]} \ket{\psi} \le \zeta,
+      \bra{\psi} H \ot I \ket{\psi} \geq (1-\nu)-\zeta.
     \]
-    and $Z \ge \E_u A_{h(u)}^u$ for every $h \in \polyfunc{m}{q}{d}$.
+    \item (Consistency with~$A$): \label{item:self-improvement-A-consistency} On average over $u \sim \F_q^m$,
+    \[
+      A^u_a \ot I \simeq_{\zeta} I \ot H_{[h(u) = a]}.
+    \]
+    \item (Strong self-consistency): \label{item:self-improvement-self}
+    \[
+      \sum_{h} \bra{\psi} H_h \ot H_h \ket{\psi} \geq \bra{\psi} H \ot I \ket{\psi} - \zeta.
+    \]
+    \item (Boundedness): \label{item:self-improvement-boundedness} There exists a positive-semidefinite matrix~$Z$ such that
+    \[
+      \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi} \leq \zeta
+    \]
+    and for each $h \in \polyfunc{m}{q}{d}$,
+    \[
+      Z \geq \left(\E_{u} A^{u}_{h(u)}\right).
+    \]
   \end{enumerate}
 \end{lemma}
 \begin{proof}
-  \uses{lem:sdp, lem:add-in-u, lem:global-variance-of-points, prop:simeq-to-approx}
-  Solve the SDP from Lemma~\ref{lem:sdp} to obtain an optimal measurement $T=\{T_h\}$ and define
+  \uses{lem:sdp, lem:add-in-u, lem:global-variance-of-points, prop:simeq-to-approx, prop:simeq-for-measurements}
+  Let $T=\{T_g\}$ and $Z$ be the optimal solutions to the SDPs~\eqref{eq:primal-objective} and~\eqref{eq:dual-objective} given by Lemma~\ref{lem:sdp}. Then $T$ is a measurement, and
+  \begin{align}
+    \forall g \in \polyfunc{m}{q}{d}: \qquad
+    Z &\geq \left(\E_{u} A^{u}_{g(u)}\right), \label{eq:Z-greater-than-A}\\
+    T_g \cdot Z &= T_g \cdot \left(\E_{u} A^{u}_{g(u)}\right). \label{eq:swap-Z-for-A}
+  \end{align}
+  For each $u \in \F_q^m$, define $H^u=\{H_h^u\}_{h \in \polyfunc{m}{q}{d}}$ by
   \[
-    H_h = \E_u A^u_{h(u)} T_h A^u_{h(u)}.
+    H_h^u := A^u_{h(u)} \cdot T_h \cdot A^u_{h(u)},
   \]
-  The four conclusions are proved separately. For completeness, apply Lemma~\ref{lem:add-in-u} with $M=A$ and the diagonal set $\{(a,h):h(u)=a\}$, then use the dual lower bound $Z\ge A_h$ together with complementary slackness. For consistency with $A$, apply Lemma~\ref{lem:add-in-u} with the off-diagonal set $\{(a,h):h(u)\ne a\}$; the right-hand side vanishes because the point measurements $A^u$ are projective. For strong self-consistency, apply Lemma~\ref{lem:add-in-u} with $M=H$ and then bound the off-diagonal polynomial pairs by global variance and Schwartz--Zippel. For boundedness, use the same averaged expression as in the completeness step but keep the dual witness $Z$ on the first tensor factor. Thus the source really branches into four quantitative estimates rather than a single uniform argument.
+  and let
+  \[
+    H_h := \E_{u} H_h^u.
+  \]
+  The pointwise family $H^u$ is a submeasurement because
+  \[
+    \sum_h H_h^u
+    = \sum_a A_a^u \cdot \Big(\sum_{h:h(u)=a} T_h\Big)\cdot A_a^u
+    \le \sum_a (A_a^u)^2
+    = I,
+  \]
+  and averaging over $u$ shows that $H \in \polysub{m}{q}{d}$.
+
+  Set
+  \[
+    \zeta_{\mathrm{variance}} = 24m\cdot\Big(\eps + \delta + \frac{md}{q}\Big).
+  \]
+  Lemma~\ref{lem:add-in-u} below is the technical transfer from the averaged family~$H$ back to the sandwiched operators $A^u_{h(u)}T_hA^u_{h(u)}$. We use it in the completeness, consistency, strong self-consistency, and boundedness estimates that follow.
+
+  We now verify the four conclusions of Lemma~\ref{lem:self-improvement-helper}.
+
+  \emph{Proof of \ref{item:self-improvement-completeness}.}
+  The completeness of~$H$ is
+  \begin{align}
+    \sum_h \bra{\psi} H_h \ot I \ket{\psi}
+    &= \E_{u} \sum_h \bra{\psi} H^{u}_h \ot I \ket{\psi} \notag\\
+    &= \E_{u} \sum_h \bra{\psi} \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \ot I \ket{\psi} \notag\\
+    &= \E_{u} \sum_a \bra{\psi} \bigl(A^{u}_{a} \cdot T_{[h(u) = a]} \cdot A^{u}_{a}\bigr) \ot I \ket{\psi}. \label{eq:bracketize-the-expression}
+  \end{align}
+  We first move the leftmost copy of~$A^u_a$ across the bipartition:
+  \begin{equation}\label{eq:yet-another-move-a}
+    \eqref{eq:bracketize-the-expression}
+    \approx_{2\sqrt{\delta}}
+    \E_{u} \sum_a \bra{\psi} \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \ot A^{u}_{a} \ket{\psi}.
+  \end{equation}
+  The difference is bounded by Cauchy--Schwarz exactly as in~\eqref{eq:move-one-cauchy-schwarz}; the first factor is at most $\sqrt{2\delta}$ by self-consistency of~$A$, and the second is at most~$1$ because $T_{[h(u)=a]} \le I$. We next remove the remaining copy of~$A^u_a$ on Bob's side:
+  \begin{equation}\label{eq:mysterious-case-of-the-disappearing-a}
+    \eqref{eq:yet-another-move-a}
+    \approx_{\sqrt{\delta}}
+    \E_{u} \sum_a \bra{\psi} \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \ot I \ket{\psi}.
+  \end{equation}
+  Here the second Cauchy--Schwarz factor is
+  \[
+    \E_{u} \sum_{a\neq b} \bra{\psi} A^u_a \ot A^u_b \ket{\psi},
+  \]
+  which is at most~$\delta$ because~$A$ is self-consistent and projective. Reindexing by~$h$ and using~\eqref{eq:swap-Z-for-A},
+  \[
+    \eqref{eq:mysterious-case-of-the-disappearing-a}
+    = \sum_h \bra{\psi} \bigl(T_h \cdot \E_{u} A^u_{h(u)}\bigr) \ot I \ket{\psi}
+    = \sum_h \bra{\psi} (T_h \cdot Z) \ot I \ket{\psi}
+    = \bra{\psi} Z \ot I \ket{\psi}.
+  \]
+  Thus
+  \begin{equation}\label{eq:gonna-use-this-later-H-versus-Z}
+    \sum_h \bra{\psi} H_h \ot I \ket{\psi} \geq \bra{\psi} Z \ot I \ket{\psi} - 3\sqrt{\delta}.
+  \end{equation}
+  Since $G$ is a measurement,~\eqref{eq:Z-greater-than-A} and Lemma~\ref{prop:simeq-for-measurements} give
+  \[
+    \bra{\psi} Z \ot I \ket{\psi}
+    \ge \E_{u} \sum_a \bra{\psi} A^u_a \ot G_{[g(u)=a]} \ket{\psi}
+    \ge 1-\nu.
+  \]
+  Therefore the completeness is at least $1-\nu-3\sqrt{\delta}$, which is bounded below by $(1-\nu)-\zeta$.
+
+  \emph{Proof of \ref{item:self-improvement-A-consistency}.}
+  The inconsistency of~$H$ with~$A$ is
+  \begin{equation}\label{eq:consistency-with-A-baby-step}
+    \E_{u} \sum_{a \neq b} \bra{\psi} A^{u}_a \ot H_{[h(u) = b]} \ket{\psi}
+    = \E_{u} \sum_{a, h: h(u) \neq a} \bra{\psi} A^{u}_a \ot H_h \ket{\psi}.
+  \end{equation}
+  Apply Lemma~\ref{lem:add-in-u} with $\mathcal O=\F_q$, $M=A$, and $S_u=\{(a,h):h(u)\neq a\}$. Then
+  \[
+    \eqref{eq:consistency-with-A-baby-step}
+    \approx_{4 \sqrt{\zeta_{\mathrm{variance}}}}
+    \E_{u} \sum_{a, h: h(u) \neq a} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot A^{u}_a \cdot A^{u}_{h(u)}\bigr)\ot T_h \ket{\psi},
+  \]
+  and the right-hand side is~$0$ because~$A$ is projective. Hence
+  \begin{equation}\label{eq:explicit-bound-for-A-consistency}
+    \E_{u} \sum_{a \neq b} \bra{\psi} A^{u}_a \ot H_{[h(u) = b]} \ket{\psi} \leq 4 \sqrt{\zeta_{\mathrm{variance}}}.
+  \end{equation}
+  Since
+  \[
+    4\sqrt{\zeta_{\mathrm{variance}}}
+    = 4 \sqrt{24 m \cdot\Big(\eps + \delta + \frac{md}{q}\Big)}
+    \le 20 m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
+    \le \zeta,
+  \]
+  this proves \ref{item:self-improvement-A-consistency}.
+
+  \emph{Proof of \ref{item:self-improvement-self}.}
+  From the definition of $H_h^u$ and the projectivity of~$A$,
+  \begin{align}
+    H^u_h &= A^u_{h(u)} \cdot T_h \cdot A^u_{h(u)} = A^u_{h(u)} \cdot H^u_h \cdot A^u_{h(u)}, \label{eq:h-sandwich}\\
+    A^u_{h(u)} \cdot H^u_{h'} \cdot A^u_{h(u)} &= H^u_{h'} \cdot A^u_{h(u)} = \bigl(A^u_{h(u)} \cdot T_{h'} \cdot A^u_{h(u)}\bigr)\cdot \bone{h(u) = h'(u)}. \label{eq:h-blt}
+  \end{align}
+  The strong self-consistency expression is
+  \begin{equation}\label{eq:self-consistency-baby-step}
+    \sum_{h\in\polyfunc{m}{q}{d}} \bra{\psi} H_h \ot H_h \ket{\psi}
+    = \E_{u} \sum_{h \in \polyfunc{m}{q}{d}} \bra{\psi} H_h^{u} \ot H_h \ket{\psi}.
+  \end{equation}
+  Apply Lemma~\ref{lem:add-in-u} with $\mathcal O=\polyfunc{m}{q}{d}$, $M=H$, and $S_u=\{(h,h):h\in\polyfunc{m}{q}{d}\}$. This gives
+  \begin{equation}\label{eq:release-the-kraken}
+    \eqref{eq:self-consistency-baby-step}
+    \approx_{4 \sqrt{\zeta_{\mathrm{variance}}}}
+    \E_{u} \sum_{h \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot H_h^{u} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
+  \end{equation}
+  We next enlarge the sum from $h'=h$ to all pairs $h,h'$:
+  \begin{equation}\label{eq:threw-in-h-prime}
+    \eqref{eq:release-the-kraken}
+    \approx_{2\sqrt{\zeta_{\mathrm{variance}}} + \frac{md}{q}}
+    \E_{u} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
+  \end{equation}
+  The added off-diagonal contribution is
+  \begin{align}
+    \eqref{eq:threw-in-h-prime}-\eqref{eq:release-the-kraken}
+    &= \E_{u} \sum_{h \neq h'} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi} \notag\\
+    &= \E_{u} \sum_{h \neq h'} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi} \cdot \bone{h(u) = h'(u)}, \label{eq:added-indicator}
+  \end{align}
+  where the second equality is~\eqref{eq:h-blt}. To estimate~\eqref{eq:added-indicator}, first replace the left copy of $A^u_{h(u)}$ by $A^v_{h(v)}$:
+  \begin{equation}\label{eq:swapped-u-for-v}
+    \eqref{eq:added-indicator}
+    \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
+    \E_{u,v} \sum_{h \neq h'} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi} \cdot \bone{h(u) = h'(u)}.
+  \end{equation}
+  The corresponding Cauchy--Schwarz bound is
+  \begin{multline}
+    \Big|\E_{u,v} \sum_{h \neq h'} \bra{\psi} \bigl((A^{u}_{h(u)} - A^{v}_{h(v)}) \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi} \cdot \bone{h(u) = h'(u)}\Big|\\
+    \leq
+    \sqrt{\E_{u,v} \sum_{h \neq h'} \bra{\psi} \bigl((A^{u}_{h(u)} - A^{v}_{h(v)}) \cdot T_{h'} \cdot (A^{u}_{h(u)} - A^{v}_{h(v)})\bigr) \ot T_h\ket{\psi}}\\
+    \cdot \sqrt{\E_{u,v} \sum_{h \neq h'} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h\ket{\psi} \cdot \bone{h(u) = h'(u)}}. \label{eq:swapped-u-for-cauchy-schwarz}
+  \end{multline}
+  The first factor is bounded by $\sqrt{\zeta_{\mathrm{variance}}}$ via Lemma~\ref{lem:global-variance-of-points}, and the second by~$1$ because $T$ and $H^u$ are submeasurements.
+
+  Repeating the same argument for the remaining copy of~$A$ yields
+  \begin{equation}\label{eq:swapped-u-for-v-this-time-it's-personal}
+    \eqref{eq:swapped-u-for-v}
+    \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
+    \E_{u,v} \sum_{h \neq h'} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr) \ot T_h \ket{\psi} \cdot \bone{h(u) = h'(u)}.
+  \end{equation}
+  The same intermediate estimate gives
+  \begin{equation}\label{eq:gonna-use-this-later}
+    \E_{u,v} \sum_{h \neq h'} \bra{\psi}  \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr)\ot T_h\ket{\psi}
+    \leq 1,
+  \end{equation}
+  so Schwartz--Zippel bounds the indicator average by $md/q$ and proves~\eqref{eq:threw-in-h-prime}.
+
+  Using~\eqref{eq:h-blt}, the right-hand side of~\eqref{eq:threw-in-h-prime} is
+  \begin{equation}\label{eq:delete-an-A}
+    \E_{u} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
+  \end{equation}
+  Replace the remaining copy of $A^u_{h(u)}$ by $A^v_{h(v)}$:
+  \begin{equation}\label{eq:swap-u-for-v-attack-of-the-clones}
+    \eqref{eq:delete-an-A}
+    \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
+    \E_{u,v} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(H^{u}_{h'} \cdot A^{v}_{h(v)}\bigr) \ot T_h \ket{\psi}.
+  \end{equation}
+  Here the first Cauchy--Schwarz factor is at most~$1$ because $T$ and $H^u$ are submeasurements, and the second is again bounded by Lemma~\ref{lem:global-variance-of-points}. Finally move this last copy of~$A^v_{h(v)}$ to Bob's side:
+  \begin{equation}\label{eq:move-over-v}
+    \eqref{eq:swap-u-for-v-attack-of-the-clones}
+    \approx_{\sqrt{2\delta}}
+    \E_{u,v} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} H^{u}_{h'}  \ot \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \ket{\psi}.
+  \end{equation}
+  Substituting~\eqref{eq:swap-Z-for-A}, then~\eqref{eq:Z-greater-than-A}, and finally the already proved bound~\eqref{eq:explicit-bound-for-A-consistency}, one obtains
+  \[
+    \eqref{eq:move-over-v}
+    \ge \sum_h \bra{\psi} H_h \ot I \ket{\psi} - 4\sqrt{\zeta_{\mathrm{variance}}}.
+  \]
+  Combining~\eqref{eq:release-the-kraken}, \eqref{eq:threw-in-h-prime}, \eqref{eq:swap-u-for-v-attack-of-the-clones}, and~\eqref{eq:move-over-v} gives
+  \[
+    \sum_h \bra{\psi} H_h \ot H_h \ket{\psi}
+    \ge \sum_h \bra{\psi} H_h \ot I \ket{\psi}
+      - 11 \sqrt{\zeta_{\mathrm{variance}}}
+      - \sqrt{2\delta}
+      - \frac{md}{q}.
+  \]
+  The paper's arithmetic shows that the right-hand error is at most
+  \[
+    57m\cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
+    \le \zeta,
+  \]
+  which proves \ref{item:self-improvement-self}.
+
+  \emph{Proof of \ref{item:self-improvement-boundedness}.}
+  The boundedness quantity is
+  \[
+    \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}.
+  \]
+  Reindexing the sum by~$h$, inserting $\sum_a A_a^u=I$, and using~\eqref{eq:explicit-bound-for-A-consistency},
+  \[
+    \bra{\psi} Z \ot I \ket{\psi}
+    -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}
+    \le \bra{\psi} Z \ot I \ket{\psi} - \sum_h \bra{\psi} I \ot H_h \ket{\psi} + 4 \sqrt{\zeta_{\mathrm{variance}}}.
+  \]
+  By~\eqref{eq:gonna-use-this-later-H-versus-Z}, the right-hand side is at most $3\sqrt{\delta}+4\sqrt{\zeta_{\mathrm{variance}}}$, which the paper bounds by
+  \[
+    23m\cdot\Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
+    \le \zeta.
+  \]
+  Together with~\eqref{eq:Z-greater-than-A}, this proves \ref{item:self-improvement-boundedness}.
 \end{proof}
 
+\subsection{A Semidefinite Program}
 
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp}
@@ -46,24 +265,72 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
   \]
-  Consider the primal program
-  \[
-    \sup \sum_g \Tr(T_g A_g)
-    \qquad\text{subject to } T_g \ge 0 \text{ for all } g, \sum_g T_g \le I,
-  \]
-  and the dual program
-  \[
-    \inf \Tr(Z)
-    \qquad\text{subject to } Z \ge A_g \text{ for all } g.
-  \]
-  These programs are dual to each other. Moreover there are optimal solutions with $\sum_g T_g = I$ and
-  \[
-    T_g Z = T_g A_g
-  \]
-  for every $g$.
+  Then the primal is
+  \begin{align}
+    \sup &\quad \sum_g \,\Tr(T_g \cdot A_g) \label{eq:primal-objective}\\
+    \text{s.t.} &\quad   T_g \geq 0\qquad\forall g\in\polyfunc{m}{q}{d}, \notag\\
+    &\quad \sum_g T_g \leq I, \notag
+  \end{align}
+  and the dual is
+  \begin{align}
+    \inf &\quad \Tr(Z) \label{eq:dual-objective}\\
+    \text{ s.t.} &\quad Z \geq A_g. \label{eq:dual-constraint}
+  \end{align}
+  These semidefinite programs are dual to each other. Moreover there is an optimal pair of solutions $\{T_g\}$ to~\eqref{eq:primal-objective} and $Z$ to~\eqref{eq:dual-objective} such that $\sum_g T_g = I$ and
+  \begin{equation}\label{eq:slater}
+    T_g Z  \,=\, T_g {A_g},\qquad\forall g\in \polyfunc{m}{q}{d}.
+  \end{equation}
 \end{lemma}
 \begin{proof}
-  Rewrite the primal in block-matrix canonical form so that one block corresponds to each polynomial $g$. Slater's condition is immediate from a strictly feasible primal point and a sufficiently large dual matrix, so strong duality holds. Complementary slackness for the optimal pair then forces the slack block attached to $I-\sum_g T_g$ to vanish, giving $\sum_g T_g=I$, and also forces each block $T_g(Z-A_g)$ to be zero, which is the stated identity.
+  Rewrite~\eqref{eq:primal-objective} in canonical block form. Let $r$ be the dimension of the space on which~$A$ acts, let $M = |\polyfunc{m}{q}{d}|$, and fix an ordering $g_1,\ldots,g_M$ of the polynomials. Consider
+  \begin{align}
+    \sup &\quad \Tr(C^\dagger X) \label{eq:primal-canonical}\\
+    \text{s.t.} &\quad \Tr(D_{ij}^\dagger X) = b_{ij} \qquad\forall i,j\in\{1,\ldots,r\}, \notag\\
+    &\quad X \geq 0, \notag
+  \end{align}
+  where
+  \[
+    C = \sum_{i = 1}^M \ket{i}\bra{i} \ot A_{g_i},
+  \]
+  and, for $i,j \in \{1,\ldots,r\}$,
+  \[
+    D_{ij} = \sum_{k=1}^{M+1} \ket{k}\bra{k} \ot \ket{i}\bra{j},
+    \qquad
+    b_{ij}  = \left\{\begin{array}{rl}
+      1 & \text{if } i = j,\\
+      0 & \text{otherwise}.
+    \end{array}\right.
+  \]
+  Writing $X=\sum_{i,j=1}^{M+1}\ket{i}\bra{j}\ot X_{ij}$, the constraints say precisely that $\sum_{i=1}^{M+1} X_{ii}=I$, hence $\sum_{i=1}^{M}X_{ii}\le I$, and the objective is
+  \[
+    \Tr(C^\dagger X)=\sum_{i=1}^M \Tr(A_{g_i}\cdot X_{ii}).
+  \]
+  Thus~\eqref{eq:primal-canonical} is equivalent to~\eqref{eq:primal-objective} under the identification $T_{g_i}=X_{ii}$.
+
+  The canonical dual is
+  \begin{align}
+    \inf &\quad \sum_i\, z_{ij} b_{ij} \label{eq:dual-canonical}\\
+    \text{s.t.} &\quad  \sum_{i,j} \,z_{ij} D_{ij} \geq C. \label{eq:dual-canonical-constraint}
+  \end{align}
+  Since
+  \[
+    \sum_{i,j=1}^r z_{ij} D_{ij}
+    = \sum_{k=1}^{M+1} \ket{k}\bra{k} \ot \left(\sum_{i,j=1}^r z_{ij}\ket{i}\bra{j}\right)
+    =: \sum_{k=1}^{M+1}\ket{k}\bra{k} \ot Z,
+  \]
+  the constraint~\eqref{eq:dual-canonical-constraint} is exactly $Z\ge A_{g_i}$ for every $i$, and the objective is $\Tr(Z)$. Hence~\eqref{eq:dual-canonical} is equivalent to~\eqref{eq:dual-objective}.
+
+  Slater's condition holds because
+  \[
+    T_g = \frac{1}{2M}\cdot I \qquad\forall g\in\polyfunc{m}{q}{d},
+    \qquad
+    Z = 2I
+  \]
+  are strictly feasible for the primal and dual respectively. Therefore strong duality holds. For an optimal pair $(X,(z_{ij}))$ in canonical form, complementary slackness gives
+  \begin{equation}\label{eq:complementary-slackness}
+    X\Big( \sum_{i,j} \,z_{ij} D_{ij} - C \Big) \,=\, 0.
+  \end{equation}
+  We may assume that $X$ is block diagonal. Translating~\eqref{eq:complementary-slackness} back to the variables $\{T_g\}$ and~$Z$ yields $T_g(Z-A_g)=0$ for every~$g$ and $X_{M+1,M+1}=0$. The latter identity is exactly $\sum_g T_g=I$, and the former is~\eqref{eq:slater}.
 \end{proof}
 
 \begin{lemma}[Averaging over the evaluation point]\label{lem:add-in-u}
@@ -75,56 +342,212 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
   \]
   and set
   \[
-    \zeta_{\mathrm{var}} = 24m\left(\eps+\delta+\frac{md}{q}\right).
+    \zeta_{\mathrm{variance}} = 24m\cdot\Big(\eps + \delta + \frac{md}{q}\Big).
   \]
-  If $M=\{M_o^u\}$ is any submeasurement and $S_u \subseteq \mathcal O \times \polyfunc{m}{q}{d}$ is any family of subsets, then
+  Suppose $M = \{M^u_o\}$ is a submeasurement with outcomes in some set $\mathcal O$. For each $u \in \F_q^m$, let $S_u$ be a subset of $\mathcal O \times \polyfunc{m}{q}{d}$. Then
   \[
-    \E_u \sum_{(o,h) \in S_u} \bra{\psi} M_o^u \ot H_h \ket{\psi}
-    \approx_{4\sqrt{\zeta_{\mathrm{var}}}}
-    \E_u \sum_{(o,h) \in S_u} \bra{\psi} A^u_{h(u)} M_o^u A^u_{h(u)} \ot T_h \ket{\psi}.
+    \E_{u} \sum_{(o, h) \in S_{u}} \bra{\psi} M^{u}_o \ot H_h \ket{\psi}
+    \approx_{4\sqrt{\zeta_{\mathrm{variance}}}}
+    \E_{u} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
   \]
 \end{lemma}
 \begin{proof}
-  Expand $H_h$ by introducing a second point $v$. Two Cauchy--Schwarz steps move the two factors $A^v_{h(v)}$ from Bob's side to Alice's side, paying only the self-consistency error of $A$. Then use Lemma~\ref{lem:global-variance-of-points} twice to replace $A^v_{h(v)}$ by $A^u_{h(u)}$ while keeping $T_h$ fixed. The resulting error is $2\sqrt{2\delta}+2\sqrt{\zeta_{\mathrm{var}}}$, which the source simplifies to $4\sqrt{\zeta_{\mathrm{var}}}$ because $2\delta\le \zeta_{\mathrm{var}}$.
+  We begin by expanding
+  \begin{align}
+    \E_{u} \sum_{(o, h) \in S_{u}} \bra{\psi} M^{u}_o \ot H_h \ket{\psi}
+    &= \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} M^{u}_o \ot H^{v}_h \ket{\psi} \notag\\
+    &= \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} M^{u}_o \ot \bigl(A^{v}_{h(v)} \cdot T_h \cdot A^{v}_{h(v)}\bigr) \ket{\psi}. \label{eq:expand-that-H}
+  \end{align}
+  We claim that
+  \begin{equation}\label{eq:move-one}
+    \eqref{eq:expand-that-H}
+    \approx_{\sqrt{2\delta}}
+    \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o\bigr) \ot \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \ket{\psi}.
+  \end{equation}
+  To show this, we bound the magnitude of the difference:
+  \begin{multline}
+    \Big|\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \cdot \bigl(M^{u}_o \ot (T_h \cdot A^{v}_{h(v)})\bigr)\ket{\psi}\Big|\\
+    \leq
+    \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \ot T_h) \cdot \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \ket{\psi}}\\
+    \cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi}  M^{u}_o \ot \bigl(A^{v}_{h(v)} \cdot T_h\cdot  A^{v}_{h(v)}\bigr) \ket{\psi}}. \label{eq:move-one-cauchy-schwarz}
+  \end{multline}
+  The first factor is at most $\sqrt{2\delta}$ by Lemma~\ref{prop:simeq-to-approx} and the self-consistency of~$A$, while the second factor is at most~$1$ because $M^u$ and $H^v$ are submeasurements.
+
+  Next, we claim that
+  \begin{equation}\label{eq:move-another}
+    \eqref{eq:move-one}
+    \approx_{\sqrt{2\delta}}
+    \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}.
+  \end{equation}
+  Again, we bound the magnitude of the difference:
+  \begin{align}\label{eq:move-another-cauchy-schwarz}
+    &\Big|\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl((A^{v}_{h(v)} \cdot M^{u}_o) \ot T_h\bigr) \cdot \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr)  \ket{\psi}\Big| \notag\\
+    &\leq \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}} \\
+    &\qquad\cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \ot T_h) \cdot \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \ket{\psi}}. \notag
+  \end{align}
+  The first factor is at most~$1$ because $M$ is a submeasurement and $T$ is a measurement, and the second factor is the same expression as in~\eqref{eq:move-one-cauchy-schwarz}, hence at most $\sqrt{2\delta}$.
+
+  Having moved both copies of~$A$ to the left-hand side, we next show that
+  \begin{equation}\label{eq:change-one}
+    \eqref{eq:move-another}
+    \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
+    \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}.
+  \end{equation}
+  The difference is bounded by
+  \begin{multline}\label{eq:change-one-cauchy-schwarz}
+    \Big|\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}\Big|\\
+    \leq
+    \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot (A^{v}_{h(v)} - A^{u}_{h(u)})\bigr) \ot T_h  \ket{\psi}}\\
+    \cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}}.
+  \end{multline}
+  The second factor is at most~$1$, and the first is at most $\sqrt{\zeta_{\mathrm{variance}}}$ by Lemma~\ref{lem:global-variance-of-points} applied to the submeasurement~$T$.
+
+  Finally, we show that
+  \begin{equation}\label{eq:change-another}
+    \eqref{eq:change-one}
+    \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
+    \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{u}_{h(u)}\bigr) \ot T_h  \ket{\psi}.
+  \end{equation}
+  The same Cauchy--Schwarz estimate as in~\eqref{eq:change-one-cauchy-schwarz}, with the final copy of $A^v_{h(v)}$ replaced by $A^u_{h(u)}$, gives the same bound $\sqrt{\zeta_{\mathrm{variance}}}$ because the first factor is again at most~$1$ and the second is again controlled by Lemma~\ref{lem:global-variance-of-points}. Summing the four transports gives an error of $2\sqrt{2\delta} + 2\sqrt{\zeta_{\mathrm{variance}}}$, and the lemma follows from $2\delta \leq \zeta_{\mathrm{variance}}$.
 \end{proof}
+
+\section{Projective Output}
+\label{sec:self-improvement-projective}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
-  Let $G \in \polymeas{m}{q}{d}$ be a measurement such that, on average over $u \sim \F_q^m$,
-  \[
-    A_a^u \ot I \simeq_\nu I \ot G_{[g(u)=a]}.
-  \]
-  Set
-  \[
-    \zeta = 3000m\left(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right).
-  \]
-  Then there exists a projective submeasurement $H \in \polysub{m}{q}{d}$ such that:
+  Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
   \begin{enumerate}
-    \item if $H=\sum_h H_h$, then $\bra{\psi} H \ot I \ket{\psi} \ge (1-\nu)-\zeta$;
-    \item on average over $u \sim \F_q^m$,
+    \item (Consistency with~$A$): \label{item:self-improvement-projective-G-consistency} On average over $u \sim \F_q^{m}$,
     \[
-      A_a^u \ot I \simeq_\zeta I \ot H_{[h(u)=a]};
+      A^{u}_a \ot I \simeq_{\nu} I \ot G_{[g(u)=a]}.
     \]
-    \item $H_h \ot I \approx_\zeta I \ot H_h$;
-    \item there exists a positive semidefinite operator $Z$ such that
+  \end{enumerate}
+  Let
+  \[
+    \zeta = 3000m\cdot \Big(\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32}\Big).
+  \]
+  Then there exists a projective submeasurement $H \in \polysub{m}{q}{d}$ with the following properties:
+  \begin{enumerate}
+    \item (Completeness): \label{item:self-improvement-projective-completeness} If $H = \sum_h H_h$, then
     \[
-      \bra{\psi} Z \ot (I-H) \ket{\psi} \le \zeta,
+      \bra{\psi} H \ot I \ket{\psi} \geq (1-\nu)-\zeta.
     \]
-    and $Z \ge \E_u A_{h(u)}^u$ for every $h \in \polyfunc{m}{q}{d}$.
+    \item (Consistency with~$A$): \label{item:self-improvement-projective-A-consistency} On average over $u \sim \F_q^m$,
+    \[
+      A^u_a \ot I \simeq_{\zeta} I \ot H_{[h(u) = a]}.
+    \]
+    \item (Strong self-consistency): \label{item:self-improvement-projective-self}
+    \[
+      H_h \ot I \approx_{\zeta} I \ot H_h.
+    \]
+    \item (Boundedness): \label{item:self-improvement-projective-boundedness} There exists a positive-semidefinite matrix~$Z$ such that
+    \[
+      \bra{\psi} Z \ot (I - H) \ket{\psi} \leq \zeta
+    \]
+    and for each $h \in \polyfunc{m}{q}{d}$,
+    \[
+      Z \geq \left(\E_{u} A^{u}_{h(u)}\right).
+    \]
   \end{enumerate}
 \end{theorem}
 \begin{proof}
-  \uses{lem:self-improvement-helper, thm:orthonormalization, prop:self-consistency-implies-data-processing, prop:completeness-transfer-self-consistent-A, prop:triangle-sub, prop:two-notions-of-self-consistency}
-  Apply Lemma~\ref{lem:self-improvement-helper} to obtain a strongly self-consistent submeasurement $\widehat H$ with error
+  \uses{lem:self-improvement-helper, thm:orthonormalization, prop:self-consistency-implies-data-processing, prop:completeness-transfer-self-consistent-A, prop:triangle-sub, prop:two-notions-of-self-consistency, prop:triangle-inequality-for-approx_delta}
+  The bound is trivial if one of $\eps$, $\delta$, or $d/q$ is at least~$1$, so assume all three are at most~$1$. Apply Lemma~\ref{lem:self-improvement-helper} to~$G$ and let $\widehat H \in \polysub{m}{q}{d}$ be the output, with
   \[
-    \widehat\zeta = 100m\left(\eps^{1/2}+\delta^{1/2}+(d/q)^{1/2}\right).
+    \widehat{\zeta} = 100m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big).
   \]
-  Orthogonalization gives a nearby projective submeasurement $H$ with error $\widehat\zeta_{\mathrm{ortho}}=100\widehat\zeta^{1/4}$, and Lemma~\ref{prop:self-consistency-implies-data-processing} upgrades this to a post-processed comparison error $\widehat\zeta_{\mathrm{dataprocess}}=8\widehat\zeta+8\sqrt{\widehat\zeta_{\mathrm{ortho}}}$. The four properties are then transferred one by one: completeness by Lemma~\ref{prop:completeness-transfer-self-consistent-A}, consistency by Lemma~\ref{prop:triangle-sub}, self-consistency by Lemma~\ref{prop:two-notions-of-self-consistency} plus the triangle inequality for $\approx_\delta$, and boundedness by replacing $\widehat H_{[h(u)=a]}$ with $H_{[h(u)=a]}$ in the helper bound. The source keeps the intermediate errors explicit and checks that each of
+  By \ref{item:self-improvement-self} of Lemma~\ref{lem:self-improvement-helper},
   \[
-    2\widehat\zeta+2\sqrt{\widehat\zeta_{\mathrm{ortho}}}, \qquad
-    \widehat\zeta+\sqrt{\widehat\zeta_{\mathrm{dataprocess}}}, \qquad
-    6\widehat\zeta+6\widehat\zeta_{\mathrm{ortho}}
+    \sum_{h} \bra{\psi} \widehat{H}_h \ot \widehat{H}_h \ket{\psi}
+    \geq \bra{\psi} \widehat{H} \ot I \ket{\psi} - \widehat{\zeta}.
   \]
-  is at most $3000m(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32})$.
+  Therefore Theorem~\ref{thm:orthonormalization} supplies a projective submeasurement $H \in \polysub{m}{q}{d}$ such that
+  \begin{equation}\label{eq:approx-between-H-with-and-without-hat}
+    \widehat{H}_h \ot I \approx_{\widehat{\zeta}_{\mathrm{ortho}}} H_{h} \ot I,
+  \end{equation}
+  where
+  \[
+    \widehat{\zeta}_{\mathrm{ortho}} = 100 \widehat{\zeta}^{1/4}.
+  \]
+  In addition, Lemma~\ref{prop:self-consistency-implies-data-processing} implies that
+  \begin{equation}\label{eq:approx-data-processed}
+    \widehat{H}_{[h(u)=a]} \ot I \approx_{\widehat{\zeta}_{\mathrm{dataprocess}}} H_{[h(u)=a]} \ot I,
+  \end{equation}
+  where
+  \[
+    \widehat{\zeta}_{\mathrm{dataprocess}} = 8 \widehat{\zeta} + 8 \sqrt{\widehat{\zeta}_{\mathrm{ortho}}}.
+  \]
+
+  The four conclusions are transferred one by one.
+
+  \emph{Proof of \ref{item:self-improvement-projective-completeness}.}
+  Lemma~\ref{prop:completeness-transfer-self-consistent-A} implies
+  \[
+    \bra{\psi} H \ot I \ket{\psi}
+    \geq \bra{\psi} \widehat{H} \ot I \ket{\psi} - \widehat{\zeta} - 2\sqrt{\widehat{\zeta}_{\mathrm{ortho}}}
+    \geq (1-\nu) - 2\widehat{\zeta} - 2\sqrt{\widehat{\zeta}_{\mathrm{ortho}}},
+  \]
+  where the second inequality is \ref{item:self-improvement-completeness} of Lemma~\ref{lem:self-improvement-helper}.
+
+  \emph{Proof of \ref{item:self-improvement-projective-A-consistency}.}
+  Lemma~\ref{prop:triangle-sub} applied to \ref{item:self-improvement-A-consistency} of Lemma~\ref{lem:self-improvement-helper} and the post-processed comparison~\eqref{eq:approx-data-processed} gives
+  \[
+    A^u_a \ot I \simeq_{\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}}
+    I \ot H_{[h(u) = a]}.
+  \]
+
+  \emph{Proof of \ref{item:self-improvement-projective-self}.}
+  Lemma~\ref{prop:two-notions-of-self-consistency} implies
+  \[
+    \widehat{H}_h \ot I \approx_{2\widehat{\zeta}} I \ot \widehat{H}_h.
+  \]
+  Combining this with~\eqref{eq:approx-between-H-with-and-without-hat} on both sides and summing the three transports with Lemma~\ref{prop:triangle-inequality-for-approx_delta} yields
+  \[
+    H_h \ot I \approx_{6 \widehat{\zeta} + 6\widehat{\zeta}_{\mathrm{ortho}}} I \ot H_h.
+  \]
+
+  \emph{Proof of \ref{item:self-improvement-projective-boundedness}.}
+  The boundedness quantity is
+  \begin{align}
+    &\bra{\psi} Z \ot (I - H) \ket{\psi} \notag\\
+    ={}& \bra{\psi} Z \ot I \ket{\psi} - \sum_h \bra{\psi} Z \ot H_h \ket{\psi} \notag\\
+    \leq{}& \bra{\psi} Z \ot I \ket{\psi} - \sum_h \bra{\psi} \E_{u} A^{u}_{h(u)} \ot H_h \ket{\psi} \notag\\
+    ={}& \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_h \bra{\psi}  A^{u}_{h(u)} \ot H_h \ket{\psi} \notag\\
+    ={}& \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}. \label{eq:almost-there-self-improvement-edition}
+  \end{align}
+  Replacing $H_{[h(u)=a]}$ by $\widehat H_{[h(u)=a]}$ using~\eqref{eq:approx-data-processed} gives
+  \[
+    \eqref{eq:almost-there-self-improvement-edition}
+    \le \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot \widehat H_{[h(u)=a]} \ket{\psi} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}},
+  \]
+  and now \ref{item:self-improvement-boundedness} of Lemma~\ref{lem:self-improvement-helper} bounds this by $\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}$.
+
+  Thus the four conclusions hold with errors
+  \[
+    2\widehat{\zeta} + 2\sqrt{\widehat{\zeta}_{\mathrm{ortho}}},
+    \qquad
+    \widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}},
+    \qquad
+    6 \widehat{\zeta} + 6\widehat{\zeta}_{\mathrm{ortho}},
+    \qquad
+    \widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}},
+  \]
+  respectively. The paper's exponent bookkeeping then shows
+  \[
+    \widehat{\zeta}_{\mathrm{ortho}}
+    \leq 400 m \cdot \Big(\eps^{1/8} + \delta^{1/8} + (d/q)^{1/8}\Big),
+  \]
+  \[
+    \widehat{\zeta}_{\mathrm{dataprocess}}
+    \leq 960m \cdot \Big(\eps^{1/16} + \delta^{1/16} + (d/q)^{1/16}\Big),
+  \]
+  and hence
+  \[
+    6 \widehat{\zeta} + 6\widehat{\zeta}_{\mathrm{ortho}} \le \zeta,
+    \qquad
+    \widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}} \le \zeta.
+  \]
+  Since $2\widehat{\zeta} + 2\sqrt{\widehat{\zeta}_{\mathrm{ortho}}} \le \widehat{\zeta}_{\mathrm{dataprocess}} \le \zeta$, all four bounds are at most~$\zeta$.
 \end{proof}

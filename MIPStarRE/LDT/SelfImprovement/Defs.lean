@@ -30,20 +30,20 @@ noncomputable def averagedPointOperator (params : Parameters)
 /-- The operator `T_g A_g` contributing to the primal SDP objective. -/
 noncomputable def sdpPrimalContributionOperator (params : Parameters)
     (strategy : SymStrat params ι)
-    (T : Measurement (Polynomial params) ι)
+    (T : SubMeas (Polynomial params) ι)
     (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
   T.outcome g * averagedPointOperator params strategy g
 
 /-- The formal primal objective operator `Σ_g T_g A_g`. -/
 noncomputable def sdpPrimalObjectiveOperator (params : Parameters)
     (strategy : SymStrat params ι)
-    (T : Measurement (Polynomial params) ι) : MIPStarRE.Quantum.Op ι :=
+    (T : SubMeas (Polynomial params) ι) : MIPStarRE.Quantum.Op ι :=
   ∑ g : Polynomial params, sdpPrimalContributionOperator params strategy T g
 
 /-- The primal objective value `Σ_g Tr(T_g A_g)`. -/
 noncomputable def sdpPrimalObjective (params : Parameters)
     (strategy : SymStrat params ι)
-    (T : Measurement (Polynomial params) ι) : Error :=
+    (T : SubMeas (Polynomial params) ι) : Error :=
   Complex.re (Matrix.trace (sdpPrimalObjectiveOperator params strategy T))
 
 /-- The dual objective value `Tr(Z)`. -/
@@ -59,7 +59,7 @@ noncomputable def sdpDualSlackOperator (params : Parameters)
 /-- The complementary-slackness equation `T_g Z = T_g A_g`. -/
 def sdpComplementarySlacknessEquation (params : Parameters)
     (strategy : SymStrat params ι)
-    (T : Measurement (Polynomial params) ι)
+    (T : SubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) (g : Polynomial params) : Prop :=
   T.outcome g * Z =
     T.outcome g * averagedPointOperator params strategy g
@@ -67,7 +67,7 @@ def sdpComplementarySlacknessEquation (params : Parameters)
 /-- The pointwise sandwiched operator `H^u_h = A^u_{h(u)} T_h A^u_{h(u)}`. -/
 noncomputable def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
     (strategy : SymStrat params ι)
-    (T : Measurement (Polynomial params) ι)
+    (T : SubMeas (Polynomial params) ι)
     (u : Point params) (h : Polynomial params) : MIPStarRE.Quantum.Op ι :=
   let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
   Au * (T.outcome h) * Au
@@ -75,7 +75,7 @@ noncomputable def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
 /-- The pointwise sandwiched submeasurement `H^u = {H^u_h}`. -/
 noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
     (strategy : SymStrat params ι)
-    (T : Measurement (Polynomial params) ι) (u : Point params) :
+    (T : SubMeas (Polynomial params) ι) (u : Point params) :
     SubMeas (Polynomial params) ι :=
   { outcome := sandwichedPolynomialOutcomeOperatorAt params strategy T u
     total := ∑ h : Polynomial params,
@@ -122,7 +122,7 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
         _ ≤ ∑ a : Fq params, Au.toSubMeas.outcome a := by
               refine Finset.sum_le_sum ?_
               intro a _
-              -- The filtered sum ∑_{h: h(u)=a} T_h ≤ ∑_h T_h = I, hence ≤ 1
+              -- The filtered sum is bounded by the total operator, hence by `1`.
               have hfilt_le_one : ∑ h ∈ Finset.univ.filter
                   (fun h : Polynomial params => h u = a), T.outcome h ≤ 1 := by
                 calc ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
@@ -131,7 +131,7 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
                       Finset.sum_le_sum_of_subset_of_nonneg
                         (Finset.filter_subset _ _) (fun h _ _ => T.outcome_pos h)
                   _ = T.total := T.sum_eq_total
-                  _ = 1 := T.total_eq_one
+                  _ ≤ 1 := T.total_le_one
               simpa [Au.proj a] using
                 sandwich_mono
                   (M := Au.toSubMeas.outcome a)
@@ -145,7 +145,7 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
 /-- The averaged sandwiched submeasurement `H_h = E_u H^u_h`. -/
 noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
     (strategy : SymStrat params ι)
-    (T : Measurement (Polynomial params) ι) : SubMeas (Polynomial params) ι :=
+    (T : SubMeas (Polynomial params) ι) : SubMeas (Polynomial params) ι :=
   { outcome := fun h =>
       averageOperatorOverDistribution (uniformDistribution (Point params))
         (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
