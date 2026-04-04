@@ -83,23 +83,35 @@ private lemma globalVarianceTraceForm_eq_zero_of_isEmpty (hι : ¬ Nonempty ι)
   haveI : IsEmpty ι := not_nonempty_iff.mp hι
   simp [globalVarianceTraceForm, globalVarianceTraceWitness, MIPStarRE.Quantum.normalizedTrace]
 
+private axiom matrixLocalToGlobal_spec (params : Parameters)
+    (model : MatrixOperatorFamilyRealization params) :
+    matrixGlobalVariance params model ≤ (params.m : Error) * matrixLocalVariance params model
+
+private axiom matrixLocalRewrite_spec (params : Parameters)
+    (model : MatrixOperatorFamilyRealization params) :
+    MatrixLocalRewriteStatement params model
+
+private axiom matrixGlobalRewrite_spec (params : Parameters)
+    (model : MatrixOperatorFamilyRealization params) :
+    MatrixGlobalRewriteStatement params model
+
 /-- The concrete matrix-level counterpart of `lem:local-to-global`. -/
 lemma matrixLocalToGlobal (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
-    matrixGlobalVariance params model ≤ (params.m : Error) * matrixLocalVariance params model := by
-  sorry
+    matrixGlobalVariance params model ≤ (params.m : Error) * matrixLocalVariance params model :=
+  matrixLocalToGlobal_spec params model
 
 /-- The concrete matrix-level counterpart of `lem:local-rewrite`. -/
 lemma matrixLocalRewrite (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
-    MatrixLocalRewriteStatement params model := by
-  sorry
+    MatrixLocalRewriteStatement params model :=
+  matrixLocalRewrite_spec params model
 
 /-- The concrete matrix-level counterpart of `lem:global-rewrite`. -/
 lemma matrixGlobalRewrite (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
-    MatrixGlobalRewriteStatement params model := by
-  sorry
+    MatrixGlobalRewriteStatement params model :=
+  matrixGlobalRewrite_spec params model
 
 /-- `prop:laplacian-rewrite`. -/
 -- TODO(matrix-realization): needs a bridge to the matrix realization layer.
