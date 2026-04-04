@@ -3002,6 +3002,7 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
+    (hperm : PermInvState ψ)
     (hψ : ψ.IsNormalized)
     (A : Measurement Outcome ι) (B : SubMeas Outcome ι)
     (a0 : Outcome) (δ ζ : Error) :
@@ -3015,21 +3016,27 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
       (constSubMeasFamily (completeAtOutcome B a0).toSubMeas.liftLeft)
       (2 * δ + 4 * Real.sqrt δ + 2 * ζ) := by
   intro hbipartite hsdd
-  -- TODO(#139): Complete the bipartite-to-local bridge and Measurement.liftLeft
-  -- construction. The mathematical content is in closenessAfterCompletion_core_local
-  -- above; only the type-level plumbing remains.
-  sorry
+  -- Bridge: convert BipartiteSSCRel to local SSCRel on left-lifted families
+  have hlocal_ssc : SSCRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas.liftLeft) ζ :=
+    bipartiteSSC_implies_localSSC_liftLeft ψ hperm (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas) ζ
+      (fun _ a => Measurement.outcome_le_one A a)
+      (by simpa [constSubMeasFamily, IdxSubMeas.liftLeft] using hbipartite)
+  -- Call the local proof instantiated at ι × ι with lifted families
+  -- The local proof needs a Measurement on ι × ι; we construct it from A.liftLeft
+  sorry -- TODO(#139): construct Measurement.liftLeft and call closenessAfterCompletion_core_local
 
 /-- `prop:completing-to-measurement`.
 
-Note: the paper's hypothesis involves permutation-invariance, but the
-proof only uses the strong self-consistency bound `ζ` and the SDD bound `δ`.
-Permutation-invariance is not consumed by this lemma; it is passed through
-from upstream. -/
+The paper's hypothesis involves permutation-invariance; the bipartite
+completion proof needs `PermInvState` to bridge `BipartiteSSCRel` to the
+local `SSCRel` used in the algebraic completion bound. -/
 theorem completingToMeasurement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
+    (hperm : PermInvState ψ)
     (hψ : ψ.IsNormalized)
     (A : Measurement Outcome ι) (B : SubMeas Outcome ι)
     (a0 : Outcome) (δ ζ : Error) :
@@ -3044,7 +3051,7 @@ theorem completingToMeasurement {Outcome : Type*}
   exact ⟨completeAtOutcome B a0, {
     completionFormula := rfl
     closenessAfterCompletion :=
-      closenessAfterCompletion_core ψ hψ A B a0 δ ζ hsc hdist
+      closenessAfterCompletion_core ψ hperm hψ A B a0 δ ζ hsc hdist
   }⟩
 
 end MIPStarRE.LDT.Preliminaries
