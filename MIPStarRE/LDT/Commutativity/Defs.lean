@@ -218,7 +218,8 @@ noncomputable def evaluatedFromFullSliceProductRight (params : Parameters)
       (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- Internal stability family from the `G^y` insertion/removal step.
-On the bipartite space `d * d`. -/
+Each outcome is weighted by `I ⊗ √(G.outcome g_y)` on the right register
+before postprocessing. On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (G : SubMeas (Polynomial params) ι) :
@@ -232,16 +233,16 @@ noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters)
             (fullSliceFirstFactor params family xy)
             (fullSliceSecondFactor params family xy))
         (leftTensor (ι₂ := ι) ((fullSliceSecondFactor params family xy).total))
+    let w (gh : FullSliceOutcome params) :=
+      A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.2))
     let B : OpFamily (FullSliceOutcome params) (ι × ι) :=
-      { outcome := fun gh =>
-          A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.2))
-        total :=
-          ∑ gh : FullSliceOutcome params,
-            A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.2)) }
+      { outcome := w
+        total := ∑ gh, w gh }
     OpFamily.postprocess B (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- Internal stability family after removing the trailing `G^y`.
-On the bipartite space `d * d`. -/
+Each outcome is weighted by `I ⊗ √(G.outcome g_y)` on the right register
+before postprocessing. On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityOneRight (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (G : SubMeas (Polynomial params) ι) :
@@ -253,16 +254,16 @@ noncomputable def commDataProcessedGStabilityOneRight (params : Parameters)
         sandwichByOuterSubMeas
           (fullSliceFirstFactor params family xy)
           (fullSliceSecondFactor params family xy)
+    let w (gh : FullSliceOutcome params) :=
+      A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.2))
     let B : OpFamily (FullSliceOutcome params) (ι × ι) :=
-      { outcome := fun gh =>
-          A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.2))
-        total :=
-          ∑ gh : FullSliceOutcome params,
-            A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.2)) }
+      { outcome := w
+        total := ∑ gh, w gh }
     OpFamily.postprocess B (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- Internal stability family from the `G^x` insertion/removal step.
-On the bipartite space `d * d`. -/
+Each outcome is weighted by `I ⊗ √(G.outcome g_x)` on the right register
+before postprocessing. On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (G : SubMeas (Polynomial params) ι) :
@@ -273,16 +274,16 @@ noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
       appendRightTotalOpFamily
         (fullSliceProductLeft params strategy family xy)
         (leftTensor (ι₂ := ι) ((fullSliceFirstFactor params family xy).total))
+    let w (gh : FullSliceOutcome params) :=
+      A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.1))
     let B : OpFamily (FullSliceOutcome params) (ι × ι) :=
-      { outcome := fun gh =>
-          A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.1))
-        total :=
-          ∑ gh : FullSliceOutcome params,
-            A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.1)) }
+      { outcome := w
+        total := ∑ gh, w gh }
     OpFamily.postprocess B (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- Internal stability family after removing the trailing `G^x`.
-On the bipartite space `d * d`. -/
+Each outcome is weighted by `I ⊗ √(G.outcome g_x)` on the right register
+before postprocessing. On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters)
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (G : SubMeas (Polynomial params) ι) :
@@ -291,12 +292,11 @@ noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters)
     let xy := fullSliceQuestionOfEvaluatedSlice params q
     let A : OpFamily (FullSliceOutcome params) (ι × ι) :=
       fullSliceProductLeft params strategy family xy
+    let w (gh : FullSliceOutcome params) :=
+      A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.1))
     let B : OpFamily (FullSliceOutcome params) (ι × ι) :=
-      { outcome := fun gh =>
-          A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.1))
-        total :=
-          ∑ gh : FullSliceOutcome params,
-            A.outcome gh * rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gh.1)) }
+      { outcome := w
+        total := ∑ gh, w gh }
     OpFamily.postprocess B (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`.
