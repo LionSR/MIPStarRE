@@ -621,9 +621,8 @@ noncomputable def gHatSandwichFamily (params : Parameters)
 mass from the total operator. -/
 noncomputable def restrictSubMeas {α : Type*} [Fintype α]
     (A : SubMeas α ι) (p : α → Prop) [DecidablePred p] :
-    SubMeas α ι := by
-  classical
-  exact
+    SubMeas α ι :=
+  open Classical in
     { outcome := fun a => if p a then A.outcome a else 0
       total := ∑ a ∈ Finset.univ.filter p, A.outcome a
       outcome_pos := by
@@ -646,12 +645,11 @@ least `d + 1`, matching the `|τ| ≥ d+1` filter in the paper before interpolat
 noncomputable def interpolationEligibleSandwichFamily (params : Parameters)
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas (PointTuple params k) (GHatTupleOutcome params k) ι :=
-  fun xs => by
-    classical
-    exact
+  fun xs =>
+    open Classical in
       restrictSubMeas
         (gHatSandwichFamily params family k xs)
-        (interpolationEligibleTuple params)
+        (InterpolationEligible params)
 
 /-- Concrete family for the half-sandwich product of `k` completed slices. -/
 noncomputable def gHatHalfSandwichLeft (params : Parameters)

@@ -150,9 +150,9 @@ def gHatTupleType {params : Parameters} {k : ℕ}
 genuine polynomials rather than `⊥`. This matches the paper's support of the type
 `τ ∈ {0,1}^k`. -/
 noncomputable def gHatTupleSupport {params : Parameters} {k : ℕ}
-    (gs : GHatTupleOutcome params k) : Finset (Fin k) := by
-  classical
-  exact Finset.univ.filter fun i => (gs i).isSome
+    (gs : GHatTupleOutcome params k) : Finset (Fin k) :=
+  open Classical in
+    Finset.univ.filter fun i => (gs i).isSome
 
 /-- The Hamming weight of a completed-slice tuple. -/
 noncomputable def gHatTupleHammingWeight {params : Parameters} {k : ℕ}
@@ -161,7 +161,7 @@ noncomputable def gHatTupleHammingWeight {params : Parameters} {k : ℕ}
 
 /-- A completed-slice tuple is eligible for interpolation exactly when its type has
 Hamming weight at least `d + 1`, matching the paper's `|w| ≥ d+1` filter. -/
-def interpolationEligibleTuple (params : Parameters) {k : ℕ}
+def InterpolationEligible (params : Parameters) {k : ℕ}
     (gs : GHatTupleOutcome params k) : Prop :=
   params.d + 1 ≤ gHatTupleHammingWeight gs
 
@@ -218,7 +218,7 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
   | 0, _xs, _gs => fallbackInterpolatedPolynomial params
   | k + 1, xs, gs => by
       classical
-      exact if interpolationEligibleTuple params gs then
+      exact if InterpolationEligible params gs then
         -- Genuine slice indices
         let τ := gHatTupleSupport gs
         -- Evaluation points in the scalar field
