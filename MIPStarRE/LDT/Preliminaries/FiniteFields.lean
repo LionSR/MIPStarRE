@@ -7,7 +7,18 @@ import MIPStarRE.LDT.Basic.Parameters
 # Finite fields and Fourier orthogonality
 
 This file formalizes the finite-field trace and the two Fourier orthogonality facts
-from `references/ldt-paper/preliminaries.tex`.
+from `references/ldt-paper/preliminaries.tex` (lines 15–83).
+
+## Main results
+
+* `fourier_fact_scalar` (`prop:fourier-fact-scalar`):
+  `𝔼_{x ∈ 𝔽_q} ω^{tr[x·a]} = 1 if a = 0, 0 otherwise`
+* `fourier_fact_vector` (`prop:fourier-fact-vector`):
+  Vector version over `𝔽_q^m`.
+
+## References
+
+* `references/ldt-paper/preliminaries.tex`, lines 15–83
 -/
 
 open scoped BigOperators
@@ -93,16 +104,16 @@ private theorem ffChar_ne_zero : ffChar (p := p) (F := F) ≠ 0 := by
   intro h
   exact ha ((AddChar.IsPrimitive.zmod_char_eq_one_iff p (ZMod.isPrimitive_stdAddChar p) _).mp h)
 
-private theorem ffChar_isPrimitive : (ffChar (p := p) (F := F)).IsPrimitive := by
+private theorem ff_char_isPrimitive : (ffChar (p := p) (F := F)).IsPrimitive := by
   apply AddChar.IsPrimitive.of_ne_one
   simpa using (ffChar_ne_zero (p := p) (F := F))
 
-private theorem ffChar_mulShift_ne_zero {a : F} (ha : a ≠ 0) :
+private theorem ff_char_mulShift_ne_zero {a : F} (ha : a ≠ 0) :
     (ffChar (p := p) (F := F)).mulShift a ≠ 0 := by
-  simpa using (ffChar_isPrimitive (p := p) (F := F) ha)
+  simpa using (ff_char_isPrimitive (p := p) (F := F) ha)
 
 /-- Paper label `prop:fourier-fact-scalar`. -/
-theorem fourierFactScalar (a : F) :
+theorem fourier_fact_scalar (a : F) :
     𝔼 x : F, ffChar (p := p) (F := F) (x * a) =
       if a = 0 then (1 : ℂ) else 0 := by
   let ψ : AddChar F ℂ := (ffChar (p := p) (F := F)).mulShift a
@@ -116,7 +127,7 @@ theorem fourierFactScalar (a : F) :
           ext x
           simp [ψ, ha]
         simp [ha, hψ]
-      · have hψ : ψ ≠ 0 := ffChar_mulShift_ne_zero (p := p) (F := F) ha
+      · have hψ : ψ ≠ 0 := ff_char_mulShift_ne_zero (p := p) (F := F) ha
         simp [ha, hψ]
 
 section Vector
@@ -141,12 +152,12 @@ noncomputable def ffVecChar (v : Fin m → F) : AddChar (Fin m → F) ℂ :=
       ffChar (p := p) (F := F) (ffDotProduct u v) :=
   rfl
 
-private def singleVec (i : Fin m) (a : F) : Fin m → F :=
+private def Pi.single_vec (i : Fin m) (a : F) : Fin m → F :=
   Pi.single i a
 
-private theorem ffDotProduct_singleVec (i : Fin m) (a : F) (v : Fin m → F) :
-    ffDotProduct (singleVec i a) v = a * v i := by
-  unfold ffDotProduct singleVec
+private theorem ff_dotProduct_Pi.single_vec (i : Fin m) (a : F) (v : Fin m → F) :
+    ffDotProduct (Pi.single_vec i a) v = a * v i := by
+  unfold ffDotProduct Pi.single_vec
   rw [Finset.sum_eq_single i]
   · simp
   · intro j _ hji
@@ -171,13 +182,13 @@ private theorem ffVecChar_ne_zero {v : Fin m → F} (hv : v ≠ 0) :
     ffTrace_nondegenerate (p := p) (F := F) (a := v i) hi
   have hb : ffTrace (p := p) (F := F) (b * v i) ≠ 0 := by
     simpa [mul_comm] using hb0
-  refine ⟨singleVec i b, ?_⟩
-  rw [ffVecChar_apply, ffDotProduct_singleVec, ffChar_apply]
+  refine ⟨Pi.single_vec i b, ?_⟩
+  rw [ffVecChar_apply, ff_dotProduct_Pi.single_vec, ffChar_apply]
   intro h
   exact hb ((AddChar.IsPrimitive.zmod_char_eq_one_iff p (ZMod.isPrimitive_stdAddChar p) _).mp h)
 
 /-- Paper label `prop:fourier-fact-vector`. -/
-theorem fourierFactVector (v : Fin m → F) :
+theorem fourier_fact_vector (v : Fin m → F) :
     𝔼 u : (Fin m → F), ffVecChar (p := p) (F := F) v u =
       if v = 0 then (1 : ℂ) else 0 := by
   calc
