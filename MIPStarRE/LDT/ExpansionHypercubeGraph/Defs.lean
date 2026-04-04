@@ -238,7 +238,9 @@ abbrev combinedColumnIndex (params : Parameters) (ι : Type*) := Point params ×
 noncomputable def combinedOperator (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) :
     Matrix (combinedColumnIndex params ι) ι ℂ :=
-  fun ui j => A ui.1 ui.2 j
+  -- We store the columns of `(A u)ᴴ` so the trace witnesses match the
+  -- variance definitions based on `ρ * ((A u - A v)ᴴ * (A u - A v))`.
+  fun ui j => (A ui.1)ᴴ ui.2 j
 
 /-! ### Fourier analysis on the hypercube `F_q^m`
 

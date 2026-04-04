@@ -105,7 +105,10 @@ noncomputable def matrixCombinedOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     RectangularMatrixOperator model.space
       (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
-  fun ui j => model.family ui.1 ui.2 j
+  -- As in `combinedOperator`, we realize the witness using the columns of
+  -- `(A u)ᴴ`, which matches the matrix variance formulas for arbitrary
+  -- operator families.
+  fun ui j => (model.family ui.1)ᴴ ui.2 j
 
 /-- Bridge for the column-operator view used in the quadratic-form witnesses. -/
 noncomputable def matrixCombinedColumnOperator (params : Parameters)
