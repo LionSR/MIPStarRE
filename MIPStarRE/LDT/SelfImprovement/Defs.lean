@@ -38,18 +38,17 @@ noncomputable def sdpPrimalContributionOperator (params : Parameters)
 noncomputable def sdpPrimalObjectiveOperator (params : Parameters)
     (strategy : SymStrat params ι)
     (T : Measurement (Polynomial params) ι) : MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution (polynomialDistribution params)
-    (sdpPrimalContributionOperator params strategy T)
+  ∑ g : Polynomial params, sdpPrimalContributionOperator params strategy T g
 
 /-- The primal objective value `Σ_g Tr(T_g A_g)`. -/
 noncomputable def sdpPrimalObjective (params : Parameters)
     (strategy : SymStrat params ι)
     (T : Measurement (Polynomial params) ι) : Error :=
-  Complex.re (MIPStarRE.Quantum.normalizedTrace (sdpPrimalObjectiveOperator params strategy T))
+  Complex.re (Matrix.trace (sdpPrimalObjectiveOperator params strategy T))
 
 /-- The dual objective value `Tr(Z)`. -/
 noncomputable def sdpDualObjective (Z : MIPStarRE.Quantum.Op ι) : Error :=
-  Complex.re (MIPStarRE.Quantum.normalizedTrace Z)
+  Complex.re (Matrix.trace Z)
 
 /-- The dual slack operator `Z - A_g`. -/
 noncomputable def sdpDualSlackOperator (params : Parameters)

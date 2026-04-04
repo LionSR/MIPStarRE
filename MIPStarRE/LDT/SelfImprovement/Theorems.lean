@@ -58,11 +58,11 @@ noncomputable def addInULeftOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι)
     (S : AddInUSelection params Outcome)
-    (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
-  match addInUSelectionChoice params S u with
-  | some (o, h) =>
-      opTensor ((M u).outcome o) (H.outcome h)
-  | none => 0
+    (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) := by
+  classical
+  exact
+    ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
+      opTensor ((M u).outcome ah.1) (H.outcome ah.2)
 
 /-- The operator inside the right-hand side of `lem:add-in-u` at a fixed point `u`.
 Returns a bipartite operator `(Au * (M u).outcome o * Au) ⊗ T.outcome h`. -/
@@ -72,12 +72,12 @@ noncomputable def addInURightOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (M : IdxSubMeas (Point params) Outcome ι)
     (T : Measurement (Polynomial params) ι)
     (S : AddInUSelection params Outcome)
-    (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
-  match addInUSelectionChoice params S u with
-  | some (o, h) =>
-      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
-      opTensor (Au * (M u).outcome o * Au) (T.outcome h)
-  | none => 0
+    (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) := by
+  classical
+  exact
+    ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
+      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 u
+      opTensor (Au * (M u).outcome ah.1 * Au) (T.outcome ah.2)
 
 /-- The left-hand expectation in `lem:add-in-u`. -/
 noncomputable def addInULeftQuantity {Outcome : Type*} [Fintype Outcome] (params : Parameters)
@@ -104,10 +104,11 @@ noncomputable def addInURightQuantity {Outcome : Type*} [Fintype Outcome] (param
 /-- The pointwise matched operator `Σ_a A^u_a ⊗ H_[h(u)=a]`
 on the bipartite space `ι × ι`. -/
 noncomputable def helperAgreementOperatorAtPoint (params : Parameters)
-    (_strategy : SymStrat params ι)
-    (_H : SubMeas (Polynomial params) ι)
-    (_u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
-  0 -- placeholder: Σ_a A^u_a ⊗ H_[h(u)=a]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι)
+    (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
+  let Hu := evaluateAt params u H
+  ∑ a : Fq params, opTensor ((strategy.pointMeasurement u).outcome a) (Hu.outcome a)
 
 /-- The average operator `E_u Σ_a A^u_a ⊗ H_[h(u)=a]`
 on the bipartite space `ι × ι`. -/
