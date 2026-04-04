@@ -3145,6 +3145,8 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
     bipartiteSSC_implies_localSSC_liftLeft ψ hperm (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas) ζ
       (by simpa [constSubMeasFamily, IdxSubMeas.liftLeft] using hbipartite)
+    -- Lift A to a full Measurement on ι × ι: total_eq_one follows from
+  -- leftTensor 1 = 1 (Kronecker I ⊗ I = I on the product space).
   let A_lifted : Measurement Outcome (ι × ι) :=
     { toSubMeas := A.toSubMeas.liftLeft
       total_eq_one := by
