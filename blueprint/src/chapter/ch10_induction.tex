@@ -78,7 +78,7 @@
 \end{theorem}
 \begin{proof}
   \uses{thm:self-improvement, prop:completing-to-measurement, prop:simeq-data-processing, prop:triangle-sub, prop:two-notions-of-self-consistency}
-  Complete $G$ to a measurement by adjoining an extra outcome $\bot$. Apply Theorem~\ref{thm:self-improvement} to the completed measurement, then discard the $\bot$ outcome. The completeness, consistency, strong self-consistency, and boundedness estimates transfer back to the original polynomial outcomes exactly as in the completion bookkeeping from Lemma~\ref{prop:completing-to-measurement}; because the output is projective, the strong self-consistency statement is equivalent to the usual formulation by Lemma~\ref{prop:two-notions-of-self-consistency}.
+  Complete $G$ to a measurement by adjoining an extra outcome $\bot$. Apply Theorem~\ref{thm:self-improvement} to the completed measurement, then discard the $\bot$ outcome. By Lemma~\ref{prop:completing-to-measurement}, the completeness, consistency, strong self-consistency, and boundedness estimates transfer back to the original polynomial outcomes with an additive error from the missing mass $\bra{\psi} (I - \sum_g G_g) \ot I \ket{\psi}$. Since the output is projective, Lemma~\ref{prop:two-notions-of-self-consistency} converts the strong self-consistency statement to the usual bipartite formulation.
 \end{proof}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
@@ -308,7 +308,7 @@
     \qquad
     G_g^{\mathrm B} = (\bra{1} \ot I)\, G_g\, (\ket{1} \ot I).
   \]
-  These are POVMs on the original prover space. The same computation as in the source paper, using the vanishing of the cross-terms in $A_{\mathrm{sym}}$, gives
+  These are POVMs on the original prover space. Since $A_{\mathrm{sym}}$ is a convex combination of $(\ket{0}\bra{0} \ot I)$ and $(\ket{1}\bra{1} \ot I)$ weighted by the test probabilities, the cross-terms $\bra{0} \cdot A_{\mathrm{sym}} \cdot \ket{1}$ vanish. Expanding the consistency of $G$ gives
   \begin{gather}
     G_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{2\sigma} I \ot A_a^{\mathrm B,u}, \label{eq:cons-a}\\
     I \ot G_{[g(u)=a]}^{\mathrm B} \simeq_{2\sigma} A_a^{\mathrm A,u} \ot I. \label{eq:cons-b}
@@ -321,7 +321,7 @@
   \[
     G_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{2\sigma + 2\sqrt{3\eps+2\sigma}} I \ot G_{[g(u)=a]}^{\mathrm B}.
   \]
-  Expanding this consistency relation and using Lemma~\ref{lem:schwartz-zippel-individual} exactly as in the paper gives
+  Expanding this consistency relation and applying Lemma~\ref{lem:schwartz-zippel-individual} to replace point evaluations by polynomial evaluations (at cost $md/q$) gives
   \begin{equation}\label{eq:G-self-consistency}
     G_g^{\mathrm A} \ot I \simeq_{\zeta_1} I \ot G_g^{\mathrm B},
   \end{equation}

@@ -231,6 +231,109 @@ noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [Decidab
     total_le_one := A.total_le_one
   }
 
+/-- Distinct outcomes of a projective measurement are orthogonal. -/
+theorem ProjMeas.outcome_mul_outcome_eq_zero_of_ne
+    {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (P : ProjMeas α ι) {a b : α} (hab : a ≠ b) :
+    P.outcome a * P.outcome b = 0 := by
+  classical
+  let sandwiched := fun x => P.outcome b * P.outcome x * P.outcome b
+  have hsum :
+      ∑ x : α, sandwiched x = P.outcome b := by
+    calc
+      ∑ x : α, sandwiched x
+          = P.outcome b * (∑ x : α, P.outcome x) * P.outcome b := by
+              simp [sandwiched, Matrix.mul_sum, Matrix.sum_mul, mul_assoc]
+      _ = P.outcome b * 1 * P.outcome b := by
+            rw [P.toMeasurement.sum_eq]
+      _ = P.outcome b := by simp [P.proj b]
+  have hfiltered_zero :
+      ∑ x ∈ Finset.univ.filter (fun x => x ≠ b), sandwiched x = 0 := by
+    have hsplit :
+        ∑ x : α, sandwiched x =
+          ∑ x ∈ Finset.univ.filter (fun x => x ≠ b), sandwiched x + P.outcome b := by
+      rw [← Finset.sum_filter_add_sum_filter_not Finset.univ (fun x : α => x ≠ b) sandwiched]
+      have hone :
+          ∑ x ∈ Finset.univ.filter (fun x : α => ¬ x ≠ b), sandwiched x =
+            P.outcome b := by
+        rw [show Finset.univ.filter (fun x : α => ¬ x ≠ b) = {b} by
+              ext x
+              simp]
+        simp [sandwiched, P.proj b, mul_assoc]
+      rw [hone]
+    have hcancel :
+        ∑ x ∈ Finset.univ.filter (fun x => x ≠ b), sandwiched x + P.outcome b =
+          0 + P.outcome b := by
+      calc
+        ∑ x ∈ Finset.univ.filter (fun x => x ≠ b), sandwiched x + P.outcome b
+          = ∑ x : α, sandwiched x := hsplit.symm
+        _ = P.outcome b := hsum
+        _ = 0 + P.outcome b := by simp
+    simpa using add_right_cancel hcancel
+  have hsandwiched_nonneg :
+      0 ≤ sandwiched a := by
+    exact MIPStarRE.Quantum.sandwich_nonneg
+      (P.toMeasurement.toSubMeas.outcome_pos a)
+      (ProjMeas.outcome_hermitian P b)
+  have hsandwiched_le_zero :
+      sandwiched a ≤ 0 := by
+    calc
+      sandwiched a
+        ≤ ∑ x ∈ Finset.univ.filter (fun x => x ≠ b), sandwiched x := by
+            refine Finset.single_le_sum ?_ ?_
+            · intro x hx
+              exact MIPStarRE.Quantum.sandwich_nonneg
+                (P.toMeasurement.toSubMeas.outcome_pos x)
+                (ProjMeas.outcome_hermitian P b)
+            · simp [hab]
+      _ = 0 := hfiltered_zero
+  have hsandwiched_eq_zero : sandwiched a = 0 :=
+    le_antisymm hsandwiched_le_zero hsandwiched_nonneg
+  have hconj :
+      (P.outcome a * P.outcome b)ᴴ * (P.outcome a * P.outcome b) = 0 := by
+    calc
+      (P.outcome a * P.outcome b)ᴴ * (P.outcome a * P.outcome b)
+          = P.outcome b * (P.outcome a * (P.outcome a * P.outcome b)) := by
+              simp [Matrix.conjTranspose_mul, ProjMeas.outcome_hermitian P a,
+                ProjMeas.outcome_hermitian P b, mul_assoc]
+      _ = P.outcome b * ((P.outcome a * P.outcome a) * P.outcome b) := by
+            rw [mul_assoc]
+      _ = P.outcome b * (P.outcome a * P.outcome b) := by
+            rw [P.proj a]
+      _ = sandwiched a := by
+            simp [sandwiched, mul_assoc]
+      _ = 0 := hsandwiched_eq_zero
+  exact Matrix.conjTranspose_mul_self_eq_zero.mp hconj
+
+/-- Postprocessed outcomes from the same projective measurement commute. -/
+theorem ProjMeas.postprocess_outcome_commute
+    {α β γ : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype γ]
+    [Fintype ι] [DecidableEq ι]
+    (P : ProjMeas α ι) (f : α → β) (g : α → γ)
+    (b : β) (c : γ) :
+    (postprocess P.toSubMeas f).outcome b *
+      (postprocess P.toSubMeas g).outcome c =
+    (postprocess P.toSubMeas g).outcome c *
+      (postprocess P.toSubMeas f).outcome b := by
+  classical
+  simp only [postprocess]
+  simp_rw [Finset.sum_mul, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  refine Finset.sum_congr rfl ?_
+  intro y _
+  by_cases hxy : x = y
+  · subst hxy
+    simp [P.proj]
+  · have hyx : y ≠ x := by
+        intro hyx
+        exact hxy hyx.symm
+    simp [ProjMeas.outcome_mul_outcome_eq_zero_of_ne P hxy,
+      ProjMeas.outcome_mul_outcome_eq_zero_of_ne P hyx]
+
 /-- Complete a submeasurement by adjoining a distinguished failure outcome. -/
 noncomputable def completeSubMeas {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
