@@ -313,7 +313,10 @@ private lemma question_cabApproxDelta
     _ = ∑ a : OutcomeA, ev ψ ((A a - B a)ᴴ * (A a - B a)) := by
             simp
 
-/-- `prop:easy-approx-from-approx-delta`. -/
+/-- `prop:easy-approx-from-approx-delta`.
+
+If `A ≈_δ B` (sub-measurements) and `C` is a sub-measurement, then
+`|𝔼_x Σ_a ⟨ψ| A_a C_a |ψ⟩ - 𝔼_x Σ_a ⟨ψ| B_a C_a |ψ⟩| ≤ √δ`. -/
 theorem easyApproxFromApproxDelta
     {Question Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
@@ -346,7 +349,10 @@ theorem easyApproxFromApproxDelta
     _ ≤ Real.sqrt δ := by
           exact Real.sqrt_le_sqrt hAB.squaredDistanceBound
 
-/-- `prop:closeness-of-ip` (`eq:closeness3`). -/
+/-- `prop:closeness-of-ip` (`eq:closeness3`).
+
+If `A ≈_γ B` (raw matrices) and `Σ_a (Σ_b C_{a,b})(Σ_b C_{a,b})† ≤ I`, then
+`|𝔼_x Σ_{a,b} ⟨ψ| C_{a,b} A_a |ψ⟩ - 𝔼_x Σ_{a,b} ⟨ψ| C_{a,b} B_a |ψ⟩| ≤ √γ`. -/
 theorem closenessOfIP
     {Question OutcomeA OutcomeB : Type*} {ι : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
@@ -381,7 +387,10 @@ theorem closenessOfIP
     _ ≤ Real.sqrt γ := by
           exact Real.sqrt_le_sqrt hAB
 
-/-- `prop:closeness-of-ip` (`eq:closeness4`). -/
+/-- `prop:closeness-of-ip` (`eq:closeness4`, adjoint version).
+
+If `A† ≈_γ B†` and `Σ_a (Σ_b C_{a,b})†(Σ_b C_{a,b}) ≤ I`, then
+`|𝔼_x Σ_{a,b} ⟨ψ| A_a C_{a,b} |ψ⟩ - 𝔼_x Σ_{a,b} ⟨ψ| B_a C_{a,b} |ψ⟩| ≤ √γ`. -/
 theorem closenessOfIPAdjoint
     {Question OutcomeA OutcomeB : Type*} {ι : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
@@ -417,7 +426,10 @@ theorem closenessOfIPAdjoint
     _ ≤ Real.sqrt γ := by
           exact Real.sqrt_le_sqrt hAB
 
-/-- `prop:cab-approx-delta`. -/
+/-- `prop:cab-approx-delta`.
+
+If `A ≈_δ B` and `∀ x a, Σ_b (C_{a,b})† C_{a,b} ≤ I`, then
+`C_{a,b} A_a ≈_δ C_{a,b} B_a`. -/
 theorem cabApproxDelta
     {Question OutcomeA OutcomeB : Type*} {ι : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
