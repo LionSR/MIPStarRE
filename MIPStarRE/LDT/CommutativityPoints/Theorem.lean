@@ -113,55 +113,83 @@ theorem commutativityPoints
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     CommutativityPointsStatement params strategy eps delta gamma := by
+  have hsampledCons :
+      ConsRel strategy.state
+        (pointWithDiagonalLineDistribution params)
+        (IdxSubMeas.liftLeft (sampledPointMeasurement params strategy))
+        (IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy))
+        (restrictedDiagonalLinesConsistencyError params gamma) := by
+    /-
+    This is the diagonal-lines test, rewritten in the
+    `PointDiagonalLineQuestion` indexing used in this section.
+    Alice's point measurement is on the left factor, Bob's diagonal-line
+    measurement is on the right factor.
+    -/
+    let e := pointDiagonalLineQuestionEquiv params
+    have hrewrite :
+        consError strategy.state
+          (pointWithDiagonalLineDistribution params)
+          (IdxSubMeas.liftLeft (sampledPointMeasurement params strategy))
+          (IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy)) =
+        consError strategy.state
+          (uniformDistribution (DiagonalTestSample params))
+          (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+          (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)) := by
+      unfold consError
+      simpa [e, pointWithDiagonalLineDistribution, sampledPointMeasurement,
+        sampledDiagonalLineEvaluation, sampledPointFromDiagonalQuestion,
+        diagonalPointAnswerFamily, diagonalLineAnswerFamily] using
+          avgOver_uniform_equiv e
+            (fun q =>
+              qConsDefect strategy.state
+                ((IdxSubMeas.liftLeft (sampledPointMeasurement params strategy)) q)
+                ((IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy)) q))
+    constructor
+    rw [hrewrite]
+    have hγ : 0 ≤ gamma := by
+      exact le_trans (consError_nonneg strategy.state
+        (uniformDistribution (DiagonalTestSample params))
+        (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+        (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)))
+        hgood.diagonalLineTest
+    have hm : (1 : Error) ≤ params.m := by
+      exact_mod_cast params.hm
+    calc
+      consError strategy.state
+          (uniformDistribution (DiagonalTestSample params))
+          (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+          (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy))
+        ≤ gamma := hgood.diagonalLineTest
+      _ ≤ gamma * (params.m : Error) := by nlinarith
   refine
-    { sampledDiagonalLineConsistency := by
-        /-
-        This is the diagonal-lines test, rewritten in the
-        `PointDiagonalLineQuestion` indexing used in this section.
-        Alice's point measurement is on the left factor, Bob's diagonal-line
-        measurement is on the right factor.
-        -/
-        let e := pointDiagonalLineQuestionEquiv params
-        have hrewrite :
-            consError strategy.state
-              (pointWithDiagonalLineDistribution params)
-              (IdxSubMeas.liftLeft (sampledPointMeasurement params strategy))
-              (IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy)) =
-            consError strategy.state
-              (uniformDistribution (DiagonalTestSample params))
-              (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-              (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)) := by
-          unfold consError
-          simpa [e, pointWithDiagonalLineDistribution, sampledPointMeasurement,
-            sampledDiagonalLineEvaluation, sampledPointFromDiagonalQuestion,
-            diagonalPointAnswerFamily, diagonalLineAnswerFamily] using
-            avgOver_uniform_equiv e
-              (fun q =>
-                qConsDefect strategy.state
-                  ((IdxSubMeas.liftLeft (sampledPointMeasurement params strategy)) q)
-                  ((IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy)) q))
-        constructor
-        rw [hrewrite]
-        have hγ : 0 ≤ gamma := by
-          exact le_trans (consError_nonneg strategy.state
-            (uniformDistribution (DiagonalTestSample params))
-            (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-            (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)))
-            hgood.diagonalLineTest
-        have hm : (1 : Error) ≤ params.m := by
-          exact_mod_cast params.hm
-        calc
-          consError strategy.state
-              (uniformDistribution (DiagonalTestSample params))
-              (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-              (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy))
-            ≤ gamma := hgood.diagonalLineTest
-          _ ≤ gamma * (params.m : Error) := by nlinarith
+    { sampledDiagonalLineConsistency := hsampledCons
       sampledDiagonalLineApproximation := by
         /-
         Apply `prop:simeq-to-approx` to the previous consistency statement.
         -/
-        sorry
+        let A : IdxMeas (PointDiagonalLineQuestion params) (Fq params) ι :=
+          fun q => (strategy.pointMeasurement (sampledPointFromDiagonalQuestion params q)).toMeasurement
+        let B : IdxMeas (PointDiagonalLineQuestion params) (Fq params) ι :=
+          fun q =>
+            { toSubMeas := postprocess ((strategy.diagonalMeasurement q.1).toSubMeas) (fun f => f q.2)
+              total_eq_one := by
+                simpa [postprocess_total] using
+                  (strategy.diagonalMeasurement q.1).toMeasurement.total_eq_one }
+        have hcons :
+            ConsRel strategy.state
+              (pointWithDiagonalLineDistribution params)
+              (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A))
+              (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B))
+              (restrictedDiagonalLinesConsistencyError params gamma) := by
+          simpa [A, B, sampledPointMeasurement, sampledDiagonalLineEvaluation] using hsampledCons
+        have happrox :=
+          MIPStarRE.LDT.Preliminaries.simeqToApprox strategy.state
+            (pointWithDiagonalLineDistribution params)
+            A B (restrictedDiagonalLinesConsistencyError params gamma) hcons
+        rcases happrox with ⟨happrox⟩
+        exact ⟨by
+          simpa [A, B, sampledPointMeasurement, sampledDiagonalLineEvaluation,
+            pointDiagonalLineApproxError, restrictedDiagonalLinesConsistencyError] using happrox⟩
       orderedLiftToMixedBridge := by
         /-
         First replacement step in the paper:
