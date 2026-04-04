@@ -3,12 +3,15 @@ import Mathlib.Algebra.MvPolynomial.CommRing
 import Mathlib.RingTheory.MvPolynomial.Basic
 
 /-!
-Polynomial preliminaries from Section 4 of
-`references/ldt-paper/preliminaries.tex`.
+# Polynomial preliminaries
 
-This file packages the paper's low-individual-degree polynomial class together
+Packages the paper's low-individual-degree polynomial class together
 with Schwartz-Zippel bounds as thin wrappers around Mathlib's existing
 multivariate polynomial theorems.
+
+## References
+
+* `references/ldt-paper/preliminaries.tex`, Section 3 (Preliminaries)
 -/
 
 open Finset Fintype
@@ -69,17 +72,15 @@ private theorem agreementEvent_eq_zeroEvent_sub {m : ℕ} {K : Type*} [Field K] 
   ext x
   simp [MvPolynomial.eval_sub, sub_eq_zero]
 
-/-- `lem:schwartz-zippel-total-degree`.
-
-If two polynomials on `K^m` have total degree at most `d`, then the uniform
+/-- If two polynomials on `K^m` have total degree at most `d`, then the uniform
 agreement probability is at most `d / |K|`. -/
 theorem schwartzZippel_totalDegree {m d : ℕ} {K : Type*} [Field K] [Fintype K]
     [DecidableEq K] {g h : MvPolynomial (Fin m) K} (hneq : g ≠ h)
     (hg : g.totalDegree ≤ d) (hh : h.totalDegree ≤ d) :
     polynomialAgreementProbability m K g h ≤ d / Fintype.card K := by
   have hsub_ne : g - h ≠ 0 := sub_ne_zero.mpr hneq
-  have hsub_deg : (g - h).totalDegree ≤ d := by
-    exact (MvPolynomial.totalDegree_sub g h).trans (max_le hg hh)
+  have hsub_deg : (g - h).totalDegree ≤ d :=
+    (MvPolynomial.totalDegree_sub g h).trans (max_le hg hh)
   unfold polynomialAgreementProbability
   rw [agreementEvent_eq_zeroEvent_sub g h]
   calc
