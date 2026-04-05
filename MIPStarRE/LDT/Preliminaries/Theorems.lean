@@ -183,7 +183,7 @@ private lemma ev_leftTensor_mul_rightTensor_nonneg
         (Matrix.nonneg_iff_posSemidef.mp hX)
         (Matrix.nonneg_iff_posSemidef.mp hY)).nonneg
 
-private lemma qMatchMass_leftRight_postprocess_ge {α β : Type*}
+lemma qMatchMass_leftRight_postprocess_ge {α β : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype α] [Fintype β]
     (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) :
@@ -495,7 +495,7 @@ private lemma questionCabApproxDelta
           simp [D]
 
 /-- `prop:cab-approx-delta`. -/
-theorem cabApproxDelta
+theorem cabApproxDelta_raw
     {Question Outcome Aux : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [Fintype Aux]
@@ -1351,7 +1351,7 @@ theorem closenessOfInnerProduct_right
     simpa [Matrix.conjTranspose_mul] using ev_adjoint_eq ψ (B q a * C q a b)
   simpa [hA, hB] using hleft
 
-private lemma question_overlap_gap_left
+lemma question_overlap_gap_left
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
@@ -1429,7 +1429,7 @@ private lemma question_overlap_gap_left
             _ = ev ψ ((A.outcome a - B.outcome a) * A.outcome a) := by
                   simp [sub_mul]
 
-private lemma question_overlap_gap_right
+lemma question_overlap_gap_right
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
@@ -1505,7 +1505,7 @@ private lemma question_overlap_gap_right
                   simp [sub_mul]
 
 /-- `prop:easy-approx-from-approx-delta`. -/
-theorem easyApproxFromApproxDelta {Question Outcome : Type*}
+theorem easyApproxFromApproxDelta_twoFamily {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
@@ -3227,7 +3227,7 @@ The proof expands `qSDD ψ A.liftLeft A.liftRight`, uses
 `PermInvState.swap_ev` to identify the left and right square terms, and
 then reads off `∑ ev(A_a² ⊗ I) ≥ ∑ ev(A_a ⊗ A_a)` from
 `qSDD_nonneg`. -/
-private lemma bipartiteSSC_implies_localSSC_liftLeft {Question Outcome : Type*}
+lemma bipartiteSSC_implies_localSSC_liftLeft {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
@@ -3407,7 +3407,7 @@ private lemma closenessAfterCompletion_core_local {Outcome : Type*}
       |diagA - overlap| ≤ Real.sqrt δ ∧
         |overlap - diagB| ≤ Real.sqrt δ := by
     simpa [diagA, diagB, overlap, constSubMeasFamily, avgOver, uniformDistribution] using
-      easyApproxFromApproxDelta ψ (uniformDistribution Unit) hψ
+      easyApproxFromApproxDelta_twoFamily ψ (uniformDistribution Unit) hψ
         (uniformDistribution_weight_sum_le_one Unit)
         (constSubMeasFamily A.toSubMeas)
         (constSubMeasFamily B) δ (by exact ⟨hδ⟩)
