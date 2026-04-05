@@ -41,6 +41,7 @@ noncomputable def pullSndOpFamily {α β : Type*} [Fintype α] [Fintype β] {κ 
     [Fintype κ] [DecidableEq κ]
     (A : OpFamily β κ) : OpFamily (α × β) κ where
   outcome := fun ab => A.outcome ab.2
+  -- `total` is the sum over all pair outcomes, so each `A.outcome b` appears `card α` times.
   total := (Fintype.card α : ℂ) • A.total
 
 /-- Outcomewise tensor product of same-indexed raw families on opposite registers. -/
@@ -55,6 +56,8 @@ noncomputable def sameOutcomeTensorOpFamily {α : Type*} [Fintype α]
     ∑ a : α,
       leftTensor (ι₂ := ιB) (A.outcome a) *
         rightTensor (ι₁ := ιA) (B.outcome a)
+
+-- TODO: add total_le_one lemma for sameOutcomeTensorOpFamily/pullSndOpFamily
 
 /-- Sandwiched product `A_a B_b A_a`.
 
