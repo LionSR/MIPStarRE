@@ -2732,6 +2732,16 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
             simpa [bipartiteSSCError] using hssc
           exact mul_le_mul_of_nonneg_left hssc' (by norm_num)
 
+/-- For a constant `Unit`-indexed family, `consError` reduces to `qConsDefect`. -/
+lemma constFamily_cons_unit
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
+    consError ψ (uniformDistribution Unit)
+      (constSubMeasFamily A) (constSubMeasFamily B) =
+      qConsDefect ψ A B := by
+  simp [consError, avgOver, uniformDistribution, constSubMeasFamily]
+
 /-- For a constant `Unit`-indexed family, `sddError` reduces to `qSDD`. -/
 lemma constFamily_sdd_unit
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]

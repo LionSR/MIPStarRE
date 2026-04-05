@@ -215,46 +215,6 @@ structure BoundedByOperator {Outcome : Type*} {ι : Type*}
   witnessOpPSD : 0 ≤ Z
   upperBound : bndError ψ A Z ≤ δ
 
-/-- Consistency between a points measurement and a global polynomial submeasurement. -/
-structure ConsWithPolyEval {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters)
-    (ψ : QuantumState ι)
-    (A : IdxSubMeas (Point params) (Fq params) ι)
-    (G : SubMeas (Polynomial params) ι)
-    (δ : Error) : Prop where
-  evaluationConsistency :
-    ConsRel ψ (uniformDistribution (Point params))
-      A
-      (polynomialEvaluationFamily params G)
-      δ
-
-/-- Consistency between two global polynomial submeasurements.
-
-This is a thin wrapper over `ConsRel` specialized to the trivial question
-distribution `uniformDistribution Unit` and constant families
-`constSubMeasFamily G₁`, `constSubMeasFamily G₂`. It exists mostly to make
-high-level statements read closer to the paper; if it stops helping readability,
-it could be inlined at use sites without changing the underlying notion. -/
-structure PolyMeasCons {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters)
-    (ψ : QuantumState ι)
-    (G₁ G₂ : SubMeas (Polynomial params) ι)
-    (δ : Error) : Prop where
-  mutualConsistency :
-    ConsRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily G₁)
-      (constSubMeasFamily G₂)
-      δ
-
-/-- Strong self-consistency for a global polynomial submeasurement. -/
-structure PolyMeasSSC {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters)
-    (ψ : QuantumState (ι × ι)) (G : SubMeas (Polynomial params) ι) (_δ : Error) : Prop where
-  diagonalMassBound :
-    BipartiteSSCRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily G)
-      _δ
-
 /-! ### Nonnegativity lemmas for defect measures -/
 
 /-- The squared-distance defect is nonneg since each summand is `⟨ψ, M†M ψ⟩ ≥ 0`. -/

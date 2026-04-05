@@ -26,12 +26,13 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
     CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
       ((1 - nu) - selfImprovementInInductionError params eps delta gamma)
   pointConsistency :
-    ConsWithPolyEval params strategy.state
+    ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      H.toSubMeas.liftRight
+      (polynomialEvaluationFamily params H.toSubMeas.liftRight)
       (selfImprovementInInductionError params eps delta gamma)
   strongSelfConsistency :
-    PolyMeasSSC params strategy.state H.toSubMeas
+    BipartiteSSCRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily H.toSubMeas)
       (selfImprovementInInductionError params eps delta gamma)
   selfCloseness :
     SDDRel strategy.state (uniformDistribution Unit)
@@ -52,9 +53,9 @@ structure LdPastingInInductionSectionConclusion (params : Parameters)
     (H : Measurement (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   pointConsistency :
-    ConsWithPolyEval params.next strategy.state
+    ConsRel strategy.state (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      H.toSubMeas.liftRight
+      (polynomialEvaluationFamily params.next H.toSubMeas.liftRight)
       (ldPastingInInductionError params k eps delta gamma kappa zeta)
 
 /-- Bookkeeping data `x ↦ (ε_x, δ_x, γ_x)` for the restricted strategies. -/
