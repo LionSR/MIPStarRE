@@ -20,7 +20,7 @@ The short version is:
 
 ### 1.1 Generic Cauchy-Schwarz / inner-product facts
 
-From `Mathlib/Analysis/InnerProductSpace/Basic.lean`:
+From `Mathlib.Analysis.InnerProductSpace.Basic`:
 
 ```lean
 theorem norm_inner_le_norm (x y : E) : ‖⟪x, y⟫‖ ≤ ‖x‖ * ‖y‖
@@ -34,7 +34,7 @@ The local `ev_cauchy_schwarz` is the better API for this project.
 
 ### 1.2 Matrix order / PSD API
 
-From `Mathlib/Analysis/Matrix/Order.lean`:
+From `Mathlib.Analysis.Matrix.Order`:
 
 ```lean
 lemma le_iff {A B : Matrix n n 𝕜} : A ≤ B ↔ (B - A).PosSemidef
@@ -49,7 +49,7 @@ These are the main order-translation lemmas. Local code already uses them heavil
 
 ### 1.3 Sandwich / conjugation PSD lemmas
 
-From `Mathlib/LinearAlgebra/Matrix/PosDef.lean`:
+From `Mathlib.LinearAlgebra.Matrix.PosDef`:
 
 ```lean
 lemma conjTranspose_mul_mul_same {A : Matrix n n R} (hA : PosSemidef A) (B : Matrix n m R) :
@@ -71,7 +71,7 @@ These are exactly the PSD tools behind the local expectation-value positivity le
 
 ### 1.4 Trace identities
 
-From `Mathlib/LinearAlgebra/Matrix/Trace.lean`:
+From `Mathlib.LinearAlgebra.Matrix.Trace`:
 
 ```lean
 theorem trace_add (A B : Matrix n n R) : trace (A + B) = trace A + trace B

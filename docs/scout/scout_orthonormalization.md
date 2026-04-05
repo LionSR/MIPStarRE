@@ -13,7 +13,7 @@ Repository/toolchain inspected:
   - `MIPStarRE/LDT/Basic/SubMeasurement.lean`
 - Paper source read carefully:
   - `references/ldt-paper/orthonormalization.tex`
-- Mathlib API checked directly in the local checkout under `.lake/packages/mathlib/Mathlib`.
+- Mathlib API checked directly in the vendored Mathlib checkout.
 
 ## Executive summary
 
@@ -53,26 +53,26 @@ Observed types:
 
 Relevant Mathlib files and what they provide:
 
-- `Mathlib/Analysis/Matrix/Spectrum.lean`
+- `Mathlib.Analysis.Matrix.Spectrum`
   - `Matrix.IsHermitian.eigenvalues`
   - `Matrix.IsHermitian.eigenvectorBasis`
   - `Matrix.IsHermitian.eigenvectorUnitary`
   - `Matrix.IsHermitian.spectral_theorem`
-- `Mathlib/Analysis/Matrix/HermitianFunctionalCalculus.lean`
+- `Mathlib.Analysis.Matrix.HermitianFunctionalCalculus`
   - `Matrix.IsHermitian.cfc`
   - matrix-level continuous functional calculus built from the Hermitian spectral theorem
-- `Mathlib/Analysis/Matrix/Order.lean`
+- `Mathlib.Analysis.Matrix.Order`
   - deprecated `Matrix.PosSemidef.sqrt`
   - `CFC.sqrt_nonneg`
   - `CFC.sq_sqrt`
   - `CFC.sqrt_mul_sqrt_self`
   - `Matrix.PosSemidef.dotProduct_mulVec_zero_iff`
-- `Mathlib/Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Order.lean`
+- `Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order`
   - order lemmas for `sqrt` in star-ordered rings
 
 Negative search results:
 
-- `rg -n "innerMulLe_norm_mul_iff" .lake/packages/mathlib/Mathlib` returned nothing.
+- A search for `innerMulLe_norm_mul_iff` in the vendored Mathlib checkout returned nothing.
 - Searches for `svd`, `SVD`, `polar decomposition`, `polarDecomposition`, and matrix `Schur` diagonalization APIs returned no relevant matrix factorization API.
 - There is a `SchurComplement` API, but that is about block matrices, not Schur unitary triangularization.
 

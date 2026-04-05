@@ -152,7 +152,7 @@ Reason:
 
 - the paper's displayed formula is explicit, but Mathlib already identifies the finite-field trace
   abstractly and proves the Frobenius-sum formula.
-- `Mathlib/FieldTheory/Finite/Trace.lean` provides:
+- `Mathlib.FieldTheory.Finite.Trace` provides:
 
 ```lean
 FiniteField.algebraMap_trace_eq_sum_pow

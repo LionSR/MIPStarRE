@@ -4,7 +4,7 @@
 
 Mathlib already contains a dedicated multivariate Schwartz–Zippel development:
 
-- `.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/SchwartzZippel.lean`
+- `Mathlib.Algebra.MvPolynomial.SchwartzZippel`
 
 So the core lemma does **not** need to be proved from scratch if we work over an actual finite field carrier. The main gap is instead between:
 
@@ -17,7 +17,7 @@ That modeling choice is fine for prime `q`, but for general prime powers it is n
 
 ### 1. `MvPolynomial` core API
 
-From [Degrees.lean](.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/Degrees.lean):
+From `Mathlib.Algebra.MvPolynomial.Degrees`:
 
 ```lean
 /-- `degreeOf n p` gives the highest power of X_n that appears in `p` -/
@@ -52,7 +52,7 @@ def totalDegree (p : MvPolynomial σ R) : ℕ :=
 lemma degreeOf_le_totalDegree (f : MvPolynomial σ R) (i : σ) : f.degreeOf i ≤ f.totalDegree
 ```
 
-Also from [CommRing.lean](.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/CommRing.lean):
+Also from `Mathlib.Algebra.MvPolynomial.CommRing`:
 
 ```lean
 theorem totalDegree_sub (a b : MvPolynomial σ R) :
@@ -63,7 +63,7 @@ This is exactly the ingredient needed to pass from distinct `g, h` to a bound on
 
 ### 2. Subtypes for bounded degree
 
-From [RingTheory/MvPolynomial/Basic.lean](.lake/packages/mathlib/Mathlib/RingTheory/MvPolynomial/Basic.lean):
+From `Mathlib.RingTheory.MvPolynomial.Basic`:
 
 ```lean
 def restrictTotalDegree (m : ℕ) : Submodule R (MvPolynomial σ R)
@@ -84,7 +84,7 @@ This is the closest built-in Mathlib object to a syntactic version of `polyfunc{
 
 ### 3. Evaluation API
 
-From [Eval.lean](.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/Eval.lean):
+From `Mathlib.Algebra.MvPolynomial.Eval`:
 
 ```lean
 def eval₂ (p : MvPolynomial σ R) : S₁
@@ -104,7 +104,7 @@ These are the APIs the local code is already using.
 
 ### 4. Univariate root bounds
 
-From [Algebra/Polynomial/Roots.lean](.lake/packages/mathlib/Mathlib/Algebra/Polynomial/Roots.lean):
+From `Mathlib.Algebra.Polynomial.Roots`:
 
 ```lean
 theorem card_roots' (p : R[X]) : Multiset.card p.roots ≤ natDegree p
@@ -115,7 +115,7 @@ theorem card_roots_sub_C' {p : R[X]} {a : R} (hp0 : 0 < degree p) :
 
 This is the univariate base-case technology used inside the multivariate Schwartz–Zippel proof.
 
-There is also a finite-field image bound in [FieldTheory/Finite/Basic.lean](.lake/packages/mathlib/Mathlib/FieldTheory/Finite/Basic.lean):
+There is also a finite-field image bound in `Mathlib.FieldTheory.Finite.Basic`:
 
 ```lean
 theorem card_image_polynomial_eval [DecidableEq R] [Fintype R] {p : R[X]} (hp : 0 < p.degree) :
@@ -124,7 +124,7 @@ theorem card_image_polynomial_eval [DecidableEq R] [Fintype R] {p : R[X]} (hp : 
 
 ### 5. Schwartz–Zippel already exists
 
-From [SchwartzZippel.lean](.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/SchwartzZippel.lean):
+From `Mathlib.Algebra.MvPolynomial.SchwartzZippel`:
 
 ```lean
 lemma schwartz_zippel_sup_sum :
@@ -151,7 +151,7 @@ Important details:
 
 ### 6. Finite-field polynomial functions modulo pointwise equality
 
-From [FieldTheory/Finite/Polynomial.lean](.lake/packages/mathlib/Mathlib/FieldTheory/Finite/Polynomial.lean):
+From `Mathlib.FieldTheory.Finite.Polynomial`:
 
 ```lean
 def R [CommRing K] : Type u :=
@@ -167,7 +167,7 @@ This is very relevant to issue `#117`: Mathlib already has a canonical "polynomi
 
 ### 7. Other nearby finite-field solution counting
 
-From [FieldTheory/ChevalleyWarning.lean](.lake/packages/mathlib/Mathlib/FieldTheory/ChevalleyWarning.lean):
+From `Mathlib.FieldTheory.ChevalleyWarning`:
 
 ```lean
 theorem MvPolynomial.sum_eval_eq_zero (f : MvPolynomial σ K)

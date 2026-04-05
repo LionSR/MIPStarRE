@@ -10,7 +10,7 @@ This memo scouts the Chapter 3 proposition list from PR issue context and classi
 
 I checked two surfaces:
 
-1. **Mathlib-facing API already vendored in this repo** (`.lake/packages/mathlib/Mathlib/...`), especially additive-character and polynomial toolchains.
+1. **Mathlib-facing API already vendored in this repo**, especially additive-character and polynomial toolchains.
 2. **Current local LDT preliminaries scaffold** (`MIPStarRE/LDT/Preliminaries/Theorems.lean`, plus operator inequalities in `MIPStarRE/LDT/Basic/Operator.lean`).
 
 ---
@@ -34,7 +34,7 @@ These give exactly the finite additive-character sum vanishing/non-vanishing pri
 
 **Mathlib declarations and import path:**
 - Declarations: in namespace `AddChar`
-- File: `Mathlib/NumberTheory/LegendreSymbol/AddCharacter.lean`
+- Module: `Mathlib.NumberTheory.LegendreSymbol.AddCharacter`
 - Add import:
   ```lean
   import Mathlib.NumberTheory.LegendreSymbol.AddCharacter
@@ -66,7 +66,7 @@ These give exactly the finite additive-character sum vanishing/non-vanishing pri
 
 **What is available now:**
 - `MvPolynomial.eq_zero_of_eval_zero_at_prod_finset` (Combinatorial Nullstellensatz direction).
-- Homogeneous/evaluation machinery in `Mathlib/RingTheory/MvPolynomial/Homogeneous.lean` (`exists_eval_ne_zero_of_totalDegree_le_card_aux`, etc.).
+- Homogeneous/evaluation machinery in `Mathlib.RingTheory.MvPolynomial.Homogeneous` (`exists_eval_ne_zero_of_totalDegree_le_card_aux`, etc.).
 
 **Gap:**
 - No direct theorem named/packaged as “Schwartz–Zippel with explicit probability bound” in current API.

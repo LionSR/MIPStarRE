@@ -107,7 +107,7 @@ This matches the main finding of this scouting pass.
 
 ### 1. Finite-field carrier and cardinality
 
-File: `Mathlib/FieldTheory/Finite/GaloisField.lean`
+Module: `Mathlib.FieldTheory.Finite.GaloisField`
 
 ```lean
 def GaloisField := SplittingField (X ^ p ^ n - X : (ZMod p)[X])
@@ -123,7 +123,7 @@ theorem GaloisField.card (h : n ≠ 0) :
     Nat.card (GaloisField p n) = p ^ n
 ```
 
-File: `Mathlib/FieldTheory/Finite/Basic.lean`
+Module: `Mathlib.FieldTheory.Finite.Basic`
 
 ```lean
 theorem FiniteField.card (p : ℕ) [CharP K p] :
@@ -147,7 +147,7 @@ Usefulness:
 
 ### 2. Finite-field trace
 
-File: `Mathlib/FieldTheory/Finite/Trace.lean`
+Module: `Mathlib.FieldTheory.Finite.Trace`
 
 ```lean
 theorem FiniteField.trace_to_zmod_nondegenerate (F : Type*) [Field F] [Finite F]
@@ -178,7 +178,7 @@ What is slightly missing:
 
 ### 3. Additive-character core API
 
-File: `Mathlib/Algebra/Group/AddChar.lean`
+Module: `Mathlib.Algebra.Group.AddChar`
 
 ```lean
 def doubleDualEmb : A →+ AddChar (AddChar A M) M
@@ -189,7 +189,7 @@ lemma sum_eq_ite (ψ : AddChar A R) [Decidable (ψ = 0)] :
     ∑ a, ψ a = if ψ = 0 then ↑(card A) else 0
 ```
 
-File: `Mathlib/Analysis/Fourier/FiniteAbelian/Orthogonality.lean`
+Module: `Mathlib.Analysis.Fourier.FiniteAbelian.Orthogonality`
 
 ```lean
 lemma AddChar.expect_eq_ite (ψ : AddChar G R) :
@@ -204,7 +204,7 @@ Usefulness:
 
 ### 4. Primitive additive characters on finite fields
 
-File: `Mathlib/NumberTheory/LegendreSymbol/AddCharacter.lean`
+Module: `Mathlib.NumberTheory.LegendreSymbol.AddCharacter`
 
 ```lean
 def AddChar.IsPrimitive (ψ : AddChar R R') : Prop := ∀ ⦃a : R⦄, a ≠ 0 → mulShift ψ a ≠ 1
@@ -262,7 +262,7 @@ What is slightly missing:
 
 ### 5. `ZMod` characters and roots of unity
 
-File: `Mathlib/Analysis/SpecialFunctions/Complex/CircleAddChar.lean`
+Module: `Mathlib.Analysis.SpecialFunctions.Complex.CircleAddChar`
 
 ```lean
 noncomputable def ZMod.stdAddChar : AddChar (ZMod N) ℂ
@@ -292,7 +292,7 @@ Usefulness:
 
 ### 6. `ZMod` Fourier and duality API
 
-File: `Mathlib/Analysis/Fourier/FiniteAbelian/PontryaginDuality.lean`
+Module: `Mathlib.Analysis.Fourier.FiniteAbelian.PontryaginDuality`
 
 ```lean
 def AddChar.zmod (x : ZMod n) : AddChar (ZMod n) Circle
@@ -309,13 +309,13 @@ Usefulness:
 
 ### 7. Product/vector factorization support
 
-File: `Mathlib/Algebra/DirectSum/AddChar.lean`
+Module: `Mathlib.Algebra.DirectSum.AddChar`
 
 ```lean
 def AddChar.directSum (ψ : ∀ i, AddChar (G i) R) : AddChar (⨁ i, G i) R
 ```
 
-File: `Mathlib/Algebra/BigOperators/Expect.lean`
+Module: `Mathlib.Algebra.BigOperators.Expect`
 
 ```lean
 lemma Finset.expect_product (s : Finset ι) (t : Finset κ) (f : ι × κ → M) :
@@ -421,7 +421,7 @@ Why:
 - orthogonality is already in `AddChar.sum_eq_ite`, `AddChar.expect_eq_ite`,
   `AddChar.sum_mulShift`,
 - primitive-character support is already in
-  `Mathlib/NumberTheory/LegendreSymbol/AddCharacter.lean`.
+  `Mathlib.NumberTheory.LegendreSymbol.AddCharacter`.
 
 ### Best choice for `ω`
 

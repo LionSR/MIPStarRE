@@ -20,33 +20,33 @@
 
 ### Core norm and inner-product lemmas
 
-- `.lake/packages/mathlib/Mathlib/Analysis/Normed/Group/Basic.lean:772`
+- `Mathlib.Analysis.Normed.Group.Basic`
 
 ```lean
 theorem norm_sum_le {E} [SeminormedAddCommGroup E] (s : Finset ι) (f : ι → E) :
     ‖∑ i ∈ s, f i‖ ≤ ∑ i ∈ s, ‖f i‖
 ```
 
-- `.lake/packages/mathlib/Mathlib/Analysis/InnerProductSpace/Basic.lean:401`
+- `Mathlib.Analysis.InnerProductSpace.Basic`
 
 ```lean
 theorem norm_add_sq (x y : E) :
     ‖x + y‖ ^ 2 = ‖x‖ ^ 2 + 2 * re ⟪x, y⟫ + ‖y‖ ^ 2
 ```
 
-- `.lake/packages/mathlib/Mathlib/Analysis/InnerProductSpace/Basic.lean:454`
+- `Mathlib.Analysis.InnerProductSpace.Basic`
 
 ```lean
 theorem norm_inner_le_norm (x y : E) : ‖⟪x, y⟫‖ ≤ ‖x‖ * ‖y‖
 ```
 
-- `.lake/packages/mathlib/Mathlib/Analysis/InnerProductSpace/Basic.lean:462`
+- `Mathlib.Analysis.InnerProductSpace.Basic`
 
 ```lean
 theorem re_inner_le_norm (x y : E) : re ⟪x, y⟫ ≤ ‖x‖ * ‖y‖
 ```
 
-- `.lake/packages/mathlib/Mathlib/Analysis/InnerProductSpace/Basic.lean:390`
+- `Mathlib.Analysis.InnerProductSpace.Basic`
 
 ```lean
 theorem inner_self_eq_norm_sq (x : E) : re ⟪x, x⟫ = ‖x‖ ^ 2
@@ -56,28 +56,28 @@ There is no hit for `inner_mul_le_norm_mul_norm` in this snapshot; the usable cu
 
 ### Finite-sum squared inequalities
 
-- `.lake/packages/mathlib/Mathlib/Algebra/Order/Chebyshev.lean:137`
+- `Mathlib.Algebra.Order.Chebyshev`
 
 ```lean
 theorem sq_sum_le_card_mul_sum_sq :
     (∑ i ∈ s, f i) ^ 2 ≤ #s * ∑ i ∈ s, f i ^ 2
 ```
 
-- `.lake/packages/mathlib/Mathlib/Algebra/Order/Chebyshev.lean:120`
+- `Mathlib.Algebra.Order.Chebyshev`
 
 ```lean
 lemma pow_sum_le_card_mul_sum_pow (hf : ∀ i ∈ s, 0 ≤ f i) :
     ∀ n, (∑ i ∈ s, f i) ^ (n + 1) ≤ (#s : α) ^ n * ∑ i ∈ s, f i ^ (n + 1)
 ```
 
-- `.lake/packages/mathlib/Mathlib/Algebra/Order/BigOperators/Ring/Finset.lean:221`
+- `Mathlib.Algebra.Order.BigOperators.Ring.Finset`
 
 ```lean
 lemma sum_mul_sq_le_sq_mul_sq (s : Finset ι) (f g : ι → R) :
     (∑ i ∈ s, f i * g i) ^ 2 ≤ (∑ i ∈ s, f i ^ 2) * ∑ i ∈ s, g i ^ 2
 ```
 
-- `.lake/packages/mathlib/Mathlib/Algebra/Order/BigOperators/Ring/Finset.lean:106`
+- `Mathlib.Algebra.Order.BigOperators.Ring.Finset`
 
 ```lean
 lemma sum_sq_le_sq_sum_of_nonneg (hf : ∀ i ∈ s, 0 ≤ f i) :
@@ -86,7 +86,7 @@ lemma sum_sq_le_sq_sum_of_nonneg (hf : ∀ i ∈ s, 0 ≤ f i) :
 
 ### Square-root Cauchy-Schwarz for sums
 
-- `.lake/packages/mathlib/Mathlib/Data/Real/Sqrt.lean:489`
+- `Mathlib.Data.Real.Sqrt`
 
 ```lean
 lemma Real.sum_sqrt_mul_sqrt_le (s : Finset ι) (hf : ∀ i, 0 ≤ f i) (hg : ∀ i, 0 ≤ g i) :

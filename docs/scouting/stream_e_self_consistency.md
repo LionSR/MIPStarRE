@@ -21,15 +21,15 @@ and "bipartite SSC" for the overlap-based defect
 
 Useful Mathlib items:
 
-- `.lake/packages/mathlib/Mathlib/Analysis/Matrix/Order.lean:270`
+- `Mathlib.Analysis.Matrix.Order`
   `Matrix.PosSemidef.kronecker`
   Signature:
   `x.PosSemidef -> y.PosSemidef -> (Matrix.kroneckerMap (fun x y => x * y) x y).PosSemidef`
-- `.lake/packages/mathlib/Mathlib/LinearAlgebra/Matrix/Kronecker.lean:364`
+- `Mathlib.LinearAlgebra.Matrix.Kronecker`
   `Matrix.mul_kronecker_mul`
-- `.lake/packages/mathlib/Mathlib/LinearAlgebra/Matrix/Kronecker.lean:394`
+- `Mathlib.LinearAlgebra.Matrix.Kronecker`
   `Matrix.conjTranspose_kronecker`
-- `.lake/packages/mathlib/Mathlib/LinearAlgebra/Matrix/Kronecker.lean:398`
+- `Mathlib.LinearAlgebra.Matrix.Kronecker`
   `Matrix.conjTranspose_kronecker'`
 
 This is already enough for the repo's `leftTensor`, `rightTensor`, `opTensor` layer, and the local code is already using `Matrix.PosSemidef.kronecker` repeatedly.
@@ -38,16 +38,16 @@ This is already enough for the repo's `leftTensor`, `rightTensor`, `opTensor` la
 
 The most relevant Mathlib items I found are:
 
-- `.lake/packages/mathlib/Mathlib/LinearAlgebra/TensorProduct/Matrix.lean:56`
+- `Mathlib.LinearAlgebra.TensorProduct.Matrix`
   `TensorProduct.toMatrix_comm`
   This identifies `TensorProduct.comm` with a swap permutation matrix.
-- `.lake/packages/mathlib/Mathlib/LinearAlgebra/Matrix/Kronecker.lean:146`
+- `Mathlib.LinearAlgebra.Matrix.Kronecker`
   `Matrix.kroneckerMap_reindex`
-- `.lake/packages/mathlib/Mathlib/LinearAlgebra/Matrix/Kronecker.lean:153`
+- `Mathlib.LinearAlgebra.Matrix.Kronecker`
   `Matrix.kroneckerMap_reindex_left`
-- `.lake/packages/mathlib/Mathlib/LinearAlgebra/Matrix/Kronecker.lean:159`
+- `Mathlib.LinearAlgebra.Matrix.Kronecker`
   `Matrix.kroneckerMap_reindex_right`
-- `.lake/packages/mathlib/Mathlib/LinearAlgebra/Matrix/Kronecker.lean:398`
+- `Mathlib.LinearAlgebra.Matrix.Kronecker`
   `Matrix.conjTranspose_kronecker'`
   gives a `Prod.swap`-based reindexing formula.
 
@@ -57,7 +57,7 @@ Takeaway: Mathlib has the raw swap/reindex machinery, but the repo is not curren
 
 Useful Mathlib items:
 
-- `.lake/packages/mathlib/Mathlib/Algebra/BigOperators/Group/Finset/Basic.lean`
+- `Mathlib.Algebra.BigOperators.Group.Finset.Basic`
   `Finset.sum_fiberwise`
   Signature:
   `Finset.sum_fiberwise (s : Finset ι) (g : ι -> κ) (f : ι -> M) :

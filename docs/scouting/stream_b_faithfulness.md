@@ -93,7 +93,7 @@ From `MIPStarRE/LDT/Basic/Parameters.lean:688-712`, the repo already proves
 
 ### Schwartz–Zippel
 
-From `.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/SchwartzZippel.lean:192-203`:
+From `Mathlib.Algebra.MvPolynomial.SchwartzZippel`:
 
 ```lean
 lemma schwartz_zippel_totalDegree {n} {p : MvPolynomial (Fin n) R} (hp : p ≠ 0) (S : Finset R) :
@@ -104,7 +104,7 @@ This is already the one-polynomial version we need.
 
 ### `restrictDegree` really is individual degree
 
-From `.lake/packages/mathlib/Mathlib/RingTheory/MvPolynomial/Basic.lean:169-187`:
+From `Mathlib.RingTheory.MvPolynomial.Basic`:
 
 ```lean
 def restrictDegree (m : ℕ) : Submodule R (MvPolynomial σ R) :=
@@ -118,8 +118,7 @@ So `restrictDegree` is exactly per-variable degree bounded by `d`, not total deg
 
 ### Degree lemmas needed for the bridge
 
-From `.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/CommRing.lean:106-108` and
-`:193-198`:
+From `Mathlib.Algebra.MvPolynomial.CommRing`:
 
 ```lean
 theorem degreeOf_sub_le (i : σ) (p q : MvPolynomial σ R) :
@@ -129,7 +128,7 @@ theorem totalDegree_sub (a b : MvPolynomial σ R) :
     (a - b).totalDegree ≤ max a.totalDegree b.totalDegree
 ```
 
-From `.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/Degrees.lean:471-474`:
+From `Mathlib.Algebra.MvPolynomial.Degrees`:
 
 ```lean
 lemma degreeOf_le_totalDegree (f : MvPolynomial σ R) (i : σ) : f.degreeOf i ≤ f.totalDegree
@@ -141,8 +140,7 @@ but it is easy to prove locally from `totalDegree`, `degreeOf_le_iff`, and `Fins
 
 ### Function-level injectivity under degree `< q`
 
-From `.lake/packages/mathlib/Mathlib/FieldTheory/Finite/Polynomial.lean:154-157` and
-`:219-223`:
+From `Mathlib.FieldTheory.Finite.Polynomial`:
 
 ```lean
 def R [CommRing K] : Type u :=
@@ -205,8 +203,8 @@ variable {K : Type*} [Field K] [Fintype K] [DecidableEq K]
 - For `Parameters`, use `HonestFq params spec` when `spec : PrimePowerFieldSpec params`.
 - Only specialize to `Scalar params = ZMod params.q` when `params.q` is prime.
 
-This matches the paper and also matches Mathlib's hypothesis
-`[CommRing R] [IsDomain R]` in `SchwartzZippel.lean:62`.
+This matches the paper and also matches the hypotheses in
+`Mathlib.Algebra.MvPolynomial.SchwartzZippel`.
 
 ### 3. How should "distinct" be represented?
 
