@@ -526,22 +526,18 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \]
 \end{lemma}
 
+% prop:cool-prop from the paper is the same result as lem:self-consistency-same-side-square above.
+% We keep the label for cross-reference fidelity.
 \begin{proposition}\label{prop:cool-prop}
-  \uses{def:strong-self-consistency}
-  Let $A = \{A_a\}$ be a $\zeta$-strongly self-consistent submeasurement. Then
-  \begin{equation*}
-    \sum_a \bra{\psi} (A_a)^2 \otimes I \ket{\psi} \geq \sum_a \bra{\psi} A_a \otimes I \ket{\psi} -\zeta.
-  \end{equation*}
+  \uses{lem:self-consistency-same-side-square}
+  This is the same statement as Lemma~\ref{lem:self-consistency-same-side-square}: for a $\zeta$-strongly self-consistent submeasurement $A$,
+  \[
+    \sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi} \geq \sum_a \bra{\psi} A_a \ot I \ket{\psi} -\zeta.
+  \]
 \end{proposition}
 \begin{proof}
-  Cauchy--Schwarz gives
-  \begin{align}
-    \sum_a \bra{\psi} A_a \otimes A_a \ket{\psi}
-    &\leq \sqrt{\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}} \cdot \sqrt{\sum_a \bra{\psi} I \ot (A_a)^2 \ket{\psi}} \nonumber\\
-    &= \sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi}.
-    \label{eq:As-on-same-side-rewrite}
-  \end{align}
-  Combine \eqref{eq:As-on-same-side-rewrite} with the strong self-consistency inequality.
+  \uses{lem:self-consistency-same-side-square}
+  Immediate from Lemma~\ref{lem:self-consistency-same-side-square}.
 \end{proof}
 
 \begin{proof}[Proof of \ref{prop:completing-to-measurement}]
