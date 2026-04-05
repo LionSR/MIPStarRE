@@ -2,6 +2,7 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 
 /-!
 # Section 7 — Theorems
+-- TODO(#206): prove matrixLocalRewrite, matrixGlobalRewrite, matrixLocalToGlobal
 
 Output structures and theorem statements for the expansion / variance lemmas.
 -/
