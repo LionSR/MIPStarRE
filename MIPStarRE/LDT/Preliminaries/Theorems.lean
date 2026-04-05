@@ -534,16 +534,6 @@ theorem cabApproxDelta
                  total := ∑ ab : Outcome × Aux,
                    C q ab.1 ab.2 * (B q).outcome ab.1
                } : OpFamily (Outcome × Aux) ι))
-              ({ outcome := fun ab : Outcome × Aux =>
-                   C q ab.1 ab.2 * (A q).outcome ab.1
-                 total := ∑ ab : Outcome × Aux,
-                   C q ab.1 ab.2 * (A q).outcome ab.1
-               } : OpFamily (Outcome × Aux) ι)
-              ({ outcome := fun ab : Outcome × Aux =>
-                   C q ab.1 ab.2 * (B q).outcome ab.1
-                 total := ∑ ab : Outcome × Aux,
-                   C q ab.1 ab.2 * (B q).outcome ab.1
-               } : OpFamily (Outcome × Aux) ι))
         ≤ avgOver 𝒟
             (fun q => qSDDOp ψ (A q) (B q)) := by
               apply avgOver_mono
