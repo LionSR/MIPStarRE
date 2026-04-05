@@ -1,6 +1,6 @@
 # Scout Report: Middle-Layer `sorry` Sites
 
-Workspace: `/Users/siruilu/Local/agentFormalization/MIPStarRE`  
+Workspace: repo root (`.`)  
 Date: 2026-04-02
 
 ## Executive Summary
@@ -94,11 +94,11 @@ That will directly affect the helper boundedness part of `selfImprovementHelper`
 
 - Lean statement: `MIPStarRE/LDT/GlobalVariance/Theorems.lean:85-89`
 - Paper reference: `references/ldt-paper/expansion.tex`, `\label{lem:generalize-b}` in Section 7.2
-- What it says: matrix-level version of the Schwartz-Zippel argument comparing `[f(u)=g(u)]` with `[f=g|_ℓ]`.
+- What it says: matrix-level version of the Schwartz–Zippel argument comparing `[f(u)=g(u)]` with `[f=g|_ℓ]`.
 - Difficulty: Medium
 - Dependencies:
   - mostly finite-sum/operator bookkeeping
-  - Schwartz-Zippel style bound already used elsewhere in the project
+  - Schwartz–Zippel style bound already used elsewhere in the project
   - no dependence on the other five requested files
 - Independence: good first target inside this file
 
@@ -240,7 +240,7 @@ That will directly affect the helper boundedness part of `selfImprovementHelper`
 - Difficulty: High
 - Dependencies:
   - `commDataProcessedG`
-  - additional Schwartz-Zippel bookkeeping
+  - additional Schwartz–Zippel bookkeeping
   - `normalizationCondition` still appears in the proof of the second term
 - Independence: direct successor to `commDataProcessedG`
 

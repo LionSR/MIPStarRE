@@ -75,7 +75,7 @@ _Dated audit snapshot: this note records a 2026-03-21 organization review. It is
   - `blueprint/src/chapter/ch10_induction.tex`
   That means an active-track documentation file is now describing an older state of the blueprint.
 
-- `docs/20260320_ldt_blueprint_dependency_review.md` also reads as a historical review rather than a current synced guide. That would be fine on its own. The problem is that the README currently lists it among the main files to use for the active track. Some of the issues it flags have already been fixed in the blueprint, including the source-order wording in `ch01_overview.tex`, the missing Schwartz--Zippel dependency in `ch10_induction.tex`, and the split between the two self-improvement theorems. As an audit snapshot, the file is useful. As a current navigation document, it is stale.
+- `docs/20260320_ldt_blueprint_dependency_review.md` also reads as a historical review rather than a current synced guide. That would be fine on its own. The problem is that the README currently lists it among the main files to use for the active track. Some of the issues it flags have already been fixed in the blueprint, including the source-order wording in `ch01_overview.tex`, the missing Schwartz–Zippel dependency in `ch10_induction.tex`, and the split between the two self-improvement theorems. As an audit snapshot, the file is useful. As a current navigation document, it is stale.
 
 - `MIPStarRE.lean` imports both `MIPStarRE.Paper2111` and `MIPStarRE.Paper2009LDT`. That means the code-level entry point does not reflect the same active-vs-legacy boundary that the README is trying to communicate. A newcomer reading imports rather than prose will see both tracks presented as equally live.
 

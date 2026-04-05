@@ -4,13 +4,13 @@
 ### S0 (verified correct): 6 comments
 - thm:main-formal: all constants match ✅
 - lem:global-variance-of-points: coefficient 24m ✅
-- thm:com-main: Schwartz-Zippel removals ✅
+- thm:com-main: Schwartz–Zippel removals ✅
 - lem:truncated-type-sum-recurrence: recurrence ✅
 - thm:self-improvement-in-induction-section: completion reduction ✅
 - thm:main-formal proof cascade: ζ₁…ζ₄ and prefactor ✅
 
 ### S3 (compresses real work): 1 comment
-1. **ch09_pasting / lem:over-all-outcomes**: Key source argument hidden — linewise consistency event, unique interpolant h*, Schwartz-Zippel at index i* not outlined.
+1. **ch09_pasting / lem:over-all-outcomes**: Key source argument hidden — linewise consistency event, unique interpolant h*, Schwartz–Zippel at index i* not outlined.
 
 ### S4: 0 comments
 
@@ -50,7 +50,7 @@
 2. **Section7 / A_comb normalization**: Lean uses average instead of unnormalized sum; changes trace identities.
 3. **Section7 / combined operator**: Matrix witness uses ⟨u|⟨u| ⊗ A^u instead of column operator; wrong quadratic forms.
 4. **Section8 / weighted state**: matrixPolynomialWeightSqrtOperator = G_g (no square root); tensor-factor placement missing.
-5. **Section8 / answer space**: Line/polynomial answers are arbitrary functions, not degree-bounded; enlarges Schwartz-Zippel domain.
+5. **Section8 / answer space**: Line/polynomial answers are arbitrary functions, not degree-bounded; enlarges Schwartz–Zippel domain.
 
 ---
 

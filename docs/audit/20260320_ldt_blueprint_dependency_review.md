@@ -55,7 +55,7 @@ _Dated review snapshot: this note records the 2026-03-20 dependency review. Some
   But the source proof of `lem:orthonormalization-main-lemma` runs through a long internal chain including `lem:projective-non-measurement`, `lem:trunc-inequality`, `lem:projective-low-rank-sum`, `lem:Q-completeness`, `lem:sqrt-Q-completeness`, `lem:q-almost-projective`, and the SVD-based sequence `lem:qa-restated`, `lem:X-squared`, `lem:X-expression-to-Q-expression`, `lem:pa-restated`, `lem:X-hat-squared`, `lem:X-times-X-hat`, `lem:squared-difference`, `lem:P-projectivity`, `lem:P-Q-approx`. For dependency estimation, the current blueprint makes this chapter look cheaper than it is.
 
 - There are a few likely missing or too-implicit dependency edges in the rebuilt blueprint:
-  - The proof of `thm:main-formal` in `ch10_induction.tex` explicitly says that Schwartz--Zippel is used to turn pointwise agreement into self-consistency of the global measurements, but its `\uses{...}` list omits `lem:schwartz-zippel-individual`.
+  - The proof of `thm:main-formal` in `ch10_induction.tex` explicitly says that Schwartz–Zippel is used to turn pointwise agreement into self-consistency of the global measurements, but its `\uses{...}` list omits `lem:schwartz-zippel-individual`.
   - The proof paragraph for `lem:over-all-outcomes` in `ch09_pasting.tex` cites `lem:h-b-consistency` in prose, but the direct dependency list only names lower-level ingredients. This may be intentional, but it means the text-level and graph-level ownership are not perfectly aligned.
 
 - Several blueprint nodes are blueprint-owned helper abstractions rather than paper-labeled results:
@@ -106,7 +106,7 @@ _Dated review snapshot: this note records the 2026-03-20 dependency review. Some
   - the quantum-information semantics of submeasurements on a bipartite state;
   - the comparison lemmas between `\simeq` and `\approx` in exactly the paper’s operator language.
 - External/non-Mathlib ingredients:
-  - the exact Schwartz--Zippel estimate used in the paper is not something I would expect to import verbatim; likely a short local proof or wrapper, possibly assisted by `Nullstellensatz`, but still not a one-line reuse.
+  - the exact Schwartz–Zippel estimate used in the paper is not something I would expect to import verbatim; likely a short local proof or wrapper, possibly assisted by `Nullstellensatz`, but still not a one-line reuse.
 
 ## `blueprint/src/chapter/ch04_projective.tex`
 
@@ -155,12 +155,12 @@ _Dated review snapshot: this note records the 2026-03-20 dependency review. Some
   - finite sums and probability/expectation over finite types.
 - Likely thin local wrappers:
   - evaluating a polynomial-valued submeasurement at a point and restricting to a line;
-  - specialized uses of Schwartz--Zippel to compare `B^\ell_{[f(u)=g(u)]}` with `B^\ell_{g|_\ell}`.
+  - specialized uses of Schwartz–Zippel to compare `B^\ell_{[f(u)=g(u)]}` with `B^\ell_{g|_\ell}`.
 - Likely substantial new local development:
   - the measurement-specific local variance estimate `lem:local-variance-of-points`;
   - the packaging of `A^u_{g(u)} \otimes (G_g)^{1/2}` as an honest state-dependent distance statement.
 - External/non-Mathlib ingredients:
-  - no new external theorem beyond Schwartz--Zippel.
+  - no new external theorem beyond Schwartz–Zippel.
 
 ## `blueprint/src/chapter/ch07_self_improvement.tex`
 
@@ -193,7 +193,7 @@ _Dated review snapshot: this note records the 2026-03-20 dependency review. Some
   - repeated use of state-dependent distance lemmas in a measurement-specific setting.
 - Likely substantial new local development:
   - the approximate commutation estimates themselves (`thm:commutativity-points`, `lem:comm-data-processed-g`, `thm:com-main`);
-  - the quartic-expression bookkeeping and the evaluation/removal steps via Schwartz--Zippel.
+  - the quartic-expression bookkeeping and the evaluation/removal steps via Schwartz–Zippel.
 - External/non-Mathlib ingredients:
   - no obvious external black box beyond the paper’s own argument.
 
@@ -231,7 +231,7 @@ _Dated review snapshot: this note records the 2026-03-20 dependency review. Some
   - the final assembly of the error bookkeeping;
   - the final passage from pointwise consistency to global measurement self-consistency.
 - Structural warning:
-  - the final proof text clearly uses Schwartz--Zippel, but the dependency list in the blueprint should say so explicitly.
+  - the final proof text clearly uses Schwartz–Zippel, but the dependency list in the blueprint should say so explicitly.
 
 # Likely Mathlib-supported pieces
 
@@ -258,7 +258,7 @@ _Dated review snapshot: this note records the 2026-03-20 dependency review. Some
   - `AddChar.FiniteField.primitiveChar_to_Complex`, `AddChar.sum_eq_zero_of_ne_one`, `AddChar.sum_mulShift` in `Mathlib.NumberTheory.LegendreSymbol.AddCharacter`.
 
 - **Polynomial vanishing machinery**:
-  - `MvPolynomial.eq_zero_of_eval_zero_at_prod_finset` in `Mathlib.Combinatorics.Nullstellensatz` is a serious reusable ingredient, even if it does not directly replace the exact Schwartz--Zippel lemma used in the paper.
+  - `MvPolynomial.eq_zero_of_eval_zero_at_prod_finset` in `Mathlib.Combinatorics.Nullstellensatz` is a serious reusable ingredient, even if it does not directly replace the exact Schwartz–Zippel lemma used in the paper.
 
 - **Scalar probability / concentration**:
   - `ProbabilityTheory.measure_ge_le_exp_mul_mgf` in `Mathlib.Probability.Moments.Basic`;
@@ -318,7 +318,7 @@ _Dated review snapshot: this note records the 2026-03-20 dependency review. Some
 
 - **The exact normalized hypercube spectral package** is not present as a reusable library result. Generic graph APIs are weaker than what this paper uses.
 
-- **The exact Schwartz--Zippel statement used repeatedly in the paper** is not obviously present under that name. This should be regarded as a short local development item rather than assumed Mathlib support.
+- **The exact Schwartz–Zippel statement used repeatedly in the paper** is not obviously present under that name. This should be regarded as a short local development item rather than assumed Mathlib support.
 
 - **External/literature-driven ingredients still worth recording explicitly**:
   - Kempe--Vidick orthogonalization (`KV11`);
