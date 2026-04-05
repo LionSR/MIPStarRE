@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.Preliminaries.Theorems
+import MIPStarRE.LDT.Preliminaries.CauchySchwarz
+import MIPStarRE.LDT.Preliminaries.Triangles
 
 /-!
 # Self-Consistency Extensions
@@ -6,10 +7,8 @@ import MIPStarRE.LDT.Preliminaries.Theorems
 Additional proposition statements from
 `references/ldt-paper/preliminaries.tex`.
 
-Four of these five propositions are now fully proved. The remaining 
+All five propositions from the paper are now fully proved. 
 This file records the exact signatures together with proof-sketch comments
-as `selfConsistencyImpliesDataProcessing` uses a `sorry` placeholder pending the
-full 70-line paper proof.
 
 -/
 
@@ -440,6 +439,241 @@ Proof sketch:
    `A_[f] ⊗ I ≈_{2δ} I ⊗ A_[f]`.
 3. Use the `SDDRel` triangle inequality to conclude
    `P_[f] ⊗ I ≈_{8δ + 8√ε} A_[f] ⊗ I`. -/
+private lemma wrongSideEstimate
+    {Question α β : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype α] [Fintype β]
+    (ψ : QuantumState (ι × ι))
+    (hperm : PermInvState ψ)
+    (hψ : ψ.IsNormalized)
+    (𝒟 : Distribution Question)
+    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
+    (A : IdxSubMeas Question α ι)
+    (P : IdxProjSubMeas Question α ι)
+    (δ ε : Error) (f : α → β) :
+    BipartiteSSCRel ψ 𝒟 A δ →
+    SDDRel ψ 𝒟
+      (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas P))
+      (IdxSubMeas.liftLeft A) ε →
+      SDDRel ψ 𝒟
+        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
+        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
+        (2 * δ + 4 * Real.sqrt ε) := by
+  intro hssc ⟨hε⟩
+  let PL : IdxProjSubMeas Question α (ι × ι) := fun q =>
+    { toSubMeas := ((P q).toSubMeas).liftLeft
+      proj := by
+        intro a
+        simp [SubMeas.liftLeft, leftTensor_mul_leftTensor, (P q).proj a] }
+  let LPf : IdxSubMeas Question β (ι × ι) :=
+    IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f)
+  let RAf : IdxSubMeas Question β (ι × ι) :=
+    IdxSubMeas.liftRight (fun q => postprocess (A q) f)
+  let crossPost : Question → Error := fun q =>
+    qMatchMass ψ (LPf q) (RAf q)
+  let crossOrig : Question → Error := fun q =>
+    qMatchMass ψ
+      ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas P)) q)
+      ((IdxSubMeas.liftRight A) q)
+  let overlapA : Question → Error := fun q =>
+    qMatchMass ψ ((IdxSubMeas.liftLeft A) q) ((IdxSubMeas.liftRight A) q)
+  have hcomp :
+      CompTransferStmt ψ 𝒟 (IdxSubMeas.liftLeft A) PL ε := by
+    apply completenessTransferProjectiveP ψ 𝒟 hψ h𝒟 (IdxSubMeas.liftLeft A) PL ε
+    exact
+      sddRel_symm ψ 𝒟
+        (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas P))
+        (IdxSubMeas.liftLeft A) ε
+        ⟨hε⟩
+  have hmassP :
+      idxSubMeasMass ψ 𝒟 LPf ≤
+        idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) + 2 * Real.sqrt ε := by
+    have hpost :
+        idxSubMeasMass ψ 𝒟 LPf =
+          idxSubMeasMass ψ 𝒟 (IdxProjSubMeas.toIdxSubMeas PL) := by
+      unfold idxSubMeasMass subMeasMass avgOver LPf PL
+      refine Finset.sum_congr rfl ?_
+      intro q hq
+      change
+        𝒟.weight q *
+            ev ψ (((postprocess ((P q).toSubMeas) f).liftLeft).total) =
+          𝒟.weight q * ev ψ ((((P q).toSubMeas).liftLeft).total)
+      simp [SubMeas.liftLeft, postprocess_total]
+    have hbase := hcomp.completenessTransfer
+    rw [hpost]
+    linarith
+  have hmassA :
+      idxSubMeasMass ψ 𝒟 RAf =
+        idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) := by
+    unfold idxSubMeasMass subMeasMass avgOver RAf
+    refine Finset.sum_congr rfl ?_
+    intro q hq
+    change
+      𝒟.weight q *
+          ev ψ (rightTensor (ι₁ := ι) ((postprocess (A q) f).total)) =
+        𝒟.weight q * ev ψ (leftTensor (ι₂ := ι) ((A q).total))
+    rw [postprocess_total, ← hperm.swap_ev ((A q).total)]
+  have hcross_post_ge :
+      avgOver 𝒟 crossPost ≥ avgOver 𝒟 crossOrig := by
+    unfold avgOver crossPost crossOrig
+    refine Finset.sum_le_sum ?_
+    intro q hq
+    exact mul_le_mul_of_nonneg_left
+      (qMatchMass_leftRight_postprocess_ge ψ ((P q).toSubMeas) (A q) f)
+      (𝒟.nonnegative q)
+  have hcross_close :
+      |avgOver 𝒟 crossOrig - avgOver 𝒟 overlapA| ≤ Real.sqrt ε := by
+    simpa [crossOrig, overlapA, qMatchMass, IdxProjSubMeas.toIdxSubMeas,
+      IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
+      easyApproxFromApproxDelta ψ hψ 𝒟 h𝒟
+        (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas P))
+        (IdxSubMeas.liftLeft A)
+        (IdxSubMeas.liftRight A)
+        ε
+        ⟨hε⟩
+  have hcross_ge :
+      avgOver 𝒟 crossPost ≥ avgOver 𝒟 overlapA - Real.sqrt ε := by
+    linarith [hcross_post_ge, (abs_le.mp hcross_close).1]
+  have hssc_gap :
+      idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) - avgOver 𝒟 overlapA ≤ δ := by
+    rcases hssc with ⟨hssc⟩
+    calc
+      idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) - avgOver 𝒟 overlapA
+        = avgOver 𝒟
+            (fun q =>
+              subMeasMass ψ ((IdxSubMeas.liftLeft A) q) - overlapA q) := by
+              unfold idxSubMeasMass subMeasMass avgOver overlapA
+              rw [← Finset.sum_sub_distrib]
+              refine Finset.sum_congr rfl ?_
+              intro q hq
+              ring
+      _ ≤ avgOver 𝒟 (fun q => qBipartiteSSCDefect ψ (A q)) := by
+            apply avgOver_mono
+            intro q
+            have hdef :
+                qBipartiteSSCDefect ψ (A q) =
+                  max 0 (subMeasMass ψ ((IdxSubMeas.liftLeft A) q) - overlapA q) := by
+              simp [qBipartiteSSCDefect, overlapA, qMatchMass, subMeasMass,
+                IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
+                SubMeas.liftLeft, SubMeas.liftRight,
+                leftTensor_mul_rightTensor_eq_opTensor]
+            rw [hdef]
+            exact le_max_right 0 _
+      _ ≤ δ := by
+            simpa [bipartiteSSCError, overlapA, qMatchMass, IdxSubMeas.liftLeft,
+              IdxSubMeas.liftRight] using hssc
+  have hpointwise :
+      ∀ q, qSDD ψ (LPf q) (RAf q) ≤
+        subMeasMass ψ (LPf q) + subMeasMass ψ (RAf q) - 2 * crossPost q := by
+    intro q
+    let diagP : Error := ∑ b : β, ev ψ ((LPf q).outcome b * (LPf q).outcome b)
+    let diagA : Error := ∑ b : β, ev ψ ((RAf q).outcome b * (RAf q).outcome b)
+    have hdiagP_le :
+        diagP ≤ subMeasMass ψ (LPf q) := by
+      simpa [diagP, subMeasMass] using subMeas_diagMass_le_mass ψ (LPf q)
+    have hdiagA_le :
+        diagA ≤ subMeasMass ψ (RAf q) := by
+      simpa [diagA, subMeasMass] using subMeas_diagMass_le_mass ψ (RAf q)
+    have h_expand : qSDD ψ (LPf q) (RAf q) = diagP + diagA - 2 * crossPost q := by
+      have hterm :
+          ∀ b : β,
+            ev ψ (((LPf q).outcome b - (RAf q).outcome b)ᴴ *
+                ((LPf q).outcome b - (RAf q).outcome b)) =
+              ev ψ ((LPf q).outcome b * (LPf q).outcome b) +
+                ev ψ ((RAf q).outcome b * (RAf q).outcome b) -
+                2 * ev ψ ((LPf q).outcome b * (RAf q).outcome b) := by
+        intro b
+        have hcomm :
+            ev ψ ((RAf q).outcome b * (LPf q).outcome b) =
+              ev ψ ((LPf q).outcome b * (RAf q).outcome b) := by
+          exact
+            ev_mul_comm_of_psd ψ _ _
+              ((RAf q).outcome_pos b)
+              ((LPf q).outcome_pos b)
+        calc
+          ev ψ (((LPf q).outcome b - (RAf q).outcome b)ᴴ *
+              ((LPf q).outcome b - (RAf q).outcome b))
+            =
+              ev ψ
+                ((((LPf q).outcome b * (LPf q).outcome b) -
+                    (LPf q).outcome b * (RAf q).outcome b) -
+                  ((RAf q).outcome b * (LPf q).outcome b -
+                    (RAf q).outcome b * (RAf q).outcome b)) := by
+                  congr 1
+                  simp [sub_mul, mul_sub, SubMeas.outcome_hermitian]
+                  abel
+          _ =
+              ev ψ ((LPf q).outcome b * (LPf q).outcome b) -
+                ev ψ ((LPf q).outcome b * (RAf q).outcome b) -
+                (ev ψ ((RAf q).outcome b * (LPf q).outcome b) -
+                  ev ψ ((RAf q).outcome b * (RAf q).outcome b)) := by
+                    rw [ev_sub, ev_sub, ev_sub]
+          _ =
+              ev ψ ((LPf q).outcome b * (LPf q).outcome b) +
+                ev ψ ((RAf q).outcome b * (RAf q).outcome b) -
+                2 * ev ψ ((LPf q).outcome b * (RAf q).outcome b) := by
+                  rw [hcomm]
+                  ring
+      unfold qSDD qSDDCore crossPost
+      calc
+        ∑ b : β,
+            ev ψ (((LPf q).outcome b - (RAf q).outcome b)ᴴ *
+              ((LPf q).outcome b - (RAf q).outcome b))
+          =
+            ∑ b : β,
+              (ev ψ ((LPf q).outcome b * (LPf q).outcome b) +
+                ev ψ ((RAf q).outcome b * (RAf q).outcome b) -
+                2 * ev ψ ((LPf q).outcome b * (RAf q).outcome b)) := by
+                  refine Finset.sum_congr rfl ?_
+                  intro b hb
+                  exact hterm b
+        _ = diagP + diagA - 2 * qMatchMass ψ (LPf q) (RAf q) := by
+              unfold diagP diagA qMatchMass
+              rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.mul_sum]
+    rw [h_expand]
+    linarith
+  constructor
+  calc
+    sddError ψ 𝒟 LPf RAf
+      ≤ avgOver 𝒟
+          (fun q =>
+            subMeasMass ψ (LPf q) + subMeasMass ψ (RAf q) - 2 * crossPost q) := by
+              unfold sddError
+              apply avgOver_mono
+              intro q
+              exact hpointwise q
+    _ = idxSubMeasMass ψ 𝒟 LPf +
+          idxSubMeasMass ψ 𝒟 RAf -
+            2 * avgOver 𝒟 crossPost := by
+              unfold idxSubMeasMass subMeasMass avgOver
+              calc
+                ∑ q ∈ 𝒟.support,
+                    𝒟.weight q * (ev ψ (LPf q).total + ev ψ (RAf q).total - 2 * crossPost q)
+                  =
+                    ∑ q ∈ 𝒟.support,
+                      (𝒟.weight q * ev ψ (LPf q).total +
+                        (𝒟.weight q * ev ψ (RAf q).total - 2 * (𝒟.weight q * crossPost q))) := by
+                          refine Finset.sum_congr rfl ?_
+                          intro q hq
+                          ring
+                _ =
+                    (∑ q ∈ 𝒟.support, 𝒟.weight q * ev ψ (LPf q).total) +
+                      ((∑ q ∈ 𝒟.support, 𝒟.weight q * ev ψ (RAf q).total) -
+                        2 * ∑ q ∈ 𝒟.support, 𝒟.weight q * crossPost q) := by
+                          rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.mul_sum]
+                _ = idxSubMeasMass ψ 𝒟 LPf +
+                    idxSubMeasMass ψ 𝒟 RAf -
+                      2 * avgOver 𝒟 crossPost := by
+                          simp [idxSubMeasMass, avgOver, subMeasMass]
+                          ring
+    _ ≤
+        (idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) + 2 * Real.sqrt ε) +
+          idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) -
+            2 * (avgOver 𝒟 overlapA - Real.sqrt ε) := by
+              rw [hmassA]
+              linarith
+    _ ≤ 2 * δ + 4 * Real.sqrt ε := by
+          linarith
+
 theorem selfConsistencyImpliesDataProcessing
     {Question α β : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype α] [Fintype β]
@@ -459,6 +693,49 @@ theorem selfConsistencyImpliesDataProcessing
         (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
         (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
         (8 * δ + 8 * Real.sqrt ε) := by
-  sorry -- TODO(sorry)
+  intro hssc hsdd
+  have hwrong :
+      SDDRel ψ 𝒟
+        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
+        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
+        (2 * δ + 4 * Real.sqrt ε) :=
+    wrongSideEstimate ψ hperm hψ 𝒟 h𝒟 A P δ ε f hssc hsdd
+  have hself :
+      SDDRel ψ 𝒟
+        (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
+        (2 * δ) :=
+    twoNotionsOfSelfConsistencyAfterEvaluation ψ hperm 𝒟 A δ f hssc
+  have hself_symm :
+      SDDRel ψ 𝒟
+        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
+        (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+        (2 * δ) := by
+    exact
+      sddRel_symm ψ 𝒟
+        (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
+        (2 * δ)
+        hself
+  have htri :
+      SDDRel ψ 𝒟
+        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
+        (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+        (2 * ((2 * δ + 4 * Real.sqrt ε) + (2 * δ))) := by
+    exact
+      stateDependentDistanceRel_triangle ψ 𝒟
+        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
+        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
+        (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+        (2 * δ + 4 * Real.sqrt ε) (2 * δ)
+        hwrong hself_symm
+  exact
+    stateDependentDistanceRel_mono ψ 𝒟
+      (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
+      (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+      (2 * ((2 * δ + 4 * Real.sqrt ε) + (2 * δ)))
+      (8 * δ + 8 * Real.sqrt ε)
+      (by linarith)
+      htri
 
 end MIPStarRE.LDT.Preliminaries
