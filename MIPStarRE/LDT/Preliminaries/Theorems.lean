@@ -433,21 +433,28 @@ private lemma questionCabApproxDelta
     (A B : OpFamily Outcome ι)
     (C : Outcome → Aux → MIPStarRE.Quantum.Op ι)
     (hC : ∀ a, ∑ b : Aux, (C a b)ᴴ * C a b ≤ 1) :
-    -- `qSDDOp` only depends on `.outcome` via `qSDDCore`, so these raw
-    -- families can use `total := 0` as a harmless sentinel.
     qSDDOp ψ
-        ({ outcome := fun ab : Outcome × Aux => C ab.1 ab.2 * A.outcome ab.1
-           total := 0 } : OpFamily (Outcome × Aux) ι)
-        ({ outcome := fun ab : Outcome × Aux => C ab.1 ab.2 * B.outcome ab.1
-           total := 0 } : OpFamily (Outcome × Aux) ι) ≤
+        ({ outcome := fun ab : Outcome × Aux =>
+             C ab.1 ab.2 * A.outcome ab.1
+           total := ∑ ab : Outcome × Aux,
+             C ab.1 ab.2 * A.outcome ab.1
+         } : OpFamily (Outcome × Aux) ι)
+        ({ outcome := fun ab : Outcome × Aux =>
+             C ab.1 ab.2 * B.outcome ab.1
+           total := ∑ ab : Outcome × Aux,
+             C ab.1 ab.2 * B.outcome ab.1
+         } : OpFamily (Outcome × Aux) ι) ≤
       qSDDOp ψ A B := by
-  let D : Outcome → MIPStarRE.Quantum.Op ι := fun a => A.outcome a - B.outcome a
+  let D : Outcome → MIPStarRE.Quantum.Op ι :=
+    fun a => A.outcome a - B.outcome a
   let CA : OpFamily (Outcome × Aux) ι :=
     { outcome := fun ab => C ab.1 ab.2 * A.outcome ab.1
-      total := 0 }
+      total := ∑ ab : Outcome × Aux,
+        C ab.1 ab.2 * A.outcome ab.1 }
   let CB : OpFamily (Outcome × Aux) ι :=
     { outcome := fun ab => C ab.1 ab.2 * B.outcome ab.1
-      total := 0 }
+      total := ∑ ab : Outcome × Aux,
+        C ab.1 ab.2 * B.outcome ab.1 }
   have hpointwise (a : Outcome) :
       ∑ b : Aux, ev ψ (((C a b * D a)ᴴ) * (C a b * D a)) ≤
         ev ψ ((D a)ᴴ * D a) := by
@@ -496,16 +503,18 @@ theorem cabApproxDelta
     (δ : Error) :
     SDDOpRel ψ 𝒟 A B δ →
     (∀ q a, ∑ b : Aux, (C q a b)ᴴ * C q a b ≤ 1) →
-    -- `SDDOpRel` unfolds to `sddErrorOp`, and `qSDDOp` only inspects the
-    -- `.outcome` field, so `total := 0` is a safe sentinel here.
     SDDOpRel ψ 𝒟
       (fun q => ({
-        outcome := fun ab : Outcome × Aux => C q ab.1 ab.2 * (A q).outcome ab.1
-        total := 0
+        outcome := fun ab : Outcome × Aux =>
+          C q ab.1 ab.2 * (A q).outcome ab.1
+        total := ∑ ab : Outcome × Aux,
+          C q ab.1 ab.2 * (A q).outcome ab.1
       } : OpFamily (Outcome × Aux) ι))
       (fun q => ({
-        outcome := fun ab : Outcome × Aux => C q ab.1 ab.2 * (B q).outcome ab.1
-        total := 0
+        outcome := fun ab : Outcome × Aux =>
+          C q ab.1 ab.2 * (B q).outcome ab.1
+        total := ∑ ab : Outcome × Aux,
+          C q ab.1 ab.2 * (B q).outcome ab.1
       } : OpFamily (Outcome × Aux) ι))
       δ := by
   intro ⟨hAB⟩ hC
@@ -515,10 +524,16 @@ theorem cabApproxDelta
       avgOver 𝒟
           (fun q =>
             qSDDOp ψ
-              ({ outcome := fun ab : Outcome × Aux => C q ab.1 ab.2 * (A q).outcome ab.1
-                 total := 0 } : OpFamily (Outcome × Aux) ι)
-              ({ outcome := fun ab : Outcome × Aux => C q ab.1 ab.2 * (B q).outcome ab.1
-                 total := 0 } : OpFamily (Outcome × Aux) ι))
+              ({ outcome := fun ab : Outcome × Aux =>
+                   C q ab.1 ab.2 * (A q).outcome ab.1
+                 total := ∑ ab : Outcome × Aux,
+                   C q ab.1 ab.2 * (A q).outcome ab.1
+               } : OpFamily (Outcome × Aux) ι)
+              ({ outcome := fun ab : Outcome × Aux =>
+                   C q ab.1 ab.2 * (B q).outcome ab.1
+                 total := ∑ ab : Outcome × Aux,
+                   C q ab.1 ab.2 * (B q).outcome ab.1
+               } : OpFamily (Outcome × Aux) ι))
         ≤ avgOver 𝒟
             (fun q => qSDDOp ψ (A q) (B q)) := by
               apply avgOver_mono
