@@ -108,11 +108,11 @@ where
 \end{equation}
 Finally, \ref{thm:com-main} gives
 \begin{equation}\label{eq:quote-com-main}
-  G_g^x G_h^y \ot I \approx_{\nu_{\rmcom}} G_h^y G_g^x \ot I,
+  G_g^x G_h^y \ot I \approx_{\nu_{\mathrm{com}}} G_h^y G_g^x \ot I,
 \end{equation}
 where
 \[
-  \nu_{\rmcom} = 30m\left(\gamma^{1/4}+\zeta^{1/4}+(d/q)^{1/4}\right).
+  \nu_{\mathrm{com}} = 30m\left(\gamma^{1/4}+\zeta^{1/4}+(d/q)^{1/4}\right).
 \]
 
 \begin{lemma}[Slice measurements are consistent with line answers]\label{lem:ld-gbcon}
@@ -439,13 +439,13 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \begin{proof}
   By \ref{eq:quote-com-main},
   \begin{equation}\label{eq:com-main-copy}
-    G_g^x G_h^y \ot I \approx_{\nu_{\rmcom}} G_h^y G_g^x \ot I.
+    G_g^x G_h^y \ot I \approx_{\nu_{\mathrm{com}}} G_h^y G_g^x \ot I.
   \end{equation}
   Applying Lemma~\ref{lem:commutativity-switcheroo} to \ref{eq:com-main-copy}, with $\{M_o^y\}$ equal to the outcome family $\{G_h^y\}$, gives
   \begin{equation}\label{eq:applied-the-lemma-to-com-main-copy}
     G_g^x G^y \ot I \approx_{\theta_1} G^y G_g^x \ot I,
   \end{equation}
-  where $\theta_1 = 12\sqrt{\zeta} + 4\sqrt{\nu_{\rmcom}}$. Applying Lemma~\ref{lem:commutativity-switcheroo} again to \ref{eq:applied-the-lemma-to-com-main-copy}, now with the one-outcome family $M_o^y = G^y$, gives
+  where $\theta_1 = 12\sqrt{\zeta} + 4\sqrt{\nu_{\mathrm{com}}}$. Applying Lemma~\ref{lem:commutativity-switcheroo} again to \ref{eq:applied-the-lemma-to-com-main-copy}, now with the one-outcome family $M_o^y = G^y$, gives
   \[
     G^x G^y \ot I \approx_{\theta_2} G^y G^x \ot I,
   \]
@@ -501,9 +501,9 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
     \E_x \sum_g \|(\widehat G_g^x \ot I - I \ot \widehat G_g^x)\ket{\psi}\|^2
     \le \zeta + \zeta = 2\zeta
   \]
-  by \ref{item:ld-pasting-self-consistency,cor:g-bot-self-consistency}. For \ref{eq:gcomall}, the same decomposition yields four cases: polynomial--polynomial, $\bot$--$\bot$, polynomial--$\bot$, and $\bot$--polynomial. These contribute $\nu_{\rmcom}$ and three copies of $\nu_2$, so
+  by \ref{item:ld-pasting-self-consistency,cor:g-bot-self-consistency}. For \ref{eq:gcomall}, the same decomposition yields four cases: polynomial--polynomial, $\bot$--$\bot$, polynomial--$\bot$, and $\bot$--polynomial. These contribute $\nu_{\mathrm{com}}$ and three copies of $\nu_2$, so
   \[
-    \nu_{\rmcom} + 3\nu_2
+    \nu_{\mathrm{com}} + 3\nu_2
     \le
     138m\left(\gamma^{1/16}+\zeta^{1/16}+(d/q)^{1/16}\right)
     = \nu_3.
