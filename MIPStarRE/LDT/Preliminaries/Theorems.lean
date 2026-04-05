@@ -495,7 +495,7 @@ private lemma questionCabApproxDelta
           simp [D]
 
 /-- `prop:cab-approx-delta`. -/
-theorem cabApproxDelta
+theorem cabApproxDelta_raw
     {Question Outcome Aux : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [Fintype Aux]
@@ -1505,7 +1505,7 @@ lemma question_overlap_gap_right
                   simp [sub_mul]
 
 /-- `prop:easy-approx-from-approx-delta`. -/
-theorem easyApproxFromApproxDelta {Question Outcome : Type*}
+theorem easyApproxFromApproxDelta_twoFamily {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
@@ -2891,6 +2891,7 @@ lemma sscError_nonneg {Question Outcome : Type*}
   unfold sscError
   exact avgOver_nonneg 𝒟 _ fun a => by unfold qSSCDefect; exact le_max_left 0 _
 
+
 private lemma leftTensor_mono
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     {A B : MIPStarRE.Quantum.Op ι₁} (hAB : A ≤ B) :
@@ -3406,7 +3407,7 @@ private lemma closenessAfterCompletion_core_local {Outcome : Type*}
       |diagA - overlap| ≤ Real.sqrt δ ∧
         |overlap - diagB| ≤ Real.sqrt δ := by
     simpa [diagA, diagB, overlap, constSubMeasFamily, avgOver, uniformDistribution] using
-      easyApproxFromApproxDelta ψ (uniformDistribution Unit) hψ
+      easyApproxFromApproxDelta_twoFamily ψ (uniformDistribution Unit) hψ
         (uniformDistribution_weight_sum_le_one Unit)
         (constSubMeasFamily A.toSubMeas)
         (constSubMeasFamily B) δ (by exact ⟨hδ⟩)
