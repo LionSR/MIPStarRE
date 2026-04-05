@@ -109,7 +109,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 
 
 \begin{definition}[Consistency]\label{def:simeq}
-  \lean{MIPStarRE.LDT.Test.ConsRel}
+  \lean{MIPStarRE.LDT.ConsRel}
   Let $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$. Let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be submeasurements with the same answer set, and let $\mathcal D$ be a distribution on the question set. We write
   \[
     A_a^x \ot I \simeq_\delta I \ot B_a^x
@@ -150,7 +150,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{proof}
 
 \begin{definition}[State-dependent distance]\label{def:approx_delta}
-  \lean{MIPStarRE.LDT.Test.SDDRel}
+  \lean{MIPStarRE.LDT.SDDRel}
   Let $\ket{\psi} \in \mathcal H$, let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be families of operators on $\mathcal H$, and let $\mathcal D$ be a distribution on the question set. We write
   \[
     A_a^x \approx_\delta B_a^x
@@ -190,8 +190,10 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   Expand the squared norm of $(A_a^x \ot I - I \ot B_a^x)\ket{\psi}$ and use the diagonal-overlap formula from Lemma~\ref{prop:simeq-for-measurements}.
 \end{proof}
 
-\begin{proposition}[Closeness of inner products]\label{prop:closeness-of-ip}
+\section{Consistency from state-dependent distance}
 \label{sec:consistency-from-state-dependent-distance}
+
+\begin{proposition}[Closeness of inner products]\label{prop:closeness-of-ip}
   \uses{def:approx_delta}
   Let $\{A^x_a\}$, $\{B^x_a\}$, and $\{C^x_{a,b}\}$ be matrices. Suppose that $A^x_a \approx_\gamma B^x_a$ and that for all~$x$,
   \[
@@ -474,6 +476,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   First prove
   \begin{equation}
     P^x_{[f(a)=b]} \ot I \approx_{2\delta + 4\sqrt{\eps}} I \ot A_{[f(a)=b]}^x.
+    % Keep the paper's exact label, including the semicolon, for cross-reference fidelity.
     \label{eq;what-we-want-to-prove-but-on-wrong-side}
   \end{equation}
   Expanding the squared norm and using projectivity gives

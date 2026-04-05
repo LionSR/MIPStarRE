@@ -1,8 +1,8 @@
 MIPStarRE.LDT.Test.mainFormal
 MIPStarRE.LDT.Preliminaries.completeAtOutcome
-MIPStarRE.LDT.Test.ConsRel
+MIPStarRE.LDT.ConsRel
 MIPStarRE.LDT.Preliminaries.simeqForMeasurements
-MIPStarRE.LDT.Test.SDDRel
+MIPStarRE.LDT.SDDRel
 MIPStarRE.LDT.Preliminaries.simeqToApprox
 MIPStarRE.LDT.Preliminaries.simeqDataProcessing
 MIPStarRE.LDT.Preliminaries.consSubMeas
@@ -52,5 +52,4 @@ MIPStarRE.LDT.Pasting.chernoffBernoulliMatrix
 MIPStarRE.LDT.Pasting.ldPastingNCompleteness
 MIPStarRE.LDT.MainInductionStep.restrictedProbabilities
 MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
-MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection
 MIPStarRE.LDT.MainInductionStep.mainInduction
