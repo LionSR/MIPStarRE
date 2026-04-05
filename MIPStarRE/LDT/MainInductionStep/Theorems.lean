@@ -13,6 +13,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- `thm:main-induction`. -/
 theorem mainInduction
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -35,6 +36,7 @@ theorem mainInduction
 /-- `thm:self-improvement-in-induction-section`. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -57,6 +59,7 @@ theorem selfImprovementInInductionSection
 /-- `thm:ld-pasting-in-induction-section`. -/
 theorem ldPastingInInductionSection
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -81,6 +84,7 @@ theorem ldPastingInInductionSection
 /-- `lem:restricted-probabilities`. -/
 lemma restrictedProbabilities
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :

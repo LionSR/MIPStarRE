@@ -16,7 +16,8 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 open scoped Matrix MatrixOrder ComplexOrder BigOperators
 
-private def pointDiagonalLineQuestionEquiv (params : Parameters) :
+private def pointDiagonalLineQuestionEquiv (params : Parameters)
+    [FieldModel params.q] :
     PointDiagonalLineQuestion params ≃ DiagonalTestSample params where
   toFun := fun q => (q.1.base, (q.1.direction, q.2))
   invFun := fun s =>
@@ -52,6 +53,7 @@ private lemma avgOver_uniform_equiv
 
 private lemma sampledDiagonalLineConsistency
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
@@ -105,6 +107,7 @@ private lemma sampledDiagonalLineConsistency
 
 private lemma sampledDiagonalLineApproximation
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
@@ -148,6 +151,7 @@ private lemma sampledDiagonalLineApproximation
 
 private lemma orderedLiftToMixedBridge
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
@@ -164,6 +168,7 @@ private lemma orderedLiftToMixedBridge
 
 private lemma orderedLiftToLineBridge
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
@@ -180,6 +185,7 @@ private lemma orderedLiftToLineBridge
 
 private lemma diagonalLineProjectiveSwap
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (_hgood : strategy.IsGood eps delta gamma) :
@@ -230,6 +236,7 @@ private lemma diagonalLineProjectiveSwap
 
 private lemma reversedDropFromLineBridge
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
@@ -246,6 +253,7 @@ private lemma reversedDropFromLineBridge
 
 private lemma reversedDropToPointsBridge
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
@@ -263,6 +271,7 @@ private lemma reversedDropToPointsBridge
 /-- `thm:commutativity-points`. -/
 theorem commutativityPoints
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :

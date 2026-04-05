@@ -18,12 +18,12 @@ open scoped BigOperators MatrixOrder ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Lift an axis-line answer from the restricted slice back to the ambient space. -/
-def liftAxisAnswer (params : Parameters) (x : Fq params) :
+def liftAxisAnswer (params : Parameters) [FieldModel params.q] (x : Fq params) :
     AxisLinePolynomial params → AxisLinePolynomial params.next :=
   fun f => AxisLinePolynomial.appendAtHeight params f x
 
 /-- Lift a diagonal-line answer from the restricted slice back to the ambient space. -/
-def liftDiagonalAnswer (params : Parameters) (x : Fq params) :
+def liftDiagonalAnswer (params : Parameters) [FieldModel params.q] (x : Fq params) :
     DiagonalLinePolynomial params → DiagonalLinePolynomial params.next :=
   fun f => DiagonalLinePolynomial.appendAtHeight params f x
 
@@ -37,7 +37,8 @@ genuine projective measurement and derives the `((m + 1) / m)` averaging bound
 from that. Matching the paper requires refactoring the diagonal-test encoding so
 that restricting an ambient diagonal answer to a slice lands in a total
 measurement on the `(m, q, d)` diagonal answer space. -/
-structure RestrictedSymStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
+structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
+    (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurement :
@@ -49,7 +50,7 @@ namespace RestrictedSymStrat
 
 /-- Sampled point answers in the axis-parallel lines test. -/
 noncomputable def axisParallelPointAnswerFamily {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
   fun s =>
@@ -58,7 +59,7 @@ noncomputable def axisParallelPointAnswerFamily {params : Parameters}
 
 /-- Sampled line answers, evaluated at the sampled parameter, in the axis-parallel lines test. -/
 noncomputable def axisParallelLineAnswerFamily {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
   fun s =>
@@ -67,7 +68,7 @@ noncomputable def axisParallelLineAnswerFamily {params : Parameters}
 
 /-- Sampled point answers in the diagonal lines test. -/
 noncomputable def diagonalPointAnswerFamily {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) :
     IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
   fun s =>
@@ -76,7 +77,7 @@ noncomputable def diagonalPointAnswerFamily {params : Parameters}
 
 /-- Sampled diagonal-line answers, evaluated at the sampled parameter. -/
 noncomputable def diagonalLineAnswerFamily {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) :
     IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
   fun s =>
@@ -87,7 +88,7 @@ noncomputable def diagonalLineAnswerFamily {params : Parameters}
 Alice's point answers are lifted to the left tensor factor, and Bob's
 line answers are lifted to the right tensor factor. -/
 noncomputable def axisParallelFailureProbability {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) : Error :=
   consError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
@@ -97,7 +98,7 @@ noncomputable def axisParallelFailureProbability {params : Parameters}
 /-- Trace-based failure surrogate for the self-consistency test.
 Uses the bipartite SSC defect (cross-register overlap). -/
 noncomputable def selfConsistencyFailureProbability {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) : Error :=
   bipartiteSSCError strategy.state
     (uniformDistribution (Point params))
@@ -107,7 +108,7 @@ noncomputable def selfConsistencyFailureProbability {params : Parameters}
 Alice's point answers are lifted to the left tensor factor, and Bob's
 diagonal-line answers are lifted to the right tensor factor. -/
 noncomputable def diagonalFailureProbability {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) : Error :=
   consError strategy.state
     (uniformDistribution (DiagonalTestSample params))
@@ -116,6 +117,7 @@ noncomputable def diagonalFailureProbability {params : Parameters}
 
 /-- Goodness data for a restricted strategy. -/
 structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι)
     (eps delta gamma : Error) : Prop where
   axisParallelTest : strategy.axisParallelFailureProbability ≤ eps
@@ -124,7 +126,7 @@ structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι
 
 end RestrictedSymStrat
 
-private def axisLinePolynomialEquiv (params : Parameters) (x : Fq params) :
+private def axisLinePolynomialEquiv (params : Parameters) [FieldModel params.q] (x : Fq params) :
     AxisLinePolynomial params ≃ AxisLinePolynomial params.next where
   toFun := liftAxisAnswer params x
   invFun := fun f => AxisLinePolynomial.restrictAtHeight params f x
@@ -138,7 +140,7 @@ private def axisLinePolynomialEquiv (params : Parameters) (x : Fq params) :
     rfl
 
 /-- Restrict an axis-parallel line measurement to the slice at height `x`. -/
-noncomputable def restrictAxisParallelMeasurement (params : Parameters)
+noncomputable def restrictAxisParallelMeasurement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι :=
   fun ℓ =>
@@ -182,6 +184,7 @@ submeasurement. A paper-faithful replacement needs a total restricted diagonal
 measurement, not just a submeasurement, which in turn requires changing the
 ambient diagonal-test answer encoding. -/
 noncomputable def restrictDiagonalMeasurement (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
     IdxProjSubMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι :=
   fun ℓ =>
@@ -219,7 +222,7 @@ noncomputable def restrictDiagonalMeasurement (params : Parameters)
       proj := fun f => lifted.proj (liftDiagonalAnswer params x f) }
 
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
-noncomputable def xRestrictedStrategy (params : Parameters)
+noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) : RestrictedSymStrat params ι where
   state := strategy.state
   pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
@@ -227,17 +230,20 @@ noncomputable def xRestrictedStrategy (params : Parameters)
   diagonalMeasurement := restrictDiagonalMeasurement params strategy x
 
 @[simp] theorem xRestrictedStrategy_state (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
     (xRestrictedStrategy params strategy x).state = strategy.state :=
   rfl
 
 @[simp] theorem xRestrictedStrategy_pointMeasurement_apply (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) (u : Point params) :
     (xRestrictedStrategy params strategy x).pointMeasurement u =
       strategy.pointMeasurement (appendPoint params u x) :=
   rfl
 
 @[simp] theorem restrictAxisParallelMeasurement_outcome (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params)
     (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
     ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas.outcome f) =
@@ -246,6 +252,7 @@ noncomputable def xRestrictedStrategy (params : Parameters)
   rfl
 
 @[simp] theorem restrictDiagonalMeasurement_outcome (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params)
     (ℓ : DiagonalLine params) (f : DiagonalLinePolynomial params) :
     ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeas.outcome f) =
@@ -301,13 +308,13 @@ private noncomputable def averageOperatorOverDistribution' {α : Type*}
   ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
 
 /-- Averaged point operator `E_u A^u_{h(u)}` appearing in boundedness. -/
-noncomputable def averagedPointEvaluationOperator (params : Parameters)
+noncomputable def averagedPointEvaluationOperator (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (h : Polynomial params) : MIPStarRE.Quantum.Op ι :=
   averageOperatorOverDistribution' (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement u).toSubMeas.outcome (h u))
 
 /-- Slice-wise averaged point operator `E_u A^{u,x}_{g(u)}`. -/
-noncomputable def averagedSlicePointEvaluationOperator (params : Parameters)
+noncomputable def averagedSlicePointEvaluationOperator (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (x : Fq params) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
   averageOperatorOverDistribution' (uniformDistribution (Point params))

@@ -70,10 +70,11 @@ theorem distinctTupleDistribution_weight_sum_le_one (params : Parameters) (k : �
     simp [hempty]
 
 /-- Placeholder outcome type for the completed family `\widehat G`. -/
-abbrev GHatOutcome (params : Parameters) := Option (Polynomial params)
+abbrev GHatOutcome (params : Parameters) [FieldModel params.q] := Option (Polynomial params)
 abbrev SliceQuestion (params : Parameters) := Fq params
 abbrev SlicePairQuestion (params : Parameters) := Fq params × Fq params
-abbrev GHatTupleOutcome (params : Parameters) (k : ℕ) := Fin k → GHatOutcome params
+abbrev GHatTupleOutcome (params : Parameters) [FieldModel params.q] (k : ℕ) :=
+  Fin k → GHatOutcome params
 abbrev GHatType (k : ℕ) := Fin k → Bool
 abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) := Point params × PointTuple params k
 abbrev VerticalLineQuestion (params : Parameters) := Point params
@@ -143,6 +144,7 @@ noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
 
 /-- Record which completed-slice outcomes are genuine polynomial outcomes. -/
 def gHatTupleType {params : Parameters} {k : ℕ}
+    [FieldModel params.q]
     (gs : GHatTupleOutcome params k) : GHatType k :=
   fun i => Option.isSome (gs i)
 
@@ -150,18 +152,21 @@ def gHatTupleType {params : Parameters} {k : ℕ}
 genuine polynomials rather than `⊥`. This matches the paper's support of the type
 `τ ∈ {0,1}^k`. -/
 noncomputable def gHatTupleSupport {params : Parameters} {k : ℕ}
+    [FieldModel params.q]
     (gs : GHatTupleOutcome params k) : Finset (Fin k) :=
   open Classical in
     Finset.univ.filter fun i => (gs i).isSome
 
 /-- The Hamming weight of a completed-slice tuple. -/
 noncomputable def gHatTupleHammingWeight {params : Parameters} {k : ℕ}
+    [FieldModel params.q]
     (gs : GHatTupleOutcome params k) : ℕ :=
   (gHatTupleSupport gs).card
 
 /-- A completed-slice tuple is eligible for interpolation exactly when its type has
 Hamming weight at least `d + 1`, matching the paper's `|w| ≥ d+1` filter. -/
 def InterpolationEligible (params : Parameters) {k : ℕ}
+    [FieldModel params.q]
     (gs : GHatTupleOutcome params k) : Prop :=
   params.d + 1 ≤ gHatTupleHammingWeight gs
 
@@ -172,12 +177,14 @@ def pointTupleTail {params : Parameters} {k : ℕ}
 
 /-- Remove the first coordinate from a tuple of completed slice outcomes. -/
 def gHatTupleOutcomeTail {params : Parameters} {k : ℕ}
+    [FieldModel params.q]
     (gs : GHatTupleOutcome params (k + 1)) : GHatTupleOutcome params k :=
   fun i => gs i.succ
 
 /-- Fallback global polynomial used when all completed slice outcomes are `⊥`.
 Uses the zero polynomial (trivially low individual degree). -/
-noncomputable def fallbackInterpolatedPolynomial (params : Parameters) : Polynomial params.next where
+noncomputable def fallbackInterpolatedPolynomial (params : Parameters) [FieldModel params.q] :
+    Polynomial params.next where
   poly := 0
   lowIndividualDegree := by
     intro i
@@ -185,6 +192,7 @@ noncomputable def fallbackInterpolatedPolynomial (params : Parameters) : Polynom
 
 /-- Extract the polynomial from a genuine slice outcome. -/
 noncomputable def extractSlicePoly {params : Parameters} {k : ℕ}
+    [FieldModel params.q]
     (gs : GHatTupleOutcome params k) (i : Fin k)
     (hi : i ∈ gHatTupleSupport gs) : Polynomial params := by
   classical
@@ -198,7 +206,7 @@ noncomputable def extractSlicePoly {params : Parameters} {k : ℕ}
         simpa [hgi])
 
 /-- Extract the polynomial from a genuine (Some) slice outcome, or fallback to zero. -/
-noncomputable def extractSliceOr0 {params : Parameters}
+noncomputable def extractSliceOr0 {params : Parameters} [FieldModel params.q]
     (g : GHatOutcome params) : PolynomialModel params :=
   match g with
   | some p => p.poly
@@ -213,7 +221,7 @@ The interpolated polynomial `h(u₁,...,uₘ,x) = ∑ᵢ Lᵢ(x) · gᵢ(u₁,..
 polynomial at that height lifted to the ambient `(m+1)`-variable space.
 
 When fewer than `d+1` genuine slices are available, returns the zero polynomial. -/
-noncomputable def interpolateCompletedSlices (params : Parameters) :
+noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel params.q] :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
   | 0, _xs, _gs => fallbackInterpolatedPolynomial params
   | k + 1, xs, gs => by
@@ -291,12 +299,12 @@ noncomputable def interpolateCompletedSlices (params : Parameters) :
         fallbackInterpolatedPolynomial params
 
 /-- Aggregate the polynomial outcomes of `G^x` into its complete part `G^x`. -/
-noncomputable def completePartSubMeas (params : Parameters)
+noncomputable def completePartSubMeas (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
   postprocess ((family.meas x).toSubMeas) (fun _ => ())
 
 /-- Placeholder for the incomplete part `G^x_⊥ = I - G^x`. -/
-noncomputable def incompletePartSubMeas (params : Parameters)
+noncomputable def incompletePartSubMeas (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
   let X := 1 - (completePartSubMeas params family x).total
   { outcome := fun _ => X
@@ -314,41 +322,41 @@ noncomputable def incompletePartSubMeas (params : Parameters)
       exact sub_le_self _ hnonneg }
 
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
-noncomputable def gHatIdxMeas (params : Parameters)
+noncomputable def gHatIdxMeas (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxMeas (Fq params) (GHatOutcome params) ι :=
   fun x => completeSubMeas ((family.meas x).toSubMeas)
 
 /-- The submeasurement view of the completed family `\widehat G`. -/
-noncomputable def gHatIdxSubMeas (params : Parameters)
+noncomputable def gHatIdxSubMeas (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (Fq params) (GHatOutcome params) ι :=
   IdxMeas.toIdxSubMeas (gHatIdxMeas params family)
 
 /-- Left tensor-placement for the complete part `G^x`
 on the bipartite space `d * d`. -/
-noncomputable def completePartLeftFamily (params : Parameters)
+noncomputable def completePartLeftFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
   fun x => leftPlacedSubMeas (ιB := ι) (completePartSubMeas params family x)
 
 /-- Right tensor-placement for the complete part `G^x`
 on the bipartite space `d * d`. -/
-noncomputable def completePartRightFamily (params : Parameters)
+noncomputable def completePartRightFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
   fun x => rightPlacedSubMeas (ιA := ι) (completePartSubMeas params family x)
 
 /-- Left tensor-placement for the incomplete part `G^x_⊥`
 on the bipartite space `d * d`. -/
-noncomputable def incompletePartLeftFamily (params : Parameters)
+noncomputable def incompletePartLeftFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
   fun x => leftPlacedSubMeas (ιB := ι) (incompletePartSubMeas params family x)
 
 /-- Right tensor-placement for the incomplete part `G^x_⊥`
 on the bipartite space `d * d`. -/
-noncomputable def incompletePartRightFamily (params : Parameters)
+noncomputable def incompletePartRightFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
   fun x => rightPlacedSubMeas (ιA := ι) (incompletePartSubMeas params family x)

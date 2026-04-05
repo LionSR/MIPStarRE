@@ -37,7 +37,8 @@ structure PermInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
       ev ψ (rightTensor (ι₁ := ι) M)
 
 /-- Paper-local symmetric strategy data. -/
-structure SymStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
+structure SymStrat (params : Parameters) [FieldModel params.q]
+    (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurement :
@@ -57,7 +58,7 @@ abbrev DiagonalTestSample (params : Parameters) := Point params × (Point params
 
 /-- Sampled point answers in the axis-parallel lines test. -/
 noncomputable def axisParallelPointAnswerFamily {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
   fun s =>
@@ -66,7 +67,7 @@ noncomputable def axisParallelPointAnswerFamily {params : Parameters}
 
 /-- Sampled line answers, evaluated at the sampled parameter, in the axis-parallel lines test. -/
 noncomputable def axisParallelLineAnswerFamily {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
   fun s =>
@@ -75,7 +76,7 @@ noncomputable def axisParallelLineAnswerFamily {params : Parameters}
 
 /-- Sampled point answers in the diagonal lines test. -/
 noncomputable def diagonalPointAnswerFamily {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) :
     IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
   fun s =>
@@ -84,7 +85,7 @@ noncomputable def diagonalPointAnswerFamily {params : Parameters}
 
 /-- Sampled diagonal-line answers, evaluated at the sampled parameter. -/
 noncomputable def diagonalLineAnswerFamily {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) :
     IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
   fun s =>
@@ -92,7 +93,8 @@ noncomputable def diagonalLineAnswerFamily {params : Parameters}
     postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
 
 /-- Paper-local (not necessarily symmetric) projective strategy data. -/
-structure ProjStrat (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
+structure ProjStrat (params : Parameters) [FieldModel params.q]
+    (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
   pointMeasurementA : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurementA :
@@ -111,7 +113,7 @@ namespace SymStrat
 Alice's point answers are lifted to the left tensor factor, and Bob's
 line answers are lifted to the right tensor factor. -/
 noncomputable def axisParallelFailureProbability {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   consError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
@@ -122,7 +124,7 @@ noncomputable def axisParallelFailureProbability {params : Parameters}
 Uses the bipartite SSC defect (cross-register overlap `∑ ev(A ⊗ A)`),
 matching `def:strong-self-consistency` in `preliminaries.tex`. -/
 noncomputable def selfConsistencyFailureProbability {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   bipartiteSSCError strategy.state
     (uniformDistribution (Point params))
@@ -132,7 +134,7 @@ noncomputable def selfConsistencyFailureProbability {params : Parameters}
 Alice's point answers are lifted to the left tensor factor, and Bob's
 diagonal-line answers are lifted to the right tensor factor. -/
 noncomputable def diagonalFailureProbability {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   consError strategy.state
     (uniformDistribution (DiagonalTestSample params))
@@ -141,6 +143,7 @@ noncomputable def diagonalFailureProbability {params : Parameters}
 
 /-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
 structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error) : Prop where
   axisParallelTest : strategy.axisParallelFailureProbability ≤ eps
@@ -152,7 +155,8 @@ end SymStrat
 namespace ProjStrat
 
 /-- View the left prover's local data as a symmetric-strategy-style package. -/
-def leftAsSymmetric {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+def leftAsSymmetric {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) :
     SymStrat params ι where
   state := strategy.state
@@ -161,7 +165,8 @@ def leftAsSymmetric {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq
   diagonalMeasurement := strategy.diagonalMeasurementA
 
 /-- View the right prover's local data as a symmetric-strategy-style package. -/
-def rightAsSymmetric {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+def rightAsSymmetric {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) :
     SymStrat params ι where
   state := strategy.state
@@ -171,7 +176,7 @@ def rightAsSymmetric {params : Parameters} {ι : Type*} [Fintype ι] [DecidableE
 
 /-- Trace-based failure surrogate for the full low-individual-degree test. -/
 noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) : Error :=
   let left := strategy.leftAsSymmetric
   let right := strategy.rightAsSymmetric
@@ -191,14 +196,15 @@ noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
 
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) (eps : Error) : Prop where
   soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
 
 end ProjStrat
 
 /-- A packaged family `x ↦ G^x` together with its witness operators and domination targets. -/
-structure IdxPolyFamily (params : Parameters) (ι : Type*) [Fintype ι] [DecidableEq ι] where
+structure IdxPolyFamily (params : Parameters) [FieldModel params.q]
+    (ι : Type*) [Fintype ι] [DecidableEq ι] where
   meas : IdxProjSubMeas (Fq params) (Polynomial params) ι
   witness : Fq params → MIPStarRE.Quantum.Op ι := fun _ => 0
   dominationTarget : Fq params → Polynomial params → MIPStarRE.Quantum.Op ι := fun _ _ => 0
@@ -209,7 +215,7 @@ namespace IdxPolyFamily
 /-- The averaged submeasurement `G = E_x G^x`: average the slice
 measurements over the uniform distribution on slice heights `x ∈ F_q`. -/
 noncomputable def averagedSubMeas {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι) :
     SubMeas (Polynomial params) ι where
   outcome := fun g =>
@@ -253,20 +259,23 @@ noncomputable def averagedSubMeas {params : Parameters}
       _ = 1 := by simp
 
 /-- Evaluate the slice family at a point `(u, x)` in `F_q^{m+1}`. -/
-noncomputable def evaluatedAtNextPoint {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+noncomputable def evaluatedAtNextPoint {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (Point params.next) (Fq params) ι :=
   fun u =>
     evaluateAt params (truncatePoint params u)
       ((family.meas (pointHeight params u)).toSubMeas)
 
-structure Complete {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+structure Complete {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
     (ψ : QuantumState (ι × ι)) (kappa : Error) : Prop where
   averageCompleteness :
     CompletenessAtLeast ψ family.averagedSubMeas.liftLeft (1 - kappa)
 
-structure ConsistentWithPoints {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+structure ConsistentWithPoints {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
     (strategy : SymStrat params.next ι) (zeta : Error) : Prop where
   pointConsistency :
@@ -275,7 +284,7 @@ structure ConsistentWithPoints {params : Parameters} {ι : Type*} [Fintype ι] [
       (IdxSubMeas.liftRight family.evaluatedAtNextPoint)
       zeta
 
-structure StronglySelfConsistent {params : Parameters}
+structure StronglySelfConsistent {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
     (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop where
@@ -284,7 +293,8 @@ structure StronglySelfConsistent {params : Parameters}
       (IdxProjSubMeas.toIdxSubMeas family.meas)
       zeta
 
-structure Bounded {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+structure Bounded {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
     (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop where
   sliceOpPSD : ∀ x, 0 ≤ family.witness x

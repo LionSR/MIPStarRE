@@ -18,7 +18,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- Output package for `lem:generalize-b`.
 `ψbi` is the bipartite state on `d * d` (passed as `strategy.state`
 by callers). -/
-structure GeneralizeBStatement (params : Parameters)
+structure GeneralizeBStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
     (G : SubMeas (Polynomial params) ι) : Prop where
   aggregateFamilyComparison :
@@ -34,7 +34,7 @@ structure GeneralizeBStatement (params : Parameters)
     generalizeBDeviation params strategy ψbi G ≤ generalizeBError params
 
 /-- Output package for `lem:local-variance-of-points`. -/
-structure LocalVarianceOfPointsStatement (params : Parameters)
+structure LocalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
     (G : SubMeas (Polynomial params) ι) (eps delta : Error) : Prop where
   aggregateEdgeComparison :
@@ -56,7 +56,7 @@ structure LocalVarianceOfPointsStatement (params : Parameters)
       localVarianceOfPointsError params eps delta
 
 /-- Output package for `lem:global-variance-of-points`. -/
-structure GlobalVarianceOfPointsStatement (params : Parameters)
+structure GlobalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
     (G : SubMeas (Polynomial params) ι) (eps delta : Error) : Prop where
   aggregateGlobalComparison :
@@ -84,6 +84,7 @@ structure GlobalVarianceOfPointsStatement (params : Parameters)
 
 lemma matrixGeneralizeB
     (params : Parameters)
+    [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params) :
     MatrixGeneralizeBStatement params model := by
   -- TODO: Prove the concrete matrix realization of `lem:generalize-b`
@@ -94,6 +95,7 @@ lemma matrixGeneralizeB
 /-- The concrete matrix-level counterpart of `lem:local-variance-of-points`. -/
 lemma matrixLocalVarianceOfPoints
     (params : Parameters)
+    [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) :
     MatrixLocalVarianceOfPointsStatement params model eps delta := by
@@ -105,6 +107,7 @@ lemma matrixLocalVarianceOfPoints
 /-- The concrete matrix-level counterpart of `lem:global-variance-of-points`. -/
 lemma matrixGlobalVarianceOfPoints
     (params : Parameters)
+    [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) :
     MatrixGlobalVarianceOfPointsStatement params model eps delta := by
@@ -116,6 +119,7 @@ lemma matrixGlobalVarianceOfPoints
 /-- `lem:generalize-b`. -/
 lemma generalizeB
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -154,6 +158,7 @@ lemma generalizeB
 /-- `lem:local-variance-of-points`. -/
 lemma localVarianceOfPoints
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -205,6 +210,7 @@ the local variance bound). The overall proof structure is complete:
 and the averaging step is fully proved. -/
 lemma globalVarianceOfPoints
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)

@@ -18,6 +18,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- `thm:ld-pasting`. -/
 theorem ldPasting
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -35,6 +36,7 @@ theorem ldPasting
 /-- `lem:ld-pasting-sub-measurement`. -/
 lemma ldPastingSubMeas
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -393,6 +395,7 @@ lemma looksEasyButTookMeAWhile
 /-- `lem:g-complete-self-consistency`. -/
 lemma gCompleteSelfConsistency
     (params : Parameters)
+    [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (zeta : Error)
@@ -409,6 +412,7 @@ lemma gCompleteSelfConsistency
 /-- `cor:g-bot-self-consistency`. -/
 theorem gBotSelfConsistency
     (params : Parameters)
+    [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (zeta : Error)
@@ -418,7 +422,7 @@ theorem gBotSelfConsistency
 
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters)
+    (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι)
@@ -446,6 +450,7 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
 /-- `cor:commuting-with-G-complete`. -/
 theorem commutingWithGComplete
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
@@ -459,6 +464,7 @@ theorem commutingWithGComplete
 /-- `cor:commuting-with-G-incomplete`. -/
 theorem commutingWithGIncomplete
     (params : Parameters)
+    [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
@@ -469,6 +475,7 @@ theorem commutingWithGIncomplete
 /-- `cor:G-hat-facts`. -/
 theorem gHatFacts
     (params : Parameters)
+    [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
@@ -482,6 +489,7 @@ theorem gHatFacts
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
     (params : Parameters)
+    [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
@@ -499,6 +507,7 @@ lemma commuteGHalfSandwich
 /-- `lem:ld-sandwich-line-one-point`. -/
 lemma ldSandwichLineOnePoint
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
     (eps delta gamma zeta : Error)
@@ -522,6 +531,7 @@ lemma ldSandwichLineOnePoint
 /-- `lem:h-b-consistency`. -/
 lemma hBConsistency
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -543,6 +553,7 @@ lemma hBConsistency
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -563,6 +574,7 @@ lemma overAllOutcomes
 /-- `lem:from-H-to-G`. -/
 lemma fromHToG
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
     (eps delta gamma zeta : Error)
@@ -611,6 +623,7 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- `cor:ld-pasting-N-completeness`. -/
 theorem ldPastingNCompleteness
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
