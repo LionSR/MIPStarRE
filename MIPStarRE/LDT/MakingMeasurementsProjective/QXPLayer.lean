@@ -7,7 +7,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 Paper-faithful proof infrastructure for the internal orthonormalization chain in
 `references/ldt-paper/orthonormalization.tex`.
 
-This file adds the intermediate `Q/X/XHat/P` objects and the 17 helper-lemma
+This file adds the intermediate `Q/X/XHat/P` objects and the 16 helper-lemma
 stubs tracked in issue #197. The actual proofs are deferred, but the signatures
 are intended to match the paper's decomposition of the argument.
 
@@ -25,15 +25,12 @@ open MIPStarRE.LDT
 
 noncomputable section
 
+-- NOTE: 16 sorry stubs are intentional scaffolding for issue #197. See PROOF_INTEGRITY.md.
+
 /-- The quarter-root error term `ζ^(1/4)` used throughout the paper's late-stage
 orthonormalization estimates. -/
 noncomputable def zetaQuarterRoot (ζ : Error) : Error :=
   Real.rpow ζ (1 / (4 : Error))
-
-/-- The square-root error term `ζ^(1/2)` used throughout the paper's spectral
-truncation and rank-reduction estimates. -/
-noncomputable def zetaSqrt (ζ : Error) : Error :=
-  Real.rpow ζ (1 / (2 : Error))
 
 /-- A raw operator family viewed as a constant indexed family on the trivial
 question set. -/
@@ -85,9 +82,9 @@ structure RoundingToProjectorsWitness {Outcome : Type*}
     SDDOpRel ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
       (constOpFamily R)
-      (2 * zetaSqrt ζ)
+      (2 * spectralTruncationError ζ)
   total_le :
-    R.total ≤ (((1 : Error) + 2 * zetaSqrt ζ) : ℂ) •
+    R.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
 
 /-- Witness package for `lem:projective-low-rank-sum`. -/
@@ -104,7 +101,7 @@ structure RankReductionWitness {Outcome : Type*}
       (constOpFamily data.q)
       (roundingToProjectiveError ζ)
   total_le :
-    QTotal data ≤ (((1 : Error) + 2 * zetaSqrt ζ) : ℂ) •
+    QTotal data ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
   auxDim_le :
     Fintype.card data.auxSpace.carrier ≤ Fintype.card ι
@@ -116,11 +113,19 @@ formulas. -/
 structure QXPLayerData (Outcome : Type*) [Fintype Outcome]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   qLayer : QLayerData Outcome ι
+  -- TODO(issue #197): record that `x` is the SVD witness used to restate `Q_a`
+  -- as `xᴴ T_a x`.
   x : Matrix qLayer.auxSpace.carrier ι ℂ
+  -- TODO(issue #197): record that `xHat` is the unitary/polar part associated
+  -- to `x`.
   xHat : Matrix qLayer.auxSpace.carrier ι ℂ
+  -- TODO(issue #197): add the intended unitarity invariant for `u`.
   u : MatrixOperator qLayer.auxSpace
+  -- TODO(issue #197): add the intended unitarity invariant for `v`.
   v : MIPStarRE.Quantum.Op ι
+  -- TODO(issue #197): relate `sigmaLeft` to the nonnegative singular values of `x`.
   sigmaLeft : MatrixOperator qLayer.auxSpace
+  -- TODO(issue #197): relate `sigmaRight` to the nonnegative singular values of `x`.
   sigmaRight : MIPStarRE.Quantum.Op ι
 
 /-- The paper's matrix `X_a = T_a · X`. -/
@@ -255,7 +260,7 @@ lemma qAlmostProjective {Outcome : Type*}
     (data : QLayerData Outcome ι) :
     RankReductionWitness ψ A ζ data →
       (∑ a, (Qa data a * QTotal data * Qa data a - Qa data a)) ≤
-        (((4 : Error) * zetaSqrt ζ) : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
+        (((4 : Error) * spectralTruncationError ζ) : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
   -- TODO: prove (issue #197)
   sorry
 
@@ -317,10 +322,21 @@ lemma paRestated {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (data : QXPLayerData Outcome ι) (a : Outcome) :
-    Pa data a = data.xHatᴴ * Ta data.qLayer a * data.xHat ∧
+      Pa data a = data.xHatᴴ * Ta data.qLayer a * data.xHat ∧
       Pa data a = (XHatA data a)ᴴ * data.xHat := by
-  -- TODO: prove (issue #197)
-  sorry
+  constructor
+  · rfl
+  · have hTa : (Ta data.qLayer a)ᴴ = Ta data.qLayer a := by
+      simpa [Ta] using ProjMeas.outcome_hermitian data.qLayer.t a
+    have hXHatA : (XHatA data a)ᴴ = data.xHatᴴ * Ta data.qLayer a := by
+      calc
+        (XHatA data a)ᴴ = (Ta data.qLayer a * data.xHat)ᴴ := by rfl
+        _ = data.xHatᴴ * (Ta data.qLayer a)ᴴ := by
+              simp [Matrix.conjTranspose_mul]
+        _ = data.xHatᴴ * Ta data.qLayer a := by rw [hTa]
+    calc
+      Pa data a = data.xHatᴴ * Ta data.qLayer a * data.xHat := by rfl
+      _ = (XHatA data a)ᴴ * data.xHat := by rw [hXHatA]
 
 /-- **`XHat` squared** (`lem:X-hat-squared`).
 
