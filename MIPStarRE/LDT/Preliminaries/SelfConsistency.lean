@@ -6,10 +6,11 @@ import MIPStarRE.LDT.Preliminaries.Theorems
 Additional proposition statements from
 `references/ldt-paper/preliminaries.tex`.
 
-The long paper-faithful Lean proofs for these extensions are still pending.
+Four of these five propositions are now fully proved. The remaining 
 This file records the exact signatures together with proof-sketch comments
-as statement stubs; the theorem bodies use `sorry` placeholders until the
-full proofs are formalized.
+as `selfConsistencyImpliesDataProcessing` uses a `sorry` placeholder pending the
+full 70-line paper proof.
+
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -23,7 +24,7 @@ open MIPStarRE.LDT
 If A is ζ-strongly self-consistent on a permutation-invariant state, then
 ∑_a ⟨ψ| A_a² ⊗ I |ψ⟩ ≥ ∑_a ⟨ψ| A_a ⊗ I |ψ⟩ − ζ.
 
-Proof sketch:
+Proof:
 1. Apply Cauchy-Schwarz to the families `A_a ⊗ I` and `I ⊗ A_a`.
 2. Use permutation invariance to identify the two square-mass factors.
 3. Conclude `∑ₐ ⟨ψ|(A_a)^2 ⊗ I|ψ⟩ ≥ ∑ₐ ⟨ψ|A_a ⊗ A_a|ψ⟩`.
@@ -64,7 +65,7 @@ theorem bipartiteSSCSquaredMass {Outcome : Type*}
 
 /-- `prop:other-two-notions-of-self-consistency`.
 
-Proof sketch:
+Proof:
 1. Expand `qConsDefect` for the left/right lifts.
 2. Bound the total-overlap term `⟨ψ|A ⊗ A|ψ⟩` by `⟨ψ|A ⊗ I|ψ⟩`
    using `A.total ≤ I`.
@@ -154,7 +155,7 @@ theorem otherTwoNotionsOfSelfConsistency {Question Outcome : Type*}
 
 /-- `prop:two-notions-of-self-consistency-after-evaluation`.
 
-Proof sketch:
+Proof:
 1. Postprocessing preserves the total mass and can only increase the diagonal
    overlap term `∑_b ⟨ψ|A_[f(a)=b] ⊗ A_[f(a)=b]|ψ⟩`.
 2. Hence bipartite SSC transfers from `A` to the postprocessed family.
@@ -256,7 +257,7 @@ theorem twoNotionsOfSelfConsistencyAfterEvaluation
 
 /-- `prop:completeness-transfer-self-consistent-A`.
 
-Proof sketch:
+Proof:
 1. Lower-bound `⟨ψ|B ⊗ I|ψ⟩` by the mixed overlap
    `∑ₐ ⟨ψ|B_a ⊗ A_a|ψ⟩` using `A_a ≤ I`.
 2. Compare `∑ₐ ⟨ψ|B_a ⊗ A_a|ψ⟩` with
