@@ -7,7 +7,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 Paper-faithful proof infrastructure for the internal orthonormalization chain in
 `references/ldt-paper/orthonormalization.tex`.
 
-This file adds the intermediate `Q/X/XHat/P` objects and the 16 helper-lemma
+This file adds the intermediate `Q/X/XHat/P` objects and the 15 helper-lemma
 stubs tracked in issue #197. The actual proofs are deferred, but the signatures
 are intended to match the paper's decomposition of the argument.
 
@@ -25,7 +25,7 @@ open MIPStarRE.LDT
 
 noncomputable section
 
--- NOTE: 16 sorry stubs are intentional scaffolding for issue #197. See PROOF_INTEGRITY.md.
+-- NOTE: 15 sorry stubs are intentional scaffolding for issue #197. See PROOF_INTEGRITY.md.
 
 /-- The quarter-root error term `ζ^(1/4)` used throughout the paper's late-stage
 orthonormalization estimates. -/
