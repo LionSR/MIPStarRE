@@ -100,6 +100,7 @@ theorem triangleInequalityForVectorsSquared
           rw [Real.sq_sqrt]
           exact ev_adjoint_self_nonneg ψ (D i)
 
+-- TODO: consider moving to Basic/
 private lemma max_zero_add_le (x y : Error) :
     max 0 (x + y) ≤ max 0 x + |y| := by
   by_cases hxy : x + y < 0
@@ -113,7 +114,7 @@ private lemma max_zero_add_le (x y : Error) :
 
 /-- `prop:triangle-sub`.
 
-Proof sketch: rewrite both consistency errors as
+The proof rewrites both consistency errors as
 `ev ψ (I ⊗ C.total) - Σₐ ev ψ (...)`, bound the overlap difference by
 Cauchy-Schwarz using `ev_abs_mul_le_sqrt` and `subMeas_diagMass_le_one`, then
 average with `avgOver_abs_le_sqrt_of_pointwise`.
@@ -297,6 +298,7 @@ theorem triangleSub
     _ ≤ δ + Real.sqrt ε := by
           simpa [add_comm] using add_le_add_right (Real.sqrt_le_sqrt hAB) δ
 
+-- TODO: factor the shared proof structure with `triangleSub`.
 private lemma triangleSub_right
     {Question Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
@@ -475,7 +477,7 @@ private lemma triangleSub_right
 
 /-- `prop:simeq-triangle-inequality`.
 
-Proof sketch: apply `simeqToApprox` to the two hypotheses through the middle
+Apply `simeqToApprox` to the two hypotheses through the middle
 measurement `B`, use the `SDDRel` triangle inequality to compare the induced
 right-side families, and finish with `triangleSub`. Quantitatively this gives
 `ε + sqrt (4 * (δ + γ)) = ε + 2 * sqrt (δ + γ)`.
@@ -545,7 +547,10 @@ theorem simeqTriangleInequality
         (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B))
         (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas D))
         (2 * ((2 * δ) + (2 * γ))) (4 * (δ + γ))
-        (by ring_nf; linarith)
+        (by
+          -- Normalizing both sides turns each expression into `4 * δ + 4 * γ`.
+          ring_nf
+          linarith)
         hBD_sdd_raw
   have hδ_nonneg : 0 ≤ δ := by
     rcases hCB with ⟨hδ⟩
