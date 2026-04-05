@@ -234,11 +234,14 @@ noncomputable def localAndVariance (params : Parameters)
 /-- The column-space indices for `A_combine`. -/
 abbrev combinedColumnIndex (params : Parameters) (ι : Type*) := Point params × ι
 
-/-- The paper's combined column operator `A_combine = ∑_u |u⟩ ⊗ A^u`. -/
+/-- The paper's combined column operator, realized here as
+`A_combine = ∑_u |u⟩ ⊗ (A^u)ᴴ`. -/
 noncomputable def combinedOperator (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) :
     Matrix (combinedColumnIndex params ι) ι ℂ :=
-  fun ui j => A ui.1 ui.2 j
+  -- We store the columns of `(A u)ᴴ` so the trace witnesses match the
+  -- variance definitions based on `ρ * ((A u - A v)ᴴ * (A u - A v))`.
+  fun ui j => (A ui.1)ᴴ ui.2 j
 
 /-! ### Fourier analysis on the hypercube `F_q^m`
 
