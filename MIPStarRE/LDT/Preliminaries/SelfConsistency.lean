@@ -34,7 +34,30 @@ theorem bipartiteSSCSquaredMass {Outcome : Type*}
     BipartiteSSCRel ψ (uniformDistribution Unit) (constSubMeasFamily A) ζ →
       ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a * A.outcome a)) ≥
         ev ψ (leftTensor (ι₂ := ι) A.total) - ζ := by
-  sorry -- TODO(sorry)
+  intro hssc
+  have hlocal :
+      SSCRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A.liftLeft) ζ :=
+    bipartiteSSC_implies_localSSC_liftLeft ψ hperm
+      (uniformDistribution Unit) (constSubMeasFamily A) ζ <|
+      by simpa [constSubMeasFamily, IdxSubMeas.liftLeft]
+        using hssc
+  rcases hlocal with ⟨hlocal⟩
+  have hq : qSSCDefect ψ A.liftLeft ≤ ζ := by
+    simpa [sscError, avgOver, uniformDistribution, constSubMeasFamily] using hlocal
+  have hinner :
+      ev ψ A.liftLeft.total -
+          ∑ a : Outcome, ev ψ (A.liftLeft.outcome a * A.liftLeft.outcome a) ≤
+        ζ := by
+    exact le_trans (le_max_right 0 _) hq
+  calc
+    ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a * A.outcome a))
+      = ∑ a : Outcome, ev ψ (A.liftLeft.outcome a * A.liftLeft.outcome a) := by
+          simp [SubMeas.liftLeft, leftTensor_mul_leftTensor]
+    _ ≥ ev ψ A.liftLeft.total - ζ := by
+          linarith
+    _ = ev ψ (leftTensor (ι₂ := ι) A.total) - ζ := by
+          simp [SubMeas.liftLeft]
 
 /-- `prop:other-two-notions-of-self-consistency`.
 
@@ -48,12 +71,83 @@ theorem otherTwoNotionsOfSelfConsistency {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
-    (hperm : PermInvState ψ)
+    (_hperm : PermInvState ψ)
     (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error) :
     BipartiteSSCRel ψ 𝒟 A δ →
       ConsRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftRight A) δ := by
-  sorry -- TODO(sorry)
+  intro ⟨hssc⟩
+  constructor
+  unfold consError
+  calc
+    avgOver 𝒟
+        (fun q =>
+          qConsDefect ψ ((IdxSubMeas.liftLeft A) q) ((IdxSubMeas.liftRight A) q))
+      ≤ avgOver 𝒟 (fun q => qBipartiteSSCDefect ψ (A q)) := by
+          apply avgOver_mono
+          intro q
+          let M := A q
+          have htotal_le :
+              ev ψ (M.liftLeft.total * M.liftRight.total) ≤
+                ev ψ (leftTensor (ι₂ := ι) M.total) := by
+            have hopTensor_le :
+                opTensor M.total M.total ≤ leftTensor (ι₂ := ι) M.total := by
+              have hrewrite :
+                  leftTensor (ι₂ := ι) M.total - opTensor M.total M.total =
+                    opTensor M.total (1 - M.total) := by
+                have hneg :
+                    Matrix.kronecker M.total (-M.total) =
+                      -Matrix.kronecker M.total M.total := by
+                  simpa using
+                    (Matrix.kronecker_smul (-1 : ℂ) M.total M.total)
+                calc
+                  leftTensor (ι₂ := ι) M.total - opTensor M.total M.total
+                    = Matrix.kronecker M.total 1 +
+                        Matrix.kronecker M.total (-M.total) := by
+                          rw [hneg]
+                          simp [leftTensor, opTensor, sub_eq_add_neg]
+                  _ = Matrix.kronecker M.total (1 - M.total) := by
+                        simpa [sub_eq_add_neg] using
+                          (Matrix.kronecker_add M.total 1 (-M.total)).symm
+                  _ = opTensor M.total (1 - M.total) := by
+                        simp [opTensor]
+              change
+                (leftTensor (ι₂ := ι) M.total - opTensor M.total M.total).PosSemidef
+              rw [hrewrite]
+              change Matrix.PosSemidef (Matrix.kronecker M.total (1 - M.total))
+              exact
+                Matrix.PosSemidef.kronecker
+                  (Matrix.nonneg_iff_posSemidef.mp M.total_nonneg)
+                  (Matrix.nonneg_iff_posSemidef.mp
+                    (sub_nonneg.mpr M.total_le_one))
+            have hmono :
+                ev ψ (opTensor M.total M.total) ≤
+                  ev ψ (leftTensor (ι₂ := ι) M.total) :=
+              ev_mono ψ _ _ hopTensor_le
+            simpa [SubMeas.liftLeft, SubMeas.liftRight,
+              leftTensor_mul_rightTensor_eq_opTensor] using hmono
+          have hmatch :
+              qMatchMass ψ M.liftLeft M.liftRight =
+                ∑ a : Outcome, ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
+            simp [qMatchMass, SubMeas.liftLeft, SubMeas.liftRight,
+              leftTensor_mul_rightTensor_eq_opTensor]
+          have hinner :
+              ev ψ (M.liftLeft.total * M.liftRight.total) -
+                  qMatchMass ψ M.liftLeft M.liftRight ≤
+                ev ψ (leftTensor (ι₂ := ι) M.total) -
+                  ∑ a : Outcome, ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
+            rw [hmatch]
+            exact sub_le_sub_right htotal_le _
+          change
+            max 0
+                (ev ψ (M.liftLeft.total * M.liftRight.total) -
+                  qMatchMass ψ M.liftLeft M.liftRight)
+              ≤
+            max 0
+                (ev ψ (leftTensor (ι₂ := ι) M.total) -
+                  ∑ a : Outcome, ev ψ (opTensor (M.outcome a) (M.outcome a)))
+          exact max_le_max le_rfl hinner
+    _ ≤ δ := hssc
 
 /-- `prop:two-notions-of-self-consistency-after-evaluation`.
 
@@ -74,7 +168,88 @@ theorem twoNotionsOfSelfConsistencyAfterEvaluation
         (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
         (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
         (2 * δ) := by
-  sorry -- TODO(sorry)
+  intro hssc
+  have hpost :
+      BipartiteSSCRel ψ 𝒟 (fun q => postprocess (A q) f) δ := by
+    rcases hssc with ⟨hssc⟩
+    constructor
+    unfold bipartiteSSCError at *
+    calc
+      avgOver 𝒟 (fun q => qBipartiteSSCDefect ψ (postprocess (A q) f))
+        ≤ avgOver 𝒟 (fun q => qBipartiteSSCDefect ψ (A q)) := by
+            apply avgOver_mono
+            intro q
+            let M := A q
+            have hmatch :
+                qMatchMass ψ
+                    (leftPlacedSubMeas (ιB := ι) (postprocess M f))
+                    (rightPlacedSubMeas (ιA := ι) (postprocess M f)) ≥
+                  qMatchMass ψ
+                    (leftPlacedSubMeas (ιB := ι) M)
+                    (rightPlacedSubMeas (ιA := ι) M) :=
+              qMatchMass_leftRight_postprocess_ge ψ M M f
+            have hsub :
+                ev ψ (leftTensor (ι₂ := ι) M.total) -
+                    qMatchMass ψ
+                      (leftPlacedSubMeas (ιB := ι) (postprocess M f))
+                      (rightPlacedSubMeas (ιA := ι) (postprocess M f))
+                  ≤
+                ev ψ (leftTensor (ι₂ := ι) M.total) -
+                    qMatchMass ψ
+                      (leftPlacedSubMeas (ιB := ι) M)
+                      (rightPlacedSubMeas (ιA := ι) M) := by
+              linarith
+            have hmass_post :
+                ev ψ (leftTensor (ι₂ := ι) (postprocess M f).total) =
+                  ev ψ (leftTensor (ι₂ := ι) M.total) := by
+              simp [postprocess_total]
+            have hmatch_post :
+                qMatchMass ψ
+                    (leftPlacedSubMeas (ιB := ι) (postprocess M f))
+                    (rightPlacedSubMeas (ιA := ι) (postprocess M f)) =
+                  ∑ b : β,
+                    ev ψ
+                      (opTensor
+                        ((postprocess M f).outcome b)
+                        ((postprocess M f).outcome b)) := by
+              simp [qMatchMass, leftPlacedSubMeas, rightPlacedSubMeas,
+                leftTensor_mul_rightTensor_eq_opTensor]
+            have hmatch_orig :
+                qMatchMass ψ
+                    (leftPlacedSubMeas (ιB := ι) M)
+                    (rightPlacedSubMeas (ιA := ι) M) =
+                  ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
+              simp [qMatchMass, leftPlacedSubMeas, rightPlacedSubMeas,
+                leftTensor_mul_rightTensor_eq_opTensor]
+            have hsub' :
+                ev ψ (leftTensor (ι₂ := ι) M.total) -
+                    ∑ b : β,
+                      ev ψ
+                        (opTensor
+                          ((postprocess M f).outcome b)
+                          ((postprocess M f).outcome b))
+                  ≤
+                ev ψ (leftTensor (ι₂ := ι) M.total) -
+                    ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
+              rw [← hmatch_post, ← hmatch_orig]
+              exact hsub
+            change
+              max 0
+                  (ev ψ (leftTensor (ι₂ := ι) (postprocess M f).total) -
+                    ∑ b : β,
+                      ev ψ
+                        (opTensor
+                          ((postprocess M f).outcome b)
+                          ((postprocess M f).outcome b)))
+                ≤
+              max 0
+                  (ev ψ (leftTensor (ι₂ := ι) M.total) -
+                    ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)))
+            rw [hmass_post]
+            exact max_le_max le_rfl hsub'
+      _ ≤ δ := hssc
+  exact twoNotionsOfSelfConsistency ψ 𝒟 (fun q => postprocess (A q) f) δ
+    ⟨hperm, hpost⟩
 
 /-- `prop:completeness-transfer-self-consistent-A`.
 
@@ -100,7 +275,153 @@ theorem completenessTransferSelfConsistentA
     SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft B) ε →
       idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft B) ≥
         idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) - δ - 2 * Real.sqrt ε := by
-  sorry -- TODO(sorry)
+  intro hssc ⟨hε⟩
+  have hlocalSSC :
+      SSCRel ψ 𝒟 (IdxSubMeas.liftLeft A) δ :=
+    bipartiteSSC_implies_localSSC_liftLeft ψ hperm 𝒟 A δ hssc
+  rcases hlocalSSC with ⟨hδ⟩
+  let diagA : Question → Error := fun q =>
+    ∑ a : Outcome,
+      ev ψ
+        (((IdxSubMeas.liftLeft A) q).outcome a *
+          ((IdxSubMeas.liftLeft A) q).outcome a)
+  let defectA : Question → Error := fun q =>
+    subMeasMass ψ ((IdxSubMeas.liftLeft A) q) - diagA q
+  have hdefectA_avg :
+      avgOver 𝒟 defectA ≤ δ := by
+    calc
+      avgOver 𝒟 defectA
+        ≤ avgOver 𝒟 (fun q => qSSCDefect ψ ((IdxSubMeas.liftLeft A) q)) := by
+            apply avgOver_mono
+            intro q
+            exact le_max_right 0 (defectA q)
+      _ = sscError ψ 𝒟 (IdxSubMeas.liftLeft A) := by
+            simp [sscError, qSSCDefect]
+      _ ≤ δ := hδ
+  let sdd : Question → Error := fun q =>
+    qSDD ψ ((IdxSubMeas.liftLeft A) q) ((IdxSubMeas.liftLeft B) q)
+  let gap : Question → Error := fun q =>
+    diagA q - subMeasMass ψ ((IdxSubMeas.liftLeft B) q)
+  have hgap_pointwise : ∀ q, gap q ≤ 2 * Real.sqrt (sdd q) := by
+    intro q
+    let diagB : Error :=
+      ∑ a : Outcome,
+        ev ψ
+          (((IdxSubMeas.liftLeft B) q).outcome a *
+            ((IdxSubMeas.liftLeft B) q).outcome a)
+    let overlap : Error :=
+      ∑ a : Outcome,
+        ev ψ
+          (((IdxSubMeas.liftLeft A) q).outcome a *
+            ((IdxSubMeas.liftLeft B) q).outcome a)
+    have hdiagB_le_massB :
+        diagB ≤ subMeasMass ψ ((IdxSubMeas.liftLeft B) q) := by
+      simpa [diagB, subMeasMass] using
+        subMeas_diagMass_le_mass ψ ((IdxSubMeas.liftLeft B) q)
+    have hgap_left_raw :
+        |diagA q - overlap| ≤ Real.sqrt (sdd q) := by
+      simpa [diagA, overlap, sdd] using
+        question_overlap_gap_left ψ hψ
+          ((IdxSubMeas.liftLeft A) q) ((IdxSubMeas.liftLeft B) q)
+    have hgap_left :
+        diagA q - overlap ≤ Real.sqrt (sdd q) := by
+      linarith [abs_le.mp hgap_left_raw]
+    have hgap_right_raw :
+        |overlap - diagB| ≤ Real.sqrt (sdd q) := by
+      simpa [diagB, overlap, sdd] using
+        question_overlap_gap_right ψ hψ
+          ((IdxSubMeas.liftLeft A) q) ((IdxSubMeas.liftLeft B) q)
+    have hgap_right :
+        overlap - diagB ≤ Real.sqrt (sdd q) := by
+      linarith [abs_le.mp hgap_right_raw]
+    have hdiag_gap :
+        diagA q - diagB ≤ 2 * Real.sqrt (sdd q) := by
+      linarith
+    have hmass_gap :
+        gap q ≤ diagA q - diagB := by
+      dsimp [gap]
+      exact sub_le_sub_left hdiagB_le_massB _
+    exact le_trans hmass_gap hdiag_gap
+  have hgap_avg :
+      avgOver 𝒟 gap ≤ avgOver 𝒟 (fun q => 2 * Real.sqrt (sdd q)) := by
+    unfold avgOver
+    refine Finset.sum_le_sum ?_
+    intro q hq
+    exact mul_le_mul_of_nonneg_left (hgap_pointwise q) (𝒟.nonnegative q)
+  have hsqrt_avg_abs :
+      |avgOver 𝒟 (fun q => Real.sqrt (sdd q))| ≤
+        Real.sqrt (avgOver 𝒟 sdd) := by
+    exact
+      avgOver_abs_le_sqrt_of_pointwise 𝒟
+        (fun q => Real.sqrt (sdd q))
+        sdd
+        (by
+          intro q
+          rw [abs_of_nonneg (Real.sqrt_nonneg _)])
+        (by
+          intro q
+          exact qSDD_nonneg ψ ((IdxSubMeas.liftLeft A) q) ((IdxSubMeas.liftLeft B) q))
+        h𝒟
+  have hsqrt_avg_nonneg :
+      0 ≤ avgOver 𝒟 (fun q => Real.sqrt (sdd q)) := by
+    unfold avgOver
+    exact Finset.sum_nonneg fun q hq =>
+      mul_nonneg (𝒟.nonnegative q) (Real.sqrt_nonneg _)
+  have hsqrt_avg :
+      avgOver 𝒟 (fun q => Real.sqrt (sdd q)) ≤
+        Real.sqrt (avgOver 𝒟 sdd) := by
+    simpa [abs_of_nonneg hsqrt_avg_nonneg] using hsqrt_avg_abs
+  have hscale_avg :
+      avgOver 𝒟 (fun q => 2 * Real.sqrt (sdd q)) =
+        2 * avgOver 𝒟 (fun q => Real.sqrt (sdd q)) := by
+    unfold avgOver
+    calc
+      ∑ q ∈ 𝒟.support, 𝒟.weight q * (2 * Real.sqrt (sdd q))
+        = ∑ q ∈ 𝒟.support, 2 * (𝒟.weight q * Real.sqrt (sdd q)) := by
+            refine Finset.sum_congr rfl ?_
+            intro q hq
+            ring
+      _ = 2 * ∑ q ∈ 𝒟.support, 𝒟.weight q * Real.sqrt (sdd q) := by
+            rw [← Finset.mul_sum]
+  have hsdd_sqrt :
+      avgOver 𝒟 (fun q => 2 * Real.sqrt (sdd q)) ≤
+        2 * Real.sqrt (sddError ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft B)) := by
+    rw [hscale_avg]
+    calc
+      2 * avgOver 𝒟 (fun q => Real.sqrt (sdd q))
+        ≤ 2 * Real.sqrt (avgOver 𝒟 sdd) := by
+            exact mul_le_mul_of_nonneg_left hsqrt_avg (by positivity)
+      _ = 2 * Real.sqrt (sddError ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft B)) := by
+            simp [sddError, sdd]
+  have hsqrt_ε :
+      Real.sqrt (sddError ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft B)) ≤
+        Real.sqrt ε := by
+    exact Real.sqrt_le_sqrt hε
+  have hgap_total :
+      avgOver 𝒟 gap ≤ 2 * Real.sqrt ε := by
+    calc
+      avgOver 𝒟 gap
+        ≤ avgOver 𝒟 (fun q => 2 * Real.sqrt (sdd q)) := hgap_avg
+      _ ≤ 2 * Real.sqrt (sddError ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft B)) := hsdd_sqrt
+      _ ≤ 2 * Real.sqrt ε := by
+            exact mul_le_mul_of_nonneg_left hsqrt_ε (by positivity)
+  have hsplit :
+      idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) -
+          idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft B) =
+        avgOver 𝒟 defectA + avgOver 𝒟 gap := by
+    unfold idxSubMeasMass subMeasMass avgOver defectA gap diagA
+    rw [← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl ?_
+    intro q hq
+    simp [subMeasMass]
+    ring
+  have hfinal :
+      idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft A) -
+          idxSubMeasMass ψ 𝒟 (IdxSubMeas.liftLeft B) ≤
+        δ + 2 * Real.sqrt ε := by
+    rw [hsplit]
+    linarith
+  linarith
 
 /-- `prop:self-consistency-implies-data-processing`.
 

@@ -183,7 +183,7 @@ private lemma ev_leftTensor_mul_rightTensor_nonneg
         (Matrix.nonneg_iff_posSemidef.mp hX)
         (Matrix.nonneg_iff_posSemidef.mp hY)).nonneg
 
-private lemma qMatchMass_leftRight_postprocess_ge {α β : Type*}
+lemma qMatchMass_leftRight_postprocess_ge {α β : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype α] [Fintype β]
     (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) :
@@ -264,7 +264,7 @@ private lemma qMatchMass_leftRight_postprocess_ge {α β : Type*}
                       (Finset.univ.filter (fun a => f a = b)) (fun a => B.outcome a)]
             _ = fiberPair b := hfiber_expand b
 
-private lemma qConsDefect_leftRight_postprocess_le {α β : Type*}
+lemma qConsDefect_leftRight_postprocess_le {α β : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype α] [Fintype β]
     (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) :
@@ -1351,7 +1351,7 @@ theorem closenessOfInnerProduct_right
     simpa [Matrix.conjTranspose_mul] using ev_adjoint_eq ψ (B q a * C q a b)
   simpa [hA, hB] using hleft
 
-private lemma question_overlap_gap_left
+lemma question_overlap_gap_left
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
@@ -1429,7 +1429,7 @@ private lemma question_overlap_gap_left
             _ = ev ψ ((A.outcome a - B.outcome a) * A.outcome a) := by
                   simp [sub_mul]
 
-private lemma question_overlap_gap_right
+lemma question_overlap_gap_right
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
@@ -2891,6 +2891,31 @@ lemma sscError_nonneg {Question Outcome : Type*}
   unfold sscError
   exact avgOver_nonneg 𝒟 _ fun a => by unfold qSSCDefect; exact le_max_left 0 _
 
+private lemma rightTensor_mul_leftTensor_eq_opTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    rightTensor (ι₁ := ι₁) B * leftTensor (ι₂ := ι₂) A = opTensor A B := by
+  simpa [rightTensor, leftTensor, opTensor] using
+    (Matrix.mul_kronecker_mul
+      (1 : MIPStarRE.Quantum.Op ι₁) A B (1 : MIPStarRE.Quantum.Op ι₂)).symm
+
+lemma leftTensor_mul_leftTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A B : MIPStarRE.Quantum.Op ι₁) :
+    leftTensor (ι₂ := ι₂) A * leftTensor (ι₂ := ι₂) B =
+      leftTensor (ι₂ := ι₂) (A * B) := by
+  simpa [leftTensor] using
+    (Matrix.mul_kronecker_mul
+      A B (1 : MIPStarRE.Quantum.Op ι₂) (1 : MIPStarRE.Quantum.Op ι₂)).symm
+
+private lemma rightTensor_mul_rightTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A B : MIPStarRE.Quantum.Op ι₂) :
+    rightTensor (ι₁ := ι₁) A * rightTensor (ι₁ := ι₁) B =
+      rightTensor (ι₁ := ι₁) (A * B) := by
+  simpa [rightTensor] using
+    (Matrix.mul_kronecker_mul
+      (1 : MIPStarRE.Quantum.Op ι₁) (1 : MIPStarRE.Quantum.Op ι₁) A B).symm
 
 private lemma leftTensor_mono
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
@@ -3227,7 +3252,7 @@ The proof expands `qSDD ψ A.liftLeft A.liftRight`, uses
 `PermInvState.swap_ev` to identify the left and right square terms, and
 then reads off `∑ ev(A_a² ⊗ I) ≥ ∑ ev(A_a ⊗ A_a)` from
 `qSDD_nonneg`. -/
-private lemma bipartiteSSC_implies_localSSC_liftLeft {Question Outcome : Type*}
+lemma bipartiteSSC_implies_localSSC_liftLeft {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
