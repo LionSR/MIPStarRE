@@ -41,7 +41,7 @@ noncomputable def pullSndOpFamily {α β : Type*} [Fintype α] [Fintype β] {κ 
     [Fintype κ] [DecidableEq κ]
     (A : OpFamily β κ) : OpFamily (α × β) κ where
   outcome := fun ab => A.outcome ab.2
-  total := ∑ ab : α × β, A.outcome ab.2
+  total := (Fintype.card α : ℂ) • A.total
 
 /-- Outcomewise tensor product of same-indexed raw families on opposite registers. -/
 noncomputable def sameOutcomeTensorOpFamily {α : Type*} [Fintype α]
@@ -166,11 +166,12 @@ noncomputable def evaluatedSliceProductRight (params : Parameters)
         (evaluatedSliceFirstFactor params family q)
         (evaluatedSliceSecondFactor params family q)
 
-/-- The sandwiched evaluated product `(G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`
-on the bipartite space `d * d`. -/
+/-- The sandwiched evaluated product `G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]`
+on the single-register space `d`. -/
 noncomputable def evaluatedSliceSandwichRaw (params : Parameters)
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) ι :=
+  -- strategy retained for API compatibility with the Lean packaging layer
   fun q =>
     sandwichByOuterSubMeas
       (evaluatedSliceFirstFactor params family q)

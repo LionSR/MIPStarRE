@@ -21,7 +21,11 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 The paper's displayed primal ranges over submeasurements `∑_g T_g ≤ I`; the
 Slater/complementary-slackness conclusion then upgrades an optimal witness to
 `∑_g T_g = I`. We model that directly by taking `T : SubMeas ...` and recording
-the upgraded equality as a field. -/
+the upgraded equality as a field. This is also why later statements often accept
+`Measurement` inputs but store the SDP witness at the `SubMeas` level via
+`.toSubMeas`: the development keeps the optimization object in the weaker
+interface and inserts the `Measurement → SubMeas` coercion layer only at the
+theorem boundary. -/
 structure SdpOptimalPair (params : Parameters)
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where
