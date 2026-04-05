@@ -57,6 +57,7 @@ The strategy state is bipartite.  Alice-side measurements are lifted to
 the left tensor factor, while Bob-side postprocessed point measurements
 are lifted to the right tensor factor. -/
 structure CommDataProcessedGConclusion (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (G : SubMeas (Polynomial params) ι)
@@ -94,6 +95,7 @@ structure CommDataProcessedGConclusion (params : Parameters)
 
 /-- Output package for `thm:com-main`. -/
 structure ComMainConclusion (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (G : SubMeas (Polynomial params) ι)
@@ -131,6 +133,7 @@ structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -247,7 +250,7 @@ private lemma postprocess_leftPlacedOpFamily_reversedProduct_outcome
 /-- The evaluated-from-full-slice ordered product equals the
 evaluated-slice ordered product at each question-outcome pair. -/
 private lemma evaluatedFromFullSliceProductLeft_outcome_eq
-    (params : Parameters) (strategy : SymStrat params.next ι)
+    (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (q : EvaluatedSliceQuestion params)
     (ab : EvaluatedSliceOutcome params) :
@@ -272,7 +275,7 @@ private lemma evaluatedFromFullSliceProductLeft_outcome_eq
 /-- The evaluated-from-full-slice reversed product equals the
 evaluated-slice reversed product at each question-outcome pair. -/
 private lemma evaluatedFromFullSliceProductRight_outcome_eq
-    (params : Parameters) (strategy : SymStrat params.next ι)
+    (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (q : EvaluatedSliceQuestion params)
     (ab : EvaluatedSliceOutcome params) :
@@ -298,7 +301,7 @@ private lemma evaluatedFromFullSliceProductRight_outcome_eq
 SDD error, because the postprocessed product equals the product of
 postprocessed submeasurements at every question-outcome pair. -/
 private lemma evaluationSpecialization_sddErrorOp_eq
-    (params : Parameters) (strategy : SymStrat params.next ι)
+    (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) :
     sddErrorOp strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
@@ -318,6 +321,7 @@ private lemma evaluationSpecialization_sddErrorOp_eq
 /-- `thm:com-main`. -/
 theorem comMain
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)

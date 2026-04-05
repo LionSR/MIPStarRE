@@ -19,27 +19,27 @@ namespace MIPStarRE.LDT
 
 /-- Evaluate a polynomial-valued submeasurement at a point. -/
 noncomputable def evaluateAt {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters) (u : Point params)
+    (params : Parameters) [FieldModel params.q] (u : Point params)
     (G : SubMeas (Polynomial params) ι) : SubMeas (Fq params) ι :=
   postprocess G (fun g => g u)
 
 /-- View a global polynomial submeasurement as a point-indexed answer family. -/
 noncomputable def polynomialEvaluationFamily {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters)
+    (params : Parameters) [FieldModel params.q]
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (Point params) (Fq params) ι :=
   fun u => evaluateAt params u G
 
 /-- Evaluate each member of an indexed polynomial family at the same point. -/
 noncomputable def evaluateFiberFamilyAt {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters) (u : Point params)
+    (params : Parameters) [FieldModel params.q] (u : Point params)
     (G : IdxSubMeas (Fq params) (Polynomial params) ι) :
     IdxSubMeas (Fq params) (Fq params) ι :=
   fun x => evaluateAt params u (G x)
 
 /-- Evaluate an indexed slice family at a point `(u, x)` in `F_q^{m+1}`. -/
 noncomputable def evaluateFiberFamilyAtNextPoint {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters)
+    (params : Parameters) [FieldModel params.q]
     (G : IdxSubMeas (Fq params) (Polynomial params) ι) :
     IdxSubMeas (Point params.next) (Fq params) ι :=
   fun u => evaluateAt params (truncatePoint params u) (G (pointHeight params u))

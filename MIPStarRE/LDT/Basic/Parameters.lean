@@ -56,9 +56,6 @@ instance {params : Parameters} : NeZero params.q :=
 abbrev Fq (params : Parameters) := Fin params.q
 abbrev Point (params : Parameters) := Fin params.m → Fq params
 abbrev PointTuple (params : Parameters) (k : ℕ) := Fin k → Fq params
-abbrev Scalar (params : Parameters) := ZMod params.q
-abbrev PolynomialModel (params : Parameters) := MvPolynomial (Fin params.m) (Scalar params)
-abbrev LinePolynomialModel (params : Parameters) := _root_.Polynomial (Scalar params)
 abbrev HilbertIndex (n : ℕ) := Fin n
 
 instance {params : Parameters} : Inhabited (Fin params.m) :=
@@ -81,36 +78,87 @@ noncomputable abbrev HonestFq (params : Parameters) (spec : PrimePowerFieldSpec 
   letI : Fact spec.p.Prime := ⟨spec.pPrime⟩
   GaloisField spec.p spec.n
 
+/-- A bundled field model for the paper's `F_q`, together with a coding equivalence
+to the repository's finite carrier `Fin q`. -/
+class FieldModel (q : ℕ) where
+  K : Type*
+  instField : Field K
+  instFintype : Fintype K
+  instDecidableEq : DecidableEq K
+  equiv : K ≃ Fin q
+
+attribute [instance] FieldModel.instField FieldModel.instFintype FieldModel.instDecidableEq
+
+/-- Build the honest field model from prime-power data. -/
+noncomputable def PrimePowerFieldSpec.toFieldModel (params : Parameters)
+    (spec : PrimePowerFieldSpec params) : FieldModel params.q := by
+  classical
+  letI : Fact spec.p.Prime := ⟨spec.pPrime⟩
+  let K := HonestFq params spec
+  letI : Fintype K := Fintype.ofFinite K
+  have hcard : Fintype.card K = params.q := by
+    rw [← Nat.card_eq_fintype_card, spec.cardEq]
+    simpa [K, HonestFq] using (GaloisField.card (p := spec.p) (n := spec.n) spec.nPos.ne')
+  exact
+    { K := K
+      instField := inferInstance
+      instFintype := inferInstance
+      instDecidableEq := inferInstance
+      equiv := Fintype.equivFinOfCardEq hcard }
+
+abbrev Scalar (params : Parameters) [FieldModel params.q] := FieldModel.K params.q
+abbrev PolynomialModel (params : Parameters) [FieldModel params.q] :=
+  MvPolynomial (Fin params.m) (Scalar params)
+abbrev LinePolynomialModel (params : Parameters) [FieldModel params.q] :=
+  _root_.Polynomial (Scalar params)
+
+@[simp] theorem scalar_card (params : Parameters) [FieldModel params.q] :
+    Fintype.card (Scalar params) = params.q := by
+  simpa [Scalar, Fq] using Fintype.card_congr (FieldModel.equiv (q := params.q))
+
+instance {params : Parameters} [FieldModel params.q] : FieldModel params.next.q := by
+  simpa [Parameters.next] using (inferInstance : FieldModel params.q)
+
 /-- Interpret a coded coordinate in `Fin q` as a scalar in `ZMod q`. -/
-def decodeScalar {params : Parameters} (x : Fq params) : Scalar params :=
-  (x.1 : ZMod params.q)
+def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
+  (FieldModel.equiv (q := params.q)).symm x
 
 /-- Re-encode a scalar in `ZMod q` as its canonical representative in `Fin q`. -/
-def encodeScalar {params : Parameters} (x : Scalar params) : Fq params :=
-  ⟨x.val, ZMod.val_lt x⟩
+def encodeScalar {params : Parameters} [FieldModel params.q] (x : Scalar params) : Fq params :=
+  FieldModel.equiv (q := params.q) x
+
+@[simp] theorem encode_decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) :
+    encodeScalar (decodeScalar x) = x := by
+  simp [encodeScalar, decodeScalar]
+
+@[simp] theorem decode_encodeScalar {params : Parameters} [FieldModel params.q]
+    (x : Scalar params) :
+    decodeScalar (encodeScalar x) = x := by
+  simp [encodeScalar, decodeScalar]
 
 /-- The zero coordinate. -/
-def zeroCoord {params : Parameters} : Fq params :=
+def zeroCoord {params : Parameters} [FieldModel params.q] : Fq params :=
   encodeScalar 0
 
 /-- Coordinate addition transported through the `Fin q` coding. -/
-def addCoord {params : Parameters} (x y : Fq params) : Fq params :=
+def addCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x + decodeScalar y)
 
 /-- Coordinate subtraction transported through the `Fin q` coding. -/
-def subCoord {params : Parameters} (x y : Fq params) : Fq params :=
+def subCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x - decodeScalar y)
 
 /-- Coordinate multiplication transported through the `Fin q` coding. -/
-def mulCoord {params : Parameters} (x y : Fq params) : Fq params :=
+def mulCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x * decodeScalar y)
 
 /-- Pointwise addition in the coded ambient space. -/
-def addPoint {params : Parameters} (u v : Point params) : Point params :=
+def addPoint {params : Parameters} [FieldModel params.q] (u v : Point params) : Point params :=
   fun i => addCoord (u i) (v i)
 
 /-- Scalar multiplication in the coded ambient space. -/
-def smulPoint {params : Parameters} (t : Fq params) (u : Point params) : Point params :=
+def smulPoint {params : Parameters} [FieldModel params.q] (t : Fq params) (u : Point params) :
+    Point params :=
   fun i => mulCoord t (u i)
 
 /-- The inclusion of the first `m` coordinates into `m + 1` coordinates. -/
@@ -145,16 +193,17 @@ def pointHeight (params : Parameters) (u : Point params.next) : Fq params :=
   simp [pointHeight, lastCoord, appendPoint]
 
 /-- Decode a coded point as a tuple of `ZMod q` scalars. -/
-def decodePoint {params : Parameters} (u : Point params) : Fin params.m → Scalar params :=
+def decodePoint {params : Parameters} [FieldModel params.q] (u : Point params) :
+    Fin params.m → Scalar params :=
   fun i => decodeScalar (u i)
 
 /-- Evaluate a multivariate `ZMod q` polynomial on a coded point. -/
-def evalPolynomialModel (params : Parameters)
+def evalPolynomialModel (params : Parameters) [FieldModel params.q]
     (p : PolynomialModel params) (u : Point params) : Fq params :=
   encodeScalar (MvPolynomial.eval (decodePoint u) p)
 
 /-- Evaluate a univariate `ZMod q` polynomial on a coded point. -/
-def evalLinePolynomialModel (params : Parameters)
+def evalLinePolynomialModel (params : Parameters) [FieldModel params.q]
     (p : LinePolynomialModel params) (t : Fq params) : Fq params :=
   encodeScalar (_root_.Polynomial.eval (decodeScalar t) p)
 
@@ -167,7 +216,8 @@ structure AxisParallelLine (params : Parameters) where
 namespace AxisParallelLine
 
 /-- The canonical affine parameterization `t ↦ base + t e_i`. -/
-def pointAt {params : Parameters} (ℓ : AxisParallelLine params) : Fq params → Point params :=
+def pointAt {params : Parameters} [FieldModel params.q]
+    (ℓ : AxisParallelLine params) : Fq params → Point params :=
   fun t i =>
     if i = ℓ.direction then
       addCoord (ℓ.base i) t
@@ -191,11 +241,12 @@ structure DiagonalLine (params : Parameters) where
 namespace DiagonalLine
 
 /-- The canonical affine parameterization `t ↦ base + t · direction`. -/
-def pointAt {params : Parameters} (ℓ : DiagonalLine params) : Fq params → Point params :=
+def pointAt {params : Parameters} [FieldModel params.q]
+    (ℓ : DiagonalLine params) : Fq params → Point params :=
   fun t => addPoint ℓ.base (smulPoint t ℓ.direction)
 
 /-- Embed a diagonal line into the slice at height `x`, keeping the new coordinate fixed. -/
-def appendAtHeight (params : Parameters)
+def appendAtHeight (params : Parameters) [FieldModel params.q]
     (ℓ : DiagonalLine params) (x : Fq params) : DiagonalLine params.next where
   base := appendPoint params ℓ.base x
   direction := appendPoint params ℓ.direction zeroCoord
@@ -204,50 +255,53 @@ end DiagonalLine
 
 /-- A coded function has low individual degree when it is represented by an actual
 multivariate polynomial over `ZMod q` whose degree in each variable is at most `d`. -/
-def HasLowIndividualDegree (params : Parameters) (g : Point params → Fq params) : Prop :=
+def HasLowIndividualDegree (params : Parameters) [FieldModel params.q]
+    (g : Point params → Fq params) : Prop :=
   ∃ p : PolynomialModel params,
     (∀ i, MvPolynomial.degreeOf i p ≤ params.d) ∧
       g = evalPolynomialModel params p
 
 /-- A coded univariate function has degree at most `bound` when it is represented by
 an actual polynomial over `ZMod q` of degree at most `bound`. -/
-def HasUnivariateDegreeAtMost (params : Parameters)
+def HasUnivariateDegreeAtMost (params : Parameters) [FieldModel params.q]
     (bound : ℕ) (f : Fq params → Fq params) : Prop :=
   ∃ p : LinePolynomialModel params,
     p.natDegree ≤ bound ∧
       f = evalLinePolynomialModel params p
 
 /-- Axis-parallel line answers are genuine univariate degree-`d` polynomials. -/
-structure AxisLinePolynomial (params : Parameters) where
+structure AxisLinePolynomial (params : Parameters) [FieldModel params.q] where
   poly : LinePolynomialModel params
   degreeBounded : poly.natDegree ≤ params.d
 
 namespace AxisLinePolynomial
 
 /-- Evaluation of an axis-line answer on the line parameter. -/
-def toFun {params : Parameters} (f : AxisLinePolynomial params) : Fq params → Fq params :=
+def toFun {params : Parameters} [FieldModel params.q] (f : AxisLinePolynomial params) :
+    Fq params → Fq params :=
   evalLinePolynomialModel params f.poly
 
-instance {params : Parameters} :
+instance {params : Parameters} [FieldModel params.q] :
     CoeFun (AxisLinePolynomial params) (fun _ => Fq params → Fq params) :=
   ⟨AxisLinePolynomial.toFun⟩
 
 /-- The stored polynomial really witnesses the advertised degree bound. -/
-theorem hasUnivariateDegreeAtMost {params : Parameters} (f : AxisLinePolynomial params) :
+theorem hasUnivariateDegreeAtMost {params : Parameters} [FieldModel params.q]
+    (f : AxisLinePolynomial params) :
     HasUnivariateDegreeAtMost params params.d f := by
   refine ⟨f.poly, f.degreeBounded, ?_⟩
   funext t
   rfl
 
 /-- Extend an axis-line answer to the slice at height `x`. -/
-def appendAtHeight (params : Parameters)
+def appendAtHeight (params : Parameters) [FieldModel params.q]
     (f : AxisLinePolynomial params) (_x : Fq params) : AxisLinePolynomial params.next where
   poly := f.poly
   degreeBounded := by
     simpa [Parameters.next] using f.degreeBounded
 
 /-- Restrict an axis-line answer in `m + 1` variables to the slice at height `x`. -/
-def restrictAtHeight (params : Parameters)
+def restrictAtHeight (params : Parameters) [FieldModel params.q]
     (f : AxisLinePolynomial params.next) (_x : Fq params) : AxisLinePolynomial params where
   poly := f.poly
   degreeBounded := by
@@ -256,29 +310,31 @@ def restrictAtHeight (params : Parameters)
 end AxisLinePolynomial
 
 /-- Diagonal-line answers are genuine univariate degree-`md` polynomials. -/
-structure DiagonalLinePolynomial (params : Parameters) where
+structure DiagonalLinePolynomial (params : Parameters) [FieldModel params.q] where
   poly : LinePolynomialModel params
   degreeBounded : poly.natDegree ≤ params.m * params.d
 
 namespace DiagonalLinePolynomial
 
 /-- Evaluation of a diagonal-line answer on the line parameter. -/
-def toFun {params : Parameters} (f : DiagonalLinePolynomial params) : Fq params → Fq params :=
+def toFun {params : Parameters} [FieldModel params.q] (f : DiagonalLinePolynomial params) :
+    Fq params → Fq params :=
   evalLinePolynomialModel params f.poly
 
-instance {params : Parameters} :
+instance {params : Parameters} [FieldModel params.q] :
     CoeFun (DiagonalLinePolynomial params) (fun _ => Fq params → Fq params) :=
   ⟨DiagonalLinePolynomial.toFun⟩
 
 /-- The stored polynomial really witnesses the advertised degree bound. -/
-theorem hasUnivariateDegreeAtMost {params : Parameters} (f : DiagonalLinePolynomial params) :
+theorem hasUnivariateDegreeAtMost {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) :
     HasUnivariateDegreeAtMost params (params.m * params.d) f := by
   refine ⟨f.poly, f.degreeBounded, ?_⟩
   funext t
   rfl
 
 /-- Extend a diagonal-line answer to the slice at height `x`. -/
-def appendAtHeight (params : Parameters)
+def appendAtHeight (params : Parameters) [FieldModel params.q]
     (f : DiagonalLinePolynomial params) (_x : Fq params) : DiagonalLinePolynomial params.next where
   poly := f.poly
   degreeBounded := by
@@ -286,7 +342,7 @@ def appendAtHeight (params : Parameters)
 
 /-- Restrict a diagonal-line answer in `m + 1` variables to the slice at height `x`.
 This interface now makes the stronger slice-wise degree requirement explicit. -/
-def restrictAtHeight (params : Parameters)
+def restrictAtHeight (params : Parameters) [FieldModel params.q]
     (f : DiagonalLinePolynomial params.next) (_x : Fq params)
     (hdegree : f.poly.natDegree ≤ params.m * params.d) : DiagonalLinePolynomial params where
   poly := f.poly
@@ -295,28 +351,31 @@ def restrictAtHeight (params : Parameters)
 end DiagonalLinePolynomial
 
 /-- Global low-individual-degree polynomial outcomes. -/
-structure Polynomial (params : Parameters) where
+structure Polynomial (params : Parameters) [FieldModel params.q] where
   poly : PolynomialModel params
   lowIndividualDegree : ∀ i, MvPolynomial.degreeOf i poly ≤ params.d
 
 namespace Polynomial
 
 /-- Evaluation of the stored multivariate polynomial on a coded point. -/
-def toFun {params : Parameters} (g : Polynomial params) : Point params → Fq params :=
+def toFun {params : Parameters} [FieldModel params.q] (g : Polynomial params) :
+    Point params → Fq params :=
   evalPolynomialModel params g.poly
 
-instance {params : Parameters} : CoeFun (Polynomial params) (fun _ => Point params → Fq params) :=
+instance {params : Parameters} [FieldModel params.q] :
+    CoeFun (Polynomial params) (fun _ => Point params → Fq params) :=
   ⟨Polynomial.toFun⟩
 
 /-- The stored polynomial indeed certifies low individual degree. -/
-theorem hasLowIndividualDegree {params : Parameters} (g : Polynomial params) :
+theorem hasLowIndividualDegree {params : Parameters} [FieldModel params.q]
+    (g : Polynomial params) :
     HasLowIndividualDegree params g := by
   refine ⟨g.poly, g.lowIndividualDegree, ?_⟩
   funext u
   rfl
 
 /-- Extend a global polynomial to the slice at height `x` by ignoring the new variable. -/
-noncomputable def appendAtHeight (params : Parameters)
+noncomputable def appendAtHeight (params : Parameters) [FieldModel params.q]
     (g : Polynomial params) (_x : Fq params) : Polynomial params.next where
   poly := MvPolynomial.rename (embedCoord params) g.poly
   lowIndividualDegree := by
@@ -341,7 +400,8 @@ noncomputable def appendAtHeight (params : Parameters)
       omega
 
 /-- Coordinate map for restricting a polynomial in `m+1` variables to the slice `X_m = x`. -/
-noncomputable def restrictAtHeightCoordinateMap (params : Parameters) (x : Fq params) :
+noncomputable def restrictAtHeightCoordinateMap (params : Parameters) [FieldModel params.q]
+    (x : Fq params) :
     Fin params.next.m → PolynomialModel params :=
   fun i =>
     if h : i.1 < params.m then
@@ -349,7 +409,8 @@ noncomputable def restrictAtHeightCoordinateMap (params : Parameters) (x : Fq pa
     else
       MvPolynomial.C (decodeScalar x)
 
-private theorem degreeOf_restrictAtHeightCoordinateMap_le (params : Parameters) (x : Fq params)
+private theorem degreeOf_restrictAtHeightCoordinateMap_le
+    (params : Parameters) [FieldModel params.q] (x : Fq params)
     (i : Fin params.m) (j : Fin params.next.m) :
     MvPolynomial.degreeOf i (restrictAtHeightCoordinateMap params x j) ≤
       if j = embedCoord params i then 1 else 0 := by
@@ -383,7 +444,7 @@ private theorem degreeOf_restrictAtHeightCoordinateMap_le (params : Parameters) 
     · simp [restrictAtHeightCoordinateMap, hj, MvPolynomial.degreeOf_C, hji]
 
 /-- Restrict a global polynomial in `m + 1` variables to the slice at height `x`. -/
-noncomputable def restrictAtHeight (params : Parameters)
+noncomputable def restrictAtHeight (params : Parameters) [FieldModel params.q]
     (g : Polynomial params.next) (x : Fq params) : Polynomial params where
   poly := MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params x) g.poly
   lowIndividualDegree := by
@@ -455,7 +516,8 @@ noncomputable def restrictAtHeight (params : Parameters)
                 (g.lowIndividualDegree (embedCoord params i))) n hn
 
 /-- Coordinate polynomial for restricting to an axis-parallel affine line. -/
-noncomputable def axisCoordinatePolynomial (params : Parameters) (ℓ : AxisParallelLine params) :
+noncomputable def axisCoordinatePolynomial (params : Parameters) [FieldModel params.q]
+    (ℓ : AxisParallelLine params) :
     Fin params.m → LinePolynomialModel params :=
   fun i =>
     if i = ℓ.direction then
@@ -463,7 +525,7 @@ noncomputable def axisCoordinatePolynomial (params : Parameters) (ℓ : AxisPara
     else
       _root_.Polynomial.C (decodeScalar (ℓ.base i))
 
-private theorem natDegree_axisCoordinatePolynomial_le (params : Parameters)
+private theorem natDegree_axisCoordinatePolynomial_le (params : Parameters) [FieldModel params.q]
     (ℓ : AxisParallelLine params) (i : Fin params.m) :
     (axisCoordinatePolynomial params ℓ i).natDegree ≤ if i = ℓ.direction then 1 else 0 := by
   classical
@@ -478,7 +540,7 @@ private theorem natDegree_axisCoordinatePolynomial_le (params : Parameters)
   · simp [axisCoordinatePolynomial, hi, Polynomial.natDegree_C]
 
 /-- Restrict a global polynomial to an axis-parallel line. -/
-noncomputable def restrictToAxisParallelLine (params : Parameters)
+noncomputable def restrictToAxisParallelLine (params : Parameters) [FieldModel params.q]
     (g : Polynomial params) (ℓ : AxisParallelLine params) : AxisLinePolynomial params where
   poly := MvPolynomial.eval₂Hom _root_.Polynomial.C (axisCoordinatePolynomial params ℓ) g.poly
   degreeBounded := by
@@ -531,13 +593,15 @@ noncomputable def restrictToAxisParallelLine (params : Parameters)
         exact (MvPolynomial.degreeOf_le_iff.mp (g.lowIndividualDegree ℓ.direction)) n hn
 
 /-- Coordinate polynomial for restricting to a diagonal affine line. -/
-noncomputable def diagonalCoordinatePolynomial (params : Parameters) (ℓ : DiagonalLine params) :
+noncomputable def diagonalCoordinatePolynomial (params : Parameters) [FieldModel params.q]
+    (ℓ : DiagonalLine params) :
     Fin params.m → LinePolynomialModel params :=
   fun i =>
     _root_.Polynomial.C (decodeScalar (ℓ.base i)) +
       _root_.Polynomial.C (decodeScalar (ℓ.direction i)) * _root_.Polynomial.X
 
 private theorem natDegree_diagonalCoordinatePolynomial_le (params : Parameters)
+    [FieldModel params.q]
     (ℓ : DiagonalLine params) (i : Fin params.m) :
     (diagonalCoordinatePolynomial params ℓ i).natDegree ≤ 1 := by
   rcases subsingleton_or_nontrivial (Scalar params) with hsub | hnontriv
@@ -561,7 +625,7 @@ private theorem natDegree_diagonalCoordinatePolynomial_le (params : Parameters)
       _ = 1 := by simp
 
 /-- Restrict a global polynomial to a diagonal line. -/
-noncomputable def restrictToDiagonalLine (params : Parameters)
+noncomputable def restrictToDiagonalLine (params : Parameters) [FieldModel params.q]
     (g : Polynomial params) (ℓ : DiagonalLine params) : DiagonalLinePolynomial params where
   poly := MvPolynomial.eval₂Hom _root_.Polynomial.C (diagonalCoordinatePolynomial params ℓ) g.poly
   degreeBounded := by
@@ -609,7 +673,8 @@ end Polynomial
 /-- TODO(finite-outcomes): replace these `sorry`-backed bounded-answer enumerations by
 explicit coefficient-vector models for the bounded polynomial answer spaces. They are
 used so postprocessing can aggregate outcome operators over actual finite fibers. -/
-noncomputable instance (params : Parameters) : Fintype (AxisLinePolynomial params) := by
+noncomputable instance (params : Parameters) [FieldModel params.q] :
+    Fintype (AxisLinePolynomial params) := by
   classical
   let e :
       AxisLinePolynomial params ≃
@@ -647,7 +712,8 @@ noncomputable instance (params : Parameters) : Fintype (AxisLinePolynomial param
   }
   exact Fintype.ofEquiv _ (e.trans e').symm
 
-noncomputable instance (params : Parameters) : Fintype (DiagonalLinePolynomial params) := by
+noncomputable instance (params : Parameters) [FieldModel params.q] :
+    Fintype (DiagonalLinePolynomial params) := by
   classical
   let e :
       DiagonalLinePolynomial params ≃
@@ -685,7 +751,8 @@ noncomputable instance (params : Parameters) : Fintype (DiagonalLinePolynomial p
   }
   exact Fintype.ofEquiv _ (e.trans e').symm
 
-noncomputable instance (params : Parameters) : Fintype (Polynomial params) := by
+noncomputable instance (params : Parameters) [FieldModel params.q] :
+    Fintype (Polynomial params) := by
   classical
   let e :
       Polynomial params ≃

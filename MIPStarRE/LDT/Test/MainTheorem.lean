@@ -30,7 +30,7 @@ The bipartite tensor placement follows the paper:
 Fixes #137.
 -/
 theorem mainFormal
-    (params : Parameters) {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι)
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)

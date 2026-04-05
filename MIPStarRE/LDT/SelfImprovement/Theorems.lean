@@ -26,7 +26,7 @@ the upgraded equality as a field. This is also why later statements often accept
 `.toSubMeas`: the development keeps the optimization object in the weaker
 interface and inserts the `Measurement → SubMeas` coercion layer only at the
 theorem boundary. -/
-structure SdpOptimalPair (params : Parameters)
+structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where
   primalTotalOperator :
@@ -47,7 +47,7 @@ structure SdpOptimalPair (params : Parameters)
           MatrixSdpOptimalWitness params model Tm Zm
 
 /-- Output package for `lem:sdp`. -/
-structure SdpStatement (params : Parameters)
+structure SdpStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :
     ∃ T : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
@@ -57,6 +57,7 @@ structure SdpStatement (params : Parameters)
 Returns a bipartite operator `(M u).outcome o ⊗ H.outcome h`. -/
 noncomputable def addInULeftOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
+    [FieldModel params.q]
     (_strategy : SymStrat params ι)
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι)
@@ -70,6 +71,7 @@ noncomputable def addInULeftOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
 Returns a bipartite operator `(Au * (M u).outcome o * Au) ⊗ T.outcome h`. -/
 noncomputable def addInURightOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (M : IdxSubMeas (Point params) Outcome ι)
     (T : SubMeas (Polynomial params) ι)
@@ -82,6 +84,7 @@ noncomputable def addInURightOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
 
 /-- The left-hand expectation in `lem:add-in-u`. -/
 noncomputable def addInULeftQuantity {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι)
@@ -93,6 +96,7 @@ noncomputable def addInULeftQuantity {Outcome : Type*} [Fintype Outcome] (params
 
 /-- The right-hand expectation in `lem:add-in-u`. -/
 noncomputable def addInURightQuantity {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (M : IdxSubMeas (Point params) Outcome ι)
     (T : SubMeas (Polynomial params) ι)
@@ -105,6 +109,7 @@ noncomputable def addInURightQuantity {Outcome : Type*} [Fintype Outcome] (param
 /-- The pointwise matched operator `Σ_a A^u_a ⊗ H_[h(u)=a]`
 on the bipartite space `ι × ι`. -/
 noncomputable def helperAgreementOperatorAtPoint (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (H : SubMeas (Polynomial params) ι)
     (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
@@ -114,6 +119,7 @@ noncomputable def helperAgreementOperatorAtPoint (params : Parameters)
 /-- The average operator `E_u Σ_a A^u_a ⊗ H_[h(u)=a]`
 on the bipartite space `ι × ι`. -/
 noncomputable def helperAgreementAverageOperator (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (H : SubMeas (Polynomial params) ι) :
     MIPStarRE.Quantum.Op (ι × ι) :=
@@ -130,6 +136,7 @@ noncomputable def helperUpperOperator (_params : Parameters)
 /-- The operator measuring the helper-stage boundedness defect
 on the bipartite space `ι × ι`. -/
 noncomputable def helperBoundednessOperator (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (H : SubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) :
@@ -139,6 +146,7 @@ noncomputable def helperBoundednessOperator (params : Parameters)
 
 /-- The helper-stage boundedness defect. -/
 noncomputable def helperBoundednessGap (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (H : SubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) : Error :=
@@ -148,6 +156,7 @@ noncomputable def helperBoundednessGap (params : Parameters)
 /-- The projective-stage residual operator `Z ⊗ (I - H)`
 on the bipartite space `ι × ι`. -/
 noncomputable def projectiveResidualOperator (params : Parameters)
+    [FieldModel params.q]
     (H : ProjSubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) :
     MIPStarRE.Quantum.Op (ι × ι) :=
@@ -156,6 +165,7 @@ noncomputable def projectiveResidualOperator (params : Parameters)
 
 /-- The projective-stage boundedness defect. -/
 noncomputable def projectiveBoundednessGap (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (H : ProjSubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) : Error :=
@@ -164,6 +174,7 @@ noncomputable def projectiveBoundednessGap (params : Parameters)
 
 /-- Output package for `lem:add-in-u`. -/
 structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : Measurement (Polynomial params) ι)
     (M : IdxSubMeas (Point params) Outcome ι)
@@ -187,7 +198,7 @@ structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Paramete
             MatrixAddInUTransferStatement params model Tm Mmat Hmat eps delta
 
 /-- Output package for `lem:self-improvement-helper`. -/
-structure SelfImprovementHelperConclusion (params : Parameters)
+structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : Measurement (Polynomial params) ι)
     (T : Measurement (Polynomial params) ι)
@@ -225,7 +236,7 @@ structure SelfImprovementHelperConclusion (params : Parameters)
       (selfImprovementHelperError params eps delta)
 
 /-- Output package for `thm:self-improvement`. -/
-structure SelfImprovementConclusion (params : Parameters)
+structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : Measurement (Polynomial params) ι)
     (H : ProjSubMeas (Polynomial params) ι)
@@ -272,7 +283,7 @@ structure SelfImprovementConclusion (params : Parameters)
       (selfImprovementError params eps delta)
 
 /-- Output package for the explicit bridge from measurement to submeasurement input. -/
-structure SelfImprovementSubMeasConclusion (params : Parameters)
+structure SelfImprovementSubMeasConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (H : ProjSubMeas (Polynomial params) ι)
@@ -285,6 +296,7 @@ structure SelfImprovementSubMeasConclusion (params : Parameters)
 /-- `lem:self-improvement-helper`. -/
 lemma selfImprovementHelper
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -306,6 +318,7 @@ lemma selfImprovementHelper
 /-- `lem:sdp`. -/
 lemma sdp
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι) :
     SdpStatement params strategy := by
   /-
@@ -319,6 +332,7 @@ lemma sdp
 /-- `lem:add-in-u`. -/
 lemma addInU {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -337,6 +351,7 @@ lemma addInU {Outcome : Type*} [Fintype Outcome]
 /-- `thm:self-improvement`. -/
 theorem selfImprovement
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -359,6 +374,7 @@ submeasurement-input version used in `inductive_step.tex`.
 -/
 theorem selfImprovementFromSubMeas
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
     (hgood : strategy.IsGood eps delta gamma)

@@ -18,6 +18,7 @@ involve bipartite-lifted operators use `leftPlacedSubMeas` /
 `rightPlacedSubMeas` / `tensorFailureExpectation` with honest bipartite
 structure. -/
 structure SelfImprovementInInductionSectionConclusion (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (_G : SubMeas (Polynomial params) ι)
     (H : ProjSubMeas (Polynomial params) ι)
@@ -48,6 +49,7 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
 
 /-- Output package for the section-local pasting theorem. -/
 structure LdPastingInInductionSectionConclusion (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (_family : IdxPolyFamily params ι)
     (H : Measurement (Polynomial params.next) ι)
@@ -60,6 +62,7 @@ structure LdPastingInInductionSectionConclusion (params : Parameters)
 
 /-- Bookkeeping data `x ↦ (ε_x, δ_x, γ_x)` for the restricted strategies. -/
 structure RestrictedFailureProfile (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι) : Type where
   axisParallel : Fq params → Error
   selfConsistency : Fq params → Error
@@ -73,24 +76,28 @@ structure RestrictedFailureProfile (params : Parameters)
 
 /-- Average restricted axis-parallel error over slices. -/
 noncomputable def averageRestrictedAxisParallelError (params : Parameters)
+    [FieldModel params.q]
     {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   avgOver (uniformDistribution (Fq params)) profile.axisParallel
 
 /-- Average restricted self-consistency error over slices. -/
 noncomputable def averageRestrictedSelfConsistencyError (params : Parameters)
+    [FieldModel params.q]
     {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   avgOver (uniformDistribution (Fq params)) profile.selfConsistency
 
 /-- Average restricted diagonal-line error over slices. -/
 noncomputable def averageRestrictedDiagonalError (params : Parameters)
+    [FieldModel params.q]
     {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   avgOver (uniformDistribution (Fq params)) profile.diagonal
 
 /-- Source-style boundedness input for the induction-level pasting theorem. -/
 structure PastingBoundednessInput (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
   bounded : family.Bounded strategy.state zeta
@@ -107,6 +114,7 @@ for the diagonal and axis-parallel branches. The extra diagonal-specific
 encoding in `RestrictedSymStrat`; they should disappear once that encoding is
 refactored to produce a genuine restricted diagonal strategy. -/
 structure RestrictedProbabilitiesStatement (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error) : Prop where
   profileExists :
