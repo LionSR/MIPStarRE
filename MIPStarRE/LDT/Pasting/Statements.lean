@@ -118,9 +118,9 @@ structure LdPastingConclusion (params : Parameters)
   -- bound here continues to use the induction-section error term, while `ν`
   -- tracks the completeness loss below.
   pointConsistency :
-    ConsWithPolyEval params.next strategy.state
+    ConsRel strategy.state (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      H.toSubMeas.liftRight
+      (polynomialEvaluationFamily params.next H.toSubMeas.liftRight)
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta)
 
@@ -137,9 +137,9 @@ structure LdPastingSubMeasConclusion (params : Parameters)
   -- bound here continues to use the induction-section error term, while `ν`
   -- only appears in the completeness lower bound.
   pointConsistency :
-    ConsWithPolyEval params.next strategy.state
+    ConsRel strategy.state (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      H.liftRight
+      (polynomialEvaluationFamily params.next H.liftRight)
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta)
   completeness :
