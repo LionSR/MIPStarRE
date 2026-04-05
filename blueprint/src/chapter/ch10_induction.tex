@@ -266,7 +266,7 @@
 
 \begin{proof}
   \proves{thm:main-formal}
-  \uses{lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual}
+  \uses{thm:main-induction, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual}
   Let
   \[
     (\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})
@@ -277,9 +277,12 @@
   \[
     \ket{\psi_{\mathrm{sym}}}
     =
+    \frac{1}{\sqrt{2}}
+    \left(
     \ket{0}_{\mathrm{A}'}\ket{1}_{\mathrm{B}'}\ket{\psi}_{\mathrm{AB}}
     +
-    \ket{1}_{\mathrm{A}'}\ket{0}_{\mathrm{B}'}\ket{\psi_{\mathrm{swap}}}_{\mathrm{AB}}.
+    \ket{1}_{\mathrm{A}'}\ket{0}_{\mathrm{B}'}\ket{\psi_{\mathrm{swap}}}_{\mathrm{AB}}
+    \right).
   \]
   Define the symmetrized point measurement by
   \[
@@ -367,7 +370,7 @@
     Q_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{\zeta_3/2} I \ot Q_{[g(u)=a]}^{\mathrm B}.
   \end{equation}
 
-  Next, Lemma~\ref{prop:triangle-sub}, applied to \ref{eq:G-self-consistency,eq:G-with-Q-A}, implies
+  Next, Lemma~\ref{prop:triangle-sub}, applied to \ref{eq:G-self-consistency} and \ref{eq:G-with-Q-A}, implies
   \[
     Q_g^{\mathrm A} \ot I \simeq_{\zeta_1} I \ot G_g^{\mathrm B}.
   \]
@@ -375,7 +378,7 @@
   \begin{equation}\label{eq:ok-almost-there-ok}
     Q_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{\zeta_1} I \ot G_{[g(u)=a]}^{\mathrm B}.
   \end{equation}
-  Applying Lemma~\ref{prop:simeq-triangle-inequality} to \ref{eq:cons-b,eq:ok-almost-there-ok,eq:just-data-processed-the-heck-outta-this} yields
+  Applying Lemma~\ref{prop:simeq-triangle-inequality} to \ref{eq:cons-b}, \ref{eq:ok-almost-there-ok}, and \ref{eq:just-data-processed-the-heck-outta-this} yields
   \begin{equation}\label{eq:one-goal}
     A_a^{\mathrm A,u} \ot I \simeq_{\zeta_4} I \ot Q_{[g(u)=a]}^{\mathrm B},
   \end{equation}
@@ -412,5 +415,5 @@
   \[
     100000k^2m^4\left(\eps^{1/40000}+(d/q)^{1/40000}+e^{-k/(2560000m^2)}\right).
   \]
-  Hence \ref{eq:one-goal,eq:another-goal,eq:third-goal} give the three claimed conclusions, with $Q^{\mathrm A}$ and $Q^{\mathrm B}$ renamed as the theorem's $G^{\mathrm A}$ and $G^{\mathrm B}$.
+  Hence \ref{eq:one-goal}, \ref{eq:another-goal}, and \ref{eq:third-goal} give the three claimed conclusions, with $Q^{\mathrm A}$ and $Q^{\mathrm B}$ renamed as the theorem's $G^{\mathrm A}$ and $G^{\mathrm B}$.
 \end{proof}
