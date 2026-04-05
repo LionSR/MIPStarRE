@@ -343,7 +343,7 @@ theorem simeqDataProcessing {Question α β : Type*}
 /-! ### Infrastructure: triangle inequality for `SDDRel` -/
 
 /-- Atomic mathematical fact: the parallelogram-style inequality for `qSDD`. -/
-private lemma questionSDD_triangle {Outcome : Type*}
+lemma questionSDD_triangle {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (A B C : SubMeas Outcome ι) :
@@ -368,7 +368,7 @@ private lemma questionSDD_triangle {Outcome : Type*}
   linarith
 
 /-- Triangle inequality for state-dependent distance. -/
-private lemma stateDependentDistanceRel_triangle
+lemma stateDependentDistanceRel_triangle
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
@@ -401,7 +401,7 @@ private lemma stateDependentDistanceRel_triangle
         exact add_le_add h₁ h₂
 
 /-- Monotonicity: if `SDDRel` holds for `δ`, it holds for any `δ' ≥ δ`. -/
-private lemma stateDependentDistanceRel_mono
+lemma stateDependentDistanceRel_mono
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
