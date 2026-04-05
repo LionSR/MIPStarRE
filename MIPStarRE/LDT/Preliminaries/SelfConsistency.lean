@@ -428,7 +428,7 @@ theorem completenessTransferSelfConsistentA
 
 /-- `prop:self-consistency-implies-data-processing`.
 
-Proof sketch:
+Proof:
 1. First prove the “wrong-side” estimate
    `P_[f] ⊗ I ≈_{2δ + 4√ε} I ⊗ A_[f]` by:
    - expanding the `qSDD` square,

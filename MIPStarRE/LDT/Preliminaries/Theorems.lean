@@ -264,8 +264,7 @@ lemma qMatchMass_leftRight_postprocess_ge {α β : Type*}
                       (Finset.univ.filter (fun a => f a = b)) (fun a => B.outcome a)]
             _ = fiberPair b := hfiber_expand b
 
--- Exported for use in `Preliminaries.SelfConsistency.selfConsistencyImpliesDataProcessing`
-lemma qConsDefect_leftRight_postprocess_le {α β : Type*}
+private lemma qConsDefect_leftRight_postprocess_le {α β : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype α] [Fintype β]
     (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) :
