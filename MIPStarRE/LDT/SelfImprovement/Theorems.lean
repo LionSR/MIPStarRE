@@ -18,14 +18,17 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- An optimal primal/dual pair for the section's semidefinite program.
 
-**Note on formulation:** The paper's SDP primal uses the weaker constraint `∑_g T_g ≤ I`,
-then proves `∑_g T_g = I` at optimality via the Slater condition. Our formalization
-takes `T : Measurement` (which enforces `total = 1`) directly — this is correct for
-the theorem statement (the optimum IS a measurement) but the proof will need the
-weaker `SubMeas` formulation internally. -/
+The paper's displayed primal ranges over submeasurements `∑_g T_g ≤ I`; the
+Slater/complementary-slackness conclusion then upgrades an optimal witness to
+`∑_g T_g = I`. We model that directly by taking `T : SubMeas ...` and recording
+the upgraded equality as a field. This is also why later statements often accept
+`Measurement` inputs but store the SDP witness at the `SubMeas` level via
+`.toSubMeas`: the development keeps the optimization object in the weaker
+interface and inserts the `Measurement → SubMeas` coercion layer only at the
+theorem boundary. -/
 structure SdpOptimalPair (params : Parameters)
     (strategy : SymStrat params ι)
-    (T : Measurement (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where
+    (T : SubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where
   primalTotalOperator :
     T.total = 1
   dualPositive : 0 ≤ Z
@@ -39,7 +42,7 @@ structure SdpOptimalPair (params : Parameters)
       sdpComplementarySlacknessEquation params strategy T Z g
   matrixWitness :
     ∃ model : MatrixSdpRealization params,
-      ∃ Tm : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space,
+      ∃ Tm : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
         ∃ Zm : MatrixOperator model.space,
           MatrixSdpOptimalWitness params model Tm Zm
 
@@ -47,7 +50,7 @@ structure SdpOptimalPair (params : Parameters)
 structure SdpStatement (params : Parameters)
     (strategy : SymStrat params ι) : Prop where
   witness :
-    ∃ T : Measurement (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+    ∃ T : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SdpOptimalPair params strategy T Z
 
 /-- The operator inside the left-hand side of `lem:add-in-u` at a fixed point `u`.
@@ -69,7 +72,7 @@ noncomputable def addInURightOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (strategy : SymStrat params ι)
     (M : IdxSubMeas (Point params) Outcome ι)
-    (T : Measurement (Polynomial params) ι)
+    (T : SubMeas (Polynomial params) ι)
     (S : AddInUSelection params Outcome)
     (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
   open Classical in
@@ -92,7 +95,7 @@ noncomputable def addInULeftQuantity {Outcome : Type*} [Fintype Outcome] (params
 noncomputable def addInURightQuantity {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     (strategy : SymStrat params ι)
     (M : IdxSubMeas (Point params) Outcome ι)
-    (T : Measurement (Polynomial params) ι)
+    (T : SubMeas (Polynomial params) ι)
     (S : AddInUSelection params Outcome) : Error :=
   avgOver (uniformDistribution (Point params))
     (fun u =>
@@ -167,20 +170,20 @@ structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Paramete
     (H : SubMeas (Polynomial params) ι)
     (eps delta : Error) : Prop where
   averagedConstruction :
-    H = averagedSandwichedPolynomialSubMeas params strategy T
+    H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
   varianceBound :
     pointConditionedGlobalVariance params strategy T.toSubMeas ≤
       selfImprovementVarianceError params eps delta
   transfer :
     ∀ S : AddInUSelection params Outcome,
       |addInULeftQuantity params strategy M H S -
-          addInURightQuantity params strategy M T S| ≤
+          addInURightQuantity params strategy M T.toSubMeas S| ≤
         addInUError params eps delta
   matrixWitness :
     ∃ model : MatrixSdpRealization params,
       ∃ Mmat : MatrixIndexedPointOutcomeFamily params Outcome model.space,
         ∃ Hmat : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
-          ∃ Tm : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space,
+          ∃ Tm : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
             MatrixAddInUTransferStatement params model Tm Mmat Hmat eps delta
 
 /-- Output package for `lem:self-improvement-helper`. -/
@@ -190,9 +193,9 @@ structure SelfImprovementHelperConclusion (params : Parameters)
     (T : Measurement (Polynomial params) ι)
     (H : SubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
-  sdpWitness : SdpOptimalPair params strategy T Z
+  sdpWitness : SdpOptimalPair params strategy T.toSubMeas Z
   averagedConstruction :
-    H = averagedSandwichedPolynomialSubMeas params strategy T
+    H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
   addInUTransfer :
     ∀ {Outcome : Type*} [Fintype Outcome] (M : IdxSubMeas (Point params) Outcome ι),
       AddInUStatement params strategy T M H eps delta

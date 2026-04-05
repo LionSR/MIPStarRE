@@ -88,7 +88,13 @@ lemma restrictedProbabilities
   /-
   This is the slice-conditioning bookkeeping lemma from `inductive_step.tex`.
   It needs a genuine construction of the restricted failure profile and several
-  averaging/conditioning estimates, so it remains a standalone proof task.
+  averaging/conditioning estimates.
+
+  TODO(#195): The paper's statement uses a genuine restricted diagonal strategy
+  and the `((m + 1) / m)` loss factor on the diagonal branch. The current Lean
+  statement still reflects the temporary `q`-based diagonal conditioning model
+  from `Defs`/`Statements`, so the proof should not be filled in until that
+  modeling mismatch is resolved.
   -/
   sorry
 

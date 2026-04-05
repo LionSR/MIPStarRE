@@ -36,14 +36,14 @@ noncomputable def matrixAveragedPointOperator (params : Parameters)
 /-- The concrete primal contribution `T_g A_g`. -/
 noncomputable def matrixSdpPrimalContributionOperator (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (g : Polynomial params) : MatrixOperator model.space :=
   (T.effect g) * matrixAveragedPointOperator params model g
 
 /-- The concrete primal objective `Σ_g Re Tr(T_g A_g)`. -/
 noncomputable def matrixSdpPrimalObjective (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space) : Error :=
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) : Error :=
   Complex.re (Matrix.trace (∑ g : Polynomial params,
     matrixSdpPrimalContributionOperator params model T g))
 
@@ -63,7 +63,7 @@ noncomputable def matrixSdpDualSlackOperator (params : Parameters)
 /-- The concrete complementary-slackness defect `T_g (Z - A_g)`. -/
 noncomputable def matrixSdpComplementarySlacknessDefect (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (Z : MatrixOperator model.space)
     (g : Polynomial params) : MatrixOperator model.space :=
   (T.effect g) * matrixSdpDualSlackOperator params model Z g
@@ -71,8 +71,10 @@ noncomputable def matrixSdpComplementarySlacknessDefect (params : Parameters)
 /-- Matrix-level witness for an optimal SDP pair. -/
 structure MatrixSdpOptimalWitness (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (Z : MatrixOperator model.space) : Prop where
+  primalTotalEqOne :
+    ∑ g : Polynomial params, T.effect g = 1
   dualPositive : 0 ≤ Z
   dualFeasible :
     ∀ g : Polynomial params,
@@ -95,7 +97,7 @@ abbrev MatrixIndexedPointOutcomeFamily (params : Parameters)
 /-- The concrete sandwiched operator `A^u_{h(u)} T_h A^u_{h(u)}`. -/
 noncomputable def matrixSandwichedPolynomialOutcomeOperatorAt (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (u : Point params) (h : Polynomial params) : MatrixOperator model.space :=
   let Au := matrixAveragedPointOperatorContribution params model h u
   Au * (T.effect h) * Au
@@ -103,7 +105,7 @@ noncomputable def matrixSandwichedPolynomialOutcomeOperatorAt (params : Paramete
 /-- The averaged concrete sandwiched operator `E_u A^u_{h(u)} T_h A^u_{h(u)}`. -/
 noncomputable def matrixAveragedSandwichedPolynomialOutcomeOperator (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (h : Polynomial params) : MatrixOperator model.space :=
   matrixAverageOperator (fun u : Point params =>
     matrixSandwichedPolynomialOutcomeOperatorAt params model T u h)
@@ -125,7 +127,7 @@ noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type*} [Fintype Ou
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
-    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome)
     (u : Point params) : MatrixOperator model.space :=
   open Classical in
@@ -149,7 +151,7 @@ noncomputable def matrixAddInURightQuantity {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (model : MatrixSdpRealization params)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
-    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome) : Error :=
   finiteAverage (fun u : Point params =>
     Complex.re (matrixExpectation model.state
@@ -200,7 +202,7 @@ noncomputable def matrixProjectiveResidualGap (params : Parameters)
 structure MatrixAddInUTransferStatement {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     (model : MatrixSdpRealization params)
-    (T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
     (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (eps delta : Error) : Prop where
