@@ -18,7 +18,10 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-/-- `prop:cool-prop` — Squared mass lower bound from bipartite SSC.
+/-- Squared mass lower bound from bipartite SSC (`prop:cool-prop`).
+
+If A is ζ-strongly self-consistent on a permutation-invariant state, then
+∑_a ⟨ψ| A_a² ⊗ I |ψ⟩ ≥ ∑_a ⟨ψ| A_a ⊗ I |ψ⟩ − ζ.
 
 Proof sketch:
 1. Apply Cauchy-Schwarz to the families `A_a ⊗ I` and `I ⊗ A_a`.
