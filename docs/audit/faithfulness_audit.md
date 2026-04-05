@@ -10,6 +10,7 @@ This audit compares the following paper/blueprint pairs for mathematical faithfu
 ## High-level summary
 
 - Copy-paste detection: I did not find any serious verbatim proof-sketch copy-paste from the paper into the blueprint. The blueprint is generally shorter and usually rephrases the paper's proofs in its own voice.
+- Timing note: this audit was run after the blueprint expansion work, so the label counts below reflect the post-expansion state rather than the earlier pre-expansion gap counts used in some campaign planning notes.
 - Missing labels:
   - `preliminaries`: paper `47`, blueprint `55`. No paper labels are missing.
   - `orthonormalization`: paper `38`, blueprint `36`. The paper-only labels are `sec:making-measurements-projective`, `ex:easy-but-long`, and `eq:awefea`; these belong to the omitted Naimark counterexample/example material rather than the main theorem chain.
@@ -96,9 +97,9 @@ What to change:
 The blueprint's first-term sketch is fine, but the second-term analysis is compressed too aggressively. The paper goes through:
 
 - the `\eqref{eq:gcom4}` comparison,
-- the first Schwartz--Zippel evaluation step,
+- the first Schwartz–Zippel evaluation step,
 - two `\prop:closeness-of-ip` transports,
-- the second Schwartz--Zippel evaluation step,
+- the second Schwartz–Zippel evaluation step,
 - the evaluated commutativity lemma,
 - the final transport back to `\bra{\psi} G \ot G \ket{\psi}`,
 - and then an explicit error tally.
@@ -114,7 +115,7 @@ What to change:
   - `\eqref{eq:evaluate-gcom-at-points}`,
   - `\eqref{eq:don't-understand-the-numbering-system}`,
   - `\eqref{eq:evaluate-gcom-at-points-part-dos}`.
-- Include the actual error sources being summed: the two `\sqrt{\zeta}` transports, the two `dm/q` Schwartz--Zippel losses, and the `\sqrt{\nu_{\mathrm{evaluation}}}` contribution coming from the evaluated commutativity lemma.
+- Include the actual error sources being summed: the two `\sqrt{\zeta}` transports, the two `dm/q` Schwartz–Zippel losses, and the `\sqrt{\nu_{\mathrm{evaluation}}}` contribution coming from the evaluated commutativity lemma.
 - Replace "exactly as in the paper" with a short explicit bound, even if abbreviated.
 
 ## No additional issues found

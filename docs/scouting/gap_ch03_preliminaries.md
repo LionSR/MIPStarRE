@@ -132,7 +132,7 @@ Estimated difficulty:
 Exact paper statement:
 
 ```latex
-\begin{lemma}[Schwartz-Zippel lemma~\cite{Sch80,Zip79}]\label{lem:schwartz-zippel-total-degree}
+\begin{lemma}[Schwartz–Zippel lemma~\cite{Sch80,Zip79}]\label{lem:schwartz-zippel-total-degree}
 Let $g, h:\F_q^m \rightarrow \F_q$ be two distinct polynomials of total degree~$d$.
 Then
 \begin{equation*}
@@ -152,7 +152,7 @@ Lean status:
 - No direct theorem in `MIPStarRE/LDT/Preliminaries/` or elsewhere in the repo.
 - The repo does already model low-individual-degree polynomials in
   `MIPStarRE/LDT/Basic/Parameters.lean`,
-  but there is no total-degree Schwartz-Zippel theorem.
+  but there is no total-degree Schwartz–Zippel theorem.
 - The blueprint keeps only the corollary
   `lem:schwartz-zippel-individual`,
   proved by appealing informally to this missing stronger lemma.
@@ -338,4 +338,4 @@ If the goal is "close the paper-blueprint gap" rather than "formalize in proof d
 5. `prop:fourier-fact-scalar`
 6. `prop:fourier-fact-vector`
 
-If the goal is instead "close the Lean formalization risk", I would move the Fourier pair later and prioritize the three reusable approximation lemmas plus Schwartz-Zippel first.
+If the goal is instead "close the Lean formalization risk", I would move the Fourier pair later and prioritize the three reusable approximation lemmas plus Schwartz–Zippel first.

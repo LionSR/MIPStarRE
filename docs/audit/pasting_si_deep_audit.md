@@ -176,7 +176,7 @@ Suggested fix:
 - Reduce to:
   - rewrite the sum over `H_h` as a sum over globally consistent tuples,
   - show inconsistent tuples contribute little by inserting line-consistency indicators,
-  - bound the indicator probability by Schwartz-Zippel,
+  - bound the indicator probability by Schwartz–Zippel,
   - replace distinct tuples by independent tuples at cost `O(k^2/q)`.
 
 5. `lem:from-H-to-G`

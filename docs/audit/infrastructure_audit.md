@@ -75,7 +75,7 @@ Interpretation:
 Command run:
 
 ```sh
-cd /Users/siruilu/Local/agentFormalization/MIPStarRE && leanblueprint web
+leanblueprint web
 ```
 
 Result: succeeded with exit code `0`.

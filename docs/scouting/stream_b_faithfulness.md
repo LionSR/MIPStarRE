@@ -1,4 +1,4 @@
-# Stream B Faithfulness Scouting: Schwartz-Zippel and Polynomial Statements
+# Stream B Faithfulness Scouting: Schwartz–Zippel and Polynomial Statements
 
 Date: 2026-04-04
 
@@ -11,7 +11,7 @@ current `Scalar params := ZMod params.q`, and it should quantify over actual pol
 Concretely:
 
 - Model `polyfunc{m}{q}{d}` by `MvPolynomial.restrictDegree (Fin m) K d`.
-- State Schwartz-Zippel for two distinct polynomials `g ≠ h` by applying Mathlib's
+- State Schwartz–Zippel for two distinct polynomials `g ≠ h` by applying Mathlib's
   `MvPolynomial.schwartz_zippel_totalDegree` to `g - h`.
 - Derive the individual-degree corollary from a short local lemma
   `totalDegree p ≤ m * d` under `∀ i, degreeOf i p ≤ d`.
@@ -30,7 +30,7 @@ From `references/ldt-paper/preliminaries.tex:89-123`:
 - `polyfunc{m}{q}{d}` is the set of polynomials in `F_q^m` with individual degree `d`.
 - The remark immediately clarifies that "individual degree `d`" means "degree of each variable is
   at most `d`".
-- The Schwartz-Zippel lemma is stated for two distinct polynomials `g, h` of total degree `d`.
+- The Schwartz–Zippel lemma is stated for two distinct polynomials `g, h` of total degree `d`.
 - The corollary uses: individual degree `d` implies total degree `m d`, hence
   `Pr[g(x) = h(x)] ≤ m d / q`.
 
@@ -91,7 +91,7 @@ From `MIPStarRE/LDT/Basic/Parameters.lean:688-712`, the repo already proves
 
 ## What Mathlib already gives
 
-### Schwartz-Zippel
+### Schwartz–Zippel
 
 From `.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/SchwartzZippel.lean:192-203`:
 

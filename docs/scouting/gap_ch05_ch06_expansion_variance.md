@@ -279,7 +279,7 @@ Match: yes. Same statement, same bound `md/q`, same distribution.
 
 Gap:
 
-- The paper gives the full squared-norm expansion with the Schwartz-Zippel step visible.
+- The paper gives the full squared-norm expansion with the Schwartz–Zippel step visible.
 - The blueprint proof summarizes that argument correctly, but drops the exact operator-sum chain.
 
 #### `lem:local-variance-of-points`

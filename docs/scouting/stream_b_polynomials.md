@@ -1,8 +1,8 @@
-# Stream B Scouting: Schwartz-Zippel and Polynomial APIs
+# Stream B Scouting: Schwartz–Zippel and Polynomial APIs
 
 ## Bottom line
 
-Mathlib already contains a dedicated multivariate Schwartz-Zippel development:
+Mathlib already contains a dedicated multivariate Schwartz–Zippel development:
 
 - `.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/SchwartzZippel.lean`
 
@@ -17,7 +17,7 @@ That modeling choice is fine for prime `q`, but for general prime powers it is n
 
 ### 1. `MvPolynomial` core API
 
-From [Degrees.lean](/Users/siruilu/Local/agentFormalization/MIPStarRE/.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/Degrees.lean):
+From [Degrees.lean](.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/Degrees.lean):
 
 ```lean
 /-- `degreeOf n p` gives the highest power of X_n that appears in `p` -/
@@ -52,7 +52,7 @@ def totalDegree (p : MvPolynomial σ R) : ℕ :=
 lemma degreeOf_le_totalDegree (f : MvPolynomial σ R) (i : σ) : f.degreeOf i ≤ f.totalDegree
 ```
 
-Also from [CommRing.lean](/Users/siruilu/Local/agentFormalization/MIPStarRE/.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/CommRing.lean):
+Also from [CommRing.lean](.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/CommRing.lean):
 
 ```lean
 theorem totalDegree_sub (a b : MvPolynomial σ R) :
@@ -63,7 +63,7 @@ This is exactly the ingredient needed to pass from distinct `g, h` to a bound on
 
 ### 2. Subtypes for bounded degree
 
-From [RingTheory/MvPolynomial/Basic.lean](/Users/siruilu/Local/agentFormalization/MIPStarRE/.lake/packages/mathlib/Mathlib/RingTheory/MvPolynomial/Basic.lean):
+From [RingTheory/MvPolynomial/Basic.lean](.lake/packages/mathlib/Mathlib/RingTheory/MvPolynomial/Basic.lean):
 
 ```lean
 def restrictTotalDegree (m : ℕ) : Submodule R (MvPolynomial σ R)
@@ -84,7 +84,7 @@ This is the closest built-in Mathlib object to a syntactic version of `polyfunc{
 
 ### 3. Evaluation API
 
-From [Eval.lean](/Users/siruilu/Local/agentFormalization/MIPStarRE/.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/Eval.lean):
+From [Eval.lean](.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/Eval.lean):
 
 ```lean
 def eval₂ (p : MvPolynomial σ R) : S₁
@@ -104,7 +104,7 @@ These are the APIs the local code is already using.
 
 ### 4. Univariate root bounds
 
-From [Algebra/Polynomial/Roots.lean](/Users/siruilu/Local/agentFormalization/MIPStarRE/.lake/packages/mathlib/Mathlib/Algebra/Polynomial/Roots.lean):
+From [Algebra/Polynomial/Roots.lean](.lake/packages/mathlib/Mathlib/Algebra/Polynomial/Roots.lean):
 
 ```lean
 theorem card_roots' (p : R[X]) : Multiset.card p.roots ≤ natDegree p
@@ -113,18 +113,18 @@ theorem card_roots_sub_C' {p : R[X]} {a : R} (hp0 : 0 < degree p) :
     Multiset.card (p - C a).roots ≤ natDegree p
 ```
 
-This is the univariate base-case technology used inside the multivariate Schwartz-Zippel proof.
+This is the univariate base-case technology used inside the multivariate Schwartz–Zippel proof.
 
-There is also a finite-field image bound in [FieldTheory/Finite/Basic.lean](/Users/siruilu/Local/agentFormalization/MIPStarRE/.lake/packages/mathlib/Mathlib/FieldTheory/Finite/Basic.lean):
+There is also a finite-field image bound in [FieldTheory/Finite/Basic.lean](.lake/packages/mathlib/Mathlib/FieldTheory/Finite/Basic.lean):
 
 ```lean
 theorem card_image_polynomial_eval [DecidableEq R] [Fintype R] {p : R[X]} (hp : 0 < p.degree) :
     Fintype.card R ≤ natDegree p * #(univ.image fun x => eval x p)
 ```
 
-### 5. Schwartz-Zippel already exists
+### 5. Schwartz–Zippel already exists
 
-From [SchwartzZippel.lean](/Users/siruilu/Local/agentFormalization/MIPStarRE/.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/SchwartzZippel.lean):
+From [SchwartzZippel.lean](.lake/packages/mathlib/Mathlib/Algebra/MvPolynomial/SchwartzZippel.lean):
 
 ```lean
 lemma schwartz_zippel_sup_sum :
@@ -151,7 +151,7 @@ Important details:
 
 ### 6. Finite-field polynomial functions modulo pointwise equality
 
-From [FieldTheory/Finite/Polynomial.lean](/Users/siruilu/Local/agentFormalization/MIPStarRE/.lake/packages/mathlib/Mathlib/FieldTheory/Finite/Polynomial.lean):
+From [FieldTheory/Finite/Polynomial.lean](.lake/packages/mathlib/Mathlib/FieldTheory/Finite/Polynomial.lean):
 
 ```lean
 def R [CommRing K] : Type u :=
@@ -167,7 +167,7 @@ This is very relevant to issue `#117`: Mathlib already has a canonical "polynomi
 
 ### 7. Other nearby finite-field solution counting
 
-From [FieldTheory/ChevalleyWarning.lean](/Users/siruilu/Local/agentFormalization/MIPStarRE/.lake/packages/mathlib/Mathlib/FieldTheory/ChevalleyWarning.lean):
+From [FieldTheory/ChevalleyWarning.lean](.lake/packages/mathlib/Mathlib/FieldTheory/ChevalleyWarning.lean):
 
 ```lean
 theorem MvPolynomial.sum_eval_eq_zero (f : MvPolynomial σ K)
@@ -177,13 +177,13 @@ theorem char_dvd_card_solutions {f : MvPolynomial σ K} (h : f.totalDegree < Fin
     p ∣ Fintype.card { x : σ → K // eval x f = 0 }
 ```
 
-This is not Schwartz-Zippel, but it shows the zero-set counting machinery around `MvPolynomial.eval` is already developed in Mathlib.
+This is not Schwartz–Zippel, but it shows the zero-set counting machinery around `MvPolynomial.eval` is already developed in Mathlib.
 
 ## B. Existing `MIPStarRE` codebase findings
 
 ### 1. Current polynomial model in `LDT/Basic/Parameters.lean`
 
-From [Parameters.lean](/Users/siruilu/Local/agentFormalization/MIPStarRE/MIPStarRE/LDT/Basic/Parameters.lean):
+From [Parameters.lean](MIPStarRE/LDT/Basic/Parameters.lean):
 
 ```lean
 abbrev Fq (params : Parameters) := Fin params.q
@@ -270,7 +270,7 @@ Issue body summary:
 - it asks whether these should instead be polynomials on finite domains
 - it notes confusion about why the finite-domain approach would need noncomputability
 
-This is the right issue. The current code also contains a concrete TODO acknowledging the gap. From [Pasting/Defs.lean](/Users/siruilu/Local/agentFormalization/MIPStarRE/MIPStarRE/LDT/Pasting/Defs.lean):
+This is the right issue. The current code also contains a concrete TODO acknowledging the gap. From [Pasting/Defs.lean](MIPStarRE/LDT/Pasting/Defs.lean):
 
 ```lean
 -- Note: honest Lagrange interpolation requires Field (ZMod q), which
@@ -280,7 +280,7 @@ This is the right issue. The current code also contains a concrete TODO acknowle
 
 ## C. Assessment
 
-### Does Schwartz-Zippel already exist in Mathlib?
+### Does Schwartz–Zippel already exist in Mathlib?
 
 Yes.
 
@@ -339,7 +339,7 @@ There are two reasonable formalizations:
 - syntactic: a subtype of bounded-degree polynomials
 - extensional: a set/type of functions admitting such a polynomial representation
 
-Mathlib's Schwartz-Zippel theorem is naturally about the syntactic polynomial.
+Mathlib's Schwartz–Zippel theorem is naturally about the syntactic polynomial.
 
 The repo already supports both viewpoints:
 
@@ -360,7 +360,7 @@ Option 2 is likely cleaner in Lean because it avoids a separate total-degree lem
 
 ### Recommendation
 
-Use Mathlib's existing Schwartz-Zippel theorem and prove thin wrapper lemmas.
+Use Mathlib's existing Schwartz–Zippel theorem and prove thin wrapper lemmas.
 
 More concretely:
 
@@ -371,12 +371,12 @@ More concretely:
 2. Define the paper-facing polynomial family as either:
    - `MvPolynomial.restrictDegree (Fin m) K d`, or
    - a local wrapper structure mirroring current `Polynomial params`, but over `K`
-3. Prove the equality version by applying Schwartz-Zippel to `g - h`.
+3. Prove the equality version by applying Schwartz–Zippel to `g - h`.
 4. Prove the individual-degree corollary using `schwartz_zippel_sum_degreeOf`.
 
 ### What not to do
 
-Do **not** spend time reproving Schwartz-Zippel from univariate root counting unless there is a strong reason to avoid Mathlib dependencies. The theorem is already there.
+Do **not** spend time reproving Schwartz–Zippel from univariate root counting unless there is a strong reason to avoid Mathlib dependencies. The theorem is already there.
 
 Do **not** build the theorem on top of `ZMod q` for arbitrary `q`. That will fight the wrong abstraction.
 
@@ -425,7 +425,7 @@ This is easier than the full prime-power case, because `ZMod q` is then a field 
 For Stream B itself:
 
 - `polyfunc{m}{q}{d}`: reuse the existing local notion, or define a field-parametrized subtype using `MvPolynomial.restrictDegree`
-- Schwartz-Zippel: **use Mathlib's `MvPolynomial.schwartz_zippel_totalDegree` / `schwartz_zippel_sum_degreeOf`**
+- Schwartz–Zippel: **use Mathlib's `MvPolynomial.schwartz_zippel_totalDegree` / `schwartz_zippel_sum_degreeOf`**
 - corollary `Pr ≤ md/q`: derive it from `schwartz_zippel_sum_degreeOf`
 
 For the repo architecture:

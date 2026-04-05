@@ -61,7 +61,7 @@ Audit scope:
 
 - `blueprint/src/chapter/ch10_induction.tex:311,324`
   Problematic text: `The same computation as in the source paper ...`, `exactly as in the paper gives`
-  Fix: write the unsymmetrization and Schwartz--Zippel argument as an actual proof sketch in the blueprint's own voice.
+  Fix: write the unsymmetrization and Schwartz–Zippel argument as an actual proof sketch in the blueprint's own voice.
 
 ### `\uses{}` inaccuracies
 

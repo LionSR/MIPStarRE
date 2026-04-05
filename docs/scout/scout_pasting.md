@@ -84,7 +84,7 @@ External results used but not among the 17:
 - `prop:two-notions-of-self-consistency`
 - `prop:switch-sandwich`
 - triangle inequalities for `approx` / `simeq`
-- Schwartz-Zippel
+- Schwartz–Zippel
 - additive Chernoff
 
 Two-branch view of the overall proof:
@@ -303,10 +303,10 @@ Reasoning:
   insert the `B` measurement;
   add an indicator for line-wise consistency;
   use `ldDnoteq` and the one-point consistency bound to control the tuples that fail the indicator;
-  then use a Schwartz-Zippel argument on a witness coordinate to show that a tuple that is line-wise consistent along a random `u` but not globally consistent only survives with probability `md/q`;
+  then use a Schwartz–Zippel argument on a witness coordinate to show that a tuple that is line-wise consistent along a random `u` but not globally consistent only survives with probability `md/q`;
   finally swap back from distinct tuples to uniform tuples.
 - Assessment: `Deep core`.
-- Why: this is a major argument, not a corollary. The "remove the restriction" step and the Schwartz-Zippel witness argument are genuinely central.
+- Why: this is a major argument, not a corollary. The "remove the restriction" step and the Schwartz–Zippel witness argument are genuinely central.
 - Direct dependencies among the 17: `ldDnoteq`, `ldSandwichLineOnePoint`.
 - Risk notes: very high. This is long and structurally subtle, even if each local step is individually standard.
 

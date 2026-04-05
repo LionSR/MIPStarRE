@@ -68,7 +68,7 @@ Findings:
 - `blueprint/src/chapter/ch02_test.tex` defines the low individual degree test and states the main
   quantum soundness theorem.
 - `blueprint/src/chapter/ch03_preliminaries.tex` defines `\polyfunc{m}{q}{d}` and proves the
-  individual-degree Schwartz-Zippel lemma.
+  individual-degree Schwartz–Zippel lemma.
 
 This matches the paper's actual mathematical stance: multilinearity is only the special case
 `d = 1`. The imported paper introduction says exactly that the multilinearity test is the low

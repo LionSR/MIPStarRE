@@ -39,7 +39,7 @@ Files inspected:
 - `commDataProcessedG` and the final `comMain.fullSliceCommutation` are still
   mostly unproved. The exact postprocessing identity used to specialize full
   slice products to evaluated slice products is present, but the two
-  Schwartz-Zippel comparison steps from the paper are not yet formalized.
+  Schwartz–Zippel comparison steps from the paper are not yet formalized.
 
 ## 1. Statement-Level Comparison: Paper vs Blueprint
 
@@ -349,11 +349,11 @@ Notes:
 | `eq:g-comm-stab7` | Rewrites claim 2 gap by summing over polynomials `g` | absent |
 | `eq:gcomterms` | Expands the full-slice commutator norm into two quartic terms | scaffolded: target packaged by `fullSliceCommutation`, but proof missing |
 | `eq:gcom4` | Converts the second quartic term into a mixed overlap using `closeness-of-ip` and the normalization lemma | absent as a dedicated theorem |
-| `eq:evaluate-gcom-at-points` | First Schwartz-Zippel evaluation step, replacing `g` by `g(u)` | absent: `evaluationSpecialization` proves an exact postprocess identity, not this approximate averaging step |
-| `eq:gcom4-diff` | Explicit difference term for the first Schwartz-Zippel step | absent |
+| `eq:evaluate-gcom-at-points` | First Schwartz–Zippel evaluation step, replacing `g` by `g(u)` | absent: `evaluationSpecialization` proves an exact postprocess identity, not this approximate averaging step |
+| `eq:gcom4-diff` | Explicit difference term for the first Schwartz–Zippel step | absent |
 | `eq:don't-understand-the-numbering-system` | Two closeness-of-ip rewrites on the evaluated expression | absent |
-| `eq:evaluate-gcom-at-points-part-dos` | Second Schwartz-Zippel evaluation step, replacing `h` by `h(v)` | absent |
-| `eq:eq:don't-understand-the-numbering-system-diff` | Explicit difference term for the second Schwartz-Zippel step | absent |
+| `eq:evaluate-gcom-at-points-part-dos` | Second Schwartz–Zippel evaluation step, replacing `h` by `h(v)` | absent |
+| `eq:eq:don't-understand-the-numbering-system-diff` | Explicit difference term for the second Schwartz–Zippel step | absent |
 
 Bottom line for the equation-level comparison:
 
@@ -410,7 +410,7 @@ What is still missing or mismatched:
   `MISMATCH(#143)` and need redesign.
 - There is no formal Lean analogue yet of the paper's auxiliary family
   `R_g^y`.
-- The two Schwartz-Zippel comparison steps in `thm:com-main` are not modeled
+- The two Schwartz–Zippel comparison steps in `thm:com-main` are not modeled
   as dedicated lemmas.
 - `fullSliceCommutation` is still `sorry`.
 
@@ -444,7 +444,7 @@ best order looks like this:
 5. Use those lemmas to finish `evaluatedSliceCommutation`
    in `commDataProcessedG`.
 
-6. Add the two Schwartz-Zippel evaluation lemmas for `comMain`.
+6. Add the two Schwartz–Zippel evaluation lemmas for `comMain`.
    The current `evaluationSpecialization` identity is useful, but it does not
    replace the paper's approximate evaluation-removal steps.
 

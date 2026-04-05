@@ -166,7 +166,7 @@ Important Lean theorem names already scaffolded:
   Vector version:
   `E_u omega^{tr[u·v]} = 1` if `v=0`, else `0`.
 
-- Schwartz-Zippel:
+- Schwartz–Zippel:
   for distinct total-degree-`d` polynomials `g,h`,
   `Pr_x[g(x)=h(x)] <= d/q`.
 
@@ -247,7 +247,7 @@ Important Lean theorem names already scaffolded:
 
 **Key bounds**
 
-- `Schwartz-Zippel`: `d/q` and `md/q`.
+- `Schwartz–Zippel`: `d/q` and `md/q`.
 - `simeq -> approx`: factor `2`.
 - `A \simeq_delta C` plus `A \approx_eps B` gives `B \simeq_{delta+sqrt(eps)} C`.
 - Strong self-consistency -> self-distance bound `2 delta`.
@@ -413,7 +413,7 @@ Key Lean theorem names:
 - Diagonalize the graph operator by finite-field Fourier characters.
 - Rewrite variances as trace expressions against the Laplacian and the orthogonal complement to the constant eigenvector.
 - Use the spectral gap `1/(mM)` to compare local and global variance.
-- Use Schwartz-Zippel to replace a line polynomial answer by the evaluation of a global polynomial `g`.
+- Use Schwartz–Zippel to replace a line polynomial answer by the evaluation of a global polynomial `g`.
 
 **Key bounds**
 
@@ -608,7 +608,7 @@ Key Lean theorem names:
 - For full `G` commutativity:
   specialize the full-slice operators at random points `u,v`,
   compare with the evaluated commutator statement,
-  then remove the evaluation using Schwartz-Zippel:
+  then remove the evaluation using Schwartz–Zippel:
   distinct polynomials agree at a random point with probability at most `md/q`.
 
 **Key bounds**
@@ -617,7 +617,7 @@ Key Lean theorem names:
   `48 m (gamma^(1/2) + zeta^(1/2))`.
 - Full commutation:
   `30 m (gamma^(1/4) + zeta^(1/4) + (d/q)^(1/4))`.
-- Schwartz-Zippel losses appear as `dm/q`.
+- Schwartz–Zippel losses appear as `dm/q`.
 
 ## `ld-pasting.tex`
 
@@ -885,6 +885,6 @@ Key Lean theorem names:
    repeated Cauchy-Schwarz transfers,
    converting `simeq` to `approx` and back,
    operator monotonicity/positivity in sandwich arguments,
-   Schwartz-Zippel applications for removing evaluation,
+   Schwartz–Zippel applications for removing evaluation,
    and the matrix-valued Chernoff/Bernoulli tail estimate in pasting.
 

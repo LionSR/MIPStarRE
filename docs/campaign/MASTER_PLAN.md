@@ -5,7 +5,7 @@
 ## Executive Summary
 
 The LDT paper has **95 named mathematical objects** (defs/props/thms/lems/cors/claims).
-The blueprint currently covers **91 labels**, but **29 paper labels are missing** and **the blueprint compresses many proof structures**.
+The blueprint currently covers **91 labels**, so only **4 paper labels are literally missing by name-count**. The larger gap is that the blueprint also compresses many proof structures; the earlier `29` figure came from that broader proof-granularity accounting, not from the `95 - 91` label count.
 
 The gap is not just "missing labels" — it's **missing proof granularity** that makes formalization impossible without guessing the internal argument structure.
 

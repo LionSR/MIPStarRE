@@ -520,7 +520,7 @@ Lean gap:
 | `eq:added-indicator` | displayed equation | No | no dedicated theorem |
 | `eq:swapped-u-for-v` | displayed equation | No | no dedicated theorem |
 | `eq:swapped-u-for-cauchy-schwarz` | displayed equation | No | no dedicated theorem |
-| `eq:swapped-u-for-v-this-time-it's-personal` | displayed equation | No | Schwartz-Zippel step |
+| `eq:swapped-u-for-v-this-time-it's-personal` | displayed equation | No | Schwartz–Zippel step |
 | `eq:gonna-use-this-later` | displayed equation | No | local auxiliary estimate only |
 | `eq:delete-an-A` | displayed equation | No | no dedicated theorem |
 | `eq:swap-u-for-v-attack-of-the-clones` | displayed equation | No | no dedicated theorem |
@@ -647,7 +647,7 @@ This branch uses:
 1. the specialization of `lem:add-in-u` with `M = H`,
 2. the pointwise identities `eq:h-sandwich` and `eq:h-blt`,
 3. two global-variance substitutions,
-4. a Schwartz-Zippel bound on `Pr_u[h(u) = h'(u)]`,
+4. a Schwartz–Zippel bound on `Pr_u[h(u) = h'(u)]`,
 5. the previously proved `A`-consistency estimate `eq:explicit-bound-for-A-consistency`.
 
 This is the densest subproof in the chapter and is almost entirely absent from the blueprint.
