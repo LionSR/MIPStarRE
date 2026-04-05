@@ -325,7 +325,8 @@ lemma paRestated {Outcome : Type*}
       Pa data a = data.xHatᴴ * Ta data.qLayer a * data.xHat ∧
       Pa data a = (XHatA data a)ᴴ * data.xHat := by
   constructor
-  · rfl
+  · -- The first conjunct is definitional from `Pa`.
+    rfl
   · have hTa : (Ta data.qLayer a)ᴴ = Ta data.qLayer a := by
       simpa [Ta] using ProjMeas.outcome_hermitian data.qLayer.t a
     have hXHatA : (XHatA data a)ᴴ = data.xHatᴴ * Ta data.qLayer a := by

@@ -208,8 +208,7 @@ theorem ldDnoteq
     have hfactor_le_one :
         ∀ i ∈ Finset.range k, 1 - (i : Error) / params.q ≤ 1 := by
       intro i hi
-      have : 0 ≤ (i : Error) / params.q := by positivity
-      nlinarith
+      exact sub_le_self _ (by positivity)
     have hprefix_le_one :
         ∀ i ∈ Finset.range k,
           ∏ j ∈ Finset.range k with j < i, (1 - (j : Error) / params.q) ≤ 1 := by

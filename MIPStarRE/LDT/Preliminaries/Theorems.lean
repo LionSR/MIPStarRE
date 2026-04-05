@@ -419,6 +419,8 @@ private lemma conjTranspose_mul_mono
     Zᴴ * X * Z ≤ Zᴴ * Y * Z := by
   apply sub_nonneg.mp
   have hnonneg : 0 ≤ Zᴴ * (Y - X) * Z := by
+    -- This `simpa` intentionally bridges the PSD-facing matrix lemma with the
+    -- ordered-ring view used by the surrounding inequality proof.
     simpa [Matrix.conjTranspose_conjTranspose] using
       (Matrix.PosSemidef.mul_mul_conjTranspose_same
         (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hXY))

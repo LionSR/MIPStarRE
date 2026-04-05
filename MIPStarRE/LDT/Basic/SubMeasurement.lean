@@ -26,6 +26,8 @@ instance {α : Type*} [Fintype α] {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (SubMeas α ι) where
   default := {
     outcome := fun _ => 0
+    -- This default object is the zero family; downstream raw-operator scaffolding
+    -- sometimes keeps `total := 0` as an explicit sentinel when only outcomes matter.
     total := 0
     outcome_pos := by
       intro a
