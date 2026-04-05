@@ -69,7 +69,7 @@
     \le{}& \E_u \sum_a \sum_{h:h(u)\ne a} \bra{\psi} A_a^u \ot H_h \ket{\psi}
     + \E_u \bra{\psi} I \ot (I-H) \ket{\psi}\\
     \le{}& \nu + \left(\kappa\left(1+\frac{1}{100m}\right) + \nu + e^{-k/(80000m^2)}\right)
-    \tag{by \ref{item:ld-pasting-N-consistency-sub-measurement,item:ld-pasting-N-completeness-sub-measurement}}\\
+    \tag{by \ref{item:ld-pasting-N-consistency-sub-measurement} and \ref{item:ld-pasting-N-completeness-sub-measurement}}\\
     ={}& \sigma.
   \end{align*}
   Thus $A_a^u \ot I \simeq_\sigma I \ot (H_{\mathrm{meas}})_{[h(u)=a]}$.
@@ -349,7 +349,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
     &=
     \E_y \sum_o \bra{\psi} M_o^y G M_o^y \ot I \ket{\psi}\\
     &\approx_{2\sqrt{\omega}} \E_y \sum_o \bra{\psi} G \ot M_o^y \ket{\psi}
-    \tag{by \ref{prop:switch-sandwich,eq:M-self-consistent}}\\
+    \tag{by \ref{prop:switch-sandwich} and \ref{eq:M-self-consistent}}\\
     &=
     \bra{\psi} G \ot M \ket{\psi}.
   \end{align*}
@@ -361,7 +361,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
     &=
     \E_x \bra{\psi} G^x M G^x \ot I \ket{\psi}\\
     &\approx_{2\sqrt{\zeta}} \E_x \bra{\psi} M \ot G^x \ket{\psi}
-    \tag{by \ref{prop:switch-sandwich,lem:g-complete-self-consistency}}\\
+    \tag{by \ref{prop:switch-sandwich} and \ref{lem:g-complete-self-consistency}}\\
     &=
     \bra{\psi} M \ot G \ket{\psi}.
   \end{align*}
@@ -404,7 +404,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
     &=
     \E_y \sum_o \bra{\psi} M_o^y G M_o^y \ot I \ket{\psi}\\
     &\approx_{2\sqrt{\omega}} \E_y \sum_o \bra{\psi} G \ot M_o^y \ket{\psi}
-    \tag{by \ref{prop:switch-sandwich,eq:M-self-consistent}}\\
+    \tag{by \ref{prop:switch-sandwich} and \ref{eq:M-self-consistent}}\\
     &=
     \bra{\psi} G \ot M \ket{\psi}.
   \end{align*}
@@ -501,7 +501,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
     \E_x \sum_g \|(\widehat G_g^x \ot I - I \ot \widehat G_g^x)\ket{\psi}\|^2
     \le \zeta + \zeta = 2\zeta
   \]
-  by \ref{item:ld-pasting-self-consistency,cor:g-bot-self-consistency}. For \ref{eq:gcomall}, the same decomposition yields four cases: polynomial--polynomial, $\bot$--$\bot$, polynomial--$\bot$, and $\bot$--polynomial. These contribute $\nu_{\mathrm{com}}$ and three copies of $\nu_2$, so
+  by \ref{item:ld-pasting-self-consistency} and \ref{cor:g-bot-self-consistency}. For \ref{eq:gcomall}, the same decomposition yields four cases: polynomial--polynomial, $\bot$--$\bot$, polynomial--$\bot$, and $\bot$--polynomial. These contribute $\nu_{\mathrm{com}}$ and three copies of $\nu_2$, so
   \[
     \nu_{\mathrm{com}} + 3\nu_2
     \le
@@ -528,7 +528,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
   \]
 \end{lemma}
 \begin{proof}
-  Repeatedly move the leftmost factor across the remaining product, using \ref{eq:gselfconall,eq:gcomall} at each step and summing the resulting errors with \ref{prop:triangle-inequality-for-approx_delta}. The paper's calculation gives
+  Repeatedly move the leftmost factor across the remaining product, using \ref{eq:gselfconall} and \ref{eq:gcomall} at each step and summing the resulting errors with \ref{prop:triangle-inequality-for-approx_delta}. The paper's calculation gives
   \[
     3k\bigl(4k\zeta + k\nu_3\bigr)
     \le

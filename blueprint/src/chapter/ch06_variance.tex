@@ -73,8 +73,8 @@ This can be viewed as a local-variance bound for the point measurements.
     \E_{u,v \sim \F_q^m} \sum_{g \in \polyfunc{m}{q}{d}} \lVert (A^u_{g(u)}-A^v_{g(v)}) \ot (G_g)^{1/2} \ket{\psi} \rVert^2
     =
     \E_{u,v \sim \F_q^m} \sum_{g \in \polyfunc{m}{q}{d}} \bra{\psi} (A^u_{g(u)}-A^v_{g(v)})^2 \ot G_g \ket{\psi}.
-    % Keep the paper's exact label, including TODO punctuation, for cross-reference fidelity.
-    \label{eq:TODO:bound-this!}
+    % Paper label: eq:TODO:bound-this!
+    \label{eq:global-variance-target}
   \end{equation}
   For each $g \in \polyfunc{m}{q}{d}$, define
   \[
@@ -84,7 +84,7 @@ This can be viewed as a local-variance bound for the point measurements.
   \]
   Then
   \[
-    \eqref{eq:TODO:bound-this!}
+    \eqref{eq:global-variance-target}
     =
     \sum_{g \in \polyfunc{m}{q}{d}} \E_{u,v \sim \F_q^m} \bra{\psi_g} (A(g)^u-A(g)^v)^2 \ot I \ket{\psi_g}
     =
@@ -92,7 +92,7 @@ This can be viewed as a local-variance bound for the point measurements.
   \]
   Applying Lemma~\ref{lem:local-to-global} gives
   \[
-    \eqref{eq:TODO:bound-this!}
+    \eqref{eq:global-variance-target}
     \le
     \sum_{g \in \polyfunc{m}{q}{d}} 2m\,\mathbf{Var}_{\mathrm{local}}(A(g),\psi_g)
     =
