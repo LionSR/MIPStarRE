@@ -100,7 +100,7 @@ noncomputable def matrixAveragePointOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : MatrixOperator model.space :=
   matrixAverageOperator model.family
 
-/-- The matrix-level combined column operator `∑_u |u⟩ ⊗ A^u`. -/
+/-- The matrix-level combined column operator `∑_u |u⟩ ⊗ (A^u)ᴴ`. -/
 noncomputable def matrixCombinedOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     RectangularMatrixOperator model.space

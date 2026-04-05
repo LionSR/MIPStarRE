@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
+-- `Mathlib` is imported transitively through the dependency chain above.
 
 /-!
 # Section 5 — Q/X/XHat/P intermediate layer
@@ -9,6 +10,11 @@ Paper-faithful proof infrastructure for the internal orthonormalization chain in
 This file adds the intermediate `Q/X/XHat/P` objects and the 17 helper-lemma
 stubs tracked in issue #197. The actual proofs are deferred, but the signatures
 are intended to match the paper's decomposition of the argument.
+
+## References
+
+- `references/ldt-paper/orthonormalization.tex`, Section 6.2, for the
+  `Q/X/XHat/P` intermediate layer and its helper lemmas.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -259,8 +265,7 @@ lemma xa_t {Outcome : Type*}
     [Fintype Outcome]
     (data : QXPLayerData Outcome ι) (a : Outcome) :
     Xa data a = Ta data.qLayer a * data.x := by
-  -- TODO: prove (issue #197)
-  sorry
+  rfl
 
 /-- **`Q_a` restated** (`lem:qa-restated`).
 

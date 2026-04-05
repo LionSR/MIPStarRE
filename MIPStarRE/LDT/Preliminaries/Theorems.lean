@@ -433,6 +433,8 @@ private lemma questionCabApproxDelta
     (A B : OpFamily Outcome ι)
     (C : Outcome → Aux → MIPStarRE.Quantum.Op ι)
     (hC : ∀ a, ∑ b : Aux, (C a b)ᴴ * C a b ≤ 1) :
+    -- `qSDDOp` only depends on `.outcome` via `qSDDCore`, so these raw
+    -- families can use `total := 0` as a harmless sentinel.
     qSDDOp ψ
         ({ outcome := fun ab : Outcome × Aux => C ab.1 ab.2 * A.outcome ab.1
            total := 0 } : OpFamily (Outcome × Aux) ι)
@@ -494,6 +496,8 @@ theorem cabApproxDelta
     (δ : Error) :
     SDDOpRel ψ 𝒟 A B δ →
     (∀ q a, ∑ b : Aux, (C q a b)ᴴ * C q a b ≤ 1) →
+    -- `SDDOpRel` unfolds to `sddErrorOp`, and `qSDDOp` only inspects the
+    -- `.outcome` field, so `total := 0` is a safe sentinel here.
     SDDOpRel ψ 𝒟
       (fun q => ({
         outcome := fun ab : Outcome × Aux => C q ab.1 ab.2 * (A q).outcome ab.1

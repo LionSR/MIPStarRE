@@ -234,7 +234,8 @@ noncomputable def localAndVariance (params : Parameters)
 /-- The column-space indices for `A_combine`. -/
 abbrev combinedColumnIndex (params : Parameters) (ι : Type*) := Point params × ι
 
-/-- The paper's combined column operator `A_combine = ∑_u |u⟩ ⊗ A^u`. -/
+/-- The paper's combined column operator, realized here as
+`A_combine = ∑_u |u⟩ ⊗ (A^u)ᴴ`. -/
 noncomputable def combinedOperator (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) :
     Matrix (combinedColumnIndex params ι) ι ℂ :=
