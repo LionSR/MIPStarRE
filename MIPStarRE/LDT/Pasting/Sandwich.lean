@@ -517,6 +517,46 @@ theorem bernoulliTailOperator_nonneg
   refine Finset.sum_nonneg fun r _ => ?_
   simpa using binomialOperatorTerm_nonneg (G := G) k r hG hGle
 
+/-- The Bernoulli tail operator is bounded by the identity for a PSD contraction. -/
+theorem bernoulliTailOperator_le_one
+    (k degree : ℕ) (G : MIPStarRE.Quantum.Op ι)
+    (hG : 0 ≤ G) (hGle : G ≤ 1) :
+    bernoulliTailOperator k degree G ≤ 1 := by
+  let term : ℕ → MIPStarRE.Quantum.Op ι := fun r =>
+    (Nat.choose k r : ℂ) • (G ^ r * (1 - G) ^ (k - r))
+  have hsubset : Finset.Icc (degree + 1) k ⊆ Finset.range (k + 1) := by
+    intro r hr
+    simp only [Finset.mem_Icc, Finset.mem_range] at hr ⊢
+    exact Nat.lt_succ_of_le hr.2
+  have htail_le_full :
+      ∑ r ∈ Finset.Icc (degree + 1) k, term r ≤ ∑ r ∈ Finset.range (k + 1), term r := by
+    refine Finset.sum_le_sum_of_subset_of_nonneg hsubset ?_
+    intro r hrange hrnot
+    simpa [term] using binomialOperatorTerm_nonneg (G := G) k r hG hGle
+  have hcomm : Commute G (1 - G) :=
+    (Commute.one_right G).sub_right (Commute.refl G)
+  have hfull :
+      ∑ r ∈ Finset.range (k + 1), term r = 1 := by
+    calc
+      ∑ r ∈ Finset.range (k + 1), term r
+          = ∑ r ∈ Finset.range (k + 1), G ^ r * (1 - G) ^ (k - r) * Nat.choose k r := by
+              refine Finset.sum_congr rfl ?_
+              intro r hr
+              let A := G ^ r * (1 - G) ^ (k - r)
+              have hcast_comm : Commute (Nat.choose k r : MIPStarRE.Quantum.Op ι) A :=
+                Nat.cast_commute (Nat.choose k r) A
+              simpa [term, A, Algebra.smul_def] using hcast_comm.eq
+      _ = (G + (1 - G)) ^ k := by
+            symm
+            exact Commute.add_pow hcomm k
+      _ = 1 := by simp
+  calc
+    bernoulliTailOperator k degree G
+        = ∑ r ∈ Finset.Icc (degree + 1) k, term r := by
+            simp [bernoulliTailOperator, term]
+    _ ≤ ∑ r ∈ Finset.range (k + 1), term r := htail_le_full
+    _ = 1 := hfull
+
 /-- Concrete family for the full sandwich
 `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k} \cdots \widehat G^{x_1}_{g_1}`. -/
 noncomputable def gHatSandwichFamily (params : Parameters) [FieldModel params.q]
@@ -899,8 +939,10 @@ noncomputable def bernoulliTailFromFamily (params : Parameters) [FieldModel para
       sum_eq_total := by
         simp
       total_le_one := by
-        -- This needs the Bernoulli-tail upper bound from the matrix Chernoff step.
-        sorry }
+        let G := (IdxPolyFamily.averagedSubMeas family).total
+        have hG : 0 ≤ G := (IdxPolyFamily.averagedSubMeas family).total_nonneg
+        have hGle : G ≤ 1 := (IdxPolyFamily.averagedSubMeas family).total_le_one
+        simpa [Y, G] using bernoulliTailOperator_le_one k params.d G hG hGle }
 
 /-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`,
 parameterised by the suffix type `τ ∈ {0,1}^k`.
