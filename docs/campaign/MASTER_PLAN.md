@@ -123,7 +123,65 @@ Prove existing sorry sites using the expanded infrastructure.
 - Prove the tractable sorry sites
 - Depends on Phase 3 for infrastructure
 
+## Progress Tracker (updated 2026-04-06)
+
+### Phase 1: Blueprint Expansion — 1/6 closed
+| Issue | Status | PR | Notes |
+|-------|--------|-----|-------|
+| #187 Ch04 orthonormalization | **CLOSED** | #208 (merged) | Covered in bulk blueprint expansion |
+| #188 Ch07 self-improvement (52 labels) | OPEN | — | Largest gap, P0 priority, no PR yet |
+| #189 Ch09 pasting (~58 labels) | OPEN | — | Largest chapter, P0 priority, no PR yet |
+| #190 Ch03 preliminaries (6 props) | OPEN | — | No PR yet |
+| #191 Ch05-06 expansion/variance | OPEN | — | No PR yet |
+| #192 Ch08 commutativity (2 claims) | OPEN | — | No PR yet |
+
+### Phase 2: Statement Fixes — 2/4 closed
+| Issue | Status | PR | Notes |
+|-------|--------|-----|-------|
+| #193 closeness-of-ip right-action | **CLOSED** | #209 (merged) | Fixed |
+| #194 commutativity Bob-side factors | **CLOSED** | #209 (merged) | Fixed |
+| #195 induction diagonal-test encoding | OPEN | — | Also tracked by follow-up #215 |
+| #196 SDP primal Measurement → SubMeas | OPEN | — | Partially addressed by #209 (docs only) |
+
+### Phase 3: Proof Infrastructure — 0/5 closed (partial progress)
+| Issue | Status | PR | Notes |
+|-------|--------|-----|-------|
+| #197 Ch04 Q/X/X̂/P Lean layer | OPEN | #210 partial | QXPLayer stubs added but issue not closed |
+| #198 Ch07 SDP infrastructure | OPEN | — | Blocked on #188 blueprint |
+| #199 Ch09 pasting skeleton | OPEN | — | Blocked on #189 blueprint |
+| #200 Ch03 easy-approx public API | OPEN | #210 partial | Some infrastructure added |
+| #201 Ch03 cab-approx raw families | OPEN | #210 partial | Some infrastructure added |
+
+### Phase 4: Sorry Elimination — 0/5 closed
+| Issue | Status | PR | Notes |
+|-------|--------|-----|-------|
+| #202 Ch04 oneMeasNaimark | OPEN | — | Requires CFC.sqrt; medium |
+| #203 Ch08 normalizationCondition | OPEN | — | ~25-line proof; no PR yet |
+| #204 Ch09 ldDnoteq (birthday paradox) | OPEN | — | Infra added by #210 but sorry remains |
+| #205 Ch09 looksEasyButTookMeAWhile | OPEN | — | Analytic inequality; no PR yet |
+| #206 Ch05 expansion matrix realization | OPEN | #213 (open) | 3 coupled sorry sites; CI green |
+
+### Non-Campaign PRs that advanced campaign goals
+| PR | Status | Campaign impact |
+|----|--------|-----------------|
+| #220 | **MERGED** | Refactored ZMod q → honest finite-field model (addresses Stream A/B scouting recs) |
+| #221 | **MERGED** | Eliminated 3 sorry in Pasting (Ch09) — not a campaign issue but reduces sorry count |
+| #222 | OPEN | Eliminates 4 sorry in MakingMeasurementsProjective (Ch04) — has blocker comment |
+| #214 | **MERGED** | Inlined boilerplate wrappers — simplifies downstream proof work |
+| #217 | **MERGED** | Unbundled CommutativityPoints theorem |
+| #185–#181 | **MERGED** | Built entire Preliminaries stack (Streams A–E) — Ch03 now sorry-free |
+
+### Sorry count trajectory
+| Date | Total sorry | Notes |
+|------|-------------|-------|
+| 2026-04-04 (campaign start) | ~64 | Per MASTER_PLAN inventory |
+| 2026-04-06 (current) | ~76* | *Higher count reflects QXPLayer stubs added by #210 |
+
+### Overall: 3/20 issues closed, 4 campaign PRs merged, 6 non-campaign PRs advancing goals
+
 ## Scouting Reports
+
+### Gap scouting (campaign planning)
 - `docs/scouting/gap_ch03_preliminaries.md`
 - `docs/scouting/gap_ch04_orthonormalization.md`
 - `docs/scouting/gap_ch05_ch06_expansion_variance.md`
@@ -132,3 +190,12 @@ Prove existing sorry sites using the expanded infrastructure.
 - `docs/scouting/gap_ch09_pasting.md`
 - `docs/scouting/gap_ch10_ch02_induction_test.md`
 - `docs/scouting/gap_multilinearity.md` (no action needed — root TeX file)
+
+### Mathlib + faithfulness scouting (Streams A–E, pre-implementation)
+| Stream | Mathlib scouting | Faithfulness scouting | Lean PR | Status |
+|--------|------------------|-----------------------|---------|--------|
+| A: Finite fields + Fourier | `stream_a_finite_fields.md` | `stream_a_faithfulness.md` | #181 (merged) | **Done** — recs adopted in #220 refactor |
+| B: Schwartz-Zippel + Polys | `stream_b_polynomials.md` | `stream_b_faithfulness.md` | #182 (merged) | **Done** — uses Mathlib SZ directly |
+| C: Cauchy-Schwarz props | `stream_c_cauchy_schwarz.md` | `stream_c_faithfulness.md` | #183 (merged) | **Done** — ev_cauchy_schwarz + overlap-gap API |
+| D: Triangle inequalities | `stream_d_triangles.md` | `stream_d_faithfulness.md` | #184 (merged) | **Done** — 1 proved, 2 sorry stubs |
+| E: Self-consistency exts | `stream_e_self_consistency.md` | `stream_e_faithfulness.md` | #185 (merged) | **Done** — 5 sorry stubs with proof roadmaps |

@@ -63,6 +63,8 @@ Each LDT submodule typically has `Defs.lean` and `Theorems.lean` files. Root imp
 
 **Always read the paper source** (`references/ldt-paper/*.tex`) before formalizing or proving a statement. The paper contains the precise mathematical definitions, theorem statements, and proof strategies that the Lean code must faithfully represent. Cross-reference with the blueprint to understand what has already been formalized.
 
+**When stuck on a sorry site or proof**, go back to the original paper TeX source. The paper proofs contain the exact mathematical argument, intermediate steps, and inequalities needed. If you cannot close a sorry, read the corresponding section in `references/ldt-paper/*.tex` — the answer is almost always there. Do not guess or try random tactics without first understanding the paper's proof strategy.
+
 When formalizing a statement from the blueprint, add `\lean{LeanDeclName}` and `\leanok` tags to the corresponding `blueprint/src/chapter/*.tex` file.
 
 ## Proof-Filling Order
