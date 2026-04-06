@@ -111,6 +111,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 
 \begin{definition}[Consistency]\label{def:simeq}
   \lean{MIPStarRE.LDT.ConsRel}
+  \leanok
   Let $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$. Let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be submeasurements with the same answer set, and let $\mathcal D$ be a distribution on the question set. We write
   \[
     A_a^x \ot I \simeq_\delta I \ot B_a^x
@@ -138,6 +139,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 
 \begin{lemma}[Consistency for measurements]\label{prop:simeq-for-measurements}
   \lean{MIPStarRE.LDT.Preliminaries.simeqForMeasurements}
+  \leanok
   \uses{def:simeq}
   If $A=\{A_a^x\}$ and $B=\{B_a^x\}$ are measurements, then
   \[
@@ -152,6 +154,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 
 \begin{definition}[State-dependent distance]\label{def:approx_delta}
   \lean{MIPStarRE.LDT.SDDRel}
+  \leanok
   Let $\ket{\psi} \in \mathcal H$, let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be families of operators on $\mathcal H$, and let $\mathcal D$ be a distribution on the question set. We write
   \[
     A_a^x \approx_\delta B_a^x
@@ -180,6 +183,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 
 \begin{lemma}[Consistency implies state-dependent distance for measurements]\label{prop:simeq-to-approx}
   \lean{MIPStarRE.LDT.Preliminaries.simeqToApprox}
+  \leanok
   \uses{def:simeq, def:approx_delta, prop:simeq-for-measurements}
   If $A$ and $B$ are measurements and $A_a^x \ot I \simeq_\delta I \ot B_a^x$, then
   \[
@@ -317,6 +321,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 
 \begin{lemma}[Data processing for consistency]\label{prop:simeq-data-processing}
   \lean{MIPStarRE.LDT.Preliminaries.simeqDataProcessing}
+  \leanok
   \uses{def:post-processing, def:simeq}
   If $A=\{A_a^x\}$ and $B=\{B_a^x\}$ are measurements such that $A_a^x \ot I \simeq_\delta I \ot B_a^x$, and $f$ is a map on the answer set, then
   \[
@@ -329,6 +334,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 
 \begin{lemma}[Consistency controls a submeasurement]\label{prop:cons-sub-meas}
   \lean{MIPStarRE.LDT.Preliminaries.consSubMeas}
+  \leanok
   \uses{def:simeq, def:approx_delta}
   Let $A=\{A_a^x\}$ be a submeasurement and $B=\{B_a^x\}$ a measurement such that $A_a^x \ot I \simeq_\gamma I \ot B_a^x$. Then
   \begin{equation}
@@ -354,6 +360,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 
 \begin{lemma}[Switch-sandwich]\label{prop:switch-sandwich}
   \lean{MIPStarRE.LDT.Preliminaries.switchSandwich}
+  \leanok
   \uses{def:approx_delta}
   Suppose $A=\{A_a^x\}$ is a projective submeasurement satisfying
   \begin{equation}
@@ -385,6 +392,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 
 \begin{lemma}[Completeness transfer to a projective approximation]\label{prop:completeness-transfer-projective-P}
   \lean{MIPStarRE.LDT.Preliminaries.completenessTransferProjectiveP}
+  \leanok
   \uses{def:approx_delta, prop:easy-approx-from-approx-delta}
   Let $A=\{A_a^x\}$ be a submeasurement and $P=\{P_a^x\}$ a projective submeasurement such that $A_a^x \ot I \approx_\eps P_a^x \ot I$. Then
   \[
@@ -420,6 +428,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 
 \begin{lemma}[Strong self-consistency and state-dependent distance]\label{prop:two-notions-of-self-consistency}
   \lean{MIPStarRE.LDT.Preliminaries.twoNotionsOfSelfConsistency}
+  \leanok
   \uses{def:strong-self-consistency, def:approx_delta}
   If $A$ is $\delta$-strongly self-consistent, then
   \[
@@ -519,6 +528,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 
 \begin{lemma}[Completing a close submeasurement to a full measurement]\label{prop:completing-to-measurement}
   \lean{MIPStarRE.LDT.Preliminaries.completingToMeasurement}
+  \leanok
   \uses{def:strong-self-consistency, def:approx_delta, prop:triangle-inequality-for-vectors-squared, prop:easy-approx-from-approx-delta, prop:cool-prop}
   Let $A=\{A_a\}$ be a measurement that is $\zeta$-strongly self-consistent, let $B=\{B_a\}$ be a submeasurement such that $A_a \ot I \approx_\delta B_a \ot I$, and let $C$ be the measurement obtained by adding the missing mass $I-B$ to one distinguished answer $a^*$. Then
   \[

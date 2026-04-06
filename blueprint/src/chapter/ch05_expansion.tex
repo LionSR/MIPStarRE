@@ -7,6 +7,7 @@
 
 \begin{definition}[Rerandomizing one coordinate]\label{def:rerandomize-coord}
   \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord}
+  \leanok
   For $u \in \F_q^m$, an index $i \in \{1,\dots,m\}$, and $x \in \F_q$, let
   \[
     \operatorname{rerand}_i(u,x) = u + x e_i.
@@ -33,6 +34,7 @@
 
 \begin{lemma}[Laplacian rewrite]\label{prop:laplacian-rewrite}
   \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianRewrite}
+  \leanok
   \uses{def:adjacency-laplacian}
   The Laplacian can be written as
   \[
@@ -74,6 +76,7 @@
 
 \begin{lemma}[Eigenvectors of the hypercube graph]\label{prop:eigenvectors}
   \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors}
+  \leanok
   \uses{def:adjacency-laplacian, lem:character-average-vector, lem:character-average-scalar}
   For each $\alpha \in \F_q^m$, define
   \[
@@ -136,6 +139,7 @@
 
 \begin{lemma}[Spectral gap of the Laplacian]\label{cor:laplacian-spectral-gap}
   \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGap}
+  \leanok
   \uses{prop:eigenvectors}
   If $\lambda_1 \le \lambda_2 \le \cdots \le \lambda_{q^m}$ are the eigenvalues of $L$, then
   \[
@@ -153,6 +157,7 @@
 
 \begin{definition}[Local and global variance]\label{def:local-and-variance}
   \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localAndVariance}
+  \leanok
   Let $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ and let $0 \le A^u \le I$ be an operator for each $u \in \F_q^m$. The local variance is
   \[
     \mathbf{Var}_{\mathrm{local}}(A,\psi)
