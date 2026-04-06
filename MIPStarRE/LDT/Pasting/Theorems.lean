@@ -679,7 +679,24 @@ theorem gHatFacts
     (hcommComplete : CommutingWithGCompleteStatement params ψbi family gamma zeta)
     (hcommIncomplete : CommutingWithGIncompleteStatement params ψbi family gamma zeta) :
     GHatFactsStatement params ψbi family gamma zeta := by
-  sorry
+  refine {
+    completePartSelfConsistencyWitness := hselfComplete
+    incompletePartSelfConsistencyWitness := hselfIncomplete
+    completePartCommutationWitness := hcommComplete
+    incompletePartCommutationWitness := hcommIncomplete
+    completedSelfConsistency := ?_
+    completedCommutation := ?_
+  }
+  · -- TODO(#199): `completedSelfConsistency`: split gHat sum over
+    -- `Option (Polynomial params)` into complete + incomplete parts and
+    -- bound by `2 * zeta`.
+    -- Paper reference: `cor:G-hat-facts` in `ld-pasting.tex`.
+    sorry
+  · -- TODO(#199): `completedCommutation`: split gHat pair-product over
+    -- `GHatOutcome × GHatOutcome` into complete + incomplete quadrants
+    -- and bound by `gHatCommutationError`.
+    -- Paper reference: `cor:G-hat-facts` in `ld-pasting.tex`.
+    sorry
 
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
