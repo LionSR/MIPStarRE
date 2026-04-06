@@ -146,19 +146,19 @@ Prove existing sorry sites using the expanded infrastructure.
 ### Phase 3: Proof Infrastructure — 0/5 closed (partial progress)
 | Issue | Status | PR | Notes |
 |-------|--------|-----|-------|
-| #197 Ch04 Q/X/X̂/P Lean layer | OPEN | #210 partial | QXPLayer stubs added but issue not closed |
+| #197 Ch04 Q/X/X̂/P Lean layer | OPEN | #210 (merged), partial | QXPLayer stubs added but issue not closed |
 | #198 Ch07 SDP infrastructure | OPEN | — | Blocked on #188 blueprint |
 | #199 Ch09 pasting skeleton | OPEN | — | Blocked on #189 blueprint |
-| #200 Ch03 easy-approx public API | OPEN | #210 partial | Some infrastructure added |
-| #201 Ch03 cab-approx raw families | OPEN | #210 partial | Some infrastructure added |
+| #200 Ch03 easy-approx public API | OPEN | #210 (merged), partial | Some infrastructure added |
+| #201 Ch03 cab-approx raw families | OPEN | #210 (merged), partial | Some infrastructure added |
 
-### Phase 4: Sorry Elimination — 0/5 closed
+### Phase 4: Sorry Elimination — 3/5 done (issues open but sorry already proved on main)
 | Issue | Status | PR | Notes |
 |-------|--------|-----|-------|
 | #202 Ch04 oneMeasNaimark | OPEN | — | Requires CFC.sqrt; medium |
-| #203 Ch08 normalizationCondition | OPEN | — | ~25-line proof; no PR yet |
-| #204 Ch09 ldDnoteq (birthday paradox) | OPEN | — | Infra added by #210 but sorry remains |
-| #205 Ch09 looksEasyButTookMeAWhile | OPEN | — | Analytic inequality; no PR yet |
+| #203 Ch08 normalizationCondition | **DONE** (issue still open) | landed via #221 or earlier | Already sorry-free on main — close issue |
+| #204 Ch09 ldDnoteq (birthday paradox) | **DONE** (issue still open) | landed via #221 or earlier | Already sorry-free on main — close issue |
+| #205 Ch09 looksEasyButTookMeAWhile | **DONE** (issue still open) | landed via #221 or earlier | Already sorry-free on main — close issue |
 | #206 Ch05 expansion matrix realization | OPEN | #213 (open) | 3 coupled sorry sites; CI green |
 
 ### Non-Campaign PRs that advanced campaign goals
@@ -175,9 +175,25 @@ Prove existing sorry sites using the expanded infrastructure.
 | Date | Total sorry | Notes |
 |------|-------------|-------|
 | 2026-04-04 (campaign start) | ~64 | Per MASTER_PLAN inventory |
-| 2026-04-06 (current) | ~76* | *Higher count reflects QXPLayer stubs added by #210 |
+| 2026-04-06 (current) | 77 | Higher count reflects QXPLayer stubs added by #210 (merged) |
 
-### Overall: 3/20 issues closed, 4 campaign PRs merged, 6 non-campaign PRs advancing goals
+### Overall: 3/20 issues closed (3 more done but not yet closed), 5 campaign PRs merged, 6 non-campaign PRs advancing goals
+
+### New PRs from @claude auto-fix (2026-04-06)
+| PR | Source Issue | Content | CI | Unresolved |
+|----|-------------|---------|-----|------------|
+| #225 | #216 | Blueprint tags for triangle inequalities | All green | 4 |
+| #226 | #212 | Blueprint tags for Cauchy-Schwarz | All green | 0 |
+| #227 | #219 | Blueprint tags for self-consistency | All green | 1 |
+| #228 | #223 | QXPLayer: prove truncationInequality | Partial | 1 |
+| #229 | #224 | MMP/Theorems: roundAlmostProjMeas + orthonormalizationMainLemma | All green | 6 |
+| #230 | (auto) | SDDOpRel triangle inequality + monotonicity infra | All green | 7 |
+
+### New issues created (2026-04-06)
+| Issue | Description |
+|-------|-------------|
+| #223 | Sorry Elimination Ch04: Batch prove QXPLayer intermediate lemmas (15 sorry) |
+| #224 | Sorry Elimination Ch04: Prove MMP/Theorems remaining sorry sites (12 sorry) |
 
 ## Scouting Reports
 
