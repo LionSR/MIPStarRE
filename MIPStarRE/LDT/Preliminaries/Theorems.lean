@@ -543,6 +543,108 @@ theorem cabApproxDelta_raw
               exact questionCabApproxDelta ψ (A q) (B q) (C q) (hC q)
       _ ≤ δ := hAB⟩
 
+/-! ### Infrastructure: triangle inequality for `SDDOpRel` -/
+
+/-- The operator-family squared-distance defect is nonnegative. -/
+theorem qSDDOp_nonneg
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι) (A B : OpFamily Outcome ι) :
+    0 ≤ qSDDOp ψ A B := by
+  unfold qSDDOp qSDDCore
+  exact Finset.sum_nonneg fun a _ => ev_adjoint_self_nonneg ψ _
+
+/-- Atomic mathematical fact: the parallelogram-style inequality for `qSDDOp`. -/
+private lemma questionSDDOp_triangle
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι) (A B C : OpFamily Outcome ι) :
+    qSDDOp ψ A C ≤ 2 * (qSDDOp ψ A B + qSDDOp ψ B C) := by
+  let ev' (X Y : MIPStarRE.Quantum.Op ι) := ev ψ ((X - Y)ᴴ * (X - Y))
+  have pointwise_outcome : ∀ a, ev' (A.outcome a) (C.outcome a) ≤
+      2 * (ev' (A.outcome a) (B.outcome a) +
+           ev' (B.outcome a) (C.outcome a)) :=
+    fun a => ev_diff_triangle ψ _ _ _
+  unfold qSDDOp qSDDCore
+  have h1 : ∑ a : Outcome, ev' (A.outcome a) (C.outcome a) ≤
+      ∑ a : Outcome, (2 * (ev' (A.outcome a) (B.outcome a) +
+                 ev' (B.outcome a) (C.outcome a))) :=
+    Finset.sum_le_sum fun a _ => pointwise_outcome a
+  have h2 : ∑ a : Outcome, (2 * (ev' (A.outcome a) (B.outcome a) +
+                        ev' (B.outcome a) (C.outcome a))) =
+      2 * (∑ a : Outcome, ev' (A.outcome a) (B.outcome a) +
+           ∑ a : Outcome, ev' (B.outcome a) (C.outcome a)) := by
+    rw [← Finset.mul_sum, ← Finset.sum_add_distrib]
+  linarith
+
+/-- Triangle inequality for operator-family state-dependent distance. -/
+lemma stateDependentDistanceOpRel_triangle
+    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B C : IdxOpFamily Question Outcome ι) (δ₁ δ₂ : Error) :
+    SDDOpRel ψ 𝒟 A B δ₁ →
+    SDDOpRel ψ 𝒟 B C δ₂ →
+    SDDOpRel ψ 𝒟 A C (2 * (δ₁ + δ₂)) := by
+  intro ⟨h₁⟩ ⟨h₂⟩
+  constructor
+  unfold sddErrorOp at *
+  calc
+    avgOver 𝒟 (fun q => qSDDOp ψ (A q) (C q))
+      ≤ avgOver 𝒟
+          (fun q => 2 * (qSDDOp ψ (A q) (B q) + qSDDOp ψ (B q) (C q))) := by
+            apply avgOver_mono
+            intro q
+            exact questionSDDOp_triangle ψ (A q) (B q) (C q)
+    _ = 2 * avgOver 𝒟
+          (fun q => qSDDOp ψ (A q) (B q) + qSDDOp ψ (B q) (C q)) := by
+            rw [avgOver_const_mul]
+    _ = 2 * (avgOver 𝒟 (fun q => qSDDOp ψ (A q) (B q)) +
+          avgOver 𝒟 (fun q => qSDDOp ψ (B q) (C q))) := by
+            rw [avgOver_add]
+    _ ≤ 2 * (δ₁ + δ₂) := by
+            apply mul_le_mul_of_nonneg_left _ (by norm_num)
+            exact add_le_add h₁ h₂
+
+/-- Monotonicity of `SDDOpRel` in the error bound. -/
+lemma stateDependentDistanceOpRel_mono
+    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B : IdxOpFamily Question Outcome ι) (δ δ' : Error)
+    (hle : δ ≤ δ') :
+    SDDOpRel ψ 𝒟 A B δ →
+    SDDOpRel ψ 𝒟 A B δ' := by
+  intro ⟨h⟩
+  exact ⟨le_trans h hle⟩
+
+private lemma qSDDOp_symm
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι) (A B : OpFamily Outcome ι) :
+    qSDDOp ψ A B = qSDDOp ψ B A := by
+  let F : Outcome → MIPStarRE.Quantum.Op ι := fun a => A.outcome a - B.outcome a
+  let G : Outcome → MIPStarRE.Quantum.Op ι := fun a => B.outcome a - A.outcome a
+  have hFG : F = fun a => -G a := by
+    funext a
+    dsimp [F, G]
+    abel
+  unfold qSDDOp qSDDCore
+  change ∑ a : Outcome, ev ψ ((F a)ᴴ * F a) = ∑ a : Outcome, ev ψ ((G a)ᴴ * G a)
+  rw [hFG]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  change ev ψ ((-G a)ᴴ * (-G a)) = ev ψ ((G a)ᴴ * G a)
+  simp
+
+/-- Symmetry of the operator-family state-dependent distance relation. -/
+lemma sddOpRel_symm
+    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B : IdxOpFamily Question Outcome ι) (δ : Error) :
+    SDDOpRel ψ 𝒟 A B δ → SDDOpRel ψ 𝒟 B A δ := by
+  intro ⟨h⟩
+  constructor
+  simpa [sddErrorOp, qSDDOp_symm] using h
+
 /-! ### Bridge lemmas for `prop:cons-sub-meas` -/
 
 private lemma consSubMeas_controlHelper

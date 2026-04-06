@@ -90,4 +90,102 @@ theorem uniformDistribution_weight_sum_le_one (α : Type*)
     ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a ≤ 1 := by
   simp [uniformDistribution]
 
+/-- Averaging a function depending only on the first coordinate marginalizes a uniform product. -/
+theorem avgOver_uniform_fst {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α → Error) :
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1) =
+      avgOver (uniformDistribution α) f := by
+  have hα : (Fintype.card α : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  have hβ : (Fintype.card β : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  calc
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1)
+        = ∑ ab : α × β, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f ab.1 := by
+            simp [avgOver, uniformDistribution, Fintype.card_prod]
+    _ = ∑ a : α, ∑ b : β, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a := by
+      simpa using
+        (Fintype.sum_prod_type'
+          (f := fun a : α => fun _ : β =>
+            (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a))
+    _ = ∑ a : α, (1 / (Fintype.card α : Error)) * f a := by
+      refine Finset.sum_congr rfl ?_
+      intro a ha
+      calc
+        ∑ b : β, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a
+            = (Fintype.card β : Error) *
+                ((1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a) := by
+                  simp
+        _ = (1 / (Fintype.card α : Error)) * f a := by
+          field_simp [hα, hβ]
+          rw [Nat.cast_mul]
+          ring
+    _ = avgOver (uniformDistribution α) f := by
+      simp [avgOver, uniformDistribution]
+
+/-- Averaging a function depending only on the second coordinate marginalizes a uniform product. -/
+theorem avgOver_uniform_snd {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : β → Error) :
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.2) =
+      avgOver (uniformDistribution β) f := by
+  have hα : (Fintype.card α : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  have hβ : (Fintype.card β : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  calc
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.2)
+        = ∑ ab : α × β, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f ab.2 := by
+            simp [avgOver, uniformDistribution, Fintype.card_prod]
+    _ = ∑ b : β, ∑ a : α, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f b := by
+      simpa using
+        (Fintype.sum_prod_type_right'
+          (f := fun a : α => fun b : β =>
+            (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f b))
+    _ = ∑ b : β, (1 / (Fintype.card β : Error)) * f b := by
+      refine Finset.sum_congr rfl ?_
+      intro b hb
+      calc
+        ∑ a : α, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f b
+            = (Fintype.card α : Error) *
+                ((1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f b) := by
+                  simp
+        _ = (1 / (Fintype.card β : Error)) * f b := by
+          field_simp [hα, hβ]
+          rw [Nat.cast_mul]
+          ring
+    _ = avgOver (uniformDistribution β) f := by
+      simp [avgOver, uniformDistribution]
+
+/-- A pointwise upper bound depending only on the first coordinate bounds the product average. -/
+theorem avgOver_uniform_prod_le_fst {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α × β → Error) (g : α → Error)
+    (h : ∀ ab, f ab ≤ g ab.1) :
+    avgOver (uniformDistribution (α × β)) f ≤
+      avgOver (uniformDistribution α) g := by
+  calc
+    avgOver (uniformDistribution (α × β)) f
+      ≤ avgOver (uniformDistribution (α × β)) (fun ab => g ab.1) := by
+          exact avgOver_mono _ _ _ h
+    _ = avgOver (uniformDistribution α) g := avgOver_uniform_fst g
+
+/-- A pointwise upper bound depending only on the second coordinate bounds the product average. -/
+theorem avgOver_uniform_prod_le_snd {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α × β → Error) (g : β → Error)
+    (h : ∀ ab, f ab ≤ g ab.2) :
+    avgOver (uniformDistribution (α × β)) f ≤
+      avgOver (uniformDistribution β) g := by
+  calc
+    avgOver (uniformDistribution (α × β)) f
+      ≤ avgOver (uniformDistribution (α × β)) (fun ab => g ab.2) := by
+          exact avgOver_mono _ _ _ h
+    _ = avgOver (uniformDistribution β) g := avgOver_uniform_snd g
+
 end MIPStarRE.LDT
