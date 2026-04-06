@@ -171,6 +171,8 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{equation}
 
 \begin{lemma}[Transferring consistency through state-dependent distance]\label{prop:triangle-sub}
+  \lean{MIPStarRE.LDT.Preliminaries.triangleSub}
+  \leanok
   \uses{def:simeq, def:approx_delta, prop:simeq-for-measurements}
   Let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be measurements and let $C=\{C_a^x\}$ be a submeasurement. If $A_a^x \ot I \simeq_\delta I \ot C_a^x$ and $A_a^x \ot I \approx_\eps B_a^x \ot I$, then
   \[
@@ -178,6 +180,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \]
 \end{lemma}
 \begin{proof}
+  \leanok
   Rewrite the inconsistency with $C$ as total mass minus diagonal overlap. The total mass is unchanged because $A$ and $B$ are measurements, and the diagonal overlap changes by at most $\sqrt\eps$ by Cauchy--Schwarz.
 \end{proof}
 
@@ -284,12 +287,15 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Triangle inequality for vectors squared]\label{prop:triangle-inequality-for-vectors-squared}
+  \lean{MIPStarRE.LDT.Preliminaries.triangleInequalityForVectorsSquared}
+  \leanok
   For vectors $\ket{\psi_1},\dots,\ket{\psi_k}$,
   \[
     \bigl\lVert \ket{\psi_1}+\cdots+\ket{\psi_k} \bigr\rVert^2 \le k(\lVert\ket{\psi_1}\rVert^2+\cdots+\lVert\ket{\psi_k}\rVert^2).
   \]
 \end{lemma}
 \begin{proof}
+  \leanok
   First,
   \begin{equation}\label{eq:prop-for-real-numbers}
     (x_1+\cdots+x_k)^2 \le k(x_1^2+\cdots+x_k^2)
@@ -309,6 +315,8 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Triangle inequality for $\simeq_\delta$]\label{prop:simeq-triangle-inequality}
+  \lean{MIPStarRE.LDT.Preliminaries.simeqTriangleInequality}
+  \leanok
   \uses{prop:simeq-to-approx, prop:triangle-inequality-for-approx_delta, prop:triangle-sub}
   Suppose $A_a^x \ot I \simeq_\eps I \ot B_a^x$, $C_a^x \ot I \simeq_\delta I \ot B_a^x$, and $C_a^x \ot I \simeq_\gamma I \ot D_a^x$, where all four families are measurements. Then
   \[
@@ -316,6 +324,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \]
 \end{lemma}
 \begin{proof}
+  \leanok
   Convert the two consistencies involving $C$ to state-dependent distance, compose them by the triangle inequality, and transfer the result back to consistency by Lemma~\ref{prop:triangle-sub}.
 \end{proof}
 
