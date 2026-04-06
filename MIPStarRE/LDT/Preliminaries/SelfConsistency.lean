@@ -4,12 +4,12 @@ import MIPStarRE.LDT.Preliminaries.Triangles
 /-!
 # Self-Consistency Extensions
 
-Additional proposition statements from
-`references/ldt-paper/preliminaries.tex`.
+Proofs of the five self-consistency propositions from the paper
+(Section 3, `references/ldt-paper/preliminaries.tex`).
 
-All five propositions from the paper are now fully proved. 
-This file records the exact signatures together with proof-sketch comments
+## References
 
+* arXiv:2009.12982, Section 3 (Propositions on self-consistency)
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
