@@ -85,15 +85,15 @@ noncomputable def diagonalLineAnswerFamily {params : Parameters}
     postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
 
 /-- Trace-based failure surrogate for the axis-parallel lines test.
-Alice's point answers are lifted to the left tensor factor, and Bob's
-line answers are lifted to the right tensor factor. -/
+Alice's point answers act on the left register and Bob's line answers act on
+the right register of the shared bipartite state. -/
 noncomputable def axisParallelFailureProbability {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) : Error :=
-  consError strategy.state
+  bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
-    (IdxSubMeas.liftLeft (axisParallelPointAnswerFamily strategy))
-    (IdxSubMeas.liftRight (axisParallelLineAnswerFamily strategy))
+    (axisParallelPointAnswerFamily strategy)
+    (axisParallelLineAnswerFamily strategy)
 
 /-- Trace-based failure surrogate for the self-consistency test.
 Uses the bipartite SSC defect (cross-register overlap). -/
@@ -105,15 +105,15 @@ noncomputable def selfConsistencyFailureProbability {params : Parameters}
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
 
 /-- Trace-based failure surrogate for the diagonal lines test.
-Alice's point answers are lifted to the left tensor factor, and Bob's
-diagonal-line answers are lifted to the right tensor factor. -/
+Alice's point answers act on the left register and Bob's diagonal-line answers
+act on the right register of the shared bipartite state. -/
 noncomputable def diagonalFailureProbability {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) : Error :=
-  consError strategy.state
+  bipartiteConsError strategy.state
     (uniformDistribution (DiagonalTestSample params))
-    (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-    (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy))
+    (diagonalPointAnswerFamily strategy)
+    (diagonalLineAnswerFamily strategy)
 
 /-- Goodness data for a restricted strategy. -/
 structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]

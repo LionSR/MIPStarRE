@@ -25,7 +25,7 @@ open MIPStarRE.LDT
 
 noncomputable section
 
--- NOTE: 15 sorry stubs are intentional scaffolding for issue #197. See PROOF_INTEGRITY.md.
+-- NOTE: sorry stubs are intentional scaffolding for issue #197. See PROOF_INTEGRITY.md.
 
 /-- The quarter-root error term `ζ^(1/4)` used throughout the paper's late-stage
 orthonormalization estimates. -/
@@ -163,15 +163,19 @@ This is the opening inequality in the proof of
 `lem:orthonormalization-main-lemma`, extracted as an explicit Lean lemma so the
 later `Q/X/XHat/P` layer can depend on it directly. -/
 lemma aLooksProjective {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome]
-    (ψ : QuantumState ι)
-    (A B : Measurement Outcome ι) (ζ : Error) :
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : ProjMeas Outcome ιB) (ζ : Error) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
-      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ := by
-  -- TODO: prove (issue #197)
+      ∑ a, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a - A.outcome a * A.outcome a)) ≤
+        2 * ζ := by
+  intro _hCons
+  -- TODO: adapt proof to the bipartite formulation, with Alice operators placed
+  -- on the left tensor factor and Bob operators on the right.
   sorry
 
 /-- **Scalar truncation inequality** (`lem:trunc-inequality`).
@@ -185,8 +189,34 @@ lemma truncationInequality (δ x : Error) :
       x ≤ 1 →
       let trunc : Error := if 1 - δ ≤ x then 1 else 0
       (x - trunc) ^ (2 : Nat) ≤ (1 / δ) * (x - x ^ (2 : Nat)) := by
-  -- TODO: prove (issue #197)
-  sorry
+  intro hδ hδ_half hx_nonneg hx_le_one
+  dsimp
+  by_cases h : 1 - δ ≤ x
+  · simp [h]
+    have hδ_le_x : δ ≤ x := by
+      linarith
+    have hmain : (x - 1) ^ (2 : Nat) * δ ≤ x - x ^ (2 : Nat) := by
+      nlinarith
+    have hdiv : (x - 1) ^ (2 : Nat) ≤ (x - x ^ (2 : Nat)) / δ := by
+      exact (le_div_iff₀ hδ).2 hmain
+    simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hdiv
+  · simp [h]
+    push_neg at h
+    have hδ_le_one_sub_x : δ ≤ 1 - x := by
+      linarith
+    have hmain : x ^ (2 : Nat) * δ ≤ x - x ^ (2 : Nat) := by
+      have hx_sq_le_x : x ^ (2 : Nat) ≤ x := by
+        nlinarith
+      have hmul₁ : x ^ (2 : Nat) * δ ≤ x * δ := by
+        exact mul_le_mul_of_nonneg_right hx_sq_le_x (le_of_lt hδ)
+      have hmul₂ : x * δ ≤ x * (1 - x) := by
+        exact mul_le_mul_of_nonneg_left hδ_le_one_sub_x hx_nonneg
+      have hmul : x ^ (2 : Nat) * δ ≤ x * (1 - x) := by
+        exact le_trans hmul₁ hmul₂
+      nlinarith
+    have hdiv : x ^ (2 : Nat) ≤ (x - x ^ (2 : Nat)) / δ := by
+      exact (le_div_iff₀ hδ).2 hmain
+    simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hdiv
 
 /-- **Rounding to projectors** (`lem:projective-non-measurement`).
 
