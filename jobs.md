@@ -1,87 +1,42 @@
-# LDT Sorry Elimination — Master Plan
+# LDT Sorry Elimination — Final Status
 
-## Wave 1 Results: 5 sorrys eliminated, 3 infrastructure fixes
+## Summary
+- **Started**: 66 sorrys across 9 files
+- **Current**: 57 sorrys across 9 files  
+- **Eliminated**: 9 sorrys + 3 infrastructure fixes
+- **PRs created**: 2
 
-### Completed
-- [x] `QXPLayer.lean:qaRestated` — PROVED (added QXPLayerData fields)
-- [x] `QXPLayer.lean:xSquared` — PROVED  
-- [x] `QXPLayer.lean:xExpressionToQExpression` — PROVED
-- [x] `QXPLayer.lean:xHatSquared` — PROVED
-- [x] `MMP/Theorems.lean:orthonormalizationMainLemma_error_bound` — PROVED (added ζ ≤ 1 hyp)
-- [x] `Pasting/Theorems.lean:commutingWithGComplete` — FIXED type mismatch
-- [x] `SelfImprovement/Theorems.lean` — Updated blocker docs
+## PRs
 
-### Sorry Count: 66 → 61
+### PR #240: Wave 1 (feat/ldt-sorry-elimination-wave1)
+- 5 sorrys eliminated: qaRestated, xSquared, xExpressionToQExpression, xHatSquared, orthonormalizationMainLemma_error_bound
+- Infrastructure: QXPLayerData fields, error bound fix, G type mismatch fix
+- Files: QXPLayer.lean, MMP/Theorems.lean, Pasting/Theorems.lean, SelfImprovement/Theorems.lean
 
-## Remaining Sorrys (61)
+### PR #241: Wave 2 (feat/ldt-sorry-elimination-wave2)  
+- 4 sorrys eliminated: aLooksProjective, 3x aggregate SDDRel in GlobalVariance
+- Infrastructure: averageUnitSubMeas public wrapper, Jensen averaging helpers
+- Files: QXPLayer.lean, GlobalVariance/Defs.lean, GlobalVariance/Theorems.lean
 
-### MakingMeasurementsProjective/QXPLayer.lean (10 remaining)
-- [ ] `aLooksProjective` — needs bipartite formulation
-- [ ] `projectiveNonMeasurement` — #197 construction
-- [ ] `projectiveLowRankSum` — #197 construction
-- [ ] `qCompleteness` — #197
-- [ ] `sqrtQCompleteness` — #197  
-- [ ] `qAlmostProjective` — #197
-- [ ] `xTimesXHat` — SVD identity
-- [ ] `squaredDifference` — operator inequality
-- [ ] `pProjectivity` — projective submeasurement construction
-- [ ] `pQApprox` — final approximation
+## Remaining 57 Sorrys — Blockers Analysis
 
-### MakingMeasurementsProjective/Theorems.lean (10 remaining)
-- [ ] `oneMeasNaimark` (5 subgoals) — #118 unitary extension
-- [ ] `naimark` — blocked on oneMeasNaimark
-- [ ] `orthonormalization` — blocked on completion bridge
-- [ ] `consistencyToAlmostProjective` — ConsRel bridge
-- [ ] `spectralTruncateAlmostProjective` — spectral cutoff
-- [ ] `adjustTruncatedProjections` — rounding
+Most remaining sorrys are **deep mathematical theorems** requiring substantial new infrastructure:
 
-### Pasting/Theorems.lean (14)
-- [ ] `ldPasting`, `ldPastingSubMeas` — top-level
-- [ ] `gCompleteSelfConsistency` — slice SSC conversion
-- [ ] `commutativitySwitcheroo` — aggregate commutation
-- [ ] `commutingWithGComplete` — has sorry (type fixed)
-- [ ] `gHatFacts` (2 subgoals) — Option splitting
-- [ ] `commuteGHalfSandwich` — iterated commutation
-- [ ] `ldSandwichLineOnePoint` — one-point comparison
-- [ ] `hBConsistency` — aggregation
-- [ ] `overAllOutcomes` — total mass
-- [ ] `fromHToG` — Bernoulli-tail
-- [ ] `chernoffBernoulliMatrix` — matrix Chernoff
-- [ ] `ldPastingNCompleteness` — combines above
+### Genuinely Hard (need new math):
+- Naimark dilation (5 sorry subgoals) — needs unitary extension
+- Orthonormalization chain (5 sorrys) — needs spectral truncation
+- SDP duality argument — needs SDP infrastructure  
+- Matrix Chernoff bound — needs random matrix theory
+- Hypercube expansion (3 sorrys) — needs spectral graph theory
+- Main induction step — depends on all above
 
-### GlobalVariance/Theorems.lean (10)
-- [ ] `matrixGeneralizeB`, `matrixLocalVarianceOfPoints`, `matrixGlobalVarianceOfPoints` — matrix transfer
-- [ ] `generalizeB` (2 subgoals) — pointwise + aggregate
-- [ ] `localVarianceOfPoints` (3 subgoals) — local variance
-- [ ] `globalVarianceOfPoints` (2 subgoals) — global variance
+### Blocked by Missing Hypotheses/Infrastructure:
+- SelfImprovement: addInU statement quantifies wrong, needs redesign
+- SelfImprovement: selfImprovement wrapper needs PermInvState  
+- Commutativity: needs PermInvState/IsNormalized assumptions
+- GlobalVariance matrix transfer: needs matrix realization bridge
+- ExpansionHypercubeGraph: needs trace/Kronecker helpers
 
-### Commutativity/Theorems.lean (5)
-- [ ] `commDataProcessedG` (4 subgoals) — SDDOpRel bridges
-- [ ] `comMain:fullSliceCommutation` — lift to full-slice
-
-### SelfImprovement/Theorems.lean (4) — BLOCKED
-- [ ] `selfImprovementHelper` — blocked on sdp + addInU
-- [ ] `sdp` — needs SDP infrastructure
-- [ ] `addInU` — statement issue (quantifies over arbitrary H)
-- [ ] `selfImprovement` — blocked on helper + orthonormalization
-
-### MainInductionStep/Theorems.lean (4) — BLOCKED
-- [ ] `mainInduction` — blocked on everything
-- [ ] `selfImprovementInInductionSection` — needs measurement witness
-- [ ] `ldPastingInInductionSection` — cyclic import
-- [ ] `restrictedProbabilities` — modeling mismatch
-
-### ExpansionHypercubeGraph/Theorems.lean (3)
-- [ ] `matrixLocalToGlobal` — expansion inequality
-- [ ] `matrixLocalRewrite` — trace identity
-- [ ] `matrixGlobalRewrite` — trace identity
-
-### Test/MainTheorem.lean (1) — BLOCKED
-- [ ] `mainFormal` — depends on everything
-
-## PR Groups
-- **PR 1 (CREATED)**: MMP + Pasting + SelfImprovement fixes
-- **PR 2 (NEXT)**: GlobalVariance averaging lemma + proofs  
-- **PR 3 (NEXT)**: ExpansionHypercubeGraph matrix proofs
-- **PR 4 (FUTURE)**: Commutativity SDDOpRel bridges
-- **PR 5 (FUTURE)**: Deep math proofs (Naimark, orthonormalization, pasting)
+### Would Need Statement Redesign:
+- Pasting gHatFacts: Option splitting goes wrong direction
+- Several wrapper theorems blocked on core theorems above

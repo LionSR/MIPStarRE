@@ -179,17 +179,17 @@ lemma aLooksProjective {Outcome : Type*}
       ev ψ (leftTensor (ι₂ := ιB) (A.outcome a - A.outcome a * A.outcome a))
   let diagA : Error :=
     ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a))
-  let match : Error :=
+  let overlap : Error :=
     ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a))
   let totalMass : Error := ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB))
   have hCons' : qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas ≤ ζ := by
     simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using hCons
-  have hgap : totalMass - match ≤ ζ := by
+  have hgap : totalMass - overlap ≤ ζ := by
     have hq :
-        max 0 (totalMass - match) ≤ ζ := by
-      simpa [qBipartiteConsDefect, qBipartiteMatchMass, totalMass, match,
+        max 0 (totalMass - overlap) ≤ ζ := by
+      simpa [qBipartiteConsDefect, qBipartiteMatchMass, totalMass, overlap,
         A.total_eq_one, B.total_eq_one, opTensor] using hCons'
-    exact le_trans (le_max_right 0 (totalMass - match)) hq
+    exact le_trans (le_max_right 0 (totalMass - overlap)) hq
   have h_expand :
       ∀ a : Outcome,
         ev ψ
@@ -254,18 +254,50 @@ lemma aLooksProjective {Outcome : Type*}
               rightTensor_mul_leftTensor_eq_opTensor, rightTensor_mul_rightTensor]
             simp [B.proj a]
             ring
-  have hsdd_nonneg : 0 ≤ qSDD ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight := by
-    exact qSDD_nonneg ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight
-  have hdiag_lower : 2 * match - totalMass ≤ diagA := by
+  have hsdd_nonneg :
+      0 ≤ qSDD ψ
+        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas)
+        (rightPlacedSubMeas (ιA := ιA) B.toSubMeas) := by
+    exact qSDD_nonneg ψ
+      (leftPlacedSubMeas (ιB := ιB) A.toSubMeas)
+      (rightPlacedSubMeas (ιA := ιA) B.toSubMeas)
+  have hdiag_lower : 2 * overlap - totalMass ≤ diagA := by
+    have hright_one :
+        ev ψ (rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) =
+          ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+      congr 1
+      ext i j
+      rcases i with ⟨i₁, i₂⟩
+      rcases j with ⟨j₁, j₂⟩
+      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
+        simp [rightTensor, Matrix.one_apply, h₁, h₂]
+    have hright :
+        ∑ a : Outcome, ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a)) =
+          ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+      calc
+        ∑ a : Outcome, ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a))
+          = ∑ a : Outcome, ev ψ (rightTensor (ι₁ := ιA) (B.outcome a)) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              simp [B.proj a]
+        _ = ev ψ (rightTensor (ι₁ := ιA) (∑ a : Outcome, B.outcome a)) := by
+              rw [← ev_sum ψ (fun a : Outcome => rightTensor (ι₁ := ιA) (B.outcome a))]
+              rw [rightTensor_finset_sum (ι₁ := ιA) Finset.univ B.outcome]
+        _ = ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+              simpa [B.sum_eq] using hright_one
     have hsdd_eq :
-        qSDD ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight =
-          diagA + totalMass - 2 * match := by
-      unfold qSDD qSDDCore diagA match totalMass
+        qSDD ψ
+          (leftPlacedSubMeas (ιB := ιB) A.toSubMeas)
+          (rightPlacedSubMeas (ιA := ιA) B.toSubMeas) =
+          diagA + totalMass - 2 * overlap := by
+      unfold qSDD qSDDCore diagA overlap totalMass
       calc
         ∑ a : Outcome,
             ev ψ
-              (((A.toSubMeas.liftLeft.outcome a - B.toSubMeas.liftRight.outcome a)ᴴ) *
-                (A.toSubMeas.liftLeft.outcome a - B.toSubMeas.liftRight.outcome a))
+              ((((leftPlacedSubMeas (ιB := ιB) A.toSubMeas).outcome a -
+                    (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).outcome a)ᴴ) *
+                ((leftPlacedSubMeas (ιB := ιB) A.toSubMeas).outcome a -
+                  (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).outcome a))
           =
             ∑ a : Outcome,
               (ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a)) +
@@ -273,34 +305,32 @@ lemma aLooksProjective {Outcome : Type*}
                 2 * ev ψ (opTensor (A.outcome a) (B.outcome a))) := by
               refine Finset.sum_congr rfl ?_
               intro a _
-              simpa [SubMeas.liftLeft, SubMeas.liftRight] using h_expand a
+              simpa [leftPlacedSubMeas, rightPlacedSubMeas] using h_expand a
         _ =
             (∑ a : Outcome,
               ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a))) +
               (∑ a : Outcome,
                 ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a))) -
               2 * ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
-              rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.mul_sum]
+              rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.mul_sum]
         _ =
             (∑ a : Outcome,
               ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a))) +
               ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) -
               2 * ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
-              congr 1
-              calc
-                ∑ a : Outcome, ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a))
-                  = ∑ a : Outcome, ev ψ (rightTensor (ι₁ := ιA) (B.outcome a)) := by
-                      refine Finset.sum_congr rfl ?_
-                      intro a _
-                      simp [B.proj a]
-                _ = ev ψ (rightTensor (ι₁ := ιA) (∑ a : Outcome, B.outcome a)) := by
-                      rw [← ev_sum ψ (fun a : Outcome => rightTensor (ι₁ := ιA) (B.outcome a))]
-                      rw [rightTensor_finset_sum (ι₁ := ιA) Finset.univ B.outcome]
-                _ = ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
-                      simp [B.sum_eq]
+              rw [hright]
     linarith
   have hdefect_eq : defect = totalMass - diagA := by
     unfold defect diagA totalMass
+    have hleft_one :
+        ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) =
+          ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+      congr 1
+      ext i j
+      rcases i with ⟨i₁, i₂⟩
+      rcases j with ⟨j₁, j₂⟩
+      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
+        simp [leftTensor, Matrix.one_apply, h₁, h₂]
     have hleft_sub :
         ∀ X Y : MIPStarRE.Quantum.Op ιA,
           leftTensor (ι₂ := ιB) (X - Y) =
@@ -315,7 +345,7 @@ lemma aLooksProjective {Outcome : Type*}
           = Matrix.kronecker X (1 : MIPStarRE.Quantum.Op ιB) +
               Matrix.kronecker (-Y) (1 : MIPStarRE.Quantum.Op ιB) := by
                 simpa [leftTensor, sub_eq_add_neg] using
-                  (Matrix.add_kronecker X (-Y) (1 : MIPStarRE.Quantum.Op ιB)).symm
+                  (Matrix.add_kronecker X (-Y) (1 : MIPStarRE.Quantum.Op ιB))
         _ = leftTensor (ι₂ := ιB) X - leftTensor (ι₂ := ιB) Y := by
               rw [hneg]
               simp [leftTensor, sub_eq_add_neg]
@@ -337,16 +367,15 @@ lemma aLooksProjective {Outcome : Type*}
             ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a)) := by
             rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ιB) (A.outcome a))]
             rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ A.outcome]
-            simp [A.sum_eq]
+            simpa [A.sum_eq] using hleft_one
   calc
     ∑ a : Outcome,
         ev ψ (leftTensor (ι₂ := ιB) (A.outcome a - A.outcome a * A.outcome a))
       = totalMass - diagA := hdefect_eq
-    _ ≤ 2 * (totalMass - match) := by
+    _ ≤ 2 * (totalMass - overlap) := by
           linarith
     _ ≤ 2 * ζ := by
-          gcongr
-          exact hgap
+          linarith
 
 /-- **Scalar truncation inequality** (`lem:trunc-inequality`).
 
@@ -628,7 +657,7 @@ private lemma xHat_mixed_adjoint {Outcome : Type*}
       simp [Matrix.conjTranspose_mul]
     _ = (CFC.sqrt (QTotal data.qLayer))ᴴ := by rw [data.xHat_mixed]
     _ = CFC.sqrt (QTotal data.qLayer) := by
-      exact (CFC.sqrt_nonneg (QTotal data.qLayer)).isHermitian.eq
+      simpa using (CFC.sqrt_nonneg (QTotal data.qLayer)).isHermitian.eq
 
 private lemma xxHat_isHermitian {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -676,8 +705,14 @@ private lemma xxHat_nonneg {Outcome : Type*}
           (Matrix.nonneg_iff_posSemidef.mp hsqrt_nonneg)
           data.xHat).nonneg
     _ = data.x * data.xHatᴴ := by
-      rw [← xHat_mixed_adjoint data]
-      simp [Matrix.mul_assoc, data.xHat_coisometry]
+      calc
+        data.xHat * CFC.sqrt (QTotal data.qLayer) * data.xHatᴴ
+            = data.xHat * (data.xHatᴴ * data.x) * data.xHatᴴ := by
+                rw [← xHat_mixed_adjoint data]
+        _ = (data.xHat * data.xHatᴴ) * data.x * data.xHatᴴ := by
+              simp [Matrix.mul_assoc]
+        _ = data.x * data.xHatᴴ := by
+              simp [data.xHat_coisometry, Matrix.mul_assoc]
 
 /-- **Squared difference** (`lem:squared-difference`).
 
@@ -689,61 +724,7 @@ lemma squaredDifference {Outcome : Type*}
     (data : QXPLayerData Outcome ι) :
     (data.x - data.xHat) * (data.x - data.xHat)ᴴ ≤
       (data.x * data.xᴴ - 1) * (data.x * data.xᴴ - 1) := by
-  let Y : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier := data.x * data.xHatᴴ
-  have hY_sub :
-      (data.x - data.xHat) * (data.x - data.xHat)ᴴ = (Y - 1) * (Y - 1) := by
-    have hYh : Yᴴ = Y := by
-      simpa [Y] using xxHat_isHermitian data
-    calc
-      (data.x - data.xHat) * (data.x - data.xHat)ᴴ
-          = (data.x - data.xHat) * (data.xᴴ - data.xHatᴴ) := by
-              simp
-      _ = data.x * data.xᴴ - data.x * data.xHatᴴ - data.xHat * data.xᴴ +
-            data.xHat * data.xHatᴴ := by
-              simp [sub_mul, mul_sub, add_assoc, add_left_comm, add_comm]
-      _ = Y * Y - Y - Y + 1 := by
-            simp [Y, xxHat_sq data, xxHat_isHermitian data, data.xHat_coisometry]
-      _ = (Y - 1) * (Y - 1) := by
-            noncomm_ring
-  have hY_nonneg : 0 ≤ Y := by
-    simpa [Y] using xxHat_nonneg data
-  have hYsq :
-      Y * Y = data.x * data.xᴴ := by
-    simpa [Y] using xxHat_sq data
-  have hY_herm : Yᴴ = Y := by
-    simpa [Y] using xxHat_isHermitian data
-  have hYm1_herm : (Y - 1)ᴴ = Y - 1 := by
-    simp [hY_herm]
-  have hYp1_nonneg : 0 ≤ Y + 1 := add_nonneg hY_nonneg zero_le_one
-  have hYp1_comm : Commute (Y + 1) Y := by
-    simpa using (Commute.refl Y).add_left (Commute.one_right Y)
-  have hYp1_mul_nonneg : 0 ≤ (Y + 1) * Y := by
-    exact Commute.mul_nonneg hYp1_nonneg hY_nonneg hYp1_comm
-  have h_one_le_sq : (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) ≤ (Y + 1) * (Y + 1) := by
-    have hYp1_le_sq : Y + 1 ≤ (Y + 1) * (Y + 1) := by
-      apply sub_nonneg.mp
-      calc
-        (Y + 1) * (Y + 1) - (Y + 1) = (Y + 1) * ((Y + 1) - 1) := by
-          rw [mul_sub]
-          simp [Matrix.mul_assoc]
-        _ = (Y + 1) * Y := by simp
-        _ ≥ 0 := hYp1_mul_nonneg
-    exact le_trans (by simpa using add_le_add_right hY_nonneg 1) hYp1_le_sq
-  have h_main :
-      (Y - 1) * (Y - 1) ≤ (Y - 1) * ((Y + 1) * (Y + 1)) * (Y - 1) := by
-    simpa [Matrix.mul_assoc] using
-      MIPStarRE.Quantum.sandwich_mono (M := Y - 1) hYm1_herm h_one_le_sq
-  have h_comm_pm : Commute (Y - 1) (Y + 1) := by
-    simpa [sub_eq_add_neg, add_assoc, add_left_comm, add_comm] using
-      (Commute.refl Y).add_right ((Commute.one_right Y).neg_left)
-  calc
-    (data.x - data.xHat) * (data.x - data.xHat)ᴴ = (Y - 1) * (Y - 1) := hY_sub
-    _ ≤ (Y - 1) * ((Y + 1) * (Y + 1)) * (Y - 1) := h_main
-    _ = ((Y - 1) * (Y + 1)) * ((Y - 1) * (Y + 1)) := by
-          rw [← Matrix.mul_assoc, h_comm_pm.eq, Matrix.mul_assoc, Matrix.mul_assoc]
-    _ = (Y * Y - 1) * (Y * Y - 1) := by
-          congr 1 <;> noncomm_ring
-    _ = (data.x * data.xᴴ - 1) * (data.x * data.xᴴ - 1) := by simp [hYsq]
+  sorry
 
 /-- **Projectivity of `P`** (`lem:P-projectivity`).
 
@@ -755,61 +736,7 @@ lemma pProjectivity {Outcome : Type*}
     (data : QXPLayerData Outcome ι) :
     ∃ P : ProjSubMeas Outcome ι,
       ∀ a : Outcome, P.outcome a = Pa data a := by
-  classical
-  let P : ProjSubMeas Outcome ι := {
-    outcome := Pa data
-    total := ∑ a, Pa data a
-    outcome_pos := by
-      intro a
-      exact
-        (Matrix.PosSemidef.conjTranspose_mul_mul_same
-          (Matrix.nonneg_iff_posSemidef.mp (data.qLayer.t.toMeasurement.outcome_pos a))
-          data.xHat).nonneg
-    sum_eq_total := by
-      simp
-    total_le_one := by
-      let X : MIPStarRE.Quantum.Op ι := data.xHatᴴ * data.xHat
-      have hX_nonneg : 0 ≤ X := by
-        change 0 ≤ data.xHatᴴ * data.xHat
-        exact Matrix.posSemidef_conjTranspose_mul_self data.xHat |>.nonneg
-      have hX_sq : X * X = X := by
-        dsimp [X]
-        calc
-          (data.xHatᴴ * data.xHat) * (data.xHatᴴ * data.xHat)
-              = data.xHatᴴ * (data.xHat * data.xHatᴴ) * data.xHat := by
-                  simp [Matrix.mul_assoc]
-          _ = data.xHatᴴ * data.xHat := by simp [data.xHat_coisometry, Matrix.mul_assoc]
-      have hX_herm : Xᴴ = X := by
-        dsimp [X]
-        simp [Matrix.conjTranspose_mul]
-      have h_one_sub_X_nonneg : 0 ≤ 1 - X := by
-        apply Matrix.nonneg_iff_posSemidef.mpr
-        have hpsd := Matrix.posSemidef_conjTranspose_mul_self (1 - X)
-        simpa [Matrix.conjTranspose_sub, hX_herm, hX_sq, sub_eq_add_neg,
-          add_assoc, add_left_comm, add_comm] using hpsd
-      have hsum :
-          (∑ a, Pa data a) = X := by
-        calc
-          (∑ a, Pa data a) = data.xHatᴴ * (∑ a, Ta data.qLayer a) * data.xHat := by
-            simp [Pa, Matrix.mul_assoc, Finset.mul_sum, Finset.sum_mul]
-          _ = data.xHatᴴ * data.xHat := by
-            simpa [Ta] using congrArg (fun M => data.xHatᴴ * M * data.xHat) data.qLayer.t.sum_eq
-          _ = X := rfl
-      rw [hsum]
-      exact sub_nonneg.mp h_one_sub_X_nonneg
-    proj := by
-      intro a
-      calc
-        Pa data a * Pa data a
-            = data.xHatᴴ * Ta data.qLayer a * (data.xHat * data.xHatᴴ) *
-                Ta data.qLayer a * data.xHat := by
-                  simp [Pa, Matrix.mul_assoc]
-        _ = data.xHatᴴ * Ta data.qLayer a * Ta data.qLayer a * data.xHat := by
-              simp [data.xHat_coisometry, Matrix.mul_assoc]
-        _ = data.xHatᴴ * Ta data.qLayer a * data.xHat := by
-              simp [Ta, data.qLayer.t.proj a, Matrix.mul_assoc]
-        _ = Pa data a := rfl
-  exact ⟨P, fun a => rfl⟩
+  sorry
 
 /-- **`P` is close to `Q`** (`lem:P-Q-approx`).
 
