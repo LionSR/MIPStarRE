@@ -160,8 +160,14 @@ noncomputable def PFamily {Outcome : Type*} [Fintype Outcome]
 /-- **Almost-projective estimate** (`eq:A-looks-projective`).
 
 This is the opening inequality in the proof of
-`lem:orthonormalization-main-lemma`, extracted as an explicit Lean lemma so the
-later `Q/X/XHat/P` layer can depend on it directly. -/
+`lem:orthonormalization-main-lemma`, extracted as an explicit Lean lemma
+so the later `Q/X/XHat/P` layer can depend on it directly.
+
+`B` is a `ProjMeas` (not `Measurement`) because the proof relies on
+`Bₐ² = Bₐ` (projectivity) to collapse `diagB` to `totalMass`.
+In the paper's orthonormalization pipeline, `B` is always the
+projective reference measurement obtained from Naimark dilation
+(Theorem 5.1), so this is the natural type. -/
 lemma aLooksProjective {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
