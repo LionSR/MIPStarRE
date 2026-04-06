@@ -329,7 +329,7 @@ differences over `h` then recovers the total `G^y` without introducing a fiber
 multiplicity from unrelated `g` values. On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (G : SubMeas (Polynomial params) ι) :
+    (G : Fq params → SubMeas (Polynomial params) ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (StabilityOneOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
@@ -339,27 +339,29 @@ noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters) [Fiel
           OpFamily (EvaluatedSliceOutcome params) (ι × ι))
         (leftTensor (ι₂ := ι) ((fullSliceSecondFactor params family xy).total)))
       (evaluateStabilityOneOutcomeAtQuestion params q)
-      (fun ah => rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome ah.2)))
+      (fun ah => rightTensor (ι₁ := ι)
+        (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)))
 
 /-- Internal stability family after removing the trailing `G^y`, while keeping
 Bob's right-register point-measurement factor.
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityOneRight (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (G : SubMeas (Polynomial params) ι) :
+    (G : Fq params → SubMeas (Polynomial params) ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (StabilityOneOutcome params) (ι × ι) :=
   fun q =>
     weightedReindexOpFamily
       ((evaluatedSliceSandwichFirstFactor params strategy family q) :
         OpFamily (EvaluatedSliceOutcome params) (ι × ι))
       (evaluateStabilityOneOutcomeAtQuestion params q)
-      (fun ah => rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome ah.2)))
+      (fun ah => rightTensor (ι₁ := ι)
+        (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)))
 
 /-- Internal stability family from the `G^x` insertion/removal step.
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (G : SubMeas (Polynomial params) ι) :
+    (G : Fq params → SubMeas (Polynomial params) ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (StabilityTwoOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
@@ -368,20 +370,22 @@ noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters) [Fiel
         (evaluatedSliceProductLeft params strategy family q)
         (leftTensor (ι₂ := ι) ((fullSliceFirstFactor params family xy).total)))
       (evaluateStabilityTwoOutcomeAtQuestion params q)
-      (fun gb => rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gb.1)))
+      (fun gb => rightTensor (ι₁ := ι)
+        (CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1)))
 
 /-- Internal stability family after removing the trailing `G^x`, while keeping
 Bob's right-register ordered point-measurement factor.
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (G : SubMeas (Polynomial params) ι) :
+    (G : Fq params → SubMeas (Polynomial params) ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (StabilityTwoOutcome params) (ι × ι) :=
   fun q =>
     weightedReindexOpFamily
       (evaluatedSliceProductLeft params strategy family q)
       (evaluateStabilityTwoOutcomeAtQuestion params q)
-      (fun gb => rightTensor (ι₁ := ι) (CFC.sqrt (G.outcome gb.1)))
+      (fun gb => rightTensor (ι₁ := ι)
+        (CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1)))
 
 /-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`.
 
