@@ -205,11 +205,44 @@ noncomputable def pointWithDiagonalLineDistribution (params : Parameters)
     Distribution (PointDiagonalLineQuestion params) :=
   uniformDistribution (PointDiagonalLineQuestion params)
 
-/-- Distribution obtained by sampling a diagonal line together with two parameters on it. -/
+/-- Realize a shared-line sample from a uniformly random point pair and parameter.
+
+The resulting line is parameterized so that the first point is visited at `t` and the
+second at `t + 1`. This matches the paper's sampling of two random points together with
+some diagonal line containing both. -/
+noncomputable def sharedDiagonalLineQuestionOfPointPair (params : Parameters)
+    [FieldModel params.q]
+    (s : PointPairQuestion params × Fq params) :
+    PointPairDiagonalLineQuestion params := by
+  let u := s.1.1
+  let v := s.1.2
+  let t := s.2
+  let direction : Point params := fun i => subCoord (v i) (u i)
+  let base : Point params := fun i => subCoord (u i) (mulCoord t (direction i))
+  exact ({ base := base, direction := direction }, (t, addCoord t (encodeScalar 1)))
+
+/-- Distribution obtained by sampling a uniform point pair and then packaging it as a
+shared diagonal-line question. -/
 noncomputable def pointPairSharedDiagonalLineDistribution (params : Parameters)
     [FieldModel params.q] :
-    Distribution (PointPairDiagonalLineQuestion params) :=
-  uniformDistribution (PointPairDiagonalLineQuestion params)
+    Distribution (PointPairDiagonalLineQuestion params) where
+  support := Finset.univ.image (sharedDiagonalLineQuestionOfPointPair params)
+  weight := fun q =>
+    if q ∈ Finset.univ.image (sharedDiagonalLineQuestionOfPointPair params) then
+      1 / (Fintype.card (PointPairQuestion params × Fq params) : Error)
+    else
+      0
+  nonnegative := by
+    intro q
+    by_cases hq : q ∈ Finset.univ.image (sharedDiagonalLineQuestionOfPointPair params)
+    · have hqpos : 0 < (params.q : Error) := by
+        exact_mod_cast params.hq
+      simp [hq]
+      positivity
+    · simp [hq]
+  outsideSupport := by
+    intro q hq
+    simp [hq]
 
 /-- The point measurement, reindexed by a sampled diagonal line and a parameter on it. -/
 def sampledPointMeasurement (params : Parameters)
