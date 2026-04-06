@@ -343,34 +343,22 @@ lemma truncationInequality (δ x : Error) :
       x ≤ 1 →
       let trunc : Error := if 1 - δ ≤ x then 1 else 0
       (x - trunc) ^ (2 : Nat) ≤ (1 / δ) * (x - x ^ (2 : Nat)) := by
-  intro hδ hδ_half hx_nonneg hx_le_one
-  dsimp
-  by_cases h : 1 - δ ≤ x
-  · simp [h]
-    have hδ_le_x : δ ≤ x := by
-      linarith
-    have hmain : (x - 1) ^ (2 : Nat) * δ ≤ x - x ^ (2 : Nat) := by
-      nlinarith
-    have hdiv : (x - 1) ^ (2 : Nat) ≤ (x - x ^ (2 : Nat)) / δ := by
-      exact (le_div_iff₀ hδ).2 hmain
-    simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hdiv
-  · simp [h]
+  intro hδ hδhalf hx hx1
+  simp only []
+  split
+  · rename_i h
+    have h1x : 0 ≤ 1 - x := by linarith
+    have hxd : 1 - x ≤ δ := by linarith
+    rw [div_mul_eq_mul_div, le_div_iff₀ hδ]
+    nlinarith [sq_nonneg (1 - x), sq_nonneg δ]
+  · rename_i h
     push_neg at h
-    have hδ_le_one_sub_x : δ ≤ 1 - x := by
-      linarith
-    have hmain : x ^ (2 : Nat) * δ ≤ x - x ^ (2 : Nat) := by
-      have hx_sq_le_x : x ^ (2 : Nat) ≤ x := by
-        nlinarith
-      have hmul₁ : x ^ (2 : Nat) * δ ≤ x * δ := by
-        exact mul_le_mul_of_nonneg_right hx_sq_le_x (le_of_lt hδ)
-      have hmul₂ : x * δ ≤ x * (1 - x) := by
-        exact mul_le_mul_of_nonneg_left hδ_le_one_sub_x hx_nonneg
-      have hmul : x ^ (2 : Nat) * δ ≤ x * (1 - x) := by
-        exact le_trans hmul₁ hmul₂
-      nlinarith
-    have hdiv : x ^ (2 : Nat) ≤ (x - x ^ (2 : Nat)) / δ := by
-      exact (le_div_iff₀ hδ).2 hmain
-    simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hdiv
+    simp only [sub_zero]
+    rw [div_mul_eq_mul_div, le_div_iff₀ hδ]
+    have hlt : 0 ≤ 1 - δ - x := by linarith
+    nlinarith [mul_nonneg hx hlt,
+      mul_nonneg (mul_nonneg (le_of_lt hδ) hx)
+        (by linarith : (0 : ℝ) ≤ 1 - x)]
 
 /-- **Rounding to projectors** (`lem:projective-non-measurement`).
 
