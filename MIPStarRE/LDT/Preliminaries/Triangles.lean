@@ -128,14 +128,13 @@ theorem triangleSub
     (A B : IdxMeas Question Outcome ι) (C : IdxSubMeas Question Outcome ι)
     (δ ε : Error)
     (hAC : ConsRel ψ 𝒟
-      (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A))
-      (IdxSubMeas.liftRight C) δ)
+      (IdxMeas.toIdxSubMeas A) C δ)
     (hAB : SDDRel ψ 𝒟
       (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A))
       (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas B)) ε) :
     ConsRel ψ 𝒟
-      (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas B))
-      (IdxSubMeas.liftRight C) (δ + Real.sqrt ε) := by
+      (IdxMeas.toIdxSubMeas B)
+      C (δ + Real.sqrt ε) := by
   let AL : IdxSubMeas Question Outcome (ι × ι) :=
     IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A)
   let BL : IdxSubMeas Question Outcome (ι × ι) :=
@@ -152,6 +151,7 @@ theorem triangleSub
     qSDD ψ (AL q) (BL q)
   let gap : Question → Error := fun q => matchA q - matchB q
   rcases hAC with ⟨hAC⟩
+  rw [bipartiteConsError_eq_consError_placed] at hAC
   rcases hAB with ⟨hAB⟩
   have hgap_pointwise : ∀ q, |gap q| ≤ Real.sqrt (sdd q) := by
     intro q
@@ -283,6 +283,7 @@ theorem triangleSub
       _ = qConsDefect ψ (AL q) (CR q) + |gap q| := by
             rw [hdefA]
   constructor
+  rw [bipartiteConsError_eq_consError_placed]
   unfold consError sddError at *
   calc
     avgOver 𝒟 (fun q => qConsDefect ψ (BL q) (CR q))
@@ -307,14 +308,13 @@ private lemma triangleSub_right
     (A : IdxSubMeas Question Outcome ι)
     (B D : IdxMeas Question Outcome ι) (δ ε : Error)
     (hAB : ConsRel ψ 𝒟
-      (IdxSubMeas.liftLeft A)
-      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) δ)
+      A (IdxMeas.toIdxSubMeas B) δ)
     (hBD : SDDRel ψ 𝒟
       (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B))
       (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas D)) ε) :
     ConsRel ψ 𝒟
-      (IdxSubMeas.liftLeft A)
-      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas D)) (δ + Real.sqrt ε) := by
+      A
+      (IdxMeas.toIdxSubMeas D) (δ + Real.sqrt ε) := by
   let AL : IdxSubMeas Question Outcome (ι × ι) := IdxSubMeas.liftLeft A
   let BR : IdxSubMeas Question Outcome (ι × ι) :=
     IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)
@@ -330,6 +330,7 @@ private lemma triangleSub_right
     qSDD ψ (BR q) (DR q)
   let gap : Question → Error := fun q => matchB q - matchD q
   rcases hAB with ⟨hAB⟩
+  rw [bipartiteConsError_eq_consError_placed] at hAB
   rcases hBD with ⟨hBD⟩
   have hgap_pointwise : ∀ q, |gap q| ≤ Real.sqrt (sdd q) := by
     intro q
@@ -460,6 +461,7 @@ private lemma triangleSub_right
       _ = qConsDefect ψ (AL q) (BR q) + |gap q| := by
             rw [hdefB]
   constructor
+  rw [bipartiteConsError_eq_consError_placed]
   unfold consError sddError at *
   calc
     avgOver 𝒟 (fun q => qConsDefect ψ (AL q) (DR q))
@@ -491,17 +493,17 @@ theorem simeqTriangleInequality
     (A B C D : IdxMeas Question Outcome ι)
     (ε δ γ : Error)
     (hAB : ConsRel ψ 𝒟
-      (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A))
-      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) ε)
+      (IdxMeas.toIdxSubMeas A)
+      (IdxMeas.toIdxSubMeas B) ε)
     (hCB : ConsRel ψ 𝒟
-      (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas C))
-      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) δ)
+      (IdxMeas.toIdxSubMeas C)
+      (IdxMeas.toIdxSubMeas B) δ)
     (hCD : ConsRel ψ 𝒟
-      (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas C))
-      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas D)) γ) :
+      (IdxMeas.toIdxSubMeas C)
+      (IdxMeas.toIdxSubMeas D) γ) :
     ConsRel ψ 𝒟
-      (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A))
-      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas D))
+      (IdxMeas.toIdxSubMeas A)
+      (IdxMeas.toIdxSubMeas D)
       (ε + 2 * Real.sqrt (δ + γ)) := by
   have hCB_bip : BipartiteSDDRel ψ 𝒟
       (IdxMeas.toIdxSubMeas C)
@@ -554,10 +556,10 @@ theorem simeqTriangleInequality
         hBD_sdd_raw
   have hδ_nonneg : 0 ≤ δ := by
     rcases hCB with ⟨hδ⟩
-    exact le_trans (consError_nonneg ψ 𝒟 _ _) hδ
+    exact le_trans (bipartiteConsError_nonneg ψ 𝒟 _ _) hδ
   have hγ_nonneg : 0 ≤ γ := by
     rcases hCD with ⟨hγ⟩
-    exact le_trans (consError_nonneg ψ 𝒟 _ _) hγ
+    exact le_trans (bipartiteConsError_nonneg ψ 𝒟 _ _) hγ
   have hsqrt_four :
       Real.sqrt (4 * (δ + γ)) = 2 * Real.sqrt (δ + γ) := by
     have hδγ_nonneg : 0 ≤ δ + γ := add_nonneg hδ_nonneg hγ_nonneg
@@ -568,8 +570,8 @@ theorem simeqTriangleInequality
       _ = 2 * Real.sqrt (δ + γ) := by norm_num
   have hfinal :
       ConsRel ψ 𝒟
-        (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A))
-        (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas D))
+        (IdxMeas.toIdxSubMeas A)
+        (IdxMeas.toIdxSubMeas D)
         (ε + Real.sqrt (4 * (δ + γ))) := by
     exact
       triangleSub_right ψ 𝒟 hψ h𝒟

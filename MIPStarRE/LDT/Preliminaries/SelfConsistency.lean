@@ -78,9 +78,10 @@ theorem otherTwoNotionsOfSelfConsistency {Question Outcome : Type*}
     (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error) :
     BipartiteSSCRel ψ 𝒟 A δ →
-      ConsRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftRight A) δ := by
+      @ConsRel Question Outcome ι ι _ _ _ _ _ ψ 𝒟 A A δ := by
   intro ⟨hssc⟩
   constructor
+  rw [bipartiteConsError_eq_consError_placed]
   unfold consError
   calc
     avgOver 𝒟

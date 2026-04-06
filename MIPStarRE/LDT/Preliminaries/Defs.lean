@@ -33,16 +33,16 @@ structure OpBounded01 {ι : Type*} [Fintype ι] [DecidableEq ι]
 noncomputable def agreementProbability {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome ι) : Error :=
-  1 - consError ψ 𝒟
+  1 - bipartiteConsError ψ 𝒟
         (IdxMeas.toIdxSubMeas A)
         (IdxMeas.toIdxSubMeas B)
 
 /-- Output package for the measurement reformulation of consistency. -/
 structure ConsAgreement {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome ι) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
 

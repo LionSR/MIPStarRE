@@ -18,7 +18,7 @@ open MIPStarRE.LDT
 theorem simeqForMeasurements {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome ι) (δ : Error) :
     ConsRel ψ 𝒟 (IdxMeas.toIdxSubMeas A)
         (IdxMeas.toIdxSubMeas B) δ ↔
@@ -124,13 +124,14 @@ theorem simeqToApprox {Question Outcome : Type*}
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome ι) (δ : Error) :
     ConsRel ψ 𝒟
-        (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A))
-        (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) δ →
+        (IdxMeas.toIdxSubMeas A)
+        (IdxMeas.toIdxSubMeas B) δ →
       BipartiteSDDRel ψ 𝒟
         (IdxMeas.toIdxSubMeas A)
         (IdxMeas.toIdxSubMeas B)
         (2 * δ) := by
   intro ⟨hcons⟩
+  rw [bipartiteConsError_eq_consError_placed] at hcons
   constructor
   unfold sddError consError at *
   calc
@@ -316,13 +317,14 @@ theorem simeqDataProcessing {Question α β : Type*}
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A B : IdxMeas Question α ι) (δ : Error) (f : α → β) :
     ConsRel ψ 𝒟
-      (fun q => leftPlacedSubMeas (ιB := ι) ((A q).toSubMeas))
-      (fun q => rightPlacedSubMeas (ιA := ι) ((B q).toSubMeas)) δ →
+      (IdxMeas.toIdxSubMeas A)
+      (IdxMeas.toIdxSubMeas B) δ →
       ConsRel ψ 𝒟
-        (fun q => leftPlacedSubMeas (ιB := ι) (postprocess ((A q).toSubMeas) f))
-        (fun q => rightPlacedSubMeas (ιA := ι) (postprocess ((B q).toSubMeas) f)) δ := by
+        (fun q => postprocess ((A q).toSubMeas) f)
+        (fun q => postprocess ((B q).toSubMeas) f) δ := by
   intro ⟨hcons⟩
   constructor
+  rw [bipartiteConsError_eq_consError_placed] at hcons ⊢
   unfold consError at *
   calc
     avgOver 𝒟
@@ -704,11 +706,12 @@ private lemma consSubMeas_diagonalControl
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) (γ : Error) :
     ConsRel ψ 𝒟
-      (IdxSubMeas.liftLeft A)
-      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) γ →
+      A
+      (IdxMeas.toIdxSubMeas B) γ →
     SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A)
       (diagonalSandwichFamily A B) γ := by
   intro ⟨hcons⟩
+  rw [bipartiteConsError_eq_consError_placed] at hcons
   constructor
   unfold sddError consError at *
   calc
@@ -804,12 +807,13 @@ private lemma consSubMeas_sandwichControl
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) (γ : Error) :
     ConsRel ψ 𝒟
-      (IdxSubMeas.liftLeft A)
-      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) γ →
+      A
+      (IdxMeas.toIdxSubMeas B) γ →
     SDDRel ψ 𝒟
       (diagonalSandwichFamily A B)
       (totalSandwichFamily A B) γ := by
   intro ⟨hcons⟩
+  rw [bipartiteConsError_eq_consError_placed] at hcons
   constructor
   unfold sddError consError at *
   calc
@@ -954,8 +958,8 @@ theorem consSubMeas {Question Outcome : Type*}
     (A : IdxSubMeas Question Outcome ι)
     (B : IdxMeas Question Outcome ι) (γ : Error) :
     ConsRel ψ 𝒟
-      (IdxSubMeas.liftLeft A)
-      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) γ →
+      A
+      (IdxMeas.toIdxSubMeas B) γ →
     ConsSubMeasStmt ψ 𝒟 A B γ := by
   intro hcons
   have hdc := consSubMeas_diagonalControl ψ 𝒟 A B γ hcons

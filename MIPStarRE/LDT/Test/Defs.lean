@@ -135,19 +135,81 @@ noncomputable def bndError {Outcome : Type*} {ι : Type*}
     (Z : MIPStarRE.Quantum.Op ι) : Error :=
   max 0 (subMeasMass ψ A - ev ψ Z)
 
-/-- Consistency relation.
-
-This is intentionally just a one-field wrapper around `consError ψ 𝒟 A B ≤ δ`.
-The extra layer does not add mathematical content; it mainly keeps consistency
-statements parallel to the sibling relations `SDDRel`, `SSCRel`, etc., and gives
-the bound a stable named projection (`offDiagonalBound`) for downstream proofs.
-In practice many lemmas still immediately destruct `ConsRel` with `⟨h⟩`, so this
-is more of an API/readability wrapper than a deep abstraction barrier. -/
-structure ConsRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+/-- Bipartite matching mass `∑_a ⟨ψ, (A_a ⊗ B_a) ψ⟩`, with `A` on the left
+register and `B` on the right register of a tensor-product state. -/
+noncomputable def qBipartiteMatchMass {Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome ι) (δ : Error) : Prop where
-  offDiagonalBound : consError ψ 𝒟 A B ≤ δ
+    (ψ : QuantumState (ιA × ιB))
+    (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) : Error :=
+  ∑ a, ev ψ (opTensor (A.outcome a) (B.outcome a))
+
+/-- Bipartite questionwise consistency defect.
+
+In the paper (Definition 4.8), the consistency of `A` on `H_A` and `B` on
+`H_B` for a shared state `|ψ⟩ ∈ H_A ⊗ H_B` is:
+  `E_x ∑_{a≠b} ⟨ψ| A^x_a ⊗ B^x_b |ψ⟩ ≤ δ`
+which equals
+  `max 0 (⟨ψ| A_total ⊗ B_total |ψ⟩ − ∑_a ⟨ψ| A_a ⊗ B_a |ψ⟩)`. -/
+noncomputable def qBipartiteConsDefect {Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB))
+    (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) : Error :=
+  let totalOverlap := ev ψ (opTensor A.total B.total)
+  max 0 (totalOverlap - qBipartiteMatchMass ψ A B)
+
+/-- Averaged bipartite off-diagonal mass for consistency statements. -/
+noncomputable def bipartiteConsError {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxSubMeas Question Outcome ιB) : Error :=
+  avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (A q) (B q))
+
+/-- **Bridge lemma**: the bipartite consistency defect equals the same-space
+`qConsDefect` applied to the left/right-placed submeasurements. -/
+theorem qBipartiteConsDefect_eq_qConsDefect_placed {Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB))
+    (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) :
+    qBipartiteConsDefect ψ A B =
+      qConsDefect ψ (leftPlacedSubMeas A) (rightPlacedSubMeas B) := by
+  simp only [qBipartiteConsDefect, qConsDefect, qBipartiteMatchMass, qMatchMass,
+    leftPlacedSubMeas, rightPlacedSubMeas,
+    leftTensor_mul_rightTensor_eq_opTensor]
+
+/-- **Bridge lemma**: averaged bipartite consistency equals the same-space
+`consError` applied to the left/right-placed families. -/
+theorem bipartiteConsError_eq_consError_placed {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxSubMeas Question Outcome ιB) :
+    bipartiteConsError ψ 𝒟 A B =
+      consError ψ 𝒟
+        (fun q => leftPlacedSubMeas (A q))
+        (fun q => rightPlacedSubMeas (B q)) := by
+  unfold bipartiteConsError consError
+  congr 1; funext q
+  exact qBipartiteConsDefect_eq_qConsDefect_placed ψ (A q) (B q)
+
+/-- Consistency relation (bipartite, paper Definition 4.8).
+
+The state `ψ` lives on `H_A ⊗ H_B`, Alice's submeasurement `A` acts on
+`H_A`, and Bob's submeasurement `B` acts on `H_B`. The relation encodes
+  `E_{x ∼ D} ∑_{a≠b} ⟨ψ| A^x_a ⊗ B^x_b |ψ⟩ ≤ δ`. -/
+structure ConsRel {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxSubMeas Question Outcome ιB)
+    (δ : Error) : Prop where
+  offDiagonalBound : bipartiteConsError ψ 𝒟 A B ≤ δ
 
 /-- State-dependent distance relation. -/
 structure SDDRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -254,6 +316,26 @@ theorem consError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [D
     (A B : IdxSubMeas Question Outcome ι) :
     0 ≤ consError ψ 𝒟 A B := by
   unfold consError; exact avgOver_nonneg 𝒟 _ fun q => qConsDefect_nonneg ψ _ _
+
+/-- The bipartite consistency defect is nonneg by definition (`max 0 _`). -/
+theorem qBipartiteConsDefect_nonneg {Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB))
+    (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) :
+    0 ≤ qBipartiteConsDefect ψ A B := by
+  unfold qBipartiteConsDefect; exact le_max_left 0 _
+
+/-- The averaged bipartite consistency error is nonneg. -/
+theorem bipartiteConsError_nonneg {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxSubMeas Question Outcome ιB) :
+    0 ≤ bipartiteConsError ψ 𝒟 A B := by
+  unfold bipartiteConsError
+  exact avgOver_nonneg 𝒟 _ fun q => qBipartiteConsDefect_nonneg ψ _ _
 
 /-- The averaged self-consistency error is nonneg. -/
 theorem sscError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]

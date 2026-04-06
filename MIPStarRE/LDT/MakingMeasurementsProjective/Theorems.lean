@@ -221,16 +221,29 @@ theorem orthonormalization {Outcome : Type*}
 
 /-! ### Orthonormalization helper lemmas -/
 
+/-- Place a measurement on the left tensor factor of `ιA × ιB`. -/
+def leftPlacedMeasurement {Outcome : Type*}
+    {ιA ιB : Type*}
+    [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : Measurement Outcome ιA) :
+    Measurement Outcome (ιA × ιB) where
+  toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
+  total_eq_one := by
+    ext i j
+    simp [leftPlacedSubMeas, leftTensor, A.total_eq_one]
+
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
 with `B`, then `A` is `2ζ`-almost-projective. -/
 lemma consistencyToAlmostProjective {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A B : Measurement Outcome ι) (ζ : Error) :
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
-      AlmostProjMeasStatement ψ A
+      AlmostProjMeasStatement ψ (leftPlacedMeasurement (ιB := ιB) A)
         (consistencyToAlmostProjectiveError ζ) := by
   -- TODO: Show consistency implies almost-projectivity with the stated error in
   -- the orthonormalization proof; blocked on bridge lemmas from `ConsRel` to
@@ -319,26 +332,34 @@ private lemma orthonormalizationMainLemma_error_bound (ζ : Error) :
 
 /-- `lem:orthonormalization-main-lemma`. -/
 lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι)
-    (A B : Measurement Outcome ι) (ζ : Error) :
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement.{_, _, uRound} ψ A P
+      ∃ P : ProjSubMeas Outcome (ιA × ιB),
+        RoundedProjMeasStatement.{_, _, uRound}
+          ψ (leftPlacedMeasurement (ιB := ιB) A) P
           (orthonormalizationMainLemmaError ζ) := by
   intro hCons
   have hAlmost :
       AlmostProjMeasStatement.{_, _, uRound}
-        ψ A (consistencyToAlmostProjectiveError ζ) :=
-    consistencyToAlmostProjective.{_, _, uRound} ψ A B ζ hCons
+        ψ (leftPlacedMeasurement (ιB := ιB) A)
+          (consistencyToAlmostProjectiveError ζ) := by
+    simpa using
+      (consistencyToAlmostProjective
+        (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons)
   have hRound :
-      ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement.{_, _, uRound} ψ A P
+      ∃ P : ProjSubMeas Outcome (ιA × ιB),
+        RoundedProjMeasStatement.{_, _, uRound}
+          ψ (leftPlacedMeasurement (ιB := ιB) A) P
           (roundingToProjectiveError (consistencyToAlmostProjectiveError ζ)) :=
-    roundAlmostProjMeas ψ A (consistencyToAlmostProjectiveError ζ) hAlmost
+    roundAlmostProjMeas (ψ := ψ)
+      (A := leftPlacedMeasurement (ιB := ιB) A)
+      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost
   obtain ⟨P, hRounded⟩ := hRound
   refine ⟨P, ?_⟩
   exact roundedProjMeasStatement_mono hRounded

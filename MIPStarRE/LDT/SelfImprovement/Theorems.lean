@@ -215,8 +215,8 @@ structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel para
       ((1 - nu) - selfImprovementHelperError params eps delta)
   pointConsistency :
     ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (polynomialEvaluationFamily params H.liftRight)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H)
       (selfImprovementHelperError params eps delta)
   strongSelfConsistency :
     BipartiteSSCRel strategy.state (uniformDistribution Unit)
@@ -259,8 +259,8 @@ structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
       ((1 - nu) - selfImprovementError params eps delta)
   pointConsistency :
     ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (polynomialEvaluationFamily params H.toSubMeas.liftRight)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
       (selfImprovementError params eps delta)
   selfCloseness :
     SDDRel strategy.state (uniformDistribution Unit)
@@ -302,8 +302,8 @@ lemma selfImprovementHelper
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι)
     (hcons : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (polynomialEvaluationFamily params G.toSubMeas.liftRight) nu) :
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas) nu) :
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusion params strategy G T H Z eps delta gamma nu := by
@@ -357,8 +357,8 @@ theorem selfImprovement
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι)
     (hcons : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (polynomialEvaluationFamily params G.toSubMeas.liftRight) nu) :
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
   /-
@@ -382,8 +382,8 @@ theorem selfImprovementFromSubMeas
     (Gmeas : Measurement (Polynomial params) ι)
     (hbridge : Gmeas.toSubMeas = G)
     (hcons : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (polynomialEvaluationFamily params G.liftRight) nu) :
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementSubMeasConclusion params strategy G H Z
         eps delta gamma nu := by

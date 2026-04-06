@@ -25,7 +25,7 @@ open MIPStarRE.LDT
 
 noncomputable section
 
--- NOTE: 15 sorry stubs are intentional scaffolding for issue #197. See PROOF_INTEGRITY.md.
+-- NOTE: sorry stubs are intentional scaffolding for issue #197. See PROOF_INTEGRITY.md.
 
 /-- The quarter-root error term `ζ^(1/4)` used throughout the paper's late-stage
 orthonormalization estimates. -/
@@ -163,103 +163,20 @@ This is the opening inequality in the proof of
 `lem:orthonormalization-main-lemma`, extracted as an explicit Lean lemma so the
 later `Q/X/XHat/P` layer can depend on it directly. -/
 lemma aLooksProjective {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome]
-    (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (B : ProjMeas Outcome ι) (ζ : Error) :
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : ProjMeas Outcome ιB) (ζ : Error) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
-      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ := by
-  intro hCons
-  classical
-  let totalMass : Error := ev ψ (1 : MIPStarRE.Quantum.Op ι)
-  let diagA : Error := ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a)
-  let diagB : Error := ∑ a : Outcome, ev ψ (B.outcome a * B.outcome a)
-  let overlap : Error := ∑ a : Outcome, ev ψ (A.outcome a * B.outcome a)
-  have hCons' :
-      qConsDefect ψ A.toSubMeas B.toSubMeas ≤ ζ := by
-    simpa [MIPStarRE.LDT.Preliminaries.constFamily_cons_unit] using hCons.offDiagonalBound
-  have hgap : totalMass - overlap ≤ ζ := by
-    have hmax :
-        max 0 (totalMass - overlap) ≤ ζ := by
-      simpa [qConsDefect, qMatchMass, totalMass, overlap, A.total_eq_one, B.total_eq_one] using
-        hCons'
-    exact le_trans (le_max_right 0 (totalMass - overlap)) hmax
-  have hdiagB :
-      diagB = totalMass := by
-    calc
-      diagB = ∑ a : Outcome, ev ψ (B.outcome a) := by
-        unfold diagB
-        refine Finset.sum_congr rfl ?_
-        intro a _
-        simp [B.proj a]
-      _ = totalMass := by
-        rw [← ev_sum ψ B.outcome, B.sum_eq]
-  have hdiagA_nonneg : 0 ≤ diagA := by
-    unfold diagA
-    exact Finset.sum_nonneg fun a _ => by
-      simpa [Measurement.outcome_hermitian] using ev_adjoint_self_nonneg ψ (A.outcome a)
-  have hmass_nonneg : 0 ≤ totalMass := by
-    simpa [totalMass] using ev_adjoint_self_nonneg ψ (1 : MIPStarRE.Quantum.Op ι)
-  have hoverlap_abs :
-      |overlap| ≤ Real.sqrt diagA * Real.sqrt totalMass := by
-    calc
-      |overlap|
-        = |∑ a : Outcome, ev ψ (A.outcome a * B.outcome a)| := by
-            simp [overlap]
-      _ ≤ ∑ a : Outcome,
-            |ev ψ (A.outcome a * B.outcome a)| := by
-              exact Finset.abs_sum_le_sum_abs _ _
-      _ ≤ ∑ a : Outcome,
-            Real.sqrt (ev ψ (A.outcome a * A.outcome a)) *
-              Real.sqrt (ev ψ (B.outcome a * B.outcome a)) := by
-              refine Finset.sum_le_sum ?_
-              intro a _
-              simpa [Measurement.outcome_hermitian] using
-                ev_abs_mul_le_sqrt ψ (A.outcome a) (B.outcome a)
-      _ ≤ Real.sqrt diagA * Real.sqrt diagB := by
-            simpa [diagA, diagB] using
-              Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
-                (f := fun a => ev ψ (A.outcome a * A.outcome a))
-                (g := fun a => ev ψ (B.outcome a * B.outcome a))
-                (fun a => by
-                  simpa [Measurement.outcome_hermitian] using
-                    ev_adjoint_self_nonneg ψ (A.outcome a))
-                (fun a => by
-                  simpa [Measurement.outcome_hermitian] using
-                    ev_adjoint_self_nonneg ψ (B.outcome a))
-      _ = Real.sqrt diagA * Real.sqrt totalMass := by rw [hdiagB]
-  have hoverlap_le : overlap ≤ Real.sqrt diagA * Real.sqrt totalMass := by
-    exact (abs_le.mp hoverlap_abs).2
-  have htwosqrt :
-      2 * (Real.sqrt diagA * Real.sqrt totalMass) ≤ diagA + totalMass := by
-    nlinarith [sq_nonneg (Real.sqrt diagA - Real.sqrt totalMass),
-      Real.sq_sqrt hdiagA_nonneg, Real.sq_sqrt hmass_nonneg]
-  have hcore : totalMass - diagA ≤ 2 * (totalMass - overlap) := by
-    have haux : 2 * overlap ≤ diagA + totalMass := by
-      calc
-        2 * overlap ≤ 2 * (Real.sqrt diagA * Real.sqrt totalMass) := by
-          gcongr
-        _ ≤ diagA + totalMass := htwosqrt
-    nlinarith
-  calc
-    ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a)
-      = totalMass - diagA := by
-          unfold totalMass diagA
-          calc
-            ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a)
-              = ∑ a, (ev ψ (A.outcome a) - ev ψ (A.outcome a * A.outcome a)) := by
-                  refine Finset.sum_congr rfl ?_
-                  intro a _
-                  exact ev_sub ψ (A.outcome a) (A.outcome a * A.outcome a)
-            _ = (∑ a, ev ψ (A.outcome a)) - ∑ a, ev ψ (A.outcome a * A.outcome a) := by
-                  rw [Finset.sum_sub_distrib]
-            _ = totalMass - ∑ a, ev ψ (A.outcome a * A.outcome a) := by
-                  rw [← ev_sum ψ A.outcome, A.sum_eq]
-            _ = totalMass - diagA := by simp [diagA]
-    _ ≤ 2 * (totalMass - overlap) := hcore
-    _ ≤ 2 * ζ := by gcongr
+      ∑ a, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a - A.outcome a * A.outcome a)) ≤
+        2 * ζ := by
+  intro _hCons
+  -- TODO: adapt proof to the bipartite formulation, with Alice operators placed
+  -- on the left tensor factor and Bob operators on the right.
+  sorry
 
 /-- **Scalar truncation inequality** (`lem:trunc-inequality`).
 

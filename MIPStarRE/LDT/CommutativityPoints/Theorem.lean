@@ -59,8 +59,8 @@ private lemma sampledDiagonalLineConsistency
     (hgood : strategy.IsGood eps delta gamma) :
     ConsRel strategy.state
       (pointWithDiagonalLineDistribution params)
-      (IdxSubMeas.liftLeft (sampledPointMeasurement params strategy))
-      (IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy))
+      (sampledPointMeasurement params strategy)
+      (sampledDiagonalLineEvaluation params strategy)
       (restrictedDiagonalLinesConsistencyError params gamma) := by
   /-
   This is the diagonal-lines test, rewritten in the
@@ -87,14 +87,33 @@ private lemma sampledDiagonalLineConsistency
             qConsDefect strategy.state
               ((IdxSubMeas.liftLeft (sampledPointMeasurement params strategy)) q)
               ((IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy)) q))
+  have hrewritePlaced :
+      consError strategy.state
+        (pointWithDiagonalLineDistribution params)
+        (fun q => leftPlacedSubMeas (sampledPointMeasurement params strategy q))
+        (fun q => rightPlacedSubMeas (sampledDiagonalLineEvaluation params strategy q)) =
+      consError strategy.state
+        (uniformDistribution (DiagonalTestSample params))
+        (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+        (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)) := by
+    simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using hrewrite
+  have hdiagonalLineTest :
+      consError strategy.state
+        (uniformDistribution (DiagonalTestSample params))
+        (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+        (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)) ≤ gamma := by
+    simpa [SymStrat.diagonalFailureProbability, bipartiteConsError_eq_consError_placed,
+      IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using hgood.diagonalLineTest
   constructor
-  rw [hrewrite]
+  rw [bipartiteConsError_eq_consError_placed]
+  rw [hrewritePlaced]
   have hγ : 0 ≤ gamma := by
-    exact le_trans (consError_nonneg strategy.state
-      (uniformDistribution (DiagonalTestSample params))
-      (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-      (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)))
-      hgood.diagonalLineTest
+    exact le_trans
+      (consError_nonneg strategy.state
+        (uniformDistribution (DiagonalTestSample params))
+        (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
+        (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)))
+      hdiagonalLineTest
   have hm : (1 : Error) ≤ params.m := by
     exact_mod_cast params.hm
   calc
@@ -102,7 +121,7 @@ private lemma sampledDiagonalLineConsistency
         (uniformDistribution (DiagonalTestSample params))
         (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
         (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy))
-      ≤ gamma := hgood.diagonalLineTest
+      ≤ gamma := hdiagonalLineTest
     _ ≤ gamma * (params.m : Error) := by nlinarith
 
 private lemma sampledDiagonalLineApproximation
@@ -136,8 +155,8 @@ private lemma sampledDiagonalLineApproximation
   have hcons :
       ConsRel strategy.state
         (pointWithDiagonalLineDistribution params)
-        (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A))
-        (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B))
+        (IdxMeas.toIdxSubMeas A)
+        (IdxMeas.toIdxSubMeas B)
         (restrictedDiagonalLinesConsistencyError params gamma) := by
     simpa [A, B, sampledPointMeasurement, sampledDiagonalLineEvaluation] using hsampledCons
   have happrox :=
