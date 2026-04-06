@@ -411,10 +411,13 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{definition}
 
 \begin{lemma}[Strong self-consistency implies ordinary self-consistency]\label{prop:other-two-notions-of-self-consistency}
+  \lean{MIPStarRE.LDT.Preliminaries.otherTwoNotionsOfSelfConsistency}
+  \leanok
   \uses{def:strong-self-consistency, def:simeq}
   If $A$ is $\delta$-strongly self-consistent, then $A_a^x \ot I \simeq_\delta I \ot A_a^x$. If $A$ is a measurement, the converse also holds.
 \end{lemma}
 \begin{proof}
+  \leanok
   Rewrite the off-diagonal mass as the difference between the total mass of $A$ and the diagonal overlap in the strong self-consistency inequality.
 \end{proof}
 
@@ -439,6 +442,8 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Post-processing preserves strong self-consistency]\label{prop:two-notions-of-self-consistency-after-evaluation}
+  \lean{MIPStarRE.LDT.Preliminaries.twoNotionsOfSelfConsistencyAfterEvaluation}
+  \leanok
   \uses{def:post-processing, def:strong-self-consistency, prop:two-notions-of-self-consistency}
   If $A$ is $\delta$-strongly self-consistent and $f$ is a function on its answer set, then
   \[
@@ -446,6 +451,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \]
 \end{lemma}
 \begin{proof}
+  \leanok
   The same computation as in Lemma~\ref{prop:two-notions-of-self-consistency} gives
   \begin{align}
     &\E_{\bx} \sum_b \lVert(A^{\bx}_{[f(a)=b]} \otimes I - I \otimes A^{\bx}_{[f(a)=b]}) \ket{\psi}\rVert^2 \nonumber\\
@@ -456,6 +462,8 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Completeness transfer for a strongly self-consistent approximation]\label{prop:completeness-transfer-self-consistent-A}
+  \lean{MIPStarRE.LDT.Preliminaries.completenessTransferSelfConsistentA}
+  \leanok
   \uses{def:strong-self-consistency, def:approx_delta, prop:easy-approx-from-approx-delta}
   Let $A$ be a $\delta$-strongly self-consistent submeasurement and let $B$ be a submeasurement such that $A_a^x \ot I \approx_\eps B_a^x \ot I$. Then
   \[
@@ -463,10 +471,13 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \]
 \end{lemma}
 \begin{proof}
+  \leanok
   Bound $\bra{\psi} B \ot I \ket{\psi}$ from below by $\E_{\bx}\sum_a \bra{\psi} B^\bx_a \ot B^\bx_a \ket{\psi}$. Then apply Proposition~\ref{prop:easy-approx-from-approx-delta} twice to replace this by $\E_{\bx}\sum_a \bra{\psi} A^\bx_a \ot A^\bx_a \ket{\psi}$, and finish with strong self-consistency of $A$.
 \end{proof}
 
 \begin{lemma}[Self-consistency implies data-processing closeness]\label{prop:self-consistency-implies-data-processing}
+  \lean{MIPStarRE.LDT.Preliminaries.selfConsistencyImpliesDataProcessing}
+  \leanok
   \uses{def:post-processing, def:strong-self-consistency, def:approx_delta, prop:two-notions-of-self-consistency-after-evaluation, prop:completeness-transfer-projective-P, prop:easy-approx-from-approx-delta, prop:triangle-inequality-for-approx_delta}
   Let $A$ be a $\delta$-strongly self-consistent submeasurement and let $P$ be a projective submeasurement such that $P_a^x \ot I \approx_\eps A_a^x \ot I$. Then for every function $f$,
   \[
@@ -474,6 +485,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \]
 \end{lemma}
 \begin{proof}
+  \leanok
   First prove
   \begin{equation}
     P^x_{[f(a)=b]} \ot I \approx_{2\delta + 4\sqrt{\eps}} I \ot A_{[f(a)=b]}^x.
@@ -529,6 +541,8 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 % prop:cool-prop from the paper is the same result as lem:self-consistency-same-side-square above.
 % We keep the label for cross-reference fidelity.
 \begin{proposition}\label{prop:cool-prop}
+  \lean{MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass}
+  \leanok
   \uses{lem:self-consistency-same-side-square}
   This is the same statement as Lemma~\ref{lem:self-consistency-same-side-square}: for a $\zeta$-strongly self-consistent submeasurement $A$,
   \[
@@ -536,6 +550,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \]
 \end{proposition}
 \begin{proof}
+  \leanok
   \uses{lem:self-consistency-same-side-square}
   Immediate from Lemma~\ref{lem:self-consistency-same-side-square}.
 \end{proof}
