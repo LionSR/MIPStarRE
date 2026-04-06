@@ -472,15 +472,8 @@ theorem ev_abs_mul_le_sqrt
 theorem ev_conjTranspose_mul_comm {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι) :
     ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B) := by
-  simp only [ev]
-  have hρ : ψ.densityᴴ = ψ.density :=
-    (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd).isHermitian.eq
-  have hstar : star (MIPStarRE.Quantum.normalizedTrace (ψ.density * (Aᴴ * B))) =
-      MIPStarRE.Quantum.normalizedTrace (ψ.density * (Bᴴ * A)) := by
-    rw [← normalizedTrace_conjTranspose]
-    simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
-    rw [hρ, MIPStarRE.Quantum.normalizedTrace_mul_comm]
-  simpa [Complex.star_def, Complex.conj_re] using (congr_arg Complex.re hstar).symm
+  simpa [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
+    using (ev_conjTranspose ψ (Aᴴ * B))
 
 /-- AM-GM for the quadratic form:
 `2 * ev ψ (Aᴴ * B) ≤ ev ψ (Aᴴ * A) + ev ψ (Bᴴ * B)`. -/
@@ -524,8 +517,7 @@ theorem ev_sum_conjTranspose_mul_sum_le {ι : Type*} [Fintype ι] [DecidableEq �
   -- Expand LHS to double sum: ev((∑Xi)ᴴ(∑Xi)) = ∑_i ∑_j ev(XiᴴXj)
   have hexpand : ev ψ ((∑ a, X a)ᴴ * (∑ a, X a)) =
       ∑ i : α, ∑ j : α, ev ψ ((X i)ᴴ * X j) := by
-    rw [show (∑ a : α, X a)ᴴ = ∑ a : α, (X a)ᴴ from
-      star_sum Finset.univ X, Finset.sum_mul]
+    rw [Matrix.conjTranspose_sum, Finset.sum_mul]
     simp_rw [Finset.mul_sum, ev_finset_sum]
   rw [hexpand]
   -- Apply cross-term bound to each pair, then simplify double sum
