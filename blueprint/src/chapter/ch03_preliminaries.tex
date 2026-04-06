@@ -195,6 +195,8 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \label{sec:consistency-from-state-dependent-distance}
 
 \begin{proposition}[Closeness of inner products]\label{prop:closeness-of-ip}
+  \lean{MIPStarRE.LDT.Preliminaries.closenessOfIP, MIPStarRE.LDT.Preliminaries.closenessOfIPAdjoint}
+  \leanok
   \uses{def:approx_delta}
   Let $\{A^x_a\}$, $\{B^x_a\}$, and $\{C^x_{a,b}\}$ be matrices. Suppose that $A^x_a \approx_\gamma B^x_a$ and that for all~$x$,
   \[
@@ -214,6 +216,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \end{equation}
 \end{proposition}
 \begin{proof}
+  \leanok
   To prove \eqref{eq:closeness3}, write the difference as
   \[
     \E_{\bx} \sum_a \bra{\psi} \Big(\sum_b C^\bx_{a,b}\Big) (A^\bx_a-B^\bx_a) \ket{\psi}.
@@ -231,6 +234,8 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{proposition}\label{prop:easy-approx-from-approx-delta}
+  \lean{MIPStarRE.LDT.Preliminaries.easyApproxFromApproxDelta}
+  \leanok
   \uses{def:submeasurement, def:approx_delta}
   Let $A = \{A^x_a\}$, $B = \{B^x_a\}$, and $C = \{C^x_a\}$ be submeasurements such that $A^x_a \approx_{\delta} B^x_a$. Then
   \begin{equation*}
@@ -239,6 +244,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \end{equation*}
 \end{proposition}
 \begin{proof}
+  \leanok
   The difference has magnitude
   \[
     \Big| \E_{\bx} \sum_a \bra{\psi} (A^{\bx}_a - B^{\bx}_a) C^{\bx}_a \ket{\psi}\Big|.
@@ -252,6 +258,8 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{proposition}\label{prop:cab-approx-delta}
+  \lean{MIPStarRE.LDT.Preliminaries.cabApproxDelta}
+  \leanok
   \uses{def:approx_delta}
   Let $\{A^x_a\}$, $\{B^x_a\}$, and $\{C^x_{a,b}\}$ be matrices. Suppose that $A^{x}_a \approx_\delta B^{x}_a$ and that for all $x$ and $a$,
   \[
@@ -263,6 +271,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \]
 \end{proposition}
 \begin{proof}
+  \leanok
   The error term is
   \[
     \E_{\bx} \sum_{a,b} \bra{\psi}
