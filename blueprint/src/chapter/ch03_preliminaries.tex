@@ -101,7 +101,6 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 
 \begin{definition}[Completion of a submeasurement]\label{def:measurement-completion}
   \lean{MIPStarRE.LDT.Preliminaries.completeAtOutcome}
-  \leanok
   \uses{def:submeasurement}
   Let $A=\{A_a^x\}_{a \in \mathcal A}$ be a submeasurement. Its completion is the measurement $\widehat A$ with outcome set $\widehat{\mathcal A}=\mathcal A \cup \{\bot\}$ given by $\widehat A_a^x=A_a^x$ for $a \in \mathcal A$ and $\widehat A_\bot^x = I-\sum_a A_a^x$.
 \end{definition}
