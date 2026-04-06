@@ -221,30 +221,6 @@ theorem orthonormalization {Outcome : Type*}
 
 /-! ### Orthonormalization helper lemmas -/
 
-/-- `lem:orthonormalization-main-lemma`. -/
-lemma orthonormalizationMainLemma {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι)
-    (A B : Measurement Outcome ι) (ζ : Error) :
-    ConsRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily A.toSubMeas)
-      (constSubMeasFamily B.toSubMeas) ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement ψ A P
-          (orthonormalizationMainLemmaError ζ) := by
-  /-
-  This is compositionally `consistencyToAlmostProjective` followed by
-  `roundAlmostProjMeas`, but in the current file order those helper lemmas are
-  declared later. Rather than reorder the section wholesale in this pass, I am
-  leaving the wrapper theorem itself as the local placeholder.
-  -/
-  -- TODO: Compose consistency-to-almost-projective with rounding to produce the
-  -- main orthonormalization witness
-  -- (`lem:orthonormalization-main-lemma`); blocked on helper-ordering and
-  -- wrapper composition infrastructure.
-  sorry
-
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
 with `B`, then `A` is `2ζ`-almost-projective. -/
 lemma consistencyToAlmostProjective {Outcome : Type*}
@@ -288,21 +264,84 @@ lemma adjustTruncatedProjections {Outcome : Type*}
   -- blocked on projection-rounding infrastructure.
   sorry
 
+universe uAlmost uRounded
+
 /-- Compose spectral truncation and adjustment to round an
 almost-projective measurement to a projective submeasurement. -/
 lemma roundAlmostProjMeas {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
-    AlmostProjMeasStatement ψ A ζ →
+    AlmostProjMeasStatement.{_, _, uAlmost} ψ A ζ →
       ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement ψ A P
+        RoundedProjMeasStatement.{_, _, uRounded} ψ A P
           (roundingToProjectiveError ζ) := by
-  -- Composition of spectralTruncateAlmostProjective and adjustTruncatedProjections.
-  -- Currently hits universe metavariable issue in elaboration.
-  -- TODO: Compose spectral truncation with adjustment to obtain a rounded
-  -- projective submeasurement in the orthonormalization proof; currently
-  -- blocked by a universe-metavariable elaboration issue.
+  intro hAlmost
+  exact adjustTruncatedProjections.{_, _, uRounded, uRounded}
+    (Outcome := Outcome) (ι := ι) ψ A ζ
+    (spectralTruncateAlmostProjective.{_, _, uAlmost, uRounded}
+      (Outcome := Outcome) (ι := ι) ψ A ζ hAlmost)
+
+/-- Increase the allowed error bound for a rounded-projective witness. -/
+private lemma roundedProjMeasStatement_mono.{uRoundedMono} {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState ι} {A : Measurement Outcome ι} {P : ProjSubMeas Outcome ι}
+    {ζ₁ ζ₂ : Error}
+    (h : RoundedProjMeasStatement.{_, _, uRoundedMono} ψ A P ζ₁) (hζ : ζ₁ ≤ ζ₂) :
+    RoundedProjMeasStatement.{_, _, uRoundedMono} ψ A P ζ₂ := by
+  refine ⟨?_, ?_⟩
+  · exact ⟨le_trans h.closeness.squaredDistanceBound hζ⟩
+  · rcases h.matrixWitness with ⟨w⟩
+    refine ⟨{
+      space := w.space
+      state := w.state
+      source := w.source
+      target := w.target
+      targetProjective := w.targetProjective
+      pointwiseTauDistance := ?_
+    }⟩
+    intro a
+    exact le_trans (w.pointwiseTauDistance a) hζ
+
+/-- Error bookkeeping for the wrapper around `consistencyToAlmostProjective`
+and `roundAlmostProjMeas`. -/
+private lemma orthonormalizationMainLemma_error_bound (ζ : Error) :
+    roundingToProjectiveError (consistencyToAlmostProjectiveError ζ) ≤
+      orthonormalizationMainLemmaError ζ := by
+  /-
+  The wrapper theorem below is structurally just the composition of
+  `consistencyToAlmostProjective` and `roundAlmostProjMeas`.
+  The remaining bookkeeping is the scalar inequality comparing the composed
+  rounding bound with the named `orthonormalizationMainLemmaError`.
+  -/
   sorry
+
+/-- `lem:orthonormalization-main-lemma`. -/
+lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState ι)
+    (A B : Measurement Outcome ι) (ζ : Error) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily B.toSubMeas) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        RoundedProjMeasStatement.{_, _, uRound} ψ A P
+          (orthonormalizationMainLemmaError ζ) := by
+  intro hCons
+  have hAlmost :
+      AlmostProjMeasStatement.{_, _, uRound}
+        ψ A (consistencyToAlmostProjectiveError ζ) :=
+    consistencyToAlmostProjective.{_, _, uRound} ψ A B ζ hCons
+  have hRound :
+      ∃ P : ProjSubMeas Outcome ι,
+        RoundedProjMeasStatement.{_, _, uRound} ψ A P
+          (roundingToProjectiveError (consistencyToAlmostProjectiveError ζ)) :=
+    roundAlmostProjMeas ψ A (consistencyToAlmostProjectiveError ζ) hAlmost
+  obtain ⟨P, hRounded⟩ := hRound
+  refine ⟨P, ?_⟩
+  exact roundedProjMeasStatement_mono hRounded
+    (orthonormalizationMainLemma_error_bound ζ)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
