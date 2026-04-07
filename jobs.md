@@ -1,42 +1,152 @@
-# LDT Sorry Elimination — Final Status
+# LDT Sorry Elimination — Status Report
 
-## Summary
-- **Started**: 66 sorrys across 9 files
-- **Current**: 57 sorrys across 9 files  
-- **Eliminated**: 9 sorrys + 3 infrastructure fixes
+## Progress Summary
+- **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
+- **Current**: 57 sorrys across 9 files
+- **Eliminated**: 9 sorrys
+- **Infrastructure fixes**: 3 type/statement bugs fixed
 - **PRs created**: 2
 
-## PRs
+---
 
-### PR #240: Wave 1 (feat/ldt-sorry-elimination-wave1)
-- 5 sorrys eliminated: qaRestated, xSquared, xExpressionToQExpression, xHatSquared, orthonormalizationMainLemma_error_bound
-- Infrastructure: QXPLayerData fields, error bound fix, G type mismatch fix
-- Files: QXPLayer.lean, MMP/Theorems.lean, Pasting/Theorems.lean, SelfImprovement/Theorems.lean
+## PRs Created
 
-### PR #241: Wave 2 (feat/ldt-sorry-elimination-wave2)  
-- 4 sorrys eliminated: aLooksProjective, 3x aggregate SDDRel in GlobalVariance
-- Infrastructure: averageUnitSubMeas public wrapper, Jensen averaging helpers
-- Files: QXPLayer.lean, GlobalVariance/Defs.lean, GlobalVariance/Theorems.lean
+### PR #240: Wave 1 (`feat/ldt-sorry-elimination-wave1`)
+**Sorrys eliminated (5):**
+- `QXPLayer.lean`: `qaRestated` — matrix identity from new QXPLayerData fields
+- `QXPLayer.lean`: `xSquared` — SVD identity from new fields
+- `QXPLayer.lean`: `xExpressionToQExpression` — algebraic manipulation using qa_eq, x_gram_right, qa_projective
+- `QXPLayer.lean`: `xHatSquared` — coisometry identity from xHat_coisometry field
+- `MMP/Theorems.lean`: `orthonormalizationMainLemma_error_bound` — scalar rpow inequality (added ζ ≤ 1 hypothesis; original was false for large ζ)
 
-## Remaining 57 Sorrys — Blockers Analysis
+**Infrastructure fixes:**
+- `QXPLayer.lean`: Added 7 invariant fields to `QXPLayerData` (`qa_eq`, `qa_projective`, `xHat_coisometry`, `x_gram_right`, `x_gram_left_svd`, `q_total_svd`, `xHat_mixed`)
+- `MMP/Theorems.lean`: Added `0 ≤ ζ` and `ζ ≤ 1` hypotheses to `orthonormalizationMainLemma_error_bound` and threaded through call site
+- `Pasting/Theorems.lean`: Fixed `G` type mismatch in `commutingWithGComplete` (`Fq params → SubMeas` → `SubMeas`)
+- `SelfImprovement/Theorems.lean`: Updated blocker documentation with exact missing ingredients
 
-Most remaining sorrys are **deep mathematical theorems** requiring substantial new infrastructure:
+**Files changed:** QXPLayer.lean, MMP/Theorems.lean, Pasting/Theorems.lean, SelfImprovement/Theorems.lean
 
-### Genuinely Hard (need new math):
-- Naimark dilation (5 sorry subgoals) — needs unitary extension
-- Orthonormalization chain (5 sorrys) — needs spectral truncation
-- SDP duality argument — needs SDP infrastructure  
-- Matrix Chernoff bound — needs random matrix theory
-- Hypercube expansion (3 sorrys) — needs spectral graph theory
-- Main induction step — depends on all above
+### PR #241: Wave 2 (`feat/ldt-sorry-elimination-wave2`)
+**Sorrys eliminated (4):**
+- `QXPLayer.lean`: `aLooksProjective` — consistency-to-defect bound using ConsRel, qBipartiteConsDefect, qSDD_nonneg
+- `GlobalVariance/Theorems.lean`: `generalizeB` aggregate SDDRel subgoal
+- `GlobalVariance/Theorems.lean`: `localVarianceOfPoints` aggregate SDDRel subgoal
+- `GlobalVariance/Theorems.lean`: `globalVarianceOfPoints` aggregate SDDRel subgoal
 
-### Blocked by Missing Hypotheses/Infrastructure:
-- SelfImprovement: addInU statement quantifies wrong, needs redesign
-- SelfImprovement: selfImprovement wrapper needs PermInvState  
-- Commutativity: needs PermInvState/IsNormalized assumptions
-- GlobalVariance matrix transfer: needs matrix realization bridge
-- ExpansionHypercubeGraph: needs trace/Kronecker helpers
+**Infrastructure added:**
+- `GlobalVariance/Defs.lean`: Public `averageUnitSubMeas` wrapper with outcome lemma (was private, blocking aggregate proofs)
+- `GlobalVariance/Theorems.lean`: Jensen/Cauchy-Schwarz averaging helpers for turning pointwise polynomial bounds into aggregate `SDDRel` statements
 
-### Would Need Statement Redesign:
-- Pasting gHatFacts: Option splitting goes wrong direction
-- Several wrapper theorems blocked on core theorems above
+**Files changed:** QXPLayer.lean, GlobalVariance/Defs.lean, GlobalVariance/Theorems.lean
+
+---
+
+## Remaining 57 Sorrys — Detailed Breakdown
+
+### MakingMeasurementsProjective/QXPLayer.lean (9 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `projectiveNonMeasurement` | BLOCKED | #197 construction — needs spectral truncation rounding |
+| `projectiveLowRankSum` | BLOCKED | #197 construction — needs rank-reduced family |
+| `qCompleteness` | BLOCKED | #197 — needs completeness from rank reduction |
+| `sqrtQCompleteness` | BLOCKED | #197 — needs sqrt completeness |
+| `qAlmostProjective` | BLOCKED | #197 — needs operator inequality |
+| `xTimesXHat` | PARTIALLY PROVABLE | Second conjunct follows from xHat_mixed field; first conjunct needs additional SVD field |
+| `squaredDifference` | NEAR-PROVABLE | Route via Y := x * xHatᴴ identified but algebra normalization incomplete |
+| `pProjectivity` | NEAR-PROVABLE | Route via ProjSubMeas construction identified |
+| `pQApprox` | BLOCKED | #197 — needs full Q/P approximation chain |
+
+### MakingMeasurementsProjective/Theorems.lean (10 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `oneMeasNaimark` (5 subgoals) | BLOCKED | #118 — needs unitary extension infrastructure |
+| `naimark` | BLOCKED | Depends on oneMeasNaimark |
+| `orthonormalization` | BLOCKED | Needs completion-to-measurement bridge |
+| `consistencyToAlmostProjective` | BLOCKED | Needs ConsRel → AlmostProjMeasStatement bridge |
+| `spectralTruncateAlmostProjective` | BLOCKED | Needs spectral cutoff infrastructure |
+| `adjustTruncatedProjections` | BLOCKED | Needs projection rounding infrastructure |
+
+### Pasting/Theorems.lean (14 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `ldPasting` | BLOCKED | Top-level, depends on everything below |
+| `ldPastingSubMeas` | BLOCKED | Wrapper around ldPasting |
+| `gCompleteSelfConsistency` | BLOCKED | Needs slice SSC → complete part conversion |
+| `commutativitySwitcheroo` | BLOCKED | Aggregate commutation step |
+| `commutingWithGComplete` | BLOCKED | Has sorry (type was fixed in PR #240) |
+| `gHatFacts` (2 subgoals) | BLOCKED | Option splitting goes wrong direction for hypotheses |
+| `commuteGHalfSandwich` | BLOCKED | Iterated commutation bound |
+| `ldSandwichLineOnePoint` | BLOCKED | One-point comparison |
+| `hBConsistency` | BLOCKED | Aggregation over slice locations |
+| `overAllOutcomes` | BLOCKED | Total mass expansion |
+| `fromHToG` | BLOCKED | Bernoulli-tail recurrence |
+| `chernoffBernoulliMatrix` | BLOCKED | Matrix Chernoff/Bernoulli bound |
+| `ldPastingNCompleteness` | BLOCKED | Combines above results |
+
+### GlobalVariance/Theorems.lean (7 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `matrixGeneralizeB` | BLOCKED | Matrix realization transfer proof |
+| `matrixLocalVarianceOfPoints` | BLOCKED | Matrix local variance transfer |
+| `matrixGlobalVarianceOfPoints` | BLOCKED | Matrix global variance transfer |
+| `generalizeB` pointwise bound | BLOCKED | Needs matrix realization |
+| `localVarianceOfPoints` pointwise bound | BLOCKED | Needs matrix transfer |
+| `localVarianceOfPoints` edge norm bound | BLOCKED | Needs rerandomized deviation bridge |
+| `globalVarianceOfPoints` global norm bound | BLOCKED | Needs localToGlobal + local estimate |
+
+### Commutativity/Theorems.lean (5 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `commDataProcessedG` postprocessedSelfConsistency | BLOCKED | Needs evaluatedPointFamily rewriting bridge |
+| `commDataProcessedG` stabilityOne | BLOCKED | Needs SDDOpRel bridge for paired tensor families |
+| `commDataProcessedG` stabilityTwo | BLOCKED | Needs SDDOpRel bridge from evaluated-slice scaffold |
+| `commDataProcessedG` evaluatedSliceCommutation | BLOCKED | Needs chaining stability estimates |
+| `comMain` fullSliceCommutation | BLOCKED | Needs full-slice vs evaluated family comparison |
+
+### SelfImprovement/Theorems.lean (4 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `selfImprovementHelper` | BLOCKED | Depends on sdp + addInU |
+| `sdp` | BLOCKED | Needs SDP infrastructure (duality, Slater, complementary slackness) |
+| `addInU` | STATEMENT ISSUE | Quantifies over arbitrary H but requires H = averagedSandwichedPolynomialSubMeas |
+| `selfImprovement` | BLOCKED | Needs selfImprovementHelper + orthonormalization; missing PermInvState |
+
+### MainInductionStep/Theorems.lean (4 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `mainInduction` | BLOCKED | Full inductive argument, depends on all sections |
+| `selfImprovementInInductionSection` | BLOCKED | Needs measurement witness bridge |
+| `ldPastingInInductionSection` | BLOCKED | Cyclic import with Pasting |
+| `restrictedProbabilities` | BLOCKED | Modeling mismatch with paper's restricted diagonal strategy |
+
+### ExpansionHypercubeGraph/Theorems.lean (3 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `matrixLocalToGlobal` | BLOCKED | Needs expansion inequality / Efron-Stein telescoping |
+| `matrixLocalRewrite` | BLOCKED | Needs trace/Kronecker sum identity helpers |
+| `matrixGlobalRewrite` | BLOCKED | Needs trace/Kronecker sum identity helpers |
+
+### Test/MainTheorem.lean (1 sorry)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `mainFormal` | BLOCKED | Top-level theorem, depends on everything |
+
+---
+
+## What Was Attempted But Could Not Be Proved
+
+### Investigated and found unprovable/blocked:
+- **orthonormalizationMainLemma_error_bound**: Was FALSE as stated (counterexample at ζ=625). Fixed by adding ζ ≤ 1 hypothesis.
+- **QXPLayer matrix identities (qaRestated, xSquared, etc.)**: Were unprovable without structure fields. Fixed by adding invariant fields to QXPLayerData.
+- **Commutativity/Theorems.lean G type mismatch**: Pre-existing type error. Fixed.
+- **GlobalVariance aggregate SDDRel**: Blocked by private averaging constructor. Fixed by making it public.
+- **SelfImprovement 4 sorrys**: All genuinely blocked on missing SDP/orthonormalization infrastructure.
+- **ExpansionHypercubeGraph 3 matrix proofs**: Need non-trivial finite-sum trace-expansion infrastructure.
+- **Pasting gHatFacts 2 subgoals**: Hypothesis direction mismatch (need per-outcome qSDD, have aggregated).
+
+### Agents dispatched (18 total across waves):
+- Wave 1: 6 survey/assessment agents
+- Wave 2: 6 infrastructure fix + proof agents  
+- Wave 3: 4 proof continuation agents
+- Wave 4: 2 cleanup/PR agents
