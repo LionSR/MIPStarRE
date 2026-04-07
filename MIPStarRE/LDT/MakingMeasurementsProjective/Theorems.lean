@@ -221,17 +221,6 @@ theorem orthonormalization {Outcome : Type*}
 
 /-! ### Orthonormalization helper lemmas -/
 
-/-- Place a measurement on the left tensor factor of `ιA × ιB`. -/
-def leftPlacedMeasurement {Outcome : Type*}
-    {ιA ιB : Type*}
-    [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : Measurement Outcome ιA) :
-    Measurement Outcome (ιA × ιB) where
-  toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-  total_eq_one := by
-    ext i j
-    simp [leftPlacedSubMeas, leftTensor, A.total_eq_one]
-
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
 with `B`, then `A` is `2ζ`-almost-projective. -/
 lemma consistencyToAlmostProjective {Outcome : Type*}
@@ -281,7 +270,7 @@ universe uAlmost uRounded
 
 /-- Compose spectral truncation and adjustment to round an
 almost-projective measurement to a projective submeasurement. -/
-lemma roundAlmostProjMeas {Outcome : Type*}
+lemma roundAlmostProjMeas.{uAlmost, uRounded} {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
@@ -296,7 +285,7 @@ lemma roundAlmostProjMeas {Outcome : Type*}
       (Outcome := Outcome) (ι := ι) ψ A ζ hAlmost)
 
 /-- Increase the allowed error bound for a rounded-projective witness. -/
-private lemma roundedProjMeasStatement_mono.{uRoundedMono} {Outcome : Type*}
+lemma roundedProjMeasStatement_mono.{uRoundedMono} {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     {ψ : QuantumState ι} {A : Measurement Outcome ι} {P : ProjSubMeas Outcome ι}
