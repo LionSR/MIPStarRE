@@ -3711,41 +3711,6 @@ theorem completingToMeasurement {Outcome : Type*}
       closenessAfterCompletion_core ψ hperm hψ A B a0 δ ζ hsc hdist
   }⟩
 
-/-- Triangle inequality for `qSDDOp`. Mirrors `questionSDD_triangle`. -/
-private lemma questionSDDOp_triangle {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (A B C : OpFamily Outcome ι) :
-    qSDDOp ψ A C ≤
-      2 * (qSDDOp ψ A B + qSDDOp ψ B C) := by
-  unfold qSDDOp qSDDCore
-  have pointwise : ∀ a, ev ψ ((A.outcome a - C.outcome a)ᴴ *
-      (A.outcome a - C.outcome a)) ≤
-    2 * (ev ψ ((A.outcome a - B.outcome a)ᴴ *
-        (A.outcome a - B.outcome a)) +
-      ev ψ ((B.outcome a - C.outcome a)ᴴ *
-        (B.outcome a - C.outcome a))) :=
-    fun a => ev_diff_triangle ψ _ _ _
-  have h1 : ∑ a : Outcome, ev ψ ((A.outcome a - C.outcome a)ᴴ *
-      (A.outcome a - C.outcome a)) ≤
-    ∑ a : Outcome,
-      (2 * (ev ψ ((A.outcome a - B.outcome a)ᴴ *
-          (A.outcome a - B.outcome a)) +
-        ev ψ ((B.outcome a - C.outcome a)ᴴ *
-          (B.outcome a - C.outcome a)))) :=
-    Finset.sum_le_sum (fun a _ => pointwise a)
-  have h2 : ∑ a : Outcome,
-      (2 * (ev ψ ((A.outcome a - B.outcome a)ᴴ *
-          (A.outcome a - B.outcome a)) +
-        ev ψ ((B.outcome a - C.outcome a)ᴴ *
-          (B.outcome a - C.outcome a)))) =
-    2 * (∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a)ᴴ *
-        (A.outcome a - B.outcome a)) +
-      ∑ a : Outcome, ev ψ ((B.outcome a - C.outcome a)ᴴ *
-        (B.outcome a - C.outcome a))) := by
-    rw [← Finset.mul_sum, ← Finset.sum_add_distrib]
-  linarith
-
 /-- Triangle inequality for state-dependent operator distance. -/
 lemma sddOpRel_triangle
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]

@@ -1392,88 +1392,6 @@ theorem commutativityPoints
       (pointMeasurementProductLeft params strategy)
       (pointMeasurementProductRight params strategy)
       (commutativityPointsError params gamma) := by
-<<<<<<< feat/sddoprel-infrastructure
-  have hsampledCons :=
-    sampledDiagonalLineConsistency params strategy eps delta gamma hgood
-  have hsampledApprox :=
-    sampledDiagonalLineApproximation params strategy eps delta gamma hgood
-  have horderedMixed :=
-    orderedLiftToMixedBridge params strategy eps delta gamma hgood
-  have horderedLine :=
-    orderedLiftToLineBridge params strategy eps delta gamma hgood
-  have hswap :=
-    diagonalLineProjectiveSwap params strategy eps delta gamma hgood
-  have hreversedLine :=
-    reversedDropFromLineBridge params strategy eps delta gamma hgood
-  have hreversedPoints :=
-    reversedDropToPointsBridge params strategy eps delta gamma hgood
-  /-
-  This is the final triangle-inequality assembly of the four
-  `≈_{2γm}` steps plus the exact projective swap.
-  -/
-  have hγ : 0 ≤ gamma := by
-    exact le_trans
-      (consError_nonneg strategy.state
-        (uniformDistribution (DiagonalTestSample params))
-        (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-        (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)))
-      hgood.diagonalLineTest
-  have h45 :
-      SDDOpRel strategy.state
-        (pointPairSharedDiagonalLineDistribution params)
-        (diagonalLineProductReversed params strategy)
-        (pointMeasurementProductAlongSharedLineReversed params strategy)
-        (2 * (pointDiagonalLineApproxError params gamma +
-          pointDiagonalLineApproxError params gamma)) := by
-    exact MIPStarRE.LDT.Preliminaries.sddOpRel_triangle
-      strategy.state
-      (pointPairSharedDiagonalLineDistribution params)
-      (diagonalLineProductReversed params strategy)
-      (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductRight params strategy))
-      (pointMeasurementProductAlongSharedLineReversed params strategy)
-      (pointDiagonalLineApproxError params gamma)
-      (pointDiagonalLineApproxError params gamma)
-      hreversedLine
-      hreversedPoints
-  have h345 :
-      SDDOpRel strategy.state
-        (pointPairSharedDiagonalLineDistribution params)
-        (diagonalLineProductOrdered params strategy)
-        (pointMeasurementProductAlongSharedLineReversed params strategy)
-        (2 * (0 + 2 * (pointDiagonalLineApproxError params gamma +
-          pointDiagonalLineApproxError params gamma))) := by
-    exact MIPStarRE.LDT.Preliminaries.sddOpRel_triangle
-      strategy.state
-      (pointPairSharedDiagonalLineDistribution params)
-      (diagonalLineProductOrdered params strategy)
-      (diagonalLineProductReversed params strategy)
-      (pointMeasurementProductAlongSharedLineReversed params strategy)
-      0
-      (2 * (pointDiagonalLineApproxError params gamma +
-        pointDiagonalLineApproxError params gamma))
-      hswap
-      h45
-  have h2345 :
-      SDDOpRel strategy.state
-        (pointPairSharedDiagonalLineDistribution params)
-        (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductLeft params strategy))
-        (pointMeasurementProductAlongSharedLineReversed params strategy)
-        (2 * (pointDiagonalLineApproxError params gamma +
-          2 * (0 + 2 * (pointDiagonalLineApproxError params gamma +
-            pointDiagonalLineApproxError params gamma)))) := by
-    exact MIPStarRE.LDT.Preliminaries.sddOpRel_triangle
-      strategy.state
-      (pointPairSharedDiagonalLineDistribution params)
-      (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductLeft params strategy))
-      (diagonalLineProductOrdered params strategy)
-      (pointMeasurementProductAlongSharedLineReversed params strategy)
-      (pointDiagonalLineApproxError params gamma)
-      (2 * (0 + 2 * (pointDiagonalLineApproxError params gamma +
-        pointDiagonalLineApproxError params gamma)))
-      horderedLine
-      h345
-  have h12345 :
-=======
   let δ := pointDiagonalLineApproxError params gamma
   have hleft :
       SDDOpRel strategy.state
@@ -1506,32 +1424,10 @@ theorem commutativityPoints
       (orderedDropFromLineBridge params strategy eps delta gamma hgood)
       (reversedDropToPointsBridge params strategy eps delta gamma hgood)
   have hshared :
->>>>>>> main
       SDDOpRel strategy.state
         (pointPairSharedDiagonalLineDistribution params)
         (pointMeasurementProductAlongSharedLine params strategy)
         (pointMeasurementProductAlongSharedLineReversed params strategy)
-<<<<<<< feat/sddoprel-infrastructure
-        (2 * (pointDiagonalLineApproxError params gamma +
-          2 * (pointDiagonalLineApproxError params gamma +
-            2 * (0 + 2 * (pointDiagonalLineApproxError params gamma +
-              pointDiagonalLineApproxError params gamma))))) := by
-    exact MIPStarRE.LDT.Preliminaries.sddOpRel_triangle
-      strategy.state
-      (pointPairSharedDiagonalLineDistribution params)
-      (pointMeasurementProductAlongSharedLine params strategy)
-      (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductLeft params strategy))
-      (pointMeasurementProductAlongSharedLineReversed params strategy)
-      (pointDiagonalLineApproxError params gamma)
-      (2 * (pointDiagonalLineApproxError params gamma +
-        2 * (0 + 2 * (pointDiagonalLineApproxError params gamma +
-          pointDiagonalLineApproxError params gamma))))
-      horderedMixed
-      h2345
-  have hm_nonneg : 0 ≤ (params.m : Error) := by
-    positivity
-  have hsharedLarge :
-=======
         (2 * (2 * (δ + δ) + 2 * (δ + δ))) := by
     exact MIPStarRE.LDT.Preliminaries.stateDependentDistanceOpRel_triangle
       strategy.state
@@ -1542,50 +1438,16 @@ theorem commutativityPoints
       (2 * (δ + δ)) (2 * (δ + δ))
       hleft hright
   have hshared' :
->>>>>>> main
       SDDOpRel strategy.state
         (pointPairSharedDiagonalLineDistribution params)
         (pointMeasurementProductAlongSharedLine params strategy)
         (pointMeasurementProductAlongSharedLineReversed params strategy)
-<<<<<<< feat/sddoprel-infrastructure
-        (76 * gamma * (params.m : Error)) := by
-    have hbound :
-        2 * (pointDiagonalLineApproxError params gamma +
-          2 * (pointDiagonalLineApproxError params gamma +
-            2 * (0 + 2 * (pointDiagonalLineApproxError params gamma +
-              pointDiagonalLineApproxError params gamma))))
-          ≤ 76 * gamma * (params.m : Error) := by
-      simp [pointDiagonalLineApproxError, restrictedDiagonalLinesConsistencyError]
-      nlinarith
-    exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono
-=======
         (commutativityPointsError params gamma) := by
     refine MIPStarRE.LDT.Preliminaries.stateDependentDistanceOpRel_mono
->>>>>>> main
       strategy.state
       (pointPairSharedDiagonalLineDistribution params)
       (pointMeasurementProductAlongSharedLine params strategy)
       (pointMeasurementProductAlongSharedLineReversed params strategy)
-<<<<<<< feat/sddoprel-infrastructure
-      _
-      _
-      h12345
-      hbound
-  /-
-  Two gaps remain here.
-
-  1. The paper averages over uniform point pairs together with a uniformly
-     random diagonal line containing both points, while the current
-     `pointPairSharedDiagonalLineDistribution` is the uniform distribution on
-     raw `(ℓ, t₁, t₂)` samples. A pushforward/marginal comparison is still
-     needed to transfer `hsharedLarge` to the target point-pair average.
-  2. With the current raw triangle lemma
-     `δ₁, δ₂ ↦ 2 * (δ₁ + δ₂)`, the five-step chaining above yields the explicit
-     bound `76 * γ * m`. Recovering the blueprint's `32 * γ * m` needs either a
-     sharper composition lemma or a different bookkeeping argument.
-  -/
-  sorry
-=======
       (2 * (2 * (δ + δ) + 2 * (δ + δ)))
       (commutativityPointsError params gamma)
       ?_ hshared
@@ -1619,6 +1481,5 @@ theorem commutativityPoints
           (pointMeasurementProductAlongSharedLineReversed params strategy) := by
             rfl
     _ ≤ commutativityPointsError params gamma := hshared'
->>>>>>> main
 
 end MIPStarRE.LDT.CommutativityPoints
