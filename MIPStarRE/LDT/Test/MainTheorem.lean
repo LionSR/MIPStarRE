@@ -38,16 +38,16 @@ theorem mainFormal
     (hk : params.m * params.d ≤ k) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
-          (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementA)
-          (polynomialEvaluationFamily params G_B.toSubMeas.liftRight)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
           (mainFormalError params k eps) ∧
         ConsRel strategy.state (uniformDistribution (Point params))
-          (IdxProjMeas.toIdxSubMeasRight strategy.pointMeasurementB)
-          (polynomialEvaluationFamily params G_A.toSubMeas.liftLeft)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (polynomialEvaluationFamily params G_A.toSubMeas)
           (mainFormalError params k eps) ∧
         ConsRel strategy.state (uniformDistribution Unit)
-          (constSubMeasFamily G_A.toSubMeas.liftLeft)
-          (constSubMeasFamily G_B.toSubMeas.liftRight)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
   sorry
 

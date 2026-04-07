@@ -25,7 +25,7 @@ open MIPStarRE.LDT
 
 noncomputable section
 
--- NOTE: 15 sorry stubs are intentional scaffolding for issue #197. See PROOF_INTEGRITY.md.
+-- NOTE: sorry stubs are intentional scaffolding for issue #197. See PROOF_INTEGRITY.md.
 
 /-- The quarter-root error term `ζ^(1/4)` used throughout the paper's late-stage
 orthonormalization estimates. -/
@@ -169,7 +169,8 @@ In the paper's orthonormalization pipeline, `B` is always the
 projective reference measurement obtained from Naimark dilation
 (Theorem 5.1), so this is the natural type. -/
 lemma aLooksProjective {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (B : ProjMeas Outcome ι) (ζ : Error) :

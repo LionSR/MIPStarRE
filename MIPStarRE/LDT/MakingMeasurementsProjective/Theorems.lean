@@ -224,13 +224,15 @@ theorem orthonormalization {Outcome : Type*}
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
 with `B`, then `A` is `2ζ`-almost-projective. -/
 lemma consistencyToAlmostProjective {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A B : Measurement Outcome ι) (ζ : Error) :
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
-      AlmostProjMeasStatement ψ A
+      AlmostProjMeasStatement ψ (leftPlacedMeasurement (ιB := ιB) A)
         (consistencyToAlmostProjectiveError ζ) := by
   -- TODO: Show consistency implies almost-projectivity with the stated error in
   -- the orthonormalization proof; blocked on bridge lemmas from `ConsRel` to
@@ -263,6 +265,8 @@ lemma adjustTruncatedProjections {Outcome : Type*}
   -- submeasurement with controlled error in the orthonormalization proof;
   -- blocked on projection-rounding infrastructure.
   sorry
+
+universe uAlmost uRounded
 
 /-- Compose spectral truncation and adjustment to round an
 almost-projective measurement to a projective submeasurement. -/
@@ -302,51 +306,52 @@ lemma roundedProjMeasStatement_mono.{uRoundedMono} {Outcome : Type*}
     intro a
     exact le_trans (w.pointwiseTauDistance a) hζ
 
-/-- Error bookkeeping for the wrapper around
-`consistencyToAlmostProjective` and `roundAlmostProjMeas`.
-
-Requires `0 ≤ ζ ≤ 1` because the composed error
-`12 · (2ζ)^(1/2)` exceeds `84 · ζ^(1/4)` for large `ζ`.
-In the paper, consistency error is always small. -/
-private lemma orthonormalizationMainLemma_error_bound
-    (ζ : Error) (hζ_nn : 0 ≤ ζ) (hζ_le : ζ ≤ 1) :
+/-- Error bookkeeping for the wrapper around `consistencyToAlmostProjective`
+and `roundAlmostProjMeas`. -/
+private lemma orthonormalizationMainLemma_error_bound (ζ : Error) :
     roundingToProjectiveError (consistencyToAlmostProjectiveError ζ) ≤
       orthonormalizationMainLemmaError ζ := by
-  -- LHS = 12 * (2ζ)^(1/2), RHS = 84 * ζ^(1/4).
-  -- For 0 ≤ ζ ≤ 1: ζ^(1/4) ≤ 1, so LHS ≤ 12√2 < 84 ≤ RHS/ζ^(1/4).
+  /-
+  The wrapper theorem below is structurally just the composition of
+  `consistencyToAlmostProjective` and `roundAlmostProjMeas`.
+  The remaining bookkeeping is the scalar inequality comparing the composed
+  rounding bound with the named `orthonormalizationMainLemmaError`.
+  -/
   sorry
 
-/-- `lem:orthonormalization-main-lemma`.
-
-Requires `0 ≤ ζ ≤ 1` for the error composition chain; in the paper,
-consistency error is always small. -/
+/-- `lem:orthonormalization-main-lemma`. -/
 lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι)
-    (A B : Measurement Outcome ι) (ζ : Error)
-    (hζ_nn : 0 ≤ ζ) (hζ_le : ζ ≤ 1) :
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement.{_, _, uRound} ψ A P
+      ∃ P : ProjSubMeas Outcome (ιA × ιB),
+        RoundedProjMeasStatement.{_, _, uRound}
+          ψ (leftPlacedMeasurement (ιB := ιB) A) P
           (orthonormalizationMainLemmaError ζ) := by
   intro hCons
   have hAlmost :
       AlmostProjMeasStatement.{_, _, uRound}
-        ψ A (consistencyToAlmostProjectiveError ζ) :=
-    consistencyToAlmostProjective.{_, _, uRound} ψ A B ζ hCons
+        ψ (leftPlacedMeasurement (ιB := ιB) A)
+          (consistencyToAlmostProjectiveError ζ) := by
+    simpa using
+      (consistencyToAlmostProjective
+        (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons)
   have hRound :
-      ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement.{_, _, uRound} ψ A P
-          (roundingToProjectiveError
-            (consistencyToAlmostProjectiveError ζ)) :=
-    roundAlmostProjMeas ψ A
-      (consistencyToAlmostProjectiveError ζ) hAlmost
+      ∃ P : ProjSubMeas Outcome (ιA × ιB),
+        RoundedProjMeasStatement.{_, _, uRound}
+          ψ (leftPlacedMeasurement (ιB := ιB) A) P
+          (roundingToProjectiveError (consistencyToAlmostProjectiveError ζ)) :=
+    roundAlmostProjMeas (ψ := ψ)
+      (A := leftPlacedMeasurement (ιB := ιB) A)
+      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost
   obtain ⟨P, hRounded⟩ := hRound
   refine ⟨P, ?_⟩
   exact roundedProjMeasStatement_mono hRounded
-    (orthonormalizationMainLemma_error_bound ζ hζ_nn hζ_le)
+    (orthonormalizationMainLemma_error_bound ζ)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

@@ -44,29 +44,28 @@ noncomputable def comMainError (params : Parameters) (gamma zeta : Error) : Erro
       Real.rpow zeta (1 / (4 : Error)) +
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)))
 
--- TODO: Add hypothesis linking G to family (e.g., G = family.meas.toSubMeas)
--- TODO: In the paper the stability argument instantiates `G` with the slice
--- submeasurement coming from `family` (for the relevant `x` or `y`). We keep
--- `G` explicit in this scaffold so the operator families can already record the
--- correct weighted bodies, but the eventual proof will need hypotheses tying
--- this parameter back to `family` or `strategy`.
-
 /-- Output package for `lem:comm-data-processed-g`.
 
 The strategy state is bipartite.  Alice-side measurements are lifted to
 the left tensor factor, while Bob-side postprocessed point measurements
-are lifted to the right tensor factor. -/
+are lifted to the right tensor factor.
+
+The parameter `G` is the slice-indexed family `x ↦ G^x`; the hypothesis
+`familyG` ties it back to `family.meas` so that the stability weights
+`√(G^y_h)` and `√(G^x_g)` agree with the family's projective
+sub-measurements. -/
 structure CommDataProcessedGConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
-    (G : SubMeas (Polynomial params) ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
     (gamma zeta : Error) : Prop where
+  familyG : ∀ x, G x = (family.meas x).toSubMeas
   postprocessedPointConsistency :
     ConsRel strategy.state
       (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (IdxSubMeas.liftRight (evaluatedPointFamily params family))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (evaluatedPointFamily params family)
       zeta
   postprocessedSelfConsistency :
     SDDRel strategy.state
@@ -98,7 +97,7 @@ structure ComMainConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
-    (G : SubMeas (Polynomial params) ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
     (gamma zeta : Error) : Prop where
   evaluatedCommutation :
     CommDataProcessedGConclusion params strategy family G gamma zeta
@@ -138,13 +137,15 @@ lemma commDataProcessedG
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
-    (G : SubMeas (Polynomial params) ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
     CommDataProcessedGConclusion params strategy family G gamma zeta := by
   refine
-    { postprocessedPointConsistency := ?_
+    { familyG := hG
+      postprocessedPointConsistency := ?_
       postprocessedSelfConsistency := by
         -- TODO: Derive self-consistency of the postprocessed left/right
         -- evaluated point families from `hself` (`lem:comm-data-processed-g`);
@@ -326,13 +327,15 @@ theorem comMain
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
-    (G : SubMeas (Polynomial params) ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
     ComMainConclusion params strategy family G gamma zeta := by
   let hEval :=
-    commDataProcessedG params strategy eps delta gamma zeta hgood family G hcons hself hbound
+    commDataProcessedG params strategy eps delta gamma zeta hgood family G
+      hG hcons hself hbound
   refine
     { evaluatedCommutation := hEval
       evaluationSpecialization := by

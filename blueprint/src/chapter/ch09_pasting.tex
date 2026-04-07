@@ -174,6 +174,7 @@ where
 
 \begin{lemma}[Distinct tuples versus independent tuples]\label{prop:ld-dnoteq}
   \lean{MIPStarRE.LDT.Pasting.ldDnoteq}
+  \leanok
   \uses{def:distinct-tuples}
   If $x=(x_1,\dots,x_k)$ is uniformly random in $\F_q^k$ and $y=(y_1,\dots,y_k)$ is uniformly random in $\mathsf{Distinct}_k$, then
   \[
@@ -222,6 +223,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 
 \begin{lemma}[A scalar inequality for the first construction]\label{lem:looks-easy-but-took-me-a-while}
   \lean{MIPStarRE.LDT.Pasting.looksEasyButTookMeAWhile}
+  \leanok
   For every real number $0 \le \lambda \le 1$,
   \[
     \lambda(1-\lambda^d) \le 2(\lambda^{d+1}(1-\lambda))^{1/(d+1)}.
@@ -298,6 +300,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 
 \begin{lemma}[Strong self-consistency of the incomplete part]\label{cor:g-bot-self-consistency}
   \lean{MIPStarRE.LDT.Pasting.gBotSelfConsistency}
+  \leanok
   \uses{lem:g-complete-self-consistency}
   Under the hypotheses of Theorem~\ref{thm:ld-pasting},
   \[
@@ -462,6 +465,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 
 \begin{lemma}[Commutativity of the incomplete part]\label{cor:commuting-with-G-incomplete}
   \lean{MIPStarRE.LDT.Pasting.commutingWithGIncomplete}
+  \leanok
   \uses{cor:commuting-with-G-complete}
   Under the hypotheses of Theorem~\ref{thm:ld-pasting},
   \[

@@ -120,8 +120,8 @@ structure LdPastingConclusion (params : Parameters)
   -- tracks the completeness loss below.
   pointConsistency :
     ConsRel strategy.state (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (polynomialEvaluationFamily params.next H.toSubMeas.liftRight)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params.next H.toSubMeas)
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta)
 
@@ -140,8 +140,8 @@ structure LdPastingSubMeasConclusion (params : Parameters)
   -- only appears in the completeness lower bound.
   pointConsistency :
     ConsRel strategy.state (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (polynomialEvaluationFamily params.next H.liftRight)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params.next H)
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta)
   completeness :
@@ -282,10 +282,8 @@ structure LdSandwichLineOnePointStatement (params : Parameters)
   linePointComparison :
     ConsRel strategy.state
       (uniformDistribution (SandwichedLineQuestion params k))
-      (IdxSubMeas.liftLeft
-        (ldSandwichLineOnePointLeftFamily params strategy family k i))
-      (IdxSubMeas.liftRight
-        (ldSandwichLineOnePointRightFamily params strategy family k i))
+      (ldSandwichLineOnePointLeftFamily params strategy family k i)
+      (ldSandwichLineOnePointRightFamily params strategy family k i)
       (ldSandwichLineOnePointError params eps delta gamma zeta k)
 
 /-- Output package for `lem:h-b-consistency`. -/
@@ -297,11 +295,9 @@ structure HBConsistencyStatement (params : Parameters)
   lineConsistency :
     ConsRel strategy.state
       (uniformDistribution (VerticalLineQuestion params))
-      (IdxSubMeas.liftLeft
-        (hRestrictionToVerticalLine params
-          (constructedPastedSubMeas params family k)))
-      (IdxSubMeas.liftRight
-        (verticalLineMeasurementFamily params strategy))
+      (hRestrictionToVerticalLine params
+        (constructedPastedSubMeas params family k))
+      (verticalLineMeasurementFamily params strategy)
       (hBConsistencyError params eps delta gamma zeta k)
 
 /-- Output package for `lem:over-all-outcomes`. -/
