@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.Preliminaries.SelfConsistency
 
 /-!
 # Section 12 — Theorems
@@ -399,15 +400,22 @@ lemma gCompleteSelfConsistency
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (zeta : Error)
+    (hperm : PermInvState ψbi)
     (hself : family.StronglySelfConsistent ψbi zeta) :
-    GCompleteSelfConsistencyStatement params ψbi family zeta := by
+    GCompleteSelfConsistencyStatement params ψbi family (2 * zeta) := by
   /-
   Paper reference: `lem:g-complete-self-consistency` in
   `references/ldt-paper/ld-pasting.tex`.
   This should convert slice strong self-consistency into self-consistency of the
   complete part `G^x = ∑_g G^x_g`.
   -/
-  sorry
+  refine ⟨?_⟩
+  simpa [completePartLeftFamily, completePartRightFamily, completePartSubMeas,
+    IdxProjSubMeas.toIdxSubMeas] using
+    (MIPStarRE.LDT.Preliminaries.twoNotionsOfSelfConsistencyAfterEvaluation
+      ψbi hperm (uniformDistribution (SliceQuestion params))
+      (IdxProjSubMeas.toIdxSubMeas family.meas) zeta (fun _ => ())
+      hself.sliceSelfConsistency)
 
 /-- `cor:g-bot-self-consistency`. -/
 theorem gBotSelfConsistency
