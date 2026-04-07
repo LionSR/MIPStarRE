@@ -289,8 +289,9 @@ structure StronglySelfConsistent {params : Parameters} [FieldModel params.q]
     (family : IdxPolyFamily params ι)
     (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop where
   sliceSelfConsistency :
-    BipartiteSSCRel ψ (uniformDistribution (Fq params))
-      (IdxProjSubMeas.toIdxSubMeas family.meas)
+    SDDRel ψ (uniformDistribution (Fq params))
+      (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas))
+      (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas))
       zeta
 
 structure Bounded {params : Parameters} [FieldModel params.q]
