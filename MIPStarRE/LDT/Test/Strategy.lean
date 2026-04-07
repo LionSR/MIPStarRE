@@ -110,15 +110,15 @@ structure ProjStrat (params : Parameters) [FieldModel params.q]
 namespace SymStrat
 
 /-- Trace-based failure surrogate for the axis-parallel lines test.
-Alice's point answers are lifted to the left tensor factor, and Bob's
-line answers are lifted to the right tensor factor. -/
+Alice's point answers act on the left register, and Bob's line answers
+act on the right register of the bipartite state. -/
 noncomputable def axisParallelFailureProbability {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
-  consError strategy.state
+  bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
-    (IdxSubMeas.liftLeft (axisParallelPointAnswerFamily strategy))
-    (IdxSubMeas.liftRight (axisParallelLineAnswerFamily strategy))
+    (axisParallelPointAnswerFamily strategy)
+    (axisParallelLineAnswerFamily strategy)
 
 /-- Trace-based failure surrogate for the self-consistency test.
 Uses the bipartite SSC defect (cross-register overlap `∑ ev(A ⊗ A)`),
@@ -131,15 +131,15 @@ noncomputable def selfConsistencyFailureProbability {params : Parameters}
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
 
 /-- Trace-based failure surrogate for the diagonal lines test.
-Alice's point answers are lifted to the left tensor factor, and Bob's
-diagonal-line answers are lifted to the right tensor factor. -/
+Alice's point answers act on the left register, and Bob's diagonal-line
+answers act on the right register of the bipartite state. -/
 noncomputable def diagonalFailureProbability {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
-  consError strategy.state
+  bipartiteConsError strategy.state
     (uniformDistribution (DiagonalTestSample params))
-    (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-    (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy))
+    (diagonalPointAnswerFamily strategy)
+    (diagonalLineAnswerFamily strategy)
 
 /-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
 structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -181,10 +181,10 @@ noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
   let left := strategy.leftAsSymmetric
   let right := strategy.rightAsSymmetric
   let pointAgreement :=
-    consError strategy.state
+    bipartiteConsError strategy.state
       (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeasRight strategy.pointMeasurementB)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
   let axisParallelBranch :=
     pointAgreement
       + (left.axisParallelFailureProbability + right.axisParallelFailureProbability) / 2
@@ -280,8 +280,8 @@ structure ConsistentWithPoints {params : Parameters} [FieldModel params.q]
     (strategy : SymStrat params.next ι) (zeta : Error) : Prop where
   pointConsistency :
     ConsRel strategy.state (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (IdxSubMeas.liftRight family.evaluatedAtNextPoint)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      family.evaluatedAtNextPoint
       zeta
 
 structure StronglySelfConsistent {params : Parameters} [FieldModel params.q]

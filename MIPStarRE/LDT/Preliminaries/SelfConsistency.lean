@@ -4,12 +4,12 @@ import MIPStarRE.LDT.Preliminaries.Triangles
 /-!
 # Self-Consistency Extensions
 
-Additional proposition statements from
-`references/ldt-paper/preliminaries.tex`.
+Proofs of the five self-consistency propositions from the paper
+(Section 3, `references/ldt-paper/preliminaries.tex`).
 
-All five propositions from the paper are now fully proved. 
-This file records the exact signatures together with proof-sketch comments
+## References
 
+* arXiv:2009.12982, Section 3 (Propositions on self-consistency)
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -78,9 +78,10 @@ theorem otherTwoNotionsOfSelfConsistency {Question Outcome : Type*}
     (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error) :
     BipartiteSSCRel ψ 𝒟 A δ →
-      ConsRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftRight A) δ := by
+      @ConsRel Question Outcome ι ι _ _ _ _ _ ψ 𝒟 A A δ := by
   intro ⟨hssc⟩
   constructor
+  rw [bipartiteConsError_eq_consError_placed]
   unfold consError
   calc
     avgOver 𝒟

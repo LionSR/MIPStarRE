@@ -224,13 +224,22 @@ theorem orthonormalization {Outcome : Type*}
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
 with `B`, then `A` is `2ζ`-almost-projective. -/
 lemma consistencyToAlmostProjective {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A B : Measurement Outcome ι) (ζ : Error) :
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
-      AlmostProjMeasStatement ψ A
+      AlmostProjMeasStatement ψ
+        ({ toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
+           total_eq_one := by
+             ext i j
+             rcases i with ⟨i₁, i₂⟩
+             rcases j with ⟨j₁, j₂⟩
+             simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] } :
+          Measurement Outcome (ιA × ιB))
         (consistencyToAlmostProjectiveError ζ) := by
   -- TODO: Show consistency implies almost-projectivity with the stated error in
   -- the orthonormalization proof; blocked on bridge lemmas from `ConsRel` to
@@ -264,11 +273,9 @@ lemma adjustTruncatedProjections {Outcome : Type*}
   -- blocked on projection-rounding infrastructure.
   sorry
 
-universe uAlmost uRounded
-
 /-- Compose spectral truncation and adjustment to round an
 almost-projective measurement to a projective submeasurement. -/
-lemma roundAlmostProjMeas {Outcome : Type*}
+lemma roundAlmostProjMeas.{uAlmost, uRounded} {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
@@ -283,7 +290,7 @@ lemma roundAlmostProjMeas {Outcome : Type*}
       (Outcome := Outcome) (ι := ι) ψ A ζ hAlmost)
 
 /-- Increase the allowed error bound for a rounded-projective witness. -/
-private lemma roundedProjMeasStatement_mono.{uRoundedMono} {Outcome : Type*}
+lemma roundedProjMeasStatement_mono.{uRoundedMono} {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     {ψ : QuantumState ι} {A : Measurement Outcome ι} {P : ProjSubMeas Outcome ι}
@@ -319,26 +326,48 @@ private lemma orthonormalizationMainLemma_error_bound (ζ : Error) :
 
 /-- `lem:orthonormalization-main-lemma`. -/
 lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι)
-    (A B : Measurement Outcome ι) (ζ : Error) :
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement.{_, _, uRound} ψ A P
+      let A_lifted : Measurement Outcome (ιA × ιB) :=
+        { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
+          total_eq_one := by
+            ext i j
+            rcases i with ⟨i₁, i₂⟩
+            rcases j with ⟨j₁, j₂⟩
+            simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
+      ∃ P : ProjSubMeas Outcome (ιA × ιB),
+        RoundedProjMeasStatement.{_, _, uRound}
+          ψ A_lifted P
           (orthonormalizationMainLemmaError ζ) := by
   intro hCons
+  let A_lifted : Measurement Outcome (ιA × ιB) :=
+    { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
+      total_eq_one := by
+        ext i j
+        rcases i with ⟨i₁, i₂⟩
+        rcases j with ⟨j₁, j₂⟩
+        simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
   have hAlmost :
       AlmostProjMeasStatement.{_, _, uRound}
-        ψ A (consistencyToAlmostProjectiveError ζ) :=
-    consistencyToAlmostProjective.{_, _, uRound} ψ A B ζ hCons
+        ψ A_lifted
+          (consistencyToAlmostProjectiveError ζ) := by
+    simpa using
+      (consistencyToAlmostProjective
+        (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons)
   have hRound :
-      ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement.{_, _, uRound} ψ A P
+      ∃ P : ProjSubMeas Outcome (ιA × ιB),
+        RoundedProjMeasStatement.{_, _, uRound}
+          ψ A_lifted P
           (roundingToProjectiveError (consistencyToAlmostProjectiveError ζ)) :=
-    roundAlmostProjMeas ψ A (consistencyToAlmostProjectiveError ζ) hAlmost
+    roundAlmostProjMeas (ψ := ψ)
+      (A := A_lifted)
+      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost
   obtain ⟨P, hRounded⟩ := hRound
   refine ⟨P, ?_⟩
   exact roundedProjMeasStatement_mono hRounded

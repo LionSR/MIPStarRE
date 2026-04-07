@@ -21,8 +21,8 @@ theorem mainInduction
     (hk : params.m * params.d ≤ k) :
     ∃ G : Measurement (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-        (polynomialEvaluationFamily params G.toSubMeas.liftRight)
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
   /-
   This is the full inductive argument from `inductive_step.tex`: it combines the
@@ -42,8 +42,8 @@ theorem selfImprovementInInductionSection
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
     (hcons : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (polynomialEvaluationFamily params G.liftRight) nu) :
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   /-
