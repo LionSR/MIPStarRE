@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems
+import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 import Mathlib.Analysis.Fourier.ZMod
 
 /-!

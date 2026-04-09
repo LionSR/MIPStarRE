@@ -52,7 +52,6 @@ MIPStarRE.LDT.CommutativityPoints.commutativityPoints
 MIPStarRE.LDT.Commutativity.commDataProcessedG
 MIPStarRE.LDT.Commutativity.normalizationCondition
 MIPStarRE.LDT.Commutativity.comMain
-MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection
 MIPStarRE.LDT.Pasting.ldPasting
 MIPStarRE.LDT.Pasting.ldPastingSubMeas
 MIPStarRE.LDT.Pasting.ldDnoteq
@@ -73,4 +72,5 @@ MIPStarRE.LDT.Pasting.chernoffBernoulliMatrix
 MIPStarRE.LDT.Pasting.ldPastingNCompleteness
 MIPStarRE.LDT.MainInductionStep.restrictedProbabilities
 MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
+MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection
 MIPStarRE.LDT.MainInductionStep.mainInduction

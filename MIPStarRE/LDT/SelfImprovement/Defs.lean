@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems
+import MIPStarRE.LDT.MainInductionStep.Defs
 
 /-!
 # Section 9 — Definitions
