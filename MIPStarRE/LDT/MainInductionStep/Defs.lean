@@ -1,14 +1,17 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
 
-set_option linter.style.longLine false
-
 /-!
-Definitions for Section 6 of the low individual degree paper in
-`references/ldt-paper/inductive_step.tex`.
+# Section 6 — Definitions
 
 This file contains restriction/lifting maps, section-local error terms,
 averaging operators, and temporary tensor-placement helpers.
+
+## References
+
+- `references/ldt-paper/inductive_step.tex`
 -/
+
+set_option linter.style.longLine false
 
 namespace MIPStarRE.LDT.MainInductionStep
 
