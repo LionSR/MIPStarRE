@@ -159,7 +159,7 @@ where
   \[
     H_{[h(u,x)=a]} \ot I \simeq_{\nu_6+\sqrt{8m\eps+4\delta}} I \ot A_a^{u,x}.
   \]
-  The paper estimates this error by
+  Since $\sqrt{8m\eps+4\delta}\le 3m(\eps^{1/32}+\delta^{1/32})$ for $\eps,\delta\le 1$, the total error is at most
   \[
     \sqrt{8m\eps+4\delta}+\nu_6 \le 47k^2m\left(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right)\le \nu,
   \]
@@ -454,7 +454,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
   \]
   where $\theta_2 = 12\sqrt{\zeta} + 4\sqrt{\theta_1}$.
 
-  The paper bounds these errors by
+  Since $\nu_{\mathrm{com}}=30m(\gamma^{1/4}+\zeta^{1/4}+(d/q)^{1/4})$, these errors satisfy
   \[
     \theta_1 \le 36m\left(\gamma^{1/8}+\zeta^{1/8}+(d/q)^{1/8}\right)\le \nu_2,
   \]
@@ -664,6 +664,33 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
     44k^2m\left(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right)
     = \nu_6.
   \]
+\end{proof}
+
+\begin{corollary}[Consistency of $H$ with $A$]\label{cor:h-a-consistency}
+  \uses{lem:h-b-consistency}
+  On average over $(u,x) \sim \F_q^{m+1}$,
+  \[
+    H_{[h(u,x)=a]} \ot I \simeq_{\nu} I \ot A_a^{u,x}.
+  \]
+\end{corollary}
+\begin{proof}
+  \uses{lem:h-b-consistency, prop:triangle-sub}
+  Lemma~\ref{lem:h-b-consistency} implies
+  \[
+    H_{[h(u,x)=a]} \ot I \simeq_{\nu_6} I \ot B^u_{[f(x)=a]}.
+  \]
+  Applying \ref{prop:triangle-sub} to this relation and \ref{eq:ld-abcon} gives
+  \[
+    H_{[h(u,x)=a]} \ot I \simeq_{\nu_6+\sqrt{8m\eps+4\delta}} I \ot A_a^{u,x}.
+  \]
+  Since
+  \[
+    \sqrt{8m\eps+4\delta} + \nu_6
+    \le
+    47k^2m\left(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right)
+    \le \nu,
+  \]
+  the claim follows.
 \end{proof}
 
 \subsection{Completeness of $H$}

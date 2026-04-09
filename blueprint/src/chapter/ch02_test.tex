@@ -4,11 +4,16 @@
 
 \section{The game and its strategies}
 
+\begin{definition}[Roles]\label{def:roles}
+  A role is an element of $\{\mathrm A,\mathrm B\}$. For a role $r \in \{\mathrm A,\mathrm B\}$, write $\overline r$ for the other element of $\{\mathrm A,\mathrm B\}$.
+\end{definition}
+
 \begin{definition}[Low individual degree test]\label{def:low-individual-degree-test}
+  \uses{def:roles}
   Fix integers $m,d \ge 0$ and a prime power $q$. The $(m,q,d)$ low individual degree test has three equally likely subtests.
-  In the axis-parallel lines test, choose a uniformly random role $r \in \{\mathrm A,\mathrm B\}$, a uniformly random point $u \in \F_q^m$, and a uniformly random coordinate $i \in \{1,\dots,m\}$. Let $\ell=\{u+t e_i : t \in \F_q\}$. Player $r$ receives $\ell$ and returns a degree-$d$ univariate polynomial $f\colon \ell \to \F_q$; Player $\bar r$ receives $u$ and returns a field element $a \in \F_q$. The verifier accepts when $f(u)=a$.
+  In the axis-parallel lines test, choose a uniformly random role $r \in \{\mathrm A,\mathrm B\}$, a uniformly random point $u \in \F_q^m$, and a uniformly random coordinate $i \in \{1,\dots,m\}$. Let $\ell=\{u+t e_i : t \in \F_q\}$. Player $r$ receives $\ell$ and returns a degree-$d$ univariate polynomial $f\colon \ell \to \F_q$; Player $\overline r$ receives $u$ and returns a field element $a \in \F_q$. The verifier accepts when $f(u)=a$.
   In the self-consistency test, both provers receive the same uniformly random point $u \in \F_q^m$ and must return the same field element.
-  In the diagonal lines test, choose a uniformly random role $r \in \{\mathrm A,\mathrm B\}$, a uniformly random point $u \in \F_q^m$, a uniformly random index $i \in \{1,\dots,m\}$, and a uniformly random direction vector $v \in \F_q^m$ whose last $m-i$ coordinates are $0$. Let $\ell=\{u+t v : t \in \F_q\}$. Player $r$ receives $\ell$ and returns a degree-$md$ univariate polynomial $f\colon \ell \to \F_q$; Player $\bar r$ receives $u$ and returns a field element $a \in \F_q$. The verifier accepts when $f(u)=a$.
+  In the diagonal lines test, choose a uniformly random role $r \in \{\mathrm A,\mathrm B\}$, a uniformly random point $u \in \F_q^m$, a uniformly random index $i \in \{1,\dots,m\}$, and a uniformly random direction vector $v \in \F_q^m$ whose last $m-i$ coordinates are $0$. Let $\ell=\{u+t v : t \in \F_q\}$. Player $r$ receives $\ell$ and returns a degree-$md$ univariate polynomial $f\colon \ell \to \F_q$; Player $\overline r$ receives $u$ and returns a field element $a \in \F_q$. The verifier accepts when $f(u)=a$.
 \end{definition}
 
 \begin{remark}\label{fig:test}
@@ -22,6 +27,10 @@
 \begin{definition}[General projective strategy]\label{def:projective-strategy}
   A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
 \end{definition}
+
+\begin{remark}\label{rem:strategy-convention}
+  Throughout this work, the term strategy refers to a projective strategy, and the term symmetric strategy refers to a symmetric projective strategy.
+\end{remark}
 
 \begin{definition}[Good strategy]\label{def:good-strategy}
   A strategy is $(\eps,\delta,\gamma)$-good if it passes the axis-parallel lines test with probability at least $1-\eps$, the self-consistency test with probability at least $1-\delta$, and the diagonal lines test with probability at least $1-\gamma$.

@@ -12,7 +12,14 @@ For complex numbers $\alpha,\beta \in \C$, write $\alpha \approx_\eps \beta$ whe
 
 Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p$ denote the finite-field trace.
 
-\begin{proposition}\label{prop:fourier-fact-scalar}
+\begin{definition}[Finite field trace]\label{def:ff-trace}
+  The finite-field trace is the map $\tr:\F_q\to\F_p$ defined by
+  \[
+    \tr[x] = \sum_{\ell=0}^{t-1} x^{p^\ell}.
+  \]
+\end{definition}
+
+\begin{lemma}\label{prop:fourier-fact-scalar}
   Let $a \in \F_q$. Then
   \begin{equation*}
     \E_{\bx \sim \F_q} \omega^{\tr[\bx \cdot a]}
@@ -21,7 +28,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
     	0 & \text{otherwise}.
     	\end{array}\right.
   \end{equation*}
-\end{proposition}
+\end{lemma}
 \begin{proof}
   If $a=0$, then $\tr[\bx\cdot a]=0$ for every $\bx$, so the average is $1$. If $a\neq 0$, choose $y \in \F_q$ such that $\tr[a\cdot y]\neq 0$, and set
   \[
@@ -35,7 +42,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
   Since $\omega^{\tr[y\cdot a]}\neq 1$, it follows that $C=0$.
 \end{proof}
 
-\begin{proposition}\label{prop:fourier-fact-vector}
+\begin{lemma}\label{prop:fourier-fact-vector}
   \uses{prop:fourier-fact-scalar}
   Let $v \in \F_q^m$. Then
   \begin{equation*}
@@ -45,7 +52,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
     	0 & \text{otherwise}.
     	\end{array}\right.
   \end{equation*}
-\end{proposition}
+\end{lemma}
 \begin{proof}
   By linearity of the trace and independence of the coordinates,
   \[
@@ -58,6 +65,14 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \begin{definition}[Low individual degree polynomials]\label{def:polyfunc}
   Let $\polyfunc{m}{q}{d}$ be the set of polynomials $g \in \F_q[x_1,\dots,x_m]$ whose degree in each variable is at most $d$, viewed as functions $\F_q^m \to \F_q$ via evaluation. (Over finite fields, distinct low-degree polynomials can induce the same function; we identify elements of $\polyfunc{m}{q}{d}$ with their polynomial representatives, not their functional equivalence classes.)
 \end{definition}
+
+\begin{remark}\label{rem:individual-degree-convention}
+  Here, ``individual degree $d$'' means degree at most $d$ in each coordinate. In
+  particular,
+  \[
+    \polyfunc{m}{q}{d} \subseteq \polyfunc{m}{q}{d+1}.
+  \]
+\end{remark}
 
 \begin{lemma}[Schwartz--Zippel lemma~\cite{Sch80,Zip79}]\label{lem:schwartz-zippel-total-degree}
   Let $g, h:\F_q^m \rightarrow \F_q$ be two distinct polynomials of total degree~$d$.
@@ -98,6 +113,31 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
     A_{[f(a)=b]} = \sum_{a\, :\, f(a)=b} A_a.
   \]
 \end{definition}
+
+\begin{proposition}[Post-processing preserves measurements]\label{prop:post-processing-preserves}
+  \uses{def:post-processing, def:submeasurement}
+  Let $A=\{A_a\}_{a \in \mathcal A}$ be a family of operators and let
+  $f\colon \mathcal A \to \mathcal B$. Then
+  \[
+    \sum_a A_a = \sum_b A_{[f(a)=b]}.
+  \]
+  Consequently, if $\{A_a\}$ is a submeasurement, respectively a measurement, then
+  $\{A_{[f(a)=b]}\}$ is again a submeasurement, respectively a measurement.
+\end{proposition}
+\begin{proof}
+  Each $a \in \mathcal A$ contributes exactly once to the right-hand side, namely in
+  the summand indexed by $b=f(a)$.
+\end{proof}
+
+\begin{remark}[Post-processing notation]\label{rem:post-processing-notation}
+  In the notation $A_{[f(a)=b]}$, the measurement outcome is the variable to which
+  the function is applied. For example, if $G=\{G_g\} \in \polysub{m}{q}{d}$ and
+  $u \in \F_q^m$, then
+  \[
+    G_{[g(u)=a]} = \sum_{g\,:\,g(u)=a} G_g.
+  \]
+  Here $g$ is the measurement outcome, and $u$ is the evaluation point.
+\end{remark}
 
 \begin{definition}[Completion of a submeasurement]\label{def:measurement-completion}
   \lean{MIPStarRE.LDT.Preliminaries.completeAtOutcome}
@@ -198,10 +238,20 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   Expand the squared norm of $(A_a^x \ot I - I \ot B_a^x)\ket{\psi}$ and use the diagonal-overlap formula from Lemma~\ref{prop:simeq-for-measurements}.
 \end{proof}
 
+\begin{remark}\label{rem:simeq-not-approx-submeas}
+  The implication above does not extend to submeasurements. For example, if
+  $A_a^x=0$ for all $a$, then $A_a^x \ot I \simeq_0 I \ot B_a^x$, but
+  \[
+    \E_{\bx} \sum_a \lVert (A^{\bx}_a \ot I - I \ot B^{\bx}_a)\ket{\psi} \rVert^2
+    = \E_{\bx} \sum_a \lVert (I \ot B^{\bx}_a)\ket{\psi} \rVert^2,
+  \]
+  which is nonzero unless $(I \ot B_a^x)\ket{\psi}=0$ for all $x$ and $a$.
+\end{remark}
+
 \section{Consistency from state-dependent distance}
 \label{sec:consistency-from-state-dependent-distance}
 
-\begin{proposition}[Closeness of inner products]\label{prop:closeness-of-ip}
+\begin{theorem}[Closeness of inner products]\label{prop:closeness-of-ip}
   \lean{MIPStarRE.LDT.Preliminaries.closenessOfIP, MIPStarRE.LDT.Preliminaries.closenessOfIPAdjoint}
   \leanok
   \uses{def:approx_delta}
@@ -221,7 +271,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \begin{equation}
     \E_{\bx} \sum_{a,b} \bra{\psi} A^{\bx}_a  C^{\bx}_{a,b} \ket{\psi} \approx_{\sqrt{\gamma}} \E_{\bx} \sum_{a,b} \bra{\psi} B^{\bx}_a  C^{\bx}_{a,b}  \ket{\psi}. \label{eq:closeness4}
   \end{equation}
-\end{proposition}
+\end{theorem}
 \begin{proof}
   \leanok
   To prove \eqref{eq:closeness3}, write the difference as
@@ -240,7 +290,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   and apply \eqref{eq:closeness3} to the adjoint families.
 \end{proof}
 
-\begin{proposition}\label{prop:easy-approx-from-approx-delta}
+\begin{theorem}\label{prop:easy-approx-from-approx-delta}
   \lean{MIPStarRE.LDT.Preliminaries.easyApproxFromApproxDelta}
   \leanok
   \uses{def:submeasurement, def:approx_delta}
@@ -249,7 +299,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
     \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a  C^{\bx}_a \ket{\psi}
     \approx_{\sqrt{\delta}} \E_{\bx} \sum_a \bra{\psi} B^{\bx}_a  C^{\bx}_a \ket{\psi}.
   \end{equation*}
-\end{proposition}
+\end{theorem}
 \begin{proof}
   \leanok
   The difference has magnitude
@@ -264,7 +314,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   The first factor is at most $\sqrt{\delta}$ by hypothesis, and the second is at most $1$ because $C$ is a submeasurement.
 \end{proof}
 
-\begin{proposition}\label{prop:cab-approx-delta}
+\begin{theorem}\label{prop:cab-approx-delta}
   \lean{MIPStarRE.LDT.Preliminaries.cabApproxDelta}
   \leanok
   \uses{def:approx_delta}
@@ -276,7 +326,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \[
     C^{x}_{a,b} A^x_{a} \approx_{\delta} C^{x}_{a,b} B^{x}_a.
   \]
-\end{proposition}
+\end{theorem}
 \begin{proof}
   \leanok
   The error term is
@@ -568,7 +618,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 
 % prop:cool-prop from the paper is the same result as lem:self-consistency-same-side-square above.
 % We keep the label for cross-reference fidelity.
-\begin{proposition}\label{prop:cool-prop}
+\begin{theorem}\label{prop:cool-prop}
   \lean{MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass}
   \leanok
   \uses{lem:self-consistency-same-side-square}
@@ -576,7 +626,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
   \[
     \sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi} \geq \sum_a \bra{\psi} A_a \ot I \ket{\psi} -\zeta.
   \]
-\end{proposition}
+\end{theorem}
 \begin{proof}
   \leanok
   \uses{lem:self-consistency-same-side-square}

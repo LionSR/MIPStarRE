@@ -449,17 +449,71 @@ Henceforth let $Q=\{Q_a\}$ be the family given by \ref{lem:projective-low-rank-s
   using \ref{eq:assumption-on-zeta} in the last step.
 \end{proof}
 
-For each $a$, let $m_a$ be the rank of $Q_a$, choose an orthonormal basis $\ket{v_{a,1}},\ldots,\ket{v_{a,m_a}}$ for the range of $Q_a$, let $m=\sum_a m_a$, and choose an orthonormal basis of $\C^m$ consisting of vectors $\ket{a,i}$ for all $a$ and $1 \leq i \leq m_a$. Define
+\begin{definition}[Matrix decomposition of~$Q_a$]\label{def:matrix-decomposition-Q}
+For each $a$, let
+\[
+  m_a = \mathrm{rank}(Q_a),
+\]
+and let $\ket{v_{a,1}},\ldots,\ket{v_{a,m_a}}$ be an orthonormal basis for the range of $Q_a$, so that
+\[
+  Q_a = \sum_{i=1}^{m_a} \ket{v_{a,i}}\bra{v_{a,i}}.
+\]
+Let
+\[
+  m = \sum_a m_a,
+\]
+and let $\{\ket{a,i}\}$ be an orthonormal basis of $\C^m$, indexed by all $a$ and all
+$1 \leq i \leq m_a$. For each $a$, define
 \[
   X_a = \sum_{i=1}^{m_a} \ket{a,i}\bra{v_{a,i}},
   \qquad
   T_a = \sum_{i=1}^{m_a} \ket{a,i}\bra{a,i},
 \]
-and
+and define
 \begin{equation}\label{eq:looks-like-singular-value-decomposition}
   X = \sum_a X_a = \sum_a \sum_{i=1}^{m_a} \ket{a,i}\bra{v_{a,i}}.
 \end{equation}
-Let $X = U \cdot \Sigma_{m \times d} \cdot V^\dagger$ be the singular value decomposition of $X$, where $U$ is $m \times m$ unitary, $V$ is $d \times d$ unitary, and $\Sigma_{m \times d}$ is diagonal with nonnegative real entries. Write $I_{h \times w}$ for the rectangular identity matrix, and for $h,w \geq m$ write $\Sigma_{h \times w}$ for the diagonal matrix extending the diagonal of $\Sigma_{m \times d}$ by zeros.
+Let $T = \{T_a\}$. Then $T$ is a projective measurement on $\C^m$.
+\end{definition}
+
+\begin{definition}[SVD of~$X$]\label{def:svd-of-X}
+Let
+\[
+  X = U \cdot \Sigma_{m \times d} \cdot V^\dagger
+\]
+be the singular value decomposition of $X$. Thus $U$ is an $m \times m$ unitary matrix,
+$V$ is a $d \times d$ unitary matrix, and $\Sigma_{m \times d}$ is an
+$m \times d$ diagonal matrix with nonnegative real entries on its diagonal.
+
+For positive integers $h$ and $w$, write $I_{h \times w}$ for the $h \times w$ matrix
+with $1$'s on its diagonal and $0$'s elsewhere. For integers $h,w \geq m$, write
+$\Sigma_{h \times w}$ for the $h \times w$ diagonal matrix whose diagonal agrees with
+that of $\Sigma_{m \times d}$ and is zero elsewhere.
+\end{definition}
+
+\begin{remark}\label{rem:motivation-for-P}
+If the family $\{Q_a\}$ were a projective measurement, then the vectors
+$\ket{v_{a,i}}$, over all $a$ and all $1 \leq i \leq m_a$, would be orthonormal.
+Then \eqref{eq:looks-like-singular-value-decomposition} would already be a singular value
+decomposition of $X$, with $\Sigma = I_{m \times d}$. Equivalently,
+\[
+  X = U \cdot I_{m \times d} \cdot V^\dagger.
+\]
+This motivates replacing $\Sigma$ by $I$ in the definition of $\widehat X$ and $P$.
+\end{remark}
+
+\begin{definition}[Definition of~$P$]\label{def:projective-P}
+Define
+\[
+  \widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger.
+\]
+For each $a$, define
+\[
+  \widehat{X}_a = T_a \cdot \widehat{X},
+  \qquad
+  P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a.
+\]
+\end{definition}
 
 \begin{lemma}\label{lem:xa-t}
 For each $a$,
@@ -572,15 +626,6 @@ For each $a$,
   \]
   gives the claim.
 \end{proof}
-
-Define
-\[
-  \widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger,
-  \qquad
-  \widehat{X}_a = T_a \cdot \widehat{X},
-  \qquad
-  P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a.
-\]
 
 \begin{lemma}[$P_a$ restated]\label{lem:pa-restated}
 For each $a$,
