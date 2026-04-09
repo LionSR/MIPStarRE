@@ -443,9 +443,37 @@ lemma generalizeB
       ∀ g : Polynomial params,
         generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params := by
     intro g
-    -- TODO: Bound `generalizeBDeviationAtPolynomial` by `generalizeBError` for
-    -- each `g` (`lem:generalize-b`); blocked on instantiating the matrix
-    -- realization / transfer lemma.
+    -- Proof outline from `references/ldt-paper/expansion.tex`, Lemma
+    -- `lem:generalize-b`:
+    --
+    -- 1. For each incident pair `qu = (ℓ, u)`, rewrite
+    --    `generalizeBLeftOperatorAtPolynomial - generalizeBRightOperatorAtPolynomial`
+    --    as the sum of those line outcomes `f` with
+    --    `f ≠ g|_ℓ` but `f` agreeing with `g` at the sampled point on `ℓ`.
+    -- 2. Use projectivity / orthogonality of `strategy.axisParallelMeasurement ℓ`
+    --    to collapse `(Dᴴ * D)` back to the same "bad outcomes" sum.
+    -- 3. Use `conjTranspose_opTensor`, `opTensor_mul`, and the square-root
+    --    identity for `polynomialWeightSqrtOperator` to rewrite the weighted term
+    --    as `opTensor badEvent (G.outcome g)`.
+    -- 4. Average over the sampled point on `ℓ`, apply Schwartz-Zippel to bound
+    --    the agreement probability of each bad `f` with `g|_ℓ`, and then use
+    --    that `G` is a submeasurement to conclude the total contribution is at
+    --    most `(params.m * params.d) / params.q`.
+    --
+    -- The current API is still missing the bridge needed for Step 1:
+    --
+    -- * `generalizeBLeftOperatorAtPolynomial` evaluates a line answer at
+    --   `u ℓ.direction`, but the actual axis-parallel test interface
+    --   (`axisParallelLineAnswerFamily`) treats line answers as functions of the
+    --   affine line parameter `t` with `u = ℓ.pointAt t`.
+    -- * Consequently, the paper's "agree at the sampled point on `ℓ`" event is
+    --   not yet available in a form that lets us isolate the bad outcomes and
+    --   invoke the univariate Schwartz-Zippel bound.
+    -- * There is also no abstract-to-matrix transfer lemma here exposing the
+    --   already intended concrete realization of this weighted deviation.
+    --
+    -- Once the line-parameter representation is normalized, the remaining proof
+    -- should follow the paper calculation directly and does not need `hgood`.
     sorry
   refine
     { aggregateFamilyComparison := by
