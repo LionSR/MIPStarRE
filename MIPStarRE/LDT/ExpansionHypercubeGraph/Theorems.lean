@@ -846,13 +846,14 @@ private lemma matrixTraceForm_localToGlobal (params : Parameters)
       matrixTensorOperator (((hypercubeSpectralGap params : ℂ) •
           orthogonalModeProjectorMatrix params)) model.state.matrix ≤
         matrixTensorOperator (matrixLaplacianOperator params) model.state.matrix := by
-    exact matrixTensorOperator_mono_left
+    exact MIPStarRE.LDT.ExpansionHypercubeGraph.matrixTensorOperator_mono_left
       (hypercubeSpectralGap_operator params) model.state.positive
   have hwitness :
       ((hypercubeSpectralGap params : ℂ) • matrixGlobalVarianceTraceWitness params model) ≤
         matrixLocalVarianceTraceWitness params model := by
     have hraw :=
-      conjTranspose_mul_mul_mono (matrixCombinedColumnOperator params model) htensor
+      MIPStarRE.LDT.ExpansionHypercubeGraph.conjTranspose_mul_mul_mono
+        (matrixCombinedColumnOperator params model) htensor
     rw [globalWitness_smul] at hraw
     simpa [matrixLocalVarianceTraceWitness] using hraw
   have htrace :
@@ -861,7 +862,7 @@ private lemma matrixTraceForm_localToGlobal (params : Parameters)
             (matrixGlobalVarianceTraceWitness params model)) ≤
         Complex.re (MIPStarRE.Quantum.normalizedTrace
           (matrixLocalVarianceTraceWitness params model)) := by
-    have hmono := normalizedTrace_re_mono hwitness
+    have hmono := MIPStarRE.LDT.ExpansionHypercubeGraph.normalizedTrace_re_mono hwitness
     rw [normalizedTrace_re_smul_real] at hmono
     exact hmono
   have hm_nonneg : 0 ≤ (params.m : Error) := by positivity
