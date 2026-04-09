@@ -398,7 +398,12 @@ private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
     A.total_eq_one] using hmax'
 
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
-with `B`, then `A` is `2ζ`-almost-projective. -/
+with `B`, then `A` is `2ζ`-almost-projective.
+
+The mathematical implication does not intrinsically need `[Nonempty Outcome]`.
+The assumption is currently required only because `AlmostProjMeasStatement`
+packages an explicit `matrixWitness`, and the local witness below is a delta
+measurement built by choosing a distinguished outcome. -/
 lemma consistencyToAlmostProjective {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -462,6 +467,9 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
         instFintype := inferInstance
         instDecidableEq := inferInstance
         instNonempty := inferInstance }
+    -- The extra `[Nonempty Outcome]` hypothesis is used only here: the packaged
+    -- matrix witness chooses a distinguished outcome and concentrates all mass
+    -- on it to produce a simple delta measurement.
     let pivot : Outcome := Classical.arbitrary Outcome
     let toyState : DensityMatrixState H :=
       { matrix := 1
@@ -646,7 +654,12 @@ private lemma orthonormalizationMainLemma_error_bound (ζ : Error)
         exact mul_le_mul_of_nonneg_left hsqrt_two_le_seven (by norm_num)
       simpa using hcoeff.trans_eq (by norm_num : (12 : Error) * 7 = 84)
 
-/-- `lem:orthonormalization-main-lemma`. -/
+/-- `lem:orthonormalization-main-lemma`.
+
+The `[Nonempty Outcome]` assumption is inherited from
+`consistencyToAlmostProjective`. The underlying orthonormalization statement is
+outcome-agnostic, but the current packaged intermediate statement carries an
+explicit matrix witness whose construction picks a distinguished outcome. -/
 lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
