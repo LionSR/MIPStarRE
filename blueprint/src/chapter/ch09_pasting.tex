@@ -182,6 +182,7 @@ where
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	A uniformly random tuple lies outside $\mathsf{Distinct}_k$ only if two coordinates collide. A union bound gives
 	\[
 		\Pr[x \notin \mathsf{Distinct}_k] \le \sum_{i=2}^k \frac{i-1}{q} = \frac{k(k-1)}{2q}\le \frac{k^2}{q},
@@ -230,6 +231,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Compare $1-\lambda^d$ with $(1-\lambda)(1+\lambda+\cdots+\lambda^{d-1})$ and use that $d^{1/(d+1)} \le 2$.
 \end{proof}
 
@@ -282,6 +284,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Because $G$ is projective, \ref{prop:two-notions-of-self-consistency} identifies the assumed strong self-consistency of the outcome-level family with
 	\begin{equation}\label{eq:ld-g-self-consistency}
 		\E_x \sum_g \bra{\psi} G_g^x \ot G_g^x \ket{\psi}
@@ -309,6 +312,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Since $G_\bot^x = I-G^x$,
 	\[
 		G_\bot^x \ot I - I \ot G_\bot^x = I \ot G^x - G^x \ot I,
@@ -476,6 +480,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	The identities
 	\[
 		G_g^x G_\bot^y - G_\bot^y G_g^x = G^y G_g^x - G_g^x G^y
