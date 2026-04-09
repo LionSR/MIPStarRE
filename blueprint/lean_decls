@@ -73,4 +73,5 @@ MIPStarRE.LDT.Pasting.chernoffBernoulliMatrix
 MIPStarRE.LDT.Pasting.ldPastingNCompleteness
 MIPStarRE.LDT.MainInductionStep.restrictedProbabilities
 MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
+MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection
 MIPStarRE.LDT.MainInductionStep.mainInduction
