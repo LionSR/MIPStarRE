@@ -41,6 +41,15 @@ noncomputable def commutingWithGIncompleteError (params : Parameters)
     (gamma zeta : Error) : Error :=
   commutingWithGCompleteError params gamma zeta
 
+/-- Displayed error term for the pairwise complete-part commutation bound used in
+`cor:G-hat-facts`. -/
+noncomputable def pairwiseCompletePartCommutationError (params : Parameters)
+    (gamma zeta : Error) : Error :=
+  30 * (params.m : Error) *
+    (Real.rpow gamma (1 / (16 : Error)) +
+      Real.rpow zeta (1 / (16 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)))
+
 /-- Displayed self-consistency error for `\widehat G`. -/
 def gHatSelfConsistencyError (zeta : Error) : Error :=
   2 * zeta
@@ -160,8 +169,8 @@ structure GCompleteSelfConsistencyStatement (params : Parameters)
   completePartSelfConsistency :
     SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
-      (completePartLeftFamily params family)
-      (completePartRightFamily params family)
+      (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas))
+      (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas))
       zeta
 
 /-- Output package for `cor:g-bot-self-consistency`. -/
@@ -198,6 +207,20 @@ structure CommutingWithGCompleteStatement (params : Parameters)
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
+  pairwiseCompletePartCommutation :
+    SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (fun q =>
+        OpFamily.leftPlacedOpFamily (ιB := ι) <|
+          orderedProductOpFamily
+            ((family.meas q.1).toSubMeas)
+            ((family.meas q.2).toSubMeas))
+      (fun q =>
+        OpFamily.leftPlacedOpFamily (ιB := ι) <|
+          reversedProductOpFamily
+            ((family.meas q.1).toSubMeas)
+            ((family.meas q.2).toSubMeas))
+      (pairwiseCompletePartCommutationError params gamma zeta)
   pointWithCompletePartCommutation :
     SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))

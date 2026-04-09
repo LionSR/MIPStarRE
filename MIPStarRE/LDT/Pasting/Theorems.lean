@@ -561,30 +561,10 @@ lemma gCompleteSelfConsistency
   /-
   Paper reference: `lem:g-complete-self-consistency` in
   `references/ldt-paper/ld-pasting.tex`.
-  This should convert slice strong self-consistency into self-consistency of the
-  complete part `G^x = ∑_g G^x_g`.
+  This is exactly the slice strong self-consistency hypothesis, repackaged under
+  the Section 12 statement name.
   -/
-  refine ⟨?_⟩
-  refine ⟨?_⟩
-  let hself_sq := hself.sliceSelfConsistency.squaredDistanceBound
-  unfold sddError at *
-  calc
-    avgOver (uniformDistribution (SliceQuestion params))
-        (fun x =>
-          qSDD ψbi
-            ((completePartLeftFamily params family) x)
-            ((completePartRightFamily params family) x))
-      ≤ avgOver (uniformDistribution (SliceQuestion params))
-          (fun x =>
-            qSDD ψbi
-              ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
-              ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x)) := by
-            apply avgOver_mono
-            intro x
-            simpa [completePartLeftFamily, completePartRightFamily,
-              IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjSubMeas.toIdxSubMeas] using
-              qSDD_completePart_le_slice params ψbi hperm family x
-    _ ≤ zeta := hself_sq
+  exact ⟨hself.sliceSelfConsistency⟩
 
 /-- `cor:g-bot-self-consistency`. -/
 theorem gBotSelfConsistency
@@ -593,6 +573,7 @@ theorem gBotSelfConsistency
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (zeta : Error)
+    (hperm : PermInvState ψbi)
     (hcomplete : GCompleteSelfConsistencyStatement params ψbi family zeta) :
     GBotSelfConsistencyStatement params ψbi family zeta := by
   refine {
@@ -600,6 +581,30 @@ theorem gBotSelfConsistency
     incompletePartSelfConsistency := ?_
   }
   rcases hcomplete.completePartSelfConsistency with ⟨hcomplete_bound⟩
+  have hcomplete_total :
+      sddError ψbi
+          (uniformDistribution (SliceQuestion params))
+          (completePartLeftFamily params family)
+          (completePartRightFamily params family)
+        ≤ zeta := by
+    unfold sddError at *
+    calc
+      avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            qSDD ψbi
+              ((completePartLeftFamily params family) x)
+              ((completePartRightFamily params family) x))
+        ≤ avgOver (uniformDistribution (SliceQuestion params))
+            (fun x =>
+              qSDD ψbi
+                ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
+                ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x)) := by
+              apply avgOver_mono
+              intro x
+              simpa [completePartLeftFamily, completePartRightFamily,
+                IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjSubMeas.toIdxSubMeas] using
+                qSDD_completePart_le_slice params ψbi hperm family x
+      _ ≤ zeta := hcomplete_bound
   refine ⟨?_⟩
   calc
     sddError ψbi
@@ -669,7 +674,7 @@ theorem gBotSelfConsistency
                           simp [qSDD, qSDDCore, completePartLeftFamily,
                             completePartRightFamily, completePartSubMeas,
                             leftPlacedSubMeas, rightPlacedSubMeas, T, hcomplete_outcome_T]
-    _ ≤ zeta := hcomplete_bound
+    _ ≤ zeta := hcomplete_total
 
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
@@ -868,7 +873,50 @@ theorem gHatFacts
     -- `Option (Polynomial params)` into complete + incomplete parts and
     -- bound by `2 * zeta`.
     -- Paper reference: `cor:G-hat-facts` in `ld-pasting.tex`.
-    sorry
+    rcases hselfComplete.completePartSelfConsistency with ⟨hcomplete_bound⟩
+    rcases hselfIncomplete.incompletePartSelfConsistency with ⟨hincomplete_bound⟩
+    refine ⟨?_⟩
+    calc
+      sddError ψbi
+          (uniformDistribution (SliceQuestion params))
+          (gHatSelfConsistencyLeftFamily params family)
+          (gHatSelfConsistencyRightFamily params family)
+        =
+          avgOver (uniformDistribution (SliceQuestion params))
+            (fun x =>
+              qSDD ψbi
+                  ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
+                  ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x) +
+                qSDD ψbi
+                  ((incompletePartLeftFamily params family) x)
+                  ((incompletePartRightFamily params family) x)) := by
+            unfold sddError
+            apply avgOver_congr
+            intro x
+            unfold qSDD qSDDCore
+            rw [Fintype.sum_option]
+            have hcomplete_total :
+                (completePartSubMeas params family x).total = (family.meas x).total := by
+              simp [completePartSubMeas, postprocess_total]
+            simpa [gHatSelfConsistencyLeftFamily, gHatSelfConsistencyRightFamily,
+              gHatIdxMeas, completeSubMeas, incompletePartLeftFamily,
+              incompletePartRightFamily, incompletePartSubMeas, leftPlacedSubMeas,
+              rightPlacedSubMeas, SubMeas.liftLeft, SubMeas.liftRight,
+              IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjSubMeas.toIdxSubMeas,
+              hcomplete_total, add_comm, add_left_comm, add_assoc]
+      _ =
+          sddError ψbi
+            (uniformDistribution (SliceQuestion params))
+            (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas))
+            (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) +
+          sddError ψbi
+            (uniformDistribution (SliceQuestion params))
+            (incompletePartLeftFamily params family)
+            (incompletePartRightFamily params family) := by
+              rw [sddError, sddError, avgOver_add]
+      _ ≤ zeta + zeta := add_le_add hcomplete_bound hincomplete_bound
+      _ = gHatSelfConsistencyError zeta := by
+            simp [gHatSelfConsistencyError, two_mul]
   · -- TODO(#199): `completedCommutation`: split gHat pair-product over
     -- `GHatOutcome × GHatOutcome` into complete + incomplete quadrants
     -- and bound by `gHatCommutationError`.
