@@ -73,6 +73,271 @@ noncomputable def orthogonalModeProjectorMatrix (params : Parameters) :
     MatrixOperator (pointHilbertSpace params) :=
   1 - constantModeProjectorMatrix params
 
+private lemma dotProductZMod_comm (params : Parameters) (u α : Point params) :
+    dotProductZMod params u α = dotProductZMod params α u := by
+  unfold dotProductZMod
+  refine Finset.sum_congr rfl ?_
+  intro i _; ring
+
+private lemma fourierBasisState_apply_comm (params : Parameters) (α u : Point params) :
+    fourierBasisState params α u = fourierBasisState params u α := by
+  unfold fourierBasisState
+  rw [addCharFq_dotProduct_eq_stdAddChar_dotProductZMod,
+    addCharFq_dotProduct_eq_stdAddChar_dotProductZMod, dotProductZMod_comm]
+
+private lemma fourierBasisState_inner_product_dual (params : Parameters) (u v : Point params) :
+    ∑ α : Point params,
+      star (fourierBasisState params α u) * fourierBasisState params α v =
+        if u = v then 1 else 0 := by
+  conv_lhs =>
+    arg 2; ext α
+    rw [fourierBasisState_apply_comm params α u, fourierBasisState_apply_comm params α v]
+  exact fourierBasisState_inner_product params u v
+
+private lemma sum_fourierBasisProjector_eq_one (params : Parameters) :
+    (∑ α : Point params, fourierBasisProjector params α) =
+      (1 : MatrixOperator (pointHilbertSpace params)) := by
+  ext u v
+  have key :
+      ∑ α : Point params,
+        (fourierBasisProjector params α) u v =
+      ∑ α : Point params,
+        star (fourierBasisState params α v) * fourierBasisState params α u := by
+    refine Finset.sum_congr rfl ?_
+    intro α _
+    simp [fourierBasisProjector, Matrix.vecMulVec_apply]; ring
+  have hsum :
+      (∑ α : Point params, fourierBasisProjector params α) u v =
+        ∑ α : Point params, (fourierBasisProjector params α) u v := by
+    simpa using
+      (Matrix.sum_apply u v (Finset.univ : Finset (Point params))
+        (fun α => fourierBasisProjector params α))
+  rw [hsum, key, fourierBasisState_inner_product_dual params v u]
+  simp [Matrix.one_apply, eq_comm]
+
+private lemma frequencyWeight_zero (params : Parameters) :
+    frequencyWeight params (0 : Point params) = 0 := by
+  simp [frequencyWeight]
+
+private lemma frequencyWeight_pos_of_ne_zero (params : Parameters) {α : Point params}
+    (hα : α ≠ 0) : 0 < frequencyWeight params α := by
+  rw [frequencyWeight, Finset.card_pos]
+  by_contra hempty
+  apply hα
+  funext i
+  by_contra hi
+  have hi_mem : i ∈ Finset.univ.filter (fun j : Fin params.m => α j ≠ (0 : Fq params)) := by
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    exact hi
+  exact hempty ⟨i, hi_mem⟩
+
+private lemma fourierBasis_norm_sq (params : Parameters) :
+    (((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) *
+      star (((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ))) =
+        (hypercubeVertexCount params : ℂ)⁻¹ := by
+  have hMpos : 0 < (hypercubeVertexCount params : ℝ) := by
+    exact_mod_cast (pow_pos params.hq params.m)
+  have hsqrt_ne : Real.sqrt (hypercubeVertexCount params : ℝ) ≠ 0 :=
+    Real.sqrt_ne_zero'.2 hMpos
+  have hnormR : (Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ *
+      (Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ =
+    (hypercubeVertexCount params : ℝ)⁻¹ := by
+    field_simp [hsqrt_ne]
+    nlinarith [Real.sq_sqrt (le_of_lt hMpos)]
+  have hstar : star ((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) =
+    ((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) := by
+    simp [Complex.conj_ofReal]
+  rw [hstar]
+  simpa [Complex.ofReal_inv, Complex.ofReal_mul] using
+    congrArg (fun x : ℝ => (x : ℂ)) hnormR
+
+private lemma constantModeProjectorMatrix_eq_fourierBasisProjector_zero (params : Parameters) :
+    constantModeProjectorMatrix params = fourierBasisProjector params 0 := by
+  ext u v
+  simp only [constantModeProjectorMatrix, fourierBasisProjector, fourierBasisState,
+    Matrix.vecMulVec_apply, Pi.star_apply]
+  have hzero : ∀ w : Point params, addCharFq params (dotProductFq params w 0) = 1 := by
+    intro w
+    have : dotProductFq params w 0 = ⟨0, params.hq⟩ := by simp [dotProductFq]
+    rw [this]; simp [addCharFq]
+  simp only [star_mul]
+  rw [hzero u, hzero v]
+  simpa [mul_assoc] using (fourierBasis_norm_sq params).symm
+
+private lemma orthogonalModeProjectorMatrix_eq_sum (params : Parameters) :
+    orthogonalModeProjectorMatrix params =
+      ∑ α ∈ (Finset.univ.erase (0 : Point params)), fourierBasisProjector params α := by
+  have hsplit :
+      fourierBasisProjector params 0 +
+          ∑ α ∈ (Finset.univ.erase (0 : Point params)), fourierBasisProjector params α =
+        ∑ α : Point params, fourierBasisProjector params α := by
+    simpa using
+      (Finset.add_sum_erase (s := (Finset.univ : Finset (Point params)))
+        (f := fun α => fourierBasisProjector params α) (by simp))
+  calc
+    orthogonalModeProjectorMatrix params
+      = (∑ α : Point params, fourierBasisProjector params α) - fourierBasisProjector params 0 := by
+          rw [orthogonalModeProjectorMatrix,
+            constantModeProjectorMatrix_eq_fourierBasisProjector_zero,
+            sum_fourierBasisProjector_eq_one]
+    _ = ∑ α ∈ (Finset.univ.erase (0 : Point params)), fourierBasisProjector params α := by
+          have hsplit' := congrArg (fun A => A - fourierBasisProjector params 0) hsplit
+          simpa [sub_eq_add_neg, add_assoc, add_left_comm, add_comm] using hsplit'.symm
+
+private lemma matrixAdjacencyOperator_spectral_decomp (params : Parameters) :
+    matrixAdjacencyOperator params =
+      ∑ α : Point params,
+        (((adjacencyEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α) := by
+  ext u v
+  rw [Matrix.sum_apply]
+  calc
+    (matrixAdjacencyOperator params) u v
+      = ∑ w : Point params,
+          (matrixAdjacencyOperator params) u w *
+            (if v = w then (1 : ℂ) else 0) := by
+              simp
+    _ = ∑ w : Point params,
+          (matrixAdjacencyOperator params) u w *
+            ∑ α : Point params,
+              star (fourierBasisState params α v) * fourierBasisState params α w := by
+            congr 1 with w
+            rw [fourierBasisState_inner_product_dual params v w]
+    _ = ∑ α : Point params,
+          star (fourierBasisState params α v) *
+            ((matrixAdjacencyOperator params).mulVec (fourierBasisState params α)) u := by
+          calc
+            ∑ w : Point params,
+                (matrixAdjacencyOperator params) u w *
+                  ∑ α : Point params,
+                    star (fourierBasisState params α v) * fourierBasisState params α w
+              = ∑ w : Point params,
+                  ∑ α : Point params,
+                    (matrixAdjacencyOperator params) u w *
+                      (star (fourierBasisState params α v) * fourierBasisState params α w) := by
+                        refine Finset.sum_congr rfl ?_
+                        intro w _
+                        rw [Finset.mul_sum]
+            _ = ∑ α : Point params,
+                  ∑ w : Point params,
+                    star (fourierBasisState params α v) *
+                      ((matrixAdjacencyOperator params) u w * fourierBasisState params α w) := by
+                        rw [Finset.sum_comm]
+                        refine Finset.sum_congr rfl ?_
+                        intro α _
+                        refine Finset.sum_congr rfl ?_
+                        intro w _
+                        ring
+            _ = ∑ α : Point params,
+                  star (fourierBasisState params α v) *
+                    ((matrixAdjacencyOperator params).mulVec (fourierBasisState params α)) u := by
+                        refine Finset.sum_congr rfl ?_
+                        intro α _
+                        simpa [Matrix.mulVec, dotProduct] using
+                          (Finset.mul_sum
+                            (s := (Finset.univ : Finset (Point params)))
+                            (a := star (fourierBasisState params α v))
+                            (f := fun i =>
+                              (matrixAdjacencyOperator params) u i *
+                                fourierBasisState params α i)).symm
+    _ = ∑ α : Point params,
+          (((adjacencyEigenvalue params α : Error) : ℂ) •
+            fourierBasisProjector params α) u v := by
+          refine Finset.sum_congr rfl ?_
+          intro α _
+          have hα := congrFun ((eigenvectors params).eigenvectorProperty α) u
+          simp only [Pi.smul_apply] at hα
+          simp [fourierBasisProjector, Matrix.vecMulVec_apply, hα, mul_assoc, mul_comm]
+
+private lemma matrixLaplacianOperator_spectral_decomp (params : Parameters) :
+    matrixLaplacianOperator params =
+      ∑ α : Point params,
+        (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α) := by
+  have hrel :
+      ∀ α : Point params,
+        (((laplacianEigenvalue params α : Error) : ℂ)) =
+          (hypercubeVertexCount params : ℂ)⁻¹ -
+            (((adjacencyEigenvalue params α : Error) : ℂ)) := by
+    intro α
+    simpa [one_div] using
+      congrArg (fun x : Error => (x : ℂ))
+        ((laplacianSpectralGap params).eigenvalueRelation α)
+  calc
+    matrixLaplacianOperator params
+      = ((hypercubeVertexCount params : ℂ)⁻¹) •
+            ∑ α : Point params, fourierBasisProjector params α -
+          ∑ α : Point params,
+            (((adjacencyEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α) := by
+          rw [matrixLaplacianOperator, sum_fourierBasisProjector_eq_one,
+            matrixAdjacencyOperator_spectral_decomp]
+    _ = ∑ α : Point params,
+          (((hypercubeVertexCount params : ℂ)⁻¹ -
+              (((adjacencyEigenvalue params α : Error) : ℂ))) •
+            fourierBasisProjector params α) := by
+          rw [Finset.smul_sum]
+          ext u v
+          rw [Matrix.sub_apply, Matrix.sum_apply, Matrix.sum_apply, Matrix.sum_apply,
+            ← Finset.sum_sub_distrib]
+          refine Finset.sum_congr rfl ?_
+          intro α _
+          simpa [sub_mul]
+    _ = ∑ α : Point params,
+          (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α) := by
+          refine Finset.sum_congr rfl ?_
+          intro α _
+          rw [hrel α]
+
+private lemma hypercubeSpectralGap_operator_posSemidef (params : Parameters) :
+    (matrixLaplacianOperator params -
+      ((hypercubeSpectralGap params : ℂ) • orthogonalModeProjectorMatrix params)).PosSemidef := by
+  have hlap0 : laplacianEigenvalue params (0 : Point params) = 0 := by
+    simp [laplacianEigenvalue, frequencyWeight_zero]
+  have hcoeff_nonneg :
+      ∀ α ∈ (Finset.univ.erase (0 : Point params)),
+        0 ≤ laplacianEigenvalue params α - hypercubeSpectralGap params := by
+    intro α hα
+    have hα0 : α ≠ 0 := by simpa using Finset.mem_erase.mp hα |>.1
+    exact sub_nonneg.mpr <|
+      (laplacianSpectralGap params).positiveModesLowerBound α
+        (frequencyWeight_pos_of_ne_zero params hα0)
+  have hdecomp :
+      matrixLaplacianOperator params -
+          ((hypercubeSpectralGap params : ℂ) • orthogonalModeProjectorMatrix params) =
+        ∑ α ∈ (Finset.univ.erase (0 : Point params)),
+          (((laplacianEigenvalue params α - hypercubeSpectralGap params : Error) : ℂ) •
+            fourierBasisProjector params α) := by
+    rw [matrixLaplacianOperator_spectral_decomp, orthogonalModeProjectorMatrix_eq_sum,
+      Finset.smul_sum]
+    have hsplit :
+        (((laplacianEigenvalue params 0 : Error) : ℂ) • fourierBasisProjector params 0) +
+            ∑ α ∈ (Finset.univ.erase (0 : Point params)),
+              (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α) =
+          ∑ α : Point params,
+            (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α) := by
+      simpa using
+        (Finset.add_sum_erase (s := (Finset.univ : Finset (Point params)))
+          (f := fun α =>
+            (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α))
+          (by simp))
+    rw [← hsplit]
+    ext u v
+    simp [Matrix.sub_apply, Matrix.sum_apply, hlap0, sub_smul,
+      Finset.sum_sub_distrib]
+  rw [hdecomp]
+  refine Matrix.posSemidef_sum _ ?_
+  intro α hα
+  have hproj :
+      (fourierBasisProjector params α).PosSemidef := by
+    simpa [fourierBasisProjector] using
+      (Matrix.posSemidef_vecMulVec_self_star (fourierBasisState params α))
+  convert hproj.smul (hcoeff_nonneg α hα) using 1
+
+/-- The operator spectral gap inequality for the hypercube:
+`(1 / (m M)) · P⊥ ≤ L`, with `M = q^m`. -/
+lemma hypercubeSpectralGap_operator (params : Parameters) :
+    ((hypercubeSpectralGap params : ℂ) • orthogonalModeProjectorMatrix params) ≤
+      matrixLaplacianOperator params := by
+  exact sub_nonneg.mp (hypercubeSpectralGap_operator_posSemidef params).nonneg
+
 /-- The quadratic form `τ(ρ (X-Y)^*(X-Y))`. -/
 noncomputable def matrixSquaredDifferenceExpectation {H : FiniteHilbertSpace}
     (ρ : PositiveMatrixState H) (X Y : MatrixOperator H) : Error :=
@@ -100,12 +365,14 @@ noncomputable def matrixAveragePointOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : MatrixOperator model.space :=
   matrixAverageOperator model.family
 
-/-- The matrix-level combined column operator `∑_u |u⟩ ⊗ A^u`. -/
+/-- The matrix-level combined column operator used for the trace rewrites.
+Its `u`-th block is `(A^u)ᴴ`, so that the trace witnesses match the
+quadratic forms `τ(ρ · (A^u - A^v)ᴴ (A^u - A^v))` for arbitrary families. -/
 noncomputable def matrixCombinedOperator (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     RectangularMatrixOperator model.space
       (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
-  fun ui j => model.family ui.1 ui.2 j
+  fun ui j => star (model.family ui.1 j ui.2)
 
 /-- Bridge for the column-operator view used in the quadratic-form witnesses. -/
 noncomputable def matrixCombinedColumnOperator (params : Parameters)
@@ -146,6 +413,36 @@ noncomputable def matrixGlobalVarianceTraceForm (params : Parameters)
   (1 / (hypercubeVertexCount params : Error)) *
     Complex.re (MIPStarRE.Quantum.normalizedTrace
       (matrixGlobalVarianceTraceWitness params model))
+
+/-- Kronecker product is monotone in the left factor against a PSD right factor. -/
+lemma matrixTensorOperator_mono_left {H K : FiniteHilbertSpace}
+    {A₁ A₂ : MatrixOperator H} {B : MatrixOperator K} (hA : A₁ ≤ A₂) (hB : 0 ≤ B) :
+    matrixTensorOperator A₁ B ≤ matrixTensorOperator A₂ B := by
+  simpa [matrixTensorOperator] using MIPStarRE.Quantum.kronecker_mono_left hA hB
+
+/-- Adjoint sandwiching is monotone in the middle factor. -/
+lemma conjTranspose_mul_mul_mono {H K : FiniteHilbertSpace}
+    (M : RectangularMatrixOperator H K) {A B : MatrixOperator K} (hAB : A ≤ B) :
+    Mᴴ * (A * M) ≤ Mᴴ * (B * M) := by
+  have hpsd : 0 ≤ Mᴴ * (B - A) * M := by
+    exact
+      (Matrix.PosSemidef.conjTranspose_mul_mul_same
+        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hAB)) M).nonneg
+  have hrewrite : Mᴴ * (B - A) * M = Mᴴ * (B * M) - Mᴴ * (A * M) := by
+    ext i j
+    simp [Matrix.mul_apply, Finset.sum_add_distrib, Finset.sum_sub_distrib,
+      Finset.sum_mul, Finset.mul_sum, sub_eq_add_neg, mul_add, add_mul]
+    congr 1 <;> (rw [Finset.sum_comm]; simp [mul_assoc])
+  rw [hrewrite] at hpsd
+  exact sub_nonneg.mp hpsd
+
+/-- Monotonicity of `Re τ` with respect to the matrix order. -/
+lemma normalizedTrace_re_mono {H : FiniteHilbertSpace}
+    {A B : MatrixOperator H} (hAB : A ≤ B) :
+    Complex.re (MIPStarRE.Quantum.normalizedTrace A) ≤
+      Complex.re (MIPStarRE.Quantum.normalizedTrace B) := by
+  let ψ : QuantumState H.carrier := { density := 1 }
+  simpa [ψ, ev] using (ev_mono ψ A B hAB)
 
 /-- Matrix-level rewrite package for the local variance. -/
 structure MatrixLocalRewriteStatement (params : Parameters)
