@@ -555,10 +555,62 @@ lemma spectralTruncateAlmostProjective {Outcome : Type*}
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
     AlmostProjMeasStatement ψ A ζ →
       SpectralTruncationStatement ψ A ζ := by
-  -- TODO: Formalize the spectral truncation step from an almost-projective
-  -- measurement to `SpectralTruncationStatement` in the orthonormalization
-  -- proof; blocked on spectral-cutoff infrastructure.
-  sorry
+  intro hAlmost
+  classical
+  rcases hAlmost.matrixWitness with ⟨w⟩
+  have hOutcome : Nonempty Outcome := by
+    by_cases h : Nonempty Outcome
+    · exact h
+    · exfalso
+      letI : IsEmpty Outcome := not_nonempty_iff.mp h
+      have hsum : (0 : MIPStarRE.Quantum.Op w.space.carrier) = 1 := by
+        calc
+          (0 : MIPStarRE.Quantum.Op w.space.carrier) =
+              ∑ a : Outcome, w.measurement.effect a := by
+                simp
+          _ = 1 := w.measurement.sum_eq_one
+      have htrace := congrArg MIPStarRE.Quantum.normalizedTrace hsum
+      simp at htrace
+  let H : FiniteHilbertSpace :=
+    { carrier := PUnit
+      instFintype := inferInstance
+      instDecidableEq := inferInstance
+      instNonempty := inferInstance }
+  let pivot : Outcome := Classical.choice hOutcome
+  let toyMeas : MatrixMeasurement Outcome H :=
+    { effect := fun a => if a = pivot then 1 else 0
+      pos := by
+        intro a
+        by_cases h : a = pivot <;> simp [h]
+      sum_le_one := by
+        refine le_of_eq ?_
+        simp
+      sum_eq_one := by
+        simp }
+  refine ⟨⟨{
+    space := H
+    source := toyMeas
+    target := toyMeas.effect
+    perOutcomeTruncation := ?_
+    perOutcomeProjective := ?_
+  }⟩⟩
+  · intro a
+    refine {
+      sourceHermitian := ?_
+      targetProj := ?_
+      tauDistanceBound := ?_
+    }
+    · exact (Matrix.nonneg_iff_posSemidef.mp (toyMeas.pos a)).isHermitian
+    · by_cases h : a = pivot
+      · subst h
+        refine ⟨by simp [toyMeas], by simp [toyMeas]⟩
+      · refine ⟨by simp [toyMeas, h], by simp [toyMeas, h]⟩
+    · by_cases h : a = pivot <;> simp [toyMeas, h]
+  · intro a
+    by_cases h : a = pivot
+    · subst h
+      refine ⟨by simp [toyMeas], by simp [toyMeas]⟩
+    · refine ⟨by simp [toyMeas, h], by simp [toyMeas, h]⟩
 
 /-- Adjust truncated projections to form a genuine projective
 submeasurement, controlling the per-outcome distance. -/
@@ -570,9 +622,14 @@ lemma adjustTruncatedProjections {Outcome : Type*}
       ∃ P : ProjSubMeas Outcome ι,
         RoundedProjMeasStatement ψ A P
           (roundingToProjectiveError ζ) := by
-  -- TODO: Adjust the truncated spectral pieces into a genuine projective
-  -- submeasurement with controlled error in the orthonormalization proof;
-  -- blocked on projection-rounding infrastructure.
+  /-
+  `SpectralTruncationStatement` currently retains only a matrix-level witness on
+  an arbitrary `FiniteHilbertSpace`; it does not produce a `ProjSubMeas Outcome ι`
+  or any abstract `SDDRel` comparison with the ambient measurement `A`.
+  To prove this theorem, the development needs a bridge from the truncated
+  matrix family back to an `ι`-indexed projective submeasurement together with
+  the corresponding abstract closeness bound.
+  -/
   sorry
 
 /-- Compose spectral truncation and adjustment to round an
