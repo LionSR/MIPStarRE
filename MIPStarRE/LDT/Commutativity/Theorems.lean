@@ -18,6 +18,50 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ## Error terms and packaged conclusions -/
 
+private def nextPointEquiv (params : Parameters) [FieldModel params.q] :
+    Point params.next ≃ Point params × Fq params where
+  toFun := fun u => (truncatePoint params u, pointHeight params u)
+  invFun := fun ux => appendPoint params ux.1 ux.2
+  left_inv := by
+    intro u
+    ext i
+    by_cases h : i.1 < params.m
+    · simp [appendPoint, truncatePoint, h]
+    · have hi : i = lastCoord params := by
+        ext
+        have hi_val : i.1 = params.m := by
+          have hi_lt : i.1 < params.m + 1 := by
+            simpa [Parameters.next] using i.2
+          exact Nat.eq_of_lt_succ_of_not_lt hi_lt h
+        simp [lastCoord, hi_val]
+      have hlast : ¬(lastCoord params).1 < params.m := by
+        simp [lastCoord]
+      simp [appendPoint, pointHeight, hi, hlast]
+  right_inv := by
+    intro ux
+    rcases ux with ⟨u, x⟩
+    simp
+
+private lemma avgOver_uniform_equiv
+    {α β : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (e : α ≃ β) (f : α → Error) :
+    avgOver (uniformDistribution α) f =
+      avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
+  calc
+    avgOver (uniformDistribution α) f
+      = (1 / (Fintype.card α : Error)) * ∑ a : α, f a := by
+          simp [avgOver, uniformDistribution, Finset.mul_sum]
+    _ = (1 / (Fintype.card β : Error)) * ∑ a : α, f a := by
+          rw [Fintype.card_congr e]
+    _ = (1 / (Fintype.card β : Error)) * ∑ b : β, f (e.symm b) := by
+          congr 1
+          exact Fintype.sum_equiv e f (fun b => f (e.symm b)) (by
+            intro a
+            simp)
+    _ = avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
+          simp [avgOver, uniformDistribution, Finset.mul_sum]
+
 /-- Operator domination, written in source order as `X ≤ Y`. -/
 abbrev OperatorDominatedBy (X Y : MIPStarRE.Quantum.Op ι) : Prop :=
   X ≤ Y
@@ -148,8 +192,20 @@ lemma commDataProcessedG
       postprocessedPointConsistency := ?_
       postprocessedSelfConsistency := by
         -- TODO: Derive self-consistency of the postprocessed left/right
-        -- evaluated point families from `hself` (`lem:comm-data-processed-g`);
-        -- blocked on the exact `evaluatedPointFamily` rewriting bridge.
+        -- evaluated point families from `hself` (`lem:comm-data-processed-g`).
+        -- The helper equivalence `nextPointEquiv params :
+        -- Point params.next ≃ Point params × Fq params` rewrites the average as
+        -- one over `(u, x)`, exposing the pointwise target:
+        -- for each slice height `x` and truncation point `u`, we need a bridge
+        -- from the slice-level `SDDRel`
+        -- `hself.sliceSelfConsistency : G^x_g ⊗ I ≈_ζ I ⊗ G^x_g`
+        -- to its postprocessed form
+        -- `G^x_[g(u)=a] ⊗ I ≈_ζ I ⊗ G^x_[g(u)=a]`.
+        -- A clean route would be either:
+        -- 1. a direct `qSDD` monotonicity lemma for postprocessing opposite-side
+        --    lifts, or
+        -- 2. a `PermInvState strategy.state` witness so we can route through
+        --    `twoNotionsOfSelfConsistencyAfterEvaluation`.
         sorry
       stabilityOne := by
         -- TODO: Prove the first insertion/removal stability step for the
@@ -343,10 +399,26 @@ theorem comMain
         rw [evaluationSpecialization_sddErrorOp_eq]
         exact hEval.evaluatedSliceCommutation.squaredDistanceBound
       fullSliceCommutation := by
+        have hEvalError :
+            sddErrorOp strategy.state
+                (uniformDistribution (EvaluatedSliceQuestion params))
+                (evaluatedFromFullSliceProductLeft params strategy family)
+                (evaluatedFromFullSliceProductRight params strategy family) =
+              sddErrorOp strategy.state
+                (uniformDistribution (EvaluatedSliceQuestion params))
+                (evaluatedSliceProductLeft params strategy family)
+                (evaluatedSliceProductRight params strategy family) :=
+          evaluationSpecialization_sddErrorOp_eq params strategy family
         -- TODO: Lift evaluated-slice commutation to the full-slice statement
-        -- with the displayed `comMainError` (`thm:com-main`); blocked on
-        -- comparison between full-slice and evaluated families plus averaging
-        -- infrastructure.
+        -- with the displayed `comMainError` (`thm:com-main`).
+        -- The missing comparison is the paper's pair of Schwartz-Zippel style
+        -- averaging steps from `references/ldt-paper/commutativity-G.tex`
+        -- around `eq:evaluate-gcom-at-points` and
+        -- `eq:evaluate-gcom-at-points-part-dos`:
+        -- 1. compare a full polynomial pair `(g, h)` with its evaluation
+        --    fibers `(g(u), h(v))`, paying the collision error `m * (d / q)`;
+        -- 2. combine that marginalization loss with `hEvalError` and
+        --    `hEval.evaluatedSliceCommutation`.
         sorry }
 
 /-- `lem:normalization-condition`. -/
