@@ -459,7 +459,10 @@ lemma selfImprovementHelper
   · simpa [T] using hsdp
   · exact addInU params strategy eps delta gamma hgood T
 
-/-- `thm:self-improvement`. -/
+/-- `thm:self-improvement`.
+
+NOTE: The SelfImprovementBridgePackage is temporary scaffolding. See issue #278
+for the plan to derive PermInvState internally. -/
 theorem selfImprovement
     (params : Parameters)
     [FieldModel params.q]
@@ -468,12 +471,11 @@ theorem selfImprovement
     (hbridges : SelfImprovementBridgePackage params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι)
-    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+    (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (polynomialEvaluationFamily params G.toSubMeas) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
-  let _ := hcons
   rcases selfImprovementHelper params strategy eps delta gamma hgood G with
     ⟨T, Hhat, Z, hhelper⟩
   have hssc :
