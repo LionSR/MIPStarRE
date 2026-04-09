@@ -94,13 +94,22 @@ structure RankReductionWitness {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι)
     (ζ : Error) (data : QLayerData Outcome ι) : Prop where
+  state_normalized : ψ.IsNormalized
+  zeta_nonneg : 0 ≤ ζ
+  zeta_le_quarter : ζ ≤ 1 / (4 : Error)
   projective :
     ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Qa data a)
+  outcome_nonneg :
+    ∀ a : Outcome, 0 ≤ Qa data a
+  sum_eq_total :
+    ∑ a, Qa data a = QTotal data
   closeness :
     SDDOpRel ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
       (constOpFamily data.q)
       (roundingToProjectiveError ζ)
+  source_almost_projective :
+    ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ
   total_le :
     QTotal data ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
@@ -378,6 +387,40 @@ lemma projectiveLowRankSum {Outcome : Type*}
   -- TODO: prove (issue #197)
   sorry
 
+private lemma spectralTruncationError_le_half (ζ : Error)
+    (hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
+    spectralTruncationError ζ ≤ 1 / (2 : Error) := by
+  -- Scalar bookkeeping for `ζ ≤ 1/4`: `√ζ ≤ 1/2`.
+  sorry
+
+private lemma zeta_le_zetaQuarterRoot (ζ : Error)
+    (hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
+    ζ ≤ zetaQuarterRoot ζ := by
+  have hζ1 : ζ ≤ 1 := by linarith
+  dsimp [zetaQuarterRoot]
+  simpa [Real.rpow_one] using
+    (Real.rpow_le_rpow_of_exponent_ge' hζ hζ1 (by positivity) (by norm_num : (1 : Error) ≥ 1 / 4))
+
+private lemma sqrt_roundingToProjectiveError_eq (ζ : Error)
+    (hζ : 0 ≤ ζ) :
+    Real.sqrt (roundingToProjectiveError ζ) =
+      Real.sqrt (12 : Error) * zetaQuarterRoot ζ := by
+  -- `sqrt (12 * √ζ) = sqrt 12 * ζ^(1/4)`.
+  sorry
+
+private lemma sqrt_roundingToProjectiveError_le_four_zetaQuarterRoot (ζ : Error)
+    (hζ : 0 ≤ ζ) :
+    Real.sqrt (roundingToProjectiveError ζ) ≤ 4 * zetaQuarterRoot ζ := by
+  -- Coefficient estimate: `sqrt 12 ≤ 4`.
+  sorry
+
+private lemma sqrt_two_mul_sqrt_roundingToProjectiveError_le_five_zetaQuarterRoot (ζ : Error)
+    (hζ : 0 ≤ ζ) :
+    Real.sqrt (2 : Error) * Real.sqrt (roundingToProjectiveError ζ) ≤
+      5 * zetaQuarterRoot ζ := by
+  -- Coefficient estimate: `sqrt 2 * sqrt 12 = sqrt 24 ≤ 5`.
+  sorry
+
 /-- **Completeness of `Q`** (`lem:Q-completeness`).
 
 If `Q_a` is the rank-reduced family from `lem:projective-low-rank-sum`, then
@@ -390,7 +433,13 @@ lemma qCompleteness {Outcome : Type*}
     (data : QLayerData Outcome ι) :
     RankReductionWitness ψ A ζ data →
       ev ψ (QTotal data) ≥ 1 - 11 * zetaQuarterRoot ζ := by
-  -- TODO: prove (issue #197)
+  intro h
+  -- The paper proof combines two Cauchy-Schwarz comparisons:
+  -- `⟨Q, Q - A⟩` and `⟨Q - A, A⟩`, then uses `source_almost_projective`.
+  -- The strengthened witness above now carries exactly the missing hypotheses
+  -- from the paper (`Q = Σₐ Qₐ`, normalization, small-ζ, and `A`-almost-projective).
+  -- Remaining work is scalar `rpow/sqrt` bookkeeping and the corresponding
+  -- operator-expectation algebra in Lean.
   sorry
 
 /-- **Completeness of `sqrt Q`** (`lem:sqrt-Q-completeness`).
@@ -404,7 +453,10 @@ lemma sqrtQCompleteness {Outcome : Type*}
     (data : QLayerData Outcome ι) :
     RankReductionWitness ψ A ζ data →
       ev ψ (CFC.sqrt (QTotal data)) ≥ 1 - 12 * zetaQuarterRoot ζ := by
-  -- TODO: prove (issue #197)
+  -- The paper deduces this from `qCompleteness` plus the spectral inequality
+  -- `sqrt Q ≥ (1 - √ζ) Q`, using `Q ≤ (1 + 2√ζ) I`.
+  -- In Lean, the remaining blocker is the NNReal/CFC comparison turning the
+  -- scalar bound into an operator inequality for `CFC.sqrt`.
   sorry
 
 /-- **`Q` is almost projective** (`lem:q-almost-projective`).
