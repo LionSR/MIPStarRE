@@ -1,14 +1,18 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems
-set_option linter.style.longLine false
 
 /-!
-Matching scaffold for Section 9 of the low individual degree paper in
-`references/ldt-paper/self_improvement.tex`.
+# Section 9 — Definitions
 
 This file exposes the paper's SDP witnesses, the `add-in-u` transfer identity,
 and the non-projective/projective self-improvement outputs through explicit named
 constructions and error terms.
+
+## References
+
+- `references/ldt-paper/self_improvement.tex`
 -/
+
+set_option linter.style.longLine false
 
 namespace MIPStarRE.LDT.SelfImprovement
 

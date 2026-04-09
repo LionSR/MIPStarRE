@@ -1,16 +1,19 @@
 import MIPStarRE.LDT.Commutativity.Theorems
-set_option linter.style.longLine false
 
 /-!
-Matching scaffold for Section 12 of the low individual degree paper in
-`references/ldt-paper/ld-pasting.tex`.
+# Section 12 — Definitions
 
 This file contains the core definitions, type abbreviations, utility operators, tuple
 helpers, interpolation, and basic `\widehat G` / part-family constructors used
 throughout the Section 12 pasting scaffold.  The displayed error formulas and
 statement structures live in `Pasting/Statements.lean`.
+
+## References
+
+- `references/ldt-paper/ld-pasting.tex`
 -/
 
+set_option linter.style.longLine false
 
 namespace MIPStarRE.LDT.Pasting
 

@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
--- `Mathlib` is imported transitively through the dependency chain above.
 
 /-!
 # Section 5 — Q/X/XHat/P intermediate layer
@@ -16,6 +15,8 @@ are intended to match the paper's decomposition of the argument.
 - `references/ldt-paper/orthonormalization.tex`, Section 6.2, for the
   `Q/X/XHat/P` intermediate layer and its helper lemmas.
 -/
+
+-- `Mathlib` is imported transitively through the dependency chain above.
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
