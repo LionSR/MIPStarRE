@@ -948,6 +948,7 @@ theorem hAConsistency
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
     (k : ℕ)
     (hHB : HBConsistencyStatement params strategy family eps delta gamma zeta k) :
