@@ -1,5 +1,8 @@
 MIPStarRE.LDT.Test.mainFormal
+MIPStarRE.LDT.Role
+MIPStarRE.LDT.Role.other
 MIPStarRE.LDT.Preliminaries.completeAtOutcome
+MIPStarRE.LDT.Preliminaries.ffTrace
 MIPStarRE.LDT.ConsRel
 MIPStarRE.LDT.Preliminaries.simeqForMeasurements
 MIPStarRE.LDT.SDDRel
@@ -22,9 +25,14 @@ MIPStarRE.LDT.Preliminaries.completenessTransferSelfConsistentA
 MIPStarRE.LDT.Preliminaries.selfConsistencyImpliesDataProcessing
 MIPStarRE.LDT.Preliminaries.completingToMeasurement
 MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass
+MIPStarRE.LDT.Preliminaries.polyFuncMonotone
+MIPStarRE.LDT.Preliminaries.postprocessPreservesMeasurements
 MIPStarRE.LDT.MakingMeasurementsProjective.naimark
 MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
 MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma
+MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ
+MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX
+MIPStarRE.LDT.MakingMeasurementsProjective.projectiveP
 MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord
 MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianRewrite
 MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors
@@ -62,6 +70,7 @@ MIPStarRE.LDT.Pasting.overAllOutcomes
 MIPStarRE.LDT.Pasting.fromHToG
 MIPStarRE.LDT.Pasting.chernoffBernoulliMatrix
 MIPStarRE.LDT.Pasting.ldPastingNCompleteness
+MIPStarRE.LDT.Pasting.hAConsistency
 MIPStarRE.LDT.MainInductionStep.restrictedProbabilities
 MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
 MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection

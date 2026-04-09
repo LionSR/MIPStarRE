@@ -4,78 +4,88 @@
 
 \section{The game and its strategies}
 
+\begin{definition}[Roles]\label{def:roles}
+	\lean{MIPStarRE.LDT.Role, MIPStarRE.LDT.Role.other}
+	A role is an element of $\{\mathrm A,\mathrm B\}$. For a role $r \in \{\mathrm A,\mathrm B\}$, write $\overline r$ for the other element of $\{\mathrm A,\mathrm B\}$.
+\end{definition}
+
 \begin{definition}[Low individual degree test]\label{def:low-individual-degree-test}
-  Fix integers $m,d \ge 0$ and a prime power $q$. The $(m,q,d)$ low individual degree test has three equally likely subtests.
-  In the axis-parallel lines test, choose a uniformly random role $r \in \{\mathrm A,\mathrm B\}$, a uniformly random point $u \in \F_q^m$, and a uniformly random coordinate $i \in \{1,\dots,m\}$. Let $\ell=\{u+t e_i : t \in \F_q\}$. Player $r$ receives $\ell$ and returns a degree-$d$ univariate polynomial $f\colon \ell \to \F_q$; Player $\bar r$ receives $u$ and returns a field element $a \in \F_q$. The verifier accepts when $f(u)=a$.
-  In the self-consistency test, both provers receive the same uniformly random point $u \in \F_q^m$ and must return the same field element.
-  In the diagonal lines test, choose a uniformly random role $r \in \{\mathrm A,\mathrm B\}$, a uniformly random point $u \in \F_q^m$, a uniformly random index $i \in \{1,\dots,m\}$, and a uniformly random direction vector $v \in \F_q^m$ whose last $m-i$ coordinates are $0$. Let $\ell=\{u+t v : t \in \F_q\}$. Player $r$ receives $\ell$ and returns a degree-$md$ univariate polynomial $f\colon \ell \to \F_q$; Player $\bar r$ receives $u$ and returns a field element $a \in \F_q$. The verifier accepts when $f(u)=a$.
+	\uses{def:roles}
+	Fix integers $m,d \ge 0$ and a prime power $q$. The $(m,q,d)$ low individual degree test has three equally likely subtests.
+	In the axis-parallel lines test, choose a uniformly random role $r \in \{\mathrm A,\mathrm B\}$, a uniformly random point $u \in \F_q^m$, and a uniformly random coordinate $i \in \{1,\dots,m\}$. Let $\ell=\{u+t e_i : t \in \F_q\}$. Player $r$ receives $\ell$ and returns a degree-$d$ univariate polynomial $f\colon \ell \to \F_q$; Player $\overline r$ receives $u$ and returns a field element $a \in \F_q$. The verifier accepts when $f(u)=a$.
+	In the self-consistency test, both provers receive the same uniformly random point $u \in \F_q^m$ and must return the same field element.
+	In the diagonal lines test, choose a uniformly random role $r \in \{\mathrm A,\mathrm B\}$, a uniformly random point $u \in \F_q^m$, a uniformly random index $i \in \{1,\dots,m\}$, and a uniformly random direction vector $v \in \F_q^m$ whose last $m-i$ coordinates are $0$. Let $\ell=\{u+t v : t \in \F_q\}$. Player $r$ receives $\ell$ and returns a degree-$md$ univariate polynomial $f\colon \ell \to \F_q$; Player $\overline r$ receives $u$ and returns a field element $a \in \F_q$. The verifier accepts when $f(u)=a$.
 \end{definition}
 
 \begin{remark}\label{fig:test}
-  With probability $\tfrac13$ each, the verifier performs the axis-parallel lines test, the self-consistency test, or the diagonal lines test from Definition~\ref{def:low-individual-degree-test}.
+	With probability $\tfrac13$ each, the verifier performs the axis-parallel lines test, the self-consistency test, or the diagonal lines test from Definition~\ref{def:low-individual-degree-test}.
 \end{remark}
 
 \begin{definition}[Symmetric projective strategy]\label{def:symmetric-projective-strategy}
-  A symmetric projective strategy for the $(m,q,d)$ low individual degree test consists of a permutation-invariant bipartite state $\ket{\psi} \in \mathcal H \ot \mathcal H$, a projective point measurement $A^u=\{A^u_a\}_{a \in \F_q}$ for each $u \in \F_q^m$, a projective axis-parallel line measurement $B^\ell=\{B^\ell_f\}$ for each axis-parallel line $\ell$, and a projective diagonal-line measurement $L^\ell=\{L^\ell_f\}$ for each line $\ell$.
+	A symmetric projective strategy for the $(m,q,d)$ low individual degree test consists of a permutation-invariant bipartite state $\ket{\psi} \in \mathcal H \ot \mathcal H$, a projective point measurement $A^u=\{A^u_a\}_{a \in \F_q}$ for each $u \in \F_q^m$, a projective axis-parallel line measurement $B^\ell=\{B^\ell_f\}$ for each axis-parallel line $\ell$, and a projective diagonal-line measurement $L^\ell=\{L^\ell_f\}$ for each line $\ell$.
 \end{definition}
 
 \begin{definition}[General projective strategy]\label{def:projective-strategy}
-  A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
+	A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
 \end{definition}
 
+\begin{remark}\label{rem:strategy-convention}
+	Throughout this work, the term strategy refers to a projective strategy, and the term symmetric strategy refers to a symmetric projective strategy.
+\end{remark}
+
 \begin{definition}[Good strategy]\label{def:good-strategy}
-  A strategy is $(\eps,\delta,\gamma)$-good if it passes the axis-parallel lines test with probability at least $1-\eps$, the self-consistency test with probability at least $1-\delta$, and the diagonal lines test with probability at least $1-\gamma$.
+	A strategy is $(\eps,\delta,\gamma)$-good if it passes the axis-parallel lines test with probability at least $1-\eps$, the self-consistency test with probability at least $1-\delta$, and the diagonal lines test with probability at least $1-\gamma$.
 \end{definition}
 
 \begin{remark}\label{rem:good-strat-characterization}
-  \uses{def:simeq}
-  Using notation which will be introduced in Chapter~\ref{chap:preliminaries} below, a symmetric strategy is $(\eps,\delta,\gamma)$-good if and only if it satisfies the following three conditions. For $\ell$ and $u$ as in the axis-parallel lines test,
-  \[
-    A_a^u \ot I \simeq_\eps I \ot B^\ell_{[f(u)=a]},
-    \quad
-    \text{and}
-    \quad
-    A_a^u \ot I \simeq_\delta I \ot A_a^u.
-  \]
-  And for $\ell$ and $u$ as in the diagonal lines test,
-  \[
-    A_a^u \ot I \simeq_\gamma I \ot L^\ell_{[f(u)=a]}.
-  \]
+	\uses{def:simeq}
+	Using notation which will be introduced in Chapter~\ref{chap:preliminaries} below, a symmetric strategy is $(\eps,\delta,\gamma)$-good if and only if it satisfies the following three conditions. For $\ell$ and $u$ as in the axis-parallel lines test,
+	\[
+		A_a^u \ot I \simeq_\eps I \ot B^\ell_{[f(u)=a]},
+		\quad
+		\text{and}
+		\quad
+		A_a^u \ot I \simeq_\delta I \ot A_a^u.
+	\]
+	And for $\ell$ and $u$ as in the diagonal lines test,
+	\[
+		A_a^u \ot I \simeq_\gamma I \ot L^\ell_{[f(u)=a]}.
+	\]
 \end{remark}
 
 \begin{remark}[Notation]\label{not:conditioned-on-last-direction}
-  \uses{def:symmetric-projective-strategy}
-  Our proof is by induction, proving soundness of the $(m+1,q,d)$ low individual degree test from the soundness of the $(m,q,d)$ low individual degree test. To do this, we frequently use the axis-parallel line test in the specific case of the last direction. Let $(\psi,A,B,L)$ be a symmetric strategy for the $(m+1,q,d)$ low individual degree test. Then for each $u \in \F_q^m$ we write $B_f^u$ as shorthand for $B_f^\ell$, where
-  \[
-    \ell = \{(u,x) \mid x \in \F_q\}.
-  \]
-  For a function $f \colon \ell \to \F_q$, we also sometimes write $f(x)$ as shorthand for $f(u,x)$.
+	\uses{def:symmetric-projective-strategy}
+	Our proof is by induction, proving soundness of the $(m+1,q,d)$ low individual degree test from the soundness of the $(m,q,d)$ low individual degree test. To do this, we frequently use the axis-parallel line test in the specific case of the last direction. Let $(\psi,A,B,L)$ be a symmetric strategy for the $(m+1,q,d)$ low individual degree test. Then for each $u \in \F_q^m$ we write $B_f^u$ as shorthand for $B_f^\ell$, where
+	\[
+		\ell = \{(u,x) \mid x \in \F_q\}.
+	\]
+	For a function $f \colon \ell \to \F_q$, we also sometimes write $f(x)$ as shorthand for $f(u,x)$.
 \end{remark}
 
 \begin{definition}
-  Consider the $(m,q,d)$ low individual degree test. For $j \in \{1,\dots,m\}$, the $j$-restricted diagonal lines test is the diagonal lines test conditioned on $i=j$. In particular, the $m$-restricted diagonal lines test is the diagonal lines test in which the sampled line is a uniformly random line in $\F_q^m$.
+	Consider the $(m,q,d)$ low individual degree test. For $j \in \{1,\dots,m\}$, the $j$-restricted diagonal lines test is the diagonal lines test conditioned on $i=j$. In particular, the $m$-restricted diagonal lines test is the diagonal lines test in which the sampled line is a uniformly random line in $\F_q^m$.
 \end{definition}
 
 \section{Formal soundness target}
 
 \begin{theorem}[Quantum soundness of the low individual degree test]\label{thm:main-formal}
-  \lean{MIPStarRE.LDT.Test.mainFormal}
-  \uses{def:projective-strategy, def:polymeasurements, def:simeq}
-  Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that passes the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Let $k \ge md$ and set
-  \[
-    \nu = 100000 k^2 m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).
-  \]
-  Then there exist projective measurements $G^{\mathrm A}, G^{\mathrm B} \in \polymeas{m}{q}{d}$ with the following properties:
-  \begin{enumerate}
-    \item on average over $u \sim \F_q^m$,
-    \[
-      A_a^{\mathrm A,u} \ot I \simeq_\nu I \ot G^{\mathrm B}_{[g(u)=a]},
-      \qquad
-      I \ot A_a^{\mathrm B,u} \simeq_\nu G^{\mathrm A}_{[g(u)=a]} \ot I;
-    \]
-    \item
-    \[
-      G_g^{\mathrm A} \ot I \simeq_\nu I \ot G_g^{\mathrm B}.
-    \]
-  \end{enumerate}
+	\lean{MIPStarRE.LDT.Test.mainFormal}
+	\uses{def:projective-strategy, def:polymeasurements, def:simeq}
+	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that passes the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Let $k \ge md$ and set
+	\[
+		\nu = 100000 k^2 m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).
+	\]
+	Then there exist projective measurements $G^{\mathrm A}, G^{\mathrm B} \in \polymeas{m}{q}{d}$ with the following properties:
+	\begin{enumerate}
+		\item on average over $u \sim \F_q^m$,
+		      \[
+			      A_a^{\mathrm A,u} \ot I \simeq_\nu I \ot G^{\mathrm B}_{[g(u)=a]},
+			      \qquad
+			      I \ot A_a^{\mathrm B,u} \simeq_\nu G^{\mathrm A}_{[g(u)=a]} \ot I;
+		      \]
+		\item
+		      \[
+			      G_g^{\mathrm A} \ot I \simeq_\nu I \ot G_g^{\mathrm B}.
+		      \]
+	\end{enumerate}
 \end{theorem}

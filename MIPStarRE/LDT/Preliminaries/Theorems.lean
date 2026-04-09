@@ -14,6 +14,17 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
+/-- `prop:post-processing-preserves`.
+
+Postprocessing preserves the total operator, so it preserves both the
+submeasurement and measurement conditions. -/
+theorem postprocessPreservesMeasurements {α β : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype α] [Fintype β]
+    (A : SubMeas α ι) (f : α → β) :
+    (postprocess A f).total = A.total := by
+  exact postprocess_total A f
+
 /-- `prop:simeq-for-measurements`. -/
 theorem simeqForMeasurements {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]

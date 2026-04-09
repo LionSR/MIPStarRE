@@ -939,6 +939,26 @@ lemma hBConsistency
   -/
   sorry
 
+/-- `cor:h-a-consistency`.
+
+This restates the pasted-submeasurement consistency with the point measurement
+using the paper's displayed `ν` error term. -/
+theorem hAConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (k : ℕ)
+    (hHB : HBConsistencyStatement params strategy family eps delta gamma zeta k) :
+    ConsRel strategy.state
+      (uniformDistribution (Point params.next))
+      (polynomialEvaluationFamily params.next (constructedPastedSubMeas params family k))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) := by
+  sorry
+
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
     (params : Parameters)
