@@ -638,7 +638,9 @@ lemma globalVarianceOfPoints
           _ = globalVarianceOfPointsError params eps delta := by
                 simp [polynomialDistribution, avgOver, uniformDistribution] }
 
-/-- The concrete matrix-level counterpart of `lem:generalize-b`. -/
+/-- Matrix-level counterpart of `lem:generalize-b`, proved by reducing to the
+abstract version via an explicit compatibility hypothesis linking the matrix
+realization to a `SymStrat`. -/
 lemma matrixGeneralizeB
     (params : Parameters)
     [FieldModel params.q]
@@ -659,7 +661,9 @@ lemma matrixGeneralizeB
   rw [hcompat g]
   exact habstract.pointwiseNormBound g
 
-/-- The concrete matrix-level counterpart of `lem:local-variance-of-points`. -/
+/-- Matrix-level counterpart of `lem:local-variance-of-points`, proved by reducing
+to the abstract version via an explicit compatibility hypothesis linking the
+matrix realization to a `SymStrat`. -/
 lemma matrixLocalVarianceOfPoints
     (params : Parameters)
     [FieldModel params.q]
@@ -680,7 +684,9 @@ lemma matrixLocalVarianceOfPoints
   rw [hcompat g]
   exact habstract.pointwiseLocalVarianceBound g
 
-/-- The concrete matrix-level counterpart of `lem:global-variance-of-points`. -/
+/-- Matrix-level counterpart of `lem:global-variance-of-points`, proved by
+reducing to the abstract version via an explicit compatibility hypothesis
+linking the matrix realization to a `SymStrat`. -/
 lemma matrixGlobalVarianceOfPoints
     (params : Parameters)
     [FieldModel params.q]
