@@ -17,20 +17,22 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Left tensor-placement for the auxiliary family `M^x_o`. -/
-def switcherooSelfConsistencyLeft {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+def switcherooSelfConsistencyLeft {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SliceQuestion params) Outcome (ι × ι) :=
   fun x => leftPlacedSubMeas (ιB := ι) ((M x).toSubMeas)
 
 /-- Right tensor-placement for the auxiliary family `M^x_o`. -/
-def switcherooSelfConsistencyRight {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+def switcherooSelfConsistencyRight {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxSubMeas (SliceQuestion params) Outcome (ι × ι) :=
   fun x => rightPlacedSubMeas (ιA := ι) ((M x).toSubMeas)
 
 /-- Concrete hypothesis family for `G^x_g M^y_o`. -/
 noncomputable def switcherooPointProductLeft
-    {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+    {Outcome : Type*} [Fintype Outcome] (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxOpFamily (SlicePairQuestion params) (Polynomial params × Outcome) (ι × ι) :=
@@ -43,7 +45,7 @@ noncomputable def switcherooPointProductLeft
 /-- Concrete hypothesis family for `M^y_o G^x_g` on the
 `Polynomial params × Outcome` outcome type. -/
 noncomputable def switcherooPointProductRight
-    {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+    {Outcome : Type*} [Fintype Outcome] (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxOpFamily (SlicePairQuestion params) (Polynomial params × Outcome) (ι × ι) :=
@@ -54,7 +56,8 @@ noncomputable def switcherooPointProductRight
         ((M q.2).toSubMeas)
 
 /-- Concrete aggregate family for `G^x M^y_o`. -/
-noncomputable def switcherooAggregateLeft {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+noncomputable def switcherooAggregateLeft {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxOpFamily (SlicePairQuestion params) Outcome (ι × ι) :=
@@ -65,7 +68,8 @@ noncomputable def switcherooAggregateLeft {Outcome : Type*} [Fintype Outcome] (p
         ((M q.2).toSubMeas)
 
 /-- Concrete aggregate family for `M^y_o G^x`. -/
-noncomputable def switcherooAggregateRight {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+noncomputable def switcherooAggregateRight {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι) :
     IdxOpFamily (SlicePairQuestion params) Outcome (ι × ι) :=
@@ -76,7 +80,7 @@ noncomputable def switcherooAggregateRight {Outcome : Type*} [Fintype Outcome] (
         (completePartSubMeas params family q.1)
 
 /-- Concrete family for `G^x_g G^y`. -/
-noncomputable def completePartPointProductLeft (params : Parameters)
+noncomputable def completePartPointProductLeft (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxOpFamily (SlicePairQuestion params) (Polynomial params) (ι × ι) :=
   fun q =>
@@ -86,7 +90,7 @@ noncomputable def completePartPointProductLeft (params : Parameters)
         (completePartSubMeas params family q.2)
 
 /-- Concrete family for `G^y G^x_g`. -/
-noncomputable def completePartPointProductRight (params : Parameters)
+noncomputable def completePartPointProductRight (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxOpFamily (SlicePairQuestion params) (Polynomial params) (ι × ι) :=
   fun q =>
@@ -96,7 +100,7 @@ noncomputable def completePartPointProductRight (params : Parameters)
         ((family.meas q.1).toSubMeas)
 
 /-- Concrete family for `G^x G^y`. -/
-noncomputable def completePartTotalProductLeft (params : Parameters)
+noncomputable def completePartTotalProductLeft (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxOpFamily (SlicePairQuestion params) Unit (ι × ι) :=
   fun q =>
@@ -106,7 +110,7 @@ noncomputable def completePartTotalProductLeft (params : Parameters)
         (completePartSubMeas params family q.2)
 
 /-- Concrete family for `G^y G^x`. -/
-noncomputable def completePartTotalProductRight (params : Parameters)
+noncomputable def completePartTotalProductRight (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxOpFamily (SlicePairQuestion params) Unit (ι × ι) :=
   fun q =>
@@ -116,7 +120,7 @@ noncomputable def completePartTotalProductRight (params : Parameters)
         (completePartSubMeas params family q.1)
 
 /-- Concrete family for `G^x_g G^y_⊥`. -/
-noncomputable def incompletePartPointProductLeft (params : Parameters)
+noncomputable def incompletePartPointProductLeft (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxOpFamily (SlicePairQuestion params) (Polynomial params) (ι × ι) :=
   fun q =>
@@ -126,7 +130,7 @@ noncomputable def incompletePartPointProductLeft (params : Parameters)
         (incompletePartSubMeas params family q.2)
 
 /-- Concrete family for `G^y_⊥ G^x_g`. -/
-noncomputable def incompletePartPointProductRight (params : Parameters)
+noncomputable def incompletePartPointProductRight (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxOpFamily (SlicePairQuestion params) (Polynomial params) (ι × ι) :=
   fun q =>
@@ -136,7 +140,7 @@ noncomputable def incompletePartPointProductRight (params : Parameters)
         ((family.meas q.1).toSubMeas)
 
 /-- Concrete family for `G^x_⊥ G^y_⊥`. -/
-noncomputable def incompletePartTotalProductLeft (params : Parameters)
+noncomputable def incompletePartTotalProductLeft (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxOpFamily (SlicePairQuestion params) Unit (ι × ι) :=
   fun q =>
@@ -146,7 +150,7 @@ noncomputable def incompletePartTotalProductLeft (params : Parameters)
         (incompletePartSubMeas params family q.2)
 
 /-- Concrete family for `G^y_⊥ G^x_⊥`. -/
-noncomputable def incompletePartTotalProductRight (params : Parameters)
+noncomputable def incompletePartTotalProductRight (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxOpFamily (SlicePairQuestion params) Unit (ι × ι) :=
   fun q =>
@@ -156,19 +160,19 @@ noncomputable def incompletePartTotalProductRight (params : Parameters)
         (incompletePartSubMeas params family q.1)
 
 /-- Left tensor-placement for `\widehat G^x_g`. -/
-noncomputable def gHatSelfConsistencyLeftFamily (params : Parameters)
+noncomputable def gHatSelfConsistencyLeftFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) (GHatOutcome params) (ι × ι) :=
   fun x => leftPlacedSubMeas (ιB := ι) ((gHatIdxMeas params family x).toSubMeas)
 
 /-- Right tensor-placement for `\widehat G^x_g`. -/
-noncomputable def gHatSelfConsistencyRightFamily (params : Parameters)
+noncomputable def gHatSelfConsistencyRightFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (SliceQuestion params) (GHatOutcome params) (ι × ι) :=
   fun x => rightPlacedSubMeas (ιA := ι) ((gHatIdxMeas params family x).toSubMeas)
 
 /-- Concrete family for the pairwise product `\widehat G^x_g \widehat G^y_h`. -/
-noncomputable def gHatPairProductLeft (params : Parameters)
+noncomputable def gHatPairProductLeft (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxOpFamily (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) (ι × ι) :=
   fun q =>
@@ -178,7 +182,7 @@ noncomputable def gHatPairProductLeft (params : Parameters)
         ((gHatIdxMeas params family q.2).toSubMeas)
 
 /-- Concrete family for the reversed pairwise product `\widehat G^y_h \widehat G^x_g`. -/
-noncomputable def gHatPairProductRight (params : Parameters)
+noncomputable def gHatPairProductRight (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxOpFamily (SlicePairQuestion params) (GHatOutcome params × GHatOutcome params) (ι × ι) :=
   fun q =>
@@ -188,7 +192,7 @@ noncomputable def gHatPairProductRight (params : Parameters)
         ((gHatIdxMeas params family q.2).toSubMeas)
 
 /-- The ordered half-product `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
-noncomputable def gHatHalfProductOutcomeOperator (params : Parameters)
+noncomputable def gHatHalfProductOutcomeOperator (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → MIPStarRE.Quantum.Op ι
   | 0, _xs, _gs =>
@@ -199,7 +203,7 @@ noncomputable def gHatHalfProductOutcomeOperator (params : Parameters)
 
 /-- The total half-product
 `\sum_{g_1,\dots,g_k} \widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k}`. -/
-noncomputable def gHatHalfProductTotalOperator (params : Parameters)
+noncomputable def gHatHalfProductTotalOperator (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     (k : ℕ) → PointTuple params k → MIPStarRE.Quantum.Op ι
   | 0, _xs =>
@@ -210,7 +214,7 @@ noncomputable def gHatHalfProductTotalOperator (params : Parameters)
 
 /-- The cyclically rotated half-product
 `\widehat G^{x_2}_{g_2} \cdots \widehat G^{x_k}_{g_k} \widehat G^{x_1}_{g_1}`. -/
-noncomputable def gHatRotatedHalfProductOutcomeOperator (params : Parameters)
+noncomputable def gHatRotatedHalfProductOutcomeOperator (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → MIPStarRE.Quantum.Op ι
   | 0, _xs, _gs =>
@@ -220,7 +224,7 @@ noncomputable def gHatRotatedHalfProductOutcomeOperator (params : Parameters)
         ((gHatIdxMeas params family (xs 0)).toSubMeas).outcome (gs 0)
 
 /-- The total cyclically rotated half-product. -/
-noncomputable def gHatRotatedHalfProductTotalOperator (params : Parameters)
+noncomputable def gHatRotatedHalfProductTotalOperator (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     (k : ℕ) → PointTuple params k → MIPStarRE.Quantum.Op ι
   | 0, _xs =>
@@ -229,7 +233,7 @@ noncomputable def gHatRotatedHalfProductTotalOperator (params : Parameters)
       gHatHalfProductTotalOperator params family k (pointTupleTail xs) *
         ((gHatIdxMeas params family (xs 0)).toSubMeas).total
 
-lemma gHatHalfProductTotalOperator_eq_one (params : Parameters)
+lemma gHatHalfProductTotalOperator_eq_one (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k), gHatHalfProductTotalOperator params family k xs = 1
   | 0, _xs => by
@@ -239,7 +243,7 @@ lemma gHatHalfProductTotalOperator_eq_one (params : Parameters)
       simp [gHatIdxMeas, completeSubMeas,
         gHatHalfProductTotalOperator_eq_one params family k (pointTupleTail xs)]
 
-lemma gHatRotatedHalfProductTotalOperator_eq_one (params : Parameters)
+lemma gHatRotatedHalfProductTotalOperator_eq_one (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k), gHatRotatedHalfProductTotalOperator params family k xs = 1
   | 0, _xs => by
@@ -249,7 +253,7 @@ lemma gHatRotatedHalfProductTotalOperator_eq_one (params : Parameters)
       simp [gHatIdxMeas, completeSubMeas,
         gHatHalfProductTotalOperator_eq_one params family k (pointTupleTail xs)]
 
-lemma gHatHalfProduct_sum_eq_total (params : Parameters)
+lemma gHatHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k),
       (∑ gs : GHatTupleOutcome params k,
@@ -258,18 +262,31 @@ lemma gHatHalfProduct_sum_eq_total (params : Parameters)
   | 0, _xs => by
       simp [gHatHalfProductOutcomeOperator, gHatHalfProductTotalOperator]
   | k + 1, xs => by
-      let α : Fin (k + 1) → Type := fun _ => GHatOutcome params
+      let e : GHatTupleOutcome params (k + 1) ≃
+          GHatOutcome params × GHatTupleOutcome params k :=
+        { toFun := fun gs => (gs 0, gHatTupleOutcomeTail gs)
+          invFun := fun p => Fin.cons p.1 p.2
+          left_inv := by
+            intro gs
+            funext i
+            cases i using Fin.cases with
+            | zero => rfl
+            | succ j => rfl
+          right_inv := by
+            intro p
+            cases p
+            rfl }
       have hsplit :
           (∑ gs : GHatTupleOutcome params (k + 1),
               gHatHalfProductOutcomeOperator params family (k + 1) xs gs) =
             ∑ p : GHatOutcome params × GHatTupleOutcome params k,
               gHatHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2) := by
         symm
-        exact Fintype.sum_equiv (Fin.consEquiv α)
+        exact (Fintype.sum_equiv e
+          (fun gs => gHatHalfProductOutcomeOperator params family (k + 1) xs gs)
           (fun p =>
             gHatHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2))
-          (fun gs => gHatHalfProductOutcomeOperator params family (k + 1) xs gs)
-          (by intro p; rfl)
+          (by intro gs; rfl)).symm
       rw [hsplit]
       simp only [gHatHalfProductOutcomeOperator, Fin.cons_zero]
       rw [← Finset.univ_product_univ, Finset.sum_product]
@@ -302,7 +319,7 @@ lemma gHatHalfProduct_sum_eq_total (params : Parameters)
               rw [(gHatIdxMeas params family (xs 0)).sum_eq_total]
               simp [gHatHalfProductTotalOperator]
 
-lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters)
+lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k),
       (∑ gs : GHatTupleOutcome params k,
@@ -311,7 +328,20 @@ lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters)
   | 0, _xs => by
       simp [gHatRotatedHalfProductOutcomeOperator, gHatRotatedHalfProductTotalOperator]
   | k + 1, xs => by
-      let α : Fin (k + 1) → Type := fun _ => GHatOutcome params
+      let e : GHatTupleOutcome params (k + 1) ≃
+          GHatOutcome params × GHatTupleOutcome params k :=
+        { toFun := fun gs => (gs 0, gHatTupleOutcomeTail gs)
+          invFun := fun p => Fin.cons p.1 p.2
+          left_inv := by
+            intro gs
+            funext i
+            cases i using Fin.cases with
+            | zero => rfl
+            | succ j => rfl
+          right_inv := by
+            intro p
+            cases p
+            rfl }
       have hsplit :
           (∑ gs : GHatTupleOutcome params (k + 1),
               gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs gs) =
@@ -319,11 +349,11 @@ lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters)
               gHatRotatedHalfProductOutcomeOperator
                 params family (k + 1) xs (Fin.cons p.1 p.2) := by
         symm
-        exact Fintype.sum_equiv (Fin.consEquiv α)
+        exact (Fintype.sum_equiv e
+          (fun gs => gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs gs)
           (fun p =>
             gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2))
-          (fun gs => gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs gs)
-          (by intro p; rfl)
+          (by intro gs; rfl)).symm
       rw [hsplit]
       simp only [gHatRotatedHalfProductOutcomeOperator, Fin.cons_zero]
       rw [← Finset.univ_product_univ, Finset.sum_product]
@@ -442,7 +472,7 @@ private lemma projSubMeas_total_proj {α : Type*} [Fintype α]
           exact projSubMeas_outcome_mul_total_eq_outcome A a
     _ = A.total := A.sum_eq_total
 
-private lemma gHatIdxMeas_proj (params : Parameters)
+private lemma gHatIdxMeas_proj (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (x : Fq params) (g : GHatOutcome params) :
     (gHatIdxMeas params family x).outcome g * (gHatIdxMeas params family x).outcome g =
       (gHatIdxMeas params family x).outcome g := by
@@ -487,9 +517,49 @@ theorem bernoulliTailOperator_nonneg
   refine Finset.sum_nonneg fun r _ => ?_
   simpa using binomialOperatorTerm_nonneg (G := G) k r hG hGle
 
+/-- The Bernoulli tail operator is bounded by the identity for a PSD contraction. -/
+theorem bernoulliTailOperator_le_one
+    (k degree : ℕ) (G : MIPStarRE.Quantum.Op ι)
+    (hG : 0 ≤ G) (hGle : G ≤ 1) :
+    bernoulliTailOperator k degree G ≤ 1 := by
+  let term : ℕ → MIPStarRE.Quantum.Op ι := fun r =>
+    (Nat.choose k r : ℂ) • (G ^ r * (1 - G) ^ (k - r))
+  have hsubset : Finset.Icc (degree + 1) k ⊆ Finset.range (k + 1) := by
+    intro r hr
+    simp only [Finset.mem_Icc, Finset.mem_range] at hr ⊢
+    exact Nat.lt_succ_of_le hr.2
+  have htail_le_full :
+      ∑ r ∈ Finset.Icc (degree + 1) k, term r ≤ ∑ r ∈ Finset.range (k + 1), term r := by
+    refine Finset.sum_le_sum_of_subset_of_nonneg hsubset ?_
+    intro r hrange hrnot
+    simpa [term] using binomialOperatorTerm_nonneg (G := G) k r hG hGle
+  have hcomm : Commute G (1 - G) :=
+    (Commute.one_right G).sub_right (Commute.refl G)
+  have hfull :
+      ∑ r ∈ Finset.range (k + 1), term r = 1 := by
+    calc
+      ∑ r ∈ Finset.range (k + 1), term r
+          = ∑ r ∈ Finset.range (k + 1), G ^ r * (1 - G) ^ (k - r) * Nat.choose k r := by
+              refine Finset.sum_congr rfl ?_
+              intro r hr
+              let A := G ^ r * (1 - G) ^ (k - r)
+              have hcast_comm : Commute (Nat.choose k r : MIPStarRE.Quantum.Op ι) A :=
+                Nat.cast_commute (Nat.choose k r) A
+              simpa [term, A, Algebra.smul_def] using hcast_comm.eq
+      _ = (G + (1 - G)) ^ k := by
+            symm
+            exact Commute.add_pow hcomm k
+      _ = 1 := by simp
+  calc
+    bernoulliTailOperator k degree G
+        = ∑ r ∈ Finset.Icc (degree + 1) k, term r := by
+            simp [bernoulliTailOperator, term]
+    _ ≤ ∑ r ∈ Finset.range (k + 1), term r := htail_le_full
+    _ = 1 := hfull
+
 /-- Concrete family for the full sandwich
 `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k} \cdots \widehat G^{x_1}_{g_1}`. -/
-noncomputable def gHatSandwichFamily (params : Parameters)
+noncomputable def gHatSandwichFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas (PointTuple params k) (GHatTupleOutcome params k) ι :=
   fun xs =>
@@ -642,7 +712,7 @@ noncomputable def restrictSubMeas {α : Type*} [Fintype α]
 
 /-- Restrict the sandwiched completed-slice family to tuples with support of size at
 least `d + 1`, matching the `|τ| ≥ d+1` filter in the paper before interpolation. -/
-noncomputable def interpolationEligibleSandwichFamily (params : Parameters)
+noncomputable def interpolationEligibleSandwichFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas (PointTuple params k) (GHatTupleOutcome params k) ι :=
   fun xs =>
@@ -652,7 +722,7 @@ noncomputable def interpolationEligibleSandwichFamily (params : Parameters)
         (InterpolationEligible params)
 
 /-- Concrete family for the half-sandwich product of `k` completed slices. -/
-noncomputable def gHatHalfSandwichLeft (params : Parameters)
+noncomputable def gHatHalfSandwichLeft (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxOpFamily (PointTuple params k) (GHatTupleOutcome params k) (ι × ι) :=
   fun xs =>
@@ -662,7 +732,7 @@ noncomputable def gHatHalfSandwichLeft (params : Parameters)
       }
 
 /-- Concrete family for the cyclically permuted half-sandwich product. -/
-noncomputable def gHatHalfSandwichRight (params : Parameters)
+noncomputable def gHatHalfSandwichRight (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxOpFamily (PointTuple params k) (GHatTupleOutcome params k) (ι × ι) :=
   fun xs =>
@@ -674,7 +744,7 @@ noncomputable def gHatHalfSandwichRight (params : Parameters)
 /-- The operator-polynomial `S_{τ≥ℓ}` from `lem:from-H-to-G` (eq:S-def):
 `S_{τ≥ℓ} = ∑_{r : r + suffixWeight ≥ d+1} C(ℓ-1, r) · G^r · (I-G)^{(ℓ-1)-r}`
 where `G` is the averaged total operator. -/
-noncomputable def suffixBernoulliWeightOperator (params : Parameters)
+noncomputable def suffixBernoulliWeightOperator (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : MIPStarRE.Quantum.Op ι :=
   let G := family.averagedSubMeas.total
   let suffixWeight := (Finset.univ.filter fun i : Fin k => ℓ ≤ i.val ∧ τ i).card
@@ -688,7 +758,7 @@ if there exists a single polynomial `h` in `m+1` variables whose restriction to
 each slice height `xᵢ` agrees with the genuine slice polynomial `gᵢ` for every
 index `i` in the support of `gs`.  This matches the paper's `Global_τ(x)` predicate
 from `references/ldt-paper/ld-pasting.tex` lines 1123–1131. -/
-def IsGloballyConsistent (params : Parameters) {k : ℕ}
+def IsGloballyConsistent (params : Parameters) [FieldModel params.q] {k : ℕ}
     (xs : PointTuple params k) (gs : GHatTupleOutcome params k) : Prop :=
   ∃ h : Polynomial params.next,
     ∀ i : Fin k, ∀ (hi : (gs i).isSome = true),
@@ -698,7 +768,7 @@ def IsGloballyConsistent (params : Parameters) {k : ℕ}
 /-- `IsGloballyConsistent params xs` is decidable (classically), needed for
 `restrictSubMeas` filtering. -/
 noncomputable instance isGloballyConsistent_decidablePred
-    (params : Parameters) {k : ℕ} (xs : PointTuple params k) :
+    (params : Parameters) [FieldModel params.q] {k : ℕ} (xs : PointTuple params k) :
     DecidablePred (IsGloballyConsistent params xs) :=
   fun _gs => Classical.dec _
 
@@ -710,7 +780,7 @@ only tuples `(g_1,…,g_k)` in `Global_τ(x)` — those consistent with a single
 polynomial `h` — and then interpolates.  The `|τ| ≥ d+1` eligibility filter is
 applied by `interpolationEligibleSandwichFamily`; this definition additionally
 restricts to globally consistent tuples via `IsGloballyConsistent`. -/
-noncomputable def pastedInterpolationFamily (params : Parameters)
+noncomputable def pastedInterpolationFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas (PointTuple params k) (Polynomial params.next) ι :=
   fun xs =>
@@ -722,7 +792,7 @@ noncomputable def pastedInterpolationFamily (params : Parameters)
 
 /-- The averaged sandwiched family restricted to outcome tuples of type `τ`
 with `|τ| ≥ d+1`, as in `lem:over-all-outcomes`. -/
-noncomputable def averagedEligibleSandwichSubMeas (params : Parameters)
+noncomputable def averagedEligibleSandwichSubMeas (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) :
     SubMeas (GHatTupleOutcome params k) ι :=
   averageIdxSubMeas
@@ -731,7 +801,7 @@ noncomputable def averagedEligibleSandwichSubMeas (params : Parameters)
     (distinctTupleDistribution_weight_sum_le_one params k)
 
 /-- The specific pasted submeasurement constructed from the sandwich/interpolation scheme. -/
-noncomputable def constructedPastedSubMeas (params : Parameters)
+noncomputable def constructedPastedSubMeas (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) : SubMeas (Polynomial params.next) ι :=
   averageIdxSubMeas
     (distinctTupleDistribution params k)
@@ -739,7 +809,8 @@ noncomputable def constructedPastedSubMeas (params : Parameters)
     (distinctTupleDistribution_weight_sum_le_one params k)
 
 /-- The distinguished fallback polynomial `h₀` that receives the completion mass. -/
-noncomputable def pastedFallbackOutcome (params : Parameters) : Polynomial params.next :=
+noncomputable def pastedFallbackOutcome (params : Parameters) [FieldModel params.q] :
+    Polynomial params.next :=
   fallbackInterpolatedPolynomial params
 
 /-- The specific pasted measurement obtained by completing the constructed pasted submeasurement.
@@ -748,7 +819,7 @@ The paper adds all missing mass `I - H_total` to a single distinguished polynomi
 outcome `h₀` (the fallback interpolant).  So the outcome operator for `h₀` becomes
 `H_{h₀} + (I - H_total)` while all other outcomes keep their original operators, and
 the total is genuinely the identity `I`. -/
-noncomputable def constructedPastedMeasurement (params : Parameters)
+noncomputable def constructedPastedMeasurement (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) : Measurement (Polynomial params.next) ι where
   toSubMeas := by
     classical
@@ -788,7 +859,7 @@ noncomputable def constructedPastedMeasurement (params : Parameters)
   total_eq_one := rfl
 
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/
-noncomputable def verticalLineMeasurementFamily (params : Parameters)
+noncomputable def verticalLineMeasurementFamily (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) :
     IdxSubMeas (VerticalLineQuestion params) (AxisLinePolynomial params.next) ι :=
   fun u =>
@@ -798,7 +869,7 @@ noncomputable def verticalLineMeasurementFamily (params : Parameters)
     (strategy.axisParallelMeasurement ℓ).toSubMeas
 
 /-- Explicit value extracted from the `i`-th completed slice outcome at the test point. -/
-noncomputable def ldSandwichLineOnePointLeftFamily (params : Parameters)
+noncomputable def ldSandwichLineOnePointLeftFamily (params : Parameters) [FieldModel params.q]
     (_strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (k i : ℕ) : IdxSubMeas (SandwichedLineQuestion params k) (Option (Fq params)) ι :=
@@ -810,7 +881,7 @@ noncomputable def ldSandwichLineOnePointLeftFamily (params : Parameters)
         none)
 
 /-- Explicit value extracted from the vertical line measurement `B^u` at the slice height `x_i`. -/
-noncomputable def ldSandwichLineOnePointRightFamily (params : Parameters)
+noncomputable def ldSandwichLineOnePointRightFamily (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (_family : IdxPolyFamily params ι)
     (k i : ℕ) : IdxSubMeas (SandwichedLineQuestion params k) (Option (Fq params)) ι :=
@@ -822,7 +893,7 @@ noncomputable def ldSandwichLineOnePointRightFamily (params : Parameters)
         none)
 
 /-- Restrict a global polynomial-valued submeasurement to the vertical line through `u`. -/
-noncomputable def hRestrictionToVerticalLine (params : Parameters)
+noncomputable def hRestrictionToVerticalLine (params : Parameters) [FieldModel params.q]
     (H : SubMeas (Polynomial params.next) ι) :
     IdxSubMeas (VerticalLineQuestion params) (AxisLinePolynomial params.next) ι :=
   fun u =>
@@ -838,21 +909,21 @@ noncomputable def pastedMeasurementTotal
   constSubMeasFamily (postprocess H (fun _ => ()))
 
 /-- The total operator of the specifically constructed pasted submeasurement. -/
-noncomputable def constructedPastedMeasurementTotal (params : Parameters)
+noncomputable def constructedPastedMeasurementTotal (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas Unit Unit ι :=
   pastedMeasurementTotal (constructedPastedSubMeas params family k)
 
 /-- The expansion over all outcome types `τ`, written as the
 total mass of the averaged sandwich family restricted to `|τ| ≥ d+1`. -/
-noncomputable def allOutcomesExpansionFamily (params : Parameters)
+noncomputable def allOutcomesExpansionFamily (params : Parameters) [FieldModel params.q]
     (_strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas Unit Unit ι :=
   pastedMeasurementTotal (averagedEligibleSandwichSubMeas params family k)
 
 /-- The Bernoulli-tail polynomial in the averaged complete operator `G = E_x \sum_g G^x_g`. -/
-noncomputable def bernoulliTailFromFamily (params : Parameters)
+noncomputable def bernoulliTailFromFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas Unit Unit ι :=
   constSubMeasFamily <|
@@ -868,8 +939,10 @@ noncomputable def bernoulliTailFromFamily (params : Parameters)
       sum_eq_total := by
         simp
       total_le_one := by
-        -- This needs the Bernoulli-tail upper bound from the matrix Chernoff step.
-        sorry }
+        let G := (IdxPolyFamily.averagedSubMeas family).total
+        have hG : 0 ≤ G := (IdxPolyFamily.averagedSubMeas family).total_nonneg
+        have hGle : G ≤ 1 := (IdxPolyFamily.averagedSubMeas family).total_le_one
+        simpa [Y, G] using bernoulliTailOperator_le_one k params.d G hG hGle }
 
 /-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`,
 parameterised by the suffix type `τ ∈ {0,1}^k`.
@@ -877,7 +950,7 @@ parameterised by the suffix type `τ ∈ {0,1}^k`.
 For each step `ℓ`, the paper (`references/ldt-paper/ld-pasting.tex` lines 1380–1425)
 forms the product `Ĥ^{x_{≥ℓ}}_{g_{≥ℓ}} ⊗ S_{τ_{≥ℓ}}` where `S_{τ_{≥ℓ}}` is the
 Bernoulli weight operator depending on the suffix type `τ`. -/
-noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters)
+noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k ℓ : ℕ)
     (τ : GHatType k) :
@@ -893,7 +966,7 @@ parameterised by the suffix type `τ ∈ {0,1}^k`.
 
 Mirror of `fromHToGRecurrenceLeftFamily` on the Bernoulli-tail side.
 See `references/ldt-paper/ld-pasting.tex` lines 1380–1425. -/
-noncomputable def fromHToGRecurrenceRightFamily (params : Parameters)
+noncomputable def fromHToGRecurrenceRightFamily (params : Parameters) [FieldModel params.q]
     (_strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k ℓ : ℕ)
     (τ : GHatType k) :

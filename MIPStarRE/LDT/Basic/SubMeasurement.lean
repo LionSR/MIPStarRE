@@ -26,6 +26,8 @@ instance {α : Type*} [Fintype α] {ι : Type*} [Fintype ι] [DecidableEq ι] :
     Inhabited (SubMeas α ι) where
   default := {
     outcome := fun _ => 0
+    -- This default object is the zero family; downstream raw-operator scaffolding
+    -- sometimes keeps `total := 0` as an explicit sentinel when only outcomes matter.
     total := 0
     outcome_pos := by
       intro a
@@ -540,5 +542,41 @@ def rightPlacedSubMeas {α : Type*}
     rw [rightTensor_finset_sum (ι₁ := ιA) Finset.univ A.outcome, A.sum_eq_total]
   total_le_one := by
     exact rightTensor_le_one (ι₁ := ιA) A.total_le_one
+
+/-- Lift an indexed submeasurement family to the left tensor factor of
+`ιA × ιB` (general bipartite placement). -/
+def IdxSubMeas.placeLeft {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (A : IdxSubMeas Question Outcome ιA) :
+    IdxSubMeas Question Outcome (ιA × ιB) :=
+  fun q => leftPlacedSubMeas (A q)
+
+/-- Lift an indexed submeasurement family to the right tensor factor of
+`ιA × ιB` (general bipartite placement). -/
+def IdxSubMeas.placeRight {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (A : IdxSubMeas Question Outcome ιB) :
+    IdxSubMeas Question Outcome (ιA × ιB) :=
+  fun q => rightPlacedSubMeas (A q)
+
+/-- `placeLeft` is `liftLeft` when both indices are the same. -/
+theorem IdxSubMeas.placeLeft_eq_liftLeft {Question Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (A : IdxSubMeas Question Outcome ι) :
+    IdxSubMeas.placeLeft (ιB := ι) A = IdxSubMeas.liftLeft A := by
+  funext q
+  rfl
+
+/-- `placeRight` is `liftRight` when both indices are the same. -/
+theorem IdxSubMeas.placeRight_eq_liftRight {Question Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (A : IdxSubMeas Question Outcome ι) :
+    IdxSubMeas.placeRight (ιA := ι) A = IdxSubMeas.liftRight A := by
+  funext q
+  rfl
 
 end MIPStarRE.LDT

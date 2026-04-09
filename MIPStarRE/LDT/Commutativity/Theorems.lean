@@ -48,16 +48,24 @@ noncomputable def comMainError (params : Parameters) (gamma zeta : Error) : Erro
 
 The strategy state is bipartite.  Alice-side measurements are lifted to
 the left tensor factor, while Bob-side postprocessed point measurements
-are lifted to the right tensor factor. -/
+are lifted to the right tensor factor.
+
+The parameter `G` is the slice-indexed family `x ↦ G^x`; the hypothesis
+`familyG` ties it back to `family.meas` so that the stability weights
+`√(G^y_h)` and `√(G^x_g)` agree with the family's projective
+sub-measurements. -/
 structure CommDataProcessedGConclusion (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
     (gamma zeta : Error) : Prop where
+  familyG : ∀ x, G x = (family.meas x).toSubMeas
   postprocessedPointConsistency :
     ConsRel strategy.state
       (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      (IdxSubMeas.liftRight (evaluatedPointFamily params family))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (evaluatedPointFamily params family)
       zeta
   postprocessedSelfConsistency :
     SDDRel strategy.state
@@ -68,14 +76,14 @@ structure CommDataProcessedGConclusion (params : Parameters)
   stabilityOne :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
-      (commDataProcessedGStabilityOneLeft params strategy family)
-      (IdxSubMeas.toIdxOpFamily (commDataProcessedGStabilityOneRight params strategy family))
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
       (commDataProcessedGStabilityOneError zeta)
   stabilityTwo :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
-      (commDataProcessedGStabilityTwoLeft params strategy family)
-      (commDataProcessedGStabilityTwoRight params strategy family)
+      (commDataProcessedGStabilityTwoLeft params strategy family G)
+      (commDataProcessedGStabilityTwoRight params strategy family G)
       (commDataProcessedGStabilityTwoError params gamma zeta)
   evaluatedSliceCommutation :
     SDDOpRel strategy.state
@@ -86,11 +94,13 @@ structure CommDataProcessedGConclusion (params : Parameters)
 
 /-- Output package for `thm:com-main`. -/
 structure ComMainConclusion (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
     (gamma zeta : Error) : Prop where
   evaluatedCommutation :
-    CommDataProcessedGConclusion params strategy family gamma zeta
+    CommDataProcessedGConclusion params strategy family G gamma zeta
   evaluationSpecialization :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
@@ -122,16 +132,20 @@ structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
-    CommDataProcessedGConclusion params strategy family gamma zeta := by
+    CommDataProcessedGConclusion params strategy family G gamma zeta := by
   refine
-    { postprocessedPointConsistency := ?_
+    { familyG := hG
+      postprocessedPointConsistency := ?_
       postprocessedSelfConsistency := by
         -- TODO: Derive self-consistency of the postprocessed left/right
         -- evaluated point families from `hself` (`lem:comm-data-processed-g`);
@@ -139,14 +153,15 @@ lemma commDataProcessedG
         sorry
       stabilityOne := by
         -- TODO: Prove the first insertion/removal stability step for the
-        -- appended `G^y` total operator (`lem:comm-data-processed-g`); blocked
-        -- on `SDDOpRel` append/postprocess bridge lemmas.
+        -- trailing `G^y` factor while keeping Bob's right-register point
+        -- measurement (`lem:comm-data-processed-g`); blocked on the needed
+        -- `SDDOpRel` bridge lemmas for these paired tensor-product families.
         sorry
       stabilityTwo := by
         -- TODO: Prove the second insertion/removal stability step for the
-        -- appended `G^x` total operator (`lem:comm-data-processed-g`); blocked
-        -- on the corresponding `SDDOpRel` bridge from the evaluated slice
-        -- product scaffold.
+        -- trailing `G^x` factor while keeping Bob's ordered point-measurement
+        -- product (`lem:comm-data-processed-g`); blocked on the corresponding
+        -- `SDDOpRel` bridge from the evaluated-slice product scaffold.
         sorry
       evaluatedSliceCommutation := by
         -- TODO: Show approximate commutation of the ordered and reversed
@@ -236,7 +251,7 @@ private lemma postprocess_leftPlacedOpFamily_reversedProduct_outcome
 /-- The evaluated-from-full-slice ordered product equals the
 evaluated-slice ordered product at each question-outcome pair. -/
 private lemma evaluatedFromFullSliceProductLeft_outcome_eq
-    (params : Parameters) (strategy : SymStrat params.next ι)
+    (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (q : EvaluatedSliceQuestion params)
     (ab : EvaluatedSliceOutcome params) :
@@ -261,7 +276,7 @@ private lemma evaluatedFromFullSliceProductLeft_outcome_eq
 /-- The evaluated-from-full-slice reversed product equals the
 evaluated-slice reversed product at each question-outcome pair. -/
 private lemma evaluatedFromFullSliceProductRight_outcome_eq
-    (params : Parameters) (strategy : SymStrat params.next ι)
+    (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (q : EvaluatedSliceQuestion params)
     (ab : EvaluatedSliceOutcome params) :
@@ -287,7 +302,7 @@ private lemma evaluatedFromFullSliceProductRight_outcome_eq
 SDD error, because the postprocessed product equals the product of
 postprocessed submeasurements at every question-outcome pair. -/
 private lemma evaluationSpecialization_sddErrorOp_eq
-    (params : Parameters) (strategy : SymStrat params.next ι)
+    (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) :
     sddErrorOp strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
@@ -307,17 +322,20 @@ private lemma evaluationSpecialization_sddErrorOp_eq
 /-- `thm:com-main`. -/
 theorem comMain
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta) :
-    ComMainConclusion params strategy family gamma zeta := by
+    ComMainConclusion params strategy family G gamma zeta := by
   let hEval :=
-    commDataProcessedG params strategy eps delta gamma zeta
-      hgood family hcons hself hbound
+    commDataProcessedG params strategy eps delta gamma zeta hgood family G
+      hG hcons hself hbound
   refine
     { evaluatedCommutation := hEval
       evaluationSpecialization := by

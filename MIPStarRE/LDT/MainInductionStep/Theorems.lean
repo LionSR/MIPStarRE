@@ -13,15 +13,16 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- `thm:main-induction`. -/
 theorem mainInduction
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (k : ℕ)
     (hk : params.m * params.d ≤ k) :
     ∃ G : Measurement (Polynomial params) ι,
-      ConsWithPolyEval params strategy.state
-        (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-        G.toSubMeas.liftRight
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
   /-
   This is the full inductive argument from `inductive_step.tex`: it combines the
@@ -35,13 +36,14 @@ theorem mainInduction
 /-- `thm:self-improvement-in-induction-section`. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
-    (hcons : ConsWithPolyEval params strategy.state
-      (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurement)
-      G.liftRight nu) :
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   /-
@@ -57,6 +59,7 @@ theorem selfImprovementInInductionSection
 /-- `thm:ld-pasting-in-induction-section`. -/
 theorem ldPastingInInductionSection
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -81,6 +84,7 @@ theorem ldPastingInInductionSection
 /-- `lem:restricted-probabilities`. -/
 lemma restrictedProbabilities
     (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
@@ -88,7 +92,13 @@ lemma restrictedProbabilities
   /-
   This is the slice-conditioning bookkeeping lemma from `inductive_step.tex`.
   It needs a genuine construction of the restricted failure profile and several
-  averaging/conditioning estimates, so it remains a standalone proof task.
+  averaging/conditioning estimates.
+
+  TODO(#195): The paper's statement uses a genuine restricted diagonal strategy
+  and the `((m + 1) / m)` loss factor on the diagonal branch. The current Lean
+  statement still reflects the temporary `q`-based diagonal conditioning model
+  from `Defs`/`Statements`, so the proof should not be filled in until that
+  modeling mismatch is resolved.
   -/
   sorry
 

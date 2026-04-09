@@ -167,16 +167,19 @@ noncomputable def tensorProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
 
 /-- Recover the sampled point from a diagonal-line/parameter sample. -/
 def sampledPointFromDiagonalQuestion (params : Parameters)
+    [FieldModel params.q]
     (q : PointDiagonalLineQuestion params) : Point params :=
   q.1.pointAt q.2
 
 /-- Recover the two sampled points from a shared diagonal-line sample. -/
 def sampledPointPairFromSharedDiagonalQuestion (params : Parameters)
+    [FieldModel params.q]
     (q : PointPairDiagonalLineQuestion params) : PointPairQuestion params :=
   (q.1.pointAt q.2.1, q.1.pointAt q.2.2)
 
 /-- The ordered point product `(A^u_a A^v_b) ⊗ I` on the bipartite space `d * d`. -/
 noncomputable def pointMeasurementProductLeft (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι) :
     IdxOpFamily (PointPairQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun uv =>
@@ -187,6 +190,7 @@ noncomputable def pointMeasurementProductLeft (params : Parameters)
 
 /-- The reversed point product `(A^v_b A^u_a) ⊗ I` on the bipartite space `ι × ι`. -/
 noncomputable def pointMeasurementProductRight (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι) :
     IdxOpFamily (PointPairQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun uv =>
@@ -196,17 +200,53 @@ noncomputable def pointMeasurementProductRight (params : Parameters)
       reversedProductOpFamily Au Av
 
 /-- Distribution obtained by sampling a diagonal line together with a parameter on that line. -/
-noncomputable def pointWithDiagonalLineDistribution (params : Parameters) :
+noncomputable def pointWithDiagonalLineDistribution (params : Parameters)
+    [FieldModel params.q] :
     Distribution (PointDiagonalLineQuestion params) :=
   uniformDistribution (PointDiagonalLineQuestion params)
 
-/-- Distribution obtained by sampling a diagonal line together with two parameters on it. -/
-noncomputable def pointPairSharedDiagonalLineDistribution (params : Parameters) :
-    Distribution (PointPairDiagonalLineQuestion params) :=
-  uniformDistribution (PointPairDiagonalLineQuestion params)
+/-- Realize a shared-line sample from a uniformly random point pair and parameter.
+
+The resulting line is parameterized so that the first point is visited at `t` and the
+second at `t + 1`. This matches the paper's sampling of two random points together with
+some diagonal line containing both. -/
+noncomputable def sharedDiagonalLineQuestionOfPointPair (params : Parameters)
+    [FieldModel params.q]
+    (s : PointPairQuestion params × Fq params) :
+    PointPairDiagonalLineQuestion params := by
+  let u := s.1.1
+  let v := s.1.2
+  let t := s.2
+  let direction : Point params := fun i => subCoord (v i) (u i)
+  let base : Point params := fun i => subCoord (u i) (mulCoord t (direction i))
+  exact ({ base := base, direction := direction }, (t, addCoord t (encodeScalar 1)))
+
+/-- Distribution obtained by sampling a uniform point pair and then packaging it as a
+shared diagonal-line question. -/
+noncomputable def pointPairSharedDiagonalLineDistribution (params : Parameters)
+    [FieldModel params.q] :
+    Distribution (PointPairDiagonalLineQuestion params) where
+  support := Finset.univ.image (sharedDiagonalLineQuestionOfPointPair params)
+  weight := fun q =>
+    if q ∈ Finset.univ.image (sharedDiagonalLineQuestionOfPointPair params) then
+      1 / (Fintype.card (PointPairQuestion params × Fq params) : Error)
+    else
+      0
+  nonnegative := by
+    intro q
+    by_cases hq : q ∈ Finset.univ.image (sharedDiagonalLineQuestionOfPointPair params)
+    · have hqpos : 0 < (params.q : Error) := by
+        exact_mod_cast params.hq
+      simp [hq]
+      positivity
+    · simp [hq]
+  outsideSupport := by
+    intro q hq
+    simp [hq]
 
 /-- The point measurement, reindexed by a sampled diagonal line and a parameter on it. -/
 def sampledPointMeasurement (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι) :
     IdxSubMeas (PointDiagonalLineQuestion params) (Fq params) ι :=
   fun q =>
@@ -214,6 +254,7 @@ def sampledPointMeasurement (params : Parameters)
 
 /-- Evaluate the diagonal-line measurement at the sampled parameter. -/
 noncomputable def sampledDiagonalLineEvaluation (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι) :
     IdxSubMeas (PointDiagonalLineQuestion params) (Fq params) ι :=
   fun q =>
@@ -221,6 +262,7 @@ noncomputable def sampledDiagonalLineEvaluation (params : Parameters)
 
 /-- The ordered point product `(A^u_a A^v_b) ⊗ I`, indexed by a shared sampled line. -/
 noncomputable def pointMeasurementProductAlongSharedLine (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι) :
     IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun q =>
@@ -229,6 +271,7 @@ noncomputable def pointMeasurementProductAlongSharedLine (params : Parameters)
 
 /-- The reversed point product `(A^v_b A^u_a) ⊗ I`, indexed by a shared sampled line. -/
 noncomputable def pointMeasurementProductAlongSharedLineReversed (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι) :
     IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun q =>
@@ -237,6 +280,7 @@ noncomputable def pointMeasurementProductAlongSharedLineReversed (params : Param
 
 /-- The mixed bridge `A^u_a ⊗ L^ℓ_[f(v)=b]` on the bipartite space `d * d`. -/
 noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι) :
     IdxSubMeas (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun q =>
@@ -250,6 +294,7 @@ noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
 /-- The bridge `I ⊗ (L^ℓ_[f(v)=b] · L^ℓ_[f(u)=a])` on the bipartite space.
 Paper's "ordered" step: `Lv * Lu` (line measurement at v times line measurement at u). -/
 noncomputable def diagonalLineProductOrdered (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι) :
     IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun q =>
@@ -264,6 +309,7 @@ noncomputable def diagonalLineProductOrdered (params : Parameters)
 /-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] · L^ℓ_[f(v)=b])` on the bipartite space.
 Paper's "reversed" step: `Lu * Lv` (projectively swapped from ordered). -/
 noncomputable def diagonalLineProductReversed (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι) :
     IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun q =>
@@ -279,6 +325,7 @@ noncomputable def diagonalLineProductReversed (params : Parameters)
 Outcome `(a, b)` maps to `leftTensor(A^v_b) * rightTensor(L^ℓ_[f(u)=a])`,
 i.e. `a` indexes the line evaluation and `b` indexes the point measurement. -/
 noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
+    [FieldModel params.q]
     (strategy : SymStrat params ι) :
     IdxSubMeas (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
   fun q =>

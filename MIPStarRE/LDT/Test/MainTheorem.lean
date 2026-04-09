@@ -30,24 +30,24 @@ The bipartite tensor placement follows the paper:
 Fixes #137.
 -/
 theorem mainFormal
-    (params : Parameters) {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι)
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
     (hk : params.m * params.d ≤ k) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
-      ConsWithPolyEval params strategy.state
-          (IdxProjMeas.toIdxSubMeasLeft strategy.pointMeasurementA)
-          G_B.toSubMeas.liftRight
+      ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
           (mainFormalError params k eps) ∧
-        ConsWithPolyEval params strategy.state
-          (IdxProjMeas.toIdxSubMeasRight strategy.pointMeasurementB)
-          G_A.toSubMeas.liftLeft
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (polynomialEvaluationFamily params G_A.toSubMeas)
           (mainFormalError params k eps) ∧
-        PolyMeasCons params strategy.state
-          G_A.toSubMeas.liftLeft
-          G_B.toSubMeas.liftRight
+        ConsRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
   sorry
 

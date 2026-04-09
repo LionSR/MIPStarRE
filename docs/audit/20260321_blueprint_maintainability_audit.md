@@ -26,7 +26,7 @@ The chapter split is mostly sound. I did not find broken `\uses` references, and
 
 - `thm:main-formal` is still a theorem-first exception, but the graph does not admit that honestly. The theorem is placed before the notation chapter that defines the comparison symbols and low-degree measurement notation it uses. That can be a reasonable expositional choice, but the current `\uses` list hides the exception instead of documenting it.
 
-- The support notes under `docs/` are partly stale relative to the active blueprint. `20260320_ldt_source_map.md` still says the blueprint uses a single `thm:self-improvement` node carrying both Lean links. The active blueprint now has a separate `thm:self-improvement-in-induction-section` node in `ch10_induction.tex`. `20260320_ldt_blueprint_dependency_review.md` still treats the merged self-improvement node and the missing Schwartz--Zippel edge as open problems, but both are already fixed in the active blueprint. That makes the maintenance notes unreliable as a guide to the current state.
+- The support notes under `docs/` are partly stale relative to the active blueprint. `20260320_ldt_source_map.md` still says the blueprint uses a single `thm:self-improvement` node carrying both Lean links. The active blueprint now has a separate `thm:self-improvement-in-induction-section` node in `ch10_induction.tex`. `20260320_ldt_blueprint_dependency_review.md` still treats the merged self-improvement node and the missing Schwartz–Zippel edge as open problems, but both are already fixed in the active blueprint. That makes the maintenance notes unreliable as a guide to the current state.
 
 # Readability and style issues
 
@@ -34,7 +34,7 @@ The chapter split is mostly sound. I did not find broken `\uses` references, and
 
 - The proof of `thm:self-improvement-in-induction-section` in `ch10_induction.tex` is not really a proof sketch. It discusses `\texttt{inductive\_step.tex}` and chapter organization instead of the mathematical reduction. The intended sketch is short and mathematical: complete the input submeasurement to a measurement, apply the measurement-level self-improvement theorem, then transfer the result back using completion and data-processing lemmas.
 
-- The bibliography is too thin for the prose. `references.bib` has only four entries. The blueprint cites Kempe--Vidick for orthogonalization and Schwartz--Zippel for the polynomial bound, but later chapters use substantial outside material without saying so: the NW19-style measurement-comparison background mirrored by `preliminaries.tex`, the scalar Chernoff input used in `lem:chernoff-bernoulli-matrix`, and the convex-optimization background behind `lem:sdp`.
+- The bibliography is too thin for the prose. `references.bib` has only four entries. The blueprint cites Kempe--Vidick for orthogonalization and Schwartz–Zippel for the polynomial bound, but later chapters use substantial outside material without saying so: the NW19-style measurement-comparison background mirrored by `preliminaries.tex`, the scalar Chernoff input used in `lem:chernoff-bernoulli-matrix`, and the convex-optimization background behind `lem:sdp`.
 
 - A few internal labels are much noisier than the surrounding prose. `lem:looks-easy-but-took-me-a-while`, `def:G-hat`, `cor:G-hat-facts`, and `prop:ld-dnoteq` are workable as internal identifiers, but they are not the kind of stable, descriptive labels the style guide asks for.
 
@@ -58,7 +58,7 @@ The chapter split is mostly sound. I did not find broken `\uses` references, and
 
 2. Fix the label taxonomy. Either rename the `prop:` and `cor:` labels to match the current `lemma` environments, or change the environments consistently if you want corollaries to stay corollaries. Right now the labels encode an obsolete convention.
 
-3. Refresh `docs/20260320_ldt_source_map.md` and `docs/20260320_ldt_blueprint_dependency_review.md` so they describe the current active blueprint, especially the now-split self-improvement node and the already-added Schwartz--Zippel edge.
+3. Refresh `docs/20260320_ldt_source_map.md` and `docs/20260320_ldt_blueprint_dependency_review.md` so they describe the current active blueprint, especially the now-split self-improvement node and the already-added Schwartz–Zippel edge.
 
 4. Decide what to do about `thm:main-formal`. Either move the formal theorem after the notation chapter, or explicitly document that Chapter 2 is a deliberate theorem-first exception and give it the missing forward dependencies honestly.
 

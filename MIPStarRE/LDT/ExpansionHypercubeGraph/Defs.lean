@@ -718,13 +718,16 @@ noncomputable def pointAddCharRight (params : Parameters) (u : Point params) :
               simp [dotProductZMod, Finset.sum_add_distrib]
     rw [hdot, AddChar.map_add_eq_mul]
 
+private def unitFq (params : Parameters) : Fq params :=
+  ⟨1 % params.q, Nat.mod_lt 1 params.hq⟩
+
 lemma dotProductZMod_single_one (params : Parameters) (α : Point params) (i : Fin params.m) :
     dotProductZMod params
-      (Function.update (0 : Point params) i (encodeScalar (1 : ZMod params.q))) α =
+      (Function.update (0 : Point params) i (unitFq params)) α =
         ((α i).val : ZMod params.q) := by
   unfold dotProductZMod
   rw [Finset.sum_eq_single i]
-  · simp [encodeScalar]
+  · simp [Function.update, unitFq]
   · intro j hj hji
     simp [Function.update, hji]
   · simp
@@ -734,7 +737,7 @@ lemma pointAddChar_eq_zero_iff (params : Parameters) (α : Point params) :
   constructor
   · intro h
     funext i
-    let e : Point params := Function.update (0 : Point params) i (encodeScalar (1 : ZMod params.q))
+    let e : Point params := Function.update (0 : Point params) i (unitFq params)
     have hchar :
         ZMod.stdAddChar (N := params.q) (((α i).val : ZMod params.q)) = 1 := by
       simpa [pointAddChar, e, dotProductZMod_single_one] using

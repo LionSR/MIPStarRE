@@ -13,8 +13,10 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
+variable (params : Parameters) [FieldModel params.q]
 
-structure MatrixVarianceTransferRealization (params : Parameters) where
+
+structure MatrixVarianceTransferRealization (params : Parameters) [FieldModel params.q] where
   space : FiniteHilbertSpace
   state : PositiveMatrixState space
   pointMeasurement : Point params → MatrixSubmeasurement (Fq params) space
@@ -25,7 +27,7 @@ structure MatrixVarianceTransferRealization (params : Parameters) where
   axisQuestionParameter : AxisParallelLineQuestion params → Fq params
 
 /-- The concrete operator `G_g`. -/
-def matrixPolynomialWeightOperator (params : Parameters)
+def matrixPolynomialWeightOperator (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : MatrixOperator model.space :=
   model.polynomialMeasurement.effect (g : DegreeBoundedPolynomialAnswer params)
@@ -34,26 +36,28 @@ def matrixPolynomialWeightOperator (params : Parameters)
 The concrete stand-in for `(G_g)^{1/2}`. The source uses the square root; this
 placeholder omits it and reuses `G_g` itself.
 -/
-noncomputable def matrixPolynomialWeightSqrtOperator (params : Parameters)
+noncomputable def matrixPolynomialWeightSqrtOperator (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : MatrixOperator model.space :=
   matrixPolynomialWeightOperator params model g
 
 /-- The concrete operator `A^u_{g(u)}`. -/
-def matrixPointConditionedOutcomeOperatorAtPolynomial (params : Parameters)
+def matrixPointConditionedOutcomeOperatorAtPolynomial (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) (u : Point params) : MatrixOperator model.space :=
   (model.pointMeasurement u).effect (g u)
 
 /-- The weighted operator `A^u_{g(u)} (G_g)^{1/2}` on one ambient matrix algebra. -/
-noncomputable def matrixWeightedPointConditionedOperatorAtPolynomial (params : Parameters)
+noncomputable def matrixWeightedPointConditionedOperatorAtPolynomial
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) (u : Point params) : MatrixOperator model.space :=
   matrixPointConditionedOutcomeOperatorAtPolynomial params model g u *
     matrixPolynomialWeightSqrtOperator params model g
 
 /-- The matrix family attached to a fixed polynomial `g`. -/
-noncomputable def matrixPointConditionedRealizationAtPolynomial (params : Parameters)
+noncomputable def matrixPointConditionedRealizationAtPolynomial
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : MatrixOperatorFamilyRealization params where
   space := model.space
@@ -61,31 +65,36 @@ noncomputable def matrixPointConditionedRealizationAtPolynomial (params : Parame
   family := matrixWeightedPointConditionedOperatorAtPolynomial params model g
 
 /-- The actual local variance of the conditioned points family at a fixed polynomial. -/
-noncomputable def matrixPointConditionedLocalVarianceAtPolynomial (params : Parameters)
+noncomputable def matrixPointConditionedLocalVarianceAtPolynomial
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : Error :=
   matrixLocalVariance params (matrixPointConditionedRealizationAtPolynomial params model g)
 
 /-- The actual global variance of the conditioned points family at a fixed polynomial. -/
-noncomputable def matrixPointConditionedGlobalVarianceAtPolynomial (params : Parameters)
+noncomputable def matrixPointConditionedGlobalVarianceAtPolynomial
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : Error :=
   matrixGlobalVariance params (matrixPointConditionedRealizationAtPolynomial params model g)
 
 /-- The polynomial-averaged actual local variance. -/
-noncomputable def matrixPointConditionedLocalVariance (params : Parameters)
+noncomputable def matrixPointConditionedLocalVariance
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params) : Error :=
   avgOver (polynomialDistribution params) (fun g =>
     matrixPointConditionedLocalVarianceAtPolynomial params model g)
 
 /-- The polynomial-averaged actual global variance. -/
-noncomputable def matrixPointConditionedGlobalVariance (params : Parameters)
+noncomputable def matrixPointConditionedGlobalVariance
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params) : Error :=
   avgOver (polynomialDistribution params) (fun g =>
     matrixPointConditionedGlobalVarianceAtPolynomial params model g)
 
 /-- The concrete left event operator `[f(u) = g(u)]`. -/
-noncomputable def matrixGeneralizeBLeftOperatorAtPolynomial (params : Parameters)
+noncomputable def matrixGeneralizeBLeftOperatorAtPolynomial
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) : MatrixOperator model.space :=
@@ -95,7 +104,8 @@ noncomputable def matrixGeneralizeBLeftOperatorAtPolynomial (params : Parameters
   valueFamily.effect (g qu.2)
 
 /-- The concrete right event operator `[f = g|_ℓ]`. -/
-noncomputable def matrixGeneralizeBRightOperatorAtPolynomial (params : Parameters)
+noncomputable def matrixGeneralizeBRightOperatorAtPolynomial
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) : MatrixOperator model.space :=
@@ -103,7 +113,8 @@ noncomputable def matrixGeneralizeBRightOperatorAtPolynomial (params : Parameter
     ((Polynomial.restrictToAxisParallelLine params g qu.1 : DegreeBoundedLineAnswer params))
 
 /-- The weighted left operator in the matrix-level `generalize-b` estimate. -/
-noncomputable def matrixWeightedGeneralizeBLeftOperatorAtPolynomial (params : Parameters)
+noncomputable def matrixWeightedGeneralizeBLeftOperatorAtPolynomial
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) : MatrixOperator model.space :=
@@ -111,7 +122,8 @@ noncomputable def matrixWeightedGeneralizeBLeftOperatorAtPolynomial (params : Pa
     matrixPolynomialWeightSqrtOperator params model g
 
 /-- The weighted right operator in the matrix-level `generalize-b` estimate. -/
-noncomputable def matrixWeightedGeneralizeBRightOperatorAtPolynomial (params : Parameters)
+noncomputable def matrixWeightedGeneralizeBRightOperatorAtPolynomial
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) : MatrixOperator model.space :=
@@ -119,7 +131,8 @@ noncomputable def matrixWeightedGeneralizeBRightOperatorAtPolynomial (params : P
     matrixPolynomialWeightSqrtOperator params model g
 
 /-- The actual squared difference appearing in the matrix-level `generalize-b` estimate. -/
-noncomputable def matrixGeneralizeBDeviationAtPolynomial (params : Parameters)
+noncomputable def matrixGeneralizeBDeviationAtPolynomial
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : Error :=
   avgOver (axisParallelLineQuestionDistribution params) (fun qu =>
@@ -128,25 +141,28 @@ noncomputable def matrixGeneralizeBDeviationAtPolynomial (params : Parameters)
       (matrixWeightedGeneralizeBRightOperatorAtPolynomial params model g qu))
 
 /-- The polynomial-averaged actual `generalize-b` deviation. -/
-noncomputable def matrixGeneralizeBDeviation (params : Parameters)
+noncomputable def matrixGeneralizeBDeviation
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params) : Error :=
   avgOver (polynomialDistribution params) (fun g =>
     matrixGeneralizeBDeviationAtPolynomial params model g)
 
 /-- The matrix-level local deviation agrees with the concrete local variance. -/
-noncomputable def matrixLocalVarianceDeviationAtPolynomial (params : Parameters)
+noncomputable def matrixLocalVarianceDeviationAtPolynomial
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : Error :=
   matrixPointConditionedLocalVarianceAtPolynomial params model g
 
 /-- The matrix-level global deviation agrees with the concrete global variance. -/
-noncomputable def matrixGlobalVarianceDeviationAtPolynomial (params : Parameters)
+noncomputable def matrixGlobalVarianceDeviationAtPolynomial
+    (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : Error :=
   matrixPointConditionedGlobalVarianceAtPolynomial params model g
 
 /-- Matrix-level version of `lem:generalize-b`. -/
-structure MatrixGeneralizeBStatement (params : Parameters)
+structure MatrixGeneralizeBStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params) : Prop where
   pointwiseDeviationBound :
     ∀ g : Polynomial params,
@@ -155,7 +171,7 @@ structure MatrixGeneralizeBStatement (params : Parameters)
     matrixGeneralizeBDeviation params model ≤ generalizeBError params
 
 /-- Matrix-level version of `lem:local-variance-of-points`. -/
-structure MatrixLocalVarianceOfPointsStatement (params : Parameters)
+structure MatrixLocalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) : Prop where
   pointwiseLocalVarianceBound :
@@ -167,7 +183,7 @@ structure MatrixLocalVarianceOfPointsStatement (params : Parameters)
       localVarianceOfPointsError params eps delta
 
 /-- Matrix-level version of `lem:global-variance-of-points`. -/
-structure MatrixGlobalVarianceOfPointsStatement (params : Parameters)
+structure MatrixGlobalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) : Prop where
   pointwiseExpansionTransfer :

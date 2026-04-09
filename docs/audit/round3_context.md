@@ -6,7 +6,7 @@ This is round 3 of criticize passes on the MIPStarRE Paper2009LDT scaffolded Lea
 ## What was already found and fixed (do NOT re-flag)
 
 ### Round 1 findings (all fixed)
-- Missing Schwartz-Zippel error term in pasting
+- Missing Schwartz–Zippel error term in pasting
 - Wrong polynomial degree in line test
 - Off-by-one in induction parameter
 - Missing bipartite register labels

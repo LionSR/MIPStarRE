@@ -17,11 +17,30 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable (params : Parameters) [FieldModel params.q]
 
 abbrev EvaluatedSliceQuestion (params : Parameters) := Point params.next × Point params.next
 abbrev EvaluatedSliceOutcome (params : Parameters) := Fq params × Fq params
 abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
-abbrev FullSliceOutcome (params : Parameters) := Polynomial params × Polynomial params
+abbrev FullSliceOutcome (params : Parameters) [FieldModel params.q] :=
+  Polynomial params × Polynomial params
+/-- Outcomes for the `G^y` stability step.
+
+We keep the first coordinate evaluated at `u`, but retain the full second
+polynomial `h` because the right-register weight is `√(G_h)`. Postprocessing
+that coordinate down to `h(v)` would sum over the whole fiber
+`{h | h(v) = b}` and introduce a spurious multiplicity. -/
+abbrev StabilityOneOutcome (params : Parameters) [FieldModel params.q] :=
+  Fq params × Polynomial params
+
+/-- Outcomes for the `G^x` stability step.
+
+We retain the full first polynomial `g` because the right-register weight is
+`√(G_g)`, while the second coordinate is already evaluated at `v`. This keeps
+the `.1`/`.2` usage aligned with the paper's `G^x` versus `G^y` roles. -/
+abbrev StabilityTwoOutcome (params : Parameters) [FieldModel params.q] :=
+  Polynomial params × Fq params
+
 
 /-- Ordered product placed on the left tensor factor of the bipartite space `ι × ι`. -/
 noncomputable def leftOrderedProductOpFamily {α β : Type*} [Fintype α] [Fintype β]
@@ -35,6 +54,26 @@ noncomputable def appendRightTotalOpFamily {α : Type*} [Fintype α] {κ : Type*
     (A : OpFamily α κ) (X : MIPStarRE.Quantum.Op κ) : OpFamily α κ where
   outcome := fun a => A.outcome a * X
   total := A.total * X
+
+/-- Reindex a family on `β` to a pair outcome by reading only the second component. -/
+noncomputable def pullSndOpFamily {α β : Type*} [Fintype α] [Fintype β] {κ : Type*}
+    [Fintype κ] [DecidableEq κ]
+    (A : OpFamily β κ) : OpFamily (α × β) κ where
+  outcome := fun ab => A.outcome ab.2
+  total := (Fintype.card α : ℂ) • A.total
+
+/-- Outcomewise tensor product of same-indexed raw families on opposite registers. -/
+noncomputable def sameOutcomeTensorOpFamily {α : Type*} [Fintype α]
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : OpFamily α ιA) (B : OpFamily α ιB) :
+    OpFamily α (ιA × ιB) where
+  outcome := fun a =>
+    leftTensor (ι₂ := ιB) (A.outcome a) *
+      rightTensor (ι₁ := ιA) (B.outcome a)
+  total :=
+    ∑ a : α,
+      leftTensor (ι₂ := ιB) (A.outcome a) *
+        rightTensor (ι₁ := ιA) (B.outcome a)
 
 /-- Sandwiched product `A_a B_b A_a`.
 
@@ -94,40 +133,40 @@ def fullSliceQuestionOfEvaluatedSlice (params : Parameters)
   (pointHeight params q.1, pointHeight params q.2)
 
 /-- The postprocessed family `((u,x) ↦ G^x_[g(u)=a])`. -/
-noncomputable def evaluatedPointFamily (params : Parameters)
+noncomputable def evaluatedPointFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (Point params.next) (Fq params) ι :=
   IdxPolyFamily.evaluatedAtNextPoint family
 
 /-- Left tensor-placement for the evaluated family `G^x_[g(u)=a]`
 on the bipartite space `d * d`. -/
-noncomputable def evaluatedPointFamilyLeft (params : Parameters)
+noncomputable def evaluatedPointFamilyLeft (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
   fun u => leftPlacedSubMeas (ιB := ι) (evaluatedPointFamily params family u)
 
 /-- Right tensor-placement for the evaluated family `G^x_[g(u)=a]`
 on the bipartite space `d * d`. -/
-noncomputable def evaluatedPointFamilyRight (params : Parameters)
+noncomputable def evaluatedPointFamilyRight (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
   fun u => rightPlacedSubMeas (ιA := ι) (evaluatedPointFamily params family u)
 
 /-- The first evaluated factor `G^x_[g(u)=a]`. -/
-noncomputable def evaluatedSliceFirstFactor (params : Parameters)
+noncomputable def evaluatedSliceFirstFactor (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (Fq params) ι :=
   fun q => evaluatedPointFamily params family q.1
 
 /-- The second evaluated factor `G^y_[h(v)=b]`. -/
-noncomputable def evaluatedSliceSecondFactor (params : Parameters)
+noncomputable def evaluatedSliceSecondFactor (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (Fq params) ι :=
   fun q => evaluatedPointFamily params family q.2
 
 /-- The ordered evaluated-slice product `(G^x_[g(u)=a] G^y_[h(v)=b]) ⊗ I`
 on the bipartite space `d * d`. -/
-noncomputable def evaluatedSliceProductLeft (params : Parameters)
+noncomputable def evaluatedSliceProductLeft (params : Parameters) [FieldModel params.q]
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -137,7 +176,7 @@ noncomputable def evaluatedSliceProductLeft (params : Parameters)
 
 /-- The reversed evaluated-slice product `(G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`
 on the bipartite space `d * d`. -/
-noncomputable def evaluatedSliceProductRight (params : Parameters)
+noncomputable def evaluatedSliceProductRight (params : Parameters) [FieldModel params.q]
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -146,32 +185,62 @@ noncomputable def evaluatedSliceProductRight (params : Parameters)
         (evaluatedSliceFirstFactor params family q)
         (evaluatedSliceSecondFactor params family q)
 
+/-- The sandwiched evaluated product `G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]`
+on the single-register space `d`. -/
+noncomputable def evaluatedSliceSandwichRaw (params : Parameters) [FieldModel params.q]
+    (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) ι :=
+  -- strategy retained for API compatibility with the Lean packaging layer
+  fun q =>
+    sandwichByOuterSubMeas
+      (evaluatedSliceFirstFactor params family q)
+      (evaluatedSliceSecondFactor params family q)
+
 /-- The sandwiched evaluated product `(G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`
 on the bipartite space `d * d`. -/
-noncomputable def evaluatedSliceSandwichFirstFactor (params : Parameters)
+noncomputable def evaluatedSliceSandwichFirstFactor (params : Parameters) [FieldModel params.q]
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
-      sandwichByOuterSubMeas
-        (evaluatedSliceFirstFactor params family q)
-        (evaluatedSliceSecondFactor params family q)
+      evaluatedSliceSandwichRaw params _strategy family q
+
+/-- Bob's second evaluated point measurement, reindexed to the pair outcome `(a,b)`. -/
+noncomputable def evaluatedSlicePointMeasurementSecondExpanded (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) ι :=
+  fun q =>
+    show OpFamily (EvaluatedSliceOutcome params) ι from
+      pullSndOpFamily (α := Fq params.next) <|
+        ((strategy.pointMeasurement q.2).toSubMeas : OpFamily (Fq params.next) ι)
+
+/-- Bob's ordered evaluated point product `A^{u,x}_a A^{v,y}_b`,
+reindexed by the pair outcome `(a,b)`. -/
+noncomputable def evaluatedSlicePointMeasurementProduct (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) ι :=
+  fun q =>
+    show OpFamily (EvaluatedSliceOutcome params) ι from
+      orderedProductOpFamily
+        ((strategy.pointMeasurement q.1).toSubMeas : SubMeas (Fq params.next) ι)
+        ((strategy.pointMeasurement q.2).toSubMeas : SubMeas (Fq params.next) ι)
 
 /-- The first full slice measurement `G^x`. -/
-def fullSliceFirstFactor (params : Parameters)
+def fullSliceFirstFactor (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (FullSliceQuestion params) (Polynomial params) ι :=
   fun q => (family.meas q.1).toSubMeas
 
 /-- The second full slice measurement `G^y`. -/
-def fullSliceSecondFactor (params : Parameters)
+def fullSliceSecondFactor (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     IdxSubMeas (FullSliceQuestion params) (Polynomial params) ι :=
   fun q => (family.meas q.2).toSubMeas
 
 /-- The ordered full-slice product `(G^x_g G^y_h) ⊗ I`
 on the bipartite space `d * d`. -/
-noncomputable def fullSliceProductLeft (params : Parameters)
+noncomputable def fullSliceProductLeft (params : Parameters) [FieldModel params.q]
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (FullSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -181,7 +250,7 @@ noncomputable def fullSliceProductLeft (params : Parameters)
 
 /-- The reversed full-slice product `(G^y_h G^x_g) ⊗ I`
 on the bipartite space `d * d`. -/
-noncomputable def fullSliceProductRight (params : Parameters)
+noncomputable def fullSliceProductRight (params : Parameters) [FieldModel params.q]
     (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (FullSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -191,15 +260,49 @@ noncomputable def fullSliceProductRight (params : Parameters)
         (fullSliceSecondFactor params family q)
 
 /-- Evaluate a pair of full-slice outcomes at the sampled points `((u,x),(v,y))`. -/
-def evaluateFullSliceOutcomeAtQuestion (params : Parameters)
+def evaluateFullSliceOutcomeAtQuestion (params : Parameters) [FieldModel params.q]
     (q : EvaluatedSliceQuestion params) :
     FullSliceOutcome params → EvaluatedSliceOutcome params :=
   fun gh =>
     (gh.1 (truncatePoint params q.1), gh.2 (truncatePoint params q.2))
 
+/-- Evaluate a `G^y`-stability outcome at the sampled second point `v`. -/
+def evaluateStabilityOneOutcomeAtQuestion (params : Parameters) [FieldModel params.q]
+    (q : EvaluatedSliceQuestion params) :
+    StabilityOneOutcome params → EvaluatedSliceOutcome params :=
+  fun ah =>
+    (ah.1, ah.2 (truncatePoint params q.2))
+
+/-- Evaluate a `G^x`-stability outcome at the sampled first point `u`.
+
+The first coordinate stays as the full polynomial `g` until this final
+evaluation step, while the second coordinate is already the measured value `b`.
+This matches the one-vs-two indexing used in the paper's two stability steps. -/
+def evaluateStabilityTwoOutcomeAtQuestion (params : Parameters) [FieldModel params.q]
+    (q : EvaluatedSliceQuestion params) :
+    StabilityTwoOutcome params → EvaluatedSliceOutcome params :=
+  fun gb =>
+    (gb.1 (truncatePoint params q.1), gb.2)
+
+/-- Reindex a raw operator family and append an explicit weight.
+
+The outcome type `β` must retain every coordinate that still appears in
+`weight`; otherwise any later postprocessing would sum over an irrelevant fiber
+and change the operator by a multiplicity factor. -/
+private noncomputable def weightedReindexOpFamily
+    {α β : Type*} [Fintype α] [Fintype β]
+    {κ : Type*} [Fintype κ] [DecidableEq κ]
+    (base : OpFamily α κ)
+    (reindex : β → α)
+    (weight : β → MIPStarRE.Quantum.Op κ) :
+    OpFamily β κ :=
+  let body := fun b => base.outcome (reindex b) * weight b
+  { outcome := body
+    total := ∑ b : β, body b }
+
 /-- Postprocess the full-slice ordered product at sampled points.
 On the bipartite space `d * d`. -/
-noncomputable def evaluatedFromFullSliceProductLeft (params : Parameters)
+noncomputable def evaluatedFromFullSliceProductLeft (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -209,7 +312,7 @@ noncomputable def evaluatedFromFullSliceProductLeft (params : Parameters)
 
 /-- Postprocess the full-slice reversed product at sampled points.
 On the bipartite space `d * d`. -/
-noncomputable def evaluatedFromFullSliceProductRight (params : Parameters)
+noncomputable def evaluatedFromFullSliceProductRight (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
   fun q =>
@@ -218,44 +321,71 @@ noncomputable def evaluatedFromFullSliceProductRight (params : Parameters)
       (evaluateFullSliceOutcomeAtQuestion params q)
 
 /-- Internal stability family from the `G^y` insertion/removal step.
-On the bipartite space `d * d`. -/
--- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
-noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+
+The paper writes the extra factor as the left-register total `G^y = ∑_h G^y_h`.
+For the `SDDOpRel` packaging we keep the polynomial `h` explicit and attach the
+right-register weight `(G_h^y)^{1/2}` to each outcome. Summing the squared
+differences over `h` then recovers the total `G^y` without introducing a fiber
+multiplicity from unrelated `g` values. On the bipartite space `d * d`. -/
+noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι) :
+    IdxOpFamily (EvaluatedSliceQuestion params) (StabilityOneOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    appendRightTotalOpFamily
-      (evaluatedSliceSandwichFirstFactor params strategy family q)
-      (leftTensor (ι₂ := ι) ((fullSliceSecondFactor params family xy).total))
+    weightedReindexOpFamily
+      (appendRightTotalOpFamily
+        ((evaluatedSliceSandwichFirstFactor params strategy family q) :
+          OpFamily (EvaluatedSliceOutcome params) (ι × ι))
+        (leftTensor (ι₂ := ι) ((fullSliceSecondFactor params family xy).total)))
+      (evaluateStabilityOneOutcomeAtQuestion params q)
+      (fun ah => rightTensor (ι₁ := ι)
+        (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)))
 
-/-- Internal stability family after removing the trailing `G^y`.
+/-- Internal stability family after removing the trailing `G^y`, while keeping
+Bob's right-register point-measurement factor.
 On the bipartite space `d * d`. -/
--- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
-noncomputable def commDataProcessedGStabilityOneRight (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
-  fun q => evaluatedSliceSandwichFirstFactor params strategy family q
+noncomputable def commDataProcessedGStabilityOneRight (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι) :
+    IdxOpFamily (EvaluatedSliceQuestion params) (StabilityOneOutcome params) (ι × ι) :=
+  fun q =>
+    weightedReindexOpFamily
+      ((evaluatedSliceSandwichFirstFactor params strategy family q) :
+        OpFamily (EvaluatedSliceOutcome params) (ι × ι))
+      (evaluateStabilityOneOutcomeAtQuestion params q)
+      (fun ah => rightTensor (ι₁ := ι)
+        (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)))
 
 /-- Internal stability family from the `G^x` insertion/removal step.
 On the bipartite space `d * d`. -/
--- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
-noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
+noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι) :
+    IdxOpFamily (EvaluatedSliceQuestion params) (StabilityTwoOutcome params) (ι × ι) :=
   fun q =>
     let xy := fullSliceQuestionOfEvaluatedSlice params q
-    appendRightTotalOpFamily
-      (evaluatedSliceProductLeft params strategy family q)
-      (leftTensor (ι₂ := ι) ((fullSliceFirstFactor params family xy).total))
+    weightedReindexOpFamily
+      (appendRightTotalOpFamily
+        (evaluatedSliceProductLeft params strategy family q)
+        (leftTensor (ι₂ := ι) ((fullSliceFirstFactor params family xy).total)))
+      (evaluateStabilityTwoOutcomeAtQuestion params q)
+      (fun gb => rightTensor (ι₁ := ι)
+        (CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1)))
 
-/-- Internal stability family after removing the trailing `G^x`.
+/-- Internal stability family after removing the trailing `G^x`, while keeping
+Bob's right-register ordered point-measurement factor.
 On the bipartite space `d * d`. -/
--- MISMATCH(#143): missing right-register factors per clm:g-comm-stability in commutativity-G.tex
-noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters)
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
-  fun q => evaluatedSliceProductLeft params strategy family q
+noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι) :
+    IdxOpFamily (EvaluatedSliceQuestion params) (StabilityTwoOutcome params) (ι × ι) :=
+  fun q =>
+    weightedReindexOpFamily
+      (evaluatedSliceProductLeft params strategy family q)
+      (evaluateStabilityTwoOutcomeAtQuestion params q)
+      (fun gb => rightTensor (ι₁ := ι)
+        (CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1)))
 
 /-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`.
 
