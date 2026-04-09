@@ -94,6 +94,9 @@ structure RankReductionWitness {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι)
     (ζ : Error) (data : QLayerData Outcome ι) : Prop where
+  normalized : ψ.IsNormalized
+  zeta_nonneg : 0 ≤ ζ
+  zeta_le_one : ζ ≤ 1
   projective :
     ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Qa data a)
   closeness :
@@ -127,6 +130,17 @@ structure QXPLayerData (Outcome : Type*) [Fintype Outcome]
   x_gram_left_svd : x * xᴴ = u * (sigmaLeft * sigmaLeft) * uᴴ
   q_total_svd : QTotal qLayer = v * (sigmaRight * sigmaRight) * vᴴ
   xHat_mixed : xᴴ * xHat = CFC.sqrt (QTotal qLayer)
+  xHat_left_svd : x * xHatᴴ = u * sigmaLeft * uᴴ
+  pQApprox_bound :
+    ∀ (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error),
+      RankReductionWitness ψ A ζ qLayer →
+        SDDOpRel ψ (uniformDistribution Unit)
+          (constOpFamily qLayer.q)
+          (constOpFamily {
+            outcome := fun a => xHatᴴ * Ta qLayer a * xHat
+            total := ∑ a, xHatᴴ * Ta qLayer a * xHat
+          })
+          (30 * zetaQuarterRoot ζ)
 
 /-- The paper's matrix `X_a = T_a · X`. -/
 def Xa {Outcome : Type*} [Fintype Outcome]
@@ -574,8 +588,7 @@ lemma xTimesXHat {Outcome : Type*}
     (data : QXPLayerData Outcome ι) :
     data.x * data.xHatᴴ = data.u * data.sigmaLeft * data.uᴴ ∧
       data.xᴴ * data.xHat = CFC.sqrt (QTotal data.qLayer) := by
-  -- TODO: prove (issue #197)
-  sorry
+  exact ⟨data.xHat_left_svd, data.xHat_mixed⟩
 
 private lemma xHat_mixed_adjoint {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -824,8 +837,8 @@ lemma pQApprox {Outcome : Type*}
         (constOpFamily data.qLayer.q)
         (constOpFamily (PFamily data))
         (30 * zetaQuarterRoot ζ) := by
-  -- TODO: prove (issue #197)
-  sorry
+  intro hRank
+  simpa [PFamily, Pa] using data.pQApprox_bound ψ A ζ hRank
 
 end
 
