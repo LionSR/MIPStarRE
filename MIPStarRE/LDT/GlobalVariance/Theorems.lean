@@ -331,15 +331,123 @@ private lemma sddRel_unit_family_of_pointwise
     _ = δ := by
           simp [avgOver, uniformDistribution]
 
+private lemma matrixGeneralizeB_of_pointwise
+    (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixVarianceTransferRealization params)
+    (hpoint :
+      ∀ g : Polynomial params,
+        matrixGeneralizeBDeviationAtPolynomial params model g ≤ generalizeBError params) :
+    MatrixGeneralizeBStatement params model := by
+  refine
+    { pointwiseDeviationBound := hpoint
+      averagedDeviationBound := by
+        unfold matrixGeneralizeBDeviation
+        calc
+          avgOver (polynomialDistribution params)
+              (fun g => matrixGeneralizeBDeviationAtPolynomial params model g)
+            ≤ avgOver (polynomialDistribution params)
+                (fun _ => generalizeBError params) := by
+                  apply avgOver_mono
+                  intro g
+                  exact hpoint g
+          _ = generalizeBError params := by
+                simp [polynomialDistribution, avgOver, uniformDistribution] }
+
+private lemma matrixLocalVarianceOfPoints_of_pointwise
+    (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixVarianceTransferRealization params)
+    (eps delta : Error)
+    (hpoint :
+      ∀ g : Polynomial params,
+        matrixPointConditionedLocalVarianceAtPolynomial params model g ≤
+          localVarianceOfPointsError params eps delta) :
+    MatrixLocalVarianceOfPointsStatement params model eps delta := by
+  refine
+    { pointwiseLocalVarianceBound := hpoint
+      averagedLocalVarianceBound := by
+        unfold matrixPointConditionedLocalVariance
+        calc
+          avgOver (polynomialDistribution params)
+              (fun g => matrixPointConditionedLocalVarianceAtPolynomial params model g)
+            ≤ avgOver (polynomialDistribution params)
+                (fun _ => localVarianceOfPointsError params eps delta) := by
+                  apply avgOver_mono
+                  intro g
+                  exact hpoint g
+          _ = localVarianceOfPointsError params eps delta := by
+                simp [polynomialDistribution, avgOver, uniformDistribution] }
+
+private lemma matrixGlobalVarianceOfPoints_from_local
+    (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixVarianceTransferRealization params)
+    (eps delta : Error)
+    (hlocal : MatrixLocalVarianceOfPointsStatement params model eps delta) :
+    MatrixGlobalVarianceOfPointsStatement params model eps delta := by
+  have hexpansion :
+      ∀ g : Polynomial params,
+        matrixPointConditionedGlobalVarianceAtPolynomial params model g ≤
+          (params.m : Error) *
+            matrixPointConditionedLocalVarianceAtPolynomial params model g := by
+    intro g
+    simpa [matrixPointConditionedGlobalVarianceAtPolynomial,
+      matrixPointConditionedLocalVarianceAtPolynomial]
+      using
+        (matrixLocalToGlobal params
+          (matrixPointConditionedRealizationAtPolynomial params model g))
+  have hglobal :
+      ∀ g : Polynomial params,
+        matrixPointConditionedGlobalVarianceAtPolynomial params model g ≤
+          globalVarianceOfPointsError params eps delta := by
+    intro g
+    calc
+      matrixPointConditionedGlobalVarianceAtPolynomial params model g
+        ≤ (params.m : Error) *
+            matrixPointConditionedLocalVarianceAtPolynomial params model g :=
+          hexpansion g
+      _ ≤ (params.m : Error) * localVarianceOfPointsError params eps delta := by
+            exact mul_le_mul_of_nonneg_left
+              (hlocal.pointwiseLocalVarianceBound g) (by positivity)
+      _ = globalVarianceOfPointsError params eps delta := by
+            simp [globalVarianceOfPointsError, localVarianceOfPointsError]
+            ring
+  refine
+    { pointwiseExpansionTransfer := hexpansion
+      pointwiseGlobalVarianceBound := hglobal
+      averagedGlobalVarianceBound := ?_ }
+  · unfold matrixPointConditionedGlobalVariance
+    calc
+      avgOver (polynomialDistribution params)
+          (fun g => matrixPointConditionedGlobalVarianceAtPolynomial params model g)
+        ≤ avgOver (polynomialDistribution params)
+            (fun _ => globalVarianceOfPointsError params eps delta) := by
+              apply avgOver_mono
+              intro g
+              exact hglobal g
+      _ = globalVarianceOfPointsError params eps delta := by
+            simp [polynomialDistribution, avgOver, uniformDistribution]
+
 lemma matrixGeneralizeB
     (params : Parameters)
     [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params) :
     MatrixGeneralizeBStatement params model := by
-  -- TODO: Prove the concrete matrix realization of `lem:generalize-b`
-  -- (`matrixGeneralizeB`); blocked on the matrix-model transfer proof from
-  -- `MatrixVarianceTransferRealization`.
-  sorry
+  have hpoint :
+      ∀ g : Polynomial params,
+        matrixGeneralizeBDeviationAtPolynomial params model g ≤ generalizeBError params := by
+    intro g
+    -- Missing infrastructure:
+    -- 1. `MatrixVarianceTransferRealization` does not record that
+    --    `axisMeasurement` is projective/orthogonal, which the paper uses to
+    --    collapse the squared deviation to a single diagonal sum.
+    -- 2. `DegreeBoundedLineAnswer` is currently just `Fq params → Fq params`,
+    --    so there is no degree witness available for the Schwartz-Zippel step.
+    -- 3. We also need a compatibility hypothesis identifying
+    --    `axisQuestionParameter qu` with the sampled point on the queried line.
+    sorry
+  exact matrixGeneralizeB_of_pointwise params model hpoint
 
 /-- The concrete matrix-level counterpart of `lem:local-variance-of-points`. -/
 lemma matrixLocalVarianceOfPoints
@@ -348,10 +456,22 @@ lemma matrixLocalVarianceOfPoints
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) :
     MatrixLocalVarianceOfPointsStatement params model eps delta := by
-  -- TODO: Prove the concrete matrix realization of
-  -- `lem:local-variance-of-points`; blocked on the matrix-model
-  -- local-variance transfer argument.
-  sorry
+  have hpoint :
+      ∀ g : Polynomial params,
+        matrixPointConditionedLocalVarianceAtPolynomial params model g ≤
+          localVarianceOfPointsError params eps delta := by
+    intro g
+    -- Missing infrastructure:
+    -- 1. The six-step transport proof from the paper needs matrix analogues of
+    --    the good-strategy consistency/self-consistency hypotheses relating the
+    --    point and axis measurements in `model`.
+    -- 2. The two middle transports are exactly `matrixGeneralizeB`, so the
+    --    pointwise `generalize-b` estimate above must be available first.
+    -- 3. The theorem statement allows arbitrary `eps` and `delta`; to use them
+    --    as error parameters, we should package the required nonnegativity and
+    --    consistency hypotheses in the realization layer.
+    sorry
+  exact matrixLocalVarianceOfPoints_of_pointwise params model eps delta hpoint
 
 /-- The concrete matrix-level counterpart of `lem:global-variance-of-points`. -/
 lemma matrixGlobalVarianceOfPoints
@@ -360,10 +480,8 @@ lemma matrixGlobalVarianceOfPoints
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) :
     MatrixGlobalVarianceOfPointsStatement params model eps delta := by
-  -- TODO: Prove the concrete matrix realization of
-  -- `lem:global-variance-of-points`; blocked on the matrix-model
-  -- global-variance transfer argument.
-  sorry
+  exact matrixGlobalVarianceOfPoints_from_local params model eps delta
+    (matrixLocalVarianceOfPoints params model eps delta)
 
 /-- `lem:generalize-b`. -/
 lemma generalizeB
