@@ -172,6 +172,7 @@
 
 \begin{lemma}[Local variance as a Laplacian form]\label{lem:local-rewrite}
   \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localRewrite}
+  \leanok
   \uses{def:adjacency-laplacian, def:local-and-variance}
   Define
   \[
@@ -220,6 +221,7 @@
 
 \begin{lemma}[Global variance as the orthogonal Fourier mass]\label{lem:global-rewrite}
   \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.globalRewrite}
+  \leanok
   \uses{prop:eigenvectors, def:local-and-variance}
   Write
   \[
@@ -280,6 +282,7 @@
 
 \begin{lemma}[Local-to-global inequality]\label{lem:local-to-global}
   \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localToGlobal}
+  \leanok
   \uses{cor:laplacian-spectral-gap, lem:local-rewrite, lem:global-rewrite}
   For every family $\{A^u\}$,
   \[
