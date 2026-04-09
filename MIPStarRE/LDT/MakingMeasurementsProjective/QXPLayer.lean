@@ -94,9 +94,6 @@ structure RankReductionWitness {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι)
     (ζ : Error) (data : QLayerData Outcome ι) : Prop where
-  state_normalized : ψ.IsNormalized
-  zeta_nonneg : 0 ≤ ζ
-  zeta_le_quarter : ζ ≤ 1 / (4 : Error)
   projective :
     ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Qa data a)
   outcome_nonneg :
@@ -384,6 +381,9 @@ lemma projectiveLowRankSum {Outcome : Type*}
     (A : Measurement Outcome ι) (ζ : Error) :
     ∃ data : QLayerData Outcome ι,
       RankReductionWitness ψ A ζ data := by
+  -- NOTE: The paper's proof also needs normalization of `ψ` and a small-`ζ`
+  -- hypothesis such as `0 ≤ ζ ≤ 1 / 4`, but those preconditions are not yet
+  -- reflected in this theorem statement.
   -- TODO: prove (issue #197)
   sorry
 
@@ -391,6 +391,7 @@ private lemma spectralTruncationError_le_half (ζ : Error)
     (hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
     spectralTruncationError ζ ≤ 1 / (2 : Error) := by
   -- Scalar bookkeeping for `ζ ≤ 1/4`: `√ζ ≤ 1/2`.
+  -- TODO(#197): prove.
   sorry
 
 private lemma zeta_le_zetaQuarterRoot (ζ : Error)
@@ -406,12 +407,14 @@ private lemma sqrt_roundingToProjectiveError_eq (ζ : Error)
     Real.sqrt (roundingToProjectiveError ζ) =
       Real.sqrt (12 : Error) * zetaQuarterRoot ζ := by
   -- `sqrt (12 * √ζ) = sqrt 12 * ζ^(1/4)`.
+  -- TODO(#197): prove.
   sorry
 
 private lemma sqrt_roundingToProjectiveError_le_four_zetaQuarterRoot (ζ : Error)
     (hζ : 0 ≤ ζ) :
     Real.sqrt (roundingToProjectiveError ζ) ≤ 4 * zetaQuarterRoot ζ := by
   -- Coefficient estimate: `sqrt 12 ≤ 4`.
+  -- TODO(#197): prove.
   sorry
 
 private lemma sqrt_two_mul_sqrt_roundingToProjectiveError_le_five_zetaQuarterRoot (ζ : Error)
@@ -419,6 +422,7 @@ private lemma sqrt_two_mul_sqrt_roundingToProjectiveError_le_five_zetaQuarterRoo
     Real.sqrt (2 : Error) * Real.sqrt (roundingToProjectiveError ζ) ≤
       5 * zetaQuarterRoot ζ := by
   -- Coefficient estimate: `sqrt 2 * sqrt 12 = sqrt 24 ≤ 5`.
+  -- TODO(#197): prove.
   sorry
 
 /-- **Completeness of `Q`** (`lem:Q-completeness`).
@@ -436,10 +440,11 @@ lemma qCompleteness {Outcome : Type*}
   intro h
   -- The paper proof combines two Cauchy-Schwarz comparisons:
   -- `⟨Q, Q - A⟩` and `⟨Q - A, A⟩`, then uses `source_almost_projective`.
-  -- The strengthened witness above now carries exactly the missing hypotheses
-  -- from the paper (`Q = Σₐ Qₐ`, normalization, small-ζ, and `A`-almost-projective).
-  -- Remaining work is scalar `rpow/sqrt` bookkeeping and the corresponding
+  -- The current scaffolding still needs the paper's normalization and
+  -- small-`ζ` hypotheses to be threaded in upstream at
+  -- `projectiveLowRankSum`, alongside the scalar `rpow/sqrt` bookkeeping and
   -- operator-expectation algebra in Lean.
+  -- TODO: prove (issue #197)
   sorry
 
 /-- **Completeness of `sqrt Q`** (`lem:sqrt-Q-completeness`).
@@ -457,6 +462,7 @@ lemma sqrtQCompleteness {Outcome : Type*}
   -- `sqrt Q ≥ (1 - √ζ) Q`, using `Q ≤ (1 + 2√ζ) I`.
   -- In Lean, the remaining blocker is the NNReal/CFC comparison turning the
   -- scalar bound into an operator inequality for `CFC.sqrt`.
+  -- TODO: prove (issue #197)
   sorry
 
 /-- **`Q` is almost projective** (`lem:q-almost-projective`).
