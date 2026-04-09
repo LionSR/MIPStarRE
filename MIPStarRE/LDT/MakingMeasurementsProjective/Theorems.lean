@@ -480,6 +480,7 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
           simpa using (MIPStarRE.Quantum.normalizedTrace_one (d := H.carrier)) }
     -- Keep this delta measurement explicit: the matrix-valued simplifications are
     -- easier for Lean to follow here than through a helper abstraction.
+    -- TODO(#280): Extract shared delta-measurement construction.
     let toyMeas : MatrixMeasurement Outcome H :=
       { effect := fun a => if a = pivot then 1 else 0
         pos := by
@@ -548,7 +549,11 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
       simpa [matrixIdempotenceDefect, toyMeas] using hAlmost_nonneg
     · simpa [matrixIdempotenceDefect, toyMeas, h] using hAlmost_nonneg
 
-/-- Spectral truncation of an almost-projective measurement. -/
+/-- Spectral truncation of an almost-projective measurement.
+
+NOTE: This proof constructs a vacuous witness because
+`SpectralTruncationStatement` does not reference the input measurement.
+See issue #279 for the plan to strengthen the statement. -/
 lemma spectralTruncateAlmostProjective {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -577,6 +582,7 @@ lemma spectralTruncateAlmostProjective {Outcome : Type*}
       instDecidableEq := inferInstance
       instNonempty := inferInstance }
   let pivot : Outcome := Classical.choice hOutcome
+  -- TODO(#280): Extract shared delta-measurement construction.
   let toyMeas : MatrixMeasurement Outcome H :=
     { effect := fun a => if a = pivot then 1 else 0
       pos := by
@@ -613,7 +619,12 @@ lemma spectralTruncateAlmostProjective {Outcome : Type*}
     · refine ⟨by simp [toyMeas, h], by simp [toyMeas, h]⟩
 
 /-- Adjust truncated projections to form a genuine projective
-submeasurement, controlling the per-outcome distance. -/
+submeasurement, controlling the per-outcome distance.
+
+NOTE: This theorem is blocked by the same issue as
+`spectralTruncateAlmostProjective`: `SpectralTruncationStatement` currently
+forgets the input measurement `A`, so it does not provide enough data to
+extract a nonvacuous `ProjSubMeas Outcome ι`. See issue #279. -/
 lemma adjustTruncatedProjections {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
