@@ -708,13 +708,12 @@ theorem commutingWithGComplete
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (gamma zeta : Error)
     (hcom : Commutativity.ComMainConclusion params strategy family G gamma zeta)
-    (hself : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    CommutingWithGCompleteStatement params ψbi family gamma zeta := by
+    (hself : GCompleteSelfConsistencyStatement params strategy.state family zeta) :
+    CommutingWithGCompleteStatement params strategy.state family gamma zeta := by
   sorry
 
 /-- `cor:commuting-with-G-incomplete`. -/
