@@ -1,4 +1,6 @@
 import MIPStarRE.LDT.MainInductionStep.Statements
+import MIPStarRE.LDT.Pasting.Theorems
+import MIPStarRE.LDT.SelfImprovement.Theorems
 
 /-!
 Theorem stubs for Section 6 of the low individual degree paper.
@@ -59,7 +61,7 @@ theorem selfImprovementInInductionSection
 /-- `thm:ld-pasting-in-induction-section`. -/
 theorem ldPastingInInductionSection
     (params : Parameters)
-    [FieldModel params.q]
+    [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
@@ -73,13 +75,10 @@ theorem ldPastingInInductionSection
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingInInductionSectionConclusion params strategy family H
         eps delta gamma kappa zeta k := by
-  /-
-  This theorem is conceptually a direct wrapper around the Section 12 pasting
-  theorem. However `MainInductionStep` sits earlier in the import graph than the
-  `Pasting` theorems, so calling that theorem here would create a cycle. Until
-  the statement layer is reorganized, this remains a local placeholder.
-  -/
-  sorry
+  obtain ⟨H, hH⟩ := Pasting.ldPasting params strategy eps delta gamma kappa zeta
+    hgood family hcomplete hcons hself hbound.bounded k hk
+  refine ⟨H, ?_⟩
+  exact ⟨hH.pointConsistency⟩
 
 /-- `lem:restricted-probabilities`. -/
 lemma restrictedProbabilities
