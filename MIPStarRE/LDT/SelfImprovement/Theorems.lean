@@ -308,10 +308,19 @@ lemma selfImprovementHelper
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusion params strategy G T H Z eps delta gamma nu := by
   /-
-  This wrapper theorem depends on `sdp`, `addInU`, and the downstream
-  bookkeeping lemmas that are themselves still placeholders in this file.
-  Keeping the wrapper as an explicit placeholder avoids unrelated ordering and
-  elaboration failures during repository builds.
+  Blocked on two concrete gaps in the current development.
+
+  1. `sdp` is still a placeholder, so there is no witness `T, Z` to feed into
+     this wrapper.
+  2. Even assuming such a witness, the remaining conclusion fields are not
+     discharged by any existing bookkeeping lemmas:
+     - `addInUTransfer` depends on `addInU`, which is itself blocked below.
+     - `completeness`, `pointConsistency`, `strongSelfConsistency`,
+       `helperResidualBound`, and `bounded` require explicit bridge lemmas from
+       the SDP/add-in-u output to the abstract `CompletenessAtLeast`,
+       `ConsRel`, `BipartiteSSCRel`, and `BoundedByOperator` predicates.
+
+  So this is not just a thin wrapper around already-formalized results yet.
   -/
   sorry
 
@@ -322,10 +331,22 @@ lemma sdp
     (strategy : SymStrat params ι) :
     SdpStatement params strategy := by
   /-
-  This is the full SDP duality/Slater/complementary-slackness argument from
-  `references/ldt-paper/self_improvement.tex`. It is a standalone proof rather
-  than a wrapper around earlier formalized lemmas, so I am leaving the theorem
-  body as the focused remaining blocker for this file.
+  Blocked on missing infrastructure rather than local proof search.
+
+  To build `SdpStatement`, the file needs:
+  1. A finite-dimensional realization theorem connecting the abstract strategy
+     to some `MatrixSdpRealization params` and transporting the matrix witness
+     back to the abstract operators in `SdpOptimalPair.matrixWitness`.
+  2. An actual SDP existence theorem (or enough convex-duality library support)
+     producing a primal/dual optimum with:
+     - `T.total = 1`,
+     - `0 ≤ Z`,
+     - `0 ≤ Z - averagedPointOperator ... g` for every `g`,
+     - strong duality, and
+     - complementary slackness.
+
+  None of those ingredients exists elsewhere in the repository at present, and
+  there is no simpler local assembly argument that can close this statement.
   -/
   sorry
 
@@ -341,10 +362,22 @@ lemma addInU {Outcome : Type*} [Fintype Outcome]
     (H : SubMeas (Polynomial params) ι) :
     AddInUStatement params strategy T M H eps delta := by
   /-
-  This is the long Cauchy-Schwarz / variance-transfer estimate from
-  `lem:add-in-u`. The statement is not purely compositional because it must
-  recover the displayed equality `H = averagedSandwichedPolynomialSubMeas ...`
-  and the transfer bound for an arbitrary selection family `S`.
+  This statement is currently unprovable as written.
+
+  The first field of `AddInUStatement` demands
+
+    `H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas`
+
+  but `H` is an arbitrary input parameter of the theorem. There is no
+  hypothesis relating `H` to `T`, so the theorem cannot hold in general.
+
+  Even after repairing the statement so that `H` is constructed rather than
+  quantified arbitrarily, the proof still needs two missing ingredients:
+  1. The variance bound should come from `globalVarianceOfPoints`, whose own
+     matrix-transfer lemmas remain placeholders.
+  2. The `transfer` field needs the actual Cauchy-Schwarz / variance-transfer
+     estimate for arbitrary selections `S`, plus a strategy-to-matrix witness
+     for `MatrixAddInUTransferStatement`.
   -/
   sorry
 
@@ -362,9 +395,20 @@ theorem selfImprovement
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
   /-
-  This theorem packages `selfImprovementHelper` with `orthonormalization`.
-  Since both components remain placeholders in the current development, the
-  wrapper is left as a placeholder as well to keep `lake build` green.
+  Blocked for two independent reasons.
+
+  1. `selfImprovementHelper` is still blocked above, so there is no helper-stage
+     witness to orthonormalize.
+  2. The imported theorem `MakingMeasurementsProjective.orthonormalization`
+     still has a `sorry`, and its API requires `PermInvState strategy.state`.
+     This theorem's statement does not assume permutation invariance, and I did
+     not find any lemma deriving `PermInvState strategy.state` from
+     `strategy.IsGood ...`.
+
+  After those are fixed, the wrapper will still need explicit transport lemmas
+  upgrading the helper-stage `SDDRel` witness to the stated
+  `pointConsistency`, `selfCloseness`, and `projectiveResidualBound` fields
+  with the named Section 9 error terms.
   -/
   sorry
 

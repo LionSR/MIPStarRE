@@ -313,7 +313,8 @@ lemma roundedProjMeasStatement_mono.{uRoundedMono} {Outcome : Type*}
 
 /-- Error bookkeeping for the wrapper around `consistencyToAlmostProjective`
 and `roundAlmostProjMeas`. -/
-private lemma orthonormalizationMainLemma_error_bound (ζ : Error) :
+private lemma orthonormalizationMainLemma_error_bound (ζ : Error)
+    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1) :
     roundingToProjectiveError (consistencyToAlmostProjectiveError ζ) ≤
       orthonormalizationMainLemmaError ζ := by
   /-
@@ -322,7 +323,34 @@ private lemma orthonormalizationMainLemma_error_bound (ζ : Error) :
   The remaining bookkeeping is the scalar inequality comparing the composed
   rounding bound with the named `orthonormalizationMainLemmaError`.
   -/
-  sorry
+  dsimp [roundingToProjectiveError, consistencyToAlmostProjectiveError,
+    orthonormalizationMainLemmaError]
+  rw [Real.mul_rpow (by positivity) hζ]
+  have hζrpow :
+      Real.rpow ζ (1 / (2 : Error)) ≤ Real.rpow ζ (1 / (4 : Error)) := by
+    refine Real.rpow_le_rpow_of_exponent_ge' hζ hζ1 ?_ ?_
+    · positivity
+    · norm_num
+  have hsqrt_two_le_seven : Real.rpow (2 : Error) (1 / (2 : Error)) ≤ 7 := by
+    have hsqrt_two_le_two : Real.rpow (2 : Error) (1 / (2 : Error)) ≤ 2 := by
+      simpa using
+        (Real.rpow_le_self_of_one_le
+          (h₁ := (by norm_num : (1 : Error) ≤ 2))
+          (h₂ := (by norm_num : (1 / (2 : Error)) ≤ 1)))
+    exact hsqrt_two_le_two.trans (by norm_num)
+  have hquarter_nonneg : 0 ≤ Real.rpow ζ (1 / (4 : Error)) := Real.rpow_nonneg hζ _
+  calc
+    12 * (Real.rpow (2 : Error) (1 / (2 : Error)) * Real.rpow ζ (1 / (2 : Error)))
+      ≤ 12 * (Real.rpow (2 : Error) (1 / (2 : Error)) * Real.rpow ζ (1 / (4 : Error))) := by
+          refine mul_le_mul_of_nonneg_left ?_ (by norm_num)
+          exact mul_le_mul_of_nonneg_left hζrpow (Real.rpow_nonneg (by norm_num) _)
+    _ = (12 * Real.rpow (2 : Error) (1 / (2 : Error))) * Real.rpow ζ (1 / (4 : Error)) := by
+      ring
+    _ ≤ 84 * Real.rpow ζ (1 / (4 : Error)) := by
+      refine mul_le_mul_of_nonneg_right ?_ hquarter_nonneg
+      have hcoeff : 12 * Real.rpow (2 : Error) (1 / (2 : Error)) ≤ 12 * 7 := by
+        exact mul_le_mul_of_nonneg_left hsqrt_two_le_seven (by norm_num)
+      simpa using hcoeff.trans_eq (by norm_num : (12 : Error) * 7 = 84)
 
 /-- `lem:orthonormalization-main-lemma`. -/
 lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
@@ -330,7 +358,8 @@ lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ιA × ιB))
-    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error) :
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error)
+    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
@@ -371,6 +400,6 @@ lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
   obtain ⟨P, hRounded⟩ := hRound
   refine ⟨P, ?_⟩
   exact roundedProjMeasStatement_mono hRounded
-    (orthonormalizationMainLemma_error_bound ζ)
+    (orthonormalizationMainLemma_error_bound ζ hζ hζ1)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
