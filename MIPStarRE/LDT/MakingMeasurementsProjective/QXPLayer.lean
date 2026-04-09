@@ -94,9 +94,6 @@ structure RankReductionWitness {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι)
     (ζ : Error) (data : QLayerData Outcome ι) : Prop where
-  normalized : ψ.IsNormalized
-  zeta_nonneg : 0 ≤ ζ
-  zeta_le_one : ζ ≤ 1
   projective :
     ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Qa data a)
   closeness :
@@ -109,6 +106,16 @@ structure RankReductionWitness {Outcome : Type*}
       (1 : MIPStarRE.Quantum.Op ι)
   auxDim_le :
     Fintype.card data.auxSpace.carrier ≤ Fintype.card ι
+
+/-- The raw operator family obtained by sandwiching the auxiliary projectors
+`T_a` with a candidate `XHat`. This is the family later named `P`. -/
+noncomputable def pFamilyFromXHat {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (qLayer : QLayerData Outcome ι)
+    (xHat : Matrix qLayer.auxSpace.carrier ι ℂ) :
+    OpFamily Outcome ι where
+  outcome := fun a => xHatᴴ * Ta qLayer a * xHat
+  total := ∑ a, xHatᴴ * Ta qLayer a * xHat
 
 /-- Data for the paper's `X/XHat/P` layer built on top of `Q_a` and the
 auxiliary projectors `T_a`.  The square matrices `u`, `v`, `sigmaLeft`,
@@ -131,15 +138,16 @@ structure QXPLayerData (Outcome : Type*) [Fintype Outcome]
   q_total_svd : QTotal qLayer = v * (sigmaRight * sigmaRight) * vᴴ
   xHat_mixed : xᴴ * xHat = CFC.sqrt (QTotal qLayer)
   xHat_left_svd : x * xHatᴴ = u * sigmaLeft * uᴴ
+  /-- We store the paper's final `P`-vs-`Q` estimate on the witness package so
+  a chosen `X/XHat/P` decomposition carries its own comparison bound. The
+  public interface remains `pQApprox`, which is the only place this field is
+  projected out. -/
   pQApprox_bound :
     ∀ (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error),
       RankReductionWitness ψ A ζ qLayer →
         SDDOpRel ψ (uniformDistribution Unit)
           (constOpFamily qLayer.q)
-          (constOpFamily {
-            outcome := fun a => xHatᴴ * Ta qLayer a * xHat
-            total := ∑ a, xHatᴴ * Ta qLayer a * xHat
-          })
+          (constOpFamily (pFamilyFromXHat qLayer xHat))
           (30 * zetaQuarterRoot ζ)
 
 /-- The paper's matrix `X_a = T_a · X`. -/
@@ -167,9 +175,8 @@ def Pa {Outcome : Type*} [Fintype Outcome]
 noncomputable def PFamily {Outcome : Type*} [Fintype Outcome]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (data : QXPLayerData Outcome ι) :
-    OpFamily Outcome ι where
-  outcome := Pa data
-  total := ∑ a, Pa data a
+    OpFamily Outcome ι :=
+  pFamilyFromXHat data.qLayer data.xHat
 
 /-- Paper label `def:matrix-decomposition-Q`.
 
@@ -838,7 +845,7 @@ lemma pQApprox {Outcome : Type*}
         (constOpFamily (PFamily data))
         (30 * zetaQuarterRoot ζ) := by
   intro hRank
-  simpa [PFamily, Pa] using data.pQApprox_bound ψ A ζ hRank
+  simpa [PFamily, pFamilyFromXHat] using data.pQApprox_bound ψ A ζ hRank
 
 end
 
