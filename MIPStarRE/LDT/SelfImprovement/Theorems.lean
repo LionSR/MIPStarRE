@@ -33,7 +33,7 @@ structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
 
-/-- Output package for `lem:sdp`. -/
+/-- Reduced output package for the currently formalized fragment of `lem:sdp`. -/
 structure SdpStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :
@@ -161,17 +161,15 @@ noncomputable def projectiveBoundednessGap (params : Parameters)
 
 /-- Reduced output package for the currently formalized fragment of `lem:add-in-u`.
 
-The averaged construction of `H` is recorded separately by
-`SelfImprovementHelperConclusion.averagedConstruction`, and the quantitative
-transfer inequality still needs the missing Cauchy-Schwarz / matrix-realization
-bridge from the paper proof. The variance bound is already available from
-`lem:global-variance-of-points`, so we expose that part here. -/
-structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Parameters)
+The paper statement quantifies over an auxiliary submeasurement `M`, the
+averaged family `H`, and a selection rule `S`, and proves a transfer inequality
+between two expectations. The current Lean pipeline only uses the downstream
+global-variance corollary, which depends only on the SDP measurement `T` and
+the error parameters, so those unused inputs are omitted here. -/
+structure AddInUStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : Measurement (Polynomial params) ι)
-    (M : IdxSubMeas (Point params) Outcome ι)
-    (H : SubMeas (Polynomial params) ι)
     (eps delta : Error) : Prop where
   varianceBound :
     pointConditionedGlobalVariance params strategy T.toSubMeas ≤
@@ -181,8 +179,8 @@ structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Paramete
 
 This structure intentionally records only the guarantees produced directly by the
 current `sdp` + `addInU` pipeline: the SDP witness, the averaged construction of
-`H`, the transfer statement for arbitrary selections, and the PSD / dual-feasibility
-facts for `Z`.
+`H`, the reduced `addInU` variance bound, and the PSD / dual-feasibility facts
+for `Z`.
 
 The paper and blueprint package four additional helper-lemma guarantees
 (`completeness`, `pointConsistency`, strong self-consistency, and boundedness).
@@ -197,9 +195,8 @@ structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel para
   sdpWitness : SdpOptimalPair params strategy T.toSubMeas Z
   averagedConstruction :
     H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
-  addInUTransfer :
-    ∀ {Outcome : Type*} [Fintype Outcome] (M : IdxSubMeas (Point params) Outcome ι),
-      AddInUStatement params strategy T M H eps delta
+  addInUVarianceBound :
+    AddInUStatement params strategy T eps delta
   positiveSemidefiniteWitness :
     0 ≤ Z
   dualDominatesAveragedPoint :
@@ -289,7 +286,12 @@ private lemma averagedPointOperator_le_one
             (uniformDistribution_weight_sum_le_one (Point params)) zero_le_one
     _ = 1 := by simp
 
-/-- `lem:sdp`. -/
+/-- Reduced version of `lem:sdp`.
+
+This currently produces only the weak SDP witness used by the formalized
+self-improvement pipeline: a measurement-valued primal witness together with a
+PSD dual witness that dominates every averaged point operator. The paper's
+strong-duality and complementary-slackness conclusions are still omitted. -/
 lemma sdp
     (params : Parameters)
     [FieldModel params.q]
@@ -319,24 +321,34 @@ lemma sdp
   simpa [Z, sdpDualSlackOperator] using
     sub_nonneg.mpr (averagedPointOperator_le_one params strategy g)
 
-/-- `lem:add-in-u`. -/
-lemma addInU {Outcome : Type*} [Fintype Outcome]
+/-- Reduced version of `lem:add-in-u`.
+
+This currently keeps only the global-variance consequence used downstream. The
+selection-dependent transfer inequality from the paper, together with its
+dependence on an auxiliary family `M` and the averaged family `H`, is not yet
+formalized here. -/
+lemma addInU
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (T : Measurement (Polynomial params) ι)
-    (M : IdxSubMeas (Point params) Outcome ι)
-    (H : SubMeas (Polynomial params) ι) :
-    AddInUStatement params strategy T M H eps delta := by
+    (T : Measurement (Polynomial params) ι) :
+    AddInUStatement params strategy T eps delta := by
   refine
     { varianceBound := ?_ }
   let hvariance :=
     globalVarianceOfPoints params strategy eps delta gamma hgood T.toSubMeas strategy.state
   simpa [selfImprovementVarianceError] using hvariance.averagedGlobalVarianceBound
 
-/-- `lem:self-improvement-helper`. -/
+/-- Reduced version of `lem:self-improvement-helper`.
+
+Unlike the paper helper lemma, this theorem does not yet take the consistency
+error `nu` or a hypothesis `hcons`. The current
+`SelfImprovementHelperConclusion` only packages the outputs produced directly by
+the reduced `sdp` + `addInU` pipeline, and those facts do not depend on the
+consistency hypothesis. The `nu`-dependent consistency information will be
+threaded back in when the full pipeline is assembled in `selfImprovement`. -/
 lemma selfImprovementHelper
     (params : Parameters)
     [FieldModel params.q]
@@ -357,12 +369,11 @@ lemma selfImprovementHelper
   refine
     { sdpWitness := ?_
       averagedConstruction := rfl
-      addInUTransfer := ?_
+      addInUVarianceBound := ?_
       positiveSemidefiniteWitness := hsdp.dualPositive
       dualDominatesAveragedPoint := hsdp.dualFeasible }
   · simpa [T] using hsdp
-  · intro Outcome _ M
-    exact addInU params strategy eps delta gamma hgood T M H
+  · exact addInU params strategy eps delta gamma hgood T
 
 /-- `thm:self-improvement`. -/
 theorem selfImprovement
