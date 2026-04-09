@@ -32,7 +32,8 @@ private def pointDiagonalLineQuestionEquiv (params : Parameters)
     rcases s with ⟨base, direction, t⟩
     rfl
 
-private lemma avgOver_uniform_equiv
+/-- Reindexing a uniform average along an equivalence preserves its value. -/
+lemma avgOver_uniform_equiv
     {α β : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
     [Fintype β] [DecidableEq β] [Nonempty β]
     (e : α ≃ β) (f : α → Error) :
