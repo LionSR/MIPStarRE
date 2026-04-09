@@ -61,44 +61,7 @@ theorem triangleInequalityForVectorsSquared
     (ψ : QuantumState ι) (D : κ → MIPStarRE.Quantum.Op ι) :
     ev ψ ((∑ i, D i)ᴴ * (∑ i, D i)) ≤
       (Fintype.card κ : Error) * ∑ i, ev ψ ((D i)ᴴ * D i) := by
-  let x : κ → Error := fun i => Real.sqrt (ev ψ ((D i)ᴴ * D i))
-  calc
-    ev ψ ((∑ i, D i)ᴴ * (∑ i, D i))
-      = ∑ i, ∑ j, ev ψ ((D i)ᴴ * D j) := by
-          rw [Matrix.conjTranspose_sum, Finset.sum_mul, ev_sum]
-          simp_rw [Matrix.mul_sum, ev_sum]
-    _ ≤ ∑ i, ∑ j, |ev ψ ((D i)ᴴ * D j)| := by
-          refine Finset.sum_le_sum ?_
-          intro i _
-          refine Finset.sum_le_sum ?_
-          intro j _
-          exact le_abs_self _
-    _ ≤ ∑ i, ∑ j, x i * x j := by
-          refine Finset.sum_le_sum ?_
-          intro i _
-          refine Finset.sum_le_sum ?_
-          intro j _
-          dsimp [x]
-          simpa using ev_abs_mul_le_sqrt ψ ((D i)ᴴ) (D j)
-    _ = (∑ i, x i) ^ 2 := by
-          rw [sq]
-          calc
-            ∑ i, ∑ j, x i * x j = ∑ i, x i * ∑ j, x j := by
-              refine Finset.sum_congr rfl ?_
-              intro i _
-              rw [Finset.mul_sum]
-            _ = (∑ i, x i) * ∑ j, x j := by
-              rw [Finset.sum_mul]
-    _ ≤ (Fintype.card κ : Error) * ∑ i, x i ^ 2 := by
-          simpa using
-            (sq_sum_le_card_mul_sum_sq (s := Finset.univ) (f := x))
-    _ = (Fintype.card κ : Error) * ∑ i, ev ψ ((D i)ᴴ * D i) := by
-          refine congrArg ((Fintype.card κ : Error) * ·) ?_
-          refine Finset.sum_congr rfl ?_
-          intro i _
-          dsimp [x]
-          rw [Real.sq_sqrt]
-          exact ev_adjoint_self_nonneg ψ (D i)
+  simpa using ev_sum_conjTranspose_mul_sum_le ψ D
 
 -- TODO: consider moving to Basic/
 private lemma max_zero_add_le (x y : Error) :

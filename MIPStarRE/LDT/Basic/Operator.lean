@@ -393,23 +393,19 @@ theorem ev_mul_comm_of_psd {ι : Type*} [Fintype ι] [DecidableEq ι]
     (Matrix.nonneg_iff_posSemidef.mp hA).isHermitian.eq
     (Matrix.nonneg_iff_posSemidef.mp hB).isHermitian.eq
 
+/-- Cross-term identity: `ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B)`. -/
+theorem ev_conjTranspose_mul_comm {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι) :
+    ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B) := by
+  simpa [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
+    using (ev_conjTranspose ψ (Aᴴ * B))
+
 /-- Cauchy-Schwarz for the state-weighted inner product:
 `(ev ψ (Aᴴ * B))² ≤ ev ψ (Aᴴ * A) * ev ψ (Bᴴ * B)`. -/
 theorem ev_cauchy_schwarz {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι) :
     (ev ψ (Aᴴ * B)) ^ 2 ≤ ev ψ (Aᴴ * A) * ev ψ (Bᴴ * B) := by
-  -- Cross-term identity: ev(BᴴA) = ev(AᴴB) (both equal Re of conjugate pair)
-  have hcross : ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B) := by
-    simp only [ev]
-    have hρ : ψ.densityᴴ = ψ.density :=
-      (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd).isHermitian.eq
-    have hstar : star (MIPStarRE.Quantum.normalizedTrace (ψ.density * (Aᴴ * B))) =
-        MIPStarRE.Quantum.normalizedTrace (ψ.density * (Bᴴ * A)) := by
-      rw [← normalizedTrace_conjTranspose]
-      -- (ρ(AᴴB))ᴴ = (AᴴB)ᴴ ρᴴ = BᴴA ρᴴ = BᴴA ρ = ρ (BᴴA)
-      simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
-      rw [hρ, MIPStarRE.Quantum.normalizedTrace_mul_comm]
-    simpa [Complex.star_def, Complex.conj_re] using (congr_arg Complex.re hstar).symm
+  have hcross : ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B) := ev_conjTranspose_mul_comm ψ A B
   -- Scalar expansion helpers
   have hscale_r : ∀ (t : ℝ) (X : MIPStarRE.Quantum.Op ι),
       ev ψ (((↑t : ℂ) • Bᴴ) * X) = t * ev ψ (Bᴴ * X) := by
@@ -467,5 +463,60 @@ theorem ev_abs_mul_le_sqrt
           rw [sq]
           ring_nf
           rw [Real.sq_sqrt hA_nonneg, Real.sq_sqrt hB_nonneg]
+
+/-- AM-GM for the quadratic form:
+`2 * ev ψ (Aᴴ * B) ≤ ev ψ (Aᴴ * A) + ev ψ (Bᴴ * B)`. -/
+theorem ev_cross_term_le {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι) :
+    2 * ev ψ (Aᴴ * B) ≤ ev ψ (Aᴴ * A) + ev ψ (Bᴴ * B) := by
+  have h := ev_adjoint_self_nonneg ψ (A - B)
+  rw [Matrix.conjTranspose_sub] at h
+  have hexp : ev ψ ((Aᴴ - Bᴴ) * (A - B)) =
+      ev ψ (Aᴴ * A) - ev ψ (Aᴴ * B) -
+        ev ψ (Bᴴ * A) + ev ψ (Bᴴ * B) := by
+    rw [sub_mul, mul_sub, mul_sub, ev_sub, ev_sub, ev_sub]
+    ring
+  rw [hexp] at h
+  linarith [ev_conjTranspose_mul_comm ψ A B]
+
+/-- Double-sum identity: `∑ᵢ ∑ⱼ (f i + f j) / 2 = n * ∑ f`. -/
+private theorem double_sum_avg_eq {α : Type*} [Fintype α] (f : α → ℝ) :
+    ∑ i : α, ∑ j : α, (f i + f j) / 2 =
+      (Fintype.card α : ℝ) * ∑ a : α, f a := by
+  have inner : ∀ i, ∑ j : α, (f i + f j) / 2 =
+      (Fintype.card α : ℝ) * (f i / 2) + (∑ j : α, f j) / 2 := by
+    intro i
+    simp_rw [add_div, Finset.sum_add_distrib, Finset.sum_const,
+      Finset.card_univ, nsmul_eq_mul, Finset.sum_div]
+  simp_rw [inner]
+  rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ,
+    nsmul_eq_mul]
+  simp_rw [show ∀ x, (Fintype.card α : ℝ) * (f x / 2) =
+    (Fintype.card α : ℝ) / 2 * f x from fun _ => by ring]
+  rw [← Finset.mul_sum]
+  ring
+
+/-- Jensen inequality for the quadratic form: for a finite family of operators,
+`ev ψ ((∑ Xᵢ)ᴴ * (∑ Xᵢ)) ≤ n * ∑ ev ψ (XᵢᴴXᵢ)`. -/
+theorem ev_sum_conjTranspose_mul_sum_le {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) {α : Type*} [Fintype α]
+    (X : α → MIPStarRE.Quantum.Op ι) :
+    ev ψ ((∑ a, X a)ᴴ * (∑ a, X a)) ≤
+      (Fintype.card α : ℝ) * ∑ a, ev ψ ((X a)ᴴ * X a) := by
+  -- Expand LHS to double sum: ev((∑Xi)ᴴ(∑Xi)) = ∑_i ∑_j ev(XiᴴXj)
+  have hexpand : ev ψ ((∑ a, X a)ᴴ * (∑ a, X a)) =
+      ∑ i : α, ∑ j : α, ev ψ ((X i)ᴴ * X j) := by
+    rw [Matrix.conjTranspose_sum, Finset.sum_mul]
+    simp_rw [Finset.mul_sum, ev_finset_sum]
+  rw [hexpand]
+  -- Apply cross-term bound to each pair, then simplify double sum
+  calc ∑ i : α, ∑ j : α, ev ψ ((X i)ᴴ * X j)
+      ≤ ∑ i : α, ∑ j : α,
+          (ev ψ ((X i)ᴴ * X i) + ev ψ ((X j)ᴴ * X j)) / 2 :=
+        Finset.sum_le_sum fun i _ =>
+          Finset.sum_le_sum fun j _ => by
+            linarith [ev_cross_term_le ψ (X i) (X j)]
+    _ = (Fintype.card α : ℝ) * ∑ a, ev ψ ((X a)ᴴ * X a) :=
+        double_sum_avg_eq _
 
 end MIPStarRE.LDT
