@@ -393,23 +393,19 @@ theorem ev_mul_comm_of_psd {ι : Type*} [Fintype ι] [DecidableEq ι]
     (Matrix.nonneg_iff_posSemidef.mp hA).isHermitian.eq
     (Matrix.nonneg_iff_posSemidef.mp hB).isHermitian.eq
 
+/-- Cross-term identity: `ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B)`. -/
+theorem ev_conjTranspose_mul_comm {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι) :
+    ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B) := by
+  simpa [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
+    using (ev_conjTranspose ψ (Aᴴ * B))
+
 /-- Cauchy-Schwarz for the state-weighted inner product:
 `(ev ψ (Aᴴ * B))² ≤ ev ψ (Aᴴ * A) * ev ψ (Bᴴ * B)`. -/
 theorem ev_cauchy_schwarz {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι) :
     (ev ψ (Aᴴ * B)) ^ 2 ≤ ev ψ (Aᴴ * A) * ev ψ (Bᴴ * B) := by
-  -- Cross-term identity: ev(BᴴA) = ev(AᴴB) (both equal Re of conjugate pair)
-  have hcross : ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B) := by
-    simp only [ev]
-    have hρ : ψ.densityᴴ = ψ.density :=
-      (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd).isHermitian.eq
-    have hstar : star (MIPStarRE.Quantum.normalizedTrace (ψ.density * (Aᴴ * B))) =
-        MIPStarRE.Quantum.normalizedTrace (ψ.density * (Bᴴ * A)) := by
-      rw [← normalizedTrace_conjTranspose]
-      -- (ρ(AᴴB))ᴴ = (AᴴB)ᴴ ρᴴ = BᴴA ρᴴ = BᴴA ρ = ρ (BᴴA)
-      simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
-      rw [hρ, MIPStarRE.Quantum.normalizedTrace_mul_comm]
-    simpa [Complex.star_def, Complex.conj_re] using (congr_arg Complex.re hstar).symm
+  have hcross : ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B) := ev_conjTranspose_mul_comm ψ A B
   -- Scalar expansion helpers
   have hscale_r : ∀ (t : ℝ) (X : MIPStarRE.Quantum.Op ι),
       ev ψ (((↑t : ℂ) • Bᴴ) * X) = t * ev ψ (Bᴴ * X) := by
@@ -467,13 +463,6 @@ theorem ev_abs_mul_le_sqrt
           rw [sq]
           ring_nf
           rw [Real.sq_sqrt hA_nonneg, Real.sq_sqrt hB_nonneg]
-
-/-- Cross-term identity: `ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B)`. -/
-theorem ev_conjTranspose_mul_comm {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (A B : MIPStarRE.Quantum.Op ι) :
-    ev ψ (Bᴴ * A) = ev ψ (Aᴴ * B) := by
-  simpa [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
-    using (ev_conjTranspose ψ (Aᴴ * B))
 
 /-- AM-GM for the quadratic form:
 `2 * ev ψ (Aᴴ * B) ≤ ev ψ (Aᴴ * A) + ev ψ (Bᴴ * B)`. -/
