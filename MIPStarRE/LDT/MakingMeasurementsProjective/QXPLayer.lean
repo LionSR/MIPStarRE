@@ -159,8 +159,14 @@ noncomputable def PFamily {Outcome : Type*} [Fintype Outcome]
 /-- **Almost-projective estimate** (`eq:A-looks-projective`).
 
 This is the opening inequality in the proof of
-`lem:orthonormalization-main-lemma`, extracted as an explicit Lean lemma so the
-later `Q/X/XHat/P` layer can depend on it directly. -/
+`lem:orthonormalization-main-lemma`, extracted as an explicit Lean lemma
+so the later `Q/X/XHat/P` layer can depend on it directly.
+
+`B` is a `ProjMeas` (not `Measurement`) because the proof relies on
+`Bₐ² = Bₐ` (projectivity) to collapse `diagB` to `totalMass`.
+In the paper's orthonormalization pipeline, `B` is always the
+projective reference measurement obtained from Naimark dilation
+(Theorem 5.1), so this is the natural type. -/
 lemma aLooksProjective {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -170,183 +176,110 @@ lemma aLooksProjective {Outcome : Type*}
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
-      ∑ a, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a - A.outcome a * A.outcome a)) ≤
-        2 * ζ := by
+      ∑ a, ev ψ
+        ((leftPlacedSubMeas (ιB := ιB) A.toSubMeas).outcome a -
+          (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).outcome a *
+            (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).outcome a) ≤ 2 * ζ := by
   intro hCons
-  rcases hCons with ⟨hCons⟩
-  let defect : Error :=
-    ∑ a : Outcome,
-      ev ψ (leftTensor (ι₂ := ιB) (A.outcome a - A.outcome a * A.outcome a))
-  let diagA : Error :=
-    ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a))
-  let match : Error :=
-    ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a))
+  classical
+  let ALeft : SubMeas Outcome (ιA × ιB) := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
+  let BRight : SubMeas Outcome (ιA × ιB) := rightPlacedSubMeas (ιA := ιA) B.toSubMeas
   let totalMass : Error := ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB))
-  have hCons' : qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas ≤ ζ := by
-    simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using hCons
-  have hgap : totalMass - match ≤ ζ := by
-    have hq :
-        max 0 (totalMass - match) ≤ ζ := by
-      simpa [qBipartiteConsDefect, qBipartiteMatchMass, totalMass, match,
-        A.total_eq_one, B.total_eq_one, opTensor] using hCons'
-    exact le_trans (le_max_right 0 (totalMass - match)) hq
-  have h_expand :
-      ∀ a : Outcome,
-        ev ψ
-            (((leftTensor (ι₂ := ιB) (A.outcome a) -
-                  rightTensor (ι₁ := ιA) (B.outcome a))ᴴ) *
-              (leftTensor (ι₂ := ιB) (A.outcome a) -
-                rightTensor (ι₁ := ιA) (B.outcome a))) =
-          ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a)) +
-            ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a)) -
-            2 * ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
-    intro a
-    have hLherm :
-        (leftTensor (ι₂ := ιB) (A.outcome a))ᴴ =
-          leftTensor (ι₂ := ιB) (A.outcome a) := by
-      exact
-        (Matrix.nonneg_iff_posSemidef.mp
-          (leftTensor_nonneg (ι₂ := ιB) (A.outcome_pos a))).isHermitian.eq
-    have hRherm :
-        (rightTensor (ι₁ := ιA) (B.outcome a))ᴴ =
-          rightTensor (ι₁ := ιA) (B.outcome a) := by
-      exact
-        (Matrix.nonneg_iff_posSemidef.mp
-          (rightTensor_nonneg (ι₁ := ιA) (B.outcome_pos a))).isHermitian.eq
+  let diagA : Error := ∑ a : Outcome, ev ψ (ALeft.outcome a * ALeft.outcome a)
+  let diagB : Error := ∑ a : Outcome, ev ψ (BRight.outcome a * BRight.outcome a)
+  let overlap : Error := ∑ a : Outcome, ev ψ (ALeft.outcome a * BRight.outcome a)
+  have hCons' :
+      qConsDefect ψ ALeft BRight ≤ ζ := by
+    have hConsPlaced := hCons.offDiagonalBound
+    rw [bipartiteConsError_eq_consError_placed] at hConsPlaced
+    have hConsConst :
+        consError ψ (uniformDistribution Unit)
+          (constSubMeasFamily ALeft) (constSubMeasFamily BRight) ≤ ζ := by
+      simpa [constSubMeasFamily, ALeft, BRight] using hConsPlaced
+    simpa [MIPStarRE.LDT.Preliminaries.constFamily_cons_unit] using hConsConst
+  have hgap : totalMass - overlap ≤ ζ := by
+    have hmax :
+        max 0 (totalMass - overlap) ≤ ζ := by
+      simpa [qConsDefect, qMatchMass, totalMass, overlap, ALeft, BRight,
+        leftPlacedSubMeas, rightPlacedSubMeas, leftTensor, rightTensor,
+        A.total_eq_one, B.total_eq_one] using hCons'
+    exact le_trans (le_max_right 0 (totalMass - overlap)) hmax
+  have hdiagB :
+      diagB = totalMass := by
     calc
-      ev ψ
-          (((leftTensor (ι₂ := ιB) (A.outcome a) -
-                rightTensor (ι₁ := ιA) (B.outcome a))ᴴ) *
-            (leftTensor (ι₂ := ιB) (A.outcome a) -
-              rightTensor (ι₁ := ιA) (B.outcome a)))
-        =
-          ev ψ
-            (((leftTensor (ι₂ := ιB) (A.outcome a) *
-                  leftTensor (ι₂ := ιB) (A.outcome a) -
-                leftTensor (ι₂ := ιB) (A.outcome a) *
-                  rightTensor (ι₁ := ιA) (B.outcome a)) -
-              (rightTensor (ι₁ := ιA) (B.outcome a) *
-                  leftTensor (ι₂ := ιB) (A.outcome a) -
-                rightTensor (ι₁ := ιA) (B.outcome a) *
-                  rightTensor (ι₁ := ιA) (B.outcome a)))) := by
-            congr 1
-            simp [hLherm, hRherm, sub_mul, mul_sub]
-            abel
-      _ =
-          ev ψ
-            (leftTensor (ι₂ := ιB) (A.outcome a) *
-              leftTensor (ι₂ := ιB) (A.outcome a)) -
-            ev ψ
-              (leftTensor (ι₂ := ιB) (A.outcome a) *
-                rightTensor (ι₁ := ιA) (B.outcome a)) -
-            (ev ψ
-                (rightTensor (ι₁ := ιA) (B.outcome a) *
-                  leftTensor (ι₂ := ιB) (A.outcome a)) -
-              ev ψ
-                (rightTensor (ι₁ := ιA) (B.outcome a) *
-                  rightTensor (ι₁ := ιA) (B.outcome a))) := by
-            rw [ev_sub, ev_sub, ev_sub]
-      _ =
-          ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a)) +
-            ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a)) -
-            2 * ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
-            rw [leftTensor_mul_leftTensor, leftTensor_mul_rightTensor_eq_opTensor,
-              rightTensor_mul_leftTensor_eq_opTensor, rightTensor_mul_rightTensor]
-            simp [B.proj a]
-            ring
-  have hsdd_nonneg : 0 ≤ qSDD ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight := by
-    exact qSDD_nonneg ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight
-  have hdiag_lower : 2 * match - totalMass ≤ diagA := by
-    have hsdd_eq :
-        qSDD ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight =
-          diagA + totalMass - 2 * match := by
-      unfold qSDD qSDDCore diagA match totalMass
-      calc
-        ∑ a : Outcome,
-            ev ψ
-              (((A.toSubMeas.liftLeft.outcome a - B.toSubMeas.liftRight.outcome a)ᴴ) *
-                (A.toSubMeas.liftLeft.outcome a - B.toSubMeas.liftRight.outcome a))
-          =
-            ∑ a : Outcome,
-              (ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a)) +
-                ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a)) -
-                2 * ev ψ (opTensor (A.outcome a) (B.outcome a))) := by
-              refine Finset.sum_congr rfl ?_
+      diagB = ∑ a : Outcome, ev ψ (BRight.outcome a) := by
+        unfold diagB
+        refine Finset.sum_congr rfl ?_
+        intro a _
+        simp [BRight, rightPlacedSubMeas, rightTensor_mul_rightTensor, B.proj a]
+      _ = totalMass := by
+        rw [← ev_sum ψ BRight.outcome, BRight.sum_eq_total]
+        simp [BRight, rightPlacedSubMeas, rightTensor, totalMass, B.total_eq_one]
+  have hdiagA_nonneg : 0 ≤ diagA := by
+    unfold diagA
+    exact Finset.sum_nonneg fun a _ => by
+      simpa [SubMeas.outcome_hermitian] using ev_adjoint_self_nonneg ψ (ALeft.outcome a)
+  have hmass_nonneg : 0 ≤ totalMass := by
+    simpa [totalMass] using ev_adjoint_self_nonneg ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB))
+  have hoverlap_abs :
+      |overlap| ≤ Real.sqrt diagA * Real.sqrt totalMass := by
+    calc
+      |overlap|
+        = |∑ a : Outcome, ev ψ (ALeft.outcome a * BRight.outcome a)| := by
+            simp [overlap]
+      _ ≤ ∑ a : Outcome,
+            |ev ψ (ALeft.outcome a * BRight.outcome a)| := by
+              exact Finset.abs_sum_le_sum_abs _ _
+      _ ≤ ∑ a : Outcome,
+            Real.sqrt (ev ψ (ALeft.outcome a * ALeft.outcome a)) *
+              Real.sqrt (ev ψ (BRight.outcome a * BRight.outcome a)) := by
+              refine Finset.sum_le_sum ?_
               intro a _
-              simpa [SubMeas.liftLeft, SubMeas.liftRight] using h_expand a
-        _ =
-            (∑ a : Outcome,
-              ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a))) +
-              (∑ a : Outcome,
-                ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a))) -
-              2 * ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
-              rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.mul_sum]
-        _ =
-            (∑ a : Outcome,
-              ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a))) +
-              ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) -
-              2 * ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
-              congr 1
-              calc
-                ∑ a : Outcome, ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a))
-                  = ∑ a : Outcome, ev ψ (rightTensor (ι₁ := ιA) (B.outcome a)) := by
-                      refine Finset.sum_congr rfl ?_
-                      intro a _
-                      simp [B.proj a]
-                _ = ev ψ (rightTensor (ι₁ := ιA) (∑ a : Outcome, B.outcome a)) := by
-                      rw [← ev_sum ψ (fun a : Outcome => rightTensor (ι₁ := ιA) (B.outcome a))]
-                      rw [rightTensor_finset_sum (ι₁ := ιA) Finset.univ B.outcome]
-                _ = ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
-                      simp [B.sum_eq]
-    linarith
-  have hdefect_eq : defect = totalMass - diagA := by
-    unfold defect diagA totalMass
-    have hleft_sub :
-        ∀ X Y : MIPStarRE.Quantum.Op ιA,
-          leftTensor (ι₂ := ιB) (X - Y) =
-            leftTensor (ι₂ := ιB) X - leftTensor (ι₂ := ιB) Y := by
-      intro X Y
-      have hneg :
-          Matrix.kronecker (-Y) (1 : MIPStarRE.Quantum.Op ιB) =
-            -Matrix.kronecker Y (1 : MIPStarRE.Quantum.Op ιB) := by
-        simpa using (Matrix.smul_kronecker (-1 : ℂ) Y (1 : MIPStarRE.Quantum.Op ιB))
+              simpa [SubMeas.outcome_hermitian] using
+                ev_abs_mul_le_sqrt ψ (ALeft.outcome a) (BRight.outcome a)
+      _ ≤ Real.sqrt diagA * Real.sqrt diagB := by
+            simpa [diagA, diagB] using
+              Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
+                (f := fun a => ev ψ (ALeft.outcome a * ALeft.outcome a))
+                (g := fun a => ev ψ (BRight.outcome a * BRight.outcome a))
+                (fun a => by
+                  simpa [SubMeas.outcome_hermitian] using
+                    ev_adjoint_self_nonneg ψ (ALeft.outcome a))
+                (fun a => by
+                  simpa [SubMeas.outcome_hermitian] using
+                    ev_adjoint_self_nonneg ψ (BRight.outcome a))
+      _ = Real.sqrt diagA * Real.sqrt totalMass := by rw [hdiagB]
+  have hoverlap_le : overlap ≤ Real.sqrt diagA * Real.sqrt totalMass := by
+    exact (abs_le.mp hoverlap_abs).2
+  have htwosqrt :
+      2 * (Real.sqrt diagA * Real.sqrt totalMass) ≤ diagA + totalMass := by
+    nlinarith [sq_nonneg (Real.sqrt diagA - Real.sqrt totalMass),
+      Real.sq_sqrt hdiagA_nonneg, Real.sq_sqrt hmass_nonneg]
+  have hcore : totalMass - diagA ≤ 2 * (totalMass - overlap) := by
+    have haux : 2 * overlap ≤ diagA + totalMass := by
       calc
-        leftTensor (ι₂ := ιB) (X - Y)
-          = Matrix.kronecker X (1 : MIPStarRE.Quantum.Op ιB) +
-              Matrix.kronecker (-Y) (1 : MIPStarRE.Quantum.Op ιB) := by
-                simpa [leftTensor, sub_eq_add_neg] using
-                  (Matrix.add_kronecker X (-Y) (1 : MIPStarRE.Quantum.Op ιB)).symm
-        _ = leftTensor (ι₂ := ιB) X - leftTensor (ι₂ := ιB) Y := by
-              rw [hneg]
-              simp [leftTensor, sub_eq_add_neg]
-    calc
-      ∑ a : Outcome,
-          ev ψ (leftTensor (ι₂ := ιB) (A.outcome a - A.outcome a * A.outcome a))
-        =
-          ∑ a : Outcome,
-            (ev ψ (leftTensor (ι₂ := ιB) (A.outcome a)) -
-              ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a))) := by
-            refine Finset.sum_congr rfl ?_
-            intro a _
-            rw [hleft_sub, ev_sub]
-      _ =
-          (∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a))) -
-            ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a)) := by
-            rw [Finset.sum_sub_distrib]
-      _ = ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) -
-            ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a)) := by
-            rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ιB) (A.outcome a))]
-            rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ A.outcome]
-            simp [A.sum_eq]
-  calc
-    ∑ a : Outcome,
-        ev ψ (leftTensor (ι₂ := ιB) (A.outcome a - A.outcome a * A.outcome a))
-      = totalMass - diagA := hdefect_eq
-    _ ≤ 2 * (totalMass - match) := by
-          linarith
-    _ ≤ 2 * ζ := by
+        2 * overlap ≤ 2 * (Real.sqrt diagA * Real.sqrt totalMass) := by
           gcongr
-          exact hgap
+        _ ≤ diagA + totalMass := htwosqrt
+    nlinarith
+  calc
+    ∑ a, ev ψ (ALeft.outcome a - ALeft.outcome a * ALeft.outcome a)
+      = totalMass - diagA := by
+          unfold totalMass diagA
+          calc
+            ∑ a, ev ψ (ALeft.outcome a - ALeft.outcome a * ALeft.outcome a)
+              = ∑ a, (ev ψ (ALeft.outcome a) - ev ψ (ALeft.outcome a * ALeft.outcome a)) := by
+                  refine Finset.sum_congr rfl ?_
+                  intro a _
+                  exact ev_sub ψ (ALeft.outcome a) (ALeft.outcome a * ALeft.outcome a)
+            _ = (∑ a, ev ψ (ALeft.outcome a)) - ∑ a, ev ψ (ALeft.outcome a * ALeft.outcome a) := by
+                  rw [Finset.sum_sub_distrib]
+            _ = totalMass - ∑ a, ev ψ (ALeft.outcome a * ALeft.outcome a) := by
+                  rw [← ev_sum ψ ALeft.outcome, ALeft.sum_eq_total]
+                  simp [ALeft, leftPlacedSubMeas, leftTensor, totalMass, A.total_eq_one]
+            _ = totalMass - diagA := by simp [diagA]
+    _ ≤ 2 * (totalMass - overlap) := hcore
+    _ ≤ 2 * ζ := by gcongr
 
 /-- **Scalar truncation inequality** (`lem:trunc-inequality`).
 

@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.Preliminaries.SelfConsistency
 
 /-!
 # Section 12 — Theorems
@@ -393,12 +394,168 @@ lemma looksEasyButTookMeAWhile
             rw [← hmul_rpow]
 
 /-- `lem:g-complete-self-consistency`. -/
+private lemma qSDD_completePart_le_slice
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hperm : PermInvState ψbi)
+    (family : IdxPolyFamily params ι)
+    (x : Fq params) :
+    qSDD ψbi
+        ((completePartSubMeas params family x).liftLeft)
+        ((completePartSubMeas params family x).liftRight)
+      ≤
+    qSDD ψbi
+        (((family.meas x).toSubMeas).liftLeft)
+        (((family.meas x).toSubMeas).liftRight) := by
+  let P := family.meas x
+  let T : MIPStarRE.Quantum.Op ι := P.total
+  have hTT : T * T = T := by
+    simpa [T, P] using MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj P
+  have hcomplete :
+      qSDD ψbi ((completePartSubMeas params family x).liftLeft)
+          ((completePartSubMeas params family x).liftRight) =
+        2 * (ev ψbi (leftTensor (ι₂ := ι) T) - ev ψbi (opTensor T T)) := by
+    calc
+      qSDD ψbi ((completePartSubMeas params family x).liftLeft)
+          ((completePartSubMeas params family x).liftRight)
+        = ev ψbi (((leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)ᴴ) *
+            (leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)) := by
+              unfold qSDD qSDDCore completePartSubMeas
+              simp [SubMeas.liftLeft, SubMeas.liftRight, postprocess, T, P.sum_eq_total]
+              rw [P.sum_eq_total]
+      _ = ev ψbi (leftTensor (ι₂ := ι) (T * T)) +
+            ev ψbi (rightTensor (ι₁ := ι) (T * T)) - 2 * ev ψbi (opTensor T T) := by
+              have hLherm : (leftTensor (ι₂ := ι) T)ᴴ = leftTensor (ι₂ := ι) T := by
+                exact
+                  (Matrix.nonneg_iff_posSemidef.mp
+                    (leftTensor_nonneg (ι₂ := ι) (SubMeas.total_nonneg P.toSubMeas))).isHermitian.eq
+              have hRherm : (rightTensor (ι₁ := ι) T)ᴴ = rightTensor (ι₁ := ι) T := by
+                exact
+                  (Matrix.nonneg_iff_posSemidef.mp
+                    (rightTensor_nonneg (ι₁ := ι) (SubMeas.total_nonneg P.toSubMeas))).isHermitian.eq
+              calc
+                ev ψbi (((leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)ᴴ) *
+                    (leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T))
+                  = ev ψbi (((leftTensor (ι₂ := ι) T * leftTensor (ι₂ := ι) T -
+                        leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) T) -
+                      (rightTensor (ι₁ := ι) T * leftTensor (ι₂ := ι) T -
+                        rightTensor (ι₁ := ι) T * rightTensor (ι₁ := ι) T))) := by
+                          congr 1
+                          simp [hLherm, hRherm, sub_mul, mul_sub]
+                          abel
+                _ = ev ψbi (leftTensor (ι₂ := ι) (T * T)) +
+                      ev ψbi (rightTensor (ι₁ := ι) (T * T)) - 2 * ev ψbi (opTensor T T) := by
+                          rw [ev_sub, ev_sub, ev_sub]
+                          rw [leftTensor_mul_leftTensor,
+                            leftTensor_mul_rightTensor_eq_opTensor,
+                            rightTensor_mul_leftTensor_eq_opTensor,
+                            rightTensor_mul_rightTensor]
+                          ring
+      _ = 2 * (ev ψbi (leftTensor (ι₂ := ι) T) - ev ψbi (opTensor T T)) := by
+            rw [hTT, hperm.swap_ev T]
+            ring_nf
+  have horig :
+      qSDD ψbi (((family.meas x).toSubMeas).liftLeft)
+          (((family.meas x).toSubMeas).liftRight) =
+        2 *
+          (ev ψbi (leftTensor (ι₂ := ι) T) -
+            ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g))) := by
+    have hsum_left :
+        ∑ g : Polynomial params, ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) =
+          ev ψbi (leftTensor (ι₂ := ι) T) := by
+      calc
+        ∑ g : Polynomial params, ev ψbi (leftTensor (ι₂ := ι) (P.outcome g))
+          = ev ψbi (∑ a, leftTensor (ι₂ := ι) (P.outcome a)) := by
+              rw [← ev_sum ψbi (fun g => leftTensor (ι₂ := ι) (P.outcome g))]
+        _ = ev ψbi (leftTensor (ι₂ := ι) (∑ a, P.outcome a)) := by
+              rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ P.outcome]
+        _ = ev ψbi (leftTensor (ι₂ := ι) T) := by simp [T, P.sum_eq_total]
+    unfold qSDD qSDDCore
+    calc
+      ∑ g : Polynomial params,
+          ev ψbi
+            ((((P.toSubMeas.liftLeft).outcome g - (P.toSubMeas.liftRight).outcome g)ᴴ) *
+              ((P.toSubMeas.liftLeft).outcome g - (P.toSubMeas.liftRight).outcome g))
+        = ∑ g : Polynomial params,
+            (2 *
+              (ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) -
+                ev ψbi (opTensor (P.outcome g) (P.outcome g)))) := by
+              refine Finset.sum_congr rfl ?_
+              intro g _
+              have hLherm :
+                  (leftTensor (ι₂ := ι) (P.outcome g))ᴴ =
+                    leftTensor (ι₂ := ι) (P.outcome g) := by
+                exact
+                  (Matrix.nonneg_iff_posSemidef.mp
+                    (leftTensor_nonneg (ι₂ := ι) (P.outcome_pos g))).isHermitian.eq
+              have hRherm :
+                  (rightTensor (ι₁ := ι) (P.outcome g))ᴴ =
+                    rightTensor (ι₁ := ι) (P.outcome g) := by
+                exact
+                  (Matrix.nonneg_iff_posSemidef.mp
+                    (rightTensor_nonneg (ι₁ := ι) (P.outcome_pos g))).isHermitian.eq
+              calc
+                ev ψbi
+                    ((((P.toSubMeas.liftLeft).outcome g - (P.toSubMeas.liftRight).outcome g)ᴴ) *
+                      ((P.toSubMeas.liftLeft).outcome g - (P.toSubMeas.liftRight).outcome g))
+                  = ev ψbi
+                      (((leftTensor (ι₂ := ι) (P.outcome g) *
+                            leftTensor (ι₂ := ι) (P.outcome g) -
+                          leftTensor (ι₂ := ι) (P.outcome g) *
+                            rightTensor (ι₁ := ι) (P.outcome g)) -
+                        (rightTensor (ι₁ := ι) (P.outcome g) *
+                            leftTensor (ι₂ := ι) (P.outcome g) -
+                          rightTensor (ι₁ := ι) (P.outcome g) *
+                            rightTensor (ι₁ := ι) (P.outcome g)))) := by
+                          congr 1
+                          simp [SubMeas.liftLeft, SubMeas.liftRight, hLherm, hRherm,
+                            sub_mul, mul_sub]
+                          abel
+                _ = ev ψbi (leftTensor (ι₂ := ι) (P.outcome g * P.outcome g)) +
+                      ev ψbi (rightTensor (ι₁ := ι) (P.outcome g * P.outcome g)) -
+                      2 * ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
+                          rw [ev_sub, ev_sub, ev_sub]
+                          rw [leftTensor_mul_leftTensor,
+                            leftTensor_mul_rightTensor_eq_opTensor,
+                            rightTensor_mul_leftTensor_eq_opTensor,
+                            rightTensor_mul_rightTensor]
+                          ring
+                _ = 2 *
+                      (ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) -
+                        ev ψbi (opTensor (P.outcome g) (P.outcome g))) := by
+                          rw [P.proj g, hperm.swap_ev (P.outcome g)]
+                          ring
+      _ = 2 *
+            ∑ g : Polynomial params,
+              (ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) -
+                ev ψbi (opTensor (P.outcome g) (P.outcome g))) := by
+              rw [← Finset.mul_sum]
+      _ = 2 *
+            ((∑ g : Polynomial params, ev ψbi (leftTensor (ι₂ := ι) (P.outcome g))) -
+              ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g))) := by
+              rw [Finset.sum_sub_distrib]
+      _ = 2 *
+            (ev ψbi (leftTensor (ι₂ := ι) T) -
+              ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g))) := by
+              rw [hsum_left]
+  have hmatch :
+      ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g)) ≤
+        ev ψbi (opTensor T T) := by
+    simpa [T, P, qMatchMass, leftPlacedSubMeas, rightPlacedSubMeas, postprocess,
+      completePartSubMeas, leftTensor_mul_rightTensor_eq_opTensor, P.sum_eq_total] using
+      MIPStarRE.LDT.Preliminaries.qMatchMass_leftRight_postprocess_ge
+        ψbi P.toSubMeas P.toSubMeas (fun _ => ())
+  rw [hcomplete, horig]
+  nlinarith
+
 lemma gCompleteSelfConsistency
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (zeta : Error)
+    (hperm : PermInvState ψbi)
     (hself : family.StronglySelfConsistent ψbi zeta) :
     GCompleteSelfConsistencyStatement params ψbi family zeta := by
   /-
@@ -407,7 +564,27 @@ lemma gCompleteSelfConsistency
   This should convert slice strong self-consistency into self-consistency of the
   complete part `G^x = ∑_g G^x_g`.
   -/
-  sorry
+  refine ⟨?_⟩
+  refine ⟨?_⟩
+  let hself_sq := hself.sliceSelfConsistency.squaredDistanceBound
+  unfold sddError at *
+  calc
+    avgOver (uniformDistribution (SliceQuestion params))
+        (fun x =>
+          qSDD ψbi
+            ((completePartLeftFamily params family) x)
+            ((completePartRightFamily params family) x))
+      ≤ avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            qSDD ψbi
+              ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
+              ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x)) := by
+            apply avgOver_mono
+            intro x
+            simpa [completePartLeftFamily, completePartRightFamily,
+              IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjSubMeas.toIdxSubMeas] using
+              qSDD_completePart_le_slice params ψbi hperm family x
+    _ ≤ zeta := hself_sq
 
 /-- `cor:g-bot-self-consistency`. -/
 theorem gBotSelfConsistency
