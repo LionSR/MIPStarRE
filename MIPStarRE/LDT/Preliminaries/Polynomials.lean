@@ -41,7 +41,10 @@ Increasing the individual-degree bound enlarges the corresponding low-degree
 polynomial class. -/
 theorem polyFuncMonotone {m d : ℕ} {K : Type*} [CommSemiring K] :
     polyFunc m K d ≤ polyFunc m K (d + 1) := by
-  sorry
+  intro p hp
+  rw [MvPolynomial.mem_restrictDegree] at hp ⊢
+  intro s hs i
+  exact (hp s hs i).trans (Nat.le_succ d)
 
 /-- The uniform agreement probability of two polynomials on `K^m`, written as a
 finite cardinality ratio over `K^m`. -/
