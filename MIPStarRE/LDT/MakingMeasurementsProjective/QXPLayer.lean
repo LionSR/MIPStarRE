@@ -545,13 +545,9 @@ lemma qAlmostProjective {Outcome : Type*}
   have hsum_smul (s : Finset Outcome) :
       Finset.sum s (fun a => (((1 : Error) + 2 * ε) : ℂ) • Qa data a) =
         (((1 : Error) + 2 * ε) : ℂ) • Finset.sum s (fun a => Qa data a) := by
-    classical
-    induction s using Finset.induction_on with
-    | empty =>
-        simp
-    | insert a s ha ih =>
-        simp [ha, smul_add]
-        simpa using ih
+    simpa using
+      (Finset.smul_sum (s := s) (r := (((1 : Error) + 2 * ε) : ℂ))
+        (f := fun a : Outcome => Qa data a)).symm
   have hsum_le :
       (∑ a, sandwiched a) ≤ (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) := by
     calc
