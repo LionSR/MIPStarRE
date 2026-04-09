@@ -166,6 +166,12 @@ structure GCompleteSelfConsistencyStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
+  /--
+  This witness intentionally stores the self-consistency of the full slice family.
+  In `cor:G-hat-facts`, the self-consistency of `\widehat G` splits into the
+  original slice-family term together with the incomplete-part term, so
+  `gHatFacts.completedSelfConsistency` needs the bound for `family.meas` itself.
+  -/
   completePartSelfConsistency :
     SDDRel ψbi
       (uniformDistribution (SliceQuestion params))

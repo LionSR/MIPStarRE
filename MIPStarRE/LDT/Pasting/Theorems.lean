@@ -870,6 +870,9 @@ theorem gHatFacts
     completedCommutation := ?_
   }
   · -- Paper reference: `cor:G-hat-facts` in `ld-pasting.tex`.
+    -- This step needs the full slice-family self-consistency witness:
+    -- `\widehat G` expands into the original slice outcomes together with the
+    -- incomplete part, not into the postprocessed complete-part family alone.
     rcases hselfComplete.completePartSelfConsistency with ⟨hcomplete_bound⟩
     rcases hselfIncomplete.incompletePartSelfConsistency with ⟨hincomplete_bound⟩
     refine ⟨?_⟩
