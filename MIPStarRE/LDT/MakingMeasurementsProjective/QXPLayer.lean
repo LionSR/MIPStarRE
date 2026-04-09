@@ -96,6 +96,10 @@ structure RankReductionWitness {Outcome : Type*}
     (ζ : Error) (data : QLayerData Outcome ι) : Prop where
   projective :
     ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Qa data a)
+  outcome_nonneg :
+    ∀ a : Outcome, 0 ≤ Qa data a
+  sum_eq_total :
+    ∑ a, Qa data a = QTotal data
   closeness :
     SDDOpRel ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
@@ -393,10 +397,54 @@ lemma projectiveLowRankSum {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (ζ : Error) :
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hζ : 0 ≤ ζ)
+    (source_almost_projective :
+      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
       RankReductionWitness ψ A ζ data := by
+  -- NOTE: The paper's proof also needs normalization of `ψ` and a small-`ζ`
+  -- hypothesis such as `ζ ≤ 1 / 4`; only the nonnegativity and
+  -- almost-projectivity preconditions are reflected here so far.
   -- TODO: prove (issue #197)
+  sorry
+
+private lemma spectralTruncationError_le_half (ζ : Error)
+    (hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
+    spectralTruncationError ζ ≤ 1 / (2 : Error) := by
+  -- Scalar bookkeeping for `ζ ≤ 1/4`: `√ζ ≤ 1/2`.
+  -- TODO(#197): prove.
+  sorry
+
+private lemma zeta_le_zetaQuarterRoot (ζ : Error)
+    (hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
+    ζ ≤ zetaQuarterRoot ζ := by
+  have hζ1 : ζ ≤ 1 := by linarith
+  dsimp [zetaQuarterRoot]
+  simpa [Real.rpow_one] using
+    (Real.rpow_le_rpow_of_exponent_ge' hζ hζ1 (by positivity) (by norm_num : (1 : Error) ≥ 1 / 4))
+
+private lemma sqrt_roundingToProjectiveError_eq (ζ : Error)
+    (hζ : 0 ≤ ζ) :
+    Real.sqrt (roundingToProjectiveError ζ) =
+      Real.sqrt (12 : Error) * zetaQuarterRoot ζ := by
+  -- `sqrt (12 * √ζ) = sqrt 12 * ζ^(1/4)`.
+  -- TODO(#197): prove.
+  sorry
+
+private lemma sqrt_roundingToProjectiveError_le_four_zetaQuarterRoot (ζ : Error)
+    (hζ : 0 ≤ ζ) :
+    Real.sqrt (roundingToProjectiveError ζ) ≤ 4 * zetaQuarterRoot ζ := by
+  -- Coefficient estimate: `sqrt 12 ≤ 4`.
+  -- TODO(#197): prove.
+  sorry
+
+private lemma sqrt_two_mul_sqrt_roundingToProjectiveError_le_five_zetaQuarterRoot (ζ : Error)
+    (hζ : 0 ≤ ζ) :
+    Real.sqrt (2 : Error) * Real.sqrt (roundingToProjectiveError ζ) ≤
+      5 * zetaQuarterRoot ζ := by
+  -- Coefficient estimate: `sqrt 2 * sqrt 12 = sqrt 24 ≤ 5`.
+  -- TODO(#197): prove.
   sorry
 
 /-- **Completeness of `Q`** (`lem:Q-completeness`).
@@ -408,9 +456,17 @@ lemma qCompleteness {Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
-    (data : QLayerData Outcome ι) :
+    (data : QLayerData Outcome ι)
+    (hψ : ψ.IsNormalized)
+    (hζ_small : ζ ≤ 1 / (4 : Error)) :
     RankReductionWitness ψ A ζ data →
       ev ψ (QTotal data) ≥ 1 - 11 * zetaQuarterRoot ζ := by
+  intro h
+  -- The paper proof combines two Cauchy-Schwarz comparisons:
+  -- `⟨Q, Q - A⟩` and `⟨Q - A, A⟩`, then uses `source_almost_projective`.
+  -- The current scaffolding still needs the scalar `rpow/sqrt` bookkeeping
+  -- and operator-expectation algebra in Lean, in addition to using the
+  -- normalization and small-`ζ` hypotheses threaded explicitly here.
   -- TODO: prove (issue #197)
   sorry
 
@@ -422,9 +478,15 @@ lemma sqrtQCompleteness {Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
-    (data : QLayerData Outcome ι) :
+    (data : QLayerData Outcome ι)
+    (hψ : ψ.IsNormalized)
+    (hζ_small : ζ ≤ 1 / (4 : Error)) :
     RankReductionWitness ψ A ζ data →
       ev ψ (CFC.sqrt (QTotal data)) ≥ 1 - 12 * zetaQuarterRoot ζ := by
+  -- The paper deduces this from `qCompleteness` plus the spectral inequality
+  -- `sqrt Q ≥ (1 - √ζ) Q`, using `Q ≤ (1 + 2√ζ) I`.
+  -- In Lean, the remaining blocker is the NNReal/CFC comparison turning the
+  -- scalar bound into an operator inequality for `CFC.sqrt`.
   -- TODO: prove (issue #197)
   sorry
 
