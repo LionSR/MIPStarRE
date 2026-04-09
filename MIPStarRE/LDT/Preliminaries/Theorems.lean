@@ -3711,4 +3711,42 @@ theorem completingToMeasurement {Outcome : Type*}
       closenessAfterCompletion_core ψ hperm hψ A B a0 δ ζ hsc hdist
   }⟩
 
+/-- Triangle inequality for state-dependent operator distance. -/
+lemma sddOpRel_triangle
+    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B C : IdxOpFamily Question Outcome ι) (δ₁ δ₂ : Error) :
+    SDDOpRel ψ 𝒟 A B δ₁ →
+    SDDOpRel ψ 𝒟 B C δ₂ →
+    SDDOpRel ψ 𝒟 A C (2 * (δ₁ + δ₂)) := by
+  intro ⟨h₁⟩ ⟨h₂⟩
+  constructor
+  unfold sddErrorOp at *
+  calc avgOver 𝒟 (fun q => qSDDOp ψ (A q) (C q))
+      ≤ avgOver 𝒟 (fun q => 2 * (qSDDOp ψ (A q) (B q) +
+            qSDDOp ψ (B q) (C q))) := by
+        apply avgOver_mono
+        intro q
+        exact questionSDDOp_triangle ψ (A q) (B q) (C q)
+    _ = 2 * avgOver 𝒟 (fun q => qSDDOp ψ (A q) (B q) +
+          qSDDOp ψ (B q) (C q)) := by
+        rw [avgOver_const_mul]
+    _ = 2 * (avgOver 𝒟 (fun q => qSDDOp ψ (A q) (B q)) +
+          avgOver 𝒟 (fun q => qSDDOp ψ (B q) (C q))) := by
+        rw [avgOver_add]
+    _ ≤ 2 * (δ₁ + δ₂) := by
+        apply mul_le_mul_of_nonneg_left _ (by norm_num)
+        exact add_le_add h₁ h₂
+
+/-- Monotonicity for `SDDOpRel`. -/
+lemma sddOpRel_mono
+    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B : IdxOpFamily Question Outcome ι) (δ δ' : Error) :
+    SDDOpRel ψ 𝒟 A B δ → δ ≤ δ' → SDDOpRel ψ 𝒟 A B δ' := by
+  intro ⟨h⟩ hle
+  exact ⟨le_trans h hle⟩
+
 end MIPStarRE.LDT.Preliminaries
