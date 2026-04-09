@@ -27,7 +27,7 @@ The bipartite tensor placement follows the paper:
 - **1b**: `I ⊗ A^B_u ≈_ν G^A_{[g(u)=a]} ⊗ I` — G_A on **left**, A^B on **right**
 - **2**: `G^A_g ⊗ I ≈_ν I ⊗ G^B_g` — G_B on **right**
 
-Fixes #137.
+Fixes #137, #239.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
