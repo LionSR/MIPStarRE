@@ -252,6 +252,9 @@ private lemma sum_ev_mul_le_sqrt {Outcome : Type*} {ι : Type*}
 /-
 The consistency defect of `(A,B)` controls the strong self-consistency defect
 of the left-placed version of `A`.
+
+The Cauchy-Schwarz-heavy inequality chain below is still heartbeat-expensive;
+reduce this budget once the proof is refactored into smaller lemmas.
 -/
 set_option maxHeartbeats 5000000 in
 private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
@@ -426,7 +429,7 @@ with `B`, then `A` is `2ζ`-almost-projective. -/
 lemma consistencyToAlmostProjective {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome] [DecidableEq Outcome] [Inhabited Outcome]
+    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
     (ψ : QuantumState (ιA × ιB))
     (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error) :
     ConsRel ψ (uniformDistribution Unit)
@@ -442,6 +445,7 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
           Measurement Outcome (ιA × ιB))
         (consistencyToAlmostProjectiveError ζ) := by
   intro hCons
+  classical
   let A_lifted : Measurement Outcome (ιA × ιB) :=
     { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
       total_eq_one := by
@@ -485,6 +489,7 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
         instFintype := inferInstance
         instDecidableEq := inferInstance
         instNonempty := inferInstance }
+    let pivot : Outcome := Classical.arbitrary Outcome
     let toyState : DensityMatrixState H :=
       { matrix := 1
         positive := by positivity
@@ -492,16 +497,16 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
           change MIPStarRE.Quantum.normalizedTrace
               (1 : MIPStarRE.Quantum.Op H.carrier) = 1
           simpa using (MIPStarRE.Quantum.normalizedTrace_one (d := H.carrier)) }
+    -- Keep this delta measurement explicit: the matrix-valued simplifications are
+    -- easier for Lean to follow here than through a helper abstraction.
     let toyMeas : MatrixMeasurement Outcome H :=
-      { effect := fun a => if a = default then 1 else 0
+      { effect := fun a => if a = pivot then 1 else 0
         pos := by
           intro a
-          by_cases h : a = default <;> simp [h]
+          by_cases h : a = pivot <;> simp [h]
         sum_le_one := by
-          simpa using (le_of_eq (by
-            change ∑ a : Outcome,
-                (if a = default then (1 : MIPStarRE.Quantum.Op H.carrier) else 0) = 1
-            simp))
+          refine le_of_eq ?_
+          simp
         sum_eq_one := by
           simp }
     refine ⟨{
@@ -519,8 +524,8 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
           intro x_1 hx_1
           have hxneq : x_1 ≠ x := by
             exact (Finset.mem_filter.mp hx_1).2
-          by_cases hx : x = default
-          · by_cases hx1 : x_1 = default
+          by_cases hx : x = pivot
+          · by_cases hx1 : x_1 = pivot
             · exfalso
               exact hxneq (hx1.trans hx.symm)
             · simp [toyMeas, hx, hx1]
@@ -530,26 +535,26 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
           unfold MIPStarRE.Quantum.diagOverlap
           change ∑ x : Outcome,
               MIPStarRE.Quantum.normalizedTrace
-                (((if x = default then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) *
-                  (if x = default then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) = 1
+                (((if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) *
+                  (if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) = 1
           calc
             ∑ x : Outcome,
                 MIPStarRE.Quantum.normalizedTrace
-                  (((if x = default then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) *
-                    (if x = default then (1 : MIPStarRE.Quantum.Op H.carrier) else 0))
+                  (((if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) *
+                    (if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0))
               =
             ∑ x : Outcome,
                 MIPStarRE.Quantum.normalizedTrace
-                  (if x = default then
-                    if x = default then (1 : MIPStarRE.Quantum.Op H.carrier) else 0
+                  (if x = pivot then
+                    if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0
                    else 0) := by
                     refine Finset.sum_congr rfl ?_
                     intro x _
-                    by_cases hx : x = default <;> simp [hx]
-            _ = ∑ x : Outcome, if x = default then (1 : ℂ) else 0 := by
+                    by_cases hx : x = pivot <;> simp [hx]
+            _ = ∑ x : Outcome, if x = pivot then (1 : ℂ) else 0 := by
                     refine Finset.sum_congr rfl ?_
                     intro x _
-                    by_cases hx : x = default <;> simp [hx]
+                    by_cases hx : x = pivot <;> simp [hx]
             _ = 1 := by
                   simp
         rw [hoff, hdiag]
@@ -557,7 +562,7 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
       pointwiseIdempotence := ?_
     }⟩
     intro a
-    by_cases h : a = default
+    by_cases h : a = pivot
     · subst h
       simpa [matrixIdempotenceDefect, toyMeas] using hAlmost_nonneg
     · simpa [matrixIdempotenceDefect, toyMeas, h] using hAlmost_nonneg
@@ -672,7 +677,7 @@ private lemma orthonormalizationMainLemma_error_bound (ζ : Error)
 lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome] [DecidableEq Outcome] [Inhabited Outcome]
+    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
     (ψ : QuantumState (ιA × ιB))
     (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error)
     (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1) :
