@@ -42,13 +42,14 @@ noncomputable def commutingWithGIncompleteError (params : Parameters)
   commutingWithGCompleteError params gamma zeta
 
 /-- Displayed error term for the pairwise complete-part commutation bound used in
-`cor:G-hat-facts`. -/
+`cor:G-hat-facts`.
+
+This is exactly the upstream `thm:com-main` error term. The proof of
+`cor:G-hat-facts` only weakens the exponent to `1/16` after adding the three
+incomplete-part commutation contributions. -/
 noncomputable def pairwiseCompletePartCommutationError (params : Parameters)
     (gamma zeta : Error) : Error :=
-  30 * (params.m : Error) *
-    (Real.rpow gamma (1 / (16 : Error)) +
-      Real.rpow zeta (1 / (16 : Error)) +
-      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)))
+  Commutativity.comMainError params gamma zeta
 
 /-- Displayed self-consistency error for `\widehat G`. -/
 def gHatSelfConsistencyError (zeta : Error) : Error :=
