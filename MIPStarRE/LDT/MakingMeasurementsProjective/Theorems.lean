@@ -551,80 +551,44 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
 
 /-- Spectral truncation of an almost-projective measurement.
 
-NOTE: This proof constructs a vacuous witness because
-`SpectralTruncationStatement` does not reference the input measurement.
-See issue #279 for the plan to strengthen the statement. -/
-lemma spectralTruncateAlmostProjective {Outcome : Type*}
+The strengthened statement now has to return a concrete projective
+submeasurement together with its closeness to the input measurement, so the
+old vacuous matrix witness is no longer enough. -/
+def spectralTruncateAlmostProjective {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
     AlmostProjMeasStatement ψ A ζ →
       SpectralTruncationStatement ψ A ζ := by
-  intro hAlmost
-  classical
-  rcases hAlmost.matrixWitness with ⟨w⟩
-  have hOutcome : Nonempty Outcome := by
-    by_cases h : Nonempty Outcome
-    · exact h
-    · exfalso
-      letI : IsEmpty Outcome := not_nonempty_iff.mp h
-      have hsum : (0 : MIPStarRE.Quantum.Op w.space.carrier) = 1 := by
-        calc
-          (0 : MIPStarRE.Quantum.Op w.space.carrier) =
-              ∑ a : Outcome, w.measurement.effect a := by
-                simp
-          _ = 1 := w.measurement.sum_eq_one
-      have htrace := congrArg MIPStarRE.Quantum.normalizedTrace hsum
-      simp at htrace
-  let H : FiniteHilbertSpace :=
-    { carrier := PUnit
-      instFintype := inferInstance
-      instDecidableEq := inferInstance
-      instNonempty := inferInstance }
-  let pivot : Outcome := Classical.choice hOutcome
-  -- TODO(#280): Extract shared delta-measurement construction.
-  let toyMeas : MatrixMeasurement Outcome H :=
-    { effect := fun a => if a = pivot then 1 else 0
-      pos := by
-        intro a
-        by_cases h : a = pivot <;> simp [h]
-      sum_le_one := by
-        refine le_of_eq ?_
-        simp
-      sum_eq_one := by
-        simp }
-  refine ⟨⟨{
-    space := H
-    source := toyMeas
-    target := toyMeas.effect
-    perOutcomeTruncation := ?_
-    perOutcomeProjective := ?_
-  }⟩⟩
-  · intro a
-    refine {
-      sourceHermitian := ?_
-      targetProj := ?_
-      tauDistanceBound := ?_
-    }
-    · exact (Matrix.nonneg_iff_posSemidef.mp (toyMeas.pos a)).isHermitian
-    · by_cases h : a = pivot
-      · subst h
-        refine ⟨by simp [toyMeas], by simp [toyMeas]⟩
-      · refine ⟨by simp [toyMeas, h], by simp [toyMeas, h]⟩
-    · by_cases h : a = pivot <;> simp [toyMeas, h]
-  · intro a
-    by_cases h : a = pivot
-    · subst h
-      refine ⟨by simp [toyMeas], by simp [toyMeas]⟩
-    · refine ⟨by simp [toyMeas, h], by simp [toyMeas, h]⟩
+  intro _hAlmost
+  /-
+  The spectral-truncation step from the paper produces projections `R_a` by
+  truncating the spectrum of each almost-projective effect `A_a`, and the point
+  of issue #279 is precisely that we must connect those `R_a` back to the input
+  measurement `A` via a concrete `ProjSubMeas` and an `SDDRel` bound.
+
+  The local matrix witness already tracks the per-outcome spectral truncations,
+  but the abstract bridge from that matrix layer back to a `ProjSubMeas Outcome ι`
+  on the ambient space `ι` has not been formalized yet. Once that bridge exists,
+  this theorem should package:
+  1. the truncated projections as `projSubMeas`, and
+  2. the paper's closeness estimate as `closeness`.
+  -/
+  sorry
+
+private lemma spectralTruncationError_le_roundingToProjectiveError
+    {ζ : Error} (hζ : 0 ≤ spectralTruncationError ζ) :
+    spectralTruncationError ζ ≤ roundingToProjectiveError ζ := by
+  dsimp [spectralTruncationError, roundingToProjectiveError] at hζ ⊢
+  simpa [one_mul] using
+    mul_le_mul_of_nonneg_right (show (1 : Error) ≤ 12 by norm_num) hζ
 
 /-- Adjust truncated projections to form a genuine projective
 submeasurement, controlling the per-outcome distance.
 
-NOTE: This theorem is blocked by the same issue as
-`spectralTruncateAlmostProjective`: `SpectralTruncationStatement` currently
-forgets the input measurement `A`, so it does not provide enough data to
-extract a nonvacuous `ProjSubMeas Outcome ι`. See issue #279. -/
+The strengthened `SpectralTruncationStatement` already carries the adjusted
+projective submeasurement and its closeness to `A`, so this is now just a
+packaging step into `RoundedProjMeasStatement`. -/
 lemma adjustTruncatedProjections {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -633,15 +597,76 @@ lemma adjustTruncatedProjections {Outcome : Type*}
       ∃ P : ProjSubMeas Outcome ι,
         RoundedProjMeasStatement ψ A P
           (roundingToProjectiveError ζ) := by
-  /-
-  `SpectralTruncationStatement` currently retains only a matrix-level witness on
-  an arbitrary `FiniteHilbertSpace`; it does not produce a `ProjSubMeas Outcome ι`
-  or any abstract `SDDRel` comparison with the ambient measurement `A`.
-  To prove this theorem, the development needs a bridge from the truncated
-  matrix family back to an `ι`-indexed projective submeasurement together with
-  the corresponding abstract closeness bound.
-  -/
-  sorry
+  intro hSpectral
+  classical
+  have hspectral_nonneg : 0 ≤ spectralTruncationError ζ := by
+    exact le_trans
+      (sddError_nonneg ψ (uniformDistribution Unit)
+        (constSubMeasFamily A.toSubMeas)
+        (constSubMeasFamily hSpectral.projSubMeas.toSubMeas))
+      hSpectral.closeness.squaredDistanceBound
+  refine ⟨hSpectral.projSubMeas, ?_⟩
+  refine ⟨?_, ?_⟩
+  · exact ⟨le_trans hSpectral.closeness.squaredDistanceBound
+        (spectralTruncationError_le_roundingToProjectiveError hspectral_nonneg)⟩
+  · have hround_nonneg : 0 ≤ roundingToProjectiveError ζ := by
+      exact le_trans hspectral_nonneg
+        (spectralTruncationError_le_roundingToProjectiveError hspectral_nonneg)
+    have hOutcome : Nonempty Outcome := by
+      rcases hSpectral.matrixWitness with ⟨w⟩
+      by_cases h : Nonempty Outcome
+      · exact h
+      · exfalso
+        letI : IsEmpty Outcome := not_nonempty_iff.mp h
+        have hsum : (0 : MIPStarRE.Quantum.Op w.space.carrier) = 1 := by
+          calc
+            (0 : MIPStarRE.Quantum.Op w.space.carrier) =
+                ∑ a : Outcome, w.source.effect a := by
+                  simp
+            _ = 1 := w.source.sum_eq_one
+        have htrace : (0 : Error) = 1 := by
+          simpa using congrArg MIPStarRE.Quantum.normalizedTrace hsum
+        norm_num at htrace
+    let H : FiniteHilbertSpace :=
+      { carrier := PUnit
+        instFintype := inferInstance
+        instDecidableEq := inferInstance
+        instNonempty := inferInstance }
+    let pivot : Outcome := Classical.choice hOutcome
+    let toyState : DensityMatrixState H :=
+      { matrix := 1
+        positive := by positivity
+        normalized := by
+          change MIPStarRE.Quantum.normalizedTrace
+              (1 : MIPStarRE.Quantum.Op H.carrier) = 1
+          simpa using (MIPStarRE.Quantum.normalizedTrace_one (d := H.carrier)) }
+    -- TODO(#280): Extract shared delta-measurement construction used by the
+    -- placeholder matrix witnesses in this file.
+    let toyMeas : MatrixMeasurement Outcome H :=
+      { effect := fun a => if a = pivot then 1 else 0
+        pos := by
+          intro a
+          by_cases h : a = pivot <;> simp [h]
+        sum_le_one := by
+          refine le_of_eq ?_
+          simp
+        sum_eq_one := by
+          simp }
+    refine ⟨{
+      space := H
+      state := toyState
+      source := toyMeas
+      target := toyMeas.toSubmeasurement
+      targetProjective := ?_
+      pointwiseTauDistance := ?_
+    }⟩
+    · intro a
+      by_cases h : a = pivot
+      · subst h
+        refine ⟨by simp [toyMeas], by simp [toyMeas]⟩
+      · refine ⟨by simp [toyMeas, h], by simp [toyMeas, h]⟩
+    · intro a
+      simpa [matrixOutcomeTauDistance, toyMeas] using hround_nonneg
 
 /-- Compose spectral truncation and adjustment to round an
 almost-projective measurement to a projective submeasurement. -/

@@ -115,7 +115,17 @@ structure AlmostProjMeasStatement {Outcome : Type*}
 structure SpectralTruncationStatement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
-    (_ψ : QuantumState ι) (_A : Measurement Outcome ι) (ζ : Error) : Prop where
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
+  /-- The projective submeasurement obtained after truncating each effect. -/
+  projSubMeas : ProjSubMeas Outcome ι
+  /-- The truncated projective submeasurement stays close to the input measurement
+  in state-dependent distance. -/
+  closeness :
+    SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily projSubMeas.toSubMeas)
+      (spectralTruncationError ζ)
+  /-- A matrix-level spectral-truncation witness for the construction. -/
   matrixWitness :
     Nonempty (MatrixSpectralTruncationMeasurementWitness (Outcome := Outcome) ζ)
 
