@@ -157,6 +157,31 @@ noncomputable def PFamily {Outcome : Type*} [Fintype Outcome]
   outcome := Pa data
   total := ∑ a, Pa data a
 
+/-- Paper label `def:matrix-decomposition-Q`.
+
+The Lean formalization stores the chosen decomposition data for `Q_a` in the
+`QLayerData` package. -/
+abbrev matrixDecompositionQ (Outcome : Type*) [Fintype Outcome]
+    (ι : Type*) [Fintype ι] [DecidableEq ι] :=
+  QLayerData Outcome ι
+
+/-- Paper label `def:svd-of-X`.
+
+The singular-value-decomposition scaffolding for the `X/XHat/P` layer is stored
+in `QXPLayerData`. -/
+abbrev svdOfX (Outcome : Type*) [Fintype Outcome]
+    (ι : Type*) [Fintype ι] [DecidableEq ι] :=
+  QXPLayerData Outcome ι
+
+/-- Paper label `def:projective-P`.
+
+The projective family `P = {P_a}` extracted from `XHat`. -/
+noncomputable def projectiveP {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (data : QXPLayerData Outcome ι) :
+    OpFamily Outcome ι :=
+  PFamily data
+
 /-- **Almost-projective estimate** (`eq:A-looks-projective`).
 
 This is the opening inequality in the proof of

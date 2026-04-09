@@ -35,6 +35,14 @@ theorem degreeOf_le_of_mem_polyFunc {m d : ℕ} {K : Type*} [CommSemiring K]
   MvPolynomial.degreeOf_le_iff.mpr fun s hs =>
     (MvPolynomial.mem_restrictDegree (σ := Fin m) (R := K) p d).mp hp s hs i
 
+/-- Paper label `rem:individual-degree-convention`.
+
+Increasing the individual-degree bound enlarges the corresponding low-degree
+polynomial class. -/
+theorem polyFuncMonotone {m d : ℕ} {K : Type*} [CommSemiring K] :
+    polyFunc m K d ≤ polyFunc m K (d + 1) := by
+  sorry
+
 /-- The uniform agreement probability of two polynomials on `K^m`, written as a
 finite cardinality ratio over `K^m`. -/
 noncomputable def polynomialAgreementProbability (m : ℕ) (K : Type*) [Field K] [Fintype K]
