@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
+import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
 # Section 5 — Theorems
@@ -221,34 +222,6 @@ theorem orthonormalization {Outcome : Type*}
 
 /-! ### Orthonormalization helper lemmas -/
 
-/-- Cauchy-Schwarz for a finite family of operators, summed over outcomes. -/
-private lemma sum_ev_mul_le_sqrt {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι)
-    (X Y : Outcome → MIPStarRE.Quantum.Op ι) :
-    |∑ a : Outcome, ev ψ (X a * Y a)| ≤
-      Real.sqrt (∑ a : Outcome, ev ψ (X a * (X a)ᴴ)) *
-        Real.sqrt (∑ a : Outcome, ev ψ ((Y a)ᴴ * Y a)) := by
-  calc
-    |∑ a : Outcome, ev ψ (X a * Y a)|
-      ≤ ∑ a : Outcome, |ev ψ (X a * Y a)| := by
-          exact Finset.abs_sum_le_sum_abs _ _
-    _ ≤ ∑ a : Outcome,
-          Real.sqrt (ev ψ (X a * (X a)ᴴ)) *
-            Real.sqrt (ev ψ ((Y a)ᴴ * Y a)) := by
-          refine Finset.sum_le_sum ?_
-          intro a _
-          exact ev_abs_mul_le_sqrt ψ (X a) (Y a)
-    _ ≤ Real.sqrt (∑ a : Outcome, ev ψ (X a * (X a)ᴴ)) *
-        Real.sqrt (∑ a : Outcome, ev ψ ((Y a)ᴴ * Y a)) := by
-          exact
-            Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
-              (f := fun a => ev ψ (X a * (X a)ᴴ))
-              (g := fun a => ev ψ ((Y a)ᴴ * Y a))
-              (fun a => by
-                simpa using ev_adjoint_self_nonneg ψ ((X a)ᴴ))
-              (fun a => ev_adjoint_self_nonneg ψ (Y a))
-
 /-
 The consistency defect of `(A,B)` controls the strong self-consistency defect
 of the left-placed version of `A`.
@@ -371,7 +344,7 @@ private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
             (1 : MIPStarRE.Quantum.Op ιA) (B.outcome a))
       rw [hherm, rightTensor_mul_rightTensor]
     simpa [diagA, diagB, overlap, leftTensor_mul_rightTensor_eq_opTensor, hX, hY] using
-      sum_ev_mul_le_sqrt ψ
+      MIPStarRE.LDT.Preliminaries.sum_ev_mul_le_sqrt ψ
         (fun a => leftTensor (ι₂ := ιB) (A.outcome a))
         (fun a => rightTensor (ι₁ := ιA) (B.outcome a))
   have hoverlap_upper : overlap ≤ Real.sqrt diagA * Real.sqrt diagB := by

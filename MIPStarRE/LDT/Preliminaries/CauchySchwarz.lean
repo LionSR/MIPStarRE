@@ -33,7 +33,7 @@ private lemma avgOver_sub {Question : Type*}
           intro q hq
           ring
 
-private lemma sum_ev_mul_le_sqrt
+lemma sum_ev_mul_le_sqrt
     {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
