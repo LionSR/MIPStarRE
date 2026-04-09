@@ -410,11 +410,13 @@ lemma projectiveLowRankSum {Outcome : Type*}
   sorry
 
 private lemma spectralTruncationError_le_half (ζ : Error)
-    (hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
+    (_hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
     spectralTruncationError ζ ≤ 1 / (2 : Error) := by
   -- Scalar bookkeeping for `ζ ≤ 1/4`: `√ζ ≤ 1/2`.
-  -- TODO(#197): prove.
-  sorry
+  have hquarter : Real.sqrt (1 / (4 : Error)) = 1 / (2 : Error) := by norm_num
+  have hsqrt : Real.sqrt ζ ≤ 1 / (2 : Error) := by
+    exact hquarter ▸ Real.sqrt_le_sqrt hζq
+  simpa [spectralTruncationError, Real.sqrt_eq_rpow] using hsqrt
 
 private lemma zeta_le_zetaQuarterRoot (ζ : Error)
     (hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
@@ -429,23 +431,51 @@ private lemma sqrt_roundingToProjectiveError_eq (ζ : Error)
     Real.sqrt (roundingToProjectiveError ζ) =
       Real.sqrt (12 : Error) * zetaQuarterRoot ζ := by
   -- `sqrt (12 * √ζ) = sqrt 12 * ζ^(1/4)`.
-  -- TODO(#197): prove.
-  sorry
+  have hsqrt_rpow :
+      Real.sqrt (ζ ^ (1 / (2 : Error))) = zetaQuarterRoot ζ := by
+    rw [Real.sqrt_eq_rpow, zetaQuarterRoot, ← Real.rpow_mul hζ]
+    congr 1
+    ring
+  dsimp [roundingToProjectiveError, spectralTruncationError]
+  rw [Real.sqrt_mul (by positivity), hsqrt_rpow]
 
 private lemma sqrt_roundingToProjectiveError_le_four_zetaQuarterRoot (ζ : Error)
     (hζ : 0 ≤ ζ) :
     Real.sqrt (roundingToProjectiveError ζ) ≤ 4 * zetaQuarterRoot ζ := by
   -- Coefficient estimate: `sqrt 12 ≤ 4`.
-  -- TODO(#197): prove.
-  sorry
+  rw [sqrt_roundingToProjectiveError_eq ζ hζ]
+  have hzqr_nonneg : 0 ≤ zetaQuarterRoot ζ := by
+    dsimp [zetaQuarterRoot]
+    exact Real.rpow_nonneg hζ _
+  have hsqrt : Real.sqrt (12 : Error) ≤ 4 := by
+    have hsq : (Real.sqrt (12 : Error)) ^ 2 ≤ (4 : Error) ^ 2 := by norm_num
+    nlinarith [Real.sq_sqrt (show 0 ≤ (12 : Error) by positivity), hsq]
+  refine mul_le_mul_of_nonneg_right ?_ hzqr_nonneg
+  exact hsqrt
 
 private lemma sqrt_two_mul_sqrt_roundingToProjectiveError_le_five_zetaQuarterRoot (ζ : Error)
     (hζ : 0 ≤ ζ) :
     Real.sqrt (2 : Error) * Real.sqrt (roundingToProjectiveError ζ) ≤
       5 * zetaQuarterRoot ζ := by
   -- Coefficient estimate: `sqrt 2 * sqrt 12 = sqrt 24 ≤ 5`.
-  -- TODO(#197): prove.
-  sorry
+  rw [sqrt_roundingToProjectiveError_eq ζ hζ]
+  have hzqr_nonneg : 0 ≤ zetaQuarterRoot ζ := by
+    dsimp [zetaQuarterRoot]
+    exact Real.rpow_nonneg hζ _
+  have hsqrt : Real.sqrt (24 : Error) ≤ 5 := by
+    have hsq : (Real.sqrt (24 : Error)) ^ 2 ≤ (5 : Error) ^ 2 := by norm_num
+    nlinarith [Real.sq_sqrt (show 0 ≤ (24 : Error) by positivity), hsq]
+  calc
+    Real.sqrt (2 : Error) * (Real.sqrt (12 : Error) * zetaQuarterRoot ζ)
+        = (Real.sqrt (2 : Error) * Real.sqrt (12 : Error)) * zetaQuarterRoot ζ := by ring
+    _ ≤ (5 : Error) * zetaQuarterRoot ζ := by
+      refine mul_le_mul_of_nonneg_right ?_ hzqr_nonneg
+      calc
+        Real.sqrt (2 : Error) * Real.sqrt (12 : Error) = Real.sqrt (24 : Error) := by
+          rw [← Real.sqrt_mul (show 0 ≤ (2 : Error) by positivity)]
+          norm_num
+        _ ≤ 5 := by
+          exact hsqrt
 
 /-- **Completeness of `Q`** (`lem:Q-completeness`).
 
