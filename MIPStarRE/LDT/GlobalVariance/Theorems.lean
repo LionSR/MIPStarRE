@@ -429,60 +429,6 @@ private lemma matrixGlobalVarianceOfPoints_from_local
       _ = globalVarianceOfPointsError params eps delta := by
             simp [polynomialDistribution, avgOver, uniformDistribution]
 
-lemma matrixGeneralizeB
-    (params : Parameters)
-    [FieldModel params.q]
-    (model : MatrixVarianceTransferRealization params) :
-    MatrixGeneralizeBStatement params model := by
-  have hpoint :
-      ∀ g : Polynomial params,
-        matrixGeneralizeBDeviationAtPolynomial params model g ≤ generalizeBError params := by
-    intro g
-    -- Missing infrastructure:
-    -- 1. `MatrixVarianceTransferRealization` does not record that
-    --    `axisMeasurement` is projective/orthogonal, which the paper uses to
-    --    collapse the squared deviation to a single diagonal sum.
-    -- 2. `DegreeBoundedLineAnswer` is currently just `Fq params → Fq params`,
-    --    so there is no degree witness available for the Schwartz-Zippel step.
-    -- 3. We also need a compatibility hypothesis identifying
-    --    `axisQuestionParameter qu` with the sampled point on the queried line.
-    sorry
-  exact matrixGeneralizeB_of_pointwise params model hpoint
-
-/-- The concrete matrix-level counterpart of `lem:local-variance-of-points`. -/
-lemma matrixLocalVarianceOfPoints
-    (params : Parameters)
-    [FieldModel params.q]
-    (model : MatrixVarianceTransferRealization params)
-    (eps delta : Error) :
-    MatrixLocalVarianceOfPointsStatement params model eps delta := by
-  have hpoint :
-      ∀ g : Polynomial params,
-        matrixPointConditionedLocalVarianceAtPolynomial params model g ≤
-          localVarianceOfPointsError params eps delta := by
-    intro g
-    -- Missing infrastructure:
-    -- 1. The six-step transport proof from the paper needs matrix analogues of
-    --    the good-strategy consistency/self-consistency hypotheses relating the
-    --    point and axis measurements in `model`.
-    -- 2. The two middle transports are exactly `matrixGeneralizeB`, so the
-    --    pointwise `generalize-b` estimate above must be available first.
-    -- 3. The theorem statement allows arbitrary `eps` and `delta`; to use them
-    --    as error parameters, we should package the required nonnegativity and
-    --    consistency hypotheses in the realization layer.
-    sorry
-  exact matrixLocalVarianceOfPoints_of_pointwise params model eps delta hpoint
-
-/-- The concrete matrix-level counterpart of `lem:global-variance-of-points`. -/
-lemma matrixGlobalVarianceOfPoints
-    (params : Parameters)
-    [FieldModel params.q]
-    (model : MatrixVarianceTransferRealization params)
-    (eps delta : Error) :
-    MatrixGlobalVarianceOfPointsStatement params model eps delta := by
-  exact matrixGlobalVarianceOfPoints_from_local params model eps delta
-    (matrixLocalVarianceOfPoints params model eps delta)
-
 /-- `lem:generalize-b`. -/
 lemma generalizeB
     (params : Parameters)
@@ -691,6 +637,66 @@ lemma globalVarianceOfPoints
                   exact hglobal g
           _ = globalVarianceOfPointsError params eps delta := by
                 simp [polynomialDistribution, avgOver, uniformDistribution] }
+
+/-- The concrete matrix-level counterpart of `lem:generalize-b`. -/
+lemma matrixGeneralizeB
+    (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixVarianceTransferRealization params)
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι)
+    (ψbi : QuantumState (ι × ι))
+    (hcompat :
+      ∀ g : Polynomial params,
+        matrixGeneralizeBDeviationAtPolynomial params model g =
+          generalizeBDeviationAtPolynomial params strategy ψbi G g) :
+    MatrixGeneralizeBStatement params model := by
+  let habstract := generalizeB params strategy eps delta gamma hgood G ψbi
+  refine matrixGeneralizeB_of_pointwise params model ?_
+  intro g
+  rw [hcompat g]
+  exact habstract.pointwiseNormBound g
+
+/-- The concrete matrix-level counterpart of `lem:local-variance-of-points`. -/
+lemma matrixLocalVarianceOfPoints
+    (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixVarianceTransferRealization params)
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι)
+    (ψbi : QuantumState (ι × ι))
+    (hcompat :
+      ∀ g : Polynomial params,
+        matrixPointConditionedLocalVarianceAtPolynomial params model g =
+          pointConditionedLocalVarianceAtPolynomial params strategy G g) :
+    MatrixLocalVarianceOfPointsStatement params model eps delta := by
+  let habstract := localVarianceOfPoints params strategy eps delta gamma hgood G ψbi
+  refine matrixLocalVarianceOfPoints_of_pointwise params model eps delta ?_
+  intro g
+  rw [hcompat g]
+  exact habstract.pointwiseLocalVarianceBound g
+
+/-- The concrete matrix-level counterpart of `lem:global-variance-of-points`. -/
+lemma matrixGlobalVarianceOfPoints
+    (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixVarianceTransferRealization params)
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι)
+    (ψbi : QuantumState (ι × ι))
+    (hcompat :
+      ∀ g : Polynomial params,
+        matrixPointConditionedLocalVarianceAtPolynomial params model g =
+          pointConditionedLocalVarianceAtPolynomial params strategy G g) :
+    MatrixGlobalVarianceOfPointsStatement params model eps delta := by
+  exact matrixGlobalVarianceOfPoints_from_local params model eps delta
+    (matrixLocalVarianceOfPoints params model strategy eps delta gamma hgood G ψbi hcompat)
 
 
 end MIPStarRE.LDT.GlobalVariance
