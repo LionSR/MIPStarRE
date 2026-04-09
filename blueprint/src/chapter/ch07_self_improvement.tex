@@ -426,11 +426,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
       \ot T_h \ket{\psi} \\
     &\le \E_{u,v} \sum_h \bra{\psi} (A^v_{h(v)})^2 \ot T_h \ket{\psi}
       \le \E_{u,v} \sum_h \bra{\psi} I \ot T_h \ket{\psi}
-      = 1,
+      \le 1,
   \end{align*}
   using first that $M$ is a submeasurement, then that $A^v_{h(v)} \le I$, and
-  finally that $T$ is a measurement. The second factor is exactly the same
-  expression as in~\eqref{eq:move-one-cauchy-schwarz}, hence at most
+  finally that $T$ is a submeasurement ($\sum_g T_g \le I$). The second factor is
+  exactly the same expression as in~\eqref{eq:move-one-cauchy-schwarz}, hence at most
   $\sqrt{2\delta}$.
 
   Having moved both copies of~$A$ to the left-hand side, we next show that
