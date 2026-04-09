@@ -561,7 +561,9 @@ private lemma xHat_mixed_adjoint {Outcome : Type*}
       simp [Matrix.conjTranspose_mul]
     _ = (CFC.sqrt (QTotal data.qLayer))ᴴ := by rw [data.xHat_mixed]
     _ = CFC.sqrt (QTotal data.qLayer) := by
-      exact (CFC.sqrt_nonneg (QTotal data.qLayer)).isHermitian.eq
+      simpa using
+        (Matrix.nonneg_iff_posSemidef.mp
+          (CFC.sqrt_nonneg (QTotal data.qLayer))).isHermitian.eq
 
 private lemma xxHat_isHermitian {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -571,16 +573,19 @@ private lemma xxHat_isHermitian {Outcome : Type*}
   calc
     (data.x * data.xHatᴴ)ᴴ = data.xHat * data.xᴴ := by
       simp [Matrix.conjTranspose_mul]
-    _ = data.xHat * data.xᴴ * (data.xHat * data.xHatᴴ) := by
-      simp [data.xHat_coisometry]
     _ = data.xHat * (data.xᴴ * data.xHat) * data.xHatᴴ := by
-      simp [Matrix.mul_assoc]
+      calc
+        data.xHat * data.xᴴ = data.xHat * (data.xᴴ * (data.xHat * data.xHatᴴ)) := by
+          rw [data.xHat_coisometry]
+          simp
+        _ = data.xHat * (data.xᴴ * data.xHat) * data.xHatᴴ := by
+          simp [Matrix.mul_assoc]
     _ = data.xHat * (data.xHatᴴ * data.x) * data.xHatᴴ := by
-      rw [xHat_mixed_adjoint data, data.xHat_mixed]
+      rw [data.xHat_mixed, ← xHat_mixed_adjoint data]
     _ = (data.xHat * data.xHatᴴ) * data.x * data.xHatᴴ := by
       simp [Matrix.mul_assoc]
     _ = data.x * data.xHatᴴ := by
-      simp [data.xHat_coisometry, Matrix.mul_assoc]
+      simp [data.xHat_coisometry]
 
 private lemma xxHat_sq {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -601,16 +606,20 @@ private lemma xxHat_nonneg {Outcome : Type*}
     [Fintype Outcome]
     (data : QXPLayerData Outcome ι) :
     0 ≤ data.x * data.xHatᴴ := by
-  have hsqrt_nonneg : 0 ≤ CFC.sqrt (QTotal data.qLayer) := CFC.sqrt_nonneg (QTotal data.qLayer)
+  have hsqrt_nonneg : 0 ≤ CFC.sqrt (QTotal data.qLayer) :=
+    CFC.sqrt_nonneg (QTotal data.qLayer)
   calc
     0 ≤ data.xHat * CFC.sqrt (QTotal data.qLayer) * data.xHatᴴ := by
       exact
         (Matrix.PosSemidef.mul_mul_conjTranspose_same
           (Matrix.nonneg_iff_posSemidef.mp hsqrt_nonneg)
           data.xHat).nonneg
-    _ = data.x * data.xHatᴴ := by
+    _ = data.xHat * (data.xHatᴴ * data.x) * data.xHatᴴ := by
       rw [← xHat_mixed_adjoint data]
-      simp [Matrix.mul_assoc, data.xHat_coisometry]
+    _ = (data.xHat * data.xHatᴴ) * data.x * data.xHatᴴ := by
+      simp [Matrix.mul_assoc]
+    _ = data.x * data.xHatᴴ := by
+      simp [data.xHat_coisometry]
 
 /-- **Squared difference** (`lem:squared-difference`).
 
@@ -627,15 +636,25 @@ lemma squaredDifference {Outcome : Type*}
       (data.x - data.xHat) * (data.x - data.xHat)ᴴ = (Y - 1) * (Y - 1) := by
     have hYh : Yᴴ = Y := by
       simpa [Y] using xxHat_isHermitian data
+    have hYadj : data.xHat * data.xᴴ = Y := by
+      simpa [Y, Matrix.conjTranspose_mul] using hYh
+    have hYsq : data.x * data.xᴴ = Y * Y := by
+      simpa [Y] using (xxHat_sq data).symm
     calc
       (data.x - data.xHat) * (data.x - data.xHat)ᴴ
           = (data.x - data.xHat) * (data.xᴴ - data.xHatᴴ) := by
               simp
+      _ = data.x * (data.xᴴ - data.xHatᴴ) - data.xHat * (data.xᴴ - data.xHatᴴ) := by
+            conv_lhs => rw [Matrix.sub_mul]
+      _ = (data.x * data.xᴴ - data.x * data.xHatᴴ) -
+            (data.xHat * data.xᴴ - data.xHat * data.xHatᴴ) := by
+              conv_lhs => rw [Matrix.mul_sub, Matrix.mul_sub]
       _ = data.x * data.xᴴ - data.x * data.xHatᴴ - data.xHat * data.xᴴ +
             data.xHat * data.xHatᴴ := by
-              simp [sub_mul, mul_sub, add_assoc, add_left_comm, add_comm]
-      _ = Y * Y - Y - Y + 1 := by
-            simp [Y, xxHat_sq data, xxHat_isHermitian data, data.xHat_coisometry]
+              abel
+      _ = data.x * data.xᴴ - Y - Y + 1 := by
+            simp [Y, hYadj, data.xHat_coisometry]
+      _ = Y * Y - Y - Y + 1 := by rw [hYsq]
       _ = (Y - 1) * (Y - 1) := by
             noncomm_ring
   have hY_nonneg : 0 ≤ Y := by
@@ -649,16 +668,18 @@ lemma squaredDifference {Outcome : Type*}
     simp [hY_herm]
   have hYp1_nonneg : 0 ≤ Y + 1 := add_nonneg hY_nonneg zero_le_one
   have hYp1_comm : Commute (Y + 1) Y := by
-    simpa using (Commute.refl Y).add_left (Commute.one_right Y)
+    change (Y + 1) * Y = Y * (Y + 1)
+    simp [mul_add, add_mul]
   have hYp1_mul_nonneg : 0 ≤ (Y + 1) * Y := by
     exact Commute.mul_nonneg hYp1_nonneg hY_nonneg hYp1_comm
-  have h_one_le_sq : (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) ≤ (Y + 1) * (Y + 1) := by
+  have h_one_le_sq :
+      (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) ≤ (Y + 1) * (Y + 1) := by
     have hYp1_le_sq : Y + 1 ≤ (Y + 1) * (Y + 1) := by
       apply sub_nonneg.mp
       calc
         (Y + 1) * (Y + 1) - (Y + 1) = (Y + 1) * ((Y + 1) - 1) := by
           rw [mul_sub]
-          simp [Matrix.mul_assoc]
+          simp
         _ = (Y + 1) * Y := by simp
         _ ≥ 0 := hYp1_mul_nonneg
     exact le_trans (by simpa using add_le_add_right hY_nonneg 1) hYp1_le_sq
@@ -667,8 +688,8 @@ lemma squaredDifference {Outcome : Type*}
     simpa [Matrix.mul_assoc] using
       MIPStarRE.Quantum.sandwich_mono (M := Y - 1) hYm1_herm h_one_le_sq
   have h_comm_pm : Commute (Y - 1) (Y + 1) := by
-    simpa [sub_eq_add_neg, add_assoc, add_left_comm, add_comm] using
-      (Commute.refl Y).add_right ((Commute.one_right Y).neg_left)
+    change (Y - 1) * (Y + 1) = (Y + 1) * (Y - 1)
+    simp [sub_eq_add_neg, mul_add, add_mul, add_assoc, add_left_comm, add_comm]
   calc
     (data.x - data.xHat) * (data.x - data.xHat)ᴴ = (Y - 1) * (Y - 1) := hY_sub
     _ ≤ (Y - 1) * ((Y + 1) * (Y + 1)) * (Y - 1) := h_main
@@ -689,60 +710,78 @@ lemma pProjectivity {Outcome : Type*}
     ∃ P : ProjSubMeas Outcome ι,
       ∀ a : Outcome, P.outcome a = Pa data a := by
   classical
-  let P : ProjSubMeas Outcome ι := {
+  refine ⟨{
     outcome := Pa data
     total := ∑ a, Pa data a
-    outcome_pos := by
-      intro a
-      exact
-        (Matrix.PosSemidef.conjTranspose_mul_mul_same
-          (Matrix.nonneg_iff_posSemidef.mp (data.qLayer.t.toMeasurement.outcome_pos a))
-          data.xHat).nonneg
-    sum_eq_total := by
-      simp
-    total_le_one := by
-      let X : MIPStarRE.Quantum.Op ι := data.xHatᴴ * data.xHat
-      have hX_nonneg : 0 ≤ X := by
-        change 0 ≤ data.xHatᴴ * data.xHat
-        exact Matrix.posSemidef_conjTranspose_mul_self data.xHat |>.nonneg
-      have hX_sq : X * X = X := by
-        dsimp [X]
-        calc
-          (data.xHatᴴ * data.xHat) * (data.xHatᴴ * data.xHat)
-              = data.xHatᴴ * (data.xHat * data.xHatᴴ) * data.xHat := by
-                  simp [Matrix.mul_assoc]
-          _ = data.xHatᴴ * data.xHat := by simp [data.xHat_coisometry, Matrix.mul_assoc]
-      have hX_herm : Xᴴ = X := by
-        dsimp [X]
-        simp [Matrix.conjTranspose_mul]
-      have h_one_sub_X_nonneg : 0 ≤ 1 - X := by
-        apply Matrix.nonneg_iff_posSemidef.mpr
-        have hpsd := Matrix.posSemidef_conjTranspose_mul_self (1 - X)
-        simpa [Matrix.conjTranspose_sub, hX_herm, hX_sq, sub_eq_add_neg,
-          add_assoc, add_left_comm, add_comm] using hpsd
-      have hsum :
-          (∑ a, Pa data a) = X := by
-        calc
-          (∑ a, Pa data a) = data.xHatᴴ * (∑ a, Ta data.qLayer a) * data.xHat := by
-            simp [Pa, Matrix.mul_assoc, Finset.mul_sum, Finset.sum_mul]
-          _ = data.xHatᴴ * data.xHat := by
-            simpa [Ta] using congrArg (fun M => data.xHatᴴ * M * data.xHat) data.qLayer.t.sum_eq
-          _ = X := rfl
-      rw [hsum]
-      exact sub_nonneg.mp h_one_sub_X_nonneg
-    proj := by
-      intro a
+    outcome_pos := ?_
+    sum_eq_total := by simp
+    total_le_one := ?_
+    proj := ?_
+  }, ?_⟩
+  · intro a
+    exact
+      (Matrix.PosSemidef.conjTranspose_mul_mul_same
+        (Matrix.nonneg_iff_posSemidef.mp (data.qLayer.t.toMeasurement.outcome_pos a))
+        data.xHat).nonneg
+  · let X : MIPStarRE.Quantum.Op ι := data.xHatᴴ * data.xHat
+    have hX_sq : X * X = X := by
+      dsimp [X]
       calc
-        Pa data a * Pa data a
-            = data.xHatᴴ * Ta data.qLayer a * (data.xHat * data.xHatᴴ) *
-                Ta data.qLayer a * data.xHat := by
-                  simp [Pa, Matrix.mul_assoc]
-        _ = data.xHatᴴ * Ta data.qLayer a * Ta data.qLayer a * data.xHat := by
-              simp [data.xHat_coisometry, Matrix.mul_assoc]
-        _ = data.xHatᴴ * Ta data.qLayer a * data.xHat := by
-              simp [Ta, data.qLayer.t.proj a, Matrix.mul_assoc]
-        _ = Pa data a := rfl
-  exact ⟨P, fun a => rfl⟩
+        (data.xHatᴴ * data.xHat) * (data.xHatᴴ * data.xHat)
+            = data.xHatᴴ * (data.xHat * data.xHatᴴ) * data.xHat := by
+                simp [Matrix.mul_assoc]
+        _ = data.xHatᴴ * data.xHat := by
+              simp [data.xHat_coisometry]
+    have hX_herm : Xᴴ = X := by
+      dsimp [X]
+      simp [Matrix.conjTranspose_mul]
+    have h_one_sub_X_sq : (1 - X) * (1 - X) = 1 - X := by
+      calc
+        (1 - X) * (1 - X) = 1 - X - X + X * X := by
+          noncomm_ring
+        _ = 1 - X := by
+          rw [hX_sq]
+          noncomm_ring
+    have h_one_sub_X_herm : (1 - X)ᴴ = 1 - X := by
+      simp [hX_herm]
+    have h_one_sub_X_nonneg : 0 ≤ 1 - X := by
+      apply Matrix.nonneg_iff_posSemidef.mpr
+      have hpsd := Matrix.posSemidef_conjTranspose_mul_self (1 - X)
+      simpa [h_one_sub_X_herm, h_one_sub_X_sq] using hpsd
+    have hsum :
+        (∑ a, Pa data a) = X := by
+      have hsum_aux (s : Finset Outcome) :
+          Finset.sum s (fun a => Pa data a) =
+            data.xHatᴴ * (Finset.sum s fun a => Ta data.qLayer a) * data.xHat := by
+        induction s using Finset.induction_on with
+        | empty => simp
+        | insert a s ha ih =>
+            rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
+            simp [Pa, Matrix.mul_assoc, Matrix.add_mul, Matrix.mul_add]
+      calc
+        (∑ a, Pa data a) = data.xHatᴴ * (∑ a, Ta data.qLayer a) * data.xHat := by
+          simpa using hsum_aux Finset.univ
+        _ = data.xHatᴴ * (∑ a, Ta data.qLayer a) * data.xHat := by
+          rfl
+        _ = data.xHatᴴ * data.xHat := by
+          simpa [Ta] using
+            congrArg (fun M => data.xHatᴴ * M * data.xHat) data.qLayer.t.sum_eq
+        _ = X := by rfl
+    rw [hsum]
+    exact sub_nonneg.mp h_one_sub_X_nonneg
+  · intro a
+    calc
+      Pa data a * Pa data a
+          = data.xHatᴴ * Ta data.qLayer a * (data.xHat * data.xHatᴴ) *
+              Ta data.qLayer a * data.xHat := by
+                simp [Pa, Matrix.mul_assoc]
+      _ = data.xHatᴴ * Ta data.qLayer a * Ta data.qLayer a * data.xHat := by
+            simp [data.xHat_coisometry, Matrix.mul_assoc]
+      _ = data.xHatᴴ * Ta data.qLayer a * data.xHat := by
+            simp [Ta, data.qLayer.t.proj a, Matrix.mul_assoc]
+      _ = Pa data a := rfl
+  · intro a
+    rfl
 
 /-- **`P` is close to `Q`** (`lem:P-Q-approx`).
 

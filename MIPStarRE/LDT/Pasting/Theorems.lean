@@ -705,7 +705,7 @@ theorem commutingWithGComplete
     (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
-    (G : SubMeas (Polynomial params) ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
     (gamma zeta : Error)
     (hcom : Commutativity.ComMainConclusion params strategy family G gamma zeta)
     (hself : GCompleteSelfConsistencyStatement params ψbi family zeta) :
