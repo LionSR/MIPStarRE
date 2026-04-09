@@ -435,16 +435,17 @@ lemma qCompleteness {Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
-    (data : QLayerData Outcome ι) :
+    (data : QLayerData Outcome ι)
+    (hψ : ψ.IsNormalized)
+    (hζ_small : ζ ≤ 1 / (4 : Error)) :
     RankReductionWitness ψ A ζ data →
       ev ψ (QTotal data) ≥ 1 - 11 * zetaQuarterRoot ζ := by
   intro h
   -- The paper proof combines two Cauchy-Schwarz comparisons:
   -- `⟨Q, Q - A⟩` and `⟨Q - A, A⟩`, then uses `source_almost_projective`.
-  -- The current scaffolding still needs the paper's normalization and
-  -- small-`ζ` hypotheses to be threaded in upstream at
-  -- `projectiveLowRankSum`, alongside the scalar `rpow/sqrt` bookkeeping and
-  -- operator-expectation algebra in Lean.
+  -- The current scaffolding still needs the scalar `rpow/sqrt` bookkeeping
+  -- and operator-expectation algebra in Lean, in addition to using the
+  -- normalization and small-`ζ` hypotheses threaded explicitly here.
   -- TODO: prove (issue #197)
   sorry
 
@@ -456,7 +457,9 @@ lemma sqrtQCompleteness {Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
-    (data : QLayerData Outcome ι) :
+    (data : QLayerData Outcome ι)
+    (hψ : ψ.IsNormalized)
+    (hζ_small : ζ ≤ 1 / (4 : Error)) :
     RankReductionWitness ψ A ζ data →
       ev ψ (CFC.sqrt (QTotal data)) ≥ 1 - 12 * zetaQuarterRoot ζ := by
   -- The paper deduces this from `qCompleteness` plus the spectral inequality
