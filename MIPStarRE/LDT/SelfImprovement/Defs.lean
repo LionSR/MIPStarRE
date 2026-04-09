@@ -28,7 +28,12 @@ noncomputable def averagedPointOperator (params : Parameters)
   averageOperatorOverDistribution (uniformDistribution (Point params))
     (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
 
-/-- The operator `T_g A_g` contributing to the primal SDP objective. -/
+/--
+The operator `T_g A_g` contributing to the primal SDP objective.
+
+We take `T` to be a `SubMeas` rather than a full `Measurement` because the
+paper's Section 9 primal only assumes `∑_g T_g ≤ I`.
+-/
 noncomputable def sdpPrimalContributionOperator (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
