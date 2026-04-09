@@ -6,6 +6,19 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \section{Non-projective Output}
 \label{sec:self-improvement}
 
+A large part of this chapter is devoted to proving
+Lemma~\ref{lem:self-improvement-helper}, which is a slightly weaker form of the
+projective self-improvement theorem proved in Section~\ref{sec:self-improvement-projective}.
+The key difference is that the output family~$H$ is only required to be a
+submeasurement, rather than a projective submeasurement. Once this non-projective
+statement is available, Theorem~\ref{thm:orthonormalization} upgrades~$H$ to a
+projective family without losing control of the four quantitative conclusions.
+
+Compared with the projective theorem, the helper lemma packages strong
+self-consistency using the explicit inequality from
+Definition~\ref{def:strong-self-consistency}, keeps the boundedness conclusion in
+terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
+
 \begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelper}
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
@@ -67,7 +80,14 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
     \le \sum_a (A_a^u)^2
     = I,
   \]
-  and averaging over $u$ shows that $H \in \polysub{m}{q}{d}$.
+  where the inequality uses that~$T$ is a measurement and the last identity uses
+  that~$A$ is projective. Averaging over~$u$ gives
+  \[
+    \sum_h H_h
+    = \E_{u} \sum_h H_h^u
+    \le I,
+  \]
+  so $H$ is also a submeasurement and therefore lies in~$\polysub{m}{q}{d}$.
 
   Set
   \[
@@ -371,7 +391,21 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
     \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \ot T_h) \cdot \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \ket{\psi}}\\
     \cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi}  M^{u}_o \ot \bigl(A^{v}_{h(v)} \cdot T_h\cdot  A^{v}_{h(v)}\bigr) \ket{\psi}}. \label{eq:move-one-cauchy-schwarz}
   \end{multline}
-  The first factor is at most $\sqrt{2\delta}$ by Lemma~\ref{prop:simeq-to-approx} and the self-consistency of~$A$, while the second factor is at most~$1$ because $M^u$ and $H^v$ are submeasurements.
+  The first factor is controlled by summing over the value $a = h(v)$:
+  \begin{align*}
+    &\E_{u,v} \sum_{a \in \F_q} \bra{\psi} \bigl(A^v_a \ot I - I \ot A^v_a\bigr)
+      \cdot \Bigl(\sum_{(o,h)\in S_u,\, h(v)=a} M^u_o \ot T_h\Bigr)
+      \cdot \bigl(A^v_a \ot I - I \ot A^v_a\bigr)\ket{\psi} \\
+    &\le \E_{u,v} \sum_{a \in \F_q} \bra{\psi} \bigl(A^v_a \ot I - I \ot A^v_a\bigr)^2
+      \ket{\psi},
+  \end{align*}
+  where the inequality uses that $M^u$ and $T$ are submeasurements. By
+  Lemma~\ref{prop:simeq-to-approx} and the self-consistency of~$A$, this is at most
+  $2\delta$. The second factor is
+  \[
+    \E_{u,v} \sum_{(o,h)\in S_u} \bra{\psi} M^u_o \ot H^v_h \ket{\psi},
+  \]
+  which is at most~$1$ because $M^u$ and $H^v$ are submeasurements.
 
   Next, we claim that
   \begin{equation}\label{eq:move-another}
@@ -385,7 +419,19 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
     &\leq \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}} \\
     &\qquad\cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \ot T_h) \cdot \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \ket{\psi}}. \notag
   \end{align}
-  The first factor is at most~$1$ because $M$ is a submeasurement and $T$ is a measurement, and the second factor is the same expression as in~\eqref{eq:move-one-cauchy-schwarz}, hence at most $\sqrt{2\delta}$.
+  The first factor is bounded by
+  \begin{align*}
+    &\E_{u,v} \sum_h \bra{\psi}
+      \Bigl(A^v_{h(v)} \cdot \sum_{o:(o,h)\in S_u} M^u_o \cdot A^v_{h(v)}\Bigr)
+      \ot T_h \ket{\psi} \\
+    &\le \E_{u,v} \sum_h \bra{\psi} (A^v_{h(v)})^2 \ot T_h \ket{\psi}
+      \le \E_{u,v} \sum_h \bra{\psi} I \ot T_h \ket{\psi}
+      \le 1,
+  \end{align*}
+  using first that $M$ is a submeasurement, then that $A^v_{h(v)} \le I$, and
+  finally that $T$ is a submeasurement ($\sum_g T_g \le I$). The second factor is
+  exactly the same expression as in~\eqref{eq:move-one-cauchy-schwarz}, hence at most
+  $\sqrt{2\delta}$.
 
   Having moved both copies of~$A$ to the left-hand side, we next show that
   \begin{equation}\label{eq:change-one}
@@ -400,7 +446,19 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
     \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot (A^{v}_{h(v)} - A^{u}_{h(u)})\bigr) \ot T_h  \ket{\psi}}\\
     \cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}}.
   \end{multline}
-  The second factor is at most~$1$, and the first is at most $\sqrt{\zeta_{\mathrm{variance}}}$ by Lemma~\ref{lem:global-variance-of-points} applied to the submeasurement~$T$.
+  The first factor can be rewritten as
+  \begin{align*}
+    &\E_{u,v} \sum_h \bra{\psi}
+      \Bigl((A^v_{h(v)} - A^u_{h(u)}) \cdot
+      \sum_{o:(o,h)\in S_u} M^u_o \cdot
+      (A^v_{h(v)} - A^u_{h(u)})\Bigr) \ot T_h \ket{\psi} \\
+    &\le \E_{u,v} \sum_h \bra{\psi}
+      (A^v_{h(v)} - A^u_{h(u)})^2 \ot T_h \ket{\psi},
+  \end{align*}
+  because $M^u$ is a submeasurement. Lemma~\ref{lem:global-variance-of-points}
+  bounds this by~$\zeta_{\mathrm{variance}}$ since $T \in \polysub{m}{q}{d}$. The
+  second factor is exactly the first factor from~\eqref{eq:move-another-cauchy-schwarz},
+  so it is at most~$1$.
 
   Finally, we show that
   \begin{equation}\label{eq:change-another}
@@ -408,11 +466,23 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
     \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{u}_{h(u)}\bigr) \ot T_h  \ket{\psi}.
   \end{equation}
-  The same Cauchy--Schwarz estimate as in~\eqref{eq:change-one-cauchy-schwarz}, with the final copy of $A^v_{h(v)}$ replaced by $A^u_{h(u)}$, gives the same bound $\sqrt{\zeta_{\mathrm{variance}}}$ because the first factor is again at most~$1$ and the second is again controlled by Lemma~\ref{lem:global-variance-of-points}. Summing the four transports gives an error of $2\sqrt{2\delta} + 2\sqrt{\zeta_{\mathrm{variance}}}$, and the lemma follows from $2\delta \leq \zeta_{\mathrm{variance}}$.
+  The same Cauchy--Schwarz estimate as in~\eqref{eq:change-one-cauchy-schwarz}, with
+  the final copy of $A^v_{h(v)}$ replaced by $A^u_{h(u)}$, gives the same bound
+  $\sqrt{\zeta_{\mathrm{variance}}}$. Indeed, the factor containing
+  $A^u_{h(u)} \cdot M^u_o \cdot A^u_{h(u)}$ is bounded by~$1$ by the same
+  submeasurement argument as above, while the factor containing
+  $(A^v_{h(v)} - A^u_{h(u)})^2$ is unchanged. Summing the four transports gives an
+  error of $2\sqrt{2\delta} + 2\sqrt{\zeta_{\mathrm{variance}}}$, and the lemma
+  follows from $2\delta \leq \zeta_{\mathrm{variance}}$.
 \end{proof}
 
 \section{Projective Output}
 \label{sec:self-improvement-projective}
+
+This final step applies orthonormalization to the non-projective family produced by
+Lemma~\ref{lem:self-improvement-helper}. The bookkeeping here is entirely about
+showing that completeness, consistency, self-consistency, and boundedness survive
+the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
@@ -453,7 +523,11 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
   \end{enumerate}
 \end{theorem}
 \begin{proof}
-  \uses{lem:self-improvement-helper, thm:orthonormalization, prop:self-consistency-implies-data-processing, prop:completeness-transfer-self-consistent-A, prop:triangle-sub, prop:two-notions-of-self-consistency, prop:triangle-inequality-for-approx_delta}
+  \uses{lem:self-improvement-helper, thm:orthonormalization,
+    prop:self-consistency-implies-data-processing,
+    prop:completeness-transfer-self-consistent-A, prop:triangle-sub,
+    prop:two-notions-of-self-consistency,
+    prop:triangle-inequality-for-approx_delta, prop:easy-approx-from-approx-delta}
   The bound is trivial if one of $\eps$, $\delta$, or $d/q$ is at least~$1$, so assume all three are at most~$1$. Apply Lemma~\ref{lem:self-improvement-helper} to~$G$ and let $\widehat H \in \polysub{m}{q}{d}$ be the output, with
   \[
     \widehat{\zeta} = 100m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big).
@@ -517,7 +591,8 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
     ={}& \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_h \bra{\psi}  A^{u}_{h(u)} \ot H_h \ket{\psi} \notag\\
     ={}& \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}. \label{eq:almost-there-self-improvement-edition}
   \end{align}
-  Replacing $H_{[h(u)=a]}$ by $\widehat H_{[h(u)=a]}$ using~\eqref{eq:approx-data-processed} gives
+  Proposition~\ref{prop:easy-approx-from-approx-delta} upgrades
+  \eqref{eq:approx-data-processed} to the scalar estimate
   \[
     \eqref{eq:almost-there-self-improvement-edition}
     \le \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot \widehat H_{[h(u)=a]} \ket{\psi} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}},
