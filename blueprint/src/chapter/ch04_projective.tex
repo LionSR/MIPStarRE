@@ -112,6 +112,7 @@
 
 \begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
+	\leanok
 	\uses{def:simeq, def:approx_delta}
 	Let $\ket{\psi}$ be a state, and let $A = \{A_a\}$ and $B = \{B_a\}$ be measurements such that
 	\[
@@ -451,6 +452,7 @@
 
 	\begin{definition}[Matrix decomposition of~$Q_a$]\label{def:matrix-decomposition-Q}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ}
+		\leanok
 		For each $a$, let
 		\[
 			m_a = \mathrm{rank}(Q_a),
@@ -479,6 +481,7 @@
 
 	\begin{definition}[SVD of~$X$]\label{def:svd-of-X}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX}
+		\leanok
 		Let
 		\[
 			X = U \cdot \Sigma_{m \times d} \cdot V^\dagger
@@ -506,6 +509,7 @@
 
 	\begin{definition}[Definition of~$P$]\label{def:projective-P}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveP}
+		\leanok
 		Define
 		\[
 			\widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger.
