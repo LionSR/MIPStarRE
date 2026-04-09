@@ -64,8 +64,10 @@ qBipartiteConsDefect ψ A B :=
 bipartiteConsError ψ 𝒟 A B :=
   avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (A q) (B q))
 
-ConsRel ψ 𝒟 A B δ :=
-  bipartiteConsError ψ 𝒟 A B ≤ δ
+structure ConsRel ... (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxSubMeas Question Outcome ιB) (δ : Error) : Prop where
+  offDiagonalBound : bipartiteConsError ψ 𝒟 A B ≤ δ
 ```
 
 This is the right shape for the paper definition.
@@ -208,7 +210,7 @@ That directionality matters.
 Paper statement:
 
 - `references/ldt-paper/test_definition.tex`, lines 190-199
-- `blueprint/src/chapter/ch02_test.tex`, lines 96-113
+- `blueprint/src/chapter/ch02_test.tex`, lines 71-90
 
 The paper says the two point-consistency conclusions are:
 
