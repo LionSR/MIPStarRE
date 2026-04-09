@@ -41,6 +41,16 @@ noncomputable def commutingWithGIncompleteError (params : Parameters)
     (gamma zeta : Error) : Error :=
   commutingWithGCompleteError params gamma zeta
 
+/-- Displayed error term for the pairwise complete-part commutation bound used in
+`cor:G-hat-facts`.
+
+This is exactly the upstream `thm:com-main` error term. The proof of
+`cor:G-hat-facts` only weakens the exponent to `1/16` after adding the three
+incomplete-part commutation contributions. -/
+noncomputable def pairwiseCompletePartCommutationError (params : Parameters)
+    (gamma zeta : Error) : Error :=
+  Commutativity.comMainError params gamma zeta
+
 /-- Displayed self-consistency error for `\widehat G`. -/
 def gHatSelfConsistencyError (zeta : Error) : Error :=
   2 * zeta
@@ -157,11 +167,17 @@ structure GCompleteSelfConsistencyStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
+  /--
+  This witness intentionally stores the self-consistency of the full slice family.
+  In `cor:G-hat-facts`, the self-consistency of `\widehat G` splits into the
+  original slice-family term together with the incomplete-part term, so
+  `gHatFacts.completedSelfConsistency` needs the bound for `family.meas` itself.
+  -/
   completePartSelfConsistency :
     SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
-      (completePartLeftFamily params family)
-      (completePartRightFamily params family)
+      (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas))
+      (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas))
       zeta
 
 /-- Output package for `cor:g-bot-self-consistency`. -/
@@ -198,6 +214,20 @@ structure CommutingWithGCompleteStatement (params : Parameters)
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
+  pairwiseCompletePartCommutation :
+    SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (fun q =>
+        OpFamily.leftPlacedOpFamily (ιB := ι) <|
+          orderedProductOpFamily
+            ((family.meas q.1).toSubMeas)
+            ((family.meas q.2).toSubMeas))
+      (fun q =>
+        OpFamily.leftPlacedOpFamily (ιB := ι) <|
+          reversedProductOpFamily
+            ((family.meas q.1).toSubMeas)
+            ((family.meas q.2).toSubMeas))
+      (pairwiseCompletePartCommutationError params gamma zeta)
   pointWithCompletePartCommutation :
     SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
