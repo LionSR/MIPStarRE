@@ -197,13 +197,23 @@ structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Paramete
           ∃ Tm : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
             MatrixAddInUTransferStatement params model Tm Mmat Hmat eps delta
 
-/-- Output package for `lem:self-improvement-helper`. -/
+/-- Reduced output package for the SDP + `addInU` stage of `lem:self-improvement-helper`.
+
+This structure intentionally records only the guarantees produced directly by the
+current `sdp` + `addInU` pipeline: the SDP witness, the averaged construction of
+`H`, the transfer statement for arbitrary selections, and the PSD / dual-feasibility
+facts for `Z`.
+
+The paper and blueprint package four additional helper-lemma guarantees
+(`completeness`, `pointConsistency`, strong self-consistency, and boundedness).
+Those do not yet come from this pipeline alone, so they are not fields here;
+they should be supplied later by separate bridge lemmas that consume this reduced
+conclusion. -/
 structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (G : Measurement (Polynomial params) ι)
     (T : Measurement (Polynomial params) ι)
     (H : SubMeas (Polynomial params) ι)
-    (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
+    (Z : MIPStarRE.Quantum.Op ι) (eps delta : Error) : Prop where
   sdpWitness : SdpOptimalPair params strategy T.toSubMeas Z
   averagedConstruction :
     H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
@@ -225,8 +235,7 @@ structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
   witness :
     ∃ T : Measurement (Polynomial params) ι,
       ∃ Hhat : SubMeas (Polynomial params) ι,
-        SelfImprovementHelperConclusion params strategy G T
-          Hhat Z eps delta gamma nu ∧
+        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta ∧
         SDDRel strategy.state (uniformDistribution Unit)
           (constSubMeasFamily Hhat.liftLeft)
           (constSubMeasFamily H.toSubMeas.liftLeft)
@@ -336,15 +345,12 @@ lemma selfImprovementHelper
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (eps delta gamma nu : Error)
+    (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : Measurement (Polynomial params) ι)
-    (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    (_G : Measurement (Polynomial params) ι) :
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-        SelfImprovementHelperConclusion params strategy G T H Z eps delta gamma nu := by
+        SelfImprovementHelperConclusion params strategy T H Z eps delta := by
   obtain ⟨Tsub, Z, hsdp⟩ := (sdp params strategy).witness
   let T : Measurement (Polynomial params) ι :=
     { toSubMeas := Tsub
