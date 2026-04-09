@@ -346,12 +346,12 @@ lemma truncationInequality (δ x : Error) :
   intro hδ hδhalf hx hx1
   simp only []
   split
-  · rename_i h
+  · next h =>
     have h1x : 0 ≤ 1 - x := by linarith
     have hxd : 1 - x ≤ δ := by linarith
     rw [div_mul_eq_mul_div, le_div_iff₀ hδ]
     nlinarith [sq_nonneg (1 - x), sq_nonneg δ]
-  · rename_i h
+  · next h =>
     push_neg at h
     simp only [sub_zero]
     rw [div_mul_eq_mul_div, le_div_iff₀ hδ]
