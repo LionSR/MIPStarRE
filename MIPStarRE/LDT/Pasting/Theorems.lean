@@ -555,7 +555,7 @@ lemma gCompleteSelfConsistency
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (zeta : Error)
-    (hperm : PermInvState ψbi)
+    (_hperm : PermInvState ψbi)
     (hself : family.StronglySelfConsistent ψbi zeta) :
     GCompleteSelfConsistencyStatement params ψbi family zeta := by
   /-
@@ -869,10 +869,7 @@ theorem gHatFacts
     completedSelfConsistency := ?_
     completedCommutation := ?_
   }
-  · -- TODO(#199): `completedSelfConsistency`: split gHat sum over
-    -- `Option (Polynomial params)` into complete + incomplete parts and
-    -- bound by `2 * zeta`.
-    -- Paper reference: `cor:G-hat-facts` in `ld-pasting.tex`.
+  · -- Paper reference: `cor:G-hat-facts` in `ld-pasting.tex`.
     rcases hselfComplete.completePartSelfConsistency with ⟨hcomplete_bound⟩
     rcases hselfIncomplete.incompletePartSelfConsistency with ⟨hincomplete_bound⟩
     refine ⟨?_⟩
