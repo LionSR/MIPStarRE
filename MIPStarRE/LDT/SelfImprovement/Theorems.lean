@@ -176,19 +176,19 @@ noncomputable def projectiveBoundednessGap (params : Parameters)
 structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (T : Measurement (Polynomial params) ι)
+    (T : SubMeas (Polynomial params) ι)
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι)
     (eps delta : Error) : Prop where
   averagedConstruction :
-    H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
+    H = averagedSandwichedPolynomialSubMeas params strategy T
   varianceBound :
-    pointConditionedGlobalVariance params strategy T.toSubMeas ≤
+    pointConditionedGlobalVariance params strategy T ≤
       selfImprovementVarianceError params eps delta
   transfer :
     ∀ S : AddInUSelection params Outcome,
       |addInULeftQuantity params strategy M H S -
-          addInURightQuantity params strategy M T.toSubMeas S| ≤
+          addInURightQuantity params strategy M T S| ≤
         addInUError params eps delta
   matrixWitness :
     ∃ model : MatrixSdpRealization params,
@@ -201,12 +201,12 @@ structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Paramete
 structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : Measurement (Polynomial params) ι)
-    (T : Measurement (Polynomial params) ι)
+    (T : SubMeas (Polynomial params) ι)
     (H : SubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
-  sdpWitness : SdpOptimalPair params strategy T.toSubMeas Z
+  sdpWitness : SdpOptimalPair params strategy T Z
   averagedConstruction :
-    H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
+    H = averagedSandwichedPolynomialSubMeas params strategy T
   addInUTransfer :
     ∀ {Outcome : Type*} [Fintype Outcome] (M : IdxSubMeas (Point params) Outcome ι),
       AddInUStatement params strategy T M H eps delta
@@ -242,7 +242,7 @@ structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
     (H : ProjSubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
   witness :
-    ∃ T : Measurement (Polynomial params) ι,
+    ∃ T : SubMeas (Polynomial params) ι,
       ∃ Hhat : SubMeas (Polynomial params) ι,
         SelfImprovementHelperConclusion params strategy G T
           Hhat Z eps delta gamma nu ∧
@@ -304,7 +304,7 @@ lemma selfImprovementHelper
     (hcons : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (polynomialEvaluationFamily params G.toSubMeas) nu) :
-    ∃ T : Measurement (Polynomial params) ι,
+    ∃ T : SubMeas (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusion params strategy G T H Z eps delta gamma nu := by
   /-
@@ -357,7 +357,7 @@ lemma addInU {Outcome : Type*} [Fintype Outcome]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (T : Measurement (Polynomial params) ι)
+    (T : SubMeas (Polynomial params) ι)
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι) :
     AddInUStatement params strategy T M H eps delta := by
@@ -366,7 +366,7 @@ lemma addInU {Outcome : Type*} [Fintype Outcome]
 
   The first field of `AddInUStatement` demands
 
-    `H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas`
+    `H = averagedSandwichedPolynomialSubMeas params strategy T`
 
   but `H` is an arbitrary input parameter of the theorem. There is no
   hypothesis relating `H` to `T`, so the theorem cannot hold in general.
