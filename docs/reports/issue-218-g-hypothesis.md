@@ -2,6 +2,8 @@
 
 Date: 2026-04-09
 
+Note: Line numbers are as of commit ab4ea72 (main, 2026-04-09).
+
 ## Conclusion
 
 This issue appears to already be addressed in the current codebase. No Lean code
@@ -49,7 +51,7 @@ change is needed in `Commutativity/Theorems.lean` or `Commutativity/Defs.lean`.
 
 Suggested issue comment:
 
-> Investigated in the current branch: this looks already fixed. Both
+> Investigated on main as of ab4ea72 (2026-04-09): this looks already fixed. Both
 > `commDataProcessedG` and `comMain` require
 > `hG : ∀ x, G x = (family.meas x).toSubMeas`, and `commDataProcessedG`
 > packages that back into `CommDataProcessedGConclusion.familyG`. The only bare
