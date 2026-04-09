@@ -488,6 +488,7 @@ lemma qCompleteness {Outcome : Type*}
     (A : Measurement Outcome ι) (ζ : Error)
     (data : QLayerData Outcome ι)
     (hψ : ψ.IsNormalized)
+    (hζ : 0 ≤ ζ)
     (hζ_small : ζ ≤ 1 / (4 : Error)) :
     RankReductionWitness ψ A ζ data →
       ev ψ (QTotal data) ≥ 1 - 11 * zetaQuarterRoot ζ := by
@@ -510,6 +511,7 @@ lemma sqrtQCompleteness {Outcome : Type*}
     (A : Measurement Outcome ι) (ζ : Error)
     (data : QLayerData Outcome ι)
     (hψ : ψ.IsNormalized)
+    (hζ : 0 ≤ ζ)
     (hζ_small : ζ ≤ 1 / (4 : Error)) :
     RankReductionWitness ψ A ζ data →
       ev ψ (CFC.sqrt (QTotal data)) ≥ 1 - 12 * zetaQuarterRoot ζ := by
@@ -924,7 +926,11 @@ lemma pProjectivity {Outcome : Type*}
 /-- **`P` is close to `Q`** (`lem:P-Q-approx`).
 
 The final internal comparison in the paper's repair step shows that `P_a`
-is `30 ζ^(1/4)`-close to `Q_a` in the project's `≈`-style raw-family metric. -/
+is `30 ζ^(1/4)`-close to `Q_a` in the project's `≈`-style raw-family metric.
+
+By design this lemma is just the public projection of the witness field
+`QXPLayerData.pQApprox_bound`: the chosen `X/XHat/P` decomposition stores the
+bound internally, and `pQApprox` is the API lemma that exposes it. -/
 lemma pQApprox {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
