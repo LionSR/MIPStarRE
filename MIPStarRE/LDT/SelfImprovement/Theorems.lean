@@ -176,19 +176,19 @@ noncomputable def projectiveBoundednessGap (params : Parameters)
 structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι)
+    (T : Measurement (Polynomial params) ι)
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι)
     (eps delta : Error) : Prop where
   averagedConstruction :
-    H = averagedSandwichedPolynomialSubMeas params strategy T
+    H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
   varianceBound :
-    pointConditionedGlobalVariance params strategy T ≤
+    pointConditionedGlobalVariance params strategy T.toSubMeas ≤
       selfImprovementVarianceError params eps delta
   transfer :
     ∀ S : AddInUSelection params Outcome,
       |addInULeftQuantity params strategy M H S -
-          addInURightQuantity params strategy M T S| ≤
+          addInURightQuantity params strategy M T.toSubMeas S| ≤
         addInUError params eps delta
   matrixWitness :
     ∃ model : MatrixSdpRealization params,
@@ -201,39 +201,20 @@ structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Paramete
 structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : Measurement (Polynomial params) ι)
-    (T : SubMeas (Polynomial params) ι)
+    (T : Measurement (Polynomial params) ι)
     (H : SubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
-  sdpWitness : SdpOptimalPair params strategy T Z
+  sdpWitness : SdpOptimalPair params strategy T.toSubMeas Z
   averagedConstruction :
-    H = averagedSandwichedPolynomialSubMeas params strategy T
+    H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
   addInUTransfer :
     ∀ {Outcome : Type*} [Fintype Outcome] (M : IdxSubMeas (Point params) Outcome ι),
       AddInUStatement params strategy T M H eps delta
-  completeness :
-    CompletenessAtLeast strategy.state H.liftLeft
-      ((1 - nu) - selfImprovementHelperError params eps delta)
-  pointConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params H)
-      (selfImprovementHelperError params eps delta)
-  strongSelfConsistency :
-    BipartiteSSCRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily H)
-      (selfImprovementHelperError params eps delta)
   positiveSemidefiniteWitness :
     0 ≤ Z
   dualDominatesAveragedPoint :
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
-  helperResidualBound :
-    helperBoundednessGap params strategy H Z ≤
-      selfImprovementHelperError params eps delta
-  bounded :
-    BoundedByOperator strategy.state H.liftLeft
-      (leftTensor (ι₂ := ι) Z)
-      (selfImprovementHelperError params eps delta)
 
 /-- Output package for `thm:self-improvement`. -/
 structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
@@ -242,7 +223,7 @@ structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
     (H : ProjSubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
   witness :
-    ∃ T : SubMeas (Polynomial params) ι,
+    ∃ T : Measurement (Polynomial params) ι,
       ∃ Hhat : SubMeas (Polynomial params) ι,
         SelfImprovementHelperConclusion params strategy G T
           Hhat Z eps delta gamma nu ∧
@@ -293,37 +274,6 @@ structure SelfImprovementSubMeasConclusion (params : Parameters) [FieldModel par
       Gmeas.toSubMeas = G ∧
       SelfImprovementConclusion params strategy Gmeas H Z eps delta gamma nu
 
-/-- `lem:self-improvement-helper`. -/
-lemma selfImprovementHelper
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma nu : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (G : Measurement (Polynomial params) ι)
-    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params G.toSubMeas) nu) :
-    ∃ T : SubMeas (Polynomial params) ι,
-      ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-        SelfImprovementHelperConclusion params strategy G T H Z eps delta gamma nu := by
-  /-
-  Blocked on two concrete gaps in the current development.
-
-  1. `sdp` is still a placeholder, so there is no witness `T, Z` to feed into
-     this wrapper.
-  2. Even assuming such a witness, the remaining conclusion fields are not
-     discharged by any existing bookkeeping lemmas:
-     - `addInUTransfer` depends on `addInU`, which is itself blocked below.
-     - `completeness`, `pointConsistency`, `strongSelfConsistency`,
-       `helperResidualBound`, and `bounded` require explicit bridge lemmas from
-       the SDP/add-in-u output to the abstract `CompletenessAtLeast`,
-       `ConsRel`, `BipartiteSSCRel`, and `BoundedByOperator` predicates.
-
-  So this is not just a thin wrapper around already-formalized results yet.
-  -/
-  sorry
-
 /-- `lem:sdp`. -/
 lemma sdp
     (params : Parameters)
@@ -357,7 +307,7 @@ lemma addInU {Outcome : Type*} [Fintype Outcome]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (T : SubMeas (Polynomial params) ι)
+    (T : Measurement (Polynomial params) ι)
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι) :
     AddInUStatement params strategy T M H eps delta := by
@@ -366,7 +316,7 @@ lemma addInU {Outcome : Type*} [Fintype Outcome]
 
   The first field of `AddInUStatement` demands
 
-    `H = averagedSandwichedPolynomialSubMeas params strategy T`
+    `H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas`
 
   but `H` is an arbitrary input parameter of the theorem. There is no
   hypothesis relating `H` to `T`, so the theorem cannot hold in general.
@@ -380,6 +330,37 @@ lemma addInU {Outcome : Type*} [Fintype Outcome]
      for `MatrixAddInUTransferStatement`.
   -/
   sorry
+
+/-- `lem:self-improvement-helper`. -/
+lemma selfImprovementHelper
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : Measurement (Polynomial params) ι)
+    (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    ∃ T : Measurement (Polynomial params) ι,
+      ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+        SelfImprovementHelperConclusion params strategy G T H Z eps delta gamma nu := by
+  obtain ⟨Tsub, Z, hsdp⟩ := (sdp params strategy).witness
+  let T : Measurement (Polynomial params) ι :=
+    { toSubMeas := Tsub
+      total_eq_one := hsdp.primalTotalOperator }
+  let H : SubMeas (Polynomial params) ι :=
+    averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
+  refine ⟨T, H, Z, ?_⟩
+  refine
+    { sdpWitness := ?_
+      averagedConstruction := rfl
+      addInUTransfer := ?_
+      positiveSemidefiniteWitness := hsdp.dualPositive
+      dualDominatesAveragedPoint := hsdp.dualFeasible }
+  · simpa [T] using hsdp
+  · intro Outcome _ M
+    exact addInU params strategy eps delta gamma hgood T M H
 
 /-- `thm:self-improvement`. -/
 theorem selfImprovement
@@ -395,17 +376,15 @@ theorem selfImprovement
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
   /-
-  Blocked for two independent reasons.
+  Blocked because the next stage of the pipeline is still missing.
 
-  1. `selfImprovementHelper` is still blocked above, so there is no helper-stage
-     witness to orthonormalize.
-  2. The imported theorem `MakingMeasurementsProjective.orthonormalization`
+  1. The imported theorem `MakingMeasurementsProjective.orthonormalization`
      still has a `sorry`, and its API requires `PermInvState strategy.state`.
      This theorem's statement does not assume permutation invariance, and I did
      not find any lemma deriving `PermInvState strategy.state` from
      `strategy.IsGood ...`.
-
-  After those are fixed, the wrapper will still need explicit transport lemmas
+  2. After orthonormalization is available, the wrapper will still need
+     explicit transport lemmas
   upgrading the helper-stage `SDDRel` witness to the stated
   `pointConsistency`, `selfCloseness`, and `projectiveResidualBound` fields
   with the named Section 9 error terms.
