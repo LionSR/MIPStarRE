@@ -24,10 +24,10 @@ noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) 
 
 The bipartite tensor placement follows the paper:
 - **1a**: `A^A_u ⊗ I ≈_ν I ⊗ G^B_{[g(u)=a]}` — G_B on **right**
-- **1b**: `I ⊗ A^B_u ≈_ν G^A_{[g(u)=a]} ⊗ I` — A^B on **right**
+- **1b**: `I ⊗ A^B_u ≈_ν G^A_{[g(u)=a]} ⊗ I` — G_A on **left**, A^B on **right**
 - **2**: `G^A_g ⊗ I ≈_ν I ⊗ G^B_g` — G_B on **right**
 
-Fixes #137.
+Fixes #137, #239.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -42,8 +42,8 @@ theorem mainFormal
           (polynomialEvaluationFamily params G_B.toSubMeas)
           (mainFormalError params k eps) ∧
         ConsRel strategy.state (uniformDistribution (Point params))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
           (polynomialEvaluationFamily params G_A.toSubMeas)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
           (mainFormalError params k eps) ∧
         ConsRel strategy.state (uniformDistribution Unit)
           (constSubMeasFamily G_A.toSubMeas)
