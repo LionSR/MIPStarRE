@@ -82,6 +82,11 @@ The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, o
 
 \subsection{From Measurements to Submeasurements}
 
+In the remainder of the chapter we only use the axis-parallel lines test in the
+last coordinate direction. We therefore write $B_f^u$ for the line measurement
+on the line $\{(u,x)\mid x\in\F_q\}$ and first record the consistency relations
+that follow formally from the hypotheses of Theorem~\ref{thm:ld-pasting}.
+
 Conditioning the low individual degree test on the last coordinate direction gives, on average over $(u,x) \sim \F_q^{m+1}$,
 \[
 	A_a^{u,x} \ot I \simeq_{(m+1)\eps} I \ot B^u_{[f(x)=a]}.
@@ -172,7 +177,7 @@ where
 	For $k \ge 1$, let $\mathsf{Distinct}_k \subseteq \F_q^k$ be the set of tuples $(x_1,\dots,x_k)$ with pairwise distinct coordinates.
 \end{definition}
 
-\begin{lemma}[Distinct tuples versus independent tuples]\label{prop:ld-dnoteq}
+\begin{proposition}[Distinct tuples versus independent tuples]\label{prop:ld-dnoteq}
 	\lean{MIPStarRE.LDT.Pasting.ldDnoteq}
 	\leanok
 	\uses{def:distinct-tuples}
@@ -180,9 +185,13 @@ where
 	\[
 		d_{\mathrm{TV}}(x,y) \le \frac{k^2}{q}.
 	\]
-\end{lemma}
+\end{proposition}
 \begin{proof}
-	A uniformly random tuple lies outside $\mathsf{Distinct}_k$ only if two coordinates collide. A union bound gives
+	The total variation distance is exactly the probability mass of the collision
+	event for a uniformly random tuple, because the distinct-tuple distribution is
+	the uniform distribution conditioned on landing in $\mathsf{Distinct}_k$. A
+	uniformly random tuple lies outside $\mathsf{Distinct}_k$ only if two
+	coordinates collide, so a union bound gives
 	\[
 		\Pr[x \notin \mathsf{Distinct}_k] \le \sum_{i=2}^k \frac{i-1}{q} = \frac{k(k-1)}{2q}\le \frac{k^2}{q},
 	\]
@@ -299,7 +308,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	by \ref{eq:ld-g-self-consistency}.
 \end{proof}
 
-\begin{lemma}[Strong self-consistency of the incomplete part]\label{cor:g-bot-self-consistency}
+\begin{corollary}[Strong self-consistency of the incomplete part]\label{cor:g-bot-self-consistency}
 	\lean{MIPStarRE.LDT.Pasting.gBotSelfConsistency}
 	\leanok
 	\uses{lem:g-complete-self-consistency}
@@ -307,7 +316,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\[
 		G_\bot^x \ot I \approx_\zeta I \ot G_\bot^x.
 	\]
-\end{lemma}
+\end{corollary}
 \begin{proof}
 	Since $G_\bot^x = I-G^x$,
 	\[
@@ -315,6 +324,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\]
 	so the claim is immediate from Lemma~\ref{lem:g-complete-self-consistency}.
 \end{proof}
+
+\subsubsection{Commutativity of $G_{\bot}$}
 
 \begin{lemma}[Commutativity with $G_g^x$ implies commutativity with $G^x$]\label{lem:commutativity-switcheroo}
 	\lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo}
@@ -426,7 +437,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\]
 \end{proof}
 
-\begin{lemma}[Commutativity of the complete part]\label{cor:commuting-with-G-complete}
+\begin{corollary}[Commutativity of the complete part]\label{cor:commuting-with-G-complete}
 	\lean{MIPStarRE.LDT.Pasting.commutingWithGComplete}
 	\uses{thm:com-main, lem:commutativity-switcheroo, lem:g-complete-self-consistency}
 	Under the hypotheses of Theorem~\ref{thm:ld-pasting}, the following commutation relations hold:
@@ -439,7 +450,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\[
 		\nu_2 = 36m\left(\gamma^{1/16}+\zeta^{1/16}+(d/q)^{1/16}\right).
 	\]
-\end{lemma}
+\end{corollary}
 \begin{proof}
 	By \ref{eq:quote-com-main},
 	\begin{equation}\label{eq:com-main-copy}
@@ -464,7 +475,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\]
 \end{proof}
 
-\begin{lemma}[Commutativity of the incomplete part]\label{cor:commuting-with-G-incomplete}
+\begin{corollary}[Commutativity of the incomplete part]\label{cor:commuting-with-G-incomplete}
 	\lean{MIPStarRE.LDT.Pasting.commutingWithGIncomplete}
 	\leanok
 	\uses{cor:commuting-with-G-complete}
@@ -474,7 +485,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\qquad
 		G_\bot^x G_\bot^y \ot I \approx_{\nu_2} G_\bot^y G_\bot^x \ot I.
 	\]
-\end{lemma}
+\end{corollary}
 \begin{proof}
 	The identities
 	\[
@@ -484,10 +495,12 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\[
 		G_\bot^x G_\bot^y - G_\bot^y G_\bot^x = G^x G^y - G^y G^x
 	\]
-	reduce both claims to Lemma~\ref{cor:commuting-with-G-complete}.
+	reduce both claims to Corollary~\ref{cor:commuting-with-G-complete}.
 \end{proof}
 
-\begin{lemma}[Strong self-consistency and commutation of $\widehat G$]\label{cor:G-hat-facts}
+\subsubsection{Putting Everything Together}
+
+\begin{corollary}[Strong self-consistency and commutation of $\widehat G$]\label{cor:G-hat-facts}
 	\lean{MIPStarRE.LDT.Pasting.gHatFacts}
 	\uses{lem:g-complete-self-consistency, cor:g-bot-self-consistency, cor:commuting-with-G-complete, cor:commuting-with-G-incomplete}
 	The completed measurements $\widehat G^x$ satisfy
@@ -499,7 +512,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\[
 		\nu_3 = 138m\left(\gamma^{1/16}+\zeta^{1/16}+(d/q)^{1/16}\right).
 	\]
-\end{lemma}
+\end{corollary}
 \begin{proof}
 	For \ref{eq:gselfconall}, split the outcome set into the genuine outcomes and $\bot$:
 	\[
@@ -1144,7 +1157,9 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\[
 		\E_{i\sim\mu} \lambda_i = \Tr(X\rho) = \bra{\psi} X \ot I \ket{\psi} \ge 1-\kappa.
 	\]
-	Equivalently, $\E_{i\sim\mu}(1-\lambda_i)\le \kappa$, so Markov's inequality gives
+	Equivalently, $\E_{i\sim\mu}(1-\lambda_i)\le \kappa$, so Markov's inequality
+	shows that most of the spectral mass of $X$ lies on eigenvalues at least
+	$\theta$:
 	\begin{equation}\label{eq:in-other-words}
 		\Pr_{i\sim\mu}[\lambda_i > \theta] \ge 1-\frac{\kappa}{1-\theta}.
 	\end{equation}
@@ -1152,7 +1167,9 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\[
 		F(p)=\sum_{r=d+1}^k \binom{k}{r}p^r(1-p)^{k-r}
 	\]
-	is the probability of observing at least $d+1$ successes in $k$ Bernoulli$(p)$ trials. The additive Chernoff bound therefore yields
+	is the probability of observing at least $d+1$ successes in $k$
+	Bernoulli$(p)$ trials. Applying the scalar Chernoff bound
+	eigenvalue-by-eigenvalue therefore yields
 	\begin{equation}\label{eq:by-chernoff}
 		F(p) \ge 1-\exp\Bigl(-2\Bigl(p-\frac{d}{k}\Bigr)^2k\Bigr).
 	\end{equation}
@@ -1179,7 +1196,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	Finally, $k \ge 2d/\theta$ implies $d/k \le \theta/2$, hence $(\theta-d/k)^2 \ge \theta^2/4$, which yields the claimed bound.
 \end{proof}
 
-\begin{lemma}[Completeness of the pasted submeasurement]\label{cor:ld-pasting-N-completeness}
+\begin{corollary}[Completeness of the pasted submeasurement]\label{cor:ld-pasting-N-completeness}
 	\lean{MIPStarRE.LDT.Pasting.ldPastingNCompleteness}
 	\uses{lem:over-all-outcomes, lem:from-H-to-G, lem:chernoff-bernoulli-matrix}
 	If $k \ge 400md$, then
@@ -1188,7 +1205,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\ge
 		1 - \kappa\left(1+\frac{1}{100m}\right) - \nu - e^{-k/(80000m^2)}.
 	\]
-\end{lemma}
+\end{corollary}
 \begin{proof}
 	Lemma~\ref{lem:over-all-outcomes} gives
 	\[
