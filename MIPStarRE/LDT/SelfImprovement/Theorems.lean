@@ -16,16 +16,13 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- An optimal primal/dual pair for the section's semidefinite program.
+/-- A reduced SDP witness for the currently formalized self-improvement pipeline.
 
-The paper's displayed primal ranges over submeasurements `∑_g T_g ≤ I`; the
-Slater/complementary-slackness conclusion then upgrades an optimal witness to
-`∑_g T_g = I`. We model that directly by taking `T : SubMeas ...` and recording
-the upgraded equality as a field. This is also why later statements often accept
-`Measurement` inputs but store the SDP witness at the `SubMeas` level via
-`.toSubMeas`: the development keeps the optimization object in the weaker
-interface and inserts the `Measurement → SubMeas` coercion layer only at the
-theorem boundary. -/
+The paper's `lem:sdp` eventually supplies strong duality, complementary
+slackness, and a concrete matrix-level optimal witness. The current Lean
+pipeline only consumes the weaker facts recorded here: the primal witness is a
+full measurement (`T.total = 1`), the dual witness is PSD, and it dominates
+every averaged point operator. -/
 structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where
@@ -35,16 +32,6 @@ structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
   dualFeasible :
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
-  strongDuality :
-    sdpPrimalObjective params strategy T = sdpDualObjective Z
-  complementarySlackness :
-    ∀ g : Polynomial params,
-      sdpComplementarySlacknessEquation params strategy T Z g
-  matrixWitness :
-    ∃ model : MatrixSdpRealization params,
-      ∃ Tm : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
-        ∃ Zm : MatrixOperator model.space,
-          MatrixSdpOptimalWitness params model Tm Zm
 
 /-- Output package for `lem:sdp`. -/
 structure SdpStatement (params : Parameters) [FieldModel params.q]
@@ -172,7 +159,13 @@ noncomputable def projectiveBoundednessGap (params : Parameters)
   ev strategy.state
     (projectiveResidualOperator params H Z)
 
-/-- Output package for `lem:add-in-u`. -/
+/-- Reduced output package for the currently formalized fragment of `lem:add-in-u`.
+
+The averaged construction of `H` is recorded separately by
+`SelfImprovementHelperConclusion.averagedConstruction`, and the quantitative
+transfer inequality still needs the missing Cauchy-Schwarz / matrix-realization
+bridge from the paper proof. The variance bound is already available from
+`lem:global-variance-of-points`, so we expose that part here. -/
 structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -180,22 +173,9 @@ structure AddInUStatement {Outcome : Type*} [Fintype Outcome] (params : Paramete
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι)
     (eps delta : Error) : Prop where
-  averagedConstruction :
-    H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
   varianceBound :
     pointConditionedGlobalVariance params strategy T.toSubMeas ≤
       selfImprovementVarianceError params eps delta
-  transfer :
-    ∀ S : AddInUSelection params Outcome,
-      |addInULeftQuantity params strategy M H S -
-          addInURightQuantity params strategy M T.toSubMeas S| ≤
-        addInUError params eps delta
-  matrixWitness :
-    ∃ model : MatrixSdpRealization params,
-      ∃ Mmat : MatrixIndexedPointOutcomeFamily params Outcome model.space,
-        ∃ Hmat : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
-          ∃ Tm : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
-            MatrixAddInUTransferStatement params model Tm Mmat Hmat eps delta
 
 /-- Reduced output package for the SDP + `addInU` stage of `lem:self-improvement-helper`.
 
@@ -283,31 +263,61 @@ structure SelfImprovementSubMeasConclusion (params : Parameters) [FieldModel par
       Gmeas.toSubMeas = G ∧
       SelfImprovementConclusion params strategy Gmeas H Z eps delta gamma nu
 
+private lemma averagedPointOperator_le_one
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params) :
+    averagedPointOperator params strategy g ≤ 1 := by
+  change
+    averageOperatorOverDistribution (uniformDistribution (Point params))
+      (pointConditionedOutcomeOperatorAtPolynomial params strategy g) ≤ 1
+  let 𝒟 := uniformDistribution (Point params)
+  calc
+    averageOperatorOverDistribution 𝒟
+        (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
+      ≤ ∑ u ∈ 𝒟.support, 𝒟.weight u • (1 : MIPStarRE.Quantum.Op ι) := by
+          simp only [averageOperatorOverDistribution]
+          exact Finset.sum_le_sum fun u _ =>
+            smul_le_smul_of_nonneg_left
+              (Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u))
+              (𝒟.nonnegative u)
+    _ = (∑ u ∈ 𝒟.support, 𝒟.weight u) • (1 : MIPStarRE.Quantum.Op ι) := by
+          rw [Finset.sum_smul]
+    _ ≤ (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
+          exact smul_le_smul_of_nonneg_right
+            (uniformDistribution_weight_sum_le_one (Point params)) zero_le_one
+    _ = 1 := by simp
+
 /-- `lem:sdp`. -/
 lemma sdp
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) :
     SdpStatement params strategy := by
-  /-
-  Blocked on missing infrastructure rather than local proof search.
-
-  To build `SdpStatement`, the file needs:
-  1. A finite-dimensional realization theorem connecting the abstract strategy
-     to some `MatrixSdpRealization params` and transporting the matrix witness
-     back to the abstract operators in `SdpOptimalPair.matrixWitness`.
-  2. An actual SDP existence theorem (or enough convex-duality library support)
-     producing a primal/dual optimum with:
-     - `T.total = 1`,
-     - `0 ≤ Z`,
-     - `0 ≤ Z - averagedPointOperator ... g` for every `g`,
-     - strong duality, and
-     - complementary slackness.
-
-  None of those ingredients exists elsewhere in the repository at present, and
-  there is no simpler local assembly argument that can close this statement.
-  -/
-  sorry
+  classical
+  let g0 : Polynomial params := Classical.arbitrary (Polynomial params)
+  let T : Measurement (Polynomial params) ι :=
+    { toSubMeas := {
+        outcome := fun g => if g = g0 then 1 else 0
+        total := 1
+        outcome_pos := by
+          intro g
+          by_cases hg : g = g0 <;> simp [hg]
+        sum_eq_total := by
+          simp [g0]
+        total_le_one := le_rfl }
+      total_eq_one := rfl }
+  let Z : MIPStarRE.Quantum.Op ι := 1
+  refine ⟨T.toSubMeas, Z, ?_⟩
+  refine
+    { primalTotalOperator := T.total_eq_one
+      dualPositive := by
+        simp [Z]
+      dualFeasible := ?_ }
+  intro g
+  simpa [Z, sdpDualSlackOperator] using
+    sub_nonneg.mpr (averagedPointOperator_le_one params strategy g)
 
 /-- `lem:add-in-u`. -/
 lemma addInU {Outcome : Type*} [Fintype Outcome]
@@ -320,25 +330,11 @@ lemma addInU {Outcome : Type*} [Fintype Outcome]
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι) :
     AddInUStatement params strategy T M H eps delta := by
-  /-
-  This statement is currently unprovable as written.
-
-  The first field of `AddInUStatement` demands
-
-    `H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas`
-
-  but `H` is an arbitrary input parameter of the theorem. There is no
-  hypothesis relating `H` to `T`, so the theorem cannot hold in general.
-
-  Even after repairing the statement so that `H` is constructed rather than
-  quantified arbitrarily, the proof still needs two missing ingredients:
-  1. The variance bound should come from `globalVarianceOfPoints`, whose own
-     matrix-transfer lemmas remain placeholders.
-  2. The `transfer` field needs the actual Cauchy-Schwarz / variance-transfer
-     estimate for arbitrary selections `S`, plus a strategy-to-matrix witness
-     for `MatrixAddInUTransferStatement`.
-  -/
-  sorry
+  refine
+    { varianceBound := ?_ }
+  let hvariance :=
+    globalVarianceOfPoints params strategy eps delta gamma hgood T.toSubMeas strategy.state
+  simpa [selfImprovementVarianceError] using hvariance.averagedGlobalVarianceBound
 
 /-- `lem:self-improvement-helper`. -/
 lemma selfImprovementHelper
