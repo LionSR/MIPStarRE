@@ -105,8 +105,6 @@ structure RankReductionWitness {Outcome : Type*}
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
       (constOpFamily data.q)
       (roundingToProjectiveError ζ)
-  source_almost_projective :
-    ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ
   total_le :
     QTotal data ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
@@ -378,12 +376,15 @@ lemma projectiveLowRankSum {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (ζ : Error) :
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hζ : 0 ≤ ζ)
+    (source_almost_projective :
+      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
       RankReductionWitness ψ A ζ data := by
   -- NOTE: The paper's proof also needs normalization of `ψ` and a small-`ζ`
-  -- hypothesis such as `0 ≤ ζ ≤ 1 / 4`, but those preconditions are not yet
-  -- reflected in this theorem statement.
+  -- hypothesis such as `ζ ≤ 1 / 4`; only the nonnegativity and
+  -- almost-projectivity preconditions are reflected here so far.
   -- TODO: prove (issue #197)
   sorry
 
