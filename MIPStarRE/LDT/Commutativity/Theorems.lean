@@ -679,6 +679,38 @@ private lemma evaluationSpecialization_sddErrorOp_eq
   simp_rw [evaluatedFromFullSliceProductLeft_outcome_eq,
       evaluatedFromFullSliceProductRight_outcome_eq]
 
+/-- The remaining `thm:com-main` lift from evaluated commutation back to
+full-slice commutation.
+
+This is the paper's two-step Schwartz-Zippel marginalization argument:
+first compare `G^x_g` with `G^x_[g(u)=a]`, then compare `G^y_h` with
+`G^y_[h(v)=b]`, while using slice strong self-consistency to move between the
+full and evaluated placements and finally absorb the scalar bookkeeping into
+`comMainError`. -/
+private lemma fullSliceCommutation_of_evaluated
+    (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (_hself : family.StronglySelfConsistent strategy.state zeta)
+    (hEval :
+      SDDOpRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedFromFullSliceProductLeft params strategy family)
+        (evaluatedFromFullSliceProductRight params strategy family)
+        (commDataProcessedGError params gamma zeta)) :
+    SDDOpRel strategy.state
+      (uniformDistribution (FullSliceQuestion params))
+      (fullSliceProductLeft params strategy family)
+      (fullSliceProductRight params strategy family)
+      (comMainError params gamma zeta) := by
+  /-
+  Paper reference: `references/ldt-paper/commutativity-G.tex`,
+  theorem `thm:com-main`, especially the passage from
+  `eq:evaluate-gcom-at-points` to `eq:evaluate-gcom-at-points-part-dos`
+  and the final displayed error estimate.
+  -/
+  sorry
+
 /-- `thm:com-main`. -/
 theorem comMain
     (params : Parameters)
@@ -696,34 +728,22 @@ theorem comMain
   let hEval :=
     commDataProcessedG params strategy eps delta gamma zeta hgood family G
       hG hcons hself hbound
+  have hSpecialized :
+      SDDOpRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedFromFullSliceProductLeft params strategy family)
+        (evaluatedFromFullSliceProductRight params strategy family)
+        (commDataProcessedGError params gamma zeta) := by
+    constructor
+    rw [evaluationSpecialization_sddErrorOp_eq]
+    exact hEval.evaluatedSliceCommutation.squaredDistanceBound
   refine
     { evaluatedCommutation := hEval
-      evaluationSpecialization := by
-        constructor
-        rw [evaluationSpecialization_sddErrorOp_eq]
-        exact hEval.evaluatedSliceCommutation.squaredDistanceBound
+      evaluationSpecialization := hSpecialized
       fullSliceCommutation := by
-        have hEvalError :
-            sddErrorOp strategy.state
-                (uniformDistribution (EvaluatedSliceQuestion params))
-                (evaluatedFromFullSliceProductLeft params strategy family)
-                (evaluatedFromFullSliceProductRight params strategy family) =
-              sddErrorOp strategy.state
-                (uniformDistribution (EvaluatedSliceQuestion params))
-                (evaluatedSliceProductLeft params strategy family)
-                (evaluatedSliceProductRight params strategy family) :=
-          evaluationSpecialization_sddErrorOp_eq params strategy family
-        -- TODO: Lift evaluated-slice commutation to the full-slice statement
-        -- with the displayed `comMainError` (`thm:com-main`).
-        -- The missing comparison is the paper's pair of Schwartz-Zippel style
-        -- averaging steps from `references/ldt-paper/commutativity-G.tex`
-        -- around `eq:evaluate-gcom-at-points` and
-        -- `eq:evaluate-gcom-at-points-part-dos`:
-        -- 1. compare a full polynomial pair `(g, h)` with its evaluation
-        --    fibers `(g(u), h(v))`, paying the collision error `m * (d / q)`;
-        -- 2. combine that marginalization loss with `hEvalError` and
-        --    `hEval.evaluatedSliceCommutation`.
-        sorry }
+        exact
+          fullSliceCommutation_of_evaluated
+            params strategy family gamma zeta hself hSpecialized }
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}
