@@ -749,6 +749,7 @@ private noncomputable def completePartProjFamily
         postprocessing has its sole outcome equal to the original total
         operator, then apply `projSubMeas_total_proj`.
         -/
+        -- Tracked scaffold for the `commutingWithGComplete` bridge.
         sorry }
 
 /-- Reinterpret the point-with-complete-part commutation bound as a relation on the
@@ -757,7 +758,7 @@ private lemma pointWithCompletePart_as_switcheroo_input
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
+    (gamma : Error)
     (hcomm : SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
       (completePartPointProductLeft params family)
@@ -774,6 +775,7 @@ private lemma pointWithCompletePart_as_switcheroo_input
   should unfold `qSDDOp`, collapse the redundant `Unit` sum, and identify the
   resulting operators definitionally.
   -/
+  -- Tracked scaffold for the `commutingWithGComplete` bridge.
   sorry
 
 /-- The complete-part family inherits self-consistency from the slice family by
@@ -833,6 +835,7 @@ private lemma completePartAggregateCommutation_as_total
   `multiplyByTotalOnRight` produce the same sole outcome operator as
   `completePartTotalProduct*`.
   -/
+  -- Tracked scaffold for the `commutingWithGComplete` bridge.
   sorry
 
 /-- TODO: formalize the paper's scalar inequality
@@ -846,6 +849,7 @@ private lemma firstSwitcherooError_le_commutingWithGCompleteError
     commutativitySwitcherooError zeta zeta
       (Commutativity.comMainError params gamma zeta)
       ≤ commutingWithGCompleteError params gamma zeta := by
+  -- Tracked scaffold for the `commutingWithGComplete` bridge.
   sorry
 
 /-- TODO: formalize the paper's scalar inequality
@@ -858,6 +862,7 @@ private lemma secondSwitcherooError_le_commutingWithGCompleteError
     commutativitySwitcherooError zeta zeta
       (commutingWithGCompleteError params gamma zeta)
       ≤ commutingWithGCompleteError params gamma zeta := by
+  -- Tracked scaffold for the `commutingWithGComplete` bridge.
   sorry
 
 /-- `cor:commuting-with-G-complete`. -/
@@ -871,15 +876,6 @@ theorem commutingWithGComplete
     (hcom : Commutativity.ComMainConclusion params strategy family G gamma zeta)
     (hself : GCompleteSelfConsistencyStatement params strategy.state family zeta) :
     CommutingWithGCompleteStatement params strategy.state family gamma zeta := by
-  have hpair :
-      SDDOpRel strategy.state
-        (uniformDistribution (SlicePairQuestion params))
-        (switcherooPointProductLeft params family family.meas)
-        (switcherooPointProductRight params family family.meas)
-        (pairwiseCompletePartCommutationError params gamma zeta) := by
-    simpa [pairwiseCompletePartCommutationError,
-      Commutativity.fullSliceProductLeft, Commutativity.fullSliceProductRight,
-      Commutativity.leftOrderedProductOpFamily] using hcom.fullSliceCommutation
   have hswitch₁ :
       CommutativitySwitcherooStatement params strategy.state family family.meas
         zeta zeta (pairwiseCompletePartCommutationError params gamma zeta) := by
@@ -938,7 +934,7 @@ theorem commutingWithGComplete
     · exact hself
     · exact completePartProjFamily_selfConsistency params strategy family zeta hself
     · exact pointWithCompletePart_as_switcheroo_input params strategy.state family
-        (commutingWithGCompleteError params gamma zeta) zeta hpoint
+        (commutingWithGCompleteError params gamma zeta) hpoint
   have htotal_raw :
       SDDOpRel strategy.state
         (uniformDistribution (SlicePairQuestion params))
