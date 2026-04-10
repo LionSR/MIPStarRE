@@ -703,6 +703,168 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
   -/
   sorry
 
+/-- Reindexing a uniform slice-pair average along `Prod.swap` preserves `SDDOpRel`. -/
+private lemma sddOpRel_swap_questions
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (A B : IdxOpFamily (SlicePairQuestion params) Outcome (ι × ι))
+    (δ : Error) :
+    SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      A B δ →
+      SDDOpRel ψbi
+        (uniformDistribution (SlicePairQuestion params))
+        (fun q => A (q.2, q.1))
+        (fun q => B (q.2, q.1))
+        δ := by
+  intro ⟨hAB⟩
+  constructor
+  unfold sddErrorOp at *
+  calc
+    avgOver (uniformDistribution (SlicePairQuestion params))
+        (fun q => qSDDOp ψbi (A (q.2, q.1)) (B (q.2, q.1)))
+      =
+        avgOver (uniformDistribution (SlicePairQuestion params))
+          (fun q => qSDDOp ψbi (A q) (B q)) := by
+            symm
+            simpa [SlicePairQuestion] using
+              (CommutativityPoints.avgOver_uniform_equiv
+                (α := SlicePairQuestion params)
+                (β := SlicePairQuestion params)
+                (Equiv.prodComm (Fq params) (Fq params))
+                (fun q => qSDDOp ψbi (A q) (B q)))
+    _ ≤ δ := hAB
+
+/-- The one-outcome projective family whose sole effect is the complete slice part `G^x`. -/
+private noncomputable def completePartProjFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    IdxProjSubMeas (SliceQuestion params) Unit ι :=
+  fun x =>
+    { toSubMeas := completePartSubMeas params family x
+      proj := by
+        /-
+        TODO: unfold `completePartSubMeas` and use that a `Unit`-indexed
+        postprocessing has its sole outcome equal to the original total
+        operator, then apply `projSubMeas_total_proj`.
+        -/
+        -- Tracked scaffold for the `commutingWithGComplete` bridge.
+        sorry }
+
+/-- Reinterpret the point-with-complete-part commutation bound as a relation on the
+`Polynomial × Unit` outcome type expected by `commutativitySwitcheroo`. -/
+private lemma pointWithCompletePart_as_switcheroo_input
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma : Error)
+    (hcomm : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (completePartPointProductLeft params family)
+      (completePartPointProductRight params family)
+      gamma) :
+    SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (switcherooPointProductLeft params family (completePartProjFamily params family))
+      (switcherooPointProductRight params family (completePartProjFamily params family))
+      gamma := by
+  /-
+  TODO: this is a pure reindexing bridge. The source and target families differ
+  only by viewing the `Polynomial` outcome as `Polynomial × Unit`. The proof
+  should unfold `qSDDOp`, collapse the redundant `Unit` sum, and identify the
+  resulting operators definitionally.
+  -/
+  -- Tracked scaffold for the `commutingWithGComplete` bridge.
+  sorry
+
+/-- The complete-part family inherits self-consistency from the slice family by
+pointwise comparison of the `qSDD` defect. -/
+private lemma completePartProjFamily_selfConsistency
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hself : GCompleteSelfConsistencyStatement params strategy.state family zeta) :
+    SDDRel strategy.state
+      (uniformDistribution (SliceQuestion params))
+      (switcherooSelfConsistencyLeft params (completePartProjFamily params family))
+      (switcherooSelfConsistencyRight params (completePartProjFamily params family))
+      zeta := by
+  rcases hself.completePartSelfConsistency with ⟨hself_bound⟩
+  constructor
+  unfold sddError at *
+  calc
+    avgOver (uniformDistribution (SliceQuestion params))
+        (fun x =>
+          qSDD strategy.state
+            ((switcherooSelfConsistencyLeft params (completePartProjFamily params family)) x)
+            ((switcherooSelfConsistencyRight params (completePartProjFamily params family)) x))
+      ≤
+        avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            qSDD strategy.state
+              ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
+              ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x)) := by
+            apply avgOver_mono
+            intro x
+            simpa [switcherooSelfConsistencyLeft, switcherooSelfConsistencyRight,
+              completePartProjFamily, IdxSubMeas.liftLeft, IdxSubMeas.liftRight]
+              using qSDD_completePart_le_slice params strategy.state strategy.permInvState family x
+    _ ≤ zeta := hself_bound
+
+/-- Convert the one-outcome switcheroo aggregate into the total-product family. -/
+private lemma completePartAggregateCommutation_as_total
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma : Error)
+    (hcomm : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (switcherooAggregateLeft params family (completePartProjFamily params family))
+      (switcherooAggregateRight params family (completePartProjFamily params family))
+      gamma) :
+    SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (completePartTotalProductLeft params family)
+      (completePartTotalProductRight params family)
+      gamma := by
+  /-
+  TODO: unfold the one-outcome `switcherooAggregate*` families and use that for
+  `Unit`-indexed submeasurements, `multiplyByTotalOnLeft` and
+  `multiplyByTotalOnRight` produce the same sole outcome operator as
+  `completePartTotalProduct*`.
+  -/
+  -- Tracked scaffold for the `commutingWithGComplete` bridge.
+  sorry
+
+/-- TODO: formalize the paper's scalar inequality
+`12 * sqrt zeta + 4 * sqrt (ν_com) ≤ ν₂`.
+The proof should either use the standing Section 12 normalization assumptions
+`gamma, zeta, d / q ≤ 1`, or split off the large-error cases where the target
+bound is already trivially at least the universal `SDDOpRel` upper bound. -/
+private lemma firstSwitcherooError_le_commutingWithGCompleteError
+    (params : Parameters) [FieldModel params.q]
+    (gamma zeta : Error) :
+    commutativitySwitcherooError zeta zeta
+      (Commutativity.comMainError params gamma zeta)
+      ≤ commutingWithGCompleteError params gamma zeta := by
+  -- Tracked scaffold for the `commutingWithGComplete` bridge.
+  sorry
+
+/-- TODO: formalize the paper's scalar inequality
+`12 * sqrt zeta + 4 * sqrt θ₁ ≤ ν₂`, where `θ₁` is the first switcheroo error.
+As above, this needs the paper-side small-error regime or a separate large-error
+fallback argument. -/
+private lemma secondSwitcherooError_le_commutingWithGCompleteError
+    (params : Parameters) [FieldModel params.q]
+    (gamma zeta : Error) :
+    commutativitySwitcherooError zeta zeta
+      (commutingWithGCompleteError params gamma zeta)
+      ≤ commutingWithGCompleteError params gamma zeta := by
+  -- Tracked scaffold for the `commutingWithGComplete` bridge.
+  sorry
+
 /-- `cor:commuting-with-G-complete`. -/
 theorem commutingWithGComplete
     (params : Parameters)
@@ -714,7 +876,92 @@ theorem commutingWithGComplete
     (hcom : Commutativity.ComMainConclusion params strategy family G gamma zeta)
     (hself : GCompleteSelfConsistencyStatement params strategy.state family zeta) :
     CommutingWithGCompleteStatement params strategy.state family gamma zeta := by
-  sorry
+  have hswitch₁ :
+      CommutativitySwitcherooStatement params strategy.state family family.meas
+        zeta zeta (pairwiseCompletePartCommutationError params gamma zeta) := by
+    simpa [pairwiseCompletePartCommutationError] using
+      commutativitySwitcheroo params strategy.state family family.meas zeta zeta
+        (Commutativity.comMainError params gamma zeta)
+        hself hself.completePartSelfConsistency hcom.fullSliceCommutation
+  have hpoint_raw :
+      SDDOpRel strategy.state
+        (uniformDistribution (SlicePairQuestion params))
+        (completePartPointProductLeft params family)
+        (completePartPointProductRight params family)
+        (commutativitySwitcherooError zeta zeta
+          (pairwiseCompletePartCommutationError params gamma zeta)) := by
+    have hswap :=
+      sddOpRel_swap_questions params strategy.state
+        (switcherooAggregateLeft params family family.meas)
+        (switcherooAggregateRight params family family.meas)
+        (commutativitySwitcherooError zeta zeta
+          (pairwiseCompletePartCommutationError params gamma zeta))
+        hswitch₁.aggregateCommutation
+    have hsymm :=
+      MIPStarRE.LDT.Preliminaries.sddOpRel_symm strategy.state
+        (uniformDistribution (SlicePairQuestion params))
+        (fun q => (switcherooAggregateLeft params family family.meas) (q.2, q.1))
+        (fun q => (switcherooAggregateRight params family family.meas) (q.2, q.1))
+        (commutativitySwitcherooError zeta zeta
+          (pairwiseCompletePartCommutationError params gamma zeta))
+        hswap
+    simpa [switcherooAggregateLeft, switcherooAggregateRight,
+      completePartPointProductLeft, completePartPointProductRight,
+      completePartSubMeas, multiplyByTotalOnRight, multiplyByTotalOnLeft]
+      using hsymm
+  have hpoint :
+      SDDOpRel strategy.state
+        (uniformDistribution (SlicePairQuestion params))
+        (completePartPointProductLeft params family)
+        (completePartPointProductRight params family)
+        (commutingWithGCompleteError params gamma zeta) :=
+    MIPStarRE.LDT.Preliminaries.sddOpRel_mono strategy.state
+      (uniformDistribution (SlicePairQuestion params))
+      (completePartPointProductLeft params family)
+      (completePartPointProductRight params family)
+      (commutativitySwitcherooError zeta zeta
+        (pairwiseCompletePartCommutationError params gamma zeta))
+      (commutingWithGCompleteError params gamma zeta)
+      hpoint_raw
+      (firstSwitcherooError_le_commutingWithGCompleteError params gamma zeta)
+  have hswitch₂ :
+      CommutativitySwitcherooStatement params strategy.state family
+        (completePartProjFamily params family)
+        zeta zeta (commutingWithGCompleteError params gamma zeta) := by
+    apply commutativitySwitcheroo params strategy.state family
+      (completePartProjFamily params family) zeta zeta
+      (commutingWithGCompleteError params gamma zeta)
+    · exact hself
+    · exact completePartProjFamily_selfConsistency params strategy family zeta hself
+    · exact pointWithCompletePart_as_switcheroo_input params strategy.state family
+        (commutingWithGCompleteError params gamma zeta) hpoint
+  have htotal_raw :
+      SDDOpRel strategy.state
+        (uniformDistribution (SlicePairQuestion params))
+        (completePartTotalProductLeft params family)
+        (completePartTotalProductRight params family)
+        (commutativitySwitcherooError zeta zeta
+          (commutingWithGCompleteError params gamma zeta)) := by
+    exact completePartAggregateCommutation_as_total params strategy.state family
+      (commutativitySwitcherooError zeta zeta
+        (commutingWithGCompleteError params gamma zeta))
+      hswitch₂.aggregateCommutation
+  refine
+    { pairwiseCompletePartCommutation := by
+        simpa [pairwiseCompletePartCommutationError,
+          Commutativity.fullSliceProductLeft, Commutativity.fullSliceProductRight,
+          Commutativity.leftOrderedProductOpFamily] using hcom.fullSliceCommutation
+      pointWithCompletePartCommutation := hpoint
+      completePartCommutation :=
+        MIPStarRE.LDT.Preliminaries.sddOpRel_mono strategy.state
+          (uniformDistribution (SlicePairQuestion params))
+          (completePartTotalProductLeft params family)
+          (completePartTotalProductRight params family)
+          (commutativitySwitcherooError zeta zeta
+            (commutingWithGCompleteError params gamma zeta))
+          (commutingWithGCompleteError params gamma zeta)
+          htotal_raw
+          (secondSwitcherooError_le_commutingWithGCompleteError params gamma zeta) }
 
 /-- `cor:commuting-with-G-incomplete`. -/
 theorem commutingWithGIncomplete
