@@ -819,7 +819,6 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
   `eq:evaluate-gcom-at-points` to `eq:evaluate-gcom-at-points-part-dos`
   and the final displayed error estimate.
   -/
-  have _ := hEval
   sorry
 
 /-- The remaining `thm:com-main` lift from evaluated commutation back to

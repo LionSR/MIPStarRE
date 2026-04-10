@@ -388,7 +388,6 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     --   * the compressed action `U * Q_⊥ = V`, packaged as `hU`,
     --   * the trace/kronecker compression calculation with `oneMeasLiftedDensity`,
     --   * `CFC.sqrt_mul_sqrt_self` reducing `√M_a * √M_a` to `M_a`.
-    clear hU V
     sorry
 
 /-! ### Full Naimark dilation (Theorem 5.1) -/

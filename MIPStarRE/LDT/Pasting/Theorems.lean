@@ -1095,8 +1095,7 @@ theorem commutingWithGIncomplete
       _ ≤ commutingWithGIncompleteError params gamma zeta := by
           simpa [commutingWithGIncompleteError] using hcomplete_bound
 
-set_option maxHeartbeats 2000000
-
+set_option maxHeartbeats 2000000 in
 /-- Split the `Option × Option` squared-distance defect into its four quadrants. -/
 private lemma qSDDCore_option_pair_decompose
     {α β : Type*} [Fintype α] [Fintype β]
@@ -1139,6 +1138,7 @@ private lemma qSDDCore_option_pair_decompose
   rw [hss]
   simpa [SS, add_assoc, add_left_comm, add_comm]
 
+set_option maxHeartbeats 2000000 in
 /-- `cor:G-hat-facts`. -/
 theorem gHatFacts
     (params : Parameters)
@@ -1564,8 +1564,6 @@ theorem gHatFacts
               _ = gHatCommutationError params gamma zeta := by
                     simp [gHatCommutationError, sixteenthSum]
                     ring
-
-set_option maxHeartbeats 200000
 
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
