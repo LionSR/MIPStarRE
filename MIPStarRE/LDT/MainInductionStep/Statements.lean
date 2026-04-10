@@ -108,11 +108,8 @@ structure PastingBoundednessInput (params : Parameters)
 
 /-- Bookkeeping package for the restricted-probabilities lemma.
 
-TODO(#195): The paper/blueprint statement uses the same `((m + 1) / m)` loss
-for the diagonal and axis-parallel branches. The extra diagonal-specific
-`q`-based terms here are a temporary consequence of the current diagonal slice
-encoding in `RestrictedSymStrat`; they should disappear once that encoding is
-refactored to produce a genuine restricted diagonal strategy. -/
+Both the axis-parallel and diagonal branches use the paper's
+`((m + 1) / m)` slice-conditioning loss. -/
 structure RestrictedProbabilitiesStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)

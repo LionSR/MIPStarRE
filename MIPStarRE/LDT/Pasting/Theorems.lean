@@ -680,6 +680,7 @@ theorem gBotSelfConsistency
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta omega chi : Error)
@@ -870,6 +871,7 @@ theorem commutingWithGComplete
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
+    (hnorm : strategy.state.IsNormalized)
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (gamma zeta : Error)
@@ -880,7 +882,7 @@ theorem commutingWithGComplete
       CommutativitySwitcherooStatement params strategy.state family family.meas
         zeta zeta (pairwiseCompletePartCommutationError params gamma zeta) := by
     simpa [pairwiseCompletePartCommutationError] using
-      commutativitySwitcheroo params strategy.state family family.meas zeta zeta
+      commutativitySwitcheroo params strategy.state hnorm family family.meas zeta zeta
         (Commutativity.comMainError params gamma zeta)
         hself hself.completePartSelfConsistency hcom.fullSliceCommutation
   have hpoint_raw :
@@ -928,7 +930,7 @@ theorem commutingWithGComplete
       CommutativitySwitcherooStatement params strategy.state family
         (completePartProjFamily params family)
         zeta zeta (commutingWithGCompleteError params gamma zeta) := by
-    apply commutativitySwitcheroo params strategy.state family
+    apply commutativitySwitcheroo params strategy.state hnorm family
       (completePartProjFamily params family) zeta zeta
       (commutingWithGCompleteError params gamma zeta)
     · exact hself
@@ -1588,17 +1590,21 @@ lemma ldSandwichLineOnePoint
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (ψbi : QuantumState (ι × ι))
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : family.Bounded strategy.state zeta)
-    (hfacts : GHatFactsStatement params ψbi family gamma zeta)
+    (hfacts : GHatFactsStatement params strategy.state family gamma zeta)
     (k i : ℕ)
     (hi : i < k) :
     LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i := by
+  have hcomm :
+      ∀ j : ℕ, 2 ≤ j →
+        CommuteGHalfSandwichStatement params strategy.state family gamma zeta j := by
+    intro j hj
+    exact commuteGHalfSandwich params strategy.state family gamma zeta j hj hfacts
   /-
   Deferred core argument from `lem:ld-sandwich-line-one-point` in
   `references/ldt-paper/ld-pasting.tex`.
