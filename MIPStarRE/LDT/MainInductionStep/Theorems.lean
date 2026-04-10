@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Pasting.Theorems
+-- Used by `selfImprovementInInductionSection` bridge (currently sorry):
 import MIPStarRE.LDT.SelfImprovement.Theorems
 
 /-!
@@ -59,6 +60,8 @@ theorem selfImprovementInInductionSection
   sorry
 
 /-- `thm:ld-pasting-in-induction-section`. -/
+-- NOTE: `FieldModel.{0}` is needed to match the universe at which
+-- `Pasting.ldPasting` was elaborated. See PR #288 discussion.
 theorem ldPastingInInductionSection
     (params : Parameters)
     [FieldModel.{0} params.q]
