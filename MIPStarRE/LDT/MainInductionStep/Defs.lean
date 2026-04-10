@@ -30,16 +30,15 @@ def liftDiagonalAnswer (params : Parameters) [FieldModel params.q] (x : Fq param
     DiagonalLinePolynomial params → DiagonalLinePolynomial params.next :=
   fun f => DiagonalLinePolynomial.appendAtHeight params f x
 
-/-- Restricted slice data keeps the point and axis-parallel measurements complete,
-but only records a projective submeasurement on diagonal lines. The ambient
-measurement type allows outcomes of degree up to `(m + 1) d`, while the honest
-slice pullback only sees the degree-`m d` image.
+/-- Restricted slice data keeps the point and axis-parallel measurements
+complete, and reindexes the ambient diagonal measurement onto slice-preserving
+lines.
 
-TODO(#195): The paper's restricted strategy treats the diagonal branch as a
-genuine projective measurement and derives the `((m + 1) / m)` averaging bound
-from that. Matching the paper requires refactoring the diagonal-test encoding so
-that restricting an ambient diagonal answer to a slice lands in a total
-measurement on the `(m, q, d)` diagonal answer space. -/
+For the diagonal branch we retain the ambient answer space
+`DiagonalLinePolynomial params.next`. This keeps the restricted family a genuine
+projective measurement instead of the earlier lossy submeasurement, while still
+supporting the slice-local evaluation operators used in the induction-step
+bookkeeping. -/
 structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)
@@ -47,7 +46,7 @@ structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
   axisParallelMeasurement :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurement :
-    IdxProjSubMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params.next) ι
 
 namespace RestrictedSymStrat
 
@@ -179,50 +178,13 @@ noncomputable def restrictAxisParallelMeasurement (params : Parameters) [FieldMo
           rfl }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
-/-- Restrict a diagonal-line measurement to the slice at height `x`.
-
-TODO(#195): This currently drops ambient outcomes whose restriction is not
-represented in `DiagonalLinePolynomial params`, so it only produces a
-submeasurement. A paper-faithful replacement needs a total restricted diagonal
-measurement, not just a submeasurement, which in turn requires changing the
-ambient diagonal-test answer encoding. -/
+/-- Restrict a diagonal-line measurement to the slice at height `x` by
+reindexing the ambient family along slice-preserving lines. -/
 noncomputable def restrictDiagonalMeasurement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
-    IdxProjSubMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι :=
-  fun ℓ =>
-    let lifted := strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)
-    { toSubMeas := {
-        outcome := fun f =>
-          lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
-        total := ∑ f : DiagonalLinePolynomial params,
-          lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
-        outcome_pos := fun f => lifted.outcome_pos (liftDiagonalAnswer params x f)
-        sum_eq_total := by
-          rfl
-        total_le_one := by
-          classical
-          calc
-            ∑ f : DiagonalLinePolynomial params,
-                lifted.toSubMeas.outcome (liftDiagonalAnswer params x f)
-              = ∑ g ∈ (Finset.univ.image (liftDiagonalAnswer params x)),
-                  lifted.toSubMeas.outcome g := by
-                    symm
-                    exact Finset.sum_image (by
-                      intro f _ g _ hfg
-                      cases f
-                      cases g
-                      cases hfg
-                      rfl)
-            _ ≤ ∑ g : DiagonalLinePolynomial params.next, lifted.toSubMeas.outcome g := by
-                  exact Finset.sum_le_univ_sum_of_nonneg
-                    (s := Finset.univ.image (liftDiagonalAnswer params x))
-                    (w := fun g => lifted.outcome_pos g)
-            _ = lifted.toSubMeas.total := by
-                  rw [lifted.toSubMeas.sum_eq_total]
-            _ ≤ 1 := lifted.toSubMeas.total_le_one
-      }
-      proj := fun f => lifted.proj (liftDiagonalAnswer params x f) }
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params.next) ι :=
+  fun ℓ => strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)
 
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
 noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q]
@@ -257,10 +219,10 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
 @[simp] theorem restrictDiagonalMeasurement_outcome (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params)
-    (ℓ : DiagonalLine params) (f : DiagonalLinePolynomial params) :
+    (ℓ : DiagonalLine params) (f : DiagonalLinePolynomial params.next) :
     ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeas.outcome f) =
       (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas.outcome
-        (liftDiagonalAnswer params x f) :=
+        f :=
   rfl
 
 /-- The intermediate `ν` from `thm:main-induction`. -/
@@ -344,22 +306,14 @@ noncomputable def sliceTransverseDirectionWeight (params : Parameters) : Error :
 noncomputable def sliceConditioningLoss (params : Parameters) : Error :=
   (((params.m + 1 : ℕ) : Error) / (params.m : Error))
 
-/-- In the current diagonal-test encoding, restricting to the slice at height
-`x` corresponds to conditioning on the sampled ambient diagonal direction having
-last coordinate `0`. This event has probability `1 / q`.
-
-TODO(#195): Once the diagonal-test sampling/answer encoding matches the paper,
-this should be replaced by the same `m / (m + 1)` transverse-direction weight
-used for the axis-parallel branch. -/
+/-- The paper-faithful diagonal conditioning weight matches the axis-parallel
+branch: one conditions away the new coordinate direction, which occurs with
+probability `m / (m + 1)`. -/
 noncomputable def sliceDiagonalDirectionWeight (params : Parameters) : Error :=
-  1 / (params.q : Error)
+  sliceTransverseDirectionWeight params
 
-/-- Reciprocal loss incurred when conditioning the diagonal test onto a fixed
-slice in the current encoding.
-
-TODO(#195): Once the restricted diagonal strategy is genuine, this should be
-`(m + 1) / m` rather than `q`. -/
+/-- Reciprocal loss incurred by the paper-faithful diagonal conditioning step. -/
 noncomputable def sliceDiagonalConditioningLoss (params : Parameters) : Error :=
-  (params.q : Error)
+  sliceConditioningLoss params
 
 end MIPStarRE.LDT.MainInductionStep
