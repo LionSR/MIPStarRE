@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Defs
+import MIPStarRE.LDT.Preliminaries.SelfConsistency
 
 /-!
 Statement packaging and scaffold theorems for Section 11 commutativity.
@@ -129,6 +130,233 @@ structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
 
 /-! ## Scaffold theorem statements -/
 
+private def pointNextEquiv (params : Parameters) [FieldModel params.q] :
+    Point params.next ≃ Point params × Fq params where
+  toFun := fun u => (truncatePoint params u, pointHeight params u)
+  invFun := fun ux => appendPoint params ux.1 ux.2
+  left_inv := by
+    intro u
+    funext i
+    by_cases h : i.1 < params.m
+    · simp [appendPoint, truncatePoint, h]
+    · have hi : i.1 = params.m := by
+        have hi_lt : i.1 < params.m + 1 := by
+          simpa [Parameters.next] using i.2
+        omega
+      have hlast : i = lastCoord params := by
+        apply Fin.ext
+        simp [lastCoord, hi]
+      simp [appendPoint, truncatePoint, pointHeight, hlast]
+  right_inv := by
+    rintro ⟨u, x⟩
+    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
+
+private lemma avgOver_uniform_prod
+    {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α → β → Error) :
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) =
+      avgOver (uniformDistribution α)
+        (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
+  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  calc
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2)
+      = ∑ a : α, ∑ b : β,
+          (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b := by
+            simpa [avgOver, uniformDistribution, Fintype.card_prod] using
+              (Fintype.sum_prod_type'
+                (f := fun a : α => fun b : β =>
+                  (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b))
+    _ = ∑ a : α, (1 / (Fintype.card α : Error)) *
+          ((1 / (Fintype.card β : Error)) * ∑ b : β, f a b) := by
+          refine Finset.sum_congr rfl ?_
+          intro a ha
+          calc
+            ∑ b : β, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b
+              = (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * ∑ b : β, f a b := by
+                  rw [← Finset.mul_sum]
+            _ = (1 / (Fintype.card α : Error)) *
+                  ((1 / (Fintype.card β : Error)) * ∑ b : β, f a b) := by
+                    field_simp [hα, hβ]
+                    rw [Nat.cast_mul]
+                    ring
+    _ = avgOver (uniformDistribution α)
+          (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
+          simp [avgOver, uniformDistribution, Finset.mul_sum]
+
+private lemma qBipartiteSSCDefect_eq_half_qSDD_of_proj
+    {α : Type*} [Fintype α]
+    (ψ : QuantumState (ι × ι))
+    (hperm : PermInvState ψ)
+    (P : ProjSubMeas α ι) :
+    qBipartiteSSCDefect ψ P.toSubMeas =
+      (1 / 2 : Error) * qSDD ψ P.toSubMeas.liftLeft P.toSubMeas.liftRight := by
+  have hgap_nonneg :
+      0 ≤
+        ev ψ (leftTensor (ι₂ := ι) P.toSubMeas.total) -
+          ∑ a : α, ev ψ (opTensor (P.outcome a) (P.outcome a)) := by
+    have hterm :
+        ∀ a : α,
+          ev ψ (opTensor (P.outcome a) (P.outcome a)) ≤
+            ev ψ (leftTensor (ι₂ := ι) (P.outcome a)) := by
+      intro a
+      have hop_le :
+          opTensor (P.outcome a) (P.outcome a) ≤
+            leftTensor (ι₂ := ι) (P.outcome a) := by
+        have hrewrite :
+            leftTensor (ι₂ := ι) (P.outcome a) -
+                opTensor (P.outcome a) (P.outcome a) =
+              opTensor (P.outcome a) (1 - P.outcome a) := by
+          have hneg :
+              Matrix.kronecker (P.outcome a) (-P.outcome a) =
+                -Matrix.kronecker (P.outcome a) (P.outcome a) := by
+            simpa using
+              (Matrix.kronecker_smul (-1 : ℂ) (P.outcome a) (P.outcome a))
+          calc
+            leftTensor (ι₂ := ι) (P.outcome a) -
+                opTensor (P.outcome a) (P.outcome a)
+              = Matrix.kronecker (P.outcome a) 1 +
+                  Matrix.kronecker (P.outcome a) (-P.outcome a) := by
+                    rw [hneg]
+                    simp [leftTensor, opTensor, sub_eq_add_neg]
+            _ = Matrix.kronecker (P.outcome a) (1 - P.outcome a) := by
+                  simpa [sub_eq_add_neg] using
+                    (Matrix.kronecker_add (P.outcome a) 1 (-P.outcome a)).symm
+            _ = opTensor (P.outcome a) (1 - P.outcome a) := by
+                  simp [opTensor]
+        change
+          (leftTensor (ι₂ := ι) (P.outcome a) -
+              opTensor (P.outcome a) (P.outcome a)).PosSemidef
+        rw [hrewrite]
+        change Matrix.PosSemidef (Matrix.kronecker (P.outcome a) (1 - P.outcome a))
+        exact
+          Matrix.PosSemidef.kronecker
+            (Matrix.nonneg_iff_posSemidef.mp (P.outcome_pos a))
+            (Matrix.nonneg_iff_posSemidef.mp
+              (sub_nonneg.mpr (P.toSubMeas.outcome_le_one a)))
+      exact ev_mono ψ _ _ hop_le
+    have hsum :
+        ∑ a : α, ev ψ (opTensor (P.outcome a) (P.outcome a)) ≤
+          ∑ a : α, ev ψ (leftTensor (ι₂ := ι) (P.outcome a)) := by
+      exact Finset.sum_le_sum fun a _ => hterm a
+    have htotal :
+        ∑ a : α, ev ψ (leftTensor (ι₂ := ι) (P.outcome a)) =
+          ev ψ (leftTensor (ι₂ := ι) P.toSubMeas.total) := by
+      rw [← ev_sum ψ (fun a : α => leftTensor (ι₂ := ι) (P.outcome a))]
+      simp [leftTensor_finset_sum, P.toSubMeas.sum_eq_total]
+    linarith
+  have hq :
+      qSDD ψ P.toSubMeas.liftLeft P.toSubMeas.liftRight =
+        2 *
+          (ev ψ (leftTensor (ι₂ := ι) P.toSubMeas.total) -
+            ∑ a : α, ev ψ (opTensor (P.outcome a) (P.outcome a))) := by
+    unfold qSDD qSDDCore
+    calc
+      ∑ a : α,
+          ev ψ
+            (((P.toSubMeas.liftLeft.outcome a - P.toSubMeas.liftRight.outcome a)ᴴ) *
+              (P.toSubMeas.liftLeft.outcome a - P.toSubMeas.liftRight.outcome a))
+        =
+          ∑ a : α,
+            (ev ψ (leftTensor (ι₂ := ι) (P.outcome a)) +
+              ev ψ (rightTensor (ι₁ := ι) (P.outcome a)) -
+              2 * ev ψ (opTensor (P.outcome a) (P.outcome a))) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            let LA : MIPStarRE.Quantum.Op (ι × ι) :=
+              leftTensor (ι₂ := ι) (P.outcome a)
+            let RA : MIPStarRE.Quantum.Op (ι × ι) :=
+              rightTensor (ι₁ := ι) (P.outcome a)
+            have hLA_herm : LAᴴ = LA := by
+              exact
+                (Matrix.nonneg_iff_posSemidef.mp
+                  (leftTensor_nonneg (ι₂ := ι) (P.outcome_pos a))).isHermitian.eq
+            have hRA_herm : RAᴴ = RA := by
+              exact
+                (Matrix.nonneg_iff_posSemidef.mp
+                  (rightTensor_nonneg (ι₁ := ι) (P.outcome_pos a))).isHermitian.eq
+            have hLA_proj : LA * LA = LA := by
+              calc
+                LA * LA
+                  = leftTensor (ι₂ := ι) (P.outcome a * P.outcome a) := by
+                      dsimp [LA]
+                      simp [leftTensor_mul_leftTensor]
+                _ = LA := by
+                      rw [P.proj a]
+            have hRA_proj : RA * RA = RA := by
+              calc
+                RA * RA
+                  = rightTensor (ι₁ := ι) (P.outcome a * P.outcome a) := by
+                      dsimp [RA]
+                      simp [rightTensor_mul_rightTensor]
+                _ = RA := by
+                      rw [P.proj a]
+            have hcomm :
+                LA * RA = RA * LA := by
+              calc
+                LA * RA
+                  = opTensor (P.outcome a) (P.outcome a) := by
+                      dsimp [LA, RA]
+                      rw [leftTensor_mul_rightTensor_eq_opTensor]
+                _ = RA * LA := by
+                      dsimp [RA, LA]
+                      simpa [rightTensor, leftTensor, opTensor] using
+                        (Matrix.mul_kronecker_mul
+                          (1 : MIPStarRE.Quantum.Op ι) (P.outcome a)
+                          (P.outcome a) (1 : MIPStarRE.Quantum.Op ι))
+            have hmul :
+                (LA - RA) * (LA - RA) = LA * LA - LA * RA - RA * LA + RA * RA := by
+              noncomm_ring
+            calc
+              ev ψ (((LA - RA)ᴴ) * (LA - RA))
+                = ev ψ (LA + RA - (2 : Error) • (LA * RA)) := by
+                    rw [show (LA - RA)ᴴ = LA - RA by simp [hLA_herm, hRA_herm]]
+                    rw [hmul, hLA_proj, hRA_proj, hcomm]
+                    simp [two_smul, sub_eq_add_neg, add_assoc, add_left_comm, add_comm]
+              _ = ev ψ LA + ev ψ RA - 2 * ev ψ (LA * RA) := by
+                    rw [ev_sub, ev_add]
+                    have hscale : ev ψ ((2 : Error) • (LA * RA)) = 2 * ev ψ (LA * RA) := by
+                      simpa using (ev_scale ψ (2 : Error) (LA * RA))
+                    rw [hscale]
+              _ = ev ψ (leftTensor (ι₂ := ι) (P.outcome a)) +
+                    ev ψ (rightTensor (ι₁ := ι) (P.outcome a)) -
+                    2 * ev ψ (opTensor (P.outcome a) (P.outcome a)) := by
+                      dsimp [LA, RA]
+                      rw [leftTensor_mul_rightTensor_eq_opTensor]
+      _ =
+          ∑ a : α,
+            2 *
+              (ev ψ (leftTensor (ι₂ := ι) (P.outcome a)) -
+                ev ψ (opTensor (P.outcome a) (P.outcome a))) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            rw [hperm.swap_ev (P.outcome a)]
+            ring
+      _ = 2 *
+          ∑ a : α,
+            (ev ψ (leftTensor (ι₂ := ι) (P.outcome a)) -
+              ev ψ (opTensor (P.outcome a) (P.outcome a))) := by
+            rw [← Finset.mul_sum]
+      _ = 2 *
+          (ev ψ (leftTensor (ι₂ := ι) P.toSubMeas.total) -
+            ∑ a : α, ev ψ (opTensor (P.outcome a) (P.outcome a))) := by
+            congr 1
+            rw [Finset.sum_sub_distrib]
+            rw [← ev_sum ψ (fun a : α => leftTensor (ι₂ := ι) (P.outcome a))]
+            simp [leftTensor_finset_sum, P.toSubMeas.sum_eq_total]
+  calc
+    qBipartiteSSCDefect ψ P.toSubMeas
+      = ev ψ (leftTensor (ι₂ := ι) P.toSubMeas.total) -
+          ∑ a : α, ev ψ (opTensor (P.outcome a) (P.outcome a)) := by
+            rw [qBipartiteSSCDefect, max_eq_right hgap_nonneg]
+    _ = (1 / 2 : Error) * qSDD ψ P.toSubMeas.liftLeft P.toSubMeas.liftRight := by
+          rw [hq]
+          ring
+
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG
     (params : Parameters)
@@ -147,21 +375,142 @@ lemma commDataProcessedG
     { familyG := hG
       postprocessedPointConsistency := ?_
       postprocessedSelfConsistency := by
-        -- TODO: Derive self-consistency of the postprocessed left/right
-        -- evaluated point families from `hself` (`lem:comm-data-processed-g`).
-        -- A clean proof will likely reindex the average over
-        -- `Point params.next` to expose the pointwise target over `(u, x)`:
-        -- for each slice height `x` and truncation point `u`, we need a bridge
-        -- from the slice-level `SDDRel`
-        -- `hself.sliceSelfConsistency : G^x_g ⊗ I ≈_ζ I ⊗ G^x_g`
-        -- to its postprocessed form
-        -- `G^x_[g(u)=a] ⊗ I ≈_ζ I ⊗ G^x_[g(u)=a]`.
-        -- A clean route would be either:
-        -- 1. a direct `qSDD` monotonicity lemma for postprocessing opposite-side
-        --    lifts, or
-        -- 2. a `PermInvState strategy.state` witness so we can route through
-        --    `twoNotionsOfSelfConsistencyAfterEvaluation`.
-        sorry
+        have hsliceSSC :
+            BipartiteSSCRel strategy.state
+              (uniformDistribution (Fq params))
+              (IdxProjSubMeas.toIdxSubMeas family.meas)
+              (zeta / 2) := by
+          constructor
+          calc
+            bipartiteSSCError strategy.state
+                (uniformDistribution (Fq params))
+                (IdxProjSubMeas.toIdxSubMeas family.meas)
+              = (1 / 2 : Error) *
+                  sddError strategy.state
+                    (uniformDistribution (Fq params))
+                    (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas))
+                    (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) := by
+                  unfold bipartiteSSCError sddError
+                  rw [avgOver_congr (uniformDistribution (Fq params))
+                    (fun x =>
+                      qBipartiteSSCDefect strategy.state
+                        ((IdxProjSubMeas.toIdxSubMeas family.meas) x))
+                    (fun x =>
+                      (1 / 2 : Error) *
+                        qSDD strategy.state
+                          (((family.meas x).toSubMeas).liftLeft)
+                          (((family.meas x).toSubMeas).liftRight))
+                    (fun x => qBipartiteSSCDefect_eq_half_qSDD_of_proj
+                      strategy.state strategy.permInvState (family.meas x))]
+                  rw [avgOver_const_mul]
+                  rfl
+            _ ≤ (1 / 2 : Error) * zeta := by
+                  exact mul_le_mul_of_nonneg_left
+                    hself.sliceSelfConsistency.squaredDistanceBound (by positivity)
+            _ = zeta / 2 := by ring
+        have hpost :
+            ∀ u : Point params,
+              SDDRel strategy.state
+                (uniformDistribution (Fq params))
+                (IdxSubMeas.liftLeft
+                  (fun x => evaluateAt params u ((family.meas x).toSubMeas)))
+                (IdxSubMeas.liftRight
+                  (fun x => evaluateAt params u ((family.meas x).toSubMeas)))
+                zeta := by
+          intro u
+          have htmp :=
+            Preliminaries.twoNotionsOfSelfConsistencyAfterEvaluation
+              strategy.state
+              strategy.permInvState
+              (uniformDistribution (Fq params))
+              (IdxProjSubMeas.toIdxSubMeas family.meas)
+              (zeta / 2)
+              (fun g => g u)
+              hsliceSSC
+          refine ⟨?_⟩
+          have hbound :
+              sddError strategy.state
+                (uniformDistribution (Fq params))
+                (IdxSubMeas.liftLeft
+                  (fun x => evaluateAt params u ((family.meas x).toSubMeas)))
+                (IdxSubMeas.liftRight
+                  (fun x => evaluateAt params u ((family.meas x).toSubMeas))) ≤
+              2 * (zeta / 2) := by
+            simpa [evaluateAt] using htmp.squaredDistanceBound
+          calc
+            sddError strategy.state
+                (uniformDistribution (Fq params))
+                (IdxSubMeas.liftLeft
+                  (fun x => evaluateAt params u ((family.meas x).toSubMeas)))
+                (IdxSubMeas.liftRight
+                  (fun x => evaluateAt params u ((family.meas x).toSubMeas)))
+              ≤ 2 * (zeta / 2) := hbound
+            _ = zeta := by ring
+        constructor
+        let e := pointNextEquiv params
+        let f :
+            Point params → Fq params → Error :=
+          fun u x =>
+            qSDD strategy.state
+              (leftPlacedSubMeas (ιB := ι)
+                (evaluateAt params u ((family.meas x).toSubMeas)))
+              (rightPlacedSubMeas (ιA := ι)
+                (evaluateAt params u ((family.meas x).toSubMeas)))
+        rw [sddError]
+        calc
+          avgOver (uniformDistribution (Point params.next))
+              (fun w =>
+                qSDD strategy.state
+                  (evaluatedPointFamilyLeft params family w)
+                  (evaluatedPointFamilyRight params family w))
+            = avgOver (uniformDistribution (Point params × Fq params))
+                (fun ux => f ux.1 ux.2) := by
+                    calc
+                      avgOver (uniformDistribution (Point params.next))
+                          (fun w =>
+                            qSDD strategy.state
+                              (evaluatedPointFamilyLeft params family w)
+                              (evaluatedPointFamilyRight params family w))
+                        = avgOver (uniformDistribution (Point params × Fq params))
+                            (fun ux =>
+                              qSDD strategy.state
+                                (evaluatedPointFamilyLeft params family (e.symm ux))
+                                (evaluatedPointFamilyRight params family (e.symm ux))) :=
+                            avgOver_uniform_equiv e
+                              (fun w =>
+                                qSDD strategy.state
+                                  (evaluatedPointFamilyLeft params family w)
+                                  (evaluatedPointFamilyRight params family w))
+                      _ = avgOver (uniformDistribution (Point params × Fq params))
+                            (fun ux => f ux.1 ux.2) := by
+                              apply avgOver_congr
+                              intro ux
+                              rcases ux with ⟨u, x⟩
+                              change qSDD strategy.state
+                                (evaluatedPointFamilyLeft params family (appendPoint params u x))
+                                (evaluatedPointFamilyRight params family (appendPoint params u x)) =
+                                  qSDD strategy.state
+                                    (leftPlacedSubMeas (ιB := ι)
+                                      (evaluateAt params u ((family.meas x).toSubMeas)))
+                                    (rightPlacedSubMeas (ιA := ι)
+                                      (evaluateAt params u ((family.meas x).toSubMeas)))
+                              simp [evaluatedPointFamilyLeft, evaluatedPointFamilyRight,
+                                evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint,
+                                evaluateAt, truncatePoint_appendPoint, pointHeight_appendPoint]
+          _ = avgOver (uniformDistribution (Point params))
+                (fun u => avgOver (uniformDistribution (Fq params)) (fun x => f u x)) := by
+                  exact avgOver_uniform_prod f
+          _ ≤ avgOver (uniformDistribution (Point params)) (fun _ => zeta) := by
+                apply avgOver_mono
+                intro u
+                exact (hpost u).squaredDistanceBound
+          _ = zeta := by
+                have hq0 : (params.q : Error) ≠ 0 := by
+                  exact_mod_cast Nat.ne_of_gt params.hq
+                have hq : ((params.q : Error) ^ params.m) ≠ 0 := by
+                  exact pow_ne_zero params.m hq0
+                simp [avgOver, uniformDistribution]
+                field_simp [hq]
       stabilityOne := by
         -- TODO: Prove the first insertion/removal stability step for the
         -- trailing `G^y` factor while keeping Bob's right-register point
