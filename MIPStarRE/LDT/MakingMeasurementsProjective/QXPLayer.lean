@@ -100,6 +100,8 @@ structure RankReductionWitness {Outcome : Type*}
     ∀ a : Outcome, 0 ≤ Qa data a
   sum_eq_total :
     ∑ a, Qa data a = QTotal data
+  source_almost_projective :
+    ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ
   closeness :
     SDDOpRel ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
@@ -480,14 +482,217 @@ lemma qCompleteness {Outcome : Type*}
     (hζ_small : ζ ≤ 1 / (4 : Error)) :
     RankReductionWitness ψ A ζ data →
       ev ψ (QTotal data) ≥ 1 - 11 * zetaQuarterRoot ζ := by
-  intro h
-  -- The paper proof combines two Cauchy-Schwarz comparisons:
-  -- `⟨Q, Q - A⟩` and `⟨Q - A, A⟩`, then uses `source_almost_projective`.
-  -- The current scaffolding still needs the scalar `rpow/sqrt` bookkeeping
-  -- and operator-expectation algebra in Lean, in addition to using the
-  -- normalization and small-`ζ` hypotheses threaded explicitly here.
-  -- TODO: prove (issue #197)
-  sorry
+  intro hRank
+  let diagA : Error := ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a)
+  let qMass : Error := ev ψ (QTotal data)
+  let overlap : Error := ∑ a : Outcome, ev ψ (A.outcome a * Qa data a)
+  have hsdd :
+      qSDDOp ψ (A.toSubMeas : OpFamily Outcome ι) data.q ≤
+        roundingToProjectiveError ζ := by
+    simpa [SDDOpRel, sddErrorOp, avgOver, uniformDistribution, constOpFamily, qSDDOp]
+      using hRank.closeness.squaredDistanceBound
+  have hdiagA_nonneg : 0 ≤ diagA := by
+    unfold diagA
+    exact Finset.sum_nonneg fun a _ => by
+      simpa [Measurement.outcome_hermitian] using ev_adjoint_self_nonneg ψ (A.outcome a)
+  have hdiagA_le_one : diagA ≤ 1 := by
+    simpa [diagA] using
+      MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ A.toSubMeas
+  have hsqrt_diagA_le_one : Real.sqrt diagA ≤ 1 := by
+    simpa using Real.sqrt_le_sqrt hdiagA_le_one
+  have hdiagA_lb : 1 - 2 * ζ ≤ diagA := by
+    have hsource := hRank.source_almost_projective
+    have hsum :
+        ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) = 1 - diagA := by
+      calc
+        ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a)
+            = ∑ a, (ev ψ (A.outcome a) - ev ψ (A.outcome a * A.outcome a)) := by
+                refine Finset.sum_congr rfl ?_
+                intro a _
+                exact ev_sub ψ (A.outcome a) (A.outcome a * A.outcome a)
+        _ = (∑ a, ev ψ (A.outcome a)) - ∑ a, ev ψ (A.outcome a * A.outcome a) := by
+              rw [Finset.sum_sub_distrib]
+        _ = 1 - diagA := by
+              rw [← ev_sum ψ A.outcome, A.sum_eq]
+              simp [diagA, ev_one_of_isNormalized ψ hψ]
+    linarith [hsource, hsum]
+  have hqtotal_nonneg : 0 ≤ QTotal data := by
+    rw [← hRank.sum_eq_total]
+    exact Finset.sum_nonneg fun a _ => hRank.outcome_nonneg a
+  have hq_nonneg : 0 ≤ qMass := by
+    exact ev_nonneg_of_psd ψ (QTotal data) hqtotal_nonneg
+  have hdiagQ_eq :
+      ∑ a : Outcome, ev ψ (Qa data a * Qa data a) = qMass := by
+    calc
+      ∑ a : Outcome, ev ψ (Qa data a * Qa data a)
+          = ∑ a : Outcome, ev ψ (Qa data a) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              rw [(hRank.projective a).idempotent]
+      _ = ev ψ (QTotal data) := by
+            rw [← ev_sum ψ (Qa data), hRank.sum_eq_total]
+  have hoverlap_le : overlap ≤ Real.sqrt diagA * Real.sqrt qMass := by
+    have hoverlap_abs :
+        |overlap| ≤ Real.sqrt diagA * Real.sqrt qMass := by
+      calc
+        |overlap|
+            = |∑ a : Outcome, ev ψ (A.outcome a * Qa data a)| := by
+                simp [overlap]
+        _ ≤ ∑ a : Outcome, |ev ψ (A.outcome a * Qa data a)| := by
+              exact Finset.abs_sum_le_sum_abs _ _
+        _ ≤ ∑ a : Outcome,
+              Real.sqrt (ev ψ (A.outcome a * A.outcome a)) *
+                Real.sqrt (ev ψ (Qa data a * Qa data a)) := by
+              refine Finset.sum_le_sum ?_
+              intro a _
+              simpa [Measurement.outcome_hermitian,
+                (hRank.projective a).isHermitian.eq] using
+                ev_abs_mul_le_sqrt ψ (A.outcome a) (Qa data a)
+        _ ≤ Real.sqrt diagA *
+              Real.sqrt (∑ a : Outcome, ev ψ (Qa data a * Qa data a)) := by
+              simpa [diagA] using
+                Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
+                  (f := fun a => ev ψ (A.outcome a * A.outcome a))
+                  (g := fun a => ev ψ (Qa data a * Qa data a))
+                  (fun a => by
+                    simpa [Measurement.outcome_hermitian] using
+                      ev_adjoint_self_nonneg ψ (A.outcome a))
+                  (fun a => by
+                    simpa [(hRank.projective a).isHermitian.eq] using
+                      ev_adjoint_self_nonneg ψ (Qa data a))
+        _ = Real.sqrt diagA * Real.sqrt qMass := by rw [hdiagQ_eq]
+    exact (abs_le.mp hoverlap_abs).2
+  have h_expand :
+      qSDDOp ψ (A.toSubMeas : OpFamily Outcome ι) data.q =
+        diagA + qMass - 2 * overlap := by
+    unfold qSDDOp qSDDCore
+    calc
+      ∑ a, ev ψ ((A.outcome a - Qa data a)ᴴ * (A.outcome a - Qa data a))
+        = ∑ a, (ev ψ (A.outcome a * A.outcome a) +
+            ev ψ (Qa data a * Qa data a) -
+            2 * ev ψ (A.outcome a * Qa data a)) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              have hcomm :
+                  ev ψ (Qa data a * A.outcome a) =
+                    ev ψ (A.outcome a * Qa data a) := by
+                exact ev_mul_comm_of_psd ψ _ _ (hRank.outcome_nonneg a) (A.outcome_pos a)
+              calc
+                ev ψ ((A.outcome a - Qa data a)ᴴ * (A.outcome a - Qa data a))
+                    = ev ψ ((A.outcome a * A.outcome a -
+                        A.outcome a * Qa data a) -
+                        (Qa data a * A.outcome a -
+                          Qa data a * Qa data a)) := by
+                          congr 1
+                          simp [sub_mul, mul_sub, Measurement.outcome_hermitian,
+                            (hRank.projective a).isHermitian.eq]
+                          abel
+                _ = ev ψ (A.outcome a * A.outcome a) -
+                      ev ψ (A.outcome a * Qa data a) -
+                      (ev ψ (Qa data a * A.outcome a) -
+                        ev ψ (Qa data a * Qa data a)) := by
+                        rw [ev_sub, ev_sub, ev_sub]
+                _ = ev ψ (A.outcome a * A.outcome a) +
+                      ev ψ (Qa data a * Qa data a) -
+                      2 * ev ψ (A.outcome a * Qa data a) := by
+                        rw [hcomm]
+                        ring
+      _ = (∑ a, ev ψ (A.outcome a * A.outcome a)) +
+            (∑ a, ev ψ (Qa data a * Qa data a)) -
+            2 * ∑ a, ev ψ (A.outcome a * Qa data a) := by
+              rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.mul_sum]
+      _ = diagA + qMass - 2 * overlap := by
+            simp [diagA, overlap, hdiagQ_eq]
+  have hsq_gap :
+      (Real.sqrt qMass - Real.sqrt diagA) ^ (2 : Nat) ≤
+        roundingToProjectiveError ζ := by
+    calc
+      (Real.sqrt qMass - Real.sqrt diagA) ^ (2 : Nat)
+          = qMass + diagA - 2 * (Real.sqrt diagA * Real.sqrt qMass) := by
+              nlinarith [Real.sq_sqrt hq_nonneg, Real.sq_sqrt hdiagA_nonneg]
+      _ ≤ qMass + diagA - 2 * overlap := by
+            nlinarith [hoverlap_le]
+      _ = qSDDOp ψ (A.toSubMeas : OpFamily Outcome ι) data.q := by
+            rw [h_expand]
+            ring
+      _ ≤ roundingToProjectiveError ζ := hsdd
+  have hround_nonneg : 0 ≤ roundingToProjectiveError ζ := by
+    dsimp [roundingToProjectiveError, spectralTruncationError]
+    exact mul_nonneg (by norm_num) (Real.rpow_nonneg hζ _)
+  have habs :
+      |Real.sqrt qMass - Real.sqrt diagA| ≤ Real.sqrt (roundingToProjectiveError ζ) := by
+    refine abs_le_of_sq_le_sq' ?_ (Real.sqrt_nonneg _) |>.2
+    calc
+      |Real.sqrt qMass - Real.sqrt diagA| ^ 2
+          = (Real.sqrt qMass - Real.sqrt diagA) ^ (2 : Nat) := by
+              rw [sq_abs]
+      _ ≤ roundingToProjectiveError ζ := hsq_gap
+      _ = (Real.sqrt (roundingToProjectiveError ζ)) ^ (2 : Nat) := by
+            calc
+              roundingToProjectiveError ζ
+                  = Real.sqrt (roundingToProjectiveError ζ) *
+                      Real.sqrt (roundingToProjectiveError ζ) := by
+                        nlinarith [Real.sq_sqrt hround_nonneg]
+              _ = (Real.sqrt (roundingToProjectiveError ζ)) ^ (2 : Nat) := by
+                    simp [pow_two]
+  have hsqrt_q_lb :
+      Real.sqrt qMass ≥ Real.sqrt diagA - Real.sqrt (roundingToProjectiveError ζ) := by
+    have hleft := (abs_le.mp habs).1
+    linarith
+  have hq_lb :
+      qMass ≥ diagA - 2 * Real.sqrt (roundingToProjectiveError ζ) := by
+    let s : Error := Real.sqrt (roundingToProjectiveError ζ)
+    let x : Error := Real.sqrt qMass
+    let y : Error := Real.sqrt diagA
+    have hxy : x ≥ y - s := by
+      dsimp [x, y, s]
+      exact hsqrt_q_lb
+    by_cases hys : y ≤ s
+    · have htarget : diagA - 2 * Real.sqrt (roundingToProjectiveError ζ) ≤ 0 := by
+        dsimp [y, s] at hys ⊢
+        nlinarith [Real.sq_sqrt hdiagA_nonneg]
+      linarith
+    · have hs_le_y : s ≤ y := le_of_not_ge hys
+      have hy_sub_nonneg : 0 ≤ y - s := by linarith
+      have hx_sq_ge : x ^ (2 : Nat) ≥ (y - s) ^ (2 : Nat) := by
+        nlinarith
+      have hx_sq_ge' :
+          qMass ≥ diagA -
+            2 * Real.sqrt diagA * Real.sqrt (roundingToProjectiveError ζ) +
+            roundingToProjectiveError ζ := by
+        dsimp [x, y, s] at hx_sq_ge
+        nlinarith [hx_sq_ge, Real.sq_sqrt hq_nonneg, Real.sq_sqrt hdiagA_nonneg,
+          Real.sq_sqrt hround_nonneg]
+      have hcross :
+          2 * Real.sqrt diagA * Real.sqrt (roundingToProjectiveError ζ) ≤
+            2 * Real.sqrt (roundingToProjectiveError ζ) := by
+        have hmul :
+            Real.sqrt diagA * Real.sqrt (roundingToProjectiveError ζ) ≤
+              1 * Real.sqrt (roundingToProjectiveError ζ) := by
+          exact mul_le_mul_of_nonneg_right hsqrt_diagA_le_one (Real.sqrt_nonneg _)
+        nlinarith
+      linarith [hx_sq_ge', hcross, hround_nonneg]
+  have hzeta_term :
+      2 * ζ ≤ 2 * zetaQuarterRoot ζ := by
+    gcongr
+    exact zeta_le_zetaQuarterRoot ζ hζ hζ_small
+  have hround_term :
+      2 * Real.sqrt (roundingToProjectiveError ζ) ≤ 8 * zetaQuarterRoot ζ := by
+    have hsqrt_bound := sqrt_roundingToProjectiveError_le_four_zetaQuarterRoot ζ hζ
+    nlinarith
+  calc
+    ev ψ (QTotal data) = qMass := rfl
+    _ ≥ diagA - 2 * Real.sqrt (roundingToProjectiveError ζ) := hq_lb
+    _ ≥ (1 - 2 * ζ) - 2 * Real.sqrt (roundingToProjectiveError ζ) := by
+          gcongr
+    _ ≥ (1 - 2 * zetaQuarterRoot ζ) - 8 * zetaQuarterRoot ζ := by
+          linarith
+    _ = 1 - 10 * zetaQuarterRoot ζ := by ring
+    _ ≥ 1 - 11 * zetaQuarterRoot ζ := by
+          have hzqr_nonneg : 0 ≤ zetaQuarterRoot ζ := by
+            dsimp [zetaQuarterRoot]
+            exact Real.rpow_nonneg hζ _
+          linarith
 
 /-- **Completeness of `sqrt Q`** (`lem:sqrt-Q-completeness`).
 
