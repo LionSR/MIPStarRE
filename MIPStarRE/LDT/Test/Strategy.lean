@@ -51,47 +51,93 @@ structure SymStrat (params : Parameters) [FieldModel params.q]
 -- projective measurement families is non-canonical and requires additional
 -- assumptions on outcome types.
 
-/-- Encoded samples `(u₀, i, t)` for the axis-parallel lines test. -/
-abbrev AxisParallelTestSample (params : Parameters) := Point params × (Fin params.m × Fq params)
+/-- Encoded samples `(u, i)` for the axis-parallel lines test.
+The paper samples a random point `u ∈ F_q^m` and a coordinate
+`i ∈ {1, …, m}`, forming the axis-parallel line through `u`
+in the `i`-th direction. -/
+abbrev AxisParallelTestSample (params : Parameters) :=
+  Point params × Fin params.m
 
-/-- Encoded samples `(u₀, v, t)` for the diagonal lines test. -/
-abbrev DiagonalTestSample (params : Parameters) := Point params × (Point params × Fq params)
+/-- Extend restricted direction coordinates to a full direction vector.
+For restriction index `j` (0-indexed), the first `j + 1` coordinates
+are the given free coordinates and the remaining are zero.
+This matches the paper's convention that `v` has its last `m − i`
+coordinates zero, where `i = j + 1`. -/
+def extendRestrictedDirection {params : Parameters}
+    [FieldModel params.q] (j : Fin params.m)
+    (freeCoords : Fin (j.val + 1) → Fq params) :
+    Point params :=
+  fun k =>
+    if h : k.val ≤ j.val then
+      freeCoords ⟨k.val, Nat.lt_succ_of_le h⟩
+    else zeroCoord
 
-/-- Sampled point answers in the axis-parallel lines test. -/
-noncomputable def axisParallelPointAnswerFamily {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+/-- Encoded samples `(u, freeCoords)` for the `j`-restricted diagonal
+lines test. The base point `u ∈ F_q^m` and the free coordinates of
+the restricted direction (first `j + 1` coordinates; rest are zero).
+The full diagonal test averages over `j ∈ {0, …, m − 1}`. -/
+abbrev RestrictedDiagonalSample (params : Parameters)
+    (j : Fin params.m) :=
+  Point params × (Fin (j.val + 1) → Fq params)
+
+/-- Sampled point answers in the axis-parallel lines test.
+The point player receives `u` (the base point) and answers with
+their measurement at `u`. -/
+noncomputable def axisParallelPointAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) :
-    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
-  fun s =>
-    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
-    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeas
+    IdxSubMeas (AxisParallelTestSample params)
+      (Fq params) ι :=
+  fun s => (strategy.pointMeasurement s.1).toSubMeas
 
-/-- Sampled line answers, evaluated at the sampled parameter, in the axis-parallel lines test. -/
-noncomputable def axisParallelLineAnswerFamily {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+/-- Sampled line answers in the axis-parallel lines test,
+evaluated at the base point `u`.
+The line player receives `ℓ` and returns a polynomial `f`.
+The verifier checks `f(u) = a`; since `u = ℓ.pointAt zeroCoord`,
+we evaluate `f` at `zeroCoord`. -/
+noncomputable def axisParallelLineAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) :
-    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
+    IdxSubMeas (AxisParallelTestSample params)
+      (Fq params) ι :=
   fun s =>
-    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
-    postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
+    let ℓ : AxisParallelLine params :=
+      { base := s.1, direction := s.2 }
+    postprocess
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+      (· zeroCoord)
 
-/-- Sampled point answers in the diagonal lines test. -/
-noncomputable def diagonalPointAnswerFamily {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι) :
-    IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
-  fun s =>
-    let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
-    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeas
+/-- Sampled point answers in the `j`-restricted diagonal test.
+The point player receives `u` and answers at `u`. -/
+noncomputable def diagonalPointAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι)
+    (j : Fin params.m) :
+    IdxSubMeas (RestrictedDiagonalSample params j)
+      (Fq params) ι :=
+  fun s => (strategy.pointMeasurement s.1).toSubMeas
 
-/-- Sampled diagonal-line answers, evaluated at the sampled parameter. -/
-noncomputable def diagonalLineAnswerFamily {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι) :
-    IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
+/-- Sampled diagonal-line answers in the `j`-restricted diagonal
+test, evaluated at the base point `u`.
+Since `u = ℓ.pointAt zeroCoord`, we evaluate `f` at
+`zeroCoord`. -/
+noncomputable def diagonalLineAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι)
+    (j : Fin params.m) :
+    IdxSubMeas (RestrictedDiagonalSample params j)
+      (Fq params) ι :=
   fun s =>
-    let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
-    postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
+    let v := extendRestrictedDirection j s.2
+    let ℓ : DiagonalLine params :=
+      { base := s.1, direction := v }
+    postprocess
+      ((strategy.diagonalMeasurement ℓ).toSubMeas)
+      (· zeroCoord)
 
 /-- Paper-local (not necessarily symmetric) projective strategy data. -/
 structure ProjStrat (params : Parameters) [FieldModel params.q]
@@ -112,10 +158,11 @@ structure ProjStrat (params : Parameters) [FieldModel params.q]
 namespace SymStrat
 
 /-- Trace-based failure surrogate for the axis-parallel lines test.
-Alice's point answers act on the left register, and Bob's line answers
-act on the right register of the bipartite state. -/
-noncomputable def axisParallelFailureProbability {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+Point answers on the left register, line answers (evaluated at the
+base point) on the right register of the bipartite state. -/
+noncomputable def axisParallelFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
@@ -123,25 +170,32 @@ noncomputable def axisParallelFailureProbability {params : Parameters}
     (axisParallelLineAnswerFamily strategy)
 
 /-- Trace-based failure surrogate for the self-consistency test.
-Uses the bipartite SSC defect (cross-register overlap `∑ ev(A ⊗ A)`),
-matching `def:strong-self-consistency` in `preliminaries.tex`. -/
-noncomputable def selfConsistencyFailureProbability {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+Uses bipartite SSC defect (cross-register overlap).
+For projective measurements this equals `bipartiteConsError`
+between the same measurement on both registers. -/
+noncomputable def selfConsistencyFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   bipartiteSSCError strategy.state
     (uniformDistribution (Point params))
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
 
 /-- Trace-based failure surrogate for the diagonal lines test.
-Alice's point answers act on the left register, and Bob's diagonal-line
-answers act on the right register of the bipartite state. -/
-noncomputable def diagonalFailureProbability {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+Averages over the restriction index `j ∈ {0, …, m − 1}`, then
+over the `j`-restricted diagonal test. For each `j`, direction
+vectors have the last `m − j − 1` coordinates equal to zero. -/
+noncomputable def diagonalFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
-  bipartiteConsError strategy.state
-    (uniformDistribution (DiagonalTestSample params))
-    (diagonalPointAnswerFamily strategy)
-    (diagonalLineAnswerFamily strategy)
+  (1 / (params.m : Error)) *
+    ∑ j : Fin params.m,
+      bipartiteConsError strategy.state
+        (uniformDistribution
+          (RestrictedDiagonalSample params j))
+        (diagonalPointAnswerFamily strategy j)
+        (diagonalLineAnswerFamily strategy j)
 
 /-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
 structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -178,25 +232,57 @@ def rightAsSymmetric {params : Parameters} [FieldModel params.q]
   axisParallelMeasurement := strategy.axisParallelMeasurementB
   diagonalMeasurement := strategy.diagonalMeasurementB
 
-/-- Trace-based failure surrogate for the full low-individual-degree test. -/
-noncomputable def lowIndividualDegreeFailureProbability {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+/-- Trace-based failure surrogate for the full low-individual-degree
+test, matching the paper's `fig:test` with role-based decomposition.
+
+Each of the three branches picks a role `r ∈ {A, B}`:
+- Player `r` receives a line and returns a polynomial;
+- Player `r̄` receives a point and returns a field element.
+
+The self-consistency branch checks cross-player point agreement.
+
+TODO(#306): `ProjStrat` currently forces both provers onto the
+same index type `ι`; the paper allows `H_A ≠ H_B`. -/
+noncomputable def lowIndividualDegreeFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) : Error :=
   let left := strategy.leftAsSymmetric
   let right := strategy.rightAsSymmetric
-  let pointAgreement :=
+  let axParDist :=
+    uniformDistribution (AxisParallelTestSample params)
+  -- Axis-parallel: average over roles
+  -- Role A: Alice→line (left), Bob→point (right)
+  -- Role B: Alice→point (left), Bob→line (right)
+  let axisParallelBranch :=
+    (bipartiteConsError strategy.state axParDist
+        (axisParallelLineAnswerFamily left)
+        (axisParallelPointAnswerFamily right)
+      + bipartiteConsError strategy.state axParDist
+        (axisParallelPointAnswerFamily left)
+        (axisParallelLineAnswerFamily right)) / 2
+  -- Self-consistency: cross-player point agreement
+  let selfConsistencyBranch :=
     bipartiteConsError strategy.state
       (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  let axisParallelBranch :=
-    pointAgreement
-      + (left.axisParallelFailureProbability + right.axisParallelFailureProbability) / 2
-  let selfConsistencyBranch :=
-    (left.selfConsistencyFailureProbability + right.selfConsistencyFailureProbability) / 2
+  -- Diagonal: average over roles and restriction index
   let diagonalBranch :=
-    (left.diagonalFailureProbability + right.diagonalFailureProbability) / 2
-  (axisParallelBranch + selfConsistencyBranch + diagonalBranch) / 3
+    (1 / (params.m : Error)) *
+      ∑ j : Fin params.m,
+        (bipartiteConsError strategy.state
+            (uniformDistribution
+              (RestrictedDiagonalSample params j))
+            (diagonalLineAnswerFamily left j)
+            (diagonalPointAnswerFamily right j)
+          + bipartiteConsError strategy.state
+            (uniformDistribution
+              (RestrictedDiagonalSample params j))
+            (diagonalPointAnswerFamily left j)
+            (diagonalLineAnswerFamily right j)) / 2
+  (axisParallelBranch + selfConsistencyBranch +
+    diagonalBranch) / 3
 
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
