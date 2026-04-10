@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-**Overall status**: 40 sorry sites across 8 files, 0 axioms, 0 sorry-free regressions.
+**Overall status**: 39 sorry sites across 8 files, 0 axioms, 0 sorry-free regressions.
 9 files are fully proved (0 sorry). Build passes on main.
 
 | Chapter | Paper File | Lean Directory | Sorry | Paper Match | Grade |
