@@ -644,17 +644,6 @@ lemma qCompleteness {Outcome : Type*}
     let s : Error := Real.sqrt (roundingToProjectiveError ζ)
     let x : Error := Real.sqrt qMass
     let y : Error := Real.sqrt diagA
-    have hs_nonneg : 0 ≤ s := by
-      dsimp [s]
-      exact Real.sqrt_nonneg _
-    have hx_nonneg : 0 ≤ x := by
-      dsimp [x]
-      exact Real.sqrt_nonneg _
-    have hy_nonneg : 0 ≤ y := by
-      dsimp [y]
-      exact Real.sqrt_nonneg _
-    have hy_le_one : y ≤ 1 := by
-      simpa [y] using hsqrt_diagA_le_one
     have hxy : x ≥ y - s := by
       dsimp [x, y, s]
       exact hsqrt_q_lb
