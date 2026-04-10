@@ -41,6 +41,142 @@ open MIPStarRE.LDT
 
 /-! ### One-measurement Naimark (Lemma 5.2) -/
 
+private lemma optionBasisProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
+    (oa : Option α) :
+    MIPStarRE.Quantum.IsProj
+      (Matrix.single oa oa (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) := by
+  refine ⟨?_, ?_⟩
+  · refine Matrix.IsHermitian.ext fun i j => ?_
+    by_cases hio : oa = i <;> by_cases hjo : oa = j <;>
+      simp [Matrix.single, hio, hjo, and_comm]
+  · simpa using
+      (Matrix.single_mul_single_same
+        (i := oa) (j := oa) (k := oa) (c := (1 : ℂ)) (d := (1 : ℂ)))
+
+private lemma optionBasisProj_nonneg {α : Type*} [Fintype α] [DecidableEq α]
+    (oa : Option α) :
+    0 ≤ (Matrix.single oa oa (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) := by
+  refine Matrix.nonneg_iff_posSemidef.mpr ?_
+  let col : Matrix (Option α) Unit ℂ := Matrix.single oa () 1
+  simpa [col] using Matrix.posSemidef_self_mul_conjTranspose col
+
+private lemma optionBasisProj_sum_eq_one {α : Type*} [Fintype α] [DecidableEq α] :
+    ∑ oa : Option α, (Matrix.single oa oa (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) = 1 := by
+  ext i j
+  by_cases hij : i = j
+  · subst hij
+    cases i with
+    | none =>
+        rw [Fintype.sum_option]
+        simp [Matrix.one_apply, Matrix.sum_apply, Matrix.single_apply]
+    | some a =>
+        rw [Fintype.sum_option]
+        simp [Matrix.one_apply, Matrix.sum_apply, Matrix.single_apply]
+  · rw [Fintype.sum_option]
+    cases i with
+    | none =>
+        cases j with
+        | none => cases hij rfl
+        | some b =>
+            simp [Matrix.sum_apply, Matrix.single_apply]
+    | some a =>
+        cases j with
+        | none =>
+            simp [Matrix.sum_apply, Matrix.single_apply]
+        | some b =>
+            have hab : a ≠ b := fun h => hij (congrArg some h)
+            simp [Matrix.sum_apply, Matrix.single_apply, Matrix.one_apply, hab]
+
+private lemma op_one_isProj {d : Type*} [Fintype d] [DecidableEq d] :
+    MIPStarRE.Quantum.IsProj (1 : MIPStarRE.Quantum.Op d) := by
+  refine ⟨?_, by simp⟩
+  refine Matrix.IsHermitian.ext fun i j => ?_
+  simp [Matrix.one_apply, eq_comm]
+
+private lemma op_one_nonneg {d : Type*} [Fintype d] [DecidableEq d] :
+    0 ≤ (1 : MIPStarRE.Quantum.Op d) := by
+  exact Matrix.PosSemidef.one.nonneg
+
+private lemma isProj_kronecker {d₁ d₂ : Type*}
+    [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    {A : MIPStarRE.Quantum.Op d₁} {B : MIPStarRE.Quantum.Op d₂}
+    (hA : MIPStarRE.Quantum.IsProj A) (hB : MIPStarRE.Quantum.IsProj B) :
+    MIPStarRE.Quantum.IsProj (Matrix.kronecker A B) := by
+  refine ⟨?_, ?_⟩
+  · refine Matrix.IsHermitian.ext fun i j => ?_
+    cases i with
+    | mk i₁ i₂ =>
+        cases j with
+        | mk j₁ j₂ =>
+            simp [Matrix.kronecker, hA.isHermitian.apply, hB.isHermitian.apply]
+  · calc
+      Matrix.kronecker A B * Matrix.kronecker A B
+          = Matrix.kronecker (A * A) (B * B) := by
+              simpa using (Matrix.mul_kronecker_mul A A B B).symm
+      _ = Matrix.kronecker A B := by rw [hA.idempotent, hB.idempotent]
+
+private lemma isProj_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
+    (U : Matrix.unitaryGroup n ℂ) {P : MIPStarRE.Quantum.Op n}
+    (hP : MIPStarRE.Quantum.IsProj P) :
+    MIPStarRE.Quantum.IsProj (((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n)) := by
+  refine ⟨?_, ?_⟩
+  · calc
+      ((((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n)))ᴴ
+          = (U : MIPStarRE.Quantum.Op n)ᴴ * Pᴴ * (U : MIPStarRE.Quantum.Op n) := by
+              simp [mul_assoc]
+      _ = (U : MIPStarRE.Quantum.Op n)ᴴ * P * (U : MIPStarRE.Quantum.Op n) := by
+            rw [hP.isHermitian.eq]
+  · calc
+      (((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n)) *
+          (((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n))
+          = (U : MIPStarRE.Quantum.Op n)ᴴ * P * ((U : MIPStarRE.Quantum.Op n) *
+              (U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n) := by
+                simp [mul_assoc]
+      _ = (U : MIPStarRE.Quantum.Op n)ᴴ * P * 1 * P * (U : MIPStarRE.Quantum.Op n) := by
+            have hUU :
+                (U : MIPStarRE.Quantum.Op n) *
+                  ((star U : Matrix.unitaryGroup n ℂ) : MIPStarRE.Quantum.Op n) = 1 := by
+              exact Unitary.coe_mul_star_self U
+            have hUU' : (U : MIPStarRE.Quantum.Op n) * (U : MIPStarRE.Quantum.Op n)ᴴ = 1 := by
+              change
+                (U : MIPStarRE.Quantum.Op n) *
+                  ((star U : Matrix.unitaryGroup n ℂ) : MIPStarRE.Quantum.Op n) = 1
+              exact Unitary.coe_mul_star_self U
+            rw [hUU']
+      _ = (U : MIPStarRE.Quantum.Op n)ᴴ * (P * P) * (U : MIPStarRE.Quantum.Op n) := by
+            simp [mul_assoc]
+      _ = (U : MIPStarRE.Quantum.Op n)ᴴ * P * (U : MIPStarRE.Quantum.Op n) := by
+            rw [hP.idempotent]
+
+private lemma nonneg_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
+    (U : Matrix.unitaryGroup n ℂ) {P : MIPStarRE.Quantum.Op n}
+    (hP : 0 ≤ P) :
+    0 ≤ ((U : MIPStarRE.Quantum.Op n)ᴴ * P * (U : MIPStarRE.Quantum.Op n)) := by
+  exact
+    (Matrix.PosSemidef.conjTranspose_mul_mul_same
+      (Matrix.nonneg_iff_posSemidef.mp hP) (U : MIPStarRE.Quantum.Op n)).nonneg
+
+private lemma unitary_conj_sum_eq_one {β n : Type*} [Fintype β] [Fintype n] [DecidableEq n]
+    (U : Matrix.unitaryGroup n ℂ) (P : β → MIPStarRE.Quantum.Op n)
+    (hP : ∑ b, P b = 1) :
+    ∑ b, ((U : MIPStarRE.Quantum.Op n)ᴴ * P b * (U : MIPStarRE.Quantum.Op n)) = 1 := by
+  calc
+    ∑ b, (U : MIPStarRE.Quantum.Op n)ᴴ * P b * (U : MIPStarRE.Quantum.Op n)
+        = (U : MIPStarRE.Quantum.Op n)ᴴ * (∑ b, P b) * (U : MIPStarRE.Quantum.Op n) := by
+            simp [Finset.mul_sum, Finset.sum_mul, mul_assoc]
+    _ = 1 := by
+          have hUstar :
+              (((star U : Matrix.unitaryGroup n ℂ) : MIPStarRE.Quantum.Op n) *
+                (U : MIPStarRE.Quantum.Op n)) = 1 := by
+            exact Unitary.coe_star_mul_self U
+          have hUstar' : (U : MIPStarRE.Quantum.Op n)ᴴ * (U : MIPStarRE.Quantum.Op n) = 1 := by
+            change
+              (((star U : Matrix.unitaryGroup n ℂ) : MIPStarRE.Quantum.Op n) *
+                (U : MIPStarRE.Quantum.Op n)) = 1
+            exact Unitary.coe_star_mul_self U
+          rw [hP]
+          simpa [mul_assoc] using hUstar'
+
 /-- **One-measurement Naimark lemma** (Lemma 5.2).
 
 For any submeasurement `M : Submeasurement α d`, there exists a projective
@@ -90,18 +226,19 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
   Extend the isometry column `V` to a unitary `U` on the whole enlarged space.
   The dilated projectors are then `U† (I ⊗ |oa⟩⟨oa|) U`.
   -/
-  -- TODO(#118): 5 sorry sites below are blocked on unitary extension infrastructure.
-  --   (1) define `U`, (2) `lifted_isProj`, (3) `lifted_pos`,
-  --   (4) `lifted_sum_le_one`, (5) `expectation_preservation`.
-  let U : MIPStarRE.Quantum.Op (d × Option α) := by
+  -- TODO(#118): Two focused blockers remain below:
+  --   (1) construct the unitary extension `U` with the prescribed `|⊥⟩` column,
+  --   (2) prove the compression identity for expectations.
+  let U : Matrix.unitaryGroup (d × Option α) ℂ := by
     -- TODO(#118): Define the Naimark unitary extension `U` from the isometry
     -- column `V` using `CFC.sqrt` data (Lemma 5.2); blocked on a
-    -- unitary-completion lemma for the enlarged space.
+    -- unitary-completion lemma for the enlarged space / Euclidean-space transport.
     sorry
+  let Umat : MIPStarRE.Quantum.Op (d × Option α) := U
   refine ⟨{
     source := M
     liftedEffect := fun oa =>
-      Uᴴ * Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa) * U
+      Umatᴴ * Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa) * Umat
     lifted_isProj := ?_
     lifted_pos := ?_
     lifted_sum_le_one := ?_
@@ -112,27 +249,74 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     `U† (I ⊗ |oa⟩⟨oa|) U` is a projection because `I ⊗ |oa⟩⟨oa|` is, and
     conjugation by a unitary preserves Hermitian idempotents.
     -/
-    -- TODO(#118): Prove each lifted effect is a projection by unitary
-    -- conjugation of `I ⊗ |oa⟩⟨oa|` (Lemma 5.2); blocked on
-    -- conjugation-preserves-`IsProj` lemmas.
-    sorry
+    let P : MIPStarRE.Quantum.Op (d × Option α) :=
+      Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa)
+    have hPproj : MIPStarRE.Quantum.IsProj P := by
+      exact isProj_kronecker op_one_isProj (optionBasisProj_isProj oa)
+    simpa [Umat, P] using isProj_unitary_conj U hPproj
   · intro oa
     /-
     Each `I ⊗ |oa⟩⟨oa|` is PSD, so its unitary conjugate is PSD as well.
     -/
-    -- TODO(#118): Prove positivity of each lifted effect from PSD auxiliary
-    -- projectors under unitary conjugation (Lemma 5.2); blocked on PSD
-    -- conjugation infrastructure.
-    sorry
+    let P : MIPStarRE.Quantum.Op (d × Option α) :=
+      Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa)
+    have hPnonneg : 0 ≤ P := by
+      exact MIPStarRE.Quantum.kronecker_nonneg op_one_nonneg (optionBasisProj_nonneg oa)
+    simpa [Umat, P] using nonneg_unitary_conj U hPnonneg
   · /-
     Since the auxiliary rank-one projectors sum to the identity on `Option α`,
     the lifted family is actually a complete projective measurement, hence in
     particular a submeasurement.
     -/
-    -- TODO(#118): Show the lifted family sums to `1` and hence is a
-    -- submeasurement (Lemma 5.2); blocked on auxiliary-projector sum and
-    -- Kronecker/unitary simplification lemmas.
-    sorry
+    have hauxDecomp : ∑ oa : Option α, auxProj oa = auxProj none + ∑ a : α, auxProj (some a) := by
+      simpa using (Fintype.sum_option (f := auxProj))
+    have hsplit :
+        ∑ oa : Option α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa) =
+          Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj none) +
+            ∑ a : α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj (some a)) := by
+      simpa using
+        (Fintype.sum_option
+          (f := fun oa : Option α =>
+            Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa)))
+    have hsumSome :
+        ∑ a : α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj (some a)) =
+          Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (∑ a : α, auxProj (some a)) := by
+      ext x y
+      rcases x with ⟨i, oi⟩
+      rcases y with ⟨j, oj⟩
+      by_cases hij : i = j
+      · subst hij
+        rw [Matrix.sum_apply]
+        simp [Matrix.kronecker, Matrix.sum_apply]
+      · rw [Matrix.sum_apply]
+        simp [Matrix.kronecker, Matrix.one_apply, hij]
+    have hauxSplit : auxProj none + ∑ a : α, auxProj (some a) = 1 := by
+      rw [← hauxDecomp, optionBasisProj_sum_eq_one]
+    have hbase :
+        ∑ oa : Option α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa) = 1 := by
+      calc
+        ∑ oa : Option α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa)
+            = Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj none) +
+                ∑ a : α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj (some a)) := by
+                  exact hsplit
+        _ = Matrix.kronecker (1 : MIPStarRE.Quantum.Op d)
+              (auxProj none + ∑ a : α, auxProj (some a)) := by
+                rw [hsumSome]
+                simpa using
+                  (Matrix.kronecker_add
+                    (1 : MIPStarRE.Quantum.Op d)
+                    (auxProj none)
+                    (∑ a : α, auxProj (some a))).symm
+        _ = Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (1 : MIPStarRE.Quantum.Op (Option α)) := by
+              rw [hauxSplit]
+        _ = (1 : MIPStarRE.Quantum.Op (d × Option α)) := by
+              simpa using
+                (Matrix.one_kronecker_one :
+                  Matrix.kronecker
+                    (1 : MIPStarRE.Quantum.Op d)
+                    (1 : MIPStarRE.Quantum.Op (Option α)) =
+                      (1 : MIPStarRE.Quantum.Op (d × Option α)))
+    exact le_of_eq <| unitary_conj_sum_eq_one U _ hbase
   · intro ρ a
     /-
     Write `Q_a = I ⊗ |a⟩⟨a|` and `Q_⊥ = I ⊗ |⊥⟩⟨⊥|`.  Using the defining action
@@ -142,8 +326,10 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     side reduces to `normalizedTrace (ρ * M.effect a)`.
     -/
     -- TODO(#118): Prove the compression/trace identity preserving expectations
-    -- after dilation (Lemma 5.2); blocked on the `U`-action-on-`|⊥⟩` slice
-    -- and `CFC.sqrt` simplification lemmas.
+    -- after dilation (Lemma 5.2).  The remaining missing ingredients are:
+    --   * the defining action of `U` on the `none = ⊥` slice coming from `V`,
+    --   * the trace/kronecker compression calculation with `oneMeasLiftedDensity`,
+    --   * `CFC.sqrt_mul_sqrt_self` reducing `√M_a * √M_a` to `M_a`.
     sorry
 
 /-! ### Full Naimark dilation (Theorem 5.1) -/
