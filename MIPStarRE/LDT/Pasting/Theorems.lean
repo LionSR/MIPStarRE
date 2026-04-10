@@ -1184,6 +1184,7 @@ theorem gHatFacts
           multiplyByTotalOnRight
             ((family.meas q.2).toSubMeas)
             (incompletePartSubMeas params family q.1)
+    -- Review note: this duplicates a symmetry argument used elsewhere; keep it local for now.
     have hqSDDOp_symm_poly
         (A B : OpFamily (Polynomial params) (ι × ι)) :
         qSDDOp ψbi A B = qSDDOp ψbi B A := by
@@ -1376,9 +1377,6 @@ theorem gHatFacts
               Real.rpow gamma (1 / (16 : Error)) +
                 Real.rpow zeta (1 / (16 : Error)) +
                 Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
-            have hsixteenth_nonneg : 0 ≤ sixteenthSum := by
-              dsimp [sixteenthSum]
-              positivity
             have hquarter_le :
                 quarterSum ≤ sixteenthSum := by
               dsimp [quarterSum, sixteenthSum]
