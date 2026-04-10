@@ -118,30 +118,27 @@ Why this is a problem:
 - These Lean abbreviations forget the degree constraints entirely.
 - That drops a real hypothesis from the mathematical objects being formalized.
 
-### 5. `interpolateCompletedSlices` is still fake interpolation
+### 5. `interpolateCompletedSlices` — Lagrange coefficients fixed, degree bound sorry'd
 
-- Lean location: `MIPStarRE/LDT/Pasting/Defs.lean:216-237`
-- Severity: **critical**
+- Lean location: `MIPStarRE/LDT/Pasting/Defs.lean`
+- Severity: **medium** (was **critical**, definition now faithful)
 
-Lean code:
-
-```lean
--- Multiply by the Lagrange basis coefficient for height xᵢ
--- Note: honest Lagrange interpolation requires Field (ZMod q), which
--- holds only for prime q. For prime-power q, use GaloisField via
--- PrimePowerFieldSpec. For now, use Lagrange basis coefficient = 1
--- as a structural placeholder; the degree bound is sorry'd regardless.
-slicePoly
-```
+The definition now uses proper Lagrange interpolation via Mathlib's
+`Lagrange.basis`, embedded into `MvPolynomial` at the last coordinate.
+The `lowIndividualDegree` proof is sorry'd: for the first `m` coordinates
+the bound follows from `degreeOf_mul_le`, but for the last coordinate
+(when `|τ| > d+1`) the cancellation argument requires slice consistency.
 
 What the paper says:
 
 - `references/ldt-paper/ld-pasting.tex:241-245`, `:478-482`, `:1240-1247` uses actual interpolation from compatible slice polynomials to the unique ambient degree-`d` polynomial.
 
-Why this is a problem:
+Remaining gap:
 
-- The current Lean definition does not perform interpolation at all; it just sums lifted slice polynomials with coefficient `1`.
-- This is a fake definition of a core construction.
+- The `lowIndividualDegree` proof obligation is sorry'd.
+- Closing this sorry requires either restricting to exactly `d+1`
+  evaluation points, or proving the cancellation argument for
+  consistent slice polynomials.
 
 ### 6. `laplacianDifferenceForm` is definitionally equal to `laplacian`, so `laplacianRewrite` is vacuous
 
@@ -422,7 +419,7 @@ I searched `MIPStarRE/LDT` for definitions whose names appear only at their defi
 
 - Placeholder / fake definitions:
   - `matrixPolynomialWeightSqrtOperator`
-  - `interpolateCompletedSlices`
+  - `interpolateCompletedSlices` (definition fixed, degree bound sorry'd)
   - `laplacianDifferenceForm`
   - `fourierBasisInnerProduct`
 - Wrong or weakened theorem statements:
