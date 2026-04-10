@@ -231,6 +231,153 @@ private lemma oneMeasNaimarkInputProj_idempotent {α : Type*} [Fintype α] [Deci
   exact
     (isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) none)).idempotent
 
+private lemma oneMeasNaimarkInputProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d] :
+    MIPStarRE.Quantum.IsProj
+      (oneMeasNaimarkInputProj (α := α) (d := d)) :=
+  isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) none)
+
+/-- The CFC square root of a PSD matrix is Hermitian. -/
+private lemma sqrt_isHermitian_eq {d : Type*} [Fintype d] [DecidableEq d]
+    {A : MIPStarRE.Quantum.Op d} (hA : 0 ≤ A) :
+    (CFC.sqrt A)ᴴ = CFC.sqrt A :=
+  (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg A)).isHermitian.eq
+
+/-- **Isometry property of the Naimark column**: `V†V = P`.
+
+The Naimark column `V` satisfies `V†V = I ⊗ |⊥⟩⟨⊥|`, i.e., V is an
+isometry on the `⊥`-slice of the auxiliary register. This is the key
+linear-algebraic content justifying the unitary extension. -/
+private lemma oneMeasNaimarkColumn_isometry
+    {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (M : MIPStarRE.Quantum.Submeasurement α d) :
+    (oneMeasNaimarkColumn M)ᴴ * oneMeasNaimarkColumn M =
+      oneMeasNaimarkInputProj (α := α) (d := d) := by
+  have hR_herm := sqrt_isHermitian_eq (oneMeasNaimarkRemainder_nonneg M)
+  have hM_herm : ∀ a : α, (CFC.sqrt (M.effect a))ᴴ = CFC.sqrt (M.effect a) :=
+    fun a => sqrt_isHermitian_eq (M.pos a)
+  ext ⟨d₁, oa₁⟩ ⟨d₂, oa₂⟩
+  simp only [Matrix.mul_apply, Matrix.conjTranspose_apply,
+    oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition,
+    Matrix.kronecker_apply, Matrix.one_apply, Matrix.single_apply]
+  rcases oa₁ with _ | a₁ <;> rcases oa₂ with _ | a₂
+  case none.none =>
+    -- Main case: `V†V` on the `⊥` block equals the identity.
+    -- Sum over `d × Option α`: split into remainder (`none`) and outcome (`some a`)
+    -- parts, identify each as `√X * √X = X`, then use `∑ M_a + R = 1`.
+    simp only [and_self, ite_true]
+    -- Rewrite as sum over product
+    have hsplit : ∀ (f : d × Option α → ℂ),
+        ∑ x : d × Option α, f x =
+          ∑ k₁ : d, (f (k₁, none) + ∑ a : α, f (k₁, some a)) := by
+      intro f
+      rw [← Finset.univ_product_univ, Finset.sum_product_right]
+      congr 1; ext k₁
+      exact (Fintype.sum_option (f := fun oa => f (k₁, oa))).symm
+    rw [hsplit, Finset.sum_add_distrib]
+    -- Expand V entries
+    simp only [oneMeasNaimarkColumn]
+    -- Identify remainder sum as matrix multiplication entry
+    have hR_mul : ∑ k₁ : d,
+        starRingEnd ℂ (CFC.sqrt (oneMeasNaimarkRemainder M) k₁ d₁) *
+          CFC.sqrt (oneMeasNaimarkRemainder M) k₁ d₂ =
+        oneMeasNaimarkRemainder M d₁ d₂ := by
+      conv_lhs =>
+        ext k₁
+        rw [show starRingEnd ℂ
+              (CFC.sqrt (oneMeasNaimarkRemainder M) k₁ d₁) =
+            CFC.sqrt (oneMeasNaimarkRemainder M) d₁ k₁ from by
+          rw [← Matrix.conjTranspose_apply, hR_herm]]
+      rw [← Matrix.mul_apply,
+        CFC.sqrt_mul_sqrt_self _ (oneMeasNaimarkRemainder_nonneg M)]
+    -- Identify each outcome sum as matrix multiplication entry
+    have hM_mul : ∀ a : α, ∑ k₁ : d,
+        starRingEnd ℂ (CFC.sqrt (M.effect a) k₁ d₁) *
+          CFC.sqrt (M.effect a) k₁ d₂ =
+        M.effect a d₁ d₂ := by
+      intro a
+      conv_lhs =>
+        ext k₁
+        rw [show starRingEnd ℂ (CFC.sqrt (M.effect a) k₁ d₁) =
+            CFC.sqrt (M.effect a) d₁ k₁ from by
+          rw [← Matrix.conjTranspose_apply, hM_herm a]]
+      rw [← Matrix.mul_apply, CFC.sqrt_mul_sqrt_self _ (M.pos a)]
+    rw [hR_mul]
+    simp_rw [hM_mul]
+    -- Now: R(d₁,d₂) + ∑_a M_a(d₁,d₂) = 1(d₁,d₂)
+    simp only [oneMeasNaimarkRemainder, Matrix.sub_apply,
+      Matrix.sum_apply, Matrix.one_apply]
+    ring
+  -- Zero cases: V is 0 whenever the column auxiliary index is not `none`.
+  case none.some =>
+    simp only [reduceCtorEq, and_false, ↓reduceIte]
+    exact Finset.sum_eq_zero fun x _ => by
+      simp [oneMeasNaimarkColumn]
+  case some.none =>
+    simp only [reduceCtorEq, false_and, ↓reduceIte]
+    exact Finset.sum_eq_zero fun x _ => by
+      simp [oneMeasNaimarkColumn]; ring
+  case some.some =>
+    simp only [reduceCtorEq, false_and, ↓reduceIte]
+    exact Finset.sum_eq_zero fun x _ => by
+      simp [oneMeasNaimarkColumn]
+
+/-- The Naimark column acts as an isometry on the input subspace: `VP = V`. -/
+private lemma oneMeasNaimarkColumn_mul_inputProj
+    {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (M : MIPStarRE.Quantum.Submeasurement α d) :
+    oneMeasNaimarkColumn M * oneMeasNaimarkInputProj (α := α) (d := d) =
+      oneMeasNaimarkColumn M := by
+  ext ⟨d₁, oa₁⟩ ⟨d₂, oa₂⟩
+  simp only [Matrix.mul_apply, oneMeasNaimarkInputProj,
+    oneMeasNaimarkAuxTransition, Matrix.kronecker_apply]
+  cases oa₂ with
+  | none =>
+    simp only [and_self, ite_true]
+    -- Sum collapses: only `(d₂, none)` survives in the product with P
+    have : ∀ x : d × Option α,
+        oneMeasNaimarkColumn M (d₁, oa₁) x *
+          (if x.1 = d₂ then 1 else 0) *
+            (if x.2 = none then if none = none then 1 else 0 else 0) =
+          if x = (d₂, none) then oneMeasNaimarkColumn M (d₁, oa₁) (d₂, none)
+          else 0 := by
+      intro ⟨k₁, k₂⟩
+      cases k₂ <;> simp (config := { decide := true }) [Prod.ext_iff]
+    simp_rw [this]
+    rw [Finset.sum_ite_eq' Finset.univ (d₂, none) (fun x =>
+      oneMeasNaimarkColumn M (d₁, oa₁) x)]
+    simp
+  | some a₂ =>
+    simp only [reduceCtorEq, ↓reduceIte, mul_zero, Finset.sum_const_zero]
+
+/-- **Partial isometry to unitary extension** (general fact).
+
+If `V†V = P` where `P` is a projection and `V = VP`, then there exists
+a unitary `U` on the full space with `UP = V`.
+
+This is a standard result in finite-dimensional linear algebra: V is an
+isometry from range(P) to V's range, and in finite dimensions any
+isometry between subspaces extends to a unitary.
+
+**Mathlib route**: `LinearIsometry.extend` provides the extension for
+linear isometries between inner product spaces. The gap is the
+matrix-to-`EuclideanSpace` transport. -/
+private lemma partialIsometry_to_unitary
+    {n : Type*} [Fintype n] [DecidableEq n]
+    (V P : MIPStarRE.Quantum.Op n)
+    (hP : MIPStarRE.Quantum.IsProj P)
+    (hVP : V * P = V)
+    (hVV : Vᴴ * V = P) :
+    ∃ U : Matrix.unitaryGroup n ℂ,
+      (U : MIPStarRE.Quantum.Op n) * P = V := by
+  -- The proof requires transporting from Matrix to EuclideanSpace and
+  -- using LinearIsometry.extend. The matrix-to-linear-map bridge is
+  -- the remaining gap. See Mathlib's `Analysis.InnerProductSpace.PiL2`
+  -- for `LinearIsometry.extend`.
+  sorry
+
 private lemma exists_unitary_extension_oneMeasNaimarkColumn
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -239,14 +386,11 @@ private lemma exists_unitary_extension_oneMeasNaimarkColumn
       (U : MIPStarRE.Quantum.Op (d × Option α)) *
           oneMeasNaimarkInputProj (α := α) (d := d) =
         oneMeasNaimarkColumn M := by
-  /-
-  This is the remaining linear-algebraic Naimark blocker: the verified column
-  `oneMeasNaimarkColumn M` should extend to a full unitary on the enlarged space.
-  Mathlib's finite-dimensional `LinearIsometry.extend` / orthonormal-basis
-  extension machinery looks like the right route, but the matrix-to-Euclidean
-  transport has not been completed here yet.
-  -/
-  sorry
+  exact partialIsometry_to_unitary
+    (oneMeasNaimarkColumn M) _
+    oneMeasNaimarkInputProj_isProj
+    (oneMeasNaimarkColumn_mul_inputProj M)
+    (oneMeasNaimarkColumn_isometry M)
 
 /-- **One-measurement Naimark lemma** (Lemma 5.2).
 
@@ -332,10 +476,9 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
         ∑ oa : Option α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa) =
           Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj none) +
             ∑ a : α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj (some a)) := by
-      simpa using
-        (Fintype.sum_option
+      exact Fintype.sum_option
           (f := fun oa : Option α =>
-            Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa)))
+            Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa))
     have hsumSome :
         ∑ a : α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj (some a)) =
           Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (∑ a : α, auxProj (some a)) := by
@@ -347,7 +490,7 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
         rw [Matrix.sum_apply]
         simp [Matrix.kronecker, Matrix.sum_apply]
       · rw [Matrix.sum_apply]
-        simp [Matrix.kronecker, Matrix.one_apply, hij]
+        simp [Matrix.kronecker, hij]
     have hauxSplit : auxProj none + ∑ a : α, auxProj (some a) = 1 := by
       rw [← hauxDecomp, optionBasisProj_sum_eq_one]
     have hbase :
@@ -365,29 +508,29 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
                     (1 : MIPStarRE.Quantum.Op d)
                     (auxProj none)
                     (∑ a : α, auxProj (some a))).symm
-        _ = Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (1 : MIPStarRE.Quantum.Op (Option α)) := by
+        _ = Matrix.kronecker (1 : MIPStarRE.Quantum.Op d)
+              (1 : MIPStarRE.Quantum.Op (Option α)) := by
               rw [hauxSplit]
         _ = (1 : MIPStarRE.Quantum.Op (d × Option α)) := by
-              simpa using
-                (Matrix.one_kronecker_one :
-                  Matrix.kronecker
-                    (1 : MIPStarRE.Quantum.Op d)
-                    (1 : MIPStarRE.Quantum.Op (Option α)) =
-                      (1 : MIPStarRE.Quantum.Op (d × Option α)))
+              exact Matrix.one_kronecker_one
     exact le_of_eq <| unitary_conj_sum_eq_one U _ hbase
   · intro ρ a
     /-
-    Write `Q_a = I ⊗ |a⟩⟨a|` and `Q_⊥ = I ⊗ |⊥⟩⟨⊥|`.  Using the defining action
-    of `U` on the `|⊥⟩` slice, we have
-      `Q_a * U * Q_⊥ = (√(M_a)) ⊗ |a⟩⟨⊥|`,
-    so after cycling the trace and using `√(M_a) * √(M_a) = M_a`, the right-hand
-    side reduces to `normalizedTrace (ρ * M.effect a)`.
+    **Compression/trace identity** (core of Lemma 5.2).
+
+    From `hU : U * P_⊥ = V`, the `⊥`-column of `U` equals the Naimark column `V`.
+    The trace identity `τ(ρ M_a) = τ'(ρ_lifted · P̂_a)` follows from:
+    1. `(ρ ⊗ |⊥⟩⟨⊥|)` restricts the trace to the `⊥`-slice of the auxiliary
+    2. On this slice, `U†(I ⊗ |a⟩⟨a|)U` acts as `√M_a * √M_a = M_a`
+       (by the column identity from `hU` and `CFC.sqrt_mul_sqrt_self`)
+    3. The `|Option α|` scaling cancels with the enlarged-space normalization
+
+    The detailed calculation is entry-level:
+      `Tr((ρ ⊗ |⊥⟩⟨⊥|) · U†Q_aU)`
+      `= ∑_d₁ ∑_d₂ ρ(d₁,d₂) · (U†Q_aU)((d₂,⊥),(d₁,⊥))`
+      `= ∑_d₁ ∑_d₂ ρ(d₁,d₂) · M_a(d₂,d₁)    [column identity + sqrt²]`
+      `= Tr(ρ · M_a)`
     -/
-    -- TODO(#118): Prove the compression/trace identity preserving expectations
-    -- after dilation (Lemma 5.2).  The remaining missing ingredients are:
-    --   * the compressed action `U * Q_⊥ = V`, packaged as `hU`,
-    --   * the trace/kronecker compression calculation with `oneMeasLiftedDensity`,
-    --   * `CFC.sqrt_mul_sqrt_self` reducing `√M_a * √M_a` to `M_a`.
     sorry
 
 /-! ### Full Naimark dilation (Theorem 5.1) -/
