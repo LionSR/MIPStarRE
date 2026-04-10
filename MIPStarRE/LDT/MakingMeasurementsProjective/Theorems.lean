@@ -128,15 +128,11 @@ private lemma isProj_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
             rw [hP.isHermitian.eq]
   · calc
       (((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n)) *
-          (((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n))
+      (((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n))
           = (U : MIPStarRE.Quantum.Op n)ᴴ * P * ((U : MIPStarRE.Quantum.Op n) *
               (U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n) := by
                 simp [mul_assoc]
       _ = (U : MIPStarRE.Quantum.Op n)ᴴ * P * 1 * P * (U : MIPStarRE.Quantum.Op n) := by
-            have hUU :
-                (U : MIPStarRE.Quantum.Op n) *
-                  ((star U : Matrix.unitaryGroup n ℂ) : MIPStarRE.Quantum.Op n) = 1 := by
-              exact Unitary.coe_mul_star_self U
             have hUU' : (U : MIPStarRE.Quantum.Op n) * (U : MIPStarRE.Quantum.Op n)ᴴ = 1 := by
               change
                 (U : MIPStarRE.Quantum.Op n) *
@@ -165,10 +161,6 @@ private lemma unitary_conj_sum_eq_one {β n : Type*} [Fintype β] [Fintype n] [D
         = (U : MIPStarRE.Quantum.Op n)ᴴ * (∑ b, P b) * (U : MIPStarRE.Quantum.Op n) := by
             simp [Finset.mul_sum, Finset.sum_mul, mul_assoc]
     _ = 1 := by
-          have hUstar :
-              (((star U : Matrix.unitaryGroup n ℂ) : MIPStarRE.Quantum.Op n) *
-                (U : MIPStarRE.Quantum.Op n)) = 1 := by
-            exact Unitary.coe_star_mul_self U
           have hUstar' : (U : MIPStarRE.Quantum.Op n)ᴴ * (U : MIPStarRE.Quantum.Op n) = 1 := by
             change
               (((star U : Matrix.unitaryGroup n ℂ) : MIPStarRE.Quantum.Op n) *
