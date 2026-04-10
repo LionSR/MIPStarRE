@@ -169,6 +169,85 @@ private lemma unitary_conj_sum_eq_one {β n : Type*} [Fintype β] [Fintype n] [D
           rw [hP]
           simpa [mul_assoc] using hUstar'
 
+private noncomputable def oneMeasNaimarkRemainder {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (M : MIPStarRE.Quantum.Submeasurement α d) : MIPStarRE.Quantum.Op d :=
+  1 - ∑ a, M.effect a
+
+private def oneMeasNaimarkAuxTransition {α : Type*} [DecidableEq α] (oa ob : Option α) :
+    MIPStarRE.Quantum.Op (Option α) :=
+  Matrix.single oa ob 1
+
+private noncomputable def oneMeasNaimarkColumn {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (M : MIPStarRE.Quantum.Submeasurement α d) :
+    MIPStarRE.Quantum.Op (d × Option α) := fun x y =>
+  match x.2, y.2 with
+  | some a, none => CFC.sqrt (M.effect a) x.1 y.1
+  | none, none => CFC.sqrt (oneMeasNaimarkRemainder M) x.1 y.1
+  | _, _ => 0
+
+private def oneMeasNaimarkInputProj {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d] :
+    MIPStarRE.Quantum.Op (d × Option α) :=
+  Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (oneMeasNaimarkAuxTransition none none)
+
+private def oneMeasNaimarkOutcomeProj {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d] (oa : Option α) :
+    MIPStarRE.Quantum.Op (d × Option α) :=
+  Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (oneMeasNaimarkAuxTransition oa oa)
+
+private lemma oneMeasNaimarkRemainder_nonneg {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (M : MIPStarRE.Quantum.Submeasurement α d) :
+    0 ≤ oneMeasNaimarkRemainder M := by
+  exact sub_nonneg.mpr M.sum_le_one
+
+private lemma oneMeasNaimarkColumn_eq {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (M : MIPStarRE.Quantum.Submeasurement α d) :
+    oneMeasNaimarkColumn M =
+      Matrix.kronecker
+        (CFC.sqrt (oneMeasNaimarkRemainder M))
+        (oneMeasNaimarkAuxTransition none none) +
+      ∑ a : α,
+        Matrix.kronecker
+          (CFC.sqrt (M.effect a))
+          (oneMeasNaimarkAuxTransition (some a) none) := by
+  ext x y
+  rcases x with ⟨i, ox⟩
+  rcases y with ⟨j, oy⟩
+  cases ox <;> cases oy
+  · simp [oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.sum_apply]
+  · simp [oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.sum_apply]
+  · simp [oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.sum_apply,
+      Matrix.single_apply, Finset.sum_eq_single]
+  · simp [oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.sum_apply]
+
+private lemma oneMeasNaimarkInputProj_idempotent {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d] :
+    oneMeasNaimarkInputProj (α := α) (d := d) * oneMeasNaimarkInputProj (α := α) (d := d) =
+      oneMeasNaimarkInputProj (α := α) (d := d) := by
+  exact
+    (isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) none)).idempotent
+
+private lemma exists_unitary_extension_oneMeasNaimarkColumn
+    {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (M : MIPStarRE.Quantum.Submeasurement α d) :
+    ∃ U : Matrix.unitaryGroup (d × Option α) ℂ,
+      (U : MIPStarRE.Quantum.Op (d × Option α)) *
+          oneMeasNaimarkInputProj (α := α) (d := d) =
+        oneMeasNaimarkColumn M := by
+  /-
+  This is the remaining linear-algebraic Naimark blocker: the verified column
+  `oneMeasNaimarkColumn M` should extend to a full unitary on the enlarged space.
+  Mathlib's finite-dimensional `LinearIsometry.extend` / orthonormal-basis
+  extension machinery looks like the right route, but the matrix-to-Euclidean
+  transport has not been completed here yet.
+  -/
+  sorry
+
 /-- **One-measurement Naimark lemma** (Lemma 5.2).
 
 For any submeasurement `M : Submeasurement α d`, there exists a projective
@@ -198,34 +277,21 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     (M : MIPStarRE.Quantum.Submeasurement α d) :
     OneMeasNaimarkLemma α d M := by
   classical
-  let remainder : MIPStarRE.Quantum.Op d := 1 - ∑ a, M.effect a
-  let sqrtEffect : α → MIPStarRE.Quantum.Op d := fun a => CFC.sqrt (M.effect a)
-  let sqrtRemainder : MIPStarRE.Quantum.Op d := CFC.sqrt remainder
   let auxProj : Option α → MIPStarRE.Quantum.Op (Option α) :=
     fun oa => Matrix.single oa oa 1
   /-
   The prescribed Naimark isometry column:
     `V (|ψ⟩ ⊗ |⊥⟩)
-      = ∑_a √(M_a)|ψ⟩ ⊗ |a⟩ + √(I - ∑_a M_a)|ψ⟩ ⊗ |⊥⟩`.
-  Concretely, this matrix is supported only on the input `none = ⊥` slice.
+      = ∑_a √(M_a)|ψ⟩ ⊗ |a⟩ + √(I - ∑_a M_a)|ψ⟩ ⊗ |⊥⟩`,
+  encoded by `oneMeasNaimarkColumn M`.  Concretely, this matrix is
+  supported only on the input `none = ⊥` slice.
   -/
-  let V : MIPStarRE.Quantum.Op (d × Option α) := fun x y =>
-    match x.2, y.2 with
-    | some a, none => sqrtEffect a x.1 y.1
-    | none, none => sqrtRemainder x.1 y.1
-    | _, _ => 0
+  let V : MIPStarRE.Quantum.Op (d × Option α) := oneMeasNaimarkColumn M
   /-
   Extend the isometry column `V` to a unitary `U` on the whole enlarged space.
   The dilated projectors are then `U† (I ⊗ |oa⟩⟨oa|) U`.
   -/
-  -- TODO(#118): Two focused blockers remain below:
-  --   (1) construct the unitary extension `U` with the prescribed `|⊥⟩` column,
-  --   (2) prove the compression identity for expectations.
-  let U : Matrix.unitaryGroup (d × Option α) ℂ := by
-    -- TODO(#118): Define the Naimark unitary extension `U` from the isometry
-    -- column `V` using `CFC.sqrt` data (Lemma 5.2); blocked on a
-    -- unitary-completion lemma for the enlarged space / Euclidean-space transport.
-    sorry
+  obtain ⟨U, hU⟩ := exists_unitary_extension_oneMeasNaimarkColumn M
   let Umat : MIPStarRE.Quantum.Op (d × Option α) := U
   refine ⟨{
     source := M
@@ -319,9 +385,10 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     -/
     -- TODO(#118): Prove the compression/trace identity preserving expectations
     -- after dilation (Lemma 5.2).  The remaining missing ingredients are:
-    --   * the defining action of `U` on the `none = ⊥` slice coming from `V`,
+    --   * the compressed action `U * Q_⊥ = V`, packaged as `hU`,
     --   * the trace/kronecker compression calculation with `oneMeasLiftedDensity`,
     --   * `CFC.sqrt_mul_sqrt_self` reducing `√M_a * √M_a` to `M_a`.
+    clear hU V
     sorry
 
 /-! ### Full Naimark dilation (Theorem 5.1) -/
@@ -345,7 +412,8 @@ full joint-probability preservation. -/
 /- TODO: Proof applies `oneMeasNaimark` per question per player and composes
    via tensor-product structure. Blocked on `oneMeasNaimark` proof above.
    See #98 for tracking. -/
-theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+private lemma exists_fullNaimarkData
+    {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
     [Fintype OutcomeA] [DecidableEq OutcomeA]
@@ -358,17 +426,28 @@ theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     ∃ data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι,
       NaimarkStatement ψ A B data := by
   /-
-  This theorem really is a tensor-product assembly of one-measurement Naimark
-  dilations, but the local proof is still blocked on constructing the combined
-  lifted state and per-question projective families from `oneMeasNaimark`.
-  I am leaving the full composition as a focused blocker rather than fabricating
-  a dummy witness.
+  This is exactly the tensor-product assembly step of Theorem 5.1: apply
+  `oneMeasNaimark` to each `A x` and `B y`, then package the lifted state and
+  per-question projective families on the full auxiliary product space.
+  At this point the only real obstruction is that `oneMeasNaimark` itself is
+  not yet fully available, so the composition layer remains intentionally
+  factored into this helper.
   -/
-  -- TODO: Assemble the per-question one-measurement dilations into the full
-  -- tensor-product Naimark witness preserving correlations (Theorem 5.1 /
-  -- `thm:naimark`); blocked on `oneMeasNaimark` and lifted-state assembly
-  -- infrastructure.
   sorry
+
+theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+    {ι : Type*}
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB]
+    [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι)
+    (A : IdxSubMeas QuestionA OutcomeA ι)
+    (B : IdxSubMeas QuestionB OutcomeB ι) :
+    ∃ data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι,
+      NaimarkStatement ψ A B data :=
+  exists_fullNaimarkData ψ A B
 
 /-! ### Orthonormalization (Theorem 5.4 / thm:orthonormalization) -/
 

@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.MainInductionStep.Statements
+import MIPStarRE.LDT.Commutativity.Theorems
 import MIPStarRE.LDT.Pasting.Theorems
--- Used by `selfImprovementInInductionSection` bridge (currently sorry):
+-- Used by `selfImprovementInInductionSection`.
 import MIPStarRE.LDT.SelfImprovement.Theorems
 
 /-!
@@ -42,22 +43,84 @@ theorem selfImprovementInInductionSection
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
+    (hbridges : SelfImprovement.SelfImprovementBridgePackage params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
+    (Gmeas : Measurement (Polynomial params) ι)
+    (hbridge : Gmeas.toSubMeas = G)
     (hcons : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
-  /-
-  The section-local theorem is meant to be a bridge from Section 9's
-  measurement-input theorem to the submeasurement form used in the induction.
-  The current local bridge theorem `selfImprovementFromSubMeas` still requires
-  an explicit measurement witness `Gmeas` with `Gmeas.toSubMeas = G`, but this
-  theorem's hypotheses only provide `G : SubMeas ...`. Until that witness is
-  threaded through the statement, this wrapper cannot be completed cleanly.
-  -/
-  sorry
+  rcases SelfImprovement.selfImprovementFromSubMeas
+      params strategy eps delta gamma nu hbridges hgood G Gmeas hbridge hcons with
+    ⟨H, Z, hH⟩
+  rcases hH.measurementBridge with ⟨_, _, hfinal⟩
+  refine ⟨H, Z, ?_⟩
+  refine
+    { completeness := by
+        simpa [SelfImprovement.selfImprovementError, selfImprovementInInductionError] using
+          hfinal.completeness
+      pointConsistency := by
+        simpa [SelfImprovement.selfImprovementError, selfImprovementInInductionError] using
+          hfinal.pointConsistency
+      strongSelfConsistency := by
+        have hssc_eq :
+            bipartiteSSCError strategy.state (uniformDistribution Unit)
+                (constSubMeasFamily H.toSubMeas) =
+              (1 / 2 : Error) *
+                sddError strategy.state (uniformDistribution Unit)
+                  (constSubMeasFamily H.toSubMeas.liftLeft)
+                  (constSubMeasFamily H.toSubMeas.liftRight) := by
+          simpa [bipartiteSSCError, sddError, avgOver, uniformDistribution, constSubMeasFamily]
+            using
+              Commutativity.qBipartiteSSCDefect_eq_half_qSDD_of_proj
+                strategy.state hbridges.permInvariant H
+        refine ⟨?_⟩
+        rw [hssc_eq]
+        have herr_nonneg : 0 ≤ SelfImprovement.selfImprovementError params eps delta := by
+          exact le_trans
+            (sddError_nonneg strategy.state (uniformDistribution Unit)
+              (constSubMeasFamily H.toSubMeas.liftLeft)
+              (constSubMeasFamily H.toSubMeas.liftRight))
+            hfinal.selfCloseness.squaredDistanceBound
+        calc
+          (1 / 2 : Error) *
+              sddError strategy.state (uniformDistribution Unit)
+                (constSubMeasFamily H.toSubMeas.liftLeft)
+                (constSubMeasFamily H.toSubMeas.liftRight)
+            ≤ (1 / 2 : Error) * SelfImprovement.selfImprovementError params eps delta := by
+                exact
+                  mul_le_mul_of_nonneg_left
+                    hfinal.selfCloseness.squaredDistanceBound (by norm_num)
+          _ ≤ 1 * SelfImprovement.selfImprovementError params eps delta := by
+                exact mul_le_mul_of_nonneg_right (by norm_num) herr_nonneg
+          _ = selfImprovementInInductionError params eps delta gamma := by
+                simp [SelfImprovement.selfImprovementError, selfImprovementInInductionError]
+      selfCloseness := by
+        simpa [SelfImprovement.selfImprovementError, selfImprovementInInductionError] using
+          hfinal.selfCloseness
+      bounded := by
+        simpa [tensorFailureExpectation, SelfImprovement.projectiveBoundednessGap,
+          SelfImprovement.projectiveResidualOperator, SelfImprovement.selfImprovementError,
+          selfImprovementInInductionError] using hfinal.projectiveResidualBound
+      dominatesAveragePointOperator := by
+        intro h
+        have hdom :=
+          hfinal.dualDominatesAveragedPoint h
+        have havg :
+            averagedPointEvaluationOperator params strategy h =
+              ∑ x ∈ (uniformDistribution (Point params)).support,
+                (uniformDistribution (Point params)).weight x •
+                  (strategy.pointMeasurement x).outcome (h x) := by
+          rfl
+        rw [havg]
+        have hdom' := hdom
+        simp [SelfImprovement.sdpDualSlackOperator, SelfImprovement.averagedPointOperator,
+          ExpansionHypercubeGraph.averageOperatorOverDistribution,
+          GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
+        simpa using Matrix.nonneg_iff_posSemidef.mp hdom' }
 
 /-- `thm:ld-pasting-in-induction-section`. -/
 -- NOTE: `FieldModel.{0}` is needed to match the universe at which

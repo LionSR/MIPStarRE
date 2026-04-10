@@ -1095,6 +1095,50 @@ theorem commutingWithGIncomplete
       _ ≤ commutingWithGIncompleteError params gamma zeta := by
           simpa [commutingWithGIncompleteError] using hcomplete_bound
 
+set_option maxHeartbeats 2000000
+
+/-- Split the `Option × Option` squared-distance defect into its four quadrants. -/
+private lemma qSDDCore_option_pair_decompose
+    {α β : Type*} [Fintype α] [Fintype β]
+    (ψ : QuantumState ι)
+    (Lss Rss : α × β → MIPStarRE.Quantum.Op ι)
+    (Lsn Rsn : α → MIPStarRE.Quantum.Op ι)
+    (Lns Rns : β → MIPStarRE.Quantum.Op ι)
+    (Lnn Rnn : Unit → MIPStarRE.Quantum.Op ι) :
+    qSDDCore ψ
+      (fun ab : Option α × Option β =>
+        match ab.1, ab.2 with
+        | some a, some b => Lss (a, b)
+        | some a, none => Lsn a
+        | none, some b => Lns b
+        | none, none => Lnn ())
+      (fun ab : Option α × Option β =>
+        match ab.1, ab.2 with
+        | some a, some b => Rss (a, b)
+        | some a, none => Rsn a
+        | none, some b => Rns b
+        | none, none => Rnn ()) =
+      qSDDCore ψ Lss Rss +
+        qSDDCore ψ Lsn Rsn +
+        qSDDCore ψ Lns Rns +
+        qSDDCore ψ Lnn Rnn := by
+  unfold qSDDCore
+  rw [Fintype.sum_prod_type, Fintype.sum_option]
+  simp_rw [Fintype.sum_option]
+  rw [Finset.sum_add_distrib]
+  let SS : α × β → Error := fun a =>
+    ev ψ ((Lss a - Rss a)ᴴ * (Lss a - Rss a))
+  have hss :
+      (∑ x, ∑ x_1, ev ψ ((Lss (x, x_1) - Rss (x, x_1))ᴴ * (Lss (x, x_1) - Rss (x, x_1)))) =
+        ∑ a : α × β, SS a := by
+    symm
+    simpa [SS] using
+      (Fintype.sum_prod_type'
+        (f := fun x x_1 =>
+          ev ψ ((Lss (x, x_1) - Rss (x, x_1))ᴴ * (Lss (x, x_1) - Rss (x, x_1)))))
+  rw [hss]
+  simpa [SS, add_assoc, add_left_comm, add_comm]
+
 /-- `cor:G-hat-facts`. -/
 theorem gHatFacts
     (params : Parameters)
@@ -1315,7 +1359,123 @@ theorem gHatFacts
       -- TODO(#199): isolate the explicit `Option × Option` sum rewrite into a reusable lemma.
       -- The rest of the proof below already handles the scalar bounds once this decomposition
       -- is available.
-      sorry
+      intro q
+      rcases q with ⟨x, y⟩
+      let completeLeft :
+          (Polynomial params × Polynomial params) → MIPStarRE.Quantum.Op (ι × ι) :=
+        (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+          orderedProductOpFamily
+            ((family.meas x).toSubMeas)
+            ((family.meas y).toSubMeas)).outcome
+      let completeRight :
+          (Polynomial params × Polynomial params) → MIPStarRE.Quantum.Op (ι × ι) :=
+        (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+          reversedProductOpFamily
+            ((family.meas x).toSubMeas)
+            ((family.meas y).toSubMeas)).outcome
+      let incompleteLeft :
+          Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+        (incompletePartPointProductLeft params family (x, y)).outcome
+      let incompleteRight :
+          Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+        (incompletePartPointProductRight params family (x, y)).outcome
+      let swappedLeft :
+          Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+        (swappedIncompletePointLeft (x, y)).outcome
+      let swappedRight :
+          Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+        (swappedIncompletePointRight (x, y)).outcome
+      let totalLeft : Unit → MIPStarRE.Quantum.Op (ι × ι) :=
+        (incompletePartTotalProductLeft params family (x, y)).outcome
+      let totalRight : Unit → MIPStarRE.Quantum.Op (ι × ι) :=
+        (incompletePartTotalProductRight params family (x, y)).outcome
+      have hcompleteTotalX :
+          (completePartSubMeas params family x).total = (family.meas x).total := by
+        simp [completePartSubMeas, postprocess_total]
+      have hcompleteTotalY :
+          (completePartSubMeas params family y).total = (family.meas y).total := by
+        simp [completePartSubMeas, postprocess_total]
+      let gHatLeft :
+          Option (Polynomial params) × Option (Polynomial params) →
+            MIPStarRE.Quantum.Op (ι × ι) :=
+        fun ab =>
+          match ab.1, ab.2 with
+          | some g, some h => completeLeft (g, h)
+          | some g, none => incompleteLeft g
+          | none, some h => swappedLeft h
+          | none, none => totalLeft ()
+      let gHatRight :
+          Option (Polynomial params) × Option (Polynomial params) →
+            MIPStarRE.Quantum.Op (ι × ι) :=
+        fun ab =>
+          match ab.1, ab.2 with
+          | some g, some h => completeRight (g, h)
+          | some g, none => incompleteRight g
+          | none, some h => swappedRight h
+          | none, none => totalRight ()
+      have hgHatLeft :
+          (gHatPairProductLeft params family (x, y)).outcome = gHatLeft := by
+        funext ab
+        rcases ab with ⟨a, b⟩
+        cases a <;> cases b <;>
+          simp [gHatLeft, completeLeft, incompleteLeft, swappedLeft, totalLeft,
+            gHatPairProductLeft, gHatIdxMeas, completeSubMeas,
+            incompletePartPointProductLeft, incompletePartTotalProductLeft,
+            swappedIncompletePointLeft, incompletePartSubMeas, multiplyByTotalOnLeft,
+            multiplyByTotalOnRight, orderedProductOpFamily, OpFamily.leftPlacedOpFamily,
+            hcompleteTotalX, hcompleteTotalY]
+      have hgHatRight :
+          (gHatPairProductRight params family (x, y)).outcome = gHatRight := by
+        funext ab
+        rcases ab with ⟨a, b⟩
+        cases a <;> cases b <;>
+          simp [gHatRight, completeRight, incompleteRight, swappedRight, totalRight,
+            gHatPairProductRight, gHatIdxMeas, completeSubMeas,
+            incompletePartPointProductRight, incompletePartTotalProductRight,
+            swappedIncompletePointRight, incompletePartSubMeas, multiplyByTotalOnLeft,
+            multiplyByTotalOnRight, reversedProductOpFamily, OpFamily.leftPlacedOpFamily,
+            hcompleteTotalX, hcompleteTotalY]
+      calc
+        qSDDOp ψbi
+            (gHatPairProductLeft params family (x, y))
+            (gHatPairProductRight params family (x, y))
+          = qSDDCore ψbi gHatLeft gHatRight := by
+              rw [qSDDOp, hgHatLeft, hgHatRight]
+        _ =
+            qSDDCore ψbi completeLeft completeRight +
+              qSDDCore ψbi incompleteLeft incompleteRight +
+              qSDDCore ψbi swappedLeft swappedRight +
+              qSDDCore ψbi totalLeft totalRight := by
+                dsimp [gHatLeft, gHatRight]
+                convert qSDDCore_option_pair_decompose ψbi
+                  completeLeft completeRight
+                  incompleteLeft incompleteRight
+                  swappedLeft swappedRight
+                  totalLeft totalRight using 1
+                · unfold qSDDCore
+                  apply Finset.sum_congr rfl
+                  intro a _ha
+                  rcases a with ⟨oa, ob⟩
+                  cases oa <;> cases ob <;> simp
+        _ =
+            completeQuadrant (x, y) +
+              incompleteQuadrant (x, y) +
+              swappedQuadrant (x, y) +
+              totalQuadrant (x, y) := by
+                have hcompleteQuadrant :
+                    qSDDCore ψbi completeLeft completeRight = completeQuadrant (x, y) := by
+                  rfl
+                have hincompleteQuadrant :
+                    qSDDCore ψbi incompleteLeft incompleteRight =
+                      incompleteQuadrant (x, y) := by
+                  rfl
+                have hswappedQuadrant :
+                    qSDDCore ψbi swappedLeft swappedRight = swappedQuadrant (x, y) := by
+                  rfl
+                have htotalQuadrant :
+                    qSDDCore ψbi totalLeft totalRight = totalQuadrant (x, y) := by
+                  rfl
+                rw [hcompleteQuadrant, hincompleteQuadrant, hswappedQuadrant, htotalQuadrant]
     rcases hcommComplete.pairwiseCompletePartCommutation with ⟨hcomplete_bound⟩
     rcases hcommIncomplete.pointWithIncompletePartCommutation with ⟨hincomplete_point_bound⟩
     rcases hcommIncomplete.incompletePartCommutation with ⟨hincomplete_total_bound⟩
@@ -1404,6 +1564,8 @@ theorem gHatFacts
               _ = gHatCommutationError params gamma zeta := by
                     simp [gHatCommutationError, sixteenthSum]
                     ring
+
+set_option maxHeartbeats 200000
 
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich

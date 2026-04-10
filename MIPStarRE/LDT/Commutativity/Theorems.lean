@@ -188,7 +188,9 @@ private lemma avgOver_uniform_prod
           (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
           simp [avgOver, uniformDistribution, Finset.mul_sum]
 
-private lemma qBipartiteSSCDefect_eq_half_qSDD_of_proj
+/-- For a projective submeasurement on a permutation-invariant bipartite state,
+the bipartite SSC defect is exactly half of the left/right SDD defect. -/
+lemma qBipartiteSSCDefect_eq_half_qSDD_of_proj
     {α : Type*} [Fintype α]
     (ψ : QuantumState (ι × ι))
     (hperm : PermInvState ψ)
@@ -679,6 +681,147 @@ private lemma evaluationSpecialization_sddErrorOp_eq
   simp_rw [evaluatedFromFullSliceProductLeft_outcome_eq,
       evaluatedFromFullSliceProductRight_outcome_eq]
 
+/-- Reindex an evaluated-slice question into its truncated points and
+underlying full-slice question. -/
+private def evaluatedSliceQuestionEquiv (params : Parameters) [FieldModel params.q] :
+    EvaluatedSliceQuestion params ≃
+      (Point params × Point params) × FullSliceQuestion params where
+  toFun := fun q =>
+    ((truncatePoint params q.1, truncatePoint params q.2),
+      fullSliceQuestionOfEvaluatedSlice params q)
+  invFun := fun r =>
+    ((appendPoint params r.1.1 r.2.1), (appendPoint params r.1.2 r.2.2))
+  left_inv := by
+    rintro ⟨u, v⟩
+    change
+      (appendPoint params (truncatePoint params u) (pointHeight params u),
+        appendPoint params (truncatePoint params v) (pointHeight params v)) =
+        (u, v)
+    exact Prod.ext
+      ((pointNextEquiv params).left_inv u)
+      ((pointNextEquiv params).left_inv v)
+  right_inv := by
+    rintro ⟨⟨u, v⟩, x, y⟩
+    simp [fullSliceQuestionOfEvaluatedSlice]
+
+/-- Pulling a family on `FullSliceQuestion` back along
+`fullSliceQuestionOfEvaluatedSlice` preserves the averaged `sddErrorOp`. -/
+private lemma sddErrorOp_pullback_fullSliceQuestion_eq
+    (params : Parameters) [FieldModel params.q]
+    (ψ : QuantumState (ι × ι))
+    {Outcome : Type*} [Fintype Outcome]
+    (A B : IdxOpFamily (FullSliceQuestion params) Outcome (ι × ι)) :
+    sddErrorOp ψ
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q => A (fullSliceQuestionOfEvaluatedSlice params q))
+      (fun q => B (fullSliceQuestionOfEvaluatedSlice params q)) =
+    sddErrorOp ψ
+      (uniformDistribution (FullSliceQuestion params))
+      A B := by
+  let e := evaluatedSliceQuestionEquiv params
+  unfold sddErrorOp
+  calc
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q =>
+          qSDDOp ψ
+            (A (fullSliceQuestionOfEvaluatedSlice params q))
+            (B (fullSliceQuestionOfEvaluatedSlice params q)))
+      =
+        avgOver
+          (uniformDistribution
+            ((Point params × Point params) × FullSliceQuestion params))
+          (fun r => qSDDOp ψ (A r.2) (B r.2)) := by
+            calc
+              avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+                  (fun q =>
+                    qSDDOp ψ
+                      (A (fullSliceQuestionOfEvaluatedSlice params q))
+                      (B (fullSliceQuestionOfEvaluatedSlice params q)))
+                =
+                  avgOver
+                    (uniformDistribution
+                      ((Point params × Point params) × FullSliceQuestion params))
+                    (fun r =>
+                      qSDDOp ψ
+                        (A (fullSliceQuestionOfEvaluatedSlice params (e.symm r)))
+                        (B (fullSliceQuestionOfEvaluatedSlice params (e.symm r)))) :=
+                    avgOver_uniform_equiv e
+                      (fun q =>
+                        qSDDOp ψ
+                          (A (fullSliceQuestionOfEvaluatedSlice params q))
+                          (B (fullSliceQuestionOfEvaluatedSlice params q)))
+              _ =
+                  avgOver
+                    (uniformDistribution
+                      ((Point params × Point params) × FullSliceQuestion params))
+                    (fun r => qSDDOp ψ (A r.2) (B r.2)) := by
+                      apply avgOver_congr
+                      rintro ⟨⟨u, v⟩, x, y⟩
+                      simp [e, evaluatedSliceQuestionEquiv,
+                        fullSliceQuestionOfEvaluatedSlice]
+    _ =
+        avgOver (uniformDistribution (FullSliceQuestion params))
+          (fun xy => qSDDOp ψ (A xy) (B xy)) := by
+            simpa using
+              (avgOver_uniform_snd
+                (α := Point params × Point params)
+                (β := FullSliceQuestion params)
+                (f := fun xy => qSDDOp ψ (A xy) (B xy)))
+
+/-- Any `SDDOpRel` bound proved after pulling back along
+`fullSliceQuestionOfEvaluatedSlice` descends to `FullSliceQuestion`. -/
+private lemma sddOpRel_of_pullback_fullSliceQuestion
+    (params : Parameters) [FieldModel params.q]
+    (ψ : QuantumState (ι × ι))
+    {Outcome : Type*} [Fintype Outcome]
+    (A B : IdxOpFamily (FullSliceQuestion params) Outcome (ι × ι))
+    (δ : Error) :
+    SDDOpRel ψ
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q => A (fullSliceQuestionOfEvaluatedSlice params q))
+      (fun q => B (fullSliceQuestionOfEvaluatedSlice params q))
+      δ →
+    SDDOpRel ψ
+      (uniformDistribution (FullSliceQuestion params))
+      A B
+      δ := by
+  intro ⟨h⟩
+  constructor
+  rw [← sddErrorOp_pullback_fullSliceQuestion_eq params ψ A B]
+  exact h
+
+/-- Core Schwartz-Zippel transport on the evaluated-question space.
+
+This is the substantive remaining step: compare the full polynomial outcomes
+with their point-evaluated postprocessings while paying the two `md/q`
+Schwartz-Zippel losses and the self-consistency bookkeeping. -/
+private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
+    (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (_hself : family.StronglySelfConsistent strategy.state zeta)
+    (hEval :
+      SDDOpRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedFromFullSliceProductLeft params strategy family)
+        (evaluatedFromFullSliceProductRight params strategy family)
+        (commDataProcessedGError params gamma zeta)) :
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q => fullSliceProductLeft params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q))
+      (fun q => fullSliceProductRight params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q))
+      (comMainError params gamma zeta) := by
+  /-
+  Paper reference: `references/ldt-paper/commutativity-G.tex`,
+  theorem `thm:com-main`, especially the passage from
+  `eq:evaluate-gcom-at-points` to `eq:evaluate-gcom-at-points-part-dos`
+  and the final displayed error estimate.
+  -/
+  have _ := hEval
+  sorry
+
 /-- The remaining `thm:com-main` lift from evaluated commutation back to
 full-slice commutation.
 
@@ -703,13 +846,13 @@ private lemma fullSliceCommutation_of_evaluated
       (fullSliceProductLeft params strategy family)
       (fullSliceProductRight params strategy family)
       (comMainError params gamma zeta) := by
-  /-
-  Paper reference: `references/ldt-paper/commutativity-G.tex`,
-  theorem `thm:com-main`, especially the passage from
-  `eq:evaluate-gcom-at-points` to `eq:evaluate-gcom-at-points-part-dos`
-  and the final displayed error estimate.
-  -/
-  sorry
+  exact
+    sddOpRel_of_pullback_fullSliceQuestion params strategy.state
+      (fullSliceProductLeft params strategy family)
+      (fullSliceProductRight params strategy family)
+      (comMainError params gamma zeta)
+      (fullSliceCommutation_of_evaluated_on_evaluated_questions
+        params strategy family gamma zeta _hself hEval)
 
 /-- `thm:com-main`. -/
 theorem comMain
