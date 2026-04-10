@@ -1170,7 +1170,240 @@ theorem gHatFacts
     -- `GHatOutcome × GHatOutcome` into complete + incomplete quadrants
     -- and bound by `gHatCommutationError`.
     -- Paper reference: `cor:G-hat-facts` in `ld-pasting.tex`.
-    sorry
+    let swappedIncompletePointLeft :
+        IdxOpFamily (SlicePairQuestion params) (Polynomial params) (ι × ι) :=
+      fun q =>
+        OpFamily.leftPlacedOpFamily (ιB := ι) <|
+          multiplyByTotalOnLeft
+            (incompletePartSubMeas params family q.1)
+            ((family.meas q.2).toSubMeas)
+    let swappedIncompletePointRight :
+        IdxOpFamily (SlicePairQuestion params) (Polynomial params) (ι × ι) :=
+      fun q =>
+        OpFamily.leftPlacedOpFamily (ιB := ι) <|
+          multiplyByTotalOnRight
+            ((family.meas q.2).toSubMeas)
+            (incompletePartSubMeas params family q.1)
+    -- Review note: this duplicates a symmetry argument used elsewhere; keep it local for now.
+    have hqSDDOp_symm_poly
+        (A B : OpFamily (Polynomial params) (ι × ι)) :
+        qSDDOp ψbi A B = qSDDOp ψbi B A := by
+      let F : Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+        fun a => A.outcome a - B.outcome a
+      let G : Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+        fun a => B.outcome a - A.outcome a
+      have hFG : F = fun a => -G a := by
+        funext a
+        dsimp [F, G]
+        abel
+      unfold qSDDOp qSDDCore
+      change ∑ a : Polynomial params, ev ψbi ((F a)ᴴ * F a) =
+        ∑ a : Polynomial params, ev ψbi ((G a)ᴴ * G a)
+      rw [hFG]
+      refine Finset.sum_congr rfl ?_
+      intro a _
+      change ev ψbi ((-G a)ᴴ * (-G a)) = ev ψbi ((G a)ᴴ * G a)
+      simp
+    have hswapIncompleteBound :
+        sddErrorOp ψbi
+          (uniformDistribution (SlicePairQuestion params))
+          swappedIncompletePointLeft
+          swappedIncompletePointRight
+          ≤ commutingWithGIncompleteError params gamma zeta := by
+      rcases hcommIncomplete.pointWithIncompletePartCommutation with ⟨hbound⟩
+      calc
+        sddErrorOp ψbi
+            (uniformDistribution (SlicePairQuestion params))
+            swappedIncompletePointLeft
+            swappedIncompletePointRight
+          =
+            avgOver (uniformDistribution (SlicePairQuestion params))
+              (fun q =>
+                qSDDOp ψbi
+                  (incompletePartPointProductLeft params family (q.2, q.1))
+                  (incompletePartPointProductRight params family (q.2, q.1))) := by
+                unfold sddErrorOp swappedIncompletePointLeft swappedIncompletePointRight
+                apply avgOver_congr
+                intro q
+                rw [hqSDDOp_symm_poly]
+                rfl
+        _ =
+            avgOver (uniformDistribution (SlicePairQuestion params))
+              (fun q =>
+                qSDDOp ψbi
+                  (incompletePartPointProductLeft params family q)
+                  (incompletePartPointProductRight params family q)) := by
+                simpa using
+                  (avgOver_uniform_equiv
+                    (Equiv.prodComm (Fq params) (Fq params))
+                    (fun q =>
+                      qSDDOp ψbi
+                        (incompletePartPointProductLeft params family q)
+                        (incompletePartPointProductRight params family q))).symm
+        _ =
+            sddErrorOp ψbi
+              (uniformDistribution (SlicePairQuestion params))
+              (incompletePartPointProductLeft params family)
+              (incompletePartPointProductRight params family) := by
+                rfl
+        _ ≤ commutingWithGIncompleteError params gamma zeta := hbound
+    have hzeta_nonneg : 0 ≤ zeta := by
+      rcases hselfIncomplete.incompletePartSelfConsistency with ⟨hbound⟩
+      exact le_trans
+        (sddError_nonneg ψbi
+          (uniformDistribution (SliceQuestion params))
+          (incompletePartLeftFamily params family)
+          (incompletePartRightFamily params family))
+        hbound
+    have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
+      positivity
+    have hratio_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 := by
+      have hq_pos : (0 : Error) < params.q := by
+        exact_mod_cast params.hq
+      exact (div_le_one hq_pos).2 (by simpa using hd_le_q)
+    have hquarter_gamma :
+        Real.rpow gamma (1 / (4 : Error)) ≤ Real.rpow gamma (1 / (16 : Error)) := by
+      have hpow :
+          (1 / (16 : Error)) ≤ (1 / (4 : Error)) := by norm_num
+      exact Real.rpow_le_rpow_of_exponent_ge' hgamma_nonneg hgamma (by norm_num) hpow
+    have hquarter_zeta :
+        Real.rpow zeta (1 / (4 : Error)) ≤ Real.rpow zeta (1 / (16 : Error)) := by
+      have hpow :
+          (1 / (16 : Error)) ≤ (1 / (4 : Error)) := by norm_num
+      exact Real.rpow_le_rpow_of_exponent_ge' hzeta_nonneg hzeta (by norm_num) hpow
+    have hquarter_ratio :
+        Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)) ≤
+          Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
+      have hpow :
+          (1 / (16 : Error)) ≤ (1 / (4 : Error)) := by norm_num
+      exact Real.rpow_le_rpow_of_exponent_ge' hratio_nonneg hratio_le_one (by norm_num) hpow
+    let completeQuadrant : SlicePairQuestion params → Error :=
+      fun q =>
+        qSDDOp ψbi
+          (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+            orderedProductOpFamily
+              ((family.meas q.1).toSubMeas)
+              ((family.meas q.2).toSubMeas))
+          (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+            reversedProductOpFamily
+              ((family.meas q.1).toSubMeas)
+              ((family.meas q.2).toSubMeas))
+    let incompleteQuadrant : SlicePairQuestion params → Error :=
+      fun q =>
+        qSDDOp ψbi
+          (incompletePartPointProductLeft params family q)
+          (incompletePartPointProductRight params family q)
+    let swappedQuadrant : SlicePairQuestion params → Error :=
+      fun q =>
+        qSDDOp ψbi
+          (swappedIncompletePointLeft q)
+          (swappedIncompletePointRight q)
+    let totalQuadrant : SlicePairQuestion params → Error :=
+      fun q =>
+        qSDDOp ψbi
+          (incompletePartTotalProductLeft params family q)
+          (incompletePartTotalProductRight params family q)
+    have hdecomp_q :
+        ∀ q,
+          qSDDOp ψbi
+              (gHatPairProductLeft params family q)
+              (gHatPairProductRight params family q) =
+            completeQuadrant q +
+              incompleteQuadrant q +
+              swappedQuadrant q +
+              totalQuadrant q := by
+      -- TODO(#199): isolate the explicit `Option × Option` sum rewrite into a reusable lemma.
+      -- The rest of the proof below already handles the scalar bounds once this decomposition
+      -- is available.
+      sorry
+    rcases hcommComplete.pairwiseCompletePartCommutation with ⟨hcomplete_bound⟩
+    rcases hcommIncomplete.pointWithIncompletePartCommutation with ⟨hincomplete_point_bound⟩
+    rcases hcommIncomplete.incompletePartCommutation with ⟨hincomplete_total_bound⟩
+    refine ⟨?_⟩
+    calc
+      sddErrorOp ψbi
+          (uniformDistribution (SlicePairQuestion params))
+          (gHatPairProductLeft params family)
+          (gHatPairProductRight params family)
+        =
+          avgOver (uniformDistribution (SlicePairQuestion params))
+            (fun q =>
+              completeQuadrant q +
+                incompleteQuadrant q +
+                swappedQuadrant q +
+                totalQuadrant q) := by
+            unfold sddErrorOp
+            apply avgOver_congr
+            exact hdecomp_q
+      _ =
+          sddErrorOp ψbi
+            (uniformDistribution (SlicePairQuestion params))
+            (fun q =>
+              OpFamily.leftPlacedOpFamily (ιB := ι) <|
+                orderedProductOpFamily
+                  ((family.meas q.1).toSubMeas)
+                  ((family.meas q.2).toSubMeas))
+            (fun q =>
+              OpFamily.leftPlacedOpFamily (ιB := ι) <|
+                reversedProductOpFamily
+                  ((family.meas q.1).toSubMeas)
+                  ((family.meas q.2).toSubMeas)) +
+          sddErrorOp ψbi
+            (uniformDistribution (SlicePairQuestion params))
+            (incompletePartPointProductLeft params family)
+            (incompletePartPointProductRight params family) +
+          sddErrorOp ψbi
+            (uniformDistribution (SlicePairQuestion params))
+            swappedIncompletePointLeft
+            swappedIncompletePointRight +
+          sddErrorOp ψbi
+            (uniformDistribution (SlicePairQuestion params))
+            (incompletePartTotalProductLeft params family)
+            (incompletePartTotalProductRight params family) := by
+              unfold sddErrorOp
+              rw [avgOver_add, avgOver_add, avgOver_add]
+      _ ≤
+          pairwiseCompletePartCommutationError params gamma zeta +
+            commutingWithGIncompleteError params gamma zeta +
+            commutingWithGIncompleteError params gamma zeta +
+            commutingWithGIncompleteError params gamma zeta := by
+              gcongr
+      _ ≤ gHatCommutationError params gamma zeta := by
+            set quarterSum : Error :=
+              Real.rpow gamma (1 / (4 : Error)) +
+                Real.rpow zeta (1 / (4 : Error)) +
+                Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error))
+            set sixteenthSum : Error :=
+              Real.rpow gamma (1 / (16 : Error)) +
+                Real.rpow zeta (1 / (16 : Error)) +
+                Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
+            have hquarter_le :
+                quarterSum ≤ sixteenthSum := by
+              dsimp [quarterSum, sixteenthSum]
+              exact add_le_add (add_le_add hquarter_gamma hquarter_zeta) hquarter_ratio
+            have hm_nonneg : 0 ≤ (params.m : Error) := by positivity
+            calc
+              pairwiseCompletePartCommutationError params gamma zeta +
+                  commutingWithGIncompleteError params gamma zeta +
+                  commutingWithGIncompleteError params gamma zeta +
+                  commutingWithGIncompleteError params gamma zeta
+                =
+                  30 * (params.m : Error) * quarterSum +
+                    36 * (params.m : Error) * sixteenthSum +
+                    36 * (params.m : Error) * sixteenthSum +
+                    36 * (params.m : Error) * sixteenthSum := by
+                      simp [pairwiseCompletePartCommutationError, quarterSum,
+                        commutingWithGIncompleteError, commutingWithGCompleteError,
+                        sixteenthSum, Commutativity.comMainError]
+              _ ≤
+                  30 * (params.m : Error) * sixteenthSum +
+                    36 * (params.m : Error) * sixteenthSum +
+                    36 * (params.m : Error) * sixteenthSum +
+                    36 * (params.m : Error) * sixteenthSum := by
+                      gcongr
+              _ = gHatCommutationError params gamma zeta := by
+                    simp [gHatCommutationError, sixteenthSum]
+                    ring
 
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
