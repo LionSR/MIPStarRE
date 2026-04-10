@@ -97,6 +97,7 @@ noncomputable def diagonalLineAnswerFamily {params : Parameters}
 structure ProjStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
+  permInvState : PermInvState state
   pointMeasurementA : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurementA :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
@@ -161,8 +162,7 @@ def leftAsSymmetric {params : Parameters} [FieldModel params.q]
     (strategy : ProjStrat params ι) :
     SymStrat params ι where
   state := strategy.state
-  permInvState := by
-    sorry
+  permInvState := strategy.permInvState
   pointMeasurement := strategy.pointMeasurementA
   axisParallelMeasurement := strategy.axisParallelMeasurementA
   diagonalMeasurement := strategy.diagonalMeasurementA
@@ -173,8 +173,7 @@ def rightAsSymmetric {params : Parameters} [FieldModel params.q]
     (strategy : ProjStrat params ι) :
     SymStrat params ι where
   state := strategy.state
-  permInvState := by
-    sorry
+  permInvState := strategy.permInvState
   pointMeasurement := strategy.pointMeasurementB
   axisParallelMeasurement := strategy.axisParallelMeasurementB
   diagonalMeasurement := strategy.diagonalMeasurementB
