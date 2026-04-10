@@ -379,32 +379,19 @@ theorem comMain
   let hEval :=
     commDataProcessedG params strategy eps delta gamma zeta hgood family G
       hG hcons hself hbound
+  have hSpecialized :
+      SDDOpRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedFromFullSliceProductLeft params strategy family)
+        (evaluatedFromFullSliceProductRight params strategy family)
+        (commDataProcessedGError params gamma zeta) := by
+    constructor
+    rw [evaluationSpecialization_sddErrorOp_eq]
+    exact hEval.evaluatedSliceCommutation.squaredDistanceBound
   refine
     { evaluatedCommutation := hEval
-      evaluationSpecialization := by
-        constructor
-        rw [evaluationSpecialization_sddErrorOp_eq]
-        exact hEval.evaluatedSliceCommutation.squaredDistanceBound
+      evaluationSpecialization := hSpecialized
       fullSliceCommutation := by
-        have hEvalError :
-            sddErrorOp strategy.state
-                (uniformDistribution (EvaluatedSliceQuestion params))
-                (evaluatedFromFullSliceProductLeft params strategy family)
-                (evaluatedFromFullSliceProductRight params strategy family) =
-              sddErrorOp strategy.state
-                (uniformDistribution (EvaluatedSliceQuestion params))
-                (evaluatedSliceProductLeft params strategy family)
-                (evaluatedSliceProductRight params strategy family) :=
-          evaluationSpecialization_sddErrorOp_eq params strategy family
-        have hSpecialized :
-            SDDOpRel strategy.state
-              (uniformDistribution (EvaluatedSliceQuestion params))
-              (evaluatedFromFullSliceProductLeft params strategy family)
-              (evaluatedFromFullSliceProductRight params strategy family)
-              (commDataProcessedGError params gamma zeta) := by
-          constructor
-          rw [hEvalError]
-          exact hEval.evaluatedSliceCommutation.squaredDistanceBound
         exact
           fullSliceCommutation_of_evaluated
             params strategy family gamma zeta hself hSpecialized }
