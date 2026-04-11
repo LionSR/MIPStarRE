@@ -284,6 +284,11 @@ noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel p
             --     slice consistency (ld-pasting.tex:1238-1254).
             -- See also: Set.InjOn v ↑τ (from distinctTuples)
             -- is needed for eval_basis_self in either approach.
+            -- NOTE(#307): This sorry is a known limitation tracked by issue #307.
+            -- The previous version proved lowIndividualDegree for an incorrect
+            -- (constant = 1) interpolation; this version uses the correct Lagrange
+            -- basis but the degree bound requires either restricting to a (d+1)-
+            -- subset or a cancellation argument. Net improvement over prior code.
             sorry }
       else
         fallbackInterpolatedPolynomial params
