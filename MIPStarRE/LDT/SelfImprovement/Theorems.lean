@@ -307,6 +307,8 @@ structure SelfImprovementBridgePackage (params : Parameters) [FieldModel params.
     (strategy : SymStrat params ι)
     (eps delta nu : Error) : Prop where
   permInvariant : PermInvState strategy.state
+  -- TODO: replace this nested conjunction with a small named structure once the
+  -- bridge package is removed or stabilized.
   globalVarianceProofInputs :
     ∀ T : Measurement (Polynomial params) ι,
       (∀ g : Polynomial params,

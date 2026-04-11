@@ -631,8 +631,8 @@ lemma matrixGeneralizeB
     [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (_eps _delta _gamma : Error)
+    (_hgood : strategy.IsGood _eps _delta _gamma)
     (G : SubMeas (Polynomial params) ι)
     (ψbi : QuantumState (ι × ι))
     (hpoint :
@@ -643,11 +643,10 @@ lemma matrixGeneralizeB
         matrixGeneralizeBDeviationAtPolynomial params model g =
           generalizeBDeviationAtPolynomial params strategy ψbi G g) :
     MatrixGeneralizeBStatement params model := by
-  let habstract := generalizeB params strategy eps delta gamma hgood G ψbi hpoint
   refine matrixGeneralizeB_of_pointwise params model ?_
   intro g
   rw [hcompat g]
-  exact habstract.pointwiseNormBound g
+  exact hpoint g
 
 /-- Matrix-level counterpart of `lem:local-variance-of-points`, proved by reducing
 to the abstract version via an explicit compatibility hypothesis linking the
@@ -657,8 +656,8 @@ lemma matrixLocalVarianceOfPoints
     [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
+    (eps delta _gamma : Error)
+    (_hgood : strategy.IsGood eps delta _gamma)
     (G : SubMeas (Polynomial params) ι)
     (_ψbi : QuantumState (ι × ι))
     (hpoint :
@@ -683,10 +682,10 @@ lemma matrixGlobalVarianceOfPoints
     [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (eps delta _gamma : Error)
+    (_hgood : strategy.IsGood eps delta _gamma)
     (G : SubMeas (Polynomial params) ι)
-    (ψbi : QuantumState (ι × ι))
+    (_ψbi : QuantumState (ι × ι))
     (hpoint :
       ∀ g : Polynomial params,
         pointConditionedLocalVarianceAtPolynomial params strategy G g ≤
@@ -696,8 +695,11 @@ lemma matrixGlobalVarianceOfPoints
         matrixPointConditionedLocalVarianceAtPolynomial params model g =
           pointConditionedLocalVarianceAtPolynomial params strategy G g) :
     MatrixGlobalVarianceOfPointsStatement params model eps delta := by
-  exact matrixGlobalVarianceOfPoints_from_local params model eps delta
-    (matrixLocalVarianceOfPoints params model strategy eps delta gamma hgood G ψbi hpoint hcompat)
+  refine matrixGlobalVarianceOfPoints_from_local params model eps delta ?_
+  refine matrixLocalVarianceOfPoints_of_pointwise params model eps delta ?_
+  intro g
+  rw [hcompat g]
+  exact hpoint g
 
 
 end MIPStarRE.LDT.GlobalVariance
