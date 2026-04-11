@@ -27,6 +27,7 @@ Last updated: 2026-04-11
 - Survey agent: refreshed executable-sorry count and file-by-file breakdown.
 - Proof agent A: assigned to `Pasting.commutativitySwitcheroo` proof shape and
   triangle-composition route.
+- Proof agent A status: actively implementing `Pasting.commutativitySwitcheroo`.
 - Proof agent B: assigned to local helper subgoals in the same cluster:
   `completePartProjFamily.proj`,
   `pointWithCompletePart_as_switcheroo_input`,
@@ -159,6 +160,10 @@ Last updated: 2026-04-11
   paper's small-error regime hypotheses `(0 ≤ gamma ≤ 1)`, `(0 ≤ zeta ≤ 1)`,
   and `params.d ≤ params.q`.
 - `Pasting/Theorems.lean:completePartAggregateCommutation_as_total` proved.
+- `Pasting/Theorems.lean`: added local switcheroo support helpers
+  `switcherooSelfConsistency_bip`,
+  `switcherooCompletePartSelfConsistency_bip`, and
+  `avgOver_uniform_slicePair`.
 - `Pasting/Theorems.lean` now has 11 executable `sorry`s remaining in this file.
 
 ## Stale Entries From Earlier Waves
