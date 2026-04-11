@@ -400,6 +400,11 @@ private lemma op_zero_le_complex_smul_one_of_real_nonneg
     smul_le_smul_of_nonneg_right hc
       (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one)
 
+private lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
+    0 ≤ spectralTruncationError ζ := by
+  dsimp [spectralTruncationError]
+  exact Real.rpow_nonneg hζ _
+
 private lemma spectralTruncationError_two_mul_le (ζ : Error) (_hζ : 0 ≤ ζ) :
     spectralTruncationError (2 * ζ) ≤ 2 * spectralTruncationError ζ := by
   dsimp [spectralTruncationError]
@@ -418,8 +423,8 @@ private lemma spectralTruncationError_two_mul_le_roundingToProjectiveError
     spectralTruncationError (2 * ζ) ≤ 2 * spectralTruncationError ζ :=
       spectralTruncationError_two_mul_le ζ hζ
     _ ≤ roundingToProjectiveError ζ := by
-      dsimp [spectralTruncationError, roundingToProjectiveError]
-      exact mul_le_mul_of_nonneg_right (by norm_num) (Real.rpow_nonneg hζ _)
+      dsimp [roundingToProjectiveError]
+      exact mul_le_mul_of_nonneg_right (by norm_num) (spectralTruncationError_nonneg hζ)
 
 private lemma almostProjMeasOfSourceAlmostProjective {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
@@ -485,6 +490,7 @@ private lemma almostProjMeasOfSourceAlmostProjective {Outcome : Type uOutcome}
       space := H
       state := toyState
       measurement := toyMeas
+      -- Toy witness: PUnit carrier, single outcome. Verbose due to structure fields.
       overlapDecomposition := by
         have hoff :
             MIPStarRE.Quantum.inconsistency toyMeas.effect toyMeas.effect = 0 := by
@@ -584,9 +590,8 @@ lemma projectiveNonMeasurement {Outcome : Type uOutcome}
         R.total ≤ (1 : MIPStarRE.Quantum.Op ι) := spectral.projSubMeas.total_le_one
         _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
             (1 : MIPStarRE.Quantum.Op ι) := by
-            have hε_nonneg : 0 ≤ spectralTruncationError ζ := by
-              dsimp [spectralTruncationError]
-              exact Real.rpow_nonneg hζ _
+            have hε_nonneg : 0 ≤ spectralTruncationError ζ :=
+              spectralTruncationError_nonneg hζ
             have hcoeff : (1 : Error) ≤ 1 + 2 * spectralTruncationError ζ := by
               nlinarith
             simpa [Complex.ofReal_add, Complex.ofReal_mul] using
@@ -609,13 +614,11 @@ lemma projectiveNonMeasurement {Outcome : Type uOutcome}
             simp [R, sddErrorOp, qSDDOp, qSDDCore, constOpFamily, avgOver,
               uniformDistribution]
         _ ≤ 2 * spectralTruncationError ζ := by
-            have hε_nonneg : 0 ≤ spectralTruncationError ζ := by
-              dsimp [spectralTruncationError]
-              exact Real.rpow_nonneg hζ _
+            have hε_nonneg : 0 ≤ spectralTruncationError ζ :=
+              spectralTruncationError_nonneg hζ
             nlinarith
-    · have hε_nonneg : 0 ≤ spectralTruncationError ζ := by
-        dsimp [spectralTruncationError]
-        exact Real.rpow_nonneg hζ _
+    · have hε_nonneg : 0 ≤ spectralTruncationError ζ :=
+        spectralTruncationError_nonneg hζ
       have hcoeff :
           (0 : Error) ≤ (1 : Error) + 2 * spectralTruncationError ζ := by
         nlinarith
@@ -698,9 +701,8 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
             ≤ (1 : MIPStarRE.Quantum.Op ι) := spectral.projSubMeas.total_le_one
         _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
             (1 : MIPStarRE.Quantum.Op ι) := by
-            have hε_nonneg : 0 ≤ spectralTruncationError ζ := by
-              dsimp [spectralTruncationError]
-              exact Real.rpow_nonneg hζ _
+            have hε_nonneg : 0 ≤ spectralTruncationError ζ :=
+              spectralTruncationError_nonneg hζ
             have hcoeff : (1 : Error) ≤ 1 + 2 * spectralTruncationError ζ := by
               nlinarith
             simpa [Complex.ofReal_add, Complex.ofReal_mul] using
@@ -945,8 +947,8 @@ lemma qCompleteness {Outcome : Type*}
             ring
       _ ≤ roundingToProjectiveError ζ := hsdd
   have hround_nonneg : 0 ≤ roundingToProjectiveError ζ := by
-    dsimp [roundingToProjectiveError, spectralTruncationError]
-    exact mul_nonneg (by norm_num) (Real.rpow_nonneg hζ _)
+    dsimp [roundingToProjectiveError]
+    exact mul_nonneg (by norm_num) (spectralTruncationError_nonneg hζ)
   have habs :
       |Real.sqrt qMass - Real.sqrt diagA| ≤ Real.sqrt (roundingToProjectiveError ζ) := by
     refine abs_le_of_sq_le_sq' ?_ (Real.sqrt_nonneg _) |>.2
@@ -1049,8 +1051,7 @@ private lemma one_sub_spectralTruncationError_smul_le_sqrt
     (((1 : Error) - spectralTruncationError ζ) : ℂ) • Q ≤ CFC.sqrt Q := by
   let ε : Error := spectralTruncationError ζ
   have hε_nonneg : 0 ≤ ε := by
-    dsimp [ε, spectralTruncationError]
-    exact Real.rpow_nonneg hζ _
+    simpa [ε] using spectralTruncationError_nonneg hζ
   have hε_half : ε ≤ 1 / (2 : Error) :=
     spectralTruncationError_le_half ζ hζ hζ_small
   let c : NNReal := ⟨1 - ε, by linarith⟩
@@ -1114,8 +1115,7 @@ lemma sqrtQCompleteness {Outcome : Type*}
   intro hRank
   let ε : Error := spectralTruncationError ζ
   have hε_nonneg : 0 ≤ ε := by
-    dsimp [ε, spectralTruncationError]
-    exact Real.rpow_nonneg hζ _
+    simpa [ε] using spectralTruncationError_nonneg hζ
   have hε_half : ε ≤ 1 / (2 : Error) :=
     spectralTruncationError_le_half ζ hζ hζ_small
   have hqtotal_nonneg : 0 ≤ QTotal data := by
@@ -1203,8 +1203,7 @@ lemma qAlmostProjective {Outcome : Type*}
         (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) - ∑ a, Qa data a := by
     exact sub_le_sub_right hsum_le _
   have hε_nonneg : 0 ≤ ε := by
-    dsimp [ε, spectralTruncationError]
-    exact Real.rpow_nonneg hζ _
+    simpa [ε] using spectralTruncationError_nonneg hζ
   have hcoeff :
       (2 * ε) * (1 + 2 * ε) ≤ 4 * ε := by
     have hε_half : ε ≤ 1 / (2 : Error) := spectralTruncationError_le_half ζ hζ hζ_small
