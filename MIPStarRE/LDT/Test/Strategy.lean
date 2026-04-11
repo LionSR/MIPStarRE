@@ -53,8 +53,10 @@ structure SymStrat (params : Parameters) [FieldModel params.q]
 
 /-- Encoded samples `(u, i)` for the axis-parallel lines test.
 The paper samples a random point `u ∈ F_q^m` and a coordinate
-`i ∈ {1, …, m}`, forming the axis-parallel line through `u`
-in the `i`-th direction. -/
+`i ∈ {1, …, m}`. In Lean, `Fin params.m` represents the 0-indexed
+coordinates `{0, …, m - 1}`, corresponding to the paper's 1-indexed
+choice. The sample forms the axis-parallel line through `u` in that
+coordinate direction. -/
 abbrev AxisParallelTestSample (params : Parameters) :=
   Point params × Fin params.m
 
@@ -189,6 +191,7 @@ noncomputable def diagonalFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
+  -- `params.hm : 0 < params.m` ensures the averaging denominator is nonzero.
   (1 / (params.m : Error)) *
     ∑ j : Fin params.m,
       bipartiteConsError strategy.state
