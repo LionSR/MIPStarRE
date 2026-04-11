@@ -143,7 +143,7 @@ Remaining gaps:
 - **τ size mismatch**: the code sums over all of `τ` (which has
   `|τ| ≥ d+1`), while the paper's initial construction
   (ld-pasting.tex:240) uses exactly `d+1` slices. For `|τ| = d+1`
-  Mathlib's `Lagrange.degree_basis_lt` directly bounds the last-
+  Mathlib's `Lagrange.degree_basis` directly bounds the last-
   coordinate degree; for `|τ| > d+1` the raw degree exceeds `d` and
   the bound requires slice consistency. If the intent is to match the
   paper precisely, the definition may need to select a `(d+1)`-sized
