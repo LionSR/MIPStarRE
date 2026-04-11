@@ -677,6 +677,78 @@ theorem gBotSelfConsistency
                             leftPlacedSubMeas, rightPlacedSubMeas, T, hcomplete_outcome_T]
     _ ≤ zeta := hcomplete_total
 
+private lemma switcherooSelfConsistency_bip
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (omega : Error)
+    (hselfM : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (switcherooSelfConsistencyLeft params M)
+      (switcherooSelfConsistencyRight params M)
+      omega) :
+    Preliminaries.BipartiteSDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (IdxProjSubMeas.toIdxSubMeas M)
+      (IdxProjSubMeas.toIdxSubMeas M)
+      omega := by
+  constructor
+  simpa [switcherooSelfConsistencyLeft, switcherooSelfConsistencyRight,
+    IdxProjSubMeas.toIdxSubMeas, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
+    hselfM.squaredDistanceBound
+
+private lemma switcherooCompletePartSelfConsistency_bip
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
+    Preliminaries.BipartiteSDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (IdxProjSubMeas.toIdxSubMeas family.meas)
+      (IdxProjSubMeas.toIdxSubMeas family.meas)
+      zeta := by
+  constructor
+  simpa [IdxProjSubMeas.toIdxSubMeas, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
+    hselfG.completePartSelfConsistency.squaredDistanceBound
+
+private lemma avgOver_uniform_slicePair
+    (params : Parameters) [FieldModel params.q]
+    (f : Fq params → Fq params → Error) :
+    avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => f q.1 q.2) =
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun x => avgOver (uniformDistribution (SliceQuestion params)) (fun y => f x y)) := by
+  have hq : ((Fintype.card (Fq params) : ℕ) : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  calc
+    avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => f q.1 q.2)
+      = ∑ x : Fq params, ∑ y : Fq params,
+          (1 / ((Fintype.card (Fq params) * Fintype.card (Fq params) : ℕ) : Error)) * f x y := by
+            simpa [avgOver, uniformDistribution, SlicePairQuestion, Fintype.card_prod] using
+              (Fintype.sum_prod_type'
+                (f := fun x : Fq params => fun y : Fq params =>
+                  (1 / ((Fintype.card (Fq params) * Fintype.card (Fq params) : ℕ) : Error)) *
+                    f x y))
+    _ = ∑ x : Fq params, (1 / (Fintype.card (Fq params) : Error)) *
+          ((1 / (Fintype.card (Fq params) : Error)) * ∑ y : Fq params, f x y) := by
+          refine Finset.sum_congr rfl ?_
+          intro x _
+          calc
+            ∑ y : Fq params,
+                (1 / ((Fintype.card (Fq params) * Fintype.card (Fq params) : ℕ) : Error)) * f x y
+              = (1 / ((Fintype.card (Fq params) * Fintype.card (Fq params) : ℕ) : Error)) *
+                  ∑ y : Fq params, f x y := by
+                    rw [← Finset.mul_sum]
+            _ = (1 / (Fintype.card (Fq params) : Error)) *
+                  ((1 / (Fintype.card (Fq params) : Error)) * ∑ y : Fq params, f x y) := by
+                    field_simp [hq]
+                    rw [Nat.cast_mul]
+                    ring
+    _ = avgOver (uniformDistribution (SliceQuestion params))
+          (fun x => avgOver (uniformDistribution (SliceQuestion params)) (fun y => f x y)) := by
+          simp [avgOver, uniformDistribution, Finset.mul_sum]
+
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
