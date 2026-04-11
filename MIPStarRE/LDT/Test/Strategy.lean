@@ -278,7 +278,9 @@ noncomputable def lowIndividualDegreeFailureProbability
       + bipartiteSSCError strategy.state
         (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)) / 2
-  -- Diagonal: average over roles and restriction index
+  -- Diagonal: for each restriction index, average the two role choices
+  -- from the paper's uniformly sampled role `r ∈ {A, B}`. The `/ 2`
+  -- is intentionally inside the summand before averaging over `j`.
   let diagonalBranch :=
     (1 / (params.m : Error)) *
       ∑ j : Fin params.m,
