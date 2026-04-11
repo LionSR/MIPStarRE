@@ -244,7 +244,7 @@ private lemma sqrt_isHermitian_eq {d : Type*} [Fintype d] [DecidableEq d]
   (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg A)).isHermitian.eq
 
 /-- Entrywise form of `√A * √A = A`, with the left factor conjugated. -/
-private lemma sqrt_star_mul_sum_eq_self {d : Type*} [Fintype d] [DecidableEq d]
+private lemma sqrt_conjTranspose_mul_self_apply {d : Type*} [Fintype d] [DecidableEq d]
     {A : MIPStarRE.Quantum.Op d} (hA : 0 ≤ A) (i j : d) :
     ∑ k : d, star (CFC.sqrt A k i) * CFC.sqrt A k j = A i j := by
   have hA_herm := sqrt_isHermitian_eq (A := A)
@@ -295,14 +295,14 @@ private lemma oneMeasNaimarkColumn_isometry
         star (CFC.sqrt (oneMeasNaimarkRemainder M) k₁ d₁) *
           CFC.sqrt (oneMeasNaimarkRemainder M) k₁ d₂ =
         oneMeasNaimarkRemainder M d₁ d₂ :=
-      sqrt_star_mul_sum_eq_self (oneMeasNaimarkRemainder_nonneg M) d₁ d₂
+      sqrt_conjTranspose_mul_self_apply (oneMeasNaimarkRemainder_nonneg M) d₁ d₂
     -- Identify each outcome sum as matrix multiplication entry
     have hM_mul : ∀ a : α, ∑ k₁ : d,
         star (CFC.sqrt (M.effect a) k₁ d₁) *
           CFC.sqrt (M.effect a) k₁ d₂ =
         M.effect a d₁ d₂ := by
       intro a
-      exact sqrt_star_mul_sum_eq_self (M.pos a) d₁ d₂
+      exact sqrt_conjTranspose_mul_self_apply (M.pos a) d₁ d₂
     rw [hR_mul]
     rw [Finset.sum_comm]
     simp_rw [hM_mul]
@@ -362,6 +362,7 @@ private lemma oneMeasNaimarkColumn_mul_inputProj
   | some a₂ =>
     simp [oneMeasNaimarkColumn, Matrix.kronecker]
 
+-- This is independent of Naimark and could be moved to `LDT/Preliminaries`.
 /-- **Partial isometry to unitary extension** (general fact).
 
 If `V†V = P` where `P` is a projection and `V = VP`, then there exists
