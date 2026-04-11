@@ -22,6 +22,11 @@ open scoped Matrix MatrixOrder ComplexOrder BigOperators
 -- of the old DiagonalTestSample.
 -- TODO(#306): Rebuild the equivalence for the restricted diagonal test.
 
+/-- The final restriction index, corresponding to the paper's `m`-restricted
+diagonal-lines test. -/
+private def lastRestrictionIndex (params : Parameters) : Fin params.m :=
+  ⟨params.m - 1, Nat.sub_lt params.hm Nat.zero_lt_one⟩
+
 /-- Reindexing a uniform average along an equivalence preserves its value. -/
 lemma avgOver_uniform_equiv
     {α β : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
@@ -57,9 +62,10 @@ private lemma sampledDiagonalLineConsistency
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     ConsRel strategy.state
-      (pointWithDiagonalLineDistribution params)
-      (sampledPointMeasurement params strategy)
-      (sampledDiagonalLineEvaluation params strategy)
+      (uniformDistribution
+        (RestrictedDiagonalSample params (lastRestrictionIndex params)))
+      (diagonalPointAnswerFamily strategy (lastRestrictionIndex params))
+      (diagonalLineAnswerFamily strategy (lastRestrictionIndex params))
       (restrictedDiagonalLinesConsistencyError
         params gamma) := by
   -- NOTE(#306): This sorry tracks a genuine proof gap introduced by
@@ -83,17 +89,39 @@ private lemma sampledDiagonalLineApproximation
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     SDDRel strategy.state
-      (pointWithDiagonalLineDistribution params)
+      (uniformDistribution
+        (RestrictedDiagonalSample params (lastRestrictionIndex params)))
       (IdxSubMeas.liftLeft
-        (sampledPointMeasurement params strategy))
+        (diagonalPointAnswerFamily strategy (lastRestrictionIndex params)))
       (IdxSubMeas.liftRight
-        (sampledDiagonalLineEvaluation params strategy))
+        (diagonalLineAnswerFamily strategy (lastRestrictionIndex params)))
       (pointDiagonalLineApproxError params gamma) := by
   -- NOTE(#306): This sorry tracks a genuine proof gap introduced by
   -- the test definition correction. The old proof used DiagonalTestSample
   -- with unrestricted directions; the corrected definition uses
   -- RestrictedDiagonalSample (restricted directions, base-point eval).
   -- The proof structure needs rebuilding against the new types.
+  sorry
+
+/-- TODO(#306): Transport the corrected restricted diagonal approximation to
+the shared line-plus-parameter distribution used by the commutativity proof. -/
+private lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    SDDRel strategy.state
+      (pointWithDiagonalLineDistribution params)
+      (IdxSubMeas.liftLeft
+        (sampledPointMeasurement params strategy))
+      (IdxSubMeas.liftRight
+        (sampledDiagonalLineEvaluation params strategy))
+      (pointDiagonalLineApproxError params gamma) := by
+  -- NOTE(#306): The corrected diagonal test gives the base-point
+  -- restricted-sample statement above. The commutativity proof still needs
+  -- a rebuilt reindexing/parameterization argument to use arbitrary
+  -- line-plus-parameter questions.
   sorry
 
 private lemma qSDDOp_symm
@@ -631,7 +659,8 @@ private lemma sampledDiagonalLineApproximation_ignore_first
         OpFamily.rightPlacedOpFamily (ιA := ι)
           (SubMeas.toOpFamily (sampledDiagonalLineEvaluation params strategy (q.1, q.2.2))))
       (pointDiagonalLineApproxError params gamma) := by
-  rcases sampledDiagonalLineApproximation params strategy eps delta gamma hgood with ⟨happrox⟩
+  rcases sampledDiagonalLineApproximation_pointWithDiagonalLine
+    params strategy eps delta gamma hgood with ⟨happrox⟩
   constructor
   calc
     sddErrorOp strategy.state
@@ -687,7 +716,8 @@ private lemma sampledDiagonalLineApproximation_ignore_second
         OpFamily.rightPlacedOpFamily (ιA := ι)
           (SubMeas.toOpFamily (sampledDiagonalLineEvaluation params strategy (q.1, q.2.1))))
       (pointDiagonalLineApproxError params gamma) := by
-  rcases sampledDiagonalLineApproximation params strategy eps delta gamma hgood with ⟨happrox⟩
+  rcases sampledDiagonalLineApproximation_pointWithDiagonalLine
+    params strategy eps delta gamma hgood with ⟨happrox⟩
   constructor
   calc
     sddErrorOp strategy.state

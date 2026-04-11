@@ -82,6 +82,11 @@ abbrev RestrictedDiagonalSample (params : Parameters)
     (j : Fin params.m) :=
   Point params × (Fin (j.val + 1) → Fq params)
 
+/-- The restricted diagonal sample space is nonempty. -/
+instance restrictedDiagonalSampleNonempty (params : Parameters) (j : Fin params.m) :
+    Nonempty (RestrictedDiagonalSample params j) :=
+  inferInstance
+
 /-- Sampled point answers in the axis-parallel lines test.
 The point player receives `u` (the base point) and answers with
 their measurement at `u`. -/
@@ -242,7 +247,8 @@ Each of the three branches picks a role `r ∈ {A, B}`:
 - Player `r` receives a line and returns a polynomial;
 - Player `r̄` receives a point and returns a field element.
 
-The self-consistency branch checks cross-player point agreement.
+The self-consistency branch checks strong self-consistency of each
+player's point measurement.
 
 TODO(#306): `ProjStrat` currently forces both provers onto the
 same index type `ι`; the paper allows `H_A ≠ H_B`. -/
@@ -264,12 +270,14 @@ noncomputable def lowIndividualDegreeFailureProbability
       + bipartiteConsError strategy.state axParDist
         (axisParallelPointAnswerFamily left)
         (axisParallelLineAnswerFamily right)) / 2
-  -- Self-consistency: cross-player point agreement
+  -- Self-consistency: average the two point-measurement SSC defects.
   let selfConsistencyBranch :=
-    bipartiteConsError strategy.state
-      (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+    (bipartiteSSCError strategy.state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      + bipartiteSSCError strategy.state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)) / 2
   -- Diagonal: average over roles and restriction index
   let diagonalBranch :=
     (1 / (params.m : Error)) *
