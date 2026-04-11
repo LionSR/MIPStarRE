@@ -466,6 +466,8 @@ lemma selfImprovementHelper
     (hgood : strategy.IsGood eps delta gamma)
     (nu : Error)
     (hbridges : SelfImprovementBridgePackage params strategy eps delta nu)
+    -- Kept for API compatibility with the full helper statement, where future
+    -- proof obligations will depend on the incoming polynomial measurement.
     (_G : Measurement (Polynomial params) ι) :
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
@@ -486,6 +488,9 @@ lemma selfImprovementHelper
   · simpa [T] using hsdp
   · rcases hbridges.globalVarianceProofInputs T with
       ⟨hlocalDev, hlocalVar, hglobalDev⟩
+    -- These are the surfaced GlobalVariance analytic obligations. The wrapper
+    -- proofs consume them here; `SelfImprovementBridgePackage` owns them until
+    -- the Section 8 estimates are formalized directly.
     exact addInU params strategy eps delta gamma hgood T hlocalDev hlocalVar hglobalDev
 
 /-- `thm:self-improvement`.

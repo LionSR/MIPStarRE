@@ -434,18 +434,16 @@ lemma generalizeB
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (_eps _delta _gamma : Error)
+    (_hgood : strategy.IsGood _eps _delta _gamma)
     (G : SubMeas (Polynomial params) ι)
     (ψbi : QuantumState (ι × ι))
     (hpoint :
       ∀ g : Polynomial params,
         generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params) :
     GeneralizeBStatement params strategy ψbi G := by
-  let _ := hgood
-  let _ := eps
-  let _ := delta
-  let _ := gamma
+  -- The analytic pointwise estimate is an explicit input here. In the
+  -- self-improvement pipeline it is supplied by `SelfImprovementBridgePackage`.
   refine
     { aggregateFamilyComparison := by
         exact sddRel_unit_family_of_pointwise ψbi
@@ -484,8 +482,8 @@ lemma localVarianceOfPoints
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (eps delta _gamma : Error)
+    (_hgood : strategy.IsGood eps delta _gamma)
     (G : SubMeas (Polynomial params) ι)
     (ψbi : QuantumState (ι × ι))
     (hedge :
@@ -497,8 +495,6 @@ lemma localVarianceOfPoints
         pointConditionedLocalVarianceAtPolynomial params strategy G g ≤
           localVarianceOfPointsError params eps delta) :
     LocalVarianceOfPointsStatement params strategy ψbi G eps delta := by
-  let _ := hgood
-  let _ := gamma
   refine
     { aggregateEdgeComparison := by
         exact sddRel_unit_family_of_pointwise ψbi
