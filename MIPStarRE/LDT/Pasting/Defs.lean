@@ -273,8 +273,8 @@ noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel p
             -- For the first m coordinates: degreeOf_mul_le +
             -- the Lagrange basis only involves the last variable.
             -- For the last coordinate:
-            --   • |τ| = d+1: Lagrange.degree_basis_lt gives
-            --     degree(Lᵢ) < |τ| = d+1, so degreeOf ≤ d.
+            --   • |τ| = d+1: Lagrange.degree_basis gives
+            --     degree(Lᵢ) = |τ| - 1 = d, so degreeOf ≤ d.
             --   • |τ| > d+1: degree(Lᵢ) < |τ| > d, so the
             --     raw bound is too weak. Closing this requires
             --     either (a) restricting the sum to a (d+1)-
