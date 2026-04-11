@@ -133,12 +133,26 @@ What the paper says:
 
 - `references/ldt-paper/ld-pasting.tex:241-245`, `:478-482`, `:1240-1247` uses actual interpolation from compatible slice polynomials to the unique ambient degree-`d` polynomial.
 
-Remaining gap:
+Remaining gaps:
 
 - The `lowIndividualDegree` proof obligation is sorry'd.
-- Closing this sorry requires either restricting to exactly `d+1`
-  evaluation points, or proving the cancellation argument for
-  consistent slice polynomials.
+- Closing this sorry requires either restricting the sum to exactly
+  `d+1` evaluation points (matching ld-pasting.tex:240), or proving
+  the cancellation argument for consistent slice polynomials
+  (ld-pasting.tex:1238-1254).
+- **τ size mismatch**: the code sums over all of `τ` (which has
+  `|τ| ≥ d+1`), while the paper's initial construction
+  (ld-pasting.tex:240) uses exactly `d+1` slices. For `|τ| = d+1`
+  Mathlib's `Lagrange.degree_basis_lt` directly bounds the last-
+  coordinate degree; for `|τ| > d+1` the raw degree exceeds `d` and
+  the bound requires slice consistency. If the intent is to match the
+  paper precisely, the definition may need to select a `(d+1)`-sized
+  subset of `τ`.
+- **Injectivity precondition**: the Lagrange interpolation properties
+  (e.g. `eval_basis_self`) require `Set.InjOn v ↑τ`, which depends
+  on `decodeScalar` being injective on the image of `xs`. This holds
+  when `xs` is drawn from `distinctTupleDistribution` but is not
+  enforced in the definition itself.
 
 ### 6. `laplacianDifferenceForm` is definitionally equal to `laplacian`, so `laplacianRewrite` is vacuous
 

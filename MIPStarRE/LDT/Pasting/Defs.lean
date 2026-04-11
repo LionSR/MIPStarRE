@@ -219,14 +219,30 @@ noncomputable def extractSliceOr0 {params : Parameters} [FieldModel params.q]
 /-- Interpolate from `d+1` or more genuine slice polynomials to recover
 a polynomial in `m+1` variables via Lagrange interpolation.
 
-The interpolated polynomial `h(u₁,...,uₘ,x) = ∑ᵢ Lᵢ(x) · gᵢ(u₁,...,uₘ)`
+The interpolated polynomial `h(u₁,...,uₘ,x) = ∑ᵢ∈τ Lᵢ(x) · gᵢ(u₁,...,uₘ)`
 where `Lᵢ` is the Lagrange basis polynomial for evaluation point `xᵢ`
 (computed via `Lagrange.basis` from Mathlib), and `gᵢ` is the slice
 polynomial at height `xᵢ` lifted to the ambient `(m+1)`-variable space
 via `MvPolynomial.rename`.
 
 When fewer than `d+1` genuine slices are available, returns the zero
-polynomial. -/
+polynomial.
+
+**Precondition**: correctness of the Lagrange interpolation (in
+particular `Lagrange.eval_basis_self`) requires that the evaluation
+points `v i = decodeScalar (xs i)` are pairwise distinct on `τ`, i.e.
+`Set.InjOn v ↑τ`. This is ensured at the call site by drawing `xs`
+from `distinctTupleDistribution` (which restricts to injective
+tuples) combined with injectivity of `decodeScalar`. The definition
+is well-typed without this hypothesis, but the interpolation property
+only holds under it.
+
+**Note on τ size**: the paper (ld-pasting.tex:240) initially defines
+the interpolant from exactly `d+1` slices, while this code sums over
+all of `τ` (which has `|τ| ≥ d+1`). For `|τ| = d+1` the degree
+bound follows from `Lagrange.degree_basis_lt`; for `|τ| > d+1` the
+last-coordinate degree may exceed `d` and the bound requires a
+cancellation argument using slice consistency (see the sorry below). -/
 noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel params.q] :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
   | 0, _xs, _gs => fallbackInterpolatedPolynomial params
@@ -254,13 +270,20 @@ noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel p
                 (MvPolynomial.X (lastCoord params))
             LiMv * slicePoly
           lowIndividualDegree := by
-            -- The degree bound requires showing that Lagrange
-            -- interpolation of degree-d slice polynomials has
-            -- individual degree ≤ d. For the first m coordinates
-            -- this follows from degreeOf_mul_le (the Lagrange
-            -- basis involves only the last coordinate). For the
-            -- last coordinate, when |τ| > d+1 the cancellation
-            -- argument needs consistency of slice polynomials.
+            -- For the first m coordinates: degreeOf_mul_le +
+            -- the Lagrange basis only involves the last variable.
+            -- For the last coordinate:
+            --   • |τ| = d+1: Lagrange.degree_basis_lt gives
+            --     degree(Lᵢ) < |τ| = d+1, so degreeOf ≤ d.
+            --   • |τ| > d+1: degree(Lᵢ) < |τ| > d, so the
+            --     raw bound is too weak. Closing this requires
+            --     either (a) restricting the sum to a (d+1)-
+            --     sized subset of τ (matching the paper's
+            --     construction at ld-pasting.tex:240), or
+            --     (b) proving a cancellation argument using
+            --     slice consistency (ld-pasting.tex:1238-1254).
+            -- See also: Set.InjOn v ↑τ (from distinctTuples)
+            -- is needed for eval_basis_self in either approach.
             sorry }
       else
         fallbackInterpolatedPolynomial params
