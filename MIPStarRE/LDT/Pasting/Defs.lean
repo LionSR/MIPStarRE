@@ -240,7 +240,7 @@ only holds under it.
 **Note on τ size**: the paper (ld-pasting.tex:240) initially defines
 the interpolant from exactly `d+1` slices, while this code sums over
 all of `τ` (which has `|τ| ≥ d+1`). For `|τ| = d+1` the degree
-bound follows from `Lagrange.degree_basis_lt`; for `|τ| > d+1` the
+bound follows from `Lagrange.degree_basis`; for `|τ| > d+1` the
 last-coordinate degree may exceed `d` and the bound requires a
 cancellation argument using slice consistency (see the sorry below). -/
 noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel params.q] :
