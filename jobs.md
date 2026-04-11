@@ -1,11 +1,42 @@
 # LDT Sorry Elimination — Status Report
 
+Last updated: 2026-04-11
+
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
-- **Current**: 57 sorrys across 9 files
-- **Eliminated**: 9 sorrys
-- **Infrastructure fixes**: 3 type/statement bugs fixed
-- **PRs created**: 2
+- **Current**: 30 executable sorrys across 7 files
+- **Eliminated**: 36 executable sorrys
+- **Infrastructure fixes landed on this branch**:
+  - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
+  - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
+  - averaged point-operator defs moved out of induction-local scope
+- **PRs already recorded in this file**: 2
+
+## Active Strategy
+- Highest-leverage live chain is now Section 12 pasting.
+- Immediate target cluster: `Pasting/Theorems.lean` around
+  `commutativitySwitcheroo` and its local helper bridges.
+- Reason: this is the lowest remaining live dependency spine to `ldPasting`,
+  `ldPastingInInductionSection`, and `mainInduction` that still looks provable
+  with current infrastructure.
+- Secondary live track: Section 11 `commDataProcessedG` local bridge lemmas,
+  which appear to need one new questionwise reduction lemma rather than a major
+  theorem-statement repair.
+
+## Agent Board
+- Survey agent: refreshed executable-sorry count and file-by-file breakdown.
+- Proof agent A: assigned to `Pasting.commutativitySwitcheroo` proof shape and
+  triangle-composition route.
+- Proof agent B: assigned to local helper subgoals in the same cluster:
+  `completePartProjFamily.proj`,
+  `pointWithCompletePart_as_switcheroo_input`,
+  `completePartAggregateCommutation_as_total`.
+- Refactor agent: reserved for transport/reindex lemmas and definitional
+  cleanups if the Pasting proof gets stuck on non-definitional equalities.
+- Proof agent C: assigned to Section 11 `commDataProcessedG.stabilityOne`
+  questionwise reduction and normalization-condition route.
+- Integration agent: reserved for file builds and reprioritization after each
+  landed proof.
 
 ---
 
@@ -42,17 +73,99 @@
 
 ---
 
-## Remaining 57 Sorrys — Detailed Breakdown
+## Remaining 30 Executable Sorrys — Detailed Breakdown
 
-### MakingMeasurementsProjective/QXPLayer.lean (9 sorrys)
+### MakingMeasurementsProjective/QXPLayer.lean (3 sorrys)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
 | `projectiveNonMeasurement` | BLOCKED | #197 construction — needs spectral truncation rounding |
 | `projectiveLowRankSum` | BLOCKED | #197 construction — needs rank-reduced family |
-| `qCompleteness` | BLOCKED | #197 — needs completeness from rank reduction |
-| `sqrtQCompleteness` | BLOCKED | #197 — needs sqrt completeness |
-| `qAlmostProjective` | BLOCKED | #197 — needs operator inequality |
-| `xTimesXHat` | PARTIALLY PROVABLE | Second conjunct follows from xHat_mixed field; first conjunct needs additional SVD field |
+| `pQApprox` | BLOCKED | #197 — needs full Q/P approximation chain |
+
+### MakingMeasurementsProjective/Theorems.lean (5 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `naimark` | BLOCKED | Depends on still-missing unitary extension infrastructure |
+| `orthonormalization` | BLOCKED | Needs completion-to-measurement bridge plus Section 5 scaffolding |
+| `consistencyToAlmostProjective` | BLOCKED | Needs ConsRel → AlmostProjMeasStatement bridge |
+| `spectralTruncateAlmostProjective` | BLOCKED | Needs spectral cutoff infrastructure |
+| `adjustTruncatedProjections` | BLOCKED | Needs projection rounding infrastructure |
+
+### Pasting/Theorems.lean (11 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `gCompleteSelfConsistency` | LIVE TARGET | First theorem on the active Section 12 spine |
+| `commutativitySwitcheroo` | LIVE TARGET | Best current high-leverage theorem; depends on local switcheroo helper bridges |
+| `completePartProjFamily.proj` | COMPLETED | Projectivity wrapper proved via `projSubMeas_total_proj` and `postprocess_total` |
+| `pointWithCompletePart_as_switcheroo_input` | COMPLETED | Pure outcome-type rewrite from `Polynomial` to `Polynomial × Unit` |
+| `completePartAggregateCommutation_as_total` | COMPLETED | Closed via a `Unit`-outcome `qSDDOp` congruence lemma |
+| `commutingWithGComplete` | PARTIALLY ADVANCED | Statement repaired to explicit small-error regime; scalar `θ₁`/`θ₂` comparisons are now proved, remaining blocker is `commutativitySwitcheroo` |
+| `gHatFacts` (2 subgoals) | BLOCKED ON ACTIVE CHAIN | Depends on `commutingWithGComplete` and complete/incomplete decomposition |
+| `commuteGHalfSandwich` | BLOCKED ON ACTIVE CHAIN | Depends on `gHatFacts` |
+| `ldSandwichLineOnePoint` | BLOCKED ON ACTIVE CHAIN | Depends on commuted sandwich estimate |
+| `hBConsistency` | BLOCKED ON ACTIVE CHAIN | Depends on one-point comparison |
+| `overAllOutcomes` | BLOCKED | Total mass expansion |
+| `fromHToG` | BLOCKED | Bernoulli-tail recurrence |
+| `chernoffBernoulliMatrix` | BLOCKED | Matrix Chernoff/Bernoulli bound |
+| `ldPastingNCompleteness` | BLOCKED | Combines above results |
+| `ldPastingSubMeas` | BLOCKED | Wrapper around `ldPasting` |
+| `ldPasting` | BLOCKED | Top-level theorem |
+
+### GlobalVariance/Theorems.lean (4 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `matrixGeneralizeB` | BLOCKED | Matrix realization transfer proof |
+| `matrixLocalVarianceOfPoints` | BLOCKED | Matrix local variance transfer |
+| `matrixGlobalVarianceOfPoints` | BLOCKED | Matrix global variance transfer |
+| `globalVarianceOfPoints` global norm bound | BLOCKED | Needs localToGlobal + local estimate |
+
+### Commutativity/Theorems.lean (4 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `commDataProcessedG` postprocessedSelfConsistency | BLOCKED | Needs evaluatedPointFamily rewriting bridge |
+| `commDataProcessedG` stabilityOne | BLOCKED ON LOCAL BRIDGE | Needs a local questionwise reduction from weighted `qSDDOp` to the slice boundedness term |
+| `commDataProcessedG` stabilityTwo | BLOCKED ON LOCAL BRIDGE | Same pattern as `stabilityOne`, plus the processed-point commutation step |
+| `comMain` fullSliceCommutation | BLOCKED | Needs full-slice vs evaluated family comparison |
+
+### MainInductionStep/Theorems.lean (2 sorrys)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `mainInduction` | BLOCKED | Full inductive argument, depends on all sections |
+| `ldPastingInInductionSection` | BLOCKED | Depends on Section 12 chain |
+
+### Test/MainTheorem.lean (1 sorry)
+| Lemma | Status | Blocker |
+|-------|--------|---------|
+| `mainFormal` | BLOCKED | Top-level theorem, depends on everything |
+
+## Files Now Clean
+- `SelfImprovement/Theorems.lean`
+- `ExpansionHypercubeGraph/Theorems.lean`
+
+## Recent Progress On This Pass
+- `Pasting/Theorems.lean:completePartProjFamily.proj` proved.
+- `Pasting/Theorems.lean:pointWithCompletePart_as_switcheroo_input` proved.
+- `Pasting/Theorems.lean`: extracted
+  `switcherooAggregateLeft_completePart_outcome` and
+  `switcherooAggregateRight_completePart_outcome` helper lemmas.
+- `Pasting/Theorems.lean`: repaired the false second switcheroo comparison to
+  the paper-correct `θ₁ -> θ₂ -> ν₂` chain inside `commutingWithGComplete`.
+- `Pasting/Theorems.lean:firstSwitcherooError_le_commutingWithGCompleteError`
+  proved under explicit small-error assumptions.
+- `Pasting/Theorems.lean:firstSwitcherooError_le_eighth_stage` proved.
+- `Pasting/Theorems.lean:secondSwitcherooError_le_commutingWithGCompleteError`
+  proved under the same explicit small-error assumptions.
+- `Pasting/Theorems.lean:commutingWithGComplete` now explicitly carries the
+  paper's small-error regime hypotheses `(0 ≤ gamma ≤ 1)`, `(0 ≤ zeta ≤ 1)`,
+  and `params.d ≤ params.q`.
+- `Pasting/Theorems.lean:completePartAggregateCommutation_as_total` proved.
+- `Pasting/Theorems.lean` now has 11 executable `sorry`s remaining in this file.
+
+## Stale Entries From Earlier Waves
+- The sections below were superseded by later progress on this branch and should
+  no longer be treated as authoritative counts.
+
+### Historical Notes
 | `squaredDifference` | NEAR-PROVABLE | Route via Y := x * xHatᴴ identified but algebra normalization incomplete |
 | `pProjectivity` | NEAR-PROVABLE | Route via ProjSubMeas construction identified |
 | `pQApprox` | BLOCKED | #197 — needs full Q/P approximation chain |
@@ -144,6 +257,8 @@
 - **SelfImprovement 4 sorrys**: All genuinely blocked on missing SDP/orthonormalization infrastructure.
 - **ExpansionHypercubeGraph 3 matrix proofs**: Need non-trivial finite-sum trace-expansion infrastructure.
 - **Pasting gHatFacts 2 subgoals**: Hypothesis direction mismatch (need per-outcome qSDD, have aggregated).
+- **Pasting second switcheroo scalar bound**: original theorem statement was false; the
+  branch now follows the paper's intermediate `θ₁`/`θ₂` error chain instead.
 
 ### Agents dispatched (18 total across waves):
 - Wave 1: 6 survey/assessment agents
