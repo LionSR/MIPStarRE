@@ -239,9 +239,26 @@ private lemma oneMeasNaimarkInputProj_isProj {α : Type*} [Fintype α] [Decidabl
 
 /-- The CFC square root of a PSD matrix is Hermitian. -/
 private lemma sqrt_isHermitian_eq {d : Type*} [Fintype d] [DecidableEq d]
-    {A : MIPStarRE.Quantum.Op d} (hA : 0 ≤ A) :
+    {A : MIPStarRE.Quantum.Op d} :
     (CFC.sqrt A)ᴴ = CFC.sqrt A :=
   (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg A)).isHermitian.eq
+
+/-- Entrywise form of `√A * √A = A`, with the left factor conjugated. -/
+private lemma sqrt_star_mul_sum_eq_self {d : Type*} [Fintype d] [DecidableEq d]
+    {A : MIPStarRE.Quantum.Op d} (hA : 0 ≤ A) (i j : d) :
+    ∑ k : d, star (CFC.sqrt A k i) * CFC.sqrt A k j = A i j := by
+  have hA_herm := sqrt_isHermitian_eq (A := A)
+  calc
+    ∑ k : d, star (CFC.sqrt A k i) * CFC.sqrt A k j =
+        ∑ k : d, CFC.sqrt A i k * CFC.sqrt A k j := by
+          refine Finset.sum_congr rfl ?_
+          intro k _
+          rw [show star (CFC.sqrt A k i) = CFC.sqrt A i k from by
+            rw [← Matrix.conjTranspose_apply, hA_herm]]
+    _ = (CFC.sqrt A * CFC.sqrt A) i j := by
+          rw [Matrix.mul_apply]
+    _ = A i j := by
+          rw [CFC.sqrt_mul_sqrt_self _ hA]
 
 /-- **Isometry property of the Naimark column**: `V†V = P`.
 
@@ -254,74 +271,59 @@ private lemma oneMeasNaimarkColumn_isometry
     (M : MIPStarRE.Quantum.Submeasurement α d) :
     (oneMeasNaimarkColumn M)ᴴ * oneMeasNaimarkColumn M =
       oneMeasNaimarkInputProj (α := α) (d := d) := by
-  have hR_herm := sqrt_isHermitian_eq (oneMeasNaimarkRemainder_nonneg M)
-  have hM_herm : ∀ a : α, (CFC.sqrt (M.effect a))ᴴ = CFC.sqrt (M.effect a) :=
-    fun a => sqrt_isHermitian_eq (M.pos a)
   ext ⟨d₁, oa₁⟩ ⟨d₂, oa₂⟩
   simp only [Matrix.mul_apply, Matrix.conjTranspose_apply,
     oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition,
     Matrix.kronecker_apply, Matrix.one_apply, Matrix.single_apply]
-  rcases oa₁ with _ | a₁ <;> rcases oa₂ with _ | a₂
-  case none.none =>
+  cases oa₁ <;> cases oa₂
+  ·
     -- Main case: `V†V` on the `⊥` block equals the identity.
     -- Sum over `d × Option α`: split into remainder (`none`) and outcome (`some a`)
     -- parts, identify each as `√X * √X = X`, then use `∑ M_a + R = 1`.
-    simp only [and_self, ite_true]
     -- Rewrite as sum over product
     have hsplit : ∀ (f : d × Option α → ℂ),
         ∑ x : d × Option α, f x =
           ∑ k₁ : d, (f (k₁, none) + ∑ a : α, f (k₁, some a)) := by
       intro f
-      rw [← Finset.univ_product_univ, Finset.sum_product_right]
-      congr 1; ext k₁
-      exact (Fintype.sum_option (f := fun oa => f (k₁, oa))).symm
+      rw [Fintype.sum_prod_type]
+      simp_rw [Fintype.sum_option]
     rw [hsplit, Finset.sum_add_distrib]
     -- Expand V entries
     simp only [oneMeasNaimarkColumn]
     -- Identify remainder sum as matrix multiplication entry
     have hR_mul : ∑ k₁ : d,
-        starRingEnd ℂ (CFC.sqrt (oneMeasNaimarkRemainder M) k₁ d₁) *
+        star (CFC.sqrt (oneMeasNaimarkRemainder M) k₁ d₁) *
           CFC.sqrt (oneMeasNaimarkRemainder M) k₁ d₂ =
-        oneMeasNaimarkRemainder M d₁ d₂ := by
-      conv_lhs =>
-        ext k₁
-        rw [show starRingEnd ℂ
-              (CFC.sqrt (oneMeasNaimarkRemainder M) k₁ d₁) =
-            CFC.sqrt (oneMeasNaimarkRemainder M) d₁ k₁ from by
-          rw [← Matrix.conjTranspose_apply, hR_herm]]
-      rw [← Matrix.mul_apply,
-        CFC.sqrt_mul_sqrt_self _ (oneMeasNaimarkRemainder_nonneg M)]
+        oneMeasNaimarkRemainder M d₁ d₂ :=
+      sqrt_star_mul_sum_eq_self (oneMeasNaimarkRemainder_nonneg M) d₁ d₂
     -- Identify each outcome sum as matrix multiplication entry
     have hM_mul : ∀ a : α, ∑ k₁ : d,
-        starRingEnd ℂ (CFC.sqrt (M.effect a) k₁ d₁) *
+        star (CFC.sqrt (M.effect a) k₁ d₁) *
           CFC.sqrt (M.effect a) k₁ d₂ =
         M.effect a d₁ d₂ := by
       intro a
-      conv_lhs =>
-        ext k₁
-        rw [show starRingEnd ℂ (CFC.sqrt (M.effect a) k₁ d₁) =
-            CFC.sqrt (M.effect a) d₁ k₁ from by
-          rw [← Matrix.conjTranspose_apply, hM_herm a]]
-      rw [← Matrix.mul_apply, CFC.sqrt_mul_sqrt_self _ (M.pos a)]
+      exact sqrt_star_mul_sum_eq_self (M.pos a) d₁ d₂
     rw [hR_mul]
+    rw [Finset.sum_comm]
     simp_rw [hM_mul]
     -- Now: R(d₁,d₂) + ∑_a M_a(d₁,d₂) = 1(d₁,d₂)
+    have hinput :
+        Matrix.kronecker (1 : MIPStarRE.Quantum.Op d)
+            (Matrix.single (none : Option α) (none : Option α) (1 : ℂ))
+            (d₁, none) (d₂, none) =
+          (1 : MIPStarRE.Quantum.Op d) d₁ d₂ := by
+      simp [Matrix.kronecker]
+    rw [hinput]
     simp only [oneMeasNaimarkRemainder, Matrix.sub_apply,
       Matrix.sum_apply, Matrix.one_apply]
     ring
   -- Zero cases: V is 0 whenever the column auxiliary index is not `none`.
-  case none.some =>
-    simp only [reduceCtorEq, and_false, ↓reduceIte]
-    exact Finset.sum_eq_zero fun x _ => by
-      simp [oneMeasNaimarkColumn]
-  case some.none =>
-    simp only [reduceCtorEq, false_and, ↓reduceIte]
-    exact Finset.sum_eq_zero fun x _ => by
-      simp [oneMeasNaimarkColumn]; ring
-  case some.some =>
-    simp only [reduceCtorEq, false_and, ↓reduceIte]
-    exact Finset.sum_eq_zero fun x _ => by
-      simp [oneMeasNaimarkColumn]
+  ·
+    simp [oneMeasNaimarkColumn, Matrix.kronecker]
+  ·
+    simp [oneMeasNaimarkColumn, Matrix.kronecker]
+  ·
+    simp [oneMeasNaimarkColumn, Matrix.kronecker]
 
 /-- The Naimark column acts as an isometry on the input subspace: `VP = V`. -/
 private lemma oneMeasNaimarkColumn_mul_inputProj
@@ -335,22 +337,30 @@ private lemma oneMeasNaimarkColumn_mul_inputProj
     oneMeasNaimarkAuxTransition, Matrix.kronecker_apply]
   cases oa₂ with
   | none =>
-    simp only [and_self, ite_true]
     -- Sum collapses: only `(d₂, none)` survives in the product with P
     have : ∀ x : d × Option α,
         oneMeasNaimarkColumn M (d₁, oa₁) x *
-          (if x.1 = d₂ then 1 else 0) *
-            (if x.2 = none then if none = none then 1 else 0 else 0) =
-          if x = (d₂, none) then oneMeasNaimarkColumn M (d₁, oa₁) (d₂, none)
+          Matrix.kronecker (1 : MIPStarRE.Quantum.Op d)
+            (Matrix.single (none : Option α) (none : Option α) (1 : ℂ)) x (d₂, none) =
+          if x = (d₂, (none : Option α)) then
+            oneMeasNaimarkColumn M (d₁, oa₁) (d₂, none)
           else 0 := by
       intro ⟨k₁, k₂⟩
-      cases k₂ <;> simp (config := { decide := true }) [Prod.ext_iff]
+      cases k₂ with
+      | none =>
+          by_cases h : k₁ = d₂ <;>
+            simp [Matrix.kronecker, Matrix.single_apply, Prod.ext_iff, h]
+      | some a =>
+          have hneq : (k₁, some a) ≠ (d₂, (none : Option α)) := by
+            intro h
+            cases h
+          simpa [Matrix.kronecker, Matrix.single_apply, hneq]
     simp_rw [this]
-    rw [Finset.sum_ite_eq' Finset.univ (d₂, none) (fun x =>
-      oneMeasNaimarkColumn M (d₁, oa₁) x)]
+    rw [Finset.sum_ite_eq' Finset.univ (d₂, (none : Option α)) (fun _ =>
+      oneMeasNaimarkColumn M (d₁, oa₁) (d₂, none))]
     simp
   | some a₂ =>
-    simp only [reduceCtorEq, ↓reduceIte, mul_zero, Finset.sum_const_zero]
+    simp [oneMeasNaimarkColumn, Matrix.kronecker]
 
 /-- **Partial isometry to unitary extension** (general fact).
 
