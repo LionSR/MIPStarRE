@@ -382,10 +382,6 @@ private lemma real_smul_matrix_eq_complex {ι : Type*} [Fintype ι] [DecidableEq
   change (c : ℂ) * Q i j = (c : ℂ) * Q i j
   rfl
 
-private lemma complex_ofReal_one_add_two_mul (ε : Error) :
-    (((1 : Error) + 2 * ε) : ℂ) = (1 : ℂ) + 2 * (ε : ℂ) := by
-  norm_num
-
 private lemma op_one_le_complex_smul_one_of_real_ge_one
     {ι : Type*} [Fintype ι] [DecidableEq ι] (c : Error)
     (hc : (1 : Error) ≤ c) :
@@ -414,12 +410,6 @@ private lemma spectralTruncationError_two_mul_le (ζ : Error) (_hζ : 0 ≤ ζ) 
     _ ≤ 2 * Real.sqrt ζ := by
       refine mul_le_mul_of_nonneg_right ?_ (Real.sqrt_nonneg ζ)
       nlinarith [Real.sq_sqrt (show 0 ≤ (2 : Error) by positivity)]
-
-private lemma spectralTruncationError_le_roundingToProjectiveError
-    (ζ : Error) (hζ : 0 ≤ ζ) :
-    spectralTruncationError ζ ≤ roundingToProjectiveError ζ := by
-  dsimp [spectralTruncationError, roundingToProjectiveError]
-  exact le_mul_of_one_le_left (Real.rpow_nonneg hζ _) (by norm_num)
 
 private lemma spectralTruncationError_two_mul_le_roundingToProjectiveError
     (ζ : Error) (hζ : 0 ≤ ζ) :
@@ -646,7 +636,7 @@ stays bounded by `(1 + 2√ζ)I`, and the auxiliary dimension is at most the
 original ambient dimension. -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 ≤ ζ)
@@ -658,61 +648,76 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
   -- hypothesis such as `ζ ≤ 1 / 4`; only the nonnegativity and
   -- almost-projectivity preconditions are reflected here so far.
   classical
-  letI : Inhabited Outcome := Classical.inhabited_of_nonempty inferInstance
-  have hAlmost :=
-    almostProjMeasOfSourceAlmostProjective ψ A (2 * ζ) (by nlinarith)
-      source_almost_projective
-  let spectral :=
-    spectralTruncateAlmostProjective.{uOutcome, uι, 0, 0} ψ A (2 * ζ) hAlmost
-  let q : OpFamily Outcome ι := spectral.projSubMeas.toSubMeas
-  let data : QLayerData Outcome ι :=
-    { auxSpace :=
-        { carrier := ι
-          instFintype := inferInstance
-          instDecidableEq := inferInstance
-          instNonempty := inferInstance }
-      q := q
-      t := (default : ProjMeas Outcome ι) }
-  refine ⟨data, ?_⟩
-  refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_⟩
-  · intro a
-    exact
-      { isHermitian :=
-          (Matrix.nonneg_iff_posSemidef.mp
-            (spectral.projSubMeas.outcome_pos a)).isHermitian
-        idempotent := spectral.projSubMeas.proj a }
-  · intro a
-    exact spectral.projSubMeas.outcome_pos a
-  · simpa [data, Qa, QTotal, q, SubMeas.toOpFamily] using
-      spectral.projSubMeas.sum_eq_total
-  · have hraw :
-        SDDOpRel ψ (uniformDistribution Unit)
-          (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
-          (constOpFamily q)
-          (spectralTruncationError (2 * ζ)) := by
-      constructor
-      simpa [q, SDDRel, sddError, sddErrorOp, qSDD, qSDDOp, constOpFamily,
-        constSubMeasFamily, avgOver, uniformDistribution, SubMeas.toOpFamily] using
-        spectral.closeness.squaredDistanceBound
-    exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
-      (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily q)
-      (spectralTruncationError (2 * ζ)) (roundingToProjectiveError ζ) hraw
-      (spectralTruncationError_two_mul_le_roundingToProjectiveError ζ hζ)
-  · calc
-      QTotal data
-          ≤ (1 : MIPStarRE.Quantum.Op ι) := spectral.projSubMeas.total_le_one
-      _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
-          (1 : MIPStarRE.Quantum.Op ι) := by
-          have hε_nonneg : 0 ≤ spectralTruncationError ζ := by
-            dsimp [spectralTruncationError]
-            exact Real.rpow_nonneg hζ _
-          have hcoeff : (1 : Error) ≤ 1 + 2 * spectralTruncationError ζ := by
-            nlinarith
-          simpa [Complex.ofReal_add, Complex.ofReal_mul] using
-            op_one_le_complex_smul_one_of_real_ge_one
-              (ι := ι) (1 + 2 * spectralTruncationError ζ) hcoeff
-  · change Fintype.card ι ≤ Fintype.card ι
-    exact le_rfl
+  by_cases hOutcome : Nonempty Outcome
+  · letI : Nonempty Outcome := hOutcome
+    letI : Inhabited Outcome := Classical.inhabited_of_nonempty hOutcome
+    letI : DecidableEq Outcome := Classical.decEq Outcome
+    have hAlmost :=
+      almostProjMeasOfSourceAlmostProjective ψ A (2 * ζ) (by nlinarith)
+        source_almost_projective
+    let spectral :=
+      spectralTruncateAlmostProjective.{uOutcome, uι, 0, 0} ψ A (2 * ζ) hAlmost
+    let q : OpFamily Outcome ι := spectral.projSubMeas.toSubMeas
+    let data : QLayerData Outcome ι :=
+      { auxSpace :=
+          { carrier := ι
+            instFintype := inferInstance
+            instDecidableEq := inferInstance
+            instNonempty := inferInstance }
+        q := q
+        -- TODO: replace this placeholder with the auxiliary projective measurement
+        -- produced by the rank-reduction construction once that bridge is formalized.
+        t := (default : ProjMeas Outcome ι) }
+    refine ⟨data, ?_⟩
+    refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_⟩
+    · intro a
+      exact
+        { isHermitian :=
+            (Matrix.nonneg_iff_posSemidef.mp
+              (spectral.projSubMeas.outcome_pos a)).isHermitian
+          idempotent := spectral.projSubMeas.proj a }
+    · intro a
+      exact spectral.projSubMeas.outcome_pos a
+    · simpa [data, Qa, QTotal, q, SubMeas.toOpFamily] using
+        spectral.projSubMeas.sum_eq_total
+    · have hraw :
+          SDDOpRel ψ (uniformDistribution Unit)
+            (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
+            (constOpFamily q)
+            (spectralTruncationError (2 * ζ)) := by
+        constructor
+        simpa [q, SDDRel, sddError, sddErrorOp, qSDD, qSDDOp, constOpFamily,
+          constSubMeasFamily, avgOver, uniformDistribution, SubMeas.toOpFamily] using
+          spectral.closeness.squaredDistanceBound
+      exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
+        (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily q)
+        (spectralTruncationError (2 * ζ)) (roundingToProjectiveError ζ) hraw
+        (spectralTruncationError_two_mul_le_roundingToProjectiveError ζ hζ)
+    · calc
+        QTotal data
+            ≤ (1 : MIPStarRE.Quantum.Op ι) := spectral.projSubMeas.total_le_one
+        _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
+            (1 : MIPStarRE.Quantum.Op ι) := by
+            have hε_nonneg : 0 ≤ spectralTruncationError ζ := by
+              dsimp [spectralTruncationError]
+              exact Real.rpow_nonneg hζ _
+            have hcoeff : (1 : Error) ≤ 1 + 2 * spectralTruncationError ζ := by
+              nlinarith
+            simpa [Complex.ofReal_add, Complex.ofReal_mul] using
+              op_one_le_complex_smul_one_of_real_ge_one
+                (ι := ι) (1 + 2 * spectralTruncationError ζ) hcoeff
+    · change Fintype.card ι ≤ Fintype.card ι
+      exact le_rfl
+  · letI : IsEmpty Outcome := not_nonempty_iff.mp hOutcome
+    exfalso
+    obtain ⟨i⟩ := (inferInstance : Nonempty ι)
+    have htotal_zero : A.toSubMeas.total = 0 := by
+      simpa using A.toSubMeas.sum_eq_total.symm
+    have hzero_one : (0 : MIPStarRE.Quantum.Op ι) = 1 := by
+      rw [← htotal_zero, A.total_eq_one]
+    have hentry : (0 : ℂ) = 1 := by
+      simpa using congrFun (congrFun hzero_one i) i
+    norm_num at hentry
 
 private lemma spectralTruncationError_le_half (ζ : Error)
     (_hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
