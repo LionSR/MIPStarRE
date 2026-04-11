@@ -650,7 +650,10 @@ lemma qCompleteness {Outcome : Type*}
     by_cases hys : y ≤ s
     · have htarget : diagA - 2 * Real.sqrt (roundingToProjectiveError ζ) ≤ 0 := by
         dsimp [y, s] at hys ⊢
-        nlinarith [Real.sq_sqrt hdiagA_nonneg]
+        have := mul_le_mul_of_nonneg_right hsqrt_diagA_le_one
+          (Real.sqrt_nonneg diagA)
+        nlinarith [Real.sq_sqrt hdiagA_nonneg,
+          Real.sqrt_nonneg (roundingToProjectiveError ζ)]
       linarith
     · have hs_le_y : s ≤ y := le_of_not_ge hys
       have hy_sub_nonneg : 0 ≤ y - s := by linarith
