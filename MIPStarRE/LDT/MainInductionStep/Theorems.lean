@@ -14,6 +14,43 @@ open MIPStarRE.LDT
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- The output data assembled by the full main-induction argument. -/
+structure MainInductionAssembly
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error) (k : ℕ) where
+  measurement : Measurement (Polynomial params) ι
+  pointConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params measurement.toSubMeas)
+      (mainInductionError params k eps delta gamma)
+
+/-- The remaining construction behind `thm:main-induction`.
+
+This is the place where the formal proof still has to assemble the base case,
+the recursive slice applications of `mainInduction`, self-improvement on each
+slice, the averaged restricted-probabilities estimates, and the induction-level
+pasting theorem. -/
+noncomputable def mainInductionAssembly
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (k : ℕ)
+    (hk : params.m * params.d ≤ k) :
+    MainInductionAssembly params strategy eps delta gamma k := by
+  /-
+  This is the full inductive argument from `inductive_step.tex`. It is not yet
+  a direct wrapper around the section-local theorem statements: the proof still
+  needs the induction-on-`m` infrastructure, the base case, the construction of
+  the slice family, and the quantitative comparison from the pasted error to
+  `mainInductionError`.
+  -/
+  sorry
+
 /-- `thm:main-induction`. -/
 theorem mainInduction
     (params : Parameters)
@@ -28,14 +65,8 @@ theorem mainInduction
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
-  /-
-  This is the full inductive argument from `inductive_step.tex`: it combines the
-  restricted-probabilities decomposition with recursive self-improvement and
-  low-degree pasting on the slices. Since it is not just a wrapper around
-  earlier theorem statements, I am leaving it as the main standalone blocker in
-  this file.
-  -/
-  sorry
+  let assembly := mainInductionAssembly params strategy eps delta gamma hgood k hk
+  exact ⟨assembly.measurement, assembly.pointConsistency⟩
 
 /-- `thm:self-improvement-in-induction-section`. -/
 theorem selfImprovementInInductionSection
@@ -146,6 +177,150 @@ theorem ldPastingInInductionSection
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 
+/-- The canonical restricted failure profile obtained by measuring each slice with its
+own three test failure probabilities. -/
+noncomputable def canonicalRestrictedFailureProfile
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    RestrictedFailureProfile params strategy where
+  axisParallel := fun x => (xRestrictedStrategy params strategy x).axisParallelFailureProbability
+  selfConsistency := fun x => (xRestrictedStrategy params strategy x).selfConsistencyFailureProbability
+  diagonal := fun x => (xRestrictedStrategy params strategy x).diagonalFailureProbability
+  restrictedGood := fun _ =>
+    { axisParallelTest := le_rfl
+      selfConsistencyTest := le_rfl
+      diagonalLineTest := le_rfl }
+
+/-- The slice-conditioning loss is nonnegative. -/
+lemma sliceConditioningLoss_nonneg (params : Parameters) :
+    0 ≤ sliceConditioningLoss params := by
+  unfold sliceConditioningLoss
+  positivity
+
+/-- The diagonal slice-conditioning loss is nonnegative. -/
+lemma sliceDiagonalConditioningLoss_nonneg (params : Parameters) :
+    0 ≤ sliceDiagonalConditioningLoss params := by
+  simpa [sliceDiagonalConditioningLoss] using sliceConditioningLoss_nonneg params
+
+/-- Axis-parallel restriction bookkeeping: the transverse weighted average of the
+canonical slice failures is bounded by the ambient axis-parallel test failure. -/
+lemma canonicalRestrictedFailureProfile_axis_weighted_le
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          sliceTransverseDirectionWeight params *
+            (canonicalRestrictedFailureProfile params strategy).axisParallel x)
+      ≤ strategy.axisParallelFailureProbability := by
+  /-
+  This is the distribution-reindexing part of `lem:restricted-probabilities`:
+  condition the `(m+1)`-dimensional axis-parallel test on directions different
+  from the new coordinate, and identify those samples with `(x, m)`-slice tests.
+  -/
+  sorry
+
+/-- Axis-parallel restriction bookkeeping after dividing by the transverse
+conditioning weight. -/
+lemma canonicalRestrictedFailureProfile_axis_average_le_conditioned
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    averageRestrictedAxisParallelError params
+        (canonicalRestrictedFailureProfile params strategy)
+      ≤ sliceConditioningLoss params * strategy.axisParallelFailureProbability := by
+  have hweighted := canonicalRestrictedFailureProfile_axis_weighted_le params strategy
+  rw [avgOver_const_mul] at hweighted
+  have hrecip :
+      sliceConditioningLoss params * sliceTransverseDirectionWeight params = 1 := by
+    unfold sliceConditioningLoss sliceTransverseDirectionWeight
+    have hm_ne : (params.m : Error) ≠ 0 := by
+      exact_mod_cast Nat.ne_of_gt params.hm
+    have hm1_ne : (((params.m + 1 : ℕ) : Error)) ≠ 0 := by
+      positivity
+    field_simp [hm_ne, hm1_ne]
+  have hmul :=
+    mul_le_mul_of_nonneg_left hweighted (sliceConditioningLoss_nonneg params)
+  calc
+    averageRestrictedAxisParallelError params
+        (canonicalRestrictedFailureProfile params strategy)
+        = sliceConditioningLoss params *
+            (sliceTransverseDirectionWeight params *
+              averageRestrictedAxisParallelError params
+                (canonicalRestrictedFailureProfile params strategy)) := by
+              rw [← mul_assoc, hrecip, one_mul]
+    _ ≤ sliceConditioningLoss params * strategy.axisParallelFailureProbability := by
+        simpa [averageRestrictedAxisParallelError] using hmul
+
+/-- Self-consistency restriction bookkeeping: averaging the slice self-consistency
+failures is bounded by the ambient self-consistency failure. -/
+lemma canonicalRestrictedFailureProfile_selfConsistency_le
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    averageRestrictedSelfConsistencyError params
+        (canonicalRestrictedFailureProfile params strategy)
+      ≤ strategy.selfConsistencyFailureProbability := by
+  /-
+  The point self-consistency test on `Point params.next` is the same as first
+  sampling a height `x` and then sampling a point in the restricted slice.
+  -/
+  sorry
+
+/-- Diagonal-line restriction bookkeeping: the transverse weighted average of the
+canonical slice failures is bounded by the ambient diagonal-line test failure. -/
+lemma canonicalRestrictedFailureProfile_diagonal_weighted_le
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          sliceDiagonalDirectionWeight params *
+            (canonicalRestrictedFailureProfile params strategy).diagonal x)
+      ≤ strategy.diagonalFailureProbability := by
+  /-
+  This mirrors the axis-parallel reindexing proof for the diagonal branch. The
+  diagonal restricted strategy deliberately keeps the ambient diagonal answer
+  type, so this lemma only has to reindex line questions and sampled points.
+  -/
+  sorry
+
+/-- Diagonal-line restriction bookkeeping after dividing by the transverse
+conditioning weight. -/
+lemma canonicalRestrictedFailureProfile_diagonal_average_le_conditioned
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    averageRestrictedDiagonalError params
+        (canonicalRestrictedFailureProfile params strategy)
+      ≤ sliceDiagonalConditioningLoss params * strategy.diagonalFailureProbability := by
+  have hweighted := canonicalRestrictedFailureProfile_diagonal_weighted_le params strategy
+  rw [avgOver_const_mul] at hweighted
+  have hrecip :
+      sliceDiagonalConditioningLoss params * sliceDiagonalDirectionWeight params = 1 := by
+    unfold sliceDiagonalConditioningLoss sliceDiagonalDirectionWeight
+    exact
+      show sliceConditioningLoss params * sliceTransverseDirectionWeight params = 1 from by
+        unfold sliceConditioningLoss sliceTransverseDirectionWeight
+        have hm_ne : (params.m : Error) ≠ 0 := by
+          exact_mod_cast Nat.ne_of_gt params.hm
+        have hm1_ne : (((params.m + 1 : ℕ) : Error)) ≠ 0 := by
+          positivity
+        field_simp [hm_ne, hm1_ne]
+  have hmul :=
+    mul_le_mul_of_nonneg_left hweighted (sliceDiagonalConditioningLoss_nonneg params)
+  calc
+    averageRestrictedDiagonalError params
+        (canonicalRestrictedFailureProfile params strategy)
+        = sliceDiagonalConditioningLoss params *
+            (sliceDiagonalDirectionWeight params *
+              averageRestrictedDiagonalError params
+                (canonicalRestrictedFailureProfile params strategy)) := by
+              rw [← mul_assoc, hrecip, one_mul]
+    _ ≤ sliceDiagonalConditioningLoss params * strategy.diagonalFailureProbability := by
+        simpa [averageRestrictedDiagonalError] using hmul
+
 /-- `lem:restricted-probabilities`. -/
 lemma restrictedProbabilities
     (params : Parameters)
@@ -154,11 +329,34 @@ lemma restrictedProbabilities
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     RestrictedProbabilitiesStatement params strategy eps delta gamma := by
-  /-
-  This is the slice-conditioning bookkeeping lemma from `inductive_step.tex`.
-  It needs a genuine construction of the restricted failure profile and several
-  averaging/conditioning estimates.
-  -/
-  sorry
+  let profile := canonicalRestrictedFailureProfile params strategy
+  refine ⟨profile, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · exact le_trans
+      (canonicalRestrictedFailureProfile_axis_weighted_le params strategy)
+      hgood.axisParallelTest
+  · exact le_trans
+      (canonicalRestrictedFailureProfile_axis_average_le_conditioned params strategy)
+      (mul_le_mul_of_nonneg_left hgood.axisParallelTest
+        (sliceConditioningLoss_nonneg params))
+  · exact le_trans
+      (canonicalRestrictedFailureProfile_selfConsistency_le params strategy)
+      hgood.selfConsistencyTest
+  · exact le_trans
+      (canonicalRestrictedFailureProfile_diagonal_weighted_le params strategy)
+      hgood.diagonalLineTest
+  · exact le_trans
+      (canonicalRestrictedFailureProfile_diagonal_average_le_conditioned params strategy)
+      (mul_le_mul_of_nonneg_left hgood.diagonalLineTest
+        (sliceDiagonalConditioningLoss_nonneg params))
+  · have hweighted := canonicalRestrictedFailureProfile_axis_weighted_le params strategy
+    rw [avgOver_const_mul] at hweighted
+    change sliceTransverseDirectionWeight params *
+        avgOver (uniformDistribution (Fq params)) profile.axisParallel ≤ eps
+    simpa [profile] using le_trans hweighted hgood.axisParallelTest
+  · have hweighted := canonicalRestrictedFailureProfile_diagonal_weighted_le params strategy
+    rw [avgOver_const_mul] at hweighted
+    change sliceDiagonalDirectionWeight params *
+        avgOver (uniformDistribution (Fq params)) profile.diagonal ≤ gamma
+    simpa [profile] using le_trans hweighted hgood.diagonalLineTest
 
 end MIPStarRE.LDT.MainInductionStep
