@@ -433,7 +433,8 @@ private lemma qSDD_completePart_le_slice
               have hRherm : (rightTensor (ι₁ := ι) T)ᴴ = rightTensor (ι₁ := ι) T := by
                 exact
                   (Matrix.nonneg_iff_posSemidef.mp
-                    (rightTensor_nonneg (ι₁ := ι) (SubMeas.total_nonneg P.toSubMeas))).isHermitian.eq
+                    (rightTensor_nonneg (ι₁ := ι)
+                    (SubMeas.total_nonneg P.toSubMeas))).isHermitian.eq
               calc
                 ev ψbi (((leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)ᴴ) *
                     (leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T))
@@ -932,7 +933,8 @@ private lemma completePartAggregateCommutation_as_total
           (fun q =>
             qSDDOp ψbi
               (switcherooAggregateLeft params family (completePartProjFamily params family) q)
-              (switcherooAggregateRight params family (completePartProjFamily params family) q)) := by
+              (switcherooAggregateRight params family
+                (completePartProjFamily params family) q)) := by
                 apply avgOver_congr
                 intro q
                 symm
@@ -942,10 +944,8 @@ private lemma completePartAggregateCommutation_as_total
                   (switcherooAggregateRight_completePart_outcome params family q)
     _ ≤ gamma := hcomm
 
--- TODO: formalize the paper's scalar inequality
--- `12 * sqrt zeta + 4 * sqrt (ν_com) ≤ ν₂`.
--- The proof uses the paper's standing small-error regime.
 set_option maxHeartbeats 1000000 in
+-- Many sqrt/rpow manipulations for `12 * sqrt zeta + 4 * sqrt (ν_com) ≤ ν₂`.
 private lemma firstSwitcherooError_le_commutingWithGCompleteError
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error)
@@ -1081,8 +1081,8 @@ private lemma firstSwitcherooError_le_commutingWithGCompleteError
       rw [Real.sqrt_mul hm_nonneg]
     calc
       Real.sqrt (Commutativity.comMainError params gamma zeta)
-          = Real.sqrt (30 : Error) * Real.sqrt ((params.m : Error) * quarterSum) := by
-              congr 1
+          = Real.sqrt (30 : Error) *
+              Real.sqrt ((params.m : Error) * quarterSum) := by
               simp [Commutativity.comMainError, quarterSum]
               ring
       _ = Real.sqrt (30 : Error) * (Real.sqrt (params.m : Error) * Real.sqrt quarterSum) := by
@@ -1138,10 +1138,11 @@ private lemma firstSwitcherooError_le_commutingWithGCompleteError
           ring
 
 set_option maxHeartbeats 1000000 in
+-- Variant of firstSwitcherooError bound using eighthSum; heavy sqrt/rpow chain.
 private lemma firstSwitcherooError_le_eighth_stage
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error)
-    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hgamma_nonneg : 0 ≤ gamma) (_hgamma : gamma ≤ 1)
     (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
     (hd_le_q : params.d ≤ params.q) :
     commutativitySwitcherooError zeta zeta
@@ -1245,8 +1246,8 @@ private lemma firstSwitcherooError_le_eighth_stage
       rw [Real.sqrt_mul hm_nonneg]
     calc
       Real.sqrt (Commutativity.comMainError params gamma zeta)
-          = Real.sqrt (30 : Error) * Real.sqrt ((params.m : Error) * quarterSum) := by
-              congr 1
+          = Real.sqrt (30 : Error) *
+              Real.sqrt ((params.m : Error) * quarterSum) := by
               simp [Commutativity.comMainError, quarterSum]
               ring
       _ = Real.sqrt (30 : Error) * (Real.sqrt (params.m : Error) * Real.sqrt quarterSum) := by
@@ -1724,6 +1725,7 @@ theorem commutingWithGIncomplete
           simpa [commutingWithGIncompleteError] using hcomplete_bound
 
 set_option maxHeartbeats 2000000 in
+-- Large Finset.sum_option + simp unfolding across four quadrants.
 /-- Split the `Option × Option` squared-distance defect into its four quadrants. -/
 private lemma qSDDCore_option_pair_decompose
     {α β : Type*} [Fintype α] [Fintype β]
@@ -1764,9 +1766,10 @@ private lemma qSDDCore_option_pair_decompose
         (f := fun x x_1 =>
           ev ψ ((Lss (x, x_1) - Rss (x, x_1))ᴴ * (Lss (x, x_1) - Rss (x, x_1)))))
   rw [hss]
-  simpa [SS, add_assoc, add_left_comm, add_comm]
+  simp [SS, add_assoc, add_left_comm, add_comm]
 
 set_option maxHeartbeats 2000000 in
+-- Combines four self-consistency + commutation witnesses with heavy unfolding.
 /-- `cor:G-hat-facts`. -/
 theorem gHatFacts
     (params : Parameters)
@@ -1775,7 +1778,7 @@ theorem gHatFacts
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
-    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (_hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
     (hd_le_q : params.d ≤ params.q)
     (hselfComplete : GCompleteSelfConsistencyStatement params ψbi family zeta)
     (hselfIncomplete : GBotSelfConsistencyStatement params ψbi family zeta)
@@ -1819,7 +1822,7 @@ theorem gHatFacts
             have hcomplete_total :
                 (completePartSubMeas params family x).total = (family.meas x).total := by
               simp [completePartSubMeas, postprocess_total]
-            simpa [gHatSelfConsistencyLeftFamily, gHatSelfConsistencyRightFamily,
+            simp [gHatSelfConsistencyLeftFamily, gHatSelfConsistencyRightFamily,
               gHatIdxMeas, completeSubMeas, incompletePartLeftFamily,
               incompletePartRightFamily, incompletePartSubMeas, leftPlacedSubMeas,
               rightPlacedSubMeas, SubMeas.liftLeft, SubMeas.liftRight,
