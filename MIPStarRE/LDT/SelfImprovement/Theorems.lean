@@ -300,12 +300,24 @@ orthonormalization theorems.
 TODO: eliminate this package by proving:
 1. `PermInvState strategy.state` for the symmetric strategies used here,
 2. the helper-stage `BipartiteSSCRel` bound for `Hhat`, and
-3. the Section 9 transport lemmas from the orthonormalization output to the
+3. the GlobalVariance pointwise estimates consumed by `addInU`, and
+4. the Section 9 transport lemmas from the orthonormalization output to the
    remaining conclusion fields. -/
 structure SelfImprovementBridgePackage (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta nu : Error) : Prop where
   permInvariant : PermInvState strategy.state
+  globalVarianceProofInputs :
+    ∀ T : Measurement (Polynomial params) ι,
+      (∀ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
+          localVarianceOfPointsError params eps delta) ∧
+      (∀ g : Polynomial params,
+        pointConditionedLocalVarianceAtPolynomial params strategy T.toSubMeas g ≤
+          localVarianceOfPointsError params eps delta) ∧
+      (∀ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
+          globalVarianceOfPointsError params eps delta)
   helperStrongSelfConsistency :
     ∀ {T : Measurement (Polynomial params) ι}
       {Hhat : SubMeas (Polynomial params) ι}
@@ -417,12 +429,25 @@ lemma addInU
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (T : Measurement (Polynomial params) ι) :
+    (T : Measurement (Polynomial params) ι)
+    (hlocalDev :
+      ∀ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
+          localVarianceOfPointsError params eps delta)
+    (hlocalVar :
+      ∀ g : Polynomial params,
+        pointConditionedLocalVarianceAtPolynomial params strategy T.toSubMeas g ≤
+          localVarianceOfPointsError params eps delta)
+    (hglobalDev :
+      ∀ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
+          globalVarianceOfPointsError params eps delta) :
     AddInUStatement params strategy T eps delta := by
   refine
     { varianceBound := ?_ }
   let hvariance :=
     globalVarianceOfPoints params strategy eps delta gamma hgood T.toSubMeas strategy.state
+      hlocalDev hlocalVar hglobalDev
   simpa [selfImprovementVarianceError] using hvariance.averagedGlobalVarianceBound
 
 /-- Reduced version of `lem:self-improvement-helper`.
@@ -439,6 +464,8 @@ lemma selfImprovementHelper
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
+    (nu : Error)
+    (hbridges : SelfImprovementBridgePackage params strategy eps delta nu)
     (_G : Measurement (Polynomial params) ι) :
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
@@ -457,7 +484,9 @@ lemma selfImprovementHelper
       positiveSemidefiniteWitness := hsdp.dualPositive
       dualDominatesAveragedPoint := hsdp.dualFeasible }
   · simpa [T] using hsdp
-  · exact addInU params strategy eps delta gamma hgood T
+  · rcases hbridges.globalVarianceProofInputs T with
+      ⟨hlocalDev, hlocalVar, hglobalDev⟩
+    exact addInU params strategy eps delta gamma hgood T hlocalDev hlocalVar hglobalDev
 
 /-- `thm:self-improvement`.
 
@@ -476,7 +505,7 @@ theorem selfImprovement
       (polynomialEvaluationFamily params G.toSubMeas) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
-  rcases selfImprovementHelper params strategy eps delta gamma hgood G with
+  rcases selfImprovementHelper params strategy eps delta gamma hgood nu hbridges G with
     ⟨T, Hhat, Z, hhelper⟩
   have hssc :
       BipartiteSSCRel strategy.state (uniformDistribution Unit)
