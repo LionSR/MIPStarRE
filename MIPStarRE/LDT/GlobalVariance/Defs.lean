@@ -128,6 +128,22 @@ def pointOnLine {params : Parameters} [FieldModel params.q]
     (qu : AxisParallelLineQuestion params) : Prop :=
   ∃ t : Fq params, qu.1.pointAt t = qu.2
 
+/-- The affine line parameter of the sampled point in an axis-parallel line question.
+
+For a line `ℓ(t) = base + t e_i`, the sampled point `u` has affine parameter
+`u_i - base_i`. This is the parameter used by the axis-parallel line-test API;
+it is not the raw coordinate `u_i` unless the line base has zero in direction `i`. -/
+def axisParallelLineQuestionParameter {params : Parameters} [FieldModel params.q]
+    (qu : AxisParallelLineQuestion params) : Fq params :=
+  subCoord (qu.2 qu.1.direction) (qu.1.base qu.1.direction)
+
+/-- The recovered parameter of `ℓ.pointAt t` is exactly `t`. -/
+@[simp] theorem axisParallelLineQuestionParameter_pointAt {params : Parameters}
+    [FieldModel params.q] (ℓ : AxisParallelLine params) (t : Fq params) :
+    axisParallelLineQuestionParameter (ℓ, ℓ.pointAt t) = t := by
+  simp only [axisParallelLineQuestionParameter, AxisParallelLine.pointAt, if_pos]
+  simp [subCoord, addCoord]
+
 /-- The distribution of an axis-parallel line together with a point queried on it.
 
 The paper samples `u ∈ F_q^m` uniformly, then samples a direction `i` uniformly,
@@ -245,7 +261,7 @@ noncomputable def generalizeBLeftOperatorAtPolynomial (params : Parameters)
   (postprocess
       ((strategy.axisParallelMeasurement ℓ).toSubMeas)
       (fun f : AxisLinePolynomial params =>
-        if f.poly.eval (decodeScalar (u ℓ.direction)) = decodeScalar (g u) then
+        if f (axisParallelLineQuestionParameter qu) = g u then
           some ()
         else
           none)).outcome (some ())
@@ -319,7 +335,7 @@ private theorem generalizeBLeftOperatorAtPolynomial_pos (params : Parameters)
     (postprocess
       ((strategy.axisParallelMeasurement ℓ).toSubMeas)
       (fun f : AxisLinePolynomial params =>
-        if f.poly.eval (decodeScalar (u ℓ.direction)) = decodeScalar (g u) then
+        if f (axisParallelLineQuestionParameter (ℓ, u)) = g u then
           some ()
         else
           none)).outcome_pos (some ())
@@ -337,7 +353,7 @@ private theorem generalizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
       (postprocess
         ((strategy.axisParallelMeasurement ℓ).toSubMeas)
         (fun f : AxisLinePolynomial params =>
-          if f.poly.eval (decodeScalar (u ℓ.direction)) = decodeScalar (g u) then
+          if f (axisParallelLineQuestionParameter (ℓ, u)) = g u then
             some ()
           else
             none))

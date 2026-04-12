@@ -310,7 +310,41 @@ private lemma oneMeasNaimarkInputProj_idempotent {α : Type*} [Fintype α] [Deci
   exact
     (isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) none)).idempotent
 
-private lemma oneMeasNaimarkColumn_conjTranspose_mul_self
+private lemma oneMeasNaimarkInputProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d] :
+    MIPStarRE.Quantum.IsProj
+      (oneMeasNaimarkInputProj (α := α) (d := d)) :=
+  isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) none)
+
+/-- The CFC square root of a matrix is Hermitian. -/
+private lemma sqrt_isHermitian_eq {d : Type*} [Fintype d] [DecidableEq d]
+    {A : MIPStarRE.Quantum.Op d} :
+    (CFC.sqrt A)ᴴ = CFC.sqrt A :=
+  (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg A)).isHermitian.eq
+
+/-- Entrywise form of `√A * √A = A`, with the left factor conjugated. -/
+private lemma sqrt_conjTranspose_mul_self_apply {d : Type*} [Fintype d] [DecidableEq d]
+    {A : MIPStarRE.Quantum.Op d} (hA : 0 ≤ A) (i j : d) :
+    ∑ k : d, star (CFC.sqrt A k i) * CFC.sqrt A k j = A i j := by
+  have hA_herm := sqrt_isHermitian_eq (A := A)
+  calc
+    ∑ k : d, star (CFC.sqrt A k i) * CFC.sqrt A k j =
+        ∑ k : d, CFC.sqrt A i k * CFC.sqrt A k j := by
+          refine Finset.sum_congr rfl ?_
+          intro k _
+          rw [show star (CFC.sqrt A k i) = CFC.sqrt A i k from by
+            rw [← Matrix.conjTranspose_apply, hA_herm]]
+    _ = (CFC.sqrt A * CFC.sqrt A) i j := by
+          rw [Matrix.mul_apply]
+    _ = A i j := by
+          rw [CFC.sqrt_mul_sqrt_self _ hA]
+
+/-- **Isometry property of the Naimark column**: `V†V = P`.
+
+The Naimark column `V` satisfies `V†V = I ⊗ |⊥⟩⟨⊥|`, i.e., V is an
+isometry on the `⊥`-slice of the auxiliary register. This is the key
+linear-algebraic content justifying the unitary extension. -/
+private lemma oneMeasNaimarkColumn_isometry
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
     (M : MIPStarRE.Quantum.Submeasurement α d) :
@@ -493,6 +527,164 @@ private lemma oneMeasNaimarkInputProj_mul_apply_some
             oneMeasNaimarkInputProj (α := α) (d := d) (i, some a) z * A z y))]
   simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker]
 
+ /-- The Naimark column acts as an isometry on the input subspace: `VP = V`. -/
+private lemma oneMeasNaimarkColumn_mul_inputProj
+    {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (M : MIPStarRE.Quantum.Submeasurement α d) :
+    oneMeasNaimarkColumn M * oneMeasNaimarkInputProj (α := α) (d := d) =
+      oneMeasNaimarkColumn M := by
+  ext ⟨d₁, oa₁⟩ ⟨d₂, oa₂⟩
+  simp only [Matrix.mul_apply, oneMeasNaimarkInputProj,
+    oneMeasNaimarkAuxTransition, Matrix.kronecker_apply]
+  cases oa₂ with
+  | none =>
+    have : ∀ x : d × Option α,
+        oneMeasNaimarkColumn M (d₁, oa₁) x *
+          Matrix.kronecker (1 : MIPStarRE.Quantum.Op d)
+            (Matrix.single (none : Option α) (none : Option α) (1 : ℂ)) x (d₂, none) =
+          if x = (d₂, (none : Option α)) then
+            oneMeasNaimarkColumn M (d₁, oa₁) (d₂, none)
+          else 0 := by
+      intro ⟨k₁, k₂⟩
+      cases k₂ with
+      | none =>
+          by_cases h : k₁ = d₂ <;>
+            simp [Matrix.kronecker, Matrix.single_apply, Prod.ext_iff, h]
+      | some a =>
+          have hneq : (k₁, some a) ≠ (d₂, (none : Option α)) := by
+            intro h
+            cases h
+          simpa [Matrix.kronecker, Matrix.single_apply, hneq]
+    simp_rw [this]
+    rw [Finset.sum_ite_eq' Finset.univ (d₂, (none : Option α)) (fun _ =>
+      oneMeasNaimarkColumn M (d₁, oa₁) (d₂, none))]
+    simp
+  | some a₂ =>
+    simp [oneMeasNaimarkColumn, Matrix.kronecker]
+
+-- This is independent of Naimark and could be moved to `LDT/Preliminaries`.
+/-- **Partial isometry to unitary extension** (general fact).
+
+If `V†V = P` where `P` is a projection and `V = VP`, then there exists
+a unitary `U` on the full space with `UP = V`.
+
+This is a standard result in finite-dimensional linear algebra: V is an
+isometry from range(P) to V's range, and in finite dimensions any
+isometry between subspaces extends to a unitary.
+
+**Mathlib route**: `LinearIsometry.extend` provides the extension for
+linear isometries between inner product spaces. The gap is the
+matrix-to-`EuclideanSpace` transport. -/
+private lemma partialIsometry_to_unitary
+    {n : Type*} [Fintype n] [DecidableEq n]
+    (V P : MIPStarRE.Quantum.Op n)
+    (hP : MIPStarRE.Quantum.IsProj P)
+    (hVP : V * P = V)
+    (hVV : Vᴴ * V = P) :
+    ∃ U : Matrix.unitaryGroup n ℂ,
+      (U : MIPStarRE.Quantum.Op n) * P = V := by
+  classical
+  have toEuclideanLin_mul :
+      ∀ A B : MIPStarRE.Quantum.Op n,
+        Matrix.toEuclideanLin (A * B) =
+          (Matrix.toEuclideanLin A).comp (Matrix.toEuclideanLin B) := by
+    intro A B
+    simpa [Matrix.toEuclideanLin] using
+      (Matrix.toLpLin_mul_same (p := (2 : ENNReal)) A B)
+  have toEuclideanLin_conjTranspose_mul_self :
+      ∀ A : MIPStarRE.Quantum.Op n,
+        Matrix.toEuclideanLin (Aᴴ * A) =
+          (Matrix.toEuclideanLin A).adjoint.comp (Matrix.toEuclideanLin A) := by
+    intro A
+    rw [toEuclideanLin_mul, Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
+  let E := EuclideanSpace ℂ n
+  letI : NormedAddCommGroup E := by dsimp [E]; infer_instance
+  letI : InnerProductSpace ℂ E := by dsimp [E]; infer_instance
+  letI : FiniteDimensional ℂ E := by dsimp [E]; infer_instance
+  let Pₗ : E →ₗ[ℂ] E := Matrix.toEuclideanLin P
+  let Vₗ : E →ₗ[ℂ] E := Matrix.toEuclideanLin V
+  let S : Submodule ℂ E := LinearMap.range Pₗ
+  have hP_fix : ∀ x : S, Pₗ (x : E) = x := by
+    intro x
+    rcases x.2 with ⟨y, hy⟩
+    rw [← hy]
+    calc
+      Pₗ (Pₗ y) = (Pₗ.comp Pₗ) y := rfl
+      _ = Matrix.toEuclideanLin (P * P) y := by rw [toEuclideanLin_mul]
+      _ = Pₗ y := by rw [hP.idempotent]
+  have hVP_lin : Vₗ.comp Pₗ = Vₗ := by
+    calc
+      Vₗ.comp Pₗ = Matrix.toEuclideanLin (V * P) := by rw [toEuclideanLin_mul]
+      _ = Vₗ := by rw [hVP]
+  have hgram : Vₗ.adjoint.comp Vₗ = Pₗ := by
+    calc
+      Vₗ.adjoint.comp Vₗ = Matrix.toEuclideanLin (Vᴴ * V) := by
+        rw [toEuclideanLin_conjTranspose_mul_self]
+      _ = Pₗ := by rw [hVV]
+  let Llin : S →ₗ[ℂ] E := Vₗ.comp S.subtype
+  have hLnorm : ∀ x : S, ‖Llin x‖ = ‖x‖ := by
+    exact (LinearMap.norm_map_iff_inner_map_map Llin).2 fun x y => by
+      have hy : Vₗ.adjoint (Vₗ (y : E)) = y := by
+        calc
+          Vₗ.adjoint (Vₗ (y : E)) = (Vₗ.adjoint.comp Vₗ) (y : E) := rfl
+          _ = Pₗ (y : E) := by rw [hgram]
+          _ = y := hP_fix y
+      calc
+        inner ℂ (Llin x) (Llin y) = inner ℂ (Vₗ (x : E)) (Vₗ (y : E)) := rfl
+        _ = inner ℂ (x : E) (Vₗ.adjoint (Vₗ (y : E))) := by rw [LinearMap.adjoint_inner_right]
+        _ = inner ℂ (x : E) (y : E) := by rw [hy]
+        _ = inner ℂ x y := rfl
+  let L : S →ₗᵢ[ℂ] E := { toLinearMap := Llin, norm_map' := hLnorm }
+  let Ulin : E →ₗᵢ[ℂ] E := L.extend
+  let Umat : MIPStarRE.Quantum.Op n :=
+    Matrix.toEuclideanLin.symm Ulin.toLinearMap
+  have hUmat_lin : Matrix.toEuclideanLin Umat = Ulin.toLinearMap := by
+    exact Matrix.toEuclideanLin.apply_symm_apply Ulin.toLinearMap
+  have hU_adjoint_comp : Ulin.toLinearMap.adjoint.comp Ulin.toLinearMap = 1 := by
+    apply LinearMap.ext
+    intro x
+    refine ext_inner_right ℂ fun y => ?_
+    calc
+      inner ℂ ((Ulin.toLinearMap.adjoint.comp Ulin.toLinearMap) x) y =
+          inner ℂ (Ulin x) (Ulin y) := by
+            rw [LinearMap.comp_apply, LinearMap.adjoint_inner_left]
+            rfl
+      _ = inner ℂ x y := Ulin.inner_map_map x y
+      _ = inner ℂ ((1 : E →ₗ[ℂ] E) x) y := rfl
+  have hUstarU : Umatᴴ * Umat = 1 := by
+    apply Matrix.toEuclideanLin.injective
+    calc
+      Matrix.toEuclideanLin (Umatᴴ * Umat) =
+          (Matrix.toEuclideanLin Umat).adjoint.comp (Matrix.toEuclideanLin Umat) := by
+            rw [toEuclideanLin_conjTranspose_mul_self]
+      _ = Ulin.toLinearMap.adjoint.comp Ulin.toLinearMap := by rw [hUmat_lin]
+      _ = 1 := hU_adjoint_comp
+      _ = Matrix.toEuclideanLin (1 : MIPStarRE.Quantum.Op n) := by
+            rw [Matrix.toEuclideanLin, Matrix.toLpLin_one]
+            rfl
+  let U : Matrix.unitaryGroup n ℂ := ⟨Umat, (Matrix.mem_unitaryGroup_iff').2 hUstarU⟩
+  refine ⟨U, ?_⟩
+  apply Matrix.toEuclideanLin.injective
+  apply LinearMap.ext
+  intro x
+  have hExt : Ulin (Pₗ x) = Vₗ (Pₗ x) := by
+    simpa [Ulin, L, Llin] using
+      (LinearIsometry.extend_apply L ⟨Pₗ x, LinearMap.mem_range_self Pₗ x⟩)
+  calc
+    Matrix.toEuclideanLin ((U : MIPStarRE.Quantum.Op n) * P) x =
+        Matrix.toEuclideanLin Umat (Pₗ x) := by
+          rw [toEuclideanLin_mul]
+          rfl
+    _ = Ulin (Pₗ x) := by
+          rw [hUmat_lin]
+          rfl
+    _ = Vₗ (Pₗ x) := hExt
+    _ = Vₗ x := by
+          have hx := congrArg (fun f : E →ₗ[ℂ] E => f x) hVP_lin
+          simpa [LinearMap.comp_apply] using hx
+    _ = Matrix.toEuclideanLin V x := rfl
+
 private lemma exists_unitary_extension_oneMeasNaimarkColumn
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -501,68 +693,11 @@ private lemma exists_unitary_extension_oneMeasNaimarkColumn
       (U : MIPStarRE.Quantum.Op (d × Option α)) *
           oneMeasNaimarkInputProj (α := α) (d := d) =
         oneMeasNaimarkColumn M := by
-  classical
-  let s : Set (d × Option α) := fun z => z.2 = none
-  let cols : d × Option α → EuclideanSpace ℂ (d × Option α) := fun z =>
-    Matrix.toEuclideanLin (oneMeasNaimarkColumn M) (EuclideanSpace.single z 1)
-  have hcols : Orthonormal ℂ (s.restrict cols) := by
-    rw [orthonormal_iff_ite]
-    intro x y
-    rcases x with ⟨⟨i, ox⟩, hx⟩
-    rcases y with ⟨⟨j, oy⟩, hy⟩
-    have hox : ox = none := by simpa [s] using hx
-    have hoy : oy = none := by simpa [s] using hy
-    cases hox
-    cases hoy
-    have hi : (i, none) ∈ s := rfl
-    have hj : (j, none) ∈ s := rfl
-    calc
-      inner ℂ ((s.restrict cols) ⟨(i, none), hi⟩)
-          ((s.restrict cols) ⟨(j, none), hj⟩)
-          = ((oneMeasNaimarkColumn M)ᴴ * oneMeasNaimarkColumn M) (i, none) (j, none) := by
-              simpa [s, cols, Matrix.toEuclideanLin_apply, EuclideanSpace.ofLp_single,
-                Matrix.mulVec_single_one] using
-                (inner_matrix_col_col (A := oneMeasNaimarkColumn M)
-                  (B := oneMeasNaimarkColumn M) (i := (i, none)) (j := (j, none)))
-      _ = (oneMeasNaimarkInputProj (α := α) (d := d)) (i, none) (j, none) := by
-            simpa using congrArg (fun A => A (i, none) (j, none))
-              (oneMeasNaimarkColumn_conjTranspose_mul_self M)
-      _ = if (⟨(i, none), hi⟩ : s) = ⟨(j, none), hj⟩ then 1 else 0 := by
-            simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker,
-              Matrix.one_apply, s]
-  obtain ⟨b, hb⟩ := hcols.exists_orthonormalBasis_extension_of_card_eq
-    (ι := d × Option α)
-    (card_ι := by simpa using (finrank_euclideanSpace (𝕜 := ℂ) (ι := d × Option α)))
-  let Umat : MIPStarRE.Quantum.Op (d × Option α) :=
-    (EuclideanSpace.basisFun (d × Option α) ℂ).toBasis.toMatrix b.toBasis
-  let U : Matrix.unitaryGroup (d × Option α) ℂ :=
-    ⟨Umat,
-      (EuclideanSpace.basisFun (d × Option α) ℂ).toMatrix_orthonormalBasis_mem_unitary b⟩
-  refine ⟨U, ?_⟩
-  ext x y
-  rcases y with ⟨j, oy⟩
-  cases oy with
-  | none =>
-      have hjnone : (j, none) ∈ s := rfl
-      have hbnone : b (j, none) = cols (j, none) := by
-        exact hb (j, none) hjnone
-      calc
-        ((U : MIPStarRE.Quantum.Op (d × Option α)) *
-            oneMeasNaimarkInputProj (α := α) (d := d)) x (j, none)
-            = (U : MIPStarRE.Quantum.Op (d × Option α)) x (j, none) := by
-                simpa [Umat] using
-                  mul_oneMeasNaimarkInputProj_apply_none
-                    (A := (U : MIPStarRE.Quantum.Op (d × Option α))) x j
-        _ = b (j, none) x := by
-              simp [U, Umat, Module.Basis.toMatrix_apply, EuclideanSpace.basisFun_repr]
-        _ = cols (j, none) x := by rw [hbnone]
-        _ = oneMeasNaimarkColumn M x (j, none) := by
-              simp [cols, Matrix.toEuclideanLin_apply, EuclideanSpace.ofLp_single,
-                Matrix.mulVec_single_one]
-  | some a =>
-      simpa [Umat, oneMeasNaimarkColumn] using
-        mul_oneMeasNaimarkInputProj_apply_some
-          (A := (U : MIPStarRE.Quantum.Op (d × Option α))) x j a
+  exact partialIsometry_to_unitary
+    (oneMeasNaimarkColumn M) (oneMeasNaimarkInputProj (α := α) (d := d))
+    oneMeasNaimarkInputProj_isProj
+    (oneMeasNaimarkColumn_mul_inputProj M)
+    (oneMeasNaimarkColumn_isometry M)
 
 private lemma normalizedTrace_oneMeasLiftedDensity_mul_auxProj
     {α : Type*} [Fintype α] [DecidableEq α]
@@ -700,10 +835,9 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
         ∑ oa : Option α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa) =
           Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj none) +
             ∑ a : α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj (some a)) := by
-      simpa using
-        (Fintype.sum_option
+      exact Fintype.sum_option
           (f := fun oa : Option α =>
-            Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa)))
+            Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa))
     have hsumSome :
         ∑ a : α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj (some a)) =
           Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (∑ a : α, auxProj (some a)) := by
@@ -715,7 +849,7 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
         rw [Matrix.sum_apply]
         simp [Matrix.kronecker, Matrix.sum_apply]
       · rw [Matrix.sum_apply]
-        simp [Matrix.kronecker, Matrix.one_apply, hij]
+        simp [Matrix.kronecker, hij]
     have hauxSplit : auxProj none + ∑ a : α, auxProj (some a) = 1 := by
       rw [← hauxDecomp, optionBasisProj_sum_eq_one]
     have hbase :
@@ -733,23 +867,28 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
                     (1 : MIPStarRE.Quantum.Op d)
                     (auxProj none)
                     (∑ a : α, auxProj (some a))).symm
-        _ = Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (1 : MIPStarRE.Quantum.Op (Option α)) := by
+        _ = Matrix.kronecker (1 : MIPStarRE.Quantum.Op d)
+              (1 : MIPStarRE.Quantum.Op (Option α)) := by
               rw [hauxSplit]
         _ = (1 : MIPStarRE.Quantum.Op (d × Option α)) := by
-              simpa using
-                (Matrix.one_kronecker_one :
-                  Matrix.kronecker
-                    (1 : MIPStarRE.Quantum.Op d)
-                    (1 : MIPStarRE.Quantum.Op (Option α)) =
-                      (1 : MIPStarRE.Quantum.Op (d × Option α)))
+              exact Matrix.one_kronecker_one
     exact le_of_eq <| unitary_conj_sum_eq_one U _ hbase
   · intro ρ a
     /-
-    Write `Q_a = I ⊗ |a⟩⟨a|` and `Q_⊥ = I ⊗ |⊥⟩⟨⊥|`.  Using the defining action
-    of `U` on the `|⊥⟩` slice, we have
-      `Q_a * U * Q_⊥ = (√(M_a)) ⊗ |a⟩⟨⊥|`,
-    so after cycling the trace and using `√(M_a) * √(M_a) = M_a`, the right-hand
-    side reduces to `normalizedTrace (ρ * M.effect a)`.
+    **Compression/trace identity** (core of Lemma 5.2).
+
+    From `hU : U * P_⊥ = V`, the `⊥`-column of `U` equals the Naimark column `V`.
+    The trace identity `τ(ρ M_a) = τ'(ρ_lifted · P̂_a)` follows from:
+    1. `(ρ ⊗ |⊥⟩⟨⊥|)` restricts the trace to the `⊥`-slice of the auxiliary
+    2. On this slice, `U†(I ⊗ |a⟩⟨a|)U` acts as `√M_a * √M_a = M_a`
+       (by the column identity from `hU` and `CFC.sqrt_mul_sqrt_self`)
+    3. The `|Option α|` scaling cancels with the enlarged-space normalization
+
+    The detailed calculation is entry-level:
+      `Tr((ρ ⊗ |⊥⟩⟨⊥|) · U†Q_aU)`
+      `= ∑_d₁ ∑_d₂ ρ(d₁,d₂) · (U†Q_aU)((d₂,⊥),(d₁,⊥))`
+      `= ∑_d₁ ∑_d₂ ρ(d₁,d₂) · M_a(d₂,d₁)    [column identity + sqrt²]`
+      `= Tr(ρ · M_a)`
     -/
     let B : MIPStarRE.Quantum.Op (d × Option α) :=
       Matrix.kronecker ρ (naimarkAuxProjector α)

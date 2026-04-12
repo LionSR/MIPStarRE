@@ -387,6 +387,73 @@ noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters) [Fie
       (fun gb => rightTensor (ι₁ := ι)
         (CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1)))
 
+/-- Expand one outcome of the first `G^y` stability family. -/
+lemma commDataProcessedGStabilityOneLeft_outcome
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (q : EvaluatedSliceQuestion params)
+    (ah : StabilityOneOutcome params) :
+    (commDataProcessedGStabilityOneLeft params strategy family G q).outcome ah =
+      (leftPlacedSubMeas (ιB := ι)
+          (evaluatedSliceSandwichRaw params strategy family q)).outcome
+          (ah.1, ah.2 (truncatePoint params q.2)) *
+        leftTensor (ι₂ := ι)
+          ((fullSliceSecondFactor params family
+            (fullSliceQuestionOfEvaluatedSlice params q)).total) *
+        rightTensor (ι₁ := ι)
+          (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)) := by
+  rfl
+
+/-- Expand one outcome of the second `G^y` stability family. -/
+lemma commDataProcessedGStabilityOneRight_outcome
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (q : EvaluatedSliceQuestion params)
+    (ah : StabilityOneOutcome params) :
+    (commDataProcessedGStabilityOneRight params strategy family G q).outcome ah =
+      leftTensor (ι₂ := ι)
+          ((evaluatedSliceSandwichRaw params strategy family q).outcome
+              (ah.1, ah.2 (truncatePoint params q.2))) *
+        rightTensor (ι₁ := ι)
+          (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)) := by
+  rfl
+
+/-- Expand one outcome of the first `G^x` stability family. -/
+lemma commDataProcessedGStabilityTwoLeft_outcome
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (q : EvaluatedSliceQuestion params)
+    (gb : StabilityTwoOutcome params) :
+    (commDataProcessedGStabilityTwoLeft params strategy family G q).outcome gb =
+      (evaluatedSliceProductLeft params strategy family q).outcome
+          (gb.1 (truncatePoint params q.1), gb.2) *
+        leftTensor (ι₂ := ι)
+          ((fullSliceFirstFactor params family
+            (fullSliceQuestionOfEvaluatedSlice params q)).total) *
+        rightTensor (ι₁ := ι)
+          (CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1)) := by
+  rfl
+
+/-- Expand one outcome of the second `G^x` stability family. -/
+lemma commDataProcessedGStabilityTwoRight_outcome
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (q : EvaluatedSliceQuestion params)
+    (gb : StabilityTwoOutcome params) :
+    (commDataProcessedGStabilityTwoRight params strategy family G q).outcome gb =
+      leftTensor (ι₂ := ι)
+          ((orderedProductOpFamily
+              (evaluatedSliceFirstFactor params family q)
+              (evaluatedSliceSecondFactor params family q)).outcome
+              (gb.1 (truncatePoint params q.1), gb.2)) *
+        rightTensor (ι₁ := ι)
+          (CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1)) := by
+  rfl
+
 /-- The operator `C_{a,b} = Q_b P_a Q_b` from `lem:normalization-condition`.
 
 We propagate explicit `matrix` from the input operators so that
