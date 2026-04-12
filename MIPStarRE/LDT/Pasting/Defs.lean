@@ -397,6 +397,30 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
         _ ≤ params.d + 0 := Nat.add_le_add hLiMv hslice_zero
         _ = params.d := by simp
 
+/-- A completed-slice tuple `gs` is globally consistent at evaluation
+points `xs` if there exists a single polynomial `h` in `m+1` variables
+whose restriction to each genuine slice height `xᵢ` agrees with the
+corresponding slice polynomial `gᵢ`.
+
+This matches the paper's `Global_τ(x)` predicate from
+`references/ldt-paper/ld-pasting.tex` lines 1123-1131. -/
+def IsGloballyConsistent (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k) : Prop :=
+  ∃ h : Polynomial params.next,
+    ∀ i : Fin k, ∀ (hi : (gs i).isSome = true),
+      (Polynomial.restrictAtHeight params h (xs i)).poly =
+        ((gs i).get hi).poly
+
+/-- `IsGloballyConsistent params xs` is decidable (classically),
+needed for `restrictSubMeas` filtering. -/
+noncomputable instance isGloballyConsistent_decidablePred
+    (params : Parameters) [FieldModel params.q] {k : ℕ}
+    (xs : PointTuple params k) :
+    DecidablePred (IsGloballyConsistent params xs) :=
+  fun _gs => Classical.dec _
+
 /-- Interpolate from `d+1` or more genuine slice polynomials to recover
 a polynomial in `m+1` variables via Lagrange interpolation.
 
