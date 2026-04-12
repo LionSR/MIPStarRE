@@ -1214,6 +1214,82 @@ lemma qBipartiteSSCDefect_eq_half_qSDD_of_proj
           rw [hq]
           ring
 
+/-! ### Scalar approximation chain (proof of `lem:comm-data-processed-g`)
+
+The paper's proof (`commutativity-G.tex`, lines 72–131) converts
+`E[∑ ABAB]` into `E[∑ ABA]` through a ten-step scalar chain.
+We decompose the chain into four phases, each a stand-alone lemma.
+
+**Phase 1** (eq:gcom8 → eq:gcom9): insert Bob's measurement and apply
+`clm:g-comm-stability` to remove trailing `G^y`.
+Error: `2√ζ + √ζ`.
+
+**Phase 2** (eq:gcom9 → eq:gcom10): insert Bob's second measurement,
+swap via `commutativityPoints`, apply `clm:g-comm-stability2` to
+remove trailing `G^x`.
+Error: `2√ζ + 6√(γ(m+1)) + √ζ + 6√(γ(m+1))`.
+
+**Phase 3** (eq:gcom10 → eq:gonna-cite-this): reverse the `eq:add-an-a`
+insertions using projectivity.
+Error: `2√ζ + 2√ζ`.
+
+**Phase 4** (eq:gonna-cite-this → BAB = ABA): apply postprocessed
+self-consistency twice.
+Error: `√ζ + √ζ`.
+
+Total: `12√ζ + 12√(γ(m+1))`. Then `2 * total ≤ 48m(√γ + √ζ)`. -/
+
+/-- Scalar approximation chain for the evaluated-slice commutation.
+
+This is the core of the paper's proof of `lem:comm-data-processed-g`
+(`references/ldt-paper/commutativity-G.tex`, lines 72–131).
+Starting from `E[∑ ABAB]`, the proof applies ten approximation steps:
+
+1. `≈_{2√ζ}`: insert Bob's measurement via `closenessOfIP` + `eq:add-an-a`
+2. `≈_{√ζ}`: remove trailing `G^y` (`clm:g-comm-stability`)
+3. `≈_{2√ζ}`: insert Bob's second measurement via `closenessOfIP` +
+   `eq:add-an-a`
+4. `≈_{6√(γ(m+1))}`: swap Bob's measurements via `closenessOfIP` +
+   `commutativityPoints`
+5. `≈_{√ζ + 6√(γ(m+1))}`: remove trailing `G^x`
+   (`clm:g-comm-stability2`)
+6–7. `≈_{2√ζ + 2√ζ}`: reverse the `eq:add-an-a` insertions
+8–9. `≈_{√ζ + √ζ}`: apply postprocessed self-consistency twice
+
+Summing: `Σεᵢ = 12√ζ + 12√(γ(m+1))`, so `2 * Σεᵢ ≤ 48m(√γ + √ζ)`. -/
+private lemma evaluatedSlice_scalar_chain_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (_hnorm : strategy.state.IsNormalized)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (_hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (_hself : family.StronglySelfConsistent strategy.state zeta)
+    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (_hpostSSC : SDDRel strategy.state
+      (uniformDistribution (Point params.next))
+      (evaluatedPointFamilyLeft params family)
+      (evaluatedPointFamilyRight params family)
+      zeta) :
+    2 *
+      (avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ ab : EvaluatedSliceOutcome params,
+            evaluatedSliceABATerm params strategy family q ab) -
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ ab : EvaluatedSliceOutcome params,
+            evaluatedSliceABABTerm params strategy family q ab)) ≤
+      commDataProcessedGError params gamma zeta := by
+  -- Paper reference: commutativity-G.tex, proof of lem:comm-data-processed-g,
+  -- equations (eq:gcom8) through the final displayed error estimate.
+  -- Each step uses closenessOfIP, easyApproxFromApproxDelta, or the
+  -- stability claims (clm:g-comm-stability, clm:g-comm-stability2).
+  -- The algebraic qSDDOp expansions and stability families are defined
+  -- in Commutativity/Defs.lean; the Cauchy-Schwarz bridges are in
+  -- Preliminaries/CauchySchwarz.lean.
+  sorry
+
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG
     (params : Parameters)
@@ -1376,14 +1452,11 @@ lemma commDataProcessedG
       postprocessedPointConsistency := ?_
       postprocessedSelfConsistency := hpostSSC
       evaluatedSliceCommutation := by
-        -- Remaining blocker: formalize the scalar approximation chain from
-        -- `blueprint/src/chapter/ch08_commutativity.tex` lines 101-157,
-        -- especially `clm:g-comm-stability2`.  The algebraic `qSDDOp`
-        -- expansions are now in place, but we still need the source-faithful
-        -- closeness-of-inner-product / Cauchy-Schwarz bridge that turns the
-        -- boundedness hypothesis and `commutativityPoints` into the two scalar
-        -- bounds driving the final averaged commutator estimate.
-        sorry }
+        refine ⟨?_⟩
+        rw [evaluatedSliceCommutation_qSDDOp_avg_eq params strategy family]
+        exact evaluatedSlice_scalar_chain_bound
+          params strategy eps delta gamma zeta
+          hnorm hgood family G hG hself hbound hpostSSC }
   simpa [evaluatedPointFamily] using hcons.pointConsistency
 
 /-- Postprocessing a `leftPlacedOpFamily` of a bilinear product equals
