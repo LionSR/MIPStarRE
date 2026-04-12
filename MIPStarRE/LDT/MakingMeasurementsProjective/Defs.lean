@@ -242,9 +242,9 @@ abbrev NaimarkLiftedIndex (ι : Type*) (QuestionA OutcomeA QuestionB OutcomeB : 
 
 /-- Output package for the paper's Naimark dilation theorem.
 
-Given submeasurements on space `ι`, this carries the dilated projective
-measurements and lifted state on the enlarged space
-`NaimarkLiftedIndex ι QuestionA OutcomeA QuestionB OutcomeB`. -/
+Given submeasurements on space `ι`, this carries the questionwise
+one-measurement Naimark dilations used as the local building blocks for the
+full tensor-product assembly. -/
 structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
     (ι : Type*)
     [Fintype QuestionA] [DecidableEq QuestionA]
@@ -252,15 +252,10 @@ structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
     [Fintype QuestionB] [DecidableEq QuestionB]
     [Fintype OutcomeB] [DecidableEq OutcomeB]
     [Fintype ι] [DecidableEq ι] where
-  /-- The lifted quantum state on the enlarged space
-  `ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`. -/
-  liftedState : QuantumState (NaimarkLiftedIndex ι QuestionA OutcomeA QuestionB OutcomeB)
-  /-- Projective measurements for Alice on the enlarged space. -/
-  left : IdxProjMeas QuestionA OutcomeA
-    (NaimarkLiftedIndex ι QuestionA OutcomeA QuestionB OutcomeB)
-  /-- Projective measurements for Bob on the enlarged space. -/
-  right : IdxProjMeas QuestionB OutcomeB
-    (NaimarkLiftedIndex ι QuestionA OutcomeA QuestionB OutcomeB)
+  /-- Alice's questionwise one-measurement Naimark dilations. -/
+  left : (x : QuestionA) → OneMeasNaimarkData OutcomeA ι
+  /-- Bob's questionwise one-measurement Naimark dilations. -/
+  right : (y : QuestionB) → OneMeasNaimarkData OutcomeB ι
 
 -- NOTE: no global `Inhabited` instance for `NaimarkData`:
 -- constructing defaults for projective measurements is mathematically non-canonical

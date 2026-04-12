@@ -38,12 +38,10 @@ def OneMeasNaimarkLemma (α : Type*) [Fintype α] [DecidableEq α]
 
 /-- Statement package carried by `NaimarkData`.
 
-This captures the content of Theorem 5.1 (thm:naimark): the dilated
-projective measurements on the enlarged space preserve all single-outcome
-and joint-outcome probabilities, and the joint probabilities commute
-(since the dilated measurements act on disjoint tensor factors).
-Projectivity is already encoded in the types of `data.left` and
-`data.right`, which land in `IdxProjMeas`. -/
+This packages the questionwise one-measurement Naimark dilations used in the
+full theorem: each `A x` and `B y` is equipped with a local projective dilation
+preserving all single-outcome expectations. The full tensor-product assembly is
+tracked separately. -/
 structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
@@ -55,43 +53,22 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     (A : IdxSubMeas QuestionA OutcomeA ι)
     (B : IdxSubMeas QuestionB OutcomeB ι)
     (data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι) : Prop where
-  /-- Alice's single-outcome probabilities are preserved by the dilation. -/
+  /-- Alice's local dilations are attached to the correct source submeasurements. -/
+  leftSource : ∀ x : QuestionA, (data.left x).source.effect = (A x).outcome
+  /-- Bob's local dilations are attached to the correct source submeasurements. -/
+  rightSource : ∀ y : QuestionB, (data.right y).source.effect = (B y).outcome
+  /-- Alice's single-outcome expectations are preserved by each local dilation. -/
   leftMarginalPreservation :
-    ∀ x : QuestionA, ∀ a : OutcomeA,
-      singleOutcomeProbability ψ (A x) a =
-        singleOutcomeProbability data.liftedState
-          ((data.left x).toSubMeas) a
-  /-- Bob's single-outcome probabilities are preserved by the dilation. -/
+    ∀ x : QuestionA, ∀ (ρ : MIPStarRE.Quantum.Op ι) (a : OutcomeA),
+      MIPStarRE.Quantum.normalizedTrace (ρ * (A x).outcome a) =
+        MIPStarRE.Quantum.normalizedTrace
+          (oneMeasLiftedDensity OutcomeA ρ * (data.left x).liftedEffect (some a))
+  /-- Bob's single-outcome expectations are preserved by each local dilation. -/
   rightMarginalPreservation :
-    ∀ y : QuestionB, ∀ b : OutcomeB,
-      singleOutcomeProbability ψ (B y) b =
-        singleOutcomeProbability data.liftedState
-          ((data.right y).toSubMeas) b
-  /-- Joint outcome probabilities are preserved by the dilation. -/
-  jointOutcomePreservation :
-    ∀ x : QuestionA, ∀ y : QuestionB,
-      ∀ a : OutcomeA, ∀ b : OutcomeB,
-        jointOutcomeProbability ψ (A x) (B y) a b =
-          jointOutcomeProbability data.liftedState
-            ((data.left x).toSubMeas)
-            ((data.right y).toSubMeas) a b
-  /-- Joint probabilities commute: since the dilated measurements act on
-  disjoint tensor factors, `⟨ψ̂|Â_a B̂_b|ψ̂⟩ = ⟨ψ̂|B̂_b Â_a|ψ̂⟩`. -/
-  liftedCommutativity :
-    ∀ x : QuestionA, ∀ y : QuestionB,
-      ∀ a : OutcomeA, ∀ b : OutcomeB,
-        jointOutcomeProbability data.liftedState
-          ((data.left x).toSubMeas)
-          ((data.right y).toSubMeas) a b =
-        jointOutcomeProbability data.liftedState
-          ((data.right y).toSubMeas)
-          ((data.left x).toSubMeas) b a
-  /-- A concrete matrix-level witness for the dilation exists.
-  TODO: When filling in proofs, this should be connected to `data` so that the
-  matrix-level identities are guaranteed to witness the *same* dilation as the
-  abstract-level preservation fields above. See #98. -/
-  matrixWitness :
-    Nonempty (MatrixNaimarkWitness QuestionA OutcomeA QuestionB OutcomeB)
+    ∀ y : QuestionB, ∀ (ρ : MIPStarRE.Quantum.Op ι) (b : OutcomeB),
+      MIPStarRE.Quantum.normalizedTrace (ρ * (B y).outcome b) =
+        MIPStarRE.Quantum.normalizedTrace
+          (oneMeasLiftedDensity OutcomeB ρ * (data.right y).liftedEffect (some b))
 
 /-! ### Orthonormalization statements -/
 
