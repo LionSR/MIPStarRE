@@ -45,7 +45,7 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
       ≤ selfImprovementInInductionError params eps delta gamma
   dominatesAveragePointOperator :
     ∀ h : Polynomial params,
-      averagedPointEvaluationOperator params strategy h ≤ Z
+      IdxPolyFamily.averagedPointEvaluationOperator strategy h ≤ Z
 
 /-- Output package for the section-local pasting theorem. -/
 structure LdPastingInInductionSectionConclusion (params : Parameters)
@@ -95,16 +95,14 @@ noncomputable def averageRestrictedDiagonalError (params : Parameters)
     (profile : RestrictedFailureProfile params strategy) : Error :=
   avgOver (uniformDistribution (Fq params)) profile.diagonal
 
-/-- Source-style boundedness input for the induction-level pasting theorem. -/
-structure PastingBoundednessInput (params : Parameters)
+/-- Source-style boundedness input for the induction-level pasting theorem.
+
+Alias of the shared Section 11/12 boundedness package. -/
+abbrev PastingBoundednessInput (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
-  bounded : family.Bounded strategy.state zeta
-  dominationTargetAgrees :
-    ∀ x : Fq params, ∀ g : Polynomial params,
-      family.dominationTarget x g =
-        averagedSlicePointEvaluationOperator params strategy x g
+    (family : IdxPolyFamily params ι) (zeta : Error) : Prop :=
+  IdxPolyFamily.SliceBoundednessInput strategy family zeta
 
 /-- Bookkeeping package for the restricted-probabilities lemma.
 
