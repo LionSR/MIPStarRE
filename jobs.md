@@ -10,7 +10,7 @@ Last updated: 2026-04-12
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
-- **PRs already recorded in this file**: 2
+- **PRs already recorded in this file**: 3
 
 ## Active Strategy
 - Highest-leverage live chain is now Section 12 pasting.
@@ -57,6 +57,18 @@ Last updated: 2026-04-12
 ---
 
 ## PRs Created
+
+### PR #333: Pasting transport scaffold (`fix/pasting-consistency-transport`)
+**Scope:**
+- `MIPStarRE/LDT/Pasting/Theorems.lean`
+- `MIPStarRE/LDT/Preliminaries/Theorems.lean`
+- `jobs.md`
+
+**What it records:**
+- explicit two-center scaffold for `commutativitySwitcheroo`
+- first formalized switch-sandwich bound on the live Section 12 path
+- new `ConsRel` transport lemmas for question-dependent postprocessing and
+  uniform-equivalence reindexing
 
 ### PR #240: Wave 1 (`feat/ldt-sorry-elimination-wave1`)
 **Sorrys eliminated (5):**
@@ -159,6 +171,7 @@ Last updated: 2026-04-12
 - `ExpansionHypercubeGraph/Theorems.lean`
 
 ## Recent Progress On This Pass
+- Opened PR #333 for the current Pasting transport/scaffold pass.
 - Opened PR #326 for the Worktree 2 Section 9 tracker refresh.
 - `SelfImprovement/Defs.lean`, `SelfImprovement/MatrixRealization.lean`, and
   `SelfImprovement/Theorems.lean` re-scanned: 0 executable
