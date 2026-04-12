@@ -226,16 +226,20 @@ private theorem extractSliceOr0_lowIndividualDegree {params : Parameters} [Field
   | some p =>
       exact p.lowIndividualDegree i
 
+/-- The old-coordinate embedding into the appended coordinate space is injective. -/
+private theorem embedCoord_injective (params : Parameters) :
+    Function.Injective (embedCoord params) := by
+  intro a b h
+  simp only [embedCoord, Fin.mk.injEq] at h
+  exact Fin.ext h
+
 /-- The appended last coordinate is outside the image of the old-coordinate embedding. -/
 private theorem degreeOf_rename_embedCoord_last (params : Parameters) [FieldModel params.q]
     (p : PolynomialModel params) :
     MvPolynomial.degreeOf (lastCoord params)
       (MvPolynomial.rename (embedCoord params) p : PolynomialModel params.next) = 0 := by
-  have hinj : Function.Injective (embedCoord params) := by
-    intro a b h
-    simp only [embedCoord, Fin.mk.injEq] at h
-    exact Fin.ext h
-  rw [MvPolynomial.degreeOf, MvPolynomial.degrees_rename_of_injective hinj]
+  rw [MvPolynomial.degreeOf, MvPolynomial.degrees_rename_of_injective
+    (embedCoord_injective params)]
   simp only [Multiset.count_eq_zero, Multiset.mem_map]
   rintro ⟨b, _, hb⟩
   simp only [embedCoord, lastCoord, Fin.ext_iff] at hb
@@ -308,7 +312,7 @@ theorem interpolationSupportSubset_card {params : Parameters} {k : ℕ}
     (Finset.exists_subset_card_eq (s := gHatTupleSupport gs) (n := params.d + 1) <| by
       simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible)).2
 
-/-- Interpolate from a specified `d+1`-element set of genuine slice polynomials to recover
+/-- Interpolate from a specified `d+1`-element index set to recover
 a polynomial in `m+1` variables via Lagrange interpolation. -/
 noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
     [FieldModel params.q] {k : ℕ} (xs : PointTuple params k)
@@ -353,14 +357,11 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
           (degreeOf_eval₂_C_X_le_natDegree
             (p := Li) (i := coord) (j := lastCoord params))
       have hslice : MvPolynomial.degreeOf coord slicePoly ≤ params.d := by
-        have hinj : Function.Injective (embedCoord params) := by
-          intro a b h
-          simp only [embedCoord, Fin.mk.injEq] at h
-          exact Fin.ext h
         change MvPolynomial.degreeOf coord
             (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs idx)) :
               PolynomialModel params.next) ≤ params.d
-        rw [← hcoord_eq, MvPolynomial.degreeOf_rename_of_injective hinj]
+        rw [← hcoord_eq, MvPolynomial.degreeOf_rename_of_injective
+          (embedCoord_injective params)]
         exact extractSliceOr0_lowIndividualDegree (gs idx) oldCoord
       calc
         MvPolynomial.degreeOf coord (LiMv * slicePoly)
@@ -399,11 +400,13 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
 /-- Interpolate from `d+1` or more genuine slice polynomials to recover
 a polynomial in `m+1` variables via Lagrange interpolation.
 
-The interpolated polynomial `h(u₁,...,uₘ,x) = ∑ᵢ∈τ Lᵢ(x) · gᵢ(u₁,...,uₘ)`
-where `Lᵢ` is the Lagrange basis polynomial for evaluation point `xᵢ`
-(computed via `Lagrange.basis` from Mathlib), and `gᵢ` is the slice
-polynomial at height `xᵢ` lifted to the ambient `(m+1)`-variable space
-via `MvPolynomial.rename`.
+When at least `d+1` genuine slices are available, the definition chooses a
+`d+1`-element subset `σ` of their support and returns the Lagrange sum
+`h(u₁,...,uₘ,x) = ∑ᵢ∈σ Lᵢ(x) · gᵢ(u₁,...,uₘ)`, where `Lᵢ` is the
+Lagrange basis polynomial for evaluation point `xᵢ` (computed via
+`Lagrange.basis` from Mathlib), and `gᵢ` is the slice polynomial at
+height `xᵢ` lifted to the ambient `(m+1)`-variable space via
+`MvPolynomial.rename`.
 
 When fewer than `d+1` genuine slices are available, returns the zero
 polynomial.
