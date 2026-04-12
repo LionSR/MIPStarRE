@@ -90,6 +90,74 @@ theorem uniformDistribution_weight_sum_le_one (α : Type*)
     ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a ≤ 1 := by
   simp [uniformDistribution]
 
+/-- Reindexing a uniform average along an equivalence preserves its value. -/
+theorem avgOver_uniform_equiv
+    {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (e : α ≃ β) (f : α → Error) :
+    avgOver (uniformDistribution α) f =
+      avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
+  calc
+    avgOver (uniformDistribution α) f
+      = (1 / (Fintype.card α : Error)) * ∑ a : α, f a := by
+          simp [avgOver, uniformDistribution, Finset.mul_sum]
+    _ = (1 / (Fintype.card β : Error)) * ∑ a : α, f a := by
+          rw [Fintype.card_congr e]
+    _ = (1 / (Fintype.card β : Error)) * ∑ b : β, f (e.symm b) := by
+          congr 1
+          exact Fintype.sum_equiv e f (fun b => f (e.symm b)) (by
+            intro a
+            simp)
+    _ = avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
+          simp [avgOver, uniformDistribution, Finset.mul_sum]
+
+/-- Split a uniform average over a product into iterated uniform averages. -/
+theorem avgOver_uniform_prod
+    {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α → β → Error) :
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) =
+      avgOver (uniformDistribution α)
+        (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
+  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  calc
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2)
+      = ∑ ab : α × β,
+          (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f ab.1 ab.2 := by
+            simp [avgOver, uniformDistribution, Fintype.card_prod]
+    _ = ∑ a : α, ∑ b : β,
+          (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b := by
+            simpa using
+              (Fintype.sum_prod_type' (f := fun a : α => fun b : β =>
+                (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b))
+    _ = ∑ a : α,
+          (1 / (Fintype.card α : Error)) *
+            ∑ b : β, (1 / (Fintype.card β : Error)) * f a b := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            calc
+              ∑ b : β, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b
+                = ∑ b : β,
+                    ((1 / (Fintype.card α : Error)) *
+                      (1 / (Fintype.card β : Error))) * f a b := by
+                        refine Finset.sum_congr rfl ?_
+                        intro b _
+                        field_simp [hα, hβ]
+                        rw [Nat.cast_mul]
+                        ring
+              _ = (1 / (Fintype.card α : Error)) *
+                    ∑ b : β, (1 / (Fintype.card β : Error)) * f a b := by
+                        rw [Finset.mul_sum]
+                        simp [mul_assoc]
+    _ = avgOver (uniformDistribution α)
+          (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
+            simp [avgOver, uniformDistribution]
+
 /-- Averaging a function depending only on the first coordinate marginalizes a uniform product. -/
 theorem avgOver_uniform_fst {α β : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α]
