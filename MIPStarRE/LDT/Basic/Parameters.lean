@@ -16,7 +16,7 @@ abbrev Error := ℝ
 inductive Role where
   | A
   | B
-  deriving DecidableEq, Repr, Inhabited
+  deriving DecidableEq, Repr, Inhabited, Fintype
 
 def Role.other : Role → Role
   | .A => .B

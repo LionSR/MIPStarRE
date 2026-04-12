@@ -337,6 +337,25 @@ theorem bipartiteConsError_nonneg {Question Outcome : Type*}
   unfold bipartiteConsError
   exact avgOver_nonneg 𝒟 _ fun q => qBipartiteConsDefect_nonneg ψ _ _
 
+/-- The bipartite strong self-consistency defect is nonneg by definition (`max 0 _`). -/
+theorem qBipartiteSSCDefect_nonneg {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) :
+    0 ≤ qBipartiteSSCDefect ψ A := by
+  unfold qBipartiteSSCDefect
+  exact le_max_left 0 _
+
+/-- The averaged bipartite strong self-consistency error is nonneg. -/
+theorem bipartiteSSCError_nonneg {Question Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι) :
+    0 ≤ bipartiteSSCError ψ 𝒟 A := by
+  unfold bipartiteSSCError
+  exact avgOver_nonneg 𝒟 _ fun q => qBipartiteSSCDefect_nonneg ψ _
+
 /-- The averaged self-consistency error is nonneg. -/
 theorem sscError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]

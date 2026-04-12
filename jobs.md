@@ -16,6 +16,12 @@ Last updated: 2026-04-12
 - `MainInductionStep` is complete for this wave.
 - `Test.mainFormal` is still blocked and must keep its original theorem
   statement.
+- Immediate Test-side proof target is the paper's role-register symmetrization,
+  not further wrappers around `mainFormal`.
+- The role-register symmetrized measurement/state layer is now in place.
+- The next missing Test-side step is the `(3 * eps, 3 * eps, 3 * eps)`
+  goodness transfer for the symmetrized strategy, or a repair of the
+  Test-level failure surrogate so that this transfer matches the paper exactly.
 - The active global target remains the Section 12 pasting and induction bridge
   pipeline needed to make `Test.mainFormal` provable without weakening it.
 - Highest-leverage upstream chain remains Section 12 pasting around
@@ -42,6 +48,23 @@ Last updated: 2026-04-12
   still blocked upstream, so the bridge-package route is the minimal safe fix.
 - Proof agent E: confirmed upstream there is still no constructor theorem for
   `SelfImprovement.SelfImprovementBridgePackage`.
+- Refactor agent: added local Test-side decomposition lemmas from
+  `PassesLowIndividualDegreeTest` and checked them against the paper.
+- Survey agent: checked the paper reduction and confirmed that the true next
+  object is a role-register symmetrized strategy, not `leftAsSymmetric` or
+  `rightAsSymmetric`.
+- Proof agent F: implemented the role-register block projectors and the
+  block-diagonal symmetrized point/axis/diagonal measurement families on
+  `Role × ι`.
+- Proof agent G: implemented the classical role-register symmetrized state,
+  proved its `PermInvState`, and packaged it into
+  `ProjStrat.classicalRoleSymmStrategy`.
+- Proof agent H: proved the self-consistency branch of the role-register
+  symmetrized strategy and reduced it exactly to the original point-agreement
+  defect.
+- Proof agent F: implemented the role-register block projectors and the
+  block-diagonal symmetrized point/axis/diagonal measurement families on
+  `Role × ι`.
 - Proof agent D: remains on `Pasting.commutativitySwitcheroo` / `ldPasting`
   because that sorry-backed Section 12 chain still feeds `mainInduction`.
 - Integration agent: reserved for `lake env lean` checks on the edited files,
@@ -208,6 +231,47 @@ Last updated: 2026-04-12
   without weakening the exported `mainFormal` statement.
 - `Test`: reverted the regressive `hbridge` hypothesis on `mainFormal` after
   review; the theorem keeps its original API and remains a live blocker.
+- `Test/Defs.lean`: added `qBipartiteSSCDefect_nonneg` and
+  `bipartiteSSCError_nonneg`.
+- `Test/Strategy.lean`: added `point_agreement_le_three_mul`, which is
+  consistent with the paper's `3 * eps` point-agreement step in the reduction
+  from `thm:main-formal` to `thm:main-induction`.
+- `Test/Strategy.lean`: added `left_as_symmetric_is_good_six_mul` and
+  `right_as_symmetric_is_good_six_mul` as Lean-local surrogate consequences of
+  the current averaged failure definition. These compile, but they are not the
+  paper's role-register symmetrization step and should not be treated as such.
+- `Basic/Parameters.lean`: added `Fintype Role`.
+- `Test/Strategy.lean`: added `roleProj`, `roleCond`, `symmetrizedIdxProjMeas`,
+  and the `ProjStrat` wrappers `symmetrizedPointMeasurement`,
+  `symmetrizedAxisParallelMeasurement`, and `symmetrizedDiagonalMeasurement`.
+- `Test/Strategy.lean`: added `rolePairPayloadEquiv`, `rolePairProj`,
+  `rolePairCond`, `classicalRoleSymmState`, and the trace/reindex lemmas
+  `normalizedTrace_reindex`, `swapDensity_mul`, and
+  `normalizedTrace_swapDensity`.
+- `Test/Strategy.lean`: proved `classicalRoleSymmState_permInvState` and added
+  `ProjStrat.classicalRoleSymmStrategy` with no extra symmetry assumption.
+- `Test/Strategy.lean`: proved `classicalRoleSymmState_isNormalized` and the
+  wrapper theorem `ProjStrat.classicalRoleSymmStrategy_isNormalized`.
+- `Test`: the paper-faithful role-register symmetrized strategy now exists and
+  compiles.
+- `Test/Strategy.lean`: proved
+  `ProjStrat.classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement` and
+  the corollary
+  `ProjStrat.classicalRoleSymmStrategy_selfConsistency_le_three_mul`.
+- `Test`: corrected the role-register state scaling to match the repository's
+  normalized-trace convention. `classicalRoleSymmState` now uses coefficient
+  `2` on each occupied role sector, and `classicalRoleSymmState_isNormalized`
+  is proved under `strategy.state.IsNormalized`.
+- `Test`: the remaining blocker is proving the symmetrized strategy is
+  `(3 * eps, 3 * eps, 3 * eps)`-good from `PassesLowIndividualDegreeTest`,
+  which is currently entangled with the known paper-vs-formal mismatch in the
+  Test-level failure surrogate.
+- `Test`: after the self-consistency proof, the remaining local proof work is
+  concentrated in the axis-parallel and diagonal branches of the role-register
+  symmetrized strategy.
+- `Test`: an attempted sampled-axis-point transport proof exposed that the next
+  axis/diagonal step needs a dedicated constant-fiber averaging lemma rather
+  than a simple equivalence rewrite.
 - `Pasting/Theorems.lean:completePartProjFamily.proj` proved.
 - `Pasting/Theorems.lean:pointWithCompletePart_as_switcheroo_input` proved.
 - `Pasting/Theorems.lean`: extracted
@@ -304,6 +368,13 @@ Last updated: 2026-04-12
 
 ## Best Next Step
 - MainInductionStep is complete for this wave; `Test.mainFormal` remains blocked.
+- For `Test`, the next paper-faithful step is to prove the
+  `(3 * eps, 3 * eps, 3 * eps)` goodness of
+  `ProjStrat.classicalRoleSymmStrategy`, or repair
+  `PassesLowIndividualDegreeTest` so that this transfer matches the paper
+  exactly.
+- Immediate local proof target: the axis-parallel sampled-point transport and
+  then the corresponding symmetrized axis bound.
 - Highest-leverage global next step returns to the Section 12 pasting spine,
   especially `Pasting.commutativitySwitcheroo` and `Pasting.ldPasting`, which
   remain the main upstream blockers for the eventual direct proof of
