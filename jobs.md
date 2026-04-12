@@ -28,12 +28,15 @@ Last updated: 2026-04-12
   - Section 12: `commutativitySwitcheroo` -> `commuteGHalfSandwich` -> `ldSandwichLineOnePoint` -> `hBConsistency` / `hAConsistency` -> `overAllOutcomes` / `fromHToG` / `chernoffBernoulliMatrix` -> `ldPastingNCompleteness` -> `ldPastingSubMeas` -> `ldPasting`
 - **Concrete blocker notes**:
   - `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine` is now the only remaining Section 10 gap, and it is a real theorem/interface blocker: `RestrictedDiagonalSample` controls only base-point evaluation `(u, v, t = 0)`, while `pointWithDiagonalLineDistribution` ranges over arbitrary `(line, t)`. The repo currently exposes no line-reparameterization invariance theorem identifying these question families.
+  - `Pasting.hAConsistency` is also blocked by a missing reparameterization fact: `HBConsistencyStatement` controls the canonical vertical line through `appendPoint u 0`, but the target point-consistency statement needs comparison with `strategy.pointMeasurement (appendPoint u x)` for arbitrary heights `x`. The repo currently has no axis-parallel analogue of this base-change invariance.
+  - `Test.mainFormal` is not a live wrapper yet: `PassesLowIndividualDegreeTest` still does not produce the `MainInductionBridgePackage` witness required by `MainInductionStep.mainInduction`.
   - `MakingMeasurementsProjective.orthonormalization` still lacks a source for `ψ.IsNormalized`; the available completion theorem requires it.
   - `MakingMeasurementsProjective.exists_fullNaimarkData` still lacks the large lifted-register embedding/packaging layer.
   - `MakingMeasurementsProjective.spectralTruncateAlmostProjective` still lacks the bridge from per-outcome spectral truncations to a concrete ambient `ProjSubMeas` witness.
 - **Active subtasks**:
   - decide whether the remaining Section 10 transport theorem should be re-stated in a base-point form, or whether a new geometric-line reparameterization API should be added first
   - if Section 10 stays blocked, return to the substantive Section 11/12 core lemmas (`commDataProcessedG`, `commutativitySwitcheroo`) rather than local wrappers
+  - treat `hAConsistency` and `mainFormal` as downstream wrapper-blocked until the missing axis-parallel / induction bridge facts exist
 - **Best next step**:
   - `sampledDiagonalLineConsistency` and `sampledDiagonalLineApproximation` are now proved, and `lake env lean MIPStarRE/LDT/CommutativityPoints/Theorem.lean` succeeds with only the remaining transport `sorry`. The next productive move is source-of-truth/API work for that transport gap, or a shift back to the deep Section 11/12 core lemmas.
 
@@ -74,9 +77,18 @@ Last updated: 2026-04-12
   - the old `interpolateCompletedSlices` degree proof gap is now removed by making
     the postprocessing map choose a globally consistent witness from `Global_τ(x)`;
     this matches the actual restricted call site in `pastedInterpolationFamily`
-  - `commutativitySwitcheroo` remains on the same local blocker: compare the
-    mixed centers `G ⊗ M` and `M ⊗ G` using permutation invariance together with
-    slice self-consistency
+  - `hAConsistency` was rechecked after the PR: it is not a thin wrapper at present,
+    because the needed axis-parallel base-change theorem from the canonical
+    vertical line to arbitrary sampled height is missing from the local API
+  - `commutativitySwitcheroo` is now reduced to a single mixed-center comparison
+    route: the common negative term has been isolated (`third = fourth` by
+    Hermitian conjugation), and the averaged `qSDDOp` expansion is now rewritten
+    directly into the named first/second/third/fourth scalar terms
+  - exact live switcheroo blocker: prove the first `χ` transport step for that
+    common negative term using `Preliminaries.closenessOfIP` with
+    `C q (g,o) = G_q * M_{y,o} * G_{x,g}`, then chain the two `ζ` transfers and
+    the final `ω` transfer to compare the negative term with both `G ⊗ M` and
+    `M ⊗ G`
   - `chernoffBernoulliMatrix` still looks like a genuine spectral/CFC step from
     the paper rather than a statement bug
 - **Verification note**:
@@ -91,6 +103,9 @@ Last updated: 2026-04-12
     `PastingBoundednessInput` after the `ldPasting` source signature repair
   - last known local source check before this pass: `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean`
     succeeded with the remaining target-local `sorry`s
+  - after the latest helper-lemma pass, `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean`
+    succeeds again with 11 remaining theorem-level `sorry` warnings and no new
+    non-sorry elaboration errors
   - `lake build MIPStarRE.LDT.MainInductionStep.Theorems` now succeeds again
     (with existing unrelated `sorry` warnings only)
 - **Ownership / subtask board**:
@@ -104,9 +119,9 @@ Last updated: 2026-04-12
   - current active subtask: finish the mixed-center helper inside
     `commutativitySwitcheroo`, then propagate that through the sandwich chain
 - **Best next step**:
-  - continue `commutativitySwitcheroo` by rewriting the mixed centers to tensor
-    form and applying permutation invariance / self-consistency to compare
-    `G ⊗ M` with `M ⊗ G`
+  - continue `commutativitySwitcheroo` by proving the first `χ` transport helper
+    for the common negative term via `Preliminaries.closenessOfIP`, then compose
+    it with the two `ζ` transfers and the final `ω` transfer
 
 ## Active Strategy
 - Highest-leverage live chain is now Section 12 pasting.
