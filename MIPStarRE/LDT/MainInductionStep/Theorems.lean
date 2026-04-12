@@ -142,7 +142,7 @@ theorem ldPastingInInductionSection
       LdPastingInInductionSectionConclusion params strategy family H
         eps delta gamma kappa zeta k := by
   obtain ⟨H, hH⟩ := Pasting.ldPasting params strategy eps delta gamma kappa zeta
-    hgood family hcomplete hcons hself hbound.bounded k hk
+    hgood family hcomplete hcons hself hbound k hk
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 

@@ -1,6 +1,6 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-11
+Last updated: 2026-04-12
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
@@ -11,6 +11,76 @@ Last updated: 2026-04-11
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
 - **PRs already recorded in this file**: 2
+
+## Current Pasting Pass
+- **Scope**: `MIPStarRE/LDT/Pasting/Theorems.lean`
+- **Executable sorrys in scope**: 11
+- **Remaining sorry checklist**:
+  - `ldPasting`
+  - `ldPastingSubMeas`
+  - `commutativitySwitcheroo`
+  - `commuteGHalfSandwich`
+  - `ldSandwichLineOnePoint`
+  - `hBConsistency`
+  - `hAConsistency`
+  - `overAllOutcomes`
+  - `fromHToG`
+  - `chernoffBernoulliMatrix`
+  - `ldPastingNCompleteness`
+- **Priority order**:
+  - `commutativitySwitcheroo` (statement repaired; now blocked on a mixed-target comparison helper)
+  - `commuteGHalfSandwich`
+  - `ldSandwichLineOnePoint`
+  - `hBConsistency`
+  - `hAConsistency`
+  - `overAllOutcomes`
+  - `fromHToG`
+  - `chernoffBernoulliMatrix`
+  - `ldPastingNCompleteness`
+  - `ldPastingSubMeas`
+  - `ldPasting`
+- **Wrapper/progression notes**:
+  - likely wrapper/assembly theorems once prerequisites exist: `hAConsistency`,
+    `ldPastingNCompleteness`, `ldPastingSubMeas`, `ldPasting`
+  - intermediate bookkeeping proofs: `commuteGHalfSandwich`, `hBConsistency`
+  - substantive mathematical gaps: `commutativitySwitcheroo`,
+    `ldSandwichLineOnePoint`, `overAllOutcomes`, `fromHToG`,
+    `chernoffBernoulliMatrix`
+  - current switcheroo blocker: after adding `PermInvState ψbi`, the remaining
+    gap is a helper that compares the mixed targets `G ⊗ M` and `M ⊗ G` using
+    symmetry together with self-consistency
+  - current Chernoff blocker: after adding `ψ.IsNormalized`, the remaining work
+    is the spectral/CFC argument from the paper rather than a statement bug
+- **Verification note**:
+  - requested command `lake build MIPStarRE.LDT.MainInductionStep` is not a valid
+    Lake target in this repo because `MIPStarRE/LDT/MainInductionStep.lean` does
+    not exist
+  - valid build fallback: `lake build MIPStarRE.LDT.MainInductionStep.Theorems`
+  - direct source check fallback: `lake env lean MIPStarRE/LDT/MainInductionStep/Theorems.lean`
+  - the `ldPasting` / `ldPastingSubMeas` source signature mismatch with
+    `PastingBoundednessInput` has now been fixed in `Pasting/Theorems.lean`
+  - `MainInductionStep/Theorems.lean` has been updated to pass the full
+    `PastingBoundednessInput` after the `ldPasting` source signature repair
+  - local source check `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean`
+    succeeds, so the current blockers are downstream verification noise rather
+    than target-local elaboration failures
+  - `lake build MIPStarRE.LDT.MainInductionStep.Theorems` now succeeds again
+    (with existing unrelated `sorry` warnings only)
+- **Ownership / subtask board**:
+  - OpenCode: active owner for `commutativitySwitcheroo`, integration, and `jobs.md`
+  - survey subagent (`ses_27ed26ed3ffeatQRJFxU2U1302`): completed wrapper-vs-gap triage
+- proof subagent (`ses_27e9c82ebffeZRRK9nqxOZZ1q9`): bounded attempt on
+  `commutativitySwitcheroo`; returned exact Lean blockers without edits
+- proof subagent (`ses_27e3de1ddffesRPWBBZLAFRg7Z`): reassessed
+  `commutativitySwitcheroo` after the statement repair; the next concrete need is
+  a mixed-target comparison helper rather than a second positive-term rewrite
+- next focused subtask: derive the mixed-target comparison inside
+  `commutativitySwitcheroo`, then return to the `chi` / `zeta` transfers built
+  on top of `Preliminaries.switchSandwich` / `cabApproxDelta`
+- **Best next step**:
+  - continue `commutativitySwitcheroo` by proving the mixed-target comparison
+    helper, then return to the `chi` / `zeta` transfers for the third and fourth
+    terms
 
 ## Active Strategy
 - Highest-leverage live chain is now Section 12 pasting.
@@ -144,6 +214,39 @@ Last updated: 2026-04-11
 - `ExpansionHypercubeGraph/Theorems.lean`
 
 ## Recent Progress On This Pass
+- `Pasting/Theorems.lean`: aligned `ldPasting` / `ldPastingSubMeas` source
+  signatures with `MainInductionStep.PastingBoundednessInput`.
+- `Pasting/Theorems.lean`: added local helpers
+  `subMeas_sum_adjoint_mul_le_one`,
+  `subMeas_total_opBounded01`, and
+  `projSubMeas_total_sq` for the switcheroo proof.
+- `Pasting/Theorems.lean`: added
+  `switcherooAggregate_qSDDOp_expand`, so the paper's four-term defect
+  decomposition is now a reusable local lemma instead of an inlined blocker.
+- `Pasting/Theorems.lean`: `qSDD_completePart_le_slice` no longer depends on
+  permutation invariance; this unlocked a generic complete-part self-consistency
+  bridge.
+- `Pasting/Theorems.lean`: added switcheroo support helpers
+  `avgOver_uniform_slicePair_swapOrder`,
+  `avgOver_abs_le_of_bound`,
+  `switcherooAggregateTarget`,
+  `switcherooAggregateFirstTerm`,
+  `switcherooAggregateFirstTerm_eq_leftSandwich`,
+  `switcherooAggregateTarget_eq_middleSandwich`,
+  `switcherooAggregateFirstTerm_le_target`, and
+  `completePartProjFamily_selfConsistency_generic`.
+- `Pasting/Theorems.lean`: moved `completePartProjFamily` earlier so
+  `commutativitySwitcheroo` can use the one-outcome complete-part family
+  directly.
+- `Pasting/Theorems.lean`: a bounded attempt to add the analogous second-term
+  helper exposed a likely target mismatch (`G ⊗ M` versus `M ⊗ G`) rather than a
+  missing local lemma; the unfinished helper was dropped to keep the file green.
+- `Pasting/Theorems.lean`: repaired the public statement of
+  `commutativitySwitcheroo` by adding `PermInvState ψbi`.
+- `Pasting/Theorems.lean`: repaired the public statement of
+  `chernoffBernoulliMatrix` by adding `ψ.IsNormalized`.
+- `MainInductionStep/Theorems.lean`: updated the `ldPasting` call site to pass
+  the full `PastingBoundednessInput` after the source signature repair.
 - `Pasting/Theorems.lean:completePartProjFamily.proj` proved.
 - `Pasting/Theorems.lean:pointWithCompletePart_as_switcheroo_input` proved.
 - `Pasting/Theorems.lean`: extracted
