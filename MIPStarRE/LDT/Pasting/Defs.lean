@@ -286,13 +286,19 @@ private theorem natDegree_lagrangeBasis_le_card_sub_one {K ρ : Type*} [Field K]
     _ = s.card - 1 := by
           simp [Finset.card_erase_of_mem hi]
 
+/-- An interpolation-eligible tuple has at least `d+1` genuine outcomes. -/
+private theorem interpolationEligible_card_le {params : Parameters} {k : ℕ}
+    [FieldModel params.q] {gs : GHatTupleOutcome params k}
+    (hEligible : InterpolationEligible params gs) :
+    params.d + 1 ≤ (gHatTupleSupport gs).card := by
+  simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible
+
 /-- A chosen `d+1`-element subset of the genuine completed-slice support. -/
 noncomputable def interpolationSupportSubset {params : Parameters} {k : ℕ}
     [FieldModel params.q] (gs : GHatTupleOutcome params k)
     (hEligible : InterpolationEligible params gs) : Finset (Fin k) :=
   Classical.choose <|
-    Finset.exists_subset_card_eq (s := gHatTupleSupport gs) (n := params.d + 1) <| by
-      simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible
+    Finset.exists_subset_card_eq (interpolationEligible_card_le hEligible)
 
 /-- The chosen interpolation support lies inside the genuine support.
 Used downstream to ensure the Lagrange interpolation correctness property
@@ -302,8 +308,8 @@ theorem interpolationSupportSubset_subset {params : Parameters} {k : ℕ}
     (hEligible : InterpolationEligible params gs) :
     interpolationSupportSubset gs hEligible ⊆ gHatTupleSupport gs :=
   (Classical.choose_spec
-    (Finset.exists_subset_card_eq (s := gHatTupleSupport gs) (n := params.d + 1) <| by
-      simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible)).1
+    (Finset.exists_subset_card_eq
+      (interpolationEligible_card_le hEligible))).1
 
 /-- The chosen interpolation support has exactly `d+1` points. -/
 theorem interpolationSupportSubset_card {params : Parameters} {k : ℕ}
@@ -311,8 +317,8 @@ theorem interpolationSupportSubset_card {params : Parameters} {k : ℕ}
     (hEligible : InterpolationEligible params gs) :
     (interpolationSupportSubset gs hEligible).card = params.d + 1 :=
   (Classical.choose_spec
-    (Finset.exists_subset_card_eq (s := gHatTupleSupport gs) (n := params.d + 1) <| by
-      simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible)).2
+    (Finset.exists_subset_card_eq
+      (interpolationEligible_card_le hEligible))).2
 
 /-- Interpolate from a specified `d+1`-element index set to recover
 a polynomial in `m+1` variables via Lagrange interpolation.
