@@ -397,7 +397,6 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
             (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs idx)) :
               PolynomialModel params.next) ≤ 0
         rw [degreeOf_rename_embedCoord_last]
-        exact Nat.le_refl 0
       calc
         MvPolynomial.degreeOf (lastCoord params) (LiMv * slicePoly)
             ≤ MvPolynomial.degreeOf (lastCoord params) LiMv +
