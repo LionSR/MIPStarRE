@@ -164,6 +164,10 @@ Last updated: 2026-04-11
   `switcherooSelfConsistency_bip`,
   `switcherooCompletePartSelfConsistency_bip`, and
   `avgOver_uniform_slicePair`.
+- `Pasting/Theorems.lean`: added compile-checked `switcheroo_first_term_close`
+  and `switcheroo_second_term_close` helper lemmas, reducing the remaining
+  `commutativitySwitcheroo` work to the term-3/term-4 chain and the final
+  four-term assembly.
 - `Pasting/Theorems.lean` now has 11 executable `sorry`s remaining in this file.
 
 ## Stale Entries From Earlier Waves
