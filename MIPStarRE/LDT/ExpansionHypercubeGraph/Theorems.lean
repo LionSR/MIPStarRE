@@ -2,7 +2,6 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 
 /-!
 # Section 7 — Theorems
--- TODO(#206): prove matrixLocalRewrite, matrixGlobalRewrite, matrixLocalToGlobal
 
 Output structures and theorem statements for the expansion / variance lemmas.
 -/
@@ -923,7 +922,6 @@ lemma matrixGlobalRewrite (params : Parameters)
   rw [matrixGlobalVariance_eq_closedForm, matrixGlobalVarianceTraceForm_eq_closedForm]
 
 /-- `prop:laplacian-rewrite`. -/
--- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 theorem laplacianRewrite (params : Parameters) :
     laplacian params = laplacianDifferenceForm params := by
   rfl
@@ -931,7 +929,6 @@ theorem laplacianRewrite (params : Parameters) :
 /-! ## Public theorem wrappers -/
 
 /-- `lem:local-to-global`. -/
--- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma localToGlobal (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     globalVariance params A ψ ≤ (params.m : Error) * localVariance params A ψ := by
@@ -944,7 +941,6 @@ lemma localToGlobal (params : Parameters)
     positivity
 
 /-- `lem:local-rewrite`. -/
--- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma localRewrite (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     LocalRewriteStatement params A ψ := by

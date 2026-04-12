@@ -1,19 +1,34 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-11
+Last updated: 2026-04-12
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
 - **Current**: 30 executable sorrys across 7 files
 - **Eliminated**: 36 executable sorrys
+- **Section 7 status**: `ExpansionHypercubeGraph` is now fully clean in this
+  worktree (`Defs.lean`, `MatrixRealization.lean`, `Theorems.lean` all have no
+  executable `sorry`s)
 - **Infrastructure fixes landed on this branch**:
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
 - **PRs already recorded in this file**: 2
 
+## ExpansionHypercubeGraph Status
+- Remaining executable sorrys in `MIPStarRE/LDT/ExpansionHypercubeGraph`: 0.
+- Clean files: `Defs.lean`, `MatrixRealization.lean`, `Theorems.lean`.
+- Verified theorem cluster: `matrixLocalToGlobal`, `matrixLocalRewrite`,
+  `matrixGlobalRewrite`, `localToGlobal`, `localRewrite`, `globalRewrite`.
+- Residual non-sorry follow-up: `Defs.globalVarianceTraceForm` still carries
+  TODO `#136` to document/verify the `1 / |U|` normalization convention.
+- Best next step after closing this bookkeeping pass: resume the live Section 12
+  chain at `Pasting/Theorems.lean:gCompleteSelfConsistency`, then
+  `commutativitySwitcheroo`.
+
 ## Active Strategy
-- Highest-leverage live chain is now Section 12 pasting.
+- Highest-leverage live chain is now Section 12 pasting; Section 7
+  `ExpansionHypercubeGraph` is no longer a blocker.
 - Immediate target cluster: `Pasting/Theorems.lean` around
   `commutativitySwitcheroo` and its local helper bridges.
 - Reason: this is the lowest remaining live dependency spine to `ldPasting`,
@@ -24,7 +39,12 @@ Last updated: 2026-04-11
   theorem-statement repair.
 
 ## Agent Board
-- Survey agent: refreshed executable-sorry count and file-by-file breakdown.
+- Survey agent: refreshed executable-sorry count and file-by-file breakdown;
+  verified `ExpansionHypercubeGraph/{Defs,MatrixRealization,Theorems}.lean`
+  contains no `sorry`/`axiom` placeholders and flagged stale TODO comments in
+  `ExpansionHypercubeGraph/Theorems.lean`.
+- Integration agent: updated `jobs.md`, removed stale Section 7 TODO comments,
+  and rechecked `ExpansionHypercubeGraph/Theorems.lean`.
 - Proof agent A: assigned to `Pasting.commutativitySwitcheroo` proof shape and
   triangle-composition route.
 - Proof agent A status: actively implementing `Pasting.commutativitySwitcheroo`.
@@ -141,9 +161,19 @@ Last updated: 2026-04-11
 
 ## Files Now Clean
 - `SelfImprovement/Theorems.lean`
+- `ExpansionHypercubeGraph/Defs.lean`
+- `ExpansionHypercubeGraph/MatrixRealization.lean`
 - `ExpansionHypercubeGraph/Theorems.lean`
 
 ## Recent Progress On This Pass
+- `ExpansionHypercubeGraph`: verified the full Section 7 module now has zero
+  executable `sorry`s.
+- `ExpansionHypercubeGraph/Theorems.lean`: confirmed
+  `matrixLocalToGlobal`, `matrixLocalRewrite`, `matrixGlobalRewrite`,
+  `localToGlobal`, `localRewrite`, and `globalRewrite` are fully proved.
+- `ExpansionHypercubeGraph/Theorems.lean`: stale pending-proof TODO comments were
+  removed; only live local follow-up is the normalization note on
+  `Defs.globalVarianceTraceForm`.
 - `Pasting/Theorems.lean:completePartProjFamily.proj` proved.
 - `Pasting/Theorems.lean:pointWithCompletePart_as_switcheroo_input` proved.
 - `Pasting/Theorems.lean`: extracted
@@ -238,12 +268,12 @@ Last updated: 2026-04-11
 | `ldPastingInInductionSection` | BLOCKED | Cyclic import with Pasting |
 | `restrictedProbabilities` | BLOCKED | Modeling mismatch with paper's restricted diagonal strategy |
 
-### ExpansionHypercubeGraph/Theorems.lean (3 sorrys)
-| Lemma | Status | Blocker |
-|-------|--------|---------|
-| `matrixLocalToGlobal` | BLOCKED | Needs expansion inequality / Efron-Stein telescoping |
-| `matrixLocalRewrite` | BLOCKED | Needs trace/Kronecker sum identity helpers |
-| `matrixGlobalRewrite` | BLOCKED | Needs trace/Kronecker sum identity helpers |
+### ExpansionHypercubeGraph/Theorems.lean (historical; now resolved)
+| Lemma | Status | Note |
+|-------|--------|------|
+| `matrixLocalToGlobal` | RESOLVED | Proved in the current branch; no executable `sorry`s remain in the module |
+| `matrixLocalRewrite` | RESOLVED | Proved in the current branch; stale blocker note removed from active planning |
+| `matrixGlobalRewrite` | RESOLVED | Proved in the current branch; tracked only as historical progress |
 
 ### Test/MainTheorem.lean (1 sorry)
 | Lemma | Status | Blocker |
@@ -260,7 +290,9 @@ Last updated: 2026-04-11
 - **Commutativity/Theorems.lean G type mismatch**: Pre-existing type error. Fixed.
 - **GlobalVariance aggregate SDDRel**: Blocked by private averaging constructor. Fixed by making it public.
 - **SelfImprovement 4 sorrys**: All genuinely blocked on missing SDP/orthonormalization infrastructure.
-- **ExpansionHypercubeGraph 3 matrix proofs**: Need non-trivial finite-sum trace-expansion infrastructure.
+- **ExpansionHypercubeGraph 3 matrix proofs**: Resolved in the current branch;
+  remaining local debt is only the normalization TODO on
+  `Defs.globalVarianceTraceForm`.
 - **Pasting gHatFacts 2 subgoals**: Hypothesis direction mismatch (need per-outcome qSDD, have aggregated).
 - **Pasting second switcheroo scalar bound**: original theorem statement was false; the
   branch now follows the paper's intermediate `θ₁`/`θ₂` error chain instead.
