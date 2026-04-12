@@ -38,7 +38,7 @@ Last updated: 2026-04-12
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
-- **PRs already recorded in this file**: 2
+- **PRs already recorded in this file**: 3
 
 ## Active Strategy
 - Section 9 `SelfImprovement/` has been rechecked and is clean; do not spend
@@ -74,6 +74,16 @@ Last updated: 2026-04-12
 ---
 
 ## PRs Created
+
+### PR #326: Worktree 2 tracker refresh (`docs/selfimprovement-status-scan`)
+**Scope:**
+- `jobs.md` only
+
+**What it records:**
+- verified `SelfImprovement/` is already free of executable placeholders
+- Section 9 proof debt now lives as temporary scaffolding rather than local
+  `sorry`s
+- best next step stays on the live `Pasting` chain
 
 ### PR #240: Wave 1 (`feat/ldt-sorry-elimination-wave1`)
 **Sorrys eliminated (5):**
@@ -176,6 +186,7 @@ Last updated: 2026-04-12
 - `ExpansionHypercubeGraph/Theorems.lean`
 
 ## Recent Progress On This Pass
+- Opened PR #326 for the Worktree 2 Section 9 tracker refresh.
 - `SelfImprovement/Defs.lean`, `SelfImprovement/MatrixRealization.lean`, and
   `SelfImprovement/Theorems.lean` re-scanned: 0 executable
   `sorry`/`admit`/`axiom` placeholders remain.
