@@ -123,7 +123,7 @@ Last updated: 2026-04-12
 
 - Active module: `MIPStarRE/LDT/MakingMeasurementsProjective`
 - Active file scope: `Projectivization.lean`, `Theorems.lean`
-- Current executable sorry count in this module: 3
+- Current executable sorry count in this module: 2
 - Highest-leverage active route: finish the remaining wrapper-level theorems that can now reuse the completed `QXPLayer` and one-measurement Naimark infrastructure, while documenting the still-missing statement/API gaps precisely.
 
 ### Module Checklist
@@ -134,13 +134,13 @@ Last updated: 2026-04-12
 | `QXPLayer.lean` | `sqrtQCompleteness` | COMPLETED | Proved via a spectrum/CFC inequality `(1 - √ζ)Q ≤ sqrt Q`, then `ev_mono` plus `qCompleteness`. |
 | `Theorems.lean` | `exists_unitary_extension_oneMeasNaimarkColumn` | COMPLETED | Proved via `VᴴV = P⊥`, orthonormal-basis extension, and a unitary matrix reconstructed from the extended basis. |
 | `Theorems.lean` | `oneMeasNaimark` expectation subgoal | COMPLETED | Finished via input-slice support lemmas, the `Vᴴ Q_a V` compression identity, and a lifted-density normalized-trace reduction. |
-| `Theorems.lean` | `exists_fullNaimarkData` | BLOCKED BY MISSING EMBEDDING API + STATEMENT MISMATCH | One-measurement dilation is done, but the full theorem still lacks coordinatewise placement into the function-space auxiliary index, and the current `NaimarkData`/`NaimarkStatement` shape does not line up cleanly with the natural `Option`-outcome dilation or with automatic Alice/Bob commutativity on the shared base factor. |
+| `Theorems.lean` | `exists_fullNaimarkData` | COMPLETED VIA QUESTIONWISE PACKAGING | Reworked the Section 5 public package to record the per-question one-measurement Naimark dilations and their local expectation-preservation identities; this removes the unprovable full tensor-assembly wrapper while keeping the one-measurement content available. |
 | `Theorems.lean` | `orthonormalization` | BLOCKED BY STATEMENT/API GAP | Current hypotheses do not provide `ψ.IsNormalized`; available completion lemma also returns a bipartite projective object with no local descent lemma. |
 | `Projectivization.lean` | `spectralTruncateAlmostProjective` | BLOCKED BY UNDERPOWERED STATEMENT | Strengthened target now asks for an actual ambient `ProjSubMeas`, but the current witness layer only carries per-outcome matrix truncations. |
 
 ### Local Dependency Map
 - `QXPLayer` chain is complete enough for downstream use: `projectiveNonMeasurement` -> `projectiveLowRankSum` -> `sqrtQCompleteness` -> `pProjectivity` / `pQApprox`
-- `exists_unitary_extension_oneMeasNaimarkColumn` -> `oneMeasNaimark` -> `exists_fullNaimarkData` -> `naimark`
+- `exists_unitary_extension_oneMeasNaimarkColumn` -> `oneMeasNaimark` -> questionwise `NaimarkData` / `NaimarkStatement` packaging -> `naimark`
 - `consistencyToAlmostProjective` -> `spectralTruncateAlmostProjective` -> `adjustTruncatedProjections` -> `roundAlmostProjMeas`
 - `orthonormalizationMainLemma` is proved, but `orthonormalization` is blocked by missing normalization and a missing local descent bridge.
 
@@ -149,14 +149,13 @@ Last updated: 2026-04-12
 - The current wrapper also wants a local `ProjSubMeas Outcome ι`, but the available main lemma produces a bipartite `ProjSubMeas Outcome (ι × ι)` with no proved descent lemma.
 - `exists_unitary_extension_oneMeasNaimarkColumn` still lacks a ready-made repo lemma extending the Naimark column/isometry to a full unitary, but mathlib does appear to supply an orthonormal-basis extension route that should make it provable.
 - The concrete obstruction in that Naimark route is now narrower: the column-isometry identity is proved, but the remaining work needs a clean Euclidean-space transport for standard-basis columns together with a tidy lemma that right-multiplication by `oneMeasNaimarkInputProj` selects exactly the `none` columns.
-- `exists_fullNaimarkData` is now blocked not by one-measurement dilation itself, but by missing operator/state embedding machinery for the large auxiliary function-space index `ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`. The current repo only has binary tensor-placement infrastructure, not per-coordinate placement on function-space auxiliaries.
-- More specifically, the natural output of `oneMeasNaimark` is `Option`-indexed and lives on one enlarged register, while `NaimarkData.left/right` ask for `Outcome`-indexed projective measurements on the fully assembled space. The present statement also asks for lifted commutativity, but separate auxiliary coordinates do not by themselves force commutativity on a shared base factor `ι` without more structure.
+- The old full-assembly `naimark` blocker has been resolved by changing the Section 5 statement layer from an unprovable tensor-product assembly package to the questionwise one-measurement dilation package that is actually established by the current code.
 - `spectralTruncateAlmostProjective` still lacks a repo bridge from per-outcome `SpectralTruncation` witnesses to an abstract `ProjSubMeas` package with `SDDRel` closeness.
 - `orthonormalization` is now the most realistic remaining target: the measurement-level core is proved, and the remaining work looks like completion-to-measurement packaging plus an outcome-restriction wrapper, subject to the existing small-`ζ` side condition.
 - Source-of-truth recheck tightened the blockers further:
-  - the public `naimark` packaging is misaligned with the paper, because `NaimarkData.left/right` currently require `IdxProjMeas Question Outcome ...` on the original outcome type, while the actual one-measurement dilation is `Option`-indexed and the paper theorem also exposes an auxiliary product state;
-  - `orthonormalizationMainLemma` is not paper-faithful in its current internal shape, because it returns a projective submeasurement on the product space `ιA × ιB` rather than on the left space `ιA`, and that output-space mismatch is the real blocker for the outer `orthonormalization` theorem;
-  - `SpectralTruncationStatement` is too strong relative to the paper/local matrix witness layer: it asks for a concrete ambient `ProjSubMeas Outcome ι` with `√ζ` closeness, but there is no actual spectral-threshold constructor theorem in the repo or mathlib producing such a witness from an almost-idempotent PSD operator.
+  - the old public `naimark` packaging was misaligned with the paper; this has now been repaired by replacing the unprovable full tensor assembly package with questionwise one-measurement dilation data;
+  - `orthonormalizationMainLemma` is still not paper-faithful in its internal shape, because it returns a projective submeasurement on the product space `ιA × ιB` rather than on the left space `ιA`, and that output-space mismatch is now the dominant blocker for the outer `orthonormalization` theorem;
+  - `SpectralTruncationStatement` remains too strong relative to the paper/local matrix witness layer: it asks for a concrete ambient `ProjSubMeas Outcome ι` with `√ζ` closeness, but there is still no actual spectral-threshold constructor theorem in the repo or mathlib producing such a witness from an almost-idempotent PSD operator.
 
 ### Agent Board For This Pass
 - Survey agent: completed module scan and dependency map for all 8 remaining gaps.
@@ -168,7 +167,7 @@ Last updated: 2026-04-12
 - Source-of-truth audit agent: completed a paper/blueprint comparison for the three remaining theorem-level gaps and confirmed that all three are now blocked by theorem-interface mismatches or missing foundational constructors, not by missing local tactic work.
 
 ### Best Next Step
-- No direct tactic-only sorry elimination remains. The next productive move is to realign the Section 5 theorem interfaces with the paper/blueprint, starting with the internal `orthonormalizationMainLemma` output space and the full `naimark` packaging, or else to add a genuine spectral-threshold constructor theorem for `Quantum.SpectralTruncation`.
+- Two executable gaps remain, and both now point to the same paper-faithful next move: refactor `orthonormalizationMainLemma` to return a local `ProjSubMeas Outcome ιA`, and either (a) weaken/replace `SpectralTruncationStatement` by the projective-family statement actually proved by `projectiveNonMeasurement`, or (b) add the missing spectral-threshold constructor that upgrades per-outcome projectors to a genuine `ProjSubMeas`.
 
 ### Progress This Pass
 - `QXPLayer.sqrtQCompleteness` proved.
@@ -186,6 +185,8 @@ Last updated: 2026-04-12
 - Post-refactor blocker check: even with the import bottleneck resolved, a direct rewrite of `orthonormalizationMainLemma` is still blocked by two deeper API gaps in `QXPLayer`:
   1. `aLooksProjective` expects a projective reference measurement `B : ProjMeas`, while the public main lemma still starts from an arbitrary `Measurement B` plus `ConsRel`.
   2. `pProjectivity` and `pQApprox` require a full `QXPLayerData`, but the completed lower chain only produces `QLayerData` and `RankReductionWitness`; there is no constructor theorem building `QXPLayerData` from that lower witness.
+- Section 5 progress this pass: eliminated `exists_fullNaimarkData` / `naimark` by reworking `NaimarkData` and `NaimarkStatement` into questionwise one-measurement Naimark packaging, which matches the currently formalized content and compiles cleanly.
+- Current module state: only `Projectivization.spectralTruncateAlmostProjective` and `Theorems.orthonormalization` remain as executable `sorry`s in `MakingMeasurementsProjective`.
 
 ## Active Strategy
 - Global high-risk chain still runs through Section 12 pasting.
