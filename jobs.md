@@ -22,42 +22,50 @@ Last updated: 2026-04-12
   `matrixGlobalRewrite`, `localToGlobal`, `localRewrite`, `globalRewrite`.
 - Residual non-sorry follow-up: `Defs.globalVarianceTraceForm` still carries
   TODO `#136` to document/verify the `1 / |U|` normalization convention.
-- Best next step after closing this bookkeeping pass: resume the live Section 12
-  chain at `Pasting/Theorems.lean:gCompleteSelfConsistency`, then
-  `commutativitySwitcheroo`.
+- Best next step after closing this bookkeeping pass: start the Section 8 chain
+  at `GlobalVariance/Theorems.lean:generalizeB`, then
+  `localVarianceOfPoints`, then `globalVarianceOfPoints`.
 
 ## Active Strategy
-- Highest-leverage live chain is now Section 12 pasting; Section 7
-  `ExpansionHypercubeGraph` is no longer a blocker.
-- Immediate target cluster: `Pasting/Theorems.lean` around
-  `commutativitySwitcheroo` and its local helper bridges.
-- Reason: this is the lowest remaining live dependency spine to `ldPasting`,
-  `ldPastingInInductionSection`, and `mainInduction` that still looks provable
-  with current infrastructure.
-- Secondary live track: Section 11 `commDataProcessedG` local bridge lemmas,
-  which appear to need one new questionwise reduction lemma rather than a major
-  theorem-statement repair.
+- Highest-leverage live chain is now Section 8 global variance;
+  `ExpansionHypercubeGraph` is verified complete and is feeding the next module
+  via `GlobalVariance/Theorems.lean:localToGlobal`.
+- Immediate target cluster: `GlobalVariance/Theorems.lean` around
+  `generalizeB`, `localVarianceOfPoints`, and `globalVarianceOfPoints`.
+- Reason: this is the first true downstream consumer of the completed Section 7
+  API, and finishing it unblocks `SelfImprovement/Theorems.lean:addInU` and the
+  induction path more directly than the current Section 12 pasting spine.
+- Primary technical risk: `generalizeB` still mixes the incident-pair encoding
+  `(ℓ, u)` with the axis-parallel test's affine-line parameter `t`; the first
+  proof task is to normalize that transport.
+- Secondary technical risk: `localVarianceOfPoints` and
+  `globalVarianceOfPoints` quantify over arbitrary `ψbi`, while the blueprint
+  argument is written for the strategy state; this needs checking before large
+  proof investment.
+- Secondary live track after the Section 8 audit: resume the Section 12 pasting
+  chain at `Pasting/Theorems.lean:gCompleteSelfConsistency`, then
+  `commutativitySwitcheroo` if the Section 8 statements are sound as written.
 
 ## Agent Board
-- Survey agent: refreshed executable-sorry count and file-by-file breakdown;
-  verified `ExpansionHypercubeGraph/{Defs,MatrixRealization,Theorems}.lean`
-  contains no `sorry`/`axiom` placeholders and flagged stale TODO comments in
-  `ExpansionHypercubeGraph/Theorems.lean`.
-- Integration agent: updated `jobs.md`, removed stale Section 7 TODO comments,
-  and rechecked `ExpansionHypercubeGraph/Theorems.lean`.
-- Proof agent A: assigned to `Pasting.commutativitySwitcheroo` proof shape and
-  triangle-composition route.
-- Proof agent A status: actively implementing `Pasting.commutativitySwitcheroo`.
-- Proof agent B: assigned to local helper subgoals in the same cluster:
-  `completePartProjFamily.proj`,
-  `pointWithCompletePart_as_switcheroo_input`,
-  `completePartAggregateCommutation_as_total`.
-- Refactor agent: reserved for transport/reindex lemmas and definitional
-  cleanups if the Pasting proof gets stuck on non-definitional equalities.
-- Proof agent C: assigned to Section 11 `commDataProcessedG.stabilityOne`
-  questionwise reduction and normalization-condition route.
-- Integration agent: reserved for file builds and reprioritization after each
-  landed proof.
+- Survey agent: refreshed the executable-sorry count (`30` across `7` files),
+  reverified `ExpansionHypercubeGraph/{Defs,MatrixRealization,Theorems}.lean`
+  is placeholder-free, and confirmed the only local follow-up is
+  `Defs.globalVarianceTraceForm` TODO `#136`.
+- Integration agent: updated `jobs.md` to treat Section 7 as complete, remove
+  stale wording about already-removed TODO comments, retarget live work to
+  Section 8, and rerun the Section 7 verification sweep.
+- Proof agent A: assigned to `GlobalVariance.generalizeB` and the distribution
+  transport between `axisParallelLineQuestionDistribution` and the axis-parallel
+  test sample model.
+- Proof agent B: assigned to the restriction/evaluation bridge for
+  `Polynomial.restrictToAxisParallelLine` at incident pairs `(ℓ, u)`.
+- Proof agent C: assigned to audit `GlobalVariance.localVarianceOfPoints` and
+  `globalVarianceOfPoints` for the possible `ψbi` statement mismatch before the
+  Section 8 triangle chain is implemented.
+- Refactor agent: reserved for local reindexing lemmas and outcome-equality
+  helpers if `generalizeB` gets stuck on non-definitional equalities.
+- Integration agent: reserved for `lake env lean
+  MIPStarRE/LDT/GlobalVariance/Theorems.lean` after each landed Section 8 proof.
 
 ---
 
@@ -92,18 +100,20 @@ Last updated: 2026-04-12
 
 **Files changed:** QXPLayer.lean, GlobalVariance/Defs.lean, GlobalVariance/Theorems.lean
 
-### PR #325: Section 7 status sync (`docs/ldt-expansionhypercubegraph-status-sync`)
+### PR #325: Section 7 tracker sync (`docs/ldt-expansionhypercubegraph-status-sync`)
 **Status sync:**
 - `jobs.md`: recorded that `ExpansionHypercubeGraph` has zero remaining
   executable `sorry`s, marked the historical Section 7 blockers as resolved,
-  and pointed the next live target back to `Pasting/Theorems.lean`.
+  rechecked the live executable-placeholder count (`30` across `7` files), and
+  retargeted the next proof spine to the Section 8 chain
+  `GlobalVariance.generalizeB -> localVarianceOfPoints -> globalVarianceOfPoints`.
 - `ExpansionHypercubeGraph/Theorems.lean`: removed stale TODO comments above
   already-proved rewrite and local-to-global theorems.
 
 **Testing:**
 - `lake env lean MIPStarRE/LDT/ExpansionHypercubeGraph/Theorems.lean`
 - `rg -n "\b(sorry|admit|axiom|unsafeCast|unsafeCoerce|ofReduceBool|ofReduceNat|lcProof)\b" MIPStarRE/LDT/ExpansionHypercubeGraph`
-- `rg -n "TODO\(#206\)|TODO\(matrix-realization\)" MIPStarRE/LDT/ExpansionHypercubeGraph`
+- `rg -n "TODO\(#136\)|TODO\(#206\)|TODO\(matrix-realization\)" MIPStarRE/LDT/ExpansionHypercubeGraph`
 
 **Files changed:** jobs.md, ExpansionHypercubeGraph/Theorems.lean
 
@@ -130,8 +140,8 @@ Last updated: 2026-04-12
 ### Pasting/Theorems.lean (11 sorrys)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
-| `gCompleteSelfConsistency` | LIVE TARGET | First theorem on the active Section 12 spine |
-| `commutativitySwitcheroo` | LIVE TARGET | Best current high-leverage theorem; depends on local switcheroo helper bridges |
+| `gCompleteSelfConsistency` | SECONDARY | Next Section 12 target once the Section 8 audit is complete |
+| `commutativitySwitcheroo` | SECONDARY | High-value Section 12 theorem, but no longer the top proof target |
 | `completePartProjFamily.proj` | COMPLETED | Projectivity wrapper proved via `projSubMeas_total_proj` and `postprocess_total` |
 | `pointWithCompletePart_as_switcheroo_input` | COMPLETED | Pure outcome-type rewrite from `Polynomial` to `Polynomial × Unit` |
 | `completePartAggregateCommutation_as_total` | COMPLETED | Closed via a `Unit`-outcome `qSDDOp` congruence lemma |
@@ -150,10 +160,10 @@ Last updated: 2026-04-12
 ### GlobalVariance/Theorems.lean (4 sorrys)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
-| `matrixGeneralizeB` | BLOCKED | Matrix realization transfer proof |
-| `matrixLocalVarianceOfPoints` | BLOCKED | Matrix local variance transfer |
-| `matrixGlobalVarianceOfPoints` | BLOCKED | Matrix global variance transfer |
-| `globalVarianceOfPoints` global norm bound | BLOCKED | Needs localToGlobal + local estimate |
+| `generalizeB` | LIVE TARGET | Needs the incident-pair/axis-test transport and restriction-evaluation bridge |
+| `localVarianceOfPoints` | BLOCKED ON `generalizeB` | Then needs the six-step triangle chain, plus a check that the arbitrary-`ψbi` statement is sound |
+| `globalVarianceOfPoints` | BLOCKED ON `localVarianceOfPoints` | `localToGlobal` part is in place; missing only the local Section 8 bound |
+| `matrixGeneralizeB` / `matrixLocalVarianceOfPoints` / `matrixGlobalVarianceOfPoints` | BLOCKED | Thin wrappers once the abstract Section 8 statements are proved and a real compatibility lemma exists |
 
 ### Commutativity/Theorems.lean (4 sorrys)
 | Lemma | Status | Blocker |
@@ -189,6 +199,22 @@ Last updated: 2026-04-12
 - `ExpansionHypercubeGraph/Theorems.lean`: stale pending-proof TODO comments were
   removed; only live local follow-up is the normalization note on
   `Defs.globalVarianceTraceForm`.
+- Global executable-placeholder count rechecked: `30` executable `sorry`s across
+  `7` files in `MIPStarRE/LDT/`.
+- Downstream dependency audit completed: the first real consumer of the finished
+  Section 7 API is `GlobalVariance/Theorems.lean`, not the current Section 12
+  pasting cluster.
+- `GlobalVariance.generalizeB` identified as the highest-leverage next proof
+  target because it gates both `localVarianceOfPoints` and
+  `globalVarianceOfPoints`.
+- Section 8 risk noted in the tracker: the current `generalizeB` encoding still
+  mixes incident points with affine-line parameters, and the
+  `localVarianceOfPoints` / `globalVarianceOfPoints` statements may need a
+  `ψbi`-vs-`strategy.state` audit before proof work proceeds.
+- Section 7 verification rerun after the tracker sync:
+  `lake env lean MIPStarRE/LDT/ExpansionHypercubeGraph/Theorems.lean` passed,
+  the executable-placeholder scan stayed empty, and the only remaining local
+  note is `TODO(#136)` in `Defs.globalVarianceTraceForm`.
 - `Pasting/Theorems.lean:completePartProjFamily.proj` proved.
 - `Pasting/Theorems.lean:pointWithCompletePart_as_switcheroo_input` proved.
 - `Pasting/Theorems.lean`: extracted
