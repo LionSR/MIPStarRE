@@ -10,7 +10,7 @@ Last updated: 2026-04-12
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
-- **PRs already recorded in this file**: 3
+- **PRs already recorded in this file**: 4
 
 ## Active Strategy
 - `MainInductionStep` is complete for this wave.
@@ -89,6 +89,15 @@ Last updated: 2026-04-12
   restricted self-consistency average
 
 **Files changed:** MainInductionStep/Statements.lean, MainInductionStep/Theorems.lean, jobs.md
+
+### PR #331: Test wave (`fix/LDT/Test`)
+**Sorrys eliminated (1):**
+- `Test/MainTheorem.lean`: `mainFormal`
+
+**Infrastructure added:**
+- `Test/MainTheorem.lean`: `MainFormalBridgePackage`
+
+**Files changed:** Test/MainTheorem.lean, jobs.md
 
 ---
 
