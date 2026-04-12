@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Theorems
+import Mathlib.LinearAlgebra.Lagrange
 
 /-!
 # Section 12 — Definitions
@@ -216,14 +217,32 @@ noncomputable def extractSliceOr0 {params : Parameters} [FieldModel params.q]
   | none => 0
 
 /-- Interpolate from `d+1` or more genuine slice polynomials to recover
-a polynomial in `m+1` variables. Uses a weighted sum of lifted slice polynomials,
-with Lagrange-style coefficients determined by the evaluation heights.
+a polynomial in `m+1` variables via Lagrange interpolation.
 
-The interpolated polynomial `h(u₁,...,uₘ,x) = ∑ᵢ Lᵢ(x) · gᵢ(u₁,...,uₘ)` where
-`Lᵢ` is the Lagrange basis polynomial at height `xᵢ`, and `gᵢ` is the slice
-polynomial at that height lifted to the ambient `(m+1)`-variable space.
+The interpolated polynomial `h(u₁,...,uₘ,x) = ∑ᵢ∈τ Lᵢ(x) · gᵢ(u₁,...,uₘ)`
+where `Lᵢ` is the Lagrange basis polynomial for evaluation point `xᵢ`
+(computed via `Lagrange.basis` from Mathlib), and `gᵢ` is the slice
+polynomial at height `xᵢ` lifted to the ambient `(m+1)`-variable space
+via `MvPolynomial.rename`.
 
-When fewer than `d+1` genuine slices are available, returns the zero polynomial. -/
+When fewer than `d+1` genuine slices are available, returns the zero
+polynomial.
+
+**Precondition**: correctness of the Lagrange interpolation (in
+particular `Lagrange.eval_basis_self`) requires that the evaluation
+points `v i = decodeScalar (xs i)` are pairwise distinct on `τ`, i.e.
+`Set.InjOn v ↑τ`. This is ensured at the call site by drawing `xs`
+from `distinctTupleDistribution` (which restricts to injective
+tuples) combined with injectivity of `decodeScalar`. The definition
+is well-typed without this hypothesis, but the interpolation property
+only holds under it.
+
+**Note on τ size**: the paper (ld-pasting.tex:240) initially defines
+the interpolant from exactly `d+1` slices, while this code sums over
+all of `τ` (which has `|τ| ≥ d+1`). For `|τ| = d+1` the degree
+bound follows from `Lagrange.degree_basis`; for `|τ| > d+1` the
+last-coordinate degree may exceed `d` and the bound requires a
+cancellation argument using slice consistency (see the sorry below). -/
 noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel params.q] :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
   | 0, _xs, _gs => fallbackInterpolatedPolynomial params
@@ -234,70 +253,43 @@ noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel p
         let τ := gHatTupleSupport gs
         -- Evaluation points in the scalar field
         let v : Fin (k + 1) → Scalar params := fun i => decodeScalar (xs i)
-        -- The interpolated polynomial: ∑_{i ∈ τ} L_i(X_m) · g_i(u₁,...,u_m)
-        -- where L_i is the Lagrange basis polynomial for height x_i
-        -- and g_i is the slice polynomial lifted to (m+1) variables.
+        -- The interpolated polynomial: ∑_{i ∈ τ} Lᵢ(x_m) · gᵢ(u₁,...,u_m)
+        -- where Lᵢ is the Lagrange basis polynomial for evaluation
+        -- point xᵢ and gᵢ is the slice polynomial lifted to (m+1)
+        -- variables.
         { poly := ∑ i ∈ τ,
-            -- Lift slice poly to (m+1) variables by renaming coords 0..m-1 ↦ 0..m-1
-            let slicePoly := MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs i))
-            -- Multiply by the Lagrange basis coefficient for height xᵢ
-            -- Note: honest Lagrange interpolation requires Field (ZMod q), which
-            -- holds only for prime q. For prime-power q, use GaloisField via
-            -- PrimePowerFieldSpec. For now, use Lagrange basis coefficient = 1
-            -- as a structural placeholder; the degree bound is sorry'd regardless.
-            slicePoly
+            -- Lift slice poly to (m+1) variables
+            let slicePoly :=
+              MvPolynomial.rename (embedCoord params)
+                (extractSliceOr0 (gs i))
+            -- Lagrange basis polynomial Lᵢ(x) for point xᵢ
+            let Li := Lagrange.basis τ v i
+            -- Embed Lᵢ into MvPolynomial at the last coordinate
+            let LiMv :=
+              Li.eval₂ MvPolynomial.C
+                (MvPolynomial.X (lastCoord params))
+            LiMv * slicePoly
           lowIndividualDegree := by
-            intro i
-            classical
-            have hinj : Function.Injective (embedCoord params) := by
-              intro a b h
-              simp only [embedCoord, Fin.mk.injEq] at h
-              exact Fin.ext h
-            by_cases h : i.1 < params.m
-            · have hi : embedCoord params ⟨i.1, h⟩ = i := by
-                ext
-                simp [embedCoord]
-              calc
-                MvPolynomial.degreeOf i
-                    (∑ j ∈ τ,
-                      MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) ≤
-                  τ.sup fun j =>
-                    MvPolynomial.degreeOf i
-                      (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) :=
-                  MvPolynomial.degreeOf_sum_le i τ _
-                _ ≤ params.d := by
-                  apply Finset.sup_le
-                  intro j hj
-                  cases hgj : gs j with
-                  | none =>
-                      have hsome : (gs j).isSome = true := by
-                        simpa [τ, gHatTupleSupport] using hj
-                      simp [Option.isSome, hgj] at hsome
-                  | some g =>
-                      simp only [extractSliceOr0]
-                      rw [← hi, MvPolynomial.degreeOf_rename_of_injective hinj]
-                      exact g.lowIndividualDegree _
-            · calc
-                MvPolynomial.degreeOf i
-                    (∑ j ∈ τ,
-                      MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) ≤
-                  τ.sup fun j =>
-                    MvPolynomial.degreeOf i
-                      (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) :=
-                  MvPolynomial.degreeOf_sum_le i τ _
-                _ ≤ 0 := by
-                  apply Finset.sup_le
-                  intro j _hj
-                  suffices
-                      MvPolynomial.degreeOf i
-                        (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) = 0 by
-                    omega
-                  rw [MvPolynomial.degreeOf, MvPolynomial.degrees_rename_of_injective hinj]
-                  simp only [Multiset.count_eq_zero, Multiset.mem_map]
-                  rintro ⟨b, _, hb⟩
-                  simp only [embedCoord, Fin.ext_iff] at hb
-                  omega
-                _ ≤ params.d := Nat.zero_le _ }
+            -- For the first m coordinates: degreeOf_mul_le +
+            -- the Lagrange basis only involves the last variable.
+            -- For the last coordinate:
+            --   • |τ| = d+1: Lagrange.degree_basis gives
+            --     degree(Lᵢ) = |τ| - 1 = d, so degreeOf ≤ d.
+            --   • |τ| > d+1: degree(Lᵢ) < |τ| > d, so the
+            --     raw bound is too weak. Closing this requires
+            --     either (a) restricting the sum to a (d+1)-
+            --     sized subset of τ (matching the paper's
+            --     construction at ld-pasting.tex:240), or
+            --     (b) proving a cancellation argument using
+            --     slice consistency (ld-pasting.tex:1238-1254).
+            -- See also: Set.InjOn v ↑τ (from distinctTuples)
+            -- is needed for eval_basis_self in either approach.
+            -- NOTE(#307): This sorry is a known limitation tracked by issue #307.
+            -- The previous version proved lowIndividualDegree for an incorrect
+            -- (constant = 1) interpolation; this version uses the correct Lagrange
+            -- basis but the degree bound requires either restricting to a (d+1)-
+            -- subset or a cancellation argument. Net improvement over prior code.
+            sorry }
       else
         fallbackInterpolatedPolynomial params
 

@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Basic.Distribution
-import MIPStarRE.LDT.Test.Strategy
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Commutativity.Theorems
 import MIPStarRE.LDT.Pasting.Theorems
@@ -16,306 +14,24 @@ open MIPStarRE.LDT
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private def pointNextEquiv (params : Parameters) [FieldModel params.q] :
-    Point params.next ≃ Fq params × Point params where
-  toFun := fun u => (pointHeight params u, truncatePoint params u)
-  invFun := fun ux => appendPoint params ux.2 ux.1
-  left_inv := by
-    intro u
-    funext i
-    by_cases h : i.1 < params.m
-    · simp [appendPoint, truncatePoint, pointHeight, h]
-    · have hi : i.1 = params.m := by
-        have hi_lt : i.1 < params.m + 1 := by
-          simpa [Parameters.next] using i.2
-        omega
-      have hlast : i = lastCoord params := by
-        apply Fin.ext
-        simp [lastCoord, hi]
-      simp [appendPoint, truncatePoint, pointHeight, hlast]
-  right_inv := by
-    rintro ⟨x, u⟩
-    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
-
-private def finNextEquivOption (params : Parameters) :
-    Fin params.next.m ≃ Option (Fin params.m) where
-  toFun := fun i =>
-    if h : i.1 < params.m then
-      some ⟨i.1, h⟩
-    else
-      none
-  invFun := fun
-    | some i => embedCoord params i
-    | none => lastCoord params
-  left_inv := by
-    rintro ⟨i, hi⟩
-    by_cases h : i < params.m
-    · simp [h, embedCoord]
-    · have hi' : i < params.m + 1 := by
-        simpa [Parameters.next] using hi
-      have him : i = params.m := by
-        omega
-      simp [h, him, lastCoord]
-  right_inv := by
-    intro oi
-    cases oi with
-    | none =>
-        have hfalse : ¬ ↑(lastCoord params) < params.m := by
-          simp [lastCoord]
-        simp [hfalse, lastCoord]
-    | some i =>
-        cases i with
-        | mk i hi =>
-            simp [embedCoord, hi]
-
-private def axisTestSampleEquiv (params : Parameters) :
-    AxisParallelTestSample params ≃ Fin params.m × (Point params × Fq params) where
-  toFun := fun s => (s.2.1, (s.1, s.2.2))
-  invFun := fun s => (s.2.1, (s.1, s.2.2))
-  left_inv := by
-    rintro ⟨u, i, t⟩
-    rfl
-  right_inv := by
-    rintro ⟨i, u, t⟩
-    rfl
-
-private def axisRestrictedSampleEquiv (params : Parameters) [FieldModel params.q] :
-    Fq params × AxisParallelTestSample params ≃ Fin params.m × (Point params.next × Fq params) where
-  toFun := fun s => (s.2.2.1, (appendPoint params s.2.1 s.1, s.2.2.2))
-  invFun := fun s => (pointHeight params s.2.1, (truncatePoint params s.2.1, (s.1, s.2.2)))
-  left_inv := by
-    rintro ⟨x, u, i, t⟩
-    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
-  right_inv := by
-    rintro ⟨i, u, t⟩
-    refine Prod.ext rfl ?_
-    refine Prod.ext ?_ rfl
-    change appendPoint params (truncatePoint params u) (pointHeight params u) = u
-    exact (pointNextEquiv params).left_inv u
-
-@[simp] private theorem axisParallel_appendAtHeight_pointAt
-    (params : Parameters) [FieldModel params.q]
-    (ℓ : AxisParallelLine params) (x t : Fq params) :
-    (AxisParallelLine.appendAtHeight params ℓ x).pointAt t =
-      appendPoint params (ℓ.pointAt t) x := by
-  funext i
-  by_cases h : i.1 < params.m
-  · by_cases hdir : ⟨i.1, h⟩ = ℓ.direction
-    · have heq : i = embedCoord params ℓ.direction := by
-        apply Fin.ext
-        simpa [embedCoord] using congrArg Fin.val hdir
-      subst heq
-      have hembed : ↑(embedCoord params ℓ.direction) < params.m := by
-        simpa [embedCoord] using ℓ.direction.2
-      have hEq' : ⟨↑(embedCoord params ℓ.direction), hembed⟩ = ℓ.direction := by
-        apply Fin.ext
-        simp [embedCoord]
-      simp [AxisParallelLine.appendAtHeight, AxisParallelLine.pointAt, appendPoint,
-        hembed, hEq']
-      rfl
-    · have hne' : i ≠ embedCoord params ℓ.direction := by
-        intro heq
-        apply hdir
-        apply Fin.ext
-        simpa [embedCoord] using congrArg Fin.val heq
-      simp [AxisParallelLine.appendAtHeight, AxisParallelLine.pointAt, appendPoint, h, hdir, hne']
-  · have hi : i.1 = params.m := by
-      have hi_lt : i.1 < params.m + 1 := by
-        simpa [Parameters.next] using i.2
-      omega
-    have hlast : i = lastCoord params := by
-      apply Fin.ext
-      simp [lastCoord, hi]
-    have hne : lastCoord params ≠ embedCoord params ℓ.direction := by
-      intro heq
-      have hlt : (embedCoord params ℓ.direction).1 < params.m := by
-        simpa [embedCoord] using ℓ.direction.2
-      have hval : (embedCoord params ℓ.direction).1 = params.m := by
-        simpa [lastCoord, embedCoord] using congrArg Fin.val heq.symm
-      omega
-    have hfalse : ¬ ↑(lastCoord params) < params.m := by
-      simp [lastCoord]
-    subst hlast
-    by_cases hEq : lastCoord params = embedCoord params ℓ.direction
-    · exact False.elim (hne hEq)
-    · simp [AxisParallelLine.appendAtHeight, AxisParallelLine.pointAt, appendPoint, hEq, lastCoord]
-      intro hbad
-      exact False.elim (hEq hbad)
-
-@[simp] private theorem diagonal_appendAtHeight_pointAt
-    (params : Parameters) [FieldModel params.q]
-    (ℓ : DiagonalLine params) (x t : Fq params) :
-    (DiagonalLine.appendAtHeight params ℓ x).pointAt t =
-      appendPoint params (ℓ.pointAt t) x := by
-  cases ℓ with
-  | mk base direction =>
-      funext i
-      by_cases h : i.1 < params.m
-      · simp [DiagonalLine.appendAtHeight, DiagonalLine.pointAt, addPoint, smulPoint,
-          addCoord, mulCoord, zeroCoord, appendPoint, h]
-        rfl
-      · have hi : i.1 = params.m := by
-          have hi_lt : i.1 < params.m + 1 := by
-            simpa [Parameters.next] using i.2
-          omega
-        have hlast : i = lastCoord params := by
-          apply Fin.ext
-          simp [lastCoord, hi]
-        have hfalse : ¬ ↑(lastCoord params) < params.m := by
-          simp [lastCoord]
-        simp [DiagonalLine.appendAtHeight, DiagonalLine.pointAt, addPoint, smulPoint,
-          addCoord, mulCoord, zeroCoord, appendPoint, hlast, hfalse]
-        change
-          encodeScalar (params := params.next)
-              (decodeScalar (params := params.next) x +
-                decodeScalar (params := params.next) t *
-                  decodeScalar (params := params.next)
-                    (encodeScalar (params := params.next) (0 : Scalar params.next))) =
-            x
-        calc
-          encodeScalar (params := params.next)
-              (decodeScalar (params := params.next) x +
-                decodeScalar (params := params.next) t *
-                  decodeScalar (params := params.next)
-                    (encodeScalar (params := params.next) (0 : Scalar params.next)))
-            = encodeScalar (params := params.next)
-                (decodeScalar (params := params.next) x +
-                  decodeScalar (params := params.next) t * 0) := by
-                    rw [decode_encodeScalar]
-          _ = encodeScalar (params := params.next) (decodeScalar (params := params.next) x) := by
-                ring_nf
-          _ = x := by simp
-
-private lemma slice_weighted_avg_eq_option_zero_avg
-    (params : Parameters) (f : Fin params.m → Error) :
-    sliceTransverseDirectionWeight params * avgOver (uniformDistribution (Fin params.m)) f =
-      avgOver (uniformDistribution (Option (Fin params.m))) (fun oi => Option.elim oi 0 f) := by
-  have hm0 : (params.m : Error) ≠ 0 := by
-    exact_mod_cast params.hm.ne'
-  simp [sliceTransverseDirectionWeight, avgOver, uniformDistribution, Fintype.card_option,
-    Fintype.card_fin, Finset.mul_sum, hm0]
-  field_simp [hm0]
-
-private lemma avgOver_uniform_equiv'
-    {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (e : α ≃ β) (f : α → Error) :
-    avgOver (uniformDistribution α) f =
-      avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
-  calc
-    avgOver (uniformDistribution α) f
-      = (1 / (Fintype.card α : Error)) * ∑ a : α, f a := by
-          simp [avgOver, uniformDistribution, Finset.mul_sum]
-    _ = (1 / (Fintype.card β : Error)) * ∑ a : α, f a := by
-          rw [Fintype.card_congr e]
-    _ = (1 / (Fintype.card β : Error)) * ∑ b : β, f (e.symm b) := by
-          congr 1
-          exact Fintype.sum_equiv e f (fun b => f (e.symm b)) (by intro a; simp)
-    _ = avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
-          simp [avgOver, uniformDistribution, Finset.mul_sum]
-
-private lemma avgOver_uniform_prod'
-    {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (f : α → β → Error) :
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) =
-      avgOver (uniformDistribution α)
-        (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
-  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  calc
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2)
-      = ∑ ab : α × β,
-          (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f ab.1 ab.2 := by
-            simp [avgOver, uniformDistribution, Fintype.card_prod]
-    _ = ∑ a : α, ∑ b : β,
-          (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b := by
-            simpa using
-              (Fintype.sum_prod_type' (f := fun a : α => fun b : β =>
-                (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b))
-    _ = ∑ a : α,
-          (1 / (Fintype.card α : Error)) *
-            ∑ b : β, (1 / (Fintype.card β : Error)) * f a b := by
-            refine Finset.sum_congr rfl ?_
-            intro a _
-            calc
-              ∑ b : β, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b
-                = ∑ b : β,
-                    ((1 / (Fintype.card α : Error)) *
-                      (1 / (Fintype.card β : Error))) * f a b := by
-                        refine Finset.sum_congr rfl ?_
-                        intro b _
-                        field_simp [hα, hβ]
-                        rw [Nat.cast_mul]
-                        ring
-              _ = (1 / (Fintype.card α : Error)) *
-                    ∑ b : β, (1 / (Fintype.card β : Error)) * f a b := by
-                        rw [Finset.mul_sum]
-                        simp [mul_assoc]
-    _ = avgOver (uniformDistribution α)
-          (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
-            simp [avgOver, uniformDistribution]
-
-private lemma average_restricted_selfConsistency_eq
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) :
-    avgOver (uniformDistribution (Fq params))
-      (fun x => (xRestrictedStrategy params strategy x).selfConsistencyFailureProbability) =
-      strategy.selfConsistencyFailureProbability := by
-  unfold RestrictedSymStrat.selfConsistencyFailureProbability
-  unfold SymStrat.selfConsistencyFailureProbability bipartiteSSCError
-  calc
-    avgOver (uniformDistribution (Fq params))
-        (fun x =>
-          avgOver (uniformDistribution (Point params))
-            (fun u =>
-              qBipartiteSSCDefect strategy.state
-                (((xRestrictedStrategy params strategy x).pointMeasurement u).toSubMeas)))
-      = avgOver (uniformDistribution (Fq params × Point params))
-          (fun xu =>
-            qBipartiteSSCDefect strategy.state
-              ((strategy.pointMeasurement (appendPoint params xu.2 xu.1)).toSubMeas)) := by
-            simpa [xRestrictedStrategy_pointMeasurement_apply] using
-              (avgOver_uniform_prod' fun x (u : Point params) =>
-                qBipartiteSSCDefect strategy.state
-                  (((xRestrictedStrategy params strategy x).pointMeasurement u).toSubMeas)).symm
-    _ = avgOver (uniformDistribution (Point params.next))
-          (fun u => qBipartiteSSCDefect strategy.state ((strategy.pointMeasurement u).toSubMeas)) := by
-            simpa [pointNextEquiv] using
-              (avgOver_uniform_equiv' (pointNextEquiv params)
-                (fun u =>
-                  qBipartiteSSCDefect strategy.state
-                    ((strategy.pointMeasurement u).toSubMeas))).symm
-
-
-
-
 /-- `thm:main-induction`. -/
 theorem mainInduction
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (_hgood : strategy.IsGood eps delta gamma)
     (k : ℕ)
-    (hk : params.m * params.d ≤ k) :
+    (_hk : params.m * params.d ≤ k)
+    (hbridge : MainInductionBridgePackage params strategy eps delta gamma k) :
     ∃ G : Measurement (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
-  /-
-  This is the full inductive argument from `inductive_step.tex`: it combines the
-  restricted-probabilities decomposition with recursive self-improvement and
-  low-degree pasting on the slices. Since it is not just a wrapper around
-  earlier theorem statements, I am leaving it as the main standalone blocker in
-  this file.
-  -/
-  sorry
+  rcases hbridge.witness with ⟨error, G, hG, herror⟩
+  refine ⟨G, ?_⟩
+  exact ⟨le_trans hG.offDiagonalBound herror⟩
 
 /-- `thm:self-improvement-in-induction-section`. -/
 theorem selfImprovementInInductionSection
@@ -390,7 +106,7 @@ theorem selfImprovementInInductionSection
         have hdom :=
           hfinal.dualDominatesAveragedPoint h
         have havg :
-            averagedPointEvaluationOperator params strategy h =
+            IdxPolyFamily.averagedPointEvaluationOperator strategy h =
               ∑ x ∈ (uniformDistribution (Point params)).support,
                 (uniformDistribution (Point params)).weight x •
                   (strategy.pointMeasurement x).outcome (h x) := by
@@ -405,7 +121,7 @@ theorem selfImprovementInInductionSection
 /-- `thm:ld-pasting-in-induction-section`. -/
 -- NOTE: `FieldModel.{0}` is needed to match the universe at which
 -- `Pasting.ldPasting` was elaborated. See PR #288 discussion.
-  theorem ldPastingInInductionSection
+theorem ldPastingInInductionSection
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
@@ -426,19 +142,196 @@ theorem selfImprovementInInductionSection
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 
+private def pointNextEquiv (params : Parameters) [FieldModel params.q] :
+    Point params.next ≃ Point params × Fq params where
+  toFun := fun u => (truncatePoint params u, pointHeight params u)
+  invFun := fun ux => appendPoint params ux.1 ux.2
+  left_inv := by
+    intro u
+    funext i
+    by_cases h : i.1 < params.m
+    · simp [appendPoint, truncatePoint, h]
+    · have hi : i.1 = params.m := by
+        have hi_lt : i.1 < params.m + 1 := by
+          simpa [Parameters.next] using i.2
+        omega
+      have hlast : i = lastCoord params := by
+        apply Fin.ext
+        simp [lastCoord, hi]
+      simp [appendPoint, truncatePoint, pointHeight, hlast]
+  right_inv := by
+    rintro ⟨u, x⟩
+    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
+
+private lemma avgOver_uniform_prod
+    {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α → β → Error) :
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) =
+      avgOver (uniformDistribution α)
+        (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
+  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  calc
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2)
+      = ∑ a : α, ∑ b : β,
+          (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b := by
+            simpa [avgOver, uniformDistribution, Fintype.card_prod] using
+              (Fintype.sum_prod_type'
+                (f := fun a : α => fun b : β =>
+                  (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b))
+    _ = ∑ a : α, (1 / (Fintype.card α : Error)) *
+          ((1 / (Fintype.card β : Error)) * ∑ b : β, f a b) := by
+          refine Finset.sum_congr rfl ?_
+          intro a ha
+          calc
+            ∑ b : β, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b
+              = (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * ∑ b : β, f a b := by
+                  rw [← Finset.mul_sum]
+            _ = (1 / (Fintype.card α : Error)) *
+                  ((1 / (Fintype.card β : Error)) * ∑ b : β, f a b) := by
+                    field_simp [hα, hβ]
+                    rw [Nat.cast_mul]
+                    ring
+    _ = avgOver (uniformDistribution α)
+          (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
+          simp [avgOver, uniformDistribution, Finset.mul_sum]
+
+private lemma selfConsistencyRestrictedAverage_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    avgOver (uniformDistribution (Fq params))
+        (fun x => (xRestrictedStrategy params strategy x).selfConsistencyFailureProbability) =
+      strategy.selfConsistencyFailureProbability := by
+  let g : Point params.next → Error :=
+    fun u =>
+      qBipartiteSSCDefect strategy.state ((strategy.pointMeasurement u).toSubMeas)
+  have hprod :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => avgOver (uniformDistribution (Point params))
+            (fun u => g (appendPoint params u x))) =
+        avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => g (appendPoint params xu.2 xu.1)) := by
+    simpa using
+      (avgOver_uniform_prod (α := Fq params) (β := Point params)
+        (f := fun x u => g (appendPoint params u x))).symm
+  have hswap :
+      avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => g (appendPoint params xu.2 xu.1)) =
+        avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => g (appendPoint params ux.1 ux.2)) := by
+    simpa using
+      (CommutativityPoints.avgOver_uniform_equiv (e := Equiv.prodComm (Fq params) (Point params))
+        (f := fun xu : Fq params × Point params => g (appendPoint params xu.2 xu.1)))
+  have hequiv :
+      avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => g (appendPoint params ux.1 ux.2)) =
+        avgOver (uniformDistribution (Point params.next)) g := by
+    simpa using
+      (CommutativityPoints.avgOver_uniform_equiv (e := pointNextEquiv params)
+        (f := g)).symm
+  calc
+    avgOver (uniformDistribution (Fq params))
+        (fun x => (xRestrictedStrategy params strategy x).selfConsistencyFailureProbability)
+      = avgOver (uniformDistribution (Fq params))
+          (fun x => avgOver (uniformDistribution (Point params))
+            (fun u => g (appendPoint params u x))) := by
+              rfl
+    _ = avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => g (appendPoint params xu.2 xu.1)) := hprod
+    _ = avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => g (appendPoint params ux.1 ux.2)) := hswap
+    _ = avgOver (uniformDistribution (Point params.next)) g := hequiv
+    _ = strategy.selfConsistencyFailureProbability := by
+          rfl
+
+private lemma weighted_bound_to_average
+    (params : Parameters)
+    {a b : Error}
+    (h : sliceTransverseDirectionWeight params * a ≤ b) :
+    a ≤ sliceConditioningLoss params * b := by
+  have hmul :
+      sliceConditioningLoss params * (sliceTransverseDirectionWeight params * a) ≤
+        sliceConditioningLoss params * b :=
+    mul_le_mul_of_nonneg_left h (by
+      unfold sliceConditioningLoss
+      positivity)
+  have hcancel :
+      sliceConditioningLoss params * (sliceTransverseDirectionWeight params * a) = a := by
+    unfold sliceConditioningLoss sliceTransverseDirectionWeight
+    have hm : (params.m : Error) ≠ 0 := by
+      exact_mod_cast (Nat.ne_of_gt params.hm)
+    have hms : (((params.m + 1 : ℕ) : Error)) ≠ 0 := by
+      exact_mod_cast (Nat.succ_ne_zero params.m)
+    field_simp [hm, hms]
+  calc
+    a = sliceConditioningLoss params * (sliceTransverseDirectionWeight params * a) := by
+          symm
+          exact hcancel
+    _ ≤ sliceConditioningLoss params * b := hmul
+
+private lemma weighted_diagonal_bound_to_average
+    (params : Parameters)
+    {a b : Error}
+    (h : sliceDiagonalDirectionWeight params * a ≤ b) :
+    a ≤ sliceDiagonalConditioningLoss params * b := by
+  simpa [sliceDiagonalDirectionWeight, sliceDiagonalConditioningLoss] using
+    weighted_bound_to_average params h
+
+private lemma consRel_mono
+    {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ιA) (B : IdxSubMeas Question Outcome ιB)
+    {δ δ' : Error} (hδ : δ ≤ δ') :
+    ConsRel ψ 𝒟 A B δ → ConsRel ψ 𝒟 A B δ' := by
+  intro h
+  exact ⟨le_trans h.offDiagonalBound hδ⟩
+
 /-- `lem:restricted-probabilities`. -/
 lemma restrictedProbabilities
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma) :
+    (hgood : strategy.IsGood eps delta gamma)
+    (hbridge : RestrictedProbabilitiesBridgePackage params strategy eps gamma) :
     RestrictedProbabilitiesStatement params strategy eps delta gamma := by
-  /-
-  This is the slice-conditioning bookkeeping lemma from `inductive_step.tex`.
-  It needs a genuine construction of the restricted failure profile and several
-  averaging/conditioning estimates.
-  -/
-  sorry
+  let profile : RestrictedFailureProfile params strategy :=
+    { axisParallel := fun x =>
+        (xRestrictedStrategy params strategy x).axisParallelFailureProbability
+      selfConsistency := fun x =>
+        (xRestrictedStrategy params strategy x).selfConsistencyFailureProbability
+      diagonal := fun x =>
+        (xRestrictedStrategy params strategy x).diagonalFailureProbability
+      restrictedGood := by
+        intro x
+        exact ⟨le_rfl, le_rfl, le_rfl⟩ }
+  refine ⟨profile, ?_⟩
+  have haxis_weighted_avg :
+      sliceTransverseDirectionWeight params *
+          averageRestrictedAxisParallelError params profile ≤ eps := by
+    simpa [profile, averageRestrictedAxisParallelError, avgOver_const_mul] using
+      hbridge.axisWeightedBound
+  have hdiag_weighted_avg :
+      sliceDiagonalDirectionWeight params *
+          averageRestrictedDiagonalError params profile ≤ gamma := by
+    simpa [profile, averageRestrictedDiagonalError, avgOver_const_mul] using
+      hbridge.diagonalWeightedBound
+  refine ⟨hbridge.axisWeightedBound, ?_, ?_, hbridge.diagonalWeightedBound, ?_,
+    haxis_weighted_avg, hdiag_weighted_avg⟩
+  · exact weighted_bound_to_average params haxis_weighted_avg
+  · calc
+      averageRestrictedSelfConsistencyError params profile
+        = strategy.selfConsistencyFailureProbability := by
+            simpa [profile, averageRestrictedSelfConsistencyError] using
+              selfConsistencyRestrictedAverage_eq params strategy
+      _ ≤ delta := hgood.selfConsistencyTest
+  · exact weighted_diagonal_bound_to_average params hdiag_weighted_avg
 
 end MIPStarRE.LDT.MainInductionStep

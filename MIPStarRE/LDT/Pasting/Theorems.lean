@@ -27,7 +27,7 @@ theorem ldPasting
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : family.Bounded strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
@@ -45,7 +45,7 @@ lemma ldPastingSubMeas
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : family.Bounded strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : SubMeas (Polynomial params.next) ι,
@@ -748,6 +748,148 @@ private lemma avgOver_uniform_slicePair
     _ = avgOver (uniformDistribution (SliceQuestion params))
           (fun x => avgOver (uniformDistribution (SliceQuestion params)) (fun y => f x y)) := by
           simp [avgOver, uniformDistribution, Finset.mul_sum]
+
+private lemma avgOver_abs_le_avgOver_abs
+    {α : Type*} [DecidableEq α]
+    (𝒟 : Distribution α) (f : α → Error) :
+    |avgOver 𝒟 f| ≤ avgOver 𝒟 (fun a => |f a|) := by
+  unfold avgOver
+  calc
+    |∑ a ∈ 𝒟.support, 𝒟.weight a * f a|
+      ≤ ∑ a ∈ 𝒟.support, |𝒟.weight a * f a| := by
+          exact Finset.abs_sum_le_sum_abs _ _
+    _ = ∑ a ∈ 𝒟.support, 𝒟.weight a * |f a| := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [abs_mul, abs_of_nonneg (𝒟.nonnegative a)]
+    _ = avgOver 𝒟 (fun a => |f a|) := by
+          rfl
+
+private lemma switcheroo_first_term_close
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (omega : Error)
+    (hselfM : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (switcherooSelfConsistencyLeft params M)
+      (switcherooSelfConsistencyRight params M)
+      omega) :
+    let firstTerm :=
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun x => Preliminaries.leftSandwichExpectation ψbi
+          (uniformDistribution (SliceQuestion params))
+          M ((completePartSubMeas params family x).total))
+    let commonTerm :=
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun x => Preliminaries.middleSandwichExpectation ψbi
+          (uniformDistribution (SliceQuestion params))
+          M ((completePartSubMeas params family x).total))
+    |firstTerm - commonTerm| ≤ 2 * Real.sqrt omega := by
+  dsimp
+  let L : Fq params → Error := fun x =>
+    Preliminaries.leftSandwichExpectation ψbi
+      (uniformDistribution (SliceQuestion params))
+      M ((completePartSubMeas params family x).total)
+  let C : Fq params → Error := fun x =>
+    Preliminaries.middleSandwichExpectation ψbi
+      (uniformDistribution (SliceQuestion params))
+      M ((completePartSubMeas params family x).total)
+  have hselfM_bip := switcherooSelfConsistency_bip params ψbi M omega hselfM
+  have hpoint : ∀ x, |L x - C x| ≤ 2 * Real.sqrt omega := by
+    intro x
+    have hB : Preliminaries.OpBounded01 ((completePartSubMeas params family x).total) := by
+      refine ⟨?_, ?_⟩
+      · exact SubMeas.total_nonneg (completePartSubMeas params family x)
+      · exact sub_nonneg.mpr (completePartSubMeas params family x).total_le_one
+    simpa [L, C] using
+      (Preliminaries.switchSandwich ψbi
+        (uniformDistribution (SliceQuestion params))
+        hnorm
+        (uniformDistribution_weight_sum_le_one (SliceQuestion params))
+        M
+        ((completePartSubMeas params family x).total)
+        hB
+        omega
+        hselfM_bip).leftSandwichTransfer
+  calc
+    |avgOver (uniformDistribution (SliceQuestion params)) L -
+        avgOver (uniformDistribution (SliceQuestion params)) C|
+      = |avgOver (uniformDistribution (SliceQuestion params)) (fun x => L x - C x)| := by
+          simp [avgOver, Finset.sum_sub_distrib, mul_sub]
+    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun x => |L x - C x|) := by
+          exact avgOver_abs_le_avgOver_abs _ _
+    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun _ => 2 * Real.sqrt omega) := by
+          exact avgOver_mono _ _ _ hpoint
+    _ = 2 * Real.sqrt omega := by
+          have hq0 : (params.q : Error) ≠ 0 := by
+            exact_mod_cast Nat.ne_of_gt params.hq
+          simp [avgOver, uniformDistribution]
+          field_simp [hq0]
+
+private lemma switcheroo_second_term_close
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (zeta : Error)
+    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
+    let secondTerm :=
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun y => Preliminaries.leftSandwichExpectation ψbi
+          (uniformDistribution (SliceQuestion params))
+          family.meas (((M y).toSubMeas).total))
+    let commonTerm :=
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun y => Preliminaries.middleSandwichExpectation ψbi
+          (uniformDistribution (SliceQuestion params))
+          family.meas (((M y).toSubMeas).total))
+    |secondTerm - commonTerm| ≤ 2 * Real.sqrt zeta := by
+  dsimp
+  let L : Fq params → Error := fun y =>
+    Preliminaries.leftSandwichExpectation ψbi
+      (uniformDistribution (SliceQuestion params))
+      family.meas (((M y).toSubMeas).total)
+  let C : Fq params → Error := fun y =>
+    Preliminaries.middleSandwichExpectation ψbi
+      (uniformDistribution (SliceQuestion params))
+      family.meas (((M y).toSubMeas).total)
+  have hselfG_bip := switcherooCompletePartSelfConsistency_bip params ψbi family zeta hselfG
+  have hpoint : ∀ y, |L y - C y| ≤ 2 * Real.sqrt zeta := by
+    intro y
+    have hB : Preliminaries.OpBounded01 (((M y).toSubMeas).total) := by
+      refine ⟨?_, ?_⟩
+      · exact SubMeas.total_nonneg ((M y).toSubMeas)
+      · exact sub_nonneg.mpr ((M y).toSubMeas).total_le_one
+    simpa [L, C] using
+      (Preliminaries.switchSandwich ψbi
+        (uniformDistribution (SliceQuestion params))
+        hnorm
+        (uniformDistribution_weight_sum_le_one (SliceQuestion params))
+        family.meas
+        (((M y).toSubMeas).total)
+        hB
+        zeta
+        hselfG_bip).leftSandwichTransfer
+  calc
+    |avgOver (uniformDistribution (SliceQuestion params)) L -
+        avgOver (uniformDistribution (SliceQuestion params)) C|
+      = |avgOver (uniformDistribution (SliceQuestion params)) (fun y => L y - C y)| := by
+          simp [avgOver, Finset.sum_sub_distrib, mul_sub]
+    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun y => |L y - C y|) := by
+          exact avgOver_abs_le_avgOver_abs _ _
+    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun _ => 2 * Real.sqrt zeta) := by
+          exact avgOver_mono _ _ _ hpoint
+    _ = 2 * Real.sqrt zeta := by
+          have hq0 : (params.q : Error) ≠ 0 := by
+            exact_mod_cast Nat.ne_of_gt params.hq
+          simp [avgOver, uniformDistribution]
+          field_simp [hq0]
 
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
@@ -2358,7 +2500,7 @@ lemma ldSandwichLineOnePoint
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : family.Bounded strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (hfacts : GHatFactsStatement params strategy.state family gamma zeta)
     (k i : ℕ)
     (hi : i < k) :
@@ -2386,7 +2528,7 @@ lemma hBConsistency
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : family.Bounded strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hline : ∀ i : ℕ, i < k →
       LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i) :
@@ -2428,7 +2570,7 @@ lemma overAllOutcomes
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : family.Bounded strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
   /-
@@ -2450,7 +2592,7 @@ lemma fromHToG
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : family.Bounded strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hhalf : CommuteGHalfSandwichStatement params ψbi family gamma zeta k) :
     FromHToGStatement params strategy family gamma zeta k := by
@@ -2499,7 +2641,7 @@ theorem ldPastingNCompleteness
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : family.Bounded strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k) :
     LdPastingNCompletenessStatement params strategy family kappa

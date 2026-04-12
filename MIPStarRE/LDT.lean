@@ -13,6 +13,7 @@ import MIPStarRE.LDT.Preliminaries.Triangles
 import MIPStarRE.LDT.Preliminaries.SelfConsistency
 import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
+import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer
 import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
 import MIPStarRE.LDT.MainInductionStep.Defs
