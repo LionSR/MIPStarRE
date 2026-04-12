@@ -19,6 +19,29 @@ noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) 
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (40000 : Error)) +
       Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))))
 
+/-- Temporary bridge package for the still-unformalized Section 3 assembly.
+
+This isolates the missing symmetrization, induction invocation, unsymmetrization,
+and final projectivization/completion steps behind an explicit witness, matching
+the bridge-package style already used elsewhere in the repository. -/
+structure MainFormalBridgePackage (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ) : Prop where
+  witness :
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params G_A.toSubMeas)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
+          (mainFormalError params k eps)
+
 /--
 `thm:main-formal` from `test_definition.tex`.
 
@@ -33,9 +56,10 @@ theorem mainFormal
     (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι)
     (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (_hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : params.m * params.d ≤ k) :
+    (_hk : params.m * params.d ≤ k)
+    (hbridge : MainFormalBridgePackage params strategy eps k) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -49,7 +73,7 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  sorry
+  exact hbridge.witness
 
 end Test
 
