@@ -4,53 +4,81 @@ Last updated: 2026-04-12
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
-- **Current**: 28 executable sorrys across 7 files
-- **Eliminated**: 38 executable sorrys
+- **Current**: 19 executable sorrys across 6 files
+- **Eliminated**: 47 executable sorrys
 - **Infrastructure fixes landed on this branch**:
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
 - **PRs already recorded in this file**: 4
 
+## Overnight Build Pass
+- **Timestamp**: 2026-04-12 (current worktree scan)
+- **Current ownership**: OpenCode
+- **Executable sorry inventory in `MIPStarRE/LDT/`**:
+  - `Pasting/Theorems.lean`: 11
+  - `Commutativity/Theorems.lean`: 2
+  - `CommutativityPoints/Theorem.lean`: 1
+  - `MakingMeasurementsProjective/Projectivization.lean`: 1
+  - `MakingMeasurementsProjective/Theorems.lean`: 2
+  - `Test/MainTheorem.lean`: 1
+- **Dependency spine**:
+  - Section 10: `sampledDiagonalLineConsistency` -> `sampledDiagonalLineApproximation` -> `sampledDiagonalLineApproximation_pointWithDiagonalLine` -> `commutativityPoints`
+  - Section 11: `commDataProcessedG.evaluatedSliceCommutation` -> `fullSliceCommutation_of_evaluated_on_evaluated_questions` -> `comMain`
+  - Section 12: `commutativitySwitcheroo` -> `commuteGHalfSandwich` -> `ldSandwichLineOnePoint` -> `hBConsistency` / `hAConsistency` -> `overAllOutcomes` / `fromHToG` / `chernoffBernoulliMatrix` -> `ldPastingNCompleteness` -> `ldPastingSubMeas` -> `ldPasting`
+- **Concrete blocker notes**:
+  - `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine` is now the only remaining Section 10 gap, and it is a real theorem/interface blocker: `RestrictedDiagonalSample` controls only base-point evaluation `(u, v, t = 0)`, while `pointWithDiagonalLineDistribution` ranges over arbitrary `(line, t)`. The repo currently exposes no line-reparameterization invariance theorem identifying these question families.
+  - `MakingMeasurementsProjective.orthonormalization` still lacks a source for `ψ.IsNormalized`; the available completion theorem requires it.
+  - `MakingMeasurementsProjective.exists_fullNaimarkData` still lacks the large lifted-register embedding/packaging layer.
+  - `MakingMeasurementsProjective.spectralTruncateAlmostProjective` still lacks the bridge from per-outcome spectral truncations to a concrete ambient `ProjSubMeas` witness.
+- **Active subtasks**:
+  - decide whether the remaining Section 10 transport theorem should be re-stated in a base-point form, or whether a new geometric-line reparameterization API should be added first
+  - if Section 10 stays blocked, return to the substantive Section 11/12 core lemmas (`commDataProcessedG`, `commutativitySwitcheroo`) rather than local wrappers
+- **Best next step**:
+  - `sampledDiagonalLineConsistency` and `sampledDiagonalLineApproximation` are now proved, and `lake env lean MIPStarRE/LDT/CommutativityPoints/Theorem.lean` succeeds with only the remaining transport `sorry`. The next productive move is source-of-truth/API work for that transport gap, or a shift back to the deep Section 11/12 core lemmas.
+
 ## Current Pasting Pass
-- **Scope**: `MIPStarRE/LDT/Pasting/Theorems.lean`
+- **Scope**: `MIPStarRE/LDT/Pasting`
 - **Executable sorrys in scope**: 11
 - **Remaining sorry checklist**:
-  - `ldPasting`
-  - `ldPastingSubMeas`
-  - `commutativitySwitcheroo`
-  - `commuteGHalfSandwich`
-  - `ldSandwichLineOnePoint`
-  - `hBConsistency`
-  - `hAConsistency`
-  - `overAllOutcomes`
-  - `fromHToG`
-  - `chernoffBernoulliMatrix`
-  - `ldPastingNCompleteness`
+  - `Theorems.ldPasting`
+  - `Theorems.ldPastingSubMeas`
+  - `Theorems.commutativitySwitcheroo`
+  - `Theorems.commuteGHalfSandwich`
+  - `Theorems.ldSandwichLineOnePoint`
+  - `Theorems.hBConsistency`
+  - `Theorems.hAConsistency`
+  - `Theorems.overAllOutcomes`
+  - `Theorems.fromHToG`
+  - `Theorems.chernoffBernoulliMatrix`
+  - `Theorems.ldPastingNCompleteness`
 - **Priority order**:
-  - `commutativitySwitcheroo` (statement repaired; now blocked on a mixed-target comparison helper)
-  - `commuteGHalfSandwich`
-  - `ldSandwichLineOnePoint`
-  - `hBConsistency`
-  - `hAConsistency`
-  - `overAllOutcomes`
-  - `fromHToG`
-  - `chernoffBernoulliMatrix`
-  - `ldPastingNCompleteness`
-  - `ldPastingSubMeas`
-  - `ldPasting`
+  - `Theorems.commutativitySwitcheroo`
+  - `Theorems.commuteGHalfSandwich`
+  - `Theorems.ldSandwichLineOnePoint`
+  - `Theorems.hBConsistency`
+  - `Theorems.overAllOutcomes`
+  - `Theorems.fromHToG`
+  - `Theorems.chernoffBernoulliMatrix`
+  - `Theorems.ldPastingNCompleteness`
+  - `Theorems.hAConsistency`
+  - `Theorems.ldPastingSubMeas`
+  - `Theorems.ldPasting`
 - **Wrapper/progression notes**:
   - likely wrapper/assembly theorems once prerequisites exist: `hAConsistency`,
     `ldPastingNCompleteness`, `ldPastingSubMeas`, `ldPasting`
   - intermediate bookkeeping proofs: `commuteGHalfSandwich`, `hBConsistency`
   - substantive mathematical gaps: `commutativitySwitcheroo`,
-    `ldSandwichLineOnePoint`, `overAllOutcomes`, `fromHToG`,
-    `chernoffBernoulliMatrix`
-  - current switcheroo blocker: after adding `PermInvState ψbi`, the remaining
-    gap is a helper that compares the mixed targets `G ⊗ M` and `M ⊗ G` using
-    symmetry together with self-consistency
-  - current Chernoff blocker: after adding `ψ.IsNormalized`, the remaining work
-    is the spectral/CFC argument from the paper rather than a statement bug
+    `ldSandwichLineOnePoint`, `overAllOutcomes`,
+    `fromHToG`, `chernoffBernoulliMatrix`
+  - the old `interpolateCompletedSlices` degree proof gap is now removed by making
+    the postprocessing map choose a globally consistent witness from `Global_τ(x)`;
+    this matches the actual restricted call site in `pastedInterpolationFamily`
+  - `commutativitySwitcheroo` remains on the same local blocker: compare the
+    mixed centers `G ⊗ M` and `M ⊗ G` using permutation invariance together with
+    slice self-consistency
+  - `chernoffBernoulliMatrix` still looks like a genuine spectral/CFC step from
+    the paper rather than a statement bug
 - **Verification note**:
   - requested command `lake build MIPStarRE.LDT.MainInductionStep` is not a valid
     Lake target in this repo because `MIPStarRE/LDT/MainInductionStep.lean` does
@@ -61,26 +89,24 @@ Last updated: 2026-04-12
     `PastingBoundednessInput` has now been fixed in `Pasting/Theorems.lean`
   - `MainInductionStep/Theorems.lean` has been updated to pass the full
     `PastingBoundednessInput` after the `ldPasting` source signature repair
-  - local source check `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean`
-    succeeds, so the current blockers are downstream verification noise rather
-    than target-local elaboration failures
+  - last known local source check before this pass: `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean`
+    succeeded with the remaining target-local `sorry`s
   - `lake build MIPStarRE.LDT.MainInductionStep.Theorems` now succeeds again
     (with existing unrelated `sorry` warnings only)
 - **Ownership / subtask board**:
-  - OpenCode: active owner for `commutativitySwitcheroo`, integration, and `jobs.md`
+  - OpenCode: active owner for all `Pasting` sorry elimination, integration, and `jobs.md`
   - survey subagent (`ses_27ed26ed3ffeatQRJFxU2U1302`): completed wrapper-vs-gap triage
-- proof subagent (`ses_27e9c82ebffeZRRK9nqxOZZ1q9`): bounded attempt on
-  `commutativitySwitcheroo`; returned exact Lean blockers without edits
-- proof subagent (`ses_27e3de1ddffesRPWBBZLAFRg7Z`): reassessed
-  `commutativitySwitcheroo` after the statement repair; the next concrete need is
-  a mixed-target comparison helper rather than a second positive-term rewrite
-- next focused subtask: derive the mixed-target comparison inside
-  `commutativitySwitcheroo`, then return to the `chi` / `zeta` transfers built
-  on top of `Preliminaries.switchSandwich` / `cabApproxDelta`
+  - proof subagent (`ses_27e9c82ebffeZRRK9nqxOZZ1q9`): bounded attempt on
+    `commutativitySwitcheroo`; returned exact Lean blockers without edits
+  - proof subagent (`ses_27e3de1ddffesRPWBBZLAFRg7Z`): reassessed
+    `commutativitySwitcheroo` after the statement repair; the next concrete need is
+    a mixed-target comparison helper rather than a second positive-term rewrite
+  - current active subtask: finish the mixed-center helper inside
+    `commutativitySwitcheroo`, then propagate that through the sandwich chain
 - **Best next step**:
-  - continue `commutativitySwitcheroo` by proving the mixed-target comparison
-    helper, then return to the `chi` / `zeta` transfers for the third and fourth
-    terms
+  - continue `commutativitySwitcheroo` by rewriting the mixed centers to tensor
+    form and applying permutation invariance / self-consistency to compare
+    `G ⊗ M` with `M ⊗ G`
 
 ## Active Strategy
 - Highest-leverage live chain is now Section 12 pasting.
