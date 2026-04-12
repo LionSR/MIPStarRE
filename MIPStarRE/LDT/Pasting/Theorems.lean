@@ -749,6 +749,148 @@ private lemma avgOver_uniform_slicePair
           (fun x => avgOver (uniformDistribution (SliceQuestion params)) (fun y => f x y)) := by
           simp [avgOver, uniformDistribution, Finset.mul_sum]
 
+private lemma avgOver_abs_le_avgOver_abs
+    {α : Type*} [DecidableEq α]
+    (𝒟 : Distribution α) (f : α → Error) :
+    |avgOver 𝒟 f| ≤ avgOver 𝒟 (fun a => |f a|) := by
+  unfold avgOver
+  calc
+    |∑ a ∈ 𝒟.support, 𝒟.weight a * f a|
+      ≤ ∑ a ∈ 𝒟.support, |𝒟.weight a * f a| := by
+          exact Finset.abs_sum_le_sum_abs _ _
+    _ = ∑ a ∈ 𝒟.support, 𝒟.weight a * |f a| := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [abs_mul, abs_of_nonneg (𝒟.nonnegative a)]
+    _ = avgOver 𝒟 (fun a => |f a|) := by
+          rfl
+
+private lemma switcheroo_first_term_close
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (omega : Error)
+    (hselfM : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (switcherooSelfConsistencyLeft params M)
+      (switcherooSelfConsistencyRight params M)
+      omega) :
+    let firstTerm :=
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun x => Preliminaries.leftSandwichExpectation ψbi
+          (uniformDistribution (SliceQuestion params))
+          M ((completePartSubMeas params family x).total))
+    let commonTerm :=
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun x => Preliminaries.middleSandwichExpectation ψbi
+          (uniformDistribution (SliceQuestion params))
+          M ((completePartSubMeas params family x).total))
+    |firstTerm - commonTerm| ≤ 2 * Real.sqrt omega := by
+  dsimp
+  let L : Fq params → Error := fun x =>
+    Preliminaries.leftSandwichExpectation ψbi
+      (uniformDistribution (SliceQuestion params))
+      M ((completePartSubMeas params family x).total)
+  let C : Fq params → Error := fun x =>
+    Preliminaries.middleSandwichExpectation ψbi
+      (uniformDistribution (SliceQuestion params))
+      M ((completePartSubMeas params family x).total)
+  have hselfM_bip := switcherooSelfConsistency_bip params ψbi M omega hselfM
+  have hpoint : ∀ x, |L x - C x| ≤ 2 * Real.sqrt omega := by
+    intro x
+    have hB : Preliminaries.OpBounded01 ((completePartSubMeas params family x).total) := by
+      refine ⟨?_, ?_⟩
+      · exact SubMeas.total_nonneg (completePartSubMeas params family x)
+      · exact sub_nonneg.mpr (completePartSubMeas params family x).total_le_one
+    simpa [L, C] using
+      (Preliminaries.switchSandwich ψbi
+        (uniformDistribution (SliceQuestion params))
+        hnorm
+        (uniformDistribution_weight_sum_le_one (SliceQuestion params))
+        M
+        ((completePartSubMeas params family x).total)
+        hB
+        omega
+        hselfM_bip).leftSandwichTransfer
+  calc
+    |avgOver (uniformDistribution (SliceQuestion params)) L -
+        avgOver (uniformDistribution (SliceQuestion params)) C|
+      = |avgOver (uniformDistribution (SliceQuestion params)) (fun x => L x - C x)| := by
+          simp [avgOver, Finset.sum_sub_distrib, mul_sub]
+    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun x => |L x - C x|) := by
+          exact avgOver_abs_le_avgOver_abs _ _
+    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun _ => 2 * Real.sqrt omega) := by
+          exact avgOver_mono _ _ _ hpoint
+    _ = 2 * Real.sqrt omega := by
+          have hq0 : (params.q : Error) ≠ 0 := by
+            exact_mod_cast Nat.ne_of_gt params.hq
+          simp [avgOver, uniformDistribution]
+          field_simp [hq0]
+
+private lemma switcheroo_second_term_close
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (zeta : Error)
+    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
+    let secondTerm :=
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun y => Preliminaries.leftSandwichExpectation ψbi
+          (uniformDistribution (SliceQuestion params))
+          family.meas (((M y).toSubMeas).total))
+    let commonTerm :=
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun y => Preliminaries.middleSandwichExpectation ψbi
+          (uniformDistribution (SliceQuestion params))
+          family.meas (((M y).toSubMeas).total))
+    |secondTerm - commonTerm| ≤ 2 * Real.sqrt zeta := by
+  dsimp
+  let L : Fq params → Error := fun y =>
+    Preliminaries.leftSandwichExpectation ψbi
+      (uniformDistribution (SliceQuestion params))
+      family.meas (((M y).toSubMeas).total)
+  let C : Fq params → Error := fun y =>
+    Preliminaries.middleSandwichExpectation ψbi
+      (uniformDistribution (SliceQuestion params))
+      family.meas (((M y).toSubMeas).total)
+  have hselfG_bip := switcherooCompletePartSelfConsistency_bip params ψbi family zeta hselfG
+  have hpoint : ∀ y, |L y - C y| ≤ 2 * Real.sqrt zeta := by
+    intro y
+    have hB : Preliminaries.OpBounded01 (((M y).toSubMeas).total) := by
+      refine ⟨?_, ?_⟩
+      · exact SubMeas.total_nonneg ((M y).toSubMeas)
+      · exact sub_nonneg.mpr ((M y).toSubMeas).total_le_one
+    simpa [L, C] using
+      (Preliminaries.switchSandwich ψbi
+        (uniformDistribution (SliceQuestion params))
+        hnorm
+        (uniformDistribution_weight_sum_le_one (SliceQuestion params))
+        family.meas
+        (((M y).toSubMeas).total)
+        hB
+        zeta
+        hselfG_bip).leftSandwichTransfer
+  calc
+    |avgOver (uniformDistribution (SliceQuestion params)) L -
+        avgOver (uniformDistribution (SliceQuestion params)) C|
+      = |avgOver (uniformDistribution (SliceQuestion params)) (fun y => L y - C y)| := by
+          simp [avgOver, Finset.sum_sub_distrib, mul_sub]
+    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun y => |L y - C y|) := by
+          exact avgOver_abs_le_avgOver_abs _ _
+    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun _ => 2 * Real.sqrt zeta) := by
+          exact avgOver_mono _ _ _ hpoint
+    _ = 2 * Real.sqrt zeta := by
+          have hq0 : (params.q : Error) ≠ 0 := by
+            exact_mod_cast Nat.ne_of_gt params.hq
+          simp [avgOver, uniformDistribution]
+          field_simp [hq0]
+
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -774,7 +916,69 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
   `references/ldt-paper/ld-pasting.tex`.
   This is the main aggregate-commutation step upgrading commutation with each
   `G^x_g` to commutation with the total `G^x`.
+
+  The paper informally compares all four `qSDDOp` expansion terms to a single
+  scalar center. In Lean it is cleaner to use two centers whose contributions
+  cancel algebraically:
+
+  * `G ⊗ M` for the first/third terms
+  * `M ⊗ G` for the second/fourth terms
+
+  This avoids inserting an extra symmetry assumption on `ψbi` at this stage.
   -/
+  let 𝒟x : Distribution (SliceQuestion params) :=
+    uniformDistribution (SliceQuestion params)
+  let Gavg : SubMeas (Polynomial params) ι := IdxPolyFamily.averagedSubMeas family
+  let Mavg : SubMeas Outcome ι :=
+    averageIdxSubMeas 𝒟x (IdxProjSubMeas.toIdxSubMeas M)
+      (uniformDistribution_weight_sum_le_one (SliceQuestion params))
+  have h𝒟x : ∑ x ∈ 𝒟x.support, 𝒟x.weight x ≤ 1 := by
+    simpa [𝒟x] using uniformDistribution_weight_sum_le_one (SliceQuestion params)
+  have hselfM_bip := switcherooSelfConsistency_bip params ψbi M omega hselfM
+  let firstTerm : Error :=
+    MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x M Gavg.total
+  let centerGM : Error :=
+    MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x M Gavg.total
+  have hfirst :
+      |firstTerm - centerGM| ≤ 2 * Real.sqrt omega := by
+    have hswitch :=
+      MIPStarRE.LDT.Preliminaries.switchSandwich ψbi 𝒟x hnorm h𝒟x M Gavg.total
+        ⟨Gavg.total_nonneg, sub_nonneg.mpr Gavg.total_le_one⟩ omega hselfM_bip
+    simpa [firstTerm, centerGM] using hswitch.leftSandwichTransfer
+  let secondTerm : Error :=
+    MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x
+      (fun x =>
+        { toSubMeas := completePartSubMeas params family x
+          proj := by
+            intro u
+            cases u
+            have hsingle :
+                (completePartSubMeas params family x).outcome () =
+                  (completePartSubMeas params family x).total := by
+              rw [← (completePartSubMeas params family x).sum_eq_total]
+              simp [completePartSubMeas]
+            rw [hsingle]
+            simpa [completePartSubMeas, postprocess_total] using
+              MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x) })
+      Mavg.total
+  let centerMG : Error :=
+    MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x
+      (fun x =>
+        { toSubMeas := completePartSubMeas params family x
+          proj := by
+            intro u
+            cases u
+            have hsingle :
+                (completePartSubMeas params family x).outcome () =
+                  (completePartSubMeas params family x).total := by
+              rw [← (completePartSubMeas params family x).sum_eq_total]
+              simp [completePartSubMeas]
+            rw [hsingle]
+            simpa [completePartSubMeas, postprocess_total] using
+              MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x) })
+      Mavg.total
+  have hMavg_bounded : MIPStarRE.LDT.Preliminaries.OpBounded01 Mavg.total := by
+    exact ⟨Mavg.total_nonneg, sub_nonneg.mpr Mavg.total_le_one⟩
   sorry
 
 /-- Reindexing a uniform slice-pair average along `Prod.swap` preserves `SDDOpRel`. -/

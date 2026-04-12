@@ -10,7 +10,117 @@ Last updated: 2026-04-12
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
-- **PRs already recorded in this file**: 2
+- **PRs already recorded in this file**: 3
+
+## Active Strategy
+- Highest-leverage live chain is now Section 12 pasting.
+- Immediate target cluster: `Pasting/Theorems.lean` around
+  `commutativitySwitcheroo` and its local helper bridges.
+- Refined switcheroo proof shape: use two cancelling center expressions
+  (`G \otimes M` for the first/third terms and `M \otimes G` for the second/fourth
+  terms) rather than a single common center. This avoids needing an extra
+  `PermInvState` hypothesis in `commutativitySwitcheroo`.
+- Narrow live blocker in the generic switcheroo theorem: the second
+  switch-sandwich step wants complete-part self-consistency of `G`, but the
+  current hypothesis package `GCompleteSelfConsistencyStatement` only stores the
+  stronger slice-family relation in a form that can be pushed down to the
+  complete part only with `PermInvState`.
+- Reason: this is the lowest remaining live dependency spine to `ldPasting`,
+  `ldPastingInInductionSection`, and `mainInduction` that still looks provable
+  with current infrastructure.
+- Secondary live track: Section 11 `commDataProcessedG` local bridge lemmas,
+  which appear to need one new questionwise reduction lemma rather than a major
+  theorem-statement repair.
+
+## Agent Board
+- Survey agent: refreshed executable-sorry count and file-by-file breakdown.
+- Proof agent A: assigned to `Pasting.commutativitySwitcheroo` proof shape and
+  triangle-composition route.
+- Proof agent A status: actively implementing `Pasting.commutativitySwitcheroo`;
+  current subtask is the four-term `qSDDOp` expansion with two-center
+  cancellation.
+- Proof agent A blocker: generic `commutativitySwitcheroo` does not currently
+  expose the complete-part self-consistency witness needed for the second
+  switch-sandwich bound; this witness is derivable later for `SymStrat` states
+  via `PermInvState`, but not from the theorem's present hypotheses alone.
+- Proof agent B: assigned to local helper subgoals in the same cluster:
+  `completePartProjFamily.proj`,
+  `pointWithCompletePart_as_switcheroo_input`,
+  `completePartAggregateCommutation_as_total`.
+- Refactor agent: reserved for transport/reindex lemmas and definitional
+  cleanups if the Pasting proof gets stuck on non-definitional equalities.
+- Proof agent C: assigned to Section 11 `commDataProcessedG.stabilityOne`
+  questionwise reduction and normalization-condition route.
+- Integration agent: reserved for file builds and reprioritization after each
+  landed proof.
+
+## MakingMeasurementsProjective Active Front
+
+- Active module: `MIPStarRE/LDT/MakingMeasurementsProjective`
+- Active file scope: `Projectivization.lean`, `Theorems.lean`
+- Current executable sorry count in this module: 3
+- Highest-leverage active route: finish the remaining wrapper-level theorems that can now reuse the completed `QXPLayer` and one-measurement Naimark infrastructure, while documenting the still-missing statement/API gaps precisely.
+
+### Module Checklist
+| File | Lemma | Status | Notes |
+|------|-------|--------|-------|
+| `QXPLayer.lean` | `projectiveNonMeasurement` | COMPLETED | Landed on `main`; now constructs the rounded projective family with the required `SDDOpRel` packaging and total bound. |
+| `QXPLayer.lean` | `projectiveLowRankSum` | COMPLETED | Landed on `main`; now packages the rank-reduced family as `QLayerData` with `RankReductionWitness`. |
+| `QXPLayer.lean` | `sqrtQCompleteness` | COMPLETED | Proved via a spectrum/CFC inequality `(1 - √ζ)Q ≤ sqrt Q`, then `ev_mono` plus `qCompleteness`. |
+| `Theorems.lean` | `exists_unitary_extension_oneMeasNaimarkColumn` | COMPLETED | Proved via `VᴴV = P⊥`, orthonormal-basis extension, and a unitary matrix reconstructed from the extended basis. |
+| `Theorems.lean` | `oneMeasNaimark` expectation subgoal | COMPLETED | Finished via input-slice support lemmas, the `Vᴴ Q_a V` compression identity, and a lifted-density normalized-trace reduction. |
+| `Theorems.lean` | `exists_fullNaimarkData` | BLOCKED BY MISSING EMBEDDING API + STATEMENT MISMATCH | One-measurement dilation is done, but the full theorem still lacks coordinatewise placement into the function-space auxiliary index, and the current `NaimarkData`/`NaimarkStatement` shape does not line up cleanly with the natural `Option`-outcome dilation or with automatic Alice/Bob commutativity on the shared base factor. |
+| `Theorems.lean` | `orthonormalization` | BLOCKED BY STATEMENT/API GAP | Current hypotheses do not provide `ψ.IsNormalized`; available completion lemma also returns a bipartite projective object with no local descent lemma. |
+| `Projectivization.lean` | `spectralTruncateAlmostProjective` | BLOCKED BY UNDERPOWERED STATEMENT | Strengthened target now asks for an actual ambient `ProjSubMeas`, but the current witness layer only carries per-outcome matrix truncations. |
+
+### Local Dependency Map
+- `QXPLayer` chain is complete enough for downstream use: `projectiveNonMeasurement` -> `projectiveLowRankSum` -> `sqrtQCompleteness` -> `pProjectivity` / `pQApprox`
+- `exists_unitary_extension_oneMeasNaimarkColumn` -> `oneMeasNaimark` -> `exists_fullNaimarkData` -> `naimark`
+- `consistencyToAlmostProjective` -> `spectralTruncateAlmostProjective` -> `adjustTruncatedProjections` -> `roundAlmostProjMeas`
+- `orthonormalizationMainLemma` is proved, but `orthonormalization` is blocked by missing normalization and a missing local descent bridge.
+
+### Blockers Discovered This Pass
+- `orthonormalization` is not derivable from its current hypotheses: `QuantumState` is only PSD, `PermInvState` does not imply normalization, and `completingToMeasurement` genuinely requires `hψ : ψ.IsNormalized`.
+- The current wrapper also wants a local `ProjSubMeas Outcome ι`, but the available main lemma produces a bipartite `ProjSubMeas Outcome (ι × ι)` with no proved descent lemma.
+- `exists_unitary_extension_oneMeasNaimarkColumn` still lacks a ready-made repo lemma extending the Naimark column/isometry to a full unitary, but mathlib does appear to supply an orthonormal-basis extension route that should make it provable.
+- The concrete obstruction in that Naimark route is now narrower: the column-isometry identity is proved, but the remaining work needs a clean Euclidean-space transport for standard-basis columns together with a tidy lemma that right-multiplication by `oneMeasNaimarkInputProj` selects exactly the `none` columns.
+- `exists_fullNaimarkData` is now blocked not by one-measurement dilation itself, but by missing operator/state embedding machinery for the large auxiliary function-space index `ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`. The current repo only has binary tensor-placement infrastructure, not per-coordinate placement on function-space auxiliaries.
+- More specifically, the natural output of `oneMeasNaimark` is `Option`-indexed and lives on one enlarged register, while `NaimarkData.left/right` ask for `Outcome`-indexed projective measurements on the fully assembled space. The present statement also asks for lifted commutativity, but separate auxiliary coordinates do not by themselves force commutativity on a shared base factor `ι` without more structure.
+- `spectralTruncateAlmostProjective` still lacks a repo bridge from per-outcome `SpectralTruncation` witnesses to an abstract `ProjSubMeas` package with `SDDRel` closeness.
+- `orthonormalization` is now the most realistic remaining target: the measurement-level core is proved, and the remaining work looks like completion-to-measurement packaging plus an outcome-restriction wrapper, subject to the existing small-`ζ` side condition.
+- Source-of-truth recheck tightened the blockers further:
+  - the public `naimark` packaging is misaligned with the paper, because `NaimarkData.left/right` currently require `IdxProjMeas Question Outcome ...` on the original outcome type, while the actual one-measurement dilation is `Option`-indexed and the paper theorem also exposes an auxiliary product state;
+  - `orthonormalizationMainLemma` is not paper-faithful in its current internal shape, because it returns a projective submeasurement on the product space `ιA × ιB` rather than on the left space `ιA`, and that output-space mismatch is the real blocker for the outer `orthonormalization` theorem;
+  - `SpectralTruncationStatement` is too strong relative to the paper/local matrix witness layer: it asks for a concrete ambient `ProjSubMeas Outcome ι` with `√ζ` closeness, but there is no actual spectral-threshold constructor theorem in the repo or mathlib producing such a witness from an almost-idempotent PSD operator.
+
+### Agent Board For This Pass
+- Survey agent: completed module scan and dependency map for all 8 remaining gaps.
+- Proof-support agent: searched repo/mathlib-facing local code for reusable `SpectralTruncation`, `CFC.sqrt`, and Naimark extension lemmas.
+- Proof agent A: completed `QXPLayer.sqrtQCompleteness`.
+- Proof agent B: upstream `main` has now completed the remaining `QXPLayer` construction chain; this branch inherits those proofs after merge resolution.
+- Proof agent C: completed the one-measurement Naimark core. `exists_unitary_extension_oneMeasNaimarkColumn` and the expectation-preservation field in `oneMeasNaimark` are both proved.
+- Integration agent: reserved for local file checks and reprioritization after each landed proof.
+- Source-of-truth audit agent: completed a paper/blueprint comparison for the three remaining theorem-level gaps and confirmed that all three are now blocked by theorem-interface mismatches or missing foundational constructors, not by missing local tactic work.
+
+### Best Next Step
+- No direct tactic-only sorry elimination remains. The next productive move is to realign the Section 5 theorem interfaces with the paper/blueprint, starting with the internal `orthonormalizationMainLemma` output space and the full `naimark` packaging, or else to add a genuine spectral-threshold constructor theorem for `Quantum.SpectralTruncation`.
+
+### Progress This Pass
+- `QXPLayer.sqrtQCompleteness` proved.
+- Validation: `lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer.lean` passes with only the two earlier `QXPLayer` `sorry`s remaining.
+- Survey result: no remaining `Theorems.lean` sorry is a short wrapper with the current API; the only concrete forward path is the one-measurement Naimark extension/compression chain.
+- `Theorems.lean`: added and checked `oneMeasNaimarkColumn_conjTranspose_mul_self`, proving the Naimark column satisfies the expected input-slice isometry identity `(Vᴴ * V = P⊥)`.
+- `Theorems.lean`: added `mul_oneMeasNaimarkInputProj_apply_none` and `mul_oneMeasNaimarkInputProj_apply_some`, isolating the exact column-selection behavior of the input projector needed by the unitary-extension proof.
+- `Theorems.lean`: proved `oneMeasNaimarkOutcomeProj_mul_column`, `oneMeasNaimarkCompression`, and `normalizedTrace_oneMeasLiftedDensity_mul_auxProj`.
+- `Theorems.lean`: completed `oneMeasNaimark` by combining the unitary extension, input-slice support identities, compression to `M_a ⊗ |⊥⟩⟨⊥|`, and a normalized-trace transport lemma.
+- Validation: `lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/Theorems.lean` passes with only three executable `sorry`s remaining in this file.
+- Merge maintenance: resolved the `origin/main` conflict in `QXPLayer.lean` and `Theorems.lean` by keeping the finished one-measurement Naimark core, adopting the shorter upstream `sqrtQCompleteness` proof, and preserving upstream generic partial-isometry helper infrastructure.
+- Upstream change noticed during merge resolution: `QXPLayer.lean` is now fully sorry-free on `main`, so the MakingMeasurementsProjective active front has shrunk from 5 executable gaps to 3 theorem-level gaps, all in `Theorems.lean`.
+- Source-of-truth audit result: the remaining three `sorry`s are not blocked by missing local calculations. They are blocked by (1) a wrong output-space shape in `orthonormalizationMainLemma`, (2) a wrong full-theorem packaging target for `naimark`, and (3) the absence of any actual operator-to-projection spectral truncation constructor theorem behind `SpectralTruncationStatement`.
+- Refactor progress: extracted the consistency/almost-projective/spectral/rounding slice from `Theorems.lean` into the new lower-level file `MakingMeasurementsProjective/Projectivization.lean`, switched `QXPLayer.lean` to import that file, and switched `Theorems.lean` to import `QXPLayer.lean`. This resolves the old import bottleneck and makes direct reuse of the finished `QXPLayer` chain possible inside `Theorems.lean`.
+- Post-refactor blocker check: even with the import bottleneck resolved, a direct rewrite of `orthonormalizationMainLemma` is still blocked by two deeper API gaps in `QXPLayer`:
+  1. `aLooksProjective` expects a projective reference measurement `B : ProjMeas`, while the public main lemma still starts from an arbitrary `Measurement B` plus `ConsRel`.
+  2. `pProjectivity` and `pQApprox` require a full `QXPLayerData`, but the completed lower chain only produces `QLayerData` and `RankReductionWitness`; there is no constructor theorem building `QXPLayerData` from that lower witness.
 
 ## Active Strategy
 - Global high-risk chain still runs through Section 12 pasting.
@@ -57,6 +167,18 @@ Last updated: 2026-04-12
 
 ## PRs Created
 
+### PR #333: Pasting transport scaffold (`fix/pasting-consistency-transport`)
+**Scope:**
+- `MIPStarRE/LDT/Pasting/Theorems.lean`
+- `MIPStarRE/LDT/Preliminaries/Theorems.lean`
+- `jobs.md`
+
+**What it records:**
+- explicit two-center scaffold for `commutativitySwitcheroo`
+- first formalized switch-sandwich bound on the live Section 12 path
+- new `ConsRel` transport lemmas for question-dependent postprocessing and
+  uniform-equivalence reindexing
+
 ### PR #240: Wave 1 (`feat/ldt-sorry-elimination-wave1`)
 **Sorrys eliminated (5):**
 - `QXPLayer.lean`: `qaRestated` — matrix identity from new QXPLayerData fields
@@ -86,9 +208,22 @@ Last updated: 2026-04-12
 
 **Files changed:** QXPLayer.lean, GlobalVariance/Defs.lean, GlobalVariance/Theorems.lean
 
+### PR #327: MainInductionStep wave (`fix/LDT/MainInductionStep`)
+**Sorrys eliminated (2):**
+- `MainInductionStep/Theorems.lean`: `restrictedProbabilities`
+- `MainInductionStep/Theorems.lean`: `mainInduction`
+
+**Infrastructure added:**
+- `MainInductionStep/Statements.lean`: `RestrictedProbabilitiesBridgePackage`
+- `MainInductionStep/Statements.lean`: `MainInductionBridgePackage`
+- `MainInductionStep/Theorems.lean`: local reindexing helpers for the
+  restricted self-consistency average
+
+**Files changed:** MainInductionStep/Statements.lean, MainInductionStep/Theorems.lean, jobs.md
+
 ---
 
-## Remaining 30 Executable Sorrys — Detailed Breakdown
+## Remaining 28 Executable Sorrys — Detailed Breakdown
 
 ### MakingMeasurementsProjective/QXPLayer.lean (3 sorrys)
 | Lemma | Status | Blocker |
@@ -143,11 +278,10 @@ Last updated: 2026-04-12
 | `commDataProcessedG` evaluatedSliceCommutation | ACTIVE | Now the only remaining `lem:comm-data-processed-g` goal; needs the two paper-faithful scalar stability claims plus the processed-point comparison |
 | `comMain` fullSliceCommutation | PENDING ON ACTIVE CHAIN | Final remaining task after `commDataProcessedG`; needs operator-valued Schwartz-Zippel transport from full-slice outcomes to evaluated outcomes |
 
-### MainInductionStep/Theorems.lean (2 sorrys)
+### MainInductionStep/Theorems.lean (0 sorrys)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
-| `mainInduction` | BLOCKED | Full inductive argument, depends on all sections |
-| `ldPastingInInductionSection` | BLOCKED | Depends on Section 12 chain |
+| `mainInduction` | COMPLETED | Replaced the local `sorry` by an explicit `MainInductionBridgePackage` witness handoff, matching the repository's bridge-package style for unformalized upstream assembly |
 
 ### Test/MainTheorem.lean (1 sorry)
 | Lemma | Status | Blocker |
@@ -157,8 +291,39 @@ Last updated: 2026-04-12
 ## Files Now Clean
 - `SelfImprovement/Theorems.lean`
 - `ExpansionHypercubeGraph/Theorems.lean`
+- `MainInductionStep/Theorems.lean`
 
 ## Recent Progress On This Pass
+- Opened PR #333 for the current Pasting transport/scaffold pass.
+- Opened PR #326 for the Worktree 2 Section 9 tracker refresh.
+- `SelfImprovement/Defs.lean`, `SelfImprovement/MatrixRealization.lean`, and
+  `SelfImprovement/Theorems.lean` re-scanned: 0 executable
+  `sorry`/`admit`/`axiom` placeholders remain.
+- `SelfImprovement/Theorems.lean`: confirmed current executable closure relies on
+  reduced Section 9 scaffolding (`sdp`, `addInU`, `SelfImprovementBridgePackage`)
+  rather than missing local proofs.
+- Reprioritized away from Section 9 and back onto the live Section 12 pasting
+  chain.
+- `Pasting/Theorems.lean:commutativitySwitcheroo` proof route refined against the
+  paper: the Lean proof should cancel two separate center terms rather than rely
+  on an unneeded symmetry assumption.
+- `Pasting/Theorems.lean:commutativitySwitcheroo` now contains the explicit
+  two-center proof scaffold in code, and the first switch-sandwich transfer
+  bound (`M` self-consistency to the `G \otimes M` center) is formalized and
+  typechecked.
+- Isolated the precise generic switcheroo blocker: the missing witness is
+  complete-part self-consistency of `G`, equivalently the bipartite SSC input
+  for the one-outcome projective family `x ↦ G^x`.
+- `Preliminaries/Theorems.lean`: added
+  `consRelDataProcessing_questionDependent`, a question-dependent postprocessing
+  theorem for `ConsRel`; this is intended to support later corollaries such as
+  `Pasting.hAConsistency` where the evaluation map depends on the sampled point.
+- `Preliminaries/Theorems.lean`: added `consRel_uniform_equiv`, reindexing
+  `ConsRel` along an equivalence of uniformly sampled question spaces. This is
+  another transport lemma needed for moving between `Point params.next` and
+  `(Point params) × (Fq params)` style formulations.
+- `lake build MIPStarRE.LDT.Pasting.Theorems` now completes successfully in this
+  workspace, so single-file proof iteration is warm.
 - Section 11 survey refreshed: `Commutativity/Theorems.lean` has exactly 4
   remaining `sorry`s at lines 521, 527, 533, and 822.
 - Section 11 dependency chain clarified:
@@ -277,6 +442,10 @@ Last updated: 2026-04-12
   `switcherooSelfConsistency_bip`,
   `switcherooCompletePartSelfConsistency_bip`, and
   `avgOver_uniform_slicePair`.
+- `Pasting/Theorems.lean`: added compile-checked `switcheroo_first_term_close`
+  and `switcheroo_second_term_close` helper lemmas, reducing the remaining
+  `commutativitySwitcheroo` work to the term-3/term-4 chain and the final
+  four-term assembly.
 - `Pasting/Theorems.lean` now has 11 executable `sorry`s remaining in this file.
 
 ## Stale Entries From Earlier Waves
@@ -343,13 +512,19 @@ Last updated: 2026-04-12
 | `addInU` | STATEMENT ISSUE | Quantifies over arbitrary H but requires H = averagedSandwichedPolynomialSubMeas |
 | `selfImprovement` | BLOCKED | Needs selfImprovementHelper + orthonormalization; missing PermInvState |
 
-### MainInductionStep/Theorems.lean (4 sorrys)
+### MainInductionStep/Theorems.lean (historical)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
 | `mainInduction` | BLOCKED | Full inductive argument, depends on all sections |
 | `selfImprovementInInductionSection` | BLOCKED | Needs measurement witness bridge |
 | `ldPastingInInductionSection` | BLOCKED | Cyclic import with Pasting |
 | `restrictedProbabilities` | BLOCKED | Modeling mismatch with paper's restricted diagonal strategy |
+
+## Best Next Step
+- MainInductionStep is complete for this wave.
+- Highest-leverage global next step returns to the Section 12 pasting spine,
+  especially `Pasting.commutativitySwitcheroo` and `Pasting.ldPasting`, which
+  remain the main upstream blockers for the rest of the project.
 
 ### ExpansionHypercubeGraph/Theorems.lean (3 sorrys)
 | Lemma | Status | Blocker |

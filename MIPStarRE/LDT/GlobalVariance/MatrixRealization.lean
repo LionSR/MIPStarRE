@@ -24,7 +24,8 @@ structure MatrixVarianceTransferRealization (params : Parameters) [FieldModel pa
     MatrixSubmeasurement (DegreeBoundedLineAnswer params) space
   polynomialMeasurement :
     MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) space
-  axisQuestionParameter : AxisParallelLineQuestion params → Fq params
+  axisQuestionParameter : AxisParallelLineQuestion params → Fq params :=
+    axisParallelLineQuestionParameter
 
 /-- The concrete operator `G_g`. -/
 def matrixPolynomialWeightOperator (params : Parameters) [FieldModel params.q]
