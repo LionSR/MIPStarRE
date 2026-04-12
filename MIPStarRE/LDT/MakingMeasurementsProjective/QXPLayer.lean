@@ -711,12 +711,109 @@ lemma sqrtQCompleteness {Outcome : Type*}
     (hζ_small : ζ ≤ 1 / (4 : Error)) :
     RankReductionWitness ψ A ζ data →
       ev ψ (CFC.sqrt (QTotal data)) ≥ 1 - 12 * zetaQuarterRoot ζ := by
-  -- The paper deduces this from `qCompleteness` plus the spectral inequality
-  -- `sqrt Q ≥ (1 - √ζ) Q`, using `Q ≤ (1 + 2√ζ) I`.
-  -- In Lean, the remaining blocker is the NNReal/CFC comparison turning the
-  -- scalar bound into an operator inequality for `CFC.sqrt`.
-  -- TODO: prove (issue #197)
-  sorry
+  intro hRank
+  let ε : Error := spectralTruncationError ζ
+  have hε_nonneg : 0 ≤ ε := by
+    dsimp [ε, spectralTruncationError]
+    exact Real.rpow_nonneg hζ _
+  have hε_half : ε ≤ 1 / (2 : Error) := by
+    simpa [ε] using spectralTruncationError_le_half ζ hζ hζ_small
+  let upper : NNReal := ⟨1 + 2 * ε, by positivity⟩
+  let lower : NNReal := ⟨1 - ε, by linarith⟩
+  have hQ_nonneg : 0 ≤ QTotal data := by
+    rw [← hRank.sum_eq_total]
+    exact Finset.sum_nonneg fun a _ => hRank.outcome_nonneg a
+  have hspectrum_le : ∀ x, x ∈ spectrum NNReal (QTotal data) → x ≤ upper := by
+    have hle' : QTotal data ≤ ((upper : Error) : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
+      simpa [upper, ε] using hRank.total_le
+    have hupper_alg : algebraMap NNReal (MIPStarRE.Quantum.Op ι) upper =
+        ((upper : Error) : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
+      rw [Algebra.algebraMap_eq_smul_one]
+      simpa [NNReal.smul_def]
+    have hle : QTotal data ≤ algebraMap NNReal (MIPStarRE.Quantum.Op ι) upper := by
+      rw [hupper_alg]
+      exact hle'
+    rw [← cfc_id' NNReal (QTotal data) (ha := hQ_nonneg),
+      ← cfc_const (R := NNReal) upper (QTotal data) (ha := hQ_nonneg),
+      cfc_nnreal_le_iff _ _ _ (SpectrumRestricts.nnreal_of_nonneg hQ_nonneg)
+        (ha := hQ_nonneg)] at hle
+    exact hle
+  have hsqrt_lower : lower • QTotal data ≤ CFC.sqrt (QTotal data) := by
+    rw [← cfc_const_mul_id lower (QTotal data) (ha := hQ_nonneg), CFC.sqrt_eq_cfc,
+      cfc_nnreal_le_iff _ _ _ (SpectrumRestricts.nnreal_of_nonneg hQ_nonneg)
+        (ha := hQ_nonneg)]
+    intro x hx
+    have hle_real : (((lower : NNReal) * x : NNReal) : Error) ≤ (NNReal.sqrt x : Error) := by
+      have hx_nonneg : 0 ≤ (x : Error) := x.2
+      have hx_le : (x : Error) ≤ 1 + 2 * ε := by
+        simpa [upper] using hspectrum_le x hx
+      have hscalar : 1 + 2 * ε ≤ 1 / ((1 - ε) ^ (2 : Nat)) := by
+        have hone_minus_pos : 0 < 1 - ε := by
+          linarith
+        have hone_minus_sq_pos : 0 < (1 - ε) ^ (2 : Nat) := by
+          nlinarith
+        rw [le_div_iff₀ hone_minus_sq_pos]
+        have hfactor_nonpos : 2 * ε - 3 ≤ 0 := by
+          linarith
+        have hsq_nonneg : 0 ≤ ε ^ (2 : Nat) := by positivity
+        have haux' : ε ^ (2 : Nat) * (2 * ε - 3) ≤ 0 := by
+          exact mul_nonpos_of_nonneg_of_nonpos hsq_nonneg hfactor_nonpos
+        have haux : (1 + 2 * ε) * ((1 - ε) ^ (2 : Nat)) ≤ 1 := by
+          nlinarith [haux']
+        simpa [pow_two, mul_assoc, mul_left_comm, mul_comm] using haux
+      have hx_bound : (x : Error) ≤ 1 / ((1 - ε) ^ (2 : Nat)) := by
+        exact le_trans hx_le hscalar
+      have hfactor_nonneg : 0 ≤ (1 - ε) ^ (2 : Nat) := by positivity
+      have hscaled' : ((1 - ε) ^ (2 : Nat)) * (x : Error) ≤
+          ((1 - ε) ^ (2 : Nat)) * (1 / ((1 - ε) ^ (2 : Nat))) := by
+        exact mul_le_mul_of_nonneg_left hx_bound hfactor_nonneg
+      have hone_minus_ne : 1 - ε ≠ 0 := by
+        linarith
+      have hone_minus_sq_ne : (1 - ε) ^ (2 : Nat) ≠ 0 := by
+        exact pow_ne_zero _ hone_minus_ne
+      have hscaled : ((1 - ε) ^ (2 : Nat)) * (x : Error) ≤ 1 := by
+        calc
+          ((1 - ε) ^ (2 : Nat)) * (x : Error) ≤
+              ((1 - ε) ^ (2 : Nat)) * (1 / ((1 - ε) ^ (2 : Nat))) := hscaled'
+          _ = 1 := by
+              rw [one_div, mul_inv_cancel₀ hone_minus_sq_ne]
+      have hsq : (((1 - ε) * (x : Error)) ^ (2 : Nat)) ≤ x := by
+        nlinarith [hscaled, hx_nonneg]
+      have hleft_nonneg : 0 ≤ (1 - ε) * (x : Error) := by
+        nlinarith
+      have hroot : (1 - ε) * (x : Error) ≤ Real.sqrt (x : Error) := by
+        exact (Real.le_sqrt hleft_nonneg hx_nonneg).2 <| by
+          simpa [pow_two, Real.sq_sqrt hx_nonneg] using hsq
+      simpa [lower] using hroot
+    exact_mod_cast hle_real
+  have hsqrt_ev :
+      (1 - ε) * ev ψ (QTotal data) ≤ ev ψ (CFC.sqrt (QTotal data)) := by
+    have hsqrt_lower' : ((((lower : NNReal) : Error) : ℂ) • QTotal data) ≤
+        CFC.sqrt (QTotal data) := by
+      simpa using hsqrt_lower
+    have hmono := ev_mono ψ ((((lower : NNReal) : Error) : ℂ) • QTotal data)
+      (CFC.sqrt (QTotal data)) hsqrt_lower'
+    rw [ev_scale] at hmono
+    simpa [lower] using hmono
+  have hq := qCompleteness (ψ := ψ) (A := A) (ζ := ζ) (data := data)
+    hψ hζ hζ_small hRank
+  have hζ1 : ζ ≤ 1 := by linarith
+  have hε_le_zqr : ε ≤ zetaQuarterRoot ζ := by
+    dsimp [ε, spectralTruncationError, zetaQuarterRoot]
+    simpa using
+      (Real.rpow_le_rpow_of_exponent_ge' hζ hζ1
+        (by positivity)
+        (by norm_num : (1 / (2 : Error)) ≥ 1 / (4 : Error)))
+  have hzqr_nonneg : 0 ≤ zetaQuarterRoot ζ := by
+    dsimp [zetaQuarterRoot]
+    exact Real.rpow_nonneg hζ _
+  calc
+    ev ψ (CFC.sqrt (QTotal data))
+        ≥ (1 - ε) * ev ψ (QTotal data) := hsqrt_ev
+    _ ≥ (1 - ε) * (1 - 11 * zetaQuarterRoot ζ) := by
+          exact mul_le_mul_of_nonneg_left hq (by linarith)
+    _ ≥ 1 - 12 * zetaQuarterRoot ζ := by
+          nlinarith
 
 /-- **`Q` is almost projective** (`lem:q-almost-projective`).
 
