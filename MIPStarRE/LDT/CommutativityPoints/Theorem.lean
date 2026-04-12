@@ -48,17 +48,8 @@ lemma avgOver_uniform_equiv
     _ = avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
           simp [avgOver, uniformDistribution, Finset.mul_sum]
 
-<<<<<<< HEAD
-/-- Consistency transfer for the restricted-diagonal sample at the last (fully free) restriction index. -/
-=======
-/-- TODO(#306): Consistency transfer for the corrected restricted diagonal test.
-
-This proof gap is intentional tracking for the diagonal-test definition fix:
-the old proof targeted a diagonal sample with unrestricted directions, while the
-corrected statement uses the restricted-diagonal sample at the last (fully free)
-restriction index, with base-point evaluation. The previous proof therefore
-established the wrong sample space for the paper-corrected test. -/
->>>>>>> 87af954 (docs(CommutativityPoints): fix oxymoronic docstrings per review)
+/-- Consistency transfer for the restricted-diagonal sample at the last
+(fully free) restriction index. -/
 private lemma sampledDiagonalLineConsistency
     (params : Parameters)
     [FieldModel params.q]
@@ -72,7 +63,6 @@ private lemma sampledDiagonalLineConsistency
       (diagonalLineAnswerFamily strategy (lastRestrictionIndex params))
       (restrictedDiagonalLinesConsistencyError
         params gamma) := by
-<<<<<<< HEAD
   let t : Fin params.m → Error := fun j =>
     bipartiteConsError strategy.state
       (uniformDistribution (RestrictedDiagonalSample params j))
@@ -108,23 +98,8 @@ private lemma sampledDiagonalLineConsistency
   dsimp [restrictedDiagonalLinesConsistencyError]
   exact le_trans hsingle_le_sum hsum_le
 
-/-- SDD approximation transfer for the restricted-diagonal sample at the last (fully free) restriction index. -/
-=======
-  -- NOTE(#306): This sorry tracks a genuine proof gap introduced by
-  -- the test definition correction. The old proof used DiagonalTestSample
-  -- with unrestricted directions; the corrected definition uses the
-  -- restricted-diagonal sample at the last (fully free) restriction index.
-  -- The proof structure needs rebuilding against the new types.
-  sorry
-
-/-- TODO(#306): SDD approximation transfer for the corrected restricted diagonal test.
-
-This proof gap is intentional tracking for the diagonal-test definition fix:
-the old proof targeted a diagonal sample with unrestricted directions, while the
-corrected statement uses the restricted-diagonal sample at the last (fully free)
-restriction index, with base-point evaluation. The previous proof therefore
-established the wrong sample space for the paper-corrected test. -/
->>>>>>> 87af954 (docs(CommutativityPoints): fix oxymoronic docstrings per review)
+/-- SDD approximation transfer for the restricted-diagonal sample at the
+last (fully free) restriction index. -/
 private lemma sampledDiagonalLineApproximation
     (params : Parameters)
     [FieldModel params.q]
@@ -139,7 +114,6 @@ private lemma sampledDiagonalLineApproximation
       (IdxSubMeas.liftRight
         (diagonalLineAnswerFamily strategy (lastRestrictionIndex params)))
       (pointDiagonalLineApproxError params gamma) := by
-<<<<<<< HEAD
   let j := lastRestrictionIndex params
   let pointMeas : IdxMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
     fun s => (strategy.pointMeasurement s.1).toMeasurement
@@ -159,6 +133,8 @@ private lemma sampledDiagonalLineApproximation
         (IdxMeas.toIdxSubMeas pointMeas)
         (IdxMeas.toIdxSubMeas lineMeas)
         (restrictedDiagonalLinesConsistencyError params gamma) := by
+    -- Relies on definitional equality between pointMeas/lineMeas and
+    -- diagonalPointAnswerFamily/diagonalLineAnswerFamily.
     simpa [j, pointMeas, lineMeas, diagonalPointAnswerFamily, diagonalLineAnswerFamily]
       using hcons
   have hbip := MIPStarRE.LDT.Preliminaries.simeqToApprox strategy.state
@@ -169,14 +145,6 @@ private lemma sampledDiagonalLineApproximation
   simpa [MIPStarRE.LDT.Preliminaries.BipartiteSDDRel, pointDiagonalLineApproxError,
     j, pointMeas, lineMeas, diagonalPointAnswerFamily, diagonalLineAnswerFamily]
     using hbip_bound
-=======
-  -- NOTE(#306): This sorry tracks a genuine proof gap introduced by
-  -- the test definition correction. The old proof used DiagonalTestSample
-  -- with unrestricted directions; the corrected definition uses the
-  -- restricted-diagonal sample at the last (fully free) restriction index.
-  -- The proof structure needs rebuilding against the new types.
-  sorry
->>>>>>> 87af954 (docs(CommutativityPoints): fix oxymoronic docstrings per review)
 
 /-- TODO(#306): Transport the corrected restricted diagonal approximation to
 the shared line-plus-parameter distribution used by the commutativity proof. -/
