@@ -13,7 +13,7 @@ Last updated: 2026-04-12
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
-- **PRs already recorded in this file**: 2
+- **PRs already recorded in this file**: 3
 
 ## ExpansionHypercubeGraph Status
 - Remaining executable sorrys in `MIPStarRE/LDT/ExpansionHypercubeGraph`: 0.
@@ -91,6 +91,21 @@ Last updated: 2026-04-12
 - `GlobalVariance/Theorems.lean`: Jensen/Cauchy-Schwarz averaging helpers for turning pointwise polynomial bounds into aggregate `SDDRel` statements
 
 **Files changed:** QXPLayer.lean, GlobalVariance/Defs.lean, GlobalVariance/Theorems.lean
+
+### PR #325: Section 7 status sync (`docs/ldt-expansionhypercubegraph-status-sync`)
+**Status sync:**
+- `jobs.md`: recorded that `ExpansionHypercubeGraph` has zero remaining
+  executable `sorry`s, marked the historical Section 7 blockers as resolved,
+  and pointed the next live target back to `Pasting/Theorems.lean`.
+- `ExpansionHypercubeGraph/Theorems.lean`: removed stale TODO comments above
+  already-proved rewrite and local-to-global theorems.
+
+**Testing:**
+- `lake env lean MIPStarRE/LDT/ExpansionHypercubeGraph/Theorems.lean`
+- `rg -n "\b(sorry|admit|axiom|unsafeCast|unsafeCoerce|ofReduceBool|ofReduceNat|lcProof)\b" MIPStarRE/LDT/ExpansionHypercubeGraph`
+- `rg -n "TODO\(#206\)|TODO\(matrix-realization\)" MIPStarRE/LDT/ExpansionHypercubeGraph`
+
+**Files changed:** jobs.md, ExpansionHypercubeGraph/Theorems.lean
 
 ---
 
