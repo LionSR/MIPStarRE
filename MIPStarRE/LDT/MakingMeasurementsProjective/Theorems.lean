@@ -461,6 +461,8 @@ private lemma oneMeasNaimarkCompression
           rw [hsingle]
           simp [hsqrt, CFC.sqrt_mul_sqrt_self, M.pos a]
 
+/-! ### Input-projector entry simplifications -/
+
 private lemma mul_oneMeasNaimarkInputProj_apply_none
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
