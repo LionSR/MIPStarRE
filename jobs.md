@@ -1,6 +1,34 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-11
+Last updated: 2026-04-12
+
+## Current Pass — Worktree 2
+- Verified by scan on 2026-04-12: `MIPStarRE/LDT/SelfImprovement/Defs.lean`,
+  `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean`, and
+  `MIPStarRE/LDT/SelfImprovement/Theorems.lean` contain **0 executable
+  `sorry`/`admit`/`axiom` placeholders**.
+- Result: the Section 9 directory is now closed for the specific executable-sorry
+  elimination goal.
+- Remaining Section 9 proof debt is no longer inside `SelfImprovement/` as
+  placeholders; it is tracked as temporary scaffolding in
+  `SelfImprovement/Theorems.lean`:
+  - reduced `sdp` witness instead of the full strong-duality/complementary-slackness theorem
+  - reduced `addInU` output keeping only the downstream variance consequence
+  - `SelfImprovementBridgePackage` externalizing `PermInvState`, helper SSC, and
+    the final transport lemmas
+- Best next global step remains Section 12 pasting, since `MainInductionStep`
+  consumes `selfImprovementFromSubMeas` but is still blocked by its own sorrys
+  and by the `Pasting/Theorems.lean` chain.
+
+## SelfImprovement Checklist
+- [x] `Defs.lean` has no executable placeholders.
+- [x] `MatrixRealization.lean` has no executable placeholders.
+- [x] `Theorems.lean` has no executable placeholders.
+- [x] Direct downstream bridge identified: `MainInductionStep/Theorems.lean`
+  uses `SelfImprovementBridgePackage` and `selfImprovementFromSubMeas`.
+- [x] Highest-leverage follow-up chosen: `Pasting/Theorems.lean` around
+  `commutativitySwitcheroo` / `gCompleteSelfConsistency`, not additional edits in
+  `SelfImprovement/`.
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
@@ -13,6 +41,9 @@ Last updated: 2026-04-11
 - **PRs already recorded in this file**: 2
 
 ## Active Strategy
+- Section 9 `SelfImprovement/` has been rechecked and is clean; do not spend
+  more proof effort there until the temporary bridge package is ready to be
+  internalized.
 - Highest-leverage live chain is now Section 12 pasting.
 - Immediate target cluster: `Pasting/Theorems.lean` around
   `commutativitySwitcheroo` and its local helper bridges.
@@ -24,7 +55,8 @@ Last updated: 2026-04-11
   theorem-statement repair.
 
 ## Agent Board
-- Survey agent: refreshed executable-sorry count and file-by-file breakdown.
+- Survey agent: refreshed executable-sorry count and file-by-file breakdown;
+  confirmed `SelfImprovement/` has zero executable placeholders.
 - Proof agent A: assigned to `Pasting.commutativitySwitcheroo` proof shape and
   triangle-composition route.
 - Proof agent A status: actively implementing `Pasting.commutativitySwitcheroo`.
@@ -36,8 +68,8 @@ Last updated: 2026-04-11
   cleanups if the Pasting proof gets stuck on non-definitional equalities.
 - Proof agent C: assigned to Section 11 `commDataProcessedG.stabilityOne`
   questionwise reduction and normalization-condition route.
-- Integration agent: reserved for file builds and reprioritization after each
-  landed proof.
+- Integration agent: updating `jobs.md`, rechecking `SelfImprovement` module
+  compilation, and preparing the module-scoped PR payload for this pass.
 
 ---
 
@@ -144,6 +176,14 @@ Last updated: 2026-04-11
 - `ExpansionHypercubeGraph/Theorems.lean`
 
 ## Recent Progress On This Pass
+- `SelfImprovement/Defs.lean`, `SelfImprovement/MatrixRealization.lean`, and
+  `SelfImprovement/Theorems.lean` re-scanned: 0 executable
+  `sorry`/`admit`/`axiom` placeholders remain.
+- `SelfImprovement/Theorems.lean`: confirmed current executable closure relies on
+  reduced Section 9 scaffolding (`sdp`, `addInU`, `SelfImprovementBridgePackage`)
+  rather than missing local proofs.
+- Reprioritized away from Section 9 and back onto the live Section 12 pasting
+  chain.
 - `Pasting/Theorems.lean:completePartProjFamily.proj` proved.
 - `Pasting/Theorems.lean:pointWithCompletePart_as_switcheroo_input` proved.
 - `Pasting/Theorems.lean`: extracted
