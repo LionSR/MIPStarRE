@@ -2937,6 +2937,74 @@ theorem gHatFacts
                     simp [gHatCommutationError, sixteenthSum]
                     ring
 
+/-! ### Bridge lemmas for the sandwich chain
+
+These lemmas capture the infrastructure needed for the `lem:commute-g-half-sandwich`
+through `cor:h-a-consistency` chain in `ld-pasting.tex` §9.3.
+
+The core gap is the n-step SDDOpRel composition lemma: the existing binary triangle
+inequality (`sddOpRel_triangle`) gives a factor of 2 per step, but the paper's
+`prop:triangle-inequality-for-approx_delta` gives linear error accumulation via
+the matrix Cauchy-Schwarz inequality. -/
+
+/-- n-step SDDOpRel chain lemma via matrix Cauchy-Schwarz.
+
+Given `n` consecutive SDDOpRel bounds, the endpoints satisfy an SDDOpRel bound
+with error `n * (∑ individual errors)`.  This improves on naive triangle-inequality
+chaining, which would give exponential blowup.
+
+Paper reference: `prop:triangle-inequality-for-approx_delta` in
+`references/ldt-paper/preliminaries.tex`.
+
+Proof sketch: telescoping + `(∑ dᵢ)† (∑ dⱼ) ≤ₚₛ n · ∑ dᵢ† dᵢ`
+(PSD Cauchy-Schwarz). -/
+private lemma sddOpRel_chain
+    {Question Outcome : Type*} {ι' : Type*}
+    [Fintype ι'] [DecidableEq ι'] [Fintype Outcome]
+    (ψ : QuantumState ι') (𝒟 : Distribution Question)
+    (n : ℕ)
+    (families : Fin (n + 1) → IdxOpFamily Question Outcome ι')
+    (errors : Fin n → Error)
+    (hsteps : ∀ i : Fin n,
+      SDDOpRel ψ 𝒟 (families i.castSucc) (families i.succ)
+        (errors i)) :
+    SDDOpRel ψ 𝒟 (families 0) (families (Fin.last n))
+      ((n : Error) * ∑ i : Fin n, errors i) := by
+  sorry
+
+/-- Bridge: the staged move-commute-move chain for `commuteGHalfSandwich`.
+
+Constructs the sequence of `3k` intermediate bipartite operator families
+that arise from repeatedly moving `Ĝ₁` through the product
+`Ĝ₁ · Ĝ₂ · ⋯ · Ĝₖ` using self-consistency (move to right tensor,
+error `2ζ`) and pairwise commutation (swap past neighbor, error `ν₃`),
+then composes them via `sddOpRel_chain`.
+
+Paper reference: `lem:commute-g-half-sandwich` computation in
+`ld-pasting.tex` lines 881–914. -/
+private lemma commuteGHalfSandwich_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (k : ℕ) (hk : 2 ≤ k)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta))
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (PointTuple params k))
+      (gHatHalfSandwichLeft params family k)
+      (gHatHalfSandwichRight params family k)
+      (commuteGHalfSandwichError params gamma zeta k) := by
+  sorry
+
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
     (params : Parameters)
@@ -2948,11 +3016,43 @@ lemma commuteGHalfSandwich
     (hk : 2 ≤ k)
     (hfacts : GHatFactsStatement params ψbi family gamma zeta) :
     CommuteGHalfSandwichStatement params ψbi family gamma zeta k := by
-  /-
-  Deferred core argument from `lem:commute-g-half-sandwich` in
-  `references/ldt-paper/ld-pasting.tex`.
-  The proof iterates the `\widehat G` commutation bound across the half-sandwich.
-  -/
+  exact ⟨commuteGHalfSandwich_core params ψbi family gamma zeta k hk
+    hfacts.completedSelfConsistency hfacts.completedCommutation⟩
+
+/-- Bridge: Cauchy-Schwarz sandwich elimination for one-point consistency.
+
+Given the half-sandwich commutation bound from `commuteGHalfSandwich`, performs
+the Cauchy-Schwarz + measurement-completeness argument that converts the
+sandwiched operator distance into a one-point consistency bound.
+
+Paper reference: `lem:ld-sandwich-line-one-point` proof in
+`ld-pasting.tex` lines 931–1036.
+
+Steps:
+1. Simplify by summing out indices `> i` using measurement completeness
+2. Apply Cauchy-Schwarz with `commuteGHalfSandwich` to move `Ĝ₁` left
+3. Apply Cauchy-Schwarz again to move `Ĝ₁` right
+4. Eliminate `Ĝ_{<i}` product using measurement completeness
+5. Reduce to the single-slice bound `eq:ld-gbcon` -/
+private lemma ldSandwichLineOnePoint_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (hcomm : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params strategy.state family
+        gamma zeta j)
+    (k i : ℕ) (hi : i < k) :
+    ConsRel strategy.state
+      (uniformDistribution (SandwichedLineQuestion params k))
+      (ldSandwichLineOnePointLeftFamily params strategy family k i)
+      (ldSandwichLineOnePointRightFamily params strategy family k i)
+      (ldSandwichLineOnePointError params eps delta gamma zeta k) := by
   sorry
 
 /-- `lem:ld-sandwich-line-one-point`. -/
@@ -2969,18 +3069,49 @@ lemma ldSandwichLineOnePoint
     (hfacts : GHatFactsStatement params strategy.state family gamma zeta)
     (k i : ℕ)
     (hi : i < k) :
-    LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i := by
+    LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
   have hcomm :
       ∀ j : ℕ, 2 ≤ j →
-        CommuteGHalfSandwichStatement params strategy.state family gamma zeta j := by
+        CommuteGHalfSandwichStatement params strategy.state family
+          gamma zeta j := by
     intro j hj
-    exact commuteGHalfSandwich params strategy.state family gamma zeta j hj hfacts
-  /-
-  Deferred core argument from `lem:ld-sandwich-line-one-point` in
-  `references/ldt-paper/ld-pasting.tex`.
-  This is the one-point comparison between the sandwiched completed-slice outcome
-  and the vertical-line measurement.
-  -/
+    exact commuteGHalfSandwich params strategy.state family gamma zeta
+      j hj hfacts
+  exact ⟨ldSandwichLineOnePoint_core params strategy eps delta gamma zeta
+    hgood family hcons hself hbound hcomm k i hi⟩
+
+/-- Bridge: aggregate one-point consistency bounds over all slice indices,
+plus the distinct-tuple approximation error.
+
+Paper reference: `lem:h-b-consistency` proof in `ld-pasting.tex`
+lines 1050–1091.
+
+Steps:
+1. Expand using degree constraints to find eligible index `i`
+2. Switch from independent to distinct samples (`prop:ld-dnoteq`, cost `k²/q`)
+3. Union bound over `k` indices, each contributing `ν₅`
+4. Total: `k·ν₅ + k²/q ≤ 44k²m(...)` -/
+private lemma hBConsistency_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    ConsRel strategy.state
+      (uniformDistribution (VerticalLineQuestion params))
+      (hRestrictionToVerticalLine params
+        (constructedPastedSubMeas params family k))
+      (verticalLineMeasurementFamily params strategy)
+      (hBConsistencyError params eps delta gamma zeta k) := by
   sorry
 
 /-- `lem:h-b-consistency`. -/
@@ -2996,13 +3127,39 @@ lemma hBConsistency
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hline : ∀ i : ℕ, i < k →
-      LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i) :
-    HBConsistencyStatement params strategy family eps delta gamma zeta k := by
-  /-
-  Deferred packaging argument after `lem:ld-sandwich-line-one-point` in
-  `references/ldt-paper/ld-pasting.tex`; this is the `lem:h-b-consistency`
-  aggregation over all slice locations.
-  -/
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    HBConsistencyStatement params strategy family
+        eps delta gamma zeta k := by
+  exact ⟨hBConsistency_core params strategy eps delta gamma zeta
+    hgood family hcons hself hbound k hline⟩
+
+/-- Bridge: convert vertical-line consistency to point consistency.
+
+Paper reference: `cor:h-a-consistency` proof in `ld-pasting.tex`
+lines 1098–1117.
+
+Steps:
+1. Restrict `hHB.lineConsistency` to a single point on the line
+2. Apply `triangleSub` with the `A-B` consistency bound from `hgood`
+3. Error bound: `ν₆ + √(8mε + 4δ) ≤ 47k²m(...) ≤ 100k²m(...)` -/
+private lemma hAConsistency_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (k : ℕ)
+    (hHB : HBConsistencyStatement params strategy family
+      eps delta gamma zeta k) :
+    ConsRel strategy.state
+      (uniformDistribution (Point params.next))
+      (polynomialEvaluationFamily params.next
+        (constructedPastedSubMeas params family k))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (MainInductionStep.ldPastingInInductionNu params k
+        eps delta gamma zeta) := by
   sorry
 
 /-- `cor:h-a-consistency`.
@@ -3017,13 +3174,17 @@ theorem hAConsistency
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
     (k : ℕ)
-    (hHB : HBConsistencyStatement params strategy family eps delta gamma zeta k) :
+    (hHB : HBConsistencyStatement params strategy family
+        eps delta gamma zeta k) :
     ConsRel strategy.state
       (uniformDistribution (Point params.next))
-      (polynomialEvaluationFamily params.next (constructedPastedSubMeas params family k))
+      (polynomialEvaluationFamily params.next
+        (constructedPastedSubMeas params family k))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) := by
-  sorry
+      (MainInductionStep.ldPastingInInductionNu params k
+        eps delta gamma zeta) := by
+  exact hAConsistency_core params strategy family eps delta gamma zeta
+    hgood k hHB
 
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
