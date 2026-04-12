@@ -10,7 +10,7 @@ Last updated: 2026-04-12
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
-- **PRs already recorded in this file**: 2
+- **PRs already recorded in this file**: 3
 
 ## Active Strategy
 - `MainInductionStep` is complete for this wave.
@@ -69,6 +69,19 @@ Last updated: 2026-04-12
 - `GlobalVariance/Theorems.lean`: Jensen/Cauchy-Schwarz averaging helpers for turning pointwise polynomial bounds into aggregate `SDDRel` statements
 
 **Files changed:** QXPLayer.lean, GlobalVariance/Defs.lean, GlobalVariance/Theorems.lean
+
+### PR #327: MainInductionStep wave (`fix/LDT/MainInductionStep`)
+**Sorrys eliminated (2):**
+- `MainInductionStep/Theorems.lean`: `restrictedProbabilities`
+- `MainInductionStep/Theorems.lean`: `mainInduction`
+
+**Infrastructure added:**
+- `MainInductionStep/Statements.lean`: `RestrictedProbabilitiesBridgePackage`
+- `MainInductionStep/Statements.lean`: `MainInductionBridgePackage`
+- `MainInductionStep/Theorems.lean`: local reindexing helpers for the
+  restricted self-consistency average
+
+**Files changed:** MainInductionStep/Statements.lean, MainInductionStep/Theorems.lean, jobs.md
 
 ---
 
