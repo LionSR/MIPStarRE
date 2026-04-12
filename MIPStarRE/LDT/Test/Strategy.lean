@@ -370,6 +370,31 @@ noncomputable def evaluatedAtNextPoint {params : Parameters} [FieldModel params.
     evaluateAt params (truncatePoint params u)
       ((family.meas (pointHeight params u)).toSubMeas)
 
+/-- Weighted sum of operators over a distribution's finite support. -/
+private noncomputable def averageOperatorOverDistribution' {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) :
+    MIPStarRE.Quantum.Op ι :=
+  ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
+
+/-- Averaged point operator `E_u A^u_{h(u)}` appearing in source-style
+boundedness assumptions. -/
+noncomputable def averagedPointEvaluationOperator {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) (h : Polynomial params) :
+    MIPStarRE.Quantum.Op ι :=
+  averageOperatorOverDistribution' (uniformDistribution (Point params))
+    (fun u => (strategy.pointMeasurement u).toSubMeas.outcome (h u))
+
+/-- Slice-wise averaged point operator `E_u A^{u,x}_{g(u)}` from the paper's
+boundedness hypothesis. -/
+noncomputable def averagedSlicePointEvaluationOperator {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι)
+    (x : Fq params) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
+  averageOperatorOverDistribution' (uniformDistribution (Point params))
+    (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
+
 structure Complete {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
@@ -403,11 +428,29 @@ structure Bounded {params : Parameters} [FieldModel params.q]
     (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop where
   sliceOpPSD : ∀ x, 0 ≤ family.witness x
   sliceBoundedness :
-    ∀ x, BoundedByOperator ψ ((family.meas x).toSubMeas.liftLeft)
-      (leftTensor (ι₂ := ι) (family.witness x)) zeta
+    avgOver (uniformDistribution (Fq params))
+      (fun x =>
+        ev ψ <|
+          leftTensor (ι₂ := ι) (family.witness x) *
+            rightTensor (ι₁ := ι) (1 - (family.meas x).toSubMeas.total)) ≤ zeta
   sliceDominatesTarget :
     ∀ x : Fq params, ∀ g : Polynomial params,
       0 ≤ family.witness x - family.dominationTarget x g
+
+/-- Paper-faithful boundedness input for slice-indexed polynomial families.
+
+This extends `IdxPolyFamily.Bounded` with the missing source-side identification
+between the abstract domination target and the averaged point operator
+`E_u A^{u,x}_{g(u)}`. -/
+structure SliceBoundednessInput {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
+  bounded : family.Bounded strategy.state zeta
+  dominationTargetAgrees :
+    ∀ x : Fq params, ∀ g : Polynomial params,
+      family.dominationTarget x g =
+        averagedSlicePointEvaluationOperator strategy x g
 
 end IdxPolyFamily
 

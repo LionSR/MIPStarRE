@@ -4,7 +4,7 @@ Last updated: 2026-04-12
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
-- **Current**: 28 executable sorrys across 6 files
+- **Current**: 28 executable sorrys across 7 files
 - **Eliminated**: 38 executable sorrys
 - **Infrastructure fixes landed on this branch**:
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
@@ -125,32 +125,34 @@ Last updated: 2026-04-12
 ## Active Strategy
 - Global high-risk chain still runs through Section 12 pasting.
 - Current assigned module focus for this worktree is Section 11
-  `Commutativity/Theorems.lean`, because clearing its 4 remaining `sorry`s is a
-  contained subproblem that also unblocks `Pasting.commutativitySwitcheroo`.
+  `Commutativity/Theorems.lean`, whose frontier is now down to the two real
+  paper obligations after removing stronger-than-source internal scaffolding.
+- Source-of-truth update: Section 11 and Section 12 theorem interfaces have now
+  been aligned with the paper's stronger boundedness hypothesis
+  `Z^x ≥ E_u A^{u,x}_{g(u)}` rather than the weaker internal `family.Bounded`
+  packaging alone.
 - Immediate target cluster:
-  `commDataProcessedG.stabilityOne`,
-  `commDataProcessedG.stabilityTwo`,
   `commDataProcessedG.evaluatedSliceCommutation`, and
   `fullSliceCommutation_of_evaluated_on_evaluated_questions`.
-- Best next step: prove a reusable local bridge for the two stability lemmas,
-  then close `evaluatedSliceCommutation` by a triangle chain, and finally solve
-  the remaining Schwartz-Zippel transport in `comMain`.
+- Best next step: prove the two paper-faithful scalar stability claims locally
+  inside `commDataProcessedG.evaluatedSliceCommutation`, then solve the
+  remaining Schwartz-Zippel transport in `comMain`.
 
 ## Agent Board
 - Survey agent: refreshed executable-sorry count and exact Section 11
   dependency chain.
-- Survey agent status: completed. Report says the live chain is
-  `stabilityOne` / `stabilityTwo` -> `evaluatedSliceCommutation` ->
+- Survey agent status: completed. Report now says the live chain is
+  `evaluatedSliceCommutation` ->
   `fullSliceCommutation_of_evaluated_on_evaluated_questions`.
 - Proof agent A: assigned to local outcome-expansion and congruence lemmas for
-  `commDataProcessedGStabilityOneLeft/Right` and
-  `commDataProcessedGStabilityTwoLeft/Right`.
-- Proof agent A status: active. Local `qSDDOp` reindex/congruence helpers are
-  landed in `Commutativity/Theorems.lean`; direct outcome lemmas are blocked by
-  the private imported wrapper behind `weightedReindexOpFamily`.
-- Proof agent B: assigned to the `commDataProcessedG` triangle composition,
-  reusing `commutativityPoints`, `cabApproxDelta_raw`, and `sddOpRel_triangle`
-  wherever possible.
+  the paper's two scalar stability claims.
+- Proof agent A status: active. Source-faithful boundedness is now in place; the
+  next target is the fixed-question `qSDDOp` rewrite behind the first scalar
+  stability claim.
+- Proof agent B: assigned to the final scalar chain in
+  `commDataProcessedG.evaluatedSliceCommutation`, reusing `closenessOfIP`,
+  `easyApproxFromApproxDelta`, `commutativityPoints`, and processed
+  self-consistency.
 - Proof agent B status: active.
 - Proof agent C: assigned to the final evaluated-to-full-slice transport in
   `fullSliceCommutation_of_evaluated_on_evaluated_questions`, including the
@@ -267,13 +269,13 @@ Last updated: 2026-04-12
 | `matrixGlobalVarianceOfPoints` | BLOCKED | Matrix global variance transfer |
 | `globalVarianceOfPoints` global norm bound | BLOCKED | Needs localToGlobal + local estimate |
 
-### Commutativity/Theorems.lean (4 sorrys)
+### Commutativity/Theorems.lean (2 sorrys)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
 | `commDataProcessedG` postprocessedSelfConsistency | COMPLETED | Closed earlier via `twoNotionsOfSelfConsistencyAfterEvaluation` and evaluated-point reindexing |
-| `commDataProcessedG` stabilityOne | ACTIVE | Needs local outcome-expansion plus a weighted boundedness bridge for the `G^y` insertion/removal step |
-| `commDataProcessedG` stabilityTwo | ACTIVE | Needs the same boundedness bridge for `G^x`, together with the processed-point commutation lift |
-| `commDataProcessedG` evaluatedSliceCommutation | PENDING ON ACTIVE CHAIN | Should close after the two stability lemmas via repeated `sddOpRel_triangle` and processed-point/add-an-`A` bridges |
+| `commDataProcessedG` stabilityOne | REMOVED AS EXPORTED FIELD | The old `SDDOpRel` packaging was stronger than the paper's scalar claim and was deleted from `CommDataProcessedGConclusion` |
+| `commDataProcessedG` stabilityTwo | REMOVED AS EXPORTED FIELD | Same source-faithfulness fix as `stabilityOne` |
+| `commDataProcessedG` evaluatedSliceCommutation | ACTIVE | Now the only remaining `lem:comm-data-processed-g` goal; needs the two paper-faithful scalar stability claims plus the processed-point comparison |
 | `comMain` fullSliceCommutation | PENDING ON ACTIVE CHAIN | Final remaining task after `commDataProcessedG`; needs operator-valued Schwartz-Zippel transport from full-slice outcomes to evaluated outcomes |
 
 ### MainInductionStep/Theorems.lean (0 sorrys)
@@ -332,44 +334,87 @@ Last updated: 2026-04-12
   `qSDDOp_reindex`, `sddOpRel_reindex`, `sddOpRel_congr_outcome`,
   `subMeas_sum_adjoint_mul_le_one`, and the four tensor-placement outcome
   multiplication lemmas.
+- `Commutativity/Theorems.lean`: added projective-postprocessing helpers
+  `projSubMeas_outcome_orthogonal`, `postprocess_proj_outcome`, and
+  `evaluatedPointFamily_outcome_proj`, plus fixed-question expansion lemmas
+  `commDataProcessedGStabilityOne_qSDDOp_expand` and
+  `commDataProcessedGStabilityTwo_qSDDOp_expand` for the two paper stability
+  steps.
 - `Commutativity/Defs.lean`: added public source-level expansion lemmas for
   `commDataProcessedGStabilityOneLeft/Right` and
   `commDataProcessedGStabilityTwoLeft/Right`, plus the two fiber-sum lemmas
   `stabilityOne_weightFiber_sum` and `stabilityTwo_weightFiber_sum` that turn
   the hidden `weightedReindexOpFamily` fibers back into explicit evaluated-slice
   outcomes.
+- `Commutativity/Theorems.lean`: added the averaged evaluated-slice commutator
+  algebra helpers
+  `evaluatedSliceCommutation_qSDDOp_avg_expand`,
+  `evaluatedSliceCommutation_avg_swap_terms`, and
+  `evaluatedSliceCommutation_qSDDOp_avg_eq`, so the remaining
+  `evaluatedSliceCommutation` proof now reduces to the paper's two scalar terms
+  rather than to raw commutator expansion.
+- `Commutativity/Theorems.lean`: extracted the postprocessed self-consistency
+  proof into a reusable local fact `hpostSSC` inside `commDataProcessedG`, and
+  added local projective-postprocessing helpers
+  `projSubMeas_outcome_orthogonal`, `postprocess_proj_outcome`, and
+  `evaluatedPointFamily_outcome_proj`.
+- `Test/Strategy.lean`: added shared source-faithful boundedness infrastructure:
+  `IdxPolyFamily.averagedPointEvaluationOperator`,
+  `IdxPolyFamily.averagedSlicePointEvaluationOperator`, and
+  `IdxPolyFamily.SliceBoundednessInput`.
+- `Commutativity/Theorems.lean` and `Pasting/Theorems.lean`: theorem
+  signatures now use `IdxPolyFamily.SliceBoundednessInput` instead of the weaker
+  `family.Bounded ...` hypothesis, matching the paper's boundedness item.
+- `Test/Strategy.lean`: `IdxPolyFamily.Bounded` itself now matches the paper's
+  tensor-failure boundedness term `E_x <psi| Z^x ⊗ (I - G^x) |psi> ≤ zeta`
+  instead of the earlier `bndError` surrogate.
+- `MainInductionStep/Statements.lean`: `PastingBoundednessInput` is now an
+  alias of the shared `IdxPolyFamily.SliceBoundednessInput`, so Section 6 still
+  exposes the same paper-faithful assumption without duplicating the package.
+- Integration check after the interface refactor:
+  `lake build MIPStarRE.LDT.Test.Strategy`
+  `MIPStarRE.LDT.MainInductionStep.Statements`
+  `MIPStarRE.LDT.MainInductionStep.Theorems`
+  `MIPStarRE.LDT.Commutativity.Theorems`
+  `MIPStarRE.LDT.Pasting.Theorems` succeeds.
+- Source-faithful cleanup: `CommDataProcessedGConclusion` no longer exports the
+  stronger-than-paper internal `stabilityOne` / `stabilityTwo` `SDDOpRel`
+  fields. They were scaffold obligations, not paper conclusions, and removing
+  them dropped `Commutativity/Theorems.lean` from 4 executable `sorry`s to 2.
 - Integration check: `lake build MIPStarRE.LDT.Commutativity.Theorems` still
   succeeds with only the two known Section 11 declarations containing `sorry`.
 - Current executable-`sorry` confirmation for `MIPStarRE/LDT/Commutativity`:
-  4 remaining at `Theorems.lean` lines 682, 688, 694, and 983.
+  2 remaining at `Theorems.lean` lines 1486 and 1775.
 - Blocker update: the private `weightedReindexOpFamily` wrapper is no longer the
   main obstacle; its outcome/fiber behavior is now exposed through public lemmas
-  in `Defs.lean`. The live blocker is constructing the theorem-level
-  `SDDOpRel` comparisons from these explicit formulas without blowing up the
-  constants.
-- Updated best-next-step: attack `commDataProcessedG.stabilityOne` first, not
-  `stabilityTwo`. The new most plausible route is a single
-  `closenessOfIPAdjoint`-style bridge from the already-proved
-  `postprocessedSelfConsistency`, using the new outcome/fiber lemmas to certify
-  the `C`-family normalization side-condition. `stabilityTwo` still appears to
-  need the extra `gamma` bookkeeping on top of the same reindexing work.
-- Proof-agent write attempt on `stabilityOne` found a sharper blocker: the
-  current hypothesis `hbound : family.Bounded strategy.state zeta` is not
-  strong enough to recover the paper's required replacement
-  `E_v A^{v,y}_{g(v)} ≤ Z^y`. In the Lean API,
-  `family.dominationTarget` is unconstrained by `family.Bounded`; the stronger,
-  needed link only appears later as
-  `PastingBoundednessInput.dominationTargetAgrees` in
-  `MainInductionStep/Statements.lean`.
-- Because of that statement-level gap, the current best independent Section 11
-  task is now `fullSliceCommutation_of_evaluated_on_evaluated_questions`, which
-  depends only on `_hself` and `hEval` and can still be advanced while the
-  boundedness mismatch is documented.
+  in `Defs.lean`, and the evaluated-slice commutator expansion is now reduced to
+  the paper's averaged `ABA` / `ABAB` scalar terms.
+- The earlier `stabilityOne` blocker from the weak boundedness hypothesis is now
+  resolved at the interface level, and the old stronger-than-paper exported
+  stability fields have been removed.
+- New live Section 11 blocker: `evaluatedSliceCommutation` still needs the two
+  paper-faithful scalar stability claims proved locally inside
+  `commDataProcessedG`, rather than through the discarded weighted `SDDOpRel`
+  scaffolding.
+- Latest proof-engineering finding: the exact paper identity
+  `qSDDOp = 2 * (first - second)` is now recovered after averaging, via a
+  `Prod.swap` reindexing on evaluated questions and outcomes. The strongest
+  remaining local blocker is `clm:g-comm-stability2`, i.e. the scalar gap
+  between `G_a^{u,x} G_b^{v,y} G^x ⊗ A_a^{u,x} A_b^{v,y}` and
+  `G_a^{u,x} G_b^{v,y} ⊗ A_a^{u,x} A_b^{v,y}`.
+- Current best independent follow-up after that is still
+  `fullSliceCommutation_of_evaluated_on_evaluated_questions`, which needs the
+  operator-valued Schwartz-Zippel transport lemma.
 - A dedicated proof-agent pass on
   `fullSliceCommutation_of_evaluated_on_evaluated_questions` found a second,
   independent missing ingredient: the repo still lacks a proved operator-valued
   Schwartz-Zippel transport lemma comparing the raw full-slice product families
   to their evaluated postprocessings on `EvaluatedSliceQuestion`.
+- Follow-up attempt in worktree 4 tried to package the first ingredient of that
+  transport as a reusable coded-point Schwartz-Zippel helper for
+  `Polynomial params`; the proof was not landed because the finite-type /
+  `decodePoint` / coercion plumbing still requires a dedicated lemma rather than
+  a quick inline reduction. The file was restored to a clean build afterward.
 - Proof-agent survey found existing reusable infrastructure:
   `cabApproxDelta_raw`, `sddOpRel_triangle`, `sddOpRel_mono`,
   `commutativityPoints`, `evaluationSpecialization_sddErrorOp_eq`, and the

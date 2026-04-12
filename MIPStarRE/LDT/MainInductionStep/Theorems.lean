@@ -106,7 +106,7 @@ theorem selfImprovementInInductionSection
         have hdom :=
           hfinal.dualDominatesAveragedPoint h
         have havg :
-            averagedPointEvaluationOperator params strategy h =
+            IdxPolyFamily.averagedPointEvaluationOperator strategy h =
               ∑ x ∈ (uniformDistribution (Point params)).support,
                 (uniformDistribution (Point params)).weight x •
                   (strategy.pointMeasurement x).outcome (h x) := by
@@ -138,7 +138,7 @@ theorem ldPastingInInductionSection
       LdPastingInInductionSectionConclusion params strategy family H
         eps delta gamma kappa zeta k := by
   obtain ⟨H, hH⟩ := Pasting.ldPasting params strategy eps delta gamma kappa zeta
-    hgood family hcomplete hcons hself hbound.bounded k hk
+    hgood family hcomplete hcons hself hbound k hk
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 

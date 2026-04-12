@@ -289,25 +289,6 @@ noncomputable def ldPastingInInductionError (params : Parameters) (k : ℕ)
     2 * ldPastingInInductionNu params k eps delta gamma zeta +
     Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))
 
-/-- Weighted sum of operators over a distribution's finite support.
-Local copy to break import cycle with `ExpansionHypercubeGraph.Defs`. -/
-private noncomputable def averageOperatorOverDistribution' {α : Type*}
-    (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
-
-/-- Averaged point operator `E_u A^u_{h(u)}` appearing in boundedness. -/
-noncomputable def averagedPointEvaluationOperator (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (h : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution' (uniformDistribution (Point params))
-    (fun u => (strategy.pointMeasurement u).toSubMeas.outcome (h u))
-
-/-- Slice-wise averaged point operator `E_u A^{u,x}_{g(u)}`. -/
-noncomputable def averagedSlicePointEvaluationOperator (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (x : Fq params) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution' (uniformDistribution (Point params))
-    (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
-
 /-- Tensor-failure expectation on a bipartite space.
 
 Computes `⟨ψ| (Z ⊗ I)(I ⊗ (I - Σ H_a)) |ψ⟩` where `Z` acts on the left register
