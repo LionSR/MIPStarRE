@@ -294,7 +294,9 @@ noncomputable def interpolationSupportSubset {params : Parameters} {k : ℕ}
     Finset.exists_subset_card_eq (s := gHatTupleSupport gs) (n := params.d + 1) <| by
       simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible
 
-/-- The chosen interpolation support lies inside the genuine support. -/
+/-- The chosen interpolation support lies inside the genuine support.
+Used downstream to ensure the Lagrange interpolation correctness property
+(`Lagrange.eval_basis_self`) holds when combined with `distinctTupleDistribution`. -/
 theorem interpolationSupportSubset_subset {params : Parameters} {k : ℕ}
     [FieldModel params.q] (gs : GHatTupleOutcome params k)
     (hEligible : InterpolationEligible params gs) :
@@ -313,7 +315,13 @@ theorem interpolationSupportSubset_card {params : Parameters} {k : ℕ}
       simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible)).2
 
 /-- Interpolate from a specified `d+1`-element index set to recover
-a polynomial in `m+1` variables via Lagrange interpolation. -/
+a polynomial in `m+1` variables via Lagrange interpolation.
+The degree bound (`lowIndividualDegree ≤ d`) holds for any `σ`;
+the interpolation correctness property (that `restrictAtHeight`
+of the result agrees with each slice) additionally requires
+`σ ⊆ gHatTupleSupport gs` and distinct evaluation points, which
+are ensured by the caller via `interpolationSupportSubset_subset`
+and `distinctTupleDistribution`. -/
 noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
     [FieldModel params.q] {k : ℕ} (xs : PointTuple params k)
     (gs : GHatTupleOutcome params k) (σ : Finset (Fin k))
