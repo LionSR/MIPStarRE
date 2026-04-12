@@ -63,23 +63,26 @@ noncomputable def axisParallelLineAnswerFamily {params : Parameters}
     let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
     postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
 
-/-- Sampled point answers in the diagonal lines test. -/
+/-- Sampled point answers in the full paper-faithful diagonal lines test. -/
 noncomputable def diagonalPointAnswerFamily {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) :
-    IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
+    IdxSubMeas (FullDiagonalTestSample params) (Fq params) ι :=
   fun s =>
-    let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
-    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeas
+    let ℓ : DiagonalLine params :=
+      { base := s.1, direction := restrictDiagonalDirection params s.2.1 s.2.2.1 }
+    (strategy.pointMeasurement (ℓ.pointAt s.2.2.2)).toSubMeas
 
-/-- Sampled diagonal-line answers, evaluated at the sampled parameter. -/
+/-- Sampled diagonal-line answers in the full paper-faithful diagonal lines
+test, evaluated at the sampled parameter. -/
 noncomputable def diagonalLineAnswerFamily {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) :
-    IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
+    IdxSubMeas (FullDiagonalTestSample params) (Fq params) ι :=
   fun s =>
-    let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
-    postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
+    let ℓ : DiagonalLine params :=
+      { base := s.1, direction := restrictDiagonalDirection params s.2.1 s.2.2.1 }
+    postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2.2)
 
 /-- Trace-based failure surrogate for the axis-parallel lines test.
 Alice's point answers act on the left register and Bob's line answers act on
@@ -101,14 +104,14 @@ noncomputable def selfConsistencyFailureProbability {params : Parameters}
     (uniformDistribution (Point params))
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
 
-/-- Trace-based failure surrogate for the diagonal lines test.
-Alice's point answers act on the left register and Bob's diagonal-line answers
-act on the right register of the shared bipartite state. -/
+/-- Trace-based failure surrogate for the full paper-faithful diagonal lines
+test. Alice's point answers act on the left register and Bob's diagonal-line
+answers act on the right register of the shared bipartite state. -/
 noncomputable def diagonalFailureProbability {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) : Error :=
   bipartiteConsError strategy.state
-    (uniformDistribution (DiagonalTestSample params))
+    (uniformDistribution (FullDiagonalTestSample params))
     (diagonalPointAnswerFamily strategy)
     (diagonalLineAnswerFamily strategy)
 

@@ -54,8 +54,51 @@ structure SymStrat (params : Parameters) [FieldModel params.q]
 /-- Encoded samples `(u₀, i, t)` for the axis-parallel lines test. -/
 abbrev AxisParallelTestSample (params : Parameters) := Point params × (Fin params.m × Fq params)
 
-/-- Encoded samples `(u₀, v, t)` for the diagonal lines test. -/
+/-- Encoded samples `(u₀, v, t)` for the `m`-restricted diagonal-lines test.
+
+This is the simplified distribution used in `CommutativityPoints`: choose a
+uniform diagonal line (equivalently, a uniform base point and direction) and a
+uniform point on that line.  The full paper-faithful diagonal test is modeled
+separately below by `FullDiagonalTestSample`. -/
 abbrev DiagonalTestSample (params : Parameters) := Point params × (Point params × Fq params)
+
+/-- Encoded samples `(u₀, i, v, t)` for the paper-faithful diagonal lines test.
+
+The verifier samples a coordinate index `i`, a raw direction vector `v`, and a
+parameter `t`; the actual line direction is obtained by zeroing all coordinates
+strictly after `i`. Sampling a raw `v : Point params` uniformly keeps the
+conditional distribution on valid restricted directions uniform. -/
+abbrev FullDiagonalTestSample (params : Parameters) :=
+  Point params × (Fin params.m × (Point params × Fq params))
+
+/-- Zero all coordinates of `v` strictly after `i`, matching the paper's
+diagonal-test restriction. -/
+def restrictDiagonalDirection (params : Parameters) [FieldModel params.q]
+    (i : Fin params.m) (v : Point params) : Point params :=
+  fun j => if j.1 ≤ i.1 then v j else zeroCoord
+
+/-- Reassociate the full diagonal sample as `(i, (u₀, v, t))`. -/
+def fullDiagonalTestSampleEquiv (params : Parameters) :
+    FullDiagonalTestSample params ≃ Fin params.m × DiagonalTestSample params where
+  toFun := fun s => (s.2.1, (s.1, (s.2.2.1, s.2.2.2)))
+  invFun := fun s => (s.2.1, (s.1, (s.2.2.1, s.2.2.2)))
+  left_inv := by
+    rintro ⟨u, i, v, t⟩
+    rfl
+  right_inv := by
+    rintro ⟨i, u, v, t⟩
+    rfl
+
+/-- The final coordinate index in `Fin params.m`. -/
+def lastDirectionIndex (params : Parameters) : Fin params.m :=
+  ⟨params.m - 1, Nat.sub_lt params.hm (Nat.succ_pos 0)⟩
+
+@[simp] theorem restrictDiagonalDirection_lastDirection
+    (params : Parameters) [FieldModel params.q] (v : Point params) :
+    restrictDiagonalDirection params (lastDirectionIndex params) v = v := by
+  funext j
+  have hj : j.1 ≤ params.m - 1 := Nat.le_pred_of_lt j.2
+  simp [restrictDiagonalDirection, lastDirectionIndex, hj]
 
 /-- Sampled point answers in the axis-parallel lines test. -/
 noncomputable def axisParallelPointAnswerFamily {params : Parameters}
@@ -75,7 +118,7 @@ noncomputable def axisParallelLineAnswerFamily {params : Parameters}
     let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
     postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
 
-/-- Sampled point answers in the diagonal lines test. -/
+/-- Sampled point answers in the `m`-restricted diagonal-lines test. -/
 noncomputable def diagonalPointAnswerFamily {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) :
@@ -84,7 +127,8 @@ noncomputable def diagonalPointAnswerFamily {params : Parameters}
     let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
     (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeas
 
-/-- Sampled diagonal-line answers, evaluated at the sampled parameter. -/
+/-- Sampled diagonal-line answers, evaluated at the sampled parameter, in the
+`m`-restricted diagonal-lines test. -/
 noncomputable def diagonalLineAnswerFamily {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) :
@@ -92,6 +136,27 @@ noncomputable def diagonalLineAnswerFamily {params : Parameters}
   fun s =>
     let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
     postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
+
+ /-- Sampled point answers in the full paper-faithful diagonal lines test. -/
+noncomputable def fullDiagonalPointAnswerFamily {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) :
+    IdxSubMeas (FullDiagonalTestSample params) (Fq params) ι :=
+  fun s =>
+    let ℓ : DiagonalLine params :=
+      { base := s.1, direction := restrictDiagonalDirection params s.2.1 s.2.2.1 }
+    (strategy.pointMeasurement (ℓ.pointAt s.2.2.2)).toSubMeas
+
+/-- Sampled diagonal-line answers in the full paper-faithful diagonal lines
+test, evaluated at the sampled parameter. -/
+noncomputable def fullDiagonalLineAnswerFamily {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) :
+    IdxSubMeas (FullDiagonalTestSample params) (Fq params) ι :=
+  fun s =>
+    let ℓ : DiagonalLine params :=
+      { base := s.1, direction := restrictDiagonalDirection params s.2.1 s.2.2.1 }
+    postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2.2)
 
 /-- Paper-local (not necessarily symmetric) projective strategy data. -/
 structure ProjStrat (params : Parameters) [FieldModel params.q]
@@ -132,16 +197,88 @@ noncomputable def selfConsistencyFailureProbability {params : Parameters}
     (uniformDistribution (Point params))
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
 
-/-- Trace-based failure surrogate for the diagonal lines test.
-Alice's point answers act on the left register, and Bob's diagonal-line
-answers act on the right register of the bipartite state. -/
-noncomputable def diagonalFailureProbability {params : Parameters}
+/-- Trace-based failure surrogate for the `m`-restricted diagonal-lines test.
+
+This is the simplified distribution used in the commutativity-at-points
+section. -/
+noncomputable def restrictedDiagonalFailureProbability {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (DiagonalTestSample params))
     (diagonalPointAnswerFamily strategy)
     (diagonalLineAnswerFamily strategy)
+
+/-- Trace-based failure surrogate for the full paper-faithful diagonal lines
+test. Alice's point answers act on the left register, and Bob's diagonal-line
+answers act on the right register of the bipartite state. -/
+noncomputable def diagonalFailureProbability {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (FullDiagonalTestSample params))
+    (fullDiagonalPointAnswerFamily strategy)
+    (fullDiagonalLineAnswerFamily strategy)
+
+/-- The `m`-restricted diagonal-lines test is one branch of the full diagonal
+test, so its failure probability is at most `m` times the full one. -/
+theorem restrictedDiagonalFailureProbability_le_mul_diagonalFailureProbability
+    {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) :
+    strategy.restrictedDiagonalFailureProbability ≤
+      (params.m : Error) * strategy.diagonalFailureProbability := by
+  let branchPointFamily : Fin params.m → IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
+    fun i s =>
+      let ℓ : DiagonalLine params :=
+        { base := s.1, direction := restrictDiagonalDirection params i s.2.1 }
+      (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeas
+  let branchLineFamily : Fin params.m → IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
+    fun i s =>
+      let ℓ : DiagonalLine params :=
+        { base := s.1, direction := restrictDiagonalDirection params i s.2.1 }
+      postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
+  let branchError : Fin params.m → Error :=
+    fun i =>
+      bipartiteConsError strategy.state
+        (uniformDistribution (DiagonalTestSample params))
+        (branchPointFamily i)
+        (branchLineFamily i)
+  have hdiag_split :
+      strategy.diagonalFailureProbability =
+        avgOver (uniformDistribution (Fin params.m)) branchError := by
+    unfold diagonalFailureProbability branchError bipartiteConsError
+    rw [avgOver_uniform_equiv (fullDiagonalTestSampleEquiv params)]
+    simpa [avgOver, fullDiagonalPointAnswerFamily, fullDiagonalLineAnswerFamily,
+      branchPointFamily, branchLineFamily] using
+      (avgOver_uniform_prod fun i (s : DiagonalTestSample params) =>
+        qBipartiteConsDefect strategy.state
+          ((branchPointFamily i) s)
+          ((branchLineFamily i) s))
+  have hbranch_eq :
+      branchError (lastDirectionIndex params) = strategy.restrictedDiagonalFailureProbability := by
+    unfold branchError restrictedDiagonalFailureProbability bipartiteConsError
+    simp [branchPointFamily, branchLineFamily, diagonalPointAnswerFamily,
+      diagonalLineAnswerFamily, restrictDiagonalDirection_lastDirection]
+  have hbranch_nonneg : ∀ i : Fin params.m, 0 ≤ branchError i := by
+    intro i
+    exact bipartiteConsError_nonneg strategy.state
+      (uniformDistribution (DiagonalTestSample params))
+      (branchPointFamily i) (branchLineFamily i)
+  have hsum :
+      (params.m : Error) * strategy.diagonalFailureProbability =
+        ∑ i : Fin params.m, branchError i := by
+    rw [hdiag_split]
+    simp [avgOver, uniformDistribution, Finset.mul_sum, params.hm.ne']
+  have hselected :
+      branchError (lastDirectionIndex params) ≤ ∑ i : Fin params.m, branchError i := by
+    simpa using
+      Finset.single_le_sum (fun i _ => hbranch_nonneg i) (Finset.mem_univ (lastDirectionIndex params))
+  rw [← hbranch_eq]
+  calc
+    branchError (lastDirectionIndex params)
+      ≤ ∑ i : Fin params.m, branchError i := hselected
+    _ = (params.m : Error) * strategy.diagonalFailureProbability := hsum.symm
 
 /-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
 structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]

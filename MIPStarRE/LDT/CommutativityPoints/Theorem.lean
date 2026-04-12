@@ -103,28 +103,25 @@ private lemma sampledDiagonalLineConsistency
       consError strategy.state
         (uniformDistribution (DiagonalTestSample params))
         (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-        (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)) ≤ gamma := by
-    simpa [SymStrat.diagonalFailureProbability, bipartiteConsError_eq_consError_placed,
-      IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using hgood.diagonalLineTest
+        (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)) ≤
+      restrictedDiagonalLinesConsistencyError params gamma := by
+    have hrestricted : strategy.restrictedDiagonalFailureProbability ≤ gamma * (params.m : Error) := by
+      have hm_nonneg : 0 ≤ (params.m : Error) := by
+        exact_mod_cast Nat.zero_le params.m
+      calc
+        strategy.restrictedDiagonalFailureProbability
+          ≤ (params.m : Error) * strategy.diagonalFailureProbability := by
+              exact SymStrat.restrictedDiagonalFailureProbability_le_mul_diagonalFailureProbability strategy
+        _ ≤ (params.m : Error) * gamma := by
+              exact mul_le_mul_of_nonneg_left hgood.diagonalLineTest hm_nonneg
+        _ = gamma * (params.m : Error) := by ring
+    simpa [SymStrat.restrictedDiagonalFailureProbability,
+      restrictedDiagonalLinesConsistencyError, bipartiteConsError_eq_consError_placed,
+      IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using hrestricted
   constructor
   rw [bipartiteConsError_eq_consError_placed]
   rw [hrewritePlaced]
-  have hγ : 0 ≤ gamma := by
-    exact le_trans
-      (consError_nonneg strategy.state
-        (uniformDistribution (DiagonalTestSample params))
-        (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-        (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy)))
-      hdiagonalLineTest
-  have hm : (1 : Error) ≤ params.m := by
-    exact_mod_cast params.hm
-  calc
-    consError strategy.state
-        (uniformDistribution (DiagonalTestSample params))
-        (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy))
-        (IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy))
-      ≤ gamma := hdiagonalLineTest
-    _ ≤ gamma * (params.m : Error) := by nlinarith
+  exact hdiagonalLineTest
 
 private lemma sampledDiagonalLineApproximation
     (params : Parameters)

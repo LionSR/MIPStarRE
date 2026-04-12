@@ -158,8 +158,20 @@ Last updated: 2026-04-12
 ### MainInductionStep/Theorems.lean (2 sorrys)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
-| `mainInduction` | BLOCKED | Full inductive argument, depends on all sections |
-| `ldPastingInInductionSection` | BLOCKED | Depends on Section 12 chain |
+| `restrictedProbabilities` | IN PROGRESS (self branch done) | Added the paper-faithful full diagonal sampling model plus local slice/reindex infrastructure in `MainInductionStep/Theorems.lean`; remaining work is still the non-last-branch conditioning proofs for the axis-parallel and diagonal tests |
+| `mainInduction` | BLOCKED ON `restrictedProbabilities` AND SECTION 9 BRIDGES | Even after the slice-profile lemma is completed, the current `selfImprovementInInductionSection` API still requires a `SelfImprovementBridgePackage` witness that `mainInduction` cannot synthesize from its assumptions |
+
+Active ownership: OpenCode current pass
+
+Dependency notes:
+- `restrictedProbabilities`: the global model mismatch is repaired. `SymStrat.diagonalFailureProbability` now uses the paper-faithful full diagonal test, while `CommutativityPoints` continues to use the old simplified model via the new bridge lemma `SymStrat.restrictedDiagonalFailureProbability_le_mul_diagonalFailureProbability`.
+- `restrictedProbabilities`: the exact self-consistency average over restricted slices is now proved in `MainInductionStep/Theorems.lean` (`average_restricted_selfConsistency_eq`). Remaining work is to prove the analogous weighted inequalities for the non-last axis-parallel and diagonal branches.
+- After rereading `references/ldt-paper/inductive_step.tex`, the right high-level proof shape is clear: split the ambient test into `last direction` vs `not last direction`, identify the latter with the slice game, and drop the former by nonnegativity. The live blocker is now Lean transport/bookkeeping for that conditioning argument, not a mathematical gap.
+- `mainInduction` still has an independent downstream blocker: `selfImprovementInInductionSection` requires a `SelfImprovementBridgePackage`, and no constructor theorem for that package exists in the current Section 9 formalization.
+
+Best next step:
+- Finish the two conditioning lemmas in `MainInductionStep/Theorems.lean` that compare the weighted average of slice-local axis/diagonal failures to the ambient non-last branches, then package those with the already-proved self-consistency equality to discharge `restrictedProbabilities`.
+- After that, reassess `mainInduction` around the missing Section 9 bridge-package constructor; if no internal constructor exists, that will be the concrete blocker for the final sorry.
 
 ### Test/MainTheorem.lean (1 sorry)
 | Lemma | Status | Blocker |
@@ -171,6 +183,13 @@ Last updated: 2026-04-12
 - `ExpansionHypercubeGraph/Theorems.lean`
 
 ## Recent Progress On This Pass
+- `Test/Strategy.lean`: split the diagonal test into the paper-faithful full test (`FullDiagonalTestSample`, `fullDiagonalPointAnswerFamily`, `fullDiagonalLineAnswerFamily`, `SymStrat.diagonalFailureProbability`) and the old simplified `m`-restricted test (`DiagonalTestSample`, `diagonalPointAnswerFamily`, `diagonalLineAnswerFamily`, `SymStrat.restrictedDiagonalFailureProbability`).
+- `Test/Strategy.lean`: proved `SymStrat.restrictedDiagonalFailureProbability_le_mul_diagonalFailureProbability`, which preserves the commutativity-at-points argument while restoring the paper-faithful diagonal test for induction.
+- `MainInductionStep/Defs.lean`: switched `RestrictedSymStrat.diagonalFailureProbability` to the full diagonal test model.
+- `CommutativityPoints/Theorem.lean`: repaired the diagonal consistency entry point to use the new restricted-vs-full bridge lemma instead of unfolding the old diagonal-goodness definition.
+- `MainInductionStep/Theorems.lean`: added and typechecked local slice/reindex infrastructure (`pointNextEquiv`, `finNextEquivOption`, `axisRestrictedSampleEquiv`, append-at-height point lemmas, and `average_restricted_selfConsistency_eq`).
+- `MainInductionStep/Theorems.lean`: reread the paper proof and tried an explicit axis-conditioning formalization; reverted the unstable helper block so the file is again back to a clean checkpoint with only the two live `sorry`s.
+- `MainInductionStep/Theorems.lean`: fixed the `ldPastingInInductionSection` wrapper after `Pasting.ldPasting`'s boundedness argument drifted; the wrapper should pass the packaged boundedness input again once the dependent `.olean` is refreshed.
 - Opened PR #333 for the current Pasting transport/scaffold pass.
 - Opened PR #326 for the Worktree 2 Section 9 tracker refresh.
 - `SelfImprovement/Defs.lean`, `SelfImprovement/MatrixRealization.lean`, and
