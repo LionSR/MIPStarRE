@@ -1415,7 +1415,9 @@ private lemma switcherooAggregate_qSDDOp_expand_avg
           (fun q => A q + B q - C q - D q) := by
               apply avgOver_congr
               intro q
-              simp [A, B, C, D, switcherooAggregate_qSDDOp_expand]
+              rw [switcherooAggregate_qSDDOp_expand]
+              rw [Finset.sum_add_distrib]
+              simp [A, B, C, D]
     _ = avgOver (uniformDistribution (SlicePairQuestion params)) A +
           avgOver (uniformDistribution (SlicePairQuestion params)) B -
           avgOver (uniformDistribution (SlicePairQuestion params)) C -
@@ -1424,7 +1426,8 @@ private lemma switcherooAggregate_qSDDOp_expand_avg
                 fun q => (A q + B q) + ((-1 : Error) * C q + (-1 : Error) * D q) by
                   funext q
                   ring]
-            rw [avgOver_add, avgOver_add, avgOver_const_mul, avgOver_const_mul]
+            rw [avgOver_add, avgOver_add, avgOver_add, avgOver_const_mul, avgOver_const_mul]
+            simp [sub_eq_add_neg]
             ring
     _ = switcherooAggregateFirstTerm params ψbi family M +
           switcherooAggregateSecondTerm params ψbi family M -
