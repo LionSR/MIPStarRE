@@ -353,6 +353,82 @@ theorem simeqDataProcessing {Question α β : Type*}
           exact qConsDefect_leftRight_postprocess_le ψ (A q).toSubMeas (B q).toSubMeas f
     _ ≤ δ := hcons
 
+/-- Question-dependent postprocessing preserves bipartite consistency. -/
+theorem consRelDataProcessing_questionDependent {Question α β : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype α] [Fintype β]
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question α ι) (δ : Error) (f : Question → α → β) :
+    ConsRel ψ 𝒟 A B δ →
+      ConsRel ψ 𝒟
+        (fun q => postprocess (A q) (f q))
+        (fun q => postprocess (B q) (f q)) δ := by
+  intro ⟨hcons⟩
+  constructor
+  rw [bipartiteConsError_eq_consError_placed] at hcons ⊢
+  unfold consError at *
+  calc
+    avgOver 𝒟
+        (fun q =>
+          qConsDefect ψ
+            (leftPlacedSubMeas (ιB := ι) (postprocess (A q) (f q)))
+            (rightPlacedSubMeas (ιA := ι) (postprocess (B q) (f q))))
+      ≤ avgOver 𝒟
+          (fun q =>
+            qConsDefect ψ
+              (leftPlacedSubMeas (ιB := ι) (A q))
+              (rightPlacedSubMeas (ιA := ι) (B q))) := by
+          apply avgOver_mono
+          intro q
+          exact qConsDefect_leftRight_postprocess_le ψ (A q) (B q) (f q)
+    _ ≤ δ := hcons
+
+/-- Reindexing a uniformly sampled consistency statement along an equivalence. -/
+lemma consRel_uniform_equiv
+    {α β Outcome : Type*}
+    {ιA ιB : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    [Fintype Outcome]
+    [Fintype ιA] [DecidableEq ιA]
+    [Fintype ιB] [DecidableEq ιB]
+    (e : α ≃ β)
+    (ψ : QuantumState (ιA × ιB))
+    (A : IdxSubMeas α Outcome ιA)
+    (B : IdxSubMeas α Outcome ιB)
+    (δ : Error) :
+    ConsRel ψ (uniformDistribution α) A B δ ↔
+      ConsRel ψ (uniformDistribution β)
+        (fun b => A (e.symm b))
+        (fun b => B (e.symm b))
+        δ := by
+  have hEq :
+      bipartiteConsError ψ (uniformDistribution α) A B =
+        bipartiteConsError ψ (uniformDistribution β)
+          (fun b => A (e.symm b))
+          (fun b => B (e.symm b)) := by
+    let f : α → Error := fun a => qBipartiteConsDefect ψ (A a) (B a)
+    unfold bipartiteConsError
+    calc
+      avgOver (uniformDistribution α) (fun a => qBipartiteConsDefect ψ (A a) (B a))
+        = (1 / (Fintype.card α : Error)) *
+            ∑ a : α, qBipartiteConsDefect ψ (A a) (B a) := by
+              simp [avgOver, uniformDistribution, Finset.mul_sum]
+      _ = (1 / (Fintype.card β : Error)) *
+            ∑ a : α, qBipartiteConsDefect ψ (A a) (B a) := by
+              rw [Fintype.card_congr e]
+      _ = (1 / (Fintype.card β : Error)) *
+            ∑ b : β, qBipartiteConsDefect ψ (A (e.symm b)) (B (e.symm b)) := by
+              congr 1
+              exact (Fintype.sum_equiv e
+                (fun a => qBipartiteConsDefect ψ (A a) (B a))
+                (fun b => qBipartiteConsDefect ψ (A (e.symm b)) (B (e.symm b)))
+                (by intro a; simp))
+      _ = avgOver (uniformDistribution β)
+            (fun b => qBipartiteConsDefect ψ (A (e.symm b)) (B (e.symm b))) := by
+              simp [avgOver, uniformDistribution, Finset.mul_sum]
+  constructor <;> rintro ⟨h⟩ <;> constructor <;> simpa [hEq] using h
+
 /-! ### Infrastructure: triangle inequality for `SDDRel` -/
 
 /-- Atomic mathematical fact: the parallelogram-style inequality for `qSDD`. -/

@@ -916,7 +916,69 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
   `references/ldt-paper/ld-pasting.tex`.
   This is the main aggregate-commutation step upgrading commutation with each
   `G^x_g` to commutation with the total `G^x`.
+
+  The paper informally compares all four `qSDDOp` expansion terms to a single
+  scalar center. In Lean it is cleaner to use two centers whose contributions
+  cancel algebraically:
+
+  * `G ⊗ M` for the first/third terms
+  * `M ⊗ G` for the second/fourth terms
+
+  This avoids inserting an extra symmetry assumption on `ψbi` at this stage.
   -/
+  let 𝒟x : Distribution (SliceQuestion params) :=
+    uniformDistribution (SliceQuestion params)
+  let Gavg : SubMeas (Polynomial params) ι := IdxPolyFamily.averagedSubMeas family
+  let Mavg : SubMeas Outcome ι :=
+    averageIdxSubMeas 𝒟x (IdxProjSubMeas.toIdxSubMeas M)
+      (uniformDistribution_weight_sum_le_one (SliceQuestion params))
+  have h𝒟x : ∑ x ∈ 𝒟x.support, 𝒟x.weight x ≤ 1 := by
+    simpa [𝒟x] using uniformDistribution_weight_sum_le_one (SliceQuestion params)
+  have hselfM_bip := switcherooSelfConsistency_bip params ψbi M omega hselfM
+  let firstTerm : Error :=
+    MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x M Gavg.total
+  let centerGM : Error :=
+    MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x M Gavg.total
+  have hfirst :
+      |firstTerm - centerGM| ≤ 2 * Real.sqrt omega := by
+    have hswitch :=
+      MIPStarRE.LDT.Preliminaries.switchSandwich ψbi 𝒟x hnorm h𝒟x M Gavg.total
+        ⟨Gavg.total_nonneg, sub_nonneg.mpr Gavg.total_le_one⟩ omega hselfM_bip
+    simpa [firstTerm, centerGM] using hswitch.leftSandwichTransfer
+  let secondTerm : Error :=
+    MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x
+      (fun x =>
+        { toSubMeas := completePartSubMeas params family x
+          proj := by
+            intro u
+            cases u
+            have hsingle :
+                (completePartSubMeas params family x).outcome () =
+                  (completePartSubMeas params family x).total := by
+              rw [← (completePartSubMeas params family x).sum_eq_total]
+              simp [completePartSubMeas]
+            rw [hsingle]
+            simpa [completePartSubMeas, postprocess_total] using
+              MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x) })
+      Mavg.total
+  let centerMG : Error :=
+    MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x
+      (fun x =>
+        { toSubMeas := completePartSubMeas params family x
+          proj := by
+            intro u
+            cases u
+            have hsingle :
+                (completePartSubMeas params family x).outcome () =
+                  (completePartSubMeas params family x).total := by
+              rw [← (completePartSubMeas params family x).sum_eq_total]
+              simp [completePartSubMeas]
+            rw [hsingle]
+            simpa [completePartSubMeas, postprocess_total] using
+              MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x) })
+      Mavg.total
+  have hMavg_bounded : MIPStarRE.LDT.Preliminaries.OpBounded01 Mavg.total := by
+    exact ⟨Mavg.total_nonneg, sub_nonneg.mpr Mavg.total_le_one⟩
   sorry
 
 /-- Reindexing a uniform slice-pair average along `Prod.swap` preserves `SDDOpRel`. -/
