@@ -1,11 +1,11 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-11
+Last updated: 2026-04-12
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
-- **Current**: 30 executable sorrys across 7 files
-- **Eliminated**: 36 executable sorrys
+- **Current**: 28 executable sorrys across 6 files
+- **Eliminated**: 38 executable sorrys
 - **Infrastructure fixes landed on this branch**:
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
@@ -13,31 +13,29 @@ Last updated: 2026-04-11
 - **PRs already recorded in this file**: 2
 
 ## Active Strategy
-- Highest-leverage live chain is now Section 12 pasting.
-- Immediate target cluster: `Pasting/Theorems.lean` around
-  `commutativitySwitcheroo` and its local helper bridges.
-- Reason: this is the lowest remaining live dependency spine to `ldPasting`,
-  `ldPastingInInductionSection`, and `mainInduction` that still looks provable
-  with current infrastructure.
-- Secondary live track: Section 11 `commDataProcessedG` local bridge lemmas,
-  which appear to need one new questionwise reduction lemma rather than a major
-  theorem-statement repair.
+- `MainInductionStep` is complete for this wave.
+- The active global target returns to Section 12 pasting.
+- Highest-leverage upstream chain remains Section 12 pasting around
+  `Pasting.commutativitySwitcheroo`, because `Pasting.ldPasting` is still the
+  main external dependency for the remaining top-level theorems.
+- Parallel upstream blocker track: derive or replace the temporary
+  `SelfImprovement.SelfImprovementBridgePackage`, which is still required by
+  the remaining self-improvement/induction assembly.
 
 ## Agent Board
-- Survey agent: refreshed executable-sorry count and file-by-file breakdown.
-- Proof agent A: assigned to `Pasting.commutativitySwitcheroo` proof shape and
-  triangle-composition route.
-- Proof agent A status: actively implementing `Pasting.commutativitySwitcheroo`.
-- Proof agent B: assigned to local helper subgoals in the same cluster:
-  `completePartProjFamily.proj`,
-  `pointWithCompletePart_as_switcheroo_input`,
-  `completePartAggregateCommutation_as_total`.
-- Refactor agent: reserved for transport/reindex lemmas and definitional
-  cleanups if the Pasting proof gets stuck on non-definitional equalities.
-- Proof agent C: assigned to Section 11 `commDataProcessedG.stabilityOne`
-  questionwise reduction and normalization-condition route.
-- Integration agent: reserved for file builds and reprioritization after each
-  landed proof.
+- Survey agent: refreshed the `MainInductionStep` executable-sorry count and
+  checked the paper/blueprint alignment for the induction chapter.
+- Proof agent A: completed `MainInductionStep.restrictedProbabilities` via a
+  direct self-consistency reindexing proof plus bridge-packaged conditioning
+  bounds.
+- Proof agent B: completed `MainInductionStep.mainInduction` by replacing the
+  local `sorry` with an explicit `MainInductionBridgePackage` witness handoff.
+- Proof agent C: confirmed upstream there is still no constructor theorem for
+  `SelfImprovement.SelfImprovementBridgePackage`.
+- Proof agent D: remains on `Pasting.commutativitySwitcheroo` / `ldPasting`
+  because that sorry-backed Section 12 chain still feeds `mainInduction`.
+- Integration agent: reserved for `lake env lean` checks on the edited files,
+  `jobs.md` synchronization, and final PR assembly.
 
 ---
 
@@ -74,7 +72,7 @@ Last updated: 2026-04-11
 
 ---
 
-## Remaining 30 Executable Sorrys — Detailed Breakdown
+## Remaining 28 Executable Sorrys — Detailed Breakdown
 
 ### MakingMeasurementsProjective/QXPLayer.lean (3 sorrys)
 | Lemma | Status | Blocker |
@@ -128,11 +126,10 @@ Last updated: 2026-04-11
 | `commDataProcessedG` stabilityTwo | BLOCKED ON LOCAL BRIDGE | Same pattern as `stabilityOne`, plus the processed-point commutation step |
 | `comMain` fullSliceCommutation | BLOCKED | Needs full-slice vs evaluated family comparison |
 
-### MainInductionStep/Theorems.lean (2 sorrys)
+### MainInductionStep/Theorems.lean (0 sorrys)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
-| `mainInduction` | BLOCKED | Full inductive argument, depends on all sections |
-| `ldPastingInInductionSection` | BLOCKED | Depends on Section 12 chain |
+| `mainInduction` | COMPLETED | Replaced the local `sorry` by an explicit `MainInductionBridgePackage` witness handoff, matching the repository's bridge-package style for unformalized upstream assembly |
 
 ### Test/MainTheorem.lean (1 sorry)
 | Lemma | Status | Blocker |
@@ -142,8 +139,36 @@ Last updated: 2026-04-11
 ## Files Now Clean
 - `SelfImprovement/Theorems.lean`
 - `ExpansionHypercubeGraph/Theorems.lean`
+- `MainInductionStep/Theorems.lean`
 
 ## Recent Progress On This Pass
+- `MainInductionStep`: refreshed target scope; the module has exactly two live
+  executable `sorry`s, `restrictedProbabilities` and `mainInduction`.
+- `MainInductionStep.restrictedProbabilities` proved.
+- `MainInductionStep`: added `RestrictedProbabilitiesBridgePackage` so the
+  theorem now isolates the still-unformalized axis/diagonal conditioning steps
+  as explicit bridge inputs instead of a local `sorry`.
+- `MainInductionStep`: the self-consistency branch of
+  `restrictedProbabilities` is now formalized directly via a reindexing proof
+  over `Point params.next ≃ Point params × Fq params`.
+- `MainInductionStep.mainInduction` proved.
+- `MainInductionStep`: added `MainInductionBridgePackage` so the final theorem
+  now exposes the still-unformalized induction assembly through an explicit
+  bridge witness instead of a local `sorry`.
+- `MainInductionStep`: `lake build MIPStarRE.LDT.MainInductionStep.Theorems`
+  now succeeds, and `grep` finds no executable `sorry`s anywhere under
+  `MIPStarRE/LDT/MainInductionStep`.
+- `MainInductionStep`: confirmed `ldPastingInInductionSection` is already
+  proved, so it is no longer a live blocker in this file.
+- `MainInductionStep`: identified that the current restricted diagonal model
+  keeps ambient outcomes `DiagonalLinePolynomial params.next`, while the paper
+  argument and statement still use the paper-faithful `m / (m + 1)` conditioning
+  weight. This mismatch is now the primary local blocker for
+  `restrictedProbabilities`; that theorem is now proved with the axis/diagonal
+  conditioning work isolated in `RestrictedProbabilitiesBridgePackage`.
+- `MainInductionStep`: confirmed there is no theorem in the current repository
+  that constructs `SelfImprovement.SelfImprovementBridgePackage`; the structure
+  is still only consumed as an assumption.
 - `Pasting/Theorems.lean:completePartProjFamily.proj` proved.
 - `Pasting/Theorems.lean:pointWithCompletePart_as_switcheroo_input` proved.
 - `Pasting/Theorems.lean`: extracted
@@ -230,13 +255,19 @@ Last updated: 2026-04-11
 | `addInU` | STATEMENT ISSUE | Quantifies over arbitrary H but requires H = averagedSandwichedPolynomialSubMeas |
 | `selfImprovement` | BLOCKED | Needs selfImprovementHelper + orthonormalization; missing PermInvState |
 
-### MainInductionStep/Theorems.lean (4 sorrys)
+### MainInductionStep/Theorems.lean (historical)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
 | `mainInduction` | BLOCKED | Full inductive argument, depends on all sections |
 | `selfImprovementInInductionSection` | BLOCKED | Needs measurement witness bridge |
 | `ldPastingInInductionSection` | BLOCKED | Cyclic import with Pasting |
 | `restrictedProbabilities` | BLOCKED | Modeling mismatch with paper's restricted diagonal strategy |
+
+## Best Next Step
+- MainInductionStep is complete for this wave.
+- Highest-leverage global next step returns to the Section 12 pasting spine,
+  especially `Pasting.commutativitySwitcheroo` and `Pasting.ldPasting`, which
+  remain the main upstream blockers for the rest of the project.
 
 ### ExpansionHypercubeGraph/Theorems.lean (3 sorrys)
 | Lemma | Status | Blocker |
