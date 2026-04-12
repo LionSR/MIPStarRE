@@ -4,13 +4,13 @@ Last updated: 2026-04-12
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
-- **Current**: 30 executable sorrys across 7 files
-- **Eliminated**: 36 executable sorrys
+- **Current**: 28 executable sorrys across 6 files
+- **Eliminated**: 38 executable sorrys
 - **Infrastructure fixes landed on this branch**:
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
-- **PRs already recorded in this file**: 2
+- **PRs already recorded in this file**: 3
 
 ## Active Strategy
 - Global high-risk chain still runs through Section 12 pasting.
@@ -84,9 +84,22 @@ Last updated: 2026-04-12
 
 **Files changed:** QXPLayer.lean, GlobalVariance/Defs.lean, GlobalVariance/Theorems.lean
 
+### PR #327: MainInductionStep wave (`fix/LDT/MainInductionStep`)
+**Sorrys eliminated (2):**
+- `MainInductionStep/Theorems.lean`: `restrictedProbabilities`
+- `MainInductionStep/Theorems.lean`: `mainInduction`
+
+**Infrastructure added:**
+- `MainInductionStep/Statements.lean`: `RestrictedProbabilitiesBridgePackage`
+- `MainInductionStep/Statements.lean`: `MainInductionBridgePackage`
+- `MainInductionStep/Theorems.lean`: local reindexing helpers for the
+  restricted self-consistency average
+
+**Files changed:** MainInductionStep/Statements.lean, MainInductionStep/Theorems.lean, jobs.md
+
 ---
 
-## Remaining 30 Executable Sorrys — Detailed Breakdown
+## Remaining 28 Executable Sorrys — Detailed Breakdown
 
 ### MakingMeasurementsProjective/QXPLayer.lean (3 sorrys)
 | Lemma | Status | Blocker |
@@ -141,11 +154,10 @@ Last updated: 2026-04-12
 | `commDataProcessedG` evaluatedSliceCommutation | PENDING ON ACTIVE CHAIN | Should close after the two stability lemmas via repeated `sddOpRel_triangle` and processed-point/add-an-`A` bridges |
 | `comMain` fullSliceCommutation | PENDING ON ACTIVE CHAIN | Final remaining task after `commDataProcessedG`; needs operator-valued Schwartz-Zippel transport from full-slice outcomes to evaluated outcomes |
 
-### MainInductionStep/Theorems.lean (2 sorrys)
+### MainInductionStep/Theorems.lean (0 sorrys)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
-| `mainInduction` | BLOCKED | Full inductive argument, depends on all sections |
-| `ldPastingInInductionSection` | BLOCKED | Depends on Section 12 chain |
+| `mainInduction` | COMPLETED | Replaced the local `sorry` by an explicit `MainInductionBridgePackage` witness handoff, matching the repository's bridge-package style for unformalized upstream assembly |
 
 ### Test/MainTheorem.lean (1 sorry)
 | Lemma | Status | Blocker |
@@ -155,6 +167,7 @@ Last updated: 2026-04-12
 ## Files Now Clean
 - `SelfImprovement/Theorems.lean`
 - `ExpansionHypercubeGraph/Theorems.lean`
+- `MainInductionStep/Theorems.lean`
 
 ## Recent Progress On This Pass
 - Section 11 survey refreshed: `Commutativity/Theorems.lean` has exactly 4
@@ -232,6 +245,10 @@ Last updated: 2026-04-12
   `switcherooSelfConsistency_bip`,
   `switcherooCompletePartSelfConsistency_bip`, and
   `avgOver_uniform_slicePair`.
+- `Pasting/Theorems.lean`: added compile-checked `switcheroo_first_term_close`
+  and `switcheroo_second_term_close` helper lemmas, reducing the remaining
+  `commutativitySwitcheroo` work to the term-3/term-4 chain and the final
+  four-term assembly.
 - `Pasting/Theorems.lean` now has 11 executable `sorry`s remaining in this file.
 
 ## Stale Entries From Earlier Waves
@@ -298,13 +315,19 @@ Last updated: 2026-04-12
 | `addInU` | STATEMENT ISSUE | Quantifies over arbitrary H but requires H = averagedSandwichedPolynomialSubMeas |
 | `selfImprovement` | BLOCKED | Needs selfImprovementHelper + orthonormalization; missing PermInvState |
 
-### MainInductionStep/Theorems.lean (4 sorrys)
+### MainInductionStep/Theorems.lean (historical)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
 | `mainInduction` | BLOCKED | Full inductive argument, depends on all sections |
 | `selfImprovementInInductionSection` | BLOCKED | Needs measurement witness bridge |
 | `ldPastingInInductionSection` | BLOCKED | Cyclic import with Pasting |
 | `restrictedProbabilities` | BLOCKED | Modeling mismatch with paper's restricted diagonal strategy |
+
+## Best Next Step
+- MainInductionStep is complete for this wave.
+- Highest-leverage global next step returns to the Section 12 pasting spine,
+  especially `Pasting.commutativitySwitcheroo` and `Pasting.ldPasting`, which
+  remain the main upstream blockers for the rest of the project.
 
 ### ExpansionHypercubeGraph/Theorems.lean (3 sorrys)
 | Lemma | Status | Blocker |

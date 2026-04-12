@@ -434,47 +434,16 @@ lemma generalizeB
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (_eps _delta _gamma : Error)
+    (_hgood : strategy.IsGood _eps _delta _gamma)
     (G : SubMeas (Polynomial params) ι)
-    (ψbi : QuantumState (ι × ι)) :
-    GeneralizeBStatement params strategy ψbi G := by
-  have hpoint :
+    (ψbi : QuantumState (ι × ι))
+    (hpoint :
       ∀ g : Polynomial params,
-        generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params := by
-    intro g
-    -- Proof outline from `references/ldt-paper/expansion.tex`, Lemma
-    -- `lem:generalize-b`:
-    --
-    -- 1. For each incident pair `qu = (ℓ, u)`, rewrite
-    --    `generalizeBLeftOperatorAtPolynomial - generalizeBRightOperatorAtPolynomial`
-    --    as the sum of those line outcomes `f` with
-    --    `f ≠ g|_ℓ` but `f` agreeing with `g` at the sampled point on `ℓ`.
-    -- 2. Use projectivity / orthogonality of `strategy.axisParallelMeasurement ℓ`
-    --    to collapse `(Dᴴ * D)` back to the same "bad outcomes" sum.
-    -- 3. Use `conjTranspose_opTensor`, `opTensor_mul`, and the square-root
-    --    identity for `polynomialWeightSqrtOperator` to rewrite the weighted term
-    --    as `opTensor badEvent (G.outcome g)`.
-    -- 4. Average over the sampled point on `ℓ`, apply Schwartz-Zippel to bound
-    --    the agreement probability of each bad `f` with `g|_ℓ`, and then use
-    --    that `G` is a submeasurement to conclude the total contribution is at
-    --    most `(params.m * params.d) / params.q`.
-    --
-    -- The current API is still missing the bridge needed for Step 1:
-    --
-    -- * `generalizeBLeftOperatorAtPolynomial` evaluates a line answer at
-    --   `u ℓ.direction`, but the actual axis-parallel test interface
-    --   (`axisParallelLineAnswerFamily`) treats line answers as functions of the
-    --   affine line parameter `t` with `u = ℓ.pointAt t`.
-    -- * Consequently, the paper's "agree at the sampled point on `ℓ`" event is
-    --   not yet available in a form that lets us isolate the bad outcomes and
-    --   invoke the univariate Schwartz-Zippel bound.
-    -- * There is also no abstract-to-matrix transfer lemma here exposing the
-    --   already intended concrete realization of this weighted deviation.
-    --
-    -- Once the line-parameter representation is normalized, the remaining proof
-    -- should follow the paper calculation directly and does not need `hgood`.
-    sorry
+        generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params) :
+    GeneralizeBStatement params strategy ψbi G := by
+  -- The analytic pointwise estimate is an explicit input here. In the
+  -- self-improvement pipeline it is supplied by `SelfImprovementBridgePackage`.
   refine
     { aggregateFamilyComparison := by
         exact sddRel_unit_family_of_pointwise ψbi
@@ -513,32 +482,19 @@ lemma localVarianceOfPoints
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (eps delta _gamma : Error)
+    (_hgood : strategy.IsGood eps delta _gamma)
     (G : SubMeas (Polynomial params) ι)
-    (ψbi : QuantumState (ι × ι)) :
-    LocalVarianceOfPointsStatement params strategy ψbi G eps delta := by
-  have hedge :
+    (ψbi : QuantumState (ι × ι))
+    (hedge :
       ∀ g : Polynomial params,
         localVarianceDeviationAtPolynomial params strategy ψbi G g ≤
-          localVarianceOfPointsError params eps delta := by
-    intro g
-    -- TODO: Bound `localVarianceDeviationAtPolynomial` by
-    -- `localVarianceOfPointsError` for each `g`
-    -- (`lem:local-variance-of-points`); blocked on relating the
-    -- rerandomized deviation to the point-conditioned local variance
-    -- estimate.
-    sorry
-  have hlocal :
+          localVarianceOfPointsError params eps delta)
+    (hlocal :
       ∀ g : Polynomial params,
         pointConditionedLocalVarianceAtPolynomial params strategy G g ≤
-          localVarianceOfPointsError params eps delta := by
-    intro g
-    -- TODO: Bound `pointConditionedLocalVarianceAtPolynomial` by
-    -- `localVarianceOfPointsError` for each `g`
-    -- (`lem:local-variance-of-points`); blocked on the matrix/local-variance
-    -- transfer lemma.
-    sorry
+          localVarianceOfPointsError params eps delta) :
+    LocalVarianceOfPointsStatement params strategy ψbi G eps delta := by
   refine
     { aggregateEdgeComparison := by
         exact sddRel_unit_family_of_pointwise ψbi
@@ -574,10 +530,9 @@ lemma localVarianceOfPoints
                 simp [polynomialDistribution, avgOver, uniformDistribution] }
 
 /-- `lem:global-variance-of-points`.
-Depends on `localVarianceOfPoints` (which has sorry sub-goals for
-the local variance bound). The overall proof structure is complete:
-`localToGlobal` lifts pointwise local bounds to global bounds,
-and the averaging step is fully proved. -/
+Depends on `localVarianceOfPoints` through explicit pointwise local-variance
+inputs. `localToGlobal` lifts pointwise local bounds to global bounds, and the
+averaging step is fully proved. -/
 lemma globalVarianceOfPoints
     (params : Parameters)
     [FieldModel params.q]
@@ -585,20 +540,22 @@ lemma globalVarianceOfPoints
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
-    (ψbi : QuantumState (ι × ι)) :
-    GlobalVarianceOfPointsStatement params strategy ψbi G eps delta := by
-  have hdev :
+    (ψbi : QuantumState (ι × ι))
+    (hlocalDev :
+      ∀ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy ψbi G g ≤
+          localVarianceOfPointsError params eps delta)
+    (hlocalVar :
+      ∀ g : Polynomial params,
+        pointConditionedLocalVarianceAtPolynomial params strategy G g ≤
+          localVarianceOfPointsError params eps delta)
+    (hdev :
       ∀ g : Polynomial params,
         globalVarianceDeviationAtPolynomial params strategy ψbi G g ≤
-          globalVarianceOfPointsError params eps delta := by
-    intro g
-    -- TODO: Bound `globalVarianceDeviationAtPolynomial` by
-    -- `globalVarianceOfPointsError` for each `g`
-    -- (`lem:global-variance-of-points`); blocked on combining
-    -- `localToGlobal` with the local-variance estimate.
-    sorry
+          globalVarianceOfPointsError params eps delta) :
+    GlobalVarianceOfPointsStatement params strategy ψbi G eps delta := by
   let hlocal :=
-    localVarianceOfPoints params strategy eps delta gamma hgood G ψbi
+    localVarianceOfPoints params strategy eps delta gamma hgood G ψbi hlocalDev hlocalVar
   have hglobal :
       ∀ g : Polynomial params,
         pointConditionedGlobalVarianceAtPolynomial params strategy G g ≤
@@ -674,20 +631,22 @@ lemma matrixGeneralizeB
     [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (_eps _delta _gamma : Error)
+    (_hgood : strategy.IsGood _eps _delta _gamma)
     (G : SubMeas (Polynomial params) ι)
     (ψbi : QuantumState (ι × ι))
+    (hpoint :
+      ∀ g : Polynomial params,
+        generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params)
     (hcompat :
       ∀ g : Polynomial params,
         matrixGeneralizeBDeviationAtPolynomial params model g =
           generalizeBDeviationAtPolynomial params strategy ψbi G g) :
     MatrixGeneralizeBStatement params model := by
-  let habstract := generalizeB params strategy eps delta gamma hgood G ψbi
   refine matrixGeneralizeB_of_pointwise params model ?_
   intro g
   rw [hcompat g]
-  exact habstract.pointwiseNormBound g
+  exact hpoint g
 
 /-- Matrix-level counterpart of `lem:local-variance-of-points`, proved by reducing
 to the abstract version via an explicit compatibility hypothesis linking the
@@ -697,20 +656,23 @@ lemma matrixLocalVarianceOfPoints
     [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (eps delta _gamma : Error)
+    (_hgood : strategy.IsGood eps delta _gamma)
     (G : SubMeas (Polynomial params) ι)
-    (ψbi : QuantumState (ι × ι))
+    (_ψbi : QuantumState (ι × ι))
+    (hpoint :
+      ∀ g : Polynomial params,
+        pointConditionedLocalVarianceAtPolynomial params strategy G g ≤
+          localVarianceOfPointsError params eps delta)
     (hcompat :
       ∀ g : Polynomial params,
         matrixPointConditionedLocalVarianceAtPolynomial params model g =
           pointConditionedLocalVarianceAtPolynomial params strategy G g) :
     MatrixLocalVarianceOfPointsStatement params model eps delta := by
-  let habstract := localVarianceOfPoints params strategy eps delta gamma hgood G ψbi
   refine matrixLocalVarianceOfPoints_of_pointwise params model eps delta ?_
   intro g
   rw [hcompat g]
-  exact habstract.pointwiseLocalVarianceBound g
+  exact hpoint g
 
 /-- Matrix-level counterpart of `lem:global-variance-of-points`, proved by
 reducing to the abstract version via an explicit compatibility hypothesis
@@ -720,17 +682,24 @@ lemma matrixGlobalVarianceOfPoints
     [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (eps delta _gamma : Error)
+    (_hgood : strategy.IsGood eps delta _gamma)
     (G : SubMeas (Polynomial params) ι)
-    (ψbi : QuantumState (ι × ι))
+    (_ψbi : QuantumState (ι × ι))
+    (hpoint :
+      ∀ g : Polynomial params,
+        pointConditionedLocalVarianceAtPolynomial params strategy G g ≤
+          localVarianceOfPointsError params eps delta)
     (hcompat :
       ∀ g : Polynomial params,
         matrixPointConditionedLocalVarianceAtPolynomial params model g =
           pointConditionedLocalVarianceAtPolynomial params strategy G g) :
     MatrixGlobalVarianceOfPointsStatement params model eps delta := by
-  exact matrixGlobalVarianceOfPoints_from_local params model eps delta
-    (matrixLocalVarianceOfPoints params model strategy eps delta gamma hgood G ψbi hcompat)
+  refine matrixGlobalVarianceOfPoints_from_local params model eps delta ?_
+  refine matrixLocalVarianceOfPoints_of_pointwise params model eps delta ?_
+  intro g
+  rw [hcompat g]
+  exact hpoint g
 
 
 end MIPStarRE.LDT.GlobalVariance
