@@ -27,7 +27,7 @@ Lean is already organized around the blueprint theorem chain, but not yet proved
 
 - `MIPStarRE/LDT/Pasting/Theorems.lean` contains 16 `sorry` sites.
 - `MIPStarRE/LDT/Pasting/Sandwich.lean` contains 1 additional `sorry` at the Bernoulli-tail upper bound.
-- `MIPStarRE/LDT/Pasting/Defs.lean` has a stated interpolation placeholder: `interpolateCompletedSlices` currently uses a dummy coefficient `1` instead of true Lagrange interpolation.
+- `MIPStarRE/LDT/Pasting/Defs.lean`: `interpolateCompletedSlices` now uses proper Lagrange interpolation via Mathlib's `Lagrange.basis`, but the `lowIndividualDegree` proof is sorry'd (see `lean_formalization_problems.md` §5).
 
 The main blockers are not the endpoint packaging theorems. The real critical path is:
 

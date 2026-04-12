@@ -45,81 +45,109 @@ structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
 
 namespace RestrictedSymStrat
 
-/-- Sampled point answers in the axis-parallel lines test. -/
-noncomputable def axisParallelPointAnswerFamily {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : RestrictedSymStrat params ι) :
-    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
-  fun s =>
-    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
-    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeas
+-- TODO(#306): These sampled answer families duplicate the `SymStrat` API in
+-- `MIPStarRE.LDT.Test.Strategy`; refactor around shared helpers once the
+-- restricted-slice bookkeeping has stabilized.
 
-/-- Sampled line answers, evaluated at the sampled parameter, in the axis-parallel lines test. -/
-noncomputable def axisParallelLineAnswerFamily {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+/-- Sampled point answers in the axis-parallel lines test.
+Point player receives `u` (base point) and answers at `u`. -/
+noncomputable def axisParallelPointAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) :
-    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
-  fun s =>
-    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2.1 }
-    postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
+    IdxSubMeas (AxisParallelTestSample params)
+      (Fq params) ι :=
+  fun s => (strategy.pointMeasurement s.1).toSubMeas
 
-/-- Sampled point answers in the diagonal lines test. -/
-noncomputable def diagonalPointAnswerFamily {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+/-- Sampled line answers in the axis-parallel lines test,
+evaluated at the base point `u` (parameter `zeroCoord`). -/
+noncomputable def axisParallelLineAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) :
-    IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
+    IdxSubMeas (AxisParallelTestSample params)
+      (Fq params) ι :=
   fun s =>
-    let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
-    (strategy.pointMeasurement (ℓ.pointAt s.2.2)).toSubMeas
+    let ℓ : AxisParallelLine params :=
+      { base := s.1, direction := s.2 }
+    postprocess
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+      (· zeroCoord)
 
-/-- Sampled diagonal-line answers, evaluated at the sampled parameter. -/
-noncomputable def diagonalLineAnswerFamily {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : RestrictedSymStrat params ι) :
-    IdxSubMeas (DiagonalTestSample params) (Fq params) ι :=
+/-- Sampled point answers in the `j`-restricted diagonal test.
+Point player receives `u` and answers at `u`. -/
+noncomputable def diagonalPointAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : RestrictedSymStrat params ι)
+    (j : Fin params.m) :
+    IdxSubMeas (RestrictedDiagonalSample params j)
+      (Fq params) ι :=
+  fun s => (strategy.pointMeasurement s.1).toSubMeas
+
+/-- Sampled diagonal-line answers in the `j`-restricted diagonal
+test, evaluated at the base point (parameter `zeroCoord`). -/
+noncomputable def diagonalLineAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : RestrictedSymStrat params ι)
+    (j : Fin params.m) :
+    IdxSubMeas (RestrictedDiagonalSample params j)
+      (Fq params) ι :=
   fun s =>
-    let ℓ : DiagonalLine params := { base := s.1, direction := s.2.1 }
-    postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (fun g => g s.2.2)
+    let v := extendRestrictedDirection j s.2
+    let ℓ : DiagonalLine params :=
+      { base := s.1, direction := v }
+    postprocess
+      ((strategy.diagonalMeasurement ℓ).toSubMeas)
+      (· zeroCoord)
 
-/-- Trace-based failure surrogate for the axis-parallel lines test.
-Alice's point answers act on the left register and Bob's line answers act on
-the right register of the shared bipartite state. -/
-noncomputable def axisParallelFailureProbability {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+/-- Failure surrogate for the axis-parallel lines test. -/
+noncomputable def axisParallelFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
     (axisParallelPointAnswerFamily strategy)
     (axisParallelLineAnswerFamily strategy)
 
-/-- Trace-based failure surrogate for the self-consistency test.
-Uses the bipartite SSC defect (cross-register overlap). -/
-noncomputable def selfConsistencyFailureProbability {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+/-- Failure surrogate for the self-consistency test. -/
+noncomputable def selfConsistencyFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) : Error :=
   bipartiteSSCError strategy.state
     (uniformDistribution (Point params))
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
 
-/-- Trace-based failure surrogate for the diagonal lines test.
-Alice's point answers act on the left register and Bob's diagonal-line answers
-act on the right register of the shared bipartite state. -/
-noncomputable def diagonalFailureProbability {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+/-- Failure surrogate for the diagonal lines test.
+Averages over restriction index `j`, then the
+`j`-restricted diagonal test. -/
+noncomputable def diagonalFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι) : Error :=
-  bipartiteConsError strategy.state
-    (uniformDistribution (DiagonalTestSample params))
-    (diagonalPointAnswerFamily strategy)
-    (diagonalLineAnswerFamily strategy)
+  (1 / (params.m : Error)) *
+    ∑ j : Fin params.m,
+      bipartiteConsError strategy.state
+        (uniformDistribution
+          (RestrictedDiagonalSample params j))
+        (diagonalPointAnswerFamily strategy j)
+        (diagonalLineAnswerFamily strategy j)
 
 /-- Goodness data for a restricted strategy. -/
-structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
+structure IsGood {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι)
     (eps delta gamma : Error) : Prop where
-  axisParallelTest : strategy.axisParallelFailureProbability ≤ eps
-  selfConsistencyTest : strategy.selfConsistencyFailureProbability ≤ delta
-  diagonalLineTest : strategy.diagonalFailureProbability ≤ gamma
+  axisParallelTest :
+    strategy.axisParallelFailureProbability ≤ eps
+  selfConsistencyTest :
+    strategy.selfConsistencyFailureProbability ≤ delta
+  diagonalLineTest :
+    strategy.diagonalFailureProbability ≤ gamma
 
 end RestrictedSymStrat
 
@@ -260,25 +288,6 @@ noncomputable def ldPastingInInductionError (params : Parameters) (k : ℕ)
   kappa * (1 + 1 / (100 * (params.m : Error))) +
     2 * ldPastingInInductionNu params k eps delta gamma zeta +
     Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))
-
-/-- Weighted sum of operators over a distribution's finite support.
-Local copy to break import cycle with `ExpansionHypercubeGraph.Defs`. -/
-private noncomputable def averageOperatorOverDistribution' {α : Type*}
-    (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
-
-/-- Averaged point operator `E_u A^u_{h(u)}` appearing in boundedness. -/
-noncomputable def averagedPointEvaluationOperator (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (h : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution' (uniformDistribution (Point params))
-    (fun u => (strategy.pointMeasurement u).toSubMeas.outcome (h u))
-
-/-- Slice-wise averaged point operator `E_u A^{u,x}_{g(u)}`. -/
-noncomputable def averagedSlicePointEvaluationOperator (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (x : Fq params) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution' (uniformDistribution (Point params))
-    (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
 
 /-- Tensor-failure expectation on a bipartite space.
 
