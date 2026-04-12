@@ -1,6 +1,6 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-11
+Last updated: 2026-04-12
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
@@ -16,6 +16,15 @@ Last updated: 2026-04-11
 - Highest-leverage live chain is now Section 12 pasting.
 - Immediate target cluster: `Pasting/Theorems.lean` around
   `commutativitySwitcheroo` and its local helper bridges.
+- Refined switcheroo proof shape: use two cancelling center expressions
+  (`G \otimes M` for the first/third terms and `M \otimes G` for the second/fourth
+  terms) rather than a single common center. This avoids needing an extra
+  `PermInvState` hypothesis in `commutativitySwitcheroo`.
+- Narrow live blocker in the generic switcheroo theorem: the second
+  switch-sandwich step wants complete-part self-consistency of `G`, but the
+  current hypothesis package `GCompleteSelfConsistencyStatement` only stores the
+  stronger slice-family relation in a form that can be pushed down to the
+  complete part only with `PermInvState`.
 - Reason: this is the lowest remaining live dependency spine to `ldPasting`,
   `ldPastingInInductionSection`, and `mainInduction` that still looks provable
   with current infrastructure.
@@ -27,7 +36,13 @@ Last updated: 2026-04-11
 - Survey agent: refreshed executable-sorry count and file-by-file breakdown.
 - Proof agent A: assigned to `Pasting.commutativitySwitcheroo` proof shape and
   triangle-composition route.
-- Proof agent A status: actively implementing `Pasting.commutativitySwitcheroo`.
+- Proof agent A status: actively implementing `Pasting.commutativitySwitcheroo`;
+  current subtask is the four-term `qSDDOp` expansion with two-center
+  cancellation.
+- Proof agent A blocker: generic `commutativitySwitcheroo` does not currently
+  expose the complete-part self-consistency witness needed for the second
+  switch-sandwich bound; this witness is derivable later for `SymStrat` states
+  via `PermInvState`, but not from the theorem's present hypotheses alone.
 - Proof agent B: assigned to local helper subgoals in the same cluster:
   `completePartProjFamily.proj`,
   `pointWithCompletePart_as_switcheroo_input`,
@@ -144,6 +159,35 @@ Last updated: 2026-04-11
 - `ExpansionHypercubeGraph/Theorems.lean`
 
 ## Recent Progress On This Pass
+- Opened PR #326 for the Worktree 2 Section 9 tracker refresh.
+- `SelfImprovement/Defs.lean`, `SelfImprovement/MatrixRealization.lean`, and
+  `SelfImprovement/Theorems.lean` re-scanned: 0 executable
+  `sorry`/`admit`/`axiom` placeholders remain.
+- `SelfImprovement/Theorems.lean`: confirmed current executable closure relies on
+  reduced Section 9 scaffolding (`sdp`, `addInU`, `SelfImprovementBridgePackage`)
+  rather than missing local proofs.
+- Reprioritized away from Section 9 and back onto the live Section 12 pasting
+  chain.
+- `Pasting/Theorems.lean:commutativitySwitcheroo` proof route refined against the
+  paper: the Lean proof should cancel two separate center terms rather than rely
+  on an unneeded symmetry assumption.
+- `Pasting/Theorems.lean:commutativitySwitcheroo` now contains the explicit
+  two-center proof scaffold in code, and the first switch-sandwich transfer
+  bound (`M` self-consistency to the `G \otimes M` center) is formalized and
+  typechecked.
+- Isolated the precise generic switcheroo blocker: the missing witness is
+  complete-part self-consistency of `G`, equivalently the bipartite SSC input
+  for the one-outcome projective family `x ↦ G^x`.
+- `Preliminaries/Theorems.lean`: added
+  `consRelDataProcessing_questionDependent`, a question-dependent postprocessing
+  theorem for `ConsRel`; this is intended to support later corollaries such as
+  `Pasting.hAConsistency` where the evaluation map depends on the sampled point.
+- `Preliminaries/Theorems.lean`: added `consRel_uniform_equiv`, reindexing
+  `ConsRel` along an equivalence of uniformly sampled question spaces. This is
+  another transport lemma needed for moving between `Point params.next` and
+  `(Point params) × (Fq params)` style formulations.
+- `lake build MIPStarRE.LDT.Pasting.Theorems` now completes successfully in this
+  workspace, so single-file proof iteration is warm.
 - `Pasting/Theorems.lean:completePartProjFamily.proj` proved.
 - `Pasting/Theorems.lean:pointWithCompletePart_as_switcheroo_input` proved.
 - `Pasting/Theorems.lean`: extracted
