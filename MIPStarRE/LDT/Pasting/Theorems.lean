@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Preliminaries.SelfConsistency
 
 /-!
@@ -398,7 +399,6 @@ private lemma qSDD_completePart_le_slice
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
-    (hperm : PermInvState ψbi)
     (family : IdxPolyFamily params ι)
     (x : Fq params) :
     qSDD ψbi
@@ -415,7 +415,9 @@ private lemma qSDD_completePart_le_slice
   have hcomplete :
       qSDD ψbi ((completePartSubMeas params family x).liftLeft)
           ((completePartSubMeas params family x).liftRight) =
-        2 * (ev ψbi (leftTensor (ι₂ := ι) T) - ev ψbi (opTensor T T)) := by
+        ev ψbi (leftTensor (ι₂ := ι) T) +
+          ev ψbi (rightTensor (ι₁ := ι) T) -
+          2 * ev ψbi (opTensor T T) := by
     calc
       qSDD ψbi ((completePartSubMeas params family x).liftLeft)
           ((completePartSubMeas params family x).liftRight)
@@ -453,15 +455,16 @@ private lemma qSDD_completePart_le_slice
                             rightTensor_mul_leftTensor_eq_opTensor,
                             rightTensor_mul_rightTensor]
                           ring
-      _ = 2 * (ev ψbi (leftTensor (ι₂ := ι) T) - ev ψbi (opTensor T T)) := by
-            rw [hTT, hperm.swap_ev T]
-            ring_nf
+      _ = ev ψbi (leftTensor (ι₂ := ι) T) +
+            ev ψbi (rightTensor (ι₁ := ι) T) -
+            2 * ev ψbi (opTensor T T) := by
+            simpa [hTT]
   have horig :
       qSDD ψbi (((family.meas x).toSubMeas).liftLeft)
           (((family.meas x).toSubMeas).liftRight) =
-        2 *
-          (ev ψbi (leftTensor (ι₂ := ι) T) -
-            ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g))) := by
+        ev ψbi (leftTensor (ι₂ := ι) T) +
+          ev ψbi (rightTensor (ι₁ := ι) T) -
+          2 * ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
     have hsum_left :
         ∑ g : Polynomial params, ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) =
           ev ψbi (leftTensor (ι₂ := ι) T) := by
@@ -472,6 +475,16 @@ private lemma qSDD_completePart_le_slice
         _ = ev ψbi (leftTensor (ι₂ := ι) (∑ a, P.outcome a)) := by
               rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ P.outcome]
         _ = ev ψbi (leftTensor (ι₂ := ι) T) := by simp [T, P.sum_eq_total]
+    have hsum_right :
+        ∑ g : Polynomial params, ev ψbi (rightTensor (ι₁ := ι) (P.outcome g)) =
+          ev ψbi (rightTensor (ι₁ := ι) T) := by
+      calc
+        ∑ g : Polynomial params, ev ψbi (rightTensor (ι₁ := ι) (P.outcome g))
+          = ev ψbi (∑ a, rightTensor (ι₁ := ι) (P.outcome a)) := by
+              rw [← ev_sum ψbi (fun g => rightTensor (ι₁ := ι) (P.outcome g))]
+        _ = ev ψbi (rightTensor (ι₁ := ι) (∑ a, P.outcome a)) := by
+              rw [← rightTensor_finset_sum (ι₁ := ι) Finset.univ P.outcome]
+        _ = ev ψbi (rightTensor (ι₁ := ι) T) := by simp [T, P.sum_eq_total]
     unfold qSDD qSDDCore
     calc
       ∑ g : Polynomial params,
@@ -479,9 +492,9 @@ private lemma qSDD_completePart_le_slice
             ((((P.toSubMeas.liftLeft).outcome g - (P.toSubMeas.liftRight).outcome g)ᴴ) *
               ((P.toSubMeas.liftLeft).outcome g - (P.toSubMeas.liftRight).outcome g))
         = ∑ g : Polynomial params,
-            (2 *
-              (ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) -
-                ev ψbi (opTensor (P.outcome g) (P.outcome g)))) := by
+            (ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) +
+              ev ψbi (rightTensor (ι₁ := ι) (P.outcome g)) -
+              2 * ev ψbi (opTensor (P.outcome g) (P.outcome g))) := by
               refine Finset.sum_congr rfl ?_
               intro g _
               have hLherm :
@@ -522,24 +535,28 @@ private lemma qSDD_completePart_le_slice
                             rightTensor_mul_leftTensor_eq_opTensor,
                             rightTensor_mul_rightTensor]
                           ring
-                _ = 2 *
-                      (ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) -
-                        ev ψbi (opTensor (P.outcome g) (P.outcome g))) := by
-                          rw [P.proj g, hperm.swap_ev (P.outcome g)]
-                          ring
-      _ = 2 *
-            ∑ g : Polynomial params,
-              (ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) -
-                ev ψbi (opTensor (P.outcome g) (P.outcome g))) := by
-              rw [← Finset.mul_sum]
-      _ = 2 *
-            ((∑ g : Polynomial params, ev ψbi (leftTensor (ι₂ := ι) (P.outcome g))) -
-              ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g))) := by
+                _ = ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) +
+                      ev ψbi (rightTensor (ι₁ := ι) (P.outcome g)) -
+                      2 * ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
+                          simpa [P.proj g]
+      _ = (∑ g : Polynomial params,
+              (ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) +
+                ev ψbi (rightTensor (ι₁ := ι) (P.outcome g)))) -
+            ∑ g : Polynomial params, 2 * ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
               rw [Finset.sum_sub_distrib]
-      _ = 2 *
-            (ev ψbi (leftTensor (ι₂ := ι) T) -
-              ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g))) := by
-              rw [hsum_left]
+      _ = (∑ g : Polynomial params, ev ψbi (leftTensor (ι₂ := ι) (P.outcome g))) +
+            ∑ g : Polynomial params, ev ψbi (rightTensor (ι₁ := ι) (P.outcome g)) -
+            ∑ g : Polynomial params, 2 * ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
+              rw [Finset.sum_add_distrib]
+      _ = ev ψbi (leftTensor (ι₂ := ι) T) + ev ψbi (rightTensor (ι₁ := ι) T) -
+            ∑ g : Polynomial params, 2 * ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
+              rw [hsum_left, hsum_right]
+      _ = ev ψbi (leftTensor (ι₂ := ι) T) + ev ψbi (rightTensor (ι₁ := ι) T) -
+            2 * ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
+              rw [← Finset.mul_sum]
+      _ = ev ψbi (leftTensor (ι₂ := ι) T) + ev ψbi (rightTensor (ι₁ := ι) T) -
+            2 * ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
+              rfl
   have hmatch :
       ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g)) ≤
         ev ψbi (opTensor T T) := by
@@ -604,7 +621,7 @@ theorem gBotSelfConsistency
               intro x
               simpa [completePartLeftFamily, completePartRightFamily,
                 IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjSubMeas.toIdxSubMeas] using
-                qSDD_completePart_le_slice params ψbi hperm family x
+                qSDD_completePart_le_slice params ψbi family x
       _ ≤ zeta := hcomplete_bound
   refine ⟨?_⟩
   calc
@@ -749,6 +766,61 @@ private lemma avgOver_uniform_slicePair
           (fun x => avgOver (uniformDistribution (SliceQuestion params)) (fun y => f x y)) := by
           simp [avgOver, uniformDistribution, Finset.mul_sum]
 
+private lemma avgOver_uniform_slicePair_swapOrder
+    (params : Parameters) [FieldModel params.q]
+    (f : Fq params → Fq params → Error) :
+    avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => f q.1 q.2) =
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun y => avgOver (uniformDistribution (SliceQuestion params)) (fun x => f x y)) := by
+  calc
+    avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => f q.1 q.2)
+      = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => f q.2 q.1) := by
+          simpa [SlicePairQuestion] using
+            (CommutativityPoints.avgOver_uniform_equiv
+              (α := SlicePairQuestion params)
+              (β := SlicePairQuestion params)
+              (Equiv.prodComm (Fq params) (Fq params))
+              (fun q => f q.1 q.2))
+    _ = avgOver (uniformDistribution (SliceQuestion params))
+          (fun y => avgOver (uniformDistribution (SliceQuestion params)) (fun x => f x y)) := by
+          simpa using (avgOver_uniform_slicePair params (f := fun y x => f x y))
+
+/-- If `|f q| ≤ c` pointwise and the distribution has total weight at most `1`, then
+its weighted average is bounded by `c`. -/
+private lemma avgOver_abs_le_of_bound
+    {Question : Type*}
+    (𝒟 : Distribution Question)
+    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
+    (f : Question → Error)
+    (c : Error)
+    (hc : 0 ≤ c)
+    (hf : ∀ q, |f q| ≤ c) :
+    |avgOver 𝒟 f| ≤ c := by
+  calc
+    |avgOver 𝒟 f|
+      = |∑ q ∈ 𝒟.support, 𝒟.weight q * f q| := rfl
+    _ ≤ ∑ q ∈ 𝒟.support, |𝒟.weight q * f q| := Finset.abs_sum_le_sum_abs _ _
+    _ = ∑ q ∈ 𝒟.support, 𝒟.weight q * |f q| := by
+          refine Finset.sum_congr rfl ?_
+          intro q _
+          rw [abs_mul, abs_of_nonneg (𝒟.nonnegative q)]
+    _ ≤ ∑ q ∈ 𝒟.support, 𝒟.weight q * c := by
+          refine Finset.sum_le_sum ?_
+          intro q _
+          exact mul_le_mul_of_nonneg_left (hf q) (𝒟.nonnegative q)
+    _ = c * ∑ q ∈ 𝒟.support, 𝒟.weight q := by
+          calc
+            ∑ q ∈ 𝒟.support, 𝒟.weight q * c
+              = ∑ q ∈ 𝒟.support, c * 𝒟.weight q := by
+                  refine Finset.sum_congr rfl ?_
+                  intro q _
+                  ring
+            _ = c * ∑ q ∈ 𝒟.support, 𝒟.weight q := by
+                  rw [Finset.mul_sum]
+    _ ≤ c * 1 := by
+          exact mul_le_mul_of_nonneg_left h𝒟 hc
+    _ = c := by ring
+
 private lemma avgOver_abs_le_avgOver_abs
     {α : Type*} [DecidableEq α]
     (𝒟 : Distribution α) (f : α → Error) :
@@ -764,6 +836,367 @@ private lemma avgOver_abs_le_avgOver_abs
           rw [abs_mul, abs_of_nonneg (𝒟.nonnegative a)]
     _ = avgOver 𝒟 (fun a => |f a|) := by
           rfl
+
+/-- The usual `Σₐ Aₐ† Aₐ ≤ I` bound for a submeasurement. -/
+private lemma subMeas_sum_adjoint_mul_le_one
+    {Outcome : Type*} [Fintype Outcome]
+    (A : SubMeas Outcome ι) :
+    ∑ a : Outcome, (A.outcome a)ᴴ * A.outcome a ≤ 1 := by
+  calc
+    ∑ a : Outcome, (A.outcome a)ᴴ * A.outcome a
+      = ∑ a : Outcome, A.outcome a * A.outcome a := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [SubMeas.outcome_hermitian]
+    _ ≤ ∑ a : Outcome, A.outcome a := by
+          refine Finset.sum_le_sum ?_
+          intro a _
+          exact MIPStarRE.Quantum.sq_le_self (A.outcome_pos a) (A.outcome_le_one a)
+    _ = A.total := A.sum_eq_total
+    _ ≤ 1 := A.total_le_one
+
+/-- The total of a submeasurement is bounded between `0` and `1`. -/
+private lemma subMeas_total_opBounded01
+    {Outcome : Type*} [Fintype Outcome]
+    (A : SubMeas Outcome ι) :
+    Preliminaries.OpBounded01 A.total := by
+  constructor
+  · exact A.total_nonneg
+  · exact sub_nonneg.mpr A.total_le_one
+
+/-- The total operator of a projective submeasurement is idempotent. -/
+private lemma projSubMeas_total_sq
+    {Outcome : Type*} [Fintype Outcome]
+    (P : ProjSubMeas Outcome ι) :
+    P.toSubMeas.total * P.toSubMeas.total = P.toSubMeas.total := by
+  simpa using MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj P
+
+/-- Expand the switcheroo aggregate defect into the four terms used in the paper. -/
+private lemma switcherooAggregate_qSDDOp_expand
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (q : SlicePairQuestion params) :
+    qSDDOp ψbi
+      (switcherooAggregateLeft params family M q)
+      (switcherooAggregateRight params family M q)
+      =
+        ∑ o : Outcome,
+          (ev ψbi
+              (leftTensor (ι₂ := ι)
+                ((M q.2).outcome o *
+                  (completePartSubMeas params family q.1).total *
+                  (M q.2).outcome o)) +
+            ev ψbi
+              (leftTensor (ι₂ := ι)
+                ((completePartSubMeas params family q.1).total *
+                  (M q.2).outcome o *
+                  (completePartSubMeas params family q.1).total)) -
+            ev ψbi
+              (leftTensor (ι₂ := ι)
+                ((M q.2).outcome o *
+                  (completePartSubMeas params family q.1).total *
+                  (M q.2).outcome o *
+                  (completePartSubMeas params family q.1).total)) -
+            ev ψbi
+              (leftTensor (ι₂ := ι)
+                ((completePartSubMeas params family q.1).total *
+                  (M q.2).outcome o *
+                  (completePartSubMeas params family q.1).total *
+                  (M q.2).outcome o))) := by
+  let G : MIPStarRE.Quantum.Op ι := (completePartSubMeas params family q.1).total
+  have hGsq : G * G = G := by
+    simpa [G, completePartSubMeas, postprocess_total] using
+      projSubMeas_total_sq (family.meas q.1)
+  unfold qSDDOp qSDDCore
+  refine Finset.sum_congr rfl ?_
+  intro o _
+  let Mo : MIPStarRE.Quantum.Op ι := (M q.2).outcome o
+  have hMosq : Mo * Mo = Mo := by
+    simpa [Mo] using (M q.2).proj o
+  have hGherm : (leftTensor (ι₂ := ι) G)ᴴ = leftTensor (ι₂ := ι) G := by
+    exact
+      (Matrix.nonneg_iff_posSemidef.mp
+        (leftTensor_nonneg (ι₂ := ι)
+          (SubMeas.total_nonneg (completePartSubMeas params family q.1)))).isHermitian.eq
+  have hMoherm : (leftTensor (ι₂ := ι) Mo)ᴴ = leftTensor (ι₂ := ι) Mo := by
+    exact
+      (Matrix.nonneg_iff_posSemidef.mp
+        (leftTensor_nonneg (ι₂ := ι) ((M q.2).outcome_pos o))).isHermitian.eq
+  calc
+    ev ψbi
+        ((((switcherooAggregateLeft params family M q).outcome o -
+              (switcherooAggregateRight params family M q).outcome o)ᴴ) *
+          ((switcherooAggregateLeft params family M q).outcome o -
+            (switcherooAggregateRight params family M q).outcome o))
+      = ev ψbi
+          ((((leftTensor (ι₂ := ι) G * leftTensor (ι₂ := ι) Mo) -
+                (leftTensor (ι₂ := ι) Mo * leftTensor (ι₂ := ι) G))ᴴ) *
+            ((leftTensor (ι₂ := ι) G * leftTensor (ι₂ := ι) Mo) -
+              (leftTensor (ι₂ := ι) Mo * leftTensor (ι₂ := ι) G))) := by
+            simp [switcherooAggregateLeft, switcherooAggregateRight,
+              multiplyByTotalOnLeft, multiplyByTotalOnRight,
+              OpFamily.leftPlacedOpFamily, completePartSubMeas, G, Mo,
+              leftTensor_mul_leftTensor, Matrix.conjTranspose_mul]
+    _ = ev ψbi
+          (((leftTensor (ι₂ := ι) Mo * leftTensor (ι₂ := ι) G) -
+                (leftTensor (ι₂ := ι) G * leftTensor (ι₂ := ι) Mo)) *
+            ((leftTensor (ι₂ := ι) G * leftTensor (ι₂ := ι) Mo) -
+              (leftTensor (ι₂ := ι) Mo * leftTensor (ι₂ := ι) G))) := by
+            simp [hGherm, hMoherm]
+    _ = ev ψbi
+          ((leftTensor (ι₂ := ι) Mo * leftTensor (ι₂ := ι) G *
+                leftTensor (ι₂ := ι) G * leftTensor (ι₂ := ι) Mo) +
+            (leftTensor (ι₂ := ι) G * leftTensor (ι₂ := ι) Mo *
+                leftTensor (ι₂ := ι) Mo * leftTensor (ι₂ := ι) G) -
+            (leftTensor (ι₂ := ι) Mo * leftTensor (ι₂ := ι) G *
+                leftTensor (ι₂ := ι) Mo * leftTensor (ι₂ := ι) G) -
+            (leftTensor (ι₂ := ι) G * leftTensor (ι₂ := ι) Mo *
+                leftTensor (ι₂ := ι) G * leftTensor (ι₂ := ι) Mo)) := by
+            congr 1
+            noncomm_ring
+    _ = ev ψbi
+          (leftTensor (ι₂ := ι) (Mo * G * Mo) +
+            leftTensor (ι₂ := ι) (G * Mo * G) -
+            leftTensor (ι₂ := ι) (Mo * G * Mo * G) -
+            leftTensor (ι₂ := ι) (G * Mo * G * Mo)) := by
+            simp [leftTensor_mul_leftTensor, hGsq, hMosq, mul_assoc]
+    _ =
+        ev ψbi
+          (leftTensor (ι₂ := ι) (Mo * G * Mo)) +
+        ev ψbi
+          (leftTensor (ι₂ := ι) (G * Mo * G)) -
+        ev ψbi
+          (leftTensor (ι₂ := ι) (Mo * G * Mo * G)) -
+        ev ψbi
+          (leftTensor (ι₂ := ι) (G * Mo * G * Mo)) := by
+            rw [ev_sub, ev_sub, ev_add]
+    _ =
+        ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((M q.2).outcome o * (completePartSubMeas params family q.1).total *
+                (M q.2).outcome o)) +
+          ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((completePartSubMeas params family q.1).total * (M q.2).outcome o *
+                (completePartSubMeas params family q.1).total)) -
+          ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((M q.2).outcome o * (completePartSubMeas params family q.1).total *
+                (M q.2).outcome o * (completePartSubMeas params family q.1).total)) -
+          ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((completePartSubMeas params family q.1).total * (M q.2).outcome o *
+                (completePartSubMeas params family q.1).total * (M q.2).outcome o)) := by
+            simp [G, Mo]
+
+/-- The common comparison scalar `⟨ψ, G ⊗ M ψ⟩` from the switcheroo proof. -/
+private noncomputable def switcherooAggregateTarget
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
+  avgOver (uniformDistribution (SlicePairQuestion params)) fun q =>
+    ∑ o : Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι) ((completePartSubMeas params family q.1).total) *
+          rightTensor (ι₁ := ι) ((M q.2).outcome o))
+
+/-- The first positive term in the switcheroo expansion. -/
+private noncomputable def switcherooAggregateFirstTerm
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
+  avgOver (uniformDistribution (SlicePairQuestion params)) fun q =>
+    ∑ o : Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          ((M q.2).outcome o * (completePartSubMeas params family q.1).total * (M q.2).outcome o))
+
+
+private lemma switcherooAggregateFirstTerm_eq_leftSandwich
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) :
+    switcherooAggregateFirstTerm params ψbi family M =
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun x =>
+          MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi
+            (uniformDistribution (SliceQuestion params))
+            M
+            ((completePartSubMeas params family x).total)) := by
+  unfold switcherooAggregateFirstTerm
+  calc
+    avgOver (uniformDistribution (SlicePairQuestion params))
+        (fun q =>
+          ∑ o : Outcome,
+            ev ψbi
+              (leftTensor (ι₂ := ι)
+                ((M q.2).outcome o * (completePartSubMeas params family q.1).total *
+                  (M q.2).outcome o)))
+      = avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            avgOver (uniformDistribution (SliceQuestion params))
+              (fun y =>
+                ∑ o : Outcome,
+                  ev ψbi
+                    (leftTensor (ι₂ := ι)
+                      ((M y).outcome o * (completePartSubMeas params family x).total *
+                        (M y).outcome o)))) := by
+            simpa using
+              (avgOver_uniform_slicePair params
+                (f := fun x y =>
+                  ∑ o : Outcome,
+                    ev ψbi
+                      (leftTensor (ι₂ := ι)
+                        ((M y).outcome o * (completePartSubMeas params family x).total *
+                          (M y).outcome o))))
+    _ = avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi
+              (uniformDistribution (SliceQuestion params))
+              M
+              ((completePartSubMeas params family x).total)) := by
+            apply avgOver_congr
+            intro x
+            simp [MIPStarRE.LDT.Preliminaries.leftSandwichExpectation,
+              avgOver, leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma switcherooAggregateTarget_eq_middleSandwich
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) :
+    switcherooAggregateTarget params ψbi family M =
+      avgOver (uniformDistribution (SliceQuestion params))
+        (fun x =>
+          MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi
+            (uniformDistribution (SliceQuestion params))
+            M
+            ((completePartSubMeas params family x).total)) := by
+  unfold switcherooAggregateTarget
+  calc
+    avgOver (uniformDistribution (SlicePairQuestion params))
+        (fun q =>
+          ∑ o : Outcome,
+            ev ψbi
+              (leftTensor (ι₂ := ι) ((completePartSubMeas params family q.1).total) *
+                rightTensor (ι₁ := ι) ((M q.2).outcome o)))
+      = avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            avgOver (uniformDistribution (SliceQuestion params))
+              (fun y =>
+                ∑ o : Outcome,
+                  ev ψbi
+                    (leftTensor (ι₂ := ι) ((completePartSubMeas params family x).total) *
+                      rightTensor (ι₁ := ι) ((M y).outcome o)))) := by
+            simpa using
+              (avgOver_uniform_slicePair params
+                (f := fun x y =>
+                  ∑ o : Outcome,
+                    ev ψbi
+                      (leftTensor (ι₂ := ι) ((completePartSubMeas params family x).total) *
+                        rightTensor (ι₁ := ι) ((M y).outcome o))))
+    _ = avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi
+              (uniformDistribution (SliceQuestion params))
+              M
+              ((completePartSubMeas params family x).total)) := by
+            apply avgOver_congr
+            intro x
+            simp [MIPStarRE.LDT.Preliminaries.middleSandwichExpectation, avgOver]
+
+private lemma switcherooAggregateFirstTerm_le_target
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (omega : Error)
+    (hselfM : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (switcherooSelfConsistencyLeft params M)
+      (switcherooSelfConsistencyRight params M)
+      omega) :
+    switcherooAggregateFirstTerm params ψbi family M ≤
+      switcherooAggregateTarget params ψbi family M + 2 * Real.sqrt omega := by
+  let 𝒟x : Distribution (SliceQuestion params) := uniformDistribution (SliceQuestion params)
+  have h𝒟x :
+      ∑ x ∈ 𝒟x.support, 𝒟x.weight x ≤ 1 := by
+    simpa [𝒟x] using uniformDistribution_weight_sum_le_one (SliceQuestion params)
+  have hswitch :
+      ∀ x : Fq params,
+        |MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x M
+              ((completePartSubMeas params family x).total) -
+            MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x M
+              ((completePartSubMeas params family x).total)| ≤
+          2 * Real.sqrt omega := by
+    intro x
+    have hB : Preliminaries.OpBounded01 ((completePartSubMeas params family x).total) :=
+      subMeas_total_opBounded01 (completePartSubMeas params family x)
+    have hM_bip := switcherooSelfConsistency_bip params ψbi M omega hselfM
+    simpa [𝒟x] using
+      (MIPStarRE.LDT.Preliminaries.switchSandwich ψbi 𝒟x hnorm h𝒟x M
+        ((completePartSubMeas params family x).total) hB omega hM_bip).leftSandwichTransfer
+  rw [switcherooAggregateFirstTerm_eq_leftSandwich,
+    switcherooAggregateTarget_eq_middleSandwich]
+  let diff : Fq params → Error := fun x =>
+    MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x M
+        ((completePartSubMeas params family x).total) -
+      MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x M
+        ((completePartSubMeas params family x).total)
+  have hdiff :
+      avgOver 𝒟x diff =
+        avgOver 𝒟x
+            (fun x => MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x M
+              ((completePartSubMeas params family x).total)) -
+          avgOver 𝒟x
+            (fun x => MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x M
+              ((completePartSubMeas params family x).total)) := by
+    unfold avgOver diff
+    rw [show
+      (∑ x ∈ 𝒟x.support,
+          𝒟x.weight x *
+            (MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x M
+                ((completePartSubMeas params family x).total) -
+              MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x M
+                ((completePartSubMeas params family x).total))) =
+        ∑ x ∈ 𝒟x.support,
+          (𝒟x.weight x *
+              MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x M
+                ((completePartSubMeas params family x).total) -
+            𝒟x.weight x *
+              MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x M
+                ((completePartSubMeas params family x).total)) by
+      refine Finset.sum_congr rfl ?_
+      intro x _
+      ring]
+    rw [Finset.sum_sub_distrib]
+  have hbound : |avgOver 𝒟x diff| ≤ 2 * Real.sqrt omega := by
+    apply avgOver_abs_le_of_bound 𝒟x h𝒟x diff (2 * Real.sqrt omega)
+    · positivity
+    · intro x
+      simpa [diff] using hswitch x
+  rw [hdiff] at hbound
+  have hupper :
+      avgOver 𝒟x
+          (fun x => MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x M
+            ((completePartSubMeas params family x).total)) -
+        avgOver 𝒟x
+          (fun x => MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x M
+            ((completePartSubMeas params family x).total)) ≤ 2 * Real.sqrt omega := by
+    exact (abs_le.mp hbound).2
+  linarith
 
 private lemma switcheroo_first_term_close
     {Outcome : Type*} [Fintype Outcome]
@@ -829,6 +1262,75 @@ private lemma switcheroo_first_term_close
             exact_mod_cast Nat.ne_of_gt params.hq
           simp [avgOver, uniformDistribution]
           field_simp [hq0]
+
+/-- The one-outcome projective family whose sole effect is the complete slice part `G^x`. -/
+private noncomputable def completePartProjFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    IdxProjSubMeas (SliceQuestion params) Unit ι :=
+  fun x =>
+    { toSubMeas := completePartSubMeas params family x
+      proj := by
+        intro u
+        cases u
+        have hsingle :
+            (completePartSubMeas params family x).outcome () =
+              (completePartSubMeas params family x).total := by
+          rw [← (completePartSubMeas params family x).sum_eq_total]
+          simp [completePartSubMeas]
+        rw [hsingle]
+        simpa [completePartSubMeas, postprocess_total] using
+          MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x) }
+
+/-- The second positive term in the switcheroo expansion. -/
+private noncomputable def switcherooAggregateSecondTerm
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
+  avgOver (uniformDistribution (SlicePairQuestion params)) fun q =>
+    ∑ o : Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          ((completePartSubMeas params family q.1).total * (M q.2).outcome o *
+            (completePartSubMeas params family q.1).total))
+
+
+
+/-- The one-outcome complete-part family inherits self-consistency from the slice family. -/
+private lemma completePartProjFamily_selfConsistency_generic
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hself : GCompleteSelfConsistencyStatement params ψbi family zeta) :
+    SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (switcherooSelfConsistencyLeft params (completePartProjFamily params family))
+      (switcherooSelfConsistencyRight params (completePartProjFamily params family))
+      zeta := by
+  rcases hself.completePartSelfConsistency with ⟨hself_bound⟩
+  constructor
+  unfold sddError at *
+  calc
+    avgOver (uniformDistribution (SliceQuestion params))
+        (fun x =>
+          qSDD ψbi
+            ((switcherooSelfConsistencyLeft params (completePartProjFamily params family)) x)
+            ((switcherooSelfConsistencyRight params (completePartProjFamily params family)) x))
+      ≤
+        avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            qSDD ψbi
+              ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
+              ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x)) := by
+            apply avgOver_mono
+            intro x
+            simpa [switcherooSelfConsistencyLeft, switcherooSelfConsistencyRight,
+              completePartProjFamily, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
+              qSDD_completePart_le_slice params ψbi family x
+    _ ≤ zeta := hself_bound
 
 private lemma switcheroo_second_term_close
     {Outcome : Type*} [Fintype Outcome]
@@ -896,6 +1398,7 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (hnorm : ψbi.IsNormalized)
+    (hperm : PermInvState ψbi)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta omega chi : Error)
@@ -1014,25 +1517,6 @@ private lemma sddOpRel_swap_questions
                 (fun q => qSDDOp ψbi (A q) (B q)))
     _ ≤ δ := hAB
 
-/-- The one-outcome projective family whose sole effect is the complete slice part `G^x`. -/
-private noncomputable def completePartProjFamily
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) :
-    IdxProjSubMeas (SliceQuestion params) Unit ι :=
-  fun x =>
-    { toSubMeas := completePartSubMeas params family x
-      proj := by
-        intro u
-        cases u
-        have hsingle :
-            (completePartSubMeas params family x).outcome () =
-              (completePartSubMeas params family x).total := by
-          rw [← (completePartSubMeas params family x).sum_eq_total]
-          simp [completePartSubMeas]
-        rw [hsingle]
-        simpa [completePartSubMeas, postprocess_total] using
-          MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x) }
-
 /-- Reinterpret the point-with-complete-part commutation bound as a relation on the
 `Polynomial × Unit` outcome type expected by `commutativitySwitcheroo`. -/
 private lemma pointWithCompletePart_as_switcheroo_input
@@ -1108,27 +1592,8 @@ private lemma completePartProjFamily_selfConsistency
       (switcherooSelfConsistencyLeft params (completePartProjFamily params family))
       (switcherooSelfConsistencyRight params (completePartProjFamily params family))
       zeta := by
-  rcases hself.completePartSelfConsistency with ⟨hself_bound⟩
-  constructor
-  unfold sddError at *
-  calc
-    avgOver (uniformDistribution (SliceQuestion params))
-        (fun x =>
-          qSDD strategy.state
-            ((switcherooSelfConsistencyLeft params (completePartProjFamily params family)) x)
-            ((switcherooSelfConsistencyRight params (completePartProjFamily params family)) x))
-      ≤
-        avgOver (uniformDistribution (SliceQuestion params))
-          (fun x =>
-            qSDD strategy.state
-              ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
-              ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x)) := by
-            apply avgOver_mono
-            intro x
-            simpa [switcherooSelfConsistencyLeft, switcherooSelfConsistencyRight,
-              completePartProjFamily, IdxSubMeas.liftLeft, IdxSubMeas.liftRight]
-              using qSDD_completePart_le_slice params strategy.state strategy.permInvState family x
-    _ ≤ zeta := hself_bound
+  simpa using
+    completePartProjFamily_selfConsistency_generic params strategy.state family zeta hself
 
 private lemma switcherooAggregateLeft_completePart_outcome
     (params : Parameters) [FieldModel params.q]
@@ -1776,7 +2241,7 @@ theorem commutingWithGComplete
       CommutativitySwitcherooStatement params strategy.state family family.meas
         zeta zeta (pairwiseCompletePartCommutationError params gamma zeta) := by
     simpa [pairwiseCompletePartCommutationError] using
-      commutativitySwitcheroo params strategy.state hnorm family family.meas zeta zeta
+      commutativitySwitcheroo params strategy.state hnorm strategy.permInvState family family.meas zeta zeta
         (Commutativity.comMainError params gamma zeta)
         hself hself.completePartSelfConsistency hcom.fullSliceCommutation
   have hpoint_raw :
@@ -1827,7 +2292,7 @@ theorem commutingWithGComplete
         zeta zeta
         (commutativitySwitcherooError zeta zeta
           (pairwiseCompletePartCommutationError params gamma zeta)) := by
-    apply commutativitySwitcheroo params strategy.state hnorm family
+    apply commutativitySwitcheroo params strategy.state hnorm strategy.permInvState family
       (completePartProjFamily params family) zeta zeta
       (commutativitySwitcherooError zeta zeta
         (pairwiseCompletePartCommutationError params gamma zeta))
@@ -2607,6 +3072,7 @@ lemma fromHToG
 /-- `lem:chernoff-bernoulli-matrix`. -/
 lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
+    (hnorm : ψ.IsNormalized)
     (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error)
     (hθ0 : 0 < theta) (hθ1 : theta < 1)
     (hk : (2 * (degree : Error)) / theta ≤ (k : Error))

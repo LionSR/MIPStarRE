@@ -9,43 +9,6 @@ The strategy state is bipartite (`QuantumState (ι × ι)`).  All fields use
 `strategy.state` directly.
 -/
 
-namespace MIPStarRE.LDT.IdxPolyFamily
-
-/-- Compatibility copy of the averaged slice point operator.
-
-This matches the paper's `E_u A^{u,x}_{g(u)}` boundedness term. The shared
-definition lives in `Test/Strategy.lean`, but standalone elaboration of this
-file does not currently expose that declaration path. -/
-private noncomputable def averageOperatorOverDistribution' {α : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) :
-    MIPStarRE.Quantum.Op ι :=
-  ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
-
-/-- Compatibility copy of the paper's slice-averaged point operator. -/
-noncomputable def averagedSlicePointEvaluationOperator {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (x : Fq params) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution' (uniformDistribution (Point params))
-    (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
-
-/-- Compatibility copy of the paper-faithful boundedness input.
-
-This is definitionally aligned with the source-side boundedness item used by
-Section 11. -/
-structure SliceBoundednessInput {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
-  bounded : family.Bounded strategy.state zeta
-  dominationTargetAgrees :
-    ∀ x : Fq params, ∀ g : Polynomial params,
-      family.dominationTarget x g =
-        averagedSlicePointEvaluationOperator strategy x g
-
-end MIPStarRE.LDT.IdxPolyFamily
-
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT
@@ -364,69 +327,6 @@ private lemma liftRight_mul_rightPlaced_outcome
       rightTensor (A.outcome a * B.outcome b) := by
   simp [SubMeas.liftRight, OpFamily.rightPlacedOpFamily, SubMeas.toOpFamily,
     rightTensor_mul_rightTensor]
-
-private lemma commDataProcessedGStabilityOneLeft_outcome
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (q : EvaluatedSliceQuestion params)
-    (ah : StabilityOneOutcome params) :
-    (commDataProcessedGStabilityOneLeft params strategy family G q).outcome ah =
-      (leftPlacedSubMeas (ιB := ι)
-          (evaluatedSliceSandwichRaw params strategy family q)).outcome
-          (ah.1, ah.2 (truncatePoint params q.2)) *
-        leftTensor (ι₂ := ι)
-          ((fullSliceSecondFactor params family
-            (fullSliceQuestionOfEvaluatedSlice params q)).total) *
-        rightTensor (ι₁ := ι)
-          (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)) := by
-  rfl
-
-private lemma commDataProcessedGStabilityOneRight_outcome
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (q : EvaluatedSliceQuestion params)
-    (ah : StabilityOneOutcome params) :
-    (commDataProcessedGStabilityOneRight params strategy family G q).outcome ah =
-      leftTensor (ι₂ := ι)
-          ((evaluatedSliceSandwichRaw params strategy family q).outcome
-              (ah.1, ah.2 (truncatePoint params q.2))) *
-        rightTensor (ι₁ := ι)
-          (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)) := by
-  rfl
-
-private lemma commDataProcessedGStabilityTwoLeft_outcome
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (q : EvaluatedSliceQuestion params)
-    (gb : StabilityTwoOutcome params) :
-    (commDataProcessedGStabilityTwoLeft params strategy family G q).outcome gb =
-      (evaluatedSliceProductLeft params strategy family q).outcome
-          (gb.1 (truncatePoint params q.1), gb.2) *
-        leftTensor (ι₂ := ι)
-          ((fullSliceFirstFactor params family
-            (fullSliceQuestionOfEvaluatedSlice params q)).total) *
-        rightTensor (ι₁ := ι)
-          (CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1)) := by
-  rfl
-
-private lemma commDataProcessedGStabilityTwoRight_outcome
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (q : EvaluatedSliceQuestion params)
-    (gb : StabilityTwoOutcome params) :
-    (commDataProcessedGStabilityTwoRight params strategy family G q).outcome gb =
-      leftTensor (ι₂ := ι)
-          ((orderedProductOpFamily
-              (evaluatedSliceFirstFactor params family q)
-              (evaluatedSliceSecondFactor params family q)).outcome
-              (gb.1 (truncatePoint params q.1), gb.2)) *
-        rightTensor (ι₁ := ι)
-          (CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1)) := by
-  rfl
 
 /-- Distinct outcomes of a projective submeasurement are orthogonal. -/
 private lemma projSubMeas_outcome_orthogonal
