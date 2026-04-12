@@ -48,13 +48,7 @@ lemma avgOver_uniform_equiv
     _ = avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
           simp [avgOver, uniformDistribution, Finset.mul_sum]
 
-/-- TODO(#306): Consistency transfer for the corrected restricted diagonal test.
-
-This proof gap is intentional tracking for the diagonal-test definition fix:
-the old proof used `DiagonalTestSample` with unrestricted directions, while the
-corrected statement uses `RestrictedDiagonalSample` with restricted directions
-and base-point evaluation. The previous proof therefore established the wrong
-sample space for the paper-corrected test. -/
+/-- Consistency transfer for the fully unrestricted restricted-diagonal sample. -/
 private lemma sampledDiagonalLineConsistency
     (params : Parameters)
     [FieldModel params.q]
@@ -68,20 +62,42 @@ private lemma sampledDiagonalLineConsistency
       (diagonalLineAnswerFamily strategy (lastRestrictionIndex params))
       (restrictedDiagonalLinesConsistencyError
         params gamma) := by
-  -- NOTE(#306): This sorry tracks a genuine proof gap introduced by
-  -- the test definition correction. The old proof used DiagonalTestSample
-  -- with unrestricted directions; the corrected definition uses
-  -- RestrictedDiagonalSample (restricted directions, base-point eval).
-  -- The proof structure needs rebuilding against the new types.
-  sorry
+  let t : Fin params.m → Error := fun j =>
+    bipartiteConsError strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params j))
+      (diagonalPointAnswerFamily strategy j)
+      (diagonalLineAnswerFamily strategy j)
+  have hterm_nonneg : ∀ j, 0 ≤ t j := by
+    intro j
+    dsimp [t]
+    exact bipartiteConsError_nonneg strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params j))
+      (diagonalPointAnswerFamily strategy j)
+      (diagonalLineAnswerFamily strategy j)
+  have hsingle_le_sum :
+      t (lastRestrictionIndex params) ≤ ∑ j : Fin params.m, t j := by
+    exact Finset.single_le_sum (fun j _ => hterm_nonneg j) (Finset.mem_univ _)
+  have hm_pos : 0 < (params.m : Error) := by
+    exact_mod_cast params.hm
+  have hm_nonneg : 0 ≤ (params.m : Error) := le_of_lt hm_pos
+  have hm_ne : (params.m : Error) ≠ 0 := ne_of_gt hm_pos
+  have hdiag :
+      (1 / (params.m : Error)) * ∑ j : Fin params.m, t j ≤ gamma := by
+    simpa [SymStrat.diagonalFailureProbability, t] using hgood.diagonalLineTest
+  have hsum_le :
+      ∑ j : Fin params.m, t j ≤ gamma * (params.m : Error) := by
+    calc
+      ∑ j : Fin params.m, t j =
+          ((1 / (params.m : Error)) * ∑ j : Fin params.m, t j) *
+            (params.m : Error) := by
+            field_simp [hm_ne]
+      _ ≤ gamma * (params.m : Error) := by
+            exact mul_le_mul_of_nonneg_right hdiag hm_nonneg
+  constructor
+  dsimp [restrictedDiagonalLinesConsistencyError]
+  exact le_trans hsingle_le_sum hsum_le
 
-/-- TODO(#306): SDD approximation transfer for the corrected restricted diagonal test.
-
-This proof gap is intentional tracking for the diagonal-test definition fix:
-the old proof used `DiagonalTestSample` with unrestricted directions, while the
-corrected statement uses `RestrictedDiagonalSample` with restricted directions
-and base-point evaluation. The previous proof therefore established the wrong
-sample space for the paper-corrected test. -/
+/-- SDD approximation transfer for the fully unrestricted restricted-diagonal sample. -/
 private lemma sampledDiagonalLineApproximation
     (params : Parameters)
     [FieldModel params.q]
@@ -96,12 +112,35 @@ private lemma sampledDiagonalLineApproximation
       (IdxSubMeas.liftRight
         (diagonalLineAnswerFamily strategy (lastRestrictionIndex params)))
       (pointDiagonalLineApproxError params gamma) := by
-  -- NOTE(#306): This sorry tracks a genuine proof gap introduced by
-  -- the test definition correction. The old proof used DiagonalTestSample
-  -- with unrestricted directions; the corrected definition uses
-  -- RestrictedDiagonalSample (restricted directions, base-point eval).
-  -- The proof structure needs rebuilding against the new types.
-  sorry
+  let j := lastRestrictionIndex params
+  let pointMeas : IdxMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+    fun s => (strategy.pointMeasurement s.1).toMeasurement
+  let lineMeas : IdxMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+    fun s =>
+      let v := extendRestrictedDirection j s.2
+      let ℓ : DiagonalLine params := { base := s.1, direction := v }
+      { toSubMeas :=
+          postprocess ((strategy.diagonalMeasurement ℓ).toSubMeas) (· zeroCoord)
+        total_eq_one := by
+          rw [postprocess_total]
+          exact (strategy.diagonalMeasurement ℓ).total_eq_one }
+  have hcons := sampledDiagonalLineConsistency params strategy eps delta gamma hgood
+  have hconsMeas :
+      ConsRel strategy.state
+        (uniformDistribution (RestrictedDiagonalSample params j))
+        (IdxMeas.toIdxSubMeas pointMeas)
+        (IdxMeas.toIdxSubMeas lineMeas)
+        (restrictedDiagonalLinesConsistencyError params gamma) := by
+    simpa [j, pointMeas, lineMeas, diagonalPointAnswerFamily, diagonalLineAnswerFamily]
+      using hcons
+  have hbip := MIPStarRE.LDT.Preliminaries.simeqToApprox strategy.state
+    (uniformDistribution (RestrictedDiagonalSample params j)) pointMeas lineMeas
+    (restrictedDiagonalLinesConsistencyError params gamma) hconsMeas
+  rcases hbip with ⟨hbip_bound⟩
+  constructor
+  simpa [MIPStarRE.LDT.Preliminaries.BipartiteSDDRel, pointDiagonalLineApproxError,
+    j, pointMeas, lineMeas, diagonalPointAnswerFamily, diagonalLineAnswerFamily]
+    using hbip_bound
 
 /-- TODO(#306): Transport the corrected restricted diagonal approximation to
 the shared line-plus-parameter distribution used by the commutativity proof. -/
