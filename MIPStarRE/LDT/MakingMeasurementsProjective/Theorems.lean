@@ -237,7 +237,7 @@ private lemma oneMeasNaimarkInputProj_isProj {α : Type*} [Fintype α] [Decidabl
       (oneMeasNaimarkInputProj (α := α) (d := d)) :=
   isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) none)
 
-/-- The CFC square root of a PSD matrix is Hermitian. -/
+/-- The CFC square root of a matrix is Hermitian. -/
 private lemma sqrt_isHermitian_eq {d : Type*} [Fintype d] [DecidableEq d]
     {A : MIPStarRE.Quantum.Op d} :
     (CFC.sqrt A)ᴴ = CFC.sqrt A :=
@@ -398,15 +398,12 @@ private lemma partialIsometry_to_unitary
     intro A
     rw [toEuclideanLin_mul, Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
   let E := EuclideanSpace ℂ n
-  letI : NormedAddCommGroup E := by
-    dsimp [E]
-    infer_instance
-  letI : InnerProductSpace ℂ E := by
-    dsimp [E]
-    infer_instance
-  letI : FiniteDimensional ℂ E := by
-    dsimp [E]
-    infer_instance
+  -- These `letI` blocks are needed because `E` is a `let`-binding, so Lean
+  -- does not unfold it during instance search. Removing them causes
+  -- elaboration failures.
+  letI : NormedAddCommGroup E := by dsimp [E]; infer_instance
+  letI : InnerProductSpace ℂ E := by dsimp [E]; infer_instance
+  letI : FiniteDimensional ℂ E := by dsimp [E]; infer_instance
   let Pₗ : E →ₗ[ℂ] E := Matrix.toEuclideanLin P
   let Vₗ : E →ₗ[ℂ] E := Matrix.toEuclideanLin V
   let S : Submodule ℂ E := LinearMap.range Pₗ
@@ -510,7 +507,7 @@ private lemma exists_unitary_extension_oneMeasNaimarkColumn
           oneMeasNaimarkInputProj (α := α) (d := d) =
         oneMeasNaimarkColumn M := by
   exact partialIsometry_to_unitary
-    (oneMeasNaimarkColumn M) _
+    (oneMeasNaimarkColumn M) (oneMeasNaimarkInputProj (α := α) (d := d))
     oneMeasNaimarkInputProj_isProj
     (oneMeasNaimarkColumn_mul_inputProj M)
     (oneMeasNaimarkColumn_isometry M)
