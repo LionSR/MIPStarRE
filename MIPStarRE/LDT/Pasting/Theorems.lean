@@ -1416,8 +1416,8 @@ private lemma switcherooAggregate_qSDDOp_expand_avg
               apply avgOver_congr
               intro q
               rw [switcherooAggregate_qSDDOp_expand]
-              rw [Finset.sum_add_distrib]
-              simp [A, B, C, D]
+              simp only [Finset.sum_add_distrib,
+                Finset.sum_sub_distrib, A, B, C, D]
     _ = avgOver (uniformDistribution (SlicePairQuestion params)) A +
           avgOver (uniformDistribution (SlicePairQuestion params)) B -
           avgOver (uniformDistribution (SlicePairQuestion params)) C -
