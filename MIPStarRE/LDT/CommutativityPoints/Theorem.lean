@@ -51,10 +51,10 @@ lemma avgOver_uniform_equiv
 /-- TODO(#306): Consistency transfer for the corrected restricted diagonal test.
 
 This proof gap is intentional tracking for the diagonal-test definition fix:
-the old proof used `DiagonalTestSample` with unrestricted directions, while the
-corrected statement uses `RestrictedDiagonalSample` with restricted directions
-and base-point evaluation. The previous proof therefore established the wrong
-sample space for the paper-corrected test. -/
+the old proof targeted a diagonal sample with unrestricted directions, while the
+corrected statement uses the restricted-diagonal sample at the last (fully free)
+restriction index, with base-point evaluation. The previous proof therefore
+established the wrong sample space for the paper-corrected test. -/
 private lemma sampledDiagonalLineConsistency
     (params : Parameters)
     [FieldModel params.q]
@@ -70,18 +70,18 @@ private lemma sampledDiagonalLineConsistency
         params gamma) := by
   -- NOTE(#306): This sorry tracks a genuine proof gap introduced by
   -- the test definition correction. The old proof used DiagonalTestSample
-  -- with unrestricted directions; the corrected definition uses
-  -- RestrictedDiagonalSample (restricted directions, base-point eval).
+  -- with unrestricted directions; the corrected definition uses the
+  -- restricted-diagonal sample at the last (fully free) restriction index.
   -- The proof structure needs rebuilding against the new types.
   sorry
 
 /-- TODO(#306): SDD approximation transfer for the corrected restricted diagonal test.
 
 This proof gap is intentional tracking for the diagonal-test definition fix:
-the old proof used `DiagonalTestSample` with unrestricted directions, while the
-corrected statement uses `RestrictedDiagonalSample` with restricted directions
-and base-point evaluation. The previous proof therefore established the wrong
-sample space for the paper-corrected test. -/
+the old proof targeted a diagonal sample with unrestricted directions, while the
+corrected statement uses the restricted-diagonal sample at the last (fully free)
+restriction index, with base-point evaluation. The previous proof therefore
+established the wrong sample space for the paper-corrected test. -/
 private lemma sampledDiagonalLineApproximation
     (params : Parameters)
     [FieldModel params.q]
@@ -98,8 +98,8 @@ private lemma sampledDiagonalLineApproximation
       (pointDiagonalLineApproxError params gamma) := by
   -- NOTE(#306): This sorry tracks a genuine proof gap introduced by
   -- the test definition correction. The old proof used DiagonalTestSample
-  -- with unrestricted directions; the corrected definition uses
-  -- RestrictedDiagonalSample (restricted directions, base-point eval).
+  -- with unrestricted directions; the corrected definition uses the
+  -- restricted-diagonal sample at the last (fully free) restriction index.
   -- The proof structure needs rebuilding against the new types.
   sorry
 
@@ -152,6 +152,7 @@ private lemma sddOpRel_symm
       SDDOpRel ψ 𝒟 B A δ := by
   intro ⟨h⟩
   constructor
+  -- `SDDOpRel` is just the `sddErrorOp` bound, so symmetry reduces to `qSDDOp_symm`.
   simpa [sddErrorOp, qSDDOp_symm] using h
 
 private lemma qSDDOp_reindex
