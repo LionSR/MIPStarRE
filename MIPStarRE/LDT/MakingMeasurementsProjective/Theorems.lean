@@ -224,6 +224,85 @@ private lemma oneMeasNaimarkColumn_eq {α : Type*} [Fintype α] [DecidableEq α]
       Matrix.single_apply, Finset.sum_eq_single]
   · simp [oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.sum_apply]
 
+private lemma oneMeasNaimarkOutcomeProj_mul_column
+    {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (M : MIPStarRE.Quantum.Submeasurement α d) (a : α) :
+    oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) * oneMeasNaimarkColumn M =
+      Matrix.kronecker (CFC.sqrt (M.effect a)) (Matrix.single (some a) none (1 : ℂ)) := by
+  ext x y
+  rcases x with ⟨i, ox⟩
+  rcases y with ⟨j, oy⟩
+  rcases ox with _ | a'
+  · rcases oy with _ | b
+    · rw [Matrix.mul_apply]
+      rw [show ∑ z : d × Option α,
+          oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, none) z *
+              oneMeasNaimarkColumn M z (j, none) =
+            ∑ k : d, ∑ o : Option α,
+              oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, none) (k, o) *
+                oneMeasNaimarkColumn M (k, o) (j, none) by
+        simpa using
+          (Fintype.sum_prod_type
+            (f := fun z : d × Option α =>
+              oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, none) z *
+                oneMeasNaimarkColumn M z (j, none)))]
+      simp [oneMeasNaimarkOutcomeProj, oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition,
+        Matrix.kronecker]
+    · rw [Matrix.mul_apply]
+      rw [show ∑ z : d × Option α,
+          oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, none) z *
+              oneMeasNaimarkColumn M z (j, some b) =
+            ∑ k : d, ∑ o : Option α,
+              oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, none) (k, o) *
+                oneMeasNaimarkColumn M (k, o) (j, some b) by
+        simpa using
+          (Fintype.sum_prod_type
+            (f := fun z : d × Option α =>
+              oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, none) z *
+                oneMeasNaimarkColumn M z (j, some b)))]
+      simp [oneMeasNaimarkOutcomeProj, oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition,
+        Matrix.kronecker]
+  · rcases oy with _ | b
+    · rw [Matrix.mul_apply]
+      rw [show ∑ z : d × Option α,
+          oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, some a') z *
+              oneMeasNaimarkColumn M z (j, none) =
+            ∑ k : d, ∑ o : Option α,
+              oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, some a') (k, o) *
+                oneMeasNaimarkColumn M (k, o) (j, none) by
+        simpa using
+          (Fintype.sum_prod_type
+            (f := fun z : d × Option α =>
+              oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, some a') z *
+                oneMeasNaimarkColumn M z (j, none)))]
+      by_cases h : a' = a
+      · subst a'
+        simp [oneMeasNaimarkOutcomeProj, oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition,
+          Matrix.kronecker, Matrix.one_apply]
+        rw [Finset.sum_eq_single a]
+        · simp
+        · intro x _ hxa
+          have hax : a ≠ x := fun h => hxa h.symm
+          simp [Matrix.single_apply, hax]
+        · simp
+      · simp [oneMeasNaimarkOutcomeProj, oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition,
+          Matrix.kronecker, show a ≠ a' by exact fun h' => h h'.symm]
+    · rw [Matrix.mul_apply]
+      rw [show ∑ z : d × Option α,
+          oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, some a') z *
+              oneMeasNaimarkColumn M z (j, some b) =
+            ∑ k : d, ∑ o : Option α,
+              oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, some a') (k, o) *
+                oneMeasNaimarkColumn M (k, o) (j, some b) by
+        simpa using
+          (Fintype.sum_prod_type
+            (f := fun z : d × Option α =>
+              oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) (i, some a') z *
+                oneMeasNaimarkColumn M z (j, some b)))]
+      simp [oneMeasNaimarkOutcomeProj, oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition,
+        Matrix.kronecker]
+
 private lemma oneMeasNaimarkInputProj_idempotent {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d] :
     oneMeasNaimarkInputProj (α := α) (d := d) * oneMeasNaimarkInputProj (α := α) (d := d) =
@@ -271,61 +350,184 @@ private lemma oneMeasNaimarkColumn_isometry
     (M : MIPStarRE.Quantum.Submeasurement α d) :
     (oneMeasNaimarkColumn M)ᴴ * oneMeasNaimarkColumn M =
       oneMeasNaimarkInputProj (α := α) (d := d) := by
-  ext ⟨d₁, oa₁⟩ ⟨d₂, oa₂⟩
-  simp only [Matrix.mul_apply, Matrix.conjTranspose_apply,
-    oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition,
-    Matrix.kronecker_apply, Matrix.one_apply, Matrix.single_apply]
-  cases oa₁ <;> cases oa₂
-  ·
-    -- Main case: `V†V` on the `⊥` block equals the identity.
-    -- Sum over `d × Option α`: split into remainder (`none`) and outcome (`some a`)
-    -- parts, identify each as `√X * √X = X`, then use `∑ M_a + R = 1`.
-    -- Rewrite as sum over product
-    have hsplit : ∀ (f : d × Option α → ℂ),
-        ∑ x : d × Option α, f x =
-          ∑ k₁ : d, (f (k₁, none) + ∑ a : α, f (k₁, some a)) := by
-      intro f
-      rw [Fintype.sum_prod_type]
-      simp_rw [Fintype.sum_option]
-    rw [hsplit, Finset.sum_add_distrib]
-    -- Expand V entries
-    simp only [oneMeasNaimarkColumn]
-    -- Identify remainder sum as matrix multiplication entry
-    have hR_mul : ∑ k₁ : d,
-        star (CFC.sqrt (oneMeasNaimarkRemainder M) k₁ d₁) *
-          CFC.sqrt (oneMeasNaimarkRemainder M) k₁ d₂ =
-        oneMeasNaimarkRemainder M d₁ d₂ :=
-      sqrt_conjTranspose_mul_self_apply (oneMeasNaimarkRemainder_nonneg M) d₁ d₂
-    -- Identify each outcome sum as matrix multiplication entry
-    have hM_mul : ∀ a : α, ∑ k₁ : d,
-        star (CFC.sqrt (M.effect a) k₁ d₁) *
-          CFC.sqrt (M.effect a) k₁ d₂ =
-        M.effect a d₁ d₂ := by
+  classical
+  ext x y
+  rcases x with ⟨i, ox⟩
+  rcases y with ⟨j, oy⟩
+  cases ox <;> cases oy
+  · rw [Matrix.mul_apply]
+    rw [show ∑ z : d × Option α,
+        (oneMeasNaimarkColumn M)ᴴ (i, none) z * oneMeasNaimarkColumn M z (j, none) =
+          ∑ k : d, ∑ o : Option α,
+            (oneMeasNaimarkColumn M)ᴴ (i, none) (k, o) *
+              oneMeasNaimarkColumn M (k, o) (j, none) by
+        simpa using
+          (Fintype.sum_prod_type
+            (f := fun z : d × Option α =>
+              (oneMeasNaimarkColumn M)ᴴ (i, none) z *
+                oneMeasNaimarkColumn M z (j, none)))]
+    simp_rw [Fintype.sum_option]
+    rw [Finset.sum_add_distrib, Finset.sum_comm]
+    have hR :
+        (CFC.sqrt (oneMeasNaimarkRemainder M))ᴴ =
+          CFC.sqrt (oneMeasNaimarkRemainder M) := by
+      simpa using (CFC.sqrt_nonneg (oneMeasNaimarkRemainder M)).isHermitian.eq
+    have hMa : ∀ a : α, (CFC.sqrt (M.effect a))ᴴ = CFC.sqrt (M.effect a) := by
       intro a
-      exact sqrt_conjTranspose_mul_self_apply (M.pos a) d₁ d₂
-    rw [hR_mul]
-    rw [Finset.sum_comm]
-    simp_rw [hM_mul]
-    -- Now: R(d₁,d₂) + ∑_a M_a(d₁,d₂) = 1(d₁,d₂)
-    have hinput :
-        Matrix.kronecker (1 : MIPStarRE.Quantum.Op d)
-            (Matrix.single (none : Option α) (none : Option α) (1 : ℂ))
-            (d₁, none) (d₂, none) =
-          (1 : MIPStarRE.Quantum.Op d) d₁ d₂ := by
-      simp [Matrix.kronecker]
-    rw [hinput]
-    simp only [oneMeasNaimarkRemainder, Matrix.sub_apply,
-      Matrix.sum_apply, Matrix.one_apply]
-    ring
-  -- Zero cases: V is 0 whenever the column auxiliary index is not `none`.
-  ·
-    simp [oneMeasNaimarkColumn, Matrix.kronecker]
-  ·
-    simp [oneMeasNaimarkColumn, Matrix.kronecker]
-  ·
-    simp [oneMeasNaimarkColumn, Matrix.kronecker]
+      simpa using (CFC.sqrt_nonneg (M.effect a)).isHermitian.eq
+    have hR_sq :
+        CFC.sqrt (oneMeasNaimarkRemainder M) * CFC.sqrt (oneMeasNaimarkRemainder M) =
+          oneMeasNaimarkRemainder M := by
+      simpa using CFC.sqrt_mul_sqrt_self (oneMeasNaimarkRemainder M)
+        (oneMeasNaimarkRemainder_nonneg M)
+    have hMa_sq : ∀ a : α,
+        CFC.sqrt (M.effect a) * CFC.sqrt (M.effect a) = M.effect a := by
+      intro a
+      simpa using CFC.sqrt_mul_sqrt_self (M.effect a) (M.pos a)
+    calc
+      ∑ k : d,
+          star ((oneMeasNaimarkColumn M) (k, none) (i, none)) *
+            (oneMeasNaimarkColumn M) (k, none) (j, none)
+        + ∑ a : α, ∑ k : d,
+            star ((oneMeasNaimarkColumn M) (k, some a) (i, none)) *
+              (oneMeasNaimarkColumn M) (k, some a) (j, none)
+          = (((CFC.sqrt (oneMeasNaimarkRemainder M))ᴴ *
+                CFC.sqrt (oneMeasNaimarkRemainder M)) i j) +
+              ∑ a : α, (((CFC.sqrt (M.effect a))ᴴ * CFC.sqrt (M.effect a)) i j) := by
+              simp [oneMeasNaimarkColumn, Matrix.mul_apply]
+      _ = ((CFC.sqrt (oneMeasNaimarkRemainder M) *
+              CFC.sqrt (oneMeasNaimarkRemainder M)) i j) +
+            ∑ a : α, ((CFC.sqrt (M.effect a) * CFC.sqrt (M.effect a)) i j) := by
+            simp [hR, hMa]
+      _ = (oneMeasNaimarkRemainder M) i j + ∑ a : α, (M.effect a) i j := by
+            simp [hR_sq, hMa_sq]
+      _ = (1 : MIPStarRE.Quantum.Op d) i j := by
+            simp [oneMeasNaimarkRemainder, Matrix.sub_apply, Matrix.sum_apply,
+              sub_eq_add_neg, add_assoc, add_comm]
+      _ = (oneMeasNaimarkInputProj (α := α) (d := d)) (i, none) (j, none) := by
+            simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker]
+  · simp [Matrix.mul_apply, oneMeasNaimarkColumn, oneMeasNaimarkInputProj,
+      oneMeasNaimarkAuxTransition, Matrix.kronecker]
+  · simp [Matrix.mul_apply, oneMeasNaimarkColumn, oneMeasNaimarkInputProj,
+      oneMeasNaimarkAuxTransition, Matrix.kronecker]
+  · simp [Matrix.mul_apply, oneMeasNaimarkColumn, oneMeasNaimarkInputProj,
+      oneMeasNaimarkAuxTransition, Matrix.kronecker]
 
-/-- The Naimark column acts as an isometry on the input subspace: `VP = V`. -/
+private lemma oneMeasNaimarkCompression
+    {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (M : MIPStarRE.Quantum.Submeasurement α d) (a : α) :
+    (oneMeasNaimarkColumn M)ᴴ *
+        oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a) *
+        oneMeasNaimarkColumn M =
+      Matrix.kronecker (M.effect a) (naimarkAuxProjector α) := by
+  let P : MIPStarRE.Quantum.Op (d × Option α) :=
+    oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a)
+  have hP_proj : MIPStarRE.Quantum.IsProj P := by
+    dsimp [P, oneMeasNaimarkOutcomeProj]
+    exact isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) (some a))
+  have hsqrt : (CFC.sqrt (M.effect a))ᴴ = CFC.sqrt (M.effect a) := by
+    simpa using (CFC.sqrt_nonneg (M.effect a)).isHermitian.eq
+  have hsingle :
+      (Matrix.single (some a) none (1 : ℂ))ᴴ * Matrix.single (some a) none (1 : ℂ) =
+        naimarkAuxProjector α := by
+    ext x y
+    cases x <;> cases y <;>
+      simp [naimarkAuxProjector, Matrix.mul_apply, Matrix.single_apply]
+  calc
+    (oneMeasNaimarkColumn M)ᴴ * P * oneMeasNaimarkColumn M
+        = (oneMeasNaimarkColumn M)ᴴ * (P * P) * oneMeasNaimarkColumn M := by
+            rw [hP_proj.idempotent]
+    _ = (oneMeasNaimarkColumn M)ᴴ * Pᴴ * (P * oneMeasNaimarkColumn M) := by
+          rw [hP_proj.isHermitian.eq]
+          simp [mul_assoc]
+    _ = (P * oneMeasNaimarkColumn M)ᴴ * (P * oneMeasNaimarkColumn M) := by
+          simp [Matrix.conjTranspose_mul, mul_assoc]
+    _ =
+        (Matrix.kronecker (CFC.sqrt (M.effect a)) (Matrix.single (some a) none (1 : ℂ)))ᴴ *
+          Matrix.kronecker (CFC.sqrt (M.effect a)) (Matrix.single (some a) none (1 : ℂ)) := by
+            rw [oneMeasNaimarkOutcomeProj_mul_column]
+    _ =
+        Matrix.kronecker ((CFC.sqrt (M.effect a))ᴴ * CFC.sqrt (M.effect a))
+          ((Matrix.single (some a) none (1 : ℂ))ᴴ * Matrix.single (some a) none (1 : ℂ)) := by
+            simpa [Matrix.conjTranspose_kronecker] using
+              (Matrix.mul_kronecker_mul
+                ((CFC.sqrt (M.effect a))ᴴ) (CFC.sqrt (M.effect a))
+                ((Matrix.single (some a) none (1 : ℂ))ᴴ)
+                (Matrix.single (some a) none (1 : ℂ))).symm
+    _ = Matrix.kronecker (M.effect a) (naimarkAuxProjector α) := by
+          rw [hsingle]
+          simp [hsqrt, CFC.sqrt_mul_sqrt_self, M.pos a]
+
+private lemma mul_oneMeasNaimarkInputProj_apply_none
+    {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (A : MIPStarRE.Quantum.Op (d × Option α))
+    (x : d × Option α) (j : d) :
+    (A * oneMeasNaimarkInputProj (α := α) (d := d)) x (j, none) = A x (j, none) := by
+  rw [Matrix.mul_apply]
+  rw [show ∑ z : d × Option α,
+      A x z * oneMeasNaimarkInputProj (α := α) (d := d) z (j, none) =
+        ∑ k : d, ∑ o : Option α,
+          A x (k, o) * oneMeasNaimarkInputProj (α := α) (d := d) (k, o) (j, none) by
+      simpa using
+        (Fintype.sum_prod_type
+          (f := fun z : d × Option α =>
+            A x z * oneMeasNaimarkInputProj (α := α) (d := d) z (j, none)))]
+  simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.one_apply]
+
+private lemma mul_oneMeasNaimarkInputProj_apply_some
+    {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (A : MIPStarRE.Quantum.Op (d × Option α))
+    (x : d × Option α) (j : d) (a : α) :
+    (A * oneMeasNaimarkInputProj (α := α) (d := d)) x (j, some a) = 0 := by
+  rw [Matrix.mul_apply]
+  rw [show ∑ z : d × Option α,
+      A x z * oneMeasNaimarkInputProj (α := α) (d := d) z (j, some a) =
+        ∑ k : d, ∑ o : Option α,
+          A x (k, o) * oneMeasNaimarkInputProj (α := α) (d := d) (k, o) (j, some a) by
+      simpa using
+        (Fintype.sum_prod_type
+          (f := fun z : d × Option α =>
+            A x z * oneMeasNaimarkInputProj (α := α) (d := d) z (j, some a)))]
+  simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker]
+
+private lemma oneMeasNaimarkInputProj_mul_apply_none
+    {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (A : MIPStarRE.Quantum.Op (d × Option α))
+    (i : d) (y : d × Option α) :
+    (oneMeasNaimarkInputProj (α := α) (d := d) * A) (i, none) y = A (i, none) y := by
+  rw [Matrix.mul_apply]
+  rw [show ∑ z : d × Option α,
+      oneMeasNaimarkInputProj (α := α) (d := d) (i, none) z * A z y =
+        ∑ k : d, ∑ o : Option α,
+          oneMeasNaimarkInputProj (α := α) (d := d) (i, none) (k, o) * A (k, o) y by
+      simpa using
+        (Fintype.sum_prod_type
+          (f := fun z : d × Option α =>
+            oneMeasNaimarkInputProj (α := α) (d := d) (i, none) z * A z y))]
+  simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.one_apply]
+
+private lemma oneMeasNaimarkInputProj_mul_apply_some
+    {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (A : MIPStarRE.Quantum.Op (d × Option α))
+    (i : d) (a : α) (y : d × Option α) :
+    (oneMeasNaimarkInputProj (α := α) (d := d) * A) (i, some a) y = 0 := by
+  rw [Matrix.mul_apply]
+  rw [show ∑ z : d × Option α,
+      oneMeasNaimarkInputProj (α := α) (d := d) (i, some a) z * A z y =
+        ∑ k : d, ∑ o : Option α,
+          oneMeasNaimarkInputProj (α := α) (d := d) (i, some a) (k, o) * A (k, o) y by
+      simpa using
+        (Fintype.sum_prod_type
+          (f := fun z : d × Option α =>
+            oneMeasNaimarkInputProj (α := α) (d := d) (i, some a) z * A z y))]
+  simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker]
+
+ /-- The Naimark column acts as an isometry on the input subspace: `VP = V`. -/
 private lemma oneMeasNaimarkColumn_mul_inputProj
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -337,7 +539,6 @@ private lemma oneMeasNaimarkColumn_mul_inputProj
     oneMeasNaimarkAuxTransition, Matrix.kronecker_apply]
   cases oa₂ with
   | none =>
-    -- Sum collapses: only `(d₂, none)` survives in the product with P
     have : ∀ x : d × Option α,
         oneMeasNaimarkColumn M (d₁, oa₁) x *
           Matrix.kronecker (1 : MIPStarRE.Quantum.Op d)
@@ -398,9 +599,6 @@ private lemma partialIsometry_to_unitary
     intro A
     rw [toEuclideanLin_mul, Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
   let E := EuclideanSpace ℂ n
-  -- These `letI` blocks are needed because `E` is a `let`-binding, so Lean
-  -- does not unfold it during instance search. Removing them causes
-  -- elaboration failures.
   letI : NormedAddCommGroup E := by dsimp [E]; infer_instance
   letI : InnerProductSpace ℂ E := by dsimp [E]; infer_instance
   letI : FiniteDimensional ℂ E := by dsimp [E]; infer_instance
@@ -413,22 +611,17 @@ private lemma partialIsometry_to_unitary
     rw [← hy]
     calc
       Pₗ (Pₗ y) = (Pₗ.comp Pₗ) y := rfl
-      _ = Matrix.toEuclideanLin (P * P) y := by
-            rw [toEuclideanLin_mul]
-      _ = Pₗ y := by
-            rw [hP.idempotent]
+      _ = Matrix.toEuclideanLin (P * P) y := by rw [toEuclideanLin_mul]
+      _ = Pₗ y := by rw [hP.idempotent]
   have hVP_lin : Vₗ.comp Pₗ = Vₗ := by
     calc
-      Vₗ.comp Pₗ = Matrix.toEuclideanLin (V * P) := by
-        rw [toEuclideanLin_mul]
-      _ = Vₗ := by
-        rw [hVP]
+      Vₗ.comp Pₗ = Matrix.toEuclideanLin (V * P) := by rw [toEuclideanLin_mul]
+      _ = Vₗ := by rw [hVP]
   have hgram : Vₗ.adjoint.comp Vₗ = Pₗ := by
     calc
       Vₗ.adjoint.comp Vₗ = Matrix.toEuclideanLin (Vᴴ * V) := by
         rw [toEuclideanLin_conjTranspose_mul_self]
-      _ = Pₗ := by
-        rw [hVV]
+      _ = Pₗ := by rw [hVV]
   let Llin : S →ₗ[ℂ] E := Vₗ.comp S.subtype
   have hLnorm : ∀ x : S, ‖Llin x‖ = ‖x‖ := by
     exact (LinearMap.norm_map_iff_inner_map_map Llin).2 fun x y => by
@@ -439,13 +632,10 @@ private lemma partialIsometry_to_unitary
           _ = y := hP_fix y
       calc
         inner ℂ (Llin x) (Llin y) = inner ℂ (Vₗ (x : E)) (Vₗ (y : E)) := rfl
-        _ = inner ℂ (x : E) (Vₗ.adjoint (Vₗ (y : E))) := by
-              rw [LinearMap.adjoint_inner_right]
+        _ = inner ℂ (x : E) (Vₗ.adjoint (Vₗ (y : E))) := by rw [LinearMap.adjoint_inner_right]
         _ = inner ℂ (x : E) (y : E) := by rw [hy]
         _ = inner ℂ x y := rfl
-  let L : S →ₗᵢ[ℂ] E :=
-    { toLinearMap := Llin
-      norm_map' := hLnorm }
+  let L : S →ₗᵢ[ℂ] E := { toLinearMap := Llin, norm_map' := hLnorm }
   let Ulin : E →ₗᵢ[ℂ] E := L.extend
   let Umat : MIPStarRE.Quantum.Op n :=
     Matrix.toEuclideanLin.symm Ulin.toLinearMap
@@ -468,8 +658,7 @@ private lemma partialIsometry_to_unitary
       Matrix.toEuclideanLin (Umatᴴ * Umat) =
           (Matrix.toEuclideanLin Umat).adjoint.comp (Matrix.toEuclideanLin Umat) := by
             rw [toEuclideanLin_conjTranspose_mul_self]
-      _ = Ulin.toLinearMap.adjoint.comp Ulin.toLinearMap := by
-            rw [hUmat_lin]
+      _ = Ulin.toLinearMap.adjoint.comp Ulin.toLinearMap := by rw [hUmat_lin]
       _ = 1 := hU_adjoint_comp
       _ = Matrix.toEuclideanLin (1 : MIPStarRE.Quantum.Op n) := by
             rw [Matrix.toEuclideanLin, Matrix.toLpLin_one]
@@ -479,9 +668,7 @@ private lemma partialIsometry_to_unitary
   apply Matrix.toEuclideanLin.injective
   apply LinearMap.ext
   intro x
-  have hExt :
-      Ulin (Pₗ x) =
-        Vₗ (Pₗ x) := by
+  have hExt : Ulin (Pₗ x) = Vₗ (Pₗ x) := by
     simpa [Ulin, L, Llin] using
       (LinearIsometry.extend_apply L ⟨Pₗ x, LinearMap.mem_range_self Pₗ x⟩)
   calc
@@ -511,6 +698,58 @@ private lemma exists_unitary_extension_oneMeasNaimarkColumn
     oneMeasNaimarkInputProj_isProj
     (oneMeasNaimarkColumn_mul_inputProj M)
     (oneMeasNaimarkColumn_isometry M)
+
+private lemma normalizedTrace_oneMeasLiftedDensity_mul_auxProj
+    {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (ρ X : MIPStarRE.Quantum.Op d) :
+    MIPStarRE.Quantum.normalizedTrace
+      (oneMeasLiftedDensity α ρ * Matrix.kronecker X (naimarkAuxProjector α)) =
+        MIPStarRE.Quantum.normalizedTrace (ρ * X) := by
+  unfold oneMeasLiftedDensity
+  rw [smul_mul_assoc, MIPStarRE.Quantum.normalizedTrace_smul]
+  unfold MIPStarRE.Quantum.normalizedTrace naimarkAuxProjector
+  have hmul :
+      Matrix.kronecker ρ
+          (Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) *
+          Matrix.kronecker X
+            (Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) =
+        Matrix.kronecker (ρ * X)
+          ((Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) *
+            (Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α))) := by
+    simpa using
+      (Matrix.mul_kronecker_mul ρ X
+        (Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α))
+        (Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α))).symm
+  rw [hmul]
+  have htrace :
+      ((ρ * X).kronecker
+          ((Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) *
+            (Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)))).trace =
+        (ρ * X).trace *
+          ((Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) *
+            (Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α))).trace := by
+    simpa using
+      Matrix.trace_kronecker (ρ * X)
+        ((Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) *
+          (Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)))
+  rw [htrace]
+  have hauxTrace :
+      ((Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) *
+        (Matrix.single none none (1 : ℂ) : MIPStarRE.Quantum.Op (Option α))).trace = 1 := by
+    simp
+  rw [hauxTrace]
+  by_cases hd' : Nonempty d
+  · letI := hd'
+    have hd : (Fintype.card d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
+    have hα : (Fintype.card (Option α) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
+    rw [Fintype.card_prod, Nat.cast_mul]
+    field_simp [hd, hα]
+  · have hd0 : (Fintype.card d : ℂ) = 0 := by
+      letI : IsEmpty d := not_nonempty_iff.mp hd'
+      simp
+    rw [Fintype.card_prod, Nat.cast_mul, hd0]
+    simp
 
 /-- **One-measurement Naimark lemma** (Lemma 5.2).
 
@@ -651,7 +890,117 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
       `= ∑_d₁ ∑_d₂ ρ(d₁,d₂) · M_a(d₂,d₁)    [column identity + sqrt²]`
       `= Tr(ρ · M_a)`
     -/
-    sorry
+    let B : MIPStarRE.Quantum.Op (d × Option α) :=
+      Matrix.kronecker ρ (naimarkAuxProjector α)
+    let Q : MIPStarRE.Quantum.Op (d × Option α) :=
+      oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a)
+    have haux_idem :
+        (naimarkAuxProjector α : MIPStarRE.Quantum.Op (Option α)) *
+            naimarkAuxProjector α =
+          naimarkAuxProjector α := by
+      ext x y
+      cases x <;> cases y <;>
+        simp [naimarkAuxProjector, Matrix.mul_apply, Matrix.single_apply]
+    have hBleft :
+        oneMeasNaimarkInputProj (α := α) (d := d) * B = B := by
+      calc
+        oneMeasNaimarkInputProj (α := α) (d := d) * B
+            = Matrix.kronecker
+                ((1 : MIPStarRE.Quantum.Op d) * ρ)
+                (naimarkAuxProjector α * naimarkAuxProjector α) := by
+                  simpa [B, oneMeasNaimarkInputProj] using
+                    (Matrix.mul_kronecker_mul
+                      (1 : MIPStarRE.Quantum.Op d) ρ
+                      (naimarkAuxProjector α) (naimarkAuxProjector α)).symm
+        _ = B := by simp [B, haux_idem]
+    have hBright :
+        B * oneMeasNaimarkInputProj (α := α) (d := d) = B := by
+      calc
+        B * oneMeasNaimarkInputProj (α := α) (d := d)
+            = Matrix.kronecker
+                (ρ * (1 : MIPStarRE.Quantum.Op d))
+                (naimarkAuxProjector α * naimarkAuxProjector α) := by
+                  simpa [B, oneMeasNaimarkInputProj] using
+                    (Matrix.mul_kronecker_mul
+                      ρ (1 : MIPStarRE.Quantum.Op d)
+                      (naimarkAuxProjector α) (naimarkAuxProjector α)).symm
+        _ = B := by simp [B, haux_idem]
+    have hInputProjHerm :
+        (oneMeasNaimarkInputProj (α := α) (d := d))ᴴ =
+          oneMeasNaimarkInputProj (α := α) (d := d) := by
+      ext x y
+      rcases x with ⟨i, ox⟩
+      rcases y with ⟨j, oy⟩
+      cases ox <;> cases oy <;>
+        simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker,
+          Matrix.one_apply, eq_comm]
+    have hUstar :
+        oneMeasNaimarkInputProj (α := α) (d := d) * Umatᴴ = Vᴴ := by
+      have hU' := congrArg Matrix.conjTranspose hU
+      rw [Matrix.conjTranspose_mul, hInputProjHerm] at hU'
+      simpa [Umat, V] using hU'
+    have hUB : Umat * B = V * B := by
+      calc
+        Umat * B
+            = Umat * (oneMeasNaimarkInputProj (α := α) (d := d) * B) := by
+                rw [hBleft]
+        _ = (Umat * oneMeasNaimarkInputProj (α := α) (d := d)) * B := by
+              simp [mul_assoc]
+        _ = V * B := by rw [hU]
+    have hBUstar : B * Umatᴴ = B * Vᴴ := by
+      calc
+        B * Umatᴴ
+            = (B * oneMeasNaimarkInputProj (α := α) (d := d)) * Umatᴴ := by
+                rw [hBright]
+        _ = B * (oneMeasNaimarkInputProj (α := α) (d := d) * Umatᴴ) := by
+              simp [mul_assoc]
+        _ = B * Vᴴ := by rw [hUstar]
+    have htrace_eq :
+        MIPStarRE.Quantum.normalizedTrace (B * Umatᴴ * Q * Umat) =
+          MIPStarRE.Quantum.normalizedTrace (B * Vᴴ * Q * V) := by
+      calc
+        MIPStarRE.Quantum.normalizedTrace (B * Umatᴴ * Q * Umat)
+            = MIPStarRE.Quantum.normalizedTrace (B * Vᴴ * Q * Umat) := by
+                rw [hBUstar]
+        _ = MIPStarRE.Quantum.normalizedTrace (Umat * B * Vᴴ * Q) := by
+              simpa [mul_assoc] using
+                (MIPStarRE.Quantum.normalizedTrace_mul_comm ((B * Vᴴ) * Q) Umat)
+        _ = MIPStarRE.Quantum.normalizedTrace (V * B * Vᴴ * Q) := by
+              rw [hUB]
+        _ = MIPStarRE.Quantum.normalizedTrace (Vᴴ * Q * V * B) := by
+              simpa [mul_assoc] using
+                (MIPStarRE.Quantum.normalizedTrace_mul_comm (V * B) (Vᴴ * Q))
+        _ = MIPStarRE.Quantum.normalizedTrace (B * Vᴴ * Q * V) := by
+              simpa [mul_assoc] using
+                (MIPStarRE.Quantum.normalizedTrace_mul_comm (Vᴴ * Q * V) B)
+    calc
+      MIPStarRE.Quantum.normalizedTrace (ρ * M.effect a)
+          = MIPStarRE.Quantum.normalizedTrace
+              (oneMeasLiftedDensity α ρ * Matrix.kronecker (M.effect a) (naimarkAuxProjector α)) := by
+                symm
+                exact normalizedTrace_oneMeasLiftedDensity_mul_auxProj (α := α) ρ (M.effect a)
+      _ = MIPStarRE.Quantum.normalizedTrace
+            (oneMeasLiftedDensity α ρ * ((oneMeasNaimarkColumn M)ᴴ * Q * oneMeasNaimarkColumn M)) := by
+              rw [oneMeasNaimarkCompression (M := M) a]
+      _ = MIPStarRE.Quantum.normalizedTrace
+            ((Fintype.card (Option α) : ℂ) • (B * (Vᴴ * Q * V))) := by
+              simp [oneMeasLiftedDensity, B, V, mul_assoc]
+      _ = (Fintype.card (Option α) : ℂ) *
+            MIPStarRE.Quantum.normalizedTrace (B * Vᴴ * Q * V) := by
+              rw [MIPStarRE.Quantum.normalizedTrace_smul]
+              simp [mul_assoc]
+      _ = (Fintype.card (Option α) : ℂ) *
+            MIPStarRE.Quantum.normalizedTrace (B * Umatᴴ * Q * Umat) := by
+              rw [htrace_eq]
+      _ = MIPStarRE.Quantum.normalizedTrace
+            ((Fintype.card (Option α) : ℂ) • (B * (Umatᴴ * Q * Umat))) := by
+              rw [MIPStarRE.Quantum.normalizedTrace_smul]
+              simp [mul_assoc]
+      _ = MIPStarRE.Quantum.normalizedTrace
+            (oneMeasLiftedDensity α ρ * (Umatᴴ * Matrix.kronecker (1 : MIPStarRE.Quantum.Op d)
+              (auxProj (some a)) * Umat)) := by
+              simp [oneMeasLiftedDensity, B, Q, auxProj, oneMeasNaimarkOutcomeProj,
+                oneMeasNaimarkAuxTransition, mul_assoc]
 
 /-! ### Full Naimark dilation (Theorem 5.1) -/
 
