@@ -3138,9 +3138,6 @@ theorem ldPasting
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  obtain ⟨_, _hHsub⟩ :=
-    ldPastingSubMeas params strategy eps delta gamma kappa zeta
-      hgood family hcomplete hcons hself hbound k hk
   refine ⟨constructedPastedMeasurement params family k, ?_⟩
   have hconsistency :=
     (hAConsistency params strategy eps delta gamma kappa zeta
