@@ -403,6 +403,8 @@ private lemma exists_unitary_extension_oneMeasNaimarkColumn
     (oneMeasNaimarkColumn_mul_inputProj M)
     (oneMeasNaimarkColumn_isometry M)
 
+/-! ### One-measurement expectation helpers -/
+
 private lemma oneMeasNaimark_unitary_inputColumn
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -661,9 +663,7 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     have hcardOption : (Fintype.card (Option α) : ℂ) ≠ 0 := by
       exact_mod_cast (Fintype.card_ne_zero : Fintype.card (Option α) ≠ 0)
     by_cases hd : (Fintype.card d : ℂ) = 0
-    · have hprod : (Fintype.card (d × Option α) : ℂ) = 0 := by
-        simp [Fintype.card_prod, hd]
-      simp [hd]
+    · simp [hd]
     · have hprod :
           (Fintype.card (d × Option α) : ℂ) =
             (Fintype.card d : ℂ) * (Fintype.card (Option α) : ℂ) := by
