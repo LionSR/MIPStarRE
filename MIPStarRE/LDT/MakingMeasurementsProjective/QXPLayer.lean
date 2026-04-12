@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
+import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 
 /-!
 # Section 5 — Q/X/XHat/P intermediate layer

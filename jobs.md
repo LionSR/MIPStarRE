@@ -57,24 +57,24 @@ Last updated: 2026-04-12
 ## MakingMeasurementsProjective Active Front
 
 - Active module: `MIPStarRE/LDT/MakingMeasurementsProjective`
-- Active file scope: `QXPLayer.lean`, `Theorems.lean`
-- Current executable sorry count in this module: 5
-- Highest-leverage active route: finish any real `Q`-layer / Naimark infrastructure that is genuinely provable, while documenting statement-level blockers precisely instead of burning time on false wrappers.
+- Active file scope: `Projectivization.lean`, `Theorems.lean`
+- Current executable sorry count in this module: 3
+- Highest-leverage active route: finish the remaining wrapper-level theorems that can now reuse the completed `QXPLayer` and one-measurement Naimark infrastructure, while documenting the still-missing statement/API gaps precisely.
 
 ### Module Checklist
 | File | Lemma | Status | Notes |
 |------|-------|--------|-------|
-| `QXPLayer.lean` | `projectiveNonMeasurement` | INVESTIGATING | Needs per-outcome spectral truncation plus aggregate `SDDOpRel` / total bound packaging. |
-| `QXPLayer.lean` | `projectiveLowRankSum` | BLOCKED ON PREVIOUS | Current statement is under-specified enough that it should be easy once `projectiveNonMeasurement` exists; the real blocker is still the spectral-threshold projector existence lemma. |
+| `QXPLayer.lean` | `projectiveNonMeasurement` | COMPLETED | Landed on `main`; now constructs the rounded projective family with the required `SDDOpRel` packaging and total bound. |
+| `QXPLayer.lean` | `projectiveLowRankSum` | COMPLETED | Landed on `main`; now packages the rank-reduced family as `QLayerData` with `RankReductionWitness`. |
 | `QXPLayer.lean` | `sqrtQCompleteness` | COMPLETED | Proved via a spectrum/CFC inequality `(1 - √ζ)Q ≤ sqrt Q`, then `ev_mono` plus `qCompleteness`. |
 | `Theorems.lean` | `exists_unitary_extension_oneMeasNaimarkColumn` | COMPLETED | Proved via `VᴴV = P⊥`, orthonormal-basis extension, and a unitary matrix reconstructed from the extended basis. |
 | `Theorems.lean` | `oneMeasNaimark` expectation subgoal | COMPLETED | Finished via input-slice support lemmas, the `Vᴴ Q_a V` compression identity, and a lifted-density normalized-trace reduction. |
 | `Theorems.lean` | `exists_fullNaimarkData` | BLOCKED BY MISSING EMBEDDING API + STATEMENT MISMATCH | One-measurement dilation is done, but the full theorem still lacks coordinatewise placement into the function-space auxiliary index, and the current `NaimarkData`/`NaimarkStatement` shape does not line up cleanly with the natural `Option`-outcome dilation or with automatic Alice/Bob commutativity on the shared base factor. |
 | `Theorems.lean` | `orthonormalization` | BLOCKED BY STATEMENT/API GAP | Current hypotheses do not provide `ψ.IsNormalized`; available completion lemma also returns a bipartite projective object with no local descent lemma. |
-| `Theorems.lean` | `spectralTruncateAlmostProjective` | BLOCKED BY UNDERPOWERED STATEMENT | Strengthened target now asks for an actual ambient `ProjSubMeas`, but the current witness layer only carries per-outcome matrix truncations. |
+| `Projectivization.lean` | `spectralTruncateAlmostProjective` | BLOCKED BY UNDERPOWERED STATEMENT | Strengthened target now asks for an actual ambient `ProjSubMeas`, but the current witness layer only carries per-outcome matrix truncations. |
 
 ### Local Dependency Map
-- `projectiveNonMeasurement` -> `projectiveLowRankSum` -> `sqrtQCompleteness`
+- `QXPLayer` chain is complete enough for downstream use: `projectiveNonMeasurement` -> `projectiveLowRankSum` -> `sqrtQCompleteness` -> `pProjectivity` / `pQApprox`
 - `exists_unitary_extension_oneMeasNaimarkColumn` -> `oneMeasNaimark` -> `exists_fullNaimarkData` -> `naimark`
 - `consistencyToAlmostProjective` -> `spectralTruncateAlmostProjective` -> `adjustTruncatedProjections` -> `roundAlmostProjMeas`
 - `orthonormalizationMainLemma` is proved, but `orthonormalization` is blocked by missing normalization and a missing local descent bridge.
@@ -82,23 +82,28 @@ Last updated: 2026-04-12
 ### Blockers Discovered This Pass
 - `orthonormalization` is not derivable from its current hypotheses: `QuantumState` is only PSD, `PermInvState` does not imply normalization, and `completingToMeasurement` genuinely requires `hψ : ψ.IsNormalized`.
 - The current wrapper also wants a local `ProjSubMeas Outcome ι`, but the available main lemma produces a bipartite `ProjSubMeas Outcome (ι × ι)` with no proved descent lemma.
-- `projectiveNonMeasurement` still lacks the real missing lemma: existence of a threshold spectral projector for a PSD contraction with the operator inequalities needed to turn `truncationInequality` into an `SDDOpRel` proof.
 - `exists_unitary_extension_oneMeasNaimarkColumn` still lacks a ready-made repo lemma extending the Naimark column/isometry to a full unitary, but mathlib does appear to supply an orthonormal-basis extension route that should make it provable.
 - The concrete obstruction in that Naimark route is now narrower: the column-isometry identity is proved, but the remaining work needs a clean Euclidean-space transport for standard-basis columns together with a tidy lemma that right-multiplication by `oneMeasNaimarkInputProj` selects exactly the `none` columns.
 - `exists_fullNaimarkData` is now blocked not by one-measurement dilation itself, but by missing operator/state embedding machinery for the large auxiliary function-space index `ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`. The current repo only has binary tensor-placement infrastructure, not per-coordinate placement on function-space auxiliaries.
 - More specifically, the natural output of `oneMeasNaimark` is `Option`-indexed and lives on one enlarged register, while `NaimarkData.left/right` ask for `Outcome`-indexed projective measurements on the fully assembled space. The present statement also asks for lifted commutativity, but separate auxiliary coordinates do not by themselves force commutativity on a shared base factor `ι` without more structure.
 - `spectralTruncateAlmostProjective` still lacks a repo bridge from per-outcome `SpectralTruncation` witnesses to an abstract `ProjSubMeas` package with `SDDRel` closeness.
+- `orthonormalization` is now the most realistic remaining target: the measurement-level core is proved, and the remaining work looks like completion-to-measurement packaging plus an outcome-restriction wrapper, subject to the existing small-`ζ` side condition.
+- Source-of-truth recheck tightened the blockers further:
+  - the public `naimark` packaging is misaligned with the paper, because `NaimarkData.left/right` currently require `IdxProjMeas Question Outcome ...` on the original outcome type, while the actual one-measurement dilation is `Option`-indexed and the paper theorem also exposes an auxiliary product state;
+  - `orthonormalizationMainLemma` is not paper-faithful in its current internal shape, because it returns a projective submeasurement on the product space `ιA × ιB` rather than on the left space `ιA`, and that output-space mismatch is the real blocker for the outer `orthonormalization` theorem;
+  - `SpectralTruncationStatement` is too strong relative to the paper/local matrix witness layer: it asks for a concrete ambient `ProjSubMeas Outcome ι` with `√ζ` closeness, but there is no actual spectral-threshold constructor theorem in the repo or mathlib producing such a witness from an almost-idempotent PSD operator.
 
 ### Agent Board For This Pass
 - Survey agent: completed module scan and dependency map for all 8 remaining gaps.
 - Proof-support agent: searched repo/mathlib-facing local code for reusable `SpectralTruncation`, `CFC.sqrt`, and Naimark extension lemmas.
 - Proof agent A: completed `QXPLayer.sqrtQCompleteness`.
-- Proof agent B: concluded `QXPLayer.projectiveNonMeasurement` is blocked on a missing threshold-projector existence lemma; `projectiveLowRankSum` is easy after that.
+- Proof agent B: upstream `main` has now completed the remaining `QXPLayer` construction chain; this branch inherits those proofs after merge resolution.
 - Proof agent C: completed the one-measurement Naimark core. `exists_unitary_extension_oneMeasNaimarkColumn` and the expectation-preservation field in `oneMeasNaimark` are both proved.
 - Integration agent: reserved for local file checks and reprioritization after each landed proof.
+- Source-of-truth audit agent: completed a paper/blueprint comparison for the three remaining theorem-level gaps and confirmed that all three are now blocked by theorem-interface mismatches or missing foundational constructors, not by missing local tactic work.
 
 ### Best Next Step
-- The remaining executable gaps are all infrastructure-level. Highest-value next move is to add a local embedding API for operators/states on `ι × Option Outcome` into `ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`, or else pivot to a spectral-projector existence theorem for `QXPLayer.projectiveNonMeasurement`.
+- No direct tactic-only sorry elimination remains. The next productive move is to realign the Section 5 theorem interfaces with the paper/blueprint, starting with the internal `orthonormalizationMainLemma` output space and the full `naimark` packaging, or else to add a genuine spectral-threshold constructor theorem for `Quantum.SpectralTruncation`.
 
 ### Progress This Pass
 - `QXPLayer.sqrtQCompleteness` proved.
@@ -110,6 +115,12 @@ Last updated: 2026-04-12
 - `Theorems.lean`: completed `oneMeasNaimark` by combining the unitary extension, input-slice support identities, compression to `M_a ⊗ |⊥⟩⟨⊥|`, and a normalized-trace transport lemma.
 - Validation: `lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/Theorems.lean` passes with only three executable `sorry`s remaining in this file.
 - Merge maintenance: resolved the `origin/main` conflict in `QXPLayer.lean` and `Theorems.lean` by keeping the finished one-measurement Naimark core, adopting the shorter upstream `sqrtQCompleteness` proof, and preserving upstream generic partial-isometry helper infrastructure.
+- Upstream change noticed during merge resolution: `QXPLayer.lean` is now fully sorry-free on `main`, so the MakingMeasurementsProjective active front has shrunk from 5 executable gaps to 3 theorem-level gaps, all in `Theorems.lean`.
+- Source-of-truth audit result: the remaining three `sorry`s are not blocked by missing local calculations. They are blocked by (1) a wrong output-space shape in `orthonormalizationMainLemma`, (2) a wrong full-theorem packaging target for `naimark`, and (3) the absence of any actual operator-to-projection spectral truncation constructor theorem behind `SpectralTruncationStatement`.
+- Refactor progress: extracted the consistency/almost-projective/spectral/rounding slice from `Theorems.lean` into the new lower-level file `MakingMeasurementsProjective/Projectivization.lean`, switched `QXPLayer.lean` to import that file, and switched `Theorems.lean` to import `QXPLayer.lean`. This resolves the old import bottleneck and makes direct reuse of the finished `QXPLayer` chain possible inside `Theorems.lean`.
+- Post-refactor blocker check: even with the import bottleneck resolved, a direct rewrite of `orthonormalizationMainLemma` is still blocked by two deeper API gaps in `QXPLayer`:
+  1. `aLooksProjective` expects a projective reference measurement `B : ProjMeas`, while the public main lemma still starts from an arbitrary `Measurement B` plus `ConsRel`.
+  2. `pProjectivity` and `pQApprox` require a full `QXPLayerData`, but the completed lower chain only produces `QLayerData` and `RankReductionWitness`; there is no constructor theorem building `QXPLayerData` from that lower witness.
 
 ## Active Strategy
 - Global high-risk chain still runs through Section 12 pasting.
