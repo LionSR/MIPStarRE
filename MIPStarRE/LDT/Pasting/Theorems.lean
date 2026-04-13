@@ -1296,6 +1296,146 @@ private noncomputable def switcherooAggregateSecondTerm
           ((completePartSubMeas params family q.1).total * (M q.2).outcome o *
             (completePartSubMeas params family q.1).total))
 
+/-- The third (negative) term in the switcheroo expansion. -/
+private noncomputable def switcherooAggregateThirdTerm
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
+  avgOver (uniformDistribution (SlicePairQuestion params)) fun q =>
+    ∑ o : Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          ((M q.2).outcome o *
+            (completePartSubMeas params family q.1).total *
+            (M q.2).outcome o *
+            (completePartSubMeas params family q.1).total))
+
+/-- The fourth (negative) term in the switcheroo expansion. -/
+private noncomputable def switcherooAggregateFourthTerm
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
+  avgOver (uniformDistribution (SlicePairQuestion params)) fun q =>
+    ∑ o : Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          ((completePartSubMeas params family q.1).total *
+            (M q.2).outcome o *
+            (completePartSubMeas params family q.1).total *
+            (M q.2).outcome o))
+
+private lemma switcherooAggregateThirdTerm_eq_fourthTerm
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) :
+    switcherooAggregateThirdTerm params ψbi family M =
+      switcherooAggregateFourthTerm params ψbi family M := by
+  unfold switcherooAggregateThirdTerm switcherooAggregateFourthTerm
+  apply avgOver_congr
+  intro q
+  refine Finset.sum_congr rfl ?_
+  intro o _
+  let G : MIPStarRE.Quantum.Op ι := (completePartSubMeas params family q.1).total
+  let Mo : MIPStarRE.Quantum.Op ι := (M q.2).outcome o
+  have hGherm : Gᴴ = G :=
+    (Matrix.nonneg_iff_posSemidef.mp
+      (SubMeas.total_nonneg (completePartSubMeas params family q.1))).isHermitian.eq
+  have hMoherm : Moᴴ = Mo :=
+    (Matrix.nonneg_iff_posSemidef.mp ((M q.2).outcome_pos o)).isHermitian.eq
+  calc
+    ev ψbi (leftTensor (ι₂ := ι) (Mo * G * Mo * G))
+      = ev ψbi ((leftTensor (ι₂ := ι) (Mo * G * Mo * G))ᴴ) := by
+          symm
+          exact ev_conjTranspose ψbi _
+    _ = ev ψbi (leftTensor (ι₂ := ι) ((Mo * G * Mo * G)ᴴ)) := by
+          congr 1
+          simpa [leftTensor, opTensor] using
+            (conjTranspose_opTensor (Mo * G * Mo * G)
+              (1 : MIPStarRE.Quantum.Op ι))
+    _ = ev ψbi (leftTensor (ι₂ := ι) (G * Mo * G * Mo)) := by
+          congr 1
+          simpa [mul_assoc, Matrix.conjTranspose_mul, hGherm, hMoherm]
+
+private lemma switcherooAggregate_qSDDOp_expand_avg
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) :
+    avgOver (uniformDistribution (SlicePairQuestion params))
+        (fun q => qSDDOp ψbi
+          (switcherooAggregateLeft params family M q)
+          (switcherooAggregateRight params family M q)) =
+      switcherooAggregateFirstTerm params ψbi family M +
+        switcherooAggregateSecondTerm params ψbi family M -
+        switcherooAggregateThirdTerm params ψbi family M -
+        switcherooAggregateFourthTerm params ψbi family M := by
+  let A : SlicePairQuestion params → Error := fun q =>
+    ∑ o : Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          ((M q.2).outcome o *
+            (completePartSubMeas params family q.1).total *
+            (M q.2).outcome o))
+  let B : SlicePairQuestion params → Error := fun q =>
+    ∑ o : Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          ((completePartSubMeas params family q.1).total *
+            (M q.2).outcome o *
+            (completePartSubMeas params family q.1).total))
+  let C : SlicePairQuestion params → Error := fun q =>
+    ∑ o : Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          ((M q.2).outcome o *
+            (completePartSubMeas params family q.1).total *
+            (M q.2).outcome o *
+            (completePartSubMeas params family q.1).total))
+  let D : SlicePairQuestion params → Error := fun q =>
+    ∑ o : Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          ((completePartSubMeas params family q.1).total *
+            (M q.2).outcome o *
+            (completePartSubMeas params family q.1).total *
+            (M q.2).outcome o))
+  calc
+    avgOver (uniformDistribution (SlicePairQuestion params))
+        (fun q => qSDDOp ψbi
+          (switcherooAggregateLeft params family M q)
+          (switcherooAggregateRight params family M q))
+      = avgOver (uniformDistribution (SlicePairQuestion params))
+          (fun q => A q + B q - C q - D q) := by
+              apply avgOver_congr
+              intro q
+              rw [switcherooAggregate_qSDDOp_expand]
+              simp only [Finset.sum_add_distrib,
+                Finset.sum_sub_distrib, A, B, C, D]
+    _ = avgOver (uniformDistribution (SlicePairQuestion params)) A +
+          avgOver (uniformDistribution (SlicePairQuestion params)) B -
+          avgOver (uniformDistribution (SlicePairQuestion params)) C -
+          avgOver (uniformDistribution (SlicePairQuestion params)) D := by
+            rw [show (fun q => A q + B q - C q - D q) =
+                fun q => (A q + B q) + ((-1 : Error) * C q + (-1 : Error) * D q) by
+                  funext q
+                  ring]
+            rw [avgOver_add, avgOver_add, avgOver_add, avgOver_const_mul, avgOver_const_mul]
+            simp [sub_eq_add_neg]
+            ring
+    _ = switcherooAggregateFirstTerm params ψbi family M +
+          switcherooAggregateSecondTerm params ψbi family M -
+          switcherooAggregateThirdTerm params ψbi family M -
+          switcherooAggregateFourthTerm params ψbi family M := by
+            simp [switcherooAggregateFirstTerm, switcherooAggregateSecondTerm,
+              switcherooAggregateThirdTerm, switcherooAggregateFourthTerm, A, B, C, D]
+
 
 
 /-- The one-outcome complete-part family inherits self-consistency from the slice family. -/
