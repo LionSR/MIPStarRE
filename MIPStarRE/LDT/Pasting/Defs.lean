@@ -541,19 +541,6 @@ noncomputable def gHatIdxSubMeas (params : Parameters) [FieldModel params.q]
     IdxSubMeas (Fq params) (GHatOutcome params) ι :=
   IdxMeas.toIdxSubMeas (gHatIdxMeas params family)
 
-/-- `def:truncated-type-sums`.
-
-Fixing a tail type `τ_tail`, this sums the source-style monomials contributed by
-all prefixes whose total Hamming weight can still reach the interpolation
-threshold `d + 1`. The parameter `prefixLen` is the paper's `ℓ - 1`. -/
-noncomputable def truncatedTypeSums (G : MIPStarRE.Quantum.Op ι)
-    (d prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) :
-    MIPStarRE.Quantum.Op ι :=
-  ∑ τprefix : GHatType prefixLen,
-    if d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight τtail then
-      G ^ gHatTypeWeight τprefix * (1 - G) ^ (prefixLen - gHatTypeWeight τprefix)
-    else 0
-
 /-- Left tensor-placement for the complete part `G^x`
 on the bipartite space `d * d`. -/
 noncomputable def completePartLeftFamily (params : Parameters) [FieldModel params.q]
