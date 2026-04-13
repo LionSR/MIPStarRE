@@ -17,42 +17,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- `thm:ld-pasting`. -/
-theorem ldPasting
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ H : Measurement (Polynomial params.next) ι,
-      LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  sorry
-
-/-- `lem:ld-pasting-sub-measurement`. -/
-lemma ldPastingSubMeas
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ H : SubMeas (Polynomial params.next) ι,
-      LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
-  sorry
-
 /-- `lem:ld-gbcon`.
 
 This is the direct consistency transfer from the slice family `G^x` to the
@@ -3318,29 +3282,6 @@ lemma fromHToG
     /- Aggregate k recurrence steps to show allOutcomesExpansion ≈ F(G).
     Total error ≤ k × per-step error ≤ fromHToGError. -/
     sorry
-
-/-- `lem:truncated-type-sum-recurrence`.
-
-This packages the recurrence and basic positivity bounds for the truncated type
-sums used in the `fromHToG` reduction. -/
-theorem truncatedTypeSumRecurrence
-    (G : MIPStarRE.Quantum.Op ι)
-    (hGpsd : 0 ≤ G)
-    (hGleOne : G ≤ 1)
-    (d prefixLen : ℕ)
-    {tailLen : ℕ} (τtail : GHatType tailLen) :
-    (truncatedTypeSums G d prefixLen τtail)ᴴ = truncatedTypeSums G d prefixLen τtail ∧
-      0 ≤ truncatedTypeSums G d prefixLen τtail ∧
-      truncatedTypeSums G d prefixLen τtail ≤ 1 ∧
-      truncatedTypeSums G d (prefixLen + 1) τtail =
-        truncatedTypeSums G d prefixLen (prependTypeBit true τtail) * G +
-          truncatedTypeSums G d prefixLen (prependTypeBit false τtail) * (1 - G) := by
-  /-
-  Paper reference: `references/ldt-paper/ld-pasting.tex`,
-  `lem:truncated-type-sum-recurrence`.
-  The proof is the commuting-polynomial argument in `G` and `I - G`.
-  -/
-  sorry
 
 /-- `lem:chernoff-bernoulli-matrix`. -/
 lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
