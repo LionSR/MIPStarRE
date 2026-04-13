@@ -1636,8 +1636,9 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     MIPStarRE.LDT.Preliminaries.switchSandwich ψbi 𝒟x hnorm h𝒟x
       (completePartProjFamily params family) Mavg.total
       hMavg_bounded zeta hselfG_bip
-  have hsecond : |secondTerm - centerMG| ≤ 2 * Real.sqrt zeta :=
-    hswitch_second.leftSandwichTransfer
+  have hsecond : |secondTerm - centerMG| ≤ 2 * Real.sqrt zeta := by
+    simpa [secondTerm, centerMG, completePartProjFamily] using
+      hswitch_second.leftSandwichTransfer
   -- Step 3: The four-term expansion gives
   --   sddErrorOp = T1 + T2 - T3 - T4
   -- where T1 = switcherooAggregateFirstTerm (close to centerGM by 2√ω),
@@ -1650,6 +1651,9 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
   --   (b) move G_g across tensor boundary (error √ζ from hselfG),
   --   (c) apply switchSandwich with M self-consistency (error 2√ω from hselfM).
   -- Total: 2√ω + 2√ζ + 2(2√ζ + 2√ω + 2√χ) = 6√ζ + 6√ω + 4√χ.
+  -- Note: hperm (permutation invariance of ψbi) ensures centerGM = centerMG,
+  -- which is needed to close the final triangle inequality combining all
+  -- four term bounds.
   sorry
 
 /-- Reindexing a uniform slice-pair average along `Prod.swap` preserves `SDDOpRel`. -/
