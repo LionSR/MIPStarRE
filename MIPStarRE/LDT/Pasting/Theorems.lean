@@ -3274,7 +3274,7 @@ theorem ldPastingNCompleteness
     LdPastingNCompletenessStatement params strategy family kappa
       (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
   -- Chain the three completeness-chain lemmas (§9.4 of the paper)
-  have hOAO := overAllOutcomes params strategy eps delta gamma zeta
+  have _hOAO := overAllOutcomes params strategy eps delta gamma zeta
     hgood family hcons hself hbound k
   constructor -- LdPastingNCompletenessStatement
   · exact hk -- largeEnough: 400 * m * d ≤ k
