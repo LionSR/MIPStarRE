@@ -158,33 +158,42 @@ def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
         m = _NAMESPACE_CLOSE_RE.match(line)
         if m:
             closed = m.group(1)
-            # Pop anonymous sections that match nothing by name.
-            if section_stack and section_stack[-1] == closed:
-                section_stack.pop()
-                # Remove matching entry from scope_order
-                for j in range(len(scope_order) - 1, -1, -1):
-                    if scope_order[j] == ("sec", closed):
-                        scope_order.pop(j)
+            # Use scope_order to determine which scope to close when
+            # both a section and namespace share the same name.
+            # Search scope_order from most recent to find the matching entry.
+            found_kind = None
+            for j in range(len(scope_order) - 1, -1, -1):
+                if scope_order[j][1] == closed:
+                    found_kind = scope_order[j][0]
+                    scope_order.pop(j)
+                    break
+
+            if found_kind == "sec" and closed in section_stack:
+                # Remove the last occurrence of `closed` from section_stack
+                for j in range(len(section_stack) - 1, -1, -1):
+                    if section_stack[j] == closed:
+                        section_stack.pop(j)
                         break
-                continue
-            if ns_stack and ns_stack[-1] == closed:
-                ns_stack.pop()
-                for j in range(len(scope_order) - 1, -1, -1):
-                    if scope_order[j] == ("ns", closed):
-                        scope_order.pop(j)
-                        break
-            elif ns_stack:
-                for j in range(len(ns_stack) - 1, -1, -1):
-                    if ns_stack[j] == closed:
-                        # Remove all namespaces from index j onward
-                        removed = set(ns_stack[j:])
-                        ns_stack = ns_stack[:j]
-                        # Remove all matching scope_order entries
-                        scope_order = [
-                            e for e in scope_order
-                            if not (e[0] == "ns" and e[1] in removed)
-                        ]
-                        break
+            elif found_kind == "ns" and closed in ns_stack:
+                if ns_stack and ns_stack[-1] == closed:
+                    ns_stack.pop()
+                else:
+                    # Non-top namespace: slice and clean up scope_order
+                    for j in range(len(ns_stack) - 1, -1, -1):
+                        if ns_stack[j] == closed:
+                            removed = set(ns_stack[j:])
+                            ns_stack = ns_stack[:j]
+                            scope_order = [
+                                e for e in scope_order
+                                if not (e[0] == "ns" and e[1] in removed)
+                            ]
+                            break
+            elif found_kind is None:
+                # Fallback: no scope_order entry found, try ns_stack directly
+                if ns_stack and ns_stack[-1] == closed:
+                    ns_stack.pop()
+                elif section_stack and section_stack[-1] == closed:
+                    section_stack.pop()
             continue
 
         m = _LEAN_DECL_RE.match(line)
