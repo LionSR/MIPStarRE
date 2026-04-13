@@ -35,7 +35,8 @@ _LEAN_DECL_RE = re.compile(
     r"^\s*(?:@\[.*?\]\s*)?"
     r"(?:(?:noncomputable|protected|private)\s+)*"
     r"(def|theorem|lemma|abbrev|instance|class|structure|inductive|axiom|opaque)\s+"
-    r"([\w.'+]+)",
+    r"([\w'+]+(?:\.[\w'+]+)*)"
+    r"(?:\.\{[^}]+\})?",
     re.MULTILINE,
 )
 _TRACKED_REVERSE_DECL_KINDS = {"def", "theorem", "lemma"}
@@ -328,10 +329,10 @@ def read_lean_decls_file(path: Path) -> set[str]:
 
 
 def _git_diff_changed_lines(root: Path, rel_path: str, diff_base: str, diff_head: str) -> set[int]:
-    """Return changed line numbers in the post-change file using `git diff -U0`."""
+    """Return changed line numbers in the post-change file using `git diff --merge-base -U0`."""
     try:
         diff = subprocess.check_output(
-            ["git", "diff", "--unified=0", diff_base, diff_head, "--", rel_path],
+            ["git", "diff", "--merge-base", "--unified=0", diff_base, diff_head, "--", rel_path],
             cwd=root,
             text=True,
             stderr=subprocess.DEVNULL,
