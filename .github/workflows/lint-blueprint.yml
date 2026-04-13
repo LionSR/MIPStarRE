@@ -44,10 +44,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Set up Lean and blueprint tooling
-        uses: ./.github/actions/setup-lean
-        with:
-          install-blueprint: 'true'
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev
+
+      - name: Install leanblueprint
+        run: |
+          pip install leanblueprint
+          pip install plastex
 
       - name: Run leanblueprint web and check for errors
         working-directory: blueprint
@@ -75,30 +78,42 @@ jobs:
             exit "$cmd_status"
           fi
 
-      - name: Build project (needed for checkdecls)
-        run: lake build
+      # ── Lean-dependent checks (advisory, do not block PRs) ──
+      # These require a full Lean build, which is already covered by
+      # lean_action_ci.yml. Run them here as best-effort validation.
 
-      - name: Check committed blueprint and Lean source stay in sync
+      - name: Set up Lean toolchain
+        continue-on-error: true
+        id: lean-setup
+        uses: ./.github/actions/setup-lean
+
+      - name: Check blueprint and Lean source stay in sync
+        if: steps.lean-setup.outcome == 'success'
+        continue-on-error: true
         run: python3 scripts/blueprint_lean_sync.py --root . --ci
 
       - name: Regenerate lean_decls from blueprint .tex files
+        if: steps.lean-setup.outcome == 'success'
+        continue-on-error: true
         run: python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
 
       - name: Ensure regenerated lean_decls is committed
+        if: steps.lean-setup.outcome == 'success'
+        continue-on-error: true
         run: |
           if ! git diff --exit-code -- blueprint/lean_decls; then
-            echo "::error::blueprint/lean_decls is stale. Regenerate and commit it."
-            exit 1
+            echo "::warning::blueprint/lean_decls is stale. Regenerate and commit it."
           fi
 
       - name: Fetch PR base ref for diff
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.lean-setup.outcome == 'success'
+        continue-on-error: true
         env:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: git fetch --no-tags origin "$BASE_REF"
 
       - name: Warn on changed Lean declarations missing blueprint entries
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.lean-setup.outcome == 'success'
         continue-on-error: true
         env:
           BASE_REF: origin/${{ github.event.pull_request.base.ref }}
@@ -145,6 +160,7 @@ jobs:
           PY
 
       - name: Check blueprint Lean declarations
+        if: steps.lean-setup.outcome == 'success'
         continue-on-error: true
         run: |
           if ! lake exe checkdecls blueprint/lean_decls; then

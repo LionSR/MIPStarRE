@@ -122,28 +122,37 @@ def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
     lines = text.splitlines()
     rel = str(lean_file.relative_to(lean_root.parent))
 
-    # Track namespace and section stacks separately.
+    # Track namespace and section stacks separately, plus a combined
+    # open-order stack to resolve bare `end` statements correctly.
     ns_stack: list[str] = []
     section_stack: list[str] = []
+    # Each entry is ("ns", name) or ("sec", name) in order of opening.
+    scope_order: list[tuple[str, str]] = []
     decls: list[LeanDecl] = []
 
     for i, line in enumerate(lines, 1):
         m = _NAMESPACE_OPEN_RE.match(line)
         if m:
             ns_stack.append(m.group(1))
+            scope_order.append(("ns", m.group(1)))
             continue
 
         m = _SECTION_OPEN_RE.match(line)
         if m:
-            section_stack.append(m.group(1) or "")
+            name = m.group(1) or ""
+            section_stack.append(name)
+            scope_order.append(("sec", name))
             continue
 
-        # Bare `end` (no name) pops the most recent section or namespace.
+        # Bare `end` (no name) pops the most recently opened scope,
+        # whether it was a section or namespace.
         if _BARE_END_RE.match(line):
-            if section_stack:
-                section_stack.pop()
-            elif ns_stack:
-                ns_stack.pop()
+            if scope_order:
+                kind, name = scope_order.pop()
+                if kind == "sec" and section_stack:
+                    section_stack.pop()
+                elif kind == "ns" and ns_stack:
+                    ns_stack.pop()
             continue
 
         m = _NAMESPACE_CLOSE_RE.match(line)
@@ -152,13 +161,27 @@ def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
             # Pop anonymous sections that match nothing by name.
             if section_stack and section_stack[-1] == closed:
                 section_stack.pop()
+                # Remove matching entry from scope_order
+                for j in range(len(scope_order) - 1, -1, -1):
+                    if scope_order[j] == ("sec", closed):
+                        scope_order.pop(j)
+                        break
                 continue
             if ns_stack and ns_stack[-1] == closed:
                 ns_stack.pop()
+                for j in range(len(scope_order) - 1, -1, -1):
+                    if scope_order[j] == ("ns", closed):
+                        scope_order.pop(j)
+                        break
             elif ns_stack:
                 for j in range(len(ns_stack) - 1, -1, -1):
                     if ns_stack[j] == closed:
                         ns_stack = ns_stack[:j]
+                        # Also clean up scope_order
+                        for k in range(len(scope_order) - 1, -1, -1):
+                            if scope_order[k] == ("ns", closed):
+                                scope_order.pop(k)
+                                break
                         break
             continue
 
