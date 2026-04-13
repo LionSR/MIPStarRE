@@ -176,12 +176,14 @@ def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
             elif ns_stack:
                 for j in range(len(ns_stack) - 1, -1, -1):
                     if ns_stack[j] == closed:
+                        # Remove all namespaces from index j onward
+                        removed = set(ns_stack[j:])
                         ns_stack = ns_stack[:j]
-                        # Also clean up scope_order
-                        for k in range(len(scope_order) - 1, -1, -1):
-                            if scope_order[k] == ("ns", closed):
-                                scope_order.pop(k)
-                                break
+                        # Remove all matching scope_order entries
+                        scope_order = [
+                            e for e in scope_order
+                            if not (e[0] == "ns" and e[1] in removed)
+                        ]
                         break
             continue
 
