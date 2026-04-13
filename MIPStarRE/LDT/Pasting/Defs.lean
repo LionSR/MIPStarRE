@@ -83,6 +83,38 @@ abbrev GHatType (k : ℕ) := Fin k → Bool
 abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) := Point params × PointTuple params k
 abbrev VerticalLineQuestion (params : Parameters) := Point params
 
+/-- The Hamming weight `|τ|` of a type `τ ∈ {0,1}^k`. -/
+def gHatTypeWeight {k : ℕ} (τ : GHatType k) : ℕ :=
+  (Finset.univ.filter fun i => τ i).card
+
+/-- Prepend one type bit to a tail type. -/
+def prependTypeBit {k : ℕ} (b : Bool) (τ : GHatType k) : GHatType (k + 1)
+  | ⟨0, _⟩ => b
+  | ⟨n + 1, hn⟩ => τ ⟨n, Nat.lt_of_succ_lt_succ hn⟩
+
+/-- The operator contribution of one type bit: `G` for `1`, `I - G` for `0`. -/
+noncomputable def gHatTypeBitOperator (G : MIPStarRE.Quantum.Op ι) (bit : Bool) :
+    MIPStarRE.Quantum.Op ι :=
+  if bit then G else 1 - G
+
+/-- The operator monomial associated with a type `τ`. -/
+noncomputable def gHatTypeOperator (G : MIPStarRE.Quantum.Op ι) {k : ℕ}
+    (τ : GHatType k) : MIPStarRE.Quantum.Op ι :=
+  G ^ gHatTypeWeight τ * (1 - G) ^ (k - gHatTypeWeight τ)
+
+/-- `def:truncated-type-sums`.
+
+Fixing a tail type `τ_tail`, this sums the source-style monomials contributed by
+all prefixes whose total Hamming weight can still reach the interpolation
+threshold `d + 1`. The parameter `prefixLen` is the paper's `ℓ - 1`. -/
+noncomputable def truncatedTypeSums (G : MIPStarRE.Quantum.Op ι)
+    (d prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) :
+    MIPStarRE.Quantum.Op ι :=
+  ∑ τprefix : GHatType prefixLen,
+    if d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight τtail then
+      gHatTypeOperator G τprefix
+    else 0
+
 /-- The Bernoulli tail operator from `lem:chernoff-bernoulli-matrix`:
 `F(X) = ∑_{r=degree+1}^{k} C(k,r) · X^r · (I - X)^{k-r}`.
 This is the matrix-valued Bernoulli tail probability. -/
@@ -167,6 +199,13 @@ noncomputable def gHatTupleHammingWeight {params : Parameters} {k : ℕ}
     (gs : GHatTupleOutcome params k) : ℕ :=
   (gHatTupleSupport gs).card
 
+/-- The set `\mathsf{Outcomes}_\tau` of completed-slice tuples whose `Some`/`none`
+pattern is prescribed by the type `τ`. -/
+def outcomesByType {params : Parameters} {k : ℕ}
+    [FieldModel params.q]
+    (τ : GHatType k) : Set (GHatTupleOutcome params k) :=
+  { gs | ∀ i : Fin k, (gs i).isSome = τ i }
+
 /-- A completed-slice tuple is eligible for interpolation exactly when its type has
 Hamming weight at least `d + 1`, matching the paper's `|w| ≥ d+1` filter. -/
 def InterpolationEligible (params : Parameters) {k : ℕ}
@@ -235,6 +274,21 @@ noncomputable instance isGloballyConsistent_decidablePred
     (params : Parameters) [FieldModel params.q] {k : ℕ} (xs : PointTuple params k) :
     DecidablePred (IsGloballyConsistent params xs) :=
   fun _gs => Classical.dec _
+
+/-- The subset `\mathsf{Global}_\tau(x)` of `\mathsf{Outcomes}_\tau` consisting of
+tuples that arise from restrictions of a single global polynomial at the slice
+heights `xs`. -/
+def globallyConsistentOutcomesByType (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k) (τ : GHatType k) :
+    Set (GHatTupleOutcome params k) :=
+  { gs | gs ∈ outcomesByType τ ∧ IsGloballyConsistent params xs gs }
+
+/-- The complement `\overline{\mathsf{Global}_\tau(x)}` inside
+`\mathsf{Outcomes}_\tau`. -/
+def nonglobalOutcomesByType (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k) (τ : GHatType k) :
+    Set (GHatTupleOutcome params k) :=
+  outcomesByType τ \ globallyConsistentOutcomesByType params xs τ
 
 /-- Recover a global polynomial from a completed-slice tuple.
 

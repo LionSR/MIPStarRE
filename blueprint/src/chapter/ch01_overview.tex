@@ -2,31 +2,34 @@
 \label{chap:overview}
 
 \begin{theorem}[Raz--Safra]\label{thm:raz-safra}
-  Suppose Provers~$\mathrm{A}$ and~$\mathrm{B}$ pass the $k=2$ surface-versus-point low-degree test with probability $1-\eps$. Then there exists a degree-$d$ polynomial $g \colon \F_q^m \to \F_q$ such that
-  \[
-    \Prb_{u \sim \F_q^m}[g(u)=a] \ge 1-\eps-\poly(m)\cdot\poly(d/q).
-  \]
-  Here $a$ denotes the prover's point answer.
+	\lean{MIPStarRE.LDT.Test.razSafra}
+	Suppose Provers~$\mathrm{A}$ and~$\mathrm{B}$ pass the $k=2$ surface-versus-point low-degree test with probability $1-\eps$. Then there exists a degree-$d$ polynomial $g \colon \F_q^m \to \F_q$ such that
+	\[
+		\Prb_{u \sim \F_q^m}[g(u)=a] \ge 1-\eps-\poly(m)\cdot\poly(d/q).
+	\]
+	Here $a$ denotes the prover's point answer.
 \end{theorem}
 \begin{proof}
-  See Raz--Safra [RS97].
+	See Raz--Safra [RS97].
 \end{proof}
 
 \begin{theorem}[Polishchuk--Spielman]\label{thm:classical-test-soundness}
-  Suppose Provers~$\mathrm{A}$ and~$\mathrm{B}$ pass the low individual degree test with probability $1-\eps$. Then there exists a polynomial $g \colon \F_q^m \to \F_q$ with individual degree $d$ such that
-  \[
-    \Prb_{u \sim \F_q^m}[g(u)=a] \ge 1-\poly(m)\cdot\bigl(\poly(\eps)+\poly(d/q)\bigr).
-  \]
-  Here $a$ denotes the prover's point answer.
+	\lean{MIPStarRE.LDT.Test.classicalTestSoundness}
+	Suppose Provers~$\mathrm{A}$ and~$\mathrm{B}$ pass the low individual degree test with probability $1-\eps$. Then there exists a polynomial $g \colon \F_q^m \to \F_q$ with individual degree $d$ such that
+	\[
+		\Prb_{u \sim \F_q^m}[g(u)=a] \ge 1-\poly(m)\cdot\bigl(\poly(\eps)+\poly(d/q)\bigr).
+	\]
+	Here $a$ denotes the prover's point answer.
 \end{theorem}
 \begin{proof}
-  See Polishchuk--Spielman [PS94].
+	See Polishchuk--Spielman [PS94].
 \end{proof}
 
 \begin{theorem}[Main theorem, informal]\label{thm:main-informal}
-  If a two-prover projective strategy passes the $(m,q,d)$ low individual degree test with probability $1-\eps$, then there are global polynomial measurements whose evaluations agree with the point answers except with error $\poly(m)(\poly(\eps)+\poly(d/q))$.
+	\lean{MIPStarRE.LDT.Test.mainInformal}
+	If a two-prover projective strategy passes the $(m,q,d)$ low individual degree test with probability $1-\eps$, then there are global polynomial measurements whose evaluations agree with the point answers except with error $\poly(m)(\poly(\eps)+\poly(d/q))$.
 \end{theorem}
 \begin{proof}
-  \uses{thm:main-formal}
-  This is the informal form of Theorem~\ref{thm:main-formal}.
+	\uses{thm:main-formal}
+	This is the informal form of Theorem~\ref{thm:main-formal}.
 \end{proof}

@@ -1383,8 +1383,68 @@ lemma commDataProcessedG
         -- closeness-of-inner-product / Cauchy-Schwarz bridge that turns the
         -- boundedness hypothesis and `commutativityPoints` into the two scalar
         -- bounds driving the final averaged commutator estimate.
-        sorry }
+         sorry }
   simpa [evaluatedPointFamily] using hcons.pointConsistency
+
+/-- `clm:g-comm-stability`.
+
+This packages the first boundedness-driven stability step in the proof of
+`lem:comm-data-processed-g`. -/
+theorem gCommStability
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
+      (Real.sqrt zeta) := by
+  /-
+  Paper reference: `references/ldt-paper/commutativity-G.tex`,
+  `clm:g-comm-stability`.
+  This is the Cauchy-Schwarz plus boundedness step that removes the trailing
+  `G^y` factor from the first quartic transport.
+  -/
+  sorry
+
+/-- `clm:g-comm-stability2`.
+
+This packages the second boundedness-driven stability step in the proof of
+`lem:comm-data-processed-g`. -/
+theorem gCommStabilityTwo
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (commDataProcessedGStabilityTwoLeft params strategy family G)
+      (commDataProcessedGStabilityTwoRight params strategy family G)
+      (Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error))) := by
+  /-
+  Paper reference: `references/ldt-paper/commutativity-G.tex`,
+  `clm:g-comm-stability2`.
+  This is the point-commutation transport followed by the same boundedness
+  argument that removes the trailing `G^x` factor.
+  -/
+  sorry
 
 /-- Postprocessing a `leftPlacedOpFamily` of a bilinear product equals
 the `leftPlacedOpFamily` of the product of postprocessed submeasurements,
