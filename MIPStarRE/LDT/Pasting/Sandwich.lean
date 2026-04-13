@@ -758,25 +758,6 @@ noncomputable def suffixBernoulliWeightOperator (params : Parameters) [FieldMode
       (Nat.choose (ℓ - 1) r : ℂ) • (G ^ r * (1 - G) ^ (ℓ - 1 - r))
     else 0
 
-/-- A completed-slice tuple `gs` is **globally consistent** at evaluation points `xs`
-if there exists a single polynomial `h` in `m+1` variables whose restriction to
-each slice height `xᵢ` agrees with the genuine slice polynomial `gᵢ` for every
-index `i` in the support of `gs`.  This matches the paper's `Global_τ(x)` predicate
-from `references/ldt-paper/ld-pasting.tex` lines 1123–1131. -/
-def IsGloballyConsistent (params : Parameters) [FieldModel params.q] {k : ℕ}
-    (xs : PointTuple params k) (gs : GHatTupleOutcome params k) : Prop :=
-  ∃ h : Polynomial params.next,
-    ∀ i : Fin k, ∀ (hi : (gs i).isSome = true),
-      (Polynomial.restrictAtHeight params h (xs i)).poly =
-        ((gs i).get hi).poly
-
-/-- `IsGloballyConsistent params xs` is decidable (classically), needed for
-`restrictSubMeas` filtering. -/
-noncomputable instance isGloballyConsistent_decidablePred
-    (params : Parameters) [FieldModel params.q] {k : ℕ} (xs : PointTuple params k) :
-    DecidablePred (IsGloballyConsistent params xs) :=
-  fun _gs => Classical.dec _
-
 /-- The interpolated operator `H^{x_1,\dots,x_k}_h` restricted to tuples that are
 globally consistent with a single polynomial.
 

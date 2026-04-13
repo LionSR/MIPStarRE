@@ -216,80 +216,37 @@ noncomputable def extractSliceOr0 {params : Parameters} [FieldModel params.q]
   | some p => p.poly
   | none => 0
 
-/-- Interpolate from `d+1` or more genuine slice polynomials to recover
-a polynomial in `m+1` variables via Lagrange interpolation.
+/-- A completed-slice tuple `gs` is globally consistent at evaluation points `xs`
+if there exists a single polynomial `h` in `m+1` variables whose restriction to
+each genuine slice height `xᵢ` agrees with the corresponding slice polynomial `gᵢ`.
 
-The interpolated polynomial `h(u₁,...,uₘ,x) = ∑ᵢ∈τ Lᵢ(x) · gᵢ(u₁,...,uₘ)`
-where `Lᵢ` is the Lagrange basis polynomial for evaluation point `xᵢ`
-(computed via `Lagrange.basis` from Mathlib), and `gᵢ` is the slice
-polynomial at height `xᵢ` lifted to the ambient `(m+1)`-variable space
-via `MvPolynomial.rename`.
+This matches the paper's `Global_τ(x)` predicate from
+`references/ldt-paper/ld-pasting.tex` lines 1123-1131. -/
+def IsGloballyConsistent (params : Parameters) [FieldModel params.q] {k : ℕ}
+    (xs : PointTuple params k) (gs : GHatTupleOutcome params k) : Prop :=
+  ∃ h : Polynomial params.next,
+    ∀ i : Fin k, ∀ (hi : (gs i).isSome = true),
+      (Polynomial.restrictAtHeight params h (xs i)).poly =
+        ((gs i).get hi).poly
 
-When fewer than `d+1` genuine slices are available, returns the zero
-polynomial.
+/-- `IsGloballyConsistent params xs` is decidable (classically), needed for
+`restrictSubMeas` filtering. -/
+noncomputable instance isGloballyConsistent_decidablePred
+    (params : Parameters) [FieldModel params.q] {k : ℕ} (xs : PointTuple params k) :
+    DecidablePred (IsGloballyConsistent params xs) :=
+  fun _gs => Classical.dec _
 
-**Precondition**: correctness of the Lagrange interpolation (in
-particular `Lagrange.eval_basis_self`) requires that the evaluation
-points `v i = decodeScalar (xs i)` are pairwise distinct on `τ`, i.e.
-`Set.InjOn v ↑τ`. This is ensured at the call site by drawing `xs`
-from `distinctTupleDistribution` (which restricts to injective
-tuples) combined with injectivity of `decodeScalar`. The definition
-is well-typed without this hypothesis, but the interpolation property
-only holds under it.
+/-- Recover a global polynomial from a completed-slice tuple.
 
-**Note on τ size**: the paper (ld-pasting.tex:240) initially defines
-the interpolant from exactly `d+1` slices, while this code sums over
-all of `τ` (which has `|τ| ≥ d+1`). For `|τ| = d+1` the degree
-bound follows from `Lagrange.degree_basis`; for `|τ| > d+1` the
-last-coordinate degree may exceed `d` and the bound requires a
-cancellation argument using slice consistency (see the sorry below). -/
+On the actual pasting path this map is only applied after restricting to tuples in
+`Global_τ(x)`, so it may choose any globally consistent witness. When no such
+witness exists, it falls back to the distinguished zero polynomial. -/
 noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel params.q] :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
-  | 0, _xs, _gs => fallbackInterpolatedPolynomial params
-  | k + 1, xs, gs => by
+  | _, xs, gs => by
       classical
-      exact if InterpolationEligible params gs then
-        -- Genuine slice indices
-        let τ := gHatTupleSupport gs
-        -- Evaluation points in the scalar field
-        let v : Fin (k + 1) → Scalar params := fun i => decodeScalar (xs i)
-        -- The interpolated polynomial: ∑_{i ∈ τ} Lᵢ(x_m) · gᵢ(u₁,...,u_m)
-        -- where Lᵢ is the Lagrange basis polynomial for evaluation
-        -- point xᵢ and gᵢ is the slice polynomial lifted to (m+1)
-        -- variables.
-        { poly := ∑ i ∈ τ,
-            -- Lift slice poly to (m+1) variables
-            let slicePoly :=
-              MvPolynomial.rename (embedCoord params)
-                (extractSliceOr0 (gs i))
-            -- Lagrange basis polynomial Lᵢ(x) for point xᵢ
-            let Li := Lagrange.basis τ v i
-            -- Embed Lᵢ into MvPolynomial at the last coordinate
-            let LiMv :=
-              Li.eval₂ MvPolynomial.C
-                (MvPolynomial.X (lastCoord params))
-            LiMv * slicePoly
-          lowIndividualDegree := by
-            -- For the first m coordinates: degreeOf_mul_le +
-            -- the Lagrange basis only involves the last variable.
-            -- For the last coordinate:
-            --   • |τ| = d+1: Lagrange.degree_basis gives
-            --     degree(Lᵢ) = |τ| - 1 = d, so degreeOf ≤ d.
-            --   • |τ| > d+1: degree(Lᵢ) < |τ| > d, so the
-            --     raw bound is too weak. Closing this requires
-            --     either (a) restricting the sum to a (d+1)-
-            --     sized subset of τ (matching the paper's
-            --     construction at ld-pasting.tex:240), or
-            --     (b) proving a cancellation argument using
-            --     slice consistency (ld-pasting.tex:1238-1254).
-            -- See also: Set.InjOn v ↑τ (from distinctTuples)
-            -- is needed for eval_basis_self in either approach.
-            -- NOTE(#307): This sorry is a known limitation tracked by issue #307.
-            -- The previous version proved lowIndividualDegree for an incorrect
-            -- (constant = 1) interpolation; this version uses the correct Lagrange
-            -- basis but the degree bound requires either restricting to a (d+1)-
-            -- subset or a cancellation argument. Net improvement over prior code.
-            sorry }
+      exact if hglob : IsGloballyConsistent params xs gs then
+        Classical.choose hglob
       else
         fallbackInterpolatedPolynomial params
 
