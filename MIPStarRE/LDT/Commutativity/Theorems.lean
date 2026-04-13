@@ -1778,6 +1778,8 @@ private lemma sddOpRel_of_pullback_fullSliceQuestion
   rw [← sddErrorOp_pullback_fullSliceQuestion_eq params ψ A B]
   exact h
 
+-- Heavy sqrt/rpow arithmetic in hArith step.
+set_option maxHeartbeats 800000 in
 /-- Core Schwartz-Zippel transport on the evaluated-question space.
 
 This is the substantive remaining step: compare the full polynomial outcomes
@@ -1787,6 +1789,7 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
     (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (hEval :
       SDDOpRel strategy.state
@@ -1909,7 +1912,158 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
           2 * Real.sqrt
             (commDataProcessedGError params gamma zeta) ≤
         comMainError params gamma zeta := by
-      sorry
+      unfold commDataProcessedGError comMainError
+      -- Useful numerical facts
+      have hm_ge : (1 : Error) ≤ (params.m : Error) :=
+        Nat.one_le_cast.mpr (Nat.succ_le_of_lt params.hm)
+      have hq_pos : (0 : Error) < ↑params.q :=
+        Nat.cast_pos.mpr params.hq
+      have hdq_nn : 0 ≤ (↑params.d : Error) / ↑params.q :=
+        div_nonneg (Nat.cast_nonneg _) hq_pos.le
+      have hg4 : 0 ≤ Real.rpow gamma (1 / (4 : Error)) :=
+        Real.rpow_nonneg hgamma_nonneg _
+      have hz4 : 0 ≤ Real.rpow zeta (1 / (4 : Error)) :=
+        Real.rpow_nonneg hzeta_nonneg _
+      have hdq4 : 0 ≤ Real.rpow
+          ((↑params.d : Error) / ↑params.q) (1 / (4 : Error)) :=
+        Real.rpow_nonneg hdq_nn _
+      -- Step 1: sqrt ζ ≤ ζ^(1/4)
+      have h_sqrt_z : Real.sqrt zeta ≤
+          Real.rpow zeta (1 / (4 : Error)) := by
+        rw [Real.sqrt_eq_rpow]
+        exact Real.rpow_le_rpow_of_exponent_ge'
+          hzeta_nonneg hzeta_le (by norm_num) (by norm_num)
+      -- Step 2: d/q ≤ (d/q)^(1/4)
+      have h_dq : (↑params.d : Error) / ↑params.q ≤
+          Real.rpow ((↑params.d : Error) / ↑params.q)
+            (1 / (4 : Error)) := by
+        conv_lhs =>
+          rw [show (↑params.d : Error) / ↑params.q =
+            Real.rpow ((↑params.d : Error) / ↑params.q) 1
+            from (Real.rpow_one _).symm]
+        exact Real.rpow_le_rpow_of_exponent_ge'
+          hdq_nn hdq_le (by norm_num) (by norm_num)
+      -- Step 3: (γ^(1/4))² = γ^(1/2) and (ζ^(1/4))² = ζ^(1/2)
+      have hg4_sq :
+          (Real.rpow gamma (1 / (4 : Error))) ^ (2 : ℕ) =
+            Real.rpow gamma (1 / (2 : Error)) := by
+        calc (Real.rpow gamma (1 / (4 : Error))) ^ (2 : ℕ)
+            = (Real.rpow gamma (1 / (4 : Error))) ^
+                (2 : Error) := by norm_num
+          _ = Real.rpow gamma
+                (1 / (4 : Error) * 2) := by
+              symm; exact Real.rpow_mul hgamma_nonneg _ _
+          _ = Real.rpow gamma
+                (1 / (2 : Error)) := by norm_num
+      have hz4_sq :
+          (Real.rpow zeta (1 / (4 : Error))) ^ (2 : ℕ) =
+            Real.rpow zeta (1 / (2 : Error)) := by
+        calc (Real.rpow zeta (1 / (4 : Error))) ^ (2 : ℕ)
+            = (Real.rpow zeta (1 / (4 : Error))) ^
+                (2 : Error) := by norm_num
+          _ = Real.rpow zeta
+                (1 / (4 : Error) * 2) := by
+              symm; exact Real.rpow_mul hzeta_nonneg _ _
+          _ = Real.rpow zeta
+                (1 / (2 : Error)) := by norm_num
+      -- Step 4: √(48m(γ^½+ζ^½)) ≤ √(48m)·(γ^¼+ζ^¼)
+      -- Using γ^½ = (γ^¼)² and a²+b² ≤ (a+b)²
+      have hsqrt_cdpg :
+          Real.sqrt (48 * ↑params.m *
+            (Real.rpow gamma (1 / (2 : Error)) +
+              Real.rpow zeta (1 / (2 : Error)))) ≤
+          Real.sqrt (48 * ↑params.m) *
+            (Real.rpow gamma (1 / (4 : Error)) +
+              Real.rpow zeta (1 / (4 : Error))) := by
+        rw [← hg4_sq, ← hz4_sq]
+        have hsq_le :
+            (Real.rpow gamma (1 / (4 : Error))) ^ (2 : ℕ) +
+              (Real.rpow zeta (1 / (4 : Error))) ^ (2 : ℕ) ≤
+            (Real.rpow gamma (1 / (4 : Error)) +
+              Real.rpow zeta (1 / (4 : Error))) ^
+                (2 : ℕ) := by
+          nlinarith [hg4, hz4]
+        calc Real.sqrt (48 * ↑params.m *
+              ((Real.rpow gamma (1 / (4 : Error))) ^
+                  (2 : ℕ) +
+                (Real.rpow zeta (1 / (4 : Error))) ^
+                  (2 : ℕ)))
+            ≤ Real.sqrt (48 * ↑params.m *
+                (Real.rpow gamma (1 / (4 : Error)) +
+                  Real.rpow zeta
+                    (1 / (4 : Error))) ^ (2 : ℕ)) := by
+              apply Real.sqrt_le_sqrt
+              exact mul_le_mul_of_nonneg_left hsq_le
+                (by positivity)
+          _ = Real.sqrt (48 * ↑params.m) *
+                Real.sqrt
+                  ((Real.rpow gamma (1 / (4 : Error)) +
+                    Real.rpow zeta
+                      (1 / (4 : Error))) ^
+                    (2 : ℕ)) := by
+              rw [Real.sqrt_mul (by positivity)]
+          _ = Real.sqrt (48 * ↑params.m) *
+                (Real.rpow gamma (1 / (4 : Error)) +
+                  Real.rpow zeta
+                    (1 / (4 : Error))) := by
+              rw [Real.sqrt_sq (by linarith)]
+      -- Step 5: 2·√(48m) ≤ 14m (since 192m ≤ 196m²
+      --   for m ≥ 1)
+      have hsqrt_48m :
+          Real.sqrt (48 * ↑params.m) ≤
+            7 * ↑params.m := by
+        rw [show 7 * (↑params.m : Error) =
+          Real.sqrt ((7 * ↑params.m) ^ 2) from
+          (Real.sqrt_sq (by linarith)).symm]
+        apply Real.sqrt_le_sqrt
+        nlinarith [hm_ge]
+      -- Combine the three parts
+      have hA : 12 * Real.sqrt zeta ≤
+          12 * ↑params.m *
+            Real.rpow zeta (1 / (4 : Error)) := by
+        nlinarith [h_sqrt_z, hm_ge, hz4]
+      have hB :
+          4 * (↑params.m * ↑params.d / ↑params.q) ≤
+          4 * ↑params.m * Real.rpow
+            ((↑params.d : Error) / ↑params.q)
+            (1 / (4 : Error)) := by
+        have hrw :
+            ↑params.m * ↑params.d / ↑params.q =
+              ↑params.m *
+                ((↑params.d : Error) / ↑params.q) := by
+          ring
+        rw [hrw]
+        nlinarith [h_dq, hm_ge, hdq4]
+      have hC :
+          2 * Real.sqrt (48 * ↑params.m *
+            (Real.rpow gamma (1 / (2 : Error)) +
+              Real.rpow zeta (1 / (2 : Error)))) ≤
+          14 * ↑params.m *
+            (Real.rpow gamma (1 / (4 : Error)) +
+              Real.rpow zeta
+                (1 / (4 : Error))) := by
+        calc 2 * Real.sqrt (48 * ↑params.m *
+              (Real.rpow gamma (1 / (2 : Error)) +
+                Real.rpow zeta (1 / (2 : Error))))
+            ≤ 2 * (Real.sqrt (48 * ↑params.m) *
+                (Real.rpow gamma (1 / (4 : Error)) +
+                  Real.rpow zeta
+                    (1 / (4 : Error)))) :=
+              mul_le_mul_of_nonneg_left hsqrt_cdpg
+                (by norm_num)
+          _ = 2 * Real.sqrt (48 * ↑params.m) *
+                (Real.rpow gamma (1 / (4 : Error)) +
+                  Real.rpow zeta
+                    (1 / (4 : Error))) := by ring
+          _ ≤ 14 * ↑params.m *
+                (Real.rpow gamma (1 / (4 : Error)) +
+                  Real.rpow zeta
+                    (1 / (4 : Error))) := by
+              exact mul_le_mul_of_nonneg_right
+                (by linarith [hsqrt_48m])
+                (by linarith)
+      -- 14m·g4 + 26m·z4 + 4m·dq4 ≤ 30m·(g4+z4+dq4)
+      nlinarith [hA, hB, hC, hg4, hz4, hdq4, hm_ge]
     exact ⟨le_trans hTransport hArith⟩
   · -- Large-parameter case: max(γ, ζ, d/q) > 1.
     -- The bound is trivial: sddErrorOp ≤ 4 (by the triangle
@@ -1930,6 +2084,7 @@ private lemma fullSliceCommutation_of_evaluated
     (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (hEval :
       SDDOpRel strategy.state
@@ -1948,7 +2103,8 @@ private lemma fullSliceCommutation_of_evaluated
       (fullSliceProductRight params strategy family)
       (comMainError params gamma zeta)
       (fullSliceCommutation_of_evaluated_on_evaluated_questions
-        params strategy family gamma zeta _hself hEval)
+        params strategy family gamma zeta
+        hgamma_nonneg hzeta_nonneg _hself hEval)
 
 /-- `thm:com-main`. -/
 theorem comMain
@@ -1977,13 +2133,25 @@ theorem comMain
     constructor
     rw [evaluationSpecialization_sddErrorOp_eq]
     exact hEval.evaluatedSliceCommutation.squaredDistanceBound
+  have hzeta_nonneg : 0 ≤ zeta :=
+    le_trans (sddError_nonneg _ _ _ _)
+      hself.sliceSelfConsistency.squaredDistanceBound
+  have hgamma_nonneg : 0 ≤ gamma := by
+    have : 0 ≤ strategy.diagonalFailureProbability := by
+      unfold SymStrat.diagonalFailureProbability
+      exact mul_nonneg (by positivity)
+        (Finset.sum_nonneg fun j _ =>
+          bipartiteConsError_nonneg strategy.state _ _ _)
+    exact le_trans this hgood.diagonalLineTest
   refine
     { evaluatedCommutation := hEval
       evaluationSpecialization := hSpecialized
       fullSliceCommutation := by
         exact
           fullSliceCommutation_of_evaluated
-            params strategy family gamma zeta hself hSpecialized }
+            params strategy family gamma zeta
+            hgamma_nonneg hzeta_nonneg
+            hself hSpecialized }
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}
