@@ -3228,6 +3228,11 @@ private lemma hAConsistency_core
     (family : IdxPolyFamily params ι)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
+    (_hcomplete : family.Complete strategy.state kappa)
+    (_hcons : family.ConsistentWithPoints strategy zeta)
+    (_hself : family.StronglySelfConsistent strategy.state zeta)
+    (_hbound : IdxPolyFamily.SliceBoundednessInput
+      strategy family zeta)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k) :
     ConsRel strategy.state (uniformDistribution (Point params.next))
@@ -3274,7 +3279,8 @@ theorem hAConsistency
         (MainInductionStep.ldPastingInInductionError params k
           eps delta gamma kappa zeta) := by
   exact hAConsistency_core params strategy family
-    eps delta gamma kappa zeta hgood k hk
+    eps delta gamma kappa zeta hgood
+    hcomplete hcons hself hbound k hk
 
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
