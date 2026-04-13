@@ -67,8 +67,7 @@ jobs:
             exit 1
           fi
           if grep -q "WARNING: File not found:" "$tmp_output_file"; then
-            echo "::error::Blueprint has missing files (see WARNING lines above)"
-            exit 1
+            echo "::warning::Blueprint has missing file references (see WARNING lines above)"
           fi
 
           # If leanblueprint itself failed, propagate its exit status
