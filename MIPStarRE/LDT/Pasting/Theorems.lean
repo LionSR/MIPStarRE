@@ -1651,6 +1651,41 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
       Mavg.total
   have hMavg_bounded : MIPStarRE.LDT.Preliminaries.OpBounded01 Mavg.total := by
     exact ⟨Mavg.total_nonneg, sub_nonneg.mpr Mavg.total_le_one⟩
+  -- Step 2: Bound |secondTerm - centerMG| ≤ 2√ζ via switchSandwich
+  -- on the one-outcome complete-part family with Mavg.total as bounded operator.
+  have hselfG_bip :
+      Preliminaries.BipartiteSDDRel ψbi 𝒟x
+        (IdxProjSubMeas.toIdxSubMeas (completePartProjFamily params family))
+        (IdxProjSubMeas.toIdxSubMeas (completePartProjFamily params family))
+        zeta :=
+    switcherooSelfConsistency_bip params ψbi
+      (completePartProjFamily params family) zeta
+      (completePartProjFamily_selfConsistency_generic params ψbi family zeta hselfG)
+  have hswitch_second :=
+    MIPStarRE.LDT.Preliminaries.switchSandwich ψbi 𝒟x hnorm h𝒟x
+      (completePartProjFamily params family) Mavg.total
+      hMavg_bounded zeta hselfG_bip
+  have hsecond : |secondTerm - centerMG| ≤ 2 * Real.sqrt zeta := by
+    simpa [secondTerm, centerMG, completePartProjFamily] using
+      hswitch_second.leftSandwichTransfer
+  -- Step 3: The four-term expansion gives
+  --   sddErrorOp = T1 + T2 - T3 - T4
+  -- where T1 = switcherooAggregateFirstTerm (close to centerGM by 2√ω),
+  --       T2 = switcherooAggregateSecondTerm (close to centerMG by 2√ζ),
+  --       T3, T4 = cross-terms requiring CST argument from paper.
+  -- Paper reference: `lem:commutativity-switcheroo` in ld-pasting.tex.
+  -- The cross-term bounds |T3 - centerGM| ≤ 2√ζ + 2√ω + 2√χ and
+  -- |T4 - centerMG| ≤ 2√ζ + 2√ω + 2√χ use:
+  --   (a) decompose G^x = Σ_g G^x_g, swap G_g past M_o (error √χ from hcomm),
+  --   (b) move G_g across tensor boundary (error √ζ from hselfG),
+  --   (c) move G_g back across tensor from the other side (error √ζ from hselfG),
+  --   (d) swap G_g past M_o again (error √χ from hcomm),
+  --   (e) apply switchSandwich with M self-consistency (error 2√ω from hselfM).
+  -- Total: 2√ω + 2√ζ + 2(2√ζ + 2√ω + 2√χ) = 6√ζ + 6√ω + 4√χ.
+  -- Note: the two-center strategy (pairing T1,T3 with centerGM and T2,T4
+  -- with centerMG) means the centers cancel algebraically in the final
+  -- triangle inequality, so hperm is not needed at this stage.
+  -- (hperm is used downstream, e.g., in sddOpRel_swap_questions.)
   sorry
 
 /-- Reindexing a uniform slice-pair average along `Prod.swap` preserves `SDDOpRel`. -/
