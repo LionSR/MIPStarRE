@@ -53,6 +53,33 @@ lemma ldPastingSubMeas
       LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
   sorry
 
+/-- `lem:ld-gbcon`.
+
+This is the displayed consistency transfer from the evaluated slice family to the
+vertical-line answers used at the start of the pasting argument. -/
+theorem ldGbcon
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta) :
+    ConsRel strategy.state
+      (uniformDistribution (Point params.next))
+      family.evaluatedAtNextPoint
+      (fun u =>
+        postprocess
+          (verticalLineMeasurementFamily params strategy (truncatePoint params u))
+          (fun f => f (pointHeight params u)))
+      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+  /-
+  Paper reference: `references/ldt-paper/ld-pasting.tex`, `lem:ld-gbcon`.
+  The proof combines point consistency, the conditioned axis-parallel test, and
+  `triangleSub`.
+  -/
+  sorry
+
 /-- `prop:ld-dnoteq`. -/
 theorem ldDnoteq
     (params : Parameters) (k : ℕ) :
@@ -1416,8 +1443,8 @@ private lemma switcherooAggregate_qSDDOp_expand_avg
               apply avgOver_congr
               intro q
               rw [switcherooAggregate_qSDDOp_expand]
-              rw [Finset.sum_add_distrib]
-              simp [A, B, C, D]
+              simp [A, B, C, D, sub_eq_add_neg, Finset.sum_add_distrib,
+                Finset.sum_neg_distrib]
     _ = avgOver (uniformDistribution (SlicePairQuestion params)) A +
           avgOver (uniformDistribution (SlicePairQuestion params)) B -
           avgOver (uniformDistribution (SlicePairQuestion params)) C -
@@ -3206,6 +3233,29 @@ lemma fromHToG
   `references/ldt-paper/ld-pasting.tex`.
   This is the Bernoulli-tail recurrence converting the all-outcomes expansion to
   the averaged complete operator `G`.
+  -/
+  sorry
+
+/-- `lem:truncated-type-sum-recurrence`.
+
+This packages the recurrence and basic positivity bounds for the truncated type
+sums used in the `fromHToG` reduction. -/
+theorem truncatedTypeSumRecurrence
+    (G : MIPStarRE.Quantum.Op ι)
+    (hGpsd : 0 ≤ G)
+    (hGleOne : G ≤ 1)
+    (d prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    (truncatedTypeSums G d prefixLen τtail)ᴴ = truncatedTypeSums G d prefixLen τtail ∧
+      0 ≤ truncatedTypeSums G d prefixLen τtail ∧
+      truncatedTypeSums G d prefixLen τtail ≤ 1 ∧
+      truncatedTypeSums G d (prefixLen + 1) τtail =
+        truncatedTypeSums G d prefixLen (prependTypeBit true τtail) * G +
+          truncatedTypeSums G d prefixLen (prependTypeBit false τtail) * (1 - G) := by
+  /-
+  Paper reference: `references/ldt-paper/ld-pasting.tex`,
+  `lem:truncated-type-sum-recurrence`.
+  The proof is the commuting-polynomial argument in `G` and `I - G`.
   -/
   sorry
 

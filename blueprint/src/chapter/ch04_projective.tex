@@ -3,7 +3,7 @@
 
 \begin{theorem}[Naimark dilation]\label{thm:naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimark}
-	\uses{def:submeasurement}
+	\uses{def:submeasurement, lem:naimark-helper}
 	Let $\ket{\psi}$ be a state in $\mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$.
 	Let $A = \{A^x_a\}$ be a sub-measurement acting on $\mathcal H_{\mathrm A}$
 	and $B=\{B^y_b\}$ be a sub-measurement acting on $\mathcal H_{\mathrm B}$.
@@ -40,6 +40,7 @@
 \subsection{Naimark dilation}\label{sec:naimark}
 
 \begin{lemma}\label{lem:naimark-helper}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.oneMeasNaimark}
 	Let $A = \{A_a\}$ be a sub-measurement with $k$ distinct outcomes $a \in \mathcal A$, and let $\ket{\mathsf{aux}} \in \C^{k+1}$ be any state. Then there exists a projective sub-measurement $\widehat{A} = \{\widehat{A}_a\}$ such that for each outcome $a$,
 	\[
 		(I \ot \bra{\mathsf{aux}}) \cdot \widehat{A}_a \cdot (I \ot \ket{\mathsf{aux}})
@@ -183,6 +184,7 @@
 	\end{equation}
 
 	\begin{lemma}\label{lem:trunc-inequality}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.truncationInequality}
 		For any $x \in [0, 1]$,
 		\begin{equation*}
 			(x - \mathsf{trunc}_\delta(x))^2 \leq \frac{1}{\delta} \cdot (x - x^2).
@@ -212,6 +214,7 @@
 	\end{proof}
 
 	\begin{lemma}[Rounding to projectors]\label{lem:projective-non-measurement}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement}
 		There exists a set of projective matrices $\{R_a\}$ such that
 		\begin{equation*}
 			A_a \ot I \approx_{2\sqrt{\zeta}} R_a \ot I.
@@ -263,6 +266,7 @@
 	\end{proof}
 
 	\begin{lemma}[Rank reduction]\label{lem:projective-low-rank-sum}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum}
 		There exists a set of projection matrices $\{Q_a\}$ such that
 		\begin{equation*}
 			A_a \ot I \approx_{12\sqrt{\zeta}} Q_a \ot I.
@@ -355,6 +359,7 @@
 	Henceforth let $Q=\{Q_a\}$ be the family given by \ref{lem:projective-low-rank-sum}.
 
 	\begin{lemma}[Completeness of~$Q$]\label{lem:Q-completeness}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qCompleteness}
 		\begin{equation*}
 			\bra{\psi} Q \ot I \ket{\psi}
 			\geq
@@ -396,6 +401,7 @@
 	\end{proof}
 
 	\begin{lemma}[Completeness of~$\sqrt{Q}$]\label{lem:sqrt-Q-completeness}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sqrtQCompleteness}
 		\begin{equation*}
 			\bra{\psi} \sqrt{Q} \ot I \ket{\psi}
 			\geq
@@ -427,6 +433,7 @@
 	\end{proof}
 
 	\begin{lemma}[$Q$ is almost projective]\label{lem:q-almost-projective}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qAlmostProjective}
 		\begin{equation*}
 			\sum_a (Q_a \cdot Q \cdot Q_a - Q_a) \leq 4\sqrt{\zeta} \cdot I.
 		\end{equation*}
@@ -453,6 +460,7 @@
 	\begin{definition}[Matrix decomposition of~$Q_a$]\label{def:matrix-decomposition-Q}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ}
 		\leanok
+		\uses{lem:projective-low-rank-sum}
 		For each $a$, let
 		\[
 			m_a = \mathrm{rank}(Q_a),
@@ -482,6 +490,7 @@
 	\begin{definition}[SVD of~$X$]\label{def:svd-of-X}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX}
 		\leanok
+		\uses{def:matrix-decomposition-Q}
 		Let
 		\[
 			X = U \cdot \Sigma_{m \times d} \cdot V^\dagger
@@ -510,6 +519,7 @@
 	\begin{definition}[Definition of~$P$]\label{def:projective-P}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveP}
 		\leanok
+		\uses{def:matrix-decomposition-Q, def:svd-of-X}
 		Define
 		\[
 			\widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger.
@@ -523,6 +533,7 @@
 	\end{definition}
 
 	\begin{lemma}\label{lem:xa-t}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xa_t}
 		For each $a$,
 		\[
 			X_a = T_a \cdot X.
@@ -543,6 +554,7 @@
 	\end{proof}
 
 	\begin{lemma}[$Q_a$ restated]\label{lem:qa-restated}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qaRestated}
 		For each $a$,
 		\begin{equation*}
 			Q_a = X_a^\dagger \cdot X_a = X^\dagger \cdot T_a \cdot X = X_a^\dagger \cdot X.
@@ -563,6 +575,7 @@
 	\end{proof}
 
 	\begin{lemma}[$X$ squared]\label{lem:X-squared}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xSquared}
 		\begin{equation*}
 			X \cdot X^\dagger = U \cdot (\Sigma_{m \times m})^2 \cdot U^\dagger,
 			\quad
@@ -600,6 +613,7 @@
 	\end{proof}
 
 	\begin{lemma}\label{lem:X-expression-to-Q-expression}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xExpressionToQExpression}
 		For each $a$,
 		\begin{equation*}
 			X_a^\dagger \cdot (X \cdot X^\dagger - I_{m \times m})^2 \cdot X_a
@@ -635,6 +649,7 @@
 	\end{proof}
 
 	\begin{lemma}[$P_a$ restated]\label{lem:pa-restated}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.paRestated}
 		For each $a$,
 		\begin{equation*}
 			P_a = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.
@@ -656,6 +671,7 @@
 	\end{proof}
 
 	\begin{lemma}[$\widehat{X}$ squared]\label{lem:X-hat-squared}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared}
 		\begin{equation*}
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
 		\end{equation*}
@@ -674,6 +690,7 @@
 	\end{proof}
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat}
 		\begin{equation*}
 			X \cdot \widehat{X}^\dagger = U \cdot \Sigma_{m \times m} \cdot U^\dagger,
 			\quad
@@ -708,6 +725,7 @@
 	\end{proof}
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.squaredDifference}
 		\begin{equation*}
 			(X - \widehat{X}) \cdot (X - \widehat{X})^\dagger \leq (X \cdot X^\dagger - I_{m \times m})^2.
 		\end{equation*}
@@ -735,6 +753,7 @@
 	\end{proof}
 
 	\begin{lemma}[Projectivity of~$P$]\label{lem:P-projectivity}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pProjectivity}
 		$P = \{P_a\}$ forms a projective sub-measurement.
 	\end{lemma}
 	\begin{proof}
@@ -756,6 +775,7 @@
 	\end{proof}
 
 	\begin{lemma}[$P$ is close to~$Q$]\label{lem:P-Q-approx}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox}
 		\begin{equation*}
 			Q_a \ot I \approx_{30\zeta^{1/4}} P_a \ot I.
 		\end{equation*}

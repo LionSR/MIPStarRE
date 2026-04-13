@@ -121,6 +121,7 @@ where
 \]
 
 \begin{lemma}[Slice measurements are consistent with line answers]\label{lem:ld-gbcon}
+	\lean{MIPStarRE.LDT.Pasting.ldGbcon}
 	\uses{prop:simeq-to-approx, prop:triangle-inequality-for-approx_delta, prop:triangle-sub}
 	Under the hypotheses of Theorem~\ref{thm:ld-pasting}, set
 	\[
@@ -137,7 +138,7 @@ where
 
 \begin{lemma}[Pasted submeasurement]\label{lem:ld-pasting-sub-measurement}
 	\lean{MIPStarRE.LDT.Pasting.ldPastingSubMeas}
-	\uses{def:polymeasurements, def:simeq}
+	\uses{def:polymeasurements, def:simeq, def:pasted-measurement}
 	Under the hypotheses of Theorem~\ref{thm:ld-pasting}, there exists a submeasurement $H \in \polysub{m+1}{q}{d}$ with the following properties.
 	\begin{enumerate}
 		\item (Consistency with $A$): \label{item:ld-pasting-N-consistency-sub-measurement}
@@ -174,6 +175,8 @@ where
 \subsection{The Pasted Submeasurement}
 
 \begin{definition}[Distinct tuples]\label{def:distinct-tuples}
+	\lean{MIPStarRE.LDT.Pasting.distinctTuples, MIPStarRE.LDT.Pasting.distinctTupleDistribution}
+	\leanok
 	For $k \ge 1$, let $\mathsf{Distinct}_k \subseteq \F_q^k$ be the set of tuples $(x_1,\dots,x_k)$ with pairwise distinct coordinates.
 \end{definition}
 
@@ -242,9 +245,26 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	Compare $1-\lambda^d$ with $(1-\lambda)(1+\lambda+\cdots+\lambda^{d-1})$ and use that $d^{1/(d+1)} \le 2$.
 \end{proof}
 
+As in the paper, Lemma~\ref{lem:looks-easy-but-took-me-a-while} now converts
+\eqref{eq:equivalent-way-of-writing-grand-plan} into the estimate
+\[
+	\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
+	\le 2\cdot \E_{i\sim\mu}\Big[(\lambda_i^{d+1}(1-\lambda_i))^{1/(d+1)}\Big]
+	\le 2\cdot \Delta^{1/(d+1)},
+\]
+where the middle step uses concavity of $a \mapsto a^{1/(d+1)}$. Equivalently,
+\[
+	\bra{\psi} G \ot I \ket{\psi} - \bra{\psi} G^{d+1} \ot I \ket{\psi}
+	\le 2\cdot \Delta^{1/(d+1)}.
+\]
+For constant~$d$, this is exactly the heuristic completeness comparison for the
+first construction recorded in `references/ldt-paper/ld-pasting.tex`.
+
 \subsubsection{The Second Construction}\label{sec:construction-numba-two}
 
 \begin{definition}[The incomplete part and the completed measurement]\label{def:G-hat}
+	\lean{MIPStarRE.LDT.Pasting.GHatOutcome, MIPStarRE.LDT.Pasting.gHatIdxMeas}
+	\leanok
 	\uses{def:polymeasurements}
 	For each $x \in \F_q$, write $G^x = \sum_g G_g^x$ and define the incomplete outcome $G_\bot^x = I-G^x$. The completed measurement $\widehat G^x$ has outcome set $\polyfunc{m}{q}{d} \cup \{\bot\}$ and is given by
 	\[
@@ -255,10 +275,14 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{definition}
 
 \begin{definition}[Types]\label{def:types}
+	\lean{MIPStarRE.LDT.Pasting.GHatType, MIPStarRE.LDT.Pasting.gHatTypeWeight}
+	\leanok
 	A type is a vector $\tau \in \{0,1\}^k$. Its weight $|\tau|$ records how many coordinates lie in $\polyfunc{m}{q}{d}$ rather than equal $\bot$.
 \end{definition}
 
 \begin{definition}[The pasted measurement]\label{def:pasted-measurement}
+	\lean{MIPStarRE.LDT.Pasting.pastedInterpolationFamily, MIPStarRE.LDT.Pasting.constructedPastedSubMeas, MIPStarRE.LDT.Pasting.constructedPastedMeasurement}
+	\leanok
 	\uses{def:G-hat, def:types, def:distinct-tuples}
 	Fix $k \ge d+1$. For $x_1,\dots,x_k \in \F_q$ and outcomes $g_1,\dots,g_k \in \polyfunc{m}{q}{d}\cup\{\bot\}$, define
 	\[
@@ -329,7 +353,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 
 \begin{lemma}[Commutativity with $G_g^x$ implies commutativity with $G^x$]\label{lem:commutativity-switcheroo}
 	\lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo}
-	\uses{prop:switch-sandwich}
+	\uses{prop:switch-sandwich, lem:g-complete-self-consistency}
 	Let $M=\{M_o^x\}$ be a projective submeasurement with outcomes in a set $\mathcal O$. Suppose that
 	\begin{equation}\label{eq:M-self-consistent}
 		M_o^x \ot I \approx_\omega I \ot M_o^x,
@@ -682,7 +706,6 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 
 \begin{corollary}[Consistency of $H$ with $A$]\label{cor:h-a-consistency}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency}
-	\leanok
 	\uses{lem:h-b-consistency}
 	On average over $(u,x) \sim \F_q^{m+1}$,
 	\[
@@ -713,6 +736,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \label{sec:completeness-of-h-low-degree}
 
 \begin{definition}[Outcomes of a fixed type]\label{def:outcomes-by-type}
+	\lean{MIPStarRE.LDT.Pasting.outcomesByType, MIPStarRE.LDT.Pasting.globallyConsistentOutcomesByType, MIPStarRE.LDT.Pasting.nonglobalOutcomesByType}
+	\leanok
 	\uses{def:types}
 	For a type $\tau \in \{0,1\}^k$, let $\mathsf{Outcomes}_\tau$ be the set of tuples $(g_1,\dots,g_k)$ such that $g_i \in \polyfunc{m}{q}{d}$ when $\tau_i=1$ and $g_i=\bot$ when $\tau_i=0$. If $x_1,\dots,x_k \in \F_q$, let $\mathsf{Global}_\tau(x)$ be the subset of $\mathsf{Outcomes}_\tau$ arising from restrictions of a single polynomial in $\polyfunc{m+1}{q}{d}$, and let $\overline{\mathsf{Global}_\tau(x)} = \mathsf{Outcomes}_\tau \setminus \mathsf{Global}_\tau(x)$.
 \end{definition}
@@ -824,6 +849,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{proof}
 
 \begin{definition}[Truncated type sums]\label{def:truncated-type-sums}
+	\lean{MIPStarRE.LDT.Pasting.truncatedTypeSums}
+	\leanok
 	\uses{def:types}
 	For $1 \le \ell \le k+1$ and a tail type $\tau_{\ge \ell} \in \{0,1\}^{k-\ell+1}$, define
 	\[
@@ -836,6 +863,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{definition}
 
 \begin{lemma}[Recurrence for truncated type sums]\label{lem:truncated-type-sum-recurrence}
+	\lean{MIPStarRE.LDT.Pasting.truncatedTypeSumRecurrence}
 	\uses{def:truncated-type-sums}
 	Each $S_{\tau_{\ge \ell}}$ is Hermitian, positive semidefinite, and bounded by $I$. Moreover, if $\tau_{>\ell}$ is a tail type of length $k-\ell$, then
 	\[

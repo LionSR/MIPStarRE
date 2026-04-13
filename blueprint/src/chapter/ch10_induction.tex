@@ -5,10 +5,14 @@
 \section{Restricting to one slice}
 
 \begin{definition}[Appending a line at height $x$]\label{def:append-x}
+	\lean{MIPStarRE.LDT.AxisParallelLine.appendAtHeight, MIPStarRE.LDT.AxisLinePolynomial.appendAtHeight, MIPStarRE.LDT.DiagonalLine.appendAtHeight}
+	\leanok
   For $x \in \F_q$, let $\operatorname{append}_x(\ell)$ be the line in $\F_q^{m+1}$ obtained by appending the coordinate $x$ to every point of a line $\ell \subseteq \F_q^m$. If $f \colon \ell \to \F_q$, let $\operatorname{append}_x(f)$ be the polynomial on $\operatorname{append}_x(\ell)$ defined by $\operatorname{append}_x(f)(u,x)=f(u)$.
 \end{definition}
 
 \begin{definition}[$x$-restricted strategy]\label{def:restricted-strategy}
+	\lean{MIPStarRE.LDT.MainInductionStep.xRestrictedStrategy, MIPStarRE.LDT.MainInductionStep.RestrictedSymStrat}
+	\leanok
   \uses{def:append-x, def:symmetric-projective-strategy}
   Let $(\psi,A,B,L)$ be a symmetric strategy for the $(m+1,q,d)$ low individual degree test. For each $x \in \F_q$, the $x$-restricted strategy $(\psi,A^x,B^x,L^x)$ for the $(m,q,d)$ test is defined by
   \[
@@ -22,6 +26,7 @@
 
 \begin{lemma}[Restricted success probabilities]\label{lem:restricted-probabilities}
   \lean{MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}
+	\leanok
   \uses{def:restricted-strategy, def:good-strategy}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the restricted strategy and let $\eps_x,\delta_x,\gamma_x$ be its three failure probabilities. Then
   \[
@@ -40,6 +45,7 @@
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
   \lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
+	\leanok
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $G \in \polysub{m}{q}{d}$ be a submeasurement with the following property:
   \begin{enumerate}
@@ -83,6 +89,7 @@
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
   \lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection}
+	\leanok
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
   \begin{enumerate}
@@ -130,7 +137,8 @@
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
   \lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
-  \uses{def:good-strategy, def:polymeasurements, def:simeq}
+	\leanok
+	\uses{def:good-strategy, def:polymeasurements, def:simeq, thm:raz-safra}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)

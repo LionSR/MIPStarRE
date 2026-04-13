@@ -16,11 +16,15 @@
 \end{definition}
 
 \begin{definition}[Hypercube graph]\label{def:hypercube-graph}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.IsHypercubeEdge, MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord}
+	\leanok
   \uses{def:rerandomize-coord}
   The hypercube graph $C=(V,E)$ has vertex set $V=\F_q^m$, and an edge between $u$ and $v$ whenever they differ in at most one coordinate. A random edge $(u,v) \sim C$ is sampled by drawing $u \sim \F_q^m$, $i \in \{1,\dots,m\}$, and $x \in \F_q$ uniformly and then setting $v=\operatorname{rerand}_i(u,x)$.
 \end{definition}
 
 \begin{definition}[Adjacency matrix and Laplacian]\label{def:adjacency-laplacian}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.adjacency, MIPStarRE.LDT.ExpansionHypercubeGraph.laplacian}
+	\leanok
   \uses{def:hypercube-graph}
   Let $M=q^m$. The normalized adjacency matrix of $C$ is
   \[
@@ -46,6 +50,9 @@
 \end{proof}
 
 \begin{lemma}[Average of a nontrivial additive character]\label{lem:character-average-scalar}
+	\lean{MIPStarRE.LDT.Preliminaries.fourier_fact_scalar}
+	\leanok
+	\uses{def:ff-trace}
   For $\beta \in \F_q$,
   \[
     \E_{x \sim \F_q} \omega^{\operatorname{tr}(\beta x)} =
@@ -60,7 +67,9 @@
 \end{proof}
 
 \begin{lemma}[Orthogonality of finite-field characters]\label{lem:character-average-vector}
-  \uses{lem:character-average-scalar}
+	\lean{MIPStarRE.LDT.Preliminaries.fourier_fact_vector}
+	\leanok
+	\uses{def:ff-trace, lem:character-average-scalar}
   For $\alpha,\beta \in \F_q^m$,
   \[
     \frac{1}{q^m}\sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot(\beta-\alpha))} =
@@ -158,6 +167,7 @@
 \begin{definition}[Local and global variance]\label{def:local-and-variance}
   \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localAndVariance}
   \leanok
+	\uses{def:hypercube-graph}
   Let $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ and let $0 \le A^u \le I$ be an operator for each $u \in \F_q^m$. The local variance is
   \[
     \mathbf{Var}_{\mathrm{local}}(A,\psi)

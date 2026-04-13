@@ -7,7 +7,6 @@
 
 \begin{theorem}[Commutativity of the point measurements]\label{thm:commutativity-points}
   \lean{MIPStarRE.LDT.CommutativityPoints.commutativityPoints}
-  \leanok
   \uses{def:good-strategy, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
   On average over independent and uniformly random $u,v \sim \F_q^m$,
@@ -42,7 +41,7 @@
 
 \begin{lemma}[Commutativity of~$G$ after evaluation]\label{lem:comm-data-processed-g}
   \lean{MIPStarRE.LDT.Commutativity.commDataProcessedG}
-  \uses{def:good-strategy, def:polymeasurements, def:approx_delta, def:strong-self-consistency}
+	\uses{def:good-strategy, def:polymeasurements, def:approx_delta, def:strong-self-consistency, clm:g-comm-stability, clm:g-comm-stability2}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
   Let $\{G^x\} \in \polysub{m}{q}{d}$ be a collection of projective sub-measurements indexed by $x \in \F_q$ with the following properties:
   \begin{enumerate}
