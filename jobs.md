@@ -1,6 +1,6 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-12
+Last updated: 2026-04-13
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
@@ -11,6 +11,47 @@ Last updated: 2026-04-12
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
 - **PRs already recorded in this file**: 4
+
+## Active Preliminaries Wave
+- **Owner**: OpenCode
+- **Scope**: `MIPStarRE/LDT/Preliminaries/*.lean`
+- **Live executable sorrys in scope**: 0
+- **Current live target**: none
+- **Status**: COMPLETED
+- **Dependency chain**:
+  - `MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass`
+  - `MIPStarRE.LDT.Preliminaries.easyApproxFromApproxDelta`
+  - `MIPStarRE.LDT.Preliminaries.completion_self_distance`
+  - `MIPStarRE.LDT.Preliminaries.constFamily_sdd_unit`
+- **Priority order**:
+  1. prove `completionMissingMassBound`
+  2. typecheck `Preliminaries/SelfConsistency.lean`
+  3. scan `MIPStarRE/LDT/Preliminaries` for remaining `sorry`s
+  4. sync blueprint tag(s) in `blueprint/src/chapter/ch03_preliminaries.tex`
+  5. run `lake build`
+- **Checklist**:
+  - [x] Survey all `sorry`s in `MIPStarRE/LDT/Preliminaries`
+  - [x] Prove `completionMissingMassBound`
+  - [x] Run `lake env lean MIPStarRE/LDT/Preliminaries/SelfConsistency.lean`
+  - [x] Verify no `sorry`s remain in `MIPStarRE/LDT/Preliminaries`
+  - [x] Add `\leanok` for `lem:completion-missing-mass-bound`
+  - [x] Run `lake build`
+- **Completed on this pass**:
+  - confirmed `completionMissingMassBound` is the only live `sorry` in `Preliminaries`
+  - traced the intended proof through `bipartiteSSCSquaredMass`,
+    `easyApproxFromApproxDelta`, and the existing completion lemmas in
+    `Preliminaries/Theorems.lean`
+  - checked the paper/blueprint statement at
+    `references/ldt-paper/preliminaries.tex:1143-1174` and
+    `blueprint/src/chapter/ch03_preliminaries.tex:626-636`
+  - proved `Preliminaries.completionMissingMassBound` after adding the missing
+    paper-faithful normalization hypothesis `hψ : ψ.IsNormalized`
+  - verified `lake env lean MIPStarRE/LDT/Preliminaries/SelfConsistency.lean`
+    succeeds with no local warnings
+  - verified `leanblueprint web` succeeds after adding `\leanok` to
+    `lem:completion-missing-mass-bound`
+  - verified `grep` finds no `sorry` anywhere under `MIPStarRE/LDT/Preliminaries`
+  - verified `lake build` completes successfully
 
 ## Active Strategy
 - `MainInductionStep` is complete for this wave.
