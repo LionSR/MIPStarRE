@@ -62,6 +62,36 @@ theorem bipartiteSSCSquaredMass {Outcome : Type*}
     _ = ev ψ (leftTensor (ι₂ := ι) A.total) - ζ := by
           simp [SubMeas.liftLeft]
 
+/-- `lem:completion-missing-mass-bound`.
+
+This is the source-style missing-mass estimate used immediately before
+`prop:completing-to-measurement` in the paper. The current formalization keeps
+the left-register placement explicit via `leftTensor`. -/
+theorem completionMissingMassBound {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hperm : PermInvState ψ)
+    (A : Measurement Outcome ι) (B : SubMeas Outcome ι)
+    (δ ζ : Error)
+    (hssc : BipartiteSSCRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas) ζ)
+    (hclose : SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas.liftLeft)
+      (constSubMeasFamily B.liftLeft) δ) :
+    ev ψ (leftTensor (ι₂ := ι)
+      (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
+        ((1 : MIPStarRE.Quantum.Op ι) - B.total))) ≤
+      2 * Real.sqrt δ + ζ := by
+  /-
+  Paper reference: `references/ldt-paper/preliminaries.tex`,
+  `lem:completion-missing-mass-bound`.
+  The existing local lemmas `bipartiteSSCSquaredMass`,
+  `completion_self_distance`, and `easyApproxFromApproxDelta` provide the
+  ingredients; the final source-style wrapper is still pending.
+  -/
+  sorry
+
 /-- `prop:other-two-notions-of-self-consistency`.
 
 Proof:
@@ -152,6 +182,57 @@ theorem otherTwoNotionsOfSelfConsistency {Question Outcome : Type*}
                   ∑ a : Outcome, ev ψ (opTensor (M.outcome a) (M.outcome a)))
           exact max_le_max le_rfl hinner
     _ ≤ δ := hssc
+
+/-- `lem:good-strategy-characterization`.
+
+The axis-parallel branch is already definitionally a consistency bound. The
+self-consistency branch is the same consistency bound specialized to the point
+measurement, since that family is complete. The diagonal branch remains bundled
+as `strategy.diagonalFailureProbability` because its sampled question type
+depends on the restriction index `j`. -/
+theorem goodStrategyCharacterization {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) (eps delta gamma : Error) :
+    strategy.IsGood eps delta gamma ↔
+      ConsRel strategy.state
+        (uniformDistribution (AxisParallelTestSample params))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy)
+        eps ∧
+      ConsRel strategy.state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        delta ∧
+      strategy.diagonalFailureProbability ≤ gamma := by
+  have hself_eq_point (u : Point params) :
+      qBipartiteSSCDefect strategy.state ((strategy.pointMeasurement u).toSubMeas) =
+        qBipartiteConsDefect strategy.state
+          ((strategy.pointMeasurement u).toSubMeas)
+          ((strategy.pointMeasurement u).toSubMeas) := by
+    simp [qBipartiteSSCDefect, qBipartiteConsDefect, qBipartiteMatchMass,
+      (strategy.pointMeasurement u).total_eq_one, leftTensor, opTensor]
+  have hself_eq :
+      bipartiteSSCError strategy.state
+          (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) =
+        bipartiteConsError strategy.state
+          (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) := by
+    unfold bipartiteSSCError bipartiteConsError
+    apply avgOver_congr
+    intro u
+    simpa using hself_eq_point u
+  constructor
+  · intro h
+    refine ⟨⟨h.axisParallelTest⟩, ?_, h.diagonalLineTest⟩
+    constructor
+    rw [← hself_eq]
+    exact h.selfConsistencyTest
+  · rintro ⟨haxis, hself, hdiag⟩
+    refine ⟨haxis.offDiagonalBound, ?_, hdiag⟩
+    simpa [SymStrat.selfConsistencyFailureProbability, hself_eq] using hself.offDiagonalBound
 
 /-- `prop:two-notions-of-self-consistency-after-evaluation`.
 

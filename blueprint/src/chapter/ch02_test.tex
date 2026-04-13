@@ -11,6 +11,7 @@
 \end{definition}
 
 \begin{definition}[Low individual degree test]\label{def:low-individual-degree-test}
+	\lean{MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability, MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest}
 	\uses{def:roles}
 	Fix integers $m,d \ge 0$ and a prime power $q$. The $(m,q,d)$ low individual degree test has three equally likely subtests.
 	In the axis-parallel lines test, choose a uniformly random role $r \in \{\mathrm A,\mathrm B\}$, a uniformly random point $u \in \F_q^m$, and a uniformly random coordinate $i \in \{1,\dots,m\}$. Let $\ell=\{u+t e_i : t \in \F_q\}$. Player $r$ receives $\ell$ and returns a degree-$d$ univariate polynomial $f\colon \ell \to \F_q$; Player $\overline r$ receives $u$ and returns a field element $a \in \F_q$. The verifier accepts when $f(u)=a$.
@@ -23,10 +24,12 @@
 \end{remark}
 
 \begin{definition}[Symmetric projective strategy]\label{def:symmetric-projective-strategy}
+	\lean{MIPStarRE.LDT.SymStrat}
 	A symmetric projective strategy for the $(m,q,d)$ low individual degree test consists of a permutation-invariant bipartite state $\ket{\psi} \in \mathcal H \ot \mathcal H$, a projective point measurement $A^u=\{A^u_a\}_{a \in \F_q}$ for each $u \in \F_q^m$, a projective axis-parallel line measurement $B^\ell=\{B^\ell_f\}$ for each axis-parallel line $\ell$, and a projective diagonal-line measurement $L^\ell=\{L^\ell_f\}$ for each line $\ell$.
 \end{definition}
 
 \begin{definition}[General projective strategy]\label{def:projective-strategy}
+	\lean{MIPStarRE.LDT.ProjStrat}
 	A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
 \end{definition}
 
@@ -35,6 +38,7 @@
 \end{remark}
 
 \begin{definition}[Good strategy]\label{def:good-strategy}
+	\lean{MIPStarRE.LDT.SymStrat.IsGood}
 	A strategy is $(\eps,\delta,\gamma)$-good if it passes the axis-parallel lines test with probability at least $1-\eps$, the self-consistency test with probability at least $1-\delta$, and the diagonal lines test with probability at least $1-\gamma$.
 \end{definition}
 
@@ -63,7 +67,9 @@
 	For a function $f \colon \ell \to \F_q$, we also sometimes write $f(x)$ as shorthand for $f(u,x)$.
 \end{remark}
 
-\begin{definition}
+\begin{definition}[Restricted diagonal lines test]\label{def:restricted-diagonal-lines-test}
+	\lean{MIPStarRE.LDT.RestrictedDiagonalSample}
+	\leanok
 	Consider the $(m,q,d)$ low individual degree test. For $j \in \{1,\dots,m\}$, the $j$-restricted diagonal lines test is the diagonal lines test conditioned on $i=j$. In particular, the $m$-restricted diagonal lines test is the diagonal lines test in which the sampled line is a uniformly random line in $\F_q^m$.
 \end{definition}
 

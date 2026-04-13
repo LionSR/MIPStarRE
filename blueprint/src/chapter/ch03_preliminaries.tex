@@ -22,6 +22,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{definition}
 
 \begin{lemma}\label{prop:fourier-fact-scalar}
+	\lean{MIPStarRE.LDT.Preliminaries.fourier_fact_scalar}
 	Let $a \in \F_q$. Then
 	\begin{equation*}
 		\E_{\bx \sim \F_q} \omega^{\tr[\bx \cdot a]}
@@ -45,6 +46,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{proof}
 
 \begin{lemma}\label{prop:fourier-fact-vector}
+	\lean{MIPStarRE.LDT.Preliminaries.fourier_fact_vector}
 	\uses{prop:fourier-fact-scalar}
 	Let $v \in \F_q^m$. Then
 	\begin{equation*}
@@ -65,6 +67,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{proof}
 
 \begin{definition}[Low individual degree polynomials]\label{def:polyfunc}
+	\lean{MIPStarRE.LDT.Preliminaries.polyFunc, MIPStarRE.LDT.Polynomial}
 	Let $\polyfunc{m}{q}{d}$ be the set of polynomials $g \in \F_q[x_1,\dots,x_m]$ whose degree in each variable is at most $d$, viewed as functions $\F_q^m \to \F_q$ via evaluation. (Over finite fields, distinct low-degree polynomials can induce the same function; we identify elements of $\polyfunc{m}{q}{d}$ with their polynomial representatives, not their functional equivalence classes.)
 \end{definition}
 
@@ -78,6 +81,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{remark}
 
 \begin{lemma}[Schwartz--Zippel lemma~\cite{Sch80,Zip79}]\label{lem:schwartz-zippel-total-degree}
+	\lean{MIPStarRE.LDT.Preliminaries.schwartzZippel_totalDegree}
 	Let $g, h:\F_q^m \rightarrow \F_q$ be two distinct polynomials of total degree~$d$.
 	Then
 	\begin{equation*}
@@ -89,6 +93,8 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{proof}
 
 \begin{lemma}[Schwartz--Zippel for individual degree]\label{lem:schwartz-zippel-individual}
+	\lean{MIPStarRE.LDT.Preliminaries.schwartzZippel_individualDegree}
+	\leanok
 	\uses{def:polyfunc, lem:schwartz-zippel-total-degree}
 	If $g,h \in \polyfunc{m}{q}{d}$ are distinct, then
 	\[
@@ -100,16 +106,18 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{proof}
 
 \begin{definition}[Measurements and submeasurements]\label{def:submeasurement}
+	\lean{MIPStarRE.LDT.SubMeas, MIPStarRE.LDT.Measurement, MIPStarRE.LDT.ProjSubMeas}
 	Let $\mathcal H$ be a Hilbert space and let $\mathcal A$ be a set of outcomes. A submeasurement on $\mathcal A$ is a family $A=\{A_a\}_{a \in \mathcal A}$ of Hermitian positive semidefinite operators on $\mathcal H$ such that $\sum_a A_a \le I$. It is a measurement when $\sum_a A_a = I$, and it is projective when each $A_a$ is an idempotent projection. (In the Lean formalization, outcome sets are assumed finite throughout.)
 \end{definition}
 
 \begin{definition}[Low-degree polynomial measurements]\label{def:polymeasurements}
+	\lean{MIPStarRE.LDT.SubMeas, MIPStarRE.LDT.Measurement, MIPStarRE.LDT.Polynomial}
 	\uses{def:polyfunc, def:submeasurement}
 	We write $\polysub{m}{q}{d}$ for the submeasurements indexed by $\polyfunc{m}{q}{d}$, and $\polymeas{m}{q}{d}$ for the corresponding measurements.
 \end{definition}
 
 \begin{definition}[Post-processing]\label{def:post-processing}
-	% \lean tag removed: no matching declaration
+	\lean{MIPStarRE.LDT.postprocess}
 	\uses{def:submeasurement}
 	Let $A=\{A_a\}_{a \in \mathcal A}$ be a family of operators and let $f\colon \mathcal A \to \mathcal B$. The post-processed family $A_{[f(a)=b]}$ is defined by
 	\[
@@ -169,6 +177,8 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{definition}
 
 \begin{lemma}[Characterization of a good symmetric strategy]\label{lem:good-strategy-characterization}
+	\lean{MIPStarRE.LDT.Preliminaries.goodStrategyCharacterization}
+	\leanok
 	\uses{def:good-strategy, def:simeq, prop:simeq-for-measurements}
 	A symmetric projective strategy $(\psi,A,B,L)$ is $(\eps,\delta,\gamma)$-good if and only if the following hold on the relevant test distributions:
 	\[
@@ -369,6 +379,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Triangle inequality for $\approx_\delta$]\label{prop:triangle-inequality-for-approx_delta}
+	\lean{MIPStarRE.LDT.Preliminaries.triangleInequalityForApproxDelta}
 	\uses{def:approx_delta, prop:triangle-inequality-for-vectors-squared}
 	Suppose $(A_i)_a^x \approx_{\delta_i} (A_{i+1})_a^x$ for $i=1,\dots,k$. Then
 	\[
@@ -483,7 +494,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{definition}[Strong self-consistency]\label{def:strong-self-consistency}
-	% \lean tag: BipartiteSSCRel used in Theorems, no standalone def
+	\lean{MIPStarRE.LDT.SSCRel, MIPStarRE.LDT.BipartiteSSCRel}
 	Let $\ket{\psi}$ be permutation-invariant and let $A=\{A_a^x\}$ be a submeasurement. We say that $A$ is $\delta$-strongly self-consistent when
 	\[
 		\E_x \sum_a \bra{\psi} A_a^x \ot A_a^x \ket{\psi}
@@ -589,6 +600,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Self-consistency moves one copy to the same side]\label{lem:self-consistency-same-side-square}
+	\lean{MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass}
 	\uses{def:strong-self-consistency}
 	Let $A=\{A_a\}$ be a $\zeta$-strongly self-consistent submeasurement. Then
 	\[
@@ -602,6 +614,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Bounding the missing mass of a close submeasurement]\label{lem:completion-missing-mass-bound}
+	\lean{MIPStarRE.LDT.Preliminaries.completionMissingMassBound}
 	\uses{def:strong-self-consistency, def:approx_delta, lem:self-consistency-same-side-square}
 	Let $A=\{A_a\}$ be a measurement that is $\zeta$-strongly self-consistent, and let $B=\{B_a\}$ be a submeasurement such that $A_a \ot I \approx_\delta B_a \ot I$. Writing $B=\sum_a B_a$, one has
 	\[

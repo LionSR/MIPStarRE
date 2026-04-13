@@ -83,6 +83,38 @@ abbrev GHatType (k : ℕ) := Fin k → Bool
 abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) := Point params × PointTuple params k
 abbrev VerticalLineQuestion (params : Parameters) := Point params
 
+/-- The Hamming weight `|τ|` of a type `τ ∈ {0,1}^k`. -/
+def gHatTypeWeight {k : ℕ} (τ : GHatType k) : ℕ :=
+  (Finset.univ.filter fun i => τ i).card
+
+/-- Prepend one type bit to a tail type. -/
+def prependTypeBit {k : ℕ} (b : Bool) (τ : GHatType k) : GHatType (k + 1)
+  | ⟨0, _⟩ => b
+  | ⟨n + 1, hn⟩ => τ ⟨n, Nat.lt_of_succ_lt_succ hn⟩
+
+/-- The operator contribution of one type bit: `G` for `1`, `I - G` for `0`. -/
+noncomputable def gHatTypeBitOperator (G : MIPStarRE.Quantum.Op ι) (bit : Bool) :
+    MIPStarRE.Quantum.Op ι :=
+  if bit then G else 1 - G
+
+/-- The operator monomial associated with a type `τ`. -/
+noncomputable def gHatTypeOperator (G : MIPStarRE.Quantum.Op ι) {k : ℕ}
+    (τ : GHatType k) : MIPStarRE.Quantum.Op ι :=
+  G ^ gHatTypeWeight τ * (1 - G) ^ (k - gHatTypeWeight τ)
+
+/-- `def:truncated-type-sums`.
+
+Fixing a tail type `τ_tail`, this sums the source-style monomials contributed by
+all prefixes whose total Hamming weight can still reach the interpolation
+threshold `d + 1`. The parameter `prefixLen` is the paper's `ℓ - 1`. -/
+noncomputable def truncatedTypeSums (G : MIPStarRE.Quantum.Op ι)
+    (d prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) :
+    MIPStarRE.Quantum.Op ι :=
+  ∑ τprefix : GHatType prefixLen,
+    if d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight τtail then
+      gHatTypeOperator G τprefix
+    else 0
+
 /-- The Bernoulli tail operator from `lem:chernoff-bernoulli-matrix`:
 `F(X) = ∑_{r=degree+1}^{k} C(k,r) · X^r · (I - X)^{k-r}`.
 This is the matrix-valued Bernoulli tail probability. -/
@@ -167,6 +199,13 @@ noncomputable def gHatTupleHammingWeight {params : Parameters} {k : ℕ}
     (gs : GHatTupleOutcome params k) : ℕ :=
   (gHatTupleSupport gs).card
 
+/-- The set `\mathsf{Outcomes}_\tau` of completed-slice tuples whose `Some`/`none`
+pattern is prescribed by the type `τ`. -/
+def outcomesByType {params : Parameters} {k : ℕ}
+    [FieldModel params.q]
+    (τ : GHatType k) : Set (GHatTupleOutcome params k) :=
+  { gs | ∀ i : Fin k, (gs i).isSome = τ i }
+
 /-- A completed-slice tuple is eligible for interpolation exactly when its type has
 Hamming weight at least `d + 1`, matching the paper's `|w| ≥ d+1` filter. -/
 def InterpolationEligible (params : Parameters) {k : ℕ}
@@ -207,7 +246,7 @@ noncomputable def extractSlicePoly {params : Parameters} {k : ℕ}
           simpa [gHatTupleSupport] using hi
         simp [Option.isSome, hgi] at hisSome
     | some p =>
-        simpa [hgi])
+        simp)
 
 /-- Extract the polynomial from a genuine (Some) slice outcome, or fallback to zero. -/
 noncomputable def extractSliceOr0 {params : Parameters} [FieldModel params.q]
@@ -216,25 +255,239 @@ noncomputable def extractSliceOr0 {params : Parameters} [FieldModel params.q]
   | some p => p.poly
   | none => 0
 
-/-- A completed-slice tuple `gs` is globally consistent at evaluation points `xs`
-if there exists a single polynomial `h` in `m+1` variables whose restriction to
-each genuine slice height `xᵢ` agrees with the corresponding slice polynomial `gᵢ`.
+/-- The zero fallback and genuine slice outcomes are low individual degree. -/
+private theorem extractSliceOr0_lowIndividualDegree {params : Parameters} [FieldModel params.q]
+    (g : GHatOutcome params) (i : Fin params.m) :
+    MvPolynomial.degreeOf i (extractSliceOr0 g) ≤ params.d := by
+  cases g with
+  | none =>
+      simp [extractSliceOr0, MvPolynomial.degreeOf_zero]
+  | some p =>
+      exact p.lowIndividualDegree i
+
+/-- The old-coordinate embedding into the appended coordinate space is injective. -/
+private theorem embedCoord_injective (params : Parameters) :
+    Function.Injective (embedCoord params) := by
+  intro a b h
+  simp only [embedCoord, Fin.mk.injEq] at h
+  exact Fin.ext h
+
+/-- The appended last coordinate is outside the image of the old-coordinate embedding. -/
+private theorem degreeOf_rename_embedCoord_last (params : Parameters) [FieldModel params.q]
+    (p : PolynomialModel params) :
+    MvPolynomial.degreeOf (lastCoord params)
+      (MvPolynomial.rename (embedCoord params) p : PolynomialModel params.next) = 0 := by
+  rw [MvPolynomial.degreeOf, MvPolynomial.degrees_rename_of_injective
+    (embedCoord_injective params)]
+  simp only [Multiset.count_eq_zero, Multiset.mem_map]
+  rintro ⟨b, _, hb⟩
+  simp only [embedCoord, lastCoord, Fin.ext_iff] at hb
+  omega
+
+/-- Substituting a univariate polynomial into one multivariate variable preserves its
+degree bound in that variable and gives degree zero in all other variables. -/
+private theorem degreeOf_eval₂_C_X_le_natDegree {K σ : Type*} [Field K] [DecidableEq σ]
+    (p : _root_.Polynomial K) (i j : σ) :
+    MvPolynomial.degreeOf i
+      (p.eval₂ MvPolynomial.C (MvPolynomial.X j) : MvPolynomial σ K) ≤
+        if i = j then p.natDegree else 0 := by
+  rw [_root_.Polynomial.eval₂_eq_sum_range]
+  refine (MvPolynomial.degreeOf_sum_le i (Finset.range (p.natDegree + 1)) _).trans ?_
+  refine Finset.sup_le fun n hn => ?_
+  calc
+    MvPolynomial.degreeOf i
+        (MvPolynomial.C (p.coeff n) * MvPolynomial.X j ^ n : MvPolynomial σ K)
+        ≤ MvPolynomial.degreeOf i (MvPolynomial.X j ^ n : MvPolynomial σ K) := by
+          exact MvPolynomial.degreeOf_C_mul_le _ _ _
+    _ ≤ n * MvPolynomial.degreeOf i (MvPolynomial.X j : MvPolynomial σ K) := by
+          exact MvPolynomial.degreeOf_pow_le _ _ _
+    _ ≤ if i = j then p.natDegree else 0 := by
+          by_cases hij : i = j
+          · have hn_le : n ≤ p.natDegree := Nat.lt_succ_iff.mp (Finset.mem_range.mp hn)
+            simp [hij, MvPolynomial.degreeOf_X, hn_le]
+          · simp [hij, MvPolynomial.degreeOf_X]
+
+/-- Each Lagrange basis polynomial has degree at most one less than the size of the
+interpolation support, without requiring distinct interpolation nodes. -/
+private theorem natDegree_lagrangeBasis_le_card_sub_one {K ρ : Type*} [Field K] [DecidableEq ρ]
+    {s : Finset ρ} {v : ρ → K} {i : ρ} (hi : i ∈ s) :
+    (Lagrange.basis s v i).natDegree ≤ s.card - 1 := by
+  rw [Lagrange.basis]
+  calc
+    (∏ j ∈ s.erase i, Lagrange.basisDivisor (v i) (v j)).natDegree
+        ≤ ∑ j ∈ s.erase i, (Lagrange.basisDivisor (v i) (v j)).natDegree := by
+          exact _root_.Polynomial.natDegree_prod_le _ _
+    _ ≤ ∑ j ∈ s.erase i, 1 := by
+          exact Finset.sum_le_sum fun j _ => by
+            rw [Lagrange.basisDivisor]
+            exact (_root_.Polynomial.natDegree_C_mul_le _ _).trans
+              (_root_.Polynomial.natDegree_X_sub_C_le _)
+    _ = s.card - 1 := by
+          simp [Finset.card_erase_of_mem hi]
+
+/-- An interpolation-eligible tuple has at least `d+1` genuine outcomes. -/
+private theorem interpolationEligible_card_le {params : Parameters} {k : ℕ}
+    [FieldModel params.q] {gs : GHatTupleOutcome params k}
+    (hEligible : InterpolationEligible params gs) :
+    params.d + 1 ≤ (gHatTupleSupport gs).card := by
+  simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible
+
+/-- A chosen `d+1`-element subset of the genuine completed-slice support. -/
+noncomputable def interpolationSupportSubset {params : Parameters} {k : ℕ}
+    [FieldModel params.q] (gs : GHatTupleOutcome params k)
+    (hEligible : InterpolationEligible params gs) : Finset (Fin k) :=
+  Classical.choose <|
+    Finset.exists_subset_card_eq (interpolationEligible_card_le hEligible)
+
+/-- The chosen interpolation support lies inside the genuine support.
+Used downstream to ensure the Lagrange interpolation correctness property
+(`Lagrange.eval_basis_self`) holds when combined with `distinctTupleDistribution`. -/
+theorem interpolationSupportSubset_subset {params : Parameters} {k : ℕ}
+    [FieldModel params.q] (gs : GHatTupleOutcome params k)
+    (hEligible : InterpolationEligible params gs) :
+    interpolationSupportSubset gs hEligible ⊆ gHatTupleSupport gs :=
+  (Classical.choose_spec
+    (Finset.exists_subset_card_eq
+      (interpolationEligible_card_le hEligible))).1
+
+/-- The chosen interpolation support has exactly `d+1` points. -/
+theorem interpolationSupportSubset_card {params : Parameters} {k : ℕ}
+    [FieldModel params.q] (gs : GHatTupleOutcome params k)
+    (hEligible : InterpolationEligible params gs) :
+    (interpolationSupportSubset gs hEligible).card = params.d + 1 :=
+  (Classical.choose_spec
+    (Finset.exists_subset_card_eq
+      (interpolationEligible_card_le hEligible))).2
+
+/-- Interpolate from a specified `d+1`-element index set to recover
+a polynomial in `m+1` variables via Lagrange interpolation.
+The degree bound (`lowIndividualDegree ≤ d`) holds for any `σ`;
+the interpolation correctness property (that `restrictAtHeight`
+of the result agrees with each slice) additionally requires
+`σ ⊆ gHatTupleSupport gs` and distinct evaluation points, which
+are ensured by the caller via `interpolationSupportSubset_subset`
+and `distinctTupleDistribution`. -/
+noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
+    [FieldModel params.q] {k : ℕ} (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k) (σ : Finset (Fin k))
+    (hσcard : σ.card = params.d + 1) : Polynomial params.next where
+  poly := ∑ i ∈ σ,
+    let slicePoly :=
+      MvPolynomial.rename (embedCoord params)
+        (extractSliceOr0 (gs i))
+    let Li := Lagrange.basis σ (fun i => decodeScalar (xs i)) i
+    let LiMv :=
+      Li.eval₂ MvPolynomial.C
+        (MvPolynomial.X (lastCoord params))
+    LiMv * slicePoly
+  lowIndividualDegree := by
+    intro coord
+    refine (MvPolynomial.degreeOf_sum_le coord σ _).trans ?_
+    refine Finset.sup_le fun idx hidx => ?_
+    let slicePoly : PolynomialModel params.next :=
+      MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs idx))
+    let Li : _root_.Polynomial (Scalar params) :=
+      Lagrange.basis σ (fun i => decodeScalar (xs i)) idx
+    let LiMv : PolynomialModel params.next :=
+      Li.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+    have hLi_natDegree : Li.natDegree ≤ params.d := by
+      have hbasis :
+          Li.natDegree ≤ σ.card - 1 := by
+        exact natDegree_lagrangeBasis_le_card_sub_one hidx
+      simpa [Li, hσcard] using hbasis
+    by_cases hcoord : coord.val < params.m
+    · let oldCoord : Fin params.m := ⟨coord.val, hcoord⟩
+      have hcoord_eq : embedCoord params oldCoord = coord := by
+        ext
+        simp [embedCoord, oldCoord]
+      have hcoord_ne_last : coord ≠ lastCoord params := by
+        intro h
+        have hval : coord.val = params.m := by
+          simpa [lastCoord] using congrArg Fin.val h
+        omega
+      have hLiMv_zero : MvPolynomial.degreeOf coord LiMv ≤ 0 := by
+        simpa [LiMv, hcoord_ne_last] using
+          (degreeOf_eval₂_C_X_le_natDegree
+            (p := Li) (i := coord) (j := lastCoord params))
+      have hslice : MvPolynomial.degreeOf coord slicePoly ≤ params.d := by
+        change MvPolynomial.degreeOf coord
+            (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs idx)) :
+              PolynomialModel params.next) ≤ params.d
+        rw [← hcoord_eq, MvPolynomial.degreeOf_rename_of_injective
+          (embedCoord_injective params)]
+        exact extractSliceOr0_lowIndividualDegree (gs idx) oldCoord
+      calc
+        MvPolynomial.degreeOf coord (LiMv * slicePoly)
+            ≤ MvPolynomial.degreeOf coord LiMv + MvPolynomial.degreeOf coord slicePoly := by
+              exact MvPolynomial.degreeOf_mul_le _ _ _
+        _ ≤ 0 + params.d := Nat.add_le_add hLiMv_zero hslice
+        _ = params.d := by simp
+    · have hcoord_eq_last : coord = lastCoord params := by
+        have hlt_succ : coord.val < params.m + 1 := by
+          simpa [Parameters.next] using coord.isLt
+        have hle : params.m ≤ coord.val := Nat.le_of_not_gt hcoord
+        have hval : coord.val = params.m := le_antisymm (Nat.le_of_lt_succ hlt_succ) hle
+        ext
+        simp [lastCoord, hval]
+      subst coord
+      have hLiMv : MvPolynomial.degreeOf (lastCoord params) LiMv ≤ params.d := by
+        have hLiMv_nat :
+            MvPolynomial.degreeOf (lastCoord params) LiMv ≤ Li.natDegree := by
+          simpa [LiMv] using
+            (degreeOf_eval₂_C_X_le_natDegree
+              (p := Li) (i := lastCoord params) (j := lastCoord params))
+        exact hLiMv_nat.trans hLi_natDegree
+      have hslice_zero : MvPolynomial.degreeOf (lastCoord params) slicePoly ≤ 0 := by
+        change MvPolynomial.degreeOf (lastCoord params)
+            (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs idx)) :
+              PolynomialModel params.next) ≤ 0
+        rw [degreeOf_rename_embedCoord_last]
+      calc
+        MvPolynomial.degreeOf (lastCoord params) (LiMv * slicePoly)
+            ≤ MvPolynomial.degreeOf (lastCoord params) LiMv +
+                MvPolynomial.degreeOf (lastCoord params) slicePoly := by
+              exact MvPolynomial.degreeOf_mul_le _ _ _
+        _ ≤ params.d + 0 := Nat.add_le_add hLiMv hslice_zero
+        _ = params.d := by simp
+
+/-- A completed-slice tuple `gs` is globally consistent at evaluation
+points `xs` if there exists a single polynomial `h` in `m+1` variables
+whose restriction to each genuine slice height `xᵢ` agrees with the
+corresponding slice polynomial `gᵢ`.
 
 This matches the paper's `Global_τ(x)` predicate from
 `references/ldt-paper/ld-pasting.tex` lines 1123-1131. -/
-def IsGloballyConsistent (params : Parameters) [FieldModel params.q] {k : ℕ}
-    (xs : PointTuple params k) (gs : GHatTupleOutcome params k) : Prop :=
+def IsGloballyConsistent (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k) : Prop :=
   ∃ h : Polynomial params.next,
     ∀ i : Fin k, ∀ (hi : (gs i).isSome = true),
       (Polynomial.restrictAtHeight params h (xs i)).poly =
         ((gs i).get hi).poly
 
-/-- `IsGloballyConsistent params xs` is decidable (classically), needed for
-`restrictSubMeas` filtering. -/
+/-- `IsGloballyConsistent params xs` is decidable (classically),
+needed for `restrictSubMeas` filtering. -/
 noncomputable instance isGloballyConsistent_decidablePred
-    (params : Parameters) [FieldModel params.q] {k : ℕ} (xs : PointTuple params k) :
+    (params : Parameters) [FieldModel params.q] {k : ℕ}
+    (xs : PointTuple params k) :
     DecidablePred (IsGloballyConsistent params xs) :=
   fun _gs => Classical.dec _
+
+/-- The subset `\mathsf{Global}_\tau(x)` of `\mathsf{Outcomes}_\tau` consisting of
+tuples that arise from restrictions of a single global polynomial at the slice
+heights `xs`. -/
+def globallyConsistentOutcomesByType (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k) (τ : GHatType k) :
+    Set (GHatTupleOutcome params k) :=
+  { gs | gs ∈ outcomesByType τ ∧ IsGloballyConsistent params xs gs }
+
+/-- The complement `\overline{\mathsf{Global}_\tau(x)}` inside
+`\mathsf{Outcomes}_\tau`. -/
+def nonglobalOutcomesByType (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k) (τ : GHatType k) :
+    Set (GHatTupleOutcome params k) :=
+  outcomesByType τ \ globallyConsistentOutcomesByType params xs τ
 
 /-- Recover a global polynomial from a completed-slice tuple.
 
@@ -243,10 +496,13 @@ On the actual pasting path this map is only applied after restricting to tuples 
 witness exists, it falls back to the distinguished zero polynomial. -/
 noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel params.q] :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
-  | _, xs, gs => by
+  | 0, _xs, _gs => fallbackInterpolatedPolynomial params
+  | k + 1, xs, gs => by
       classical
-      exact if hglob : IsGloballyConsistent params xs gs then
-        Classical.choose hglob
+      exact if hEligible : InterpolationEligible params gs then
+        let σ := interpolationSupportSubset gs hEligible
+        interpolateCompletedSlicesFromSupport params xs gs σ
+          (interpolationSupportSubset_card gs hEligible)
       else
         fallbackInterpolatedPolynomial params
 

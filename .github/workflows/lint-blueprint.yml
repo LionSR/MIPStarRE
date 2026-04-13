@@ -12,6 +12,7 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
+      - 'blueprint/lean_decls'
       - 'scripts/blueprint_lean_sync.py'
   pull_request:
     types: [opened, synchronize, reopened]
@@ -23,6 +24,7 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
+      - 'blueprint/lean_decls'
       - 'scripts/blueprint_lean_sync.py'
 
 concurrency:
@@ -62,6 +64,10 @@ jobs:
           # Check for blueprint ERROR lines in the captured output
           if grep -q "^ERROR:" "$tmp_output_file"; then
             echo "::error::Blueprint has unresolved labels (see ERROR lines above)"
+            exit 1
+          fi
+          if grep -q "WARNING: File not found:" "$tmp_output_file"; then
+            echo "::error::Blueprint has missing files (see WARNING lines above)"
             exit 1
           fi
 
