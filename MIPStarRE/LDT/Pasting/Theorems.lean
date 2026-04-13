@@ -3214,6 +3214,9 @@ lemma hBConsistency
 
 /-- Bridge: convert vertical-line consistency to point consistency.
 
+Given `hHB : HBConsistencyStatement` (the output of `hBConsistency`), derives
+point consistency by restricting the vertical-line bound to individual points.
+
 Paper reference: `cor:h-a-consistency` proof in `ld-pasting.tex`
 lines 1098–1117.
 
@@ -3228,13 +3231,10 @@ private lemma hAConsistency_core
     (family : IdxPolyFamily params ι)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (_hcomplete : family.Complete strategy.state kappa)
-    (_hcons : family.ConsistentWithPoints strategy zeta)
-    (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hbound : IdxPolyFamily.SliceBoundednessInput
-      strategy family zeta)
     (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k)
+    (hHB : HBConsistencyStatement params strategy family
+        eps delta gamma zeta k) :
     ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next
@@ -3278,9 +3278,16 @@ theorem hAConsistency
           (constructedPastedMeasurement params family k).toSubMeas)
         (MainInductionStep.ldPastingInInductionError params k
           eps delta gamma kappa zeta) := by
+  have hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
+    -- Chain: gHatFacts → commuteGHalfSandwich → ldSandwichLineOnePoint
+    -- Requires GHatFactsStatement derivation; tracked in #299
+    sorry
+  have hHB := hBConsistency params strategy eps delta gamma zeta
+    hgood family hcons hself hbound k hline
   exact hAConsistency_core params strategy family
-    eps delta gamma kappa zeta hgood
-    hcomplete hcons hself hbound k hk
+    eps delta gamma kappa zeta hgood k hk hHB
 
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
