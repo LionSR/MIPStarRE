@@ -17,42 +17,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- `thm:ld-pasting`. -/
-theorem ldPasting
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ H : Measurement (Polynomial params.next) ι,
-      LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  sorry
-
-/-- `lem:ld-pasting-sub-measurement`. -/
-lemma ldPastingSubMeas
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ H : SubMeas (Polynomial params.next) ι,
-      LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
-  sorry
-
 /-- `lem:ld-gbcon`.
 
 This is the direct consistency transfer from the slice family `G^x` to the
