@@ -6,100 +6,100 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 
 
 \begin{lemma}[Replacing a line answer by a fixed polynomial]\label{lem:generalize-b}
-  \lean{MIPStarRE.LDT.GlobalVariance.generalizeB}
+	\lean{MIPStarRE.LDT.GlobalVariance.generalizeB}
 	\leanok
-  \uses{def:polymeasurements, lem:schwartz-zippel-individual}
-  Let $G \in \polysub{m}{q}{d}$. On the axis-parallel line-test distribution,
-  \[
-    B^{\ell}_{[f(u)=g(u)]} \ot (G_g)^{1/2}
-    \approx_{md/q}
-    B^{\ell}_{g|_{\ell}} \ot (G_g)^{1/2}.
-  \]
+	\uses{def:polymeasurements, lem:schwartz-zippel-individual}
+	Let $G \in \polysub{m}{q}{d}$. On the axis-parallel line-test distribution,
+	\[
+		B^{\ell}_{[f(u)=g(u)]} \ot (G_g)^{1/2}
+		\approx_{md/q}
+		B^{\ell}_{g|_{\ell}} \ot (G_g)^{1/2}.
+	\]
 \end{lemma}
 \begin{proof}
-  \uses{lem:schwartz-zippel-individual}
-  Expand the $\approx_{md/q}$ norm on the weighted vector $(I\ot (G_g)^{1/2})\ket{\psi}$. Because $B^\ell$ is a projective measurement, only those line polynomials $f$ with $f\ne g|_\ell$ and $f(u)=g(u)$ contribute. Lemma~\ref{lem:schwartz-zippel-individual} bounds the probability of this event by $md/q$, and the remaining operator sum is bounded by the fact that $G$ is a submeasurement.
+	\uses{lem:schwartz-zippel-individual}
+	Expand the $\approx_{md/q}$ norm on the weighted vector $(I\ot (G_g)^{1/2})\ket{\psi}$. Because $B^\ell$ is a projective measurement, only those line polynomials $f$ with $f\ne g|_\ell$ and $f(u)=g(u)$ contribute. Lemma~\ref{lem:schwartz-zippel-individual} bounds the probability of this event by $md/q$, and the remaining operator sum is bounded by the fact that $G$ is a submeasurement.
 \end{proof}
 
 \begin{lemma}[Local variance of the points measurements]\label{lem:local-variance-of-points}
-  \lean{MIPStarRE.LDT.GlobalVariance.localVarianceOfPoints}
+	\lean{MIPStarRE.LDT.GlobalVariance.localVarianceOfPoints}
 	\leanok
-  \uses{lem:good-strategy-characterization, prop:simeq-to-approx, lem:generalize-b, prop:triangle-inequality-for-approx_delta}
-  Let $G \in \polysub{m}{q}{d}$. On the hypercube edge distribution $(u,v) \sim C$,
-  \begin{equation}
-    A^u_{g(u)} \ot (G_g)^{1/2}
-    \approx_{24\cdot\left(\eps+\delta+\frac{md}{q}\right)}
-    A^v_{g(v)} \ot (G_g)^{1/2}.
-    \label{eq:local-variance-of-points-equation}
-  \end{equation}
+	\uses{lem:good-strategy-characterization, prop:simeq-to-approx, lem:generalize-b, prop:triangle-inequality-for-approx_delta}
+	Let $G \in \polysub{m}{q}{d}$. On the hypercube edge distribution $(u,v) \sim C$,
+	\begin{equation}
+		A^u_{g(u)} \ot (G_g)^{1/2}
+		\approx_{24\cdot\left(\eps+\delta+\frac{md}{q}\right)}
+		A^v_{g(v)} \ot (G_g)^{1/2}.
+		\label{eq:local-variance-of-points-equation}
+	\end{equation}
 \end{lemma}
 \begin{proof}
-  \uses{prop:simeq-to-approx, lem:generalize-b, lem:good-strategy-characterization, prop:triangle-inequality-for-approx_delta}
-  Fix $g$ and keep the weight $(G_g)^{1/2}$ on the second tensor factor throughout. On the vector $(I\ot (G_g)^{1/2})\ket{\psi}$ one has the six-step chain
-  \[
-    A^u_{g(u)} \ot (G_g)^{1/2}
-    \approx_{2\delta} I\ot (G_g)^{1/2} A^u_{g(u)}
-    \approx_{2\eps} B^\ell_{[f(u)=g(u)]} \ot (G_g)^{1/2}
-    \approx_{md/q} B^\ell_{g|_\ell} \ot (G_g)^{1/2}
-    \approx_{md/q} B^\ell_{[f(v)=g(v)]} \ot (G_g)^{1/2}
-    \approx_{2\eps} I\ot (G_g)^{1/2} A^v_{g(v)}
-    \approx_{2\delta} A^v_{g(v)} \ot (G_g)^{1/2}.
-  \]
-  The first, second, fifth, and sixth comparisons use Lemma~\ref{prop:simeq-to-approx} together with the good-strategy hypotheses, and the middle pair is Lemma~\ref{lem:generalize-b}. Lemma~\ref{prop:triangle-inequality-for-approx_delta} sums these six weighted transports.
+	\uses{prop:simeq-to-approx, lem:generalize-b, lem:good-strategy-characterization, prop:triangle-inequality-for-approx_delta}
+	Fix $g$ and keep the weight $(G_g)^{1/2}$ on the second tensor factor throughout. On the vector $(I\ot (G_g)^{1/2})\ket{\psi}$ one has the six-step chain
+	\[
+		A^u_{g(u)} \ot (G_g)^{1/2}
+		\approx_{2\delta} I\ot (G_g)^{1/2} A^u_{g(u)}
+		\approx_{2\eps} B^\ell_{[f(u)=g(u)]} \ot (G_g)^{1/2}
+		\approx_{md/q} B^\ell_{g|_\ell} \ot (G_g)^{1/2}
+		\approx_{md/q} B^\ell_{[f(v)=g(v)]} \ot (G_g)^{1/2}
+		\approx_{2\eps} I\ot (G_g)^{1/2} A^v_{g(v)}
+		\approx_{2\delta} A^v_{g(v)} \ot (G_g)^{1/2}.
+	\]
+	The first, second, fifth, and sixth comparisons use Lemma~\ref{prop:simeq-to-approx} together with the good-strategy hypotheses, and the middle pair is Lemma~\ref{lem:generalize-b}. Lemma~\ref{prop:triangle-inequality-for-approx_delta} sums these six weighted transports.
 \end{proof}
 
 We note that \ref{eq:local-variance-of-points-equation} is equivalent to the statement that
 \begin{equation}
-  \sum_{g \in \polyfunc{m}{q}{d}} \E_{(u,v)\sim C} \bra{\psi} (A^u_{g(u)}-A^v_{g(v)})^2 \ot G_g \ket{\psi}
-  \le
-  24\left(\eps+\delta+\frac{md}{q}\right).
-  \label{eq:equivalent-local-variance}
+	\sum_{g \in \polyfunc{m}{q}{d}} \E_{(u,v)\sim C} \bra{\psi} (A^u_{g(u)}-A^v_{g(v)})^2 \ot G_g \ket{\psi}
+	\le
+	24\left(\eps+\delta+\frac{md}{q}\right).
+	\label{eq:equivalent-local-variance}
 \end{equation}
 This can be viewed as a local-variance bound for the point measurements.
 
 \begin{lemma}[Global variance of the points measurements]\label{lem:global-variance-of-points}
-  \lean{MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints}
+	\lean{MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints}
 	\leanok
-  \uses{def:local-and-variance, lem:local-to-global, lem:local-variance-of-points}
-  Let $G \in \polysub{m}{q}{d}$. On the uniform distribution over independent $u,v \in \F_q^m$,
-  \begin{equation}
-    A^u_{g(u)} \ot (G_g)^{1/2}
-    \approx_{24m\left(\eps+\delta+\frac{md}{q}\right)}
-    A^v_{g(v)} \ot (G_g)^{1/2}.
-    \label{eq:global-variance-of-points-equation}
-  \end{equation}
+	\uses{def:local-and-variance, lem:local-to-global, lem:local-variance-of-points}
+	Let $G \in \polysub{m}{q}{d}$. On the uniform distribution over independent $u,v \in \F_q^m$,
+	\begin{equation}
+		A^u_{g(u)} \ot (G_g)^{1/2}
+		\approx_{24m\left(\eps+\delta+\frac{md}{q}\right)}
+		A^v_{g(v)} \ot (G_g)^{1/2}.
+		\label{eq:global-variance-of-points-equation}
+	\end{equation}
 \end{lemma}
 \begin{proof}
-  \uses{def:local-and-variance, lem:local-to-global, lem:local-variance-of-points}
-  We want to bound
-  \begin{equation}
-    \E_{u,v \sim \F_q^m} \sum_{g \in \polyfunc{m}{q}{d}} \lVert (A^u_{g(u)}-A^v_{g(v)}) \ot (G_g)^{1/2} \ket{\psi} \rVert^2
-    =
-    \E_{u,v \sim \F_q^m} \sum_{g \in \polyfunc{m}{q}{d}} \bra{\psi} (A^u_{g(u)}-A^v_{g(v)})^2 \ot G_g \ket{\psi}.
-    % Paper label: eq:TODO:bound-this!
-    \label{eq:global-variance-target}
-  \end{equation}
-  For each $g \in \polyfunc{m}{q}{d}$, define
-  \[
-    A(g)^u := A^u_{g(u)},
-    \qquad
-    \ket{\psi_g} := (I \ot (G_g)^{1/2})\ket{\psi}.
-  \]
-  Then
-  \[
-    \eqref{eq:global-variance-target}
-    =
-    \sum_{g \in \polyfunc{m}{q}{d}} \E_{u,v \sim \F_q^m} \bra{\psi_g} (A(g)^u-A(g)^v)^2 \ot I \ket{\psi_g}
-    =
-    \sum_{g \in \polyfunc{m}{q}{d}} 2\,\mathbf{Var}_{\mathrm{global}}(A(g),\psi_g).
-  \]
-  Applying Lemma~\ref{lem:local-to-global} gives
-  \[
-    \eqref{eq:global-variance-target}
-    \le
-    \sum_{g \in \polyfunc{m}{q}{d}} 2m\,\mathbf{Var}_{\mathrm{local}}(A(g),\psi_g)
-    =
-    m \cdot \sum_{g \in \polyfunc{m}{q}{d}} \E_{(u,v)\sim C} \bra{\psi} (A^u_{g(u)}-A^v_{g(v)})^2 \ot G_g \ket{\psi}.
-  \]
-  The last quantity is at most $m \cdot 24\left(\eps+\delta+\frac{md}{q}\right)$ by \eqref{eq:equivalent-local-variance}, which is exactly \ref{eq:global-variance-of-points-equation}.
+	\uses{def:local-and-variance, lem:local-to-global, lem:local-variance-of-points}
+	We want to bound
+	\begin{equation}
+		\E_{u,v \sim \F_q^m} \sum_{g \in \polyfunc{m}{q}{d}} \lVert (A^u_{g(u)}-A^v_{g(v)}) \ot (G_g)^{1/2} \ket{\psi} \rVert^2
+		=
+		\E_{u,v \sim \F_q^m} \sum_{g \in \polyfunc{m}{q}{d}} \bra{\psi} (A^u_{g(u)}-A^v_{g(v)})^2 \ot G_g \ket{\psi}.
+		% Paper label: eq:TODO:bound-this!
+		\label{eq:global-variance-target}
+	\end{equation}
+	For each $g \in \polyfunc{m}{q}{d}$, define
+	\[
+		A(g)^u := A^u_{g(u)},
+		\qquad
+		\ket{\psi_g} := (I \ot (G_g)^{1/2})\ket{\psi}.
+	\]
+	Then
+	\[
+		\eqref{eq:global-variance-target}
+		=
+		\sum_{g \in \polyfunc{m}{q}{d}} \E_{u,v \sim \F_q^m} \bra{\psi_g} (A(g)^u-A(g)^v)^2 \ot I \ket{\psi_g}
+		=
+		\sum_{g \in \polyfunc{m}{q}{d}} 2\,\mathbf{Var}_{\mathrm{global}}(A(g),\psi_g).
+	\]
+	Applying Lemma~\ref{lem:local-to-global} gives
+	\[
+		\eqref{eq:global-variance-target}
+		\le
+		\sum_{g \in \polyfunc{m}{q}{d}} 2m\,\mathbf{Var}_{\mathrm{local}}(A(g),\psi_g)
+		=
+		m \cdot \sum_{g \in \polyfunc{m}{q}{d}} \E_{(u,v)\sim C} \bra{\psi} (A^u_{g(u)}-A^v_{g(v)})^2 \ot G_g \ket{\psi}.
+	\]
+	The last quantity is at most $m \cdot 24\left(\eps+\delta+\frac{md}{q}\right)$ by \eqref{eq:equivalent-local-variance}, which is exactly \ref{eq:global-variance-of-points-equation}.
 \end{proof}

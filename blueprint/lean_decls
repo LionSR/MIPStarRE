@@ -1,5 +1,14 @@
+MIPStarRE.LDT.Test.razSafra
+MIPStarRE.LDT.Test.classicalTestSoundness
+MIPStarRE.LDT.Test.mainInformal
 MIPStarRE.LDT.Role
 MIPStarRE.LDT.Role.other
+MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability
+MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest
+MIPStarRE.LDT.SymStrat
+MIPStarRE.LDT.ProjStrat
+MIPStarRE.LDT.SymStrat.IsGood
+MIPStarRE.LDT.RestrictedDiagonalSample
 MIPStarRE.LDT.Test.mainFormal
 MIPStarRE.LDT.Preliminaries.ffTrace
 MIPStarRE.LDT.Preliminaries.fourier_fact_scalar
@@ -92,6 +101,8 @@ MIPStarRE.LDT.SelfImprovement.addInU
 MIPStarRE.LDT.SelfImprovement.selfImprovement
 MIPStarRE.LDT.CommutativityPoints.commutativityPoints
 MIPStarRE.LDT.Commutativity.commDataProcessedG
+MIPStarRE.LDT.Commutativity.gCommStability
+MIPStarRE.LDT.Commutativity.gCommStabilityTwo
 MIPStarRE.LDT.Commutativity.normalizationCondition
 MIPStarRE.LDT.Commutativity.comMain
 MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection

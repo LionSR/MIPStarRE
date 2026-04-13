@@ -3,7 +3,8 @@
 
 \begin{theorem}[Naimark dilation]\label{thm:naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimark}
-	\uses{def:submeasurement, lem:naimark-helper}
+	\leanok
+	\uses{def:submeasurement}
 	Let $\ket{\psi}$ be a state in $\mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$.
 	Let $A = \{A^x_a\}$ be a sub-measurement acting on $\mathcal H_{\mathrm A}$
 	and $B=\{B^y_b\}$ be a sub-measurement acting on $\mathcal H_{\mathrm B}$.
@@ -41,6 +42,7 @@
 
 \begin{lemma}\label{lem:naimark-helper}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.oneMeasNaimark}
+	\leanok
 	Let $A = \{A_a\}$ be a sub-measurement with $k$ distinct outcomes $a \in \mathcal A$, and let $\ket{\mathsf{aux}} \in \C^{k+1}$ be any state. Then there exists a projective sub-measurement $\widehat{A} = \{\widehat{A}_a\}$ such that for each outcome $a$,
 	\[
 		(I \ot \bra{\mathsf{aux}}) \cdot \widehat{A}_a \cdot (I \ot \ket{\mathsf{aux}})
@@ -555,6 +557,7 @@
 
 	\begin{lemma}[$Q_a$ restated]\label{lem:qa-restated}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qaRestated}
+		\leanok
 		For each $a$,
 		\begin{equation*}
 			Q_a = X_a^\dagger \cdot X_a = X^\dagger \cdot T_a \cdot X = X_a^\dagger \cdot X.
@@ -576,6 +579,7 @@
 
 	\begin{lemma}[$X$ squared]\label{lem:X-squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xSquared}
+		\leanok
 		\begin{equation*}
 			X \cdot X^\dagger = U \cdot (\Sigma_{m \times m})^2 \cdot U^\dagger,
 			\quad
@@ -614,6 +618,7 @@
 
 	\begin{lemma}\label{lem:X-expression-to-Q-expression}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xExpressionToQExpression}
+		\leanok
 		For each $a$,
 		\begin{equation*}
 			X_a^\dagger \cdot (X \cdot X^\dagger - I_{m \times m})^2 \cdot X_a
@@ -672,6 +677,7 @@
 
 	\begin{lemma}[$\widehat{X}$ squared]\label{lem:X-hat-squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared}
+		\leanok
 		\begin{equation*}
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
 		\end{equation*}
@@ -691,6 +697,7 @@
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat}
+		\leanok
 		\begin{equation*}
 			X \cdot \widehat{X}^\dagger = U \cdot \Sigma_{m \times m} \cdot U^\dagger,
 			\quad
@@ -726,6 +733,7 @@
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.squaredDifference}
+		\leanok
 		\begin{equation*}
 			(X - \widehat{X}) \cdot (X - \widehat{X})^\dagger \leq (X \cdot X^\dagger - I_{m \times m})^2.
 		\end{equation*}
@@ -754,6 +762,7 @@
 
 	\begin{lemma}[Projectivity of~$P$]\label{lem:P-projectivity}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pProjectivity}
+		\leanok
 		$P = \{P_a\}$ forms a projective sub-measurement.
 	\end{lemma}
 	\begin{proof}
@@ -776,6 +785,7 @@
 
 	\begin{lemma}[$P$ is close to~$Q$]\label{lem:P-Q-approx}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox}
+		\leanok
 		\begin{equation*}
 			Q_a \ot I \approx_{30\zeta^{1/4}} P_a \ot I.
 		\end{equation*}

@@ -55,8 +55,9 @@ lemma ldPastingSubMeas
 
 /-- `lem:ld-gbcon`.
 
-This is the displayed consistency transfer from the evaluated slice family to the
-vertical-line answers used at the start of the pasting argument. -/
+This is the direct consistency transfer from the slice family `G^x` to the
+vertical line answers `B^u`, obtained by composing the hypothesis
+`item:ld-pasting-consistency` with the conditioned axis-parallel test relation. -/
 theorem ldGbcon
     (params : Parameters)
     [FieldModel params.q]
@@ -67,7 +68,8 @@ theorem ldGbcon
     (hcons : family.ConsistentWithPoints strategy zeta) :
     ConsRel strategy.state
       (uniformDistribution (Point params.next))
-      family.evaluatedAtNextPoint
+      (evaluateFiberFamilyAtNextPoint params
+        (IdxProjSubMeas.toIdxSubMeas family.meas))
       (fun u =>
         postprocess
           (verticalLineMeasurementFamily params strategy (truncatePoint params u))
@@ -75,7 +77,8 @@ theorem ldGbcon
       (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
   /-
   Paper reference: `references/ldt-paper/ld-pasting.tex`, `lem:ld-gbcon`.
-  The proof combines point consistency, the conditioned axis-parallel test, and
+  The proof is the displayed chain leading to equation `eq:ld-gbcon` in the
+  blueprint: combine good-strategy consistency, `simeqToApprox`, and
   `triangleSub`.
   -/
   sorry
@@ -1443,8 +1446,7 @@ private lemma switcherooAggregate_qSDDOp_expand_avg
               apply avgOver_congr
               intro q
               rw [switcherooAggregate_qSDDOp_expand]
-              simp [A, B, C, D, sub_eq_add_neg, Finset.sum_add_distrib,
-                Finset.sum_neg_distrib]
+              simp [A, B, C, D, Finset.sum_add_distrib, Finset.sum_sub_distrib]
     _ = avgOver (uniformDistribution (SlicePairQuestion params)) A +
           avgOver (uniformDistribution (SlicePairQuestion params)) B -
           avgOver (uniformDistribution (SlicePairQuestion params)) C -
@@ -3174,22 +3176,32 @@ lemma hBConsistency
 
 /-- `cor:h-a-consistency`.
 
-This restates the pasted-submeasurement consistency with the point measurement
-using the paper's displayed `ν` error term. -/
+This packages the point-consistency part of the pasted-submeasurement chain and
+the completed-measurement wrapper. -/
 theorem hAConsistency
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
+    (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
-    (hHB : HBConsistencyStatement params strategy family eps delta gamma zeta k) :
-    ConsRel strategy.state
-      (uniformDistribution (Point params.next))
-      (polynomialEvaluationFamily params.next (constructedPastedSubMeas params family k))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) := by
+    (hk : 400 * params.m * params.d ≤ k) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next (constructedPastedSubMeas params family k))
+        (MainInductionStep.ldPastingInInductionError params k
+          eps delta gamma kappa zeta) ∧
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedMeasurement params family k).toSubMeas)
+        (MainInductionStep.ldPastingInInductionError params k
+          eps delta gamma kappa zeta) := by
   sorry
 
 /-- `lem:over-all-outcomes`. -/
@@ -3205,11 +3217,38 @@ lemma overAllOutcomes
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
+  constructor -- OverAllOutcomesStatement
+  constructor -- SDDRel
+  /- Paper: `lem:over-all-outcomes` (ld-pasting.tex §9.4, lines 1140–1289).
+  Expand pasted-measurement total mass over all outcome types τ with |τ| ≥ d+1.
+  Steps: (1) expand over distinct k-tuples via `distinctTupleDistribution`,
+  (2) decompose by outcome type with |τ| ≥ d+1,
+  (3) remove global-polynomial restriction (Schwartz-Zippel: error md/q),
+  (4) swap distinct → uniform sampling (`prop:ld-dnoteq`: error 2k²/q),
+  (5) bound sandwich errors (`lem:ld-sandwich-line-one-point`: k × ν₅).
+  Requires: Schwartz-Zippel infrastructure, distinct → uniform swap lemma. -/
+  sorry
+
+/-- `lem:truncated-type-sum-recurrence`.
+
+This is the source-style recurrence for the truncated type sums that appear in
+the `fromHToG` reduction. -/
+theorem truncatedTypeSumRecurrence
+    (G : MIPStarRE.Quantum.Op ι)
+    (hGpsd : 0 ≤ G)
+    (hGleOne : G ≤ 1)
+    (d prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    (truncatedTypeSums G d prefixLen τtail)ᴴ = truncatedTypeSums G d prefixLen τtail ∧
+      0 ≤ truncatedTypeSums G d prefixLen τtail ∧
+      truncatedTypeSums G d prefixLen τtail ≤ 1 ∧
+      truncatedTypeSums G d (prefixLen + 1) τtail =
+        truncatedTypeSums G d prefixLen (prependTypeBit true τtail) * G +
+          truncatedTypeSums G d prefixLen (prependTypeBit false τtail) * (1 - G) := by
   /-
-  Deferred core argument from `lem:over-all-outcomes` in
-  `references/ldt-paper/ld-pasting.tex`.
-  The proof expands the total mass of the pasted measurement across all completed
-  outcome types `τ`.
+  Paper reference: `references/ldt-paper/ld-pasting.tex`,
+  `lem:truncated-type-sum-recurrence`.
+  The proof is the commuting-polynomial argument in `G` and `I - G`.
   -/
   sorry
 
@@ -3228,13 +3267,22 @@ lemma fromHToG
     (k : ℕ)
     (hhalf : CommuteGHalfSandwichStatement params ψbi family gamma zeta k) :
     FromHToGStatement params strategy family gamma zeta k := by
-  /-
-  Deferred core argument from `lem:from-H-to-G` in
-  `references/ldt-paper/ld-pasting.tex`.
-  This is the Bernoulli-tail recurrence converting the all-outcomes expansion to
-  the averaged complete operator `G`.
-  -/
-  sorry
+  constructor -- FromHToGStatement
+  · -- recurrenceStep: per-step Bernoulli-tail commutation
+    intro ℓ hℓ τ
+    constructor -- SDDOpRel
+    /- Inductive step ℓ of the Bernoulli-tail recurrence (ld-pasting.tex
+    lines 1294–1666). Three commutation sub-steps per induction step:
+    (a) move rightmost Ĝ^{x_ℓ} to 2nd tensor factor (√(2ζ)),
+    (b) commute leftmost Ĝ past remaining factors (√ν₄),
+    (c) move leftmost to 2nd tensor factor (√(2ζ)).
+    Per-step error: 2√(2ζ) + 2√ν₄ = fromHToGRecurrenceError. -/
+    sorry
+  · -- bernoulliPolynomialRewrite: aggregate k recurrence steps
+    constructor -- SDDRel
+    /- Aggregate k recurrence steps to show allOutcomesExpansion ≈ F(G).
+    Total error ≤ k × per-step error ≤ fromHToGError. -/
+    sorry
 
 /-- `lem:truncated-type-sum-recurrence`.
 
@@ -3280,10 +3328,18 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
            exact hXleOne } : SubMeas Unit ι)
       (1 - kappa)) :
     ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd hXleOne := by
-  /-
-  Deferred matrix Chernoff/Bernoulli-tail contraction argument from
-  `lem:chernoff-bernoulli-matrix` in `references/ldt-paper/ld-pasting.tex`.
-  -/
+  -- tail_le_one: bernoulliTailOperator k degree X ≤ 1
+  have htail := bernoulliTailOperator_le_one k degree X hXpsd hXleOne
+  refine { tail_le_one := htail, matrixTailBound := ⟨?_⟩ }
+  /- Paper: `lem:chernoff-bernoulli-matrix` (ld-pasting.tex lines 1670–1797).
+  Core spectral/Chernoff bound: ev ψ (F(X)) ≥ 1 - κ/(1-θ) - exp(-θ²k/2).
+  (1) Spectral decomposition: X = ∑ λ_i |v_i⟩⟨v_i|, so
+      ev ψ (F(X)) = E_{i∼μ} F(λ_i).
+  (2) Markov: Pr[λ_i ≥ θ] ≥ 1 - κ/(1-θ).
+  (3) Scalar Chernoff: ∀p ≥ θ, F(p) ≥ 1 - exp(-θ²k/2)
+      (using hk: 2d/θ ≤ k ⟹ p - d/k ≥ θ/2).
+  (4) Combine: (1-κ/(1-θ))(1-exp(-θ²k/2)) ≥ 1-κ/(1-θ)-exp(-θ²k/2).
+  Requires: spectral decomposition for Op ι, scalar Chernoff bound. -/
   sorry
 
 /-- `cor:ld-pasting-N-completeness`. -/
@@ -3302,11 +3358,74 @@ theorem ldPastingNCompleteness
     (hk : 400 * params.m * params.d ≤ k) :
     LdPastingNCompletenessStatement params strategy family kappa
       (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
-  /-
-  Paper reference: `cor:ld-pasting-N-completeness` in
-  `references/ldt-paper/ld-pasting.tex`.
-  This combines `overAllOutcomes`, `fromHToG`, and the matrix Chernoff bound.
-  -/
-  sorry
+  -- Chain the three completeness-chain lemmas (§9.4 of the paper)
+  have _hOAO := overAllOutcomes params strategy eps delta gamma zeta
+    hgood family hcons hself hbound k
+  constructor -- LdPastingNCompletenessStatement
+  · exact hk -- largeEnough: 400 * m * d ≤ k
+  · -- completenessBound
+    constructor -- CompletenessAtLeast
+    /- Paper: `cor:ld-pasting-N-completeness` (ld-pasting.tex lines 1798–1849).
+    Chains: overAllOutcomes (ν₇) + fromHToG (ν₈) → SDDRel H vs F(G);
+    chernoffBernoulliMatrix (θ = 1/(200m)): ev ψ F(G) ≥ 1-κ/(1-θ)-exp(...);
+    SDDRel → mass transfer: ev ψ H ≥ ev ψ F(G) - √(ν₇+ν₈);
+    parameter match: κ/(1-θ) ≤ κ(1+1/(100m)),
+    exp(-θ²k/2) = exp(-k/(80000m²)).
+    Requires: SDDRel → completeness transfer for Unit-indexed families. -/
+    sorry
+
+/-- `lem:ld-pasting-sub-measurement`. -/
+lemma ldPastingSubMeas
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ H : SubMeas (Polynomial params.next) ι,
+      LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
+  refine ⟨constructedPastedSubMeas params family k, ?_⟩
+  have hconsistency :=
+    (hAConsistency params strategy eps delta gamma kappa zeta
+      hgood family hcomplete hcons hself hbound k hk).1
+  have hcompleteness :=
+    ldPastingNCompleteness params strategy eps delta gamma kappa zeta
+      hgood family hcomplete hcons hself hbound k hk
+  exact
+    { largeEnough := hk
+      constructedSubMeas := rfl
+      pointConsistency := hconsistency
+      completeness := hcompleteness.completenessBound }
+
+/-- `thm:ld-pasting`. -/
+theorem ldPasting
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ H : Measurement (Polynomial params.next) ι,
+      LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
+  refine ⟨constructedPastedMeasurement params family k, ?_⟩
+  have hconsistency :=
+    (hAConsistency params strategy eps delta gamma kappa zeta
+      hgood family hcomplete hcons hself hbound k hk).2
+  exact
+    { largeEnough := hk
+      constructedMeasurement := rfl
+      pointConsistency := hconsistency }
 
 end MIPStarRE.LDT.Pasting

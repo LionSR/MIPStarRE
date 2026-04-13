@@ -6,334 +6,332 @@
 
 
 \begin{definition}[Rerandomizing one coordinate]\label{def:rerandomize-coord}
-  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord}
-  \leanok
-  For $u \in \F_q^m$, an index $i \in \{1,\dots,m\}$, and $x \in \F_q$, let
-  \[
-    \operatorname{rerand}_i(u,x) = u + x e_i.
-  \]
-  This is the move obtained by rerandomizing the $i$-th coordinate of $u$ by a uniform additive shift.
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord}
+	\leanok
+	For $u \in \F_q^m$, an index $i \in \{1,\dots,m\}$, and $x \in \F_q$, let
+	\[
+		\operatorname{rerand}_i(u,x) = u + x e_i.
+	\]
+	This is the move obtained by rerandomizing the $i$-th coordinate of $u$ by a uniform additive shift.
 \end{definition}
 
 \begin{definition}[Hypercube graph]\label{def:hypercube-graph}
 	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.IsHypercubeEdge, MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord}
 	\leanok
-  \uses{def:rerandomize-coord}
-  The hypercube graph $C=(V,E)$ has vertex set $V=\F_q^m$, and an edge between $u$ and $v$ whenever they differ in at most one coordinate. A random edge $(u,v) \sim C$ is sampled by drawing $u \sim \F_q^m$, $i \in \{1,\dots,m\}$, and $x \in \F_q$ uniformly and then setting $v=\operatorname{rerand}_i(u,x)$.
+	\uses{def:rerandomize-coord}
+	The hypercube graph $C=(V,E)$ has vertex set $V=\F_q^m$, and an edge between $u$ and $v$ whenever they differ in at most one coordinate. A random edge $(u,v) \sim C$ is sampled by drawing $u \sim \F_q^m$, $i \in \{1,\dots,m\}$, and $x \in \F_q$ uniformly and then setting $v=\operatorname{rerand}_i(u,x)$.
 \end{definition}
 
 \begin{definition}[Adjacency matrix and Laplacian]\label{def:adjacency-laplacian}
 	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.adjacency, MIPStarRE.LDT.ExpansionHypercubeGraph.laplacian}
 	\leanok
-  \uses{def:hypercube-graph}
-  Let $M=q^m$. The normalized adjacency matrix of $C$ is
-  \[
-    K = \E_{(u,v)\sim C} \ket{u}\bra{v},
-  \]
-  and the Laplacian is
-  \[
-    L = \frac{1}{M}I-K.
-  \]
+	\uses{def:hypercube-graph}
+	Let $M=q^m$. The normalized adjacency matrix of $C$ is
+	\[
+		K = \E_{(u,v)\sim C} \ket{u}\bra{v},
+	\]
+	and the Laplacian is
+	\[
+		L = \frac{1}{M}I-K.
+	\]
 \end{definition}
 
 \begin{lemma}[Laplacian rewrite]\label{prop:laplacian-rewrite}
-  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianRewrite}
-  \leanok
-  \uses{def:adjacency-laplacian}
-  The Laplacian can be written as
-  \[
-    L = \frac12 \E_{(u,v)\sim C} (\ket{u}-\ket{v})(\bra{u}-\bra{v}).
-  \]
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianRewrite}
+	\leanok
+	\uses{def:adjacency-laplacian}
+	The Laplacian can be written as
+	\[
+		L = \frac12 \E_{(u,v)\sim C} (\ket{u}-\ket{v})(\bra{u}-\bra{v}).
+	\]
 \end{lemma}
 \begin{proof}
-  The two vertex marginals of a random edge are uniform on $\F_q^m$. Expanding the right-hand side yields $(1/M)I-K$.
+	The two vertex marginals of a random edge are uniform on $\F_q^m$. Expanding the right-hand side yields $(1/M)I-K$.
 \end{proof}
 
 \begin{lemma}[Average of a nontrivial additive character]\label{lem:character-average-scalar}
 	\lean{MIPStarRE.LDT.Preliminaries.fourier_fact_scalar}
 	\leanok
-	\uses{def:ff-trace}
-  For $\beta \in \F_q$,
-  \[
-    \E_{x \sim \F_q} \omega^{\operatorname{tr}(\beta x)} =
-    \begin{cases}
-      1 & \text{if } \beta=0,\\
-      0 & \text{if } \beta\ne 0.
-    \end{cases}
-  \]
+	For $\beta \in \F_q$,
+	\[
+		\E_{x \sim \F_q} \omega^{\operatorname{tr}(\beta x)} =
+		\begin{cases}
+			1 & \text{if } \beta=0,    \\
+			0 & \text{if } \beta\ne 0.
+		\end{cases}
+	\]
 \end{lemma}
 \begin{proof}
-  If $\beta=0$ the character is constant. If $\beta\ne 0$, the map $x \mapsto \beta x$ permutes $\F_q$, so the average is the average of a nontrivial additive character, which vanishes.
+	If $\beta=0$ the character is constant. If $\beta\ne 0$, the map $x \mapsto \beta x$ permutes $\F_q$, so the average is the average of a nontrivial additive character, which vanishes.
 \end{proof}
 
 \begin{lemma}[Orthogonality of finite-field characters]\label{lem:character-average-vector}
 	\lean{MIPStarRE.LDT.Preliminaries.fourier_fact_vector}
 	\leanok
-	\uses{def:ff-trace, lem:character-average-scalar}
-  For $\alpha,\beta \in \F_q^m$,
-  \[
-    \frac{1}{q^m}\sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot(\beta-\alpha))} =
-    \begin{cases}
-      1 & \text{if } \alpha=\beta,\\
-      0 & \text{if } \alpha\ne \beta.
-    \end{cases}
-  \]
+	\uses{lem:character-average-scalar}
+	For $\alpha,\beta \in \F_q^m$,
+	\[
+		\frac{1}{q^m}\sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot(\beta-\alpha))} =
+		\begin{cases}
+			1 & \text{if } \alpha=\beta,    \\
+			0 & \text{if } \alpha\ne \beta.
+		\end{cases}
+	\]
 \end{lemma}
 \begin{proof}
-  Factor the sum over the $m$ coordinates and apply Lemma~\ref{lem:character-average-scalar} to each factor.
+	Factor the sum over the $m$ coordinates and apply Lemma~\ref{lem:character-average-scalar} to each factor.
 \end{proof}
 
 \begin{lemma}[Eigenvectors of the hypercube graph]\label{prop:eigenvectors}
-  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors}
-  \leanok
-  \uses{def:adjacency-laplacian, lem:character-average-vector, lem:character-average-scalar}
-  For each $\alpha \in \F_q^m$, define
-  \[
-    \ket{\varphi_\alpha}
-    =
-    \frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot \alpha)} \ket{u}.
-  \]
-  Then the following two statements hold.
-  \begin{enumerate}
-    \item The $\ket{\varphi_\alpha}$'s form an orthonormal basis of $\C^V$.\label{item:orthonormal}
-    \item For each $\alpha \in \F_q^m$, $\ket{\varphi_\alpha}$ is an eigenvector for $K$ with eigenvalue $\frac{1}{M} \cdot \frac{m-|\alpha|}{m}$, where $|\alpha|$ is the number of nonzero coordinates of $\alpha$.\label{item:eigenvector}
-  \end{enumerate}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors}
+	\leanok
+	\uses{def:adjacency-laplacian, lem:character-average-vector, lem:character-average-scalar}
+	For each $\alpha \in \F_q^m$, define
+	\[
+		\ket{\varphi_\alpha}
+		=
+		\frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot \alpha)} \ket{u}.
+	\]
+	Then the following two statements hold.
+	\begin{enumerate}
+		\item The $\ket{\varphi_\alpha}$'s form an orthonormal basis of $\C^V$.\label{item:orthonormal}
+		\item For each $\alpha \in \F_q^m$, $\ket{\varphi_\alpha}$ is an eigenvector for $K$ with eigenvalue $\frac{1}{M} \cdot \frac{m-|\alpha|}{m}$, where $|\alpha|$ is the number of nonzero coordinates of $\alpha$.\label{item:eigenvector}
+	\end{enumerate}
 \end{lemma}
 \begin{proof}
-  \uses{lem:character-average-vector, lem:character-average-scalar, def:hypercube-graph}
-  First we prove \ref{item:orthonormal}. For $\alpha,\beta \in \F_q^m$,
-  \[
-    \braket{\varphi_\alpha}{\varphi_\beta}
-    =
-    \frac{1}{M} \sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot(\beta-\alpha))}
-    =
-    \begin{cases}
-      1 & \text{if } \alpha=\beta,\\
-      0 & \text{if } \alpha\ne \beta,
-    \end{cases}
-  \]
-  by Lemma~\ref{lem:character-average-vector}. Thus the $\ket{\varphi_\alpha}$ form an orthonormal basis of $\C^V$.
+	\uses{lem:character-average-vector, lem:character-average-scalar, def:hypercube-graph}
+	First we prove \ref{item:orthonormal}. For $\alpha,\beta \in \F_q^m$,
+	\[
+		\braket{\varphi_\alpha}{\varphi_\beta}
+		=
+		\frac{1}{M} \sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot(\beta-\alpha))}
+		=
+		\begin{cases}
+			1 & \text{if } \alpha=\beta,    \\
+			0 & \text{if } \alpha\ne \beta,
+		\end{cases}
+	\]
+	by Lemma~\ref{lem:character-average-vector}. Thus the $\ket{\varphi_\alpha}$ form an orthonormal basis of $\C^V$.
 
-  Next we prove \ref{item:eigenvector}. For $\alpha \in \F_q^m$,
-  \begin{equation}
-    \begin{aligned}
-      K \cdot \ket{\varphi_\alpha}
-      &=
-      \left(\E_{(u,v)\sim C} \ket{u}\bra{v}\right) \cdot \left(\frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot \alpha)} \ket{u}\right) \\
-      &=
-      \frac{1}{M^{1/2}} \cdot \E_{(u,v)\sim C} \omega^{\operatorname{tr}(v\cdot \alpha)} \ket{u}.
-    \end{aligned}
-    \label{eq:eigenvector-calculation}
-  \end{equation}
-  By the edge-sampling rule from Definition~\ref{def:hypercube-graph}, we may write $v=u+x e_i$, where $i$ is uniformly random in $\{1,\dots,m\}$ and $x$ is uniformly random in $\F_q$. Therefore
-  \[
-    \eqref{eq:eigenvector-calculation}
-    =
-    \frac{1}{M^{1/2}} \cdot \E_{u,i,x} \omega^{\operatorname{tr}((u+x e_i)\cdot \alpha)} \ket{u}
-    =
-    \left(\E_{i,x}\omega^{\operatorname{tr}(x\alpha_i)}\right) \cdot \frac{1}{M^{1/2}} \cdot \E_u \omega^{\operatorname{tr}(u\cdot \alpha)} \ket{u}
-    =
-    \frac{1}{M}\left(\E_{i,x}\omega^{\operatorname{tr}(x\alpha_i)}\right) \cdot \ket{\varphi_\alpha}.
-  \]
-  Hence $\ket{\varphi_\alpha}$ is an eigenvector of $K$ with eigenvalue
-  \[
-    \frac{1}{M} \cdot \E_i \left[\E_x \omega^{\operatorname{tr}(x\alpha_i)}\right]
-    =
-    \frac{1}{M} \cdot \E_i \left[\bone[\alpha_i=0]\right]
-    =
-    \frac{1}{M} \cdot \frac{m-|\alpha|}{m},
-  \]
-  by Lemma~\ref{lem:character-average-scalar}.
+	Next we prove \ref{item:eigenvector}. For $\alpha \in \F_q^m$,
+	\begin{equation}
+		\begin{aligned}
+			K \cdot \ket{\varphi_\alpha}
+			 & =
+			\left(\E_{(u,v)\sim C} \ket{u}\bra{v}\right) \cdot \left(\frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot \alpha)} \ket{u}\right) \\
+			 & =
+			\frac{1}{M^{1/2}} \cdot \E_{(u,v)\sim C} \omega^{\operatorname{tr}(v\cdot \alpha)} \ket{u}.
+		\end{aligned}
+		\label{eq:eigenvector-calculation}
+	\end{equation}
+	By the edge-sampling rule from Definition~\ref{def:hypercube-graph}, we may write $v=u+x e_i$, where $i$ is uniformly random in $\{1,\dots,m\}$ and $x$ is uniformly random in $\F_q$. Therefore
+	\[
+		\eqref{eq:eigenvector-calculation}
+		=
+		\frac{1}{M^{1/2}} \cdot \E_{u,i,x} \omega^{\operatorname{tr}((u+x e_i)\cdot \alpha)} \ket{u}
+		=
+		\left(\E_{i,x}\omega^{\operatorname{tr}(x\alpha_i)}\right) \cdot \frac{1}{M^{1/2}} \cdot \E_u \omega^{\operatorname{tr}(u\cdot \alpha)} \ket{u}
+		=
+		\frac{1}{M}\left(\E_{i,x}\omega^{\operatorname{tr}(x\alpha_i)}\right) \cdot \ket{\varphi_\alpha}.
+	\]
+	Hence $\ket{\varphi_\alpha}$ is an eigenvector of $K$ with eigenvalue
+	\[
+		\frac{1}{M} \cdot \E_i \left[\E_x \omega^{\operatorname{tr}(x\alpha_i)}\right]
+		=
+		\frac{1}{M} \cdot \E_i \left[\bone[\alpha_i=0]\right]
+		=
+		\frac{1}{M} \cdot \frac{m-|\alpha|}{m},
+	\]
+	by Lemma~\ref{lem:character-average-scalar}.
 \end{proof}
 
 \begin{lemma}[Spectral gap of the Laplacian]\label{cor:laplacian-spectral-gap}
-  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGap}
-  \leanok
-  \uses{prop:eigenvectors}
-  If $\lambda_1 \le \lambda_2 \le \cdots \le \lambda_{q^m}$ are the eigenvalues of $L$, then
-  \[
-    \lambda_1=0,
-    \qquad
-    \lambda_2 = \frac{1}{m q^m}.
-  \]
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGap}
+	\leanok
+	\uses{prop:eigenvectors}
+	If $\lambda_1 \le \lambda_2 \le \cdots \le \lambda_{q^m}$ are the eigenvalues of $L$, then
+	\[
+		\lambda_1=0,
+		\qquad
+		\lambda_2 = \frac{1}{m q^m}.
+	\]
 \end{lemma}
 \begin{proof}
-  \uses{prop:eigenvectors}
-  Lemma~\ref{prop:eigenvectors} identifies the two largest eigenvalues of $K$, hence the two smallest eigenvalues of $L=(1/q^m)I-K$.
+	\uses{prop:eigenvectors}
+	Lemma~\ref{prop:eigenvectors} identifies the two largest eigenvalues of $K$, hence the two smallest eigenvalues of $L=(1/q^m)I-K$.
 \end{proof}
 
 \section{Local and global variance}
 
 \begin{definition}[Local and global variance]\label{def:local-and-variance}
-  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localAndVariance}
-  \leanok
-	\uses{def:hypercube-graph}
-  Let $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ and let $0 \le A^u \le I$ be an operator for each $u \in \F_q^m$. The local variance is
-  \[
-    \mathbf{Var}_{\mathrm{local}}(A,\psi)
-    = \frac12 \E_{(u,v)\sim C} \bra{\psi} (A^u-A^v)^2 \ot I \ket{\psi},
-  \]
-  and the global variance is
-  \[
-    \mathbf{Var}_{\mathrm{global}}(A,\psi)
-    = \frac12 \E_{u,v\sim \F_q^m} \bra{\psi} (A^u-A^v)^2 \ot I \ket{\psi}.
-  \]
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localAndVariance}
+	\leanok
+	Let $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ and let $0 \le A^u \le I$ be an operator for each $u \in \F_q^m$. The local variance is
+	\[
+		\mathbf{Var}_{\mathrm{local}}(A,\psi)
+		= \frac12 \E_{(u,v)\sim C} \bra{\psi} (A^u-A^v)^2 \ot I \ket{\psi},
+	\]
+	and the global variance is
+	\[
+		\mathbf{Var}_{\mathrm{global}}(A,\psi)
+		= \frac12 \E_{u,v\sim \F_q^m} \bra{\psi} (A^u-A^v)^2 \ot I \ket{\psi}.
+	\]
 \end{definition}
 
 \begin{lemma}[Local variance as a Laplacian form]\label{lem:local-rewrite}
-  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localRewrite}
-  \leanok
-  \uses{def:adjacency-laplacian, def:local-and-variance}
-  Define
-  \[
-    A_{\mathrm{comb}} = \sum_{u \in \F_q^m} \ket{u} \ot A^u \ot I.
-  \]
-  Then
-  \[
-    \Tr(A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}})
-    = \mathbf{Var}_{\mathrm{local}}(A,\psi).
-  \]
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localRewrite}
+	\leanok
+	\uses{def:adjacency-laplacian, def:local-and-variance}
+	Define
+	\[
+		A_{\mathrm{comb}} = \sum_{u \in \F_q^m} \ket{u} \ot A^u \ot I.
+	\]
+	Then
+	\[
+		\Tr(A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}})
+		= \mathbf{Var}_{\mathrm{local}}(A,\psi).
+	\]
 \end{lemma}
 \begin{proof}
-  \uses{prop:laplacian-rewrite}
-  For $u,v \in \F_q^m$,
-  \begin{equation}
-    \begin{aligned}
-      ((\bra{u}-\bra{v}) \ot \bra{\psi}) \cdot A_{\mathrm{comb}}
-      &=
-      ((\bra{u}-\bra{v}) \ot \bra{\psi}) \cdot \sum_{w \in \F_q^m} \ket{w} \ot A^w \ot I \\
-      &=
-      \bra{\psi} \cdot ((A^u-A^v)\ot I).
-    \end{aligned}
-    \label{eq:reader-probably-has-no-idea-whats-going-on-yet}
-  \end{equation}
-  Therefore
-  \[
-    A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}}
-    =
-    \frac12 \E_{(u,v)\sim C} A_{\mathrm{comb}}^\dagger \bigl((\ket{u}-\ket{v})(\bra{u}-\bra{v}) \ot \ket{\psi}\bra{\psi}\bigr) A_{\mathrm{comb}}
-  \]
-  by Lemma~\ref{prop:laplacian-rewrite}, and hence
-  \[
-    A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}}
-    =
-    \frac12 \E_{(u,v)\sim C} ((A^u-A^v)\ot I)\ket{\psi}\bra{\psi}((A^u-A^v)\ot I)
-  \]
-  by \eqref{eq:reader-probably-has-no-idea-whats-going-on-yet}. Taking the trace gives
-  \[
-    \Tr(A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}})
-    =
-    \frac12 \E_{(u,v)\sim C} \bra{\psi} (A^u-A^v)^2 \ot I \ket{\psi}
-    =
-    \mathbf{Var}_{\mathrm{local}}(A,\psi).
-  \]
+	\uses{prop:laplacian-rewrite}
+	For $u,v \in \F_q^m$,
+	\begin{equation}
+		\begin{aligned}
+			((\bra{u}-\bra{v}) \ot \bra{\psi}) \cdot A_{\mathrm{comb}}
+			 & =
+			((\bra{u}-\bra{v}) \ot \bra{\psi}) \cdot \sum_{w \in \F_q^m} \ket{w} \ot A^w \ot I \\
+			 & =
+			\bra{\psi} \cdot ((A^u-A^v)\ot I).
+		\end{aligned}
+		\label{eq:reader-probably-has-no-idea-whats-going-on-yet}
+	\end{equation}
+	Therefore
+	\[
+		A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}}
+		=
+		\frac12 \E_{(u,v)\sim C} A_{\mathrm{comb}}^\dagger \bigl((\ket{u}-\ket{v})(\bra{u}-\bra{v}) \ot \ket{\psi}\bra{\psi}\bigr) A_{\mathrm{comb}}
+	\]
+	by Lemma~\ref{prop:laplacian-rewrite}, and hence
+	\[
+		A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}}
+		=
+		\frac12 \E_{(u,v)\sim C} ((A^u-A^v)\ot I)\ket{\psi}\bra{\psi}((A^u-A^v)\ot I)
+	\]
+	by \eqref{eq:reader-probably-has-no-idea-whats-going-on-yet}. Taking the trace gives
+	\[
+		\Tr(A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}})
+		=
+		\frac12 \E_{(u,v)\sim C} \bra{\psi} (A^u-A^v)^2 \ot I \ket{\psi}
+		=
+		\mathbf{Var}_{\mathrm{local}}(A,\psi).
+	\]
 \end{proof}
 
 \begin{lemma}[Global variance as the orthogonal Fourier mass]\label{lem:global-rewrite}
-  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.globalRewrite}
-  \leanok
-  \uses{prop:eigenvectors, def:local-and-variance}
-  Write
-  \[
-    A_{\mathrm{comb}} = \ket{\varphi_0} \ot A_0 + \ket{\varphi_\perp} \ot A_\perp,
-  \]
-  where $\ket{\varphi_\perp}$ is orthogonal to $\ket{\varphi_0}$. Then
-  \[
-    \frac{1}{q^m}\Tr((\bra{\varphi_\perp}\ot A_\perp)(I\ot \ket{\psi}\bra{\psi})(\ket{\varphi_\perp}\ot A_\perp))
-    = \mathbf{Var}_{\mathrm{global}}(A,\psi).
-  \]
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.globalRewrite}
+	\leanok
+	\uses{prop:eigenvectors, def:local-and-variance}
+	Write
+	\[
+		A_{\mathrm{comb}} = \ket{\varphi_0} \ot A_0 + \ket{\varphi_\perp} \ot A_\perp,
+	\]
+	where $\ket{\varphi_\perp}$ is orthogonal to $\ket{\varphi_0}$. Then
+	\[
+		\frac{1}{q^m}\Tr((\bra{\varphi_\perp}\ot A_\perp)(I\ot \ket{\psi}\bra{\psi})(\ket{\varphi_\perp}\ot A_\perp))
+		= \mathbf{Var}_{\mathrm{global}}(A,\psi).
+	\]
 \end{lemma}
 \begin{proof}
-  \uses{prop:eigenvectors}
-  We first compute
-  \[
-    A_0
-    =
-    (\bra{\varphi_0}\ot I)\cdot A_{\mathrm{comb}}
-    =
-    \left(\frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} \bra{u}\right) \ot I \cdot \left(\sum_{u \in \F_q^m} \ket{u} \ot A^u \ot I\right)
-    =
-    \frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} A^u \ot I.
-  \]
-  Writing $A_{\mathrm{avg}}=\E_u A^u$, it follows that
-  \[
-    \ket{\varphi_0}\ot A_0
-    =
-    \sum_{u \in \F_q^m} \ket{u} \ot A_{\mathrm{avg}} \ot I,
-    \qquad
-    \ket{\varphi_\perp}\ot A_\perp
-    =
-    \sum_{u \in \F_q^m} \ket{u} \ot (A^u-A_{\mathrm{avg}}) \ot I.
-  \]
-  Hence
-  \begin{equation}
-    \frac{1}{M} \cdot \Tr((\bra{\varphi_\perp}\ot A_\perp)(I\ot \ket{\psi}\bra{\psi})(\ket{\varphi_\perp}\ot A_\perp))
-    =
-    \E_{u \sim \F_q^m} \bra{\psi} (A^u-A_{\mathrm{avg}})^2 \ot I \ket{\psi}.
-    \label{eq:just-took-trace}
-  \end{equation}
-  Moreover,
-  \[
-    \E_{u \sim \F_q^m}(A^u-A_{\mathrm{avg}})^2
-    =
-    \E_{u \sim \F_q^m}\bigl((A^u)^2-(A_{\mathrm{avg}})^2\bigr)
-    =
-    \frac12 \E_{u,v \sim \F_q^m} (A^u-A^v)^2.
-  \]
-  Substituting this identity into \eqref{eq:just-took-trace} yields
-  \[
-    \frac{1}{M} \cdot \Tr((\bra{\varphi_\perp}\ot A_\perp)(I\ot \ket{\psi}\bra{\psi})(\ket{\varphi_\perp}\ot A_\perp))
-    =
-    \frac12 \E_{u,v \sim \F_q^m} \bra{\psi} (A^u-A^v)^2 \ot I \ket{\psi}
-    =
-    \mathbf{Var}_{\mathrm{global}}(A,\psi).
-  \]
+	\uses{prop:eigenvectors}
+	We first compute
+	\[
+		A_0
+		=
+		(\bra{\varphi_0}\ot I)\cdot A_{\mathrm{comb}}
+		=
+		\left(\frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} \bra{u}\right) \ot I \cdot \left(\sum_{u \in \F_q^m} \ket{u} \ot A^u \ot I\right)
+		=
+		\frac{1}{M^{1/2}} \cdot \sum_{u \in \F_q^m} A^u \ot I.
+	\]
+	Writing $A_{\mathrm{avg}}=\E_u A^u$, it follows that
+	\[
+		\ket{\varphi_0}\ot A_0
+		=
+		\sum_{u \in \F_q^m} \ket{u} \ot A_{\mathrm{avg}} \ot I,
+		\qquad
+		\ket{\varphi_\perp}\ot A_\perp
+		=
+		\sum_{u \in \F_q^m} \ket{u} \ot (A^u-A_{\mathrm{avg}}) \ot I.
+	\]
+	Hence
+	\begin{equation}
+		\frac{1}{M} \cdot \Tr((\bra{\varphi_\perp}\ot A_\perp)(I\ot \ket{\psi}\bra{\psi})(\ket{\varphi_\perp}\ot A_\perp))
+		=
+		\E_{u \sim \F_q^m} \bra{\psi} (A^u-A_{\mathrm{avg}})^2 \ot I \ket{\psi}.
+		\label{eq:just-took-trace}
+	\end{equation}
+	Moreover,
+	\[
+		\E_{u \sim \F_q^m}(A^u-A_{\mathrm{avg}})^2
+		=
+		\E_{u \sim \F_q^m}\bigl((A^u)^2-(A_{\mathrm{avg}})^2\bigr)
+		=
+		\frac12 \E_{u,v \sim \F_q^m} (A^u-A^v)^2.
+	\]
+	Substituting this identity into \eqref{eq:just-took-trace} yields
+	\[
+		\frac{1}{M} \cdot \Tr((\bra{\varphi_\perp}\ot A_\perp)(I\ot \ket{\psi}\bra{\psi})(\ket{\varphi_\perp}\ot A_\perp))
+		=
+		\frac12 \E_{u,v \sim \F_q^m} \bra{\psi} (A^u-A^v)^2 \ot I \ket{\psi}
+		=
+		\mathbf{Var}_{\mathrm{global}}(A,\psi).
+	\]
 \end{proof}
 
 \begin{lemma}[Local-to-global inequality]\label{lem:local-to-global}
-  \lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localToGlobal}
-  \leanok
-  \uses{cor:laplacian-spectral-gap, lem:local-rewrite, lem:global-rewrite}
-  For every family $\{A^u\}$,
-  \[
-    \mathbf{Var}_{\mathrm{global}}(A,\psi) \le m\, \mathbf{Var}_{\mathrm{local}}(A,\psi).
-  \]
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localToGlobal}
+	\leanok
+	\uses{cor:laplacian-spectral-gap, lem:local-rewrite, lem:global-rewrite}
+	For every family $\{A^u\}$,
+	\[
+		\mathbf{Var}_{\mathrm{global}}(A,\psi) \le m\, \mathbf{Var}_{\mathrm{local}}(A,\psi).
+	\]
 \end{lemma}
 \begin{proof}
-  \uses{lem:local-rewrite, cor:laplacian-spectral-gap, lem:global-rewrite}
-  \begin{equation}
-    \begin{aligned}
-      A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}}
-      &=
-      (\bra{\varphi_0}\ot A_0+\bra{\varphi_\perp}\ot A_\perp)(L \ot \ket{\psi}\bra{\psi})(\ket{\varphi_0}\ot A_0+\ket{\varphi_\perp}\ot A_\perp) \\
-      &=
-      (\bra{\varphi_\perp}\ot A_\perp)(L \ot \ket{\psi}\bra{\psi})(\ket{\varphi_\perp}\ot A_\perp) \\
-      &=
-      \bra{\varphi_\perp}L\ket{\varphi_\perp} \cdot A_\perp \ket{\psi}\bra{\psi} A_\perp.
-    \end{aligned}
-    \label{eq:used-0-eigenvector}
-  \end{equation}
-  The second step uses that $\ket{\varphi_0}$ is a $0$-eigenvector of $L$. Since $\ket{\varphi_\perp}$ is orthogonal to $\ket{\varphi_0}$, Lemma~\ref{cor:laplacian-spectral-gap} gives
-  \[
-    \bra{\varphi_\perp}L\ket{\varphi_\perp}
-    \ge
-    \frac{1}{mM} \cdot \braket{\varphi_\perp}{\varphi_\perp}.
-  \]
-  Therefore
-  \[
-    \mathbf{Var}_{\mathrm{local}}(A,\psi)
-    =
-    \Tr(A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}})
-    =
-    \bra{\varphi_\perp}L\ket{\varphi_\perp} \cdot \Tr(A_\perp \ket{\psi}\bra{\psi} A_\perp)
-  \]
-  by Lemma~\ref{lem:local-rewrite} and \eqref{eq:used-0-eigenvector}, so
-  \[
-    \mathbf{Var}_{\mathrm{local}}(A,\psi)
-    \ge
-    \frac{1}{mM} \cdot \Tr((\bra{\varphi_\perp}\ot A_\perp)(I\ot \ket{\psi}\bra{\psi})(\ket{\varphi_\perp}\ot A_\perp))
-    =
-    \frac{1}{m}\mathbf{Var}_{\mathrm{global}}(A,\psi),
-  \]
-  where the last step is Lemma~\ref{lem:global-rewrite}. Rearranging gives the claim.
+	\uses{lem:local-rewrite, cor:laplacian-spectral-gap, lem:global-rewrite}
+	\begin{equation}
+		\begin{aligned}
+			A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}}
+			 & =
+			(\bra{\varphi_0}\ot A_0+\bra{\varphi_\perp}\ot A_\perp)(L \ot \ket{\psi}\bra{\psi})(\ket{\varphi_0}\ot A_0+\ket{\varphi_\perp}\ot A_\perp) \\
+			 & =
+			(\bra{\varphi_\perp}\ot A_\perp)(L \ot \ket{\psi}\bra{\psi})(\ket{\varphi_\perp}\ot A_\perp)                                               \\
+			 & =
+			\bra{\varphi_\perp}L\ket{\varphi_\perp} \cdot A_\perp \ket{\psi}\bra{\psi} A_\perp.
+		\end{aligned}
+		\label{eq:used-0-eigenvector}
+	\end{equation}
+	The second step uses that $\ket{\varphi_0}$ is a $0$-eigenvector of $L$. Since $\ket{\varphi_\perp}$ is orthogonal to $\ket{\varphi_0}$, Lemma~\ref{cor:laplacian-spectral-gap} gives
+	\[
+		\bra{\varphi_\perp}L\ket{\varphi_\perp}
+		\ge
+		\frac{1}{mM} \cdot \braket{\varphi_\perp}{\varphi_\perp}.
+	\]
+	Therefore
+	\[
+		\mathbf{Var}_{\mathrm{local}}(A,\psi)
+		=
+		\Tr(A_{\mathrm{comb}}^\dagger (L \ot \ket{\psi}\bra{\psi}) A_{\mathrm{comb}})
+		=
+		\bra{\varphi_\perp}L\ket{\varphi_\perp} \cdot \Tr(A_\perp \ket{\psi}\bra{\psi} A_\perp)
+	\]
+	by Lemma~\ref{lem:local-rewrite} and \eqref{eq:used-0-eigenvector}, so
+	\[
+		\mathbf{Var}_{\mathrm{local}}(A,\psi)
+		\ge
+		\frac{1}{mM} \cdot \Tr((\bra{\varphi_\perp}\ot A_\perp)(I\ot \ket{\psi}\bra{\psi})(\ket{\varphi_\perp}\ot A_\perp))
+		=
+		\frac{1}{m}\mathbf{Var}_{\mathrm{global}}(A,\psi),
+	\]
+	where the last step is Lemma~\ref{lem:global-rewrite}. Rearranging gives the claim.
 \end{proof}
