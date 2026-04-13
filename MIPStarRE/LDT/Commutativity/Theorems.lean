@@ -1806,8 +1806,91 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
   theorem `thm:com-main`, especially the passage from
   `eq:evaluate-gcom-at-points` to `eq:evaluate-gcom-at-points-part-dos`
   and the final displayed error estimate.
+
+  ## Proof strategy
+
+  The full-product SDD expands via quartic trace terms as
+    `SDD = 2 * (ABA_avg - ABAB_avg)`
+  where:
+    `ABA_avg  = E_q Σ_{g,h} ev(G^x_g G^y_h G^x_g ⊗ I)`
+    `ABAB_avg = E_q Σ_{g,h} ev(G^x_g G^y_h G^x_g G^y_h ⊗ I)`
+  with `(x,y) = fullSliceQuestionOfEvaluatedSlice q`.
+
+  The key argument relates full polynomial sums to evaluated indicator
+  sums via two applications of the Schwartz-Zippel lemma
+  (`schwartzZippel_individualDegree`):
+
+  1. **First Schwartz-Zippel marginalization** (error `md/q`):
+     Replace `Σ_g` by `E_u Σ_a` where `a = g(u)`. For distinct
+     polynomials `g ≠ g'` of individual degree `d`, the cross terms
+     satisfy `Pr_u[g(u) = g'(u)] ≤ md/q`.
+
+  2. **First closenessOfIP** (error `√ζ`):
+     Swap `G^y_h ⊗ I` to `I ⊗ G^y_h` using slice strong
+     self-consistency `_hself`.
+
+  3. **Second Schwartz-Zippel marginalization** (error `md/q`):
+     Replace `Σ_h` by `E_v Σ_b` where `b = h(v)`.
+
+  4. **closenessOfIP with evaluated commutation** (error
+     `√(commDataProcessedGError)`):
+     Use `hEval` through `closenessOfIP` to bound the evaluated
+     commutation, contributing `√(commDataProcessedGError)`.
+
+  5. **Return closenessOfIP steps** (error `√ζ` each):
+     Swap back tensor placements.
+
+  Total error (doubled for both halves of the commutator):
+    `12√ζ + 4md/q + 2√(commDataProcessedGError)`
+  which simplifies to `≤ comMainError` by real-analysis arithmetic.
   -/
-  sorry
+  -- Step 1: The Schwartz-Zippel transport.
+  -- Bound the full-product sddErrorOp by corrections from:
+  -- (a) Two Schwartz-Zippel marginalizations (each ≤ md/q)
+  -- (b) Multiple closenessOfIP applications (each ≤ √ζ)
+  -- (c) The evaluated commutation via closenessOfIP
+  --     (≤ √(commDataProcessedGError))
+  -- giving total ≤ 12√ζ + 4md/q + 2√(commDataProcessedGError).
+  --
+  -- Proof sketch for this step:
+  -- * Expand qSDDOp into quartic trace terms (BAB + ABA - BABA - ABAB)
+  --   using projectivity of family.meas
+  -- * Use BAB = ABA and BABA = ABAB symmetry (swap x↔y, g↔h)
+  -- * For each of ABA and ABAB, apply the marginalization chain
+  --   described above to relate full-polynomial sums to evaluated sums
+  -- * Use submeasurement bounds (Σ_g G^x_g ≤ I) to control quartic
+  --   terms: ABA ≤ 1 by sandwichByOuterSubMeas.total_le_one
+  -- * The ABAB term ≥ 1 - ε is shown via the chain, using hEval
+  --   through closenessOfIP to obtain √(commDataProcessedGError)
+  have hTransport :
+      sddErrorOp strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => fullSliceProductLeft params strategy family
+          (fullSliceQuestionOfEvaluatedSlice params q))
+        (fun q => fullSliceProductRight params strategy family
+          (fullSliceQuestionOfEvaluatedSlice params q)) ≤
+      12 * Real.sqrt zeta +
+        4 * (↑params.m * ↑params.d / ↑params.q) +
+        2 * Real.sqrt
+          (commDataProcessedGError params gamma zeta) := by
+    sorry
+  -- Step 2: Error arithmetic.
+  -- Show: 12√ζ + 4md/q + 2√(48m(√γ + √ζ)) ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
+  --
+  -- Key estimates:
+  -- * 2√(48m(√γ + √ζ)) ≤ 2√(48m)(γ^¼ + ζ^¼) ≤ 14m(γ^¼ + ζ^¼)
+  --   using √(a+b) ≤ √a + √b and √m ≤ m (for m ≥ 1)
+  -- * 12√ζ ≤ 12ζ^¼ ≤ 12m·ζ^¼ (for ζ ≤ 1, m ≥ 1)
+  -- * 4md/q ≤ 4m(d/q)^¼ (for d/q ≤ 1, since x ≤ x^¼)
+  -- * Total ≤ 14m·γ^¼ + 26m·ζ^¼ + 4m·(d/q)^¼ ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
+  have hArith :
+      12 * Real.sqrt zeta +
+        4 * (↑params.m * ↑params.d / ↑params.q) +
+        2 * Real.sqrt
+          (commDataProcessedGError params gamma zeta) ≤
+      comMainError params gamma zeta := by
+    sorry
+  exact ⟨le_trans hTransport hArith⟩
 
 /-- The remaining `thm:com-main` lift from evaluated commutation back to
 full-slice commutation.
