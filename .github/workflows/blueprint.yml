@@ -42,6 +42,7 @@ jobs:
         run: pip install leanblueprint
 
       - name: Build blueprint
+        working-directory: blueprint
         run: |
           set -o pipefail
           leanblueprint web 2>&1 | tee /tmp/blueprint-output.txt

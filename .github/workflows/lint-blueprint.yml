@@ -81,7 +81,7 @@ jobs:
 
       - name: Fetch PR base ref for diff
         if: github.event_name == 'pull_request'
-        run: git fetch --no-tags --depth=0 origin "${{ github.event.pull_request.base.ref }}"
+        run: git fetch --no-tags origin "${{ github.event.pull_request.base.ref }}"
 
       - name: Warn on changed Lean declarations missing blueprint entries
         if: github.event_name == 'pull_request'
