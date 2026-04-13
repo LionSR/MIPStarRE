@@ -1649,11 +1649,14 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
   -- |T4 - centerMG| ≤ 2√ζ + 2√ω + 2√χ use:
   --   (a) decompose G^x = Σ_g G^x_g, swap G_g past M_o (error √χ from hcomm),
   --   (b) move G_g across tensor boundary (error √ζ from hselfG),
-  --   (c) apply switchSandwich with M self-consistency (error 2√ω from hselfM).
+  --   (c) move G_g back across tensor from the other side (error √ζ from hselfG),
+  --   (d) swap G_g past M_o again (error √χ from hcomm),
+  --   (e) apply switchSandwich with M self-consistency (error 2√ω from hselfM).
   -- Total: 2√ω + 2√ζ + 2(2√ζ + 2√ω + 2√χ) = 6√ζ + 6√ω + 4√χ.
-  -- Note: hperm (permutation invariance of ψbi) ensures centerGM = centerMG,
-  -- which is needed to close the final triangle inequality combining all
-  -- four term bounds.
+  -- Note: the two-center strategy (pairing T1,T3 with centerGM and T2,T4
+  -- with centerMG) means the centers cancel algebraically in the final
+  -- triangle inequality, so hperm is not needed at this stage.
+  -- (hperm is used downstream, e.g., in sddOpRel_swap_questions.)
   sorry
 
 /-- Reindexing a uniform slice-pair average along `Prod.swap` preserves `SDDOpRel`. -/
