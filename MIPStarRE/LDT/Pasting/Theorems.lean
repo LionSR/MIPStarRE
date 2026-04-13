@@ -3082,35 +3082,9 @@ theorem gHatFacts
 These lemmas capture the infrastructure needed for the `lem:commute-g-half-sandwich`
 through `cor:h-a-consistency` chain in `ld-pasting.tex` §9.3.
 
-The core gap is the n-step SDDOpRel composition lemma: the existing binary triangle
-inequality (`sddOpRel_triangle`) gives a factor of 2 per step, but the paper's
-`prop:triangle-inequality-for-approx_delta` gives linear error accumulation via
-the matrix Cauchy-Schwarz inequality. -/
-
-/-- n-step SDDOpRel chain lemma via matrix Cauchy-Schwarz.
-
-Given `n` consecutive SDDOpRel bounds, the endpoints satisfy an SDDOpRel bound
-with error `n * (∑ individual errors)`.  This improves on naive triangle-inequality
-chaining, which would give exponential blowup.
-
-Paper reference: `prop:triangle-inequality-for-approx_delta` in
-`references/ldt-paper/preliminaries.tex`.
-
-Proof sketch: telescoping + `(∑ dᵢ)† (∑ dⱼ) ≤ₚₛ n · ∑ dᵢ† dᵢ`
-(PSD Cauchy-Schwarz). -/
-private lemma sddOpRel_chain
-    {Question Outcome : Type*} {ι' : Type*}
-    [Fintype ι'] [DecidableEq ι'] [Fintype Outcome]
-    (ψ : QuantumState ι') (𝒟 : Distribution Question)
-    (n : ℕ)
-    (families : Fin (n + 1) → IdxOpFamily Question Outcome ι')
-    (errors : Fin n → Error)
-    (hsteps : ∀ i : Fin n,
-      SDDOpRel ψ 𝒟 (families i.castSucc) (families i.succ)
-        (errors i)) :
-    SDDOpRel ψ 𝒟 (families 0) (families (Fin.last n))
-      ((n : Error) * ∑ i : Fin n, errors i) := by
-  sorry
+The n-step SDDOpRel composition lemma (`sddOpRel_chain`) now lives in
+`Preliminaries.Theorems` alongside `sddOpRel_triangle`, since it is a
+general-purpose result used by multiple chapters. -/
 
 /-- Bridge: the staged move-commute-move chain for `commuteGHalfSandwich`.
 
