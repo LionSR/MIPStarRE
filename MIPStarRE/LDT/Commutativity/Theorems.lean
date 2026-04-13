@@ -1218,7 +1218,9 @@ lemma qBipartiteSSCDefect_eq_half_qSDD_of_proj
 
 The paper's proof (`commutativity-G.tex`, lines 72–131) converts
 `E[∑ ABAB]` into `E[∑ ABA]` through a ten-step scalar chain.
-We decompose the chain into four phases, each a stand-alone lemma.
+In the Lean development, this argument is packaged into a single bound
+lemma (`evaluatedSlice_scalar_chain_bound`), and the proof is organized
+conceptually into the following four phases.
 
 **Phase 1** (eq:gcom8 → eq:gcom9): insert Bob's measurement and apply
 `clm:g-comm-stability` to remove trailing `G^y`.
@@ -1229,11 +1231,11 @@ swap via `commutativityPoints`, apply `clm:g-comm-stability2` to
 remove trailing `G^x`.
 Error: `2√ζ + 6√(γ(m+1)) + √ζ + 6√(γ(m+1))`.
 
-**Phase 3** (eq:gcom10 → eq:gonna-cite-this): reverse the `eq:add-an-a`
-insertions using projectivity.
+**Phase 3** (eq:gcom10 → eq:gonna-cite-this-in-just-a-bit): reverse the
+`eq:add-an-a` insertions using projectivity.
 Error: `2√ζ + 2√ζ`.
 
-**Phase 4** (eq:gonna-cite-this → BAB = ABA): apply postprocessed
+**Phase 4** (eq:gonna-cite-this-in-just-a-bit → BAB = ABA): apply postprocessed
 self-consistency twice.
 Error: `√ζ + √ζ`.
 
