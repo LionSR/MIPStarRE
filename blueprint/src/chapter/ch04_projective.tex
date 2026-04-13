@@ -51,6 +51,7 @@
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Consider an orthonormal basis for $\C^{k+1}$ consisting of vectors $\ket{a}$ for $a \in \mathcal A$ and the vector $\ket{\bot}$. Let $U$ be any unitary such that for each vector $\ket{\phi}$,
 	\[
 		U \cdot (\ket{\phi} \ot \ket{\mathsf{aux}})
@@ -90,6 +91,7 @@
 \end{proof}
 
 \begin{proof}[Proof of \ref{thm:naimark}]
+	\leanok
 
 	For each question $x$, choose a local auxiliary state $\ket{\mathsf{aux}_{\mathrm A,x}}$ of dimension one larger than the number of outcomes of $A^x$, and apply \ref{lem:naimark-helper} to obtain a projective sub-measurement $\widetilde A^x$. Do the same for each question $y$ on Bob's side, obtaining auxiliary states $\ket{\mathsf{aux}_{\mathrm B,y}}$ and projective sub-measurements $\widetilde B^y$.
 
@@ -369,6 +371,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:projective-low-rank-sum}
 		Since each $Q_a$ is projective,
 		\begin{equation}\label{eq:Q-for-an-A}
@@ -411,6 +414,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:Q-completeness, lem:projective-low-rank-sum}
 		Diagonalize $Q=\sum_i \nu_i \ket{u_i}\bra{u_i}$. Because $Q \leq (1+2\sqrt{\zeta})I$ by \ref{lem:projective-low-rank-sum}, each $\nu_i$ is at most $1+2\sqrt{\zeta}$. Therefore
 		\[
@@ -441,6 +445,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:projective-low-rank-sum}
 		Since $Q \leq (1+2\sqrt{\zeta})I$ by \ref{lem:projective-low-rank-sum},
 		\begin{align*}
@@ -542,6 +547,7 @@
 		\]
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		Multiply the definition of $X$ by $T_a$ on the left and use that $T_a$ selects exactly the basis vectors $\ket{a,i}$:
 		\[
 			T_a \cdot X
@@ -564,6 +570,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:xa-t}
 		The identity $X_a^\dagger X_a = Q_a$ follows by expanding the basis sums. The remaining equalities come from \ref{lem:xa-t} and the projectivity of $T$:
 		\[
@@ -589,6 +596,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:qa-restated}
 		The first identity is the standard computation from the singular value decomposition:
 		\[
@@ -627,6 +635,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:X-squared, lem:qa-restated}
 		Expand the square and apply \ref{lem:X-squared} and \ref{lem:qa-restated} term by term:
 		\[
@@ -661,6 +670,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		Since $T$ is projective,
 		\[
 			P_a
@@ -683,6 +693,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		Multiply out the definition of $\widehat X$ and use the unitarity of $U$ and $V$:
 		\[
 			\widehat{X} \cdot \widehat{X}^\dagger
@@ -707,6 +718,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:X-squared}
 		The first identity follows directly from the singular value decomposition:
 		\[
@@ -739,6 +751,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:X-squared, lem:X-hat-squared, lem:X-times-X-hat}
 		By \ref{lem:X-squared}, \ref{lem:X-hat-squared}, and \ref{lem:X-times-X-hat},
 		\[
@@ -766,6 +779,7 @@
 		$P = \{P_a\}$ forms a projective sub-measurement.
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:pa-restated, lem:X-hat-squared}
 		For outcomes $a,b$,
 		\begin{align*}
@@ -791,6 +805,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:projective-low-rank-sum, lem:q-almost-projective, lem:sqrt-Q-completeness, lem:xa-t, lem:qa-restated, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity}
 		The quantity to bound is
 		\begin{equation}\label{eq:P-Q-thing-to-bound}
