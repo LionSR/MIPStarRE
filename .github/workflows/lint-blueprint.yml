@@ -73,24 +73,36 @@ jobs:
       - name: Build project (needed for checkdecls)
         run: lake build
 
-      - name: Generate lean_decls from blueprint .tex files
+      - name: Check committed blueprint and Lean source stay in sync
+        run: python3 scripts/blueprint_lean_sync.py --root . --ci
+
+      - name: Regenerate lean_decls from blueprint .tex files
         run: python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
 
-      - name: Check blueprint and Lean source stay in sync
-        run: python3 scripts/blueprint_lean_sync.py --root . --ci
+      - name: Ensure regenerated lean_decls is committed
+        run: |
+          if ! git diff --exit-code -- blueprint/lean_decls; then
+            echo "::error::blueprint/lean_decls is stale. Regenerate and commit it."
+            exit 1
+          fi
 
       - name: Fetch PR base ref for diff
         if: github.event_name == 'pull_request'
-        run: git fetch --no-tags origin "${{ github.event.pull_request.base.ref }}"
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: git fetch --no-tags origin "$BASE_REF"
 
       - name: Warn on changed Lean declarations missing blueprint entries
         if: github.event_name == 'pull_request'
         continue-on-error: true
+        env:
+          BASE_REF: origin/${{ github.event.pull_request.base.ref }}
         run: |
           python3 - <<'PY'
+          import os
           import subprocess
 
-          base_ref = "origin/${{ github.event.pull_request.base.ref }}"
+          base_ref = os.environ["BASE_REF"]
 
           changed = subprocess.check_output(
               [

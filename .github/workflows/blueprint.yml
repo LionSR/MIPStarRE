@@ -54,7 +54,8 @@ jobs:
           set -o pipefail
 
           if grep -q "^ERROR:" "$tmp_output_file"; then
-            echo "::warning::Blueprint has unresolved labels (see ERROR lines above)"
+            echo "::error::Blueprint has unresolved labels (see ERROR lines above)"
+            exit 1
           fi
           if grep -q "WARNING: File not found:" "$tmp_output_file"; then
             echo "::error::Blueprint has missing files (see WARNING lines above)"
