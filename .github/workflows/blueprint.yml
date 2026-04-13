@@ -39,7 +39,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev texlive-binaries
 
       - name: Install leanblueprint
-        run: pip install leanblueprint
+        run: |
+          pipx install leanblueprint
+          pipx inject --include-apps --force leanblueprint plastex
 
       - name: Build blueprint
         working-directory: blueprint
