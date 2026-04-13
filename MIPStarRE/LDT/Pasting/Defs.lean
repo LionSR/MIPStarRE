@@ -83,6 +83,38 @@ abbrev GHatType (k : ℕ) := Fin k → Bool
 abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) := Point params × PointTuple params k
 abbrev VerticalLineQuestion (params : Parameters) := Point params
 
+/-- The Hamming weight `|τ|` of a type `τ ∈ {0,1}^k`. -/
+def gHatTypeWeight {k : ℕ} (τ : GHatType k) : ℕ :=
+  (Finset.univ.filter fun i => τ i).card
+
+/-- Prepend one type bit to a tail type. -/
+def prependTypeBit {k : ℕ} (b : Bool) (τ : GHatType k) : GHatType (k + 1)
+  | ⟨0, _⟩ => b
+  | ⟨n + 1, hn⟩ => τ ⟨n, Nat.lt_of_succ_lt_succ hn⟩
+
+/-- The operator contribution of one type bit: `G` for `1`, `I - G` for `0`. -/
+noncomputable def gHatTypeBitOperator (G : MIPStarRE.Quantum.Op ι) (bit : Bool) :
+    MIPStarRE.Quantum.Op ι :=
+  if bit then G else 1 - G
+
+/-- The operator monomial associated with a type `τ`. -/
+noncomputable def gHatTypeOperator (G : MIPStarRE.Quantum.Op ι) {k : ℕ}
+    (τ : GHatType k) : MIPStarRE.Quantum.Op ι :=
+  G ^ gHatTypeWeight τ * (1 - G) ^ (k - gHatTypeWeight τ)
+
+/-- `def:truncated-type-sums`.
+
+Fixing a tail type `τ_tail`, this sums the source-style monomials contributed by
+all prefixes whose total Hamming weight can still reach the interpolation
+threshold `d + 1`. The parameter `prefixLen` is the paper's `ℓ - 1`. -/
+noncomputable def truncatedTypeSums (G : MIPStarRE.Quantum.Op ι)
+    (d prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) :
+    MIPStarRE.Quantum.Op ι :=
+  ∑ τprefix : GHatType prefixLen,
+    if d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight τtail then
+      gHatTypeOperator G τprefix
+    else 0
+
 /-- The Bernoulli tail operator from `lem:chernoff-bernoulli-matrix`:
 `F(X) = ∑_{r=degree+1}^{k} C(k,r) · X^r · (I - X)^{k-r}`.
 This is the matrix-valued Bernoulli tail probability. -/
@@ -166,6 +198,13 @@ noncomputable def gHatTupleHammingWeight {params : Parameters} {k : ℕ}
     [FieldModel params.q]
     (gs : GHatTupleOutcome params k) : ℕ :=
   (gHatTupleSupport gs).card
+
+/-- The set `\mathsf{Outcomes}_\tau` of completed-slice tuples whose `Some`/`none`
+pattern is prescribed by the type `τ`. -/
+def outcomesByType {params : Parameters} {k : ℕ}
+    [FieldModel params.q]
+    (τ : GHatType k) : Set (GHatTupleOutcome params k) :=
+  { gs | ∀ i : Fin k, (gs i).isSome = τ i }
 
 /-- A completed-slice tuple is eligible for interpolation exactly when its type has
 Hamming weight at least `d + 1`, matching the paper's `|w| ≥ d+1` filter. -/
@@ -435,35 +474,26 @@ noncomputable instance isGloballyConsistent_decidablePred
     DecidablePred (IsGloballyConsistent params xs) :=
   fun _gs => Classical.dec _
 
-/-- Interpolate from `d+1` or more genuine slice polynomials to recover
-a polynomial in `m+1` variables via Lagrange interpolation.
+/-- The subset `\mathsf{Global}_\tau(x)` of `\mathsf{Outcomes}_\tau` consisting of
+tuples that arise from restrictions of a single global polynomial at the slice
+heights `xs`. -/
+def globallyConsistentOutcomesByType (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k) (τ : GHatType k) :
+    Set (GHatTupleOutcome params k) :=
+  { gs | gs ∈ outcomesByType τ ∧ IsGloballyConsistent params xs gs }
 
-When at least `d+1` genuine slices are available, the definition chooses a
-`d+1`-element subset `σ` of their support and returns the Lagrange sum
-`h(u₁,...,uₘ,x) = ∑ᵢ∈σ Lᵢ(x) · gᵢ(u₁,...,uₘ)`, where `Lᵢ` is the
-Lagrange basis polynomial for evaluation point `xᵢ` (computed via
-`Lagrange.basis` from Mathlib), and `gᵢ` is the slice polynomial at
-height `xᵢ` lifted to the ambient `(m+1)`-variable space via
-`MvPolynomial.rename`.
+/-- The complement `\overline{\mathsf{Global}_\tau(x)}` inside
+`\mathsf{Outcomes}_\tau`. -/
+def nonglobalOutcomesByType (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k) (τ : GHatType k) :
+    Set (GHatTupleOutcome params k) :=
+  outcomesByType τ \ globallyConsistentOutcomesByType params xs τ
 
-When fewer than `d+1` genuine slices are available, returns the zero
-polynomial.
+/-- Recover a global polynomial from a completed-slice tuple.
 
-**Precondition**: correctness of the Lagrange interpolation (in
-particular `Lagrange.eval_basis_self`) requires that the evaluation
-points `v i = decodeScalar (xs i)` are pairwise distinct on `τ`, i.e.
-`Set.InjOn v ↑τ`. This is ensured at the call site by drawing `xs`
-from `distinctTupleDistribution` (which restricts to injective
-tuples) combined with injectivity of `decodeScalar`. The definition
-is well-typed without this hypothesis, but the interpolation property
-only holds under it.
-
-**Note on τ size**: the paper (ld-pasting.tex:240) initially defines
-the interpolant from exactly `d+1` slices. When the genuine support has
-more than `d+1` entries, this definition chooses a `d+1`-element subset
-of that support before interpolating; this avoids the higher raw degree
-of the all-of-`τ` Lagrange sum, whose degree bound would require the
-cancellation argument from ld-pasting.tex:1238-1254. -/
+On the actual pasting path this map is only applied after restricting to tuples in
+`Global_τ(x)`, so it may choose any globally consistent witness. When no such
+witness exists, it falls back to the distinguished zero polynomial. -/
 noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel params.q] :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
   | 0, _xs, _gs => fallbackInterpolatedPolynomial params

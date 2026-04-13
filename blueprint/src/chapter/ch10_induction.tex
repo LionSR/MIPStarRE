@@ -5,416 +5,418 @@
 \section{Restricting to one slice}
 
 \begin{definition}[Appending a line at height $x$]\label{def:append-x}
-  For $x \in \F_q$, let $\operatorname{append}_x(\ell)$ be the line in $\F_q^{m+1}$ obtained by appending the coordinate $x$ to every point of a line $\ell \subseteq \F_q^m$. If $f \colon \ell \to \F_q$, let $\operatorname{append}_x(f)$ be the polynomial on $\operatorname{append}_x(\ell)$ defined by $\operatorname{append}_x(f)(u,x)=f(u)$.
+	\lean{MIPStarRE.LDT.AxisParallelLine.appendAtHeight, MIPStarRE.LDT.AxisLinePolynomial.appendAtHeight, MIPStarRE.LDT.DiagonalLine.appendAtHeight}
+	For $x \in \F_q$, let $\operatorname{append}_x(\ell)$ be the line in $\F_q^{m+1}$ obtained by appending the coordinate $x$ to every point of a line $\ell \subseteq \F_q^m$. If $f \colon \ell \to \F_q$, let $\operatorname{append}_x(f)$ be the polynomial on $\operatorname{append}_x(\ell)$ defined by $\operatorname{append}_x(f)(u,x)=f(u)$.
 \end{definition}
 
 \begin{definition}[$x$-restricted strategy]\label{def:restricted-strategy}
-  \uses{def:append-x, def:symmetric-projective-strategy}
-  Let $(\psi,A,B,L)$ be a symmetric strategy for the $(m+1,q,d)$ low individual degree test. For each $x \in \F_q$, the $x$-restricted strategy $(\psi,A^x,B^x,L^x)$ for the $(m,q,d)$ test is defined by
-  \[
-    (A^x)_a^u = A_a^{u,x},
-    \qquad
-    (B^x)_f^\ell = B_{\operatorname{append}_x(f)}^{\operatorname{append}_x(\ell)},
-    \qquad
-    (L^x)_f^\ell = L_{\operatorname{append}_x(f)}^{\operatorname{append}_x(\ell)}.
-  \]
+	\lean{MIPStarRE.LDT.MainInductionStep.xRestrictedStrategy, MIPStarRE.LDT.MainInductionStep.RestrictedSymStrat}
+	\uses{def:append-x, def:symmetric-projective-strategy}
+	Let $(\psi,A,B,L)$ be a symmetric strategy for the $(m+1,q,d)$ low individual degree test. For each $x \in \F_q$, the $x$-restricted strategy $(\psi,A^x,B^x,L^x)$ for the $(m,q,d)$ test is defined by
+	\[
+		(A^x)_a^u = A_a^{u,x},
+		\qquad
+		(B^x)_f^\ell = B_{\operatorname{append}_x(f)}^{\operatorname{append}_x(\ell)},
+		\qquad
+		(L^x)_f^\ell = L_{\operatorname{append}_x(f)}^{\operatorname{append}_x(\ell)}.
+	\]
 \end{definition}
 
 \begin{lemma}[Restricted success probabilities]\label{lem:restricted-probabilities}
-  \lean{MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}
-  \uses{def:restricted-strategy, def:good-strategy}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the restricted strategy and let $\eps_x,\delta_x,\gamma_x$ be its three failure probabilities. Then
-  \[
-    \E_x \eps_x \le \frac{m+1}{m}\eps,
-    \qquad
-    \E_x \delta_x \le \delta,
-    \qquad
-    \E_x \gamma_x \le \frac{m+1}{m}\gamma.
-  \]
+	\lean{MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}
+	\uses{def:restricted-strategy, def:good-strategy}
+	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the restricted strategy and let $\eps_x,\delta_x,\gamma_x$ be its three failure probabilities. Then
+	\[
+		\E_x \eps_x \le \frac{m+1}{m}\eps,
+		\qquad
+		\E_x \delta_x \le \delta,
+		\qquad
+		\E_x \gamma_x \le \frac{m+1}{m}\gamma.
+	\]
 \end{lemma}
 \begin{proof}
-  The self-consistency test restricts exactly to the slice at height $x$. For the axis-parallel and diagonal-line tests, conditioning on the sampled line not being parallel to the last coordinate identifies the test with the corresponding restricted game.
+	The self-consistency test restricts exactly to the slice at height $x$. For the axis-parallel and diagonal-line tests, conditioning on the sampled line not being parallel to the last coordinate identifies the test with the corresponding restricted game.
 \end{proof}
 
 \section{The inductive construction}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
-  \lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
-  \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $G \in \polysub{m}{q}{d}$ be a submeasurement with the following property:
-  \begin{enumerate}
-    \item (Consistency with~$A$): \label{item:si-inductive-G-consistency} On average over $u \sim \F_q^m$,
-    \[
-      A_a^u \ot I \simeq_\nu I \ot G_{[g(u)=a]}.
-    \]
-  \end{enumerate}
-  Let
-  \[
-    \zeta = 3000m\left(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right).
-  \]
-  Then there exists a projective submeasurement $H \in \polysub{m}{q}{d}$ with the following properties:
-  \begin{enumerate}
-    \item (Completeness): \label{item:si-inductive-completeness} If $H=\sum_h H_h$, then
-    \[
-      \bra{\psi} H \ot I \ket{\psi} \ge (1-\nu)-\zeta.
-    \]
-    \item (Consistency with~$A$): \label{item:si-inductive-A-consistency} On average over $u \sim \F_q^m$,
-    \[
-      A_a^u \ot I \simeq_\zeta I \ot H_{[h(u)=a]}.
-    \]
-    \item (Strong self-consistency): \label{item:si-inductive-self}
-    \[
-      H_h \ot I \approx_\zeta I \ot H_h.
-    \]
-    \item (Boundedness): \label{item:si-inductive-boundedness} There exists a positive semidefinite operator $Z$ such that
-    \[
-      \bra{\psi} Z \ot (I-H) \ket{\psi} \le \zeta
-    \]
-    and for each $h \in \polyfunc{m}{q}{d}$,
-    \[
-      Z \ge \E_u A_{h(u)}^u.
-    \]
-  \end{enumerate}
+	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
+	\uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
+	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $G \in \polysub{m}{q}{d}$ be a submeasurement with the following property:
+	\begin{enumerate}
+		\item (Consistency with~$A$): \label{item:si-inductive-G-consistency} On average over $u \sim \F_q^m$,
+		      \[
+			      A_a^u \ot I \simeq_\nu I \ot G_{[g(u)=a]}.
+		      \]
+	\end{enumerate}
+	Let
+	\[
+		\zeta = 3000m\left(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right).
+	\]
+	Then there exists a projective submeasurement $H \in \polysub{m}{q}{d}$ with the following properties:
+	\begin{enumerate}
+		\item (Completeness): \label{item:si-inductive-completeness} If $H=\sum_h H_h$, then
+		      \[
+			      \bra{\psi} H \ot I \ket{\psi} \ge (1-\nu)-\zeta.
+		      \]
+		\item (Consistency with~$A$): \label{item:si-inductive-A-consistency} On average over $u \sim \F_q^m$,
+		      \[
+			      A_a^u \ot I \simeq_\zeta I \ot H_{[h(u)=a]}.
+		      \]
+		\item (Strong self-consistency): \label{item:si-inductive-self}
+		      \[
+			      H_h \ot I \approx_\zeta I \ot H_h.
+		      \]
+		\item (Boundedness): \label{item:si-inductive-boundedness} There exists a positive semidefinite operator $Z$ such that
+		      \[
+			      \bra{\psi} Z \ot (I-H) \ket{\psi} \le \zeta
+		      \]
+		      and for each $h \in \polyfunc{m}{q}{d}$,
+		      \[
+			      Z \ge \E_u A_{h(u)}^u.
+		      \]
+	\end{enumerate}
 \end{theorem}
 \begin{proof}
-  \uses{thm:self-improvement, prop:completing-to-measurement, prop:simeq-data-processing, prop:triangle-sub, prop:two-notions-of-self-consistency}
-  Complete $G$ to a measurement by adjoining an extra outcome $\bot$. Apply Theorem~\ref{thm:self-improvement} to the completed measurement, then discard the $\bot$ outcome. By Lemma~\ref{prop:completing-to-measurement}, the completeness, consistency, strong self-consistency, and boundedness estimates transfer back to the original polynomial outcomes with an additive error from the missing mass $\bra{\psi} (I - \sum_g G_g) \ot I \ket{\psi}$. Since the output is projective, Lemma~\ref{prop:two-notions-of-self-consistency} converts the strong self-consistency statement to the usual bipartite formulation.
+	\uses{thm:self-improvement, prop:completing-to-measurement, prop:simeq-data-processing, prop:triangle-sub, prop:two-notions-of-self-consistency}
+	Complete $G$ to a measurement by adjoining an extra outcome $\bot$. Apply Theorem~\ref{thm:self-improvement} to the completed measurement, then discard the $\bot$ outcome. By Lemma~\ref{prop:completing-to-measurement}, the completeness, consistency, strong self-consistency, and boundedness estimates transfer back to the original polynomial outcomes with an additive error from the missing mass $\bra{\psi} (I - \sum_g G_g) \ot I \ket{\psi}$. Since the output is projective, Lemma~\ref{prop:two-notions-of-self-consistency} converts the strong self-consistency statement to the usual bipartite formulation.
 \end{proof}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
-  \lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection}
-  \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
-  \begin{enumerate}
-    \item (Completeness): \label{item:ld-pasting-inductive-completeness} If $G=\E_x \sum_g G_g^x$, then
-    \[
-      \bra{\psi} G \ot I \ket{\psi} \ge 1-\kappa.
-    \]
-    \item (Consistency with~$A$): \label{item:ld-pasting-inductive-consistency} On average over $(u,x) \sim \F_q^{m+1}$,
-    \[
-      A_a^{u,x} \ot I \simeq_\zeta I \ot G_{[g(u)=a]}^x.
-    \]
-    \item (Strong self-consistency): \label{item:ld-pasting-inductive-self-consistency} On average over $x \sim \F_q$,
-    \[
-      G_g^x \ot I \approx_\zeta I \ot G_g^x.
-    \]
-    \item (Boundedness): \label{item:ld-pasting-inductive-boundedness} There are positive semidefinite operators $Z^x$ such that
-    \[
-      \E_x \bra{\psi} (I-G^x) \ot Z^x \ket{\psi} \le \zeta
-    \]
-    and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
-    \[
-      Z^x \ge \E_u A_{g(u)}^{u,x}.
-    \]
-  \end{enumerate}
-  Let $k \ge 400md$ and set
-  \[
-    \nu = 100k^2m\left(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right)
-  \]
-  and
-  \[
-    \sigma = \kappa\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)}.
-  \]
-  Then there exists a measurement $H \in \polymeas{m+1}{q}{d}$ with the following property:
-  \begin{enumerate}
-    \item (Consistency with~$A$): \label{item:ld-pasting-inductive-N-consistency} On average over $u \sim \F_q^{m+1}$,
-    \[
-      A_a^u \ot I \simeq_\sigma I \ot H_{[h(u)=a]}.
-    \]
-  \end{enumerate}
+	\lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection}
+	\uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
+	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
+	\begin{enumerate}
+		\item (Completeness): \label{item:ld-pasting-inductive-completeness} If $G=\E_x \sum_g G_g^x$, then
+		      \[
+			      \bra{\psi} G \ot I \ket{\psi} \ge 1-\kappa.
+		      \]
+		\item (Consistency with~$A$): \label{item:ld-pasting-inductive-consistency} On average over $(u,x) \sim \F_q^{m+1}$,
+		      \[
+			      A_a^{u,x} \ot I \simeq_\zeta I \ot G_{[g(u)=a]}^x.
+		      \]
+		\item (Strong self-consistency): \label{item:ld-pasting-inductive-self-consistency} On average over $x \sim \F_q$,
+		      \[
+			      G_g^x \ot I \approx_\zeta I \ot G_g^x.
+		      \]
+		\item (Boundedness): \label{item:ld-pasting-inductive-boundedness} There are positive semidefinite operators $Z^x$ such that
+		      \[
+			      \E_x \bra{\psi} (I-G^x) \ot Z^x \ket{\psi} \le \zeta
+		      \]
+		      and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
+		      \[
+			      Z^x \ge \E_u A_{g(u)}^{u,x}.
+		      \]
+	\end{enumerate}
+	Let $k \ge 400md$ and set
+	\[
+		\nu = 100k^2m\left(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right)
+	\]
+	and
+	\[
+		\sigma = \kappa\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)}.
+	\]
+	Then there exists a measurement $H \in \polymeas{m+1}{q}{d}$ with the following property:
+	\begin{enumerate}
+		\item (Consistency with~$A$): \label{item:ld-pasting-inductive-N-consistency} On average over $u \sim \F_q^{m+1}$,
+		      \[
+			      A_a^u \ot I \simeq_\sigma I \ot H_{[h(u)=a]}.
+		      \]
+	\end{enumerate}
 \end{theorem}
 \begin{proof}
-  \uses{thm:ld-pasting}
-  This is exactly Theorem~\ref{thm:ld-pasting}, restated in the induction chapter because it is the pasting input used in the proof of Theorem~\ref{thm:main-induction}.
+	\uses{thm:ld-pasting}
+	This is exactly Theorem~\ref{thm:ld-pasting}, restated in the induction chapter because it is the pasting input used in the proof of Theorem~\ref{thm:main-induction}.
 \end{proof}
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
-  \lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
-  \uses{def:good-strategy, def:polymeasurements, def:simeq}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
-  \[
-    \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
-  \]
-  and
-  \[
-    \sigma = m^2\left(\nu + e^{-k/(80000m^2)}\right).
-  \]
-  Then there exists a measurement $G \in \polymeas{m}{q}{d}$ such that, on average over $u \sim \F_q^m$,
-  \[
-    A_a^u \ot I \simeq_\sigma I \ot G_{[g(u)=a]}.
-  \]
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
+	\uses{def:good-strategy, def:polymeasurements, def:simeq}
+	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
+	\[
+		\nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
+	\]
+	and
+	\[
+		\sigma = m^2\left(\nu + e^{-k/(80000m^2)}\right).
+	\]
+	Then there exists a measurement $G \in \polymeas{m}{q}{d}$ such that, on average over $u \sim \F_q^m$,
+	\[
+		A_a^u \ot I \simeq_\sigma I \ot G_{[g(u)=a]}.
+	\]
 \end{theorem}
 \begin{proof}
-  \uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section}
-  We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
+	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section}
+	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
-  The proof is by induction on $m$. For $m=1$, there is only one axis-parallel line $\ell$ in $\F_q$, so the line measurement $B^\ell$ is already an element of $\polymeas{1}{q}{d}$. Because the strategy fails the axis-parallel lines test with probability at most $\eps$,
-  \[
-    A_a^u \ot I \simeq_\eps I \ot B^\ell_{[f(u)=a]}
-  \]
-  on average over $u \sim \F_q$, and this is stronger than the theorem's claim.
+	The proof is by induction on $m$. For $m=1$, there is only one axis-parallel line $\ell$ in $\F_q$, so the line measurement $B^\ell$ is already an element of $\polymeas{1}{q}{d}$. Because the strategy fails the axis-parallel lines test with probability at most $\eps$,
+	\[
+		A_a^u \ot I \simeq_\eps I \ot B^\ell_{[f(u)=a]}
+	\]
+	on average over $u \sim \F_q$, and this is stronger than the theorem's claim.
 
-  For the step from $m$ to $m+1$, let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test, and let $k \ge (m+1)d$. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the $x$-restricted strategy, with failure parameters $\eps_x,\delta_x,\gamma_x$. Apply the induction hypothesis to each restricted strategy with the same integer $k$ and define
-  \[
-    \nu_x = 1000k^2m^2\left(\eps_x^{1/1024}+\delta_x^{1/1024}+\gamma_x^{1/1024}+(d/q)^{1/1024}\right),
-    \qquad
-    \sigma_x = m^2\left(\nu_x + e^{-k/(80000m^2)}\right).
-  \]
-  This yields a measurement $G^x \in \polymeas{m}{q}{d}$ such that
-  \[
-    (A^x)_a^u \ot I \simeq_{\sigma_x} I \ot G_{[g(u)=a]}^x.
-  \]
+	For the step from $m$ to $m+1$, let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test, and let $k \ge (m+1)d$. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the $x$-restricted strategy, with failure parameters $\eps_x,\delta_x,\gamma_x$. Apply the induction hypothesis to each restricted strategy with the same integer $k$ and define
+	\[
+		\nu_x = 1000k^2m^2\left(\eps_x^{1/1024}+\delta_x^{1/1024}+\gamma_x^{1/1024}+(d/q)^{1/1024}\right),
+		\qquad
+		\sigma_x = m^2\left(\nu_x + e^{-k/(80000m^2)}\right).
+	\]
+	This yields a measurement $G^x \in \polymeas{m}{q}{d}$ such that
+	\[
+		(A^x)_a^u \ot I \simeq_{\sigma_x} I \ot G_{[g(u)=a]}^x.
+	\]
 
-  Next define
-  \[
-    \zeta_x = 3000m\left(\eps_x^{1/32}+\delta_x^{1/32}+(d/q)^{1/32}\right).
-  \]
-  Theorem~\ref{thm:self-improvement-in-induction-section} produces a projective submeasurement $\widehat G^x \in \polysub{m}{q}{d}$ such that, for each $x$:
-  \begin{enumerate}
-    \item if $\widehat G^x=\sum_g \widehat G_g^x$, then
-    \[
-      \bra{\psi} \widehat G^x \ot I \ket{\psi} \ge (1-\sigma_x)-\zeta_x;
-    \]
-    \item on average over $u \sim \F_q^m$,
-    \[
-      (A^x)_a^u \ot I \simeq_{\zeta_x} I \ot \widehat G_{[g(u)=a]}^x;
-    \]
-    \item
-    \[
-      \widehat G_g^x \ot I \approx_{\zeta_x} I \ot \widehat G_g^x;
-    \]
-    \item there exists a positive semidefinite operator $Z^x$ such that
-    \[
-      \bra{\psi} Z^x \ot (I-\widehat G^x) \ket{\psi} \le \zeta_x
-    \]
-    and for each $g \in \polyfunc{m}{q}{d}$,
-    \[
-      Z^x \ge \E_u (A^x)_{g(u)}^u.
-    \]
-  \end{enumerate}
+	Next define
+	\[
+		\zeta_x = 3000m\left(\eps_x^{1/32}+\delta_x^{1/32}+(d/q)^{1/32}\right).
+	\]
+	Theorem~\ref{thm:self-improvement-in-induction-section} produces a projective submeasurement $\widehat G^x \in \polysub{m}{q}{d}$ such that, for each $x$:
+	\begin{enumerate}
+		\item if $\widehat G^x=\sum_g \widehat G_g^x$, then
+		      \[
+			      \bra{\psi} \widehat G^x \ot I \ket{\psi} \ge (1-\sigma_x)-\zeta_x;
+		      \]
+		\item on average over $u \sim \F_q^m$,
+		      \[
+			      (A^x)_a^u \ot I \simeq_{\zeta_x} I \ot \widehat G_{[g(u)=a]}^x;
+		      \]
+		\item
+		      \[
+			      \widehat G_g^x \ot I \approx_{\zeta_x} I \ot \widehat G_g^x;
+		      \]
+		\item there exists a positive semidefinite operator $Z^x$ such that
+		      \[
+			      \bra{\psi} Z^x \ot (I-\widehat G^x) \ket{\psi} \le \zeta_x
+		      \]
+		      and for each $g \in \polyfunc{m}{q}{d}$,
+		      \[
+			      Z^x \ge \E_u (A^x)_{g(u)}^u.
+		      \]
+	\end{enumerate}
 
-  We now average the slice-dependent parameters. By concavity of $\alpha \mapsto \alpha^c$ for $c \le 1$ and Lemma~\ref{lem:restricted-probabilities},
-  \begin{align*}
-    \E_x \nu_x
-    &\le 1000k^2m^2\left((\E_x \eps_x)^{1/1024}+(\E_x \delta_x)^{1/1024}+(\E_x \gamma_x)^{1/1024}+(d/q)^{1/1024}\right) \\
-    &\le 1000k^2m^2\left(\left(\frac{m+1}{m}\eps\right)^{1/1024}+\delta^{1/1024}+\left(\frac{m+1}{m}\gamma\right)^{1/1024}+(d/q)^{1/1024}\right) \\
-    &\le 1000k^2(m+1)^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right).
-  \end{align*}
-  Call this final quantity $\nu$. Then, defining
-  \[
-    \sigma = m^2\left(\nu + e^{-k/(80000m^2)}\right),
-  \]
-  we have
-  \[
-    \sigma \ge \E_x \sigma_x.
-  \]
-  Similarly,
-  \begin{align*}
-    \E_x \zeta_x
-    &\le 3000m\left((\E_x \eps_x)^{1/32}+(\E_x \delta_x)^{1/32}+(d/q)^{1/32}\right) \\
-    &\le 3000m\left(\left(\frac{m+1}{m}\eps\right)^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right) \\
-    &\le 3000(m+1)\left(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right).
-  \end{align*}
-  Call this last quantity $\zeta$. For later use,
-  \begin{align}
-    \zeta
-    &= 3000(m+1)\left(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right) \notag\\
-    &\le 1000k^2(m+1)^2\left(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right) \notag\\
-    &\le 1000k^2(m+1)^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right) \notag\\
-    &= \nu. \label{eq:zeta-smaller-than-nu}
-  \end{align}
+	We now average the slice-dependent parameters. By concavity of $\alpha \mapsto \alpha^c$ for $c \le 1$ and Lemma~\ref{lem:restricted-probabilities},
+	\begin{align*}
+		\E_x \nu_x
+		 & \le 1000k^2m^2\left((\E_x \eps_x)^{1/1024}+(\E_x \delta_x)^{1/1024}+(\E_x \gamma_x)^{1/1024}+(d/q)^{1/1024}\right)                          \\
+		 & \le 1000k^2m^2\left(\left(\frac{m+1}{m}\eps\right)^{1/1024}+\delta^{1/1024}+\left(\frac{m+1}{m}\gamma\right)^{1/1024}+(d/q)^{1/1024}\right) \\
+		 & \le 1000k^2(m+1)^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right).
+	\end{align*}
+	Call this final quantity $\nu$. Then, defining
+	\[
+		\sigma = m^2\left(\nu + e^{-k/(80000m^2)}\right),
+	\]
+	we have
+	\[
+		\sigma \ge \E_x \sigma_x.
+	\]
+	Similarly,
+	\begin{align*}
+		\E_x \zeta_x
+		 & \le 3000m\left((\E_x \eps_x)^{1/32}+(\E_x \delta_x)^{1/32}+(d/q)^{1/32}\right)         \\
+		 & \le 3000m\left(\left(\frac{m+1}{m}\eps\right)^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right) \\
+		 & \le 3000(m+1)\left(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right).
+	\end{align*}
+	Call this last quantity $\zeta$. For later use,
+	\begin{align}
+		\zeta
+		 & = 3000(m+1)\left(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right) \notag                              \\
+		 & \le 1000k^2(m+1)^2\left(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}\right) \notag                       \\
+		 & \le 1000k^2(m+1)^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right) \notag \\
+		 & = \nu. \label{eq:zeta-smaller-than-nu}
+	\end{align}
 
-  The averaged slice family $\{\widehat G^x\}_{x \in \F_q}$ therefore satisfies the four hypotheses of Theorem~\ref{thm:ld-pasting-in-induction-section} with completeness parameter $\kappa=\sigma+\zeta$. To verify the new $\nu$ bound in that theorem, observe that $(3000)^{1/32} \le 2$, so
-  \[
-    \zeta^{1/32} \le 2(m+1)\left(\eps^{1/1024}+\delta^{1/1024}+(d/q)^{1/1024}\right),
-  \]
-  and hence
-  \begin{align*}
-    &100k^2m\left(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right) \\
-    &\le 1000k^2(m+1)^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right) \\
-    &= \nu.
-  \end{align*}
-  Therefore Theorem~\ref{thm:ld-pasting-in-induction-section} gives a pasted measurement $H \in \polymeas{m+1}{q}{d}$ such that, on average over $u \sim \F_q^{m+1}$,
-  \[
-    A_a^u \ot I \simeq_{\sigma^*} I \ot H_{[h(u)=a]},
-  \]
-  where
-  \[
-    \sigma^* = (\sigma+\zeta)\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)}.
-  \]
-  It remains to compare $\sigma^*$ with the next-stage target:
-  \begin{align}
-    \sigma^*
-    &= (\sigma+\zeta)\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)} \notag\\
-    &\le (\sigma+\nu)\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)} \tag{by \ref{eq:zeta-smaller-than-nu}} \notag\\
-    &= \left(1+\frac{1}{100m}\right)\left(m^2\left(\nu+e^{-k/(80000m^2)}\right)+\nu\right) + 2\nu + e^{-k/(80000m^2)} \notag\\
-    &\le \left(1+\frac{1}{100m}\right)(m^2+3)\left(\nu+e^{-k/(80000m^2)}\right). \label{eq:gonna-bound-m-function}
-  \end{align}
-  The base case $m=1$ follows directly from Theorem~\ref{thm:raz-safra} (the Raz--Safra result for surfaces and points).
-  Since $m \ge 2$,
-  \[
-    \left(1+\frac{1}{100m}\right)(m^2+3) \le (m+1)^2.
-  \]
-  Applying this to \eqref{eq:gonna-bound-m-function} yields
-  \[
-    \sigma^* \le (m+1)^2\left(\nu+e^{-k/(80000m^2)}\right)
-    \le (m+1)^2\left(\nu+e^{-k/(80000(m+1)^2)}\right),
-  \]
-  which is exactly the bound required for dimension $m+1$.
+	The averaged slice family $\{\widehat G^x\}_{x \in \F_q}$ therefore satisfies the four hypotheses of Theorem~\ref{thm:ld-pasting-in-induction-section} with completeness parameter $\kappa=\sigma+\zeta$. To verify the new $\nu$ bound in that theorem, observe that $(3000)^{1/32} \le 2$, so
+	\[
+		\zeta^{1/32} \le 2(m+1)\left(\eps^{1/1024}+\delta^{1/1024}+(d/q)^{1/1024}\right),
+	\]
+	and hence
+	\begin{align*}
+		 & 100k^2m\left(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right)       \\
+		 & \le 1000k^2(m+1)^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right) \\
+		 & = \nu.
+	\end{align*}
+	Therefore Theorem~\ref{thm:ld-pasting-in-induction-section} gives a pasted measurement $H \in \polymeas{m+1}{q}{d}$ such that, on average over $u \sim \F_q^{m+1}$,
+	\[
+		A_a^u \ot I \simeq_{\sigma^*} I \ot H_{[h(u)=a]},
+	\]
+	where
+	\[
+		\sigma^* = (\sigma+\zeta)\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)}.
+	\]
+	It remains to compare $\sigma^*$ with the next-stage target:
+	\begin{align}
+		\sigma^*
+		 & = (\sigma+\zeta)\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)} \notag                                         \\
+		 & \le (\sigma+\nu)\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)} \tag{by \ref{eq:zeta-smaller-than-nu}} \notag  \\
+		 & = \left(1+\frac{1}{100m}\right)\left(m^2\left(\nu+e^{-k/(80000m^2)}\right)+\nu\right) + 2\nu + e^{-k/(80000m^2)} \notag \\
+		 & \le \left(1+\frac{1}{100m}\right)(m^2+3)\left(\nu+e^{-k/(80000m^2)}\right). \label{eq:gonna-bound-m-function}
+	\end{align}
+	The base case $m=1$ follows directly from Theorem~\ref{thm:raz-safra} (the Raz--Safra result for surfaces and points).
+	Since $m \ge 2$,
+	\[
+		\left(1+\frac{1}{100m}\right)(m^2+3) \le (m+1)^2.
+	\]
+	Applying this to \eqref{eq:gonna-bound-m-function} yields
+	\[
+		\sigma^* \le (m+1)^2\left(\nu+e^{-k/(80000m^2)}\right)
+		\le (m+1)^2\left(\nu+e^{-k/(80000(m+1)^2)}\right),
+	\]
+	which is exactly the bound required for dimension $m+1$.
 \end{proof}
 
 \section{Proof of the main formal theorem}
 
 \begin{proof}
-  \proves{thm:main-formal}
-  \uses{thm:main-induction, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual}
-  Let
-  \[
-    (\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})
-  \]
-  be a projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Since the three subtests occur with probability $1/3$, this strategy is $(3\eps,3\eps,3\eps)$-good.
+	\proves{thm:main-formal}
+	\uses{thm:main-induction, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual}
+	Let
+	\[
+		(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})
+	\]
+	be a projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Since the three subtests occur with probability $1/3$, this strategy is $(3\eps,3\eps,3\eps)$-good.
 
-  Introduce a two-dimensional role register on each side and define the symmetrized state
-  \[
-    \ket{\psi_{\mathrm{sym}}}
-    =
-    \frac{1}{\sqrt{2}}
-    \left(
-    \ket{0}_{\mathrm{A}'}\ket{1}_{\mathrm{B}'}\ket{\psi}_{\mathrm{AB}}
-    +
-    \ket{1}_{\mathrm{A}'}\ket{0}_{\mathrm{B}'}\ket{\psi_{\mathrm{swap}}}_{\mathrm{AB}}
-    \right).
-  \]
-  Define the symmetrized point measurement by
-  \[
-    (A_{\mathrm{sym}})_a^u
-    =
-    \ket{0}\bra{0} \ot A_a^{\mathrm A,u}
-    +
-    \ket{1}\bra{1} \ot A_a^{\mathrm B,u},
-  \]
-  and similarly for $B_{\mathrm{sym}}$ and $L_{\mathrm{sym}}$. This yields a symmetric $(3\eps,3\eps,3\eps)$-good strategy. Set
-  \[
-    \nu = 10000k^2m^2\left(\eps^{1/1024}+(d/q)^{1/1024}\right),
-    \qquad
-    \sigma = m^2\left(\nu+e^{-k/(80000m^2)}\right).
-  \]
-  Theorem~\ref{thm:main-induction} applied to the symmetrized strategy produces a measurement $G=\{G_g\} \in \polymeas{m}{q}{d}$ such that
-  \begin{equation}\label{eq:just-applied-induction}
-    (A_{\mathrm{sym}})_a^u \ot I \simeq_\sigma I \ot G_{[g(u)=a]},
-    \qquad
-    G_{[g(u)=a]} \ot I \simeq_\sigma I \ot (A_{\mathrm{sym}})_a^u.
-  \end{equation}
+	Introduce a two-dimensional role register on each side and define the symmetrized state
+	\[
+		\ket{\psi_{\mathrm{sym}}}
+		=
+		\frac{1}{\sqrt{2}}
+		\left(
+		\ket{0}_{\mathrm{A}'}\ket{1}_{\mathrm{B}'}\ket{\psi}_{\mathrm{AB}}
+		+
+		\ket{1}_{\mathrm{A}'}\ket{0}_{\mathrm{B}'}\ket{\psi_{\mathrm{swap}}}_{\mathrm{AB}}
+		\right).
+	\]
+	Define the symmetrized point measurement by
+	\[
+		(A_{\mathrm{sym}})_a^u
+		=
+		\ket{0}\bra{0} \ot A_a^{\mathrm A,u}
+		+
+		\ket{1}\bra{1} \ot A_a^{\mathrm B,u},
+	\]
+	and similarly for $B_{\mathrm{sym}}$ and $L_{\mathrm{sym}}$. This yields a symmetric $(3\eps,3\eps,3\eps)$-good strategy. Set
+	\[
+		\nu = 10000k^2m^2\left(\eps^{1/1024}+(d/q)^{1/1024}\right),
+		\qquad
+		\sigma = m^2\left(\nu+e^{-k/(80000m^2)}\right).
+	\]
+	Theorem~\ref{thm:main-induction} applied to the symmetrized strategy produces a measurement $G=\{G_g\} \in \polymeas{m}{q}{d}$ such that
+	\begin{equation}\label{eq:just-applied-induction}
+		(A_{\mathrm{sym}})_a^u \ot I \simeq_\sigma I \ot G_{[g(u)=a]},
+		\qquad
+		G_{[g(u)=a]} \ot I \simeq_\sigma I \ot (A_{\mathrm{sym}})_a^u.
+	\end{equation}
 
-  Now unsymmetrize by defining
-  \[
-    G_g^{\mathrm A} = (\bra{0} \ot I)\, G_g\, (\ket{0} \ot I),
-    \qquad
-    G_g^{\mathrm B} = (\bra{1} \ot I)\, G_g\, (\ket{1} \ot I).
-  \]
-  These are POVMs on the original prover space. Since $A_{\mathrm{sym}}$ is a convex combination of $(\ket{0}\bra{0} \ot I)$ and $(\ket{1}\bra{1} \ot I)$ weighted by the test probabilities, the cross-terms $\bra{0} \cdot A_{\mathrm{sym}} \cdot \ket{1}$ vanish. Expanding the consistency of $G$ gives
-  \begin{gather}
-    G_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{2\sigma} I \ot A_a^{\mathrm B,u}, \label{eq:cons-a}\\
-    I \ot G_{[g(u)=a]}^{\mathrm B} \simeq_{2\sigma} A_a^{\mathrm A,u} \ot I. \label{eq:cons-b}
-  \end{gather}
-  Since the original strategy is $(3\eps,3\eps,3\eps)$-good,
-  \[
-    A_a^{\mathrm A,u} \ot I \simeq_{3\eps} I \ot A_a^{\mathrm B,u}.
-  \]
-  Therefore Lemma~\ref{prop:simeq-triangle-inequality} yields
-  \[
-    G_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{2\sigma + 2\sqrt{3\eps+2\sigma}} I \ot G_{[g(u)=a]}^{\mathrm B}.
-  \]
-  Expanding this consistency relation and applying Lemma~\ref{lem:schwartz-zippel-individual} to replace point evaluations by polynomial evaluations (at cost $md/q$) gives
-  \begin{equation}\label{eq:G-self-consistency}
-    G_g^{\mathrm A} \ot I \simeq_{\zeta_1} I \ot G_g^{\mathrm B},
-  \end{equation}
-  where
-  \[
-    \zeta_1 = 2\sigma + 2\sqrt{3\eps+2\sigma} + \frac{md}{q}.
-  \]
+	Now unsymmetrize by defining
+	\[
+		G_g^{\mathrm A} = (\bra{0} \ot I)\, G_g\, (\ket{0} \ot I),
+		\qquad
+		G_g^{\mathrm B} = (\bra{1} \ot I)\, G_g\, (\ket{1} \ot I).
+	\]
+	These are POVMs on the original prover space. Since $A_{\mathrm{sym}}$ is a convex combination of $(\ket{0}\bra{0} \ot I)$ and $(\ket{1}\bra{1} \ot I)$ weighted by the test probabilities, the cross-terms $\bra{0} \cdot A_{\mathrm{sym}} \cdot \ket{1}$ vanish. Expanding the consistency of $G$ gives
+	\begin{gather}
+		G_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{2\sigma} I \ot A_a^{\mathrm B,u}, \label{eq:cons-a}\\
+		I \ot G_{[g(u)=a]}^{\mathrm B} \simeq_{2\sigma} A_a^{\mathrm A,u} \ot I. \label{eq:cons-b}
+	\end{gather}
+	Since the original strategy is $(3\eps,3\eps,3\eps)$-good,
+	\[
+		A_a^{\mathrm A,u} \ot I \simeq_{3\eps} I \ot A_a^{\mathrm B,u}.
+	\]
+	Therefore Lemma~\ref{prop:simeq-triangle-inequality} yields
+	\[
+		G_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{2\sigma + 2\sqrt{3\eps+2\sigma}} I \ot G_{[g(u)=a]}^{\mathrm B}.
+	\]
+	Expanding this consistency relation and applying Lemma~\ref{lem:schwartz-zippel-individual} to replace point evaluations by polynomial evaluations (at cost $md/q$) gives
+	\begin{equation}\label{eq:G-self-consistency}
+		G_g^{\mathrm A} \ot I \simeq_{\zeta_1} I \ot G_g^{\mathrm B},
+	\end{equation}
+	where
+	\[
+		\zeta_1 = 2\sigma + 2\sqrt{3\eps+2\sigma} + \frac{md}{q}.
+	\]
 
-  Apply Lemma~\ref{lem:orthonormalization-main-lemma} to \ref{eq:G-self-consistency}. This gives projective submeasurements $P^{\mathrm A},P^{\mathrm B} \in \polysub{m}{q}{d}$ with
-  \[
-    G_g^{\mathrm A} \ot I \approx_{100\zeta_1^{1/4}} P_g^{\mathrm A} \ot I,
-    \qquad
-    I \ot G_g^{\mathrm B} \approx_{100\zeta_1^{1/4}} I \ot P_g^{\mathrm B}.
-  \]
-  Completing them by Lemma~\ref{prop:completing-to-measurement} yields projective measurements $Q^{\mathrm A},Q^{\mathrm B} \in \polymeas{m}{q}{d}$ such that
-  \begin{align}
-    G_g^{\mathrm A} \ot I &\approx_{\zeta_2} Q_g^{\mathrm A} \ot I, \label{eq:G-with-Q-A}\\
-    I \ot G_g^{\mathrm B} &\approx_{\zeta_2} I \ot Q_g^{\mathrm B}, \notag
-  \end{align}
-  where
-  \[
-    \zeta_2 = 200\zeta_1^{1/4} + 40\zeta_1^{1/8}.
-  \]
+	Apply Lemma~\ref{lem:orthonormalization-main-lemma} to \ref{eq:G-self-consistency}. This gives projective submeasurements $P^{\mathrm A},P^{\mathrm B} \in \polysub{m}{q}{d}$ with
+	\[
+		G_g^{\mathrm A} \ot I \approx_{100\zeta_1^{1/4}} P_g^{\mathrm A} \ot I,
+		\qquad
+		I \ot G_g^{\mathrm B} \approx_{100\zeta_1^{1/4}} I \ot P_g^{\mathrm B}.
+	\]
+	Completing them by Lemma~\ref{prop:completing-to-measurement} yields projective measurements $Q^{\mathrm A},Q^{\mathrm B} \in \polymeas{m}{q}{d}$ such that
+	\begin{align}
+		G_g^{\mathrm A} \ot I & \approx_{\zeta_2} Q_g^{\mathrm A} \ot I, \label{eq:G-with-Q-A} \\
+		I \ot G_g^{\mathrm B} & \approx_{\zeta_2} I \ot Q_g^{\mathrm B}, \notag
+	\end{align}
+	where
+	\[
+		\zeta_2 = 200\zeta_1^{1/4} + 40\zeta_1^{1/8}.
+	\]
 
-  By \ref{eq:G-self-consistency} and Lemma~\ref{prop:simeq-to-approx},
-  \[
-    G_g^{\mathrm A} \ot I \approx_{2\zeta_1} I \ot G_g^{\mathrm B}.
-  \]
-  Hence Lemma~\ref{prop:triangle-inequality-for-approx_delta} gives
-  \[
-    Q_g^{\mathrm A} \ot I \approx_{\zeta_3} I \ot Q_g^{\mathrm B},
-  \]
-  where
-  \[
-    \zeta_3 = 6\zeta_1 + 6\zeta_2.
-  \]
-  Because both measurements are projective, Lemma~\ref{prop:simeq-to-approx} converts this to
-  \begin{equation}\label{eq:third-goal}
-    Q_g^{\mathrm A} \ot I \simeq_{\zeta_3/2} I \ot Q_g^{\mathrm B}.
-  \end{equation}
-  By data processing,
-  \begin{equation}\label{eq:just-data-processed-the-heck-outta-this}
-    Q_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{\zeta_3/2} I \ot Q_{[g(u)=a]}^{\mathrm B}.
-  \end{equation}
+	By \ref{eq:G-self-consistency} and Lemma~\ref{prop:simeq-to-approx},
+	\[
+		G_g^{\mathrm A} \ot I \approx_{2\zeta_1} I \ot G_g^{\mathrm B}.
+	\]
+	Hence Lemma~\ref{prop:triangle-inequality-for-approx_delta} gives
+	\[
+		Q_g^{\mathrm A} \ot I \approx_{\zeta_3} I \ot Q_g^{\mathrm B},
+	\]
+	where
+	\[
+		\zeta_3 = 6\zeta_1 + 6\zeta_2.
+	\]
+	Because both measurements are projective, Lemma~\ref{prop:simeq-to-approx} converts this to
+	\begin{equation}\label{eq:third-goal}
+		Q_g^{\mathrm A} \ot I \simeq_{\zeta_3/2} I \ot Q_g^{\mathrm B}.
+	\end{equation}
+	By data processing,
+	\begin{equation}\label{eq:just-data-processed-the-heck-outta-this}
+		Q_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{\zeta_3/2} I \ot Q_{[g(u)=a]}^{\mathrm B}.
+	\end{equation}
 
-  Next, Lemma~\ref{prop:triangle-sub}, applied to \ref{eq:G-self-consistency} and \ref{eq:G-with-Q-A}, implies
-  \[
-    Q_g^{\mathrm A} \ot I \simeq_{\zeta_1} I \ot G_g^{\mathrm B}.
-  \]
-  Data processing then gives
-  \begin{equation}\label{eq:ok-almost-there-ok}
-    Q_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{\zeta_1} I \ot G_{[g(u)=a]}^{\mathrm B}.
-  \end{equation}
-  Applying Lemma~\ref{prop:simeq-triangle-inequality} to \ref{eq:cons-b}, \ref{eq:ok-almost-there-ok}, and \ref{eq:just-data-processed-the-heck-outta-this} yields
-  \begin{equation}\label{eq:one-goal}
-    A_a^{\mathrm A,u} \ot I \simeq_{\zeta_4} I \ot Q_{[g(u)=a]}^{\mathrm B},
-  \end{equation}
-  where
-  \[
-    \zeta_4 = 2\sigma + 2\sqrt{\zeta_1+\zeta_3/2}.
-  \]
-  The same argument with the roles reversed gives
-  \begin{equation}\label{eq:another-goal}
-    I \ot A_a^{\mathrm B,u} \simeq_{\zeta_4} Q_{[g(u)=a]}^{\mathrm A} \ot I.
-  \end{equation}
+	Next, Lemma~\ref{prop:triangle-sub}, applied to \ref{eq:G-self-consistency} and \ref{eq:G-with-Q-A}, implies
+	\[
+		Q_g^{\mathrm A} \ot I \simeq_{\zeta_1} I \ot G_g^{\mathrm B}.
+	\]
+	Data processing then gives
+	\begin{equation}\label{eq:ok-almost-there-ok}
+		Q_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{\zeta_1} I \ot G_{[g(u)=a]}^{\mathrm B}.
+	\end{equation}
+	Applying Lemma~\ref{prop:simeq-triangle-inequality} to \ref{eq:cons-b}, \ref{eq:ok-almost-there-ok}, and \ref{eq:just-data-processed-the-heck-outta-this} yields
+	\begin{equation}\label{eq:one-goal}
+		A_a^{\mathrm A,u} \ot I \simeq_{\zeta_4} I \ot Q_{[g(u)=a]}^{\mathrm B},
+	\end{equation}
+	where
+	\[
+		\zeta_4 = 2\sigma + 2\sqrt{\zeta_1+\zeta_3/2}.
+	\]
+	The same argument with the roles reversed gives
+	\begin{equation}\label{eq:another-goal}
+		I \ot A_a^{\mathrm B,u} \simeq_{\zeta_4} Q_{[g(u)=a]}^{\mathrm A} \ot I.
+	\end{equation}
 
-  It remains to bound the parameters. First,
-  \[
-    \sigma \le 10000k^2m^4\left(\eps^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).
-  \]
-  Then
-  \[
-    \zeta_1 \le 20204k^2m^4\left(\eps^{1/2048}+(d/q)^{1/2048}+e^{-k/(160000m^2)}\right),
-  \]
-  and
-  \[
-    \zeta_2 \le 2560km\left(\eps^{1/16384}+(d/q)^{1/16384}+e^{-k/(1280000m^2)}\right).
-  \]
-  Consequently,
-  \[
-    \zeta_3 \le 150000k^2m^4\left(\eps^{1/16384}+(d/q)^{1/16384}+e^{-k/(1280000m^2)}\right),
-  \]
-  and
-  \[
-    \zeta_4 \le 40000k^2m^4\left(\eps^{1/32768}+(d/q)^{1/32768}+e^{-k/(2560000m^2)}\right).
-  \]
-  Both $\zeta_3/2$ and $\zeta_4$ are therefore bounded by
-  \[
-    100000k^2m^4\left(\eps^{1/40000}+(d/q)^{1/40000}+e^{-k/(2560000m^2)}\right).
-  \]
-  Hence \ref{eq:one-goal}, \ref{eq:another-goal}, and \ref{eq:third-goal} give the three claimed conclusions, with $Q^{\mathrm A}$ and $Q^{\mathrm B}$ renamed as the theorem's $G^{\mathrm A}$ and $G^{\mathrm B}$.
+	It remains to bound the parameters. First,
+	\[
+		\sigma \le 10000k^2m^4\left(\eps^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).
+	\]
+	Then
+	\[
+		\zeta_1 \le 20204k^2m^4\left(\eps^{1/2048}+(d/q)^{1/2048}+e^{-k/(160000m^2)}\right),
+	\]
+	and
+	\[
+		\zeta_2 \le 2560km\left(\eps^{1/16384}+(d/q)^{1/16384}+e^{-k/(1280000m^2)}\right).
+	\]
+	Consequently,
+	\[
+		\zeta_3 \le 150000k^2m^4\left(\eps^{1/16384}+(d/q)^{1/16384}+e^{-k/(1280000m^2)}\right),
+	\]
+	and
+	\[
+		\zeta_4 \le 40000k^2m^4\left(\eps^{1/32768}+(d/q)^{1/32768}+e^{-k/(2560000m^2)}\right).
+	\]
+	Both $\zeta_3/2$ and $\zeta_4$ are therefore bounded by
+	\[
+		100000k^2m^4\left(\eps^{1/40000}+(d/q)^{1/40000}+e^{-k/(2560000m^2)}\right).
+	\]
+	Hence \ref{eq:one-goal}, \ref{eq:another-goal}, and \ref{eq:third-goal} give the three claimed conclusions, with $Q^{\mathrm A}$ and $Q^{\mathrm B}$ renamed as the theorem's $G^{\mathrm A}$ and $G^{\mathrm B}$.
 \end{proof}
