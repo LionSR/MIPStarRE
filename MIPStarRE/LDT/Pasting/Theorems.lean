@@ -3319,6 +3319,29 @@ lemma fromHToG
     Total error ≤ k × per-step error ≤ fromHToGError. -/
     sorry
 
+/-- `lem:truncated-type-sum-recurrence`.
+
+This packages the recurrence and basic positivity bounds for the truncated type
+sums used in the `fromHToG` reduction. -/
+theorem truncatedTypeSumRecurrence
+    (G : MIPStarRE.Quantum.Op ι)
+    (hGpsd : 0 ≤ G)
+    (hGleOne : G ≤ 1)
+    (d prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    (truncatedTypeSums G d prefixLen τtail)ᴴ = truncatedTypeSums G d prefixLen τtail ∧
+      0 ≤ truncatedTypeSums G d prefixLen τtail ∧
+      truncatedTypeSums G d prefixLen τtail ≤ 1 ∧
+      truncatedTypeSums G d (prefixLen + 1) τtail =
+        truncatedTypeSums G d prefixLen (prependTypeBit true τtail) * G +
+          truncatedTypeSums G d prefixLen (prependTypeBit false τtail) * (1 - G) := by
+  /-
+  Paper reference: `references/ldt-paper/ld-pasting.tex`,
+  `lem:truncated-type-sum-recurrence`.
+  The proof is the commuting-polynomial argument in `G` and `I - G`.
+  -/
+  sorry
+
 /-- `lem:chernoff-bernoulli-matrix`. -/
 lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
