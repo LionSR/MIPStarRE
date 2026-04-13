@@ -113,8 +113,8 @@ jobs:
               chore    — Dependency bumps, linting, toolchain updates
 
             Scope: shortened module path (omit MIPStarRE/ prefix).
-              Examples: LDT/Basic, LDT/SelfImprovement, Quantum, blueprint,
-                        LDT/Pasting, LDT/MainInductionStep
+              Examples: derived from the common path prefix of changed files,
+              e.g. `LDT/Soundness`, `blueprint`, etc.
 
             Rules:
             - If the current title already matches `type(scope): ...`, keep it as-is.
@@ -129,8 +129,7 @@ jobs:
               • CI changes → ci
               • Dependency bumps → chore
             - Keep the description concise (under ~60 chars after prefix).
-            - Strip ad-hoc brackets like [LDT follow-up], [Section 7], etc. —
-              fold that context into the scope instead.
+            - Strip ad-hoc brackets and fold that context into the scope instead.
             - If the title already includes `(#N)` issue ref suffix, keep it.
             - Use imperative mood ("add", not "added") per CONTRIBUTING.md §3.
 
@@ -175,8 +174,7 @@ jobs:
             - Fold `## Summary` / `## Test plan` content into the matching template
               sections, then remove those non-standard headings.
             - When filling in Motivation, reference the linked issue context if
-              available (e.g., "Continues formalization of LDT self-improvement
-              step, see #42").
+              available (e.g., "Continues formalization of Chapter 2 results, see #140").
 
             ─── STEP 5: APPLY LABELS ───
             Collect labels to apply (see docs/CONTRIBUTING.md §4 for full taxonomy):
@@ -186,13 +184,8 @@ jobs:
                  - Only `.yml` under `.github/` → add `ci`
                  - New `.lean` files with definitions → add `formalization`
               c. Infer topic labels from file paths if not already covered by
-                 issue labels:
-                 - `LDT/SelfImprovement/` → `self-improvement`
-                 - `LDT/Pasting/` → `pasting`
-                 - `LDT/MainInductionStep/` → `main-induction`
-                 - `LDT/Commutativity/` → `commutativity`
-                 - `LDT/ExpansionHypercubeGraph/` → `expansion-graph`
-                 - `Quantum/` → `quantum-foundations`
+                 issue labels. Only apply labels that already exist in the
+                 repository (check with `gh label list`).
 
             Apply with:
               `gh pr edit ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --add-label "label1,label2,..."`
