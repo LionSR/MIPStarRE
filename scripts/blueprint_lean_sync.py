@@ -44,10 +44,11 @@ _DIFF_HUNK_RE = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 
 _NAMESPACE_OPEN_RE = re.compile(r"^\s*namespace\s+([\w.]+)", re.MULTILINE)
 _SECTION_OPEN_RE = re.compile(
-    r"^\s*(?:(?:noncomputable|private|protected|local)\s+)*section\s+([\w.]+)",
+    r"^\s*(?:(?:noncomputable|private|protected|local)\s+)*section(?:\s+([\w.]+))?",
     re.MULTILINE,
 )
 _NAMESPACE_CLOSE_RE = re.compile(r"^\s*end\s+([\w.]+)", re.MULTILINE)
+_BARE_END_RE = re.compile(r"^\s*end\s*$", re.MULTILINE)
 
 _TEX_LEAN_RE = re.compile(r"\\lean\{([^}]+)\}")
 _TEX_LEANOK_RE = re.compile(r"\\leanok")
@@ -134,12 +135,21 @@ def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
 
         m = _SECTION_OPEN_RE.match(line)
         if m:
-            section_stack.append(m.group(1))
+            section_stack.append(m.group(1) or "")
+            continue
+
+        # Bare `end` (no name) pops the most recent section or namespace.
+        if _BARE_END_RE.match(line):
+            if section_stack:
+                section_stack.pop()
+            elif ns_stack:
+                ns_stack.pop()
             continue
 
         m = _NAMESPACE_CLOSE_RE.match(line)
         if m:
             closed = m.group(1)
+            # Pop anonymous sections that match nothing by name.
             if section_stack and section_stack[-1] == closed:
                 section_stack.pop()
                 continue

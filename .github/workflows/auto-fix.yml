@@ -296,8 +296,9 @@ jobs:
           token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Attach to PR branch
+        env:
+          BRANCH: ${{ needs.setup.outputs.head_branch }}
         run: |
-          BRANCH="${{ needs.setup.outputs.head_branch }}"
           git fetch origin "$BRANCH"
           git checkout -B "$BRANCH" "origin/$BRANCH"
           git branch --set-upstream-to="origin/$BRANCH" "$BRANCH"
