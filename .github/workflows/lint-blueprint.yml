@@ -5,10 +5,29 @@ on:
     branches:
       - main
     paths:
+      - '**.lean'
+      - 'lakefile.*'
+      - 'lean-toolchain'
+      - 'lake-manifest.json'
+      - '.github/actions/setup-lean/**'
+      - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
+      - 'scripts/blueprint_lean_sync.py'
   pull_request:
+    types: [opened, synchronize, reopened]
     paths:
+      - '**.lean'
+      - 'lakefile.*'
+      - 'lean-toolchain'
+      - 'lake-manifest.json'
+      - '.github/actions/setup-lean/**'
+      - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
+      - 'scripts/blueprint_lean_sync.py'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint-blueprint:
@@ -16,18 +35,17 @@ jobs:
     name: Check blueprint compiles without errors
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev
-
-      - name: Install leanblueprint
-        run: |
-          pip install leanblueprint
-          pip install plastex
+      - name: Set up Lean and blueprint tooling
+        uses: ./.github/actions/setup-lean
+        with:
+          install-blueprint: 'true'
 
       - name: Run leanblueprint web and check for errors
         working-directory: blueprint
@@ -51,3 +69,59 @@ jobs:
           if [ "$cmd_status" -ne 0 ]; then
             exit "$cmd_status"
           fi
+
+      - name: Build project (needed for checkdecls)
+        run: lake build
+
+      - name: Generate lean_decls from blueprint .tex files
+        run: python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
+
+      - name: Check blueprint and Lean source stay in sync
+        run: python3 scripts/blueprint_lean_sync.py --root . --ci
+
+      - name: Warn on changed Lean declarations missing blueprint entries
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import subprocess
+
+          base_ref = "origin/${{ github.event.pull_request.base.ref }}"
+
+          changed = subprocess.check_output(
+              [
+                  "git",
+                  "diff",
+                  "--merge-base",
+                  "--name-only",
+                  "--diff-filter=AMR",
+                  base_ref,
+                  "--",
+                  "MIPStarRE/**/*.lean",
+              ],
+              text=True,
+          )
+          changed_lean_files = [line for line in changed.splitlines() if line.endswith(".lean")]
+
+          if not changed_lean_files:
+              print("No changed MIPStarRE/*.lean files in this pull request.")
+              raise SystemExit(0)
+
+          subprocess.run(
+              [
+                  "python3",
+                  "scripts/blueprint_lean_sync.py",
+                  "--root",
+                  ".",
+                  "--warn-missing-blueprint",
+                  "--diff-base",
+                  base_ref,
+                  "--changed-files",
+                  *changed_lean_files,
+              ],
+              check=True,
+          )
+          PY
+
+      - name: Check blueprint Lean declarations
+        run: lake exe checkdecls blueprint/lean_decls
