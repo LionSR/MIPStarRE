@@ -68,12 +68,39 @@ private lemma sampledDiagonalLineConsistency
       (diagonalLineAnswerFamily strategy (lastRestrictionIndex params))
       (restrictedDiagonalLinesConsistencyError
         params gamma) := by
-  -- NOTE(#306): This sorry tracks a genuine proof gap introduced by
-  -- the test definition correction. The old proof used DiagonalTestSample
-  -- with unrestricted directions; the corrected definition uses
-  -- RestrictedDiagonalSample (restricted directions, base-point eval).
-  -- The proof structure needs rebuilding against the new types.
-  sorry
+  let j := lastRestrictionIndex params
+  let err : Fin params.m → Error := fun j =>
+    bipartiteConsError strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params j))
+      (diagonalPointAnswerFamily strategy j)
+      (diagonalLineAnswerFamily strategy j)
+  have herr_nonneg : ∀ j : Fin params.m, 0 ≤ err j := by
+    intro j'
+    exact bipartiteConsError_nonneg strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params j'))
+      (diagonalPointAnswerFamily strategy j')
+      (diagonalLineAnswerFamily strategy j')
+  have hsum_bound : ∑ j' : Fin params.m, err j' ≤ gamma * (params.m : Error) := by
+    have hm_nonneg : 0 ≤ (params.m : Error) := by
+      positivity
+    have hm_ne : (params.m : Error) ≠ 0 := by
+      exact_mod_cast Nat.ne_of_gt params.hm
+    have hdiag := hgood.diagonalLineTest
+    dsimp [SymStrat.diagonalFailureProbability, err] at hdiag
+    calc
+      ∑ j' : Fin params.m, err j'
+        = (params.m : Error) * ((1 / (params.m : Error)) * ∑ j' : Fin params.m, err j') := by
+            field_simp [hm_ne]
+      _ ≤ (params.m : Error) * gamma := by
+            exact mul_le_mul_of_nonneg_left hdiag hm_nonneg
+      _ = gamma * (params.m : Error) := by ring
+  have hj_le : err j ≤ gamma * (params.m : Error) := by
+    calc
+      err j ≤ ∑ j' : Fin params.m, err j' := by
+        exact Finset.single_le_sum (fun j' _ => herr_nonneg j') (Finset.mem_univ j)
+      _ ≤ gamma * (params.m : Error) := hsum_bound
+  refine ⟨?_⟩
+  simpa [j, err, restrictedDiagonalLinesConsistencyError] using hj_le
 
 /-- TODO(#306): SDD approximation transfer for the corrected restricted diagonal test.
 
@@ -96,12 +123,44 @@ private lemma sampledDiagonalLineApproximation
       (IdxSubMeas.liftRight
         (diagonalLineAnswerFamily strategy (lastRestrictionIndex params)))
       (pointDiagonalLineApproxError params gamma) := by
-  -- NOTE(#306): This sorry tracks a genuine proof gap introduced by
-  -- the test definition correction. The old proof used DiagonalTestSample
-  -- with unrestricted directions; the corrected definition uses
-  -- RestrictedDiagonalSample (restricted directions, base-point eval).
-  -- The proof structure needs rebuilding against the new types.
-  sorry
+  let j := lastRestrictionIndex params
+  let pointFamily : IdxMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+    fun s => (strategy.pointMeasurement s.1).toMeasurement
+  let lineFamily : IdxMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+    fun s =>
+      { toSubMeas := diagonalLineAnswerFamily strategy j s
+        total_eq_one := by
+          dsimp [diagonalLineAnswerFamily]
+          rw [postprocess_total]
+          exact
+            (strategy.diagonalMeasurement
+              { base := s.1
+                direction := extendRestrictedDirection j s.2 }).total_eq_one }
+  have hcons := sampledDiagonalLineConsistency params strategy eps delta gamma hgood
+  have hcons' :
+      ConsRel strategy.state
+        (uniformDistribution (RestrictedDiagonalSample params j))
+        (IdxMeas.toIdxSubMeas pointFamily)
+        (IdxMeas.toIdxSubMeas lineFamily)
+        (restrictedDiagonalLinesConsistencyError params gamma) := by
+    simpa [j, pointFamily, lineFamily, diagonalPointAnswerFamily,
+      diagonalLineAnswerFamily, IdxMeas.toIdxSubMeas] using hcons
+  have happrox :
+      Preliminaries.BipartiteSDDRel strategy.state
+        (uniformDistribution (RestrictedDiagonalSample params j))
+        (IdxMeas.toIdxSubMeas pointFamily)
+        (IdxMeas.toIdxSubMeas lineFamily)
+        (2 * restrictedDiagonalLinesConsistencyError params gamma) :=
+    Preliminaries.simeqToApprox strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params j))
+      pointFamily lineFamily
+      (restrictedDiagonalLinesConsistencyError params gamma) hcons'
+  refine ⟨?_⟩
+  simpa [j, pointFamily, lineFamily, diagonalPointAnswerFamily,
+    pointDiagonalLineApproxError, restrictedDiagonalLinesConsistencyError,
+    Preliminaries.BipartiteSDDRel, sddError, IdxMeas.toIdxSubMeas,
+    IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
+    happrox.leftRightSquaredDistanceBound
 
 /-- TODO(#306): Transport the corrected restricted diagonal approximation to
 the shared line-plus-parameter distribution used by the commutativity proof. -/
