@@ -114,6 +114,12 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
+  /-
+  The paper proof still requires the missing Section 3 assembly that turns
+  `hpass` and `hk` into a `MainFormalBridgePackage`: symmetrization,
+  application of the induction theorem, unsymmetrization, and the final
+  projectivization/completion transfer.
+  -/
   sorry
 
 end Test

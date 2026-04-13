@@ -187,7 +187,6 @@
 
 	\begin{lemma}\label{lem:trunc-inequality}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.truncationInequality}
-		\leanok
 		For any $x \in [0, 1]$,
 		\begin{equation*}
 			(x - \mathsf{trunc}_\delta(x))^2 \leq \frac{1}{\delta} \cdot (x - x^2).
@@ -218,7 +217,6 @@
 
 	\begin{lemma}[Rounding to projectors]\label{lem:projective-non-measurement}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement}
-		\leanok
 		There exists a set of projective matrices $\{R_a\}$ such that
 		\begin{equation*}
 			A_a \ot I \approx_{2\sqrt{\zeta}} R_a \ot I.
@@ -271,7 +269,6 @@
 
 	\begin{lemma}[Rank reduction]\label{lem:projective-low-rank-sum}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum}
-		\leanok
 		There exists a set of projection matrices $\{Q_a\}$ such that
 		\begin{equation*}
 			A_a \ot I \approx_{12\sqrt{\zeta}} Q_a \ot I.
@@ -365,7 +362,6 @@
 
 	\begin{lemma}[Completeness of~$Q$]\label{lem:Q-completeness}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qCompleteness}
-		\leanok
 		\begin{equation*}
 			\bra{\psi} Q \ot I \ket{\psi}
 			\geq
@@ -408,7 +404,6 @@
 
 	\begin{lemma}[Completeness of~$\sqrt{Q}$]\label{lem:sqrt-Q-completeness}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sqrtQCompleteness}
-		\leanok
 		\begin{equation*}
 			\bra{\psi} \sqrt{Q} \ot I \ket{\psi}
 			\geq
@@ -441,7 +436,6 @@
 
 	\begin{lemma}[$Q$ is almost projective]\label{lem:q-almost-projective}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qAlmostProjective}
-		\leanok
 		\begin{equation*}
 			\sum_a (Q_a \cdot Q \cdot Q_a - Q_a) \leq 4\sqrt{\zeta} \cdot I.
 		\end{equation*}
@@ -468,6 +462,7 @@
 	\begin{definition}[Matrix decomposition of~$Q_a$]\label{def:matrix-decomposition-Q}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ}
 		\leanok
+		\uses{lem:projective-low-rank-sum}
 		For each $a$, let
 		\[
 			m_a = \mathrm{rank}(Q_a),
@@ -497,6 +492,7 @@
 	\begin{definition}[SVD of~$X$]\label{def:svd-of-X}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX}
 		\leanok
+		\uses{def:matrix-decomposition-Q}
 		Let
 		\[
 			X = U \cdot \Sigma_{m \times d} \cdot V^\dagger
@@ -525,6 +521,7 @@
 	\begin{definition}[Definition of~$P$]\label{def:projective-P}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveP}
 		\leanok
+		\uses{def:matrix-decomposition-Q, def:svd-of-X}
 		Define
 		\[
 			\widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger.
@@ -539,7 +536,6 @@
 
 	\begin{lemma}\label{lem:xa-t}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xa_t}
-		\leanok
 		For each $a$,
 		\[
 			X_a = T_a \cdot X.
@@ -659,7 +655,6 @@
 
 	\begin{lemma}[$P_a$ restated]\label{lem:pa-restated}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.paRestated}
-		\leanok
 		For each $a$,
 		\begin{equation*}
 			P_a = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.

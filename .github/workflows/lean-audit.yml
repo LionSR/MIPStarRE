@@ -28,16 +28,9 @@ jobs:
           fetch-depth: 1
 
       - name: Set up Lean toolchain and cache
-        uses: leanprover/lean-action@v1
+        uses: ./.github/actions/setup-lean
         with:
-          use-mathlib-cache: true
-          build: false
-
-      - name: Install graphviz headers (needed by pygraphviz)
-        run: sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev
-
-      - name: Install leanblueprint
-        run: pipx install leanblueprint
+          install-blueprint: 'true'
 
       - name: Run Lean Audit
         uses: anthropics/claude-code-action@v1
@@ -52,9 +45,9 @@ jobs:
 
             ${{ github.event.inputs.audit_type == 'blueprint-check' && 'Task: Compare the blueprint/ directory (look for .tex files listing theorems/lemmas to formalize) against the MIPStarRE/ directory. Report: (1) which blueprint items are fully formalized (no sorry), (2) which are partially formalized (have sorry), (3) which are missing entirely. Output a markdown progress report with percentages.' || '' }}
 
-            ${{ github.event.inputs.audit_type == 'mathlib-readiness' && 'Task: Review the MIPStarRE/ directory for lemmas that could be upstreamed to Mathlib. Look for: (1) general-purpose lemmas not specific to the LDT/quantum complexity domain, (2) lemmas that fill gaps in existing Mathlib files (check import paths), (3) well-documented, sorry-free results. For each candidate, note the file, lemma name, and which Mathlib module it could belong to. Output a markdown list.' || '' }}
+            ${{ github.event.inputs.audit_type == 'mathlib-readiness' && 'Task: Review the MIPStarRE/ directory for lemmas that could be upstreamed to Mathlib. Look for: (1) general-purpose lemmas not specific to the MIP* = RE / LDT domain, (2) lemmas that fill gaps in existing Mathlib files (check import paths), (3) well-documented, sorry-free results. For each candidate, note the file, lemma name, and which Mathlib module it could belong to. Output a markdown list.' || '' }}
 
           claude_args: |
             --model claude-opus-4-6
             --allowedTools "Read,Glob,Grep,Bash(lake build),Bash(lake exe cache get),Bash(lake update),Bash(lake env),Bash(lean *),Bash(elan *),Bash(grep *),Bash(find *),Bash(wc *),Bash(leanblueprint *)"
-            --append-system-prompt "This is a Lean 4 / Mathlib formalization project for MIP* = RE (quantum complexity theory). Be thorough and precise. Report findings in clean markdown format."
+            --append-system-prompt "This is a Lean 4 / Mathlib formalization project for quantum complexity theory (MIP* = RE, low-degree tests). Be thorough and precise. Report findings in clean markdown format."
