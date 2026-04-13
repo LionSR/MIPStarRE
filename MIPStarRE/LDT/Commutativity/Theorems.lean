@@ -1807,7 +1807,15 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
   `eq:evaluate-gcom-at-points` to `eq:evaluate-gcom-at-points-part-dos`
   and the final displayed error estimate.
 
-  ## Proof strategy
+  ## WLOG small-parameter regime
+
+  The paper (lines 260–276) first handles the trivial case: when any of
+  `γ`, `ζ`, or `d/q` is `≥ 1`, then `comMainError ≥ 30m ≥ 30` (since
+  `m ≥ 1`), while `sddErrorOp ≤ 4` by the triangle inequality for
+  vectors and the sub-measurement bound.  Hence we may assume all three
+  are `≤ 1`, which is used in the error arithmetic (Step 2).
+
+  ## Proof strategy (small-parameter case)
 
   The full-product SDD expands via quartic trace terms as
     `SDD = 2 * (ABA_avg - ABAB_avg)`
@@ -1844,53 +1852,71 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
     `12√ζ + 4md/q + 2√(commDataProcessedGError)`
   which simplifies to `≤ comMainError` by real-analysis arithmetic.
   -/
-  -- Step 1: The Schwartz-Zippel transport.
-  -- Bound the full-product sddErrorOp by corrections from:
-  -- (a) Two Schwartz-Zippel marginalizations (each ≤ md/q)
-  -- (b) Multiple closenessOfIP applications (each ≤ √ζ)
-  -- (c) The evaluated commutation via closenessOfIP
-  --     (≤ √(commDataProcessedGError))
-  -- giving total ≤ 12√ζ + 4md/q + 2√(commDataProcessedGError).
-  --
-  -- Proof sketch for this step:
-  -- * Expand qSDDOp into quartic trace terms (BAB + ABA - BABA - ABAB)
-  --   using projectivity of family.meas
-  -- * Use BAB = ABA and BABA = ABAB symmetry (swap x↔y, g↔h)
-  -- * For each of ABA and ABAB, apply the marginalization chain
-  --   described above to relate full-polynomial sums to evaluated sums
-  -- * Use submeasurement bounds (Σ_g G^x_g ≤ I) to control quartic
-  --   terms: ABA ≤ 1 by sandwichByOuterSubMeas.total_le_one
-  -- * The ABAB term ≥ 1 - ε is shown via the chain, using hEval
-  --   through closenessOfIP to obtain √(commDataProcessedGError)
-  have hTransport :
-      sddErrorOp strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q => fullSliceProductLeft params strategy family
-          (fullSliceQuestionOfEvaluatedSlice params q))
-        (fun q => fullSliceProductRight params strategy family
-          (fullSliceQuestionOfEvaluatedSlice params q)) ≤
-      12 * Real.sqrt zeta +
-        4 * (↑params.m * ↑params.d / ↑params.q) +
-        2 * Real.sqrt
-          (commDataProcessedGError params gamma zeta) := by
+  -- WLOG: reduce to the small-parameter regime (paper lines 260–276).
+  -- When max(γ, ζ, d/q) ≥ 1, comMainError ≥ 30m ≥ 30 while
+  -- sddErrorOp ≤ 4 by the sub-measurement bound, so the inequality
+  -- holds trivially.
+  by_cases hsmall :
+      gamma ≤ 1 ∧ zeta ≤ 1 ∧
+        (↑params.d : Error) / (↑params.q : Error) ≤ 1
+  · -- Small-parameter case: γ, ζ, d/q ≤ 1.
+    obtain ⟨hgamma_le, hzeta_le, hdq_le⟩ := hsmall
+    -- Step 1: The Schwartz-Zippel transport.
+    -- Bound the full-product sddErrorOp by corrections from:
+    -- (a) Two Schwartz-Zippel marginalizations (each ≤ md/q)
+    -- (b) Multiple closenessOfIP applications (each ≤ √ζ)
+    -- (c) The evaluated commutation via closenessOfIP
+    --     (≤ √(commDataProcessedGError))
+    -- giving total ≤ 12√ζ + 4md/q + 2√(commDataProcessedGError).
+    --
+    -- Proof sketch:
+    -- * Expand qSDDOp into quartic trace terms
+    --   (BAB + ABA - BABA - ABAB) using projectivity
+    -- * Use BAB = ABA and BABA = ABAB symmetry (swap x↔y, g↔h)
+    -- * For each of ABA and ABAB, apply the marginalization chain
+    --   to relate full-polynomial sums to evaluated sums
+    -- * Use submeasurement bounds (Σ_g G^x_g ≤ I) to control
+    --   quartic terms: ABA ≤ 1
+    -- * The ABAB term uses hEval through closenessOfIP to obtain
+    --   √(commDataProcessedGError)
+    have hTransport :
+        sddErrorOp strategy.state
+          (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => fullSliceProductLeft params strategy family
+            (fullSliceQuestionOfEvaluatedSlice params q))
+          (fun q => fullSliceProductRight params strategy family
+            (fullSliceQuestionOfEvaluatedSlice params q)) ≤
+        12 * Real.sqrt zeta +
+          4 * (↑params.m * ↑params.d / ↑params.q) +
+          2 * Real.sqrt
+            (commDataProcessedGError params gamma zeta) := by
+      sorry
+    -- Step 2: Error arithmetic (using small-parameter hypotheses).
+    -- Show:
+    --   12√ζ + 4md/q + 2√(48m(√γ + √ζ))
+    --     ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
+    --
+    -- Key estimates (all require γ, ζ, d/q ≤ 1):
+    -- * 2√(48m(√γ + √ζ)) ≤ 2√(48m)(γ^¼ + ζ^¼) ≤ 14m(γ^¼ + ζ^¼)
+    --   using √(a+b) ≤ √a + √b and √m ≤ m (for m ≥ 1)
+    -- * 12√ζ ≤ 12ζ^¼ ≤ 12m·ζ^¼ (ζ ≤ 1 ⇒ ζ^½ ≤ ζ^¼; m ≥ 1)
+    -- * 4md/q ≤ 4m(d/q)^¼ (d/q ≤ 1 ⇒ x ≤ x^¼)
+    -- * Total: 14m·γ^¼ + 26m·ζ^¼ + 4m·(d/q)^¼
+    --         ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
+    have hArith :
+        12 * Real.sqrt zeta +
+          4 * (↑params.m * ↑params.d / ↑params.q) +
+          2 * Real.sqrt
+            (commDataProcessedGError params gamma zeta) ≤
+        comMainError params gamma zeta := by
+      sorry
+    exact ⟨le_trans hTransport hArith⟩
+  · -- Large-parameter case: max(γ, ζ, d/q) > 1.
+    -- The bound is trivial: sddErrorOp ≤ 4 (by the triangle
+    -- inequality for vectors and the sub-measurement property;
+    -- paper lines 263–271), while comMainError ≥ 30m ≥ 30 > 4
+    -- (since rpow x (1/4) ≥ 1 when x ≥ 1, and m ≥ 1).
     sorry
-  -- Step 2: Error arithmetic.
-  -- Show: 12√ζ + 4md/q + 2√(48m(√γ + √ζ)) ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
-  --
-  -- Key estimates:
-  -- * 2√(48m(√γ + √ζ)) ≤ 2√(48m)(γ^¼ + ζ^¼) ≤ 14m(γ^¼ + ζ^¼)
-  --   using √(a+b) ≤ √a + √b and √m ≤ m (for m ≥ 1)
-  -- * 12√ζ ≤ 12ζ^¼ ≤ 12m·ζ^¼ (for ζ ≤ 1, m ≥ 1)
-  -- * 4md/q ≤ 4m(d/q)^¼ (for d/q ≤ 1, since x ≤ x^¼)
-  -- * Total ≤ 14m·γ^¼ + 26m·ζ^¼ + 4m·(d/q)^¼ ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
-  have hArith :
-      12 * Real.sqrt zeta +
-        4 * (↑params.m * ↑params.d / ↑params.q) +
-        2 * Real.sqrt
-          (commDataProcessedGError params gamma zeta) ≤
-      comMainError params gamma zeta := by
-    sorry
-  exact ⟨le_trans hTransport hArith⟩
 
 /-- The remaining `thm:com-main` lift from evaluated commutation back to
 full-slice commutation.
