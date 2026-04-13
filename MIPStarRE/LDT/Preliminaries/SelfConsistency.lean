@@ -72,6 +72,7 @@ theorem completionMissingMassBound {Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (hperm : PermInvState ψ)
+    (hψ : ψ.IsNormalized)
     (A : Measurement Outcome ι) (B : SubMeas Outcome ι)
     (δ ζ : Error)
     (hssc : BipartiteSSCRel ψ (uniformDistribution Unit)
@@ -83,14 +84,67 @@ theorem completionMissingMassBound {Outcome : Type*}
       (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
         ((1 : MIPStarRE.Quantum.Op ι) - B.total))) ≤
       2 * Real.sqrt δ + ζ := by
-  /-
-  Paper reference: `references/ldt-paper/preliminaries.tex`,
-  `lem:completion-missing-mass-bound`.
-  The existing local lemmas `bipartiteSSCSquaredMass`,
-  `completion_self_distance`, and `easyApproxFromApproxDelta` provide the
-  ingredients; the final source-style wrapper is still pending.
-  -/
-  sorry
+  have hδ : qSDD ψ A.toSubMeas.liftLeft B.liftLeft ≤ δ := by
+    simpa [constFamily_sdd_unit] using hclose.squaredDistanceBound
+  let diagA : Error :=
+    ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a * A.outcome a))
+  let diagB : Error :=
+    ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (B.outcome a * B.outcome a))
+  let overlap : Error :=
+    ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a * B.outcome a))
+  have hdiagA_lb : 1 - ζ ≤ diagA := by
+    have hsq := bipartiteSSCSquaredMass ψ hperm A.toSubMeas ζ hssc
+    have hmassA : ev ψ (leftTensor (ι₂ := ι) A.total) = 1 := by
+      simpa [A.total_eq_one, leftTensor] using ev_one_of_isNormalized ψ hψ
+    linarith
+  have hgapA_raw :
+      |diagA - overlap| ≤ Real.sqrt (qSDD ψ A.toSubMeas.liftLeft B.liftLeft) := by
+    simpa [diagA, overlap, SubMeas.liftLeft, leftTensor_mul_leftTensor] using
+      question_overlap_gap_left ψ hψ A.toSubMeas.liftLeft B.liftLeft
+  have hgapA : diagA - overlap ≤ Real.sqrt δ := by
+    exact le_trans (abs_le.mp hgapA_raw).2 (Real.sqrt_le_sqrt hδ)
+  have hgapB_raw :
+      |overlap - diagB| ≤ Real.sqrt (qSDD ψ A.toSubMeas.liftLeft B.liftLeft) := by
+    simpa [diagB, overlap, SubMeas.liftLeft, leftTensor_mul_leftTensor] using
+      question_overlap_gap_right ψ hψ A.toSubMeas.liftLeft B.liftLeft
+  have hgapB : overlap - diagB ≤ Real.sqrt δ := by
+    exact le_trans (abs_le.mp hgapB_raw).2 (Real.sqrt_le_sqrt hδ)
+  have hdiagB_lb : 1 - ζ - 2 * Real.sqrt δ ≤ diagB := by
+    linarith
+  let R : MIPStarRE.Quantum.Op ι := (1 : MIPStarRE.Quantum.Op ι) - B.total
+  let RL : MIPStarRE.Quantum.Op (ι × ι) := leftTensor (ι₂ := ι) R
+  have hdiagB_le_mass : diagB ≤ ev ψ (leftTensor (ι₂ := ι) B.total) := by
+    simpa [diagB, subMeasMass, SubMeas.liftLeft, leftTensor_mul_leftTensor] using
+      subMeas_diagMass_le_mass ψ B.liftLeft
+  have hRL_nonneg : 0 ≤ RL := by
+    dsimp [RL, R]
+    exact leftTensor_nonneg (ι₂ := ι) (sub_nonneg.mpr B.total_le_one)
+  have hRL_le_one : RL ≤ 1 := by
+    dsimp [RL, R]
+    exact leftTensor_le_one (ι₂ := ι)
+      (sub_le_self (1 : MIPStarRE.Quantum.Op ι) B.total_nonneg)
+  have hRL_sq_le : RL * RL ≤ RL := by
+    exact MIPStarRE.Quantum.sq_le_self hRL_nonneg hRL_le_one
+  have hRL_rewrite : RL = 1 - leftTensor (ι₂ := ι) B.total := by
+    dsimp [RL, R]
+    ext i j
+    rcases i with ⟨i₁, i₂⟩
+    rcases j with ⟨j₁, j₂⟩
+    by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
+      simp [leftTensor, h₁, h₂, sub_eq_add_neg, add_comm]
+  have hRL_ev : ev ψ RL ≤ 2 * Real.sqrt δ + ζ := by
+    have hRL_eq : ev ψ RL = 1 - ev ψ (leftTensor (ι₂ := ι) B.total) := by
+      rw [hRL_rewrite, ev_sub]
+      simp [ev_one_of_isNormalized ψ hψ]
+    linarith
+  calc
+    ev ψ (leftTensor (ι₂ := ι)
+        (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
+          ((1 : MIPStarRE.Quantum.Op ι) - B.total)))
+      = ev ψ (RL * RL) := by
+          simp [RL, R, leftTensor_mul_leftTensor]
+    _ ≤ ev ψ RL := ev_mono ψ _ _ hRL_sq_le
+    _ ≤ 2 * Real.sqrt δ + ζ := hRL_ev
 
 /-- `prop:other-two-notions-of-self-consistency`.
 
