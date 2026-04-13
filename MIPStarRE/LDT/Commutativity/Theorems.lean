@@ -1778,6 +1778,8 @@ private lemma sddOpRel_of_pullback_fullSliceQuestion
   rw [← sddErrorOp_pullback_fullSliceQuestion_eq params ψ A B]
   exact h
 
+-- Heavy sqrt/rpow arithmetic in hArith step.
+set_option maxHeartbeats 800000 in
 /-- Core Schwartz-Zippel transport on the evaluated-question space.
 
 This is the substantive remaining step: compare the full polynomial outcomes
@@ -1787,6 +1789,7 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
     (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (hEval :
       SDDOpRel strategy.state
@@ -1806,8 +1809,268 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
   theorem `thm:com-main`, especially the passage from
   `eq:evaluate-gcom-at-points` to `eq:evaluate-gcom-at-points-part-dos`
   and the final displayed error estimate.
+
+  ## WLOG small-parameter regime
+
+  The paper (lines 260–276) first handles the trivial case: when any of
+  `γ`, `ζ`, or `d/q` is `≥ 1`, then `comMainError ≥ 30m ≥ 30` (since
+  `m ≥ 1`), while `sddErrorOp ≤ 4` by the triangle inequality for
+  vectors and the sub-measurement bound.  Hence we may assume all three
+  are `≤ 1`, which is used in the error arithmetic (Step 2).
+
+  ## Proof strategy (small-parameter case)
+
+  The full-product SDD expands via quartic trace terms as
+    `SDD = 2 * (ABA_avg - ABAB_avg)`
+  where:
+    `ABA_avg  = E_q Σ_{g,h} ev(G^x_g G^y_h G^x_g ⊗ I)`
+    `ABAB_avg = E_q Σ_{g,h} ev(G^x_g G^y_h G^x_g G^y_h ⊗ I)`
+  with `(x,y) = fullSliceQuestionOfEvaluatedSlice q`.
+
+  The key argument relates full polynomial sums to evaluated indicator
+  sums via two applications of the Schwartz-Zippel lemma
+  (`schwartzZippel_individualDegree`):
+
+  1. **First Schwartz-Zippel marginalization** (error `md/q`):
+     Replace `Σ_g` by `E_u Σ_a` where `a = g(u)`. For distinct
+     polynomials `g ≠ g'` of individual degree `d`, the cross terms
+     satisfy `Pr_u[g(u) = g'(u)] ≤ md/q`.
+
+  2. **First closenessOfIP** (error `√ζ`):
+     Swap `G^y_h ⊗ I` to `I ⊗ G^y_h` using slice strong
+     self-consistency `_hself`.
+
+  3. **Second Schwartz-Zippel marginalization** (error `md/q`):
+     Replace `Σ_h` by `E_v Σ_b` where `b = h(v)`.
+
+  4. **closenessOfIP with evaluated commutation** (error
+     `√(commDataProcessedGError)`):
+     Use `hEval` through `closenessOfIP` to bound the evaluated
+     commutation, contributing `√(commDataProcessedGError)`.
+
+  5. **Return closenessOfIP steps** (error `√ζ` each):
+     Swap back tensor placements.
+
+  Total error (doubled for both halves of the commutator):
+    `12√ζ + 4md/q + 2√(commDataProcessedGError)`
+  which simplifies to `≤ comMainError` by real-analysis arithmetic.
   -/
-  sorry
+  -- WLOG: reduce to the small-parameter regime (paper lines 260–276).
+  -- When max(γ, ζ, d/q) ≥ 1, comMainError ≥ 30m ≥ 30 while
+  -- sddErrorOp ≤ 4 by the sub-measurement bound, so the inequality
+  -- holds trivially.
+  by_cases hsmall :
+      gamma ≤ 1 ∧ zeta ≤ 1 ∧
+        (↑params.d : Error) / (↑params.q : Error) ≤ 1
+  · -- Small-parameter case: γ, ζ, d/q ≤ 1.
+    obtain ⟨hgamma_le, hzeta_le, hdq_le⟩ := hsmall
+    -- Step 1: The Schwartz-Zippel transport.
+    -- Bound the full-product sddErrorOp by corrections from:
+    -- (a) Two Schwartz-Zippel marginalizations (each ≤ md/q)
+    -- (b) Multiple closenessOfIP applications (each ≤ √ζ)
+    -- (c) The evaluated commutation via closenessOfIP
+    --     (≤ √(commDataProcessedGError))
+    -- giving total ≤ 12√ζ + 4md/q + 2√(commDataProcessedGError).
+    --
+    -- Proof sketch:
+    -- * Expand qSDDOp into quartic trace terms
+    --   (BAB + ABA - BABA - ABAB) using projectivity
+    -- * Use BAB = ABA and BABA = ABAB symmetry (swap x↔y, g↔h)
+    -- * For each of ABA and ABAB, apply the marginalization chain
+    --   to relate full-polynomial sums to evaluated sums
+    -- * Use submeasurement bounds (Σ_g G^x_g ≤ I) to control
+    --   quartic terms: ABA ≤ 1
+    -- * The ABAB term uses hEval through closenessOfIP to obtain
+    --   √(commDataProcessedGError)
+    have hTransport :
+        sddErrorOp strategy.state
+          (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => fullSliceProductLeft params strategy family
+            (fullSliceQuestionOfEvaluatedSlice params q))
+          (fun q => fullSliceProductRight params strategy family
+            (fullSliceQuestionOfEvaluatedSlice params q)) ≤
+        12 * Real.sqrt zeta +
+          4 * (↑params.m * ↑params.d / ↑params.q) +
+          2 * Real.sqrt
+            (commDataProcessedGError params gamma zeta) := by
+      sorry
+    -- Step 2: Error arithmetic (using small-parameter hypotheses).
+    -- Show:
+    --   12√ζ + 4md/q + 2√(48m(√γ + √ζ))
+    --     ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
+    --
+    -- Key estimates (all require γ, ζ, d/q ≤ 1):
+    -- * 2√(48m(√γ + √ζ)) ≤ 2√(48m)(γ^¼ + ζ^¼) ≤ 14m(γ^¼ + ζ^¼)
+    --   using √(a+b) ≤ √a + √b and √m ≤ m (for m ≥ 1)
+    -- * 12√ζ ≤ 12ζ^¼ ≤ 12m·ζ^¼ (ζ ≤ 1 ⇒ ζ^½ ≤ ζ^¼; m ≥ 1)
+    -- * 4md/q ≤ 4m(d/q)^¼ (d/q ≤ 1 ⇒ x ≤ x^¼)
+    -- * Total: 14m·γ^¼ + 26m·ζ^¼ + 4m·(d/q)^¼
+    --         ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
+    have hArith :
+        12 * Real.sqrt zeta +
+          4 * (↑params.m * ↑params.d / ↑params.q) +
+          2 * Real.sqrt
+            (commDataProcessedGError params gamma zeta) ≤
+        comMainError params gamma zeta := by
+      unfold commDataProcessedGError comMainError
+      -- Useful numerical facts
+      have hm_ge : (1 : Error) ≤ (params.m : Error) :=
+        Nat.one_le_cast.mpr (Nat.succ_le_of_lt params.hm)
+      have hq_pos : (0 : Error) < ↑params.q :=
+        Nat.cast_pos.mpr params.hq
+      have hdq_nn : 0 ≤ (↑params.d : Error) / ↑params.q :=
+        div_nonneg (Nat.cast_nonneg _) hq_pos.le
+      have hg4 : 0 ≤ Real.rpow gamma (1 / (4 : Error)) :=
+        Real.rpow_nonneg hgamma_nonneg _
+      have hz4 : 0 ≤ Real.rpow zeta (1 / (4 : Error)) :=
+        Real.rpow_nonneg hzeta_nonneg _
+      have hdq4 : 0 ≤ Real.rpow
+          ((↑params.d : Error) / ↑params.q) (1 / (4 : Error)) :=
+        Real.rpow_nonneg hdq_nn _
+      -- Step 1: sqrt ζ ≤ ζ^(1/4)
+      have h_sqrt_z : Real.sqrt zeta ≤
+          Real.rpow zeta (1 / (4 : Error)) := by
+        rw [Real.sqrt_eq_rpow]
+        exact Real.rpow_le_rpow_of_exponent_ge'
+          hzeta_nonneg hzeta_le (by norm_num) (by norm_num)
+      -- Step 2: d/q ≤ (d/q)^(1/4)
+      have h_dq : (↑params.d : Error) / ↑params.q ≤
+          Real.rpow ((↑params.d : Error) / ↑params.q)
+            (1 / (4 : Error)) := by
+        conv_lhs =>
+          rw [show (↑params.d : Error) / ↑params.q =
+            Real.rpow ((↑params.d : Error) / ↑params.q) 1
+            from (Real.rpow_one _).symm]
+        exact Real.rpow_le_rpow_of_exponent_ge'
+          hdq_nn hdq_le (by norm_num) (by norm_num)
+      -- Step 3: (γ^(1/4))² = γ^(1/2) and (ζ^(1/4))² = ζ^(1/2)
+      have hg4_sq :
+          (Real.rpow gamma (1 / (4 : Error))) ^ (2 : ℕ) =
+            Real.rpow gamma (1 / (2 : Error)) := by
+        calc (Real.rpow gamma (1 / (4 : Error))) ^ (2 : ℕ)
+            = (Real.rpow gamma (1 / (4 : Error))) ^
+                (2 : Error) := by norm_num
+          _ = Real.rpow gamma
+                (1 / (4 : Error) * 2) := by
+              symm; exact Real.rpow_mul hgamma_nonneg _ _
+          _ = Real.rpow gamma
+                (1 / (2 : Error)) := by norm_num
+      have hz4_sq :
+          (Real.rpow zeta (1 / (4 : Error))) ^ (2 : ℕ) =
+            Real.rpow zeta (1 / (2 : Error)) := by
+        calc (Real.rpow zeta (1 / (4 : Error))) ^ (2 : ℕ)
+            = (Real.rpow zeta (1 / (4 : Error))) ^
+                (2 : Error) := by norm_num
+          _ = Real.rpow zeta
+                (1 / (4 : Error) * 2) := by
+              symm; exact Real.rpow_mul hzeta_nonneg _ _
+          _ = Real.rpow zeta
+                (1 / (2 : Error)) := by norm_num
+      -- Step 4: √(48m(γ^½+ζ^½)) ≤ √(48m)·(γ^¼+ζ^¼)
+      -- Using γ^½ = (γ^¼)² and a²+b² ≤ (a+b)²
+      have hsqrt_cdpg :
+          Real.sqrt (48 * ↑params.m *
+            (Real.rpow gamma (1 / (2 : Error)) +
+              Real.rpow zeta (1 / (2 : Error)))) ≤
+          Real.sqrt (48 * ↑params.m) *
+            (Real.rpow gamma (1 / (4 : Error)) +
+              Real.rpow zeta (1 / (4 : Error))) := by
+        rw [← hg4_sq, ← hz4_sq]
+        have hsq_le :
+            (Real.rpow gamma (1 / (4 : Error))) ^ (2 : ℕ) +
+              (Real.rpow zeta (1 / (4 : Error))) ^ (2 : ℕ) ≤
+            (Real.rpow gamma (1 / (4 : Error)) +
+              Real.rpow zeta (1 / (4 : Error))) ^
+                (2 : ℕ) := by
+          nlinarith [hg4, hz4]
+        calc Real.sqrt (48 * ↑params.m *
+              ((Real.rpow gamma (1 / (4 : Error))) ^
+                  (2 : ℕ) +
+                (Real.rpow zeta (1 / (4 : Error))) ^
+                  (2 : ℕ)))
+            ≤ Real.sqrt (48 * ↑params.m *
+                (Real.rpow gamma (1 / (4 : Error)) +
+                  Real.rpow zeta
+                    (1 / (4 : Error))) ^ (2 : ℕ)) := by
+              apply Real.sqrt_le_sqrt
+              exact mul_le_mul_of_nonneg_left hsq_le
+                (by positivity)
+          _ = Real.sqrt (48 * ↑params.m) *
+                Real.sqrt
+                  ((Real.rpow gamma (1 / (4 : Error)) +
+                    Real.rpow zeta
+                      (1 / (4 : Error))) ^
+                    (2 : ℕ)) := by
+              rw [Real.sqrt_mul (by positivity)]
+          _ = Real.sqrt (48 * ↑params.m) *
+                (Real.rpow gamma (1 / (4 : Error)) +
+                  Real.rpow zeta
+                    (1 / (4 : Error))) := by
+              rw [Real.sqrt_sq (by linarith)]
+      -- Step 5: 2·√(48m) ≤ 14m (since 192m ≤ 196m²
+      --   for m ≥ 1)
+      have hsqrt_48m :
+          Real.sqrt (48 * ↑params.m) ≤
+            7 * ↑params.m := by
+        rw [show 7 * (↑params.m : Error) =
+          Real.sqrt ((7 * ↑params.m) ^ 2) from
+          (Real.sqrt_sq (by linarith)).symm]
+        apply Real.sqrt_le_sqrt
+        nlinarith [hm_ge]
+      -- Combine the three parts
+      have hA : 12 * Real.sqrt zeta ≤
+          12 * ↑params.m *
+            Real.rpow zeta (1 / (4 : Error)) := by
+        nlinarith [h_sqrt_z, hm_ge, hz4]
+      have hB :
+          4 * (↑params.m * ↑params.d / ↑params.q) ≤
+          4 * ↑params.m * Real.rpow
+            ((↑params.d : Error) / ↑params.q)
+            (1 / (4 : Error)) := by
+        have hrw :
+            ↑params.m * ↑params.d / ↑params.q =
+              ↑params.m *
+                ((↑params.d : Error) / ↑params.q) := by
+          ring
+        rw [hrw]
+        nlinarith [h_dq, hm_ge, hdq4]
+      have hC :
+          2 * Real.sqrt (48 * ↑params.m *
+            (Real.rpow gamma (1 / (2 : Error)) +
+              Real.rpow zeta (1 / (2 : Error)))) ≤
+          14 * ↑params.m *
+            (Real.rpow gamma (1 / (4 : Error)) +
+              Real.rpow zeta
+                (1 / (4 : Error))) := by
+        calc 2 * Real.sqrt (48 * ↑params.m *
+              (Real.rpow gamma (1 / (2 : Error)) +
+                Real.rpow zeta (1 / (2 : Error))))
+            ≤ 2 * (Real.sqrt (48 * ↑params.m) *
+                (Real.rpow gamma (1 / (4 : Error)) +
+                  Real.rpow zeta
+                    (1 / (4 : Error)))) :=
+              mul_le_mul_of_nonneg_left hsqrt_cdpg
+                (by norm_num)
+          _ = 2 * Real.sqrt (48 * ↑params.m) *
+                (Real.rpow gamma (1 / (4 : Error)) +
+                  Real.rpow zeta
+                    (1 / (4 : Error))) := by ring
+          _ ≤ 14 * ↑params.m *
+                (Real.rpow gamma (1 / (4 : Error)) +
+                  Real.rpow zeta
+                    (1 / (4 : Error))) := by
+              exact mul_le_mul_of_nonneg_right
+                (by linarith [hsqrt_48m])
+                (by linarith)
+      -- 14m·g4 + 26m·z4 + 4m·dq4 ≤ 30m·(g4+z4+dq4)
+      nlinarith [hA, hB, hC, hg4, hz4, hdq4, hm_ge]
+    exact ⟨le_trans hTransport hArith⟩
+  · -- Large-parameter case: max(γ, ζ, d/q) > 1.
+    -- The bound is trivial: sddErrorOp ≤ 4 (by the triangle
+    -- inequality for vectors and the sub-measurement property;
+    -- paper lines 263–271), while comMainError ≥ 30m ≥ 30 > 4
+    -- (since rpow x (1/4) ≥ 1 when x ≥ 1, and m ≥ 1).
+    sorry
 
 /-- The remaining `thm:com-main` lift from evaluated commutation back to
 full-slice commutation.
@@ -1821,6 +2084,7 @@ private lemma fullSliceCommutation_of_evaluated
     (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (hEval :
       SDDOpRel strategy.state
@@ -1839,7 +2103,8 @@ private lemma fullSliceCommutation_of_evaluated
       (fullSliceProductRight params strategy family)
       (comMainError params gamma zeta)
       (fullSliceCommutation_of_evaluated_on_evaluated_questions
-        params strategy family gamma zeta _hself hEval)
+        params strategy family gamma zeta
+        hgamma_nonneg hzeta_nonneg _hself hEval)
 
 /-- `thm:com-main`. -/
 theorem comMain
@@ -1868,13 +2133,25 @@ theorem comMain
     constructor
     rw [evaluationSpecialization_sddErrorOp_eq]
     exact hEval.evaluatedSliceCommutation.squaredDistanceBound
+  have hzeta_nonneg : 0 ≤ zeta :=
+    le_trans (sddError_nonneg _ _ _ _)
+      hself.sliceSelfConsistency.squaredDistanceBound
+  have hgamma_nonneg : 0 ≤ gamma := by
+    have : 0 ≤ strategy.diagonalFailureProbability := by
+      unfold SymStrat.diagonalFailureProbability
+      exact mul_nonneg (by positivity)
+        (Finset.sum_nonneg fun j _ =>
+          bipartiteConsError_nonneg strategy.state _ _ _)
+    exact le_trans this hgood.diagonalLineTest
   refine
     { evaluatedCommutation := hEval
       evaluationSpecialization := hSpecialized
       fullSliceCommutation := by
         exact
           fullSliceCommutation_of_evaluated
-            params strategy family gamma zeta hself hSpecialized }
+            params strategy family gamma zeta
+            hgamma_nonneg hzeta_nonneg
+            hself hSpecialized }
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}
