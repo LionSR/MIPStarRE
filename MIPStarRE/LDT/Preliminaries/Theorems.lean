@@ -3836,4 +3836,29 @@ lemma sddOpRel_mono
   intro ⟨h⟩ hle
   exact ⟨le_trans h hle⟩
 
+/-- n-step SDDOpRel chain lemma via vector Cauchy-Schwarz.
+
+Given `n` consecutive SDDOpRel bounds, the endpoints satisfy an SDDOpRel
+bound with error `n * (∑ individual errors)`.  This improves on naive
+triangle-inequality chaining, which would give exponential blowup.
+
+Paper reference: `prop:triangle-inequality-for-approx_delta` in
+`references/ldt-paper/preliminaries.tex`.
+
+Proof sketch: telescoping + `‖∑ dᵢ|ψ⟩‖² ≤ n · ∑ ‖dᵢ|ψ⟩‖²`
+(vector Cauchy-Schwarz / norm triangle inequality). -/
+lemma sddOpRel_chain
+    {Question Outcome : Type*} {ι' : Type*}
+    [Fintype ι'] [DecidableEq ι'] [Fintype Outcome]
+    (ψ : QuantumState ι') (𝒟 : Distribution Question)
+    (n : ℕ)
+    (families : Fin (n + 1) → IdxOpFamily Question Outcome ι')
+    (errors : Fin n → Error)
+    (hsteps : ∀ i : Fin n,
+      SDDOpRel ψ 𝒟 (families i.castSucc) (families i.succ)
+        (errors i)) :
+    SDDOpRel ψ 𝒟 (families 0) (families (Fin.last n))
+      ((n : Error) * ∑ i : Fin n, errors i) := by
+  sorry
+
 end MIPStarRE.LDT.Preliminaries
