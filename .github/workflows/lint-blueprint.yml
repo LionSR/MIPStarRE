@@ -79,6 +79,10 @@ jobs:
       - name: Check blueprint and Lean source stay in sync
         run: python3 scripts/blueprint_lean_sync.py --root . --ci
 
+      - name: Fetch PR base ref for diff
+        if: github.event_name == 'pull_request'
+        run: git fetch --no-tags --depth=0 origin "${{ github.event.pull_request.base.ref }}"
+
       - name: Warn on changed Lean declarations missing blueprint entries
         if: github.event_name == 'pull_request'
         continue-on-error: true

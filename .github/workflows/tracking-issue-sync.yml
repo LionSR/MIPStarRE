@@ -110,9 +110,9 @@ jobs:
             Use the project's established labels (see `docs/CONTRIBUTING.md` §4):
 
             **Area**: `formalization`, `infrastructure`, `documentation`, `ci`, `cleanup`
-            **Paper**: `0802.0447`, `1606.00608`, `1708.00029`, `1804.04964`, `2011.12127`
-            **Topic**: `parent-hamiltonian`, `correlation-decay`, `symmetry-SPT`,
-              `rfp-mpdo`, `algebraic-FT`, `wolf-ch1` through `wolf-ch7`
+            **Paper**: `2009.12982`
+            **Topic**: `ldt-basic`, `self-improvement`, `pasting`, `main-induction`,
+              `commutativity`, `expansion-graph`, `quantum-foundations`
             **Workflow**: `tracking`, `blueprint-sync`, `automation`
             **Follow-ups**: use `follow-up` label (create it if it doesn't exist)
 
@@ -409,11 +409,11 @@ jobs:
 
             Example:
             "**Suggested next:** #138 (*Discharge sorry in
-            OperatorMonotone.lean*) — all dependencies resolved and
-            it is the last Ch5 task; completing it would let #21
-            (Wolf Ch5 Tracking) close. Consider a Mathlib rescouting
-            report first — the Loewner's theorem API may have landed
-            since the last Mathlib bump."
+            SelfImprovement.lean*) — all dependencies resolved and
+            it is the last task in this area; completing it would let
+            the parent tracking issue close. Consider a Mathlib
+            rescouting report first in case the relevant API has
+            landed since the last Mathlib bump."
 
             ---
 

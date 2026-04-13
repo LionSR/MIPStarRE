@@ -13,7 +13,8 @@ on:
       - 'home_page/**'
   workflow_dispatch:
 
-# Cancel previous runs if a new commit is pushed
+# Serialize gh-pages deployments across blueprint/docgen workflows;
+# do not cancel in-progress deploys when new commits arrive.
 concurrency:
   group: gh-pages-deploy
   cancel-in-progress: false
