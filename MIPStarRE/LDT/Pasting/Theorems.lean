@@ -3231,6 +3231,7 @@ private lemma hAConsistency_core
     (family : IdxPolyFamily params ι)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
+    (hcomplete : family.Complete strategy.state kappa)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
     (hHB : HBConsistencyStatement params strategy family
@@ -3287,7 +3288,7 @@ theorem hAConsistency
   have hHB := hBConsistency params strategy eps delta gamma zeta
     hgood family hcons hself hbound k hline
   exact hAConsistency_core params strategy family
-    eps delta gamma kappa zeta hgood k hk hHB
+    eps delta gamma kappa zeta hgood hcomplete k hk hHB
 
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
