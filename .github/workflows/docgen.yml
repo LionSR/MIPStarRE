@@ -69,6 +69,10 @@ jobs:
             echo "::error::Blueprint has unresolved labels (see ERROR lines above)"
             exit 1
           fi
+          if grep -q "WARNING: File not found:" "$tmp_output_file"; then
+            echo "::error::Blueprint has missing files (see WARNING lines above)"
+            exit 1
+          fi
 
           if [ "$cmd_status" -ne 0 ]; then
             exit "$cmd_status"
