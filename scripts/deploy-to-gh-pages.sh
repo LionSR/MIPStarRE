@@ -31,7 +31,7 @@ git clone --branch gh-pages --single-branch --depth 1 "$REPO_URL" "$WORK_DIR/sit
 echo "==> Updating blueprint..."
 rm -rf "$WORK_DIR/site/blueprint"
 mkdir -p "$WORK_DIR/site/blueprint"
-cp -r "$REPO_ROOT/blueprint/web/"* "$WORK_DIR/site/blueprint/"
+cp -r "$REPO_ROOT/blueprint/web/." "$WORK_DIR/site/blueprint/"
 cp "$REPO_ROOT/blueprint/print/print.pdf" "$WORK_DIR/site/blueprint.pdf" 2>/dev/null || true
 
 # Update homepage (remove all homepage files first, then copy fresh)
@@ -39,7 +39,7 @@ echo "==> Updating homepage..."
 rm -rf "$WORK_DIR/site/_layouts" "$WORK_DIR/site/assets" \
        "$WORK_DIR/site/_config.yml" "$WORK_DIR/site/index.md" \
        "$WORK_DIR/site/404.html" "$WORK_DIR/site/Gemfile"
-cp -r "$REPO_ROOT/home_page/"* "$WORK_DIR/site/"
+cp -r "$REPO_ROOT/home_page/." "$WORK_DIR/site/"
 
 # Update API docs (only with --with-docs)
 if [ "$WITH_DOCS" = true ]; then
