@@ -17,42 +17,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- `thm:ld-pasting`. -/
-theorem ldPasting
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ H : Measurement (Polynomial params.next) ι,
-      LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  sorry
-
-/-- `lem:ld-pasting-sub-measurement`. -/
-lemma ldPastingSubMeas
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ H : SubMeas (Polynomial params.next) ι,
-      LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
-  sorry
-
 /-- `prop:ld-dnoteq`. -/
 theorem ldDnoteq
     (params : Parameters) (k : ℕ) :
@@ -3262,43 +3226,55 @@ private lemma hAConsistency_core
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
-    (eps delta gamma zeta : Error)
+    (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (k : ℕ)
-    (hHB : HBConsistencyStatement params strategy family
-      eps delta gamma zeta k) :
-    ConsRel strategy.state
-      (uniformDistribution (Point params.next))
-      (polynomialEvaluationFamily params.next
-        (constructedPastedSubMeas params family k))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (MainInductionStep.ldPastingInInductionNu params k
-        eps delta gamma zeta) := by
+    (hk : 400 * params.m * params.d ≤ k) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedSubMeas params family k))
+        (MainInductionStep.ldPastingInInductionError params k
+          eps delta gamma kappa zeta) ∧
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedMeasurement params family k).toSubMeas)
+        (MainInductionStep.ldPastingInInductionError params k
+          eps delta gamma kappa zeta) := by
   sorry
 
 /-- `cor:h-a-consistency`.
 
-This restates the pasted-submeasurement consistency with the point measurement
-using the paper's displayed `ν` error term. -/
+This packages the point-consistency part of the pasted-submeasurement chain and
+the completed-measurement wrapper. -/
 theorem hAConsistency
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
+    (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
-    (hHB : HBConsistencyStatement params strategy family
-        eps delta gamma zeta k) :
-    ConsRel strategy.state
-      (uniformDistribution (Point params.next))
-      (polynomialEvaluationFamily params.next
-        (constructedPastedSubMeas params family k))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (MainInductionStep.ldPastingInInductionNu params k
-        eps delta gamma zeta) := by
-  exact hAConsistency_core params strategy family eps delta gamma zeta
-    hgood k hHB
+    (hk : 400 * params.m * params.d ≤ k) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedSubMeas params family k))
+        (MainInductionStep.ldPastingInInductionError params k
+          eps delta gamma kappa zeta) ∧
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedMeasurement params family k).toSubMeas)
+        (MainInductionStep.ldPastingInInductionError params k
+          eps delta gamma kappa zeta) := by
+  exact hAConsistency_core params strategy family
+    eps delta gamma kappa zeta hgood k hk
 
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
@@ -3393,5 +3369,59 @@ theorem ldPastingNCompleteness
   This combines `overAllOutcomes`, `fromHToG`, and the matrix Chernoff bound.
   -/
   sorry
+
+/-- `lem:ld-pasting-sub-measurement`. -/
+lemma ldPastingSubMeas
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ H : SubMeas (Polynomial params.next) ι,
+      LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
+  refine ⟨constructedPastedSubMeas params family k, ?_⟩
+  have hconsistency :=
+    (hAConsistency params strategy eps delta gamma kappa zeta
+      hgood family hcomplete hcons hself hbound k hk).1
+  have hcompleteness :=
+    ldPastingNCompleteness params strategy eps delta gamma kappa zeta
+      hgood family hcomplete hcons hself hbound k hk
+  exact
+    { largeEnough := hk
+      constructedSubMeas := rfl
+      pointConsistency := hconsistency
+      completeness := hcompleteness.completenessBound }
+
+/-- `thm:ld-pasting`. -/
+theorem ldPasting
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ H : Measurement (Polynomial params.next) ι,
+      LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
+  refine ⟨constructedPastedMeasurement params family k, ?_⟩
+  have hconsistency :=
+    (hAConsistency params strategy eps delta gamma kappa zeta
+      hgood family hcomplete hcons hself hbound k hk).2
+  exact
+    { largeEnough := hk
+      constructedMeasurement := rfl
+      pointConsistency := hconsistency }
 
 end MIPStarRE.LDT.Pasting
