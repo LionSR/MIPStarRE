@@ -1268,6 +1268,7 @@ private lemma evaluatedSlice_scalar_chain_bound
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (_hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hcons : family.ConsistentWithPoints strategy zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (_hpostSSC : SDDRel strategy.state
@@ -1299,6 +1300,33 @@ private lemma evaluatedSlice_scalar_chain_bound
     evaluatedPointSelfConsistency_fst params strategy family zeta _hpostSSC
   have hpostSSC_snd :=
     evaluatedPointSelfConsistency_snd params strategy family zeta _hpostSSC
+  have _hpointCons :
+      ConsRel strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (evaluatedPointFamily params family)
+        zeta := by
+    simpa [evaluatedPointFamily] using hcons.pointConsistency
+  -- TODO(issue #296): finish the scalar approximation chain from
+  -- `references/ldt-paper/commutativity-G.tex`, eq:gcom8 onward.
+  --
+  -- The missing point-consistency bridge is now available above as
+  -- `_hpointCons`; it is the hypothesis needed for the four `eq:add-an-a`
+  -- insertions/removals via `closenessOfIP`/`easyApproxFromApproxDelta`.
+  -- The remaining intended steps are:
+  --
+  -- * use `_hpointCons`, `hpostSSC_fst`, and `hpostSSC_snd` for the
+  --   `2√ζ`/`√ζ` point and postprocessed self-consistency losses;
+  -- * use `commutativityPoints params strategy eps delta gamma hgood` for
+  --   the point-measurement swap loss;
+  -- * use `gCommStability` and `gCommStabilityTwo` for the stability losses.
+  --
+  -- The last bullet is a declaration-order blocker in the current file:
+  -- `gCommStability` and `gCommStabilityTwo` are defined below
+  -- `commDataProcessedG`, while this helper is above it.  Completing this
+  -- proof therefore requires moving this helper below those stability
+  -- theorems and moving the `commDataProcessedG` wrapper after the helper, or
+  -- otherwise factoring the stability results into an earlier section.
   sorry
 
 /-- `lem:comm-data-processed-g`. -/
@@ -1467,7 +1495,7 @@ lemma commDataProcessedG
         rw [evaluatedSliceCommutation_qSDDOp_avg_eq params strategy family]
         exact evaluatedSlice_scalar_chain_bound
           params strategy eps delta gamma zeta
-          hnorm hgood family G hG hself hbound hpostSSC }
+          hnorm hgood family G hG hcons hself hbound hpostSSC }
   simpa [evaluatedPointFamily] using hcons.pointConsistency
 
 /-- The common overlap term `⟨ψ, (I - G^x) ⊗ G^x ψ⟩` controlling both
