@@ -19,39 +19,132 @@ noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) 
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (40000 : Error)) +
       Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))))
 
-/-- Generic overview-level soundness conclusion: a low individual degree
-polynomial agrees with the point-answer function except on `slack` average mass.
+/-- Placeholder polynomial-size slack for the overview Raz--Safra statement.
 
-This is used for the two classical theorems quoted in Chapter 1, whose full test
-infrastructure is not yet formalized in this repository. -/
+The Chapter 1 overview records the dependence as `eps + poly(m) * poly(d/q)`;
+the exact constants are intentionally left to the future direct formalization of
+the classical result. -/
+noncomputable def razSafraSlackBound (params : Parameters) (eps : Error) : Error :=
+  eps + (params.m : Error) * ((params.d : Error) / (params.q : Error))
+
+/-- Placeholder polynomial-size slack for classical low-individual-degree soundness.
+
+The Chapter 1 overview records the dependence as
+`poly(m) * (poly(eps) + poly(d/q))`; this named expression keeps that dependence
+visible until the Polishchuk--Spielman theorem is formalized directly. -/
+noncomputable def classicalTestSoundnessSlackBound
+    (params : Parameters) (eps : Error) : Error :=
+  ((params.m : Error) ^ (2 : ℕ)) *
+    (Real.sqrt eps + (params.d : Error) / (params.q : Error))
+
+/-- Opaque, proof-carrying pass condition for point-answer versions of the
+classical surface-versus-point test.
+
+This is intentionally minimal: the surface test itself is not yet modeled here,
+but callers must still provide evidence of a bounded failure probability rather
+than an arbitrary proposition. -/
+def PointTestPassCondition (params : Parameters) [FieldModel params.q]
+    (_a : Point params → Fq params) (eps : Error) : Prop :=
+  ∃ failureProbability : Error, 0 ≤ failureProbability ∧ failureProbability ≤ eps
+
+/-- Deterministic classical data for the low individual degree test. -/
+structure ClassicalLowIndividualDegreeStrategy
+    (params : Parameters) [FieldModel params.q] where
+  /-- The prover's point answer. -/
+  pointAnswer : Point params → Fq params
+  /-- The prover's answer to an axis-parallel line question. -/
+  axisParallelAnswer : AxisParallelLine params → AxisLinePolynomial params
+  /-- The prover's answer to a diagonal line question. -/
+  diagonalAnswer : DiagonalLine params → DiagonalLinePolynomial params
+
+namespace ClassicalLowIndividualDegreeStrategy
+
+/-- Classical failure probability for the axis-parallel branch. -/
+noncomputable def axisParallelFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    (strategy : ClassicalLowIndividualDegreeStrategy params) : Error :=
+  avgOver (uniformDistribution (AxisParallelTestSample params)) fun s =>
+    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
+    if strategy.axisParallelAnswer ℓ zeroCoord = strategy.pointAnswer s.1 then
+      0
+    else
+      1
+
+/-- Classical failure probability for the diagonal-line branch. -/
+noncomputable def diagonalFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    (strategy : ClassicalLowIndividualDegreeStrategy params) : Error :=
+  (1 / (params.m : Error)) *
+    ∑ j : Fin params.m,
+      avgOver (uniformDistribution (RestrictedDiagonalSample params j)) fun s =>
+        let v := extendRestrictedDirection j s.2
+        let ℓ : DiagonalLine params := { base := s.1, direction := v }
+        if strategy.diagonalAnswer ℓ zeroCoord = strategy.pointAnswer s.1 then
+          0
+        else
+          1
+
+/-- Classical failure probability for the deterministic low individual degree test.
+
+For a single deterministic point-answer function the self-consistency branch has
+zero failure, so this averages the two line-consistency branches with that zero
+branch. -/
+noncomputable def lowIndividualDegreeFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    (strategy : ClassicalLowIndividualDegreeStrategy params) : Error :=
+  (strategy.axisParallelFailureProbability + 0 +
+    strategy.diagonalFailureProbability) / 3
+
+/-- Passing the deterministic classical low individual degree test with error `eps`. -/
+structure PassesLowIndividualDegreeTest
+    {params : Parameters} [FieldModel params.q]
+    (strategy : ClassicalLowIndividualDegreeStrategy params) (eps : Error) : Prop where
+  /-- The strategy's test failure probability is at most `eps`. -/
+  soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
+
+end ClassicalLowIndividualDegreeStrategy
+
+/-- Generic overview-level soundness conclusion: a low individual degree
+polynomial agrees with the point-answer function except on `slack` average mass,
+where `slack` is constrained by the theorem's named error bound.
+
+This is used for the two classical theorems quoted in Chapter 1, whose exact
+constants are not yet formalized in this repository. -/
 def PointAnswerSoundnessConclusion (params : Parameters) [FieldModel params.q]
-    (a : Point params → Fq params) (slack : Error) : Prop :=
-  ∃ g : Polynomial params,
-    avgOver (uniformDistribution (Point params))
-        (fun u => if g u = a u then (1 : Error) else 0) ≥
-      1 - slack
+    (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
+  0 ≤ slack ∧
+    slack ≤ 1 ∧
+      slack ≤ slackBound ∧
+        ∃ g : Polynomial params,
+          avgOver (uniformDistribution (Point params))
+              (fun u => if g u = a u then (1 : Error) else 0) ≥
+            1 - slack
 
 /-- `thm:raz-safra`.
 
 The surface-versus-point low-degree test itself is not yet modeled in Lean here,
-so the hypothesis is kept opaque and this theorem records only the paper-facing
-soundness conclusion. -/
+so the hypothesis records an opaque but proof-carrying point-test pass condition.
+-/
 theorem razSafra
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
-    (_hpass : Prop) :
-    ∃ slack : Error, PointAnswerSoundnessConclusion params a slack := by
+    (hpass : PointTestPassCondition params a eps) :
+    ∃ slack : Error,
+      PointAnswerSoundnessConclusion params a (razSafraSlackBound params eps) slack := by
   sorry
 
 /-- `thm:classical-test-soundness`.
 
-As with `razSafra`, this keeps the classical test-passing hypothesis abstract
-until the purely classical low individual degree test is formalized directly. -/
+This uses a deterministic classical test strategy with an actual pass predicate,
+while leaving the Polishchuk--Spielman soundness proof itself as a quoted
+classical result. -/
 theorem classicalTestSoundness
     (params : Parameters) [FieldModel params.q]
-    (a : Point params → Fq params) (eps : Error)
-    (_hpass : Prop) :
-    ∃ slack : Error, PointAnswerSoundnessConclusion params a slack := by
+    (strategy : ClassicalLowIndividualDegreeStrategy params) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    ∃ slack : Error,
+      PointAnswerSoundnessConclusion params strategy.pointAnswer
+        (classicalTestSoundnessSlackBound params eps) slack := by
   sorry
 
 /-- `thm:main-informal`.
