@@ -347,19 +347,30 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
 
 /-- Spectral truncation of an almost-projective measurement.
 
-The current abstract statement already asks for the repaired projective
-submeasurement on the ambient space. The remaining construction from the paper's
-raw spectral truncations to that packaged witness is recorded explicitly as a
-temporary bridge package. -/
+The strengthened statement now has to return a concrete projective
+submeasurement together with its closeness to the input measurement, so the
+old vacuous matrix witness is no longer enough. -/
 def spectralTruncateAlmostProjective {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
     AlmostProjMeasStatement ψ A ζ →
-      SpectralTruncationBridgePackage ψ A ζ →
       SpectralTruncationStatement ψ A ζ := by
-  intro _hAlmost hbridge
-  exact hbridge.witness
+  intro _hAlmost
+  /-
+  The spectral-truncation step from the paper produces projections `R_a` by
+  truncating the spectrum of each almost-projective effect `A_a`, and the point
+  of issue #279 is precisely that we must connect those `R_a` back to the input
+  measurement `A` via a concrete `ProjSubMeas Outcome ι` and an `SDDRel` bound.
+
+  The local matrix witness already tracks the per-outcome spectral truncations,
+  but the abstract bridge from that matrix layer back to a `ProjSubMeas Outcome ι`
+  on the ambient space `ι` has not been formalized yet. Once that bridge exists,
+  this theorem should package:
+  1. the truncated projections as `projSubMeas`, and
+  2. the paper's closeness estimate as `closeness`.
+  -/
+  sorry
 
 private lemma spectralTruncationError_le_roundingToProjectiveError
     {ζ : Error} (hζ : 0 ≤ spectralTruncationError ζ) :
@@ -453,19 +464,19 @@ lemma adjustTruncatedProjections {Outcome : Type*}
 
 /-- Compose spectral truncation and adjustment to round an
 almost-projective measurement to a projective submeasurement. -/
-lemma roundAlmostProjMeas {Outcome : Type*}
+lemma roundAlmostProjMeas.{uAlmost, uRounded} {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
-    AlmostProjMeasStatement ψ A ζ →
-      SpectralTruncationBridgePackage ψ A ζ →
+    AlmostProjMeasStatement.{_, _, uAlmost} ψ A ζ →
       ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement ψ A P
+        RoundedProjMeasStatement.{_, _, uRounded} ψ A P
           (roundingToProjectiveError ζ) := by
-  intro hAlmost hbridge
-  exact adjustTruncatedProjections (Outcome := Outcome) (ι := ι) ψ A ζ
-    (spectralTruncateAlmostProjective
-      (Outcome := Outcome) (ι := ι) ψ A ζ hAlmost hbridge)
+  intro hAlmost
+  exact adjustTruncatedProjections.{_, _, uRounded, uRounded}
+    (Outcome := Outcome) (ι := ι) ψ A ζ
+    (spectralTruncateAlmostProjective.{_, _, uAlmost, uRounded}
+      (Outcome := Outcome) (ι := ι) ψ A ζ hAlmost)
 
 /-- Increase the allowed error bound for a rounded-projective witness. -/
 lemma roundedProjMeasStatement_mono.{uRoundedMono} {Outcome : Type*}

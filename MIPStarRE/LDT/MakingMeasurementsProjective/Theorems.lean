@@ -1091,14 +1091,21 @@ theorem orthonormalization {Outcome : Type*}
     (A : SubMeas Outcome ι) (ζ : Error) :
     BipartiteSSCRel ψ (uniformDistribution Unit)
         (constSubMeasFamily A) ζ →
-      OrthonormalizationBridgePackage ψ A ζ →
       ∃ P : ProjSubMeas Outcome ι,
         SDDRel ψ (uniformDistribution Unit)
           (constSubMeasFamily A.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
-  intro _hssc hbridge
-  exact hbridge.witness
+  /-
+  This theorem still needs the completion-to-measurement bridge and the final
+  error bookkeeping around `orthonormalizationMainLemma`. It is not just a thin
+  wrapper around the already-formalized lemmas yet.
+  -/
+  -- TODO: Complete the orthonormalization wrapper by converting SSC to the
+  -- rounded projective witness with final error bookkeeping (Theorem 5.4 /
+  -- `thm:orthonormalization`); blocked on the completion-to-measurement bridge
+  -- and wrapper composition lemmas.
+  sorry
 
 
 
@@ -1155,17 +1162,7 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
     (ψ : QuantumState (ιA × ιB))
     (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error)
-    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
-    (hbridge :
-      let A_lifted : Measurement Outcome (ιA × ιB) :=
-        { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-          total_eq_one := by
-            ext i j
-            rcases i with ⟨i₁, i₂⟩
-            rcases j with ⟨j₁, j₂⟩
-            simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
-      SpectralTruncationBridgePackage ψ A_lifted
-        (consistencyToAlmostProjectiveError ζ)) :
+    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
@@ -1188,10 +1185,6 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
         rcases i with ⟨i₁, i₂⟩
         rcases j with ⟨j₁, j₂⟩
         simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
-  have hbridge' :
-      SpectralTruncationBridgePackage ψ A_lifted
-        (consistencyToAlmostProjectiveError ζ) := by
-    simpa [A_lifted] using hbridge
   have hAlmost :
       AlmostProjMeasStatement.{_, _, 0}
         ψ A_lifted
@@ -1206,7 +1199,7 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
           (roundingToProjectiveError (consistencyToAlmostProjectiveError ζ)) :=
     roundAlmostProjMeas (ψ := ψ)
       (A := A_lifted)
-      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost hbridge'
+      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost
   obtain ⟨P, hRounded⟩ := hRound
   refine ⟨P, ?_⟩
   simpa [A_lifted] using

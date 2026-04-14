@@ -547,10 +547,9 @@ From the estimate `eq:A-looks-projective`, construct a family `R_a` of
 projectors close to `A_a` whose total is bounded by `(1 + 2√ζ)I`. -/
 lemma projectiveNonMeasurement {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (ζ : Error)
-    (hbridge : SpectralTruncationBridgePackage ψ A (2 * ζ)) :
+    (A : Measurement Outcome ι) (ζ : Error) :
     (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
       ∃ R : OpFamily Outcome ι,
         RoundingToProjectorsWitness ψ A ζ R := by
@@ -560,10 +559,11 @@ lemma projectiveNonMeasurement {Outcome : Type uOutcome}
   have hζ : 0 ≤ ζ := by nlinarith
   by_cases hOutcome : Nonempty Outcome
   · letI : Nonempty Outcome := hOutcome
+    letI : DecidableEq Outcome := Classical.decEq Outcome
     have hAlmost :=
       almostProjMeasOfSourceAlmostProjective ψ A (2 * ζ) (by nlinarith) hsource
     let spectral :=
-      spectralTruncateAlmostProjective ψ A (2 * ζ) hAlmost hbridge
+      spectralTruncateAlmostProjective.{uOutcome, uι, 0, 0} ψ A (2 * ζ) hAlmost
     let R : OpFamily Outcome ι := spectral.projSubMeas.toSubMeas
     refine ⟨R, ?_⟩
     refine ⟨?_, ?_, ?_⟩
@@ -639,11 +639,10 @@ stays bounded by `(1 + 2√ζ)I`, and the auxiliary dimension is at most the
 original ambient dimension. -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 ≤ ζ)
-    (hbridge : SpectralTruncationBridgePackage ψ A (2 * ζ))
     (source_almost_projective :
       ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
@@ -655,11 +654,12 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
   by_cases hOutcome : Nonempty Outcome
   · letI : Nonempty Outcome := hOutcome
     letI : Inhabited Outcome := Classical.inhabited_of_nonempty hOutcome
+    letI : DecidableEq Outcome := Classical.decEq Outcome
     have hAlmost :=
       almostProjMeasOfSourceAlmostProjective ψ A (2 * ζ) (by nlinarith)
         source_almost_projective
     let spectral :=
-      spectralTruncateAlmostProjective ψ A (2 * ζ) hAlmost hbridge
+      spectralTruncateAlmostProjective.{uOutcome, uι, 0, 0} ψ A (2 * ζ) hAlmost
     let q : OpFamily Outcome ι := spectral.projSubMeas.toSubMeas
     let data : QLayerData Outcome ι :=
       { auxSpace :=
