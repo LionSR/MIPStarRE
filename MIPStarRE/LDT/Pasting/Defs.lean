@@ -366,7 +366,11 @@ the interpolation correctness property (that `restrictAtHeight`
 of the result agrees with each slice) additionally requires
 `σ ⊆ gHatTupleSupport gs` and distinct evaluation points, which
 are ensured by the caller via `interpolationSupportSubset_subset`
-and `distinctTupleDistribution`. -/
+and `distinctTupleDistribution`.
+
+The coefficient is Mathlib's `Lagrange.basis σ v i`, the polynomial
+`∏ j ∈ σ.erase i, (X - v j) / (v i - v j)`, evaluated at the appended
+coordinate. -/
 noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
     [FieldModel params.q] {k : ℕ} (xs : PointTuple params k)
     (gs : GHatTupleOutcome params k) (σ : Finset (Fin k))
@@ -375,7 +379,8 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
     let slicePoly :=
       MvPolynomial.rename (embedCoord params)
         (extractSliceOr0 (gs i))
-    let Li := Lagrange.basis σ (fun i => decodeScalar (xs i)) i
+    let Li : _root_.Polynomial (Scalar params) :=
+      Lagrange.basis σ (fun i => decodeScalar (xs i)) i
     let LiMv :=
       Li.eval₂ MvPolynomial.C
         (MvPolynomial.X (lastCoord params))
