@@ -37,16 +37,6 @@ noncomputable def classicalTestSoundnessSlackBound
   ((params.m : Error) ^ (2 : ℕ)) *
     (Real.sqrt eps + (params.d : Error) / (params.q : Error))
 
-/-- Opaque, proof-carrying pass condition for point-answer versions of the
-classical surface-versus-point test.
-
-This is intentionally minimal: the surface test itself is not yet modeled here,
-but callers must still provide evidence of a bounded failure probability rather
-than an arbitrary proposition. -/
-def PointTestPassCondition (params : Parameters) [FieldModel params.q]
-    (_a : Point params → Fq params) (eps : Error) : Prop :=
-  ∃ failureProbability : Error, 0 ≤ failureProbability ∧ failureProbability ≤ eps
-
 /-- Deterministic classical data for the low individual degree test. -/
 structure ClassicalLowIndividualDegreeStrategy
     (params : Parameters) [FieldModel params.q] where
@@ -103,6 +93,17 @@ structure PassesLowIndividualDegreeTest
   soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
 
 end ClassicalLowIndividualDegreeStrategy
+
+/-- Proof-carrying pass condition for point-answer versions of the classical
+surface-versus-point test.
+
+The `a`-dependence is enforced by requiring a classical strategy whose
+`pointAnswer` field agrees with `a` and that passes the low individual degree
+test with error at most `eps`. -/
+def PointTestPassCondition (params : Parameters) [FieldModel params.q]
+    (a : Point params → Fq params) (eps : Error) : Prop :=
+  ∃ (strategy : ClassicalLowIndividualDegreeStrategy params),
+    strategy.pointAnswer = a ∧ strategy.PassesLowIndividualDegreeTest eps
 
 /-- Generic overview-level soundness conclusion: a low individual degree
 polynomial agrees with the point-answer function except on `slack` average mass,
