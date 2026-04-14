@@ -501,7 +501,7 @@ lemma stateDependentDistanceRel_mono
   intro ⟨h⟩
   exact ⟨le_trans h hle⟩
 
-private lemma conjTranspose_mul_mono
+lemma conjTranspose_mul_mono
     {ι : Type*} [Fintype ι]
     {X Y Z : MIPStarRE.Quantum.Op ι}
     (hXY : X ≤ Y) :
@@ -516,7 +516,7 @@ private lemma conjTranspose_mul_mono
         Zᴴ).nonneg
   simpa [mul_sub, sub_mul, Matrix.conjTranspose_conjTranspose, mul_assoc] using hnonneg
 
-private lemma questionCabApproxDelta
+lemma questionCabApproxDelta
     {Outcome Aux : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [Fintype Aux]

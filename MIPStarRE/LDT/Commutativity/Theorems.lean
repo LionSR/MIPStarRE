@@ -301,18 +301,8 @@ private lemma qSDDOp_zeroOpFamily_le_one_of_sum_adjoint_mul_le_one
           exact ev_mono ψ _ _ hA
     _ = 1 := ev_one_of_isNormalized ψ hψ
 
-private lemma conjTranspose_mul_mono_local
-    {κ : Type*} [Fintype κ]
-    {X Y Z : MIPStarRE.Quantum.Op κ}
-    (hXY : X ≤ Y) :
-    Zᴴ * X * Z ≤ Zᴴ * Y * Z := by
-  apply sub_nonneg.mp
-  have hnonneg : 0 ≤ Zᴴ * (Y - X) * Z := by
-    simpa [Matrix.conjTranspose_conjTranspose] using
-      (Matrix.PosSemidef.mul_mul_conjTranspose_same
-        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hXY))
-        Zᴴ).nonneg
-  simpa [mul_sub, sub_mul, Matrix.conjTranspose_conjTranspose, mul_assoc] using hnonneg
+-- conjTranspose_mul_mono is now public in Preliminaries/Theorems.lean
+private alias conjTranspose_mul_mono_local := conjTranspose_mul_mono
 
 private lemma leftTensor_conjTranspose
     {κ₁ κ₂ : Type*} [Fintype κ₁] [DecidableEq κ₁] [Fintype κ₂] [DecidableEq κ₂]
@@ -343,71 +333,8 @@ private lemma leftPlacedOpFamily_sum_adjoint_mul_le_one
     _ ≤ 1 :=
           leftTensor_le_one (ι₂ := ι) (subMeas_sum_adjoint_mul_le_one A)
 
-private lemma questionCabApproxDelta_local
-    {Outcome Aux κ : Type*}
-    [Fintype Outcome] [Fintype Aux] [Fintype κ] [DecidableEq κ]
-    (ψ : QuantumState κ)
-    (A B : OpFamily Outcome κ)
-    (C : Outcome → Aux → MIPStarRE.Quantum.Op κ)
-    (hC : ∀ a, ∑ b : Aux, (C a b)ᴴ * C a b ≤ 1) :
-    qSDDOp ψ
-        ({ outcome := fun ab : Outcome × Aux =>
-             C ab.1 ab.2 * A.outcome ab.1
-           total := ∑ ab : Outcome × Aux,
-             C ab.1 ab.2 * A.outcome ab.1
-         } : OpFamily (Outcome × Aux) κ)
-        ({ outcome := fun ab : Outcome × Aux =>
-             C ab.1 ab.2 * B.outcome ab.1
-           total := ∑ ab : Outcome × Aux,
-             C ab.1 ab.2 * B.outcome ab.1
-         } : OpFamily (Outcome × Aux) κ) ≤
-      qSDDOp ψ A B := by
-  let D : Outcome → MIPStarRE.Quantum.Op κ :=
-    fun a => A.outcome a - B.outcome a
-  let CA : OpFamily (Outcome × Aux) κ :=
-    { outcome := fun ab => C ab.1 ab.2 * A.outcome ab.1
-      total := ∑ ab : Outcome × Aux,
-        C ab.1 ab.2 * A.outcome ab.1 }
-  let CB : OpFamily (Outcome × Aux) κ :=
-    { outcome := fun ab => C ab.1 ab.2 * B.outcome ab.1
-      total := ∑ ab : Outcome × Aux,
-        C ab.1 ab.2 * B.outcome ab.1 }
-  have hpointwise (a : Outcome) :
-      ∑ b : Aux, ev ψ (((C a b * D a)ᴴ) * (C a b * D a)) ≤
-        ev ψ ((D a)ᴴ * D a) := by
-    calc
-      ∑ b : Aux, ev ψ (((C a b * D a)ᴴ) * (C a b * D a))
-        = ∑ b : Aux, ev ψ ((D a)ᴴ * ((C a b)ᴴ * C a b) * D a) := by
-            refine Finset.sum_congr rfl ?_
-            intro b _
-            simp [Matrix.conjTranspose_mul, mul_assoc]
-      _ = ev ψ (∑ b : Aux, (D a)ᴴ * ((C a b)ᴴ * C a b) * D a) := by
-            rw [← ev_finset_sum]
-      _ = ev ψ ((D a)ᴴ * (∑ b : Aux, (C a b)ᴴ * C a b) * D a) := by
-            congr 1
-            rw [← Finset.sum_mul, ← Matrix.mul_sum]
-      _ ≤ ev ψ ((D a)ᴴ * 1 * D a) := by
-            exact ev_mono ψ _ _ (conjTranspose_mul_mono_local (Z := D a) (hC a))
-      _ = ev ψ ((D a)ᴴ * D a) := by simp
-  have hrewrite :
-      qSDDOp ψ CA CB =
-        ∑ a : Outcome, ∑ b : Aux,
-          ev ψ (((C a b * D a)ᴴ) * (C a b * D a)) := by
-    unfold CA CB qSDDOp qSDDCore
-    simpa [D, mul_sub] using
-      (Fintype.sum_prod_type' (f := fun a b =>
-        ev ψ (((C a b * D a)ᴴ) * (C a b * D a))))
-  calc
-    qSDDOp ψ CA CB
-      = ∑ a : Outcome, ∑ b : Aux,
-          ev ψ (((C a b * D a)ᴴ) * (C a b * D a)) := hrewrite
-    _ ≤ ∑ a : Outcome, ev ψ ((D a)ᴴ * D a) := by
-          refine Finset.sum_le_sum ?_
-          intro a _
-          exact hpointwise a
-    _ = qSDDOp ψ A B := by
-          unfold qSDDOp qSDDCore
-          simp [D]
+-- questionCabApproxDelta is now public in Preliminaries/Theorems.lean
+private alias questionCabApproxDelta_local := questionCabApproxDelta
 
 private lemma qSDDOp_leftOrderedProduct_zeroOpFamily_le_one
     {α β : Type*} [Fintype α] [Fintype β]
