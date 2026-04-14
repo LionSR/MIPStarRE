@@ -492,13 +492,10 @@ Last updated: 2026-04-14
   review; the theorem keeps its original API and remains a live blocker.
 - `Test/Defs.lean`: added `qBipartiteSSCDefect_nonneg` and
   `bipartiteSSCError_nonneg`.
-- `Test/Strategy.lean`: added `point_agreement_le_three_mul`, which is
-  consistent with the paper's `3 * eps` point-agreement step in the reduction
-  from `thm:main-formal` to `thm:main-induction`.
-- `Test/Strategy.lean`: added `left_as_symmetric_is_good_six_mul` and
-  `right_as_symmetric_is_good_six_mul` as Lean-local surrogate consequences of
-  the current averaged failure definition. These compile, but they are not the
-  paper's role-register symmetrization step and should not be treated as such.
+- `Test/Strategy.lean`: replaced the incorrect claimed point-agreement and
+  same-local `IsGood` consequences with tested crossed-branch component bounds;
+  `PassesLowIndividualDegreeTest` directly controls the individual point SSC
+  defects and crossed line/point branch terms, not cross-prover point agreement.
 - `Basic/Parameters.lean`: added `Fintype Role`.
 - `Test/Strategy.lean`: added `roleProj`, `roleCond`, `symmetrizedIdxProjMeas`,
   and the `ProjStrat` wrappers `symmetrizedPointMeasurement`,
@@ -515,8 +512,8 @@ Last updated: 2026-04-14
   compiles.
 - `Test/Strategy.lean`: proved
   `ProjStrat.classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement` and
-  the corollary
-  `ProjStrat.classicalRoleSymmStrategy_selfConsistency_le_three_mul`.
+  the conditional bridge
+  `ProjStrat.classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement`.
 - `Test`: corrected the role-register state scaling to match the repository's
   normalized-trace convention. `classicalRoleSymmState` now uses coefficient
   `2` on each occupied role sector, and `classicalRoleSymmState_isNormalized`
