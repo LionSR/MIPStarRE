@@ -286,7 +286,8 @@ theorem rebaseAt_pointAt {params : Parameters} [FieldModel params.q]
   cases ℓ with
   | mk base direction =>
       change
-        ({ base := ({ base := base, direction := direction } : DiagonalLine params).pointAt zeroCoord,
+        ({ base :=
+             ({ base := base, direction := direction } : DiagonalLine params).pointAt zeroCoord,
            direction := direction } : DiagonalLine params) =
         ({ base := base, direction := direction } : DiagonalLine params)
       congr
@@ -299,9 +300,13 @@ theorem rebaseAt_rebase {params : Parameters} [FieldModel params.q]
   cases ℓ with
   | mk base direction =>
       change
-        ({ base := (rebaseAt ({ base := base, direction := direction } : DiagonalLine params) t).pointAt s,
+        ({ base :=
+             (rebaseAt
+               ({ base := base, direction := direction } : DiagonalLine params) t).pointAt s,
            direction := direction } : DiagonalLine params) =
-        ({ base := ({ base := base, direction := direction } : DiagonalLine params).pointAt (addCoord t s),
+        ({ base :=
+             ({ base := base, direction := direction } : DiagonalLine params).pointAt
+               (addCoord t s),
            direction := direction } : DiagonalLine params)
       exact congrArg
         (fun b => ({ base := b, direction := direction } : DiagonalLine params))
@@ -319,7 +324,7 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
       rebaseAt (appendAtHeight params ℓ x) t := by
   cases ℓ with
   | mk base direction =>
-      show
+      change
         ({ base := appendPoint params (addPoint base (smulPoint t direction)) x,
            direction := appendPoint params direction zeroCoord } : DiagonalLine params.next) =
         ({ base := addPoint (appendPoint params base x)

@@ -121,8 +121,8 @@ Last updated: 2026-04-14
   - replaced the former blocker with a reusable strategy-level invariant:
     `DiagonalEvaluationReparamInvariant` on diagonal-line measurements, together
     with public rebasing lemmas in `Basic/Parameters.lean`
-  - threaded the new rebasing invariant through `SymStrat` / `ProjStrat` and the
-    existing strategy wrappers in `Test/Strategy.lean`
+  - localized the new rebasing invariant to `SymStrat.IsGood` instead of adding
+    it to the core `SymStrat` / `ProjStrat` records
   - proved `sampledDiagonalLineApproximation_pointWithDiagonalLine` by reindexing
     `RestrictedDiagonalSample(last) × Fq` onto `PointDiagonalLineQuestion` via a
     rebased-line equivalence and then transporting the line side with the new
@@ -132,8 +132,8 @@ Last updated: 2026-04-14
   - verified `lake env lean MIPStarRE/LDT/CommutativityPoints/Theorem.lean`
     succeeds
   - verified `lake build` succeeds after the strategy-model update
-  - added `\leanok` for `thm:commutativity-points` in
-    `blueprint/src/chapter/ch08_commutativity.tex`
+  - synced `blueprint/src/chapter/ch08_commutativity.tex` with the completed
+    Lean theorem without overclaiming statement-level `\leanok`
 
 ## Active Strategy
 - `MainInductionStep` is complete for this wave.

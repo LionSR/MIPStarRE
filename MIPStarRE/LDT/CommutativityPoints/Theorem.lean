@@ -77,103 +77,6 @@ private lemma avgOver_uniform_prod_ignore_right_local
     _ = avgOver (uniformDistribution α) f := by
           simp [avgOver, uniformDistribution, Finset.mul_sum]
 
-/-- Rebase a parameterized diagonal line so that the old point `ℓ.pointAt t`
-becomes the new base point. -/
-private def rebaseDiagonalLine
-    (params : Parameters)
-    [FieldModel params.q]
-    (ℓ : DiagonalLine params) (t : Fq params) : DiagonalLine params :=
-  { base := ℓ.pointAt t
-    direction := ℓ.direction }
-
-/-- Rebasing at parameter `t` moves that point to parameter `0`. -/
-private lemma rebaseDiagonalLine_pointAt_zero
-    (params : Parameters)
-    [FieldModel params.q]
-    (ℓ : DiagonalLine params) (t : Fq params) :
-    (rebaseDiagonalLine params ℓ t).pointAt zeroCoord = ℓ.pointAt t := by
-  ext i
-  simp [rebaseDiagonalLine, DiagonalLine.pointAt, addPoint, smulPoint,
-    addCoord, mulCoord, zeroCoord]
-
-private lemma addCoord_subCoord_right
-    (params : Parameters)
-    [FieldModel params.q]
-    (x y : Fq params) :
-    addCoord y (subCoord x y) = x := by
-  unfold addCoord subCoord
-  rw [decode_encodeScalar]
-  simp [sub_eq_add_neg]
-
-private lemma addCoord_subCoord_left
-    (params : Parameters)
-    [FieldModel params.q]
-    (x y : Fq params) :
-    addCoord (subCoord x y) y = x := by
-  unfold addCoord subCoord
-  rw [decode_encodeScalar]
-  simp [sub_eq_add_neg]
-
-private lemma rebaseDiagonalLine_pointAt
-    (params : Parameters)
-    [FieldModel params.q]
-    (ℓ : DiagonalLine params) (t s : Fq params) :
-    (rebaseDiagonalLine params ℓ t).pointAt s = ℓ.pointAt (addCoord t s) := by
-  ext i
-  simp [rebaseDiagonalLine, DiagonalLine.pointAt, addPoint, smulPoint,
-    addCoord, mulCoord]
-  rw [← encode_decodeScalar (ℓ.base i)]
-  congr 1
-  ring_nf
-
-private lemma rebaseDiagonalLine_zero
-    (params : Parameters)
-    [FieldModel params.q]
-    (ℓ : DiagonalLine params) :
-    rebaseDiagonalLine params ℓ zeroCoord = ℓ := by
-  cases ℓ with
-  | mk base direction =>
-      change
-        ({ base := ({ base := base, direction := direction } : DiagonalLine params).pointAt zeroCoord,
-           direction := direction } : DiagonalLine params) =
-        ({ base := base, direction := direction } : DiagonalLine params)
-      congr
-      funext i
-      simp [DiagonalLine.pointAt, addPoint, smulPoint, addCoord, mulCoord, zeroCoord]
-
-private lemma rebaseDiagonalLine_rebase
-    (params : Parameters)
-    [FieldModel params.q]
-    (ℓ : DiagonalLine params) (t s : Fq params) :
-    rebaseDiagonalLine params (rebaseDiagonalLine params ℓ t) s =
-      rebaseDiagonalLine params ℓ (addCoord t s) := by
-  cases ℓ with
-  | mk base direction =>
-      change
-        ({ base := (rebaseDiagonalLine params ({ base := base, direction := direction } : DiagonalLine params) t).pointAt s,
-           direction := direction } : DiagonalLine params) =
-        ({ base := ({ base := base, direction := direction } : DiagonalLine params).pointAt (addCoord t s),
-           direction := direction } : DiagonalLine params)
-      exact congrArg
-        (fun b => ({ base := b, direction := direction } : DiagonalLine params))
-        (rebaseDiagonalLine_pointAt params { base := base, direction := direction } t s)
-
-private noncomputable def rebaseDiagonalLineEquiv
-    (params : Parameters)
-    [FieldModel params.q]
-    (t : Fq params) :
-    DiagonalLine params ≃ DiagonalLine params where
-  toFun := fun ℓ => rebaseDiagonalLine params ℓ t
-  invFun := fun ℓ => rebaseDiagonalLine params ℓ (subCoord zeroCoord t)
-  left_inv := by
-    intro ℓ
-    simpa [rebaseDiagonalLine_zero, addCoord_subCoord_right] using
-      rebaseDiagonalLine_rebase params ℓ t (subCoord zeroCoord t)
-  right_inv := by
-    intro ℓ
-    simpa [rebaseDiagonalLine_zero, addCoord_subCoord_left] using
-      rebaseDiagonalLine_rebase params ℓ (subCoord zeroCoord t) t
-
 private lemma lastRestrictionIndex_val_succ
     (params : Parameters) :
     (lastRestrictionIndex params).val + 1 = params.m := by
@@ -262,21 +165,8 @@ private noncomputable def lastRestrictedSampleEquivDiagonalLine
             omega⟩ : Fin params.m) = k := by
       ext
       rfl
-    simpa [lastRestrictedDirectionEquiv, extendRestrictedDirection, hk] using congrArg direction hidx
-
-private noncomputable def lastRestrictedQuestionEquiv
-    (params : Parameters)
-    [FieldModel params.q] :
-    (RestrictedDiagonalSample params (lastRestrictionIndex params) × Fq params) ≃
-      PointDiagonalLineQuestion params where
-  toFun := fun s => (lastRestrictedSampleEquivDiagonalLine params s.1, s.2)
-  invFun := fun q => ((lastRestrictedSampleEquivDiagonalLine params).symm q.1, q.2)
-  left_inv := by
-    rintro ⟨s, t⟩
-    simp
-  right_inv := by
-    rintro ⟨ℓ, t⟩
-    simp
+    simpa [lastRestrictedDirectionEquiv, extendRestrictedDirection, hk] using
+      congrArg direction hidx
 
 private noncomputable def rebasedLastRestrictedQuestionEquiv
     (params : Parameters)
@@ -295,35 +185,6 @@ private noncomputable def rebasedLastRestrictedQuestionEquiv
   right_inv := by
     rintro ⟨ℓ, t⟩
     simp [DiagonalLine.rebaseAt_rebase, addCoord_subCoord_right]
-
-/-- The exact missing invariant for transporting the corrected diagonal test
-from base-point evaluation to arbitrary line parameters. -/
-private def DiagonalEvaluationReparamInvariant
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) : Prop :=
-  ∀ (ℓ : DiagonalLine params) (t : Fq params),
-    postprocess
-        ((strategy.diagonalMeasurement (rebaseDiagonalLine params ℓ t)).toSubMeas)
-        (fun f => f zeroCoord) =
-      postprocess
-        ((strategy.diagonalMeasurement ℓ).toSubMeas)
-        (fun f => f t)
-
-/-- Under the affine rebasing invariant, evaluating the original line at `t`
-is the same as evaluating the rebased line at `0`. -/
-private lemma sampledDiagonalLineEvaluation_rebase
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (hreparam : DiagonalEvaluationReparamInvariant params strategy)
-    (ℓ : DiagonalLine params) (t : Fq params) :
-    sampledDiagonalLineEvaluation params strategy (ℓ, t) =
-      postprocess
-        ((strategy.diagonalMeasurement (rebaseDiagonalLine params ℓ t)).toSubMeas)
-        (fun f => f zeroCoord) := by
-  simpa [sampledDiagonalLineEvaluation, DiagonalEvaluationReparamInvariant]
-    using (hreparam ℓ t).symm
 
 /-- TODO(#306): Consistency transfer for the corrected restricted diagonal test.
 
@@ -516,7 +377,8 @@ private lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
                       simp [ℓ₀, lastRestrictedSampleEquivDiagonalLine, DiagonalLine.pointAt,
                         addPoint, smulPoint, zeroCoord, addCoord, mulCoord]
             have hA : ∀ a,
-                (((IdxSubMeas.liftLeft (sampledPointMeasurement params strategy)) (e (s, t))).outcome a) =
+                (((IdxSubMeas.liftLeft
+                    (sampledPointMeasurement params strategy)) (e (s, t))).outcome a) =
                   (((IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy j)) s).outcome a) := by
               intro a
               simp [IdxSubMeas.liftLeft, sampledPointMeasurement, diagonalPointAnswerFamily,
@@ -527,7 +389,7 @@ private lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
                   (((IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy j)) s).outcome a) := by
               intro a
               have hreparam :=
-                strategy.diagonalEvaluationReparam
+                hgood.diagonalEvaluationReparam
                   (DiagonalLine.rebaseAt ℓ₀ (subCoord zeroCoord t)) t a
               have hline :
                   ((sampledDiagonalLineEvaluation params strategy) (e (s, t))).outcome a =
@@ -557,12 +419,17 @@ private lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
                               (postprocess
                                 ((strategy.diagonalMeasurement
                                   { base := u,
-                                    direction := lastRestrictedDirectionEquiv params free }).toSubMeas)
+                                    direction :=
+                                      lastRestrictedDirectionEquiv params free
+                                  }).toSubMeas)
                                 (fun f => f zeroCoord)).outcome a =
                               (postprocess
                                 ((strategy.diagonalMeasurement
                                   { base := u,
-                                    direction := extendRestrictedDirection (lastRestrictionIndex params) free }).toSubMeas)
+                                    direction :=
+                                      extendRestrictedDirection
+                                        (lastRestrictionIndex params) free
+                                  }).toSubMeas)
                                 (fun f => f zeroCoord)).outcome a
                             simpa [lastRestrictedDirectionEquiv]
               simpa [IdxSubMeas.liftRight] using
