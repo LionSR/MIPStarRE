@@ -41,6 +41,16 @@ structure PermInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
     ev ψ (leftTensor (ι₂ := ι) M) =
       ev ψ (rightTensor (ι₁ := ι) M)
 
+/-- Reparametrization invariance for diagonal-line measurements: evaluating a
+rebased line at `zeroCoord` agrees outcome-wise with evaluating the original
+line at the rebasing parameter. -/
+def DiagonalEvaluationReparamInvariant (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι) : Prop :=
+  ∀ (ℓ : DiagonalLine params) (t a : Fq params),
+    (postprocess ((M (DiagonalLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a =
+      (postprocess ((M ℓ).toSubMeas) (fun f => f t)).outcome a
+
 /-- Paper-local symmetric strategy data. -/
 structure SymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
@@ -1011,6 +1021,10 @@ structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι
   axisParallelTest : strategy.axisParallelFailureProbability ≤ eps
   selfConsistencyTest : strategy.selfConsistencyFailureProbability ≤ delta
   diagonalLineTest : strategy.diagonalFailureProbability ≤ gamma
+  /-- Lean-local strengthening used to transport the corrected diagonal test
+  from base-point evaluation to arbitrary line parameters. -/
+  diagonalEvaluationReparam :
+    DiagonalEvaluationReparamInvariant params strategy.diagonalMeasurement
 
 end SymStrat
 
