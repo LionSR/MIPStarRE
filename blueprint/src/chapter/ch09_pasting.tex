@@ -49,7 +49,7 @@
 		      \]
 	\end{enumerate}
 \end{theorem}
-\begin{proof}\leanok
+\begin{proof}
 	\uses{lem:ld-pasting-sub-measurement}
 	Let $H$ be the submeasurement from Lemma~\ref{lem:ld-pasting-sub-measurement}, and fix an arbitrary polynomial $h^* \in \polyfunc{m+1}{q}{d}$. Define a measurement $H_{\mathrm{meas}} \in \polymeas{m+1}{q}{d}$ by
 	\[
@@ -875,7 +875,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\sum_{\tau_\ell \in \{0,1\}} S_{\tau_{\ge \ell}} G^{\tau_\ell}(I-G)^{1-\tau_\ell}.
 	\]
 \end{lemma}
-\begin{proof}
+\begin{proof}\leanok
 	Every summand is a polynomial in the commuting positive operators $G$ and $I-G$, so $S_{\tau_{\ge \ell}}$ is Hermitian and positive semidefinite. Summing over all prefixes gives
 	\[
 		S_{\tau_{\ge \ell}} \le (G+(I-G))^{\ell-1}=I.
