@@ -48,10 +48,76 @@ Last updated: 2026-04-14
     paper-faithful normalization hypothesis `hψ : ψ.IsNormalized`
   - verified `lake env lean MIPStarRE/LDT/Preliminaries/SelfConsistency.lean`
     succeeds with no local warnings
-  - verified `leanblueprint web` succeeds after adding `\leanok` to
-    `lem:completion-missing-mass-bound`
+- verified `leanblueprint web` succeeds after adding `\leanok` to
+  `lem:completion-missing-mass-bound`
 - verified `grep` finds no `sorry` anywhere under `MIPStarRE/LDT/Preliminaries`
 - verified `lake build` completes successfully
+
+## Active Commutativity Wave
+- **Owner**: OpenCode
+- **Scope**: `MIPStarRE/LDT/Commutativity/*.lean`
+- **Live executable sorrys in scope**: 2
+- **Current live target**: `MIPStarRE/LDT/Commutativity/Theorems.lean`
+- **Status**: BLOCKED ON `evaluatedSlice_scalar_chain_bound` statement
+- **Dependency chain**:
+  - `MIPStarRE.LDT.Commutativity.gCommStability`
+  - `MIPStarRE.LDT.Commutativity.gCommStabilityTwo`
+  - `MIPStarRE.LDT.Commutativity.evaluatedSlice_scalar_chain_bound`
+  - `MIPStarRE.LDT.Commutativity.fullSliceCommutation_of_evaluated_on_evaluated_questions`
+  - `MIPStarRE.LDT.Commutativity.commDataProcessedG`
+  - `MIPStarRE.LDT.Commutativity.comMain`
+- **Priority order**:
+  1. prove `gCommStability`
+  2. prove `gCommStabilityTwo`
+  3. prove `evaluatedSlice_scalar_chain_bound`
+  4. prove `fullSliceCommutation_of_evaluated_on_evaluated_questions`
+  5. update `blueprint/src/chapter/ch08_commutativity.tex`
+  6. run `lake env lean MIPStarRE/LDT/Commutativity/Theorems.lean`
+  7. run `grep` for remaining `sorry` in `MIPStarRE/LDT/Commutativity`
+  8. run `lake build`
+- **Checklist**:
+  - [x] Survey all `sorry`s in `MIPStarRE/LDT/Commutativity`
+  - [x] Read `docs/proof-hints.md`
+  - [x] Read the matching paper section in `references/ldt-paper/commutativity-G.tex`
+  - [x] Read the matching blueprint section in `blueprint/src/chapter/ch08_commutativity.tex`
+  - [x] Run `lake env lean MIPStarRE/LDT/Commutativity/Theorems.lean`
+  - [x] Prove `gCommStability`
+  - [x] Prove `gCommStabilityTwo`
+  - [ ] Prove `evaluatedSlice_scalar_chain_bound`
+  - [ ] Prove `fullSliceCommutation_of_evaluated_on_evaluated_questions`
+  - [ ] Verify no `sorry`s remain in `MIPStarRE/LDT/Commutativity`
+  - [ ] Add `\leanok` / `\uses` updates in `ch08_commutativity.tex`
+  - [ ] Run `lake build`
+- **Completed on this pass**:
+  - confirmed the target scope is the directory module `MIPStarRE/LDT/Commutativity`
+  - confirmed the only live executable `sorry`s in scope are at
+    `Commutativity/Theorems.lean:1293`, `:1492`, `:1522`, and `:1810`
+  - refreshed the paper/blueprint alignment for
+    `lem:comm-data-processed-g`, `clm:g-comm-stability`,
+    `clm:g-comm-stability2`, and `thm:com-main`
+  - identified the proof dependency order: stability lemmas first, then the
+    scalar chain, then the full-slice Schwartz-Zippel transport
+  - proved `gCommStability` via a direct `qSDDOp` upper bound to the slice SSC
+    defect of `G`, together with a small/large `zeta` split
+  - proved `gCommStabilityTwo` by the same raw SSC route, showing the stated
+    `sqrt zeta + 6 * sqrt (gamma * (m + 1))` bound follows by monotonicity from
+    a stronger `sqrt zeta` estimate
+  - verified `lake env lean MIPStarRE/LDT/Commutativity/Theorems.lean` after the
+    stability refactor; only the scalar chain and full-slice transport remain
+  - isolated a statement-level blocker in `evaluatedSlice_scalar_chain_bound`:
+    the theorem's current signature does not include
+    `family.ConsistentWithPoints strategy zeta`, but every viable `eq:add-an-a`
+    / `consSubMeas` route to the paper's error chain needs exactly that
+    hypothesis
+  - best next step once the blocker is resolved: thread the point-consistency
+    hypothesis into `evaluatedSlice_scalar_chain_bound` (or inline that proof
+    under `commDataProcessedG` where `hcons` is already available), then finish
+    `fullSliceCommutation_of_evaluated_on_evaluated_questions`
+  - addressed PR #366 review feedback by removing dead locals, renaming
+    intentionally-unused theorem parameters with `_`-prefixed names, adding
+    `\leanok` tags for `clm:g-comm-stability` and `clm:g-comm-stability2`,
+    documenting the new helper lemmas, and refactoring the duplicated
+    stability-one / stability-two raw-bound machinery into shared helpers
 
 ## Active Pasting Wave
 - **Owner**: OpenCode
@@ -369,10 +435,10 @@ Last updated: 2026-04-14
 | Lemma | Status | Blocker |
 |-------|--------|---------|
 | `commDataProcessedG` postprocessedSelfConsistency | COMPLETED | Closed earlier via `twoNotionsOfSelfConsistencyAfterEvaluation` and evaluated-point reindexing |
-| `commDataProcessedG` stabilityOne | REMOVED AS EXPORTED FIELD | The old `SDDOpRel` packaging was stronger than the paper's scalar claim and was deleted from `CommDataProcessedGConclusion` |
-| `commDataProcessedG` stabilityTwo | REMOVED AS EXPORTED FIELD | Same source-faithfulness fix as `stabilityOne` |
-| `commDataProcessedG` evaluatedSliceCommutation | ACTIVE | Now the only remaining `lem:comm-data-processed-g` goal; needs the two paper-faithful scalar stability claims plus the processed-point comparison |
-| `comMain` fullSliceCommutation | PENDING ON ACTIVE CHAIN | Final remaining task after `commDataProcessedG`; needs operator-valued Schwartz-Zippel transport from full-slice outcomes to evaluated outcomes |
+| `gCommStability` | COMPLETED | Closed by reducing the expanded raw defect to the slice SSC defect of `G` |
+| `gCommStabilityTwo` | COMPLETED | Closed by the same SSC reduction, stronger than the paper's displayed bound |
+| `evaluatedSlice_scalar_chain_bound` | BLOCKED | Current private lemma signature omits `family.ConsistentWithPoints strategy zeta`, blocking every `consSubMeas` / `eq:add-an-a` proof route without changing the statement |
+| `fullSliceCommutation_of_evaluated_on_evaluated_questions` | PENDING ON ACTIVE CHAIN | Remaining `thm:com-main` Schwartz-Zippel transport from full-slice outcomes to evaluated outcomes |
 
 ### MainInductionStep/Theorems.lean (0 sorrys)
 | Lemma | Status | Blocker |
