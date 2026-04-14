@@ -301,8 +301,13 @@ private lemma qSDDOp_zeroOpFamily_le_one_of_sum_adjoint_mul_le_one
           exact ev_mono ψ _ _ hA
     _ = 1 := ev_one_of_isNormalized ψ hψ
 
--- conjTranspose_mul_mono is now public in Preliminaries/Theorems.lean
-private alias conjTranspose_mul_mono_local := conjTranspose_mul_mono
+-- Forwarding wrapper for the now-public Preliminaries lemma
+private lemma conjTranspose_mul_mono_local
+    {κ : Type*} [Fintype κ]
+    {X Y Z : MIPStarRE.Quantum.Op κ}
+    (hXY : X ≤ Y) :
+    Zᴴ * X * Z ≤ Zᴴ * Y * Z :=
+  Preliminaries.conjTranspose_mul_mono hXY
 
 private lemma leftTensor_conjTranspose
     {κ₁ κ₂ : Type*} [Fintype κ₁] [DecidableEq κ₁] [Fintype κ₂] [DecidableEq κ₂]
@@ -333,8 +338,27 @@ private lemma leftPlacedOpFamily_sum_adjoint_mul_le_one
     _ ≤ 1 :=
           leftTensor_le_one (ι₂ := ι) (subMeas_sum_adjoint_mul_le_one A)
 
--- questionCabApproxDelta is now public in Preliminaries/Theorems.lean
-private alias questionCabApproxDelta_local := questionCabApproxDelta
+-- Forwarding wrapper for the now-public Preliminaries lemma
+private lemma questionCabApproxDelta_local
+    {Outcome Aux κ : Type*}
+    [Fintype Outcome] [Fintype Aux] [Fintype κ] [DecidableEq κ]
+    (ψ : QuantumState κ)
+    (A B : OpFamily Outcome κ)
+    (C : Outcome → Aux → MIPStarRE.Quantum.Op κ)
+    (hC : ∀ a, ∑ b : Aux, (C a b)ᴴ * C a b ≤ 1) :
+    qSDDOp ψ
+        ({ outcome := fun ab : Outcome × Aux =>
+             C ab.1 ab.2 * A.outcome ab.1
+           total := ∑ ab : Outcome × Aux,
+             C ab.1 ab.2 * A.outcome ab.1
+         } : OpFamily (Outcome × Aux) κ)
+        ({ outcome := fun ab : Outcome × Aux =>
+             C ab.1 ab.2 * B.outcome ab.1
+           total := ∑ ab : Outcome × Aux,
+             C ab.1 ab.2 * B.outcome ab.1
+         } : OpFamily (Outcome × Aux) κ) ≤
+      qSDDOp ψ A B :=
+  Preliminaries.questionCabApproxDelta ψ A B C hC
 
 private lemma qSDDOp_leftOrderedProduct_zeroOpFamily_le_one
     {α β : Type*} [Fintype α] [Fintype β]
