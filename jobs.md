@@ -114,6 +114,60 @@ Last updated: 2026-04-14
     under `commDataProcessedG` where `hcons` is already available), then finish
     `fullSliceCommutation_of_evaluated_on_evaluated_questions`
 
+## Active Pasting Wave
+- **Owner**: OpenCode
+- **Scope**: `MIPStarRE/LDT/Pasting/*.lean`
+- **Live executable sorrys in scope**: 11
+- **Current live target**: `MIPStarRE/LDT/Pasting/Theorems.lean`
+- **Status**: IN PROGRESS
+- **Dependency chain**:
+  - `ldGbcon`
+  - `commutativitySwitcheroo`
+  - `commuteGHalfSandwich`
+  - `ldSandwichLineOnePoint`
+  - `hBConsistency`
+  - `hAConsistency`
+  - `overAllOutcomes`
+  - `fromHToG`
+  - `chernoffBernoulliMatrix`
+  - `ldPastingNCompleteness`
+- **Priority order**:
+  1. prove `ldGbcon` or confirm the exact modeling blocker on the conditioned vertical-line test
+  2. prove `commutativitySwitcheroo` if the upstream `ldGbcon` path is not the blocker
+  3. attack the Bernoulli-tail chain now that `truncatedTypeSumRecurrence` is available
+  4. finish downstream wrappers/completeness lemmas that become unblocked
+  5. sync `blueprint/src/chapter/ch09_pasting.tex`
+  6. run `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean` and `lake build`
+- **Checklist**:
+  - [x] Survey all `sorry`s in `MIPStarRE/LDT/Pasting`
+  - [x] Read `docs/proof-hints.md`
+  - [x] Read the corresponding paper/blueprint section for Section 12
+  - [ ] Eliminate `ldGbcon`
+  - [ ] Eliminate `commutativitySwitcheroo`
+  - [ ] Eliminate `commuteGHalfSandwich`
+  - [ ] Eliminate `ldSandwichLineOnePoint`
+  - [ ] Eliminate `hBConsistency`
+  - [ ] Eliminate `hAConsistency`
+  - [ ] Eliminate `overAllOutcomes`
+  - [x] Eliminate `truncatedTypeSumRecurrence`
+  - [ ] Eliminate `fromHToG`
+  - [ ] Eliminate `chernoffBernoulliMatrix`
+  - [ ] Eliminate `ldPastingNCompleteness`
+  - [ ] Add/update `\leanok` tags in `blueprint/src/chapter/ch09_pasting.tex`
+  - [ ] Run `lake build`
+- **Completed on this pass**:
+  - confirmed all current Pasting `sorry`s live in `Pasting/Theorems.lean`
+  - refreshed the exact live chain: `ldGbcon`, `commutativitySwitcheroo`, `commuteGHalfSandwich`, `ldSandwichLineOnePoint`, `hBConsistency`, `hAConsistency`, `overAllOutcomes`, `fromHToG` (2 goals), `chernoffBernoulliMatrix`, `ldPastingNCompleteness`
+  - re-read `references/ldt-paper/ld-pasting.tex` and `blueprint/src/chapter/ch09_pasting.tex` for the active Section 12 spine
+  - re-read `docs/proof-hints.md` and the local Pasting/Preliminaries infrastructure for transport, averaging, and triangle patterns
+  - identified that `ldGbcon` is blocked by the conditioned last-direction axis-line encoding: the axis test uses the sampled ambient basepoint, while the pasting theorem needs the canonical vertical-line family based at height `0`
+  - proved `Pasting.truncatedTypeSumRecurrence` via a `Fin.cons` decomposition of Boolean types, positivity of each operator monomial, and a recursive full-sum identity `∑_τ G^|τ| (I-G)^(k-|τ|) = I`
+  - added `\leanok` tags in `blueprint/src/chapter/ch09_pasting.tex` for `commutingWithGComplete`, `gHatFacts`, and `truncatedTypeSumRecurrence`
+  - verified `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean` still typechecks with 11 remaining local `sorry`s
+  - attempted `leanblueprint web`, but the `leanblueprint` command is not installed in the current environment
+  - confirmed `fromHToG` is blocked by the current scaffold: `fromHToGRecurrenceLeftFamily` / `RightFamily` already collapse to endpoint families times a weight operator, so they do not encode the paper's suffix-indexed intermediate quantities
+  - confirmed `commuteGHalfSandwich` is blocked at the theorem interface: the statement no longer carries the small-error assumptions needed to weaken the `2 * zeta` self-consistency cost from `GHatFactsStatement` to the displayed `zeta^(1/16)` bound
+
 ## Active CommutativityPoints Wave
 - **Owner**: OpenCode
 - **Scope**: `MIPStarRE/LDT/CommutativityPoints/*.lean`
@@ -344,19 +398,22 @@ Last updated: 2026-04-14
 ### Pasting/Theorems.lean (11 sorrys)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
-| `gCompleteSelfConsistency` | LIVE TARGET | First theorem on the active Section 12 spine |
-| `commutativitySwitcheroo` | LIVE TARGET | Best current high-leverage theorem; depends on local switcheroo helper bridges |
+| `ldGbcon` | BLOCKED | The conditioned axis test indexes the last-direction line by the sampled ambient basepoint, while `verticalLineMeasurementFamily` uses the canonical base at height `0`; no invariance/reparameterization lemma currently connects the two encodings |
+| `gCompleteSelfConsistency` | COMPLETED | Pure repackaging of slice strong self-consistency |
+| `commutativitySwitcheroo` | LIVE TARGET | Best current high-leverage theorem after `ldGbcon`; depends on local switcheroo helper bridges |
 | `completePartProjFamily.proj` | COMPLETED | Projectivity wrapper proved via `projSubMeas_total_proj` and `postprocess_total` |
 | `pointWithCompletePart_as_switcheroo_input` | COMPLETED | Pure outcome-type rewrite from `Polynomial` to `Polynomial × Unit` |
 | `completePartAggregateCommutation_as_total` | COMPLETED | Closed via a `Unit`-outcome `qSDDOp` congruence lemma |
-| `commutingWithGComplete` | PARTIALLY ADVANCED | Statement repaired to explicit small-error regime; scalar `θ₁`/`θ₂` comparisons are now proved, remaining blocker is `commutativitySwitcheroo` |
-| `gHatFacts` (2 subgoals) | BLOCKED ON ACTIVE CHAIN | Depends on `commutingWithGComplete` and complete/incomplete decomposition |
-| `commuteGHalfSandwich` | BLOCKED ON ACTIVE CHAIN | Depends on `gHatFacts` |
+| `commutingWithGComplete` | COMPLETED | Statement repaired to explicit small-error regime and now closes once `commutativitySwitcheroo` is available |
+| `gHatFacts` | COMPLETED | Complete/incomplete decomposition now proved |
+| `commuteGHalfSandwich` | BLOCKED | The statement/package dropped the small-error hypotheses needed to weaken the `2 * zeta` self-consistency term to the displayed `zeta^(1/16)` bound |
 | `ldSandwichLineOnePoint` | BLOCKED ON ACTIVE CHAIN | Depends on commuted sandwich estimate |
 | `hBConsistency` | BLOCKED ON ACTIVE CHAIN | Depends on one-point comparison |
-| `overAllOutcomes` | BLOCKED | Total mass expansion |
-| `fromHToG` | BLOCKED | Bernoulli-tail recurrence |
-| `chernoffBernoulliMatrix` | BLOCKED | Matrix Chernoff/Bernoulli bound |
+| `hAConsistency` | BLOCKED ON ACTIVE CHAIN | Wrapper around `hBConsistency` plus completion-to-measurement transfer |
+| `overAllOutcomes` | BLOCKED | Total mass expansion and Schwartz-Zippel removal |
+| `truncatedTypeSumRecurrence` | COMPLETED | Bernoulli-tail recurrence formalized via Boolean-prefix recursion |
+| `fromHToG` | BLOCKED | The current recurrence-family defs already collapse to endpoint families times a shared weight, so they do not model the paper's tail-indexed recurrence step |
+| `chernoffBernoulliMatrix` | BLOCKED | Matrix Chernoff/Bernoulli bound; likely needs spectral infrastructure |
 | `ldPastingNCompleteness` | BLOCKED | Combines above results |
 | `ldPastingSubMeas` | BLOCKED | Wrapper around `ldPasting` |
 | `ldPasting` | BLOCKED | Top-level theorem |
