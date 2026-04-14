@@ -463,6 +463,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{corollary}[Commutativity of the complete part]\label{cor:commuting-with-G-complete}
 	\lean{MIPStarRE.LDT.Pasting.commutingWithGComplete}
+	\leanok
 	\uses{thm:com-main, lem:commutativity-switcheroo, lem:g-complete-self-consistency}
 	Under the hypotheses of Theorem~\ref{thm:ld-pasting}, the following commutation relations hold:
 	\[
@@ -526,6 +527,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{corollary}[Strong self-consistency and commutation of $\widehat G$]\label{cor:G-hat-facts}
 	\lean{MIPStarRE.LDT.Pasting.gHatFacts}
+	\leanok
 	\uses{lem:g-complete-self-consistency, cor:g-bot-self-consistency, cor:commuting-with-G-complete, cor:commuting-with-G-incomplete}
 	The completed measurements $\widehat G^x$ satisfy
 	\begin{align}
@@ -864,6 +866,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Recurrence for truncated type sums]\label{lem:truncated-type-sum-recurrence}
 	\lean{MIPStarRE.LDT.Pasting.truncatedTypeSumRecurrence}
+	\leanok
 	\uses{def:truncated-type-sums}
 	Each $S_{\tau_{\ge \ell}}$ is Hermitian, positive semidefinite, and bounded by $I$. Moreover, if $\tau_{>\ell}$ is a tail type of length $k-\ell$, then
 	\[
