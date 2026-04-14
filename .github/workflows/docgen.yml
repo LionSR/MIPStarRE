@@ -12,11 +12,13 @@ on:
         default: 'main'
 
 concurrency:
-  group: gh-pages-deploy
+  group: pages-deploy
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build_project:
@@ -41,50 +43,8 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.ref || 'main' }}
 
-      - name: Build project
-        uses: leanprover/lean-action@v1
+      - name: Build project, blueprint, and documentation
+        uses: leanprover-community/docgen-action@main
         with:
-          build: true
-
-      - name: Install TeX and graphviz
-        run: sudo apt-get update && sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended texlive-science latexmk graphviz libgraphviz-dev
-
-      - name: Install leanblueprint
-        run: |
-          pipx install leanblueprint
-          pipx inject --include-apps --force leanblueprint plastex
-
-      - name: Build blueprint
-        working-directory: blueprint
-        run: |
-          leanblueprint pdf
-          tmp_output_file="$(mktemp)"
-
-          set +o pipefail
-          leanblueprint web 2>&1 | tee "$tmp_output_file"
-          cmd_status=${PIPESTATUS[0]}
-          set -o pipefail
-
-          if grep -q "^ERROR:" "$tmp_output_file"; then
-            echo "::error::Blueprint has unresolved labels (see ERROR lines above)"
-            exit 1
-          fi
-          if grep -q "WARNING: File not found:" "$tmp_output_file"; then
-            echo "::error::Blueprint has missing files (see WARNING lines above)"
-            exit 1
-          fi
-
-          if [ "$cmd_status" -ne 0 ]; then
-            exit "$cmd_status"
-          fi
-
-      - name: Generate API docs
-        run: |
-          cd docbuild
-          lake build MIPStarRE:docs
-
-      - name: Deploy to gh-pages
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: ./scripts/deploy-to-gh-pages.sh --with-docs --ci
+          blueprint: true
+          homepage: home_page
