@@ -148,6 +148,20 @@ def addCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq 
 def subCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x - decodeScalar y)
 
+@[simp] theorem addCoord_subCoord_right {params : Parameters} [FieldModel params.q]
+    (x y : Fq params) :
+    addCoord y (subCoord x y) = x := by
+  unfold addCoord subCoord
+  rw [decode_encodeScalar]
+  simp [sub_eq_add_neg]
+
+@[simp] theorem addCoord_subCoord_left {params : Parameters} [FieldModel params.q]
+    (x y : Fq params) :
+    addCoord (subCoord x y) y = x := by
+  unfold addCoord subCoord
+  rw [decode_encodeScalar]
+  simp [sub_eq_add_neg]
+
 /-- Coordinate multiplication transported through the `Fin q` coding. -/
 def mulCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x * decodeScalar y)
@@ -245,11 +259,90 @@ def pointAt {params : Parameters} [FieldModel params.q]
     (ℓ : DiagonalLine params) : Fq params → Point params :=
   fun t => addPoint ℓ.base (smulPoint t ℓ.direction)
 
+/-- Rebase a diagonal line so that the old point `ℓ.pointAt t` becomes the new base point. -/
+def rebaseAt {params : Parameters} [FieldModel params.q]
+    (ℓ : DiagonalLine params) (t : Fq params) : DiagonalLine params where
+  base := ℓ.pointAt t
+  direction := ℓ.direction
+
+@[simp] theorem rebaseAt_pointAt_zero {params : Parameters} [FieldModel params.q]
+    (ℓ : DiagonalLine params) (t : Fq params) :
+    (rebaseAt ℓ t).pointAt zeroCoord = ℓ.pointAt t := by
+  ext i
+  simp [rebaseAt, pointAt, addPoint, smulPoint, addCoord, mulCoord, zeroCoord]
+
+theorem rebaseAt_pointAt {params : Parameters} [FieldModel params.q]
+    (ℓ : DiagonalLine params) (t s : Fq params) :
+    (rebaseAt ℓ t).pointAt s = ℓ.pointAt (addCoord t s) := by
+  ext i
+  simp [rebaseAt, pointAt, addPoint, smulPoint, addCoord, mulCoord]
+  rw [← encode_decodeScalar (ℓ.base i)]
+  congr 1
+  ring_nf
+
+@[simp] theorem rebaseAt_zero {params : Parameters} [FieldModel params.q]
+    (ℓ : DiagonalLine params) :
+    rebaseAt ℓ zeroCoord = ℓ := by
+  cases ℓ with
+  | mk base direction =>
+      change
+        ({ base := ({ base := base, direction := direction } : DiagonalLine params).pointAt zeroCoord,
+           direction := direction } : DiagonalLine params) =
+        ({ base := base, direction := direction } : DiagonalLine params)
+      congr
+      funext i
+      simp [pointAt, addPoint, smulPoint, addCoord, mulCoord, zeroCoord]
+
+theorem rebaseAt_rebase {params : Parameters} [FieldModel params.q]
+    (ℓ : DiagonalLine params) (t s : Fq params) :
+    rebaseAt (rebaseAt ℓ t) s = rebaseAt ℓ (addCoord t s) := by
+  cases ℓ with
+  | mk base direction =>
+      change
+        ({ base := (rebaseAt ({ base := base, direction := direction } : DiagonalLine params) t).pointAt s,
+           direction := direction } : DiagonalLine params) =
+        ({ base := ({ base := base, direction := direction } : DiagonalLine params).pointAt (addCoord t s),
+           direction := direction } : DiagonalLine params)
+      exact congrArg
+        (fun b => ({ base := b, direction := direction } : DiagonalLine params))
+        (rebaseAt_pointAt { base := base, direction := direction } t s)
+
 /-- Embed a diagonal line into the slice at height `x`, keeping the new coordinate fixed. -/
 def appendAtHeight (params : Parameters) [FieldModel params.q]
     (ℓ : DiagonalLine params) (x : Fq params) : DiagonalLine params.next where
   base := appendPoint params ℓ.base x
   direction := appendPoint params ℓ.direction zeroCoord
+
+@[simp] theorem appendAtHeight_rebaseAt {params : Parameters} [FieldModel params.q]
+    (ℓ : DiagonalLine params) (t x : Fq params) :
+    appendAtHeight params (rebaseAt ℓ t) x =
+      rebaseAt (appendAtHeight params ℓ x) t := by
+  cases ℓ with
+  | mk base direction =>
+      show
+        ({ base := appendPoint params (addPoint base (smulPoint t direction)) x,
+           direction := appendPoint params direction zeroCoord } : DiagonalLine params.next) =
+        ({ base := addPoint (appendPoint params base x)
+             (smulPoint t (appendPoint params direction zeroCoord)),
+           direction := appendPoint params direction zeroCoord } : DiagonalLine params.next)
+      congr
+      funext i
+      by_cases hi : i.1 < params.m
+      · simp [appendPoint, addPoint, smulPoint, addCoord, mulCoord, hi]
+        rfl
+      · simp [appendPoint, addPoint, smulPoint, addCoord, mulCoord, hi, zeroCoord]
+        rw [← encode_decodeScalar x]
+        congr 1
+        ring_nf
+        have hx' : decodeScalar (encodeScalar (decodeScalar x)) = decodeScalar x := by
+          simpa using (decode_encodeScalar (params := params) (x := decodeScalar x))
+        have hz' : decodeScalar (encodeScalar (0 : Scalar params)) = (0 : Scalar params) := by
+          simpa using (decode_encodeScalar (params := params) (x := (0 : Scalar params)))
+        calc
+          decodeScalar x = decodeScalar x + decodeScalar t * (0 : Scalar params) := by ring
+          _ = decodeScalar x + decodeScalar t * decodeScalar (encodeScalar 0) := by rw [hz']
+          _ = decodeScalar (encodeScalar (decodeScalar x)) +
+                decodeScalar t * decodeScalar (encodeScalar 0) := by rw [hx']
 
 end DiagonalLine
 

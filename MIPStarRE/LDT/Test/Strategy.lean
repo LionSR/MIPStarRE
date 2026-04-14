@@ -42,6 +42,14 @@ structure PermInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
       ev ψ (rightTensor (ι₁ := ι) M)
 
 /-- Paper-local symmetric strategy data. -/
+def DiagonalEvaluationReparamInvariant (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι) : Prop :=
+  ∀ (ℓ : DiagonalLine params) (t a : Fq params),
+    (postprocess ((M (DiagonalLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a =
+      (postprocess ((M ℓ).toSubMeas) (fun f => f t)).outcome a
+
+/-/ Paper-local symmetric strategy data. -/
 structure SymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
@@ -51,6 +59,8 @@ structure SymStrat (params : Parameters) [FieldModel params.q]
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurement :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+  diagonalEvaluationReparam :
+    DiagonalEvaluationReparamInvariant params diagonalMeasurement
 
 -- NOTE: no global `Inhabited` instance for `SymStrat`; constructing default
 -- projective measurement families is non-canonical and requires additional
@@ -161,11 +171,15 @@ structure ProjStrat (params : Parameters) [FieldModel params.q]
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurementA :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+  diagonalEvaluationReparamA :
+    DiagonalEvaluationReparamInvariant params diagonalMeasurementA
   pointMeasurementB : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurementB :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurementB :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+  diagonalEvaluationReparamB :
+    DiagonalEvaluationReparamInvariant params diagonalMeasurementB
 
 /-- Basis projector onto the role sector `r`. -/
 def roleProj (r : Role) : MIPStarRE.Quantum.Op Role :=
@@ -914,6 +928,31 @@ noncomputable def symmetrizedIdxProjMeas
         simp [add_mul, mul_add, roleCond_mul_same, roleCond_A_mul_B,
           roleCond_B_mul_A, (MA q).proj a, (MB q).proj a] }
 
+private lemma symmetrizedIdxProjMeas_diagonalEvaluationReparam
+    {params : Parameters} [FieldModel params.q] {ι : Type*}
+    [Fintype ι] [DecidableEq ι]
+    (MA MB : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι)
+    (hA : DiagonalEvaluationReparamInvariant params MA)
+    (hB : DiagonalEvaluationReparamInvariant params MB) :
+    DiagonalEvaluationReparamInvariant params (symmetrizedIdxProjMeas MA MB) := by
+  intro ℓ t a
+  classical
+  calc
+    (postprocess ((symmetrizedIdxProjMeas MA MB (DiagonalLine.rebaseAt ℓ t)).toSubMeas)
+        (· zeroCoord)).outcome a
+      = roleCond Role.A
+          ((postprocess ((MA (DiagonalLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a) +
+        roleCond Role.B
+          ((postprocess ((MB (DiagonalLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a) := by
+            simp [symmetrizedIdxProjMeas, postprocess, Finset.sum_add_distrib,
+              roleCond_finset_sum, add_assoc]
+    _ = roleCond Role.A ((postprocess ((MA ℓ).toSubMeas) (fun f => f t)).outcome a) +
+        roleCond Role.B ((postprocess ((MB ℓ).toSubMeas) (fun f => f t)).outcome a) := by
+            rw [hA ℓ t a, hB ℓ t a]
+    _ = (postprocess ((symmetrizedIdxProjMeas MA MB ℓ).toSubMeas) (fun f => f t)).outcome a := by
+            simp [symmetrizedIdxProjMeas, postprocess, Finset.sum_add_distrib,
+              roleCond_finset_sum, add_assoc]
+
 namespace ProjStrat
 
 /-- The paper's symmetrized point measurement, obtained by putting Alice's and
@@ -950,6 +989,12 @@ noncomputable def classicalRoleSymmStrategy {params : Parameters}
   pointMeasurement := strategy.symmetrizedPointMeasurement
   axisParallelMeasurement := strategy.symmetrizedAxisParallelMeasurement
   diagonalMeasurement := strategy.symmetrizedDiagonalMeasurement
+  diagonalEvaluationReparam :=
+    symmetrizedIdxProjMeas_diagonalEvaluationReparam
+      strategy.diagonalMeasurementA
+      strategy.diagonalMeasurementB
+      strategy.diagonalEvaluationReparamA
+      strategy.diagonalEvaluationReparamB
 
 /-- The classical role-register symmetrized strategy preserves normalization. -/
 theorem classicalRoleSymmStrategy_isNormalized {params : Parameters}
@@ -1026,6 +1071,7 @@ def leftAsSymmetric {params : Parameters} [FieldModel params.q]
   pointMeasurement := strategy.pointMeasurementA
   axisParallelMeasurement := strategy.axisParallelMeasurementA
   diagonalMeasurement := strategy.diagonalMeasurementA
+  diagonalEvaluationReparam := strategy.diagonalEvaluationReparamA
 
 /-- View the right prover's local data as a symmetric-strategy-style package. -/
 def rightAsSymmetric {params : Parameters} [FieldModel params.q]
@@ -1037,6 +1083,7 @@ def rightAsSymmetric {params : Parameters} [FieldModel params.q]
   pointMeasurement := strategy.pointMeasurementB
   axisParallelMeasurement := strategy.axisParallelMeasurementB
   diagonalMeasurement := strategy.diagonalMeasurementB
+  diagonalEvaluationReparam := strategy.diagonalEvaluationReparamB
 
 /-- Trace-based failure surrogate for the full low-individual-degree
 test, matching the paper's `fig:test` with role-based decomposition.
