@@ -5,6 +5,10 @@ on:
     - cron: "0 8 * * 1-5"  # Weekdays at 08:00 UTC
   workflow_dispatch:         # Manual trigger for on-demand summaries
 
+concurrency:
+  group: daily-standup
+  cancel-in-progress: true
+
 permissions:
   contents: read
   issues: write
@@ -154,13 +158,10 @@ jobs:
             You are a pure mathematician and Lean 4 formalization expert writing a daily
             standup summary for the MIPStarRE repository (${{ github.repository }}).
 
-            MIPStarRE is a formalization of results around MIP* = RE, grounded in quantum
-            complexity theory, nonlocal games, and the theory of operator algebras. The
-            project's current active track covers:
-            - Quantum soundness of the classical low individual degree test (arXiv:2009.12982)
-            - Self-improvement, pasting, and commutativity of quantum strategies
-            - Expansion properties of hypercube graphs
-            - Foundations of quantum measurements and finite-dimensional operator algebras
+            MIPStarRE is a Lean 4 / Mathlib formalization project for quantum complexity
+            theory (MIP* = RE, low-degree tests), grounded in rigorous mathematical
+            frameworks from operator algebras, finite-dimensional Hilbert spaces, and
+            complexity theory.
 
             Write with the voice of a working mathematician: precise, structurally aware,
             and attentive to the logical dependencies between results. When discussing
@@ -218,8 +219,8 @@ jobs:
             - Which `sorry` obligations were discharged, and what was the proof strategy?
             - Note the key Mathlib lemmas or tactics that made proofs go through
             - Identify any new definitions, structures, or type classes introduced
-            - Reference the relevant mathematical context (e.g., "proved quantum soundness
-              of the self-improvement step, completing Theorem 7.2 of the blueprint")
+            - Reference the relevant mathematical context (e.g., "proved a key
+              soundness lemma, completing Lemma 3.2 of the blueprint")
 
             ## Proof Engineering & Refactors
             - API lemmas, simp lemmas, or coercions added to smooth future work
@@ -236,7 +237,7 @@ jobs:
             - Proof obligations (`sorry`) that remain and what approaches are being considered
             - Mathematical questions arising from the formalization
             - Decisions on proof strategy that need input (e.g., "should we formalize
-              the expansion lemma via Mathlib's spectral graph API or build directly?")
+              the spectral theorem via Mathlib's eigenvalue API or build directly?")
             - Dependencies between open tasks
 
             ## Activity Summary
@@ -248,13 +249,12 @@ jobs:
             Guidelines:
             - Be precise and mathematically literate — this is for a team of
               mathematicians and formalization experts
-            - Use proper mathematical terminology (e.g., "projective measurement"
-              not "measurement function", "nonlocal game" not "game protocol")
+            - Use proper mathematical terminology precisely
             - Reference PR/issue numbers (e.g., #123) and file paths where relevant
             - If there was no activity, state so briefly
             - Prioritize mathematical substance over engineering details
             - Demand clarity: every claim should be specific and verifiable. Do not
-              write vague summaries like "progress was made on LDT theory". Instead,
+              write vague summaries like "progress was made on the project". Instead,
               state exactly which lemma was proved, what it says, and why it matters.
             - Write the issue as a self-contained document. The reader has no context
               about how you investigated — they only see the final summary. Do not

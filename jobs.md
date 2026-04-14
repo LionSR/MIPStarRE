@@ -1,11 +1,11 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-13
+Last updated: 2026-04-14
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
-- **Current**: 19 executable sorrys across 6 files
-- **Eliminated**: 47 executable sorrys
+- **Current**: 25 executable sorrys across 6 files
+- **Eliminated**: 41 executable sorrys
 - **Infrastructure fixes landed on this branch**:
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
@@ -113,6 +113,88 @@ Last updated: 2026-04-13
     hypothesis into `evaluatedSlice_scalar_chain_bound` (or inline that proof
     under `commDataProcessedG` where `hcons` is already available), then finish
     `fullSliceCommutation_of_evaluated_on_evaluated_questions`
+
+## Active CommutativityPoints Wave
+- **Owner**: OpenCode
+- **Scope**: `MIPStarRE/LDT/CommutativityPoints/*.lean`
+- **Live executable sorrys in scope**: 0
+- **Current live target**: none
+- **Status**: COMPLETED
+- **Dependency chain**:
+  - `sampledDiagonalLineConsistency`
+  - `sampledDiagonalLineApproximation`
+  - `sampledDiagonalLineApproximation_pointWithDiagonalLine`
+  - `sampledDiagonalLineApproximation_ignore_first`
+  - `sampledDiagonalLineApproximation_ignore_second`
+  - `commutativityPoints`
+- **Priority order**:
+  1. survey the remaining `sorry` in `CommutativityPoints`
+  2. read the paper and blueprint statements for `thm:commutativity-points`
+  3. compare the current restricted-diagonal test definitions against the target
+     `PointDiagonalLineQuestion` transport step
+  4. inspect the removed `pointDiagonalLineQuestionEquiv` proof route in git history
+  5. either rebuild the transport from current assumptions or record the exact
+     missing invariant if the route is no longer derivable
+- **Checklist**:
+  - [x] Enumerate all `sorry`s in `MIPStarRE/LDT/CommutativityPoints`
+  - [x] Read `references/ldt-paper/commutativity-points.tex`
+  - [x] Read `blueprint/src/chapter/ch08_commutativity.tex`
+  - [x] Read `docs/proof-hints.md`
+  - [x] Inspect `CommutativityPoints/Theorem.lean` and
+    `CommutativityPoints/Defs.lean`
+  - [x] Inspect `Test/Strategy.lean` definitions for
+    `RestrictedDiagonalSample`, `diagonalPointAnswerFamily`, and
+    `diagonalLineAnswerFamily`
+  - [x] Inspect the old `pointDiagonalLineQuestionEquiv` route in git history
+  - [x] Prove `sampledDiagonalLineApproximation_pointWithDiagonalLine`
+  - [x] Run `lake env lean MIPStarRE/LDT/CommutativityPoints/Theorem.lean`
+  - [x] Verify no `sorry`s remain in `MIPStarRE/LDT/CommutativityPoints`
+  - [x] Add `\leanok` / `\uses` updates in `blueprint/src/chapter/ch08_commutativity.tex`
+  - [x] Run `lake build`
+- **Completed on this pass**:
+  - confirmed the only live executable `sorry` in `CommutativityPoints` is
+    `sampledDiagonalLineApproximation_pointWithDiagonalLine`
+  - traced the local proof spine from the corrected
+    `sampledDiagonalLineConsistency` and `sampledDiagonalLineApproximation`
+    lemmas into the downstream shared-line commutativity bridges
+  - verified the paper and blueprint target statements at
+    `references/ldt-paper/commutativity-points.tex` and
+    `blueprint/src/chapter/ch08_commutativity.tex`
+  - checked git history: commit `838ff11` proved the old transport via
+    `pointDiagonalLineQuestionEquiv` when the diagonal test used the old
+    `DiagonalTestSample`; commit `ad33e7b` removed that route when the test was
+    corrected to `RestrictedDiagonalSample`
+  - verified `lake env lean MIPStarRE/LDT/CommutativityPoints/Theorem.lean`
+    still typechecks except for the single remaining transport `sorry`
+  - verified `grep` finds exactly one executable `sorry` under
+    `MIPStarRE/LDT/CommutativityPoints`
+  - added local rebasing helpers in `CommutativityPoints/Theorem.lean`:
+    `rebaseDiagonalLine`, `rebaseDiagonalLine_pointAt_zero`,
+    `DiagonalEvaluationReparamInvariant`, and
+    `sampledDiagonalLineEvaluation_rebase`
+  - added the parameter-shift bookkeeping that the eventual transport proof
+    will need once the invariant exists:
+    `rebaseDiagonalLine_pointAt`, `rebaseDiagonalLine_zero`,
+    `rebaseDiagonalLine_rebase`, `rebaseDiagonalLineEquiv`,
+    `lastRestrictionIndex_val_succ`, `lastRestrictedDirectionEquiv`,
+    `lastRestrictedSampleEquivDiagonalLine`, and
+    `lastRestrictedQuestionEquiv`
+  - replaced the former blocker with a reusable strategy-level invariant:
+    `DiagonalEvaluationReparamInvariant` on diagonal-line measurements, together
+    with public rebasing lemmas in `Basic/Parameters.lean`
+  - localized the new rebasing invariant to `SymStrat.IsGood` instead of adding
+    it to the core `SymStrat` / `ProjStrat` records
+  - proved `sampledDiagonalLineApproximation_pointWithDiagonalLine` by reindexing
+    `RestrictedDiagonalSample(last) × Fq` onto `PointDiagonalLineQuestion` via a
+    rebased-line equivalence and then transporting the line side with the new
+    invariant
+  - verified `grep` finds no executable `sorry` in
+    `MIPStarRE/LDT/CommutativityPoints`
+  - verified `lake env lean MIPStarRE/LDT/CommutativityPoints/Theorem.lean`
+    succeeds
+  - verified `lake build` succeeds after the strategy-model update
+  - synced `blueprint/src/chapter/ch08_commutativity.tex` with the completed
+    Lean theorem without overclaiming statement-level `\leanok`
 
 ## Active Strategy
 - `MainInductionStep` is complete for this wave.
