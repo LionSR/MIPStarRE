@@ -4808,6 +4808,46 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
           4 * (↑params.m * ↑params.d / ↑params.q) +
           2 * Real.sqrt
             (commDataProcessedGError params gamma zeta) := by
+      /-
+      TODO(#361): this is the remaining paper-faithful transport from
+      polynomial-indexed full slice outcomes to their sampled evaluation
+      postprocessings (`commutativity-G.tex`, lines 278-408).
+
+      The existing file has the ingredients for the evaluated commutator:
+      `evaluatedSliceCommutation_qSDDOp_avg_eq`, the self-consistency
+      pullbacks, `closenessOfIP`, and `normalizationCondition`.  What is still
+      missing is the analogous infrastructure for the full polynomial outcomes:
+
+      1. A full-slice version of `evaluatedSliceCommutation_qSDDOp_avg_eq`,
+         expanding the pulled-back `qSDDOp` into the two scalar quartic terms
+         `E_{x,y} ∑_{g,h} <G^x_g G^y_h G^x_g>` and
+         `E_{x,y} ∑_{g,h} <G^x_g G^y_h G^x_g G^y_h>`.
+
+      2. Two Schwartz-Zippel marginalization lemmas in scalar form:
+         replacing `∑_g G^x_g` by `E_u ∑_a G^x_[g(u)=a]`, and then
+         replacing `∑_h G^y_h` by `E_v ∑_b G^y_[h(v)=b]`, each with loss
+         `params.m * params.d / params.q`.  These need to bridge
+         `Polynomial params` to `Preliminaries.polyFunc` so that
+         `schwartzZippel_individualDegree` applies, and they need positivity
+         lemmas showing the off-diagonal collision terms are bounded by the
+         submeasurement mass.
+
+      3. Packaged `closenessOfIP` applications for the intermediate scalar
+         terms, using `family.StronglySelfConsistent` after postprocessing by
+         point evaluation.  The normalization side conditions should be closed
+         by the existing `normalizationCondition` / projective-postprocess
+         lemmas, but there is no current lemma exposing exactly the
+         `C q a b` families used in lines 332-367 of the paper.
+
+      4. A final `closenessOfIP` specialization of `hEval` to the evaluated
+         ABAB scalar term (paper lines 391-405), yielding the
+         `sqrt (commDataProcessedGError params gamma zeta)` contribution.
+
+      Once those four scalar lemmas are available, the final estimate is just
+      the paper bookkeeping:
+      `2 * (2√ζ + 2(md/q) + √ν + 4√ζ) =
+       12√ζ + 4(md/q) + 2√ν`.
+      -/
       sorry
     -- Step 2: Error arithmetic (using small-parameter hypotheses).
     -- Show:
