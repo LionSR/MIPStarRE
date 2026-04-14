@@ -113,6 +113,11 @@ Last updated: 2026-04-14
     hypothesis into `evaluatedSlice_scalar_chain_bound` (or inline that proof
     under `commDataProcessedG` where `hcons` is already available), then finish
     `fullSliceCommutation_of_evaluated_on_evaluated_questions`
+  - addressed PR #366 review feedback by removing dead locals, renaming
+    intentionally-unused theorem parameters with `_`-prefixed names, adding
+    `\leanok` tags for `clm:g-comm-stability` and `clm:g-comm-stability2`,
+    documenting the new helper lemmas, and refactoring the duplicated
+    stability-one / stability-two raw-bound machinery into shared helpers
 
 ## Active Pasting Wave
 - **Owner**: OpenCode

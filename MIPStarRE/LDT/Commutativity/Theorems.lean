@@ -1299,9 +1299,6 @@ private lemma evaluatedSlice_scalar_chain_bound
     evaluatedPointSelfConsistency_fst params strategy family zeta _hpostSSC
   have hpostSSC_snd :=
     evaluatedPointSelfConsistency_snd params strategy family zeta _hpostSSC
-  let _ := h𝒟
-  let _ := hpostSSC_fst
-  let _ := hpostSSC_snd
   sorry
 
 /-- `lem:comm-data-processed-g`. -/
@@ -1473,7 +1470,20 @@ lemma commDataProcessedG
           hnorm hgood family G hG hself hbound hpostSSC }
   simpa [evaluatedPointFamily] using hcons.pointConsistency
 
+/-- The common overlap term `⟨ψ, (I - G^x) ⊗ G^x ψ⟩` controlling both
+stability estimates. -/
+private noncomputable def gCommOverlapTerm
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (x : Fq params) : Error :=
+  ev strategy.state
+    (leftTensor (ι₂ := ι) (1 - (G x).total) *
+      rightTensor (ι₁ := ι) ((G x).total))
+
 set_option maxHeartbeats 2000000 in
+/-- The slice self-consistency defect of `G` is at most `zeta / 2`. -/
 private lemma gCommStability_sliceSSC
     (params : Parameters)
     [FieldModel params.q]
@@ -1539,6 +1549,96 @@ private lemma gCommStability_sliceSSC
     _ = zeta / 2 := by ring
 
 set_option maxHeartbeats 2000000 in
+/-- A sandwiched product of two submeasurements is controlled by the overlap of
+the right-hand total with its complement. -/
+private lemma gCommStability_pointwise_sum_bound_core
+    (ψ : QuantumState (ι × ι))
+    {α β : Type*} [Fintype α] [Fintype β]
+    (A : SubMeas α ι)
+    (B : SubMeas β ι)
+    (hB_sq : B.total * B.total = B.total) :
+    (∑ ab : α × β,
+        ev ψ
+          ((leftTensor (ι₂ := ι)
+              ((1 - B.total) * A.outcome ab.1 * (1 - B.total))) *
+            rightTensor (ι₁ := ι) (B.outcome ab.2))) ≤
+      ev ψ
+        (leftTensor (ι₂ := ι) (1 - B.total) *
+          rightTensor (ι₁ := ι) B.total) := by
+  let T : MIPStarRE.Quantum.Op ι := B.total
+  have hT_herm : Tᴴ = T := by
+    exact
+      (Matrix.nonneg_iff_posSemidef.mp <| by
+        simpa [T] using B.total_nonneg).isHermitian.eq
+  have hTc_herm : (1 - T)ᴴ = 1 - T := by
+    simp [hT_herm]
+  calc
+    ∑ ab : α × β,
+        ev ψ
+          ((leftTensor (ι₂ := ι)
+              ((1 - B.total) * A.outcome ab.1 * (1 - B.total))) *
+            rightTensor (ι₁ := ι) (B.outcome ab.2))
+      = ∑ a : α,
+          ev ψ
+            (leftTensor (ι₂ := ι) ((1 - T) * A.outcome a * (1 - T)) *
+              rightTensor (ι₁ := ι) T) := by
+          rw [Fintype.sum_prod_type]
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [← ev_sum ψ
+            (fun b : β =>
+              leftTensor (ι₂ := ι) ((1 - T) * A.outcome a * (1 - T)) *
+                rightTensor (ι₁ := ι) (B.outcome b))]
+          rw [← Matrix.mul_sum]
+          rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ B.outcome]
+          rw [B.sum_eq_total]
+    _ = ev ψ
+          (leftTensor (ι₂ := ι) ((1 - T) * A.total * (1 - T)) *
+            rightTensor (ι₁ := ι) T) := by
+          rw [← ev_sum ψ
+            (fun a : α =>
+              leftTensor (ι₂ := ι) ((1 - T) * A.outcome a * (1 - T)) *
+                rightTensor (ι₁ := ι) T)]
+          rw [← Finset.sum_mul]
+          rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ
+            (fun a : α => (1 - T) * A.outcome a * (1 - T))]
+          rw [show leftTensor (ι₂ := ι)
+              (∑ a : α, (1 - T) * A.outcome a * (1 - T)) =
+                leftTensor (ι₂ := ι) ((1 - T) * A.total * (1 - T)) by
+                congr 1
+                calc
+                  ∑ a : α, (1 - T) * A.outcome a * (1 - T)
+                    = (∑ a : α, (1 - T) * A.outcome a) * (1 - T) := by
+                        rw [← Finset.sum_mul]
+                  _ = ((1 - T) * ∑ a : α, A.outcome a) * (1 - T) := by
+                        rw [Matrix.mul_sum]
+                  _ = (1 - T) * (∑ a : α, A.outcome a) * (1 - T) := by
+                        simp [mul_assoc]
+                  _ = (1 - T) * A.total * (1 - T) := by
+                        rw [A.sum_eq_total]]
+    _ ≤ ev ψ
+          (leftTensor (ι₂ := ι) ((1 - T) * 1 * (1 - T)) *
+            rightTensor (ι₁ := ι) T) := by
+          exact
+            ev_mono ψ _ _ <| by
+              simpa [leftTensor_mul_rightTensor_eq_opTensor] using
+                opTensor_mono_left
+                  (MIPStarRE.Quantum.sandwich_mono hTc_herm A.total_le_one)
+                  B.total_nonneg
+    _ = ev ψ
+          (leftTensor (ι₂ := ι) (1 - T) * rightTensor (ι₁ := ι) T) := by
+          have hcollapse : (1 - T) * (1 - T) = 1 - T := by
+            calc
+              (1 - T) * (1 - T) = 1 - T - T + T * T := by
+                  noncomm_ring
+              _ = 1 - T - T + T := by rw [hB_sq]
+              _ = 1 - T := by abel
+          rw [show (1 - T) * 1 * (1 - T) = (1 - T) * (1 - T) by simp]
+          rw [hcollapse]
+
+set_option maxHeartbeats 2000000 in
+/-- Summing the stability-one comparison family leaves only the overlap term
+for `G^y`. -/
 private lemma gCommStability_pointwise_sum_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -1554,85 +1654,18 @@ private lemma gCommStability_pointwise_sum_bound
                 (evaluatedPointFamily params family q.1).outcome ah.1 *
                 (1 - (G (pointHeight params q.2)).total))) *
             rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2))) ≤
-      ev strategy.state
-        (leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.2)).total) *
-          rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).total)) := by
+      gCommOverlapTerm params strategy G (pointHeight params q.2) := by
   let y := pointHeight params q.2
-  let T : MIPStarRE.Quantum.Op ι := (G y).total
   let A : SubMeas (Fq params) ι := evaluatedPointFamily params family q.1
-  have hT_herm : Tᴴ = T := by
-    exact
-      (Matrix.nonneg_iff_posSemidef.mp <| by
-        simpa [T] using (G y).total_nonneg).isHermitian.eq
-  have hTc_herm : (1 - T)ᴴ = 1 - T := by
-    simp [hT_herm]
-  calc
-    ∑ ah : StabilityOneOutcome params,
-        ev strategy.state
-          ((leftTensor (ι₂ := ι)
-              ((1 - (G y).total) * A.outcome ah.1 * (1 - (G y).total))) *
-            rightTensor (ι₁ := ι) ((G y).outcome ah.2))
-      = ∑ a : Fq params,
-          ev strategy.state
-            (leftTensor (ι₂ := ι) ((1 - T) * A.outcome a * (1 - T)) *
-              rightTensor (ι₁ := ι) T) := by
-          rw [Fintype.sum_prod_type]
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [← ev_sum strategy.state
-            (fun h : Polynomial params =>
-              leftTensor (ι₂ := ι) ((1 - T) * A.outcome a * (1 - T)) *
-                rightTensor (ι₁ := ι) ((G y).outcome h))]
-          rw [← Matrix.mul_sum]
-          rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ
-            (fun h : Polynomial params => (G y).outcome h)]
-          rw [(G y).sum_eq_total]
-    _ = ev strategy.state
-          (leftTensor (ι₂ := ι) ((1 - T) * A.total * (1 - T)) *
-            rightTensor (ι₁ := ι) T) := by
-          rw [← ev_sum strategy.state
-            (fun a : Fq params =>
-              leftTensor (ι₂ := ι) ((1 - T) * A.outcome a * (1 - T)) *
-                rightTensor (ι₁ := ι) T)]
-          rw [← Finset.sum_mul]
-          rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ
-            (fun a : Fq params => (1 - T) * A.outcome a * (1 - T))]
-          rw [show leftTensor (ι₂ := ι) (∑ a : Fq params, (1 - T) * A.outcome a * (1 - T)) =
-              leftTensor (ι₂ := ι) ((1 - T) * A.total * (1 - T)) by
-                congr 1
-                calc
-                  ∑ a : Fq params, (1 - T) * A.outcome a * (1 - T)
-                    = (∑ a : Fq params, (1 - T) * A.outcome a) * (1 - T) := by
-                        rw [← Finset.sum_mul]
-                  _ = ((1 - T) * ∑ a : Fq params, A.outcome a) * (1 - T) := by
-                        rw [Matrix.mul_sum]
-                  _ = (1 - T) * (∑ a : Fq params, A.outcome a) * (1 - T) := by
-                        simp [mul_assoc]
-                  _ = (1 - T) * A.total * (1 - T) := by
-                        rw [A.sum_eq_total]]
-    _ ≤ ev strategy.state
-          (leftTensor (ι₂ := ι) ((1 - T) * 1 * (1 - T)) *
-            rightTensor (ι₁ := ι) T) := by
-          exact
-            ev_mono strategy.state _ _ <| by
-              simpa [leftTensor_mul_rightTensor_eq_opTensor] using
-                opTensor_mono_left
-                  (MIPStarRE.Quantum.sandwich_mono hTc_herm A.total_le_one)
-                  ((G y).total_nonneg)
-    _ = ev strategy.state
-          (leftTensor (ι₂ := ι) (1 - T) * rightTensor (ι₁ := ι) T) := by
-          have hT_sq : T * T = T := by
-            simpa [T, hG y] using
-              MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas y)
-          have hcollapse : (1 - T) * (1 - T) = 1 - T := by
-            calc
-              (1 - T) * (1 - T) = 1 - T - T + T * T := by
-                  noncomm_ring
-              _ = 1 - T := by simp [hT_sq]
-          rw [show (1 - T) * 1 * (1 - T) = (1 - T) * (1 - T) by simp]
-          rw [hcollapse]
+  have hGy_sq : (G y).total * (G y).total = (G y).total := by
+    simpa [hG y] using
+      MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas y)
+  simpa [y, A, gCommOverlapTerm] using
+    gCommStability_pointwise_sum_bound_core strategy.state A (G y) hGy_sq
 
 set_option maxHeartbeats 2000000 in
+/-- A single stability-one summand is controlled by replacing the inner
+evaluated slice sandwich with the corresponding evaluated point outcome. -/
 private lemma gCommStability_pointwise_summand_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -1709,6 +1742,8 @@ private lemma gCommStability_pointwise_summand_bound
         opTensor_mono_left hleft ((G y).outcome_pos ah.2)
 
 set_option maxHeartbeats 2000000 in
+/-- The full stability-one defect is bounded by the overlap term for the
+target slice measurement `G^y`. -/
 private lemma gCommStability_pointwise_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -1759,15 +1794,14 @@ private lemma gCommStability_pointwise_bound
             gCommStability_pointwise_sum_bound params strategy family G hG q
 
 set_option maxHeartbeats 2000000 in
+/-- The overlap term at `x` is bounded by the bipartite SSC defect of `G x`. -/
 private lemma gCommStability_ssc_point
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (G : Fq params → SubMeas (Polynomial params) ι) :
     ∀ x : Fq params,
-      ev strategy.state
-        (leftTensor (ι₂ := ι) (1 - (G x).total) *
-          rightTensor (ι₁ := ι) ((G x).total)) ≤
+      gCommOverlapTerm params strategy G x ≤
       qBipartiteSSCDefect strategy.state (G x) := by
   intro x
   let T : MIPStarRE.Quantum.Op ι := (G x).total
@@ -1807,6 +1841,7 @@ private lemma gCommStability_ssc_point
                   _ = leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) T := by
                             rw [(G x).sum_eq_total]]
             rw [leftTensor_mul_rightTensor_eq_opTensor]
+  unfold gCommOverlapTerm
   calc
     ev strategy.state
         (leftTensor (ι₂ := ι) (1 - T) * rightTensor (ι₁ := ι) T)
@@ -1857,6 +1892,225 @@ private lemma gCommStability_ssc_point
                   ev strategy.state (opTensor ((G x).outcome h) ((G x).outcome h))))
 
 set_option maxHeartbeats 2000000 in
+/-- Averaging the common overlap term over `Point params.next` depends only on
+the final coordinate `x : F_q`. -/
+private lemma gCommOverlap_avgOver_point
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (G : Fq params → SubMeas (Polynomial params) ι) :
+    avgOver (uniformDistribution (Point params.next))
+      (fun w => gCommOverlapTerm params strategy G (pointHeight params w)) =
+    avgOver (uniformDistribution (Fq params))
+      (fun x => gCommOverlapTerm params strategy G x) := by
+  let e := pointNextEquiv params
+  calc
+    avgOver (uniformDistribution (Point params.next))
+        (fun w => gCommOverlapTerm params strategy G (pointHeight params w))
+      = avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => gCommOverlapTerm params strategy G (pointHeight params (e.symm ux))) :=
+          avgOver_uniform_equiv e _
+    _ = avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => gCommOverlapTerm params strategy G ux.2) := by
+          apply avgOver_congr
+          intro ux
+          rcases ux with ⟨u, x⟩
+          simp [e, pointNextEquiv, pointHeight_appendPoint]
+    _ = avgOver (uniformDistribution (Fq params))
+          (fun x => gCommOverlapTerm params strategy G x) := by
+          exact avgOver_uniform_snd
+            (α := Point params)
+            (β := Fq params)
+            (f := fun x => gCommOverlapTerm params strategy G x)
+
+/-- Averaging the overlap term over evaluated-slice questions through the
+second point coordinate marginalizes to the uniform `x : F_q` average. -/
+private lemma gCommOverlap_avgOver_snd
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (G : Fq params → SubMeas (Polynomial params) ι) :
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q => gCommOverlapTerm params strategy G (pointHeight params q.2)) =
+    avgOver (uniformDistribution (Fq params))
+      (fun x => gCommOverlapTerm params strategy G x) := by
+  calc
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => gCommOverlapTerm params strategy G (pointHeight params q.2))
+      = avgOver (uniformDistribution (Point params.next))
+          (fun w => gCommOverlapTerm params strategy G (pointHeight params w)) := by
+            exact avgOver_uniform_snd
+              (f := fun w => gCommOverlapTerm params strategy G (pointHeight params w))
+    _ = avgOver (uniformDistribution (Fq params))
+          (fun x => gCommOverlapTerm params strategy G x) :=
+          gCommOverlap_avgOver_point params strategy G
+
+/-- Averaging the overlap term over evaluated-slice questions through the
+first point coordinate marginalizes to the uniform `x : F_q` average. -/
+private lemma gCommOverlap_avgOver_fst
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (G : Fq params → SubMeas (Polynomial params) ι) :
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q => gCommOverlapTerm params strategy G (pointHeight params q.1)) =
+    avgOver (uniformDistribution (Fq params))
+      (fun x => gCommOverlapTerm params strategy G x) := by
+  calc
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => gCommOverlapTerm params strategy G (pointHeight params q.1))
+      = avgOver (uniformDistribution (Point params.next))
+          (fun w => gCommOverlapTerm params strategy G (pointHeight params w)) := by
+            exact avgOver_uniform_fst
+              (f := fun w => gCommOverlapTerm params strategy G (pointHeight params w))
+    _ = avgOver (uniformDistribution (Fq params))
+          (fun x => gCommOverlapTerm params strategy G x) :=
+          gCommOverlap_avgOver_point params strategy G
+
+/-- The common overlap term is always at most `1`. -/
+private lemma gCommOverlapTerm_le_one
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (hnorm : strategy.state.IsNormalized)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (x : Fq params) :
+    gCommOverlapTerm params strategy G x ≤ 1 := by
+  unfold gCommOverlapTerm
+  have hmono :
+      opTensor (1 - (G x).total) ((G x).total) ≤
+        leftTensor (ι₂ := ι) (1 - (G x).total) := by
+    exact opTensor_le_leftTensor
+      (sub_nonneg.mpr (G x).total_le_one)
+      (G x).total_le_one
+  calc
+    ev strategy.state
+        (leftTensor (ι₂ := ι) (1 - (G x).total) *
+          rightTensor (ι₁ := ι) ((G x).total))
+      = ev strategy.state
+          (opTensor (1 - (G x).total) ((G x).total)) := by
+            rw [leftTensor_mul_rightTensor_eq_opTensor]
+    _ ≤ ev strategy.state
+          (leftTensor (ι₂ := ι) (1 - (G x).total)) := by
+            exact ev_mono strategy.state _ _ hmono
+    _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+            exact ev_mono strategy.state _ _ <|
+              leftTensor_le_one (ι₂ := ι)
+                (sub_le_self (1 : MIPStarRE.Quantum.Op ι) (G x).total_nonneg)
+    _ = 1 := ev_one_of_isNormalized strategy.state hnorm
+
+set_option maxHeartbeats 2000000 in
+/-- Any pointwise defect bound by the common overlap term inherits a raw
+`zeta / 2` estimate after marginalizing to the slice SSC defect of `G`. -/
+private lemma gCommStability_raw_le_half_of
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (zeta : Error)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    {Outcome : Type*} [Fintype Outcome]
+    (A B : IdxOpFamily (EvaluatedSliceQuestion params) Outcome (ι × ι))
+    (point : EvaluatedSliceQuestion params → Point params.next)
+    (hmarg :
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => gCommOverlapTerm params strategy G (pointHeight params (point q))) =
+      avgOver (uniformDistribution (Fq params))
+        (fun x => gCommOverlapTerm params strategy G x))
+    (hpointwise : ∀ q,
+      qSDDOp strategy.state (A q) (B q) ≤
+        gCommOverlapTerm params strategy G (pointHeight params (point q))) :
+    sddErrorOp strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      A B ≤
+    zeta / 2 := by
+  have hsliceSSC := gCommStability_sliceSSC params strategy zeta family G hG hself
+  have hssc_point := gCommStability_ssc_point params strategy G
+  calc
+    sddErrorOp strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        A B
+      ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => gCommOverlapTerm params strategy G (pointHeight params (point q))) := by
+            unfold sddErrorOp
+            exact avgOver_mono _ _ _ hpointwise
+    _ = avgOver (uniformDistribution (Fq params))
+          (fun x => gCommOverlapTerm params strategy G x) := hmarg
+    _ ≤ avgOver (uniformDistribution (Fq params))
+          (fun x => qBipartiteSSCDefect strategy.state (G x)) := by
+            exact avgOver_mono _ _ _ hssc_point
+    _ = bipartiteSSCError strategy.state (uniformDistribution (Fq params)) G := by
+          rfl
+    _ ≤ zeta / 2 := hsliceSSC.overlapBound
+
+set_option maxHeartbeats 2000000 in
+/-- Any pointwise defect bound by the common overlap term is trivially at most
+`1`. -/
+private lemma gCommStability_raw_le_one_of
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (hnorm : strategy.state.IsNormalized)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    {Outcome : Type*} [Fintype Outcome]
+    (A B : IdxOpFamily (EvaluatedSliceQuestion params) Outcome (ι × ι))
+    (point : EvaluatedSliceQuestion params → Point params.next)
+    (hpointwise : ∀ q,
+      qSDDOp strategy.state (A q) (B q) ≤
+        gCommOverlapTerm params strategy G (pointHeight params (point q))) :
+    sddErrorOp strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      A B ≤
+    1 := by
+  calc
+    sddErrorOp strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        A B
+      ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => gCommOverlapTerm params strategy G (pointHeight params (point q))) := by
+            unfold sddErrorOp
+            exact avgOver_mono _ _ _ hpointwise
+    _ ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params)) (fun _ => 1) := by
+          apply avgOver_mono
+          intro q
+          exact gCommOverlapTerm_le_one
+            params strategy hnorm G (pointHeight params (point q))
+    _ = ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
+          (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
+          simp [avgOver]
+    _ ≤ 1 := by
+          simpa using
+            uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
+
+set_option maxHeartbeats 2000000 in
+/-- Upgrade raw `zeta / 2` and `1` bounds to the displayed `sqrt zeta` relation. -/
+private lemma sddOpRel_of_sqrt_bound_from_half_one
+    {Question Outcome : Type*}
+    [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (𝒟 : Distribution Question)
+    (A B : IdxOpFamily Question Outcome ι)
+    (zeta : Error)
+    (hz_nonneg : 0 ≤ zeta)
+    (hhalf : sddErrorOp ψ 𝒟 A B ≤ zeta / 2)
+    (hone : sddErrorOp ψ 𝒟 A B ≤ 1) :
+    SDDOpRel ψ 𝒟 A B (Real.sqrt zeta) := by
+  constructor
+  by_cases hz1 : zeta ≤ 1
+  · have hsmall : zeta / 2 ≤ Real.sqrt zeta := by
+      have hsqrt_nonneg : 0 ≤ Real.sqrt zeta := Real.sqrt_nonneg _
+      nlinarith [Real.sq_sqrt hz_nonneg]
+    exact le_trans hhalf hsmall
+  · have hbig : 1 ≤ Real.sqrt zeta := by
+      have hz_one : 1 ≤ zeta := by linarith
+      have hsqrt_nonneg : 0 ≤ Real.sqrt zeta := Real.sqrt_nonneg _
+      nlinarith [Real.sq_sqrt hz_nonneg]
+    exact le_trans hone hbig
+
+set_option maxHeartbeats 2000000 in
+/-- The first stability family has raw defect at most `zeta / 2`. -/
 private lemma gCommStability_raw_le_half
     (params : Parameters)
     [FieldModel params.q]
@@ -1871,81 +2125,16 @@ private lemma gCommStability_raw_le_half
       (commDataProcessedGStabilityOneLeft params strategy family G)
       (commDataProcessedGStabilityOneRight params strategy family G) ≤
     zeta / 2 := by
-  have hsliceSSC := gCommStability_sliceSSC params strategy zeta family G hG hself
-  have hpointwise := gCommStability_pointwise_bound params strategy family G hG
-  have hssc_point := gCommStability_ssc_point params strategy G
-  calc
-    sddErrorOp strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params))
-        (commDataProcessedGStabilityOneLeft params strategy family G)
-        (commDataProcessedGStabilityOneRight params strategy family G)
-      ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-          (fun q =>
-            ev strategy.state
-              (leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.2)).total) *
-                rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).total))) := by
-            unfold sddErrorOp
-            exact avgOver_mono _ _ _ hpointwise
-    _ = avgOver (uniformDistribution (Point params.next))
-          (fun w =>
-            ev strategy.state
-              (leftTensor (ι₂ := ι) (1 - (G (pointHeight params w)).total) *
-                rightTensor (ι₁ := ι) ((G (pointHeight params w)).total))) := by
-            exact avgOver_uniform_snd
-              (f := fun w =>
-                ev strategy.state
-                  (leftTensor (ι₂ := ι) (1 - (G (pointHeight params w)).total) *
-                    rightTensor (ι₁ := ι) ((G (pointHeight params w)).total)))
-    _ = avgOver (uniformDistribution (Fq params))
-          (fun x =>
-            ev strategy.state
-              (leftTensor (ι₂ := ι) (1 - (G x).total) *
-                rightTensor (ι₁ := ι) ((G x).total))) := by
-            let e := pointNextEquiv params
-            calc
-              avgOver (uniformDistribution (Point params.next))
-                  (fun w =>
-                    ev strategy.state
-                      (leftTensor (ι₂ := ι) (1 - (G (pointHeight params w)).total) *
-                        rightTensor (ι₁ := ι) ((G (pointHeight params w)).total)))
-                = avgOver (uniformDistribution (Point params × Fq params))
-                    (fun ux =>
-                      ev strategy.state
-                        (leftTensor (ι₂ := ι)
-                          (1 - (G (pointHeight params (e.symm ux))).total) *
-                          rightTensor (ι₁ := ι)
-                            ((G (pointHeight params (e.symm ux))).total))) :=
-                    avgOver_uniform_equiv e _
-              _ = avgOver (uniformDistribution (Point params × Fq params))
-                    (fun ux =>
-                      ev strategy.state
-                        (leftTensor (ι₂ := ι) (1 - (G ux.2).total) *
-                          rightTensor (ι₁ := ι) ((G ux.2).total))) := by
-                        apply avgOver_congr
-                        intro ux
-                        rcases ux with ⟨u, x⟩
-                        simp [e, pointNextEquiv, pointHeight_appendPoint]
-              _ = avgOver (uniformDistribution (Fq params))
-                    (fun x =>
-                      ev strategy.state
-                        (leftTensor (ι₂ := ι) (1 - (G x).total) *
-                          rightTensor (ι₁ := ι) ((G x).total))) := by
-                        exact
-                          avgOver_uniform_snd
-                            (α := Point params)
-                            (β := Fq params)
-                            (f := fun x =>
-                              ev strategy.state
-                                (leftTensor (ι₂ := ι) (1 - (G x).total) *
-                                  rightTensor (ι₁ := ι) ((G x).total)))
-    _ ≤ avgOver (uniformDistribution (Fq params))
-          (fun x => qBipartiteSSCDefect strategy.state (G x)) := by
-            exact avgOver_mono _ _ _ hssc_point
-    _ = bipartiteSSCError strategy.state (uniformDistribution (Fq params)) G := by
-          rfl
-    _ ≤ zeta / 2 := hsliceSSC.overlapBound
+  exact
+    gCommStability_raw_le_half_of params strategy zeta family G hG hself
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
+      Prod.snd
+      (gCommOverlap_avgOver_snd params strategy G)
+      (gCommStability_pointwise_bound params strategy family G hG)
 
 set_option maxHeartbeats 2000000 in
+/-- The first stability family has raw defect at most `1`. -/
 private lemma gCommStability_raw_le_one
     (params : Parameters)
     [FieldModel params.q]
@@ -1960,62 +2149,12 @@ private lemma gCommStability_raw_le_one
       (commDataProcessedGStabilityOneLeft params strategy family G)
       (commDataProcessedGStabilityOneRight params strategy family G) ≤
     1 := by
-  have hpointwise := gCommStability_pointwise_bound params strategy family G hG
-  calc
-    sddErrorOp strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params))
-        (commDataProcessedGStabilityOneLeft params strategy family G)
-        (commDataProcessedGStabilityOneRight params strategy family G)
-      ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-          (fun q =>
-            ev strategy.state
-              (leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.2)).total) *
-                rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).total))) := by
-            unfold sddErrorOp
-            exact avgOver_mono _ _ _ hpointwise
-    _ ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params)) (fun _ => 1) := by
-          apply avgOver_mono
-          intro q
-          have hmono :
-              opTensor (1 - (G (pointHeight params q.2)).total)
-                  ((G (pointHeight params q.2)).total) ≤
-                leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.2)).total) := by
-            exact opTensor_le_leftTensor
-              (sub_nonneg.mpr ((G (pointHeight params q.2)).total_le_one))
-              ((G (pointHeight params q.2)).total_le_one)
-          calc
-            ev strategy.state
-                (leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.2)).total) *
-                  rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).total))
-              = ev strategy.state
-                  (opTensor (1 - (G (pointHeight params q.2)).total)
-                    ((G (pointHeight params q.2)).total)) := by
-                      rw [leftTensor_mul_rightTensor_eq_opTensor]
-            _ ≤ ev strategy.state
-                  (leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.2)).total)) := by
-                      exact ev_mono strategy.state _ _ hmono
-            _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-                  exact ev_mono strategy.state _ _ <|
-                    leftTensor_le_one (ι₂ := ι)
-                      (sub_le_self (1 : MIPStarRE.Quantum.Op ι)
-                        ((G (pointHeight params q.2)).total_nonneg))
-            _ = 1 := ev_one_of_isNormalized strategy.state hnorm
-    _ = 1 := by
-          calc
-            avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-                (fun _ => (1 : Error))
-              = avgOver (uniformDistribution (Point params.next))
-                  (fun _ => (1 : Error)) := by
-                    exact avgOver_uniform_snd (f := fun _ => (1 : Error))
-            _ = avgOver (uniformDistribution (Point params × Fq params))
-                  (fun _ => (1 : Error)) := by
-                    let e := pointNextEquiv params
-                    simpa using
-                      avgOver_uniform_equiv e (fun _ : Point params.next => (1 : Error))
-            _ = avgOver (uniformDistribution (Fq params)) (fun _ => (1 : Error)) := by
-                  exact avgOver_uniform_snd (f := fun _ => (1 : Error))
-            _ = 1 := by
-                  simp [avgOver, uniformDistribution]
+  exact
+    gCommStability_raw_le_one_of params strategy hnorm G
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
+      Prod.snd
+      (gCommStability_pointwise_bound params strategy family G hG)
 
 set_option maxHeartbeats 2000000 in
 /-- `clm:g-comm-stability`.
@@ -2026,26 +2165,20 @@ theorem gCommStability
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
+    (_eps _delta _gamma zeta : Error)
     (hnorm : strategy.state.IsNormalized)
-    (hgood : strategy.IsGood eps delta gamma)
+    (_hgood : strategy.IsGood _eps _delta _gamma)
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hcons : family.ConsistentWithPoints strategy zeta)
+    (_hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityOneLeft params strategy family G)
       (commDataProcessedGStabilityOneRight params strategy family G)
       (Real.sqrt zeta) := by
-  let _ := eps
-  let _ := delta
-  let _ := gamma
-  let _ := hgood
-  let _ := hcons
-  let _ := hbound
   have hz_nonneg : 0 ≤ zeta := by
     exact le_trans
       (sddError_nonneg strategy.state
@@ -2057,21 +2190,17 @@ theorem gCommStability
     gCommStability_raw_le_half params strategy zeta family G hG hself
   have hraw_le_one :=
     gCommStability_raw_le_one params strategy zeta hnorm family G hG
-  constructor
-  by_cases hz1 : zeta ≤ 1
-  · have hsmall : zeta / 2 ≤ Real.sqrt zeta := by
-      have hz_le_sqrt : zeta ≤ Real.sqrt zeta := by
-        have hsqrt_nonneg : 0 ≤ Real.sqrt zeta := Real.sqrt_nonneg _
-        nlinarith [Real.sq_sqrt hz_nonneg]
-      linarith
-    exact le_trans hraw_le_half hsmall
-  · have hbig : 1 ≤ Real.sqrt zeta := by
-      have hz_one : 1 ≤ zeta := by linarith
-      have hsqrt_nonneg : 0 ≤ Real.sqrt zeta := Real.sqrt_nonneg _
-      nlinarith [Real.sq_sqrt hz_nonneg]
-    exact le_trans hraw_le_one hbig
+  exact
+    sddOpRel_of_sqrt_bound_from_half_one
+      strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
+      zeta hz_nonneg hraw_le_half hraw_le_one
 
 set_option maxHeartbeats 2000000 in
+/-- Summing the stability-two comparison family leaves only the overlap term
+for `G^x`. -/
 private lemma gCommStabilityTwo_pointwise_sum_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -2087,84 +2216,45 @@ private lemma gCommStabilityTwo_pointwise_sum_bound
                 (evaluatedPointFamily params family q.2).outcome gb.2 *
                 (1 - (G (pointHeight params q.1)).total))) *
             rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).outcome gb.1))) ≤
-      ev strategy.state
-        (leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.1)).total) *
-          rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).total)) := by
+      gCommOverlapTerm params strategy G (pointHeight params q.1) := by
   let x := pointHeight params q.1
-  let T : MIPStarRE.Quantum.Op ι := (G x).total
   let B : SubMeas (Fq params) ι := evaluatedPointFamily params family q.2
-  have hT_herm : Tᴴ = T := by
-    exact
-      (Matrix.nonneg_iff_posSemidef.mp <| by
-        simpa [T] using (G x).total_nonneg).isHermitian.eq
-  have hTc_herm : (1 - T)ᴴ = 1 - T := by
-    simp [hT_herm]
+  have hGx_sq : (G x).total * (G x).total = (G x).total := by
+    simpa [hG x] using
+      MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x)
   calc
     ∑ gb : StabilityTwoOutcome params,
         ev strategy.state
           ((leftTensor (ι₂ := ι)
               ((1 - (G x).total) * B.outcome gb.2 * (1 - (G x).total))) *
             rightTensor (ι₁ := ι) ((G x).outcome gb.1))
-      = ∑ g : Polynomial params,
+      = ∑ ab : Fq params × Polynomial params,
           ev strategy.state
-            (leftTensor (ι₂ := ι) ((1 - T) * B.total * (1 - T)) *
-              rightTensor (ι₁ := ι) ((G x).outcome g)) := by
-          rw [Fintype.sum_prod_type]
-          refine Finset.sum_congr rfl ?_
-          intro g _
-          rw [← ev_sum strategy.state
-            (fun b : Fq params =>
-              leftTensor (ι₂ := ι) ((1 - T) * B.outcome b * (1 - T)) *
-                rightTensor (ι₁ := ι) ((G x).outcome g))]
-          rw [← Finset.sum_mul]
-          rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ
-            (fun b : Fq params => (1 - T) * B.outcome b * (1 - T))]
-          rw [show leftTensor (ι₂ := ι) (∑ b : Fq params, (1 - T) * B.outcome b * (1 - T)) =
-              leftTensor (ι₂ := ι) ((1 - T) * B.total * (1 - T)) by
-                congr 1
-                calc
-                  ∑ b : Fq params, (1 - T) * B.outcome b * (1 - T)
-                    = (∑ b : Fq params, (1 - T) * B.outcome b) * (1 - T) := by
-                        rw [← Finset.sum_mul]
-                  _ = ((1 - T) * ∑ b : Fq params, B.outcome b) * (1 - T) := by
-                        rw [Matrix.mul_sum]
-                  _ = (1 - T) * (∑ b : Fq params, B.outcome b) * (1 - T) := by
-                        simp [mul_assoc]
-                  _ = (1 - T) * B.total * (1 - T) := by
-                        rw [B.sum_eq_total]]
-    _ = ev strategy.state
-          (leftTensor (ι₂ := ι) ((1 - T) * B.total * (1 - T)) *
-            rightTensor (ι₁ := ι) T) := by
-          rw [← ev_sum strategy.state
-            (fun g : Polynomial params =>
-              leftTensor (ι₂ := ι) ((1 - T) * B.total * (1 - T)) *
-                rightTensor (ι₁ := ι) ((G x).outcome g))]
-          rw [← Matrix.mul_sum]
-          rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ
-            (fun g : Polynomial params => (G x).outcome g)]
-          rw [(G x).sum_eq_total]
-    _ ≤ ev strategy.state
-          (leftTensor (ι₂ := ι) ((1 - T) * 1 * (1 - T)) *
-            rightTensor (ι₁ := ι) T) := by
-          exact
-            ev_mono strategy.state _ _ <| by
-              simpa [leftTensor_mul_rightTensor_eq_opTensor] using
-                opTensor_mono_left
-                  (MIPStarRE.Quantum.sandwich_mono hTc_herm B.total_le_one)
-                  ((G x).total_nonneg)
-    _ = ev strategy.state
-          (leftTensor (ι₂ := ι) (1 - T) * rightTensor (ι₁ := ι) T) := by
-          have hT_sq : T * T = T := by
-            simpa [T, hG x] using
-              MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x)
-          have hcollapse : (1 - T) * (1 - T) = 1 - T := by
-            calc
-              (1 - T) * (1 - T) = 1 - T - T + T * T := by
-                  noncomm_ring
-              _ = 1 - T := by simp [hT_sq]
-          rw [show (1 - T) * 1 * (1 - T) = (1 - T) * (1 - T) by simp]
-          rw [hcollapse]
+            ((leftTensor (ι₂ := ι)
+                ((1 - (G x).total) * B.outcome ab.1 * (1 - (G x).total))) *
+              rightTensor (ι₁ := ι) ((G x).outcome ab.2)) := by
+          simpa [StabilityTwoOutcome] using
+            (Fintype.sum_equiv
+              (Equiv.prodComm (Polynomial params) (Fq params))
+              (fun gb : Polynomial params × Fq params =>
+                ev strategy.state
+                  ((leftTensor (ι₂ := ι)
+                      ((1 - (G x).total) * B.outcome gb.2 * (1 - (G x).total))) *
+                    rightTensor (ι₁ := ι) ((G x).outcome gb.1)))
+              (fun ab : Fq params × Polynomial params =>
+                ev strategy.state
+                  ((leftTensor (ι₂ := ι)
+                      ((1 - (G x).total) * B.outcome ab.1 * (1 - (G x).total))) *
+                    rightTensor (ι₁ := ι) ((G x).outcome ab.2)))
+              (by
+                rintro ⟨g, b⟩
+                rfl))
+    _ ≤ gCommOverlapTerm params strategy G x := by
+          simpa [x, B, gCommOverlapTerm] using
+            gCommStability_pointwise_sum_bound_core strategy.state B (G x) hGx_sq
 
+/-- A single stability-two summand is controlled by replacing the inner ordered
+product square by the corresponding evaluated point outcome. -/
 private lemma gCommStabilityTwo_pointwise_summand_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -2247,6 +2337,8 @@ private lemma gCommStabilityTwo_pointwise_summand_bound
         opTensor_mono_left hleft ((G x).outcome_pos gb.1)
 
 set_option maxHeartbeats 2000000 in
+/-- The full stability-two defect is bounded by the overlap term for the
+target slice measurement `G^x`. -/
 private lemma gCommStabilityTwo_pointwise_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -2294,6 +2386,7 @@ private lemma gCommStabilityTwo_pointwise_bound
           simpa using gCommStabilityTwo_pointwise_sum_bound params strategy family G hG q
 
 set_option maxHeartbeats 2000000 in
+/-- The second stability family has raw defect at most `zeta / 2`. -/
 private lemma gCommStabilityTwo_raw_le_half
     (params : Parameters)
     [FieldModel params.q]
@@ -2308,79 +2401,16 @@ private lemma gCommStabilityTwo_raw_le_half
       (commDataProcessedGStabilityTwoLeft params strategy family G)
       (commDataProcessedGStabilityTwoRight params strategy family G) ≤
     zeta / 2 := by
-  have hsliceSSC := gCommStability_sliceSSC params strategy zeta family G hG hself
-  have hpointwise := gCommStabilityTwo_pointwise_bound params strategy family G hG
-  have hssc_point := gCommStability_ssc_point params strategy G
-  calc
-    sddErrorOp strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params))
-        (commDataProcessedGStabilityTwoLeft params strategy family G)
-        (commDataProcessedGStabilityTwoRight params strategy family G)
-      ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-          (fun q =>
-            ev strategy.state
-              (leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.1)).total) *
-                rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).total))) := by
-            unfold sddErrorOp
-            exact avgOver_mono _ _ _ hpointwise
-    _ = avgOver (uniformDistribution (Point params.next))
-          (fun w =>
-            ev strategy.state
-              (leftTensor (ι₂ := ι) (1 - (G (pointHeight params w)).total) *
-                rightTensor (ι₁ := ι) ((G (pointHeight params w)).total))) := by
-          exact avgOver_uniform_fst
-            (f := fun w =>
-              ev strategy.state
-                (leftTensor (ι₂ := ι) (1 - (G (pointHeight params w)).total) *
-                  rightTensor (ι₁ := ι) ((G (pointHeight params w)).total)))
-    _ = avgOver (uniformDistribution (Fq params))
-          (fun x =>
-            ev strategy.state
-              (leftTensor (ι₂ := ι) (1 - (G x).total) *
-                rightTensor (ι₁ := ι) ((G x).total))) := by
-          let e := pointNextEquiv params
-          calc
-            avgOver (uniformDistribution (Point params.next))
-                (fun w =>
-                  ev strategy.state
-                    (leftTensor (ι₂ := ι) (1 - (G (pointHeight params w)).total) *
-                      rightTensor (ι₁ := ι) ((G (pointHeight params w)).total)))
-              = avgOver (uniformDistribution (Point params × Fq params))
-                  (fun ux =>
-                    ev strategy.state
-                      (leftTensor (ι₂ := ι)
-                        (1 - (G (pointHeight params (e.symm ux))).total) *
-                        rightTensor (ι₁ := ι) ((G (pointHeight params (e.symm ux))).total))) :=
-                    avgOver_uniform_equiv e _
-            _ = avgOver (uniformDistribution (Point params × Fq params))
-                  (fun ux =>
-                    ev strategy.state
-                      (leftTensor (ι₂ := ι) (1 - (G ux.2).total) *
-                        rightTensor (ι₁ := ι) ((G ux.2).total))) := by
-                        apply avgOver_congr
-                        intro ux
-                        rcases ux with ⟨u, x⟩
-                        simp [e, pointNextEquiv, pointHeight_appendPoint]
-            _ = avgOver (uniformDistribution (Fq params))
-                  (fun x =>
-                    ev strategy.state
-                      (leftTensor (ι₂ := ι) (1 - (G x).total) *
-                        rightTensor (ι₁ := ι) ((G x).total))) := by
-                        exact avgOver_uniform_snd
-                          (α := Point params)
-                          (β := Fq params)
-                          (f := fun x =>
-                            ev strategy.state
-                              (leftTensor (ι₂ := ι) (1 - (G x).total) *
-                                rightTensor (ι₁ := ι) ((G x).total)))
-    _ ≤ avgOver (uniformDistribution (Fq params))
-          (fun x => qBipartiteSSCDefect strategy.state (G x)) := by
-            exact avgOver_mono _ _ _ hssc_point
-    _ = bipartiteSSCError strategy.state (uniformDistribution (Fq params)) G := by
-          rfl
-    _ ≤ zeta / 2 := hsliceSSC.overlapBound
+  exact
+    gCommStability_raw_le_half_of params strategy zeta family G hG hself
+      (commDataProcessedGStabilityTwoLeft params strategy family G)
+      (commDataProcessedGStabilityTwoRight params strategy family G)
+      Prod.fst
+      (gCommOverlap_avgOver_fst params strategy G)
+      (gCommStabilityTwo_pointwise_bound params strategy family G hG)
 
 set_option maxHeartbeats 2000000 in
+/-- The second stability family has raw defect at most `1`. -/
 private lemma gCommStabilityTwo_raw_le_one
     (params : Parameters)
     [FieldModel params.q]
@@ -2395,62 +2425,12 @@ private lemma gCommStabilityTwo_raw_le_one
       (commDataProcessedGStabilityTwoLeft params strategy family G)
       (commDataProcessedGStabilityTwoRight params strategy family G) ≤
     1 := by
-  have hpointwise := gCommStabilityTwo_pointwise_bound params strategy family G hG
-  calc
-    sddErrorOp strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params))
-        (commDataProcessedGStabilityTwoLeft params strategy family G)
-        (commDataProcessedGStabilityTwoRight params strategy family G)
-      ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-          (fun q =>
-            ev strategy.state
-              (leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.1)).total) *
-                rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).total))) := by
-            unfold sddErrorOp
-            exact avgOver_mono _ _ _ hpointwise
-    _ ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params)) (fun _ => 1) := by
-          apply avgOver_mono
-          intro q
-          have hmono :
-              opTensor (1 - (G (pointHeight params q.1)).total)
-                  ((G (pointHeight params q.1)).total) ≤
-                leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.1)).total) := by
-            exact opTensor_le_leftTensor
-              (sub_nonneg.mpr ((G (pointHeight params q.1)).total_le_one))
-              ((G (pointHeight params q.1)).total_le_one)
-          calc
-            ev strategy.state
-                (leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.1)).total) *
-                  rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).total))
-              = ev strategy.state
-                  (opTensor (1 - (G (pointHeight params q.1)).total)
-                    ((G (pointHeight params q.1)).total)) := by
-                      rw [leftTensor_mul_rightTensor_eq_opTensor]
-            _ ≤ ev strategy.state
-                  (leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.1)).total)) := by
-                      exact ev_mono strategy.state _ _ hmono
-            _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-                  exact ev_mono strategy.state _ _ <|
-                    leftTensor_le_one (ι₂ := ι)
-                      (sub_le_self (1 : MIPStarRE.Quantum.Op ι)
-                        ((G (pointHeight params q.1)).total_nonneg))
-            _ = 1 := ev_one_of_isNormalized strategy.state hnorm
-    _ = 1 := by
-          calc
-            avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-                (fun _ => (1 : Error))
-              = avgOver (uniformDistribution (Point params.next))
-                  (fun _ => (1 : Error)) := by
-                    exact avgOver_uniform_fst (f := fun _ => (1 : Error))
-            _ = avgOver (uniformDistribution (Point params × Fq params))
-                  (fun _ => (1 : Error)) := by
-                    let e := pointNextEquiv params
-                    simpa using
-                      avgOver_uniform_equiv e (fun _ : Point params.next => (1 : Error))
-            _ = avgOver (uniformDistribution (Fq params)) (fun _ => (1 : Error)) := by
-                  exact avgOver_uniform_snd (f := fun _ => (1 : Error))
-            _ = 1 := by
-                  simp [avgOver, uniformDistribution]
+  exact
+    gCommStability_raw_le_one_of params strategy hnorm G
+      (commDataProcessedGStabilityTwoLeft params strategy family G)
+      (commDataProcessedGStabilityTwoRight params strategy family G)
+      Prod.fst
+      (gCommStabilityTwo_pointwise_bound params strategy family G hG)
 
 /-- `clm:g-comm-stability2`.
 
@@ -2460,15 +2440,15 @@ theorem gCommStabilityTwo
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
+    (_eps _delta gamma zeta : Error)
     (hnorm : strategy.state.IsNormalized)
-    (hgood : strategy.IsGood eps delta gamma)
+    (_hgood : strategy.IsGood _eps _delta gamma)
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hcons : family.ConsistentWithPoints strategy zeta)
+    (_hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityTwoLeft params strategy family G)
@@ -2480,11 +2460,6 @@ theorem gCommStabilityTwo
   This is the point-commutation transport followed by the same boundedness
   argument that removes the trailing `G^x` factor.
   -/
-  let _ := eps
-  let _ := delta
-  let _ := hgood
-  let _ := hcons
-  let _ := hbound
   have hz_nonneg : 0 ≤ zeta := by
     exact le_trans
       (sddError_nonneg strategy.state
@@ -2496,23 +2471,21 @@ theorem gCommStabilityTwo
     gCommStabilityTwo_raw_le_half params strategy zeta family G hG hself
   have hstrong_one :=
     gCommStabilityTwo_raw_le_one params strategy zeta hnorm family G hG
+  -- The SSC argument gives the stronger `sqrt zeta` bound directly.
+  -- We then relax it by monotonicity to match the paper's displayed error term.
   have hstrong :
       SDDOpRel strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
         (commDataProcessedGStabilityTwoLeft params strategy family G)
         (commDataProcessedGStabilityTwoRight params strategy family G)
         (Real.sqrt zeta) := by
-    constructor
-    by_cases hz1 : zeta ≤ 1
-    · have hsmall : zeta / 2 ≤ Real.sqrt zeta := by
-        have hsqrt_nonneg : 0 ≤ Real.sqrt zeta := Real.sqrt_nonneg _
-        nlinarith [Real.sq_sqrt hz_nonneg]
-      exact le_trans hstrong_half hsmall
-    · have hbig : 1 ≤ Real.sqrt zeta := by
-        have hz_one : 1 ≤ zeta := by linarith
-        have hsqrt_nonneg : 0 ≤ Real.sqrt zeta := Real.sqrt_nonneg _
-        nlinarith [Real.sq_sqrt hz_nonneg]
-      exact le_trans hstrong_one hbig
+    exact
+      sddOpRel_of_sqrt_bound_from_half_one
+        strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (commDataProcessedGStabilityTwoLeft params strategy family G)
+        (commDataProcessedGStabilityTwoRight params strategy family G)
+        zeta hz_nonneg hstrong_half hstrong_one
   have hextra_nonneg :
       0 ≤ 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
     positivity
@@ -2845,14 +2818,6 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
       (fun q => fullSliceProductRight params strategy family
         (fullSliceQuestionOfEvaluatedSlice params q))
       (comMainError params gamma zeta) := by
-  have hEval' :
-      SDDOpRel strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params))
-        (evaluatedSliceProductLeft params strategy family)
-        (evaluatedSliceProductRight params strategy family)
-        (commDataProcessedGError params gamma zeta) :=
-    evaluatedSliceCommutation_of_evaluationSpecialization
-      params strategy family (commDataProcessedGError params gamma zeta) hEval
   /-
   Paper reference: `references/ldt-paper/commutativity-G.tex`,
   theorem `thm:com-main`, especially the passage from
@@ -2868,8 +2833,8 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
 
   In the small-parameter case, the proof uses two Schwartz-Zippel
   marginalizations together with `closenessOfIP` and the evaluated
-  commutation estimate `hEval'`, producing the displayed error chain that is
-  then absorbed into `comMainError`.
+  commutation estimate obtained from `hEval`, producing the displayed error
+  chain that is then absorbed into `comMainError`.
   -/
   -- WLOG: reduce to the small-parameter regime (paper lines 260–276).
   -- When max(γ, ζ, d/q) ≥ 1, comMainError ≥ 30m ≥ 30 while
