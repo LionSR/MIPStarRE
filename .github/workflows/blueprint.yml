@@ -5,46 +5,65 @@ on:
     branches:
       - main
     paths:
-      - '.github/workflows/blueprint.yml'
       - 'blueprint/src/**'
       - 'blueprint/lean_decls'
       - 'home_page/**'
   workflow_dispatch:
 
-# Serialize Pages deployments across blueprint/docgen workflows;
+# Serialize gh-pages deployments across blueprint/docgen workflows;
 # do not cancel in-progress deploys when new commits arrive.
 concurrency:
-  group: pages-deploy
+  group: gh-pages-deploy
   cancel-in-progress: false
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
-  build_project:
+  blueprint:
     runs-on: ubuntu-latest
-    name: Build project
+    name: Build and deploy blueprint
     steps:
-      - name: Cleanup to free disk space
-        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # main as of 2026-04-13
-        with:
-          tool-cache: false
-          android: true
-          dotnet: false
-          haskell: false
-          large-packages: false
-          docker-images: false
-          swap-storage: false
-
       - name: Checkout project
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
-      - name: Build project, blueprint, and documentation
-        uses: leanprover-community/docgen-action@main
+      - name: Install Python
+        uses: actions/setup-python@v5
         with:
-          blueprint: true
-          homepage: home_page
+          python-version: '3.12'
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev texlive-binaries
+
+      - name: Install leanblueprint
+        run: |
+          pipx install leanblueprint
+          pipx inject --include-apps --force leanblueprint plastex
+
+      - name: Build blueprint
+        working-directory: blueprint
+        run: |
+          tmp_output_file="$(mktemp)"
+
+          set +o pipefail
+          leanblueprint web 2>&1 | tee "$tmp_output_file"
+          cmd_status=${PIPESTATUS[0]}
+          set -o pipefail
+
+          if grep -q "^ERROR:" "$tmp_output_file"; then
+            echo "::error::Blueprint has unresolved labels (see ERROR lines above)"
+            exit 1
+          fi
+          if grep -q "WARNING: File not found:" "$tmp_output_file"; then
+            echo "::error::Blueprint has missing files (see WARNING lines above)"
+            exit 1
+          fi
+          if [ "$cmd_status" -ne 0 ]; then
+            exit "$cmd_status"
+          fi
+
+      - name: Deploy to gh-pages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: ./scripts/deploy-to-gh-pages.sh --ci
