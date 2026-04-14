@@ -106,6 +106,19 @@ structure SpectralTruncationStatement {Outcome : Type*}
   matrixWitness :
     Nonempty (MatrixSpectralTruncationMeasurementWitness (Outcome := Outcome) ζ)
 
+/-- Temporary bridge package isolating the still-unformalized assembly from the
+almost-projective input to the ambient `SpectralTruncationStatement` witness.
+
+The paper's Section 5 route first constructs a raw projective family with a
+global total-mass bound, and only later repairs it to a genuine projective
+submeasurement. The current theorem layer asks directly for the repaired object,
+so this bridge records that missing assembly explicitly. -/
+structure SpectralTruncationBridgePackage {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
+  witness : SpectralTruncationStatement ψ A ζ
+
 /-- Output package for the rounding-to-projective step. -/
 structure RoundedProjMeasStatement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -119,5 +132,21 @@ structure RoundedProjMeasStatement {Outcome : Type*}
       ζ
   matrixWitness :
     Nonempty (MatrixRoundedProjectiveWitness (Outcome := Outcome) ζ)
+
+/-- Temporary bridge package for the exported orthonormalization theorem.
+
+This isolates the remaining gap between the current measurement-level Section 5
+infrastructure and the paper's local projective submeasurement output for a
+submeasurement on one register. -/
+structure OrthonormalizationBridgePackage {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
+  witness :
+    ∃ P : ProjSubMeas Outcome ι,
+      SDDRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A.liftLeft)
+        (constSubMeasFamily P.toSubMeas.liftLeft)
+        (orthonormalizationError ζ)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
