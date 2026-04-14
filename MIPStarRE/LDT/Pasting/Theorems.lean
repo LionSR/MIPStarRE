@@ -1531,7 +1531,7 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (hnorm : ψbi.IsNormalized)
-    (hperm : PermInvState ψbi)
+    (_hperm : PermInvState ψbi)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta omega chi : Error)
@@ -1563,13 +1563,8 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
   This avoids inserting an extra symmetry assumption on `ψbi` at this stage.
   -/
   refine ⟨?_⟩
-  let 𝒟xy : Distribution (SlicePairQuestion params) :=
-    uniformDistribution (SlicePairQuestion params)
   let 𝒟x : Distribution (SliceQuestion params) :=
     uniformDistribution (SliceQuestion params)
-  let Mavg : SubMeas Outcome ι :=
-    averageIdxSubMeas 𝒟x (IdxProjSubMeas.toIdxSubMeas M)
-      (uniformDistribution_weight_sum_le_one (SliceQuestion params))
   let firstTerm :=
     avgOver 𝒟x (fun x =>
       Preliminaries.leftSandwichExpectation ψbi 𝒟x M
@@ -2376,7 +2371,8 @@ theorem commutingWithGComplete
       CommutativitySwitcherooStatement params strategy.state family family.meas
         zeta zeta (pairwiseCompletePartCommutationError params gamma zeta) := by
     simpa [pairwiseCompletePartCommutationError] using
-      commutativitySwitcheroo params strategy.state hnorm strategy.permInvState family family.meas zeta zeta
+      commutativitySwitcheroo params strategy.state hnorm strategy.permInvState
+        family family.meas zeta zeta
         (Commutativity.comMainError params gamma zeta)
         hself hself.completePartSelfConsistency hcom.fullSliceCommutation
   have hpoint_raw :
@@ -3195,16 +3191,11 @@ lemma overAllOutcomes
   Requires: Schwartz-Zippel infrastructure, distinct → uniform swap lemma. -/
   sorry
 
+
 /-- `lem:truncated-type-sum-recurrence`.
 
 This is the source-style recurrence for the truncated type sums that appear in
 the `fromHToG` reduction. -/
-private lemma gHatTypeWeight_eq_sum_ite {k : ℕ} (τ : GHatType k) :
-    gHatTypeWeight τ = ∑ i : Fin k, if τ i then 1 else 0 := by
-  classical
-  unfold gHatTypeWeight
-  simpa using
-    (Finset.sum_boole (p := fun i : Fin k => τ i) (s := (Finset.univ : Finset (Fin k)))).symm
 
 private lemma gHatTypeWeight_le {k : ℕ} (τ : GHatType k) :
     gHatTypeWeight τ ≤ k := by
@@ -3243,21 +3234,6 @@ private lemma gHatTypeWeight_fin_cons_true {k : ℕ} (τ : GHatType k) :
 private lemma gHatTypeWeight_fin_cons_false {k : ℕ} (τ : GHatType k) :
     gHatTypeWeight (Fin.cons false τ : GHatType (k + 1)) = gHatTypeWeight τ := by
   simpa [finCons_eq_prependTypeBit] using gHatTypeWeight_prepend_false τ
-
-private def gHatTypeConsEquiv (k : ℕ) :
-    GHatType (k + 1) ≃ Bool × GHatType k where
-  toFun := fun τ => (τ 0, fun i => τ i.succ)
-  invFun := fun p => Fin.cons p.1 p.2
-  left_inv := by
-    intro τ
-    funext i
-    cases i using Fin.cases with
-    | zero => rfl
-    | succ j => rfl
-  right_inv := by
-    intro p
-    cases p
-    rfl
 
 private lemma gHatTypeOperator_nonneg
     (G : MIPStarRE.Quantum.Op ι)
@@ -3321,6 +3297,10 @@ private lemma gHatTypeOperator_fin_cons_false
       gHatTypeOperator G τ * (1 - G) := by
   simpa [finCons_eq_prependTypeBit] using gHatTypeOperator_prepend_false G τ
 
+/-- The full sum of type operators equals the identity.
+
+This is the commuting binomial expansion
+`∑ τ : GHatType k, G ^ |τ| * (1 - G) ^ (k - |τ|) = (G + (1 - G))^k = 1`. -/
 private lemma full_gHatType_sum_eq_one
     (G : MIPStarRE.Quantum.Op ι) :
     ∀ prefixLen : ℕ, ∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix = 1
@@ -3328,41 +3308,54 @@ private lemma full_gHatType_sum_eq_one
       simp [gHatTypeOperator, gHatTypeWeight]
   | prefixLen + 1 => by
       have hsplit :
-          (∑ τprefix : GHatType (prefixLen + 1), gHatTypeOperator G τprefix) =
-            ∑ p : Bool × GHatType prefixLen, gHatTypeOperator G (Fin.cons p.1 p.2) := by
-        exact (Fintype.sum_equiv (gHatTypeConsEquiv prefixLen)
+          (∑ τprefix : GHatType (prefixLen + 1),
+              gHatTypeOperator G τprefix) =
+            ∑ p : Bool × GHatType prefixLen,
+              gHatTypeOperator G (Fin.cons p.1 p.2) := by
+        exact (Fintype.sum_equiv
+          ((Fin.consEquiv (fun _ : Fin (prefixLen + 1) => Bool)).symm)
           (fun τprefix => gHatTypeOperator G τprefix)
           (fun p => gHatTypeOperator G (Fin.cons p.1 p.2))
           (by
             intro τprefix
-            have hτ :
-                ((Fin.cons (τprefix 0) (fun i => τprefix i.succ) : GHatType (prefixLen + 1))) =
-                  τprefix := by
-              funext i
-              cases i using Fin.cases with
-              | zero => rfl
-              | succ j => rfl
-            simpa [gHatTypeConsEquiv, hτ]))
+            simp))
       have hprod :
-          (∑ p : Bool × GHatType prefixLen, gHatTypeOperator G (Fin.cons p.1 p.2)) =
-            ∑ b : Bool, ∑ τprefix : GHatType prefixLen, gHatTypeOperator G (Fin.cons b τprefix) := by
+          (∑ p : Bool × GHatType prefixLen,
+              gHatTypeOperator G (Fin.cons p.1 p.2)) =
+            ∑ b : Bool,
+              ∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G (Fin.cons b τprefix) := by
         simpa using
-          (Fintype.sum_prod_type' (f := fun b τprefix => gHatTypeOperator G (Fin.cons b τprefix)))
+          (Fintype.sum_prod_type'
+            (f := fun b τprefix => gHatTypeOperator G (Fin.cons b τprefix)))
       calc
         ∑ τprefix : GHatType (prefixLen + 1), gHatTypeOperator G τprefix
-          = ∑ p : Bool × GHatType prefixLen, gHatTypeOperator G (Fin.cons p.1 p.2) := hsplit
-        _ = ∑ b : Bool, ∑ τprefix : GHatType prefixLen, gHatTypeOperator G (Fin.cons b τprefix) := hprod
-        _ = (∑ τprefix : GHatType prefixLen, gHatTypeOperator G (Fin.cons true τprefix)) +
-              ∑ τprefix : GHatType prefixLen, gHatTypeOperator G (Fin.cons false τprefix) := by
+          = ∑ p : Bool × GHatType prefixLen,
+              gHatTypeOperator G (Fin.cons p.1 p.2) := hsplit
+        _ = ∑ b : Bool,
+              ∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G (Fin.cons b τprefix) := hprod
+        _ =
+            (∑ τprefix : GHatType prefixLen,
+              gHatTypeOperator G (Fin.cons true τprefix)) +
+              ∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G (Fin.cons false τprefix) := by
                 rw [Fintype.sum_bool]
-        _ = (∑ τprefix : GHatType prefixLen, gHatTypeOperator G (prependTypeBit true τprefix)) +
-              ∑ τprefix : GHatType prefixLen, gHatTypeOperator G (prependTypeBit false τprefix) := by
+        _ =
+            (∑ τprefix : GHatType prefixLen,
+              gHatTypeOperator G (prependTypeBit true τprefix)) +
+              ∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G (prependTypeBit false τprefix) := by
                 simp [finCons_eq_prependTypeBit]
-        _ = (∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix * G) +
-              ∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix * (1 - G) := by
+        _ =
+            (∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix * G) +
+              ∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G τprefix * (1 - G) := by
                 simp_rw [gHatTypeOperator_prepend_true, gHatTypeOperator_prepend_false]
-        _ = (∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix) * G +
-              (∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix) * (1 - G) := by
+        _ =
+            (∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix) * G +
+              (∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G τprefix) * (1 - G) := by
                 rw [Finset.sum_mul, Finset.sum_mul]
         _ = 1 * G + 1 * (1 - G) := by
               simpa [full_gHatType_sum_eq_one G prefixLen]
@@ -3418,7 +3411,8 @@ theorem truncatedTypeSumRecurrence
             gHatTypeOperator G (Fin.cons p.1 p.2)
           else (0 : MIPStarRE.Quantum.Op ι) := by
     unfold truncatedTypeSums
-    exact (Fintype.sum_equiv (gHatTypeConsEquiv prefixLen)
+    exact (Fintype.sum_equiv
+      ((Fin.consEquiv (fun _ : Fin (prefixLen + 1) => Bool)).symm)
       (fun τprefix =>
         if d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight τtail then
           gHatTypeOperator G τprefix
@@ -3429,23 +3423,17 @@ theorem truncatedTypeSumRecurrence
         else (0 : MIPStarRE.Quantum.Op ι))
       (by
         intro τprefix
-        have hτ :
-            ((Fin.cons (τprefix 0) (fun i => τprefix i.succ) : GHatType (prefixLen + 1))) =
-              τprefix := by
-          funext i
-          cases i using Fin.cases with
-          | zero => rfl
-          | succ j => rfl
-        simpa [gHatTypeConsEquiv, hτ]))
+        simp))
   have hprod :
       (∑ p : Bool × GHatType prefixLen,
           if d + 1 ≤ gHatTypeWeight (Fin.cons p.1 p.2) + gHatTypeWeight τtail then
             gHatTypeOperator G (Fin.cons p.1 p.2)
           else (0 : MIPStarRE.Quantum.Op ι)) =
-        ∑ b : Bool, ∑ τprefix : GHatType prefixLen,
-          if d + 1 ≤ gHatTypeWeight (Fin.cons b τprefix) + gHatTypeWeight τtail then
-            gHatTypeOperator G (Fin.cons b τprefix)
-          else (0 : MIPStarRE.Quantum.Op ι) := by
+        ∑ b : Bool,
+          ∑ τprefix : GHatType prefixLen,
+            if d + 1 ≤ gHatTypeWeight (Fin.cons b τprefix) + gHatTypeWeight τtail then
+              gHatTypeOperator G (Fin.cons b τprefix)
+            else (0 : MIPStarRE.Quantum.Op ι) := by
     simpa using
       (Fintype.sum_prod_type' (f := fun b τprefix =>
         if d + 1 ≤ gHatTypeWeight (Fin.cons b τprefix) + gHatTypeWeight τtail then
@@ -3471,14 +3459,20 @@ theorem truncatedTypeSumRecurrence
               intro τprefix _
               have hcond :
                   (d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) + gHatTypeWeight τtail) ↔
-                    (d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight (prependTypeBit true τtail)) := by
+                    (d + 1 ≤ gHatTypeWeight τprefix +
+                      gHatTypeWeight (prependTypeBit true τtail)) := by
                 rw [gHatTypeWeight_fin_cons_true, gHatTypeWeight_prepend_true]
                 omega
-              by_cases h : d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight (prependTypeBit true τtail)
-              · have h' : d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) + gHatTypeWeight τtail :=
+              by_cases h : d + 1 ≤ gHatTypeWeight τprefix +
+                  gHatTypeWeight (prependTypeBit true τtail)
+              · have h' :
+                    d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) +
+                      gHatTypeWeight τtail :=
                   hcond.mpr h
                 simpa [h, h'] using gHatTypeOperator_fin_cons_true G τprefix
-              · have h' : ¬ d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) + gHatTypeWeight τtail := by
+              · have h' :
+                    ¬ d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) +
+                      gHatTypeWeight τtail := by
                   exact fun h' => h (hcond.mp h')
                 simp [h, h']
       _ = truncatedTypeSums G d prefixLen (prependTypeBit true τtail) * G := by
@@ -3504,13 +3498,19 @@ theorem truncatedTypeSumRecurrence
               intro τprefix _
               have hcond :
                   (d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) + gHatTypeWeight τtail) ↔
-                    (d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight (prependTypeBit false τtail)) := by
+                    (d + 1 ≤ gHatTypeWeight τprefix +
+                      gHatTypeWeight (prependTypeBit false τtail)) := by
                 simpa [gHatTypeWeight_fin_cons_false, gHatTypeWeight_prepend_false]
-              by_cases h : d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight (prependTypeBit false τtail)
-              · have h' : d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) + gHatTypeWeight τtail :=
+              by_cases h : d + 1 ≤ gHatTypeWeight τprefix +
+                  gHatTypeWeight (prependTypeBit false τtail)
+              · have h' :
+                    d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) +
+                      gHatTypeWeight τtail :=
                   hcond.mpr h
                 simpa [h, h'] using gHatTypeOperator_fin_cons_false G τprefix
-              · have h' : ¬ d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) + gHatTypeWeight τtail := by
+              · have h' :
+                    ¬ d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) +
+                      gHatTypeWeight τtail := by
                   exact fun h' => h (hcond.mp h')
                 simp [h, h']
       _ = truncatedTypeSums G d prefixLen (prependTypeBit false τtail) * (1 - G) := by
@@ -3523,10 +3523,11 @@ theorem truncatedTypeSumRecurrence
           if d + 1 ≤ gHatTypeWeight (Fin.cons p.1 p.2) + gHatTypeWeight τtail then
             gHatTypeOperator G (Fin.cons p.1 p.2)
           else (0 : MIPStarRE.Quantum.Op ι) := hsplit
-    _ = ∑ b : Bool, ∑ τprefix : GHatType prefixLen,
-          if d + 1 ≤ gHatTypeWeight (Fin.cons b τprefix) + gHatTypeWeight τtail then
-            gHatTypeOperator G (Fin.cons b τprefix)
-          else (0 : MIPStarRE.Quantum.Op ι) := hprod
+    _ = ∑ b : Bool,
+          ∑ τprefix : GHatType prefixLen,
+            if d + 1 ≤ gHatTypeWeight (Fin.cons b τprefix) + gHatTypeWeight τtail then
+              gHatTypeOperator G (Fin.cons b τprefix)
+            else (0 : MIPStarRE.Quantum.Op ι) := hprod
     _ = (∑ τprefix : GHatType prefixLen,
             (if d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) + gHatTypeWeight τtail then
               gHatTypeOperator G (Fin.cons true τprefix)
