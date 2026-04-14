@@ -258,8 +258,7 @@ theorem goodStrategyCharacterization {params : Parameters} [FieldModel params.q]
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         delta ∧
-      strategy.diagonalFailureProbability ≤ gamma ∧
-      DiagonalEvaluationReparamInvariant params strategy.diagonalMeasurement := by
+      strategy.diagonalFailureProbability ≤ gamma := by
   have hself_eq_point (u : Point params) :
       qBipartiteSSCDefect strategy.state ((strategy.pointMeasurement u).toSubMeas) =
         qBipartiteConsDefect strategy.state
@@ -281,14 +280,12 @@ theorem goodStrategyCharacterization {params : Parameters} [FieldModel params.q]
     simpa using hself_eq_point u
   constructor
   · intro h
-    refine ⟨⟨h.axisParallelTest⟩, ?_⟩
-    refine ⟨?_, h.diagonalLineTest, h.diagonalEvaluationReparam⟩
+    refine ⟨⟨h.axisParallelTest⟩, ?_, h.diagonalLineTest⟩
     constructor
     rw [← hself_eq]
     exact h.selfConsistencyTest
-  · rintro ⟨haxis, hrest⟩
-    rcases hrest with ⟨hself, hdiag, hreparam⟩
-    refine ⟨haxis.offDiagonalBound, ?_, hdiag, hreparam⟩
+  · rintro ⟨haxis, hself, hdiag⟩
+    refine ⟨haxis.offDiagonalBound, ?_, hdiag⟩
     simpa [SymStrat.selfConsistencyFailureProbability, hself_eq] using
       hself.offDiagonalBound
 
