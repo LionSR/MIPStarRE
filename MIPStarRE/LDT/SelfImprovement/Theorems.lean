@@ -358,6 +358,35 @@ structure SelfImprovementBridgePackage (params : Parameters) [FieldModel params.
         (selfImprovementDataProcessingError params eps delta) →
       SelfImprovementFinalFields params strategy H Z eps delta nu
 
+/-- Producer for the temporary Section 9 self-improvement bridge package.
+
+This is the paper-faithful construction point for the assumptions currently
+bundled in `SelfImprovementBridgePackage`. From an `(ε, δ, γ)`-good symmetric
+strategy and an input polynomial measurement `G` that is `ν`-consistent with
+the point measurements, the eventual proof must:
+
+* expose the permutation-invariance of the symmetric state;
+* prove the GlobalVariance estimates used by `addInU`;
+* derive the helper-stage strong self-consistency bound;
+* transport orthonormalization through polynomial evaluation by data processing;
+* assemble the projective completeness, point-consistency, self-closeness, and
+  boundedness fields after orthonormalization.
+
+The proof is intentionally left as a stub until those Section 8/9 transport
+lemmas are formalized. -/
+theorem selfImprovementBridgePackage
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (G : Measurement (Polynomial params) ι)
+    (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    SelfImprovementBridgePackage params strategy eps delta nu := by
+  sorry
+
 private lemma averagedPointOperator_le_one
     (params : Parameters)
     [FieldModel params.q]
