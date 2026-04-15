@@ -103,7 +103,7 @@ structure SpectralTruncationStatement {Outcome : Type*}
     SDDOpRel ψ (uniformDistribution Unit)
       (fun _ => (A.toSubMeas : OpFamily Outcome ι))
       (fun _ => roundedFamily)
-      (2 * spectralTruncationError ζ)
+      (spectralTruncationError ζ)
   /-- The stored total operator is the sum of the rounded family. -/
   sum_eq_total : ∑ a, roundedFamily.outcome a = roundedFamily.total
   /-- The total operator of the rounded family is almost bounded by `I`. -/
@@ -119,7 +119,9 @@ structure SpectralTruncationBridgePackage {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
-  witness : SpectralTruncationStatement ψ A ζ
+  fromSourceAlmostProjective :
+    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
+      SpectralTruncationStatement ψ A ζ
 
 /-- Output package for the rounding-to-projective step. -/
 structure RoundedProjMeasStatement {Outcome : Type*}
@@ -139,12 +141,10 @@ structure ProjectivizationRepairPackage {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
-  projSubMeas : ProjSubMeas Outcome ι
-  closeness :
-    SDDRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily A.toSubMeas)
-      (constSubMeasFamily projSubMeas.toSubMeas)
-      (roundingToProjectiveError ζ)
+  fromSpectral :
+    SpectralTruncationStatement ψ A ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        RoundedProjMeasStatement ψ A P (roundingToProjectiveError ζ)
 
 /-- Temporary bridge package for the final descent from the product-space
 measurement lemma back to the local orthonormalization theorem. -/
@@ -152,11 +152,13 @@ structure OrthonormalizationBridgePackage {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
-  witness :
-    ∃ P : ProjSubMeas Outcome ι,
-      SDDRel ψ (uniformDistribution Unit)
-        (constSubMeasFamily A.liftLeft)
-        (constSubMeasFamily P.toSubMeas.liftLeft)
-        (orthonormalizationError ζ)
+  fromSSC :
+    BipartiteSSCRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationError ζ)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

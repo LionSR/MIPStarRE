@@ -364,17 +364,6 @@ lemma truncationInequality (δ x : Error) :
       mul_nonneg (mul_nonneg (le_of_lt hδ) hx)
         (by linarith : (0 : ℝ) ≤ 1 - x)]
 
-private lemma sourceAlmostProjective_nonneg {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) :
-    0 ≤ ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) := by
-  refine Finset.sum_nonneg ?_
-  intro a _
-  exact ev_nonneg_of_psd ψ _ <|
-    sub_nonneg.mpr <|
-      MIPStarRE.Quantum.sq_le_self (A.outcome_pos a) (A.outcome_le_one a)
-
 private lemma real_smul_matrix_eq_complex {ι : Type*} [Fintype ι] [DecidableEq ι]
     (Q : MIPStarRE.Quantum.Op ι) (c : Error) :
     (c : ℂ) • Q = c • Q := by
@@ -428,7 +417,7 @@ private lemma spectralTruncationError_two_mul_le_roundingToProjectiveError
 
 private lemma almostProjMeasOfSourceAlmostProjective {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
+    [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (η : Error)
     (hη : 0 ≤ η)
     (hsource :
@@ -479,17 +468,20 @@ lemma projectiveNonMeasurement {Outcome : Type uOutcome}
       ∃ R : OpFamily Outcome ι,
         RoundingToProjectorsWitness ψ A ζ R := by
   intro hsource
-  have hsource_nonneg := sourceAlmostProjective_nonneg ψ A
-  have hζ : 0 ≤ ζ := by linarith
-  let spectral := hspectral.witness
+  have hζ : 0 ≤ ζ := by
+    have hsource_nonneg := sourceAlmostProjective_nonneg ψ A
+    linarith
+  let spectral := hspectral.fromSourceAlmostProjective hsource
   refine ⟨spectral.roundedFamily, ?_⟩
   refine ⟨spectral.projective, ?_, ?_⟩
   · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
       (constOpFamily spectral.roundedFamily)
-      (2 * spectralTruncationError ζ) (2 * spectralTruncationError ζ)
+      (spectralTruncationError ζ) (2 * spectralTruncationError ζ)
       spectral.closeness
-      le_rfl
+      (by
+        have hε_nonneg : 0 ≤ spectralTruncationError ζ := spectralTruncationError_nonneg hζ
+        nlinarith)
   · exact spectral.total_le
 
 /-- **Rank reduction** (`lem:projective-low-rank-sum`).
@@ -513,7 +505,7 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
   by_cases hOutcome : Nonempty Outcome
   · letI : Nonempty Outcome := hOutcome
     letI : Inhabited Outcome := Classical.inhabited_of_nonempty hOutcome
-    let spectral := hspectral.witness
+    let spectral := hspectral.fromSourceAlmostProjective source_almost_projective
     let q : OpFamily Outcome ι := spectral.roundedFamily
     let data : QLayerData Outcome ι :=
       { auxSpace :=
@@ -534,12 +526,12 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
     · simpa [Qa, QTotal, data, q] using spectral.sum_eq_total
     · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
         (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily q)
-        (2 * spectralTruncationError ζ) (roundingToProjectiveError ζ)
+        (spectralTruncationError ζ) (roundingToProjectiveError ζ)
         spectral.closeness
         (by
           have hε_nonneg : 0 ≤ spectralTruncationError ζ := spectralTruncationError_nonneg hζ
-          dsimp [roundingToProjectiveError]
-          exact mul_le_mul_of_nonneg_right (by norm_num : (2 : Error) ≤ 12) hε_nonneg)
+          simpa [roundingToProjectiveError, spectralTruncationError] using
+            mul_le_mul_of_nonneg_right (by norm_num : (1 : Error) ≤ 12) hε_nonneg)
     · calc
         QTotal data = q.total := rfl
         _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •

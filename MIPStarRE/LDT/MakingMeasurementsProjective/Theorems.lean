@@ -1097,8 +1097,8 @@ theorem orthonormalization {Outcome : Type*}
           (constSubMeasFamily A.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
-  intro _hssc hbridge
-  exact hbridge.witness
+  intro hssc hbridge
+  exact hbridge.fromSSC hssc
 
 
 
@@ -1143,6 +1143,19 @@ private lemma orthonormalizationMainLemma_error_bound (ζ : Error)
         exact mul_le_mul_of_nonneg_left hsqrt_two_le_seven (by norm_num)
       simpa using hcoeff.trans_eq (by norm_num : (12 : Error) * 7 = 84)
 
+private def leftLiftedMeasurement {Outcome : Type*}
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (A : Measurement Outcome ιA) :
+    Measurement Outcome (ιA × ιB) :=
+  { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
+    total_eq_one := by
+      ext i j
+      rcases i with ⟨i₁, i₂⟩
+      rcases j with ⟨j₁, j₂⟩
+      simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
+
 /-- `lem:orthonormalization-main-lemma`.
 
 The bridge inputs isolate the still-unformalized spectral truncation and the
@@ -1151,52 +1164,26 @@ submeasurement on the lifted space. -/
 lemma orthonormalizationMainLemma {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
+    [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ιA × ιB))
     (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error)
     (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
     (hspectral :
-      let A_lifted : Measurement Outcome (ιA × ιB) :=
-        { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-          total_eq_one := by
-            ext i j
-            rcases i with ⟨i₁, i₂⟩
-            rcases j with ⟨j₁, j₂⟩
-            simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
-      SpectralTruncationBridgePackage ψ A_lifted
+      SpectralTruncationBridgePackage ψ (leftLiftedMeasurement (ιB := ιB) A)
         (consistencyToAlmostProjectiveError ζ))
     (hrepair :
-      let A_lifted : Measurement Outcome (ιA × ιB) :=
-        { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-          total_eq_one := by
-            ext i j
-            rcases i with ⟨i₁, i₂⟩
-            rcases j with ⟨j₁, j₂⟩
-            simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
-      ProjectivizationRepairPackage ψ A_lifted
+      ProjectivizationRepairPackage ψ (leftLiftedMeasurement (ιB := ιB) A)
         (consistencyToAlmostProjectiveError ζ)) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
-      let A_lifted : Measurement Outcome (ιA × ιB) :=
-        { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-          total_eq_one := by
-            ext i j
-            rcases i with ⟨i₁, i₂⟩
-            rcases j with ⟨j₁, j₂⟩
-            simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
+      let A_lifted : Measurement Outcome (ιA × ιB) := leftLiftedMeasurement (ιB := ιB) A
       ∃ P : ProjSubMeas Outcome (ιA × ιB),
         RoundedProjMeasStatement
           ψ A_lifted P
           (orthonormalizationMainLemmaError ζ) := by
   intro hCons
-  let A_lifted : Measurement Outcome (ιA × ιB) :=
-    { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-      total_eq_one := by
-        ext i j
-        rcases i with ⟨i₁, i₂⟩
-        rcases j with ⟨j₁, j₂⟩
-        simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
+  let A_lifted : Measurement Outcome (ιA × ιB) := leftLiftedMeasurement (ιB := ιB) A
   have hspectral' :
       SpectralTruncationBridgePackage ψ A_lifted
         (consistencyToAlmostProjectiveError ζ) := by
