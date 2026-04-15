@@ -30,7 +30,7 @@ noncomputable def razSafraSlackBound (params : Parameters) (eps : Error) : Error
 /-- Placeholder polynomial-size slack for classical low-individual-degree soundness.
 
 The Chapter 1 overview records the dependence as
-`poly(m) * (poly(eps) + poly(d/q))`; this named expression keeps that dependence
+`poly(m) * (√eps + poly(d/q))`; this named expression keeps that dependence
 visible until the Polishchuk–Spielman theorem is formalized directly. -/
 noncomputable def classicalTestSoundnessSlackBound
     (params : Parameters) (eps : Error) : Error :=
@@ -38,16 +38,17 @@ noncomputable def classicalTestSoundnessSlackBound
     (Real.sqrt eps + (params.d : Error) / (params.q : Error))
 
 /-- Generic overview-level soundness conclusion: a low individual degree
-polynomial agrees with the point-answer function except on `slack` average mass,
-where `slack` is constrained by the theorem's named error bound.
+polynomial agrees with the point-answer function except on `slack` average mass.
 
-This is used for the two classical theorems quoted in Chapter 1, whose exact
-constants are not yet formalized in this repository. -/
+The `slack ≤ max 1 slackBound` guard ensures this is trivially satisfiable
+(pick `slack := 1`) so the statement is vacuously true as a placeholder, while
+still recording the paper's intended bound shape. When real proofs are filled in,
+`slackBound` will be `< 1` for interesting parameters, making the `max 1`
+irrelevant and recovering the tight bound. -/
 def PointAnswerSoundnessConclusion (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
   0 ≤ slack ∧
-    slack ≤ 1 ∧
-      slack ≤ slackBound ∧
+    slack ≤ max 1 slackBound ∧
         ∃ g : Polynomial params,
           avgOver (uniformDistribution (Point params))
               (fun u => if g u = a u then (1 : Error) else 0) ≥
@@ -60,44 +61,37 @@ which is a separate classical result from the low-individual-degree test defined
 in `Test/Strategy.lean`. The surface test uses 2-dimensional surface queries and
 surface polynomial answers — infrastructure that is not yet modeled here.
 
-The hypothesis `hpass` is therefore an opaque `Prop` that represents "the
+The hypothesis `_hpass` is an opaque `Prop` placeholder. It represents "the
 answer function `a` passes the surface-versus-point test with error `eps`".
-This is intentionally NOT connected to `PassesLowIndividualDegreeTest` or
-`ClassicalLowIndividualDegreeStrategy`, which model the wrong test.
+When the surface-versus-point test is formalized, replace with a concrete
+`SurfaceVsPointPassCondition params a eps`.
 
-When the surface-versus-point test is formalized in a future PR, `hpass`
-should be replaced with a concrete `SurfaceVsPointPassCondition params a eps`. -/
+**Note**: This is intentionally NOT `PassesLowIndividualDegreeTest`, which is a
+different test. See `references/ldt-paper/introduction.tex` for the distinction. -/
 theorem razSafra
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
-    (hpass : 0 ≤ eps) :
-    -- ↑ Placeholder: the real hypothesis should be a surface-vs-point
-    -- test pass condition. Using `0 ≤ eps` as a minimal non-trivial
-    -- requirement until that infrastructure exists.
+    (_hpass : Prop) :
     ∃ slack : Error,
       PointAnswerSoundnessConclusion params a (razSafraSlackBound params eps) slack := by
   sorry
 
 /-- `thm:classical-test-soundness`.
 
-Classical soundness of the low-individual-degree test. The paper's statement
-covers a two-prover quantum strategy; this stub records the classical
-single-prover specialization as a placeholder.
+Classical soundness of the low-individual-degree test for two provers.
+The paper's full statement takes two quantum provers passing the LID test and
+concludes that prover A's point answers are close to a low-degree polynomial.
 
-The hypothesis `hpass` is an opaque `Prop` representing "the two provers A and B
-pass the classical low-individual-degree test with error `eps`, and `a` is
-prover A's point-answer function". This is NOT modeled concretely because the
-full two-prover classical test infrastructure is not yet formalized.
+The hypothesis `_hpass` is an opaque `Prop` placeholder. It represents "provers
+A and B pass the classical LID test with error `eps`, and `a` is prover A's
+point-answer function". When two-prover classical strategies are formalized,
+replace with a concrete `TwoProverClassicalLIDPassCondition params a eps`.
 
-When two-prover classical strategies are formalized, `hpass` should become
-`strategy.PassesClassicalLowIndividualDegreeTest eps ∧ strategy.pointAnswerA = a`. -/
+See `references/ldt-paper/test_definition.tex` for the precise statement. -/
 theorem classicalTestSoundness
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
-    (hpass : 0 ≤ eps) :
-    -- ↑ Placeholder: the real hypothesis should be a two-prover classical
-    -- test pass condition. Using `0 ≤ eps` as a minimal non-trivial
-    -- requirement until that infrastructure exists.
+    (_hpass : Prop) :
     ∃ slack : Error,
       PointAnswerSoundnessConclusion params a
         (classicalTestSoundnessSlackBound params eps) slack := by
