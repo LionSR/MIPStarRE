@@ -3387,6 +3387,7 @@ private lemma hAConsistency_submeas_core
     (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
     (hdq_le : params.d ≤ params.q)
+    (hcomplete : family.Complete strategy.state kappa)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
     (hHB : HBConsistencyStatement params strategy family
@@ -3416,6 +3417,7 @@ theorem hAConsistency_submeas
     (hzeta_le : zeta ≤ 1)
     (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
@@ -3454,7 +3456,7 @@ theorem hAConsistency_submeas
     hnorm hgood family hcons hself hbound k hline
   exact hAConsistency_submeas_core params strategy family
     eps delta gamma kappa zeta hnorm hgood hgamma_le hzeta_le hdq_le
-    k hk hHB
+    hcomplete k hk hHB
 
 /-- Completed-measurement version of `cor:h-a-consistency`.
 
@@ -4000,7 +4002,7 @@ lemma ldPastingSubMeas
   have hconsistency :=
     hAConsistency_submeas params strategy eps delta gamma kappa zeta
       hnorm hgood hgamma_le hzeta_le hdq_le
-      family hcons hself hbound k hk
+      family hcomplete hcons hself hbound k hk
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
       hnorm hgood hgamma_le hzeta_le hdq_le
@@ -4035,7 +4037,7 @@ theorem ldPasting
   have hsubmeasConsistency :=
     hAConsistency_submeas params strategy eps delta gamma kappa zeta
       hnorm hgood hgamma_le hzeta_le hdq_le
-      family hcons hself hbound k hk
+      family hcomplete hcons hself hbound k hk
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
       hnorm hgood hgamma_le hzeta_le hdq_le
