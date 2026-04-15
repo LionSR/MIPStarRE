@@ -51,14 +51,25 @@ def DiagonalEvaluationReparamInvariant (params : Parameters)
     (postprocess ((M (DiagonalLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a =
       (postprocess ((M ℓ).toSubMeas) (fun f => f t)).outcome a
 
+/-- Reparametrization invariance for axis-parallel-line measurements: evaluating a
+rebased line at `zeroCoord` agrees outcome-wise with evaluating the original
+line at the rebasing parameter. -/
+def AxisParallelEvaluationReparamInvariant (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι) : Prop :=
+  ∀ (ℓ : AxisParallelLine params) (t a : Fq params),
+    (postprocess ((M (AxisParallelLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a =
+      (postprocess ((M ℓ).toSubMeas) (fun f => f t)).outcome a
+
 /-- Paper-local symmetric strategy data.
 
-The `diagonalReparamInvariant` field encodes that diagonal-line
-measurements are geometrically covariant: evaluating at a rebased
-line's base point (`zeroCoord`) agrees with evaluating at the
-original parameter.  The paper treats this as implicit (lines are
-geometric objects), but in the Lean model `DiagonalLine` includes the
-parametrization, so we state it explicitly. -/
+The `axisParallelReparamInvariant` and `diagonalReparamInvariant`
+fields encode that line measurements are geometrically covariant:
+evaluating at a rebased line's base point (`zeroCoord`) agrees with
+evaluating at the original parameter. The paper treats this as
+implicit (lines are geometric objects), but in the Lean model
+`AxisParallelLine` and `DiagonalLine` include the parametrization, so
+we state it explicitly. -/
 structure SymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
@@ -66,6 +77,8 @@ structure SymStrat (params : Parameters) [FieldModel params.q]
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurement :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
+  axisParallelReparamInvariant :
+    AxisParallelEvaluationReparamInvariant params axisParallelMeasurement
   diagonalMeasurement :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
   diagonalReparamInvariant :
@@ -185,6 +198,10 @@ structure ProjStrat (params : Parameters) [FieldModel params.q]
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurementB :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+  axisParallelReparamInvariantA :
+    AxisParallelEvaluationReparamInvariant params axisParallelMeasurementA
+  axisParallelReparamInvariantB :
+    AxisParallelEvaluationReparamInvariant params axisParallelMeasurementB
   diagonalReparamInvariantA :
     DiagonalEvaluationReparamInvariant params diagonalMeasurementA
   diagonalReparamInvariantB :
@@ -939,7 +956,28 @@ noncomputable def symmetrizedIdxProjMeas
 
 /-- Reparametrization invariance is preserved by block-diagonal
 symmetrization over the role register. -/
-private theorem symmetrizedIdxProjMeas_reparamInvariant
+private theorem symmetrizedAxisParallelReparamInvariant
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {MA MB : IdxProjMeas (AxisParallelLine params)
+      (AxisLinePolynomial params) ι}
+    (hA : AxisParallelEvaluationReparamInvariant params MA)
+    (hB : AxisParallelEvaluationReparamInvariant params MB) :
+    AxisParallelEvaluationReparamInvariant params
+      (symmetrizedIdxProjMeas MA MB) := by
+  intro ℓ t a
+  have hA' := hA ℓ t a
+  have hB' := hB ℓ t a
+  classical
+  simp only [postprocess, symmetrizedIdxProjMeas] at hA' hB' ⊢
+  rw [Finset.sum_add_distrib, Finset.sum_add_distrib,
+    roleCond_finset_sum, roleCond_finset_sum,
+    roleCond_finset_sum, roleCond_finset_sum,
+    hA', hB']
+
+/-- Reparametrization invariance is preserved by block-diagonal
+symmetrization over the role register. -/
+private theorem symmetrizedDiagonalReparamInvariant
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {MA MB : IdxProjMeas (DiagonalLine params)
@@ -993,9 +1031,13 @@ noncomputable def classicalRoleSymmStrategy {params : Parameters}
   permInvState := classicalRoleSymmState_permInvState strategy.state
   pointMeasurement := strategy.symmetrizedPointMeasurement
   axisParallelMeasurement := strategy.symmetrizedAxisParallelMeasurement
+  axisParallelReparamInvariant :=
+    symmetrizedAxisParallelReparamInvariant
+      strategy.axisParallelReparamInvariantA
+      strategy.axisParallelReparamInvariantB
   diagonalMeasurement := strategy.symmetrizedDiagonalMeasurement
   diagonalReparamInvariant :=
-    symmetrizedIdxProjMeas_reparamInvariant
+    symmetrizedDiagonalReparamInvariant
       strategy.diagonalReparamInvariantA
       strategy.diagonalReparamInvariantB
 
@@ -1079,6 +1121,7 @@ def leftAsSymmetric {params : Parameters} [FieldModel params.q]
   permInvState := strategy.permInvState
   pointMeasurement := strategy.pointMeasurementA
   axisParallelMeasurement := strategy.axisParallelMeasurementA
+  axisParallelReparamInvariant := strategy.axisParallelReparamInvariantA
   diagonalMeasurement := strategy.diagonalMeasurementA
   diagonalReparamInvariant := strategy.diagonalReparamInvariantA
 
@@ -1091,6 +1134,7 @@ def rightAsSymmetric {params : Parameters} [FieldModel params.q]
   permInvState := strategy.permInvState
   pointMeasurement := strategy.pointMeasurementB
   axisParallelMeasurement := strategy.axisParallelMeasurementB
+  axisParallelReparamInvariant := strategy.axisParallelReparamInvariantB
   diagonalMeasurement := strategy.diagonalMeasurementB
   diagonalReparamInvariant := strategy.diagonalReparamInvariantB
 
