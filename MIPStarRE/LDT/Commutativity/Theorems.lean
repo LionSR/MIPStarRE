@@ -3633,24 +3633,77 @@ private lemma gCommStability_raw_le_one
       Prod.snd
       (gCommStability_pointwise_bound params strategy family G hG)
 
-set_option maxHeartbeats 2000000 in
-/-- `clm:g-comm-stability`.
+/-- The boundedness residual currently stored by `IdxPolyFamily.Bounded`.
 
-This packages the first boundedness-driven stability step in the proof of
-`lem:comm-data-processed-g`. -/
-theorem gCommStability
+This is the induction-oriented `Z^x ⊗ (I - G^x)` term after replacing the
+abstract slice family by the concrete `G` supplied to the commutativity theorem.
+The paper's commutativity stability claims use the swapped
+`(I - G^x) ⊗ Z^x` orientation, so this lemma records the currently available
+boundedness input rather than completing the paper's scalar argument. -/
+noncomputable def gCommStabilityBoundedResidual
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (_eps _delta _gamma zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (_hgood : strategy.IsGood _eps _delta _gamma)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (x : Fq params) : Error :=
+  ev strategy.state
+    (leftTensor (ι₂ := ι) (family.witness x) *
+      rightTensor (ι₁ := ι) (1 - (G x).total))
+
+/-- Stored residual half of the boundedness hypothesis.
+
+This is the line currently available from `IdxPolyFamily.Bounded`.  It is
+swapped relative to `references/ldt-paper/commutativity-G.tex`, where the
+residual appears as `(I-G^x) ⊗ Z^x`. -/
+theorem gCommStability_storedBoundedResidualBound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (zeta : Error)
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (_hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    avgOver (uniformDistribution (Fq params))
+      (fun x => gCommStabilityBoundedResidual params strategy family G x) ≤ zeta := by
+  simpa [gCommStabilityBoundedResidual, hG] using hbound.bounded.sliceBoundedness
+
+/-- Paper-faithful domination half of the boundedness hypothesis.
+
+This is the line `Z^x ≥ E_u A^{u,x}_{g(u)}` from
+`references/ldt-paper/commutativity-G.tex`. -/
+theorem gCommStability_averagedPoint_le_witness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (zeta : Error)
+    (family : IdxPolyFamily params ι)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    ∀ x : Fq params, ∀ g : Polynomial params,
+      IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x := by
+  intro x g
+  have hdom : family.dominationTarget x g ≤ family.witness x :=
+    sub_nonneg.mp (hbound.bounded.sliceDominatesTarget x g)
+  simpa [hbound.dominationTargetAgrees x g] using hdom
+
+set_option maxHeartbeats 2000000 in
+/-- Internal overlap version of the first stability estimate.
+
+This is not the paper's boundedness-driven scalar proof of
+`clm:g-comm-stability`: it bounds the current SDD package through the slice SSC
+overlap term `⟨ψ,(I-G^y)⊗G^y ψ⟩`.  It remains useful as an internal overlap
+lemma while the scalar-chain API is being completed. -/
+private theorem gCommStability_overlap
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityOneLeft params strategy family G)
@@ -3674,6 +3727,43 @@ theorem gCommStability
       (commDataProcessedGStabilityOneLeft params strategy family G)
       (commDataProcessedGStabilityOneRight params strategy family G)
       zeta hz_nonneg hraw_le_half hraw_le_one
+
+set_option maxHeartbeats 2000000 in
+/-- `clm:g-comm-stability`.
+
+The paper proof is a boundedness-driven scalar estimate with right-register
+factors `A_b^{v,y}` and the witness operators `Z^y`; the currently available
+boundedness consequences are exposed by
+`gCommStability_storedBoundedResidualBound` and
+`gCommStability_averagedPoint_le_witness`.
+
+The current formal `SDDOpRel` package still delegates to the internal overlap
+lemma above, because the scalar-chain API has not yet been connected to the
+paper's `A_b^{v,y}` expressions. -/
+theorem gCommStability
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (_eps _delta _gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (_hgood : strategy.IsGood _eps _delta _gamma)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (_hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
+      (Real.sqrt zeta) := by
+  have _hpaperResidual :=
+    gCommStability_storedBoundedResidualBound params strategy zeta family G hG hbound
+  have _hpaperDomination :=
+    gCommStability_averagedPoint_le_witness params strategy zeta family hbound
+  exact
+    gCommStability_overlap params strategy zeta hnorm family G hG hself
 
 set_option maxHeartbeats 2000000 in
 /-- Summing the stability-two comparison family leaves only the overlap term
@@ -3909,34 +3999,28 @@ private lemma gCommStabilityTwo_raw_le_one
       Prod.fst
       (gCommStabilityTwo_pointwise_bound params strategy family G hG)
 
-/-- `clm:g-comm-stability2`.
+set_option maxHeartbeats 2000000 in
+/-- Internal overlap version of the second stability estimate.
 
-This packages the second boundedness-driven stability step in the proof of
-`lem:comm-data-processed-g`. -/
-theorem gCommStabilityTwo
+This removes the trailing `G^x` in the current SDD package via slice SSC overlap.
+The paper's `clm:g-comm-stability2` first transports the right-register point
+operators with `commutativityPoints`, then applies the boundedness witness
+`Z^x`; that scalar mechanism is not what this internal lemma proves. -/
+private theorem gCommStabilityTwo_overlap
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (_eps _delta gamma zeta : Error)
+    (gamma zeta : Error)
     (hnorm : strategy.state.IsNormalized)
-    (_hgood : strategy.IsGood _eps _delta gamma)
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (_hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityTwoLeft params strategy family G)
       (commDataProcessedGStabilityTwoRight params strategy family G)
       (Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error))) := by
-  /-
-  Paper reference: `references/ldt-paper/commutativity-G.tex`,
-  `clm:g-comm-stability2`.
-  This is the point-commutation transport followed by the same boundedness
-  argument that removes the trailing `G^x` factor.
-  -/
   have hz_nonneg : 0 ≤ zeta := by
     exact le_trans
       (sddError_nonneg strategy.state
@@ -3980,6 +4064,49 @@ theorem gCommStabilityTwo
       (Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)))
       hstrong
       hle
+
+set_option maxHeartbeats 2000000 in
+/-- `clm:g-comm-stability2`.
+
+The paper proof is a scalar estimate: it uses `commutativityPoints` to swap the
+two right-register point factors, then uses the boundedness witness consequences
+recorded in `gCommStability_storedBoundedResidualBound` and
+`gCommStability_averagedPoint_le_witness`.
+
+The current formal `SDDOpRel` package still delegates to the internal overlap
+lemma above until the scalar-chain API can express the paper's
+`A_a^{u,x} A_b^{v,y}` right-register factors. -/
+theorem gCommStabilityTwo
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (_eps _delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood _eps _delta gamma)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (_hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (commDataProcessedGStabilityTwoLeft params strategy family G)
+      (commDataProcessedGStabilityTwoRight params strategy family G)
+      (Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error))) := by
+  have _hpaperResidual :=
+    gCommStability_storedBoundedResidualBound params strategy zeta family G hG hbound
+  have _hpaperDomination :=
+    gCommStability_averagedPoint_le_witness params strategy zeta family hbound
+  have _hpaperPointSwap :
+      SDDOpRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (pointMeasurementProductLeft params.next strategy)
+        (pointMeasurementProductRight params.next strategy)
+        (commutativityPointsError params.next gamma) :=
+    commutativityPoints params.next strategy _eps _delta gamma hgood
+  exact
+    gCommStabilityTwo_overlap params strategy gamma zeta hnorm family G hG hself
 
 set_option maxHeartbeats 2000000 in
 /-- Unfold the first stability relation into its averaged scalar defect term. -/
