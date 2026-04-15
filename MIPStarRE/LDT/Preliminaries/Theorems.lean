@@ -501,7 +501,7 @@ lemma stateDependentDistanceRel_mono
   intro ⟨h⟩
   exact ⟨le_trans h hle⟩
 
-lemma conjTranspose_mul_mono
+private lemma conjTranspose_mul_mono
     {ι : Type*} [Fintype ι]
     {X Y Z : MIPStarRE.Quantum.Op ι}
     (hXY : X ≤ Y) :
