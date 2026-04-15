@@ -82,15 +82,15 @@ def SurfaceVsPointPassCondition (_params : Parameters) [FieldModel _params.q]
     (_a : Point _params → Fq _params) (eps : Error) : Prop :=
   0 ≤ eps
 
-/-- Pass condition for the repository's modeled deterministic two-prover
-classical low individual degree test.
+/-- Pass condition for the paper's deterministic two-prover classical low
+individual degree test.
 
-This records only the modeled test-passing data:
-- a deterministic classical strategy for the current repository's modeled low
-  individual degree test,
+This records only the paper-faithful classical test-passing data:
+- a deterministic classical strategy for the two-prover low individual degree
+  test from `references/ldt-paper/test_definition.tex`,
 - a proof that Alice's point-answer function is the ambient `a`, and
-- a proof that the modeled strategy passes the test with acceptance probability
-  at least `1 - eps`.
+- a proof that the strategy passes that classical test with acceptance
+  probability at least `1 - eps`.
 
 The quoted Polishchuk–Spielman soundness implication is kept separate in
 `TwoProverClassicalLIDBridgePackage` so downstream theorems state an implication
@@ -105,9 +105,9 @@ def TwoProverClassicalLIDPassCondition (params : Parameters)
 /-- Temporary bridge/package predicate for the quoted Polishchuk–Spielman
 soundness theorem.
 
-This packages the external implication from the modeled classical pass condition
-to the named low-degree-agreement conclusion, while keeping that implication
-separate from `TwoProverClassicalLIDPassCondition` itself.
+This packages the external implication from the paper-faithful classical pass
+condition to the named low-degree-agreement conclusion, while keeping that
+implication separate from `TwoProverClassicalLIDPassCondition` itself.
 
 TODO(#404): replace this bridge package with a direct formalization (or other
 honest quoted-result interface) for the Polishchuk–Spielman implication. -/

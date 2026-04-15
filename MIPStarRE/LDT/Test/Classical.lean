@@ -4,7 +4,12 @@ import MIPStarRE.LDT.Test.Strategy
 # Section 3 — Classical two-prover strategies
 
 Deterministic classical strategy data and acceptance probabilities for the
-repository's currently modeled low individual degree test.
+paper's two-prover classical low individual degree test from
+`references/ldt-paper/test_definition.tex`.
+
+The relation between this paper-faithful classical test model and the
+repository's current quantum/projective surrogate
+`ProjStrat.lowIndividualDegreeFailureProbability` remains a follow-up task.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -22,8 +27,7 @@ indicates which prover receives the line query. -/
 abbrev ClassicalAxisParallelSample (params : Parameters) :=
   Role × AxisParallelTestSample params
 
-/-- The self-consistency branch sends a point query in the modeled classical
-specialization of the repository's current LID test. -/
+/-- The self-consistency branch sends the same point query to both provers. -/
 abbrev ClassicalSelfConsistencySample (params : Parameters) :=
   Point params
 
@@ -96,18 +100,18 @@ def axisParallelAccepts {params : Parameters} [FieldModel params.q]
   | .A => strategy.axisParallelAnswerA ℓ zeroCoord = strategy.pointAnswerB u
   | .B => strategy.pointAnswerA u = strategy.axisParallelAnswerB ℓ zeroCoord
 
-/-- Whether the deterministic strategy is accepted on the modeled
+/-- Whether the deterministic strategy is accepted on the paper's
 self-consistency branch.
 
-The repository's current `ProjStrat.lowIndividualDegreeFailureProbability`
-models the self-consistency branch via each prover's own strong
-self-consistency defect rather than cross-prover point agreement. For a
-deterministic classical point-answer function, that branch succeeds identically,
-so the acceptance predicate is `True`. -/
+This is the actual verifier check from `references/ldt-paper/test_definition.tex`:
+both provers receive the same point question and must return the same field
+value. This paper-faithful classical branch is not yet proved equivalent to the
+repository's current quantum/projective self-consistency surrogate; see
+TODO(#404). -/
 def selfConsistencyAccepts {params : Parameters} [FieldModel params.q]
-    (_strategy : TwoProverClassicalLIDStrategy params)
-    (_u : ClassicalSelfConsistencySample params) : Prop :=
-  True
+    (strategy : TwoProverClassicalLIDStrategy params)
+    (u : ClassicalSelfConsistencySample params) : Prop :=
+  strategy.pointAnswerA u = strategy.pointAnswerB u
 
 /-- Whether the deterministic strategy is accepted on a sampled `j`-restricted
  diagonal branch instance. -/
@@ -175,12 +179,13 @@ noncomputable def lowIndividualDegreeAcceptanceProbability {params : Parameters}
       strategy.selfConsistencyAcceptanceProbability +
       strategy.diagonalAcceptanceProbability) / 3
 
-/-- Passing the repository's modeled classical low individual degree test with
-error `eps`, stated in acceptance-probability form.
+/-- Passing the paper's deterministic two-prover classical low individual degree
+test with error `eps`, stated in acceptance-probability form.
 
 This name is deliberately distinct from `ProjStrat.PassesLowIndividualDegreeTest`
-so the classical specialization does not collide by dot notation with the
-quantum/projective predicate. -/
+so this paper-faithful classical predicate does not collide by dot notation with
+the repository's quantum/projective surrogate predicate. Relating the two
+formulations remains follow-up work; see TODO(#404). -/
 structure ClassicallyPassesLowIndividualDegreeTest {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) (eps : Error) : Prop where
