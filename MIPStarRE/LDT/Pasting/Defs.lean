@@ -96,7 +96,13 @@ def prependTypeBit {k : ℕ} (b : Bool) (τ : GHatType k) : GHatType (k + 1)
 
 In the `fromHToG` recurrence the natural index is the number of prefix bits
 already converted to the Bernoulli polynomial.  This helper turns a full
-`k`-type into the remaining tail `τ_{≥ prefixLen}` using zero-based indexing. -/
+`k`-type into the remaining tail `τ_{≥ prefixLen}` using zero-based indexing.
+
+Note: because `k - prefixLen` uses `Nat` subtraction, passing `prefixLen > k`
+silently returns `GHatType 0` (the empty tuple) rather than being a type error.
+Callers in the `fromHToG` recurrence always satisfy `prefixLen ≤ k`, so this
+wraparound is never triggered; reviewers should treat `prefixLen ≤ k` as an
+invariant of all call sites. -/
 def gHatTypeSuffix {k : ℕ} (prefixLen : ℕ) (τ : GHatType k) : GHatType (k - prefixLen) :=
   fun i => τ ⟨prefixLen + i.val, by omega⟩
 
