@@ -58,7 +58,7 @@ Last updated: 2026-04-14
 - **Scope**: `MIPStarRE/LDT/Commutativity/*.lean`
 - **Live executable sorrys in scope**: 2
 - **Current live target**: `MIPStarRE/LDT/Commutativity/Theorems.lean`
-- **Status**: BLOCKED ON `evaluatedSlice_scalar_chain_bound` statement
+- **Status**: IN PROGRESS
 - **Dependency chain**:
   - `MIPStarRE.LDT.Commutativity.gCommStability`
   - `MIPStarRE.LDT.Commutativity.gCommStabilityTwo`
@@ -104,20 +104,43 @@ Last updated: 2026-04-14
     a stronger `sqrt zeta` estimate
   - verified `lake env lean MIPStarRE/LDT/Commutativity/Theorems.lean` after the
     stability refactor; only the scalar chain and full-slice transport remain
-  - isolated a statement-level blocker in `evaluatedSlice_scalar_chain_bound`:
-    the theorem's current signature does not include
-    `family.ConsistentWithPoints strategy zeta`, but every viable `eq:add-an-a`
-    / `consSubMeas` route to the paper's error chain needs exactly that
-    hypothesis
-  - best next step once the blocker is resolved: thread the point-consistency
-    hypothesis into `evaluatedSlice_scalar_chain_bound` (or inline that proof
-    under `commDataProcessedG` where `hcons` is already available), then finish
-    `fullSliceCommutation_of_evaluated_on_evaluated_questions`
+  - threaded `family.ConsistentWithPoints strategy zeta` into the private
+    scalar-chain lemma so the `consSubMeas` / `eq:add-an-a` route is now
+    available without changing the exported theorem interfaces
   - addressed PR #366 review feedback by removing dead locals, renaming
     intentionally-unused theorem parameters with `_`-prefixed names, adding
     `\leanok` tags for `clm:g-comm-stability` and `clm:g-comm-stability2`,
     documenting the new helper lemmas, and refactoring the duplicated
     stability-one / stability-two raw-bound machinery into shared helpers
+  - eliminated the large-parameter branch `sorry` in
+    `fullSliceCommutation_of_evaluated_on_evaluated_questions`
+  - re-surveyed the current target and confirmed 2 live executable `sorry`s
+    remain in `Commutativity/Theorems.lean`: one in
+    `evaluatedSlice_scalar_chain_bound` and one in the small-parameter branch of
+    `fullSliceCommutation_of_evaluated_on_evaluated_questions`
+  - added compiling scalar-chain helpers for phases 1, 3, 4, 5, and 8/9,
+    including the `closenessOfIP` normalization side condition,
+    point-measurement insertion bounds, weighted stability-family rewrites, and
+    the point-measurement commutation step
+  - added full-slice transport helpers for the large-parameter branch and the
+    first Schwartz-Zippel reindexing domain conversion
+  - added local density-fixed symmetry lemmas showing how the missing swapped
+    point-consistency transport would follow from the stronger hypothesis
+    `swapDensity strategy.state.density = strategy.state.density`
+  - current mathematical blocker for the scalar-chain assembly: the remaining
+    insertion helpers want a swapped point-consistency statement, but the public
+    `PermInvState` API only exposes `swap_ev` on one-sided tensors; repeated
+    attempts indicate this is too weak to justify a general `ConsRel` symmetry
+    lemma for `opTensor X Y` vs `opTensor Y X`
+  - the remaining full-slice small-parameter transport now reduces to the same
+    unresolved scalar-chain ingredients, so both live `sorry`s are blocked by
+    the same interface gap rather than missing local quartic expansions
+  - best next step once the blocker is resolved: either strengthen
+    `PermInvState` to an actual swap-invariance hypothesis on `density`, or add
+    a public theorem deriving bipartite consistency symmetry from whatever
+    stronger invariant the project intends to use; then finish
+    `evaluatedSlice_scalar_chain_bound` and thread those bounds into the final
+    `hTransport` proof
 
 ## Active Pasting Wave
 - **Owner**: OpenCode
