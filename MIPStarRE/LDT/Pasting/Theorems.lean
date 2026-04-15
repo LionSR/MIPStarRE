@@ -1526,6 +1526,58 @@ private lemma switcheroo_second_term_close
           simp [avgOver, uniformDistribution]
           field_simp [hq0]
 
+/-- Raw SDD bound for completed-part pairs: marginalizes the completed-part
+self-consistency bound over `SlicePairQuestion` via `avgOver_uniform_fst`.
+Used as infrastructure for the commutativitySwitcheroo cross-term chain (issue #298). -/
+private lemma switcheroo_complete_part_pair_raw_sdd
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
+    avgOver (uniformDistribution (SlicePairQuestion params))
+      (fun q =>
+        qSDDCore ψbi
+          (fun g : Polynomial params =>
+            leftTensor (ι₂ := ι) ((family.meas q.1).outcome g))
+          (fun g : Polynomial params =>
+            rightTensor (ι₁ := ι) ((family.meas q.1).outcome g))) ≤ zeta := by
+  calc
+    avgOver (uniformDistribution (SlicePairQuestion params))
+        (fun q =>
+          qSDDCore ψbi
+            (fun g : Polynomial params =>
+              leftTensor (ι₂ := ι) ((family.meas q.1).outcome g))
+            (fun g : Polynomial params =>
+              rightTensor (ι₁ := ι) ((family.meas q.1).outcome g)))
+      = avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            qSDDCore ψbi
+              (fun g : Polynomial params =>
+                leftTensor (ι₂ := ι) ((family.meas x).outcome g))
+              (fun g : Polynomial params =>
+                rightTensor (ι₁ := ι) ((family.meas x).outcome g))) := by
+            simpa [SlicePairQuestion] using
+              (avgOver_uniform_fst (α := SliceQuestion params)
+                (β := SliceQuestion params)
+                (f := fun x =>
+                  qSDDCore ψbi
+                    (fun g : Polynomial params =>
+                      leftTensor (ι₂ := ι) ((family.meas x).outcome g))
+                    (fun g : Polynomial params =>
+                      rightTensor (ι₁ := ι) ((family.meas x).outcome g))))
+    _ = avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            qSDD ψbi
+              ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
+              ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x)) := by
+            apply avgOver_congr
+            intro x
+            simp [qSDD, qSDDCore, IdxProjSubMeas.toIdxSubMeas,
+              IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
+              SubMeas.liftLeft, SubMeas.liftRight]
+    _ ≤ zeta := hselfG.completePartSelfConsistency.squaredDistanceBound
+
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
