@@ -96,3 +96,14 @@
 		      \]
 	\end{enumerate}
 \end{theorem}
+
+\begin{remark}[Lean status note]\label{rem:main-formal-lean-bridge}
+	\lean{MIPStarRE.LDT.Test.MainFormalBridgePackage}
+	\leanok
+	\uses{thm:main-formal}
+	The current Lean development isolates the remaining Section~\ref{sec:induction}
+	assembly for Theorem~\ref{thm:main-formal} in an explicit bridge package.
+	This keeps the paper-facing theorem name stable while recording the still
+	unformalized symmetrization, induction, unsymmetrization, and
+	completion/projectivization transfer steps as a single Lean-side input.
+\end{remark}

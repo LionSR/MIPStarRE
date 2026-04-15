@@ -1052,15 +1052,93 @@ def rightAsSymmetric {params : Parameters} [FieldModel params.q]
   axisParallelMeasurement := strategy.axisParallelMeasurementB
   diagonalMeasurement := strategy.diagonalMeasurementB
 
+/-- Axis-parallel branch component where the left prover is queried with a line
+and the right prover is queried with the sampled base point.
+
+This is one of the two crossed role choices in the full low-individual-degree
+test. It is not the local axis-parallel failure probability of
+`strategy.leftAsSymmetric`, which would compare the left prover's point and line
+measurements against each other. -/
+noncomputable def axisParallelLineLeftPointRightFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (AxisParallelTestSample params))
+    (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
+    (axisParallelPointAnswerFamily strategy.rightAsSymmetric)
+
+/-- Axis-parallel branch component where the left prover is queried with the
+sampled base point and the right prover is queried with a line.
+
+This is the other crossed role choice in the full test, again distinct from any
+same-local `SymStrat.axisParallelFailureProbability`. -/
+noncomputable def axisParallelPointLeftLineRightFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (AxisParallelTestSample params))
+    (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
+    (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
+
+/-- Diagonal branch component where the left prover is queried with a diagonal
+line and the right prover is queried with the sampled base point.
+
+The average is over the restriction index and then over the corresponding
+restricted diagonal sample. This crossed component is what the full test bounds;
+it is not the diagonal-line failure probability of either local symmetric view. -/
+noncomputable def diagonalLineLeftPointRightFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  (1 / (params.m : Error)) *
+    ∑ j : Fin params.m,
+      bipartiteConsError strategy.state
+        (uniformDistribution (RestrictedDiagonalSample params j))
+        (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
+        (diagonalPointAnswerFamily strategy.rightAsSymmetric j)
+
+/-- Diagonal branch component where the left prover is queried with the sampled
+base point and the right prover is queried with a diagonal line.
+
+Together with `diagonalLineLeftPointRightFailureProbability`, this is the
+role-averaged diagonal part of `lowIndividualDegreeFailureProbability`. -/
+noncomputable def diagonalPointLeftLineRightFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  (1 / (params.m : Error)) *
+    ∑ j : Fin params.m,
+      bipartiteConsError strategy.state
+        (uniformDistribution (RestrictedDiagonalSample params j))
+        (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
+        (diagonalLineAnswerFamily strategy.rightAsSymmetric j)
+
+/-- Cross-prover point-agreement failure probability: both provers receive the
+same uniformly sampled point and the verifier checks that their answers agree.
+
+This is the self-consistency branch of the full low-individual-degree test
+(`fig:test` in the paper): "Player A: Give `u`; receive `a`. Player B: Give `u`;
+receive `b`. Accept if `a = b`." -/
+noncomputable def pointAgreementFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (Point params))
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+
 /-- Trace-based failure surrogate for the full low-individual-degree
 test, matching the paper's `fig:test` with role-based decomposition.
 
-Each of the three branches picks a role `r ∈ {A, B}`:
+The axis-parallel and diagonal branches pick a role `r ∈ {A, B}`:
 - Player `r` receives a line and returns a polynomial;
 - Player `r̄` receives a point and returns a field element.
 
-The self-consistency branch checks strong self-consistency of each
-player's point measurement.
+The self-consistency branch queries both provers at the same point and checks
+cross-prover point agreement.
 
 TODO(#306): `ProjStrat` currently forces both provers onto the
 same index type `ι`; the paper allows `H_A ≠ H_B`. -/
@@ -1068,46 +1146,14 @@ noncomputable def lowIndividualDegreeFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) : Error :=
-  let left := strategy.leftAsSymmetric
-  let right := strategy.rightAsSymmetric
-  let axParDist :=
-    uniformDistribution (AxisParallelTestSample params)
-  -- Axis-parallel: average over roles
-  -- Role A: Alice→line (left), Bob→point (right)
-  -- Role B: Alice→point (left), Bob→line (right)
   let axisParallelBranch :=
-    (bipartiteConsError strategy.state axParDist
-        (axisParallelLineAnswerFamily left)
-        (axisParallelPointAnswerFamily right)
-      + bipartiteConsError strategy.state axParDist
-        (axisParallelPointAnswerFamily left)
-        (axisParallelLineAnswerFamily right)) / 2
-  -- Self-consistency: average the two point-measurement SSC defects.
-  let selfConsistencyBranch :=
-    (bipartiteSSCError strategy.state
-        (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      + bipartiteSSCError strategy.state
-        (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)) / 2
-  -- Diagonal: for each restriction index, average the two role choices
-  -- from the paper's uniformly sampled role `r ∈ {A, B}`. The `/ 2`
-  -- is intentionally inside the summand before averaging over `j`.
+    (strategy.axisParallelLineLeftPointRightFailureProbability
+      + strategy.axisParallelPointLeftLineRightFailureProbability) / 2
+  let selfConsistencyBranch := strategy.pointAgreementFailureProbability
   let diagonalBranch :=
-    (1 / (params.m : Error)) *
-      ∑ j : Fin params.m,
-        (bipartiteConsError strategy.state
-            (uniformDistribution
-              (RestrictedDiagonalSample params j))
-            (diagonalLineAnswerFamily left j)
-            (diagonalPointAnswerFamily right j)
-          + bipartiteConsError strategy.state
-            (uniformDistribution
-              (RestrictedDiagonalSample params j))
-            (diagonalPointAnswerFamily left j)
-            (diagonalLineAnswerFamily right j)) / 2
-  (axisParallelBranch + selfConsistencyBranch +
-    diagonalBranch) / 3
+    (strategy.diagonalLineLeftPointRightFailureProbability
+      + strategy.diagonalPointLeftLineRightFailureProbability) / 2
+  (axisParallelBranch + selfConsistencyBranch + diagonalBranch) / 3
 
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
@@ -1115,93 +1161,97 @@ structure PassesLowIndividualDegreeTest {params : Parameters}
     (strategy : ProjStrat params ι) (eps : Error) : Prop where
   soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
 
-/-- Passing the test bounds the point-agreement defect by `3 * eps`. -/
+/-- Passing the full test bounds each sampled branch component.
+
+The role-averaged axis-parallel and diagonal components carry two levels of
+averaging, giving the `6 * eps` bounds. The self-consistency branch has no role
+average, so the cross-prover point-agreement error is bounded by `3 * eps`. -/
+theorem tested_branch_components_le_six_mul {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    strategy.axisParallelLineLeftPointRightFailureProbability ≤ 6 * eps ∧
+      strategy.axisParallelPointLeftLineRightFailureProbability ≤ 6 * eps ∧
+      strategy.pointAgreementFailureProbability ≤ 3 * eps ∧
+      strategy.diagonalLineLeftPointRightFailureProbability ≤ 6 * eps ∧
+      strategy.diagonalPointLeftLineRightFailureProbability ≤ 6 * eps := by
+  let axLinePoint := strategy.axisParallelLineLeftPointRightFailureProbability
+  let axPointLine := strategy.axisParallelPointLeftLineRightFailureProbability
+  let pointAgreement := strategy.pointAgreementFailureProbability
+  let diagLinePoint := strategy.diagonalLineLeftPointRightFailureProbability
+  let diagPointLine := strategy.diagonalPointLeftLineRightFailureProbability
+  have hlow :
+      (((axLinePoint + axPointLine) / 2 + pointAgreement
+          + (diagLinePoint + diagPointLine) / 2) / 3) ≤ eps := by
+    simpa [lowIndividualDegreeFailureProbability, axLinePoint, axPointLine,
+      pointAgreement, diagLinePoint, diagPointLine] using hpass.soundnessHypothesis
+  have h_axLinePoint_nonneg : 0 ≤ axLinePoint := by
+    simpa [axisParallelLineLeftPointRightFailureProbability, axLinePoint] using
+      bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params))
+        (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
+        (axisParallelPointAnswerFamily strategy.rightAsSymmetric)
+  have h_axPointLine_nonneg : 0 ≤ axPointLine := by
+    simpa [axisParallelPointLeftLineRightFailureProbability, axPointLine] using
+      bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params))
+        (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
+        (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
+  have h_pointAgreement_nonneg : 0 ≤ pointAgreement := by
+    simpa [pointAgreementFailureProbability, pointAgreement] using
+      bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have h_diagLinePoint_nonneg : 0 ≤ diagLinePoint := by
+    have hsum :
+        0 ≤ ∑ j : Fin params.m,
+          bipartiteConsError strategy.state
+            (uniformDistribution (RestrictedDiagonalSample params j))
+            (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
+            (diagonalPointAnswerFamily strategy.rightAsSymmetric j) := by
+      exact Finset.sum_nonneg fun j _ =>
+        bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
+          (diagonalPointAnswerFamily strategy.rightAsSymmetric j)
+    simpa [diagonalLineLeftPointRightFailureProbability, diagLinePoint] using
+      mul_nonneg (by positivity : 0 ≤ (1 / (params.m : Error))) hsum
+  have h_diagPointLine_nonneg : 0 ≤ diagPointLine := by
+    have hsum :
+        0 ≤ ∑ j : Fin params.m,
+          bipartiteConsError strategy.state
+            (uniformDistribution (RestrictedDiagonalSample params j))
+            (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
+            (diagonalLineAnswerFamily strategy.rightAsSymmetric j) := by
+      exact Finset.sum_nonneg fun j _ =>
+        bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
+          (diagonalLineAnswerFamily strategy.rightAsSymmetric j)
+    simpa [diagonalPointLeftLineRightFailureProbability, diagPointLine] using
+      mul_nonneg (by positivity : 0 ≤ (1 / (params.m : Error))) hsum
+  constructor
+  · nlinarith
+  constructor
+  · nlinarith
+  constructor
+  · nlinarith
+  constructor <;> nlinarith
+
+/-- Passing the full test bounds cross-prover point agreement by `3 * eps`.
+
+This is the direct consequence of the self-consistency branch of
+`lowIndividualDegreeFailureProbability`: both provers receive the same point and
+the verifier checks that the two answers agree. -/
 theorem point_agreement_le_three_mul {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    bipartiteConsError strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) ≤ 3 * eps := by
-  let p : Error :=
-    bipartiteConsError strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  let axParDist := uniformDistribution (AxisParallelTestSample params)
-  let left := strategy.leftAsSymmetric
-  let right := strategy.rightAsSymmetric
-  let axisParallelBranch :=
-    (bipartiteConsError strategy.state axParDist
-        (axisParallelLineAnswerFamily left)
-        (axisParallelPointAnswerFamily right)
-      + bipartiteConsError strategy.state axParDist
-        (axisParallelPointAnswerFamily left)
-        (axisParallelLineAnswerFamily right)) / 2
-  let selfConsistencyBranch :=
-    (bipartiteSSCError strategy.state
-        (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      + bipartiteSSCError strategy.state
-        (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)) / 2
-  let diagonalBranch :=
-    (1 / (params.m : Error)) *
-      ∑ j : Fin params.m,
-        (bipartiteConsError strategy.state
-            (uniformDistribution (RestrictedDiagonalSample params j))
-            (diagonalLineAnswerFamily left j)
-            (diagonalPointAnswerFamily right j)
-          + bipartiteConsError strategy.state
-            (uniformDistribution (RestrictedDiagonalSample params j))
-            (diagonalPointAnswerFamily left j)
-            (diagonalLineAnswerFamily right j)) / 2
-  have hp_nonneg : 0 ≤ p := by
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  have haxis_nonneg : 0 ≤ axisParallelBranch := by
-    unfold axisParallelBranch
-    refine div_nonneg ?_ (by norm_num)
-    exact add_nonneg
-      (bipartiteConsError_nonneg strategy.state axParDist
-        (axisParallelLineAnswerFamily left)
-        (axisParallelPointAnswerFamily right))
-      (bipartiteConsError_nonneg strategy.state axParDist
-        (axisParallelPointAnswerFamily left)
-        (axisParallelLineAnswerFamily right))
-  have hself_nonneg : 0 ≤ selfConsistencyBranch := by
-    unfold selfConsistencyBranch
-    refine div_nonneg ?_ (by norm_num)
-    exact add_nonneg
-      (bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA))
-      (bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB))
-  have hdiag_nonneg : 0 ≤ diagonalBranch := by
-    unfold diagonalBranch
-    refine mul_nonneg ?_ ?_
-    · positivity
-    · refine Finset.sum_nonneg ?_
-      intro j _
-      refine div_nonneg ?_ (by norm_num)
-      exact add_nonneg
-        (bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (RestrictedDiagonalSample params j))
-          (diagonalLineAnswerFamily left j)
-          (diagonalPointAnswerFamily right j))
-        (bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (RestrictedDiagonalSample params j))
-          (diagonalPointAnswerFamily left j)
-          (diagonalLineAnswerFamily right j))
-  have hmain : (axisParallelBranch + selfConsistencyBranch + diagonalBranch) / 3 ≤ eps := by
-    simpa [ProjStrat.lowIndividualDegreeFailureProbability,
-      axisParallelBranch, selfConsistencyBranch, diagonalBranch,
-      p, left, right] using hpass.soundnessHypothesis
-  have hsum : p + axisParallelBranch + selfConsistencyBranch + diagonalBranch ≤ 3 * eps := by
-    have haux : axisParallelBranch + selfConsistencyBranch + diagonalBranch ≤ 3 * eps := by
-      linarith
-    linarith
-  linarith
+    strategy.pointAgreementFailureProbability ≤ 3 * eps := by
+  rcases tested_branch_components_le_six_mul hpass with
+    ⟨_, _, hpoint, _, _⟩
+  exact hpoint
 
 private lemma addCoord_subCoord_right {params : Parameters} [FieldModel params.q]
     (x y : Fq params) :
@@ -1380,14 +1430,24 @@ theorem classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (strategy : ProjStrat params ι) :
     (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability =
-      bipartiteConsError strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) := by
-  unfold SymStrat.selfConsistencyFailureProbability bipartiteSSCError bipartiteConsError
+      strategy.pointAgreementFailureProbability := by
+  unfold SymStrat.selfConsistencyFailureProbability bipartiteSSCError
+    pointAgreementFailureProbability bipartiteConsError
   refine Finset.sum_congr rfl ?_
   intro u _
   exact congrArg (fun t => (uniformDistribution (Point params)).weight u * t)
     (qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect strategy u)
+
+/-- The role-register symmetrized strategy's self-consistency is bounded by any
+available cross-prover point-agreement bound. -/
+theorem classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    {strategy : ProjStrat params ι} {delta : Error}
+    (hpoint : strategy.pointAgreementFailureProbability ≤ delta) :
+    (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤ delta := by
+  rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
+  exact hpoint
 
 /-- The self-consistency branch of the role-register symmetrized strategy is
 bounded by `3 * eps` under the current Test-level failure surrogate. -/
@@ -1397,154 +1457,42 @@ theorem classicalRoleSymmStrategy_selfConsistency_le_three_mul
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤ 3 * eps := by
-  rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
-  exact point_agreement_le_three_mul hpass
+  exact classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
+    (strategy := strategy) (point_agreement_le_three_mul hpass)
 
-/-- A Lean-local surrogate consequence of the averaged test bound: the left local
-strategy is `(6 * eps, 6 * eps, 6 * eps)`-good.
+/-- Tested branch bounds involving the left prover's point measurement.
 
-This is not the paper's symmetrization step, which yields a separate symmetric
-strategy that is `(3 * eps, 3 * eps, 3 * eps)`-good. -/
-theorem left_as_symmetric_is_good_six_mul {params : Parameters}
+These are the three components of the full test in which the left prover's
+point measurement appears: left-point/right-line axis consistency, cross-prover
+point agreement, and left-point/right-diagonal consistency. They are
+crossed-prover quantities, so they are not an `IsGood` certificate for
+`strategy.leftAsSymmetric`. -/
+theorem left_point_tested_branches_le_six_mul {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    strategy.leftAsSymmetric.IsGood (6 * eps) (6 * eps) (6 * eps) := by
-  let p : Error :=
-    bipartiteConsError strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  let la : Error := strategy.leftAsSymmetric.axisParallelFailureProbability
-  let ra : Error := strategy.rightAsSymmetric.axisParallelFailureProbability
-  let ls : Error := strategy.leftAsSymmetric.selfConsistencyFailureProbability
-  let rs : Error := strategy.rightAsSymmetric.selfConsistencyFailureProbability
-  let ld : Error := strategy.leftAsSymmetric.diagonalFailureProbability
-  let rd : Error := strategy.rightAsSymmetric.diagonalFailureProbability
-  have hp_nonneg : 0 ≤ p := by
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  have hla_nonneg : 0 ≤ la := by
-    unfold la SymStrat.axisParallelFailureProbability ProjStrat.leftAsSymmetric
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (AxisParallelTestSample params))
-      (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
-      (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
-  have hra_nonneg : 0 ≤ ra := by
-    unfold ra SymStrat.axisParallelFailureProbability ProjStrat.rightAsSymmetric
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (AxisParallelTestSample params))
-      (axisParallelPointAnswerFamily strategy.rightAsSymmetric)
-      (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
-  have hls_nonneg : 0 ≤ ls := by
-    unfold ls SymStrat.selfConsistencyFailureProbability ProjStrat.leftAsSymmetric
-    exact bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-  have hrs_nonneg : 0 ≤ rs := by
-    unfold rs SymStrat.selfConsistencyFailureProbability ProjStrat.rightAsSymmetric
-    exact bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  have hld_nonneg : 0 ≤ ld := by
-    unfold ld SymStrat.diagonalFailureProbability ProjStrat.leftAsSymmetric
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (DiagonalTestSample params))
-      (diagonalPointAnswerFamily strategy.leftAsSymmetric)
-      (diagonalLineAnswerFamily strategy.leftAsSymmetric)
-  have hrd_nonneg : 0 ≤ rd := by
-    unfold rd SymStrat.diagonalFailureProbability ProjStrat.rightAsSymmetric
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (DiagonalTestSample params))
-      (diagonalPointAnswerFamily strategy.rightAsSymmetric)
-      (diagonalLineAnswerFamily strategy.rightAsSymmetric)
-  have hmain : (p + (la + ra) / 2 + (ls + rs) / 2 + (ld + rd) / 2) / 3 ≤ eps := by
-    simpa [p, la, ra, ls, rs, ld, rd, ProjStrat.lowIndividualDegreeFailureProbability,
-      SymStrat.axisParallelFailureProbability, SymStrat.selfConsistencyFailureProbability,
-      SymStrat.diagonalFailureProbability,
-      ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric] using hpass.soundnessHypothesis
-  have hsum : p + (la + ra) / 2 + (ls + rs) / 2 + (ld + rd) / 2 ≤ 3 * eps := by
-    linarith
-  have haxis_pair : (la + ra) / 2 ≤ 3 * eps := by
-    linarith [hsum, hp_nonneg, hls_nonneg, hrs_nonneg, hld_nonneg, hrd_nonneg]
-  have hself_pair : (ls + rs) / 2 ≤ 3 * eps := by
-    linarith [hsum, hp_nonneg, hla_nonneg, hra_nonneg, hld_nonneg, hrd_nonneg]
-  have hdiag_pair : (ld + rd) / 2 ≤ 3 * eps := by
-    linarith [hsum, hp_nonneg, hla_nonneg, hra_nonneg, hls_nonneg, hrs_nonneg]
-  constructor
-  · dsimp [la]
-    linarith [haxis_pair, hra_nonneg]
-  · dsimp [ls]
-    linarith [hself_pair, hrs_nonneg]
-  · dsimp [ld]
-    linarith [hdiag_pair, hrd_nonneg]
+    strategy.axisParallelPointLeftLineRightFailureProbability ≤ 6 * eps ∧
+      strategy.pointAgreementFailureProbability ≤ 3 * eps ∧
+      strategy.diagonalPointLeftLineRightFailureProbability ≤ 6 * eps := by
+  rcases tested_branch_components_le_six_mul hpass with
+    ⟨_, haxis, hpoint, _, hdiag⟩
+  exact ⟨haxis, hpoint, hdiag⟩
 
-/-- A Lean-local surrogate consequence of the averaged test bound: the right local
-strategy is `(6 * eps, 6 * eps, 6 * eps)`-good.
+/-- Tested branch bounds involving the right prover's point measurement.
 
-This is not the paper's symmetrization step, which yields a separate symmetric
-strategy that is `(3 * eps, 3 * eps, 3 * eps)`-good. -/
-theorem right_as_symmetric_is_good_six_mul {params : Parameters}
+These are the mirror-image crossed components: left-line/right-point axis
+consistency, cross-prover point agreement, and left-diagonal/right-point
+consistency. -/
+theorem right_point_tested_branches_le_six_mul {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    strategy.rightAsSymmetric.IsGood (6 * eps) (6 * eps) (6 * eps) := by
-  let p : Error :=
-    bipartiteConsError strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  let la : Error := strategy.leftAsSymmetric.axisParallelFailureProbability
-  let ra : Error := strategy.rightAsSymmetric.axisParallelFailureProbability
-  let ls : Error := strategy.leftAsSymmetric.selfConsistencyFailureProbability
-  let rs : Error := strategy.rightAsSymmetric.selfConsistencyFailureProbability
-  let ld : Error := strategy.leftAsSymmetric.diagonalFailureProbability
-  let rd : Error := strategy.rightAsSymmetric.diagonalFailureProbability
-  have hp_nonneg : 0 ≤ p := by
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  have hra_nonneg : 0 ≤ ra := by
-    unfold ra SymStrat.axisParallelFailureProbability ProjStrat.rightAsSymmetric
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (AxisParallelTestSample params))
-      (axisParallelPointAnswerFamily strategy.rightAsSymmetric)
-      (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
-  have hla_nonneg : 0 ≤ la := by
-    unfold la SymStrat.axisParallelFailureProbability ProjStrat.leftAsSymmetric
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (AxisParallelTestSample params))
-      (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
-      (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
-  have hls_nonneg : 0 ≤ ls := by
-    unfold ls SymStrat.selfConsistencyFailureProbability ProjStrat.leftAsSymmetric
-    exact bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-  have hrs_nonneg : 0 ≤ rs := by
-    unfold rs SymStrat.selfConsistencyFailureProbability ProjStrat.rightAsSymmetric
-    exact bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  have hld_nonneg : 0 ≤ ld := by
-    unfold ld SymStrat.diagonalFailureProbability ProjStrat.leftAsSymmetric
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (DiagonalTestSample params))
-      (diagonalPointAnswerFamily strategy.leftAsSymmetric)
-      (diagonalLineAnswerFamily strategy.leftAsSymmetric)
-  have hrd_nonneg : 0 ≤ rd := by
-    unfold rd SymStrat.diagonalFailureProbability ProjStrat.rightAsSymmetric
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (DiagonalTestSample params))
-      (diagonalPointAnswerFamily strategy.rightAsSymmetric)
-      (diagonalLineAnswerFamily strategy.rightAsSymmetric)
-  have hmain : (p + (la + ra) / 2 + (ls + rs) / 2 + (ld + rd) / 2) / 3 ≤ eps := by
-    simpa [p, la, ra, ls, rs, ld, rd, ProjStrat.lowIndividualDegreeFailureProbability,
-      SymStrat.axisParallelFailureProbability, SymStrat.selfConsistencyFailureProbability,
-      SymStrat.diagonalFailureProbability,
-      ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric] using hpass.soundnessHypothesis
-  have hsum : p + (la + ra) / 2 + (ls + rs) / 2 + (ld + rd) / 2 ≤ 3 * eps := by
-    linarith
-  have haxis_pair : (la + ra) / 2 ≤ 3 * eps := by
-    linarith [hsum, hp_nonneg, hls_nonneg, hrs_nonneg, hld_nonneg, hrd_nonneg]
-  have hself_pair : (ls + rs) / 2 ≤ 3 * eps := by
-    linarith [hsum, hp_nonneg, hla_nonneg, hra_nonneg, hld_nonneg, hrd_nonneg]
-  have hdiag_pair : (ld + rd) / 2 ≤ 3 * eps := by
-    linarith [hsum, hp_nonneg, hla_nonneg, hra_nonneg, hls_nonneg, hrs_nonneg]
-  constructor
-  · dsimp [ra]
-    linarith [haxis_pair, hla_nonneg]
-  · dsimp [rs]
-    linarith [hself_pair, hls_nonneg]
-  · dsimp [rd]
-    linarith [hdiag_pair, hld_nonneg]
+    strategy.axisParallelLineLeftPointRightFailureProbability ≤ 6 * eps ∧
+      strategy.pointAgreementFailureProbability ≤ 3 * eps ∧
+      strategy.diagonalLineLeftPointRightFailureProbability ≤ 6 * eps := by
+  rcases tested_branch_components_le_six_mul hpass with
+    ⟨haxis, _, hpoint, hdiag, _⟩
+  exact ⟨haxis, hpoint, hdiag⟩
 
 end ProjStrat
 

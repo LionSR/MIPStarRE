@@ -172,6 +172,16 @@ where
 	which proves \ref{item:ld-pasting-N-consistency-sub-measurement}. The completeness claim is exactly Corollary~\ref{cor:ld-pasting-N-completeness}.
 \end{proof}
 
+\begin{remark}[Lean status note]\label{rem:pasting-lean-statement-packages}
+	\lean{MIPStarRE.LDT.Pasting.CommutativitySwitcherooStatement, MIPStarRE.LDT.Pasting.CommuteGHalfSandwichStatement, MIPStarRE.LDT.Pasting.LdSandwichLineOnePointStatement, MIPStarRE.LDT.Pasting.HBConsistencyStatement, MIPStarRE.LDT.Pasting.OverAllOutcomesStatement, MIPStarRE.LDT.Pasting.FromHToGStatement, MIPStarRE.LDT.Pasting.ChernoffBernoulliMatrixStatement, MIPStarRE.LDT.Pasting.LdPastingNCompletenessStatement}
+	\leanok
+	\uses{lem:commutativity-switcheroo, lem:commute-g-half-sandwich, lem:ld-sandwich-line-one-point, lem:h-b-consistency, lem:over-all-outcomes, lem:from-H-to-G, lem:chernoff-bernoulli-matrix, cor:ld-pasting-N-completeness}
+	The current Lean development packages the remaining Chapter~\ref{chap:pasting}
+	assembly in explicit statement structures. The wrapper theorems compile against
+	these named intermediate witnesses, which makes the exact unresolved pasting
+	inputs visible without renaming the paper-facing declarations.
+\end{remark}
+
 \subsection{The Pasted Submeasurement}
 
 \begin{definition}[Distinct tuples]\label{def:distinct-tuples}

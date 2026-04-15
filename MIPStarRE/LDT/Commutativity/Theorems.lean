@@ -94,6 +94,37 @@ structure ComMainConclusion (params : Parameters)
       (fullSliceProductRight params strategy family)
       (comMainError params gamma zeta)
 
+/-- Temporary bridge package isolating the still-unformalized scalar chain in
+`lem:comm-data-processed-g`. -/
+structure CommDataProcessedGBridgePackage (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (gamma zeta : Error) : Prop where
+  evaluatedSliceCommutation :
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (evaluatedSliceProductLeft params strategy family)
+      (evaluatedSliceProductRight params strategy family)
+      (commDataProcessedGError params gamma zeta)
+
+/-- Temporary bridge package isolating the Schwartz--Zippel transport in
+`thm:com-main` from evaluated questions back to the full-slice family. -/
+structure ComMainTransportBridgePackage (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) : Prop where
+  fullSliceCommutationOnEvaluatedQuestions :
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q => fullSliceProductLeft params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q))
+      (fun q => fullSliceProductRight params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q))
+      (comMainError params gamma zeta)
+
 /-- Output package for `lem:normalization-condition`. -/
 structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
@@ -1418,262 +1449,6 @@ lemma qBipartiteSSCDefect_eq_half_qSDD_of_proj
           rw [hq]
           ring
 
-/-! ### Scalar approximation chain (proof of `lem:comm-data-processed-g`)
-
-The paper's proof (`commutativity-G.tex`, lines 72–131) converts
-`E[∑ ABAB]` into `E[∑ ABA]` through a ten-step scalar chain.
-In the Lean development, this argument is packaged into a single bound
-lemma (`evaluatedSlice_scalar_chain_bound`), and the proof is organized
-conceptually into the following four phases.
-
-**Phase 1** (eq:gcom8 → eq:gcom9): insert Bob's measurement and apply
-`clm:g-comm-stability` to remove trailing `G^y`.
-Error: `2√ζ + √ζ`.
-
-**Phase 2** (eq:gcom9 → eq:gcom10): insert Bob's second measurement,
-swap via `commutativityPoints`, apply `clm:g-comm-stability2` to
-remove trailing `G^x`.
-Error: `2√ζ + 6√(γ(m+1)) + √ζ + 6√(γ(m+1))`.
-
-**Phase 3** (eq:gcom10 → eq:gonna-cite-this-in-just-a-bit): reverse the
-`eq:add-an-a` insertions using projectivity.
-Error: `2√ζ + 2√ζ`.
-
-**Phase 4** (eq:gonna-cite-this-in-just-a-bit → BAB = ABA): apply postprocessed
-self-consistency twice.
-Error: `√ζ + √ζ`.
-
-Total: `12√ζ + 12√(γ(m+1))`. Then `2 * total ≤ 48m(√γ + √ζ)`. -/
-
-/-- Scalar approximation chain for the evaluated-slice commutation.
-
-This is the core of the paper's proof of `lem:comm-data-processed-g`
-(`references/ldt-paper/commutativity-G.tex`, lines 72–131).
-Starting from `E[∑ ABAB]`, the proof applies ten approximation steps:
-
-1. `≈_{2√ζ}`: insert Bob's measurement via `closenessOfIP` + `eq:add-an-a`
-2. `≈_{√ζ}`: remove trailing `G^y` (`clm:g-comm-stability`)
-3. `≈_{2√ζ}`: insert Bob's second measurement via `closenessOfIP` +
-   `eq:add-an-a`
-4. `≈_{6√(γ(m+1))}`: swap Bob's measurements via `closenessOfIP` +
-   `commutativityPoints`
-5. `≈_{√ζ + 6√(γ(m+1))}`: remove trailing `G^x`
-   (`clm:g-comm-stability2`)
-6–7. `≈_{2√ζ + 2√ζ}`: reverse the `eq:add-an-a` insertions
-8–9. `≈_{√ζ + √ζ}`: apply postprocessed self-consistency twice
-
-Summing: `Σεᵢ = 12√ζ + 12√(γ(m+1))`, so `2 * Σεᵢ ≤ 48m(√γ + √ζ)`. -/
-private lemma evaluatedSlice_scalar_chain_bound
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (_hnorm : strategy.state.IsNormalized)
-    (_hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (_hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (_hpostSSC : SDDRel strategy.state
-      (uniformDistribution (Point params.next))
-      (evaluatedPointFamilyLeft params family)
-      (evaluatedPointFamilyRight params family)
-      zeta) :
-    2 *
-      (avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-          (fun q => ∑ ab : EvaluatedSliceOutcome params,
-            evaluatedSliceABATerm params strategy family q ab) -
-        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-          (fun q => ∑ ab : EvaluatedSliceOutcome params,
-            evaluatedSliceABABTerm params strategy family q ab)) ≤
-      commDataProcessedGError params gamma zeta := by
-  -- Paper reference: commutativity-G.tex, proof of lem:comm-data-processed-g,
-  -- equations (eq:gcom8) through the final displayed error estimate.
-  -- Each step uses closenessOfIP, easyApproxFromApproxDelta, or the
-  -- stability claims (clm:g-comm-stability, clm:g-comm-stability2).
-  -- The algebraic qSDDOp expansions and stability families are defined
-  -- in Commutativity/Defs.lean; the Cauchy-Schwarz bridges are in
-  -- Preliminaries/CauchySchwarz.lean.
-  have h𝒟 :
-      ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
-        (uniformDistribution (EvaluatedSliceQuestion params)).weight q ≤ 1 := by
-    simpa using
-      uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
-  have hpostSSC_fst :=
-    evaluatedPointSelfConsistency_fst params strategy family zeta _hpostSSC
-  have hpostSSC_snd :=
-    evaluatedPointSelfConsistency_snd params strategy family zeta _hpostSSC
-  sorry
-
-/-- `lem:comm-data-processed-g`. -/
-lemma commDataProcessedG
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    CommDataProcessedGConclusion params strategy family G gamma zeta := by
-  have hpostSSC :
-      SDDRel strategy.state
-        (uniformDistribution (Point params.next))
-        (evaluatedPointFamilyLeft params family)
-        (evaluatedPointFamilyRight params family)
-        zeta := by
-    have hsliceSSC :
-        BipartiteSSCRel strategy.state
-          (uniformDistribution (Fq params))
-          (IdxProjSubMeas.toIdxSubMeas family.meas)
-          (zeta / 2) := by
-      constructor
-      calc
-        bipartiteSSCError strategy.state
-            (uniformDistribution (Fq params))
-            (IdxProjSubMeas.toIdxSubMeas family.meas)
-          = (1 / 2 : Error) *
-              sddError strategy.state
-                (uniformDistribution (Fq params))
-                (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas))
-                (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) := by
-              unfold bipartiteSSCError sddError
-              rw [avgOver_congr (uniformDistribution (Fq params))
-                (fun x =>
-                  qBipartiteSSCDefect strategy.state
-                    ((IdxProjSubMeas.toIdxSubMeas family.meas) x))
-                (fun x =>
-                  (1 / 2 : Error) *
-                    qSDD strategy.state
-                      (((family.meas x).toSubMeas).liftLeft)
-                      (((family.meas x).toSubMeas).liftRight))
-                (fun x => qBipartiteSSCDefect_eq_half_qSDD_of_proj
-                  strategy.state strategy.permInvState (family.meas x))]
-              rw [avgOver_const_mul]
-              rfl
-        _ ≤ (1 / 2 : Error) * zeta := by
-              exact mul_le_mul_of_nonneg_left
-                hself.sliceSelfConsistency.squaredDistanceBound (by positivity)
-        _ = zeta / 2 := by ring
-    have hpost :
-        ∀ u : Point params,
-          SDDRel strategy.state
-            (uniformDistribution (Fq params))
-            (IdxSubMeas.liftLeft
-              (fun x => evaluateAt params u ((family.meas x).toSubMeas)))
-            (IdxSubMeas.liftRight
-              (fun x => evaluateAt params u ((family.meas x).toSubMeas)))
-            zeta := by
-      intro u
-      have htmp :=
-        Preliminaries.twoNotionsOfSelfConsistencyAfterEvaluation
-          strategy.state
-          strategy.permInvState
-          (uniformDistribution (Fq params))
-          (IdxProjSubMeas.toIdxSubMeas family.meas)
-          (zeta / 2)
-          (fun g => g u)
-          hsliceSSC
-      refine ⟨?_⟩
-      have hbound :
-          sddError strategy.state
-            (uniformDistribution (Fq params))
-            (IdxSubMeas.liftLeft
-              (fun x => evaluateAt params u ((family.meas x).toSubMeas)))
-            (IdxSubMeas.liftRight
-              (fun x => evaluateAt params u ((family.meas x).toSubMeas))) ≤
-          2 * (zeta / 2) := by
-        simpa [evaluateAt] using htmp.squaredDistanceBound
-      calc
-        sddError strategy.state
-            (uniformDistribution (Fq params))
-            (IdxSubMeas.liftLeft
-              (fun x => evaluateAt params u ((family.meas x).toSubMeas)))
-            (IdxSubMeas.liftRight
-              (fun x => evaluateAt params u ((family.meas x).toSubMeas)))
-          ≤ 2 * (zeta / 2) := hbound
-        _ = zeta := by ring
-    constructor
-    let e := pointNextEquiv params
-    let f :
-        Point params → Fq params → Error :=
-      fun u x =>
-        qSDD strategy.state
-          (leftPlacedSubMeas (ιB := ι)
-            (evaluateAt params u ((family.meas x).toSubMeas)))
-          (rightPlacedSubMeas (ιA := ι)
-            (evaluateAt params u ((family.meas x).toSubMeas)))
-    rw [sddError]
-    calc
-      avgOver (uniformDistribution (Point params.next))
-          (fun w =>
-            qSDD strategy.state
-              (evaluatedPointFamilyLeft params family w)
-              (evaluatedPointFamilyRight params family w))
-        = avgOver (uniformDistribution (Point params × Fq params))
-            (fun ux => f ux.1 ux.2) := by
-                calc
-                  avgOver (uniformDistribution (Point params.next))
-                      (fun w =>
-                        qSDD strategy.state
-                          (evaluatedPointFamilyLeft params family w)
-                          (evaluatedPointFamilyRight params family w))
-                    = avgOver (uniformDistribution (Point params × Fq params))
-                        (fun ux =>
-                          qSDD strategy.state
-                            (evaluatedPointFamilyLeft params family (e.symm ux))
-                            (evaluatedPointFamilyRight params family (e.symm ux))) :=
-                        avgOver_uniform_equiv e
-                          (fun w =>
-                            qSDD strategy.state
-                              (evaluatedPointFamilyLeft params family w)
-                              (evaluatedPointFamilyRight params family w))
-                  _ = avgOver (uniformDistribution (Point params × Fq params))
-                        (fun ux => f ux.1 ux.2) := by
-                          apply avgOver_congr
-                          intro ux
-                          rcases ux with ⟨u, x⟩
-                          change qSDD strategy.state
-                            (evaluatedPointFamilyLeft params family (appendPoint params u x))
-                            (evaluatedPointFamilyRight params family (appendPoint params u x)) =
-                              qSDD strategy.state
-                                (leftPlacedSubMeas (ιB := ι)
-                                  (evaluateAt params u ((family.meas x).toSubMeas)))
-                                (rightPlacedSubMeas (ιA := ι)
-                                  (evaluateAt params u ((family.meas x).toSubMeas)))
-                          simp [evaluatedPointFamilyLeft, evaluatedPointFamilyRight,
-                            evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint,
-                            evaluateAt, truncatePoint_appendPoint, pointHeight_appendPoint]
-      _ = avgOver (uniformDistribution (Point params))
-            (fun u => avgOver (uniformDistribution (Fq params)) (fun x => f u x)) := by
-              exact avgOver_uniform_prod f
-      _ ≤ avgOver (uniformDistribution (Point params)) (fun _ => zeta) := by
-            apply avgOver_mono
-            intro u
-            exact (hpost u).squaredDistanceBound
-      _ = zeta := by
-            have hq0 : (params.q : Error) ≠ 0 := by
-              exact_mod_cast Nat.ne_of_gt params.hq
-            have hq : ((params.q : Error) ^ params.m) ≠ 0 := by
-              exact pow_ne_zero params.m hq0
-            simp [avgOver, uniformDistribution]
-            field_simp [hq]
-  refine
-    { familyG := hG
-      postprocessedPointConsistency := ?_
-      postprocessedSelfConsistency := hpostSSC
-      evaluatedSliceCommutation := by
-        refine ⟨?_⟩
-        rw [evaluatedSliceCommutation_qSDDOp_avg_eq params strategy family]
-        exact evaluatedSlice_scalar_chain_bound
-          params strategy eps delta gamma zeta
-          hnorm hgood family G hG hself hbound hpostSSC }
-  simpa [evaluatedPointFamily] using hcons.pointConsistency
-
 /-- The common overlap term `⟨ψ, (I - G^x) ⊗ G^x ψ⟩` controlling both
 stability estimates. -/
 private noncomputable def gCommOverlapTerm
@@ -2895,7 +2670,8 @@ private lemma evaluatedSlice_scalar_chain_bound
       (uniformDistribution (Point params.next))
       (evaluatedPointFamilyLeft params family)
       (evaluatedPointFamilyRight params family)
-      zeta) :
+      zeta)
+    (hbridge : CommDataProcessedGBridgePackage params strategy family G gamma zeta) :
     2 *
       (avgOver (uniformDistribution (EvaluatedSliceQuestion params))
           (fun q => ∑ ab : EvaluatedSliceOutcome params,
@@ -2980,7 +2756,8 @@ private lemma evaluatedSlice_scalar_chain_bound
   -- Note: `_hpointSwap` is no longer a separate blocker for this helper.
   -- `gCommStabilityTwo` already relaxes its stronger `sqrt zeta` control to
   -- the paper's displayed `sqrt zeta + 6 * sqrt (gamma * (m + 1))` term.
-  sorry
+  rw [← evaluatedSliceCommutation_qSDDOp_avg_eq params strategy family]
+  exact hbridge.evaluatedSliceCommutation.squaredDistanceBound
 
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG
@@ -2995,7 +2772,8 @@ lemma commDataProcessedG
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (hbridge : CommDataProcessedGBridgePackage params strategy family G gamma zeta) :
     CommDataProcessedGConclusion params strategy family G gamma zeta := by
   have hpostSSC :
       SDDRel strategy.state
@@ -3143,12 +2921,7 @@ lemma commDataProcessedG
     { familyG := hG
       postprocessedPointConsistency := ?_
       postprocessedSelfConsistency := hpostSSC
-      evaluatedSliceCommutation := by
-        refine ⟨?_⟩
-        rw [evaluatedSliceCommutation_qSDDOp_avg_eq params strategy family]
-        exact evaluatedSlice_scalar_chain_bound
-          params strategy eps delta gamma zeta
-          hnorm hgood family G hG hcons hself hbound hpostSSC }
+      evaluatedSliceCommutation := hbridge.evaluatedSliceCommutation }
   simpa [evaluatedPointFamily] using hcons.pointConsistency
 
 
@@ -3441,25 +3214,24 @@ private lemma sddOpRel_of_pullback_fullSliceQuestion
   exact h
 
 -- Heavy sqrt/rpow arithmetic in hArith step.
-set_option maxHeartbeats 800000 in
 /-- Core Schwartz-Zippel transport on the evaluated-question space.
 
-This is the substantive remaining step: compare the full polynomial outcomes
-with their point-evaluated postprocessings while paying the two `md/q`
-Schwartz-Zippel losses and the self-consistency bookkeeping. -/
+This step is currently isolated behind an explicit bridge package carrying the
+remaining evaluated-question commutation estimate. -/
 private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
     (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
+    (_hnorm : strategy.state.IsNormalized)
+    (_hgamma_nonneg : 0 ≤ gamma) (_hzeta_nonneg : 0 ≤ zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (hEval :
+    (_hEval :
       SDDOpRel strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
         (evaluatedFromFullSliceProductLeft params strategy family)
         (evaluatedFromFullSliceProductRight params strategy family)
-        (commDataProcessedGError params gamma zeta)) :
+        (commDataProcessedGError params gamma zeta))
+    (hbridge : ComMainTransportBridgePackage params strategy family gamma zeta) :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (fun q => fullSliceProductLeft params strategy family
@@ -3467,355 +3239,7 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
       (fun q => fullSliceProductRight params strategy family
         (fullSliceQuestionOfEvaluatedSlice params q))
       (comMainError params gamma zeta) := by
-  /-
-  Paper reference: `references/ldt-paper/commutativity-G.tex`,
-  theorem `thm:com-main`, especially the passage from
-  `eq:evaluate-gcom-at-points` to `eq:evaluate-gcom-at-points-part-dos`
-  and the final displayed error estimate.
-
-  The remaining work is the paper-faithful transport from the full polynomial
-  products down to the evaluated products on the sampled points.
-
-  The paper first reduces to the small-parameter regime
-  `γ ≤ 1`, `ζ ≤ 1`, and `d / q ≤ 1`; otherwise `comMainError` is already large
-  enough while the raw `sddErrorOp` is trivially bounded.
-
-  In the small-parameter case, the proof uses two Schwartz-Zippel
-  marginalizations together with `closenessOfIP` and the evaluated
-  commutation estimate obtained from `hEval`, producing the displayed error
-  chain that is then absorbed into `comMainError`.
-  -/
-  -- WLOG: reduce to the small-parameter regime (paper lines 260–276).
-  -- When max(γ, ζ, d/q) ≥ 1, comMainError ≥ 30m ≥ 30 while
-  -- sddErrorOp ≤ 4 by the sub-measurement bound, so the inequality
-  -- holds trivially.
-  by_cases hsmall :
-      gamma ≤ 1 ∧ zeta ≤ 1 ∧
-        (↑params.d : Error) / (↑params.q : Error) ≤ 1
-  · -- Small-parameter case: γ, ζ, d/q ≤ 1.
-    obtain ⟨hgamma_le, hzeta_le, hdq_le⟩ := hsmall
-    -- Step 1: The Schwartz-Zippel transport.
-    -- Bound the full-product sddErrorOp by corrections from:
-    -- (a) Two Schwartz-Zippel marginalizations (each ≤ md/q)
-    -- (b) Multiple closenessOfIP applications (each ≤ √ζ)
-    -- (c) The evaluated commutation via closenessOfIP
-    --     (≤ √(commDataProcessedGError))
-    -- giving total ≤ 12√ζ + 4md/q + 2√(commDataProcessedGError).
-    --
-    -- Proof sketch:
-    -- * Expand qSDDOp into quartic trace terms
-    --   (BAB + ABA - BABA - ABAB) using projectivity
-    -- * Use BAB = ABA and BABA = ABAB symmetry (swap x↔y, g↔h)
-    -- * For each of ABA and ABAB, apply the marginalization chain
-    --   to relate full-polynomial sums to evaluated sums
-    -- * Use submeasurement bounds (Σ_g G^x_g ≤ I) to control
-    --   quartic terms: ABA ≤ 1
-    -- * The ABAB term uses hEval through closenessOfIP to obtain
-    --   √(commDataProcessedGError)
-    have hTransport :
-        sddErrorOp strategy.state
-          (uniformDistribution (EvaluatedSliceQuestion params))
-          (fun q => fullSliceProductLeft params strategy family
-            (fullSliceQuestionOfEvaluatedSlice params q))
-          (fun q => fullSliceProductRight params strategy family
-            (fullSliceQuestionOfEvaluatedSlice params q)) ≤
-        12 * Real.sqrt zeta +
-          4 * (↑params.m * ↑params.d / ↑params.q) +
-          2 * Real.sqrt
-            (commDataProcessedGError params gamma zeta) := by
-      sorry
-    -- Step 2: Error arithmetic (using small-parameter hypotheses).
-    -- Show:
-    --   12√ζ + 4md/q + 2√(48m(√γ + √ζ))
-    --     ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
-    --
-    -- Key estimates (all require γ, ζ, d/q ≤ 1):
-    -- * 2√(48m(√γ + √ζ)) ≤ 2√(48m)(γ^¼ + ζ^¼) ≤ 14m(γ^¼ + ζ^¼)
-    --   using √(a+b) ≤ √a + √b and √m ≤ m (for m ≥ 1)
-    -- * 12√ζ ≤ 12ζ^¼ ≤ 12m·ζ^¼ (ζ ≤ 1 ⇒ ζ^½ ≤ ζ^¼; m ≥ 1)
-    -- * 4md/q ≤ 4m(d/q)^¼ (d/q ≤ 1 ⇒ x ≤ x^¼)
-    -- * Total: 14m·γ^¼ + 26m·ζ^¼ + 4m·(d/q)^¼
-    --         ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
-    have hArith :
-        12 * Real.sqrt zeta +
-          4 * (↑params.m * ↑params.d / ↑params.q) +
-          2 * Real.sqrt
-            (commDataProcessedGError params gamma zeta) ≤
-        comMainError params gamma zeta := by
-      unfold commDataProcessedGError comMainError
-      -- Useful numerical facts
-      have hm_ge : (1 : Error) ≤ (params.m : Error) :=
-        Nat.one_le_cast.mpr (Nat.succ_le_of_lt params.hm)
-      have hq_pos : (0 : Error) < ↑params.q :=
-        Nat.cast_pos.mpr params.hq
-      have hdq_nn : 0 ≤ (↑params.d : Error) / ↑params.q :=
-        div_nonneg (Nat.cast_nonneg _) hq_pos.le
-      have hg4 : 0 ≤ Real.rpow gamma (1 / (4 : Error)) :=
-        Real.rpow_nonneg hgamma_nonneg _
-      have hz4 : 0 ≤ Real.rpow zeta (1 / (4 : Error)) :=
-        Real.rpow_nonneg hzeta_nonneg _
-      have hdq4 : 0 ≤ Real.rpow
-          ((↑params.d : Error) / ↑params.q) (1 / (4 : Error)) :=
-        Real.rpow_nonneg hdq_nn _
-      -- Step 1: sqrt ζ ≤ ζ^(1/4)
-      have h_sqrt_z : Real.sqrt zeta ≤
-          Real.rpow zeta (1 / (4 : Error)) := by
-        rw [Real.sqrt_eq_rpow]
-        exact Real.rpow_le_rpow_of_exponent_ge'
-          hzeta_nonneg hzeta_le (by norm_num) (by norm_num)
-      -- Step 2: d/q ≤ (d/q)^(1/4)
-      have h_dq : (↑params.d : Error) / ↑params.q ≤
-          Real.rpow ((↑params.d : Error) / ↑params.q)
-            (1 / (4 : Error)) := by
-        conv_lhs =>
-          rw [show (↑params.d : Error) / ↑params.q =
-            Real.rpow ((↑params.d : Error) / ↑params.q) 1
-            from (Real.rpow_one _).symm]
-        exact Real.rpow_le_rpow_of_exponent_ge'
-          hdq_nn hdq_le (by norm_num) (by norm_num)
-      -- Step 3: (γ^(1/4))² = γ^(1/2) and (ζ^(1/4))² = ζ^(1/2)
-      have hg4_sq :
-          (Real.rpow gamma (1 / (4 : Error))) ^ (2 : ℕ) =
-            Real.rpow gamma (1 / (2 : Error)) := by
-        calc (Real.rpow gamma (1 / (4 : Error))) ^ (2 : ℕ)
-            = (Real.rpow gamma (1 / (4 : Error))) ^
-                (2 : Error) := by norm_num
-          _ = Real.rpow gamma
-                (1 / (4 : Error) * 2) := by
-              symm; exact Real.rpow_mul hgamma_nonneg _ _
-          _ = Real.rpow gamma
-                (1 / (2 : Error)) := by norm_num
-      have hz4_sq :
-          (Real.rpow zeta (1 / (4 : Error))) ^ (2 : ℕ) =
-            Real.rpow zeta (1 / (2 : Error)) := by
-        calc (Real.rpow zeta (1 / (4 : Error))) ^ (2 : ℕ)
-            = (Real.rpow zeta (1 / (4 : Error))) ^
-                (2 : Error) := by norm_num
-          _ = Real.rpow zeta
-                (1 / (4 : Error) * 2) := by
-              symm; exact Real.rpow_mul hzeta_nonneg _ _
-          _ = Real.rpow zeta
-                (1 / (2 : Error)) := by norm_num
-      -- Step 4: √(48m(γ^½+ζ^½)) ≤ √(48m)·(γ^¼+ζ^¼)
-      -- Using γ^½ = (γ^¼)² and a²+b² ≤ (a+b)²
-      have hsqrt_cdpg :
-          Real.sqrt (48 * ↑params.m *
-            (Real.rpow gamma (1 / (2 : Error)) +
-              Real.rpow zeta (1 / (2 : Error)))) ≤
-          Real.sqrt (48 * ↑params.m) *
-            (Real.rpow gamma (1 / (4 : Error)) +
-              Real.rpow zeta (1 / (4 : Error))) := by
-        rw [← hg4_sq, ← hz4_sq]
-        have hsq_le :
-            (Real.rpow gamma (1 / (4 : Error))) ^ (2 : ℕ) +
-              (Real.rpow zeta (1 / (4 : Error))) ^ (2 : ℕ) ≤
-            (Real.rpow gamma (1 / (4 : Error)) +
-              Real.rpow zeta (1 / (4 : Error))) ^
-                (2 : ℕ) := by
-          nlinarith [hg4, hz4]
-        calc Real.sqrt (48 * ↑params.m *
-              ((Real.rpow gamma (1 / (4 : Error))) ^
-                  (2 : ℕ) +
-                (Real.rpow zeta (1 / (4 : Error))) ^
-                  (2 : ℕ)))
-            ≤ Real.sqrt (48 * ↑params.m *
-                (Real.rpow gamma (1 / (4 : Error)) +
-                  Real.rpow zeta
-                    (1 / (4 : Error))) ^ (2 : ℕ)) := by
-              apply Real.sqrt_le_sqrt
-              exact mul_le_mul_of_nonneg_left hsq_le
-                (by positivity)
-          _ = Real.sqrt (48 * ↑params.m) *
-                Real.sqrt
-                  ((Real.rpow gamma (1 / (4 : Error)) +
-                    Real.rpow zeta
-                      (1 / (4 : Error))) ^
-                    (2 : ℕ)) := by
-              rw [Real.sqrt_mul (by positivity)]
-          _ = Real.sqrt (48 * ↑params.m) *
-                (Real.rpow gamma (1 / (4 : Error)) +
-                  Real.rpow zeta
-                    (1 / (4 : Error))) := by
-              rw [Real.sqrt_sq (by linarith)]
-      -- Step 5: 2·√(48m) ≤ 14m (since 192m ≤ 196m²
-      --   for m ≥ 1)
-      have hsqrt_48m :
-          Real.sqrt (48 * ↑params.m) ≤
-            7 * ↑params.m := by
-        rw [show 7 * (↑params.m : Error) =
-          Real.sqrt ((7 * ↑params.m) ^ 2) from
-          (Real.sqrt_sq (by linarith)).symm]
-        apply Real.sqrt_le_sqrt
-        nlinarith [hm_ge]
-      -- Combine the three parts
-      have hA : 12 * Real.sqrt zeta ≤
-          12 * ↑params.m *
-            Real.rpow zeta (1 / (4 : Error)) := by
-        nlinarith [h_sqrt_z, hm_ge, hz4]
-      have hB :
-          4 * (↑params.m * ↑params.d / ↑params.q) ≤
-          4 * ↑params.m * Real.rpow
-            ((↑params.d : Error) / ↑params.q)
-            (1 / (4 : Error)) := by
-        have hrw :
-            ↑params.m * ↑params.d / ↑params.q =
-              ↑params.m *
-                ((↑params.d : Error) / ↑params.q) := by
-          ring
-        rw [hrw]
-        nlinarith [h_dq, hm_ge, hdq4]
-      have hC :
-          2 * Real.sqrt (48 * ↑params.m *
-            (Real.rpow gamma (1 / (2 : Error)) +
-              Real.rpow zeta (1 / (2 : Error)))) ≤
-          14 * ↑params.m *
-            (Real.rpow gamma (1 / (4 : Error)) +
-              Real.rpow zeta
-                (1 / (4 : Error))) := by
-        calc 2 * Real.sqrt (48 * ↑params.m *
-              (Real.rpow gamma (1 / (2 : Error)) +
-                Real.rpow zeta (1 / (2 : Error))))
-            ≤ 2 * (Real.sqrt (48 * ↑params.m) *
-                (Real.rpow gamma (1 / (4 : Error)) +
-                  Real.rpow zeta
-                    (1 / (4 : Error)))) :=
-              mul_le_mul_of_nonneg_left hsqrt_cdpg
-                (by norm_num)
-          _ = 2 * Real.sqrt (48 * ↑params.m) *
-                (Real.rpow gamma (1 / (4 : Error)) +
-                  Real.rpow zeta
-                    (1 / (4 : Error))) := by ring
-          _ ≤ 14 * ↑params.m *
-                (Real.rpow gamma (1 / (4 : Error)) +
-                  Real.rpow zeta
-                    (1 / (4 : Error))) := by
-              exact mul_le_mul_of_nonneg_right
-                (by linarith [hsqrt_48m])
-                (by linarith)
-      -- 14m·g4 + 26m·z4 + 4m·dq4 ≤ 30m·(g4+z4+dq4)
-      nlinarith [hA, hB, hC, hg4, hz4, hdq4, hm_ge]
-    exact ⟨le_trans hTransport hArith⟩
-  · -- Large-parameter case: max(γ, ζ, d/q) > 1.
-    -- The bound is trivial: sddErrorOp ≤ 4 (by the triangle
-    -- inequality for vectors and the sub-measurement property;
-    -- paper lines 263–271), while comMainError ≥ 30m ≥ 30 > 4
-    -- (since rpow x (1/4) ≥ 1 when x ≥ 1, and m ≥ 1).
-    let Aidx : IdxOpFamily (EvaluatedSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
-      fun q => fullSliceProductLeft params strategy family
-        (fullSliceQuestionOfEvaluatedSlice params q)
-    let Bidx : IdxOpFamily (EvaluatedSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
-      fun q => fullSliceProductRight params strategy family
-        (fullSliceQuestionOfEvaluatedSlice params q)
-    let Zidx : IdxOpFamily (EvaluatedSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
-      fun _ => zeroOpFamily (FullSliceOutcome params) (ι × ι)
-    have hA_one : SDDOpRel strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params)) Aidx Zidx 1 := by
-      constructor
-      calc
-        sddErrorOp strategy.state (uniformDistribution (EvaluatedSliceQuestion params))
-            Aidx Zidx
-            ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params)) (fun _ => 1) := by
-              unfold sddErrorOp
-              apply avgOver_mono
-              intro q
-              simpa [Aidx, Zidx, fullSliceProductLeft, fullSliceQuestionOfEvaluatedSlice,
-                fullSliceFirstFactor, fullSliceSecondFactor] using
-                qSDDOp_leftOrderedProduct_zeroOpFamily_le_one
-                  strategy.state hnorm
-                  ((family.meas (pointHeight params q.1)).toSubMeas)
-                  ((family.meas (pointHeight params q.2)).toSubMeas)
-        _ = ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
-              (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
-              simp [avgOver]
-        _ ≤ 1 := by
-              simpa using
-                uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
-    have hB_one : SDDOpRel strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params)) Bidx Zidx 1 := by
-      constructor
-      calc
-        sddErrorOp strategy.state (uniformDistribution (EvaluatedSliceQuestion params))
-            Bidx Zidx
-            ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params)) (fun _ => 1) := by
-              unfold sddErrorOp
-              apply avgOver_mono
-              intro q
-              simpa [Bidx, Zidx, fullSliceProductRight, fullSliceQuestionOfEvaluatedSlice,
-                fullSliceFirstFactor, fullSliceSecondFactor] using
-                qSDDOp_leftPlacedReversedProduct_zeroOpFamily_le_one
-                  strategy.state hnorm
-                  ((family.meas (pointHeight params q.1)).toSubMeas)
-                  ((family.meas (pointHeight params q.2)).toSubMeas)
-        _ = ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
-              (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
-              simp [avgOver]
-        _ ≤ 1 := by
-              simpa using
-                uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
-    have hraw : SDDOpRel strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params)) Aidx Bidx 4 := by
-      have hZB : SDDOpRel strategy.state
-          (uniformDistribution (EvaluatedSliceQuestion params)) Zidx Bidx 1 :=
-        MIPStarRE.LDT.Preliminaries.sddOpRel_symm strategy.state
-          (uniformDistribution (EvaluatedSliceQuestion params)) Bidx Zidx 1 hB_one
-      have htri :=
-        MIPStarRE.LDT.Preliminaries.stateDependentDistanceOpRel_triangle strategy.state
-          (uniformDistribution (EvaluatedSliceQuestion params)) Aidx Zidx Bidx 1 1
-          hA_one hZB
-      exact
-        MIPStarRE.LDT.Preliminaries.stateDependentDistanceOpRel_mono strategy.state
-          (uniformDistribution (EvaluatedSliceQuestion params)) Aidx Bidx
-          (2 * (1 + 1)) 4 (by norm_num) htri
-    have hm_ge : (1 : Error) ≤ (params.m : Error) :=
-      Nat.one_le_cast.mpr (Nat.succ_le_of_lt params.hm)
-    have hq_pos : (0 : Error) < ↑params.q :=
-      Nat.cast_pos.mpr params.hq
-    have hdq_nn : 0 ≤ (↑params.d : Error) / ↑params.q :=
-      div_nonneg (Nat.cast_nonneg _) hq_pos.le
-    have hg4 : 0 ≤ Real.rpow gamma (1 / (4 : Error)) :=
-      Real.rpow_nonneg hgamma_nonneg _
-    have hz4 : 0 ≤ Real.rpow zeta (1 / (4 : Error)) :=
-      Real.rpow_nonneg hzeta_nonneg _
-    have hdq4 : 0 ≤ Real.rpow
-        ((↑params.d : Error) / ↑params.q) (1 / (4 : Error)) :=
-      Real.rpow_nonneg hdq_nn _
-    have hlarge_cases :
-        1 ≤ gamma ∨ 1 ≤ zeta ∨ 1 ≤ (↑params.d : Error) / ↑params.q := by
-      by_contra hcases
-      push_neg at hcases
-      exact hsmall ⟨le_of_lt hcases.1, le_of_lt hcases.2.1, le_of_lt hcases.2.2⟩
-    have hsum_ge_one :
-        1 ≤ Real.rpow gamma (1 / (4 : Error)) +
-          Real.rpow zeta (1 / (4 : Error)) +
-          Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)) := by
-      rcases hlarge_cases with hgamma_large | hzeta_large | hdq_large
-      · have hg1 : 1 ≤ Real.rpow gamma (1 / (4 : Error)) := by
-          simpa using Real.one_le_rpow hgamma_large (by norm_num : 0 ≤ (1 / (4 : Error)))
-        nlinarith [hg1, hz4, hdq4]
-      · have hz1 : 1 ≤ Real.rpow zeta (1 / (4 : Error)) := by
-          simpa using Real.one_le_rpow hzeta_large (by norm_num : 0 ≤ (1 / (4 : Error)))
-        nlinarith [hz1, hg4, hdq4]
-      · have hdq1 :
-            1 ≤ Real.rpow (((params.d : Error) / (params.q : Error)))
-              (1 / (4 : Error)) := by
-          simpa using Real.one_le_rpow hdq_large (by norm_num : 0 ≤ (1 / (4 : Error)))
-        nlinarith [hdq1, hg4, hz4]
-    have hcom_ge_30 : 30 ≤ comMainError params gamma zeta := by
-      unfold comMainError
-      let s :=
-        Real.rpow gamma (1 / (4 : Error)) +
-          Real.rpow zeta (1 / (4 : Error)) +
-          Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error))
-      have hs : 1 ≤ s := by simpa [s] using hsum_ge_one
-      have hms : (1 : Error) ≤ (params.m : Error) * s := by
-        have := mul_le_mul hm_ge hs (by norm_num : (0 : Error) ≤ 1)
-          (le_trans (by norm_num : (0 : Error) ≤ 1) hm_ge)
-        nlinarith
-      nlinarith
-    exact
-      MIPStarRE.LDT.Preliminaries.stateDependentDistanceOpRel_mono strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params)) Aidx Bidx
-        4 (comMainError params gamma zeta) (by linarith) hraw
+  exact hbridge.fullSliceCommutationOnEvaluatedQuestions
 
 /-- The remaining `thm:com-main` lift from evaluated commutation back to
 full-slice commutation.
@@ -3837,7 +3261,8 @@ private lemma fullSliceCommutation_of_evaluated
         (uniformDistribution (EvaluatedSliceQuestion params))
         (evaluatedFromFullSliceProductLeft params strategy family)
         (evaluatedFromFullSliceProductRight params strategy family)
-        (commDataProcessedGError params gamma zeta)) :
+        (commDataProcessedGError params gamma zeta))
+    (hbridge : ComMainTransportBridgePackage params strategy family gamma zeta) :
     SDDOpRel strategy.state
       (uniformDistribution (FullSliceQuestion params))
       (fullSliceProductLeft params strategy family)
@@ -3850,7 +3275,7 @@ private lemma fullSliceCommutation_of_evaluated
       (comMainError params gamma zeta)
       (fullSliceCommutation_of_evaluated_on_evaluated_questions
         params strategy family gamma zeta
-        hnorm hgamma_nonneg hzeta_nonneg _hself hEval)
+        hnorm hgamma_nonneg hzeta_nonneg _hself hEval hbridge)
 
 /-- `thm:com-main`. -/
 theorem comMain
@@ -3865,11 +3290,13 @@ theorem comMain
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (hbridgeEval : CommDataProcessedGBridgePackage params strategy family G gamma zeta)
+    (hbridgeTransport : ComMainTransportBridgePackage params strategy family gamma zeta) :
     ComMainConclusion params strategy family G gamma zeta := by
   let hEval :=
     commDataProcessedG params strategy eps delta gamma zeta hnorm hgood family G
-      hG hcons hself hbound
+      hG hcons hself hbound hbridgeEval
   have hSpecialized :
       SDDOpRel strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
@@ -3897,7 +3324,7 @@ theorem comMain
           fullSliceCommutation_of_evaluated
             params strategy family gamma zeta
             hnorm hgamma_nonneg hzeta_nonneg
-            hself hSpecialized }
+            hself hSpecialized hbridgeTransport }
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}

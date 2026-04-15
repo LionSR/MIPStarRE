@@ -231,6 +231,17 @@
 	Hence \ref{eq:g-comm-stab7} has magnitude at most $\sqrt{\zeta}$, and the total loss is $\sqrt{\zeta}+6\sqrt{\gamma(m+1)}$.
 \end{proof}
 
+\begin{remark}[Lean status note]\label{rem:comm-data-processed-g-lean-bridges}
+	\lean{MIPStarRE.LDT.Commutativity.CommDataProcessedGBridgePackage, MIPStarRE.LDT.Commutativity.ComMainTransportBridgePackage}
+	\leanok
+	\uses{lem:comm-data-processed-g, thm:com-main}
+	The current Lean development isolates the remaining scalar approximation chain
+	for Lemma~\ref{lem:comm-data-processed-g} and the final evaluated-to-full-slice
+	transport for Theorem~\ref{thm:com-main} in explicit bridge packages. This
+	records the exact unresolved commutativity inputs without changing the paper's
+	dependency structure.
+\end{remark}
+
 \section{Commutativity of~$G$}
 \label{sec:G-commutes}
 

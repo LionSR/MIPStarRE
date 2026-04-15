@@ -38,6 +38,17 @@
 	\]
 \end{theorem}
 
+\begin{remark}[Lean status note]\label{rem:orthonormalization-lean-bridges}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationBridgePackage, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationRepairPackage, MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationBridgePackage}
+	\leanok
+	\uses{thm:orthonormalization, lem:orthonormalization-main-lemma}
+	The current Lean development isolates the spectral-truncation construction,
+	the repair from the raw rounded family to a genuine projective
+	submeasurement, and the final descent back to the original submeasurement in
+	explicit bridge packages. This keeps the paper-facing theorem names stable
+	while making the remaining linear-algebraic assembly visible in Lean.
+\end{remark}
+
 \subsection{Naimark dilation}\label{sec:naimark}
 
 \begin{lemma}\label{lem:naimark-helper}

@@ -26,7 +26,6 @@
 
 \begin{lemma}[Restricted success probabilities]\label{lem:restricted-probabilities}
   \lean{MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}
-	\leanok
   \uses{def:restricted-strategy, def:good-strategy}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the restricted strategy and let $\eps_x,\delta_x,\gamma_x$ be its three failure probabilities. Then
   \[
@@ -41,11 +40,20 @@
 	The self-consistency test restricts exactly to the slice at height $x$. For the axis-parallel and diagonal-line tests, conditioning on the sampled line not being parallel to the last coordinate identifies the test with the corresponding restricted game.
 \end{proof}
 
+\begin{remark}[Lean status note]\label{rem:induction-lean-bridges}
+	\lean{MIPStarRE.LDT.MainInductionStep.RestrictedProbabilitiesBridgePackage, MIPStarRE.LDT.MainInductionStep.MainInductionBridgePackage, MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgePackage}
+	\leanok
+	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, thm:main-induction}
+	The current Lean development isolates the slice-conditioning estimates, the
+	self-improvement assembly, and the final induction wrapper in explicit bridge
+	packages. These declarations make the remaining induction-level inputs visible
+	without changing the paper-facing theorem names.
+\end{remark}
+
 \section{The inductive construction}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
   \lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
-	\leanok
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $G \in \polysub{m}{q}{d}$ be a submeasurement with the following property:
   \begin{enumerate}
@@ -89,7 +97,6 @@
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
   \lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection}
-	\leanok
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
   \begin{enumerate}
@@ -137,7 +144,6 @@
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
   \lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
-	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, thm:raz-safra}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
   \[
