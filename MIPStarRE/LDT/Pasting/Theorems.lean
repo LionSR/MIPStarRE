@@ -1486,7 +1486,6 @@ private lemma switcheroo_second_aggregate_term_close
           (uniformDistribution (SliceQuestion params))
           (completePartProjFamily params family) (((M y).toSubMeas).total))
     |secondTerm - commonTerm| ≤ 2 * Real.sqrt zeta := by
-  dsimp
   let 𝒟x : Distribution (SliceQuestion params) := uniformDistribution (SliceQuestion params)
   let Gcomplete : IdxProjSubMeas (SliceQuestion params) Unit ι :=
     completePartProjFamily params family
@@ -1494,6 +1493,8 @@ private lemma switcheroo_second_aggregate_term_close
     Preliminaries.leftSandwichExpectation ψbi 𝒟x Gcomplete (((M y).toSubMeas).total)
   let C : Fq params → Error := fun y =>
     Preliminaries.middleSandwichExpectation ψbi 𝒟x Gcomplete (((M y).toSubMeas).total)
+  change |switcherooAggregateSecondTerm params ψbi family M - avgOver 𝒟x C| ≤
+    2 * Real.sqrt zeta
   have hselfG_complete :
       SDDRel ψbi 𝒟x
         (switcherooSelfConsistencyLeft params Gcomplete)
@@ -1587,99 +1588,6 @@ private lemma switcheroo_second_aggregate_term_close
             exact_mod_cast Nat.ne_of_gt params.hq
           simp [𝒟x, avgOver, uniformDistribution]
           field_simp [hq0]
-
-private lemma switcheroo_second_term_close
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (hnorm : ψbi.IsNormalized)
-    (family : IdxPolyFamily params ι)
-    (M : IdxProjSubMeas (Fq params) Outcome ι)
-    (zeta : Error)
-    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    let secondTerm :=
-      avgOver (uniformDistribution (SliceQuestion params))
-        (fun y => Preliminaries.leftSandwichExpectation ψbi
-          (uniformDistribution (SliceQuestion params))
-          family.meas (((M y).toSubMeas).total))
-    let commonTerm :=
-      avgOver (uniformDistribution (SliceQuestion params))
-        (fun y => Preliminaries.middleSandwichExpectation ψbi
-          (uniformDistribution (SliceQuestion params))
-          family.meas (((M y).toSubMeas).total))
-    |secondTerm - commonTerm| ≤ 2 * Real.sqrt zeta := by
-  dsimp
-  let L : Fq params → Error := fun y =>
-    Preliminaries.leftSandwichExpectation ψbi
-      (uniformDistribution (SliceQuestion params))
-      family.meas (((M y).toSubMeas).total)
-  let C : Fq params → Error := fun y =>
-    Preliminaries.middleSandwichExpectation ψbi
-      (uniformDistribution (SliceQuestion params))
-      family.meas (((M y).toSubMeas).total)
-  have hselfG_bip := switcherooCompletePartSelfConsistency_bip params ψbi family zeta hselfG
-  have hpoint : ∀ y, |L y - C y| ≤ 2 * Real.sqrt zeta := by
-    intro y
-    have hB : Preliminaries.OpBounded01 (((M y).toSubMeas).total) := by
-      refine ⟨?_, ?_⟩
-      · exact SubMeas.total_nonneg ((M y).toSubMeas)
-      · exact sub_nonneg.mpr ((M y).toSubMeas).total_le_one
-    simpa [L, C] using
-      (Preliminaries.switchSandwich ψbi
-        (uniformDistribution (SliceQuestion params))
-        hnorm
-        (uniformDistribution_weight_sum_le_one (SliceQuestion params))
-        family.meas
-        (((M y).toSubMeas).total)
-        hB
-        zeta
-        hselfG_bip).leftSandwichTransfer
-  calc
-    |avgOver (uniformDistribution (SliceQuestion params)) L -
-        avgOver (uniformDistribution (SliceQuestion params)) C|
-      = |avgOver (uniformDistribution (SliceQuestion params)) (fun y => L y - C y)| := by
-          simp [avgOver, Finset.sum_sub_distrib, mul_sub]
-    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun y => |L y - C y|) := by
-          exact avgOver_abs_le_avgOver_abs _ _
-    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun _ => 2 * Real.sqrt zeta) := by
-          exact avgOver_mono _ _ _ hpoint
-    _ = 2 * Real.sqrt zeta := by
-          have hq0 : (params.q : Error) ≠ 0 := by
-            exact_mod_cast Nat.ne_of_gt params.hq
-          simp [avgOver, uniformDistribution]
-          field_simp [hq0]
-
-/-- Error bookkeeping for the final line of `commutativitySwitcheroo`.
-
-The mathematical work is in the two lower bounds for the negative expansion
-terms. Once those are available, this lemma converts them together with the
-two existing positive-term estimates into the displayed switcheroo error. -/
-private lemma commutativitySwitcheroo_arithmetic
-    (zeta omega chi firstTerm secondTerm thirdTerm fourthTerm centerGM centerMG : Error)
-    (hfirst : |firstTerm - centerGM| ≤ 2 * Real.sqrt omega)
-    (hsecond : |secondTerm - centerMG| ≤ 2 * Real.sqrt zeta)
-    (hthird :
-      centerGM - (2 * Real.sqrt zeta + 2 * Real.sqrt omega + 2 * Real.sqrt chi) ≤
-        thirdTerm)
-    (hfourth :
-      centerMG - (2 * Real.sqrt zeta + 2 * Real.sqrt omega + 2 * Real.sqrt chi) ≤
-        fourthTerm) :
-    firstTerm + secondTerm - thirdTerm - fourthTerm ≤
-      commutativitySwitcherooError zeta omega chi := by
-  have hfirst_upper : firstTerm ≤ centerGM + 2 * Real.sqrt omega := by
-    linarith [(abs_le.mp hfirst).2]
-  have hsecond_upper : secondTerm ≤ centerMG + 2 * Real.sqrt zeta := by
-    linarith [(abs_le.mp hsecond).2]
-  calc
-    firstTerm + secondTerm - thirdTerm - fourthTerm
-        ≤ (centerGM + 2 * Real.sqrt omega) + (centerMG + 2 * Real.sqrt zeta) -
-            (centerGM - (2 * Real.sqrt zeta + 2 * Real.sqrt omega + 2 * Real.sqrt chi)) -
-            (centerMG - (2 * Real.sqrt zeta + 2 * Real.sqrt omega + 2 * Real.sqrt chi)) := by
-          linarith
-    _ = 6 * Real.sqrt zeta + 6 * Real.sqrt omega + 4 * Real.sqrt chi := by
-          ring
-    _ = commutativitySwitcherooError zeta omega chi := by
-          simp [commutativitySwitcherooError, Real.sqrt_eq_rpow]
 
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
