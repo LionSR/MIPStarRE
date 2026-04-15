@@ -44,6 +44,19 @@ theorem ldGbcon
   The proof is the displayed chain leading to equation `eq:ld-gbcon` in the
   blueprint: combine good-strategy consistency, `simeqToApprox`, and
   `triangleSub`.
+
+  Current API blockers:
+  * `SymStrat` has diagonal-line reparametrization invariance but no analogous
+    axis-parallel invariance. The axis-parallel test samples the vertical line
+    with base `(u, x)` and evaluates at `0`, while `verticalLineMeasurementFamily`
+    uses the canonical base `(u, 0)` and evaluates at `x`.
+  * `triangleSub` requires `strategy.state.IsNormalized`, but `SymStrat` does
+    not currently carry normalization.
+  * `family.ConsistentWithPoints` is oriented as point measurement on the left
+    and slice family on the right; the paper step and this theorem need the
+    slice family on the left and the point/line measurement on the right. A
+    general `ConsRel` swap lemma needs stronger permutation invariance than the
+    current `PermInvState.swap_ev`, which only swaps `A ⊗ I` with `I ⊗ A`.
   -/
   sorry
 
