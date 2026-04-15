@@ -709,21 +709,6 @@ private lemma switcherooSelfConsistency_bip
     IdxProjSubMeas.toIdxSubMeas, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
     hselfM.squaredDistanceBound
 
-private lemma switcherooCompletePartSelfConsistency_bip
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (zeta : Error)
-    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    Preliminaries.BipartiteSDDRel ψbi
-      (uniformDistribution (SliceQuestion params))
-      (IdxProjSubMeas.toIdxSubMeas family.meas)
-      (IdxProjSubMeas.toIdxSubMeas family.meas)
-      zeta := by
-  constructor
-  simpa [IdxProjSubMeas.toIdxSubMeas, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
-    hselfG.completePartSelfConsistency.squaredDistanceBound
-
 private lemma avgOver_uniform_slicePair
     (params : Parameters) [FieldModel params.q]
     (f : Fq params → Fq params → Error) :
@@ -1251,11 +1236,8 @@ private lemma switcheroo_first_term_close
           exact avgOver_abs_le_avgOver_abs _ _
     _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun _ => 2 * Real.sqrt omega) := by
           exact avgOver_mono _ _ _ hpoint
-    _ = 2 * Real.sqrt omega := by
-          have hq0 : (params.q : Error) ≠ 0 := by
-            exact_mod_cast Nat.ne_of_gt params.hq
-          simp [avgOver, uniformDistribution]
-          field_simp [hq0]
+    _ = 2 * Real.sqrt omega :=
+          avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt omega)
 
 /-- The one-outcome projective family whose sole effect is the complete slice part `G^x`. -/
 private noncomputable def completePartProjFamily
@@ -1465,7 +1447,12 @@ private lemma completePartProjFamily_selfConsistency_generic
               qSDD_completePart_le_slice params ψbi family x
     _ ≤ zeta := hself_bound
 
-private lemma switcheroo_second_term_close
+/-- The second positive expansion term is close to its `M ⊗ G` center.
+
+This aggregate form matches the four-term `qSDDOp` expansion: the projective
+family in the sandwich is the one-outcome complete part `G^x`, not the original
+slice-outcome family. -/
+private lemma switcheroo_second_aggregate_term_close
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -1474,57 +1461,120 @@ private lemma switcheroo_second_term_close
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta : Error)
     (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    let secondTerm :=
-      avgOver (uniformDistribution (SliceQuestion params))
-        (fun y => Preliminaries.leftSandwichExpectation ψbi
-          (uniformDistribution (SliceQuestion params))
-          family.meas (((M y).toSubMeas).total))
+    let secondTerm := switcherooAggregateSecondTerm params ψbi family M
     let commonTerm :=
       avgOver (uniformDistribution (SliceQuestion params))
         (fun y => Preliminaries.middleSandwichExpectation ψbi
           (uniformDistribution (SliceQuestion params))
-          family.meas (((M y).toSubMeas).total))
+          (completePartProjFamily params family) (((M y).toSubMeas).total))
     |secondTerm - commonTerm| ≤ 2 * Real.sqrt zeta := by
-  dsimp
+  let 𝒟x : Distribution (SliceQuestion params) := uniformDistribution (SliceQuestion params)
+  let Gcomplete : IdxProjSubMeas (SliceQuestion params) Unit ι :=
+    completePartProjFamily params family
   let L : Fq params → Error := fun y =>
-    Preliminaries.leftSandwichExpectation ψbi
-      (uniformDistribution (SliceQuestion params))
-      family.meas (((M y).toSubMeas).total)
+    Preliminaries.leftSandwichExpectation ψbi 𝒟x Gcomplete (((M y).toSubMeas).total)
   let C : Fq params → Error := fun y =>
-    Preliminaries.middleSandwichExpectation ψbi
-      (uniformDistribution (SliceQuestion params))
-      family.meas (((M y).toSubMeas).total)
-  have hselfG_bip := switcherooCompletePartSelfConsistency_bip params ψbi family zeta hselfG
+    Preliminaries.middleSandwichExpectation ψbi 𝒟x Gcomplete (((M y).toSubMeas).total)
+  change |switcherooAggregateSecondTerm params ψbi family M - avgOver 𝒟x C| ≤
+    2 * Real.sqrt zeta
+  have hselfG_complete :
+      SDDRel ψbi 𝒟x
+        (switcherooSelfConsistencyLeft params Gcomplete)
+        (switcherooSelfConsistencyRight params Gcomplete)
+        zeta := by
+    simpa [𝒟x, Gcomplete] using
+      completePartProjFamily_selfConsistency_generic params ψbi family zeta hselfG
+  have hselfG_bip := switcherooSelfConsistency_bip params ψbi Gcomplete zeta hselfG_complete
   have hpoint : ∀ y, |L y - C y| ≤ 2 * Real.sqrt zeta := by
     intro y
     have hB : Preliminaries.OpBounded01 (((M y).toSubMeas).total) := by
       refine ⟨?_, ?_⟩
       · exact SubMeas.total_nonneg ((M y).toSubMeas)
       · exact sub_nonneg.mpr ((M y).toSubMeas).total_le_one
-    simpa [L, C] using
+    simpa [L, C, 𝒟x, Gcomplete] using
       (Preliminaries.switchSandwich ψbi
-        (uniformDistribution (SliceQuestion params))
+        𝒟x
         hnorm
-        (uniformDistribution_weight_sum_le_one (SliceQuestion params))
-        family.meas
+        (by simpa [𝒟x] using uniformDistribution_weight_sum_le_one (SliceQuestion params))
+        Gcomplete
         (((M y).toSubMeas).total)
         hB
         zeta
         hselfG_bip).leftSandwichTransfer
+  have hsecond_eq :
+      switcherooAggregateSecondTerm params ψbi family M =
+        avgOver 𝒟x L := by
+    change
+      avgOver (uniformDistribution (SlicePairQuestion params))
+          (fun q =>
+            ∑ o : Outcome,
+              ev ψbi
+                (leftTensor
+                  ((completePartSubMeas params family q.1).total * (M q.2).outcome o *
+                    (completePartSubMeas params family q.1).total))) =
+        avgOver 𝒟x L
+    calc
+      avgOver (uniformDistribution (SlicePairQuestion params))
+          (fun q =>
+            ∑ o : Outcome,
+              ev ψbi
+                (leftTensor
+                  ((completePartSubMeas params family q.1).total * (M q.2).outcome o *
+                    (completePartSubMeas params family q.1).total)))
+        = avgOver (uniformDistribution (SliceQuestion params))
+            (fun y =>
+              avgOver (uniformDistribution (SliceQuestion params))
+                (fun x =>
+                  ∑ o : Outcome,
+                    ev ψbi
+                      (leftTensor
+                        ((completePartSubMeas params family x).total * (M y).outcome o *
+                          (completePartSubMeas params family x).total)))) := by
+              simpa using
+                (avgOver_uniform_slicePair_swapOrder params
+                  (f := fun x y =>
+                    ∑ o : Outcome,
+                      ev ψbi
+                        (leftTensor
+                          ((completePartSubMeas params family x).total * (M y).outcome o *
+                            (completePartSubMeas params family x).total))))
+      _ = avgOver 𝒟x L := by
+            apply avgOver_congr
+            intro y
+            unfold L Preliminaries.leftSandwichExpectation
+            apply avgOver_congr
+            intro x
+            let G : MIPStarRE.Quantum.Op ι := (completePartSubMeas params family x).total
+            have hGout : (Gcomplete x).outcome () = G := by
+              simpa [Gcomplete, completePartProjFamily, G, completePartSubMeas,
+                postprocess] using (family.meas x).sum_eq_total
+            calc
+              ∑ o : Outcome,
+                  ev ψbi (leftTensor (G * (M y).outcome o * G))
+                = ev ψbi (leftTensor (G * ((M y).toSubMeas).total * G)) := by
+                    rw [← ev_sum ψbi (fun o : Outcome =>
+                      leftTensor (G * (M y).outcome o * G))]
+                    rw [leftTensor_finset_sum]
+                    congr 1
+                    rw [← Finset.sum_mul, ← Finset.mul_sum, (M y).sum_eq_total]
+              _ = ∑ _u : Unit,
+                    ev ψbi
+                      (leftTensor ((Gcomplete x).outcome ()) *
+                        leftTensor (((M y).toSubMeas).total) *
+                        leftTensor ((Gcomplete x).outcome ())) := by
+                    simp [hGout, leftTensor_mul_leftTensor, mul_assoc]
   calc
-    |avgOver (uniformDistribution (SliceQuestion params)) L -
-        avgOver (uniformDistribution (SliceQuestion params)) C|
-      = |avgOver (uniformDistribution (SliceQuestion params)) (fun y => L y - C y)| := by
+    |switcherooAggregateSecondTerm params ψbi family M - avgOver 𝒟x C|
+      = |avgOver 𝒟x L - avgOver 𝒟x C| := by rw [hsecond_eq]
+    _ = |avgOver 𝒟x (fun y => L y - C y)| := by
           simp [avgOver, Finset.sum_sub_distrib, mul_sub]
-    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun y => |L y - C y|) := by
+    _ ≤ avgOver 𝒟x (fun y => |L y - C y|) := by
           exact avgOver_abs_le_avgOver_abs _ _
-    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun _ => 2 * Real.sqrt zeta) := by
+    _ ≤ avgOver 𝒟x (fun _ => 2 * Real.sqrt zeta) := by
           exact avgOver_mono _ _ _ hpoint
     _ = 2 * Real.sqrt zeta := by
-          have hq0 : (params.q : Error) ≠ 0 := by
-            exact_mod_cast Nat.ne_of_gt params.hq
-          simp [avgOver, uniformDistribution]
-          field_simp [hq0]
+          simpa [𝒟x] using
+            avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt zeta)
 
 /-- Raw SDD bound for completed-part pairs: marginalizes the completed-part
 self-consistency bound over `SlicePairQuestion` via `avgOver_uniform_fst`.
@@ -1621,26 +1671,23 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     avgOver 𝒟x (fun x =>
       Preliminaries.leftSandwichExpectation ψbi 𝒟x M
         ((completePartSubMeas params family x).total))
-  let secondTerm :=
-    avgOver 𝒟x (fun y =>
-      Preliminaries.leftSandwichExpectation ψbi 𝒟x family.meas
-        (((M y).toSubMeas).total))
+  let secondTerm := switcherooAggregateSecondTerm params ψbi family M
   let thirdTerm := switcherooAggregateThirdTerm params ψbi family M
   let fourthTerm := switcherooAggregateFourthTerm params ψbi family M
   let centerGM : Error :=
     avgOver 𝒟x (fun x =>
       Preliminaries.middleSandwichExpectation ψbi 𝒟x M
         ((completePartSubMeas params family x).total))
-  let centerMG : Error :=
+  let centerMGComplete : Error :=
     avgOver 𝒟x (fun y =>
-      Preliminaries.middleSandwichExpectation ψbi 𝒟x family.meas
-        (((M y).toSubMeas).total))
+      Preliminaries.middleSandwichExpectation ψbi 𝒟x
+        (completePartProjFamily params family) (((M y).toSubMeas).total))
   have hfirst : |firstTerm - centerGM| ≤ 2 * Real.sqrt omega := by
     simpa [firstTerm, centerGM] using
       switcheroo_first_term_close params ψbi hnorm family M omega hselfM
-  have hsecond : |secondTerm - centerMG| ≤ 2 * Real.sqrt zeta := by
-    simpa [secondTerm, centerMG] using
-      switcheroo_second_term_close params ψbi hnorm family M zeta hselfG
+  have hsecond : |secondTerm - centerMGComplete| ≤ 2 * Real.sqrt zeta := by
+    simpa [secondTerm, centerMGComplete, 𝒟x] using
+      switcheroo_second_aggregate_term_close params ψbi hnorm family M zeta hselfG
   have hexpand := switcherooAggregate_qSDDOp_expand_avg params ψbi family M
   have hthird_eq : thirdTerm = fourthTerm := by
     simpa [thirdTerm, fourthTerm] using
@@ -1651,15 +1698,15 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
   /-
   Remaining blocker: the paper's cross-term chain is not yet packaged as local Lean
   lemmas. What is still needed is a lower bound showing that the negative terms are
-  close to the matching centers, e.g.
+    close to the matching centers, e.g.
 
     thirdTerm ≥ centerGM - (2 * √zeta + 2 * √omega + 2 * √chi)
-    fourthTerm ≥ centerMG - (2 * √zeta + 2 * √omega + 2 * √chi),
+    fourthTerm ≥ centerMGComplete - (2 * √zeta + 2 * √omega + 2 * √chi),
 
   obtained by composing:
   1. `hcomm` through `cabApproxDelta_raw` / closeness-of-inner-product,
   2. two `hselfG` transfers across the tensor boundary,
-  3. the existing `switcheroo_first_term_close` / `switcheroo_second_term_close`.
+  3. the existing positive-term estimates above.
 
   Once those cross-term lemmas are available, the final arithmetic is immediate from
   `hexpand`, `hfirst`, and `hsecond`.
