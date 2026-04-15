@@ -93,8 +93,8 @@ This records only the paper-faithful classical test-passing data:
   probability at least `1 - eps`.
 
 The quoted Polishchuk–Spielman soundness implication is kept separate in
-`TwoProverClassicalLIDBridgePackage` so downstream theorems state an implication
-from test-passing data rather than merely projecting a bundled conclusion. -/
+`PolishchukSpielmanClassicalSoundnessStatement` so downstream theorems state the
+external dependency explicitly, without making it ambient proof power. -/
 def TwoProverClassicalLIDPassCondition (params : Parameters)
     [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error) : Prop :=
@@ -102,23 +102,19 @@ def TwoProverClassicalLIDPassCondition (params : Parameters)
     strategy.pointAnswerA = a ∧
       strategy.ClassicallyPassesLowIndividualDegreeTest eps
 
-/-- Temporary bridge/package structure for the quoted Polishchuk–Spielman
-soundness theorem.
+/-- Quoted theorem statement for the classical low-individual-degree soundness
+result of Polishchuk and Spielman.
 
-This packages the external implication from the paper-faithful classical pass
-condition to the named low-degree-agreement conclusion, while keeping that
-implication separate from `TwoProverClassicalLIDPassCondition` itself.
-
-TODO(#404): replace this bridge package with a direct formalization (or other
-honest quoted-result interface) for the Polishchuk–Spielman implication. -/
-structure TwoProverClassicalLIDBridgePackage (params : Parameters)
+This `Prop`-valued interface keeps the external dependency explicit at each call
+site: users of `classicalTestSoundness` must still supply a witness of this
+statement, rather than inheriting any ambient assumed theorem. -/
+def PolishchukSpielmanClassicalSoundnessStatement (params : Parameters)
     [FieldModel params.q]
-    (a : Point params → Fq params) (eps : Error) : Prop where
-  soundness :
-    TwoProverClassicalLIDPassCondition params a eps →
-      ∃ slack : Error,
-        BoundedPointAnswerSoundnessConclusion params a
-          (classicalTestSoundnessSlackBound params eps) slack
+    (a : Point params → Fq params) (eps : Error) : Prop :=
+  TwoProverClassicalLIDPassCondition params a eps →
+    ∃ slack : Error,
+      BoundedPointAnswerSoundnessConclusion params a
+        (classicalTestSoundnessSlackBound params eps) slack
 
 /-- `thm:raz-safra`.
 
@@ -135,19 +131,19 @@ theorem razSafra
 
 /-- `thm:classical-test-soundness`.
 
-Temporary bridge wrapper for the classical overview theorem: from modeled
-classical LID test-passing data together with an explicit quoted
-Polishchuk–Spielman bridge package, conclude that prover A's point-answer
+Quoted classical overview theorem wrapper: from paper-faithful classical LID
+test-passing data together with an explicit witness of the
+Polishchuk–Spielman soundness statement, conclude that prover A's point-answer
 function is close to a low-degree polynomial with the named slack bound. -/
 theorem classicalTestSoundness
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
     (hpass : TwoProverClassicalLIDPassCondition params a eps)
-    (hbridge : TwoProverClassicalLIDBridgePackage params a eps) :
+    (hPS : PolishchukSpielmanClassicalSoundnessStatement params a eps) :
     ∃ slack : Error,
       BoundedPointAnswerSoundnessConclusion params a
         (classicalTestSoundnessSlackBound params eps) slack := by
-  exact hbridge.soundness hpass
+  exact hPS hpass
 
 /-- Temporary bridge package for the still-unformalized proof of
 `thm:main-formal`.
