@@ -3487,6 +3487,10 @@ theorem hAConsistency_completed
         (constructedPastedMeasurement params family k).toSubMeas)
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta) := by
+  /-
+  Review note: the completed-measurement bridge is expected to justify that the
+  completion step preserves the stated induction error bound using `hcomplete`.
+  -/
   sorry
 
 /-- `lem:over-all-outcomes`. -/
