@@ -1,16 +1,131 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-13
+Last updated: 2026-04-14
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
-- **Current**: 19 executable sorrys across 6 files
-- **Eliminated**: 47 executable sorrys
+- **Current**: 22 executable sorrys across 6 files
+- **Eliminated**: 44 executable sorrys
 - **Infrastructure fixes landed on this branch**:
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
 - **PRs already recorded in this file**: 4
+
+## Active Test Wave
+- **Owner**: OpenCode
+- **Scope**: `MIPStarRE/LDT/Test/*.lean`
+- **Live executable sorrys in scope**: 3
+- **Current live targets**:
+  - `Test/MainTheorem.lean`: `razSafra`
+  - `Test/MainTheorem.lean`: `classicalTestSoundness`
+  - `Test/MainTheorem.lean`: `mainFormal`
+- **Status**: IN PROGRESS
+- **Dependency chain**:
+  - `Test/Strategy.lean` is now paper-faithful and clean: the general test uses
+    point agreement as its self-consistency branch, the role-register
+    symmetrized strategy is proved `(3 * eps, 3 * eps, 3 * eps)`-good, and the
+    sampled line questions are canonicalized to geometric representatives.
+  - `MainInductionStep/Defs.lean` now uses the same canonical geometric line
+    representatives on the restricted slice test path.
+  - The previous anchored-line counterexample for `mainFormal` on the Test path
+    no longer applies.
+  - The `d = 0` / `k = 0` corner has been excluded in the Lean and blueprint
+    statements.
+  - `razSafra` and `classicalTestSoundness` remain intentionally opaque because
+    the classical tests cited in Chapter 1 are still not formalized in Lean.
+- **Priority order**:
+  1. keep `Test/Strategy.lean` aligned with the paper
+  2. canonicalize every sampled line question to a unique geometric
+     representative and evaluate line answers at the recovered affine parameter
+  3. return to the Section 3 assembly only after the Test model is repaired
+  4. only then return to the Section 3 assembly for `mainFormal`
+- **Checklist**:
+  - [x] Survey all `sorry`s in `MIPStarRE/LDT/Test`
+  - [x] Resolve the Test-level failure-surrogate mismatch behind
+    `point_agreement_le_three_mul`
+  - [x] Replace the stale left/right surrogate goals by the paper-faithful
+    symmetrized-strategy goodness transfer
+  - [x] Exclude the degenerate `d = 0` / `k = 0` corner from
+    `mainFormal` / `mainInformal`
+  - [x] Eliminate `mainInformal`
+  - [x] Repair the top-level Test model so sampled line questions use unique
+    geometric representatives
+  - [ ] Eliminate `razSafra`, `classicalTestSoundness`, and `mainFormal`
+  - [ ] Sync any blueprint tags justified by exact Lean/theorem agreement
+- **Completed on this pass**:
+  - repaired `ProjStrat.lowIndividualDegreeFailureProbability` so its
+    self-consistency branch is the paper's cross-player point-agreement test
+  - proved `ProjStrat.point_agreement_le_three_mul`
+  - removed the stale left/right surrogate theorems and replaced them by the
+    paper-faithful symmetrization results
+    `ProjStrat.classicalRoleSymmStrategy_axisParallel_eq_roleAverage`,
+    `ProjStrat.classicalRoleSymmStrategy_diagonal_eq_roleAverage`, and
+    `ProjStrat.classicalRoleSymmStrategy_is_good_three_mul`
+  - strengthened `Test.mainFormal` and `Test.mainInformal` to exclude the
+    degenerate `d = 0` / `k = 0` corner, and synced the corresponding blueprint
+    text in `ch01_overview.tex` and `ch02_test.tex`
+  - proved `Test.mainInformal` as the wrapper choosing `k = m * d`
+  - added canonical geometric-line constructors and recovered sample-parameter
+    maps in `Basic/Parameters.lean`
+  - switched `Test/Strategy.lean` and `MainInductionStep/Defs.lean` to query
+    line measurements through those canonical geometric representatives
+  - verified `lake env lean MIPStarRE/LDT/Test/Strategy.lean`
+  - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Defs.lean`
+  - verified `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean`
+  - verified `lake build` succeeds with the current edits
+  - traced the remaining `Test.mainFormal` path far enough to isolate two
+    paper-level structural gaps:
+    1. `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
+       still ranges over raw `DiagonalLine × Fq` questions and needs a canonical
+       geometric-line question model on the commutativity path as well
+    2. `MakingMeasurementsProjective.spectralTruncateAlmostProjective` still
+       overshoots the paper by asking the spectral truncation step to already
+       return a genuine `ProjSubMeas`
+- **Concrete blocker**:
+  - `Test.mainFormal` is no longer blocked by the sampled-line model. The
+    remaining blocker is the still-missing Section 3 assembly from the repaired
+    symmetrized Test theorem to the final unsymmetrized/projectivized witnesses.
+  - Concretely, `mainFormal` still needs the bridge chain through the upstream
+    remaining sorries in `MakingMeasurementsProjective`, `Commutativity`,
+    `CommutativityPoints`, `Projectivization`, and `Pasting`.
+  - `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
+    is not just missing a reindexing lemma: with the current raw
+    `PointDiagonalLineQuestion = DiagonalLine × Fq` model and
+    `sampledDiagonalLineEvaluation`, it is blocked by the same affine
+    reparameterization issue as the old Test path. The paper only justifies
+    averaging over geometric lines through a point, not over arbitrary raw line
+    representatives.
+  - A paper-faithful fix there will require canonicalizing the commutativity
+    line-question model as well, or rebuilding the shared-line bridge so its
+    marginals land directly in the canonical `m`-restricted diagonal sample
+    space.
+  - The next highest-leverage upstream theorem,
+    `MakingMeasurementsProjective.spectralTruncateAlmostProjective`, is blocked
+    by a statement-level mismatch with the paper. The paper's spectral
+    truncation step only yields a projective family `R_a` with
+    `∑_a R_a ≤ (1 + 2 * sqrt ζ) I`, not a genuine `ProjSubMeas`.
+  - Accordingly, the current `SpectralTruncationStatement` and
+    `spectralTruncateAlmostProjective` overshoot the paper by asking spectral
+    truncation to already return a concrete ambient `ProjSubMeas Outcome ι`.
+    The current `AlmostProjMeasStatement.matrixWitness` is also only a vacuous
+    auxiliary-space witness, so it cannot repair that gap.
+  - A paper-faithful Section 5 repair will need to refactor this intermediate
+    statement back to the raw projective-family / total-bound form from
+    `orthonormalization.tex`, then rebuild the later adjustment step honestly.
+  - `razSafra` and `classicalTestSoundness` are still genuine placeholders for
+    classical tests that are not formalized anywhere else in the repository, so
+    there is no honest local proof route for them without adding that missing
+    classical test infrastructure.
+  - `razSafra` and `classicalTestSoundness` remain opaque until the
+    corresponding classical tests are formalized.
+- **Best next step once unblocked**:
+  - continue up the Section 3 dependency chain, starting with the remaining
+    projectivization / orthonormalization / commutativity / pasting wrappers
+    needed to produce the witness consumed by `Test.mainFormal`.
+  - No blueprint `\leanok` tags were added on this pass: the remaining `Test`
+    theorems are still blocked by modeling issues, and the Chapter 1 classical
+    theorems are still intentionally opaque.
 
 ## Active Preliminaries Wave
 - **Owner**: OpenCode
@@ -55,14 +170,9 @@ Last updated: 2026-04-13
 
 ## Active Strategy
 - `MainInductionStep` is complete for this wave.
-- `Test.mainFormal` is still blocked and must keep its original theorem
-  statement.
-- Immediate Test-side proof target is the paper's role-register symmetrization,
-  not further wrappers around `mainFormal`.
-- The role-register symmetrized measurement/state layer is now in place.
-- The next missing Test-side step is the `(3 * eps, 3 * eps, 3 * eps)`
-  goodness transfer for the symmetrized strategy, or a repair of the
-  Test-level failure surrogate so that this transfer matches the paper exactly.
+- `Test/Strategy.lean` is now paper-faithful and complete for this wave.
+- `Test.mainFormal` is blocked by the anchored-line Test model, not by the
+  symmetrization layer anymore.
 - The active global target remains the Section 12 pasting and induction bridge
   pipeline needed to make `Test.mainFormal` provable without weakening it.
 - Highest-leverage upstream chain remains Section 12 pasting around

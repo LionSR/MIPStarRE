@@ -134,8 +134,8 @@ private lemma sampledDiagonalLineApproximation
           rw [postprocess_total]
           exact
             (strategy.diagonalMeasurement
-              { base := s.1
-                direction := extendRestrictedDirection j s.2 }).total_eq_one }
+              (DiagonalLine.throughPointDirection (params := params)
+                s.1 (extendRestrictedDirection j s.2))).total_eq_one }
   have hcons := sampledDiagonalLineConsistency params strategy eps delta gamma hgood
   have hcons' :
       ConsRel strategy.state

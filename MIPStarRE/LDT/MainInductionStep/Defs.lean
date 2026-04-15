@@ -60,7 +60,7 @@ noncomputable def axisParallelPointAnswerFamily
   fun s => (strategy.pointMeasurement s.1).toSubMeas
 
 /-- Sampled line answers in the axis-parallel lines test,
-evaluated at the base point `u` (parameter `zeroCoord`). -/
+evaluated at the sampled point `u` on the canonical geometric line. -/
 noncomputable def axisParallelLineAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -68,11 +68,10 @@ noncomputable def axisParallelLineAnswerFamily
     IdxSubMeas (AxisParallelTestSample params)
       (Fq params) ι :=
   fun s =>
-    let ℓ : AxisParallelLine params :=
-      { base := s.1, direction := s.2 }
+    let ℓ := AxisParallelLine.throughPoint s.1 s.2
     postprocess
       ((strategy.axisParallelMeasurement ℓ).toSubMeas)
-      (· zeroCoord)
+      (· (AxisParallelLine.sampleParameter s.1 s.2))
 
 /-- Sampled point answers in the `j`-restricted diagonal test.
 Point player receives `u` and answers at `u`. -/
@@ -86,7 +85,7 @@ noncomputable def diagonalPointAnswerFamily
   fun s => (strategy.pointMeasurement s.1).toSubMeas
 
 /-- Sampled diagonal-line answers in the `j`-restricted diagonal
-test, evaluated at the base point (parameter `zeroCoord`). -/
+test, evaluated at the sampled point on the canonical geometric line. -/
 noncomputable def diagonalLineAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -96,11 +95,10 @@ noncomputable def diagonalLineAnswerFamily
       (Fq params) ι :=
   fun s =>
     let v := extendRestrictedDirection j s.2
-    let ℓ : DiagonalLine params :=
-      { base := s.1, direction := v }
+    let ℓ := DiagonalLine.throughPointDirection (params := params) s.1 v
     postprocess
       ((strategy.diagonalMeasurement ℓ).toSubMeas)
-      (· zeroCoord)
+      (· (DiagonalLine.sampleParameter (params := params) s.1 v))
 
 /-- Failure surrogate for the axis-parallel lines test. -/
 noncomputable def axisParallelFailureProbability
