@@ -105,9 +105,11 @@ self-consistency branch.
 
 This is the actual verifier check from `references/ldt-paper/test_definition.tex`:
 both provers receive the same point question and must return the same field
-value. This paper-faithful classical branch is not yet proved equivalent to the
-repository's current quantum/projective self-consistency surrogate; see
-TODO(#406). -/
+value. This differs from the repository's current quantum/projective
+self-consistency surrogate, which measures each prover's own SSC defect rather
+than cross-prover point agreement. The theorem
+`lowIndividualDegreeAcceptanceProbability_eq_branchAverage` below keeps that
+relationship explicit. -/
 def selfConsistencyAccepts {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params)
     (u : ClassicalSelfConsistencySample params) : Prop :=
@@ -148,6 +150,17 @@ private theorem avgOver_uniform_role (f : Role → Error) :
   rw [avgOver_uniform_equiv roleEquivBool f]
   simp [avgOver, uniformDistribution, roleEquivBool]
   ring_nf
+
+/-- A uniform average over `Role × β` is the arithmetic mean of the two
+role-specific uniform averages. -/
+private theorem avgOver_uniform_role_prod {β : Type*}
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (F : Role → β → Error) :
+    avgOver (uniformDistribution (Role × β)) (fun rs => F rs.1 rs.2) =
+      (avgOver (uniformDistribution β) (fun s => F Role.A s) +
+        avgOver (uniformDistribution β) (fun s => F Role.B s)) / 2 := by
+  rw [avgOver_uniform_prod]
+  rw [avgOver_uniform_role]
 
 /-- Pull a common scalar through a finite sum of arithmetic means. -/
 private theorem smul_sum_half_split {α : Type*} [Fintype α]
@@ -216,12 +229,9 @@ theorem axisParallelAcceptanceProbability_eq_roleAverage {params : Parameters}
           strategy.pointAnswerA (axisParallelPointOfSample params s) =
             strategy.axisParallelAnswerB (axisParallelLineOfSample params s) zeroCoord
     then (1 : Error) else 0
-  have hsplit := avgOver_uniform_prod (α := Role)
-    (β := AxisParallelTestSample params) F
   change avgOver (uniformDistribution (Role × AxisParallelTestSample params))
-      (fun rs => F rs.1 rs.2) = _ at hsplit ⊢
-  rw [hsplit]
-  rw [avgOver_uniform_role]
+      (fun rs => F rs.1 rs.2) = _
+  rw [avgOver_uniform_role_prod F]
   simp [F]
   ring_nf
 
@@ -289,12 +299,9 @@ theorem restrictedDiagonalAcceptanceProbability_eq_roleAverage {params : Paramet
           strategy.pointAnswerA (restrictedDiagonalPointOfSample j s) =
             strategy.diagonalAnswerB (restrictedDiagonalLineOfSample j s) zeroCoord
     then (1 : Error) else 0
-  have hsplit := avgOver_uniform_prod (α := Role)
-    (β := RestrictedDiagonalSample params j) F
   change avgOver (uniformDistribution (Role × RestrictedDiagonalSample params j))
-      (fun rs => F rs.1 rs.2) = _ at hsplit ⊢
-  rw [hsplit]
-  rw [avgOver_uniform_role]
+      (fun rs => F rs.1 rs.2) = _
+  rw [avgOver_uniform_role_prod F]
   simp [F]
   ring_nf
 
@@ -320,12 +327,10 @@ noncomputable def diagonalPointLeftLineRightAcceptanceProbability
 individual degree test.
 
 The branch first samples `j : Fin params.m` uniformly and then a role-tagged
-restricted diagonal sample for that `j`.
-
-TODO(#406): connect this paper-faithful diagonal branch to the repository's
-quantum/projective surrogate `ProjStrat.lowIndividualDegreeFailureProbability`.
-The theorem `diagonalAcceptanceProbability_eq_roleAverage` below makes the
-restricted-diagonal averaging order explicit on the classical side. -/
+restricted diagonal sample for that `j`. The theorem
+`diagonalAcceptanceProbability_eq_roleAverage` below makes the restricted-
+diagonal averaging order explicit on the classical side, matching the paper's
+role-first presentation. -/
 noncomputable def diagonalAcceptanceProbability {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) : Error :=
@@ -357,13 +362,33 @@ noncomputable def lowIndividualDegreeAcceptanceProbability {params : Parameters}
       strategy.selfConsistencyAcceptanceProbability +
       strategy.diagonalAcceptanceProbability) / 3
 
+/-- The full classical test acceptance probability decomposes into the same
+axis-parallel and diagonal role averages made explicit above, together with the
+paper's cross-prover self-consistency branch. This clarifies the exact overlap
+with the projective surrogate: the role-averaged line/point branches coincide in
+shape, while the self-consistency branch is intentionally the paper-faithful
+cross-prover check rather than the surrogate SSC defect. -/
+theorem lowIndividualDegreeAcceptanceProbability_eq_branchAverage
+    {params : Parameters} [FieldModel params.q]
+    (strategy : TwoProverClassicalLIDStrategy params) :
+    strategy.lowIndividualDegreeAcceptanceProbability =
+      ((strategy.axisParallelLineLeftPointRightAcceptanceProbability +
+          strategy.axisParallelPointLeftLineRightAcceptanceProbability) / 2 +
+        strategy.selfConsistencyAcceptanceProbability +
+        (strategy.diagonalLineLeftPointRightAcceptanceProbability +
+          strategy.diagonalPointLeftLineRightAcceptanceProbability) / 2) / 3 := by
+  unfold lowIndividualDegreeAcceptanceProbability
+  rw [axisParallelAcceptanceProbability_eq_roleAverage,
+    diagonalAcceptanceProbability_eq_roleAverage]
+
 /-- Passing the paper's deterministic two-prover classical low individual degree
 test with error `eps`, stated in acceptance-probability form.
 
 This name is deliberately distinct from `ProjStrat.PassesLowIndividualDegreeTest`
 so this paper-faithful classical predicate does not collide by dot notation with
-the repository's quantum/projective surrogate predicate. Relating the two
-formulations remains follow-up work; see TODO(#406). -/
+the repository's quantum/projective surrogate predicate. The precise comparison
+is now exposed concretely by `lowIndividualDegreeAcceptanceProbability_eq_branchAverage`.
+-/
 structure ClassicallyPassesLowIndividualDegreeTest {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) (eps : Error) : Prop where

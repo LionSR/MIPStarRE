@@ -106,19 +106,18 @@ def TwoProverClassicalLIDPassCondition (params : Parameters)
 /-- Quoted theorem interface for the classical low-individual-degree soundness
 result of Polishchuk and Spielman.
 
-This declaration is the single named interface for the external implication from
-paper-faithful classical test-passing data to low-degree agreement. Keeping the
-gap here, rather than threading an extra bridge-package hypothesis through every
-consumer, makes the remaining quoted-result dependency explicit and localized.
--/
-theorem polishchukSpielmanClassicalSoundness
+This explicit axiom is the single named interface for the external implication
+from paper-faithful classical test-passing data to low-degree agreement.
+Keeping the quoted-result dependency here, rather than threading an extra bridge
+hypothesis through every consumer, makes the remaining external assumption both
+localized and visible to `#print axioms`. -/
+axiom polishchukSpielmanClassicalSoundness
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
     (hpass : TwoProverClassicalLIDPassCondition params a eps) :
     ∃ slack : Error,
       BoundedPointAnswerSoundnessConclusion params a
-        (classicalTestSoundnessSlackBound params eps) slack := by
-  sorry
+        (classicalTestSoundnessSlackBound params eps) slack
 
 /-- `thm:raz-safra`.
 
@@ -147,7 +146,7 @@ theorem classicalTestSoundness
     ∃ slack : Error,
       BoundedPointAnswerSoundnessConclusion params a
         (classicalTestSoundnessSlackBound params eps) slack := by
-  simpa using polishchukSpielmanClassicalSoundness params a eps hpass
+  exact polishchukSpielmanClassicalSoundness params a eps hpass
 
 /-- `thm:main-informal`.
 
