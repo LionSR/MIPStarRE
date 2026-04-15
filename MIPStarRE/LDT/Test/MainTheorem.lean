@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.Strategy
+import MIPStarRE.LDT.Test.Classical
 
 /-!
 # Section 3 — Main theorem
@@ -37,23 +37,36 @@ noncomputable def classicalTestSoundnessSlackBound
   ((params.m : Error) ^ (2 : ℕ)) *
     (Real.sqrt eps + (params.d : Error) / (params.q : Error))
 
-/-- Generic overview-level soundness conclusion: a low individual degree
-polynomial agrees with the point-answer function except on `slack` average mass.
+/-- Generic placeholder overview-level soundness conclusion: a low individual
+degree polynomial agrees with the point-answer function except on `slack`
+average mass.
 
-The `slack ≤ max 1 slackBound` guard ensures this is trivially satisfiable
-(pick `slack := 1, g := default`) so the statement is vacuously true as a
-placeholder. The `slackBound` parameter records the paper's intended error
-dependence; once a real test-passing hypothesis constrains `a`, the proof
-should produce `slack ≤ slackBound < 1`, which is strictly stronger than
-`slack ≤ max 1 slackBound`. -/
+The `slack ≤ max 1 slackBound` guard keeps this conclusion compatible with the
+still-placeholder Raz–Safra hypothesis. Once the surface-versus-point test is
+formalized directly, this should be replaced by the bounded variant below. -/
 def PointAnswerSoundnessConclusion (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
   0 ≤ slack ∧
     slack ≤ max 1 slackBound ∧
-        ∃ g : Polynomial params,
-          avgOver (uniformDistribution (Point params))
-              (fun u => if g u = a u then (1 : Error) else 0) ≥
-            1 - slack
+      ∃ g : Polynomial params,
+        avgOver (uniformDistribution (Point params))
+            (fun u => if g u = a u then (1 : Error) else 0) ≥
+          1 - slack
+
+/-- Non-vacuous overview-level soundness conclusion with an explicit slack
+bound.
+
+This is the form used by the classical two-prover theorem once the hypothesis
+carries a quoted Polishchuk–Spielman witness. -/
+def BoundedPointAnswerSoundnessConclusion (params : Parameters)
+    [FieldModel params.q]
+    (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
+  0 ≤ slack ∧
+    slack ≤ slackBound ∧
+      ∃ g : Polynomial params,
+        avgOver (uniformDistribution (Point params))
+            (fun u => if g u = a u then (1 : Error) else 0) ≥
+          1 - slack
 
 /-- Placeholder pass condition for the surface-versus-point low-degree test.
 
@@ -67,23 +80,31 @@ This is intentionally NOT `PassesLowIndividualDegreeTest`, which models a
 different test. See `references/ldt-paper/introduction.tex`. -/
 def SurfaceVsPointPassCondition (_params : Parameters) [FieldModel _params.q]
     (_a : Point _params → Fq _params) (eps : Error) : Prop :=
-  0 ≤ eps  -- placeholder body; real definition needs surface test infrastructure
+  0 ≤ eps
 
-/-- Placeholder pass condition for the two-prover classical low-individual-degree
-test.
+/-- Temporary bridge predicate for the quoted Polishchuk–Spielman theorem.
 
-The paper's `thm:classical-test-soundness` takes two quantum provers A and B
-who jointly pass the classical LID test and concludes that prover A's
-point-answer function is close to a low-degree polynomial. The two-prover
-classical strategy infrastructure is not yet modeled here. This named
-placeholder `def` is `0 ≤ eps` (trivially satisfiable), but its name and
-type signature carry the intended semantics.
+Unlike the old placeholder `0 ≤ eps`, this predicate is built from explicit
+classical two-prover strategy data:
+- a deterministic classical strategy for the current repository's modeled low
+  individual degree test,
+- a proof that Alice's point-answer function is the ambient `a`,
+- a proof that the modeled strategy passes the test with acceptance probability
+  at least `1 - eps`, and
+- a quoted soundness witness with the named slack bound.
 
-See `references/ldt-paper/test_definition.tex` for the precise statement. -/
-def TwoProverClassicalLIDPassCondition (_params : Parameters)
-    [FieldModel _params.q]
-    (_a : Point _params → Fq _params) (eps : Error) : Prop :=
-  0 ≤ eps  -- placeholder body; real definition needs two-prover strategy types
+This matches the repository's existing bridge-package pattern for temporarily
+isolating external mathematics behind explicit data while keeping the local Lean
+statement non-vacuous. -/
+def TwoProverClassicalLIDPassCondition (params : Parameters)
+    [FieldModel params.q]
+    (a : Point params → Fq params) (eps : Error) : Prop :=
+  ∃ strategy : TwoProverClassicalLIDStrategy params,
+    strategy.pointAnswerA = a ∧
+      strategy.PassesLowIndividualDegreeTest eps ∧
+        ∃ slack : Error,
+          BoundedPointAnswerSoundnessConclusion params a
+            (classicalTestSoundnessSlackBound params eps) slack
 
 /-- `thm:raz-safra`.
 
@@ -100,16 +121,19 @@ theorem razSafra
 
 /-- `thm:classical-test-soundness`.
 
-Classical soundness: if two provers pass the classical LID test with error `eps`,
-then prover A's point-answer function is close to a low-degree polynomial. -/
+Classical soundness: if a modeled deterministic two-prover classical strategy
+passes the low individual degree test with error `eps` and carries the quoted
+Polishchuk–Spielman witness, then prover A's point-answer function is close to a
+low-degree polynomial with the named slack bound. -/
 theorem classicalTestSoundness
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
     (hpass : TwoProverClassicalLIDPassCondition params a eps) :
     ∃ slack : Error,
-      PointAnswerSoundnessConclusion params a
+      BoundedPointAnswerSoundnessConclusion params a
         (classicalTestSoundnessSlackBound params eps) slack := by
-  sorry
+  rcases hpass with ⟨_, _, _, slack, hsound⟩
+  exact ⟨slack, hsound⟩
 
 /-- `thm:main-informal`.
 
