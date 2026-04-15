@@ -1504,8 +1504,15 @@ private lemma switcheroo_second_aggregate_term_close
   have hsecond_eq :
       switcherooAggregateSecondTerm params ψbi family M =
         avgOver 𝒟x L := by
-    unfold switcherooAggregateSecondTerm
-    dsimp [L, 𝒟x, Gcomplete]
+    change
+      avgOver (uniformDistribution (SlicePairQuestion params))
+          (fun q =>
+            ∑ o : Outcome,
+              ev ψbi
+                (leftTensor
+                  ((completePartSubMeas params family q.1).total * (M q.2).outcome o *
+                    (completePartSubMeas params family q.1).total))) =
+        avgOver 𝒟x L
     calc
       avgOver (uniformDistribution (SlicePairQuestion params))
           (fun q =>
