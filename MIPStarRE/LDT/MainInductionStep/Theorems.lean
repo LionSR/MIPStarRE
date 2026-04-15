@@ -126,7 +126,11 @@ theorem ldPastingInInductionSection
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -138,7 +142,8 @@ theorem ldPastingInInductionSection
       LdPastingInInductionSectionConclusion params strategy family H
         eps delta gamma kappa zeta k := by
   obtain ⟨H, hH⟩ := Pasting.ldPasting params strategy eps delta gamma kappa zeta
-    hgood family hcomplete hcons hself hbound k hk
+    hnorm hgood hgamma_le hzeta_le hdq_le
+    family hcomplete hcons hself hbound k hk
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 
