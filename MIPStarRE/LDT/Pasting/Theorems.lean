@@ -3309,9 +3309,26 @@ theorem hAConsistency
   have hline : ∀ i : ℕ, i < k →
       LdSandwichLineOnePointStatement params strategy family
         eps delta gamma zeta k i := by
-    -- Chain: gHatFacts → commuteGHalfSandwich → ldSandwichLineOnePoint
-    -- Requires GHatFactsStatement derivation; tracked in #299
-    sorry
+    have hfacts : GHatFactsStatement params strategy.state family gamma zeta := by
+      /-
+      TODO(#299): derive the full `GHatFactsStatement` package here.
+
+      The available local hypotheses already provide the inputs for the
+      one-point sandwich lemma once `hfacts` is available:
+      `hgood`, `hcons`, `hself`, and `hbound`.
+
+      Constructing `hfacts` itself must thread the earlier chain
+      `gCompleteSelfConsistency → gBotSelfConsistency →
+      Commutativity.comMain → commutingWithGComplete →
+      commutingWithGIncomplete → gHatFacts`.  The current `hAConsistency`
+      hypotheses do not expose all side conditions required by that chain,
+      in particular `strategy.state.IsNormalized`, `gamma ≤ 1`, `zeta ≤ 1`,
+      and `params.d ≤ params.q`.
+      -/
+      sorry
+    intro i hi
+    exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
+      hgood family hcons hself hbound hfacts k i hi
   have hHB := hBConsistency params strategy eps delta gamma zeta
     hgood family hcons hself hbound k hline
   exact hAConsistency_core params strategy family
