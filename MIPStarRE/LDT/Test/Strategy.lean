@@ -1123,7 +1123,85 @@ theorem point_agreement_le_three_mul {params : Parameters}
     bipartiteConsError strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) ≤ 3 * eps := by
-  sorry
+  let p : Error :=
+    bipartiteConsError strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  let axParDist := uniformDistribution (AxisParallelTestSample params)
+  let left := strategy.leftAsSymmetric
+  let right := strategy.rightAsSymmetric
+  let axisParallelBranch :=
+    (bipartiteConsError strategy.state axParDist
+        (axisParallelLineAnswerFamily left)
+        (axisParallelPointAnswerFamily right)
+      + bipartiteConsError strategy.state axParDist
+        (axisParallelPointAnswerFamily left)
+        (axisParallelLineAnswerFamily right)) / 2
+  let selfConsistencyBranch :=
+    (bipartiteSSCError strategy.state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      + bipartiteSSCError strategy.state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)) / 2
+  let diagonalBranch :=
+    (1 / (params.m : Error)) *
+      ∑ j : Fin params.m,
+        (bipartiteConsError strategy.state
+            (uniformDistribution (RestrictedDiagonalSample params j))
+            (diagonalLineAnswerFamily left j)
+            (diagonalPointAnswerFamily right j)
+          + bipartiteConsError strategy.state
+            (uniformDistribution (RestrictedDiagonalSample params j))
+            (diagonalPointAnswerFamily left j)
+            (diagonalLineAnswerFamily right j)) / 2
+  have hp_nonneg : 0 ≤ p := by
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have haxis_nonneg : 0 ≤ axisParallelBranch := by
+    unfold axisParallelBranch
+    refine div_nonneg ?_ (by norm_num)
+    exact add_nonneg
+      (bipartiteConsError_nonneg strategy.state axParDist
+        (axisParallelLineAnswerFamily left)
+        (axisParallelPointAnswerFamily right))
+      (bipartiteConsError_nonneg strategy.state axParDist
+        (axisParallelPointAnswerFamily left)
+        (axisParallelLineAnswerFamily right))
+  have hself_nonneg : 0 ≤ selfConsistencyBranch := by
+    unfold selfConsistencyBranch
+    refine div_nonneg ?_ (by norm_num)
+    exact add_nonneg
+      (bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA))
+      (bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB))
+  have hdiag_nonneg : 0 ≤ diagonalBranch := by
+    unfold diagonalBranch
+    refine mul_nonneg ?_ ?_
+    · positivity
+    · refine Finset.sum_nonneg ?_
+      intro j _
+      refine div_nonneg ?_ (by norm_num)
+      exact add_nonneg
+        (bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (diagonalLineAnswerFamily left j)
+          (diagonalPointAnswerFamily right j))
+        (bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (diagonalPointAnswerFamily left j)
+          (diagonalLineAnswerFamily right j))
+  have hmain : (axisParallelBranch + selfConsistencyBranch + diagonalBranch) / 3 ≤ eps := by
+    simpa [ProjStrat.lowIndividualDegreeFailureProbability,
+      axisParallelBranch, selfConsistencyBranch, diagonalBranch,
+      p, left, right] using hpass.soundnessHypothesis
+  have hsum : p + axisParallelBranch + selfConsistencyBranch + diagonalBranch ≤ 3 * eps := by
+    have haux : axisParallelBranch + selfConsistencyBranch + diagonalBranch ≤ 3 * eps := by
+      linarith
+    linarith
+  linarith
 
 private lemma addCoord_subCoord_right {params : Parameters} [FieldModel params.q]
     (x y : Fq params) :
@@ -1332,7 +1410,68 @@ theorem left_as_symmetric_is_good_six_mul {params : Parameters}
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     strategy.leftAsSymmetric.IsGood (6 * eps) (6 * eps) (6 * eps) := by
-  sorry
+  let p : Error :=
+    bipartiteConsError strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  let la : Error := strategy.leftAsSymmetric.axisParallelFailureProbability
+  let ra : Error := strategy.rightAsSymmetric.axisParallelFailureProbability
+  let ls : Error := strategy.leftAsSymmetric.selfConsistencyFailureProbability
+  let rs : Error := strategy.rightAsSymmetric.selfConsistencyFailureProbability
+  let ld : Error := strategy.leftAsSymmetric.diagonalFailureProbability
+  let rd : Error := strategy.rightAsSymmetric.diagonalFailureProbability
+  have hp_nonneg : 0 ≤ p := by
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have hla_nonneg : 0 ≤ la := by
+    unfold la SymStrat.axisParallelFailureProbability ProjStrat.leftAsSymmetric
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (AxisParallelTestSample params))
+      (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
+      (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
+  have hra_nonneg : 0 ≤ ra := by
+    unfold ra SymStrat.axisParallelFailureProbability ProjStrat.rightAsSymmetric
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (AxisParallelTestSample params))
+      (axisParallelPointAnswerFamily strategy.rightAsSymmetric)
+      (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
+  have hls_nonneg : 0 ≤ ls := by
+    unfold ls SymStrat.selfConsistencyFailureProbability ProjStrat.leftAsSymmetric
+    exact bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+  have hrs_nonneg : 0 ≤ rs := by
+    unfold rs SymStrat.selfConsistencyFailureProbability ProjStrat.rightAsSymmetric
+    exact bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have hld_nonneg : 0 ≤ ld := by
+    unfold ld SymStrat.diagonalFailureProbability ProjStrat.leftAsSymmetric
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (DiagonalTestSample params))
+      (diagonalPointAnswerFamily strategy.leftAsSymmetric)
+      (diagonalLineAnswerFamily strategy.leftAsSymmetric)
+  have hrd_nonneg : 0 ≤ rd := by
+    unfold rd SymStrat.diagonalFailureProbability ProjStrat.rightAsSymmetric
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (DiagonalTestSample params))
+      (diagonalPointAnswerFamily strategy.rightAsSymmetric)
+      (diagonalLineAnswerFamily strategy.rightAsSymmetric)
+  have hmain : (p + (la + ra) / 2 + (ls + rs) / 2 + (ld + rd) / 2) / 3 ≤ eps := by
+    simpa [p, la, ra, ls, rs, ld, rd, ProjStrat.lowIndividualDegreeFailureProbability,
+      SymStrat.axisParallelFailureProbability, SymStrat.selfConsistencyFailureProbability,
+      SymStrat.diagonalFailureProbability,
+      ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric] using hpass.soundnessHypothesis
+  have hsum : p + (la + ra) / 2 + (ls + rs) / 2 + (ld + rd) / 2 ≤ 3 * eps := by
+    linarith
+  have haxis_pair : (la + ra) / 2 ≤ 3 * eps := by
+    linarith [hsum, hp_nonneg, hls_nonneg, hrs_nonneg, hld_nonneg, hrd_nonneg]
+  have hself_pair : (ls + rs) / 2 ≤ 3 * eps := by
+    linarith [hsum, hp_nonneg, hla_nonneg, hra_nonneg, hld_nonneg, hrd_nonneg]
+  have hdiag_pair : (ld + rd) / 2 ≤ 3 * eps := by
+    linarith [hsum, hp_nonneg, hla_nonneg, hra_nonneg, hls_nonneg, hrs_nonneg]
+  constructor
+  · dsimp [la]
+    linarith [haxis_pair, hra_nonneg]
+  · dsimp [ls]
+    linarith [hself_pair, hrs_nonneg]
+  · dsimp [ld]
+    linarith [hdiag_pair, hrd_nonneg]
 
 /-- A Lean-local surrogate consequence of the averaged test bound: the right local
 strategy is `(6 * eps, 6 * eps, 6 * eps)`-good.
@@ -1344,7 +1483,68 @@ theorem right_as_symmetric_is_good_six_mul {params : Parameters}
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     strategy.rightAsSymmetric.IsGood (6 * eps) (6 * eps) (6 * eps) := by
-  sorry
+  let p : Error :=
+    bipartiteConsError strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  let la : Error := strategy.leftAsSymmetric.axisParallelFailureProbability
+  let ra : Error := strategy.rightAsSymmetric.axisParallelFailureProbability
+  let ls : Error := strategy.leftAsSymmetric.selfConsistencyFailureProbability
+  let rs : Error := strategy.rightAsSymmetric.selfConsistencyFailureProbability
+  let ld : Error := strategy.leftAsSymmetric.diagonalFailureProbability
+  let rd : Error := strategy.rightAsSymmetric.diagonalFailureProbability
+  have hp_nonneg : 0 ≤ p := by
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have hra_nonneg : 0 ≤ ra := by
+    unfold ra SymStrat.axisParallelFailureProbability ProjStrat.rightAsSymmetric
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (AxisParallelTestSample params))
+      (axisParallelPointAnswerFamily strategy.rightAsSymmetric)
+      (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
+  have hla_nonneg : 0 ≤ la := by
+    unfold la SymStrat.axisParallelFailureProbability ProjStrat.leftAsSymmetric
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (AxisParallelTestSample params))
+      (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
+      (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
+  have hls_nonneg : 0 ≤ ls := by
+    unfold ls SymStrat.selfConsistencyFailureProbability ProjStrat.leftAsSymmetric
+    exact bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+  have hrs_nonneg : 0 ≤ rs := by
+    unfold rs SymStrat.selfConsistencyFailureProbability ProjStrat.rightAsSymmetric
+    exact bipartiteSSCError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have hld_nonneg : 0 ≤ ld := by
+    unfold ld SymStrat.diagonalFailureProbability ProjStrat.leftAsSymmetric
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (DiagonalTestSample params))
+      (diagonalPointAnswerFamily strategy.leftAsSymmetric)
+      (diagonalLineAnswerFamily strategy.leftAsSymmetric)
+  have hrd_nonneg : 0 ≤ rd := by
+    unfold rd SymStrat.diagonalFailureProbability ProjStrat.rightAsSymmetric
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (DiagonalTestSample params))
+      (diagonalPointAnswerFamily strategy.rightAsSymmetric)
+      (diagonalLineAnswerFamily strategy.rightAsSymmetric)
+  have hmain : (p + (la + ra) / 2 + (ls + rs) / 2 + (ld + rd) / 2) / 3 ≤ eps := by
+    simpa [p, la, ra, ls, rs, ld, rd, ProjStrat.lowIndividualDegreeFailureProbability,
+      SymStrat.axisParallelFailureProbability, SymStrat.selfConsistencyFailureProbability,
+      SymStrat.diagonalFailureProbability,
+      ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric] using hpass.soundnessHypothesis
+  have hsum : p + (la + ra) / 2 + (ls + rs) / 2 + (ld + rd) / 2 ≤ 3 * eps := by
+    linarith
+  have haxis_pair : (la + ra) / 2 ≤ 3 * eps := by
+    linarith [hsum, hp_nonneg, hls_nonneg, hrs_nonneg, hld_nonneg, hrd_nonneg]
+  have hself_pair : (ls + rs) / 2 ≤ 3 * eps := by
+    linarith [hsum, hp_nonneg, hla_nonneg, hra_nonneg, hld_nonneg, hrd_nonneg]
+  have hdiag_pair : (ld + rd) / 2 ≤ 3 * eps := by
+    linarith [hsum, hp_nonneg, hla_nonneg, hra_nonneg, hls_nonneg, hrs_nonneg]
+  constructor
+  · dsimp [ra]
+    linarith [haxis_pair, hla_nonneg]
+  · dsimp [rs]
+    linarith [hself_pair, hls_nonneg]
+  · dsimp [rd]
+    linarith [hdiag_pair, hld_nonneg]
 
 end ProjStrat
 
