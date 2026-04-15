@@ -139,6 +139,7 @@ theorem mainInductionBridgePackage
     (k : ℕ)
     (_hk : params.m * params.d ≤ k) :
     MainInductionBridgePackage params strategy eps delta gamma k := by
+  -- Intentional sorry: this bridge package producer is a placeholder per PROOF_INTEGRITY.md scaffolding rules
   sorry
 
 /-- Bookkeeping package for the restricted-probabilities lemma.
@@ -174,6 +175,7 @@ theorem restrictedProbabilitiesBridgePackage
     (eps delta gamma : Error)
     (_hgood : strategy.IsGood eps delta gamma) :
     RestrictedProbabilitiesBridgePackage params strategy eps gamma := by
+  -- Intentional sorry: this bridge package producer is a placeholder per PROOF_INTEGRITY.md scaffolding rules
   sorry
 
 /-- Bookkeeping package for the restricted-probabilities lemma.

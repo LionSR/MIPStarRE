@@ -385,6 +385,7 @@ theorem selfImprovementBridgePackage
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (polynomialEvaluationFamily params G.toSubMeas) nu) :
     SelfImprovementBridgePackage params strategy eps delta nu := by
+  -- Intentional sorry: this bridge package producer is a placeholder per PROOF_INTEGRITY.md scaffolding rules
   sorry
 
 private lemma averagedPointOperator_le_one
