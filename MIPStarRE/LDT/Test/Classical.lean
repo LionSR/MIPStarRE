@@ -125,28 +125,28 @@ def restrictedDiagonalAccepts {params : Parameters} [FieldModel params.q]
 
 /-- Acceptance probability of the axis-parallel branch of the classical low
 individual degree test. -/
-open scoped Classical in
 noncomputable def axisParallelAcceptanceProbability {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) : Error :=
+  open scoped Classical in
   avgOver (uniformDistribution (ClassicalAxisParallelSample params)) fun rs =>
     if strategy.axisParallelAccepts rs then (1 : Error) else 0
 
 /-- Acceptance probability of the self-consistency branch of the classical low
 individual degree test. -/
-open scoped Classical in
 noncomputable def selfConsistencyAcceptanceProbability {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) : Error :=
+  open scoped Classical in
   avgOver (uniformDistribution (ClassicalSelfConsistencySample params)) fun u =>
     if strategy.selfConsistencyAccepts u then (1 : Error) else 0
 
 /-- Acceptance probability of the `j`-restricted diagonal branch. -/
-open scoped Classical in
 noncomputable def restrictedDiagonalAcceptanceProbability {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params)
     (j : Fin params.m) : Error :=
+  open scoped Classical in
   avgOver (uniformDistribution (ClassicalRestrictedDiagonalSample params j)) fun rs =>
     if strategy.restrictedDiagonalAccepts j rs then (1 : Error) else 0
 
