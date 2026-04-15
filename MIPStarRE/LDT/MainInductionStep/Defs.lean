@@ -42,7 +42,7 @@ structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
   axisParallelMeasurement :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   axisParallelReparamInvariant :
-    AxisParallelEvaluationReparamInvariant params axisParallelMeasurement
+    MIPStarRE.LDT.AxisParallelEvaluationReparamInvariant params axisParallelMeasurement
   diagonalMeasurement :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params.next) ι
 
@@ -63,7 +63,7 @@ noncomputable def axisParallelPointAnswerFamily
   fun s => (strategy.pointMeasurement s.1).toSubMeas
 
 /-- Sampled line answers in the axis-parallel lines test,
-evaluated at the sampled point `u` on the canonical geometric line. -/
+evaluated at the base point `u` (parameter `zeroCoord`). -/
 noncomputable def axisParallelLineAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -71,10 +71,11 @@ noncomputable def axisParallelLineAnswerFamily
     IdxSubMeas (AxisParallelTestSample params)
       (Fq params) ι :=
   fun s =>
-    let ℓ := AxisParallelLine.throughPoint s.1 s.2
+    let ℓ : AxisParallelLine params :=
+      { base := s.1, direction := s.2 }
     postprocess
       ((strategy.axisParallelMeasurement ℓ).toSubMeas)
-      (· (AxisParallelLine.sampleParameter s.1 s.2))
+      (· zeroCoord)
 
 /-- Sampled point answers in the `j`-restricted diagonal test.
 Point player receives `u` and answers at `u`. -/
@@ -88,7 +89,7 @@ noncomputable def diagonalPointAnswerFamily
   fun s => (strategy.pointMeasurement s.1).toSubMeas
 
 /-- Sampled diagonal-line answers in the `j`-restricted diagonal
-test, evaluated at the sampled point on the canonical geometric line. -/
+test, evaluated at the base point (parameter `zeroCoord`). -/
 noncomputable def diagonalLineAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -98,10 +99,11 @@ noncomputable def diagonalLineAnswerFamily
       (Fq params) ι :=
   fun s =>
     let v := extendRestrictedDirection j s.2
-    let ℓ := DiagonalLine.throughPointDirection (params := params) s.1 v
+    let ℓ : DiagonalLine params :=
+      { base := s.1, direction := v }
     postprocess
       ((strategy.diagonalMeasurement ℓ).toSubMeas)
-      (· (DiagonalLine.sampleParameter (params := params) s.1 v))
+      (· zeroCoord)
 
 /-- Failure surrogate for the axis-parallel lines test. -/
 noncomputable def axisParallelFailureProbability
@@ -232,15 +234,8 @@ private theorem restrictAxisParallelMeasurement_postprocess_eval
                   if g t = a then lifted.toSubMeas.outcome g else 0)
                 (by
                   intro f
-                  change (if f t = a then
-                      lifted.toSubMeas.outcome (liftAxisAnswer params x f)
-                    else
-                      0) =
-                    if (liftAxisAnswer params x f) t = a then
-                      lifted.toSubMeas.outcome (liftAxisAnswer params x f)
-                    else
-                      0
-                  simp [liftAxisAnswer]))
+                  simp [axisLinePolynomialEquiv, liftAxisAnswer,
+                    AxisLinePolynomial.appendAtHeight_apply]))
     _ = (postprocess (lifted.toSubMeas) (fun f => f t)).outcome a := by
           simp [postprocess, lifted, Finset.sum_filter]
           apply Finset.sum_congr rfl
@@ -250,7 +245,7 @@ private theorem restrictAxisParallelMeasurement_postprocess_eval
 private theorem restrictAxisParallelMeasurement_reparamInvariant
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
-    AxisParallelEvaluationReparamInvariant params
+    MIPStarRE.LDT.AxisParallelEvaluationReparamInvariant params
       (restrictAxisParallelMeasurement params strategy x) := by
   intro ℓ t a
   calc

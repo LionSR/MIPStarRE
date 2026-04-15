@@ -1185,25 +1185,16 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
         rcases i with ⟨i₁, i₂⟩
         rcases j with ⟨j₁, j₂⟩
         simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
-  have hAlmost :
-      AlmostProjMeasStatement.{_, _, 0}
-        ψ A_lifted
-          (consistencyToAlmostProjectiveError ζ) := by
-    simpa using
+  have hRound :=
+    roundAlmostProjMeas.{0, 0} (ψ := ψ)
+      (A := A_lifted)
+      (ζ := consistencyToAlmostProjectiveError ζ)
       (consistencyToAlmostProjective
         (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons)
-  have hRound :
-      ∃ P : ProjSubMeas Outcome (ιA × ιB),
-        RoundedProjMeasStatement.{_, _, 0}
-          ψ A_lifted P
-          (roundingToProjectiveError (consistencyToAlmostProjectiveError ζ)) :=
-    roundAlmostProjMeas (ψ := ψ)
-      (A := A_lifted)
-      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost
   obtain ⟨P, hRounded⟩ := hRound
   refine ⟨P, ?_⟩
   simpa [A_lifted] using
-    (roundedProjMeasStatement_mono hRounded
+    (roundedProjMeasStatement_mono.{0} hRounded
       (orthonormalizationMainLemma_error_bound ζ hζ hζ1))
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

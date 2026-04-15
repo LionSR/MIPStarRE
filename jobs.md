@@ -21,14 +21,14 @@ Last updated: 2026-04-14
   - `Test/MainTheorem.lean`: `mainFormal`
 - **Status**: IN PROGRESS
 - **Dependency chain**:
-  - `Test/Strategy.lean` is now paper-faithful and clean: the general test uses
-    point agreement as its self-consistency branch, the role-register
-    symmetrized strategy is proved `(3 * eps, 3 * eps, 3 * eps)`-good, and the
-    sampled line questions are canonicalized to geometric representatives.
-  - `MainInductionStep/Defs.lean` now uses the same canonical geometric line
-    representatives on the restricted slice test path.
-  - The previous anchored-line counterexample for `mainFormal` on the Test path
-    no longer applies.
+  - `Test/Strategy.lean` is now paper-faithful in its failure-surrogate branch
+    decomposition: the general test uses point agreement as its
+    self-consistency branch and the role-register symmetrized strategy is proved
+    `(3 * eps, 3 * eps, 3 * eps)`-good.
+  - The canonical geometric-line API now exists in `Basic/Parameters.lean`, but
+    the actual Test / induction / commutativity paths stay on the older raw
+    affine representatives in this PR so the downstream commutativity proof
+    remains fully proved.
   - The `d = 0` / `k = 0` corner has been excluded in the Lean and blueprint
     statements.
   - `Test.classicalTestSoundness` now closes through the explicit quoted
@@ -37,9 +37,10 @@ Last updated: 2026-04-14
     formalized in Lean.
 - **Priority order**:
   1. keep `Test/Strategy.lean` aligned with the paper
-  2. canonicalize every sampled line question to a unique geometric
-     representative and evaluate line answers at the recovered affine parameter
-  3. return to the Section 3 assembly only after the Test model is repaired
+  2. if we revisit the sampled-line model, land the geometric-line
+     canonicalization together with the matching commutativity refactor
+  3. return to the Section 3 assembly only after the Test model question is
+     resolved one way or the other
   4. only then return to the Section 3 assembly for `mainFormal`
 - **Checklist**:
   - [x] Survey all `sorry`s in `MIPStarRE/LDT/Test`
@@ -50,7 +51,7 @@ Last updated: 2026-04-14
   - [x] Exclude the degenerate `d = 0` / `k = 0` corner from
     `mainFormal` / `mainInformal`
   - [x] Eliminate `mainInformal`
-  - [x] Repair the top-level Test model so sampled line questions use unique
+  - [ ] Repair the top-level Test model so sampled line questions use unique
     geometric representatives
   - [ ] Eliminate `razSafra` and `mainFormal`
   - [ ] Sync any blueprint tags justified by exact Lean/theorem agreement
@@ -70,10 +71,12 @@ Last updated: 2026-04-14
   - merged `origin/main`'s classical soundness interface, so
     `Test.classicalTestSoundness` now closes via
     `polishchukSpielmanClassicalSoundness`
-  - added canonical geometric-line constructors and recovered sample-parameter
-    maps in `Basic/Parameters.lean`
-  - switched `Test/Strategy.lean` and `MainInductionStep/Defs.lean` to query
-    line measurements through those canonical geometric representatives
+  - added canonical geometric-line constructors and recovery/sample-parameter
+    lemmas in `Basic/Parameters.lean`
+  - addressed PR review feedback by restoring the fully-proved
+    `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
+    bridge and by keeping the Test / induction / commutativity paths on the
+    older raw representative model in this PR
   - verified `lake env lean MIPStarRE/LDT/Test/Strategy.lean`
   - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Defs.lean`
   - verified `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean`
@@ -87,23 +90,19 @@ Last updated: 2026-04-14
        overshoots the paper by asking the spectral truncation step to already
        return a genuine `ProjSubMeas`
 - **Concrete blocker**:
-  - `Test.mainFormal` is no longer blocked by the sampled-line model. The
-    remaining blocker is the still-missing Section 3 assembly from the repaired
-    symmetrized Test theorem to the final unsymmetrized/projectivized witnesses.
+  - `Test.mainFormal` is still blocked by the sampled-line modeling question as
+    well as the still-missing Section 3 assembly from the repaired symmetrized
+    Test theorem to the final unsymmetrized/projectivized witnesses.
   - Concretely, `mainFormal` still needs the bridge chain through the upstream
     remaining sorries in `MakingMeasurementsProjective`, `Commutativity`,
     `CommutativityPoints`, `Projectivization`, and `Pasting`.
-  - `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
-    is not just missing a reindexing lemma: with the current raw
-    `PointDiagonalLineQuestion = DiagonalLine × Fq` model and
-    `sampledDiagonalLineEvaluation`, it is blocked by the same affine
-    reparameterization issue as the old Test path. The paper only justifies
-    averaging over geometric lines through a point, not over arbitrary raw line
-    representatives.
-  - A paper-faithful fix there will require canonicalizing the commutativity
-    line-question model as well, or rebuilding the shared-line bridge so its
-    marginals land directly in the canonical `m`-restricted diagonal sample
-    space.
+  - The geometric-line canonicalization is not merged on the live proof path in
+    this branch: the commutativity bridge remains proved only for the older raw
+    `PointDiagonalLineQuestion = DiagonalLine × Fq` model.
+  - A paper-faithful future fix will require canonicalizing the commutativity
+    line-question model at the same time as the Test-side line model, or
+    rebuilding the shared-line bridge so its marginals land directly in the
+    canonical `m`-restricted diagonal sample space.
   - The next highest-leverage upstream theorem,
     `MakingMeasurementsProjective.spectralTruncateAlmostProjective`, is blocked
     by a statement-level mismatch with the paper. The paper's spectral

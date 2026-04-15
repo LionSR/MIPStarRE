@@ -136,10 +136,10 @@ noncomputable def axisParallelPointAnswerFamily
   fun s => (strategy.pointMeasurement s.1).toSubMeas
 
 /-- Sampled line answers in the axis-parallel lines test,
-evaluated at the sampled point `u`.
+evaluated at the base point `u`.
 The line player receives `ℓ` and returns a polynomial `f`.
-The verifier canonicalizes the geometric line through `u` and evaluates `f` at
-the recovered affine parameter of `u` on that canonical representative. -/
+The verifier checks `f(u) = a`; since `u = ℓ.pointAt zeroCoord`,
+we evaluate `f` at `zeroCoord`. -/
 noncomputable def axisParallelLineAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -147,10 +147,11 @@ noncomputable def axisParallelLineAnswerFamily
     IdxSubMeas (AxisParallelTestSample params)
       (Fq params) ι :=
   fun s =>
-    let ℓ := AxisParallelLine.throughPoint (params := params) s.1 s.2
+    let ℓ : AxisParallelLine params :=
+      { base := s.1, direction := s.2 }
     postprocess
       ((strategy.axisParallelMeasurement ℓ).toSubMeas)
-      (· (AxisParallelLine.sampleParameter (params := params) s.1 s.2))
+      (· zeroCoord)
 
 /-- Sampled point answers in the `j`-restricted diagonal test.
 The point player receives `u` and answers at `u`. -/
@@ -164,8 +165,9 @@ noncomputable def diagonalPointAnswerFamily
   fun s => (strategy.pointMeasurement s.1).toSubMeas
 
 /-- Sampled diagonal-line answers in the `j`-restricted diagonal
-test, evaluated at the sampled point `u` on the canonical geometric line
-through `(u, v)`. -/
+test, evaluated at the base point `u`.
+Since `u = ℓ.pointAt zeroCoord`, we evaluate `f` at
+`zeroCoord`. -/
 noncomputable def diagonalLineAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -175,10 +177,11 @@ noncomputable def diagonalLineAnswerFamily
       (Fq params) ι :=
   fun s =>
     let v := extendRestrictedDirection j s.2
-    let ℓ := DiagonalLine.throughPointDirection (params := params) s.1 v
+    let ℓ : DiagonalLine params :=
+      { base := s.1, direction := v }
     postprocess
       ((strategy.diagonalMeasurement ℓ).toSubMeas)
-      (· (DiagonalLine.sampleParameter (params := params) s.1 v))
+      (· zeroCoord)
 
 /-- Paper-local (not necessarily symmetric) projective strategy data. -/
 structure ProjStrat (params : Parameters) [FieldModel params.q]
@@ -1595,13 +1598,11 @@ private noncomputable def axisParallelLineAnswerMeasurement
     (s : AxisParallelTestSample params) :
     Measurement (Fq params) ι where
   toSubMeas :=
-    let ℓ := AxisParallelLine.throughPoint (params := params) s.1 s.2
-    postprocess ((M ℓ).toSubMeas)
-      (· (AxisParallelLine.sampleParameter (params := params) s.1 s.2))
+    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
+    postprocess ((M ℓ).toSubMeas) (· zeroCoord)
   total_eq_one := by
-    let ℓ := AxisParallelLine.throughPoint (params := params) s.1 s.2
-    simpa [ℓ, postprocess_total, AxisParallelLine.sampleParameter] using
-      (M ℓ).total_eq_one
+    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
+    simpa [ℓ, postprocess_total] using (M ℓ).total_eq_one
 
 private noncomputable def diagonalLineAnswerMeasurement
     {params : Parameters} [FieldModel params.q]
@@ -1611,14 +1612,12 @@ private noncomputable def diagonalLineAnswerMeasurement
     Measurement (Fq params) ι where
   toSubMeas :=
     let v := extendRestrictedDirection j s.2
-    let ℓ := DiagonalLine.throughPointDirection (params := params) s.1 v
-    postprocess ((M ℓ).toSubMeas)
-      (· (DiagonalLine.sampleParameter (params := params) s.1 v))
+    let ℓ : DiagonalLine params := { base := s.1, direction := v }
+    postprocess ((M ℓ).toSubMeas) (· zeroCoord)
   total_eq_one := by
     let v := extendRestrictedDirection j s.2
-    let ℓ := DiagonalLine.throughPointDirection (params := params) s.1 v
-    simpa [v, ℓ, postprocess_total, DiagonalLine.sampleParameter] using
-      (M ℓ).total_eq_one
+    let ℓ : DiagonalLine params := { base := s.1, direction := v }
+    simpa [v, ℓ, postprocess_total] using (M ℓ).total_eq_one
 
 @[simp] private lemma postprocess_symmetrizedIdxProjMeas_outcome
     {Question α β : Type*} {ι : Type*}
@@ -1788,10 +1787,71 @@ private lemma qBipartiteConsDefect_symmetrizedMeas_eq_average
             rw [← qBipartiteConsDefect_of_measurements ψ MA NB]
             rw [← qBipartiteConsDefect_of_measurements ψ NA MB]
 
+set_option maxHeartbeats 1000000 in
+-- The sample-level symmetrization lemma still unfolds the role-placed measurement API.
+private lemma axisParallel_symm_sample_eq_average
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (strategy : ProjStrat params ι) (s : AxisParallelTestSample params) :
+    qBipartiteConsDefect (strategy.classicalRoleSymmStrategy.state)
+        (axisParallelPointAnswerFamily strategy.classicalRoleSymmStrategy s)
+        (axisParallelLineAnswerFamily strategy.classicalRoleSymmStrategy s) =
+      (qBipartiteConsDefect strategy.state
+          (axisParallelLineAnswerFamily strategy.leftAsSymmetric s)
+          (axisParallelPointAnswerFamily strategy.rightAsSymmetric s) +
+        qBipartiteConsDefect strategy.state
+          (axisParallelPointAnswerFamily strategy.leftAsSymmetric s)
+          (axisParallelLineAnswerFamily strategy.rightAsSymmetric s)) / 2 := by
+  let PA := strategy.pointMeasurementA s.1
+  let PB := strategy.pointMeasurementB s.1
+  let LA := axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementA s
+  let LB := axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementB s
+  simpa [qBipartiteConsDefect, qBipartiteMatchMass,
+    ProjStrat.classicalRoleSymmStrategy,
+    ProjStrat.symmetrizedPointMeasurement,
+    ProjStrat.symmetrizedAxisParallelMeasurement,
+    ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
+    axisParallelPointAnswerFamily, axisParallelLineAnswerFamily,
+    axisParallelLineAnswerMeasurement, symmetrizedMeas,
+    postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
+    PA, PB, LA, LB, add_comm] using
+    qBipartiteConsDefect_symmetrizedMeas_eq_average strategy.state
+      PA.toMeasurement PB.toMeasurement LA LB
+
+set_option maxHeartbeats 1000000 in
+-- The diagonal sample uses the same role-placed expansion uniformly in the restriction index.
+private lemma diagonal_symm_sample_eq_average
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (strategy : ProjStrat params ι)
+    (j : Fin params.m) (s : RestrictedDiagonalSample params j) :
+    qBipartiteConsDefect (strategy.classicalRoleSymmStrategy.state)
+        (diagonalPointAnswerFamily strategy.classicalRoleSymmStrategy j s)
+        (diagonalLineAnswerFamily strategy.classicalRoleSymmStrategy j s) =
+      (qBipartiteConsDefect strategy.state
+          (diagonalLineAnswerFamily strategy.leftAsSymmetric j s)
+          (diagonalPointAnswerFamily strategy.rightAsSymmetric j s) +
+        qBipartiteConsDefect strategy.state
+          (diagonalPointAnswerFamily strategy.leftAsSymmetric j s)
+          (diagonalLineAnswerFamily strategy.rightAsSymmetric j s)) / 2 := by
+  let PA := strategy.pointMeasurementA s.1
+  let PB := strategy.pointMeasurementB s.1
+  let LA := diagonalLineAnswerMeasurement strategy.diagonalMeasurementA j s
+  let LB := diagonalLineAnswerMeasurement strategy.diagonalMeasurementB j s
+  simpa [qBipartiteConsDefect, qBipartiteMatchMass,
+    ProjStrat.classicalRoleSymmStrategy,
+    ProjStrat.symmetrizedPointMeasurement,
+    ProjStrat.symmetrizedDiagonalMeasurement,
+    ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
+    diagonalPointAnswerFamily, diagonalLineAnswerFamily,
+    diagonalLineAnswerMeasurement, symmetrizedMeas,
+    postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
+    PA, PB, LA, LB, add_comm] using
+    qBipartiteConsDefect_symmetrizedMeas_eq_average strategy.state
+      PA.toMeasurement PB.toMeasurement LA LB
+
 /- The paper's role-register symmetrized strategy exactly averages the two
 axis-parallel role choices from the original general strategy. -/
-set_option maxHeartbeats 5000000 in
--- The per-sample `simpa` below expands several symmetrized measurement definitions.
 theorem classicalRoleSymmStrategy_axisParallel_eq_roleAverage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
@@ -1818,25 +1878,7 @@ theorem classicalRoleSymmStrategy_axisParallel_eq_roleAverage
         avgOver axParDist (fun s => (leftRoleErr s + rightRoleErr s) / 2) := by
     apply avgOver_congr
     intro s
-    let PA := strategy.pointMeasurementA s.1
-    let PB := strategy.pointMeasurementB s.1
-    let LA := axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementA s
-    let LB := axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementB s
-    have hsample :
-        symmErr s = (leftRoleErr s + rightRoleErr s) / 2 := by
-          simpa [symmErr, leftRoleErr, rightRoleErr,
-            qBipartiteConsDefect, qBipartiteMatchMass,
-            ProjStrat.classicalRoleSymmStrategy,
-            ProjStrat.symmetrizedPointMeasurement,
-            ProjStrat.symmetrizedAxisParallelMeasurement,
-            ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
-            axisParallelPointAnswerFamily, axisParallelLineAnswerFamily,
-            axisParallelLineAnswerMeasurement, symmetrizedMeas,
-            postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
-            PA, PB, LA, LB, add_comm] using
-            qBipartiteConsDefect_symmetrizedMeas_eq_average strategy.state
-              PA.toMeasurement PB.toMeasurement LA LB
-    exact hsample
+    exact axisParallel_symm_sample_eq_average strategy s
   calc
     (strategy.classicalRoleSymmStrategy).axisParallelFailureProbability
       = avgOver axParDist symmErr := by
@@ -1859,8 +1901,6 @@ theorem classicalRoleSymmStrategy_axisParallel_eq_roleAverage
 
 /- The paper's role-register symmetrized strategy exactly averages the two
 diagonal-line role choices from the original general strategy. -/
-set_option maxHeartbeats 5000000 in
--- The diagonal branch repeats the same expansion uniformly over the restricted samples.
 theorem classicalRoleSymmStrategy_diagonal_eq_roleAverage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
@@ -1896,22 +1936,7 @@ theorem classicalRoleSymmStrategy_diagonal_eq_roleAverage
               intro j _
               apply avgOver_congr
               intro s
-              let PA := strategy.pointMeasurementA s.1
-              let PB := strategy.pointMeasurementB s.1
-              let LA := diagonalLineAnswerMeasurement strategy.diagonalMeasurementA j s
-              let LB := diagonalLineAnswerMeasurement strategy.diagonalMeasurementB j s
-              simpa [symmErr, leftRoleErr, rightRoleErr,
-                qBipartiteConsDefect, qBipartiteMatchMass,
-                ProjStrat.classicalRoleSymmStrategy,
-                ProjStrat.symmetrizedPointMeasurement,
-                ProjStrat.symmetrizedDiagonalMeasurement,
-                ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
-                diagonalPointAnswerFamily, diagonalLineAnswerFamily,
-                diagonalLineAnswerMeasurement, symmetrizedMeas,
-                postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
-                PA, PB, LA, LB, add_comm] using
-                qBipartiteConsDefect_symmetrizedMeas_eq_average strategy.state
-                  PA.toMeasurement PB.toMeasurement LA LB
+              exact diagonal_symm_sample_eq_average strategy j s
     _ = (1 / (params.m : Error)) *
           ∑ j : Fin params.m,
             (avgOver (uniformDistribution (RestrictedDiagonalSample params j)) (leftRoleErr j) +
