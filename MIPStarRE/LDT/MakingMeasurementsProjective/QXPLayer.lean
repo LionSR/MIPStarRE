@@ -115,6 +115,20 @@ structure RankReductionWitness {Outcome : Type*}
   auxDim_le :
     Fintype.card data.auxSpace.carrier ≤ Fintype.card ι
 
+/-- Temporary bridge package for the paper's `lem:projective-non-measurement`
+stage, which starts from the `2 * ζ` source-idempotence defect and directly
+produces the rounded family `R_a` with the paper's `2 * sqrt ζ` closeness and
+`(1 + 2 * sqrt ζ) I` total-mass bound. -/
+structure ProjectiveNonMeasurementBridgePackage {Outcome : Type*}
+    [Fintype Outcome]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) : Prop where
+  fromSourceAlmostProjective :
+    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
+      ∃ R : OpFamily Outcome ι,
+        RoundingToProjectorsWitness ψ A ζ R ∧
+          ∑ a, R.outcome a = R.total
+
 /-- The raw operator family obtained by sandwiching the auxiliary projectors
 `T_a` with a candidate `XHat`. This is the family later named `P`. -/
 noncomputable def pFamilyFromXHat {Outcome : Type*} [Fintype Outcome]
@@ -364,17 +378,6 @@ lemma truncationInequality (δ x : Error) :
       mul_nonneg (mul_nonneg (le_of_lt hδ) hx)
         (by linarith : (0 : ℝ) ≤ 1 - x)]
 
-private lemma sourceAlmostProjective_nonneg {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) :
-    0 ≤ ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) := by
-  refine Finset.sum_nonneg ?_
-  intro a _
-  exact ev_nonneg_of_psd ψ _ <|
-    sub_nonneg.mpr <|
-      MIPStarRE.Quantum.sq_le_self (A.outcome_pos a) (A.outcome_le_one a)
-
 private lemma real_smul_matrix_eq_complex {ι : Type*} [Fintype ι] [DecidableEq ι]
     (Q : MIPStarRE.Quantum.Op ι) (c : Error) :
     (c : ℂ) • Q = c • Q := by
@@ -405,231 +408,22 @@ private lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
   dsimp [spectralTruncationError]
   exact Real.rpow_nonneg hζ _
 
-private lemma spectralTruncationError_two_mul_le (ζ : Error) (_hζ : 0 ≤ ζ) :
-    spectralTruncationError (2 * ζ) ≤ 2 * spectralTruncationError ζ := by
-  dsimp [spectralTruncationError]
-  rw [← Real.sqrt_eq_rpow, ← Real.sqrt_eq_rpow]
-  calc
-    Real.sqrt (2 * ζ) = Real.sqrt 2 * Real.sqrt ζ := by
-      rw [Real.sqrt_mul (by positivity)]
-    _ ≤ 2 * Real.sqrt ζ := by
-      refine mul_le_mul_of_nonneg_right ?_ (Real.sqrt_nonneg ζ)
-      nlinarith [Real.sq_sqrt (show 0 ≤ (2 : Error) by positivity)]
-
-private lemma spectralTruncationError_two_mul_le_roundingToProjectiveError
-    (ζ : Error) (hζ : 0 ≤ ζ) :
-    spectralTruncationError (2 * ζ) ≤ roundingToProjectiveError ζ := by
-  calc
-    spectralTruncationError (2 * ζ) ≤ 2 * spectralTruncationError ζ :=
-      spectralTruncationError_two_mul_le ζ hζ
-    _ ≤ roundingToProjectiveError ζ := by
-      dsimp [roundingToProjectiveError]
-      exact mul_le_mul_of_nonneg_right (by norm_num) (spectralTruncationError_nonneg hζ)
-
-private lemma almostProjMeasOfSourceAlmostProjective {Outcome : Type uOutcome}
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (η : Error)
-    (hη : 0 ≤ η)
-    (hsource :
-      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ η) :
-    AlmostProjMeasStatement.{uOutcome, uι, 0} ψ A η := by
-  classical
-  let diagA : Error := ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a)
-  have hsource_eq :
-      ∑ a : Outcome, ev ψ (A.outcome a - A.outcome a * A.outcome a) =
-        ev ψ A.toSubMeas.total - diagA := by
-    calc
-      ∑ a : Outcome, ev ψ (A.outcome a - A.outcome a * A.outcome a)
-          = ∑ a : Outcome,
-              (ev ψ (A.outcome a) - ev ψ (A.outcome a * A.outcome a)) := by
-              refine Finset.sum_congr rfl ?_
-              intro a _
-              exact ev_sub ψ (A.outcome a) (A.outcome a * A.outcome a)
-      _ = (∑ a : Outcome, ev ψ (A.outcome a)) -
-            ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a) := by
-            rw [Finset.sum_sub_distrib]
-      _ = ev ψ A.toSubMeas.total - diagA := by
-            rw [← ev_sum ψ A.outcome, A.toSubMeas.sum_eq_total]
-  refine ⟨?_, ?_, ?_⟩
-  · constructor
-    rw [MIPStarRE.LDT.Preliminaries.constFamily_ssc_unit]
-    dsimp [qSSCDefect]
-    exact max_le_iff.mpr ⟨hη, by simpa [diagA, hsource_eq] using hsource⟩
-  · constructor
-    calc
-      sddError ψ (uniformDistribution Unit)
-          (constSubMeasFamily A.toSubMeas)
-          (constSubMeasFamily A.toSubMeas)
-          = 0 := sddError_self ψ (uniformDistribution Unit) _
-      _ ≤ 2 * η := by nlinarith
-  · let H : FiniteHilbertSpace :=
-      { carrier := PUnit
-        instFintype := inferInstance
-        instDecidableEq := inferInstance
-        instNonempty := inferInstance }
-    let pivot : Outcome := Classical.arbitrary Outcome
-    let toyState : DensityMatrixState H :=
-      { matrix := 1
-        positive := by positivity
-        normalized := by
-          change MIPStarRE.Quantum.normalizedTrace
-              (1 : MIPStarRE.Quantum.Op H.carrier) = 1
-          simp }
-    let toyMeas : MatrixMeasurement Outcome H :=
-      { effect := fun a => if a = pivot then 1 else 0
-        pos := by
-          intro a
-          by_cases h : a = pivot <;> simp [h]
-        sum_le_one := by
-          refine le_of_eq ?_
-          simp
-        sum_eq_one := by
-          simp }
-    refine ⟨{
-      space := H
-      state := toyState
-      measurement := toyMeas
-      -- Toy witness: PUnit carrier, single outcome. Verbose due to structure fields.
-      overlapDecomposition := by
-        have hoff :
-            MIPStarRE.Quantum.inconsistency toyMeas.effect toyMeas.effect = 0 := by
-          unfold MIPStarRE.Quantum.inconsistency
-          refine Finset.sum_eq_zero ?_
-          intro x _
-          refine Finset.sum_eq_zero ?_
-          intro y hy
-          have hyx : y ≠ x := (Finset.mem_filter.mp hy).2
-          by_cases hx : x = pivot
-          · by_cases hy' : y = pivot
-            · exact (hyx (hy'.trans hx.symm)).elim
-            · simp [toyMeas, hx, hy']
-          · simp [toyMeas, hx]
-        have hdiag :
-            MIPStarRE.Quantum.diagOverlap toyMeas.effect toyMeas.effect = 1 := by
-          unfold MIPStarRE.Quantum.diagOverlap
-          change ∑ x : Outcome,
-              MIPStarRE.Quantum.normalizedTrace
-                (((if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) *
-                  (if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) = 1
-          calc
-            ∑ x : Outcome,
-                MIPStarRE.Quantum.normalizedTrace
-                  (((if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) *
-                    (if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0))
-                =
-              ∑ x : Outcome,
-                MIPStarRE.Quantum.normalizedTrace
-                  (if x = pivot then
-                    if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0
-                   else 0) := by
-                  refine Finset.sum_congr rfl ?_
-                  intro x _
-                  by_cases hx : x = pivot <;> simp [hx]
-            _ = ∑ x : Outcome, if x = pivot then (1 : ℂ) else 0 := by
-                  refine Finset.sum_congr rfl ?_
-                  intro x _
-                  by_cases hx : x = pivot <;> simp [hx]
-            _ = 1 := by simp
-        rw [hoff, hdiag]
-        norm_num
-      pointwiseIdempotence := ?_
-    }⟩
-    intro a
-    by_cases h : a = pivot
-    · subst h
-      simpa [matrixIdempotenceDefect, toyMeas] using hη
-    · simpa [matrixIdempotenceDefect, toyMeas, h] using hη
-
 /-- **Rounding to projectors** (`lem:projective-non-measurement`).
 
 From the estimate `eq:A-looks-projective`, construct a family `R_a` of
 projectors close to `A_a` whose total is bounded by `(1 + 2√ζ)I`. -/
 lemma projectiveNonMeasurement {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
+    [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (ζ : Error) :
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ) :
     (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
       ∃ R : OpFamily Outcome ι,
         RoundingToProjectorsWitness ψ A ζ R := by
   intro hsource
-  classical
-  have hsource_nonneg := sourceAlmostProjective_nonneg ψ A
-  have hζ : 0 ≤ ζ := by nlinarith
-  by_cases hOutcome : Nonempty Outcome
-  · letI : Nonempty Outcome := hOutcome
-    letI : DecidableEq Outcome := Classical.decEq Outcome
-    have hAlmost :=
-      almostProjMeasOfSourceAlmostProjective ψ A (2 * ζ) (by nlinarith) hsource
-    let spectral :=
-      spectralTruncateAlmostProjective.{uOutcome, uι, 0, 0} ψ A (2 * ζ) hAlmost
-    let R : OpFamily Outcome ι := spectral.projSubMeas.toSubMeas
-    refine ⟨R, ?_⟩
-    refine ⟨?_, ?_, ?_⟩
-    · intro a
-      exact
-        { isHermitian :=
-            (Matrix.nonneg_iff_posSemidef.mp
-              (spectral.projSubMeas.outcome_pos a)).isHermitian
-          idempotent := spectral.projSubMeas.proj a }
-    · have hraw :
-          SDDOpRel ψ (uniformDistribution Unit)
-            (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
-            (constOpFamily R)
-            (spectralTruncationError (2 * ζ)) := by
-        constructor
-        simpa [R, SDDRel, sddError, sddErrorOp, qSDD, qSDDOp, constOpFamily,
-          constSubMeasFamily, avgOver, uniformDistribution, SubMeas.toOpFamily] using
-          spectral.closeness.squaredDistanceBound
-      exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
-        (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily R)
-        (spectralTruncationError (2 * ζ)) (2 * spectralTruncationError ζ) hraw
-        (spectralTruncationError_two_mul_le ζ hζ)
-    · calc
-        R.total ≤ (1 : MIPStarRE.Quantum.Op ι) := spectral.projSubMeas.total_le_one
-        _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
-            (1 : MIPStarRE.Quantum.Op ι) := by
-            have hε_nonneg : 0 ≤ spectralTruncationError ζ :=
-              spectralTruncationError_nonneg hζ
-            have hcoeff : (1 : Error) ≤ 1 + 2 * spectralTruncationError ζ := by
-              nlinarith
-            simpa [Complex.ofReal_add, Complex.ofReal_mul] using
-              op_one_le_complex_smul_one_of_real_ge_one
-                (ι := ι) (1 + 2 * spectralTruncationError ζ) hcoeff
-  · letI : IsEmpty Outcome := not_nonempty_iff.mp hOutcome
-    let R : OpFamily Outcome ι :=
-      { outcome := fun a => isEmptyElim a
-        total := 0 }
-    refine ⟨R, ?_⟩
-    refine ⟨?_, ?_, ?_⟩
-    · intro a
-      exact isEmptyElim a
-    · constructor
-      calc
-        sddErrorOp ψ (uniformDistribution Unit)
-            (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
-            (constOpFamily R)
-            = 0 := by
-            simp [R, sddErrorOp, qSDDOp, qSDDCore, constOpFamily, avgOver,
-              uniformDistribution]
-        _ ≤ 2 * spectralTruncationError ζ := by
-            have hε_nonneg : 0 ≤ spectralTruncationError ζ :=
-              spectralTruncationError_nonneg hζ
-            nlinarith
-    · have hε_nonneg : 0 ≤ spectralTruncationError ζ :=
-        spectralTruncationError_nonneg hζ
-      have hcoeff :
-          (0 : Error) ≤ (1 : Error) + 2 * spectralTruncationError ζ := by
-        nlinarith
-      have hzero_le :
-          (0 : MIPStarRE.Quantum.Op ι) ≤
-            (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
-              (1 : MIPStarRE.Quantum.Op ι) := by
-        simpa [Complex.ofReal_add, Complex.ofReal_mul] using
-          op_zero_le_complex_smul_one_of_real_nonneg
-            (ι := ι) (1 + 2 * spectralTruncationError ζ) hcoeff
-      exact le_trans (show R.total ≤ (0 : MIPStarRE.Quantum.Op ι) by rfl) hzero_le
+  rcases hbridge.fromSourceAlmostProjective hsource with ⟨R, hR, _⟩
+  exact ⟨R, hR⟩
 
 /-- **Rank reduction** (`lem:projective-low-rank-sum`).
 
@@ -639,28 +433,20 @@ stays bounded by `(1 + 2√ζ)I`, and the auxiliary dimension is at most the
 original ambient dimension. -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    [Fintype Outcome]
+    [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 ≤ ζ)
+    (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ)
     (source_almost_projective :
       ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
       RankReductionWitness ψ A ζ data := by
-  -- NOTE: The paper's proof also needs normalization of `ψ` and a small-`ζ`
-  -- hypothesis such as `ζ ≤ 1 / 4`; only the nonnegativity and
-  -- almost-projectivity preconditions are reflected here so far.
   classical
   by_cases hOutcome : Nonempty Outcome
   · letI : Nonempty Outcome := hOutcome
     letI : Inhabited Outcome := Classical.inhabited_of_nonempty hOutcome
-    letI : DecidableEq Outcome := Classical.decEq Outcome
-    have hAlmost :=
-      almostProjMeasOfSourceAlmostProjective ψ A (2 * ζ) (by nlinarith)
-        source_almost_projective
-    let spectral :=
-      spectralTruncateAlmostProjective.{uOutcome, uι, 0, 0} ψ A (2 * ζ) hAlmost
-    let q : OpFamily Outcome ι := spectral.projSubMeas.toSubMeas
+    obtain ⟨q, hrounded, hsum⟩ := hbridge.fromSourceAlmostProjective source_almost_projective
     let data : QLayerData Outcome ι :=
       { auxSpace :=
           { carrier := ι
@@ -668,46 +454,28 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
             instDecidableEq := inferInstance
             instNonempty := inferInstance }
         q := q
-        -- TODO: replace this placeholder with the auxiliary projective measurement
-        -- produced by the rank-reduction construction once that bridge is formalized.
         t := (default : ProjMeas Outcome ι) }
     refine ⟨data, ?_⟩
     refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_⟩
     · intro a
-      exact
-        { isHermitian :=
-            (Matrix.nonneg_iff_posSemidef.mp
-              (spectral.projSubMeas.outcome_pos a)).isHermitian
-          idempotent := spectral.projSubMeas.proj a }
+      exact hrounded.projective a
     · intro a
-      exact spectral.projSubMeas.outcome_pos a
-    · simpa [data, Qa, QTotal, q, SubMeas.toOpFamily] using
-        spectral.projSubMeas.sum_eq_total
-    · have hraw :
-          SDDOpRel ψ (uniformDistribution Unit)
-            (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
-            (constOpFamily q)
-            (spectralTruncationError (2 * ζ)) := by
-        constructor
-        simpa [q, SDDRel, sddError, sddErrorOp, qSDD, qSDDOp, constOpFamily,
-          constSubMeasFamily, avgOver, uniformDistribution, SubMeas.toOpFamily] using
-          spectral.closeness.squaredDistanceBound
-      exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
+      have hproj := hrounded.projective a
+      simpa [hproj.isHermitian.eq, hproj.idempotent] using
+        (Matrix.posSemidef_conjTranspose_mul_self (q.outcome a)).nonneg
+    · simpa [Qa, QTotal, data] using hsum
+    · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
         (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily q)
-        (spectralTruncationError (2 * ζ)) (roundingToProjectiveError ζ) hraw
-        (spectralTruncationError_two_mul_le_roundingToProjectiveError ζ hζ)
+        (2 * spectralTruncationError ζ) (roundingToProjectiveError ζ)
+        hrounded.closeness
+        (by
+          have hε_nonneg : 0 ≤ spectralTruncationError ζ := spectralTruncationError_nonneg hζ
+          dsimp [roundingToProjectiveError]
+          exact mul_le_mul_of_nonneg_right (by norm_num : (2 : Error) ≤ 12) hε_nonneg)
     · calc
-        QTotal data
-            ≤ (1 : MIPStarRE.Quantum.Op ι) := spectral.projSubMeas.total_le_one
+        QTotal data = q.total := rfl
         _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
-            (1 : MIPStarRE.Quantum.Op ι) := by
-            have hε_nonneg : 0 ≤ spectralTruncationError ζ :=
-              spectralTruncationError_nonneg hζ
-            have hcoeff : (1 : Error) ≤ 1 + 2 * spectralTruncationError ζ := by
-              nlinarith
-            simpa [Complex.ofReal_add, Complex.ofReal_mul] using
-              op_one_le_complex_smul_one_of_real_ge_one
-                (ι := ι) (1 + 2 * spectralTruncationError ζ) hcoeff
+            (1 : MIPStarRE.Quantum.Op ι) := hrounded.total_le
     · change Fintype.card ι ≤ Fintype.card ι
       exact le_rfl
   · letI : IsEmpty Outcome := not_nonempty_iff.mp hOutcome

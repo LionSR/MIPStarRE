@@ -328,6 +328,14 @@ structure SelfImprovementBridgePackage (params : Parameters) [FieldModel params.
         BipartiteSSCRel strategy.state (uniformDistribution Unit)
           (constSubMeasFamily Hhat)
           (selfImprovementHelperError params eps delta)
+  /-- Bridge for the final orthonormalization step on the helper submeasurement. -/
+  orthonormalizationBridge :
+    ∀ {Hhat : SubMeas (Polynomial params) ι},
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta) →
+      OrthonormalizationBridgePackage strategy.state Hhat
+        (selfImprovementHelperError params eps delta)
   evaluationDataProcessing :
     ∀ {Hhat : SubMeas (Polynomial params) ι}
       {H : ProjSubMeas (Polynomial params) ι},
@@ -520,7 +528,8 @@ theorem selfImprovement
         (selfImprovementHelperError params eps delta) :=
     hbridges.helperStrongSelfConsistency hhelper
   rcases orthonormalization strategy.state hbridges.permInvariant Hhat
-      (selfImprovementHelperError params eps delta) hssc with ⟨H, horth⟩
+      (selfImprovementHelperError params eps delta)
+      hssc (hbridges.orthonormalizationBridge hssc) with ⟨H, horth⟩
   have hdata :
       SDDRel strategy.state (uniformDistribution (Point params))
         ((polynomialEvaluationFamily params Hhat).liftLeft)
