@@ -163,7 +163,7 @@
 \end{proof}
 
 \begin{lemma}\label{clm:g-comm-stability}
-	\lean{MIPStarRE.LDT.Commutativity.gCommStability_storedBoundedResidualBound, MIPStarRE.LDT.Commutativity.gCommStability_averagedPoint_le_witness, MIPStarRE.LDT.Commutativity.gCommStability}
+	\lean{MIPStarRE.LDT.Commutativity.gCommStability_storedBoundedResidualBound, MIPStarRE.LDT.Commutativity.gCommStability_averagedPoint_le_witness, MIPStarRE.LDT.Commutativity.gCommStability_overlap}
 	\uses{def:approx_delta}
 	\begin{align}
 		                       & \E_{u,v,x,y} \sum_{a,b}
@@ -176,7 +176,6 @@
 	\end{align}
 \end{lemma}
 \begin{proof}
-	\leanok
 	For each $y \in \F_q$ and $g \in \polyfunc{m}{q}{d}$, define
 	\[
 		R_g^y = \E_{u,x} \sum_a G_a^{u,x} G_g^y G_a^{u,x}.
@@ -197,7 +196,7 @@
 \end{proof}
 
 \begin{lemma}\label{clm:g-comm-stability2}
-	\lean{MIPStarRE.LDT.Commutativity.gCommStability_storedBoundedResidualBound, MIPStarRE.LDT.Commutativity.gCommStability_averagedPoint_le_witness, MIPStarRE.LDT.Commutativity.gCommStabilityTwo}
+	\lean{MIPStarRE.LDT.Commutativity.gCommStability_storedBoundedResidualBound, MIPStarRE.LDT.Commutativity.gCommStability_averagedPoint_le_witness, MIPStarRE.LDT.Commutativity.gCommStabilityTwo_overlap}
 	\uses{def:approx_delta}
 	\begin{align*}
 		                                           & \E_{u,v,x,y} \sum_{a,b}
@@ -208,7 +207,6 @@
 	\end{align*}
 \end{lemma}
 \begin{proof}
-	\leanok
 	\uses{thm:commutativity-points}
 	The difference between the two sides is
 	\begin{align}
