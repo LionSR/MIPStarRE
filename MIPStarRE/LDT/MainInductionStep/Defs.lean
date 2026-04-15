@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
+import MIPStarRE.LDT.Test.Strategy
 
 /-!
 # Section 6 — Definitions
@@ -40,6 +41,8 @@ structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurement :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
+  axisParallelReparamInvariant :
+    AxisParallelEvaluationReparamInvariant params axisParallelMeasurement
   diagonalMeasurement :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params.next) ι
 
@@ -201,6 +204,81 @@ noncomputable def restrictAxisParallelMeasurement (params : Parameters) [FieldMo
           rfl }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
+private theorem restrictAxisParallelMeasurement_postprocess_eval
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params)
+    (ℓ : AxisParallelLine params) (t a : Fq params) :
+    (postprocess ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas)
+      (fun f => f t)).outcome a =
+      (postprocess ((strategy.axisParallelMeasurement
+        (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas)
+        (fun f => f t)).outcome a := by
+  classical
+  let lifted := strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)
+  calc
+    (postprocess ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas)
+        (fun f => f t)).outcome a
+      = ∑ f : AxisLinePolynomial params,
+          if f t = a then lifted.toSubMeas.outcome (liftAxisAnswer params x f) else 0 := by
+            simp [postprocess, restrictAxisParallelMeasurement, lifted, liftAxisAnswer, Finset.sum_filter]
+            apply Finset.sum_congr rfl
+            intro f hf
+            by_cases h : f t = a <;> simp [h]
+    _ = ∑ g : AxisLinePolynomial params.next,
+          if g t = a then lifted.toSubMeas.outcome g else 0 := by
+            simpa [axisLinePolynomialEquiv, liftAxisAnswer, lifted] using
+              (Fintype.sum_equiv (axisLinePolynomialEquiv params x)
+                (fun f : AxisLinePolynomial params =>
+                  if f t = a then lifted.toSubMeas.outcome (liftAxisAnswer params x f) else 0)
+                (fun g : AxisLinePolynomial params.next =>
+                  if g t = a then lifted.toSubMeas.outcome g else 0)
+                (by
+                  intro f
+                  change (if f t = a then
+                      lifted.toSubMeas.outcome (liftAxisAnswer params x f)
+                    else
+                      0) =
+                    if (liftAxisAnswer params x f) t = a then
+                      lifted.toSubMeas.outcome (liftAxisAnswer params x f)
+                    else
+                      0
+                  simp [liftAxisAnswer]))
+    _ = (postprocess (lifted.toSubMeas) (fun f => f t)).outcome a := by
+          simp [postprocess, lifted, Finset.sum_filter]
+          apply Finset.sum_congr rfl
+          intro g hg
+          by_cases h : g t = a <;> simp [h]
+
+private theorem restrictAxisParallelMeasurement_reparamInvariant
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    AxisParallelEvaluationReparamInvariant params
+      (restrictAxisParallelMeasurement params strategy x) := by
+  intro ℓ t a
+  calc
+    (postprocess (((restrictAxisParallelMeasurement params strategy x)
+      (AxisParallelLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a
+      = (postprocess ((strategy.axisParallelMeasurement
+          (AxisParallelLine.appendAtHeight params (AxisParallelLine.rebaseAt ℓ t) x)).toSubMeas)
+          (· zeroCoord)).outcome a := by
+            simpa using
+              restrictAxisParallelMeasurement_postprocess_eval params strategy x
+                (AxisParallelLine.rebaseAt ℓ t) zeroCoord a
+    _ = (postprocess ((strategy.axisParallelMeasurement
+          (AxisParallelLine.rebaseAt (AxisParallelLine.appendAtHeight params ℓ x) t)).toSubMeas)
+          (· zeroCoord)).outcome a := by
+            simp
+    _ = (postprocess ((strategy.axisParallelMeasurement
+          (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas)
+          (fun f => f t)).outcome a := by
+            exact strategy.axisParallelReparamInvariant
+              (AxisParallelLine.appendAtHeight params ℓ x) t a
+    _ = (postprocess (((restrictAxisParallelMeasurement params strategy x) ℓ).toSubMeas)
+          (fun f => f t)).outcome a := by
+            symm
+            simpa using
+              restrictAxisParallelMeasurement_postprocess_eval params strategy x ℓ t a
+
 /-- Restrict a diagonal-line measurement to the slice at height `x` by
 reindexing the ambient family along slice-preserving lines. -/
 noncomputable def restrictDiagonalMeasurement (params : Parameters)
@@ -215,6 +293,8 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
   state := strategy.state
   pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
   axisParallelMeasurement := restrictAxisParallelMeasurement params strategy x
+  axisParallelReparamInvariant :=
+    restrictAxisParallelMeasurement_reparamInvariant params strategy x
   diagonalMeasurement := restrictDiagonalMeasurement params strategy x
 
 @[simp] theorem xRestrictedStrategy_state (params : Parameters)

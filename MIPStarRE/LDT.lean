@@ -5,6 +5,7 @@ import MIPStarRE.LDT.Basic.SubMeasurement
 import MIPStarRE.LDT.Basic.OpFamily
 import MIPStarRE.LDT.Test.Defs
 import MIPStarRE.LDT.Test.Strategy
+import MIPStarRE.LDT.Test.Classical
 import MIPStarRE.LDT.Test.MainTheorem
 import MIPStarRE.LDT.Preliminaries.FiniteFields
 import MIPStarRE.LDT.Preliminaries.Defs

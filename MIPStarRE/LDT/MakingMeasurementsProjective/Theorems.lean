@@ -1156,7 +1156,7 @@ The `[Nonempty Outcome]` assumption is inherited from
 `consistencyToAlmostProjective`. The underlying orthonormalization statement is
 outcome-agnostic, but the current packaged intermediate statement carries an
 explicit matrix witness whose construction picks a distinguished outcome. -/
-lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
+lemma orthonormalizationMainLemma {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
@@ -1174,7 +1174,7 @@ lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
             rcases j with ⟨j₁, j₂⟩
             simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
       ∃ P : ProjSubMeas Outcome (ιA × ιB),
-        RoundedProjMeasStatement.{_, _, uRound}
+        RoundedProjMeasStatement.{_, _, 0}
           ψ A_lifted P
           (orthonormalizationMainLemmaError ζ) := by
   intro hCons
@@ -1186,7 +1186,7 @@ lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
         rcases j with ⟨j₁, j₂⟩
         simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
   have hAlmost :
-      AlmostProjMeasStatement.{_, _, uRound}
+      AlmostProjMeasStatement.{_, _, 0}
         ψ A_lifted
           (consistencyToAlmostProjectiveError ζ) := by
     simpa using
@@ -1194,7 +1194,7 @@ lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
         (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons)
   have hRound :
       ∃ P : ProjSubMeas Outcome (ιA × ιB),
-        RoundedProjMeasStatement.{_, _, uRound}
+        RoundedProjMeasStatement.{_, _, 0}
           ψ A_lifted P
           (roundingToProjectiveError (consistencyToAlmostProjectiveError ζ)) :=
     roundAlmostProjMeas (ψ := ψ)
@@ -1202,7 +1202,8 @@ lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
       (ζ := consistencyToAlmostProjectiveError ζ) hAlmost
   obtain ⟨P, hRounded⟩ := hRound
   refine ⟨P, ?_⟩
-  exact roundedProjMeasStatement_mono hRounded
-    (orthonormalizationMainLemma_error_bound ζ hζ hζ1)
+  simpa [A_lifted] using
+    (roundedProjMeasStatement_mono hRounded
+      (orthonormalizationMainLemma_error_bound ζ hζ hζ1))
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

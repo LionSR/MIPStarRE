@@ -21,6 +21,9 @@
 	\]
 	Here $a$ denotes the prover's point answer.
 \end{theorem}
+\begin{remark}
+	The current Lean declaration \lean{MIPStarRE.LDT.Test.classicalTestSoundness} is derived from the standalone quoted-theorem interface \lean{MIPStarRE.LDT.Test.polishchukSpielmanClassicalSoundness}. In Lean this interface is currently an explicit axiom for the external Polishchuk--Spielman implication. This preserves the paper-faithful theorem statement above while localizing the deferred external dependency to a single named declaration that remains visible to proof-audit tools. Accordingly, this result is not marked \leanok.
+\end{remark}
 \begin{proof}
 	See Polishchuk--Spielman [PS94].
 \end{proof}

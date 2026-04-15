@@ -389,7 +389,7 @@ private lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
                   (((IdxSubMeas.liftRight (diagonalLineAnswerFamily strategy j)) s).outcome a) := by
               intro a
               have hreparam :=
-                hgood.diagonalEvaluationReparam
+                strategy.diagonalReparamInvariant
                   (DiagonalLine.rebaseAt ℓ₀ (subCoord zeroCoord t)) t a
               have hline :
                   ((sampledDiagonalLineEvaluation params strategy) (e (s, t))).outcome a =
