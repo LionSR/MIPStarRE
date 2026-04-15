@@ -361,7 +361,7 @@ def spectralTruncateAlmostProjective {Outcome : Type*}
   The spectral-truncation step from the paper produces projections `R_a` by
   truncating the spectrum of each almost-projective effect `A_a`, and the point
   of issue #279 is precisely that we must connect those `R_a` back to the input
-  measurement `A` via a concrete `ProjSubMeas` and an `SDDRel` bound.
+  measurement `A` via a concrete `ProjSubMeas Outcome ι` and an `SDDRel` bound.
 
   The local matrix witness already tracks the per-outcome spectral truncations,
   but the abstract bridge from that matrix layer back to a `ProjSubMeas Outcome ι`

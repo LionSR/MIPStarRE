@@ -62,11 +62,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Attach to PR branch
+        env:
+          BRANCH: ${{ inputs.head_branch }}
         run: |
           # Checkout put us in detached HEAD at the exact failing SHA.
           # Fetch the remote branch ref (not available after SHA checkout)
           # and create a local branch tracking it so pushes work.
-          BRANCH="${{ inputs.head_branch }}"
           git fetch origin "$BRANCH"
           git checkout -B "$BRANCH" "origin/$BRANCH"
           git branch --set-upstream-to="origin/$BRANCH" "$BRANCH"
@@ -74,7 +75,7 @@ jobs:
       - name: Check for previous auto-fix attempts
         id: loop_guard
         env:
-          # IMPORTANT: This cap is shared with pr-review-auto-fix.yml.
+          # IMPORTANT: This cap is shared with auto-fix.yml.
           # If you change the value or counting regex here, update it there too.
           MAX_BOT_FIX_ITERATIONS: 5
         run: |
@@ -82,7 +83,7 @@ jobs:
           # [claude-review-fix]) to cap the combined iteration loop.
           # Both CI-fix and review-fix workflows share a single budget so
           # interleaved commits cannot reset each other's counters.
-          # See also: pr-review-auto-fix.yml (same logic)
+          # See also: auto-fix.yml (same logic)
           COUNT=0
           while IFS= read -r MSG; do
             if echo "$MSG" | grep -qE '\[claude-(auto|review)-fix\]'; then
@@ -110,10 +111,7 @@ jobs:
 
       - name: Set up Lean toolchain and cache
         if: inputs.setup_lean && steps.loop_guard.outputs.skip != 'true'
-        uses: leanprover/lean-action@v1
-        with:
-          use-mathlib-cache: true
-          build: false
+        uses: ./.github/actions/setup-lean
 
       - name: Get CI failure details
         if: steps.loop_guard.outputs.skip != 'true'

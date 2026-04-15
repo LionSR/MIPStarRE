@@ -1526,12 +1526,64 @@ private lemma switcheroo_second_term_close
           simp [avgOver, uniformDistribution]
           field_simp [hq0]
 
+/-- Raw SDD bound for completed-part pairs: marginalizes the completed-part
+self-consistency bound over `SlicePairQuestion` via `avgOver_uniform_fst`.
+Used as infrastructure for the commutativitySwitcheroo cross-term chain (issue #298). -/
+private lemma switcheroo_complete_part_pair_raw_sdd
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
+    avgOver (uniformDistribution (SlicePairQuestion params))
+      (fun q =>
+        qSDDCore ψbi
+          (fun g : Polynomial params =>
+            leftTensor (ι₂ := ι) ((family.meas q.1).outcome g))
+          (fun g : Polynomial params =>
+            rightTensor (ι₁ := ι) ((family.meas q.1).outcome g))) ≤ zeta := by
+  calc
+    avgOver (uniformDistribution (SlicePairQuestion params))
+        (fun q =>
+          qSDDCore ψbi
+            (fun g : Polynomial params =>
+              leftTensor (ι₂ := ι) ((family.meas q.1).outcome g))
+            (fun g : Polynomial params =>
+              rightTensor (ι₁ := ι) ((family.meas q.1).outcome g)))
+      = avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            qSDDCore ψbi
+              (fun g : Polynomial params =>
+                leftTensor (ι₂ := ι) ((family.meas x).outcome g))
+              (fun g : Polynomial params =>
+                rightTensor (ι₁ := ι) ((family.meas x).outcome g))) := by
+            simpa [SlicePairQuestion] using
+              (avgOver_uniform_fst (α := SliceQuestion params)
+                (β := SliceQuestion params)
+                (f := fun x =>
+                  qSDDCore ψbi
+                    (fun g : Polynomial params =>
+                      leftTensor (ι₂ := ι) ((family.meas x).outcome g))
+                    (fun g : Polynomial params =>
+                      rightTensor (ι₁ := ι) ((family.meas x).outcome g))))
+    _ = avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            qSDD ψbi
+              ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
+              ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x)) := by
+            apply avgOver_congr
+            intro x
+            simp [qSDD, qSDDCore, IdxProjSubMeas.toIdxSubMeas,
+              IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
+              SubMeas.liftLeft, SubMeas.liftRight]
+    _ ≤ zeta := hselfG.completePartSelfConsistency.squaredDistanceBound
+
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (hnorm : ψbi.IsNormalized)
-    (hperm : PermInvState ψbi)
+    (_hperm : PermInvState ψbi)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta omega chi : Error)
@@ -1562,94 +1614,56 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
 
   This avoids inserting an extra symmetry assumption on `ψbi` at this stage.
   -/
+  refine ⟨?_⟩
   let 𝒟x : Distribution (SliceQuestion params) :=
     uniformDistribution (SliceQuestion params)
-  let Gavg : SubMeas (Polynomial params) ι := IdxPolyFamily.averagedSubMeas family
-  let Mavg : SubMeas Outcome ι :=
-    averageIdxSubMeas 𝒟x (IdxProjSubMeas.toIdxSubMeas M)
-      (uniformDistribution_weight_sum_le_one (SliceQuestion params))
-  have h𝒟x : ∑ x ∈ 𝒟x.support, 𝒟x.weight x ≤ 1 := by
-    simpa [𝒟x] using uniformDistribution_weight_sum_le_one (SliceQuestion params)
-  have hselfM_bip := switcherooSelfConsistency_bip params ψbi M omega hselfM
-  let firstTerm : Error :=
-    MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x M Gavg.total
+  let firstTerm :=
+    avgOver 𝒟x (fun x =>
+      Preliminaries.leftSandwichExpectation ψbi 𝒟x M
+        ((completePartSubMeas params family x).total))
+  let secondTerm :=
+    avgOver 𝒟x (fun y =>
+      Preliminaries.leftSandwichExpectation ψbi 𝒟x family.meas
+        (((M y).toSubMeas).total))
+  let thirdTerm := switcherooAggregateThirdTerm params ψbi family M
+  let fourthTerm := switcherooAggregateFourthTerm params ψbi family M
   let centerGM : Error :=
-    MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x M Gavg.total
-  have hfirst :
-      |firstTerm - centerGM| ≤ 2 * Real.sqrt omega := by
-    have hswitch :=
-      MIPStarRE.LDT.Preliminaries.switchSandwich ψbi 𝒟x hnorm h𝒟x M Gavg.total
-        ⟨Gavg.total_nonneg, sub_nonneg.mpr Gavg.total_le_one⟩ omega hselfM_bip
-    simpa [firstTerm, centerGM] using hswitch.leftSandwichTransfer
-  let secondTerm : Error :=
-    MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi 𝒟x
-      (fun x =>
-        { toSubMeas := completePartSubMeas params family x
-          proj := by
-            intro u
-            cases u
-            have hsingle :
-                (completePartSubMeas params family x).outcome () =
-                  (completePartSubMeas params family x).total := by
-              rw [← (completePartSubMeas params family x).sum_eq_total]
-              simp [completePartSubMeas]
-            rw [hsingle]
-            simpa [completePartSubMeas, postprocess_total] using
-              MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x) })
-      Mavg.total
+    avgOver 𝒟x (fun x =>
+      Preliminaries.middleSandwichExpectation ψbi 𝒟x M
+        ((completePartSubMeas params family x).total))
   let centerMG : Error :=
-    MIPStarRE.LDT.Preliminaries.middleSandwichExpectation ψbi 𝒟x
-      (fun x =>
-        { toSubMeas := completePartSubMeas params family x
-          proj := by
-            intro u
-            cases u
-            have hsingle :
-                (completePartSubMeas params family x).outcome () =
-                  (completePartSubMeas params family x).total := by
-              rw [← (completePartSubMeas params family x).sum_eq_total]
-              simp [completePartSubMeas]
-            rw [hsingle]
-            simpa [completePartSubMeas, postprocess_total] using
-              MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x) })
-      Mavg.total
-  have hMavg_bounded : MIPStarRE.LDT.Preliminaries.OpBounded01 Mavg.total := by
-    exact ⟨Mavg.total_nonneg, sub_nonneg.mpr Mavg.total_le_one⟩
-  -- Step 2: Bound |secondTerm - centerMG| ≤ 2√ζ via switchSandwich
-  -- on the one-outcome complete-part family with Mavg.total as bounded operator.
-  have hselfG_bip :
-      Preliminaries.BipartiteSDDRel ψbi 𝒟x
-        (IdxProjSubMeas.toIdxSubMeas (completePartProjFamily params family))
-        (IdxProjSubMeas.toIdxSubMeas (completePartProjFamily params family))
-        zeta :=
-    switcherooSelfConsistency_bip params ψbi
-      (completePartProjFamily params family) zeta
-      (completePartProjFamily_selfConsistency_generic params ψbi family zeta hselfG)
-  have hswitch_second :=
-    MIPStarRE.LDT.Preliminaries.switchSandwich ψbi 𝒟x hnorm h𝒟x
-      (completePartProjFamily params family) Mavg.total
-      hMavg_bounded zeta hselfG_bip
+    avgOver 𝒟x (fun y =>
+      Preliminaries.middleSandwichExpectation ψbi 𝒟x family.meas
+        (((M y).toSubMeas).total))
+  have hfirst : |firstTerm - centerGM| ≤ 2 * Real.sqrt omega := by
+    simpa [firstTerm, centerGM] using
+      switcheroo_first_term_close params ψbi hnorm family M omega hselfM
   have hsecond : |secondTerm - centerMG| ≤ 2 * Real.sqrt zeta := by
-    simpa [secondTerm, centerMG, completePartProjFamily] using
-      hswitch_second.leftSandwichTransfer
-  -- Step 3: The four-term expansion gives
-  --   sddErrorOp = T1 + T2 - T3 - T4
-  -- where T1 = switcherooAggregateFirstTerm (close to centerGM by 2√ω),
-  --       T2 = switcherooAggregateSecondTerm (close to centerMG by 2√ζ),
-  --       T3, T4 = cross-terms requiring CST argument from paper.
-  -- Paper reference: `lem:commutativity-switcheroo` in ld-pasting.tex.
-  -- The cross-term bounds |T3 - centerGM| ≤ 2√ζ + 2√ω + 2√χ and
-  -- |T4 - centerMG| ≤ 2√ζ + 2√ω + 2√χ use:
-  --   (a) decompose G^x = Σ_g G^x_g, swap G_g past M_o (error √χ from hcomm),
-  --   (b) move G_g across tensor boundary (error √ζ from hselfG),
-  --   (c) move G_g back across tensor from the other side (error √ζ from hselfG),
-  --   (d) swap G_g past M_o again (error √χ from hcomm),
-  --   (e) apply switchSandwich with M self-consistency (error 2√ω from hselfM).
-  -- Total: 2√ω + 2√ζ + 2(2√ζ + 2√ω + 2√χ) = 6√ζ + 6√ω + 4√χ.
-  -- Note: the two-center strategy (pairing T1,T3 with centerGM and T2,T4
-  -- with centerMG) means the centers cancel algebraically in the final
-  -- triangle inequality, so hperm is not needed at this stage.
-  -- (hperm is used downstream, e.g., in sddOpRel_swap_questions.)
+    simpa [secondTerm, centerMG] using
+      switcheroo_second_term_close params ψbi hnorm family M zeta hselfG
+  have hexpand := switcherooAggregate_qSDDOp_expand_avg params ψbi family M
+  have hthird_eq : thirdTerm = fourthTerm := by
+    simpa [thirdTerm, fourthTerm] using
+      switcherooAggregateThirdTerm_eq_fourthTerm params ψbi family M
+  constructor
+  unfold sddErrorOp
+  rw [hexpand]
+  /-
+  Remaining blocker: the paper's cross-term chain is not yet packaged as local Lean
+  lemmas. What is still needed is a lower bound showing that the negative terms are
+  close to the matching centers, e.g.
+
+    thirdTerm ≥ centerGM - (2 * √zeta + 2 * √omega + 2 * √chi)
+    fourthTerm ≥ centerMG - (2 * √zeta + 2 * √omega + 2 * √chi),
+
+  obtained by composing:
+  1. `hcomm` through `cabApproxDelta_raw` / closeness-of-inner-product,
+  2. two `hselfG` transfers across the tensor boundary,
+  3. the existing `switcheroo_first_term_close` / `switcheroo_second_term_close`.
+
+  Once those cross-term lemmas are available, the final arithmetic is immediate from
+  `hexpand`, `hfirst`, and `hsecond`.
+  -/
   sorry
 
 /-- Reindexing a uniform slice-pair average along `Prod.swap` preserves `SDDOpRel`. -/
@@ -2409,7 +2423,8 @@ theorem commutingWithGComplete
       CommutativitySwitcherooStatement params strategy.state family family.meas
         zeta zeta (pairwiseCompletePartCommutationError params gamma zeta) := by
     simpa [pairwiseCompletePartCommutationError] using
-      commutativitySwitcheroo params strategy.state hnorm strategy.permInvState family family.meas zeta zeta
+      commutativitySwitcheroo params strategy.state hnorm strategy.permInvState
+        family family.meas zeta zeta
         (Commutativity.comMainError params gamma zeta)
         hself hself.completePartSelfConsistency hcom.fullSliceCommutation
   have hpoint_raw :
@@ -3105,6 +3120,49 @@ theorem gHatFacts
                     simp [gHatCommutationError, sixteenthSum]
                     ring
 
+/-! ### Bridge lemmas for the sandwich chain
+
+These lemmas capture the infrastructure needed for the `lem:commute-g-half-sandwich`
+through `cor:h-a-consistency` chain in `ld-pasting.tex` §9.3.
+
+The n-step SDDOpRel composition lemma (`sddOpRel_chain`) now lives in
+`Preliminaries.Theorems` alongside `sddOpRel_triangle`, since it is a
+general-purpose result used by multiple chapters. -/
+
+/-- Bridge: the staged move-commute-move chain for `commuteGHalfSandwich`.
+
+Constructs the sequence of `3k` intermediate bipartite operator families
+that arise from repeatedly moving `Ĝ₁` through the product
+`Ĝ₁ · Ĝ₂ · ⋯ · Ĝₖ` using self-consistency (move to right tensor,
+error `2ζ`) and pairwise commutation (swap past neighbor, error `ν₃`),
+then composes them via `sddOpRel_chain`.
+
+Paper reference: `lem:commute-g-half-sandwich` computation in
+`ld-pasting.tex` lines 881–914. -/
+private lemma commuteGHalfSandwich_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (k : ℕ) (hk : 2 ≤ k)
+    (hzeta_le : zeta ≤ 1)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta))
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (PointTuple params k))
+      (gHatHalfSandwichLeft params family k)
+      (gHatHalfSandwichRight params family k)
+      (commuteGHalfSandwichError params gamma zeta k) := by
+  sorry
+
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
     (params : Parameters)
@@ -3114,13 +3172,50 @@ lemma commuteGHalfSandwich
     (gamma zeta : Error)
     (k : ℕ)
     (hk : 2 ≤ k)
+    (hzeta_le : zeta ≤ 1)
     (hfacts : GHatFactsStatement params ψbi family gamma zeta) :
     CommuteGHalfSandwichStatement params ψbi family gamma zeta k := by
-  /-
-  Deferred core argument from `lem:commute-g-half-sandwich` in
-  `references/ldt-paper/ld-pasting.tex`.
-  The proof iterates the `\widehat G` commutation bound across the half-sandwich.
-  -/
+  exact ⟨commuteGHalfSandwich_core params ψbi family gamma zeta k hk
+    hzeta_le hfacts.completedSelfConsistency hfacts.completedCommutation⟩
+
+/-- Bridge: Cauchy-Schwarz sandwich elimination for one-point consistency.
+
+Given the half-sandwich commutation bound from `commuteGHalfSandwich`, performs
+the Cauchy-Schwarz + measurement-completeness argument that converts the
+sandwiched operator distance into a one-point consistency bound.
+
+Paper reference: `lem:ld-sandwich-line-one-point` proof in
+`ld-pasting.tex` lines 931–1036.
+
+Steps:
+1. Simplify by summing out indices `> i` using measurement completeness
+2. Apply Cauchy-Schwarz with `commuteGHalfSandwich` to move `Ĝ₁` left
+3. Apply Cauchy-Schwarz again to move `Ĝ₁` right
+4. Eliminate `Ĝ_{<i}` product using measurement completeness
+5. Reduce to the single-slice bound `eq:ld-gbcon` -/
+private lemma ldSandwichLineOnePoint_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (hcomm : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params strategy.state family
+        gamma zeta j)
+    (k i : ℕ) (hi : i < k) :
+    ConsRel strategy.state
+      (uniformDistribution (SandwichedLineQuestion params k))
+      (ldSandwichLineOnePointLeftFamily params strategy family k i)
+      (ldSandwichLineOnePointRightFamily params strategy family k i)
+      (ldSandwichLineOnePointError params eps delta gamma zeta k) := by
   sorry
 
 /-- `lem:ld-sandwich-line-one-point`. -/
@@ -3129,7 +3224,11 @@ lemma ldSandwichLineOnePoint
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -3137,18 +3236,51 @@ lemma ldSandwichLineOnePoint
     (hfacts : GHatFactsStatement params strategy.state family gamma zeta)
     (k i : ℕ)
     (hi : i < k) :
-    LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i := by
+    LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
   have hcomm :
       ∀ j : ℕ, 2 ≤ j →
-        CommuteGHalfSandwichStatement params strategy.state family gamma zeta j := by
+        CommuteGHalfSandwichStatement params strategy.state family
+          gamma zeta j := by
     intro j hj
-    exact commuteGHalfSandwich params strategy.state family gamma zeta j hj hfacts
-  /-
-  Deferred core argument from `lem:ld-sandwich-line-one-point` in
-  `references/ldt-paper/ld-pasting.tex`.
-  This is the one-point comparison between the sandwiched completed-slice outcome
-  and the vertical-line measurement.
-  -/
+    exact commuteGHalfSandwich params strategy.state family gamma zeta
+      j hj hzeta_le hfacts
+  exact ⟨ldSandwichLineOnePoint_core params strategy eps delta gamma zeta
+    hnorm hgood hgamma_le hzeta_le hdq_le
+    family hcons hself hbound hcomm k i hi⟩
+
+/-- Bridge: aggregate one-point consistency bounds over all slice indices,
+plus the distinct-tuple approximation error.
+
+Paper reference: `lem:h-b-consistency` proof in `ld-pasting.tex`
+lines 1050–1091.
+
+Steps:
+1. Expand using degree constraints to find eligible index `i`
+2. Switch from independent to distinct samples (`prop:ld-dnoteq`, cost `k²/q`)
+3. Union bound over `k` indices, each contributing `ν₅`
+4. Total: `k·ν₅ + k²/q ≤ 44k²m(...)` -/
+private lemma hBConsistency_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    ConsRel strategy.state
+      (uniformDistribution (VerticalLineQuestion params))
+      (hRestrictionToVerticalLine params
+        (constructedPastedSubMeas params family k))
+      (verticalLineMeasurementFamily params strategy)
+      (hBConsistencyError params eps delta gamma zeta k) := by
   sorry
 
 /-- `lem:h-b-consistency`. -/
@@ -3157,6 +3289,7 @@ lemma hBConsistency
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -3164,13 +3297,53 @@ lemma hBConsistency
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hline : ∀ i : ℕ, i < k →
-      LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i) :
-    HBConsistencyStatement params strategy family eps delta gamma zeta k := by
-  /-
-  Deferred packaging argument after `lem:ld-sandwich-line-one-point` in
-  `references/ldt-paper/ld-pasting.tex`; this is the `lem:h-b-consistency`
-  aggregation over all slice locations.
-  -/
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    HBConsistencyStatement params strategy family
+        eps delta gamma zeta k := by
+  exact ⟨hBConsistency_core params strategy eps delta gamma zeta
+    hnorm hgood family hcons hself hbound k hline⟩
+
+/-- Bridge: convert vertical-line consistency to point consistency.
+
+Given `hHB : HBConsistencyStatement` (the output of `hBConsistency`), derives
+point consistency by restricting the vertical-line bound to individual points.
+
+Paper reference: `cor:h-a-consistency` proof in `ld-pasting.tex`
+lines 1098–1117.
+
+Steps:
+1. Restrict `hHB.lineConsistency` to a single point on the line
+2. Apply `triangleSub` with the `A-B` consistency bound from `hgood`
+3. Error bound: `ν₆ + √(8mε + 4δ) ≤ 47k²m(...) ≤ 100k²m(...)` -/
+private lemma hAConsistency_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (hcomplete : family.Complete strategy.state kappa)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k)
+    (hHB : HBConsistencyStatement params strategy family
+        eps delta gamma zeta k) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedSubMeas params family k))
+        (MainInductionStep.ldPastingInInductionError params k
+          eps delta gamma kappa zeta) ∧
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedMeasurement params family k).toSubMeas)
+        (MainInductionStep.ldPastingInInductionError params k
+          eps delta gamma kappa zeta) := by
   sorry
 
 /-- `cor:h-a-consistency`.
@@ -3182,7 +3355,11 @@ theorem hAConsistency
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -3192,7 +3369,8 @@ theorem hAConsistency
     (hk : 400 * params.m * params.d ≤ k) :
     ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next (constructedPastedSubMeas params family k))
+        (polynomialEvaluationFamily params.next
+          (constructedPastedSubMeas params family k))
         (MainInductionStep.ldPastingInInductionError params k
           eps delta gamma kappa zeta) ∧
       ConsRel strategy.state (uniformDistribution (Point params.next))
@@ -3201,7 +3379,34 @@ theorem hAConsistency
           (constructedPastedMeasurement params family k).toSubMeas)
         (MainInductionStep.ldPastingInInductionError params k
           eps delta gamma kappa zeta) := by
-  sorry
+  have hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
+    have hfacts : GHatFactsStatement params strategy.state family gamma zeta := by
+      /-
+      TODO(#299): derive the full `GHatFactsStatement` package here.
+
+      The available local hypotheses already provide the inputs for the
+      one-point sandwich lemma once `hfacts` is available:
+      `hgood`, `hcons`, `hself`, and `hbound`.
+
+      Constructing `hfacts` itself must package the earlier chain
+      `gCompleteSelfConsistency → gBotSelfConsistency →
+      Commutativity.comMain → commutingWithGComplete →
+      commutingWithGIncomplete → gHatFacts` from the now-threaded local
+      hypotheses `hnorm`, `hgood`, `hcons`, `hself`, `hbound`,
+      `hgamma_le`, `hzeta_le`, and `hdq_le`.
+      -/
+      sorry
+    intro i hi
+    exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
+      hnorm hgood hgamma_le hzeta_le hdq_le
+      family hcons hself hbound hfacts k i hi
+  have hHB := hBConsistency params strategy eps delta gamma zeta
+    hnorm hgood family hcons hself hbound k hline
+  exact hAConsistency_core params strategy family
+    eps delta gamma kappa zeta hnorm hgood hgamma_le hzeta_le hdq_le
+    hcomplete k hk hHB
 
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
@@ -3209,7 +3414,11 @@ lemma overAllOutcomes
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -3228,10 +3437,179 @@ lemma overAllOutcomes
   Requires: Schwartz-Zippel infrastructure, distinct → uniform swap lemma. -/
   sorry
 
+
 /-- `lem:truncated-type-sum-recurrence`.
 
 This is the source-style recurrence for the truncated type sums that appear in
 the `fromHToG` reduction. -/
+
+private lemma gHatTypeWeight_le {k : ℕ} (τ : GHatType k) :
+    gHatTypeWeight τ ≤ k := by
+  unfold gHatTypeWeight
+  simpa using (Finset.card_filter_le
+    (s := (Finset.univ : Finset (Fin k)))
+    (p := fun i : Fin k => τ i))
+
+private lemma finCons_eq_prependTypeBit {k : ℕ} (b : Bool) (τ : GHatType k) :
+    ((Fin.cons b τ : GHatType (k + 1))) = prependTypeBit b τ := by
+  funext i
+  cases i using Fin.cases with
+  | zero => rfl
+  | succ j => rfl
+
+private lemma gHatTypeWeight_prepend_true {k : ℕ} (τ : GHatType k) :
+    gHatTypeWeight (prependTypeBit true τ) = gHatTypeWeight τ + 1 := by
+  rw [← finCons_eq_prependTypeBit true τ]
+  unfold gHatTypeWeight
+  simpa [Fin.cons_zero, Fin.cons_succ, add_comm] using
+    (Fin.card_filter_univ_succ
+      (n := k) (p := fun i : Fin (k + 1) => (Fin.cons true τ : GHatType (k + 1)) i = true))
+
+private lemma gHatTypeWeight_prepend_false {k : ℕ} (τ : GHatType k) :
+    gHatTypeWeight (prependTypeBit false τ) = gHatTypeWeight τ := by
+  rw [← finCons_eq_prependTypeBit false τ]
+  unfold gHatTypeWeight
+  simpa [Fin.cons_zero, Fin.cons_succ] using
+    (Fin.card_filter_univ_succ
+      (n := k) (p := fun i : Fin (k + 1) => (Fin.cons false τ : GHatType (k + 1)) i = true))
+
+private lemma gHatTypeWeight_fin_cons_true {k : ℕ} (τ : GHatType k) :
+    gHatTypeWeight (Fin.cons true τ : GHatType (k + 1)) = gHatTypeWeight τ + 1 := by
+  simpa [finCons_eq_prependTypeBit] using gHatTypeWeight_prepend_true τ
+
+private lemma gHatTypeWeight_fin_cons_false {k : ℕ} (τ : GHatType k) :
+    gHatTypeWeight (Fin.cons false τ : GHatType (k + 1)) = gHatTypeWeight τ := by
+  simpa [finCons_eq_prependTypeBit] using gHatTypeWeight_prepend_false τ
+
+private lemma gHatTypeOperator_nonneg
+    (G : MIPStarRE.Quantum.Op ι)
+    (hGpsd : 0 ≤ G)
+    (hGleOne : G ≤ 1)
+    {k : ℕ} (τ : GHatType k) :
+    0 ≤ gHatTypeOperator G τ := by
+  have hcomm : Commute G (1 - G) :=
+    (Commute.one_right G).sub_right (Commute.refl G)
+  have hGpow : 0 ≤ G ^ gHatTypeWeight τ := by
+    exact (Matrix.PosSemidef.pow (Matrix.nonneg_iff_posSemidef.mp hGpsd) _).nonneg
+  have hIGpow : 0 ≤ (1 - G) ^ (k - gHatTypeWeight τ) := by
+    exact
+      (Matrix.PosSemidef.pow
+        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hGleOne)) _).nonneg
+  have hcommPow : Commute (G ^ gHatTypeWeight τ) ((1 - G) ^ (k - gHatTypeWeight τ)) :=
+    (hcomm.pow_left _).pow_right _
+  exact Commute.mul_nonneg hGpow hIGpow hcommPow
+
+private lemma gHatTypeOperator_prepend_true
+    (G : MIPStarRE.Quantum.Op ι)
+    {k : ℕ} (τ : GHatType k) :
+    gHatTypeOperator G (prependTypeBit true τ) = gHatTypeOperator G τ * G := by
+  have hcomm : Commute G (1 - G) :=
+    (Commute.one_right G).sub_right (Commute.refl G)
+  have hsub : k + 1 - (gHatTypeWeight τ + 1) = k - gHatTypeWeight τ := by
+    have hweight_le : gHatTypeWeight τ ≤ k := gHatTypeWeight_le τ
+    omega
+  unfold gHatTypeOperator
+  rw [gHatTypeWeight_prepend_true, hsub, pow_succ]
+  calc
+    (G ^ gHatTypeWeight τ * G) * (1 - G) ^ (k - gHatTypeWeight τ)
+      = G ^ gHatTypeWeight τ * (G * (1 - G) ^ (k - gHatTypeWeight τ)) := by
+          simp [mul_assoc]
+    _ = G ^ gHatTypeWeight τ * ((1 - G) ^ (k - gHatTypeWeight τ) * G) := by
+          rw [(hcomm.pow_right _).eq]
+    _ = (G ^ gHatTypeWeight τ * (1 - G) ^ (k - gHatTypeWeight τ)) * G := by
+          simp [mul_assoc]
+
+private lemma gHatTypeOperator_prepend_false
+    (G : MIPStarRE.Quantum.Op ι)
+    {k : ℕ} (τ : GHatType k) :
+    gHatTypeOperator G (prependTypeBit false τ) = gHatTypeOperator G τ * (1 - G) := by
+  have hsub : k + 1 - gHatTypeWeight τ = k - gHatTypeWeight τ + 1 := by
+    have hweight_le : gHatTypeWeight τ ≤ k := gHatTypeWeight_le τ
+    omega
+  unfold gHatTypeOperator
+  rw [gHatTypeWeight_prepend_false, hsub, pow_succ]
+  simp [mul_assoc]
+
+private lemma gHatTypeOperator_fin_cons_true
+    (G : MIPStarRE.Quantum.Op ι)
+    {k : ℕ} (τ : GHatType k) :
+    gHatTypeOperator G (Fin.cons true τ : GHatType (k + 1)) = gHatTypeOperator G τ * G := by
+  simpa [finCons_eq_prependTypeBit] using gHatTypeOperator_prepend_true G τ
+
+private lemma gHatTypeOperator_fin_cons_false
+    (G : MIPStarRE.Quantum.Op ι)
+    {k : ℕ} (τ : GHatType k) :
+    gHatTypeOperator G (Fin.cons false τ : GHatType (k + 1)) =
+      gHatTypeOperator G τ * (1 - G) := by
+  simpa [finCons_eq_prependTypeBit] using gHatTypeOperator_prepend_false G τ
+
+/-- The full sum of type operators equals the identity.
+
+This is the commuting binomial expansion
+`∑ τ : GHatType k, G ^ |τ| * (1 - G) ^ (k - |τ|) = (G + (1 - G))^k = 1`. -/
+private lemma full_gHatType_sum_eq_one
+    (G : MIPStarRE.Quantum.Op ι) :
+    ∀ prefixLen : ℕ, ∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix = 1
+  | 0 => by
+      simp [gHatTypeOperator, gHatTypeWeight]
+  | prefixLen + 1 => by
+      have hsplit :
+          (∑ τprefix : GHatType (prefixLen + 1),
+              gHatTypeOperator G τprefix) =
+            ∑ p : Bool × GHatType prefixLen,
+              gHatTypeOperator G (Fin.cons p.1 p.2) := by
+        exact (Fintype.sum_equiv
+          ((Fin.consEquiv (fun _ : Fin (prefixLen + 1) => Bool)).symm)
+          (fun τprefix => gHatTypeOperator G τprefix)
+          (fun p => gHatTypeOperator G (Fin.cons p.1 p.2))
+          (by
+            intro τprefix
+            simp))
+      have hprod :
+          (∑ p : Bool × GHatType prefixLen,
+              gHatTypeOperator G (Fin.cons p.1 p.2)) =
+            ∑ b : Bool,
+              ∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G (Fin.cons b τprefix) := by
+        simpa using
+          (Fintype.sum_prod_type'
+            (f := fun b τprefix => gHatTypeOperator G (Fin.cons b τprefix)))
+      calc
+        ∑ τprefix : GHatType (prefixLen + 1), gHatTypeOperator G τprefix
+          = ∑ p : Bool × GHatType prefixLen,
+              gHatTypeOperator G (Fin.cons p.1 p.2) := hsplit
+        _ = ∑ b : Bool,
+              ∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G (Fin.cons b τprefix) := hprod
+        _ =
+            (∑ τprefix : GHatType prefixLen,
+              gHatTypeOperator G (Fin.cons true τprefix)) +
+              ∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G (Fin.cons false τprefix) := by
+                rw [Fintype.sum_bool]
+        _ =
+            (∑ τprefix : GHatType prefixLen,
+              gHatTypeOperator G (prependTypeBit true τprefix)) +
+              ∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G (prependTypeBit false τprefix) := by
+                simp [finCons_eq_prependTypeBit]
+        _ =
+            (∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix * G) +
+              ∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G τprefix * (1 - G) := by
+                simp_rw [gHatTypeOperator_prepend_true, gHatTypeOperator_prepend_false]
+        _ =
+            (∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix) * G +
+              (∑ τprefix : GHatType prefixLen,
+                gHatTypeOperator G τprefix) * (1 - G) := by
+                rw [Finset.sum_mul, Finset.sum_mul]
+        _ = 1 * G + 1 * (1 - G) := by
+              simpa [full_gHatType_sum_eq_one G prefixLen]
+        _ = 1 := by
+              have hcancel : G + (1 - G) = (1 : MIPStarRE.Quantum.Op ι) := by
+                abel
+              simpa [one_mul] using hcancel
+
 theorem truncatedTypeSumRecurrence
     (G : MIPStarRE.Quantum.Op ι)
     (hGpsd : 0 ≤ G)
@@ -3249,7 +3627,165 @@ theorem truncatedTypeSumRecurrence
   `lem:truncated-type-sum-recurrence`.
   The proof is the commuting-polynomial argument in `G` and `I - G`.
   -/
-  sorry
+  have hnonneg :
+      0 ≤ truncatedTypeSums G d prefixLen τtail := by
+    unfold truncatedTypeSums
+    refine Finset.sum_nonneg ?_
+    intro τprefix _
+    split_ifs with hcond
+    · exact gHatTypeOperator_nonneg G hGpsd hGleOne τprefix
+    · simp
+  have hle_one :
+      truncatedTypeSums G d prefixLen τtail ≤ 1 := by
+    calc
+      truncatedTypeSums G d prefixLen τtail
+        ≤ ∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix := by
+            unfold truncatedTypeSums
+            refine Finset.sum_le_sum ?_
+            intro τprefix _
+            split_ifs with hcond
+            · exact le_rfl
+            · exact gHatTypeOperator_nonneg G hGpsd hGleOne τprefix
+      _ = 1 := full_gHatType_sum_eq_one G prefixLen
+  have hherm :
+      (truncatedTypeSums G d prefixLen τtail)ᴴ = truncatedTypeSums G d prefixLen τtail := by
+    exact (Matrix.nonneg_iff_posSemidef.mp hnonneg).isHermitian.eq
+  have hsplit :
+      truncatedTypeSums G d (prefixLen + 1) τtail =
+        ∑ p : Bool × GHatType prefixLen,
+          if d + 1 ≤ gHatTypeWeight (Fin.cons p.1 p.2) + gHatTypeWeight τtail then
+            gHatTypeOperator G (Fin.cons p.1 p.2)
+          else (0 : MIPStarRE.Quantum.Op ι) := by
+    unfold truncatedTypeSums
+    exact (Fintype.sum_equiv
+      ((Fin.consEquiv (fun _ : Fin (prefixLen + 1) => Bool)).symm)
+      (fun τprefix =>
+        if d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight τtail then
+          gHatTypeOperator G τprefix
+        else (0 : MIPStarRE.Quantum.Op ι))
+      (fun p =>
+        if d + 1 ≤ gHatTypeWeight (Fin.cons p.1 p.2) + gHatTypeWeight τtail then
+          gHatTypeOperator G (Fin.cons p.1 p.2)
+        else (0 : MIPStarRE.Quantum.Op ι))
+      (by
+        intro τprefix
+        simp))
+  have hprod :
+      (∑ p : Bool × GHatType prefixLen,
+          if d + 1 ≤ gHatTypeWeight (Fin.cons p.1 p.2) + gHatTypeWeight τtail then
+            gHatTypeOperator G (Fin.cons p.1 p.2)
+          else (0 : MIPStarRE.Quantum.Op ι)) =
+        ∑ b : Bool,
+          ∑ τprefix : GHatType prefixLen,
+            if d + 1 ≤ gHatTypeWeight (Fin.cons b τprefix) + gHatTypeWeight τtail then
+              gHatTypeOperator G (Fin.cons b τprefix)
+            else (0 : MIPStarRE.Quantum.Op ι) := by
+    simpa using
+      (Fintype.sum_prod_type' (f := fun b τprefix =>
+        if d + 1 ≤ gHatTypeWeight (Fin.cons b τprefix) + gHatTypeWeight τtail then
+          gHatTypeOperator G (Fin.cons b τprefix)
+        else (0 : MIPStarRE.Quantum.Op ι)))
+  have htrue :
+      (∑ τprefix : GHatType prefixLen,
+          (if d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) + gHatTypeWeight τtail then
+            gHatTypeOperator G (Fin.cons true τprefix)
+          else (0 : MIPStarRE.Quantum.Op ι))) =
+        truncatedTypeSums G d prefixLen (prependTypeBit true τtail) * G := by
+    calc
+      (∑ τprefix : GHatType prefixLen,
+          (if d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) + gHatTypeWeight τtail then
+            gHatTypeOperator G (Fin.cons true τprefix)
+          else (0 : MIPStarRE.Quantum.Op ι)))
+        =
+          ∑ τprefix : GHatType prefixLen,
+            ((if d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight (prependTypeBit true τtail) then
+              gHatTypeOperator G τprefix
+            else (0 : MIPStarRE.Quantum.Op ι)) * G) := by
+              refine Finset.sum_congr rfl ?_
+              intro τprefix _
+              have hcond :
+                  (d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) + gHatTypeWeight τtail) ↔
+                    (d + 1 ≤ gHatTypeWeight τprefix +
+                      gHatTypeWeight (prependTypeBit true τtail)) := by
+                rw [gHatTypeWeight_fin_cons_true, gHatTypeWeight_prepend_true]
+                omega
+              by_cases h : d + 1 ≤ gHatTypeWeight τprefix +
+                  gHatTypeWeight (prependTypeBit true τtail)
+              · have h' :
+                    d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) +
+                      gHatTypeWeight τtail :=
+                  hcond.mpr h
+                simpa [h, h'] using gHatTypeOperator_fin_cons_true G τprefix
+              · have h' :
+                    ¬ d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) +
+                      gHatTypeWeight τtail := by
+                  exact fun h' => h (hcond.mp h')
+                simp [h, h']
+      _ = truncatedTypeSums G d prefixLen (prependTypeBit true τtail) * G := by
+            unfold truncatedTypeSums
+            rw [Finset.sum_mul]
+  have hfalse :
+      (∑ τprefix : GHatType prefixLen,
+          (if d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) + gHatTypeWeight τtail then
+            gHatTypeOperator G (Fin.cons false τprefix)
+          else (0 : MIPStarRE.Quantum.Op ι))) =
+        truncatedTypeSums G d prefixLen (prependTypeBit false τtail) * (1 - G) := by
+    calc
+      (∑ τprefix : GHatType prefixLen,
+          (if d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) + gHatTypeWeight τtail then
+            gHatTypeOperator G (Fin.cons false τprefix)
+          else (0 : MIPStarRE.Quantum.Op ι)))
+        =
+          ∑ τprefix : GHatType prefixLen,
+            ((if d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight (prependTypeBit false τtail) then
+              gHatTypeOperator G τprefix
+            else (0 : MIPStarRE.Quantum.Op ι)) * (1 - G)) := by
+              refine Finset.sum_congr rfl ?_
+              intro τprefix _
+              have hcond :
+                  (d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) + gHatTypeWeight τtail) ↔
+                    (d + 1 ≤ gHatTypeWeight τprefix +
+                      gHatTypeWeight (prependTypeBit false τtail)) := by
+                simpa [gHatTypeWeight_fin_cons_false, gHatTypeWeight_prepend_false]
+              by_cases h : d + 1 ≤ gHatTypeWeight τprefix +
+                  gHatTypeWeight (prependTypeBit false τtail)
+              · have h' :
+                    d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) +
+                      gHatTypeWeight τtail :=
+                  hcond.mpr h
+                simpa [h, h'] using gHatTypeOperator_fin_cons_false G τprefix
+              · have h' :
+                    ¬ d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) +
+                      gHatTypeWeight τtail := by
+                  exact fun h' => h (hcond.mp h')
+                simp [h, h']
+      _ = truncatedTypeSums G d prefixLen (prependTypeBit false τtail) * (1 - G) := by
+            unfold truncatedTypeSums
+            rw [Finset.sum_mul]
+  refine ⟨hherm, hnonneg, hle_one, ?_⟩
+  calc
+    truncatedTypeSums G d (prefixLen + 1) τtail
+      = ∑ p : Bool × GHatType prefixLen,
+          if d + 1 ≤ gHatTypeWeight (Fin.cons p.1 p.2) + gHatTypeWeight τtail then
+            gHatTypeOperator G (Fin.cons p.1 p.2)
+          else (0 : MIPStarRE.Quantum.Op ι) := hsplit
+    _ = ∑ b : Bool,
+          ∑ τprefix : GHatType prefixLen,
+            if d + 1 ≤ gHatTypeWeight (Fin.cons b τprefix) + gHatTypeWeight τtail then
+              gHatTypeOperator G (Fin.cons b τprefix)
+            else (0 : MIPStarRE.Quantum.Op ι) := hprod
+    _ = (∑ τprefix : GHatType prefixLen,
+            (if d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) + gHatTypeWeight τtail then
+              gHatTypeOperator G (Fin.cons true τprefix)
+            else (0 : MIPStarRE.Quantum.Op ι))) +
+          (∑ τprefix : GHatType prefixLen,
+            (if d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) + gHatTypeWeight τtail then
+              gHatTypeOperator G (Fin.cons false τprefix)
+            else (0 : MIPStarRE.Quantum.Op ι))) := by
+              rw [Fintype.sum_bool]
+    _ = truncatedTypeSums G d prefixLen (prependTypeBit true τtail) * G +
+          truncatedTypeSums G d prefixLen (prependTypeBit false τtail) * (1 - G) := by
+            rw [htrue, hfalse]
 
 /-- `lem:from-H-to-G`. -/
 lemma fromHToG
@@ -3324,7 +3860,11 @@ theorem ldPastingNCompleteness
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -3336,7 +3876,8 @@ theorem ldPastingNCompleteness
       (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
   -- Chain the three completeness-chain lemmas (§9.4 of the paper)
   have _hOAO := overAllOutcomes params strategy eps delta gamma zeta
-    hgood family hcons hself hbound k
+    hnorm hgood hgamma_le hzeta_le hdq_le
+    family hcons hself hbound k
   constructor -- LdPastingNCompletenessStatement
   · exact hk -- largeEnough: 400 * m * d ≤ k
   · -- completenessBound
@@ -3356,7 +3897,11 @@ lemma ldPastingSubMeas
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -3369,10 +3914,12 @@ lemma ldPastingSubMeas
   refine ⟨constructedPastedSubMeas params family k, ?_⟩
   have hconsistency :=
     (hAConsistency params strategy eps delta gamma kappa zeta
-      hgood family hcomplete hcons hself hbound k hk).1
+      hnorm hgood hgamma_le hzeta_le hdq_le
+      family hcomplete hcons hself hbound k hk).1
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
-      hgood family hcomplete hcons hself hbound k hk
+      hnorm hgood hgamma_le hzeta_le hdq_le
+      family hcomplete hcons hself hbound k hk
   exact
     { largeEnough := hk
       constructedSubMeas := rfl
@@ -3385,7 +3932,11 @@ theorem ldPasting
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -3398,7 +3949,8 @@ theorem ldPasting
   refine ⟨constructedPastedMeasurement params family k, ?_⟩
   have hconsistency :=
     (hAConsistency params strategy eps delta gamma kappa zeta
-      hgood family hcomplete hcons hself hbound k hk).2
+      hnorm hgood hgamma_le hzeta_le hdq_le
+      family hcomplete hcons hself hbound k hk).2
   exact
     { largeEnough := hk
       constructedMeasurement := rfl

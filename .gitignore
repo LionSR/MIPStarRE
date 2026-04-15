@@ -38,4 +38,4 @@
 *.bcf
 *-blx.bib
 *.pdf
-.claude/worktrees/
+.claude/

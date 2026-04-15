@@ -7,6 +7,7 @@
 
 \begin{theorem}[Commutativity of the point measurements]\label{thm:commutativity-points}
 	\lean{MIPStarRE.LDT.CommutativityPoints.commutativityPoints}
+	\leanok
 	\uses{def:good-strategy, def:approx_delta}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
 	On average over independent and uniformly random $u,v \sim \F_q^m$,
@@ -15,6 +16,7 @@
 	\]
 \end{theorem}
 \begin{proof}
+	\leanok
 	\uses{lem:good-strategy-characterization, prop:simeq-to-approx, prop:triangle-inequality-for-approx_delta}
 	The strategy passes the diagonal lines test with probability $1-\gamma$, so it passes the $m$-restricted diagonal lines test with probability $1-\gamma m$. Hence
 	\[
@@ -40,39 +42,39 @@
 \label{sec:G-commutes-after-evaluation}
 
 \begin{lemma}[Commutativity of~$G$ after evaluation]\label{lem:comm-data-processed-g}
-  \lean{MIPStarRE.LDT.Commutativity.commDataProcessedG}
+	\lean{MIPStarRE.LDT.Commutativity.commDataProcessedG}
 	\uses{def:good-strategy, def:polymeasurements, def:approx_delta, def:strong-self-consistency, clm:g-comm-stability, clm:g-comm-stability2}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
-  Let $\{G^x\} \in \polysub{m}{q}{d}$ be a collection of projective sub-measurements indexed by $x \in \F_q$ with the following properties:
-  \begin{enumerate}
-    \item (Consistency with~$A$)\label{item:data-processed-consistency}
-    On average over $(u,x) \sim \F_q^{m+1}$,
-    \[
-      A_a^{u,x} \ot I \simeq_\zeta I \ot G^x_{[g(u)=a]}.
-    \]
-    \item (Strong self-consistency)\label{item:data-processed-self-consistency}
-    On average over $x \sim \F_q$,
-    \[
-      G_g^x \ot I \approx_\zeta I \ot G_g^x.
-    \]
-    \item (Boundedness)\label{item:data-processed-boundedness}
-    There exists a positive-semidefinite matrix $Z^x$ for each $x \in \F_q$ such that
-    \[
-      \E_x \bra{\psi} (I-G^x) \ot Z^x \ket{\psi} \le \zeta
-    \]
-    and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
-    \[
-      Z^x \ge \left(\E_u A_{g(u)}^{u,x}\right).
-    \]
-  \end{enumerate}
-  Let
-  \[
-    \nu = 48m\bigl(\gamma^{1/2}+\zeta^{1/2}\bigr).
-  \]
-  Then on average over independent and uniformly random $(u,x),(v,y) \sim \F_q^{m+1}$,
-  \[
-    G^x_{[g(u)=a]} G^y_{[h(v)=b]} \ot I \approx_\nu G^y_{[h(v)=b]} G^x_{[g(u)=a]} \ot I.
-  \]
+	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
+	Let $\{G^x\} \in \polysub{m}{q}{d}$ be a collection of projective sub-measurements indexed by $x \in \F_q$ with the following properties:
+	\begin{enumerate}
+		\item (Consistency with~$A$)\label{item:data-processed-consistency}
+		      On average over $(u,x) \sim \F_q^{m+1}$,
+		      \[
+			      A_a^{u,x} \ot I \simeq_\zeta I \ot G^x_{[g(u)=a]}.
+		      \]
+		\item (Strong self-consistency)\label{item:data-processed-self-consistency}
+		      On average over $x \sim \F_q$,
+		      \[
+			      G_g^x \ot I \approx_\zeta I \ot G_g^x.
+		      \]
+		\item (Boundedness)\label{item:data-processed-boundedness}
+		      There exists a positive-semidefinite matrix $Z^x$ for each $x \in \F_q$ such that
+		      \[
+			      \E_x \bra{\psi} (I-G^x) \ot Z^x \ket{\psi} \le \zeta
+		      \]
+		      and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
+		      \[
+			      Z^x \ge \left(\E_u A_{g(u)}^{u,x}\right).
+		      \]
+	\end{enumerate}
+	Let
+	\[
+		\nu = 48m\bigl(\gamma^{1/2}+\zeta^{1/2}\bigr).
+	\]
+	Then on average over independent and uniformly random $(u,x),(v,y) \sim \F_q^{m+1}$,
+	\[
+		G^x_{[g(u)=a]} G^y_{[h(v)=b]} \ot I \approx_\nu G^y_{[h(v)=b]} G^x_{[g(u)=a]} \ot I.
+	\]
 \end{lemma}
 \begin{proof}
 	\uses{prop:cons-sub-meas, prop:closeness-of-ip, prop:two-notions-of-self-consistency, prop:two-notions-of-self-consistency-after-evaluation, thm:commutativity-points}
@@ -174,6 +176,7 @@
 	\end{align}
 \end{lemma}
 \begin{proof}
+	\leanok
 	For each $y \in \F_q$ and $g \in \polyfunc{m}{q}{d}$, define
 	\[
 		R_g^y = \E_{u,x} \sum_a G_a^{u,x} G_g^y G_a^{u,x}.
@@ -205,6 +208,7 @@
 	\end{align*}
 \end{lemma}
 \begin{proof}
+	\leanok
 	\uses{thm:commutativity-points}
 	The difference between the two sides is
 	\begin{align}

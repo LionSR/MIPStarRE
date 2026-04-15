@@ -48,6 +48,144 @@ lemma avgOver_uniform_equiv
     _ = avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
           simp [avgOver, uniformDistribution, Finset.mul_sum]
 
+private lemma avgOver_uniform_prod_ignore_right_local
+    {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α → Error) :
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1) =
+      avgOver (uniformDistribution α) f := by
+  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  calc
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1)
+      = (1 / (Fintype.card (α × β) : Error)) * ∑ ab : α × β, f ab.1 := by
+          simp [avgOver, uniformDistribution, Finset.mul_sum]
+    _ = (1 / ((Fintype.card α : Error) * (Fintype.card β : Error))) *
+          ∑ a : α, ∑ b : β, f a := by
+          rw [Fintype.card_prod]
+          simpa using
+            (Fintype.sum_prod_type' (f := fun (a : α) (_b : β) => f a))
+    _ = (1 / ((Fintype.card α : Error) * (Fintype.card β : Error))) *
+          ((Fintype.card β : Error) * ∑ a : α, f a) := by
+          congr 1
+          simpa [Finset.mul_sum]
+    _ = (1 / (Fintype.card α : Error)) * ∑ a : α, f a := by
+          field_simp [hα, hβ]
+    _ = avgOver (uniformDistribution α) f := by
+          simp [avgOver, uniformDistribution, Finset.mul_sum]
+
+private lemma lastRestrictionIndex_val_succ
+    (params : Parameters) :
+    (lastRestrictionIndex params).val + 1 = params.m := by
+  have hm := params.hm
+  dsimp [lastRestrictionIndex]
+  omega
+
+private noncomputable def lastRestrictedDirectionEquiv
+    (params : Parameters)
+    [FieldModel params.q] :
+    (Fin ((lastRestrictionIndex params).val + 1) → Fq params) ≃ Point params where
+  toFun := extendRestrictedDirection (lastRestrictionIndex params)
+  invFun := fun direction i =>
+    direction ⟨i.val, by
+      have h := lastRestrictionIndex_val_succ params
+      omega⟩
+  left_inv := by
+    intro free
+    funext i
+    have hlt : i.val < params.m := by
+      have h := lastRestrictionIndex_val_succ params
+      omega
+    have hle : (⟨i.val, hlt⟩ : Fin params.m).val ≤ (lastRestrictionIndex params).val := by
+      dsimp [lastRestrictionIndex]
+      omega
+    have hidx :
+        (⟨i.val, Nat.lt_succ_of_le hle⟩ : Fin ((lastRestrictionIndex params).val + 1)) = i := by
+      ext
+      rfl
+    simpa [extendRestrictedDirection, hle] using congrArg free hidx
+  right_inv := by
+    intro direction
+    funext k
+    have hk : k.val ≤ (lastRestrictionIndex params).val := by
+      dsimp [lastRestrictionIndex]
+      omega
+    have hidx :
+        (⟨k.val, by
+            have h := lastRestrictionIndex_val_succ params
+            omega⟩ : Fin params.m) = k := by
+      ext
+      rfl
+    simpa [extendRestrictedDirection, hk] using congrArg direction hidx
+
+private noncomputable def lastRestrictedSampleEquivDiagonalLine
+    (params : Parameters)
+    [FieldModel params.q] :
+    RestrictedDiagonalSample params (lastRestrictionIndex params) ≃ DiagonalLine params where
+  toFun := fun s =>
+    { base := s.1
+      direction := lastRestrictedDirectionEquiv params s.2 }
+  invFun := fun ℓ =>
+    (ℓ.base, (lastRestrictedDirectionEquiv params).symm ℓ.direction)
+  left_inv := by
+    rintro ⟨base, free⟩
+    refine Prod.ext rfl ?_
+    funext i
+    have hlt : i.val < params.m := by
+      have h := lastRestrictionIndex_val_succ params
+      omega
+    have hle : (⟨i.val, hlt⟩ : Fin params.m).val ≤ (lastRestrictionIndex params).val := by
+      dsimp [lastRestrictionIndex]
+      omega
+    have hidx :
+        (⟨i.val, Nat.lt_succ_of_le hle⟩ : Fin ((lastRestrictionIndex params).val + 1)) = i := by
+      ext
+      rfl
+    simpa [lastRestrictedDirectionEquiv, extendRestrictedDirection, hle] using congrArg free hidx
+  right_inv := by
+    rintro ⟨base, direction⟩
+    change
+      ({ base := base,
+         direction := extendRestrictedDirection (lastRestrictionIndex params)
+           (fun i => direction ⟨i.val, by
+             have h := lastRestrictionIndex_val_succ params
+             omega⟩) } : DiagonalLine params) =
+      ({ base := base, direction := direction } : DiagonalLine params)
+    congr
+    funext k
+    have hk : k.val ≤ (lastRestrictionIndex params).val := by
+      dsimp [lastRestrictionIndex]
+      omega
+    have hidx :
+        (⟨k.val, by
+            have h := lastRestrictionIndex_val_succ params
+            omega⟩ : Fin params.m) = k := by
+      ext
+      rfl
+    simpa [lastRestrictedDirectionEquiv, extendRestrictedDirection, hk] using
+      congrArg direction hidx
+
+private noncomputable def rebasedLastRestrictedQuestionEquiv
+    (params : Parameters)
+    [FieldModel params.q] :
+    (RestrictedDiagonalSample params (lastRestrictionIndex params) × Fq params) ≃
+      PointDiagonalLineQuestion params where
+  toFun := fun st =>
+    let ℓ := lastRestrictedSampleEquivDiagonalLine params st.1
+    (DiagonalLine.rebaseAt ℓ (subCoord zeroCoord st.2), st.2)
+  invFun := fun q =>
+    let ℓ := DiagonalLine.rebaseAt q.1 q.2
+    ((lastRestrictedSampleEquivDiagonalLine params).symm ℓ, q.2)
+  left_inv := by
+    rintro ⟨s, t⟩
+    simp [DiagonalLine.rebaseAt_rebase, addCoord_subCoord_left]
+  right_inv := by
+    rintro ⟨ℓ, t⟩
+    simp [DiagonalLine.rebaseAt_rebase, addCoord_subCoord_right]
+
 /-- TODO(#306): Consistency transfer for the corrected restricted diagonal test.
 
 This proof gap is intentional tracking for the diagonal-test definition fix:

@@ -806,43 +806,10 @@ outcome `h₀` (the fallback interpolant).  So the outcome operator for `h₀` b
 `H_{h₀} + (I - H_total)` while all other outcomes keep their original operators, and
 the total is genuinely the identity `I`. -/
 noncomputable def constructedPastedMeasurement (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (k : ℕ) : Measurement (Polynomial params.next) ι where
-  toSubMeas := by
-    classical
-    let H := constructedPastedSubMeas params family k
-    let h₀ := pastedFallbackOutcome params
-    let completionMass := 1 - H.total
-    exact
-      { outcome := fun h =>
-          if h = h₀ then
-            H.outcome h + completionMass
-          else
-            H.outcome h
-        total := 1
-        outcome_pos := by
-          intro h
-          by_cases hh : h = h₀
-          · simpa [hh, completionMass] using
-              add_nonneg (H.outcome_pos h₀) (sub_nonneg.mpr H.total_le_one)
-          · simp [hh, H.outcome_pos h]
-        sum_eq_total := by
-          have hsingle :
-              (∑ x : Polynomial params.next,
-                  if x = h₀ then completionMass else 0) = completionMass := by
-            simp
-          have hrewrite :
-              (∑ a : Polynomial params.next,
-                  if a = h₀ then H.outcome a + completionMass else H.outcome a) =
-                ∑ a : Polynomial params.next,
-                  (H.outcome a + if a = h₀ then completionMass else 0) := by
-            apply Finset.sum_congr rfl
-            intro a _
-            by_cases h : a = h₀ <;> simp [h]
-          rw [hrewrite, Finset.sum_add_distrib, H.sum_eq_total, hsingle]
-          simp [completionMass]
-        total_le_one := by
-          exact le_rfl }
-  total_eq_one := rfl
+    (family : IdxPolyFamily params ι) (k : ℕ) : Measurement (Polynomial params.next) ι :=
+  Preliminaries.completeAtOutcome
+    (constructedPastedSubMeas params family k)
+    (pastedFallbackOutcome params)
 
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/
 noncomputable def verticalLineMeasurementFamily (params : Parameters) [FieldModel params.q]
