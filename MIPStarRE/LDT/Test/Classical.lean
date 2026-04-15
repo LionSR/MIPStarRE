@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Test.Strategy
 # Section 3 — Classical two-prover strategies
 
 Deterministic classical strategy data and acceptance probabilities for the
-classical low individual degree test quoted in Chapter 1.
+repository's currently modeled low individual degree test.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -22,7 +22,8 @@ indicates which prover receives the line query. -/
 abbrev ClassicalAxisParallelSample (params : Parameters) :=
   Role × AxisParallelTestSample params
 
-/-- The self-consistency branch sends the same point question to both provers. -/
+/-- The self-consistency branch sends a point query in the modeled classical
+specialization of the repository's current LID test. -/
 abbrev ClassicalSelfConsistencySample (params : Parameters) :=
   Point params
 
@@ -35,34 +36,8 @@ abbrev ClassicalRestrictedDiagonalSample (params : Parameters)
     (j : Fin params.m) :=
   Role × RestrictedDiagonalSample params j
 
-instance (params : Parameters) : Fintype (ClassicalAxisParallelSample params) := by
-  dsimp [ClassicalAxisParallelSample, AxisParallelTestSample, Point, Fq]
-  infer_instance
-
-instance (params : Parameters) : DecidableEq (ClassicalAxisParallelSample params) := by
-  dsimp [ClassicalAxisParallelSample, AxisParallelTestSample, Point, Fq]
-  infer_instance
-
-instance (params : Parameters) : Fintype (ClassicalSelfConsistencySample params) := by
-  dsimp [ClassicalSelfConsistencySample, Point, Fq]
-  infer_instance
-
-instance (params : Parameters) : DecidableEq (ClassicalSelfConsistencySample params) := by
-  dsimp [ClassicalSelfConsistencySample, Point, Fq]
-  infer_instance
-
-instance (params : Parameters) (j : Fin params.m) :
-    Fintype (ClassicalRestrictedDiagonalSample params j) := by
-  dsimp [ClassicalRestrictedDiagonalSample, RestrictedDiagonalSample, Point, Fq]
-  infer_instance
-
-instance (params : Parameters) (j : Fin params.m) :
-    DecidableEq (ClassicalRestrictedDiagonalSample params j) := by
-  dsimp [ClassicalRestrictedDiagonalSample, RestrictedDiagonalSample, Point, Fq]
-  infer_instance
-
 /-- Deterministic classical answers for the two provers in the low individual
- degree test. -/
+degree test. -/
 structure TwoProverClassicalLIDStrategy (params : Parameters) [FieldModel params.q] where
   /-- Prover A's answer to a point query. -/
   pointAnswerA : Point params → Fq params
@@ -121,12 +96,18 @@ def axisParallelAccepts {params : Parameters} [FieldModel params.q]
   | .A => strategy.axisParallelAnswerA ℓ zeroCoord = strategy.pointAnswerB u
   | .B => strategy.pointAnswerA u = strategy.axisParallelAnswerB ℓ zeroCoord
 
-/-- Whether the deterministic strategy is accepted on the self-consistency
-branch. -/
+/-- Whether the deterministic strategy is accepted on the modeled
+self-consistency branch.
+
+The repository's current `ProjStrat.lowIndividualDegreeFailureProbability`
+models the self-consistency branch via each prover's own strong
+self-consistency defect rather than cross-prover point agreement. For a
+deterministic classical point-answer function, that branch succeeds identically,
+so the acceptance predicate is `True`. -/
 def selfConsistencyAccepts {params : Parameters} [FieldModel params.q]
-    (strategy : TwoProverClassicalLIDStrategy params)
-    (u : ClassicalSelfConsistencySample params) : Prop :=
-  strategy.pointAnswerA u = strategy.pointAnswerB u
+    (_strategy : TwoProverClassicalLIDStrategy params)
+    (_u : ClassicalSelfConsistencySample params) : Prop :=
+  True
 
 /-- Whether the deterministic strategy is accepted on a sampled `j`-restricted
  diagonal branch instance. -/
@@ -189,9 +170,13 @@ noncomputable def lowIndividualDegreeAcceptanceProbability {params : Parameters}
       strategy.selfConsistencyAcceptanceProbability +
       strategy.diagonalAcceptanceProbability) / 3
 
-/-- Passing the classical low individual degree test with error `eps`, stated in
-the paper's acceptance-probability form. -/
-structure PassesLowIndividualDegreeTest {params : Parameters}
+/-- Passing the repository's modeled classical low individual degree test with
+error `eps`, stated in acceptance-probability form.
+
+This name is deliberately distinct from `ProjStrat.PassesLowIndividualDegreeTest`
+so the classical specialization does not collide by dot notation with the
+quantum/projective predicate. -/
+structure ClassicallyPassesLowIndividualDegreeTest {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) (eps : Error) : Prop where
   /-- The modeled classical acceptance probability is at least `1 - eps`. -/
