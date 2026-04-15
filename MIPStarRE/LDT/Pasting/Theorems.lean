@@ -3091,8 +3091,12 @@ private lemma commuteGHalfSandwich_core
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
+    (_hnorm : ψbi.IsNormalized)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) (hk : 2 ≤ k)
+    (_hgamma_nonneg : 0 ≤ gamma) (_hgamma : gamma ≤ 1)
+    (_hzeta_nonneg : 0 ≤ zeta) (_hzeta : zeta ≤ 1)
+    (_hd_le_q : params.d ≤ params.q)
     (hsc : SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
       (gHatSelfConsistencyLeftFamily params family)
@@ -3115,13 +3119,18 @@ lemma commuteGHalfSandwich
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     (k : ℕ)
     (hk : 2 ≤ k)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (hd_le_q : params.d ≤ params.q)
     (hfacts : GHatFactsStatement params ψbi family gamma zeta) :
     CommuteGHalfSandwichStatement params ψbi family gamma zeta k := by
-  exact ⟨commuteGHalfSandwich_core params ψbi family gamma zeta k hk
+  exact ⟨commuteGHalfSandwich_core params ψbi hnorm family gamma zeta k hk
+    hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
     hfacts.completedSelfConsistency hfacts.completedCommutation⟩
 
 /-- Bridge: Cauchy-Schwarz sandwich elimination for one-point consistency.
@@ -3144,7 +3153,11 @@ private lemma ldSandwichLineOnePoint_core
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (_hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (_hgamma_nonneg : 0 ≤ gamma) (_hgamma : gamma ≤ 1)
+    (_hzeta_nonneg : 0 ≤ zeta) (_hzeta : zeta ≤ 1)
+    (_hd_le_q : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -3166,7 +3179,11 @@ lemma ldSandwichLineOnePoint
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (hd_le_q : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -3181,10 +3198,11 @@ lemma ldSandwichLineOnePoint
         CommuteGHalfSandwichStatement params strategy.state family
           gamma zeta j := by
     intro j hj
-    exact commuteGHalfSandwich params strategy.state family gamma zeta
-      j hj hfacts
+    exact commuteGHalfSandwich params strategy.state hnorm family gamma zeta
+      j hj hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hfacts
   exact ⟨ldSandwichLineOnePoint_core params strategy eps delta gamma zeta
-    hgood family hcons hself hbound hcomm k i hi⟩
+    hnorm hgood hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+    family hcons hself hbound hcomm k i hi⟩
 
 /-- Bridge: aggregate one-point consistency bounds over all slice indices,
 plus the distinct-tuple approximation error.
@@ -3202,7 +3220,11 @@ private lemma hBConsistency_core
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (_hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (_hgamma_nonneg : 0 ≤ gamma) (_hgamma : gamma ≤ 1)
+    (_hzeta_nonneg : 0 ≤ zeta) (_hzeta : zeta ≤ 1)
+    (_hd_le_q : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -3225,7 +3247,11 @@ lemma hBConsistency
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (hd_le_q : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -3237,7 +3263,8 @@ lemma hBConsistency
     HBConsistencyStatement params strategy family
         eps delta gamma zeta k := by
   exact ⟨hBConsistency_core params strategy eps delta gamma zeta
-    hgood family hcons hself hbound k hline⟩
+    hnorm hgood hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+    family hcons hself hbound k hline⟩
 
 /-- Bridge: convert vertical-line consistency to point consistency.
 
@@ -3257,7 +3284,11 @@ private lemma hAConsistency_core
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (eps delta gamma kappa zeta : Error)
+    (_hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (_hgamma_nonneg : 0 ≤ gamma) (_hgamma : gamma ≤ 1)
+    (_hzeta_nonneg : 0 ≤ zeta) (_hzeta : zeta ≤ 1)
+    (_hd_le_q : params.d ≤ params.q)
     (hcomplete : family.Complete strategy.state kappa)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
@@ -3286,7 +3317,11 @@ theorem hAConsistency
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (hd_le_q : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -3310,29 +3345,42 @@ theorem hAConsistency
       LdSandwichLineOnePointStatement params strategy family
         eps delta gamma zeta k i := by
     have hfacts : GHatFactsStatement params strategy.state family gamma zeta := by
-      /-
-      TODO(#299): derive the full `GHatFactsStatement` package here.
-
-      The available local hypotheses already provide the inputs for the
-      one-point sandwich lemma once `hfacts` is available:
-      `hgood`, `hcons`, `hself`, and `hbound`.
-
-      Constructing `hfacts` itself must thread the earlier chain
-      `gCompleteSelfConsistency → gBotSelfConsistency →
-      Commutativity.comMain → commutingWithGComplete →
-      commutingWithGIncomplete → gHatFacts`.  The current `hAConsistency`
-      hypotheses do not expose all side conditions required by that chain,
-      in particular `strategy.state.IsNormalized`, `gamma ≤ 1`, `zeta ≤ 1`,
-      and `params.d ≤ params.q`.
-      -/
-      sorry
+      let G : Fq params → SubMeas (Polynomial params) ι :=
+        fun x => (family.meas x).toSubMeas
+      have hG : ∀ x, G x = (family.meas x).toSubMeas := by
+        intro x
+        rfl
+      have hselfComplete :
+          GCompleteSelfConsistencyStatement params strategy.state family zeta :=
+        gCompleteSelfConsistency params strategy.state family zeta
+          strategy.permInvState hself
+      have hselfIncomplete :
+          GBotSelfConsistencyStatement params strategy.state family zeta :=
+        gBotSelfConsistency params strategy.state family zeta
+          strategy.permInvState hselfComplete
+      have hcom : Commutativity.ComMainConclusion params strategy family G gamma zeta :=
+        Commutativity.comMain params strategy eps delta gamma zeta
+          hnorm hgood family G hG hcons hself hbound
+      have hcommComplete :
+          CommutingWithGCompleteStatement params strategy.state family gamma zeta :=
+        commutingWithGComplete params strategy hnorm family G gamma zeta
+          hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hcom hselfComplete
+      have hcommIncomplete :
+          CommutingWithGIncompleteStatement params strategy.state family gamma zeta :=
+        commutingWithGIncomplete params strategy.state family gamma zeta hcommComplete
+      exact gHatFacts params strategy.state family gamma zeta
+        hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+        hselfComplete hselfIncomplete hcommComplete hcommIncomplete
     intro i hi
     exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
-      hgood family hcons hself hbound hfacts k i hi
+      hnorm hgood hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+      family hcons hself hbound hfacts k i hi
   have hHB := hBConsistency params strategy eps delta gamma zeta
-    hgood family hcons hself hbound k hline
+    hnorm hgood hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+    family hcons hself hbound k hline
   exact hAConsistency_core params strategy family
-    eps delta gamma kappa zeta hgood hcomplete k hk hHB
+    eps delta gamma kappa zeta hnorm hgood hgamma_nonneg hgamma
+    hzeta_nonneg hzeta hd_le_q hcomplete k hk hHB
 
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
@@ -3340,7 +3388,11 @@ lemma overAllOutcomes
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (_hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (_hgamma_nonneg : 0 ≤ gamma) (_hgamma : gamma ≤ 1)
+    (_hzeta_nonneg : 0 ≤ zeta) (_hzeta : zeta ≤ 1)
+    (_hd_le_q : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -3714,15 +3766,18 @@ lemma fromHToG
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (ψbi : QuantumState (ι × ι))
     (eps delta gamma zeta : Error)
+    (_hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (_hgamma_nonneg : 0 ≤ gamma) (_hgamma : gamma ≤ 1)
+    (_hzeta_nonneg : 0 ≤ zeta) (_hzeta : zeta ≤ 1)
+    (_hd_le_q : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
-    (hhalf : CommuteGHalfSandwichStatement params ψbi family gamma zeta k) :
+    (hhalf : CommuteGHalfSandwichStatement params strategy.state family gamma zeta k) :
     FromHToGStatement params strategy family gamma zeta k := by
   constructor -- FromHToGStatement
   · -- recurrenceStep: per-step Bernoulli-tail commutation
@@ -3782,7 +3837,11 @@ theorem ldPastingNCompleteness
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (hd_le_q : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -3794,7 +3853,8 @@ theorem ldPastingNCompleteness
       (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
   -- Chain the three completeness-chain lemmas (§9.4 of the paper)
   have _hOAO := overAllOutcomes params strategy eps delta gamma zeta
-    hgood family hcons hself hbound k
+    hnorm hgood hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+    family hcons hself hbound k
   constructor -- LdPastingNCompletenessStatement
   · exact hk -- largeEnough: 400 * m * d ≤ k
   · -- completenessBound
@@ -3814,7 +3874,11 @@ lemma ldPastingSubMeas
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (hd_le_q : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -3827,10 +3891,12 @@ lemma ldPastingSubMeas
   refine ⟨constructedPastedSubMeas params family k, ?_⟩
   have hconsistency :=
     (hAConsistency params strategy eps delta gamma kappa zeta
-      hgood family hcomplete hcons hself hbound k hk).1
+      hnorm hgood hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+      family hcomplete hcons hself hbound k hk).1
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
-      hgood family hcomplete hcons hself hbound k hk
+      hnorm hgood hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+      family hcomplete hcons hself hbound k hk
   exact
     { largeEnough := hk
       constructedSubMeas := rfl
@@ -3843,7 +3909,11 @@ theorem ldPasting
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (hd_le_q : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -3856,7 +3926,8 @@ theorem ldPasting
   refine ⟨constructedPastedMeasurement params family k, ?_⟩
   have hconsistency :=
     (hAConsistency params strategy eps delta gamma kappa zeta
-      hgood family hcomplete hcons hself hbound k hk).2
+      hnorm hgood hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+      family hcomplete hcons hself hbound k hk).2
   exact
     { largeEnough := hk
       constructedMeasurement := rfl
