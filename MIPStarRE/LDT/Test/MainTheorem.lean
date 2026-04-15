@@ -102,7 +102,7 @@ def TwoProverClassicalLIDPassCondition (params : Parameters)
     strategy.pointAnswerA = a ∧
       strategy.ClassicallyPassesLowIndividualDegreeTest eps
 
-/-- Temporary bridge/package predicate for the quoted Polishchuk–Spielman
+/-- Temporary bridge/package structure for the quoted Polishchuk–Spielman
 soundness theorem.
 
 This packages the external implication from the paper-faithful classical pass
@@ -111,13 +111,14 @@ implication separate from `TwoProverClassicalLIDPassCondition` itself.
 
 TODO(#404): replace this bridge package with a direct formalization (or other
 honest quoted-result interface) for the Polishchuk–Spielman implication. -/
-def TwoProverClassicalLIDBridgePackage (params : Parameters)
+structure TwoProverClassicalLIDBridgePackage (params : Parameters)
     [FieldModel params.q]
-    (a : Point params → Fq params) (eps : Error) : Prop :=
-  TwoProverClassicalLIDPassCondition params a eps →
-    ∃ slack : Error,
-      BoundedPointAnswerSoundnessConclusion params a
-        (classicalTestSoundnessSlackBound params eps) slack
+    (a : Point params → Fq params) (eps : Error) : Prop where
+  soundness :
+    TwoProverClassicalLIDPassCondition params a eps →
+      ∃ slack : Error,
+        BoundedPointAnswerSoundnessConclusion params a
+          (classicalTestSoundnessSlackBound params eps) slack
 
 /-- `thm:raz-safra`.
 
@@ -146,7 +147,7 @@ theorem classicalTestSoundness
     ∃ slack : Error,
       BoundedPointAnswerSoundnessConclusion params a
         (classicalTestSoundnessSlackBound params eps) slack := by
-  exact hbridge hpass
+  exact hbridge.soundness hpass
 
 /-- `thm:main-informal`.
 
