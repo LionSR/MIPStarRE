@@ -864,6 +864,7 @@ private lemma projSubMeas_total_sq
     (P : ProjSubMeas Outcome ι) :
     P.toSubMeas.total * P.toSubMeas.total = P.toSubMeas.total := by
   simpa using MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj P
+
 /-- Expand the switcheroo aggregate defect into the four terms used in the paper. -/
 private lemma switcherooAggregate_qSDDOp_expand
     {Outcome : Type*} [Fintype Outcome]
@@ -1576,7 +1577,6 @@ private lemma switcheroo_complete_part_pair_raw_sdd
               IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
               SubMeas.liftLeft, SubMeas.liftRight]
     _ ≤ zeta := hselfG.completePartSelfConsistency.squaredDistanceBound
-
 
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
