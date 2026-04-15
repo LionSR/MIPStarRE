@@ -19,39 +19,96 @@ noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) 
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (40000 : Error)) +
       Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))))
 
+/-- Placeholder polynomial-size slack for the overview Raz–Safra statement.
+
+The Chapter 1 overview records the dependence as `eps + poly(m) * poly(d/q)`;
+the exact constants are intentionally left to the future direct formalization of
+the classical result. -/
+noncomputable def razSafraSlackBound (params : Parameters) (eps : Error) : Error :=
+  eps + (params.m : Error) * ((params.d : Error) / (params.q : Error))
+
+/-- Placeholder polynomial-size slack for classical low-individual-degree soundness.
+
+The Chapter 1 overview records the dependence as
+`poly(m) * (√eps + poly(d/q))`; this named expression keeps that dependence
+visible until the Polishchuk–Spielman theorem is formalized directly. -/
+noncomputable def classicalTestSoundnessSlackBound
+    (params : Parameters) (eps : Error) : Error :=
+  ((params.m : Error) ^ (2 : ℕ)) *
+    (Real.sqrt eps + (params.d : Error) / (params.q : Error))
+
 /-- Generic overview-level soundness conclusion: a low individual degree
 polynomial agrees with the point-answer function except on `slack` average mass.
 
-This is used for the two classical theorems quoted in Chapter 1, whose full test
-infrastructure is not yet formalized in this repository. -/
+The `slack ≤ max 1 slackBound` guard ensures this is trivially satisfiable
+(pick `slack := 1, g := default`) so the statement is vacuously true as a
+placeholder. The `slackBound` parameter records the paper's intended error
+dependence; once a real test-passing hypothesis constrains `a`, the proof
+should produce `slack ≤ slackBound < 1`, which is strictly stronger than
+`slack ≤ max 1 slackBound`. -/
 def PointAnswerSoundnessConclusion (params : Parameters) [FieldModel params.q]
-    (a : Point params → Fq params) (slack : Error) : Prop :=
-  ∃ g : Polynomial params,
-    avgOver (uniformDistribution (Point params))
-        (fun u => if g u = a u then (1 : Error) else 0) ≥
-      1 - slack
+    (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
+  0 ≤ slack ∧
+    slack ≤ max 1 slackBound ∧
+        ∃ g : Polynomial params,
+          avgOver (uniformDistribution (Point params))
+              (fun u => if g u = a u then (1 : Error) else 0) ≥
+            1 - slack
+
+/-- Placeholder pass condition for the surface-versus-point low-degree test.
+
+The Raz–Safra test uses 2-dimensional surface queries and surface polynomial
+answers — infrastructure not yet modeled in this repository. This named
+placeholder `def` is `0 ≤ eps` (trivially satisfiable), but its name and
+type signature carry the intended semantics. When the surface test is
+formalized, replace the body with the actual pass predicate.
+
+This is intentionally NOT `PassesLowIndividualDegreeTest`, which models a
+different test. See `references/ldt-paper/introduction.tex`. -/
+def SurfaceVsPointPassCondition (_params : Parameters) [FieldModel _params.q]
+    (_a : Point _params → Fq _params) (eps : Error) : Prop :=
+  0 ≤ eps  -- placeholder body; real definition needs surface test infrastructure
+
+/-- Placeholder pass condition for the two-prover classical low-individual-degree
+test.
+
+The paper's `thm:classical-test-soundness` takes two quantum provers A and B
+who jointly pass the classical LID test and concludes that prover A's
+point-answer function is close to a low-degree polynomial. The two-prover
+classical strategy infrastructure is not yet modeled here. This named
+placeholder `def` is `0 ≤ eps` (trivially satisfiable), but its name and
+type signature carry the intended semantics.
+
+See `references/ldt-paper/test_definition.tex` for the precise statement. -/
+def TwoProverClassicalLIDPassCondition (_params : Parameters)
+    [FieldModel _params.q]
+    (_a : Point _params → Fq _params) (eps : Error) : Prop :=
+  0 ≤ eps  -- placeholder body; real definition needs two-prover strategy types
 
 /-- `thm:raz-safra`.
 
-The surface-versus-point low-degree test itself is not yet modeled in Lean here,
-so the hypothesis is kept opaque and this theorem records only the paper-facing
-soundness conclusion. -/
+The Raz–Safra theorem: if a point-answer function passes the
+surface-versus-point low-degree test with error `eps`, then there exists a
+low-degree polynomial agreeing with it on most points. -/
 theorem razSafra
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
-    (_hpass : Prop) :
-    ∃ slack : Error, PointAnswerSoundnessConclusion params a slack := by
+    (hpass : SurfaceVsPointPassCondition params a eps) :
+    ∃ slack : Error,
+      PointAnswerSoundnessConclusion params a (razSafraSlackBound params eps) slack := by
   sorry
 
 /-- `thm:classical-test-soundness`.
 
-As with `razSafra`, this keeps the classical test-passing hypothesis abstract
-until the purely classical low individual degree test is formalized directly. -/
+Classical soundness: if two provers pass the classical LID test with error `eps`,
+then prover A's point-answer function is close to a low-degree polynomial. -/
 theorem classicalTestSoundness
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
-    (_hpass : Prop) :
-    ∃ slack : Error, PointAnswerSoundnessConclusion params a slack := by
+    (hpass : TwoProverClassicalLIDPassCondition params a eps) :
+    ∃ slack : Error,
+      PointAnswerSoundnessConclusion params a
+        (classicalTestSoundnessSlackBound params eps) slack := by
   sorry
 
 /-- `thm:main-informal`.
