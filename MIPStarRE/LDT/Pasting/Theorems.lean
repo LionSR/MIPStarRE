@@ -864,84 +864,6 @@ private lemma projSubMeas_total_sq
     (P : ProjSubMeas Outcome ι) :
     P.toSubMeas.total * P.toSubMeas.total = P.toSubMeas.total := by
   simpa using MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj P
-
-/-- Distinct outcomes of a projective submeasurement are orthogonal. -/
-private lemma projSubMeas_outcome_orthogonal
-    {Outcome : Type*} [Fintype Outcome]
-    (P : ProjSubMeas Outcome ι) (a b : Outcome) (hab : a ≠ b) :
-    P.outcome a * P.outcome b = 0 := by
-  classical
-  set Pa := P.outcome a
-  set Pb := P.outcome b
-  have hPa_herm : Paᴴ = Pa := P.outcome_hermitian a
-  have hPb_herm : Pbᴴ = Pb := P.outcome_hermitian b
-  have hsum : Pa + Pb ≤ P.total := by
-    calc
-      Pa + Pb
-        = ∑ i ∈ ({a, b} : Finset Outcome), P.outcome i := by
-            simp [Pa, Pb, hab]
-      _ ≤ ∑ i : Outcome, P.outcome i := by
-            exact Finset.sum_le_sum_of_subset_of_nonneg
-              (by simp)
-              (fun i _ _ => P.outcome_pos i)
-      _ = P.total := P.sum_eq_total
-  have hPb_le : Pb ≤ 1 - Pa := by
-    calc
-      Pb = Pa + Pb - Pa := by abel
-      _ ≤ P.total - Pa := by
-          exact sub_le_sub_right hsum Pa
-      _ ≤ 1 - Pa := by
-          exact sub_le_sub_right P.total_le_one Pa
-  have hPaPbPa_nonneg : 0 ≤ Pa * Pb * Pa :=
-    MIPStarRE.Quantum.sandwich_nonneg (P.outcome_pos b) hPa_herm
-  have hPa_idem : Pa * (1 - Pa) * Pa = 0 := by
-    calc
-      Pa * (1 - Pa) * Pa = (Pa * 1 - Pa * Pa) * Pa := by rw [mul_sub]
-      _ = 0 := by simp [Pa, P.proj a]
-  have hPaPbPa_eq_zero : Pa * Pb * Pa = 0 := by
-    apply le_antisymm
-    · calc
-        Pa * Pb * Pa ≤ Pa * (1 - Pa) * Pa :=
-          MIPStarRE.Quantum.sandwich_mono hPa_herm hPb_le
-        _ = 0 := hPa_idem
-    · exact hPaPbPa_nonneg
-  have hPbPa_eq_zero : Pb * Pa = 0 := by
-    apply Matrix.conjTranspose_mul_self_eq_zero.mp
-    calc
-      (Pb * Pa)ᴴ * (Pb * Pa) = (Paᴴ * Pbᴴ) * (Pb * Pa) := by
-        simp [Matrix.conjTranspose_mul]
-      _ = Pa * (Pb * Pb) * Pa := by
-        simp [hPa_herm, hPb_herm, mul_assoc]
-      _ = Pa * Pb * Pa := by simp [Pb, P.proj b]
-      _ = 0 := hPaPbPa_eq_zero
-  calc
-    Pa * Pb = (Pb * Pa)ᴴ := by
-      simp [Matrix.conjTranspose_mul, hPa_herm, hPb_herm]
-    _ = 0 := by rw [hPbPa_eq_zero]; simp
-
-/-- If `A ≤ 1`, then its left tensor placement is also bounded by `1`. -/
-private lemma leftTensor_le_one_of_le_one
-    {A : MIPStarRE.Quantum.Op ι} (hA : A ≤ 1) :
-    leftTensor (ι₂ := ι) A ≤ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-  have hop :
-      opTensor A (1 : MIPStarRE.Quantum.Op ι) ≤
-        opTensor (1 : MIPStarRE.Quantum.Op ι) (1 : MIPStarRE.Quantum.Op ι) := by
-    exact MIPStarRE.LDT.opTensor_mono_left hA (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by
-      exact zero_le_one)
-  simpa [leftTensor, opTensor] using hop
-
-/-- If `A ≤ 1`, then its right tensor placement is also bounded by `1`. -/
-private lemma rightTensor_le_one_of_le_one
-    {A : MIPStarRE.Quantum.Op ι} (hA : A ≤ 1) :
-    rightTensor (ι₁ := ι) A ≤ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-  have hop :
-      opTensor (1 : MIPStarRE.Quantum.Op ι) A ≤
-        leftTensor (ι₂ := ι) (1 : MIPStarRE.Quantum.Op ι) := by
-    exact MIPStarRE.LDT.opTensor_le_leftTensor
-      (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one)
-      hA
-  simpa [rightTensor, leftTensor, opTensor] using hop
-
 /-- Expand the switcheroo aggregate defect into the four terms used in the paper. -/
 private lemma switcherooAggregate_qSDDOp_expand
     {Outcome : Type*} [Fintype Outcome]
@@ -1603,6 +1525,9 @@ private lemma switcheroo_second_term_close
           simp [avgOver, uniformDistribution]
           field_simp [hq0]
 
+/-- Raw SDD bound for completed-part pairs: marginalizes the completed-part
+self-consistency bound over `SlicePairQuestion` via `avgOver_uniform_fst`.
+Used as infrastructure for the commutativitySwitcheroo cross-term chain (issue #298). -/
 private lemma switcheroo_complete_part_pair_raw_sdd
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
