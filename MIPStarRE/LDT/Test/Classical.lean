@@ -208,8 +208,7 @@ noncomputable def axisParallelLineLeftPointRightAcceptanceProbability
     {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) : Error :=
   indicatorAcceptanceProbability fun s : AxisParallelTestSample params =>
-    strategy.axisParallelAnswerA (axisParallelLineOfSample params s) zeroCoord =
-      strategy.pointAnswerB (axisParallelPointOfSample params s)
+    strategy.axisParallelAccepts (Role.A, s)
 
 /-- Axis-parallel acceptance probability for the role choice where Alice gets the
 sampled base point and Bob gets the line. -/
@@ -217,8 +216,7 @@ noncomputable def axisParallelPointLeftLineRightAcceptanceProbability
     {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) : Error :=
   indicatorAcceptanceProbability fun s : AxisParallelTestSample params =>
-    strategy.pointAnswerA (axisParallelPointOfSample params s) =
-      strategy.axisParallelAnswerB (axisParallelLineOfSample params s) zeroCoord
+    strategy.axisParallelAccepts (Role.B, s)
 
 /-- Acceptance probability of the axis-parallel branch of the classical low
 individual degree test. -/
@@ -227,11 +225,9 @@ noncomputable def axisParallelAcceptanceProbability {params : Parameters}
     (strategy : TwoProverClassicalLIDStrategy params) : Error :=
   roleTaggedAcceptanceProbability
     (fun s : AxisParallelTestSample params =>
-      strategy.axisParallelAnswerA (axisParallelLineOfSample params s) zeroCoord =
-        strategy.pointAnswerB (axisParallelPointOfSample params s))
+      strategy.axisParallelAccepts (Role.A, s))
     (fun s : AxisParallelTestSample params =>
-      strategy.pointAnswerA (axisParallelPointOfSample params s) =
-        strategy.axisParallelAnswerB (axisParallelLineOfSample params s) zeroCoord)
+      strategy.axisParallelAccepts (Role.B, s))
 
 /-- The role-tagged axis-parallel average equals the arithmetic mean of the two
 crossed role choices. -/
@@ -245,11 +241,9 @@ theorem axisParallelAcceptanceProbability_eq_roleAverage {params : Parameters}
     axisParallelPointLeftLineRightAcceptanceProbability] using
       (roleTaggedAcceptanceProbability_eq_roleAverage
         (pA := fun s : AxisParallelTestSample params =>
-          strategy.axisParallelAnswerA (axisParallelLineOfSample params s) zeroCoord =
-            strategy.pointAnswerB (axisParallelPointOfSample params s))
+          strategy.axisParallelAccepts (Role.A, s))
         (pB := fun s : AxisParallelTestSample params =>
-          strategy.pointAnswerA (axisParallelPointOfSample params s) =
-            strategy.axisParallelAnswerB (axisParallelLineOfSample params s) zeroCoord))
+          strategy.axisParallelAccepts (Role.B, s)))
 
 /-- Acceptance probability of the self-consistency branch of the classical low
 individual degree test. -/
@@ -265,8 +259,7 @@ noncomputable def restrictedDiagonalLineLeftPointRightAcceptanceProbability
     {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) (j : Fin params.m) : Error :=
   indicatorAcceptanceProbability fun s : RestrictedDiagonalSample params j =>
-    strategy.diagonalAnswerA (restrictedDiagonalLineOfSample j s) zeroCoord =
-      strategy.pointAnswerB (restrictedDiagonalPointOfSample j s)
+    strategy.restrictedDiagonalAccepts j (Role.A, s)
 
 /-- Restricted-diagonal acceptance probability for the role choice where Alice
 gets the sampled base point and Bob gets the diagonal line. -/
@@ -274,8 +267,7 @@ noncomputable def restrictedDiagonalPointLeftLineRightAcceptanceProbability
     {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) (j : Fin params.m) : Error :=
   indicatorAcceptanceProbability fun s : RestrictedDiagonalSample params j =>
-    strategy.pointAnswerA (restrictedDiagonalPointOfSample j s) =
-      strategy.diagonalAnswerB (restrictedDiagonalLineOfSample j s) zeroCoord
+    strategy.restrictedDiagonalAccepts j (Role.B, s)
 
 /-- Acceptance probability of the `j`-restricted diagonal branch. -/
 noncomputable def restrictedDiagonalAcceptanceProbability {params : Parameters}
@@ -284,11 +276,9 @@ noncomputable def restrictedDiagonalAcceptanceProbability {params : Parameters}
     (j : Fin params.m) : Error :=
   roleTaggedAcceptanceProbability
     (fun s : RestrictedDiagonalSample params j =>
-      strategy.diagonalAnswerA (restrictedDiagonalLineOfSample j s) zeroCoord =
-        strategy.pointAnswerB (restrictedDiagonalPointOfSample j s))
+      strategy.restrictedDiagonalAccepts j (Role.A, s))
     (fun s : RestrictedDiagonalSample params j =>
-      strategy.pointAnswerA (restrictedDiagonalPointOfSample j s) =
-        strategy.diagonalAnswerB (restrictedDiagonalLineOfSample j s) zeroCoord)
+      strategy.restrictedDiagonalAccepts j (Role.B, s))
 
 /-- The role-tagged restricted-diagonal average equals the arithmetic mean of the
 corresponding two crossed role choices. -/
@@ -303,11 +293,9 @@ theorem restrictedDiagonalAcceptanceProbability_eq_roleAverage {params : Paramet
     restrictedDiagonalPointLeftLineRightAcceptanceProbability] using
       (roleTaggedAcceptanceProbability_eq_roleAverage
         (pA := fun s : RestrictedDiagonalSample params j =>
-          strategy.diagonalAnswerA (restrictedDiagonalLineOfSample j s) zeroCoord =
-            strategy.pointAnswerB (restrictedDiagonalPointOfSample j s))
+          strategy.restrictedDiagonalAccepts j (Role.A, s))
         (pB := fun s : RestrictedDiagonalSample params j =>
-          strategy.pointAnswerA (restrictedDiagonalPointOfSample j s) =
-            strategy.diagonalAnswerB (restrictedDiagonalLineOfSample j s) zeroCoord))
+          strategy.restrictedDiagonalAccepts j (Role.B, s)))
 
 /-- Diagonal acceptance probability for the role choice where Alice gets the
 sampled diagonal line and Bob gets the sampled base point. -/

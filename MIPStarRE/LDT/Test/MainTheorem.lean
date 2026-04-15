@@ -57,7 +57,8 @@ def PointAnswerSoundnessConclusion (params : Parameters) [FieldModel params.q]
 bound.
 
 This is the form used by the classical two-prover theorem once the quoted
-Polishchuk–Spielman implication is supplied separately as a bridge package. -/
+Polishchuk–Spielman implication is supplied separately as an explicit
+hypothesis. -/
 def BoundedPointAnswerSoundnessConclusion (params : Parameters)
     [FieldModel params.q]
     (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
