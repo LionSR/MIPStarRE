@@ -3752,16 +3752,12 @@ theorem gCommStability
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (_hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityOneLeft params strategy family G)
       (commDataProcessedGStabilityOneRight params strategy family G)
       (Real.sqrt zeta) := by
-  have _hpaperResidual :=
-    gCommStability_storedBoundedResidualBound params strategy zeta family G hG hbound
-  have _hpaperDomination :=
-    gCommStability_averagedPoint_le_witness params strategy zeta family hbound
   exact
     gCommStability_overlap params strategy zeta hnorm family G hG hself
 
@@ -4088,16 +4084,12 @@ theorem gCommStabilityTwo
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (_hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityTwoLeft params strategy family G)
       (commDataProcessedGStabilityTwoRight params strategy family G)
       (Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error))) := by
-  have _hpaperResidual :=
-    gCommStability_storedBoundedResidualBound params strategy zeta family G hG hbound
-  have _hpaperDomination :=
-    gCommStability_averagedPoint_le_witness params strategy zeta family hbound
   have _hpaperPointSwap :
       SDDOpRel strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
