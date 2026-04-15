@@ -2248,6 +2248,132 @@ theorem gCommStabilityTwo
       hstrong
       hle
 
+set_option maxHeartbeats 2000000 in
+/-- Unfold the first stability relation into its averaged scalar defect term. -/
+private lemma gCommStabilityOne_scalar_gap
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (zeta : Error)
+    (hstab : SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
+      (Real.sqrt zeta)) :
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q =>
+        ∑ ah : StabilityOneOutcome params,
+          ev strategy.state
+            ((leftTensor (ι₂ := ι)
+                ((1 - (G (pointHeight params q.2)).total) *
+                  (((evaluatedSliceSandwichRaw params strategy family q).outcome
+                    (ah.1, ah.2 (truncatePoint params q.2)))ᴴ *
+                    (evaluatedSliceSandwichRaw params strategy family q).outcome
+                      (ah.1, ah.2 (truncatePoint params q.2))) *
+                  (1 - (G (pointHeight params q.2)).total))) *
+              rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2))) ≤
+      Real.sqrt zeta := by
+  rcases hstab with ⟨hstab⟩
+  calc
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q =>
+          ∑ ah : StabilityOneOutcome params,
+            ev strategy.state
+              ((leftTensor (ι₂ := ι)
+                  ((1 - (G (pointHeight params q.2)).total) *
+                    (((evaluatedSliceSandwichRaw params strategy family q).outcome
+                      (ah.1, ah.2 (truncatePoint params q.2)))ᴴ *
+                      (evaluatedSliceSandwichRaw params strategy family q).outcome
+                        (ah.1, ah.2 (truncatePoint params q.2))) *
+                    (1 - (G (pointHeight params q.2)).total))) *
+                rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2)))
+      = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q =>
+            qSDDOp strategy.state
+              (commDataProcessedGStabilityOneLeft params strategy family G q)
+              (commDataProcessedGStabilityOneRight params strategy family G q)) := by
+            apply avgOver_congr
+            intro q
+            symm
+            exact
+              commDataProcessedGStabilityOne_qSDDOp_expand
+                params strategy family G hG q
+    _ = sddErrorOp strategy.state
+          (uniformDistribution (EvaluatedSliceQuestion params))
+          (commDataProcessedGStabilityOneLeft params strategy family G)
+          (commDataProcessedGStabilityOneRight params strategy family G) := by
+            rfl
+    _ ≤ Real.sqrt zeta := hstab
+
+set_option maxHeartbeats 2000000 in
+/-- Unfold the second stability relation into its averaged scalar defect term. -/
+private lemma gCommStabilityTwo_scalar_gap
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (gamma zeta : Error)
+    (hstab : SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (commDataProcessedGStabilityTwoLeft params strategy family G)
+      (commDataProcessedGStabilityTwoRight params strategy family G)
+      (Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)))) :
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q =>
+        ∑ gb : StabilityTwoOutcome params,
+          ev strategy.state
+            ((leftTensor (ι₂ := ι)
+                ((1 - (G (pointHeight params q.1)).total) *
+                  (((orderedProductOpFamily
+                      (evaluatedSliceFirstFactor params family q)
+                      (evaluatedSliceSecondFactor params family q)).outcome
+                      (gb.1 (truncatePoint params q.1), gb.2))ᴴ *
+                    (orderedProductOpFamily
+                      (evaluatedSliceFirstFactor params family q)
+                      (evaluatedSliceSecondFactor params family q)).outcome
+                      (gb.1 (truncatePoint params q.1), gb.2)) *
+                  (1 - (G (pointHeight params q.1)).total))) *
+              rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).outcome gb.1))) ≤
+      Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
+  rcases hstab with ⟨hstab⟩
+  calc
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q =>
+          ∑ gb : StabilityTwoOutcome params,
+            ev strategy.state
+              ((leftTensor (ι₂ := ι)
+                  ((1 - (G (pointHeight params q.1)).total) *
+                    (((orderedProductOpFamily
+                        (evaluatedSliceFirstFactor params family q)
+                        (evaluatedSliceSecondFactor params family q)).outcome
+                        (gb.1 (truncatePoint params q.1), gb.2))ᴴ *
+                      (orderedProductOpFamily
+                        (evaluatedSliceFirstFactor params family q)
+                        (evaluatedSliceSecondFactor params family q)).outcome
+                        (gb.1 (truncatePoint params q.1), gb.2)) *
+                    (1 - (G (pointHeight params q.1)).total))) *
+                rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).outcome gb.1)))
+      = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q =>
+            qSDDOp strategy.state
+              (commDataProcessedGStabilityTwoLeft params strategy family G q)
+              (commDataProcessedGStabilityTwoRight params strategy family G q)) := by
+            apply avgOver_congr
+            intro q
+            symm
+            exact
+              commDataProcessedGStabilityTwo_qSDDOp_expand
+                params strategy family G hG q
+    _ = sddErrorOp strategy.state
+          (uniformDistribution (EvaluatedSliceQuestion params))
+          (commDataProcessedGStabilityTwoLeft params strategy family G)
+          (commDataProcessedGStabilityTwoRight params strategy family G) := by
+            rfl
+    _ ≤ Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := hstab
+
 /-! ### Scalar approximation chain (proof of `lem:comm-data-processed-g`)
 
 The paper's proof (`commutativity-G.tex`, lines 72–131) converts
@@ -2367,24 +2493,33 @@ private lemma evaluatedSlice_scalar_chain_bound
   -- TODO(issue #296): finish the scalar approximation chain from
   -- `references/ldt-paper/commutativity-G.tex`, eq:gcom8 onward.
   --
-  -- The missing point-consistency bridge is now available above as
-  -- `_hpointCons`; it is the hypothesis needed for the four `eq:add-an-a`
-  -- insertions/removals via `closenessOfIP`/`easyApproxFromApproxDelta`.
-  -- The two stability relations are also available above as `_hstabOne` and
-  -- `_hstabTwo`, now that this helper has been moved below
-  -- `gCommStability` and `gCommStabilityTwo`. The intended chain is:
+  -- After checking the available API, the remaining proof work reduces to
+  -- three still-unpackaged scalar bridges.
   --
-  -- * use `_hpointCons`, `hpostSSC_fst`, and `hpostSSC_snd` for the
-  --   `2√ζ`/`√ζ` point and postprocessed self-consistency losses;
-  -- * use `_hpointSwap`, after reindexing along the definitional equality
-  --   `EvaluatedSliceQuestion params = PointPairQuestion params.next`, for
-  --   the point-measurement swap loss;
-  -- * use `_hstabOne` and `_hstabTwo` for the stability losses.
-  -- What is still missing is a scalar-chain API converting these `SDDOpRel`
-  -- hypotheses into the nine absolute-value estimates on the displayed
-  -- averaged quartic terms. In particular, the next useful helpers should
-  -- package each `closenessOfIP` application with its normalization condition
-  -- and expose its conclusion in the exact scalar shape used here.
+  -- * `pointConsistency_addAnA_snd` / `pointConsistency_addAnA_fst`:
+  --   convert `_hpointCons`, via `simeqToApprox` and `closenessOfIP`, into the
+  --   two `eq:add-an-a` insertion/removal estimates.  The fixed-index
+  --   normalization witness is the relevant sandwiched family; its row-square
+  --   bound should come from `sandwichByOuterSubMeas.total_le_one`.
+  -- * `gCommStabilityOne_scalar_gap`:
+  --   extract from `_hstabOne` the scalar estimate comparing the averaged
+  --   `G^y`-inserted and `G^y`-removed quartic terms.  The missing ingredient
+  --   is an orthogonal-fiber postprocessing lemma: summing the `a`-coordinate
+  --   of `commDataProcessedGStabilityOneLeft/Right` should preserve the
+  --   relevant `qSDDOp` defect because different `a`-fibers are orthogonal.
+  -- * `gCommStabilityTwo_scalar_gap`:
+  --   the analogous scalar extraction for `_hstabTwo`, now summing the
+  --   `b`-coordinate.
+  --
+  -- Once those three bridges are available, the rest of the proof is routine:
+  -- use `easyApproxFromApproxDelta_twoFamily` with `hpostSSC_fst` and
+  -- `hpostSSC_snd`, apply `evaluatedSliceCommutation_avg_swap_terms` for
+  -- `BAB = ABA`, and finish with the arithmetic
+  -- `12√ζ + 12√(γ(m+1)) ≤ 48m(√γ + √ζ)`.
+  --
+  -- Note: `_hpointSwap` is no longer a separate blocker for this helper.
+  -- `gCommStabilityTwo` already relaxes its stronger `sqrt zeta` control to
+  -- the paper's displayed `sqrt zeta + 6 * sqrt (gamma * (m + 1))` term.
   sorry
 
 /-- `lem:comm-data-processed-g`. -/
