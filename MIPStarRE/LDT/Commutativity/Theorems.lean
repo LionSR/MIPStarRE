@@ -280,6 +280,131 @@ private lemma subMeas_sum_adjoint_mul_le_one
     _ = A.total := A.sum_eq_total
     _ ≤ 1 := A.total_le_one
 
+private def zeroOpFamily (Outcome κ : Type*) [Fintype κ] [DecidableEq κ] :
+    OpFamily Outcome κ where
+  outcome := fun _ => 0
+  total := 0
+
+private lemma qSDDOp_zeroOpFamily_le_one_of_sum_adjoint_mul_le_one
+    {Outcome κ : Type*} [Fintype Outcome] [Fintype κ] [DecidableEq κ]
+    (ψ : QuantumState κ) (hψ : ψ.IsNormalized) (A : OpFamily Outcome κ)
+    (hA : ∑ a : Outcome, (A.outcome a)ᴴ * A.outcome a ≤ 1) :
+    qSDDOp ψ A (zeroOpFamily Outcome κ) ≤ 1 := by
+  unfold qSDDOp qSDDCore zeroOpFamily
+  calc
+    ∑ a : Outcome, ev ψ ((A.outcome a - 0)ᴴ * (A.outcome a - 0))
+        = ∑ a : Outcome, ev ψ ((A.outcome a)ᴴ * A.outcome a) := by
+            simp
+    _ = ev ψ (∑ a : Outcome, (A.outcome a)ᴴ * A.outcome a) := by
+          rw [ev_sum]
+    _ ≤ ev ψ (1 : MIPStarRE.Quantum.Op κ) := by
+          exact ev_mono ψ _ _ hA
+    _ = 1 := ev_one_of_isNormalized ψ hψ
+
+private lemma leftTensor_conjTranspose
+    {κ₁ κ₂ : Type*} [Fintype κ₁] [DecidableEq κ₁] [Fintype κ₂] [DecidableEq κ₂]
+    (X : MIPStarRE.Quantum.Op κ₁) :
+    (leftTensor (ι₂ := κ₂) X)ᴴ = leftTensor (ι₂ := κ₂) Xᴴ := by
+  simpa [leftTensor, opTensor] using
+    (conjTranspose_opTensor X (1 : MIPStarRE.Quantum.Op κ₂))
+
+private lemma leftPlacedOpFamily_sum_adjoint_mul_le_one
+    {Outcome : Type*} [Fintype Outcome]
+    (A : SubMeas Outcome ι) :
+    ∑ a : Outcome,
+        ((OpFamily.leftPlacedOpFamily (ιB := ι) A.toOpFamily).outcome a)ᴴ *
+          (OpFamily.leftPlacedOpFamily (ιB := ι) A.toOpFamily).outcome a ≤
+      (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+  calc
+    ∑ a : Outcome,
+        ((OpFamily.leftPlacedOpFamily (ιB := ι) A.toOpFamily).outcome a)ᴴ *
+          (OpFamily.leftPlacedOpFamily (ιB := ι) A.toOpFamily).outcome a
+        = ∑ a : Outcome,
+            leftTensor (ι₂ := ι) ((A.outcome a)ᴴ * A.outcome a) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            simp [OpFamily.leftPlacedOpFamily, SubMeas.toOpFamily,
+              leftTensor_conjTranspose, leftTensor_mul_leftTensor]
+    _ = leftTensor (ι₂ := ι) (∑ a : Outcome, (A.outcome a)ᴴ * A.outcome a) := by
+          rw [leftTensor_finset_sum]
+    _ ≤ 1 :=
+          leftTensor_le_one (ι₂ := ι) (subMeas_sum_adjoint_mul_le_one A)
+
+private lemma qSDDOp_leftOrderedProduct_zeroOpFamily_le_one
+    {α β : Type*} [Fintype α] [Fintype β]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A : SubMeas α ι) (B : SubMeas β ι) :
+    qSDDOp ψ (leftOrderedProductOpFamily A B) (zeroOpFamily (α × β) (ι × ι)) ≤ 1 := by
+  let base : OpFamily β (ι × ι) :=
+    OpFamily.leftPlacedOpFamily (ιB := ι) B.toOpFamily
+  let zeroBase : OpFamily β (ι × ι) := zeroOpFamily β (ι × ι)
+  let lifted : OpFamily (β × α) (ι × ι) :=
+    { outcome := fun ba => leftTensor (ι₂ := ι) (A.outcome ba.2) * base.outcome ba.1
+      total := ∑ ba : β × α,
+        leftTensor (ι₂ := ι) (A.outcome ba.2) * base.outcome ba.1 }
+  let liftedZero : OpFamily (β × α) (ι × ι) :=
+    { outcome := fun ba => leftTensor (ι₂ := ι) (A.outcome ba.2) * zeroBase.outcome ba.1
+      total := ∑ ba : β × α,
+        leftTensor (ι₂ := ι) (A.outcome ba.2) * zeroBase.outcome ba.1 }
+  have hbase : qSDDOp ψ base zeroBase ≤ 1 :=
+    qSDDOp_zeroOpFamily_le_one_of_sum_adjoint_mul_le_one ψ hψ base
+      (leftPlacedOpFamily_sum_adjoint_mul_le_one B)
+  have hC : ∀ b : β,
+      ∑ a : α,
+        (leftTensor (ι₂ := ι) (A.outcome a))ᴴ *
+          leftTensor (ι₂ := ι) (A.outcome a) ≤
+      (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+    intro b
+    simpa [OpFamily.leftPlacedOpFamily, SubMeas.toOpFamily] using
+      leftPlacedOpFamily_sum_adjoint_mul_le_one A
+  have hLift : qSDDOp ψ lifted liftedZero ≤ 1 := by
+    exact le_trans
+      (Preliminaries.questionCabApproxDelta ψ base zeroBase
+        (fun _ a => leftTensor (ι₂ := ι) (A.outcome a)) hC)
+      hbase
+  rw [qSDDOp_reindex (Equiv.prodComm α β) ψ
+    (leftOrderedProductOpFamily A B) (zeroOpFamily (α × β) (ι × ι))]
+  simpa [lifted, liftedZero, leftOrderedProductOpFamily, orderedProductOpFamily,
+    base, zeroBase, zeroOpFamily, OpFamily.leftPlacedOpFamily, SubMeas.toOpFamily,
+    leftTensor_mul_leftTensor] using hLift
+
+private lemma qSDDOp_leftPlacedReversedProduct_zeroOpFamily_le_one
+    {α β : Type*} [Fintype α] [Fintype β]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A : SubMeas α ι) (B : SubMeas β ι) :
+    qSDDOp ψ
+      (OpFamily.leftPlacedOpFamily (ιB := ι) (reversedProductOpFamily A B))
+      (zeroOpFamily (α × β) (ι × ι)) ≤ 1 := by
+  let base : OpFamily α (ι × ι) :=
+    OpFamily.leftPlacedOpFamily (ιB := ι) A.toOpFamily
+  let zeroBase : OpFamily α (ι × ι) := zeroOpFamily α (ι × ι)
+  let lifted : OpFamily (α × β) (ι × ι) :=
+    { outcome := fun ab => leftTensor (ι₂ := ι) (B.outcome ab.2) * base.outcome ab.1
+      total := ∑ ab : α × β,
+        leftTensor (ι₂ := ι) (B.outcome ab.2) * base.outcome ab.1 }
+  let liftedZero : OpFamily (α × β) (ι × ι) :=
+    { outcome := fun ab => leftTensor (ι₂ := ι) (B.outcome ab.2) * zeroBase.outcome ab.1
+      total := ∑ ab : α × β,
+        leftTensor (ι₂ := ι) (B.outcome ab.2) * zeroBase.outcome ab.1 }
+  have hbase : qSDDOp ψ base zeroBase ≤ 1 :=
+    qSDDOp_zeroOpFamily_le_one_of_sum_adjoint_mul_le_one ψ hψ base
+      (leftPlacedOpFamily_sum_adjoint_mul_le_one A)
+  have hC : ∀ a : α,
+      ∑ b : β,
+        (leftTensor (ι₂ := ι) (B.outcome b))ᴴ *
+          leftTensor (ι₂ := ι) (B.outcome b) ≤
+      (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+    intro a
+    simpa [OpFamily.leftPlacedOpFamily, SubMeas.toOpFamily] using
+      leftPlacedOpFamily_sum_adjoint_mul_le_one B
+  have hLift : qSDDOp ψ lifted liftedZero ≤ 1 := by
+    exact le_trans
+      (Preliminaries.questionCabApproxDelta ψ base zeroBase
+        (fun _ b => leftTensor (ι₂ := ι) (B.outcome b)) hC)
+      hbase
+  simpa [lifted, liftedZero, reversedProductOpFamily, base, zeroBase, zeroOpFamily,
+    OpFamily.leftPlacedOpFamily, SubMeas.toOpFamily, leftTensor_mul_leftTensor] using hLift
+
 private lemma liftLeft_mul_leftPlaced_outcome
     {α β : Type*}
     [Fintype α] [Fintype β]
@@ -2856,6 +2981,7 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
     (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (hEval :
@@ -3104,7 +3230,122 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
     -- inequality for vectors and the sub-measurement property;
     -- paper lines 263–271), while comMainError ≥ 30m ≥ 30 > 4
     -- (since rpow x (1/4) ≥ 1 when x ≥ 1, and m ≥ 1).
-    sorry
+    let Aidx : IdxOpFamily (EvaluatedSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
+      fun q => fullSliceProductLeft params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q)
+    let Bidx : IdxOpFamily (EvaluatedSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
+      fun q => fullSliceProductRight params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q)
+    let Zidx : IdxOpFamily (EvaluatedSliceQuestion params) (FullSliceOutcome params) (ι × ι) :=
+      fun _ => zeroOpFamily (FullSliceOutcome params) (ι × ι)
+    have hA_one : SDDOpRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params)) Aidx Zidx 1 := by
+      constructor
+      calc
+        sddErrorOp strategy.state (uniformDistribution (EvaluatedSliceQuestion params))
+            Aidx Zidx
+            ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params)) (fun _ => 1) := by
+              unfold sddErrorOp
+              apply avgOver_mono
+              intro q
+              simpa [Aidx, Zidx, fullSliceProductLeft, fullSliceQuestionOfEvaluatedSlice,
+                fullSliceFirstFactor, fullSliceSecondFactor] using
+                qSDDOp_leftOrderedProduct_zeroOpFamily_le_one
+                  strategy.state hnorm
+                  ((family.meas (pointHeight params q.1)).toSubMeas)
+                  ((family.meas (pointHeight params q.2)).toSubMeas)
+        _ = ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
+              (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
+              simp [avgOver]
+        _ ≤ 1 := by
+              simpa using
+                uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
+    have hB_one : SDDOpRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params)) Bidx Zidx 1 := by
+      constructor
+      calc
+        sddErrorOp strategy.state (uniformDistribution (EvaluatedSliceQuestion params))
+            Bidx Zidx
+            ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params)) (fun _ => 1) := by
+              unfold sddErrorOp
+              apply avgOver_mono
+              intro q
+              simpa [Bidx, Zidx, fullSliceProductRight, fullSliceQuestionOfEvaluatedSlice,
+                fullSliceFirstFactor, fullSliceSecondFactor] using
+                qSDDOp_leftPlacedReversedProduct_zeroOpFamily_le_one
+                  strategy.state hnorm
+                  ((family.meas (pointHeight params q.1)).toSubMeas)
+                  ((family.meas (pointHeight params q.2)).toSubMeas)
+        _ = ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
+              (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
+              simp [avgOver]
+        _ ≤ 1 := by
+              simpa using
+                uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
+    have hraw : SDDOpRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params)) Aidx Bidx 4 := by
+      have hZB : SDDOpRel strategy.state
+          (uniformDistribution (EvaluatedSliceQuestion params)) Zidx Bidx 1 :=
+        MIPStarRE.LDT.Preliminaries.sddOpRel_symm strategy.state
+          (uniformDistribution (EvaluatedSliceQuestion params)) Bidx Zidx 1 hB_one
+      have htri :=
+        MIPStarRE.LDT.Preliminaries.stateDependentDistanceOpRel_triangle strategy.state
+          (uniformDistribution (EvaluatedSliceQuestion params)) Aidx Zidx Bidx 1 1
+          hA_one hZB
+      exact
+        MIPStarRE.LDT.Preliminaries.stateDependentDistanceOpRel_mono strategy.state
+          (uniformDistribution (EvaluatedSliceQuestion params)) Aidx Bidx
+          (2 * (1 + 1)) 4 (by norm_num) htri
+    have hm_ge : (1 : Error) ≤ (params.m : Error) :=
+      Nat.one_le_cast.mpr (Nat.succ_le_of_lt params.hm)
+    have hq_pos : (0 : Error) < ↑params.q :=
+      Nat.cast_pos.mpr params.hq
+    have hdq_nn : 0 ≤ (↑params.d : Error) / ↑params.q :=
+      div_nonneg (Nat.cast_nonneg _) hq_pos.le
+    have hg4 : 0 ≤ Real.rpow gamma (1 / (4 : Error)) :=
+      Real.rpow_nonneg hgamma_nonneg _
+    have hz4 : 0 ≤ Real.rpow zeta (1 / (4 : Error)) :=
+      Real.rpow_nonneg hzeta_nonneg _
+    have hdq4 : 0 ≤ Real.rpow
+        ((↑params.d : Error) / ↑params.q) (1 / (4 : Error)) :=
+      Real.rpow_nonneg hdq_nn _
+    have hlarge_cases :
+        1 ≤ gamma ∨ 1 ≤ zeta ∨ 1 ≤ (↑params.d : Error) / ↑params.q := by
+      by_contra hcases
+      push_neg at hcases
+      exact hsmall ⟨le_of_lt hcases.1, le_of_lt hcases.2.1, le_of_lt hcases.2.2⟩
+    have hsum_ge_one :
+        1 ≤ Real.rpow gamma (1 / (4 : Error)) +
+          Real.rpow zeta (1 / (4 : Error)) +
+          Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)) := by
+      rcases hlarge_cases with hgamma_large | hzeta_large | hdq_large
+      · have hg1 : 1 ≤ Real.rpow gamma (1 / (4 : Error)) := by
+          simpa using Real.one_le_rpow hgamma_large (by norm_num : 0 ≤ (1 / (4 : Error)))
+        nlinarith [hg1, hz4, hdq4]
+      · have hz1 : 1 ≤ Real.rpow zeta (1 / (4 : Error)) := by
+          simpa using Real.one_le_rpow hzeta_large (by norm_num : 0 ≤ (1 / (4 : Error)))
+        nlinarith [hz1, hg4, hdq4]
+      · have hdq1 :
+            1 ≤ Real.rpow (((params.d : Error) / (params.q : Error)))
+              (1 / (4 : Error)) := by
+          simpa using Real.one_le_rpow hdq_large (by norm_num : 0 ≤ (1 / (4 : Error)))
+        nlinarith [hdq1, hg4, hz4]
+    have hcom_ge_30 : 30 ≤ comMainError params gamma zeta := by
+      unfold comMainError
+      let s :=
+        Real.rpow gamma (1 / (4 : Error)) +
+          Real.rpow zeta (1 / (4 : Error)) +
+          Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error))
+      have hs : 1 ≤ s := by simpa [s] using hsum_ge_one
+      have hms : (1 : Error) ≤ (params.m : Error) * s := by
+        have := mul_le_mul hm_ge hs (by norm_num : (0 : Error) ≤ 1)
+          (le_trans (by norm_num : (0 : Error) ≤ 1) hm_ge)
+        nlinarith
+      nlinarith
+    exact
+      MIPStarRE.LDT.Preliminaries.stateDependentDistanceOpRel_mono strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params)) Aidx Bidx
+        4 (comMainError params gamma zeta) (by linarith) hraw
 
 /-- The remaining `thm:com-main` lift from evaluated commutation back to
 full-slice commutation.
@@ -3118,6 +3359,7 @@ private lemma fullSliceCommutation_of_evaluated
     (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (hEval :
@@ -3138,7 +3380,7 @@ private lemma fullSliceCommutation_of_evaluated
       (comMainError params gamma zeta)
       (fullSliceCommutation_of_evaluated_on_evaluated_questions
         params strategy family gamma zeta
-        hgamma_nonneg hzeta_nonneg _hself hEval)
+        hnorm hgamma_nonneg hzeta_nonneg _hself hEval)
 
 /-- `thm:com-main`. -/
 theorem comMain
@@ -3184,7 +3426,7 @@ theorem comMain
         exact
           fullSliceCommutation_of_evaluated
             params strategy family gamma zeta
-            hgamma_nonneg hzeta_nonneg
+            hnorm hgamma_nonneg hzeta_nonneg
             hself hSpecialized }
 
 /-- `lem:normalization-condition`. -/

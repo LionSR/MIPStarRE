@@ -516,7 +516,7 @@ private lemma conjTranspose_mul_mono
         Zᴴ).nonneg
   simpa [mul_sub, sub_mul, Matrix.conjTranspose_conjTranspose, mul_assoc] using hnonneg
 
-private lemma questionCabApproxDelta
+lemma questionCabApproxDelta
     {Outcome Aux : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [Fintype Aux]
