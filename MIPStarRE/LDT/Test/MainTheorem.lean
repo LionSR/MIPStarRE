@@ -158,7 +158,8 @@ theorem mainFormalBridgePackage
     (k : ℕ)
     (_hk : params.m * params.d ≤ k) :
     MainFormalBridgePackage params strategy eps k := by
-  -- Intentional sorry: this bridge package producer is a placeholder per PROOF_INTEGRITY.md scaffolding rules
+  -- TODO(Section 3): Intentional sorry pending paper-faithful assembly (see docstring);
+  -- load-bearing for `mainFormal`, which invokes this producer below.
   sorry
 
 /-- `thm:main-informal`.

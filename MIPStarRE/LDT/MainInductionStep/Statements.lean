@@ -121,27 +121,6 @@ structure MainInductionBridgePackage (params : Parameters)
         error ∧
       error ≤ mainInductionError params k eps delta gamma
 
-/-- Producer for the temporary Section 6 main-induction bridge package.
-
-This is the paper-faithful construction point for `MainInductionBridgePackage`.
-Starting from the exact inputs of `thm:main-induction`, the eventual proof must
-handle the `m = 1` base case and, in the inductive step, restrict the strategy
-to slices, apply the recursive induction hypothesis to each slice, self-improve
-the slice measurements, average the resulting completeness/consistency/
-boundedness estimates, paste the slice family, and close the explicit
-`mainInductionError` bookkeeping. -/
-theorem mainInductionBridgePackage
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
-    (k : ℕ)
-    (_hk : params.m * params.d ≤ k) :
-    MainInductionBridgePackage params strategy eps delta gamma k := by
-  -- Intentional sorry: this bridge package producer is a placeholder per PROOF_INTEGRITY.md scaffolding rules
-  sorry
-
 /-- Bookkeeping package for the restricted-probabilities lemma.
 
 Both the axis-parallel and diagonal branches use the paper's
@@ -157,26 +136,6 @@ structure RestrictedProbabilitiesBridgePackage (params : Parameters)
     avgOver (uniformDistribution (Fq params))
         (fun x => sliceDiagonalDirectionWeight params *
           (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma
-
-/-- Producer for the temporary restricted-probabilities bridge package.
-
-This is the paper-faithful construction point for the two conditioning bounds
-used in `lem:restricted-probabilities`. From an `(ε, δ, γ)`-good symmetric
-strategy on `(m + 1, q, d)`, the eventual proof must identify the axis-parallel
-and diagonal tests conditioned on not using the new coordinate direction with
-the corresponding `x`-restricted tests, producing the shared
-`m / (m + 1)` weighted bounds recorded in
-`RestrictedProbabilitiesBridgePackage`. The self-consistency branch is already
-proved directly in `restrictedProbabilities`. -/
-theorem restrictedProbabilitiesBridgePackage
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (_hgood : strategy.IsGood eps delta gamma) :
-    RestrictedProbabilitiesBridgePackage params strategy eps gamma := by
-  -- Intentional sorry: this bridge package producer is a placeholder per PROOF_INTEGRITY.md scaffolding rules
-  sorry
 
 /-- Bookkeeping package for the restricted-probabilities lemma.
 
