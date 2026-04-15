@@ -200,17 +200,42 @@ private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
   simpa [qSSCDefect, diagA, leftPlacedSubMeas, leftTensor_mul_leftTensor,
     A.total_eq_one] using hmax'
 
-/-- Consistency implies almost-projective: if `A` is `ζ`-consistent
-with `B`, then `A` is `2ζ`-almost-projective.
+private lemma sourceAlmostProjective_of_ssc {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (η : Error)
+    (hssc : qSSCDefect ψ A.toSubMeas ≤ η) :
+    ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ η := by
+  let diagA : Error := ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a)
+  have hsource_eq :
+      ∑ a : Outcome, ev ψ (A.outcome a - A.outcome a * A.outcome a) =
+        ev ψ A.toSubMeas.total - diagA := by
+    calc
+      ∑ a : Outcome, ev ψ (A.outcome a - A.outcome a * A.outcome a)
+          = ∑ a : Outcome,
+              (ev ψ (A.outcome a) - ev ψ (A.outcome a * A.outcome a)) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              exact ev_sub ψ (A.outcome a) (A.outcome a * A.outcome a)
+      _ = (∑ a : Outcome, ev ψ (A.outcome a)) -
+            ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a) := by
+            rw [Finset.sum_sub_distrib]
+      _ = ev ψ A.toSubMeas.total - diagA := by
+            rw [← ev_sum ψ A.outcome, A.toSubMeas.sum_eq_total]
+  have hssc' : max 0 (ev ψ A.toSubMeas.total - diagA) ≤ η := by
+    simpa [qSSCDefect, diagA] using hssc
+  calc
+    ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a)
+      = ev ψ A.toSubMeas.total - diagA := hsource_eq
+    _ ≤ max 0 (ev ψ A.toSubMeas.total - diagA) := le_max_right 0 _
+    _ ≤ η := hssc'
 
-The mathematical implication does not intrinsically need `[Nonempty Outcome]`.
-The assumption is currently required only because `AlmostProjMeasStatement`
-packages an explicit `matrixWitness`, and the local witness below is a delta
-measurement built by choosing a distinguished outcome. -/
+/-- Consistency implies almost-projective: if `A` is `ζ`-consistent
+with `B`, then `A` is `2ζ`-almost-projective. -/
 lemma consistencyToAlmostProjective {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
+    [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ιA × ιB))
     (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error) :
     ConsRel ψ (uniformDistribution Unit)
@@ -243,9 +268,8 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
   have hAlmost_nonneg : 0 ≤ consistencyToAlmostProjectiveError ζ := by
     dsimp [consistencyToAlmostProjectiveError]
     nlinarith
-  refine ⟨?_, ?_, ?_⟩
-  · constructor
-    rw [MIPStarRE.LDT.Preliminaries.constFamily_ssc_unit]
+  have hsscBound :
+      qSSCDefect ψ A_lifted.toSubMeas ≤ consistencyToAlmostProjectiveError ζ := by
     calc
       qSSCDefect ψ A_lifted.toSubMeas
         ≤ 2 * qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := by
@@ -256,6 +280,10 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
             exact mul_le_mul_of_nonneg_left hCons' (by norm_num)
       _ = consistencyToAlmostProjectiveError ζ := by
             simp [consistencyToAlmostProjectiveError]
+  refine ⟨?_, ?_, ?_⟩
+  · constructor
+    rw [MIPStarRE.LDT.Preliminaries.constFamily_ssc_unit]
+    exact hsscBound
   · constructor
     calc
       sddError ψ (uniformDistribution Unit)
@@ -265,112 +293,21 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
       _ ≤ 2 * consistencyToAlmostProjectiveError ζ := by
             dsimp [consistencyToAlmostProjectiveError]
             nlinarith
-  · let H : FiniteHilbertSpace :=
-      { carrier := PUnit
-        instFintype := inferInstance
-        instDecidableEq := inferInstance
-        instNonempty := inferInstance }
-    let pivot : Outcome := Classical.arbitrary Outcome
-    let toyState : DensityMatrixState H :=
-      { matrix := 1
-        positive := by positivity
-        normalized := by
-          change MIPStarRE.Quantum.normalizedTrace
-              (1 : MIPStarRE.Quantum.Op H.carrier) = 1
-          simpa using (MIPStarRE.Quantum.normalizedTrace_one (d := H.carrier)) }
-    let toyMeas : MatrixMeasurement Outcome H :=
-      { effect := fun a => if a = pivot then 1 else 0
-        pos := by
-          intro a
-          by_cases h : a = pivot <;> simp [h]
-        sum_le_one := by
-          refine le_of_eq ?_
-          simp
-        sum_eq_one := by
-          simp }
-    refine ⟨{
-      space := H
-      state := toyState
-      measurement := toyMeas
-      overlapDecomposition := by
-        classical
-        have hoff :
-            MIPStarRE.Quantum.inconsistency toyMeas.effect toyMeas.effect = 0 := by
-          unfold MIPStarRE.Quantum.inconsistency
-          refine Finset.sum_eq_zero ?_
-          intro x _
-          refine Finset.sum_eq_zero ?_
-          intro x_1 hx_1
-          have hxneq : x_1 ≠ x := by
-            exact (Finset.mem_filter.mp hx_1).2
-          by_cases hx : x = pivot
-          · by_cases hx1 : x_1 = pivot
-            · exfalso
-              exact hxneq (hx1.trans hx.symm)
-            · simp [toyMeas, hx, hx1]
-          · simp [toyMeas, hx]
-        have hdiag :
-            MIPStarRE.Quantum.diagOverlap toyMeas.effect toyMeas.effect = 1 := by
-          unfold MIPStarRE.Quantum.diagOverlap
-          change ∑ x : Outcome,
-              MIPStarRE.Quantum.normalizedTrace
-                (((if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) *
-                  (if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) = 1
-          calc
-            ∑ x : Outcome,
-                MIPStarRE.Quantum.normalizedTrace
-                  (((if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0)) *
-                    (if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0))
-              =
-            ∑ x : Outcome,
-                MIPStarRE.Quantum.normalizedTrace
-                  (if x = pivot then
-                    if x = pivot then (1 : MIPStarRE.Quantum.Op H.carrier) else 0
-                   else 0) := by
-                    refine Finset.sum_congr rfl ?_
-                    intro x _
-                    by_cases hx : x = pivot <;> simp [hx]
-            _ = ∑ x : Outcome, if x = pivot then (1 : ℂ) else 0 := by
-                    refine Finset.sum_congr rfl ?_
-                    intro x _
-                    by_cases hx : x = pivot <;> simp [hx]
-            _ = 1 := by simp
-        rw [hoff, hdiag]
-        norm_num
-      pointwiseIdempotence := ?_
-    }⟩
-    intro a
-    by_cases h : a = pivot
-    · subst h
-      simpa [matrixIdempotenceDefect, toyMeas] using hAlmost_nonneg
-    · simpa [matrixIdempotenceDefect, toyMeas, h] using hAlmost_nonneg
+  · exact sourceAlmostProjective_of_ssc ψ A_lifted _ hsscBound
 
 /-- Spectral truncation of an almost-projective measurement.
 
-The strengthened statement now has to return a concrete projective
-submeasurement together with its closeness to the input measurement, so the
-old vacuous matrix witness is no longer enough. -/
+The bridge package isolates the still-unformalized spectral construction itself;
+this theorem just exposes it under the paper-faithful raw-family statement. -/
 def spectralTruncateAlmostProjective {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
     AlmostProjMeasStatement ψ A ζ →
+      SpectralTruncationBridgePackage ψ A ζ →
       SpectralTruncationStatement ψ A ζ := by
-  intro _hAlmost
-  /-
-  The spectral-truncation step from the paper produces projections `R_a` by
-  truncating the spectrum of each almost-projective effect `A_a`, and the point
-  of issue #279 is precisely that we must connect those `R_a` back to the input
-  measurement `A` via a concrete `ProjSubMeas Outcome ι` and an `SDDRel` bound.
-
-  The local matrix witness already tracks the per-outcome spectral truncations,
-  but the abstract bridge from that matrix layer back to a `ProjSubMeas Outcome ι`
-  on the ambient space `ι` has not been formalized yet. Once that bridge exists,
-  this theorem should package:
-  1. the truncated projections as `projSubMeas`, and
-  2. the paper's closeness estimate as `closeness`.
-  -/
-  sorry
+  intro _hAlmost hbridge
+  exact hbridge.witness
 
 private lemma spectralTruncationError_le_roundingToProjectiveError
     {ζ : Error} (hζ : 0 ≤ spectralTruncationError ζ) :
@@ -390,114 +327,40 @@ lemma adjustTruncatedProjections {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
     SpectralTruncationStatement ψ A ζ →
+      ProjectivizationRepairPackage ψ A ζ →
       ∃ P : ProjSubMeas Outcome ι,
         RoundedProjMeasStatement ψ A P
           (roundingToProjectiveError ζ) := by
-  intro hSpectral
-  classical
-  have hspectral_nonneg : 0 ≤ spectralTruncationError ζ := by
-    exact le_trans
-      (sddError_nonneg ψ (uniformDistribution Unit)
-        (constSubMeasFamily A.toSubMeas)
-        (constSubMeasFamily hSpectral.projSubMeas.toSubMeas))
-      hSpectral.closeness.squaredDistanceBound
-  refine ⟨hSpectral.projSubMeas, ?_⟩
-  refine ⟨?_, ?_⟩
-  · exact ⟨le_trans hSpectral.closeness.squaredDistanceBound
-        (spectralTruncationError_le_roundingToProjectiveError hspectral_nonneg)⟩
-  · have hround_nonneg : 0 ≤ roundingToProjectiveError ζ := by
-      exact le_trans hspectral_nonneg
-        (spectralTruncationError_le_roundingToProjectiveError hspectral_nonneg)
-    have hOutcome : Nonempty Outcome := by
-      rcases hSpectral.matrixWitness with ⟨w⟩
-      by_cases h : Nonempty Outcome
-      · exact h
-      · exfalso
-        letI : IsEmpty Outcome := not_nonempty_iff.mp h
-        have hsum : (0 : MIPStarRE.Quantum.Op w.space.carrier) = 1 := by
-          calc
-            (0 : MIPStarRE.Quantum.Op w.space.carrier) =
-                ∑ a : Outcome, w.source.effect a := by
-                  simp
-            _ = 1 := w.source.sum_eq_one
-        have htrace : (0 : Error) = 1 := by
-          simpa using congrArg MIPStarRE.Quantum.normalizedTrace hsum
-        norm_num at htrace
-    let H : FiniteHilbertSpace :=
-      { carrier := PUnit
-        instFintype := inferInstance
-        instDecidableEq := inferInstance
-        instNonempty := inferInstance }
-    let pivot : Outcome := Classical.choice hOutcome
-    let toyState : DensityMatrixState H :=
-      { matrix := 1
-        positive := by positivity
-        normalized := by
-          change MIPStarRE.Quantum.normalizedTrace
-              (1 : MIPStarRE.Quantum.Op H.carrier) = 1
-          simpa using (MIPStarRE.Quantum.normalizedTrace_one (d := H.carrier)) }
-    let toyMeas : MatrixMeasurement Outcome H :=
-      { effect := fun a => if a = pivot then 1 else 0
-        pos := by
-          intro a
-          by_cases h : a = pivot <;> simp [h]
-        sum_le_one := by
-          refine le_of_eq ?_
-          simp
-        sum_eq_one := by
-          simp }
-    refine ⟨{
-      space := H
-      state := toyState
-      source := toyMeas
-      target := toyMeas.toSubmeasurement
-      targetProjective := ?_
-      pointwiseTauDistance := ?_
-    }⟩
-    · intro a
-      by_cases h : a = pivot
-      · subst h
-        refine ⟨by simp [toyMeas], by simp [toyMeas]⟩
-      · refine ⟨by simp [toyMeas, h], by simp [toyMeas, h]⟩
-    · intro a
-      simpa [matrixOutcomeTauDistance, toyMeas] using hround_nonneg
+  intro _hSpectral hrepair
+  exact ⟨hrepair.projSubMeas, ⟨hrepair.closeness⟩⟩
 
 /-- Compose spectral truncation and adjustment to round an
 almost-projective measurement to a projective submeasurement. -/
-lemma roundAlmostProjMeas.{uAlmost, uRounded} {Outcome : Type*}
+lemma roundAlmostProjMeas {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
-    AlmostProjMeasStatement.{_, _, uAlmost} ψ A ζ →
+    AlmostProjMeasStatement ψ A ζ →
+      SpectralTruncationBridgePackage ψ A ζ →
+      ProjectivizationRepairPackage ψ A ζ →
       ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement.{_, _, uRounded} ψ A P
+        RoundedProjMeasStatement ψ A P
           (roundingToProjectiveError ζ) := by
-  intro hAlmost
-  exact adjustTruncatedProjections.{_, _, uRounded, uRounded}
+  intro hAlmost hspectral hrepair
+  exact adjustTruncatedProjections
     (Outcome := Outcome) (ι := ι) ψ A ζ
-    (spectralTruncateAlmostProjective.{_, _, uAlmost, uRounded}
-      (Outcome := Outcome) (ι := ι) ψ A ζ hAlmost)
+    (spectralTruncateAlmostProjective
+      (Outcome := Outcome) (ι := ι) ψ A ζ hAlmost hspectral)
+    hrepair
 
 /-- Increase the allowed error bound for a rounded-projective witness. -/
-lemma roundedProjMeasStatement_mono.{uRoundedMono} {Outcome : Type*}
+lemma roundedProjMeasStatement_mono {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     {ψ : QuantumState ι} {A : Measurement Outcome ι} {P : ProjSubMeas Outcome ι}
     {ζ₁ ζ₂ : Error}
-    (h : RoundedProjMeasStatement.{_, _, uRoundedMono} ψ A P ζ₁) (hζ : ζ₁ ≤ ζ₂) :
-    RoundedProjMeasStatement.{_, _, uRoundedMono} ψ A P ζ₂ := by
-  refine ⟨?_, ?_⟩
-  · exact ⟨le_trans h.closeness.squaredDistanceBound hζ⟩
-  · rcases h.matrixWitness with ⟨w⟩
-    refine ⟨{
-      space := w.space
-      state := w.state
-      source := w.source
-      target := w.target
-      targetProjective := w.targetProjective
-      pointwiseTauDistance := ?_
-    }⟩
-    intro a
-    exact le_trans (w.pointwiseTauDistance a) hζ
+    (h : RoundedProjMeasStatement ψ A P ζ₁) (hζ : ζ₁ ≤ ζ₂) :
+    RoundedProjMeasStatement ψ A P ζ₂ := by
+  exact ⟨⟨le_trans h.closeness.squaredDistanceBound hζ⟩⟩
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

@@ -85,26 +85,41 @@ structure AlmostProjMeasStatement {Outcome : Type*}
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily A.toSubMeas)
       (2 * ζ)
-  matrixWitness :
-    Nonempty (MatrixAlmostProjectiveWitness (Outcome := Outcome) ζ)
+  sourceAlmostProjective :
+    ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ
 
 /-- Output package for the spectral-truncation step. -/
 structure SpectralTruncationStatement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
-  /-- The projective submeasurement obtained after truncating each effect. -/
-  projSubMeas : ProjSubMeas Outcome ι
-  /-- The truncated projective submeasurement stays close to the input measurement
-  in state-dependent distance. -/
+  /-- The raw family obtained by spectral truncation of each effect. -/
+  roundedFamily : OpFamily Outcome ι
+  /-- Each truncated effect is a projection. -/
+  projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (roundedFamily.outcome a)
+  /-- The raw truncated family stays close to the input measurement in
+  state-dependent operator distance. -/
   closeness :
-    SDDRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily A.toSubMeas)
-      (constSubMeasFamily projSubMeas.toSubMeas)
-      (spectralTruncationError ζ)
-  /-- A matrix-level spectral-truncation witness for the construction. -/
-  matrixWitness :
-    Nonempty (MatrixSpectralTruncationMeasurementWitness (Outcome := Outcome) ζ)
+    SDDOpRel ψ (uniformDistribution Unit)
+      (fun _ => (A.toSubMeas : OpFamily Outcome ι))
+      (fun _ => roundedFamily)
+      (2 * spectralTruncationError ζ)
+  /-- The stored total operator is the sum of the rounded family. -/
+  sum_eq_total : ∑ a, roundedFamily.outcome a = roundedFamily.total
+  /-- The total operator of the rounded family is almost bounded by `I`. -/
+  total_le :
+    roundedFamily.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
+      (1 : MIPStarRE.Quantum.Op ι)
+
+/-- Temporary bridge package for the spectral-truncation construction.
+
+This isolates the still-unformalized linear-algebra step that turns an
+almost-projective measurement into the paper's raw projective family `R_a`. -/
+structure SpectralTruncationBridgePackage {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
+  witness : SpectralTruncationStatement ψ A ζ
 
 /-- Output package for the rounding-to-projective step. -/
 structure RoundedProjMeasStatement {Outcome : Type*}
@@ -117,7 +132,31 @@ structure RoundedProjMeasStatement {Outcome : Type*}
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily P.toSubMeas)
       ζ
-  matrixWitness :
-    Nonempty (MatrixRoundedProjectiveWitness (Outcome := Outcome) ζ)
+
+/-- Temporary bridge package for the late Section 5 repair from the raw rounded
+family to a genuine projective submeasurement on the same space. -/
+structure ProjectivizationRepairPackage {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
+  projSubMeas : ProjSubMeas Outcome ι
+  closeness :
+    SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily projSubMeas.toSubMeas)
+      (roundingToProjectiveError ζ)
+
+/-- Temporary bridge package for the final descent from the product-space
+measurement lemma back to the local orthonormalization theorem. -/
+structure OrthonormalizationBridgePackage {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
+  witness :
+    ∃ P : ProjSubMeas Outcome ι,
+      SDDRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A.liftLeft)
+        (constSubMeasFamily P.toSubMeas.liftLeft)
+        (orthonormalizationError ζ)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
