@@ -125,36 +125,41 @@ def restrictedDiagonalAccepts {params : Parameters} [FieldModel params.q]
 
 /-- Acceptance probability of the axis-parallel branch of the classical low
 individual degree test. -/
+open scoped Classical in
 noncomputable def axisParallelAcceptanceProbability {params : Parameters}
     [FieldModel params.q]
-    (strategy : TwoProverClassicalLIDStrategy params) : Error := by
-  classical
-  exact avgOver (uniformDistribution (ClassicalAxisParallelSample params)) fun rs =>
+    (strategy : TwoProverClassicalLIDStrategy params) : Error :=
+  avgOver (uniformDistribution (ClassicalAxisParallelSample params)) fun rs =>
     if strategy.axisParallelAccepts rs then (1 : Error) else 0
 
 /-- Acceptance probability of the self-consistency branch of the classical low
 individual degree test. -/
+open scoped Classical in
 noncomputable def selfConsistencyAcceptanceProbability {params : Parameters}
     [FieldModel params.q]
-    (strategy : TwoProverClassicalLIDStrategy params) : Error := by
-  classical
-  exact avgOver (uniformDistribution (ClassicalSelfConsistencySample params)) fun u =>
+    (strategy : TwoProverClassicalLIDStrategy params) : Error :=
+  avgOver (uniformDistribution (ClassicalSelfConsistencySample params)) fun u =>
     if strategy.selfConsistencyAccepts u then (1 : Error) else 0
 
 /-- Acceptance probability of the `j`-restricted diagonal branch. -/
+open scoped Classical in
 noncomputable def restrictedDiagonalAcceptanceProbability {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params)
-    (j : Fin params.m) : Error := by
-  classical
-  exact avgOver (uniformDistribution (ClassicalRestrictedDiagonalSample params j)) fun rs =>
+    (j : Fin params.m) : Error :=
+  avgOver (uniformDistribution (ClassicalRestrictedDiagonalSample params j)) fun rs =>
     if strategy.restrictedDiagonalAccepts j rs then (1 : Error) else 0
 
 /-- Acceptance probability of the full diagonal branch of the classical low
 individual degree test.
 
 The branch first samples `j : Fin params.m` uniformly and then a role-tagged
-restricted diagonal sample for that `j`. -/
+restricted diagonal sample for that `j`.
+
+TODO(#404): prove that this classical branch decomposition matches the
+repository's modeled `ProjStrat.lowIndividualDegreeFailureProbability`,
+especially the order of averaging over the restriction index and the sampled
+role. -/
 noncomputable def diagonalAcceptanceProbability {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) : Error :=

@@ -107,7 +107,10 @@ soundness theorem.
 
 This packages the external implication from the modeled classical pass condition
 to the named low-degree-agreement conclusion, while keeping that implication
-separate from `TwoProverClassicalLIDPassCondition` itself. -/
+separate from `TwoProverClassicalLIDPassCondition` itself.
+
+TODO(#404): replace this bridge package with a direct formalization (or other
+honest quoted-result interface) for the Polishchuk–Spielman implication. -/
 def TwoProverClassicalLIDBridgePackage (params : Parameters)
     [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error) : Prop :=
