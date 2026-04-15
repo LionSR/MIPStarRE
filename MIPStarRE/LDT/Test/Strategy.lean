@@ -51,7 +51,14 @@ def DiagonalEvaluationReparamInvariant (params : Parameters)
     (postprocess ((M (DiagonalLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a =
       (postprocess ((M ℓ).toSubMeas) (fun f => f t)).outcome a
 
-/-- Paper-local symmetric strategy data. -/
+/-- Paper-local symmetric strategy data.
+
+The `diagonalReparamInvariant` field encodes that diagonal-line
+measurements are geometrically covariant: evaluating at a rebased
+line's base point (`zeroCoord`) agrees with evaluating at the
+original parameter.  The paper treats this as implicit (lines are
+geometric objects), but in the Lean model `DiagonalLine` includes the
+parametrization, so we state it explicitly. -/
 structure SymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
@@ -61,6 +68,8 @@ structure SymStrat (params : Parameters) [FieldModel params.q]
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurement :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+  diagonalReparamInvariant :
+    DiagonalEvaluationReparamInvariant params diagonalMeasurement
 
 -- NOTE: no global `Inhabited` instance for `SymStrat`; constructing default
 -- projective measurement families is non-canonical and requires additional
@@ -176,6 +185,10 @@ structure ProjStrat (params : Parameters) [FieldModel params.q]
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurementB :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+  diagonalReparamInvariantA :
+    DiagonalEvaluationReparamInvariant params diagonalMeasurementA
+  diagonalReparamInvariantB :
+    DiagonalEvaluationReparamInvariant params diagonalMeasurementB
 
 /-- Basis projector onto the role sector `r`. -/
 def roleProj (r : Role) : MIPStarRE.Quantum.Op Role :=
@@ -924,6 +937,27 @@ noncomputable def symmetrizedIdxProjMeas
         simp [add_mul, mul_add, roleCond_mul_same, roleCond_A_mul_B,
           roleCond_B_mul_A, (MA q).proj a, (MB q).proj a] }
 
+/-- Reparametrization invariance is preserved by block-diagonal
+symmetrization over the role register. -/
+private theorem symmetrizedIdxProjMeas_reparamInvariant
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {MA MB : IdxProjMeas (DiagonalLine params)
+      (DiagonalLinePolynomial params) ι}
+    (hA : DiagonalEvaluationReparamInvariant params MA)
+    (hB : DiagonalEvaluationReparamInvariant params MB) :
+    DiagonalEvaluationReparamInvariant params
+      (symmetrizedIdxProjMeas MA MB) := by
+  intro ℓ t a
+  have hA' := hA ℓ t a
+  have hB' := hB ℓ t a
+  classical
+  simp only [postprocess, symmetrizedIdxProjMeas] at hA' hB' ⊢
+  rw [Finset.sum_add_distrib, Finset.sum_add_distrib,
+    roleCond_finset_sum, roleCond_finset_sum,
+    roleCond_finset_sum, roleCond_finset_sum,
+    hA', hB']
+
 namespace ProjStrat
 
 /-- The paper's symmetrized point measurement, obtained by putting Alice's and
@@ -960,6 +994,10 @@ noncomputable def classicalRoleSymmStrategy {params : Parameters}
   pointMeasurement := strategy.symmetrizedPointMeasurement
   axisParallelMeasurement := strategy.symmetrizedAxisParallelMeasurement
   diagonalMeasurement := strategy.symmetrizedDiagonalMeasurement
+  diagonalReparamInvariant :=
+    symmetrizedIdxProjMeas_reparamInvariant
+      strategy.diagonalReparamInvariantA
+      strategy.diagonalReparamInvariantB
 
 /-- The classical role-register symmetrized strategy preserves normalization. -/
 theorem classicalRoleSymmStrategy_isNormalized {params : Parameters}
@@ -1013,7 +1051,13 @@ noncomputable def diagonalFailureProbability
         (diagonalPointAnswerFamily strategy j)
         (diagonalLineAnswerFamily strategy j)
 
-/-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
+/-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy.
+
+Matches the paper's Definition 3.1: three test-passing bounds with no
+extra hypotheses.  The reparametrization covariance that was formerly
+listed here is now a structural property of `SymStrat`, where it
+belongs (the paper treats diagonal measurements as geometrically
+covariant by construction). -/
 structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -1021,10 +1065,6 @@ structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι
   axisParallelTest : strategy.axisParallelFailureProbability ≤ eps
   selfConsistencyTest : strategy.selfConsistencyFailureProbability ≤ delta
   diagonalLineTest : strategy.diagonalFailureProbability ≤ gamma
-  /-- Lean-local strengthening used to transport the corrected diagonal test
-  from base-point evaluation to arbitrary line parameters. -/
-  diagonalEvaluationReparam :
-    DiagonalEvaluationReparamInvariant params strategy.diagonalMeasurement
 
 end SymStrat
 
@@ -1040,6 +1080,7 @@ def leftAsSymmetric {params : Parameters} [FieldModel params.q]
   pointMeasurement := strategy.pointMeasurementA
   axisParallelMeasurement := strategy.axisParallelMeasurementA
   diagonalMeasurement := strategy.diagonalMeasurementA
+  diagonalReparamInvariant := strategy.diagonalReparamInvariantA
 
 /-- View the right prover's local data as a symmetric-strategy-style package. -/
 def rightAsSymmetric {params : Parameters} [FieldModel params.q]
@@ -1051,6 +1092,7 @@ def rightAsSymmetric {params : Parameters} [FieldModel params.q]
   pointMeasurement := strategy.pointMeasurementB
   axisParallelMeasurement := strategy.axisParallelMeasurementB
   diagonalMeasurement := strategy.diagonalMeasurementB
+  diagonalReparamInvariant := strategy.diagonalReparamInvariantB
 
 /-- Axis-parallel branch component where the left prover is queried with a line
 and the right prover is queried with the sampled base point.
