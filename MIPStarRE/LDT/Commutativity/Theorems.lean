@@ -582,7 +582,8 @@ private lemma commDataProcessedGStabilityOne_qSDDOp_expand
   let T : MIPStarRE.Quantum.Op ι := (G (pointHeight params q.2)).total
   let W : MIPStarRE.Quantum.Op ι := CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)
   have hT :
-      (fullSliceSecondFactor params family (fullSliceQuestionOfEvaluatedSlice params q)).total = T := by
+      (fullSliceSecondFactor params family
+        (fullSliceQuestionOfEvaluatedSlice params q)).total = T := by
     simp [fullSliceSecondFactor, fullSliceQuestionOfEvaluatedSlice, T, hG]
   have hT_herm : Tᴴ = T := by
     exact
@@ -595,7 +596,7 @@ private lemma commDataProcessedGStabilityOne_qSDDOp_expand
   have hW_herm : Wᴴ = W := by
     exact
       (Matrix.nonneg_iff_posSemidef.mp <| by
-        simpa [W] using CFC.sqrt_nonneg ((G (pointHeight params q.2)).outcome ah.2)
+        simp [W]
       ).isHermitian.eq
   have hW_adj_mul : Wᴴ * W = (G (pointHeight params q.2)).outcome ah.2 := by
     simpa [hW_herm] using hW_sq
@@ -625,7 +626,9 @@ private lemma commDataProcessedGStabilityOne_qSDDOp_expand
           (opTensor (((S * (T - 1))ᴴ) * (S * (T - 1))) (Wᴴ * W)) := by
             simp [conjTranspose_opTensor, opTensor_mul]
     _ = ev strategy.state
-          (opTensor ((1 - T) * (Sᴴ * S) * (1 - T)) ((G (pointHeight params q.2)).outcome ah.2)) := by
+          (opTensor
+            ((1 - T) * (Sᴴ * S) * (1 - T))
+            ((G (pointHeight params q.2)).outcome ah.2)) := by
             have hleft :
                 ((S * (T - 1))ᴴ) * (S * (T - 1)) =
                   (1 - T) * (Sᴴ * S) * (1 - T) := by
@@ -695,7 +698,8 @@ private lemma commDataProcessedGStabilityTwo_qSDDOp_expand
   let T : MIPStarRE.Quantum.Op ι := (G (pointHeight params q.1)).total
   let W : MIPStarRE.Quantum.Op ι := CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1)
   have hT :
-      (fullSliceFirstFactor params family (fullSliceQuestionOfEvaluatedSlice params q)).total = T := by
+      (fullSliceFirstFactor params family
+        (fullSliceQuestionOfEvaluatedSlice params q)).total = T := by
     simp [fullSliceFirstFactor, fullSliceQuestionOfEvaluatedSlice, T, hG]
   have hT_herm : Tᴴ = T := by
     exact
@@ -708,7 +712,7 @@ private lemma commDataProcessedGStabilityTwo_qSDDOp_expand
   have hW_herm : Wᴴ = W := by
     exact
       (Matrix.nonneg_iff_posSemidef.mp <| by
-        simpa [W] using CFC.sqrt_nonneg ((G (pointHeight params q.1)).outcome gb.1)
+        simp [W]
       ).isHermitian.eq
   have hW_adj_mul : Wᴴ * W = (G (pointHeight params q.1)).outcome gb.1 := by
     simpa [hW_herm] using hW_sq
@@ -739,7 +743,9 @@ private lemma commDataProcessedGStabilityTwo_qSDDOp_expand
           (opTensor (((S * (T - 1))ᴴ) * (S * (T - 1))) (Wᴴ * W)) := by
             simp [conjTranspose_opTensor, opTensor_mul]
     _ = ev strategy.state
-          (opTensor ((1 - T) * (Sᴴ * S) * (1 - T)) ((G (pointHeight params q.1)).outcome gb.1)) := by
+          (opTensor
+            ((1 - T) * (Sᴴ * S) * (1 - T))
+            ((G (pointHeight params q.1)).outcome gb.1)) := by
             have hleft :
                 ((S * (T - 1))ᴴ) * (S * (T - 1)) =
                   (1 - T) * (Sᴴ * S) * (1 - T) := by
@@ -871,7 +877,7 @@ private lemma evaluatedSliceCommutation_qSDDOp_avg_expand
           = LB * LA * LA * LB - LB * LA * LB * LA - LA * LB * LA * LB + LA * LB * LB * LA := by
               noncomm_ring
       _ = LB * LA * LB - LB * LA * LB * LA - LA * LB * LA * LB + LA * LB * LA := by
-            simpa [mul_assoc, hLA_proj, hLB_proj]
+            simp [mul_assoc, hLA_proj, hLB_proj]
       _ = LB * LA * LB + LA * LB * LA - LB * LA * LB * LA - LA * LB * LA * LB := by
             abel
   calc
@@ -956,7 +962,7 @@ private lemma evaluatedSliceCommutation_avg_swap_terms
                       intro ab _
                       rcases q with ⟨u, v⟩
                       rcases ab with ⟨a, b⟩
-                      simpa [eQ, eA, evaluatedSliceBABTerm, evaluatedSliceABATerm]
+                      simp [eQ, eA, evaluatedSliceBABTerm, evaluatedSliceABATerm]
       _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
             (fun q => ∑ ab : EvaluatedSliceOutcome params,
               evaluatedSliceABATerm params strategy family q ab) := by
@@ -989,7 +995,7 @@ private lemma evaluatedSliceCommutation_avg_swap_terms
                       intro ab _
                       rcases q with ⟨u, v⟩
                       rcases ab with ⟨a, b⟩
-                      simpa [eQ, eA, evaluatedSliceBABATerm, evaluatedSliceABABTerm]
+                      simp [eQ, eA, evaluatedSliceBABATerm, evaluatedSliceABABTerm]
       _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
             (fun q => ∑ ab : EvaluatedSliceOutcome params,
               evaluatedSliceABABTerm params strategy family q ab) := by
@@ -1352,6 +1358,8 @@ private noncomputable def gCommOverlapTerm
       rightTensor (ι₁ := ι) ((G x).total))
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- The slice self-consistency defect of `G` is at most `zeta / 2`. -/
 private lemma gCommStability_sliceSSC
     (params : Parameters)
@@ -1418,6 +1426,8 @@ private lemma gCommStability_sliceSSC
     _ = zeta / 2 := by ring
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- A sandwiched product of two submeasurements is controlled by the overlap of
 the right-hand total with its complement. -/
 private lemma gCommStability_pointwise_sum_bound_core
@@ -1506,6 +1516,8 @@ private lemma gCommStability_pointwise_sum_bound_core
           rw [hcollapse]
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- Summing the stability-one comparison family leaves only the overlap term
 for `G^y`. -/
 private lemma gCommStability_pointwise_sum_bound
@@ -1533,6 +1545,8 @@ private lemma gCommStability_pointwise_sum_bound
     gCommStability_pointwise_sum_bound_core strategy.state A (G y) hGy_sq
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- A single stability-one summand is controlled by replacing the inner
 evaluated slice sandwich with the corresponding evaluated point outcome. -/
 private lemma gCommStability_pointwise_summand_bound
@@ -1611,6 +1625,8 @@ private lemma gCommStability_pointwise_summand_bound
         opTensor_mono_left hleft ((G y).outcome_pos ah.2)
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- The full stability-one defect is bounded by the overlap term for the
 target slice measurement `G^y`. -/
 private lemma gCommStability_pointwise_bound
@@ -1663,6 +1679,8 @@ private lemma gCommStability_pointwise_bound
             gCommStability_pointwise_sum_bound params strategy family G hG q
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- The overlap term at `x` is bounded by the bipartite SSC defect of `G x`. -/
 private lemma gCommStability_ssc_point
     (params : Parameters)
@@ -1733,7 +1751,7 @@ private lemma gCommStability_ssc_point
                               cases j with
                               | mk j1 j2 =>
                                   by_cases h1 : i1 = j1 <;> by_cases h2 : i2 = j2 <;>
-                                    simp [leftTensor, sub_eq_add_neg, Matrix.one_apply, h1, h2]
+                                    simp [leftTensor, h1, h2]
                           calc
                             leftTensor (ι₂ := ι) (1 - T) * rightTensor (ι₁ := ι) T
                               = (leftTensor (ι₂ := ι) 1 - leftTensor (ι₂ := ι) T) *
@@ -1754,13 +1772,16 @@ private lemma gCommStability_ssc_point
             ev strategy.state (opTensor ((G x).outcome h) ((G x).outcome h)) := by
             linarith
     _ ≤ qBipartiteSSCDefect strategy.state (G x) := by
-          simpa [qBipartiteSSCDefect, T] using
-            (le_max_right 0
+          unfold qBipartiteSSCDefect
+          exact
+            le_max_right 0
               (ev strategy.state (leftTensor (ι₂ := ι) T) -
                 ∑ h : Polynomial params,
-                  ev strategy.state (opTensor ((G x).outcome h) ((G x).outcome h))))
+                  ev strategy.state (opTensor ((G x).outcome h) ((G x).outcome h)))
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- Averaging the common overlap term over `Point params.next` depends only on
 the final coordinate `x : F_q`. -/
 private lemma gCommOverlap_avgOver_point
@@ -1869,6 +1890,8 @@ private lemma gCommOverlapTerm_le_one
     _ = 1 := ev_one_of_isNormalized strategy.state hnorm
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- Any pointwise defect bound by the common overlap term inherits a raw
 `zeta / 2` estimate after marginalizing to the slice SSC defect of `G`. -/
 private lemma gCommStability_raw_le_half_of
@@ -1915,6 +1938,8 @@ private lemma gCommStability_raw_le_half_of
     _ ≤ zeta / 2 := hsliceSSC.overlapBound
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- Any pointwise defect bound by the common overlap term is trivially at most
 `1`. -/
 private lemma gCommStability_raw_le_one_of
@@ -1954,6 +1979,8 @@ private lemma gCommStability_raw_le_one_of
             uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- Upgrade raw `zeta / 2` and `1` bounds to the displayed `sqrt zeta` relation. -/
 private lemma sddOpRel_of_sqrt_bound_from_half_one
     {Question Outcome : Type*}
@@ -1979,6 +2006,8 @@ private lemma sddOpRel_of_sqrt_bound_from_half_one
     exact le_trans hone hbig
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- The first stability family has raw defect at most `zeta / 2`. -/
 private lemma gCommStability_raw_le_half
     (params : Parameters)
@@ -2003,6 +2032,8 @@ private lemma gCommStability_raw_le_half
       (gCommStability_pointwise_bound params strategy family G hG)
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- The first stability family has raw defect at most `1`. -/
 private lemma gCommStability_raw_le_one
     (params : Parameters)
@@ -2026,6 +2057,8 @@ private lemma gCommStability_raw_le_one
       (gCommStability_pointwise_bound params strategy family G hG)
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- `clm:g-comm-stability`.
 
 This packages the first boundedness-driven stability step in the proof of
@@ -2068,6 +2101,8 @@ theorem gCommStability
       zeta hz_nonneg hraw_le_half hraw_le_one
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- Summing the stability-two comparison family leaves only the overlap term
 for `G^x`. -/
 private lemma gCommStabilityTwo_pointwise_sum_bound
@@ -2206,6 +2241,8 @@ private lemma gCommStabilityTwo_pointwise_summand_bound
         opTensor_mono_left hleft ((G x).outcome_pos gb.1)
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- The full stability-two defect is bounded by the overlap term for the
 target slice measurement `G^x`. -/
 private lemma gCommStabilityTwo_pointwise_bound
@@ -2255,6 +2292,8 @@ private lemma gCommStabilityTwo_pointwise_bound
           simpa using gCommStabilityTwo_pointwise_sum_bound params strategy family G hG q
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- The second stability family has raw defect at most `zeta / 2`. -/
 private lemma gCommStabilityTwo_raw_le_half
     (params : Parameters)
@@ -2279,6 +2318,8 @@ private lemma gCommStabilityTwo_raw_le_half
       (gCommStabilityTwo_pointwise_bound params strategy family G hG)
 
 set_option maxHeartbeats 2000000 in
+-- This proof still needs extra heartbeats for the large matrix/Finset
+-- simplifications and reindexing steps.
 /-- The second stability family has raw defect at most `1`. -/
 private lemma gCommStabilityTwo_raw_le_one
     (params : Parameters)
@@ -3105,8 +3146,8 @@ private lemma sddOpRel_of_pullback_fullSliceQuestion
   rw [← sddErrorOp_pullback_fullSliceQuestion_eq params ψ A B]
   exact h
 
--- Heavy sqrt/rpow arithmetic in hArith step.
 set_option maxHeartbeats 800000 in
+-- Heavy sqrt/rpow arithmetic in hArith step.
 /-- Core Schwartz-Zippel transport on the evaluated-question space.
 
 This is the substantive remaining step: compare the full polynomial outcomes

@@ -418,8 +418,11 @@ private lemma qSDD_completePart_le_slice
         = ev ψbi (((leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)ᴴ) *
             (leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)) := by
               unfold qSDD qSDDCore completePartSubMeas
-              simp [SubMeas.liftLeft, SubMeas.liftRight, postprocess, T, P.sum_eq_total]
-              rw [P.sum_eq_total]
+              simp only [SubMeas.liftLeft, SubMeas.liftRight, postprocess, T,
+                Finset.univ_unique, PUnit.default_eq_unit, Matrix.conjTranspose_sub,
+                Finset.sum_singleton]
+              have hsum : ∑ a, P.outcome a = P.total := P.sum_eq_total
+              simp [P, hsum]
       _ = ev ψbi (leftTensor (ι₂ := ι) (T * T)) +
             ev ψbi (rightTensor (ι₁ := ι) (T * T)) - 2 * ev ψbi (opTensor T T) := by
               have hLherm : (leftTensor (ι₂ := ι) T)ᴴ = leftTensor (ι₂ := ι) T := by
@@ -452,7 +455,7 @@ private lemma qSDD_completePart_le_slice
       _ = ev ψbi (leftTensor (ι₂ := ι) T) +
             ev ψbi (rightTensor (ι₁ := ι) T) -
             2 * ev ψbi (opTensor T T) := by
-            simpa [hTT]
+            simp [hTT]
   have horig :
       qSDD ψbi (((family.meas x).toSubMeas).liftLeft)
           (((family.meas x).toSubMeas).liftRight) =
@@ -532,7 +535,7 @@ private lemma qSDD_completePart_le_slice
                 _ = ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) +
                       ev ψbi (rightTensor (ι₁ := ι) (P.outcome g)) -
                       2 * ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
-                          simpa [P.proj g]
+                          simp [P.proj g]
       _ = (∑ g : Polynomial params,
               (ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) +
                 ev ψbi (rightTensor (ι₁ := ι) (P.outcome g)))) -
@@ -588,6 +591,7 @@ theorem gBotSelfConsistency
     (hperm : PermInvState ψbi)
     (hcomplete : GCompleteSelfConsistencyStatement params ψbi family zeta) :
     GBotSelfConsistencyStatement params ψbi family zeta := by
+  let _ := hperm
   refine {
     completePartWitness := hcomplete
     incompletePartSelfConsistency := ?_
@@ -816,9 +820,10 @@ private lemma avgOver_abs_le_of_bound
     _ = c := by ring
 
 private lemma avgOver_abs_le_avgOver_abs
-    {α : Type*} [DecidableEq α]
+    {α : Type*}
     (𝒟 : Distribution α) (f : α → Error) :
     |avgOver 𝒟 f| ≤ avgOver 𝒟 (fun a => |f a|) := by
+  classical
   unfold avgOver
   calc
     |∑ a ∈ 𝒟.support, 𝒟.weight a * f a|
@@ -933,7 +938,7 @@ private lemma switcherooAggregate_qSDDOp_expand
             simp [switcherooAggregateLeft, switcherooAggregateRight,
               multiplyByTotalOnLeft, multiplyByTotalOnRight,
               OpFamily.leftPlacedOpFamily, completePartSubMeas, G, Mo,
-              leftTensor_mul_leftTensor, Matrix.conjTranspose_mul]
+              leftTensor_mul_leftTensor]
     _ = ev ψbi
           (((leftTensor (ι₂ := ι) Mo * leftTensor (ι₂ := ι) G) -
                 (leftTensor (ι₂ := ι) G * leftTensor (ι₂ := ι) Mo)) *
@@ -1354,7 +1359,7 @@ private lemma switcherooAggregateThirdTerm_eq_fourthTerm
               (1 : MIPStarRE.Quantum.Op ι))
     _ = ev ψbi (leftTensor (ι₂ := ι) (G * Mo * G * Mo)) := by
           congr 1
-          simpa [mul_assoc, Matrix.conjTranspose_mul, hGherm, hMoherm]
+          simp [mul_assoc, Matrix.conjTranspose_mul, hGherm, hMoherm]
 
 private lemma switcherooAggregate_qSDDOp_expand_avg
     {Outcome : Type*} [Fintype Outcome]
@@ -2751,7 +2756,7 @@ theorem gHatFacts
               incompletePartRightFamily, incompletePartSubMeas, leftPlacedSubMeas,
               rightPlacedSubMeas, SubMeas.liftLeft, SubMeas.liftRight,
               IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjSubMeas.toIdxSubMeas,
-              hcomplete_total, add_comm, add_left_comm, add_assoc]
+              hcomplete_total, add_comm]
       _ =
           sddError ψbi
             (uniformDistribution (SliceQuestion params))
@@ -3442,7 +3447,6 @@ lemma overAllOutcomes
 
 This is the source-style recurrence for the truncated type sums that appear in
 the `fromHToG` reduction. -/
-
 private lemma gHatTypeWeight_le {k : ℕ} (τ : GHatType k) :
     gHatTypeWeight τ ≤ k := by
   unfold gHatTypeWeight
@@ -3604,11 +3608,13 @@ private lemma full_gHatType_sum_eq_one
                 gHatTypeOperator G τprefix) * (1 - G) := by
                 rw [Finset.sum_mul, Finset.sum_mul]
         _ = 1 * G + 1 * (1 - G) := by
-              simpa [full_gHatType_sum_eq_one G prefixLen]
+              simp [full_gHatType_sum_eq_one G prefixLen]
         _ = 1 := by
               have hcancel : G + (1 - G) = (1 : MIPStarRE.Quantum.Op ι) := by
                 abel
-              simpa [one_mul] using hcancel
+              calc
+                1 * G + 1 * (1 - G) = G + (1 - G) := by simp
+                _ = (1 : MIPStarRE.Quantum.Op ι) := hcancel
 
 theorem truncatedTypeSumRecurrence
     (G : MIPStarRE.Quantum.Op ι)
@@ -3746,7 +3752,7 @@ theorem truncatedTypeSumRecurrence
                   (d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) + gHatTypeWeight τtail) ↔
                     (d + 1 ≤ gHatTypeWeight τprefix +
                       gHatTypeWeight (prependTypeBit false τtail)) := by
-                simpa [gHatTypeWeight_fin_cons_false, gHatTypeWeight_prepend_false]
+                simp [gHatTypeWeight_fin_cons_false, gHatTypeWeight_prepend_false]
               by_cases h : d + 1 ≤ gHatTypeWeight τprefix +
                   gHatTypeWeight (prependTypeBit false τtail)
               · have h' :

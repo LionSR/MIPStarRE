@@ -3855,7 +3855,7 @@ private lemma questionSDDOp_chain
       (families 0).outcome a - (families (Fin.last n)).outcome a =
         ∑ i : Fin n, D i a := by
     intro a
-    show (families 0).outcome a -
+    change (families 0).outcome a -
         (families (Fin.last n)).outcome a =
       ∑ i : Fin n, ((families i.castSucc).outcome a -
         (families i.succ).outcome a)
