@@ -328,6 +328,7 @@ structure SelfImprovementBridgePackage (params : Parameters) [FieldModel params.
         BipartiteSSCRel strategy.state (uniformDistribution Unit)
           (constSubMeasFamily Hhat)
           (selfImprovementHelperError params eps delta)
+  /-- Bridge for the final orthonormalization step on the helper submeasurement. -/
   orthonormalizationBridge :
     ∀ {Hhat : SubMeas (Polynomial params) ι},
       BipartiteSSCRel strategy.state (uniformDistribution Unit)

@@ -230,6 +230,17 @@ private lemma sourceAlmostProjective_of_ssc {Outcome : Type*}
     _ ≤ max 0 (ev ψ A.toSubMeas.total - diagA) := le_max_right 0 _
     _ ≤ η := hssc'
 
+lemma sourceAlmostProjective_nonneg {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) :
+    0 ≤ ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) := by
+  refine Finset.sum_nonneg ?_
+  intro a _
+  exact ev_nonneg_of_psd ψ _ <|
+    sub_nonneg.mpr <|
+      MIPStarRE.Quantum.sq_le_self (A.outcome_pos a) (A.outcome_le_one a)
+
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
 with `B`, then `A` is `2ζ`-almost-projective. -/
 lemma consistencyToAlmostProjective {Outcome : Type*}
@@ -306,22 +317,20 @@ def spectralTruncateAlmostProjective {Outcome : Type*}
     AlmostProjMeasStatement ψ A ζ →
       SpectralTruncationBridgePackage ψ A ζ →
       SpectralTruncationStatement ψ A ζ := by
-  intro _hAlmost hbridge
-  exact hbridge.witness
-
-private lemma spectralTruncationError_le_roundingToProjectiveError
-    {ζ : Error} (hζ : 0 ≤ spectralTruncationError ζ) :
-    spectralTruncationError ζ ≤ roundingToProjectiveError ζ := by
-  dsimp [spectralTruncationError, roundingToProjectiveError] at hζ ⊢
-  simpa [one_mul] using
-    mul_le_mul_of_nonneg_right (show (1 : Error) ≤ 12 by norm_num) hζ
+  intro hAlmost hbridge
+  have hζ_nonneg : 0 ≤ ζ := by
+    exact le_trans (sourceAlmostProjective_nonneg ψ A) hAlmost.sourceAlmostProjective
+  exact hbridge.fromSourceAlmostProjective <| by
+    calc
+      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ := hAlmost.sourceAlmostProjective
+      _ ≤ 2 * ζ := by nlinarith
 
 /-- Adjust truncated projections to form a genuine projective
 submeasurement, controlling the per-outcome distance.
 
-The strengthened `SpectralTruncationStatement` already carries the adjusted
-projective submeasurement and its closeness to `A`, so this is now just a
-packaging step into `RoundedProjMeasStatement`. -/
+The raw rounded family is exposed by `SpectralTruncationStatement`; the late
+repair from that family to a genuine projective submeasurement is isolated in
+`ProjectivizationRepairPackage`. -/
 lemma adjustTruncatedProjections {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -331,8 +340,8 @@ lemma adjustTruncatedProjections {Outcome : Type*}
       ∃ P : ProjSubMeas Outcome ι,
         RoundedProjMeasStatement ψ A P
           (roundingToProjectiveError ζ) := by
-  intro _hSpectral hrepair
-  exact ⟨hrepair.projSubMeas, ⟨hrepair.closeness⟩⟩
+  intro hSpectral hrepair
+  exact hrepair.fromSpectral hSpectral
 
 /-- Compose spectral truncation and adjustment to round an
 almost-projective measurement to a projective submeasurement. -/
