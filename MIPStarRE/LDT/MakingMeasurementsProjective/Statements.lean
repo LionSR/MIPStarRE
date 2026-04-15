@@ -120,7 +120,7 @@ structure SpectralTruncationBridgePackage {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
   fromSourceAlmostProjective :
-    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
+    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
       SpectralTruncationStatement ψ A ζ
 
 /-- Output package for the rounding-to-projective step. -/

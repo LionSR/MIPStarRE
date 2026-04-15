@@ -318,12 +318,7 @@ def spectralTruncateAlmostProjective {Outcome : Type*}
       SpectralTruncationBridgePackage ψ A ζ →
       SpectralTruncationStatement ψ A ζ := by
   intro hAlmost hbridge
-  have hζ_nonneg : 0 ≤ ζ := by
-    exact le_trans (sourceAlmostProjective_nonneg ψ A) hAlmost.sourceAlmostProjective
-  exact hbridge.fromSourceAlmostProjective <| by
-    calc
-      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ := hAlmost.sourceAlmostProjective
-      _ ≤ 2 * ζ := by nlinarith
+  exact hbridge.fromSourceAlmostProjective hAlmost.sourceAlmostProjective
 
 /-- Adjust truncated projections to form a genuine projective
 submeasurement, controlling the per-outcome distance.
