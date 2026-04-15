@@ -55,44 +55,57 @@ def PointAnswerSoundnessConclusion (params : Parameters) [FieldModel params.q]
               (fun u => if g u = a u then (1 : Error) else 0) ≥
             1 - slack
 
+/-- Placeholder pass condition for the surface-versus-point low-degree test.
+
+The Raz–Safra test uses 2-dimensional surface queries and surface polynomial
+answers — infrastructure not yet modeled in this repository. This named
+placeholder `def` is `0 ≤ eps` (trivially satisfiable), but its name and
+type signature carry the intended semantics. When the surface test is
+formalized, replace the body with the actual pass predicate.
+
+This is intentionally NOT `PassesLowIndividualDegreeTest`, which models a
+different test. See `references/ldt-paper/introduction.tex`. -/
+def SurfaceVsPointPassCondition (_params : Parameters) [FieldModel _params.q]
+    (_a : Point _params → Fq _params) (eps : Error) : Prop :=
+  0 ≤ eps  -- placeholder body; real definition needs surface test infrastructure
+
+/-- Placeholder pass condition for the two-prover classical low-individual-degree
+test.
+
+The paper's `thm:classical-test-soundness` takes two quantum provers A and B
+who jointly pass the classical LID test and concludes that prover A's
+point-answer function is close to a low-degree polynomial. The two-prover
+classical strategy infrastructure is not yet modeled here. This named
+placeholder `def` is `0 ≤ eps` (trivially satisfiable), but its name and
+type signature carry the intended semantics.
+
+See `references/ldt-paper/test_definition.tex` for the precise statement. -/
+def TwoProverClassicalLIDPassCondition (_params : Parameters)
+    [FieldModel _params.q]
+    (_a : Point _params → Fq _params) (eps : Error) : Prop :=
+  0 ≤ eps  -- placeholder body; real definition needs two-prover strategy types
+
 /-- `thm:raz-safra`.
 
-The Raz–Safra theorem concerns the **surface-versus-point** low-degree test,
-which is a separate classical result from the low-individual-degree test defined
-in `Test/Strategy.lean`. The surface test uses 2-dimensional surface queries and
-surface polynomial answers — infrastructure that is not yet modeled here.
-
-The hypothesis `_hpass` is an opaque `Prop` placeholder. It represents "the
-answer function `a` passes the surface-versus-point test with error `eps`".
-When the surface-versus-point test is formalized, replace with a concrete
-`SurfaceVsPointPassCondition params a eps`.
-
-**Note**: This is intentionally NOT `PassesLowIndividualDegreeTest`, which is a
-different test. See `references/ldt-paper/introduction.tex` for the distinction. -/
+The Raz–Safra theorem: if a point-answer function passes the
+surface-versus-point low-degree test with error `eps`, then there exists a
+low-degree polynomial agreeing with it on most points. -/
 theorem razSafra
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
-    (_hpass : Prop) :
+    (hpass : SurfaceVsPointPassCondition params a eps) :
     ∃ slack : Error,
       PointAnswerSoundnessConclusion params a (razSafraSlackBound params eps) slack := by
   sorry
 
 /-- `thm:classical-test-soundness`.
 
-Classical soundness of the low-individual-degree test for two provers.
-The paper's full statement takes two quantum provers passing the LID test and
-concludes that prover A's point answers are close to a low-degree polynomial.
-
-The hypothesis `_hpass` is an opaque `Prop` placeholder. It represents "provers
-A and B pass the classical LID test with error `eps`, and `a` is prover A's
-point-answer function". When two-prover classical strategies are formalized,
-replace with a concrete `TwoProverClassicalLIDPassCondition params a eps`.
-
-See `references/ldt-paper/test_definition.tex` for the precise statement. -/
+Classical soundness: if two provers pass the classical LID test with error `eps`,
+then prover A's point-answer function is close to a low-degree polynomial. -/
 theorem classicalTestSoundness
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
-    (_hpass : Prop) :
+    (hpass : TwoProverClassicalLIDPassCondition params a eps) :
     ∃ slack : Error,
       PointAnswerSoundnessConclusion params a
         (classicalTestSoundnessSlackBound params eps) slack := by
