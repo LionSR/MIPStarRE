@@ -887,12 +887,14 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \begin{lemma}[From the pasted sum to a polynomial in $G$]\label{lem:from-H-to-G}
 	\lean{MIPStarRE.LDT.Pasting.fromHToG}
 	\uses{cor:G-hat-facts, lem:commute-g-half-sandwich, def:pasted-measurement, def:truncated-type-sums, lem:truncated-type-sum-recurrence}
-	If $x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
+	Let $\ket{\psi_{\mathrm{bi}}}$ be a bipartite state on $\iota \otimes \iota$.  If
+	$x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
 	\[
 		\E_{x_1,\dots,x_k} \sum_{\tau:\,|\tau|\ge d+1} \sum_{(g_1,\dots,g_k)\in \mathsf{Outcomes}_\tau}
-		\bra{\psi} \widehat H_{g_1,\dots,g_k}^{x_1,\dots,x_k} \ot I \ket{\psi}
+		\bra{\psi_{\mathrm{bi}}} \widehat H_{g_1,\dots,g_k}^{x_1,\dots,x_k} \ot I \ket{\psi_{\mathrm{bi}}}
 		\approx_{\nu_8}
-		\sum_{r=d+1}^k \binom{k}{r} \bra{\psi} G^r(I-G)^{k-r} \ot I \ket{\psi},
+		\sum_{r=d+1}^k \binom{k}{r} \bra{\psi_{\mathrm{bi}}} G^r(I-G)^{k-r} \ot I
+			\ket{\psi_{\mathrm{bi}}},
 	\]
 	where
 	\[
