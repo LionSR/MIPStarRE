@@ -90,6 +90,17 @@ theorem uniformDistribution_weight_sum_le_one (α : Type*)
     ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a ≤ 1 := by
   simp [uniformDistribution]
 
+/-- Averaging a constant against the uniform distribution on a nonempty finite type
+returns that constant. -/
+theorem avgOver_uniform_const {α : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α] (c : Error) :
+    avgOver (uniformDistribution α) (fun _ : α => c) = c := by
+  have hα : (Fintype.card α : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  simp only [avgOver, uniformDistribution, Finset.sum_const, Finset.card_univ,
+    nsmul_eq_mul, one_div]
+  field_simp
+
 /-- Reindexing a uniform average along an equivalence preserves its value. -/
 theorem avgOver_uniform_equiv
     {α β : Type*}

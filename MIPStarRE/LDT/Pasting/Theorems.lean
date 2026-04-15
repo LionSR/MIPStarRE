@@ -709,21 +709,6 @@ private lemma switcherooSelfConsistency_bip
     IdxProjSubMeas.toIdxSubMeas, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
     hselfM.squaredDistanceBound
 
-private lemma switcherooCompletePartSelfConsistency_bip
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (zeta : Error)
-    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    Preliminaries.BipartiteSDDRel ψbi
-      (uniformDistribution (SliceQuestion params))
-      (IdxProjSubMeas.toIdxSubMeas family.meas)
-      (IdxProjSubMeas.toIdxSubMeas family.meas)
-      zeta := by
-  constructor
-  simpa [IdxProjSubMeas.toIdxSubMeas, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
-    hselfG.completePartSelfConsistency.squaredDistanceBound
-
 private lemma avgOver_uniform_slicePair
     (params : Parameters) [FieldModel params.q]
     (f : Fq params → Fq params → Error) :
@@ -1251,11 +1236,8 @@ private lemma switcheroo_first_term_close
           exact avgOver_abs_le_avgOver_abs _ _
     _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun _ => 2 * Real.sqrt omega) := by
           exact avgOver_mono _ _ _ hpoint
-    _ = 2 * Real.sqrt omega := by
-          have hq0 : (params.q : Error) ≠ 0 := by
-            exact_mod_cast Nat.ne_of_gt params.hq
-          simp [avgOver, uniformDistribution]
-          field_simp [hq0]
+    _ = 2 * Real.sqrt omega :=
+          avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt omega)
 
 /-- The one-outcome projective family whose sole effect is the complete slice part `G^x`. -/
 private noncomputable def completePartProjFamily
@@ -1584,10 +1566,8 @@ private lemma switcheroo_second_aggregate_term_close
     _ ≤ avgOver 𝒟x (fun _ => 2 * Real.sqrt zeta) := by
           exact avgOver_mono _ _ _ hpoint
     _ = 2 * Real.sqrt zeta := by
-          have hq0 : (params.q : Error) ≠ 0 := by
-            exact_mod_cast Nat.ne_of_gt params.hq
-          simp [𝒟x, avgOver, uniformDistribution]
-          field_simp [hq0]
+          simpa [𝒟x] using
+            avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt zeta)
 
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
