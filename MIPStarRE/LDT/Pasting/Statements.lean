@@ -348,18 +348,19 @@ structure OverAllOutcomesStatement (params : Parameters)
 structure FromHToGStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceStep :
     ∀ ℓ : ℕ, ℓ < k → ∀ (τ : GHatType k),
-      SDDOpRel strategy.state (uniformDistribution Unit)
+      SDDOpRel ψbi (uniformDistribution Unit)
         (IdxOpFamily.liftLeft
           (fromHToGRecurrenceLeftFamily params strategy family k ℓ τ))
         (IdxOpFamily.liftLeft
           (fromHToGRecurrenceRightFamily params strategy family k ℓ τ))
         (fromHToGRecurrenceError params gamma zeta k)
   bernoulliPolynomialRewrite :
-    SDDRel strategy.state (uniformDistribution Unit)
+    SDDRel ψbi (uniformDistribution Unit)
       (IdxSubMeas.liftLeft
         (allOutcomesExpansionFamily params strategy family k))
       (IdxSubMeas.liftLeft

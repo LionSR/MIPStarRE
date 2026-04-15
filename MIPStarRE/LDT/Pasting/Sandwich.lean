@@ -746,17 +746,37 @@ noncomputable def gHatHalfSandwichRight (params : Parameters) [FieldModel params
         total := gHatRotatedHalfProductTotalOperator params family k xs
       }
 
-/-- The operator-polynomial `S_{τ≥ℓ}` from `lem:from-H-to-G` (eq:S-def):
-`S_{τ≥ℓ} = ∑_{r : r + suffixWeight ≥ d+1} C(ℓ-1, r) · G^r · (I-G)^{(ℓ-1)-r}`
-where `G` is the averaged total operator. -/
+/-- Source-style recurrence weight `S_{τtail}` from `lem:from-H-to-G`.
+
+The parameter `prefixLen` is the number of type bits already converted into the
+Bernoulli polynomial.  This is exactly `truncatedTypeSums` specialized to the
+averaged complete operator `G = E_x ∑_g G^x_g`. -/
+noncomputable def fromHToGRecurrenceWeight (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (prefixLen : ℕ) {tailLen : ℕ}
+    (τtail : GHatType tailLen) : MIPStarRE.Quantum.Op ι :=
+  truncatedTypeSums family.averagedSubMeas.total params.d prefixLen τtail
+
+/-- The suffix-specialized recurrence weight used by the `fromHToG` families.
+
+This used to be encoded as the grouped Bernoulli sum
+`∑_r C(prefixLen,r) G^r (I-G)^(prefixLen-r)`, filtered by the suffix Hamming
+weight.  The grouped form is the same operator after collecting the summands of
+`truncatedTypeSums` by prefix Hamming weight; keeping this definition in
+source-style form lets the proved recurrence for `truncatedTypeSums` apply
+directly.  The index `ℓ` is zero-based: the suffix is `τ_{≥ℓ}` and the prefix
+has length `ℓ`. -/
 noncomputable def suffixBernoulliWeightOperator (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : MIPStarRE.Quantum.Op ι :=
-  let G := family.averagedSubMeas.total
-  let suffixWeight := (Finset.univ.filter fun i : Fin k => ℓ ≤ i.val ∧ τ i).card
-  ∑ r ∈ Finset.range ℓ,
-    if r + suffixWeight ≥ params.d + 1 then
-      (Nat.choose (ℓ - 1) r : ℂ) • (G ^ r * (1 - G) ^ (ℓ - 1 - r))
-    else 0
+  fromHToGRecurrenceWeight params family ℓ (gHatTypeSuffix ℓ τ)
+
+/-- Definitional bridge from the suffix API to the proved truncated-sum API. -/
+@[simp]
+lemma suffixBernoulliWeightOperator_eq_truncatedTypeSums
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) :
+    suffixBernoulliWeightOperator params family k ℓ τ =
+      truncatedTypeSums family.averagedSubMeas.total params.d ℓ (gHatTypeSuffix ℓ τ) := by
+  rfl
 
 /-- The interpolated operator `H^{x_1,\dots,x_k}_h` restricted to tuples that are
 globally consistent with a single polynomial.
