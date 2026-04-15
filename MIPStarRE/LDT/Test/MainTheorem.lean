@@ -41,10 +41,11 @@ noncomputable def classicalTestSoundnessSlackBound
 polynomial agrees with the point-answer function except on `slack` average mass.
 
 The `slack ≤ max 1 slackBound` guard ensures this is trivially satisfiable
-(pick `slack := 1`) so the statement is vacuously true as a placeholder, while
-still recording the paper's intended bound shape. When real proofs are filled in,
-`slackBound` will be `< 1` for interesting parameters, making the `max 1`
-irrelevant and recovering the tight bound. -/
+(pick `slack := 1, g := default`) so the statement is vacuously true as a
+placeholder. The `slackBound` parameter records the paper's intended error
+dependence; once a real test-passing hypothesis constrains `a`, the proof
+should produce `slack ≤ slackBound < 1`, which is strictly stronger than
+`slack ≤ max 1 slackBound`. -/
 def PointAnswerSoundnessConclusion (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
   0 ≤ slack ∧
