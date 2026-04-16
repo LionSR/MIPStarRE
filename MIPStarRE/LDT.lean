@@ -7,7 +7,6 @@ import MIPStarRE.LDT.Test.Defs
 import MIPStarRE.LDT.Test.Strategy
 import MIPStarRE.LDT.Test.Classical
 import MIPStarRE.LDT.Test.MainTheorem
-import MIPStarRE.LDT.Test.AxiomAudit
 import MIPStarRE.LDT.Preliminaries.FiniteFields
 import MIPStarRE.LDT.Preliminaries.Defs
 import MIPStarRE.LDT.Preliminaries.Theorems

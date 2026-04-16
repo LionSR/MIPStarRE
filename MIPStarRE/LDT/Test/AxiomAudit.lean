@@ -1,3 +1,4 @@
+import Lean
 import MIPStarRE.LDT.Test.MainTheorem
 
 /-!
@@ -6,14 +7,26 @@ import MIPStarRE.LDT.Test.MainTheorem
 Regression checks for the issue-#408 replacement of the former ambient
 Polishchuk--Spielman axiom by the explicit hypothesis
 `PolishchukSpielmanClassicalSoundnessStatement`.
+
+This module is built explicitly in CI rather than imported from the umbrella
+library modules, so the axiom audits stay out of normal downstream imports
+while still acting as regression tests.
 -/
 
-/-- info: 'MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement' depends on axioms: [propext,
- Classical.choice,
- Quot.sound] -/
-#guard_msgs in
-#print axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
+open Lean Elab Command
 
-/-- info: 'MIPStarRE.LDT.Test.classicalTestSoundness' depends on axioms: [propext, Classical.choice, Quot.sound] -/
-#guard_msgs in
-#print axioms MIPStarRE.LDT.Test.classicalTestSoundness
+private def expectedStandardAxioms : Array Name :=
+  #[``propext, ``Classical.choice, ``Quot.sound].qsort Name.lt
+
+private def assertUsesOnlyStandardAxioms (declName : Name) : CommandElabM Unit := do
+  let axioms := (← Lean.collectAxioms declName).qsort Name.lt
+  unless axioms == expectedStandardAxioms do
+    throwError
+      m!"'{declName}' depends on axioms {axioms.toList}, expected only " ++
+        m!"{expectedStandardAxioms.toList}"
+
+elab "assert_standard_axioms " id:ident : command => do
+  assertUsesOnlyStandardAxioms id.getId
+
+assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
+assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
