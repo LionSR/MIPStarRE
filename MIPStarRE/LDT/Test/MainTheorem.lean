@@ -29,9 +29,12 @@ noncomputable def razSafraSlackBound (params : Parameters) (eps : Error) : Error
 
 /-- Placeholder polynomial-size slack for classical low-individual-degree soundness.
 
-The Chapter 1 overview records the dependence as
-`poly(m) * (√eps + poly(d/q))`; this named expression keeps that dependence
-visible until the Polishchuk–Spielman theorem is formalized directly. -/
+The Chapter 1 overview records the dependence only schematically as
+`poly(m) * (poly(eps) + poly(d/q))`. This named expression keeps the current
+`sqrt eps` placeholder visible until the Polishchuk–Spielman theorem is
+formalized directly or the exact exponent is audited against [PS94]. Issue #384
+tracks tightening this placeholder in lock-step with the quoted external
+soundness statement below. -/
 noncomputable def classicalTestSoundnessSlackBound
     (params : Parameters) (eps : Error) : Error :=
   ((params.m : Error) ^ (2 : ℕ)) *
@@ -106,9 +109,12 @@ def TwoProverClassicalLIDPassCondition (params : Parameters)
 /-- Quoted theorem statement for the classical low-individual-degree soundness
 result of Polishchuk and Spielman.
 
-This `Prop`-valued interface keeps the external dependency explicit at each call
-site: users of `classicalTestSoundness` must still supply a witness of this
-statement, rather than inheriting any ambient assumed theorem. -/
+This issue-#408 `Prop`-valued interface replaces the earlier ambient axiom with
+an explicit hypothesis at each call site: users of `classicalTestSoundness`
+must still supply a witness of this statement, rather than inheriting any
+assumed theorem as ambient proof power. The regression audit in
+`MIPStarRE.LDT.Test.AxiomAudit` checks that `classicalTestSoundness` therefore
+remains kernel-clean apart from the standard Lean axioms. -/
 def PolishchukSpielmanClassicalSoundnessStatement (params : Parameters)
     [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error) : Prop :=
