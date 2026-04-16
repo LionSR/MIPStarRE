@@ -43,7 +43,7 @@ abbrev ClassicalRestrictedDiagonalSample (params : Parameters)
   Role × RestrictedDiagonalSample params j
 
 /-- Deterministic classical answers for the two provers in the low individual
- degree test. -/
+degree test. -/
 structure TwoProverClassicalLIDStrategy (params : Parameters) [FieldModel params.q] where
   /-- Prover A's answer to a point query. -/
   pointAnswerA : Point params → Fq params
@@ -120,7 +120,7 @@ def selfConsistencyAccepts {params : Parameters} [FieldModel params.q]
   strategy.pointAnswerA u = strategy.pointAnswerB u
 
 /-- Whether the deterministic strategy is accepted on a sampled `j`-restricted
- diagonal branch instance. -/
+diagonal branch instance. -/
 def restrictedDiagonalAccepts {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params)
     (j : Fin params.m)
@@ -189,7 +189,9 @@ private theorem roleTaggedAcceptanceProbability_eq_roleAverage {β : Type*}
     then (1 : Error) else 0
   change avgOver (uniformDistribution (Role × β)) (fun rs => F rs.1 rs.2) = _
   rw [avgOver_uniform_prod]
-  rw [avgOver_uniform_role]
+  simpa [F] using
+    (avgOver_uniform_role (fun r =>
+      avgOver (uniformDistribution β) fun s => F r s))
 
 /-- Pull a common scalar through a finite sum of arithmetic means. -/
 private theorem smul_sum_half_split {α : Type*} [Fintype α]
@@ -197,12 +199,7 @@ private theorem smul_sum_half_split {α : Type*} [Fintype α]
     m * ∑ x, (A x + B x) / 2 =
       ((m * ∑ x, A x) + (m * ∑ x, B x)) / 2 := by
   simp_rw [div_eq_mul_inv, add_mul]
-  rw [Finset.sum_add_distrib, mul_add]
-  have hA : ∑ x, A x * (2 : Error)⁻¹ = (∑ x, A x) * (2 : Error)⁻¹ := by
-    rw [Finset.sum_mul]
-  have hB : ∑ x, B x * (2 : Error)⁻¹ = (∑ x, B x) * (2 : Error)⁻¹ := by
-    rw [Finset.sum_mul]
-  rw [hA, hB]
+  rw [Finset.sum_add_distrib, ← Finset.sum_mul, ← Finset.sum_mul, mul_add]
   ring
 
 /-- Axis-parallel acceptance probability for the role choice where Alice gets the
@@ -373,9 +370,20 @@ theorem lowIndividualDegreeAcceptanceProbability_eq_branchAverage
         strategy.selfConsistencyAcceptanceProbability +
         (strategy.diagonalLineLeftPointRightAcceptanceProbability +
           strategy.diagonalPointLeftLineRightAcceptanceProbability) / 2) / 3 := by
-  unfold lowIndividualDegreeAcceptanceProbability
-  rw [axisParallelAcceptanceProbability_eq_roleAverage,
-    diagonalAcceptanceProbability_eq_roleAverage]
+  calc
+    strategy.lowIndividualDegreeAcceptanceProbability
+      = ((strategy.axisParallelLineLeftPointRightAcceptanceProbability +
+            strategy.axisParallelPointLeftLineRightAcceptanceProbability) / 2 +
+          strategy.selfConsistencyAcceptanceProbability +
+          strategy.diagonalAcceptanceProbability) / 3 := by
+            rw [lowIndividualDegreeAcceptanceProbability,
+              axisParallelAcceptanceProbability_eq_roleAverage]
+    _ = ((strategy.axisParallelLineLeftPointRightAcceptanceProbability +
+            strategy.axisParallelPointLeftLineRightAcceptanceProbability) / 2 +
+          strategy.selfConsistencyAcceptanceProbability +
+          (strategy.diagonalLineLeftPointRightAcceptanceProbability +
+            strategy.diagonalPointLeftLineRightAcceptanceProbability) / 2) / 3 := by
+            rw [diagonalAcceptanceProbability_eq_roleAverage]
 
 /-- Passing the paper's deterministic two-prover classical low individual degree
 test with error `eps`, stated in acceptance-probability form.

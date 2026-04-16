@@ -22,7 +22,7 @@
 	Here $a$ denotes the prover's point answer.
 \end{theorem}
 \begin{remark}
-	The current Lean declaration \lean{MIPStarRE.LDT.Test.classicalTestSoundness} keeps the quoted Polishchuk--Spielman dependency explicit through the auxiliary hypothesis \texttt{MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement}. This preserves the paper-faithful theorem statement above while ensuring every Lean use site must supply the external implication explicitly. Accordingly, this result is not marked \leanok.
+	The current Lean declaration \lean{MIPStarRE.LDT.Test.classicalTestSoundness} keeps the quoted Polishchuk--Spielman dependency explicit through the auxiliary hypothesis \lean{MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement}. This preserves the paper-faithful theorem statement above while ensuring every Lean use site must supply the external implication explicitly. Accordingly, this result is not marked \leanok.
 \end{remark}
 \begin{proof}
 	See Polishchuk--Spielman [PS94].
