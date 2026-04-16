@@ -746,17 +746,44 @@ noncomputable def gHatHalfSandwichRight (params : Parameters) [FieldModel params
         total := gHatRotatedHalfProductTotalOperator params family k xs
       }
 
-/-- The operator-polynomial `S_{τ≥ℓ}` from `lem:from-H-to-G` (eq:S-def):
-`S_{τ≥ℓ} = ∑_{r : r + suffixWeight ≥ d+1} C(ℓ-1, r) · G^r · (I-G)^{(ℓ-1)-r}`
-where `G` is the averaged total operator. -/
+/-- Source-style recurrence weight `S_{τtail}` from `lem:from-H-to-G`.
+
+The parameter `prefixLen` is the number of type bits already converted into the
+Bernoulli polynomial.  This is exactly `truncatedTypeSums` specialized to the
+averaged complete operator `G = E_x ∑_g G^x_g`. -/
+noncomputable def fromHToGRecurrenceWeight (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (prefixLen : ℕ) {tailLen : ℕ}
+    (τtail : GHatType tailLen) : MIPStarRE.Quantum.Op ι :=
+  truncatedTypeSums family.averagedSubMeas.total params.d prefixLen τtail
+
+/-- The suffix-specialized recurrence weight used by the `fromHToG` families.
+
+Semantics/indexing fix: the previous grouped Bernoulli encoding
+`∑_r C(ℓ-1, r) G^r (I-G)^(ℓ-1-r)` interpreted `ℓ` as the paper's 1-indexed
+prefix length, whereas the callers (`FromHToGStatement.recurrenceStep` uses
+`∀ ℓ < k`) and the rest of `Pasting/` treat `ℓ` as 0-indexed — the off-by-one
+produced a binomial of degree `ℓ - 1` instead of the paper's
+`\binom{\ell}{r}` (see `references/ldt-paper/ld-pasting.tex` eq. (S-def)).
+The new definition uses `truncatedTypeSums` at `prefixLen = ℓ`, which sums
+over `GHatType ℓ` and matches both the 0-indexed convention and the proved
+recurrence in `truncatedTypeSumRecurrence`.  The index `ℓ` is zero-based:
+the suffix is `τ_{≥ℓ}` and the prefix has length `ℓ`. -/
 noncomputable def suffixBernoulliWeightOperator (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : MIPStarRE.Quantum.Op ι :=
-  let G := family.averagedSubMeas.total
-  let suffixWeight := (Finset.univ.filter fun i : Fin k => ℓ ≤ i.val ∧ τ i).card
-  ∑ r ∈ Finset.range ℓ,
-    if r + suffixWeight ≥ params.d + 1 then
-      (Nat.choose (ℓ - 1) r : ℂ) • (G ^ r * (1 - G) ^ (ℓ - 1 - r))
-    else 0
+  fromHToGRecurrenceWeight params family ℓ (gHatTypeSuffix ℓ τ)
+
+/-- Definitional bridge from the suffix API to the proved truncated-sum API.
+
+Not tagged `@[simp]`: eager unfolding would eliminate every mention of the
+named `suffixBernoulliWeightOperator` abstraction and leak the
+`gHatTypeSuffix` wrapper into downstream goals.  Call sites that need the
+expansion should use `unfold` or `show` explicitly. -/
+lemma suffixBernoulliWeightOperator_eq_truncatedTypeSums
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) :
+    suffixBernoulliWeightOperator params family k ℓ τ =
+      truncatedTypeSums family.averagedSubMeas.total params.d ℓ (gHatTypeSuffix ℓ τ) := by
+  rfl
 
 /-- The interpolated operator `H^{x_1,\dots,x_k}_h` restricted to tuples that are
 globally consistent with a single polynomial.

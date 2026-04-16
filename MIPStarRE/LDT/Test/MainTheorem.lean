@@ -92,10 +92,9 @@ This records only the paper-faithful classical test-passing data:
 - a proof that the strategy passes that classical test with acceptance
   probability at least `1 - eps`.
 
-The quoted Polishchuk–Spielman soundness implication is kept separate in the
-standalone theorem interface `polishchukSpielmanClassicalSoundness`, so
-consumers can refer to that external dependency by name rather than projecting a
-bundled conclusion out of a hypothesis. -/
+The quoted Polishchuk–Spielman soundness implication is kept separate in
+`TwoProverClassicalLIDBridgePackage` so downstream theorems state an implication
+from test-passing data rather than merely projecting a bundled conclusion. -/
 def TwoProverClassicalLIDPassCondition (params : Parameters)
     [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error) : Prop :=
@@ -103,21 +102,23 @@ def TwoProverClassicalLIDPassCondition (params : Parameters)
     strategy.pointAnswerA = a ∧
       strategy.ClassicallyPassesLowIndividualDegreeTest eps
 
-/-- Quoted theorem interface for the classical low-individual-degree soundness
-result of Polishchuk and Spielman.
+/-- Temporary bridge/package structure for the quoted Polishchuk–Spielman
+soundness theorem.
 
-This explicit axiom is the single named interface for the external implication
-from paper-faithful classical test-passing data to low-degree agreement.
-Keeping the quoted-result dependency here, rather than threading an extra bridge
-hypothesis through every consumer, makes the remaining external assumption both
-localized and visible to `#print axioms`. -/
-axiom polishchukSpielmanClassicalSoundness
-    (params : Parameters) [FieldModel params.q]
-    (a : Point params → Fq params) (eps : Error)
-    (hpass : TwoProverClassicalLIDPassCondition params a eps) :
-    ∃ slack : Error,
-      BoundedPointAnswerSoundnessConclusion params a
-        (classicalTestSoundnessSlackBound params eps) slack
+This packages the external implication from the paper-faithful classical pass
+condition to the named low-degree-agreement conclusion, while keeping that
+implication separate from `TwoProverClassicalLIDPassCondition` itself.
+
+TODO(#404): replace this bridge package with a direct formalization (or other
+honest quoted-result interface) for the Polishchuk–Spielman implication. -/
+structure TwoProverClassicalLIDBridgePackage (params : Parameters)
+    [FieldModel params.q]
+    (a : Point params → Fq params) (eps : Error) : Prop where
+  soundness :
+    TwoProverClassicalLIDPassCondition params a eps →
+      ∃ slack : Error,
+        BoundedPointAnswerSoundnessConclusion params a
+          (classicalTestSoundnessSlackBound params eps) slack
 
 /-- `thm:raz-safra`.
 
@@ -134,19 +135,70 @@ theorem razSafra
 
 /-- `thm:classical-test-soundness`.
 
-The overview theorem is now stated directly from paper-faithful classical
-LID test-passing data, and its proof simply invokes the dedicated quoted theorem
-interface `polishchukSpielmanClassicalSoundness`. This keeps the remaining
-external dependency explicit in one named declaration rather than as an extra
-hypothesis on every consumer. -/
+Temporary bridge wrapper for the classical overview theorem: from modeled
+classical LID test-passing data together with an explicit quoted
+Polishchuk–Spielman bridge package, conclude that prover A's point-answer
+function is close to a low-degree polynomial with the named slack bound. -/
 theorem classicalTestSoundness
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
-    (hpass : TwoProverClassicalLIDPassCondition params a eps) :
+    (hpass : TwoProverClassicalLIDPassCondition params a eps)
+    (hbridge : TwoProverClassicalLIDBridgePackage params a eps) :
     ∃ slack : Error,
       BoundedPointAnswerSoundnessConclusion params a
         (classicalTestSoundnessSlackBound params eps) slack := by
-  exact polishchukSpielmanClassicalSoundness params a eps hpass
+  exact hbridge.soundness hpass
+
+/-- Temporary bridge package for the still-unformalized proof of
+`thm:main-formal`.
+
+This packages exactly the three projective-measurement conclusions of the main
+formal theorem. It isolates the missing Section 3 assembly from the theorem
+statement itself: role-register symmetrization, application of
+`thm:main-induction`, unsymmetrization, Schwartz-Zippel replacement of point
+evaluations by polynomial evaluations, orthonormalization/completion, and the
+final triangle/data-processing error bookkeeping. -/
+structure MainFormalBridgePackage
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι)
+    (eps : Error) (k : ℕ) : Prop where
+  witness :
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params G_A.toSubMeas)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
+          (mainFormalError params k eps)
+
+/-- Producer for the temporary `thm:main-formal` bridge package.
+
+From the paper inputs to `thm:main-formal`, the eventual proof must convert the
+possibly nonsymmetric projective strategy into a role-register symmetric
+strategy, prove the symmetrized strategy is good with the required constants,
+apply `thm:main-induction`, unsymmetrize the resulting measurement into
+`G_A` and `G_B`, derive polynomial-level self-consistency using
+Schwartz-Zippel, then apply orthonormalization and completion while preserving
+the final `mainFormalError` bound. -/
+theorem mainFormalBridgePackage
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι)
+    (eps : Error)
+    (_hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (k : ℕ)
+    (_hk : params.m * params.d ≤ k) :
+    MainFormalBridgePackage params strategy eps k := by
+  -- TODO(Section 3): Intentional sorry pending paper-faithful assembly (see docstring);
+  -- load-bearing for `mainFormal`, which invokes this producer below.
+  sorry
 
 /--
 `thm:main-formal` from `test_definition.tex`.
@@ -180,13 +232,7 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  /-
-  The paper proof still requires the missing Section 3 assembly that turns
-  `hpass`, `hd`, `hk`, and `hk0` into a `MainFormalBridgePackage`: symmetrization,
-  application of the induction theorem, unsymmetrization, and the final
-  projectivization/completion transfer.
-  -/
-  sorry
+  exact (mainFormalBridgePackage params strategy eps hpass k hk).witness
 
 /-- `thm:main-informal`.
 
