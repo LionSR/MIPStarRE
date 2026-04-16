@@ -79,7 +79,7 @@ noncomputable def axisParallelLineAnswerFamily
 
 /-- Sampled point answers in the `j`-restricted diagonal test.
 Point player receives `u` and answers at `u`. -/
-noncomputable def diagonalPointAnswerFamily
+noncomputable def restrictedDiagonalPointAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι)
@@ -90,7 +90,7 @@ noncomputable def diagonalPointAnswerFamily
 
 /-- Sampled diagonal-line answers in the `j`-restricted diagonal
 test, evaluated at the base point (parameter `zeroCoord`). -/
-noncomputable def diagonalLineAnswerFamily
+noncomputable def restrictedDiagonalLineAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : RestrictedSymStrat params ι)
@@ -136,8 +136,8 @@ noncomputable def diagonalFailureProbability
       bipartiteConsError strategy.state
         (uniformDistribution
           (RestrictedDiagonalSample params j))
-        (diagonalPointAnswerFamily strategy j)
-        (diagonalLineAnswerFamily strategy j)
+        (restrictedDiagonalPointAnswerFamily strategy j)
+        (restrictedDiagonalLineAnswerFamily strategy j)
 
 /-- Goodness data for a restricted strategy. -/
 structure IsGood {params : Parameters}
