@@ -5,7 +5,16 @@ import MIPStarRE.LDT.Pasting.Theorems
 import MIPStarRE.LDT.SelfImprovement.Theorems
 
 /-!
-Theorem stubs for Section 6 of the low individual degree paper.
+# Section 6 — Theorems
+
+This file contains the currently formalized theorem-level API for the main
+induction step, together with local helper lemmas for restricted-slice
+averaging.
+
+## References
+
+- `blueprint/src/chapter/ch10_induction.tex`
+- `references/ldt-paper/inductive_step.tex`
 -/
 
 namespace MIPStarRE.LDT.MainInductionStep
@@ -126,11 +135,11 @@ theorem ldPastingInInductionSection
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
+    (_hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
-    (hgamma_le : gamma ≤ 1)
-    (hzeta_le : zeta ≤ 1)
-    (hdq_le : params.d ≤ params.q)
+    (_hgamma_le : gamma ≤ 1)
+    (_hzeta_le : zeta ≤ 1)
+    (_hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -141,11 +150,15 @@ theorem ldPastingInInductionSection
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingInInductionSectionConclusion params strategy family H
         eps delta gamma kappa zeta k := by
-  obtain ⟨H, hH⟩ := Pasting.ldPasting params strategy eps delta gamma kappa zeta
-    hnorm hgood hgamma_le hzeta_le hdq_le
-    family hcomplete hcons hself hbound k hk
+  have hldPasting :=
+    Pasting.ldPasting params strategy eps delta gamma kappa zeta
+      _hnorm hgood _hgamma_le _hzeta_le _hdq_le
+      family hcomplete hcons hself hbound k hk
+  obtain ⟨H, hH⟩ := hldPasting
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
+
+/-! ## Restricted-probability helpers -/
 
 private def pointNextEquiv (params : Parameters) [FieldModel params.q] :
     Point params.next ≃ Point params × Fq params where
@@ -167,43 +180,6 @@ private def pointNextEquiv (params : Parameters) [FieldModel params.q] :
   right_inv := by
     rintro ⟨u, x⟩
     simp [truncatePoint_appendPoint, pointHeight_appendPoint]
-
-private lemma avgOver_uniform_prod
-    {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (f : α → β → Error) :
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) =
-      avgOver (uniformDistribution α)
-        (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
-  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  calc
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2)
-      = ∑ a : α, ∑ b : β,
-          (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b := by
-            simpa [avgOver, uniformDistribution, Fintype.card_prod] using
-              (Fintype.sum_prod_type'
-                (f := fun a : α => fun b : β =>
-                  (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b))
-    _ = ∑ a : α, (1 / (Fintype.card α : Error)) *
-          ((1 / (Fintype.card β : Error)) * ∑ b : β, f a b) := by
-          refine Finset.sum_congr rfl ?_
-          intro a ha
-          calc
-            ∑ b : β, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b
-              = (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * ∑ b : β, f a b := by
-                  rw [← Finset.mul_sum]
-            _ = (1 / (Fintype.card α : Error)) *
-                  ((1 / (Fintype.card β : Error)) * ∑ b : β, f a b) := by
-                    field_simp [hα, hβ]
-                    rw [Nat.cast_mul]
-                    ring
-    _ = avgOver (uniformDistribution α)
-          (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
-          simp [avgOver, uniformDistribution, Finset.mul_sum]
 
 private lemma selfConsistencyRestrictedAverage_eq
     (params : Parameters)
@@ -287,16 +263,7 @@ private lemma weighted_diagonal_bound_to_average
   simpa [sliceDiagonalDirectionWeight, sliceDiagonalConditioningLoss] using
     weighted_bound_to_average params h
 
-private lemma consRel_mono
-    {Question Outcome : Type*}
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome]
-    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
-    (A : IdxSubMeas Question Outcome ιA) (B : IdxSubMeas Question Outcome ιB)
-    {δ δ' : Error} (hδ : δ ≤ δ') :
-    ConsRel ψ 𝒟 A B δ → ConsRel ψ 𝒟 A B δ' := by
-  intro h
-  exact ⟨le_trans h.offDiagonalBound hδ⟩
+/-! ## Restricted success probabilities -/
 
 /-- `lem:restricted-probabilities`. -/
 lemma restrictedProbabilities

@@ -3,23 +3,25 @@ import MIPStarRE.Quantum.FiniteMatrix
 /-!
 # Matrix-valued measurements for the MIP*=RE project
 
-This file provides the matrix-valued measurement layer used by the LDT
-formalization.
+This file provides the matrix-valued measurement layer used by the LDT formalization.
 
 ## Main definitions
 
 * `Submeasurement` — a family of PSD matrices summing to at most the identity.
 * `Measurement` — a family of PSD matrices summing to exactly the identity.
-* `Submeasurement.postprocess` — data-processed measurement via answer relabeling.
-* `inconsistency` — the off-diagonal mass `∑_{a≠b} τ(M_a N_b)`.
+* `Submeasurement.postprocess` — data-processed measurements via answer relabeling.
+* `inconsistency` — the off-diagonal mass `∑_{a ≠ b} τ(M_a N_b)`.
 * `diagOverlap` — the diagonal mass `∑_a τ(M_a N_a)`.
+
+## References
+
+This file supplies reusable measurement infrastructure for the LDT paper sources in
+`references/ldt-paper/`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.Quantum
-
-variable {d : Type*} [Fintype d] [DecidableEq d]
 
 /-! ## Submeasurements and measurements -/
 
@@ -43,8 +45,11 @@ structure Measurement (α : Type*) [Fintype α] (d : Type*) [Fintype d] [Decidab
   /-- The effects sum to the identity. -/
   sum_eq_one : ∑ a, effect a = 1
 
+/-! ## Totals and postprocessing -/
+
 namespace Submeasurement
 
+variable {d : Type*} [Fintype d] [DecidableEq d]
 variable {α β : Type*} [Fintype α] [Fintype β]
 
 /-- The total operator `∑ a, M_a`. -/
@@ -71,6 +76,7 @@ end Submeasurement
 
 section Overlap
 
+variable {d : Type*} [Fintype d] [DecidableEq d]
 variable {α : Type*} [Fintype α] [DecidableEq α]
 
 /-- The off-diagonal overlap mass `∑_{a ≠ b} τ(M_a N_b)`. -/

@@ -207,6 +207,8 @@ structure ProjStrat (params : Parameters) [FieldModel params.q]
   diagonalReparamInvariantB :
     DiagonalEvaluationReparamInvariant params diagonalMeasurementB
 
+/-! ### Role-register symmetrization infrastructure -/
+
 /-- Basis projector onto the role sector `r`. -/
 def roleProj (r : Role) : MIPStarRE.Quantum.Op Role :=
   Matrix.single r r (1 : ℂ)
@@ -265,13 +267,13 @@ private lemma roleCond_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op ι) :
     roleCond Role.A X * roleCond Role.B Y = 0 := by
   rw [roleCond, roleCond, opTensor_mul, roleProj_A_mul_B]
-  simpa [opTensor] using (Matrix.zero_kronecker (X * Y))
+  simp [opTensor]
 
 @[simp] private lemma roleCond_B_mul_A {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op ι) :
     roleCond Role.B X * roleCond Role.A Y = 0 := by
   rw [roleCond, roleCond, opTensor_mul, roleProj_B_mul_A]
-  simpa [opTensor] using (Matrix.zero_kronecker (X * Y))
+  simp [opTensor]
 
 private lemma roleCond_finset_sum {α ι : Type*}
     [Fintype ι] [DecidableEq ι]
@@ -318,10 +320,12 @@ noncomputable def rolePairCond {ι : Type*} [Fintype ι] [DecidableEq ι]
   Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
     (opTensor (rolePairProj rL rR) X)
 
-private lemma reindex_nonneg {α β : Type*} [Fintype α] [DecidableEq α]
-    [Fintype β] [DecidableEq β]
+private lemma reindex_nonneg {α β : Type*} [Finite α] [Finite β]
     (e : α ≃ β) {X : MIPStarRE.Quantum.Op α} (hX : 0 ≤ X) :
     0 ≤ Matrix.reindex e e X := by
+  classical
+  let _ : Fintype α := Fintype.ofFinite α
+  let _ : Fintype β := Fintype.ofFinite β
   refine Matrix.nonneg_iff_posSemidef.mpr ?_
   rw [Matrix.reindex_apply]
   exact (Matrix.posSemidef_submatrix_equiv (M := X) e.symm).2
@@ -380,7 +384,7 @@ private lemma swapDensity_eq_reindex {ι : Type*}
   rcases x with ⟨i₁, i₂⟩
   rcases y with ⟨j₁, j₂⟩
   by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
-    simp [swapDensity, leftTensor, rightTensor, opTensor, h₁, h₂, mul_comm]
+    simp [swapDensity, leftTensor, rightTensor, h₁, h₂, mul_comm]
 
 @[simp] private lemma swapDensity_rightTensor {ι : Type*} [Fintype ι] [DecidableEq ι]
     (M : MIPStarRE.Quantum.Op ι) :
@@ -389,9 +393,9 @@ private lemma swapDensity_eq_reindex {ι : Type*}
   rcases x with ⟨i₁, i₂⟩
   rcases y with ⟨j₁, j₂⟩
   by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
-    simp [swapDensity, leftTensor, rightTensor, opTensor, h₁, h₂, mul_comm]
+    simp [swapDensity, leftTensor, rightTensor, h₁, h₂, mul_comm]
 
-private lemma swapDensity_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
+private lemma swapDensity_nonneg {ι : Type*} [Finite ι]
     {X : MIPStarRE.Quantum.Op (ι × ι)} (hX : 0 ≤ X) :
     0 ≤ swapDensity X := by
   simpa [swapDensity_eq_reindex] using
@@ -445,24 +449,25 @@ noncomputable def classicalRoleSymmState {ι : Type*} [Fintype ι] [DecidableEq 
     _ = (classicalRoleSymmState ψ).density := by
           simp [classicalRoleSymmState, add_comm]
 
-private lemma normalizedTrace_reindex {α β : Type*} [Fintype α] [DecidableEq α]
-    [Fintype β] [DecidableEq β]
+private lemma normalizedTrace_reindex {α β : Type*} [Fintype α] [Fintype β]
     (e : α ≃ β) (X : MIPStarRE.Quantum.Op α) :
     MIPStarRE.Quantum.normalizedTrace (Matrix.reindex e e X) =
       MIPStarRE.Quantum.normalizedTrace X := by
+  classical
   have hcard : Fintype.card β = Fintype.card α := Fintype.card_congr e.symm
   unfold MIPStarRE.Quantum.normalizedTrace Matrix.trace
   simp_rw [Matrix.diag_apply, Matrix.reindex_apply]
   rw [← e.symm.sum_comp (fun i : α => X i i)]
   simp [hcard]
 
-private lemma swapDensity_mul {ι : Type*} [Fintype ι] [DecidableEq ι]
+private lemma swapDensity_mul {ι : Type*} [Fintype ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     swapDensity (X * Y) = swapDensity X * swapDensity Y := by
+  classical
   simpa [swapDensity_eq_reindex] using
     (Matrix.reindexAlgEquiv_mul ℂ ℂ (Equiv.prodComm ι ι) X Y)
 
-private lemma normalizedTrace_swapDensity {ι : Type*} [Fintype ι] [DecidableEq ι]
+private lemma normalizedTrace_swapDensity {ι : Type*} [Fintype ι]
     (X : MIPStarRE.Quantum.Op (ι × ι)) :
     MIPStarRE.Quantum.normalizedTrace (swapDensity X) = MIPStarRE.Quantum.normalizedTrace X := by
   simpa [swapDensity_eq_reindex] using
@@ -512,6 +517,26 @@ private lemma normalizedTrace_rolePairCond {ι : Type*} [Fintype ι] [DecidableE
             simpa using normalizedTrace_opTensor (rolePairProj rL rR) X
     _ = (1 / 4 : ℂ) * MIPStarRE.Quantum.normalizedTrace X := by
           rw [normalizedTrace_rolePairProj]
+
+private lemma normalizedTrace_two_smul_rolePairCond {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (rL rR : Role) (X : MIPStarRE.Quantum.Op (ι × ι)) :
+    MIPStarRE.Quantum.normalizedTrace ((2 : Error) • rolePairCond rL rR X) =
+      (1 / 2 : ℂ) * MIPStarRE.Quantum.normalizedTrace X := by
+  rw [show (2 : Error) • rolePairCond rL rR X =
+      rolePairCond rL rR X + rolePairCond rL rR X by
+        simpa using (two_smul Error (rolePairCond rL rR X))]
+  rw [MIPStarRE.Quantum.normalizedTrace_add, normalizedTrace_rolePairCond]
+  ring_nf
+
+private lemma normalizedTrace_two_smul_rolePairCond_re {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (rL rR : Role) (X : MIPStarRE.Quantum.Op (ι × ι)) :
+    Complex.re
+        (MIPStarRE.Quantum.normalizedTrace ((2 : Error) • rolePairCond rL rR X)) =
+      (1 / 2 : Error) * Complex.re (MIPStarRE.Quantum.normalizedTrace X) := by
+  rw [normalizedTrace_two_smul_rolePairCond]
+  norm_num [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
 
 private lemma permInvState_of_density_fixed {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι))
@@ -629,129 +654,65 @@ private lemma rolePairProj_BA_mul_BB :
   rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_mul_self, roleProj_A_mul_B]
   simp [opTensor]
 
+private lemma rolePairCond_mul {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (rL₁ rR₁ rL₂ rR₂ : Role) (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
+    rolePairCond rL₁ rR₁ X * rolePairCond rL₂ rR₂ Y =
+      Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
+        (opTensor (rolePairProj rL₁ rR₁ * rolePairProj rL₂ rR₂) (X * Y)) := by
+  calc
+    rolePairCond rL₁ rR₁ X * rolePairCond rL₂ rR₂ Y
+      = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
+          ((opTensor (rolePairProj rL₁ rR₁) X) *
+            (opTensor (rolePairProj rL₂ rR₂) Y)) := by
+              exact
+                (Matrix.reindexAlgEquiv_mul ℂ ℂ (rolePairPayloadEquiv ι)
+                  (opTensor (rolePairProj rL₁ rR₁) X)
+                  (opTensor (rolePairProj rL₂ rR₂) Y)).symm
+    _ = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
+          (opTensor (rolePairProj rL₁ rR₁ * rolePairProj rL₂ rR₂) (X * Y)) := by
+            rw [opTensor_mul]
+
 private lemma rolePairCond_mul_same {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL rR : Role) (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond rL rR X * rolePairCond rL rR Y = rolePairCond rL rR (X * Y) := by
-  calc
-    rolePairCond rL rR X * rolePairCond rL rR Y
-      = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          ((opTensor (rolePairProj rL rR) X) * (opTensor (rolePairProj rL rR) Y)) := by
-            simpa [rolePairCond] using
-              (Matrix.reindexAlgEquiv_mul ℂ ℂ (rolePairPayloadEquiv ι)
-                (opTensor (rolePairProj rL rR) X) (opTensor (rolePairProj rL rR) Y)).symm
-    _ = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          (opTensor (rolePairProj rL rR * rolePairProj rL rR) (X * Y)) := by
-            rw [opTensor_mul]
-    _ = rolePairCond rL rR (X * Y) := by
-          simp [rolePairCond, rolePairProj_mul_same]
+  rw [rolePairCond_mul]
+  simp [rolePairCond, rolePairProj_mul_same]
 
 private lemma rolePairCond_AB_mul_BA {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond Role.A Role.B X * rolePairCond Role.B Role.A Y = 0 := by
-  calc
-    rolePairCond Role.A Role.B X * rolePairCond Role.B Role.A Y
-      = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          ((opTensor (rolePairProj Role.A Role.B) X) *
-            (opTensor (rolePairProj Role.B Role.A) Y)) := by
-              simpa [rolePairCond] using
-                (Matrix.reindexAlgEquiv_mul ℂ ℂ (rolePairPayloadEquiv ι)
-                  (opTensor (rolePairProj Role.A Role.B) X)
-                  (opTensor (rolePairProj Role.B Role.A) Y)).symm
-    _ = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          (opTensor 0 (X * Y)) := by
-            rw [opTensor_mul, rolePairProj_AB_mul_BA]
-    _ = 0 := by
-          simp [opTensor]
+  rw [rolePairCond_mul]
+  simp [opTensor, rolePairProj_AB_mul_BA]
 
 private lemma rolePairCond_BA_mul_AB {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond Role.B Role.A X * rolePairCond Role.A Role.B Y = 0 := by
-  calc
-    rolePairCond Role.B Role.A X * rolePairCond Role.A Role.B Y
-      = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          ((opTensor (rolePairProj Role.B Role.A) X) *
-            (opTensor (rolePairProj Role.A Role.B) Y)) := by
-              simpa [rolePairCond] using
-                (Matrix.reindexAlgEquiv_mul ℂ ℂ (rolePairPayloadEquiv ι)
-                  (opTensor (rolePairProj Role.B Role.A) X)
-                  (opTensor (rolePairProj Role.A Role.B) Y)).symm
-    _ = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          (opTensor 0 (X * Y)) := by
-            rw [opTensor_mul, rolePairProj_BA_mul_AB]
-    _ = 0 := by
-          simp [opTensor]
+  rw [rolePairCond_mul]
+  simp [opTensor, rolePairProj_BA_mul_AB]
 
 private lemma rolePairCond_AB_mul_AA {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond Role.A Role.B X * rolePairCond Role.A Role.A Y = 0 := by
-  calc
-    rolePairCond Role.A Role.B X * rolePairCond Role.A Role.A Y
-      = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          ((opTensor (rolePairProj Role.A Role.B) X) *
-            (opTensor (rolePairProj Role.A Role.A) Y)) := by
-              simpa [rolePairCond] using
-                (Matrix.reindexAlgEquiv_mul ℂ ℂ (rolePairPayloadEquiv ι)
-                  (opTensor (rolePairProj Role.A Role.B) X)
-                  (opTensor (rolePairProj Role.A Role.A) Y)).symm
-    _ = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          (opTensor 0 (X * Y)) := by
-            rw [opTensor_mul, rolePairProj_AB_mul_AA]
-    _ = 0 := by
-          simp [opTensor]
+  rw [rolePairCond_mul]
+  simp [opTensor, rolePairProj_AB_mul_AA]
 
 private lemma rolePairCond_BA_mul_AA {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond Role.B Role.A X * rolePairCond Role.A Role.A Y = 0 := by
-  calc
-    rolePairCond Role.B Role.A X * rolePairCond Role.A Role.A Y
-      = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          ((opTensor (rolePairProj Role.B Role.A) X) *
-            (opTensor (rolePairProj Role.A Role.A) Y)) := by
-              simpa [rolePairCond] using
-                (Matrix.reindexAlgEquiv_mul ℂ ℂ (rolePairPayloadEquiv ι)
-                  (opTensor (rolePairProj Role.B Role.A) X)
-                  (opTensor (rolePairProj Role.A Role.A) Y)).symm
-    _ = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          (opTensor 0 (X * Y)) := by
-            rw [opTensor_mul, rolePairProj_BA_mul_AA]
-    _ = 0 := by
-          simp [opTensor]
+  rw [rolePairCond_mul]
+  simp [opTensor, rolePairProj_BA_mul_AA]
 
 private lemma rolePairCond_AB_mul_BB {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond Role.A Role.B X * rolePairCond Role.B Role.B Y = 0 := by
-  calc
-    rolePairCond Role.A Role.B X * rolePairCond Role.B Role.B Y
-      = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          ((opTensor (rolePairProj Role.A Role.B) X) *
-            (opTensor (rolePairProj Role.B Role.B) Y)) := by
-              simpa [rolePairCond] using
-                (Matrix.reindexAlgEquiv_mul ℂ ℂ (rolePairPayloadEquiv ι)
-                  (opTensor (rolePairProj Role.A Role.B) X)
-                  (opTensor (rolePairProj Role.B Role.B) Y)).symm
-    _ = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          (opTensor 0 (X * Y)) := by
-            rw [opTensor_mul, rolePairProj_AB_mul_BB]
-    _ = 0 := by
-          simp [opTensor]
+  rw [rolePairCond_mul]
+  simp [opTensor, rolePairProj_AB_mul_BB]
 
 private lemma rolePairCond_BA_mul_BB {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond Role.B Role.A X * rolePairCond Role.B Role.B Y = 0 := by
-  calc
-    rolePairCond Role.B Role.A X * rolePairCond Role.B Role.B Y
-      = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          ((opTensor (rolePairProj Role.B Role.A) X) *
-            (opTensor (rolePairProj Role.B Role.B) Y)) := by
-              simpa [rolePairCond] using
-                (Matrix.reindexAlgEquiv_mul ℂ ℂ (rolePairPayloadEquiv ι)
-                  (opTensor (rolePairProj Role.B Role.A) X)
-                  (opTensor (rolePairProj Role.B Role.B) Y)).symm
-    _ = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
-          (opTensor 0 (X * Y)) := by
-            rw [opTensor_mul, rolePairProj_BA_mul_BB]
-    _ = 0 := by
-          simp [opTensor]
+  rw [rolePairCond_mul]
+  simp [opTensor, rolePairProj_BA_mul_BB]
 
 private lemma opTensor_roleCond_AA {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op ι) :
@@ -802,39 +763,25 @@ private lemma ev_classicalRoleSymmState_rolePair_AB {ι : Type*}
   rw [add_mul, MIPStarRE.Quantum.normalizedTrace_add,
     smul_mul_assoc, smul_mul_assoc,
     rolePairCond_mul_same,
-    rolePairCond_BA_mul_AB]
-  have hscalar :
-      MIPStarRE.Quantum.normalizedTrace ((2 : Error) • rolePairCond Role.A Role.B (ψ.density * Z)) =
-        (1 / 2 : ℂ) * MIPStarRE.Quantum.normalizedTrace (ψ.density * Z) := by
-    rw [show (2 : Error) • rolePairCond Role.A Role.B (ψ.density * Z) =
-        rolePairCond Role.A Role.B (ψ.density * Z) + rolePairCond Role.A Role.B (ψ.density * Z) by
-          ext i j
-          change ((2 : ℂ) * rolePairCond Role.A Role.B (ψ.density * Z) i j) =
-            rolePairCond Role.A Role.B (ψ.density * Z) i j +
-              rolePairCond Role.A Role.B (ψ.density * Z) i j
-          ring]
-    rw [MIPStarRE.Quantum.normalizedTrace_add, normalizedTrace_rolePairCond]
-    ring_nf
+    rolePairCond_BA_mul_AB,
+    Complex.add_re]
   have hscalarRe :
       Complex.re
           (MIPStarRE.Quantum.normalizedTrace
             ((2 : Error) • rolePairCond Role.A Role.B (ψ.density * Z))) =
-        (2 : Error)⁻¹ * Complex.re (MIPStarRE.Quantum.normalizedTrace (ψ.density * Z)) := by
-          calc
-            Complex.re (MIPStarRE.Quantum.normalizedTrace (2 • rolePairCond Role.A Role.B (ψ.density * Z)))
-              = Complex.re ((1 / 2 : ℂ) * MIPStarRE.Quantum.normalizedTrace (ψ.density * Z)) :=
-                  congrArg Complex.re hscalar
-            _ = (2 : Error)⁻¹ * Complex.re (MIPStarRE.Quantum.normalizedTrace (ψ.density * Z)) := by
-                  norm_num [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
-  rw [Complex.add_re]
+        (1 / 2 : Error) *
+          Complex.re (MIPStarRE.Quantum.normalizedTrace (ψ.density * Z)) :=
+    normalizedTrace_two_smul_rolePairCond_re Role.A Role.B (ψ.density * Z)
   calc
-    (MIPStarRE.Quantum.normalizedTrace ((2 : Error) • rolePairCond Role.A Role.B (ψ.density * Z))).re +
+    (MIPStarRE.Quantum.normalizedTrace
+        ((2 : Error) • rolePairCond Role.A Role.B (ψ.density * Z))).re +
         (MIPStarRE.Quantum.normalizedTrace ((2 : Error) • 0)).re
-      = (MIPStarRE.Quantum.normalizedTrace ((2 : Error) • rolePairCond Role.A Role.B (ψ.density * Z))).re + 0 := by
-          simp [MIPStarRE.Quantum.normalizedTrace_zero]
-    _ = (2 : Error)⁻¹ * (MIPStarRE.Quantum.normalizedTrace (ψ.density * Z)).re + 0 := by
-          exact congrArg (fun t => t + 0) hscalarRe
-    _ = (1 / 2 : Error) * (MIPStarRE.Quantum.normalizedTrace (ψ.density * Z)).re := by norm_num
+      = (1 / 2 : Error) *
+          (MIPStarRE.Quantum.normalizedTrace (ψ.density * Z)).re + 0 := by
+            rw [hscalarRe]
+            simp [MIPStarRE.Quantum.normalizedTrace_zero]
+    _ = (1 / 2 : Error) *
+          (MIPStarRE.Quantum.normalizedTrace (ψ.density * Z)).re := by ring
 
 private lemma ev_classicalRoleSymmState_rolePair_BA {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
@@ -845,51 +792,26 @@ private lemma ev_classicalRoleSymmState_rolePair_BA {ι : Type*}
   rw [add_mul, MIPStarRE.Quantum.normalizedTrace_add,
     smul_mul_assoc, smul_mul_assoc,
     rolePairCond_AB_mul_BA,
-    rolePairCond_mul_same]
-  have hscalar :
-      MIPStarRE.Quantum.normalizedTrace
-          ((2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density * Z)) =
-        (1 / 2 : ℂ) *
-          MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density * Z) := by
-    rw [show (2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density * Z) =
-        rolePairCond Role.B Role.A (swapDensity ψ.density * Z) +
-          rolePairCond Role.B Role.A (swapDensity ψ.density * Z) by
-          ext i j
-          change ((2 : ℂ) * rolePairCond Role.B Role.A (swapDensity ψ.density * Z) i j) =
-            rolePairCond Role.B Role.A (swapDensity ψ.density * Z) i j +
-              rolePairCond Role.B Role.A (swapDensity ψ.density * Z) i j
-          ring]
-    rw [MIPStarRE.Quantum.normalizedTrace_add, normalizedTrace_rolePairCond]
-    ring_nf
+    rolePairCond_mul_same,
+    Complex.add_re]
   have hscalarRe :
       Complex.re
           (MIPStarRE.Quantum.normalizedTrace
             ((2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density * Z))) =
-        (2 : Error)⁻¹ *
-          Complex.re (MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density * Z)) := by
-            calc
-              Complex.re
-                  (MIPStarRE.Quantum.normalizedTrace
-                    (2 • rolePairCond Role.B Role.A (swapDensity ψ.density * Z)))
-                = Complex.re ((1 / 2 : ℂ) *
-                    MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density * Z)) :=
-                    congrArg Complex.re hscalar
-              _ = (2 : Error)⁻¹ *
-                    Complex.re (MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density * Z)) := by
-                    norm_num [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
-  rw [Complex.add_re]
+        (1 / 2 : Error) *
+          Complex.re (MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density * Z)) :=
+    normalizedTrace_two_smul_rolePairCond_re
+      Role.B Role.A (swapDensity ψ.density * Z)
   calc
     (MIPStarRE.Quantum.normalizedTrace ((2 : Error) • 0)).re +
         (MIPStarRE.Quantum.normalizedTrace
           ((2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density * Z))).re
-      = 0 + (MIPStarRE.Quantum.normalizedTrace
-          ((2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density * Z))).re := by
-            simp [MIPStarRE.Quantum.normalizedTrace_zero]
-    _ = 0 + (2 : Error)⁻¹ *
+      = 0 + (1 / 2 : Error) *
           (MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density * Z)).re := by
-            exact congrArg (fun t => 0 + t) hscalarRe
+            rw [hscalarRe]
+            simp [MIPStarRE.Quantum.normalizedTrace_zero]
     _ = (1 / 2 : Error) *
-          (MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density * Z)).re := by norm_num
+          (MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density * Z)).re := by ring
 
 private lemma ev_classicalRoleSymmState_rolePair_AA {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
@@ -900,7 +822,7 @@ private lemma ev_classicalRoleSymmState_rolePair_AA {ι : Type*}
     smul_mul_assoc, smul_mul_assoc,
     rolePairCond_AB_mul_AA,
     rolePairCond_BA_mul_AA]
-  simp [MIPStarRE.Quantum.normalizedTrace_smul]
+  simp
 
 private lemma ev_classicalRoleSymmState_rolePair_BB {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
@@ -911,7 +833,7 @@ private lemma ev_classicalRoleSymmState_rolePair_BB {ι : Type*}
     smul_mul_assoc, smul_mul_assoc,
     rolePairCond_AB_mul_BB,
     rolePairCond_BA_mul_BB]
-  simp [MIPStarRE.Quantum.normalizedTrace_smul]
+  simp
 
 /-- Block-diagonal symmetrization of two projective-measurement families over the
 paper's role register. -/
@@ -1049,6 +971,8 @@ theorem classicalRoleSymmStrategy_isNormalized {params : Parameters}
   classicalRoleSymmState_isNormalized strategy.state hψ
 
 end ProjStrat
+
+/-! ### Symmetrized strategies and tested-branch bounds -/
 
 namespace SymStrat
 
@@ -1350,39 +1274,14 @@ private lemma addCoord_subCoord_right {params : Parameters} [FieldModel params.q
     addCoord y (subCoord x y) = x := by
   unfold addCoord subCoord
   rw [decode_encodeScalar]
-  simp [sub_eq_add_neg, add_assoc, add_left_comm, add_comm]
+  simp [sub_eq_add_neg, add_left_comm]
 
 private lemma subCoord_addCoord_left {params : Parameters} [FieldModel params.q]
     (x y : Fq params) :
     subCoord (addCoord x y) x = y := by
   unfold addCoord subCoord
   rw [decode_encodeScalar]
-  simp [sub_eq_add_neg, add_assoc, add_left_comm, add_comm]
-
-private def axisPointFiberEquiv (params : Parameters) [FieldModel params.q]
-    (i : Fin params.m) :
-    Point params × Fq params ≃ Point params × Fq params where
-  toFun := fun ux =>
-    ((({ base := ux.1, direction := i } : AxisParallelLine params).pointAt ux.2), ux.1 i)
-  invFun := fun ux =>
-    (fun j => if h : j = i then ux.2 else ux.1 j,
-      subCoord (ux.1 i) ux.2)
-  left_inv := by
-    rintro ⟨u, x⟩
-    ext j
-    · by_cases h : j = i
-      · subst h
-        simp [AxisParallelLine.pointAt]
-      · simp [AxisParallelLine.pointAt, h]
-    · simp [AxisParallelLine.pointAt, subCoord_addCoord_left]
-  right_inv := by
-    rintro ⟨u, x⟩
-    ext j
-    · by_cases h : j = i
-      · subst h
-        simp [AxisParallelLine.pointAt, addCoord_subCoord_right]
-      · simp [AxisParallelLine.pointAt, h]
-    · simp
+  simp [sub_eq_add_neg, add_assoc]
 
 private lemma ev_classicalRoleSymmState_one {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
@@ -1391,32 +1290,9 @@ private lemma ev_classicalRoleSymmState_one {ι : Type*}
       ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
   unfold ev classicalRoleSymmState
   rw [mul_one, MIPStarRE.Quantum.normalizedTrace_add]
-  have hAB :
-      MIPStarRE.Quantum.normalizedTrace ((2 : Error) • rolePairCond Role.A Role.B ψ.density) =
-        (1 / 2 : ℂ) * MIPStarRE.Quantum.normalizedTrace ψ.density := by
-    rw [show (2 : Error) • rolePairCond Role.A Role.B ψ.density =
-        rolePairCond Role.A Role.B ψ.density + rolePairCond Role.A Role.B ψ.density by
-          ext i j
-          change ((2 : ℂ) * rolePairCond Role.A Role.B ψ.density i j) =
-            rolePairCond Role.A Role.B ψ.density i j + rolePairCond Role.A Role.B ψ.density i j
-          ring]
-    rw [MIPStarRE.Quantum.normalizedTrace_add, normalizedTrace_rolePairCond]
-    ring_nf
-  have hBA :
-      MIPStarRE.Quantum.normalizedTrace ((2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density)) =
-        (1 / 2 : ℂ) * MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density) := by
-    rw [show (2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density) =
-        rolePairCond Role.B Role.A (swapDensity ψ.density) +
-          rolePairCond Role.B Role.A (swapDensity ψ.density) by
-          ext i j
-          change ((2 : ℂ) * rolePairCond Role.B Role.A (swapDensity ψ.density) i j) =
-            rolePairCond Role.B Role.A (swapDensity ψ.density) i j +
-              rolePairCond Role.B Role.A (swapDensity ψ.density) i j
-          ring]
-    rw [MIPStarRE.Quantum.normalizedTrace_add, normalizedTrace_rolePairCond]
-    ring_nf
-  rw [hAB, hBA, normalizedTrace_swapDensity]
-  rw [mul_one]
+  rw [normalizedTrace_two_smul_rolePairCond (rL := Role.A) (rR := Role.B)]
+  rw [normalizedTrace_two_smul_rolePairCond (rL := Role.B) (rR := Role.A)]
+  rw [normalizedTrace_swapDensity, mul_one]
   ring_nf
 
 private lemma qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect
@@ -1454,7 +1330,8 @@ private lemma qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect
               rolePairCond Role.A Role.B (opTensor (MA.outcome a) (MB.outcome a)) +
               (rolePairCond Role.B Role.A (opTensor (MB.outcome a) (MA.outcome a)) +
                 rolePairCond Role.B Role.B (opTensor (MB.outcome a) (MB.outcome a)))) := by
-                rw [show S.outcome a = roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a) by
+                rw [show S.outcome a =
+                    roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a) by
                   rfl]
                 rw [opTensor_add_left, opTensor_add_right, opTensor_add_right]
                 rw [opTensor_roleCond_AA, opTensor_roleCond_AB,
@@ -1469,8 +1346,10 @@ private lemma qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect
             (rolePairCond Role.B Role.B (opTensor (MB.outcome a) (MB.outcome a))) := by
               repeat rw [ev_add]
               abel_nf
-      _ = 0 + (1 / 2 : Error) * ev strategy.state (opTensor (MA.outcome a) (MB.outcome a)) +
-            (1 / 2 : Error) * ev strategy.state (opTensor (MA.outcome a) (MB.outcome a)) + 0 := by
+      _ = 0 + (1 / 2 : Error) *
+            ev strategy.state (opTensor (MA.outcome a) (MB.outcome a)) +
+          (1 / 2 : Error) *
+            ev strategy.state (opTensor (MA.outcome a) (MB.outcome a)) + 0 := by
               have hAA :
                   ev (strategy.classicalRoleSymmStrategy.state)
                     (rolePairCond Role.A Role.A (opTensor (MA.outcome a) (MA.outcome a))) = 0 := by
@@ -1480,14 +1359,16 @@ private lemma qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect
               have hAB :
                   ev (strategy.classicalRoleSymmStrategy.state)
                     (rolePairCond Role.A Role.B (opTensor (MA.outcome a) (MB.outcome a))) =
-                    (1 / 2 : Error) * ev strategy.state (opTensor (MA.outcome a) (MB.outcome a)) := by
+                    (1 / 2 : Error) *
+                      ev strategy.state (opTensor (MA.outcome a) (MB.outcome a)) := by
                       simpa [ProjStrat.classicalRoleSymmStrategy] using
                         ev_classicalRoleSymmState_rolePair_AB strategy.state
                           (opTensor (MA.outcome a) (MB.outcome a))
               have hBA :
                   ev (strategy.classicalRoleSymmStrategy.state)
                     (rolePairCond Role.B Role.A (opTensor (MB.outcome a) (MA.outcome a))) =
-                    (1 / 2 : Error) * ev strategy.state (opTensor (MA.outcome a) (MB.outcome a)) := by
+                    (1 / 2 : Error) *
+                      ev strategy.state (opTensor (MA.outcome a) (MB.outcome a)) := by
                       rw [show ev (strategy.classicalRoleSymmStrategy.state)
                           (rolePairCond Role.B Role.A (opTensor (MB.outcome a) (MA.outcome a))) =
                           (1 / 2 : Error) * ev (swapQuantumState strategy.state)
@@ -2026,6 +1907,8 @@ theorem classicalRoleSymmStrategy_is_good_three_mul {params : Parameters}
     exact hdiag
 
 end ProjStrat
+
+/-! ### Polynomial-family interfaces -/
 
 /-- A packaged family `x ↦ G^x` together with its witness operators and domination targets. -/
 structure IdxPolyFamily (params : Parameters) [FieldModel params.q]
