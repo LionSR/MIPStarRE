@@ -1,6 +1,6 @@
 # MIPStarRE Blueprint Gap Campaign — Master Plan
 
-## Date: 2026-04-05 (Session 5)
+## Date: 2026-04-16 (Session 6 — Full Issue Review)
 
 ## Executive Summary
 
@@ -123,77 +123,174 @@ Prove existing sorry sites using the expanded infrastructure.
 - Prove the tractable sorry sites
 - Depends on Phase 3 for infrastructure
 
-## Progress Tracker (updated 2026-04-06)
+## Progress Tracker (updated 2026-04-16)
 
-### Phase 1: Blueprint Expansion — 1/6 closed
-| Issue | Status | PR | Notes |
-|-------|--------|-----|-------|
-| #187 Ch04 orthonormalization | **CLOSED** | #208 (merged) | Covered in bulk blueprint expansion |
-| #188 Ch07 self-improvement (52 labels) | OPEN | — | Largest gap, P0 priority, no PR yet |
-| #189 Ch09 pasting (~58 labels) | OPEN | — | Largest chapter, P0 priority, no PR yet |
-| #190 Ch03 preliminaries (6 props) | OPEN | — | No PR yet |
-| #191 Ch05-06 expansion/variance | OPEN | — | No PR yet |
-| #192 Ch08 commutativity (2 claims) | OPEN | — | No PR yet |
-
-### Phase 2: Statement Fixes — 2/4 closed
-| Issue | Status | PR | Notes |
-|-------|--------|-----|-------|
-| #193 closeness-of-ip right-action | **CLOSED** | #209 (merged) | Fixed |
-| #194 commutativity Bob-side factors | **CLOSED** | #209 (merged) | Fixed |
-| #195 induction diagonal-test encoding | OPEN | — | Also tracked by follow-up #215 |
-| #196 SDP primal Measurement → SubMeas | OPEN | — | Partially addressed by #209 (docs only) |
-
-### Phase 3: Proof Infrastructure — 0/5 closed (partial progress)
-| Issue | Status | PR | Notes |
-|-------|--------|-----|-------|
-| #197 Ch04 Q/X/X̂/P Lean layer | OPEN | #210 (merged), partial | QXPLayer stubs added but issue not closed |
-| #198 Ch07 SDP infrastructure | OPEN | — | Blocked on #188 blueprint |
-| #199 Ch09 pasting skeleton | OPEN | — | Blocked on #189 blueprint |
-| #200 Ch03 easy-approx public API | OPEN | #210 (merged), partial | Some infrastructure added |
-| #201 Ch03 cab-approx raw families | OPEN | #210 (merged), partial | Some infrastructure added |
-
-### Phase 4: Sorry Elimination — 3/5 done (issues open but sorry already proved on main)
-| Issue | Status | PR | Notes |
-|-------|--------|-----|-------|
-| #202 Ch04 oneMeasNaimark | OPEN | — | Requires CFC.sqrt; medium |
-| #203 Ch08 normalizationCondition | **DONE** (issue still open) | landed via #221 or earlier | Already sorry-free on main — close issue |
-| #204 Ch09 ldDnoteq (birthday paradox) | **DONE** (issue still open) | landed via #221 or earlier | Already sorry-free on main — close issue |
-| #205 Ch09 looksEasyButTookMeAWhile | **DONE** (issue still open) | landed via #221 or earlier | Already sorry-free on main — close issue |
-| #206 Ch05 expansion matrix realization | OPEN | #213 (open) | 3 coupled sorry sites; CI green |
-
-### Non-Campaign PRs that advanced campaign goals
-| PR | Status | Campaign impact |
-|----|--------|-----------------|
-| #220 | **MERGED** | Refactored ZMod q → honest finite-field model (addresses Stream A/B scouting recs) |
-| #221 | **MERGED** | Eliminated 3 sorry in Pasting (Ch09) — not a campaign issue but reduces sorry count |
-| #222 | OPEN | Eliminates 4 sorry in MakingMeasurementsProjective (Ch04) — has blocker comment |
-| #214 | **MERGED** | Inlined boilerplate wrappers — simplifies downstream proof work |
-| #217 | **MERGED** | Unbundled CommutativityPoints theorem |
-| #185–#181 | **MERGED** | Built entire Preliminaries stack (Streams A–E) — Ch03 now sorry-free |
+### Campaign Phase 1-4 Issues: ALL CLOSED
+All 20 original campaign issues (#187-#206) plus #223-#224 are now **closed**.
+PRs #342-#370 landed substantial sorry elimination and infrastructure work.
 
 ### Sorry count trajectory
 | Date | Total sorry | Notes |
 |------|-------------|-------|
 | 2026-04-04 (campaign start) | ~64 | Per MASTER_PLAN inventory |
-| 2026-04-06 (current) | 77 | Higher count reflects QXPLayer stubs added by #210 (merged) |
+| 2026-04-06 | 77 | Higher count reflects QXPLayer stubs added by #210 |
+| **2026-04-16 (current)** | **24** | Massive reduction — 53 sorry eliminated since Apr 6 |
 
-### Overall: 3/20 issues closed (3 more done but not yet closed), 5 campaign PRs merged, 6 non-campaign PRs advancing goals
+### Current sorry distribution (24 total)
+| Submodule | Count | Files | Key blockers |
+|-----------|:-----:|-------|-------------|
+| LDT/Pasting | 12 | Theorems.lean (3848 lines) | Recurrence chain, Chernoff, completeness |
+| LDT/Test | 7 | MainTheorem.lean (4), Strategy.lean (3) | Top-level theorems + symmetrization |
+| LDT/Commutativity | 3 | Theorems.lean (3164 lines) | Schwartz-Zippel transport, large-param |
+| LDT/MakingMeasurementsProjective | 2 | Theorems.lean (1), Projectivization.lean (1) | Bridges missing |
 
-### New PRs from @claude auto-fix (2026-04-06)
-| PR | Source Issue | Content | CI | Unresolved |
-|----|-------------|---------|-----|------------|
-| #225 | #216 | Blueprint tags for triangle inequalities | All green | 4 |
-| #226 | #212 | Blueprint tags for Cauchy-Schwarz | All green | 0 |
-| #227 | #219 | Blueprint tags for self-consistency | All green | 1 |
-| #228 | #223 | QXPLayer: prove truncationInequality | Partial | 1 |
-| #229 | #224 | MMP/Theorems: roundAlmostProjMeas + orthonormalizationMainLemma | All green | 6 |
-| #230 | (auto) | SDDOpRel triangle inequality + monotonicity infra | All green | 7 |
+### PROOF_INTEGRITY audit (2026-04-16)
+- **Blockers**: CLEAN (no axiom, no native_decide, no unsafeCast, no circular reasoning)
+- **Warnings**:
+  - 1x `maxHeartbeats 5000000` in `Projectivization.lean:34` (25x default — exceeds 4M threshold)
+  - 17x `maxHeartbeats 2000000` in `Commutativity/Theorems.lean` (10x default)
+  - 4x `maxHeartbeats 1M-2M` in `Pasting/Theorems.lean`
+- **File sizes over 1000-line split threshold**:
+  - `Pasting/Theorems.lean`: 3848 lines (3.8x)
+  - `Commutativity/Theorems.lean`: 3164 lines (3.1x)
+  - `CommutativityPoints/Theorem.lean`: 1766 lines
+  - `Test/Strategy.lean`: 1500 lines
+  - `MMP/Theorems.lean`: 1209 lines
 
-### New issues created (2026-04-06)
-| Issue | Description |
-|-------|-------------|
-| #223 | Sorry Elimination Ch04: Batch prove QXPLayer intermediate lemmas (15 sorry) |
-| #224 | Sorry Elimination Ch04: Prove MMP/Theorems remaining sorry sites (12 sorry) |
+---
+
+## Current Open Issues (44 total, 2026-04-16)
+
+### Epic + Chapter Tracking (10 umbrella issues)
+| Issue | Title |
+|-------|-------|
+| #422 | [Epic] Complete formalization of thm:main-formal |
+| #101-#110 | Ch 2-11 chapter tracking issues |
+
+### mainFormal Assembly Steps (6 issues)
+| Issue | Title | Status |
+|-------|-------|--------|
+| #423 | Step 1/8: ProjStrat→SymStrat symmetrization bridge | Blocked on #431 |
+| #424 | Step 3/8: measurement unsymmetrization | Blocked on #423 |
+| #425 | Step 5/8: Schwartz-Zippel to self-consistency error | Blocked on #424 |
+| #426 | Step 6/8: orthonormalization + completion chain | Blocked on #301 |
+| #427 | Step 8/8: error cascade bounds | Blocked on #425, #426 |
+| #428 | MainInductionBridgePackage assembly | Blocked on all above |
+
+### Pasting Sorry/Fix (9 issues)
+| Issue | Title | Sorry sites | Priority |
+|-------|-------|:-----------:|:--------:|
+| #429 | Unblock ldGbcon (IsNormalized) | 1 | P1 |
+| #430 | GHatFactsStatement in hAConsistency_submeas | 1 | P1 |
+| #394 | Thread IsNormalized into Pasting chain | cross-cutting | P0 |
+| #395 | Fix fromHToG state mismatch | statement fix | P0 |
+| #351 | 5 completeness-chain sorry sites | 5 | P1 |
+| #300 | Completeness chain proof | 4 | P1 |
+| #299 | Sandwich chain proof | 4 | P1 |
+| #298 | completedCommutation quadrant split | 2 | P0 |
+| #307 | Fix Lagrange coeff placeholder | statement fix | P2 |
+
+### Commutativity (6 issues)
+| Issue | Title | Sorry sites | Priority |
+|-------|-------|:-----------:|:--------:|
+| #297 | Schwartz-Zippel for comMain | 1 | P0 |
+| #296 | SDDRel postprocessing bridge + stability | 4 | P0 |
+| #361 | hTransport sorry in fullSliceCommutation | 1 | P1 |
+| #367 | DiagonalEvaluationReparamInvariant | 1 | P1 |
+| #411 | PermInvState + bipartite consistency symmetry | 0 | P1 |
+| #414 | Hoist SliceBoundednessInput helpers | 0 | P2 |
+
+### MakingMeasurementsProjective (2 issues)
+| Issue | Title | Sorry sites |
+|-------|-------|:-----------:|
+| #301 | spectralTruncateAlmostProjective + orthonormalization bridge | 2 |
+| #396 | IsNormalized + statement weakening | cross-cutting |
+
+### Test/Strategy (2 issues)
+| Issue | Title | Sorry sites |
+|-------|-------|:-----------:|
+| #382 | SurfaceVsPointPassCondition + razSafra | 1 |
+| #378 | Cross-prover point-agreement bound | 1 |
+
+### Statement Fixes (3 issues)
+| Issue | Title |
+|-------|-------|
+| #215 | Diagonal-test encoding → genuine restricted diagonal strategy |
+| #306 | Test definition → paper's fig:test sampling procedure |
+| #320 | Replace t := default placeholder with actual auxiliary |
+
+### Documentation/CI (3 issues)
+| Issue | Title |
+|-------|-------|
+| #432 | Add missing \leanok tags to proved Ch8 theorems |
+| #433 | Clarify \leanok semantics (statement vs proof level) |
+| #434 | CI: blueprint ↔ Lean sync check |
+
+### Structural/Cleanup (2 issues)
+| Issue | Title |
+|-------|-------|
+| #431 | Add IsNormalized carrier to SymStrat |
+| #280 | Refactor qAlmostProjective |
+
+---
+
+## Next 10 Steps (dependency-ordered)
+
+### Step 1: IsNormalized threading (#431, #429, #394, #396) — CROSS-CUTTING PREREQUISITE
+**Size**: Large | **Blocks**: 5+ downstream issues
+Add `IsNormalized` carrier to `SymStrat`. This unblocks Pasting chain (#394, #429),
+MMP statement weakening (#396), and mainFormal Step 1 (#423).
+
+### Step 2: MMP sorry elimination (#301, #396) — 2 sorry sites
+**Size**: Large | **Difficulty**: Hard
+`orthonormalization` (Theorems.lean:1108) and `spectralTruncateAlmostProjective`
+(Projectivization.lean:373). Early in dependency chain (Ch04).
+Blocked on completion-to-measurement bridge and abstract matrix→ProjSubMeas bridge.
+
+### Step 3: Commutativity SDDRel bridge + stability (#296) — P0
+**Size**: Large | **Difficulty**: Medium-Hard
+SDDRel postprocessing bridge + 4 stability claims. P0 priority, foundational for comMain.
+
+### Step 4: Commutativity Schwartz-Zippel for comMain (#297) — P0
+**Size**: Medium-Large | **Difficulty**: Hard
+`comMainCore` (line 2877) Schwartz-Zippel transport Step 1.
+**Also**: `comMainCore` large-parameter case (line 3054) — EASY, pure numerical bound.
+
+### Step 5: Commutativity hTransport + DiagonalEval (#361, #367)
+**Size**: Medium | **Difficulty**: Medium
+hTransport sorry in fullSliceCommutation + DiagonalEvaluationReparamInvariant.
+
+### Step 6: Pasting completedCommutation (#298) — P0, 2 sorry
+**Size**: Medium-Large | **Difficulty**: Hard
+Option × Option quadrant decomposition for gHatFacts. Entry point for pasting chain.
+
+### Step 7: Pasting sandwich chain (#299, #429, #430) — 4 sorry
+**Size**: Large | **Dependency DAG layer 0→4**
+Attack order (leaf-first):
+1. `commuteGHalfSandwich_core` (line 3111) — LEAF, uses sddOpRel_chain
+2. `ldSandwichLineOnePoint_core` (line 3161) — depends on #1
+3. `hBConsistency_core` (line 3220) — depends on #2
+4. `hAConsistency_core` (line 3278) — depends on #3
+5. `hAConsistency` wrapper (line 3314) — depends on all above
+
+### Step 8: Pasting completeness chain (#300, #351) — 4+ sorry
+**Size**: Very Large | **Dependency DAG layers**
+Attack order:
+1. `chernoffBernoulliMatrix` (line 3760) — LEAF, independent
+2. `overAllOutcomes` (line 3343) — depends on sandwich chain
+3. `fromHToG` recurrence (lines 3720, 3725) — depends on leaf #3111
+4. `ldPastingNCompleteness` (line 3792) — depends on all above
+
+### Step 9: Statement fixes — fromHToG + Lagrange + test def (#395, #307, #306)
+**Size**: Medium | **Must fix before final assembly**
+- #395: fromHToG state mismatch and collapsed recurrence families
+- #307: Lagrange coeff = 1 placeholder in Pasting/Defs.lean
+- #306: Test definition vs paper's fig:test sampling procedure
+
+### Step 10: mainFormal assembly (#422, #423-#428) + Test (#382, #378)
+**Size**: Very Large | **Depends on**: Steps 1-9
+The capstone: prove `mainFormal` by composing all machinery.
+8 sub-steps tracked in #423-#428. Test sorry sites (#382, #378) feed into this.
 
 ## Scouting Reports
 
