@@ -5135,17 +5135,33 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd hXleOne := by
   -- tail_le_one: bernoulliTailOperator k degree X ≤ 1
   have htail := bernoulliTailOperator_le_one k degree X hXpsd hXleOne
+  have hnonneg : 0 ≤ bernoulliTailOperator k degree X :=
+    bernoulliTailOperator_nonneg k degree X hXpsd hXleOne
   refine { tail_le_one := htail, matrixTailBound := ⟨?_⟩ }
-  /- Paper: `lem:chernoff-bernoulli-matrix` (ld-pasting.tex lines 1670–1797).
-  Core spectral/Chernoff bound: ev ψ (F(X)) ≥ 1 - κ/(1-θ) - exp(-θ²k/2).
-  (1) Spectral decomposition: X = ∑ λ_i |v_i⟩⟨v_i|, so
-      ev ψ (F(X)) = E_{i∼μ} F(λ_i).
-  (2) Markov: Pr[λ_i ≥ θ] ≥ 1 - κ/(1-θ).
-  (3) Scalar Chernoff: ∀p ≥ θ, F(p) ≥ 1 - exp(-θ²k/2)
-      (using hk: 2d/θ ≤ k ⟹ p - d/k ≥ θ/2).
-  (4) Combine: (1-κ/(1-θ))(1-exp(-θ²k/2)) ≥ 1-κ/(1-θ)-exp(-θ²k/2).
-  Requires: spectral decomposition for Op ι, scalar Chernoff bound. -/
-  sorry
+  -- Case-split on the sign of the target lower bound. The nontrivial case
+  -- requires the full spectral + scalar-Chernoff proof.
+  by_cases hRHS : 1 - kappa / (1 - theta) -
+      Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2) ≤ 0
+  · -- Trivial regime (RHS ≤ 0): PSD nonnegativity of `bernoulliTailOperator`
+    -- gives `ev ψ (F(X)) ≥ 0`, which dominates the nonpositive RHS.
+    show _ ≥ _
+    unfold subMeasMass
+    have hev : 0 ≤ ev ψ (bernoulliTailOperator k degree X) :=
+      ev_nonneg_of_psd ψ _ hnonneg
+    linarith
+  · -- Nontrivial regime (RHS > 0): full spectral + scalar-Chernoff proof.
+    /- Paper: `lem:chernoff-bernoulli-matrix` (ld-pasting.tex lines 1670–1797).
+    Core spectral/Chernoff bound: ev ψ (F(X)) ≥ 1 - κ/(1-θ) - exp(-θ²k/2).
+    (1) Spectral decomposition: X = ∑ λ_i |v_i⟩⟨v_i|, so
+        ev ψ (F(X)) = E_{i∼μ} F(λ_i).
+    (2) Markov: Pr[λ_i ≥ θ] ≥ 1 - κ/(1-θ).
+    (3) Scalar Chernoff: ∀p ≥ θ, F(p) ≥ 1 - exp(-θ²k/2)
+        (using hk: 2d/θ ≤ k ⟹ p - d/k ≥ θ/2).
+    (4) Combine: (1-κ/(1-θ))(1-exp(-θ²k/2)) ≥ 1-κ/(1-θ)-exp(-θ²k/2).
+    Mathlib requires: `Matrix.IsHermitian.spectral_theorem` composed with
+    `ev`/`normalizedTrace` expansion, and an explicit additive Chernoff bound
+    for sums of iid Bernoullis (Mathlib only exposes MGF-based Chernoff). -/
+    sorry
 
 /-- `cor:ld-pasting-N-completeness`. -/
 theorem ldPastingNCompleteness
