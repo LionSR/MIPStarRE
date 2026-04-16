@@ -5080,12 +5080,24 @@ theorem fromHToGRecurrenceWeight_succ
           (1 - family.averagedSubMeas.total) :=
   (fromHToGRecurrenceWeight_recurrence params family prefixLen τtail).2.2.2
 
-/-- `lem:from-H-to-G`. -/
+/-- `lem:from-H-to-G`.
+
+The bipartite state `ψbi` is required to coincide with `strategy.state` so the
+strategy-level self-consistency / point-consistency / boundedness hypotheses
+(`hself`, `hcons`, `hbound`) — phrased over `strategy.state` — can be
+transported to facts about `ψbi`, which is the state appearing in the
+goal `FromHToGStatement` and in the recurrence hypothesis `hhalf`. The
+blueprint statement (`blueprint/src/chapter/ch09_pasting.tex:887–903`)
+keeps `ψbi` as a separate name for the bipartite state on `ι ⊗ ι` matching
+the paper's `\ket{\psi_{\mathrm{bi}}}`; the equality hypothesis pins it to
+the symmetric strategy's bipartite state, since `SymStrat.state` is already
+typed `QuantumState (ι × ι)` (`MIPStarRE/LDT/Test/Strategy.lean:75`). -/
 lemma fromHToG
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
+    (hψ : ψbi = strategy.state)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
@@ -5100,16 +5112,34 @@ lemma fromHToG
     intro ℓ hℓ τ
     constructor -- SDDOpRel
     /- Inductive step ℓ of the Bernoulli-tail recurrence (ld-pasting.tex
-    lines 1294–1666). Three commutation sub-steps per induction step:
+    lines 1346–1666). Three commutation sub-steps per induction step:
     (a) move rightmost Ĝ^{x_ℓ} to 2nd tensor factor (√(2ζ)),
     (b) commute leftmost Ĝ past remaining factors (√ν₄),
     (c) move leftmost to 2nd tensor factor (√(2ζ)).
     Per-step error: 2√(2ζ) + 2√ν₄ = fromHToGRecurrenceError. -/
+    /- Outstanding gap (tracked in issue #395):
+    `fromHToGRecurrenceLeftFamily` / `fromHToGRecurrenceRightFamily`
+    (`Sandwich.lean:930-955`) are currently in collapsed form
+    `allOutcomesExpansion.total * suffixBernoulliWeightOperator k ℓ τ` and
+    `bernoulliTailFromFamily.total * suffixBernoulliWeightOperator k ℓ τ`;
+    the paper's recurrence step relates the *intermediate* family
+    `Ĥ^{x_≥ℓ} ⊗ S_{τ_≥ℓ}` to `Ĥ^{x_>ℓ} ⊗ S_{τ_>ℓ}` (eq:i-think-this-is-what-
+    i'm-supposed-to-prove-2). To finish this case the families need to be
+    refactored to expose the per-step Ĥ-on-suffix structure (a new
+    `intermediateHSuffixFamily k ℓ` definition), then the three commutation
+    sub-steps above can be discharged using `hhalf` (for √ν₄) and
+    `cor:G-hat-facts` (for √(2ζ)), each composed via `sddOpRel_mono` /
+    `sddOpRel_trans`. The state-equality bridge `hψ` lets us reuse
+    `hself`/`hcons`/`hbound`, which are phrased against `strategy.state`,
+    once that refactor is in place. -/
     sorry
   · -- bernoulliPolynomialRewrite: aggregate k recurrence steps
     constructor -- SDDRel
     /- Aggregate k recurrence steps to show allOutcomesExpansion ≈ F(G).
-    Total error ≤ k × per-step error ≤ fromHToGError. -/
+    Total error ≤ k × per-step error ≤ fromHToGError. The chained
+    `sddOpRel_trans` argument depends on the refactored families above
+    so that `RightFamily ℓ` definitionally equals `LeftFamily (ℓ+1)`,
+    enabling the telescoping in ld-pasting.tex lines 1354–1376. -/
     sorry
 
 /-- `lem:chernoff-bernoulli-matrix`. -/
