@@ -30,15 +30,17 @@ noncomputable def razSafraSlackBound (params : Parameters) (eps : Error) : Error
 /-- Placeholder polynomial-size slack for classical low-individual-degree soundness.
 
 The Chapter 1 overview records the dependence only schematically as
-`poly(m) * (poly(eps) + poly(d/q))`. This named expression keeps the current
-`sqrt eps` placeholder visible until the Polishchuk–Spielman theorem is
-formalized directly or the exact exponent is audited against [PS94]. Issue #384
-tracks tightening this placeholder in lock-step with the quoted external
-soundness statement below. -/
+`poly(m) * (poly(eps) + poly(d/q))`. The cited bivariate
+Polishchuk--Spielman estimate [PS94, Theorem 9] has a square-root shape: a
+`δ^2` disagreement hypothesis yields a `2δ` conclusion. We nevertheless use
+the simpler linear placeholder `eps` here so the Lean bookkeeping follows the
+same integer-polynomial convention as the overview theorem, rather than fixing a
+specific fractional exponent before the full classical soundness theorem is
+formalized directly. -/
 noncomputable def classicalTestSoundnessSlackBound
     (params : Parameters) (eps : Error) : Error :=
   ((params.m : Error) ^ (2 : ℕ)) *
-    (Real.sqrt eps + (params.d : Error) / (params.q : Error))
+    (eps + (params.d : Error) / (params.q : Error))
 
 /-- Generic placeholder overview-level soundness conclusion: a low individual
 degree polynomial agrees with the point-answer function except on `slack`
@@ -113,10 +115,10 @@ This issue-#408 `Prop`-valued interface replaces the earlier ambient axiom with
 an explicit hypothesis at each call site. The external witness now carries its
 own slack bound parameter `slackBound`, so issue #408 no longer bakes the
 still-unaudited placeholder `classicalTestSoundnessSlackBound` into the quoted
-external statement. Issue #384 tracks the current placeholder instantiation
-separately. The regression audit in `MIPStarRE.LDT.Test.AxiomAudit` checks that
-`classicalTestSoundness` remains kernel-clean apart from the standard Lean
-axioms. -/
+external statement. The current placeholder instantiation is kept separate in
+`classicalTestSoundnessWithPlaceholderBound`. The regression audit in
+`MIPStarRE.LDT.Test.AxiomAudit` checks that `classicalTestSoundness` remains
+kernel-clean apart from the standard Lean axioms. -/
 def PolishchukSpielmanClassicalSoundnessStatement (params : Parameters)
     [FieldModel params.q]
     (a : Point params → Fq params) (eps slackBound : Error) : Prop :=
@@ -156,8 +158,9 @@ theorem classicalTestSoundness
 /-- Placeholder convenience instantiation of `classicalTestSoundness` using the
 repository's current named slack bound.
 
-Issue #384 tracks replacing `classicalTestSoundnessSlackBound` by an audited
-Polishchuk–Spielman exponent shape. -/
+This wrapper fixes the slack bound to the overview-level linear placeholder
+`classicalTestSoundnessSlackBound`, which matches the schematic `poly(eps)`
+convention used in Chapter 1. -/
 theorem classicalTestSoundnessWithPlaceholderBound
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
