@@ -1692,6 +1692,13 @@ structure StronglySelfConsistent {params : Parameters} [FieldModel params.q]
       (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas))
       zeta
 
+/-- Slice boundedness data for the commutativity and pasting arguments.
+
+The residual bound is currently stored in the induction-level tensor-failure
+orientation `Z^x ⊗ (I - G^x)`.  The paper's commutativity claims
+`clm:g-comm-stability` and `clm:g-comm-stability2` use the swapped orientation
+`(I - G^x) ⊗ Z^x`; a paper-faithful proof of those scalar claims must either
+store that orientation directly or add an explicit tensor-swap bridge. -/
 structure Bounded {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)

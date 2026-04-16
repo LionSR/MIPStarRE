@@ -320,13 +320,19 @@ noncomputable def evaluatedFromFullSliceProductRight (params : Parameters) [Fiel
     OpFamily.postprocess (fullSliceProductRight params strategy family xy)
       (evaluateFullSliceOutcomeAtQuestion params q)
 
-/-- Internal stability family from the `G^y` insertion/removal step.
+/-- Internal overlap family from the `G^y` insertion/removal step.
 
 The paper writes the extra factor as the left-register total `G^y = ∑_h G^y_h`.
 For the `SDDOpRel` packaging we keep the polynomial `h` explicit and attach the
 right-register weight `(G_h^y)^{1/2}` to each outcome. Summing the squared
 differences over `h` then recovers the total `G^y` without introducing a fiber
-multiplicity from unrelated `g` values. On the bipartite space `d * d`. -/
+multiplicity from unrelated `g` values.
+
+This is deliberately an overlap estimate family, not the scalar
+`clm:g-comm-stability` expression from the paper.  The paper claim keeps the
+right-register factor `A_b^{v,y}` and is driven by the boundedness witness
+`Z^y`; the overlap family below instead measures a stronger-looking SDD package
+against `G_h^y` weights. On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι) :
@@ -342,8 +348,8 @@ noncomputable def commDataProcessedGStabilityOneLeft (params : Parameters) [Fiel
       (fun ah => rightTensor (ι₁ := ι)
         (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)))
 
-/-- Internal stability family after removing the trailing `G^y`, while keeping
-Bob's right-register point-measurement factor.
+/-- Internal overlap family after removing the trailing `G^y`, while keeping
+the `G_h^y` right-register square-root weight used by the SDD package.
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityOneRight (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
@@ -357,7 +363,12 @@ noncomputable def commDataProcessedGStabilityOneRight (params : Parameters) [Fie
       (fun ah => rightTensor (ι₁ := ι)
         (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)))
 
-/-- Internal stability family from the `G^x` insertion/removal step.
+/-- Internal overlap family from the `G^x` insertion/removal step.
+
+As for `commDataProcessedGStabilityOneLeft`, this packages an overlap-style SDD
+comparison.  The paper's `clm:g-comm-stability2` is a scalar boundedness argument
+with right-register factor `A_a^{u,x} A_b^{v,y}` and an internal
+`commutativityPoints` transport step.
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
@@ -373,8 +384,8 @@ noncomputable def commDataProcessedGStabilityTwoLeft (params : Parameters) [Fiel
       (fun gb => rightTensor (ι₁ := ι)
         (CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1)))
 
-/-- Internal stability family after removing the trailing `G^x`, while keeping
-Bob's right-register ordered point-measurement factor.
+/-- Internal overlap family after removing the trailing `G^x`, while keeping
+the `G_g^x` right-register square-root weight used by the SDD package.
 On the bipartite space `d * d`. -/
 noncomputable def commDataProcessedGStabilityTwoRight (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
