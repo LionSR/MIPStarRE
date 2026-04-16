@@ -22,7 +22,7 @@
 	Here $a$ denotes the prover's point answer.
 \end{theorem}
 \begin{remark}
-	The current Lean declaration \lean{MIPStarRE.LDT.Test.classicalTestSoundness} keeps the external Polishchuk--Spielman dependency explicit through a chosen slack-bound parameter together with the auxiliary hypothesis \lean{MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement}. The repository's current placeholder instantiation is isolated in \lean{MIPStarRE.LDT.Test.classicalTestSoundnessWithPlaceholderBound} and remains tracked separately by Issue~\#384. Accordingly, this result is not marked \leanok.
+	The current Lean declaration \lean{MIPStarRE.LDT.Test.classicalTestSoundness} keeps the external Polishchuk--Spielman dependency explicit through a chosen slack-bound parameter together with the auxiliary hypothesis \lean{MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement}. The repository's current placeholder instantiation is isolated in \lean{MIPStarRE.LDT.Test.classicalTestSoundnessWithPlaceholderBound} and uses the overview-level linear placeholder for \(\poly(\eps)\), rather than fixing the sharper square-root exponent visible in the bivariate Polishchuk--Spielman estimate. Accordingly, this result is not marked \leanok.
 \end{remark}
 \begin{proof}
 	See Polishchuk--Spielman [PS94].
