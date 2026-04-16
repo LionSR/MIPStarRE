@@ -129,6 +129,7 @@ abbrev GCommStabilityInput (params : Parameters)
     family.ConsistentWithPoints strategy zeta →
     family.StronglySelfConsistent strategy.state zeta →
     IdxPolyFamily.SliceBoundednessInput strategy family zeta →
+    (∀ x, G x = (family.meas x).toSubMeas) →
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityOneLeft params strategy family G)
@@ -147,6 +148,7 @@ abbrev GCommStabilityTwoInput (params : Parameters)
     family.ConsistentWithPoints strategy zeta →
     family.StronglySelfConsistent strategy.state zeta →
     IdxPolyFamily.SliceBoundednessInput strategy family zeta →
+    (∀ x, G x = (family.meas x).toSubMeas) →
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (commDataProcessedGStabilityTwoLeft params strategy family G)
@@ -160,7 +162,9 @@ abbrev FullSliceCommutationEvaluatedInput (params : Parameters)
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop :=
-  family.StronglySelfConsistent strategy.state zeta →
+  strategy.state.IsNormalized →
+    0 ≤ gamma →
+    family.StronglySelfConsistent strategy.state zeta →
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (evaluatedFromFullSliceProductLeft params strategy family)
