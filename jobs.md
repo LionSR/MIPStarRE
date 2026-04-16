@@ -106,6 +106,39 @@ Last updated: 2026-04-13
   - attempted `leanblueprint web`, but the `leanblueprint` command is not installed in the current environment
   - confirmed `fromHToG` is blocked by the current scaffold: `fromHToGRecurrenceLeftFamily` / `RightFamily` already collapse to endpoint families times a weight operator, so they do not encode the paper's suffix-indexed intermediate quantities
   - confirmed `commuteGHalfSandwich` is blocked at the theorem interface: the statement no longer carries the small-error assumptions needed to weaken the `2 * zeta` self-consistency cost from `GHatFactsStatement` to the displayed `zeta^(1/16)` bound
+  - continued the `commutativitySwitcheroo` attack by extracting reusable local scaffolding:
+    `projSubMeas_sandwich_sum_le_one`,
+    `switcherooCompletePartSelfConsistency_pairBound`,
+    `switcherooPointProductCommutation_coreBound`,
+    `switcherooAggregateTargetSwapped`,
+    `switcherooAggregateTargetSwapped_eq_middleSandwich`, and
+    `switcherooAggregateFourthTerm_eq_split`
+  - rewired `commutativitySwitcheroo` so its two centers are now the explicit aggregate targets `switcherooAggregateTarget` and `switcherooAggregateTargetSwapped`, matching the intended two-center proof strategy
+  - narrowed the remaining live blocker in `commutativitySwitcheroo` to two lower-bound helpers for the negative terms: the paper-faithful `χ, ζ, ζ, χ, ω` chain for `switcherooAggregateFourthTerm` to `switcherooAggregateTarget`, and its mirrored chain sending `switcherooAggregateThirdTerm` to `switcherooAggregateTargetSwapped`
+  - formalized the first two steps of the fourth-term chain inside `commutativitySwitcheroo`:
+    `switcherooAggregateFourthTerm_split_close_once_commuted` gives the first `√χ` step, and
+    `switcherooAggregateFourthTerm_once_commuted_close_mixed` gives the first `√ζ` step
+  - added `projSubMeas_outcome_orthogonal` and the contraction witness
+    `switcherooAggregateFourthTerm_once_commuted_contraction_left`, which package the summed-operator side condition needed for the first `√ζ` closeness argument
+  - added `switcherooAggregateFourthTerm_once_commuted_contraction_right`, giving the right-action contraction needed for the second `√ζ` step
+  - added `switcherooAggregateFourthTerm_mixed_close_left_front_raw`, a compiled raw form of the paper's second `√ζ` transfer before the final pretty rewrites
+  - added `switcherooAggregateFirstTerm_eq_split_by_g`, collapsing the split-by-`g` expression exactly back to `switcherooAggregateFirstTerm`
+  - added `switcherooAggregateLeftFront_contraction`, the contraction side condition for the final `√χ` step; the remaining blocker is packaging the final `√χ` transfer itself without triggering Lean heartbeat blowups
+  - added named raw scalar expressions `switcherooAggregateLeftFrontRaw`, `switcherooAggregateFirstSplitRaw`, `switcherooAggregateOnceCommutedRaw`, `switcherooAggregateMixedRaw`, plus the witness-form raw scalars for the last `√χ` step; these are intended to keep future theorem statements small enough for Lean to elaborate
+  - current live blocker remains proof-engineering, not mathematics: the final `√χ` wrapper and the combined fourth-term bound both become expensive enough to hit Lean heartbeat limits unless broken into still smaller statements
+  - succeeded in compiling the first-step raw wrapper `switcherooAggregateFourthTerm_close_once_commuted_raw`; the remaining raw gap in the fourth-term chain is still the final `√χ` transfer from `switcherooAggregateLeftFrontRaw` to `switcherooAggregateFirstSplitRaw`
+  - current compiled raw fourth-term chain now consists of:
+    `switcherooAggregateFourthTerm_close_once_commuted_raw`,
+    `switcherooAggregateFourthTerm_once_commuted_close_mixed`,
+    `switcherooAggregateFourthTerm_mixed_close_left_front_raw`,
+    plus the exact collapse `switcherooAggregateFirstTerm_eq_split_by_g`
+  - exact blocker: every direct attempt to package the final `√χ` step
+    `switcherooAggregateLeftFrontRaw -> switcherooAggregateFirstSplitRaw`
+    into a standalone lemma causes Lean elaboration/`whnf` heartbeat blowups, even after shrinking statements to named raw defs and increasing local heartbeat budgets. Because `commutativitySwitcheroo` still depends on that wrapper, and the later Section 12 sorries depend on `commutativitySwitcheroo` or on separate already-documented structural mismatches (`ldGbcon`, `fromHToG`, `commuteGHalfSandwich`), this is the current concrete blocker preventing further meaningful progress in `TARGET`
+  - best next step once this blocker is addressed: prove the final `√χ` step in a smaller auxiliary file-local normalization chain, or refactor the relevant raw expressions so Lean no longer has to normalize the whole `switcherooPointProductRight * leftTensor(...)` term inside one theorem; then combine the raw fourth-term chain, transfer it via `hthird_eq`, and finish `commutativitySwitcheroo`
+  - attempted the second `√ζ` step and the final `√χ` collapse-to-`firstTerm` step, but reverted those partial proofs after they introduced elaboration/heartbeat blowups and nontrivial rewrite obligations; the file is back to a compiling state
+  - current concrete blocker: the remaining fourth-term chain needs one more `closenessOfInnerProduct_right` step plus the final `χ` step. The obstacle is not a missing statement now, but proof-engineering complexity: the right-action witness must be chosen so that `hC` reuses the existing left contraction, and the resulting expressions must be rewritten to the target scalar without triggering Lean heartbeat timeouts on large tensor/adjoint normal forms
+  - best next step once resuming: prove the second `√ζ` step with a tightly controlled `closenessOfInnerProduct_right` proof that uses an adjointed witness to recycle `switcherooAggregateFourthTerm_once_commuted_contraction_left`, then package the final `√χ` step and exact collapse to `switcherooAggregateFirstTerm`; only after that mirror the argument for the third term to `switcherooAggregateTargetSwapped`
 
 ## Active Strategy
 - `MainInductionStep` is complete for this wave.
