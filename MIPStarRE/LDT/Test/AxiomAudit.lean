@@ -30,3 +30,4 @@ elab "assert_standard_axioms " id:ident : command => do
 
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
+assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundnessWithPlaceholderBound
