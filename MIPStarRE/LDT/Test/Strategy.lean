@@ -41,7 +41,35 @@ structure PermInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
     ev ψ (leftTensor (ι₂ := ι) M) =
       ev ψ (rightTensor (ι₁ := ι) M)
 
-/-- Paper-local symmetric strategy data. -/
+/-- Reparametrization invariance for diagonal-line measurements: evaluating a
+rebased line at `zeroCoord` agrees outcome-wise with evaluating the original
+line at the rebasing parameter. -/
+def DiagonalEvaluationReparamInvariant (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι) : Prop :=
+  ∀ (ℓ : DiagonalLine params) (t a : Fq params),
+    (postprocess ((M (DiagonalLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a =
+      (postprocess ((M ℓ).toSubMeas) (fun f => f t)).outcome a
+
+/-- Reparametrization invariance for axis-parallel-line measurements: evaluating a
+rebased line at `zeroCoord` agrees outcome-wise with evaluating the original
+line at the rebasing parameter. -/
+def AxisParallelEvaluationReparamInvariant (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι) : Prop :=
+  ∀ (ℓ : AxisParallelLine params) (t a : Fq params),
+    (postprocess ((M (AxisParallelLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a =
+      (postprocess ((M ℓ).toSubMeas) (fun f => f t)).outcome a
+
+/-- Paper-local symmetric strategy data.
+
+The `axisParallelReparamInvariant` and `diagonalReparamInvariant`
+fields encode that line measurements are geometrically covariant:
+evaluating at a rebased line's base point (`zeroCoord`) agrees with
+evaluating at the original parameter. The paper treats this as
+implicit (lines are geometric objects), but in the Lean model
+`AxisParallelLine` and `DiagonalLine` include the parametrization, so
+we state it explicitly. -/
 structure SymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
@@ -49,8 +77,12 @@ structure SymStrat (params : Parameters) [FieldModel params.q]
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurement :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
+  axisParallelReparamInvariant :
+    AxisParallelEvaluationReparamInvariant params axisParallelMeasurement
   diagonalMeasurement :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+  diagonalReparamInvariant :
+    DiagonalEvaluationReparamInvariant params diagonalMeasurement
 
 -- NOTE: no global `Inhabited` instance for `SymStrat`; constructing default
 -- projective measurement families is non-canonical and requires additional
@@ -166,6 +198,14 @@ structure ProjStrat (params : Parameters) [FieldModel params.q]
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   diagonalMeasurementB :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+  axisParallelReparamInvariantA :
+    AxisParallelEvaluationReparamInvariant params axisParallelMeasurementA
+  axisParallelReparamInvariantB :
+    AxisParallelEvaluationReparamInvariant params axisParallelMeasurementB
+  diagonalReparamInvariantA :
+    DiagonalEvaluationReparamInvariant params diagonalMeasurementA
+  diagonalReparamInvariantB :
+    DiagonalEvaluationReparamInvariant params diagonalMeasurementB
 
 /-- Basis projector onto the role sector `r`. -/
 def roleProj (r : Role) : MIPStarRE.Quantum.Op Role :=
@@ -914,6 +954,48 @@ noncomputable def symmetrizedIdxProjMeas
         simp [add_mul, mul_add, roleCond_mul_same, roleCond_A_mul_B,
           roleCond_B_mul_A, (MA q).proj a, (MB q).proj a] }
 
+/-- Reparametrization invariance is preserved by block-diagonal
+symmetrization over the role register. -/
+private theorem symmetrizedAxisParallelReparamInvariant
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {MA MB : IdxProjMeas (AxisParallelLine params)
+      (AxisLinePolynomial params) ι}
+    (hA : AxisParallelEvaluationReparamInvariant params MA)
+    (hB : AxisParallelEvaluationReparamInvariant params MB) :
+    AxisParallelEvaluationReparamInvariant params
+      (symmetrizedIdxProjMeas MA MB) := by
+  intro ℓ t a
+  have hA' := hA ℓ t a
+  have hB' := hB ℓ t a
+  classical
+  simp only [postprocess, symmetrizedIdxProjMeas] at hA' hB' ⊢
+  rw [Finset.sum_add_distrib, Finset.sum_add_distrib,
+    roleCond_finset_sum, roleCond_finset_sum,
+    roleCond_finset_sum, roleCond_finset_sum,
+    hA', hB']
+
+/-- Reparametrization invariance is preserved by block-diagonal
+symmetrization over the role register. -/
+private theorem symmetrizedDiagonalReparamInvariant
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {MA MB : IdxProjMeas (DiagonalLine params)
+      (DiagonalLinePolynomial params) ι}
+    (hA : DiagonalEvaluationReparamInvariant params MA)
+    (hB : DiagonalEvaluationReparamInvariant params MB) :
+    DiagonalEvaluationReparamInvariant params
+      (symmetrizedIdxProjMeas MA MB) := by
+  intro ℓ t a
+  have hA' := hA ℓ t a
+  have hB' := hB ℓ t a
+  classical
+  simp only [postprocess, symmetrizedIdxProjMeas] at hA' hB' ⊢
+  rw [Finset.sum_add_distrib, Finset.sum_add_distrib,
+    roleCond_finset_sum, roleCond_finset_sum,
+    roleCond_finset_sum, roleCond_finset_sum,
+    hA', hB']
+
 namespace ProjStrat
 
 /-- The paper's symmetrized point measurement, obtained by putting Alice's and
@@ -949,7 +1031,15 @@ noncomputable def classicalRoleSymmStrategy {params : Parameters}
   permInvState := classicalRoleSymmState_permInvState strategy.state
   pointMeasurement := strategy.symmetrizedPointMeasurement
   axisParallelMeasurement := strategy.symmetrizedAxisParallelMeasurement
+  axisParallelReparamInvariant :=
+    symmetrizedAxisParallelReparamInvariant
+      strategy.axisParallelReparamInvariantA
+      strategy.axisParallelReparamInvariantB
   diagonalMeasurement := strategy.symmetrizedDiagonalMeasurement
+  diagonalReparamInvariant :=
+    symmetrizedDiagonalReparamInvariant
+      strategy.diagonalReparamInvariantA
+      strategy.diagonalReparamInvariantB
 
 /-- The classical role-register symmetrized strategy preserves normalization. -/
 theorem classicalRoleSymmStrategy_isNormalized {params : Parameters}
@@ -1003,7 +1093,13 @@ noncomputable def diagonalFailureProbability
         (diagonalPointAnswerFamily strategy j)
         (diagonalLineAnswerFamily strategy j)
 
-/-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy. -/
+/-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy.
+
+Matches the paper's Definition 3.1: three test-passing bounds with no
+extra hypotheses.  The reparametrization covariance that was formerly
+listed here is now a structural property of `SymStrat`, where it
+belongs (the paper treats diagonal measurements as geometrically
+covariant by construction). -/
 structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -1025,7 +1121,9 @@ def leftAsSymmetric {params : Parameters} [FieldModel params.q]
   permInvState := strategy.permInvState
   pointMeasurement := strategy.pointMeasurementA
   axisParallelMeasurement := strategy.axisParallelMeasurementA
+  axisParallelReparamInvariant := strategy.axisParallelReparamInvariantA
   diagonalMeasurement := strategy.diagonalMeasurementA
+  diagonalReparamInvariant := strategy.diagonalReparamInvariantA
 
 /-- View the right prover's local data as a symmetric-strategy-style package. -/
 def rightAsSymmetric {params : Parameters} [FieldModel params.q]
@@ -1036,17 +1134,97 @@ def rightAsSymmetric {params : Parameters} [FieldModel params.q]
   permInvState := strategy.permInvState
   pointMeasurement := strategy.pointMeasurementB
   axisParallelMeasurement := strategy.axisParallelMeasurementB
+  axisParallelReparamInvariant := strategy.axisParallelReparamInvariantB
   diagonalMeasurement := strategy.diagonalMeasurementB
+  diagonalReparamInvariant := strategy.diagonalReparamInvariantB
+
+/-- Axis-parallel branch component where the left prover is queried with a line
+and the right prover is queried with the sampled base point.
+
+This is one of the two crossed role choices in the full low-individual-degree
+test. It is not the local axis-parallel failure probability of
+`strategy.leftAsSymmetric`, which would compare the left prover's point and line
+measurements against each other. -/
+noncomputable def axisParallelLineLeftPointRightFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (AxisParallelTestSample params))
+    (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
+    (axisParallelPointAnswerFamily strategy.rightAsSymmetric)
+
+/-- Axis-parallel branch component where the left prover is queried with the
+sampled base point and the right prover is queried with a line.
+
+This is the other crossed role choice in the full test, again distinct from any
+same-local `SymStrat.axisParallelFailureProbability`. -/
+noncomputable def axisParallelPointLeftLineRightFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (AxisParallelTestSample params))
+    (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
+    (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
+
+/-- Diagonal branch component where the left prover is queried with a diagonal
+line and the right prover is queried with the sampled base point.
+
+The average is over the restriction index and then over the corresponding
+restricted diagonal sample. This crossed component is what the full test bounds;
+it is not the diagonal-line failure probability of either local symmetric view. -/
+noncomputable def diagonalLineLeftPointRightFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  (1 / (params.m : Error)) *
+    ∑ j : Fin params.m,
+      bipartiteConsError strategy.state
+        (uniformDistribution (RestrictedDiagonalSample params j))
+        (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
+        (diagonalPointAnswerFamily strategy.rightAsSymmetric j)
+
+/-- Diagonal branch component where the left prover is queried with the sampled
+base point and the right prover is queried with a diagonal line.
+
+Together with `diagonalLineLeftPointRightFailureProbability`, this is the
+role-averaged diagonal part of `lowIndividualDegreeFailureProbability`. -/
+noncomputable def diagonalPointLeftLineRightFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  (1 / (params.m : Error)) *
+    ∑ j : Fin params.m,
+      bipartiteConsError strategy.state
+        (uniformDistribution (RestrictedDiagonalSample params j))
+        (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
+        (diagonalLineAnswerFamily strategy.rightAsSymmetric j)
+
+/-- Cross-prover point-agreement failure probability: both provers receive the
+same uniformly sampled point and the verifier checks that their answers agree.
+
+This is the self-consistency branch of the full low-individual-degree test
+(`fig:test` in the paper): "Player A: Give `u`; receive `a`. Player B: Give `u`;
+receive `b`. Accept if `a = b`." -/
+noncomputable def pointAgreementFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (Point params))
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
 
 /-- Trace-based failure surrogate for the full low-individual-degree
 test, matching the paper's `fig:test` with role-based decomposition.
 
-Each of the three branches picks a role `r ∈ {A, B}`:
+The axis-parallel and diagonal branches pick a role `r ∈ {A, B}`:
 - Player `r` receives a line and returns a polynomial;
 - Player `r̄` receives a point and returns a field element.
 
-The self-consistency branch checks strong self-consistency of each
-player's point measurement.
+The self-consistency branch queries both provers at the same point and checks
+cross-prover point agreement.
 
 TODO(#306): `ProjStrat` currently forces both provers onto the
 same index type `ι`; the paper allows `H_A ≠ H_B`. -/
@@ -1054,44 +1232,19 @@ noncomputable def lowIndividualDegreeFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) : Error :=
-  let left := strategy.leftAsSymmetric
-  let right := strategy.rightAsSymmetric
-  let axParDist :=
-    uniformDistribution (AxisParallelTestSample params)
   -- Axis-parallel: average over roles
   -- Role A: Alice→line (left), Bob→point (right)
   -- Role B: Alice→point (left), Bob→line (right)
   let axisParallelBranch :=
-    (bipartiteConsError strategy.state axParDist
-        (axisParallelLineAnswerFamily left)
-        (axisParallelPointAnswerFamily right)
-      + bipartiteConsError strategy.state axParDist
-        (axisParallelPointAnswerFamily left)
-        (axisParallelLineAnswerFamily right)) / 2
-  -- Self-consistency: average the two point-measurement SSC defects.
-  let selfConsistencyBranch :=
-    (bipartiteSSCError strategy.state
-        (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      + bipartiteSSCError strategy.state
-        (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)) / 2
+    (strategy.axisParallelLineLeftPointRightFailureProbability
+      + strategy.axisParallelPointLeftLineRightFailureProbability) / 2
+  -- Self-consistency: both provers receive the same point.
+  let selfConsistencyBranch := strategy.pointAgreementFailureProbability
   -- Diagonal: for each restriction index, average the two role choices
-  -- from the paper's uniformly sampled role `r ∈ {A, B}`. The `/ 2`
-  -- is intentionally inside the summand before averaging over `j`.
+  -- from the paper's uniformly sampled role `r ∈ {A, B}`.
   let diagonalBranch :=
-    (1 / (params.m : Error)) *
-      ∑ j : Fin params.m,
-        (bipartiteConsError strategy.state
-            (uniformDistribution
-              (RestrictedDiagonalSample params j))
-            (diagonalLineAnswerFamily left j)
-            (diagonalPointAnswerFamily right j)
-          + bipartiteConsError strategy.state
-            (uniformDistribution
-              (RestrictedDiagonalSample params j))
-            (diagonalPointAnswerFamily left j)
-            (diagonalLineAnswerFamily right j)) / 2
+    (strategy.diagonalLineLeftPointRightFailureProbability
+      + strategy.diagonalPointLeftLineRightFailureProbability) / 2
   (axisParallelBranch + selfConsistencyBranch +
     diagonalBranch) / 3
 
@@ -1101,15 +1254,97 @@ structure PassesLowIndividualDegreeTest {params : Parameters}
     (strategy : ProjStrat params ι) (eps : Error) : Prop where
   soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
 
-/-- Passing the test bounds the point-agreement defect by `3 * eps`. -/
+/-- Passing the full test bounds each sampled branch component.
+
+The role-averaged axis-parallel and diagonal components carry two levels of
+averaging, giving the `6 * eps` bounds. The self-consistency branch has no role
+average, so the cross-prover point-agreement error is bounded by `3 * eps`. -/
+theorem tested_branch_components_le_six_mul {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    strategy.axisParallelLineLeftPointRightFailureProbability ≤ 6 * eps ∧
+      strategy.axisParallelPointLeftLineRightFailureProbability ≤ 6 * eps ∧
+      strategy.pointAgreementFailureProbability ≤ 3 * eps ∧
+      strategy.diagonalLineLeftPointRightFailureProbability ≤ 6 * eps ∧
+      strategy.diagonalPointLeftLineRightFailureProbability ≤ 6 * eps := by
+  let axLinePoint := strategy.axisParallelLineLeftPointRightFailureProbability
+  let axPointLine := strategy.axisParallelPointLeftLineRightFailureProbability
+  let pointAgreement := strategy.pointAgreementFailureProbability
+  let diagLinePoint := strategy.diagonalLineLeftPointRightFailureProbability
+  let diagPointLine := strategy.diagonalPointLeftLineRightFailureProbability
+  have hlow :
+      (((axLinePoint + axPointLine) / 2 + pointAgreement
+          + (diagLinePoint + diagPointLine) / 2) / 3) ≤ eps := by
+    simpa [lowIndividualDegreeFailureProbability, axLinePoint, axPointLine,
+      pointAgreement, diagLinePoint, diagPointLine] using hpass.soundnessHypothesis
+  have h_axLinePoint_nonneg : 0 ≤ axLinePoint := by
+    simpa [axisParallelLineLeftPointRightFailureProbability, axLinePoint] using
+      bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params))
+        (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
+        (axisParallelPointAnswerFamily strategy.rightAsSymmetric)
+  have h_axPointLine_nonneg : 0 ≤ axPointLine := by
+    simpa [axisParallelPointLeftLineRightFailureProbability, axPointLine] using
+      bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params))
+        (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
+        (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
+  have h_pointAgreement_nonneg : 0 ≤ pointAgreement := by
+    simpa [pointAgreementFailureProbability, pointAgreement] using
+      bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have h_diagLinePoint_nonneg : 0 ≤ diagLinePoint := by
+    have hsum :
+        0 ≤ ∑ j : Fin params.m,
+          bipartiteConsError strategy.state
+            (uniformDistribution (RestrictedDiagonalSample params j))
+            (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
+            (diagonalPointAnswerFamily strategy.rightAsSymmetric j) := by
+      exact Finset.sum_nonneg fun j _ =>
+        bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
+          (diagonalPointAnswerFamily strategy.rightAsSymmetric j)
+    simpa [diagonalLineLeftPointRightFailureProbability, diagLinePoint] using
+      mul_nonneg (by positivity : 0 ≤ (1 / (params.m : Error))) hsum
+  have h_diagPointLine_nonneg : 0 ≤ diagPointLine := by
+    have hsum :
+        0 ≤ ∑ j : Fin params.m,
+          bipartiteConsError strategy.state
+            (uniformDistribution (RestrictedDiagonalSample params j))
+            (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
+            (diagonalLineAnswerFamily strategy.rightAsSymmetric j) := by
+      exact Finset.sum_nonneg fun j _ =>
+        bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
+          (diagonalLineAnswerFamily strategy.rightAsSymmetric j)
+    simpa [diagonalPointLeftLineRightFailureProbability, diagPointLine] using
+      mul_nonneg (by positivity : 0 ≤ (1 / (params.m : Error))) hsum
+  constructor
+  · nlinarith
+  constructor
+  · nlinarith
+  constructor
+  · nlinarith
+  constructor <;> nlinarith
+
+/-- Passing the full test bounds cross-prover point agreement by `3 * eps`.
+
+This is the direct consequence of the self-consistency branch of
+`lowIndividualDegreeFailureProbability`: both provers receive the same point and
+the verifier checks that the two answers agree. -/
 theorem point_agreement_le_three_mul {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    bipartiteConsError strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) ≤ 3 * eps := by
-  sorry
+    strategy.pointAgreementFailureProbability ≤ 3 * eps := by
+  rcases tested_branch_components_le_six_mul hpass with
+    ⟨_, _, hpoint, _, _⟩
+  exact hpoint
 
 private lemma addCoord_subCoord_right {params : Parameters} [FieldModel params.q]
     (x y : Fq params) :
@@ -1288,49 +1523,69 @@ theorem classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (strategy : ProjStrat params ι) :
     (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability =
-      bipartiteConsError strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) := by
-  unfold SymStrat.selfConsistencyFailureProbability bipartiteSSCError bipartiteConsError
+      strategy.pointAgreementFailureProbability := by
+  unfold SymStrat.selfConsistencyFailureProbability bipartiteSSCError
+    pointAgreementFailureProbability bipartiteConsError
   refine Finset.sum_congr rfl ?_
   intro u _
   exact congrArg (fun t => (uniformDistribution (Point params)).weight u * t)
     (qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect strategy u)
 
-/-- The self-consistency branch of the role-register symmetrized strategy is
-bounded by `3 * eps` under the current Test-level failure surrogate. -/
+/-- The role-register symmetrized strategy's self-consistency is bounded by any
+available cross-prover point-agreement bound. -/
+theorem classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    {strategy : ProjStrat params ι} {delta : Error}
+    (hpoint : strategy.pointAgreementFailureProbability ≤ delta) :
+    (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤ delta := by
+  rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
+  exact hpoint
+
+/-- Passing the full test bounds the role-register symmetrized strategy's
+self-consistency by `3 * eps`. -/
 theorem classicalRoleSymmStrategy_selfConsistency_le_three_mul
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤ 3 * eps := by
-  rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
-  exact point_agreement_le_three_mul hpass
+    (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤
+      3 * eps := by
+  exact classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
+    (point_agreement_le_three_mul hpass)
 
-/-- A Lean-local surrogate consequence of the averaged test bound: the left local
-strategy is `(6 * eps, 6 * eps, 6 * eps)`-good.
+/-- Tested branch bounds involving the left prover's point measurement.
 
-This is not the paper's symmetrization step, which yields a separate symmetric
-strategy that is `(3 * eps, 3 * eps, 3 * eps)`-good. -/
-theorem left_as_symmetric_is_good_six_mul {params : Parameters}
+These are the three components of the full test in which the left prover's
+point measurement appears: left-point/right-line axis consistency, left point
+agreement with the right point measurement, and left-point/right-diagonal
+consistency. -/
+theorem left_point_tested_branches_le_six_mul {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    strategy.leftAsSymmetric.IsGood (6 * eps) (6 * eps) (6 * eps) := by
-  sorry
+    strategy.axisParallelPointLeftLineRightFailureProbability ≤ 6 * eps ∧
+      strategy.pointAgreementFailureProbability ≤ 3 * eps ∧
+      strategy.diagonalPointLeftLineRightFailureProbability ≤ 6 * eps := by
+  rcases tested_branch_components_le_six_mul hpass with
+    ⟨_, haxis, hpoint, _, hdiag⟩
+  exact ⟨haxis, hpoint, hdiag⟩
 
-/-- A Lean-local surrogate consequence of the averaged test bound: the right local
-strategy is `(6 * eps, 6 * eps, 6 * eps)`-good.
+/-- Tested branch bounds involving the right prover's point measurement.
 
-This is not the paper's symmetrization step, which yields a separate symmetric
-strategy that is `(3 * eps, 3 * eps, 3 * eps)`-good. -/
-theorem right_as_symmetric_is_good_six_mul {params : Parameters}
+These are the mirror-image crossed components: left-line/right-point axis
+consistency, point agreement with the left point measurement, and
+left-diagonal/right-point consistency. -/
+theorem right_point_tested_branches_le_six_mul {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    strategy.rightAsSymmetric.IsGood (6 * eps) (6 * eps) (6 * eps) := by
-  sorry
+    strategy.axisParallelLineLeftPointRightFailureProbability ≤ 6 * eps ∧
+      strategy.pointAgreementFailureProbability ≤ 3 * eps ∧
+      strategy.diagonalLineLeftPointRightFailureProbability ≤ 6 * eps := by
+  rcases tested_branch_components_le_six_mul hpass with
+    ⟨haxis, _, hpoint, hdiag, _⟩
+  exact ⟨haxis, hpoint, hdiag⟩
 
 end ProjStrat
 

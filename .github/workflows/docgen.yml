@@ -1,17 +1,16 @@
-name: Blueprint
+name: Full documentation
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'blueprint/src/**'
-      - 'blueprint/lean_decls'
-      - 'home_page/**'
+  schedule:
+    # Run weekly on Sunday at 06:00 UTC
+    - cron: '0 6 * * 0'
   workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch to build docs from (default: main)'
+        required: false
+        default: 'main'
 
-# Serialize gh-pages deployments across blueprint/docgen workflows;
-# do not cancel in-progress deploys when new commits arrive.
 concurrency:
   group: gh-pages-deploy
   cancel-in-progress: false
@@ -20,20 +19,35 @@ permissions:
   contents: write
 
 jobs:
-  blueprint:
+  build_project:
     runs-on: ubuntu-latest
-    name: Build and deploy blueprint
+    name: Build project and generate docs
+    timeout-minutes: 330
     steps:
+      - name: Cleanup to free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # main as of 2026-04-13
+        with:
+          tool-cache: false
+          android: true
+          dotnet: false
+          haskell: false
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
       - name: Checkout project
         uses: actions/checkout@v6
-
-      - name: Install Python
-        uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          fetch-depth: 0
+          ref: ${{ inputs.ref || 'main' }}
 
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev texlive-binaries
+      - name: Build project
+        uses: leanprover/lean-action@v1
+        with:
+          build: true
+
+      - name: Install TeX and graphviz
+        run: sudo apt-get update && sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended texlive-science latexmk graphviz libgraphviz-dev
 
       - name: Install leanblueprint
         run: |
@@ -43,6 +57,7 @@ jobs:
       - name: Build blueprint
         working-directory: blueprint
         run: |
+          leanblueprint pdf
           tmp_output_file="$(mktemp)"
 
           set +o pipefail
@@ -58,12 +73,18 @@ jobs:
             echo "::error::Blueprint has missing files (see WARNING lines above)"
             exit 1
           fi
+
           if [ "$cmd_status" -ne 0 ]; then
             exit "$cmd_status"
           fi
+
+      - name: Generate API docs
+        run: |
+          cd docbuild
+          lake build MIPStarRE:docs
 
       - name: Deploy to gh-pages
         env:
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: ./scripts/deploy-to-gh-pages.sh --ci
+        run: ./scripts/deploy-to-gh-pages.sh --with-docs --ci

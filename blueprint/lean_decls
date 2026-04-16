@@ -1,5 +1,7 @@
 MIPStarRE.LDT.Test.razSafra
 MIPStarRE.LDT.Test.classicalTestSoundness
+MIPStarRE.LDT.Test.classicalTestSoundness
+MIPStarRE.LDT.Test.TwoProverClassicalLIDBridgePackage
 MIPStarRE.LDT.Test.mainInformal
 MIPStarRE.LDT.Role
 MIPStarRE.LDT.Role.other
@@ -38,7 +40,7 @@ MIPStarRE.LDT.Preliminaries.closenessOfIPAdjoint
 MIPStarRE.LDT.Preliminaries.easyApproxFromApproxDelta
 MIPStarRE.LDT.Preliminaries.cabApproxDelta
 MIPStarRE.LDT.Preliminaries.triangleInequalityForVectorsSquared
-MIPStarRE.LDT.Preliminaries.triangleInequalityForApproxDelta
+MIPStarRE.LDT.Preliminaries.sddOpRel_chain
 MIPStarRE.LDT.Preliminaries.simeqTriangleInequality
 MIPStarRE.LDT.Preliminaries.simeqDataProcessing
 MIPStarRE.LDT.Preliminaries.consSubMeas
@@ -129,7 +131,8 @@ MIPStarRE.LDT.Pasting.gHatFacts
 MIPStarRE.LDT.Pasting.commuteGHalfSandwich
 MIPStarRE.LDT.Pasting.ldSandwichLineOnePoint
 MIPStarRE.LDT.Pasting.hBConsistency
-MIPStarRE.LDT.Pasting.hAConsistency
+MIPStarRE.LDT.Pasting.hAConsistency_submeas
+MIPStarRE.LDT.Pasting.hAConsistency_completed
 MIPStarRE.LDT.Pasting.outcomesByType
 MIPStarRE.LDT.Pasting.globallyConsistentOutcomesByType
 MIPStarRE.LDT.Pasting.nonglobalOutcomesByType

@@ -1091,21 +1091,14 @@ theorem orthonormalization {Outcome : Type*}
     (A : SubMeas Outcome ι) (ζ : Error) :
     BipartiteSSCRel ψ (uniformDistribution Unit)
         (constSubMeasFamily A) ζ →
+      MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationBridgePackage ψ A ζ →
       ∃ P : ProjSubMeas Outcome ι,
         SDDRel ψ (uniformDistribution Unit)
           (constSubMeasFamily A.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
-  /-
-  This theorem still needs the completion-to-measurement bridge and the final
-  error bookkeeping around `orthonormalizationMainLemma`. It is not just a thin
-  wrapper around the already-formalized lemmas yet.
-  -/
-  -- TODO: Complete the orthonormalization wrapper by converting SSC to the
-  -- rounded projective witness with final error bookkeeping (Theorem 5.4 /
-  -- `thm:orthonormalization`); blocked on the completion-to-measurement bridge
-  -- and wrapper composition lemmas.
-  sorry
+  intro hssc hbridge
+  exact hbridge.fromSSC hssc
 
 
 
@@ -1150,59 +1143,70 @@ private lemma orthonormalizationMainLemma_error_bound (ζ : Error)
         exact mul_le_mul_of_nonneg_left hsqrt_two_le_seven (by norm_num)
       simpa using hcoeff.trans_eq (by norm_num : (12 : Error) * 7 = 84)
 
-/-- `lem:orthonormalization-main-lemma`.
-
-The `[Nonempty Outcome]` assumption is inherited from
-`consistencyToAlmostProjective`. The underlying orthonormalization statement is
-outcome-agnostic, but the current packaged intermediate statement carries an
-explicit matrix witness whose construction picks a distinguished outcome. -/
-lemma orthonormalizationMainLemma.{uRound} {Outcome : Type*}
+private def leftLiftedMeasurement {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
+    [Fintype Outcome]
+    (A : Measurement Outcome ιA) :
+    Measurement Outcome (ιA × ιB) :=
+  { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
+    total_eq_one := by
+      ext i j
+      rcases i with ⟨i₁, i₂⟩
+      rcases j with ⟨j₁, j₂⟩
+      simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
+
+/-- `lem:orthonormalization-main-lemma`.
+
+The bridge inputs isolate the still-unformalized spectral truncation and the
+later repair from the raw rounded family to a genuine projective
+submeasurement on the lifted space. -/
+lemma orthonormalizationMainLemma {Outcome : Type*}
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ιA × ιB))
     (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error)
-    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1) :
+    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
+    (hspectral :
+      MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationBridgePackage
+        ψ (leftLiftedMeasurement (ιB := ιB) A)
+        (consistencyToAlmostProjectiveError ζ))
+    (hrepair :
+      MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationRepairPackage
+        ψ (leftLiftedMeasurement (ιB := ιB) A)
+        (consistencyToAlmostProjectiveError ζ)) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
-      let A_lifted : Measurement Outcome (ιA × ιB) :=
-        { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-          total_eq_one := by
-            ext i j
-            rcases i with ⟨i₁, i₂⟩
-            rcases j with ⟨j₁, j₂⟩
-            simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
+      let A_lifted : Measurement Outcome (ιA × ιB) := leftLiftedMeasurement (ιB := ιB) A
       ∃ P : ProjSubMeas Outcome (ιA × ιB),
-        RoundedProjMeasStatement.{_, _, uRound}
+        RoundedProjMeasStatement
           ψ A_lifted P
           (orthonormalizationMainLemmaError ζ) := by
   intro hCons
-  let A_lifted : Measurement Outcome (ιA × ιB) :=
-    { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-      total_eq_one := by
-        ext i j
-        rcases i with ⟨i₁, i₂⟩
-        rcases j with ⟨j₁, j₂⟩
-        simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
+  change ∃ P : ProjSubMeas Outcome (ιA × ιB),
+      RoundedProjMeasStatement
+        ψ (leftLiftedMeasurement (ιB := ιB) A) P
+        (orthonormalizationMainLemmaError ζ)
   have hAlmost :
-      AlmostProjMeasStatement.{_, _, uRound}
-        ψ A_lifted
-          (consistencyToAlmostProjectiveError ζ) := by
-    simpa using
-      (consistencyToAlmostProjective
-        (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons)
+      MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
+        ψ (leftLiftedMeasurement (ιB := ιB) A)
+        (consistencyToAlmostProjectiveError ζ) := by
+    exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
+        (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons
   have hRound :
       ∃ P : ProjSubMeas Outcome (ιA × ιB),
-        RoundedProjMeasStatement.{_, _, uRound}
-          ψ A_lifted P
+        MIPStarRE.LDT.MakingMeasurementsProjective.RoundedProjMeasStatement
+          ψ (leftLiftedMeasurement (ιB := ιB) A) P
           (roundingToProjectiveError (consistencyToAlmostProjectiveError ζ)) :=
-    roundAlmostProjMeas (ψ := ψ)
-      (A := A_lifted)
-      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost
+    MIPStarRE.LDT.MakingMeasurementsProjective.roundAlmostProjMeas (ψ := ψ)
+      (A := leftLiftedMeasurement (ιB := ιB) A)
+      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost hspectral hrepair
   obtain ⟨P, hRounded⟩ := hRound
   refine ⟨P, ?_⟩
-  exact roundedProjMeasStatement_mono hRounded
-    (orthonormalizationMainLemma_error_bound ζ hζ hζ1)
+  simpa using
+    (MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono hRounded
+      (orthonormalizationMainLemma_error_bound ζ hζ hζ1))
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

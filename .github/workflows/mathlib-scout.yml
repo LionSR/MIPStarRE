@@ -32,10 +32,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Lean toolchain and cache
-        uses: leanprover/lean-action@v1
-        with:
-          use-mathlib-cache: true
-          build: false
+        uses: ./.github/actions/setup-lean
 
       - name: Sanitize issue content
         id: sanitize
@@ -53,7 +50,6 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          use_claude_code_oauth: true
 
           prompt: |
             A new formalization issue has been opened. Your job is to scout Mathlib
@@ -102,4 +98,4 @@ jobs:
           claude_args: |
             --model claude-opus-4-6
             --allowedTools "Read,Glob,Grep,Bash(lean *),Bash(lake env),mcp__github__add_issue_comment,mcp__github__issue_read"
-            --append-system-prompt "This is a Lean 4 / Mathlib repository for MIP* = RE (quantum complexity theory, low individual degree test, quantum soundness). Your ONLY task is to scout Mathlib and the existing codebase for relevant lemmas and post a scouting report. Do NOT write code or create files. Be thorough — search multiple keywords and naming conventions. Mathlib sources are under .lake/packages/mathlib/Mathlib/."
+            --append-system-prompt "This is a Lean 4 / Mathlib formalization project for quantum complexity theory (MIP* = RE, low-degree tests). Your ONLY task is to scout Mathlib and the existing codebase for relevant lemmas and post a scouting report. Do NOT write code or create files. Be thorough — search multiple keywords and naming conventions. Mathlib sources are under .lake/packages/mathlib/Mathlib/."

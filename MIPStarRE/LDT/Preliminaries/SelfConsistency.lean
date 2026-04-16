@@ -286,7 +286,8 @@ theorem goodStrategyCharacterization {params : Parameters} [FieldModel params.q]
     exact h.selfConsistencyTest
   · rintro ⟨haxis, hself, hdiag⟩
     refine ⟨haxis.offDiagonalBound, ?_, hdiag⟩
-    simpa [SymStrat.selfConsistencyFailureProbability, hself_eq] using hself.offDiagonalBound
+    simpa [SymStrat.selfConsistencyFailureProbability, hself_eq] using
+      hself.offDiagonalBound
 
 /-- `prop:two-notions-of-self-consistency-after-evaluation`.
 

@@ -386,7 +386,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Triangle inequality for $\approx_\delta$]\label{prop:triangle-inequality-for-approx_delta}
-	\lean{MIPStarRE.LDT.Preliminaries.triangleInequalityForApproxDelta}
+	\lean{MIPStarRE.LDT.Preliminaries.sddOpRel_chain}
 	\leanok
 	\uses{def:approx_delta, prop:triangle-inequality-for-vectors-squared}
 	Suppose $(A_i)_a^x \approx_{\delta_i} (A_{i+1})_a^x$ for $i=1,\dots,k$. Then
@@ -395,6 +395,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Expand $(A_1-A_{k+1})\ket{\psi}$ as a telescoping sum and apply Lemma~\ref{prop:triangle-inequality-for-vectors-squared}.
 \end{proof}
 

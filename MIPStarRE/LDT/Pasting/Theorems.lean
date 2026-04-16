@@ -44,6 +44,19 @@ theorem ldGbcon
   The proof is the displayed chain leading to equation `eq:ld-gbcon` in the
   blueprint: combine good-strategy consistency, `simeqToApprox`, and
   `triangleSub`.
+
+  Current API blockers:
+  * `SymStrat` has diagonal-line reparametrization invariance but no analogous
+    axis-parallel invariance. The axis-parallel test samples the vertical line
+    with base `(u, x)` and evaluates at `0`, while `verticalLineMeasurementFamily`
+    uses the canonical base `(u, 0)` and evaluates at `x`.
+  * `triangleSub` requires `strategy.state.IsNormalized`, but `SymStrat` does
+    not currently carry normalization.
+  * `family.ConsistentWithPoints` is oriented as point measurement on the left
+    and slice family on the right; the paper step and this theorem need the
+    slice family on the left and the point/line measurement on the right. A
+    general `ConsRel` swap lemma needs stronger permutation invariance than the
+    current `PermInvState.swap_ev`, which only swaps `A ⊗ I` with `I ⊗ A`.
   -/
   sorry
 
@@ -708,21 +721,6 @@ private lemma switcherooSelfConsistency_bip
   simpa [switcherooSelfConsistencyLeft, switcherooSelfConsistencyRight,
     IdxProjSubMeas.toIdxSubMeas, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
     hselfM.squaredDistanceBound
-
-private lemma switcherooCompletePartSelfConsistency_bip
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (zeta : Error)
-    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    Preliminaries.BipartiteSDDRel ψbi
-      (uniformDistribution (SliceQuestion params))
-      (IdxProjSubMeas.toIdxSubMeas family.meas)
-      (IdxProjSubMeas.toIdxSubMeas family.meas)
-      zeta := by
-  constructor
-  simpa [IdxProjSubMeas.toIdxSubMeas, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
-    hselfG.completePartSelfConsistency.squaredDistanceBound
 
 private lemma avgOver_uniform_slicePair
     (params : Parameters) [FieldModel params.q]
@@ -1475,11 +1473,8 @@ private lemma switcheroo_first_term_close
           exact avgOver_abs_le_avgOver_abs _ _
     _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun _ => 2 * Real.sqrt omega) := by
           exact avgOver_mono _ _ _ hpoint
-    _ = 2 * Real.sqrt omega := by
-          have hq0 : (params.q : Error) ≠ 0 := by
-            exact_mod_cast Nat.ne_of_gt params.hq
-          simp [avgOver, uniformDistribution]
-          field_simp [hq0]
+    _ = 2 * Real.sqrt omega :=
+          avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt omega)
 
 /-- The one-outcome projective family whose sole effect is the complete slice part `G^x`. -/
 private noncomputable def completePartProjFamily
@@ -2744,7 +2739,12 @@ private lemma completePartProjFamily_selfConsistency_generic
               qSDD_completePart_le_slice params ψbi family x
     _ ≤ zeta := hself_bound
 
-private lemma switcheroo_second_term_close
+/-- The second positive expansion term is close to its `M ⊗ G` center.
+
+This aggregate form matches the four-term `qSDDOp` expansion: the projective
+family in the sandwich is the one-outcome complete part `G^x`, not the original
+slice-outcome family. -/
+private lemma switcheroo_second_aggregate_term_close
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -2753,57 +2753,172 @@ private lemma switcheroo_second_term_close
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta : Error)
     (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    let secondTerm :=
-      avgOver (uniformDistribution (SliceQuestion params))
-        (fun y => Preliminaries.leftSandwichExpectation ψbi
-          (uniformDistribution (SliceQuestion params))
-          family.meas (((M y).toSubMeas).total))
+    let secondTerm := switcherooAggregateSecondTerm params ψbi family M
     let commonTerm :=
       avgOver (uniformDistribution (SliceQuestion params))
         (fun y => Preliminaries.middleSandwichExpectation ψbi
           (uniformDistribution (SliceQuestion params))
-          family.meas (((M y).toSubMeas).total))
+          (completePartProjFamily params family) (((M y).toSubMeas).total))
     |secondTerm - commonTerm| ≤ 2 * Real.sqrt zeta := by
-  dsimp
+  let 𝒟x : Distribution (SliceQuestion params) := uniformDistribution (SliceQuestion params)
+  let Gcomplete : IdxProjSubMeas (SliceQuestion params) Unit ι :=
+    completePartProjFamily params family
   let L : Fq params → Error := fun y =>
-    Preliminaries.leftSandwichExpectation ψbi
-      (uniformDistribution (SliceQuestion params))
-      family.meas (((M y).toSubMeas).total)
+    Preliminaries.leftSandwichExpectation ψbi 𝒟x Gcomplete (((M y).toSubMeas).total)
   let C : Fq params → Error := fun y =>
-    Preliminaries.middleSandwichExpectation ψbi
-      (uniformDistribution (SliceQuestion params))
-      family.meas (((M y).toSubMeas).total)
-  have hselfG_bip := switcherooCompletePartSelfConsistency_bip params ψbi family zeta hselfG
+    Preliminaries.middleSandwichExpectation ψbi 𝒟x Gcomplete (((M y).toSubMeas).total)
+  change |switcherooAggregateSecondTerm params ψbi family M - avgOver 𝒟x C| ≤
+    2 * Real.sqrt zeta
+  have hselfG_complete :
+      SDDRel ψbi 𝒟x
+        (switcherooSelfConsistencyLeft params Gcomplete)
+        (switcherooSelfConsistencyRight params Gcomplete)
+        zeta := by
+    simpa [𝒟x, Gcomplete] using
+      completePartProjFamily_selfConsistency_generic params ψbi family zeta hselfG
+  have hselfG_bip := switcherooSelfConsistency_bip params ψbi Gcomplete zeta hselfG_complete
   have hpoint : ∀ y, |L y - C y| ≤ 2 * Real.sqrt zeta := by
     intro y
     have hB : Preliminaries.OpBounded01 (((M y).toSubMeas).total) := by
       refine ⟨?_, ?_⟩
       · exact SubMeas.total_nonneg ((M y).toSubMeas)
       · exact sub_nonneg.mpr ((M y).toSubMeas).total_le_one
-    simpa [L, C] using
+    simpa [L, C, 𝒟x, Gcomplete] using
       (Preliminaries.switchSandwich ψbi
-        (uniformDistribution (SliceQuestion params))
+        𝒟x
         hnorm
-        (uniformDistribution_weight_sum_le_one (SliceQuestion params))
-        family.meas
+        (by simpa [𝒟x] using uniformDistribution_weight_sum_le_one (SliceQuestion params))
+        Gcomplete
         (((M y).toSubMeas).total)
         hB
         zeta
         hselfG_bip).leftSandwichTransfer
+  have hsecond_eq :
+      switcherooAggregateSecondTerm params ψbi family M =
+        avgOver 𝒟x L := by
+    change
+      avgOver (uniformDistribution (SlicePairQuestion params))
+          (fun q =>
+            ∑ o : Outcome,
+              ev ψbi
+                (leftTensor
+                  ((completePartSubMeas params family q.1).total * (M q.2).outcome o *
+                    (completePartSubMeas params family q.1).total))) =
+        avgOver 𝒟x L
+    calc
+      avgOver (uniformDistribution (SlicePairQuestion params))
+          (fun q =>
+            ∑ o : Outcome,
+              ev ψbi
+                (leftTensor
+                  ((completePartSubMeas params family q.1).total * (M q.2).outcome o *
+                    (completePartSubMeas params family q.1).total)))
+        = avgOver (uniformDistribution (SliceQuestion params))
+            (fun y =>
+              avgOver (uniformDistribution (SliceQuestion params))
+                (fun x =>
+                  ∑ o : Outcome,
+                    ev ψbi
+                      (leftTensor
+                        ((completePartSubMeas params family x).total * (M y).outcome o *
+                          (completePartSubMeas params family x).total)))) := by
+              simpa using
+                (avgOver_uniform_slicePair_swapOrder params
+                  (f := fun x y =>
+                    ∑ o : Outcome,
+                      ev ψbi
+                        (leftTensor
+                          ((completePartSubMeas params family x).total * (M y).outcome o *
+                            (completePartSubMeas params family x).total))))
+      _ = avgOver 𝒟x L := by
+            apply avgOver_congr
+            intro y
+            unfold L Preliminaries.leftSandwichExpectation
+            apply avgOver_congr
+            intro x
+            let G : MIPStarRE.Quantum.Op ι := (completePartSubMeas params family x).total
+            have hGout : (Gcomplete x).outcome () = G := by
+              simpa [Gcomplete, completePartProjFamily, G, completePartSubMeas,
+                postprocess] using (family.meas x).sum_eq_total
+            calc
+              ∑ o : Outcome,
+                  ev ψbi (leftTensor (G * (M y).outcome o * G))
+                = ev ψbi (leftTensor (G * ((M y).toSubMeas).total * G)) := by
+                    rw [← ev_sum ψbi (fun o : Outcome =>
+                      leftTensor (G * (M y).outcome o * G))]
+                    rw [leftTensor_finset_sum]
+                    congr 1
+                    rw [← Finset.sum_mul, ← Finset.mul_sum, (M y).sum_eq_total]
+              _ = ∑ _u : Unit,
+                    ev ψbi
+                      (leftTensor ((Gcomplete x).outcome ()) *
+                        leftTensor (((M y).toSubMeas).total) *
+                        leftTensor ((Gcomplete x).outcome ())) := by
+                    simp [hGout, leftTensor_mul_leftTensor, mul_assoc]
   calc
-    |avgOver (uniformDistribution (SliceQuestion params)) L -
-        avgOver (uniformDistribution (SliceQuestion params)) C|
-      = |avgOver (uniformDistribution (SliceQuestion params)) (fun y => L y - C y)| := by
+    |switcherooAggregateSecondTerm params ψbi family M - avgOver 𝒟x C|
+      = |avgOver 𝒟x L - avgOver 𝒟x C| := by rw [hsecond_eq]
+    _ = |avgOver 𝒟x (fun y => L y - C y)| := by
           simp [avgOver, Finset.sum_sub_distrib, mul_sub]
-    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun y => |L y - C y|) := by
+    _ ≤ avgOver 𝒟x (fun y => |L y - C y|) := by
           exact avgOver_abs_le_avgOver_abs _ _
-    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun _ => 2 * Real.sqrt zeta) := by
+    _ ≤ avgOver 𝒟x (fun _ => 2 * Real.sqrt zeta) := by
           exact avgOver_mono _ _ _ hpoint
     _ = 2 * Real.sqrt zeta := by
-          have hq0 : (params.q : Error) ≠ 0 := by
-            exact_mod_cast Nat.ne_of_gt params.hq
-          simp [avgOver, uniformDistribution]
-          field_simp [hq0]
+          simpa [𝒟x] using
+            avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt zeta)
+
+/-- Raw SDD bound for completed-part pairs: marginalizes the completed-part
+self-consistency bound over `SlicePairQuestion` via `avgOver_uniform_fst`.
+Used as infrastructure for the commutativitySwitcheroo cross-term chain (issue #298). -/
+private lemma switcheroo_complete_part_pair_raw_sdd
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
+    avgOver (uniformDistribution (SlicePairQuestion params))
+      (fun q =>
+        qSDDCore ψbi
+          (fun g : Polynomial params =>
+            leftTensor (ι₂ := ι) ((family.meas q.1).outcome g))
+          (fun g : Polynomial params =>
+            rightTensor (ι₁ := ι) ((family.meas q.1).outcome g))) ≤ zeta := by
+  calc
+    avgOver (uniformDistribution (SlicePairQuestion params))
+        (fun q =>
+          qSDDCore ψbi
+            (fun g : Polynomial params =>
+              leftTensor (ι₂ := ι) ((family.meas q.1).outcome g))
+            (fun g : Polynomial params =>
+              rightTensor (ι₁ := ι) ((family.meas q.1).outcome g)))
+      = avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            qSDDCore ψbi
+              (fun g : Polynomial params =>
+                leftTensor (ι₂ := ι) ((family.meas x).outcome g))
+              (fun g : Polynomial params =>
+                rightTensor (ι₁ := ι) ((family.meas x).outcome g))) := by
+            simpa [SlicePairQuestion] using
+              (avgOver_uniform_fst (α := SliceQuestion params)
+                (β := SliceQuestion params)
+                (f := fun x =>
+                  qSDDCore ψbi
+                    (fun g : Polynomial params =>
+                      leftTensor (ι₂ := ι) ((family.meas x).outcome g))
+                    (fun g : Polynomial params =>
+                      rightTensor (ι₁ := ι) ((family.meas x).outcome g))))
+    _ = avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            qSDD ψbi
+              ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
+              ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x)) := by
+            apply avgOver_congr
+            intro x
+            simp [qSDD, qSDDCore, IdxProjSubMeas.toIdxSubMeas,
+              IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
+              SubMeas.liftLeft, SubMeas.liftRight]
+    _ ≤ zeta := hselfG.completePartSelfConsistency.squaredDistanceBound
 
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
@@ -2848,10 +2963,7 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     avgOver 𝒟x (fun x =>
       Preliminaries.leftSandwichExpectation ψbi 𝒟x M
         ((completePartSubMeas params family x).total))
-  let secondTerm :=
-    avgOver 𝒟x (fun y =>
-      Preliminaries.leftSandwichExpectation ψbi 𝒟x family.meas
-        (((M y).toSubMeas).total))
+  let secondTerm := switcherooAggregateSecondTerm params ψbi family M
   let thirdTerm := switcherooAggregateThirdTerm params ψbi family M
   let fourthTerm := switcherooAggregateFourthTerm params ψbi family M
   let onceRaw := switcherooAggregateOnceCommutedRaw params ψbi family M
@@ -4417,6 +4529,49 @@ theorem gHatFacts
                     simp [gHatCommutationError, sixteenthSum]
                     ring
 
+/-! ### Bridge lemmas for the sandwich chain
+
+These lemmas capture the infrastructure needed for the `lem:commute-g-half-sandwich`
+through `cor:h-a-consistency` chain in `ld-pasting.tex` §9.3.
+
+The n-step SDDOpRel composition lemma (`sddOpRel_chain`) now lives in
+`Preliminaries.Theorems` alongside `sddOpRel_triangle`, since it is a
+general-purpose result used by multiple chapters. -/
+
+/-- Bridge: the staged move-commute-move chain for `commuteGHalfSandwich`.
+
+Constructs the sequence of `3k` intermediate bipartite operator families
+that arise from repeatedly moving `Ĝ₁` through the product
+`Ĝ₁ · Ĝ₂ · ⋯ · Ĝₖ` using self-consistency (move to right tensor,
+error `2ζ`) and pairwise commutation (swap past neighbor, error `ν₃`),
+then composes them via `sddOpRel_chain`.
+
+Paper reference: `lem:commute-g-half-sandwich` computation in
+`ld-pasting.tex` lines 881–914. -/
+private lemma commuteGHalfSandwich_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (k : ℕ) (hk : 2 ≤ k)
+    (hzeta_le : zeta ≤ 1)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta))
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (PointTuple params k))
+      (gHatHalfSandwichLeft params family k)
+      (gHatHalfSandwichRight params family k)
+      (commuteGHalfSandwichError params gamma zeta k) := by
+  sorry
+
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
     (params : Parameters)
@@ -4426,13 +4581,50 @@ lemma commuteGHalfSandwich
     (gamma zeta : Error)
     (k : ℕ)
     (hk : 2 ≤ k)
+    (hzeta_le : zeta ≤ 1)
     (hfacts : GHatFactsStatement params ψbi family gamma zeta) :
     CommuteGHalfSandwichStatement params ψbi family gamma zeta k := by
-  /-
-  Deferred core argument from `lem:commute-g-half-sandwich` in
-  `references/ldt-paper/ld-pasting.tex`.
-  The proof iterates the `\widehat G` commutation bound across the half-sandwich.
-  -/
+  exact ⟨commuteGHalfSandwich_core params ψbi family gamma zeta k hk
+    hzeta_le hfacts.completedSelfConsistency hfacts.completedCommutation⟩
+
+/-- Bridge: Cauchy-Schwarz sandwich elimination for one-point consistency.
+
+Given the half-sandwich commutation bound from `commuteGHalfSandwich`, performs
+the Cauchy-Schwarz + measurement-completeness argument that converts the
+sandwiched operator distance into a one-point consistency bound.
+
+Paper reference: `lem:ld-sandwich-line-one-point` proof in
+`ld-pasting.tex` lines 931–1036.
+
+Steps:
+1. Simplify by summing out indices `> i` using measurement completeness
+2. Apply Cauchy-Schwarz with `commuteGHalfSandwich` to move `Ĝ₁` left
+3. Apply Cauchy-Schwarz again to move `Ĝ₁` right
+4. Eliminate `Ĝ_{<i}` product using measurement completeness
+5. Reduce to the single-slice bound `eq:ld-gbcon` -/
+private lemma ldSandwichLineOnePoint_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (hcomm : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params strategy.state family
+        gamma zeta j)
+    (k i : ℕ) (hi : i < k) :
+    ConsRel strategy.state
+      (uniformDistribution (SandwichedLineQuestion params k))
+      (ldSandwichLineOnePointLeftFamily params strategy family k i)
+      (ldSandwichLineOnePointRightFamily params strategy family k i)
+      (ldSandwichLineOnePointError params eps delta gamma zeta k) := by
   sorry
 
 /-- `lem:ld-sandwich-line-one-point`. -/
@@ -4441,7 +4633,11 @@ lemma ldSandwichLineOnePoint
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -4449,18 +4645,51 @@ lemma ldSandwichLineOnePoint
     (hfacts : GHatFactsStatement params strategy.state family gamma zeta)
     (k i : ℕ)
     (hi : i < k) :
-    LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i := by
+    LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
   have hcomm :
       ∀ j : ℕ, 2 ≤ j →
-        CommuteGHalfSandwichStatement params strategy.state family gamma zeta j := by
+        CommuteGHalfSandwichStatement params strategy.state family
+          gamma zeta j := by
     intro j hj
-    exact commuteGHalfSandwich params strategy.state family gamma zeta j hj hfacts
-  /-
-  Deferred core argument from `lem:ld-sandwich-line-one-point` in
-  `references/ldt-paper/ld-pasting.tex`.
-  This is the one-point comparison between the sandwiched completed-slice outcome
-  and the vertical-line measurement.
-  -/
+    exact commuteGHalfSandwich params strategy.state family gamma zeta
+      j hj hzeta_le hfacts
+  exact ⟨ldSandwichLineOnePoint_core params strategy eps delta gamma zeta
+    hnorm hgood hgamma_le hzeta_le hdq_le
+    family hcons hself hbound hcomm k i hi⟩
+
+/-- Bridge: aggregate one-point consistency bounds over all slice indices,
+plus the distinct-tuple approximation error.
+
+Paper reference: `lem:h-b-consistency` proof in `ld-pasting.tex`
+lines 1050–1091.
+
+Steps:
+1. Expand using degree constraints to find eligible index `i`
+2. Switch from independent to distinct samples (`prop:ld-dnoteq`, cost `k²/q`)
+3. Union bound over `k` indices, each contributing `ν₅`
+4. Total: `k·ν₅ + k²/q ≤ 44k²m(...)` -/
+private lemma hBConsistency_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    ConsRel strategy.state
+      (uniformDistribution (VerticalLineQuestion params))
+      (hRestrictionToVerticalLine params
+        (constructedPastedSubMeas params family k))
+      (verticalLineMeasurementFamily params strategy)
+      (hBConsistencyError params eps delta gamma zeta k) := by
   sorry
 
 /-- `lem:h-b-consistency`. -/
@@ -4469,6 +4698,7 @@ lemma hBConsistency
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -4476,25 +4706,65 @@ lemma hBConsistency
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hline : ∀ i : ℕ, i < k →
-      LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i) :
-    HBConsistencyStatement params strategy family eps delta gamma zeta k := by
-  /-
-  Deferred packaging argument after `lem:ld-sandwich-line-one-point` in
-  `references/ldt-paper/ld-pasting.tex`; this is the `lem:h-b-consistency`
-  aggregation over all slice locations.
-  -/
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    HBConsistencyStatement params strategy family
+        eps delta gamma zeta k := by
+  exact ⟨hBConsistency_core params strategy eps delta gamma zeta
+    hnorm hgood family hcons hself hbound k hline⟩
+
+/-- Bridge: convert vertical-line consistency to point consistency.
+
+Given `hHB : HBConsistencyStatement` (the output of `hBConsistency`), derives
+point consistency by restricting the vertical-line bound to individual points.
+
+Paper reference: `cor:h-a-consistency` proof in `ld-pasting.tex`
+lines 1098–1117.
+
+Steps:
+1. Restrict `hHB.lineConsistency` to a single point on the line
+2. Apply `triangleSub` with the `A-B` consistency bound from `hgood`
+3. Error bound: `ν₆ + √(8mε + 4δ) ≤ 47k²m(...) ≤ 100k²m(...)` -/
+private lemma hAConsistency_submeas_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (hcomplete : family.Complete strategy.state kappa)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k)
+    (hHB : HBConsistencyStatement params strategy family
+        eps delta gamma zeta k) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedSubMeas params family k))
+        (MainInductionStep.ldPastingInInductionError params k
+          eps delta gamma kappa zeta) := by
   sorry
 
 /-- `cor:h-a-consistency`.
 
-This packages the point-consistency part of the pasted-submeasurement chain and
-the completed-measurement wrapper. -/
-theorem hAConsistency
+This is the point-consistency part of the pasted-submeasurement chain.  The
+completed-measurement consistency is deliberately separated as
+`hAConsistency_completed`, since the paper proves it only after
+`cor:ld-pasting-N-completeness`. -/
+theorem hAConsistency_submeas
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -4504,15 +4774,74 @@ theorem hAConsistency
     (hk : 400 * params.m * params.d ≤ k) :
     ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next (constructedPastedSubMeas params family k))
+        (polynomialEvaluationFamily params.next
+          (constructedPastedSubMeas params family k))
         (MainInductionStep.ldPastingInInductionError params k
-          eps delta gamma kappa zeta) ∧
+          eps delta gamma kappa zeta) := by
+  have hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
+    have hfacts : GHatFactsStatement params strategy.state family gamma zeta := by
+      /-
+      TODO(#299): derive the full `GHatFactsStatement` package here.
+
+      The available local hypotheses already provide the inputs for the
+      one-point sandwich lemma once `hfacts` is available:
+      `hgood`, `hcons`, `hself`, and `hbound`.
+
+      Constructing `hfacts` itself must package the earlier chain
+      `gCompleteSelfConsistency → gBotSelfConsistency →
+      Commutativity.comMain → commutingWithGComplete →
+      commutingWithGIncomplete → gHatFacts` from the now-threaded local
+      hypotheses `hnorm`, `hgood`, `hcons`, `hself`, `hbound`,
+      `hgamma_le`, `hzeta_le`, and `hdq_le`.
+      -/
+      sorry
+    intro i hi
+    exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
+      hnorm hgood hgamma_le hzeta_le hdq_le
+      family hcons hself hbound hfacts k i hi
+  have hHB := hBConsistency params strategy eps delta gamma zeta
+    hnorm hgood family hcons hself hbound k hline
+  exact hAConsistency_submeas_core params strategy family
+    eps delta gamma kappa zeta hnorm hgood hgamma_le hzeta_le hdq_le
+    hcomplete k hk hHB
+
+/-- Completed-measurement version of `cor:h-a-consistency`.
+
+This wrapper is intentionally downstream of `cor:ld-pasting-N-completeness`:
+it may use the submeasurement consistency together with the completeness bound
+for the constructed pasted submeasurement to control the added completion mass. -/
+theorem hAConsistency_completed
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (family : IdxPolyFamily params ι)
+    (k : ℕ)
+    (hsubmeas :
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next
-          (constructedPastedMeasurement params family k).toSubMeas)
+          (constructedPastedSubMeas params family k))
         (MainInductionStep.ldPastingInInductionError params k
-          eps delta gamma kappa zeta) := by
+          eps delta gamma kappa zeta))
+    (hcomplete :
+      CompletenessAtLeast strategy.state
+        (constructedPastedSubMeas params family k).liftLeft
+        (ldPastingCompletenessLowerBound params kappa
+          (MainInductionStep.ldPastingInInductionNu params k
+            eps delta gamma zeta) k)) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params.next
+        (constructedPastedMeasurement params family k).toSubMeas)
+      (MainInductionStep.ldPastingInInductionError params k
+        eps delta gamma kappa zeta) := by
+  /-
+  Review note: the completed-measurement bridge is expected to justify that the
+  completion step preserves the stated induction error bound using `hcomplete`.
+  -/
   sorry
 
 /-- `lem:over-all-outcomes`. -/
@@ -4521,7 +4850,11 @@ lemma overAllOutcomes
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -4545,7 +4878,6 @@ lemma overAllOutcomes
 
 This is the source-style recurrence for the truncated type sums that appear in
 the `fromHToG` reduction. -/
-
 private lemma gHatTypeWeight_le {k : ℕ} (τ : GHatType k) :
     gHatTypeWeight τ ≤ k := by
   unfold gHatTypeWeight
@@ -4890,6 +5222,74 @@ theorem truncatedTypeSumRecurrence
           truncatedTypeSums G d prefixLen (prependTypeBit false τtail) * (1 - G) := by
             rw [htrue, hfalse]
 
+/-- Bundle the four proved facts about the averaged total operator `G` used by
+`fromHToGRecurrenceWeight` into a single `truncatedTypeSumRecurrence` call. -/
+private lemma fromHToGRecurrenceWeight_recurrence
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    (truncatedTypeSums family.averagedSubMeas.total params.d prefixLen τtail)ᴴ =
+        truncatedTypeSums family.averagedSubMeas.total params.d prefixLen τtail ∧
+      0 ≤ truncatedTypeSums family.averagedSubMeas.total params.d prefixLen τtail ∧
+      truncatedTypeSums family.averagedSubMeas.total params.d prefixLen τtail ≤ 1 ∧
+      truncatedTypeSums family.averagedSubMeas.total params.d (prefixLen + 1) τtail =
+        truncatedTypeSums family.averagedSubMeas.total params.d prefixLen
+            (prependTypeBit true τtail) * family.averagedSubMeas.total +
+          truncatedTypeSums family.averagedSubMeas.total params.d prefixLen
+            (prependTypeBit false τtail) * (1 - family.averagedSubMeas.total) :=
+  truncatedTypeSumRecurrence family.averagedSubMeas.total
+    family.averagedSubMeas.total_nonneg family.averagedSubMeas.total_le_one
+    params.d prefixLen τtail
+
+/-- `fromHToGRecurrenceWeight` is Hermitian (source-style API). -/
+theorem fromHToGRecurrenceWeight_isHermitian
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    (fromHToGRecurrenceWeight params family prefixLen τtail)ᴴ =
+      fromHToGRecurrenceWeight params family prefixLen τtail :=
+  (fromHToGRecurrenceWeight_recurrence params family prefixLen τtail).1
+
+/-- `fromHToGRecurrenceWeight` is positive semidefinite (source-style API). -/
+theorem fromHToGRecurrenceWeight_nonneg
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    0 ≤ fromHToGRecurrenceWeight params family prefixLen τtail :=
+  (fromHToGRecurrenceWeight_recurrence params family prefixLen τtail).2.1
+
+/-- `fromHToGRecurrenceWeight` is bounded above by the identity. -/
+theorem fromHToGRecurrenceWeight_le_one
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    fromHToGRecurrenceWeight params family prefixLen τtail ≤ 1 :=
+  (fromHToGRecurrenceWeight_recurrence params family prefixLen τtail).2.2.1
+
+/-- One-step recurrence for `fromHToGRecurrenceWeight`: adding a new prefix bit
+splits the weight into the `τ_ℓ = 1` and `τ_ℓ = 0` branches, each multiplied by
+the appropriate Bernoulli factor `G` or `I - G`. -/
+theorem fromHToGRecurrenceWeight_succ
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    fromHToGRecurrenceWeight params family (prefixLen + 1) τtail =
+      fromHToGRecurrenceWeight params family prefixLen (prependTypeBit true τtail) *
+          family.averagedSubMeas.total +
+        fromHToGRecurrenceWeight params family prefixLen (prependTypeBit false τtail) *
+          (1 - family.averagedSubMeas.total) :=
+  (fromHToGRecurrenceWeight_recurrence params family prefixLen τtail).2.2.2
+
 /-- `lem:from-H-to-G`. -/
 lemma fromHToG
     (params : Parameters)
@@ -4904,7 +5304,7 @@ lemma fromHToG
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hhalf : CommuteGHalfSandwichStatement params ψbi family gamma zeta k) :
-    FromHToGStatement params strategy family gamma zeta k := by
+    FromHToGStatement params strategy ψbi family gamma zeta k := by
   constructor -- FromHToGStatement
   · -- recurrenceStep: per-step Bernoulli-tail commutation
     intro ℓ hℓ τ
@@ -4963,7 +5363,11 @@ theorem ldPastingNCompleteness
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -4975,7 +5379,8 @@ theorem ldPastingNCompleteness
       (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
   -- Chain the three completeness-chain lemmas (§9.4 of the paper)
   have _hOAO := overAllOutcomes params strategy eps delta gamma zeta
-    hgood family hcons hself hbound k
+    hnorm hgood hgamma_le hzeta_le hdq_le
+    family hcons hself hbound k
   constructor -- LdPastingNCompletenessStatement
   · exact hk -- largeEnough: 400 * m * d ≤ k
   · -- completenessBound
@@ -4995,7 +5400,11 @@ lemma ldPastingSubMeas
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -5007,11 +5416,13 @@ lemma ldPastingSubMeas
       LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
   refine ⟨constructedPastedSubMeas params family k, ?_⟩
   have hconsistency :=
-    (hAConsistency params strategy eps delta gamma kappa zeta
-      hgood family hcomplete hcons hself hbound k hk).1
+    hAConsistency_submeas params strategy eps delta gamma kappa zeta
+      hnorm hgood hgamma_le hzeta_le hdq_le
+      family hcomplete hcons hself hbound k hk
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
-      hgood family hcomplete hcons hself hbound k hk
+      hnorm hgood hgamma_le hzeta_le hdq_le
+      family hcomplete hcons hself hbound k hk
   exact
     { largeEnough := hk
       constructedSubMeas := rfl
@@ -5024,7 +5435,11 @@ theorem ldPasting
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -5035,9 +5450,17 @@ theorem ldPasting
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   refine ⟨constructedPastedMeasurement params family k, ?_⟩
+  have hsubmeasConsistency :=
+    hAConsistency_submeas params strategy eps delta gamma kappa zeta
+      hnorm hgood hgamma_le hzeta_le hdq_le
+      family hcomplete hcons hself hbound k hk
+  have hcompleteness :=
+    ldPastingNCompleteness params strategy eps delta gamma kappa zeta
+      hnorm hgood hgamma_le hzeta_le hdq_le
+      family hcomplete hcons hself hbound k hk
   have hconsistency :=
-    (hAConsistency params strategy eps delta gamma kappa zeta
-      hgood family hcomplete hcons hself hbound k hk).2
+    hAConsistency_completed params strategy eps delta gamma kappa zeta
+      family k hsubmeasConsistency hcompleteness.completenessBound
   exact
     { largeEnough := hk
       constructedMeasurement := rfl

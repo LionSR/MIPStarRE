@@ -92,6 +92,20 @@ def prependTypeBit {k : ℕ} (b : Bool) (τ : GHatType k) : GHatType (k + 1)
   | ⟨0, _⟩ => b
   | ⟨n + 1, hn⟩ => τ ⟨n, Nat.lt_of_succ_lt_succ hn⟩
 
+/-- Drop the first `prefixLen` bits of a type.
+
+In the `fromHToG` recurrence the natural index is the number of prefix bits
+already converted to the Bernoulli polynomial.  This helper turns a full
+`k`-type into the remaining tail `τ_{≥ prefixLen}` using zero-based indexing.
+
+Note: because `k - prefixLen` uses `Nat` subtraction, passing `prefixLen > k`
+silently returns `GHatType 0` (the empty tuple) rather than being a type error.
+Callers in the `fromHToG` recurrence always satisfy `prefixLen ≤ k`, so this
+wraparound is never triggered; reviewers should treat `prefixLen ≤ k` as an
+invariant of all call sites. -/
+def gHatTypeSuffix {k : ℕ} (prefixLen : ℕ) (τ : GHatType k) : GHatType (k - prefixLen) :=
+  fun i => τ ⟨prefixLen + i.val, by omega⟩
+
 /-- The operator contribution of one type bit: `G` for `1`, `I - G` for `0`. -/
 noncomputable def gHatTypeBitOperator (G : MIPStarRE.Quantum.Op ι) (bit : Bool) :
     MIPStarRE.Quantum.Op ι :=
@@ -366,7 +380,11 @@ the interpolation correctness property (that `restrictAtHeight`
 of the result agrees with each slice) additionally requires
 `σ ⊆ gHatTupleSupport gs` and distinct evaluation points, which
 are ensured by the caller via `interpolationSupportSubset_subset`
-and `distinctTupleDistribution`. -/
+and `distinctTupleDistribution`.
+
+The coefficient is Mathlib's `Lagrange.basis σ v i`, the polynomial
+`∏ j ∈ σ.erase i, (X - v j) / (v i - v j)`, evaluated at the appended
+coordinate. -/
 noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
     [FieldModel params.q] {k : ℕ} (xs : PointTuple params k)
     (gs : GHatTupleOutcome params k) (σ : Finset (Fin k))
@@ -375,7 +393,8 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
     let slicePoly :=
       MvPolynomial.rename (embedCoord params)
         (extractSliceOr0 (gs i))
-    let Li := Lagrange.basis σ (fun i => decodeScalar (xs i)) i
+    let Li : _root_.Polynomial (Scalar params) :=
+      Lagrange.basis σ (fun i => decodeScalar (xs i)) i
     let LiMv :=
       Li.eval₂ MvPolynomial.C
         (MvPolynomial.X (lastCoord params))
