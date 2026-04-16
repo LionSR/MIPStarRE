@@ -79,6 +79,37 @@ The blueprint reads as a **mathematical document**, not software documentation. 
 - `\notready` — marks as not ready for formalization (orange in graph)
 - `\mathlibok` — already in Mathlib (dark green in graph)
 
+### Statement-level vs proof-level `\leanok`
+`\leanok` is used at two distinct levels. Both are currently parsed identically by `leanblueprint`, but they carry different meanings:
+
+1. **Statement-level `\leanok`**: placed *inside* the `\begin{theorem}` / `\begin{lemma}` / `\begin{definition}` environment, on its own line directly after the `\lean{...}` tag. Signals that the **statement** has a matching declaration in Lean.
+2. **Proof-level `\leanok`**: placed *inside* the `\begin{proof}` environment, typically immediately after `\begin{proof}` on the next line. Signals that the **Lean proof is complete** (no transitive `sorryAx` dependency).
+
+Because `leanblueprint` counts both markers the same way, a chapter can legitimately contain more `\leanok` occurrences than theorem/lemma/definition environments. For example, `blueprint/src/chapter/ch03_preliminaries.tex` has 48 `\leanok` markers against 37 environment blocks — each fully proved result contributes one statement-level marker and one proof-level marker. Drift audits that compare raw `\leanok` counts against environment counts must account for this. See existing proof-level examples at lines 245, 299, 327, 354, 380, 398, 412, 523 of `ch03_preliminaries.tex`, and the closed prior discussion in #231.
+
+Canonical placement:
+```latex
+\begin{theorem}[Title]\label{thm:label}
+    \lean{LeanDeclarationName}
+    \leanok
+    \uses{...}
+    % LaTeX statement
+\end{theorem}
+\begin{proof}
+    \leanok
+    % proof sketch matching the Lean proof
+\end{proof}
+```
+
+A definition with a formalized Lean counterpart uses only the statement-level marker (definitions have no proof block):
+```latex
+\begin{definition}[Title]\label{def:label}
+    \lean{LeanDeclarationName}
+    \leanok
+    % LaTeX definition
+\end{definition}
+```
+
 ## Dependency Graph Colors (web)
 - **Light green box**: definition with `\lean` + `\leanok` (defined in Lean)
 - **Green**: theorem stated + `\lean` + `\leanok` (stated in Lean)
