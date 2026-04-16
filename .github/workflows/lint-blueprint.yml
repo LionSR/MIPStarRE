@@ -85,15 +85,16 @@ jobs:
         id: lean-setup
         uses: ./.github/actions/setup-lean
 
-      - name: Check blueprint and Lean source stay in sync
-        if: steps.lean-setup.outcome == 'success'
-        continue-on-error: true
-        run: python3 scripts/blueprint_lean_sync.py --root . --ci
-
       - name: Generate lean_decls from blueprint .tex files
         if: steps.lean-setup.outcome == 'success'
         continue-on-error: true
+        id: lean-decls
         run: python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
+
+      - name: Check blueprint and Lean source stay in sync
+        if: steps.lean-setup.outcome == 'success' && steps.lean-decls.outcome == 'success'
+        continue-on-error: true
+        run: python3 scripts/blueprint_lean_sync.py --root . --ci
 
       - name: Fetch PR base ref for diff
         if: github.event_name == 'pull_request' && steps.lean-setup.outcome == 'success'
@@ -150,7 +151,7 @@ jobs:
           PY
 
       - name: Check blueprint Lean declarations
-        if: steps.lean-setup.outcome == 'success'
+        if: steps.lean-setup.outcome == 'success' && steps.lean-decls.outcome == 'success'
         continue-on-error: true
         run: |
           if ! lake exe checkdecls blueprint/lean_decls; then
