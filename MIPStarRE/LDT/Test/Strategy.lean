@@ -1234,6 +1234,23 @@ noncomputable def lowIndividualDegreeFailureProbability
   (axisParallelBranch + selfConsistencyBranch +
     diagonalBranch) / 3
 
+/-- The full projective low-individual-degree failure surrogate decomposes into
+the same two role-averaged line/point branches and cross-prover point-agreement
+branch used in the paper's verifier. This makes the comparison with
+`TwoProverClassicalLIDStrategy.lowIndividualDegreeAcceptanceProbability`
+completely explicit, up to the acceptance-versus-failure convention. -/
+theorem lowIndividualDegreeFailureProbability_eq_branchAverage
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    strategy.lowIndividualDegreeFailureProbability =
+      ((strategy.axisParallelLineLeftPointRightFailureProbability +
+          strategy.axisParallelPointLeftLineRightFailureProbability) / 2 +
+        strategy.pointAgreementFailureProbability +
+        (strategy.diagonalLineLeftPointRightFailureProbability +
+          strategy.diagonalPointLeftLineRightFailureProbability) / 2) / 3 := by
+  simp [lowIndividualDegreeFailureProbability]
+
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
