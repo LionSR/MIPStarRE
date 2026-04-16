@@ -36,9 +36,10 @@ These patterns **must** be resolved before merging.
 
 When an external mathematical result must remain unformalized temporarily,
 prefer a caller-supplied `Prop` hypothesis over a global `axiom`
-declaration, and add a regression check (for example `#guard_msgs in`
-`#print axioms ...`) so later refactors cannot silently widen the axiomatic
-base.
+declaration, and add a regression check (for example a
+`Lean.collectAxioms`-based assertion, as in
+`MIPStarRE.LDT.Test.AxiomAudit`) so later refactors cannot silently widen
+the axiomatic base.
 
 ### Circular reasoning
 
