@@ -38,4 +38,5 @@
 *.bcf
 *-blx.bib
 *.pdf
+blueprint/lean_decls
 .claude/

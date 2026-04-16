@@ -12,7 +12,6 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
-      - 'blueprint/lean_decls'
       - 'scripts/blueprint_lean_sync.py'
   pull_request:
     types: [opened, synchronize, reopened]
@@ -24,7 +23,6 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
-      - 'blueprint/lean_decls'
       - 'scripts/blueprint_lean_sync.py'
 
 concurrency:
@@ -87,23 +85,16 @@ jobs:
         id: lean-setup
         uses: ./.github/actions/setup-lean
 
-      - name: Check blueprint and Lean source stay in sync
+      - name: Generate lean_decls from blueprint .tex files
         if: steps.lean-setup.outcome == 'success'
         continue-on-error: true
-        run: python3 scripts/blueprint_lean_sync.py --root . --ci
-
-      - name: Regenerate lean_decls from blueprint .tex files
-        if: steps.lean-setup.outcome == 'success'
-        continue-on-error: true
+        id: lean-decls
         run: python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
 
-      - name: Ensure regenerated lean_decls is committed
-        if: steps.lean-setup.outcome == 'success'
+      - name: Check blueprint and Lean source stay in sync
+        if: steps.lean-setup.outcome == 'success' && steps.lean-decls.outcome == 'success'
         continue-on-error: true
-        run: |
-          if ! git diff --exit-code -- blueprint/lean_decls; then
-            echo "::warning::blueprint/lean_decls is stale. Regenerate and commit it."
-          fi
+        run: python3 scripts/blueprint_lean_sync.py --root . --ci
 
       - name: Fetch PR base ref for diff
         if: github.event_name == 'pull_request' && steps.lean-setup.outcome == 'success'
@@ -160,7 +151,7 @@ jobs:
           PY
 
       - name: Check blueprint Lean declarations
-        if: steps.lean-setup.outcome == 'success'
+        if: steps.lean-setup.outcome == 'success' && steps.lean-decls.outcome == 'success'
         continue-on-error: true
         run: |
           if ! lake exe checkdecls blueprint/lean_decls; then
