@@ -13,8 +13,6 @@ constructions and error terms.
 - `references/ldt-paper/self_improvement.tex`
 -/
 
-set_option linter.style.longLine false
-
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT
@@ -80,6 +78,18 @@ def sdpComplementarySlacknessEquation (params : Parameters)
   T.outcome g * Z =
     T.outcome g * averagedPointOperator params strategy g
 
+/-- A point-indexed selection of outcome/polynomial pairs used in `lem:add-in-u`. -/
+abbrev AddInUSelection (params : Parameters) [FieldModel params.q] (Outcome : Type*) :=
+  Point params → Set (Outcome × Polynomial params)
+
+/-- The finite set of selected outcome/polynomial pairs at a point `u`. -/
+noncomputable def addInUSelectionPairs {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (S : AddInUSelection params Outcome) (u : Point params) :
+    Finset (Outcome × Polynomial params) :=
+  open Classical in
+    Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u)
+
 /-- The pointwise sandwiched operator `H^u_h = A^u_{h(u)} T_h A^u_{h(u)}`. -/
 noncomputable def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
     [FieldModel params.q]
@@ -88,6 +98,18 @@ noncomputable def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
     (u : Point params) (h : Polynomial params) : MIPStarRE.Quantum.Op ι :=
   let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
   Au * (T.outcome h) * Au
+
+private theorem filteredPolynomialOutcomeSum_le_one (params : Parameters)
+    [FieldModel params.q]
+    (T : SubMeas (Polynomial params) ι) (u : Point params) (a : Fq params) :
+    ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a), T.outcome h ≤ 1 := by
+  calc
+    ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a), T.outcome h
+      ≤ ∑ h : Polynomial params, T.outcome h :=
+        Finset.sum_le_sum_of_subset_of_nonneg
+          (Finset.filter_subset _ _) (fun h _ _ => T.outcome_pos h)
+    _ = T.total := T.sum_eq_total
+    _ ≤ 1 := T.total_le_one
 
 /-- The pointwise sandwiched submeasurement `H^u = {H^u_h}`. -/
 noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
@@ -140,16 +162,9 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
         _ ≤ ∑ a : Fq params, Au.toSubMeas.outcome a := by
               refine Finset.sum_le_sum ?_
               intro a _
-              -- The filtered sum is bounded by the total operator, hence by `1`.
               have hfilt_le_one : ∑ h ∈ Finset.univ.filter
-                  (fun h : Polynomial params => h u = a), T.outcome h ≤ 1 := by
-                calc ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
-                        T.outcome h
-                    ≤ ∑ h : Polynomial params, T.outcome h :=
-                      Finset.sum_le_sum_of_subset_of_nonneg
-                        (Finset.filter_subset _ _) (fun h _ _ => T.outcome_pos h)
-                  _ = T.total := T.sum_eq_total
-                  _ ≤ 1 := T.total_le_one
+                  (fun h : Polynomial params => h u = a), T.outcome h ≤ 1 :=
+                filteredPolynomialOutcomeSum_le_one (ι := ι) (params := params) T u a
               simpa [Au.proj a] using
                 sandwich_mono
                   (M := Au.toSubMeas.outcome a)

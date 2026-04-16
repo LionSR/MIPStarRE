@@ -10,8 +10,6 @@ Concrete finite-dimensional matrix realizations of the self-improvement SDP data
 - `references/ldt-paper/self_improvement.tex`
 -/
 
-set_option linter.style.longLine false
-
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT
@@ -96,10 +94,6 @@ structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
     ∀ g : Polynomial params,
       matrixSdpComplementarySlacknessDefect params model T Z g = 0
 
-/-- The family of outcome/polynomial selections used in `lem:add-in-u`. -/
-abbrev AddInUSelection (params : Parameters) [FieldModel params.q] (Outcome : Type*) :=
-  Point params → Set (Outcome × Polynomial params)
-
 /-- A raw point-indexed matrix outcome family used in the matrix `add-in-u` transfer. -/
 abbrev MatrixIndexedPointOutcomeFamily (params : Parameters) [FieldModel params.q]
     (Outcome : Type*) (H : FiniteHilbertSpace) :=
@@ -132,9 +126,8 @@ noncomputable def matrixAddInULeftOperatorAtPoint {Outcome : Type*} [Fintype Out
     (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome)
     (u : Point params) : MatrixOperator model.space :=
-  open Classical in
-    ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
-      (M u ah.1) * (H.effect ah.2)
+  ∑ ah ∈ addInUSelectionPairs params S u,
+    (M u ah.1) * (H.effect ah.2)
 
 /-- The matrix right-hand operator in `add-in-u`. -/
 noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
@@ -145,10 +138,9 @@ noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type*} [Fintype Ou
     (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome)
     (u : Point params) : MatrixOperator model.space :=
-  open Classical in
-    ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
-      let Au := matrixAveragedPointOperatorContribution params model ah.2 u
-      Au * (M u ah.1) * Au * (T.effect ah.2)
+  ∑ ah ∈ addInUSelectionPairs params S u,
+    let Au := matrixAveragedPointOperatorContribution params model ah.2 u
+    Au * (M u ah.1) * Au * (T.effect ah.2)
 
 /-- The matrix left-hand expectation in `add-in-u`. -/
 noncomputable def matrixAddInULeftQuantity {Outcome : Type*} [Fintype Outcome]
@@ -198,7 +190,8 @@ noncomputable def matrixHelperAgreementOperatorAtPoint (params : Parameters)
 noncomputable def matrixHelperAgreementAverageOperator (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params)
-    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) : MatrixOperator model.space :=
+    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
+    MatrixOperator model.space :=
   matrixAverageOperator (fun u : Point params =>
     matrixHelperAgreementOperatorAtPoint params model H u)
 

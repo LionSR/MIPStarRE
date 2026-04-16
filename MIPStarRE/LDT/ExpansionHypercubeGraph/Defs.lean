@@ -2,12 +2,15 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 import Mathlib.Analysis.Fourier.ZMod
 
 /-!
-Matching scaffold for Section 7 of the low individual degree paper in
-`references/ldt-paper/expansion.tex`.
+# Section 7 — Expansion hypercube graph definitions
 
-This file records the hypercube-graph spectral ingredients and the local/global
-variance comparison in a deliberately lightweight form, but now with explicit
-named quantities that mirror the formulas appearing in the paper.
+This file defines the hypercube graph on `F_q^m`, its rerandomization
+sampling distribution, the local and global variance quantities, and the
+Fourier-analytic data used in the spectral-gap statements.
+
+## References
+
+This file mirrors Section 7 of `references/ldt-paper/expansion.tex`.
 -/
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph

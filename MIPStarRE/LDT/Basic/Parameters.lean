@@ -119,11 +119,11 @@ abbrev LinePolynomialModel (params : Parameters) [FieldModel params.q] :=
 instance {params : Parameters} [FieldModel params.q] : FieldModel params.next.q := by
   simpa [Parameters.next] using (inferInstance : FieldModel params.q)
 
-/-- Interpret a coded coordinate in `Fin q` as a scalar in `ZMod q`. -/
+/-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
 def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
   (FieldModel.equiv (q := params.q)).symm x
 
-/-- Re-encode a scalar in `ZMod q` as its canonical representative in `Fin q`. -/
+/-- Re-encode a field-model scalar as its canonical representative in `Fin q`. -/
 def encodeScalar {params : Parameters} [FieldModel params.q] (x : Scalar params) : Fq params :=
   FieldModel.equiv (q := params.q) x
 
@@ -214,17 +214,17 @@ def pointHeight (params : Parameters) (u : Point params.next) : Fq params :=
     pointHeight params (appendPoint params u x) = x := by
   simp [pointHeight, lastCoord, appendPoint]
 
-/-- Decode a coded point as a tuple of `ZMod q` scalars. -/
+/-- Decode a coded point as a tuple of scalars in the chosen field model. -/
 def decodePoint {params : Parameters} [FieldModel params.q] (u : Point params) :
     Fin params.m → Scalar params :=
   fun i => decodeScalar (u i)
 
-/-- Evaluate a multivariate `ZMod q` polynomial on a coded point. -/
+/-- Evaluate a multivariate polynomial over the chosen field model on a coded point. -/
 def evalPolynomialModel (params : Parameters) [FieldModel params.q]
     (p : PolynomialModel params) (u : Point params) : Fq params :=
   encodeScalar (MvPolynomial.eval (decodePoint u) p)
 
-/-- Evaluate a univariate `ZMod q` polynomial on a coded point. -/
+/-- Evaluate a univariate polynomial over the chosen field model on a coded point. -/
 def evalLinePolynomialModel (params : Parameters) [FieldModel params.q]
     (p : LinePolynomialModel params) (t : Fq params) : Fq params :=
   encodeScalar (_root_.Polynomial.eval (decodeScalar t) p)
@@ -497,9 +497,9 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
         congr 1
         ring_nf
         have hx' : decodeScalar (encodeScalar (decodeScalar x)) = decodeScalar x := by
-          simpa using (decode_encodeScalar (params := params) (x := decodeScalar x))
+          exact decode_encodeScalar (params := params) (x := decodeScalar x)
         have hz' : decodeScalar (encodeScalar (0 : Scalar params)) = (0 : Scalar params) := by
-          simpa using (decode_encodeScalar (params := params) (x := (0 : Scalar params)))
+          exact decode_encodeScalar (params := params) (x := (0 : Scalar params))
         calc
           decodeScalar x = decodeScalar x + decodeScalar t * (0 : Scalar params) := by ring
           _ = decodeScalar x + decodeScalar t * decodeScalar (encodeScalar 0) := by rw [hz']
@@ -509,7 +509,8 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
 end DiagonalLine
 
 /-- A coded function has low individual degree when it is represented by an actual
-multivariate polynomial over `ZMod q` whose degree in each variable is at most `d`. -/
+multivariate polynomial over the chosen field model whose degree in each variable is at
+most `d`. -/
 def HasLowIndividualDegree (params : Parameters) [FieldModel params.q]
     (g : Point params → Fq params) : Prop :=
   ∃ p : PolynomialModel params,
@@ -517,7 +518,7 @@ def HasLowIndividualDegree (params : Parameters) [FieldModel params.q]
       g = evalPolynomialModel params p
 
 /-- A coded univariate function has degree at most `bound` when it is represented by
-an actual polynomial over `ZMod q` of degree at most `bound`. -/
+an actual polynomial over the chosen field model of degree at most `bound`. -/
 def HasUnivariateDegreeAtMost (params : Parameters) [FieldModel params.q]
     (bound : ℕ) (f : Fq params → Fq params) : Prop :=
   ∃ p : LinePolynomialModel params,
@@ -930,9 +931,8 @@ noncomputable def restrictToDiagonalLine (params : Parameters) [FieldModel param
 
 end Polynomial
 
-/-- TODO(finite-outcomes): replace these `sorry`-backed bounded-answer enumerations by
-explicit coefficient-vector models for the bounded polynomial answer spaces. They are
-used so postprocessing can aggregate outcome operators over actual finite fibers. -/
+/-- Axis-line polynomial answers form a finite type via their bounded coefficient vectors.
+This finiteness lets postprocessing sum over actual outcome fibers. -/
 noncomputable instance (params : Parameters) [FieldModel params.q] :
     Fintype (AxisLinePolynomial params) := by
   classical

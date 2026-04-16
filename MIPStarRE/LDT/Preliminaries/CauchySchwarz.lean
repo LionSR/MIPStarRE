@@ -20,19 +20,7 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-private lemma avgOver_sub {Question : Type*}
-    (𝒟 : Distribution Question) (f g : Question → Error) :
-    avgOver 𝒟 f - avgOver 𝒟 g = avgOver 𝒟 (fun q => f q - g q) := by
-  unfold avgOver
-  calc
-    ∑ a ∈ 𝒟.support, 𝒟.weight a * f a - ∑ a ∈ 𝒟.support, 𝒟.weight a * g a
-      = ∑ a ∈ 𝒟.support, (𝒟.weight a * f a - 𝒟.weight a * g a) := by
-          rw [Finset.sum_sub_distrib]
-    _ = ∑ a ∈ 𝒟.support, 𝒟.weight a * (f a - g a) := by
-          refine Finset.sum_congr rfl ?_
-          intro q hq
-          ring
-
+/-- Cauchy-Schwarz bound for the sum of the correlation terms `ev ψ (X a * Y a)`. -/
 lemma sum_ev_mul_le_sqrt
     {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
@@ -124,181 +112,6 @@ private lemma question_easyApproxFromApproxDelta
           rw [(ev_sub ψ (A.outcome a * C.outcome a) (B.outcome a * C.outcome a)).symm]
           simp [sub_mul]
 
-private lemma question_closenessOfIP
-    {OutcomeA OutcomeB : Type*} {ι : Type*}
-    [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
-    (A B : OutcomeA → MIPStarRE.Quantum.Op ι)
-    (C : OutcomeA → OutcomeB → MIPStarRE.Quantum.Op ι)
-    (hC : ∑ a : OutcomeA, (∑ b : OutcomeB, C a b) * (∑ b : OutcomeB, C a b)ᴴ ≤ 1) :
-    |(∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C a b * A a)) -
-        ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C a b * B a)| ≤
-      Real.sqrt (qSDDCore ψ A B) := by
-  let row : OutcomeA → MIPStarRE.Quantum.Op ι := fun a => ∑ b : OutcomeB, C a b
-  have hrow_le_one :
-      ∑ a : OutcomeA, ev ψ (row a * (row a)ᴴ) ≤ 1 := by
-    calc
-      ∑ a : OutcomeA, ev ψ (row a * (row a)ᴴ)
-        = ev ψ (∑ a : OutcomeA, row a * (row a)ᴴ) := by
-            symm
-            exact ev_sum ψ (fun a => row a * (row a)ᴴ)
-      _ ≤ ev ψ (1 : MIPStarRE.Quantum.Op ι) := by
-            exact ev_mono ψ _ _ hC
-      _ = 1 := ev_one_of_isNormalized ψ hψ
-  have hsqrt_row : Real.sqrt (∑ a : OutcomeA, ev ψ (row a * (row a)ᴴ)) ≤ 1 := by
-    simpa using Real.sqrt_le_sqrt hrow_le_one
-  have hmain :
-      |∑ a : OutcomeA, ev ψ (row a * (A a - B a))| ≤
-        Real.sqrt (∑ a : OutcomeA, ev ψ (row a * (row a)ᴴ)) *
-          Real.sqrt (qSDDCore ψ A B) := by
-    calc
-      |∑ a : OutcomeA, ev ψ (row a * (A a - B a))|
-        ≤ Real.sqrt
-            (∑ a : OutcomeA, ev ψ (row a * (row a)ᴴ)) *
-            Real.sqrt
-              (∑ a : OutcomeA, ev ψ ((A a - B a)ᴴ * (A a - B a))) := by
-              simpa using
-                sum_ev_mul_le_sqrt ψ row (fun a => A a - B a)
-      _ = Real.sqrt (∑ a : OutcomeA, ev ψ (row a * (row a)ᴴ)) *
-            Real.sqrt (qSDDCore ψ A B) := by
-            simp [qSDDCore]
-  have hmain' :
-      |∑ a : OutcomeA, ev ψ (row a * (A a - B a))| ≤
-        Real.sqrt (qSDDCore ψ A B) := by
-    calc
-      |∑ a : OutcomeA, ev ψ (row a * (A a - B a))|
-        ≤ Real.sqrt (∑ a : OutcomeA, ev ψ (row a * (row a)ᴴ)) *
-            Real.sqrt (qSDDCore ψ A B) := hmain
-      _ ≤ 1 * Real.sqrt (qSDDCore ψ A B) := by
-            exact mul_le_mul_of_nonneg_right hsqrt_row (Real.sqrt_nonneg _)
-      _ = Real.sqrt (qSDDCore ψ A B) := by ring
-  convert hmain' using 1
-  refine congrArg abs ?_
-  calc
-    (∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C a b * A a)) -
-        ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C a b * B a)
-      = ∑ a : OutcomeA,
-          ((∑ b : OutcomeB, ev ψ (C a b * A a)) -
-            ∑ b : OutcomeB, ev ψ (C a b * B a)) := by
-              rw [← Finset.sum_sub_distrib]
-    _ = ∑ a : OutcomeA, ev ψ (row a * (A a - B a)) := by
-          refine Finset.sum_congr rfl ?_
-          intro a ha
-          calc
-            (∑ b : OutcomeB, ev ψ (C a b * A a)) -
-                ∑ b : OutcomeB, ev ψ (C a b * B a)
-              = ev ψ ((∑ b : OutcomeB, C a b) * A a) -
-                  ev ψ ((∑ b : OutcomeB, C a b) * B a) := by
-                    rw [← ev_sum ψ (fun b => C a b * A a),
-                      ← ev_sum ψ (fun b => C a b * B a),
-                      Finset.sum_mul, Finset.sum_mul]
-            _ = ev ψ (((∑ b : OutcomeB, C a b) * A a) -
-                  ((∑ b : OutcomeB, C a b) * B a)) := by
-                    rw [(ev_sub ψ _ _).symm]
-            _ = ev ψ (row a * (A a - B a)) := by
-                    simp [row, mul_sub]
-
-private lemma question_closenessOfIPAdjoint
-    {OutcomeA OutcomeB : Type*} {ι : Type*}
-    [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
-    (A B : OutcomeA → MIPStarRE.Quantum.Op ι)
-    (C : OutcomeA → OutcomeB → MIPStarRE.Quantum.Op ι)
-    (hC : ∑ a : OutcomeA, (∑ b : OutcomeB, C a b)ᴴ * (∑ b : OutcomeB, C a b) ≤ 1) :
-    |(∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A a * C a b)) -
-        ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B a * C a b)| ≤
-      Real.sqrt (qSDDCore ψ (fun a => (A a)ᴴ) (fun a => (B a)ᴴ)) := by
-  have hforward :
-      |(∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C a b)ᴴ * (A a)ᴴ)) -
-          ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C a b)ᴴ * (B a)ᴴ)| ≤
-        Real.sqrt (qSDDCore ψ (fun a => (A a)ᴴ) (fun a => (B a)ᴴ)) := by
-    have hC' :
-        ∑ a : OutcomeA,
-            (∑ b : OutcomeB, (C a b)ᴴ) * (∑ b : OutcomeB, (C a b)ᴴ)ᴴ ≤ 1 := by
-      simpa [Matrix.conjTranspose_sum] using hC
-    simpa using
-      question_closenessOfIP ψ hψ
-        (fun a => (A a)ᴴ)
-        (fun a => (B a)ᴴ)
-        (fun a b => (C a b)ᴴ)
-        hC'
-  convert hforward using 1
-  refine congrArg abs ?_
-  calc
-    (∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A a * C a b)) -
-        ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B a * C a b)
-      = (∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C a b)ᴴ * (A a)ᴴ)) -
-          ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C a b)ᴴ * (B a)ᴴ) := by
-            congr 1
-            · refine Finset.sum_congr rfl ?_
-              intro a ha
-              refine Finset.sum_congr rfl ?_
-              intro b hb
-              simpa [Matrix.conjTranspose_mul] using
-                (MIPStarRE.LDT.ev_conjTranspose ψ (A a * C a b)).symm
-            · refine Finset.sum_congr rfl ?_
-              intro a ha
-              refine Finset.sum_congr rfl ?_
-              intro b hb
-              simpa [Matrix.conjTranspose_mul] using
-                (MIPStarRE.LDT.ev_conjTranspose ψ (B a * C a b)).symm
-
--- Mathlib provides PSD preservation for `Mᴴ * P * M`, but not this monotonicity wrapper.
-private lemma adjoint_sandwich_mono
-    {ι : Type*} [Fintype ι]
-    (M P Q : MIPStarRE.Quantum.Op ι) (hPQ : P ≤ Q) :
-    Mᴴ * P * M ≤ Mᴴ * Q * M := by
-  have hpsd :
-      0 ≤ Mᴴ * (Q - P) * M := by
-    exact
-      (Matrix.PosSemidef.conjTranspose_mul_mul_same
-        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hPQ)) M).nonneg
-  simpa [mul_sub, sub_mul, mul_assoc] using hpsd
-
-private lemma question_cabApproxDelta
-    {OutcomeA OutcomeB : Type*} {ι : Type*}
-    [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι)
-    (A B : OutcomeA → MIPStarRE.Quantum.Op ι)
-    (C : OutcomeA → OutcomeB → MIPStarRE.Quantum.Op ι)
-    (hC : ∀ a : OutcomeA, ∑ b : OutcomeB, (C a b)ᴴ * C a b ≤ 1) :
-    qSDDCore ψ
-        (fun ab : OutcomeA × OutcomeB => C ab.1 ab.2 * A ab.1)
-        (fun ab : OutcomeA × OutcomeB => C ab.1 ab.2 * B ab.1) ≤
-      qSDDCore ψ A B := by
-  unfold qSDDCore
-  rw [Fintype.sum_prod_type]
-  calc
-    ∑ a : OutcomeA, ∑ b : OutcomeB,
-        ev ψ
-          (((C a b * A a - C a b * B a)ᴴ) *
-            (C a b * A a - C a b * B a))
-      = ∑ a : OutcomeA, ∑ b : OutcomeB,
-          ev ψ
-            ((A a - B a)ᴴ * ((C a b)ᴴ * C a b) * (A a - B a)) := by
-              refine Finset.sum_congr rfl ?_
-              intro a ha
-              refine Finset.sum_congr rfl ?_
-              intro b hb
-              have hfactor : C a b * A a - C a b * B a = C a b * (A a - B a) := by
-                simp [mul_sub]
-              rw [hfactor]
-              congr 1
-              simp [Matrix.conjTranspose_mul, mul_assoc]
-    _ = ∑ a : OutcomeA,
-          ev ψ ((A a - B a)ᴴ * (∑ b : OutcomeB, (C a b)ᴴ * C a b) * (A a - B a)) := by
-            refine Finset.sum_congr rfl ?_
-            intro a ha
-            rw [← ev_sum ψ (fun b => (A a - B a)ᴴ * ((C a b)ᴴ * C a b) * (A a - B a))]
-            simp [Finset.sum_mul, Finset.mul_sum, mul_assoc]
-    _ ≤ ∑ a : OutcomeA, ev ψ ((A a - B a)ᴴ * 1 * (A a - B a)) := by
-            refine Finset.sum_le_sum ?_
-            intro a ha
-            exact ev_mono ψ _ _ <|
-              adjoint_sandwich_mono (A a - B a) (∑ b : OutcomeB, (C a b)ᴴ * C a b) 1 (hC a)
-    _ = ∑ a : OutcomeA, ev ψ ((A a - B a)ᴴ * (A a - B a)) := by
-            simp
-
 /-- `prop:easy-approx-from-approx-delta`.
 
 If `A ≈_δ B` (sub-measurements) and `C` is a sub-measurement, then
@@ -322,7 +135,7 @@ theorem easyApproxFromApproxDelta
           (fun q =>
             (∑ a : Outcome, ev ψ ((A q).outcome a * (C q).outcome a)) -
               ∑ a : Outcome, ev ψ ((B q).outcome a * (C q).outcome a))| := by
-              rw [avgOver_sub]
+              simp [avgOver, Finset.sum_sub_distrib, mul_sub]
     _ ≤ Real.sqrt (avgOver 𝒟 (fun q => qSDD ψ (A q) (B q))) := by
           exact avgOver_abs_le_sqrt_of_pointwise 𝒟
             (fun q =>
@@ -353,25 +166,7 @@ theorem closenessOfIP
     |avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a)) -
         avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a))| ≤
       Real.sqrt γ := by
-  calc
-    |avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a)) -
-        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a))|
-      = |avgOver 𝒟
-          (fun q =>
-            (∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a)) -
-              ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a))| := by
-              rw [avgOver_sub]
-    _ ≤ Real.sqrt (avgOver 𝒟 (fun q => qSDDCore ψ (A q) (B q))) := by
-          exact avgOver_abs_le_sqrt_of_pointwise 𝒟
-            (fun q =>
-              (∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a)) -
-                ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a))
-            (fun q => qSDDCore ψ (A q) (B q))
-            (fun q => question_closenessOfIP ψ hψ (A q) (B q) (C q) (hC q))
-            (fun q => Finset.sum_nonneg fun a ha => ev_adjoint_self_nonneg ψ (A q a - B q a))
-            h𝒟
-    _ ≤ Real.sqrt γ := by
-          exact Real.sqrt_le_sqrt hAB
+  simpa using closenessOfInnerProduct_left ψ hψ 𝒟 h𝒟 A B C γ hAB hC
 
 /-- `prop:closeness-of-ip` (`eq:closeness4`, adjoint version).
 
@@ -391,26 +186,7 @@ theorem closenessOfIPAdjoint
     |avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A q a * C q a b)) -
         avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B q a * C q a b))| ≤
       Real.sqrt γ := by
-  calc
-    |avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A q a * C q a b)) -
-        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B q a * C q a b))|
-      = |avgOver 𝒟
-          (fun q =>
-            (∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A q a * C q a b)) -
-              ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B q a * C q a b))| := by
-              rw [avgOver_sub]
-    _ ≤ Real.sqrt (avgOver 𝒟 (fun q => qSDDCore ψ (fun a => (A q a)ᴴ) (fun a => (B q a)ᴴ))) := by
-          exact avgOver_abs_le_sqrt_of_pointwise 𝒟
-            (fun q =>
-              (∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A q a * C q a b)) -
-                ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B q a * C q a b))
-            (fun q => qSDDCore ψ (fun a => (A q a)ᴴ) (fun a => (B q a)ᴴ))
-            (fun q =>
-              question_closenessOfIPAdjoint ψ hψ (A q) (B q) (C q) (hC q))
-            (fun q => Finset.sum_nonneg fun a ha => ev_adjoint_self_nonneg ψ ((A q a)ᴴ - (B q a)ᴴ))
-            h𝒟
-    _ ≤ Real.sqrt γ := by
-          exact Real.sqrt_le_sqrt hAB
+  simpa using closenessOfInnerProduct_right ψ hψ 𝒟 h𝒟 A B C γ hAB hC
 
 /-- `prop:cab-approx-delta`.
 
@@ -432,16 +208,31 @@ theorem cabApproxDelta
           (fun ab : OutcomeA × OutcomeB => C q ab.1 ab.2 * A q ab.1)
           (fun ab : OutcomeA × OutcomeB => C q ab.1 ab.2 * B q ab.1))
       ≤ δ := by
-  calc
-    avgOver 𝒟
-      (fun q =>
-        qSDDCore ψ
-          (fun ab : OutcomeA × OutcomeB => C q ab.1 ab.2 * A q ab.1)
-          (fun ab : OutcomeA × OutcomeB => C q ab.1 ab.2 * B q ab.1))
-      ≤ avgOver 𝒟 (fun q => qSDDCore ψ (A q) (B q)) := by
-          apply avgOver_mono
-          intro q
-          exact question_cabApproxDelta ψ (A q) (B q) (C q) (hC q)
-    _ ≤ δ := hAB
+  let AOp : IdxOpFamily Question OutcomeA ι := fun q =>
+    { outcome := A q
+      total := ∑ a : OutcomeA, A q a }
+  let BOp : IdxOpFamily Question OutcomeA ι := fun q =>
+    { outcome := B q
+      total := ∑ a : OutcomeA, B q a }
+  have hAB_op : SDDOpRel ψ 𝒟 AOp BOp δ := by
+    constructor
+    simpa [sddErrorOp, qSDDOp, AOp, BOp] using hAB
+  have hcab :
+      SDDOpRel ψ 𝒟
+        (fun q => ({
+          outcome := fun ab : OutcomeA × OutcomeB =>
+            C q ab.1 ab.2 * (AOp q).outcome ab.1
+          total := ∑ ab : OutcomeA × OutcomeB,
+            C q ab.1 ab.2 * (AOp q).outcome ab.1
+        } : OpFamily (OutcomeA × OutcomeB) ι))
+        (fun q => ({
+          outcome := fun ab : OutcomeA × OutcomeB =>
+            C q ab.1 ab.2 * (BOp q).outcome ab.1
+          total := ∑ ab : OutcomeA × OutcomeB,
+            C q ab.1 ab.2 * (BOp q).outcome ab.1
+        } : OpFamily (OutcomeA × OutcomeB) ι))
+        δ :=
+    cabApproxDelta_raw ψ 𝒟 AOp BOp C δ hAB_op hC
+  simpa [sddErrorOp, qSDDOp, AOp, BOp] using hcab.squaredDistanceBound
 
 end MIPStarRE.LDT.Preliminaries

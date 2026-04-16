@@ -57,7 +57,7 @@ theorem avgOver_mono {α : Type*} (𝒟 : Distribution α) (f g : α → Error)
 theorem avgOver_nonneg {α : Type*} (𝒟 : Distribution α) (f : α → Error)
     (hf : ∀ a, 0 ≤ f a) :
     0 ≤ avgOver 𝒟 f := by
-  rw [← avgOver_zero 𝒟]; exact avgOver_mono 𝒟 _ f hf
+  simpa [avgOver_zero] using avgOver_mono 𝒟 (fun _ => 0) f hf
 
 /-- Averaging distributes over addition. -/
 theorem avgOver_add {α : Type*} (𝒟 : Distribution α) (f g : α → Error) :
@@ -70,19 +70,23 @@ theorem avgOver_const_mul {α : Type*} (𝒟 : Distribution α)
     (c : Error) (f : α → Error) :
     avgOver 𝒟 (fun a => c * f a) =
       c * avgOver 𝒟 f := by
-  simp only [avgOver]
-  conv_lhs => arg 2; ext a; rw [show 𝒟.weight a * (c * f a) = c * (𝒟.weight a * f a) by ring]
-  exact (Finset.mul_sum 𝒟.support (fun a => 𝒟.weight a * f a) c).symm
+  calc
+    avgOver 𝒟 (fun a => c * f a)
+      = ∑ a ∈ 𝒟.support, c * (𝒟.weight a * f a) := by
+          unfold avgOver
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          ring
+    _ = c * ∑ a ∈ 𝒟.support, 𝒟.weight a * f a := by
+          rw [Finset.mul_sum]
+    _ = c * avgOver 𝒟 f := rfl
 
 /-- If `f = g` pointwise, their averages agree. -/
 theorem avgOver_congr {α : Type*} (𝒟 : Distribution α)
     (f g : α → Error) (h : ∀ a, f a = g a) :
     avgOver 𝒟 f = avgOver 𝒟 g := by
-  simp only [avgOver]; exact Finset.sum_congr rfl fun a _ => by rw [h a]
+  exact Finset.sum_congr rfl fun a _ => by rw [h a]
 
-end MIPStarRE.LDT
-
-namespace MIPStarRE.LDT
 
 /-- The weights of a uniform distribution sum to at most 1. -/
 theorem uniformDistribution_weight_sum_le_one (α : Type*)
