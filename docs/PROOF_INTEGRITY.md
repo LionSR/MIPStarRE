@@ -34,6 +34,13 @@ These patterns **must** be resolved before merging.
 |---------|------|
 | `axiom` declarations | Introduces unproven assumptions that could be inconsistent; must be explicitly justified |
 
+When an external mathematical result must remain unformalized temporarily,
+prefer a caller-supplied `Prop` hypothesis over a global `axiom`
+declaration, and add a regression check (for example a
+`Lean.collectAxioms`-based assertion, as in
+`MIPStarRE.LDT.Test.AxiomAudit`) so later refactors cannot silently widen
+the axiomatic base.
+
 ### Circular reasoning
 
 Lean's kernel forbids literal declaration cycles, so focus on **mathematical

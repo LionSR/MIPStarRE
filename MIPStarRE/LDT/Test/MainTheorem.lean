@@ -29,9 +29,12 @@ noncomputable def razSafraSlackBound (params : Parameters) (eps : Error) : Error
 
 /-- Placeholder polynomial-size slack for classical low-individual-degree soundness.
 
-The Chapter 1 overview records the dependence as
-`poly(m) * (√eps + poly(d/q))`; this named expression keeps that dependence
-visible until the Polishchuk–Spielman theorem is formalized directly. -/
+The Chapter 1 overview records the dependence only schematically as
+`poly(m) * (poly(eps) + poly(d/q))`. This named expression keeps the current
+`sqrt eps` placeholder visible until the Polishchuk–Spielman theorem is
+formalized directly or the exact exponent is audited against [PS94]. Issue #384
+tracks tightening this placeholder in lock-step with the quoted external
+soundness statement below. -/
 noncomputable def classicalTestSoundnessSlackBound
     (params : Parameters) (eps : Error) : Error :=
   ((params.m : Error) ^ (2 : ℕ)) *
@@ -103,19 +106,23 @@ def TwoProverClassicalLIDPassCondition (params : Parameters)
     strategy.pointAnswerA = a ∧
       strategy.ClassicallyPassesLowIndividualDegreeTest eps
 
-/-- Quoted theorem statement for the classical low-individual-degree soundness
-result of Polishchuk and Spielman.
+/-- Hypothesis-style interface for the classical low-individual-degree
+soundness result of Polishchuk and Spielman.
 
-This `Prop`-valued interface keeps the external dependency explicit at each call
-site: users of `classicalTestSoundness` must still supply a witness of this
-statement, rather than inheriting any ambient assumed theorem. -/
+This issue-#408 `Prop`-valued interface replaces the earlier ambient axiom with
+an explicit hypothesis at each call site. The external witness now carries its
+own slack bound parameter `slackBound`, so issue #408 no longer bakes the
+still-unaudited placeholder `classicalTestSoundnessSlackBound` into the quoted
+external statement. Issue #384 tracks the current placeholder instantiation
+separately. The regression audit in `MIPStarRE.LDT.Test.AxiomAudit` checks that
+`classicalTestSoundness` remains kernel-clean apart from the standard Lean
+axioms. -/
 def PolishchukSpielmanClassicalSoundnessStatement (params : Parameters)
     [FieldModel params.q]
-    (a : Point params → Fq params) (eps : Error) : Prop :=
+    (a : Point params → Fq params) (eps slackBound : Error) : Prop :=
   TwoProverClassicalLIDPassCondition params a eps →
     ∃ slack : Error,
-      BoundedPointAnswerSoundnessConclusion params a
-        (classicalTestSoundnessSlackBound params eps) slack
+      BoundedPointAnswerSoundnessConclusion params a slackBound slack
 
 /-- `thm:raz-safra`.
 
@@ -134,17 +141,34 @@ theorem razSafra
 
 Quoted classical overview theorem wrapper: from paper-faithful classical LID
 test-passing data together with an explicit witness of the
-Polishchuk–Spielman soundness statement, conclude that prover A's point-answer
-function is close to a low-degree polynomial with the named slack bound. -/
+Polishchuk–Spielman soundness statement at a chosen slack bound `slackBound`,
+conclude that prover A's point-answer function is close to a low-degree
+polynomial with that same bound. -/
 theorem classicalTestSoundness
+    (params : Parameters) [FieldModel params.q]
+    (a : Point params → Fq params) (eps slackBound : Error)
+    (hpass : TwoProverClassicalLIDPassCondition params a eps)
+    (hPS : PolishchukSpielmanClassicalSoundnessStatement params a eps slackBound) :
+    ∃ slack : Error,
+      BoundedPointAnswerSoundnessConclusion params a slackBound slack := by
+  exact hPS hpass
+
+/-- Placeholder convenience instantiation of `classicalTestSoundness` using the
+repository's current named slack bound.
+
+Issue #384 tracks replacing `classicalTestSoundnessSlackBound` by an audited
+Polishchuk–Spielman exponent shape. -/
+theorem classicalTestSoundnessWithPlaceholderBound
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
     (hpass : TwoProverClassicalLIDPassCondition params a eps)
-    (hPS : PolishchukSpielmanClassicalSoundnessStatement params a eps) :
+    (hPS : PolishchukSpielmanClassicalSoundnessStatement params a eps
+      (classicalTestSoundnessSlackBound params eps)) :
     ∃ slack : Error,
       BoundedPointAnswerSoundnessConclusion params a
         (classicalTestSoundnessSlackBound params eps) slack := by
-  exact hPS hpass
+  exact classicalTestSoundness params a eps
+    (classicalTestSoundnessSlackBound params eps) hpass hPS
 
 /-- Temporary bridge package for the still-unformalized proof of
 `thm:main-formal`.
