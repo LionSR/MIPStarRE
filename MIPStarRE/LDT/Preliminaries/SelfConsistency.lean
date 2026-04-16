@@ -250,8 +250,8 @@ theorem goodStrategyCharacterization {params : Parameters} [FieldModel params.q]
     strategy.IsGood eps delta gamma ↔
       ConsRel strategy.state
         (uniformDistribution (AxisParallelTestSample params))
-        (axisParallelPointAnswerFamily strategy)
-        (axisParallelLineAnswerFamily strategy)
+        (axisParallelPointAnswerFamily strategy.pointMeasurement)
+        (axisParallelLineAnswerFamily strategy.axisParallelMeasurement)
         eps ∧
       ConsRel strategy.state
         (uniformDistribution (Point params))

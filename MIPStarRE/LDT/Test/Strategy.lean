@@ -126,52 +126,66 @@ instance restrictedDiagonalSampleNonempty (params : Parameters) (j : Fin params.
 
 /-- Sampled point answers in the axis-parallel lines test.
 The point player receives `u` (the base point) and answers with
-their measurement at `u`. -/
+their point measurement at `u`.
+
+Parameterized by the raw point measurement so both `SymStrat` and
+`ProjStrat` (each prover separately) can reuse it. -/
 noncomputable def axisParallelPointAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι) :
+    (pointMeas : IdxProjMeas (Point params) (Fq params) ι) :
     IdxSubMeas (AxisParallelTestSample params)
       (Fq params) ι :=
-  fun s => (strategy.pointMeasurement s.1).toSubMeas
+  fun s => (pointMeas s.1).toSubMeas
 
 /-- Sampled line answers in the axis-parallel lines test,
 evaluated at the base point `u`.
 The line player receives `ℓ` and returns a polynomial `f`.
 The verifier checks `f(u) = a`; since `u = ℓ.pointAt zeroCoord`,
-we evaluate `f` at `zeroCoord`. -/
+we evaluate `f` at `zeroCoord`.
+
+Parameterized by the raw axis-parallel line measurement so both
+`SymStrat` and `ProjStrat` (each prover separately) can reuse it. -/
 noncomputable def axisParallelLineAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι) :
+    (lineMeas :
+      IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι) :
     IdxSubMeas (AxisParallelTestSample params)
       (Fq params) ι :=
   fun s =>
     let ℓ : AxisParallelLine params :=
       { base := s.1, direction := s.2 }
     postprocess
-      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+      ((lineMeas ℓ).toSubMeas)
       (· zeroCoord)
 
 /-- Sampled point answers in the `j`-restricted diagonal test.
-The point player receives `u` and answers at `u`. -/
+The point player receives `u` and answers at `u`.
+
+Parameterized by the raw point measurement so both `SymStrat` and
+`ProjStrat` (each prover separately) can reuse it. -/
 noncomputable def diagonalPointAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι)
+    (pointMeas : IdxProjMeas (Point params) (Fq params) ι)
     (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j)
       (Fq params) ι :=
-  fun s => (strategy.pointMeasurement s.1).toSubMeas
+  fun s => (pointMeas s.1).toSubMeas
 
 /-- Sampled diagonal-line answers in the `j`-restricted diagonal
 test, evaluated at the base point `u`.
 Since `u = ℓ.pointAt zeroCoord`, we evaluate `f` at
-`zeroCoord`. -/
+`zeroCoord`.
+
+Parameterized by the raw diagonal-line measurement so both
+`SymStrat` and `ProjStrat` (each prover separately) can reuse it. -/
 noncomputable def diagonalLineAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι)
+    (lineMeas :
+      IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι)
     (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j)
       (Fq params) ι :=
@@ -180,14 +194,13 @@ noncomputable def diagonalLineAnswerFamily
     let ℓ : DiagonalLine params :=
       { base := s.1, direction := v }
     postprocess
-      ((strategy.diagonalMeasurement ℓ).toSubMeas)
+      ((lineMeas ℓ).toSubMeas)
       (· zeroCoord)
 
 /-- Paper-local (not necessarily symmetric) projective strategy data. -/
 structure ProjStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
-  permInvState : PermInvState state
   pointMeasurementA : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurementA :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
@@ -1061,8 +1074,8 @@ noncomputable def axisParallelFailureProbability
     (strategy : SymStrat params ι) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
-    (axisParallelPointAnswerFamily strategy)
-    (axisParallelLineAnswerFamily strategy)
+    (axisParallelPointAnswerFamily strategy.pointMeasurement)
+    (axisParallelLineAnswerFamily strategy.axisParallelMeasurement)
 
 /-- Trace-based failure surrogate for the self-consistency test.
 Uses bipartite SSC defect (cross-register overlap).
@@ -1090,8 +1103,8 @@ noncomputable def diagonalFailureProbability
       bipartiteConsError strategy.state
         (uniformDistribution
           (RestrictedDiagonalSample params j))
-        (diagonalPointAnswerFamily strategy j)
-        (diagonalLineAnswerFamily strategy j)
+        (diagonalPointAnswerFamily strategy.pointMeasurement j)
+        (diagonalLineAnswerFamily strategy.diagonalMeasurement j)
 
 /-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy.
 
@@ -1112,47 +1125,20 @@ end SymStrat
 
 namespace ProjStrat
 
-/-- View the left prover's local data as a symmetric-strategy-style package. -/
-def leftAsSymmetric {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
-    SymStrat params ι where
-  state := strategy.state
-  permInvState := strategy.permInvState
-  pointMeasurement := strategy.pointMeasurementA
-  axisParallelMeasurement := strategy.axisParallelMeasurementA
-  axisParallelReparamInvariant := strategy.axisParallelReparamInvariantA
-  diagonalMeasurement := strategy.diagonalMeasurementA
-  diagonalReparamInvariant := strategy.diagonalReparamInvariantA
-
-/-- View the right prover's local data as a symmetric-strategy-style package. -/
-def rightAsSymmetric {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
-    SymStrat params ι where
-  state := strategy.state
-  permInvState := strategy.permInvState
-  pointMeasurement := strategy.pointMeasurementB
-  axisParallelMeasurement := strategy.axisParallelMeasurementB
-  axisParallelReparamInvariant := strategy.axisParallelReparamInvariantB
-  diagonalMeasurement := strategy.diagonalMeasurementB
-  diagonalReparamInvariant := strategy.diagonalReparamInvariantB
-
 /-- Axis-parallel branch component where the left prover is queried with a line
 and the right prover is queried with the sampled base point.
 
 This is one of the two crossed role choices in the full low-individual-degree
-test. It is not the local axis-parallel failure probability of
-`strategy.leftAsSymmetric`, which would compare the left prover's point and line
-measurements against each other. -/
+test. It is not a local axis-parallel failure probability comparing a single
+prover's own point and line measurements against each other. -/
 noncomputable def axisParallelLineLeftPointRightFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
-    (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
-    (axisParallelPointAnswerFamily strategy.rightAsSymmetric)
+    (axisParallelLineAnswerFamily strategy.axisParallelMeasurementA)
+    (axisParallelPointAnswerFamily strategy.pointMeasurementB)
 
 /-- Axis-parallel branch component where the left prover is queried with the
 sampled base point and the right prover is queried with a line.
@@ -1165,8 +1151,8 @@ noncomputable def axisParallelPointLeftLineRightFailureProbability
     (strategy : ProjStrat params ι) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
-    (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
-    (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
+    (axisParallelPointAnswerFamily strategy.pointMeasurementA)
+    (axisParallelLineAnswerFamily strategy.axisParallelMeasurementB)
 
 /-- Diagonal branch component where the left prover is queried with a diagonal
 line and the right prover is queried with the sampled base point.
@@ -1182,8 +1168,8 @@ noncomputable def diagonalLineLeftPointRightFailureProbability
     ∑ j : Fin params.m,
       bipartiteConsError strategy.state
         (uniformDistribution (RestrictedDiagonalSample params j))
-        (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
-        (diagonalPointAnswerFamily strategy.rightAsSymmetric j)
+        (diagonalLineAnswerFamily strategy.diagonalMeasurementA j)
+        (diagonalPointAnswerFamily strategy.pointMeasurementB j)
 
 /-- Diagonal branch component where the left prover is queried with the sampled
 base point and the right prover is queried with a diagonal line.
@@ -1198,8 +1184,8 @@ noncomputable def diagonalPointLeftLineRightFailureProbability
     ∑ j : Fin params.m,
       bipartiteConsError strategy.state
         (uniformDistribution (RestrictedDiagonalSample params j))
-        (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
-        (diagonalLineAnswerFamily strategy.rightAsSymmetric j)
+        (diagonalPointAnswerFamily strategy.pointMeasurementA j)
+        (diagonalLineAnswerFamily strategy.diagonalMeasurementB j)
 
 /-- Cross-prover point-agreement failure probability: both provers receive the
 same uniformly sampled point and the verifier checks that their answers agree.
@@ -1282,14 +1268,14 @@ theorem tested_branch_components_le_six_mul {params : Parameters}
     simpa [axisParallelLineLeftPointRightFailureProbability, axLinePoint] using
       bipartiteConsError_nonneg strategy.state
         (uniformDistribution (AxisParallelTestSample params))
-        (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
-        (axisParallelPointAnswerFamily strategy.rightAsSymmetric)
+        (axisParallelLineAnswerFamily strategy.axisParallelMeasurementA)
+        (axisParallelPointAnswerFamily strategy.pointMeasurementB)
   have h_axPointLine_nonneg : 0 ≤ axPointLine := by
     simpa [axisParallelPointLeftLineRightFailureProbability, axPointLine] using
       bipartiteConsError_nonneg strategy.state
         (uniformDistribution (AxisParallelTestSample params))
-        (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
-        (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
+        (axisParallelPointAnswerFamily strategy.pointMeasurementA)
+        (axisParallelLineAnswerFamily strategy.axisParallelMeasurementB)
   have h_pointAgreement_nonneg : 0 ≤ pointAgreement := by
     simpa [pointAgreementFailureProbability, pointAgreement] using
       bipartiteConsError_nonneg strategy.state
@@ -1301,13 +1287,13 @@ theorem tested_branch_components_le_six_mul {params : Parameters}
         0 ≤ ∑ j : Fin params.m,
           bipartiteConsError strategy.state
             (uniformDistribution (RestrictedDiagonalSample params j))
-            (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
-            (diagonalPointAnswerFamily strategy.rightAsSymmetric j) := by
+            (diagonalLineAnswerFamily strategy.diagonalMeasurementA j)
+            (diagonalPointAnswerFamily strategy.pointMeasurementB j) := by
       exact Finset.sum_nonneg fun j _ =>
         bipartiteConsError_nonneg strategy.state
           (uniformDistribution (RestrictedDiagonalSample params j))
-          (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
-          (diagonalPointAnswerFamily strategy.rightAsSymmetric j)
+          (diagonalLineAnswerFamily strategy.diagonalMeasurementA j)
+          (diagonalPointAnswerFamily strategy.pointMeasurementB j)
     simpa [diagonalLineLeftPointRightFailureProbability, diagLinePoint] using
       mul_nonneg (by positivity : 0 ≤ (1 / (params.m : Error))) hsum
   have h_diagPointLine_nonneg : 0 ≤ diagPointLine := by
@@ -1315,13 +1301,13 @@ theorem tested_branch_components_le_six_mul {params : Parameters}
         0 ≤ ∑ j : Fin params.m,
           bipartiteConsError strategy.state
             (uniformDistribution (RestrictedDiagonalSample params j))
-            (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
-            (diagonalLineAnswerFamily strategy.rightAsSymmetric j) := by
+            (diagonalPointAnswerFamily strategy.pointMeasurementA j)
+            (diagonalLineAnswerFamily strategy.diagonalMeasurementB j) := by
       exact Finset.sum_nonneg fun j _ =>
         bipartiteConsError_nonneg strategy.state
           (uniformDistribution (RestrictedDiagonalSample params j))
-          (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
-          (diagonalLineAnswerFamily strategy.rightAsSymmetric j)
+          (diagonalPointAnswerFamily strategy.pointMeasurementA j)
+          (diagonalLineAnswerFamily strategy.diagonalMeasurementB j)
     simpa [diagonalPointLeftLineRightFailureProbability, diagPointLine] using
       mul_nonneg (by positivity : 0 ≤ (1 / (params.m : Error))) hsum
   constructor
