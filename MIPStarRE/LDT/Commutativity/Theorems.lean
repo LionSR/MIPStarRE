@@ -4724,6 +4724,169 @@ private lemma zero_to_fullSliceProductRight_le_one
           (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
             simp [avgOver]
     _ ≤ 1 := uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
+/-- Full-slice ABA scalar average: `E_{x,y} ∑_{g,h} ⟨ψ| G^x_g G^y_h G^x_g ⊗ I |ψ⟩`.
+
+Full-polynomial analog of the evaluated `evaluatedSliceABATerm` (line 664);
+obtained from it by replacing the evaluated outcomes `a,b` with polynomial
+outcomes `g,h` summed over `FullSliceOutcome`. -/
+private noncomputable def fullSliceABAAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (FullSliceQuestion params))
+    (fun xy =>
+      ∑ gh : FullSliceOutcome params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            ((family.meas xy.1).toSubMeas.outcome gh.1 *
+              (family.meas xy.2).toSubMeas.outcome gh.2 *
+              (family.meas xy.1).toSubMeas.outcome gh.1)))
+
+/-- Full-slice ABAB scalar average:
+`E_{x,y} ∑_{g,h} ⟨ψ| G^x_g G^y_h G^x_g G^y_h ⊗ I |ψ⟩`. -/
+private noncomputable def fullSliceABABAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (FullSliceQuestion params))
+    (fun xy =>
+      ∑ gh : FullSliceOutcome params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            ((family.meas xy.1).toSubMeas.outcome gh.1 *
+              (family.meas xy.2).toSubMeas.outcome gh.2 *
+              (family.meas xy.1).toSubMeas.outcome gh.1 *
+              (family.meas xy.2).toSubMeas.outcome gh.2)))
+
+/-- Evaluated-slice ABA scalar average:
+`E_{u,v,x,y} ∑_{a,b} ⟨ψ| G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a] ⊗ I |ψ⟩`.
+
+Averaged analog of `evaluatedSliceABATerm` (line 664) over the full slice
+question. -/
+private noncomputable def evaluatedSliceABAAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+    (fun q =>
+      ∑ ab : EvaluatedSliceOutcome params,
+        evaluatedSliceABATerm params strategy family q ab)
+
+/-- Evaluated-slice ABAB scalar average:
+`E_{u,v,x,y} ∑_{a,b} ⟨ψ| G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a] G^y_[h(v)=b] ⊗ I |ψ⟩`. -/
+private noncomputable def evaluatedSliceABABAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+    (fun q =>
+      ∑ ab : EvaluatedSliceOutcome params,
+        evaluatedSliceABABTerm params strategy family q ab)
+
+/-- Paper `lem:normalization-condition` (`commutativity-G.tex` line 309).
+
+For a sub-measurement `P` and projective sub-measurement `Q`, the sandwiched
+family `C_{a,b} = Q_b · P_a · Q_b` satisfies the `closenessOfIP` normalization
+condition `∑_a (∑_b C_{a,b}) (∑_b C_{a,b})ᴴ ≤ I`.
+
+TODO(#361): the paper proof (lines 319-328) expands the outer product, uses
+projectivity of `Q` to collapse `b ≠ b'` off-diagonals, then `Q_b ≤ I` and the
+sub-measurement property of `P` and `Q`. -/
+private lemma normalizationCondition_sandwich_bound
+    {α β : Type*} [Fintype α] [Fintype β]
+    (P : SubMeas α ι) (Q : ProjSubMeas β ι) :
+    ∑ a : α,
+        (∑ b : β, Q.outcome b * P.outcome a * Q.outcome b) *
+          (∑ b : β, Q.outcome b * P.outcome a * Q.outcome b)ᴴ ≤ 1 := by
+  sorry
+
+/-- Paper `eq:gcomterms` (`commutativity-G.tex` lines 286-290).
+
+Full-slice analog of `evaluatedSliceCommutation_qSDDOp_avg_eq` (line 878): the
+pulled-back `sddErrorOp` on the full-slice product equals `2·(ABAAvg − ABABAvg)`
+after using projectivity and the `(x,g) ↔ (y,h)` symmetry to collapse
+`BAB + ABA − BABA − ABAB` into the two surviving scalar quartic terms.
+
+TODO(#361): mirror the proof of `evaluatedSliceCommutation_qSDDOp_avg_eq` at
+the full-polynomial level.  Relies on `sddErrorOp_pullback_fullSliceQuestion_eq`
+to descend from `EvaluatedSliceQuestion` to `FullSliceQuestion`. -/
+private lemma fullSliceCommutation_qSDDOp_avg_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    sddErrorOp strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => fullSliceProductLeft params strategy family
+          (fullSliceQuestionOfEvaluatedSlice params q))
+        (fun q => fullSliceProductRight params strategy family
+          (fullSliceQuestionOfEvaluatedSlice params q)) =
+      2 * (fullSliceABAAvg params strategy family -
+        fullSliceABABAvg params strategy family) := by
+  sorry
+
+/-- Paper `eq:evaluate-gcom-at-points` / `eq:gcom4-diff`
+(`commutativity-G.tex` lines 339-354).
+
+Schwartz-Zippel marginalization on the `x` variable: replacing the full
+polynomial sum `∑_g G^x_g` by the point-evaluated sum `E_u ∑_a G^x_[g(u)=a]`
+inside the ABA term costs at most `params.m · params.d / params.q`.
+
+TODO(#361): apply `schwartzZippel_individualDegree` from
+`MIPStarRE/LDT/Preliminaries/Polynomials.lean` to the polynomial-agreement
+collision term `1[g(u) = g'(u)]`, then bound the off-diagonal fiber sum using
+the sub-measurement property of `G^x`. -/
+private lemma fullSlice_scalar_marginalize_x
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    |fullSliceABAAvg params strategy family -
+        evaluatedSliceABAAvg params strategy family| ≤
+      (↑params.m : Error) * ↑params.d / ↑params.q := by
+  sorry
+
+/-- Paper `eq:eq:don't-understand-the-numbering-system-diff`
+(`commutativity-G.tex` lines 369-385).
+
+Schwartz-Zippel marginalization on the `y` variable: replacing the full
+polynomial sum `∑_h G^y_h` by the point-evaluated sum `E_v ∑_b G^y_[h(v)=b]`
+inside the ABAB term costs at most `params.m · params.d / params.q`.  Symmetric
+in structure to `fullSlice_scalar_marginalize_x`. -/
+private lemma fullSlice_scalar_marginalize_y
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    |fullSliceABABAvg params strategy family -
+        evaluatedSliceABABAvg params strategy family| ≤
+      (↑params.m : Error) * ↑params.d / ↑params.q := by
+  sorry
+
+/-- Combined `closenessOfIP` chain on the evaluated side
+(`commutativity-G.tex` lines 301, 334, 359-360, 394, 396).
+
+Using `hEval` together with the six `closenessOfIP` steps in the paper:
+two on the ABA side (line 301: `2√ζ`) and four on the ABAB side
+(line 334: `√ζ`, lines 359-360: `2√ζ`, line 396: `√ζ`), plus the final
+`closenessOfIP` with `hEval` as the `A≈B` input (line 394: `√ν_evaluation`),
+the evaluated-slice scalar commutator is bounded by
+`6√ζ + √(commDataProcessedGError)`.
+
+The `hEval` hypothesis is bound into the fourth step via
+`fullSlice_closenessOfIP_CAB_hEval` inputs; the first six steps use
+`item:commuting-self-consistency` from `_hself`.
+
+TODO(#361): invoke `closenessOfIP` (`Preliminaries/CauchySchwarz.lean:342`) six
+times, each with `normalizationCondition_sandwich_bound` discharging the `C`
+normalization condition, and chain the `√ζ` / `√ν` contributions. -/
+private lemma fullSlice_closenessOfIP_CAB_hEval
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (_hgamma_nonneg : 0 ≤ gamma) (_hzeta_nonneg : 0 ≤ zeta)
+    (_hself : family.StronglySelfConsistent strategy.state zeta)
+    (_hEval :
+      SDDOpRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedFromFullSliceProductLeft params strategy family)
+        (evaluatedFromFullSliceProductRight params strategy family)
+        (commDataProcessedGError params gamma zeta)) :
+    |evaluatedSliceABAAvg params strategy family -
+        evaluatedSliceABABAvg params strategy family| ≤
+      6 * Real.sqrt zeta +
+        Real.sqrt (commDataProcessedGError params gamma zeta) := by
+  sorry
 
 -- Heavy sqrt/rpow arithmetic in hArith step.
 set_option maxHeartbeats 800000 in
@@ -4808,47 +4971,132 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
           4 * (↑params.m * ↑params.d / ↑params.q) +
           2 * Real.sqrt
             (commDataProcessedGError params gamma zeta) := by
-      /-
-      TODO(#361): this is the remaining paper-faithful transport from
-      polynomial-indexed full slice outcomes to their sampled evaluation
-      postprocessings (`commutativity-G.tex`, lines 278-408).
-
-      The existing file has the ingredients for the evaluated commutator:
-      `evaluatedSliceCommutation_qSDDOp_avg_eq`, the self-consistency
-      pullbacks, `closenessOfIP`, and `normalizationCondition`.  What is still
-      missing is the analogous infrastructure for the full polynomial outcomes:
-
-      1. A full-slice version of `evaluatedSliceCommutation_qSDDOp_avg_eq`,
-         expanding the pulled-back `qSDDOp` into the two scalar quartic terms
-         `E_{x,y} ∑_{g,h} <G^x_g G^y_h G^x_g>` and
-         `E_{x,y} ∑_{g,h} <G^x_g G^y_h G^x_g G^y_h>`.
-
-      2. Two Schwartz-Zippel marginalization lemmas in scalar form:
-         replacing `∑_g G^x_g` by `E_u ∑_a G^x_[g(u)=a]`, and then
-         replacing `∑_h G^y_h` by `E_v ∑_b G^y_[h(v)=b]`, each with loss
-         `params.m * params.d / params.q`.  These need to bridge
-         `Polynomial params` to `Preliminaries.polyFunc` so that
-         `schwartzZippel_individualDegree` applies, and they need positivity
-         lemmas showing the off-diagonal collision terms are bounded by the
-         submeasurement mass.
-
-      3. Packaged `closenessOfIP` applications for the intermediate scalar
-         terms, using `family.StronglySelfConsistent` after postprocessing by
-         point evaluation.  The normalization side conditions should be closed
-         by the existing `normalizationCondition` / projective-postprocess
-         lemmas, but there is no current lemma exposing exactly the
-         `C q a b` families used in lines 332-367 of the paper.
-
-      4. A final `closenessOfIP` specialization of `hEval` to the evaluated
-         ABAB scalar term (paper lines 391-405), yielding the
-         `sqrt (commDataProcessedGError params gamma zeta)` contribution.
-
-      Once those four scalar lemmas are available, the final estimate is just
-      the paper bookkeeping:
-      `2 * (2√ζ + 2(md/q) + √ν + 4√ζ) =
-       12√ζ + 4(md/q) + 2√ν`.
-      -/
-      sorry
+      -- Compose the four scalar lemmas.  Paper chain:
+      -- * `fullSliceCommutation_qSDDOp_avg_eq` rewrites the pulled-back
+      --   `sddErrorOp` as `2 · (fullABA − fullABAB)` (paper lines 286-290).
+      -- * Triangle on the real line:
+      --     `|fullABA − fullABAB|
+      --        ≤ |fullABA − evalABA| + |evalABA − evalABAB|
+      --          + |evalABAB − fullABAB|`
+      -- * `fullSlice_scalar_marginalize_x`: `|fullABA − evalABA| ≤ md/q`
+      --   (paper line 342).
+      -- * `fullSlice_scalar_marginalize_y`: `|fullABAB − evalABAB| ≤ md/q`
+      --   (paper line 373).
+      -- * `fullSlice_closenessOfIP_CAB_hEval`: using `hEval` and the six
+      --   `closenessOfIP` steps on the evaluated side,
+      --   `|evalABA − evalABAB| ≤ 6√ζ + √ν` (paper lines 301, 334, 359-360,
+      --   394, 396).
+      -- Summing gives `|fullABA − fullABAB| ≤ 6√ζ + 2(md/q) + √ν`,
+      -- and multiplying by `2` produces `12√ζ + 4(md/q) + 2√ν`.
+      have hExpand :=
+        fullSliceCommutation_qSDDOp_avg_eq params strategy family
+      have hMargX :=
+        fullSlice_scalar_marginalize_x params strategy family
+      have hMargY :=
+        fullSlice_scalar_marginalize_y params strategy family
+      have hClose :=
+        fullSlice_closenessOfIP_CAB_hEval params strategy family gamma zeta
+          hgamma_nonneg hzeta_nonneg _hself hEval
+      -- Triangle inequality on the three intermediate quantities.
+      have hTri :
+          |fullSliceABAAvg params strategy family -
+              fullSliceABABAvg params strategy family| ≤
+            |fullSliceABAAvg params strategy family -
+                evaluatedSliceABAAvg params strategy family| +
+              |evaluatedSliceABAAvg params strategy family -
+                  evaluatedSliceABABAvg params strategy family| +
+              |evaluatedSliceABABAvg params strategy family -
+                  fullSliceABABAvg params strategy family| := by
+        have h1 :
+            fullSliceABAAvg params strategy family -
+                fullSliceABABAvg params strategy family =
+              (fullSliceABAAvg params strategy family -
+                  evaluatedSliceABAAvg params strategy family) +
+                (evaluatedSliceABAAvg params strategy family -
+                    evaluatedSliceABABAvg params strategy family) +
+                (evaluatedSliceABABAvg params strategy family -
+                    fullSliceABABAvg params strategy family) := by
+          ring
+        calc
+          |fullSliceABAAvg params strategy family -
+              fullSliceABABAvg params strategy family|
+            = |(fullSliceABAAvg params strategy family -
+                  evaluatedSliceABAAvg params strategy family) +
+                (evaluatedSliceABAAvg params strategy family -
+                    evaluatedSliceABABAvg params strategy family) +
+                (evaluatedSliceABABAvg params strategy family -
+                    fullSliceABABAvg params strategy family)| := by
+                  rw [h1]
+          _ ≤ |(fullSliceABAAvg params strategy family -
+                  evaluatedSliceABAAvg params strategy family) +
+                (evaluatedSliceABAAvg params strategy family -
+                    evaluatedSliceABABAvg params strategy family)| +
+                |evaluatedSliceABABAvg params strategy family -
+                    fullSliceABABAvg params strategy family| :=
+                abs_add _ _
+          _ ≤ (|fullSliceABAAvg params strategy family -
+                    evaluatedSliceABAAvg params strategy family| +
+                  |evaluatedSliceABAAvg params strategy family -
+                      evaluatedSliceABABAvg params strategy family|) +
+                |evaluatedSliceABABAvg params strategy family -
+                    fullSliceABABAvg params strategy family| := by
+                gcongr
+                exact abs_add _ _
+      -- Symmetry of `abs`: `|evalABAB - fullABAB| = |fullABAB - evalABAB|`.
+      have hMargY' :
+          |evaluatedSliceABABAvg params strategy family -
+              fullSliceABABAvg params strategy family| ≤
+            (↑params.m : Error) * ↑params.d / ↑params.q := by
+        rw [abs_sub_comm]
+        exact hMargY
+      -- `sddErrorOp = 2 · (fullABA − fullABAB) ≤ 2 · |fullABA − fullABAB|`.
+      have hTwoAbs :
+          sddErrorOp strategy.state
+            (uniformDistribution (EvaluatedSliceQuestion params))
+            (fun q => fullSliceProductLeft params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q))
+            (fun q => fullSliceProductRight params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q)) ≤
+          2 *
+            |fullSliceABAAvg params strategy family -
+                fullSliceABABAvg params strategy family| := by
+        rw [hExpand]
+        have := le_abs_self
+          (fullSliceABAAvg params strategy family -
+            fullSliceABABAvg params strategy family)
+        linarith
+      calc
+        sddErrorOp strategy.state
+            (uniformDistribution (EvaluatedSliceQuestion params))
+            (fun q => fullSliceProductLeft params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q))
+            (fun q => fullSliceProductRight params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q))
+          ≤ 2 *
+              |fullSliceABAAvg params strategy family -
+                  fullSliceABABAvg params strategy family| := hTwoAbs
+        _ ≤ 2 *
+              (|fullSliceABAAvg params strategy family -
+                    evaluatedSliceABAAvg params strategy family| +
+                |evaluatedSliceABAAvg params strategy family -
+                    evaluatedSliceABABAvg params strategy family| +
+                |evaluatedSliceABABAvg params strategy family -
+                    fullSliceABABAvg params strategy family|) := by
+              linarith [hTri]
+        _ ≤ 2 *
+              (((↑params.m : Error) * ↑params.d / ↑params.q) +
+                (6 * Real.sqrt zeta +
+                  Real.sqrt
+                    (commDataProcessedGError params gamma zeta)) +
+                ((↑params.m : Error) * ↑params.d / ↑params.q)) := by
+              have := abs_nonneg
+                (fullSliceABAAvg params strategy family -
+                  fullSliceABABAvg params strategy family)
+              linarith [hMargX, hMargY', hClose]
+        _ = 12 * Real.sqrt zeta +
+              4 * (↑params.m * ↑params.d / ↑params.q) +
+              2 * Real.sqrt
+                (commDataProcessedGError params gamma zeta) := by ring
     -- Step 2: Error arithmetic (using small-parameter hypotheses).
     -- Show:
     --   12√ζ + 4md/q + 2√(48m(√γ + √ζ))
