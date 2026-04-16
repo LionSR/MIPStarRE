@@ -1,7 +1,6 @@
 MIPStarRE.LDT.Test.razSafra
 MIPStarRE.LDT.Test.classicalTestSoundness
-MIPStarRE.LDT.Test.classicalTestSoundness
-MIPStarRE.LDT.Test.TwoProverClassicalLIDBridgePackage
+MIPStarRE.LDT.Test.classicalTestSoundnessWithPlaceholderBound
 MIPStarRE.LDT.Test.mainInformal
 MIPStarRE.LDT.Role
 MIPStarRE.LDT.Role.other
@@ -23,9 +22,6 @@ MIPStarRE.LDT.Preliminaries.schwartzZippel_individualDegree
 MIPStarRE.LDT.SubMeas
 MIPStarRE.LDT.Measurement
 MIPStarRE.LDT.ProjSubMeas
-MIPStarRE.LDT.SubMeas
-MIPStarRE.LDT.Measurement
-MIPStarRE.LDT.Polynomial
 MIPStarRE.LDT.postprocess
 MIPStarRE.LDT.Preliminaries.postprocessPreservesMeasurements
 MIPStarRE.LDT.Preliminaries.completeAtOutcome
@@ -56,7 +52,6 @@ MIPStarRE.LDT.Preliminaries.selfConsistencyImpliesDataProcessing
 MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass
 MIPStarRE.LDT.Preliminaries.completionMissingMassBound
 MIPStarRE.LDT.Preliminaries.completingToMeasurement
-MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass
 MIPStarRE.LDT.MakingMeasurementsProjective.naimark
 MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
 MIPStarRE.LDT.MakingMeasurementsProjective.oneMeasNaimark
@@ -82,12 +77,9 @@ MIPStarRE.LDT.MakingMeasurementsProjective.pProjectivity
 MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox
 MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord
 MIPStarRE.LDT.ExpansionHypercubeGraph.IsHypercubeEdge
-MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord
 MIPStarRE.LDT.ExpansionHypercubeGraph.adjacency
 MIPStarRE.LDT.ExpansionHypercubeGraph.laplacian
 MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianRewrite
-MIPStarRE.LDT.Preliminaries.fourier_fact_scalar
-MIPStarRE.LDT.Preliminaries.fourier_fact_vector
 MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors
 MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGap
 MIPStarRE.LDT.ExpansionHypercubeGraph.localAndVariance
@@ -103,8 +95,10 @@ MIPStarRE.LDT.SelfImprovement.addInU
 MIPStarRE.LDT.SelfImprovement.selfImprovement
 MIPStarRE.LDT.CommutativityPoints.commutativityPoints
 MIPStarRE.LDT.Commutativity.commDataProcessedG
-MIPStarRE.LDT.Commutativity.gCommStability
-MIPStarRE.LDT.Commutativity.gCommStabilityTwo
+MIPStarRE.LDT.Commutativity.gCommStability_storedBoundedResidualBound
+MIPStarRE.LDT.Commutativity.gCommStability_averagedPoint_le_witness
+MIPStarRE.LDT.Commutativity.gCommStability_overlap
+MIPStarRE.LDT.Commutativity.gCommStabilityTwo_overlap
 MIPStarRE.LDT.Commutativity.normalizationCondition
 MIPStarRE.LDT.Commutativity.comMain
 MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection
@@ -149,5 +143,5 @@ MIPStarRE.LDT.MainInductionStep.xRestrictedStrategy
 MIPStarRE.LDT.MainInductionStep.RestrictedSymStrat
 MIPStarRE.LDT.MainInductionStep.restrictedProbabilities
 MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
-MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection
 MIPStarRE.LDT.MainInductionStep.mainInduction
+MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
