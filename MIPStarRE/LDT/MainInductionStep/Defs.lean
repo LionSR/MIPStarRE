@@ -42,7 +42,7 @@ structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
   axisParallelMeasurement :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
   axisParallelReparamInvariant :
-    AxisParallelEvaluationReparamInvariant params axisParallelMeasurement
+    MIPStarRE.LDT.AxisParallelEvaluationReparamInvariant params axisParallelMeasurement
   diagonalMeasurement :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params.next) ι
 
@@ -234,15 +234,8 @@ private theorem restrictAxisParallelMeasurement_postprocess_eval
                   if g t = a then lifted.toSubMeas.outcome g else 0)
                 (by
                   intro f
-                  change (if f t = a then
-                      lifted.toSubMeas.outcome (liftAxisAnswer params x f)
-                    else
-                      0) =
-                    if (liftAxisAnswer params x f) t = a then
-                      lifted.toSubMeas.outcome (liftAxisAnswer params x f)
-                    else
-                      0
-                  simp [liftAxisAnswer]))
+                  simp [axisLinePolynomialEquiv, liftAxisAnswer,
+                    AxisLinePolynomial.appendAtHeight_apply]))
     _ = (postprocess (lifted.toSubMeas) (fun f => f t)).outcome a := by
           simp [postprocess, lifted, Finset.sum_filter]
           apply Finset.sum_congr rfl
@@ -252,7 +245,7 @@ private theorem restrictAxisParallelMeasurement_postprocess_eval
 private theorem restrictAxisParallelMeasurement_reparamInvariant
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
-    AxisParallelEvaluationReparamInvariant params
+    MIPStarRE.LDT.AxisParallelEvaluationReparamInvariant params
       (restrictAxisParallelMeasurement params strategy x) := by
   intro ℓ t a
   calc

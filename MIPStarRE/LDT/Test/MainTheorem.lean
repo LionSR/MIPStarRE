@@ -224,36 +224,6 @@ theorem mainFormalBridgePackage
   -- load-bearing for `mainFormal`, which invokes this producer below.
   sorry
 
-/-- `thm:main-informal`.
-
-This overview wrapper packages the formal theorem with an existential choice of
-the auxiliary interpolation parameter `k`. -/
-theorem mainInformal
-    (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι)
-    (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    ∃ k : ℕ, params.m * params.d ≤ k ∧
-      ∃ G_A G_B : ProjMeas (Polynomial params) ι,
-        ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-            (polynomialEvaluationFamily params G_B.toSubMeas)
-            (mainFormalError params k eps) ∧
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (polynomialEvaluationFamily params G_A.toSubMeas)
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-            (mainFormalError params k eps) ∧
-          ConsRel strategy.state (uniformDistribution Unit)
-            (constSubMeasFamily G_A.toSubMeas)
-            (constSubMeasFamily G_B.toSubMeas)
-            (mainFormalError params k eps) := by
-  /-
-  Paper reference: `blueprint/src/chapter/ch01_overview.tex`, `thm:main-informal`.
-  This is the high-level existential form of `mainFormal`, leaving the choice of
-  `k` abstract.
-  -/
-  sorry
-
 /--
 `thm:main-formal` from `test_definition.tex`.
 
@@ -268,9 +238,11 @@ theorem mainFormal
     (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι)
     (eps : Error)
+    (hd : 0 < params.d)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : params.m * params.d ≤ k) :
+    (hk : params.m * params.d ≤ k)
+    (hk0 : 0 < k) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -285,6 +257,34 @@ theorem mainFormal
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
   exact (mainFormalBridgePackage params strategy eps hpass k hk).witness
+
+/-- `thm:main-informal`.
+
+This overview wrapper packages the formal theorem with an existential choice of
+the auxiliary interpolation parameter `k`. -/
+theorem mainInformal
+    (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι)
+    (eps : Error)
+    (hd : 0 < params.d)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    ∃ k : ℕ, 0 < k ∧ params.m * params.d ≤ k ∧
+      ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+        ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+            (polynomialEvaluationFamily params G_B.toSubMeas)
+            (mainFormalError params k eps) ∧
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (polynomialEvaluationFamily params G_A.toSubMeas)
+            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+            (mainFormalError params k eps) ∧
+          ConsRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily G_A.toSubMeas)
+            (constSubMeasFamily G_B.toSubMeas)
+            (mainFormalError params k eps) := by
+  refine ⟨params.m * params.d, Nat.mul_pos params.hm hd, le_rfl, ?_⟩
+  simpa using mainFormal params strategy eps hd hpass (params.m * params.d)
+    le_rfl (Nat.mul_pos params.hm hd)
 
 end Test
 

@@ -166,6 +166,10 @@ def subCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq 
 def mulCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x * decodeScalar y)
 
+/-- Coordinate inversion transported through the `Fin q` coding. -/
+def invCoord {params : Parameters} [FieldModel params.q] (x : Fq params) : Fq params :=
+  encodeScalar ((decodeScalar x)⁻¹)
+
 /-- Pointwise addition in the coded ambient space. -/
 def addPoint {params : Parameters} [FieldModel params.q] (u v : Point params) : Point params :=
   fun i => addCoord (u i) (v i)
@@ -174,6 +178,10 @@ def addPoint {params : Parameters} [FieldModel params.q] (u v : Point params) : 
 def smulPoint {params : Parameters} [FieldModel params.q] (t : Fq params) (u : Point params) :
     Point params :=
   fun i => mulCoord t (u i)
+
+/-- The zero point in `F_q^m`. -/
+def zeroPoint {params : Parameters} [FieldModel params.q] : Point params :=
+  fun _ => zeroCoord
 
 /-- The inclusion of the first `m` coordinates into `m + 1` coordinates. -/
 def embedCoord (params : Parameters) : Fin params.m → Fin params.next.m :=
@@ -237,6 +245,21 @@ def pointAt {params : Parameters} [FieldModel params.q]
       addCoord (ℓ.base i) t
     else
       ℓ.base i
+
+/-- Canonical geometric axis-parallel line through `u` in direction `i`.
+
+The representative stores zero in the moving coordinate, so all points on the
+same geometric line map to the same `AxisParallelLine`. -/
+def throughPoint {params : Parameters} [FieldModel params.q]
+    (u : Point params) (i : Fin params.m) : AxisParallelLine params where
+  base := fun j => if j = i then zeroCoord else u j
+  direction := i
+
+/-- Affine parameter of the sampled point on the canonical axis-parallel line
+through `u` in direction `i`. -/
+def sampleParameter {params : Parameters} [FieldModel params.q]
+    (u : Point params) (i : Fin params.m) : Fq params :=
+  u i
 
 /-- Rebase an axis-parallel line so that the old point `ℓ.pointAt t` becomes the new base point. -/
 def rebaseAt {params : Parameters} [FieldModel params.q]
@@ -320,6 +343,78 @@ namespace DiagonalLine
 def pointAt {params : Parameters} [FieldModel params.q]
     (ℓ : DiagonalLine params) : Fq params → Point params :=
   fun t => addPoint ℓ.base (smulPoint t ℓ.direction)
+
+/-- The support of the nonzero coordinates of a direction vector. -/
+noncomputable def nonzeroDirectionSupport {params : Parameters} [FieldModel params.q]
+    (v : Point params) : Finset (Fin params.m) :=
+  Finset.univ.filter fun i => v i ≠ zeroCoord
+
+/-- The least nonzero coordinate of a direction vector, when one exists. -/
+noncomputable def firstNonzeroCoord? {params : Parameters} [FieldModel params.q]
+    (v : Point params) : Option (Fin params.m) :=
+  open Classical in
+  let s := nonzeroDirectionSupport (params := params) v
+  if hs : s.Nonempty then some (s.min' hs) else none
+
+/-- Normalize a direction vector so its first nonzero coordinate becomes `1`. -/
+noncomputable def normalizeDirection {params : Parameters} [FieldModel params.q]
+    (v : Point params) : Point params :=
+  open Classical in
+  match firstNonzeroCoord? (params := params) v with
+    | none => zeroPoint
+    | some i => smulPoint (invCoord (v i)) v
+
+/-- Canonical geometric diagonal line through `u` in direction `v`.
+
+For nonzero `v`, we normalize by the first nonzero coordinate and shift the
+base point so that this pivot coordinate is `0`. The degenerate `v = 0` case is
+kept as the singleton line through `u`. -/
+noncomputable def throughPointDirection {params : Parameters} [FieldModel params.q]
+    (u v : Point params) : DiagonalLine params :=
+  open Classical in
+  match firstNonzeroCoord? (params := params) v with
+    | none => { base := u, direction := zeroPoint }
+    | some i =>
+        let w := normalizeDirection (params := params) v
+        let t := u i
+        { base := fun j => subCoord (u j) (mulCoord t (w j))
+          direction := w }
+
+/-- Affine parameter of the sampled point on the canonical diagonal line through
+`u` in direction `v`. -/
+noncomputable def sampleParameter {params : Parameters} [FieldModel params.q]
+    (u v : Point params) : Fq params :=
+  open Classical in
+  match firstNonzeroCoord? (params := params) v with
+    | none => zeroCoord
+    | some i => u i
+
+@[simp] theorem throughPoint_pointAt_sampleParameter {params : Parameters}
+    [FieldModel params.q] (u : Point params) (i : Fin params.m) :
+    (AxisParallelLine.throughPoint (params := params) u i).pointAt
+        (AxisParallelLine.sampleParameter (params := params) u i) = u := by
+  funext j
+  by_cases h : j = i
+  · subst h
+    unfold AxisParallelLine.pointAt AxisParallelLine.throughPoint
+    simp [AxisParallelLine.sampleParameter, addCoord, zeroCoord]
+  · simp [AxisParallelLine.throughPoint, AxisParallelLine.sampleParameter,
+      AxisParallelLine.pointAt, h]
+
+@[simp] theorem throughPointDirection_pointAt_sampleParameter {params : Parameters}
+    [FieldModel params.q] (u v : Point params) :
+    (DiagonalLine.throughPointDirection (params := params) u v).pointAt
+        (DiagonalLine.sampleParameter (params := params) u v) = u := by
+  classical
+  unfold DiagonalLine.throughPointDirection DiagonalLine.sampleParameter
+  split
+  · funext j
+    simp [DiagonalLine.pointAt, addPoint, smulPoint, zeroPoint,
+      zeroCoord, addCoord, mulCoord]
+  · rename_i i
+    funext j
+    simp [DiagonalLine.pointAt, addPoint, smulPoint, subCoord, addCoord, mulCoord]
+    repeat rw [decode_encodeScalar]
 
 /-- Rebase a diagonal line so that the old point `ℓ.pointAt t` becomes the new base point. -/
 def rebaseAt {params : Parameters} [FieldModel params.q]

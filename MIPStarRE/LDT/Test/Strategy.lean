@@ -126,66 +126,52 @@ instance restrictedDiagonalSampleNonempty (params : Parameters) (j : Fin params.
 
 /-- Sampled point answers in the axis-parallel lines test.
 The point player receives `u` (the base point) and answers with
-their point measurement at `u`.
-
-Parameterized by the raw point measurement so both `SymStrat` and
-`ProjStrat` (each prover separately) can reuse it. -/
+their measurement at `u`. -/
 noncomputable def axisParallelPointAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (pointMeas : IdxProjMeas (Point params) (Fq params) ι) :
+    (strategy : SymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params)
       (Fq params) ι :=
-  fun s => (pointMeas s.1).toSubMeas
+  fun s => (strategy.pointMeasurement s.1).toSubMeas
 
 /-- Sampled line answers in the axis-parallel lines test,
 evaluated at the base point `u`.
 The line player receives `ℓ` and returns a polynomial `f`.
 The verifier checks `f(u) = a`; since `u = ℓ.pointAt zeroCoord`,
-we evaluate `f` at `zeroCoord`.
-
-Parameterized by the raw axis-parallel line measurement so both
-`SymStrat` and `ProjStrat` (each prover separately) can reuse it. -/
+we evaluate `f` at `zeroCoord`. -/
 noncomputable def axisParallelLineAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (lineMeas :
-      IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι) :
+    (strategy : SymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params)
       (Fq params) ι :=
   fun s =>
     let ℓ : AxisParallelLine params :=
       { base := s.1, direction := s.2 }
     postprocess
-      ((lineMeas ℓ).toSubMeas)
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
       (· zeroCoord)
 
 /-- Sampled point answers in the `j`-restricted diagonal test.
-The point player receives `u` and answers at `u`.
-
-Parameterized by the raw point measurement so both `SymStrat` and
-`ProjStrat` (each prover separately) can reuse it. -/
+The point player receives `u` and answers at `u`. -/
 noncomputable def diagonalPointAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (pointMeas : IdxProjMeas (Point params) (Fq params) ι)
+    (strategy : SymStrat params ι)
     (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j)
       (Fq params) ι :=
-  fun s => (pointMeas s.1).toSubMeas
+  fun s => (strategy.pointMeasurement s.1).toSubMeas
 
 /-- Sampled diagonal-line answers in the `j`-restricted diagonal
 test, evaluated at the base point `u`.
 Since `u = ℓ.pointAt zeroCoord`, we evaluate `f` at
-`zeroCoord`.
-
-Parameterized by the raw diagonal-line measurement so both
-`SymStrat` and `ProjStrat` (each prover separately) can reuse it. -/
+`zeroCoord`. -/
 noncomputable def diagonalLineAnswerFamily
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (lineMeas :
-      IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι)
+    (strategy : SymStrat params ι)
     (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j)
       (Fq params) ι :=
@@ -194,13 +180,14 @@ noncomputable def diagonalLineAnswerFamily
     let ℓ : DiagonalLine params :=
       { base := s.1, direction := v }
     postprocess
-      ((lineMeas ℓ).toSubMeas)
+      ((strategy.diagonalMeasurement ℓ).toSubMeas)
       (· zeroCoord)
 
 /-- Paper-local (not necessarily symmetric) projective strategy data. -/
 structure ProjStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
+  permInvState : PermInvState state
   pointMeasurementA : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurementA :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
@@ -1074,8 +1061,8 @@ noncomputable def axisParallelFailureProbability
     (strategy : SymStrat params ι) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
-    (axisParallelPointAnswerFamily strategy.pointMeasurement)
-    (axisParallelLineAnswerFamily strategy.axisParallelMeasurement)
+    (axisParallelPointAnswerFamily strategy)
+    (axisParallelLineAnswerFamily strategy)
 
 /-- Trace-based failure surrogate for the self-consistency test.
 Uses bipartite SSC defect (cross-register overlap).
@@ -1103,8 +1090,8 @@ noncomputable def diagonalFailureProbability
       bipartiteConsError strategy.state
         (uniformDistribution
           (RestrictedDiagonalSample params j))
-        (diagonalPointAnswerFamily strategy.pointMeasurement j)
-        (diagonalLineAnswerFamily strategy.diagonalMeasurement j)
+        (diagonalPointAnswerFamily strategy j)
+        (diagonalLineAnswerFamily strategy j)
 
 /-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy.
 
@@ -1125,20 +1112,47 @@ end SymStrat
 
 namespace ProjStrat
 
+/-- View the left prover's local data as a symmetric-strategy-style package. -/
+def leftAsSymmetric {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    SymStrat params ι where
+  state := strategy.state
+  permInvState := strategy.permInvState
+  pointMeasurement := strategy.pointMeasurementA
+  axisParallelMeasurement := strategy.axisParallelMeasurementA
+  axisParallelReparamInvariant := strategy.axisParallelReparamInvariantA
+  diagonalMeasurement := strategy.diagonalMeasurementA
+  diagonalReparamInvariant := strategy.diagonalReparamInvariantA
+
+/-- View the right prover's local data as a symmetric-strategy-style package. -/
+def rightAsSymmetric {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    SymStrat params ι where
+  state := strategy.state
+  permInvState := strategy.permInvState
+  pointMeasurement := strategy.pointMeasurementB
+  axisParallelMeasurement := strategy.axisParallelMeasurementB
+  axisParallelReparamInvariant := strategy.axisParallelReparamInvariantB
+  diagonalMeasurement := strategy.diagonalMeasurementB
+  diagonalReparamInvariant := strategy.diagonalReparamInvariantB
+
 /-- Axis-parallel branch component where the left prover is queried with a line
 and the right prover is queried with the sampled base point.
 
 This is one of the two crossed role choices in the full low-individual-degree
-test. It is not a local axis-parallel failure probability comparing a single
-prover's own point and line measurements against each other. -/
+test. It is not the local axis-parallel failure probability of
+`strategy.leftAsSymmetric`, which would compare the left prover's point and line
+measurements against each other. -/
 noncomputable def axisParallelLineLeftPointRightFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
-    (axisParallelLineAnswerFamily strategy.axisParallelMeasurementA)
-    (axisParallelPointAnswerFamily strategy.pointMeasurementB)
+    (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
+    (axisParallelPointAnswerFamily strategy.rightAsSymmetric)
 
 /-- Axis-parallel branch component where the left prover is queried with the
 sampled base point and the right prover is queried with a line.
@@ -1151,8 +1165,26 @@ noncomputable def axisParallelPointLeftLineRightFailureProbability
     (strategy : ProjStrat params ι) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
-    (axisParallelPointAnswerFamily strategy.pointMeasurementA)
-    (axisParallelLineAnswerFamily strategy.axisParallelMeasurementB)
+    (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
+    (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
+
+/-- Self-consistency branch component for the left prover's point measurement. -/
+noncomputable def pointLeftSelfConsistencyFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  bipartiteSSCError strategy.state
+    (uniformDistribution (Point params))
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+
+/-- Self-consistency branch component for the right prover's point measurement. -/
+noncomputable def pointRightSelfConsistencyFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  bipartiteSSCError strategy.state
+    (uniformDistribution (Point params))
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
 
 /-- Diagonal branch component where the left prover is queried with a diagonal
 line and the right prover is queried with the sampled base point.
@@ -1168,8 +1200,8 @@ noncomputable def diagonalLineLeftPointRightFailureProbability
     ∑ j : Fin params.m,
       bipartiteConsError strategy.state
         (uniformDistribution (RestrictedDiagonalSample params j))
-        (diagonalLineAnswerFamily strategy.diagonalMeasurementA j)
-        (diagonalPointAnswerFamily strategy.pointMeasurementB j)
+        (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
+        (diagonalPointAnswerFamily strategy.rightAsSymmetric j)
 
 /-- Diagonal branch component where the left prover is queried with the sampled
 base point and the right prover is queried with a diagonal line.
@@ -1184,33 +1216,53 @@ noncomputable def diagonalPointLeftLineRightFailureProbability
     ∑ j : Fin params.m,
       bipartiteConsError strategy.state
         (uniformDistribution (RestrictedDiagonalSample params j))
-        (diagonalPointAnswerFamily strategy.pointMeasurementA j)
-        (diagonalLineAnswerFamily strategy.diagonalMeasurementB j)
+        (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
+        (diagonalLineAnswerFamily strategy.rightAsSymmetric j)
 
-/-- Cross-prover point-agreement failure probability: both provers receive the
-same uniformly sampled point and the verifier checks that their answers agree.
-
-This is the self-consistency branch of the full low-individual-degree test
-(`fig:test` in the paper): "Player A: Give `u`; receive `a`. Player B: Give `u`;
-receive `b`. Accept if `a = b`." -/
-noncomputable def pointAgreementFailureProbability
+/-- The paper's axis-parallel branch for a general strategy, averaged over the
+two role choices. -/
+noncomputable def axisParallelRoleAverage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) : Error :=
-  bipartiteConsError strategy.state
-    (uniformDistribution (Point params))
-    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  let left := strategy.leftAsSymmetric
+  let right := strategy.rightAsSymmetric
+  let axParDist := uniformDistribution (AxisParallelTestSample params)
+  (bipartiteConsError strategy.state axParDist
+      (axisParallelLineAnswerFamily left)
+      (axisParallelPointAnswerFamily right)
+    + bipartiteConsError strategy.state axParDist
+      (axisParallelPointAnswerFamily left)
+      (axisParallelLineAnswerFamily right)) / 2
+
+/-- The paper's diagonal branch for a general strategy, averaged over the two
+role choices and the restricted diagonal samples. -/
+noncomputable def diagonalRoleAverage
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  let left := strategy.leftAsSymmetric
+  let right := strategy.rightAsSymmetric
+  (1 / (params.m : Error)) *
+    ∑ j : Fin params.m,
+      (bipartiteConsError strategy.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (diagonalLineAnswerFamily left j)
+          (diagonalPointAnswerFamily right j)
+        + bipartiteConsError strategy.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (diagonalPointAnswerFamily left j)
+          (diagonalLineAnswerFamily right j)) / 2
 
 /-- Trace-based failure surrogate for the full low-individual-degree
 test, matching the paper's `fig:test` with role-based decomposition.
 
-The axis-parallel and diagonal branches pick a role `r ∈ {A, B}`:
+Each of the geometric line branches picks a role `r ∈ {A, B}`:
 - Player `r` receives a line and returns a polynomial;
 - Player `r̄` receives a point and returns a field element.
 
-The self-consistency branch queries both provers at the same point and checks
-cross-prover point agreement.
+The self-consistency branch samples a shared point and checks cross-player point
+agreement there.
 
 TODO(#306): `ProjStrat` currently forces both provers onto the
 same index type `ι`; the paper allows `H_A ≠ H_B`. -/
@@ -1218,38 +1270,17 @@ noncomputable def lowIndividualDegreeFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) : Error :=
-  -- Axis-parallel: average over roles
-  -- Role A: Alice→line (left), Bob→point (right)
-  -- Role B: Alice→point (left), Bob→line (right)
-  let axisParallelBranch :=
-    (strategy.axisParallelLineLeftPointRightFailureProbability
-      + strategy.axisParallelPointLeftLineRightFailureProbability) / 2
-  -- Self-consistency: both provers receive the same point.
-  let selfConsistencyBranch := strategy.pointAgreementFailureProbability
-  -- Diagonal: for each restriction index, average the two role choices
-  -- from the paper's uniformly sampled role `r ∈ {A, B}`.
-  let diagonalBranch :=
-    (strategy.diagonalLineLeftPointRightFailureProbability
-      + strategy.diagonalPointLeftLineRightFailureProbability) / 2
+  let axisParallelBranch := strategy.axisParallelRoleAverage
+  -- Self-consistency: the paper samples the same point for Alice and Bob and
+  -- checks agreement of their point answers.
+  let selfConsistencyBranch :=
+    bipartiteConsError strategy.state
+      (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  let diagonalBranch := strategy.diagonalRoleAverage
   (axisParallelBranch + selfConsistencyBranch +
     diagonalBranch) / 3
-
-/-- The full projective low-individual-degree failure surrogate decomposes into
-the same two role-averaged line/point branches and cross-prover point-agreement
-branch used in the paper's verifier. This makes the comparison with
-`TwoProverClassicalLIDStrategy.lowIndividualDegreeAcceptanceProbability`
-completely explicit, up to the acceptance-versus-failure convention. -/
-theorem lowIndividualDegreeFailureProbability_eq_branchAverage
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
-    strategy.lowIndividualDegreeFailureProbability =
-      ((strategy.axisParallelLineLeftPointRightFailureProbability +
-          strategy.axisParallelPointLeftLineRightFailureProbability) / 2 +
-        strategy.pointAgreementFailureProbability +
-        (strategy.diagonalLineLeftPointRightFailureProbability +
-          strategy.diagonalPointLeftLineRightFailureProbability) / 2) / 3 := by
-  simp [lowIndividualDegreeFailureProbability]
 
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
@@ -1257,97 +1288,62 @@ structure PassesLowIndividualDegreeTest {params : Parameters}
     (strategy : ProjStrat params ι) (eps : Error) : Prop where
   soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
 
-/-- Passing the full test bounds each sampled branch component.
-
-The role-averaged axis-parallel and diagonal components carry two levels of
-averaging, giving the `6 * eps` bounds. The self-consistency branch has no role
-average, so the cross-prover point-agreement error is bounded by `3 * eps`. -/
-theorem tested_branch_components_le_six_mul {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error}
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    strategy.axisParallelLineLeftPointRightFailureProbability ≤ 6 * eps ∧
-      strategy.axisParallelPointLeftLineRightFailureProbability ≤ 6 * eps ∧
-      strategy.pointAgreementFailureProbability ≤ 3 * eps ∧
-      strategy.diagonalLineLeftPointRightFailureProbability ≤ 6 * eps ∧
-      strategy.diagonalPointLeftLineRightFailureProbability ≤ 6 * eps := by
-  let axLinePoint := strategy.axisParallelLineLeftPointRightFailureProbability
-  let axPointLine := strategy.axisParallelPointLeftLineRightFailureProbability
-  let pointAgreement := strategy.pointAgreementFailureProbability
-  let diagLinePoint := strategy.diagonalLineLeftPointRightFailureProbability
-  let diagPointLine := strategy.diagonalPointLeftLineRightFailureProbability
-  have hlow :
-      (((axLinePoint + axPointLine) / 2 + pointAgreement
-          + (diagLinePoint + diagPointLine) / 2) / 3) ≤ eps := by
-    simpa [lowIndividualDegreeFailureProbability, axLinePoint, axPointLine,
-      pointAgreement, diagLinePoint, diagPointLine] using hpass.soundnessHypothesis
-  have h_axLinePoint_nonneg : 0 ≤ axLinePoint := by
-    simpa [axisParallelLineLeftPointRightFailureProbability, axLinePoint] using
-      bipartiteConsError_nonneg strategy.state
-        (uniformDistribution (AxisParallelTestSample params))
-        (axisParallelLineAnswerFamily strategy.axisParallelMeasurementA)
-        (axisParallelPointAnswerFamily strategy.pointMeasurementB)
-  have h_axPointLine_nonneg : 0 ≤ axPointLine := by
-    simpa [axisParallelPointLeftLineRightFailureProbability, axPointLine] using
-      bipartiteConsError_nonneg strategy.state
-        (uniformDistribution (AxisParallelTestSample params))
-        (axisParallelPointAnswerFamily strategy.pointMeasurementA)
-        (axisParallelLineAnswerFamily strategy.axisParallelMeasurementB)
-  have h_pointAgreement_nonneg : 0 ≤ pointAgreement := by
-    simpa [pointAgreementFailureProbability, pointAgreement] using
-      bipartiteConsError_nonneg strategy.state
-        (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  have h_diagLinePoint_nonneg : 0 ≤ diagLinePoint := by
-    have hsum :
-        0 ≤ ∑ j : Fin params.m,
-          bipartiteConsError strategy.state
-            (uniformDistribution (RestrictedDiagonalSample params j))
-            (diagonalLineAnswerFamily strategy.diagonalMeasurementA j)
-            (diagonalPointAnswerFamily strategy.pointMeasurementB j) := by
-      exact Finset.sum_nonneg fun j _ =>
-        bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (RestrictedDiagonalSample params j))
-          (diagonalLineAnswerFamily strategy.diagonalMeasurementA j)
-          (diagonalPointAnswerFamily strategy.pointMeasurementB j)
-    simpa [diagonalLineLeftPointRightFailureProbability, diagLinePoint] using
-      mul_nonneg (by positivity : 0 ≤ (1 / (params.m : Error))) hsum
-  have h_diagPointLine_nonneg : 0 ≤ diagPointLine := by
-    have hsum :
-        0 ≤ ∑ j : Fin params.m,
-          bipartiteConsError strategy.state
-            (uniformDistribution (RestrictedDiagonalSample params j))
-            (diagonalPointAnswerFamily strategy.pointMeasurementA j)
-            (diagonalLineAnswerFamily strategy.diagonalMeasurementB j) := by
-      exact Finset.sum_nonneg fun j _ =>
-        bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (RestrictedDiagonalSample params j))
-          (diagonalPointAnswerFamily strategy.pointMeasurementA j)
-          (diagonalLineAnswerFamily strategy.diagonalMeasurementB j)
-    simpa [diagonalPointLeftLineRightFailureProbability, diagPointLine] using
-      mul_nonneg (by positivity : 0 ≤ (1 / (params.m : Error))) hsum
-  constructor
-  · nlinarith
-  constructor
-  · nlinarith
-  constructor
-  · nlinarith
-  constructor <;> nlinarith
-
-/-- Passing the full test bounds cross-prover point agreement by `3 * eps`.
-
-This is the direct consequence of the self-consistency branch of
-`lowIndividualDegreeFailureProbability`: both provers receive the same point and
-the verifier checks that the two answers agree. -/
+/-- Passing the full test bounds the cross-prover point-agreement branch by
+`3 * eps`, exactly because that branch is one of the three nonnegative terms
+averaged in `lowIndividualDegreeFailureProbability`. -/
 theorem point_agreement_le_three_mul {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    strategy.pointAgreementFailureProbability ≤ 3 * eps := by
-  rcases tested_branch_components_le_six_mul hpass with
-    ⟨_, _, hpoint, _, _⟩
-  exact hpoint
+    bipartiteConsError strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) ≤ 3 * eps := by
+  let pointAgreement : Error :=
+    bipartiteConsError strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  let axisParallelBranch : Error := strategy.axisParallelRoleAverage
+  let diagonalBranch : Error := strategy.diagonalRoleAverage
+  have hpoint_nonneg : 0 ≤ pointAgreement := by
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have haxis_nonneg : 0 ≤ axisParallelBranch := by
+    dsimp [axisParallelBranch]
+    apply div_nonneg
+    · linarith [bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (AxisParallelTestSample params))
+          (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
+          (axisParallelPointAnswerFamily strategy.rightAsSymmetric),
+        bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (AxisParallelTestSample params))
+          (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
+          (axisParallelLineAnswerFamily strategy.rightAsSymmetric)]
+    · norm_num
+  have hdiag_nonneg : 0 ≤ diagonalBranch := by
+    dsimp [diagonalBranch]
+    refine mul_nonneg ?_ ?_
+    · positivity
+    · refine Finset.sum_nonneg ?_
+      intro j _
+      apply div_nonneg
+      · linarith [bipartiteConsError_nonneg strategy.state
+            (uniformDistribution (RestrictedDiagonalSample params j))
+            (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
+            (diagonalPointAnswerFamily strategy.rightAsSymmetric j),
+          bipartiteConsError_nonneg strategy.state
+            (uniformDistribution (RestrictedDiagonalSample params j))
+            (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
+            (diagonalLineAnswerFamily strategy.rightAsSymmetric j)]
+      · norm_num
+  have hmain : (axisParallelBranch + pointAgreement + diagonalBranch) / 3 ≤ eps := by
+    simpa [axisParallelBranch, pointAgreement, diagonalBranch,
+      ProjStrat.lowIndividualDegreeFailureProbability,
+      ProjStrat.axisParallelRoleAverage, ProjStrat.diagonalRoleAverage,
+      ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
+      SymStrat.axisParallelFailureProbability, SymStrat.diagonalFailureProbability] using
+      hpass.soundnessHypothesis
+  linarith
 
 private lemma addCoord_subCoord_right {params : Parameters} [FieldModel params.q]
     (x y : Fq params) :
@@ -1526,69 +1522,508 @@ theorem classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (strategy : ProjStrat params ι) :
     (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability =
-      strategy.pointAgreementFailureProbability := by
-  unfold SymStrat.selfConsistencyFailureProbability bipartiteSSCError
-    pointAgreementFailureProbability bipartiteConsError
+      bipartiteConsError strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) := by
+  unfold SymStrat.selfConsistencyFailureProbability bipartiteSSCError bipartiteConsError
   refine Finset.sum_congr rfl ?_
   intro u _
   exact congrArg (fun t => (uniformDistribution (Point params)).weight u * t)
     (qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect strategy u)
 
-/-- The role-register symmetrized strategy's self-consistency is bounded by any
-available cross-prover point-agreement bound. -/
-theorem classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    {strategy : ProjStrat params ι} {delta : Error}
-    (hpoint : strategy.pointAgreementFailureProbability ≤ delta) :
-    (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤ delta := by
-  rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
-  exact hpoint
-
-/-- Passing the full test bounds the role-register symmetrized strategy's
-self-consistency by `3 * eps`. -/
+/-- The role-register symmetrized strategy inherits the point-agreement branch
+bound from the full test. -/
 theorem classicalRoleSymmStrategy_selfConsistency_le_three_mul
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤
-      3 * eps := by
-  exact classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
-    (point_agreement_le_three_mul hpass)
+    (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤ 3 * eps := by
+  rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
+  exact point_agreement_le_three_mul hpass
 
-/-- Tested branch bounds involving the left prover's point measurement.
+/-- The role-register symmetrized strategy's self-consistency is bounded by any
+available cross-prover point-agreement bound.
 
-These are the three components of the full test in which the left prover's
-point measurement appears: left-point/right-line axis consistency, left point
-agreement with the right point measurement, and left-point/right-diagonal
-consistency. -/
-theorem left_point_tested_branches_le_six_mul {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+The full low-individual-degree failure surrogate does not itself provide such a
+point-agreement bound: its self-consistency branch contains the separate SSC
+defects of the two point measurements. This conditional lemma records the
+correct bridge when an independent point-agreement estimate is available. -/
+theorem classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    {strategy : ProjStrat params ι} {delta : Error}
+    (hpoint :
+      bipartiteConsError strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) ≤ delta) :
+    (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤ delta := by
+  rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
+  exact hpoint
+
+private noncomputable def symmetrizedMeas
+    {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    (MA MB : Measurement Outcome ι) : Measurement Outcome (Role × ι) where
+  toSubMeas :=
+    { outcome := fun a =>
+        roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a)
+      total := 1
+      outcome_pos := by
+        intro a
+        exact add_nonneg
+          (roleCond_nonneg Role.A (MA.outcome_pos a))
+          (roleCond_nonneg Role.B (MB.outcome_pos a))
+      sum_eq_total := by
+        calc
+          ∑ a, (roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a))
+              = ∑ a, roleCond Role.A (MA.outcome a) +
+                  ∑ a, roleCond Role.B (MB.outcome a) := by
+                    rw [Finset.sum_add_distrib]
+          _ = roleCond Role.A (∑ a, MA.outcome a) +
+                roleCond Role.B (∑ a, MB.outcome a) := by
+                  rw [roleCond_finset_sum Role.A Finset.univ MA.outcome]
+                  rw [roleCond_finset_sum Role.B Finset.univ MB.outcome]
+          _ = roleCond Role.A (1 : MIPStarRE.Quantum.Op ι) +
+                roleCond Role.B 1 := by
+                  rw [MA.sum_eq, MB.sum_eq]
+          _ = 1 := roleCond_one_sum
+      total_le_one := le_rfl }
+  total_eq_one := rfl
+
+private noncomputable def axisParallelLineAnswerMeasurement
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι)
+    (s : AxisParallelTestSample params) :
+    Measurement (Fq params) ι where
+  toSubMeas :=
+    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
+    postprocess ((M ℓ).toSubMeas) (· zeroCoord)
+  total_eq_one := by
+    let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
+    simpa [ℓ, postprocess_total] using (M ℓ).total_eq_one
+
+private noncomputable def diagonalLineAnswerMeasurement
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι)
+    (j : Fin params.m) (s : RestrictedDiagonalSample params j) :
+    Measurement (Fq params) ι where
+  toSubMeas :=
+    let v := extendRestrictedDirection j s.2
+    let ℓ : DiagonalLine params := { base := s.1, direction := v }
+    postprocess ((M ℓ).toSubMeas) (· zeroCoord)
+  total_eq_one := by
+    let v := extendRestrictedDirection j s.2
+    let ℓ : DiagonalLine params := { base := s.1, direction := v }
+    simpa [v, ℓ, postprocess_total] using (M ℓ).total_eq_one
+
+@[simp] private lemma postprocess_symmetrizedIdxProjMeas_outcome
+    {Question α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (MA MB : IdxProjMeas Question α ι) (q : Question) (f : α → β) (b : β) :
+    (postprocess ((symmetrizedIdxProjMeas MA MB q).toSubMeas) f).outcome b =
+      roleCond Role.A ((postprocess ((MA q).toSubMeas) f).outcome b) +
+        roleCond Role.B ((postprocess ((MB q).toSubMeas) f).outcome b) := by
+  classical
+  simp [symmetrizedIdxProjMeas, postprocess, roleCond_finset_sum,
+    Finset.sum_add_distrib]
+
+private lemma qBipartiteConsDefect_of_measurements
+    {Outcome : Type*} {ιA ιB : Type*}
+    [Fintype Outcome]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) :
+    qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas =
+      ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) -
+        qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas := by
+  have hmatch_le :
+      qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas ≤
+        ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+    calc
+      qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas
+        = ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
+            rfl
+      _ ≤ ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a)) := by
+            refine Finset.sum_le_sum ?_
+            intro a _
+            exact ev_mono ψ _ _ <|
+              opTensor_le_leftTensor (ι₂ := ιB)
+                (A.outcome_pos a) (Measurement.outcome_le_one B a)
+      _ = ev ψ (leftTensor (ι₂ := ιB) A.total) := by
+            rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ιB) (A.outcome a))]
+            rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ A.outcome, A.sum_eq_total]
+      _ = ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+            simpa [A.total_eq_one, leftTensor]
+  unfold qBipartiteConsDefect
+  rw [show ev ψ (opTensor A.toSubMeas.total B.toSubMeas.total) =
+      ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) by
+    simp [A.total_eq_one, B.total_eq_one, opTensor]]
+  rw [max_eq_right (sub_nonneg.mpr hmatch_le)]
+
+private lemma qBipartiteMatchMass_symmetrizedMeas_eq_average
+    {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : QuantumState (ι × ι))
+    (MA MB NA NB : Measurement Outcome ι) :
+    qBipartiteMatchMass (classicalRoleSymmState ψ)
+        (symmetrizedMeas MA MB).toSubMeas
+        (symmetrizedMeas NA NB).toSubMeas =
+      (qBipartiteMatchMass ψ MA.toSubMeas NB.toSubMeas +
+        qBipartiteMatchMass ψ NA.toSubMeas MB.toSubMeas) / 2 := by
+  let SL := (symmetrizedMeas MA MB).toSubMeas
+  let SR := (symmetrizedMeas NA NB).toSubMeas
+  have houtcome :
+      ∀ a : Outcome,
+        ev (classicalRoleSymmState ψ) (opTensor (SL.outcome a) (SR.outcome a)) =
+          (1 / 2 : Error) * ev ψ (opTensor (MA.outcome a) (NB.outcome a)) +
+            (1 / 2 : Error) * ev ψ (opTensor (NA.outcome a) (MB.outcome a)) := by
+    intro a
+    calc
+      ev (classicalRoleSymmState ψ) (opTensor (SL.outcome a) (SR.outcome a))
+        = ev (classicalRoleSymmState ψ)
+            (rolePairCond Role.A Role.A (opTensor (MA.outcome a) (NA.outcome a)) +
+              rolePairCond Role.A Role.B (opTensor (MA.outcome a) (NB.outcome a)) +
+              (rolePairCond Role.B Role.A (opTensor (MB.outcome a) (NA.outcome a)) +
+                rolePairCond Role.B Role.B (opTensor (MB.outcome a) (NB.outcome a)))) := by
+                  rw [show SL.outcome a = roleCond Role.A (MA.outcome a) +
+                      roleCond Role.B (MB.outcome a) by rfl]
+                  rw [show SR.outcome a = roleCond Role.A (NA.outcome a) +
+                      roleCond Role.B (NB.outcome a) by rfl]
+                  rw [opTensor_add_left, opTensor_add_right, opTensor_add_right]
+                  rw [opTensor_roleCond_AA, opTensor_roleCond_AB,
+                    opTensor_roleCond_BA, opTensor_roleCond_BB]
+      _ = ev (classicalRoleSymmState ψ)
+            (rolePairCond Role.A Role.A (opTensor (MA.outcome a) (NA.outcome a))) +
+          ev (classicalRoleSymmState ψ)
+            (rolePairCond Role.A Role.B (opTensor (MA.outcome a) (NB.outcome a))) +
+          ev (classicalRoleSymmState ψ)
+            (rolePairCond Role.B Role.A (opTensor (MB.outcome a) (NA.outcome a))) +
+          ev (classicalRoleSymmState ψ)
+            (rolePairCond Role.B Role.B (opTensor (MB.outcome a) (NB.outcome a))) := by
+              repeat rw [ev_add]
+              abel_nf
+      _ = 0 + (1 / 2 : Error) * ev ψ (opTensor (MA.outcome a) (NB.outcome a)) +
+            (1 / 2 : Error) * ev ψ (opTensor (NA.outcome a) (MB.outcome a)) + 0 := by
+              have hAA :
+                  ev (classicalRoleSymmState ψ)
+                    (rolePairCond Role.A Role.A (opTensor (MA.outcome a) (NA.outcome a))) = 0 := by
+                      exact ev_classicalRoleSymmState_rolePair_AA ψ _
+              have hAB :
+                  ev (classicalRoleSymmState ψ)
+                    (rolePairCond Role.A Role.B (opTensor (MA.outcome a) (NB.outcome a))) =
+                    (1 / 2 : Error) * ev ψ (opTensor (MA.outcome a) (NB.outcome a)) := by
+                      exact ev_classicalRoleSymmState_rolePair_AB ψ _
+              have hBA :
+                  ev (classicalRoleSymmState ψ)
+                    (rolePairCond Role.B Role.A (opTensor (MB.outcome a) (NA.outcome a))) =
+                    (1 / 2 : Error) * ev ψ (opTensor (NA.outcome a) (MB.outcome a)) := by
+                      rw [ev_classicalRoleSymmState_rolePair_BA]
+                      rw [ev_swapQuantumState, swapDensity_opTensor]
+              have hBB :
+                  ev (classicalRoleSymmState ψ)
+                    (rolePairCond Role.B Role.B (opTensor (MB.outcome a) (NB.outcome a))) = 0 := by
+                      exact ev_classicalRoleSymmState_rolePair_BB ψ _
+              rw [hAA, hAB, hBA, hBB]
+      _ = (1 / 2 : Error) * ev ψ (opTensor (MA.outcome a) (NB.outcome a)) +
+            (1 / 2 : Error) * ev ψ (opTensor (NA.outcome a) (MB.outcome a)) := by ring
+  unfold qBipartiteMatchMass
+  calc
+    ∑ a : Outcome,
+        ev (classicalRoleSymmState ψ) (opTensor (SL.outcome a) (SR.outcome a))
+      = ∑ a : Outcome,
+          ((1 / 2 : Error) * ev ψ (opTensor (MA.outcome a) (NB.outcome a)) +
+            (1 / 2 : Error) * ev ψ (opTensor (NA.outcome a) (MB.outcome a))) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              exact houtcome a
+    _ = (1 / 2 : Error) * ∑ a : Outcome, ev ψ (opTensor (MA.outcome a) (NB.outcome a)) +
+          (1 / 2 : Error) * ∑ a : Outcome, ev ψ (opTensor (NA.outcome a) (MB.outcome a)) := by
+            rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum]
+    _ = (qBipartiteMatchMass ψ MA.toSubMeas NB.toSubMeas +
+          qBipartiteMatchMass ψ NA.toSubMeas MB.toSubMeas) / 2 := by
+            simp [qBipartiteMatchMass]
+            ring
+
+private lemma qBipartiteConsDefect_symmetrizedMeas_eq_average
+    {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : QuantumState (ι × ι))
+    (MA MB NA NB : Measurement Outcome ι) :
+    qBipartiteConsDefect (classicalRoleSymmState ψ)
+        (symmetrizedMeas MA MB).toSubMeas
+        (symmetrizedMeas NA NB).toSubMeas =
+      (qBipartiteConsDefect ψ MA.toSubMeas NB.toSubMeas +
+        qBipartiteConsDefect ψ NA.toSubMeas MB.toSubMeas) / 2 := by
+  calc
+    qBipartiteConsDefect (classicalRoleSymmState ψ)
+        (symmetrizedMeas MA MB).toSubMeas
+        (symmetrizedMeas NA NB).toSubMeas
+      = ev (classicalRoleSymmState ψ)
+          (1 : MIPStarRE.Quantum.Op ((Role × ι) × (Role × ι))) -
+        qBipartiteMatchMass (classicalRoleSymmState ψ)
+          (symmetrizedMeas MA MB).toSubMeas
+          (symmetrizedMeas NA NB).toSubMeas := by
+            exact qBipartiteConsDefect_of_measurements (classicalRoleSymmState ψ)
+              (symmetrizedMeas MA MB) (symmetrizedMeas NA NB)
+    _ = ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
+          qBipartiteMatchMass (classicalRoleSymmState ψ)
+            (symmetrizedMeas MA MB).toSubMeas
+            (symmetrizedMeas NA NB).toSubMeas := by
+              rw [ev_classicalRoleSymmState_one]
+    _ = ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
+          ((qBipartiteMatchMass ψ MA.toSubMeas NB.toSubMeas +
+            qBipartiteMatchMass ψ NA.toSubMeas MB.toSubMeas) / 2) := by
+              rw [qBipartiteMatchMass_symmetrizedMeas_eq_average]
+    _ = ((ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
+            qBipartiteMatchMass ψ MA.toSubMeas NB.toSubMeas) +
+          (ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
+            qBipartiteMatchMass ψ NA.toSubMeas MB.toSubMeas)) / 2 := by
+              ring
+    _ = (qBipartiteConsDefect ψ MA.toSubMeas NB.toSubMeas +
+          qBipartiteConsDefect ψ NA.toSubMeas MB.toSubMeas) / 2 := by
+            rw [← qBipartiteConsDefect_of_measurements ψ MA NB]
+            rw [← qBipartiteConsDefect_of_measurements ψ NA MB]
+
+set_option maxHeartbeats 1000000 in
+-- The sample-level symmetrization lemma still unfolds the role-placed measurement API.
+private lemma axisParallel_symm_sample_eq_average
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (strategy : ProjStrat params ι) (s : AxisParallelTestSample params) :
+    qBipartiteConsDefect (strategy.classicalRoleSymmStrategy.state)
+        (axisParallelPointAnswerFamily strategy.classicalRoleSymmStrategy s)
+        (axisParallelLineAnswerFamily strategy.classicalRoleSymmStrategy s) =
+      (qBipartiteConsDefect strategy.state
+          (axisParallelLineAnswerFamily strategy.leftAsSymmetric s)
+          (axisParallelPointAnswerFamily strategy.rightAsSymmetric s) +
+        qBipartiteConsDefect strategy.state
+          (axisParallelPointAnswerFamily strategy.leftAsSymmetric s)
+          (axisParallelLineAnswerFamily strategy.rightAsSymmetric s)) / 2 := by
+  let PA := strategy.pointMeasurementA s.1
+  let PB := strategy.pointMeasurementB s.1
+  let LA := axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementA s
+  let LB := axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementB s
+  simpa [qBipartiteConsDefect, qBipartiteMatchMass,
+    ProjStrat.classicalRoleSymmStrategy,
+    ProjStrat.symmetrizedPointMeasurement,
+    ProjStrat.symmetrizedAxisParallelMeasurement,
+    ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
+    axisParallelPointAnswerFamily, axisParallelLineAnswerFamily,
+    axisParallelLineAnswerMeasurement, symmetrizedMeas,
+    postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
+    PA, PB, LA, LB, add_comm] using
+    qBipartiteConsDefect_symmetrizedMeas_eq_average strategy.state
+      PA.toMeasurement PB.toMeasurement LA LB
+
+set_option maxHeartbeats 1000000 in
+-- The diagonal sample uses the same role-placed expansion uniformly in the restriction index.
+private lemma diagonal_symm_sample_eq_average
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (strategy : ProjStrat params ι)
+    (j : Fin params.m) (s : RestrictedDiagonalSample params j) :
+    qBipartiteConsDefect (strategy.classicalRoleSymmStrategy.state)
+        (diagonalPointAnswerFamily strategy.classicalRoleSymmStrategy j s)
+        (diagonalLineAnswerFamily strategy.classicalRoleSymmStrategy j s) =
+      (qBipartiteConsDefect strategy.state
+          (diagonalLineAnswerFamily strategy.leftAsSymmetric j s)
+          (diagonalPointAnswerFamily strategy.rightAsSymmetric j s) +
+        qBipartiteConsDefect strategy.state
+          (diagonalPointAnswerFamily strategy.leftAsSymmetric j s)
+          (diagonalLineAnswerFamily strategy.rightAsSymmetric j s)) / 2 := by
+  let PA := strategy.pointMeasurementA s.1
+  let PB := strategy.pointMeasurementB s.1
+  let LA := diagonalLineAnswerMeasurement strategy.diagonalMeasurementA j s
+  let LB := diagonalLineAnswerMeasurement strategy.diagonalMeasurementB j s
+  simpa [qBipartiteConsDefect, qBipartiteMatchMass,
+    ProjStrat.classicalRoleSymmStrategy,
+    ProjStrat.symmetrizedPointMeasurement,
+    ProjStrat.symmetrizedDiagonalMeasurement,
+    ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
+    diagonalPointAnswerFamily, diagonalLineAnswerFamily,
+    diagonalLineAnswerMeasurement, symmetrizedMeas,
+    postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
+    PA, PB, LA, LB, add_comm] using
+    qBipartiteConsDefect_symmetrizedMeas_eq_average strategy.state
+      PA.toMeasurement PB.toMeasurement LA LB
+
+/- The paper's role-register symmetrized strategy exactly averages the two
+axis-parallel role choices from the original general strategy. -/
+theorem classicalRoleSymmStrategy_axisParallel_eq_roleAverage
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (strategy : ProjStrat params ι) :
+    (strategy.classicalRoleSymmStrategy).axisParallelFailureProbability =
+      strategy.axisParallelRoleAverage := by
+  let left := strategy.leftAsSymmetric
+  let right := strategy.rightAsSymmetric
+  let axParDist := uniformDistribution (AxisParallelTestSample params)
+  let symmErr : AxisParallelTestSample params → Error := fun s =>
+    qBipartiteConsDefect (strategy.classicalRoleSymmStrategy.state)
+      (axisParallelPointAnswerFamily strategy.classicalRoleSymmStrategy s)
+      (axisParallelLineAnswerFamily strategy.classicalRoleSymmStrategy s)
+  let leftRoleErr : AxisParallelTestSample params → Error := fun s =>
+    qBipartiteConsDefect strategy.state
+      (axisParallelLineAnswerFamily left s)
+      (axisParallelPointAnswerFamily right s)
+  let rightRoleErr : AxisParallelTestSample params → Error := fun s =>
+    qBipartiteConsDefect strategy.state
+      (axisParallelPointAnswerFamily left s)
+      (axisParallelLineAnswerFamily right s)
+  have hcongr :
+      avgOver axParDist symmErr =
+        avgOver axParDist (fun s => (leftRoleErr s + rightRoleErr s) / 2) := by
+    apply avgOver_congr
+    intro s
+    exact axisParallel_symm_sample_eq_average strategy s
+  calc
+    (strategy.classicalRoleSymmStrategy).axisParallelFailureProbability
+      = avgOver axParDist symmErr := by
+          rfl
+    _ = avgOver axParDist (fun s => (leftRoleErr s + rightRoleErr s) / 2) := hcongr
+    _ = (avgOver axParDist leftRoleErr + avgOver axParDist rightRoleErr) / 2 := by
+          rw [show (fun s => (leftRoleErr s + rightRoleErr s) / 2) =
+              fun s => (1 / 2 : Error) * (leftRoleErr s + rightRoleErr s) by
+            funext s
+            ring]
+          rw [avgOver_const_mul, avgOver_add]
+          ring
+    _ = (bipartiteConsError strategy.state axParDist
+            (axisParallelLineAnswerFamily left)
+            (axisParallelPointAnswerFamily right) +
+          bipartiteConsError strategy.state axParDist
+            (axisParallelPointAnswerFamily left)
+            (axisParallelLineAnswerFamily right)) / 2 := by
+          rfl
+
+/- The paper's role-register symmetrized strategy exactly averages the two
+diagonal-line role choices from the original general strategy. -/
+theorem classicalRoleSymmStrategy_diagonal_eq_roleAverage
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (strategy : ProjStrat params ι) :
+    (strategy.classicalRoleSymmStrategy).diagonalFailureProbability =
+      strategy.diagonalRoleAverage := by
+  let left := strategy.leftAsSymmetric
+  let right := strategy.rightAsSymmetric
+  let symmErr := fun j : Fin params.m => fun s : RestrictedDiagonalSample params j =>
+    qBipartiteConsDefect (strategy.classicalRoleSymmStrategy.state)
+      (diagonalPointAnswerFamily strategy.classicalRoleSymmStrategy j s)
+      (diagonalLineAnswerFamily strategy.classicalRoleSymmStrategy j s)
+  let leftRoleErr := fun j : Fin params.m => fun s : RestrictedDiagonalSample params j =>
+    qBipartiteConsDefect strategy.state
+      (diagonalLineAnswerFamily left j s)
+      (diagonalPointAnswerFamily right j s)
+  let rightRoleErr := fun j : Fin params.m => fun s : RestrictedDiagonalSample params j =>
+    qBipartiteConsDefect strategy.state
+      (diagonalPointAnswerFamily left j s)
+      (diagonalLineAnswerFamily right j s)
+  calc
+    (strategy.classicalRoleSymmStrategy).diagonalFailureProbability
+      = (1 / (params.m : Error)) *
+          ∑ j : Fin params.m,
+            avgOver (uniformDistribution (RestrictedDiagonalSample params j)) (symmErr j) := by
+              rfl
+    _ = (1 / (params.m : Error)) *
+          ∑ j : Fin params.m,
+            avgOver (uniformDistribution (RestrictedDiagonalSample params j))
+              (fun s => (leftRoleErr j s + rightRoleErr j s) / 2) := by
+              refine congrArg (fun t => (1 / (params.m : Error)) * t) ?_
+              refine Finset.sum_congr rfl ?_
+              intro j _
+              apply avgOver_congr
+              intro s
+              exact diagonal_symm_sample_eq_average strategy j s
+    _ = (1 / (params.m : Error)) *
+          ∑ j : Fin params.m,
+            (avgOver (uniformDistribution (RestrictedDiagonalSample params j)) (leftRoleErr j) +
+              avgOver (uniformDistribution (RestrictedDiagonalSample params j)) (rightRoleErr j)) / 2 := by
+              refine congrArg (fun t => (1 / (params.m : Error)) * t) ?_
+              refine Finset.sum_congr rfl ?_
+              intro j _
+              rw [show (fun s => (leftRoleErr j s + rightRoleErr j s) / 2) =
+                  fun s => (1 / 2 : Error) * (leftRoleErr j s + rightRoleErr j s) by
+                funext s
+                ring]
+              rw [avgOver_const_mul, avgOver_add]
+              ring
+    _ = (1 / (params.m : Error)) *
+          ∑ j : Fin params.m,
+            (bipartiteConsError strategy.state
+                (uniformDistribution (RestrictedDiagonalSample params j))
+                (diagonalLineAnswerFamily left j)
+                (diagonalPointAnswerFamily right j) +
+              bipartiteConsError strategy.state
+                (uniformDistribution (RestrictedDiagonalSample params j))
+                (diagonalPointAnswerFamily left j)
+                (diagonalLineAnswerFamily right j)) / 2 := by
+              rfl
+
+/-- The role-register symmetrized strategy is `(3 * eps, 3 * eps, 3 * eps)`-good,
+exactly as in the paper's reduction from general to symmetric strategies. -/
+theorem classicalRoleSymmStrategy_is_good_three_mul {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    strategy.axisParallelPointLeftLineRightFailureProbability ≤ 6 * eps ∧
-      strategy.pointAgreementFailureProbability ≤ 3 * eps ∧
-      strategy.diagonalPointLeftLineRightFailureProbability ≤ 6 * eps := by
-  rcases tested_branch_components_le_six_mul hpass with
-    ⟨_, haxis, hpoint, _, hdiag⟩
-  exact ⟨haxis, hpoint, hdiag⟩
-
-/-- Tested branch bounds involving the right prover's point measurement.
-
-These are the mirror-image crossed components: left-line/right-point axis
-consistency, point agreement with the left point measurement, and
-left-diagonal/right-point consistency. -/
-theorem right_point_tested_branches_le_six_mul {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error}
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    strategy.axisParallelLineLeftPointRightFailureProbability ≤ 6 * eps ∧
-      strategy.pointAgreementFailureProbability ≤ 3 * eps ∧
-      strategy.diagonalLineLeftPointRightFailureProbability ≤ 6 * eps := by
-  rcases tested_branch_components_le_six_mul hpass with
-    ⟨haxis, _, hpoint, hdiag, _⟩
-  exact ⟨haxis, hpoint, hdiag⟩
+    (strategy.classicalRoleSymmStrategy).IsGood (3 * eps) (3 * eps) (3 * eps) := by
+  let pointAgreement : Error :=
+    bipartiteConsError strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  let axisParallelBranch : Error := strategy.axisParallelRoleAverage
+  let diagonalBranch : Error := strategy.diagonalRoleAverage
+  have hpoint_nonneg : 0 ≤ pointAgreement := by
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have haxis_nonneg : 0 ≤ axisParallelBranch := by
+    dsimp [axisParallelBranch]
+    apply div_nonneg
+    · linarith [bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (AxisParallelTestSample params))
+          (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
+          (axisParallelPointAnswerFamily strategy.rightAsSymmetric),
+        bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (AxisParallelTestSample params))
+          (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
+          (axisParallelLineAnswerFamily strategy.rightAsSymmetric)]
+    · norm_num
+  have hdiag_nonneg : 0 ≤ diagonalBranch := by
+    dsimp [diagonalBranch]
+    refine mul_nonneg ?_ ?_
+    · positivity
+    · refine Finset.sum_nonneg ?_
+      intro j _
+      apply div_nonneg
+      · linarith [bipartiteConsError_nonneg strategy.state
+            (uniformDistribution (RestrictedDiagonalSample params j))
+            (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
+            (diagonalPointAnswerFamily strategy.rightAsSymmetric j),
+          bipartiteConsError_nonneg strategy.state
+            (uniformDistribution (RestrictedDiagonalSample params j))
+            (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
+            (diagonalLineAnswerFamily strategy.rightAsSymmetric j)]
+      · norm_num
+  have hmain : (axisParallelBranch + pointAgreement + diagonalBranch) / 3 ≤ eps := by
+    simpa [axisParallelBranch, pointAgreement, diagonalBranch,
+      ProjStrat.lowIndividualDegreeFailureProbability,
+      ProjStrat.axisParallelRoleAverage, ProjStrat.diagonalRoleAverage,
+      ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
+      SymStrat.axisParallelFailureProbability, SymStrat.diagonalFailureProbability] using
+      hpass.soundnessHypothesis
+  have haxis : axisParallelBranch ≤ 3 * eps := by
+    linarith
+  have hdiag : diagonalBranch ≤ 3 * eps := by
+    linarith
+  refine ⟨?_, ?_, ?_⟩
+  · rw [classicalRoleSymmStrategy_axisParallel_eq_roleAverage strategy]
+    exact haxis
+  · exact classicalRoleSymmStrategy_selfConsistency_le_three_mul hpass
+  · rw [classicalRoleSymmStrategy_diagonal_eq_roleAverage strategy]
+    exact hdiag
 
 end ProjStrat
 
@@ -1709,13 +2144,6 @@ structure StronglySelfConsistent {params : Parameters} [FieldModel params.q]
       (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas))
       zeta
 
-/-- Slice boundedness data for the commutativity and pasting arguments.
-
-The residual bound is currently stored in the induction-level tensor-failure
-orientation `Z^x ⊗ (I - G^x)`.  The paper's commutativity claims
-`clm:g-comm-stability` and `clm:g-comm-stability2` use the swapped orientation
-`(I - G^x) ⊗ Z^x`; a paper-faithful proof of those scalar claims must either
-store that orientation directly or add an explicit tensor-swap bridge. -/
 structure Bounded {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
