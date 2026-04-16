@@ -307,6 +307,7 @@ structure SelfImprovementBridgePackage (params : Parameters) [FieldModel params.
     (strategy : SymStrat params ι)
     (eps delta nu : Error) : Prop where
   permInvariant : PermInvState strategy.state
+  normalizedState : strategy.state.IsNormalized
   -- TODO: replace this nested conjunction with a small named structure once the
   -- bridge package is removed or stabilized.
   globalVarianceProofInputs :
@@ -527,7 +528,8 @@ theorem selfImprovement
         (constSubMeasFamily Hhat)
         (selfImprovementHelperError params eps delta) :=
     hbridges.helperStrongSelfConsistency hhelper
-  rcases orthonormalization strategy.state hbridges.permInvariant Hhat
+  rcases orthonormalization strategy.state hbridges.normalizedState
+      hbridges.permInvariant Hhat
       (selfImprovementHelperError params eps delta)
       hssc (hbridges.orthonormalizationBridge hssc) with ⟨H, horth⟩
   have hdata :

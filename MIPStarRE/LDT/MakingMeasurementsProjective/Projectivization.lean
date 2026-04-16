@@ -309,16 +309,19 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
 /-- Spectral truncation of an almost-projective measurement.
 
 The bridge package isolates the still-unformalized spectral construction itself;
-this theorem just exposes it under the paper-faithful raw-family statement. -/
+this theorem just exposes it under the paper-faithful raw-family statement. The
+normalization hypothesis is explicit because the `√ζ`-scale error bound is
+state-dependent. -/
 def spectralTruncateAlmostProjective {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
+    (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ι) (ζ : Error) :
     AlmostProjMeasStatement ψ A ζ →
       SpectralTruncationBridgePackage ψ A ζ →
       SpectralTruncationStatement ψ A ζ := by
   intro hAlmost hbridge
-  exact hbridge.fromSourceAlmostProjective hAlmost.sourceAlmostProjective
+  exact hbridge.fromSourceAlmostProjective hψ hAlmost.sourceAlmostProjective
 
 /-- Adjust truncated projections to form a genuine projective
 submeasurement, controlling the per-outcome distance.
@@ -343,7 +346,8 @@ almost-projective measurement to a projective submeasurement. -/
 lemma roundAlmostProjMeas {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
+    (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ι) (ζ : Error) :
     AlmostProjMeasStatement ψ A ζ →
       SpectralTruncationBridgePackage ψ A ζ →
       ProjectivizationRepairPackage ψ A ζ →
@@ -354,7 +358,7 @@ lemma roundAlmostProjMeas {Outcome : Type*}
   exact adjustTruncatedProjections
     (Outcome := Outcome) (ι := ι) ψ A ζ
     (spectralTruncateAlmostProjective
-      (Outcome := Outcome) (ι := ι) ψ A ζ hAlmost hspectral)
+      (Outcome := Outcome) (ι := ι) ψ hψ A ζ hAlmost hspectral)
     hrepair
 
 /-- Increase the allowed error bound for a rounded-projective witness. -/
