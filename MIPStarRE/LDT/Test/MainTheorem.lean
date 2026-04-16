@@ -173,57 +173,6 @@ theorem classicalTestSoundnessWithPlaceholderBound
   exact classicalTestSoundness params a eps
     (classicalTestSoundnessSlackBound params eps) hpass hPS
 
-/-- Temporary bridge package for the still-unformalized proof of
-`thm:main-formal`.
-
-This packages exactly the three projective-measurement conclusions of the main
-formal theorem. It isolates the missing Section 3 assembly from the theorem
-statement itself: role-register symmetrization, application of
-`thm:main-induction`, unsymmetrization, Schwartz-Zippel replacement of point
-evaluations by polynomial evaluations, orthonormalization/completion, and the
-final triangle/data-processing error bookkeeping. -/
-structure MainFormalBridgePackage
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι)
-    (eps : Error) (k : ℕ) : Prop where
-  witness :
-    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
-      ConsRel strategy.state (uniformDistribution (Point params))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-          (polynomialEvaluationFamily params G_B.toSubMeas)
-          (mainFormalError params k eps) ∧
-        ConsRel strategy.state (uniformDistribution (Point params))
-          (polynomialEvaluationFamily params G_A.toSubMeas)
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-          (mainFormalError params k eps) ∧
-        ConsRel strategy.state (uniformDistribution Unit)
-          (constSubMeasFamily G_A.toSubMeas)
-          (constSubMeasFamily G_B.toSubMeas)
-          (mainFormalError params k eps)
-
-/-- Producer for the temporary `thm:main-formal` bridge package.
-
-From the paper inputs to `thm:main-formal`, the eventual proof must convert the
-possibly nonsymmetric projective strategy into a role-register symmetric
-strategy, prove the symmetrized strategy is good with the required constants,
-apply `thm:main-induction`, unsymmetrize the resulting measurement into
-`G_A` and `G_B`, derive polynomial-level self-consistency using
-Schwartz-Zippel, then apply orthonormalization and completion while preserving
-the final `mainFormalError` bound. -/
-theorem mainFormalBridgePackage
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι)
-    (eps : Error)
-    (_hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (k : ℕ)
-    (_hk : params.m * params.d ≤ k) :
-    MainFormalBridgePackage params strategy eps k := by
-  -- TODO(Section 3): Intentional sorry pending paper-faithful assembly (see docstring);
-  -- load-bearing for `mainFormal`, which invokes this producer below.
-  sorry
-
 /--
 `thm:main-formal` from `test_definition.tex`.
 
@@ -256,35 +205,11 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  exact (mainFormalBridgePackage params strategy eps hpass k hk).witness
-
-/-- `thm:main-informal`.
-
-This overview wrapper packages the formal theorem with an existential choice of
-the auxiliary interpolation parameter `k`. -/
-theorem mainInformal
-    (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι)
-    (eps : Error)
-    (hd : 0 < params.d)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    ∃ k : ℕ, 0 < k ∧ params.m * params.d ≤ k ∧
-      ∃ G_A G_B : ProjMeas (Polynomial params) ι,
-        ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-            (polynomialEvaluationFamily params G_B.toSubMeas)
-            (mainFormalError params k eps) ∧
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (polynomialEvaluationFamily params G_A.toSubMeas)
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-            (mainFormalError params k eps) ∧
-          ConsRel strategy.state (uniformDistribution Unit)
-            (constSubMeasFamily G_A.toSubMeas)
-            (constSubMeasFamily G_B.toSubMeas)
-            (mainFormalError params k eps) := by
-  refine ⟨params.m * params.d, Nat.mul_pos params.hm hd, le_rfl, ?_⟩
-  simpa using mainFormal params strategy eps hd hpass (params.m * params.d)
-    le_rfl (Nat.mul_pos params.hm hd)
+  -- TODO(Section 3): formalize the paper-faithful assembly from `hpass` and
+  -- `hk` through role-register symmetrization, `thm:main-induction`,
+  -- unsymmetrization, Schwartz-Zippel, and the final projectivization and
+  -- error bookkeeping argument.
+  sorry
 
 end Test
 
