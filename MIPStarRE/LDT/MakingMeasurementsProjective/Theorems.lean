@@ -1091,7 +1091,7 @@ theorem orthonormalization {Outcome : Type*}
     (A : SubMeas Outcome ι) (ζ : Error) :
     BipartiteSSCRel ψ (uniformDistribution Unit)
         (constSubMeasFamily A) ζ →
-      OrthonormalizationBridgePackage ψ A ζ →
+      MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationBridgePackage ψ A ζ →
       ∃ P : ProjSubMeas Outcome ι,
         SDDRel ψ (uniformDistribution Unit)
           (constSubMeasFamily A.liftLeft)
@@ -1169,10 +1169,12 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
     (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error)
     (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
     (hspectral :
-      SpectralTruncationBridgePackage ψ (leftLiftedMeasurement (ιB := ιB) A)
+      MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationBridgePackage
+        ψ (leftLiftedMeasurement (ιB := ιB) A)
         (consistencyToAlmostProjectiveError ζ))
     (hrepair :
-      ProjectivizationRepairPackage ψ (leftLiftedMeasurement (ιB := ιB) A)
+      MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationRepairPackage
+        ψ (leftLiftedMeasurement (ιB := ιB) A)
         (consistencyToAlmostProjectiveError ζ)) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
@@ -1183,34 +1185,28 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
           ψ A_lifted P
           (orthonormalizationMainLemmaError ζ) := by
   intro hCons
-  let A_lifted : Measurement Outcome (ιA × ιB) := leftLiftedMeasurement (ιB := ιB) A
-  have hspectral' :
-      SpectralTruncationBridgePackage ψ A_lifted
-        (consistencyToAlmostProjectiveError ζ) := by
-    simpa [A_lifted] using hspectral
-  have hrepair' :
-      ProjectivizationRepairPackage ψ A_lifted
-        (consistencyToAlmostProjectiveError ζ) := by
-    simpa [A_lifted] using hrepair
+  change ∃ P : ProjSubMeas Outcome (ιA × ιB),
+      RoundedProjMeasStatement
+        ψ (leftLiftedMeasurement (ιB := ιB) A) P
+        (orthonormalizationMainLemmaError ζ)
   have hAlmost :
-      AlmostProjMeasStatement
-        ψ A_lifted
-          (consistencyToAlmostProjectiveError ζ) := by
-    simpa using
-      (consistencyToAlmostProjective
-        (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons)
+      MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
+        ψ (leftLiftedMeasurement (ιB := ιB) A)
+        (consistencyToAlmostProjectiveError ζ) := by
+    exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
+        (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons
   have hRound :
       ∃ P : ProjSubMeas Outcome (ιA × ιB),
-        RoundedProjMeasStatement
-          ψ A_lifted P
+        MIPStarRE.LDT.MakingMeasurementsProjective.RoundedProjMeasStatement
+          ψ (leftLiftedMeasurement (ιB := ιB) A) P
           (roundingToProjectiveError (consistencyToAlmostProjectiveError ζ)) :=
-    roundAlmostProjMeas (ψ := ψ)
-      (A := A_lifted)
-      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost hspectral' hrepair'
+    MIPStarRE.LDT.MakingMeasurementsProjective.roundAlmostProjMeas (ψ := ψ)
+      (A := leftLiftedMeasurement (ιB := ιB) A)
+      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost hspectral hrepair
   obtain ⟨P, hRounded⟩ := hRound
   refine ⟨P, ?_⟩
-  simpa [A_lifted] using
-    (roundedProjMeasStatement_mono hRounded
+  simpa using
+    (MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono hRounded
       (orthonormalizationMainLemma_error_bound ζ hζ hζ1))
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
