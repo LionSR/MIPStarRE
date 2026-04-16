@@ -2733,6 +2733,76 @@ Error: `√ζ + √ζ`.
 
 Total: `12√ζ + 12√(γ(m+1))`. Then `2 * total ≤ 48m(√γ + √ζ)`. -/
 
+/-- Final arithmetic step of the paper's proof of
+`lem:comm-data-processed-g`: twice the ten-step scalar total
+(`12√ζ + 12√(γ(m+1))`) is bounded by the displayed error
+`48m·(√γ + √ζ)` of `commDataProcessedGError`.
+
+Corresponds to the closing three-line computation in
+`references/ldt-paper/commutativity-G.tex`, lines 124–130:
+`24·(√(γ(m+1)) + √ζ) ≤ 24·√(m+1)·(√γ + √ζ) ≤ 48m·(√γ + √ζ)`.
+
+The second inequality uses `m ≥ 1` so that `m + 1 ≤ 2m ≤ (2m)²`,
+hence `√(m + 1) ≤ 2m`. -/
+private lemma commDataProcessedG_final_arithmetic
+    (params : Parameters) (gamma zeta : Error)
+    (hgamma : 0 ≤ gamma) :
+    24 * Real.sqrt zeta +
+        24 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) ≤
+      commDataProcessedGError params gamma zeta := by
+  unfold commDataProcessedGError
+  have hm_one : (1 : Error) ≤ (params.m : Error) :=
+    Nat.one_le_cast.mpr params.hm
+  have hm_nn : (0 : Error) ≤ (params.m : Error) :=
+    (Nat.cast_nonneg _ : (0 : Error) ≤ (params.m : Error))
+  have hrpow_g : Real.rpow gamma (1 / (2 : Error)) = Real.sqrt gamma :=
+    (Real.sqrt_eq_rpow gamma).symm
+  have hrpow_z : Real.rpow zeta (1 / (2 : Error)) = Real.sqrt zeta :=
+    (Real.sqrt_eq_rpow zeta).symm
+  rw [hrpow_g, hrpow_z]
+  -- `√(γ(m+1)) = √γ · √(m+1)`.
+  have hsqrt_prod :
+      Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) =
+        Real.sqrt gamma * Real.sqrt (((params.m + 1 : ℕ)) : Error) :=
+    Real.sqrt_mul hgamma _
+  rw [hsqrt_prod]
+  -- `√(m+1) ≤ 2m`: since `m ≥ 1`, `m+1 ≤ 2m ≤ (2m)^2`.
+  have h_mp1_le_sq :
+      (((params.m + 1 : ℕ)) : Error) ≤ (2 * (params.m : Error)) ^ 2 := by
+    push_cast
+    nlinarith [hm_one]
+  have h2m_nn : (0 : Error) ≤ 2 * (params.m : Error) := by positivity
+  have h_sqrt_mp1 :
+      Real.sqrt (((params.m + 1 : ℕ)) : Error) ≤ 2 * (params.m : Error) := by
+    have hsqrt := Real.sqrt_le_sqrt h_mp1_le_sq
+    rwa [Real.sqrt_sq h2m_nn] at hsqrt
+  -- Assemble: each summand is bounded by one half of the right-hand side.
+  have h_sqrt_g_nn : 0 ≤ Real.sqrt gamma := Real.sqrt_nonneg _
+  have h_sqrt_z_nn : 0 ≤ Real.sqrt zeta := Real.sqrt_nonneg _
+  have h_two_four : (24 : Error) ≤ 48 * (params.m : Error) := by
+    nlinarith [hm_one]
+  have h_gamma_term :
+      24 * (Real.sqrt gamma *
+          Real.sqrt (((params.m + 1 : ℕ)) : Error)) ≤
+        48 * (params.m : Error) * Real.sqrt gamma := by
+    have hmul :
+        Real.sqrt gamma * Real.sqrt (((params.m + 1 : ℕ)) : Error) ≤
+          Real.sqrt gamma * (2 * (params.m : Error)) :=
+      mul_le_mul_of_nonneg_left h_sqrt_mp1 h_sqrt_g_nn
+    nlinarith [hmul, h_sqrt_g_nn, hm_nn]
+  have h_zeta_term :
+      24 * Real.sqrt zeta ≤ 48 * (params.m : Error) * Real.sqrt zeta :=
+    mul_le_mul_of_nonneg_right h_two_four h_sqrt_z_nn
+  calc
+    24 * Real.sqrt zeta +
+        24 * (Real.sqrt gamma *
+          Real.sqrt (((params.m + 1 : ℕ)) : Error))
+      ≤ 48 * (params.m : Error) * Real.sqrt zeta +
+          48 * (params.m : Error) * Real.sqrt gamma := by
+              linarith [h_zeta_term, h_gamma_term]
+    _ = 48 * (params.m : Error) *
+          (Real.sqrt gamma + Real.sqrt zeta) := by ring
+
 /-- Scalar approximation chain for the evaluated-slice commutation.
 
 This is the core of the paper's proof of `lem:comm-data-processed-g`
