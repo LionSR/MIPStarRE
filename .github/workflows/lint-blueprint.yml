@@ -12,7 +12,6 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
-      - 'blueprint/lean_decls'
       - 'scripts/blueprint_lean_sync.py'
   pull_request:
     types: [opened, synchronize, reopened]
@@ -24,7 +23,6 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
-      - 'blueprint/lean_decls'
       - 'scripts/blueprint_lean_sync.py'
 
 concurrency:
@@ -92,18 +90,10 @@ jobs:
         continue-on-error: true
         run: python3 scripts/blueprint_lean_sync.py --root . --ci
 
-      - name: Regenerate lean_decls from blueprint .tex files
+      - name: Generate lean_decls from blueprint .tex files
         if: steps.lean-setup.outcome == 'success'
         continue-on-error: true
         run: python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
-
-      - name: Ensure regenerated lean_decls is committed
-        if: steps.lean-setup.outcome == 'success'
-        continue-on-error: true
-        run: |
-          if ! git diff --exit-code -- blueprint/lean_decls; then
-            echo "::warning::blueprint/lean_decls is stale. Regenerate and commit it."
-          fi
 
       - name: Fetch PR base ref for diff
         if: github.event_name == 'pull_request' && steps.lean-setup.outcome == 'success'
