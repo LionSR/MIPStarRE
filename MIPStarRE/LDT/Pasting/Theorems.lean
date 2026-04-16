@@ -701,6 +701,8 @@ theorem gBotSelfConsistency
                             leftPlacedSubMeas, rightPlacedSubMeas, T, hcomplete_outcome_T]
     _ ≤ zeta := hcomplete_total
 
+/-- Convert the one-question switcheroo self-consistency input into the
+bipartite form used by `switchSandwich`. -/
 private lemma switcherooSelfConsistency_bip
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -777,6 +779,10 @@ private lemma avgOver_uniform_slicePair_swapOrder
           (fun y => avgOver (uniformDistribution (SliceQuestion params)) (fun x => f x y)) := by
           simpa using (avgOver_uniform_slicePair params (f := fun y x => f x y))
 
+/-- Lift slicewise complete-part self-consistency to the slice-pair distribution.
+
+This packages the `G^x` self-consistency input in the form used by the
+switcheroo tensor-bound steps. -/
 private lemma switcherooCompletePartSelfConsistency_pairBound
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -821,6 +827,8 @@ private lemma switcherooCompletePartSelfConsistency_pairBound
               IdxProjSubMeas.toIdxSubMeas, SubMeas.liftLeft, SubMeas.liftRight]
     _ ≤ zeta := hselfG.completePartSelfConsistency.squaredDistanceBound
 
+/-- Read the switcheroo point-product commutation hypothesis as an average
+`qSDDCore` bound. -/
 private lemma switcherooPointProductCommutation_coreBound
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -892,60 +900,6 @@ private lemma avgOver_abs_le_avgOver_abs
     _ = avgOver 𝒟 (fun a => |f a|) := by
           rfl
 
-/-- Distinct outcomes of a projective submeasurement are orthogonal. -/
-private lemma projSubMeas_outcome_orthogonal
-    {Outcome : Type*} [Fintype Outcome]
-    (P : ProjSubMeas Outcome ι) (a b : Outcome) (hab : a ≠ b) :
-    P.outcome a * P.outcome b = 0 := by
-  classical
-  set Pa := P.outcome a
-  set Pb := P.outcome b
-  have hPa_herm : Paᴴ = Pa := P.outcome_hermitian a
-  have hPb_herm : Pbᴴ = Pb := P.outcome_hermitian b
-  have hsum : Pa + Pb ≤ P.total := by
-    calc
-      Pa + Pb
-        = ∑ i ∈ ({a, b} : Finset Outcome), P.outcome i := by
-            simp [Pa, Pb, hab]
-      _ ≤ ∑ i : Outcome, P.outcome i := by
-            exact Finset.sum_le_sum_of_subset_of_nonneg
-              (by simp)
-              (fun i _ _ => P.outcome_pos i)
-      _ = P.total := P.sum_eq_total
-  have hPb_le : Pb ≤ 1 - Pa := by
-    calc
-      Pb = Pa + Pb - Pa := by abel
-      _ ≤ P.total - Pa := by
-          exact sub_le_sub_right hsum Pa
-      _ ≤ 1 - Pa := by
-          exact sub_le_sub_right P.total_le_one Pa
-  have hPaPbPa_nonneg : 0 ≤ Pa * Pb * Pa :=
-    MIPStarRE.Quantum.sandwich_nonneg (P.outcome_pos b) hPa_herm
-  have hPa_idem : Pa * (1 - Pa) * Pa = 0 := by
-    calc
-      Pa * (1 - Pa) * Pa = (Pa * 1 - Pa * Pa) * Pa := by rw [mul_sub]
-      _ = 0 := by simp [Pa, P.proj a]
-  have hPaPbPa_eq_zero : Pa * Pb * Pa = 0 := by
-    apply le_antisymm
-    · calc
-        Pa * Pb * Pa ≤ Pa * (1 - Pa) * Pa :=
-          MIPStarRE.Quantum.sandwich_mono hPa_herm hPb_le
-        _ = 0 := hPa_idem
-    · exact hPaPbPa_nonneg
-  have hPbPa_eq_zero : Pb * Pa = 0 := by
-    apply Matrix.conjTranspose_mul_self_eq_zero.mp
-    calc
-      (Pb * Pa)ᴴ * (Pb * Pa) = (Paᴴ * Pbᴴ) * (Pb * Pa) := by
-        simp [Matrix.conjTranspose_mul]
-      _ = Pa * (Pb * Pb) * Pa := by
-        simp [hPa_herm, hPb_herm, mul_assoc]
-      _ = Pa * Pb * Pa := by simp [Pb, P.proj b]
-      _ = 0 := hPaPbPa_eq_zero
-  calc
-    Pa * Pb = (Pb * Pa)ᴴ := by
-      simp [Matrix.conjTranspose_mul, hPa_herm, hPb_herm]
-    _ = 0 := by rw [hPbPa_eq_zero]; simp
-
 /-- The usual `Σₐ Aₐ† Aₐ ≤ I` bound for a submeasurement. -/
 private lemma subMeas_sum_adjoint_mul_le_one
     {Outcome : Type*} [Fintype Outcome]
@@ -973,6 +927,8 @@ private lemma subMeas_total_opBounded01
   · exact A.total_nonneg
   · exact sub_nonneg.mpr A.total_le_one
 
+/-- A projective sandwich family with middle operator bounded by `1` sums to at
+most `1`. -/
 private lemma projSubMeas_sandwich_sum_le_one
     {Outcome : Type*} [Fintype Outcome]
     (A : ProjSubMeas Outcome ι)
@@ -999,7 +955,8 @@ private lemma projSubMeas_total_sq
     P.toSubMeas.total * P.toSubMeas.total = P.toSubMeas.total := by
   simpa using MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj P
 
-/-- Expand the switcheroo aggregate defect into the four terms used in the paper. -/
+/-- Expand a single-question switcheroo `qSDDOp` term into its four scalar
+components. -/
 private lemma switcherooAggregate_qSDDOp_expand
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -1160,6 +1117,7 @@ private noncomputable def switcherooAggregateFirstTerm
           ((M q.2).outcome o * (completePartSubMeas params family q.1).total * (M q.2).outcome o))
 
 
+/-- Rewrite the first positive switcheroo term as a left-sandwich average. -/
 private lemma switcherooAggregateFirstTerm_eq_leftSandwich
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -1210,6 +1168,7 @@ private lemma switcherooAggregateFirstTerm_eq_leftSandwich
             simp [MIPStarRE.LDT.Preliminaries.leftSandwichExpectation,
               avgOver, leftTensor_mul_leftTensor, mul_assoc]
 
+/-- Rewrite the `G ⊗ M` switcheroo center as a middle-sandwich average. -/
 private lemma switcherooAggregateTarget_eq_middleSandwich
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -1256,6 +1215,8 @@ private lemma switcherooAggregateTarget_eq_middleSandwich
             intro x
             simp [MIPStarRE.LDT.Preliminaries.middleSandwichExpectation, avgOver]
 
+/-- Rewrite the swapped switcheroo center as the corresponding middle-sandwich
+expectation. -/
 private lemma switcherooAggregateTargetSwapped_eq_middleSandwich
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -1314,7 +1275,8 @@ private lemma switcherooAggregateTargetSwapped_eq_middleSandwich
                       rightTensor (ι₁ := ι) ((completePartSubMeas params family x).total))
                   = ev ψbi
                       (leftTensor (ι₂ := ι) (((M y).toSubMeas).total) *
-                        rightTensor (ι₁ := ι) (∑ a : Polynomial params, (family.meas x).outcome a)) := by
+                        rightTensor (ι₁ := ι)
+                          (∑ a : Polynomial params, (family.meas x).outcome a)) := by
                           rw [(family.meas x).sum_eq_total]
                           simp [completePartSubMeas, postprocess_total]
                 _ = ev ψbi
@@ -1331,6 +1293,8 @@ private lemma switcherooAggregateTargetSwapped_eq_middleSandwich
                             rw [ev_sum]
             simpa [hx]
 
+/-- The first positive switcheroo term is bounded above by the `G ⊗ M`
+center. -/
 private lemma switcherooAggregateFirstTerm_le_target
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -1414,6 +1378,8 @@ private lemma switcherooAggregateFirstTerm_le_target
     exact (abs_le.mp hbound).2
   linarith
 
+/-- The first positive switcheroo term is close to the `G ⊗ M` center via the
+self-consistency of `M`. -/
 private lemma switcheroo_first_term_close
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -1559,12 +1525,6 @@ private lemma switcherooAggregateThirdTerm_eq_fourthTerm
   have hGherm : Gᴴ = G :=
     (Matrix.nonneg_iff_posSemidef.mp
       (SubMeas.total_nonneg (completePartSubMeas params family q.1))).isHermitian.eq
-  have hGsq : G * G = G := by
-    simpa [G, completePartSubMeas, postprocess_total] using
-      projSubMeas_total_sq (family.meas q.1)
-  have hGsq : G * G = G := by
-    simpa [G, completePartSubMeas, postprocess_total] using
-      projSubMeas_total_sq (family.meas q.1)
   have hMoherm : Moᴴ = Mo :=
     (Matrix.nonneg_iff_posSemidef.mp ((M q.2).outcome_pos o)).isHermitian.eq
   calc
@@ -1581,6 +1541,8 @@ private lemma switcherooAggregateThirdTerm_eq_fourthTerm
           congr 1
           simpa [mul_assoc, Matrix.conjTranspose_mul, hGherm, hMoherm]
 
+/-- Split the fourth switcheroo term by inserting the complete-part projector
+resolution `G = ∑_g G_g`. -/
 private lemma switcherooAggregateFourthTerm_eq_split
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -1656,6 +1618,7 @@ private lemma switcherooAggregateFourthTerm_eq_split
                   (leftTensor (ι₂ := ι)
                     (G * (M q.2).outcome o * Gq g * Gq g * (M q.2).outcome o))))
 
+/-- Contraction witness for the first `sqrt chi` switcheroo transfer. -/
 private lemma switcherooAggregateFourthTerm_split_contraction
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -1674,9 +1637,6 @@ private lemma switcherooAggregateFourthTerm_split_contraction
   let G : MIPStarRE.Quantum.Op ι := (completePartSubMeas params family q.1).total
   let Gq : Polynomial params → MIPStarRE.Quantum.Op ι := (family.meas q.1).outcome
   let Mo : Outcome → MIPStarRE.Quantum.Op ι := (M q.2).outcome
-  have hGsq : G * G = G := by
-    simpa [G, completePartSubMeas, postprocess_total] using
-      projSubMeas_total_sq (family.meas q.1)
   have hGherm : Gᴴ = G :=
     (Matrix.nonneg_iff_posSemidef.mp
       (SubMeas.total_nonneg (completePartSubMeas params family q.1))).isHermitian.eq
@@ -1758,7 +1718,8 @@ private lemma switcherooAggregateFourthTerm_split_contraction
             congr 1
             simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
   have hmid_le : ∑ o : Outcome, Mo o * G * Mo o ≤ 1 := by
-    exact projSubMeas_sandwich_sum_le_one (M q.2) G (by simpa [G] using (completePartSubMeas params family q.1).total_le_one)
+    exact projSubMeas_sandwich_sum_le_one (M q.2) G
+      (by simpa [G] using (completePartSubMeas params family q.1).total_le_one)
   have hsandwich_le : G * (∑ o : Outcome, Mo o * G * Mo o) * G ≤ G := by
     calc
       G * (∑ o : Outcome, Mo o * G * Mo o) * G ≤ G * 1 * G := by
@@ -1784,6 +1745,7 @@ private lemma switcherooAggregateFourthTerm_split_contraction
           simpa [G] using leftTensor_le_one (ι₂ := ι)
             ((completePartSubMeas params family q.1).total_le_one)
 
+/-- The first `sqrt chi` step in the fourth-term switcheroo chain. -/
 private lemma switcherooAggregateFourthTerm_split_close_once_commuted
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -1874,6 +1836,7 @@ private lemma switcherooAggregateFourthTerm_split_close_once_commuted
       OpFamily.leftPlacedOpFamily, leftTensor_mul_leftTensor, mul_assoc]
   simpa [hleft, hright] using hclose
 
+/-- Left-action contraction witness for the first `sqrt zeta` transfer. -/
 private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -2017,6 +1980,7 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
           simpa [G] using leftTensor_le_one (ι₂ := ι)
             ((completePartSubMeas params family q.1).total_le_one)
 
+/-- The first `sqrt zeta` step in the fourth-term switcheroo chain. -/
 private lemma switcherooAggregateFourthTerm_once_commuted_close_mixed
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -2075,6 +2039,7 @@ private lemma switcherooAggregateFourthTerm_once_commuted_close_mixed
   simpa [𝒟q, A, B, C, leftTensor_mul_leftTensor, rightTensor_mul_leftTensor_eq_opTensor,
     leftTensor_mul_rightTensor_eq_opTensor, mul_assoc] using hclose
 
+/-- Right-action contraction witness for the second `sqrt zeta` transfer. -/
 private lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -2227,6 +2192,8 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
             _ = 1 := by simp [leftTensor]
 
 
+/-- Collapse the split-by-`g` raw expression back to the first positive
+switcheroo term. -/
 private lemma switcherooAggregateFirstTerm_eq_split_by_g
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -2368,6 +2335,7 @@ private noncomputable def switcherooAggregateOnceCommutedRaw
             (M q.2).outcome go.2 *
             (family.meas q.1).outcome go.1)))
 
+/-- Repackage the first `sqrt chi` step using the named raw scalar. -/
 private lemma switcherooAggregateFourthTerm_close_once_commuted_raw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -2405,6 +2373,8 @@ private noncomputable def switcherooAggregateMixedRaw
             (M q.2).outcome o)) *
           rightTensor (ι₁ := ι) ((family.meas q.1).outcome g)))
 
+/-- Repackage the second `sqrt zeta` step using the named raw left-front
+scalar. -/
 private lemma switcherooAggregateFourthTerm_mixed_close_left_front_raw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -2483,6 +2453,7 @@ private lemma switcherooAggregateFourthTerm_mixed_close_left_front_raw
   simpa [𝒟q, A, B, C] using
     (Preliminaries.closenessOfInnerProduct_right ψbi hnorm 𝒟q h𝒟q A B C zeta hAB hC)
 
+/-- Contraction witness for the final `sqrt chi` left-front overlap step. -/
 private lemma switcherooAggregateLeftFront_contraction
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -2601,7 +2572,8 @@ private lemma switcherooAggregateLeftFront_contraction
                           calc
                             ∑ g : Polynomial params,
                                 (M q.2).outcome o * (family.meas q.1).outcome g * (M q.2).outcome o
-                              = (M q.2).outcome o * (∑ g : Polynomial params, (family.meas q.1).outcome g) *
+                              = (M q.2).outcome o *
+                                  (∑ g : Polynomial params, (family.meas q.1).outcome g) *
                                   (M q.2).outcome o := by
                                     simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
                             _ = (M q.2).outcome o * (completePartSubMeas params family q.1).total *
@@ -2630,6 +2602,8 @@ private lemma switcherooAggregateLeftFront_contraction
             _ = 1 := by simp [leftTensor]
 
 set_option maxHeartbeats 3000000 in
+/-- Average the single-question four-term `qSDDOp` expansion over the
+slice-pair distribution. -/
 private lemma switcherooAggregate_qSDDOp_expand_avg
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -2739,7 +2713,8 @@ private lemma completePartProjFamily_selfConsistency_generic
               qSDD_completePart_le_slice params ψbi family x
     _ ≤ zeta := hself_bound
 
-/-- The second positive expansion term is close to its `M ⊗ G` center.
+/-- The second positive switcheroo term is close to the swapped center coming
+from the complete-part family.
 
 This aggregate form matches the four-term `qSDDOp` expansion: the projective
 family in the sandwich is the one-outcome complete part `G^x`, not the original
@@ -2868,9 +2843,11 @@ private lemma switcheroo_second_aggregate_term_close
           simpa [𝒟x] using
             avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt zeta)
 
-/-- Raw SDD bound for completed-part pairs: marginalizes the completed-part
-self-consistency bound over `SlicePairQuestion` via `avgOver_uniform_fst`.
-Used as infrastructure for the commutativitySwitcheroo cross-term chain (issue #298). -/
+/-- Raw `qSDDOp` estimate for the completed slice family against its one-outcome
+complete part.
+
+This is the pairwise complete-part commutation input used later in the
+switcheroo commutation step. -/
 private lemma switcheroo_complete_part_pair_raw_sdd
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -2968,32 +2945,21 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
   let secondTerm := switcherooAggregateSecondTerm params ψbi family M
   let thirdTerm := switcherooAggregateThirdTerm params ψbi family M
   let fourthTerm := switcherooAggregateFourthTerm params ψbi family M
-  let onceRaw := switcherooAggregateOnceCommutedRaw params ψbi family M
-  let mixedRaw := switcherooAggregateMixedRaw params ψbi family M
-  let leftFrontRaw := switcherooAggregateLeftFrontRaw params ψbi family M
-  let firstSplitRaw := switcherooAggregateFirstSplitRaw params ψbi family M
   let centerGM := switcherooAggregateTarget params ψbi family M
-  let centerMG := switcherooAggregateTargetSwapped params ψbi family M
+  let centerMGComplete : Error :=
+    avgOver 𝒟x (fun y =>
+      Preliminaries.middleSandwichExpectation ψbi 𝒟x
+        (completePartProjFamily params family) (((M y).toSubMeas).total))
   have hfirst : |firstTerm - centerGM| ≤ 2 * Real.sqrt omega := by
     simpa [firstTerm, centerGM, switcherooAggregateTarget_eq_middleSandwich] using
       switcheroo_first_term_close params ψbi hnorm family M omega hselfM
-  have hsecond : |secondTerm - centerMG| ≤ 2 * Real.sqrt zeta := by
-    sorry -- API changed: switcheroo_second_aggregate_term_close now uses completePartProjFamily
+  have hsecond : |secondTerm - centerMGComplete| ≤ 2 * Real.sqrt zeta := by
+    simpa [secondTerm, centerMGComplete, 𝒟x] using
+      switcheroo_second_aggregate_term_close params ψbi hnorm family M zeta hselfG
   have hexpand := switcherooAggregate_qSDDOp_expand_avg params ψbi family M
   have hthird_eq : thirdTerm = fourthTerm := by
     simpa [thirdTerm, fourthTerm] using
       switcherooAggregateThirdTerm_eq_fourthTerm params ψbi family M
-  have hfourth_once : |fourthTerm - onceRaw| ≤ Real.sqrt chi := by
-    simpa [fourthTerm, onceRaw] using
-      switcherooAggregateFourthTerm_close_once_commuted_raw params ψbi hnorm family M chi hcomm
-  have hfourth_mixed : |onceRaw - mixedRaw| ≤ Real.sqrt zeta := by
-    sorry -- sum indexing mismatch (∑ go vs ∑ g, ∑ o) after def unfolding
-  have hfourth_leftFront : |mixedRaw - leftFrontRaw| ≤ Real.sqrt zeta := by
-    sorry -- simpa timeout: tensor algebra rewrite chain needs restructuring
-  have hfirstSplit : firstSplitRaw = firstTerm := by
-    sorry -- def unfolding mismatch: firstTerm is leftSandwichExpectation, not the raw aggregate
-  have hleftFront_firstSplit : |leftFrontRaw - firstSplitRaw| ≤ Real.sqrt chi := by
-    sorry -- closenessOfInnerProduct_right application times out (issue #298)
   constructor
   unfold sddErrorOp
   rw [hexpand]
@@ -3115,6 +3081,8 @@ private lemma completePartProjFamily_selfConsistency
   simpa using
     completePartProjFamily_selfConsistency_generic params strategy.state family zeta hself
 
+/-- Expand the left aggregate family after replacing the slice family by its
+completed one-outcome form. -/
 private lemma switcherooAggregateLeft_completePart_outcome
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -3136,6 +3104,8 @@ private lemma switcherooAggregateLeft_completePart_outcome
     multiplyByTotalOnRight, multiplyByTotalOnLeft,
     OpFamily.leftPlacedOpFamily, postprocess_total, hsingle1, hsingle2]
 
+/-- Expand the right aggregate family after replacing the slice family by its
+completed one-outcome form. -/
 private lemma switcherooAggregateRight_completePart_outcome
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
