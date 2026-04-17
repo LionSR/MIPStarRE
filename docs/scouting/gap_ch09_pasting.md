@@ -27,7 +27,7 @@ Lean is already organized around the blueprint theorem chain, but not yet proved
 
 - `MIPStarRE/LDT/Pasting/Theorems.lean` contains 16 `sorry` sites.
 - `MIPStarRE/LDT/Pasting/Sandwich.lean` contains 1 additional `sorry` at the Bernoulli-tail upper bound.
-- `MIPStarRE/LDT/Pasting/Defs.lean`: `interpolateCompletedSlices` now uses proper Lagrange interpolation via Mathlib's `Lagrange.basis`, but the `lowIndividualDegree` proof is sorry'd (see `lean_formalization_problems.md` §5).
+- `MIPStarRE/LDT/Pasting/Defs.lean`: `interpolateCompletedSlices` now uses proper Lagrange interpolation via Mathlib's `Lagrange.basis`, restricted to a `(d+1)`-sized subset via `interpolationSupportSubset`, and the `lowIndividualDegree` proof is fully discharged. The remaining downstream obligation is interpolation correctness (injectivity of evaluation points), not a definitional placeholder — see `lean_formalization_problems.md` §5.
 
 The main blockers are not the endpoint packaging theorems. The real critical path is:
 
@@ -134,14 +134,14 @@ Construction layer status:
 
 - `constructedPastedSubMeas` and `constructedPastedMeasurement` already exist in `MIPStarRE/LDT/Pasting/Sandwich.lean`.
 - `pastedInterpolationFamily` restricts to globally consistent tuples before postprocessing.
-- `interpolateCompletedSlices` in `MIPStarRE/LDT/Pasting/Defs.lean` is not the paper's actual interpolation map yet: it explicitly uses a dummy coefficient `1` instead of Lagrange coefficients.
+- `interpolateCompletedSlices` in `MIPStarRE/LDT/Pasting/Defs.lean` now uses Mathlib's `Lagrange.basis` restricted to a `(d+1)`-sized subset of the genuine support, and the degree bound is proven. The remaining gap is downstream correctness (evaluation-point injectivity), not the coefficient itself.
 
 ### Does Lean proof structure match?
 
 Mostly yes at the theorem level, but with two important caveats.
 
 - The theorem chain matches the blueprint, not the raw paper exposition: `lem:ld-gbcon` is blueprint-only and not a standalone Lean theorem in `Pasting`.
-- The interpolation implementation is only a scaffold. The paper's second construction depends on interpolation from globally consistent tuples; Lean has the filtering predicate `IsGloballyConsistent`, but the actual map `interpolateCompletedSlices` is only structurally shaped like interpolation.
+- The interpolation implementation is faithful at the definition level. The paper's second construction depends on interpolation from globally consistent tuples; Lean has the filtering predicate `IsGloballyConsistent`, and `interpolateCompletedSlices` now performs the actual Lagrange interpolation with a proven degree bound. What remains is proving agreement with each slice at the evaluation points — this is a downstream theorem obligation, not a definitional placeholder.
 
 ### Dependency chain
 
@@ -438,7 +438,7 @@ What is reorganized:
 What is structurally weaker than the paper right now:
 
 - `fromHToGRecurrence{Left,Right}Family` are collapsed to `Unit`-indexed operator families, so the rich paper proof has already been compressed before the proof begins.
-- `interpolateCompletedSlices` is still placeholder interpolation, which is potentially relevant to the global-consistency side of `overAllOutcomes`.
+- `interpolateCompletedSlices` is now genuine Lagrange interpolation with a proven degree bound. The remaining downstream obligation — that the interpolated polynomial restricts to each slice at the correct evaluation point — is relevant to the global-consistency side of `overAllOutcomes`.
 
 ### Dependency chain
 
@@ -561,7 +561,7 @@ The following are already implemented and align well with the paper/blueprint ar
 
 The biggest structural caveat remains:
 
-- `interpolateCompletedSlices` is only a placeholder interpolation map, not the paper's genuine reconstruction.
+- `interpolateCompletedSlices` is the paper's genuine Lagrange reconstruction with a proven degree bound; downstream correctness (agreement of the reconstruction with each slice) is still an open proof obligation.
 
 ## Recommended proof priority
 

@@ -175,14 +175,14 @@ The most sorry-heavy chapter. All 13 sorry are in Theorems.lean.
 | `ldPastingSubMeas` | — | 1 | Assembly |
 | `ldPasting` | — | 1 | Assembly |
 
-**Also**: Placeholder interpolation (Lagrange coeff = 1) in Defs.lean:227.
+**Also**: ~~Placeholder interpolation (Lagrange coeff = 1) in Defs.lean:227.~~ **Resolved**: `interpolateCompletedSlices` now uses Mathlib's `Lagrange.basis` on a `(d+1)`-sized subset and the `lowIndividualDegree` proof is complete (PR #313 fixed the coefficient; the sorry was discharged subsequently). See `docs/audit/lean_formalization_problems.md` §5 for the remaining downstream correctness obligation.
 
 **Action Items**:
 1. **P0**: Fix completedCommutation quadrant split (heartbeat optimization)
 2. **P0**: Prove commutativitySwitcheroo (aggregate commutation from slice commutation)
 3. **P1**: Sandwich chain (commuteGHalfSandwich → ldSandwichLineOnePoint → hBConsistency → hAConsistency)
 4. **P1**: Completeness chain (overAllOutcomes → fromHToG → chernoffBernoulliMatrix → ldPastingNCompleteness)
-5. **P2**: Fix placeholder interpolation
+5. ~~**P2**: Fix placeholder interpolation~~ **Done** (definition faithful, degree bound proven; remaining work is downstream correctness, not the definition)
 6. Assembly (ldPastingSubMeas, ldPasting) falls out once chains are done
 
 ---
