@@ -27,7 +27,9 @@ import MIPStarRE.LDT.Preliminaries.SelfConsistency
 import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Completeness
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
 import MIPStarRE.LDT.MakingMeasurementsProjective.Naimark
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
