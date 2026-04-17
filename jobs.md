@@ -307,7 +307,7 @@ Last updated: 2026-04-14
   - identified that `ldGbcon` is blocked by the conditioned last-direction axis-line encoding: the axis test uses the sampled ambient basepoint, while the pasting theorem needs the canonical vertical-line family based at height `0`
   - proved `Pasting.truncatedTypeSumRecurrence` via a `Fin.cons` decomposition of Boolean types, positivity of each operator monomial, and a recursive full-sum identity `∑_τ G^|τ| (I-G)^(k-|τ|) = I`
   - added `\leanok` tags in `blueprint/src/chapter/ch09_pasting.tex` for `commutingWithGComplete`, `gHatFacts`, and `truncatedTypeSumRecurrence`
-  - verified `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean` still typechecks with 11 remaining local `sorry`s
+  - verified `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean` still typechecks with 12 remaining local `sorry`s
   - attempted `leanblueprint web`, but the `leanblueprint` command is not installed in the current environment
   - confirmed `fromHToG` is blocked by the current scaffold: `fromHToGRecurrenceLeftFamily` / `RightFamily` already collapse to endpoint families times a weight operator, so they do not encode the paper's suffix-indexed intermediate quantities
   - confirmed `commuteGHalfSandwich` is blocked at the theorem interface: the statement no longer carries the small-error assumptions needed to weaken the `2 * zeta` self-consistency cost from `GHatFactsStatement` to the displayed `zeta^(1/16)` bound
@@ -349,6 +349,7 @@ Last updated: 2026-04-14
   - repaired that interface mismatch so `LdPastingSubMeasConclusion` and `hAConsistency_submeas` now carry the paper's intermediate `ν`, while `hAConsistency_completed` is the separate completion step to the final induction error `σ`
   - proved `hAConsistency_completed` by showing evaluation commutes with `completeAtOutcome`, bounding completion's extra off-diagonal mass by the residual total mass, and then using the completeness lower bound to absorb that residual into the final `σ`
   - re-verified `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean`; the file now typechecks with 12 remaining local `sorry`s
+  - re-checked the live `sorry` count with `rg -n "\bsorry\b"`: this branch has 12 executable `sorry`s in `Pasting/Theorems.lean`, while `main` still has 13, so the board count of 12 is a correction of stale tracking rather than an increase
 
 ## Active CommutativityPoints Wave
 - **Owner**: OpenCode
@@ -734,7 +735,7 @@ Last updated: 2026-04-14
   and `switcheroo_second_term_close` helper lemmas, reducing the remaining
   `commutativitySwitcheroo` work to the term-3/term-4 chain and the final
   four-term assembly.
-- `Pasting/Theorems.lean` now has 11 executable `sorry`s remaining in this file.
+- `Pasting/Theorems.lean` now has 12 executable `sorry`s remaining in this file.
 
 ## Stale Entries From Earlier Waves
 - The sections below were superseded by later progress on this branch and should

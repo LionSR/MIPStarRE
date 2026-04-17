@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Pasting.Statements
 import MIPStarRE.LDT.MainInductionStep.Statements
+import MIPStarRE.LDT.Preliminaries.Theorems
 import MIPStarRE.LDT.Preliminaries.SelfConsistency
 
 /-!
@@ -4706,190 +4707,6 @@ theorem hAConsistency_submeas
     eps delta gamma kappa zeta hnorm hgood hgamma_le hzeta_le hdq_le
     hcomplete k hk hHB
 
-private lemma subMeas_eq_of_outcome_total_eq
-    {Outcome : Type*}
-    [Fintype Outcome]
-    {A B : SubMeas Outcome ι}
-    (houtcome : ∀ a : Outcome, A.outcome a = B.outcome a)
-    (htotal : A.total = B.total) :
-    A = B := by
-  cases A with
-  | mk outcomeA totalA posA sumA leA =>
-      cases B with
-      | mk outcomeB totalB posB sumB leB =>
-          have houtcome' : outcomeA = outcomeB := by
-            funext a
-            exact houtcome a
-          cases htotal
-          cases houtcome'
-          simp
-
-private lemma evaluateAt_completeAtOutcome
-    (params : Parameters)
-    [FieldModel params.q]
-    (H : SubMeas (Polynomial params.next) ι)
-    (h0 : Polynomial params.next)
-    (u : Point params.next) :
-    evaluateAt params.next u (Preliminaries.completeAtOutcome H h0).toSubMeas =
-      (Preliminaries.completeAtOutcome (evaluateAt params.next u H) (h0 u)).toSubMeas := by
-  classical
-  let R : MIPStarRE.Quantum.Op ι := 1 - H.total
-  let L := evaluateAt params.next u (Preliminaries.completeAtOutcome H h0).toSubMeas
-  let Rhs := (Preliminaries.completeAtOutcome (evaluateAt params.next u H) (h0 u)).toSubMeas
-  have houtcome : L.outcome = Rhs.outcome := by
-    funext b
-    let S : Finset (Polynomial params.next) :=
-      Finset.univ.filter fun h : Polynomial params.next => h u = b
-    have hsplit :
-        (∑ h ∈ S,
-            if hh : h = h0 then H.outcome h + R else H.outcome h) =
-          (∑ h ∈ S, H.outcome h) +
-            ∑ h ∈ S, if h = h0 then R else 0 := by
-      calc
-        (∑ h ∈ S, if hh : h = h0 then H.outcome h + R else H.outcome h)
-          = ∑ h ∈ S, (H.outcome h + if h = h0 then R else 0) := by
-              refine Finset.sum_congr rfl ?_
-              intro h hh
-              by_cases hEq : h = h0 <;> simp [hEq]
-        _ = (∑ h ∈ S, H.outcome h) + ∑ h ∈ S, if h = h0 then R else 0 := by
-              rw [Finset.sum_add_distrib]
-    have hresidual :
-        (∑ h ∈ S, if h = h0 then R else 0) =
-          if b = h0 u then R else 0 := by
-      rw [Finset.sum_ite_eq' S h0 (fun _ => R)]
-      by_cases hb : b = h0 u <;> simp [S, hb, eq_comm]
-    have hLout :
-        (evaluateAt params.next u (Preliminaries.completeAtOutcome H h0).toSubMeas).outcome b =
-          ∑ h ∈ Finset.univ.filter (fun g : Polynomial params.next => g u = b),
-            (Preliminaries.completeAtOutcome H h0).toSubMeas.outcome h := by
-      ext i j
-      simp [evaluateAt, postprocess]
-      convert rfl
-    have hEval :
-        (evaluateAt params.next u H).outcome b =
-          ∑ h ∈ Finset.univ.filter (fun g : Polynomial params.next => g u = b), H.outcome h := by
-      ext i j
-      simp [evaluateAt, postprocess]
-      convert rfl
-    calc
-      L.outcome b = ∑ h ∈ S, if hh : h = h0 then H.outcome h + R else H.outcome h := by
-              simpa [L, S, Preliminaries.completeAtOutcome, R] using hLout
-      _ = (∑ h ∈ S, H.outcome h) + ∑ h ∈ S, if h = h0 then R else 0 := hsplit
-      _ = (evaluateAt params.next u H).outcome b + if b = h0 u then R else 0 := by
-            rw [hEval]
-            exact congrArg (fun X => (∑ h ∈ S, H.outcome h) + X) hresidual
-      _ = Rhs.outcome b := by
-            by_cases hb : b = h0 u
-            · simp [Rhs, Preliminaries.completeAtOutcome, hb, R, evaluateAt, postprocess_total]
-            · simp [Rhs, Preliminaries.completeAtOutcome, hb, R, evaluateAt, postprocess_total]
-  have htotal : L.total = Rhs.total := by
-    simp [L, Rhs, evaluateAt, Preliminaries.completeAtOutcome, postprocess]
-  exact subMeas_eq_of_outcome_total_eq (A := L) (B := Rhs) (fun a => congrFun houtcome a) htotal
-
-private lemma qBipartiteConsDefect_completeAtOutcome_right_le
-    {Outcome : Type*}
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι))
-    (A : Measurement Outcome ι)
-    (B : SubMeas Outcome ι)
-    (a0 : Outcome) :
-    qBipartiteConsDefect ψ A.toSubMeas (Preliminaries.completeAtOutcome B a0).toSubMeas ≤
-      qBipartiteConsDefect ψ A.toSubMeas B +
-        ev ψ (rightTensor (ι₁ := ι) (1 - B.total)) := by
-  classical
-  let R : MIPStarRE.Quantum.Op ι := 1 - B.total
-  have hR_nonneg : 0 ≤ R := by
-    dsimp [R]
-    exact sub_nonneg.mpr B.total_le_one
-  have hAres_nonneg : 0 ≤ 1 - A.outcome a0 := by
-    exact sub_nonneg.mpr (A.outcome_le_one a0)
-  have hAres_le_one : 1 - A.outcome a0 ≤ 1 := by
-    exact sub_le_self (1 : MIPStarRE.Quantum.Op ι) (A.toSubMeas.outcome_pos a0)
-  have hextra_nonneg : 0 ≤ ev ψ (opTensor (1 - A.outcome a0) R) := by
-    exact ev_nonneg_of_psd ψ _ <|
-      (Matrix.PosSemidef.kronecker
-        (Matrix.nonneg_iff_posSemidef.mp hAres_nonneg)
-        (Matrix.nonneg_iff_posSemidef.mp hR_nonneg)).nonneg
-  have hmatchExtra_nonneg : 0 ≤ ev ψ (opTensor (A.outcome a0) R) := by
-    exact ev_nonneg_of_psd ψ _ <|
-      (Matrix.PosSemidef.kronecker
-        (Matrix.nonneg_iff_posSemidef.mp (A.toSubMeas.outcome_pos a0))
-        (Matrix.nonneg_iff_posSemidef.mp hR_nonneg)).nonneg
-  have hextra_le :
-      ev ψ (opTensor (1 - A.outcome a0) R) ≤
-        ev ψ (rightTensor (ι₁ := ι) R) := by
-    have hop : opTensor (1 - A.outcome a0) R ≤ rightTensor (ι₁ := ι) R := by
-      simpa [rightTensor, opTensor] using
-        (opTensor_mono_left (ι₂ := ι) (A₁ := 1 - A.outcome a0) (A₂ := 1) (B := R)
-          hAres_le_one hR_nonneg)
-    exact ev_mono ψ _ _ hop
-  have hmatch :
-      qBipartiteMatchMass ψ A.toSubMeas (Preliminaries.completeAtOutcome B a0).toSubMeas =
-        qBipartiteMatchMass ψ A.toSubMeas B + ev ψ (opTensor (A.outcome a0) R) := by
-    unfold qBipartiteMatchMass
-    calc
-      ∑ a : Outcome,
-          ev ψ (opTensor (A.toSubMeas.outcome a)
-            ((Preliminaries.completeAtOutcome B a0).toSubMeas.outcome a))
-        = ∑ a : Outcome,
-            ev ψ (opTensor (A.outcome a) (B.outcome a + if a = a0 then R else 0)) := by
-              refine Finset.sum_congr rfl ?_
-              intro a _
-              by_cases ha : a = a0 <;> simp [Preliminaries.completeAtOutcome, ha, R]
-      _ = ∑ a : Outcome,
-            (ev ψ (opTensor (A.outcome a) (B.outcome a)) +
-              ev ψ (opTensor (A.outcome a) (if a = a0 then R else 0))) := by
-              refine Finset.sum_congr rfl ?_
-              intro a _
-              by_cases ha : a = a0
-              · simp [ha, opTensor, ev_add, Matrix.kronecker_add]
-              · simpa [ha, opTensor] using (ev_zero ψ)
-      _ = qBipartiteMatchMass ψ A.toSubMeas B +
-            ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (if a = a0 then R else 0)) := by
-              simp [qBipartiteMatchMass, Finset.sum_add_distrib]
-      _ = qBipartiteMatchMass ψ A.toSubMeas B + ev ψ (opTensor (A.outcome a0) R) := by
-              rw [Finset.sum_eq_single a0]
-              · simp [R]
-              · intro a _ ha
-                simpa [ha, opTensor] using (ev_zero ψ)
-              · intro hnot
-                exact (hnot (Finset.mem_univ a0)).elim
-  have htotal :
-      ev ψ (opTensor A.toSubMeas.total ((Preliminaries.completeAtOutcome B a0).toSubMeas.total)) =
-        ev ψ (opTensor A.toSubMeas.total B.total) + ev ψ (rightTensor (ι₁ := ι) R) := by
-    calc
-      ev ψ (opTensor A.toSubMeas.total ((Preliminaries.completeAtOutcome B a0).toSubMeas.total))
-        = ev ψ (opTensor (1 : MIPStarRE.Quantum.Op ι) (B.total + R)) := by
-            simp [Preliminaries.completeAtOutcome, A.total_eq_one, R]
-      _ = ev ψ (opTensor (1 : MIPStarRE.Quantum.Op ι) B.total + opTensor (1 : MIPStarRE.Quantum.Op ι) R) := by
-            congr 1
-            simp [opTensor, Matrix.kronecker_add]
-      _ = ev ψ (opTensor (1 : MIPStarRE.Quantum.Op ι) B.total) +
-            ev ψ (opTensor (1 : MIPStarRE.Quantum.Op ι) R) := by
-              rw [ev_add]
-      _ = ev ψ (opTensor A.toSubMeas.total B.total) + ev ψ (opTensor (1 : MIPStarRE.Quantum.Op ι) R) := by
-            simp [A.total_eq_one]
-      _ = ev ψ (opTensor A.toSubMeas.total B.total) + ev ψ (rightTensor (ι₁ := ι) R) := by
-            rfl
-  have hinnerB_le :
-      ev ψ (opTensor A.toSubMeas.total B.total) - qBipartiteMatchMass ψ A.toSubMeas B ≤
-        qBipartiteConsDefect ψ A.toSubMeas B := by
-    exact le_max_right 0 _
-  have hinnerC_le :
-      ev ψ (opTensor A.toSubMeas.total ((Preliminaries.completeAtOutcome B a0).toSubMeas.total)) -
-          qBipartiteMatchMass ψ A.toSubMeas (Preliminaries.completeAtOutcome B a0).toSubMeas ≤
-        qBipartiteConsDefect ψ A.toSubMeas B + ev ψ (rightTensor (ι₁ := ι) R) := by
-    rw [htotal, hmatch]
-    linarith
-  have hrhs_nonneg :
-      0 ≤ qBipartiteConsDefect ψ A.toSubMeas B + ev ψ (rightTensor (ι₁ := ι) R) := by
-    have hright_nonneg : 0 ≤ ev ψ (rightTensor (ι₁ := ι) R) :=
-      ev_nonneg_of_psd ψ _ <|
-        (Matrix.nonneg_iff_posSemidef.mp (rightTensor_nonneg (ι₁ := ι) hR_nonneg)).nonneg
-    exact add_nonneg (qBipartiteConsDefect_nonneg ψ A.toSubMeas B) hright_nonneg
-  unfold qBipartiteConsDefect
-  exact max_le_iff.mpr ⟨hrhs_nonneg, hinnerC_le⟩
-
 /-- Completed-measurement version of `cor:h-a-consistency`.
 
 This wrapper is intentionally downstream of `cor:ld-pasting-N-completeness`:
@@ -4933,7 +4750,8 @@ theorem hAConsistency_completed
           (constructedPastedMeasurement params family k).toSubMeas := by
     funext u
     simpa [completedEval, H, constructedPastedMeasurement, pastedFallbackOutcome] using
-      (evaluateAt_completeAtOutcome params H (pastedFallbackOutcome params) u).symm
+      (Preliminaries.evaluateAt_completeAtOutcome params.next H
+        (pastedFallbackOutcome params) u).symm
   have hresidualMass :
       ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total)) ≤
         kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
@@ -4983,7 +4801,7 @@ theorem hAConsistency_completed
                 apply avgOver_mono
                 intro u
                 simpa [H, evaluateAt, postprocess_total, ν] using
-                  qBipartiteConsDefect_completeAtOutcome_right_le
+                  Preliminaries.qBipartiteConsDefect_completeAtOutcome_right_le
                     strategy.state (strategy.pointMeasurement u).toMeasurement
                     (evaluateAt params.next u H)
                     ((pastedFallbackOutcome params) u)
@@ -5011,17 +4829,8 @@ theorem hAConsistency_completed
           eps delta gamma kappa zeta := by
     simp [MainInductionStep.ldPastingInInductionError, ν]
     ring
-  constructor
-  simpa [hcompletedEval] using
-    le_trans hcompleted.offDiagonalBound
-      (by
-        have hσle :
-            ν + (kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
-              Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))) ≤
-              MainInductionStep.ldPastingInInductionError params k
-                eps delta gamma kappa zeta := by
-          exact hsigma.le
-        exact hσle)
+  exact ⟨by
+    simpa [hcompletedEval] using le_trans hcompleted.offDiagonalBound hsigma.le⟩
 
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
