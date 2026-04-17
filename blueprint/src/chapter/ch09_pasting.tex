@@ -708,7 +708,6 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{corollary}[Consistency of $H$ with $A$]\label{cor:h-a-consistency}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas}
-	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed}
 	\uses{lem:h-b-consistency}
 	On average over $(u,x) \sim \F_q^{m+1}$,
 	\[
@@ -733,6 +732,32 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\le \nu,
 	\]
 	the claim follows.
+\end{proof}
+
+\begin{corollary}[Consistency of the completed $H$ with $A$]
+	\label{cor:h-a-consistency-completed}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed}
+	\uses{cor:h-a-consistency, cor:ld-pasting-N-completeness}
+	Let $H_{\mathrm{meas}}$ be the completion of $H$ at the fallback outcome.
+	On average over $(u,x) \sim \F_q^{m+1}$,
+	\[
+		(H_{\mathrm{meas}})_{[h(u,x)=a]} \ot I \simeq_{\sigma} I \ot A_a^{u,x}.
+	\]
+\end{corollary}
+\begin{proof}
+	Corollary~\ref{cor:h-a-consistency} gives
+	\[
+		H_{[h(u,x)=a]} \ot I \simeq_{\nu} I \ot A_a^{u,x}.
+	\]
+	Corollary~\ref{cor:ld-pasting-N-completeness} bounds the missing mass of $H$ by
+	\[
+		\kappa \cdot \left(1 + \frac{1}{100m}\right) + \nu + e^{-k/(80000m^2)}.
+	\]
+	Adding this completion mass to the $\nu$-bound gives
+	\[
+		\nu + \kappa \cdot \left(1 + \frac{1}{100m}\right) + \nu +
+		e^{-k/(80000m^2)} = \sigma.
+	\]
 \end{proof}
 
 \subsection{Completeness of $H$}
@@ -894,7 +919,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\bra{\psi_{\mathrm{bi}}} \widehat H_{g_1,\dots,g_k}^{x_1,\dots,x_k} \ot I \ket{\psi_{\mathrm{bi}}}
 		\approx_{\nu_8}
 		\sum_{r=d+1}^k \binom{k}{r} \bra{\psi_{\mathrm{bi}}} G^r(I-G)^{k-r} \ot I
-			\ket{\psi_{\mathrm{bi}}},
+		\ket{\psi_{\mathrm{bi}}},
 	\]
 	where
 	\[

@@ -3,12 +3,15 @@ import MIPStarRE.LDT.SelfImprovement.Defs
 /-!
 # Section 9 — Theorems
 
-This file packages the currently formalized self-improvement outputs, together
-with the temporary bridge assumptions that connect the reduced Section 9 lemmas
-to the downstream induction step.
+Reduced theorem wrappers for the currently formalized self-improvement pipeline.
+
+This file packages the weakened SDP witness, the reduced `add-in-u`
+consequence, and the current bridge-based versions of
+`lem:self-improvement-helper` and `thm:self-improvement`.
 
 ## References
 
+- `blueprint/src/chapter/ch07_self_improvement.tex`
 - `references/ldt-paper/self_improvement.tex`
 -/
 
@@ -21,6 +24,8 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-! ## Operator and output packages -/
 
 /-- A reduced SDP witness for the currently formalized self-improvement pipeline.
 
@@ -73,6 +78,12 @@ noncomputable def addInURightOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 u
     opTensor (Au * (M u).outcome ah.1 * Au) (T.outcome ah.2)
 
+private noncomputable def addInUPointAverage (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (f : Point params → MIPStarRE.Quantum.Op (ι × ι)) : Error :=
+  avgOver (uniformDistribution (Point params)) (fun u => ev strategy.state (f u))
+
 /-- The left-hand expectation in `lem:add-in-u`. -/
 noncomputable def addInULeftQuantity {Outcome : Type*} [Fintype Outcome] (params : Parameters)
     [FieldModel params.q]
@@ -80,10 +91,7 @@ noncomputable def addInULeftQuantity {Outcome : Type*} [Fintype Outcome] (params
     (M : IdxSubMeas (Point params) Outcome ι)
     (H : SubMeas (Polynomial params) ι)
     (S : AddInUSelection params Outcome) : Error :=
-  avgOver (uniformDistribution (Point params))
-    (fun u =>
-      ev strategy.state
-        (addInULeftOperatorAtPoint params strategy M H S u))
+  addInUPointAverage params strategy (addInULeftOperatorAtPoint params strategy M H S)
 
 /-- The right-hand expectation in `lem:add-in-u`. -/
 noncomputable def addInURightQuantity {Outcome : Type*} [Fintype Outcome] (params : Parameters)
@@ -92,10 +100,7 @@ noncomputable def addInURightQuantity {Outcome : Type*} [Fintype Outcome] (param
     (M : IdxSubMeas (Point params) Outcome ι)
     (T : SubMeas (Polynomial params) ι)
     (S : AddInUSelection params Outcome) : Error :=
-  avgOver (uniformDistribution (Point params))
-    (fun u =>
-      ev strategy.state
-        (addInURightOperatorAtPoint params strategy M T S u))
+  addInUPointAverage params strategy (addInURightOperatorAtPoint params strategy M T S)
 
 /-- The pointwise matched operator `Σ_a A^u_a ⊗ H_[h(u)=a]`
 on the bipartite space `ι × ι`. -/
@@ -371,31 +376,24 @@ structure SelfImprovementBridgePackage (params : Parameters) [FieldModel params.
         (selfImprovementDataProcessingError params eps delta) →
       SelfImprovementFinalFields params strategy H Z eps delta nu
 
+/-! ## Reduced theorem wrappers -/
+
 private lemma averagedPointOperator_le_one
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (g : Polynomial params) :
     averagedPointOperator params strategy g ≤ 1 := by
-  change
-    averageOperatorOverDistribution (uniformDistribution (Point params))
-      (pointConditionedOutcomeOperatorAtPolynomial params strategy g) ≤ 1
-  let 𝒟 := uniformDistribution (Point params)
-  calc
-    averageOperatorOverDistribution 𝒟
-        (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
-      ≤ ∑ u ∈ 𝒟.support, 𝒟.weight u • (1 : MIPStarRE.Quantum.Op ι) := by
-          simp only [averageOperatorOverDistribution]
-          exact Finset.sum_le_sum fun u _ =>
-            smul_le_smul_of_nonneg_left
-              (Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u))
-              (𝒟.nonnegative u)
-    _ = (∑ u ∈ 𝒟.support, 𝒟.weight u) • (1 : MIPStarRE.Quantum.Op ι) := by
-          rw [Finset.sum_smul]
-    _ ≤ (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
-          exact smul_le_smul_of_nonneg_right
-            (uniformDistribution_weight_sum_le_one (Point params)) zero_le_one
-    _ = 1 := by simp
+  let A : SubMeas Unit ι :=
+    averageUnitSubMeas (ι := ι)
+      (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
+      (fun u => by
+        simpa [pointConditionedOutcomeOperatorAtPolynomial] using
+          (strategy.pointMeasurement u).outcome_pos (g u))
+      (fun u => by
+        simpa [pointConditionedOutcomeOperatorAtPolynomial] using
+          Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u))
+  simpa [A, averagedPointOperator, averageUnitSubMeas_outcome] using A.outcome_le_one ()
 
 /-- Reduced version of `lem:sdp`.
 

@@ -38,7 +38,6 @@
 
 \begin{lemma}[Laplacian rewrite]\label{prop:laplacian-rewrite}
 	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianRewrite}
-	\leanok
 	\uses{def:adjacency-laplacian}
 	The Laplacian can be written as
 	\[
@@ -62,6 +61,7 @@
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	If $\beta=0$ the character is constant. If $\beta\ne 0$, the map $x \mapsto \beta x$ permutes $\F_q$, so the average is the average of a nontrivial additive character, which vanishes.
 \end{proof}
 
@@ -79,12 +79,12 @@
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Factor the sum over the $m$ coordinates and apply Lemma~\ref{lem:character-average-scalar} to each factor.
 \end{proof}
 
 \begin{lemma}[Eigenvectors of the hypercube graph]\label{prop:eigenvectors}
 	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors}
-	\leanok
 	\uses{def:adjacency-laplacian, lem:character-average-vector, lem:character-average-scalar}
 	For each $\alpha \in \F_q^m$, define
 	\[
@@ -157,6 +157,7 @@
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	\uses{prop:eigenvectors}
 	Lemma~\ref{prop:eigenvectors} identifies the two largest eigenvalues of $K$, hence the two smallest eigenvalues of $L=(1/q^m)I-K$.
 \end{proof}
@@ -193,6 +194,7 @@
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	\uses{prop:laplacian-rewrite}
 	For $u,v \in \F_q^m$,
 	\begin{equation}
@@ -242,6 +244,7 @@
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	\uses{prop:eigenvectors}
 	We first compute
 	\[
@@ -298,6 +301,7 @@
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	\uses{lem:local-rewrite, cor:laplacian-spectral-gap, lem:global-rewrite}
 	\begin{equation}
 		\begin{aligned}

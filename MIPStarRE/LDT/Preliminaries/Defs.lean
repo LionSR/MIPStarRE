@@ -1,11 +1,27 @@
 import MIPStarRE.LDT.Test.MainTheorem
 
 /-!
-Matching scaffold for Section 4 of the low individual degree paper in
-`references/ldt-paper/preliminaries.tex`.
+# Preliminary definition packages
 
-This file introduces lightweight paper-local definitions for the measurement
-calculus of the paper. All operator fields use `Op ι` directly.
+This file collects the lightweight statement and definition layer for the
+preliminaries chapter of the LDT development. It packages the paper's
+consistency, sandwich, and completion interfaces in a form convenient for later
+files.
+
+## Main definitions
+
+- `BipartiteSDDRel`: the paper-style left/right state-dependent distance
+  relation.
+- `ConsAgreement`: the measurement reformulation of consistency.
+- `ConsSubMeasStmt`, `SwitchSandwichStmt`, `CompTransferStmt`, and
+  `CompletingToMeasStmt`: bundled outputs for the main preliminary bridge
+  propositions.
+- `completeAtOutcome`: completion of a submeasurement at a distinguished
+  outcome.
+
+## References
+
+- `references/ldt-paper/preliminaries.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -14,6 +30,8 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 open MIPStarRE.Quantum
+
+/-! ## Consistency and distance packages -/
 
 /-- Source-style left/right relation `A^x_a ⊗ I ≈_δ I ⊗ B^x_a`. -/
 structure BipartiteSDDRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -29,7 +47,7 @@ structure OpBounded01 {ι : Type*} [Fintype ι] [DecidableEq ι]
   nonnegative : 0 ≤ B
   boundedByIdentity : 0 ≤ (1 : MIPStarRE.Quantum.Op ι) - B
 
-/-- Placeholder agreement probability from `prop:simeq-for-measurements`. -/
+/-- Agreement probability from `prop:simeq-for-measurements`. -/
 noncomputable def agreementProbability {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -45,10 +63,6 @@ structure ConsAgreement {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
     (A B : IdxMeas Question Outcome ι) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
-
--- `leftTensor_mul_rightTensor_eq_opTensor` is now in `Basic/Operator.lean`
--- (namespace `MIPStarRE.LDT`). We re-export for backwards compatibility.
--- Local alias removed per PR review to avoid duplication.
 
 /-- `A_a ⊗ B_a`, the diagonal bipartite bridge from `prop:cons-sub-meas`. -/
 noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
@@ -178,6 +192,8 @@ structure ConsSubMeasStmt {Question Outcome : Type*} {ι : Type*} [Fintype ι] [
   combinedControl :
     SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A) (totalSandwichFamily A B) (4 * γ)
 
+/-! ## Sandwich expectations -/
+
 /-- Averaged left term `E_x ∑_a ⟨ψ, (A_a B A_a ⊗ I) ψ⟩`. -/
 noncomputable def leftSandwichExpectation {Question Outcome : Type*}
     {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
@@ -237,6 +253,8 @@ structure CompTransferStmt {Question Outcome : Type*}
       idxSubMeasMass ψ 𝒟
         (IdxProjSubMeas.toIdxSubMeas P)
         - 2 * Real.sqrt ε
+
+/-! ## Completion -/
 
 /-- Canonical completion of `B` by adjoining the residual `I - Σ_a B_a`
 to the distinguished outcome `a0`. -/

@@ -1,11 +1,32 @@
 import MIPStarRE.LDT.Preliminaries.Defs
 
 /-!
-Matching scaffold for Section 4 of the low individual degree paper in
-`references/ldt-paper/preliminaries.tex`.
+# Preliminary comparison theorems
 
-This file records the main proposition names with placeholder proofs.
-All operator fields use `Op ι` directly.
+This file proves the main consistency, state-dependent-distance, sandwich, and
+completion lemmas used throughout the preliminaries chapter. It also records a
+small collection of reusable helper lemmas for postprocessing, tensor lifts,
+and constant families.
+
+## Main results
+
+- `simeqForMeasurements`: consistency for measurements in terms of agreement.
+- `simeqToApprox`: consistency implies state-dependent distance for
+  measurements.
+- `simeqDataProcessing`: postprocessing preserves consistency.
+- `consSubMeas`: the two-step sandwich bridge from consistency to
+  submeasurement control.
+- `switchSandwich`: the paper's switch-sandwich estimate.
+- `completenessTransferProjectiveP`: completeness transfer from a nearby
+  projective family.
+- `twoNotionsOfSelfConsistency`: bipartite self-consistency implies left/right
+  closeness.
+- `completingToMeasurement`: completion of a submeasurement while controlling
+  distance to the original measurement.
+
+## References
+
+- `references/ldt-paper/preliminaries.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -161,17 +182,13 @@ theorem simeqToApprox {Question Outcome : Type*}
           let A' : Measurement Outcome (ι × ι) :=
             { toSubMeas := ((A q).toSubMeas).liftLeft
               total_eq_one := by
-                ext i j
-                rcases i with ⟨i₁, i₂⟩
-                rcases j with ⟨j₁, j₂⟩
-                simp [SubMeas.liftLeft, leftTensor, (A q).total_eq_one] }
+                simpa [SubMeas.liftLeft, (A q).total_eq_one] using
+                  (leftTensor_one (ι₁ := ι) (ι₂ := ι)) }
           let B' : Measurement Outcome (ι × ι) :=
             { toSubMeas := ((B q).toSubMeas).liftRight
               total_eq_one := by
-                ext i j
-                rcases i with ⟨i₁, i₂⟩
-                rcases j with ⟨j₁, j₂⟩
-                simp [SubMeas.liftRight, rightTensor, (B q).total_eq_one] }
+                simpa [SubMeas.liftRight, (B q).total_eq_one] using
+                  (rightTensor_one (ι₁ := ι) (ι₂ := ι)) }
           simpa [A', B', IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxMeas.toIdxSubMeas] using
             questionSDD_le_two_questionConsistency ψ A' B'
     _ = 2 * avgOver 𝒟
@@ -817,7 +834,7 @@ private lemma consSubMeas_diagonalControl
           have hX_nonneg : ∀ a : Outcome, 0 ≤ X a := by
             intro a
             dsimp [X]
-            simp only [IdxSubMeas.liftLeft, SubMeas.liftLeft, diagonalSandwichFamily,
+            simp only [IdxSubMeas.liftLeft, diagonalSandwichFamily,
               LDT.leftTensor_mul_rightTensor_eq_opTensor, sub_nonneg]
             exact MIPStarRE.LDT.opTensor_le_leftTensor
               ((A q).outcome_pos a)
@@ -856,7 +873,7 @@ private lemma consSubMeas_diagonalControl
                       ev ψ
                         (leftTensor (ι₂ := ι) ((A q).outcome a) *
                           rightTensor (ι₁ := ι) ((B q).outcome a)) := by
-                          simp [X, IdxSubMeas.liftLeft, SubMeas.liftLeft,
+                          simp [X, IdxSubMeas.liftLeft,
                             diagonalSandwichFamily, ev_sub]
               _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) -
                     qMatchMass ψ
@@ -864,7 +881,7 @@ private lemma consSubMeas_diagonalControl
                       (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
                           unfold qMatchMass
                           simp [hleft, IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
-                            SubMeas.liftLeft, SubMeas.liftRight, IdxMeas.toIdxSubMeas]
+                            IdxMeas.toIdxSubMeas]
               _ =
                   ev ψ
                     ((((IdxSubMeas.liftLeft A) q).total) *
@@ -1002,8 +1019,7 @@ private lemma consSubMeas_sandwichControl
                       (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
                         unfold qMatchMass
                         simp [htotal, diagonalSandwichFamily, IdxSubMeas.liftLeft,
-                          IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight,
-                          IdxMeas.toIdxSubMeas]
+                          IdxSubMeas.liftRight, IdxMeas.toIdxSubMeas]
               _ =
                   ev ψ
                     ((((IdxSubMeas.liftLeft A) q).total) *
@@ -1014,7 +1030,7 @@ private lemma consSubMeas_sandwichControl
                         rw [show ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total =
                             rightTensor (ι₁ := ι) ((B q).total) by rfl]
                         rw [(B q).total_eq_one]
-                        simp [IdxSubMeas.liftLeft, SubMeas.liftLeft, rightTensor, leftTensor]
+                        simp [IdxSubMeas.liftLeft, rightTensor, leftTensor]
     _ ≤ γ := hcons
 
 private lemma consSubMeas_combinedControl
@@ -3408,6 +3424,165 @@ lemma completion_self_distance
       _ = ev ψ (R * R) := hsingle
   simpa [qSDD, qSDDCore, R] using hsum
 
+/-- Evaluating a completed polynomial submeasurement at a point is the same as
+completing the evaluated submeasurement at the induced outcome. -/
+lemma evaluateAt_completeAtOutcome
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters)
+    [FieldModel params.q]
+    (H : SubMeas (Polynomial params) ι)
+    (h0 : Polynomial params)
+    (u : Point params) :
+    evaluateAt params u (completeAtOutcome H h0).toSubMeas =
+      (completeAtOutcome (evaluateAt params u H) (h0 u)).toSubMeas := by
+  classical
+  let R : MIPStarRE.Quantum.Op ι := 1 - H.total
+  let L := evaluateAt params u (completeAtOutcome H h0).toSubMeas
+  let Rhs := (completeAtOutcome (evaluateAt params u H) (h0 u)).toSubMeas
+  have houtcome : L.outcome = Rhs.outcome := by
+    funext b
+    let S : Finset (Polynomial params) :=
+      Finset.univ.filter fun h : Polynomial params => h u = b
+    have hsplit :
+        (∑ h ∈ S,
+            if hh : h = h0 then H.outcome h + R else H.outcome h) =
+          (∑ h ∈ S, H.outcome h) +
+            ∑ h ∈ S, if h = h0 then R else 0 := by
+      calc
+        (∑ h ∈ S, if hh : h = h0 then H.outcome h + R else H.outcome h)
+          = ∑ h ∈ S, (H.outcome h + if h = h0 then R else 0) := by
+              refine Finset.sum_congr rfl ?_
+              intro h hh
+              by_cases hEq : h = h0 <;> simp [hEq]
+        _ = (∑ h ∈ S, H.outcome h) + ∑ h ∈ S, if h = h0 then R else 0 := by
+              rw [Finset.sum_add_distrib]
+    have hresidual :
+        (∑ h ∈ S, if h = h0 then R else 0) =
+          if b = h0 u then R else 0 := by
+      rw [Finset.sum_ite_eq' S h0 (fun _ => R)]
+      by_cases hb : b = h0 u <;> simp [S, hb, eq_comm]
+    have hLout :
+        (evaluateAt params u (completeAtOutcome H h0).toSubMeas).outcome b =
+          ∑ h ∈ Finset.univ.filter (fun g : Polynomial params => g u = b),
+            (completeAtOutcome H h0).toSubMeas.outcome h := by
+      ext i j
+      simp [evaluateAt, postprocess]
+      convert rfl
+    have hEval :
+        (evaluateAt params u H).outcome b =
+          ∑ h ∈ Finset.univ.filter (fun g : Polynomial params => g u = b), H.outcome h := by
+      ext i j
+      simp [evaluateAt, postprocess]
+      convert rfl
+    calc
+      L.outcome b = ∑ h ∈ S, if hh : h = h0 then H.outcome h + R else H.outcome h := by
+              simpa [L, S, completeAtOutcome, R] using hLout
+      _ = (∑ h ∈ S, H.outcome h) + ∑ h ∈ S, if h = h0 then R else 0 := hsplit
+      _ = (evaluateAt params u H).outcome b + if b = h0 u then R else 0 := by
+            rw [hEval]
+            exact congrArg (fun X => (∑ h ∈ S, H.outcome h) + X) hresidual
+      _ = Rhs.outcome b := by
+            by_cases hb : b = h0 u
+            · simp [Rhs, completeAtOutcome, hb, R, evaluateAt, postprocess_total]
+            · simp [Rhs, completeAtOutcome, hb, R, evaluateAt, postprocess_total]
+  have htotal : L.total = Rhs.total := by
+    simp [L, Rhs, evaluateAt, completeAtOutcome, postprocess]
+  exact SubMeas.ext (A := L) (B := Rhs) (fun a => congrFun houtcome a) htotal
+
+/-- Completing the right submeasurement can increase the bipartite consistency
+defect by at most the residual completion mass `1 - B.total`. -/
+lemma qBipartiteConsDefect_completeAtOutcome_right_le
+    {Outcome : Type*}
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA)
+    (B : SubMeas Outcome ιB)
+    (a0 : Outcome) :
+    qBipartiteConsDefect ψ A.toSubMeas (completeAtOutcome B a0).toSubMeas ≤
+      qBipartiteConsDefect ψ A.toSubMeas B +
+        ev ψ (rightTensor (ι₁ := ιA) (1 - B.total)) := by
+  classical
+  let R : MIPStarRE.Quantum.Op ιB := 1 - B.total
+  have hR_nonneg : 0 ≤ R := by
+    dsimp [R]
+    exact sub_nonneg.mpr B.total_le_one
+  have hmatchExtra_nonneg : 0 ≤ ev ψ (opTensor (A.outcome a0) R) := by
+    exact ev_nonneg_of_psd ψ _ <|
+      (Matrix.PosSemidef.kronecker
+        (Matrix.nonneg_iff_posSemidef.mp (A.toSubMeas.outcome_pos a0))
+        (Matrix.nonneg_iff_posSemidef.mp hR_nonneg)).nonneg
+  have hmatch :
+      qBipartiteMatchMass ψ A.toSubMeas (completeAtOutcome B a0).toSubMeas =
+        qBipartiteMatchMass ψ A.toSubMeas B + ev ψ (opTensor (A.outcome a0) R) := by
+    unfold qBipartiteMatchMass
+    calc
+      ∑ a : Outcome,
+          ev ψ
+            (opTensor (A.toSubMeas.outcome a) ((completeAtOutcome B a0).toSubMeas.outcome a))
+        = ∑ a : Outcome,
+            ev ψ (opTensor (A.outcome a) (B.outcome a + if a = a0 then R else 0)) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              by_cases ha : a = a0 <;> simp [completeAtOutcome, ha, R]
+      _ = ∑ a : Outcome,
+            (ev ψ (opTensor (A.outcome a) (B.outcome a)) +
+              ev ψ (opTensor (A.outcome a) (if a = a0 then R else 0))) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              by_cases ha : a = a0
+              · simp [ha, opTensor, ev_add, Matrix.kronecker_add]
+              · simpa [ha, opTensor] using (ev_zero ψ)
+      _ = qBipartiteMatchMass ψ A.toSubMeas B +
+            ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (if a = a0 then R else 0)) := by
+              simp [qBipartiteMatchMass, Finset.sum_add_distrib]
+      _ = qBipartiteMatchMass ψ A.toSubMeas B + ev ψ (opTensor (A.outcome a0) R) := by
+              rw [Finset.sum_eq_single a0]
+              · simp [R]
+              · intro a _ ha
+                simpa [ha, opTensor] using (ev_zero ψ)
+              · intro hnot
+                exact (hnot (Finset.mem_univ a0)).elim
+  have htotal :
+      ev ψ (opTensor A.toSubMeas.total ((completeAtOutcome B a0).toSubMeas.total)) =
+        ev ψ (opTensor A.toSubMeas.total B.total) + ev ψ (rightTensor (ι₁ := ιA) R) := by
+    calc
+      ev ψ (opTensor A.toSubMeas.total ((completeAtOutcome B a0).toSubMeas.total))
+        = ev ψ (opTensor (1 : MIPStarRE.Quantum.Op ιA) (B.total + R)) := by
+            simp [completeAtOutcome, A.total_eq_one, R]
+      _ = ev ψ
+            (opTensor (1 : MIPStarRE.Quantum.Op ιA) B.total +
+              opTensor (1 : MIPStarRE.Quantum.Op ιA) R) := by
+              congr 1
+              simp [opTensor, Matrix.kronecker_add]
+      _ = ev ψ (opTensor (1 : MIPStarRE.Quantum.Op ιA) B.total) +
+            ev ψ (opTensor (1 : MIPStarRE.Quantum.Op ιA) R) := by
+              rw [ev_add]
+      _ = ev ψ (opTensor A.toSubMeas.total B.total) +
+            ev ψ (opTensor (1 : MIPStarRE.Quantum.Op ιA) R) := by
+              simp [A.total_eq_one]
+      _ = ev ψ (opTensor A.toSubMeas.total B.total) + ev ψ (rightTensor (ι₁ := ιA) R) := by
+            rfl
+  have hinnerB_le :
+      ev ψ (opTensor A.toSubMeas.total B.total) - qBipartiteMatchMass ψ A.toSubMeas B ≤
+        qBipartiteConsDefect ψ A.toSubMeas B := by
+    exact le_max_right 0 _
+  have hinnerC_le :
+      ev ψ (opTensor A.toSubMeas.total ((completeAtOutcome B a0).toSubMeas.total)) -
+          qBipartiteMatchMass ψ A.toSubMeas (completeAtOutcome B a0).toSubMeas ≤
+        qBipartiteConsDefect ψ A.toSubMeas B + ev ψ (rightTensor (ι₁ := ιA) R) := by
+    rw [htotal, hmatch]
+    linarith
+  have hrhs_nonneg :
+      0 ≤ qBipartiteConsDefect ψ A.toSubMeas B + ev ψ (rightTensor (ι₁ := ιA) R) := by
+    have hright_nonneg : 0 ≤ ev ψ (rightTensor (ι₁ := ιA) R) :=
+      ev_nonneg_of_psd ψ _ <|
+        (Matrix.nonneg_iff_posSemidef.mp (rightTensor_nonneg (ι₁ := ιA) hR_nonneg)).nonneg
+    exact add_nonneg (qBipartiteConsDefect_nonneg ψ A.toSubMeas B) hright_nonneg
+  unfold qBipartiteConsDefect
+  exact max_le_iff.mpr ⟨hrhs_nonneg, hinnerC_le⟩
+
 /-- Bridge lemma: for a permutation-invariant bipartite state, bipartite SSC
 on local families implies local SSC on the left-lifted families.
 
@@ -3729,10 +3904,8 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
   let A_lifted : Measurement Outcome (ι × ι) :=
     { toSubMeas := A.toSubMeas.liftLeft
       total_eq_one := by
-        ext i j
-        rcases i with ⟨i₁, i₂⟩
-        rcases j with ⟨j₁, j₂⟩
-        simp [SubMeas.liftLeft, leftTensor, A.total_eq_one] }
+        simpa [SubMeas.liftLeft, A.total_eq_one] using
+          (leftTensor_one (ι₁ := ι) (ι₂ := ι)) }
   have hlocal :=
     closenessAfterCompletion_core_local ψ hψ A_lifted B.liftLeft a0 δ ζ
       hlocal_ssc hsdd
@@ -3806,25 +3979,8 @@ lemma sddOpRel_triangle
     (A B C : IdxOpFamily Question Outcome ι) (δ₁ δ₂ : Error) :
     SDDOpRel ψ 𝒟 A B δ₁ →
     SDDOpRel ψ 𝒟 B C δ₂ →
-    SDDOpRel ψ 𝒟 A C (2 * (δ₁ + δ₂)) := by
-  intro ⟨h₁⟩ ⟨h₂⟩
-  constructor
-  unfold sddErrorOp at *
-  calc avgOver 𝒟 (fun q => qSDDOp ψ (A q) (C q))
-      ≤ avgOver 𝒟 (fun q => 2 * (qSDDOp ψ (A q) (B q) +
-            qSDDOp ψ (B q) (C q))) := by
-        apply avgOver_mono
-        intro q
-        exact questionSDDOp_triangle ψ (A q) (B q) (C q)
-    _ = 2 * avgOver 𝒟 (fun q => qSDDOp ψ (A q) (B q) +
-          qSDDOp ψ (B q) (C q)) := by
-        rw [avgOver_const_mul]
-    _ = 2 * (avgOver 𝒟 (fun q => qSDDOp ψ (A q) (B q)) +
-          avgOver 𝒟 (fun q => qSDDOp ψ (B q) (C q))) := by
-        rw [avgOver_add]
-    _ ≤ 2 * (δ₁ + δ₂) := by
-        apply mul_le_mul_of_nonneg_left _ (by norm_num)
-        exact add_le_add h₁ h₂
+    SDDOpRel ψ 𝒟 A C (2 * (δ₁ + δ₂)) :=
+  stateDependentDistanceOpRel_triangle ψ 𝒟 A B C δ₁ δ₂
 
 /-- Monotonicity for `SDDOpRel`. -/
 lemma sddOpRel_mono
@@ -3833,8 +3989,8 @@ lemma sddOpRel_mono
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A B : IdxOpFamily Question Outcome ι) (δ δ' : Error) :
     SDDOpRel ψ 𝒟 A B δ → δ ≤ δ' → SDDOpRel ψ 𝒟 A B δ' := by
-  intro ⟨h⟩ hle
-  exact ⟨le_trans h hle⟩
+  intro h hle
+  exact stateDependentDistanceOpRel_mono ψ 𝒟 A B δ δ' hle h
 
 /-- Questionwise n-step chain bound: the squared distance between the
 first and last operator family telescopes and is bounded by
@@ -3855,7 +4011,7 @@ private lemma questionSDDOp_chain
       (families 0).outcome a - (families (Fin.last n)).outcome a =
         ∑ i : Fin n, D i a := by
     intro a
-    show (families 0).outcome a -
+    change (families 0).outcome a -
         (families (Fin.last n)).outcome a =
       ∑ i : Fin n, ((families i.castSucc).outcome a -
         (families i.succ).outcome a)

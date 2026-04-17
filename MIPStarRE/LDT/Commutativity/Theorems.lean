@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Defs
+import MIPStarRE.LDT.CommutativityPoints.Theorem
 import MIPStarRE.LDT.Preliminaries.Polynomials
 import MIPStarRE.LDT.Preliminaries.SelfConsistency
 import MIPStarRE.LDT.Test.Strategy
@@ -195,64 +196,6 @@ structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
 
 /-! ## Scaffold theorem statements -/
 
-private def pointNextEquiv (params : Parameters) [FieldModel params.q] :
-    Point params.next ≃ Point params × Fq params where
-  toFun := fun u => (truncatePoint params u, pointHeight params u)
-  invFun := fun ux => appendPoint params ux.1 ux.2
-  left_inv := by
-    intro u
-    funext i
-    by_cases h : i.1 < params.m
-    · simp [appendPoint, truncatePoint, h]
-    · have hi : i.1 = params.m := by
-        have hi_lt : i.1 < params.m + 1 := by
-          simpa [Parameters.next] using i.2
-        omega
-      have hlast : i = lastCoord params := by
-        apply Fin.ext
-        simp [lastCoord, hi]
-      simp [appendPoint, truncatePoint, pointHeight, hlast]
-  right_inv := by
-    rintro ⟨u, x⟩
-    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
-
-private lemma avgOver_uniform_prod
-    {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (f : α → β → Error) :
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) =
-      avgOver (uniformDistribution α)
-        (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
-  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  calc
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2)
-      = ∑ a : α, ∑ b : β,
-          (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b := by
-            simpa [avgOver, uniformDistribution, Fintype.card_prod] using
-              (Fintype.sum_prod_type'
-                (f := fun a : α => fun b : β =>
-                  (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b))
-    _ = ∑ a : α, (1 / (Fintype.card α : Error)) *
-          ((1 / (Fintype.card β : Error)) * ∑ b : β, f a b) := by
-          refine Finset.sum_congr rfl ?_
-          intro a ha
-          calc
-            ∑ b : β, (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * f a b
-              = (1 / ((Fintype.card α * Fintype.card β : ℕ) : Error)) * ∑ b : β, f a b := by
-                  rw [← Finset.mul_sum]
-            _ = (1 / (Fintype.card α : Error)) *
-                  ((1 / (Fintype.card β : Error)) * ∑ b : β, f a b) := by
-                    field_simp [hα, hβ]
-                    rw [Nat.cast_mul]
-                    ring
-    _ = avgOver (uniformDistribution α)
-          (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
-          simp [avgOver, uniformDistribution, Finset.mul_sum]
-
 /-- Coordinatewise transport between coded `F_q` points and the underlying scalar model. -/
 private def pointScalarEquiv (params : Parameters) [FieldModel params.q] :
     Point params ≃ (Fin params.m → Scalar params) where
@@ -406,119 +349,6 @@ private lemma evaluatedPointFamily_pointConsistency
       zeta := by
   simpa [evaluatedPointFamily] using hcons.pointConsistency
 
-private lemma qSDDOp_reindex
-    {Outcome Outcome' : Type*}
-    [Fintype Outcome] [Fintype Outcome']
-    (e : Outcome ≃ Outcome')
-    (ψ : QuantumState ι)
-    (A B : OpFamily Outcome ι) :
-    qSDDOp ψ A B =
-      qSDDOp ψ
-        ({ outcome := fun a' => A.outcome (e.symm a')
-           total := A.total } : OpFamily Outcome' ι)
-        ({ outcome := fun a' => B.outcome (e.symm a')
-           total := B.total } : OpFamily Outcome' ι) := by
-  unfold qSDDOp qSDDCore
-  calc
-    ∑ a : Outcome, ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a))
-      = ∑ a' : Outcome',
-          ev ψ
-            ((A.outcome (e.symm a') - B.outcome (e.symm a'))ᴴ *
-              (A.outcome (e.symm a') - B.outcome (e.symm a'))) := by
-          exact Fintype.sum_equiv e
-            (fun a =>
-              ev ψ ((A.outcome a - B.outcome a)ᴴ * (A.outcome a - B.outcome a)))
-            (fun a' =>
-              ev ψ
-                ((A.outcome (e.symm a') - B.outcome (e.symm a'))ᴴ *
-                  (A.outcome (e.symm a') - B.outcome (e.symm a'))))
-            (by
-              intro a
-              simp)
-    _ = qSDDOp ψ
-          ({ outcome := fun a' => A.outcome (e.symm a')
-             total := A.total } : OpFamily Outcome' ι)
-          ({ outcome := fun a' => B.outcome (e.symm a')
-             total := B.total } : OpFamily Outcome' ι) := by
-          rfl
-
-private lemma sddOpRel_reindex
-    {Question Outcome Outcome' : Type*}
-    [Fintype Outcome] [Fintype Outcome']
-    (e : Outcome ≃ Outcome')
-    (ψ : QuantumState ι)
-    (𝒟 : Distribution Question)
-    (A B : IdxOpFamily Question Outcome ι)
-    (δ : Error) :
-    SDDOpRel ψ 𝒟 A B δ →
-      SDDOpRel ψ 𝒟
-        (fun q =>
-          ({ outcome := fun a' => (A q).outcome (e.symm a')
-             total := (A q).total } : OpFamily Outcome' ι))
-        (fun q =>
-          ({ outcome := fun a' => (B q).outcome (e.symm a')
-             total := (B q).total } : OpFamily Outcome' ι))
-        δ := by
-  intro ⟨h⟩
-  constructor
-  unfold sddErrorOp at *
-  calc
-    avgOver 𝒟
-        (fun q =>
-          qSDDOp ψ
-            ({ outcome := fun a' => (A q).outcome (e.symm a')
-               total := (A q).total } : OpFamily Outcome' ι)
-            ({ outcome := fun a' => (B q).outcome (e.symm a')
-               total := (B q).total } : OpFamily Outcome' ι))
-      = avgOver 𝒟 (fun q => qSDDOp ψ (A q) (B q)) := by
-          apply avgOver_congr
-          intro q
-          rw [qSDDOp_reindex e ψ (A q) (B q)]
-    _ ≤ δ := h
-
-private lemma sddOpRel_congr_outcome
-    {Question Outcome : Type*}
-    [Fintype Outcome]
-    (ψ : QuantumState ι)
-    (𝒟 : Distribution Question)
-    (A B A' B' : IdxOpFamily Question Outcome ι)
-    (δ : Error)
-    (hA : ∀ q a, (A q).outcome a = (A' q).outcome a)
-    (hB : ∀ q a, (B q).outcome a = (B' q).outcome a) :
-    SDDOpRel ψ 𝒟 A B δ →
-      SDDOpRel ψ 𝒟 A' B' δ := by
-  intro ⟨h⟩
-  constructor
-  unfold sddErrorOp at *
-  calc
-    avgOver 𝒟 (fun q => qSDDOp ψ (A' q) (B' q))
-      = avgOver 𝒟 (fun q => qSDDOp ψ (A q) (B q)) := by
-          apply avgOver_congr
-          intro q
-          unfold qSDDOp qSDDCore
-          apply Finset.sum_congr rfl
-          intro a _
-          rw [hA q a, hB q a]
-    _ ≤ δ := h
-
-private lemma subMeas_sum_adjoint_mul_le_one
-    {Outcome : Type*}
-    [Fintype Outcome]
-    (A : SubMeas Outcome ι) :
-    ∑ a : Outcome, (A.outcome a)ᴴ * A.outcome a ≤ 1 := by
-  calc
-    ∑ a : Outcome, (A.outcome a)ᴴ * A.outcome a
-      = ∑ a : Outcome, A.outcome a * A.outcome a := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [SubMeas.outcome_hermitian]
-    _ ≤ ∑ a : Outcome, A.outcome a := by
-          refine Finset.sum_le_sum ?_
-          intro a _
-          exact MIPStarRE.Quantum.sq_le_self (A.outcome_pos a) (A.outcome_le_one a)
-    _ = A.total := A.sum_eq_total
-    _ ≤ 1 := A.total_le_one
-
 private lemma qMatchMass_symm
     {Outcome : Type*} [Fintype Outcome]
     (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
@@ -661,54 +491,6 @@ private lemma evaluatedPointFamily_pointConsistency_swapped_of_density_fixed
     zeta
     (by simpa [evaluatedPointFamily] using hcons.pointConsistency)
 
-private lemma liftLeft_mul_leftPlaced_outcome
-    {α β : Type*}
-    [Fintype α] [Fintype β]
-    (A : SubMeas α ι)
-    (B : SubMeas β ι)
-    (a : α)
-    (b : β) :
-    (A.liftLeft).outcome a * (OpFamily.leftPlacedOpFamily B.toOpFamily).outcome b =
-      leftTensor (A.outcome a * B.outcome b) := by
-  simp [SubMeas.liftLeft, OpFamily.leftPlacedOpFamily, SubMeas.toOpFamily,
-    leftTensor_mul_leftTensor]
-
-private lemma liftLeft_mul_rightPlaced_outcome
-    {α β : Type*}
-    [Fintype α] [Fintype β]
-    (A : SubMeas α ι)
-    (B : SubMeas β ι)
-    (a : α)
-    (b : β) :
-    (A.liftLeft).outcome a * (OpFamily.rightPlacedOpFamily B.toOpFamily).outcome b =
-      opTensor (A.outcome a) (B.outcome b) := by
-  simp [SubMeas.liftLeft, OpFamily.rightPlacedOpFamily, SubMeas.toOpFamily,
-    leftTensor_mul_rightTensor_eq_opTensor]
-
-private lemma liftRight_mul_leftPlaced_outcome
-    {α β : Type*}
-    [Fintype α] [Fintype β]
-    (A : SubMeas α ι)
-    (B : SubMeas β ι)
-    (a : α)
-    (b : β) :
-    (A.liftRight).outcome a * (OpFamily.leftPlacedOpFamily B.toOpFamily).outcome b =
-      opTensor (B.outcome b) (A.outcome a) := by
-  simp [SubMeas.liftRight, OpFamily.leftPlacedOpFamily, SubMeas.toOpFamily,
-    rightTensor_mul_leftTensor_eq_opTensor]
-
-private lemma liftRight_mul_rightPlaced_outcome
-    {α β : Type*}
-    [Fintype α] [Fintype β]
-    (A : SubMeas α ι)
-    (B : SubMeas β ι)
-    (a : α)
-    (b : β) :
-    (A.liftRight).outcome a * (OpFamily.rightPlacedOpFamily B.toOpFamily).outcome b =
-      rightTensor (A.outcome a * B.outcome b) := by
-  simp [SubMeas.liftRight, OpFamily.rightPlacedOpFamily, SubMeas.toOpFamily,
-    rightTensor_mul_rightTensor]
-
 /-- Distinct outcomes of a projective submeasurement are orthogonal. -/
 private lemma projSubMeas_outcome_orthogonal
     {α : Type*} [Fintype α]
@@ -804,7 +586,6 @@ private lemma evaluatedPointFamily_outcome_proj
     postprocess_proj_outcome (family.meas (pointHeight params u))
       (fun g => g (truncatePoint params u)) a
 
-/-- The square root of a submeasurement outcome squares back to that outcome. -/
 private lemma sqrt_subMeas_outcome_mul_self
     {α : Type*} [Fintype α]
     (A : SubMeas α ι) (a : α) :
@@ -872,11 +653,43 @@ private lemma commDataProcessedGStabilityOne_qSDDOp_expand
       = ev strategy.state
           (((opTensor (S * T) W - opTensor S W)ᴴ) *
             (opTensor (S * T) W - opTensor S W)) := by
+            have hleft :
+                (leftPlacedSubMeas (ιB := ι)
+                    (evaluatedSliceSandwichRaw params strategy family q)).outcome
+                    (ah.1, ah.2 (truncatePoint params q.2)) *
+                  leftTensor (ι₂ := ι) T *
+                  rightTensor (ι₁ := ι) W =
+                opTensor (S * T) W := by
+              calc
+                (leftPlacedSubMeas (ιB := ι)
+                      (evaluatedSliceSandwichRaw params strategy family q)).outcome
+                      (ah.1, ah.2 (truncatePoint params q.2)) *
+                    leftTensor (ι₂ := ι) T *
+                    rightTensor (ι₁ := ι) W
+                  = leftTensor (ι₂ := ι) S *
+                      leftTensor (ι₂ := ι) T *
+                      rightTensor (ι₁ := ι) W := by
+                        change
+                          leftTensor (ι₂ := ι)
+                              ((evaluatedSliceSandwichRaw params strategy family q).outcome
+                                (ah.1, ah.2 (truncatePoint params q.2))) *
+                            leftTensor (ι₂ := ι) T *
+                            rightTensor (ι₁ := ι) W =
+                              leftTensor (ι₂ := ι) S *
+                                leftTensor (ι₂ := ι) T *
+                                rightTensor (ι₁ := ι) W
+                        simp [S]
+                _ = leftTensor (ι₂ := ι) (S * T) * rightTensor (ι₁ := ι) W := by
+                      rw [leftTensor_mul_leftTensor]
+                _ = opTensor (S * T) W := by
+                      rw [leftTensor_mul_rightTensor_eq_opTensor]
+            have hright :
+                leftTensor (ι₂ := ι) S * rightTensor (ι₁ := ι) W =
+                  opTensor S W := by
+              simp [S, W, leftTensor_mul_rightTensor_eq_opTensor]
             rw [commDataProcessedGStabilityOneLeft_outcome,
               commDataProcessedGStabilityOneRight_outcome]
-            rw [hT]
-            simp [S, T, W, leftPlacedSubMeas, leftTensor_mul_leftTensor,
-              leftTensor_mul_rightTensor_eq_opTensor]
+            rw [hT, hleft, hright]
     _ = ev strategy.state
           (((opTensor (S * (T - 1)) W)ᴴ) * opTensor (S * (T - 1)) W) := by
             have hsub : S * T - S = S * (T - 1) := by
@@ -889,7 +702,8 @@ private lemma commDataProcessedGStabilityOne_qSDDOp_expand
           (opTensor (((S * (T - 1))ᴴ) * (S * (T - 1))) (Wᴴ * W)) := by
             simp [conjTranspose_opTensor, opTensor_mul]
     _ = ev strategy.state
-          (opTensor ((1 - T) * (Sᴴ * S) * (1 - T))
+          (opTensor
+            ((1 - T) * (Sᴴ * S) * (1 - T))
             ((G (pointHeight params q.2)).outcome ah.2)) := by
             have hleft :
                 ((S * (T - 1))ᴴ) * (S * (T - 1)) =
@@ -1005,7 +819,8 @@ private lemma commDataProcessedGStabilityTwo_qSDDOp_expand
           (opTensor (((S * (T - 1))ᴴ) * (S * (T - 1))) (Wᴴ * W)) := by
             simp [conjTranspose_opTensor, opTensor_mul]
     _ = ev strategy.state
-          (opTensor ((1 - T) * (Sᴴ * S) * (1 - T))
+          (opTensor
+            ((1 - T) * (Sᴴ * S) * (1 - T))
             ((G (pointHeight params q.1)).outcome gb.1)) := by
             have hleft :
                 ((S * (T - 1))ᴴ) * (S * (T - 1)) =
@@ -1569,16 +1384,101 @@ private lemma evaluatedSlice_phaseTwo_left_weighted_outcome
       CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2) *
           CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2) =
         (G (pointHeight params q.2)).outcome ah.2 := by
-    simpa using sqrt_subMeas_outcome_mul_self (G (pointHeight params q.2)) ah.2
-  have hsqrt' :
-      CFC.sqrt ((family.meas (pointHeight params q.2)).outcome ah.2) *
-          CFC.sqrt ((family.meas (pointHeight params q.2)).outcome ah.2) =
-        (family.meas (pointHeight params q.2)).outcome ah.2 := by
-    simpa [hG] using hsqrt
+    simpa using
+      sqrt_subMeas_outcome_mul_self (G (pointHeight params q.2)) ah.2
   rw [commDataProcessedGStabilityOneLeft_outcome]
-  simp [evaluatedSliceSandwichRaw, sandwichByOuterSubMeas, leftPlacedSubMeas,
-    fullSliceSecondFactor, fullSliceQuestionOfEvaluatedSlice, hG,
-    leftTensor_mul_leftTensor, rightTensor_mul_rightTensor, mul_assoc, hsqrt']
+  have hleft_raw :
+      (leftPlacedSubMeas (ιB := ι)
+          (evaluatedSliceSandwichRaw params strategy family q)).outcome
+          (ah.1, ah.2 (truncatePoint params q.2)) *
+        leftTensor (ι₂ := ι)
+          ((fullSliceSecondFactor params family
+            (fullSliceQuestionOfEvaluatedSlice params q)).total) =
+      leftTensor (ι₂ := ι)
+        (((evaluatedSliceSandwichRaw params strategy family q).outcome
+            (ah.1, ah.2 (truncatePoint params q.2))) *
+          ((fullSliceSecondFactor params family
+            (fullSliceQuestionOfEvaluatedSlice params q)).total)) := by
+    calc
+      (leftPlacedSubMeas (ιB := ι)
+            (evaluatedSliceSandwichRaw params strategy family q)).outcome
+            (ah.1, ah.2 (truncatePoint params q.2)) *
+          leftTensor (ι₂ := ι)
+            ((fullSliceSecondFactor params family
+              (fullSliceQuestionOfEvaluatedSlice params q)).total)
+        = leftTensor (ι₂ := ι)
+            ((evaluatedSliceSandwichRaw params strategy family q).outcome
+              (ah.1, ah.2 (truncatePoint params q.2))) *
+          leftTensor (ι₂ := ι)
+            ((fullSliceSecondFactor params family
+              (fullSliceQuestionOfEvaluatedSlice params q)).total) := by
+              rfl
+      _ = leftTensor (ι₂ := ι)
+            (((evaluatedSliceSandwichRaw params strategy family q).outcome
+                (ah.1, ah.2 (truncatePoint params q.2))) *
+              ((fullSliceSecondFactor params family
+                (fullSliceQuestionOfEvaluatedSlice params q)).total)) := by
+              rw [leftTensor_mul_leftTensor]
+  have hsandwich :
+      ((evaluatedSliceSandwichRaw params strategy family q).outcome
+          (ah.1, ah.2 (truncatePoint params q.2))) *
+        ((fullSliceSecondFactor params family
+          (fullSliceQuestionOfEvaluatedSlice params q)).total) =
+      ((evaluatedSliceFirstFactor params family q).outcome ah.1) *
+        ((evaluatedSliceSecondFactor params family q).outcome
+          (ah.2 (truncatePoint params q.2))) *
+        ((evaluatedSliceFirstFactor params family q).outcome ah.1) *
+        ((G (pointHeight params q.2)).total) := by
+    simp [evaluatedSliceSandwichRaw, sandwichByOuterSubMeas,
+      fullSliceSecondFactor, fullSliceQuestionOfEvaluatedSlice, hG, mul_assoc]
+  have hleft :
+      (leftPlacedSubMeas (ιB := ι)
+          (evaluatedSliceSandwichRaw params strategy family q)).outcome
+          (ah.1, ah.2 (truncatePoint params q.2)) *
+        leftTensor (ι₂ := ι)
+          ((fullSliceSecondFactor params family
+            (fullSliceQuestionOfEvaluatedSlice params q)).total) =
+      leftTensor (ι₂ := ι)
+        (((evaluatedSliceFirstFactor params family q).outcome ah.1) *
+          ((evaluatedSliceSecondFactor params family q).outcome
+            (ah.2 (truncatePoint params q.2))) *
+          ((evaluatedSliceFirstFactor params family q).outcome ah.1) *
+          ((G (pointHeight params q.2)).total)) := by
+    rw [hleft_raw, hsandwich]
+  calc
+    (leftPlacedSubMeas (ιB := ι)
+          (evaluatedSliceSandwichRaw params strategy family q)).outcome
+          (ah.1, ah.2 (truncatePoint params q.2)) *
+        leftTensor (ι₂ := ι)
+          ((fullSliceSecondFactor params family
+            (fullSliceQuestionOfEvaluatedSlice params q)).total) *
+        rightTensor (ι₁ := ι) (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)) *
+        rightTensor (ι₁ := ι) (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2))
+      = ((leftPlacedSubMeas (ιB := ι)
+            (evaluatedSliceSandwichRaw params strategy family q)).outcome
+            (ah.1, ah.2 (truncatePoint params q.2)) *
+          leftTensor (ι₂ := ι)
+            ((fullSliceSecondFactor params family
+              (fullSliceQuestionOfEvaluatedSlice params q)).total)) *
+          (rightTensor (ι₁ := ι) (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2)) *
+            rightTensor (ι₁ := ι) (CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2))) := by
+          simp [mul_assoc]
+    _ = ((leftPlacedSubMeas (ιB := ι)
+            (evaluatedSliceSandwichRaw params strategy family q)).outcome
+            (ah.1, ah.2 (truncatePoint params q.2)) *
+          leftTensor (ι₂ := ι)
+            ((fullSliceSecondFactor params family
+              (fullSliceQuestionOfEvaluatedSlice params q)).total)) *
+          rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2) := by
+          rw [rightTensor_mul_rightTensor, hsqrt]
+    _ = leftTensor (ι₂ := ι)
+          (((evaluatedSliceFirstFactor params family q).outcome ah.1) *
+            ((evaluatedSliceSecondFactor params family q).outcome
+              (ah.2 (truncatePoint params q.2))) *
+            ((evaluatedSliceFirstFactor params family q).outcome ah.1) *
+            ((G (pointHeight params q.2)).total)) *
+          rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2) := by
+          rw [hleft]
 
 /-- Fixed-outcome expansion for the phase-2 `G^y` removal summand. -/
 private lemma evaluatedSlice_phaseTwo_right_weighted_outcome
@@ -1601,7 +1501,8 @@ private lemma evaluatedSlice_phaseTwo_right_weighted_outcome
       CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2) *
           CFC.sqrt ((G (pointHeight params q.2)).outcome ah.2) =
         (G (pointHeight params q.2)).outcome ah.2 := by
-    simpa using sqrt_subMeas_outcome_mul_self (G (pointHeight params q.2)) ah.2
+    simpa using
+      sqrt_subMeas_outcome_mul_self (G (pointHeight params q.2)) ah.2
   rw [commDataProcessedGStabilityOneRight_outcome]
   simp [evaluatedSliceSandwichRaw, sandwichByOuterSubMeas,
     rightTensor_mul_rightTensor, mul_assoc, hsqrt]
@@ -1742,8 +1643,8 @@ private lemma evaluatedSlice_phaseFour_pointSwap_bound
     (eps delta gamma : Error)
     (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
-    (C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params →
-      MIPStarRE.Quantum.Op (ι × ι))
+    (C : EvaluatedSliceQuestion params →
+      EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι))
     (hC : ∀ q, ∑ ab : EvaluatedSliceOutcome params, C q ab * (C q ab)ᴴ ≤ 1) :
     let 𝒟 := uniformDistribution (EvaluatedSliceQuestion params)
     let inserted : EvaluatedSliceQuestion params → Error := fun q =>
@@ -1758,11 +1659,11 @@ private lemma evaluatedSlice_phaseFour_pointSwap_bound
       6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
   let 𝒟 : Distribution (EvaluatedSliceQuestion params) :=
     uniformDistribution (EvaluatedSliceQuestion params)
-  let A : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params →
-      MIPStarRE.Quantum.Op (ι × ι) :=
+  let A : EvaluatedSliceQuestion params →
+      EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι) :=
     fun q ab => (pointMeasurementProductLeft params.next strategy q).outcome ab
-  let B : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params →
-      MIPStarRE.Quantum.Op (ι × ι) :=
+  let B : EvaluatedSliceQuestion params →
+      EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι) :=
     fun q ab => (pointMeasurementProductRight params.next strategy q).outcome ab
   let C' : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params → Unit →
       MIPStarRE.Quantum.Op (ι × ι) := fun q ab _ => C q ab
@@ -1781,8 +1682,8 @@ private lemma evaluatedSlice_phaseFour_pointSwap_bound
       avgOver 𝒟 (fun q => qSDDCore strategy.state (A q) (B q)) ≤
         commutativityPointsError params.next gamma := by
     simpa [𝒟, A, B, qSDDOp] using
-      (commutativityPoints (params := params.next)
-        strategy eps delta gamma hgood).squaredDistanceBound
+      (commutativityPoints
+        (params := params.next) strategy eps delta gamma hgood).squaredDistanceBound
   have hC' :
       ∀ q,
         ∑ ab : EvaluatedSliceOutcome params,
@@ -1844,7 +1745,8 @@ private lemma evaluatedSlice_phaseFive_left_weighted_outcome
       CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1) *
           CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1) =
         (G (pointHeight params q.1)).outcome gb.1 := by
-    simpa using sqrt_subMeas_outcome_mul_self (G (pointHeight params q.1)) gb.1
+    simpa using
+      sqrt_subMeas_outcome_mul_self (G (pointHeight params q.1)) gb.1
   have hsqrt' :
       CFC.sqrt ((family.meas (pointHeight params q.1)).outcome gb.1) *
           CFC.sqrt ((family.meas (pointHeight params q.1)).outcome gb.1) =
@@ -1875,7 +1777,8 @@ private lemma evaluatedSlice_phaseFive_right_weighted_outcome
       CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1) *
           CFC.sqrt ((G (pointHeight params q.1)).outcome gb.1) =
         (G (pointHeight params q.1)).outcome gb.1 := by
-    simpa using sqrt_subMeas_outcome_mul_self (G (pointHeight params q.1)) gb.1
+    simpa using
+      sqrt_subMeas_outcome_mul_self (G (pointHeight params q.1)) gb.1
   rw [commDataProcessedGStabilityTwoRight_outcome]
   simp [orderedProductOpFamily, rightTensor_mul_rightTensor, mul_assoc, hsqrt]
 
@@ -2975,7 +2878,7 @@ lemma commDataProcessedG
           ≤ 2 * (zeta / 2) := hbound
         _ = zeta := by ring
     constructor
-    let e := pointNextEquiv params
+    let e := CommutativityPoints.pointNextEquiv params
     let f :
         Point params → Fq params → Error :=
       fun u x =>
@@ -3027,7 +2930,7 @@ lemma commDataProcessedG
                             evaluateAt, truncatePoint_appendPoint, pointHeight_appendPoint]
       _ = avgOver (uniformDistribution (Point params))
             (fun u => avgOver (uniformDistribution (Fq params)) (fun x => f u x)) := by
-              exact avgOver_uniform_prod f
+              exact MIPStarRE.LDT.avgOver_uniform_prod f
       _ ≤ avgOver (uniformDistribution (Point params)) (fun _ => zeta) := by
             apply avgOver_mono
             intro u
@@ -3483,7 +3386,7 @@ private lemma gCommOverlap_avgOver_point
       (fun w => gCommOverlapTerm params strategy G (pointHeight params w)) =
     avgOver (uniformDistribution (Fq params))
       (fun x => gCommOverlapTerm params strategy G x) := by
-  let e := pointNextEquiv params
+  let e := CommutativityPoints.pointNextEquiv params
   calc
     avgOver (uniformDistribution (Point params.next))
         (fun w => gCommOverlapTerm params strategy G (pointHeight params w))
@@ -3495,7 +3398,7 @@ private lemma gCommOverlap_avgOver_point
           apply avgOver_congr
           intro ux
           rcases ux with ⟨u, x⟩
-          simp [e, pointNextEquiv, pointHeight_appendPoint]
+          simp [e, CommutativityPoints.pointNextEquiv, pointHeight_appendPoint]
     _ = avgOver (uniformDistribution (Fq params))
           (fun x => gCommOverlapTerm params strategy G x) := by
           exact avgOver_uniform_snd
@@ -4259,10 +4162,10 @@ private lemma gCommStabilityTwo_scalar_gap
 
 /-! ### Transport from evaluated to full-slice commutation
 
-The lemmas in this section compare the full-slice products with their
-point-evaluated postprocessings and then lift the evaluated commutation estimate
-up to `thm:com-main`.  The remaining difficult step is the Schwartz-Zippel
-transport on evaluated questions. -/
+This section converts the evaluated commutation estimate into the full-slice
+commutation bound. It collects the postprocessing identities, question
+reindexing lemmas, and large/small parameter case split used in the proof of
+`thm:com-main`. -/
 
 /-- Postprocessing a `leftPlacedOpFamily` of a bilinear product equals
 the `leftPlacedOpFamily` of the product of postprocessed submeasurements,
@@ -4430,7 +4333,7 @@ private lemma evaluatedSliceCommutation_of_evaluationSpecialization
       (evaluatedSliceProductRight params strategy family)
       δ := by
   exact
-    sddOpRel_congr_outcome strategy.state
+    CommutativityPoints.sddOpRel_congr_outcome strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
       (evaluatedFromFullSliceProductLeft params strategy family)
       (evaluatedFromFullSliceProductRight params strategy family)
@@ -4460,8 +4363,8 @@ private def evaluatedSliceQuestionEquiv (params : Parameters) [FieldModel params
         appendPoint params (truncatePoint params v) (pointHeight params v)) =
         (u, v)
     exact Prod.ext
-      ((pointNextEquiv params).left_inv u)
-      ((pointNextEquiv params).left_inv v)
+      ((CommutativityPoints.pointNextEquiv params).left_inv u)
+      ((CommutativityPoints.pointNextEquiv params).left_inv v)
   right_inv := by
     rintro ⟨⟨u, v⟩, x, y⟩
     simp [fullSliceQuestionOfEvaluatedSlice]
@@ -4810,6 +4713,172 @@ private lemma zero_to_fullSliceProductRight_le_one
             simp [avgOver]
     _ ≤ 1 := uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
 
+/-- Full-slice ABA scalar average: `E_{x,y} ∑_{g,h} ⟨ψ| G^x_g G^y_h G^x_g ⊗ I |ψ⟩`.
+
+Full-polynomial analog of the evaluated `evaluatedSliceABATerm` (line 664);
+obtained from it by replacing the evaluated outcomes `a,b` with polynomial
+outcomes `g,h` summed over `FullSliceOutcome`. -/
+private noncomputable def fullSliceABAAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (FullSliceQuestion params))
+    (fun xy =>
+      ∑ gh : FullSliceOutcome params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            ((family.meas xy.1).toSubMeas.outcome gh.1 *
+              (family.meas xy.2).toSubMeas.outcome gh.2 *
+              (family.meas xy.1).toSubMeas.outcome gh.1)))
+
+/-- Full-slice ABAB scalar average:
+`E_{x,y} ∑_{g,h} ⟨ψ| G^x_g G^y_h G^x_g G^y_h ⊗ I |ψ⟩`. -/
+private noncomputable def fullSliceABABAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (FullSliceQuestion params))
+    (fun xy =>
+      ∑ gh : FullSliceOutcome params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            ((family.meas xy.1).toSubMeas.outcome gh.1 *
+              (family.meas xy.2).toSubMeas.outcome gh.2 *
+              (family.meas xy.1).toSubMeas.outcome gh.1 *
+              (family.meas xy.2).toSubMeas.outcome gh.2)))
+
+/-- Evaluated-slice ABA scalar average:
+`E_{u,v,x,y} ∑_{a,b} ⟨ψ| G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a] ⊗ I |ψ⟩`.
+
+Averaged analog of `evaluatedSliceABATerm` (line 664) over the full slice
+question. -/
+private noncomputable def evaluatedSliceABAAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+    (fun q =>
+      ∑ ab : EvaluatedSliceOutcome params,
+        evaluatedSliceABATerm params strategy family q ab)
+
+/-- Evaluated-slice ABAB scalar average:
+`E_{u,v,x,y} ∑_{a,b} ⟨ψ| G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a] G^y_[h(v)=b] ⊗ I |ψ⟩`. -/
+private noncomputable def evaluatedSliceABABAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+    (fun q =>
+      ∑ ab : EvaluatedSliceOutcome params,
+        evaluatedSliceABABTerm params strategy family q ab)
+
+/-- Paper `lem:normalization-condition` (`commutativity-G.tex` line 309).
+
+For a sub-measurement `P` and projective sub-measurement `Q`, the sandwiched
+family `C_{a,b} = Q_b · P_a · Q_b` satisfies the `closenessOfIP` normalization
+condition `∑_a (∑_b C_{a,b}) (∑_b C_{a,b})ᴴ ≤ I`.
+
+TODO(#361): the paper proof (lines 319-328) expands the outer product, uses
+projectivity of `Q` to collapse `b ≠ b'` off-diagonals, then `Q_b ≤ I` and the
+sub-measurement property of `P` and `Q`. -/
+private lemma normalizationCondition_sandwich_bound
+    {α β : Type*} [Fintype α] [Fintype β]
+    (P : SubMeas α ι) (Q : ProjSubMeas β ι) :
+    ∑ a : α,
+        (∑ b : β, Q.outcome b * P.outcome a * Q.outcome b) *
+          (∑ b : β, Q.outcome b * P.outcome a * Q.outcome b)ᴴ ≤ 1 := by
+  sorry
+
+/-- Paper `eq:gcomterms` (`commutativity-G.tex` lines 286-290).
+
+Full-slice analog of `evaluatedSliceCommutation_qSDDOp_avg_eq` (line 878): the
+pulled-back `sddErrorOp` on the full-slice product equals `2·(ABAAvg − ABABAvg)`
+after using projectivity and the `(x,g) ↔ (y,h)` symmetry to collapse
+`BAB + ABA − BABA − ABAB` into the two surviving scalar quartic terms.
+
+TODO(#361): mirror the proof of `evaluatedSliceCommutation_qSDDOp_avg_eq` at
+the full-polynomial level.  Relies on `sddErrorOp_pullback_fullSliceQuestion_eq`
+to descend from `EvaluatedSliceQuestion` to `FullSliceQuestion`. -/
+private lemma fullSliceCommutation_qSDDOp_avg_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    sddErrorOp strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => fullSliceProductLeft params strategy family
+          (fullSliceQuestionOfEvaluatedSlice params q))
+        (fun q => fullSliceProductRight params strategy family
+          (fullSliceQuestionOfEvaluatedSlice params q)) =
+      2 * (fullSliceABAAvg params strategy family -
+        fullSliceABABAvg params strategy family) := by
+  sorry
+
+/-- Paper `eq:evaluate-gcom-at-points` / `eq:gcom4-diff`
+(`commutativity-G.tex` lines 339-354).
+
+Schwartz-Zippel marginalization on the `x` variable: replacing the full
+polynomial sum `∑_g G^x_g` by the point-evaluated sum `E_u ∑_a G^x_[g(u)=a]`
+inside the ABA term costs at most `params.m · params.d / params.q`.
+
+TODO(#361): apply `schwartzZippel_individualDegree` from
+`MIPStarRE/LDT/Preliminaries/Polynomials.lean` to the polynomial-agreement
+collision term `1[g(u) = g'(u)]`, then bound the off-diagonal fiber sum using
+the sub-measurement property of `G^x`. -/
+private lemma fullSlice_scalar_marginalize_x
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    |fullSliceABAAvg params strategy family -
+        evaluatedSliceABAAvg params strategy family| ≤
+      (↑params.m : Error) * ↑params.d / ↑params.q := by
+  sorry
+
+/-- Paper `eq:evaluate-gcom-at-points-part-dos`
+(`commutativity-G.tex` lines 369-385).
+
+Schwartz-Zippel marginalization on the `y` variable: replacing the full
+polynomial sum `∑_h G^y_h` by the point-evaluated sum `E_v ∑_b G^y_[h(v)=b]`
+inside the ABAB term costs at most `params.m · params.d / params.q`.  Symmetric
+in structure to `fullSlice_scalar_marginalize_x`; the paper's difference-
+expression label at line 379 is idiosyncratic, so we cite the enclosing
+approximation statement. -/
+private lemma fullSlice_scalar_marginalize_y
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    |fullSliceABABAvg params strategy family -
+        evaluatedSliceABABAvg params strategy family| ≤
+      (↑params.m : Error) * ↑params.d / ↑params.q := by
+  sorry
+
+/-- Combined `closenessOfIP` chain on the evaluated side
+(`commutativity-G.tex` lines 301, 334, 359-360, 394, 396).
+
+Using `hEval` together with the six `closenessOfIP` steps in the paper:
+two on the ABA side (line 301: `2√ζ`) and four on the ABAB side
+(line 334: `√ζ`, lines 359-360: `2√ζ`, line 396: `√ζ`), plus the final
+`closenessOfIP` with `hEval` as the `A≈B` input (line 394: `√ν_evaluation`),
+the evaluated-slice scalar commutator is bounded by
+`6√ζ + √(commDataProcessedGError)`.
+
+The `hEval` hypothesis is bound into the fourth step via
+`fullSlice_closenessOfIP_CAB_hEval` inputs; the first six steps use
+`item:commuting-self-consistency` from `_hself`.
+
+TODO(#361): invoke `closenessOfIP` (`Preliminaries/CauchySchwarz.lean:342`) six
+times, each with `normalizationCondition_sandwich_bound` discharging the `C`
+normalization condition, and chain the `√ζ` / `√ν` contributions. -/
+private lemma fullSlice_closenessOfIP_CAB_hEval
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (_hgamma_nonneg : 0 ≤ gamma) (_hzeta_nonneg : 0 ≤ zeta)
+    (_hself : family.StronglySelfConsistent strategy.state zeta)
+    (_hEval :
+      SDDOpRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedFromFullSliceProductLeft params strategy family)
+        (evaluatedFromFullSliceProductRight params strategy family)
+        (commDataProcessedGError params gamma zeta)) :
+    |evaluatedSliceABAAvg params strategy family -
+        evaluatedSliceABABAvg params strategy family| ≤
+      6 * Real.sqrt zeta +
+        Real.sqrt (commDataProcessedGError params gamma zeta) := by
+  sorry
+
 -- Heavy sqrt/rpow arithmetic in hArith step.
 set_option maxHeartbeats 800000 in
 /-- Core Schwartz-Zippel transport on the evaluated-question space.
@@ -4893,7 +4962,132 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
           4 * (↑params.m * ↑params.d / ↑params.q) +
           2 * Real.sqrt
             (commDataProcessedGError params gamma zeta) := by
-      sorry
+      -- Compose the four scalar lemmas.  Paper chain:
+      -- * `fullSliceCommutation_qSDDOp_avg_eq` rewrites the pulled-back
+      --   `sddErrorOp` as `2 · (fullABA − fullABAB)` (paper lines 286-290).
+      -- * Triangle on the real line:
+      --     `|fullABA − fullABAB|
+      --        ≤ |fullABA − evalABA| + |evalABA − evalABAB|
+      --          + |evalABAB − fullABAB|`
+      -- * `fullSlice_scalar_marginalize_x`: `|fullABA − evalABA| ≤ md/q`
+      --   (paper line 342).
+      -- * `fullSlice_scalar_marginalize_y`: `|fullABAB − evalABAB| ≤ md/q`
+      --   (paper line 373).
+      -- * `fullSlice_closenessOfIP_CAB_hEval`: using `hEval` and the six
+      --   `closenessOfIP` steps on the evaluated side,
+      --   `|evalABA − evalABAB| ≤ 6√ζ + √ν` (paper lines 301, 334, 359-360,
+      --   394, 396).
+      -- Summing gives `|fullABA − fullABAB| ≤ 6√ζ + 2(md/q) + √ν`,
+      -- and multiplying by `2` produces `12√ζ + 4(md/q) + 2√ν`.
+      have hExpand :=
+        fullSliceCommutation_qSDDOp_avg_eq params strategy family
+      have hMargX :=
+        fullSlice_scalar_marginalize_x params strategy family
+      have hMargY :=
+        fullSlice_scalar_marginalize_y params strategy family
+      have hClose :=
+        fullSlice_closenessOfIP_CAB_hEval params strategy family gamma zeta
+          hgamma_nonneg hzeta_nonneg _hself hEval
+      -- Triangle inequality on the three intermediate quantities.
+      have hTri :
+          |fullSliceABAAvg params strategy family -
+              fullSliceABABAvg params strategy family| ≤
+            |fullSliceABAAvg params strategy family -
+                evaluatedSliceABAAvg params strategy family| +
+              |evaluatedSliceABAAvg params strategy family -
+                  evaluatedSliceABABAvg params strategy family| +
+              |evaluatedSliceABABAvg params strategy family -
+                  fullSliceABABAvg params strategy family| := by
+        have h1 :
+            fullSliceABAAvg params strategy family -
+                fullSliceABABAvg params strategy family =
+              (fullSliceABAAvg params strategy family -
+                  evaluatedSliceABAAvg params strategy family) +
+                (evaluatedSliceABAAvg params strategy family -
+                    evaluatedSliceABABAvg params strategy family) +
+                (evaluatedSliceABABAvg params strategy family -
+                    fullSliceABABAvg params strategy family) := by
+          ring
+        calc
+          |fullSliceABAAvg params strategy family -
+              fullSliceABABAvg params strategy family|
+            = |(fullSliceABAAvg params strategy family -
+                  evaluatedSliceABAAvg params strategy family) +
+                (evaluatedSliceABAAvg params strategy family -
+                    evaluatedSliceABABAvg params strategy family) +
+                (evaluatedSliceABABAvg params strategy family -
+                    fullSliceABABAvg params strategy family)| := by
+                  rw [h1]
+          _ ≤ |(fullSliceABAAvg params strategy family -
+                  evaluatedSliceABAAvg params strategy family) +
+                (evaluatedSliceABAAvg params strategy family -
+                    evaluatedSliceABABAvg params strategy family)| +
+                |evaluatedSliceABABAvg params strategy family -
+                    fullSliceABABAvg params strategy family| :=
+                abs_add_le _ _
+          _ ≤ (|fullSliceABAAvg params strategy family -
+                    evaluatedSliceABAAvg params strategy family| +
+                  |evaluatedSliceABAAvg params strategy family -
+                      evaluatedSliceABABAvg params strategy family|) +
+                |evaluatedSliceABABAvg params strategy family -
+                    fullSliceABABAvg params strategy family| := by
+                gcongr
+                exact abs_add_le _ _
+      -- Symmetry of `abs`: `|evalABAB - fullABAB| = |fullABAB - evalABAB|`.
+      have hMargY' :
+          |evaluatedSliceABABAvg params strategy family -
+              fullSliceABABAvg params strategy family| ≤
+            (↑params.m : Error) * ↑params.d / ↑params.q := by
+        rw [abs_sub_comm]
+        exact hMargY
+      -- `sddErrorOp = 2 · (fullABA − fullABAB) ≤ 2 · |fullABA − fullABAB|`.
+      have hTwoAbs :
+          sddErrorOp strategy.state
+            (uniformDistribution (EvaluatedSliceQuestion params))
+            (fun q => fullSliceProductLeft params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q))
+            (fun q => fullSliceProductRight params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q)) ≤
+          2 *
+            |fullSliceABAAvg params strategy family -
+                fullSliceABABAvg params strategy family| := by
+        rw [hExpand]
+        have := le_abs_self
+          (fullSliceABAAvg params strategy family -
+            fullSliceABABAvg params strategy family)
+        linarith
+      calc
+        sddErrorOp strategy.state
+            (uniformDistribution (EvaluatedSliceQuestion params))
+            (fun q => fullSliceProductLeft params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q))
+            (fun q => fullSliceProductRight params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q))
+          ≤ 2 *
+              |fullSliceABAAvg params strategy family -
+                  fullSliceABABAvg params strategy family| := hTwoAbs
+        _ ≤ 2 *
+              (|fullSliceABAAvg params strategy family -
+                    evaluatedSliceABAAvg params strategy family| +
+                |evaluatedSliceABAAvg params strategy family -
+                    evaluatedSliceABABAvg params strategy family| +
+                |evaluatedSliceABABAvg params strategy family -
+                    fullSliceABABAvg params strategy family|) := by
+              linarith [hTri]
+        _ ≤ 2 *
+              (((↑params.m : Error) * ↑params.d / ↑params.q) +
+                (6 * Real.sqrt zeta +
+                  Real.sqrt
+                    (commDataProcessedGError params gamma zeta)) +
+                ((↑params.m : Error) * ↑params.d / ↑params.q)) := by
+              have := abs_nonneg
+                (fullSliceABAAvg params strategy family -
+                  fullSliceABABAvg params strategy family)
+              linarith [hMargX, hMargY', hClose]
+        _ = 12 * Real.sqrt zeta +
+              4 * (↑params.m * ↑params.d / ↑params.q) +
+              2 * Real.sqrt
+                (commDataProcessedGError params gamma zeta) := by ring
     -- Step 2: Error arithmetic (using small-parameter hypotheses).
     -- Show:
     --   12√ζ + 4md/q + 2√(48m(√γ + √ζ))
@@ -5129,21 +5323,18 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
             simpa using Real.one_le_rpow hg.le (show (0 : Error) ≤ 1 / (4 : Error) by norm_num)
           have hζnn : 0 ≤ Real.rpow zeta (1 / (4 : Error)) := Real.rpow_nonneg hzeta_nonneg _
           have hdqnn :
-              0 ≤ Real.rpow (((params.d : Error) / (params.q : Error)))
-                (1 / (4 : Error)) :=
+              0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)) :=
             Real.rpow_nonneg hdq_nonneg _
           linarith
         · have hζ : 1 ≤ Real.rpow zeta (1 / (4 : Error)) := by
             simpa using Real.one_le_rpow hz.le (show (0 : Error) ≤ 1 / (4 : Error) by norm_num)
           have hγnn : 0 ≤ Real.rpow gamma (1 / (4 : Error)) := Real.rpow_nonneg hgamma_nonneg _
           have hdqnn :
-              0 ≤ Real.rpow (((params.d : Error) / (params.q : Error)))
-                (1 / (4 : Error)) :=
+              0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)) :=
             Real.rpow_nonneg hdq_nonneg _
           linarith
         · have hdq' :
-              1 ≤ Real.rpow (((params.d : Error) / (params.q : Error)))
-                (1 / (4 : Error)) := by
+              1 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)) := by
             simpa using Real.one_le_rpow hdq.le (show (0 : Error) ≤ 1 / (4 : Error) by norm_num)
           have hγnn : 0 ≤ Real.rpow gamma (1 / (4 : Error)) := Real.rpow_nonneg hgamma_nonneg _
           have hζnn : 0 ≤ Real.rpow zeta (1 / (4 : Error)) := Real.rpow_nonneg hzeta_nonneg _

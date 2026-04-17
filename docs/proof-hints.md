@@ -55,8 +55,8 @@ If the paper passes through arbitrary matrix families, expect the Lean proof to 
 These are often the first missing ingredients.
 
 - `avgOver_uniform_equiv`
-- `avgOver_uniform_prod_ignore_left`
-- `avgOver_uniform_prod_ignore_right`
+- `avgOver_uniform_fst`
+- `avgOver_uniform_snd`
 
 When the paper says “the marginal distribution is the same”, prove that as an explicit
 equivalence or `sum_image` rewrite before attacking the inequality.

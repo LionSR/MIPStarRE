@@ -35,6 +35,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 	\end{equation*}
 \end{lemma}
 \begin{proof}
+	\leanok
 	If $a=0$, then $\tr[\bx\cdot a]=0$ for every $\bx$, so the average is $1$. If $a\neq 0$, choose $y \in \F_q$ such that $\tr[a\cdot y]\neq 0$, and set
 	\[
 		C=\E_{\bx \sim \F_q} \omega^{\tr[\bx \cdot a]}.
@@ -61,6 +62,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 	\end{equation*}
 \end{lemma}
 \begin{proof}
+	\leanok
 	By linearity of the trace and independence of the coordinates,
 	\[
 		\E_{\bu \sim \F_q^m} \omega^{\tr[\bu \cdot v]}
@@ -71,6 +73,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 
 \begin{definition}[Low individual degree polynomials]\label{def:polyfunc}
 	\lean{MIPStarRE.LDT.Preliminaries.polyFunc, MIPStarRE.LDT.Polynomial}
+	\leanok
 	Let $\polyfunc{m}{q}{d}$ be the set of polynomials $g \in \F_q[x_1,\dots,x_m]$ whose degree in each variable is at most $d$, viewed as functions $\F_q^m \to \F_q$ via evaluation. (Over finite fields, distinct low-degree polynomials can induce the same function; we identify elements of $\polyfunc{m}{q}{d}$ with their polynomial representatives, not their functional equivalence classes.)
 \end{definition}
 
@@ -93,6 +96,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 	\end{equation*}
 \end{lemma}
 \begin{proof}
+	\leanok
 	Apply the Schwartz--Zippel lemma to the nonzero polynomial $g-h$, which has total degree at most $d$.
 \end{proof}
 
@@ -106,6 +110,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	The difference $g-h$ is a nonzero polynomial of total degree at most $md$. Apply Lemma~\ref{lem:schwartz-zippel-total-degree}.
 \end{proof}
 
@@ -145,6 +150,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 	$\{A_{[f(a)=b]}\}$ is again a submeasurement, respectively a measurement.
 \end{proposition}
 \begin{proof}
+	\leanok
 	Each $a \in \mathcal A$ contributes exactly once to the right-hand side, namely in
 	the summand indexed by $b=f(a)$.
 \end{proof}
@@ -197,6 +203,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Each subtest accepts exactly when the two measurement outcomes agree. Because the relevant families are measurements, Lemma~\ref{prop:simeq-for-measurements} rewrites those acceptance probabilities as consistency bounds.
 \end{proof}
 
@@ -212,6 +219,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Expand the off-diagonal sum by writing $\sum_{a \ne b} A_a^x \ot B_b^x = \sum_b (I-A_b^x) \ot B_b^x$.
 \end{proof}
 
@@ -258,6 +266,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 	If both measurements are projective, the converse also holds.
 \end{lemma}
 \begin{proof}
+	\leanok
 	Expand the squared norm of $(A_a^x \ot I - I \ot B_a^x)\ket{\psi}$ and use the diagonal-overlap formula from Lemma~\ref{prop:simeq-for-measurements}.
 \end{proof}
 
@@ -423,6 +432,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Merging outcome classes can only decrease the off-diagonal mass.
 \end{proof}
 
@@ -441,6 +451,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	For the first approximation in \eqref{eq:closeness5}, bound
 	\[
 		\E_{\bx} \sum_a \bra{\psi} \bigl(A^{\bx}_a \ot (I-B^{\bx}_a)\bigr)^2 \ket{\psi}
@@ -472,6 +483,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 	\end{equation}
 \end{lemma}
 \begin{proof}
+	\leanok
 	We prove the first approximation in \eqref{eq:switch-sandwich} in two steps. First,
 	\begin{equation}
 		\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a B A^{\bx}_a \ot I \ket{\psi}
@@ -494,6 +506,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Since $P$ is projective,
 	\[
 		\bra{\psi} P \ot I \ket{\psi}
@@ -535,6 +548,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 	If $A$ is projective, the converse also holds.
 \end{lemma}
 \begin{proof}
+	\leanok
 	Expanding the squared norm gives
 	\begin{align}
 		      & \E_{\bx} \sum_a \lVert(A^{\bx}_a \otimes I - I \otimes A^{\bx}_a)\ket{\psi}\rVert^2 \nonumber                                                                  \\
@@ -621,6 +635,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Apply Cauchy--Schwarz to the two-sided overlap $\sum_a \bra{\psi} A_a \ot A_a \ket{\psi}$ and compare it with the strong self-consistency lower bound.
 \end{proof}
 
@@ -634,6 +649,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Since $0 \le I-B \le I$, the left-hand side is at most $1-\bra{\psi} B \ot I \ket{\psi}$. Compare $\sum_a \bra{\psi} B_a^2 \ot I \ket{\psi}$ with $\sum_a \bra{\psi} A_a B_a \ot I \ket{\psi}$ and then with $\sum_a \bra{\psi} A_a^2 \ot I \ket{\psi}$ using the $\approx_\delta$ hypothesis, and finish with Lemma~\ref{lem:self-consistency-same-side-square}.
 \end{proof}
 
@@ -665,6 +681,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{proof}[Proof of \ref{prop:completing-to-measurement}]
+	\leanok
 	By Lemma~\ref{prop:triangle-inequality-for-vectors-squared},
 	\[
 		\sum_a \lVert(A_a-C_a)\ot I \ket{\psi} \rVert^2

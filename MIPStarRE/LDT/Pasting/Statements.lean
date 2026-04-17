@@ -3,14 +3,14 @@ import MIPStarRE.LDT.Pasting.Sandwich
 /-!
 # Section 12 — Statements
 
-This file packages the displayed error terms and statement records used by the
-Section 12 pasting arguments. The underlying constructions live in
-`Pasting/Defs.lean` and `Pasting/Sandwich.lean`, while the proof stubs and
-supporting lemmas live in `Pasting/Theorems.lean`.
+This file packages the Section 12 pasting conclusions into reusable proposition-valued
+structures. It records the displayed error formulas and the statement bundles for the
+switcheroo, completed-family, half-sandwich, recurrence, Chernoff, and final pasting steps.
 
 ## References
 
 - `references/ldt-paper/ld-pasting.tex`
+- `blueprint/src/chapter/ch09_pasting.tex`
 -/
 
 namespace MIPStarRE.LDT.Pasting
@@ -153,14 +153,14 @@ structure LdPastingSubMeasConclusion (params : Parameters)
   constructedSubMeas :
     H = constructedPastedSubMeas params family k
   -- Naming note: this is not a `ν` field from the paper. The point-consistency
-  -- bound here continues to use the induction-section error term, while `ν`
-  -- only appears in the completeness lower bound.
+  -- bound here is the paper's intermediate `ν`, while the completeness field
+  -- carries the missing-mass term needed for the final `σ` after completion.
   pointConsistency :
     ConsRel strategy.state (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (polynomialEvaluationFamily params.next H)
-      (MainInductionStep.ldPastingInInductionError params k
-        eps delta gamma kappa zeta)
+      (MainInductionStep.ldPastingInInductionNu params k
+        eps delta gamma zeta)
   completeness :
     CompletenessAtLeast strategy.state H.liftLeft
       (ldPastingCompletenessLowerBound params kappa

@@ -186,12 +186,14 @@
 
 	\begin{lemma}\label{lem:trunc-inequality}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.truncationInequality}
+		\leanok
 		For any $x \in [0, 1]$,
 		\begin{equation*}
 			(x - \mathsf{trunc}_\delta(x))^2 \leq \frac{1}{\delta} \cdot (x - x^2).
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		If $x \geq 1-\delta$, then $\mathsf{trunc}_\delta(x)=1$. Since $\delta \leq 1/2$ below, one also has $x \geq \delta$, so
 		\[
 			(x-\mathsf{trunc}_\delta(x))^2
@@ -361,6 +363,7 @@
 
 	\begin{lemma}[Completeness of~$Q$]\label{lem:Q-completeness}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qCompleteness}
+		\leanok
 		\begin{equation*}
 			\bra{\psi} Q \ot I \ket{\psi}
 			\geq
@@ -368,6 +371,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:projective-low-rank-sum}
 		Since each $Q_a$ is projective,
 		\begin{equation}\label{eq:Q-for-an-A}
@@ -403,6 +407,7 @@
 
 	\begin{lemma}[Completeness of~$\sqrt{Q}$]\label{lem:sqrt-Q-completeness}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sqrtQCompleteness}
+		\leanok
 		\begin{equation*}
 			\bra{\psi} \sqrt{Q} \ot I \ket{\psi}
 			\geq
@@ -410,6 +415,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:Q-completeness, lem:projective-low-rank-sum}
 		Diagonalize $Q=\sum_i \nu_i \ket{u_i}\bra{u_i}$. Because $Q \leq (1+2\sqrt{\zeta})I$ by \ref{lem:projective-low-rank-sum}, each $\nu_i$ is at most $1+2\sqrt{\zeta}$. Therefore
 		\[
@@ -435,11 +441,13 @@
 
 	\begin{lemma}[$Q$ is almost projective]\label{lem:q-almost-projective}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qAlmostProjective}
+		\leanok
 		\begin{equation*}
 			\sum_a (Q_a \cdot Q \cdot Q_a - Q_a) \leq 4\sqrt{\zeta} \cdot I.
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:projective-low-rank-sum}
 		Since $Q \leq (1+2\sqrt{\zeta})I$ by \ref{lem:projective-low-rank-sum},
 		\begin{align*}

@@ -51,9 +51,7 @@ private lemma optionBasisProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
   · refine Matrix.IsHermitian.ext fun i j => ?_
     by_cases hio : oa = i <;> by_cases hjo : oa = j <;>
       simp [Matrix.single, hio, hjo, and_comm]
-  · simpa using
-      (Matrix.single_mul_single_same
-        (i := oa) (j := oa) (k := oa) (c := (1 : ℂ)) (d := (1 : ℂ)))
+  · simp
 
 private lemma optionBasisProj_nonneg {α : Type*} [Fintype α] [DecidableEq α]
     (oa : Option α) :
@@ -266,7 +264,7 @@ private lemma oneMeasNaimarkOutcomeProj_mul_column
         · simp
         · intro x _ hxa
           have hax : a ≠ x := fun h => hxa h.symm
-          simp [Matrix.single_apply, hax]
+          simp [hax]
         · simp
       · simp [oneMeasNaimarkOutcomeProj, oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition,
           Matrix.kronecker, show a ≠ a' by exact fun h' => h h'.symm]
@@ -355,7 +353,7 @@ private lemma oneMeasNaimarkColumn_isometry
             simp [hR_sq, hMa_sq]
       _ = (1 : MIPStarRE.Quantum.Op d) i j := by
             simp [oneMeasNaimarkRemainder, Matrix.sub_apply, Matrix.sum_apply,
-              sub_eq_add_neg, add_assoc, add_comm]
+              sub_eq_add_neg, add_comm]
       _ = (oneMeasNaimarkInputProj (α := α) (d := d)) (i, none) (j, none) := by
             simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker]
   · simp [Matrix.mul_apply, oneMeasNaimarkColumn, oneMeasNaimarkInputProj,
@@ -420,7 +418,7 @@ private lemma oneMeasNaimarkColumn_mul_inputProj
       oneMeasNaimarkColumn M := by
   ext ⟨d₁, oa₁⟩ ⟨d₂, oa₂⟩
   simp only [Matrix.mul_apply, oneMeasNaimarkInputProj,
-    oneMeasNaimarkAuxTransition, Matrix.kronecker_apply]
+    oneMeasNaimarkAuxTransition]
   cases oa₂ with
   | none =>
     have : ∀ x : d × Option α,
@@ -434,12 +432,12 @@ private lemma oneMeasNaimarkColumn_mul_inputProj
       cases k₂ with
       | none =>
           by_cases h : k₁ = d₂ <;>
-            simp [Matrix.kronecker, Matrix.single_apply, Prod.ext_iff, h]
+            simp [Matrix.kronecker, Prod.ext_iff, h]
       | some a =>
           have hneq : (k₁, some a) ≠ (d₂, (none : Option α)) := by
             intro h
             cases h
-          simpa [Matrix.kronecker, Matrix.single_apply, hneq]
+          simp [Matrix.kronecker, hneq]
     simp_rw [this]
     rw [Finset.sum_ite_eq' Finset.univ (d₂, (none : Option α)) (fun _ =>
       oneMeasNaimarkColumn M (d₁, oa₁) (d₂, none))]
@@ -653,12 +651,6 @@ Define `P̂_a = V†(I ⊗ |a⟩⟨a|)V`. Then `P̂_a` is an orthogonal projecti
 The proof requires matrix square roots for PSD operators, which are
 available in principle via the spectral theorem but require nontrivial
 Mathlib infrastructure. -/
-/- TODO: The proof requires matrix square roots for PSD operators (via spectral theorem)
-   and Mathlib's `Matrix.PosSemidef.sqrt`. See #98 for tracking. The construction is:
-   1. Build isometry V using √M_a and √(I − ∑M_a)
-   2. Define P̂_a = V†(I ⊗ |a⟩⟨a|)V and verify IsProj
-   3. Verify compression identity: (I⊗⟨⊥|)P̂_a(I⊗|⊥⟩) = M_a
-   Blocked on: Mathlib `Matrix.PosSemidef.sqrt`, `Matrix.IsHermitian.spectral_theorem` -/
 theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
     (M : MIPStarRE.Quantum.Submeasurement α d) :
@@ -863,7 +855,8 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
               (oneMeasLiftedDensity α ρ *
                 Matrix.kronecker (M.effect a) (naimarkAuxProjector α)) := by
                 symm
-                exact normalizedTrace_oneMeasLiftedDensity_mul_auxProj (α := α) ρ (M.effect a)
+                exact
+                  normalizedTrace_oneMeasLiftedDensity_mul_auxProj (α := α) ρ (M.effect a)
       _ = MIPStarRE.Quantum.normalizedTrace
             (oneMeasLiftedDensity α ρ *
               ((oneMeasNaimarkColumn M)ᴴ * Q * oneMeasNaimarkColumn M)) := by
@@ -949,6 +942,8 @@ private lemma exists_fullNaimarkData
   · intro y ρ b
     simpa [rightData, hright y] using (rightData y).expectation_preservation ρ b
 
+/-- Package the questionwise one-measurement dilations on both sides into the
+paper's full Naimark statement package. -/
 theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
@@ -1039,10 +1034,14 @@ private def leftLiftedMeasurement {Outcome : Type*}
     Measurement Outcome (ιA × ιB) :=
   { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
     total_eq_one := by
-      ext i j
-      rcases i with ⟨i₁, i₂⟩
-      rcases j with ⟨j₁, j₂⟩
-      simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
+      calc
+        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).total
+            = leftTensor (ι₂ := ιB) A.total :=
+              rfl
+        _ = leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA) := by
+              rw [A.total_eq_one]
+        _ = 1 := by
+              simp [leftTensor] }
 
 /-- `lem:orthonormalization-main-lemma`.
 

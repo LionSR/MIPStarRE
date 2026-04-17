@@ -142,6 +142,12 @@ noncomputable def matrixAddInURightOperatorAtPoint {Outcome : Type*} [Fintype Ou
     let Au := matrixAveragedPointOperatorContribution params model ah.2 u
     Au * (M u ah.1) * Au * (T.effect ah.2)
 
+private noncomputable def matrixAddInUPointAverage (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (f : Point params → MatrixOperator model.space) : Error :=
+  finiteAverage (fun u : Point params => Complex.re (matrixExpectation model.state (f u)))
+
 /-- The matrix left-hand expectation in `add-in-u`. -/
 noncomputable def matrixAddInULeftQuantity {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
@@ -150,9 +156,7 @@ noncomputable def matrixAddInULeftQuantity {Outcome : Type*} [Fintype Outcome]
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
     (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome) : Error :=
-  finiteAverage (fun u : Point params =>
-    Complex.re (matrixExpectation model.state
-      (matrixAddInULeftOperatorAtPoint params model M H S u)))
+  matrixAddInUPointAverage params model (matrixAddInULeftOperatorAtPoint params model M H S)
 
 /-- The matrix right-hand expectation in `add-in-u`. -/
 noncomputable def matrixAddInURightQuantity {Outcome : Type*} [Fintype Outcome]
@@ -162,9 +166,7 @@ noncomputable def matrixAddInURightQuantity {Outcome : Type*} [Fintype Outcome]
     (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
     (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
     (S : AddInUSelection params Outcome) : Error :=
-  finiteAverage (fun u : Point params =>
-    Complex.re (matrixExpectation model.state
-      (matrixAddInURightOperatorAtPoint params model M T S u)))
+  matrixAddInUPointAverage params model (matrixAddInURightOperatorAtPoint params model M T S)
 
 /-- The concrete evaluated polynomial family `H_[h(u)=a]`. -/
 noncomputable def matrixPolynomialEvaluationOutcomeOperatorAtPoint (params : Parameters)

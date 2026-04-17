@@ -3,21 +3,14 @@ import MIPStarRE.LDT.SelfImprovement.Theorems
 /-!
 # Section 10 — Definitions
 
-Supporting definitions for the point-measurement commutativity argument from Section 10 of the
-low individual degree paper.
-
-## Main definitions
-
-- `pointWithDiagonalLineDistribution`: uniformly samples a diagonal line together with a
-  parameter.
-- `pointPairSharedDiagonalLineDistribution`: packages a uniform point pair and parameter as a
-  shared diagonal-line sample.
-- `pointMeasurementProductLeft` / `pointMeasurementProductRight`: the ordered and reversed point
-  products on the bipartite space.
+Auxiliary definitions for the commutativity-at-points argument from Section 10 of the
+low individual degree paper. This file packages the sampled diagonal-line questions,
+point/line bridge families, and the error terms used by `commutativityPoints`.
 
 ## References
 
 - `references/ldt-paper/commutativity-points.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
 -/
 
 namespace MIPStarRE.LDT.CommutativityPoints
@@ -153,7 +146,7 @@ noncomputable def tensorProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
                   A.total (1 : MIPStarRE.Quantum.Op ι)
                   (1 : MIPStarRE.Quantum.Op ι) B.total).symm
       _ ≤ leftTensor (ι₂ := ι) A.total :=
-            opTensor_le_leftTensor
+            MIPStarRE.LDT.opTensor_le_leftTensor
               (ι₂ := ι)
               (SubMeas.total_nonneg A)
               B.total_le_one

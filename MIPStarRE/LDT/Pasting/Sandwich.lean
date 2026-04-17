@@ -236,8 +236,20 @@ noncomputable def gHatRotatedHalfProductTotalOperator (params : Parameters) [Fie
       gHatHalfProductTotalOperator params family k (pointTupleTail xs) *
         ((gHatIdxMeas params family (xs 0)).toSubMeas).total
 
-/-- The total half-product collapses to the identity because each completed slice
-has total operator `1`. -/
+private def gHatTupleOutcomeConsEquiv (params : Parameters) [FieldModel params.q] (k : ℕ) :
+    GHatTupleOutcome params (k + 1) ≃ GHatOutcome params × GHatTupleOutcome params k where
+  toFun gs := (gs 0, gHatTupleOutcomeTail gs)
+  invFun p := Fin.cons p.1 p.2
+  left_inv gs := by
+    funext i
+    cases i using Fin.cases with
+    | zero => rfl
+    | succ j => rfl
+  right_inv p := by
+    cases p
+    rfl
+
+/-- The total operator of the ordered half-product is always the identity. -/
 lemma gHatHalfProductTotalOperator_eq_one (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k), gHatHalfProductTotalOperator params family k xs = 1
@@ -248,7 +260,7 @@ lemma gHatHalfProductTotalOperator_eq_one (params : Parameters) [FieldModel para
       simp [gHatIdxMeas, completeSubMeas,
         gHatHalfProductTotalOperator_eq_one params family k (pointTupleTail xs)]
 
-/-- The rotated total half-product also collapses to the identity. -/
+/-- The total operator of the rotated half-product is always the identity. -/
 lemma gHatRotatedHalfProductTotalOperator_eq_one (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k), gHatRotatedHalfProductTotalOperator params family k xs = 1
@@ -259,8 +271,7 @@ lemma gHatRotatedHalfProductTotalOperator_eq_one (params : Parameters) [FieldMod
       simp [gHatIdxMeas, completeSubMeas,
         gHatHalfProductTotalOperator_eq_one params family k (pointTupleTail xs)]
 
-/-- Summing the ordered half-product over all completed-slice outcomes
-recovers its total operator. -/
+/-- Summing the ordered half-product over all completed outcomes gives its total operator. -/
 lemma gHatHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k),
@@ -270,27 +281,13 @@ lemma gHatHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
   | 0, _xs => by
       simp [gHatHalfProductOutcomeOperator, gHatHalfProductTotalOperator]
   | k + 1, xs => by
-      let e : GHatTupleOutcome params (k + 1) ≃
-          GHatOutcome params × GHatTupleOutcome params k :=
-        { toFun := fun gs => (gs 0, gHatTupleOutcomeTail gs)
-          invFun := fun p => Fin.cons p.1 p.2
-          left_inv := by
-            intro gs
-            funext i
-            cases i using Fin.cases with
-            | zero => rfl
-            | succ j => rfl
-          right_inv := by
-            intro p
-            cases p
-            rfl }
       have hsplit :
           (∑ gs : GHatTupleOutcome params (k + 1),
               gHatHalfProductOutcomeOperator params family (k + 1) xs gs) =
             ∑ p : GHatOutcome params × GHatTupleOutcome params k,
               gHatHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2) := by
         symm
-        exact (Fintype.sum_equiv e
+        exact (Fintype.sum_equiv (gHatTupleOutcomeConsEquiv params k)
           (fun gs => gHatHalfProductOutcomeOperator params family (k + 1) xs gs)
           (fun p =>
             gHatHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2))
@@ -327,8 +324,7 @@ lemma gHatHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
               rw [(gHatIdxMeas params family (xs 0)).sum_eq_total]
               simp [gHatHalfProductTotalOperator]
 
-/-- Summing the rotated half-product over all completed-slice outcomes
-recovers its total operator. -/
+/-- Summing the rotated half-product over all completed outcomes gives its total operator. -/
 lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k),
@@ -338,20 +334,6 @@ lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters) [FieldModel para
   | 0, _xs => by
       simp [gHatRotatedHalfProductOutcomeOperator, gHatRotatedHalfProductTotalOperator]
   | k + 1, xs => by
-      let e : GHatTupleOutcome params (k + 1) ≃
-          GHatOutcome params × GHatTupleOutcome params k :=
-        { toFun := fun gs => (gs 0, gHatTupleOutcomeTail gs)
-          invFun := fun p => Fin.cons p.1 p.2
-          left_inv := by
-            intro gs
-            funext i
-            cases i using Fin.cases with
-            | zero => rfl
-            | succ j => rfl
-          right_inv := by
-            intro p
-            cases p
-            rfl }
       have hsplit :
           (∑ gs : GHatTupleOutcome params (k + 1),
               gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs gs) =
@@ -359,7 +341,7 @@ lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters) [FieldModel para
               gHatRotatedHalfProductOutcomeOperator
                 params family (k + 1) xs (Fin.cons p.1 p.2) := by
         symm
-        exact (Fintype.sum_equiv e
+        exact (Fintype.sum_equiv (gHatTupleOutcomeConsEquiv params k)
           (fun gs => gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs gs)
           (fun p =>
             gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2))
@@ -492,7 +474,7 @@ private lemma gHatIdxMeas_proj (params : Parameters) [FieldModel params.q]
   | some p =>
       simp [gHatIdxMeas, completeSubMeas, (family.meas x).proj p]
 
-/-- Each summand in the Bernoulli tail operator is positive semidefinite for a PSD contraction. -/
+/-- Each binomial term in the Bernoulli tail operator is positive semidefinite. -/
 lemma binomialOperatorTerm_nonneg {G : MIPStarRE.Quantum.Op ι} (n r : ℕ)
     (hG : 0 ≤ G) (hGle : G ≤ 1) :
     0 ≤ (Nat.choose n r : ℂ) • (G ^ r * (1 - G) ^ (n - r)) := by
