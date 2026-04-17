@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.StrategyRole
+import MIPStarRE.LDT.Test.StrategyRoleSymmetrization
 
 /-!
 # Symmetric-strategy failure probabilities

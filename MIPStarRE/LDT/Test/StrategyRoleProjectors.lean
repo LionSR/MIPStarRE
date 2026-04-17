@@ -97,7 +97,7 @@ lemma roleCond_finset_sum {α ι : Type*}
   rcases j with ⟨rj, ij⟩
   cases ri <;> cases rj <;> simp [roleCond, roleProj, opTensor, Matrix.one_apply]
 
-/-- Reassociate the role and payload indices for the role-register symmetrization. -/
+/-- Reassociate the role-pair and payload-pair indices into local role-register factors. -/
 def rolePairPayloadEquiv (ι : Type*) :
     ((Role × Role) × (ι × ι)) ≃ ((Role × ι) × (Role × ι)) where
   toFun x := ((x.1.1, x.2.1), (x.1.2, x.2.2))
@@ -335,6 +335,7 @@ lemma normalizedTrace_two_smul_rolePairCond {ι : Type*}
   rw [MIPStarRE.Quantum.normalizedTrace_add, normalizedTrace_rolePairCond]
   ring_nf
 
+/-- Doubling a role-pair slice doubles the real part of its normalized trace. -/
 lemma normalizedTrace_re_two_smul_rolePairCond {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (rL rR : Role) (X : MIPStarRE.Quantum.Op (ι × ι)) :
@@ -392,6 +393,7 @@ theorem classicalRoleSymmState_isNormalized {ι : Type*} [Fintype ι] [Decidable
   rw [normalizedTrace_swapDensity, hψ]
   norm_num
 
+/-- Tensor placement is additive in the left factor. -/
 lemma opTensor_add_left {ι₁ ι₂ : Type*}
     [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (A B : MIPStarRE.Quantum.Op ι₁) (C : MIPStarRE.Quantum.Op ι₂) :
@@ -399,6 +401,7 @@ lemma opTensor_add_left {ι₁ ι₂ : Type*}
   ext i j
   simp [opTensor, add_mul]
 
+/-- Tensor placement is additive in the right factor. -/
 lemma opTensor_add_right {ι₁ ι₂ : Type*}
     [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (A : MIPStarRE.Quantum.Op ι₁) (B C : MIPStarRE.Quantum.Op ι₂) :

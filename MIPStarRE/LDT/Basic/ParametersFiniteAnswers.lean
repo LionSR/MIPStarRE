@@ -1,10 +1,10 @@
-import MIPStarRE.LDT.Basic.ParametersCore
+import MIPStarRE.LDT.Basic.LowDegreePolynomial
 
 /-!
 # Finite answer spaces for the low individual degree test
 
 Finite-type instances for the bounded polynomial answer spaces defined in
-`MIPStarRE.LDT.Basic.ParametersCore`.
+`MIPStarRE.LDT.Basic.LowDegreePolynomial`.
 -/
 
 namespace MIPStarRE.LDT

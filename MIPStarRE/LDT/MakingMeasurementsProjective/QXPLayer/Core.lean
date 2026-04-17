@@ -22,6 +22,7 @@ orthonormalization estimates. -/
 noncomputable def zetaQuarterRoot (ζ : Error) : Error :=
   Real.rpow ζ (1 / (4 : Error))
 
+/-- The quarter-root error term is nonnegative on nonnegative input. -/
 lemma zetaQuarterRoot_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
     0 ≤ zetaQuarterRoot ζ := by
   dsimp [zetaQuarterRoot]

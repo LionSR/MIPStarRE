@@ -10,6 +10,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT
 
+/-- A paper-local submeasurement with outcomes in `α` and Hilbert space index `ι`. -/
 structure SubMeas (α : Type*) [Fintype α] (ι : Type*) [Fintype ι] [DecidableEq ι] where
   outcome : α → MIPStarRE.Quantum.Op ι := fun _ => 0
   total : MIPStarRE.Quantum.Op ι := 0

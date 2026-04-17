@@ -15,6 +15,7 @@ open MIPStarRE.LDT
 
 noncomputable section
 
+/-- Under the small-error hypothesis `ζ ≤ 1/4`, the truncation error is at most `1/2`. -/
 lemma spectralTruncationError_le_half (ζ : Error)
     (_hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
     spectralTruncationError ζ ≤ 1 / (2 : Error) := by

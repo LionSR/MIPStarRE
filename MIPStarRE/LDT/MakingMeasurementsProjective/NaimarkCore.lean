@@ -18,6 +18,7 @@ open MIPStarRE.LDT
 
 /-! ### One-measurement Naimark (Lemma 5.2) -/
 
+/-- The rank-one projector onto an `Option` basis vector is projective. -/
 lemma optionBasisProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
     (oa : Option α) :
     MIPStarRE.Quantum.IsProj
@@ -28,6 +29,7 @@ lemma optionBasisProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
       simp [Matrix.single, hio, hjo, and_comm]
   · simp
 
+/-- The rank-one projector onto an `Option` basis vector is positive semidefinite. -/
 lemma optionBasisProj_nonneg {α : Type*} [Fintype α] [DecidableEq α]
     (oa : Option α) :
     0 ≤ (Matrix.single oa oa (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) := by
@@ -35,6 +37,7 @@ lemma optionBasisProj_nonneg {α : Type*} [Fintype α] [DecidableEq α]
   let col : Matrix (Option α) Unit ℂ := Matrix.single oa () 1
   simpa [col] using Matrix.posSemidef_self_mul_conjTranspose col
 
+/-- The `Option` basis projectors sum to the identity. -/
 lemma optionBasisProj_sum_eq_one {α : Type*} [Fintype α] [DecidableEq α] :
     ∑ oa : Option α, (Matrix.single oa oa (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) = 1 := by
   ext i j
@@ -62,16 +65,19 @@ lemma optionBasisProj_sum_eq_one {α : Type*} [Fintype α] [DecidableEq α] :
             have hab : a ≠ b := fun h => hij (congrArg some h)
             simp [Matrix.sum_apply, Matrix.single_apply, Matrix.one_apply, hab]
 
+/-- The identity operator is projective. -/
 lemma op_one_isProj {d : Type*} [Fintype d] [DecidableEq d] :
     MIPStarRE.Quantum.IsProj (1 : MIPStarRE.Quantum.Op d) := by
   refine ⟨?_, by simp⟩
   refine Matrix.IsHermitian.ext fun i j => ?_
   simp [Matrix.one_apply, eq_comm]
 
+/-- The identity operator is positive semidefinite. -/
 lemma op_one_nonneg {d : Type*} [Fintype d] [DecidableEq d] :
     0 ≤ (1 : MIPStarRE.Quantum.Op d) := by
   exact Matrix.PosSemidef.one.nonneg
 
+/-- Kronecker products of projectors are projective. -/
 lemma isProj_kronecker {d₁ d₂ : Type*}
     [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
     {A : MIPStarRE.Quantum.Op d₁} {B : MIPStarRE.Quantum.Op d₂}
@@ -90,6 +96,7 @@ lemma isProj_kronecker {d₁ d₂ : Type*}
               simpa using (Matrix.mul_kronecker_mul A A B B).symm
       _ = Matrix.kronecker A B := by rw [hA.idempotent, hB.idempotent]
 
+/-- Unitary conjugation preserves projectivity. -/
 lemma isProj_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
     (U : Matrix.unitaryGroup n ℂ) {P : MIPStarRE.Quantum.Op n}
     (hP : MIPStarRE.Quantum.IsProj P) :
@@ -120,6 +127,7 @@ lemma isProj_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
       _ = (U : MIPStarRE.Quantum.Op n)ᴴ * P * (U : MIPStarRE.Quantum.Op n) := by
             rw [hP.idempotent]
 
+/-- Unitary conjugation preserves positive semidefiniteness. -/
 lemma nonneg_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
     (U : Matrix.unitaryGroup n ℂ) {P : MIPStarRE.Quantum.Op n}
     (hP : 0 ≤ P) :
@@ -128,6 +136,7 @@ lemma nonneg_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
     (Matrix.PosSemidef.conjTranspose_mul_mul_same
       (Matrix.nonneg_iff_posSemidef.mp hP) (U : MIPStarRE.Quantum.Op n)).nonneg
 
+/-- Unitary conjugation preserves identity decompositions. -/
 lemma unitary_conj_sum_eq_one {β n : Type*} [Fintype β] [Fintype n] [DecidableEq n]
     (U : Matrix.unitaryGroup n ℂ) (P : β → MIPStarRE.Quantum.Op n)
     (hP : ∑ b, P b = 1) :
@@ -145,15 +154,18 @@ lemma unitary_conj_sum_eq_one {β n : Type*} [Fintype β] [Fintype n] [Decidable
           rw [hP]
           simpa [mul_assoc] using hUstar'
 
+/-- The slack operator `I - ∑_a M_a` for one-measurement Naimark dilation. -/
 noncomputable def oneMeasNaimarkRemainder {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
     (M : MIPStarRE.Quantum.Submeasurement α d) : MIPStarRE.Quantum.Op d :=
   1 - ∑ a, M.effect a
 
+/-- The auxiliary matrix unit used in the one-measurement Naimark construction. -/
 def oneMeasNaimarkAuxTransition {α : Type*} [DecidableEq α] (oa ob : Option α) :
     MIPStarRE.Quantum.Op (Option α) :=
   Matrix.single oa ob 1
 
+/-- The partial-isometry column implementing the one-measurement Naimark map. -/
 noncomputable def oneMeasNaimarkColumn {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
     (M : MIPStarRE.Quantum.Submeasurement α d) :
@@ -163,22 +175,27 @@ noncomputable def oneMeasNaimarkColumn {α : Type*} [Fintype α] [DecidableEq α
   | none, none => CFC.sqrt (oneMeasNaimarkRemainder M) x.1 y.1
   | _, _ => 0
 
+/-- The projector onto the input `none` slice of the auxiliary register. -/
 def oneMeasNaimarkInputProj {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d] :
     MIPStarRE.Quantum.Op (d × Option α) :=
   Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (oneMeasNaimarkAuxTransition none none)
 
+/-- The auxiliary-basis projector for a given Naimark outcome slice. -/
 def oneMeasNaimarkOutcomeProj {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d] (oa : Option α) :
     MIPStarRE.Quantum.Op (d × Option α) :=
   Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (oneMeasNaimarkAuxTransition oa oa)
 
+/-- The one-measurement Naimark slack operator is positive semidefinite. -/
 lemma oneMeasNaimarkRemainder_nonneg {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
     (M : MIPStarRE.Quantum.Submeasurement α d) :
     0 ≤ oneMeasNaimarkRemainder M := by
   exact sub_nonneg.mpr M.sum_le_one
 
+/-- Multiplying by an outcome projector isolates the matching square-root block
+of the Naimark column. -/
 lemma oneMeasNaimarkOutcomeProj_mul_column
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -258,6 +275,7 @@ lemma oneMeasNaimarkOutcomeProj_mul_column
       simp [oneMeasNaimarkOutcomeProj, oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition,
         Matrix.kronecker]
 
+/-- The input-slice projector in the one-measurement Naimark dilation is projective. -/
 lemma oneMeasNaimarkInputProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d] :
     MIPStarRE.Quantum.IsProj
@@ -266,9 +284,9 @@ lemma oneMeasNaimarkInputProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
 
 /-- **Isometry property of the Naimark column**: `V†V = P`.
 
-The Naimark column `V` satisfies `V†V = I ⊗ |⊥⟩⟨⊥|`, i.e., V is an
-isometry on the `⊥`-slice of the auxiliary register. This is the key
-linear-algebraic content justifying the unitary extension. -/
+The Naimark column `V` satisfies `V†V = I ⊗ |⊥⟩⟨⊥|`, i.e., it is an
+isometry on the designated input slice of the auxiliary register. This is
+the key linear-algebraic content justifying the unitary extension. -/
 lemma oneMeasNaimarkColumn_isometry
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -338,6 +356,7 @@ lemma oneMeasNaimarkColumn_isometry
   · simp [Matrix.mul_apply, oneMeasNaimarkColumn, oneMeasNaimarkInputProj,
       oneMeasNaimarkAuxTransition, Matrix.kronecker]
 
+/-- Compressing the dilated outcome projector recovers the original effect. -/
 lemma oneMeasNaimarkCompression
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]

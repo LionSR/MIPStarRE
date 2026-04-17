@@ -170,13 +170,7 @@ lemma truncationInequality (δ x : Error) :
       mul_nonneg (mul_nonneg (le_of_lt hδ) hx)
         (by linarith : (0 : ℝ) ≤ 1 - x)]
 
-private lemma real_smul_matrix_eq_complex {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (Q : MIPStarRE.Quantum.Op ι) (c : Error) :
-    (c : ℂ) • Q = c • Q := by
-  ext i j
-  change (c : ℂ) * Q i j = (c : ℂ) * Q i j
-  rfl
-
+/-- The spectral truncation error is nonnegative on nonnegative input. -/
 lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
     0 ≤ spectralTruncationError ζ := by
   dsimp [spectralTruncationError]

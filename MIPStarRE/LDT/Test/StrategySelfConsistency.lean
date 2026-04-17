@@ -12,6 +12,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace ProjStrat
 
+/-- The classical role-register symmetrized state has the same total mass as the original state. -/
 lemma ev_classicalRoleSymmState_one {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : QuantumState (ι × ι)) :
@@ -180,6 +181,7 @@ theorem classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
   rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
   exact hpoint
 
+/-- Block-diagonal symmetrization of two local measurements over the role register. -/
 noncomputable def symmetrizedMeas
     {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
@@ -210,6 +212,7 @@ noncomputable def symmetrizedMeas
       total_le_one := le_rfl }
   total_eq_one := rfl
 
+/-- The symmetrized measurement extracted from the axis-parallel line answer family. -/
 noncomputable def axisParallelLineAnswerMeasurement
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -223,6 +226,7 @@ noncomputable def axisParallelLineAnswerMeasurement
     let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
     simpa [ℓ, postprocess_total] using (M ℓ).total_eq_one
 
+/-- The symmetrized measurement extracted from the diagonal line answer family. -/
 noncomputable def diagonalLineAnswerMeasurement
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -249,6 +253,8 @@ noncomputable def diagonalLineAnswerMeasurement
   simp [symmetrizedIdxProjMeas, postprocess, roleCond_finset_sum,
     Finset.sum_add_distrib]
 
+/-- For full measurements, the total match mass controls the bipartite
+consistency defect. -/
 lemma qBipartiteConsDefect_of_measurements
     {Outcome : Type*} {ιA ιB : Type*}
     [Fintype Outcome]
