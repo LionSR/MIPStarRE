@@ -165,6 +165,7 @@ abbrev FullSliceCommutationEvaluatedInput (params : Parameters)
     (gamma zeta : Error) : Prop :=
   strategy.state.IsNormalized →
     0 ≤ gamma →
+    0 ≤ zeta →
     family.StronglySelfConsistent strategy.state zeta →
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
