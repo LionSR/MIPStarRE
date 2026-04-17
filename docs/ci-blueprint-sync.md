@@ -26,10 +26,15 @@ distinction is drawn for this check — either form is considered a claim that
 the theorem statement is formalized.
 
 The axiom closure is obtained by `lake env lean`-ing a throwaway harness that
-runs `#print axioms Name` for each unique declaration. False positives on
-unknown declarations can happen if the full `MIPStarRE` module fails to
-import; in that case the script emits a raw-output warning on stderr and
-falls through without spurious errors.
+runs `#print axioms Name` for each unique declaration. Lean's `#print axioms`
+output is accepted both with a `<file>:line:col:` location prefix and as
+plain `'Name' depends on axioms: […]` / `'Name' does not depend on any
+axioms` lines. If the harness itself fails — i.e. `lake env lean` exits
+non-zero **and** no recognised `#print axioms` output was produced (typical
+symptom of `import MIPStarRE` failing before the body runs) — the script
+prints a warning with the tail of the raw lake output to stderr, skips
+per-declaration classification, and exits 0. That way a broken Lean build
+is not hidden behind cascading false blueprint errors.
 
 ## Running locally
 

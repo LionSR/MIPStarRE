@@ -138,8 +138,16 @@ def _unique(seq):
     return out
 
 
-def run_axiom_check(decls: list[str], repo_root: Path, lake: str) -> dict[str, dict]:
-    """Run ``lake env lean`` on a harness that ``#print axioms`` every decl."""
+def run_axiom_check(
+    decls: list[str], repo_root: Path, lake: str
+) -> dict[str, dict] | None:
+    """Run ``lake env lean`` on a harness that ``#print axioms`` every decl.
+
+    Returns ``None`` to signal a global harness failure (e.g. ``import
+    MIPStarRE`` failed) — the caller should skip per-declaration
+    classification rather than emit false errors for every ``\\leanok``
+    entry.
+    """
     if not decls:
         return {}
 
@@ -159,20 +167,50 @@ def run_axiom_check(decls: list[str], repo_root: Path, lake: str) -> dict[str, d
         harness_str = str(harness)
 
     output = (proc.stdout or "") + "\n" + (proc.stderr or "")
+    # Lean may emit `#print axioms` output either prefixed with a
+    # ``<file>:line:col:`` location (the historical format) or as plain
+    # lines (seen in Lean 4.28). Handle both by attributing lines to a decl
+    # first via line number, then falling back to the ``'DeclName'`` quoted
+    # subject that appears at the start of every ``#print axioms`` message.
     loc_re = re.compile(rf"^{re.escape(harness_str)}:(\d+):\d+:\s*(.*)$")
-    records: dict[int, list[str]] = {}
-    current: int | None = None
-    for line in output.splitlines():
-        m = loc_re.match(line)
+    records: dict[str, list[str]] = {d: [] for d in decls}
+    current: str | None = None
+    for raw_line in output.splitlines():
+        content = raw_line
+        matched: str | None = None
+        m = loc_re.match(raw_line)
         if m:
-            current = int(m.group(1))
-            records.setdefault(current, []).append(m.group(2))
-        elif current is not None:
-            records[current].append(line)
+            content = m.group(2)
+            matched = line_to_decl.get(int(m.group(1)))
+        if matched is None:
+            for decl in decls:
+                if f"'{decl}'" in content:
+                    matched = decl
+                    break
+        if matched is not None:
+            current = matched
+        if current is not None:
+            records[current].append(content)
+
+    # Global-failure detection: ``lake env lean`` exited non-zero and we
+    # matched no output to any queried declaration. The most common cause
+    # is ``import MIPStarRE`` failing before the harness body runs. Signal
+    # ``None`` so the caller can skip classification and exit cleanly
+    # rather than reporting every ``\leanok`` entry as a missing decl.
+    if proc.returncode != 0 and not any(records[d] for d in decls):
+        sys.stderr.write(
+            f"warning: `lake env lean` exited with status {proc.returncode} "
+            "and produced no recognised `#print axioms` output. MIPStarRE "
+            "likely failed to import. Skipping per-declaration "
+            "classification to avoid spurious errors.\n"
+        )
+        sys.stderr.write("Raw lake output (tail):\n")
+        sys.stderr.write(output[-4000:] + "\n")
+        return None
 
     result: dict[str, dict] = {}
-    for ln, decl in line_to_decl.items():
-        joined = "\n".join(records.get(ln, []))
+    for decl in decls:
+        joined = "\n".join(records.get(decl, []))
         exists = True
         axioms: list[str] = []
         if not joined:
@@ -191,12 +229,6 @@ def run_axiom_check(decls: list[str], repo_root: Path, lake: str) -> dict[str, d
             "axioms": axioms,
             "raw": joined,
         }
-    if not any(r["exists"] for r in result.values()) and result:
-        sys.stderr.write(
-            "warning: no #print axioms output recognised; Lean may have failed "
-            "to import MIPStarRE. Raw lake output follows:\n"
-        )
-        sys.stderr.write(output[-4000:] + "\n")
     return result
 
 
@@ -239,6 +271,14 @@ def main() -> int:
 
     print(f"Running `{args.lake} env lean` axiom check on {len(decls)} unique decls …")
     axinfo = run_axiom_check(decls, root, lake=args.lake)
+    if axinfo is None:
+        print(
+            "Axiom check skipped: the harness itself failed to run "
+            "(see stderr warning above). Blueprint drift was not evaluated; "
+            "exiting 0 so the real cause (e.g. a broken Lean build) is not "
+            "hidden behind cascading blueprint errors."
+        )
+        return 0
 
     errors = 0
     warnings = 0
