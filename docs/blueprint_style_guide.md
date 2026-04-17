@@ -154,14 +154,18 @@ the proof is complete.
 | Blueprint entry describes an object or claim not yet in Lean          | no                   | no               |
 
 ### When to remove a `\leanok`
-Remove **both** `\leanok` tags the moment any of the following happens:
+Remove **both** `\leanok` tags when:
 - The Lean declaration is renamed or deleted (update `\lean{}` first; if
   there is no replacement, drop `\leanok`).
-- A transitive dependency regresses to `sorry` or is replaced by an
-  unjustified `axiom`.
 - The Lean statement drifts away from the blueprint wording (e.g. the
   bound is weakened or a hypothesis is added) — realign the Lean
   statement or the blueprint text, then re-add `\leanok`.
+
+Remove only the **proof-level** `\leanok` (keep the statement-level tag) when:
+- The proof regresses to `sorry`, introduces an unjustified `axiom`, or
+  gains a transitive dependency on `sorryAx`. The statement is still
+  formalized and type-matched, so the statement-level tag stays per the
+  decision table above; only the completeness claim needs to go.
 
 ### Multi-declaration `\lean{A, B, C}` tags
 A comma-separated `\lean{}` tag means the blueprint entry is jointly
