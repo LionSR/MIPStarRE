@@ -105,6 +105,7 @@ abbrev CommDataProcessedGEvaluatedSliceInput (params : Parameters)
   strategy.state.IsNormalized →
     strategy.IsGood eps delta gamma →
     family.StronglySelfConsistent strategy.state zeta →
+    family.ConsistentWithPoints strategy zeta →
     IdxPolyFamily.SliceBoundednessInput strategy family zeta →
     SDDRel strategy.state
       (uniformDistribution (Point params.next))
