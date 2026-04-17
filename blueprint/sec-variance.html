@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  MathJax = { 
+    tex: {
+		    inlineMath: [['$','$'], ['\\(','\\)']]
+	} }
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<meta name="generator" content="plasTeX" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Global variance of the points measurements</title>
+<link rel="next" href="chap-self-improvement.html" title="Self-improvement" />
+<link rel="prev" href="sec-expansion.html" title="Expansion in the hypercube graph" />
+<link rel="up" href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test" />
+<link rel="stylesheet" href="styles/theme-white.css" />
+<link rel="stylesheet" href="styles/amsthm.css" />
+<link rel="stylesheet" href="styles/showmore.css" />
+<link rel="stylesheet" href="styles/blueprint.css" />
+<link rel="stylesheet" href="styles/extra_styles.css" />
+</head>
+
+<body>
+<header>
+<svg  id="toc-toggle" class="icon icon-list-numbered "><use xlink:href="symbol-defs.svg#icon-list-numbered"></use></svg>
+<h1 id="doc_title"><a href="index.html">Blueprint for arXiv:2009.12982<br /><i class="itshape">Quantum Soundness of the Classical Low Individual Degree Test</i></a></h1>
+</header>
+
+<div class="wrapper">
+<nav class="toc">
+<ul class="sub-toc-0">
+<li class="">
+  <a href="chap-overview.html"><span class="toc_ref">1</span> <span class="toc_entry">Overview</span></a>
+ </li>
+<li class="">
+  <a href="sec-the-test.html"><span class="toc_ref">2</span> <span class="toc_entry">The low individual degree test</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-the-test.html#a0000000009"><span class="toc_ref">2.1</span> <span class="toc_entry">The game and its strategies</span></a>
+ </li>
+<li class="">
+  <a href="sec-the-test.html#a0000000010"><span class="toc_ref">2.2</span> <span class="toc_entry">Formal soundness target</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-prelims.html"><span class="toc_ref">3</span> <span class="toc_entry">Preliminaries</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-prelims.html#a0000000011"><span class="toc_ref">3.1</span> <span class="toc_entry">Polynomials and measurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#sec:comparing-measurements"><span class="toc_ref">3.2</span> <span class="toc_entry">Consistency and state-dependent distance</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#sec:consistency-from-state-dependent-distance"><span class="toc_ref">3.3</span> <span class="toc_entry">Consistency from state-dependent distance</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#a0000000012"><span class="toc_ref">3.4</span> <span class="toc_entry">Strong self-consistency</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-projective.html"><span class="toc_ref">4</span> <span class="toc_entry">Making measurements projective</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-projective.html#sec:naimark"><span class="toc_ref">4.0.1</span> <span class="toc_entry">Naimark dilation</span></a>
+ </li>
+<li class="">
+  <a href="chap-projective.html#sec:orthogonalization"><span class="toc_ref">4.0.2</span> <span class="toc_entry">Orthogonalization lemma</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-expansion.html"><span class="toc_ref">5</span> <span class="toc_entry">Expansion in the hypercube graph</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-expansion.html#a0000000013"><span class="toc_ref">5.1</span> <span class="toc_entry">The graph and its spectrum</span></a>
+ </li>
+<li class="">
+  <a href="sec-expansion.html#a0000000014"><span class="toc_ref">5.2</span> <span class="toc_entry">Local and global variance</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class=" active current">
+  <a href="sec-variance.html"><span class="toc_ref">6</span> <span class="toc_entry">Global variance of the points measurements</span></a>
+ </li>
+<li class="">
+  <a href="chap-self-improvement.html"><span class="toc_ref">7</span> <span class="toc_entry">Self-improvement</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-self-improvement.html#sec:self-improvement"><span class="toc_ref">7.1</span> <span class="toc_entry">Non-projective Output</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="chap-self-improvement.html#a0000000015"><span class="toc_ref">7.1.1</span> <span class="toc_entry">A Semidefinite Program</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-self-improvement.html#sec:self-improvement-projective"><span class="toc_ref">7.2</span> <span class="toc_entry">Projective Output</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html"><span class="toc_ref">8</span> <span class="toc_entry">Commutativity</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-g-comm.html#sec:commutativity-points"><span class="toc_ref">8.1</span> <span class="toc_entry">Commutativity of the point measurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html#sec:G-commutes-after-evaluation"><span class="toc_ref">8.2</span> <span class="toc_entry">Commutativity of&#160;\(G\) after evaluation</span></a>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html#sec:G-commutes"><span class="toc_ref">8.3</span> <span class="toc_entry">Commutativity of&#160;\(G\)</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html"><span class="toc_ref">9</span> <span class="toc_entry">Pasting</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-ld-pasting.html#a0000000016"><span class="toc_ref">9.0.1</span> <span class="toc_entry">From Measurements to Submeasurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#a0000000017"><span class="toc_ref">9.0.2</span> <span class="toc_entry">The Pasted Submeasurement</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-ld-pasting.html#sec:construction-numba-one"><span class="toc_ref"></span> <span class="toc_entry">The First Construction</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:construction-numba-two"><span class="toc_ref"></span> <span class="toc_entry">The Second Construction</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:hat-consistency"><span class="toc_ref">9.0.3</span> <span class="toc_entry">Strong Self-Consistency and Commutation of \(\widehat G\)</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-ld-pasting.html#a0000000018"><span class="toc_ref"></span> <span class="toc_entry">Commutativity of \(G_{\bot }\)</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#a0000000019"><span class="toc_ref"></span> <span class="toc_entry">Putting Everything Together</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:ld-sandwiching"><span class="toc_ref">9.0.4</span> <span class="toc_entry">Sandwiching Lemmas</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:consistency-of-h-with-a"><span class="toc_ref">9.0.5</span> <span class="toc_entry">Consistency of \(H\) with \(A\)</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:completeness-of-h-low-degree"><span class="toc_ref">9.0.6</span> <span class="toc_entry">Completeness of \(H\)</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-induction.html"><span class="toc_ref">10</span> <span class="toc_entry">The main induction step</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-induction.html#a0000000020"><span class="toc_ref">10.1</span> <span class="toc_entry">Restricting to one slice</span></a>
+ </li>
+<li class="">
+  <a href="sec-induction.html#a0000000021"><span class="toc_ref">10.2</span> <span class="toc_entry">The inductive construction</span></a>
+ </li>
+<li class="">
+  <a href="sec-induction.html#a0000000022"><span class="toc_ref">10.3</span> <span class="toc_entry">Proof of the main formal theorem</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sect0001.html"><span class="toc_ref">11</span> <span class="toc_entry">Bibliography</span></a>
+ </li>
+<li ><a href="dep_graph_document.html">Dependency graph</a></li>
+</ul>
+</nav>
+
+<div class="content">
+<div class="content-wrapper">
+
+
+<div class="main-text">
+<h1 id="sec:variance">6 Global variance of the points measurements</h1>
+
+<p>Throughout this chapter, \((\psi ,A,B,L)\) is an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m,q,d)\) low individual degree test. </p>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:generalize-b">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">6.1</span>
+    <span class="lemma_thmtitle">Replacing a line answer by a fixed polynomial</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-variance.html#lem:generalize-b">#</a>
+    
+    <a class="icon proof" href="sec-variance.html#a0000000267"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.9</a></li>
+          
+          <li><a href="sec-prelims.html#lem:schwartz-zippel-individual">Lemma 3.7</a></li>
+          
+          <li><a href="sec-prelims.html#lem:schwartz-zippel-individual">Lemma 3.7</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeB" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeB</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(G \in \mathrm{PolySub}(m,q,d)\). On the axis-parallel line-test distribution, </p>
+<div class="displaymath" id="a0000000268">
+  \[  B^{\ell }_{[f(u)=g(u)]} \otimes (G_g)^{1/2} \approx _{md/q} B^{\ell }_{g|_{\ell }} \otimes (G_g)^{1/2}.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000267">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> Expand the \(\approx _{md/q}\) norm on the weighted vector \((I\otimes (G_g)^{1/2})\lvert \psi  \rangle \). Because \(B^\ell \) is a projective measurement, only those line polynomials \(f\) with \(f\ne g|_\ell \) and \(f(u)=g(u)\) contribute. Lemma&#160;<a href="sec-prelims.html#lem:schwartz-zippel-individual">3.7</a> bounds the probability of this event by \(md/q\), and the remaining operator sum is bounded by the fact that \(G\) is a submeasurement. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:local-variance-of-points">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">6.2</span>
+    <span class="lemma_thmtitle">Local variance of the points measurements</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-variance.html#lem:local-variance-of-points">#</a>
+    
+    <a class="icon proof" href="sec-variance.html#a0000000269"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#lem:good-strategy-characterization">Lemma 3.15</a></li>
+          
+          <li><a href="sec-prelims.html#prop:simeq-to-approx">Lemma 3.19</a></li>
+          
+          <li><a href="sec-variance.html#lem:generalize-b">Lemma 6.1</a></li>
+          
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.25</a></li>
+          
+          <li><a href="sec-prelims.html#prop:simeq-to-approx">Lemma 3.19</a></li>
+          
+          <li><a href="sec-variance.html#lem:generalize-b">Lemma 6.1</a></li>
+          
+          <li><a href="sec-prelims.html#lem:good-strategy-characterization">Lemma 3.15</a></li>
+          
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.25</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.localVarianceOfPoints" class="lean_decl">MIPStarRE.LDT.GlobalVariance.localVarianceOfPoints</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(G \in \mathrm{PolySub}(m,q,d)\). On the hypercube edge distribution \((u,v) \sim C\), </p>
+<div class="equation" id="eq:local-variance-of-points-equation">
+<p>
+  <div class="equation_content">
+    \begin{equation}  A^u_{g(u)} \otimes (G_g)^{1/2} \approx _{24\cdot \left(\varepsilon +\delta +\frac{md}{q}\right)} A^v_{g(v)} \otimes (G_g)^{1/2}. \label{eq:local-variance-of-points-equation} \end{equation}
+  </div>
+  <span class="equation_label">1</span>
+</p>
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000269">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> Fix \(g\) and keep the weight \((G_g)^{1/2}\) on the second tensor factor throughout. On the vector \((I\otimes (G_g)^{1/2})\lvert \psi  \rangle \) one has the six-step chain </p>
+<div class="displaymath" id="a0000000270">
+  \[  A^u_{g(u)} \otimes (G_g)^{1/2} \approx _{2\delta } I\otimes (G_g)^{1/2} A^u_{g(u)} \approx _{2\varepsilon } B^\ell _{[f(u)=g(u)]} \otimes (G_g)^{1/2} \approx _{md/q} B^\ell _{g|_\ell } \otimes (G_g)^{1/2} \approx _{md/q} B^\ell _{[f(v)=g(v)]} \otimes (G_g)^{1/2} \approx _{2\varepsilon } I\otimes (G_g)^{1/2} A^v_{g(v)} \approx _{2\delta } A^v_{g(v)} \otimes (G_g)^{1/2}.  \]
+</div>
+<p> The first, second, fifth, and sixth comparisons use Lemma&#160;<a href="sec-prelims.html#prop:simeq-to-approx">3.19</a> together with the good-strategy hypotheses, and the middle pair is Lemma&#160;<a href="sec-variance.html#lem:generalize-b">6.1</a>. Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.25</a> sums these six weighted transports. </p>
+
+  </div>
+</div>
+<p>We note that <a href="sec-variance.html#eq:local-variance-of-points-equation">1</a> is equivalent to the statement that </p>
+<div class="equation" id="eq:equivalent-local-variance">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \sum _{g \in \mathcal{P}(m,q,d)} \mathbb {E}_{(u,v)\sim C} \langle \psi  \rvert  (A^u_{g(u)}-A^v_{g(v)})^2 \otimes G_g \lvert \psi  \rangle  \le 24\left(\varepsilon +\delta +\frac{md}{q}\right). \label{eq:equivalent-local-variance} \end{equation}
+  </div>
+  <span class="equation_label">2</span>
+</p>
+</div>
+<p> This can be viewed as a local-variance bound for the point measurements. </p>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:global-variance-of-points">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">6.3</span>
+    <span class="lemma_thmtitle">Global variance of the points measurements</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-variance.html#lem:global-variance-of-points">#</a>
+    
+    <a class="icon proof" href="sec-variance.html#a0000000271"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-expansion.html#def:local-and-variance">Definition 5.9</a></li>
+          
+          <li><a href="sec-expansion.html#lem:local-to-global">Lemma 5.12</a></li>
+          
+          <li><a href="sec-variance.html#lem:local-variance-of-points">Lemma 6.2</a></li>
+          
+          <li><a href="sec-expansion.html#def:local-and-variance">Definition 5.9</a></li>
+          
+          <li><a href="sec-expansion.html#lem:local-to-global">Lemma 5.12</a></li>
+          
+          <li><a href="sec-variance.html#lem:local-variance-of-points">Lemma 6.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints" class="lean_decl">MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(G \in \mathrm{PolySub}(m,q,d)\). On the uniform distribution over independent \(u,v \in \mathbb {F}_q^m\), </p>
+<div class="equation" id="eq:global-variance-of-points-equation">
+<p>
+  <div class="equation_content">
+    \begin{equation}  A^u_{g(u)} \otimes (G_g)^{1/2} \approx _{24m\left(\varepsilon +\delta +\frac{md}{q}\right)} A^v_{g(v)} \otimes (G_g)^{1/2}. \label{eq:global-variance-of-points-equation} \end{equation}
+  </div>
+  <span class="equation_label">3</span>
+</p>
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000271">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> We want to bound </p>
+<div class="equation" id="eq:global-variance-target">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \mathbb {E}_{u,v \sim \mathbb {F}_q^m} \sum _{g \in \mathcal{P}(m,q,d)} \lVert (A^u_{g(u)}-A^v_{g(v)}) \otimes (G_g)^{1/2} \lvert \psi  \rangle  \rVert ^2 = \mathbb {E}_{u,v \sim \mathbb {F}_q^m} \sum _{g \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  (A^u_{g(u)}-A^v_{g(v)})^2 \otimes G_g \lvert \psi  \rangle . \label{eq:global-variance-target} \end{equation}
+  </div>
+  <span class="equation_label">4</span>
+</p>
+</div>
+<p> For each \(g \in \mathcal{P}(m,q,d)\), define </p>
+<div class="displaymath" id="a0000000272">
+  \[  A(g)^u := A^u_{g(u)}, \qquad \lvert \psi _g \rangle  := (I \otimes (G_g)^{1/2})\lvert \psi  \rangle .  \]
+</div>
+<p> Then </p>
+<div class="displaymath" id="a0000000273">
+  \[  \eqref{eq:global-variance-target} = \sum _{g \in \mathcal{P}(m,q,d)} \mathbb {E}_{u,v \sim \mathbb {F}_q^m} \langle \psi _g \rvert  (A(g)^u-A(g)^v)^2 \otimes I \lvert \psi _g \rangle  = \sum _{g \in \mathcal{P}(m,q,d)} 2\, \mathbf{Var}_{\mathrm{global}}(A(g),\psi _g).  \]
+</div>
+<p> Applying Lemma&#160;<a href="sec-expansion.html#lem:local-to-global">5.12</a> gives </p>
+<div class="displaymath" id="a0000000274">
+  \[  \eqref{eq:global-variance-target} \le \sum _{g \in \mathcal{P}(m,q,d)} 2m\, \mathbf{Var}_{\mathrm{local}}(A(g),\psi _g) = m \cdot \sum _{g \in \mathcal{P}(m,q,d)} \mathbb {E}_{(u,v)\sim C} \langle \psi  \rvert  (A^u_{g(u)}-A^v_{g(v)})^2 \otimes G_g \lvert \psi  \rangle .  \]
+</div>
+<p> The last quantity is at most \(m \cdot 24\left(\varepsilon +\delta +\frac{md}{q}\right)\) by <a href="sec-variance.html#eq:equivalent-local-variance" class="eqref">2</a>, which is exactly <a href="sec-variance.html#eq:global-variance-of-points-equation">3</a>. </p>
+
+  </div>
+</div>
+
+</div> <!--main-text -->
+</div> <!-- content-wrapper -->
+</div> <!-- content -->
+</div> <!-- wrapper -->
+
+<nav class="prev_up_next">
+  <svg  id="showmore-minus" class="icon icon-eye-minus showmore"><use xlink:href="symbol-defs.svg#icon-eye-minus"></use></svg>
+
+  <svg  id="showmore-plus" class="icon icon-eye-plus showmore"><use xlink:href="symbol-defs.svg#icon-eye-plus"></use></svg>
+
+  <a href="sec-expansion.html" title="Expansion in the hypercube graph"><svg  class="icon icon-arrow-left "><use xlink:href="symbol-defs.svg#icon-arrow-left"></use></svg>
+</a>
+  <a href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test"><svg  class="icon icon-arrow-up "><use xlink:href="symbol-defs.svg#icon-arrow-up"></use></svg>
+</a>
+  <a href="chap-self-improvement.html" title="Self-improvement"><svg  class="icon icon-arrow-right "><use xlink:href="symbol-defs.svg#icon-arrow-right"></use></svg>
+</a>
+</nav>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/plastex.js"></script>
+<script type="text/javascript" src="js/svgxuse.js"></script>
+<script type="text/javascript" src="js/js.cookie.min.js"></script>
+<script type="text/javascript" src="js/showmore.js"></script>
+</body>
+</html>

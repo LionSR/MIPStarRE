@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  MathJax = { 
+    tex: {
+		    inlineMath: [['$','$'], ['\\(','\\)']]
+	} }
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<meta name="generator" content="plasTeX" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Expansion in the hypercube graph</title>
+<link rel="next" href="sec-variance.html" title="Global variance of the points measurements" />
+<link rel="prev" href="chap-projective.html" title="Making measurements projective" />
+<link rel="up" href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test" />
+<link rel="stylesheet" href="styles/theme-white.css" />
+<link rel="stylesheet" href="styles/amsthm.css" />
+<link rel="stylesheet" href="styles/showmore.css" />
+<link rel="stylesheet" href="styles/blueprint.css" />
+<link rel="stylesheet" href="styles/extra_styles.css" />
+</head>
+
+<body>
+<header>
+<svg  id="toc-toggle" class="icon icon-list-numbered "><use xlink:href="symbol-defs.svg#icon-list-numbered"></use></svg>
+<h1 id="doc_title"><a href="index.html">Blueprint for arXiv:2009.12982<br /><i class="itshape">Quantum Soundness of the Classical Low Individual Degree Test</i></a></h1>
+</header>
+
+<div class="wrapper">
+<nav class="toc">
+<ul class="sub-toc-0">
+<li class="">
+  <a href="chap-overview.html"><span class="toc_ref">1</span> <span class="toc_entry">Overview</span></a>
+ </li>
+<li class="">
+  <a href="sec-the-test.html"><span class="toc_ref">2</span> <span class="toc_entry">The low individual degree test</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-the-test.html#a0000000009"><span class="toc_ref">2.1</span> <span class="toc_entry">The game and its strategies</span></a>
+ </li>
+<li class="">
+  <a href="sec-the-test.html#a0000000010"><span class="toc_ref">2.2</span> <span class="toc_entry">Formal soundness target</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-prelims.html"><span class="toc_ref">3</span> <span class="toc_entry">Preliminaries</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-prelims.html#a0000000011"><span class="toc_ref">3.1</span> <span class="toc_entry">Polynomials and measurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#sec:comparing-measurements"><span class="toc_ref">3.2</span> <span class="toc_entry">Consistency and state-dependent distance</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#sec:consistency-from-state-dependent-distance"><span class="toc_ref">3.3</span> <span class="toc_entry">Consistency from state-dependent distance</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#a0000000012"><span class="toc_ref">3.4</span> <span class="toc_entry">Strong self-consistency</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-projective.html"><span class="toc_ref">4</span> <span class="toc_entry">Making measurements projective</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-projective.html#sec:naimark"><span class="toc_ref">4.0.1</span> <span class="toc_entry">Naimark dilation</span></a>
+ </li>
+<li class="">
+  <a href="chap-projective.html#sec:orthogonalization"><span class="toc_ref">4.0.2</span> <span class="toc_entry">Orthogonalization lemma</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class=" active current">
+  <a href="sec-expansion.html"><span class="toc_ref">5</span> <span class="toc_entry">Expansion in the hypercube graph</span></a>
+  <span class="expand-toc">▼</span>
+  <ul class="sub-toc-1 active">
+     <li class="">
+  <a href="sec-expansion.html#a0000000013"><span class="toc_ref">5.1</span> <span class="toc_entry">The graph and its spectrum</span></a>
+ </li>
+<li class="">
+  <a href="sec-expansion.html#a0000000014"><span class="toc_ref">5.2</span> <span class="toc_entry">Local and global variance</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-variance.html"><span class="toc_ref">6</span> <span class="toc_entry">Global variance of the points measurements</span></a>
+ </li>
+<li class="">
+  <a href="chap-self-improvement.html"><span class="toc_ref">7</span> <span class="toc_entry">Self-improvement</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-self-improvement.html#sec:self-improvement"><span class="toc_ref">7.1</span> <span class="toc_entry">Non-projective Output</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="chap-self-improvement.html#a0000000015"><span class="toc_ref">7.1.1</span> <span class="toc_entry">A Semidefinite Program</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-self-improvement.html#sec:self-improvement-projective"><span class="toc_ref">7.2</span> <span class="toc_entry">Projective Output</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html"><span class="toc_ref">8</span> <span class="toc_entry">Commutativity</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-g-comm.html#sec:commutativity-points"><span class="toc_ref">8.1</span> <span class="toc_entry">Commutativity of the point measurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html#sec:G-commutes-after-evaluation"><span class="toc_ref">8.2</span> <span class="toc_entry">Commutativity of&#160;\(G\) after evaluation</span></a>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html#sec:G-commutes"><span class="toc_ref">8.3</span> <span class="toc_entry">Commutativity of&#160;\(G\)</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html"><span class="toc_ref">9</span> <span class="toc_entry">Pasting</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-ld-pasting.html#a0000000016"><span class="toc_ref">9.0.1</span> <span class="toc_entry">From Measurements to Submeasurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#a0000000017"><span class="toc_ref">9.0.2</span> <span class="toc_entry">The Pasted Submeasurement</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-ld-pasting.html#sec:construction-numba-one"><span class="toc_ref"></span> <span class="toc_entry">The First Construction</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:construction-numba-two"><span class="toc_ref"></span> <span class="toc_entry">The Second Construction</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:hat-consistency"><span class="toc_ref">9.0.3</span> <span class="toc_entry">Strong Self-Consistency and Commutation of \(\widehat G\)</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-ld-pasting.html#a0000000018"><span class="toc_ref"></span> <span class="toc_entry">Commutativity of \(G_{\bot }\)</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#a0000000019"><span class="toc_ref"></span> <span class="toc_entry">Putting Everything Together</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:ld-sandwiching"><span class="toc_ref">9.0.4</span> <span class="toc_entry">Sandwiching Lemmas</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:consistency-of-h-with-a"><span class="toc_ref">9.0.5</span> <span class="toc_entry">Consistency of \(H\) with \(A\)</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:completeness-of-h-low-degree"><span class="toc_ref">9.0.6</span> <span class="toc_entry">Completeness of \(H\)</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-induction.html"><span class="toc_ref">10</span> <span class="toc_entry">The main induction step</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-induction.html#a0000000020"><span class="toc_ref">10.1</span> <span class="toc_entry">Restricting to one slice</span></a>
+ </li>
+<li class="">
+  <a href="sec-induction.html#a0000000021"><span class="toc_ref">10.2</span> <span class="toc_entry">The inductive construction</span></a>
+ </li>
+<li class="">
+  <a href="sec-induction.html#a0000000022"><span class="toc_ref">10.3</span> <span class="toc_entry">Proof of the main formal theorem</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sect0001.html"><span class="toc_ref">11</span> <span class="toc_entry">Bibliography</span></a>
+ </li>
+<li ><a href="dep_graph_document.html">Dependency graph</a></li>
+</ul>
+</nav>
+
+<div class="content">
+<div class="content-wrapper">
+
+
+<div class="main-text">
+<h1 id="sec:expansion">5 Expansion in the hypercube graph</h1>
+
+<h1 id="a0000000013">5.1 The graph and its spectrum</h1>
+<div class="definition_thmwrapper theorem-style-definition" id="def:rerandomize-coord">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">5.1</span>
+    <span class="definition_thmtitle">Rerandomizing one coordinate</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#def:rerandomize-coord">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>  For \(u \in \mathbb {F}_q^m\), an index \(i \in \{ 1,\dots ,m\} \), and \(x \in \mathbb {F}_q\), let </p>
+<div class="displaymath" id="a0000000231">
+  \[  \operatorname {rerand}_i(u,x) = u + x e_i.  \]
+</div>
+<p> This is the move obtained by rerandomizing the \(i\)-th coordinate of \(u\) by a uniform additive shift. </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:hypercube-graph">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">5.2</span>
+    <span class="definition_thmtitle">Hypercube graph</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#def:hypercube-graph">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-expansion.html#def:rerandomize-coord">Definition 5.1</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.IsHypercubeEdge" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.IsHypercubeEdge</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   The hypercube graph \(C=(V,E)\) has vertex set \(V=\mathbb {F}_q^m\), and an edge between \(u\) and \(v\) whenever they differ in at most one coordinate. A random edge \((u,v) \sim C\) is sampled by drawing \(u \sim \mathbb {F}_q^m\), \(i \in \{ 1,\dots ,m\} \), and \(x \in \mathbb {F}_q\) uniformly and then setting \(v=\operatorname {rerand}_i(u,x)\). </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:adjacency-laplacian">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">5.3</span>
+    <span class="definition_thmtitle">Adjacency matrix and Laplacian</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#def:adjacency-laplacian">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-expansion.html#def:hypercube-graph">Definition 5.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.adjacency" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.adjacency</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.laplacian" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.laplacian</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   Let \(M=q^m\). The normalized adjacency matrix of \(C\) is </p>
+<div class="displaymath" id="a0000000232">
+  \[  K = \mathbb {E}_{(u,v)\sim C} \lvert u \rangle \langle v \rvert ,  \]
+</div>
+<p> and the Laplacian is </p>
+<div class="displaymath" id="a0000000233">
+  \[  L = \frac{1}{M}I-K.  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:laplacian-rewrite">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">5.4</span>
+    <span class="lemma_thmtitle">Laplacian rewrite</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#prop:laplacian-rewrite">#</a>
+    
+    <a class="icon proof" href="sec-expansion.html#a0000000234"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-expansion.html#def:adjacency-laplacian">Definition 5.3</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianRewrite" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianRewrite</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   The Laplacian can be written as </p>
+<div class="displaymath" id="a0000000235">
+  \[  L = \frac12 \mathbb {E}_{(u,v)\sim C} (\lvert u \rangle -\lvert v \rangle )(\langle u \rvert -\langle v \rvert ).  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000234">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>The two vertex marginals of a random edge are uniform on \(\mathbb {F}_q^m\). Expanding the right-hand side yields \((1/M)I-K\). </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:character-average-scalar">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">5.5</span>
+    <span class="lemma_thmtitle">Average of a nontrivial additive character</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#lem:character-average-scalar">#</a>
+    
+    <a class="icon proof" href="sec-expansion.html#a0000000236"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.fourier_fact_scalar" class="lean_decl">MIPStarRE.LDT.Preliminaries.fourier_fact_scalar</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  For \(\beta \in \mathbb {F}_q\), </p>
+<div class="displaymath" id="a0000000237">
+  \[  \mathbb {E}_{x \sim \mathbb {F}_q} \omega ^{\operatorname {tr}(\beta x)} = \begin{cases}  1 &  \text{if } \beta =0, \\ 0 &  \text{if } \beta \ne 0. \end{cases}  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000236">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>If \(\beta =0\) the character is constant. If \(\beta \ne 0\), the map \(x \mapsto \beta x\) permutes \(\mathbb {F}_q\), so the average is the average of a nontrivial additive character, which vanishes. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:character-average-vector">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">5.6</span>
+    <span class="lemma_thmtitle">Orthogonality of finite-field characters</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#lem:character-average-vector">#</a>
+    
+    <a class="icon proof" href="sec-expansion.html#a0000000238"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-expansion.html#lem:character-average-scalar">Lemma 5.5</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.fourier_fact_vector" class="lean_decl">MIPStarRE.LDT.Preliminaries.fourier_fact_vector</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   For \(\alpha ,\beta \in \mathbb {F}_q^m\), </p>
+<div class="displaymath" id="a0000000239">
+  \[  \frac{1}{q^m}\sum _{u \in \mathbb {F}_q^m} \omega ^{\operatorname {tr}(u\cdot (\beta -\alpha ))} = \begin{cases}  1 &  \text{if } \alpha =\beta , \\ 0 &  \text{if } \alpha \ne \beta . \end{cases}  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000238">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Factor the sum over the \(m\) coordinates and apply Lemma&#160;<a href="sec-expansion.html#lem:character-average-scalar">5.5</a> to each factor. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:eigenvectors">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">5.7</span>
+    <span class="lemma_thmtitle">Eigenvectors of the hypercube graph</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#prop:eigenvectors">#</a>
+    
+    <a class="icon proof" href="sec-expansion.html#a0000000240"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-expansion.html#def:adjacency-laplacian">Definition 5.3</a></li>
+          
+          <li><a href="sec-expansion.html#lem:character-average-vector">Lemma 5.6</a></li>
+          
+          <li><a href="sec-expansion.html#lem:character-average-scalar">Lemma 5.5</a></li>
+          
+          <li><a href="sec-expansion.html#lem:character-average-vector">Lemma 5.6</a></li>
+          
+          <li><a href="sec-expansion.html#lem:character-average-scalar">Lemma 5.5</a></li>
+          
+          <li><a href="sec-expansion.html#def:hypercube-graph">Definition 5.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   For each \(\alpha \in \mathbb {F}_q^m\), define </p>
+<div class="displaymath" id="a0000000241">
+  \[  \lvert \varphi _\alpha  \rangle  = \frac{1}{M^{1/2}} \cdot \sum _{u \in \mathbb {F}_q^m} \omega ^{\operatorname {tr}(u\cdot \alpha )} \lvert u \rangle .  \]
+</div>
+<p> Then the following two statements hold. </p>
+<ol class="enumerate">
+  <li><p>The \(\lvert \varphi _\alpha  \rangle \)’s form an orthonormal basis of \(\mathbb {C}^V\). </p>
+</li>
+  <li><p>For each \(\alpha \in \mathbb {F}_q^m\), \(\lvert \varphi _\alpha  \rangle \) is an eigenvector for \(K\) with eigenvalue \(\frac{1}{M} \cdot \frac{m-|\alpha |}{m}\), where \(|\alpha |\) is the number of nonzero coordinates of \(\alpha \). </p>
+</li>
+</ol>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000240">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> First we prove <a href="sec-expansion.html#item:orthonormal">1</a>. For \(\alpha ,\beta \in \mathbb {F}_q^m\), </p>
+<div class="displaymath" id="a0000000242">
+  \[  \langle \varphi _\alpha  \mid \varphi _\beta  \rangle  = \frac{1}{M} \sum _{u \in \mathbb {F}_q^m} \omega ^{\operatorname {tr}(u\cdot (\beta -\alpha ))} = \begin{cases}  1 &  \text{if } \alpha =\beta , \\ 0 &  \text{if } \alpha \ne \beta , \end{cases}  \]
+</div>
+<p> by Lemma&#160;<a href="sec-expansion.html#lem:character-average-vector">5.6</a>. Thus the \(\lvert \varphi _\alpha  \rangle \) form an orthonormal basis of \(\mathbb {C}^V\). </p>
+<p>Next we prove <a href="sec-expansion.html#item:eigenvector">2</a>. For \(\alpha \in \mathbb {F}_q^m\), </p>
+<div class="equation" id="eq:eigenvector-calculation">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \begin{aligned}  K \cdot \lvert \varphi _\alpha  \rangle  &  = \left(\mathbb {E}_{(u,v)\sim C} \lvert u \rangle \langle v \rvert \right) \cdot \left(\frac{1}{M^{1/2}} \cdot \sum _{u \in \mathbb {F}_q^m} \omega ^{\operatorname {tr}(u\cdot \alpha )} \lvert u \rangle \right) \\ &  = \frac{1}{M^{1/2}} \cdot \mathbb {E}_{(u,v)\sim C} \omega ^{\operatorname {tr}(v\cdot \alpha )} \lvert u \rangle . \end{aligned} \label{eq:eigenvector-calculation} \end{equation}
+  </div>
+  <span class="equation_label">7</span>
+</p>
+</div>
+<p> By the edge-sampling rule from Definition&#160;<a href="sec-expansion.html#def:hypercube-graph">5.2</a>, we may write \(v=u+x e_i\), where \(i\) is uniformly random in \(\{ 1,\dots ,m\} \) and \(x\) is uniformly random in \(\mathbb {F}_q\). Therefore </p>
+<div class="displaymath" id="a0000000243">
+  \[  \eqref{eq:eigenvector-calculation} = \frac{1}{M^{1/2}} \cdot \mathbb {E}_{u,i,x} \omega ^{\operatorname {tr}((u+x e_i)\cdot \alpha )} \lvert u \rangle  = \left(\mathbb {E}_{i,x}\omega ^{\operatorname {tr}(x\alpha _i)}\right) \cdot \frac{1}{M^{1/2}} \cdot \mathbb {E}_u \omega ^{\operatorname {tr}(u\cdot \alpha )} \lvert u \rangle  = \frac{1}{M}\left(\mathbb {E}_{i,x}\omega ^{\operatorname {tr}(x\alpha _i)}\right) \cdot \lvert \varphi _\alpha  \rangle .  \]
+</div>
+<p> Hence \(\lvert \varphi _\alpha  \rangle \) is an eigenvector of \(K\) with eigenvalue </p>
+<div class="displaymath" id="a0000000244">
+  \[  \frac{1}{M} \cdot \mathbb {E}_i \left[\mathbb {E}_x \omega ^{\operatorname {tr}(x\alpha _i)}\right] = \frac{1}{M} \cdot \mathbb {E}_i \left[\mathbf{1}\! \left[[\right]\alpha _i=0]\right] = \frac{1}{M} \cdot \frac{m-|\alpha |}{m},  \]
+</div>
+<p> by Lemma&#160;<a href="sec-expansion.html#lem:character-average-scalar">5.5</a>. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="cor:laplacian-spectral-gap">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">5.8</span>
+    <span class="lemma_thmtitle">Spectral gap of the Laplacian</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#cor:laplacian-spectral-gap">#</a>
+    
+    <a class="icon proof" href="sec-expansion.html#a0000000245"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-expansion.html#prop:eigenvectors">Lemma 5.7</a></li>
+          
+          <li><a href="sec-expansion.html#prop:eigenvectors">Lemma 5.7</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGap" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGap</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   If \(\lambda _1 \le \lambda _2 \le \cdots \le \lambda _{q^m}\) are the eigenvalues of \(L\), then </p>
+<div class="displaymath" id="a0000000246">
+  \[  \lambda _1=0, \qquad \lambda _2 = \frac{1}{m q^m}.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000245">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> Lemma&#160;<a href="sec-expansion.html#prop:eigenvectors">5.7</a> identifies the two largest eigenvalues of \(K\), hence the two smallest eigenvalues of \(L=(1/q^m)I-K\). </p>
+
+  </div>
+</div>
+<h1 id="a0000000014">5.2 Local and global variance</h1>
+<div class="definition_thmwrapper theorem-style-definition" id="def:local-and-variance">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">5.9</span>
+    <span class="definition_thmtitle">Local and global variance</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#def:local-and-variance">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.localAndVariance" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.localAndVariance</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>  Let \(\lvert \psi  \rangle  \in \mathcal H_{\mathrm A} \otimes \mathcal H_{\mathrm B}\) and let \(0 \le A^u \le I\) be an operator for each \(u \in \mathbb {F}_q^m\). The local variance is </p>
+<div class="displaymath" id="a0000000247">
+  \[  \mathbf{Var}_{\mathrm{local}}(A,\psi ) = \frac12 \mathbb {E}_{(u,v)\sim C} \langle \psi  \rvert  (A^u-A^v)^2 \otimes I \lvert \psi  \rangle ,  \]
+</div>
+<p> and the global variance is </p>
+<div class="displaymath" id="a0000000248">
+  \[  \mathbf{Var}_{\mathrm{global}}(A,\psi ) = \frac12 \mathbb {E}_{u,v\sim \mathbb {F}_q^m} \langle \psi  \rvert  (A^u-A^v)^2 \otimes I \lvert \psi  \rangle .  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:local-rewrite">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">5.10</span>
+    <span class="lemma_thmtitle">Local variance as a Laplacian form</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#lem:local-rewrite">#</a>
+    
+    <a class="icon proof" href="sec-expansion.html#a0000000249"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-expansion.html#def:adjacency-laplacian">Definition 5.3</a></li>
+          
+          <li><a href="sec-expansion.html#def:local-and-variance">Definition 5.9</a></li>
+          
+          <li><a href="sec-expansion.html#prop:laplacian-rewrite">Lemma 5.4</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.localRewrite" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.localRewrite</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Define </p>
+<div class="displaymath" id="a0000000250">
+  \[  A_{\mathrm{comb}} = \sum _{u \in \mathbb {F}_q^m} \lvert u \rangle  \otimes A^u \otimes I.  \]
+</div>
+<p> Then </p>
+<div class="displaymath" id="a0000000251">
+  \[  \operatorname{Tr}(A_{\mathrm{comb}}^\dagger (L \otimes \lvert \psi  \rangle \langle \psi  \rvert ) A_{\mathrm{comb}}) = \mathbf{Var}_{\mathrm{local}}(A,\psi ).  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000249">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> For \(u,v \in \mathbb {F}_q^m\), </p>
+<div class="equation" id="eq:reader-probably-has-no-idea-whats-going-on-yet">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \begin{aligned}  ((\langle u \rvert -\langle v \rvert ) \otimes \langle \psi  \rvert ) \cdot A_{\mathrm{comb}} &  = ((\langle u \rvert -\langle v \rvert ) \otimes \langle \psi  \rvert ) \cdot \sum _{w \in \mathbb {F}_q^m} \lvert w \rangle  \otimes A^w \otimes I \\ &  = \langle \psi  \rvert  \cdot ((A^u-A^v)\otimes I). \end{aligned} \label{eq:reader-probably-has-no-idea-whats-going-on-yet} \end{equation}
+  </div>
+  <span class="equation_label">8</span>
+</p>
+</div>
+<p> Therefore </p>
+<div class="displaymath" id="a0000000252">
+  \[  A_{\mathrm{comb}}^\dagger (L \otimes \lvert \psi  \rangle \langle \psi  \rvert ) A_{\mathrm{comb}} = \frac12 \mathbb {E}_{(u,v)\sim C} A_{\mathrm{comb}}^\dagger \bigl((\lvert u \rangle -\lvert v \rangle )(\langle u \rvert -\langle v \rvert ) \otimes \lvert \psi  \rangle \langle \psi  \rvert \bigr) A_{\mathrm{comb}}  \]
+</div>
+<p> by Lemma&#160;<a href="sec-expansion.html#prop:laplacian-rewrite">5.4</a>, and hence </p>
+<div class="displaymath" id="a0000000253">
+  \[  A_{\mathrm{comb}}^\dagger (L \otimes \lvert \psi  \rangle \langle \psi  \rvert ) A_{\mathrm{comb}} = \frac12 \mathbb {E}_{(u,v)\sim C} ((A^u-A^v)\otimes I)\lvert \psi  \rangle \langle \psi  \rvert ((A^u-A^v)\otimes I)  \]
+</div>
+<p> by <a href="sec-expansion.html#eq:reader-probably-has-no-idea-whats-going-on-yet" class="eqref">8</a>. Taking the trace gives </p>
+<div class="displaymath" id="a0000000254">
+  \[  \operatorname{Tr}(A_{\mathrm{comb}}^\dagger (L \otimes \lvert \psi  \rangle \langle \psi  \rvert ) A_{\mathrm{comb}}) = \frac12 \mathbb {E}_{(u,v)\sim C} \langle \psi  \rvert  (A^u-A^v)^2 \otimes I \lvert \psi  \rangle  = \mathbf{Var}_{\mathrm{local}}(A,\psi ).  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:global-rewrite">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">5.11</span>
+    <span class="lemma_thmtitle">Global variance as the orthogonal Fourier mass</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#lem:global-rewrite">#</a>
+    
+    <a class="icon proof" href="sec-expansion.html#a0000000255"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-expansion.html#prop:eigenvectors">Lemma 5.7</a></li>
+          
+          <li><a href="sec-expansion.html#def:local-and-variance">Definition 5.9</a></li>
+          
+          <li><a href="sec-expansion.html#prop:eigenvectors">Lemma 5.7</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.globalRewrite" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.globalRewrite</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Write </p>
+<div class="displaymath" id="a0000000256">
+  \[  A_{\mathrm{comb}} = \lvert \varphi _0 \rangle  \otimes A_0 + \lvert \varphi _\perp  \rangle  \otimes A_\perp ,  \]
+</div>
+<p> where \(\lvert \varphi _\perp  \rangle \) is orthogonal to \(\lvert \varphi _0 \rangle \). Then </p>
+<div class="displaymath" id="a0000000257">
+  \[  \frac{1}{q^m}\operatorname{Tr}((\langle \varphi _\perp  \rvert \otimes A_\perp )(I\otimes \lvert \psi  \rangle \langle \psi  \rvert )(\lvert \varphi _\perp  \rangle \otimes A_\perp )) = \mathbf{Var}_{\mathrm{global}}(A,\psi ).  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000255">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> We first compute </p>
+<div class="displaymath" id="a0000000258">
+  \[  A_0 = (\langle \varphi _0 \rvert \otimes I)\cdot A_{\mathrm{comb}} = \left(\frac{1}{M^{1/2}} \cdot \sum _{u \in \mathbb {F}_q^m} \langle u \rvert \right) \otimes I \cdot \left(\sum _{u \in \mathbb {F}_q^m} \lvert u \rangle  \otimes A^u \otimes I\right) = \frac{1}{M^{1/2}} \cdot \sum _{u \in \mathbb {F}_q^m} A^u \otimes I.  \]
+</div>
+<p> Writing \(A_{\mathrm{avg}}=\mathbb {E}_u A^u\), it follows that </p>
+<div class="displaymath" id="a0000000259">
+  \[  \lvert \varphi _0 \rangle \otimes A_0 = \sum _{u \in \mathbb {F}_q^m} \lvert u \rangle  \otimes A_{\mathrm{avg}} \otimes I, \qquad \lvert \varphi _\perp  \rangle \otimes A_\perp = \sum _{u \in \mathbb {F}_q^m} \lvert u \rangle  \otimes (A^u-A_{\mathrm{avg}}) \otimes I.  \]
+</div>
+<p> Hence </p>
+<div class="equation" id="eq:just-took-trace">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \frac{1}{M} \cdot \operatorname{Tr}((\langle \varphi _\perp  \rvert \otimes A_\perp )(I\otimes \lvert \psi  \rangle \langle \psi  \rvert )(\lvert \varphi _\perp  \rangle \otimes A_\perp )) = \mathbb {E}_{u \sim \mathbb {F}_q^m} \langle \psi  \rvert  (A^u-A_{\mathrm{avg}})^2 \otimes I \lvert \psi  \rangle . \label{eq:just-took-trace} \end{equation}
+  </div>
+  <span class="equation_label">9</span>
+</p>
+</div>
+<p> Moreover, </p>
+<div class="displaymath" id="a0000000260">
+  \[  \mathbb {E}_{u \sim \mathbb {F}_q^m}(A^u-A_{\mathrm{avg}})^2 = \mathbb {E}_{u \sim \mathbb {F}_q^m}\bigl((A^u)^2-(A_{\mathrm{avg}})^2\bigr) = \frac12 \mathbb {E}_{u,v \sim \mathbb {F}_q^m} (A^u-A^v)^2.  \]
+</div>
+<p> Substituting this identity into <a href="sec-expansion.html#eq:just-took-trace" class="eqref">9</a> yields </p>
+<div class="displaymath" id="a0000000261">
+  \[  \frac{1}{M} \cdot \operatorname{Tr}((\langle \varphi _\perp  \rvert \otimes A_\perp )(I\otimes \lvert \psi  \rangle \langle \psi  \rvert )(\lvert \varphi _\perp  \rangle \otimes A_\perp )) = \frac12 \mathbb {E}_{u,v \sim \mathbb {F}_q^m} \langle \psi  \rvert  (A^u-A^v)^2 \otimes I \lvert \psi  \rangle  = \mathbf{Var}_{\mathrm{global}}(A,\psi ).  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:local-to-global">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">5.12</span>
+    <span class="lemma_thmtitle">Local-to-global inequality</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-expansion.html#lem:local-to-global">#</a>
+    
+    <a class="icon proof" href="sec-expansion.html#a0000000262"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-expansion.html#cor:laplacian-spectral-gap">Lemma 5.8</a></li>
+          
+          <li><a href="sec-expansion.html#lem:local-rewrite">Lemma 5.10</a></li>
+          
+          <li><a href="sec-expansion.html#lem:global-rewrite">Lemma 5.11</a></li>
+          
+          <li><a href="sec-expansion.html#lem:local-rewrite">Lemma 5.10</a></li>
+          
+          <li><a href="sec-expansion.html#cor:laplacian-spectral-gap">Lemma 5.8</a></li>
+          
+          <li><a href="sec-expansion.html#lem:global-rewrite">Lemma 5.11</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.localToGlobal" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.localToGlobal</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   For every family \(\{ A^u\} \), </p>
+<div class="displaymath" id="a0000000263">
+  \[  \mathbf{Var}_{\mathrm{global}}(A,\psi ) \le m\,  \mathbf{Var}_{\mathrm{local}}(A,\psi ).  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000262">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  
+<div class="equation" id="eq:used-0-eigenvector">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \begin{aligned}  A_{\mathrm{comb}}^\dagger (L \otimes \lvert \psi  \rangle \langle \psi  \rvert ) A_{\mathrm{comb}} &  = (\langle \varphi _0 \rvert \otimes A_0+\langle \varphi _\perp  \rvert \otimes A_\perp )(L \otimes \lvert \psi  \rangle \langle \psi  \rvert )(\lvert \varphi _0 \rangle \otimes A_0+\lvert \varphi _\perp  \rangle \otimes A_\perp ) \\ &  = (\langle \varphi _\perp  \rvert \otimes A_\perp )(L \otimes \lvert \psi  \rangle \langle \psi  \rvert )(\lvert \varphi _\perp  \rangle \otimes A_\perp ) \\ &  = \langle \varphi _\perp  \rvert L\lvert \varphi _\perp  \rangle  \cdot A_\perp \lvert \psi  \rangle \langle \psi  \rvert  A_\perp . \end{aligned} \label{eq:used-0-eigenvector} \end{equation}
+  </div>
+  <span class="equation_label">10</span>
+</p>
+</div>
+<p> The second step uses that \(\lvert \varphi _0 \rangle \) is a \(0\)-eigenvector of \(L\). Since \(\lvert \varphi _\perp  \rangle \) is orthogonal to \(\lvert \varphi _0 \rangle \), Lemma&#160;<a href="sec-expansion.html#cor:laplacian-spectral-gap">5.8</a> gives </p>
+<div class="displaymath" id="a0000000264">
+  \[  \langle \varphi _\perp  \rvert L\lvert \varphi _\perp  \rangle  \ge \frac{1}{mM} \cdot \langle \varphi _\perp  \mid \varphi _\perp  \rangle .  \]
+</div>
+<p> Therefore </p>
+<div class="displaymath" id="a0000000265">
+  \[  \mathbf{Var}_{\mathrm{local}}(A,\psi ) = \operatorname{Tr}(A_{\mathrm{comb}}^\dagger (L \otimes \lvert \psi  \rangle \langle \psi  \rvert ) A_{\mathrm{comb}}) = \langle \varphi _\perp  \rvert L\lvert \varphi _\perp  \rangle  \cdot \operatorname{Tr}(A_\perp \lvert \psi  \rangle \langle \psi  \rvert  A_\perp )  \]
+</div>
+<p> by Lemma&#160;<a href="sec-expansion.html#lem:local-rewrite">5.10</a> and <a href="sec-expansion.html#eq:used-0-eigenvector" class="eqref">10</a>, so </p>
+<div class="displaymath" id="a0000000266">
+  \[  \mathbf{Var}_{\mathrm{local}}(A,\psi ) \ge \frac{1}{mM} \cdot \operatorname{Tr}((\langle \varphi _\perp  \rvert \otimes A_\perp )(I\otimes \lvert \psi  \rangle \langle \psi  \rvert )(\lvert \varphi _\perp  \rangle \otimes A_\perp )) = \frac{1}{m}\mathbf{Var}_{\mathrm{global}}(A,\psi ),  \]
+</div>
+<p> where the last step is Lemma&#160;<a href="sec-expansion.html#lem:global-rewrite">5.11</a>. Rearranging gives the claim. </p>
+
+  </div>
+</div>
+
+</div> <!--main-text -->
+</div> <!-- content-wrapper -->
+</div> <!-- content -->
+</div> <!-- wrapper -->
+
+<nav class="prev_up_next">
+  <svg  id="showmore-minus" class="icon icon-eye-minus showmore"><use xlink:href="symbol-defs.svg#icon-eye-minus"></use></svg>
+
+  <svg  id="showmore-plus" class="icon icon-eye-plus showmore"><use xlink:href="symbol-defs.svg#icon-eye-plus"></use></svg>
+
+  <a href="chap-projective.html" title="Making measurements projective"><svg  class="icon icon-arrow-left "><use xlink:href="symbol-defs.svg#icon-arrow-left"></use></svg>
+</a>
+  <a href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test"><svg  class="icon icon-arrow-up "><use xlink:href="symbol-defs.svg#icon-arrow-up"></use></svg>
+</a>
+  <a href="sec-variance.html" title="Global variance of the points measurements"><svg  class="icon icon-arrow-right "><use xlink:href="symbol-defs.svg#icon-arrow-right"></use></svg>
+</a>
+</nav>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/plastex.js"></script>
+<script type="text/javascript" src="js/svgxuse.js"></script>
+<script type="text/javascript" src="js/js.cookie.min.js"></script>
+<script type="text/javascript" src="js/showmore.js"></script>
+</body>
+</html>

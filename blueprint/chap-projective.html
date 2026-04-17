@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  MathJax = { 
+    tex: {
+		    inlineMath: [['$','$'], ['\\(','\\)']]
+	} }
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<meta name="generator" content="plasTeX" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Making measurements projective</title>
+<link rel="next" href="sec-expansion.html" title="Expansion in the hypercube graph" />
+<link rel="prev" href="sec-prelims.html" title="Preliminaries" />
+<link rel="up" href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test" />
+<link rel="stylesheet" href="styles/theme-white.css" />
+<link rel="stylesheet" href="styles/amsthm.css" />
+<link rel="stylesheet" href="styles/showmore.css" />
+<link rel="stylesheet" href="styles/blueprint.css" />
+<link rel="stylesheet" href="styles/extra_styles.css" />
+</head>
+
+<body>
+<header>
+<svg  id="toc-toggle" class="icon icon-list-numbered "><use xlink:href="symbol-defs.svg#icon-list-numbered"></use></svg>
+<h1 id="doc_title"><a href="index.html">Blueprint for arXiv:2009.12982<br /><i class="itshape">Quantum Soundness of the Classical Low Individual Degree Test</i></a></h1>
+</header>
+
+<div class="wrapper">
+<nav class="toc">
+<ul class="sub-toc-0">
+<li class="">
+  <a href="chap-overview.html"><span class="toc_ref">1</span> <span class="toc_entry">Overview</span></a>
+ </li>
+<li class="">
+  <a href="sec-the-test.html"><span class="toc_ref">2</span> <span class="toc_entry">The low individual degree test</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-the-test.html#a0000000009"><span class="toc_ref">2.1</span> <span class="toc_entry">The game and its strategies</span></a>
+ </li>
+<li class="">
+  <a href="sec-the-test.html#a0000000010"><span class="toc_ref">2.2</span> <span class="toc_entry">Formal soundness target</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-prelims.html"><span class="toc_ref">3</span> <span class="toc_entry">Preliminaries</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-prelims.html#a0000000011"><span class="toc_ref">3.1</span> <span class="toc_entry">Polynomials and measurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#sec:comparing-measurements"><span class="toc_ref">3.2</span> <span class="toc_entry">Consistency and state-dependent distance</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#sec:consistency-from-state-dependent-distance"><span class="toc_ref">3.3</span> <span class="toc_entry">Consistency from state-dependent distance</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#a0000000012"><span class="toc_ref">3.4</span> <span class="toc_entry">Strong self-consistency</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class=" active current">
+  <a href="chap-projective.html"><span class="toc_ref">4</span> <span class="toc_entry">Making measurements projective</span></a>
+  <span class="expand-toc">▼</span>
+  <ul class="sub-toc-1 active">
+     <li class="">
+  <a href="chap-projective.html#sec:naimark"><span class="toc_ref">4.0.1</span> <span class="toc_entry">Naimark dilation</span></a>
+ </li>
+<li class="">
+  <a href="chap-projective.html#sec:orthogonalization"><span class="toc_ref">4.0.2</span> <span class="toc_entry">Orthogonalization lemma</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-expansion.html"><span class="toc_ref">5</span> <span class="toc_entry">Expansion in the hypercube graph</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-expansion.html#a0000000013"><span class="toc_ref">5.1</span> <span class="toc_entry">The graph and its spectrum</span></a>
+ </li>
+<li class="">
+  <a href="sec-expansion.html#a0000000014"><span class="toc_ref">5.2</span> <span class="toc_entry">Local and global variance</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-variance.html"><span class="toc_ref">6</span> <span class="toc_entry">Global variance of the points measurements</span></a>
+ </li>
+<li class="">
+  <a href="chap-self-improvement.html"><span class="toc_ref">7</span> <span class="toc_entry">Self-improvement</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-self-improvement.html#sec:self-improvement"><span class="toc_ref">7.1</span> <span class="toc_entry">Non-projective Output</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="chap-self-improvement.html#a0000000015"><span class="toc_ref">7.1.1</span> <span class="toc_entry">A Semidefinite Program</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-self-improvement.html#sec:self-improvement-projective"><span class="toc_ref">7.2</span> <span class="toc_entry">Projective Output</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html"><span class="toc_ref">8</span> <span class="toc_entry">Commutativity</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-g-comm.html#sec:commutativity-points"><span class="toc_ref">8.1</span> <span class="toc_entry">Commutativity of the point measurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html#sec:G-commutes-after-evaluation"><span class="toc_ref">8.2</span> <span class="toc_entry">Commutativity of&#160;\(G\) after evaluation</span></a>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html#sec:G-commutes"><span class="toc_ref">8.3</span> <span class="toc_entry">Commutativity of&#160;\(G\)</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html"><span class="toc_ref">9</span> <span class="toc_entry">Pasting</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-ld-pasting.html#a0000000016"><span class="toc_ref">9.0.1</span> <span class="toc_entry">From Measurements to Submeasurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#a0000000017"><span class="toc_ref">9.0.2</span> <span class="toc_entry">The Pasted Submeasurement</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-ld-pasting.html#sec:construction-numba-one"><span class="toc_ref"></span> <span class="toc_entry">The First Construction</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:construction-numba-two"><span class="toc_ref"></span> <span class="toc_entry">The Second Construction</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:hat-consistency"><span class="toc_ref">9.0.3</span> <span class="toc_entry">Strong Self-Consistency and Commutation of \(\widehat G\)</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-ld-pasting.html#a0000000018"><span class="toc_ref"></span> <span class="toc_entry">Commutativity of \(G_{\bot }\)</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#a0000000019"><span class="toc_ref"></span> <span class="toc_entry">Putting Everything Together</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:ld-sandwiching"><span class="toc_ref">9.0.4</span> <span class="toc_entry">Sandwiching Lemmas</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:consistency-of-h-with-a"><span class="toc_ref">9.0.5</span> <span class="toc_entry">Consistency of \(H\) with \(A\)</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:completeness-of-h-low-degree"><span class="toc_ref">9.0.6</span> <span class="toc_entry">Completeness of \(H\)</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-induction.html"><span class="toc_ref">10</span> <span class="toc_entry">The main induction step</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-induction.html#a0000000020"><span class="toc_ref">10.1</span> <span class="toc_entry">Restricting to one slice</span></a>
+ </li>
+<li class="">
+  <a href="sec-induction.html#a0000000021"><span class="toc_ref">10.2</span> <span class="toc_entry">The inductive construction</span></a>
+ </li>
+<li class="">
+  <a href="sec-induction.html#a0000000022"><span class="toc_ref">10.3</span> <span class="toc_entry">Proof of the main formal theorem</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sect0001.html"><span class="toc_ref">11</span> <span class="toc_entry">Bibliography</span></a>
+ </li>
+<li ><a href="dep_graph_document.html">Dependency graph</a></li>
+</ul>
+</nav>
+
+<div class="content">
+<div class="content-wrapper">
+
+
+<div class="main-text">
+<h1 id="chap:projective">4 Making measurements projective</h1>
+
+<div class="theorem_thmwrapper theorem-style-plain" id="thm:naimark">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">4.1</span>
+    <span class="theorem_thmtitle">Naimark dilation</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#thm:naimark">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.8</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.naimark" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.naimark</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>   Let \(\lvert \psi  \rangle \) be a state in \(\mathcal H_{\mathrm A} \otimes \mathcal H_{\mathrm B}\). Let \(A = \{ A^x_a\} \) be a sub-measurement acting on \(\mathcal H_{\mathrm A}\) and \(B=\{ B^y_b\} \) be a sub-measurement acting on \(\mathcal H_{\mathrm B}\). Then there exist Hilbert spaces \(\mathcal H_{\mathrm A_{\mathsf{aux}}}\) and \(\mathcal H_{\mathrm B_{\mathsf{aux}}}\), a state \(\lvert \mathsf{aux} \rangle  \in \mathcal H_{\mathrm A_{\mathsf{aux}}} \otimes \mathcal H_{\mathrm B_{\mathsf{aux}}}\), and measurements \(\widehat{A} = \{ \widehat{A}^x_a\} \) and \(\widehat{B}=\{ \widehat{B}^y_b\} \) acting on \(\mathcal H_{\mathrm A} \otimes \mathcal H_{\mathrm A_{\mathsf{aux}}}\) and \(\mathcal H_{\mathrm B} \otimes \mathcal H_{\mathrm B_{\mathsf{aux}}}\), respectively, such that, if \(\lvert \widehat{\psi } \rangle  = \lvert \psi  \rangle  \otimes \lvert \mathsf{aux} \rangle \), then for all \(x,y,a,b\), </p>
+<div class="displaymath" id="a0000000116">
+  \[  \langle \psi  \rvert  A^x_a \otimes B^y_b \lvert \psi  \rangle  = \langle \widehat{\psi } \rvert  \widehat{A}^x_a \otimes \widehat{B}^y_b \lvert \widehat{\psi } \rangle .  \]
+</div>
+<p> In addition, \(\lvert \mathsf{aux} \rangle \) is a product state. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm:orthonormalization">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">4.2</span>
+    <span class="theorem_thmtitle">Orthogonalization lemma</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#thm:orthonormalization">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.31</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>   Let \(\lvert \psi  \rangle \) be a permutation-invariant state, and let \(A = \{ A_a\} \) be a sub-measurement with strong self-consistency </p>
+<div class="displaymath" id="a0000000117">
+  \[  \sum _a \langle \psi  \rvert  A_a \otimes A_a \lvert \psi  \rangle  \geq \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  - \zeta .  \]
+</div>
+<p> Then there exists a projective sub-measurement \(P = \{ P_a\} \) such that </p>
+<div class="displaymath" id="a0000000118">
+  \[  A_a \otimes I \approx _{100 \zeta ^{1/4}} P_a \otimes I.  \]
+</div>
+
+  </div>
+</div>
+<h2 id="sec:naimark">4.0.1 Naimark dilation</h2>
+
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:naimark-helper">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.3</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:naimark-helper">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000119"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.oneMeasNaimark" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.oneMeasNaimark</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  Let \(A = \{ A_a\} \) be a sub-measurement with \(k\) distinct outcomes \(a \in \mathcal A\), and let \(\lvert \mathsf{aux} \rangle  \in \mathbb {C}^{k+1}\) be any state. Then there exists a projective sub-measurement \(\widehat{A} = \{ \widehat{A}_a\} \) such that for each outcome \(a\), </p>
+<div class="displaymath" id="a0000000120">
+  \[  (I \otimes \langle \mathsf{aux} \rvert ) \cdot \widehat{A}_a \cdot (I \otimes \lvert \mathsf{aux} \rangle ) = A_a.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000121">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Consider an orthonormal basis for \(\mathbb {C}^{k+1}\) consisting of vectors \(\lvert a \rangle \) for \(a \in \mathcal A\) and the vector \(\lvert \bot  \rangle \). Let \(U\) be any unitary such that for each vector \(\lvert \phi  \rangle \), </p>
+<div class="displaymath" id="a0000000122">
+  \[  U \cdot (\lvert \phi  \rangle  \otimes \lvert \mathsf{aux} \rangle ) = \sum _{a \in \mathcal A} ((A_a)^{1/2}\lvert \phi  \rangle ) \otimes \lvert a \rangle  + ((I-A)^{1/2}\lvert \phi  \rangle ) \otimes \lvert \bot  \rangle ,  \]
+</div>
+<p> where \(A=\sum _a A_a\). Then </p>
+<div class="displaymath" id="a0000000123">
+  \[  U \cdot (I \otimes \lvert \mathsf{aux} \rangle ) = \sum _{a \in \mathcal A} (A_a)^{1/2} \otimes \lvert a \rangle  + (I-A)^{1/2} \otimes \lvert \bot  \rangle ,  \]
+</div>
+<p> so for any \(a \in \mathcal A\), </p>
+<div class="displaymath" id="a0000000124">
+  \[  (I \otimes \langle a \rvert ) \cdot U \cdot (I \otimes \lvert \mathsf{aux} \rangle ) = (A_a)^{1/2}.  \]
+</div>
+<p> Define </p>
+<div class="displaymath" id="a0000000125">
+  \[  \widehat{A}_a = U^\dagger \cdot (I \otimes \lvert a \rangle \langle a \rvert ) \cdot U.  \]
+</div>
+<p> Each \(\widehat{A}_a\) is a projector, and </p>
+<div class="displaymath" id="a0000000126">
+  \begin{align*}  (I \otimes \langle \mathsf{aux} \rvert ) \cdot \widehat{A}_a \cdot (I \otimes \lvert \mathsf{aux} \rangle ) &  = (I \otimes \langle \mathsf{aux} \rvert ) \cdot U^\dagger \cdot (I \otimes \lvert a \rangle ) \cdot (I \otimes \langle a \rvert ) \cdot U \cdot (I \otimes \lvert \mathsf{aux} \rangle ) \\ &  = (A_a)^{1/2} \cdot (A_a)^{1/2} = A_a. \end{align*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000119">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof of <a href="chap-projective.html#thm:naimark">4.1</a>
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>For each question \(x\), choose a local auxiliary state \(\lvert \mathsf{aux}_{\mathrm A,x} \rangle \) of dimension one larger than the number of outcomes of \(A^x\), and apply <a href="chap-projective.html#lem:naimark-helper">4.3</a> to obtain a projective sub-measurement \(\widetilde A^x\). Do the same for each question \(y\) on Bob’s side, obtaining auxiliary states \(\lvert \mathsf{aux}_{\mathrm B,y} \rangle \) and projective sub-measurements \(\widetilde B^y\). </p>
+<p>Let </p>
+<div class="displaymath" id="a0000000127">
+  \[  \lvert \mathsf{aux} \rangle  = \Big(\bigotimes _x \lvert \mathsf{aux}_{\mathrm A,x} \rangle \Big) \otimes \Big(\bigotimes _y \lvert \mathsf{aux}_{\mathrm B,y} \rangle \Big), \qquad \lvert \widehat{\psi } \rangle  = \lvert \psi  \rangle  \otimes \lvert \mathsf{aux} \rangle ,  \]
+</div>
+<p> and let \(\widehat A^x_a\) and \(\widehat B^y_b\) be obtained by letting \(\widetilde A^x_a\) or \(\widetilde B^y_b\) act on the relevant auxiliary factor and the identity act on every other auxiliary factor. Because the auxiliary state is a product state and the two dilations act on disjoint tensor factors, the correlation for fixed \((x,y)\) reduces to the compression identity from <a href="chap-projective.html#lem:naimark-helper">4.3</a> on the \(x\)- and \(y\)-registers. Hence </p>
+<div class="displaymath" id="a0000000128">
+  \[  \langle \widehat{\psi } \rvert  \widehat A^x_a \otimes \widehat B^y_b \lvert \widehat{\psi } \rangle  = \langle \psi  \rvert  A^x_a \otimes B^y_b \lvert \psi  \rangle .  \]
+</div>
+
+  </div>
+</div>
+<h2 id="sec:orthogonalization">4.0.2 Orthogonalization lemma</h2>
+
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:orthonormalization-main-lemma">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.4</span>
+    <span class="lemma_thmtitle">Orthogonalization lemma for measurements</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:orthonormalization-main-lemma">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000129"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.14</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.16</a></li>
+          
+          <li><a href="chap-projective.html#lem:projective-non-measurement">Lemma 4.6</a></li>
+          
+          <li><a href="chap-projective.html#lem:projective-low-rank-sum">Lemma 4.7</a></li>
+          
+          <li><a href="chap-projective.html#lem:Q-completeness">Lemma 4.8</a></li>
+          
+          <li><a href="chap-projective.html#lem:sqrt-Q-completeness">Lemma 4.9</a></li>
+          
+          <li><a href="chap-projective.html#lem:q-almost-projective">Lemma 4.10</a></li>
+          
+          <li><a href="chap-projective.html#lem:xa-t">Lemma 4.15</a></li>
+          
+          <li><a href="chap-projective.html#lem:qa-restated">Lemma 4.16</a></li>
+          
+          <li><a href="chap-projective.html#lem:X-squared">Lemma 4.17</a></li>
+          
+          <li><a href="chap-projective.html#lem:X-expression-to-Q-expression">Lemma 4.18</a></li>
+          
+          <li><a href="chap-projective.html#lem:pa-restated">Lemma 4.19</a></li>
+          
+          <li><a href="chap-projective.html#lem:X-hat-squared">Lemma 4.20</a></li>
+          
+          <li><a href="chap-projective.html#lem:X-times-X-hat">Lemma 4.21</a></li>
+          
+          <li><a href="chap-projective.html#lem:squared-difference">Lemma 4.22</a></li>
+          
+          <li><a href="chap-projective.html#lem:P-projectivity">Lemma 4.23</a></li>
+          
+          <li><a href="chap-projective.html#lem:P-Q-approx">Lemma 4.24</a></li>
+          
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.25</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(\lvert \psi  \rangle \) be a state, and let \(A = \{ A_a\} \) and \(B = \{ B_a\} \) be measurements such that </p>
+<div class="displaymath" id="a0000000130">
+  \[  A_a \otimes I \simeq _\zeta I \otimes B_a  \]
+</div>
+<p> on state \(\lvert \psi  \rangle \). Here \(\lvert \psi  \rangle \) is not assumed to be permutation-invariant. Then there exists a projective sub-measurement \(P = \{ P_a\} \) such that </p>
+<div class="displaymath" id="a0000000131">
+  \[  A_a \otimes I \approx _{84 \zeta ^{1/4}} P_a \otimes I.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000132">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof of <a href="chap-projective.html#thm:orthonormalization">4.2</a> assuming <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.4</a>
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Let \(A = \{ A_a\} \) be a sub-measurement with outcomes in \(\mathcal A\). Write \(A=\sum _a A_a\). The strong self-consistency assumption implies </p>
+<div class="displaymath" id="a0000000133">
+  \[  \langle \psi  \rvert  A \otimes A \lvert \psi  \rangle  \geq \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \zeta ,  \]
+</div>
+<p> so </p>
+<div class="displaymath" id="a0000000134">
+  \[  \langle \psi  \rvert  A \otimes (I-A) \lvert \psi  \rangle  \leq \zeta .  \]
+</div>
+<p> Rearranging once more gives </p>
+<div class="displaymath" id="a0000000135">
+  \[  \langle \psi  \rvert  (I-A) \otimes (I-A) \lvert \psi  \rangle  \geq \langle \psi  \rvert  (I-A) \otimes I \lvert \psi  \rangle  - \zeta .  \]
+</div>
+<p>Complete \(A\) to the measurement \(\widehat A=\{ \widehat A_a\} _{a \in \widehat{\mathcal A}}\) on \(\widehat{\mathcal A}=\mathcal A \cup \{ \bot \} \) by setting \(\widehat A_a=A_a\) for \(a \in \mathcal A\) and \(\widehat A_{\bot }=I-A\). Adding the two preceding inequalities shows that \(\widehat A\) is \(2\zeta \)-strongly self-consistent. By <a href="sec-prelims.html#prop:other-two-notions-of-self-consistency">3.32</a>, this is equivalent to </p>
+<div class="displaymath" id="a0000000136">
+  \[  \widehat A_a \otimes I \simeq _{2\zeta } I \otimes \widehat A_a.  \]
+</div>
+<p> Apply <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.4</a> to obtain a projective sub-measurement \(\widehat P\) such that </p>
+<div class="displaymath" id="a0000000137">
+  \[  \widehat A_a \otimes I \approx _{84(2\zeta )^{1/4}} \widehat P_a \otimes I.  \]
+</div>
+<p> Discard the extra outcome and set \(P_a=\widehat P_a\) for \(a \in \mathcal A\). Then </p>
+<div class="displaymath" id="a0000000138">
+  \[  A_a \otimes I \approx _{84(2\zeta )^{1/4}} P_a \otimes I,  \]
+</div>
+<p> and \(84 \cdot 2^{1/4} \leq 100\), so the claimed bound follows. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000129">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof of <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.4</a>
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>  The statement is trivial when \(\zeta {\gt} 1/4\), so assume </p>
+<div class="equation" id="eq:assumption-on-zeta">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:assumption-on-zeta} \zeta \leq 1/4. \end{equation}
+  </div>
+  <span class="equation_label">1</span>
+</p>
+</div>
+<p> By <a href="sec-prelims.html#prop:simeq-for-measurements">3.16</a>, </p>
+<div class="displaymath" id="a0000000139">
+  \[  \sum _a \langle \psi  \rvert  A_a \otimes B_a \lvert \psi  \rangle  \geq 1-\zeta .  \]
+</div>
+<p> Apply Cauchy–Schwarz to </p>
+<div class="displaymath" id="a0000000140">
+  \[  \sum _a \langle \psi  \rvert  (A_a \otimes I)\cdot (I \otimes B_a)\lvert \psi  \rangle   \]
+</div>
+<p> to obtain </p>
+<div class="displaymath" id="a0000000141">
+  \[  \sum _a \langle \psi  \rvert  (A_a)^2 \otimes I \lvert \psi  \rangle  \geq (1-\zeta )^2 \geq 1-2\zeta .  \]
+</div>
+<p> Because \(A\) is a measurement, this rewrites as </p>
+<div class="equation" id="eq:A-looks-projective">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:A-looks-projective} \sum _a \langle \psi  \rvert  (A_a-(A_a)^2) \otimes I \lvert \psi  \rangle  \leq 2\zeta . \end{equation}
+  </div>
+  <span class="equation_label">2</span>
+</p>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:trunc-inequality">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.5</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:trunc-inequality">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000142"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.truncationInequality" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.truncationInequality</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  For any \(x \in [0, 1]\), </p>
+<div class="displaymath" id="a0000000143">
+  \begin{equation*}  (x - \mathsf{trunc}_\delta (x))^2 \leq \frac{1}{\delta } \cdot (x - x^2). \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000142">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>If \(x \geq 1-\delta \), then \(\mathsf{trunc}_\delta (x)=1\). Since \(\delta \leq 1/2\) below, one also has \(x \geq \delta \), so </p>
+<div class="displaymath" id="a0000000144">
+  \[  (x-\mathsf{trunc}_\delta (x))^2 = (1-x)^2 \leq (1-x)\frac{x}{\delta } = \frac{1}{\delta }(x-x^2).  \]
+</div>
+<p> If \(x {\lt} 1-\delta \), then \(\mathsf{trunc}_\delta (x)=0\), and similarly </p>
+<div class="displaymath" id="a0000000145">
+  \[  (x-\mathsf{trunc}_\delta (x))^2 = x^2 \leq x\frac{1-x}{\delta } = \frac{1}{\delta }(x-x^2).  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:projective-non-measurement">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.6</span>
+    <span class="lemma_thmtitle">Rounding to projectors</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:projective-non-measurement">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000146"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  There exists a set of projective matrices \(\{ R_a\} \) such that </p>
+<div class="displaymath" id="a0000000147">
+  \begin{equation*}  A_a \otimes I \approx _{2\sqrt{\zeta }} R_a \otimes I. \end{equation*}
+</div>
+<p> and </p>
+<div class="displaymath" id="a0000000148">
+  \begin{equation*}  R:= \sum _a R_a \leq (1+2\sqrt{\zeta }) \cdot I. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000146">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> Write the eigendecomposition of \(A_a\) as </p>
+<div class="displaymath" id="a0000000149">
+  \[  A_a = \sum _i \lambda _{a,i}\lvert u_{a,i} \rangle \langle u_{a,i} \rvert .  \]
+</div>
+<p> Choose </p>
+<div class="equation" id="eq:bound-on-delta">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:bound-on-delta} 0 {\lt} \delta \leq 1/2, \end{equation}
+  </div>
+  <span class="equation_label">3</span>
+</p>
+</div>
+<p> define \(\mathsf{trunc}_\delta :[0,1] \to \{ 0,1\} \) by \(\mathsf{trunc}_\delta (x)=1\) when \(x \geq 1-\delta \) and \(0\) otherwise, and set </p>
+<div class="displaymath" id="a0000000150">
+  \[  R_a = \mathsf{trunc}_\delta (A_a) = \sum _i \mathsf{trunc}_\delta (\lambda _{a,i}) \lvert u_{a,i} \rangle \langle u_{a,i} \rvert .  \]
+</div>
+<p> By <a href="chap-projective.html#lem:trunc-inequality">4.5</a>, </p>
+<div class="displaymath" id="a0000000151">
+  \[  (A_a-R_a)^2 \leq \frac{1}{\delta }(A_a-(A_a)^2).  \]
+</div>
+<p> Summing expectations and using <a href="chap-projective.html#eq:A-looks-projective">2</a> gives </p>
+<div class="displaymath" id="a0000000152">
+  \[  \sum _a \Vert (A_a-R_a)\otimes I \lvert \psi  \rangle \Vert ^2 \leq \frac{2\zeta }{\delta },  \]
+</div>
+<p> so \(A_a \otimes I \approx _{2\zeta /\delta } R_a \otimes I\). </p>
+<p>For every \(x \in [0,1]\), one has \(\mathsf{trunc}_\delta (x) \leq x/(1-\delta )\), hence </p>
+<div class="displaymath" id="a0000000153">
+  \[  R_a \leq \frac{1}{1-\delta } A_a.  \]
+</div>
+<p> Summing over \(a\) and using that \(A\) is a measurement, </p>
+<div class="displaymath" id="a0000000154">
+  \[  R = \sum _a R_a \leq \frac{1}{1-\delta } I \leq (1+2\delta )I,  \]
+</div>
+<p> where the last estimate uses \(\delta \leq 1/2\). Setting \(\delta =\sqrt{\zeta }\) gives the claim, and <a href="chap-projective.html#eq:assumption-on-zeta">1</a> ensures \(\delta \leq 1/2\). </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:projective-low-rank-sum">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.7</span>
+    <span class="lemma_thmtitle">Rank reduction</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:projective-low-rank-sum">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000155"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  There exists a set of projection matrices \(\{ Q_a\} \) such that </p>
+<div class="displaymath" id="a0000000156">
+  \begin{equation*}  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I. \end{equation*}
+</div>
+<p> and </p>
+<div class="displaymath" id="a0000000157">
+  \begin{equation*}  Q:= \sum _a Q_a \leq (1+2\sqrt{\zeta }) \cdot I. \end{equation*}
+</div>
+<p> Furthermore, </p>
+<div class="displaymath" id="a0000000158">
+  \begin{equation*}  \sum _a \mathrm{rank}(Q_a) \leq d. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000155">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> Let \(\{ R_a\} \) be given by <a href="chap-projective.html#lem:projective-non-measurement">4.6</a>. Write \(r_a=\mathrm{rank}(R_a)\) and \(r=\sum _a r_a\). If \(r \leq d\), take \(Q_a=R_a\). Otherwise, </p>
+<div class="equation" id="eq:bound-on-r">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:bound-on-r} r = \sum _a r_a = \sum _a \operatorname{Tr}(R_a) = \operatorname{Tr}(R) \leq (1+2\sqrt{\zeta })d. \end{equation}
+  </div>
+  <span class="equation_label">4</span>
+</p>
+</div>
+<p> Let \(\lvert v_{a,1} \rangle ,\ldots ,\lvert v_{a,r_a} \rangle \) be an orthonormal basis for the range of \(R_a\), so </p>
+<div class="displaymath" id="a0000000159">
+  \[  R_a = \sum _{i=1}^{r_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert .  \]
+</div>
+<p> Define the overlaps </p>
+<div class="displaymath" id="a0000000160">
+  \[  o_{a,i} = \langle \psi  \rvert  (\lvert v_{a,i} \rangle \langle v_{a,i} \rvert  \otimes I)\lvert \psi  \rangle .  \]
+</div>
+<p> Their total satisfies </p>
+<div class="equation" id="eq:total-overlap">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:total-overlap} \sum _a \sum _{i=1}^{r_a} o_{a,i} = \langle \psi  \rvert  R \otimes I \lvert \psi  \rangle  \leq 1+2\sqrt{\zeta }. \end{equation}
+  </div>
+  <span class="equation_label">5</span>
+</p>
+</div>
+<p> Let \(\mathsf{Large}\) be the set of the \(d\) largest overlaps \(o_{a,i}\), breaking ties arbitrarily, and let \(\mathsf{Small}\) be the complement. Then </p>
+<div class="equation" id="eq:size-of-small-is-small">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:size-of-small-is-small} |\mathsf{Small}| = r-d \leq 2\sqrt{\zeta }\, d \leq 2\sqrt{\zeta }\, r, \end{equation}
+  </div>
+  <span class="equation_label">6</span>
+</p>
+</div>
+<p> by <a href="chap-projective.html#eq:bound-on-r">4</a>. Averaging the overlaps over the \(r\) indices gives </p>
+<div class="equation" id="eq:small-overlaps">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:small-overlaps} \sum _{(a,i)\in \mathsf{Small}} o_{a,i} \leq \frac{|\mathsf{Small}|}{r}\sum _{a,i} o_{a,i} \leq 4\sqrt{\zeta }, \end{equation}
+  </div>
+  <span class="equation_label">7</span>
+</p>
+</div>
+<p> using <a href="chap-projective.html#eq:size-of-small-is-small">6</a>, <a href="chap-projective.html#eq:total-overlap">5</a>, and <a href="chap-projective.html#eq:assumption-on-zeta">1</a>. </p>
+<p>For each \(a\), let \(\mathsf{Large}_a=\{ i : (a,i)\in \mathsf{Large}\} \) and define </p>
+<div class="displaymath" id="a0000000161">
+  \[  Q_a = \sum _{i \in \mathsf{Large}_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert .  \]
+</div>
+<p> Then \(\sum _a \mathrm{rank}(Q_a)=|\mathsf{Large}| \leq d\), and \(Q_a \leq R_a\) for every \(a\), so </p>
+<div class="displaymath" id="a0000000162">
+  \[  Q = \sum _a Q_a \leq \sum _a R_a = R \leq (1+2\sqrt{\zeta })I.  \]
+</div>
+<p> Also, </p>
+<div class="displaymath" id="a0000000163">
+  \[  R_a-Q_a = \sum _{i \in \mathsf{Small}_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert   \]
+</div>
+<p> is a projector, hence </p>
+<div class="displaymath" id="a0000000164">
+  \[  \sum _a \Vert (R_a-Q_a)\otimes I \lvert \psi  \rangle \Vert ^2 = \sum _{(a,i)\in \mathsf{Small}} o_{a,i} \leq 4\sqrt{\zeta }  \]
+</div>
+<p> by <a href="chap-projective.html#eq:small-overlaps">7</a>. Therefore \(R_a \otimes I \approx _{4\sqrt{\zeta }} Q_a \otimes I\). Combining this with <a href="chap-projective.html#lem:projective-non-measurement">4.6</a> and the triangle inequality for \(\approx _\delta \) gives </p>
+<div class="displaymath" id="a0000000165">
+  \[  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I.  \]
+</div>
+
+  </div>
+</div>
+<p>Henceforth let \(Q=\{ Q_a\} \) be the family given by <a href="chap-projective.html#lem:projective-low-rank-sum">4.7</a>. </p>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:Q-completeness">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.8</span>
+    <span class="lemma_thmtitle">Completeness of&#160;\(Q\)</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:Q-completeness">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000166"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.qCompleteness" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.qCompleteness</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  
+<div class="displaymath" id="a0000000167">
+  \begin{equation*}  \langle \psi  \rvert  Q \otimes I \lvert \psi  \rangle  \geq 1 - 11 \zeta ^{1/4}. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000166">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> Since each \(Q_a\) is projective, </p>
+<div class="equation" id="eq:Q-for-an-A">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:Q-for-an-A} \langle \psi  \rvert  Q \otimes I \lvert \psi  \rangle  = \sum _a \langle \psi  \rvert  (Q_a)^2 \otimes I \lvert \psi  \rangle  \approx _{5\zeta ^{1/4}} \sum _a \langle \psi  \rvert  (Q_a \cdot A_a)\otimes I \lvert \psi  \rangle . \end{equation}
+  </div>
+  <span class="equation_label">8</span>
+</p>
+</div>
+<p> By Cauchy–Schwarz, </p>
+<div class="displaymath" id="a0000000168">
+  \[  \sum _a \langle \psi  \rvert  (Q_a)^2 \otimes I \lvert \psi  \rangle  \leq 1+2\sqrt{\zeta } \quad \text{and}\quad \sum _a \langle \psi  \rvert  (Q_a-A_a)^2 \otimes I \lvert \psi  \rangle  \leq 12\sqrt{\zeta }  \]
+</div>
+<p> from <a href="chap-projective.html#lem:projective-low-rank-sum">4.7</a>. A second Cauchy–Schwarz estimate yields </p>
+<div class="equation" id="eq:another-Q-for-A">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:another-Q-for-A} \sum _a \langle \psi  \rvert  (Q_a \cdot A_a)\otimes I \lvert \psi  \rangle  \approx _{4\zeta ^{1/4}} \sum _a \langle \psi  \rvert  (A_a)^2 \otimes I \lvert \psi  \rangle . \end{equation}
+  </div>
+  <span class="equation_label">9</span>
+</p>
+</div>
+<p> Combining <a href="chap-projective.html#eq:Q-for-an-A">8</a> and <a href="chap-projective.html#eq:another-Q-for-A">9</a> with <a href="chap-projective.html#eq:A-looks-projective">2</a> gives </p>
+<div class="displaymath" id="a0000000169">
+  \[  \langle \psi  \rvert  Q \otimes I \lvert \psi  \rangle  \geq \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  - 2\zeta - 9\zeta ^{1/4} = 1 - 11\zeta ^{1/4},  \]
+</div>
+<p> since \(\zeta \leq \zeta ^{1/4}\) under <a href="chap-projective.html#eq:assumption-on-zeta">1</a>. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:sqrt-Q-completeness">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.9</span>
+    <span class="lemma_thmtitle">Completeness of&#160;\(\sqrt{Q}\)</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:sqrt-Q-completeness">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000170"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.sqrtQCompleteness" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.sqrtQCompleteness</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  
+<div class="displaymath" id="a0000000171">
+  \begin{equation*}  \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle  \geq 1 - 12 \zeta ^{1/4}. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000170">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> Diagonalize \(Q=\sum _i \nu _i \lvert u_i \rangle \langle u_i \rvert \). Because \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.7</a>, each \(\nu _i\) is at most \(1+2\sqrt{\zeta }\). Therefore </p>
+<div class="displaymath" id="a0000000172">
+  \[  \sqrt{Q} = \sum _i \sqrt{\nu _i}\lvert u_i \rangle \langle u_i \rvert  \geq \frac{1}{\sqrt{1+2\sqrt{\zeta }}} Q.  \]
+</div>
+<p> The scalar estimate </p>
+<div class="displaymath" id="a0000000173">
+  \[  \frac{1}{\sqrt{1+2\sqrt{\zeta }}} \geq 1-\sqrt{\zeta }  \]
+</div>
+<p> gives \(\sqrt{Q} \geq (1-\sqrt{\zeta })Q\). Hence <a href="chap-projective.html#lem:Q-completeness">4.8</a> implies </p>
+<div class="displaymath" id="a0000000174">
+  \[  \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle  \geq (1-\sqrt{\zeta })(1-11\zeta ^{1/4}) \geq 1-12\zeta ^{1/4}.  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:q-almost-projective">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.10</span>
+    <span class="lemma_thmtitle">\(Q\) is almost projective</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:q-almost-projective">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000175"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.qAlmostProjective" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.qAlmostProjective</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  
+<div class="displaymath" id="a0000000176">
+  \begin{equation*}  \sum _a (Q_a \cdot Q \cdot Q_a - Q_a) \leq 4\sqrt{\zeta } \cdot I. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000175">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> Since \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.7</a>, </p>
+<div class="displaymath" id="a0000000177">
+  \begin{align*}  \sum _a Q_a \cdot Q \cdot Q_a - \sum _a Q_a &  \leq (1+2\sqrt{\zeta }) \sum _a Q_a \cdot I \cdot Q_a - \sum _a Q_a \\ &  = (1+2\sqrt{\zeta })Q - Q \\ &  = 2\sqrt{\zeta }\, Q \\ &  \leq 2\sqrt{\zeta }(1+2\sqrt{\zeta })I \\ &  \leq 4\sqrt{\zeta }\, I, \end{align*}
+</div>
+<p> using <a href="chap-projective.html#eq:assumption-on-zeta">1</a> in the last step. </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:matrix-decomposition-Q">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">4.11</span>
+    <span class="definition_thmtitle">Matrix decomposition of&#160;\(Q_a\)</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#def:matrix-decomposition-Q">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap-projective.html#lem:projective-low-rank-sum">Lemma 4.7</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   For each \(a\), let </p>
+<div class="displaymath" id="a0000000178">
+  \[  m_a = \mathrm{rank}(Q_a),  \]
+</div>
+<p> and let \(\lvert v_{a,1} \rangle ,\ldots ,\lvert v_{a,m_a} \rangle \) be an orthonormal basis for the range of \(Q_a\), so that </p>
+<div class="displaymath" id="a0000000179">
+  \[  Q_a = \sum _{i=1}^{m_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert .  \]
+</div>
+<p> Let </p>
+<div class="displaymath" id="a0000000180">
+  \[  m = \sum _a m_a,  \]
+</div>
+<p> and let \(\{ \lvert a,i \rangle \} \) be an orthonormal basis of \(\mathbb {C}^m\), indexed by all \(a\) and all \(1 \leq i \leq m_a\). For each \(a\), define </p>
+<div class="displaymath" id="a0000000181">
+  \[  X_a = \sum _{i=1}^{m_a} \lvert a,i \rangle \langle v_{a,i} \rvert , \qquad T_a = \sum _{i=1}^{m_a} \lvert a,i \rangle \langle a,i \rvert ,  \]
+</div>
+<p> and define </p>
+<div class="equation" id="eq:looks-like-singular-value-decomposition">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:looks-like-singular-value-decomposition} X = \sum _a X_a = \sum _a \sum _{i=1}^{m_a} \lvert a,i \rangle \langle v_{a,i} \rvert . \end{equation}
+  </div>
+  <span class="equation_label">10</span>
+</p>
+</div>
+<p> Let \(T = \{ T_a\} \). Then \(T\) is a projective measurement on \(\mathbb {C}^m\). </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:svd-of-X">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">4.12</span>
+    <span class="definition_thmtitle">SVD of&#160;\(X\)</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#def:svd-of-X">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap-projective.html#def:matrix-decomposition-Q">Definition 4.11</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   Let </p>
+<div class="displaymath" id="a0000000182">
+  \[  X = U \cdot \Sigma _{m \times d} \cdot V^\dagger  \]
+</div>
+<p> be the singular value decomposition of \(X\). Thus \(U\) is an \(m \times m\) unitary matrix, \(V\) is a \(d \times d\) unitary matrix, and \(\Sigma _{m \times d}\) is an \(m \times d\) diagonal matrix with nonnegative real entries on its diagonal. </p>
+<p>For positive integers \(h\) and \(w\), write \(I_{h \times w}\) for the \(h \times w\) matrix with \(1\)’s on its diagonal and \(0\)’s elsewhere. For integers \(h,w \geq m\), write \(\Sigma _{h \times w}\) for the \(h \times w\) diagonal matrix whose diagonal agrees with that of \(\Sigma _{m \times d}\) and is zero elsewhere. </p>
+
+  </div>
+</div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:motivation-for-P">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">4.13</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#rem:motivation-for-P">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p> If the family \(\{ Q_a\} \) were a projective measurement, then the vectors \(\lvert v_{a,i} \rangle \), over all \(a\) and all \(1 \leq i \leq m_a\), would be orthonormal. Then <a href="chap-projective.html#eq:looks-like-singular-value-decomposition" class="eqref">10</a> would already be a singular value decomposition of \(X\), with \(\Sigma = I_{m \times d}\). Equivalently, </p>
+<div class="displaymath" id="a0000000183">
+  \[  X = U \cdot I_{m \times d} \cdot V^\dagger .  \]
+</div>
+<p> This motivates replacing \(\Sigma \) by \(I\) in the definition of \(\widehat X\) and \(P\). </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:projective-P">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">4.14</span>
+    <span class="definition_thmtitle">Definition of&#160;\(P\)</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#def:projective-P">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap-projective.html#def:matrix-decomposition-Q">Definition 4.11</a></li>
+          
+          <li><a href="chap-projective.html#def:svd-of-X">Definition 4.12</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.projectiveP" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.projectiveP</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   Define </p>
+<div class="displaymath" id="a0000000184">
+  \[  \widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger .  \]
+</div>
+<p> For each \(a\), define </p>
+<div class="displaymath" id="a0000000185">
+  \[  \widehat{X}_a = T_a \cdot \widehat{X}, \qquad P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a.  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:xa-t">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.15</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:xa-t">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000186"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.xa_t" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.xa_t</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  For each \(a\), </p>
+<div class="displaymath" id="a0000000187">
+  \[  X_a = T_a \cdot X.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000186">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Multiply the definition of \(X\) by \(T_a\) on the left and use that \(T_a\) selects exactly the basis vectors \(\lvert a,i \rangle \): </p>
+<div class="displaymath" id="a0000000188">
+  \[  T_a \cdot X = \Big(\sum _{i=1}^{m_a} \lvert a,i \rangle \langle a,i \rvert \Big) \Big(\sum _b \sum _{j=1}^{m_b} \lvert b,j \rangle \langle v_{b,j} \rvert \Big) = \sum _{i=1}^{m_a} \lvert a,i \rangle \langle v_{a,i} \rvert  = X_a.  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:qa-restated">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.16</span>
+    <span class="lemma_thmtitle">\(Q_a\) restated</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:qa-restated">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000189"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.qaRestated" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.qaRestated</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  For each \(a\), </p>
+<div class="displaymath" id="a0000000190">
+  \begin{equation*}  Q_a = X_a^\dagger \cdot X_a = X^\dagger \cdot T_a \cdot X = X_a^\dagger \cdot X. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000189">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> The identity \(X_a^\dagger X_a = Q_a\) follows by expanding the basis sums. The remaining equalities come from <a href="chap-projective.html#lem:xa-t">4.15</a> and the projectivity of \(T\): </p>
+<div class="displaymath" id="a0000000191">
+  \[  X_a^\dagger \cdot X_a = (X^\dagger \cdot T_a)(T_a \cdot X) = X^\dagger \cdot T_a \cdot X = X_a^\dagger \cdot X.  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:X-squared">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.17</span>
+    <span class="lemma_thmtitle">\(X\) squared</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:X-squared">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000192"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.xSquared" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.xSquared</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  
+<div class="displaymath" id="a0000000193">
+  \begin{equation*}  X \cdot X^\dagger = U \cdot (\Sigma _{m \times m})^2 \cdot U^\dagger , \quad \text{and} \quad X^\dagger \cdot X = Q = V \cdot (\Sigma _{d \times d})^2 \cdot V^\dagger . \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000192">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> The first identity is the standard computation from the singular value decomposition: </p>
+<div class="displaymath" id="a0000000194">
+  \[  X \cdot X^\dagger = (U \cdot \Sigma _{m \times d} \cdot V^\dagger )(U \cdot \Sigma _{m \times d} \cdot V^\dagger )^\dagger = U \cdot (\Sigma _{m \times m})^2 \cdot U^\dagger .  \]
+</div>
+<p> For the second, use that \(T\) is a measurement and then <a href="chap-projective.html#lem:qa-restated">4.16</a>: </p>
+<div class="displaymath" id="a0000000195">
+  \[  X^\dagger \cdot X = \sum _a X^\dagger \cdot T_a \cdot X = \sum _a Q_a = Q.  \]
+</div>
+<p> Computing again from the singular value decomposition gives </p>
+<div class="displaymath" id="a0000000196">
+  \[  X^\dagger \cdot X = V \cdot (\Sigma _{d \times d})^2 \cdot V^\dagger .  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:X-expression-to-Q-expression">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.18</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:X-expression-to-Q-expression">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000197"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.xExpressionToQExpression" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.xExpressionToQExpression</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  For each \(a\), </p>
+<div class="displaymath" id="a0000000198">
+  \begin{equation*}  X_a^\dagger \cdot (X \cdot X^\dagger - I_{m \times m})^2 \cdot X_a = Q_a \cdot Q \cdot Q_a - Q_a. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000197">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> Expand the square and apply <a href="chap-projective.html#lem:X-squared">4.17</a> and <a href="chap-projective.html#lem:qa-restated">4.16</a> term by term: </p>
+<div class="displaymath" id="a0000000199">
+  \[  X_a^\dagger (X \cdot X^\dagger \cdot X \cdot X^\dagger ) X_a = Q_a \cdot Q \cdot Q_a,  \]
+</div>
+<p> while </p>
+<div class="displaymath" id="a0000000200">
+  \[  X_a^\dagger (X \cdot X^\dagger ) X_a = (X_a^\dagger \cdot X)(X^\dagger \cdot X_a) = Q_a \cdot Q_a = Q_a,  \]
+</div>
+<p> and \(X_a^\dagger I_{m \times m} X_a = X_a^\dagger X_a = Q_a\). Substituting these identities into </p>
+<div class="displaymath" id="a0000000201">
+  \[  (X \cdot X^\dagger - I_{m \times m})^2 = X \cdot X^\dagger \cdot X \cdot X^\dagger - 2X \cdot X^\dagger + I_{m \times m}  \]
+</div>
+<p> gives the claim. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:pa-restated">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.19</span>
+    <span class="lemma_thmtitle">\(P_a\) restated</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:pa-restated">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000202"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.paRestated" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.paRestated</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  For each \(a\), </p>
+<div class="displaymath" id="a0000000203">
+  \begin{equation*}  P_a = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000202">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Since \(T\) is projective, </p>
+<div class="displaymath" id="a0000000204">
+  \[  P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a = (\widehat{X}^\dagger \cdot T_a)(T_a \cdot \widehat{X}) = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:X-hat-squared">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.20</span>
+    <span class="lemma_thmtitle">\(\widehat{X}\) squared</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:X-hat-squared">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000205"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  
+<div class="displaymath" id="a0000000206">
+  \begin{equation*}  \widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000205">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Multiply out the definition of \(\widehat X\) and use the unitarity of \(U\) and \(V\): </p>
+<div class="displaymath" id="a0000000207">
+  \[  \widehat{X} \cdot \widehat{X}^\dagger = (U \cdot I_{m \times d} \cdot V^\dagger )(U \cdot I_{m \times d} \cdot V^\dagger )^\dagger = U \cdot I_{m \times m} \cdot U^\dagger = I_{m \times m}.  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:X-times-X-hat">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.21</span>
+    <span class="lemma_thmtitle">\(X\) times \(\widehat{X}\)</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:X-times-X-hat">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000208"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  
+<div class="displaymath" id="a0000000209">
+  \begin{equation*}  X \cdot \widehat{X}^\dagger = U \cdot \Sigma _{m \times m} \cdot U^\dagger , \quad \text{and} \quad X^\dagger \cdot \widehat{X} = \sqrt{Q}. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000208">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> The first identity follows directly from the singular value decomposition: </p>
+<div class="displaymath" id="a0000000210">
+  \[  X \cdot \widehat{X}^\dagger = (U \cdot \Sigma _{m \times d} \cdot V^\dagger )(U \cdot I_{m \times d} \cdot V^\dagger )^\dagger = U \cdot \Sigma _{m \times m} \cdot U^\dagger .  \]
+</div>
+<p> Similarly, </p>
+<div class="displaymath" id="a0000000211">
+  \[  X^\dagger \cdot \widehat{X} = (U \cdot \Sigma _{m \times d} \cdot V^\dagger )^\dagger (U \cdot I_{m \times d} \cdot V^\dagger ) = V \cdot \Sigma _{d \times d} \cdot V^\dagger .  \]
+</div>
+<p> By <a href="chap-projective.html#lem:X-squared">4.17</a>, this is the positive square root of </p>
+<div class="displaymath" id="a0000000212">
+  \[  V \cdot (\Sigma _{d \times d})^2 \cdot V^\dagger = Q,  \]
+</div>
+<p> so \(X^\dagger \cdot \widehat X = \sqrt Q\). </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:squared-difference">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.22</span>
+    <span class="lemma_thmtitle">Squared difference</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:squared-difference">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000213"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.squaredDifference" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.squaredDifference</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  
+<div class="displaymath" id="a0000000214">
+  \begin{equation*}  (X - \widehat{X}) \cdot (X - \widehat{X})^\dagger \leq (X \cdot X^\dagger - I_{m \times m})^2. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000213">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> By <a href="chap-projective.html#lem:X-squared">4.17</a>, <a href="chap-projective.html#lem:X-hat-squared">4.20</a>, and <a href="chap-projective.html#lem:X-times-X-hat">4.21</a>, </p>
+<div class="displaymath" id="a0000000215">
+  \[  (X-\widehat X)(X-\widehat X)^\dagger = U \cdot (\Sigma _{m \times m}-I_{m \times m})^2 \cdot U^\dagger .  \]
+</div>
+<p> Since \(\Sigma _{m \times m}\) commutes with \(I_{m \times m}\), </p>
+<div class="displaymath" id="a0000000216">
+  \[  (\Sigma _{m \times m}-I_{m \times m})^2 \leq (\Sigma _{m \times m}^2-I_{m \times m})^2.  \]
+</div>
+<p> Conjugating by \(U\) and using <a href="chap-projective.html#lem:X-squared">4.17</a> gives </p>
+<div class="displaymath" id="a0000000217">
+  \[  (X-\widehat X)(X-\widehat X)^\dagger \leq (X \cdot X^\dagger - I_{m \times m})^2.  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:P-projectivity">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.23</span>
+    <span class="lemma_thmtitle">Projectivity of&#160;\(P\)</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:P-projectivity">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000218"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.pProjectivity" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.pProjectivity</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  \(P = \{ P_a\} \) forms a projective sub-measurement. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000218">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> For outcomes \(a,b\), </p>
+<div class="displaymath" id="a0000000219">
+  \begin{align*}  P_a \cdot P_b &  = (\widehat{X}^\dagger \cdot T_a \cdot \widehat{X}) (\widehat{X}^\dagger \cdot T_b \cdot \widehat{X}) \\ &  = \widehat{X}^\dagger \cdot T_a \cdot I_{m \times m} \cdot T_b \cdot \widehat{X} \\ &  = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} \cdot \mathbf{1}\! \left[[\right]a=b] \\ &  = P_a \cdot \mathbf{1}\! \left[[\right]a=b], \end{align*}
+</div>
+<p> where the second line uses <a href="chap-projective.html#lem:X-hat-squared">4.20</a>, the third uses that \(T\) is projective, and the last uses <a href="chap-projective.html#lem:pa-restated">4.19</a>. Summing over \(a\) shows \(\sum _a P_a \leq I\), so \(P\) is a projective sub-measurement. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:P-Q-approx">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">4.24</span>
+    <span class="lemma_thmtitle">\(P\) is close to&#160;\(Q\)</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#lem:P-Q-approx">#</a>
+    
+    <a class="icon proof" href="chap-projective.html#a0000000220"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  
+<div class="displaymath" id="a0000000221">
+  \begin{equation*}  Q_a \otimes I \approx _{30\zeta ^{1/4}} P_a \otimes I. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000220">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> The quantity to bound is </p>
+<div class="equation" id="eq:P-Q-thing-to-bound">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:P-Q-thing-to-bound} \sum _a \langle \psi  \rvert  (Q_a-P_a)^2 \otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  Q \otimes I \lvert \psi  \rangle  + \langle \psi  \rvert  P \otimes I \lvert \psi  \rangle  - \sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle  - \sum _a \langle \psi  \rvert  P_aQ_a \otimes I \lvert \psi  \rangle , \end{equation}
+  </div>
+  <span class="equation_label">11</span>
+</p>
+</div>
+<p> using the projectivity of \(Q\) and \(P\). The first term is at most \(1+2\sqrt{\zeta }\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.7</a>, and the second is at most \(1\) because \(P\) is a sub-measurement. </p>
+<p>For the last two terms, </p>
+<div class="equation" id="eq:complex-conjugates">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:complex-conjugates} \sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle  + \sum _a \langle \psi  \rvert  P_aQ_a \otimes I \lvert \psi  \rangle  = 2 \cdot \mathfrak {R}\Big(\sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle \Big). \end{equation}
+  </div>
+  <span class="equation_label">12</span>
+</p>
+</div>
+<p> By <a href="chap-projective.html#lem:qa-restated">4.16</a>, </p>
+<div class="displaymath" id="a0000000222">
+  \[  \sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle  = \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot X \cdot P_a) \otimes I \lvert \psi  \rangle .  \]
+</div>
+<p> The main estimate is </p>
+<div class="equation" id="eq:add-a-hat">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:add-a-hat} \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot X \cdot P_a)\otimes I \lvert \psi  \rangle  \approx _{2\zeta ^{1/4}} \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot \widehat{X} \cdot P_a)\otimes I \lvert \psi  \rangle . \end{equation}
+  </div>
+  <span class="equation_label">13</span>
+</p>
+</div>
+<p> This follows by Cauchy–Schwarz: </p>
+<div class="displaymath" id="a0000000223">
+  \[  \Big|\sum _a \langle \psi  \rvert  ((X_a^\dagger \cdot (X-\widehat X)) \otimes I)\cdot (P_a \otimes I)\lvert \psi  \rangle \Big|  \]
+</div>
+<p> is bounded by the square root of </p>
+<div class="displaymath" id="a0000000224">
+  \[  \sum _a \langle \psi  \rvert  \big(X_a^\dagger \cdot (X-\widehat X)(X-\widehat X)^\dagger \cdot X_a\big)\otimes I \lvert \psi  \rangle ,  \]
+</div>
+<p> times the square root of \(\sum _a \langle \psi  \rvert (P_a)^2 \otimes I \lvert \psi  \rangle  \leq 1\). The first factor is at most \(4\sqrt{\zeta }\) by <a href="chap-projective.html#lem:squared-difference">4.22</a>, <a href="chap-projective.html#lem:X-expression-to-Q-expression">4.18</a>, and <a href="chap-projective.html#lem:q-almost-projective">4.10</a>, so the total error is at most \(2\zeta ^{1/4}\). </p>
+<p>The right-hand side of <a href="chap-projective.html#eq:add-a-hat">13</a> is real, because </p>
+<div class="displaymath" id="a0000000225">
+  \[  \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot \widehat{X} \cdot P_a)\otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  (X^\dagger \cdot \widehat{X}) \otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle ,  \]
+</div>
+<p> where the first equality uses <a href="chap-projective.html#lem:xa-t">4.15</a>, <a href="chap-projective.html#lem:pa-restated">4.19</a>, and <a href="chap-projective.html#lem:X-hat-squared">4.20</a> and that \(T\) is a measurement, and the second uses <a href="chap-projective.html#lem:X-times-X-hat">4.21</a>. Hence <a href="chap-projective.html#lem:sqrt-Q-completeness">4.9</a> and <a href="chap-projective.html#eq:add-a-hat">13</a> imply </p>
+<div class="displaymath" id="a0000000226">
+  \[  \mathfrak {R}\Big(\sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle \Big) \geq 1-14\zeta ^{1/4}.  \]
+</div>
+<p> Substituting this into <a href="chap-projective.html#eq:complex-conjugates">12</a> and then into <a href="chap-projective.html#eq:P-Q-thing-to-bound">11</a> gives </p>
+<div class="displaymath" id="a0000000227">
+  \[  \sum _a \langle \psi  \rvert  (Q_a-P_a)^2 \otimes I \lvert \psi  \rangle  \leq (1+2\sqrt{\zeta }) + 1 - 2(1-14\zeta ^{1/4}) = 2\sqrt{\zeta } + 28\zeta ^{1/4} \leq 30\zeta ^{1/4}.  \]
+</div>
+
+  </div>
+</div>
+<p>Finally, <a href="chap-projective.html#lem:projective-low-rank-sum">4.7</a> gives </p>
+<div class="displaymath" id="a0000000228">
+  \[  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I,  \]
+</div>
+<p> and <a href="chap-projective.html#lem:P-Q-approx">4.24</a> gives </p>
+<div class="displaymath" id="a0000000229">
+  \[  Q_a \otimes I \approx _{30\zeta ^{1/4}} P_a \otimes I.  \]
+</div>
+<p> The triangle inequality for \(\approx _\delta \) yields </p>
+<div class="displaymath" id="a0000000230">
+  \[  A_a \otimes I \approx _{84\zeta ^{1/4}} P_a \otimes I.  \]
+</div>
+
+  </div>
+</div>
+
+</div> <!--main-text -->
+</div> <!-- content-wrapper -->
+</div> <!-- content -->
+</div> <!-- wrapper -->
+
+<nav class="prev_up_next">
+  <svg  id="showmore-minus" class="icon icon-eye-minus showmore"><use xlink:href="symbol-defs.svg#icon-eye-minus"></use></svg>
+
+  <svg  id="showmore-plus" class="icon icon-eye-plus showmore"><use xlink:href="symbol-defs.svg#icon-eye-plus"></use></svg>
+
+  <a href="sec-prelims.html" title="Preliminaries"><svg  class="icon icon-arrow-left "><use xlink:href="symbol-defs.svg#icon-arrow-left"></use></svg>
+</a>
+  <a href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test"><svg  class="icon icon-arrow-up "><use xlink:href="symbol-defs.svg#icon-arrow-up"></use></svg>
+</a>
+  <a href="sec-expansion.html" title="Expansion in the hypercube graph"><svg  class="icon icon-arrow-right "><use xlink:href="symbol-defs.svg#icon-arrow-right"></use></svg>
+</a>
+</nav>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/plastex.js"></script>
+<script type="text/javascript" src="js/svgxuse.js"></script>
+<script type="text/javascript" src="js/js.cookie.min.js"></script>
+<script type="text/javascript" src="js/showmore.js"></script>
+</body>
+</html>

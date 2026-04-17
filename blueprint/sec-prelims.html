@@ -1,0 +1,3306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  MathJax = { 
+    tex: {
+		    inlineMath: [['$','$'], ['\\(','\\)']]
+	} }
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<meta name="generator" content="plasTeX" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Preliminaries</title>
+<link rel="next" href="chap-projective.html" title="Making measurements projective" />
+<link rel="prev" href="sec-the-test.html" title="The low individual degree test" />
+<link rel="up" href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test" />
+<link rel="stylesheet" href="styles/theme-white.css" />
+<link rel="stylesheet" href="styles/amsthm.css" />
+<link rel="stylesheet" href="styles/showmore.css" />
+<link rel="stylesheet" href="styles/blueprint.css" />
+<link rel="stylesheet" href="styles/extra_styles.css" />
+</head>
+
+<body>
+<header>
+<svg  id="toc-toggle" class="icon icon-list-numbered "><use xlink:href="symbol-defs.svg#icon-list-numbered"></use></svg>
+<h1 id="doc_title"><a href="index.html">Blueprint for arXiv:2009.12982<br /><i class="itshape">Quantum Soundness of the Classical Low Individual Degree Test</i></a></h1>
+</header>
+
+<div class="wrapper">
+<nav class="toc">
+<ul class="sub-toc-0">
+<li class="">
+  <a href="chap-overview.html"><span class="toc_ref">1</span> <span class="toc_entry">Overview</span></a>
+ </li>
+<li class="">
+  <a href="sec-the-test.html"><span class="toc_ref">2</span> <span class="toc_entry">The low individual degree test</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-the-test.html#a0000000009"><span class="toc_ref">2.1</span> <span class="toc_entry">The game and its strategies</span></a>
+ </li>
+<li class="">
+  <a href="sec-the-test.html#a0000000010"><span class="toc_ref">2.2</span> <span class="toc_entry">Formal soundness target</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class=" active current">
+  <a href="sec-prelims.html"><span class="toc_ref">3</span> <span class="toc_entry">Preliminaries</span></a>
+  <span class="expand-toc">▼</span>
+  <ul class="sub-toc-1 active">
+     <li class="">
+  <a href="sec-prelims.html#a0000000011"><span class="toc_ref">3.1</span> <span class="toc_entry">Polynomials and measurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#sec:comparing-measurements"><span class="toc_ref">3.2</span> <span class="toc_entry">Consistency and state-dependent distance</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#sec:consistency-from-state-dependent-distance"><span class="toc_ref">3.3</span> <span class="toc_entry">Consistency from state-dependent distance</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#a0000000012"><span class="toc_ref">3.4</span> <span class="toc_entry">Strong self-consistency</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-projective.html"><span class="toc_ref">4</span> <span class="toc_entry">Making measurements projective</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-projective.html#sec:naimark"><span class="toc_ref">4.0.1</span> <span class="toc_entry">Naimark dilation</span></a>
+ </li>
+<li class="">
+  <a href="chap-projective.html#sec:orthogonalization"><span class="toc_ref">4.0.2</span> <span class="toc_entry">Orthogonalization lemma</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-expansion.html"><span class="toc_ref">5</span> <span class="toc_entry">Expansion in the hypercube graph</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-expansion.html#a0000000013"><span class="toc_ref">5.1</span> <span class="toc_entry">The graph and its spectrum</span></a>
+ </li>
+<li class="">
+  <a href="sec-expansion.html#a0000000014"><span class="toc_ref">5.2</span> <span class="toc_entry">Local and global variance</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-variance.html"><span class="toc_ref">6</span> <span class="toc_entry">Global variance of the points measurements</span></a>
+ </li>
+<li class="">
+  <a href="chap-self-improvement.html"><span class="toc_ref">7</span> <span class="toc_entry">Self-improvement</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-self-improvement.html#sec:self-improvement"><span class="toc_ref">7.1</span> <span class="toc_entry">Non-projective Output</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="chap-self-improvement.html#a0000000015"><span class="toc_ref">7.1.1</span> <span class="toc_entry">A Semidefinite Program</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-self-improvement.html#sec:self-improvement-projective"><span class="toc_ref">7.2</span> <span class="toc_entry">Projective Output</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html"><span class="toc_ref">8</span> <span class="toc_entry">Commutativity</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-g-comm.html#sec:commutativity-points"><span class="toc_ref">8.1</span> <span class="toc_entry">Commutativity of the point measurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html#sec:G-commutes-after-evaluation"><span class="toc_ref">8.2</span> <span class="toc_entry">Commutativity of&#160;\(G\) after evaluation</span></a>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html#sec:G-commutes"><span class="toc_ref">8.3</span> <span class="toc_entry">Commutativity of&#160;\(G\)</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html"><span class="toc_ref">9</span> <span class="toc_entry">Pasting</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-ld-pasting.html#a0000000016"><span class="toc_ref">9.0.1</span> <span class="toc_entry">From Measurements to Submeasurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#a0000000017"><span class="toc_ref">9.0.2</span> <span class="toc_entry">The Pasted Submeasurement</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-ld-pasting.html#sec:construction-numba-one"><span class="toc_ref"></span> <span class="toc_entry">The First Construction</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:construction-numba-two"><span class="toc_ref"></span> <span class="toc_entry">The Second Construction</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:hat-consistency"><span class="toc_ref">9.0.3</span> <span class="toc_entry">Strong Self-Consistency and Commutation of \(\widehat G\)</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-ld-pasting.html#a0000000018"><span class="toc_ref"></span> <span class="toc_entry">Commutativity of \(G_{\bot }\)</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#a0000000019"><span class="toc_ref"></span> <span class="toc_entry">Putting Everything Together</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:ld-sandwiching"><span class="toc_ref">9.0.4</span> <span class="toc_entry">Sandwiching Lemmas</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:consistency-of-h-with-a"><span class="toc_ref">9.0.5</span> <span class="toc_entry">Consistency of \(H\) with \(A\)</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:completeness-of-h-low-degree"><span class="toc_ref">9.0.6</span> <span class="toc_entry">Completeness of \(H\)</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-induction.html"><span class="toc_ref">10</span> <span class="toc_entry">The main induction step</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-induction.html#a0000000020"><span class="toc_ref">10.1</span> <span class="toc_entry">Restricting to one slice</span></a>
+ </li>
+<li class="">
+  <a href="sec-induction.html#a0000000021"><span class="toc_ref">10.2</span> <span class="toc_entry">The inductive construction</span></a>
+ </li>
+<li class="">
+  <a href="sec-induction.html#a0000000022"><span class="toc_ref">10.3</span> <span class="toc_entry">Proof of the main formal theorem</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sect0001.html"><span class="toc_ref">11</span> <span class="toc_entry">Bibliography</span></a>
+ </li>
+<li ><a href="dep_graph_document.html">Dependency graph</a></li>
+</ul>
+</nav>
+
+<div class="content">
+<div class="content-wrapper">
+
+
+<div class="main-text">
+<h1 id="sec:prelims">3 Preliminaries</h1>
+
+<h1 id="a0000000011">3.1 Polynomials and measurements</h1>
+<p>For complex numbers \(\alpha ,\beta \in \mathbb {C}\), write \(\alpha \approx _\varepsilon \beta \) when \(|\alpha -\beta |\le \varepsilon \). In particular, </p>
+<div class="equation" id="eq:triangle-inequality-for-numbers">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:triangle-inequality-for-numbers} \text{if $\alpha \approx _{\varepsilon } \beta $ and $\beta \approx _{\delta } \gamma $, then $\alpha \approx _{\varepsilon +\delta }\gamma $.} \end{equation}
+  </div>
+  <span class="equation_label">1</span>
+</p>
+</div>
+<p>Fix a prime power \(q=p^t\). Write \(\omega =e^{2\pi i/p}\), and let \(\operatorname {tr}:\mathbb {F}_q\to \mathbb {F}_p\) denote the finite-field trace. </p>
+<div class="definition_thmwrapper theorem-style-definition" id="def:ff-trace">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">3.1</span>
+    <span class="definition_thmtitle">Finite field trace</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#def:ff-trace">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.ffTrace" class="lean_decl">MIPStarRE.LDT.Preliminaries.ffTrace</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>  The finite-field trace is the map \(\operatorname {tr}:\mathbb {F}_q\to \mathbb {F}_p\) defined by </p>
+<div class="displaymath" id="a0000000030">
+  \[  \operatorname {tr}[x] = \sum _{\ell =0}^{t-1} x^{p^\ell }.  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:fourier-fact-scalar">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.2</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:fourier-fact-scalar">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000031"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:ff-trace">Definition 3.1</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.fourier_fact_scalar" class="lean_decl">MIPStarRE.LDT.Preliminaries.fourier_fact_scalar</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(a \in \mathbb {F}_q\). Then </p>
+<div class="displaymath" id="a0000000032">
+  \begin{equation*}  \mathbb {E}_{{\boldsymbol {x}}\sim \mathbb {F}_q} \omega ^{\operatorname {tr}[{\boldsymbol {x}}\cdot a]} = \left\{ \begin{array}{rl} 1 &  \text{if $a = 0$}, \\ 0 &  \text{otherwise}. \end{array}\right. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000031">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>If \(a=0\), then \(\operatorname {tr}[{\boldsymbol {x}}\cdot a]=0\) for every \({\boldsymbol {x}}\), so the average is \(1\). If \(a\neq 0\), choose \(y \in \mathbb {F}_q\) such that \(\operatorname {tr}[a\cdot y]\neq 0\), and set </p>
+<div class="displaymath" id="a0000000033">
+  \[  C=\mathbb {E}_{{\boldsymbol {x}}\sim \mathbb {F}_q} \omega ^{\operatorname {tr}[{\boldsymbol {x}}\cdot a]}.  \]
+</div>
+<p> Translation invariance of the uniform distribution gives </p>
+<div class="displaymath" id="a0000000034">
+  \[  C=\mathbb {E}_{{\boldsymbol {x}}\sim \mathbb {F}_q} \omega ^{\operatorname {tr}[({\boldsymbol {x}}+y)\cdot a]} = C \cdot \omega ^{\operatorname {tr}[y\cdot a]}.  \]
+</div>
+<p> Since \(\omega ^{\operatorname {tr}[y\cdot a]}\neq 1\), it follows that \(C=0\). </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:fourier-fact-vector">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.3</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:fourier-fact-vector">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000035"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:ff-trace">Definition 3.1</a></li>
+          
+          <li><a href="sec-prelims.html#prop:fourier-fact-scalar">Lemma 3.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.fourier_fact_vector" class="lean_decl">MIPStarRE.LDT.Preliminaries.fourier_fact_vector</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(v \in \mathbb {F}_q^m\). Then </p>
+<div class="displaymath" id="a0000000036">
+  \begin{equation*}  \mathbb {E}_{\boldsymbol {u}\sim \mathbb {F}_q^m} \omega ^{\operatorname {tr}[\boldsymbol {u}\cdot v]} = \left\{ \begin{array}{rl} 1 &  \text{if $v = 0$}, \\ 0 &  \text{otherwise}. \end{array}\right. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000035">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>By linearity of the trace and independence of the coordinates, </p>
+<div class="displaymath" id="a0000000037">
+  \[  \mathbb {E}_{\boldsymbol {u}\sim \mathbb {F}_q^m} \omega ^{\operatorname {tr}[\boldsymbol {u}\cdot v]} = \prod _{i=1}^m \mathbb {E}_{\boldsymbol {u}_i \sim \mathbb {F}_q} \omega ^{\operatorname {tr}[\boldsymbol {u}_i \cdot v_i]}.  \]
+</div>
+<p> Proposition&#160;<a href="sec-prelims.html#prop:fourier-fact-scalar">3.2</a> shows that the \(i\)-th factor is \(1\) when \(v_i=0\) and \(0\) otherwise, so the product is \(1\) exactly when \(v=0\). </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:polyfunc">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">3.4</span>
+    <span class="definition_thmtitle">Low individual degree polynomials</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#def:polyfunc">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.polyFunc" class="lean_decl">MIPStarRE.LDT.Preliminaries.polyFunc</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Polynomial" class="lean_decl">MIPStarRE.LDT.Polynomial</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>  Let \(\mathcal{P}(m,q,d)\) be the set of polynomials \(g \in \mathbb {F}_q[x_1,\dots ,x_m]\) whose degree in each variable is at most \(d\), viewed as functions \(\mathbb {F}_q^m \to \mathbb {F}_q\) via evaluation. (Over finite fields, distinct low-degree polynomials can induce the same function; we identify elements of \(\mathcal{P}(m,q,d)\) with their polynomial representatives, not their functional equivalence classes.) </p>
+
+  </div>
+</div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:individual-degree-convention">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">3.5</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#rem:individual-degree-convention">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p>  Here, “individual degree \(d\)” means degree at most \(d\) in each coordinate. In particular, </p>
+<div class="displaymath" id="a0000000038">
+  \[  \mathcal{P}(m,q,d) \subseteq \mathcal{P}(m,q,d+1).  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:schwartz-zippel-total-degree">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.6</span>
+    <span class="lemma_thmtitle">Schwartz–Zippel lemma&#160;<span class="cite">
+	[
+</span></span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#lem:schwartz-zippel-total-degree">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000039"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.schwartzZippel_totalDegree" class="lean_decl">MIPStarRE.LDT.Preliminaries.schwartzZippel_totalDegree</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  Let \(g, h:\mathbb {F}_q^m \rightarrow \mathbb {F}_q\) be two distinct polynomials of total degree&#160;\(d\). Then </p>
+<div class="displaymath" id="a0000000040">
+  \begin{equation*}  \mathbb {P}_{{\boldsymbol {x}}\sim \mathbb {F}_q^m}[g({\boldsymbol {x}}) = h({\boldsymbol {x}})] \leq \frac{d}{q}. \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000039">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Apply the Schwartz–Zippel lemma to the nonzero polynomial \(g-h\), which has total degree at most \(d\). </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:schwartz-zippel-individual">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.7</span>
+    <span class="lemma_thmtitle">Schwartz–Zippel for individual degree</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#lem:schwartz-zippel-individual">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000041"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:polyfunc">Definition 3.4</a></li>
+          
+          <li><a href="sec-prelims.html#lem:schwartz-zippel-total-degree">Lemma 3.6</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.schwartzZippel_individualDegree" class="lean_decl">MIPStarRE.LDT.Preliminaries.schwartzZippel_individualDegree</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   If \(g,h \in \mathcal{P}(m,q,d)\) are distinct, then </p>
+<div class="displaymath" id="a0000000042">
+  \[  \mathbb {P}_{u \sim \mathbb {F}_q^m}[g(u)=h(u)] \le \frac{md}{q}.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000041">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>The difference \(g-h\) is a nonzero polynomial of total degree at most \(md\). Apply Lemma&#160;<a href="sec-prelims.html#lem:schwartz-zippel-total-degree">3.6</a>. </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:submeasurement">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">3.8</span>
+    <span class="definition_thmtitle">Measurements and submeasurements</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#def:submeasurement">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SubMeas" class="lean_decl">MIPStarRE.LDT.SubMeas</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Measurement" class="lean_decl">MIPStarRE.LDT.Measurement</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ProjSubMeas" class="lean_decl">MIPStarRE.LDT.ProjSubMeas</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>  Let \(\mathcal H\) be a Hilbert space and let \(\mathcal A\) be a set of outcomes. A submeasurement on \(\mathcal A\) is a family \(A=\{ A_a\} _{a \in \mathcal A}\) of Hermitian positive semidefinite operators on \(\mathcal H\) such that \(\sum _a A_a \le I\). It is a measurement when \(\sum _a A_a = I\), and it is projective when each \(A_a\) is an idempotent projection. (In the Lean formalization, outcome sets are assumed finite throughout.) </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:polymeasurements">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">3.9</span>
+    <span class="definition_thmtitle">Low-degree polynomial measurements</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#def:polymeasurements">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:polyfunc">Definition 3.4</a></li>
+          
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.8</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SubMeas" class="lean_decl">MIPStarRE.LDT.SubMeas</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Measurement" class="lean_decl">MIPStarRE.LDT.Measurement</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Polynomial" class="lean_decl">MIPStarRE.LDT.Polynomial</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   We write \(\mathrm{PolySub}(m,q,d)\) for the submeasurements indexed by \(\mathcal{P}(m,q,d)\), and \(\mathrm{PolyMeas}(m,q,d)\) for the corresponding measurements. </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:post-processing">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">3.10</span>
+    <span class="definition_thmtitle">Post-processing</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#def:post-processing">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.8</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.postprocess" class="lean_decl">MIPStarRE.LDT.postprocess</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   Let \(A=\{ A_a\} _{a \in \mathcal A}\) be a family of operators and let \(f\colon \mathcal A \to \mathcal B\). The post-processed family \(A_{[f(a)=b]}\) is defined by </p>
+<div class="displaymath" id="a0000000043">
+  \[  A_{[f(a)=b]} = \sum _{a\,  :\,  f(a)=b} A_a.  \]
+</div>
+
+  </div>
+</div>
+<div class="proposition_thmwrapper theorem-style-plain" id="prop:post-processing-preserves">
+  <div class="proposition_thmheading">
+    <span class="proposition_thmcaption">
+    Proposition
+    </span>
+    <span class="proposition_thmlabel">3.11</span>
+    <span class="proposition_thmtitle">Post-processing preserves measurements</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:post-processing-preserves">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000044"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:post-processing">Definition 3.10</a></li>
+          
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.8</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.postprocessPreservesMeasurements" class="lean_decl">MIPStarRE.LDT.Preliminaries.postprocessPreservesMeasurements</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="proposition_thmcontent">
+  <p>   Let \(A=\{ A_a\} _{a \in \mathcal A}\) be a family of operators and let \(f\colon \mathcal A \to \mathcal B\). Then </p>
+<div class="displaymath" id="a0000000045">
+  \[  \sum _a A_a = \sum _b A_{[f(a)=b]}.  \]
+</div>
+<p> Consequently, if \(\{ A_a\} \) is a submeasurement, respectively a measurement, then \(\{ A_{[f(a)=b]}\} \) is again a submeasurement, respectively a measurement. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000044">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Each \(a \in \mathcal A\) contributes exactly once to the right-hand side, namely in the summand indexed by \(b=f(a)\). </p>
+
+  </div>
+</div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:post-processing-notation">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">3.12</span>
+    <span class="remark_thmtitle">Post-processing notation</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#rem:post-processing-notation">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p> In the notation \(A_{[f(a)=b]}\), the measurement outcome is the variable to which the function is applied. For example, if \(G=\{ G_g\}  \in \mathrm{PolySub}(m,q,d)\) and \(u \in \mathbb {F}_q^m\), then </p>
+<div class="displaymath" id="a0000000046">
+  \[  G_{[g(u)=a]} = \sum _{g\, :\, g(u)=a} G_g.  \]
+</div>
+<p> Here \(g\) is the measurement outcome, and \(u\) is the evaluation point. </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:measurement-completion">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">3.13</span>
+    <span class="definition_thmtitle">Completion of a submeasurement</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#def:measurement-completion">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.8</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.completeAtOutcome" class="lean_decl">MIPStarRE.LDT.Preliminaries.completeAtOutcome</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   Let \(A=\{ A_a^x\} _{a \in \mathcal A}\) be a submeasurement. Its completion is the measurement \(\widehat A\) with outcome set \(\widehat{\mathcal A}=\mathcal A \cup \{ \bot \} \) given by \(\widehat A_a^x=A_a^x\) for \(a \in \mathcal A\) and \(\widehat A_\bot ^x = I-\sum _a A_a^x\). </p>
+
+  </div>
+</div>
+<h1 id="sec:comparing-measurements">3.2 Consistency and state-dependent distance</h1>
+
+<div class="definition_thmwrapper theorem-style-definition" id="def:simeq">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">3.14</span>
+    <span class="definition_thmtitle">Consistency</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#def:simeq">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ConsRel" class="lean_decl">MIPStarRE.LDT.ConsRel</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>  Let \(\lvert \psi  \rangle  \in \mathcal H_{\mathrm A} \otimes \mathcal H_{\mathrm B}\). Let \(A=\{ A_a^x\} \) and \(B=\{ B_a^x\} \) be submeasurements with the same answer set, and let \(\mathcal D\) be a distribution on the question set. We write </p>
+<div class="displaymath" id="a0000000047">
+  \[  A_a^x \otimes I \simeq _\delta I \otimes B_a^x  \]
+</div>
+<p> when </p>
+<div class="equation" id="eq:no-big-Oh">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:no-big-Oh} \mathbb {E}_{x \sim \mathcal D} \sum _{a \ne b} \langle \psi  \rvert  A_a^x \otimes B_b^x \lvert \psi  \rangle  \le \delta . \end{equation}
+  </div>
+  <span class="equation_label">2</span>
+</p>
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:good-strategy-characterization">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.15</span>
+    <span class="lemma_thmtitle">Characterization of a good symmetric strategy</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#lem:good-strategy-characterization">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000048"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.14</a></li>
+          
+          <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.16</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.goodStrategyCharacterization" class="lean_decl">MIPStarRE.LDT.Preliminaries.goodStrategyCharacterization</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   A symmetric projective strategy \((\psi ,A,B,L)\) is \((\varepsilon ,\delta ,\gamma )\)-good if and only if the following hold on the relevant test distributions: </p>
+<div class="displaymath" id="a0000000049">
+  \[  A_a^u \otimes I \simeq _\varepsilon I \otimes B^{\ell }_{[f(u)=a]}, \qquad A_a^u \otimes I \simeq _\delta I \otimes A_a^u, \qquad A_a^u \otimes I \simeq _\gamma I \otimes L^{\ell }_{[f(u)=a]}.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000048">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Each subtest accepts exactly when the two measurement outcomes agree. Because the relevant families are measurements, Lemma&#160;<a href="sec-prelims.html#prop:simeq-for-measurements">3.16</a> rewrites those acceptance probabilities as consistency bounds. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:simeq-for-measurements">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.16</span>
+    <span class="lemma_thmtitle">Consistency for measurements</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:simeq-for-measurements">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000050"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.14</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.simeqForMeasurements" class="lean_decl">MIPStarRE.LDT.Preliminaries.simeqForMeasurements</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   If \(A=\{ A_a^x\} \) and \(B=\{ B_a^x\} \) are measurements, then </p>
+<div class="displaymath" id="a0000000051">
+  \[  A_a^x \otimes I \simeq _\delta I \otimes B_a^x \qquad \text{if and only if}\qquad \mathbb {E}_x \sum _a \langle \psi  \rvert  A_a^x \otimes B_a^x \lvert \psi  \rangle  \ge 1-\delta .  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000050">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Expand the off-diagonal sum by writing \(\sum _{a \ne b} A_a^x \otimes B_b^x = \sum _b (I-A_b^x) \otimes B_b^x\). </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:approx_delta">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">3.17</span>
+    <span class="definition_thmtitle">State-dependent distance</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#def:approx_delta">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SDDRel" class="lean_decl">MIPStarRE.LDT.SDDRel</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>  Let \(\lvert \psi  \rangle  \in \mathcal H\), let \(A=\{ A_a^x\} \) and \(B=\{ B_a^x\} \) be families of operators on \(\mathcal H\), and let \(\mathcal D\) be a distribution on the question set. We write </p>
+<div class="displaymath" id="a0000000052">
+  \[  A_a^x \approx _\delta B_a^x  \]
+</div>
+<p> when </p>
+<div class="displaymath" id="a0000000053">
+  \[  \mathbb {E}_{x \sim \mathcal D} \sum _a \lVert (A_a^x-B_a^x)\lvert \psi  \rangle  \rVert ^2 \le \delta .  \]
+</div>
+
+  </div>
+</div>
+<p>In particular, if \(A^x_a \otimes I \simeq _{\varepsilon } I \otimes C^x_a\), the question is what hypothesis on \(A\) and \(B\) allows one to conclude that </p>
+<div class="equation" id="eq:can-we-use-approx-delta-to-derive-this">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:can-we-use-approx-delta-to-derive-this} B^x_a \otimes I \simeq _{\varepsilon } I \otimes C^x_a. \end{equation}
+  </div>
+  <span class="equation_label">3</span>
+</p>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:triangle-sub">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.18</span>
+    <span class="lemma_thmtitle">Transferring consistency through state-dependent distance</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:triangle-sub">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000054"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.14</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.16</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.triangleSub" class="lean_decl">MIPStarRE.LDT.Preliminaries.triangleSub</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(A=\{ A_a^x\} \) and \(B=\{ B_a^x\} \) be measurements and let \(C=\{ C_a^x\} \) be a submeasurement. If \(A_a^x \otimes I \simeq _\delta I \otimes C_a^x\) and \(A_a^x \otimes I \approx _\varepsilon B_a^x \otimes I\), then </p>
+<div class="displaymath" id="a0000000055">
+  \[  B_a^x \otimes I \simeq _{\delta +\sqrt\varepsilon } I \otimes C_a^x.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000054">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Rewrite the inconsistency with \(C\) as total mass minus diagonal overlap. The total mass is unchanged because \(A\) and \(B\) are measurements, and the diagonal overlap changes by at most \(\sqrt\varepsilon \) by Cauchy–Schwarz. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:simeq-to-approx">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.19</span>
+    <span class="lemma_thmtitle">Consistency implies state-dependent distance for measurements</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:simeq-to-approx">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000056"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.14</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.16</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.simeqToApprox" class="lean_decl">MIPStarRE.LDT.Preliminaries.simeqToApprox</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   If \(A\) and \(B\) are measurements and \(A_a^x \otimes I \simeq _\delta I \otimes B_a^x\), then </p>
+<div class="displaymath" id="a0000000057">
+  \[  A_a^x \otimes I \approx _{2\delta } I \otimes B_a^x.  \]
+</div>
+<p> If both measurements are projective, the converse also holds. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000056">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Expand the squared norm of \((A_a^x \otimes I - I \otimes B_a^x)\lvert \psi  \rangle \) and use the diagonal-overlap formula from Lemma&#160;<a href="sec-prelims.html#prop:simeq-for-measurements">3.16</a>. </p>
+
+  </div>
+</div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:simeq-not-approx-submeas">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">3.20</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#rem:simeq-not-approx-submeas">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p> The implication above does not extend to submeasurements. For example, if \(A_a^x=0\) for all \(a\), then \(A_a^x \otimes I \simeq _0 I \otimes B_a^x\), but </p>
+<div class="displaymath" id="a0000000058">
+  \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \lVert (A^{{\boldsymbol {x}}}_a \otimes I - I \otimes B^{{\boldsymbol {x}}}_a)\lvert \psi  \rangle  \rVert ^2 = \mathbb {E}_{{\boldsymbol {x}}} \sum _a \lVert (I \otimes B^{{\boldsymbol {x}}}_a)\lvert \psi  \rangle  \rVert ^2,  \]
+</div>
+<p> which is nonzero unless \((I \otimes B_a^x)\lvert \psi  \rangle =0\) for all \(x\) and \(a\). </p>
+
+  </div>
+</div>
+<h1 id="sec:consistency-from-state-dependent-distance">3.3 Consistency from state-dependent distance</h1>
+
+<div class="theorem_thmwrapper theorem-style-plain" id="prop:closeness-of-ip">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">3.21</span>
+    <span class="theorem_thmtitle">Closeness of inner products</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:closeness-of-ip">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000059"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.closenessOfIP" class="lean_decl">MIPStarRE.LDT.Preliminaries.closenessOfIP</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.closenessOfIPAdjoint" class="lean_decl">MIPStarRE.LDT.Preliminaries.closenessOfIPAdjoint</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>   Let \(\{ A^x_a\} \), \(\{ B^x_a\} \), and \(\{ C^x_{a,b}\} \) be matrices. Suppose that \(A^x_a \approx _\gamma B^x_a\) and that for all&#160;\(x\), </p>
+<div class="displaymath" id="a0000000060">
+  \[  \sum _a \Big(\sum _b C^x_{a,b}\Big) \Big(\sum _b C^x_{a,b}\Big)^\dagger \le I.  \]
+</div>
+<p> Then </p>
+<div class="equation" id="eq:closeness3">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \mathbb {E}_{{\boldsymbol {x}}} \sum _{a,b} \langle \psi  \rvert  C^{{\boldsymbol {x}}}_{a,b} A^{{\boldsymbol {x}}}_a \lvert \psi  \rangle  \approx _{\sqrt{\gamma }} \mathbb {E}_{{\boldsymbol {x}}} \sum _{a,b} \langle \psi  \rvert  C^{{\boldsymbol {x}}}_{a,b} B^{{\boldsymbol {x}}}_a \lvert \psi  \rangle . \label{eq:closeness3} \end{equation}
+  </div>
+  <span class="equation_label">4</span>
+</p>
+</div>
+<p> Similarly, suppose that \((A^x_a)^\dagger \approx _\gamma (B^x_a)^\dagger \) and that for all&#160;\(x\), </p>
+<div class="displaymath" id="a0000000061">
+  \[  \sum _a \Big(\sum _b C^x_{a,b}\Big)^\dagger \Big(\sum _b C^x_{a,b}\Big) \le I.  \]
+</div>
+<p> Then </p>
+<div class="equation" id="eq:closeness4">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \mathbb {E}_{{\boldsymbol {x}}} \sum _{a,b} \langle \psi  \rvert  A^{{\boldsymbol {x}}}_a C^{{\boldsymbol {x}}}_{a,b} \lvert \psi  \rangle  \approx _{\sqrt{\gamma }} \mathbb {E}_{{\boldsymbol {x}}} \sum _{a,b} \langle \psi  \rvert  B^{{\boldsymbol {x}}}_a C^{{\boldsymbol {x}}}_{a,b} \lvert \psi  \rangle . \label{eq:closeness4} \end{equation}
+  </div>
+  <span class="equation_label">5</span>
+</p>
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000059">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>To prove <a href="sec-prelims.html#eq:closeness3" class="eqref">4</a>, write the difference as </p>
+<div class="displaymath" id="a0000000062">
+  \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  \Big(\sum _b C^{\boldsymbol {x}}_{a,b}\Big) (A^{\boldsymbol {x}}_a-B^{\boldsymbol {x}}_a) \lvert \psi  \rangle .  \]
+</div>
+<p> Cauchy–Schwarz bounds its magnitude by </p>
+<div class="displaymath" id="a0000000063">
+  \[  \Big( \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  \Big(\sum _b C^{{\boldsymbol {x}}}_{a,b}\Big)\Big(\sum _b C^{{\boldsymbol {x}}}_{a,b}\Big)^\dagger \lvert \psi  \rangle  \Big)^{1/2} \Big( \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a)^\dagger (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a) \lvert \psi  \rangle  \Big)^{1/2},  \]
+</div>
+<p> and the two hypotheses bound these factors by \(1\) and \(\sqrt{\gamma }\) respectively. For <a href="sec-prelims.html#eq:closeness4" class="eqref">5</a>, rewrite the difference as </p>
+<div class="displaymath" id="a0000000064">
+  \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _{a,b} \langle \psi  \rvert  (C^{{\boldsymbol {x}}}_{a,b})^\dagger \big((A^{{\boldsymbol {x}}}_a)^\dagger -(B^{{\boldsymbol {x}}}_a)^\dagger \big) \lvert \psi  \rangle ,  \]
+</div>
+<p> and apply <a href="sec-prelims.html#eq:closeness3" class="eqref">4</a> to the adjoint families. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="prop:easy-approx-from-approx-delta">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">3.22</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:easy-approx-from-approx-delta">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000065"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.8</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.easyApproxFromApproxDelta" class="lean_decl">MIPStarRE.LDT.Preliminaries.easyApproxFromApproxDelta</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>   Let \(A = \{ A^x_a\} \), \(B = \{ B^x_a\} \), and \(C = \{ C^x_a\} \) be submeasurements such that \(A^x_a \approx _{\delta } B^x_a\). Then </p>
+<div class="displaymath" id="a0000000066">
+  \begin{equation*}  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{{\boldsymbol {x}}}_a C^{{\boldsymbol {x}}}_a \lvert \psi  \rangle  \approx _{\sqrt{\delta }} \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  B^{{\boldsymbol {x}}}_a C^{{\boldsymbol {x}}}_a \lvert \psi  \rangle . \end{equation*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000065">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>The difference has magnitude </p>
+<div class="displaymath" id="a0000000067">
+  \[  \Big| \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a) C^{{\boldsymbol {x}}}_a \lvert \psi  \rangle \Big|.  \]
+</div>
+<p> By Cauchy–Schwarz this is at most </p>
+<div class="displaymath" id="a0000000068">
+  \[  \Big(\mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a)^2 \lvert \psi  \rangle \Big)^{1/2} \Big(\mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (C^{{\boldsymbol {x}}}_a)^2 \lvert \psi  \rangle \Big)^{1/2}.  \]
+</div>
+<p> The first factor is at most \(\sqrt{\delta }\) by hypothesis, and the second is at most \(1\) because \(C\) is a submeasurement. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="prop:cab-approx-delta">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">3.23</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:cab-approx-delta">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000069"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.cabApproxDelta" class="lean_decl">MIPStarRE.LDT.Preliminaries.cabApproxDelta</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>   Let \(\{ A^x_a\} \), \(\{ B^x_a\} \), and \(\{ C^x_{a,b}\} \) be matrices. Suppose that \(A^{x}_a \approx _\delta B^{x}_a\) and that for all \(x\) and \(a\), </p>
+<div class="displaymath" id="a0000000070">
+  \[  \sum _b (C^{x}_{a,b})^\dagger (C^{x}_{a,b}) \leq I.  \]
+</div>
+<p> Then </p>
+<div class="displaymath" id="a0000000071">
+  \[  C^{x}_{a,b} A^x_{a} \approx _{\delta } C^{x}_{a,b} B^{x}_a.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000069">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>The error term is </p>
+<div class="displaymath" id="a0000000072">
+  \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _{a,b} \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a)^\dagger (C^{{\boldsymbol {x}}}_{a,b})^\dagger C^{{\boldsymbol {x}}}_{a,b} (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a) \lvert \psi  \rangle .  \]
+</div>
+<p> Using \(\sum _b (C^{x}_{a,b})^\dagger (C^{x}_{a,b}) \le I\), this is bounded by </p>
+<div class="displaymath" id="a0000000073">
+  \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a)^\dagger (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a) \lvert \psi  \rangle  \le \delta .  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:triangle-inequality-for-vectors-squared">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.24</span>
+    <span class="lemma_thmtitle">Triangle inequality for vectors squared</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000074"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.triangleInequalityForVectorsSquared" class="lean_decl">MIPStarRE.LDT.Preliminaries.triangleInequalityForVectorsSquared</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  For vectors \(\lvert \psi _1 \rangle ,\dots ,\lvert \psi _k \rangle \), </p>
+<div class="displaymath" id="a0000000075">
+  \[  \bigl\lVert \lvert \psi _1 \rangle +\cdots +\lvert \psi _k \rangle  \bigr\rVert ^2 \le k(\lVert \lvert \psi _1 \rangle \rVert ^2+\cdots +\lVert \lvert \psi _k \rangle \rVert ^2).  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000074">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>First, </p>
+<div class="equation" id="eq:prop-for-real-numbers">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:prop-for-real-numbers} (x_1+\cdots +x_k)^2 \le k(x_1^2+\cdots +x_k^2) \end{equation}
+  </div>
+  <span class="equation_label">6</span>
+</p>
+</div>
+<p> for all real numbers \(x_1,\dots ,x_k\). Apply <a href="sec-prelims.html#eq:prop-for-real-numbers" class="eqref">6</a> to \(x_i=\lVert \lvert \psi _i \rangle \rVert \) and combine it with the triangle inequality. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:triangle-inequality-for-approx_delta">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.25</span>
+    <span class="lemma_thmtitle">Triangle inequality for \(\approx _\delta \)</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000076"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">Lemma 3.24</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.sddOpRel_chain" class="lean_decl">MIPStarRE.LDT.Preliminaries.sddOpRel_chain</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Suppose \((A_i)_a^x \approx _{\delta _i} (A_{i+1})_a^x\) for \(i=1,\dots ,k\). Then </p>
+<div class="displaymath" id="a0000000077">
+  \[  (A_1)_a^x \approx _{k(\delta _1+\cdots +\delta _k)} (A_{k+1})_a^x.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000076">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Expand \((A_1-A_{k+1})\lvert \psi  \rangle \) as a telescoping sum and apply Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">3.24</a>. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:simeq-triangle-inequality">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.26</span>
+    <span class="lemma_thmtitle">Triangle inequality for \(\simeq _\delta \)</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:simeq-triangle-inequality">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000078"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#prop:simeq-to-approx">Lemma 3.19</a></li>
+          
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.25</a></li>
+          
+          <li><a href="sec-prelims.html#prop:triangle-sub">Lemma 3.18</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.simeqTriangleInequality" class="lean_decl">MIPStarRE.LDT.Preliminaries.simeqTriangleInequality</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Suppose \(A_a^x \otimes I \simeq _\varepsilon I \otimes B_a^x\), \(C_a^x \otimes I \simeq _\delta I \otimes B_a^x\), and \(C_a^x \otimes I \simeq _\gamma I \otimes D_a^x\), where all four families are measurements. Then </p>
+<div class="displaymath" id="a0000000079">
+  \[  A_a^x \otimes I \simeq _{\varepsilon + 2\sqrt{\delta +\gamma }} I \otimes D_a^x.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000078">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Convert the two consistencies involving \(C\) to state-dependent distance, compose them by the triangle inequality, and transfer the result back to consistency by Lemma&#160;<a href="sec-prelims.html#prop:triangle-sub">3.18</a>. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:simeq-data-processing">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.27</span>
+    <span class="lemma_thmtitle">Data processing for consistency</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:simeq-data-processing">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000080"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:post-processing">Definition 3.10</a></li>
+          
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.14</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.simeqDataProcessing" class="lean_decl">MIPStarRE.LDT.Preliminaries.simeqDataProcessing</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   If \(A=\{ A_a^x\} \) and \(B=\{ B_a^x\} \) are measurements such that \(A_a^x \otimes I \simeq _\delta I \otimes B_a^x\), and \(f\) is a map on the answer set, then </p>
+<div class="displaymath" id="a0000000081">
+  \[  A_{[f(a)=b]}^x \otimes I \simeq _\delta I \otimes B_{[f(a)=b]}^x.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000080">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Merging outcome classes can only decrease the off-diagonal mass. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:cons-sub-meas">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.28</span>
+    <span class="lemma_thmtitle">Consistency controls a submeasurement</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:cons-sub-meas">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000082"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.14</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.25</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.consSubMeas" class="lean_decl">MIPStarRE.LDT.Preliminaries.consSubMeas</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(A=\{ A_a^x\} \) be a submeasurement and \(B=\{ B_a^x\} \) a measurement such that \(A_a^x \otimes I \simeq _\gamma I \otimes B_a^x\). Then </p>
+<div class="equation" id="eq:closeness5">
+<p>
+  <div class="equation_content">
+    \begin{equation}  A_a^x \otimes I \approx _\gamma A_a^x \otimes B_a^x \approx _\gamma A^x \otimes B_a^x, \label{eq:closeness5} \end{equation}
+  </div>
+  <span class="equation_label">7</span>
+</p>
+</div>
+<p> where \(A^x=\sum _a A_a^x\). In particular, </p>
+<div class="displaymath" id="a0000000083">
+  \[  A_a^x \otimes I \approx _{4\gamma } A^x \otimes B_a^x.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000082">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>For the first approximation in <a href="sec-prelims.html#eq:closeness5" class="eqref">7</a>, bound </p>
+<div class="displaymath" id="a0000000084">
+  \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  \bigl(A^{{\boldsymbol {x}}}_a \otimes (I-B^{{\boldsymbol {x}}}_a)\bigr)^2 \lvert \psi  \rangle   \]
+</div>
+<p> by the inconsistency between \(A\) and \(B\). The second approximation is identical, applied to </p>
+<div class="displaymath" id="a0000000085">
+  \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  \bigl((A^{\boldsymbol {x}}-A^{\boldsymbol {x}}_a)\otimes B^{\boldsymbol {x}}_a\bigr)^2 \lvert \psi  \rangle .  \]
+</div>
+<p> Then compose the two bounds with Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.25</a>. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:switch-sandwich">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.29</span>
+    <span class="lemma_thmtitle">Switch-sandwich</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:switch-sandwich">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000086"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.switchSandwich" class="lean_decl">MIPStarRE.LDT.Preliminaries.switchSandwich</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Suppose \(A=\{ A_a^x\} \) is a projective submeasurement satisfying </p>
+<div class="equation" id="eq:Aapproxd">
+<p>
+  <div class="equation_content">
+    \begin{equation}  A_a^x \otimes I \approx _\delta I \otimes A_a^x. \label{eq:Aapproxd} \end{equation}
+  </div>
+  <span class="equation_label">8</span>
+</p>
+</div>
+<p> Then for every operator \(B\) with \(0 \le B \le I\), </p>
+<div class="equation" id="eq:switch-sandwich">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \mathbb {E}_x \sum _a \langle \psi  \rvert  A_a^x B A_a^x \otimes I \lvert \psi  \rangle  \approx _{2\sqrt\delta } \mathbb {E}_x \sum _a \langle \psi  \rvert  B \otimes A_a^x \lvert \psi  \rangle  \approx _{\sqrt\delta } \mathbb {E}_x \sum _a \langle \psi  \rvert  BA_a^x \otimes I \lvert \psi  \rangle . \label{eq:switch-sandwich} \end{equation}
+  </div>
+  <span class="equation_label">9</span>
+</p>
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000086">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>We prove the first approximation in <a href="sec-prelims.html#eq:switch-sandwich" class="eqref">9</a> in two steps. First, </p>
+<div class="equation" id="eq:shift-right-A">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{{\boldsymbol {x}}}_a B A^{{\boldsymbol {x}}}_a \otimes I \lvert \psi  \rangle  \approx _{\sqrt{\delta }} \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{{\boldsymbol {x}}}_a B \otimes A^{{\boldsymbol {x}}}_a \lvert \psi  \rangle . \label{eq:shift-right-A} \end{equation}
+  </div>
+  <span class="equation_label">10</span>
+</p>
+</div>
+<p> This is obtained by applying Cauchy–Schwarz to the difference and using \(B^2 \le B \le I\) together with <a href="sec-prelims.html#eq:Aapproxd" class="eqref">8</a>. For the second step, move the remaining left copy of \(A^{\boldsymbol {x}}_a\) across the bipartition in the same way; projectivity then collapses the sandwich and yields the first approximation in <a href="sec-prelims.html#eq:switch-sandwich" class="eqref">9</a>. The second approximation in <a href="sec-prelims.html#eq:switch-sandwich" class="eqref">9</a> is the same argument with the rightmost factor \(A_a^{\boldsymbol {x}}\) omitted. </p>
+
+  </div>
+</div>
+<h1 id="a0000000012">3.4 Strong self-consistency</h1>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:completeness-transfer-projective-P">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.30</span>
+    <span class="lemma_thmtitle">Completeness transfer to a projective approximation</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:completeness-transfer-projective-P">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000087"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.22</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.completenessTransferProjectiveP" class="lean_decl">MIPStarRE.LDT.Preliminaries.completenessTransferProjectiveP</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(A=\{ A_a^x\} \) be a submeasurement and \(P=\{ P_a^x\} \) a projective submeasurement such that \(A_a^x \otimes I \approx _\varepsilon P_a^x \otimes I\). Then </p>
+<div class="displaymath" id="a0000000088">
+  \[  \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  \ge \langle \psi  \rvert  P \otimes I \lvert \psi  \rangle  - 2\sqrt\varepsilon .  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000087">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Since \(P\) is projective, </p>
+<div class="displaymath" id="a0000000089">
+  \[  \langle \psi  \rvert  P \otimes I \lvert \psi  \rangle  = \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (P^{{\boldsymbol {x}}}_a)^2 \otimes I \lvert \psi  \rangle .  \]
+</div>
+<p> Apply Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.22</a> twice to replace \((P^{\boldsymbol {x}}_a)^2\) first by \(A^{\boldsymbol {x}}_aP^{\boldsymbol {x}}_a\) and then by \((A^{\boldsymbol {x}}_a)^2\), and conclude with \((A_a^{\boldsymbol {x}})^2 \le A_a^{\boldsymbol {x}}\). </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:strong-self-consistency">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">3.31</span>
+    <span class="definition_thmtitle">Strong self-consistency</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#def:strong-self-consistency">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SSCRel" class="lean_decl">MIPStarRE.LDT.SSCRel</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.BipartiteSSCRel" class="lean_decl">MIPStarRE.LDT.BipartiteSSCRel</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>  Let \(\lvert \psi  \rangle \) be permutation-invariant and let \(A=\{ A_a^x\} \) be a submeasurement. We say that \(A\) is \(\delta \)-strongly self-consistent when </p>
+<div class="displaymath" id="a0000000090">
+  \[  \mathbb {E}_x \sum _a \langle \psi  \rvert  A_a^x \otimes A_a^x \lvert \psi  \rangle  \ge \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \delta .  \]
+</div>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:other-two-notions-of-self-consistency">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.32</span>
+    <span class="lemma_thmtitle">Strong self-consistency implies ordinary self-consistency</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:other-two-notions-of-self-consistency">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000091"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.31</a></li>
+          
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.14</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.otherTwoNotionsOfSelfConsistency" class="lean_decl">MIPStarRE.LDT.Preliminaries.otherTwoNotionsOfSelfConsistency</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   If \(A\) is \(\delta \)-strongly self-consistent, then \(A_a^x \otimes I \simeq _\delta I \otimes A_a^x\). If \(A\) is a measurement, the converse also holds. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000091">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Rewrite the off-diagonal mass as the difference between the total mass of \(A\) and the diagonal overlap in the strong self-consistency inequality. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:two-notions-of-self-consistency">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.33</span>
+    <span class="lemma_thmtitle">Strong self-consistency and state-dependent distance</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:two-notions-of-self-consistency">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000092"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.31</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.twoNotionsOfSelfConsistency" class="lean_decl">MIPStarRE.LDT.Preliminaries.twoNotionsOfSelfConsistency</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   If \(A\) is \(\delta \)-strongly self-consistent, then </p>
+<div class="displaymath" id="a0000000093">
+  \[  A_a^x \otimes I \approx _{2\delta } I \otimes A_a^x.  \]
+</div>
+<p> If \(A\) is projective, the converse also holds. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000092">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Expanding the squared norm gives </p>
+<div class="displaymath" id="a0000000094">
+  \begin{align} &  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \lVert (A^{{\boldsymbol {x}}}_a \otimes I - I \otimes A^{{\boldsymbol {x}}}_a)\lvert \psi  \rangle \rVert ^2 \nonumber \\ =~  &  2\cdot \Big( \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a)^2 \otimes I \lvert \psi  \rangle  - \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{{\boldsymbol {x}}}_a \otimes A^{{\boldsymbol {x}}}_a \lvert \psi  \rangle \Big) \nonumber \\ \leq ~  &  2\cdot \Big( \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{{\boldsymbol {x}}}_a \otimes I \lvert \psi  \rangle  - \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{{\boldsymbol {x}}}_a \otimes A^{{\boldsymbol {x}}}_a \lvert \psi  \rangle \Big). \label{eq:here's-where-projectivity-would-help} \end{align}
+</div>
+<p> The strong self-consistency bound controls the last line by \(2\delta \). If \(A\) is projective, then <a href="sec-prelims.html#eq:here's-where-projectivity-would-help" class="eqref">11</a> is an equality, which gives the converse. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:two-notions-of-self-consistency-after-evaluation">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.34</span>
+    <span class="lemma_thmtitle">Post-processing preserves strong self-consistency</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:two-notions-of-self-consistency-after-evaluation">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000095"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:post-processing">Definition 3.10</a></li>
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.31</a></li>
+          
+          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency">Lemma 3.33</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.twoNotionsOfSelfConsistencyAfterEvaluation" class="lean_decl">MIPStarRE.LDT.Preliminaries.twoNotionsOfSelfConsistencyAfterEvaluation</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   If \(A\) is \(\delta \)-strongly self-consistent and \(f\) is a function on its answer set, then </p>
+<div class="displaymath" id="a0000000096">
+  \[  A_{[f(a)=b]}^x \otimes I \approx _{2\delta } I \otimes A_{[f(a)=b]}^x.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000095">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>The same computation as in Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.33</a> gives </p>
+<div class="displaymath" id="a0000000097">
+  \begin{align} &  \mathbb {E}_{{\boldsymbol {x}}} \sum _b \lVert (A^{{\boldsymbol {x}}}_{[f(a)=b]} \otimes I - I \otimes A^{{\boldsymbol {x}}}_{[f(a)=b]}) \lvert \psi  \rangle \rVert ^2 \nonumber \\ \leq ~  &  2\cdot \Big( \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \mathbb {E}_{{\boldsymbol {x}}} \sum _b \langle \psi  \rvert  A^{{\boldsymbol {x}}}_{[f(a)=b]} \otimes A^{{\boldsymbol {x}}}_{[f(a)=b]} \lvert \psi  \rangle \Big). \label{eq:finishing-this-up} \end{align}
+</div>
+<p> The post-processed diagonal term dominates \(\mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{\boldsymbol {x}}_a \otimes A^{\boldsymbol {x}}_a \lvert \psi  \rangle \), so strong self-consistency bounds <a href="sec-prelims.html#eq:finishing-this-up" class="eqref">12</a> by \(2\delta \). </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:completeness-transfer-self-consistent-A">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.35</span>
+    <span class="lemma_thmtitle">Completeness transfer for a strongly self-consistent approximation</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:completeness-transfer-self-consistent-A">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000098"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.31</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.22</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.completenessTransferSelfConsistentA" class="lean_decl">MIPStarRE.LDT.Preliminaries.completenessTransferSelfConsistentA</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(A\) be a \(\delta \)-strongly self-consistent submeasurement and let \(B\) be a submeasurement such that \(A_a^x \otimes I \approx _\varepsilon B_a^x \otimes I\). Then </p>
+<div class="displaymath" id="a0000000099">
+  \[  \langle \psi  \rvert  B \otimes I \lvert \psi  \rangle  \ge \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \delta - 2\sqrt\varepsilon .  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000098">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Bound \(\langle \psi  \rvert  B \otimes I \lvert \psi  \rangle \) from below by \(\mathbb {E}_{{\boldsymbol {x}}}\sum _a \langle \psi  \rvert  B^{\boldsymbol {x}}_a \otimes B^{\boldsymbol {x}}_a \lvert \psi  \rangle \). Then apply Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.22</a> twice to replace this by \(\mathbb {E}_{{\boldsymbol {x}}}\sum _a \langle \psi  \rvert  A^{\boldsymbol {x}}_a \otimes A^{\boldsymbol {x}}_a \lvert \psi  \rangle \), and finish with strong self-consistency of \(A\). </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:self-consistency-implies-data-processing">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.36</span>
+    <span class="lemma_thmtitle">Self-consistency implies data-processing closeness</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:self-consistency-implies-data-processing">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000100"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:post-processing">Definition 3.10</a></li>
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.31</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency-after-evaluation">Lemma 3.34</a></li>
+          
+          <li><a href="sec-prelims.html#prop:completeness-transfer-projective-P">Lemma 3.30</a></li>
+          
+          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.22</a></li>
+          
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.25</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.selfConsistencyImpliesDataProcessing" class="lean_decl">MIPStarRE.LDT.Preliminaries.selfConsistencyImpliesDataProcessing</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(A\) be a \(\delta \)-strongly self-consistent submeasurement and let \(P\) be a projective submeasurement such that \(P_a^x \otimes I \approx _\varepsilon A_a^x \otimes I\). Then for every function \(f\), </p>
+<div class="displaymath" id="a0000000101">
+  \[  P_{[f(a)=b]}^x \otimes I \approx _{8\delta + 8\sqrt\varepsilon } A_{[f(a)=b]}^x \otimes I.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000100">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>First prove </p>
+<div class="equation" id="eq:what-we-want-to-prove-but-on-wrong-side">
+<p>
+  <div class="equation_content">
+    \begin{equation}  P^x_{[f(a)=b]} \otimes I \approx _{2\delta + 4\sqrt{\varepsilon }} I \otimes A_{[f(a)=b]}^x. \label{eq:what-we-want-to-prove-but-on-wrong-side} \end{equation}
+  </div>
+  <span class="equation_label">13</span>
+</p>
+</div>
+<p> Expanding the squared norm and using projectivity gives </p>
+<div class="displaymath" id="a0000000102">
+  \begin{align} &  \mathbb {E}_{{\boldsymbol {x}}} \sum _b \lVert (P^{{\boldsymbol {x}}}_{[f(a)=b]} \otimes I - I \otimes A_{[f(a)=b]}^{{\boldsymbol {x}}}) \lvert \psi  \rangle  \rVert ^2 \nonumber \\ \leq ~  &  \langle \psi  \rvert  P \otimes I \lvert \psi  \rangle  + \langle \psi  \rvert  I \otimes A \lvert \psi  \rangle  - 2\cdot \mathbb {E}_{{\boldsymbol {x}}} \sum _b \langle \psi  \rvert  P^{{\boldsymbol {x}}}_{[f(a)=b]} \otimes A^{{\boldsymbol {x}}}_{[f(a)=b]} \lvert \psi  \rangle . \label{eq:gonna-handle-third-term} \end{align}
+</div>
+<p> Proposition&#160;<a href="sec-prelims.html#prop:completeness-transfer-projective-P">3.30</a> bounds the first term by \(\langle \psi  \rvert  A \otimes I \lvert \psi  \rangle +2\sqrt{\varepsilon }\), and Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.22</a> together with strong self-consistency bounds the third term below by \(\langle \psi  \rvert  A \otimes I \lvert \psi  \rangle -\delta -\sqrt{\varepsilon }\). Substituting into <a href="sec-prelims.html#eq:gonna-handle-third-term" class="eqref">14</a> yields <a href="sec-prelims.html#eq:what-we-want-to-prove-but-on-wrong-side" class="eqref">13</a>. Now combine <a href="sec-prelims.html#eq:what-we-want-to-prove-but-on-wrong-side" class="eqref">13</a> with </p>
+<div class="displaymath" id="a0000000103">
+  \[  A^x_{[f(a)=b]} \otimes I \approx _{2\delta } I \otimes A^x_{[f(a)=b]}  \]
+</div>
+<p> from Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency-after-evaluation">3.34</a>, and conclude by Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.25</a>. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:self-consistency-same-side-square">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.37</span>
+    <span class="lemma_thmtitle">Self-consistency moves one copy to the same side</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#lem:self-consistency-same-side-square">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000104"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.31</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass" class="lean_decl">MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(A=\{ A_a\} \) be a \(\zeta \)-strongly self-consistent submeasurement. Then </p>
+<div class="displaymath" id="a0000000105">
+  \[  \sum _a \langle \psi  \rvert  A_a^2 \otimes I \lvert \psi  \rangle  \ge \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  - \zeta .  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000104">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Apply Cauchy–Schwarz to the two-sided overlap \(\sum _a \langle \psi  \rvert  A_a \otimes A_a \lvert \psi  \rangle \) and compare it with the strong self-consistency lower bound. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:completion-missing-mass-bound">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.38</span>
+    <span class="lemma_thmtitle">Bounding the missing mass of a close submeasurement</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#lem:completion-missing-mass-bound">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000106"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.31</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#lem:self-consistency-same-side-square">Lemma 3.37</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.completionMissingMassBound" class="lean_decl">MIPStarRE.LDT.Preliminaries.completionMissingMassBound</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(A=\{ A_a\} \) be a measurement that is \(\zeta \)-strongly self-consistent, and let \(B=\{ B_a\} \) be a submeasurement such that \(A_a \otimes I \approx _\delta B_a \otimes I\). Writing \(B=\sum _a B_a\), one has </p>
+<div class="displaymath" id="a0000000107">
+  \[  \lVert (I-B) \otimes I\lvert \psi  \rangle  \rVert ^2 \le 2\sqrt\delta + \zeta .  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000106">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Since \(0 \le I-B \le I\), the left-hand side is at most \(1-\langle \psi  \rvert  B \otimes I \lvert \psi  \rangle \). Compare \(\sum _a \langle \psi  \rvert  B_a^2 \otimes I \lvert \psi  \rangle \) with \(\sum _a \langle \psi  \rvert  A_a B_a \otimes I \lvert \psi  \rangle \) and then with \(\sum _a \langle \psi  \rvert  A_a^2 \otimes I \lvert \psi  \rangle \) using the \(\approx _\delta \) hypothesis, and finish with Lemma&#160;<a href="sec-prelims.html#lem:self-consistency-same-side-square">3.37</a>. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="prop:completing-to-measurement">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.39</span>
+    <span class="lemma_thmtitle">Completing a close submeasurement to a full measurement</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:completing-to-measurement">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:measurement-completion">Definition 3.13</a></li>
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.31</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">Lemma 3.24</a></li>
+          
+          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.22</a></li>
+          
+          <li><a href="sec-prelims.html#prop:cool-prop">Theorem 3.40</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.completingToMeasurement" class="lean_decl">MIPStarRE.LDT.Preliminaries.completingToMeasurement</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(A=\{ A_a\} \) be a measurement that is \(\zeta \)-strongly self-consistent, let \(B=\{ B_a\} \) be a submeasurement such that \(A_a \otimes I \approx _\delta B_a \otimes I\), and let \(C\) be the measurement obtained by adding the missing mass \(I-B\) to one distinguished answer \(a^*\). Then </p>
+<div class="displaymath" id="a0000000108">
+  \[  A_a \otimes I \approx _{2\delta + 4\sqrt\delta + 2\zeta } C_a \otimes I.  \]
+</div>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="prop:cool-prop">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">3.40</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#prop:cool-prop">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000109"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#lem:self-consistency-same-side-square">Lemma 3.37</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass" class="lean_decl">MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>   This is the same statement as Lemma&#160;<a href="sec-prelims.html#lem:self-consistency-same-side-square">3.37</a>: for a \(\zeta \)-strongly self-consistent submeasurement \(A\), </p>
+<div class="displaymath" id="a0000000110">
+  \[  \sum _a \langle \psi  \rvert  (A_a)^2 \otimes I \lvert \psi  \rangle  \geq \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  -\zeta .  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000111">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> Immediate from Lemma&#160;<a href="sec-prelims.html#lem:self-consistency-same-side-square">3.37</a>. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000109">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof of <a href="sec-prelims.html#prop:completing-to-measurement">3.39</a>
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> By Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">3.24</a>, </p>
+<div class="displaymath" id="a0000000112">
+  \[  \sum _a \lVert (A_a-C_a)\otimes I \lvert \psi  \rangle  \rVert ^2 \leq 2\delta + 2 \cdot \lVert (I-B)\otimes I \lvert \psi  \rangle \rVert ^2.  \]
+</div>
+<p> It remains to bound the residual term. Since \(0 \le I-B \le I\), </p>
+<div class="displaymath" id="eq:to-return-later-whatevs">
+  \begin{align}  \lVert (I-B) \otimes I \lvert \psi  \rangle \rVert ^2 &  \leq 1 -\sum _a \langle \psi  \rvert  B_a^2 \otimes I \lvert \psi  \rangle . \label{eq:to-return-later-whatevs} \end{align}
+</div>
+<p> By Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.22</a>, </p>
+<div class="displaymath" id="a0000000113">
+  \[  \sum _a \langle \psi  \rvert  B_a^2 \otimes I \lvert \psi  \rangle  \approx _{\sqrt{\delta }} \sum _a \langle \psi  \rvert  (A_a B_a)\otimes I \lvert \psi  \rangle  \approx _{\sqrt{\delta }} \sum _a \langle \psi  \rvert  A_a^2\otimes I \lvert \psi  \rangle .  \]
+</div>
+<p> Proposition&#160;<a href="sec-prelims.html#prop:cool-prop">3.40</a> gives </p>
+<div class="displaymath" id="a0000000114">
+  \[  \sum _a \langle \psi  \rvert  A_a^2\otimes I \lvert \psi  \rangle  \geq \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \zeta = 1-\zeta .  \]
+</div>
+<p> Hence <a href="sec-prelims.html#eq:to-return-later-whatevs" class="eqref">15</a> implies </p>
+<div class="displaymath" id="a0000000115">
+  \[  \lVert (I-B) \otimes I \lvert \psi  \rangle \rVert ^2 \le 2\sqrt\delta + \zeta .  \]
+</div>
+<p> Substituting this into the first bound proves the claim. </p>
+
+  </div>
+</div>
+
+</div> <!--main-text -->
+</div> <!-- content-wrapper -->
+</div> <!-- content -->
+</div> <!-- wrapper -->
+
+<nav class="prev_up_next">
+  <svg  id="showmore-minus" class="icon icon-eye-minus showmore"><use xlink:href="symbol-defs.svg#icon-eye-minus"></use></svg>
+
+  <svg  id="showmore-plus" class="icon icon-eye-plus showmore"><use xlink:href="symbol-defs.svg#icon-eye-plus"></use></svg>
+
+  <a href="sec-the-test.html" title="The low individual degree test"><svg  class="icon icon-arrow-left "><use xlink:href="symbol-defs.svg#icon-arrow-left"></use></svg>
+</a>
+  <a href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test"><svg  class="icon icon-arrow-up "><use xlink:href="symbol-defs.svg#icon-arrow-up"></use></svg>
+</a>
+  <a href="chap-projective.html" title="Making measurements projective"><svg  class="icon icon-arrow-right "><use xlink:href="symbol-defs.svg#icon-arrow-right"></use></svg>
+</a>
+</nav>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/plastex.js"></script>
+<script type="text/javascript" src="js/svgxuse.js"></script>
+<script type="text/javascript" src="js/js.cookie.min.js"></script>
+<script type="text/javascript" src="js/showmore.js"></script>
+</body>
+</html>

@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  MathJax = { 
+    tex: {
+		    inlineMath: [['$','$'], ['\\(','\\)']]
+	} }
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<meta name="generator" content="plasTeX" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Commutativity</title>
+<link rel="next" href="sec-ld-pasting.html" title="Pasting" />
+<link rel="prev" href="chap-self-improvement.html" title="Self-improvement" />
+<link rel="up" href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test" />
+<link rel="stylesheet" href="styles/theme-white.css" />
+<link rel="stylesheet" href="styles/amsthm.css" />
+<link rel="stylesheet" href="styles/showmore.css" />
+<link rel="stylesheet" href="styles/blueprint.css" />
+<link rel="stylesheet" href="styles/extra_styles.css" />
+</head>
+
+<body>
+<header>
+<svg  id="toc-toggle" class="icon icon-list-numbered "><use xlink:href="symbol-defs.svg#icon-list-numbered"></use></svg>
+<h1 id="doc_title"><a href="index.html">Blueprint for arXiv:2009.12982<br /><i class="itshape">Quantum Soundness of the Classical Low Individual Degree Test</i></a></h1>
+</header>
+
+<div class="wrapper">
+<nav class="toc">
+<ul class="sub-toc-0">
+<li class="">
+  <a href="chap-overview.html"><span class="toc_ref">1</span> <span class="toc_entry">Overview</span></a>
+ </li>
+<li class="">
+  <a href="sec-the-test.html"><span class="toc_ref">2</span> <span class="toc_entry">The low individual degree test</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-the-test.html#a0000000009"><span class="toc_ref">2.1</span> <span class="toc_entry">The game and its strategies</span></a>
+ </li>
+<li class="">
+  <a href="sec-the-test.html#a0000000010"><span class="toc_ref">2.2</span> <span class="toc_entry">Formal soundness target</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-prelims.html"><span class="toc_ref">3</span> <span class="toc_entry">Preliminaries</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-prelims.html#a0000000011"><span class="toc_ref">3.1</span> <span class="toc_entry">Polynomials and measurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#sec:comparing-measurements"><span class="toc_ref">3.2</span> <span class="toc_entry">Consistency and state-dependent distance</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#sec:consistency-from-state-dependent-distance"><span class="toc_ref">3.3</span> <span class="toc_entry">Consistency from state-dependent distance</span></a>
+ </li>
+<li class="">
+  <a href="sec-prelims.html#a0000000012"><span class="toc_ref">3.4</span> <span class="toc_entry">Strong self-consistency</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-projective.html"><span class="toc_ref">4</span> <span class="toc_entry">Making measurements projective</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-projective.html#sec:naimark"><span class="toc_ref">4.0.1</span> <span class="toc_entry">Naimark dilation</span></a>
+ </li>
+<li class="">
+  <a href="chap-projective.html#sec:orthogonalization"><span class="toc_ref">4.0.2</span> <span class="toc_entry">Orthogonalization lemma</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-expansion.html"><span class="toc_ref">5</span> <span class="toc_entry">Expansion in the hypercube graph</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-expansion.html#a0000000013"><span class="toc_ref">5.1</span> <span class="toc_entry">The graph and its spectrum</span></a>
+ </li>
+<li class="">
+  <a href="sec-expansion.html#a0000000014"><span class="toc_ref">5.2</span> <span class="toc_entry">Local and global variance</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-variance.html"><span class="toc_ref">6</span> <span class="toc_entry">Global variance of the points measurements</span></a>
+ </li>
+<li class="">
+  <a href="chap-self-improvement.html"><span class="toc_ref">7</span> <span class="toc_entry">Self-improvement</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-self-improvement.html#sec:self-improvement"><span class="toc_ref">7.1</span> <span class="toc_entry">Non-projective Output</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="chap-self-improvement.html#a0000000015"><span class="toc_ref">7.1.1</span> <span class="toc_entry">A Semidefinite Program</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-self-improvement.html#sec:self-improvement-projective"><span class="toc_ref">7.2</span> <span class="toc_entry">Projective Output</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class=" active current">
+  <a href="sec-g-comm.html"><span class="toc_ref">8</span> <span class="toc_entry">Commutativity</span></a>
+  <span class="expand-toc">▼</span>
+  <ul class="sub-toc-1 active">
+     <li class="">
+  <a href="sec-g-comm.html#sec:commutativity-points"><span class="toc_ref">8.1</span> <span class="toc_entry">Commutativity of the point measurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html#sec:G-commutes-after-evaluation"><span class="toc_ref">8.2</span> <span class="toc_entry">Commutativity of&#160;\(G\) after evaluation</span></a>
+ </li>
+<li class="">
+  <a href="sec-g-comm.html#sec:G-commutes"><span class="toc_ref">8.3</span> <span class="toc_entry">Commutativity of&#160;\(G\)</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html"><span class="toc_ref">9</span> <span class="toc_entry">Pasting</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-ld-pasting.html#a0000000016"><span class="toc_ref">9.0.1</span> <span class="toc_entry">From Measurements to Submeasurements</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#a0000000017"><span class="toc_ref">9.0.2</span> <span class="toc_entry">The Pasted Submeasurement</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-ld-pasting.html#sec:construction-numba-one"><span class="toc_ref"></span> <span class="toc_entry">The First Construction</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:construction-numba-two"><span class="toc_ref"></span> <span class="toc_entry">The Second Construction</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:hat-consistency"><span class="toc_ref">9.0.3</span> <span class="toc_entry">Strong Self-Consistency and Commutation of \(\widehat G\)</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-ld-pasting.html#a0000000018"><span class="toc_ref"></span> <span class="toc_entry">Commutativity of \(G_{\bot }\)</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#a0000000019"><span class="toc_ref"></span> <span class="toc_entry">Putting Everything Together</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:ld-sandwiching"><span class="toc_ref">9.0.4</span> <span class="toc_entry">Sandwiching Lemmas</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:consistency-of-h-with-a"><span class="toc_ref">9.0.5</span> <span class="toc_entry">Consistency of \(H\) with \(A\)</span></a>
+ </li>
+<li class="">
+  <a href="sec-ld-pasting.html#sec:completeness-of-h-low-degree"><span class="toc_ref">9.0.6</span> <span class="toc_entry">Completeness of \(H\)</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sec-induction.html"><span class="toc_ref">10</span> <span class="toc_entry">The main induction step</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="sec-induction.html#a0000000020"><span class="toc_ref">10.1</span> <span class="toc_entry">Restricting to one slice</span></a>
+ </li>
+<li class="">
+  <a href="sec-induction.html#a0000000021"><span class="toc_ref">10.2</span> <span class="toc_entry">The inductive construction</span></a>
+ </li>
+<li class="">
+  <a href="sec-induction.html#a0000000022"><span class="toc_ref">10.3</span> <span class="toc_entry">Proof of the main formal theorem</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sect0001.html"><span class="toc_ref">11</span> <span class="toc_entry">Bibliography</span></a>
+ </li>
+<li ><a href="dep_graph_document.html">Dependency graph</a></li>
+</ul>
+</nav>
+
+<div class="content">
+<div class="content-wrapper">
+
+
+<div class="main-text">
+<h1 id="sec:g-comm">8 Commutativity</h1>
+
+<h1 id="sec:commutativity-points">8.1 Commutativity of the point measurements</h1>
+
+<div class="theorem_thmwrapper theorem-style-plain" id="thm:commutativity-points">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">8.1</span>
+    <span class="theorem_thmtitle">Commutativity of the point measurements</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-g-comm.html#thm:commutativity-points">#</a>
+    
+    <a class="icon proof" href="sec-g-comm.html#a0000000341"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#lem:good-strategy-characterization">Lemma 3.15</a></li>
+          
+          <li><a href="sec-prelims.html#prop:simeq-to-approx">Lemma 3.19</a></li>
+          
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.25</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.CommutativityPoints.commutativityPoints" class="lean_decl">MIPStarRE.LDT.CommutativityPoints.commutativityPoints</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>   Let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m,q,d)\) low individual degree test. On average over independent and uniformly random \(u,v \sim \mathbb {F}_q^m\), </p>
+<div class="displaymath" id="a0000000342">
+  \[  (A_a^u A_b^v) \otimes I \approx _{32\gamma m} (A_b^v A_a^u) \otimes I.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000341">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> The strategy passes the diagonal lines test with probability \(1-\gamma \), so it passes the \(m\)-restricted diagonal lines test with probability \(1-\gamma m\). Hence </p>
+<div class="displaymath" id="a0000000343">
+  \[  A_a^u \otimes I \simeq _{\gamma m} I \otimes L^\ell _{[f(u)=a]}  \]
+</div>
+<p> on average over uniformly random \(u \sim \mathbb {F}_q^m\) and a uniformly random line \(\ell \) in \(\mathbb {F}_q^m\) containing \(u\). By <a href="sec-prelims.html#prop:simeq-to-approx">3.19</a>, </p>
+<div class="equation" id="eq:point-diagonal-line-approx">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:point-diagonal-line-approx} A_a^u \otimes I \approx _{2\gamma m} I \otimes L^\ell _{[f(u)=a]}. \end{equation}
+  </div>
+  <span class="equation_label">1</span>
+</p>
+</div>
+<p> Let \(u\) and \(v\) be independent uniformly random points in \(\mathbb {F}_q^m\), and let \(\ell \) be a uniformly random line containing both points. The marginal distribution on \((u,\ell )\) and on \((v,\ell )\) is the same as above, so </p>
+<div class="displaymath" id="a0000000344">
+  \begin{align*}  (A_a^u A_b^v) \otimes I &  \approx _{2\gamma m} A_a^u \otimes L^\ell _{[f(v)=b]} \tag {by \ref{eq:point-diagonal-line-approx}} \\ &  \approx _{2\gamma m} I \otimes \bigl(L^\ell _{[f(v)=b]} L^\ell _{[f(u)=a]}\bigr) \tag {by \ref{eq:point-diagonal-line-approx}} \\ &  = I \otimes \bigl(L^\ell _{[f(u)=a]} L^\ell _{[f(v)=b]}\bigr) \tag {because~ $L$ is projective} \\ &  \approx _{2\gamma m} A_b^v \otimes L^\ell _{[f(u)=a]} \tag {by \ref{eq:point-diagonal-line-approx}} \\ &  \approx _{2\gamma m} (A_b^v A_a^u) \otimes I. \tag {by \ref{eq:point-diagonal-line-approx}} \end{align*}
+</div>
+<p> The theorem follows from <a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.25</a>. </p>
+
+  </div>
+</div>
+<h1 id="sec:G-commutes-after-evaluation">8.2 Commutativity of&#160;\(G\) after evaluation</h1>
+
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:comm-data-processed-g">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">8.2</span>
+    <span class="lemma_thmtitle">Commutativity of&#160;\(G\) after evaluation</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-g-comm.html#lem:comm-data-processed-g">#</a>
+    
+    <a class="icon proof" href="sec-g-comm.html#a0000000345"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          
+          <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.9</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.31</a></li>
+          
+          <li><a href="sec-g-comm.html#clm:g-comm-stability">Lemma 8.3</a></li>
+          
+          <li><a href="sec-g-comm.html#clm:g-comm-stability2">Lemma 8.4</a></li>
+          
+          <li><a href="sec-prelims.html#prop:cons-sub-meas">Lemma 3.28</a></li>
+          
+          <li><a href="sec-prelims.html#prop:closeness-of-ip">Theorem 3.21</a></li>
+          
+          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency">Lemma 3.33</a></li>
+          
+          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency-after-evaluation">Lemma 3.34</a></li>
+          
+          <li><a href="sec-g-comm.html#thm:commutativity-points">Theorem 8.1</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Commutativity.commDataProcessedG" class="lean_decl">MIPStarRE.LDT.Commutativity.commDataProcessedG</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m+1,q,d)\) low individual degree test. Let \(\{ G^x\}  \in \mathrm{PolySub}(m,q,d)\) be a collection of projective sub-measurements indexed by \(x \in \mathbb {F}_q\) with the following properties: </p>
+<ol class="enumerate">
+  <li><p>(Consistency with&#160;\(A\)) On average over \((u,x) \sim \mathbb {F}_q^{m+1}\), </p>
+<div class="displaymath" id="a0000000346">
+  \[  A_a^{u,x} \otimes I \simeq _\zeta I \otimes G^x_{[g(u)=a]}.  \]
+</div>
+</li>
+  <li><p>(Strong self-consistency) On average over \(x \sim \mathbb {F}_q\), </p>
+<div class="displaymath" id="a0000000347">
+  \[  G_g^x \otimes I \approx _\zeta I \otimes G_g^x.  \]
+</div>
+</li>
+  <li><p>(Boundedness) There exists a positive-semidefinite matrix \(Z^x\) for each \(x \in \mathbb {F}_q\) such that </p>
+<div class="displaymath" id="a0000000348">
+  \[  \mathbb {E}_x \langle \psi  \rvert  (I-G^x) \otimes Z^x \lvert \psi  \rangle  \le \zeta  \]
+</div>
+<p> and for each \(x \in \mathbb {F}_q\) and \(g \in \mathcal{P}(m,q,d)\), </p>
+<div class="displaymath" id="a0000000349">
+  \[  Z^x \ge \left(\mathbb {E}_u A_{g(u)}^{u,x}\right).  \]
+</div>
+</li>
+</ol>
+<p> Let </p>
+<div class="displaymath" id="a0000000350">
+  \[  \nu = 48m\bigl(\gamma ^{1/2}+\zeta ^{1/2}\bigr).  \]
+</div>
+<p> Then on average over independent and uniformly random \((u,x),(v,y) \sim \mathbb {F}_q^{m+1}\), </p>
+<div class="displaymath" id="a0000000351">
+  \[  G^x_{[g(u)=a]} G^y_{[h(v)=b]} \otimes I \approx _\nu G^y_{[h(v)=b]} G^x_{[g(u)=a]} \otimes I.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000345">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> Write \(G_a^{u,x}=G^x_{[g(u)=a]}\). Expanding the commutator square gives </p>
+<div class="displaymath" id="a0000000352">
+  \begin{align} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  \bigl(G_a^{u,x} G_b^{v,y} - G_b^{v,y} G_a^{u,x}\bigr)^\dagger \bigl(G_a^{u,x} G_b^{v,y} - G_b^{v,y} G_a^{u,x}\bigr) \otimes I \lvert \psi  \rangle \nonumber \\ &  = 2 \mathbb {E}_{u,v,x,y} \sum _{a,b} \Bigl(\langle \psi  \rvert  G_b^{v,y} G_a^{u,x} G_b^{v,y} \otimes I \lvert \psi  \rangle  - \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G_a^{u,x} G_b^{v,y} \otimes I \lvert \psi  \rangle \Bigr), \label{eq:gcom8} \end{align}
+</div>
+<p> using the projectivity of&#160;\(G\). To compare the two quartic terms, first note that </p>
+<div class="equation" id="eq:sum-of-gux">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:sum-of-gux} G^{u,x} = \sum _a G_a^{u,x} = \sum _a G^x_{[g(u)=a]} = G^x. \end{equation}
+  </div>
+  <span class="equation_label">3</span>
+</p>
+</div>
+<p> By <a href="sec-g-comm.html#item:data-processed-consistency">1</a> and <a href="sec-prelims.html#prop:cons-sub-meas">3.28</a>, </p>
+<div class="displaymath" id="a0000000353">
+  \begin{align}  G_a^{u,x} \otimes I &  \approx _{4\zeta } G^{u,x} \otimes A_a^{u,x}\nonumber \\ &  = G^x \otimes A_a^{u,x}, \label{eq:add-an-a} \end{align}
+</div>
+<p> where the last equality is <a href="sec-g-comm.html#eq:sum-of-gux">3</a>. Applying <a href="sec-prelims.html#prop:closeness-of-ip">3.21</a> once to the second term in <a href="sec-g-comm.html#eq:gcom8">2</a> gives </p>
+<div class="displaymath" id="a0000000354">
+  \begin{align} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G_a^{u,x} G_b^{v,y} \otimes I \lvert \psi  \rangle \nonumber \\ \approx _{2\sqrt{\zeta }} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G_a^{u,x} G^y \otimes A_b^{v,y} \lvert \psi  \rangle . \label{eq:apply-add-an-a-once} \end{align}
+</div>
+<p> The first boundedness-driven stability step is </p>
+<div class="equation" id="eq:gcom9">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \eqref{eq:apply-add-an-a-once} \approx _{\sqrt{\zeta }} \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G_a^{u,x} \otimes A_b^{v,y} \lvert \psi  \rangle , \label{eq:gcom9} \end{equation}
+  </div>
+  <span class="equation_label">6</span>
+</p>
+</div>
+<p> which is <a href="sec-g-comm.html#clm:g-comm-stability">8.3</a>. Applying <a href="sec-g-comm.html#eq:add-an-a">4</a> once more and then <a href="sec-g-comm.html#thm:commutativity-points">8.1</a>, we obtain </p>
+<div class="displaymath" id="a0000000355">
+  \begin{align}  \eqref{eq:gcom9} &  \approx _{2\sqrt{\zeta }} \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G^x \otimes A_a^{u,x} A_b^{v,y} \lvert \psi  \rangle \nonumber \\ &  \approx _{6\sqrt{\gamma (m+1)}} \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G^x \otimes A_b^{v,y} A_a^{u,x} \lvert \psi  \rangle . \label{eq:dunno-what-i-should-call-this} \end{align}
+</div>
+<p> The second boundedness-driven stability step is </p>
+<div class="equation" id="eq:gcom10">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \eqref{eq:dunno-what-i-should-call-this} \approx _{\sqrt{\zeta }+6\sqrt{\gamma (m+1)}} \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} \otimes A_a^{u,x} A_b^{v,y} \lvert \psi  \rangle , \label{eq:gcom10} \end{equation}
+  </div>
+  <span class="equation_label">8</span>
+</p>
+</div>
+<p> which is <a href="sec-g-comm.html#clm:g-comm-stability2">8.4</a>. Using <a href="sec-g-comm.html#eq:add-an-a">4</a> twice more and <a href="sec-prelims.html#prop:closeness-of-ip">3.21</a>, </p>
+<div class="displaymath" id="a0000000356">
+  \begin{align}  \eqref{eq:gcom10} &  \approx _{2\sqrt{\zeta }} \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} \otimes A_b^{v,y} \lvert \psi  \rangle \nonumber \\ &  \approx _{2\sqrt{\zeta }} \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G_b^{v,y} \otimes I \lvert \psi  \rangle . \label{eq:gonna-cite-this-in-just-a-bit} \end{align}
+</div>
+<p> Next, <a href="sec-g-comm.html#item:data-processed-self-consistency">2</a> and the projectivity of&#160;\(G\) imply via <a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.33</a> and <a href="sec-prelims.html#prop:two-notions-of-self-consistency-after-evaluation">3.34</a> that </p>
+<div class="equation" id="eq:new-fact-that-i-derived">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:new-fact-that-i-derived} G_a^{u,x} \otimes I \approx _\zeta I \otimes G_a^{u,x}. \end{equation}
+  </div>
+  <span class="equation_label">10</span>
+</p>
+</div>
+<p> Applying <a href="sec-g-comm.html#eq:new-fact-that-i-derived">10</a> twice with <a href="sec-prelims.html#prop:closeness-of-ip">3.21</a> turns <a href="sec-g-comm.html#eq:gonna-cite-this-in-just-a-bit">9</a> into </p>
+<div class="displaymath" id="a0000000357">
+  \[  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_b^{v,y} G_a^{u,x} G_b^{v,y} \otimes I \lvert \psi  \rangle ,  \]
+</div>
+<p> which is the first quartic term from <a href="sec-g-comm.html#eq:gcom8">2</a>. Collecting the ten approximation steps appearing between <a href="sec-g-comm.html#eq:gcom8">2</a> and <a href="sec-g-comm.html#eq:new-fact-that-i-derived">10</a> yields the bound </p>
+<div class="displaymath" id="a0000000358">
+  \[  48m\bigl(\gamma ^{1/2}+\zeta ^{1/2}\bigr),  \]
+</div>
+<p> so the commutator norm is at most&#160;\(\nu \). </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="clm:g-comm-stability">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">8.3</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-g-comm.html#clm:g-comm-stability">#</a>
+    
+    <a class="icon proof" href="sec-g-comm.html#a0000000359"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Commutativity.gCommStability_storedBoundedResidualBound" class="lean_decl">MIPStarRE.LDT.Commutativity.gCommStability_storedBoundedResidualBound</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Commutativity.gCommStability_averagedPoint_le_witness" class="lean_decl">MIPStarRE.LDT.Commutativity.gCommStability_averagedPoint_le_witness</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Commutativity.gCommStability_overlap" class="lean_decl">MIPStarRE.LDT.Commutativity.gCommStability_overlap</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  
+<div class="displaymath" id="eq:g-comm-stab1">
+  \begin{align} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G_a^{u,x} G^y \otimes A_b^{v,y} \lvert \psi  \rangle  \label{eq:g-comm-stab1} \\ \approx _{\sqrt{\zeta }} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G_a^{u,x} \otimes A_b^{v,y} \lvert \psi  \rangle . \nonumber \end{align}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000359">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>For each \(y \in \mathbb {F}_q\) and \(g \in \mathcal{P}(m,q,d)\), define </p>
+<div class="displaymath" id="a0000000360">
+  \[  R_g^y = \mathbb {E}_{u,x} \sum _a G_a^{u,x} G_g^y G_a^{u,x}.  \]
+</div>
+<p> Since \(G\) is a sub-measurement, \(R^y=\{ R_g^y\} \) is also a sub-measurement. The difference between the two sides of the lemma is </p>
+<div class="displaymath" id="a0000000361">
+  \begin{align} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G_a^{u,x} (I-G^y) \otimes A_b^{v,y} \lvert \psi  \rangle \nonumber \\ &  = \mathbb {E}_{v,y} \sum _g \langle \psi  \rvert  R_g^y (I-G^y) \otimes A_{g(v)}^{v,y} \lvert \psi  \rangle . \label{eq:bound-this-right-now!} \end{align}
+</div>
+<p> Apply Cauchy–Schwarz to <a href="sec-g-comm.html#eq:bound-this-right-now!">12</a>. The first factor is at most&#160;\(1\) because \(R^y\) is a sub-measurement. For the second factor, average over&#160;\(v\) and use <a href="sec-g-comm.html#item:data-processed-boundedness">3</a> to replace \(\mathbb {E}_v A_{g(v)}^{v,y}\) by \(Z^y\); the resulting quantity is at most </p>
+<div class="displaymath" id="a0000000362">
+  \[  \mathbb {E}_y \langle \psi  \rvert  (I-G^y) \otimes Z^y \lvert \psi  \rangle  \le \zeta .  \]
+</div>
+<p> Hence the difference has magnitude at most \(\sqrt{\zeta }\). </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="clm:g-comm-stability2">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">8.4</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-g-comm.html#clm:g-comm-stability2">#</a>
+    
+    <a class="icon proof" href="sec-g-comm.html#a0000000363"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-g-comm.html#thm:commutativity-points">Theorem 8.1</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Commutativity.gCommStability_storedBoundedResidualBound" class="lean_decl">MIPStarRE.LDT.Commutativity.gCommStability_storedBoundedResidualBound</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Commutativity.gCommStability_averagedPoint_le_witness" class="lean_decl">MIPStarRE.LDT.Commutativity.gCommStability_averagedPoint_le_witness</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Commutativity.gCommStabilityTwo_overlap" class="lean_decl">MIPStarRE.LDT.Commutativity.gCommStabilityTwo_overlap</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  
+<div class="displaymath" id="a0000000364">
+  \begin{align*} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G^x \otimes A_a^{u,x} A_b^{v,y} \lvert \psi  \rangle  \\ \approx _{\sqrt{\zeta }+6\sqrt{\gamma (m+1)}} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} \otimes A_a^{u,x} A_b^{v,y} \lvert \psi  \rangle . \end{align*}
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000363">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> The difference between the two sides is </p>
+<div class="displaymath" id="a0000000365">
+  \begin{align} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} (I-G^x) \otimes A_a^{u,x} A_b^{v,y} \lvert \psi  \rangle \nonumber \\ \approx _{6\sqrt{\gamma (m+1)}} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} (I-G^x) \otimes A_b^{v,y} A_a^{u,x} \lvert \psi  \rangle , \label{eq:just-got-commuted} \end{align}
+</div>
+<p> where <a href="sec-g-comm.html#thm:commutativity-points">8.1</a> commutes the point measurements on the right register. Expanding \(G_a^{u,x}=\sum _{g:g(u)=a} G_g^x\), we rewrite </p>
+<div class="displaymath" id="eq:g-comm-stab7">
+  \begin{align}  \eqref{eq:just-got-commuted} &  = \mathbb {E}_{u,v,x,y} \sum _{g,b} \langle \psi  \rvert  G_g^x G_b^{v,y} (I-G^x) \otimes A_b^{v,y} A_{g(u)}^{u,x} \lvert \psi  \rangle . \label{eq:g-comm-stab7} \end{align}
+</div>
+<p> Apply Cauchy–Schwarz to <a href="sec-g-comm.html#eq:g-comm-stab7">14</a>. The first factor is at most&#160;\(1\) because both \(G\) and&#160;\(A\) are sub-measurements. In the second factor, average over&#160;\(u\) and use <a href="sec-g-comm.html#item:data-processed-boundedness">3</a> to replace \(\mathbb {E}_u A_{g(u)}^{u,x}\) by \(Z^x\); then sum over&#160;\(g\) and&#160;\(b\) using the sub-measurement property. This leaves </p>
+<div class="displaymath" id="a0000000366">
+  \[  \mathbb {E}_x \langle \psi  \rvert  (I-G^x) \otimes Z^x \lvert \psi  \rangle  \le \zeta .  \]
+</div>
+<p> Hence <a href="sec-g-comm.html#eq:g-comm-stab7">14</a> has magnitude at most \(\sqrt{\zeta }\), and the total loss is \(\sqrt{\zeta }+6\sqrt{\gamma (m+1)}\). </p>
+
+  </div>
+</div>
+<h1 id="sec:G-commutes">8.3 Commutativity of&#160;\(G\)</h1>
+
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:normalization-condition">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">8.5</span>
+    <span class="lemma_thmtitle">Normalization condition for a sandwiched family</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-g-comm.html#lem:normalization-condition">#</a>
+    
+    <a class="icon proof" href="sec-g-comm.html#a0000000367"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.8</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Commutativity.normalizationCondition" class="lean_decl">MIPStarRE.LDT.Commutativity.normalizationCondition</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(P=\{ P_a\} \) be a sub-measurement and \(Q=\{ Q_b\} \) be a projective sub-measurement. Define \(C_{a,b}=Q_b P_a Q_b\). Then </p>
+<div class="displaymath" id="a0000000368">
+  \[  \sum _a \left(\sum _b C_{a,b}\right)^\dagger \left(\sum _b C_{a,b}\right) = \sum _a \left(\sum _b C_{a,b}\right)\left(\sum _b C_{a,b}\right)^\dagger \le I.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000367">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Expand the square, use the orthogonality \(Q_b Q_{b'}=0\) for \(b \neq b'\), and then sum over the sub-measurement&#160;\(P\). </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm:com-main">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">8.6</span>
+    <span class="theorem_thmtitle">Commutativity of&#160;\(G\)</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-g-comm.html#thm:com-main">#</a>
+    
+    <a class="icon proof" href="sec-g-comm.html#a0000000369"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          
+          <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.9</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.17</a></li>
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.31</a></li>
+          
+          <li><a href="sec-g-comm.html#lem:comm-data-processed-g">Lemma 8.2</a></li>
+          
+          <li><a href="sec-g-comm.html#lem:normalization-condition">Lemma 8.5</a></li>
+          
+          <li><a href="sec-prelims.html#prop:switch-sandwich">Lemma 3.29</a></li>
+          
+          <li><a href="sec-prelims.html#prop:closeness-of-ip">Theorem 3.21</a></li>
+          
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">Lemma 3.24</a></li>
+          
+          <li><a href="sec-prelims.html#lem:schwartz-zippel-individual">Lemma 3.7</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Commutativity.comMain" class="lean_decl">MIPStarRE.LDT.Commutativity.comMain</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>   Let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m+1,q,d)\) low individual degree test. Let \(\{ G^x\} _{x \in \mathbb {F}_q}\) denote a set of projective sub-measurements in \(\mathrm{PolySub}(m,q,d)\) with the following properties: </p>
+<ol class="enumerate">
+  <li><p>(Consistency with&#160;\(A\)) On average over \((u,x) \sim \mathbb {F}_q^{m+1}\), </p>
+<div class="displaymath" id="a0000000370">
+  \[  A_a^{u,x} \otimes I \simeq _\zeta I \otimes G^x_{[g(u)=a]}.  \]
+</div>
+</li>
+  <li><p>(Strong self-consistency) On average over \(x \sim \mathbb {F}_q\), </p>
+<div class="displaymath" id="a0000000371">
+  \[  G_g^x \otimes I \approx _\zeta I \otimes G_g^x.  \]
+</div>
+</li>
+  <li><p>(Boundedness) There exists a positive-semidefinite matrix \(Z^x\) for each \(x \in \mathbb {F}_q\) such that </p>
+<div class="displaymath" id="a0000000372">
+  \[  \mathbb {E}_x \langle \psi  \rvert  (I-G^x) \otimes Z^x \lvert \psi  \rangle  \le \zeta  \]
+</div>
+<p> and for each \(x \in \mathbb {F}_q\) and \(g \in \mathcal{P}(m,q,d)\), </p>
+<div class="displaymath" id="a0000000373">
+  \[  Z^x \ge \left(\mathbb {E}_u A_{g(u)}^{u,x}\right).  \]
+</div>
+</li>
+</ol>
+<p> Let </p>
+<div class="displaymath" id="a0000000374">
+  \[  \nu = 30m\left(\gamma ^{1/4}+\zeta ^{1/4}+(d/q)^{1/4}\right).  \]
+</div>
+<p> Then on average over independent and uniformly random \((u,x),(v,y) \sim \mathbb {F}_q^{m+1}\), </p>
+<div class="displaymath" id="a0000000375">
+  \[  G_g^x G_h^y \otimes I \approx _\nu G_h^y G_g^x \otimes I.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000369">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> If at least one of \(\gamma \), \(\zeta \), or \(d/q\) is at least&#160;\(1\), then \(\nu \ge 30\) and the estimate is trivial from <a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">3.24</a>. We therefore assume \(\gamma ,\zeta ,d/q \le 1\). </p>
+<p>Expanding the commutator square gives </p>
+<div class="displaymath" id="a0000000376">
+  \begin{align} &  \mathbb {E}_{x,y} \sum _{g,h} \langle \psi  \rvert  \bigl(G_g^x G_h^y - G_h^y G_g^x\bigr)^\dagger \bigl(G_g^x G_h^y - G_h^y G_g^x\bigr) \otimes I \lvert \psi  \rangle \nonumber \\ &  = 2 \mathbb {E}_{x,y} \sum _{g,h} \langle \psi  \rvert  G_g^x G_h^y G_g^x \otimes I \lvert \psi  \rangle  - 2 \mathbb {E}_{x,y} \sum _{g,h} \langle \psi  \rvert  G_g^x G_h^y G_g^x G_h^y \otimes I \lvert \psi  \rangle . \label{eq:gcomterms} \end{align}
+</div>
+<p> The first term is close to \(\langle \psi  \rvert  G \otimes G \lvert \psi  \rangle \), where \(G=\mathbb {E}_x G^x\), by <a href="sec-prelims.html#prop:switch-sandwich">3.29</a> and <a href="sec-g-comm.html#item:commuting-self-consistency">2</a>. For the second term, <a href="sec-prelims.html#prop:closeness-of-ip">3.21</a> and <a href="sec-g-comm.html#lem:normalization-condition">8.5</a> yield </p>
+<div class="equation" id="eq:gcom4">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \mathbb {E}_{x,y} \sum _{g,h} \langle \psi  \rvert  G_g^x G_h^y G_g^x G_h^y \otimes I \lvert \psi  \rangle  \approx _{\sqrt{\zeta }} \mathbb {E}_{x,y} \sum _{g,h} \langle \psi  \rvert  G_h^y G_g^x G_h^y \otimes G_g^x \lvert \psi  \rangle . \label{eq:gcom4} \end{equation}
+  </div>
+  <span class="equation_label">16</span>
+</p>
+</div>
+<p> The first Schwartz–Zippel reduction evaluates the left factor at a random point: </p>
+<div class="displaymath" id="a0000000377">
+  \begin{align}  \eqref{eq:gcom4} &  = \mathbb {E}_{x,y} \sum _{g,h} \langle \psi  \rvert  G_h^y G_g^x G_h^y \otimes G_g^x \lvert \psi  \rangle \nonumber \\ &  \approx _{\frac{dm}{q}} \mathbb {E}_{u,x,y} \sum _{a,h} \langle \psi  \rvert  G_h^y G^x_{[g(u)=a]} G_h^y \otimes G^x_{[g(u)=a]} \lvert \psi  \rangle . \label{eq:evaluate-gcom-at-points} \end{align}
+</div>
+<p> Indeed, the difference is </p>
+<div class="equation" id="eq:gcom4-diff">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:gcom4-diff} \mathbb {E}_{u,x,y} \sum _{g \neq g',h} \mathbf{1}\! \left[[\right]g(u)=g'(u)] \langle \psi  \rvert  G_h^y G_g^x G_h^y \otimes G_{g'}^x \lvert \psi  \rangle , \end{equation}
+  </div>
+  <span class="equation_label">18</span>
+</p>
+</div>
+<p> and <a href="sec-prelims.html#lem:schwartz-zippel-individual">3.7</a> bounds this by \(dm/q\). </p>
+<p>Next, apply <a href="sec-prelims.html#prop:closeness-of-ip">3.21</a> twice: </p>
+<div class="displaymath" id="a0000000378">
+  \begin{align}  \eqref{eq:evaluate-gcom-at-points} &  = \mathbb {E}_{u,x,y} \sum _{a,h} \langle \psi  \rvert  G_h^y G^x_{[g(u)=a]} G_h^y \otimes G^x_{[g(u)=a]} \lvert \psi  \rangle \nonumber \\ &  \approx _{\sqrt{\zeta }} \mathbb {E}_{u,x,y} \sum _{a,h} \langle \psi  \rvert  G^x_{[g(u)=a]} G_h^y G^x_{[g(u)=a]} G_h^y \otimes I \lvert \psi  \rangle \nonumber \\ &  \approx _{\sqrt{\zeta }} \mathbb {E}_{u,x,y} \sum _{a,h} \langle \psi  \rvert  G^x_{[g(u)=a]} G_h^y G^x_{[g(u)=a]} \otimes G_h^y \lvert \psi  \rangle . \label{eq:don't-understand-the-numbering-system} \end{align}
+</div>
+<p> A second Schwartz–Zippel reduction evaluates the right factor at an independent point: </p>
+<div class="displaymath" id="a0000000379">
+  \begin{align}  \eqref{eq:don't-understand-the-numbering-system} &  = \mathbb {E}_{u,x,y} \sum _{a,h} \langle \psi  \rvert  G^x_{[g(u)=a]} G_h^y G^x_{[g(u)=a]} \otimes G_h^y \lvert \psi  \rangle \nonumber \\ &  \approx _{\frac{dm}{q}} \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G^x_{[g(u)=a]} G^y_{[h(v)=b]} G^x_{[g(u)=a]} \otimes G^y_{[h(v)=b]} \lvert \psi  \rangle . \label{eq:evaluate-gcom-at-points-part-dos} \end{align}
+</div>
+<p> The difference is </p>
+<div class="equation" id="eq:numbering-system-diff">
+<p>
+  <div class="equation_content">
+    \begin{equation}  \label{eq:numbering-system-diff} \mathbb {E}_{u,v,x,y} \sum _{a,h \neq h'} \mathbf{1}\! \left[[\right]h(v)=h'(v)] \langle \psi  \rvert  G^x_{[g(u)=a]} G_h^y G^x_{[g(u)=a]} \otimes G_{h'}^y \lvert \psi  \rangle , \end{equation}
+  </div>
+  <span class="equation_label">21</span>
+</p>
+</div>
+<p> and the same Schwartz–Zippel estimate again gives the loss \(dm/q\). </p>
+<p>Now set </p>
+<div class="displaymath" id="a0000000380">
+  \[  \nu _{\mathrm{evaluation}} = 48m\bigl(\gamma ^{1/2}+\zeta ^{1/2}\bigr),  \]
+</div>
+<p> the error from <a href="sec-g-comm.html#lem:comm-data-processed-g">8.2</a>. Apply <a href="sec-g-comm.html#lem:comm-data-processed-g">8.2</a> to commute the evaluated families in <a href="sec-g-comm.html#eq:evaluate-gcom-at-points-part-dos">20</a>; after one more use of <a href="sec-prelims.html#prop:closeness-of-ip">3.21</a> with <a href="sec-g-comm.html#item:commuting-self-consistency">2</a>, the resulting quantity is \(\langle \psi  \rvert  G \otimes G \lvert \psi  \rangle \). Thus the second term in <a href="sec-g-comm.html#eq:gcomterms">15</a> is also close to \(\langle \psi  \rvert  G \otimes G \lvert \psi  \rangle \). </p>
+<p>Combining the first-term estimate, <a href="sec-g-comm.html#eq:gcom4">16</a>, the two Schwartz–Zippel losses, the two intermediate \(\sqrt{\zeta }\) losses, and the evaluated commutation error \(\nu _{\mathrm{evaluation}}^{1/2}\) gives </p>
+<div class="displaymath" id="a0000000381">
+  \[  30m\left(\gamma ^{1/4}+\zeta ^{1/4}+(d/q)^{1/4}\right),  \]
+</div>
+<p> where the constant \(30m\) accounts for the \(10m\) Schwartz–Zippel evaluation losses plus \(20m\) from the \(\approx \)-chain in the first and second terms. This proves <a href="sec-g-comm.html#thm:com-main">8.6</a>. </p>
+
+  </div>
+</div>
+
+</div> <!--main-text -->
+</div> <!-- content-wrapper -->
+</div> <!-- content -->
+</div> <!-- wrapper -->
+
+<nav class="prev_up_next">
+  <svg  id="showmore-minus" class="icon icon-eye-minus showmore"><use xlink:href="symbol-defs.svg#icon-eye-minus"></use></svg>
+
+  <svg  id="showmore-plus" class="icon icon-eye-plus showmore"><use xlink:href="symbol-defs.svg#icon-eye-plus"></use></svg>
+
+  <a href="chap-self-improvement.html" title="Self-improvement"><svg  class="icon icon-arrow-left "><use xlink:href="symbol-defs.svg#icon-arrow-left"></use></svg>
+</a>
+  <a href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test"><svg  class="icon icon-arrow-up "><use xlink:href="symbol-defs.svg#icon-arrow-up"></use></svg>
+</a>
+  <a href="sec-ld-pasting.html" title="Pasting"><svg  class="icon icon-arrow-right "><use xlink:href="symbol-defs.svg#icon-arrow-right"></use></svg>
+</a>
+</nav>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/plastex.js"></script>
+<script type="text/javascript" src="js/svgxuse.js"></script>
+<script type="text/javascript" src="js/js.cookie.min.js"></script>
+<script type="text/javascript" src="js/showmore.js"></script>
+</body>
+</html>
