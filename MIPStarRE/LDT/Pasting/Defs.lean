@@ -41,6 +41,7 @@ noncomputable def distinctTupleDistribution (params : Parameters) (k : ℕ) :
     outsideSupport := by intro xs hxs; simp_all
   }
 
+/-- The distinct-tuple distribution has total mass at most `1`. -/
 theorem distinctTupleDistribution_weight_sum_le_one (params : Parameters) (k : ℕ) :
     ∑ xs ∈ (distinctTupleDistribution params k).support,
       (distinctTupleDistribution params k).weight xs ≤ 1 := by
@@ -71,14 +72,27 @@ theorem distinctTupleDistribution_weight_sum_le_one (params : Parameters) (k : �
   · have hempty : support = ∅ := Finset.not_nonempty_iff_eq_empty.mp hs
     simp [hempty]
 
-/-- Placeholder outcome type for the completed family `\widehat G`. -/
+/-- The outcome type of the completed family `\widehat G`. -/
 abbrev GHatOutcome (params : Parameters) [FieldModel params.q] := Option (Polynomial params)
+
+/-- The question type for a single slice height. -/
 abbrev SliceQuestion (params : Parameters) := Fq params
+
+/-- The question type for an ordered pair of slice heights. -/
 abbrev SlicePairQuestion (params : Parameters) := Fq params × Fq params
+
+/-- The outcome type of a `k`-tuple of completed-slice answers. -/
 abbrev GHatTupleOutcome (params : Parameters) [FieldModel params.q] (k : ℕ) :=
   Fin k → GHatOutcome params
+
+/-- A Boolean type pattern for a completed-slice tuple. -/
 abbrev GHatType (k : ℕ) := Fin k → Bool
-abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) := Point params × PointTuple params k
+
+/-- A sandwiched-line question consists of a point and a `k`-tuple of slice heights. -/
+abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) :=
+  Point params × PointTuple params k
+
+/-- The question type for vertical lines, identified with their base point. -/
 abbrev VerticalLineQuestion (params : Parameters) := Point params
 
 /-- The Hamming weight `|τ|` of a type `τ ∈ {0,1}^k`. -/

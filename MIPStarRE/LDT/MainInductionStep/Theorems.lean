@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MainInductionStep.Statements
+import MIPStarRE.LDT.CommutativityPoints.Theorem
 import MIPStarRE.LDT.Commutativity.Theorems
 import MIPStarRE.LDT.Pasting.Theorems
 -- Used by `selfImprovementInInductionSection`.
@@ -7,9 +8,10 @@ import MIPStarRE.LDT.SelfImprovement.Theorems
 /-!
 # Section 6 — Theorems
 
-This file contains the currently formalized theorem-level API for the main
-induction step, together with local helper lemmas for restricted-slice
-averaging.
+This file contains the current Lean wrappers for the induction-step results.
+The main theorems either forward to already-formalized Section 7/8/9/11 inputs
+or package the remaining induction bookkeeping behind explicit bridge
+hypotheses.
 
 ## References
 
@@ -158,28 +160,7 @@ theorem ldPastingInInductionSection
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 
-/-! ## Restricted-probability helpers -/
-
-private def pointNextEquiv (params : Parameters) [FieldModel params.q] :
-    Point params.next ≃ Point params × Fq params where
-  toFun := fun u => (truncatePoint params u, pointHeight params u)
-  invFun := fun ux => appendPoint params ux.1 ux.2
-  left_inv := by
-    intro u
-    funext i
-    by_cases h : i.1 < params.m
-    · simp [appendPoint, truncatePoint, h]
-    · have hi : i.1 = params.m := by
-        have hi_lt : i.1 < params.m + 1 := by
-          simpa [Parameters.next] using i.2
-        omega
-      have hlast : i = lastCoord params := by
-        apply Fin.ext
-        simp [lastCoord, hi]
-      simp [appendPoint, truncatePoint, pointHeight, hlast]
-  right_inv := by
-    rintro ⟨u, x⟩
-    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
+/-! ## Restricted-probability bookkeeping -/
 
 private lemma selfConsistencyRestrictedAverage_eq
     (params : Parameters)
@@ -213,7 +194,8 @@ private lemma selfConsistencyRestrictedAverage_eq
           (fun ux => g (appendPoint params ux.1 ux.2)) =
         avgOver (uniformDistribution (Point params.next)) g := by
     simpa using
-      (CommutativityPoints.avgOver_uniform_equiv (e := pointNextEquiv params)
+      (CommutativityPoints.avgOver_uniform_equiv
+        (e := CommutativityPoints.pointNextEquiv params)
         (f := g)).symm
   calc
     avgOver (uniformDistribution (Fq params))
@@ -262,8 +244,6 @@ private lemma weighted_diagonal_bound_to_average
     a ≤ sliceDiagonalConditioningLoss params * b := by
   simpa [sliceDiagonalDirectionWeight, sliceDiagonalConditioningLoss] using
     weighted_bound_to_average params h
-
-/-! ## Restricted success probabilities -/
 
 /-- `lem:restricted-probabilities`. -/
 lemma restrictedProbabilities

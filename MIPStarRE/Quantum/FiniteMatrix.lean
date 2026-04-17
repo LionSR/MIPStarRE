@@ -14,17 +14,10 @@ formalization.
 * `IsProj` — predicate for orthogonal projections.
 * `SpectralTruncation` — witness for rounding a Hermitian matrix to a projection.
 
-## Main results
-
-* `sandwich_nonneg` and `sandwich_mono` control the PSD order under Hermitian sandwiching.
-* `sq_le_self` shows that an effect operator dominates its square.
-* `kronecker_nonneg`, `kronecker_le_kronecker_right_one`, and `kronecker_mono_left`
-  record basic order properties of Kronecker products.
-
 ## References
 
-This file supplies reusable linear-algebra infrastructure for the LDT paper sources in
-`references/ldt-paper/`.
+This file packages the finite-dimensional matrix and PSD API from Mathlib for the
+project's quantum layer and the LDT development formalizing `references/ldt-paper/`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -35,6 +28,38 @@ namespace MIPStarRE.Quantum
 
 /-- Square complex matrices as the finite-dimensional operator algebra. -/
 abbrev Op (d : Type*) := Matrix d d ℂ
+
+/-! ### Kronecker product bookkeeping -/
+
+/-- Kronecker product is additive in the right factor, rewritten for subtraction. -/
+theorem kronecker_sub_right
+    {d₁ d₂ : Type*} {A : Op d₁} {B₁ B₂ : Op d₂} :
+    Matrix.kronecker A B₁ - Matrix.kronecker A B₂ =
+      Matrix.kronecker A (B₁ - B₂) := by
+  have hneg : Matrix.kronecker A (-B₂) = -Matrix.kronecker A B₂ := by
+    simpa using (Matrix.kronecker_smul (-1 : ℂ) A B₂)
+  calc
+    Matrix.kronecker A B₁ - Matrix.kronecker A B₂
+        = Matrix.kronecker A B₁ + Matrix.kronecker A (-B₂) := by
+            rw [hneg]
+            simp [sub_eq_add_neg]
+    _ = Matrix.kronecker A (B₁ - B₂) := by
+          simpa [sub_eq_add_neg] using (Matrix.kronecker_add A B₁ (-B₂)).symm
+
+/-- Kronecker product is additive in the left factor, rewritten for subtraction. -/
+theorem kronecker_sub_left
+    {d₁ d₂ : Type*} {A₁ A₂ : Op d₁} {B : Op d₂} :
+    Matrix.kronecker A₁ B - Matrix.kronecker A₂ B =
+      Matrix.kronecker (A₁ - A₂) B := by
+  have hneg : Matrix.kronecker (-A₂) B = -Matrix.kronecker A₂ B := by
+    simpa using (Matrix.smul_kronecker (-1 : ℂ) A₂ B)
+  calc
+    Matrix.kronecker A₁ B - Matrix.kronecker A₂ B
+        = Matrix.kronecker A₁ B + Matrix.kronecker (-A₂) B := by
+            rw [hneg]
+            simp [sub_eq_add_neg]
+    _ = Matrix.kronecker (A₁ - A₂) B := by
+          simpa [sub_eq_add_neg] using (Matrix.add_kronecker A₁ (-A₂) B).symm
 
 /-! ### Basic order lemmas -/
 
@@ -66,36 +91,6 @@ theorem sq_le_self [DecidableEq d] {X : Op d} (hX : 0 ≤ X) (hXle : X ≤ 1) :
 
 /-! ### Kronecker product order lemmas -/
 
-private theorem kronecker_sub_right
-    {d₁ d₂ : Type*} [Finite d₁] [Finite d₂] (A : Op d₁) (B₁ B₂ : Op d₂) :
-    Matrix.kronecker A B₁ - Matrix.kronecker A B₂ = Matrix.kronecker A (B₁ - B₂) := by
-  letI : Fintype d₁ := Fintype.ofFinite d₁
-  letI : Fintype d₂ := Fintype.ofFinite d₂
-  have hneg : Matrix.kronecker A (-B₂) = -Matrix.kronecker A B₂ := by
-    simpa using (Matrix.kronecker_smul (-1 : ℂ) A B₂)
-  calc
-    Matrix.kronecker A B₁ - Matrix.kronecker A B₂
-        = Matrix.kronecker A B₁ + Matrix.kronecker A (-B₂) := by
-            rw [hneg]
-            simp [sub_eq_add_neg]
-    _ = Matrix.kronecker A (B₁ - B₂) := by
-      simpa [sub_eq_add_neg] using (Matrix.kronecker_add A B₁ (-B₂)).symm
-
-private theorem kronecker_sub_left
-    {d₁ d₂ : Type*} [Finite d₁] [Finite d₂] (A₁ A₂ : Op d₁) (B : Op d₂) :
-    Matrix.kronecker A₂ B - Matrix.kronecker A₁ B = Matrix.kronecker (A₂ - A₁) B := by
-  letI : Fintype d₁ := Fintype.ofFinite d₁
-  letI : Fintype d₂ := Fintype.ofFinite d₂
-  have hneg : Matrix.kronecker (-A₁) B = -Matrix.kronecker A₁ B := by
-    simpa using (Matrix.smul_kronecker (-1 : ℂ) A₁ B)
-  calc
-    Matrix.kronecker A₂ B - Matrix.kronecker A₁ B
-        = Matrix.kronecker A₂ B + Matrix.kronecker (-A₁) B := by
-            rw [hneg]
-            simp [sub_eq_add_neg]
-    _ = Matrix.kronecker (A₂ - A₁) B := by
-      simpa [sub_eq_add_neg] using (Matrix.add_kronecker A₂ (-A₁) B).symm
-
 /-- Kronecker products preserve positivity. -/
 theorem kronecker_nonneg
     {d₁ d₂ : Type*} [hd₁ : Finite d₁] [hd₂ : Finite d₂]
@@ -115,9 +110,11 @@ theorem kronecker_le_kronecker_right_one
     Matrix.kronecker A B ≤ Matrix.kronecker A (1 : Op d₂) := by
   letI : Fintype d₁ := Fintype.ofFinite d₁
   letI : Fintype d₂ := Fintype.ofFinite d₂
-  apply sub_nonneg.mp
+  change (Matrix.kronecker A (1 : Op d₂) - Matrix.kronecker A B).PosSemidef
+  have hpsd : Matrix.PosSemidef (Matrix.kronecker A (1 - B)) := by
+    exact Matrix.nonneg_iff_posSemidef.mp <| kronecker_nonneg hA (sub_nonneg.mpr hB)
   rw [kronecker_sub_right]
-  exact kronecker_nonneg hA (sub_nonneg.mpr hB)
+  exact hpsd
 
 /-- Kronecker product is monotone in the left factor against a PSD right factor. -/
 theorem kronecker_mono_left
@@ -126,9 +123,11 @@ theorem kronecker_mono_left
     Matrix.kronecker A₁ B ≤ Matrix.kronecker A₂ B := by
   letI : Fintype d₁ := Fintype.ofFinite d₁
   letI : Fintype d₂ := Fintype.ofFinite d₂
-  apply sub_nonneg.mp
+  change (Matrix.kronecker A₂ B - Matrix.kronecker A₁ B).PosSemidef
+  have hpsd : Matrix.PosSemidef (Matrix.kronecker (A₂ - A₁) B) := by
+    exact Matrix.nonneg_iff_posSemidef.mp <| kronecker_nonneg (sub_nonneg.mpr hA) hB
   rw [kronecker_sub_left]
-  exact kronecker_nonneg (sub_nonneg.mpr hA) hB
+  exact hpsd
 
 /-! ### Normalized trace -/
 
@@ -152,18 +151,18 @@ theorem normalizedTrace_add (A B : Op d) :
     normalizedTrace (A + B) = normalizedTrace A + normalizedTrace B := by
   simp [normalizedTrace, Matrix.trace_add, add_div]
 
-/-- The normalized trace preserves subtraction. -/
+/-- The normalized trace sends subtraction to subtraction. -/
 theorem normalizedTrace_sub (A B : Op d) :
     normalizedTrace (A - B) = normalizedTrace A - normalizedTrace B := by
   simp [normalizedTrace, Matrix.trace_sub, sub_div]
 
-/-- The normalized trace commutes with complex scalar multiplication. -/
+/-- Scalar multiplication pulls out of the normalized trace. -/
 theorem normalizedTrace_smul (c : ℂ) (A : Op d) :
     normalizedTrace (c • A) = c * normalizedTrace A := by
   simp [normalizedTrace, Matrix.trace_smul]
   ring
 
-/-- The normalized trace is cyclic on products of two operators. -/
+/-- The normalized trace is invariant under swapping two multiplicative factors. -/
 theorem normalizedTrace_mul_comm (A B : Op d) :
     normalizedTrace (A * B) = normalizedTrace (B * A) := by
   simp only [normalizedTrace]
@@ -187,9 +186,9 @@ noncomputable def tauNormSq (A : Op d) : ℂ :=
 
 /-- A matrix is an orthogonal projection when it is Hermitian and idempotent. -/
 structure IsProj (P : Op d) : Prop where
-  /-- An orthogonal projection is Hermitian. -/
+  /-- The projection is Hermitian. -/
   isHermitian : P.IsHermitian
-  /-- An orthogonal projection is idempotent. -/
+  /-- The projection is idempotent. -/
   idempotent : P * P = P
 
 /-! ### Spectral truncation -/
@@ -202,11 +201,11 @@ above `1 / 2` are rounded to `1`, and those below are rounded to `0`.
 The key output is the τ-distance bound between `source` and `target`.
 -/
 structure SpectralTruncation (source target : Op d) : Prop where
-  /-- The source operator is Hermitian. -/
+  /-- The source matrix is Hermitian. -/
   sourceHermitian : source.IsHermitian
-  /-- The target operator is a projection. -/
+  /-- The target matrix is an orthogonal projection. -/
   targetProj : IsProj target
-  /-- Spectral truncation does not increase the τ-distance to projectivity. -/
+  /-- Spectral truncation does not increase the defect measured by `tauNormSq`. -/
   tauDistanceBound : Complex.re (tauNormSq (source - target)) ≤
     Complex.re (tauNormSq (source * source - source))
 

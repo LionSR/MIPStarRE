@@ -6,9 +6,10 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 Paper-faithful proof infrastructure for the internal orthonormalization chain in
 `references/ldt-paper/orthonormalization.tex`.
 
-This file adds the intermediate `Q/X/XHat/P` objects and the 14 helper-lemma
-stubs tracked in issue #197. The actual proofs are deferred, but the signatures
-are intended to match the paper's decomposition of the argument.
+This file introduces the intermediate `Q/X/XHat/P` objects used in the paper's
+orthonormalization argument and proves the algebraic identities attached to
+those objects. The remaining linear-algebraic existence steps are isolated in
+bridge packages whose interfaces match the paper's decomposition of the proof.
 
 ## References
 
@@ -27,8 +28,6 @@ open MIPStarRE.LDT
 noncomputable section
 
 universe uOutcome uι
-
--- NOTE: older proof-hole scaffolding for issue #197 is being discharged incrementally.
 
 /-- The quarter-root error term `ζ^(1/4)` used throughout the paper's late-stage
 orthonormalization estimates. -/
@@ -382,6 +381,13 @@ lemma truncationInequality (δ x : Error) :
     nlinarith [mul_nonneg hx hlt,
       mul_nonneg (mul_nonneg (le_of_lt hδ) hx)
         (by linarith : (0 : ℝ) ≤ 1 - x)]
+
+private lemma real_smul_matrix_eq_complex {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (Q : MIPStarRE.Quantum.Op ι) (c : Error) :
+    (c : ℂ) • Q = c • Q := by
+  ext i j
+  change (c : ℂ) * Q i j = (c : ℂ) * Q i j
+  rfl
 
 private lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
     0 ≤ spectralTruncationError ζ := by

@@ -3,13 +3,14 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs
 /-!
 # Section 7 — Matrix realization
 
-Concrete finite-dimensional matrix realizations of the hypercube variance
-operators and spectral projectors from `Defs`, together with the matrix-order
-lemmas used by the public wrappers.
+This file gives concrete finite-dimensional matrix realizations of the
+hypercube variance operators, Fourier projectors, and spectral inequalities
+introduced in `Defs`.
 
 ## References
 
-This file mirrors Section 7 of `references/ldt-paper/expansion.tex`.
+- `blueprint/src/chapter/ch05_expansion.tex`
+- `references/ldt-paper/expansion.tex`
 -/
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph

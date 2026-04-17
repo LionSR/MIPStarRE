@@ -1,5 +1,5 @@
 import Mathlib.Algebra.Order.Chebyshev
-import MIPStarRE.LDT.Preliminaries.Theorems
+import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-! # Triangle Inequalities for State-Dependent Distance
 
@@ -63,6 +63,8 @@ theorem triangleInequalityForVectorsSquared
       (Fintype.card κ : Error) * ∑ i, ev ψ ((D i)ᴴ * D i) := by
   simpa using ev_sum_conjTranspose_mul_sum_le ψ D
 
+/-! ### Elementary max bound -/
+
 private lemma max_zero_add_le (x y : Error) :
     max 0 (x + y) ≤ max 0 x + |y| := by
   by_cases hxy : x + y < 0
@@ -76,25 +78,25 @@ private lemma max_zero_add_le (x y : Error) :
 
 private lemma avgOver_abs_le_sqrt_of_pointwise_nonneg
     {Question : Type*}
-    (𝒟 : Distribution Question) (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
+    (𝒟 : Distribution Question)
+    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
     (f g : Question → Error)
-    (hf : ∀ q, |f q| ≤ Real.sqrt (g q))
+    (hfg : ∀ q, |f q| ≤ Real.sqrt (g q))
     (hg : ∀ q, 0 ≤ g q) :
     avgOver 𝒟 (fun q => |f q|) ≤ Real.sqrt (avgOver 𝒟 g) := by
+  have havg_nonneg : 0 ≤ avgOver 𝒟 (fun q => |f q|) :=
+    avgOver_nonneg 𝒟 (fun q => |f q|) (fun q => abs_nonneg (f q))
   have havg_abs :
       |avgOver 𝒟 (fun q => |f q|)| ≤ Real.sqrt (avgOver 𝒟 g) := by
     exact
       avgOver_abs_le_sqrt_of_pointwise 𝒟
         (fun q => |f q|)
         g
-        (by
-          intro q
-          simpa [abs_of_nonneg (abs_nonneg (f q))] using hf q)
+        (fun q => by
+          simpa [abs_of_nonneg (abs_nonneg (f q))] using hfg q)
         hg
         h𝒟
-  have hnonneg : 0 ≤ avgOver 𝒟 (fun q => |f q|) :=
-    avgOver_nonneg 𝒟 _ fun q => abs_nonneg (f q)
-  simpa [abs_of_nonneg hnonneg] using havg_abs
+  simpa [abs_of_nonneg havg_nonneg] using havg_abs
 
 /-- `prop:triangle-sub`.
 
@@ -147,42 +149,19 @@ theorem triangleSub
           Real.sqrt (sdd q) * Real.sqrt diagC := by
       calc
         |∑ a : Outcome, ev ψ (((AL q).outcome a - (BL q).outcome a) * (CR q).outcome a)|
-          ≤ ∑ a : Outcome,
-              |ev ψ (((AL q).outcome a - (BL q).outcome a) * (CR q).outcome a)| := by
-                exact Finset.abs_sum_le_sum_abs _ _
-        _ ≤ ∑ a : Outcome,
-              Real.sqrt
-                  (ev ψ
-                    (((AL q).outcome a - (BL q).outcome a)ᴴ *
-                      ((AL q).outcome a - (BL q).outcome a))) *
-                Real.sqrt (ev ψ ((CR q).outcome a * (CR q).outcome a)) := by
-                  refine Finset.sum_le_sum ?_
-                  intro a _
-                  have hherm :
-                      ((AL q).outcome a - (BL q).outcome a)ᴴ =
-                        (AL q).outcome a - (BL q).outcome a := by
-                    simp [SubMeas.outcome_hermitian]
-                  simpa [hherm, SubMeas.outcome_hermitian] using
-                    ev_abs_mul_le_sqrt ψ ((AL q).outcome a - (BL q).outcome a) ((CR q).outcome a)
-        _ ≤ Real.sqrt
+          ≤ Real.sqrt
               (∑ a : Outcome,
                 ev ψ
-                  (((AL q).outcome a - (BL q).outcome a)ᴴ *
-                    ((AL q).outcome a - (BL q).outcome a))) *
-            Real.sqrt diagC := by
-              simpa [diagC] using
-                Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
-                  (f := fun a =>
-                    ev ψ
-                      (((AL q).outcome a - (BL q).outcome a)ᴴ *
-                        ((AL q).outcome a - (BL q).outcome a)))
-                  (g := fun a => ev ψ ((CR q).outcome a * (CR q).outcome a))
-                  (fun a => ev_adjoint_self_nonneg ψ _)
-                  (fun a => by
-                    simpa [SubMeas.outcome_hermitian] using
-                      ev_adjoint_self_nonneg ψ ((CR q).outcome a))
+                  (((AL q).outcome a - (BL q).outcome a) *
+                    ((AL q).outcome a - (BL q).outcome a)ᴴ)) *
+              Real.sqrt
+                (∑ a : Outcome, ev ψ (((CR q).outcome a)ᴴ * (CR q).outcome a)) := by
+                  simpa using
+                    sum_ev_mul_le_sqrt ψ
+                      (fun a => (AL q).outcome a - (BL q).outcome a)
+                      (fun a => (CR q).outcome a)
         _ = Real.sqrt (sdd q) * Real.sqrt diagC := by
-              simp [sdd, qSDD, qSDDCore, diagC]
+              simp [sdd, qSDD, qSDDCore, diagC, SubMeas.outcome_hermitian]
     have hsqrtC : Real.sqrt diagC ≤ 1 := by
       simpa using Real.sqrt_le_sqrt hdiagC_le_one
     have haux' :
@@ -211,10 +190,11 @@ theorem triangleSub
               ((BL q).outcome a * (CR q).outcome a)).symm]
             simp [sub_mul]
   have hgap_avg_abs :
-      avgOver 𝒟 (fun q => |gap q|) ≤ Real.sqrt (avgOver 𝒟 sdd) :=
-    avgOver_abs_le_sqrt_of_pointwise_nonneg 𝒟 h𝒟 gap sdd
-      hgap_pointwise
-      (fun q => qSDD_nonneg ψ (AL q) (BL q))
+      avgOver 𝒟 (fun q => |gap q|) ≤ Real.sqrt (avgOver 𝒟 sdd) := by
+    exact
+      avgOver_abs_le_sqrt_of_pointwise_nonneg 𝒟 h𝒟 gap sdd
+        hgap_pointwise
+        (fun q => qSDD_nonneg ψ (AL q) (BL q))
   have hdefect_pointwise :
       ∀ q, qConsDefect ψ (BL q) (CR q) ≤ qConsDefect ψ (AL q) (CR q) + |gap q| := by
     intro q
@@ -268,6 +248,8 @@ theorem triangleSub
     _ ≤ δ + Real.sqrt ε := by
           simpa [add_comm] using add_le_add_right (Real.sqrt_le_sqrt hAB) δ
 
+/-! ### Right-register variant of `triangleSub` -/
+
 private lemma triangleSub_right
     {Question Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
@@ -310,41 +292,19 @@ private lemma triangleSub_right
           Real.sqrt diagA * Real.sqrt (sdd q) := by
       calc
         |∑ a : Outcome, ev ψ ((AL q).outcome a * ((BR q).outcome a - (DR q).outcome a))|
-          ≤ ∑ a : Outcome,
-              |ev ψ ((AL q).outcome a * ((BR q).outcome a - (DR q).outcome a))| := by
-                exact Finset.abs_sum_le_sum_abs _ _
-        _ ≤ ∑ a : Outcome,
-              Real.sqrt (ev ψ ((AL q).outcome a * (AL q).outcome a)) *
-                Real.sqrt
-                  (ev ψ
+          ≤ Real.sqrt
+              (∑ a : Outcome, ev ψ ((AL q).outcome a * ((AL q).outcome a)ᴴ)) *
+              Real.sqrt
+                (∑ a : Outcome,
+                  ev ψ
                     (((BR q).outcome a - (DR q).outcome a)ᴴ *
                       ((BR q).outcome a - (DR q).outcome a))) := by
-                  refine Finset.sum_le_sum ?_
-                  intro a _
-                  have hherm :
-                      ((AL q).outcome a)ᴴ = (AL q).outcome a := by
-                    simp [SubMeas.outcome_hermitian]
-                  simpa [hherm, SubMeas.outcome_hermitian] using
-                    ev_abs_mul_le_sqrt ψ ((AL q).outcome a) ((BR q).outcome a - (DR q).outcome a)
-        _ ≤ Real.sqrt diagA *
-            Real.sqrt
-              (∑ a : Outcome,
-                ev ψ
-                  (((BR q).outcome a - (DR q).outcome a)ᴴ *
-                    ((BR q).outcome a - (DR q).outcome a))) := by
-              simpa [diagA, mul_comm, mul_left_comm, mul_assoc] using
-                Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
-                  (f := fun a => ev ψ ((AL q).outcome a * (AL q).outcome a))
-                  (g := fun a =>
-                    ev ψ
-                      (((BR q).outcome a - (DR q).outcome a)ᴴ *
-                        ((BR q).outcome a - (DR q).outcome a)))
-                  (fun a => by
-                    simpa [SubMeas.outcome_hermitian] using
-                      ev_adjoint_self_nonneg ψ ((AL q).outcome a))
-                  (fun a => ev_adjoint_self_nonneg ψ _)
+                  simpa using
+                    sum_ev_mul_le_sqrt ψ
+                      (fun a => (AL q).outcome a)
+                      (fun a => (BR q).outcome a - (DR q).outcome a)
         _ = Real.sqrt diagA * Real.sqrt (sdd q) := by
-              simp [sdd, qSDD, qSDDCore]
+              simp [diagA, sdd, qSDD, qSDDCore, SubMeas.outcome_hermitian]
     have hsqrtA : Real.sqrt diagA ≤ 1 := by
       simpa using Real.sqrt_le_sqrt hdiagA_le_one
     have haux' :
@@ -373,10 +333,11 @@ private lemma triangleSub_right
               ((AL q).outcome a * (DR q).outcome a)).symm]
             simp [mul_sub]
   have hgap_avg_abs :
-      avgOver 𝒟 (fun q => |gap q|) ≤ Real.sqrt (avgOver 𝒟 sdd) :=
-    avgOver_abs_le_sqrt_of_pointwise_nonneg 𝒟 h𝒟 gap sdd
-      hgap_pointwise
-      (fun q => qSDD_nonneg ψ (BR q) (DR q))
+      avgOver 𝒟 (fun q => |gap q|) ≤ Real.sqrt (avgOver 𝒟 sdd) := by
+    exact
+      avgOver_abs_le_sqrt_of_pointwise_nonneg 𝒟 h𝒟 gap sdd
+        hgap_pointwise
+        (fun q => qSDD_nonneg ψ (BR q) (DR q))
   have hdefect_pointwise :
       ∀ q, qConsDefect ψ (AL q) (DR q) ≤ qConsDefect ψ (AL q) (BR q) + |gap q| := by
     intro q

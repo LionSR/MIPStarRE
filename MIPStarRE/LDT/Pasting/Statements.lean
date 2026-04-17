@@ -3,14 +3,14 @@ import MIPStarRE.LDT.Pasting.Sandwich
 /-!
 # Section 12 — Statements
 
-This file packages the displayed error terms and statement records used by the
-Section 12 pasting arguments. The underlying constructions live in
-`Pasting/Defs.lean` and `Pasting/Sandwich.lean`, while the proof stubs and
-supporting lemmas live in `Pasting/Theorems.lean`.
+This file packages the Section 12 pasting conclusions into reusable proposition-valued
+structures. It records the displayed error formulas and the statement bundles for the
+switcheroo, completed-family, half-sandwich, recurrence, Chernoff, and final pasting steps.
 
 ## References
 
 - `references/ldt-paper/ld-pasting.tex`
+- `blueprint/src/chapter/ch09_pasting.tex`
 -/
 
 namespace MIPStarRE.LDT.Pasting

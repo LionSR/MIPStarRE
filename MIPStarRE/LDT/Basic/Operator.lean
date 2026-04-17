@@ -57,6 +57,22 @@ abbrev rightTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fi
     (B : MIPStarRE.Quantum.Op ι₂) : MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
   Matrix.kronecker 1 B
 
+/-- Left placement of the identity is the identity on the product space. -/
+theorem leftTensor_one
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂] :
+    leftTensor (ι₂ := ι₂) (1 : MIPStarRE.Quantum.Op ι₁) =
+      (1 : MIPStarRE.Quantum.Op (ι₁ × ι₂)) := by
+  simpa only [leftTensor] using
+    (Matrix.one_kronecker_one (m := ι₁) (n := ι₂) (α := ℂ))
+
+/-- Right placement of the identity is the identity on the product space. -/
+theorem rightTensor_one
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂] :
+    rightTensor (ι₁ := ι₁) (1 : MIPStarRE.Quantum.Op ι₂) =
+      (1 : MIPStarRE.Quantum.Op (ι₁ × ι₂)) := by
+  simpa only [rightTensor] using
+    (Matrix.one_kronecker_one (m := ι₁) (n := ι₂) (α := ℂ))
+
 /-- Local tensor placements multiply to the full Kronecker product. -/
 theorem leftTensor_mul_rightTensor_eq_opTensor
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
@@ -140,8 +156,8 @@ theorem opTensor_sub_left
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (A B : MIPStarRE.Quantum.Op ι₁) (C : MIPStarRE.Quantum.Op ι₂) :
     opTensor A C - opTensor B C = opTensor (A - B) C := by
-  ext i j
-  simp [opTensor, Matrix.sub_apply, sub_mul]
+  simpa [opTensor] using
+    MIPStarRE.Quantum.kronecker_sub_left (A₁ := A) (A₂ := B) (B := C)
 
 /-! ### Bridging lemmas: expectation-value linearity -/
 
@@ -205,7 +221,7 @@ theorem ev_leftTensor_rightTensor
     (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
     ev ψ (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) B) =
       ev ψ (opTensor A B) := by
-  rw [leftTensor_mul_rightTensor_eq_opTensor]
+  simpa using (ev_opTensor ψ A B).symm
 
 /-- A normalized state has unit expectation on the identity operator. -/
 @[simp] theorem ev_one_of_isNormalized {ι : Type*} [Fintype ι] [DecidableEq ι]

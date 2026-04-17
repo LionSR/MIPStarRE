@@ -36,11 +36,12 @@ set_option maxHeartbeats 5000000 in
 private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
     {Outcome : Type*} {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState (ιA × ιB))
     (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) :
     qSSCDefect ψ (leftPlacedSubMeas (ιB := ιB) A.toSubMeas) ≤
       2 * qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := by
+  classical
   let diagA : Error :=
     ∑ a : Outcome,
       ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a))
@@ -88,17 +89,39 @@ private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
       congrArg (ev ψ)
         (Matrix.one_kronecker_one
           (α := ℂ) (m := ιA) (n := ιB))
+  have hleftPlaced_outcome :
+      ∀ a : Outcome,
+        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).outcome a =
+          leftTensor (ι₂ := ιB) (A.outcome a) := by
+    intro a
+    rfl
+  have hleftPlaced_total :
+      (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).total =
+        leftTensor (ι₂ := ιB) A.total :=
+    rfl
+  have hrightPlaced_outcome :
+      ∀ a : Outcome,
+        (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).outcome a =
+          rightTensor (ι₁ := ιA) (B.outcome a) := by
+    intro a
+    rfl
+  have hrightPlaced_total :
+      (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).total =
+        rightTensor (ι₁ := ιA) B.total :=
+    rfl
   have hdiagA_le : diagA ≤ totalMass := by
     calc
       diagA ≤ ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) := by
-        simpa [diagA, leftPlacedSubMeas, leftTensor_mul_leftTensor, A.total_eq_one] using
+        simpa [diagA, hleftPlaced_outcome, hleftPlaced_total, leftTensor_mul_leftTensor,
+          A.total_eq_one] using
           (MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_mass ψ
             (leftPlacedSubMeas (ιB := ιB) A.toSubMeas))
       _ = totalMass := hleft_one
   have hdiagB_le : diagB ≤ totalMass := by
     calc
       diagB ≤ ev ψ (rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) := by
-        simpa [diagB, rightPlacedSubMeas, rightTensor_mul_rightTensor, B.total_eq_one] using
+        simpa [diagB, hrightPlaced_outcome, hrightPlaced_total,
+          rightTensor_mul_rightTensor, B.total_eq_one] using
           (MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_mass ψ
             (rightPlacedSubMeas (ιA := ιA) B.toSubMeas))
       _ = totalMass := hright_one
@@ -197,15 +220,16 @@ private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
   have hmax' : max 0 (ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) - diagA) ≤
       2 * defect := by
     simpa [hleft_one] using hmax
-  simpa [qSSCDefect, diagA, leftPlacedSubMeas, leftTensor_mul_leftTensor,
-    A.total_eq_one] using hmax'
+  simpa [qSSCDefect, diagA, hleftPlaced_outcome, hleftPlaced_total,
+    leftTensor_mul_leftTensor, A.total_eq_one] using hmax'
 
 private lemma sourceAlmostProjective_of_ssc {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (η : Error)
     (hssc : qSSCDefect ψ A.toSubMeas ≤ η) :
     ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ η := by
+  classical
   let diagA : Error := ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a)
   have hsource_eq :
       ∑ a : Outcome, ev ψ (A.outcome a - A.outcome a * A.outcome a) =
@@ -230,6 +254,7 @@ private lemma sourceAlmostProjective_of_ssc {Outcome : Type*}
     _ ≤ max 0 (ev ψ A.toSubMeas.total - diagA) := le_max_right 0 _
     _ ≤ η := hssc'
 
+/-- The source idempotence defect of a measurement is nonnegative. -/
 lemma sourceAlmostProjective_nonneg {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -240,6 +265,23 @@ lemma sourceAlmostProjective_nonneg {Outcome : Type*}
   exact ev_nonneg_of_psd ψ _ <|
     sub_nonneg.mpr <|
       MIPStarRE.Quantum.sq_le_self (A.outcome_pos a) (A.outcome_le_one a)
+
+private def leftLiftedMeasurement {Outcome : Type*}
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (A : Measurement Outcome ιA) :
+    Measurement Outcome (ιA × ιB) :=
+  { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
+    total_eq_one := by
+      calc
+        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).total
+            = leftTensor (ι₂ := ιB) A.total :=
+              rfl
+        _ = leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA) := by
+              rw [A.total_eq_one]
+        _ = 1 := by
+              simp [leftTensor] }
 
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
 with `B`, then `A` is `2ζ`-almost-projective. -/
@@ -253,23 +295,12 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →
       AlmostProjMeasStatement ψ
-        ({ toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-           total_eq_one := by
-             ext i j
-             rcases i with ⟨i₁, i₂⟩
-             rcases j with ⟨j₁, j₂⟩
-             simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] } :
-          Measurement Outcome (ιA × ιB))
+        (leftLiftedMeasurement (ιB := ιB) A)
         (consistencyToAlmostProjectiveError ζ) := by
   intro hCons
   classical
   let A_lifted : Measurement Outcome (ιA × ιB) :=
-    { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-      total_eq_one := by
-        ext i j
-        rcases i with ⟨i₁, i₂⟩
-        rcases j with ⟨j₁, j₂⟩
-        simp [leftPlacedSubMeas, leftTensor, A.total_eq_one] }
+    leftLiftedMeasurement (ιB := ιB) A
   have hCons' :
       qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas ≤ ζ := by
     simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using
@@ -300,7 +331,7 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
         = 0 := sddError_self ψ (uniformDistribution Unit) _
       _ ≤ 2 * consistencyToAlmostProjectiveError ζ := by
             dsimp [consistencyToAlmostProjectiveError]
-            nlinarith
+            nlinarith [hζ_nonneg]
   · exact sourceAlmostProjective_of_ssc ψ A_lifted _ hsscBound
 
 /-- Spectral truncation of an almost-projective measurement.

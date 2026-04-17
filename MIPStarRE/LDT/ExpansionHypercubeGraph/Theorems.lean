@@ -3,13 +3,20 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 /-!
 # Section 7 — Theorems
 
-Statement packages and theorem wrappers for the hypercube expansion and
-variance identities, together with the bridge to the concrete matrix
-realization.
+This file packages the abstract Section 7 variance statements and proves them by
+transporting the concrete matrix results from `MatrixRealization`.
+
+## Main results
+
+- `laplacianRewrite`
+- `localRewrite`
+- `globalRewrite`
+- `localToGlobal`
 
 ## References
 
-This file mirrors Section 7 of `references/ldt-paper/expansion.tex`.
+- `blueprint/src/chapter/ch05_expansion.tex`
+- `references/ldt-paper/expansion.tex`
 -/
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
@@ -89,6 +96,8 @@ private lemma globalVarianceTraceForm_eq_zero_of_isEmpty (hι : ¬ Nonempty ι)
   haveI : IsEmpty ι := not_nonempty_iff.mp hι
   simp [globalVarianceTraceForm, globalVarianceTraceWitness, MIPStarRE.Quantum.normalizedTrace]
 
+/-! ## Finite-sum helper lemmas -/
+
 private lemma sum_mul_sum_expand {α β γ : Type*}
     [Fintype α] [Fintype β] [Fintype γ]
     (f : α → β → γ → ℂ) (g : α → β → ℂ) :
@@ -161,6 +170,8 @@ private lemma sum_sum_sub {α β γ : Type*}
       exact sum_sum_add (f := f) (g := fun a b => -g a b)
     _ = (∑ a, ∑ b, f a b) - ∑ a, ∑ b, g a b := by
       simp [sub_eq_add_neg]
+
+/-! ## Trace witness closed forms -/
 
 private def matrixModelState {params : Parameters}
     (model : MatrixOperatorFamilyRealization params) : QuantumState model.space.carrier where
