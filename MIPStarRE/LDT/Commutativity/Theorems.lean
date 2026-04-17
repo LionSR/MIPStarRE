@@ -95,6 +95,91 @@ structure ComMainConclusion (params : Parameters)
       (fullSliceProductRight params strategy family)
       (comMainError params gamma zeta)
 
+/-- Explicit remaining input for the evaluated-slice commutation step in
+`lem:comm-data-processed-g`. -/
+abbrev CommDataProcessedGEvaluatedSliceInput (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error) : Prop :=
+  strategy.state.IsNormalized →
+    strategy.IsGood eps delta gamma →
+    family.StronglySelfConsistent strategy.state zeta →
+    family.ConsistentWithPoints strategy zeta →
+    IdxPolyFamily.SliceBoundednessInput strategy family zeta →
+    SDDRel strategy.state
+      (uniformDistribution (Point params.next))
+      (evaluatedPointFamilyLeft params family)
+      (evaluatedPointFamilyRight params family)
+      zeta →
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (evaluatedSliceProductLeft params strategy family)
+      (evaluatedSliceProductRight params strategy family)
+      (commDataProcessedGError params gamma zeta)
+
+/-- Explicit remaining input for `clm:g-comm-stability`. -/
+abbrev GCommStabilityInput (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (eps delta gamma zeta : Error) : Prop :=
+  strategy.state.IsNormalized →
+    strategy.IsGood eps delta gamma →
+    family.ConsistentWithPoints strategy zeta →
+    family.StronglySelfConsistent strategy.state zeta →
+    IdxPolyFamily.SliceBoundednessInput strategy family zeta →
+    (∀ x, G x = (family.meas x).toSubMeas) →
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
+      (Real.sqrt zeta)
+
+/-- Explicit remaining input for `clm:g-comm-stability2`. -/
+abbrev GCommStabilityTwoInput (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (eps delta gamma zeta : Error) : Prop :=
+  strategy.state.IsNormalized →
+    strategy.IsGood eps delta gamma →
+    family.ConsistentWithPoints strategy zeta →
+    family.StronglySelfConsistent strategy.state zeta →
+    IdxPolyFamily.SliceBoundednessInput strategy family zeta →
+    (∀ x, G x = (family.meas x).toSubMeas) →
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (commDataProcessedGStabilityTwoLeft params strategy family G)
+      (commDataProcessedGStabilityTwoRight params strategy family G)
+      (Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)))
+
+/-- Explicit remaining input for the Schwartz-Zippel transport from evaluated
+slice commutation to full-slice commutation. -/
+abbrev FullSliceCommutationEvaluatedInput (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) : Prop :=
+  strategy.state.IsNormalized →
+    0 ≤ gamma →
+    0 ≤ zeta →
+    family.StronglySelfConsistent strategy.state zeta →
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (evaluatedFromFullSliceProductLeft params strategy family)
+      (evaluatedFromFullSliceProductRight params strategy family)
+      (commDataProcessedGError params gamma zeta) →
+    SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q => fullSliceProductLeft params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q))
+      (fun q => fullSliceProductRight params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q))
+      (comMainError params gamma zeta)
+
 /-- Output package for `lem:normalization-condition`. -/
 structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
