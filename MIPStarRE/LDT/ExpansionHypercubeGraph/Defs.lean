@@ -4,13 +4,20 @@ import Mathlib.Analysis.Fourier.ZMod
 /-!
 # Section 7 — Expansion hypercube graph definitions
 
-This file defines the hypercube graph on `F_q^m`, its rerandomization
-sampling distribution, the local and global variance quantities, and the
-Fourier-analytic data used in the spectral-gap statements.
+This file defines the hypercube edge distribution, Laplacian and adjacency
+operators, Fourier basis data, and variance trace witnesses used in Section 7
+of the low-degree paper.
+
+## Main definitions
+
+- `rerandomizeCoord`, `adjacency`, `laplacian`
+- `fourierBasisState`, `fourierBasisProjector`
+- `localVariance`, `globalVariance`
 
 ## References
 
-This file mirrors Section 7 of `references/ldt-paper/expansion.tex`.
+- `blueprint/src/chapter/ch05_expansion.tex`
+- `references/ldt-paper/expansion.tex`
 -/
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
@@ -458,12 +465,13 @@ noncomputable def localVarianceTraceForm (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error :=
   Complex.re (MIPStarRE.Quantum.normalizedTrace (localVarianceTraceWitness params A ψ))
 
-/-- The global-variance trace expression from `lem:global-rewrite`. -/
+/-- The global-variance trace expression from `lem:global-rewrite`.
+
+The prefactor `1 / hypercubeVertexCount params` is the paper's `1 / M`
+normalization from Section 7. -/
 noncomputable def globalVarianceTraceForm (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
     (decomp : GlobalVarianceDecomposition params A) : Error :=
-  -- TODO(#136): document/verify the `1 / |U|` normalization convention against
-  -- Section 7 (`lem:global-rewrite`) to avoid silent constant-factor drift.
   (1 / (hypercubeVertexCount params : Error)) *
     Complex.re (MIPStarRE.Quantum.normalizedTrace (globalVarianceTraceWitness params A ψ decomp))
 

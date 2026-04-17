@@ -15,7 +15,8 @@ This file provides the matrix-valued measurement layer used by the LDT formaliza
 
 ## References
 
-This file supplies reusable measurement infrastructure for the LDT paper sources in
+This file builds the project's finite-dimensional measurement layer on top of
+`MIPStarRE/Quantum/FiniteMatrix.lean` for the quantum formalization in
 `references/ldt-paper/`.
 -/
 
@@ -51,6 +52,8 @@ namespace Submeasurement
 
 variable {d : Type*} [Fintype d] [DecidableEq d]
 variable {α β : Type*} [Fintype α] [Fintype β]
+
+/-! ### Totals and postprocessing -/
 
 /-- The total operator `∑ a, M_a`. -/
 noncomputable def total (M : Submeasurement α d) : Op d :=

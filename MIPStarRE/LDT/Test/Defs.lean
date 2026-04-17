@@ -178,7 +178,8 @@ theorem qBipartiteConsDefect_eq_qConsDefect_placed {Outcome : Type*}
     qBipartiteConsDefect ψ A B =
       qConsDefect ψ (leftPlacedSubMeas A) (rightPlacedSubMeas B) := by
   simp only [qBipartiteConsDefect, qConsDefect, qBipartiteMatchMass, qMatchMass,
-    leftPlacedSubMeas, rightPlacedSubMeas,
+    leftPlacedSubMeas_total, rightPlacedSubMeas_total,
+    leftPlacedSubMeas_outcome, rightPlacedSubMeas_outcome,
     leftTensor_mul_rightTensor_eq_opTensor]
 
 /-- **Bridge lemma**: averaged bipartite consistency equals the same-space

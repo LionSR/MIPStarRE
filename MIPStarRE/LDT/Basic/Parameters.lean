@@ -398,8 +398,7 @@ noncomputable def sampleParameter {params : Parameters} [FieldModel params.q]
   · subst h
     unfold AxisParallelLine.pointAt AxisParallelLine.throughPoint
     simp [AxisParallelLine.sampleParameter, addCoord, zeroCoord]
-  · simp [AxisParallelLine.throughPoint, AxisParallelLine.sampleParameter,
-      AxisParallelLine.pointAt, h]
+  · simp [AxisParallelLine.throughPoint, AxisParallelLine.pointAt, h]
 
 @[simp] theorem throughPointDirection_pointAt_sampleParameter {params : Parameters}
     [FieldModel params.q] (u v : Point params) :
@@ -414,7 +413,6 @@ noncomputable def sampleParameter {params : Parameters} [FieldModel params.q]
   · rename_i i
     funext j
     simp [DiagonalLine.pointAt, addPoint, smulPoint, subCoord, addCoord, mulCoord]
-    repeat rw [decode_encodeScalar]
 
 /-- Rebase a diagonal line so that the old point `ℓ.pointAt t` becomes the new base point. -/
 def rebaseAt {params : Parameters} [FieldModel params.q]
@@ -497,9 +495,9 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
         congr 1
         ring_nf
         have hx' : decodeScalar (encodeScalar (decodeScalar x)) = decodeScalar x := by
-          exact decode_encodeScalar (params := params) (x := decodeScalar x)
+          simp
         have hz' : decodeScalar (encodeScalar (0 : Scalar params)) = (0 : Scalar params) := by
-          exact decode_encodeScalar (params := params) (x := (0 : Scalar params))
+          simp
         calc
           decodeScalar x = decodeScalar x + decodeScalar t * (0 : Scalar params) := by ring
           _ = decodeScalar x + decodeScalar t * decodeScalar (encodeScalar 0) := by rw [hz']
@@ -931,8 +929,9 @@ noncomputable def restrictToDiagonalLine (params : Parameters) [FieldModel param
 
 end Polynomial
 
-/-- Axis-line polynomial answers form a finite type via their bounded coefficient vectors.
-This finiteness lets postprocessing sum over actual outcome fibers. -/
+/-! ### Finite answer spaces -/
+
+/-- Axis-line polynomial answers form a finite type via their bounded coefficient vectors. -/
 noncomputable instance (params : Parameters) [FieldModel params.q] :
     Fintype (AxisLinePolynomial params) := by
   classical
@@ -972,6 +971,7 @@ noncomputable instance (params : Parameters) [FieldModel params.q] :
   }
   exact Fintype.ofEquiv _ (e.trans e').symm
 
+/-- Diagonal-line polynomial answers form a finite type via their bounded coefficient vectors. -/
 noncomputable instance (params : Parameters) [FieldModel params.q] :
     Fintype (DiagonalLinePolynomial params) := by
   classical
@@ -1011,6 +1011,7 @@ noncomputable instance (params : Parameters) [FieldModel params.q] :
   }
   exact Fintype.ofEquiv _ (e.trans e').symm
 
+/-- Global low-individual-degree polynomial answers form a finite type. -/
 noncomputable instance (params : Parameters) [FieldModel params.q] :
     Fintype (Polynomial params) := by
   classical

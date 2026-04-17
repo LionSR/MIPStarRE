@@ -1,11 +1,32 @@
 import MIPStarRE.LDT.Preliminaries.Defs
 
 /-!
-Matching scaffold for Section 4 of the low individual degree paper in
-`references/ldt-paper/preliminaries.tex`.
+# Preliminary comparison theorems
 
-This file records the main proposition names with placeholder proofs.
-All operator fields use `Op ι` directly.
+This file proves the main consistency, state-dependent-distance, sandwich, and
+completion lemmas used throughout the preliminaries chapter. It also records a
+small collection of reusable helper lemmas for postprocessing, tensor lifts,
+and constant families.
+
+## Main results
+
+- `simeqForMeasurements`: consistency for measurements in terms of agreement.
+- `simeqToApprox`: consistency implies state-dependent distance for
+  measurements.
+- `simeqDataProcessing`: postprocessing preserves consistency.
+- `consSubMeas`: the two-step sandwich bridge from consistency to
+  submeasurement control.
+- `switchSandwich`: the paper's switch-sandwich estimate.
+- `completenessTransferProjectiveP`: completeness transfer from a nearby
+  projective family.
+- `twoNotionsOfSelfConsistency`: bipartite self-consistency implies left/right
+  closeness.
+- `completingToMeasurement`: completion of a submeasurement while controlling
+  distance to the original measurement.
+
+## References
+
+- `references/ldt-paper/preliminaries.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -161,17 +182,13 @@ theorem simeqToApprox {Question Outcome : Type*}
           let A' : Measurement Outcome (ι × ι) :=
             { toSubMeas := ((A q).toSubMeas).liftLeft
               total_eq_one := by
-                ext i j
-                rcases i with ⟨i₁, i₂⟩
-                rcases j with ⟨j₁, j₂⟩
-                simp [SubMeas.liftLeft, leftTensor, (A q).total_eq_one] }
+                simpa [SubMeas.liftLeft, (A q).total_eq_one] using
+                  (leftTensor_one (ι₁ := ι) (ι₂ := ι)) }
           let B' : Measurement Outcome (ι × ι) :=
             { toSubMeas := ((B q).toSubMeas).liftRight
               total_eq_one := by
-                ext i j
-                rcases i with ⟨i₁, i₂⟩
-                rcases j with ⟨j₁, j₂⟩
-                simp [SubMeas.liftRight, rightTensor, (B q).total_eq_one] }
+                simpa [SubMeas.liftRight, (B q).total_eq_one] using
+                  (rightTensor_one (ι₁ := ι) (ι₂ := ι)) }
           simpa [A', B', IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxMeas.toIdxSubMeas] using
             questionSDD_le_two_questionConsistency ψ A' B'
     _ = 2 * avgOver 𝒟
@@ -817,7 +834,7 @@ private lemma consSubMeas_diagonalControl
           have hX_nonneg : ∀ a : Outcome, 0 ≤ X a := by
             intro a
             dsimp [X]
-            simp only [IdxSubMeas.liftLeft, SubMeas.liftLeft, diagonalSandwichFamily,
+            simp only [IdxSubMeas.liftLeft, diagonalSandwichFamily,
               LDT.leftTensor_mul_rightTensor_eq_opTensor, sub_nonneg]
             exact MIPStarRE.LDT.opTensor_le_leftTensor
               ((A q).outcome_pos a)
@@ -856,7 +873,7 @@ private lemma consSubMeas_diagonalControl
                       ev ψ
                         (leftTensor (ι₂ := ι) ((A q).outcome a) *
                           rightTensor (ι₁ := ι) ((B q).outcome a)) := by
-                          simp [X, IdxSubMeas.liftLeft, SubMeas.liftLeft,
+                          simp [X, IdxSubMeas.liftLeft,
                             diagonalSandwichFamily, ev_sub]
               _ = ev ψ (leftTensor (ι₂ := ι) ((A q).total)) -
                     qMatchMass ψ
@@ -864,7 +881,7 @@ private lemma consSubMeas_diagonalControl
                       (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
                           unfold qMatchMass
                           simp [hleft, IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
-                            SubMeas.liftLeft, SubMeas.liftRight, IdxMeas.toIdxSubMeas]
+                            IdxMeas.toIdxSubMeas]
               _ =
                   ev ψ
                     ((((IdxSubMeas.liftLeft A) q).total) *
@@ -1002,8 +1019,7 @@ private lemma consSubMeas_sandwichControl
                       (((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
                         unfold qMatchMass
                         simp [htotal, diagonalSandwichFamily, IdxSubMeas.liftLeft,
-                          IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight,
-                          IdxMeas.toIdxSubMeas]
+                          IdxSubMeas.liftRight, IdxMeas.toIdxSubMeas]
               _ =
                   ev ψ
                     ((((IdxSubMeas.liftLeft A) q).total) *
@@ -1014,7 +1030,7 @@ private lemma consSubMeas_sandwichControl
                         rw [show ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q).total =
                             rightTensor (ι₁ := ι) ((B q).total) by rfl]
                         rw [(B q).total_eq_one]
-                        simp [IdxSubMeas.liftLeft, SubMeas.liftLeft, rightTensor, leftTensor]
+                        simp [IdxSubMeas.liftLeft, rightTensor, leftTensor]
     _ ≤ γ := hcons
 
 private lemma consSubMeas_combinedControl
@@ -3729,10 +3745,8 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
   let A_lifted : Measurement Outcome (ι × ι) :=
     { toSubMeas := A.toSubMeas.liftLeft
       total_eq_one := by
-        ext i j
-        rcases i with ⟨i₁, i₂⟩
-        rcases j with ⟨j₁, j₂⟩
-        simp [SubMeas.liftLeft, leftTensor, A.total_eq_one] }
+        simpa [SubMeas.liftLeft, A.total_eq_one] using
+          (leftTensor_one (ι₁ := ι) (ι₂ := ι)) }
   have hlocal :=
     closenessAfterCompletion_core_local ψ hψ A_lifted B.liftLeft a0 δ ζ
       hlocal_ssc hsdd
@@ -3806,25 +3820,8 @@ lemma sddOpRel_triangle
     (A B C : IdxOpFamily Question Outcome ι) (δ₁ δ₂ : Error) :
     SDDOpRel ψ 𝒟 A B δ₁ →
     SDDOpRel ψ 𝒟 B C δ₂ →
-    SDDOpRel ψ 𝒟 A C (2 * (δ₁ + δ₂)) := by
-  intro ⟨h₁⟩ ⟨h₂⟩
-  constructor
-  unfold sddErrorOp at *
-  calc avgOver 𝒟 (fun q => qSDDOp ψ (A q) (C q))
-      ≤ avgOver 𝒟 (fun q => 2 * (qSDDOp ψ (A q) (B q) +
-            qSDDOp ψ (B q) (C q))) := by
-        apply avgOver_mono
-        intro q
-        exact questionSDDOp_triangle ψ (A q) (B q) (C q)
-    _ = 2 * avgOver 𝒟 (fun q => qSDDOp ψ (A q) (B q) +
-          qSDDOp ψ (B q) (C q)) := by
-        rw [avgOver_const_mul]
-    _ = 2 * (avgOver 𝒟 (fun q => qSDDOp ψ (A q) (B q)) +
-          avgOver 𝒟 (fun q => qSDDOp ψ (B q) (C q))) := by
-        rw [avgOver_add]
-    _ ≤ 2 * (δ₁ + δ₂) := by
-        apply mul_le_mul_of_nonneg_left _ (by norm_num)
-        exact add_le_add h₁ h₂
+    SDDOpRel ψ 𝒟 A C (2 * (δ₁ + δ₂)) :=
+  stateDependentDistanceOpRel_triangle ψ 𝒟 A B C δ₁ δ₂
 
 /-- Monotonicity for `SDDOpRel`. -/
 lemma sddOpRel_mono
@@ -3833,8 +3830,8 @@ lemma sddOpRel_mono
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
     (A B : IdxOpFamily Question Outcome ι) (δ δ' : Error) :
     SDDOpRel ψ 𝒟 A B δ → δ ≤ δ' → SDDOpRel ψ 𝒟 A B δ' := by
-  intro ⟨h⟩ hle
-  exact ⟨le_trans h hle⟩
+  intro h hle
+  exact stateDependentDistanceOpRel_mono ψ 𝒟 A B δ δ' hle h
 
 /-- Questionwise n-step chain bound: the squared distance between the
 first and last operator family telescopes and is bounded by
@@ -3855,7 +3852,7 @@ private lemma questionSDDOp_chain
       (families 0).outcome a - (families (Fin.last n)).outcome a =
         ∑ i : Fin n, D i a := by
     intro a
-    show (families 0).outcome a -
+    change (families 0).outcome a -
         (families (Fin.last n)).outcome a =
       ∑ i : Fin n, ((families i.castSucc).outcome a -
         (families i.succ).outcome a)

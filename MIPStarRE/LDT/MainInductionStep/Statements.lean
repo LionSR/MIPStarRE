@@ -1,11 +1,13 @@
 import MIPStarRE.LDT.MainInductionStep.Defs
 
 /-!
-# Section 6 — Statement packages
+# Section 6 — Statement Packages
 
-This file packages the hypotheses and conclusions used by the main induction-step
-results, including restricted-slice bookkeeping and bridge-style temporary
-interfaces.
+This file packages the intermediate conclusion structures and bookkeeping
+statements used in the induction step. It contains conclusion packages for the
+induction-level self-improvement and pasting theorems, together with restricted
+failure profiles and temporary bridge statements for the still-partial assembly
+of the main induction argument.
 
 ## References
 
@@ -32,26 +34,32 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
     (_G : SubMeas (Polynomial params) ι)
     (H : ProjSubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
+  /-- The projective submeasurement remains almost complete. -/
   completeness :
     CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
       ((1 - nu) - selfImprovementInInductionError params eps delta gamma)
+  /-- The projective submeasurement stays point-consistent with the original strategy. -/
   pointConsistency :
     ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (polynomialEvaluationFamily params H.toSubMeas)
       (selfImprovementInInductionError params eps delta gamma)
+  /-- The output family is strongly self-consistent in the bipartite sense. -/
   strongSelfConsistency :
     BipartiteSSCRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily H.toSubMeas)
       (selfImprovementInInductionError params eps delta gamma)
+  /-- The left and right placements of the output family stay close in squared distance. -/
   selfCloseness :
     SDDRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
       (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
       (selfImprovementInInductionError params eps delta gamma)
+  /-- The dual witness `Z` controls the tensor failure expectation of `H`. -/
   bounded :
     tensorFailureExpectation strategy.state Z H.toSubMeas
       ≤ selfImprovementInInductionError params eps delta gamma
+  /-- Every averaged point-evaluation operator is dominated by the dual witness `Z`. -/
   dominatesAveragePointOperator :
     ∀ h : Polynomial params,
       IdxPolyFamily.averagedPointEvaluationOperator strategy h ≤ Z
@@ -63,6 +71,7 @@ structure LdPastingInInductionSectionConclusion (params : Parameters)
     (_family : IdxPolyFamily params ι)
     (H : Measurement (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
+  /-- The pasted measurement is point-consistent with the ambient strategy. -/
   pointConsistency :
     ConsRel strategy.state (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
@@ -73,9 +82,13 @@ structure LdPastingInInductionSectionConclusion (params : Parameters)
 structure RestrictedFailureProfile (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) : Type where
+  /-- The axis-parallel failure bound attached to each slice height. -/
   axisParallel : Fq params → Error
+  /-- The self-consistency failure bound attached to each slice height. -/
   selfConsistency : Fq params → Error
+  /-- The diagonal-line failure bound attached to each slice height. -/
   diagonal : Fq params → Error
+  /-- Each slice-restricted strategy is good with the recorded parameters. -/
   restrictedGood :
     ∀ x,
       (xRestrictedStrategy params strategy x).IsGood
@@ -122,6 +135,7 @@ structure MainInductionBridgePackage (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error) (k : ℕ) : Prop where
+  /-- A temporary witness measurement already satisfying the target consistency bound. -/
   witness :
     ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
@@ -137,10 +151,12 @@ Both the axis-parallel and diagonal branches use the paper's
 structure RestrictedProbabilitiesBridgePackage (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (eps gamma : Error) : Prop where
+  /-- The weighted average axis-parallel slice error is bounded by `eps`. -/
   axisWeightedBound :
     avgOver (uniformDistribution (Fq params))
         (fun x => sliceTransverseDirectionWeight params *
           (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps
+  /-- The weighted average diagonal slice error is bounded by `gamma`. -/
   diagonalWeightedBound :
     avgOver (uniformDistribution (Fq params))
         (fun x => sliceDiagonalDirectionWeight params *
@@ -156,6 +172,7 @@ structure RestrictedProbabilitiesStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error) : Prop where
+  /-- There is a slice-wise error profile satisfying all averaged restricted bounds. -/
   profileExists :
     ∃ profile : RestrictedFailureProfile params strategy,
       avgOver (uniformDistribution (Fq params))

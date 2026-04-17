@@ -3,13 +3,13 @@ import MIPStarRE.LDT.GlobalVariance.Defs
 /-!
 # Section 8 — Matrix realization
 
-Concrete finite-dimensional matrix realizations of the global-variance transfer
-data.
+This file packages concrete finite-dimensional matrix realizations of the
+variance-transfer constructions from the global-variance chapter.
 
 ## References
 
-- Blueprint: `blueprint/src/chapter/ch06_variance.tex`
-- Paper: `references/ldt-paper/expansion.tex`, Section `sec:variance`
+- `blueprint/src/chapter/ch06_variance.tex`
+- `references/ldt-paper/expansion.tex`
 -/
 
 namespace MIPStarRE.LDT.GlobalVariance
@@ -21,25 +21,28 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable (params : Parameters) [FieldModel params.q]
 
-/-! ## Realization data -/
+/-! ## Matrix realizations -/
 
-/-- Matrix-model data used to interpret the global-variance constructions. -/
+/-- Concrete matrix data realizing the operators and distributions used in the
+variance-transfer statements. -/
 structure MatrixVarianceTransferRealization (params : Parameters) [FieldModel params.q] where
-  /-- The underlying finite-dimensional Hilbert space. -/
+  /-- The finite-dimensional Hilbert space on which the realization lives. -/
   space : FiniteHilbertSpace
-  /-- The positive semidefinite state on the realization space. -/
+  /-- The ambient positive matrix state. -/
   state : PositiveMatrixState space
-  /-- The point-measurement family `A^u_a`. -/
+  /-- The point measurement family `u ↦ A^u`. -/
   pointMeasurement : Point params → MatrixSubmeasurement (Fq params) space
-  /-- The axis-parallel line measurement family `B^ℓ_f`. -/
+  /-- The axis-parallel line measurement family `ℓ ↦ B^ℓ`. -/
   axisMeasurement : AxisParallelLine params →
     MatrixSubmeasurement (DegreeBoundedLineAnswer params) space
-  /-- The polynomial measurement family `G_g`. -/
+  /-- The polynomial-weight submeasurement `G`. -/
   polynomialMeasurement :
     MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) space
-  /-- The affine parameter attached to an axis-line question. -/
+  /-- The affine parameter used to evaluate a queried point on an axis-parallel line. -/
   axisQuestionParameter : AxisParallelLineQuestion params → Fq params :=
     axisParallelLineQuestionParameter
+
+/-! ## Concrete operators and variances -/
 
 /-- The concrete operator `G_g`. -/
 def matrixPolynomialWeightOperator (params : Parameters) [FieldModel params.q]
@@ -176,16 +179,16 @@ noncomputable def matrixGlobalVarianceDeviationAtPolynomial
     (g : Polynomial params) : Error :=
   matrixPointConditionedGlobalVarianceAtPolynomial params model g
 
-/-! ## Matrix-level statement packages -/
+/-! ## Matrix statement packages -/
 
 /-- Matrix-level version of `lem:generalize-b`. -/
 structure MatrixGeneralizeBStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params) : Prop where
-  /-- Each fixed polynomial satisfies the matrix-level `generalize-b` bound. -/
+  /-- Each fixed polynomial satisfies the claimed matrix deviation bound. -/
   pointwiseDeviationBound :
     ∀ g : Polynomial params,
       matrixGeneralizeBDeviationAtPolynomial params model g ≤ generalizeBError params
-  /-- The polynomial average also satisfies the matrix-level `generalize-b` bound. -/
+  /-- The polynomial average of the matrix deviations satisfies the same bound. -/
   averagedDeviationBound :
     matrixGeneralizeBDeviation params model ≤ generalizeBError params
 
@@ -193,12 +196,12 @@ structure MatrixGeneralizeBStatement (params : Parameters) [FieldModel params.q]
 structure MatrixLocalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) : Prop where
-  /-- Each fixed polynomial satisfies the matrix-level local-variance bound. -/
+  /-- Each fixed polynomial satisfies the matrix local-variance bound. -/
   pointwiseLocalVarianceBound :
     ∀ g : Polynomial params,
       matrixPointConditionedLocalVarianceAtPolynomial params model g ≤
         localVarianceOfPointsError params eps delta
-  /-- The polynomial average satisfies the matrix-level local-variance bound. -/
+  /-- The polynomial average of the matrix local variances satisfies the same bound. -/
   averagedLocalVarianceBound :
     matrixPointConditionedLocalVariance params model ≤
       localVarianceOfPointsError params eps delta
@@ -207,18 +210,18 @@ structure MatrixLocalVarianceOfPointsStatement (params : Parameters) [FieldModel
 structure MatrixGlobalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) : Prop where
-  /-- Pointwise local-to-global transfer for the matrix realization. -/
+  /-- Each fixed polynomial satisfies the matrix local-to-global comparison. -/
   pointwiseExpansionTransfer :
     ∀ g : Polynomial params,
       matrixPointConditionedGlobalVarianceAtPolynomial params model g ≤
         (params.m : Error) *
           matrixPointConditionedLocalVarianceAtPolynomial params model g
-  /-- Each fixed polynomial satisfies the matrix-level global-variance bound. -/
+  /-- Each fixed polynomial satisfies the matrix global-variance bound. -/
   pointwiseGlobalVarianceBound :
     ∀ g : Polynomial params,
       matrixPointConditionedGlobalVarianceAtPolynomial params model g ≤
         globalVarianceOfPointsError params eps delta
-  /-- The polynomial average satisfies the matrix-level global-variance bound. -/
+  /-- The polynomial average of the matrix global variances satisfies the same bound. -/
   averagedGlobalVarianceBound :
     matrixPointConditionedGlobalVariance params model ≤
       globalVarianceOfPointsError params eps delta
