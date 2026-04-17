@@ -5033,7 +5033,7 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
                     evaluatedSliceABABAvg params strategy family)| +
                 |evaluatedSliceABABAvg params strategy family -
                     fullSliceABABAvg params strategy family| :=
-                abs_add _ _
+                abs_add_le _ _
           _ ≤ (|fullSliceABAAvg params strategy family -
                     evaluatedSliceABAAvg params strategy family| +
                   |evaluatedSliceABAAvg params strategy family -
@@ -5041,7 +5041,7 @@ private lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
                 |evaluatedSliceABABAvg params strategy family -
                     fullSliceABABAvg params strategy family| := by
                 gcongr
-                exact abs_add _ _
+                exact abs_add_le _ _
       -- Symmetry of `abs`: `|evalABAB - fullABAB| = |fullABAB - evalABAB|`.
       have hMargY' :
           |evaluatedSliceABABAvg params strategy family -
