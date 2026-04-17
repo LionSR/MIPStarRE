@@ -14,8 +14,6 @@ statement structures live in `Pasting/Statements.lean`.
 - `references/ldt-paper/ld-pasting.tex`
 -/
 
-set_option linter.style.longLine false
-
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
@@ -530,6 +528,20 @@ noncomputable def completePartSubMeas (params : Parameters) [FieldModel params.q
     (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
   postprocess ((family.meas x).toSubMeas) (fun _ => ())
 
+/-- The total operator of the complete part is the original slice total. -/
+@[simp] theorem completePartSubMeas_total (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) :
+    (completePartSubMeas params family x).total = (family.meas x).total := by
+  simp [completePartSubMeas, postprocess_total]
+
+/-- The unique outcome of the complete part equals its total operator. -/
+@[simp] theorem completePartSubMeas_outcome_unit (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) :
+    (completePartSubMeas params family x).outcome () =
+      (completePartSubMeas params family x).total := by
+  rw [← (completePartSubMeas params family x).sum_eq_total]
+  simp [completePartSubMeas]
+
 /-- Placeholder for the incomplete part `G^x_⊥ = I - G^x`. -/
 noncomputable def incompletePartSubMeas (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
@@ -542,11 +554,7 @@ noncomputable def incompletePartSubMeas (params : Parameters) [FieldModel params
     sum_eq_total := by
       simp
     total_le_one := by
-      have hnonneg : 0 ≤ (completePartSubMeas params family x).total := by
-        rw [← (completePartSubMeas params family x).sum_eq_total]
-        exact Finset.sum_nonneg fun _ _ =>
-          (completePartSubMeas params family x).outcome_pos ()
-      exact sub_le_self _ hnonneg }
+      exact sub_le_self _ (completePartSubMeas params family x).total_nonneg }
 
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
 noncomputable def gHatIdxMeas (params : Parameters) [FieldModel params.q]

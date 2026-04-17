@@ -3,7 +3,13 @@ import MIPStarRE.LDT.GlobalVariance.Defs
 /-!
 # Section 8 — Matrix realization
 
-Concrete finite-dimensional matrix realizations of the variance transfer data.
+Concrete finite-dimensional matrix realizations of the global-variance transfer
+data.
+
+## References
+
+- Blueprint: `blueprint/src/chapter/ch06_variance.tex`
+- Paper: `references/ldt-paper/expansion.tex`, Section `sec:variance`
 -/
 
 namespace MIPStarRE.LDT.GlobalVariance
@@ -15,15 +21,23 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable (params : Parameters) [FieldModel params.q]
 
+/-! ## Realization data -/
 
+/-- Matrix-model data used to interpret the global-variance constructions. -/
 structure MatrixVarianceTransferRealization (params : Parameters) [FieldModel params.q] where
+  /-- The underlying finite-dimensional Hilbert space. -/
   space : FiniteHilbertSpace
+  /-- The positive semidefinite state on the realization space. -/
   state : PositiveMatrixState space
+  /-- The point-measurement family `A^u_a`. -/
   pointMeasurement : Point params → MatrixSubmeasurement (Fq params) space
+  /-- The axis-parallel line measurement family `B^ℓ_f`. -/
   axisMeasurement : AxisParallelLine params →
     MatrixSubmeasurement (DegreeBoundedLineAnswer params) space
+  /-- The polynomial measurement family `G_g`. -/
   polynomialMeasurement :
     MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) space
+  /-- The affine parameter attached to an axis-line question. -/
   axisQuestionParameter : AxisParallelLineQuestion params → Fq params :=
     axisParallelLineQuestionParameter
 
@@ -162,12 +176,16 @@ noncomputable def matrixGlobalVarianceDeviationAtPolynomial
     (g : Polynomial params) : Error :=
   matrixPointConditionedGlobalVarianceAtPolynomial params model g
 
+/-! ## Matrix-level statement packages -/
+
 /-- Matrix-level version of `lem:generalize-b`. -/
 structure MatrixGeneralizeBStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params) : Prop where
+  /-- Each fixed polynomial satisfies the matrix-level `generalize-b` bound. -/
   pointwiseDeviationBound :
     ∀ g : Polynomial params,
       matrixGeneralizeBDeviationAtPolynomial params model g ≤ generalizeBError params
+  /-- The polynomial average also satisfies the matrix-level `generalize-b` bound. -/
   averagedDeviationBound :
     matrixGeneralizeBDeviation params model ≤ generalizeBError params
 
@@ -175,10 +193,12 @@ structure MatrixGeneralizeBStatement (params : Parameters) [FieldModel params.q]
 structure MatrixLocalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) : Prop where
+  /-- Each fixed polynomial satisfies the matrix-level local-variance bound. -/
   pointwiseLocalVarianceBound :
     ∀ g : Polynomial params,
       matrixPointConditionedLocalVarianceAtPolynomial params model g ≤
         localVarianceOfPointsError params eps delta
+  /-- The polynomial average satisfies the matrix-level local-variance bound. -/
   averagedLocalVarianceBound :
     matrixPointConditionedLocalVariance params model ≤
       localVarianceOfPointsError params eps delta
@@ -187,15 +207,18 @@ structure MatrixLocalVarianceOfPointsStatement (params : Parameters) [FieldModel
 structure MatrixGlobalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) : Prop where
+  /-- Pointwise local-to-global transfer for the matrix realization. -/
   pointwiseExpansionTransfer :
     ∀ g : Polynomial params,
       matrixPointConditionedGlobalVarianceAtPolynomial params model g ≤
         (params.m : Error) *
           matrixPointConditionedLocalVarianceAtPolynomial params model g
+  /-- Each fixed polynomial satisfies the matrix-level global-variance bound. -/
   pointwiseGlobalVarianceBound :
     ∀ g : Polynomial params,
       matrixPointConditionedGlobalVarianceAtPolynomial params model g ≤
         globalVarianceOfPointsError params eps delta
+  /-- The polynomial average satisfies the matrix-level global-variance bound. -/
   averagedGlobalVarianceBound :
     matrixPointConditionedGlobalVariance params model ≤
       globalVarianceOfPointsError params eps delta

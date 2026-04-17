@@ -120,7 +120,8 @@ private lemma isProj_kronecker {d₁ d₂ : Type*}
 private lemma isProj_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
     (U : Matrix.unitaryGroup n ℂ) {P : MIPStarRE.Quantum.Op n}
     (hP : MIPStarRE.Quantum.IsProj P) :
-    MIPStarRE.Quantum.IsProj (((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n)) := by
+    MIPStarRE.Quantum.IsProj
+      (((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n)) := by
   refine ⟨?_, ?_⟩
   · calc
       ((((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n)))ᴴ
@@ -205,27 +206,6 @@ private lemma oneMeasNaimarkRemainder_nonneg {α : Type*} [Fintype α] [Decidabl
     0 ≤ oneMeasNaimarkRemainder M := by
   exact sub_nonneg.mpr M.sum_le_one
 
-private lemma oneMeasNaimarkColumn_eq {α : Type*} [Fintype α] [DecidableEq α]
-    {d : Type*} [Fintype d] [DecidableEq d]
-    (M : MIPStarRE.Quantum.Submeasurement α d) :
-    oneMeasNaimarkColumn M =
-      Matrix.kronecker
-        (CFC.sqrt (oneMeasNaimarkRemainder M))
-        (oneMeasNaimarkAuxTransition none none) +
-      ∑ a : α,
-        Matrix.kronecker
-          (CFC.sqrt (M.effect a))
-          (oneMeasNaimarkAuxTransition (some a) none) := by
-  ext x y
-  rcases x with ⟨i, ox⟩
-  rcases y with ⟨j, oy⟩
-  cases ox <;> cases oy
-  · simp [oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.sum_apply]
-  · simp [oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.sum_apply]
-  · simp [oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.sum_apply,
-      Matrix.single_apply, Finset.sum_eq_single]
-  · simp [oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.sum_apply]
-
 private lemma oneMeasNaimarkOutcomeProj_mul_column
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -305,41 +285,11 @@ private lemma oneMeasNaimarkOutcomeProj_mul_column
       simp [oneMeasNaimarkOutcomeProj, oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition,
         Matrix.kronecker]
 
-private lemma oneMeasNaimarkInputProj_idempotent {α : Type*} [Fintype α] [DecidableEq α]
-    {d : Type*} [Fintype d] [DecidableEq d] :
-    oneMeasNaimarkInputProj (α := α) (d := d) * oneMeasNaimarkInputProj (α := α) (d := d) =
-      oneMeasNaimarkInputProj (α := α) (d := d) := by
-  exact
-    (isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) none)).idempotent
-
 private lemma oneMeasNaimarkInputProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d] :
     MIPStarRE.Quantum.IsProj
       (oneMeasNaimarkInputProj (α := α) (d := d)) :=
   isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) none)
-
-/-- The CFC square root of a matrix is Hermitian. -/
-private lemma sqrt_isHermitian_eq {d : Type*} [Fintype d] [DecidableEq d]
-    {A : MIPStarRE.Quantum.Op d} :
-    (CFC.sqrt A)ᴴ = CFC.sqrt A :=
-  (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg A)).isHermitian.eq
-
-/-- Entrywise form of `√A * √A = A`, with the left factor conjugated. -/
-private lemma sqrt_conjTranspose_mul_self_apply {d : Type*} [Fintype d] [DecidableEq d]
-    {A : MIPStarRE.Quantum.Op d} (hA : 0 ≤ A) (i j : d) :
-    ∑ k : d, star (CFC.sqrt A k i) * CFC.sqrt A k j = A i j := by
-  have hA_herm := sqrt_isHermitian_eq (A := A)
-  calc
-    ∑ k : d, star (CFC.sqrt A k i) * CFC.sqrt A k j =
-        ∑ k : d, CFC.sqrt A i k * CFC.sqrt A k j := by
-          refine Finset.sum_congr rfl ?_
-          intro k _
-          rw [show star (CFC.sqrt A k i) = CFC.sqrt A i k from by
-            rw [← Matrix.conjTranspose_apply, hA_herm]]
-    _ = (CFC.sqrt A * CFC.sqrt A) i j := by
-          rw [Matrix.mul_apply]
-    _ = A i j := by
-          rw [CFC.sqrt_mul_sqrt_self _ hA]
 
 /-- **Isometry property of the Naimark column**: `V†V = P`.
 
@@ -461,75 +411,7 @@ private lemma oneMeasNaimarkCompression
           rw [hsingle]
           simp [hsqrt, CFC.sqrt_mul_sqrt_self, M.pos a]
 
-private lemma mul_oneMeasNaimarkInputProj_apply_none
-    {α : Type*} [Fintype α] [DecidableEq α]
-    {d : Type*} [Fintype d] [DecidableEq d]
-    (A : MIPStarRE.Quantum.Op (d × Option α))
-    (x : d × Option α) (j : d) :
-    (A * oneMeasNaimarkInputProj (α := α) (d := d)) x (j, none) = A x (j, none) := by
-  rw [Matrix.mul_apply]
-  rw [show ∑ z : d × Option α,
-      A x z * oneMeasNaimarkInputProj (α := α) (d := d) z (j, none) =
-        ∑ k : d, ∑ o : Option α,
-          A x (k, o) * oneMeasNaimarkInputProj (α := α) (d := d) (k, o) (j, none) by
-      simpa using
-        (Fintype.sum_prod_type
-          (f := fun z : d × Option α =>
-            A x z * oneMeasNaimarkInputProj (α := α) (d := d) z (j, none)))]
-  simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.one_apply]
-
-private lemma mul_oneMeasNaimarkInputProj_apply_some
-    {α : Type*} [Fintype α] [DecidableEq α]
-    {d : Type*} [Fintype d] [DecidableEq d]
-    (A : MIPStarRE.Quantum.Op (d × Option α))
-    (x : d × Option α) (j : d) (a : α) :
-    (A * oneMeasNaimarkInputProj (α := α) (d := d)) x (j, some a) = 0 := by
-  rw [Matrix.mul_apply]
-  rw [show ∑ z : d × Option α,
-      A x z * oneMeasNaimarkInputProj (α := α) (d := d) z (j, some a) =
-        ∑ k : d, ∑ o : Option α,
-          A x (k, o) * oneMeasNaimarkInputProj (α := α) (d := d) (k, o) (j, some a) by
-      simpa using
-        (Fintype.sum_prod_type
-          (f := fun z : d × Option α =>
-            A x z * oneMeasNaimarkInputProj (α := α) (d := d) z (j, some a)))]
-  simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker]
-
-private lemma oneMeasNaimarkInputProj_mul_apply_none
-    {α : Type*} [Fintype α] [DecidableEq α]
-    {d : Type*} [Fintype d] [DecidableEq d]
-    (A : MIPStarRE.Quantum.Op (d × Option α))
-    (i : d) (y : d × Option α) :
-    (oneMeasNaimarkInputProj (α := α) (d := d) * A) (i, none) y = A (i, none) y := by
-  rw [Matrix.mul_apply]
-  rw [show ∑ z : d × Option α,
-      oneMeasNaimarkInputProj (α := α) (d := d) (i, none) z * A z y =
-        ∑ k : d, ∑ o : Option α,
-          oneMeasNaimarkInputProj (α := α) (d := d) (i, none) (k, o) * A (k, o) y by
-      simpa using
-        (Fintype.sum_prod_type
-          (f := fun z : d × Option α =>
-            oneMeasNaimarkInputProj (α := α) (d := d) (i, none) z * A z y))]
-  simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker, Matrix.one_apply]
-
-private lemma oneMeasNaimarkInputProj_mul_apply_some
-    {α : Type*} [Fintype α] [DecidableEq α]
-    {d : Type*} [Fintype d] [DecidableEq d]
-    (A : MIPStarRE.Quantum.Op (d × Option α))
-    (i : d) (a : α) (y : d × Option α) :
-    (oneMeasNaimarkInputProj (α := α) (d := d) * A) (i, some a) y = 0 := by
-  rw [Matrix.mul_apply]
-  rw [show ∑ z : d × Option α,
-      oneMeasNaimarkInputProj (α := α) (d := d) (i, some a) z * A z y =
-        ∑ k : d, ∑ o : Option α,
-          oneMeasNaimarkInputProj (α := α) (d := d) (i, some a) (k, o) * A (k, o) y by
-      simpa using
-        (Fintype.sum_prod_type
-          (f := fun z : d × Option α =>
-            oneMeasNaimarkInputProj (α := α) (d := d) (i, some a) z * A z y))]
-  simp [oneMeasNaimarkInputProj, oneMeasNaimarkAuxTransition, Matrix.kronecker]
-
- /-- The Naimark column acts as an isometry on the input subspace: `VP = V`. -/
+/-- The Naimark column acts as an isometry on the input subspace: `VP = V`. -/
 private lemma oneMeasNaimarkColumn_mul_inputProj
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -978,11 +860,13 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     calc
       MIPStarRE.Quantum.normalizedTrace (ρ * M.effect a)
           = MIPStarRE.Quantum.normalizedTrace
-              (oneMeasLiftedDensity α ρ * Matrix.kronecker (M.effect a) (naimarkAuxProjector α)) := by
+              (oneMeasLiftedDensity α ρ *
+                Matrix.kronecker (M.effect a) (naimarkAuxProjector α)) := by
                 symm
                 exact normalizedTrace_oneMeasLiftedDensity_mul_auxProj (α := α) ρ (M.effect a)
       _ = MIPStarRE.Quantum.normalizedTrace
-            (oneMeasLiftedDensity α ρ * ((oneMeasNaimarkColumn M)ᴴ * Q * oneMeasNaimarkColumn M)) := by
+            (oneMeasLiftedDensity α ρ *
+              ((oneMeasNaimarkColumn M)ᴴ * Q * oneMeasNaimarkColumn M)) := by
               rw [oneMeasNaimarkCompression (M := M) a]
       _ = MIPStarRE.Quantum.normalizedTrace
             ((Fintype.card (Option α) : ℂ) • (B * (Vᴴ * Q * V))) := by

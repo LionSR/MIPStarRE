@@ -250,8 +250,8 @@ theorem goodStrategyCharacterization {params : Parameters} [FieldModel params.q]
     strategy.IsGood eps delta gamma ↔
       ConsRel strategy.state
         (uniformDistribution (AxisParallelTestSample params))
-        (axisParallelPointAnswerFamily strategy.pointMeasurement)
-        (axisParallelLineAnswerFamily strategy.axisParallelMeasurement)
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy)
         eps ∧
       ConsRel strategy.state
         (uniformDistribution (Point params))
@@ -503,10 +503,8 @@ theorem completenessTransferSelfConsistentA
           exact qSDD_nonneg ψ ((IdxSubMeas.liftLeft A) q) ((IdxSubMeas.liftLeft B) q))
         h𝒟
   have hsqrt_avg_nonneg :
-      0 ≤ avgOver 𝒟 (fun q => Real.sqrt (sdd q)) := by
-    unfold avgOver
-    exact Finset.sum_nonneg fun q hq =>
-      mul_nonneg (𝒟.nonnegative q) (Real.sqrt_nonneg _)
+      0 ≤ avgOver 𝒟 (fun q => Real.sqrt (sdd q)) :=
+    avgOver_nonneg 𝒟 _ fun q => Real.sqrt_nonneg _
   have hsqrt_avg :
       avgOver 𝒟 (fun q => Real.sqrt (sdd q)) ≤
         Real.sqrt (avgOver 𝒟 sdd) := by
@@ -811,6 +809,12 @@ private lemma wrongSideEstimate
     _ ≤ 2 * δ + 4 * Real.sqrt ε := by
           linarith
 
+/-- `prop:self-consistency-implies-data-processing`.
+
+A projective approximation to a strongly self-consistent family remains close
+after postprocessing on the left register. The proof combines the wrong-side
+estimate, self-consistency after evaluation, and the `SDDRel` triangle
+inequality. -/
 theorem selfConsistencyImpliesDataProcessing
     {Question α β : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype α] [Fintype β]
@@ -847,13 +851,12 @@ theorem selfConsistencyImpliesDataProcessing
       SDDRel ψ 𝒟
         (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
         (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
-        (2 * δ) := by
-    exact
-      sddRel_symm ψ 𝒟
-        (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
-        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
-        (2 * δ)
-        hself
+        (2 * δ) :=
+    sddRel_symm ψ 𝒟
+      (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+      (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
+      (2 * δ)
+      hself
   have htri :
       SDDRel ψ 𝒟
         (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))

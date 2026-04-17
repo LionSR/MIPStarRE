@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'blueprint/src/**'
-      - 'blueprint/lean_decls'
       - 'home_page/**'
   workflow_dispatch:
 

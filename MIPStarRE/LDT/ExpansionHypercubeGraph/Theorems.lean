@@ -2,9 +2,14 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 
 /-!
 # Section 7 — Theorems
--- TODO(#206): prove matrixLocalRewrite, matrixGlobalRewrite, matrixLocalToGlobal
 
-Output structures and theorem statements for the expansion / variance lemmas.
+Statement packages and theorem wrappers for the hypercube expansion and
+variance identities, together with the bridge to the concrete matrix
+realization.
+
+## References
+
+This file mirrors Section 7 of `references/ldt-paper/expansion.tex`.
 -/
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
@@ -94,7 +99,7 @@ private lemma sum_mul_sum_expand {α β γ : Type*}
   intro b hb
   rw [← Finset.sum_mul]
 
-private lemma sum_reorder₄ {α β γ δ : Type*}
+private lemma sum_reorder_four {α β γ δ : Type*}
     [Fintype α] [Fintype β] [Fintype γ] [Fintype δ]
     (h : α → β → γ → δ → ℂ) :
     ∑ a, ∑ b, ∑ c, ∑ d, h a b c d = ∑ c, ∑ a, ∑ d, ∑ b, h a b c d := by
@@ -152,13 +157,10 @@ private lemma sum_sum_sub {α β γ : Type*}
       refine Finset.sum_congr rfl ?_
       intro b hb
       rw [sub_eq_add_neg]
-    _ = (∑ a, ∑ b, f a b) + ∑ a, ∑ b, (-g a b) := sum_sum_add (f := f) (g := fun a b => -g a b)
+    _ = (∑ a, ∑ b, f a b) + ∑ a, ∑ b, (-g a b) := by
+      exact sum_sum_add (f := f) (g := fun a b => -g a b)
     _ = (∑ a, ∑ b, f a b) - ∑ a, ∑ b, g a b := by
       simp [sub_eq_add_neg]
-
-private lemma complex_re_sub (a b : ℂ) :
-    Complex.re (a - b) = Complex.re a - Complex.re b := by
-  simp [sub_eq_add_neg]
 
 private def matrixModelState {params : Parameters}
     (model : MatrixOperatorFamilyRealization params) : QuantumState model.space.carrier where
@@ -170,7 +172,8 @@ private lemma trace_combined_tensor_eq (params : Parameters)
     (P : MatrixOperator (pointHilbertSpace params)) :
     (((matrixCombinedOperator params model)ᴴ *
         (matrixTensorOperator P model.state.matrix * matrixCombinedOperator params model)).trace) =
-      ∑ u, ∑ v, P u v * (model.state.matrix * ((model.family v)ᴴ * model.family u)).trace := by
+      ∑ u, ∑ v,
+        P u v * (model.state.matrix * ((model.family v)ᴴ * model.family u)).trace := by
   rw [Matrix.trace_mul_comm]
   simp [Matrix.trace, Matrix.mul_apply, matrixCombinedOperator, matrixTensorOperator]
   let f : (Point params × model.space.carrier) → model.space.carrier →
@@ -185,7 +188,7 @@ private lemma trace_combined_tensor_eq (params : Parameters)
   refine Finset.sum_congr rfl ?_
   intro x hx
   simpa [mul_assoc, mul_left_comm, mul_comm] using
-    (sum_reorder₄ (h := fun x₁ x₂ x₃ x₄ =>
+    (sum_reorder_four (h := fun x₁ x₂ x₃ x₄ =>
       P x x₃ *
         (model.state.matrix x₁ x₄ *
           (model.family x x₂ x₁ * (starRingEnd ℂ) (model.family x₃ x₂ x₄)))))
@@ -196,7 +199,8 @@ private lemma normalizedTrace_combined_tensor_eq (params : Parameters)
     MIPStarRE.Quantum.normalizedTrace
       ((matrixCombinedOperator params model)ᴴ *
         (matrixTensorOperator P model.state.matrix * matrixCombinedOperator params model)) =
-      ∑ u, ∑ v, P u v * matrixExpectation model.state ((model.family v)ᴴ * model.family u) := by
+      ∑ u, ∑ v,
+        P u v * matrixExpectation model.state ((model.family v)ᴴ * model.family u) := by
   unfold MIPStarRE.Quantum.normalizedTrace matrixExpectation
   rw [trace_combined_tensor_eq]
   simp_rw [div_eq_mul_inv]
@@ -376,7 +380,10 @@ private lemma matrixGlobalVariance_eq_closedForm (params : Parameters)
               intro v hv
               ring
       _ = ∑ u, ∑ v, diag u + ∑ u, ∑ v, (diag v - corr u v - corr u v) := by
-              exact sum_sum_add (f := fun u v => diag u) (g := fun u v => diag v - corr u v - corr u v)
+              exact
+                sum_sum_add
+                  (f := fun u v => diag u)
+                  (g := fun u v => diag v - corr u v - corr u v)
       _ = ∑ u, ∑ v, diag u + ((∑ u, ∑ v, diag v) - (∑ u, ∑ v, corr u v) -
               (∑ u, ∑ v, corr u v)) := by
               congr 1
@@ -468,7 +475,7 @@ private lemma update_eq_fixed_count (params : Parameters)
         simpa [toFun, invFun, Function.update, hji] using huj.symm
     have hright : Function.RightInverse invFun toFun := by
       intro a
-      simp [toFun, invFun, hx]
+      simp [toFun, invFun]
     let e : {u : Point params // Function.update u i x = v} ≃ Fq params :=
       { toFun := toFun, invFun := invFun, left_inv := hleft, right_inv := hright }
     have hcard : Fintype.card {u : Point params // Function.update u i x = v} = params.q := by
@@ -498,7 +505,7 @@ private lemma update_eq_fixed_count (params : Parameters)
       by_cases huv : Function.update u i x = v
       · exfalso
         have hi := congrArg (fun f => f i) huv
-        simpa [Function.update, hx] using hi
+        simp [Function.update, hx] at hi
       · simp [huv]
     simp [hx, hsum_zero]
 
@@ -767,7 +774,9 @@ private lemma matrixLocalVariance_eq_closedForm (params : Parameters)
     unfold diagLeft diagRight corrSum
     calc
       ∑ u, ∑ v, w u v * (diag u + diag v - corr u v - corr u v)
-          = ∑ u, ∑ v, (w u v * diag u + (w u v * diag v - w u v * corr u v - w u v * corr u v)) := by
+          = ∑ u, ∑ v,
+              (w u v * diag u +
+                (w u v * diag v - w u v * corr u v - w u v * corr u v)) := by
               refine Finset.sum_congr rfl ?_
               intro u hu
               refine Finset.sum_congr rfl ?_
@@ -834,7 +843,7 @@ private lemma globalWitness_smul (params : Parameters)
           ((matrixCombinedColumnOperator params model)ᴴ *
             (matrixTensorOperator (orthogonalModeProjectorMatrix params) model.state.matrix *
               matrixCombinedColumnOperator params model)) := by
-              simp [mul_assoc]
+              simp
     _ = c • matrixGlobalVarianceTraceWitness params model := by
           simp [matrixGlobalVarianceTraceWitness]
 
@@ -899,7 +908,8 @@ private lemma matrixTraceForm_localToGlobal (params : Parameters)
 /-- The concrete matrix-level counterpart of `lem:local-to-global`. -/
 lemma matrixLocalToGlobal (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
-    matrixGlobalVariance params model ≤ (params.m : Error) * matrixLocalVariance params model := by
+    matrixGlobalVariance params model ≤
+      (params.m : Error) * matrixLocalVariance params model := by
   calc
     matrixGlobalVariance params model = matrixGlobalVarianceTraceForm params model := by
       rw [matrixGlobalVariance_eq_closedForm, matrixGlobalVarianceTraceForm_eq_closedForm]
@@ -923,7 +933,6 @@ lemma matrixGlobalRewrite (params : Parameters)
   rw [matrixGlobalVariance_eq_closedForm, matrixGlobalVarianceTraceForm_eq_closedForm]
 
 /-- `prop:laplacian-rewrite`. -/
--- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 theorem laplacianRewrite (params : Parameters) :
     laplacian params = laplacianDifferenceForm params := by
   rfl
@@ -931,7 +940,6 @@ theorem laplacianRewrite (params : Parameters) :
 /-! ## Public theorem wrappers -/
 
 /-- `lem:local-to-global`. -/
--- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma localToGlobal (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     globalVariance params A ψ ≤ (params.m : Error) * localVariance params A ψ := by
@@ -944,7 +952,6 @@ lemma localToGlobal (params : Parameters)
     positivity
 
 /-- `lem:local-rewrite`. -/
--- TODO(matrix-realization): needs a bridge to the matrix realization layer.
 lemma localRewrite (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     LocalRewriteStatement params A ψ := by

@@ -1,9 +1,15 @@
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization
+import MIPStarRE.LDT.SelfImprovement.Defs
 
 /-!
 # Section 9 — Theorems
 
-Theorem stubs for the self-improvement argument.
+This file packages the currently formalized self-improvement outputs, together
+with the temporary bridge assumptions that connect the reduced Section 9 lemmas
+to the downstream induction step.
+
+## References
+
+- `references/ldt-paper/self_improvement.tex`
 -/
 
 namespace MIPStarRE.LDT.SelfImprovement
@@ -50,9 +56,8 @@ noncomputable def addInULeftOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (H : SubMeas (Polynomial params) ι)
     (S : AddInUSelection params Outcome)
     (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
-  open Classical in
-    ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
-      opTensor ((M u).outcome ah.1) (H.outcome ah.2)
+  ∑ ah ∈ addInUSelectionPairs params S u,
+    opTensor ((M u).outcome ah.1) (H.outcome ah.2)
 
 /-- The operator inside the right-hand side of `lem:add-in-u` at a fixed point `u`.
 Returns a bipartite operator `(Au * (M u).outcome o * Au) ⊗ T.outcome h`. -/
@@ -64,10 +69,9 @@ noncomputable def addInURightOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
     (T : SubMeas (Polynomial params) ι)
     (S : AddInUSelection params Outcome)
     (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
-  open Classical in
-    ∑ ah ∈ Finset.univ.filter (fun ah : Outcome × Polynomial params => ah ∈ S u),
-      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 u
-      opTensor (Au * (M u).outcome ah.1 * Au) (T.outcome ah.2)
+  ∑ ah ∈ addInUSelectionPairs params S u,
+    let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 u
+    opTensor (Au * (M u).outcome ah.1 * Au) (T.outcome ah.2)
 
 /-- The left-hand expectation in `lem:add-in-u`. -/
 noncomputable def addInULeftQuantity {Outcome : Type*} [Fintype Outcome] (params : Parameters)
@@ -405,18 +409,9 @@ lemma sdp
     (strategy : SymStrat params ι) :
     SdpStatement params strategy := by
   classical
-  let g0 : Polynomial params := Classical.arbitrary (Polynomial params)
-  let T : Measurement (Polynomial params) ι :=
-    { toSubMeas := {
-        outcome := fun g => if g = g0 then 1 else 0
-        total := 1
-        outcome_pos := by
-          intro g
-          by_cases hg : g = g0 <;> simp [hg]
-        sum_eq_total := by
-          simp [g0]
-        total_le_one := le_rfl }
-      total_eq_one := rfl }
+  letI : Inhabited (Polynomial params) :=
+    ⟨Classical.arbitrary (Polynomial params)⟩
+  let T : Measurement (Polynomial params) ι := default
   let Z : MIPStarRE.Quantum.Op ι := 1
   refine ⟨T.toSubMeas, Z, ?_⟩
   refine
@@ -456,10 +451,11 @@ lemma addInU
     AddInUStatement params strategy T eps delta := by
   refine
     { varianceBound := ?_ }
-  let hvariance :=
+  let hglobalVariance :=
     globalVarianceOfPoints params strategy eps delta gamma hgood T.toSubMeas strategy.state
       hlocalDev hlocalVar hglobalDev
-  simpa [selfImprovementVarianceError] using hvariance.averagedGlobalVarianceBound
+  simpa [selfImprovementVarianceError] using
+    hglobalVariance.averagedGlobalVarianceBound
 
 /-- Reduced version of `lem:self-improvement-helper`.
 
@@ -487,9 +483,9 @@ lemma selfImprovementHelper
   let T : Measurement (Polynomial params) ι :=
     { toSubMeas := Tsub
       total_eq_one := hsdp.primalTotalOperator }
-  let H : SubMeas (Polynomial params) ι :=
+  let Hhat : SubMeas (Polynomial params) ι :=
     averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
-  refine ⟨T, H, Z, ?_⟩
+  refine ⟨T, Hhat, Z, ?_⟩
   refine
     { sdpWitness := ?_
       averagedConstruction := rfl

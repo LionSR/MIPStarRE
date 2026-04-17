@@ -3,7 +3,13 @@ import MIPStarRE.LDT.GlobalVariance.MatrixRealization
 /-!
 # Section 8 — Theorems
 
-Output structures and theorem statements for the global variance lemmas.
+Output structures, averaging lemmas, and theorem statements for the
+global-variance results.
+
+## References
+
+- Blueprint: `blueprint/src/chapter/ch06_variance.tex`
+- Paper: `references/ldt-paper/expansion.tex`, Section `sec:variance`
 -/
 
 namespace MIPStarRE.LDT.GlobalVariance
@@ -15,21 +21,26 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-! ## Statement packages -/
+
 /-- Output package for `lem:generalize-b`.
 `ψbi` is the bipartite state on `d * d` (passed as `strategy.state`
 by callers). -/
 structure GeneralizeBStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
     (G : SubMeas (Polynomial params) ι) : Prop where
+  /-- The aggregated left and right families satisfy the `SDDRel` comparison. -/
   aggregateFamilyComparison :
     SDDRel ψbi
       (axisParallelLineQuestionDistribution params)
       (generalizeBLeftFamily params strategy G)
       (generalizeBRightFamily params strategy G)
       (generalizeBError params)
+  /-- Each fixed polynomial satisfies the pointwise `generalize-b` norm bound. -/
   pointwiseNormBound :
     ∀ g : Polynomial params,
       generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params
+  /-- The polynomial average also satisfies the `generalize-b` norm bound. -/
   averagedNormBound :
     generalizeBDeviation params strategy ψbi G ≤ generalizeBError params
 
@@ -37,20 +48,24 @@ structure GeneralizeBStatement (params : Parameters) [FieldModel params.q]
 structure LocalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
     (G : SubMeas (Polynomial params) ι) (eps delta : Error) : Prop where
+  /-- The aggregated edgewise families satisfy the `SDDRel` comparison. -/
   aggregateEdgeComparison :
     SDDRel ψbi
       (rerandomizeCoord params)
       (localVarianceLeftFamily params strategy G)
       (localVarianceRightFamily params strategy G)
       (localVarianceOfPointsError params eps delta)
+  /-- Each fixed polynomial satisfies the edgewise deviation bound. -/
   pointwiseEdgeNormBound :
     ∀ g : Polynomial params,
       localVarianceDeviationAtPolynomial params strategy ψbi G g ≤
         localVarianceOfPointsError params eps delta
+  /-- Each fixed polynomial satisfies the local-variance bound. -/
   pointwiseLocalVarianceBound :
     ∀ g : Polynomial params,
       pointConditionedLocalVarianceAtPolynomial params strategy G g ≤
         localVarianceOfPointsError params eps delta
+  /-- The polynomial average satisfies the local-variance bound. -/
   averagedLocalVarianceBound :
     pointConditionedLocalVariance params strategy G ≤
       localVarianceOfPointsError params eps delta
@@ -59,28 +74,35 @@ structure LocalVarianceOfPointsStatement (params : Parameters) [FieldModel param
 structure GlobalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
     (G : SubMeas (Polynomial params) ι) (eps delta : Error) : Prop where
+  /-- The aggregated global families satisfy the `SDDRel` comparison. -/
   aggregateGlobalComparison :
     SDDRel ψbi
       (independentPointPair params)
       (globalVarianceLeftFamily params strategy G)
       (globalVarianceRightFamily params strategy G)
       (globalVarianceOfPointsError params eps delta)
+  /-- Each fixed polynomial satisfies the global deviation bound. -/
   pointwiseGlobalNormBound :
     ∀ g : Polynomial params,
       globalVarianceDeviationAtPolynomial params strategy ψbi G g ≤
         globalVarianceOfPointsError params eps delta
+  /-- Pointwise local-to-global transfer for the weighted conditioned family. -/
   pointwiseExpansionTransfer :
     ∀ g : Polynomial params,
       pointConditionedGlobalVarianceAtPolynomial params strategy G g ≤
         (params.m : Error) *
           pointConditionedLocalVarianceAtPolynomial params strategy G g
+  /-- Each fixed polynomial satisfies the global-variance bound. -/
   pointwiseGlobalVarianceBound :
     ∀ g : Polynomial params,
       pointConditionedGlobalVarianceAtPolynomial params strategy G g ≤
         globalVarianceOfPointsError params eps delta
+  /-- The polynomial average satisfies the global-variance bound. -/
   averagedGlobalVarianceBound :
     pointConditionedGlobalVariance params strategy G ≤
       globalVarianceOfPointsError params eps delta
+
+/-! ## Averaging lemmas -/
 
 private lemma avgOver_uniform_swap
     {Question α : Type*}
@@ -331,6 +353,23 @@ private lemma sddRel_unit_family_of_pointwise
     _ = δ := by
           simp [avgOver, uniformDistribution]
 
+/-- A polynomial average is bounded by a constant once each summand is. -/
+private lemma avgOver_polynomialDistribution_le_of_pointwise
+    (params : Parameters) [FieldModel params.q]
+    (f : Polynomial params → Error) (δ : Error)
+    (hpoint : ∀ g : Polynomial params, f g ≤ δ) :
+    avgOver (polynomialDistribution params) f ≤ δ := by
+  calc
+    avgOver (polynomialDistribution params) f
+      ≤ avgOver (polynomialDistribution params) (fun _ => δ) := by
+          apply avgOver_mono
+          intro g
+          exact hpoint g
+    _ = δ := by
+          simp [polynomialDistribution, avgOver, uniformDistribution]
+
+/-! ## Reduction helpers -/
+
 private lemma matrixGeneralizeB_of_pointwise
     (params : Parameters)
     [FieldModel params.q]
@@ -342,17 +381,12 @@ private lemma matrixGeneralizeB_of_pointwise
   refine
     { pointwiseDeviationBound := hpoint
       averagedDeviationBound := by
-        unfold matrixGeneralizeBDeviation
-        calc
-          avgOver (polynomialDistribution params)
-              (fun g => matrixGeneralizeBDeviationAtPolynomial params model g)
-            ≤ avgOver (polynomialDistribution params)
-                (fun _ => generalizeBError params) := by
-                  apply avgOver_mono
-                  intro g
-                  exact hpoint g
-          _ = generalizeBError params := by
-                simp [polynomialDistribution, avgOver, uniformDistribution] }
+        simpa [matrixGeneralizeBDeviation] using
+          avgOver_polynomialDistribution_le_of_pointwise
+            (params := params)
+            (f := fun g => matrixGeneralizeBDeviationAtPolynomial params model g)
+            (δ := generalizeBError params)
+            hpoint }
 
 private lemma matrixLocalVarianceOfPoints_of_pointwise
     (params : Parameters)
@@ -367,17 +401,25 @@ private lemma matrixLocalVarianceOfPoints_of_pointwise
   refine
     { pointwiseLocalVarianceBound := hpoint
       averagedLocalVarianceBound := by
-        unfold matrixPointConditionedLocalVariance
-        calc
-          avgOver (polynomialDistribution params)
-              (fun g => matrixPointConditionedLocalVarianceAtPolynomial params model g)
-            ≤ avgOver (polynomialDistribution params)
-                (fun _ => localVarianceOfPointsError params eps delta) := by
-                  apply avgOver_mono
-                  intro g
-                  exact hpoint g
-          _ = localVarianceOfPointsError params eps delta := by
-                simp [polynomialDistribution, avgOver, uniformDistribution] }
+        simpa [matrixPointConditionedLocalVariance] using
+          avgOver_polynomialDistribution_le_of_pointwise
+            (params := params)
+            (f := fun g => matrixPointConditionedLocalVarianceAtPolynomial params model g)
+            (δ := localVarianceOfPointsError params eps delta)
+            hpoint }
+
+private lemma matrixPointConditionedGlobalVarianceAtPolynomial_le_mul_local
+    (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixVarianceTransferRealization params)
+    (g : Polynomial params) :
+    matrixPointConditionedGlobalVarianceAtPolynomial params model g ≤
+      (params.m : Error) *
+        matrixPointConditionedLocalVarianceAtPolynomial params model g := by
+  simpa [matrixPointConditionedGlobalVarianceAtPolynomial,
+    matrixPointConditionedLocalVarianceAtPolynomial] using
+    (matrixLocalToGlobal params
+      (matrixPointConditionedRealizationAtPolynomial params model g))
 
 private lemma matrixGlobalVarianceOfPoints_from_local
     (params : Parameters)
@@ -390,13 +432,9 @@ private lemma matrixGlobalVarianceOfPoints_from_local
       ∀ g : Polynomial params,
         matrixPointConditionedGlobalVarianceAtPolynomial params model g ≤
           (params.m : Error) *
-            matrixPointConditionedLocalVarianceAtPolynomial params model g := by
-    intro g
-    simpa [matrixPointConditionedGlobalVarianceAtPolynomial,
-      matrixPointConditionedLocalVarianceAtPolynomial]
-      using
-        (matrixLocalToGlobal params
-          (matrixPointConditionedRealizationAtPolynomial params model g))
+            matrixPointConditionedLocalVarianceAtPolynomial params model g :=
+    fun g =>
+      matrixPointConditionedGlobalVarianceAtPolynomial_le_mul_local params model g
   have hglobal :
       ∀ g : Polynomial params,
         matrixPointConditionedGlobalVarianceAtPolynomial params model g ≤
@@ -416,18 +454,32 @@ private lemma matrixGlobalVarianceOfPoints_from_local
   refine
     { pointwiseExpansionTransfer := hexpansion
       pointwiseGlobalVarianceBound := hglobal
-      averagedGlobalVarianceBound := ?_ }
-  · unfold matrixPointConditionedGlobalVariance
-    calc
-      avgOver (polynomialDistribution params)
-          (fun g => matrixPointConditionedGlobalVarianceAtPolynomial params model g)
-        ≤ avgOver (polynomialDistribution params)
-            (fun _ => globalVarianceOfPointsError params eps delta) := by
-              apply avgOver_mono
-              intro g
-              exact hglobal g
-      _ = globalVarianceOfPointsError params eps delta := by
-            simp [polynomialDistribution, avgOver, uniformDistribution]
+      averagedGlobalVarianceBound := by
+        simpa [matrixPointConditionedGlobalVariance] using
+          avgOver_polynomialDistribution_le_of_pointwise
+            (params := params)
+            (f := fun g => matrixPointConditionedGlobalVarianceAtPolynomial params model g)
+            (δ := globalVarianceOfPointsError params eps delta)
+            hglobal }
+
+private lemma pointConditionedGlobalVarianceAtPolynomial_le_mul_local
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) :
+    pointConditionedGlobalVarianceAtPolynomial params strategy G g ≤
+      (params.m : Error) *
+        pointConditionedLocalVarianceAtPolynomial params strategy G g := by
+  simpa [pointConditionedGlobalVarianceAtPolynomial,
+    pointConditionedLocalVarianceAtPolynomial] using
+    (localToGlobal params
+      (fun u =>
+        leftTensor (ι₂ := ι)
+          (pointConditionedOutcomeOperatorAtPolynomial params strategy g u))
+      (weightedPolynomialState params strategy G g))
+
+/-! ## Abstract theorem packages -/
 
 /-- `lem:generalize-b`. -/
 lemma generalizeB
@@ -465,17 +517,12 @@ lemma generalizeB
             simpa [generalizeBDeviationAtPolynomial] using hpoint g)
       pointwiseNormBound := hpoint
       averagedNormBound := by
-        unfold generalizeBDeviation
-        calc
-          avgOver (polynomialDistribution params)
-              (fun g => generalizeBDeviationAtPolynomial params strategy ψbi G g)
-            ≤ avgOver (polynomialDistribution params)
-                (fun _ => generalizeBError params) := by
-                  apply avgOver_mono
-                  intro g
-                  exact hpoint g
-          _ = generalizeBError params := by
-                simp [polynomialDistribution, avgOver, uniformDistribution] }
+        simpa [generalizeBDeviation] using
+          avgOver_polynomialDistribution_le_of_pointwise
+            (params := params)
+            (f := fun g => generalizeBDeviationAtPolynomial params strategy ψbi G g)
+            (δ := generalizeBError params)
+            hpoint }
 
 /-- `lem:local-variance-of-points`. -/
 lemma localVarianceOfPoints
@@ -517,17 +564,12 @@ lemma localVarianceOfPoints
       pointwiseEdgeNormBound := hedge
       pointwiseLocalVarianceBound := hlocal
       averagedLocalVarianceBound := by
-        unfold pointConditionedLocalVariance
-        calc
-          avgOver (polynomialDistribution params)
-              (fun g => pointConditionedLocalVarianceAtPolynomial params strategy G g)
-            ≤ avgOver (polynomialDistribution params)
-                (fun _ => localVarianceOfPointsError params eps delta) := by
-                  apply avgOver_mono
-                  intro g
-                  exact hlocal g
-          _ = localVarianceOfPointsError params eps delta := by
-                simp [polynomialDistribution, avgOver, uniformDistribution] }
+        simpa [pointConditionedLocalVariance] using
+          avgOver_polynomialDistribution_le_of_pointwise
+            (params := params)
+            (f := fun g => pointConditionedLocalVarianceAtPolynomial params strategy G g)
+            (δ := localVarianceOfPointsError params eps delta)
+            hlocal }
 
 /-- `lem:global-variance-of-points`.
 Depends on `localVarianceOfPoints` through explicit pointwise local-variance
@@ -564,15 +606,8 @@ lemma globalVarianceOfPoints
     calc
       pointConditionedGlobalVarianceAtPolynomial params strategy G g
         ≤ (params.m : Error) *
-            pointConditionedLocalVarianceAtPolynomial params strategy G g := by
-              simpa [pointConditionedGlobalVarianceAtPolynomial,
-                pointConditionedLocalVarianceAtPolynomial]
-                using
-                  (localToGlobal params
-                    (fun u =>
-                      leftTensor (ι₂ := ι)
-                        (pointConditionedOutcomeOperatorAtPolynomial params strategy g u))
-                    (weightedPolynomialState params strategy G g))
+            pointConditionedLocalVarianceAtPolynomial params strategy G g :=
+          pointConditionedGlobalVarianceAtPolynomial_le_mul_local params strategy G g
       _ ≤ (params.m : Error) * localVarianceOfPointsError params eps delta := by
             exact mul_le_mul_of_nonneg_left
               (hlocal.pointwiseLocalVarianceBound g) (by positivity)
@@ -601,27 +636,17 @@ lemma globalVarianceOfPoints
       pointwiseGlobalNormBound := hdev
       pointwiseExpansionTransfer := by
         intro g
-        simpa [pointConditionedGlobalVarianceAtPolynomial,
-          pointConditionedLocalVarianceAtPolynomial]
-          using
-            (localToGlobal params
-              (fun u =>
-                leftTensor (ι₂ := ι)
-                  (pointConditionedOutcomeOperatorAtPolynomial params strategy g u))
-              (weightedPolynomialState params strategy G g))
+        exact pointConditionedGlobalVarianceAtPolynomial_le_mul_local params strategy G g
       pointwiseGlobalVarianceBound := hglobal
       averagedGlobalVarianceBound := by
-        unfold pointConditionedGlobalVariance
-        calc
-          avgOver (polynomialDistribution params)
-              (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
-            ≤ avgOver (polynomialDistribution params)
-                (fun _ => globalVarianceOfPointsError params eps delta) := by
-                  apply avgOver_mono
-                  intro g
-                  exact hglobal g
-          _ = globalVarianceOfPointsError params eps delta := by
-                simp [polynomialDistribution, avgOver, uniformDistribution] }
+        simpa [pointConditionedGlobalVariance] using
+          avgOver_polynomialDistribution_le_of_pointwise
+            (params := params)
+            (f := fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
+            (δ := globalVarianceOfPointsError params eps delta)
+            hglobal }
+
+/-! ## Matrix theorem wrappers -/
 
 /-- Matrix-level counterpart of `lem:generalize-b`, proved by reducing to the
 abstract version via an explicit compatibility hypothesis linking the matrix

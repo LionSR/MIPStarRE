@@ -119,11 +119,11 @@ abbrev LinePolynomialModel (params : Parameters) [FieldModel params.q] :=
 instance {params : Parameters} [FieldModel params.q] : FieldModel params.next.q := by
   simpa [Parameters.next] using (inferInstance : FieldModel params.q)
 
-/-- Interpret a coded coordinate in `Fin q` as a scalar in `ZMod q`. -/
+/-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
 def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
   (FieldModel.equiv (q := params.q)).symm x
 
-/-- Re-encode a scalar in `ZMod q` as its canonical representative in `Fin q`. -/
+/-- Re-encode a field-model scalar as its canonical representative in `Fin q`. -/
 def encodeScalar {params : Parameters} [FieldModel params.q] (x : Scalar params) : Fq params :=
   FieldModel.equiv (q := params.q) x
 
@@ -166,6 +166,10 @@ def subCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq 
 def mulCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x * decodeScalar y)
 
+/-- Coordinate inversion transported through the `Fin q` coding. -/
+def invCoord {params : Parameters} [FieldModel params.q] (x : Fq params) : Fq params :=
+  encodeScalar ((decodeScalar x)⁻¹)
+
 /-- Pointwise addition in the coded ambient space. -/
 def addPoint {params : Parameters} [FieldModel params.q] (u v : Point params) : Point params :=
   fun i => addCoord (u i) (v i)
@@ -174,6 +178,10 @@ def addPoint {params : Parameters} [FieldModel params.q] (u v : Point params) : 
 def smulPoint {params : Parameters} [FieldModel params.q] (t : Fq params) (u : Point params) :
     Point params :=
   fun i => mulCoord t (u i)
+
+/-- The zero point in `F_q^m`. -/
+def zeroPoint {params : Parameters} [FieldModel params.q] : Point params :=
+  fun _ => zeroCoord
 
 /-- The inclusion of the first `m` coordinates into `m + 1` coordinates. -/
 def embedCoord (params : Parameters) : Fin params.m → Fin params.next.m :=
@@ -206,17 +214,17 @@ def pointHeight (params : Parameters) (u : Point params.next) : Fq params :=
     pointHeight params (appendPoint params u x) = x := by
   simp [pointHeight, lastCoord, appendPoint]
 
-/-- Decode a coded point as a tuple of `ZMod q` scalars. -/
+/-- Decode a coded point as a tuple of scalars in the chosen field model. -/
 def decodePoint {params : Parameters} [FieldModel params.q] (u : Point params) :
     Fin params.m → Scalar params :=
   fun i => decodeScalar (u i)
 
-/-- Evaluate a multivariate `ZMod q` polynomial on a coded point. -/
+/-- Evaluate a multivariate polynomial over the chosen field model on a coded point. -/
 def evalPolynomialModel (params : Parameters) [FieldModel params.q]
     (p : PolynomialModel params) (u : Point params) : Fq params :=
   encodeScalar (MvPolynomial.eval (decodePoint u) p)
 
-/-- Evaluate a univariate `ZMod q` polynomial on a coded point. -/
+/-- Evaluate a univariate polynomial over the chosen field model on a coded point. -/
 def evalLinePolynomialModel (params : Parameters) [FieldModel params.q]
     (p : LinePolynomialModel params) (t : Fq params) : Fq params :=
   encodeScalar (_root_.Polynomial.eval (decodeScalar t) p)
@@ -237,6 +245,21 @@ def pointAt {params : Parameters} [FieldModel params.q]
       addCoord (ℓ.base i) t
     else
       ℓ.base i
+
+/-- Canonical geometric axis-parallel line through `u` in direction `i`.
+
+The representative stores zero in the moving coordinate, so all points on the
+same geometric line map to the same `AxisParallelLine`. -/
+def throughPoint {params : Parameters} [FieldModel params.q]
+    (u : Point params) (i : Fin params.m) : AxisParallelLine params where
+  base := fun j => if j = i then zeroCoord else u j
+  direction := i
+
+/-- Affine parameter of the sampled point on the canonical axis-parallel line
+through `u` in direction `i`. -/
+def sampleParameter {params : Parameters} [FieldModel params.q]
+    (u : Point params) (i : Fin params.m) : Fq params :=
+  u i
 
 /-- Rebase an axis-parallel line so that the old point `ℓ.pointAt t` becomes the new base point. -/
 def rebaseAt {params : Parameters} [FieldModel params.q]
@@ -321,6 +344,78 @@ def pointAt {params : Parameters} [FieldModel params.q]
     (ℓ : DiagonalLine params) : Fq params → Point params :=
   fun t => addPoint ℓ.base (smulPoint t ℓ.direction)
 
+/-- The support of the nonzero coordinates of a direction vector. -/
+noncomputable def nonzeroDirectionSupport {params : Parameters} [FieldModel params.q]
+    (v : Point params) : Finset (Fin params.m) :=
+  Finset.univ.filter fun i => v i ≠ zeroCoord
+
+/-- The least nonzero coordinate of a direction vector, when one exists. -/
+noncomputable def firstNonzeroCoord? {params : Parameters} [FieldModel params.q]
+    (v : Point params) : Option (Fin params.m) :=
+  open Classical in
+  let s := nonzeroDirectionSupport (params := params) v
+  if hs : s.Nonempty then some (s.min' hs) else none
+
+/-- Normalize a direction vector so its first nonzero coordinate becomes `1`. -/
+noncomputable def normalizeDirection {params : Parameters} [FieldModel params.q]
+    (v : Point params) : Point params :=
+  open Classical in
+  match firstNonzeroCoord? (params := params) v with
+    | none => zeroPoint
+    | some i => smulPoint (invCoord (v i)) v
+
+/-- Canonical geometric diagonal line through `u` in direction `v`.
+
+For nonzero `v`, we normalize by the first nonzero coordinate and shift the
+base point so that this pivot coordinate is `0`. The degenerate `v = 0` case is
+kept as the singleton line through `u`. -/
+noncomputable def throughPointDirection {params : Parameters} [FieldModel params.q]
+    (u v : Point params) : DiagonalLine params :=
+  open Classical in
+  match firstNonzeroCoord? (params := params) v with
+    | none => { base := u, direction := zeroPoint }
+    | some i =>
+        let w := normalizeDirection (params := params) v
+        let t := u i
+        { base := fun j => subCoord (u j) (mulCoord t (w j))
+          direction := w }
+
+/-- Affine parameter of the sampled point on the canonical diagonal line through
+`u` in direction `v`. -/
+noncomputable def sampleParameter {params : Parameters} [FieldModel params.q]
+    (u v : Point params) : Fq params :=
+  open Classical in
+  match firstNonzeroCoord? (params := params) v with
+    | none => zeroCoord
+    | some i => u i
+
+@[simp] theorem throughPoint_pointAt_sampleParameter {params : Parameters}
+    [FieldModel params.q] (u : Point params) (i : Fin params.m) :
+    (AxisParallelLine.throughPoint (params := params) u i).pointAt
+        (AxisParallelLine.sampleParameter (params := params) u i) = u := by
+  funext j
+  by_cases h : j = i
+  · subst h
+    unfold AxisParallelLine.pointAt AxisParallelLine.throughPoint
+    simp [AxisParallelLine.sampleParameter, addCoord, zeroCoord]
+  · simp [AxisParallelLine.throughPoint, AxisParallelLine.sampleParameter,
+      AxisParallelLine.pointAt, h]
+
+@[simp] theorem throughPointDirection_pointAt_sampleParameter {params : Parameters}
+    [FieldModel params.q] (u v : Point params) :
+    (DiagonalLine.throughPointDirection (params := params) u v).pointAt
+        (DiagonalLine.sampleParameter (params := params) u v) = u := by
+  classical
+  unfold DiagonalLine.throughPointDirection DiagonalLine.sampleParameter
+  split
+  · funext j
+    simp [DiagonalLine.pointAt, addPoint, smulPoint, zeroPoint,
+      zeroCoord, addCoord, mulCoord]
+  · rename_i i
+    funext j
+    simp [DiagonalLine.pointAt, addPoint, smulPoint, subCoord, addCoord, mulCoord]
+    repeat rw [decode_encodeScalar]
+
 /-- Rebase a diagonal line so that the old point `ℓ.pointAt t` becomes the new base point. -/
 def rebaseAt {params : Parameters} [FieldModel params.q]
     (ℓ : DiagonalLine params) (t : Fq params) : DiagonalLine params where
@@ -402,9 +497,9 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
         congr 1
         ring_nf
         have hx' : decodeScalar (encodeScalar (decodeScalar x)) = decodeScalar x := by
-          simpa using (decode_encodeScalar (params := params) (x := decodeScalar x))
+          exact decode_encodeScalar (params := params) (x := decodeScalar x)
         have hz' : decodeScalar (encodeScalar (0 : Scalar params)) = (0 : Scalar params) := by
-          simpa using (decode_encodeScalar (params := params) (x := (0 : Scalar params)))
+          exact decode_encodeScalar (params := params) (x := (0 : Scalar params))
         calc
           decodeScalar x = decodeScalar x + decodeScalar t * (0 : Scalar params) := by ring
           _ = decodeScalar x + decodeScalar t * decodeScalar (encodeScalar 0) := by rw [hz']
@@ -414,7 +509,8 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
 end DiagonalLine
 
 /-- A coded function has low individual degree when it is represented by an actual
-multivariate polynomial over `ZMod q` whose degree in each variable is at most `d`. -/
+multivariate polynomial over the chosen field model whose degree in each variable is at
+most `d`. -/
 def HasLowIndividualDegree (params : Parameters) [FieldModel params.q]
     (g : Point params → Fq params) : Prop :=
   ∃ p : PolynomialModel params,
@@ -422,7 +518,7 @@ def HasLowIndividualDegree (params : Parameters) [FieldModel params.q]
       g = evalPolynomialModel params p
 
 /-- A coded univariate function has degree at most `bound` when it is represented by
-an actual polynomial over `ZMod q` of degree at most `bound`. -/
+an actual polynomial over the chosen field model of degree at most `bound`. -/
 def HasUnivariateDegreeAtMost (params : Parameters) [FieldModel params.q]
     (bound : ℕ) (f : Fq params → Fq params) : Prop :=
   ∃ p : LinePolynomialModel params,
@@ -835,9 +931,8 @@ noncomputable def restrictToDiagonalLine (params : Parameters) [FieldModel param
 
 end Polynomial
 
-/-- TODO(finite-outcomes): replace these `sorry`-backed bounded-answer enumerations by
-explicit coefficient-vector models for the bounded polynomial answer spaces. They are
-used so postprocessing can aggregate outcome operators over actual finite fibers. -/
+/-- Axis-line polynomial answers form a finite type via their bounded coefficient vectors.
+This finiteness lets postprocessing sum over actual outcome fibers. -/
 noncomputable instance (params : Parameters) [FieldModel params.q] :
     Fintype (AxisLinePolynomial params) := by
   classical
