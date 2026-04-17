@@ -36,6 +36,16 @@ def QuantumState.IsNormalized {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) : Prop :=
   MIPStarRE.Quantum.normalizedTrace ψ.density = 1
 
+/-- A normalized state has a nonempty carrier: if the carrier were empty, the
+trace would vanish and `normalizedTrace = 0 / 0 = 0`, contradicting `= 1`. -/
+theorem QuantumState.IsNormalized.nonempty {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState ι} (hψ : ψ.IsNormalized) : Nonempty ι := by
+  by_contra h
+  rw [not_nonempty_iff] at h
+  apply (zero_ne_one (α := ℂ))
+  simpa [QuantumState.IsNormalized, MIPStarRE.Quantum.normalizedTrace,
+    Matrix.trace_eq_zero_of_isEmpty] using hψ
+
 /-- The expectation `Re τ(ψ X)`. Dimensions match by construction. -/
 noncomputable def ev {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) : Error :=

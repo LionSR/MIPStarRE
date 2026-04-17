@@ -69,11 +69,19 @@ evaluating at a rebased line's base point (`zeroCoord`) agrees with
 evaluating at the original parameter. The paper treats this as
 implicit (lines are geometric objects), but in the Lean model
 `AxisParallelLine` and `DiagonalLine` include the parametrization, so
-we state it explicitly. -/
+we state it explicitly.
+
+The `isNormalized` field records that the bipartite state's density
+operator has normalized trace `1`. For pure states, this coincides
+with the usual unit-vector condition (`⟨ψ|ψ⟩ = 1`) used in the paper.
+Bundling normalization with the strategy avoids threading a
+`state.IsNormalized` hypothesis through every downstream consumer
+(pasting cascade, `triangleSub` users, self-improvement helpers). -/
 structure SymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
   permInvState : PermInvState state
+  isNormalized : state.IsNormalized
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurement :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
@@ -183,11 +191,17 @@ noncomputable def diagonalLineAnswerFamily
       ((strategy.diagonalMeasurement ℓ).toSubMeas)
       (· zeroCoord)
 
-/-- Paper-local (not necessarily symmetric) projective strategy data. -/
+/-- Paper-local (not necessarily symmetric) projective strategy data.
+
+Carries `isNormalized` so that symmetrization constructors
+(`leftAsSymmetric`, `rightAsSymmetric`, `classicalRoleSymmStrategy`)
+can discharge the matching `SymStrat.isNormalized` field without
+threading an extra hypothesis. -/
 structure ProjStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
   permInvState : PermInvState state
+  isNormalized : state.IsNormalized
   pointMeasurementA : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurementA :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
@@ -941,31 +955,38 @@ noncomputable def symmetrizedDiagonalMeasurement {params : Parameters}
   symmetrizedIdxProjMeas strategy.diagonalMeasurementA strategy.diagonalMeasurementB
 
 /-- Package the role-register symmetrized measurements with an external
-permutation-invariant classical role-register state. -/
+permutation-invariant classical role-register state.
+
+`Nonempty ι` is derived locally from `strategy.isNormalized`: an empty carrier
+would force `normalizedTrace = 0 / 0 = 0`, contradicting the normalization
+hypothesis bundled with the strategy. -/
 noncomputable def classicalRoleSymmStrategy {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) :
-    SymStrat params (Role × ι) where
-  state := classicalRoleSymmState strategy.state
-  permInvState := classicalRoleSymmState_permInvState strategy.state
-  pointMeasurement := strategy.symmetrizedPointMeasurement
-  axisParallelMeasurement := strategy.symmetrizedAxisParallelMeasurement
-  axisParallelReparamInvariant :=
-    symmetrizedAxisParallelReparamInvariant
-      strategy.axisParallelReparamInvariantA
-      strategy.axisParallelReparamInvariantB
-  diagonalMeasurement := strategy.symmetrizedDiagonalMeasurement
-  diagonalReparamInvariant :=
-    symmetrizedDiagonalReparamInvariant
-      strategy.diagonalReparamInvariantA
-      strategy.diagonalReparamInvariantB
+    SymStrat params (Role × ι) :=
+  haveI : Nonempty ι := strategy.isNormalized.nonempty.map Prod.fst
+  { state := classicalRoleSymmState strategy.state
+    permInvState := classicalRoleSymmState_permInvState strategy.state
+    isNormalized :=
+      classicalRoleSymmState_isNormalized strategy.state strategy.isNormalized
+    pointMeasurement := strategy.symmetrizedPointMeasurement
+    axisParallelMeasurement := strategy.symmetrizedAxisParallelMeasurement
+    axisParallelReparamInvariant :=
+      symmetrizedAxisParallelReparamInvariant
+        strategy.axisParallelReparamInvariantA
+        strategy.axisParallelReparamInvariantB
+    diagonalMeasurement := strategy.symmetrizedDiagonalMeasurement
+    diagonalReparamInvariant :=
+      symmetrizedDiagonalReparamInvariant
+        strategy.diagonalReparamInvariantA
+        strategy.diagonalReparamInvariantB }
 
 /-- The classical role-register symmetrized strategy preserves normalization. -/
 theorem classicalRoleSymmStrategy_isNormalized {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (strategy : ProjStrat params ι) (hψ : strategy.state.IsNormalized) :
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
     (strategy.classicalRoleSymmStrategy).state.IsNormalized :=
-  classicalRoleSymmState_isNormalized strategy.state hψ
+  strategy.classicalRoleSymmStrategy.isNormalized
 
 end ProjStrat
 
@@ -1040,6 +1061,7 @@ def leftAsSymmetric {params : Parameters} [FieldModel params.q]
     SymStrat params ι where
   state := strategy.state
   permInvState := strategy.permInvState
+  isNormalized := strategy.isNormalized
   pointMeasurement := strategy.pointMeasurementA
   axisParallelMeasurement := strategy.axisParallelMeasurementA
   axisParallelReparamInvariant := strategy.axisParallelReparamInvariantA
@@ -1053,6 +1075,7 @@ def rightAsSymmetric {params : Parameters} [FieldModel params.q]
     SymStrat params ι where
   state := strategy.state
   permInvState := strategy.permInvState
+  isNormalized := strategy.isNormalized
   pointMeasurement := strategy.pointMeasurementB
   axisParallelMeasurement := strategy.axisParallelMeasurementB
   axisParallelReparamInvariant := strategy.axisParallelReparamInvariantB
