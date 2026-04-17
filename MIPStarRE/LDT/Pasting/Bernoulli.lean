@@ -629,7 +629,7 @@ theorem ldPasting
       family hcomplete hcons hself hbound k hk
   have hconsistency :=
     hAConsistency_completed params strategy eps delta gamma kappa zeta
-      hnorm family k hsubmeasConsistency hcompleteness.completenessBound
+      strategy.isNormalized family k hsubmeasConsistency hcompleteness.completenessBound
   exact
     { largeEnough := hk
       constructedMeasurement := rfl
