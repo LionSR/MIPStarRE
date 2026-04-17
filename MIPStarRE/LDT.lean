@@ -54,6 +54,13 @@ import MIPStarRE.LDT.CommutativityPoints.SharedHelpers
 import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems
 import MIPStarRE.LDT.CommutativityPoints.Theorem
 import MIPStarRE.LDT.Commutativity.Defs
+import MIPStarRE.LDT.Commutativity.Scaffold
+import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds
+import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation
+import MIPStarRE.LDT.Commutativity.ScalarApproximation
+import MIPStarRE.LDT.Commutativity.GCommStability
+import MIPStarRE.LDT.Commutativity.Transport
+import MIPStarRE.LDT.Commutativity.Main
 import MIPStarRE.LDT.Commutativity.Theorems
 import MIPStarRE.LDT.Pasting.Defs
 import MIPStarRE.LDT.Pasting.Sandwich
