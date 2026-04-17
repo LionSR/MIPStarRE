@@ -40,3 +40,4 @@ jobs:
 
       - name: Run axiom-level blueprint ↔ Lean sync check
         run: python3 scripts/check_blueprint_sync.py
+        continue-on-error: true

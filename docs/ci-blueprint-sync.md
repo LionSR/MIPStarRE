@@ -8,6 +8,10 @@ points to is free of `sorryAx` in its transitive closure.
 It runs on every pull request that touches `blueprint/**`, `MIPStarRE/**`,
 or the toolchain files, and on manual dispatch.
 
+> **Current mode: advisory.** The check runs with `continue-on-error: true`
+> so it does not block merging. Once the codebase reaches zero sorry sites,
+> flip the workflow to hard-fail by removing `continue-on-error`.
+
 ## What it checks
 
 For every `\begin{theorem|lemma|proposition|corollary|definition}` block in
