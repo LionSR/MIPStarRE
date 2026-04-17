@@ -134,3 +134,4 @@ import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.Preliminaries.Polynomials
+import MIPStarRE.LDT.Preliminaries.PolynomialAgreement

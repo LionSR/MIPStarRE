@@ -115,6 +115,20 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 	The difference $g-h$ is a nonzero polynomial of total degree at most $md$. Apply Lemma~\ref{lem:schwartz-zippel-total-degree}.
 \end{proof}
 
+\begin{lemma}[Polynomial agreement bound on coded points]\label{lem:polynomial-agreement-mdq}
+	\lean{MIPStarRE.LDT.Preliminaries.polynomialAgreement_avg_le_mdq}
+	\leanok
+	\uses{lem:schwartz-zippel-individual}
+	Let $g, g' : \mathrm{Polynomial}\,\mathrm{params}$ be two distinct full polynomial outcomes with individual degrees at most $d$. Then
+	\[
+		\E_{u \sim \mathrm{Point}\,\mathrm{params}}\bigl[\mathbf{1}[g(u) = g'(u)]\bigr] \le \frac{md}{q}.
+	\]
+	This packages the $md/q$ loss term used in the \texttt{mainFormal} self-consistency cascade (\texttt{inductive\_step.tex}, lines 119--133) and in \texttt{comMain} (\texttt{commutativity-G.tex}).
+\end{lemma}
+\begin{proof}
+	Transport along the equivalence between coded $\F_q$ points and the underlying scalar function space, then apply Lemma~\ref{lem:schwartz-zippel-individual}.
+\end{proof}
+
 \begin{definition}[Measurements and submeasurements]\label{def:submeasurement}
 	\lean{MIPStarRE.LDT.SubMeas, MIPStarRE.LDT.Measurement, MIPStarRE.LDT.ProjSubMeas}
 	\leanok
