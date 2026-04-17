@@ -24,15 +24,162 @@ open MIPStarRE.LDT
 
 /-! ### Orthonormalization helper lemmas -/
 
+/-- The conjugate transpose of `leftTensor` of a Hermitian outcome is itself. -/
+private lemma leftTensor_outcome_conjTranspose_self
+    {Outcome : Type*} {ιA ιB : Type*} [Fintype Outcome]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : SubMeas Outcome ιA) (a : Outcome) :
+    (leftTensor (ι₂ := ιB) (A.outcome a))ᴴ =
+      leftTensor (ι₂ := ιB) (A.outcome a) := by
+  simpa [leftTensor, SubMeas.outcome_hermitian] using
+    (Matrix.conjTranspose_kronecker
+      (A.outcome a) (1 : MIPStarRE.Quantum.Op ιB))
+
+/-- The conjugate transpose of `rightTensor` of a Hermitian outcome is itself. -/
+private lemma rightTensor_outcome_conjTranspose_self
+    {Outcome : Type*} {ιA ιB : Type*} [Fintype Outcome]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (B : SubMeas Outcome ιB) (a : Outcome) :
+    (rightTensor (ι₁ := ιA) (B.outcome a))ᴴ =
+      rightTensor (ι₁ := ιA) (B.outcome a) := by
+  simpa [rightTensor, SubMeas.outcome_hermitian] using
+    (Matrix.conjTranspose_kronecker
+      (1 : MIPStarRE.Quantum.Op ιA) (B.outcome a))
+
+/-- `leftTensor (A_a) * (leftTensor (A_a))ᴴ = leftTensor (A_a * A_a)` for Hermitian outcomes. -/
+private lemma leftTensor_outcome_mul_conjTranspose_eq
+    {Outcome : Type*} {ιA ιB : Type*} [Fintype Outcome]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : SubMeas Outcome ιA) (a : Outcome) :
+    leftTensor (ι₂ := ιB) (A.outcome a) *
+        (leftTensor (ι₂ := ιB) (A.outcome a))ᴴ =
+      leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a) := by
+  rw [leftTensor_outcome_conjTranspose_self (ιB := ιB) A a,
+    leftTensor_mul_leftTensor]
+
+/-- `(rightTensor (B_a))ᴴ * rightTensor (B_a) = rightTensor (B_a * B_a)` for Hermitian outcomes. -/
+private lemma rightTensor_outcome_conjTranspose_mul_eq
+    {Outcome : Type*} {ιA ιB : Type*} [Fintype Outcome]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (B : SubMeas Outcome ιB) (a : Outcome) :
+    (rightTensor (ι₁ := ιA) (B.outcome a))ᴴ *
+        rightTensor (ι₁ := ιA) (B.outcome a) =
+      rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a) := by
+  rw [rightTensor_outcome_conjTranspose_self (ιA := ιA) B a,
+    rightTensor_mul_rightTensor]
+
+/-- Cauchy–Schwarz bound for the sum `∑_a ⟨ψ | A_a ⊗ B_a | ψ⟩`, expressed in
+terms of the left/right diagonal masses. -/
+private lemma abs_sum_ev_opTensor_le_sqrt_mul_sqrt
+    {Outcome : Type*} {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB))
+    (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) :
+    |∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a))| ≤
+      Real.sqrt
+          (∑ a : Outcome,
+            ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a))) *
+        Real.sqrt
+          (∑ a : Outcome,
+            ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a))) := by
+  have hX := fun a : Outcome =>
+    leftTensor_outcome_mul_conjTranspose_eq (ιB := ιB) A a
+  have hY := fun a : Outcome =>
+    rightTensor_outcome_conjTranspose_mul_eq (ιA := ιA) B a
+  simpa [leftTensor_mul_rightTensor_eq_opTensor, hX, hY] using
+    MIPStarRE.LDT.Preliminaries.sum_ev_mul_le_sqrt ψ
+      (fun a => leftTensor (ι₂ := ιB) (A.outcome a))
+      (fun a => rightTensor (ι₁ := ιA) (B.outcome a))
+
+/-- The `diagA` sum (in terms of `leftTensor (A_a * A_a)`) is nonnegative. -/
+private lemma sum_ev_leftTensor_outcome_sq_nonneg
+    {Outcome : Type*} {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (A : SubMeas Outcome ιA) :
+    0 ≤ ∑ a : Outcome,
+          ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a)) := by
+  refine Finset.sum_nonneg fun a _ => ?_
+  have hherm := leftTensor_outcome_conjTranspose_self (ιB := ιB) A a
+  have h := ev_adjoint_self_nonneg ψ (leftTensor (ι₂ := ιB) (A.outcome a))
+  rw [← leftTensor_outcome_mul_conjTranspose_eq (ιB := ιB) A a, ← hherm]
+  simpa [Matrix.mul_assoc] using h
+
+/-- The `diagB` sum (in terms of `rightTensor (B_a * B_a)`) is nonnegative. -/
+private lemma sum_ev_rightTensor_outcome_sq_nonneg
+    {Outcome : Type*} {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (B : SubMeas Outcome ιB) :
+    0 ≤ ∑ a : Outcome,
+          ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a)) := by
+  refine Finset.sum_nonneg fun a _ => ?_
+  rw [← rightTensor_outcome_conjTranspose_mul_eq (ιA := ιA) B a]
+  exact ev_adjoint_self_nonneg ψ (rightTensor (ι₁ := ιA) (B.outcome a))
+
+/-- Bound the overlap sum `∑_a ⟨ψ | A_a ⊗ B_a | ψ⟩` by the total mass
+`⟨ψ | 1 | ψ⟩` using `B.outcome a ≤ 1` and `A`'s completeness. -/
+private lemma sum_ev_opTensor_outcome_le_totalMass
+    {Outcome : Type*} {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) :
+    ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) ≤
+      ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+  have hleft_one :
+      ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) =
+        ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+    simpa [leftTensor] using
+      congrArg (ev ψ)
+        (Matrix.one_kronecker_one
+          (α := ℂ) (m := ιA) (n := ιB))
+  calc
+    ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a))
+      ≤ ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a)) := by
+          refine Finset.sum_le_sum ?_
+          intro a _
+          exact ev_mono ψ _ _ <|
+            opTensor_le_leftTensor (ι₂ := ιB)
+              (A.outcome_pos a) (Measurement.outcome_le_one B a)
+    _ = ev ψ (leftTensor (ι₂ := ιB) A.total) := by
+          rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ιB) (A.outcome a))]
+          rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ A.outcome]
+          simp [A.sum_eq_total]
+    _ = ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) := by
+          rw [A.total_eq_one]
+    _ = ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := hleft_one
+
+/-- Lower bound for the `diagA` sum in terms of the overlap and the bipartite
+consistency defect, obtained from the Cauchy–Schwarz squared bound. -/
+private lemma totalMass_sub_two_defect_le_diagA
+    {diagA diagB totalMass defect overlap : Error}
+    (hdiagA_nonneg : 0 ≤ diagA)
+    (hdefect_nonneg : 0 ≤ defect)
+    (hdefect_eq : defect = totalMass - overlap)
+    (hoverlap_sq : overlap ^ 2 ≤ diagA * diagB)
+    (hdiagB_le : diagB ≤ totalMass) :
+    totalMass - 2 * defect ≤ diagA := by
+  by_cases hsmall : totalMass ≤ defect
+  · linarith
+  · have hmass_pos : 0 < totalMass := by
+      have hdefect_lt : defect < totalMass := lt_of_not_ge hsmall
+      linarith
+    have hoverlap_eq : overlap = totalMass - defect := by linarith [hdefect_eq]
+    have hsquare : (totalMass - defect) ^ 2 ≤ diagA * totalMass := by
+      nlinarith [hoverlap_eq, hoverlap_sq, hdiagB_le, hdiagA_nonneg]
+    nlinarith [hsquare, hmass_pos]
+
 /-
 The consistency defect of `(A,B)` controls the strong self-consistency defect
-of the left-placed version of `A`.
-
-The Cauchy-Schwarz-heavy inequality chain below is still heartbeat-expensive;
-reduce this budget once the proof is refactored into smaller lemmas.
+of the left-placed version of `A`. The Cauchy–Schwarz chain and tensor
+hermitian identities have been factored out above, so the main proof is now a
+straightforward combination of those helpers.
 -/
-set_option maxHeartbeats 5000000 in
--- The Cauchy-Schwarz expansion below is still a single large proof term.
+set_option maxHeartbeats 800000 in
+-- The proof threads together several bipartite-tensor identities; a small bump
+-- over the default (200k) remains needed for the closing `simpa` unfolds.
 private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
     {Outcome : Type*} {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -51,40 +198,14 @@ private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
     ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a))
   let totalMass : Error := ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB))
   let defect : Error := qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas
-  have hdiagA_nonneg : 0 ≤ diagA := by
-    dsimp [diagA]
-    exact Finset.sum_nonneg fun a _ => by
-      have hherm :
-          (leftTensor (ι₂ := ιB) (A.outcome a))ᴴ =
-            leftTensor (ι₂ := ιB) (A.outcome a) := by
-        simpa [leftTensor, SubMeas.outcome_hermitian] using
-          (Matrix.conjTranspose_kronecker
-            (A.outcome a) (1 : MIPStarRE.Quantum.Op ιB))
-      simpa [hherm, leftTensor_mul_leftTensor] using
-        ev_adjoint_self_nonneg ψ (leftTensor (ι₂ := ιB) (A.outcome a))
-  have hdiagB_nonneg : 0 ≤ diagB := by
-    dsimp [diagB]
-    exact Finset.sum_nonneg fun a _ => by
-      have hherm :
-          (rightTensor (ι₁ := ιA) (B.outcome a))ᴴ =
-            rightTensor (ι₁ := ιA) (B.outcome a) := by
-        simpa [rightTensor, SubMeas.outcome_hermitian] using
-          (Matrix.conjTranspose_kronecker
-            (1 : MIPStarRE.Quantum.Op ιA) (B.outcome a))
-      simpa [hherm, rightTensor_mul_rightTensor] using
-        ev_adjoint_self_nonneg ψ (rightTensor (ι₁ := ιA) (B.outcome a))
-  have hoverlap_nonneg : 0 ≤ overlap := by
-    dsimp [overlap]
-    exact Finset.sum_nonneg fun a _ => by
-      exact ev_nonneg_of_psd ψ _ <| opTensor_nonneg (A.outcome_pos a) (B.outcome_pos a)
+  have hdefect_nonneg : 0 ≤ defect :=
+    qBipartiteConsDefect_nonneg ψ A.toSubMeas B.toSubMeas
+  have hdiagA_nonneg : 0 ≤ diagA :=
+    sum_ev_leftTensor_outcome_sq_nonneg (ιB := ιB) ψ A.toSubMeas
+  have hdiagB_nonneg : 0 ≤ diagB :=
+    sum_ev_rightTensor_outcome_sq_nonneg (ιA := ιA) ψ B.toSubMeas
   have hleft_one : ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) = totalMass := by
     simpa [leftTensor, totalMass] using
-      congrArg (ev ψ)
-        (Matrix.one_kronecker_one
-          (α := ℂ) (m := ιA) (n := ιB))
-  have hright_one :
-      ev ψ (rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) = totalMass := by
-    simpa [rightTensor, totalMass] using
       congrArg (ev ψ)
         (Matrix.one_kronecker_one
           (α := ℂ) (m := ιA) (n := ιB))
@@ -96,65 +217,30 @@ private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
             (leftPlacedSubMeas (ιB := ιB) A.toSubMeas))
       _ = totalMass := hleft_one
   have hdiagB_le : diagB ≤ totalMass := by
+    have hright_one :
+        ev ψ (rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) = totalMass := by
+      simpa [rightTensor, totalMass] using
+        congrArg (ev ψ)
+          (Matrix.one_kronecker_one
+            (α := ℂ) (m := ιA) (n := ιB))
     calc
       diagB ≤ ev ψ (rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) := by
         simpa [diagB, rightPlacedSubMeas, rightTensor_mul_rightTensor, B.total_eq_one] using
           (MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_mass ψ
             (rightPlacedSubMeas (ιA := ιA) B.toSubMeas))
       _ = totalMass := hright_one
-  have hoverlap_le : overlap ≤ totalMass := by
-    calc
-      overlap = ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
-        rfl
-      _ ≤ ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a)) := by
-            refine Finset.sum_le_sum ?_
-            intro a _
-            exact ev_mono ψ _ _ <|
-              opTensor_le_leftTensor (ι₂ := ιB)
-                (A.outcome_pos a) (Measurement.outcome_le_one B a)
-      _ = ev ψ (leftTensor (ι₂ := ιB) A.total) := by
-            rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ιB) (A.outcome a))]
-            rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ A.outcome]
-            simp [A.sum_eq_total]
-      _ = totalMass := by
-            simpa [A.total_eq_one] using hleft_one
-  have habs :
-      |overlap| ≤ Real.sqrt diagA * Real.sqrt diagB := by
-    have hX :
-        ∀ a : Outcome,
-          leftTensor (ι₂ := ιB) (A.outcome a) *
-              (leftTensor (ι₂ := ιB) (A.outcome a))ᴴ =
-            leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a) := by
-      intro a
-      have hherm :
-          (leftTensor (ι₂ := ιB) (A.outcome a))ᴴ =
-            leftTensor (ι₂ := ιB) (A.outcome a) := by
-        simpa [leftTensor, SubMeas.outcome_hermitian] using
-          (Matrix.conjTranspose_kronecker
-            (A.outcome a) (1 : MIPStarRE.Quantum.Op ιB))
-      rw [hherm, leftTensor_mul_leftTensor]
-    have hY :
-        ∀ a : Outcome,
-          (rightTensor (ι₁ := ιA) (B.outcome a))ᴴ *
-              rightTensor (ι₁ := ιA) (B.outcome a) =
-            rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a) := by
-      intro a
-      have hherm :
-          (rightTensor (ι₁ := ιA) (B.outcome a))ᴴ =
-            rightTensor (ι₁ := ιA) (B.outcome a) := by
-        simpa [rightTensor, SubMeas.outcome_hermitian] using
-          (Matrix.conjTranspose_kronecker
-            (1 : MIPStarRE.Quantum.Op ιA) (B.outcome a))
-      rw [hherm, rightTensor_mul_rightTensor]
-    simpa [diagA, diagB, overlap, leftTensor_mul_rightTensor_eq_opTensor, hX, hY] using
-      MIPStarRE.LDT.Preliminaries.sum_ev_mul_le_sqrt ψ
-        (fun a => leftTensor (ι₂ := ιB) (A.outcome a))
-        (fun a => rightTensor (ι₁ := ιA) (B.outcome a))
-  have hoverlap_upper : overlap ≤ Real.sqrt diagA * Real.sqrt diagB := by
-    exact (abs_le.mp habs).2
+  have hoverlap_le : overlap ≤ totalMass :=
+    sum_ev_opTensor_outcome_le_totalMass (ψ := ψ) A B
+  have habs : |overlap| ≤ Real.sqrt diagA * Real.sqrt diagB :=
+    abs_sum_ev_opTensor_le_sqrt_mul_sqrt (ψ := ψ) A.toSubMeas B.toSubMeas
+  have hoverlap_upper : overlap ≤ Real.sqrt diagA * Real.sqrt diagB :=
+    (abs_le.mp habs).2
   have hoverlap_sq : overlap ^ 2 ≤ diagA * diagB := by
     have hsq :
         overlap ^ 2 ≤ (Real.sqrt diagA * Real.sqrt diagB) ^ 2 := by
+      have hoverlap_nonneg : 0 ≤ overlap :=
+        Finset.sum_nonneg fun a _ =>
+          ev_nonneg_of_psd ψ _ <| opTensor_nonneg (A.outcome_pos a) (B.outcome_pos a)
       nlinarith [hoverlap_nonneg, hoverlap_upper,
         Real.sqrt_nonneg diagA, Real.sqrt_nonneg diagB]
     calc
@@ -174,26 +260,13 @@ private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
         max 0 (ev ψ (opTensor A.total B.total) - overlap) by rfl]
     rw [max_eq_right (sub_nonneg.mpr hoverlap_le_totalOverlap)]
     simp [totalMass, A.total_eq_one, B.total_eq_one, opTensor]
-  have hdiagA_lower : totalMass - 2 * defect ≤ diagA := by
-    by_cases hsmall : totalMass ≤ defect
-    · linarith
-    · have hmass_pos : 0 < totalMass := by
-        have hdefect_lt : defect < totalMass := lt_of_not_ge hsmall
-        have hdefect_nonneg : 0 ≤ defect := qBipartiteConsDefect_nonneg ψ A.toSubMeas B.toSubMeas
-        linarith
-      have hoverlap_eq : overlap = totalMass - defect := by
-        linarith [hdefect_eq]
-      have hsquare : (totalMass - defect) ^ 2 ≤ diagA * totalMass := by
-        nlinarith [hoverlap_eq, hoverlap_sq, hdiagB_le]
-      nlinarith [hsquare, hmass_pos]
-  have hinner : totalMass - diagA ≤ 2 * defect := by
-    linarith
-  have htarget_nonneg : 0 ≤ 2 * defect := by
-    have hdefect_nonneg : 0 ≤ defect := by
-      exact qBipartiteConsDefect_nonneg ψ A.toSubMeas B.toSubMeas
-    nlinarith
-  have hmax : max 0 (totalMass - diagA) ≤ 2 * defect := by
-    exact max_le_iff.mpr ⟨htarget_nonneg, hinner⟩
+  have hdiagA_lower : totalMass - 2 * defect ≤ diagA :=
+    totalMass_sub_two_defect_le_diagA
+      hdiagA_nonneg hdefect_nonneg hdefect_eq hoverlap_sq hdiagB_le
+  have hinner : totalMass - diagA ≤ 2 * defect := by linarith
+  have htarget_nonneg : 0 ≤ 2 * defect := by linarith
+  have hmax : max 0 (totalMass - diagA) ≤ 2 * defect :=
+    max_le_iff.mpr ⟨htarget_nonneg, hinner⟩
   have hmax' : max 0 (ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) - diagA) ≤
       2 * defect := by
     simpa [hleft_one] using hmax
