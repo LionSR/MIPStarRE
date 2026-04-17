@@ -259,7 +259,7 @@ Last updated: 2026-04-14
 ## Active Pasting Wave
 - **Owner**: OpenCode
 - **Scope**: `MIPStarRE/LDT/Pasting/*.lean`
-- **Live executable sorrys in scope**: 11
+- **Live executable sorrys in scope**: 12
 - **Current live target**: `MIPStarRE/LDT/Pasting/Theorems.lean`
 - **Status**: IN PROGRESS
 - **Dependency chain**:
@@ -275,9 +275,10 @@ Last updated: 2026-04-14
   - `ldPastingNCompleteness`
 - **Priority order**:
   1. prove `ldGbcon` or confirm the exact modeling blocker on the conditioned vertical-line test
-  2. prove `commutativitySwitcheroo` if the upstream `ldGbcon` path is not the blocker
-  3. attack the Bernoulli-tail chain now that `truncatedTypeSumRecurrence` is available
-  4. finish downstream wrappers/completeness lemmas that become unblocked
+  2. repair the paper-faithful `ν`/`σ` split for the pasted-submeasurement versus completed-measurement consistency statements
+  3. prove `commutativitySwitcheroo` if the upstream `ldGbcon` path is not the blocker
+  4. attack the Bernoulli-tail chain now that `truncatedTypeSumRecurrence` is available
+  5. finish downstream wrappers/completeness lemmas that become unblocked
   5. sync `blueprint/src/chapter/ch09_pasting.tex`
   6. run `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean` and `lake build`
 - **Checklist**:
@@ -289,6 +290,7 @@ Last updated: 2026-04-14
   - [ ] Eliminate `commuteGHalfSandwich`
   - [ ] Eliminate `ldSandwichLineOnePoint`
   - [ ] Eliminate `hBConsistency`
+  - [x] Repair the `hAConsistency_*` statement split to match the paper (`ν` before completion, `σ` after completion)
   - [ ] Eliminate `hAConsistency`
   - [ ] Eliminate `overAllOutcomes`
   - [x] Eliminate `truncatedTypeSumRecurrence`
@@ -342,6 +344,11 @@ Last updated: 2026-04-14
   - attempted the second `√ζ` step and the final `√χ` collapse-to-`firstTerm` step, but reverted those partial proofs after they introduced elaboration/heartbeat blowups and nontrivial rewrite obligations; the file is back to a compiling state
   - current concrete blocker: the remaining fourth-term chain needs one more `closenessOfInnerProduct_right` step plus the final `χ` step. The obstacle is not a missing statement now, but proof-engineering complexity: the right-action witness must be chosen so that `hC` reuses the existing left contraction, and the resulting expressions must be rewritten to the target scalar without triggering Lean heartbeat timeouts on large tensor/adjoint normal forms
   - best next step once resuming: prove the second `√ζ` step with a tightly controlled `closenessOfInnerProduct_right` proof that uses an adjointed witness to recycle `switcherooAggregateFourthTerm_once_commuted_contraction_left`, then package the final `√χ` step and exact collapse to `switcherooAggregateFirstTerm`; only after that mirror the argument for the third term to `switcherooAggregateTargetSwapped`
+  - re-surveyed the target and confirmed there are currently 12 executable `sorry`s in `Pasting/Theorems.lean`
+  - identified a paper-level statement mismatch in the pasted consistency chain: the current Lean scaffolding states the pasted submeasurement consistency at the final induction error `σ`, but the paper/blueprint give the intermediate `ν` before completion and only add the missing-mass term when passing to the completed measurement
+  - repaired that interface mismatch so `LdPastingSubMeasConclusion` and `hAConsistency_submeas` now carry the paper's intermediate `ν`, while `hAConsistency_completed` is the separate completion step to the final induction error `σ`
+  - proved `hAConsistency_completed` by showing evaluation commutes with `completeAtOutcome`, bounding completion's extra off-diagonal mass by the residual total mass, and then using the completeness lower bound to absorb that residual into the final `σ`
+  - re-verified `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean`; the file now typechecks with 12 remaining local `sorry`s
 
 ## Active CommutativityPoints Wave
 - **Owner**: OpenCode

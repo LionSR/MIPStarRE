@@ -146,14 +146,14 @@ structure LdPastingSubMeasConclusion (params : Parameters)
   constructedSubMeas :
     H = constructedPastedSubMeas params family k
   -- Naming note: this is not a `ν` field from the paper. The point-consistency
-  -- bound here continues to use the induction-section error term, while `ν`
-  -- only appears in the completeness lower bound.
+  -- bound here is the paper's intermediate `ν`, while the completeness field
+  -- carries the missing-mass term needed for the final `σ` after completion.
   pointConsistency :
     ConsRel strategy.state (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (polynomialEvaluationFamily params.next H)
-      (MainInductionStep.ldPastingInInductionError params k
-        eps delta gamma kappa zeta)
+      (MainInductionStep.ldPastingInInductionNu params k
+        eps delta gamma zeta)
   completeness :
     CompletenessAtLeast strategy.state H.liftLeft
       (ldPastingCompletenessLowerBound params kappa
