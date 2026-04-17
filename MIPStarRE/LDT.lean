@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.Basic.ParametersCore
 import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
-import MIPStarRE.LDT.Basic.Parameters
 import MIPStarRE.LDT.Basic.Operator
 import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Basic.SubMeasurement
@@ -10,7 +9,6 @@ import MIPStarRE.LDT.Test.StrategyCore
 import MIPStarRE.LDT.Test.StrategyRole
 import MIPStarRE.LDT.Test.StrategySymmetrized
 import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
-import MIPStarRE.LDT.Test.Strategy
 import MIPStarRE.LDT.Test.Classical
 import MIPStarRE.LDT.Test.MainTheorem
 import MIPStarRE.LDT.Test.ErrorCascade
@@ -24,7 +22,6 @@ import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
-import MIPStarRE.LDT.Preliminaries.Theorems
 import MIPStarRE.LDT.Preliminaries.Triangles
 import MIPStarRE.LDT.Preliminaries.SelfConsistency
 import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
@@ -32,10 +29,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer
 import MIPStarRE.LDT.MakingMeasurementsProjective.Naimark
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
 import MIPStarRE.LDT.MainInductionStep.Defs
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.MainInductionStep.Theorems
@@ -52,7 +47,6 @@ import MIPStarRE.LDT.CommutativityPoints.Defs
 import MIPStarRE.LDT.CommutativityPoints.Approximation
 import MIPStarRE.LDT.CommutativityPoints.SharedHelpers
 import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems
-import MIPStarRE.LDT.CommutativityPoints.Theorem
 import MIPStarRE.LDT.Commutativity.Defs
 import MIPStarRE.LDT.Commutativity.Scaffold
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds
@@ -61,7 +55,6 @@ import MIPStarRE.LDT.Commutativity.ScalarApproximation
 import MIPStarRE.LDT.Commutativity.GCommStability
 import MIPStarRE.LDT.Commutativity.Transport
 import MIPStarRE.LDT.Commutativity.Main
-import MIPStarRE.LDT.Commutativity.Theorems
 import MIPStarRE.LDT.Pasting.Defs
 import MIPStarRE.LDT.Pasting.Sandwich
 import MIPStarRE.LDT.Pasting.Statements
@@ -73,5 +66,4 @@ import MIPStarRE.LDT.Pasting.CommutingWithG
 import MIPStarRE.LDT.Pasting.GHatFacts
 import MIPStarRE.LDT.Pasting.BridgeLemmas
 import MIPStarRE.LDT.Pasting.Bernoulli
-import MIPStarRE.LDT.Pasting.Theorems
 import MIPStarRE.LDT.Preliminaries.Polynomials

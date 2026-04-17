@@ -6,7 +6,8 @@ import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 /-!
 # Section 5 — Naimark
 
-The one-measurement and full Naimark dilation theorems from Section 5.
+Statements and proofs for the one-measurement Naimark lemma together with the
+per-question dilation data used in the full Naimark theorem.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -622,9 +623,10 @@ Define `P̂_a = V†(I ⊗ |a⟩⟨a|)V`. Then `P̂_a` is an orthogonal projecti
 (since `|a⟩⟨a|` is), and the compression identity
 `(I⊗⟨⊥|) P̂_a (I⊗|⊥⟩) = √M_a · √M_a = M_a` gives the result.
 
-The proof requires matrix square roots for PSD operators, which are
-available in principle via the spectral theorem but require nontrivial
-Mathlib infrastructure. -/
+The proof uses `CFC.sqrt` for PSD operators together with lemmas such as
+`CFC.sqrt_mul_sqrt_self`. A future refactor could re-express the argument
+using a more specialized positive-semidefinite square-root interface if
+that becomes more convenient. -/
 theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
     (M : MIPStarRE.Quantum.Submeasurement α d) :
