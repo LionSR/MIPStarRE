@@ -65,5 +65,13 @@ import MIPStarRE.LDT.Commutativity.Theorems
 import MIPStarRE.LDT.Pasting.Defs
 import MIPStarRE.LDT.Pasting.Sandwich
 import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.Pasting.Core
+import MIPStarRE.LDT.Pasting.SwitcherooSetup
+import MIPStarRE.LDT.Pasting.SwitcherooContraction
+import MIPStarRE.LDT.Pasting.SwitcherooCompletion
+import MIPStarRE.LDT.Pasting.CommutingWithG
+import MIPStarRE.LDT.Pasting.GHatFacts
+import MIPStarRE.LDT.Pasting.BridgeLemmas
+import MIPStarRE.LDT.Pasting.Bernoulli
 import MIPStarRE.LDT.Pasting.Theorems
 import MIPStarRE.LDT.Preliminaries.Polynomials
