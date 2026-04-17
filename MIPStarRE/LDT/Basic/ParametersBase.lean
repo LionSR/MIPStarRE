@@ -1,0 +1,231 @@
+import Mathlib
+
+/-!
+# Basic parameters and scalar infrastructure for the low individual degree test
+
+Core parameter data, finite-field models, and coordinate arithmetic.
+-/
+
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+namespace MIPStarRE.LDT
+
+abbrev Error := ℝ
+
+inductive Role where
+  | A
+  | B
+  deriving DecidableEq, Repr, Inhabited, Fintype
+
+def Role.other : Role → Role
+  | .A => .B
+  | .B => .A
+
+@[simp] theorem Role.other_other (r : Role) : r.other.other = r := by
+  cases r <;> rfl
+
+/-- Parameters for the `(m,q,d)` low individual degree test. -/
+structure Parameters where
+  m : ℕ
+  q : ℕ
+  d : ℕ
+  hm : 0 < m
+  hq : 0 < q
+  deriving DecidableEq
+
+instance : Inhabited Parameters where
+  default :=
+    { m := 1
+      q := 2
+      d := 0
+      hm := by decide
+      hq := by decide }
+
+/-- The successor test obtained by appending one coordinate. -/
+def Parameters.next (params : Parameters) : Parameters :=
+  { m := params.m + 1
+    q := params.q
+    d := params.d
+    hm := Nat.succ_pos _
+    hq := params.hq }
+
+instance {params : Parameters} : NeZero params.q :=
+  ⟨Nat.ne_of_gt params.hq⟩
+
+abbrev Fq (params : Parameters) := Fin params.q
+abbrev Point (params : Parameters) := Fin params.m → Fq params
+abbrev PointTuple (params : Parameters) (k : ℕ) := Fin k → Fq params
+abbrev HilbertIndex (n : ℕ) := Fin n
+
+instance {params : Parameters} : Inhabited (Fin params.m) :=
+  ⟨⟨0, params.hm⟩⟩
+
+instance {params : Parameters} : Inhabited (Fq params) :=
+  ⟨⟨0, params.hq⟩⟩
+
+/-- Prime-power metadata exposing the genuine finite-field carrier `GaloisField p n`
+underlying the paper's notation `F_q` when such a witness is available. -/
+structure PrimePowerFieldSpec (params : Parameters) where
+  p : ℕ
+  n : ℕ
+  pPrime : Nat.Prime p
+  nPos : 0 < n
+  cardEq : params.q = p ^ n
+
+/-- An honest finite field of order `q`, obtained from a prime-power decomposition of `q`. -/
+noncomputable abbrev HonestFq (params : Parameters) (spec : PrimePowerFieldSpec params) :=
+  letI : Fact spec.p.Prime := ⟨spec.pPrime⟩
+  GaloisField spec.p spec.n
+
+/-- A bundled field model for the paper's `F_q`, together with a coding equivalence
+to the repository's finite carrier `Fin q`. -/
+class FieldModel (q : ℕ) where
+  K : Type*
+  instField : Field K
+  instFintype : Fintype K
+  instDecidableEq : DecidableEq K
+  equiv : K ≃ Fin q
+
+attribute [instance] FieldModel.instField FieldModel.instFintype FieldModel.instDecidableEq
+
+/-- Build the honest field model from prime-power data. -/
+noncomputable def PrimePowerFieldSpec.toFieldModel (params : Parameters)
+    (spec : PrimePowerFieldSpec params) : FieldModel params.q := by
+  classical
+  letI : Fact spec.p.Prime := ⟨spec.pPrime⟩
+  let K := HonestFq params spec
+  letI : Fintype K := Fintype.ofFinite K
+  have hcard : Fintype.card K = params.q := by
+    rw [← Nat.card_eq_fintype_card, spec.cardEq]
+    simpa [K, HonestFq] using (GaloisField.card (p := spec.p) (n := spec.n) spec.nPos.ne')
+  exact
+    { K := K
+      instField := inferInstance
+      instFintype := inferInstance
+      instDecidableEq := inferInstance
+      equiv := Fintype.equivFinOfCardEq hcard }
+
+abbrev Scalar (params : Parameters) [FieldModel params.q] := FieldModel.K params.q
+abbrev PolynomialModel (params : Parameters) [FieldModel params.q] :=
+  MvPolynomial (Fin params.m) (Scalar params)
+abbrev LinePolynomialModel (params : Parameters) [FieldModel params.q] :=
+  _root_.Polynomial (Scalar params)
+
+@[simp] theorem scalar_card (params : Parameters) [FieldModel params.q] :
+    Fintype.card (Scalar params) = params.q := by
+  simpa [Scalar, Fq] using Fintype.card_congr (FieldModel.equiv (q := params.q))
+
+instance {params : Parameters} [FieldModel params.q] : FieldModel params.next.q := by
+  simpa [Parameters.next] using (inferInstance : FieldModel params.q)
+
+/-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
+def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
+  (FieldModel.equiv (q := params.q)).symm x
+
+/-- Re-encode a field-model scalar as its canonical representative in `Fin q`. -/
+def encodeScalar {params : Parameters} [FieldModel params.q] (x : Scalar params) : Fq params :=
+  FieldModel.equiv (q := params.q) x
+
+@[simp] theorem encode_decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) :
+    encodeScalar (decodeScalar x) = x := by
+  simp [encodeScalar, decodeScalar]
+
+@[simp] theorem decode_encodeScalar {params : Parameters} [FieldModel params.q]
+    (x : Scalar params) :
+    decodeScalar (encodeScalar x) = x := by
+  simp [encodeScalar, decodeScalar]
+
+/-- The zero coordinate. -/
+def zeroCoord {params : Parameters} [FieldModel params.q] : Fq params :=
+  encodeScalar 0
+
+/-- Coordinate addition transported through the `Fin q` coding. -/
+def addCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
+  encodeScalar (decodeScalar x + decodeScalar y)
+
+/-- Coordinate subtraction transported through the `Fin q` coding. -/
+def subCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
+  encodeScalar (decodeScalar x - decodeScalar y)
+
+@[simp] theorem addCoord_subCoord_right {params : Parameters} [FieldModel params.q]
+    (x y : Fq params) :
+    addCoord y (subCoord x y) = x := by
+  unfold addCoord subCoord
+  rw [decode_encodeScalar]
+  simp [sub_eq_add_neg]
+
+@[simp] theorem addCoord_subCoord_left {params : Parameters} [FieldModel params.q]
+    (x y : Fq params) :
+    addCoord (subCoord x y) y = x := by
+  unfold addCoord subCoord
+  rw [decode_encodeScalar]
+  simp [sub_eq_add_neg]
+
+/-- Coordinate multiplication transported through the `Fin q` coding. -/
+def mulCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
+  encodeScalar (decodeScalar x * decodeScalar y)
+
+/-- Coordinate inversion transported through the `Fin q` coding. -/
+def invCoord {params : Parameters} [FieldModel params.q] (x : Fq params) : Fq params :=
+  encodeScalar ((decodeScalar x)⁻¹)
+
+/-- Pointwise addition in the coded ambient space. -/
+def addPoint {params : Parameters} [FieldModel params.q] (u v : Point params) : Point params :=
+  fun i => addCoord (u i) (v i)
+
+/-- Scalar multiplication in the coded ambient space. -/
+def smulPoint {params : Parameters} [FieldModel params.q] (t : Fq params) (u : Point params) :
+    Point params :=
+  fun i => mulCoord t (u i)
+
+/-- The zero point in `F_q^m`. -/
+def zeroPoint {params : Parameters} [FieldModel params.q] : Point params :=
+  fun _ => zeroCoord
+
+/-- The inclusion of the first `m` coordinates into `m + 1` coordinates. -/
+def embedCoord (params : Parameters) : Fin params.m → Fin params.next.m :=
+  fun i => ⟨i.1, Nat.lt_trans i.2 (Nat.lt_succ_self params.m)⟩
+
+/-- The last coordinate of `F_q^(m+1)`. -/
+def lastCoord (params : Parameters) : Fin params.next.m :=
+  ⟨params.m, Nat.lt_succ_self params.m⟩
+
+/-- Append a final coordinate to a point in `F_q^m`. -/
+def appendPoint (params : Parameters) (u : Point params) (x : Fq params) : Point params.next :=
+  fun i => if h : i.1 < params.m then u ⟨i.1, h⟩ else x
+
+/-- Truncate the last coordinate of a point in `F_q^{m+1}`. -/
+def truncatePoint (params : Parameters) (u : Point params.next) : Point params :=
+  fun i => u ⟨i.1, Nat.lt_trans i.2 (Nat.lt_succ_self params.m)⟩
+
+/-- Extract the final coordinate of a point in `F_q^{m+1}`. -/
+def pointHeight (params : Parameters) (u : Point params.next) : Fq params :=
+  u (lastCoord params)
+
+@[simp] theorem truncatePoint_appendPoint (params : Parameters)
+    (u : Point params) (x : Fq params) :
+    truncatePoint params (appendPoint params u x) = u := by
+  funext i
+  simp [truncatePoint, appendPoint, i.2]
+
+@[simp] theorem pointHeight_appendPoint (params : Parameters)
+    (u : Point params) (x : Fq params) :
+    pointHeight params (appendPoint params u x) = x := by
+  simp [pointHeight, lastCoord, appendPoint]
+
+/-- Decode a coded point as a tuple of scalars in the chosen field model. -/
+def decodePoint {params : Parameters} [FieldModel params.q] (u : Point params) :
+    Fin params.m → Scalar params :=
+  fun i => decodeScalar (u i)
+
+/-- Evaluate a multivariate polynomial over the chosen field model on a coded point. -/
+def evalPolynomialModel (params : Parameters) [FieldModel params.q]
+    (p : PolynomialModel params) (u : Point params) : Fq params :=
+  encodeScalar (MvPolynomial.eval (decodePoint u) p)
+
+/-- Evaluate a univariate polynomial over the chosen field model on a coded point. -/
+def evalLinePolynomialModel (params : Parameters) [FieldModel params.q]
+    (p : LinePolynomialModel params) (t : Fq params) : Fq params :=
+  encodeScalar (_root_.Polynomial.eval (decodeScalar t) p)
+
+end MIPStarRE.LDT
