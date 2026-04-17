@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Pasting.Statements
 import MIPStarRE.LDT.MainInductionStep.Statements
+import MIPStarRE.LDT.Preliminaries.Theorems
 import MIPStarRE.LDT.Preliminaries.SelfConsistency
 
 /-!
@@ -4532,8 +4533,8 @@ private lemma hAConsistency_submeas_core
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next
           (constructedPastedSubMeas params family k))
-        (MainInductionStep.ldPastingInInductionError params k
-          eps delta gamma kappa zeta) := by
+        (MainInductionStep.ldPastingInInductionNu params k
+          eps delta gamma zeta) := by
   sorry
 
 /-- `cor:h-a-consistency`.
@@ -4563,8 +4564,8 @@ theorem hAConsistency_submeas
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next
           (constructedPastedSubMeas params family k))
-        (MainInductionStep.ldPastingInInductionError params k
-          eps delta gamma kappa zeta) := by
+        (MainInductionStep.ldPastingInInductionNu params k
+          eps delta gamma zeta) := by
   have hline : ∀ i : ℕ, i < k →
       LdSandwichLineOnePointStatement params strategy family
         eps delta gamma zeta k i := by
@@ -4604,6 +4605,7 @@ theorem hAConsistency_completed
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
     (family : IdxPolyFamily params ι)
     (k : ℕ)
     (hsubmeas :
@@ -4611,8 +4613,8 @@ theorem hAConsistency_completed
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next
           (constructedPastedSubMeas params family k))
-        (MainInductionStep.ldPastingInInductionError params k
-          eps delta gamma kappa zeta))
+        (MainInductionStep.ldPastingInInductionNu params k
+          eps delta gamma zeta))
     (hcomplete :
       CompletenessAtLeast strategy.state
         (constructedPastedSubMeas params family k).liftLeft
@@ -4625,11 +4627,98 @@ theorem hAConsistency_completed
         (constructedPastedMeasurement params family k).toSubMeas)
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta) := by
-  /-
-  Review note: the completed-measurement bridge is expected to justify that the
-  completion step preserves the stated induction error bound using `hcomplete`.
-  -/
-  sorry
+  let H := constructedPastedSubMeas params family k
+  let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
+  let completedEval : IdxSubMeas (Point params.next) (Fq params) ι :=
+    fun u => (Preliminaries.completeAtOutcome (evaluateAt params.next u H)
+      ((pastedFallbackOutcome params) u)).toSubMeas
+  have hcompletedEval :
+      completedEval =
+        polynomialEvaluationFamily params.next
+          (constructedPastedMeasurement params family k).toSubMeas := by
+    funext u
+    simpa [completedEval, H, constructedPastedMeasurement, pastedFallbackOutcome] using
+      (Preliminaries.evaluateAt_completeAtOutcome params.next H
+        (pastedFallbackOutcome params) u).symm
+  have hresidualMass :
+      ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total)) ≤
+        kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
+          Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
+    have hmass :
+        ev strategy.state (leftTensor (ι₂ := ι) H.total) ≥
+          ldPastingCompletenessLowerBound params kappa ν k := by
+      simpa [H, subMeasMass, SubMeas.liftLeft] using hcomplete.lowerBound
+    calc
+      ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total))
+        = ev strategy.state (leftTensor (ι₂ := ι) (1 - H.total)) := by
+            simpa using (strategy.permInvState.swap_ev (1 - H.total)).symm
+      _ = 1 - ev strategy.state (leftTensor (ι₂ := ι) H.total) := by
+            have hleftSub :
+                leftTensor (ι₂ := ι) (1 - H.total) =
+                  1 - leftTensor (ι₂ := ι) H.total := by
+              ext i j
+              rcases i with ⟨i₁, i₂⟩
+              rcases j with ⟨j₁, j₂⟩
+              by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
+                simp [leftTensor, h₁, h₂, sub_eq_add_neg]
+            rw [hleftSub, ev_sub]
+            simp [ev_one_of_isNormalized strategy.state hnorm]
+      _ ≤ 1 - ldPastingCompletenessLowerBound params kappa ν k := by
+            linarith
+      _ = kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
+            Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
+            simp [ldPastingCompletenessLowerBound, ν]
+            ring
+  have hcompleted :
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        completedEval
+        (ν + (kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
+          Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))))) := by
+    constructor
+    calc
+      bipartiteConsError strategy.state (uniformDistribution (Point params.next))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          completedEval
+        ≤ avgOver (uniformDistribution (Point params.next)) (fun u =>
+            qBipartiteConsDefect strategy.state
+                ((strategy.pointMeasurement u).toSubMeas)
+                (evaluateAt params.next u H) +
+              ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total))) := by
+                unfold bipartiteConsError completedEval
+                apply avgOver_mono
+                intro u
+                simpa [H, evaluateAt, postprocess_total, ν] using
+                  Preliminaries.qBipartiteConsDefect_completeAtOutcome_right_le
+                    strategy.state (strategy.pointMeasurement u).toMeasurement
+                    (evaluateAt params.next u H)
+                    ((pastedFallbackOutcome params) u)
+      _ = bipartiteConsError strategy.state (uniformDistribution (Point params.next))
+            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+            (polynomialEvaluationFamily params.next H) +
+          avgOver (uniformDistribution (Point params.next))
+            (fun _ => ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total))) := by
+              unfold bipartiteConsError
+              rw [avgOver_add]
+              simp [IdxProjMeas.toIdxSubMeas, polynomialEvaluationFamily]
+      _ ≤ ν + avgOver (uniformDistribution (Point params.next))
+            (fun _ => ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total))) := by
+              exact add_le_add hsubmeas.offDiagonalBound le_rfl
+      _ = ν + ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total)) := by
+            simpa using avgOver_uniform_const (α := Point params.next)
+              (ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total)))
+      _ ≤ ν + (kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
+            Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))) := by
+              gcongr
+  have hsigma :
+      ν + (kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
+        Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))) =
+        MainInductionStep.ldPastingInInductionError params k
+          eps delta gamma kappa zeta := by
+    simp [MainInductionStep.ldPastingInInductionError, ν]
+    ring
+  exact ⟨by
+    simpa [hcompletedEval] using le_trans hcompleted.offDiagonalBound hsigma.le⟩
 
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
@@ -5277,7 +5366,7 @@ theorem ldPasting
       family hcomplete hcons hself hbound k hk
   have hconsistency :=
     hAConsistency_completed params strategy eps delta gamma kappa zeta
-      family k hsubmeasConsistency hcompleteness.completenessBound
+      hnorm family k hsubmeasConsistency hcompleteness.completenessBound
   exact
     { largeEnough := hk
       constructedMeasurement := rfl

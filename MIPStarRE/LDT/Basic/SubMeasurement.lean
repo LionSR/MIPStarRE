@@ -93,6 +93,28 @@ noncomputable instance {α : Type*} {ι : Type*}
 
 /-! ### Derived properties -/
 
+/-- Two submeasurements are equal when they have the same outcome operators and
+the same total operator. -/
+@[ext] theorem SubMeas.ext {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    {A B : SubMeas α ι}
+    (houtcome : ∀ a : α, A.outcome a = B.outcome a)
+    (htotal : A.total = B.total) :
+    A = B := by
+  cases A with
+  | mk outcomeA totalA posA sumA leA =>
+      cases B with
+      | mk outcomeB totalB posB sumB leB =>
+          have houtcome' : outcomeA = outcomeB := by
+            funext a
+            exact houtcome a
+          cases houtcome'
+          cases htotal
+          cases Subsingleton.elim posB posA
+          cases Subsingleton.elim sumB sumA
+          cases Subsingleton.elim leB leA
+          rfl
+
 /-- PSD outcomes are Hermitian. -/
 theorem SubMeas.outcome_hermitian {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
