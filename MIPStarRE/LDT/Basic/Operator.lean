@@ -298,8 +298,6 @@ theorem ev_diff_triangle {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ### Infrastructure for bridge lemma proofs -/
 
-open scoped BigOperators
-
 /-- `ev` distributes over finite sums. -/
 theorem ev_finset_sum {ι : Type*} [Fintype ι] [DecidableEq ι]
     {α : Type*} (ψ : QuantumState ι) (s : Finset α)

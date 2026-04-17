@@ -3,7 +3,14 @@ import MIPStarRE.LDT.Pasting.Sandwich
 /-!
 # Section 12 — Statements
 
-Output structures for the low-degree pasting lemmas.
+This file packages the displayed error terms and statement records used by the
+Section 12 pasting arguments. The underlying constructions live in
+`Pasting/Defs.lean` and `Pasting/Sandwich.lean`, while the proof stubs and
+supporting lemmas live in `Pasting/Theorems.lean`.
+
+## References
+
+- `references/ldt-paper/ld-pasting.tex`
 -/
 
 namespace MIPStarRE.LDT.Pasting

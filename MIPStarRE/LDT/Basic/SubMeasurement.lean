@@ -384,71 +384,36 @@ theorem leftTensor_nonneg
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     {A : MIPStarRE.Quantum.Op ι₁} (hA : 0 ≤ A) :
     0 ≤ leftTensor (ι₂ := ι₂) A := by
-  change 0 ≤ Matrix.kronecker A (1 : MIPStarRE.Quantum.Op ι₂)
-  exact
-    (Matrix.PosSemidef.kronecker
-      (Matrix.nonneg_iff_posSemidef.mp hA)
-      (Matrix.nonneg_iff_posSemidef.mp
-        (zero_le_one : (0 : MIPStarRE.Quantum.Op ι₂) ≤ 1))).nonneg
+  simpa [leftTensor, opTensor] using
+    opTensor_nonneg (ι₁ := ι₁) (ι₂ := ι₂) hA
+      (show 0 ≤ (1 : MIPStarRE.Quantum.Op ι₂) by exact zero_le_one)
 
 theorem rightTensor_nonneg
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     {A : MIPStarRE.Quantum.Op ι₂} (hA : 0 ≤ A) :
     0 ≤ rightTensor (ι₁ := ι₁) A := by
-  change 0 ≤ Matrix.kronecker (1 : MIPStarRE.Quantum.Op ι₁) A
-  exact
-    (Matrix.PosSemidef.kronecker
-      (Matrix.nonneg_iff_posSemidef.mp
-        (zero_le_one : (0 : MIPStarRE.Quantum.Op ι₁) ≤ 1))
-      (Matrix.nonneg_iff_posSemidef.mp hA)).nonneg
+  simpa [rightTensor, opTensor] using
+    opTensor_nonneg (ι₁ := ι₁) (ι₂ := ι₂)
+      (show 0 ≤ (1 : MIPStarRE.Quantum.Op ι₁) by exact zero_le_one) hA
 
 theorem leftTensor_le_one
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     {A : MIPStarRE.Quantum.Op ι₁} (hA : A ≤ 1) :
     leftTensor (ι₂ := ι₂) A ≤ 1 := by
-  change (1 - leftTensor (ι₂ := ι₂) A).PosSemidef
-  have hrewrite : 1 - leftTensor (ι₂ := ι₂) A = leftTensor (ι₂ := ι₂) (1 - A) := by
-    ext i j
-    rcases i with ⟨i₁, i₂⟩
-    rcases j with ⟨j₁, j₂⟩
-    by_cases h₁ : i₁ = j₁
-    · by_cases h₂ : i₂ = j₂
-      · subst h₁
-        subst h₂
-        simp [leftTensor, sub_eq_add_neg]
-      · simp [leftTensor, h₁, h₂, sub_eq_add_neg]
-    · by_cases h₂ : i₂ = j₂
-      · simp [leftTensor, h₁, h₂, sub_eq_add_neg]
-      · simp [leftTensor, h₁, h₂, sub_eq_add_neg]
-  have hpsd :
-      Matrix.PosSemidef (leftTensor (ι₂ := ι₂) (1 - A)) :=
-    Matrix.nonneg_iff_posSemidef.mp <|
-      leftTensor_nonneg (ι₂ := ι₂) (sub_nonneg.mpr hA)
-  rwa [hrewrite]
+  simpa [leftTensor, opTensor, Matrix.one_kronecker_one] using
+    opTensor_mono_left (ι₁ := ι₁) (ι₂ := ι₂)
+      (A₁ := A) (A₂ := (1 : MIPStarRE.Quantum.Op ι₁))
+      (B := (1 : MIPStarRE.Quantum.Op ι₂)) hA
+      (show 0 ≤ (1 : MIPStarRE.Quantum.Op ι₂) by exact zero_le_one)
 
 theorem rightTensor_le_one
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     {A : MIPStarRE.Quantum.Op ι₂} (hA : A ≤ 1) :
     rightTensor (ι₁ := ι₁) A ≤ 1 := by
-  change (1 - rightTensor (ι₁ := ι₁) A).PosSemidef
-  have hrewrite : 1 - rightTensor (ι₁ := ι₁) A = rightTensor (ι₁ := ι₁) (1 - A) := by
-    ext i j
-    rcases i with ⟨i₁, i₂⟩
-    rcases j with ⟨j₁, j₂⟩
-    by_cases h₁ : i₁ = j₁
-    · by_cases h₂ : i₂ = j₂
-      · subst h₁
-        subst h₂
-        simp [rightTensor, sub_eq_add_neg]
-      · simp [rightTensor, h₁, h₂, sub_eq_add_neg]
-    · by_cases h₂ : i₂ = j₂
-      · simp [rightTensor, h₁, h₂, sub_eq_add_neg]
-      · simp [rightTensor, h₁, h₂, sub_eq_add_neg]
-  have hpsd :
-      Matrix.PosSemidef (rightTensor (ι₁ := ι₁) (1 - A)) :=
-    Matrix.nonneg_iff_posSemidef.mp <|
-      rightTensor_nonneg (ι₁ := ι₁) (sub_nonneg.mpr hA)
-  rwa [hrewrite]
+  simpa [rightTensor, leftTensor, opTensor, Matrix.one_kronecker_one] using
+    opTensor_le_leftTensor (ι₁ := ι₁) (ι₂ := ι₂)
+      (A := (1 : MIPStarRE.Quantum.Op ι₁)) (B := A)
+      (show 0 ≤ (1 : MIPStarRE.Quantum.Op ι₁) by exact zero_le_one) hA
 
 /-- Lift a submeasurement to the left tensor factor of a bipartite space `ι × ι`.
 Each outcome operator `A_a : Op ι` becomes `A_a ⊗ I : Op (ι × ι)`. -/

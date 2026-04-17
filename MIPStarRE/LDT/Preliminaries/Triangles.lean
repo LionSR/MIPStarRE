@@ -63,7 +63,6 @@ theorem triangleInequalityForVectorsSquared
       (Fintype.card κ : Error) * ∑ i, ev ψ ((D i)ᴴ * D i) := by
   simpa using ev_sum_conjTranspose_mul_sum_le ψ D
 
--- TODO: consider moving to Basic/
 private lemma max_zero_add_le (x y : Error) :
     max 0 (x + y) ≤ max 0 x + |y| := by
   by_cases hxy : x + y < 0
@@ -74,6 +73,28 @@ private lemma max_zero_add_le (x y : Error) :
     have hx : x ≤ max 0 x := le_max_right _ _
     have hy : y ≤ |y| := le_abs_self y
     linarith
+
+private lemma avgOver_abs_le_sqrt_of_pointwise_nonneg
+    {Question : Type*}
+    (𝒟 : Distribution Question) (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
+    (f g : Question → Error)
+    (hf : ∀ q, |f q| ≤ Real.sqrt (g q))
+    (hg : ∀ q, 0 ≤ g q) :
+    avgOver 𝒟 (fun q => |f q|) ≤ Real.sqrt (avgOver 𝒟 g) := by
+  have havg_abs :
+      |avgOver 𝒟 (fun q => |f q|)| ≤ Real.sqrt (avgOver 𝒟 g) := by
+    exact
+      avgOver_abs_le_sqrt_of_pointwise 𝒟
+        (fun q => |f q|)
+        g
+        (by
+          intro q
+          simpa [abs_of_nonneg (abs_nonneg (f q))] using hf q)
+        hg
+        h𝒟
+  have hnonneg : 0 ≤ avgOver 𝒟 (fun q => |f q|) :=
+    avgOver_nonneg 𝒟 _ fun q => abs_nonneg (f q)
+  simpa [abs_of_nonneg hnonneg] using havg_abs
 
 /-- `prop:triangle-sub`.
 
@@ -189,26 +210,11 @@ theorem triangleSub
             rw [(ev_sub ψ ((AL q).outcome a * (CR q).outcome a)
               ((BL q).outcome a * (CR q).outcome a)).symm]
             simp [sub_mul]
-  have hgap_avg_abs_raw :
-      |avgOver 𝒟 (fun q => |gap q|)| ≤ Real.sqrt (avgOver 𝒟 sdd) := by
-    exact
-      avgOver_abs_le_sqrt_of_pointwise 𝒟
-        (fun q => |gap q|)
-        sdd
-        (by
-          intro q
-          simpa [abs_of_nonneg (abs_nonneg (gap q))] using hgap_pointwise q)
-        (by
-          intro q
-          exact qSDD_nonneg ψ (AL q) (BL q))
-        h𝒟
-  have hgap_avg_nonneg : 0 ≤ avgOver 𝒟 (fun q => |gap q|) := by
-    unfold avgOver
-    exact Finset.sum_nonneg fun q hq =>
-      mul_nonneg (𝒟.nonnegative q) (abs_nonneg (gap q))
   have hgap_avg_abs :
-      avgOver 𝒟 (fun q => |gap q|) ≤ Real.sqrt (avgOver 𝒟 sdd) := by
-    simpa [abs_of_nonneg hgap_avg_nonneg] using hgap_avg_abs_raw
+      avgOver 𝒟 (fun q => |gap q|) ≤ Real.sqrt (avgOver 𝒟 sdd) :=
+    avgOver_abs_le_sqrt_of_pointwise_nonneg 𝒟 h𝒟 gap sdd
+      hgap_pointwise
+      (fun q => qSDD_nonneg ψ (AL q) (BL q))
   have hdefect_pointwise :
       ∀ q, qConsDefect ψ (BL q) (CR q) ≤ qConsDefect ψ (AL q) (CR q) + |gap q| := by
     intro q
@@ -262,7 +268,6 @@ theorem triangleSub
     _ ≤ δ + Real.sqrt ε := by
           simpa [add_comm] using add_le_add_right (Real.sqrt_le_sqrt hAB) δ
 
--- TODO: factor the shared proof structure with `triangleSub`.
 private lemma triangleSub_right
     {Question Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
@@ -367,26 +372,11 @@ private lemma triangleSub_right
             rw [(ev_sub ψ ((AL q).outcome a * (BR q).outcome a)
               ((AL q).outcome a * (DR q).outcome a)).symm]
             simp [mul_sub]
-  have hgap_avg_abs_raw :
-      |avgOver 𝒟 (fun q => |gap q|)| ≤ Real.sqrt (avgOver 𝒟 sdd) := by
-    exact
-      avgOver_abs_le_sqrt_of_pointwise 𝒟
-        (fun q => |gap q|)
-        sdd
-        (by
-          intro q
-          simpa [abs_of_nonneg (abs_nonneg (gap q))] using hgap_pointwise q)
-        (by
-          intro q
-          exact qSDD_nonneg ψ (BR q) (DR q))
-        h𝒟
-  have hgap_avg_nonneg : 0 ≤ avgOver 𝒟 (fun q => |gap q|) := by
-    unfold avgOver
-    exact Finset.sum_nonneg fun q hq =>
-      mul_nonneg (𝒟.nonnegative q) (abs_nonneg (gap q))
   have hgap_avg_abs :
-      avgOver 𝒟 (fun q => |gap q|) ≤ Real.sqrt (avgOver 𝒟 sdd) := by
-    simpa [abs_of_nonneg hgap_avg_nonneg] using hgap_avg_abs_raw
+      avgOver 𝒟 (fun q => |gap q|) ≤ Real.sqrt (avgOver 𝒟 sdd) :=
+    avgOver_abs_le_sqrt_of_pointwise_nonneg 𝒟 h𝒟 gap sdd
+      hgap_pointwise
+      (fun q => qSDD_nonneg ψ (BR q) (DR q))
   have hdefect_pointwise :
       ∀ q, qConsDefect ψ (AL q) (DR q) ≤ qConsDefect ψ (AL q) (BR q) + |gap q| := by
     intro q

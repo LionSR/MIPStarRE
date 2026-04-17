@@ -1,7 +1,16 @@
 import MIPStarRE.LDT.MainInductionStep.Defs
 
 /-!
-Statement containers for Section 6 of the low individual degree paper.
+# Section 6 — Statement packages
+
+This file packages the hypotheses and conclusions used by the main induction-step
+results, including restricted-slice bookkeeping and bridge-style temporary
+interfaces.
+
+## References
+
+- `blueprint/src/chapter/ch10_induction.tex`
+- `references/ldt-paper/inductive_step.tex`
 -/
 
 namespace MIPStarRE.LDT.MainInductionStep
@@ -13,7 +22,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Output package for the induction-level self-improvement theorem.
 
-The strategy's state is bipartite (`QuantumState (ι × ι)`).  Fields that
+The strategy's state is bipartite (`QuantumState (ι × ι)`). Fields that
 involve bipartite-lifted operators use `leftPlacedSubMeas` /
 `rightPlacedSubMeas` / `tensorFailureExpectation` with honest bipartite
 structure. -/

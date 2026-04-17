@@ -12,8 +12,6 @@ averaging operators, and temporary tensor-placement helpers.
 - `references/ldt-paper/inductive_step.tex`
 -/
 
-set_option linter.style.longLine false
-
 namespace MIPStarRE.LDT.MainInductionStep
 
 open MIPStarRE.LDT
@@ -220,7 +218,8 @@ private theorem restrictAxisParallelMeasurement_postprocess_eval
         (fun f => f t)).outcome a
       = ∑ f : AxisLinePolynomial params,
           if f t = a then lifted.toSubMeas.outcome (liftAxisAnswer params x f) else 0 := by
-            simp [postprocess, restrictAxisParallelMeasurement, lifted, liftAxisAnswer, Finset.sum_filter]
+            simp [postprocess, restrictAxisParallelMeasurement, lifted, liftAxisAnswer,
+              Finset.sum_filter]
             apply Finset.sum_congr rfl
             intro f hf
             by_cases h : f t = a <;> simp [h]
@@ -290,12 +289,14 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
     restrictAxisParallelMeasurement_reparamInvariant params strategy x
   diagonalMeasurement := restrictDiagonalMeasurement params strategy x
 
+/-- Restricting a strategy to a slice preserves the underlying shared state. -/
 @[simp] theorem xRestrictedStrategy_state (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
     (xRestrictedStrategy params strategy x).state = strategy.state :=
   rfl
 
+/-- The restricted point measurement is the ambient point measurement at the appended point. -/
 @[simp] theorem xRestrictedStrategy_pointMeasurement_apply (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) (u : Point params) :
@@ -303,22 +304,25 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
       strategy.pointMeasurement (appendPoint params u x) :=
   rfl
 
+/-- Restricting an axis-parallel measurement reindexes outcomes by `liftAxisAnswer`. -/
 @[simp] theorem restrictAxisParallelMeasurement_outcome (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params)
     (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
-    ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas.outcome f) =
-      (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas.outcome
-        (liftAxisAnswer params x f) :=
+    (restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas.outcome f =
+      ((strategy.axisParallelMeasurement
+          (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas.outcome
+        (liftAxisAnswer params x f)) :=
   rfl
 
+/-- Restricting a diagonal measurement only changes the line index, not the outcome label. -/
 @[simp] theorem restrictDiagonalMeasurement_outcome (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params)
     (ℓ : DiagonalLine params) (f : DiagonalLinePolynomial params.next) :
-    ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeas.outcome f) =
-      (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas.outcome
-        f :=
+    (restrictDiagonalMeasurement params strategy x ℓ).toSubMeas.outcome f =
+      ((strategy.diagonalMeasurement
+          (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas.outcome f) :=
   rfl
 
 /-- The intermediate `ν` from `thm:main-induction`. -/

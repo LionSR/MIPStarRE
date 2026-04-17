@@ -1,8 +1,23 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems
 
 /-!
-Matching scaffold for Section 10 of the low individual degree paper in
-`references/ldt-paper/commutativity-points.tex`.
+# Section 10 — Definitions
+
+Supporting definitions for the point-measurement commutativity argument from Section 10 of the
+low individual degree paper.
+
+## Main definitions
+
+- `pointWithDiagonalLineDistribution`: uniformly samples a diagonal line together with a
+  parameter.
+- `pointPairSharedDiagonalLineDistribution`: packages a uniform point pair and parameter as a
+  shared diagonal-line sample.
+- `pointMeasurementProductLeft` / `pointMeasurementProductRight`: the ordered and reversed point
+  products on the bipartite space.
+
+## References
+
+- `references/ldt-paper/commutativity-points.tex`
 -/
 
 namespace MIPStarRE.LDT.CommutativityPoints
@@ -14,8 +29,13 @@ open scoped BigOperators MatrixOrder ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- Outcomes `(a, b)` for the ordered or reversed product of two point measurements. -/
 abbrev PointPairOutcome (params : Parameters) := Fq params × Fq params
+
+/-- A diagonal line together with a sampled parameter on that line. -/
 abbrev PointDiagonalLineQuestion (params : Parameters) := DiagonalLine params × Fq params
+
+/-- A diagonal line together with the two sampled parameters used for a point pair. -/
 abbrev PointPairDiagonalLineQuestion (params : Parameters) :=
   DiagonalLine params × (Fq params × Fq params)
 
@@ -36,39 +56,13 @@ noncomputable instance (params : Parameters) : Fintype (DiagonalLine params) := 
         rfl }
   exact Fintype.ofEquiv (Point params × Point params) e.symm
 
-private theorem opTensor_le_leftTensor
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    {A : MIPStarRE.Quantum.Op ι₁} {B : MIPStarRE.Quantum.Op ι₂}
-    (hA : 0 ≤ A) (hB : B ≤ 1) :
-    opTensor A B ≤ leftTensor (ι₂ := ι₂) A := by
-  change (leftTensor (ι₂ := ι₂) A - opTensor A B).PosSemidef
-  have hrewrite : leftTensor (ι₂ := ι₂) A - opTensor A B = opTensor A (1 - B) := by
-    have hneg : Matrix.kronecker A (-B) = - Matrix.kronecker A B := by
-      simpa using (Matrix.kronecker_smul (-1 : ℂ) A B)
-    calc
-      leftTensor (ι₂ := ι₂) A - opTensor A B
-          = Matrix.kronecker A 1 + Matrix.kronecker A (-B) := by
-              rw [hneg]
-              simp [leftTensor, opTensor, sub_eq_add_neg]
-      _ = Matrix.kronecker A (1 - B) := by
-            simpa [sub_eq_add_neg] using (Matrix.kronecker_add A 1 (-B)).symm
-      _ = opTensor A (1 - B) := by
-            simp [opTensor]
-  have hpsd : Matrix.PosSemidef (opTensor A (1 - B)) := by
-    change Matrix.PosSemidef (Matrix.kronecker A (1 - B))
-    exact
-      Matrix.PosSemidef.kronecker
-        (Matrix.nonneg_iff_posSemidef.mp hA)
-        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hB))
-  rwa [hrewrite]
-
 /-- Ordered product of two submeasurements viewed as a raw operator family. -/
 noncomputable def orderedProductOpFamily {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
     OpFamily (α × β) ι where
   outcome := fun | (a, b) => A.outcome a * B.outcome b
   total := A.total * B.total
- 
+
 /-- The outcomes sum to the displayed total operator. -/
 theorem orderedProductOpFamily_sum_eq_total {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :

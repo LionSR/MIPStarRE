@@ -35,6 +35,11 @@ orthonormalization estimates. -/
 noncomputable def zetaQuarterRoot (ζ : Error) : Error :=
   Real.rpow ζ (1 / (4 : Error))
 
+private lemma zetaQuarterRoot_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
+    0 ≤ zetaQuarterRoot ζ := by
+  dsimp [zetaQuarterRoot]
+  exact Real.rpow_nonneg hζ _
+
 /-- A raw operator family viewed as a constant indexed family on the trivial
 question set. -/
 def constOpFamily {Outcome : Type*} {ι : Type*}
@@ -378,31 +383,6 @@ lemma truncationInequality (δ x : Error) :
       mul_nonneg (mul_nonneg (le_of_lt hδ) hx)
         (by linarith : (0 : ℝ) ≤ 1 - x)]
 
-private lemma real_smul_matrix_eq_complex {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (Q : MIPStarRE.Quantum.Op ι) (c : Error) :
-    (c : ℂ) • Q = c • Q := by
-  ext i j
-  change (c : ℂ) * Q i j = (c : ℂ) * Q i j
-  rfl
-
-private lemma op_one_le_complex_smul_one_of_real_ge_one
-    {ι : Type*} [Fintype ι] [DecidableEq ι] (c : Error)
-    (hc : (1 : Error) ≤ c) :
-    (1 : MIPStarRE.Quantum.Op ι) ≤ (c : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
-  rw [real_smul_matrix_eq_complex]
-  simpa using
-    smul_le_smul_of_nonneg_right hc
-      (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one)
-
-private lemma op_zero_le_complex_smul_one_of_real_nonneg
-    {ι : Type*} [Fintype ι] [DecidableEq ι] (c : Error)
-    (hc : (0 : Error) ≤ c) :
-    (0 : MIPStarRE.Quantum.Op ι) ≤ (c : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
-  rw [real_smul_matrix_eq_complex]
-  simpa using
-    smul_le_smul_of_nonneg_right hc
-      (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one)
-
 private lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
     0 ≤ spectralTruncationError ζ := by
   dsimp [spectralTruncationError]
@@ -532,38 +512,12 @@ private lemma sqrt_roundingToProjectiveError_le_four_zetaQuarterRoot (ζ : Error
     Real.sqrt (roundingToProjectiveError ζ) ≤ 4 * zetaQuarterRoot ζ := by
   -- Coefficient estimate: `sqrt 12 ≤ 4`.
   rw [sqrt_roundingToProjectiveError_eq ζ hζ]
-  have hzqr_nonneg : 0 ≤ zetaQuarterRoot ζ := by
-    dsimp [zetaQuarterRoot]
-    exact Real.rpow_nonneg hζ _
+  have hzqr_nonneg : 0 ≤ zetaQuarterRoot ζ := zetaQuarterRoot_nonneg hζ
   have hsqrt : Real.sqrt (12 : Error) ≤ 4 := by
     have hsq : (Real.sqrt (12 : Error)) ^ 2 ≤ (4 : Error) ^ 2 := by norm_num
     nlinarith [Real.sq_sqrt (show 0 ≤ (12 : Error) by positivity), hsq]
   refine mul_le_mul_of_nonneg_right ?_ hzqr_nonneg
   exact hsqrt
-
-private lemma sqrt_two_mul_sqrt_roundingToProjectiveError_le_five_zetaQuarterRoot (ζ : Error)
-    (hζ : 0 ≤ ζ) :
-    Real.sqrt (2 : Error) * Real.sqrt (roundingToProjectiveError ζ) ≤
-      5 * zetaQuarterRoot ζ := by
-  -- Coefficient estimate: `sqrt 2 * sqrt 12 = sqrt 24 ≤ 5`.
-  rw [sqrt_roundingToProjectiveError_eq ζ hζ]
-  have hzqr_nonneg : 0 ≤ zetaQuarterRoot ζ := by
-    dsimp [zetaQuarterRoot]
-    exact Real.rpow_nonneg hζ _
-  have hsqrt : Real.sqrt (24 : Error) ≤ 5 := by
-    have hsq : (Real.sqrt (24 : Error)) ^ 2 ≤ (5 : Error) ^ 2 := by norm_num
-    nlinarith [Real.sq_sqrt (show 0 ≤ (24 : Error) by positivity), hsq]
-  calc
-    Real.sqrt (2 : Error) * (Real.sqrt (12 : Error) * zetaQuarterRoot ζ)
-        = (Real.sqrt (2 : Error) * Real.sqrt (12 : Error)) * zetaQuarterRoot ζ := by ring
-    _ ≤ (5 : Error) * zetaQuarterRoot ζ := by
-      refine mul_le_mul_of_nonneg_right ?_ hzqr_nonneg
-      calc
-        Real.sqrt (2 : Error) * Real.sqrt (12 : Error) = Real.sqrt (24 : Error) := by
-          rw [← Real.sqrt_mul (show 0 ≤ (2 : Error) by positivity)]
-          norm_num
-        _ ≤ 5 := by
-          exact hsqrt
 
 /-- **Completeness of `Q`** (`lem:Q-completeness`).
 
@@ -796,7 +750,7 @@ lemma qCompleteness {Outcome : Type*}
             exact Real.rpow_nonneg hζ _
           linarith
 
-private lemma nnreal_smul_matrix_eq_complex {ι : Type*} [Fintype ι] [DecidableEq ι]
+private lemma nnreal_smul_matrix_eq_complex {ι : Type*}
     (Q : MIPStarRE.Quantum.Op ι) (c : NNReal) :
     (c : ℂ) • Q = c • Q := by
   ext i j
@@ -908,9 +862,7 @@ lemma sqrtQCompleteness {Outcome : Type*}
     qCompleteness ψ A ζ data hψ hζ hζ_small hRank
   have hε_le_zqr : ε ≤ zetaQuarterRoot ζ := by
     simpa [ε] using spectralTruncationError_le_zetaQuarterRoot ζ hζ hζ_small
-  have hzqr_nonneg : 0 ≤ zetaQuarterRoot ζ := by
-    dsimp [zetaQuarterRoot]
-    exact Real.rpow_nonneg hζ _
+  have hzqr_nonneg : 0 ≤ zetaQuarterRoot ζ := zetaQuarterRoot_nonneg hζ
   have hscaled :
       (1 - ε) * (1 - 11 * zetaQuarterRoot ζ) ≤
         (1 - ε) * ev ψ (QTotal data) := by
@@ -1116,7 +1068,8 @@ lemma xExpressionToQExpression {Outcome : Type*}
           simp [Matrix.mul_assoc, two_smul, hneg]
     _ = Qa data.qLayer a * QTotal data.qLayer * Qa data.qLayer a -
         Qa data.qLayer a := by
-      simp [Matrix.mul_assoc, hQaXa, hQaLeft, hQaRight, data.x_gram_right, hQaSq]
+      simp only [Matrix.mul_assoc, hQaXa, hQaLeft, hQaRight, data.x_gram_right, hQaSq,
+        Int.reduceNeg, neg_smul, zsmul_eq_mul, Int.cast_ofNat]
       noncomm_ring
     _ = Qa data.qLayer a * QTotal data.qLayer * Qa data.qLayer a -
         Qa data.qLayer a := by

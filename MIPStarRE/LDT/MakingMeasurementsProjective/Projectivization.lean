@@ -276,9 +276,6 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
       hCons.offDiagonalBound
   have hζ_nonneg : 0 ≤ ζ := by
     exact le_trans (qBipartiteConsDefect_nonneg ψ A.toSubMeas B.toSubMeas) hCons'
-  have hAlmost_nonneg : 0 ≤ consistencyToAlmostProjectiveError ζ := by
-    dsimp [consistencyToAlmostProjectiveError]
-    nlinarith
   have hsscBound :
       qSSCDefect ψ A_lifted.toSubMeas ≤ consistencyToAlmostProjectiveError ζ := by
     calc

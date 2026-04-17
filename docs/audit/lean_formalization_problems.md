@@ -118,16 +118,22 @@ Why this is a problem:
 - These Lean abbreviations forget the degree constraints entirely.
 - That drops a real hypothesis from the mathematical objects being formalized.
 
-### 5. `interpolateCompletedSlices` — Lagrange coefficients fixed, degree bound sorry'd
+### 5. `interpolateCompletedSlices` — definition faithful, degree bound proven
 
 - Lean location: `MIPStarRE/LDT/Pasting/Defs.lean`
-- Severity: **medium** (was **critical**, definition now faithful)
+- Severity: **low** (was **critical**; definition now faithful and the
+  `lowIndividualDegree` proof is complete)
 
-The definition now uses proper Lagrange interpolation via Mathlib's
-`Lagrange.basis`, embedded into `MvPolynomial` at the last coordinate.
-The `lowIndividualDegree` proof is sorry'd: for the first `m` coordinates
-the bound follows from `degreeOf_mul_le`, but for the last coordinate
-(when `|τ| > d+1`) the cancellation argument requires slice consistency.
+The definition uses proper Lagrange interpolation via Mathlib's
+`Lagrange.basis`, embedded into `MvPolynomial` at the last coordinate,
+and restricts the sum to a chosen `(d+1)`-sized subset `σ` of the
+genuine support (via `interpolationSupportSubset`). The
+`lowIndividualDegree` proof is fully discharged: for the first `m`
+coordinates the bound follows from `degreeOf_mul_le` plus the fact that
+`Li.eval₂ C (X (lastCoord))` has degree `0` in those coordinates; for
+the last coordinate the bound follows from
+`natDegree_lagrangeBasis_le_card_sub_one` together with
+`σ.card = d + 1`, avoiding the cancellation argument entirely.
 
 What the paper says:
 
@@ -135,24 +141,14 @@ What the paper says:
 
 Remaining gaps:
 
-- The `lowIndividualDegree` proof obligation is sorry'd.
-- Closing this sorry requires either restricting the sum to exactly
-  `d+1` evaluation points (matching ld-pasting.tex:240), or proving
-  the cancellation argument for consistent slice polynomials
-  (ld-pasting.tex:1238-1254).
-- **τ size mismatch**: the code sums over all of `τ` (which has
-  `|τ| ≥ d+1`), while the paper's initial construction
-  (ld-pasting.tex:240) uses exactly `d+1` slices. For `|τ| = d+1`
-  Mathlib's `Lagrange.degree_basis` directly bounds the last-
-  coordinate degree; for `|τ| > d+1` the raw degree exceeds `d` and
-  the bound requires slice consistency. If the intent is to match the
-  paper precisely, the definition may need to select a `(d+1)`-sized
-  subset of `τ`.
-- **Injectivity precondition**: the Lagrange interpolation properties
-  (e.g. `eval_basis_self`) require `Set.InjOn v ↑τ`, which depends
-  on `decodeScalar` being injective on the image of `xs`. This holds
-  when `xs` is drawn from `distinctTupleDistribution` but is not
-  enforced in the definition itself.
+- **Interpolation correctness (downstream)**: the definition gives the
+  correct degree bound unconditionally, but to prove the paper's
+  restriction property (that `restrictAtHeight` of the result agrees
+  with each slice on `σ`) one needs `Set.InjOn (decodeScalar ∘ xs) ↑σ`
+  and `σ ⊆ gHatTupleSupport gs`. The latter is supplied by
+  `interpolationSupportSubset_subset`; the former holds when `xs` is
+  drawn from `distinctTupleDistribution`, but is a proof obligation at
+  each downstream call site, not in the definition itself.
 
 ### 6. `laplacianDifferenceForm` is definitionally equal to `laplacian`, so `laplacianRewrite` is vacuous
 
@@ -433,7 +429,7 @@ I searched `MIPStarRE/LDT` for definitions whose names appear only at their defi
 
 - Placeholder / fake definitions:
   - `matrixPolynomialWeightSqrtOperator`
-  - `interpolateCompletedSlices` (definition fixed, degree bound sorry'd)
+  - ~~`interpolateCompletedSlices`~~ (resolved: definition faithful and degree bound proven; see §5)
   - `laplacianDifferenceForm`
   - `fourierBasisInnerProduct`
 - Wrong or weakened theorem statements:

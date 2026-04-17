@@ -10,8 +10,6 @@ Switcheroo and sandwich operator families for the pasting argument.
 - `references/ldt-paper/ld-pasting.tex`
 -/
 
-set_option linter.style.longLine false
-
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
@@ -238,6 +236,8 @@ noncomputable def gHatRotatedHalfProductTotalOperator (params : Parameters) [Fie
       gHatHalfProductTotalOperator params family k (pointTupleTail xs) *
         ((gHatIdxMeas params family (xs 0)).toSubMeas).total
 
+/-- The total half-product collapses to the identity because each completed slice
+has total operator `1`. -/
 lemma gHatHalfProductTotalOperator_eq_one (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k), gHatHalfProductTotalOperator params family k xs = 1
@@ -248,6 +248,7 @@ lemma gHatHalfProductTotalOperator_eq_one (params : Parameters) [FieldModel para
       simp [gHatIdxMeas, completeSubMeas,
         gHatHalfProductTotalOperator_eq_one params family k (pointTupleTail xs)]
 
+/-- The rotated total half-product also collapses to the identity. -/
 lemma gHatRotatedHalfProductTotalOperator_eq_one (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k), gHatRotatedHalfProductTotalOperator params family k xs = 1
@@ -258,6 +259,8 @@ lemma gHatRotatedHalfProductTotalOperator_eq_one (params : Parameters) [FieldMod
       simp [gHatIdxMeas, completeSubMeas,
         gHatHalfProductTotalOperator_eq_one params family k (pointTupleTail xs)]
 
+/-- Summing the ordered half-product over all completed-slice outcomes
+recovers its total operator. -/
 lemma gHatHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k),
@@ -324,6 +327,8 @@ lemma gHatHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
               rw [(gHatIdxMeas params family (xs 0)).sum_eq_total]
               simp [gHatHalfProductTotalOperator]
 
+/-- Summing the rotated half-product over all completed-slice outcomes
+recovers its total operator. -/
 lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ k (xs : PointTuple params k),
@@ -456,15 +461,6 @@ private lemma projSubMeas_outcome_mul_total_eq_outcome {α : Type*} [Fintype α]
           simp [this]
     _ = A.outcome a := by rfl
 
-private lemma projSubMeas_total_mul_outcome_eq_outcome {α : Type*} [Fintype α]
-    (A : ProjSubMeas α ι) (a : α) :
-    A.total * A.outcome a = A.outcome a := by
-  have := projSubMeas_outcome_mul_total_eq_outcome (A := A) a
-  exact by
-    simpa [A.outcome_hermitian a,
-      (Matrix.nonneg_iff_posSemidef.mp A.total_nonneg).isHermitian.eq,
-      Matrix.conjTranspose_mul] using congrArg Matrix.conjTranspose this
-
 private lemma projSubMeas_total_proj {α : Type*} [Fintype α]
     (A : ProjSubMeas α ι) :
     A.total * A.total = A.total := by
@@ -496,6 +492,7 @@ private lemma gHatIdxMeas_proj (params : Parameters) [FieldModel params.q]
   | some p =>
       simp [gHatIdxMeas, completeSubMeas, (family.meas x).proj p]
 
+/-- Each summand in the Bernoulli tail operator is positive semidefinite for a PSD contraction. -/
 lemma binomialOperatorTerm_nonneg {G : MIPStarRE.Quantum.Op ι} (n r : ℕ)
     (hG : 0 ≤ G) (hGle : G ≤ 1) :
     0 ≤ (Nat.choose n r : ℂ) • (G ^ r * (1 - G) ^ (n - r)) := by

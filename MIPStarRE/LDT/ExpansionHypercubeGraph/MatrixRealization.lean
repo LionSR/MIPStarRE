@@ -3,8 +3,13 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs
 /-!
 # Section 7 — Matrix realization
 
-Concrete finite-dimensional matrix realizations of the hypercube
-variance operators and spectral structures from `Defs`.
+Concrete finite-dimensional matrix realizations of the hypercube variance
+operators and spectral projectors from `Defs`, together with the matrix-order
+lemmas used by the public wrappers.
+
+## References
+
+This file mirrors Section 7 of `references/ldt-paper/expansion.tex`.
 -/
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
@@ -173,7 +178,7 @@ private lemma orthogonalModeProjectorMatrix_eq_sum (params : Parameters) :
         ∑ α : Point params, fourierBasisProjector params α := by
     simpa using
       (Finset.add_sum_erase (s := (Finset.univ : Finset (Point params)))
-        (f := fun α => fourierBasisProjector params α) (by simp))
+         (f := fun α => fourierBasisProjector params α) (by simp))
   calc
     orthogonalModeProjectorMatrix params
       = (∑ α : Point params, fourierBasisProjector params α) - fourierBasisProjector params 0 := by
@@ -430,7 +435,7 @@ lemma conjTranspose_mul_mul_mono {H K : FiniteHilbertSpace}
         (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hAB)) M).nonneg
   have hrewrite : Mᴴ * (B - A) * M = Mᴴ * (B * M) - Mᴴ * (A * M) := by
     ext i j
-    simp [Matrix.mul_apply, Finset.sum_add_distrib, Finset.sum_sub_distrib,
+    simp [Matrix.mul_apply, Finset.sum_add_distrib,
       Finset.sum_mul, Finset.mul_sum, sub_eq_add_neg, mul_add, add_mul]
     congr 1 <;> (rw [Finset.sum_comm]; simp [mul_assoc])
   rw [hrewrite] at hpsd

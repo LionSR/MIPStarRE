@@ -5,9 +5,15 @@ import MIPStarRE.LDT.Preliminaries.Theorems
 /-!
 # Section 10 — Theorems
 
-Output structures and theorem statements for commutativity at points.
-The strategy state is bipartite (`QuantumState (ι × ι)`), so all fields
-use `strategy.state` directly.
+The main theorem in this file proves commutativity of the point measurements by transporting the
+paper's diagonal-line approximation through a sequence of operator-valued bridge families.
+The strategy state is bipartite (`QuantumState (ι × ι)`), so all state-dependent distances are
+measured against `strategy.state` directly.
+
+## References
+
+- `references/ldt-paper/commutativity-points.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
 -/
 
 namespace MIPStarRE.LDT.CommutativityPoints
@@ -34,22 +40,22 @@ lemma avgOver_uniform_equiv
     [Fintype β] [DecidableEq β] [Nonempty β]
     (e : α ≃ β) (f : α → Error) :
     avgOver (uniformDistribution α) f =
-      avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
-  calc
-    avgOver (uniformDistribution α) f
-      = (1 / (Fintype.card α : Error)) * ∑ a : α, f a := by
-          simp [avgOver, uniformDistribution, Finset.mul_sum]
-    _ = (1 / (Fintype.card β : Error)) * ∑ a : α, f a := by
-          rw [Fintype.card_congr e]
-    _ = (1 / (Fintype.card β : Error)) * ∑ b : β, f (e.symm b) := by
-          congr 1
-          exact Fintype.sum_equiv e f (fun b => f (e.symm b)) (by
-            intro a
-            simp)
-    _ = avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
-          simp [avgOver, uniformDistribution, Finset.mul_sum]
+      avgOver (uniformDistribution β) (fun b => f (e.symm b)) :=
+  MIPStarRE.LDT.avgOver_uniform_equiv e f
 
-private lemma avgOver_uniform_prod_ignore_right_local
+/-- Swapping the two coordinates reindexes point-pair outcomes. -/
+private def pointPairOutcomeSwapEquiv (params : Parameters) :
+    PointPairOutcome params ≃ PointPairOutcome params :=
+  Equiv.prodComm (Fq params) (Fq params)
+
+/-- Build an operator family from its outcomes, taking the total to be their sum. -/
+private noncomputable def opFamilyOfOutcome {Outcome : Type*} [Fintype Outcome]
+    (outcome : Outcome → MIPStarRE.Quantum.Op ι) :
+    OpFamily Outcome ι where
+  outcome := outcome
+  total := ∑ a : Outcome, outcome a
+
+private lemma avgOver_uniform_prod_fst
     {α β : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α]
     [Fintype β] [DecidableEq β] [Nonempty β]
@@ -72,7 +78,7 @@ private lemma avgOver_uniform_prod_ignore_right_local
     _ = (1 / ((Fintype.card α : Error) * (Fintype.card β : Error))) *
           ((Fintype.card β : Error) * ∑ a : α, f a) := by
           congr 1
-          simpa [Finset.mul_sum]
+          simp [Finset.mul_sum]
     _ = (1 / (Fintype.card α : Error)) * ∑ a : α, f a := by
           field_simp [hα, hβ]
     _ = avgOver (uniformDistribution α) f := by
@@ -354,7 +360,7 @@ private lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
             (RestrictedDiagonalSample params j × Fq params))
           (fun st => g st.1) =
         avgOver (uniformDistribution (RestrictedDiagonalSample params j)) g := by
-    exact avgOver_uniform_prod_ignore_right_local g
+    exact avgOver_uniform_prod_fst g
   refine ⟨?_⟩
   calc
     sddError strategy.state
@@ -640,64 +646,6 @@ private lemma liftRight_mul_rightPlaced_outcome
   simp [SubMeas.liftRight, OpFamily.rightPlacedOpFamily, SubMeas.toOpFamily,
     rightTensor_mul_rightTensor]
 
-private lemma avgOver_uniform_prod_ignore_left
-    {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (f : β → Error) :
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.2) =
-      avgOver (uniformDistribution β) f := by
-  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  calc
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.2)
-      = (1 / (Fintype.card (α × β) : Error)) * ∑ ab : α × β, f ab.2 := by
-          simp [avgOver, uniformDistribution, Finset.mul_sum]
-    _ = (1 / ((Fintype.card α : Error) * (Fintype.card β : Error))) *
-          ∑ a : α, ∑ b : β, f b := by
-          rw [Fintype.card_prod]
-          simpa using
-            (Fintype.sum_prod_type' (f := fun (_a : α) (b : β) => f b))
-    _ = (1 / ((Fintype.card α : Error) * (Fintype.card β : Error))) *
-          ((Fintype.card α : Error) * ∑ b : β, f b) := by
-          congr 1
-          simp
-    _ = (1 / (Fintype.card β : Error)) * ∑ b : β, f b := by
-          field_simp [hα, hβ]
-    _ = avgOver (uniformDistribution β) f := by
-          simp [avgOver, uniformDistribution, Finset.mul_sum]
-
-private lemma avgOver_uniform_prod_ignore_right
-    {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (f : α → Error) :
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1) =
-      avgOver (uniformDistribution α) f := by
-  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  calc
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1)
-      = (1 / (Fintype.card (α × β) : Error)) * ∑ ab : α × β, f ab.1 := by
-          simp [avgOver, uniformDistribution, Finset.mul_sum]
-    _ = (1 / ((Fintype.card α : Error) * (Fintype.card β : Error))) *
-          ∑ a : α, ∑ b : β, f a := by
-          rw [Fintype.card_prod]
-          simpa using
-            (Fintype.sum_prod_type' (f := fun (a : α) (_b : β) => f a))
-    _ = (1 / ((Fintype.card α : Error) * (Fintype.card β : Error))) *
-          ((Fintype.card β : Error) * ∑ a : α, f a) := by
-          congr 1
-          simpa [Finset.mul_sum]
-    _ = (1 / (Fintype.card α : Error)) * ∑ a : α, f a := by
-          field_simp [hα, hβ]
-     _ = avgOver (uniformDistribution α) f := by
-           simp [avgOver, uniformDistribution, Finset.mul_sum]
-
 private theorem sharedDiagonalLineQuestionOfPointPair_sampledPointPair
     (params : Parameters)
     [FieldModel params.q]
@@ -733,15 +681,13 @@ private theorem sharedDiagonalLineQuestionOfPointPair_of_line
         ({ base := base, direction := direction }, (t, addCoord t (encodeScalar 1)))
       congr
       · funext i
-        simp [sharedDiagonalLineQuestionOfPointPair, DiagonalLine.pointAt,
-          addPoint, smulPoint, addCoord, subCoord, mulCoord]
+        simp [DiagonalLine.pointAt, addPoint, smulPoint, addCoord, subCoord, mulCoord]
         rw [← encode_decodeScalar (base i)]
         congr 1
         ring_nf
         simpa using (decode_encodeScalar (params := params) (decodeScalar (base i)))
       · funext i
-        simp [sharedDiagonalLineQuestionOfPointPair, DiagonalLine.pointAt,
-          addPoint, smulPoint, addCoord, subCoord, mulCoord]
+        simp [DiagonalLine.pointAt, addPoint, smulPoint, addCoord, subCoord, mulCoord]
         rw [← encode_decodeScalar (direction i)]
         congr 1
         ring_nf
@@ -886,7 +832,7 @@ private lemma avgOver_pointPairSharedDiagonalLine_sampled_pair
               avgOver_pointPairSharedDiagonalLine_eq_uniform_seed params
                 (fun q => f (sampledPointPairFromSharedDiagonalQuestion params q))
     _ = avgOver (uniformDistribution (PointPairQuestion params)) f := by
-          exact avgOver_uniform_prod_ignore_right f
+          exact avgOver_uniform_prod_fst f
 
 private lemma pointMeasurementProductAlongSharedLine_outcome
     (params : Parameters)
@@ -900,7 +846,7 @@ private lemma pointMeasurementProductAlongSharedLine_outcome
           (strategy.pointMeasurement (q.1.pointAt q.2.2)).outcome b) := by
   simp [pointMeasurementProductAlongSharedLine, pointMeasurementProductLeft,
     orderedProductOpFamily, sampledPointPairFromSharedDiagonalQuestion,
-    OpFamily.leftPlacedOpFamily, SubMeas.toOpFamily, leftTensor_mul_leftTensor]
+    OpFamily.leftPlacedOpFamily]
 
 private lemma pointMeasurementProductAlongSharedLineReversed_outcome
     (params : Parameters)
@@ -914,7 +860,7 @@ private lemma pointMeasurementProductAlongSharedLineReversed_outcome
           (strategy.pointMeasurement (q.1.pointAt q.2.1)).outcome a) := by
   simp [pointMeasurementProductAlongSharedLineReversed, pointMeasurementProductRight,
     reversedProductOpFamily, sampledPointPairFromSharedDiagonalQuestion,
-    OpFamily.leftPlacedOpFamily, SubMeas.toOpFamily, leftTensor_mul_leftTensor]
+    OpFamily.leftPlacedOpFamily]
 
 private lemma pointDiagonalLineMixedProductLeft_outcome
     (params : Parameters)
@@ -922,7 +868,8 @@ private lemma pointDiagonalLineMixedProductLeft_outcome
     (strategy : SymStrat params ι)
     (q : PointPairDiagonalLineQuestion params)
     (a b : Fq params) :
-    (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductLeft params strategy) q).outcome (a, b) =
+    ((IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductLeft params strategy) q).outcome
+      (a, b)) =
       opTensor
         ((strategy.pointMeasurement (q.1.pointAt q.2.1)).outcome a)
         ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).outcome b) := by
@@ -936,7 +883,8 @@ private lemma pointDiagonalLineMixedProductRight_outcome
     (strategy : SymStrat params ι)
     (q : PointPairDiagonalLineQuestion params)
     (a b : Fq params) :
-    (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductRight params strategy) q).outcome (a, b) =
+    ((IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductRight params strategy) q).outcome
+      (a, b)) =
       opTensor
         ((strategy.pointMeasurement (q.1.pointAt q.2.2)).outcome b)
         ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).outcome a) := by
@@ -949,7 +897,7 @@ private lemma pointDiagonalLineMixedProductRight_outcome
         {(b, a)} := by
     ext ab
     rcases ab with ⟨a', b'⟩
-    simpa [and_comm]
+    simp [and_comm]
   rw [hfilter]
   simp
 
@@ -964,8 +912,7 @@ private lemma diagonalLineProductOrdered_outcome
         ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).outcome b *
           (sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).outcome a) := by
   simp [diagonalLineProductOrdered, sampledDiagonalLineEvaluation,
-    OpFamily.rightPlacedOpFamily, reversedProductOpFamily, SubMeas.toOpFamily,
-    rightTensor_mul_rightTensor]
+    OpFamily.rightPlacedOpFamily, reversedProductOpFamily]
 
 private lemma diagonalLineProductReversed_outcome
     (params : Parameters)
@@ -978,8 +925,7 @@ private lemma diagonalLineProductReversed_outcome
         ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).outcome a *
           (sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).outcome b) := by
   simp [diagonalLineProductReversed, sampledDiagonalLineEvaluation,
-    OpFamily.rightPlacedOpFamily, orderedProductOpFamily, SubMeas.toOpFamily,
-    rightTensor_mul_rightTensor]
+    OpFamily.rightPlacedOpFamily, orderedProductOpFamily]
 
 private lemma sampledDiagonalLineApproximation_ignore_first
     (params : Parameters)
@@ -1110,35 +1056,22 @@ private lemma orderedLiftToMixedBridge
   First replacement step in the paper:
   `(A^u_a A^v_b) ⊗ I ≈ A^u_a ⊗ L^ℓ_[f(v)=b]`.
   -/
-  let e : (Fq params × Fq params) ≃ (Fq params × Fq params) :=
-    { toFun := Prod.swap
-      invFun := Prod.swap
-      left_inv := by intro ab; cases ab; rfl
-      right_inv := by intro ab; cases ab; rfl }
-  let Araw : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+  let e : PointPairOutcome params ≃ PointPairOutcome params :=
+    pointPairOutcomeSwapEquiv params
+  let Araw : IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params =>
-           (((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas).liftLeft).outcome ab.2 *
-             (OpFamily.leftPlacedOpFamily (ιB := ι)
-               ((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas)).outcome ab.1
-         total := ∑ ab : Fq params × Fq params,
-           (((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas).liftLeft).outcome ab.2 *
-             (OpFamily.leftPlacedOpFamily (ιB := ι)
-               ((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas)).outcome ab.1
-       } : OpFamily (Fq params × Fq params) (ι × ι))
-  let Braw : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+      let Au := (strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas
+      let Av := (strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas
+      opFamilyOfOutcome fun ab : PointPairOutcome params =>
+        (Au.liftLeft).outcome ab.2 *
+          (OpFamily.leftPlacedOpFamily (ιB := ι) Av).outcome ab.1
+  let Braw : IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params =>
-           (((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas).liftLeft).outcome ab.2 *
-             (OpFamily.rightPlacedOpFamily (ιA := ι)
-               (SubMeas.toOpFamily
-                 (sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)))).outcome ab.1
-         total := ∑ ab : Fq params × Fq params,
-           (((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas).liftLeft).outcome ab.2 *
-             (OpFamily.rightPlacedOpFamily (ιA := ι)
-               (SubMeas.toOpFamily
-                 (sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)))).outcome ab.1
-       } : OpFamily (Fq params × Fq params) (ι × ι))
+      let Au := (strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas
+      let Lv := sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)
+      opFamilyOfOutcome fun ab : PointPairOutcome params =>
+        (Au.liftLeft).outcome ab.2 *
+          (OpFamily.rightPlacedOpFamily (ιA := ι) Lv.toOpFamily).outcome ab.1
   let hbase :=
     sampledDiagonalLineApproximation_ignore_first params strategy eps delta gamma hgood
   let hcab :=
@@ -1166,16 +1099,16 @@ private lemma orderedLiftToMixedBridge
       Braw
       (pointDiagonalLineApproxError params gamma)
       hcab
-  let Astep : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+  let Astep :
+      IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params => (Araw q).outcome (e.symm ab)
-         total := (Araw q).total
-       } : OpFamily (Fq params × Fq params) (ι × ι))
-  let Bstep : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+      ({ outcome := fun ab : PointPairOutcome params => (Araw q).outcome (e.symm ab)
+         total := (Araw q).total } : OpFamily (PointPairOutcome params) (ι × ι))
+  let Bstep :
+      IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params => (Braw q).outcome (e.symm ab)
-         total := (Braw q).total
-       } : OpFamily (Fq params × Fq params) (ι × ι))
+      ({ outcome := fun ab : PointPairOutcome params => (Braw q).outcome (e.symm ab)
+         total := (Braw q).total } : OpFamily (PointPairOutcome params) (ι × ι))
   exact sddOpRel_congr_outcome strategy.state
     (pointPairSharedDiagonalLineDistribution params)
     Astep Bstep
@@ -1211,8 +1144,10 @@ private lemma orderedLiftToMixedBridge
                       ((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas)
                       (sampledDiagonalLineEvaluation params strategy (q.1, q.2.2))
                       a b
-        _ = ((IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductLeft params strategy)) q).outcome
-              (a, b) := by
+        _ =
+              ((IdxSubMeas.toIdxOpFamily
+                (pointDiagonalLineMixedProductLeft params strategy) q).outcome
+                (a, b)) := by
               symm
               exact pointDiagonalLineMixedProductLeft_outcome params strategy q a b)
     hreindexed
@@ -1232,26 +1167,18 @@ private lemma orderedLiftToLineBridge
   Second replacement step:
   `A^u_a ⊗ L^ℓ_[f(v)=b] ≈ I ⊗ (L^ℓ_[f(v)=b] L^ℓ_[f(u)=a])`.
   -/
-  let Araw : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+  let Araw : IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params =>
-           opTensor ((strategy.pointMeasurement (q.1.pointAt q.2.1)).outcome ab.1)
-             ((postprocess (strategy.diagonalMeasurement q.1).toSubMeas fun f => f q.2.2).outcome ab.2)
-         total := ∑ ab : Fq params × Fq params,
-           opTensor ((strategy.pointMeasurement (q.1.pointAt q.2.1)).outcome ab.1)
-             ((postprocess (strategy.diagonalMeasurement q.1).toSubMeas fun f => f q.2.2).outcome ab.2)
-       } : OpFamily (Fq params × Fq params) (ι × ι))
-  let Braw : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+      let Au := strategy.pointMeasurement (q.1.pointAt q.2.1)
+      let Lv := postprocess (strategy.diagonalMeasurement q.1).toSubMeas fun f => f q.2.2
+      opFamilyOfOutcome fun ab : PointPairOutcome params =>
+        opTensor (Au.outcome ab.1) (Lv.outcome ab.2)
+  let Braw : IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params =>
-           rightTensor
-             ((postprocess (strategy.diagonalMeasurement q.1).toSubMeas fun f => f q.2.2).outcome ab.2 *
-               (postprocess (strategy.diagonalMeasurement q.1).toSubMeas fun f => f q.2.1).outcome ab.1)
-         total := ∑ ab : Fq params × Fq params,
-           rightTensor
-             ((postprocess (strategy.diagonalMeasurement q.1).toSubMeas fun f => f q.2.2).outcome ab.2 *
-               (postprocess (strategy.diagonalMeasurement q.1).toSubMeas fun f => f q.2.1).outcome ab.1)
-       } : OpFamily (Fq params × Fq params) (ι × ι))
+      let Lu := postprocess (strategy.diagonalMeasurement q.1).toSubMeas fun f => f q.2.1
+      let Lv := postprocess (strategy.diagonalMeasurement q.1).toSubMeas fun f => f q.2.2
+      opFamilyOfOutcome fun ab : PointPairOutcome params =>
+        rightTensor (Lv.outcome ab.2 * Lu.outcome ab.1)
   let hbase :=
     sampledDiagonalLineApproximation_ignore_second params strategy eps delta gamma hgood
   have hcab :=
@@ -1272,28 +1199,22 @@ private lemma orderedLiftToLineBridge
         intro q a
         exact subMeas_sum_adjoint_mul_le_one
           ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).liftRight))
-  let Astep : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+  let Astep :
+      IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params =>
-           ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).liftRight).outcome ab.2 *
-             (OpFamily.leftPlacedOpFamily (ιB := ι)
-               ((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas)).outcome ab.1
-         total := ∑ ab : Fq params × Fq params,
-           ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).liftRight).outcome ab.2 *
-             (OpFamily.leftPlacedOpFamily (ιB := ι)
-               ((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas)).outcome ab.1
-       } : OpFamily (Fq params × Fq params) (ι × ι))
-  let Bstep : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+      let Au := (strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas
+      let Lv := sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)
+      opFamilyOfOutcome fun ab : PointPairOutcome params =>
+        (Lv.liftRight).outcome ab.2 *
+          (OpFamily.leftPlacedOpFamily (ιB := ι) Au).outcome ab.1
+  let Bstep :
+      IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params =>
-           ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).liftRight).outcome ab.2 *
-             (OpFamily.rightPlacedOpFamily (ιA := ι)
-               (SubMeas.toOpFamily (sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)))).outcome ab.1
-         total := ∑ ab : Fq params × Fq params,
-           ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).liftRight).outcome ab.2 *
-             (OpFamily.rightPlacedOpFamily (ιA := ι)
-               (SubMeas.toOpFamily (sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)))).outcome ab.1
-       } : OpFamily (Fq params × Fq params) (ι × ι))
+      let Lu := sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)
+      let Lv := sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)
+      opFamilyOfOutcome fun ab : PointPairOutcome params =>
+        (Lv.liftRight).outcome ab.2 *
+          (OpFamily.rightPlacedOpFamily (ιA := ι) Lu.toOpFamily).outcome ab.1
   exact sddOpRel_congr_outcome strategy.state
     (pointPairSharedDiagonalLineDistribution params)
     Astep Bstep
@@ -1313,8 +1234,10 @@ private lemma orderedLiftToLineBridge
                       (sampledDiagonalLineEvaluation params strategy (q.1, q.2.2))
                       ((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas)
                       b a
-        _ = ((IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductLeft params strategy)) q).outcome
-              (a, b) := by
+        _ =
+              ((IdxSubMeas.toIdxOpFamily
+                (pointDiagonalLineMixedProductLeft params strategy) q).outcome
+                (a, b)) := by
               symm
               exact pointDiagonalLineMixedProductLeft_outcome params strategy q a b)
     (by
@@ -1334,57 +1257,6 @@ private lemma orderedLiftToLineBridge
               symm
               exact diagonalLineProductOrdered_outcome params strategy q a b)
     hcab
-
-private lemma diagonalLineProjectiveSwap
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (_hgood : strategy.IsGood eps delta gamma) :
-    SDDOpRel strategy.state
-      (pointPairSharedDiagonalLineDistribution params)
-      (diagonalLineProductOrdered params strategy)
-      (diagonalLineProductReversed params strategy)
-      0 := by
-  /-
-  The middle exact equality uses projectivity of
-  the diagonal-line measurement on the common
-  sampled line: postprocessed outcomes from the
-  same ProjMeas commute.
-  -/
-  constructor
-  show sddErrorOp _ _ _ _ ≤ 0
-  have heq : ∀ q ab,
-      (diagonalLineProductOrdered params
-        strategy q).outcome ab =
-      (diagonalLineProductReversed params
-        strategy q).outcome ab := by
-    intro q ⟨a, b⟩
-    simp only [diagonalLineProductOrdered,
-      diagonalLineProductReversed,
-      OpFamily.rightPlacedOpFamily,
-      reversedProductOpFamily,
-      orderedProductOpFamily,
-      sampledDiagonalLineEvaluation]
-    congr 1
-    exact (strategy.diagonalMeasurement
-      q.1).postprocess_outcome_commute
-      (fun f => f q.2.2)
-      (fun f => f q.2.1) b a
-  have hzero : ∀ q, qSDDOp strategy.state
-      (diagonalLineProductOrdered params
-        strategy q)
-      (diagonalLineProductReversed params
-        strategy q) = 0 := by
-    intro q
-    unfold qSDDOp qSDDCore
-    apply Finset.sum_eq_zero
-    intro ab _
-    rw [heq q ab, sub_self,
-      Matrix.conjTranspose_zero, Matrix.zero_mul,
-      ev_zero]
-  simp only [sddErrorOp, hzero]
-  rw [MIPStarRE.LDT.avgOver_zero]
 
 private lemma diagonalLineProduct_outcome_swap
     (params : Parameters)
@@ -1423,35 +1295,22 @@ private lemma reversedDropFromLineBridge
   Third replacement step:
   `I ⊗ (L^ℓ_[f(u)=a] L^ℓ_[f(v)=b]) ≈ A^v_b ⊗ L^ℓ_[f(u)=a]`.
   -/
-  let e : (Fq params × Fq params) ≃ (Fq params × Fq params) :=
-    { toFun := Prod.swap
-      invFun := Prod.swap
-      left_inv := by intro ab; cases ab; rfl
-      right_inv := by intro ab; cases ab; rfl }
-  let Araw : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+  let e : PointPairOutcome params ≃ PointPairOutcome params :=
+    pointPairOutcomeSwapEquiv params
+  let Araw : IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params =>
-           ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).liftRight).outcome ab.2 *
-             (OpFamily.rightPlacedOpFamily (ιA := ι)
-               (SubMeas.toOpFamily
-                 (sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)))).outcome ab.1
-         total := ∑ ab : Fq params × Fq params,
-           ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).liftRight).outcome ab.2 *
-             (OpFamily.rightPlacedOpFamily (ιA := ι)
-               (SubMeas.toOpFamily
-                 (sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)))).outcome ab.1
-       } : OpFamily (Fq params × Fq params) (ι × ι))
-  let Braw : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+      let Lu := sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)
+      let Lv := sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)
+      opFamilyOfOutcome fun ab : PointPairOutcome params =>
+        (Lu.liftRight).outcome ab.2 *
+          (OpFamily.rightPlacedOpFamily (ιA := ι) Lv.toOpFamily).outcome ab.1
+  let Braw : IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params =>
-           ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).liftRight).outcome ab.2 *
-             (OpFamily.leftPlacedOpFamily (ιB := ι)
-               ((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas)).outcome ab.1
-         total := ∑ ab : Fq params × Fq params,
-           ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).liftRight).outcome ab.2 *
-             (OpFamily.leftPlacedOpFamily (ιB := ι)
-               ((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas)).outcome ab.1
-       } : OpFamily (Fq params × Fq params) (ι × ι))
+      let Lu := sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)
+      let Av := (strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas
+      opFamilyOfOutcome fun ab : PointPairOutcome params =>
+        (Lu.liftRight).outcome ab.2 *
+          (OpFamily.leftPlacedOpFamily (ιB := ι) Av).outcome ab.1
   let hbase :=
     sddOpRel_symm strategy.state
       (pointPairSharedDiagonalLineDistribution params)
@@ -1489,16 +1348,16 @@ private lemma reversedDropFromLineBridge
       Braw
       (pointDiagonalLineApproxError params gamma)
       hcab
-  let Astep : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+  let Astep :
+      IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params => (Araw q).outcome (e.symm ab)
-         total := (Araw q).total
-       } : OpFamily (Fq params × Fq params) (ι × ι))
-  let Bstep : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+      ({ outcome := fun ab : PointPairOutcome params => (Araw q).outcome (e.symm ab)
+         total := (Araw q).total } : OpFamily (PointPairOutcome params) (ι × ι))
+  let Bstep :
+      IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params => (Braw q).outcome (e.symm ab)
-         total := (Braw q).total
-       } : OpFamily (Fq params × Fq params) (ι × ι))
+      ({ outcome := fun ab : PointPairOutcome params => (Braw q).outcome (e.symm ab)
+         total := (Braw q).total } : OpFamily (PointPairOutcome params) (ι × ι))
   exact sddOpRel_congr_outcome strategy.state
     (pointPairSharedDiagonalLineDistribution params)
     Astep Bstep
@@ -1534,8 +1393,10 @@ private lemma reversedDropFromLineBridge
                       (sampledDiagonalLineEvaluation params strategy (q.1, q.2.1))
                       ((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas)
                       a b
-        _ = ((IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductRight params strategy)) q).outcome
-              (a, b) := by
+        _ =
+              ((IdxSubMeas.toIdxOpFamily
+                (pointDiagonalLineMixedProductRight params strategy) q).outcome
+                (a, b)) := by
               symm
               exact pointDiagonalLineMixedProductRight_outcome params strategy q a b)
     hreindexed
@@ -1580,30 +1441,22 @@ private lemma reversedDropToPointsBridge
   Final replacement step:
   `A^v_b ⊗ L^ℓ_[f(u)=a] ≈ (A^v_b A^u_a) ⊗ I`.
   -/
-  let Astep : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+  let Astep :
+      IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params =>
-           (((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas).liftLeft).outcome ab.2 *
-             (OpFamily.rightPlacedOpFamily (ιA := ι)
-               (SubMeas.toOpFamily (sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)))).outcome ab.1
-         ,
-          total := ∑ ab : Fq params × Fq params,
-            (((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas).liftLeft).outcome ab.2 *
-              (OpFamily.rightPlacedOpFamily (ιA := ι)
-                (SubMeas.toOpFamily (sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)))).outcome ab.1
-        } : OpFamily (Fq params × Fq params) (ι × ι))
-  let Bstep : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+      let Av := (strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas
+      let Lu := sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)
+      opFamilyOfOutcome fun ab : PointPairOutcome params =>
+        (Av.liftLeft).outcome ab.2 *
+          (OpFamily.rightPlacedOpFamily (ιA := ι) Lu.toOpFamily).outcome ab.1
+  let Bstep :
+      IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
     fun q =>
-      ({ outcome := fun ab : Fq params × Fq params =>
-           (((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas).liftLeft).outcome ab.2 *
-             (OpFamily.leftPlacedOpFamily (ιB := ι)
-               ((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas)).outcome ab.1
-         ,
-          total := ∑ ab : Fq params × Fq params,
-            (((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas).liftLeft).outcome ab.2 *
-              (OpFamily.leftPlacedOpFamily (ιB := ι)
-                ((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas)).outcome ab.1
-        } : OpFamily (Fq params × Fq params) (ι × ι))
+      let Au := (strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas
+      let Av := (strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas
+      opFamilyOfOutcome fun ab : PointPairOutcome params =>
+        (Av.liftLeft).outcome ab.2 *
+          (OpFamily.leftPlacedOpFamily (ιB := ι) Au).outcome ab.1
   let hbase :=
     sddOpRel_symm strategy.state
       (pointPairSharedDiagonalLineDistribution params)
@@ -1652,8 +1505,10 @@ private lemma reversedDropToPointsBridge
                       ((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas)
                       (sampledDiagonalLineEvaluation params strategy (q.1, q.2.1))
                       b a
-        _ = ((IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductRight params strategy)) q).outcome
-              (a, b) := by
+        _ =
+              ((IdxSubMeas.toIdxOpFamily
+                (pointDiagonalLineMixedProductRight params strategy) q).outcome
+                (a, b)) := by
               symm
               exact pointDiagonalLineMixedProductRight_outcome params strategy q a b)
     (by
