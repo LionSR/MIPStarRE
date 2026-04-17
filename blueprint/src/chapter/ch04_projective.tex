@@ -24,6 +24,7 @@
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
+	\leanok
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency
@@ -115,6 +116,7 @@
 
 \begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
+	\leanok
 	\uses{def:simeq, def:approx_delta}
 	Let $\ket{\psi}$ be a state, and let $A = \{A_a\}$ and $B = \{B_a\}$ be measurements such that
 	\[
@@ -128,6 +130,7 @@
 \end{lemma}
 
 \begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:orthonormalization-main-lemma}]
+	\leanok
 
 	Let $A = \{A_a\}$ be a sub-measurement with outcomes in $\mathcal A$. Write $A=\sum_a A_a$. The strong self-consistency assumption implies
 	\[
@@ -162,6 +165,7 @@
 \end{proof}
 
 \begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
+	\leanok
 	\uses{prop:simeq-for-measurements, lem:projective-non-measurement, lem:projective-low-rank-sum, lem:Q-completeness, lem:sqrt-Q-completeness, lem:q-almost-projective, lem:xa-t, lem:qa-restated, lem:X-squared, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity, lem:P-Q-approx, prop:triangle-inequality-for-approx_delta}
 	The statement is trivial when $\zeta > 1/4$, so assume
 	\begin{equation}\label{eq:assumption-on-zeta}
@@ -186,12 +190,14 @@
 
 	\begin{lemma}\label{lem:trunc-inequality}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.truncationInequality}
+		\leanok
 		For any $x \in [0, 1]$,
 		\begin{equation*}
 			(x - \mathsf{trunc}_\delta(x))^2 \leq \frac{1}{\delta} \cdot (x - x^2).
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		If $x \geq 1-\delta$, then $\mathsf{trunc}_\delta(x)=1$. Since $\delta \leq 1/2$ below, one also has $x \geq \delta$, so
 		\[
 			(x-\mathsf{trunc}_\delta(x))^2
@@ -216,6 +222,7 @@
 
 	\begin{lemma}[Rounding to projectors]\label{lem:projective-non-measurement}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement}
+		\leanok
 		There exists a set of projective matrices $\{R_a\}$ such that
 		\begin{equation*}
 			A_a \ot I \approx_{2\sqrt{\zeta}} R_a \ot I.
@@ -226,6 +233,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:trunc-inequality}
 		Write the eigendecomposition of $A_a$ as
 		\[
@@ -268,6 +276,7 @@
 
 	\begin{lemma}[Rank reduction]\label{lem:projective-low-rank-sum}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum}
+		\leanok
 		There exists a set of projection matrices $\{Q_a\}$ such that
 		\begin{equation*}
 			A_a \ot I \approx_{12\sqrt{\zeta}} Q_a \ot I.
@@ -282,6 +291,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:projective-non-measurement, prop:triangle-inequality-for-approx_delta}
 		Let $\{R_a\}$ be given by \ref{lem:projective-non-measurement}. Write $r_a=\mathrm{rank}(R_a)$ and $r=\sum_a r_a$. If $r \leq d$, take $Q_a=R_a$. Otherwise,
 		\begin{equation}\label{eq:bound-on-r}
@@ -361,6 +371,7 @@
 
 	\begin{lemma}[Completeness of~$Q$]\label{lem:Q-completeness}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qCompleteness}
+		\leanok
 		\begin{equation*}
 			\bra{\psi} Q \ot I \ket{\psi}
 			\geq
@@ -368,6 +379,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:projective-low-rank-sum}
 		Since each $Q_a$ is projective,
 		\begin{equation}\label{eq:Q-for-an-A}
@@ -403,6 +415,7 @@
 
 	\begin{lemma}[Completeness of~$\sqrt{Q}$]\label{lem:sqrt-Q-completeness}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sqrtQCompleteness}
+		\leanok
 		\begin{equation*}
 			\bra{\psi} \sqrt{Q} \ot I \ket{\psi}
 			\geq
@@ -410,6 +423,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:Q-completeness, lem:projective-low-rank-sum}
 		Diagonalize $Q=\sum_i \nu_i \ket{u_i}\bra{u_i}$. Because $Q \leq (1+2\sqrt{\zeta})I$ by \ref{lem:projective-low-rank-sum}, each $\nu_i$ is at most $1+2\sqrt{\zeta}$. Therefore
 		\[
@@ -435,11 +449,13 @@
 
 	\begin{lemma}[$Q$ is almost projective]\label{lem:q-almost-projective}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qAlmostProjective}
+		\leanok
 		\begin{equation*}
 			\sum_a (Q_a \cdot Q \cdot Q_a - Q_a) \leq 4\sqrt{\zeta} \cdot I.
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:projective-low-rank-sum}
 		Since $Q \leq (1+2\sqrt{\zeta})I$ by \ref{lem:projective-low-rank-sum},
 		\begin{align*}
@@ -535,12 +551,14 @@
 
 	\begin{lemma}\label{lem:xa-t}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xa_t}
+		\leanok
 		For each $a$,
 		\[
 			X_a = T_a \cdot X.
 		\]
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		Multiply the definition of $X$ by $T_a$ on the left and use that $T_a$ selects exactly the basis vectors $\ket{a,i}$:
 		\[
 			T_a \cdot X
@@ -654,12 +672,14 @@
 
 	\begin{lemma}[$P_a$ restated]\label{lem:pa-restated}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.paRestated}
+		\leanok
 		For each $a$,
 		\begin{equation*}
 			P_a = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		Since $T$ is projective,
 		\[
 			P_a
