@@ -5082,22 +5082,19 @@ theorem fromHToGRecurrenceWeight_succ
 
 /-- `lem:from-H-to-G`.
 
-The bipartite state `ψbi` is required to coincide with `strategy.state` so the
-strategy-level self-consistency / point-consistency / boundedness hypotheses
-(`hself`, `hcons`, `hbound`) — phrased over `strategy.state` — can be
-transported to facts about `ψbi`, which is the state appearing in the
-goal `FromHToGStatement` and in the recurrence hypothesis `hhalf`. The
-blueprint statement (`blueprint/src/chapter/ch09_pasting.tex:887–903`)
-keeps `ψbi` as a separate name for the bipartite state on `ι ⊗ ι` matching
-the paper's `\ket{\psi_{\mathrm{bi}}}`; the equality hypothesis pins it to
-the symmetric strategy's bipartite state, since `SymStrat.state` is already
-typed `QuantumState (ι × ι)` (`MIPStarRE/LDT/Test/Strategy.lean:75`). -/
+The bipartite state in the goal `FromHToGStatement` and in the recurrence
+hypothesis `hhalf` is taken to be `strategy.state` directly, matching the
+paper's identification of `\ket{\psi_{\mathrm{bi}}}` with the symmetric
+strategy's bipartite state (both are typed `QuantumState (ι × ι)` since
+`SymStrat.state` is itself bipartite — see
+`MIPStarRE/LDT/Test/Strategy.lean:75`). This keeps the Lean signature in
+lockstep with the blueprint statement (`blueprint/src/chapter/ch09_pasting.tex:887–903`)
+and lets `hself`/`hcons`/`hbound`, which are phrased over `strategy.state`,
+be reused without an equality bridge. -/
 lemma fromHToG
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (ψbi : QuantumState (ι × ι))
-    (hψ : ψbi = strategy.state)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
@@ -5105,8 +5102,8 @@ lemma fromHToG
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
-    (hhalf : CommuteGHalfSandwichStatement params ψbi family gamma zeta k) :
-    FromHToGStatement params strategy ψbi family gamma zeta k := by
+    (hhalf : CommuteGHalfSandwichStatement params strategy.state family gamma zeta k) :
+    FromHToGStatement params strategy strategy.state family gamma zeta k := by
   constructor -- FromHToGStatement
   · -- recurrenceStep: per-step Bernoulli-tail commutation
     intro ℓ hℓ τ
@@ -5129,9 +5126,8 @@ lemma fromHToG
     `intermediateHSuffixFamily k ℓ` definition), then the three commutation
     sub-steps above can be discharged using `hhalf` (for √ν₄) and
     `cor:G-hat-facts` (for √(2ζ)), each composed via `sddOpRel_mono` /
-    `sddOpRel_trans`. The state-equality bridge `hψ` lets us reuse
-    `hself`/`hcons`/`hbound`, which are phrased against `strategy.state`,
-    once that refactor is in place. -/
+    `sddOpRel_trans`, reusing `hself`/`hcons`/`hbound` directly against
+    `strategy.state`. -/
     sorry
   · -- bernoulliPolynomialRewrite: aggregate k recurrence steps
     constructor -- SDDRel
