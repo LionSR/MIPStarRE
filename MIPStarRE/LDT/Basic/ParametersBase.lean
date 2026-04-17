@@ -1,4 +1,9 @@
-import Mathlib
+import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.RingTheory.MvPolynomial.Basic
+import Mathlib.Algebra.MvPolynomial.Eval
+import Mathlib.RingTheory.Polynomial.Basic
+import Mathlib.Analysis.Matrix.Order
+import Mathlib.Analysis.Complex.Order
 
 /-!
 # Basic parameters and scalar infrastructure for the low individual degree test
