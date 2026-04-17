@@ -328,20 +328,30 @@ theorem zeta2_bound {params : Parameters} {k : ℕ} {eps : Error}
     cascadeZeta2 ζ₁ ≤ mainFormalError params k eps := by
   rw [mainFormalError_eq_envelope]
   have hENN := h.envelope_nonneg
-  have hk_nn : 0 ≤ (k : Error) := by linarith [h.hk]
   have hm_nn : 0 ≤ (params.m : Error) := by linarith [h.hm]
   have hk_le : (k : Error) ≤ ((k : Error) ^ (2 : ℕ)) := h.k_le_k2
   have hm_le : (params.m : Error) ≤ ((params.m : Error) ^ (4 : ℕ)) := h.m_le_m4
-  -- 2560·k·m ≤ 2560·k²·m⁴ ≤ 100000·k²·m⁴.
-  have hinflate :
-      2560 * (k : Error) * (params.m : Error) * mainFormalEnvelope params k eps ≤
-      100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
-        mainFormalEnvelope params k eps := by
-    have hkm_le : (k : Error) * (params.m : Error) ≤
-        ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by
-      exact mul_le_mul hk_le hm_le hm_nn (by positivity)
-    nlinarith [hkm_le, hENN, hk_nn, hm_nn, h.k2_ge_one, h.m4_ge_one]
-  exact hζ₂.trans hinflate
+  have hkm_le : (k : Error) * (params.m : Error) ≤
+      ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) :=
+    mul_le_mul hk_le hm_le hm_nn (by positivity)
+  have hk2m4_nn : (0 : Error) ≤
+      ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by positivity
+  -- 2560·k·m ≤ 2560·k²·m⁴ ≤ 100000·k²·m⁴, then multiply by envelope ≥ 0.
+  refine hζ₂.trans ?_
+  calc 2560 * (k : Error) * (params.m : Error) * mainFormalEnvelope params k eps
+      = (2560 * ((k : Error) * (params.m : Error))) *
+          mainFormalEnvelope params k eps := by ring
+    _ ≤ (2560 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
+          mainFormalEnvelope params k eps :=
+        mul_le_mul_of_nonneg_right
+          (mul_le_mul_of_nonneg_left hkm_le (by norm_num)) hENN
+    _ ≤ (100000 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
+          mainFormalEnvelope params k eps :=
+        mul_le_mul_of_nonneg_right
+          (mul_le_mul_of_nonneg_right (by norm_num : (2560 : Error) ≤ 100000)
+            hk2m4_nn) hENN
+    _ = 100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+          mainFormalEnvelope params k eps := by ring
 
 /-- **Paper lines 214–217.** `ζ₃ = 6·ζ₁ + 6·ζ₂ ≤ 150000 · k² · m⁴ · envelope`
 translates to `ζ₃ ≤ 2 · mainFormalError`, matching paper line 230's
