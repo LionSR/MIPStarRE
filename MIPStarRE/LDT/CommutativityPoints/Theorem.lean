@@ -72,35 +72,6 @@ private noncomputable def opFamilyOfOutcome {Outcome : Type*} [Fintype Outcome]
   outcome := outcome
   total := ∑ a : Outcome, outcome a
 
-private lemma avgOver_uniform_prod_ignore_right
-    {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (f : α → Error) :
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1) =
-      avgOver (uniformDistribution α) f := by
-  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  calc
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1)
-      = (1 / (Fintype.card (α × β) : Error)) * ∑ ab : α × β, f ab.1 := by
-          simp [avgOver, uniformDistribution, Finset.mul_sum]
-    _ = (1 / ((Fintype.card α : Error) * (Fintype.card β : Error))) *
-          ∑ a : α, ∑ b : β, f a := by
-          rw [Fintype.card_prod]
-          simpa using
-            (Fintype.sum_prod_type' (f := fun (a : α) (_b : β) => f a))
-    _ = (1 / ((Fintype.card α : Error) * (Fintype.card β : Error))) *
-          ((Fintype.card β : Error) * ∑ a : α, f a) := by
-          congr 1
-          simp [Finset.mul_sum]
-    _ = (1 / (Fintype.card α : Error)) * ∑ a : α, f a := by
-          field_simp [hα, hβ]
-    _ = avgOver (uniformDistribution α) f := by
-          simp [avgOver, uniformDistribution, Finset.mul_sum]
-
 private abbrev pointPairOutcomeSwapEquiv (params : Parameters) :
     PointPairOutcome params ≃ PointPairOutcome params :=
   Equiv.prodComm _ _
@@ -381,7 +352,7 @@ private lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
             (RestrictedDiagonalSample params j × Fq params))
           (fun st => g st.1) =
         avgOver (uniformDistribution (RestrictedDiagonalSample params j)) g := by
-    exact avgOver_uniform_prod_ignore_right g
+    exact avgOver_uniform_fst g
   refine ⟨?_⟩
   calc
     sddError strategy.state
@@ -693,21 +664,6 @@ lemma liftRight_mul_rightPlaced_outcome
     _ = rightTensor (A.outcome a * B.outcome b) := by
           rw [rightTensor_mul_rightTensor]
 
-private lemma avgOver_uniform_prod_ignore_left
-    {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (f : β → Error) :
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.2) =
-      avgOver (uniformDistribution β) f := by
-  calc
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.2)
-      = avgOver (uniformDistribution (β × α)) (fun ba => f ba.1) := by
-          simpa using
-            (avgOver_uniform_equiv (Equiv.prodComm α β) (fun ab : α × β => f ab.2))
-    _ = avgOver (uniformDistribution β) f := by
-          simpa using (avgOver_uniform_prod_ignore_right (α := β) (β := α) f)
-
 private theorem sharedDiagonalLineQuestionOfPointPair_sampledPointPair
     (params : Parameters)
     [FieldModel params.q]
@@ -896,7 +852,7 @@ private lemma avgOver_pointPairSharedDiagonalLine_sampled_pair
               avgOver_pointPairSharedDiagonalLine_eq_uniform_seed params
                 (fun q => f (sampledPointPairFromSharedDiagonalQuestion params q))
     _ = avgOver (uniformDistribution (PointPairQuestion params)) f := by
-          exact avgOver_uniform_prod_ignore_right f
+          exact avgOver_uniform_fst f
 
 private lemma pointMeasurementProductAlongSharedLine_outcome
     (params : Parameters)
