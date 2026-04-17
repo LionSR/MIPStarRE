@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Shared deploy logic for pushing to gh-pages branch.
+# Shared deploy logic for pushing to the Pages branch.
 # Usage: ./scripts/deploy-to-gh-pages.sh [--with-docs] [--ci]
 #
 # --with-docs   Also deploy API docs from docbuild/.lake/build/doc (fails if missing)
@@ -19,13 +19,22 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WORK_DIR="$(mktemp -d)"
 trap 'rm -rf "$WORK_DIR"' EXIT
 
-echo "==> Cloning gh-pages branch..."
 if [ "$CI_MODE" = true ]; then
   REPO_URL="https://x-access-token:${GITHUB_TOKEN:-$GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 else
   REPO_URL="$(git -C "$REPO_ROOT" remote get-url origin)"
 fi
-git clone --branch gh-pages --single-branch --depth 1 "$REPO_URL" "$WORK_DIR/site"
+
+if [ -n "${PAGES_BRANCH:-}" ]; then
+  TARGET_BRANCH="$PAGES_BRANCH"
+elif git -C "$REPO_ROOT" ls-remote --exit-code --heads origin github-pages >/dev/null 2>&1; then
+  TARGET_BRANCH="github-pages"
+else
+  TARGET_BRANCH="gh-pages"
+fi
+
+echo "==> Cloning $TARGET_BRANCH branch..."
+git clone --branch "$TARGET_BRANCH" --single-branch --depth 1 "$REPO_URL" "$WORK_DIR/site"
 
 # Update blueprint
 echo "==> Updating blueprint..."
@@ -73,6 +82,6 @@ else
   MSG="Update blueprint"
   [ "$WITH_DOCS" = true ] && MSG="Full docs update"
   git commit -m "$MSG ($(date -u '+%Y-%m-%d %H:%M UTC'))"
-  git push origin gh-pages
+  git push origin "$TARGET_BRANCH"
   echo "==> Deployed!"
 fi
