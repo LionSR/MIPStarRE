@@ -91,9 +91,8 @@ audits that compare raw `\leanok` counts against environment counts must
 account for this (see prior discussion in #231).
 
 ### Statement-level `\leanok`
-Appears **inside** a `\begin{theorem|lemma|proposition|corollary|definition}
-… \end{…}` environment (typically on its own line just after the `\lean{}`
-tag). Claims:
+Appears **inside** a theorem, lemma, corollary, or definition environment
+(typically on its own line just after the `\lean{}` tag). Claims:
 
 > "The *statement* of this theorem (or the *object* introduced by this
 > definition) exists as a Lean declaration, with a type that matches the
@@ -101,7 +100,9 @@ tag). Claims:
 
 It does **not** claim the proof is complete. A theorem whose Lean statement
 is declared but whose proof is `sorry` should still carry a statement-level
-`\leanok` as soon as the type is right.
+`\leanok` as soon as the type is right. Statement-level `\leanok` is
+therefore **not subject to the axiom-closure check** — a `sorry` proof
+does not block it.
 
 ```latex
 \begin{theorem}[Commutativity of~$G$]\label{thm:com-main}
@@ -137,10 +138,12 @@ Appears **inside** the matching `\begin{proof} … \end{proof}` environment
 > `sorryAx` dependency."
 
 A proof-level `\leanok` is a strictly stronger assertion than a
-statement-level one. The CI blueprint↔Lean sync check (`blueprint-sync.yml`)
-inspects the transitive axiom closure of the declaration and **fails the
-build** when a `\leanok` tag (statement or proof level) sits on a theorem
-whose axiom closure still mentions `sorryAx`.
+statement-level one. When the CI blueprint↔Lean axiom-closure check (see
+*Related CI* below) is in place, it inspects the transitive axiom closure
+of each Lean declaration that carries a **proof-level** `\leanok` and
+fails the build when the closure still mentions `sorryAx`. Statement-level
+`\leanok` is unaffected by that check by design, since it does not claim
+the proof is complete.
 
 ### When to add each
 | Situation                                                             | Statement `\leanok`? | Proof `\leanok`? |
@@ -169,12 +172,15 @@ decls is partial or has a disclaimer in its docstring; prefer splitting
 the blueprint entry into the parts that are genuinely formalized.
 
 ### Related CI
-- `.github/workflows/lint-blueprint.yml` — the surface-level sync check
-  (grep-based); flags `\lean{X}` tags whose Lean declaration is missing.
-- `.github/workflows/blueprint-sync.yml` — the axiom-level sync check;
-  runs `#print axioms` on every `\leanok`-tagged declaration and fails if
-  the transitive closure contains `sorryAx`. See
-  [`docs/ci-blueprint-sync.md`](ci-blueprint-sync.md).
+- `.github/workflows/lint-blueprint.yml` — the surface-level sync check;
+  runs `python3 scripts/blueprint_lean_sync.py` to flag `\lean{X}` tags
+  whose Lean declaration is missing and to report aggregate
+  formalization progress per chapter.
+- **Planned** axiom-closure check (tracked in #434, implementation in
+  #438): runs `#print axioms` on every declaration that carries a
+  **proof-level** `\leanok` and fails the build if the transitive
+  closure contains `sorryAx`. Until that workflow lands, proof-level
+  `\leanok` is enforced only by convention and PR review.
 
 ## Dependency Graph Colors (web)
 - **Light green box**: definition with `\lean` + `\leanok` (defined in Lean)
