@@ -114,14 +114,17 @@ structure SpectralTruncationStatement {Outcome : Type*}
 /-- Temporary bridge package for the spectral-truncation construction.
 
 This isolates the still-unformalized linear-algebra step that turns an
-almost-projective measurement into the paper's raw projective family `R_a`. -/
+almost-projective measurement into the paper's raw projective family `R_a`.
+Because the resulting error bounds are state-dependent, the bridge is stated
+only for normalized states. -/
 structure SpectralTruncationBridgePackage {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
   fromSourceAlmostProjective :
-    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
-      SpectralTruncationStatement ψ A ζ
+    ψ.IsNormalized →
+      (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
+        SpectralTruncationStatement ψ A ζ
 
 /-- Output package for the rounding-to-projective step. -/
 structure RoundedProjMeasStatement {Outcome : Type*}
@@ -147,18 +150,22 @@ structure ProjectivizationRepairPackage {Outcome : Type*}
         RoundedProjMeasStatement ψ A P (roundingToProjectiveError ζ)
 
 /-- Temporary bridge package for the final descent from the product-space
-measurement lemma back to the local orthonormalization theorem. -/
+measurement lemma back to the local orthonormalization theorem.
+
+The paper's `100 · ζ^{1/4}` bound is state-dependent, so the bridge records the
+missing normalized-state hypothesis explicitly. -/
 structure OrthonormalizationBridgePackage {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
   fromSSC :
-    BipartiteSSCRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily A) ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        SDDRel ψ (uniformDistribution Unit)
-          (constSubMeasFamily A.liftLeft)
-          (constSubMeasFamily P.toSubMeas.liftLeft)
-          (orthonormalizationError ζ)
+    ψ.IsNormalized →
+      BipartiteSSCRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A) ζ →
+        ∃ P : ProjSubMeas Outcome ι,
+          SDDRel ψ (uniformDistribution Unit)
+            (constSubMeasFamily A.liftLeft)
+            (constSubMeasFamily P.toSubMeas.liftLeft)
+            (orthonormalizationError ζ)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

@@ -966,11 +966,15 @@ theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
 /-! ### Orthonormalization (Theorem 5.4 / thm:orthonormalization) -/
 
 set_option linter.unusedFintypeInType false in
-/-- `thm:orthonormalization`. -/
+/-- `thm:orthonormalization`.
+
+The explicit normalized-state hypothesis matches the paper's scale-sensitive
+`100 · ζ^{1/4}` error bound. -/
 theorem orthonormalization {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
+    (hψ : ψ.IsNormalized)
     (_hperm : PermInvState ψ)
     (A : SubMeas Outcome ι) (ζ : Error) :
     BipartiteSSCRel ψ (uniformDistribution Unit)
@@ -982,7 +986,7 @@ theorem orthonormalization {Outcome : Type*}
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
   intro hssc hbridge
-  exact hbridge.fromSSC hssc
+  exact hbridge.fromSSC hψ hssc
 
 
 
@@ -1050,6 +1054,7 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ιA × ιB))
+    (hψ : ψ.IsNormalized)
     (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error)
     (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
     (hspectral :
@@ -1085,7 +1090,7 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
           ψ (leftLiftedMeasurement (ιB := ιB) A) P
           (roundingToProjectiveError (consistencyToAlmostProjectiveError ζ)) :=
     MIPStarRE.LDT.MakingMeasurementsProjective.roundAlmostProjMeas (ψ := ψ)
-      (A := leftLiftedMeasurement (ιB := ιB) A)
+      (hψ := hψ) (A := leftLiftedMeasurement (ιB := ιB) A)
       (ζ := consistencyToAlmostProjectiveError ζ) hAlmost hspectral hrepair
   obtain ⟨P, hRounded⟩ := hRound
   refine ⟨P, ?_⟩
