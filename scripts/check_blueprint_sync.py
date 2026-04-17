@@ -175,32 +175,34 @@ def run_axiom_check(
         harness_str = str(harness)
 
     output = _strip_ansi((proc.stdout or "") + "\n" + (proc.stderr or ""))
-    # Lean may emit `#print axioms` output either prefixed with a
-    # ``<file>:line:col:`` location (the historical format) or as plain
-    # lines (seen in Lean 4.28). Handle both by attributing lines to a decl
-    # first via line number, then falling back to the ``'DeclName'`` quoted
-    # subject that appears at the start of every ``#print axioms`` message.
-    # The path prefix is matched loosely (any ``…:N:M:`` anchored at the
-    # beginning) so cwd/path rewrites or relative-path emissions still
-    # attribute correctly.
+    # Lean may emit `#print axioms` output either as plain lines (Lean 4.28:
+    # ``'DeclName' depends on axioms: […]``) or prefixed with a
+    # ``<harness>:line:col:`` location (historical format). We attribute
+    # lines to a decl *first* via the quoted ``'DeclName'`` / ```DeclName```
+    # subject — this is the only mechanism that works for Lean 4.28's
+    # plain-line format, and it is immune to stray warnings emitted from
+    # imported modules. As a fallback we accept a precise harness-path
+    # prefix (``<harness>:N:M:``) but deliberately refuse any other
+    # ``file:N:M:`` prefix, because warnings like
+    # ``./MIPStarRE/Foo.lean:4:0: warning: …`` would otherwise match the
+    # harness line number and poison attribution.
     loc_exact_re = re.compile(rf"^{re.escape(harness_str)}:(\d+):\d+:\s*(.*)$")
-    loc_any_re = re.compile(r"^[^:\s]\S*:(\d+):\d+:\s*(.*)$")
     records: dict[str, list[str]] = {d: [] for d in decls}
     current: str | None = None
     for raw_line in output.splitlines():
         content = raw_line
         matched: str | None = None
-        m = loc_exact_re.match(raw_line) or loc_any_re.match(raw_line)
-        if m:
-            line_no = int(m.group(1))
-            if line_no in line_to_decl:
-                content = m.group(2)
-                matched = line_to_decl[line_no]
+        for decl in decls:
+            if f"'{decl}'" in raw_line or f"`{decl}`" in raw_line:
+                matched = decl
+                break
         if matched is None:
-            for decl in decls:
-                if f"'{decl}'" in content or f"`{decl}`" in content:
-                    matched = decl
-                    break
+            m = loc_exact_re.match(raw_line)
+            if m:
+                line_no = int(m.group(1))
+                if line_no in line_to_decl:
+                    content = m.group(2)
+                    matched = line_to_decl[line_no]
         if matched is not None:
             current = matched
         if current is not None:
@@ -222,19 +224,30 @@ def run_axiom_check(
         sys.stderr.write(output[-4000:] + "\n")
         return None
 
-    unknown_re = re.compile(r"unknown\s+(identifier|constant)", re.IGNORECASE)
-    depends_re = re.compile(r"depends on axioms:\s*\[([^\]]*)\]", re.DOTALL)
+    # Matchers run against a lowercased copy of the per-decl output to stay
+    # robust across Lean capitalisation changes (Lean 4.28 emits
+    # ``Unknown constant`` with a capital U; older toolchains used
+    # ``unknown identifier``). ``depends_re`` is applied to the lowercased
+    # form too, which is safe because the axiom list is extracted by
+    # position and the list contents are only used as names — we go back
+    # to the original ``joined`` for axiom-list extraction so that
+    # ``sorryAx`` capitalisation is preserved.
+    unknown_re = re.compile(r"unknown\s+(identifier|constant)")
+    depends_re = re.compile(
+        r"depends on axioms:\s*\[([^\]]*)\]", re.DOTALL | re.IGNORECASE
+    )
     result: dict[str, dict] = {}
     for decl in decls:
         joined = "\n".join(records.get(decl, []))
+        joined_lc = joined.lower()
         exists = True
         axioms: list[str] = []
         parse_error = False
         if not joined:
             exists = False
-        elif unknown_re.search(joined):
+        elif unknown_re.search(joined_lc):
             exists = False
-        elif "does not depend on any axioms" in joined:
+        elif "does not depend on any axioms" in joined_lc:
             pass
         else:
             mm = depends_re.search(joined)

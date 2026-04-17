@@ -28,13 +28,19 @@ distinction is drawn for this check — either form is considered a claim that
 the theorem statement is formalized.
 
 The axiom closure is obtained by `lake env lean`-ing a throwaway harness that
-runs `#print axioms Name` for each unique declaration. Lean's `#print axioms`
-output is accepted both with a `<file>:line:col:` location prefix and as
-plain `'Name' depends on axioms: […]` / `'Name' does not depend on any
-axioms` lines. ANSI colour escapes are stripped before parsing. Unknown
-declarations are detected case-insensitively via `Unknown identifier` /
-`Unknown constant` (either capitalisation, including Lean 4.28's
-capital-U form).
+runs `#print axioms Name` for each unique declaration. Lines are attributed
+to a declaration **by the quoted `'Name'` / `` `Name` `` subject first**
+(this is what Lean 4.28 emits with its plain-line format: `'Name' depends
+on axioms: […]` / `'Name' does not depend on any axioms`), and only fall
+back to a strict `<harness-path>:line:col:` location prefix (historical
+format). Arbitrary `file:line:col:` prefixes from imported modules are
+deliberately **not** trusted — a stray warning such as
+`./MIPStarRE/Foo.lean:4:0: warning: …` would otherwise misattribute lines
+to whichever declaration happens to sit on line 4 of the harness. ANSI
+colour escapes are stripped before parsing. Pattern matching
+(`Unknown identifier` / `Unknown constant`, `does not depend on any
+axioms`, `depends on axioms: […]`) is performed case-insensitively so
+both Lean 4.28's capital-U form and older lowercase forms are accepted.
 
 **Two distinct global/local failure modes:**
 
