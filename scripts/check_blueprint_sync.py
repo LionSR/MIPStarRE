@@ -138,6 +138,14 @@ def _unique(seq):
     return out
 
 
+_ANSI_RE = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
+
+
+def _strip_ansi(s: str) -> str:
+    """Drop ANSI CSI escape sequences (harmless no-op if none present)."""
+    return _ANSI_RE.sub("", s)
+
+
 def run_axiom_check(
     decls: list[str], repo_root: Path, lake: str
 ) -> dict[str, dict] | None:
@@ -166,25 +174,31 @@ def run_axiom_check(
         )
         harness_str = str(harness)
 
-    output = (proc.stdout or "") + "\n" + (proc.stderr or "")
+    output = _strip_ansi((proc.stdout or "") + "\n" + (proc.stderr or ""))
     # Lean may emit `#print axioms` output either prefixed with a
     # ``<file>:line:col:`` location (the historical format) or as plain
     # lines (seen in Lean 4.28). Handle both by attributing lines to a decl
     # first via line number, then falling back to the ``'DeclName'`` quoted
     # subject that appears at the start of every ``#print axioms`` message.
-    loc_re = re.compile(rf"^{re.escape(harness_str)}:(\d+):\d+:\s*(.*)$")
+    # The path prefix is matched loosely (any ``…:N:M:`` anchored at the
+    # beginning) so cwd/path rewrites or relative-path emissions still
+    # attribute correctly.
+    loc_exact_re = re.compile(rf"^{re.escape(harness_str)}:(\d+):\d+:\s*(.*)$")
+    loc_any_re = re.compile(r"^[^:\s]\S*:(\d+):\d+:\s*(.*)$")
     records: dict[str, list[str]] = {d: [] for d in decls}
     current: str | None = None
     for raw_line in output.splitlines():
         content = raw_line
         matched: str | None = None
-        m = loc_re.match(raw_line)
+        m = loc_exact_re.match(raw_line) or loc_any_re.match(raw_line)
         if m:
-            content = m.group(2)
-            matched = line_to_decl.get(int(m.group(1)))
+            line_no = int(m.group(1))
+            if line_no in line_to_decl:
+                content = m.group(2)
+                matched = line_to_decl[line_no]
         if matched is None:
             for decl in decls:
-                if f"'{decl}'" in content:
+                if f"'{decl}'" in content or f"`{decl}`" in content:
                     matched = decl
                     break
         if matched is not None:
@@ -208,26 +222,36 @@ def run_axiom_check(
         sys.stderr.write(output[-4000:] + "\n")
         return None
 
+    unknown_re = re.compile(r"unknown\s+(identifier|constant)", re.IGNORECASE)
+    depends_re = re.compile(r"depends on axioms:\s*\[([^\]]*)\]", re.DOTALL)
     result: dict[str, dict] = {}
     for decl in decls:
         joined = "\n".join(records.get(decl, []))
         exists = True
         axioms: list[str] = []
+        parse_error = False
         if not joined:
             exists = False
-        elif "unknown identifier" in joined or "unknown constant" in joined:
+        elif unknown_re.search(joined):
             exists = False
         elif "does not depend on any axioms" in joined:
             pass
         else:
-            mm = re.search(r"depends on axioms:\s*\[([^\]]*)\]", joined, re.DOTALL)
+            mm = depends_re.search(joined)
             if mm:
                 axioms = [a.strip() for a in mm.group(1).split(",") if a.strip()]
+            else:
+                # Non-empty output we could not classify. Fail-safe: flag as
+                # parse drift so a ``\leanok``-tagged entry cannot silently
+                # pass with a ``sorryAx`` dependency hidden behind an
+                # unexpected output format.
+                parse_error = True
         result[decl] = {
             "exists": exists,
             "sorry": any(a == "sorryAx" or a.startswith("sorryAx.") for a in axioms),
             "axioms": axioms,
             "raw": joined,
+            "parse_error": parse_error,
         }
     return result
 
@@ -283,11 +307,30 @@ def main() -> int:
     errors = 0
     warnings = 0
     for e in entries:
-        info = axinfo.get(e.lean_name, {"exists": False, "sorry": False})
+        info = axinfo.get(
+            e.lean_name,
+            {"exists": False, "sorry": False, "parse_error": False, "raw": ""},
+        )
         if not info["exists"]:
             msg = (
                 f"{e.lean_name}: blueprint \\lean{{}} tag but declaration "
                 f"not found in Lean source."
+            )
+            if e.any_leanok:
+                errors += 1
+                print(f"ERROR {e.file}:{e.line} {msg}")
+                _emit("error", e.file, e.line, "Blueprint sync", msg)
+            else:
+                warnings += 1
+                print(f"WARN  {e.file}:{e.line} {msg}")
+                _emit("warning", e.file, e.line, "Blueprint sync", msg)
+            continue
+        if info.get("parse_error"):
+            raw_head = info.get("raw", "")[:200].replace("\n", " \\n ")
+            msg = (
+                f"{e.lean_name}: could not parse `#print axioms` output — "
+                f"treating as drift (fail-safe). First 200 chars: "
+                f"{raw_head!r}"
             )
             if e.any_leanok:
                 errors += 1
