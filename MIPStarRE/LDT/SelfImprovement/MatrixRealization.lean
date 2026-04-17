@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.SelfImprovement.Defs
 
 /-!
