@@ -4724,6 +4724,7 @@ private lemma zero_to_fullSliceProductRight_le_one
           (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
             simp [avgOver]
     _ ≤ 1 := uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
+
 /-- Full-slice ABA scalar average: `E_{x,y} ∑_{g,h} ⟨ψ| G^x_g G^y_h G^x_g ⊗ I |ψ⟩`.
 
 Full-polynomial analog of the evaluated `evaluatedSliceABATerm` (line 664);
@@ -4838,13 +4839,15 @@ private lemma fullSlice_scalar_marginalize_x
       (↑params.m : Error) * ↑params.d / ↑params.q := by
   sorry
 
-/-- Paper `eq:eq:don't-understand-the-numbering-system-diff`
+/-- Paper `eq:evaluate-gcom-at-points-part-dos`
 (`commutativity-G.tex` lines 369-385).
 
 Schwartz-Zippel marginalization on the `y` variable: replacing the full
 polynomial sum `∑_h G^y_h` by the point-evaluated sum `E_v ∑_b G^y_[h(v)=b]`
 inside the ABAB term costs at most `params.m · params.d / params.q`.  Symmetric
-in structure to `fullSlice_scalar_marginalize_x`. -/
+in structure to `fullSlice_scalar_marginalize_x`; the paper's difference-
+expression label at line 379 is idiosyncratic, so we cite the enclosing
+approximation statement. -/
 private lemma fullSlice_scalar_marginalize_y
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
