@@ -523,7 +523,7 @@
           
           <li><a href="sec-ld-pasting.html#lem:h-b-consistency">Lemma 9.18</a></li>
           
-          <li><a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">Corollary 9.26</a></li>
+          <li><a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">Corollary 9.27</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-sub">Lemma 3.18</a></li>
           
@@ -597,7 +597,7 @@
 <div class="displaymath" id="a0000000405">
   \[  \sqrt{8m\varepsilon +4\delta }+\nu _6 \le 47k^2m\left(\varepsilon ^{1/32}+\delta ^{1/32}+\gamma ^{1/32}+\zeta ^{1/32}+(d/q)^{1/32}\right)\le \nu ,  \]
 </div>
-<p> which proves <a href="sec-ld-pasting.html#item:ld-pasting-N-consistency-sub-measurement">1</a>. The completeness claim is exactly Corollary&#160;<a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">9.26</a>. </p>
+<p> which proves <a href="sec-ld-pasting.html#item:ld-pasting-N-consistency-sub-measurement">1</a>. The completeness claim is exactly Corollary&#160;<a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">9.27</a>. </p>
 
   </div>
 </div>
@@ -2060,7 +2060,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Pasting.hAConsistency_completed" class="lean_decl">MIPStarRE.LDT.Pasting.hAConsistency_completed</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Pasting.hAConsistency_submeas" class="lean_decl">MIPStarRE.LDT.Pasting.hAConsistency_submeas</a></li>
           
         </ul>
     
@@ -2071,7 +2071,7 @@
         </div>
   </div>
   <div class="corollary_thmcontent">
-  <p>    On average over \((u,x) \sim \mathbb {F}_q^{m+1}\), </p>
+  <p>   On average over \((u,x) \sim \mathbb {F}_q^{m+1}\), </p>
 <div class="displaymath" id="a0000000465">
   \[  H_{[h(u,x)=a]} \otimes I \simeq _{\nu } I \otimes A_a^{u,x}.  \]
 </div>
@@ -2102,6 +2102,99 @@
 
   </div>
 </div>
+<div class="corollary_thmwrapper theorem-style-plain" id="cor:h-a-consistency-completed">
+  <div class="corollary_thmheading">
+    <span class="corollary_thmcaption">
+    Corollary
+    </span>
+    <span class="corollary_thmlabel">9.20</span>
+    <span class="corollary_thmtitle">Consistency of the completed \(H\) with \(A\)</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-ld-pasting.html#cor:h-a-consistency-completed">#</a>
+    
+    <a class="icon proof" href="sec-ld-pasting.html#a0000000469"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-ld-pasting.html#cor:h-a-consistency">Corollary 9.19</a></li>
+          
+          <li><a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">Corollary 9.27</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Pasting.hAConsistency_completed" class="lean_decl">MIPStarRE.LDT.Pasting.hAConsistency_completed</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="corollary_thmcontent">
+  <p>    Let \(H_{\mathrm{meas}}\) be the completion of \(H\) at the fallback outcome. On average over \((u,x) \sim \mathbb {F}_q^{m+1}\), </p>
+<div class="displaymath" id="a0000000470">
+  \[  (H_{\mathrm{meas}})_{[h(u,x)=a]} \otimes I \simeq _{\sigma } I \otimes A_a^{u,x}.  \]
+</div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000469">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Corollary&#160;<a href="sec-ld-pasting.html#cor:h-a-consistency">9.19</a> gives </p>
+<div class="displaymath" id="a0000000471">
+  \[  H_{[h(u,x)=a]} \otimes I \simeq _{\nu } I \otimes A_a^{u,x}.  \]
+</div>
+<p> Corollary&#160;<a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">9.27</a> bounds the missing mass of \(H\) by </p>
+<div class="displaymath" id="a0000000472">
+  \[  \kappa \cdot \left(1 + \frac{1}{100m}\right) + \nu + e^{-k/(80000m^2)}.  \]
+</div>
+<p> Adding this completion mass to the \(\nu \)-bound gives </p>
+<div class="displaymath" id="a0000000473">
+  \[  \nu + \kappa \cdot \left(1 + \frac{1}{100m}\right) + \nu + e^{-k/(80000m^2)} = \sigma .  \]
+</div>
+
+  </div>
+</div>
 <h2 id="sec:completeness-of-h-low-degree">9.0.6 Completeness of \(H\)</h2>
 
 <div class="definition_thmwrapper theorem-style-definition" id="def:outcomes-by-type">
@@ -2109,7 +2202,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">9.20</span>
+    <span class="definition_thmlabel">9.21</span>
     <span class="definition_thmtitle">Outcomes of a fixed type</span>
     <div class="thm_header_extras">
 
@@ -2177,7 +2270,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.21</span>
+    <span class="lemma_thmlabel">9.22</span>
     <span class="lemma_thmtitle">Summing over all outcomes</span>
     <div class="thm_header_extras">
 
@@ -2186,7 +2279,7 @@
 
     <a class="icon proof" href="sec-ld-pasting.html#lem:over-all-outcomes">#</a>
     
-    <a class="icon proof" href="sec-ld-pasting.html#a0000000469"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-ld-pasting.html#a0000000474"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2202,7 +2295,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:outcomes-by-type">Definition 9.20</a></li>
+          <li><a href="sec-ld-pasting.html#def:outcomes-by-type">Definition 9.21</a></li>
           
           <li><a href="sec-ld-pasting.html#prop:ld-dnoteq">Proposition 9.5</a></li>
           
@@ -2240,17 +2333,17 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   If \(x_1,\dots ,x_k\) are sampled independently and uniformly from \(\mathbb {F}_q\), then </p>
-<div class="displaymath" id="a0000000470">
+<div class="displaymath" id="a0000000475">
   \[  \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  \approx _{\nu _7} \mathbb {E}_{x_1,\dots ,x_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _{(g_1,\dots ,g_k)\in \mathsf{Outcomes}_\tau } \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{x_1,\dots ,x_k} \otimes I \lvert \psi  \rangle ,  \]
 </div>
 <p> where </p>
-<div class="displaymath" id="a0000000471">
+<div class="displaymath" id="a0000000476">
   \[  \nu _7 = 46k^2m\left(\varepsilon ^{1/32}+\delta ^{1/32}+\gamma ^{1/32}+\zeta ^{1/32}+(d/q)^{1/32}\right).  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000469">
+<div class="proof_wrapper" id="a0000000474">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2259,7 +2352,7 @@
   </div>
   <div class="proof_content">
   <p>Let \((y_1,\dots ,y_k)\sim \mathsf{Distinct}_k\). By definition, </p>
-<div class="displaymath" id="a0000000472">
+<div class="displaymath" id="a0000000477">
   \begin{align}  \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  &  = \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle \nonumber \\ &  = \mathbb {E}_{y_1,\dots ,y_k} \sum _h \langle \psi  \rvert  H_h^{y_1,\dots ,y_k} \otimes I \lvert \psi  \rangle \nonumber \\ &  = \mathbb {E}_{y_1,\dots ,y_k} \sum _h \sum _{\tau :\, |\tau |\ge d+1} \sum _{(g_1,\dots ,g_k)=h_\tau } \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes I \lvert \psi  \rangle \nonumber \\ &  = \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _{(g_1,\dots ,g_k)\in \mathsf{Global}_\tau (y)} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes I \lvert \psi  \rangle . \label{eq:sum-restricted-to-global-polynomial} \end{align}
 </div>
 <p> We now remove the restriction to globally consistent tuples: </p>
@@ -2272,7 +2365,7 @@
 </p>
 </div>
 <p> Since the right-hand side is at least the left-hand side, it suffices to bound the difference: </p>
-<div class="displaymath" id="a0000000473">
+<div class="displaymath" id="a0000000478">
   \begin{align}  \eqref{eq:remove-the-restriction} - \eqref{eq:sum-restricted-to-global-polynomial} &  = \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes I \lvert \psi  \rangle \nonumber \\ &  = \mathbb {E}_u \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _f \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes B_f^u \lvert \psi  \rangle . \label{eq:B-appears-out-of-thin-air} \end{align}
 </div>
 <p> We next insert an indicator recording consistency along the sampled line: </p>
@@ -2295,19 +2388,19 @@
 </div>
 <p> and after switching to independent tuples and applying Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-sandwich-line-one-point">9.17</a> coordinatewise, this contributes at most \(k^2/q + k\nu _5\). </p>
 <p>Let \(\mathsf{Consistent}_\tau (g,y,u)\) denote the event that there exists a degree-\(d\) polynomial \(f\) with \(f(y_i)=g_i(u)\) for all \(i\in \tau \). Then </p>
-<div class="displaymath" id="a0000000474">
+<div class="displaymath" id="a0000000479">
   \[  \mathbf{1}\! \left[[\right]\forall i\in \tau ,\  f(y_i)=g_i(u)] \le \mathbf{1}\! \left[[\right]\mathsf{Consistent}_\tau (g,y,u)],  \]
 </div>
 <p> so <a href="sec-ld-pasting.html#eq:add-in-indicator-for-f-and-g">35</a> is bounded by </p>
-<div class="displaymath" id="a0000000475">
+<div class="displaymath" id="a0000000480">
   \begin{align} &  \mathbb {E}_u \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes I \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[[\right]\mathsf{Consistent}_\tau (g,y,u)]\nonumber \\ ={} &  \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes I \lvert \psi  \rangle  \cdot \Pr _u[\mathsf{Consistent}_\tau (g,y,u)]. \label{eq:consistent-indicator} \end{align}
 </div>
 <p> For a fixed globally inconsistent tuple, choose \(d+1\) active coordinates and let \(h^*\) be the unique interpolant through them. Since the tuple is not globally consistent, some active coordinate \(i^*\) satisfies \(g_{i^*} \ne h^*|_{y_{i^*}}\), and then Schwartz–Zippel gives </p>
-<div class="displaymath" id="a0000000476">
+<div class="displaymath" id="a0000000481">
   \[  \Pr _u[\mathsf{Consistent}_\tau (g,y,u)] \le \Pr _u[g_{i^*}(u)=h^*(u,y_{i^*})] \le \frac{md}{q}.  \]
 </div>
 <p> Therefore <a href="sec-ld-pasting.html#eq:consistent-indicator">37</a> is at most \(md/q\), which proves <a href="sec-ld-pasting.html#eq:remove-the-restriction">33</a>. A final application of Lemma&#160;<a href="sec-ld-pasting.html#prop:ld-dnoteq">9.5</a> replaces distinct tuples by independent tuples, giving a total error of </p>
-<div class="displaymath" id="a0000000477">
+<div class="displaymath" id="a0000000482">
   \[  2\frac{k^2}{q} + \frac{md}{q} + k\nu _5 \le 46k^2m\left(\varepsilon ^{1/32}+\delta ^{1/32}+\gamma ^{1/32}+\zeta ^{1/32}+(d/q)^{1/32}\right) = \nu _7.  \]
 </div>
 
@@ -2318,7 +2411,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">9.22</span>
+    <span class="definition_thmlabel">9.23</span>
     <span class="definition_thmtitle">Truncated type sums</span>
     <div class="thm_header_extras">
 
@@ -2374,7 +2467,7 @@
   </div>
   <div class="definition_thmcontent">
   <p>   For \(1 \le \ell \le k+1\) and a tail type \(\tau _{\ge \ell } \in \{ 0,1\} ^{k-\ell +1}\), define </p>
-<div class="displaymath" id="a0000000478">
+<div class="displaymath" id="a0000000483">
   \[  S_{\tau _{\ge \ell }} = \sum _{\tau _{{\lt}\ell }\, :\, |\tau |\ge d+1} G^{|\tau _{{\lt}\ell }|}(I-G)^{(\ell -1)-|\tau _{{\lt}\ell }|}.  \]
 </div>
 <p> This records the contribution of all prefixes that can still be completed to total weight at least \(d+1\) once the tail \(\tau _{\ge \ell }\) is fixed. </p>
@@ -2386,7 +2479,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.23</span>
+    <span class="lemma_thmlabel">9.24</span>
     <span class="lemma_thmtitle">Recurrence for truncated type sums</span>
     <div class="thm_header_extras">
 
@@ -2397,7 +2490,7 @@
 
     <a class="icon proof" href="sec-ld-pasting.html#lem:truncated-type-sum-recurrence">#</a>
     
-    <a class="icon proof" href="sec-ld-pasting.html#a0000000479"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-ld-pasting.html#a0000000484"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2413,7 +2506,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:truncated-type-sums">Definition 9.22</a></li>
+          <li><a href="sec-ld-pasting.html#def:truncated-type-sums">Definition 9.23</a></li>
           
         </ul>
     
@@ -2445,13 +2538,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Each \(S_{\tau _{\ge \ell }}\) is Hermitian, positive semidefinite, and bounded by \(I\). Moreover, if \(\tau _{{\gt}\ell }\) is a tail type of length \(k-\ell \), then </p>
-<div class="displaymath" id="a0000000480">
+<div class="displaymath" id="a0000000485">
   \[  S_{\tau _{{\gt}\ell }} = \sum _{\tau _\ell \in \{ 0,1\} } S_{\tau _{\ge \ell }} G^{\tau _\ell }(I-G)^{1-\tau _\ell }.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000479">
+<div class="proof_wrapper" id="a0000000484">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2460,7 +2553,7 @@
   </div>
   <div class="proof_content">
   <p>Every summand is a polynomial in the commuting positive operators \(G\) and \(I-G\), so \(S_{\tau _{\ge \ell }}\) is Hermitian and positive semidefinite. Summing over all prefixes gives </p>
-<div class="displaymath" id="a0000000481">
+<div class="displaymath" id="a0000000486">
   \[  S_{\tau _{\ge \ell }} \le (G+(I-G))^{\ell -1}=I.  \]
 </div>
 <p> Splitting the next type bit according to whether \(\tau _\ell =1\) or \(\tau _\ell =0\) gives the stated recurrence. </p>
@@ -2472,7 +2565,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.24</span>
+    <span class="lemma_thmlabel">9.25</span>
     <span class="lemma_thmtitle">From the pasted sum to a polynomial in \(G\)</span>
     <div class="thm_header_extras">
 
@@ -2481,7 +2574,7 @@
 
     <a class="icon proof" href="sec-ld-pasting.html#lem:from-H-to-G">#</a>
     
-    <a class="icon proof" href="sec-ld-pasting.html#a0000000482"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-ld-pasting.html#a0000000487"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2503,9 +2596,9 @@
           
           <li><a href="sec-ld-pasting.html#def:pasted-measurement">Definition 9.9</a></li>
           
-          <li><a href="sec-ld-pasting.html#def:truncated-type-sums">Definition 9.22</a></li>
+          <li><a href="sec-ld-pasting.html#def:truncated-type-sums">Definition 9.23</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:truncated-type-sum-recurrence">Lemma 9.23</a></li>
+          <li><a href="sec-ld-pasting.html#lem:truncated-type-sum-recurrence">Lemma 9.24</a></li>
           
         </ul>
     
@@ -2537,17 +2630,17 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Let \(\lvert \psi _{\mathrm{bi}} \rangle \) be a bipartite state on \(\iota \otimes \iota \). If \(x_1,\dots ,x_k\) are sampled independently and uniformly from \(\mathbb {F}_q\), then </p>
-<div class="displaymath" id="a0000000483">
+<div class="displaymath" id="a0000000488">
   \[  \mathbb {E}_{x_1,\dots ,x_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _{(g_1,\dots ,g_k)\in \mathsf{Outcomes}_\tau } \langle \psi _{\mathrm{bi}} \rvert  \widehat H_{g_1,\dots ,g_k}^{x_1,\dots ,x_k} \otimes I \lvert \psi _{\mathrm{bi}} \rangle  \approx _{\nu _8} \sum _{r=d+1}^k \binom {k}{r} \langle \psi _{\mathrm{bi}} \rvert  G^r(I-G)^{k-r} \otimes I \lvert \psi _{\mathrm{bi}} \rangle ,  \]
 </div>
 <p> where </p>
-<div class="displaymath" id="a0000000484">
+<div class="displaymath" id="a0000000489">
   \[  \nu _8 = 46km\left(\gamma ^{1/32}+\zeta ^{1/32}+(d/q)^{1/32}\right).  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000482">
+<div class="proof_wrapper" id="a0000000487">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2556,7 +2649,7 @@
   </div>
   <div class="proof_content">
   <p>For a type \(\tau \in \{ 0,1\} ^k\), write \(\tau _{{\lt}\ell }\), \(\tau _{{\gt}\ell }\), \(\tau _{\le \ell }\), and \(\tau _{\ge \ell }\) for the obvious truncations, and similarly for tuples \(g\). Also write </p>
-<div class="displaymath" id="a0000000485">
+<div class="displaymath" id="a0000000490">
   \[  \widehat G_{g_{\ge \ell }}^{x_{\ge \ell }} = \widehat G_{g_\ell }^{x_\ell }\cdots \widehat G_{g_k}^{x_k}.  \]
 </div>
 <p> Then </p>
@@ -2578,15 +2671,15 @@
 </p>
 </div>
 <p> Write \(\mathsf O_\tau = \mathsf{Outcomes}_\tau \). The main iterative step is that for each \(1\le \ell \le k\), </p>
-<div class="displaymath" id="a0000000486">
+<div class="displaymath" id="a0000000491">
   \begin{align} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau :\, |\tau |\ge d+1} \sum _{g_{\ge \ell }\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes \bigl(G^{|\tau _{{\lt}\ell }|}(I-G)^{(\ell -1)-|\tau _{{\lt}\ell }|}\bigr)\lvert \psi  \rangle \nonumber \\ \approx _{2\sqrt{2\zeta }+2\sqrt{\nu _4}}{} &  \mathbb {E}_{x_{{\gt}\ell }} \sum _{\tau :\, |\tau |\ge d+1} \sum _{g_{{\gt}\ell }\in \mathsf O_{\tau _{{\gt}\ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(G^{|\tau _{\le \ell }|}(I-G)^{\ell -|\tau _{\le \ell }|}\bigr)\lvert \psi  \rangle . \label{eq:i-think-this-is-what-i'm-supposed-to-prove} \end{align}
 </div>
 <p> Iterating <a href="sec-ld-pasting.html#eq:i-think-this-is-what-i'm-supposed-to-prove">40</a> for \(\ell =1,\dots ,k\) produces the Bernoulli polynomial </p>
-<div class="displaymath" id="a0000000487">
+<div class="displaymath" id="a0000000492">
   \[  \sum _{r=d+1}^k \binom {k}{r} \langle \psi  \rvert  G^r(I-G)^{k-r} \otimes I \lvert \psi  \rangle ,  \]
 </div>
 <p> and the accumulated error is </p>
-<div class="displaymath" id="a0000000488">
+<div class="displaymath" id="a0000000493">
   \[  k(2\sqrt{2\zeta }+2\sqrt{\nu _4}) \le 46km\left(\gamma ^{1/32}+\zeta ^{1/32}+(d/q)^{1/32}\right) = \nu _8.  \]
 </div>
 <p>To prove <a href="sec-ld-pasting.html#eq:i-think-this-is-what-i'm-supposed-to-prove">40</a>, define for each \(1\le \ell \le k+1\) and each tail type \(\tau _{\ge \ell }\), </p>
@@ -2599,11 +2692,11 @@
 </p>
 </div>
 <p> Then <a href="sec-ld-pasting.html#eq:i-think-this-is-what-i'm-supposed-to-prove">40</a> may be rewritten as </p>
-<div class="displaymath" id="a0000000489">
+<div class="displaymath" id="a0000000494">
   \begin{align} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{g_{\ge \ell }\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes S_{\tau _{\ge \ell }} \lvert \psi  \rangle \nonumber \\ \approx _{2\sqrt{2\zeta }+2\sqrt{\nu _4}}{} &  \mathbb {E}_{x_{{\gt}\ell }} \sum _{\tau _{{\gt}\ell }} \sum _{g_{{\gt}\ell }\in \mathsf O_{\tau _{{\gt}\ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes S_{\tau _{{\gt}\ell }} \lvert \psi  \rangle . \label{eq:i-think-this-is-what-i'm-supposed-to-prove-2} \end{align}
 </div>
 <p> The operators \(S_{\tau _{\ge \ell }}\) are Hermitian and positive semidefinite, and </p>
-<div class="displaymath" id="a0000000490">
+<div class="displaymath" id="a0000000495">
   \begin{align}  S_{\tau _{\ge \ell }} &  = \sum _{\tau _{{\lt}\ell }\, :\, |\tau |\ge d+1} G^{|\tau _{{\lt}\ell }|}(I-G)^{(\ell -1)-|\tau _{{\lt}\ell }|}\nonumber \\ &  \le \sum _{\tau _{{\lt}\ell }} G^{|\tau _{{\lt}\ell }|}(I-G)^{(\ell -1)-|\tau _{{\lt}\ell }|}\nonumber \\ &  = (G+(I-G))^{\ell -1} = I. \label{eq:S-bound} \end{align}
 </div>
 <p> For any \(\tau _\ell \in \{ 0,1\} \), </p>
@@ -2616,7 +2709,7 @@
 </p>
 </div>
 <p> Therefore, for every \(\tau _{{\gt}\ell }\), </p>
-<div class="displaymath" id="a0000000491">
+<div class="displaymath" id="a0000000496">
   \begin{align}  \sum _{\tau _\ell } S_{\tau _{\ge \ell }} \cdot \Bigl(\mathbb {E}_{x_\ell } \sum _{g_\ell \in \mathsf O_{\tau _\ell }} \widehat G_{g_\ell }^{x_\ell }\Bigr) &  = \sum _{\tau _\ell } S_{\tau _{\ge \ell }} G^{\tau _\ell }(I-G)^{1-\tau _\ell }\nonumber \\ &  = S_{\tau _{{\gt}\ell }}. \label{eq:S-recurrence} \end{align}
 </div>
 <p> Moreover, </p>
@@ -2625,7 +2718,7 @@
 </div>
 <p> because \(S_{\tau _{\ge \ell }}\) commutes with \(G\) and \((I-G)\) and is bounded by \(I\). </p>
 <p>We now prove <a href="sec-ld-pasting.html#eq:i-think-this-is-what-i'm-supposed-to-prove-2">42</a>. Writing \(\widehat H\) as a sandwich of \(\widehat G\) operators and moving the rightmost \(\widehat G_{g_\ell }^{x_\ell }\) to the second tensor factor gives </p>
-<div class="displaymath" id="a0000000492">
+<div class="displaymath" id="a0000000497">
   \begin{align} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes S_{\tau _{\ge \ell }}\lvert \psi  \rangle \nonumber \\ ={} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{\ge \ell }}^{x_{\ge \ell }} (\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \widehat G_{g_\ell }^{x_\ell }\bigr) \otimes S_{\tau _{\ge \ell }}\lvert \psi  \rangle \nonumber \\ \approx _{\sqrt{2\zeta }}{} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{\ge \ell }}^{x_{\ge \ell }} (\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle . \label{eq:move-g-over-there} \end{align}
 </div>
 <p> The corresponding Cauchy–Schwarz bound is </p>
@@ -2634,7 +2727,7 @@
 </div>
 <p> The first square root is at most \(1\) because \(S_{\tau _{\ge \ell }}\le I\) and \(\widehat H\) is a submeasurement, and the second is at most \(2\zeta \) by <a href="sec-ld-pasting.html#eq:gselfconall">23</a>. </p>
 <p>Next, commute the leftmost \(\widehat G_{g_\ell }^{x_\ell }\) across the left half-sandwich: </p>
-<div class="displaymath" id="a0000000493">
+<div class="displaymath" id="a0000000498">
   \begin{align}  \eqref{eq:move-g-over-there} &  = \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_\ell }^{x_\ell }\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }}(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle \nonumber \\ &  \approx _{\sqrt{\nu _4}} \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }}\widehat G_{g_\ell }^{x_\ell }(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle . \label{eq:commute-g-part-one} \end{align}
 </div>
 <p> The associated Cauchy–Schwarz estimate is </p>
@@ -2656,7 +2749,7 @@
   \begin{align}  \eqref{eq:commute-g-part-two} \approx _{\sqrt{2\zeta }} \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\widehat G_{g_\ell }^{x_\ell }\bigr) \lvert \psi  \rangle . \label{eq:h-ot-mgg} \end{align}
 </div>
 <p> The omitted Cauchy–Schwarz bound reuses the first square root from <a href="sec-ld-pasting.html#eq:call-again-later-part-dos">54</a> and the second square root from <a href="sec-ld-pasting.html#eq:call-again-later-part-tres">48</a>. Since \(\widehat G\) is projective, </p>
-<div class="displaymath" id="a0000000494">
+<div class="displaymath" id="a0000000499">
   \begin{align*}  \eqref{eq:h-ot-mgg} &  = \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr) \lvert \psi  \rangle  \\ &  = \mathbb {E}_{x_{{\gt}\ell }} \sum _{\tau _{{\gt}\ell }} \sum _{g_{{\gt}\ell }\in \mathsf O_{\tau _{{\gt}\ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \Bigl(\sum _{\tau _\ell } S_{\tau _{\ge \ell }} \Bigl(\mathbb {E}_{x_\ell }\sum _{g_\ell \in \mathsf O_{\tau _\ell }} \widehat G_{g_\ell }^{x_\ell }\Bigr)\Bigr) \lvert \psi  \rangle  \\ &  = \mathbb {E}_{x_{{\gt}\ell }} \sum _{\tau _{{\gt}\ell }} \sum _{g_{{\gt}\ell }\in \mathsf O_{\tau _{{\gt}\ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes S_{\tau _{{\gt}\ell }} \lvert \psi  \rangle  \tag {by \ref{eq:S-recurrence}}, \end{align*}
 </div>
 <p> which is exactly <a href="sec-ld-pasting.html#eq:i-think-this-is-what-i'm-supposed-to-prove-2">42</a>. </p>
@@ -2668,7 +2761,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.25</span>
+    <span class="lemma_thmlabel">9.26</span>
     <span class="lemma_thmtitle">Matrix Chernoff bound for the Bernoulli polynomial</span>
     <div class="thm_header_extras">
 
@@ -2677,7 +2770,7 @@
 
     <a class="icon proof" href="sec-ld-pasting.html#lem:chernoff-bernoulli-matrix">#</a>
     
-    <a class="icon proof" href="sec-ld-pasting.html#a0000000495"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-ld-pasting.html#a0000000500"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2705,17 +2798,17 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  Let \(0{\lt}\theta {\lt}1\) and integers \(k,d{\gt}0\) with \(k \ge 2d/\theta \). Define </p>
-<div class="displaymath" id="a0000000496">
+<div class="displaymath" id="a0000000501">
   \[  F(X) = \sum _{r=d+1}^k \binom {k}{r} X^r (I-X)^{k-r}.  \]
 </div>
 <p> If \(X\) is Hermitian, \(0 \le X \le I\), and \(\langle \psi  \rvert  X \otimes I \lvert \psi  \rangle  \ge 1-\kappa \), then </p>
-<div class="displaymath" id="a0000000497">
+<div class="displaymath" id="a0000000502">
   \[  \langle \psi  \rvert  F(X) \otimes I \lvert \psi  \rangle  \ge 1 - \frac{\kappa }{1-\theta } - e^{-\theta ^2 k/2}.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000495">
+<div class="proof_wrapper" id="a0000000500">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2724,7 +2817,7 @@
   </div>
   <div class="proof_content">
   <p>Let \(\rho \) be the reduced state of \(\lvert \psi  \rangle \) on one prover’s subsystem, and write the eigendecomposition \(X = \sum _i \lambda _i \lvert v_i \rangle \langle v_i \rvert \). This defines a probability distribution \(\mu (i)=\langle v_i \rvert \rho \lvert v_i \rangle \), with </p>
-<div class="displaymath" id="a0000000498">
+<div class="displaymath" id="a0000000503">
   \[  \mathbb {E}_{i\sim \mu } \lambda _i = \operatorname{Tr}(X\rho ) = \langle \psi  \rvert  X \otimes I \lvert \psi  \rangle  \ge 1-\kappa .  \]
 </div>
 <p> Equivalently, \(\mathbb {E}_{i\sim \mu }(1-\lambda _i)\le \kappa \), so Markov’s inequality shows that most of the spectral mass of \(X\) lies on eigenvalues at least \(\theta \): </p>
@@ -2737,7 +2830,7 @@
 </p>
 </div>
 <p> For a scalar \(p \in [d/k,1]\), the quantity </p>
-<div class="displaymath" id="a0000000499">
+<div class="displaymath" id="a0000000504">
   \[  F(p)=\sum _{r=d+1}^k \binom {k}{r}p^r(1-p)^{k-r}  \]
 </div>
 <p> is the probability of observing at least \(d+1\) successes in \(k\) Bernoulli\((p)\) trials. Applying the scalar Chernoff bound eigenvalue-by-eigenvalue therefore yields </p>
@@ -2750,11 +2843,11 @@
 </p>
 </div>
 <p> Hence </p>
-<div class="displaymath" id="a0000000500">
+<div class="displaymath" id="a0000000505">
   \begin{align}  \langle \psi  \rvert  F(X) \otimes I \lvert \psi  \rangle  &  = \operatorname{Tr}(F(X)\rho )\nonumber \\ &  = \sum _i F(\lambda _i)\langle v_i \rvert \rho \lvert v_i \rangle \nonumber \\ &  = \mathbb {E}_{i\sim \mu } F(\lambda _i)\nonumber \\ &  \ge \Pr _{i\sim \mu }[\lambda _i \ge \theta ]\cdot F(\theta )\nonumber \\ &  \ge \left(1-\frac{\kappa }{1-\theta }\right)\cdot F(\theta ) \tag {by \ref{eq:in-other-words}}\nonumber \\ &  \ge \left(1-\frac{\kappa }{1-\theta }\right)\cdot \left(1-\exp \Bigl(-2\Bigl(\theta -\frac{d}{k}\Bigr)^2k\Bigr)\right). \label{eq:almost-done-with-this-giant-proof} \end{align}
 </div>
 <p> Since \((1-b)(1-c)\ge 1-b-c\) for \(b,c\ge 0\), <a href="sec-ld-pasting.html#eq:almost-done-with-this-giant-proof">59</a> implies </p>
-<div class="displaymath" id="a0000000501">
+<div class="displaymath" id="a0000000506">
   \[  \langle \psi  \rvert  F(X) \otimes I \lvert \psi  \rangle  \ge 1-\frac{\kappa }{1-\theta } - \exp \Bigl(-2\Bigl(\theta -\frac{d}{k}\Bigr)^2k\Bigr).  \]
 </div>
 <p> Finally, \(k \ge 2d/\theta \) implies \(d/k \le \theta /2\), hence \((\theta -d/k)^2 \ge \theta ^2/4\), which yields the claimed bound. </p>
@@ -2766,7 +2859,7 @@
     <span class="corollary_thmcaption">
     Corollary
     </span>
-    <span class="corollary_thmlabel">9.26</span>
+    <span class="corollary_thmlabel">9.27</span>
     <span class="corollary_thmtitle">Completeness of the pasted submeasurement</span>
     <div class="thm_header_extras">
 
@@ -2775,7 +2868,7 @@
 
     <a class="icon proof" href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">#</a>
     
-    <a class="icon proof" href="sec-ld-pasting.html#a0000000502"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-ld-pasting.html#a0000000507"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2791,11 +2884,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#lem:over-all-outcomes">Lemma 9.21</a></li>
+          <li><a href="sec-ld-pasting.html#lem:over-all-outcomes">Lemma 9.22</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:from-H-to-G">Lemma 9.24</a></li>
+          <li><a href="sec-ld-pasting.html#lem:from-H-to-G">Lemma 9.25</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:chernoff-bernoulli-matrix">Lemma 9.25</a></li>
+          <li><a href="sec-ld-pasting.html#lem:chernoff-bernoulli-matrix">Lemma 9.26</a></li>
           
         </ul>
     
@@ -2827,13 +2920,13 @@
   </div>
   <div class="corollary_thmcontent">
   <p>   If \(k \ge 400md\), then </p>
-<div class="displaymath" id="a0000000503">
+<div class="displaymath" id="a0000000508">
   \[  \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  \ge 1 - \kappa \left(1+\frac{1}{100m}\right) - \nu - e^{-k/(80000m^2)}.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000502">
+<div class="proof_wrapper" id="a0000000507">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2841,16 +2934,16 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Lemma&#160;<a href="sec-ld-pasting.html#lem:over-all-outcomes">9.21</a> gives </p>
-<div class="displaymath" id="a0000000504">
+  <p>Lemma&#160;<a href="sec-ld-pasting.html#lem:over-all-outcomes">9.22</a> gives </p>
+<div class="displaymath" id="a0000000509">
   \[  \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  \approx _{\nu _7} \mathbb {E}_{x_1,\dots ,x_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _{(g_1,\dots ,g_k)\in \mathsf{Outcomes}_\tau } \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{x_1,\dots ,x_k} \otimes I \lvert \psi  \rangle .  \]
 </div>
-<p> Lemma&#160;<a href="sec-ld-pasting.html#lem:from-H-to-G">9.24</a> turns the right-hand side into </p>
-<div class="displaymath" id="a0000000505">
+<p> Lemma&#160;<a href="sec-ld-pasting.html#lem:from-H-to-G">9.25</a> turns the right-hand side into </p>
+<div class="displaymath" id="a0000000510">
   \[  \sum _{r=d+1}^k \binom {k}{r} \langle \psi  \rvert  G^r(I-G)^{k-r} \otimes I \lvert \psi  \rangle   \]
 </div>
-<p> up to error \(\nu _8\). Apply Lemma&#160;<a href="sec-ld-pasting.html#lem:chernoff-bernoulli-matrix">9.25</a> with \(\theta = 1/(200m)\). Since \(k\ge 400md\), the hypothesis \(k \ge 2d/\theta \) is satisfied, and the resulting lower bound is </p>
-<div class="displaymath" id="a0000000506">
+<p> up to error \(\nu _8\). Apply Lemma&#160;<a href="sec-ld-pasting.html#lem:chernoff-bernoulli-matrix">9.26</a> with \(\theta = 1/(200m)\). Since \(k\ge 400md\), the hypothesis \(k \ge 2d/\theta \) is satisfied, and the resulting lower bound is </p>
+<div class="displaymath" id="a0000000511">
   \[  1 - \frac{\kappa }{1-1/(200m)} - e^{-k/(80000m^2)} \ge 1 - \kappa \left(1+\frac{1}{100m}\right) - e^{-k/(80000m^2)}.  \]
 </div>
 <p> The paper then absorbs the approximation losses \(\nu _7+\nu _8\) into \(\nu \). </p>
