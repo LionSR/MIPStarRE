@@ -185,10 +185,10 @@ private lemma firstSwitcherooError_le_eighth_stage
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (8 : Error))) := by
             simp [eighthSum]
 
-/-- TODO: formalize the paper's scalar inequality
-`12 * sqrt zeta + 4 * sqrt θ₁ ≤ ν₂`, where `θ₁` is the first switcheroo error.
-As above, this needs the paper-side small-error regime or a separate large-error
-fallback argument. -/
+/-- The paper's scalar inequality
+`12·√ζ + 4·√θ₁ ≤ ν₂`, where `θ₁ = θ(ζ, ζ, comMainError)` is the first switcheroo
+error. The proof uses `firstSwitcherooError_le_eighth_stage` to bound `θ₁` by
+`36m · eighthSum`, then a sqrt/rpow chain to land on `ν₂ = commutingWithGCompleteError`. -/
 private lemma secondSwitcherooError_le_commutingWithGCompleteError
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error)

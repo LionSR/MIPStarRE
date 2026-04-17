@@ -31,13 +31,18 @@ abbrev AxisParallelLineQuestion (params : Parameters) :=
 abbrev PointPairQuestion (params : Parameters) :=
   Point params × Point params
 
-/-- TODO(degree): polynomial answers should be degree-bounded objects rather than raw functions. -/
-abbrev DegreeBoundedPolynomialAnswer (params : Parameters) :=
-  Point params → Fq params
+/-- Degree-bounded polynomial answers: global low-individual-degree polynomials over the
+chosen field model, i.e. pairs of a multivariate polynomial and a proof that each
+individual degree is at most `params.d`. Coerces to a raw function `Point params → Fq params`
+via `Polynomial.toFun`, so downstream callers may still write `g u` to evaluate. -/
+abbrev DegreeBoundedPolynomialAnswer (params : Parameters) [FieldModel params.q] :=
+  Polynomial params
 
-/-- TODO(degree): line answers should be degree-bounded objects rather than raw functions. -/
-abbrev DegreeBoundedLineAnswer (params : Parameters) :=
-  Fq params → Fq params
+/-- Degree-bounded axis-line answers: univariate polynomials of degree at most `params.d`
+over the chosen field model. Coerces to a raw function `Fq params → Fq params` via
+`AxisLinePolynomial.toFun`. -/
+abbrev DegreeBoundedLineAnswer (params : Parameters) [FieldModel params.q] :=
+  AxisLinePolynomial params
 
 /-- Axis-parallel lines are finitely enumerable via their base point and direction. -/
 noncomputable instance (params : Parameters) : Fintype (AxisParallelLine params) := by
@@ -58,6 +63,12 @@ noncomputable instance (params : Parameters) : Fintype (AxisParallelLine params)
 /-- The placeholder finite polynomial model uses classical equality on the bundled witness. -/
 noncomputable instance (params : Parameters) [FieldModel params.q] :
     DecidableEq (Polynomial params) :=
+  Classical.decEq _
+
+/-- The axis-parallel line polynomial model uses classical equality on the bundled witness.
+Required by `MatrixSubmeasurement (DegreeBoundedLineAnswer params) ...`. -/
+noncomputable instance (params : Parameters) [FieldModel params.q] :
+    DecidableEq (AxisLinePolynomial params) :=
   Classical.decEq _
 
 /-- A default low-degree polynomial used so uniform placeholder distributions are inhabited. -/
