@@ -335,6 +335,7 @@ noncomputable def classicalRoleSymmStrategy {params : Parameters}
   haveI : Nonempty ι := strategy.isNormalized.nonempty.map Prod.fst
   { state := classicalRoleSymmState strategy.state
     permInvState := classicalRoleSymmState_permInvState strategy.state
+    densityFixed := classicalRoleSymmState_density_fixed strategy.state
     isNormalized :=
       classicalRoleSymmState_isNormalized strategy.state strategy.isNormalized
     pointMeasurement := strategy.symmetrizedPointMeasurement

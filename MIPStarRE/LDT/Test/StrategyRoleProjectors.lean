@@ -234,7 +234,13 @@ noncomputable def classicalRoleSymmState {ι : Type*} [Fintype ι] [DecidableEq 
       (smul_nonneg (by norm_num) hAB)
       (smul_nonneg (by norm_num) hBA)
 
-@[simp] private lemma classicalRoleSymmState_density_fixed {ι : Type*}
+/-- Swap-invariance of the classical role-register symmetrized density.
+
+The symmetrized density is built by summing the `(A, B)` sector of the original
+state with the `(B, A)` sector of the swapped state, so swapping the two sides
+exchanges the two summands and leaves the total invariant. This is the
+`densityFixed` witness required to package a `SymStrat`. -/
+@[simp] theorem classicalRoleSymmState_density_fixed {ι : Type*}
     [Fintype ι] [DecidableEq ι] (ψ : QuantumState (ι × ι)) :
     swapDensity (classicalRoleSymmState ψ).density = (classicalRoleSymmState ψ).density := by
   calc
