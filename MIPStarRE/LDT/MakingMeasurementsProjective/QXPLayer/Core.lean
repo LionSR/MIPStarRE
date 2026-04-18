@@ -122,6 +122,50 @@ structure ProjectiveNonMeasurementBridgePackage {Outcome : Type*}
         RoundingToProjectorsWitness ψ A ζ R ∧
           ∑ a, R.outcome a = R.total
 
+/-- Output of the auxiliary-space construction used inside
+`lem:projective-low-rank-sum`: the paper's auxiliary Hilbert space
+`ℂ^m` together with the diagonal projective measurement `T_a` on it,
+and the paper's rank bound `m ≤ d`. -/
+structure RankReductionAuxOutput (Outcome : Type uOutcome) [Fintype Outcome]
+    (ι : Type uι) [Fintype ι] [DecidableEq ι] where
+  /-- Auxiliary Hilbert space (paper's `ℂ^m`). -/
+  auxSpace : FiniteHilbertSpace.{uι}
+  /-- Diagonal projective measurement `T_a` on the auxiliary space. -/
+  t : ProjMeas Outcome auxSpace.carrier
+  /-- Paper's rank bound `m ≤ d`. -/
+  auxDim_le : Fintype.card auxSpace.carrier ≤ Fintype.card ι
+
+/-- Temporary bridge package for the auxiliary-space-and-`T` construction in
+the rank-reduction step (`lem:projective-low-rank-sum`, orthonormalization.tex
+Lem 5.5).
+
+Given a rounded projective family `R_a` on `ι` whose total stays bounded by
+`(1 + 2√ζ)·I`, the paper's proof constructs an auxiliary Hilbert space `ℂ^m`
+with `m = ∑_a rank(Q_a) ≤ d` and diagonal projective measurements
+`T_a = ∑_i |a,i⟩⟨a,i|` on it, used downstream in the `X/XHat/P` layer
+construction.
+
+The matrix-level spectral argument — eigenvector basis of each rounded
+projector `R_a`, followed by the indexed-slab construction on
+`Σ_a Fin (rank R_a)` — is isolated here as an opaque producer until the
+supporting spectral lemmas (e.g., `Matrix.IsHermitian.eigenvectorBasis`
+restricted to the 1-eigenspace of a projector, plus a matrix-level
+`rank_of_isProj`) land in Mathlib or in the project.  This mirrors the
+existing `ProjectiveNonMeasurementBridgePackage` /
+`SpectralTruncationBridgePackage` / `ProjectivizationRepairPackage` pattern:
+the linear-algebra debt is centralized in one bridge rather than hidden
+behind a `default` witness. -/
+structure RankReductionBridgePackage {Outcome : Type uOutcome} [Fintype Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
+  /-- Given any rounded projective family produced by
+  `ProjectiveNonMeasurementBridgePackage`, produce the paper's `(auxSpace,
+  T_a)` pair together with the `m ≤ d` rank bound. -/
+  fromRounded :
+    ∀ (q : OpFamily Outcome ι),
+      RoundingToProjectorsWitness ψ A ζ q →
+        RankReductionAuxOutput Outcome ι
+
 /-- The raw operator family obtained by sandwiching the auxiliary projectors
 `T_a` with a candidate `XHat`. This is the family later named `P`. -/
 noncomputable def pFamilyFromXHat {Outcome : Type*} [Fintype Outcome]
