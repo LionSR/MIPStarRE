@@ -1,4 +1,7 @@
-import MIPStarRE.LDT.GlobalVariance.Defs
+import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
+import MIPStarRE.LDT.GlobalVariance.Defs.Core
+import MIPStarRE.LDT.GlobalVariance.Defs.Operators
+import MIPStarRE.LDT.GlobalVariance.Defs.Families
 
 /-!
 # Section 8 — Matrix realization

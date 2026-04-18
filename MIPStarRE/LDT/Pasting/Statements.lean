@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.Sandwich
+import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 
 /-!
 # Section 12 — Statements
