@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency
+import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
+import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
+import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
 
 /-!
 # Preliminary comparison theorems: completion and chain rules

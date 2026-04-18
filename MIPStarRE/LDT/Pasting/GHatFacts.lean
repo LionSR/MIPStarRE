@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.CommutingWithG
+import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 
 /-!
 # Section 12 pasting: G-hat facts

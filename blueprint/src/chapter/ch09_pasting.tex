@@ -737,6 +737,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \begin{corollary}[Consistency of the completed $H$ with $A$]
 	\label{cor:h-a-consistency-completed}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed}
+	\leanok
 	\uses{cor:h-a-consistency, cor:ld-pasting-N-completeness}
 	Let $H_{\mathrm{meas}}$ be the completion of $H$ at the fallback outcome.
 	On average over $(u,x) \sim \F_q^{m+1}$,
@@ -745,6 +746,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 \end{corollary}
 \begin{proof}
+	\leanok
 	Corollary~\ref{cor:h-a-consistency} gives
 	\[
 		H_{[h(u,x)=a]} \ot I \simeq_{\nu} I \ot A_a^{u,x}.

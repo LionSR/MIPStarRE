@@ -1,0 +1,147 @@
+import MIPStarRE.LDT.Pasting.Defs.Interpolation
+
+/-!
+# Section 12 — Definitions: consistency and families
+
+Global-consistency predicates and the completed-slice family wrappers.
+-/
+
+namespace MIPStarRE.LDT.Pasting
+
+open MIPStarRE.LDT
+open MIPStarRE.LDT.ExpansionHypercubeGraph
+open MIPStarRE.LDT.CommutativityPoints
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- A completed-slice tuple `gs` is globally consistent at evaluation
+points `xs` if there exists a single polynomial `h` in `m+1` variables
+whose restriction to each genuine slice height `xᵢ` agrees with the
+corresponding slice polynomial `gᵢ`.
+
+This matches the paper's `Global_τ(x)` predicate from
+`references/ldt-paper/ld-pasting.tex` lines 1123-1131. -/
+def IsGloballyConsistent (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k) : Prop :=
+  ∃ h : Polynomial params.next,
+    ∀ i : Fin k, ∀ (hi : (gs i).isSome = true),
+      (Polynomial.restrictAtHeight params h (xs i)).poly =
+        ((gs i).get hi).poly
+
+/-- `IsGloballyConsistent params xs` is decidable (classically),
+needed for `restrictSubMeas` filtering. -/
+noncomputable instance isGloballyConsistent_decidablePred
+    (params : Parameters) [FieldModel params.q] {k : ℕ}
+    (xs : PointTuple params k) :
+    DecidablePred (IsGloballyConsistent params xs) :=
+  fun _gs => Classical.dec _
+
+/-- The subset `\mathsf{Global}_\tau(x)` of `\mathsf{Outcomes}_\tau` consisting of
+tuples that arise from restrictions of a single global polynomial at the slice
+heights `xs`. -/
+def globallyConsistentOutcomesByType (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k) (τ : GHatType k) :
+    Set (GHatTupleOutcome params k) :=
+  { gs | gs ∈ outcomesByType τ ∧ IsGloballyConsistent params xs gs }
+
+/-- The complement `\overline{\mathsf{Global}_\tau(x)}` inside
+`\mathsf{Outcomes}_\tau`. -/
+def nonglobalOutcomesByType (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k) (τ : GHatType k) :
+    Set (GHatTupleOutcome params k) :=
+  outcomesByType τ \ globallyConsistentOutcomesByType params xs τ
+
+/-- Recover a global polynomial from a completed-slice tuple.
+
+On the actual pasting path this map is only applied after restricting to tuples in
+`Global_τ(x)`, so it may choose any globally consistent witness. When no such
+witness exists, it falls back to the distinguished zero polynomial. -/
+noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel params.q] :
+    (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
+  | 0, _xs, _gs => fallbackInterpolatedPolynomial params
+  | k + 1, xs, gs => by
+      classical
+      exact if hEligible : InterpolationEligible params gs then
+        let σ := interpolationSupportSubset gs hEligible
+        interpolateCompletedSlicesFromSupport params xs gs σ
+          (interpolationSupportSubset_card gs hEligible)
+      else
+        fallbackInterpolatedPolynomial params
+
+/-- Aggregate the polynomial outcomes of `G^x` into its complete part `G^x`. -/
+noncomputable def completePartSubMeas (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
+  postprocess ((family.meas x).toSubMeas) (fun _ => ())
+
+/-- The total operator of the complete part is the original slice total. -/
+@[simp] theorem completePartSubMeas_total (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) :
+    (completePartSubMeas params family x).total = (family.meas x).total := by
+  simp [completePartSubMeas, postprocess_total]
+
+/-- The unique outcome of the complete part equals its total operator. -/
+@[simp] theorem completePartSubMeas_outcome_unit (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) :
+    (completePartSubMeas params family x).outcome () =
+      (completePartSubMeas params family x).total := by
+  rw [← (completePartSubMeas params family x).sum_eq_total]
+  simp [completePartSubMeas]
+
+/-- Placeholder for the incomplete part `G^x_⊥ = I - G^x`. -/
+noncomputable def incompletePartSubMeas (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
+  let X := 1 - (completePartSubMeas params family x).total
+  { outcome := fun _ => X
+    total := X
+    outcome_pos := by
+      intro _
+      exact sub_nonneg.mpr (completePartSubMeas params family x).total_le_one
+    sum_eq_total := by
+      simp
+    total_le_one := by
+      exact sub_le_self _ (completePartSubMeas params family x).total_nonneg }
+
+/-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
+noncomputable def gHatIdxMeas (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    IdxMeas (Fq params) (GHatOutcome params) ι :=
+  fun x => completeSubMeas ((family.meas x).toSubMeas)
+
+/-- The submeasurement view of the completed family `\widehat G`. -/
+noncomputable def gHatIdxSubMeas (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (Fq params) (GHatOutcome params) ι :=
+  IdxMeas.toIdxSubMeas (gHatIdxMeas params family)
+
+/-- Left tensor-placement for the complete part `G^x`
+on the bipartite space `d * d`. -/
+noncomputable def completePartLeftFamily (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
+  fun x => leftPlacedSubMeas (ιB := ι) (completePartSubMeas params family x)
+
+/-- Right tensor-placement for the complete part `G^x`
+on the bipartite space `d * d`. -/
+noncomputable def completePartRightFamily (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
+  fun x => rightPlacedSubMeas (ιA := ι) (completePartSubMeas params family x)
+
+/-- Left tensor-placement for the incomplete part `G^x_⊥`
+on the bipartite space `d * d`. -/
+noncomputable def incompletePartLeftFamily (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
+  fun x => leftPlacedSubMeas (ιB := ι) (incompletePartSubMeas params family x)
+
+/-- Right tensor-placement for the incomplete part `G^x_⊥`
+on the bipartite space `d * d`. -/
+noncomputable def incompletePartRightFamily (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    IdxSubMeas (SliceQuestion params) Unit (ι × ι) :=
+  fun x => rightPlacedSubMeas (ιA := ι) (incompletePartSubMeas params family x)
+
+end MIPStarRE.LDT.Pasting
