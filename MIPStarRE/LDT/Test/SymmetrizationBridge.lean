@@ -6,29 +6,35 @@ import MIPStarRE.LDT.Test.Strategy
 This file packages the classical role-register symmetrization of
 `references/ldt-paper/test_definition.tex` and
 `references/ldt-paper/inductive_step.tex` (paragraph starting at line 26)
-into the public API consumed by `MIPStarRE.LDT.Test.MainTheorem.mainFormal`.
+into the public API consumed by `MIPStarRE.LDT.Test.mainFormal`.
 
-The paper's construction introduces a two-dimensional role register on each
-side and takes the symmetrized state
+The paper motivates the construction using a two-dimensional role register
+on each side.  In this Lean development, the corresponding symmetrized
+state is implemented by `classicalRoleSymmState`: a block-diagonal density
+operator on the `(Role × ι)`-indexed strategy space, with one block for
+the `A/B` role assignment carrying the original state and one block for
+the `B/A` assignment carrying the swapped state, together with
+block-diagonal symmetrized measurements.  An explicit scalar `2` on each
+occupied role sector compensates for the normalized-trace convention on
+the enlarged ambient space; there are no coherent cross terms between
+the two role assignments.
 
-  `|ψ_sym⟩ = |0⟩_{A'}|1⟩_{B'} |ψ⟩_{AB} + |1⟩_{A'}|0⟩_{B'} |ψ_swap⟩_{AB}`
-
-together with block-diagonal symmetrized measurements.  The underlying Lean
-construction is `ProjStrat.classicalRoleSymmStrategy` on the `(Role × ι)` index
-type, which already exists in `MIPStarRE.LDT.Test.Strategy`.  This bridge
-module exposes the two facts required to start the proof of `thm:main-formal`:
+This bridge module exposes the two facts required to start the proof of
+`thm:main-formal`:
 
 * `ProjStrat.strategySymmetrization` — public alias for
   `classicalRoleSymmStrategy`, giving a role-register symmetrized
   `SymStrat params (Role × ι)` from any `ProjStrat params ι`.
-* `ProjStrat.strategySymmetrization_isGood_three_mul` — the paper's goodness
-  preservation: if the original strategy passes the
+* `ProjStrat.strategySymmetrization_isGood_three_mul` — the paper's
+  goodness preservation: if the original strategy passes the
   `(m,q,d)`-low individual degree test with error `ε`, the symmetrized
   strategy is `(3ε, 3ε, 3ε)`-good.  This matches paper line 33,
-  `(ψ,A^A,B^A,L^A,A^B,B^B,L^B) is a (3ε,3ε,3ε)-good strategy`, combined with
-  the observation that symmetrization preserves goodness exactly.
+  `(ψ,A^A,B^A,L^A,A^B,B^B,L^B) is a (3ε,3ε,3ε)-good strategy`,
+  combined with the observation that symmetrization preserves goodness
+  exactly.
 * `ProjStrat.strategySymmetrization_isNormalized` — normalization of the
-  symmetrized state, assuming the original state is normalized.
+  symmetrized state, inherited from the `isNormalized` field already
+  bundled into `ProjStrat`.
 
 ## References
 
@@ -38,8 +44,6 @@ module exposes the two facts required to start the proof of `thm:main-formal`:
   `blueprint/src/chapter/ch10_induction.tex`.
 -/
 
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
-
 namespace MIPStarRE.LDT
 
 namespace ProjStrat
@@ -48,15 +52,16 @@ namespace ProjStrat
 
 Public alias for `ProjStrat.classicalRoleSymmStrategy`, wrapping a
 `ProjStrat params ι` as a symmetric strategy
-`SymStrat params (Role × ι)` via the paper's construction from
-`references/ldt-paper/inductive_step.tex` (lines 44–61).  The two players'
-local Hilbert spaces are each extended by a two-dimensional role register, the
-bipartite state is replaced by
-
-  `|ψ_sym⟩ = |0⟩_{A'}|1⟩_{B'} |ψ⟩_{AB} + |1⟩_{A'}|0⟩_{B'} |ψ_swap⟩_{AB}`,
-
-and each measurement becomes block-diagonal over the role register, applying
-Alice's original measurement on the `|0⟩` block and Bob's on the `|1⟩` block.
+`SymStrat params (Role × ι)` via the Lean construction
+`classicalRoleSymmState` from `MIPStarRE.LDT.Test.StrategyRole`.  Each
+player's local Hilbert space is extended by a two-dimensional role
+register, and the bipartite state is replaced by the block-diagonal
+density operator supported on the `A/B` and `B/A` role sectors: the
+`A/B` block carries the original state and the `B/A` block carries the
+swapped state, each scaled by `2` to match the normalized-trace
+convention on the enlarged ambient space.  Each measurement becomes
+block-diagonal over the role register, applying Alice's original
+measurement on the `A` block and Bob's on the `B` block.
 
 Downstream Step 1 of `MIPStarRE.LDT.Test.mainFormal` invokes this alias
 together with `strategySymmetrization_isGood_three_mul` to reduce
@@ -87,13 +92,15 @@ theorem strategySymmetrization_isGood_three_mul {params : Parameters}
 /-- Normalization preservation for the role-register symmetrization.
 
 The symmetrized state inherits trace normalization from the original bipartite
-state.  Together with `strategySymmetrization_isGood_three_mul` this is
-everything Step 1 of `mainFormal` needs to hand off to `thm:main-induction`. -/
+state.  Normalization is already bundled as the `isNormalized` field of
+`ProjStrat`, so no additional hypothesis is required here.  Together with
+`strategySymmetrization_isGood_three_mul` this is everything Step 1 of
+`mainFormal` needs to hand off to `thm:main-induction`. -/
 theorem strategySymmetrization_isNormalized {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (strategy : ProjStrat params ι) (hψ : strategy.state.IsNormalized) :
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
     (strategy.strategySymmetrization).state.IsNormalized :=
-  strategy.classicalRoleSymmStrategy_isNormalized hψ
+  strategy.classicalRoleSymmStrategy_isNormalized
 
 end ProjStrat
 

@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Test.Classical
-import MIPStarRE.LDT.Test.SymmetrizationBridge
 
 /-!
 # Section 3 — Main theorem
@@ -185,8 +184,7 @@ The bipartite tensor placement follows the paper:
 Fixes #137, #239.
 -/
 theorem mainFormal
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι)
     (eps : Error)
     (hd : 0 < params.d)
@@ -207,15 +205,10 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  -- Step 1 of 8 (inductive_step.tex:26–66): role-register symmetrization.
-  -- The symmetrized strategy lives on the `(Role × ι)`-enlarged space and is
-  -- `(3ε, 3ε, 3ε)`-good by `ProjStrat.strategySymmetrization_isGood_three_mul`.
-  have _hsym_good :
-      (strategy.strategySymmetrization).IsGood (3 * eps) (3 * eps) (3 * eps) :=
-    ProjStrat.strategySymmetrization_isGood_three_mul hpass
-  -- TODO(Section 3, Steps 2–8): apply `thm:main-induction` to the symmetrized
-  -- strategy, unsymmetrize the resulting `G` measurement into `G^A, G^B`,
-  -- apply Schwartz–Zippel, projectivize, and bookkeep the error parameters.
+  -- TODO(Section 3): formalize the paper-faithful assembly from `hpass` and
+  -- `hk` through role-register symmetrization, `thm:main-induction`,
+  -- unsymmetrization, Schwartz-Zippel, and the final projectivization and
+  -- error bookkeeping argument.
   sorry
 
 end Test
