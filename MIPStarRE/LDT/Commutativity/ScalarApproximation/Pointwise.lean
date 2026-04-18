@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG
 
+/-!
+# Section 11 commutativity: pointwise scalar approximation
+
+Pointwise overlap terms `⟨ψ, (I - G^x) ⊗ G^x ψ⟩` controlling both sides of
+the `G`-stability estimate, used as the base for the averaged scalar bound.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

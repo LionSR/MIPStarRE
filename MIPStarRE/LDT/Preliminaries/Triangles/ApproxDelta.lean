@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Preliminaries.Triangles.Consistency
 
+/-!
+# Triangle inequalities: binary `approx_δ` composition
+
+Records the binary composition step of `prop:triangle-inequality-for-approx_delta`
+from the paper; the iterated chain version follows by induction on chain length.
+
+## References
+
+- arXiv:2009.12982, Section 7 (triangle inequalities for state-dependent distance).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

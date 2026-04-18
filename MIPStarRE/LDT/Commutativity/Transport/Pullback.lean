@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.Commutativity.Transport.EvaluationSpecialization
 
+/-!
+# Section 11 commutativity: evaluated-slice pullback
+
+Pullback equivalence reindexing evaluated-slice questions into their truncated
+points and the underlying full-slice question, used to transport full-slice
+bounds.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

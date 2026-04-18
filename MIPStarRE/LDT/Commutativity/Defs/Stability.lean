@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Commutativity.Defs.Core
 
+/-!
+# Section 11 commutativity: stability definitions
+
+Reindexing and postprocessing infrastructure used in the full-slice and
+stability reductions, including the weighted reindex of raw operator families.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

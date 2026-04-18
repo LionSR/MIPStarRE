@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Pointwise
 
+/-!
+# Section 11 commutativity: `G`-stability overlap (step one)
+
+First overlap-averaging step for the `G`-stability argument: averaging the
+common overlap term over `Point params.next` reduces to a single-coordinate
+integral.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

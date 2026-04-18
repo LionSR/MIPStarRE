@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.Completeness
 
+/-!
+# Preliminary comparison theorems: bipartite self-consistency (core)
+
+Core building blocks for bipartite self-consistency: reflexivity of the
+question-level state-dependent distance `qSDD` and its lift to the family-level
+`sddError`.
+
+## References
+
+- arXiv:2009.12982, Section 7 (self-consistency preliminaries).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

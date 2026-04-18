@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.Commutativity.Scaffold.Symmetry
 
+/-!
+# Section 11 commutativity: scaffold product lemmas
+
+Basic product-style lemmas on projective submeasurement outcomes — in
+particular orthogonality of distinct outcomes — reused throughout the
+Section 11 commutativity argument.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

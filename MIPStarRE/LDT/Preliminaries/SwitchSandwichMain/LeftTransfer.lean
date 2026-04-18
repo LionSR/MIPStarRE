@@ -2,6 +2,18 @@ import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Left
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Middle
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
 
+/-!
+# Switch-sandwich main: left-to-middle transfer
+
+The left-to-middle transfer estimate used in `prop:switch-sandwich`, bounding
+the gap between the left and middle expressions via the Cauchy–Schwarz-based
+gap bounds.
+
+## References
+
+- arXiv:2009.12982, Section 7 (`prop:switch-sandwich`).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

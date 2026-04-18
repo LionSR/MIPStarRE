@@ -4,6 +4,17 @@ import MIPStarRE.LDT.Preliminaries.Polynomials
 import MIPStarRE.LDT.Preliminaries.SelfConsistency
 import MIPStarRE.LDT.Test.Strategy
 
+/-!
+# Section 11 commutativity: scaffold core
+
+Core operator-ordering notation and basic scaffolding lemmas shared across
+the Section 11 commutativity argument.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Commutativity.Scaffold.Products
 
+/-!
+# Section 11 commutativity: evaluated-slice bounds for phases 1 and 3
+
+Closeness-of-inner-product side conditions for inserting Bob's measurement
+into the evaluated-slice step (phases 1 and 3 in the paper proof).
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

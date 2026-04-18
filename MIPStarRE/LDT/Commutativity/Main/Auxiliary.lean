@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice
 
+/-!
+# Section 11 commutativity: auxiliary transport lemmas
+
+Schwartz–Zippel marginalization helpers (`eq:evaluate-gcom-at-points`,
+`eq:gcom4-diff`) used in the final full-slice commutation theorem.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

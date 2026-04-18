@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Core
 
+/-!
+# Switch-sandwich gap bounds: left gap
+
+The left gap estimate `question_switchSandwich_left_gap`, bounding the
+question-level left gap of the switch-sandwich argument.
+
+## References
+
+- arXiv:2009.12982, Section 7 (switch-sandwich gap estimates).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

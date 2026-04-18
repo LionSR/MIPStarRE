@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseOneThree
 
+/-!
+# Section 11 commutativity: evaluated-slice bound for phase 2
+
+Fixed-outcome expansion for the phase-2 `G^y`-insertion summand, bridging to
+the `commDataProcessedGStabilityOneLeft` family for `gCommStability_overlap`.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

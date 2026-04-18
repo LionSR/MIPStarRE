@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Fourier
 
+/-!
+# Section 7 hypercube graph: additive characters
+
+Additive characters on `Point params`, providing the character theory used to
+diagonalize the hypercube graph via the discrete Fourier transform.
+
+## References
+
+- arXiv:2009.12982, Section 7 (expansion of the hypercube graph).
+-/
+
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
 open MIPStarRE.LDT

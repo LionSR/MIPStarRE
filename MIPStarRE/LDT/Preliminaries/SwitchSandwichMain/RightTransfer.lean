@@ -1,5 +1,15 @@
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
 
+/-!
+# Switch-sandwich main: middle-to-right transfer
+
+The middle-to-right transfer estimate used in `prop:switch-sandwich`.
+
+## References
+
+- arXiv:2009.12982, Section 7 (`prop:switch-sandwich`).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

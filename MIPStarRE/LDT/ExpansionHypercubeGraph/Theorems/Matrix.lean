@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Foundations
 
+/-!
+# Section 7 hypercube graph: matrix-realization theorems
+
+Translating the squared-difference expectation of the hypercube graph
+operators into the `ev`-based inner-product language of the matrix
+realization model.
+
+## References
+
+- arXiv:2009.12982, Section 7 (expansion of the hypercube graph).
+-/
+
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
 open MIPStarRE.LDT

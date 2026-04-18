@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.CommutativityPoints.Theorem
 
+/-!
+# Section 11 commutativity: core definitions
+
+Outcome and question abbreviations for the evaluated-slice, full-slice, and
+stability steps of the Section 11 commutativity argument.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

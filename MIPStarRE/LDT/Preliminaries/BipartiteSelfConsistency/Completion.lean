@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
 
+/-!
+# Preliminary comparison theorems: bipartite self-consistency (completion)
+
+Completion-transfer lemmas for bipartite self-consistency: reducing `consError`
+on a `Unit`-indexed constant family to the underlying `qConsDefect`.
+
+## References
+
+- arXiv:2009.12982, Section 7 (self-consistency preliminaries).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

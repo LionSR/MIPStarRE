@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
 
+/-!
+# Switch-sandwich preparation: `approx_δ` overlap gaps
+
+Pointwise overlap-gap estimates used to bound the switch-sandwich approximation
+error under `approx_δ` families.
+
+## References
+
+- arXiv:2009.12982, Section 7 (switch-sandwich preliminaries, `prop:switch-sandwich`).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

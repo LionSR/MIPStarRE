@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.Commutativity.GCommStability.OverlapTwo
 
+/-!
+# Section 11 commutativity: transport via evaluation specialization
+
+Postprocessing identities for `leftPlacedOpFamily` of bilinear products, used
+to transport bounds across evaluation specializations of the full-slice
+commutation argument.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

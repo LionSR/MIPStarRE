@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.PhaseFourFive
 
+/-!
+# Section 11 commutativity: evaluated-slice averaged expansion
+
+Averaged evaluated-slice expansion of `qSDDOp` into the four projector terms
+`BAB + ABA - BABA - ABAB`, used to reduce the commutation to per-projector
+estimates.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

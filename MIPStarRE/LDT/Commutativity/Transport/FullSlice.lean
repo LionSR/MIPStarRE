@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Commutativity.Transport.Pullback
 
+/-!
+# Section 11 commutativity: full-slice transport
+
+Zero-family definition and full-slice transport lemmas assembling the
+evaluated-slice bounds into the ambient full-slice outcome space.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

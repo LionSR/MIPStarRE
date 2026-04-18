@@ -3,7 +3,14 @@ import MIPStarRE.LDT.Basic.ParametersBase
 /-!
 # Axis-parallel lines for the low individual degree test
 
-Axis-parallel line geometry on top of the core parameter infrastructure.
+Axis-parallel line geometry on top of the core parameter infrastructure:
+`AxisParallelLine` records a base point and a coordinate direction, with
+canonical parameterization, rebasing, and slice-embedding operations.
+
+## References
+
+- arXiv:2009.12982, Section 3 (low individual degree test, axis-parallel line
+  questions).
 -/
 
 namespace MIPStarRE.LDT

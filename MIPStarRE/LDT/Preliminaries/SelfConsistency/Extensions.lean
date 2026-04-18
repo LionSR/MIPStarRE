@@ -1,6 +1,17 @@
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Core
 
+/-!
+# Self-consistency: strategy-level extensions
+
+Good-strategy characterization lemmas (`lem:good-strategy-characterization`)
+bundling the axis-parallel, self-consistency, and diagonal branches.
+
+## References
+
+- arXiv:2009.12982, Section 7 (self-consistency preliminaries).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

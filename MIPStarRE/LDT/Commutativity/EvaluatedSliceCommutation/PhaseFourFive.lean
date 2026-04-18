@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseTwo
 
+/-!
+# Section 11 commutativity: evaluated-slice commutation (phases 4 and 5)
+
+Swap helpers transporting inserted scalar terms across the point-measurement
+commutation relation in phases 4 and 5 of `evaluatedSlice_scalar_chain_bound`.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

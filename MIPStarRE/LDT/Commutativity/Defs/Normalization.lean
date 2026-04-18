@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Commutativity.Defs.Stability
 
+/-!
+# Section 11 commutativity: normalization definitions
+
+The normalization-condition sandwich `C_{a,b} = Q_b P_a Q_b` and the associated
+indexed submeasurement family used in `lem:normalization-condition`.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.SharedLine
 
+/-!
+# Section 10 commutativity points: lift bridges
+
+Bridge lemmas lifting the ordered shared-line point product to the mixed
+line family, used in the lift direction of the Section 10 bridge argument.
+
+## References
+
+- arXiv:2009.12982, Section 10 (commutativity of the point measurements).
+-/
+
 namespace MIPStarRE.LDT.CommutativityPoints
 
 open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)

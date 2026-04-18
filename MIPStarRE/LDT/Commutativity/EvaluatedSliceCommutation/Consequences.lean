@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
 
+/-!
+# Section 11 commutativity: evaluated-slice commutation consequences
+
+Downstream consequences of the evaluated-slice commutation estimate: pulling
+single-point evaluated-family self-consistency bounds up to evaluated-slice
+questions.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

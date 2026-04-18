@@ -2,6 +2,17 @@ import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.LeftTransfer
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.RightTransfer
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
 
+/-!
+# Switch-sandwich main: completeness estimate
+
+`prop:switch-sandwich` assembled from the left and right transfer steps on a
+normalized quantum state with a subprobability distribution.
+
+## References
+
+- arXiv:2009.12982, Section 7 (`prop:switch-sandwich`).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

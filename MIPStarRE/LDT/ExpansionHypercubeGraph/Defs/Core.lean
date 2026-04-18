@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 
+/-!
+# Section 7 hypercube graph: core definitions
+
+Vertex-set cardinality and base-`q` digit encoding for points in `F_q^m`,
+used to index the hypercube graph operators.
+
+## References
+
+- arXiv:2009.12982, Section 7 (expansion of the hypercube graph).
+-/
+
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
 open MIPStarRE.LDT

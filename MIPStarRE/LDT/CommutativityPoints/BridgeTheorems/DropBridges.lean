@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.LiftBridges
 
+/-!
+# Section 10 commutativity points: drop bridges
+
+Bridge lemmas that drop structure from the mixed line family back to the
+ordered diagonal-line product, used in the drop direction of the Section 10
+bridge argument.
+
+## References
+
+- arXiv:2009.12982, Section 10 (commutativity of the point measurements).
+-/
+
 namespace MIPStarRE.LDT.CommutativityPoints
 
 open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)

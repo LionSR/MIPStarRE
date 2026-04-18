@@ -2,6 +2,17 @@ import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
 
+/-!
+# Self-consistency: core squared-mass bounds
+
+Squared-mass lower bound lemma derived from bipartite self-consistency on
+permutation-invariant states (`prop:cool-prop`).
+
+## References
+
+- arXiv:2009.12982, Section 7 (self-consistency preliminaries).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

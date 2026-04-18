@@ -1,6 +1,17 @@
 import Mathlib.Algebra.Order.Chebyshev
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
+/-!
+# Triangle inequalities: core symmetries
+
+Symmetry lemmas for the question-level state-dependent distance `qSDD` and its
+averaged `sddError`, used as the base case of the triangle chain.
+
+## References
+
+- arXiv:2009.12982, Section 7 (triangle inequalities for state-dependent distance).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

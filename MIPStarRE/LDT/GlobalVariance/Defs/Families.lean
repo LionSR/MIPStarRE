@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.GlobalVariance.Defs.Operators
 
+/-!
+# Section 8 global variance: operator families
+
+Positivity and normalization lemmas for the point-conditioned outcome
+operator families used to build the global-variance comparisons.
+
+## References
+
+- arXiv:2009.12982, Section 8 (global variance).
+-/
+
 namespace MIPStarRE.LDT.GlobalVariance
 
 open MIPStarRE.LDT

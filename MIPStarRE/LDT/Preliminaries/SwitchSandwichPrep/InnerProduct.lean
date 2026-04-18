@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
 
+/-!
+# Switch-sandwich preparation: inner-product bounds
+
+Cauchy–Schwarz-style inner-product bounds in the `avgOver` formulation used by
+the switch-sandwich argument.
+
+## References
+
+- arXiv:2009.12982, Section 7 (switch-sandwich preliminaries, `prop:switch-sandwich`).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

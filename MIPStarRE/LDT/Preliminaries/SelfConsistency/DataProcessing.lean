@@ -3,6 +3,17 @@ import MIPStarRE.LDT.Preliminaries.Triangles.Core
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.Completeness
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 
+/-!
+# Self-consistency: data processing
+
+`prop:self-consistency-implies-data-processing`: self-consistency implies that
+postprocessing a measurement cannot substantially decrease consistency.
+
+## References
+
+- arXiv:2009.12982, Section 7 (self-consistency preliminaries).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

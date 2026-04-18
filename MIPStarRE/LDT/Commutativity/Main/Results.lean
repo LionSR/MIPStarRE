@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Commutativity.Main.EvaluatedQuestions
 
+/-!
+# Section 11 commutativity: final results
+
+Top-level `thm:com-main` statement, lifting evaluated commutation back to
+full-slice commutation via the two-step Schwartz–Zippel marginalization.
+
+## References
+
+- arXiv:2009.12982, Section 11 (`thm:com-main`).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

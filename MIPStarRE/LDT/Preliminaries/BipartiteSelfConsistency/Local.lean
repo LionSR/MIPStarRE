@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
 
+/-!
+# Preliminary comparison theorems: bipartite self-consistency (local bridges)
+
+Bridge lemmas connecting the bipartite self-consistency relation on a
+permutation-invariant state to the single-sided local self-consistency relation
+after a left/right lift of the family.
+
+## References
+
+- arXiv:2009.12982, Section 7 (self-consistency preliminaries).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

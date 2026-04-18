@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Commutativity.Main.Auxiliary
 
+/-!
+# Section 11 commutativity: evaluated-question transport
+
+Core Schwartz–Zippel transport on the evaluated-question space, comparing
+full-polynomial and point-evaluated outcomes.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

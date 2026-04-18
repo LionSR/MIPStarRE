@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
 
+/-!
+# Switch-sandwich gap bounds: Cauchy–Schwarz core
+
+Shared Cauchy–Schwarz contraction used in both the left and middle gap
+estimates of the switch-sandwich argument.
+
+## References
+
+- arXiv:2009.12982, Section 7 (switch-sandwich gap estimates).
+-/
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.Preliminaries

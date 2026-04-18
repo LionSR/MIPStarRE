@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 
+/-!
+# Section 10 commutativity points: shared-line helpers
+
+Compatibility lemmas between sampled point pairs and shared-diagonal line
+questions, used by both the lift and drop bridges.
+
+## References
+
+- arXiv:2009.12982, Section 10 (commutativity of the point measurements).
+-/
+
 namespace MIPStarRE.LDT.CommutativityPoints
 
 open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
