@@ -79,13 +79,10 @@ absorbed form as a downstream calculation.
   (orthonormalization theorem).
 -/
 
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
-
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
-open MIPStarRE.LDT.Preliminaries (completingToMeasurement completeAtOutcome
-  CompletingToMeasStmt)
+open MIPStarRE.LDT.Preliminaries (completingToMeasurement completeAtOutcome)
 
 /-! ### Error functions -/
 
