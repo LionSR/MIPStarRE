@@ -158,7 +158,7 @@ theorem selfImprovement
         (selfImprovementHelperError params eps delta) :=
     hbridges.helperStrongSelfConsistency hhelper
   rcases orthonormalization strategy.state hbridges.normalizedState
-      hbridges.permInvariant Hhat
+      strategy.permInvState Hhat
       (selfImprovementHelperError params eps delta)
       hssc (hbridges.orthonormalizationBridge hssc) with ⟨H, horth⟩
   have hdata :

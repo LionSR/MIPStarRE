@@ -273,9 +273,21 @@
 
 \section{Proof of the main formal theorem}
 
+\begin{lemma}[Role-register symmetrization bridge]\label{lem:symmetrization-bridge}
+	\lean{MIPStarRE.LDT.ProjStrat.strategySymmetrization, MIPStarRE.LDT.ProjStrat.strategySymmetrization_isGood_three_mul, MIPStarRE.LDT.ProjStrat.strategySymmetrization_isNormalized}
+	\leanok
+	\uses{def:projective-strategy, def:symmetric-projective-strategy, def:good-strategy}
+	Let $(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})$ be a projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Introducing a two-dimensional role register on each side and taking $(\psi_{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})$ as in paper Section~3 yields a symmetric projective strategy that is $(3\eps,3\eps,3\eps)$-good.
+\end{lemma}
+\begin{proof}
+	\leanok
+	\uses{def:projective-strategy, def:good-strategy}
+	Each of the three subtests (axis-parallel, self-consistency, diagonal) occurs with probability $1/3$, so the total failure probability at most $\eps$ implies each branch is at most $3\eps$. Block-diagonalizing the measurements over the role register preserves the axis-parallel and diagonal branch averages exactly, and the cross-register self-consistency branch of the symmetrized strategy equals the original point-agreement defect, which is itself bounded by $3\eps$.
+\end{proof}
+
 \begin{proof}
 	\proves{thm:main-formal}
-	\uses{thm:main-induction, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual}
+	\uses{thm:main-induction, lem:symmetrization-bridge, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual}
 	Let
 	\[
 		(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})

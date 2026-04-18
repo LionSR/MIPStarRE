@@ -83,7 +83,7 @@ theorem selfImprovementInInductionSection
           simpa [bipartiteSSCError, sddError, avgOver, uniformDistribution, constSubMeasFamily]
             using
               Commutativity.qBipartiteSSCDefect_eq_half_qSDD_of_proj
-                strategy.state hbridges.permInvariant H
+                strategy.state strategy.permInvState H
         refine ⟨?_⟩
         rw [hssc_eq]
         have herr_nonneg : 0 ≤ SelfImprovement.selfImprovementError params eps delta := by
