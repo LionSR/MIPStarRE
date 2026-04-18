@@ -136,6 +136,11 @@ Last updated: 2026-04-18
   - verified `lake env lean MIPStarRE/LDT/Test/StrategyRoleProjectors.lean`
     and `lake env lean MIPStarRE/LDT/Test/StrategyRoleSymmetrization.lean`
     after adding those helpers
+  - ported `MainInductionStep.mainInductionBridgeFromPastedFamily`, so the
+    final `ldPastingInInductionSection -> mainInduction` handoff is now present
+    on this branch under the split-module API
+  - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Theorems.lean`
+    after adding that bridge theorem
   - traced the remaining `Test.mainFormal` path far enough to isolate two
     paper-level structural gaps:
     1. `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
@@ -156,6 +161,13 @@ Last updated: 2026-04-18
   - Concretely, `mainFormal` still needs the bridge chain through the upstream
     remaining sorries in `Commutativity/ScalarApproximation.lean`,
     `Commutativity/Main.lean`, and the Section 12 `Pasting` files.
+  - More precisely after this pass: the downstream handoff from pasting into
+    `mainInduction` is no longer missing, but there is still no theorem on the
+    current branch deriving the required slice-indexed polynomial family and its
+    `Complete` / `ConsistentWithPoints` / `StronglySelfConsistent` /
+    `SliceBoundednessInput` hypotheses directly from the symmetrized
+    `hpass : strategy.PassesLowIndividualDegreeTest eps`. Without that family
+    assembly, `Test.mainFormal` cannot instantiate the induction witness.
   - The geometric-line canonicalization is not merged on the live proof path in
     this branch: the commutativity bridge remains proved only for the older raw
     `PointDiagonalLineQuestion = DiagonalLine × Fq` model.
@@ -181,6 +193,11 @@ Last updated: 2026-04-18
     now-explicit Section 5/8/10 hypotheses and either proving them directly or
     replacing those wrapper surfaces by the real theorems they are standing in
     for, without adding new assumptions to `Test.mainFormal`
+  - the highest-leverage next theorem is the missing family-assembly step:
+    from the symmetrized strategy and the restricted-probability / per-slice
+    induction outputs, build the `IdxPolyFamily` plus the four hypotheses
+    consumed by `mainInductionBridgeFromPastedFamily`; only after that can the
+    new role-block unsymmetrization helpers be used to finish `Test.mainFormal`
   - continue up the Section 3 dependency chain, starting with the remaining
     projectivization / orthonormalization / commutativity / pasting wrappers
     needed to produce the witness consumed by `Test.mainFormal`.

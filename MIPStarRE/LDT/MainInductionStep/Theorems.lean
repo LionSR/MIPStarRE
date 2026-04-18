@@ -176,6 +176,55 @@ theorem ldPastingInInductionSection
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 
+/-! ## Main-induction bridge assembly
+
+The theorem in this section packages the final compositional step of the
+`thm:main-induction` proof at dimension `m + 1`, assuming the per-slice data at
+dimension `m` has already been assembled into an ambient polynomial family with
+the averaged pasting hypotheses.  The remaining recursive assembly
+(`restrict → induct-on-slices → self-improve → average`) is still left as
+explicit input. -/
+
+/-- Final bridge assembly for `thm:main-induction`.
+
+Given an `(m+1,q,d)` symmetric strategy together with a pasting-ready
+polynomial family over the slice index `Fq params`, `ldPastingInInductionSection`
+produces a measurement `H ∈ polymeas(m+1,q,d)` whose point-consistency error is
+`ldPastingInInductionError params k eps delta gamma kappa zeta`.  An explicit
+telescoping hypothesis then bounds this error by
+`mainInductionError params.next k eps delta gamma`, yielding the induction
+witness expected by `mainInduction` at dimension `m + 1`. -/
+theorem mainInductionBridgeFromPastedFamily
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : PastingBoundednessInput params strategy family zeta)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k)
+    (herror :
+      ldPastingInInductionError params k eps delta gamma kappa zeta ≤
+        mainInductionError params.next k eps delta gamma) :
+    ∃ error : Error, ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        error ∧
+      error ≤ mainInductionError params.next k eps delta gamma := by
+  obtain ⟨H, hH⟩ :=
+    ldPastingInInductionSection params strategy eps delta gamma kappa zeta
+      hgood hgamma_le hzeta_le hdq_le family hcomplete hcons hself hbound k hk
+  refine ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
+    hH.pointConsistency, herror⟩
+
 /-! ## Restricted-probability bookkeeping -/
 
 private lemma selfConsistencyRestrictedAverage_eq
