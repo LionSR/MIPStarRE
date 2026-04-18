@@ -147,6 +147,7 @@ theorem ldPastingInInductionSection
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : PastingBoundednessInput params strategy family zeta)
     (k : ℕ)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingInInductionSectionConclusion params strategy family H
@@ -154,7 +155,7 @@ theorem ldPastingInInductionSection
   have hldPasting :=
     Pasting.ldPasting params strategy eps delta gamma kappa zeta
       hgood _hgamma_le _hzeta_le _hdq_le
-      family hcomplete hcons hself hbound k hk
+      family hcomplete hcons hself hbound k hk_pos hk
   obtain ⟨H, hH⟩ := hldPasting
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩

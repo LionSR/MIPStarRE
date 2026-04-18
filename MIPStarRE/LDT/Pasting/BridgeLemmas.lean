@@ -131,6 +131,318 @@ private lemma consRel_uniform_fst
             exact avgOver_uniform_fst (fun a => qBipartiteConsDefect ψ (A a) (B a))
     _ ≤ δ := h
 
+private lemma qBipartiteMatchMass_nonneg
+    {Outcome : Type*} [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (A B : SubMeas Outcome ι) :
+    0 ≤ qBipartiteMatchMass ψ A B := by
+  unfold qBipartiteMatchMass
+  exact Finset.sum_nonneg fun a _ =>
+    ev_nonneg_of_psd ψ _ <| opTensor_nonneg (A.outcome_pos a) (B.outcome_pos a)
+
+private lemma qBipartiteConsDefect_le_one
+    {Outcome : Type*} [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hnorm : ψ.IsNormalized)
+    (A B : SubMeas Outcome ι) :
+    qBipartiteConsDefect ψ A B ≤ 1 := by
+  unfold qBipartiteConsDefect
+  have hmatch_nonneg : 0 ≤ qBipartiteMatchMass ψ A B := qBipartiteMatchMass_nonneg ψ A B
+  have htotal_le : ev ψ (opTensor A.total B.total) ≤ 1 := by
+    calc
+      ev ψ (opTensor A.total B.total) ≤ ev ψ (leftTensor (ι₂ := ι) A.total) := by
+            exact ev_mono ψ _ _ (opTensor_le_leftTensor A.total_nonneg B.total_le_one)
+      _ ≤ 1 := by
+            simpa [ev_one_of_isNormalized ψ hnorm] using
+              ev_mono ψ _ _ (leftTensor_le_one (ι₂ := ι) A.total_le_one)
+  have hinner : ev ψ (opTensor A.total B.total) - qBipartiteMatchMass ψ A B ≤ 1 := by
+    linarith
+  exact max_le_iff.mpr ⟨by positivity, hinner⟩
+
+private lemma bipartiteConsError_uniform_le_one
+    {Question Outcome : Type*}
+    [Fintype Question] [DecidableEq Question] [Nonempty Question]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hnorm : ψ.IsNormalized)
+    (A B : IdxSubMeas Question Outcome ι) :
+    bipartiteConsError ψ (uniformDistribution Question) A B ≤ 1 := by
+  unfold bipartiteConsError
+  calc
+    avgOver (uniformDistribution Question) (fun q => qBipartiteConsDefect ψ (A q) (B q))
+      ≤ avgOver (uniformDistribution Question) (fun _ => (1 : Error)) := by
+          exact avgOver_mono _ _ _ (fun q => qBipartiteConsDefect_le_one ψ hnorm (A q) (B q))
+    _ = 1 := by
+          simpa using avgOver_uniform_const (α := Question) (c := (1 : Error))
+
+private lemma bridge_ev_swapDensity_of_density_fixed
+    (ψ : QuantumState (ι × ι))
+    (hfix : swapDensity ψ.density = ψ.density)
+    (Z : MIPStarRE.Quantum.Op (ι × ι)) :
+    ev ψ (swapDensity Z) = ev ψ Z := by
+  have hswap_mul :
+      swapDensity (ψ.density * Z) = swapDensity ψ.density * swapDensity Z := by
+    simpa [swapDensity] using
+      (Matrix.reindexAlgEquiv_mul ℂ ℂ (Equiv.prodComm ι ι) ψ.density Z)
+  unfold ev
+  apply congrArg Complex.re
+  calc
+    MIPStarRE.Quantum.normalizedTrace (ψ.density * swapDensity Z)
+      = MIPStarRE.Quantum.normalizedTrace (swapDensity (ψ.density * Z)) := by
+          rw [hswap_mul]
+          simp [hfix]
+    _ = MIPStarRE.Quantum.normalizedTrace (ψ.density * Z) :=
+          normalizedTrace_swapDensity _
+
+private lemma bridge_ev_opTensor_swap_of_density_fixed
+    (ψ : QuantumState (ι × ι))
+    (hfix : swapDensity ψ.density = ψ.density)
+    (X Y : MIPStarRE.Quantum.Op ι) :
+    ev ψ (opTensor X Y) = ev ψ (opTensor Y X) := by
+  rw [show opTensor Y X = swapDensity (opTensor X Y) by
+    rw [swapDensity_opTensor]]
+  exact (bridge_ev_swapDensity_of_density_fixed ψ hfix (opTensor X Y)).symm
+
+private lemma bridge_qBipartiteMatchMass_symm_of_density_fixed
+    (ψ : QuantumState (ι × ι))
+    (hfix : swapDensity ψ.density = ψ.density)
+    {Outcome : Type*} [Fintype Outcome]
+    (A B : SubMeas Outcome ι) :
+    qBipartiteMatchMass ψ A B = qBipartiteMatchMass ψ B A := by
+  unfold qBipartiteMatchMass
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  exact bridge_ev_opTensor_swap_of_density_fixed ψ hfix (A.outcome a) (B.outcome a)
+
+private lemma bridge_qBipartiteConsDefect_symm_of_density_fixed
+    (ψ : QuantumState (ι × ι))
+    (hfix : swapDensity ψ.density = ψ.density)
+    {Outcome : Type*} [Fintype Outcome]
+    (A B : SubMeas Outcome ι) :
+    qBipartiteConsDefect ψ A B = qBipartiteConsDefect ψ B A := by
+  simp [qBipartiteConsDefect,
+    bridge_qBipartiteMatchMass_symm_of_density_fixed ψ hfix,
+    bridge_ev_opTensor_swap_of_density_fixed ψ hfix]
+
+private lemma bridge_consRel_symm_of_density_fixed
+    (ψ : QuantumState (ι × ι))
+    (hfix : swapDensity ψ.density = ψ.density)
+    {Question Outcome : Type*} [Fintype Outcome]
+    (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question Outcome ι)
+    (δ : Error) :
+    ConsRel ψ 𝒟 A B δ → ConsRel ψ 𝒟 B A δ := by
+  intro ⟨h⟩
+  constructor
+  unfold bipartiteConsError at *
+  calc
+    avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (B q) (A q))
+      = avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (A q) (B q)) := by
+          apply avgOver_congr
+          intro q
+          symm
+          exact bridge_qBipartiteConsDefect_symm_of_density_fixed ψ hfix (A q) (B q)
+    _ ≤ δ := h
+
+private lemma qBipartiteSSCDefect_le_one
+    {Outcome : Type*} [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hnorm : ψ.IsNormalized)
+    (A : SubMeas Outcome ι) :
+    qBipartiteSSCDefect ψ A ≤ 1 := by
+  unfold qBipartiteSSCDefect
+  have hoverlap_nonneg : 0 ≤ ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (A.outcome a)) := by
+    exact Finset.sum_nonneg fun a _ =>
+      ev_nonneg_of_psd ψ _ <| opTensor_nonneg (A.outcome_pos a) (A.outcome_pos a)
+  have htotal_le : ev ψ (leftTensor (ι₂ := ι) A.total) ≤ 1 := by
+    simpa [ev_one_of_isNormalized ψ hnorm] using
+      ev_mono ψ _ _ (leftTensor_le_one (ι₂ := ι) A.total_le_one)
+  have hinner : ev ψ (leftTensor (ι₂ := ι) A.total) -
+      ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (A.outcome a)) ≤ 1 := by
+    linarith
+  exact max_le_iff.mpr ⟨by positivity, hinner⟩
+
+private lemma bipartiteSSCError_uniform_le_one
+    {Question Outcome : Type*}
+    [Fintype Question] [DecidableEq Question] [Nonempty Question]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hnorm : ψ.IsNormalized)
+    (A : IdxSubMeas Question Outcome ι) :
+    bipartiteSSCError ψ (uniformDistribution Question) A ≤ 1 := by
+  unfold bipartiteSSCError
+  calc
+    avgOver (uniformDistribution Question) (fun q => qBipartiteSSCDefect ψ (A q))
+      ≤ avgOver (uniformDistribution Question) (fun _ => (1 : Error)) := by
+          exact avgOver_mono _ _ _ (fun q => qBipartiteSSCDefect_le_one ψ hnorm (A q))
+    _ = 1 := by
+          simpa using avgOver_uniform_const (α := Question) (c := (1 : Error))
+
+private lemma sqrt_min_le_rpow32
+    (x : Error) (hx : 0 ≤ x) :
+    Real.sqrt (min x 1) ≤ Real.rpow x (1 / (32 : Error)) := by
+  have hmin_nonneg : 0 ≤ min x 1 := by positivity
+  have hmin_le_one : min x 1 ≤ 1 := min_le_right _ _
+  calc
+    Real.sqrt (min x 1) = (min x 1) ^ (1 / (2 : Error)) := by
+          rw [Real.sqrt_eq_rpow]
+    _ ≤ (min x 1) ^ (1 / (32 : Error)) := by
+          exact Real.rpow_le_rpow_of_exponent_ge' hmin_nonneg hmin_le_one (by norm_num) (by norm_num)
+    _ ≤ x ^ (1 / (32 : Error)) := by
+          exact Real.rpow_le_rpow hmin_nonneg (min_le_left _ _) (by positivity)
+
+private lemma hAConsistency_sqrt_bound_of_pos
+    (params : Parameters)
+    (eps delta : Error)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta) :
+    Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1)
+      ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+          (Real.rpow eps (1 / (32 : Error)) + Real.rpow delta (1 / (32 : Error))) := by
+  have hm_nonneg : 0 ≤ (params.m : Error) := by positivity
+  have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
+    exact_mod_cast Nat.succ_le_of_lt params.hm
+  have hk_sq_ge_one : (1 : Error) ≤ (k : Error) ^ (2 : ℕ) := by
+    have hk_ge_one : (1 : Error) ≤ (k : Error) := by exact_mod_cast hk_pos
+    nlinarith
+  have hsqrt_m_le : Real.sqrt (params.m : Error) ≤ (params.m : Error) := by
+    refine (Real.sqrt_le_iff).2 ?_
+    constructor
+    · exact hm_nonneg
+    · nlinarith
+  have hsqrt8_le_three : Real.sqrt (8 : Error) ≤ 3 := by
+    have : (Real.sqrt (8 : Error)) ^ (2 : ℕ) ≤ (3 : Error) ^ (2 : ℕ) := by norm_num
+    nlinarith [Real.sq_sqrt (show 0 ≤ (8 : Error) by positivity), this]
+  have heps_term :
+      Real.sqrt (8 * (params.m : Error) * min eps 1)
+        ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow eps (1 / (32 : Error)) := by
+    calc
+      Real.sqrt (8 * (params.m : Error) * min eps 1)
+        = Real.sqrt (8 : Error) * Real.sqrt (params.m : Error) * Real.sqrt (min eps 1) := by
+            rw [show 8 * (params.m : Error) * min eps 1 = (8 : Error) * ((params.m : Error) * min eps 1) by ring]
+            rw [Real.sqrt_mul (show 0 ≤ (8 : Error) by positivity)]
+            rw [Real.sqrt_mul hm_nonneg (min eps 1)]
+            ring
+      _ ≤ 3 * (params.m : Error) * Real.rpow eps (1 / (32 : Error)) := by
+            have hfac : Real.sqrt (8 : Error) * Real.sqrt (params.m : Error) ≤ 3 * (params.m : Error) := by
+              calc
+                Real.sqrt (8 : Error) * Real.sqrt (params.m : Error)
+                  ≤ 3 * Real.sqrt (params.m : Error) := by
+                      exact mul_le_mul_of_nonneg_right hsqrt8_le_three (by positivity)
+                _ ≤ 3 * (params.m : Error) := by
+                      exact mul_le_mul_of_nonneg_left hsqrt_m_le (by positivity)
+            have hmin : Real.sqrt (min eps 1) ≤ Real.rpow eps (1 / (32 : Error)) :=
+              sqrt_min_le_rpow32 eps heps_nonneg
+            have hright_nonneg : 0 ≤ Real.rpow eps (1 / (32 : Error)) := Real.rpow_nonneg heps_nonneg _
+            have hsqrt_nonneg : 0 ≤ Real.sqrt (min eps 1) := by positivity
+            calc
+              Real.sqrt (8 : Error) * Real.sqrt (params.m : Error) * Real.sqrt (min eps 1)
+                ≤ (3 * (params.m : Error)) * Real.sqrt (min eps 1) := by
+                    exact mul_le_mul_of_nonneg_right hfac hsqrt_nonneg
+              _ ≤ (3 * (params.m : Error)) * Real.rpow eps (1 / (32 : Error)) := by
+                    exact mul_le_mul_of_nonneg_left hmin (by positivity)
+      _ ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow eps (1 / (32 : Error)) := by
+            have hroot_nonneg : 0 ≤ Real.rpow eps (1 / (32 : Error)) := Real.rpow_nonneg heps_nonneg _
+            have hmroot_nonneg : 0 ≤ (params.m : Error) * Real.rpow eps (1 / (32 : Error)) := by positivity
+            nlinarith
+  have hdelta_term :
+      Real.sqrt (4 * min delta 1)
+        ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow delta (1 / (32 : Error)) := by
+    calc
+      Real.sqrt (4 * min delta 1)
+        = 2 * Real.sqrt (min delta 1) := by
+            rw [show 4 * min delta 1 = (4 : Error) * (min delta 1) by ring]
+            rw [Real.sqrt_mul (show 0 ≤ (4 : Error) by positivity) (min delta 1)]
+            norm_num
+      _ ≤ 2 * Real.rpow delta (1 / (32 : Error)) := by
+            have hmin : Real.sqrt (min delta 1) ≤ Real.rpow delta (1 / (32 : Error)) :=
+              sqrt_min_le_rpow32 delta hdelta_nonneg
+            nlinarith
+      _ ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow delta (1 / (32 : Error)) := by
+            have hroot_nonneg : 0 ≤ Real.rpow delta (1 / (32 : Error)) := Real.rpow_nonneg hdelta_nonneg _
+            have hmroot_nonneg : 0 ≤ (params.m : Error) * Real.rpow delta (1 / (32 : Error)) := by positivity
+            nlinarith [hk_sq_ge_one, hm_ge_one, hmroot_nonneg]
+  have hsqrt_add :
+      Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1)
+        ≤ Real.sqrt (8 * (params.m : Error) * min eps 1) + Real.sqrt (4 * min delta 1) := by
+    have ha : 0 ≤ 8 * (params.m : Error) * min eps 1 := by positivity
+    have hb : 0 ≤ 4 * min delta 1 := by positivity
+    refine (Real.sqrt_le_iff).2 ?_
+    constructor
+    · positivity
+    · have hcross : 0 ≤ 2 * Real.sqrt (8 * (params.m : Error) * min eps 1) * Real.sqrt (4 * min delta 1) := by
+          positivity
+      nlinarith [Real.sq_sqrt ha, Real.sq_sqrt hb, hcross]
+  calc
+    Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1)
+      ≤ Real.sqrt (8 * (params.m : Error) * min eps 1) + Real.sqrt (4 * min delta 1) := hsqrt_add
+    _ ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow eps (1 / (32 : Error)) +
+          3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow delta (1 / (32 : Error)) := by
+            exact add_le_add heps_term hdelta_term
+    _ = 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+          (Real.rpow eps (1 / (32 : Error)) + Real.rpow delta (1 / (32 : Error))) := by
+            ring
+
+private lemma hAConsistency_error_le_nu_of_pos
+    (params : Parameters)
+    (eps delta gamma zeta : Error)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta) :
+    hBConsistencyError params eps delta gamma zeta k +
+        Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1)
+      ≤ MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta := by
+  let S : Error :=
+    Real.rpow eps (1 / (32 : Error)) +
+      Real.rpow delta (1 / (32 : Error)) +
+      Real.rpow gamma (1 / (32 : Error)) +
+      Real.rpow zeta (1 / (32 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))
+  have hsqrt :
+      Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1)
+        ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+            (Real.rpow eps (1 / (32 : Error)) + Real.rpow delta (1 / (32 : Error))) :=
+    hAConsistency_sqrt_bound_of_pos params eps delta k hk_pos heps_nonneg hdelta_nonneg
+  have hsum_le :
+      Real.rpow eps (1 / (32 : Error)) + Real.rpow delta (1 / (32 : Error)) ≤ S := by
+    dsimp [S]
+    nlinarith [Real.rpow_nonneg hgamma_nonneg (1 / (32 : Error)),
+      Real.rpow_nonneg hzeta_nonneg (1 / (32 : Error)),
+      Real.rpow_nonneg (by positivity : 0 ≤ ((params.d : Error) / (params.q : Error)))
+        (1 / (32 : Error))]
+  have hS_nonneg : 0 ≤ S := by
+    dsimp [S]
+    positivity
+  calc
+    hBConsistencyError params eps delta gamma zeta k +
+        Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1)
+      ≤ hBConsistencyError params eps delta gamma zeta k +
+          3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+            (Real.rpow eps (1 / (32 : Error)) + Real.rpow delta (1 / (32 : Error))) := by
+            simpa [add_comm, add_left_comm, add_assoc] using
+              add_le_add_left hsqrt (hBConsistencyError params eps delta gamma zeta k)
+    _ = 44 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S +
+          3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+            (Real.rpow eps (1 / (32 : Error)) + Real.rpow delta (1 / (32 : Error))) := by
+          simp [hBConsistencyError, S]
+    _ ≤ 44 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S +
+          3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by
+            have hcoeff_nonneg : 0 ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) := by positivity
+            simpa [add_comm, add_left_comm, add_assoc] using
+              add_le_add_left (mul_le_mul_of_nonneg_left hsum_le hcoeff_nonneg)
+                (44 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S)
+    _ = 47 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by ring
+    _ ≤ 100 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by
+          have hcoeff_nonneg : 0 ≤ ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by positivity
+          nlinarith
+    _ = MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta := by
+          simp [MainInductionStep.ldPastingInInductionNu, S]
+
 /-! ### Bridge lemmas for the sandwich chain
 
 These lemmas capture the infrastructure needed for the `lem:commute-g-half-sandwich`
@@ -139,6 +451,110 @@ through `cor:h-a-consistency` chain in `ld-pasting.tex` §9.3.
 The n-step SDDOpRel composition lemma (`sddOpRel_chain`) now lives in
 `Preliminaries.Theorems` alongside `sddOpRel_triangle`, since it is a
 general-purpose result used by multiple chapters. -/
+
+private def pointTupleConsEquiv (params : Parameters) (k : ℕ) :
+    PointTuple params (k + 1) ≃ SliceQuestion params × PointTuple params k where
+  toFun xs := (xs 0, pointTupleTail xs)
+  invFun p := Fin.cons p.1 p.2
+  left_inv xs := by
+    funext i
+    cases i using Fin.cases with
+    | zero => rfl
+    | succ j => rfl
+  right_inv p := by
+    cases p
+    rfl
+
+private def gHatTupleOutcomeConsEquiv' (params : Parameters) [FieldModel params.q] (k : ℕ) :
+    GHatTupleOutcome params (k + 1) ≃ GHatOutcome params × GHatTupleOutcome params k where
+  toFun gs := (gs 0, gHatTupleOutcomeTail gs)
+  invFun p := Fin.cons p.1 p.2
+  left_inv gs := by
+    funext i
+    cases i using Fin.cases with
+    | zero => rfl
+    | succ j => rfl
+  right_inv p := by
+    cases p
+    rfl
+
+private noncomputable def headTailOrderedFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ) :
+    IdxOpFamily
+      (SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι) :=
+  fun q =>
+    { outcome := fun ogs =>
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome ogs.1) *
+          leftTensor (ι₂ := ι)
+            (gHatHalfProductOutcomeOperator params family r q.2 ogs.2)
+      total :=
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
+          leftTensor (ι₂ := ι) (gHatHalfProductTotalOperator params family r q.2) }
+
+private noncomputable def headTailRotatedFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ) :
+    IdxOpFamily
+      (SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι) :=
+  fun q =>
+    { outcome := fun ogs =>
+        leftTensor (ι₂ := ι)
+          (gHatHalfProductOutcomeOperator params family r q.2 ogs.2) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome ogs.1)
+      total :=
+        leftTensor (ι₂ := ι) (gHatHalfProductTotalOperator params family r q.2) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) }
+
+private lemma gHatHalfSandwichLeft_split_outcome
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ)
+    (xs : PointTuple params (k + 1))
+    (gs : GHatTupleOutcome params (k + 1)) :
+    (gHatHalfSandwichLeft params family (k + 1) xs).outcome gs =
+      (headTailOrderedFamily params family k ((pointTupleConsEquiv params k) xs)).outcome
+        ((gHatTupleOutcomeConsEquiv' params k) gs) := by
+  simp [gHatHalfSandwichLeft, headTailOrderedFamily,
+    pointTupleConsEquiv, gHatTupleOutcomeConsEquiv',
+    gHatHalfProductOutcomeOperator, OpFamily.leftPlacedOpFamily,
+    leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma gHatHalfSandwichLeft_split_total
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ)
+    (xs : PointTuple params (k + 1)) :
+    (gHatHalfSandwichLeft params family (k + 1) xs).total =
+      (headTailOrderedFamily params family k ((pointTupleConsEquiv params k) xs)).total := by
+  simp [gHatHalfSandwichLeft, headTailOrderedFamily,
+    pointTupleConsEquiv, gHatHalfProductTotalOperator,
+    OpFamily.leftPlacedOpFamily, leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma gHatHalfSandwichRight_split_outcome
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ)
+    (xs : PointTuple params (k + 1))
+    (gs : GHatTupleOutcome params (k + 1)) :
+    (gHatHalfSandwichRight params family (k + 1) xs).outcome gs =
+      (headTailRotatedFamily params family k ((pointTupleConsEquiv params k) xs)).outcome
+        ((gHatTupleOutcomeConsEquiv' params k) gs) := by
+  simp [gHatHalfSandwichRight, headTailRotatedFamily,
+    pointTupleConsEquiv, gHatTupleOutcomeConsEquiv',
+    gHatRotatedHalfProductOutcomeOperator, OpFamily.leftPlacedOpFamily,
+    leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma gHatHalfSandwichRight_split_total
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ)
+    (xs : PointTuple params (k + 1)) :
+    (gHatHalfSandwichRight params family (k + 1) xs).total =
+      (headTailRotatedFamily params family k ((pointTupleConsEquiv params k) xs)).total := by
+  simp [gHatHalfSandwichRight, headTailRotatedFamily,
+    pointTupleConsEquiv, gHatRotatedHalfProductTotalOperator,
+    OpFamily.leftPlacedOpFamily, leftTensor_mul_leftTensor, mul_assoc]
 
 /-- Bridge: the staged move-commute-move chain for `commuteGHalfSandwich`.
 
@@ -330,11 +746,14 @@ private lemma hAConsistency_submeas_core
     (family : IdxPolyFamily params ι)
     (eps delta gamma kappa zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
     (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
     (hdq_le : params.d ≤ params.q)
     (hcomplete : family.Complete strategy.state kappa)
     (k : ℕ)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k)
     (hHB : HBConsistencyStatement params strategy family
         eps delta gamma zeta k) :
@@ -356,8 +775,38 @@ private lemma hAConsistency_submeas_core
             direction := lastCoord params }
         simpa [verticalLineMeasurementFamily, ℓ, postprocess_total] using
           (strategy.axisParallelMeasurement ℓ).total_eq_one }
+  let pointMeas : IdxMeas (Point params.next) (Fq params.next) ι :=
+    fun u => (strategy.pointMeasurement u).toMeasurement
   let νB := hBConsistencyError params eps delta gamma zeta k
   let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
+  let eps' : Error := min eps 1
+  let delta' : Error := min delta 1
+  have haxis_le_one : strategy.axisParallelFailureProbability ≤ 1 := by
+    simpa [SymStrat.axisParallelFailureProbability] using
+      bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy)
+  have hself_le_one : strategy.selfConsistencyFailureProbability ≤ 1 := by
+    simpa [SymStrat.selfConsistencyFailureProbability] using
+      bipartiteSSCError_uniform_le_one strategy.state strategy.isNormalized
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+  have hgood_small : strategy.IsGood eps' delta' gamma := by
+    refine ⟨?_, ?_, hgood.diagonalLineTest⟩
+    · exact le_min hgood.axisParallelTest haxis_le_one
+    · exact le_min hgood.selfConsistencyTest hself_le_one
+  have heps_nonneg : 0 ≤ eps := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params.next))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy))
+      hgood.axisParallelTest
+  have hdelta_nonneg : 0 ≤ delta := by
+    exact le_trans
+      (bipartiteSSCError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      hgood.selfConsistencyTest
   have hline_prod :
       ConsRel strategy.state (uniformDistribution (VerticalLineQuestion params × Fq params))
         (fun ux => hRestrictionToVerticalLine params H ux.1)
@@ -396,49 +845,51 @@ private lemma hAConsistency_submeas_core
       postprocess_hRestrictionToVerticalLine_eq_evaluateAt, H] using hproc
   have hpoint_sdd :
       SDDRel strategy.state
-        (uniformDistribution (Point params.next))
-        (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointLineMeas))
-        (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-        (8 * (params.m : Error) * eps + 4 * delta) := by
+      (uniformDistribution (Point params.next))
+      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointLineMeas))
+      (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+        (8 * (params.m : Error) * eps' + 4 * delta') := by
     exact Preliminaries.sddRel_symm strategy.state
       (uniformDistribution (Point params.next))
       _ _ _
-      (by simpa [pointLineMeas] using pointVerticalLineSdd params strategy eps delta gamma hgood)
+      (by simpa [pointLineMeas, eps', delta'] using
+        MIPStarRE.LDT.Pasting.pointVerticalLineSdd params strategy eps' delta' gamma hgood_small)
   have htri :
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (polynomialEvaluationFamily params.next H)
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (νB + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+        (νB + Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta')) := by
     exact Preliminaries.triangleSub_right strategy.state
       (uniformDistribution (Point params.next))
       strategy.isNormalized
       (by simpa using uniformDistribution_weight_sum_le_one (Point params.next))
       (polynomialEvaluationFamily params.next H)
       pointLineMeas
-      (fun u => (strategy.pointMeasurement u).toMeasurement)
+      pointMeas
       νB
-      (8 * (params.m : Error) * eps + 4 * delta)
+      (8 * (params.m : Error) * eps' + 4 * delta')
       hline_point
       hpoint_sdd
   have hswap :
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next H)
-        (νB + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-    exact ldGbcon_consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+        (νB + Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta')) := by
+    exact bridge_consRel_symm_of_density_fixed strategy.state strategy.densityFixed
       (uniformDistribution (Point params.next))
       (polynomialEvaluationFamily params.next H)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (νB + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))
+      (νB + Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta'))
       htri
   refine ⟨?_⟩
   calc
     bipartiteConsError strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next H)
-      ≤ νB + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta) := hswap.offDiagonalBound
+      ≤ νB + Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta') := hswap.offDiagonalBound
     _ ≤ ν := by
-      sorry
+      exact hAConsistency_error_le_nu_of_pos params eps delta gamma zeta k hk_pos
+        heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
 
 /-- `cor:h-a-consistency`.
 
@@ -461,6 +912,7 @@ theorem hAConsistency_submeas
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
@@ -510,9 +962,22 @@ theorem hAConsistency_submeas
       family hcons hself hbound hfacts k i hi
   have hHB := hBConsistency params strategy eps delta gamma zeta
     hgood family hcons hself hbound k hline
+  have hgamma_nonneg : 0 ≤ gamma := by
+    have : 0 ≤ strategy.diagonalFailureProbability := by
+      unfold SymStrat.diagonalFailureProbability
+      exact mul_nonneg (by positivity)
+        (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
+    exact le_trans this hgood.diagonalLineTest
+  have hzeta_nonneg : 0 ≤ zeta := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        family.evaluatedAtNextPoint)
+      hcons.pointConsistency.offDiagonalBound
   exact hAConsistency_submeas_core params strategy family
-    eps delta gamma kappa zeta hgood hgamma_le hzeta_le hdq_le
-    hcomplete k hk hHB
+    eps delta gamma kappa zeta hgood hgamma_nonneg hzeta_nonneg hgamma_le hzeta_le hdq_le
+    hcomplete k hk_pos hk hHB
 
 /-- Completed-measurement version of `cor:h-a-consistency`.
 

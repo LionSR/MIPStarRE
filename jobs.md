@@ -281,7 +281,8 @@ Last updated: 2026-04-14
   - ported the proved `ldGbcon` machinery into the active split leaf `MIPStarRE/LDT/Pasting/Core/Bounds.lean`, including the public reusable theorem `pointVerticalLineSdd`
   - converted `MIPStarRE/LDT/Pasting/SwitcherooCompletion/Switcheroo.lean` into a re-export wrapper of the finished top-level `SwitcherooCompletion` implementation, removing that split-leaf `sorry`
   - added the helper lemmas `postprocess_postprocess`, `restrictToAxisParallelLine_eval_at_pointHeight`, `postprocess_hRestrictionToVerticalLine_eq_evaluateAt`, and `consRel_uniform_fst` in `BridgeLemmas.lean` to support the paper-faithful proof of `hAConsistency_submeas_core`
-  - partially wired `hAConsistency_submeas_core` through the intended chain `hHB.lineConsistency -> product lift -> pointNextEquiv -> question-dependent postprocess -> triangleSub_right` and isolated the remaining obstruction to the final quantitative comparison with `ldPastingInInductionNu`
+  - added local boundedness helpers in `BridgeLemmas.lean` (`qBipartiteConsDefect_le_one`, `bipartiteSSCError_uniform_le_one`, `sqrt_min_le_rpow32`, `hAConsistency_sqrt_bound_of_pos`, `hAConsistency_error_le_nu_of_pos`) and rewired `hAConsistency_submeas_core` to the paper's main regime using `eps' = min eps 1`, `delta' = min delta 1`
+  - `hAConsistency_submeas_core` is now reduced to the `k = 0` corner case only; the `k > 0` branch already closes through the new `hAConsistency_error_le_nu_of_pos` helper
   - proved `commutativitySwitcheroo` in `Pasting/SwitcherooCompletion.lean` by replacing the last heartbeat-heavy `χ` step with pointwise raw rewrite lemmas and local wrapper bounds (`OnceCommutedRawLocal`, `MixedRawLocal`, `LeftFrontRawLocal`, `FirstSplitRawLocal`)
   - proved `ldGbcon` in `Pasting/Core.lean` from the paper's `eq:ld-abcon` -> `eq:ld-gbcon` chain: conditioned axis-parallel consistency in the last direction, self-consistency-to-right-register transfer, `triangleSub_right`, and the vertical-line reparametrization identity
   - added reusable `pointVerticalLineSdd` in `Pasting/Core.lean`, exposing the point-vs-vertical-line `SDDRel` bound with error `8m eps + 4 delta`
@@ -311,6 +312,8 @@ Last updated: 2026-04-14
   - `Pasting/Bernoulli/Recurrence.lean`: 2 `sorry`s
   - `Pasting/Bernoulli/Final.lean`: 1 `sorry`
   - total remaining in `MIPStarRE/LDT/Pasting`: 8
+- **Current blocker focus**:
+  - the main paper-regime bound in `hAConsistency_submeas_core` is proved for `k > 0`; the unresolved branch is the degenerate `k = 0` case, which appears to expose a formulation bug around the section-local pasting statements when `constructedPastedSubMeas params family 0` collapses to zero mass because `InterpolationEligible` requires at least `d + 1` genuine outcomes
   - refreshed the exact live chain: `ldGbcon`, `commutativitySwitcheroo`, `commuteGHalfSandwich`, `ldSandwichLineOnePoint`, `hBConsistency`, `hAConsistency`, `overAllOutcomes`, `fromHToG` (2 goals), `chernoffBernoulliMatrix`, `ldPastingNCompleteness`
   - re-read `references/ldt-paper/ld-pasting.tex` and `blueprint/src/chapter/ch09_pasting.tex` for the active Section 12 spine
   - re-read `docs/proof-hints.md` and the local Pasting/Preliminaries infrastructure for transport, averaging, and triangle patterns
