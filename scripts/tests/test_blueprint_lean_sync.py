@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+"""Regression tests for scripts/blueprint_lean_sync.py."""
+
 from __future__ import annotations
 
 import sys
@@ -6,9 +9,14 @@ import textwrap
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+SCRIPT_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(SCRIPT_DIR))
 
-from blueprint_lean_sync import collect_blueprint_entries, find_orphan_leanok_tags
+import blueprint_lean_sync  # noqa: E402
+from blueprint_lean_sync import (  # noqa: E402
+    collect_blueprint_entries,
+    find_orphan_leanok_tags,
+)
 
 
 class BlueprintLeanSyncTests(unittest.TestCase):
@@ -89,6 +97,77 @@ class BlueprintLeanSyncTests(unittest.TestCase):
             blueprint_src = root / "blueprint" / "src"
             orphans = find_orphan_leanok_tags(blueprint_src)
             self.assertEqual(orphans, [])
+
+
+class CollectBlueprintEntriesTests(unittest.TestCase):
+    def _collect_entries(self, tex_source: str) -> list[blueprint_lean_sync.BlueprintEntry]:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            blueprint_src = Path(tmp_dir) / "blueprint" / "src"
+            chapter_dir = blueprint_src / "chapter"
+            chapter_dir.mkdir(parents=True)
+            (chapter_dir / "ch04_projective.tex").write_text(tex_source.strip() + "\n")
+            return blueprint_lean_sync.collect_blueprint_entries(blueprint_src)
+
+    def test_nested_proof_credits_outer_proof_leanok(self) -> None:
+        entries = self._collect_entries(
+            r"""
+\begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
+  \lean{OuterDecl}
+\end{lemma}
+
+\begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
+  \leanok
+
+  \begin{lemma}\label{lem:trunc-inequality}
+    \lean{InnerDecl}
+    \leanok
+  \end{lemma}
+  \begin{proof}
+    \leanok
+  \end{proof}
+\end{proof}
+"""
+        )
+
+        self.assertEqual(len(entries), 2)
+        by_label = {entry.label: entry for entry in entries}
+
+        outer = by_label["lem:orthonormalization-main-lemma"]
+        inner = by_label["lem:trunc-inequality"]
+
+        self.assertFalse(outer.has_leanok)
+        self.assertTrue(outer.proof_has_leanok)
+        self.assertTrue(inner.has_leanok)
+        self.assertTrue(inner.proof_has_leanok)
+
+    def test_inner_leanok_does_not_formalize_outer_proof(self) -> None:
+        entries = self._collect_entries(
+            r"""
+\begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
+  \lean{OuterDecl}
+\end{lemma}
+
+\begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
+  \begin{lemma}\label{lem:trunc-inequality}
+    \lean{InnerDecl}
+    \leanok
+  \end{lemma}
+  \begin{proof}
+    \leanok
+  \end{proof}
+\end{proof}
+"""
+        )
+
+        by_label = {entry.label: entry for entry in entries}
+
+        outer = by_label["lem:orthonormalization-main-lemma"]
+        inner = by_label["lem:trunc-inequality"]
+
+        self.assertFalse(outer.has_leanok)
+        self.assertFalse(outer.proof_has_leanok)
+        self.assertTrue(inner.has_leanok)
+        self.assertTrue(inner.proof_has_leanok)
 
 
 if __name__ == "__main__":
