@@ -30,9 +30,7 @@ theorem mainInduction
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
     (k : ℕ)
-    (_hk : params.m * params.d ≤ k)
     (hwitness :
       ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
         ConsRel strategy.state (uniformDistribution (Point params))

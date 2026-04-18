@@ -151,10 +151,7 @@ theorem selfImprovement
       EvaluationDataProcessingInput params strategy eps delta)
     (hfinalFields : FinalFieldsInput params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : Measurement (Polynomial params) ι)
-    (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    (G : Measurement (Polynomial params) ι) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
   rcases selfImprovementHelper params strategy eps delta gamma hgood nu
@@ -210,7 +207,7 @@ theorem selfImprovementFromSubMeas
     (G : SubMeas (Polynomial params) ι)
     (Gmeas : Measurement (Polynomial params) ι)
     (hbridge : Gmeas.toSubMeas = G)
-    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+    (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
@@ -219,7 +216,7 @@ theorem selfImprovementFromSubMeas
   rcases selfImprovement params strategy eps delta gamma nu
       hnormalizedState hglobalVarianceProofInputs hhelperStrongSelfConsistency
       horthonormalization hevaluationDataProcessing hfinalFields hgood Gmeas
-      (by simpa [hbridge] using hcons) with ⟨H, Z, hH⟩
+      with ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩
   exact
     { measurementBridge := ⟨Gmeas, hbridge, hH⟩ }

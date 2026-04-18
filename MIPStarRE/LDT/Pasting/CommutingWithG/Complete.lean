@@ -20,7 +20,7 @@ set_option maxHeartbeats 1000000 in
 private lemma firstSwitcherooError_le_eighth_stage
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error)
-    (hgamma_nonneg : 0 ≤ gamma) (_hgamma : gamma ≤ 1)
+    (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
     (hd_le_q : params.d ≤ params.q) :
     commutativitySwitcherooError zeta zeta
@@ -290,7 +290,7 @@ private lemma secondSwitcherooError_le_commutingWithGCompleteError
           ≤ Real.sqrt (36 * (params.m : Error) * eighthSum) := by
               have htheta1_bound :=
                 firstSwitcherooError_le_eighth_stage params gamma zeta
-                  hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+                  hgamma_nonneg hzeta_nonneg hzeta hd_le_q
               exact Real.sqrt_le_sqrt htheta1_bound
         _ = Real.sqrt (36 : Error) * Real.sqrt ((params.m : Error) * eighthSum) := by
               rw [show (36 * (params.m : Error) * eighthSum) =
