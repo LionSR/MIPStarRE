@@ -63,9 +63,12 @@ convention on the enlarged ambient space.  Each measurement becomes
 block-diagonal over the role register, applying Alice's original
 measurement on the `A` block and Bob's on the `B` block.
 
-Downstream Step 1 of `MIPStarRE.LDT.Test.mainFormal` invokes this alias
-together with `strategySymmetrization_isGood_three_mul` to reduce
-`thm:main-formal` to the symmetric induction `thm:main-induction`. -/
+Implemented as a `noncomputable abbrev` rather than a `def`: the alias
+is intentionally definitionally transparent so that the goodness and
+normalization lemmas below — and any downstream consumer at Step 1 of
+`mainFormal` — can directly reuse rewrite/simp lemmas already proven
+about `classicalRoleSymmStrategy` without having to thread an extra
+unfolding step. -/
 noncomputable abbrev strategySymmetrization {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) :
@@ -78,15 +81,25 @@ If the original projective strategy passes the `(m,q,d)`-low individual degree
 test with error `ε`, its symmetrization is a `(3ε, 3ε, 3ε)`-good symmetric
 strategy.  The factor `3` is exactly the inverse of the uniform `1/3` weight
 on each of the three subtests (axis-parallel, self-consistency, diagonal),
-per paper line 33.
+per paper lines 33 (goodness of the original strategy) and 66 (the
+symmetrized strategy is also `(3ε, 3ε, 3ε)`-good); see
+`references/ldt-paper/inductive_step.tex`.
 
-This is the public form of `classicalRoleSymmStrategy_is_good_three_mul` and
-is the core bridge lemma consumed by Step 1 of `mainFormal`. -/
+No `[Nonempty ι]` instance is required: nonemptiness of the carrier is
+already implied by `strategy.isNormalized` (an empty carrier would force
+`normalizedTrace = 0`, contradicting normalization), so we synthesise it
+locally.  This makes the bridge strictly more ergonomic than the
+underlying `classicalRoleSymmStrategy_is_good_three_mul` for callers such
+as `mainFormal` that only have a bare `strategy : ProjStrat params ι`.
+
+This is the public form of `classicalRoleSymmStrategy_is_good_three_mul`
+and is the core bridge lemma consumed by Step 1 of `mainFormal`. -/
 theorem strategySymmetrization_isGood_three_mul {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     (strategy.strategySymmetrization).IsGood (3 * eps) (3 * eps) (3 * eps) :=
+  haveI : Nonempty ι := strategy.isNormalized.nonempty.map Prod.fst
   classicalRoleSymmStrategy_is_good_three_mul hpass
 
 /-- Normalization preservation for the role-register symmetrization.
