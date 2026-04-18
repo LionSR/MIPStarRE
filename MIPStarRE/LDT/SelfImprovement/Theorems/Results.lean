@@ -163,7 +163,7 @@ theorem selfImprovement
         (selfImprovementHelperError params eps delta) :=
     hhelperStrongSelfConsistency hhelper
   rcases orthonormalization strategy.state hnormalizedState
-      strategy.permInvState Hhat
+      Hhat
       (selfImprovementHelperError params eps delta)
       hssc horthonormalization with ⟨H, horth⟩
   have hdata :
