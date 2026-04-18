@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.Commutativity.Scaffold.Core
 
+/-!
+# Section 11 commutativity: scaffold symmetry
+
+Symmetry transport between coded `F_q` points and the underlying scalar model,
+packaging the scaffold theorem statements used by the Section 11 commutativity
+argument.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

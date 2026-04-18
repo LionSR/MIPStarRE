@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.CommutativityPoints.Approximation
 
+/-!
+# Section 10 commutativity points: shared helpers core
+
+Shared reindexing and tensor-placement helpers used by the Section 10
+commutativity-of-points argument.
+
+## References
+
+- arXiv:2009.12982, Section 10 (commutativity of the point measurements).
+-/
+
 namespace MIPStarRE.LDT.CommutativityPoints
 
 open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)

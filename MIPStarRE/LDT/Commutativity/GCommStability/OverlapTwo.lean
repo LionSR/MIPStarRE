@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.Commutativity.GCommStability.OverlapOne
 
+/-!
+# Section 11 commutativity: `G`-stability overlap (step two)
+
+Second overlap-averaging step for the `G`-stability argument: completes the
+integral reduction begun in `OverlapOne`.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+-/
+
 namespace MIPStarRE.LDT.Commutativity
 
 open MIPStarRE.LDT

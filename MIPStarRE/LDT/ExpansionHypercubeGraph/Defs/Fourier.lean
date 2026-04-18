@@ -1,6 +1,17 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Core
 import Mathlib.Analysis.Fourier.ZMod
 
+/-!
+# Section 7 hypercube graph: Fourier basis
+
+Additive characters and the Fourier basis of `ℂ^{F_q^m}` used to diagonalize
+the hypercube adjacency matrix `K`.
+
+## References
+
+- arXiv:2009.12982, Section 7 (expansion of the hypercube graph).
+-/
+
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
 open MIPStarRE.LDT

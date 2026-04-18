@@ -1,5 +1,16 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Core
 
+/-!
+# Section 8 global variance: core definitions
+
+Basic question and answer types (axis-parallel line questions, point-pair
+questions) underlying the Section 8 global-variance construction.
+
+## References
+
+- arXiv:2009.12982, Section 8 (global variance).
+-/
+
 namespace MIPStarRE.LDT.GlobalVariance
 
 open MIPStarRE.LDT

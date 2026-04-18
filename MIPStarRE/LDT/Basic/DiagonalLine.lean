@@ -4,6 +4,11 @@ import MIPStarRE.LDT.Basic.AxisParallelLine
 # Diagonal lines for the low individual degree test
 
 Diagonal-line geometry and rebasing operations.
+
+## References
+
+- arXiv:2009.12982, Section 3 (low individual degree test, diagonal line
+  questions).
 -/
 
 namespace MIPStarRE.LDT

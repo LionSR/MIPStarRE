@@ -5,6 +5,11 @@ import MIPStarRE.LDT.Basic.DiagonalLine
 # One-variable line polynomials for the low individual degree test
 
 Polynomial answer types attached to axis-parallel and diagonal lines.
+
+## References
+
+- arXiv:2009.12982, Section 3 (low individual degree test, line polynomial
+  answers).
 -/
 
 namespace MIPStarRE.LDT

@@ -4,6 +4,10 @@ import MIPStarRE.LDT.Pasting.Statements
 # Section 12 pasting: core bounds
 
 Initial pasting bounds and scalar estimates.
+
+## References
+
+- arXiv:2009.12982, Section 12 (pasting).
 -/
 
 namespace MIPStarRE.LDT.Pasting
