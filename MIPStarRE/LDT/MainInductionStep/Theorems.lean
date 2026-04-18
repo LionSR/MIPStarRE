@@ -200,7 +200,6 @@ theorem mainInductionBridgeFromPastedFamily
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
     (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
@@ -218,7 +217,7 @@ theorem mainInductionBridgeFromPastedFamily
     MainInductionBridgePackage params.next strategy eps delta gamma k := by
   obtain ⟨H, hH⟩ :=
     ldPastingInInductionSection params strategy eps delta gamma kappa zeta
-      hnorm hgood hgamma_le hzeta_le hdq_le family hcomplete hcons hself hbound k hk
+      hgood hgamma_le hzeta_le hdq_le family hcomplete hcons hself hbound k hk
   exact
     { witness :=
         ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
