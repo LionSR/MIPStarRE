@@ -149,12 +149,24 @@ Last updated: 2026-04-18
     now derives the axis-parallel weighted slice bound directly from
     `strategy.IsGood`, using a new ambient-to-slice transport lemma
     `restrictedAxisWeightedBound`
+  - completed the diagonal analogue as well: `restrictedDiagonalWeightedBound`
+    now derives the weighted diagonal slice bound directly from
+    `strategy.IsGood`, so `MainInductionStep.restrictedProbabilities` no longer
+    needs any extra weighted-bound hypotheses and now matches the paper-facing
+    surface of `inductive_step.tex:374-411`
+  - removed the redundant explicit normalization hypothesis from
+    `SelfImprovement.selfImprovement`,
+    `SelfImprovement.selfImprovementFromSubMeas`, and
+    `MainInductionStep.selfImprovementInInductionSection`: these theorems now
+    use the existing `strategy.isNormalized` field from `SymStrat` directly
   - exposed `restrictAxisParallelMeasurement_postprocess_eval` from
     `MainInductionStep/Defs.lean` so the axis transport proof can reuse the
     slice-to-ambient postprocess identity directly
   - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Defs.lean` and
     `lake env lean MIPStarRE/LDT/MainInductionStep/Theorems.lean` after the
-    axis-side Section 6 repair
+    Section 6 restricted-probability repair
+  - verified `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean` still leaves
+    only the single remaining `mainFormal` sorry after this upstream repair
   - traced the remaining `Test.mainFormal` path far enough to isolate two
     paper-level structural gaps:
     1. `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
@@ -190,10 +202,18 @@ Last updated: 2026-04-18
     transport lemmas require explicit equivalences between ambient samples in
     dimension `m+1` and slice samples at height `x`; they are not yet present in
     the repository.
-  - After this pass, the axis-parallel transport lemma is present, but the
-    diagonal analogue is still missing. That diagonal transport is now the
-    immediate blocker to removing the final extra hypothesis from
-    `restrictedProbabilities` and continuing the paper-faithful Section 6 chain.
+  - After this pass, both transport lemmas are present and
+    `restrictedProbabilities` is paper-faithful. The next paper-facing
+    divergence on the `mainFormal` path is now the larger Section 8/9 wrapper
+    surface: `selfImprovement` / `selfImprovementInInductionSection` still carry
+    explicit extra hypotheses that are not part of the paper theorem.
+  - Concretely, the remaining non-paper hypotheses are now:
+    `GlobalVarianceProofInputs`,
+    `HelperStrongSelfConsistencyInput`,
+    `OrthonormalizationInput`,
+    `EvaluationDataProcessingInput`, and
+    `FinalFieldsInput`. A repo/branch scan on this pass found no existing local
+    theorem that derives these from `strategy.IsGood` on the current branch.
   - The geometric-line canonicalization is not merged on the live proof path in
     this branch: the commutativity bridge remains proved only for the older raw
     `PointDiagonalLineQuestion = DiagonalLine × Fq` model.
@@ -228,10 +248,16 @@ Last updated: 2026-04-18
     the axis-parallel and diagonal branches and use them to remove the extra
     weighted-bound hypotheses from `MainInductionStep.restrictedProbabilities`,
     so the Section 6 surface matches `inductive_step.tex:374-411`
-  - the axis branch is now done; the next concrete theorem is the diagonal
-    ambient-to-slice transport lemma bounding the weighted average of the
-    `x`-restricted diagonal failure probabilities by the ambient diagonal branch
-    of `strategy.IsGood`
+  - the next concrete theorem repair is upstream of `mainInduction`: eliminate
+    the explicit wrapper hypotheses from
+    `SelfImprovement.selfImprovement` /
+    `MainInductionStep.selfImprovementInInductionSection` by internalizing the
+    Section 8/9 arguments they currently take as assumptions
+  - the first truly missing theorem on that path appears to be one of the
+    Section 8/9 producers for the remaining inputs, not another `Test`-local
+    helper: either a theorem deriving `GlobalVarianceProofInputs` from the
+    existing GlobalVariance results, or the helper-stage strong
+    self-consistency / data-processing transport used in `selfImprovement`
   - continue up the Section 3 dependency chain, starting with the remaining
     projectivization / orthonormalization / commutativity / pasting wrappers
     needed to produce the witness consumed by `Test.mainFormal`.
