@@ -6,6 +6,13 @@ rather than duplicating the rules inline.
 
 > **Lean version**: 4.x (Lean 3 keywords like `constant` do not apply)
 
+> **Companion document:** [`anti_patterns.md`](./anti_patterns.md) catalogues
+> subtler proof-evasion patterns that pass every blocker check below yet still
+> fail to prove the claimed mathematics (conclusion-shaped hypotheses,
+> definitional sleight-of-hand, zero-fallback branches, trivial default
+> witnesses, Mathlib-bypass castles, external `*Statement` smuggles).
+> Consult it alongside this file during review.
+
 ---
 
 ## Blockers

@@ -505,7 +505,80 @@ this codebase, include a docstring explaining its grounding plan and
 - [#449] — hypothesis-smuggle ledger (⚠️H items)
 - [#278] — the original "derive `PermInvState` internally" discussion
 
+---
+
+## Reviewer checklist
+
+Use this alongside the [`PROOF_INTEGRITY.md`](./PROOF_INTEGRITY.md) blocker
+list. For any theorem or lemma that claims a paper result, ask:
+
+- [ ] **Hypothesis audit.** Does any hypothesis contain (up to `∃`/`∧`) the
+      theorem's conclusion? If yes, that's A1 — reject or strengthen.
+- [ ] **Definitional audit.** Is the proof `rfl` or a one-line `simp`? If
+      yes, does the unfolded definition do the paper's math, or just match
+      the shape of the conclusion? The latter is A2.
+- [ ] **Domain audit.** Does the function have a fallback branch (`if
+      eligible ... else default`)? If yes, does the theorem's signature
+      require eligibility? If not, that's A3.
+- [ ] **Witness audit.** Does the proof pick `x := default` for an
+      existential named after a paper lemma? That's A4 unless the witness
+      is genuinely unique-up-to-isomorphism.
+- [ ] **Mathlib audit.** Is there a `private lemma` that duplicates a
+      Mathlib fact? Run `exact?` / `apply?` / `#find` before accepting it
+      (A5).
+- [ ] **External-citation audit.** Does the proof consume a `*Statement` /
+      `*Witness` / `*Package`? Is there a tracking issue that names its
+      grounding plan (A6)?
+- [ ] **Paper-faithfulness.** Does the Lean signature match the paper's
+      statement, or does Lean sneak in extra hypotheses? Flag divergences
+      as ⚠️S in [#449].
+
+A lemma that passes all of these is a proof. A lemma that fails one is
+scaffolding, and should be labelled and tracked as such (don't tag with
+`\leanok` until the gap is closed).
+
+## CI prevention
+
+Mechanical detection is possible for many of these patterns:
+
+- **A1 (conclusion-shaped hypothesis).** When [#438] lands (`\leanok` ↔
+  `sorryAx` drift), extend it with a heuristic: for each `\leanok`-tagged
+  declaration, parse the hypothesis list; if any hypothesis's type (modulo
+  `∃`/`∀`/`∧`) contains a prefix of the conclusion structure, warn.
+- **A2 (definitional sleight).** Grep for `theorem <Name>.* := rfl` where
+  `<Name>` has a blueprint `\lean{}` cross-reference. The only allowed cases
+  are ones annotated with `@[paper_bookkeeping]` (proposed attribute) or in
+  an allow-list.
+- **A3 (zero-fallback).** Grep for identifier suffixes `fallback`, `or0`,
+  `orDefault`, `placeholder`, `sentinel` in `Defs/*` files. Each should have
+  a docstring citing the downstream eligibility precondition.
+- **A4 (default witnesses).** Grep `:= default`, `refine ⟨default`, `exact
+  ⟨default`, `Classical.arbitrary` inside proof bodies (not typeclass
+  definitions). Cross-reference to [#449]'s witness ledger.
+- **A5 (Mathlib bypass).** No reliable CI check, but `docs/audit/` reports
+  catch it during per-chapter audits.
+- **A6 (external smuggles).** Every new `structure *Statement` without a
+  producing theorem should be required to carry a `/-- Grounded by: #NNN
+  -/` docstring, enforced by a lint rule over `blueprint/`.
+
+The scripts in `scripts/` (notably `scripts/check_blueprint_sync.py` from
+PR [#438]) are the natural home for extensions that add these checks.
+
+## See also
+
+- [`PROOF_INTEGRITY.md`](./PROOF_INTEGRITY.md) — kernel-level blockers
+  (`sorry`, `native_decide`, bare `axiom`, etc.).
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md) — overall contributor workflow;
+  review checklist section should link here.
+- [`pr-review.md`](./pr-review.md) — detailed PR review guidelines.
+- [`naming.md`](./naming.md) and [`style.md`](./style.md) — Mathlib
+  conventions; avoiding A5 (bypassing Mathlib) often starts with using
+  Mathlib's names.
+- [#449], [#451], [#477], [#493], [#494], [#495] — concrete trackers for
+  the anti-patterns documented here.
+
 [#278]: https://github.com/LionSR/MIPStarRE/issues/278
+[#438]: https://github.com/LionSR/MIPStarRE/pull/438
 [#307]: https://github.com/LionSR/MIPStarRE/issues/307
 [#449]: https://github.com/LionSR/MIPStarRE/issues/449
 [#451]: https://github.com/LionSR/MIPStarRE/issues/451

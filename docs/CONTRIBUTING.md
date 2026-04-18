@@ -252,6 +252,15 @@ Every PR touching Lean code should be reviewed against these criteria:
    types incompatible with Mathlib blocks future proof work. See
    [PROOF_INTEGRITY.md](PROOF_INTEGRITY.md) for details.
 
+9. **Proof-evasion anti-patterns** -- Review against
+   [anti_patterns.md](anti_patterns.md), which catalogues subtler failure
+   modes that pass the `PROOF_INTEGRITY.md` blocker checks but still fail
+   to prove the claimed mathematics: conclusion-shaped hypotheses (A1),
+   `:= rfl` definitional sleight-of-hand (A2), zero-fallback branches
+   hiding preconditions (A3), trivial default witnesses (A4),
+   Mathlib-bypass castles (A5), and external `*Statement` smuggles (A6).
+   Use the reviewer checklist at the end of that file.
+
 ### Semantic scaffold checklist (required for core math objects)
 
 For semantic objects such as measurements, submeasurements, distributions,
