@@ -45,7 +45,7 @@ private def evaluatedSliceQuestionEquiv (params : Parameters) [FieldModel params
 
 /-- Pulling a family on `FullSliceQuestion` back along
 `fullSliceQuestionOfEvaluatedSlice` preserves the averaged `sddErrorOp`. -/
-private lemma sddErrorOp_pullback_fullSliceQuestion_eq
+lemma sddErrorOp_pullback_fullSliceQuestion_eq
     (params : Parameters) [FieldModel params.q]
     (ψ : QuantumState (ι × ι))
     {Outcome : Type*} [Fintype Outcome]
