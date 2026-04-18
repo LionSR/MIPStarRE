@@ -858,6 +858,124 @@ private lemma gHatPairProduct_sddOpRel_triple
     (fun q => gHatPairProductRight params family q.1)
     (gHatCommutationError params gamma zeta)).1 hfst
 
+/- private lemma commuteGHalfSandwich_step_commute
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (r : ℕ)
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveFamily params family r)
+      (commuteGHalfSandwich_commuteFamily params family r)
+      (gHatCommutationError params gamma zeta) := by
+  let C : (SliceQuestion params × SliceQuestion params × PointTuple params r) →
+      (GHatOutcome params × GHatOutcome params) → GHatTupleOutcome params r →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q _ gt => rightTensor (ι₁ := ι)
+      (gHatHalfProductOutcomeOperator params family r q.2.2 gt)
+  have hC :
+      ∀ q a,
+        ∑ gt : GHatTupleOutcome params r, (C q a gt)ᴴ * C q a gt ≤ 1 := by
+    intro q a
+    calc
+      ∑ gt : GHatTupleOutcome params r, (C q a gt)ᴴ * C q a gt
+        = rightTensor (ι₁ := ι)
+            (∑ gt : GHatTupleOutcome params r,
+              ((gHatHalfProductOutcomeOperator params family r q.2.2 gt)ᴴ) *
+                gHatHalfProductOutcomeOperator params family r q.2.2 gt) := by
+                  refine Finset.sum_congr rfl ?_
+                  intro gt _
+                  rw [show (rightTensor (ι₁ := ι)
+                      (gHatHalfProductOutcomeOperator params family r q.2.2 gt))ᴴ =
+                      rightTensor (ι₁ := ι)
+                        ((gHatHalfProductOutcomeOperator params family r q.2.2 gt)ᴴ) by
+                    simpa [rightTensor, opTensor] using
+                      (conjTranspose_opTensor (1 : MIPStarRE.Quantum.Op ι)
+                        (gHatHalfProductOutcomeOperator params family r q.2.2 gt))]
+                  simp [C, rightTensor_mul_rightTensor]
+      _ ≤ rightTensor (ι₁ := ι) (1 : MIPStarRE.Quantum.Op ι) := by
+            simpa [rightTensor_finset_sum] using
+              opTensor_mono_right (ι₁ := ι) (A := (1 : MIPStarRE.Quantum.Op ι))
+                (gHatHalfProduct_sum_adjoint_mul_le_one params family r q.2.2)
+                (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one)
+      _ = 1 := by simp [rightTensor]
+  let rawSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun ag => C q ag.1 ag.2 * (gHatPairProductLeft params family (q.1, q.2.1)).outcome ag.1
+        total := ∑ ag, C q ag.1 ag.2 * (gHatPairProductLeft params family (q.1, q.2.1)).outcome ag.1 }
+  let rawTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun ag => C q ag.1 ag.2 * (gHatPairProductRight params family (q.1, q.2.1)).outcome ag.1
+        total := ∑ ag, C q ag.1 ag.2 * (gHatPairProductRight params family (q.1, q.2.1)).outcome ag.1 }
+  have hcab :=
+    Preliminaries.cabApproxDelta_raw ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (fun q => gHatPairProductLeft params family (q.1, q.2.1))
+      (fun q => gHatPairProductRight params family (q.1, q.2.1))
+      C (gHatCommutationError params gamma zeta)
+      (gHatPairProduct_sddOpRel_triple params ψbi family gamma zeta r hcom)
+      hC
+  have hreindex := CommutativityPoints.sddOpRel_reindex (pairTailOutcomeEquiv params r)
+    ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    rawSource rawTarget (gHatCommutationError params gamma zeta) hcab
+  let reindexedSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun a' => (rawSource q).outcome ((pairTailOutcomeEquiv params r).symm a')
+        total := (rawSource q).total }
+  let reindexedTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun a' => (rawTarget q).outcome ((pairTailOutcomeEquiv params r).symm a')
+        total := (rawTarget q).total }
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    reindexedSource reindexedTarget
+    (commuteGHalfSandwich_moveFamily params family r)
+    (commuteGHalfSandwich_commuteFamily params family r)
+    (gHatCommutationError params gamma zeta)
+    (fun q ogs => by
+      simp [reindexedSource, rawSource, commuteGHalfSandwich_moveFamily,
+        pairTailOutcomeEquiv, C, rightTensor_mul_leftTensor_eq_opTensor,
+        leftTensor_mul_rightTensor_eq_opTensor, mul_assoc])
+    (fun q ogs => by
+      simp [reindexedTarget, rawTarget, commuteGHalfSandwich_commuteFamily,
+        pairTailOutcomeEquiv, C, rightTensor_mul_leftTensor_eq_opTensor,
+        leftTensor_mul_rightTensor_eq_opTensor, mul_assoc])
+    hreindex -/
+
+private def thirdSliceFrontEquiv (params : Parameters) (r : ℕ) :
+    (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) ≃
+      (SliceQuestion params × (SliceQuestion params × SliceQuestion params × PointTuple params r)) where
+  toFun q := (q.2.2.1, (q.1, q.2.1, q.2.2.2))
+  invFun q := (q.2.1, q.2.2.1, q.1, q.2.2.2)
+  left_inv q := by
+    rcases q with ⟨x₁, x₂, x₃, xs⟩
+    rfl
+  right_inv q := by
+    rcases q with ⟨x₃, x₁, x₂, xs⟩
+    rfl
+
+private def firstTwoSlicesFrontEquiv (params : Parameters) (r : ℕ) :
+    (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) ≃
+      (SlicePairQuestion params × (SliceQuestion params × PointTuple params r)) where
+  toFun q := ((q.1, q.2.1), (q.2.2.1, q.2.2.2))
+  invFun q := (q.1.1, q.1.2, q.2.1, q.2.2)
+  left_inv q := by
+    rcases q with ⟨x₁, x₂, x₃, xs⟩
+    rfl
+  right_inv q := by
+    rcases q with ⟨⟨x₁, x₂⟩, x₃, xs⟩
+    rfl
+
 private lemma commuteGHalfSandwich_error_bound
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error) (k : ℕ)
@@ -925,6 +1043,225 @@ private def prefixTripleOutcomeEquiv (params : Parameters) [FieldModel params.q]
   left_inv og := by cases og; rfl
   right_inv og := by cases og; rfl
 
+private def pairTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
+    ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r) ≃
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
+  toFun og := (og.1.1, og.1.2, og.2)
+  invFun og := ((og.1, og.2.1), og.2.2)
+  left_inv og := by cases og; rfl
+  right_inv og := by cases og; rfl
+
+private def moveTailQuestionEquiv (params : Parameters) (r : ℕ) :
+    (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) ≃
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) where
+  toFun q := (q.1, q.2.1, q.2.2 0, pointTupleTail q.2.2)
+  invFun q := (q.1, q.2.1, Fin.cons q.2.2.1 q.2.2.2)
+  left_inv q := by
+    rcases q with ⟨x₁, x₂, xs⟩
+    change (x₁, x₂, Fin.cons (xs 0) (pointTupleTail xs)) = (x₁, x₂, xs)
+    congr
+    funext i
+    cases i using Fin.cases with
+    | zero => rfl
+    | succ j => rfl
+  right_inv q := by
+    cases q
+    rfl
+
+private def moveTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
+    (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) ≃
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
+  toFun og := (og.1, og.2.1, og.2.2 0, gHatTupleOutcomeTail og.2.2)
+  invFun og := (og.1, og.2.1, Fin.cons og.2.2.1 og.2.2.2)
+  left_inv og := by
+    rcases og with ⟨g₁, g₂, gs⟩
+    change (g₁, g₂, Fin.cons (gs 0) (gHatTupleOutcomeTail gs)) = (g₁, g₂, gs)
+    congr
+    funext i
+    cases i using Fin.cases with
+    | zero => rfl
+    | succ j => rfl
+  right_inv og := by
+    cases og
+    rfl
+
+private noncomputable def commuteGHalfSandwich_moveStepSourceFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ) :
+    IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι) :=
+  fun q =>
+    { outcome := fun ogs =>
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome ogs.1) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.2.1).outcome ogs.2.2.1) *
+          leftTensor (ι₂ := ι)
+            (gHatHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2)
+      total :=
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.2.1).total) *
+          leftTensor (ι₂ := ι)
+            (gHatHalfProductTotalOperator params family r q.2.2.2) }
+
+private noncomputable def commuteGHalfSandwich_moveStepTargetFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ) :
+    IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι) :=
+  fun q =>
+    { outcome := fun ogs =>
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome ogs.1) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+          rightTensor (ι₁ := ι) ((gHatIdxMeas params family q.2.2.1).outcome ogs.2.2.1) *
+          rightTensor (ι₁ := ι)
+            (gHatHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2)
+      total :=
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
+          rightTensor (ι₁ := ι) ((gHatIdxMeas params family q.2.2.1).total) *
+          rightTensor (ι₁ := ι)
+            (gHatHalfProductTotalOperator params family r q.2.2.2) }
+
+private noncomputable def commuteGHalfSandwich_moveStepMidFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ) :
+    IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι) :=
+  fun q =>
+    { outcome := fun ogs =>
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome ogs.1) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.2.1).outcome ogs.2.2.1) *
+          rightTensor (ι₁ := ι)
+            (gHatHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2)
+      total :=
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.2.1).total) *
+          rightTensor (ι₁ := ι)
+            (gHatHalfProductTotalOperator params family r q.2.2.2) }
+
+private noncomputable def commuteGHalfSandwich_moveSourceFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ) :
+    IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι) :=
+  fun q =>
+    { outcome := fun ogs =>
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome ogs.1) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+          leftTensor (ι₂ := ι)
+            (gHatHalfProductOutcomeOperator params family r q.2.2 ogs.2.2)
+      total :=
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
+          leftTensor (ι₂ := ι)
+            (gHatHalfProductTotalOperator params family r q.2.2) }
+
+private lemma commuteGHalfSandwich_moveSource_eq_split
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params r)
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :
+    (commuteGHalfSandwich_moveSourceFamily params family r q).outcome ogs =
+      (headTailOrderedFamily params family (r + 1) (q.1, Fin.cons q.2.1 q.2.2)).outcome
+        (ogs.1, Fin.cons ogs.2.1 ogs.2.2) := by
+  let A := (gHatIdxMeas params family q.1).outcome ogs.1
+  let B := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+  let T := gHatHalfProductOutcomeOperator params family r q.2.2 ogs.2.2
+  calc
+    (commuteGHalfSandwich_moveSourceFamily params family r q).outcome ogs
+      = leftTensor (ι₂ := ι) ((A * B) * T) := by
+          simp [commuteGHalfSandwich_moveSourceFamily, A, B, T,
+            leftTensor_mul_leftTensor, mul_assoc]
+    _ = leftTensor (ι₂ := ι) (A * (B * T)) := by
+          simp [mul_assoc]
+    _ = leftTensor (ι₂ := ι)
+          (A * (B * gHatHalfProductOutcomeOperator params family r
+            (pointTupleTail (Fin.cons q.2.1 q.2.2))
+            (gHatTupleOutcomeTail (Fin.cons ogs.2.1 ogs.2.2)))) := by
+              have htail :
+                  T = gHatHalfProductOutcomeOperator params family r
+                    (pointTupleTail (Fin.cons q.2.1 q.2.2))
+                    (gHatTupleOutcomeTail (Fin.cons ogs.2.1 ogs.2.2)) := by
+                rfl
+              exact congrArg (fun t => leftTensor (ι₂ := ι) (A * (B * t))) htail
+    _ = (headTailOrderedFamily params family (r + 1) (q.1, Fin.cons q.2.1 q.2.2)).outcome
+          (ogs.1, Fin.cons ogs.2.1 ogs.2.2) := by
+            simp [headTailOrderedFamily, A, B, T,
+              gHatHalfProductOutcomeOperator, leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_move_recursive_zero
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params 0))
+      (commuteGHalfSandwich_moveSourceFamily params family 0)
+      (commuteGHalfSandwich_moveFamily params family 0)
+      0 := by
+  refine ⟨?_⟩
+  unfold sddErrorOp qSDDOp qSDDCore commuteGHalfSandwich_moveSourceFamily commuteGHalfSandwich_moveFamily
+  simp [gHatHalfProductOutcomeOperator, leftTensor_mul_leftTensor,
+    leftTensor_mul_rightTensor_eq_opTensor]
+  have hzero :
+      avgOver (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params 0))
+        (fun q => ((Fintype.card (Polynomial params) : Error) + 1) *
+          ((Fintype.card (Polynomial params) : Error) + 1) * ev ψbi 0) = 0 := by
+    simp [avgOver, uniformDistribution, ev_zero]
+  nlinarith [hzero]
+
+private def pointTupleOneEquiv (params : Parameters) :
+    PointTuple params 1 ≃ SliceQuestion params where
+  toFun xs := xs 0
+  invFun x := fun _ => x
+  left_inv xs := by
+    funext i
+    fin_cases i
+    rfl
+  right_inv x := by rfl
+
+private def gHatTupleOutcomeOneEquiv (params : Parameters) [FieldModel params.q] :
+    GHatTupleOutcome params 1 ≃ GHatOutcome params where
+  toFun gs := gs 0
+  invFun g := fun _ => g
+  left_inv gs := by
+    funext i
+    fin_cases i
+    rfl
+  right_inv g := by rfl
+
+private def splitQuestionEquivOne (params : Parameters) :
+    (SliceQuestion params × PointTuple params 1) ≃ SlicePairQuestion params where
+  toFun q := (q.1, (pointTupleOneEquiv params) q.2)
+  invFun q := (q.1, (pointTupleOneEquiv params).symm q.2)
+  left_inv q := by
+    rcases q with ⟨x, xs⟩
+    simpa using congrArg (fun ys => (x, ys)) ((pointTupleOneEquiv params).left_inv xs)
+  right_inv q := by
+    rcases q with ⟨x, y⟩
+    simpa using congrArg (fun ys => (x, ys)) ((pointTupleOneEquiv params).right_inv y)
+
+private def splitOutcomeEquivOne (params : Parameters) [FieldModel params.q] :
+    (GHatOutcome params × GHatTupleOutcome params 1) ≃ (GHatOutcome params × GHatOutcome params) where
+  toFun og := (og.1, (gHatTupleOutcomeOneEquiv params) og.2)
+  invFun og := (og.1, (gHatTupleOutcomeOneEquiv params).symm og.2)
+  left_inv og := by
+    rcases og with ⟨g, gs⟩
+    simpa using congrArg (fun hs => (g, hs)) ((gHatTupleOutcomeOneEquiv params).left_inv gs)
+  right_inv og := by
+    rcases og with ⟨g₁, g₂⟩
+    simpa using congrArg (fun hs => (g₁, hs)) ((gHatTupleOutcomeOneEquiv params).right_inv g₂)
+
 private noncomputable def commuteGHalfSandwich_recursiveSourceFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -948,6 +1285,50 @@ private noncomputable def commuteGHalfSandwich_recursiveTargetFamily
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           (headTailRotatedFamily params family r (q.1, q.2.2)).outcome (ogs.1, ogs.2.2)
       total := 0 }
+
+private lemma commuteGHalfSandwich_moveBack_eq_recursiveSource
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params r)
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :
+    (commuteGHalfSandwich_moveBackFamily params family r q).outcome ogs =
+      (commuteGHalfSandwich_recursiveSourceFamily params family r q).outcome ogs := by
+  simp [commuteGHalfSandwich_moveBackFamily, commuteGHalfSandwich_recursiveSourceFamily,
+    headTailOrderedFamily, leftTensor_mul_leftTensor, mul_assoc]
+
+/- private lemma commuteGHalfSandwich_recursiveTarget_eq_rotated
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params r)
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :
+    (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs =
+      (headTailRotatedFamily params family (r + 1) (q.1, Fin.cons q.2.1 q.2.2)).outcome
+        (ogs.1, Fin.cons ogs.2.1 ogs.2.2) := by
+  let A := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+  let T := gHatHalfProductOutcomeOperator params family r q.2.2 ogs.2.2
+  let G := (gHatIdxMeas params family q.1).outcome ogs.1
+  have htail :
+      T = gHatHalfProductOutcomeOperator params family r
+        (pointTupleTail (Fin.cons q.2.1 q.2.2))
+        (gHatTupleOutcomeTail (Fin.cons ogs.2.1 ogs.2.2)) := by
+      rfl
+  calc
+    (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs
+      = leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) (T * G) := by
+          rw [show (headTailRotatedFamily params family r (q.1, q.2.2)).outcome (ogs.1, ogs.2.2) =
+              leftTensor (ι₂ := ι) T * leftTensor (ι₂ := ι) G by
+            simp [headTailRotatedFamily, T, G]]
+          rw [leftTensor_mul_leftTensor]
+    _ = leftTensor (ι₂ := ι) (A * (T * G)) := by
+          rw [leftTensor_mul_leftTensor]
+          rfl
+    _ = (headTailRotatedFamily params family (r + 1) (q.1, Fin.cons q.2.1 q.2.2)).outcome
+          (ogs.1, Fin.cons ogs.2.1 ogs.2.2) := by
+            rw [htail]
+            simp [headTailRotatedFamily, A, T, G,
+              gHatHalfProductOutcomeOperator, gHatRotatedHalfProductOutcomeOperator,
+              pointTupleTail, gHatTupleOutcomeTail, leftTensor_mul_leftTensor, mul_assoc]
+-/
 
 private lemma commuteGHalfSandwich_prefixSecondSliceLeft
     (params : Parameters) [FieldModel params.q]
