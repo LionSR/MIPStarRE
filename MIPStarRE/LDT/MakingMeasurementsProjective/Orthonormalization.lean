@@ -31,14 +31,14 @@ theorem orthonormalization {Outcome : Type*}
     (A : SubMeas Outcome ι) (ζ : Error) :
     BipartiteSSCRel ψ (uniformDistribution Unit)
         (constSubMeasFamily A) ζ →
-      MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationBridgePackage ψ A ζ →
+      OrthonormalizationInput ψ A ζ →
       ∃ P : ProjSubMeas Outcome ι,
         SDDRel ψ (uniformDistribution Unit)
           (constSubMeasFamily A.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
-  intro hssc hbridge
-  exact hbridge.fromSSC hψ hssc
+  intro hssc hround
+  exact hround hψ hssc
 
 
 
@@ -102,9 +102,8 @@ private def leftLiftedMeasurement {Outcome : Type*}
 
 /-- `lem:orthonormalization-main-lemma`.
 
-The bridge inputs isolate the still-unformalized spectral truncation and the
-later repair from the raw rounded family to a genuine projective
-submeasurement on the lifted space. -/
+The still-unformalized spectral truncation and late repair are exposed here as
+explicit theorem hypotheses rather than dedicated bridge-package structures. -/
 lemma orthonormalizationMainLemma {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -113,14 +112,12 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
     (hψ : ψ.IsNormalized)
     (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error)
     (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
-    (hspectral :
-      MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationBridgePackage
-        ψ (leftLiftedMeasurement (ιB := ιB) A)
-        (consistencyToAlmostProjectiveError ζ))
-    (hrepair :
-      MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationRepairPackage
-        ψ (leftLiftedMeasurement (ιB := ιB) A)
-        (consistencyToAlmostProjectiveError ζ)) :
+    (hspectral : SpectralTruncationInput
+      ψ (leftLiftedMeasurement (ιB := ιB) A)
+      (consistencyToAlmostProjectiveError ζ))
+    (hrepair : ProjectivizationRepairInput
+      ψ (leftLiftedMeasurement (ιB := ιB) A)
+      (consistencyToAlmostProjectiveError ζ)) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →

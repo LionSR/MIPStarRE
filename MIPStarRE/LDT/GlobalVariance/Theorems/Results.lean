@@ -143,7 +143,8 @@ lemma generalizeB
         generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params) :
     GeneralizeBStatement params strategy ψbi G := by
   -- The analytic pointwise estimate is an explicit input here. In the
-  -- self-improvement pipeline it is supplied by `SelfImprovementBridgePackage`.
+  -- self-improvement pipeline it is supplied as an explicit theorem
+  -- hypothesis.
   refine
     { aggregateFamilyComparison := by
         exact sddRel_unit_family_of_pointwise ψbi

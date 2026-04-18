@@ -126,48 +126,11 @@ abbrev PastingBoundednessInput (params : Parameters)
     (family : IdxPolyFamily params ι) (zeta : Error) : Prop :=
   IdxPolyFamily.SliceBoundednessInput strategy family zeta
 
-/-- Temporary bridge package for the still-unformalized induction assembly.
-
-This isolates the missing recursion/self-improvement/pasting assembly behind an
-explicit witness, matching the temporary bridge style already used in Section 9
-for `SelfImprovementBridgePackage`. -/
-structure MainInductionBridgePackage (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error) (k : ℕ) : Prop where
-  /-- A temporary witness measurement already satisfying the target consistency bound. -/
-  witness :
-    ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
-      ConsRel strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params G.toSubMeas)
-        error ∧
-      error ≤ mainInductionError params k eps delta gamma
-
-/-- Bookkeeping package for the restricted-probabilities lemma.
-
-Both the axis-parallel and diagonal branches use the paper's
-`((m + 1) / m)` slice-conditioning loss. -/
-structure RestrictedProbabilitiesBridgePackage (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (eps gamma : Error) : Prop where
-  /-- The weighted average axis-parallel slice error is bounded by `eps`. -/
-  axisWeightedBound :
-    avgOver (uniformDistribution (Fq params))
-        (fun x => sliceTransverseDirectionWeight params *
-          (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps
-  /-- The weighted average diagonal slice error is bounded by `gamma`. -/
-  diagonalWeightedBound :
-    avgOver (uniformDistribution (Fq params))
-        (fun x => sliceDiagonalDirectionWeight params *
-          (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma
-
 /-- Bookkeeping package for the restricted-probabilities lemma.
 
 The self-consistency branch is formalized directly. The axis-parallel and
-diagonal conditioning bounds are currently exposed through
-`RestrictedProbabilitiesBridgePackage`, matching the temporary bridge-pattern
-already used elsewhere in the repository. -/
+diagonal conditioning bounds now appear as explicit theorem hypotheses rather
+than a dedicated bridge-package structure. -/
 structure RestrictedProbabilitiesStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)

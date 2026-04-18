@@ -10,8 +10,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems
 
 This file contains the current Lean wrappers for the induction-step results.
 The main theorems either forward to already-formalized Section 7/8/9/11 inputs
-or package the remaining induction bookkeeping behind explicit bridge
-hypotheses.
+or expose the remaining induction bookkeeping as explicit theorem hypotheses.
 
 ## References
 
@@ -34,13 +33,19 @@ theorem mainInduction
     (_hgood : strategy.IsGood eps delta gamma)
     (k : ℕ)
     (_hk : params.m * params.d ≤ k)
-    (hbridge : MainInductionBridgePackage params strategy eps delta gamma k) :
+    (hwitness :
+      ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (polynomialEvaluationFamily params G.toSubMeas)
+          error ∧
+        error ≤ mainInductionError params k eps delta gamma) :
     ∃ G : Measurement (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
-  rcases hbridge.witness with ⟨error, G, hG, herror⟩
+  rcases hwitness with ⟨error, G, hG, herror⟩
   refine ⟨G, ?_⟩
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 
@@ -50,18 +55,30 @@ theorem selfImprovementInInductionSection
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hbridges : SelfImprovement.SelfImprovementBridgePackage params strategy eps delta nu)
+    (hnormalizedState : strategy.state.IsNormalized)
+    (hglobalVarianceProofInputs :
+      SelfImprovement.GlobalVarianceProofInputs params strategy eps delta)
+    (hhelperStrongSelfConsistency :
+      SelfImprovement.HelperStrongSelfConsistencyInput params strategy eps delta)
+    (horthonormalization :
+      SelfImprovement.OrthonormalizationInput params strategy eps delta)
+    (hevaluationDataProcessing :
+      SelfImprovement.EvaluationDataProcessingInput params strategy eps delta)
+    (hfinalFields : SelfImprovement.FinalFieldsInput params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
     (Gmeas : Measurement (Polynomial params) ι)
     (hbridge : Gmeas.toSubMeas = G)
     (hcons : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params G) nu) :
+        (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   rcases SelfImprovement.selfImprovementFromSubMeas
-      params strategy eps delta gamma nu hbridges hgood G Gmeas hbridge hcons with
+      params strategy eps delta gamma nu hnormalizedState
+      hglobalVarianceProofInputs hhelperStrongSelfConsistency
+      horthonormalization hevaluationDataProcessing hfinalFields
+      hgood G Gmeas hbridge hcons with
     ⟨H, Z, hH⟩
   rcases hH.measurementBridge with ⟨_, _, hfinal⟩
   refine ⟨H, Z, ?_⟩
@@ -251,7 +268,14 @@ lemma restrictedProbabilities
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (hbridge : RestrictedProbabilitiesBridgePackage params strategy eps gamma) :
+    (haxisWeightedBound :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params *
+            (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps)
+    (hdiagonalWeightedBound :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceDiagonalDirectionWeight params *
+            (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma) :
     RestrictedProbabilitiesStatement params strategy eps delta gamma := by
   let profile : RestrictedFailureProfile params strategy :=
     { axisParallel := fun x =>
@@ -268,13 +292,13 @@ lemma restrictedProbabilities
       sliceTransverseDirectionWeight params *
           averageRestrictedAxisParallelError params profile ≤ eps := by
     simpa [profile, averageRestrictedAxisParallelError, avgOver_const_mul] using
-      hbridge.axisWeightedBound
+      haxisWeightedBound
   have hdiag_weighted_avg :
       sliceDiagonalDirectionWeight params *
           averageRestrictedDiagonalError params profile ≤ gamma := by
     simpa [profile, averageRestrictedDiagonalError, avgOver_const_mul] using
-      hbridge.diagonalWeightedBound
-  refine ⟨hbridge.axisWeightedBound, ?_, ?_, hbridge.diagonalWeightedBound, ?_,
+      hdiagonalWeightedBound
+  refine ⟨haxisWeightedBound, ?_, ?_, hdiagonalWeightedBound, ?_,
     haxis_weighted_avg, hdiag_weighted_avg⟩
   · exact weighted_bound_to_average params haxis_weighted_avg
   · calc

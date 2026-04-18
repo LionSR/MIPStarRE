@@ -104,8 +104,8 @@ lemma selfImprovementHelper
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (nu : Error)
-    (hbridges : SelfImprovementBridgePackage params strategy eps delta nu)
+    (_nu : Error)
+    (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
     -- Kept for API compatibility with the full helper statement, where future
     -- proof obligations will depend on the incoming polynomial measurement.
     (_G : Measurement (Polynomial params) ι) :
@@ -126,23 +126,30 @@ lemma selfImprovementHelper
       positiveSemidefiniteWitness := hsdp.dualPositive
       dualDominatesAveragedPoint := hsdp.dualFeasible }
   · simpa [T] using hsdp
-  · rcases hbridges.globalVarianceProofInputs T with
+  · rcases hglobalVarianceProofInputs T with
       ⟨hlocalDev, hlocalVar, hglobalDev⟩
     -- These are the surfaced GlobalVariance analytic obligations. The wrapper
-    -- proofs consume them here; `SelfImprovementBridgePackage` owns them until
-    -- the Section 8 estimates are formalized directly.
+    -- proofs consume them here until the Section 8 estimates are formalized
+    -- directly.
     exact addInU params strategy eps delta gamma hgood T hlocalDev hlocalVar hglobalDev
 
 /-- `thm:self-improvement`.
 
-NOTE: The SelfImprovementBridgePackage is temporary scaffolding. See issue #278
-for the plan to derive PermInvState internally. -/
+The remaining Section 8/9 obligations are exposed as explicit theorem
+hypotheses, rather than bundled behind a dedicated bridge-package structure. -/
 theorem selfImprovement
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hbridges : SelfImprovementBridgePackage params strategy eps delta nu)
+    (hnormalizedState : strategy.state.IsNormalized)
+    (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
+    (hhelperStrongSelfConsistency :
+      HelperStrongSelfConsistencyInput params strategy eps delta)
+    (horthonormalization : OrthonormalizationInput params strategy eps delta)
+    (hevaluationDataProcessing :
+      EvaluationDataProcessingInput params strategy eps delta)
+    (hfinalFields : FinalFieldsInput params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι)
     (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
@@ -150,26 +157,27 @@ theorem selfImprovement
       (polynomialEvaluationFamily params G.toSubMeas) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
-  rcases selfImprovementHelper params strategy eps delta gamma hgood nu hbridges G with
+  rcases selfImprovementHelper params strategy eps delta gamma hgood nu
+      hglobalVarianceProofInputs G with
     ⟨T, Hhat, Z, hhelper⟩
   have hssc :
       BipartiteSSCRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily Hhat)
         (selfImprovementHelperError params eps delta) :=
-    hbridges.helperStrongSelfConsistency hhelper
-  rcases orthonormalization strategy.state hbridges.normalizedState
+    hhelperStrongSelfConsistency hhelper
+  rcases orthonormalization strategy.state hnormalizedState
       strategy.permInvState Hhat
       (selfImprovementHelperError params eps delta)
-      hssc (hbridges.orthonormalizationBridge hssc) with ⟨H, horth⟩
+      hssc horthonormalization with ⟨H, horth⟩
   have hdata :
       SDDRel strategy.state (uniformDistribution (Point params))
         ((polynomialEvaluationFamily params Hhat).liftLeft)
         ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
         (selfImprovementDataProcessingError params eps delta) :=
-    hbridges.evaluationDataProcessing hssc horth
+    hevaluationDataProcessing hssc horth
   have hfinal :
       SelfImprovementFinalFields params strategy H Z eps delta nu :=
-    hbridges.finalFields hhelper horth hdata
+    hfinalFields hhelper horth hdata
   refine ⟨H, Z, ?_⟩
   exact
     { witness := ⟨T, Hhat, hhelper, horth, hdata⟩
@@ -190,7 +198,14 @@ theorem selfImprovementFromSubMeas
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hbridges : SelfImprovementBridgePackage params strategy eps delta nu)
+    (hnormalizedState : strategy.state.IsNormalized)
+    (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
+    (hhelperStrongSelfConsistency :
+      HelperStrongSelfConsistencyInput params strategy eps delta)
+    (horthonormalization : OrthonormalizationInput params strategy eps delta)
+    (hevaluationDataProcessing :
+      EvaluationDataProcessingInput params strategy eps delta)
+    (hfinalFields : FinalFieldsInput params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
     (Gmeas : Measurement (Polynomial params) ι)
@@ -201,7 +216,9 @@ theorem selfImprovementFromSubMeas
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementSubMeasConclusion params strategy G H Z
         eps delta gamma nu := by
-  rcases selfImprovement params strategy eps delta gamma nu hbridges hgood Gmeas
+  rcases selfImprovement params strategy eps delta gamma nu
+      hnormalizedState hglobalVarianceProofInputs hhelperStrongSelfConsistency
+      horthonormalization hevaluationDataProcessing hfinalFields hgood Gmeas
       (by simpa [hbridge] using hcons) with ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩
   exact
