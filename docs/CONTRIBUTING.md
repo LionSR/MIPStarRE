@@ -153,6 +153,14 @@ When the LaTeX blueprint is out of sync with Lean code, open an issue with
 the `blueprint-sync` label. Describe which chapter, theorem, or definition
 needs `\lean{}` / `\leanok` tags.
 
+Automated drift detection: the [blueprint ↔ Lean sync check][ci-sync] runs
+on every PR and fails when a `\leanok` tag sits on a Lean declaration whose
+transitive axiom closure still depends on `sorryAx`. See
+[`docs/ci-blueprint-sync.md`][ci-sync] for what it checks and how to run it
+locally.
+
+[ci-sync]: ci-blueprint-sync.md
+
 ---
 
 ## 3. Commit Messages

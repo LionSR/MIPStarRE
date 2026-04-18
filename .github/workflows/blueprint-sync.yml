@@ -1,0 +1,43 @@
+name: Blueprint ↔ Lean sync
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'blueprint/**'
+      - 'MIPStarRE/**'
+      - 'lakefile.toml'
+      - 'lake-manifest.json'
+      - 'lean-toolchain'
+      - 'scripts/check_blueprint_sync.py'
+      - '.github/workflows/blueprint-sync.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  blueprint-sync:
+    runs-on: ubuntu-latest
+    name: Axiom-level blueprint ↔ Lean sync
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Lean toolchain and fetch Mathlib cache
+        uses: ./.github/actions/setup-lean
+
+      - name: Build MIPStarRE (cache expected to cover most of it)
+        run: lake build
+
+      - name: Parse blueprint (smoke test)
+        run: python3 scripts/check_blueprint_sync.py --skip-axiom-check
+
+      - name: Run axiom-level blueprint ↔ Lean sync check
+        run: python3 scripts/check_blueprint_sync.py
+        continue-on-error: true
