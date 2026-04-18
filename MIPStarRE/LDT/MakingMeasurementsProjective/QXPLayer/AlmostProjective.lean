@@ -46,19 +46,15 @@ lemma qAlmostProjective {Outcome : Type*}
               exact MIPStarRE.Quantum.sandwich_mono (M := Qa data a) hQa_herm hRank.total_le
       _ = (((1 : Error) + 2 * ε) : ℂ) • Qa data a := by
             simp [hQa_sq]
-  have hsum_smul (s : Finset Outcome) :
-      Finset.sum s (fun a => (((1 : Error) + 2 * ε) : ℂ) • Qa data a) =
-        (((1 : Error) + 2 * ε) : ℂ) • Finset.sum s (fun a => Qa data a) := by
-    simpa using
-      (Finset.smul_sum (s := s) (r := (((1 : Error) + 2 * ε) : ℂ))
-        (f := fun a : Outcome => Qa data a)).symm
   have hsum_le :
       (∑ a, sandwiched a) ≤ (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) := by
     calc
       (∑ a, sandwiched a) ≤ ∑ a, (((1 : Error) + 2 * ε) : ℂ) • Qa data a := by
         exact Finset.sum_le_sum fun a _ => hsandwiched_le a
       _ = (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) := by
-        simpa using hsum_smul Finset.univ
+        simpa using
+          (Finset.smul_sum (s := Finset.univ) (r := (((1 : Error) + 2 * ε) : ℂ))
+            (f := fun a : Outcome => Qa data a)).symm
   have hsub_le :
       (∑ a, sandwiched a) - ∑ a, Qa data a ≤
         (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) - ∑ a, Qa data a := by
@@ -84,29 +80,13 @@ lemma qAlmostProjective {Outcome : Type*}
     _ ≤ (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) - ∑ a, Qa data a := hsub_le
     _ = (2 * ε) • QTotal data := by
           rw [hRank.sum_eq_total]
-          calc
-            ((1 + 2 * (ε : ℂ)) • QTotal data) - QTotal data
-                = ((1 + 2 * (ε : ℂ)) • QTotal data) - ((1 : ℂ) • QTotal data) := by simp
-            _ = ((1 + 2 * (ε : ℂ)) - 1) • QTotal data := by
-                  rw [← sub_smul]
-            _ = ((2 * ε : Error) : ℂ) • QTotal data := by
-                  simp
-            _ = (2 * ε) • QTotal data := rfl
+          simpa [sub_smul]
     _ ≤ (2 * ε) • ((((1 : Error) + 2 * ε) : ℂ) • (1 : MIPStarRE.Quantum.Op ι)) := hscaled_total
     _ = ((2 * ε) * ((1 : Error) + 2 * ε)) • (1 : MIPStarRE.Quantum.Op ι) := by
-          ext i j
-          by_cases hij : i = j
-          · subst hij
-            simp [Matrix.smul_apply]
-            ring
-          · simp [Matrix.smul_apply, hij]
+          simpa [smul_assoc, mul_comm, mul_left_comm, mul_assoc]
     _ ≤ ((4 : Error) * ε) • (1 : MIPStarRE.Quantum.Op ι) := hcoeff_op
     _ = (((4 : Error) * spectralTruncationError ζ) : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
-          ext i j
-          by_cases hij : i = j
-          · subst hij
-            simp [Matrix.smul_apply, ε]
-          · simp [Matrix.smul_apply, hij]
+          simp [ε]
 
 
 end
