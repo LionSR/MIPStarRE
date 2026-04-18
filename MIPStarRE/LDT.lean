@@ -19,6 +19,7 @@ import MIPStarRE.LDT.Test.StrategySelfConsistency
 import MIPStarRE.LDT.Test.StrategyRoleAverage
 import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 import MIPStarRE.LDT.Test.Classical
+import MIPStarRE.LDT.Test.SymmetrizationBridge
 import MIPStarRE.LDT.Test.MainTheorem
 import MIPStarRE.LDT.Test.ErrorCascade
 import MIPStarRE.LDT.Preliminaries.FiniteFields
