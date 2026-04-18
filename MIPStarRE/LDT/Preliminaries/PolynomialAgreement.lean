@@ -1,5 +1,5 @@
+import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Preliminaries.Polynomials
-import MIPStarRE.LDT.Preliminaries.SelfConsistency
 
 /-!
 # Polynomial agreement bound (Step 5 hammer)
