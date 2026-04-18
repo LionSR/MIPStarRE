@@ -143,7 +143,7 @@ private lemma switcherooAggregateFourthTerm_split_contraction
             ((completePartSubMeas params family q.1).total_le_one)
 
 /-- The first `sqrt chi` step in the fourth-term switcheroo chain. -/
-private lemma switcherooAggregateFourthTerm_split_close_once_commuted
+lemma switcherooAggregateFourthTerm_split_close_once_commuted
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -234,7 +234,7 @@ private lemma switcherooAggregateFourthTerm_split_close_once_commuted
   simpa [hleft, hright] using hclose
 
 /-- Left-action contraction witness for the first `sqrt zeta` transfer. -/
-private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
+lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -378,7 +378,7 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
             ((completePartSubMeas params family q.1).total_le_one)
 
 /-- The first `sqrt zeta` step in the fourth-term switcheroo chain. -/
-private lemma switcherooAggregateFourthTerm_once_commuted_close_mixed
+lemma switcherooAggregateFourthTerm_once_commuted_close_mixed
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -437,7 +437,7 @@ private lemma switcherooAggregateFourthTerm_once_commuted_close_mixed
     leftTensor_mul_rightTensor_eq_opTensor, mul_assoc] using hclose
 
 /-- Right-action contraction witness for the second `sqrt zeta` transfer. -/
-private lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
+lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -591,7 +591,7 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
 
 /-- Collapse the split-by-`g` raw expression back to the first positive
 switcheroo term. -/
-private lemma switcherooAggregateFirstTerm_eq_split_by_g
+lemma switcherooAggregateFirstTerm_eq_split_by_g
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -685,7 +685,7 @@ private lemma switcherooAggregateFirstTerm_eq_split_by_g
           rfl
 
 /-- The post-second-`√ζ` left-front expression in the paper's cross-term chain. -/
-private noncomputable def switcherooAggregateLeftFrontRaw
+noncomputable def switcherooAggregateLeftFrontRaw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -701,7 +701,7 @@ private noncomputable def switcherooAggregateLeftFrontRaw
             (M q.2).outcome go.2)))
 
 /-- The split-by-`g` expression that collapses back to the first positive term. -/
-private noncomputable def switcherooAggregateFirstSplitRaw
+noncomputable def switcherooAggregateFirstSplitRaw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -716,7 +716,7 @@ private noncomputable def switcherooAggregateFirstSplitRaw
               (M q.2).outcome go.2))))
 
 /-- The post-first-`√χ` raw expression in the fourth-term chain. -/
-private noncomputable def switcherooAggregateOnceCommutedRaw
+noncomputable def switcherooAggregateOnceCommutedRaw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -733,7 +733,7 @@ private noncomputable def switcherooAggregateOnceCommutedRaw
             (family.meas q.1).outcome go.1)))
 
 /-- Repackage the first `sqrt chi` step using the named raw scalar. -/
-private lemma switcherooAggregateFourthTerm_close_once_commuted_raw
+lemma switcherooAggregateFourthTerm_close_once_commuted_raw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -754,7 +754,7 @@ private lemma switcherooAggregateFourthTerm_close_once_commuted_raw
       params ψbi hnorm family M chi hcomm
 
 /-- The post-first-`√ζ` mixed-tensor raw expression in the fourth-term chain. -/
-private noncomputable def switcherooAggregateMixedRaw
+noncomputable def switcherooAggregateMixedRaw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -772,7 +772,7 @@ private noncomputable def switcherooAggregateMixedRaw
 
 /-- Repackage the second `sqrt zeta` step using the named raw left-front
 scalar. -/
-private lemma switcherooAggregateFourthTerm_mixed_close_left_front_raw
+lemma switcherooAggregateFourthTerm_mixed_close_left_front_raw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))

@@ -250,7 +250,7 @@ theorem triangleSub
 
 /-! ### Right-register variant of `triangleSub` -/
 
-private lemma triangleSub_right
+theorem triangleSub_right
     {Question Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)

@@ -82,6 +82,7 @@ def leftAsSymmetric {params : Parameters} [FieldModel params.q]
     SymStrat params ι where
   state := strategy.state
   permInvState := strategy.permInvState
+  densityFixed := strategy.densityFixed
   isNormalized := strategy.isNormalized
   pointMeasurement := strategy.pointMeasurementA
   axisParallelMeasurement := strategy.axisParallelMeasurementA
@@ -96,6 +97,7 @@ def rightAsSymmetric {params : Parameters} [FieldModel params.q]
     SymStrat params ι where
   state := strategy.state
   permInvState := strategy.permInvState
+  densityFixed := strategy.densityFixed
   isNormalized := strategy.isNormalized
   pointMeasurement := strategy.pointMeasurementB
   axisParallelMeasurement := strategy.axisParallelMeasurementB

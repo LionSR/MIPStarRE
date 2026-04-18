@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.SelfImprovement.Defs
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 
 /-!
 # Section 9 — Theorems
