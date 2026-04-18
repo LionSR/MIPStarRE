@@ -97,6 +97,127 @@ lemma roleCond_finset_sum {α ι : Type*}
   rcases j with ⟨rj, ij⟩
   cases ri <;> cases rj <;> simp [roleCond, roleProj, opTensor, Matrix.one_apply]
 
+/-- Restrict an operator on `Role × ι` to its diagonal `r` block. -/
+noncomputable def roleBlock {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) (X : MIPStarRE.Quantum.Op (Role × ι)) :
+    MIPStarRE.Quantum.Op ι :=
+  Matrix.submatrix X (fun i => (r, i)) (fun j => (r, j))
+
+@[simp] lemma roleBlock_apply {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) (X : MIPStarRE.Quantum.Op (Role × ι)) (i j : ι) :
+    roleBlock r X i j = X (r, i) (r, j) :=
+  rfl
+
+@[simp] lemma roleBlock_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) :
+    roleBlock r (0 : MIPStarRE.Quantum.Op (Role × ι)) = 0 := by
+  ext i j
+  simp [roleBlock]
+
+@[simp] lemma roleBlock_add {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) (X Y : MIPStarRE.Quantum.Op (Role × ι)) :
+    roleBlock r (X + Y) = roleBlock r X + roleBlock r Y := by
+  ext i j
+  simp [roleBlock]
+
+@[simp] lemma roleBlock_neg {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) (X : MIPStarRE.Quantum.Op (Role × ι)) :
+    roleBlock r (-X) = -roleBlock r X := by
+  ext i j
+  simp [roleBlock]
+
+@[simp] lemma roleBlock_sub {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) (X Y : MIPStarRE.Quantum.Op (Role × ι)) :
+    roleBlock r (X - Y) = roleBlock r X - roleBlock r Y := by
+  ext i j
+  simp [sub_eq_add_neg, roleBlock]
+
+@[simp] lemma roleBlock_one {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) :
+    roleBlock r (1 : MIPStarRE.Quantum.Op (Role × ι)) = 1 := by
+  ext i j
+  simp [roleBlock, Matrix.one_apply]
+
+@[simp] lemma roleBlock_roleCond_same {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) (X : MIPStarRE.Quantum.Op ι) :
+    roleBlock r (roleCond r X) = X := by
+  ext i j
+  cases r <;> simp [roleBlock, roleCond, roleProj, opTensor]
+
+@[simp] lemma roleBlock_roleCond_other {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) (X : MIPStarRE.Quantum.Op ι) :
+    roleBlock r (roleCond (Role.other r) X) = 0 := by
+  ext i j
+  cases r <;> simp [roleBlock, roleCond, Role.other, roleProj, opTensor]
+
+@[simp] lemma roleBlock_A_roleCond_B {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (X : MIPStarRE.Quantum.Op ι) :
+    roleBlock Role.A (roleCond Role.B X) = 0 := by
+  ext i j
+  simp [roleBlock, roleCond, roleProj, opTensor]
+
+@[simp] lemma roleBlock_B_roleCond_A {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (X : MIPStarRE.Quantum.Op ι) :
+    roleBlock Role.B (roleCond Role.A X) = 0 := by
+  ext i j
+  simp [roleBlock, roleCond, roleProj, opTensor]
+
+lemma roleBlock_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) {X : MIPStarRE.Quantum.Op (Role × ι)} (hX : 0 ≤ X) :
+    0 ≤ roleBlock r X := by
+  refine Matrix.nonneg_iff_posSemidef.mpr ?_
+  exact (Matrix.nonneg_iff_posSemidef.mp hX).submatrix (fun i => (r, i))
+
+lemma roleBlock_le_one {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) {X : MIPStarRE.Quantum.Op (Role × ι)} (hX : X ≤ 1) :
+    roleBlock r X ≤ 1 := by
+  have hnonneg : 0 ≤ roleBlock r (1 - X) :=
+    roleBlock_nonneg r (sub_nonneg.mpr hX)
+  simpa using hnonneg
+
+/-- Restrict a submeasurement on `Role × ι` to its `r` role block. -/
+noncomputable def restrictRoleSubMeas {α : Type*} [Fintype α]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) (A : SubMeas α (Role × ι)) :
+    SubMeas α ι where
+  outcome := fun a => roleBlock r (A.outcome a)
+  total := roleBlock r A.total
+  outcome_pos := by
+    intro a
+    exact roleBlock_nonneg r (A.outcome_pos a)
+  sum_eq_total := by
+    ext i j
+    have hsum :
+        (∑ a : α, roleBlock r (A.outcome a)) i j =
+          ∑ a : α, roleBlock r (A.outcome a) i j := by
+      simpa using
+        (Matrix.sum_apply i j (Finset.univ : Finset α)
+          (fun a => roleBlock r (A.outcome a)))
+    have hsumA :
+        (∑ a : α, A.outcome a) (r, i) (r, j) =
+          ∑ a : α, A.outcome a (r, i) (r, j) := by
+      simpa using
+        (Matrix.sum_apply (r, i) (r, j) (Finset.univ : Finset α)
+          (fun a => A.outcome a))
+    calc
+      (∑ a : α, roleBlock r (A.outcome a)) i j
+        = ∑ a : α, roleBlock r (A.outcome a) i j := hsum
+      _ = (∑ a : α, A.outcome a) (r, i) (r, j) := by
+            rw [hsumA]
+            simp [roleBlock]
+      _ = A.total (r, i) (r, j) := by
+            exact congrFun (congrFun A.sum_eq_total (r, i)) (r, j)
+  total_le_one := roleBlock_le_one r A.total_le_one
+
+/-- Restrict a measurement on `Role × ι` to its `r` role block. -/
+noncomputable def restrictRoleMeasurement {α : Type*} [Fintype α]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) (A : Measurement α (Role × ι)) :
+    Measurement α ι where
+  toSubMeas := restrictRoleSubMeas r A.toSubMeas
+  total_eq_one := by
+    simpa [restrictRoleSubMeas] using congrArg (roleBlock r) A.total_eq_one
+
 /-- Reassociate the role-pair and payload-pair indices into local role-register factors. -/
 def rolePairPayloadEquiv (ι : Type*) :
     ((Role × Role) × (ι × ι)) ≃ ((Role × ι) × (Role × ι)) where

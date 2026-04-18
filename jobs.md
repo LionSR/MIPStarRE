@@ -128,6 +128,14 @@ Last updated: 2026-04-18
   - verified `lake env lean MIPStarRE/LDT/Test/Strategy.lean`
   - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Defs.lean`
   - verified `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean`
+  - added a `Test`-local role-block extraction API in
+    `Test/StrategyRoleProjectors.lean`:
+    `restrictRoleSubMeas` and `restrictRoleMeasurement`, together with simp
+    lemmas recovering the original `A`- and `B`-side outcomes from the
+    symmetrized measurement on the corresponding role block
+  - verified `lake env lean MIPStarRE/LDT/Test/StrategyRoleProjectors.lean`
+    and `lake env lean MIPStarRE/LDT/Test/StrategyRoleSymmetrization.lean`
+    after adding those helpers
   - traced the remaining `Test.mainFormal` path far enough to isolate two
     paper-level structural gaps:
     1. `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
