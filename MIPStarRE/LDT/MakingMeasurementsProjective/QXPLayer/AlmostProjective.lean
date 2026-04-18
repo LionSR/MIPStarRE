@@ -87,8 +87,9 @@ lemma qAlmostProjective {Outcome : Type*}
               Complex.coe_smul]
     _ ≤ (2 * ε) • ((((1 : Error) + 2 * ε) : ℂ) • (1 : MIPStarRE.Quantum.Op ι)) := hscaled_total
     _ = ((2 * ε) * ((1 : Error) + 2 * ε)) • (1 : MIPStarRE.Quantum.Op ι) := by
-          rw [← Complex.coe_smul, ← Complex.coe_smul, smul_smul]
-          simp
+          rw [show (((1 : Error) + 2 * ε) : ℂ) = ((((1 : Error) + 2 * ε : ℝ)) : ℂ) from by
+                push_cast; ring,
+              Complex.coe_smul, smul_smul]
     _ ≤ ((4 : Error) * ε) • (1 : MIPStarRE.Quantum.Op ι) := hcoeff_op
     _ = (((4 : Error) * spectralTruncationError ζ) : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
           rw [show (((4 : Error) : ℂ) * ((spectralTruncationError ζ : Error) : ℂ))
