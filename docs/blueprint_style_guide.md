@@ -79,29 +79,48 @@ The blueprint reads as a **mathematical document**, not software documentation. 
 - `\notready` — marks as not ready for formalization (orange in graph)
 - `\mathlibok` — already in Mathlib (dark green in graph)
 
-### Statement-level vs proof-level `\leanok`
-`\leanok` is used at two distinct levels. Both are currently parsed identically by `leanblueprint`, but they carry different meanings:
+## `\leanok` semantics: statement-level vs proof-level
 
-1. **Statement-level `\leanok`**: placed *inside* the `\begin{theorem}` / `\begin{lemma}` / `\begin{definition}` environment, on its own line directly after the `\lean{...}` tag. Signals that the **statement** has a matching declaration in Lean.
-2. **Proof-level `\leanok`**: placed *inside* the `\begin{proof}` environment, typically immediately after `\begin{proof}` on the next line. Signals that the **Lean proof is complete** (no transitive `sorryAx` dependency).
+`\leanok` means different things depending on **where** it appears. Both
+placements are valid; they claim different things and must be used
+deliberately. `leanblueprint` currently parses both markers identically,
+so a chapter can legitimately contain more `\leanok` occurrences than
+theorem/lemma/definition environments — each fully proved result
+contributes one statement-level marker and one proof-level marker. Drift
+audits that compare raw `\leanok` counts against environment counts must
+account for this (see prior discussion in #231).
 
-Because `leanblueprint` counts both markers the same way, a chapter can legitimately contain more `\leanok` occurrences than theorem/lemma/definition environments. For example, `blueprint/src/chapter/ch03_preliminaries.tex` has 48 `\leanok` markers against 37 environment blocks — each fully proved result contributes one statement-level marker and one proof-level marker. Drift audits that compare raw `\leanok` counts against environment counts must account for this. See existing proof-level examples at lines 245, 299, 327, 354, 380, 398, 412, 523 of `ch03_preliminaries.tex`, and the closed prior discussion in #231.
+### Statement-level `\leanok`
+Appears **inside** a theorem, lemma, corollary, or definition environment
+(typically on its own line just after the `\lean{}` tag). Claims:
 
-Canonical placement:
+> "The *statement* of this theorem (or the *object* introduced by this
+> definition) exists as a Lean declaration, with a type that matches the
+> blueprint wording."
+
+It does **not** claim the proof is complete. A theorem whose Lean statement
+is declared but whose proof is `sorry` should still carry a statement-level
+`\leanok` as soon as the type is right. Statement-level `\leanok` is
+therefore **not subject to the axiom-closure check** — a `sorry` proof
+does not block it.
+
 ```latex
-\begin{theorem}[Title]\label{thm:label}
-    \lean{LeanDeclarationName}
-    \leanok
-    \uses{...}
-    % LaTeX statement
+\begin{theorem}[Commutativity of~$G$]\label{thm:com-main}
+    \lean{MIPStarRE.LDT.Commutativity.comMain}
+    \leanok                          % statement-level: the type matches
+    \uses{…}
+    … the statement …
 \end{theorem}
 \begin{proof}
-    \leanok
-    % proof sketch matching the Lean proof
+    \leanok                          % proof-level: the proof is complete
+    \uses{…}
+    … the sketch …
 \end{proof}
 ```
 
-A definition with a formalized Lean counterpart uses only the statement-level marker (definitions have no proof block):
+A definition with a formalized Lean counterpart uses only the statement-level
+marker (definitions have no proof block):
+
 ```latex
 \begin{definition}[Title]\label{def:label}
     \lean{LeanDeclarationName}
@@ -109,6 +128,63 @@ A definition with a formalized Lean counterpart uses only the statement-level ma
     % LaTeX definition
 \end{definition}
 ```
+
+### Proof-level `\leanok`
+Appears **inside** the matching `\begin{proof} … \end{proof}` environment
+(or on the same line as `\begin{proof}`). Claims:
+
+> "The Lean proof of this theorem is complete — no `sorry`, no unjustified
+> `axiom`, no `native_decide` on non-trivial goals, and no transitive
+> `sorryAx` dependency."
+
+A proof-level `\leanok` is a strictly stronger assertion than a
+statement-level one. When the CI blueprint↔Lean axiom-closure check (see
+*Related CI* below) is in place, it inspects the transitive axiom closure
+of each Lean declaration that carries a **proof-level** `\leanok` and
+fails the build when the closure still mentions `sorryAx`. Statement-level
+`\leanok` is unaffected by that check by design, since it does not claim
+the proof is complete.
+
+### When to add each
+| Situation                                                             | Statement `\leanok`? | Proof `\leanok`? |
+|-----------------------------------------------------------------------|----------------------|------------------|
+| Statement only declared in Lean, proof is `sorry`                     | yes                  | no               |
+| Statement + proof complete, no transitive `sorry`                     | yes                  | yes              |
+| Statement complete but a dependency still carries `sorry`             | yes                  | no               |
+| Blueprint entry describes an object or claim not yet in Lean          | no                   | no               |
+
+### When to remove a `\leanok`
+Remove **both** `\leanok` tags when:
+- The Lean declaration is renamed or deleted (update `\lean{}` first; if
+  there is no replacement, drop `\leanok`).
+- The Lean statement drifts away from the blueprint wording (e.g. the
+  bound is weakened or a hypothesis is added) — realign the Lean
+  statement or the blueprint text, then re-add `\leanok`.
+
+Remove only the **proof-level** `\leanok` (keep the statement-level tag) when:
+- The proof regresses to `sorry`, introduces an unjustified `axiom`, or
+  gains a transitive dependency on `sorryAx`. The statement is still
+  formalized and type-matched, so the statement-level tag stays per the
+  decision table above; only the completeness claim needs to go.
+
+### Multi-declaration `\lean{A, B, C}` tags
+A comma-separated `\lean{}` tag means the blueprint entry is jointly
+formalized by all listed declarations. A `\leanok` on such an entry
+claims **every** listed declaration is formalized to the level the tag
+asserts. Do not add `\leanok` to a multi-decl tag when one of the listed
+decls is partial or has a disclaimer in its docstring; prefer splitting
+the blueprint entry into the parts that are genuinely formalized.
+
+### Related CI
+- `.github/workflows/lint-blueprint.yml` — the surface-level sync check;
+  runs `python3 scripts/blueprint_lean_sync.py` to flag `\lean{X}` tags
+  whose Lean declaration is missing and to report aggregate
+  formalization progress per chapter.
+- **Planned** axiom-closure check (tracked in #434, implementation in
+  #438): runs `#print axioms` on every declaration that carries a
+  **proof-level** `\leanok` and fails the build if the transitive
+  closure contains `sorryAx`. Until that workflow lands, proof-level
+  `\leanok` is enforced only by convention and PR review.
 
 ## Dependency Graph Colors (web)
 - **Light green box**: definition with `\lean` + `\leanok` (defined in Lean)
