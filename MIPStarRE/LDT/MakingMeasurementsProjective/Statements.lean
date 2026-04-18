@@ -111,6 +111,15 @@ structure SpectralTruncationStatement {Outcome : Type*}
     roundedFamily.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
 
+/-- Explicit input exposing the paper's spectral truncation stage. -/
+abbrev SpectralTruncationInput {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :=
+  ψ.IsNormalized →
+    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
+      SpectralTruncationStatement ψ A ζ
+
 /-- Output package for the rounding-to-projective step. -/
 structure RoundedProjMeasStatement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -122,5 +131,29 @@ structure RoundedProjMeasStatement {Outcome : Type*}
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily P.toSubMeas)
       ζ
+
+/-- Explicit input exposing the late repair from a rounded family to a genuine
+projective submeasurement. -/
+abbrev ProjectivizationRepairInput {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :=
+  SpectralTruncationStatement ψ A ζ →
+    ∃ P : ProjSubMeas Outcome ι,
+      RoundedProjMeasStatement ψ A P (roundingToProjectiveError ζ)
+
+/-- Explicit input exposing the final product-space orthonormalization step. -/
+abbrev OrthonormalizationInput {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) :=
+  ψ.IsNormalized →
+    BipartiteSSCRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationError ζ)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

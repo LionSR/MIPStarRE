@@ -15,14 +15,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma ev_rightTensor_eq_leftTensor_of_permInv
-    (ψ : QuantumState (ι × ι))
-    (hperm : PermInvState ψ)
-    (M : MIPStarRE.Quantum.Op ι) :
-    ev ψ (rightTensor (ι₁ := ι) M) = ev ψ (leftTensor (ι₂ := ι) M) := by
-  rcases hperm with ⟨hswap_ev⟩
-  exact (hswap_ev M).symm
-
 /-- For a projective submeasurement on a permutation-invariant bipartite state,
 the bipartite SSC defect is exactly half of the left/right SDD defect. -/
 lemma qBipartiteSSCDefect_eq_half_qSDD_of_proj
@@ -171,7 +163,7 @@ lemma qBipartiteSSCDefect_eq_half_qSDD_of_proj
                 ev ψ (opTensor (P.outcome a) (P.outcome a))) := by
             refine Finset.sum_congr rfl ?_
             intro a _
-            rw [ev_rightTensor_eq_leftTensor_of_permInv ψ hperm (P.outcome a)]
+            rw [← hperm.swap_ev (P.outcome a)]
             ring
       _ = 2 *
           ∑ a : α,
@@ -862,8 +854,7 @@ lemma gCommStability_ssc_point
                       rw [ev_sub]
               _ = ev strategy.state (leftTensor (ι₂ := ι) T) -
                     ev strategy.state (opTensor T T) := by
-                      rw [ev_rightTensor_eq_leftTensor_of_permInv
-                        strategy.state strategy.permInvState T]
+                      rw [← strategy.permInvState.swap_ev T]
     _ ≤ ev strategy.state (leftTensor (ι₂ := ι) T) -
           ∑ h : Polynomial params,
             ev strategy.state (opTensor ((G x).outcome h) ((G x).outcome h)) := by

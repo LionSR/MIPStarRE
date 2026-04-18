@@ -31,14 +31,7 @@ theorem orthonormalization {Outcome : Type*}
     (A : SubMeas Outcome ι) (ζ : Error) :
     BipartiteSSCRel ψ (uniformDistribution Unit)
         (constSubMeasFamily A) ζ →
-      (ψ.IsNormalized →
-        BipartiteSSCRel ψ (uniformDistribution Unit)
-          (constSubMeasFamily A) ζ →
-          ∃ P : ProjSubMeas Outcome ι,
-            SDDRel ψ (uniformDistribution Unit)
-              (constSubMeasFamily A.liftLeft)
-              (constSubMeasFamily P.toSubMeas.liftLeft)
-              (orthonormalizationError ζ)) →
+      OrthonormalizationInput ψ A ζ →
       ∃ P : ProjSubMeas Outcome ι,
         SDDRel ψ (uniformDistribution Unit)
           (constSubMeasFamily A.liftLeft)
@@ -119,25 +112,12 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
     (hψ : ψ.IsNormalized)
     (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error)
     (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
-    (hspectral :
-      ψ.IsNormalized →
-        (∑ a,
-            ev ψ
-              ((leftLiftedMeasurement (ιB := ιB) A).outcome a -
-                (leftLiftedMeasurement (ιB := ιB) A).outcome a *
-                  (leftLiftedMeasurement (ιB := ιB) A).outcome a) ≤
-          consistencyToAlmostProjectiveError ζ) →
-          MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationStatement
-            ψ (leftLiftedMeasurement (ιB := ιB) A)
-            (consistencyToAlmostProjectiveError ζ))
-    (hrepair :
-      MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationStatement
-          ψ (leftLiftedMeasurement (ιB := ιB) A)
-          (consistencyToAlmostProjectiveError ζ) →
-        ∃ P : ProjSubMeas Outcome (ιA × ιB),
-          MIPStarRE.LDT.MakingMeasurementsProjective.RoundedProjMeasStatement
-            ψ (leftLiftedMeasurement (ιB := ιB) A) P
-            (roundingToProjectiveError (consistencyToAlmostProjectiveError ζ))) :
+    (hspectral : SpectralTruncationInput
+      ψ (leftLiftedMeasurement (ιB := ιB) A)
+      (consistencyToAlmostProjectiveError ζ))
+    (hrepair : ProjectivizationRepairInput
+      ψ (leftLiftedMeasurement (ιB := ιB) A)
+      (consistencyToAlmostProjectiveError ζ)) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas)
       (constSubMeasFamily B.toSubMeas) ζ →

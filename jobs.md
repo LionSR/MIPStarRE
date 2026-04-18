@@ -55,14 +55,14 @@ Last updated: 2026-04-18
   - [x] Eliminate `mainInformal`
   - [ ] Repair the top-level Test model so sampled line questions use unique
     geometric representatives
-  - [x] Eliminate `razSafra`
+  - [x] Close placeholder `razSafra` wrapper
   - [ ] Eliminate `mainFormal`
   - [x] Remove `BridgePackage` wrappers on the `mainFormal` dependency path
   - [ ] Sync any blueprint tags justified by exact Lean/theorem agreement
 - **Completed on this pass**:
-  - proved `Test.razSafra` using the current placeholder surface-vs-point
-    interface: the theorem now closes kernel-clean without introducing any new
-    theorem assumptions
+  - closed the placeholder `Test.razSafra` wrapper against the current reduced
+    surface-versus-point interfaces; this removes the local `sorry`, but it is
+    not yet a paper-faithful Raz-Safra formalization
   - re-surveyed `MIPStarRE/LDT/Test` and confirmed the directory now contains
     exactly one live executable `sorry`, in `Test/MainTheorem.lean`
     (`Test.mainFormal`)
@@ -78,12 +78,16 @@ Last updated: 2026-04-18
   - removed the now-dead bridge-package structure declarations from
     `MainInductionStep/Statements.lean` and
     `MakingMeasurementsProjective/Statements.lean`
+  - follow-up cleanup for PR review: deduplicated the repeated
+    self-improvement and projectivization obligation blocks into named input
+    abbreviations, while keeping the theorem surfaces explicit instead of
+    introducing a new bundled hypothesis
   - verified `grep` finds no remaining `BridgePackage` names anywhere under
     `MIPStarRE/LDT`
   - repaired the commutativity rebuild failure in
-    `Commutativity/ScalarApproximation.lean` by avoiding the stale
-    `PermInvState.swap_ev` projection path and using a local helper theorem for
-    the left/right expectation symmetry step; `lake env lean
+    `Commutativity/ScalarApproximation.lean` by rewriting the two
+    left/right-expectation symmetry sites directly through
+    `PermInvState.swap_ev`; `lake env lean
     MIPStarRE/LDT/Commutativity/ScalarApproximation.lean` now succeeds again
   - eliminated both `Commutativity/Transport.lean` sorries:
     `normalizationCondition_sandwich_bound` now closes directly from

@@ -128,9 +128,13 @@ def PolishchukSpielmanClassicalSoundnessStatement (params : Parameters)
 
 /-- `thm:raz-safra`.
 
-The Raz–Safra theorem: if a point-answer function passes the
-surface-versus-point low-degree test with error `eps`, then there exists a
-low-degree polynomial agreeing with it on most points. -/
+Placeholder wrapper for the current surface-versus-point placeholder
+interfaces.
+
+At present `SurfaceVsPointPassCondition` and
+`PointAnswerSoundnessConclusion` are still reduced placeholders, so this
+theorem only closes that reduced interface. It should not be read as a full
+formalized Raz-Safra theorem yet. -/
 theorem razSafra
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
