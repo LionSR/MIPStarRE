@@ -210,7 +210,7 @@ noncomputable def restrictAxisParallelMeasurement (params : Parameters) [FieldMo
           rfl }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
-private theorem restrictAxisParallelMeasurement_postprocess_eval
+theorem restrictAxisParallelMeasurement_postprocess_eval
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params)
     (ℓ : AxisParallelLine params) (t a : Fq params) :

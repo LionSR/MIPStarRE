@@ -141,6 +141,20 @@ Last updated: 2026-04-18
     on this branch under the split-module API
   - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Theorems.lean`
     after adding that bridge theorem
+  - re-read `references/ldt-paper/inductive_step.tex` and matched the codebase
+    against the paper-faithful order: the next real divergence is earlier than
+    `Test.mainFormal`, at `MainInductionStep.restrictedProbabilities`, whose
+    extra weighted slice-bound hypotheses are not present in the paper
+  - made the first Section 6 surface repair: `MainInductionStep.restrictedProbabilities`
+    now derives the axis-parallel weighted slice bound directly from
+    `strategy.IsGood`, using a new ambient-to-slice transport lemma
+    `restrictedAxisWeightedBound`
+  - exposed `restrictAxisParallelMeasurement_postprocess_eval` from
+    `MainInductionStep/Defs.lean` so the axis transport proof can reuse the
+    slice-to-ambient postprocess identity directly
+  - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Defs.lean` and
+    `lake env lean MIPStarRE/LDT/MainInductionStep/Theorems.lean` after the
+    axis-side Section 6 repair
   - traced the remaining `Test.mainFormal` path far enough to isolate two
     paper-level structural gaps:
     1. `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
@@ -168,6 +182,18 @@ Last updated: 2026-04-18
     `SliceBoundednessInput` hypotheses directly from the symmetrized
     `hpass : strategy.PassesLowIndividualDegreeTest eps`. Without that family
     assembly, `Test.mainFormal` cannot instantiate the induction witness.
+  - Before that family assembly can be made paper-faithful, the earlier
+    `restrictedProbabilities` wrapper still needs two missing transport lemmas:
+    one showing the weighted average of the `x`-restricted axis-parallel branch
+    is bounded by the ambient axis-parallel failure probability, and one showing
+    the analogous weighted bound for the restricted diagonal branch. Those
+    transport lemmas require explicit equivalences between ambient samples in
+    dimension `m+1` and slice samples at height `x`; they are not yet present in
+    the repository.
+  - After this pass, the axis-parallel transport lemma is present, but the
+    diagonal analogue is still missing. That diagonal transport is now the
+    immediate blocker to removing the final extra hypothesis from
+    `restrictedProbabilities` and continuing the paper-faithful Section 6 chain.
   - The geometric-line canonicalization is not merged on the live proof path in
     this branch: the commutativity bridge remains proved only for the older raw
     `PointDiagonalLineQuestion = DiagonalLine × Fq` model.
@@ -198,6 +224,14 @@ Last updated: 2026-04-18
     induction outputs, build the `IdxPolyFamily` plus the four hypotheses
     consumed by `mainInductionBridgeFromPastedFamily`; only after that can the
     new role-block unsymmetrization helpers be used to finish `Test.mainFormal`
+  - immediately before that, add the two ambient-to-slice transport lemmas for
+    the axis-parallel and diagonal branches and use them to remove the extra
+    weighted-bound hypotheses from `MainInductionStep.restrictedProbabilities`,
+    so the Section 6 surface matches `inductive_step.tex:374-411`
+  - the axis branch is now done; the next concrete theorem is the diagonal
+    ambient-to-slice transport lemma bounding the weighted average of the
+    `x`-restricted diagonal failure probabilities by the ambient diagonal branch
+    of `strategy.IsGood`
   - continue up the Section 3 dependency chain, starting with the remaining
     projectivization / orthonormalization / commutativity / pasting wrappers
     needed to produce the witness consumed by `Test.mainFormal`.
