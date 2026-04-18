@@ -211,7 +211,7 @@ theorem orthonormalizeAndComplete
       OrthonormalizeAndCompleteStatement ψ A P Q a0 ζ := by
   -- Step 6a: apply orthonormalization to A.toSubMeas.
   obtain ⟨P, hClose⟩ :=
-    orthonormalization (Outcome := Outcome) (ι := ι) ψ hψ hperm
+    orthonormalization (Outcome := Outcome) (ι := ι) ψ hψ
       A.toSubMeas ζ hssc hbridge
   -- Step 6b: complete P to a measurement Q via completeAtOutcome at a0.
   obtain ⟨Q, hQstmt⟩ :=
