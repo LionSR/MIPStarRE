@@ -210,6 +210,12 @@ noncomputable def restrictAxisParallelMeasurement (params : Parameters) [FieldMo
           rfl }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
+/-- Slice/ambient postprocess identity: postprocessing the height-`x` slice of the
+axis-parallel measurement at coordinate `t` agrees pointwise with postprocessing the
+ambient axis-parallel measurement on `AxisParallelLine.appendAtHeight params ℓ x` at
+the same coordinate. This is the reusable bridge that transports axis-parallel
+probabilities between the restricted `xRestrictedStrategy` and the ambient `strategy`
+on each slice. -/
 theorem restrictAxisParallelMeasurement_postprocess_eval
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params)

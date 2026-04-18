@@ -255,6 +255,10 @@ noncomputable def symmetrizedIdxProjMeas
         simp [add_mul, mul_add, roleCond_mul_same, roleCond_A_mul_B,
           roleCond_B_mul_A, (MA q).proj a, (MB q).proj a] }
 
+/-- Bridge simp lemma: on the `A`-role diagonal block, the symmetrized measurement's
+outcomes reduce to Alice's original outcomes `(MA q).outcome a`. This is the key
+unsymmetrization identity used on the `mainFormal` path to recover `G_A` from the
+induction output `G`. -/
 @[simp] theorem restrictRoleSubMeas_symmetrizedIdxProjMeas_A_outcome
     {Question Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
@@ -263,6 +267,10 @@ noncomputable def symmetrizedIdxProjMeas
       (MA q).outcome a := by
   simp [restrictRoleSubMeas, symmetrizedIdxProjMeas]
 
+/-- Bridge simp lemma: on the `B`-role diagonal block, the symmetrized measurement's
+outcomes reduce to Bob's original outcomes `(MB q).outcome a`. This is the key
+unsymmetrization identity used on the `mainFormal` path to recover `G_B` from the
+induction output `G`. -/
 @[simp] theorem restrictRoleSubMeas_symmetrizedIdxProjMeas_B_outcome
     {Question Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
