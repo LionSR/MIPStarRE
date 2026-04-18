@@ -278,6 +278,10 @@ Last updated: 2026-04-14
   - [ ] Add/update `\leanok` tags in `blueprint/src/chapter/ch09_pasting.tex`
   - [ ] Run `lake build`
 - **Completed on this pass**:
+  - ported the proved `ldGbcon` machinery into the active split leaf `MIPStarRE/LDT/Pasting/Core/Bounds.lean`, including the public reusable theorem `pointVerticalLineSdd`
+  - converted `MIPStarRE/LDT/Pasting/SwitcherooCompletion/Switcheroo.lean` into a re-export wrapper of the finished top-level `SwitcherooCompletion` implementation, removing that split-leaf `sorry`
+  - added the helper lemmas `postprocess_postprocess`, `restrictToAxisParallelLine_eval_at_pointHeight`, `postprocess_hRestrictionToVerticalLine_eq_evaluateAt`, and `consRel_uniform_fst` in `BridgeLemmas.lean` to support the paper-faithful proof of `hAConsistency_submeas_core`
+  - partially wired `hAConsistency_submeas_core` through the intended chain `hHB.lineConsistency -> product lift -> pointNextEquiv -> question-dependent postprocess -> triangleSub_right` and isolated the remaining obstruction to the final quantitative comparison with `ldPastingInInductionNu`
   - proved `commutativitySwitcheroo` in `Pasting/SwitcherooCompletion.lean` by replacing the last heartbeat-heavy `χ` step with pointwise raw rewrite lemmas and local wrapper bounds (`OnceCommutedRawLocal`, `MixedRawLocal`, `LeftFrontRawLocal`, `FirstSplitRawLocal`)
   - proved `ldGbcon` in `Pasting/Core.lean` from the paper's `eq:ld-abcon` -> `eq:ld-gbcon` chain: conditioned axis-parallel consistency in the last direction, self-consistency-to-right-register transfer, `triangleSub_right`, and the vertical-line reparametrization identity
   - added reusable `pointVerticalLineSdd` in `Pasting/Core.lean`, exposing the point-vs-vertical-line `SDDRel` bound with error `8m eps + 4 delta`
@@ -301,8 +305,11 @@ Last updated: 2026-04-14
 - **Current live count after this pass**:
   - `Pasting/SwitcherooCompletion.lean`: 0 `sorry`s
   - `Pasting/Core.lean`: 0 `sorry`s
+  - `Pasting/SwitcherooCompletion/Switcheroo.lean`: 0 `sorry`s
+  - `Pasting/Core/Bounds.lean`: 0 `sorry`s
   - `Pasting/BridgeLemmas.lean`: 5 `sorry`s
-  - `Pasting/Bernoulli.lean`: 3 `sorry`s
+  - `Pasting/Bernoulli/Recurrence.lean`: 2 `sorry`s
+  - `Pasting/Bernoulli/Final.lean`: 1 `sorry`
   - total remaining in `MIPStarRE/LDT/Pasting`: 8
   - refreshed the exact live chain: `ldGbcon`, `commutativitySwitcheroo`, `commuteGHalfSandwich`, `ldSandwichLineOnePoint`, `hBConsistency`, `hAConsistency`, `overAllOutcomes`, `fromHToG` (2 goals), `chernoffBernoulliMatrix`, `ldPastingNCompleteness`
   - re-read `references/ldt-paper/ld-pasting.tex` and `blueprint/src/chapter/ch09_pasting.tex` for the active Section 12 spine

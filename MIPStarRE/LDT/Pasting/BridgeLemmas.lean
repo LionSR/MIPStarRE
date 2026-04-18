@@ -1,4 +1,6 @@
 import MIPStarRE.LDT.Pasting.GHatFacts
+import MIPStarRE.LDT.Pasting.Core.Bounds
+import MIPStarRE.LDT.Basic.LowDegreePolynomial
 
 /-!
 # Section 12 pasting: sandwich-chain bridge lemmas
@@ -14,6 +16,120 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+private lemma postprocess_postprocess
+    {α β γ : Type*} [Fintype α] [Fintype β] [Fintype γ]
+    (A : SubMeas α ι) (f : α → β) (g : β → γ) :
+    postprocess (postprocess A f) g = postprocess A (g ∘ f) := by
+  classical
+  refine SubMeas.ext ?_ ?_
+  · intro c
+    simp [postprocess, Function.comp, Finset.sum_filter, Finset.sum_comm,
+      eq_comm, and_left_comm, and_assoc]
+  · simp [postprocess_total]
+
+private lemma restrictToAxisParallelLine_eval_at_pointHeight
+    (params : Parameters) [FieldModel params.q]
+    (h : Polynomial params.next) (u : Point params.next) :
+    let verticalLine : AxisParallelLine params.next :=
+      { base := appendPoint params (truncatePoint params u) zeroCoord
+        direction := lastCoord params }
+    (Polynomial.restrictToAxisParallelLine params.next h verticalLine)
+        (pointHeight params u) = h u := by
+  let verticalLine : AxisParallelLine params.next :=
+    { base := appendPoint params (truncatePoint params u) zeroCoord
+      direction := lastCoord params }
+  change encodeScalar
+      (_root_.Polynomial.eval (decodeScalar (pointHeight params u))
+        (MvPolynomial.eval₂ _root_.Polynomial.C
+          (Polynomial.axisCoordinatePolynomial params.next verticalLine) h.poly)) =
+    encodeScalar (MvPolynomial.eval (decodePoint u) h.poly)
+  rw [MvPolynomial.polynomial_eval_eval₂]
+  have hC :
+      (_root_.Polynomial.evalRingHom (decodeScalar (pointHeight params u))).comp
+          _root_.Polynomial.C = RingHom.id (Scalar params.next) := by
+    ext r
+    change _root_.Polynomial.eval (decodeScalar (pointHeight params u)) (_root_.Polynomial.C r) = r
+    simp
+  rw [hC]
+  have hvars :
+      (fun s : Fin params.next.m =>
+        _root_.Polynomial.eval (decodeScalar (pointHeight params u))
+          (Polynomial.axisCoordinatePolynomial params.next verticalLine s)) = decodePoint u := by
+    funext s
+    by_cases hs : s = lastCoord params
+    · subst hs
+      rw [show pointHeight params u = u (lastCoord params) by simp [pointHeight, lastCoord]]
+      have hbase : verticalLine.base (lastCoord params) = zeroCoord := by
+        simpa [verticalLine, pointHeight] using
+          (pointHeight_appendPoint params (truncatePoint params u) zeroCoord)
+      rw [Polynomial.axisCoordinatePolynomial, if_pos rfl, hbase]
+      change _root_.Polynomial.eval (decodeScalar (u (lastCoord params)))
+          (_root_.Polynomial.C (decodeScalar zeroCoord) + _root_.Polynomial.X) =
+        decodeScalar (u (lastCoord params))
+      simp [zeroCoord]
+    · have hs_lt : s.1 < params.m := by
+        have hs_succ : s.1 < params.m + 1 := by
+          simpa [Parameters.next] using s.2
+        have hs_ne : s.1 ≠ params.m := by
+          intro h
+          apply hs
+          exact Fin.ext h
+        omega
+      have hs' : s ≠ verticalLine.direction := by
+        simpa [verticalLine] using hs
+      have hbase : verticalLine.base s = u s := by
+        simp [verticalLine, appendPoint, truncatePoint, hs_lt]
+      rw [Polynomial.axisCoordinatePolynomial, if_neg hs', hbase]
+      change _root_.Polynomial.eval (decodeScalar (pointHeight params u))
+          (_root_.Polynomial.C (decodeScalar (u s))) = decodeScalar (u s)
+      simp
+      rfl
+  rw [hvars]
+  exact congrArg encodeScalar (show MvPolynomial.eval₂ (RingHom.id (Scalar params.next)) (decodePoint u) h.poly =
+    MvPolynomial.eval (decodePoint u) h.poly by rfl)
+
+private lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
+    (params : Parameters) [FieldModel params.q]
+    (H : SubMeas (Polynomial params.next) ι) (u : Point params.next) :
+    postprocess
+      (hRestrictionToVerticalLine params H (truncatePoint params u))
+      (fun f => f (pointHeight params u)) =
+    evaluateAt params.next u H := by
+  let verticalLine : AxisParallelLine params.next :=
+    { base := appendPoint params (truncatePoint params u) zeroCoord
+      direction := lastCoord params }
+  rw [show hRestrictionToVerticalLine params H (truncatePoint params u) =
+      postprocess H (fun h => Polynomial.restrictToAxisParallelLine params.next h verticalLine) by
+      rfl]
+  rw [postprocess_postprocess]
+  have hfun :
+      (fun h => (Polynomial.restrictToAxisParallelLine params.next h verticalLine) (pointHeight params u)) =
+        fun h => h u := by
+          funext h
+          simpa [verticalLine] using restrictToAxisParallelLine_eval_at_pointHeight params h u
+  simpa [evaluateAt, Function.comp] using congrArg (postprocess H) hfun
+
+private lemma consRel_uniform_fst
+    {α β Outcome : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β] [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (A B : IdxSubMeas α Outcome ι) (δ : Error) :
+    ConsRel ψ (uniformDistribution α) A B δ →
+      ConsRel ψ (uniformDistribution (α × β))
+        (fun ab => A ab.1)
+        (fun ab => B ab.1)
+        δ := by
+  intro ⟨h⟩
+  constructor
+  unfold bipartiteConsError at *
+  calc
+    avgOver (uniformDistribution (α × β))
+        (fun ab => qBipartiteConsDefect ψ (A ab.1) (B ab.1))
+      = avgOver (uniformDistribution α)
+          (fun a => qBipartiteConsDefect ψ (A a) (B a)) := by
+            exact avgOver_uniform_fst (fun a => qBipartiteConsDefect ψ (A a) (B a))
+    _ ≤ δ := h
 
 /-! ### Bridge lemmas for the sandwich chain
 
@@ -228,7 +344,101 @@ private lemma hAConsistency_submeas_core
           (constructedPastedSubMeas params family k))
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta) := by
-  sorry
+  let H := constructedPastedSubMeas params family k
+  let pointLineMeas : IdxMeas (Point params.next) (Fq params.next) ι := fun u =>
+    { toSubMeas :=
+        postprocess
+          (verticalLineMeasurementFamily params strategy (truncatePoint params u))
+          (fun f => f (pointHeight params u))
+      total_eq_one := by
+        let ℓ : AxisParallelLine params.next :=
+          { base := appendPoint params (truncatePoint params u) zeroCoord
+            direction := lastCoord params }
+        simpa [verticalLineMeasurementFamily, ℓ, postprocess_total] using
+          (strategy.axisParallelMeasurement ℓ).total_eq_one }
+  let νB := hBConsistencyError params eps delta gamma zeta k
+  let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
+  have hline_prod :
+      ConsRel strategy.state (uniformDistribution (VerticalLineQuestion params × Fq params))
+        (fun ux => hRestrictionToVerticalLine params H ux.1)
+        (fun ux => verticalLineMeasurementFamily params strategy ux.1)
+        νB := by
+    exact consRel_uniform_fst strategy.state
+      (hRestrictionToVerticalLine params H)
+      (verticalLineMeasurementFamily params strategy)
+      νB
+      hHB.lineConsistency
+  have hline_next :
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (fun u => hRestrictionToVerticalLine params H (truncatePoint params u))
+        (fun u => verticalLineMeasurementFamily params strategy (truncatePoint params u))
+        νB := by
+    exact (Preliminaries.consRel_uniform_equiv
+      ((pointNextEquiv params).symm)
+      strategy.state
+      (fun ux => hRestrictionToVerticalLine params H ux.1)
+      (fun ux => verticalLineMeasurementFamily params strategy ux.1)
+      νB).1 hline_prod
+  have hline_point :
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (polynomialEvaluationFamily params.next H)
+        (IdxMeas.toIdxSubMeas pointLineMeas)
+        νB := by
+    have hproc :=
+      Preliminaries.consRelDataProcessing_questionDependent strategy.state
+        (uniformDistribution (Point params.next))
+        (fun u => hRestrictionToVerticalLine params H (truncatePoint params u))
+        (fun u => verticalLineMeasurementFamily params strategy (truncatePoint params u))
+        νB
+        (fun u f => f (pointHeight params u))
+        hline_next
+    simpa [pointLineMeas, polynomialEvaluationFamily,
+      postprocess_hRestrictionToVerticalLine_eq_evaluateAt, H] using hproc
+  have hpoint_sdd :
+      SDDRel strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointLineMeas))
+        (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+        (8 * (params.m : Error) * eps + 4 * delta) := by
+    exact Preliminaries.sddRel_symm strategy.state
+      (uniformDistribution (Point params.next))
+      _ _ _
+      (by simpa [pointLineMeas] using pointVerticalLineSdd params strategy eps delta gamma hgood)
+  have htri :
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (polynomialEvaluationFamily params.next H)
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (νB + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+    exact Preliminaries.triangleSub_right strategy.state
+      (uniformDistribution (Point params.next))
+      strategy.isNormalized
+      (by simpa using uniformDistribution_weight_sum_le_one (Point params.next))
+      (polynomialEvaluationFamily params.next H)
+      pointLineMeas
+      strategy.pointMeasurement.toMeasurement
+      νB
+      (8 * (params.m : Error) * eps + 4 * delta)
+      hline_point
+      hpoint_sdd
+  have hswap :
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next H)
+        (νB + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+    exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+      (uniformDistribution (Point params.next))
+      (polynomialEvaluationFamily params.next H)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (νB + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))
+      htri
+  refine ⟨?_⟩
+  calc
+    bipartiteConsError strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next H)
+      ≤ νB + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta) := hswap.offDiagonalBound
+    _ ≤ ν := by
+      sorry
 
 /-- `cor:h-a-consistency`.
 
