@@ -123,14 +123,27 @@ structure ProjectiveNonMeasurementBridgePackage {Outcome : Type*}
           ∑ a, R.outcome a = R.total
 
 /-- Output of the auxiliary-space construction used inside
-`lem:projective-low-rank-sum`: the paper's auxiliary Hilbert space
-`ℂ^m` together with the diagonal projective measurement `T_a` on it,
-and the paper's rank bound `m ≤ d`. -/
+`lem:projective-low-rank-sum`: the paper's auxiliary Hilbert space `ℂ^m`
+together with an auxiliary projective measurement `T_a` on it, and the
+paper's rank bound `m ≤ d`.
+
+The paper's intended construction (orthonormalization.tex Lem 5.5) takes
+`T_a = ∑_i |a,i⟩⟨a,i|` on `ℂ^m` with `m = ∑_a rank(Q_a)`, i.e. the
+indexed-slab diagonal form over the eigenvector basis of each rounded
+projector `R_a`.  That diagonal/basis structure is *not* enforced as a
+predicate here — it is the obligation of the concrete bridge instance.
+Downstream proofs that rely on the diagonal action of `T_a` (e.g.
+`xa_t`, `qaRestated`) will therefore require the bridge instance to also
+expose that predicate, or to be refined with additional fields when the
+supporting spectral lemmas land. -/
 structure RankReductionAuxOutput (Outcome : Type uOutcome) [Fintype Outcome]
     (ι : Type uι) [Fintype ι] [DecidableEq ι] where
   /-- Auxiliary Hilbert space (paper's `ℂ^m`). -/
   auxSpace : FiniteHilbertSpace.{uι}
-  /-- Diagonal projective measurement `T_a` on the auxiliary space. -/
+  /-- Auxiliary projective measurement `T_a` on the auxiliary space.
+  Intended to be the paper's diagonal/indexed-slab form, but the diagonal
+  predicate is not part of this structure — see the structure-level
+  docstring. -/
   t : ProjMeas Outcome auxSpace.carrier
   /-- Paper's rank bound `m ≤ d`. -/
   auxDim_le : Fintype.card auxSpace.carrier ≤ Fintype.card ι
@@ -139,32 +152,40 @@ structure RankReductionAuxOutput (Outcome : Type uOutcome) [Fintype Outcome]
 the rank-reduction step (`lem:projective-low-rank-sum`, orthonormalization.tex
 Lem 5.5).
 
-Given a rounded projective family `R_a` on `ι` whose total stays bounded by
-`(1 + 2√ζ)·I`, the paper's proof constructs an auxiliary Hilbert space `ℂ^m`
-with `m = ∑_a rank(Q_a) ≤ d` and diagonal projective measurements
+Given a specific rounded projective family `q = R_a` on `ι` satisfying
+`RoundingToProjectorsWitness ψ A ζ q` (so that its total stays bounded by
+`(1 + 2√ζ)·I`), the paper's proof constructs an auxiliary Hilbert space
+`ℂ^m` with `m = ∑_a rank(Q_a) ≤ d` and a projective measurement
 `T_a = ∑_i |a,i⟩⟨a,i|` on it, used downstream in the `X/XHat/P` layer
 construction.
 
 The matrix-level spectral argument — eigenvector basis of each rounded
 projector `R_a`, followed by the indexed-slab construction on
 `Σ_a Fin (rank R_a)` — is isolated here as an opaque producer until the
-supporting spectral lemmas (e.g., `Matrix.IsHermitian.eigenvectorBasis`
+supporting spectral lemmas (e.g. `Matrix.IsHermitian.eigenvectorBasis`
 restricted to the 1-eigenspace of a projector, plus a matrix-level
-`rank_of_isProj`) land in Mathlib or in the project.  This mirrors the
-existing `ProjectiveNonMeasurementBridgePackage` /
-`SpectralTruncationBridgePackage` / `ProjectivizationRepairPackage` pattern:
-the linear-algebra debt is centralized in one bridge rather than hidden
-behind a `default` witness. -/
+`rank_of_isProj`) land in Mathlib or in the project.
+
+This is the second Lean bridge scaffold in this chapter alongside the
+earlier `ProjectiveNonMeasurementBridgePackage`.  Unlike that bridge, this
+one is `Type`-valued (not `Prop`-valued) because `RankReductionAuxOutput`
+carries data (`auxSpace`, `t`).  It is parametric on the *specific*
+`(q, hq)` the consumer holds, so a future implementation that can only
+build `(auxSpace, T_a)` for the selected rounded family suffices — no
+universal quantification over all rounded families is required.  The
+closest sibling abbrevs in `MakingMeasurementsProjective/Statements.lean`
+are `SpectralTruncationStatement` (output-shaped, not a producer) and
+`ProjectivizationRepairInput` (`Prop`-valued existential over the repaired
+family), neither of which uses the `structure ... where fromX` form
+employed here. -/
 structure RankReductionBridgePackage {Outcome : Type uOutcome} [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
-  /-- Given any rounded projective family produced by
-  `ProjectiveNonMeasurementBridgePackage`, produce the paper's `(auxSpace,
-  T_a)` pair together with the `m ≤ d` rank bound. -/
-  fromRounded :
-    ∀ (q : OpFamily Outcome ι),
-      RoundingToProjectorsWitness ψ A ζ q →
-        RankReductionAuxOutput Outcome ι
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
+    (q : OpFamily Outcome ι)
+    (hq : RoundingToProjectorsWitness ψ A ζ q) where
+  /-- The paper's `(auxSpace, T_a)` construction output together with the
+  `m ≤ d` rank bound for the specific rounded family `q`. -/
+  out : RankReductionAuxOutput Outcome ι
 
 /-- The raw operator family obtained by sandwiching the auxiliary projectors
 `T_a` with a candidate `XHat`. This is the family later named `P`. -/

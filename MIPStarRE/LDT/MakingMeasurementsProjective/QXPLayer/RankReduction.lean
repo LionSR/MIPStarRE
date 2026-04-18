@@ -201,9 +201,10 @@ stays bounded by `(1 + 2√ζ)I`, and the auxiliary dimension is at most the
 original ambient dimension.
 
 The auxiliary-space-and-`T` data is supplied via
-`RankReductionBridgePackage`; this keeps the paper's spectral derivation of
-`(auxSpace, T_a)` from the rounded family `R_a` localized to one bridge
-rather than silently filled in with a vacuous `default` witness. -/
+`RankReductionBridgePackage`, parametric on the specific rounded family
+`(q, hq)`; this keeps the paper's spectral derivation of `(auxSpace, T_a)`
+from the rounded family `R_a` localized to one bridge rather than silently
+filled in with a vacuous `default` witness. -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -211,7 +212,9 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
     (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 ≤ ζ)
     (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ)
-    (hrankBridge : RankReductionBridgePackage ψ A ζ)
+    (hrankBridge : ∀ (q : OpFamily Outcome ι)
+        (hq : RoundingToProjectorsWitness ψ A ζ q),
+      RankReductionBridgePackage ψ A ζ q hq)
     (source_almost_projective :
       ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
@@ -221,7 +224,7 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
   · letI : Nonempty Outcome := hOutcome
     letI : Inhabited Outcome := Classical.inhabited_of_nonempty hOutcome
     obtain ⟨q, hrounded, hsum⟩ := hbridge.fromSourceAlmostProjective source_almost_projective
-    let aux : RankReductionAuxOutput Outcome ι := hrankBridge.fromRounded q hrounded
+    let aux : RankReductionAuxOutput Outcome ι := (hrankBridge q hrounded).out
     let data : QLayerData Outcome ι :=
       { auxSpace := aux.auxSpace
         q := q
