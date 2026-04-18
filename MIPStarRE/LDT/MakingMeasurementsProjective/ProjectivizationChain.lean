@@ -1,16 +1,30 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
 
 /-!
-# Section 5/Section 10 — Projectivization chain (Step 6 of the inductive step)
+# Section 10 — Step 6 (orthonormalize-and-complete chain)
 
 This file formalises **Step 6** of the eight-step pipeline used in the proof of
-the main inductive step (`mainFormal`):
-after the Schwartz–Zippel reduction (Step 5) yields a polynomial measurement `G`
-together with a `ζ₁`-self-consistency relation
-`G_g ⊗ I ≃_{ζ₁} I ⊗ G_g`,
-the paper applies the orthonormalization lemma (`thm:orthonormalization`)
-followed by the completion lemma (`prop:completing-to-measurement`) to obtain
-projective measurements `Q^A`, `Q^B` close to `G^A`, `G^B`.
+the main inductive step (`mainFormal`). In the paper, Step 6 is the
+"projectivization chain" (`inductive_step.tex` lines 130–149) whose ultimate
+goal is to produce projective measurements `Q^A`, `Q^B` close to `G^A`, `G^B`.
+That chain has two substeps:
+
+1. **Orthonormalization** (`thm:orthonormalization`, cross-referenced from
+   Section 5).
+2. **Completion to a measurement** (`prop:completing-to-measurement`).
+
+followed by a separate promotion of the completed measurement to a
+projective measurement (`\polymeas{m}{q}{d}`), needed for Step 7's
+invocation of `prop:simeq-to-approx`.
+
+This file formalises *only* the first two substeps — orthonormalization
+followed by completion — which together yield measurements `Q^A`, `Q^B`
+close to `G^A`, `G^B` in state-dependent distance. The subsequent promotion
+of `Q` to a `ProjMeas` is tracked as an explicit follow-up (see the
+`Note (Q-projective)` section below). The main theorem is therefore named
+`orthonormalizeAndComplete` to accurately describe what is proven here,
+while the module/file name retains the paper's `ProjectivizationChain`
+terminology for the overall pipeline step.
 
 The chain composes two existing pieces of infrastructure:
 
@@ -75,7 +89,7 @@ open MIPStarRE.LDT.Preliminaries (completingToMeasurement completeAtOutcome
 
 /-! ### Error functions -/
 
-/-- The combined error of the orthonormalization+completion chain (Step 6).
+/-- The combined error of the orthonormalization + completion chain (Step 6).
 
 Substituting `δ := orthonormalizationError ζ = 100·ζ^{1/4}` into the
 closeness conclusion of `prop:completing-to-measurement`
@@ -88,16 +102,10 @@ This is the literal error returned by composing the two existing lemmas.
 The paper's `ζ₂ = 200·ζ^{1/4} + 40·ζ^{1/8}` (`inductive_step.tex`, line 149)
 absorbs the residual `2·ζ` term into a downstream calculation; the
 absorbed form is not needed for the present chain statement. -/
-noncomputable def projectivizationChainError (ζ : Error) : Error :=
+noncomputable def orthonormalizeAndCompleteError (ζ : Error) : Error :=
   2 * orthonormalizationError ζ +
     4 * Real.sqrt (orthonormalizationError ζ) +
     2 * ζ
-
-/-- The intermediate orthonormalization error, exposed as a named
-abbreviation for downstream callers wishing to refer to the `100·ζ^{1/4}`
-bound directly. -/
-noncomputable def projectivizationOrthoError (ζ : Error) : Error :=
-  orthonormalizationError ζ
 
 /-! ### Output package -/
 
@@ -114,8 +122,8 @@ The chain takes a measurement `A : Measurement Outcome ι` together with a
 * a completed measurement `Q : Measurement Outcome ι` obtained by
   adjoining the residual `I − Σ_a P_a` at a distinguished outcome `a₀`,
   satisfying the chain closeness
-  `A ≈_{projectivizationChainError ζ} Q` (paper `inductive_step.tex` line 146,
-  `eq:G-with-Q-A`).
+  `A ≈_{orthonormalizeAndCompleteError ζ} Q` (paper `inductive_step.tex`
+  line 146, `eq:G-with-Q-A`).
 
 The `completionFormula` field exposes the canonical structural form of the
 completion (cf. `Preliminaries.completeAtOutcome`).
@@ -129,7 +137,7 @@ requires pairwise orthogonality of `P` (each `P_a · P_b = 0` for `a ≠ b`),
 which holds because `Σ_a P_a ≤ 1` and each `P_a` is a projection. This step
 is intentionally separated from the closeness statement here and tracked as
 a follow-up. -/
-structure ProjectivizationChainStatement
+structure OrthonormalizeAndCompleteStatement
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
@@ -150,19 +158,18 @@ structure ProjectivizationChainStatement
   completionFormula :
     Q = completeAtOutcome P.toSubMeas a0
   /-- The chain closeness statement
-  `A ≈_{projectivizationChainError ζ} Q` (paper:
+  `A ≈_{orthonormalizeAndCompleteError ζ} Q` (paper:
   `inductive_step.tex` line 146, `eq:G-with-Q-A`). -/
   completedCloseness :
     SDDRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas.liftLeft)
       (constSubMeasFamily Q.toSubMeas.liftLeft)
-      (projectivizationChainError ζ)
+      (orthonormalizeAndCompleteError ζ)
 
 /-! ### Main theorem -/
 
 set_option linter.unusedFintypeInType false in
-/-- **Step 6 of the inductive step**: orthonormalization + completion
-projectivization chain.
+/-- **Step 6 of the inductive step**: orthonormalize-and-complete chain.
 
 Given:
 * a permutation-invariant, normalized bipartite state `ψ`;
@@ -175,8 +182,12 @@ Given:
   linear-algebra step inside `thm:orthonormalization`,
 
 we obtain a projective sub-measurement `P` together with a measurement `Q`
-satisfying the chain bound `A ≈_{projectivizationChainError ζ} Q` from
+satisfying the chain bound `A ≈_{orthonormalizeAndCompleteError ζ} Q` from
 `inductive_step.tex` line 146 (`eq:G-with-Q-A`).
+
+Note that `Q` is delivered as a `Measurement`, not a `ProjMeas`; the
+promotion to a projective measurement required for Step 7 is deferred (see
+`Note (Q-projective)` on `OrthonormalizeAndCompleteStatement`).
 
 The proof is a direct composition of the two existing lemmas:
 * `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization`
@@ -184,11 +195,11 @@ The proof is a direct composition of the two existing lemmas:
 * `MIPStarRE.LDT.Preliminaries.completingToMeasurement`
   (Step 6b; `preliminaries.tex` line 1101).
 
-The error `projectivizationChainError ζ` is *definitionally equal* to
+The error `orthonormalizeAndCompleteError ζ` is *definitionally equal* to
 `2 · orthonormalizationError ζ + 4 · √(orthonormalizationError ζ) + 2·ζ`,
 which matches the closeness conclusion of `completingToMeasurement` after
 substituting `δ := orthonormalizationError ζ`. -/
-theorem projectivizationChain
+theorem orthonormalizeAndComplete
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
@@ -200,7 +211,7 @@ theorem projectivizationChain
         (constSubMeasFamily A.toSubMeas) ζ)
     (hbridge : OrthonormalizationBridgePackage ψ A.toSubMeas ζ) :
     ∃ P : ProjSubMeas Outcome ι, ∃ Q : Measurement Outcome ι,
-      ProjectivizationChainStatement ψ A P Q a0 ζ := by
+      OrthonormalizeAndCompleteStatement ψ A P Q a0 ζ := by
   -- Step 6a: apply orthonormalization to A.toSubMeas.
   obtain ⟨P, hClose⟩ :=
     orthonormalization (Outcome := Outcome) (ι := ι) ψ hψ hperm
@@ -216,7 +227,7 @@ theorem projectivizationChain
       completedCloseness := ?_ }
   -- The closeness from completingToMeasurement is
   -- `SDDRel ψ … (2·δ + 4·√δ + 2·ζ)` with `δ := orthonormalizationError ζ`,
-  -- which is exactly `projectivizationChainError ζ` by definition.
+  -- which is exactly `orthonormalizeAndCompleteError ζ` by definition.
   exact hQstmt.closenessAfterCompletion
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
