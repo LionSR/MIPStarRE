@@ -1,4 +1,7 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.QCompleteness
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
 
 /-!

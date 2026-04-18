@@ -1,4 +1,8 @@
-import MIPStarRE.LDT.Basic.ParametersCore
+import MIPStarRE.LDT.Basic.ParametersBase
+import MIPStarRE.LDT.Basic.AxisParallelLine
+import MIPStarRE.LDT.Basic.DiagonalLine
+import MIPStarRE.LDT.Basic.LinePolynomials
+import MIPStarRE.LDT.Basic.LowDegreePolynomial
 import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
 
 /-!

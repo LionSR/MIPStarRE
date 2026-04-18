@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems
+import MIPStarRE.LDT.GlobalVariance.Defs.Families
 import MIPStarRE.LDT.MainInductionStep.Defs
 
 /-!
