@@ -10,18 +10,21 @@ appear through the unsymmetrization → Schwartz–Zippel → orthonormalization
 completion chain, and shows that each is absorbed by the final
 `mainFormalError` envelope.
 
-The cascade lemmas are stated against the common envelope
+The absorbing conclusions all target the common envelope
 `ε^(1/40000) + (d/q)^(1/40000) + exp(-k/(2560000 m²))`, which coincides with
 the unscaled factor of `mainFormalError`; see `mainFormalError_eq_envelope`.
+The upstream hypotheses are stated at the paper's native exponents and decay
+scales (`1/1024`, `1/2048`, `1/16384`, `1/32768`) and are coarsened to this
+common envelope inside the Lean proofs.
 
 Each cascade-step lemma has two components:
 
 * The **cascade variable** (`cascadeSigma`, `cascadeZeta1`, …), a
   paper-faithful definition of the intermediate quantity.
 * The **cascade bound** (`sigma_bound`, `zeta1_bound`, …), taking the
-  paper's upstream bound on the previous step's variable as a hypothesis
-  and concluding that the current step's variable is ≤ the correspondingly
-  scaled envelope.
+  paper's upstream bound at its native exponent as a hypothesis and
+  concluding that the current step's variable is absorbed by the final
+  envelope.
 
 The consolidator `errorCascade_le_mainFormalError` packages all five bounds
 against `mainFormalError` itself (with `ζ₃/2 ≤ mainFormalError`, as stated
@@ -180,153 +183,188 @@ private theorem exp_neg_le_of_denom_ge (k : ℕ) (m : Error) (hm : 0 < m)
     exact mul_le_mul_of_nonneg_right h₁₂ hm2.le
   exact Real.exp_le_exp.mpr (neg_le_neg hratio)
 
+/-- A paper-local envelope with exponent `1/n` and decay scale `N` is absorbed
+by `mainFormalEnvelope` whenever `n ≤ 40000` and `N ≤ 2560000`. -/
+private theorem stepEnvelope_le_mainFormalEnvelope {params : Parameters} {k : ℕ} {eps : Error}
+    (h : CascadeHypotheses params k eps) {n N : Error}
+    (hnPos : 0 < n) (hn : n ≤ 40000) (hNPos : 0 < N) (hN : N ≤ 2560000) :
+    Real.rpow eps (1 / n) +
+      Real.rpow ((params.d : Error) / (params.q : Error)) (1 / n) +
+      Real.exp (-((k : Error) / (N * ((params.m : Error) ^ (2 : ℕ))))) ≤
+        mainFormalEnvelope params k eps := by
+  unfold mainFormalEnvelope
+  have hEps := rpow_le_envelope_exponent h.hepsNN h.hepsOne hnPos hn
+  have hDq := rpow_le_envelope_exponent h.dqNN h.dqLeOne hnPos hn
+  have hmPos : 0 < (params.m : Error) := by linarith [h.hm]
+  have hExp := exp_neg_le_of_denom_ge k (params.m : Error) hmPos hNPos hN
+  linarith
+
 /-- **Paper lines 189–193.** Given the main-induction bound
-`ν ≤ 1000 · k² · m² · (ε^(1/1024) + (d/q)^(1/1024))`, the paper quantity
+`ν ≤ 10000 · k² · m² · (ε^(1/1024) + (d/q)^(1/1024))`, the paper quantity
 `σ = m²·(ν + exp(-k/(80000 m²)))` is bounded by
 `10000 · k² · m⁴ · mainFormalEnvelope`. -/
 theorem sigma_bound {params : Parameters} {k : ℕ} {eps : Error}
-    (h : CascadeHypotheses params k eps) {ν : Error} (_hνNN : 0 ≤ ν)
-    (hν : ν ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
+    (h : CascadeHypotheses params k eps) {ν : Error}
+    (hν : ν ≤ 10000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
       (Real.rpow eps (1 / (1024 : Error)) +
         Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error)))) :
     cascadeSigma params k ν ≤
       10000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
         mainFormalEnvelope params k eps := by
-  unfold cascadeSigma mainFormalEnvelope
+  unfold cascadeSigma
   set m2 : Error := (params.m : Error) ^ (2 : ℕ) with hm2_def
   set m4 : Error := (params.m : Error) ^ (4 : ℕ) with hm4_def
   set k2 : Error := (k : Error) ^ (2 : ℕ) with hk2_def
   have hm2NN : 0 ≤ m2 := by positivity
   have hm4NN : 0 ≤ m4 := by positivity
   have hk2NN : 0 ≤ k2 := by positivity
-  have hm2_ge_one : (1 : Error) ≤ m2 := h.m2_ge_one
   have hk2_ge_one : (1 : Error) ≤ k2 := h.k2_ge_one
   have hm2_le_m4 : m2 ≤ m4 := h.m2_le_m4
-  -- The key algebraic identity `m² · m² = m⁴`, preserved from the set bindings.
   have hm2_sq_m4 : m2 * m2 = m4 := by
     simp only [hm2_def, hm4_def]
     ring
-  -- Bound ν: push through the `m²` multiplication and replace `m²` with `m⁴`.
   have hStep1 :
-      m2 * ν ≤ 1000 * k2 * m4 *
+      m2 * ν ≤ 10000 * k2 * m4 *
         (Real.rpow eps (1 / (1024 : Error)) +
           Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error))) := by
-    have hrpowNN : 0 ≤ Real.rpow eps (1 / (1024 : Error)) +
-        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error)) :=
-      add_nonneg (Real.rpow_nonneg h.hepsNN _) (Real.rpow_nonneg h.dqNN _)
     have hreorder :
-        m2 * (1000 * k2 * m2 *
+        m2 * (10000 * k2 * m2 *
             (Real.rpow eps (1 / (1024 : Error)) +
               Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error)))) =
-          1000 * k2 * (m2 * m2) *
+          10000 * k2 * (m2 * m2) *
             (Real.rpow eps (1 / (1024 : Error)) +
               Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error))) := by
       ring
-    calc m2 * ν
-        ≤ m2 * (1000 * k2 * m2 *
-            (Real.rpow eps (1 / (1024 : Error)) +
-              Real.rpow ((params.d : Error) / (params.q : Error))
-                (1 / (1024 : Error)))) :=
-          mul_le_mul_of_nonneg_left hν hm2NN
-      _ = 1000 * k2 * (m2 * m2) *
+    calc
+      m2 * ν
+          ≤ m2 * (10000 * k2 * m2 *
+              (Real.rpow eps (1 / (1024 : Error)) +
+                Real.rpow ((params.d : Error) / (params.q : Error))
+                  (1 / (1024 : Error)))) :=
+            mul_le_mul_of_nonneg_left hν hm2NN
+      _ = 10000 * k2 * (m2 * m2) *
             (Real.rpow eps (1 / (1024 : Error)) +
               Real.rpow ((params.d : Error) / (params.q : Error))
                 (1 / (1024 : Error))) := hreorder
-      _ = 1000 * k2 * m4 *
+      _ = 10000 * k2 * m4 *
             (Real.rpow eps (1 / (1024 : Error)) +
               Real.rpow ((params.d : Error) / (params.q : Error))
                 (1 / (1024 : Error))) := by rw [hm2_sq_m4]
-  -- Replace 1/1024 exponents with 1/40000 (envelope level).
-  have hEps : Real.rpow eps (1 / (1024 : Error)) ≤ Real.rpow eps (1 / (40000 : Error)) :=
-    rpow_le_envelope_exponent h.hepsNN h.hepsOne (by norm_num) (by norm_num)
-  have hDq : Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error)) ≤
-      Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (40000 : Error)) :=
-    rpow_le_envelope_exponent h.dqNN h.dqLeOne (by norm_num) (by norm_num)
-  have h1kNN : (0 : Error) ≤ 1000 * k2 * m4 := by positivity
-  have hStep2 :
-      1000 * k2 * m4 *
-        (Real.rpow eps (1 / (1024 : Error)) +
-          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error))) ≤
-      1000 * k2 * m4 *
-        (Real.rpow eps (1 / (40000 : Error)) +
-          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (40000 : Error))) :=
-    mul_le_mul_of_nonneg_left (by linarith) h1kNN
-  -- Bound the exponential factor.
   have hmPos : 0 < (params.m : Error) := by linarith [h.hm]
   have hExpMono :
       Real.exp (-((k : Error) / (80000 * m2))) ≤
         Real.exp (-((k : Error) / (2560000 * m2))) := by
     have := exp_neg_le_of_denom_ge k (params.m : Error) hmPos
-      (by norm_num : (0:Error) < 80000) (by norm_num : (80000:Error) ≤ 2560000)
+      (by norm_num : (0 : Error) < 80000) (by norm_num : (80000 : Error) ≤ 2560000)
     simpa [hm2_def] using this
-  have hExpNN : 0 ≤ Real.exp (-((k : Error) / (2560000 * m2))) := Real.exp_nonneg _
-  -- `m² ≤ 10000 k² m⁴` since `k,m ≥ 1`.
+  have hScaleGeOne : (1 : Error) ≤ 10000 * k2 := by
+    nlinarith [hk2_ge_one]
   have hm2_le_10k2m4 : m2 ≤ 10000 * k2 * m4 := by
-    have h10k : (10000 : Error) * 1 * 1 ≤ 10000 * k2 * m4 := by
-      have := mul_le_mul_of_nonneg_left h.m4_ge_one
-        (by norm_num : (0 : Error) ≤ 10000 * 1)
-      nlinarith [hk2_ge_one, h.m4_ge_one]
-    have : m2 ≤ m4 := hm2_le_m4
-    have hm4_le : m4 ≤ 10000 * k2 * m4 := by
-      have hm4NN' : (0 : Error) ≤ m4 := hm4NN
-      nlinarith [hk2_ge_one, hm4NN']
-    linarith
-  have hStep3 :
+    calc
+      m2 ≤ m4 := hm2_le_m4
+      _ ≤ (10000 * k2) * m4 := by
+        nlinarith [hScaleGeOne, hm4NN]
+      _ = 10000 * k2 * m4 := by ring
+  have hStep2 :
       m2 * Real.exp (-((k : Error) / (80000 * m2))) ≤
         10000 * k2 * m4 * Real.exp (-((k : Error) / (2560000 * m2))) := by
-    calc m2 * Real.exp (-((k : Error) / (80000 * m2)))
-        ≤ m2 * Real.exp (-((k : Error) / (2560000 * m2))) :=
-          mul_le_mul_of_nonneg_left hExpMono hm2NN
+    have hExpNN : 0 ≤ Real.exp (-((k : Error) / (2560000 * m2))) := Real.exp_nonneg _
+    calc
+      m2 * Real.exp (-((k : Error) / (80000 * m2)))
+          ≤ m2 * Real.exp (-((k : Error) / (2560000 * m2))) :=
+            mul_le_mul_of_nonneg_left hExpMono hm2NN
       _ ≤ 10000 * k2 * m4 * Real.exp (-((k : Error) / (2560000 * m2))) :=
-          mul_le_mul_of_nonneg_right hm2_le_10k2m4 hExpNN
-  -- Combine the two term-bounds into the target inequality.
-  have hEpsNN : 0 ≤ Real.rpow eps (1 / (40000 : Error)) := Real.rpow_nonneg h.hepsNN _
-  have hDqNN : 0 ≤ Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (40000 : Error)) :=
-    Real.rpow_nonneg h.dqNN _
+            mul_le_mul_of_nonneg_right hm2_le_10k2m4 hExpNN
+  have hStepEnvelope :
+      Real.rpow eps (1 / (1024 : Error)) +
+        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error)) +
+        Real.exp (-((k : Error) / (2560000 * m2))) ≤
+          mainFormalEnvelope params k eps := by
+    have := stepEnvelope_le_mainFormalEnvelope (h := h) (n := (1024 : Error))
+      (N := (2560000 : Error)) (hnPos := by norm_num) (hn := by norm_num)
+      (hNPos := by norm_num) (hN := by norm_num)
+    simpa [hm2_def] using this
+  have hCoeffNN : 0 ≤ 10000 * k2 * m4 := by positivity
   have hExpand : m2 * (ν + Real.exp (-((k : Error) / (80000 * m2)))) =
       m2 * ν + m2 * Real.exp (-((k : Error) / (80000 * m2))) := by ring
   rw [hExpand]
-  have hk2m4NN : 0 ≤ k2 * m4 := mul_nonneg hk2NN hm4NN
   calc
     m2 * ν + m2 * Real.exp (-((k : Error) / (80000 * m2)))
-        ≤ 1000 * k2 * m4 *
-            (Real.rpow eps (1 / (40000 : Error)) +
-              Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (40000 : Error))) +
-          10000 * k2 * m4 * Real.exp (-((k : Error) / (2560000 * m2))) := by
-          linarith [hStep1.trans hStep2, hStep3]
-    _ ≤ 10000 * k2 * m4 *
-          (Real.rpow eps (1 / (40000 : Error)) +
-            Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (40000 : Error)) +
-            Real.exp (-((k : Error) / (2560000 * m2)))) := by
-          nlinarith [hEpsNN, hDqNN, hExpNN, hk2m4NN]
+        ≤ 10000 * k2 * m4 *
+              (Real.rpow eps (1 / (1024 : Error)) +
+                Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error))) +
+            10000 * k2 * m4 * Real.exp (-((k : Error) / (2560000 * m2))) := by
+          linarith [hStep1, hStep2]
+    _ = 10000 * k2 * m4 *
+          (Real.rpow eps (1 / (1024 : Error)) +
+            Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error)) +
+            Real.exp (-((k : Error) / (2560000 * m2)))) := by ring
+    _ ≤ 10000 * k2 * m4 * mainFormalEnvelope params k eps :=
+          mul_le_mul_of_nonneg_left hStepEnvelope hCoeffNN
 
-/-- **Paper lines 196–201, structural inflation.** The paper derives a tight
-`20204 · k² · m⁴ · envelope` bound for `ζ₁` through a sequence of square-root
-expansions at intermediate envelope exponents (`1/2048`, `1/4096`). Here we
-carry the paper's tight bound as a hypothesis `hζ₁` and verify the loose
-absorbing inflation `ζ₁ ≤ 100000 · k² · m⁴ · envelope = mainFormalError`. -/
+/-- **Paper lines 196–201, structural inflation.** The paper proves
+`ζ₁ ≤ 20204 · k² · m⁴ · (ε^(1/2048) + (d/q)^(1/2048) + exp(-k/(160000 m²)))`.
+This lemma coarsens that tighter envelope to `mainFormalEnvelope` and then
+absorbs `20204` into the final `100000` constant. -/
 theorem zeta1_bound {params : Parameters} {k : ℕ} {eps : Error}
     (h : CascadeHypotheses params k eps) {σ : Error}
     (hζ₁ : cascadeZeta1 params eps σ ≤
       20204 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
-        mainFormalEnvelope params k eps) :
+        (Real.rpow eps (1 / (2048 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2048 : Error)) +
+          Real.exp (-((k : Error) / (160000 * ((params.m : Error) ^ (2 : ℕ))))))) :
     cascadeZeta1 params eps σ ≤ mainFormalError params k eps := by
   rw [mainFormalError_eq_envelope]
+  have hTightEnvelope :
+      Real.rpow eps (1 / (2048 : Error)) +
+        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2048 : Error)) +
+        Real.exp (-((k : Error) / (160000 * ((params.m : Error) ^ (2 : ℕ))))) ≤
+          mainFormalEnvelope params k eps :=
+    stepEnvelope_le_mainFormalEnvelope (h := h) (n := (2048 : Error)) (N := (160000 : Error))
+      (hnPos := by norm_num) (hn := by norm_num) (hNPos := by norm_num) (hN := by norm_num)
   have hENN := h.envelope_nonneg
   have hk2m4NN : 0 ≤ ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by positivity
-  nlinarith [hζ₁, hENN, hk2m4NN]
+  have hCoeffNN : 0 ≤ 20204 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by
+    positivity
+  refine hζ₁.trans ?_
+  calc
+    20204 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+        (Real.rpow eps (1 / (2048 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2048 : Error)) +
+          Real.exp (-((k : Error) / (160000 * ((params.m : Error) ^ (2 : ℕ))))))
+      ≤ 20204 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+          mainFormalEnvelope params k eps :=
+        mul_le_mul_of_nonneg_left hTightEnvelope hCoeffNN
+    _ = (20204 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
+          mainFormalEnvelope params k eps := by ring
+    _ ≤ (100000 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
+          mainFormalEnvelope params k eps :=
+        mul_le_mul_of_nonneg_right
+          (mul_le_mul_of_nonneg_right (by norm_num : (20204 : Error) ≤ 100000) hk2m4NN) hENN
+    _ = 100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+          mainFormalEnvelope params k eps := by ring
 
-/-- **Paper lines 205–212, structural inflation.** The paper tracks `ζ₂`
-through two `rpow` expansions (`^(1/4)` and `^(1/8)`) giving the tight
-`2560 · k · m · envelope` bound. Here we carry the paper's tight bound as a
-hypothesis `hζ₂` (equivalently inflated to `2560 · k² · m⁴ · envelope` using
-`k, m ≥ 1`) and verify the absorbing inflation to `mainFormalError`. -/
+/-- **Paper lines 205–212, structural inflation.** The paper proves
+`ζ₂ ≤ 2560 · k · m · (ε^(1/16384) + (d/q)^(1/16384) + exp(-k/(1280000 m²)))`.
+This lemma first coarsens the tighter envelope to `mainFormalEnvelope`, then
+inflates the `k · m` factor to `k² · m⁴`, and finally absorbs `2560` into the
+final `100000` constant. -/
 theorem zeta2_bound {params : Parameters} {k : ℕ} {eps : Error}
     (h : CascadeHypotheses params k eps) {ζ₁ : Error}
     (hζ₂ : cascadeZeta2 ζ₁ ≤
-      2560 * (k : Error) * (params.m : Error) * mainFormalEnvelope params k eps) :
+      2560 * (k : Error) * (params.m : Error) *
+        (Real.rpow eps (1 / (16384 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (16384 : Error)) +
+          Real.exp (-((k : Error) / (1280000 * ((params.m : Error) ^ (2 : ℕ))))))) :
     cascadeZeta2 ζ₁ ≤ mainFormalError params k eps := by
   rw [mainFormalError_eq_envelope]
+  have hTightEnvelope :
+      Real.rpow eps (1 / (16384 : Error)) +
+        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (16384 : Error)) +
+        Real.exp (-((k : Error) / (1280000 * ((params.m : Error) ^ (2 : ℕ))))) ≤
+          mainFormalEnvelope params k eps :=
+    stepEnvelope_le_mainFormalEnvelope (h := h) (n := (16384 : Error)) (N := (1280000 : Error))
+      (hnPos := by norm_num) (hn := by norm_num) (hNPos := by norm_num) (hN := by norm_num)
   have hENN := h.envelope_nonneg
   have hm_nn : 0 ≤ (params.m : Error) := by linarith [h.hm]
   have hk_le : (k : Error) ≤ ((k : Error) ^ (2 : ℕ)) := h.k_le_k2
@@ -334,12 +372,18 @@ theorem zeta2_bound {params : Parameters} {k : ℕ} {eps : Error}
   have hkm_le : (k : Error) * (params.m : Error) ≤
       ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) :=
     mul_le_mul hk_le hm_le hm_nn (by positivity)
+  have hCoeffNN : 0 ≤ 2560 * (k : Error) * (params.m : Error) := by positivity
   have hk2m4_nn : (0 : Error) ≤
       ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by positivity
-  -- 2560·k·m ≤ 2560·k²·m⁴ ≤ 100000·k²·m⁴, then multiply by envelope ≥ 0.
   refine hζ₂.trans ?_
-  calc 2560 * (k : Error) * (params.m : Error) * mainFormalEnvelope params k eps
-      = (2560 * ((k : Error) * (params.m : Error))) *
+  calc
+    2560 * (k : Error) * (params.m : Error) *
+        (Real.rpow eps (1 / (16384 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (16384 : Error)) +
+          Real.exp (-((k : Error) / (1280000 * ((params.m : Error) ^ (2 : ℕ))))))
+      ≤ 2560 * (k : Error) * (params.m : Error) * mainFormalEnvelope params k eps :=
+        mul_le_mul_of_nonneg_left hTightEnvelope hCoeffNN
+    _ = (2560 * ((k : Error) * (params.m : Error))) *
           mainFormalEnvelope params k eps := by ring
     _ ≤ (2560 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
           mainFormalEnvelope params k eps :=
@@ -348,51 +392,105 @@ theorem zeta2_bound {params : Parameters} {k : ℕ} {eps : Error}
     _ ≤ (100000 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
           mainFormalEnvelope params k eps :=
         mul_le_mul_of_nonneg_right
-          (mul_le_mul_of_nonneg_right (by norm_num : (2560 : Error) ≤ 100000)
-            hk2m4_nn) hENN
+          (mul_le_mul_of_nonneg_right (by norm_num : (2560 : Error) ≤ 100000) hk2m4_nn) hENN
     _ = 100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
           mainFormalEnvelope params k eps := by ring
 
-/-- **Paper lines 214–217.** `ζ₃ = 6·ζ₁ + 6·ζ₂ ≤ 150000 · k² · m⁴ · envelope`
-translates to `ζ₃ ≤ 2 · mainFormalError`, matching paper line 230's
+/-- **Paper lines 214–217.** The paper proves
+`ζ₃ ≤ 150000 · k² · m⁴ · (ε^(1/16384) + (d/q)^(1/16384) + exp(-k/(1280000 m²)))`.
+This lemma coarsens that envelope to `mainFormalEnvelope` and then rewrites the
+result as `ζ₃ ≤ 2 · mainFormalError`, matching paper line 230's
 `ζ₃ / 2 ≤ mainFormalError`. -/
 theorem zeta3_bound {params : Parameters} {k : ℕ} {eps : Error}
     (h : CascadeHypotheses params k eps) {ζ₁ ζ₂ : Error}
     (hζ₃ : cascadeZeta3 ζ₁ ζ₂ ≤
       150000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
-        mainFormalEnvelope params k eps) :
+        (Real.rpow eps (1 / (16384 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (16384 : Error)) +
+          Real.exp (-((k : Error) / (1280000 * ((params.m : Error) ^ (2 : ℕ))))))) :
     cascadeZeta3 ζ₁ ζ₂ ≤ 2 * mainFormalError params k eps := by
   rw [mainFormalError_eq_envelope]
+  have hTightEnvelope :
+      Real.rpow eps (1 / (16384 : Error)) +
+        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (16384 : Error)) +
+        Real.exp (-((k : Error) / (1280000 * ((params.m : Error) ^ (2 : ℕ))))) ≤
+          mainFormalEnvelope params k eps :=
+    stepEnvelope_le_mainFormalEnvelope (h := h) (n := (16384 : Error)) (N := (1280000 : Error))
+      (hnPos := by norm_num) (hn := by norm_num) (hNPos := by norm_num) (hN := by norm_num)
   have hENN := h.envelope_nonneg
   have hk2m4NN : 0 ≤ ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by positivity
-  nlinarith [hζ₃, hENN, hk2m4NN]
+  have hCoeffNN : 0 ≤ 150000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by
+    positivity
+  refine hζ₃.trans ?_
+  calc
+    150000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+        (Real.rpow eps (1 / (16384 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (16384 : Error)) +
+          Real.exp (-((k : Error) / (1280000 * ((params.m : Error) ^ (2 : ℕ))))))
+      ≤ 150000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+          mainFormalEnvelope params k eps :=
+        mul_le_mul_of_nonneg_left hTightEnvelope hCoeffNN
+    _ = (150000 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
+          mainFormalEnvelope params k eps := by ring
+    _ ≤ (200000 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
+          mainFormalEnvelope params k eps :=
+        mul_le_mul_of_nonneg_right
+          (mul_le_mul_of_nonneg_right (by norm_num : (150000 : Error) ≤ 200000) hk2m4NN) hENN
+    _ = 2 *
+          (100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+            mainFormalEnvelope params k eps) := by ring
 
-/-- **Paper lines 220–228, structural inflation.** The paper derives
-`ζ₄ ≤ 40000 · k² · m⁴ · envelope` via a two-term square-root analysis.
-Here we carry this bound as a hypothesis and verify the absorbing inflation
-to `mainFormalError`. -/
+/-- **Paper lines 220–228, structural inflation.** The paper proves
+`ζ₄ ≤ 40000 · k² · m⁴ · (ε^(1/32768) + (d/q)^(1/32768) + exp(-k/(2560000 m²)))`.
+This lemma coarsens that tighter envelope to `mainFormalEnvelope` and then
+absorbs `40000` into the final `100000` constant. -/
 theorem zeta4_bound {params : Parameters} {k : ℕ} {eps : Error}
     (h : CascadeHypotheses params k eps) {σ ζ₁ ζ₃ : Error}
     (hζ₄ : cascadeZeta4 σ ζ₁ ζ₃ ≤
       40000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
-        mainFormalEnvelope params k eps) :
+        (Real.rpow eps (1 / (32768 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32768 : Error)) +
+          Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))))) :
     cascadeZeta4 σ ζ₁ ζ₃ ≤ mainFormalError params k eps := by
   rw [mainFormalError_eq_envelope]
+  have hTightEnvelope :
+      Real.rpow eps (1 / (32768 : Error)) +
+        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32768 : Error)) +
+        Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))) ≤
+          mainFormalEnvelope params k eps :=
+    stepEnvelope_le_mainFormalEnvelope (h := h) (n := (32768 : Error)) (N := (2560000 : Error))
+      (hnPos := by norm_num) (hn := by norm_num) (hNPos := by norm_num) (hN := by norm_num)
   have hENN := h.envelope_nonneg
   have hk2m4NN : 0 ≤ ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by positivity
-  nlinarith [hζ₄, hENN, hk2m4NN]
+  have hCoeffNN : 0 ≤ 40000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by
+    positivity
+  refine hζ₄.trans ?_
+  calc
+    40000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+        (Real.rpow eps (1 / (32768 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32768 : Error)) +
+          Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))))
+      ≤ 40000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+          mainFormalEnvelope params k eps :=
+        mul_le_mul_of_nonneg_left hTightEnvelope hCoeffNN
+    _ = (40000 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
+          mainFormalEnvelope params k eps := by ring
+    _ ≤ (100000 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
+          mainFormalEnvelope params k eps :=
+        mul_le_mul_of_nonneg_right
+          (mul_le_mul_of_nonneg_right (by norm_num : (40000 : Error) ≤ 100000) hk2m4NN) hENN
+    _ = 100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+          mainFormalEnvelope params k eps := by ring
 
-/-- **Consolidator.** Under the standing cascade hypotheses and the paper's
-tight cascade bounds for each intermediate quantity (the results of the
-corresponding `sigma_bound`, `zeta1_bound`, `zeta2_bound`, `zeta3_bound`,
-`zeta4_bound` theorems), each of σ, ζ₁, ζ₂, ζ₄ is absorbed by
-`mainFormalError`, and ζ₃ by `2 · mainFormalError` — matching paper line 230's
+/-- **Consolidator.** Under the standing cascade hypotheses, the native paper
+bounds for `σ`, `ζ₁`, `ζ₂`, `ζ₃`, together with the specialized coarsened bound
+for `ζ₄`, imply that each of σ, ζ₁, ζ₂, ζ₄ is absorbed by `mainFormalError`,
+and ζ₃ by `2 · mainFormalError` — matching paper line 230's
 `ζ₃/2 ≤ mainFormalError` and the three use-sites in `mainFormal`
 (point-A consistency, point-B consistency, self-consistency). -/
 theorem errorCascade_le_mainFormalError {params : Parameters} {k : ℕ} {eps : Error}
     (h : CascadeHypotheses params k eps) {ν σ ζ₁ ζ₂ ζ₃ : Error}
-    (hνNN : 0 ≤ ν)
-    (hν : ν ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
+    (hν : ν ≤ 10000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
       (Real.rpow eps (1 / (1024 : Error)) +
         Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error))))
     (hσEq : σ = cascadeSigma params k ν)
@@ -401,44 +499,50 @@ theorem errorCascade_le_mainFormalError {params : Parameters} {k : ℕ} {eps : E
     (hζ₃Eq : ζ₃ = cascadeZeta3 ζ₁ ζ₂)
     (hζ₁Bound : cascadeZeta1 params eps σ ≤
       20204 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
-        mainFormalEnvelope params k eps)
+        (Real.rpow eps (1 / (2048 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2048 : Error)) +
+          Real.exp (-((k : Error) / (160000 * ((params.m : Error) ^ (2 : ℕ)))))))
     (hζ₂Bound : cascadeZeta2 ζ₁ ≤
-      2560 * (k : Error) * (params.m : Error) * mainFormalEnvelope params k eps)
+      2560 * (k : Error) * (params.m : Error) *
+        (Real.rpow eps (1 / (16384 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (16384 : Error)) +
+          Real.exp (-((k : Error) / (1280000 * ((params.m : Error) ^ (2 : ℕ)))))))
     (hζ₃Bound : cascadeZeta3 ζ₁ ζ₂ ≤
       150000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
-        mainFormalEnvelope params k eps)
-    (hζ₄Bound : ∀ σ' ζ₁' ζ₃' : Error, cascadeZeta4 σ' ζ₁' ζ₃' ≤
+        (Real.rpow eps (1 / (16384 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (16384 : Error)) +
+          Real.exp (-((k : Error) / (1280000 * ((params.m : Error) ^ (2 : ℕ)))))))
+    (hζ₄Bound : cascadeZeta4 σ ζ₁ ζ₃ ≤
       40000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
         mainFormalEnvelope params k eps) :
     σ ≤ mainFormalError params k eps ∧
     ζ₁ ≤ mainFormalError params k eps ∧
     ζ₂ ≤ mainFormalError params k eps ∧
     ζ₃ ≤ 2 * mainFormalError params k eps ∧
-    ∀ ζ₄ : Error, ζ₄ = cascadeZeta4 σ ζ₁ ζ₃ → ζ₄ ≤ mainFormalError params k eps := by
-  have hENN := h.envelope_nonneg
-  have hk2m4NN : 0 ≤ ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by positivity
-  -- σ bound.
+    cascadeZeta4 σ ζ₁ ζ₃ ≤ mainFormalError params k eps := by
   have hσ : σ ≤ mainFormalError params k eps := by
     rw [hσEq, mainFormalError_eq_envelope]
-    have := sigma_bound h hνNN hν
-    nlinarith [this, hENN, hk2m4NN]
-  -- ζ₁ bound.
+    have hENN := h.envelope_nonneg
+    have hk2m4NN : 0 ≤ ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by
+      positivity
+    have hσraw := sigma_bound h hν
+    nlinarith [hσraw, hENN, hk2m4NN]
   have hζ₁ : ζ₁ ≤ mainFormalError params k eps := by
     rw [hζ₁Eq]
     exact zeta1_bound h hζ₁Bound
-  -- ζ₂ bound.
   have hζ₂ : ζ₂ ≤ mainFormalError params k eps := by
     rw [hζ₂Eq]
     exact zeta2_bound h hζ₂Bound
-  -- ζ₃ bound.
   have hζ₃ : ζ₃ ≤ 2 * mainFormalError params k eps := by
     rw [hζ₃Eq]
     exact zeta3_bound h hζ₃Bound
-  -- ζ₄ bound (for any `ζ₄` defined from σ, ζ₁, ζ₃).
-  refine ⟨hσ, hζ₁, hζ₂, hζ₃, ?_⟩
-  intro ζ₄ hζ₄Eq
-  rw [hζ₄Eq]
-  exact zeta4_bound h (hζ₄Bound σ ζ₁ ζ₃)
+  have hζ₄ : cascadeZeta4 σ ζ₁ ζ₃ ≤ mainFormalError params k eps := by
+    rw [mainFormalError_eq_envelope]
+    have hENN := h.envelope_nonneg
+    have hk2m4NN : 0 ≤ ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by
+      positivity
+    nlinarith [hζ₄Bound, hENN, hk2m4NN]
+  exact ⟨hσ, hζ₁, hζ₂, hζ₃, hζ₄⟩
 
 end Test
 
