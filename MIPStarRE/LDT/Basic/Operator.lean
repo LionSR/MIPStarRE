@@ -117,6 +117,22 @@ theorem opTensor_mono_left
     opTensor A₁ B ≤ opTensor A₂ B := by
   simpa [opTensor] using MIPStarRE.Quantum.kronecker_mono_left hA hB
 
+/-- `opTensor` is monotone in the right factor against a PSD left factor. -/
+theorem opTensor_mono_right
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {A : MIPStarRE.Quantum.Op ι₁} {B₁ B₂ : MIPStarRE.Quantum.Op ι₂}
+    (hA : 0 ≤ A) (hB : B₁ ≤ B₂) :
+    opTensor A B₁ ≤ opTensor A B₂ := by
+  change Matrix.kronecker A B₁ ≤ Matrix.kronecker A B₂
+  letI : Finite ι₁ := Finite.of_fintype ι₁
+  letI : Finite ι₂ := Finite.of_fintype ι₂
+  change (Matrix.kronecker A B₂ - Matrix.kronecker A B₁).PosSemidef
+  have hpsd : Matrix.PosSemidef (Matrix.kronecker A (B₂ - B₁)) := by
+    exact Matrix.nonneg_iff_posSemidef.mp <|
+      MIPStarRE.Quantum.kronecker_nonneg hA (sub_nonneg.mpr hB)
+  rw [MIPStarRE.Quantum.kronecker_sub_right]
+  exact hpsd
+
 
 /-- `rightTensor B * leftTensor A = opTensor A B`. -/
 theorem rightTensor_mul_leftTensor_eq_opTensor

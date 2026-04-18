@@ -89,7 +89,7 @@ private lemma evaluatedSlice_phaseOne_hC
 
 /-- View the `params.next` point measurement with the outcome type rewritten as
 `Fq params`. -/
-private noncomputable def evaluatedSlicePointMeas
+noncomputable def evaluatedSlicePointMeas
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) :
     IdxMeas (Point params.next) (Fq params) ι :=
@@ -104,7 +104,7 @@ pointwise `consSubMeas` control to the second coordinate of an evaluated-slice
 question, then apply `closenessOfIP` with the left-sandwich family
 `G_a^{u,x} G_b^{v,y} G_a^{u,x}`.  The inserted term is kept in the explicit
 `G^y \otimes A_b^{v,y}` form coming from `totalSandwichFamily`. -/
-private lemma evaluatedSlice_phaseOne_insert_bound
+lemma evaluatedSlice_phaseOne_insert_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (zeta : Error)
@@ -240,7 +240,7 @@ evaluated points swapped: transport the `consSubMeas` control to the first
 coordinate of an evaluated-slice question, then apply `closenessOfIP` to the
 explicit `B A B * (G^x \otimes A_a^{u,x})` summand that feeds the later
 `commutativityPoints` step. -/
-private lemma evaluatedSlice_phaseThree_insert_bound
+lemma evaluatedSlice_phaseThree_insert_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (zeta : Error)
@@ -559,7 +559,7 @@ private lemma evaluatedSlice_phaseTwo_right_weighted_outcome
 This is the bookkeeping bridge between the explicit `G^y`-inserted / `G^y`-removed
 summands and the stability-one operator families used by
 `gCommStability_overlap`. -/
-private lemma evaluatedSlice_phaseTwo_scalar_rewrite
+lemma evaluatedSlice_phaseTwo_scalar_rewrite
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)

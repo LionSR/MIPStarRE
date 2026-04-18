@@ -259,7 +259,7 @@ private lemma fullPolynomial_agreement_avg_eq_scalarDomain
 /-- Schwartz-Zippel bound for the pointwise agreement indicator of two distinct
 full polynomial outcomes. This packages the `dm / q` loss from the first
 evaluated-at-points marginalization in the commutativity proof. -/
-private lemma fullPolynomial_agreement_avg_le_mdq
+lemma fullPolynomial_agreement_avg_le_mdq
     (params : Parameters) [FieldModel params.q]
     (g g' : Polynomial params) (hneq : g ≠ g') :
     avgOver (uniformDistribution (Point params))
@@ -349,7 +349,7 @@ private lemma evaluatedPointFamily_pointConsistency
       zeta := by
   simpa [evaluatedPointFamily] using hcons.pointConsistency
 
-private lemma qMatchMass_symm
+lemma qMatchMass_symm
     {Outcome : Type*} [Fintype Outcome]
     (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
     qMatchMass ψ A B = qMatchMass ψ B A := by
@@ -358,7 +358,7 @@ private lemma qMatchMass_symm
   intro a _
   exact ev_mul_comm_of_psd ψ _ _ (A.outcome_pos a) (B.outcome_pos a)
 
-private lemma qConsDefect_symm
+lemma qConsDefect_symm
     {Outcome : Type*} [Fintype Outcome]
     (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
     qConsDefect ψ A B = qConsDefect ψ B A := by
