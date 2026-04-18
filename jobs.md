@@ -170,91 +170,69 @@ Last updated: 2026-04-14
 ## Active Commutativity Wave
 - **Owner**: OpenCode
 - **Scope**: `MIPStarRE/LDT/Commutativity/*.lean`
-- **Live executable sorrys in scope**: 2
-- **Current live target**: `MIPStarRE/LDT/Commutativity/Theorems.lean`
+- **Live executable sorrys in scope**: 4
+- **Current live targets**:
+  - `Commutativity/ScalarApproximation.lean`: `evaluatedSlice_scalar_chain_bound`
+  - `Commutativity/Main.lean`: `fullSlice_scalar_marginalize_x`
+  - `Commutativity/Main.lean`: `fullSlice_scalar_marginalize_y`
+  - `Commutativity/Main.lean`: `fullSlice_closenessOfIP_CAB_hEval`
 - **Status**: IN PROGRESS
 - **Dependency chain**:
-  - `MIPStarRE.LDT.Commutativity.gCommStability`
-  - `MIPStarRE.LDT.Commutativity.gCommStabilityTwo`
+  - `MIPStarRE.LDT.Commutativity.normalizationCondition_sandwich_bound`
+  - `MIPStarRE.LDT.Commutativity.fullSliceCommutation_qSDDOp_avg_eq`
   - `MIPStarRE.LDT.Commutativity.evaluatedSlice_scalar_chain_bound`
+  - `MIPStarRE.LDT.Commutativity.fullSlice_scalar_marginalize_x`
+  - `MIPStarRE.LDT.Commutativity.fullSlice_scalar_marginalize_y`
+  - `MIPStarRE.LDT.Commutativity.fullSlice_closenessOfIP_CAB_hEval`
   - `MIPStarRE.LDT.Commutativity.fullSliceCommutation_of_evaluated_on_evaluated_questions`
   - `MIPStarRE.LDT.Commutativity.commDataProcessedG`
   - `MIPStarRE.LDT.Commutativity.comMain`
 - **Priority order**:
-  1. prove `gCommStability`
-  2. prove `gCommStabilityTwo`
-  3. prove `evaluatedSlice_scalar_chain_bound`
-  4. prove `fullSliceCommutation_of_evaluated_on_evaluated_questions`
+  1. discharge the two transport lemmas already covered by existing normalization / swap infrastructure
+  2. assemble `evaluatedSlice_scalar_chain_bound` from the existing phase lemmas
+  3. prove the two Schwartz-Zippel marginalization lemmas in `Main.lean`
+  4. close the evaluated-side `closenessOfIP` chain in `Main.lean`
   5. update `blueprint/src/chapter/ch08_commutativity.tex`
-  6. run `lake env lean MIPStarRE/LDT/Commutativity/Theorems.lean`
-  7. run `grep` for remaining `sorry` in `MIPStarRE/LDT/Commutativity`
-  8. run `lake build`
+  6. verify no `sorry`s remain in `MIPStarRE/LDT/Commutativity`
+  7. run `lake build`
 - **Checklist**:
   - [x] Survey all `sorry`s in `MIPStarRE/LDT/Commutativity`
   - [x] Read `docs/proof-hints.md`
   - [x] Read the matching paper section in `references/ldt-paper/commutativity-G.tex`
   - [x] Read the matching blueprint section in `blueprint/src/chapter/ch08_commutativity.tex`
-  - [x] Run `lake env lean MIPStarRE/LDT/Commutativity/Theorems.lean`
-  - [x] Prove `gCommStability`
-  - [x] Prove `gCommStabilityTwo`
+  - [x] Refresh the live `sorry` inventory for the split module layout
+  - [x] Prove `normalizationCondition_sandwich_bound`
+  - [x] Prove `fullSliceCommutation_qSDDOp_avg_eq`
   - [ ] Prove `evaluatedSlice_scalar_chain_bound`
-  - [ ] Prove `fullSliceCommutation_of_evaluated_on_evaluated_questions`
+  - [ ] Prove `fullSlice_scalar_marginalize_x`
+  - [ ] Prove `fullSlice_scalar_marginalize_y`
+  - [ ] Prove `fullSlice_closenessOfIP_CAB_hEval`
   - [ ] Verify no `sorry`s remain in `MIPStarRE/LDT/Commutativity`
   - [ ] Add `\leanok` / `\uses` updates in `ch08_commutativity.tex`
   - [ ] Run `lake build`
 - **Completed on this pass**:
-  - confirmed the target scope is the directory module `MIPStarRE/LDT/Commutativity`
-  - confirmed the only live executable `sorry`s in scope are at
-    `Commutativity/Theorems.lean:1293`, `:1492`, `:1522`, and `:1810`
-  - refreshed the paper/blueprint alignment for
-    `lem:comm-data-processed-g`, `clm:g-comm-stability`,
-    `clm:g-comm-stability2`, and `thm:com-main`
-  - identified the proof dependency order: stability lemmas first, then the
-    scalar chain, then the full-slice Schwartz-Zippel transport
-  - proved `gCommStability` via a direct `qSDDOp` upper bound to the slice SSC
-    defect of `G`, together with a small/large `zeta` split
-  - proved `gCommStabilityTwo` by the same raw SSC route, showing the stated
-    `sqrt zeta + 6 * sqrt (gamma * (m + 1))` bound follows by monotonicity from
-    a stronger `sqrt zeta` estimate
-  - verified `lake env lean MIPStarRE/LDT/Commutativity/Theorems.lean` after the
-    stability refactor; only the scalar chain and full-slice transport remain
-  - threaded `family.ConsistentWithPoints strategy zeta` into the private
-    scalar-chain lemma so the `consSubMeas` / `eq:add-an-a` route is now
-    available without changing the exported theorem interfaces
-  - addressed PR #366 review feedback by removing dead locals, renaming
-    intentionally-unused theorem parameters with `_`-prefixed names, adding
-    `\leanok` tags for `clm:g-comm-stability` and `clm:g-comm-stability2`,
-    documenting the new helper lemmas, and refactoring the duplicated
-    stability-one / stability-two raw-bound machinery into shared helpers
-  - eliminated the large-parameter branch `sorry` in
-    `fullSliceCommutation_of_evaluated_on_evaluated_questions`
-  - re-surveyed the current target and confirmed 2 live executable `sorry`s
-    remain in `Commutativity/Theorems.lean`: one in
-    `evaluatedSlice_scalar_chain_bound` and one in the small-parameter branch of
-    `fullSliceCommutation_of_evaluated_on_evaluated_questions`
-  - added compiling scalar-chain helpers for phases 1, 3, 4, 5, and 8/9,
-    including the `closenessOfIP` normalization side condition,
-    point-measurement insertion bounds, weighted stability-family rewrites, and
-    the point-measurement commutation step
-  - added full-slice transport helpers for the large-parameter branch and the
-    first Schwartz-Zippel reindexing domain conversion
-  - added local density-fixed symmetry lemmas showing how the missing swapped
-    point-consistency transport would follow from the stronger hypothesis
-    `swapDensity strategy.state.density = strategy.state.density`
-  - current mathematical blocker for the scalar-chain assembly: the remaining
-    insertion helpers want a swapped point-consistency statement, but the public
-    `PermInvState` API only exposes `swap_ev` on one-sided tensors; repeated
-    attempts indicate this is too weak to justify a general `ConsRel` symmetry
-    lemma for `opTensor X Y` vs `opTensor Y X`
-  - the remaining full-slice small-parameter transport now reduces to the same
-    unresolved scalar-chain ingredients, so both live `sorry`s are blocked by
-    the same interface gap rather than missing local quartic expansions
-  - best next step once the blocker is resolved: either strengthen
-    `PermInvState` to an actual swap-invariance hypothesis on `density`, or add
-    a public theorem deriving bipartite consistency symmetry from whatever
-    stronger invariant the project intends to use; then finish
-    `evaluatedSlice_scalar_chain_bound` and thread those bounds into the final
-    `hTransport` proof
+  - re-surveyed the split commutativity module and confirmed the live `sorry`s now sit in `Transport.lean`, `ScalarApproximation.lean`, and `Main.lean` rather than the old monolithic `Theorems.lean`
+  - read `docs/proof-hints.md`, `references/ldt-paper/commutativity-G.tex`, and `blueprint/src/chapter/ch08_commutativity.tex` against the current Lean layout
+  - confirmed the lowest-risk first moves are to reuse the existing normalization-condition API from `Commutativity/Defs.lean` and to mirror the already-proved evaluated-slice swap argument for the full-slice `qSDDOp` identity
+  - confirmed `evaluatedSlice_scalar_chain_bound` is now a proof-assembly task: the phase-1, phase-3, phase-4, phase-5, phase-8/9, and stability scalar-gap helpers already exist and compile
+  - proved `normalizationCondition_sandwich_bound` directly from the existing `normalizationConditionSquareFamily` API in `Commutativity/Defs.lean`
+  - proved `fullSliceCommutation_qSDDOp_avg_eq` by expanding the full-slice `qSDDOp`, reindexing the joint `(question, outcome)` average by the simultaneous swap equivalence, and collapsing the averaged `BAB/BABA` terms to `ABA/ABAB`
+  - exposed `Commutativity.fullPolynomial_agreement_avg_le_mdq` from `Scaffold.lean` so the remaining `md/q` transport lemmas can reuse the existing Schwartz-Zippel package once their statements line up with the paper argument
+  - verified `lake env lean MIPStarRE/LDT/Commutativity/Transport.lean`
+- **Concrete blocker**:
+- **Current refactor direction**:
+  - the actual mismatch is deeper and now understood precisely: `IdxPolyFamily.Bounded.sliceBoundedness` is stored in the swapped orientation `Z^x ⊗ (I - G^x)`, while the paper's claims `clm:g-comm-stability` and `clm:g-comm-stability2` require `(I - G^x) ⊗ Z^x`. The overlap-only `SDDOpRel` theorems were added to work around that mismatch, but they are too weak for the scalar chain because `closenessOfIP` would introduce an extra square root.
+  - the fix in progress is therefore to make the boundedness interface paper-faithful inside the Lean code, expose the phase-1/3/4/5 helper lemmas currently marked `private`, and then prove the scalar phase-2 / phase-5 bounds directly by the paper's Cauchy-Schwarz + witness-domination argument.
+  - completed so far in this refactor:
+    - changed `IdxPolyFamily.Bounded.sliceBoundedness` to the paper orientation `(I - G^x) ⊗ Z^x`
+    - updated `gCommStabilityBoundedResidual` and its documentation to match that orientation
+    - exposed `evaluatedSlicePointMeas`, `evaluatedSlice_phaseOne_insert_bound`, `evaluatedSlice_phaseThree_insert_bound`, `evaluatedSlice_phaseTwo_scalar_rewrite`, `evaluatedSlice_phaseFour_pointSwap_bound`, and `evaluatedSlice_phaseFive_scalar_rewrite`
+    - added public single-register symmetry helpers `qMatchMass_symm`, `qConsDefect_symm`, `consRel_symm`, and `evaluatedPointFamily_pointConsistency_swapped`
+    - added operator/order helpers and paper-proof scaffolding in `GCommStability.lean`: `averageIdxSubMeas`, `gCommStabilityR`, `gCommStabilityR_sqrt_mul_self`, `gCommStabilityR_first_factor_le_one`, averaged-point PSD / boundedness lemmas, and a first draft of the direct scalar `clm:g-comm-stability` proof
+  - remaining work in this refactor:
+    - finish the direct pointwise scalar Cauchy-Schwarz proof in `GCommStability.lean`
+    - move the scalar-chain theorem / `commDataProcessedG` assembly onto the new paper-faithful scalar lemmas
+    - then return to the three `Main.lean` transport sorries with the stronger evaluated-side theorem available
 
 ## Active Pasting Wave
 - **Owner**: OpenCode

@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.StrategySymmetrized
+import MIPStarRE.LDT.Test.StrategyRoleAverage
 
 /-!
 # Polynomial-family interfaces for the low individual degree test
@@ -139,8 +139,8 @@ structure Bounded {params : Parameters} [FieldModel params.q]
     avgOver (uniformDistribution (Fq params))
       (fun x =>
         ev ψ <|
-          leftTensor (ι₂ := ι) (family.witness x) *
-            rightTensor (ι₁ := ι) (1 - (family.meas x).toSubMeas.total)) ≤ zeta
+          leftTensor (ι₂ := ι) (1 - (family.meas x).toSubMeas.total) *
+            rightTensor (ι₁ := ι) (family.witness x)) ≤ zeta
   sliceDominatesTarget :
     ∀ x : Fq params, ∀ g : Polynomial params,
       0 ≤ family.witness x - family.dominationTarget x g
