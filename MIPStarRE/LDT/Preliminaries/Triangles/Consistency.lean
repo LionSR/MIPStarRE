@@ -193,7 +193,10 @@ theorem triangleSub
 
 /-! ### Right-register variant of `triangleSub` -/
 
-private lemma triangleSub_right
+/-- Right-register consistency transfer: if `A` is `δ`-consistent with `B` placed on the
+left register, and the right-placed extensions of `B` and `D` are `ε`-spectrally close,
+then `A` is `(δ + √ε)`-consistent with `D`. -/
+theorem triangleSub_right
     {Question Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)

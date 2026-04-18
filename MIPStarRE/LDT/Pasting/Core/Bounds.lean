@@ -2,6 +2,7 @@ import MIPStarRE.LDT.Pasting.Statements
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Preliminaries.Theorems
 import MIPStarRE.LDT.Preliminaries.SelfConsistency
+import MIPStarRE.LDT.Preliminaries.Triangles.Consistency
 
 /-!
 # Section 12 pasting: core bounds
@@ -81,7 +82,8 @@ private lemma ldGbcon_qBipartiteConsDefect_symm_of_density_fixed
     ldGbcon_qBipartiteMatchMass_symm_of_density_fixed ψ hfix,
     ldGbcon_ev_opTensor_swap_of_density_fixed ψ hfix]
 
-private lemma ldGbcon_consRel_symm_of_density_fixed
+/-- Symmetry of `ConsRel` when the bipartite state has swap-invariant density. -/
+lemma ldGbcon_consRel_symm_of_density_fixed
     (ψ : QuantumState (ι × ι))
     (hfix : swapDensity ψ.density = ψ.density)
     {Question Outcome : Type*} [Fintype Outcome]

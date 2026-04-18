@@ -1791,7 +1791,7 @@ private lemma qSDDOp_congr_unit_outcome
   unfold qSDDOp qSDDCore
   simp [hA, hB]
 
-lemma completePartAggregateCommutation_as_total
+private lemma completePartAggregateCommutation_as_total
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
@@ -1832,7 +1832,7 @@ lemma completePartAggregateCommutation_as_total
 
 set_option maxHeartbeats 1000000 in
 -- Many sqrt/rpow manipulations for `12 * sqrt zeta + 4 * sqrt (ν_com) ≤ ν₂`.
-lemma firstSwitcherooError_le_commutingWithGCompleteError
+private lemma firstSwitcherooError_le_commutingWithGCompleteError
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error)
     (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)

@@ -415,7 +415,7 @@ private lemma hAConsistency_submeas_core
       (by simpa using uniformDistribution_weight_sum_le_one (Point params.next))
       (polynomialEvaluationFamily params.next H)
       pointLineMeas
-      strategy.pointMeasurement.toMeasurement
+      (fun u => (strategy.pointMeasurement u).toMeasurement)
       νB
       (8 * (params.m : Error) * eps + 4 * delta)
       hline_point
@@ -425,7 +425,7 @@ private lemma hAConsistency_submeas_core
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next H)
         (νB + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-    exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+    exact ldGbcon_consRel_symm_of_density_fixed strategy.state strategy.densityFixed
       (uniformDistribution (Point params.next))
       (polynomialEvaluationFamily params.next H)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
