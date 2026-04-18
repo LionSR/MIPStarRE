@@ -202,7 +202,7 @@ hypotheses, `ldPastingInInductionSection` produces a measurement
 `ldPastingInInductionError params k eps delta gamma kappa zeta`.  An
 explicit telescoping hypothesis then bounds this error by
 `mainInductionError params.next k eps delta gamma`, yielding the
-`MainInductionBridgePackage` witness at dimension `m+1`.
+`mainInduction` witness at dimension `m+1`.
 
 This formalizes the final composition step. The remaining assembly
 obligations (restriction to slices, per-slice induction, per-slice
@@ -229,14 +229,18 @@ theorem mainInductionBridgeFromPastedFamily
     (herror :
       ldPastingInInductionError params k eps delta gamma kappa zeta ≤
         mainInductionError params.next k eps delta gamma) :
-    MainInductionBridgePackage params.next strategy eps delta gamma k := by
+    ∃ error : Error, ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (polynomialEvaluationFamily params.next G.toSubMeas)
+          error ∧
+        error ≤ mainInductionError params.next k eps delta gamma := by
   obtain ⟨H, hH⟩ :=
     ldPastingInInductionSection params strategy eps delta gamma kappa zeta
       hgood hgamma_le hzeta_le hdq_le family hcomplete hcons hself hbound k hk
   exact
-    { witness :=
-        ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
-          hH.pointConsistency, herror⟩ }
+    ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
+      hH.pointConsistency, herror⟩
 
 /-! ## Restricted-probability bookkeeping -/
 

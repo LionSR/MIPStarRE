@@ -52,7 +52,7 @@ absorbed form as a downstream calculation.
 ## Status
 
 - The orthonormalization step is mediated by
-  `OrthonormalizationBridgePackage`, isolating the still-unformalized linear
+  `OrthonormalizationInput`, isolating the still-unformalized linear
   algebra (cf. `MakingMeasurementsProjective/Statements.lean`).
 - The completion step uses the **fully-formalized** `completingToMeasurement`
   (`\leanok` in `blueprint/src/chapter/ch03_preliminaries.tex`), so no new
@@ -206,7 +206,7 @@ theorem orthonormalizeAndComplete
     (hssc :
       BipartiteSSCRel ψ (uniformDistribution Unit)
         (constSubMeasFamily A.toSubMeas) ζ)
-    (hbridge : OrthonormalizationBridgePackage ψ A.toSubMeas ζ) :
+    (hbridge : OrthonormalizationInput ψ A.toSubMeas ζ) :
     ∃ P : ProjSubMeas Outcome ι, ∃ Q : Measurement Outcome ι,
       OrthonormalizeAndCompleteStatement ψ A P Q a0 ζ := by
   -- Step 6a: apply orthonormalization to A.toSubMeas.
