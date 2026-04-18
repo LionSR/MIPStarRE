@@ -30,9 +30,9 @@ codebase.
 - [A1 — Conclusion-shaped hypothesis](#a1--conclusion-shaped-hypothesis)
 - [A2 — Definitional sleight-of-hand](#a2--definitional-sleight-of-hand)
 - [A3 — Zero-fallback branches hiding preconditions](#a3--zero-fallback-branches-hiding-preconditions)
-- A4 — Trivial default witnesses for existentials *(forthcoming)*
-- A5 — Castle-in-the-air / bypassing Mathlib *(forthcoming)*
-- A6 — External `*Statement` smuggles *(forthcoming)*
+- [A4 — Trivial default witnesses for existentials](#a4--trivial-default-witnesses-for-existentials)
+- [A5 — Castle-in-the-air / bypassing Mathlib](#a5--castle-in-the-air--bypassing-mathlib)
+- [A6 — External `*Statement` smuggles](#a6--external-statement-smuggles)
 
 ---
 
@@ -302,6 +302,208 @@ in `LDT/Pasting/`.
 
 - [#307] — placeholder Lagrange coefficient (original fallback tracker)
 - [#495] — the full pasting-interpolation catalogue
+
+---
+
+## A4 — Trivial default witnesses for existentials
+
+**Smell.** A theorem of the shape `∃ x, P x` is closed by picking
+`x := default`, `x := 0`, `x := 1`, or `x := Classical.arbitrary`, where the
+paper names a *specific, non-trivial* `x` and derives `P x` from real
+structure. The Lean claim is *mathematically* weaker because the Lean
+theorem guarantees less than the paper's (it proves some-trivial-thing, not
+the-specific-paper-thing). See [#449] for the full ledger.
+
+### Why it's bad
+
+The theorem name matches a paper lemma but the witness has been cheapened
+into a placeholder. Downstream theorems that inspect the witness get `0` or
+`default`, which is almost always useless. Consumers that "use" the lemma
+are really using the trivial `∃` and cannot proceed past the first attempt
+to pin the witness down.
+
+### How to spot it
+
+- `refine ⟨default, ?_⟩` / `exact ⟨default, ...⟩` / `refine ⟨0, ?_⟩` /
+  `exact ⟨1, ...⟩` inside a proof of a paper-cited existential.
+- `letI : Inhabited X := ⟨Classical.arbitrary X⟩` followed by a `let x :=
+  default`.
+- `Classical.arbitrary` / `Classical.choice` / `Nonempty.some` in proof
+  bodies (as opposed to typeclass definitions).
+- Identifier suffix `...Witness := default` on a bundled output.
+
+### Concrete example
+
+From the ledger in [#449]:
+
+- `lem:sdp` / `sdp` — primal witness is `T := default` (a zero
+  submeasurement) and dual witness `Z := 1`. The paper requires a specific
+  feasible pair; the Lean version proves only that some arbitrary pair exists,
+  which always does.
+- `lem:projective-low-rank-sum` / `projectiveLowRankSum` — auxiliary
+  projective measurement `t := (default : ProjMeas Outcome ι)`. The paper
+  constructs `(auxSpace, T_a)` from the eigenvector basis of each rounded
+  `R_a`; the Lean version picks a zero-dimensional placeholder, which is
+  disconnected from the paper's SVD derivation.
+- `lem:global-rewrite` / `globalRewrite` — decomposition witness is
+  `default`. The paper gives the concrete `|φ₀⟩ ⊗ A₀ + |φ_⊥⟩ ⊗ A_⊥`; Lean
+  proves the weaker existential.
+
+### Acceptable uses
+
+Non-computable instances required for typeclass plumbing —
+`Nonempty (Polynomial params)` inhabited by the zero polynomial, `Inhabited
+(Measurement ...)` by the trivial one — are fine when they are used only to
+*inhabit* a type, not to discharge a paper-cited existential. The smell is
+specifically about `default` showing up in the proof of a *theorem named
+after a paper result*.
+
+### How to fix it
+
+- Construct the paper's witness explicitly. If the ingredients are not yet
+  formalized (e.g., Mathlib SVD, spectral decomposition), extract a bridge
+  lemma that *constructs* the witness from the missing Mathlib facts, and
+  track the Mathlib gap as a separate issue.
+- Keep the existential statement, but strengthen the conclusion so that
+  `x := default` no longer satisfies it (e.g., "there exists `x` *with*
+  rank `m`", not merely "there exists `x`").
+- If the theorem is a scaffold that will later consume a producer, consider
+  making that producer an explicit bridge hypothesis (A1-grade placeholder)
+  rather than silently picking `default`. The bridge at least appears in
+  [#451].
+
+### Related issues
+
+- [#449] — master ledger; all three known cases are already listed
+
+---
+
+## A5 — Castle-in-the-air / bypassing Mathlib
+
+**Smell.** Lean code re-declares or re-proves something that already lives
+in Mathlib, or builds a tower of custom lemmas that never bottom out in
+Mathlib / Lean core. The proof "works" only because the internal custom
+statements are compatible with each other — it is a closed ecosystem that
+doesn't ground in the reference library.
+
+This is the "scaffolding that blocks real formalization" section of
+[`PROOF_INTEGRITY.md`](./PROOF_INTEGRITY.md) in concrete examples. The two
+flavours:
+
+1. **Re-proving Mathlib.** Writing `private lemma my_add_comm : a + b = b + a`
+   when `add_comm` exists.
+2. **Custom types that shadow Mathlib.** Defining `MyMeasurement` instead of
+   using `MeasureTheory.Measure`, `MyMatrix` instead of `Matrix`,
+   `MyHermitian` instead of `Matrix.IsHermitian`. The custom version may be
+   definitionally equal to (or coercible from) the Mathlib version, but if
+   it isn't, every consumer must reprove everything.
+
+### Why it's bad
+
+1. The duplicated statements aren't audited by Mathlib's community, so they
+   may be subtly wrong (wrong edge case, wrong universe, wrong typeclass).
+2. When the real Mathlib proof is needed (for a key gap lemma), the custom
+   tower must be rewritten to interoperate — often via a painful coercion
+   layer that reintroduces every fact.
+3. Hides real Mathlib gaps. If we decline to use Mathlib because "our
+   version is simpler," the gap never gets filed against Mathlib.
+
+### How to spot it
+
+- `private lemma` in a file about well-established algebra/analysis
+  (Cauchy–Schwarz, `sqrt`, `rpow`, `PosSemidef`, `Matrix.trace`, etc.).
+- Custom structures named `MyX` / `LocalX` / `ProjectX` where `X` is a
+  standard concept.
+- Proof bodies that chain ten `private lemma`s where the natural Mathlib
+  counterpart would be two `exact?` lookups.
+- Files with no `import Mathlib.*` above the level of `Mathlib.Tactic.*`
+  when the subject matter is clearly Mathlib-adjacent (linear algebra,
+  analysis, measure theory).
+
+### How to fix it
+
+Before writing a new lemma, spend one minute on:
+
+- `exact?` / `apply?` on the goal.
+- `#find` / `Loogle` for the statement shape.
+- `rg -n "theorem.*X" .lake/packages/mathlib/` for a keyword.
+
+If Mathlib has it, use it. If it doesn't, consider whether the missing
+lemma should be upstreamed (file an issue against Mathlib, or at least a
+TODO pointing at the gap). The project already has this mandate — see the
+"Mathlib Integration" section of [`CLAUDE.md`](../CLAUDE.md):
+
+> Scout Mathlib first (`exact?`, `apply?`, `#find?`, grep Mathlib source)
+
+A5 is what happens when that step is skipped.
+
+### Audit cross-reference
+
+`docs/audit/` contains chapter-by-chapter Mathlib dependency scouting
+reports. If a section of the code review says "this could use Mathlib
+lemma X", it belongs in a specific `docs/audit/*.md` file for that chapter.
+
+---
+
+## A6 — External `*Statement` smuggles
+
+**Smell.** A theorem takes a hypothesis of type `SomeStatement` (or
+`SomeWitness`, `SomeOutput`, etc.) that is defined elsewhere and intended
+to represent an external mathematical result — but the external result
+has no producer and no plan for one. The Lean statement is then:
+"assuming the external result, the Lean conclusion holds." That is
+sometimes legitimate (e.g., a cite to a book whose formalization we don't
+plan to do), and sometimes a cover for locally-unwanted work.
+
+This overlaps with A1 but is subtler: the hypothesis isn't the
+*current theorem's* conclusion, it's an *independently-named* claim that
+happens to unblock the current proof.
+
+### Acceptable external smuggles
+
+- **Genuine external citations.** `PolishchukSpielmanClassicalSoundnessStatement`
+  cites the Polishchuk–Spielman theorem; we don't plan to formalize it.
+- **Mathlib gaps we can't fill.** `hMatrixChernoff` in `chernoffBernoulliMatrix`
+  is a Mathlib matrix-Chernoff-type statement; we flagged the gap upstream.
+- **Placeholder interfaces with a named tracking issue.** A `*Statement`
+  that has an open sub-issue saying "produce this" is trackable.
+
+### Unacceptable external smuggles
+
+- A `*Statement` with no open tracking issue, no docstring explaining the
+  mathematical gap, and no consumer-side comment flagging the smuggle.
+- A `*Statement` whose body is the theorem's conclusion, wearing a different
+  name (A1 in disguise).
+- A `*Statement` used to close a lemma whose paper version does not require
+  any such external assumption (silent strengthening of the Lean theorem
+  relative to the paper's).
+
+### How to spot it
+
+Grep for these suffixes: `*Statement`, `*Witness`, `*Claim`,
+`*Conclusion`, `*Output`, `*Input`, `*Hypothesis`, `*Requirement`,
+`*Assumption`, `*Package` (that isn't a `*BridgePackage`). For each, ask:
+
+- Is there a theorem anywhere that **produces** a value of this type?
+- If not, is the absence explained in a docstring / tracking issue /
+  `docs/audit/` entry?
+- Does the paper depend on an external theorem of this shape?
+
+If any answer is "no", the structure is an unacceptable smuggle.
+
+### Current status (audited 2026-04-18)
+
+All 34 `*Statement` / 9 `*Conclusion` / 8 `*Witness` structures on `main`
+are either grounded (have producer theorems) or are the known tracked
+items in [#449] / [#451] / [#477]. No new unacceptable smuggles were
+found in that sweep. If you add a new `*Statement`-style structure to
+this codebase, include a docstring explaining its grounding plan and
+(if no producer exists yet) file a sub-issue in [#449].
+
+### Related issues
+
+- [#449] — hypothesis-smuggle ledger (⚠️H items)
+- [#278] — the original "derive `PermInvState` internally" discussion
 
 [#278]: https://github.com/LionSR/MIPStarRE/issues/278
 [#307]: https://github.com/LionSR/MIPStarRE/issues/307
