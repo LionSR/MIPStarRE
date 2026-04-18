@@ -27,7 +27,6 @@ theorem orthonormalization {Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (hψ : ψ.IsNormalized)
-    (_hperm : PermInvState ψ)
     (A : SubMeas Outcome ι) (ζ : Error) :
     BipartiteSSCRel ψ (uniformDistribution Unit)
         (constSubMeasFamily A) ζ →
