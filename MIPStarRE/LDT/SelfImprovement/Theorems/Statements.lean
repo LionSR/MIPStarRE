@@ -292,15 +292,17 @@ to assemble `thm:self-improvement` from the already-formalized helper and
 orthonormalization theorems.
 
 TODO: eliminate this package by proving:
-1. `PermInvState strategy.state` for the symmetric strategies used here,
-2. the helper-stage `BipartiteSSCRel` bound for `Hhat`, and
-3. the GlobalVariance pointwise estimates consumed by `addInU`, and
-4. the Section 9 transport lemmas from the orthonormalization output to the
-   remaining conclusion fields. -/
+1. the helper-stage `BipartiteSSCRel` bound for `Hhat`, and
+2. the GlobalVariance pointwise estimates consumed by `addInU`, and
+3. the Section 9 transport lemmas from the orthonormalization output to the
+   remaining conclusion fields.
+
+Note: the `PermInvState` obligation was previously a field here, but every
+`SymStrat` already carries `strategy.permInvState` as a structural field, so
+the obligation is trivially discharged and was removed from this package. -/
 structure SelfImprovementBridgePackage (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta nu : Error) : Prop where
-  permInvariant : PermInvState strategy.state
   normalizedState : strategy.state.IsNormalized
   -- TODO: replace this nested conjunction with a small named structure once the
   -- bridge package is removed or stabilized.
