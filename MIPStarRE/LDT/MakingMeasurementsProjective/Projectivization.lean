@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
+import MIPStarRE.LDT.Basic.SubMeasurement
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
@@ -337,23 +338,6 @@ lemma sourceAlmostProjective_nonneg {Outcome : Type*}
   exact ev_nonneg_of_psd ψ _ <|
     sub_nonneg.mpr <|
       MIPStarRE.Quantum.sq_le_self (A.outcome_pos a) (A.outcome_le_one a)
-
-private def leftLiftedMeasurement {Outcome : Type*}
-    {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome]
-    (A : Measurement Outcome ιA) :
-    Measurement Outcome (ιA × ιB) :=
-  { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-    total_eq_one := by
-      calc
-        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).total
-            = leftTensor (ι₂ := ιB) A.total :=
-              rfl
-        _ = leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA) := by
-              rw [A.total_eq_one]
-        _ = 1 := by
-              simp [leftTensor] }
 
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
 with `B`, then `A` is `2ζ`-almost-projective. -/

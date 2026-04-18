@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
+import MIPStarRE.LDT.Basic.SubMeasurement
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
@@ -81,23 +82,6 @@ private lemma orthonormalizationMainLemma_error_bound (ζ : Error)
       have hcoeff : 12 * Real.rpow (2 : Error) (1 / (2 : Error)) ≤ 12 * 7 := by
         exact mul_le_mul_of_nonneg_left hsqrt_two_le_seven (by norm_num)
       simpa using hcoeff.trans_eq (by norm_num : (12 : Error) * 7 = 84)
-
-private def leftLiftedMeasurement {Outcome : Type*}
-    {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome]
-    (A : Measurement Outcome ιA) :
-    Measurement Outcome (ιA × ιB) :=
-  { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-    total_eq_one := by
-      calc
-        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).total
-            = leftTensor (ι₂ := ιB) A.total :=
-              rfl
-        _ = leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA) := by
-              rw [A.total_eq_one]
-        _ = 1 := by
-              simp [leftTensor] }
 
 /-- `lem:orthonormalization-main-lemma`.
 
