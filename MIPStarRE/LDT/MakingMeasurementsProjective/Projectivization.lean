@@ -101,7 +101,8 @@ private lemma sum_ev_leftTensor_outcome_sq_nonneg
     0 ≤ ∑ a : Outcome,
           ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a)) := by
   refine Finset.sum_nonneg fun a _ => ?_
-  rw [← leftTensor_mul_leftTensor, ← leftTensor_outcome_conjTranspose_self (ιB := ιB) A a]
+  rw [← leftTensor_mul_leftTensor]
+  nth_rw 1 [← leftTensor_outcome_conjTranspose_self (ιB := ιB) A a]
   exact ev_adjoint_self_nonneg ψ (leftTensor (ι₂ := ιB) (A.outcome a))
 
 /-- The `diagB` sum (in terms of `rightTensor (B_a * B_a)`) is nonnegative. -/

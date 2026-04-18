@@ -79,15 +79,20 @@ lemma qAlmostProjective {Outcome : Type*}
             simp [sandwiched, Finset.sum_sub_distrib]
     _ ≤ (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) - ∑ a, Qa data a := hsub_le
     _ = (2 * ε) • QTotal data := by
-          rw [hRank.sum_eq_total]
-          simp
+          rw [hRank.sum_eq_total,
+            show (((1 : Error) + 2 * ε) : ℂ) = (((1 + 2 * ε : Error)) : ℂ) from by
+              push_cast; ring]
+          show ((1 + 2 * ε : Error)) • QTotal data - QTotal data = (2 * ε) • QTotal data
+          rw [add_smul, one_smul, add_sub_cancel_left]
     _ ≤ (2 * ε) • ((((1 : Error) + 2 * ε) : ℂ) • (1 : MIPStarRE.Quantum.Op ι)) := hscaled_total
     _ = ((2 * ε) * ((1 : Error) + 2 * ε)) • (1 : MIPStarRE.Quantum.Op ι) := by
           rw [← Complex.coe_smul, ← Complex.coe_smul, smul_smul]
           simp
     _ ≤ ((4 : Error) * ε) • (1 : MIPStarRE.Quantum.Op ι) := hcoeff_op
     _ = (((4 : Error) * spectralTruncationError ζ) : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
-          simp [ε]
+          rw [show (((4 : Error) * spectralTruncationError ζ) : ℂ) =
+              (((4 * spectralTruncationError ζ : Error)) : ℂ) from by push_cast; ring]
+          exact (Complex.coe_smul _ _).symm
 
 
 end
