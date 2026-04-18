@@ -51,7 +51,7 @@ structure MatrixVarianceTransferRealization (params : Parameters) [FieldModel pa
 def matrixPolynomialWeightOperator (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : MatrixOperator model.space :=
-  model.polynomialMeasurement.effect (g : DegreeBoundedPolynomialAnswer params)
+  model.polynomialMeasurement.effect g
 
 /--
 The concrete stand-in for `(G_g)^{1/2}`. The source uses the square root; this
@@ -131,7 +131,7 @@ noncomputable def matrixGeneralizeBRightOperatorAtPolynomial
     (g : Polynomial params)
     (qu : AxisParallelLineQuestion params) : MatrixOperator model.space :=
   (model.axisMeasurement qu.1).effect
-    ((Polynomial.restrictToAxisParallelLine params g qu.1 : DegreeBoundedLineAnswer params))
+    (Polynomial.restrictToAxisParallelLine params g qu.1)
 
 /-- The weighted left operator in the matrix-level `generalize-b` estimate. -/
 noncomputable def matrixWeightedGeneralizeBLeftOperatorAtPolynomial
