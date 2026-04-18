@@ -80,10 +80,11 @@ lemma qAlmostProjective {Outcome : Type*}
     _ ≤ (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) - ∑ a, Qa data a := hsub_le
     _ = (2 * ε) • QTotal data := by
           rw [hRank.sum_eq_total]
-          simpa [sub_smul]
+          simp
     _ ≤ (2 * ε) • ((((1 : Error) + 2 * ε) : ℂ) • (1 : MIPStarRE.Quantum.Op ι)) := hscaled_total
     _ = ((2 * ε) * ((1 : Error) + 2 * ε)) • (1 : MIPStarRE.Quantum.Op ι) := by
-          simpa [smul_assoc, mul_comm, mul_left_comm, mul_assoc]
+          rw [← Complex.coe_smul, ← Complex.coe_smul, smul_smul]
+          simp
     _ ≤ ((4 : Error) * ε) • (1 : MIPStarRE.Quantum.Op ι) := hcoeff_op
     _ = (((4 : Error) * spectralTruncationError ζ) : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
           simp [ε]
