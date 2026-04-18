@@ -285,60 +285,6 @@ private lemma gCommStability_raw_le_one
       Prod.snd
       (gCommStability_pointwise_bound params strategy family G hG)
 
-/-- The boundedness residual currently stored by `IdxPolyFamily.Bounded`.
-
-This is the induction-oriented `Z^x ⊗ (I - G^x)` term after replacing the
-abstract slice family by the concrete `G` supplied to the commutativity theorem.
-The paper's commutativity stability claims use the swapped
-`(I - G^x) ⊗ Z^x` orientation, so this lemma records the currently available
-boundedness input rather than completing the paper's scalar argument. -/
-noncomputable def gCommStabilityBoundedResidual
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (x : Fq params) : Error :=
-  ev strategy.state
-    (leftTensor (ι₂ := ι) (family.witness x) *
-      rightTensor (ι₁ := ι) (1 - (G x).total))
-
-/-- Stored residual half of the boundedness hypothesis.
-
-This is the line currently available from `IdxPolyFamily.Bounded`.  It is
-swapped relative to `references/ldt-paper/commutativity-G.tex`, where the
-residual appears as `(I-G^x) ⊗ Z^x`. -/
-theorem gCommStability_storedBoundedResidualBound
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (zeta : Error)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    avgOver (uniformDistribution (Fq params))
-      (fun x => gCommStabilityBoundedResidual params strategy family G x) ≤ zeta := by
-  simpa [gCommStabilityBoundedResidual, hG] using hbound.bounded.sliceBoundedness
-
-/-- Paper-faithful domination half of the boundedness hypothesis.
-
-This is the line `Z^x ≥ E_u A^{u,x}_{g(u)}` from
-`references/ldt-paper/commutativity-G.tex`. -/
-theorem gCommStability_averagedPoint_le_witness
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (zeta : Error)
-    (family : IdxPolyFamily params ι)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    ∀ x : Fq params, ∀ g : Polynomial params,
-      IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x := by
-  intro x g
-  have hdom : family.dominationTarget x g ≤ family.witness x :=
-    sub_nonneg.mp (hbound.bounded.sliceDominatesTarget x g)
-  simpa [hbound.dominationTargetAgrees x g] using hdom
-
 set_option maxHeartbeats 2000000 in
 /-- Overlap-only version of the first stability estimate.
 
