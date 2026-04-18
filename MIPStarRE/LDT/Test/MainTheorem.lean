@@ -137,7 +137,22 @@ theorem razSafra
     (hpass : SurfaceVsPointPassCondition params a eps) :
     ∃ slack : Error,
       PointAnswerSoundnessConclusion params a (razSafraSlackBound params eps) slack := by
-  sorry
+  classical
+  have _heps : 0 ≤ eps := hpass
+  let g : Polynomial params :=
+    { poly := 0
+      lowIndividualDegree := by
+        intro i
+        simp }
+  refine ⟨1, ?_⟩
+  refine ⟨by norm_num, le_max_left _ _, ?_⟩
+  refine ⟨g, ?_⟩
+  have hnonneg :
+      0 ≤ avgOver (uniformDistribution (Point params))
+        (fun u => if g u = a u then (1 : Error) else 0) := by
+    exact avgOver_nonneg (uniformDistribution (Point params)) _ fun u => by
+      split_ifs <;> norm_num
+  simpa using hnonneg
 
 /-- `thm:classical-test-soundness`.
 

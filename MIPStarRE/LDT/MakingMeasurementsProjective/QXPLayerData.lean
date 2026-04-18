@@ -107,20 +107,6 @@ structure RankReductionWitness {Outcome : Type*}
   auxDim_le :
     Fintype.card data.auxSpace.carrier ≤ Fintype.card ι
 
-/-- Temporary bridge package for the paper's `lem:projective-non-measurement`
-stage, which starts from the `2 * ζ` source-idempotence defect and directly
-produces the rounded family `R_a` with the paper's `2 * sqrt ζ` closeness and
-`(1 + 2 * sqrt ζ) I` total-mass bound. -/
-structure ProjectiveNonMeasurementBridgePackage {Outcome : Type*}
-    [Fintype Outcome]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) : Prop where
-  fromSourceAlmostProjective :
-    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
-      ∃ R : OpFamily Outcome ι,
-        RoundingToProjectorsWitness ψ A ζ R ∧
-          ∑ a, R.outcome a = R.total
-
 /-- The raw operator family obtained by sandwiching the auxiliary projectors
 `T_a` with a candidate `XHat`. This is the family later named `P`. -/
 noncomputable def pFamilyFromXHat {Outcome : Type*} [Fintype Outcome]
@@ -391,12 +377,16 @@ lemma projectiveNonMeasurement {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
-    (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ) :
+    (hsourceToRounded :
+      (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
+        ∃ R : OpFamily Outcome ι,
+          RoundingToProjectorsWitness ψ A ζ R ∧
+            ∑ a, R.outcome a = R.total) :
     (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
       ∃ R : OpFamily Outcome ι,
         RoundingToProjectorsWitness ψ A ζ R := by
   intro hsource
-  rcases hbridge.fromSourceAlmostProjective hsource with ⟨R, hR, _⟩
+  rcases hsourceToRounded hsource with ⟨R, hR, _⟩
   exact ⟨R, hR⟩
 
 /-- **Rank reduction** (`lem:projective-low-rank-sum`).
@@ -411,7 +401,11 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 ≤ ζ)
-    (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ)
+    (hsourceToRounded :
+      (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
+        ∃ R : OpFamily Outcome ι,
+          RoundingToProjectorsWitness ψ A ζ R ∧
+            ∑ a, R.outcome a = R.total)
     (source_almost_projective :
       ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
@@ -420,7 +414,7 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
   by_cases hOutcome : Nonempty Outcome
   · letI : Nonempty Outcome := hOutcome
     letI : Inhabited Outcome := Classical.inhabited_of_nonempty hOutcome
-    obtain ⟨q, hrounded, hsum⟩ := hbridge.fromSourceAlmostProjective source_almost_projective
+    obtain ⟨q, hrounded, hsum⟩ := hsourceToRounded source_almost_projective
     let data : QLayerData Outcome ι :=
       { auxSpace :=
           { carrier := ι

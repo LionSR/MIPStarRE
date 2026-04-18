@@ -336,9 +336,9 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
 
 /-- Spectral truncation of an almost-projective measurement.
 
-The bridge package isolates the still-unformalized spectral construction itself;
-this theorem just exposes it under the paper-faithful raw-family statement. The
-normalization hypothesis is explicit because the `√ζ`-scale error bound is
+The still-unformalized spectral construction is exposed here as an explicit
+hypothesis rather than a dedicated bridge-package structure. The normalization
+hypothesis remains explicit because the `√ζ`-scale error bound is
 state-dependent. -/
 def spectralTruncateAlmostProjective {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -346,28 +346,33 @@ def spectralTruncateAlmostProjective {Outcome : Type*}
     (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
     (A : Measurement Outcome ι) (ζ : Error) :
     AlmostProjMeasStatement ψ A ζ →
-      SpectralTruncationBridgePackage ψ A ζ →
+      (ψ.IsNormalized →
+        (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
+          SpectralTruncationStatement ψ A ζ) →
       SpectralTruncationStatement ψ A ζ := by
-  intro hAlmost hbridge
-  exact hbridge.fromSourceAlmostProjective hψ hAlmost.sourceAlmostProjective
+  intro hAlmost hspectral
+  exact hspectral hψ hAlmost.sourceAlmostProjective
 
 /-- Adjust truncated projections to form a genuine projective
 submeasurement, controlling the per-outcome distance.
 
 The raw rounded family is exposed by `SpectralTruncationStatement`; the late
-repair from that family to a genuine projective submeasurement is isolated in
-`ProjectivizationRepairPackage`. -/
+repair from that family to a genuine projective submeasurement is now an
+explicit theorem hypothesis. -/
 lemma adjustTruncatedProjections {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
     SpectralTruncationStatement ψ A ζ →
-      ProjectivizationRepairPackage ψ A ζ →
+      (SpectralTruncationStatement ψ A ζ →
+        ∃ P : ProjSubMeas Outcome ι,
+          RoundedProjMeasStatement ψ A P
+            (roundingToProjectiveError ζ)) →
       ∃ P : ProjSubMeas Outcome ι,
         RoundedProjMeasStatement ψ A P
           (roundingToProjectiveError ζ) := by
   intro hSpectral hrepair
-  exact hrepair.fromSpectral hSpectral
+  exact hrepair hSpectral
 
 /-- Compose spectral truncation and adjustment to round an
 almost-projective measurement to a projective submeasurement. -/
@@ -377,8 +382,13 @@ lemma roundAlmostProjMeas {Outcome : Type*}
     (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
     (A : Measurement Outcome ι) (ζ : Error) :
     AlmostProjMeasStatement ψ A ζ →
-      SpectralTruncationBridgePackage ψ A ζ →
-      ProjectivizationRepairPackage ψ A ζ →
+      (ψ.IsNormalized →
+        (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
+          SpectralTruncationStatement ψ A ζ) →
+      (SpectralTruncationStatement ψ A ζ →
+        ∃ P : ProjSubMeas Outcome ι,
+          RoundedProjMeasStatement ψ A P
+            (roundingToProjectiveError ζ)) →
       ∃ P : ProjSubMeas Outcome ι,
         RoundedProjMeasStatement ψ A P
           (roundingToProjectiveError ζ) := by

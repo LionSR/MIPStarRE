@@ -631,7 +631,14 @@ lemma normalizationCondition_sandwich_bound
     ∑ a : α,
         (∑ b : β, Q.outcome b * P.outcome a * Q.outcome b) *
           (∑ b : β, Q.outcome b * P.outcome a * Q.outcome b)ᴴ ≤ 1 := by
-  sorry
+  simpa [normalizationConditionSquareOperator,
+    normalizationConditionSquareFamily,
+    normalizationConditionSandwichedTotalOperator,
+    normalizationConditionSandwichedTotalFamily,
+    normalizationConditionSandwichedFamily,
+    normalizationConditionSandwichedOperator,
+    postprocess] using
+      (normalizationConditionSquareFamily P Q).total_le_one
 
 /-- Paper `eq:gcomterms` (`commutativity-G.tex` lines 286-290).
 
@@ -654,7 +661,341 @@ lemma fullSliceCommutation_qSDDOp_avg_eq
           (fullSliceQuestionOfEvaluatedSlice params q)) =
       2 * (fullSliceABAAvg params strategy family -
         fullSliceABABAvg params strategy family) := by
-  sorry
+  have hswap :
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceBABTerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) =
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceABATerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) ∧
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceBABATerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) =
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceABABTerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) := by
+    let eQ : EvaluatedSliceQuestion params ≃ EvaluatedSliceQuestion params :=
+      { toFun := Prod.swap
+        invFun := Prod.swap
+        left_inv := by intro q; cases q; rfl
+        right_inv := by intro q; cases q; rfl }
+    let eA : FullSliceOutcome params ≃ FullSliceOutcome params :=
+      { toFun := Prod.swap
+        invFun := Prod.swap
+        left_inv := by intro gh; cases gh; rfl
+        right_inv := by intro gh; cases gh; rfl }
+    constructor
+    · calc
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+            (fun q => ∑ gh : FullSliceOutcome params,
+              fullSliceBABTerm params strategy family
+                (fullSliceQuestionOfEvaluatedSlice params q) gh)
+          = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+              (fun q => ∑ gh : FullSliceOutcome params,
+                fullSliceABATerm params strategy family
+                  (fullSliceQuestionOfEvaluatedSlice params (eQ q)) gh) := by
+                apply avgOver_congr
+                intro q
+                calc
+                  ∑ gh : FullSliceOutcome params,
+                      fullSliceBABTerm params strategy family
+                        (fullSliceQuestionOfEvaluatedSlice params q) gh
+                    = ∑ gh' : FullSliceOutcome params,
+                        fullSliceBABTerm params strategy family
+                          (fullSliceQuestionOfEvaluatedSlice params q) (eA.symm gh') := by
+                            exact Fintype.sum_equiv eA
+                              (fun gh =>
+                                fullSliceBABTerm params strategy family
+                                  (fullSliceQuestionOfEvaluatedSlice params q) gh)
+                              (fun gh' =>
+                                fullSliceBABTerm params strategy family
+                                  (fullSliceQuestionOfEvaluatedSlice params q) (eA.symm gh'))
+                              (by intro gh; simp [eA])
+                  _ = ∑ gh : FullSliceOutcome params,
+                        fullSliceABATerm params strategy family
+                          (fullSliceQuestionOfEvaluatedSlice params (eQ q)) gh := by
+                            refine Finset.sum_congr rfl ?_
+                            intro gh _
+                            rcases q with ⟨u, v⟩
+                            rcases gh with ⟨g, h⟩
+                            simp [eQ, eA, fullSliceQuestionOfEvaluatedSlice,
+                              fullSliceBABTerm, fullSliceABATerm,
+                              fullSliceFirstFactor, fullSliceSecondFactor]
+        _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+              (fun q => ∑ gh : FullSliceOutcome params,
+                fullSliceABATerm params strategy family
+                  (fullSliceQuestionOfEvaluatedSlice params q) gh) := by
+                simpa [eQ] using
+                  (avgOver_uniform_equiv eQ
+                    (fun q => ∑ gh : FullSliceOutcome params,
+                      fullSliceABATerm params strategy family
+                        (fullSliceQuestionOfEvaluatedSlice params q) gh)).symm
+    · calc
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+            (fun q => ∑ gh : FullSliceOutcome params,
+              fullSliceBABATerm params strategy family
+                (fullSliceQuestionOfEvaluatedSlice params q) gh)
+          = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+              (fun q => ∑ gh : FullSliceOutcome params,
+                fullSliceABABTerm params strategy family
+                  (fullSliceQuestionOfEvaluatedSlice params (eQ q)) gh) := by
+                apply avgOver_congr
+                intro q
+                calc
+                  ∑ gh : FullSliceOutcome params,
+                      fullSliceBABATerm params strategy family
+                        (fullSliceQuestionOfEvaluatedSlice params q) gh
+                    = ∑ gh' : FullSliceOutcome params,
+                        fullSliceBABATerm params strategy family
+                          (fullSliceQuestionOfEvaluatedSlice params q) (eA.symm gh') := by
+                            exact Fintype.sum_equiv eA
+                              (fun gh =>
+                                fullSliceBABATerm params strategy family
+                                  (fullSliceQuestionOfEvaluatedSlice params q) gh)
+                              (fun gh' =>
+                                fullSliceBABATerm params strategy family
+                                  (fullSliceQuestionOfEvaluatedSlice params q) (eA.symm gh'))
+                              (by intro gh; simp [eA])
+                  _ = ∑ gh : FullSliceOutcome params,
+                        fullSliceABABTerm params strategy family
+                          (fullSliceQuestionOfEvaluatedSlice params (eQ q)) gh := by
+                            refine Finset.sum_congr rfl ?_
+                            intro gh _
+                            rcases q with ⟨u, v⟩
+                            rcases gh with ⟨g, h⟩
+                            simp [eQ, eA, fullSliceQuestionOfEvaluatedSlice,
+                              fullSliceBABATerm, fullSliceABABTerm,
+                              fullSliceFirstFactor, fullSliceSecondFactor]
+        _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+              (fun q => ∑ gh : FullSliceOutcome params,
+                fullSliceABABTerm params strategy family
+                  (fullSliceQuestionOfEvaluatedSlice params q) gh) := by
+                simpa [eQ] using
+                  (avgOver_uniform_equiv eQ
+                    (fun q => ∑ gh : FullSliceOutcome params,
+                      fullSliceABABTerm params strategy family
+                        (fullSliceQuestionOfEvaluatedSlice params q) gh)).symm
+  unfold sddErrorOp
+  rw [fullSliceCommutation_qSDDOp_avg_expand params strategy family]
+  rcases hswap with ⟨hBAB, hBABA⟩
+  let sf : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ gh : FullSliceOutcome params,
+      fullSliceBABTerm params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q) gh
+  let sg : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ gh : FullSliceOutcome params,
+      fullSliceABATerm params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q) gh
+  let sh : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ gh : FullSliceOutcome params,
+      fullSliceBABATerm params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q) gh
+  let sk : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ gh : FullSliceOutcome params,
+      fullSliceABABTerm params strategy family
+        (fullSliceQuestionOfEvaluatedSlice params q) gh
+  have hpoint :
+      ∀ q,
+        (∑ gh : FullSliceOutcome params,
+            (fullSliceBABTerm params strategy family
+                (fullSliceQuestionOfEvaluatedSlice params q) gh +
+              fullSliceABATerm params strategy family
+                (fullSliceQuestionOfEvaluatedSlice params q) gh -
+              fullSliceBABATerm params strategy family
+                (fullSliceQuestionOfEvaluatedSlice params q) gh -
+              fullSliceABABTerm params strategy family
+                (fullSliceQuestionOfEvaluatedSlice params q) gh)) =
+          sf q + sg q - sh q - sk q := by
+    intro q
+    dsimp [sf, sg, sh, sk]
+    rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, Finset.sum_add_distrib]
+  have hsplit :
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => sf q + sg q - sh q - sk q) =
+          avgOver (uniformDistribution (EvaluatedSliceQuestion params)) sf +
+            avgOver (uniformDistribution (EvaluatedSliceQuestion params)) sg -
+            avgOver (uniformDistribution (EvaluatedSliceQuestion params)) sh -
+            avgOver (uniformDistribution (EvaluatedSliceQuestion params)) sk := by
+    unfold avgOver
+    have hmul :
+        ∀ q,
+          (uniformDistribution (EvaluatedSliceQuestion params)).weight q *
+              (sf q + sg q - sh q - sk q) =
+            (uniformDistribution (EvaluatedSliceQuestion params)).weight q * sf q +
+              (uniformDistribution (EvaluatedSliceQuestion params)).weight q * sg q -
+              (uniformDistribution (EvaluatedSliceQuestion params)).weight q * sh q -
+              (uniformDistribution (EvaluatedSliceQuestion params)).weight q * sk q := by
+      intro q
+      ring
+    simp_rw [hmul, sub_eq_add_neg]
+    repeat rw [Finset.sum_add_distrib]
+    simp_rw [Finset.sum_neg_distrib]
+  have hABA_pullback :
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => ∑ gh : FullSliceOutcome params,
+          fullSliceABATerm params strategy family
+            (fullSliceQuestionOfEvaluatedSlice params q) gh) =
+      fullSliceABAAvg params strategy family := by
+    let e := evaluatedSliceQuestionEquiv params
+    calc
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceABATerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh)
+        = avgOver
+            (uniformDistribution ((Point params × Point params) × FullSliceQuestion params))
+            (fun r => ∑ gh : FullSliceOutcome params,
+              fullSliceABATerm params strategy family r.2 gh) := by
+                calc
+                  avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+                      (fun q => ∑ gh : FullSliceOutcome params,
+                        fullSliceABATerm params strategy family
+                          (fullSliceQuestionOfEvaluatedSlice params q) gh)
+                    = avgOver
+                        (uniformDistribution ((Point params × Point params) × FullSliceQuestion params))
+                        (fun r =>
+                          ∑ gh : FullSliceOutcome params,
+                            fullSliceABATerm params strategy family
+                              (fullSliceQuestionOfEvaluatedSlice params (e.symm r)) gh) :=
+                        avgOver_uniform_equiv e _
+                  _ = avgOver
+                        (uniformDistribution ((Point params × Point params) × FullSliceQuestion params))
+                        (fun r => ∑ gh : FullSliceOutcome params,
+                          fullSliceABATerm params strategy family r.2 gh) := by
+                          apply avgOver_congr
+                          rintro ⟨⟨u, v⟩, x, y⟩
+                          simp [e, evaluatedSliceQuestionEquiv, fullSliceQuestionOfEvaluatedSlice]
+      _ = avgOver (uniformDistribution (FullSliceQuestion params))
+            (fun xy => ∑ gh : FullSliceOutcome params,
+              fullSliceABATerm params strategy family xy gh) := by
+              simpa using
+                (avgOver_uniform_snd
+                  (α := Point params × Point params)
+                  (β := FullSliceQuestion params)
+                  (f := fun xy => ∑ gh : FullSliceOutcome params,
+                    fullSliceABATerm params strategy family xy gh))
+      _ = fullSliceABAAvg params strategy family := by
+            rfl
+  have hABAB_pullback :
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => ∑ gh : FullSliceOutcome params,
+          fullSliceABABTerm params strategy family
+            (fullSliceQuestionOfEvaluatedSlice params q) gh) =
+      fullSliceABABAvg params strategy family := by
+    let e := evaluatedSliceQuestionEquiv params
+    calc
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceABABTerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh)
+        = avgOver
+            (uniformDistribution ((Point params × Point params) × FullSliceQuestion params))
+            (fun r => ∑ gh : FullSliceOutcome params,
+              fullSliceABABTerm params strategy family r.2 gh) := by
+                calc
+                  avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+                      (fun q => ∑ gh : FullSliceOutcome params,
+                        fullSliceABABTerm params strategy family
+                          (fullSliceQuestionOfEvaluatedSlice params q) gh)
+                    = avgOver
+                        (uniformDistribution ((Point params × Point params) × FullSliceQuestion params))
+                        (fun r =>
+                          ∑ gh : FullSliceOutcome params,
+                            fullSliceABABTerm params strategy family
+                              (fullSliceQuestionOfEvaluatedSlice params (e.symm r)) gh) :=
+                        avgOver_uniform_equiv e _
+                  _ = avgOver
+                        (uniformDistribution ((Point params × Point params) × FullSliceQuestion params))
+                        (fun r => ∑ gh : FullSliceOutcome params,
+                          fullSliceABABTerm params strategy family r.2 gh) := by
+                          apply avgOver_congr
+                          rintro ⟨⟨u, v⟩, x, y⟩
+                          simp [e, evaluatedSliceQuestionEquiv, fullSliceQuestionOfEvaluatedSlice]
+      _ = avgOver (uniformDistribution (FullSliceQuestion params))
+            (fun xy => ∑ gh : FullSliceOutcome params,
+              fullSliceABABTerm params strategy family xy gh) := by
+              simpa using
+                (avgOver_uniform_snd
+                  (α := Point params × Point params)
+                  (β := FullSliceQuestion params)
+                  (f := fun xy => ∑ gh : FullSliceOutcome params,
+                    fullSliceABABTerm params strategy family xy gh))
+      _ = fullSliceABABAvg params strategy family := by
+            rfl
+  calc
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q =>
+          ∑ gh : FullSliceOutcome params,
+            (fullSliceBABTerm params strategy family
+                (fullSliceQuestionOfEvaluatedSlice params q) gh +
+              fullSliceABATerm params strategy family
+                (fullSliceQuestionOfEvaluatedSlice params q) gh -
+              fullSliceBABATerm params strategy family
+                (fullSliceQuestionOfEvaluatedSlice params q) gh -
+              fullSliceABABTerm params strategy family
+                (fullSliceQuestionOfEvaluatedSlice params q) gh))
+      = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceBABTerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) +
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceABATerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) -
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceBABATerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) -
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceABABTerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) := by
+            calc
+              avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+                  (fun q =>
+                    ∑ gh : FullSliceOutcome params,
+                      (fullSliceBABTerm params strategy family
+                          (fullSliceQuestionOfEvaluatedSlice params q) gh +
+                        fullSliceABATerm params strategy family
+                          (fullSliceQuestionOfEvaluatedSlice params q) gh -
+                        fullSliceBABATerm params strategy family
+                          (fullSliceQuestionOfEvaluatedSlice params q) gh -
+                        fullSliceABABTerm params strategy family
+                          (fullSliceQuestionOfEvaluatedSlice params q) gh))
+                = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+                    (fun q => sf q + sg q - sh q - sk q) := by
+                      apply avgOver_congr
+                      intro q
+                      exact hpoint q
+              _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params)) sf +
+                    avgOver (uniformDistribution (EvaluatedSliceQuestion params)) sg -
+                    avgOver (uniformDistribution (EvaluatedSliceQuestion params)) sh -
+                    avgOver (uniformDistribution (EvaluatedSliceQuestion params)) sk := hsplit
+    _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceABATerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) +
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceABATerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) -
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceABABTerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) -
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => ∑ gh : FullSliceOutcome params,
+            fullSliceABABTerm params strategy family
+              (fullSliceQuestionOfEvaluatedSlice params q) gh) := by
+            rw [hBAB, hBABA]
+    _ = 2 * (fullSliceABAAvg params strategy family -
+          fullSliceABABAvg params strategy family) := by
+            rw [hABA_pullback, hABAB_pullback]
+            ring
 
 
 end MIPStarRE.LDT.Commutativity

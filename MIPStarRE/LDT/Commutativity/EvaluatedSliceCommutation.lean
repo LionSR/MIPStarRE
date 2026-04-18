@@ -377,7 +377,7 @@ private lemma evaluatedSliceCommutation_qSDDOp_avg_expand
 
 /-- Expand the pulled-back full-slice `qSDDOp` into the four projector terms
 `BAB + ABA - BABA - ABAB`. -/
-private lemma fullSliceCommutation_qSDDOp_avg_expand
+lemma fullSliceCommutation_qSDDOp_avg_expand
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
     avgOver (uniformDistribution (EvaluatedSliceQuestion params))

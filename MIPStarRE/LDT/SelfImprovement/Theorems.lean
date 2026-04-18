@@ -302,80 +302,6 @@ structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
       (leftTensor (ι₂ := ι) Z)
       (selfImprovementError params eps delta)
 
-/-- Temporary bridge package exposing the exact unformalized ingredients needed
-to assemble `thm:self-improvement` from the already-formalized helper and
-orthonormalization theorems.
-
-TODO: eliminate this package by proving:
-1. `PermInvState strategy.state` for the symmetric strategies used here,
-2. the helper-stage `BipartiteSSCRel` bound for `Hhat`, and
-3. the GlobalVariance pointwise estimates consumed by `addInU`, and
-4. the Section 9 transport lemmas from the orthonormalization output to the
-   remaining conclusion fields. -/
-structure SelfImprovementBridgePackage (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta nu : Error) : Prop where
-  permInvariant : PermInvState strategy.state
-  normalizedState : strategy.state.IsNormalized
-  -- TODO: replace this nested conjunction with a small named structure once the
-  -- bridge package is removed or stabilized.
-  globalVarianceProofInputs :
-    ∀ T : Measurement (Polynomial params) ι,
-      (∀ g : Polynomial params,
-        localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
-          localVarianceOfPointsError params eps delta) ∧
-      (∀ g : Polynomial params,
-        pointConditionedLocalVarianceAtPolynomial params strategy T.toSubMeas g ≤
-          localVarianceOfPointsError params eps delta) ∧
-      (∀ g : Polynomial params,
-        globalVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
-          globalVarianceOfPointsError params eps delta)
-  helperStrongSelfConsistency :
-    ∀ {T : Measurement (Polynomial params) ι}
-      {Hhat : SubMeas (Polynomial params) ι}
-      {Z : MIPStarRE.Quantum.Op ι},
-      SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-        BipartiteSSCRel strategy.state (uniformDistribution Unit)
-          (constSubMeasFamily Hhat)
-          (selfImprovementHelperError params eps delta)
-  /-- Bridge for the final orthonormalization step on the helper submeasurement. -/
-  orthonormalizationBridge :
-    ∀ {Hhat : SubMeas (Polynomial params) ι},
-      BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta) →
-      OrthonormalizationBridgePackage strategy.state Hhat
-        (selfImprovementHelperError params eps delta)
-  evaluationDataProcessing :
-    ∀ {Hhat : SubMeas (Polynomial params) ι}
-      {H : ProjSubMeas (Polynomial params) ι},
-      BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta) →
-      SDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat.liftLeft)
-        (constSubMeasFamily H.toSubMeas.liftLeft)
-        (selfImprovementOrthogonalizationError params eps delta) →
-      SDDRel strategy.state (uniformDistribution (Point params))
-        ((polynomialEvaluationFamily params Hhat).liftLeft)
-        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
-        (selfImprovementDataProcessingError params eps delta)
-  finalFields :
-    ∀ {T : Measurement (Polynomial params) ι}
-      {Hhat : SubMeas (Polynomial params) ι}
-      {H : ProjSubMeas (Polynomial params) ι}
-      {Z : MIPStarRE.Quantum.Op ι},
-      SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-      SDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat.liftLeft)
-        (constSubMeasFamily H.toSubMeas.liftLeft)
-        (selfImprovementOrthogonalizationError params eps delta) →
-      SDDRel strategy.state (uniformDistribution (Point params))
-        ((polynomialEvaluationFamily params Hhat).liftLeft)
-        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
-        (selfImprovementDataProcessingError params eps delta) →
-      SelfImprovementFinalFields params strategy H Z eps delta nu
-
 /-! ## Reduced theorem wrappers -/
 
 private lemma averagedPointOperator_le_one
@@ -469,8 +395,18 @@ lemma selfImprovementHelper
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (nu : Error)
-    (hbridges : SelfImprovementBridgePackage params strategy eps delta nu)
+    (_nu : Error)
+    (hglobalVarianceProofInputs :
+      ∀ T : Measurement (Polynomial params) ι,
+        (∀ g : Polynomial params,
+          localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
+            localVarianceOfPointsError params eps delta) ∧
+        (∀ g : Polynomial params,
+          pointConditionedLocalVarianceAtPolynomial params strategy T.toSubMeas g ≤
+            localVarianceOfPointsError params eps delta) ∧
+        (∀ g : Polynomial params,
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
+            globalVarianceOfPointsError params eps delta))
     -- Kept for API compatibility with the full helper statement, where future
     -- proof obligations will depend on the incoming polynomial measurement.
     (_G : Measurement (Polynomial params) ι) :
@@ -491,23 +427,83 @@ lemma selfImprovementHelper
       positiveSemidefiniteWitness := hsdp.dualPositive
       dualDominatesAveragedPoint := hsdp.dualFeasible }
   · simpa [T] using hsdp
-  · rcases hbridges.globalVarianceProofInputs T with
+  · rcases hglobalVarianceProofInputs T with
       ⟨hlocalDev, hlocalVar, hglobalDev⟩
     -- These are the surfaced GlobalVariance analytic obligations. The wrapper
-    -- proofs consume them here; `SelfImprovementBridgePackage` owns them until
-    -- the Section 8 estimates are formalized directly.
+    -- proofs consume them here until the Section 8 estimates are formalized
+    -- directly.
     exact addInU params strategy eps delta gamma hgood T hlocalDev hlocalVar hglobalDev
 
 /-- `thm:self-improvement`.
 
-NOTE: The SelfImprovementBridgePackage is temporary scaffolding. See issue #278
-for the plan to derive PermInvState internally. -/
+The remaining Section 8/9 obligations are exposed as explicit theorem
+hypotheses, rather than bundled behind a dedicated bridge-package structure. -/
 theorem selfImprovement
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hbridges : SelfImprovementBridgePackage params strategy eps delta nu)
+    (hpermInvariant : PermInvState strategy.state)
+    (hnormalizedState : strategy.state.IsNormalized)
+    (hglobalVarianceProofInputs :
+      ∀ T : Measurement (Polynomial params) ι,
+        (∀ g : Polynomial params,
+          localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
+            localVarianceOfPointsError params eps delta) ∧
+        (∀ g : Polynomial params,
+          pointConditionedLocalVarianceAtPolynomial params strategy T.toSubMeas g ≤
+            localVarianceOfPointsError params eps delta) ∧
+        (∀ g : Polynomial params,
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
+            globalVarianceOfPointsError params eps delta))
+    (hhelperStrongSelfConsistency :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
+          BipartiteSSCRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily Hhat)
+            (selfImprovementHelperError params eps delta))
+    (horthonormalization :
+      ∀ {Hhat : SubMeas (Polynomial params) ι},
+        strategy.state.IsNormalized →
+        BipartiteSSCRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily Hhat)
+          (selfImprovementHelperError params eps delta) →
+        ∃ H : ProjSubMeas (Polynomial params) ι,
+          SDDRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily Hhat.liftLeft)
+            (constSubMeasFamily H.toSubMeas.liftLeft)
+            (selfImprovementOrthogonalizationError params eps delta))
+    (hevaluationDataProcessing :
+      ∀ {Hhat : SubMeas (Polynomial params) ι}
+        {H : ProjSubMeas (Polynomial params) ι},
+        BipartiteSSCRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily Hhat)
+          (selfImprovementHelperError params eps delta) →
+        SDDRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily Hhat.liftLeft)
+          (constSubMeasFamily H.toSubMeas.liftLeft)
+          (selfImprovementOrthogonalizationError params eps delta) →
+        SDDRel strategy.state (uniformDistribution (Point params))
+          ((polynomialEvaluationFamily params Hhat).liftLeft)
+          ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+          (selfImprovementDataProcessingError params eps delta))
+    (hfinalFields :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {H : ProjSubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
+        SDDRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily Hhat.liftLeft)
+          (constSubMeasFamily H.toSubMeas.liftLeft)
+          (selfImprovementOrthogonalizationError params eps delta) →
+        SDDRel strategy.state (uniformDistribution (Point params))
+          ((polynomialEvaluationFamily params Hhat).liftLeft)
+          ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+          (selfImprovementDataProcessingError params eps delta) →
+        SelfImprovementFinalFields params strategy H Z eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι)
     (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
@@ -515,26 +511,27 @@ theorem selfImprovement
       (polynomialEvaluationFamily params G.toSubMeas) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
-  rcases selfImprovementHelper params strategy eps delta gamma hgood nu hbridges G with
+  rcases selfImprovementHelper params strategy eps delta gamma hgood nu
+      hglobalVarianceProofInputs G with
     ⟨T, Hhat, Z, hhelper⟩
   have hssc :
       BipartiteSSCRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily Hhat)
         (selfImprovementHelperError params eps delta) :=
-    hbridges.helperStrongSelfConsistency hhelper
-  rcases orthonormalization strategy.state hbridges.normalizedState
-      hbridges.permInvariant Hhat
+    hhelperStrongSelfConsistency hhelper
+  rcases orthonormalization strategy.state hnormalizedState
+      hpermInvariant Hhat
       (selfImprovementHelperError params eps delta)
-      hssc (hbridges.orthonormalizationBridge hssc) with ⟨H, horth⟩
+      hssc horthonormalization with ⟨H, horth⟩
   have hdata :
       SDDRel strategy.state (uniformDistribution (Point params))
         ((polynomialEvaluationFamily params Hhat).liftLeft)
         ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
         (selfImprovementDataProcessingError params eps delta) :=
-    hbridges.evaluationDataProcessing hssc horth
+    hevaluationDataProcessing hssc horth
   have hfinal :
       SelfImprovementFinalFields params strategy H Z eps delta nu :=
-    hbridges.finalFields hhelper horth hdata
+    hfinalFields hhelper horth hdata
   refine ⟨H, Z, ?_⟩
   exact
     { witness := ⟨T, Hhat, hhelper, horth, hdata⟩
@@ -555,7 +552,67 @@ theorem selfImprovementFromSubMeas
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hbridges : SelfImprovementBridgePackage params strategy eps delta nu)
+    (hpermInvariant : PermInvState strategy.state)
+    (hnormalizedState : strategy.state.IsNormalized)
+    (hglobalVarianceProofInputs :
+      ∀ T : Measurement (Polynomial params) ι,
+        (∀ g : Polynomial params,
+          localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
+            localVarianceOfPointsError params eps delta) ∧
+        (∀ g : Polynomial params,
+          pointConditionedLocalVarianceAtPolynomial params strategy T.toSubMeas g ≤
+            localVarianceOfPointsError params eps delta) ∧
+        (∀ g : Polynomial params,
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
+            globalVarianceOfPointsError params eps delta))
+    (hhelperStrongSelfConsistency :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
+          BipartiteSSCRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily Hhat)
+            (selfImprovementHelperError params eps delta))
+    (horthonormalization :
+      ∀ {Hhat : SubMeas (Polynomial params) ι},
+        strategy.state.IsNormalized →
+        BipartiteSSCRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily Hhat)
+          (selfImprovementHelperError params eps delta) →
+        ∃ H : ProjSubMeas (Polynomial params) ι,
+          SDDRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily Hhat.liftLeft)
+            (constSubMeasFamily H.toSubMeas.liftLeft)
+            (selfImprovementOrthogonalizationError params eps delta))
+    (hevaluationDataProcessing :
+      ∀ {Hhat : SubMeas (Polynomial params) ι}
+        {H : ProjSubMeas (Polynomial params) ι},
+        BipartiteSSCRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily Hhat)
+          (selfImprovementHelperError params eps delta) →
+        SDDRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily Hhat.liftLeft)
+          (constSubMeasFamily H.toSubMeas.liftLeft)
+          (selfImprovementOrthogonalizationError params eps delta) →
+        SDDRel strategy.state (uniformDistribution (Point params))
+          ((polynomialEvaluationFamily params Hhat).liftLeft)
+          ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+          (selfImprovementDataProcessingError params eps delta))
+    (hfinalFields :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {H : ProjSubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
+        SDDRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily Hhat.liftLeft)
+          (constSubMeasFamily H.toSubMeas.liftLeft)
+          (selfImprovementOrthogonalizationError params eps delta) →
+        SDDRel strategy.state (uniformDistribution (Point params))
+          ((polynomialEvaluationFamily params Hhat).liftLeft)
+          ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+          (selfImprovementDataProcessingError params eps delta) →
+        SelfImprovementFinalFields params strategy H Z eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
     (Gmeas : Measurement (Polynomial params) ι)
@@ -566,7 +623,10 @@ theorem selfImprovementFromSubMeas
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementSubMeasConclusion params strategy G H Z
         eps delta gamma nu := by
-  rcases selfImprovement params strategy eps delta gamma nu hbridges hgood Gmeas
+  rcases selfImprovement params strategy eps delta gamma nu
+      hpermInvariant hnormalizedState hglobalVarianceProofInputs
+      hhelperStrongSelfConsistency horthonormalization
+      hevaluationDataProcessing hfinalFields hgood Gmeas
       (by simpa [hbridge] using hcons) with ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩
   exact
