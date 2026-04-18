@@ -176,6 +176,70 @@ theorem ldPastingInInductionSection
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 
+/-! ## Main-induction bridge assembly
+
+The theorems in this section package the final compositional step of the
+`thm:main-induction` proof at dimension `m + 1`, assuming the per-slice data at
+dimension `m` has already been pasted into an ambient polynomial family.  The
+full assembly (`restrict → induct-on-slices → self-improve → paste`) then
+reduces to:
+1. running the induction hypothesis at each slice to obtain `G^x`,
+2. applying `selfImprovementInInductionSection` to each `G^x` to obtain `Ĝ^x`,
+3. averaging the per-slice bounds into an `IdxPolyFamily` with the
+   `Complete`/`ConsistentWithPoints`/`StronglySelfConsistent`/
+   `PastingBoundednessInput` hypotheses, and
+4. applying `mainInductionBridgeFromPastedFamily` below.
+
+Steps (1)–(3) and the `σ* ≤ mainInductionError params.next k ε δ γ` error
+telescoping from `references/ldt-paper/inductive_step.tex:487-622` are left as
+explicit inputs, to be supplied by follow-up PRs that formalize the recursion
+entry point and the `rpow`-concavity averaging inequalities. -/
+
+/-- Bridge assembly (step 4 of `thm:main-induction`).
+
+Given an `(m+1,q,d)` symmetric strategy together with a pasting-ready
+polynomial family over the slice index `Fq params` and the averaged pasting
+hypotheses, `ldPastingInInductionSection` produces a measurement
+`H ∈ polymeas(m+1,q,d)` whose point-consistency error is
+`ldPastingInInductionError params k eps delta gamma kappa zeta`.  An
+explicit telescoping hypothesis then bounds this error by
+`mainInductionError params.next k eps delta gamma`, yielding the
+`MainInductionBridgePackage` witness at dimension `m+1`.
+
+This formalizes the final composition step. The remaining assembly
+obligations (restriction to slices, per-slice induction, per-slice
+self-improvement, and the error-telescoping inequality) enter as the
+`family`, `hcomplete`, `hcons`, `hself`, `hbound`, and `herror`
+hypotheses, matching the paper's bookkeeping in
+`references/ldt-paper/inductive_step.tex:414-622`. -/
+theorem mainInductionBridgeFromPastedFamily
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : PastingBoundednessInput params strategy family zeta)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k)
+    (herror :
+      ldPastingInInductionError params k eps delta gamma kappa zeta ≤
+        mainInductionError params.next k eps delta gamma) :
+    MainInductionBridgePackage params.next strategy eps delta gamma k := by
+  obtain ⟨H, hH⟩ :=
+    ldPastingInInductionSection params strategy eps delta gamma kappa zeta
+      hgood hgamma_le hzeta_le hdq_le family hcomplete hcons hself hbound k hk
+  exact
+    { witness :=
+        ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
+          hH.pointConsistency, herror⟩ }
+
 /-! ## Restricted-probability bookkeeping -/
 
 private lemma selfConsistencyRestrictedAverage_eq
