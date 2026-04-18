@@ -248,8 +248,8 @@ From `MIPStarRE/LDT/Pasting/Defs/Interpolation.lean`:
 
 ```lean
 /-- Extract the polynomial from a completed slice outcome; returns 0 on ⊥. -/
-def extractSliceOr0 {params : Parameters} [FieldModel params.q]
-    (g : GHatOutcome params) : Polynomial params :=
+noncomputable def extractSliceOr0 {params : Parameters} [FieldModel params.q]
+    (g : GHatOutcome params) : PolynomialModel params :=
   match g with
   | some p => p.poly
   | none   => 0
