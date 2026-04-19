@@ -17,8 +17,8 @@
 \end{theorem}
 \begin{proof}
 	\leanok
-	\uses{lem:good-strategy-characterization, prop:simeq-to-approx, prop:triangle-inequality-for-approx_delta}
-	The strategy passes the diagonal lines test with probability $1-\gamma$, so it passes the $m$-restricted diagonal lines test with probability $1-\gamma m$. Hence
+	\uses{def:restricted-diagonal-lines-test, lem:good-strategy-characterization, prop:simeq-to-approx, prop:triangle-inequality-for-approx_delta}
+	By Definition~\ref{def:restricted-diagonal-lines-test}, the strategy passes the $m$-restricted diagonal lines test with probability $1-\gamma m$. Hence
 	\[
 		A_a^u \otimes I \simeq_{\gamma m} I \otimes L^\ell_{[f(u)=a]}
 	\]
@@ -77,7 +77,7 @@
 	\]
 \end{lemma}
 \begin{proof}
-	\uses{prop:cons-sub-meas, prop:closeness-of-ip, prop:two-notions-of-self-consistency, prop:two-notions-of-self-consistency-after-evaluation, thm:commutativity-points}
+	\uses{prop:cons-sub-meas, prop:closeness-of-ip, prop:post-processing-preserves, prop:two-notions-of-self-consistency, prop:two-notions-of-self-consistency-after-evaluation, thm:commutativity-points}
 	Write $G_a^{u,x}=G^x_{[g(u)=a]}$. Expanding the commutator square gives
 	\begin{align}
 		 & \E_{u,v,x,y} \sum_{a,b} \bra{\psi}
@@ -93,6 +93,7 @@
 	\begin{equation}\label{eq:sum-of-gux}
 		G^{u,x} = \sum_a G_a^{u,x} = \sum_a G^x_{[g(u)=a]} = G^x.
 	\end{equation}
+	The identity \eqref{eq:sum-of-gux} is exactly Proposition~\ref{prop:post-processing-preserves} for the evaluation map $g \mapsto g(u)$.
 	By \ref{item:data-processed-consistency} and \ref{prop:cons-sub-meas},
 	\begin{align}
 		G_a^{u,x} \ot I

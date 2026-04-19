@@ -34,7 +34,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 	\end{equation}
 \end{lemma}
 \begin{proof}
-	\uses{prop:simeq-to-approx, lem:generalize-b, lem:good-strategy-characterization, prop:triangle-inequality-for-approx_delta}
+	\uses{prop:simeq-to-approx, prop:cab-approx-delta, lem:generalize-b, lem:good-strategy-characterization, prop:triangle-inequality-for-approx_delta}
 	Fix $g$ and keep the weight $(G_g)^{1/2}$ on the second tensor factor throughout. On the vector $(I\ot (G_g)^{1/2})\ket{\psi}$ one has the six-step chain
 	\[
 		A^u_{g(u)} \ot (G_g)^{1/2}
@@ -45,7 +45,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 		\approx_{2\eps} I\ot (G_g)^{1/2} A^v_{g(v)}
 		\approx_{2\delta} A^v_{g(v)} \ot (G_g)^{1/2}.
 	\]
-	The first, second, fifth, and sixth comparisons use Lemma~\ref{prop:simeq-to-approx} together with the good-strategy hypotheses, and the middle pair is Lemma~\ref{lem:generalize-b}. Lemma~\ref{prop:triangle-inequality-for-approx_delta} sums these six weighted transports.
+	The first, second, fifth, and sixth comparisons use Lemma~\ref{prop:simeq-to-approx} together with Proposition~\ref{prop:cab-approx-delta} and the good-strategy hypotheses, and the middle pair is Lemma~\ref{lem:generalize-b}. Lemma~\ref{prop:triangle-inequality-for-approx_delta} sums these six weighted transports.
 \end{proof}
 
 We note that \ref{eq:local-variance-of-points-equation} is equivalent to the statement that

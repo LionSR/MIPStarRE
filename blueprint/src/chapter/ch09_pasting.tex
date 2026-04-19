@@ -5,7 +5,7 @@
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting}
 	\lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection, MIPStarRE.LDT.Pasting.ldPasting}
-	\uses{def:polymeasurements, def:simeq}
+	\uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
 	\begin{enumerate}
 		\item (Completeness): \label{item:ld-pasting-completeness}
@@ -233,6 +233,7 @@ for a small error $\Delta = \poly(m)\cdot \poly(\eps,\delta,\gamma,\zeta,d/q)$. 
 \end{equation}
 The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar inequality.
 
+% ORPHAN: motivation for the first construction only; the final pasting proof proceeds through the second construction instead.
 \begin{lemma}[A scalar inequality for the first construction]\label{lem:looks-easy-but-took-me-a-while}
 	\lean{MIPStarRE.LDT.Pasting.looksEasyButTookMeAWhile}
 	\leanok
