@@ -226,11 +226,18 @@ projective measurement `T_a`, so that `Q_a` remains close to `A_a`, its total
 stays bounded by `(1 + 2√ζ)I`, and the auxiliary dimension is at most the
 original ambient dimension.
 
-The auxiliary-space-and-`T` data is supplied via
-`RankReductionBridgePackage`, parametric on the specific rounded family
-`(q, hq)`; this keeps the paper's spectral derivation of `(auxSpace, T_a)`
-from the rounded family `R_a` localized to one bridge rather than silently
-filled in with a vacuous `default` witness. -/
+The auxiliary-space-and-`T` data `(auxSpace, t, hAuxDim)` is taken as explicit
+caller-supplied parameters rather than via a dedicated `*BridgePackage` wrapper.
+In the paper (orthonormalization.tex), Lem 5.5 itself only produces `{Q_a}`;
+the auxiliary space `ℂ^m` and the projective measurement
+`T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent
+"Matrix decomposition of `Q_a`" definition, which requires an orthonormal
+eigenbasis of each rounded projector `R_a`'s 1-eigenspace — a construction
+not currently available in Mathlib (no matrix SVD; no restriction of
+`Matrix.IsHermitian.eigenvectorBasis` to a projector's 1-eigenspace; no
+matrix-level `rank_of_isProj` adapter).  Exposing `(auxSpace, t, hAuxDim)`
+as direct parameters localises this debt to call sites without hiding it
+behind a vacuous `default` witness. -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -238,9 +245,9 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
     (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 ≤ ζ)
     (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ)
-    (hrankBridge : ∀ (q : OpFamily Outcome ι)
-        (hq : RoundingToProjectorsWitness ψ A ζ q),
-      RankReductionBridgePackage ψ A ζ q hq)
+    (auxSpace : FiniteHilbertSpace.{uι})
+    (t : ProjMeas Outcome auxSpace.carrier)
+    (hAuxDim : Fintype.card auxSpace.carrier ≤ Fintype.card ι)
     (source_almost_projective :
       ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
@@ -248,11 +255,10 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
   classical
   by_cases hOutcome : Nonempty Outcome
   · obtain ⟨q, hrounded, hsum⟩ := hbridge.fromSourceAlmostProjective source_almost_projective
-    let aux : RankReductionAuxOutput Outcome ι := (hrankBridge q hrounded).out
     let data : QLayerData Outcome ι :=
-      { auxSpace := aux.auxSpace
+      { auxSpace := auxSpace
         q := q
-        t := aux.t }
+        t := t }
     refine ⟨data, ?_⟩
     refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_⟩
     · intro a
@@ -274,7 +280,7 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
         QTotal data = q.total := rfl
         _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
             (1 : MIPStarRE.Quantum.Op ι) := hrounded.total_le
-    · exact aux.auxDim_le
+    · exact hAuxDim
   · letI : IsEmpty Outcome := not_nonempty_iff.mp hOutcome
     exact rankReduction_emptyOutcome (ψ := ψ) (A := A) (ζ := ζ)
 
