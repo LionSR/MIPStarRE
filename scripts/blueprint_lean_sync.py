@@ -92,6 +92,14 @@ class LeanDecl:
 
 
 @dataclass
+class OrphanLeanok:
+    """A \\leanok tag that appears before any matching \\lean{} tag."""
+    file: str
+    line: int
+    context: str
+
+
+@dataclass
 class SyncReport:
     """Aggregated sync report."""
     blueprint_entries: list[BlueprintEntry] = field(default_factory=list)
@@ -101,6 +109,7 @@ class SyncReport:
     leanok_but_missing: list[BlueprintEntry] = field(default_factory=list)
     stale_lean_decls: list[str] = field(default_factory=list)
     missing_from_lean_decls_file: list[str] = field(default_factory=list)
+    orphan_leanok_tags: list[OrphanLeanok] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -348,8 +357,82 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
 
 
 # ---------------------------------------------------------------------------
+# Orphan \leanok heuristics
+# ---------------------------------------------------------------------------
+
+
+def find_orphan_leanok_tags(blueprint_src: Path) -> list[OrphanLeanok]:
+    """Heuristically flag ``\\leanok`` tags that appear before any ``\\lean{}`` tag."""
+    chapter_dir = blueprint_src / "chapter"
+    if not chapter_dir.exists():
+        return []
+
+    token_re = re.compile(
+        r"\\begin\{(definition|theorem|lemma|proposition|corollary|remark|example)\}"
+        r"(?:\[.*?\])?(?:\\label\{[^}]+\})?"
+        r"|\\end\{(definition|theorem|lemma|proposition|corollary|remark|example)\}"
+        r"|\\begin\{proof\}"
+        r"|\\end\{proof\}"
+        r"|\\lean\{[^}]+\}"
+        r"|\\leanok\b"
+    )
+
+    orphans: list[OrphanLeanok] = []
+    for tex_file in sorted(chapter_dir.glob("*.tex")):
+        rel = str(tex_file.relative_to(blueprint_src.parent))
+        env_stack: list[dict[str, bool]] = []
+        in_proof = False
+        proof_has_lean_context = False
+        pending_proof_has_lean = False
+
+        for i, line in enumerate(tex_file.read_text(errors="replace").splitlines(), 1):
+            for token in token_re.finditer(line):
+                text = token.group(0)
+                if text.startswith("\\begin{proof}"):
+                    in_proof = True
+                    proof_has_lean_context = pending_proof_has_lean
+                    continue
+                if text.startswith("\\end{proof}"):
+                    in_proof = False
+                    proof_has_lean_context = False
+                    pending_proof_has_lean = False
+                    continue
+                if text.startswith("\\begin{"):
+                    env_stack.append({"has_lean": False})
+                    continue
+                if text.startswith("\\end{"):
+                    popped_has_lean = env_stack.pop()["has_lean"] if env_stack else False
+                    # Only refresh pending_proof_has_lean from envs that carried
+                    # a \lean{} tag, so an intervening \begin{remark}\end{remark}
+                    # between a statement and its proof cannot steal the proof.
+                    if popped_has_lean:
+                        pending_proof_has_lean = True
+                    continue
+                if text.startswith("\\lean{"):
+                    if env_stack:
+                        env_stack[-1]["has_lean"] = True
+                    elif in_proof:
+                        proof_has_lean_context = True
+                    else:
+                        pending_proof_has_lean = True
+                    continue
+                if text == "\\leanok":
+                    if env_stack:
+                        if not env_stack[-1]["has_lean"]:
+                            orphans.append(OrphanLeanok(file=rel, line=i, context="statement"))
+                    elif in_proof:
+                        if not proof_has_lean_context:
+                            orphans.append(OrphanLeanok(file=rel, line=i, context="proof"))
+                    else:
+                        orphans.append(OrphanLeanok(file=rel, line=i, context="outside"))
+
+    return orphans
+
+
+# ---------------------------------------------------------------------------
 # Read lean_decls file
 # ---------------------------------------------------------------------------
+
 
 def read_lean_decls_file(path: Path) -> set[str]:
     if not path.exists():
@@ -509,6 +592,9 @@ def run_sync(
     print("Scanning blueprint .tex files …")
     report.blueprint_entries = collect_blueprint_entries(blueprint_src)
     print(f"  Found {len(report.blueprint_entries)} \\lean{{}} references in blueprint")
+    report.orphan_leanok_tags = find_orphan_leanok_tags(blueprint_src)
+    if report.orphan_leanok_tags:
+        print(f"  Flagged {len(report.orphan_leanok_tags)} orphan \\leanok tag(s)")
 
     # 3. Cross-reference
     blueprint_decl_names: set[str] = set()
@@ -516,21 +602,24 @@ def run_sync(
         blueprint_decl_names.add(entry.lean_decl)
         if entry.lean_decl not in report.lean_decls:
             report.missing_in_lean.append(entry)
-            if entry.has_leanok:
+            if entry.has_leanok or entry.proof_has_leanok:
                 report.leanok_but_missing.append(entry)
 
-    # 4. Check lean_decls file
+    # 4. Optionally update lean_decls before diffing against it.  We capture the
+    # pre-write contents first so the drift loops below still surface the
+    # "developer added a blueprint ref but forgot to regenerate lean_decls"
+    # warning even in the regeneration path.
     existing_lean_decls = read_lean_decls_file(lean_decls_path)
-    for name in sorted(existing_lean_decls - blueprint_decl_names):
-        report.stale_lean_decls.append(name)
-    for name in sorted(blueprint_decl_names - existing_lean_decls):
-        report.missing_from_lean_decls_file.append(name)
-
-    # 5. Optionally update lean_decls
     if update_lean_decls:
         sorted_decls = sorted(blueprint_decl_names)
         lean_decls_path.write_text("\n".join(sorted_decls) + "\n")
         print(f"  Updated {lean_decls_path} with {len(sorted_decls)} entries")
+
+    # 5. Check lean_decls file
+    for name in sorted(existing_lean_decls - blueprint_decl_names):
+        report.stale_lean_decls.append(name)
+    for name in sorted(blueprint_decl_names - existing_lean_decls):
+        report.missing_from_lean_decls_file.append(name)
 
     # 6. Print report
     _print_report(report, root)
@@ -599,7 +688,7 @@ def _print_report(report: SyncReport, root: Path) -> None:
         for entry in report.missing_in_lean:
             if entry.lean_decl not in seen:
                 seen.add(entry.lean_decl)
-                ok_tag = " [has \\leanok!]" if entry.has_leanok else ""
+                ok_tag = " [has \\leanok!]" if (entry.has_leanok or entry.proof_has_leanok) else ""
                 print(f"  ✗ {entry.lean_decl}{ok_tag}")
                 print(f"    {entry.file}:{entry.line} ({entry.env_type})")
 
@@ -626,6 +715,16 @@ def _print_report(report: SyncReport, root: Path) -> None:
         print(f"Blueprint refs missing from lean_decls file ({len(report.missing_from_lean_decls_file)}):")
         for name in report.missing_from_lean_decls_file:
             print(f"  + {name}")
+
+    # Orphan leanok tags
+    if report.orphan_leanok_tags:
+        print()
+        print(
+            f"WARNING: orphan \\leanok tags (no preceding \\lean{{}} in the same statement/proof) "
+            f"({len(report.orphan_leanok_tags)}):"
+        )
+        for orphan in report.orphan_leanok_tags:
+            print(f"  ⚠ {orphan.file}:{orphan.line}  ({orphan.context})")
 
     # Summary
     print()
@@ -656,6 +755,10 @@ def _write_json_report(report: SyncReport, path: Path, root: Path) -> None:
         ],
         "stale_lean_decls": report.stale_lean_decls,
         "missing_from_lean_decls_file": report.missing_from_lean_decls_file,
+        "orphan_leanok_tags": [
+            {"file": orphan.file, "line": orphan.line, "context": orphan.context}
+            for orphan in report.orphan_leanok_tags
+        ],
         "chapter_stats": _chapter_stats(report),
     }
     path.write_text(json.dumps(data, indent=2) + "\n")
