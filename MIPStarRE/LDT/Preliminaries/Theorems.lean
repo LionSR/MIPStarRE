@@ -18,7 +18,12 @@ import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 /-!
 # Preliminary comparison theorems
 
-Barrel module re-exporting the concrete preliminaries theorem submodules.
+This module re-exports the concrete preliminaries theorem submodules and
+additionally hosts the projective converse `approxToSimeq` of
+`prop:simeq-to-approx` (Proposition 4.9). The converse is kept here until the
+`ComparisonCore` file overlap is resolved (see `TODO(#456)`); when that
+constraint lifts, move `approxToSimeq` and its helper next to
+`simeqToApprox` and restore this file to a pure re-export barrel.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -27,11 +32,11 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-private lemma questionConsistency_le_questionSDD_of_projective
+private lemma two_questionConsistency_eq_questionSDD_of_projective
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (A B : ProjMeas Outcome ι) :
-    qConsDefect ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight ≤
+    2 * qConsDefect ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight =
       qSDD ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight := by
   let ALeft : ProjSubMeas Outcome (ι × ι) :=
     { toSubMeas := A.toSubMeas.liftLeft
@@ -122,7 +127,7 @@ private lemma questionConsistency_le_questionSDD_of_projective
   have hgap_nonneg : 0 ≤ totalMass - overlap := by
     have hnonneg := qSDD_nonneg ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight
     rw [hqSDD] at hnonneg
-    nlinarith
+    linarith
   have hqCons :
       qConsDefect ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight = totalMass - overlap := by
     unfold qConsDefect qMatchMass
@@ -142,55 +147,52 @@ private lemma questionConsistency_le_questionSDD_of_projective
         _ = totalMass := rfl
     rw [htotal, max_eq_right hgap_nonneg]
   calc
-    qConsDefect ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight
-      = totalMass - overlap := hqCons
-    _ ≤ 2 * (totalMass - overlap) := by
-          nlinarith
-    _ = qSDD ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight := by
-          rw [hqSDD]
+    2 * qConsDefect ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight
+      = 2 * (totalMass - overlap) := by rw [hqCons]
+    _ = qSDD ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight := by rw [hqSDD]
 
 /-- Projective converse of `prop:simeq-to-approx` (Proposition 4.9 of
-`references/ldt-paper/preliminaries.tex`, lines 426--455). -/
+`references/ldt-paper/preliminaries.tex`, lines 426--455).
+
+For projective measurements `A`, `B`, the `≈` relation at strength `2·δ` implies
+the `≃` relation at strength `δ`, making the paper's implication an iff in the
+projective case (the forward direction is `simeqToApprox`). -/
 theorem approxToSimeq {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
-    (A B : IdxMeas Question Outcome ι) (δ : Error)
-    (hA : ∀ q : Question, ∀ a : Outcome,
-      (A q).outcome a * (A q).outcome a = (A q).outcome a)
-    (hB : ∀ q : Question, ∀ a : Outcome,
-      (B q).outcome a * (B q).outcome a = (B q).outcome a) :
+    (A B : IdxProjMeas Question Outcome ι) (δ : Error) :
     BipartiteSDDRel ψ 𝒟
-        (IdxMeas.toIdxSubMeas A)
-        (IdxMeas.toIdxSubMeas B) δ →
+        (IdxProjMeas.toIdxSubMeas A)
+        (IdxProjMeas.toIdxSubMeas B) (2 * δ) →
       ConsRel ψ 𝒟
-        (IdxMeas.toIdxSubMeas A)
-        (IdxMeas.toIdxSubMeas B) δ := by
+        (IdxProjMeas.toIdxSubMeas A)
+        (IdxProjMeas.toIdxSubMeas B) δ := by
   intro ⟨happrox⟩
   constructor
   rw [bipartiteConsError_eq_consError_placed]
   unfold consError sddError at *
-  calc
-    avgOver 𝒟
-        (fun q =>
-          qConsDefect ψ
-            ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A)) q)
-            ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q))
-      ≤ avgOver 𝒟
+  have h_two_avg :
+      2 * avgOver 𝒟
+          (fun q =>
+            qConsDefect ψ
+              ((IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas A)) q)
+              ((IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas B)) q)) =
+        avgOver 𝒟
           (fun q =>
             qSDD ψ
-              ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas A)) q)
-              ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas B)) q)) := by
-          apply avgOver_mono
-          intro q
-          let A' : ProjMeas Outcome ι :=
-            { toMeasurement := A q
-              proj := fun a => hA q a }
-          let B' : ProjMeas Outcome ι :=
-            { toMeasurement := B q
-              proj := fun a => hB q a }
-          simpa [A', B', IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxMeas.toIdxSubMeas] using
-            questionConsistency_le_questionSDD_of_projective ψ A' B'
-    _ ≤ δ := happrox
+              ((IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas A)) q)
+              ((IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas B)) q)) := by
+    rw [← avgOver_const_mul]
+    refine avgOver_congr _ _ _ ?_
+    intro q
+    simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjMeas.toIdxSubMeas] using
+      two_questionConsistency_eq_questionSDD_of_projective ψ (A q) (B q)
+  show avgOver 𝒟
+      (fun q =>
+        qConsDefect ψ
+          ((IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas A)) q)
+          ((IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas B)) q)) ≤ δ
+  linarith
 
 end MIPStarRE.LDT.Preliminaries
