@@ -131,10 +131,7 @@ private lemma sum_ev_opTensor_outcome_le_totalMass
   have hleft_one :
       ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) =
         ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
-    simpa [leftTensor] using
-      congrArg (ev ψ)
-        (Matrix.one_kronecker_one
-          (α := ℂ) (m := ιA) (n := ιB))
+    simpa using congrArg (ev ψ) (leftTensor_one (ι₁ := ιA) (ι₂ := ιB))
   calc
     ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a))
       ≤ ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a)) := by
@@ -206,16 +203,10 @@ private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
   have hdiagB_nonneg : 0 ≤ diagB :=
     sum_ev_rightTensor_outcome_sq_nonneg (ιA := ιA) ψ B.toSubMeas
   have hleft_one : ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) = totalMass := by
-    simpa [leftTensor, totalMass] using
-      congrArg (ev ψ)
-        (Matrix.one_kronecker_one
-          (α := ℂ) (m := ιA) (n := ιB))
+    simpa [totalMass] using congrArg (ev ψ) (leftTensor_one (ι₁ := ιA) (ι₂ := ιB))
   have hright_one :
       ev ψ (rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) = totalMass := by
-    simpa [rightTensor, totalMass] using
-      congrArg (ev ψ)
-        (Matrix.one_kronecker_one
-          (α := ℂ) (m := ιA) (n := ιB))
+    simpa [totalMass] using congrArg (ev ψ) (rightTensor_one (ι₁ := ιA) (ι₂ := ιB))
   have hleftPlaced_outcome :
       ∀ a : Outcome,
         (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).outcome a =
