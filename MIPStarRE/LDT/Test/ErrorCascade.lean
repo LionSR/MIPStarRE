@@ -214,10 +214,9 @@ theorem sigma_bound {params : Parameters} {k : ℕ} {eps : Error}
   unfold cascadeSigma
   set m2 : Error := (params.m : Error) ^ (2 : ℕ) with hm2_def
   set m4 : Error := (params.m : Error) ^ (4 : ℕ) with hm4_def
-  set k2 : Error := (k : Error) ^ (2 : ℕ) with hk2_def
+  set k2 : Error := (k : Error) ^ (2 : ℕ)
   have hm2NN : 0 ≤ m2 := by positivity
   have hm4NN : 0 ≤ m4 := by positivity
-  have hk2NN : 0 ≤ k2 := by positivity
   have hk2_ge_one : (1 : Error) ≤ k2 := h.k2_ge_one
   have hm2_le_m4 : m2 ≤ m4 := h.m2_le_m4
   have hm2_sq_m4 : m2 * m2 = m4 := by
@@ -483,8 +482,8 @@ theorem zeta4_bound {params : Parameters} {k : ℕ} {eps : Error}
           mainFormalEnvelope params k eps := by ring
 
 /-- **Consolidator.** Under the standing cascade hypotheses, the native paper
-bounds for `σ`, `ζ₁`, `ζ₂`, `ζ₃`, together with the specialized coarsened bound
-for `ζ₄`, imply that each of σ, ζ₁, ζ₂, ζ₄ is absorbed by `mainFormalError`,
+bounds for `σ`, `ζ₁`, `ζ₂`, `ζ₃`, and `ζ₄` imply that each of σ, ζ₁, ζ₂, ζ₄ is
+absorbed by `mainFormalError`,
 and ζ₃ by `2 · mainFormalError` — matching paper line 230's
 `ζ₃/2 ≤ mainFormalError` and the three use-sites in `mainFormal`
 (point-A consistency, point-B consistency, self-consistency). -/
@@ -514,7 +513,9 @@ theorem errorCascade_le_mainFormalError {params : Parameters} {k : ℕ} {eps : E
           Real.exp (-((k : Error) / (1280000 * ((params.m : Error) ^ (2 : ℕ)))))))
     (hζ₄Bound : cascadeZeta4 σ ζ₁ ζ₃ ≤
       40000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
-        mainFormalEnvelope params k eps) :
+        (Real.rpow eps (1 / (32768 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32768 : Error)) +
+          Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))))) :
     σ ≤ mainFormalError params k eps ∧
     ζ₁ ≤ mainFormalError params k eps ∧
     ζ₂ ≤ mainFormalError params k eps ∧
@@ -537,11 +538,7 @@ theorem errorCascade_le_mainFormalError {params : Parameters} {k : ℕ} {eps : E
     rw [hζ₃Eq]
     exact zeta3_bound h hζ₃Bound
   have hζ₄ : cascadeZeta4 σ ζ₁ ζ₃ ≤ mainFormalError params k eps := by
-    rw [mainFormalError_eq_envelope]
-    have hENN := h.envelope_nonneg
-    have hk2m4NN : 0 ≤ ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by
-      positivity
-    nlinarith [hζ₄Bound, hENN, hk2m4NN]
+    exact zeta4_bound h hζ₄Bound
   exact ⟨hσ, hζ₁, hζ₂, hζ₃, hζ₄⟩
 
 end Test
