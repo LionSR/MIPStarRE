@@ -26,7 +26,7 @@ class BlueprintLeanokAxiomsTests(unittest.TestCase):
             line_to_decl={3: "Foo.good", 4: "Foo.bad", 5: "Foo.missing"},
             returncode=1,
         )
-        assert results is not None
+        self.assertIsNotNone(results)
         self.assertTrue(results["Foo.good"].exists)
         self.assertFalse(results["Foo.good"].sorry)
         self.assertTrue(results["Foo.bad"].exists)

@@ -401,7 +401,12 @@ def find_orphan_leanok_tags(blueprint_src: Path) -> list[OrphanLeanok]:
                     env_stack.append({"has_lean": False})
                     continue
                 if text.startswith("\\end{"):
-                    pending_proof_has_lean = env_stack.pop()["has_lean"] if env_stack else False
+                    popped_has_lean = env_stack.pop()["has_lean"] if env_stack else False
+                    # Only refresh pending_proof_has_lean from envs that carried
+                    # a \lean{} tag, so an intervening \begin{remark}\end{remark}
+                    # between a statement and its proof cannot steal the proof.
+                    if popped_has_lean:
+                        pending_proof_has_lean = True
                     continue
                 if text.startswith("\\lean{"):
                     if env_stack:
@@ -600,14 +605,15 @@ def run_sync(
             if entry.has_leanok or entry.proof_has_leanok:
                 report.leanok_but_missing.append(entry)
 
-    # 4. Optionally update lean_decls before diffing against it
+    # 4. Optionally update lean_decls before diffing against it.  We capture the
+    # pre-write contents first so the drift loops below still surface the
+    # "developer added a blueprint ref but forgot to regenerate lean_decls"
+    # warning even in the regeneration path.
+    existing_lean_decls = read_lean_decls_file(lean_decls_path)
     if update_lean_decls:
         sorted_decls = sorted(blueprint_decl_names)
         lean_decls_path.write_text("\n".join(sorted_decls) + "\n")
         print(f"  Updated {lean_decls_path} with {len(sorted_decls)} entries")
-        existing_lean_decls = set(sorted_decls)
-    else:
-        existing_lean_decls = read_lean_decls_file(lean_decls_path)
 
     # 5. Check lean_decls file
     for name in sorted(existing_lean_decls - blueprint_decl_names):

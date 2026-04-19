@@ -141,7 +141,14 @@ def parse_axiom_output(
     harness_str = str(harness_path)
     loc_exact_re = re.compile(rf"^{re.escape(harness_str)}:(\d+):\d+:\s*(.*)$")
 
-    subject_re = re.compile(r"^[`']([^`']+)[`']\s+(depends on axioms:|does not depend on any axioms)")
+    # Lean wraps subject names in matched quotes.  Allow apostrophes inside the
+    # name (Lean primes like `foo'` are common) by requiring the closing quote
+    # to match the opening one rather than treating `` ` `` and `'` as
+    # interchangeable terminators.
+    subject_re = re.compile(
+        r"^(?:`(?P<btick>[^`]+)`|'(?P<apos>[^']+)')\s+"
+        r"(depends on axioms:|does not depend on any axioms)"
+    )
     decl_set = set(decls)
 
     records: dict[str, list[str]] = {decl: [] for decl in decls}
@@ -151,8 +158,10 @@ def parse_axiom_output(
         matched: str | None = None
 
         subject = subject_re.match(raw_line)
-        if subject and subject.group(1) in decl_set:
-            matched = subject.group(1)
+        if subject:
+            name = subject.group("btick") or subject.group("apos")
+            if name in decl_set:
+                matched = name
 
         if matched is None:
             match = loc_exact_re.match(raw_line)
@@ -206,28 +215,32 @@ def module_source_path(repo_root: Path, module: str) -> Path:
     return repo_root / Path(*module.split(".")).with_suffix(".lean")
 
 
-def module_output_paths(repo_root: Path, module: str) -> tuple[Path, Path, Path]:
-    """Return the expected ``.olean`` / ``.ilean`` / C output paths."""
+def module_output_paths(repo_root: Path, module: str) -> tuple[Path, Path]:
+    """Return the expected ``.olean`` / ``.ilean`` output paths."""
     rel = Path(*module.split("."))
     olean = repo_root / ".lake" / "build" / "lib" / "lean" / rel.with_suffix(".olean")
     ilean = repo_root / ".lake" / "build" / "lib" / "lean" / rel.with_suffix(".ilean")
-    c_file = repo_root / ".lake" / "build" / "ir" / rel.with_suffix(".c")
-    return olean, ilean, c_file
+    return olean, ilean
 
 
 def ensure_module_olean(repo_root: Path, module: str, lake: str) -> str | None:
-    """Build a local module on demand when its ``.olean`` is missing."""
+    """Build a local module on demand when its ``.olean`` is missing.
+
+    This is a fallback used when ``lake build`` has not been run beforehand.
+    It only emits the ``.olean`` / ``.ilean`` artifacts the axiom harness
+    needs — no C output — since generating C adds significant overhead
+    without providing any value to ``#print axioms``.
+    """
     source = module_source_path(repo_root, module)
     if not source.is_file():
         return None
 
-    olean, ilean, c_file = module_output_paths(repo_root, module)
+    olean, ilean = module_output_paths(repo_root, module)
     if olean.exists():
         return None
 
     olean.parent.mkdir(parents=True, exist_ok=True)
     ilean.parent.mkdir(parents=True, exist_ok=True)
-    c_file.parent.mkdir(parents=True, exist_ok=True)
 
     proc = subprocess.run(
         [
@@ -239,8 +252,6 @@ def ensure_module_olean(repo_root: Path, module: str, lake: str) -> str | None:
             str(olean),
             "-i",
             str(ilean),
-            "-c",
-            str(c_file),
         ],
         cwd=repo_root,
         capture_output=True,

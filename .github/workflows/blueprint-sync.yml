@@ -45,5 +45,8 @@ jobs:
       - name: Set up Lean toolchain and fetch Mathlib cache
         uses: ./.github/actions/setup-lean
 
+      - name: Build MIPStarRE
+        run: lake build
+
       - name: Check \leanok declarations are sorry-free
         run: python3 scripts/blueprint_leanok_axioms.py --ci
