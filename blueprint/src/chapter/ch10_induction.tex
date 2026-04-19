@@ -297,7 +297,8 @@
 	\uses{def:main-formal-envelope}
 	If $0 \le \eps$, then
 	\[
-		100000k^2m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right)
+		\mainFormalError
+		= 100000k^2m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right)
 		= 100000k^2m^4 E,
 	\]
 	and $E \ge 0$.
@@ -330,6 +331,8 @@
 	\uses{def:main-formal-envelope, def:main-formal-error-cascade}
 	Under the standing hypotheses, if
 	\[
+		0 \le \nu
+		\quad\text{and}\quad
 		\nu \le 1000k^2m^2\left(\eps^{1/1024} + (d/q)^{1/1024}\right),
 	\]
 	then
@@ -365,10 +368,15 @@
 	Each inequality is a numerical inflation of the corresponding hypothesis. For $\zeta_2$ one also uses $k \le k^2$, $m \le m^4$, and $E \ge 0$.
 \end{proof}
 
-\begin{theorem}[Packaged error cascade]\label{thm:error-cascade-main-formal}
+\begin{theorem}[Consolidated error cascade]\label{thm:error-cascade-main-formal}
 	\lean{MIPStarRE.LDT.Test.errorCascade_le_mainFormalError}
 	\uses{def:main-formal-envelope, def:main-formal-error-cascade, thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
-	Assume the standing hypotheses, the input bound from Theorem~\ref{thm:sigma-bound-main-formal}, the envelope-level bounds of Theorem~\ref{thm:zeta-bounds-main-formal}, and in addition a bound of the same form for the quantity $2\sigma' + 2\sqrt{\zeta_1' + \zeta_3'/2}$ for every triple $(\sigma',\zeta_1',\zeta_3')$. Then
+	Assume the standing hypotheses, the input bound from Theorem~\ref{thm:sigma-bound-main-formal}, and the envelope-level bounds of Theorem~\ref{thm:zeta-bounds-main-formal}. Assume in addition the explicit uniform bound
+	\[
+		2\sigma' + 2\sqrt{\zeta_1' + \zeta_3'/2}
+		\le 40000k^2m^4 E
+	\]
+	for every triple $(\sigma',\zeta_1',\zeta_3')$. Then
 	\[
 		\sigma \le 100000k^2m^4 E,
 		\qquad
@@ -416,7 +424,7 @@
 	\]
 	and similarly for $B_{\mathrm{sym}}$ and $L_{\mathrm{sym}}$. This yields a symmetric $(3\eps,3\eps,3\eps)$-good strategy. Set
 	\[
-		\nu = 10000k^2m^2\left(\eps^{1/1024}+(d/q)^{1/1024}\right),
+		\nu = 1000k^2m^2\left(\eps^{1/1024}+(d/q)^{1/1024}\right),
 		\qquad
 		\sigma = m^2\left(\nu+e^{-k/(80000m^2)}\right).
 	\]
