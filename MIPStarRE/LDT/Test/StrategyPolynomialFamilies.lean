@@ -13,12 +13,25 @@ namespace MIPStarRE.LDT
 
 /-! ### Polynomial-family interfaces -/
 
-/-- A packaged family `x ↦ G^x` together with its witness operators and domination targets. -/
+/-- A packaged family `x ↦ G^x` together with its witness operators and domination targets.
+
+The `witness` and `dominationTarget` fields store the per-slice PSD operator
+`Z^x` and per-slice, per-polynomial operator `E_u A^{u,x}_{g(u)}` appearing in
+the paper's boundedness hypothesis (`references/ldt-paper/commutativity-G.tex`,
+item `data-processed-boundedness`). Their stored defaults use the slice
+submeasurement itself — `total` dominates every per-polynomial outcome — which
+is PSD, non-vacuous, and satisfies `sliceOpPSD` and `sliceDominatesTarget`
+without any additional hypothesis.
+
+Callers with access to a symmetric strategy should prefer the paper-faithful
+smart constructor `ofSymStrat`, which ties `dominationTarget` to the averaged
+slice-point evaluation operator `E_u A^{u,x}_{g(u)}` from the paper. -/
 structure IdxPolyFamily (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   meas : IdxProjSubMeas (Fq params) (Polynomial params) ι
-  witness : Fq params → MIPStarRE.Quantum.Op ι := fun _ => 0
-  dominationTarget : Fq params → Polynomial params → MIPStarRE.Quantum.Op ι := fun _ _ => 0
+  witness : Fq params → MIPStarRE.Quantum.Op ι := fun x => (meas x).toSubMeas.total
+  dominationTarget : Fq params → Polynomial params → MIPStarRE.Quantum.Op ι :=
+    fun x g => (meas x).toSubMeas.outcome g
   deriving Inhabited
 
 namespace IdxPolyFamily
@@ -102,6 +115,42 @@ noncomputable def averagedSlicePointEvaluationOperator {params : Parameters}
     (x : Fq params) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
   averageOperatorOverDistribution' (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
+
+/-- Paper-faithful smart constructor: bundle a slice submeasurement with a
+symmetric strategy to obtain the `IdxPolyFamily` whose `dominationTarget` is the
+averaged slice-point evaluation operator `E_u A^{u,x}_{g(u)}` from
+`references/ldt-paper/commutativity-G.tex`. The `witness` field is set to the
+identity operator, which is a valid PSD upper bound on every `dominationTarget`
+slice (the paper only requires such a `Z^x` to exist). -/
+noncomputable def ofSymStrat {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι)
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι) :
+    IdxPolyFamily params ι where
+  meas := meas
+  witness := fun _ => 1
+  dominationTarget := fun x g => averagedSlicePointEvaluationOperator strategy x g
+
+@[simp] lemma ofSymStrat_meas {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι)
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι) :
+    (ofSymStrat strategy meas).meas = meas := rfl
+
+@[simp] lemma ofSymStrat_witness {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι)
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (x : Fq params) :
+    (ofSymStrat strategy meas).witness x = 1 := rfl
+
+@[simp] lemma ofSymStrat_dominationTarget {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι)
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (x : Fq params) (g : Polynomial params) :
+    (ofSymStrat strategy meas).dominationTarget x g =
+      averagedSlicePointEvaluationOperator strategy x g := rfl
 
 structure Complete {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
