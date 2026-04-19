@@ -198,7 +198,13 @@ lemma projectiveNonMeasurement {Outcome : Type uOutcome}
 Construct the paper's rank-reduced family `Q_a`, together with the auxiliary
 projective measurement `T_a`, so that `Q_a` remains close to `A_a`, its total
 stays bounded by `(1 + 2√ζ)I`, and the auxiliary dimension is at most the
-original ambient dimension. -/
+original ambient dimension.
+
+The auxiliary-space-and-`T` data is supplied via
+`RankReductionBridgePackage`, parametric on the specific rounded family
+`(q, hq)`; this keeps the paper's spectral derivation of `(auxSpace, T_a)`
+from the rounded family `R_a` localized to one bridge rather than silently
+filled in with a vacuous `default` witness. -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -206,6 +212,9 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
     (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 ≤ ζ)
     (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ)
+    (hrankBridge : ∀ (q : OpFamily Outcome ι)
+        (hq : RoundingToProjectorsWitness ψ A ζ q),
+      RankReductionBridgePackage ψ A ζ q hq)
     (source_almost_projective :
       ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
@@ -215,14 +224,11 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
   · letI : Nonempty Outcome := hOutcome
     letI : Inhabited Outcome := Classical.inhabited_of_nonempty hOutcome
     obtain ⟨q, hrounded, hsum⟩ := hbridge.fromSourceAlmostProjective source_almost_projective
+    let aux : RankReductionAuxOutput Outcome ι := (hrankBridge q hrounded).out
     let data : QLayerData Outcome ι :=
-      { auxSpace :=
-          { carrier := ι
-            instFintype := inferInstance
-            instDecidableEq := inferInstance
-            instNonempty := inferInstance }
+      { auxSpace := aux.auxSpace
         q := q
-        t := (default : ProjMeas Outcome ι) }
+        t := aux.t }
     refine ⟨data, ?_⟩
     refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_⟩
     · intro a
@@ -244,8 +250,7 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
         QTotal data = q.total := rfl
         _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
             (1 : MIPStarRE.Quantum.Op ι) := hrounded.total_le
-    · change Fintype.card ι ≤ Fintype.card ι
-      exact le_rfl
+    · exact aux.auxDim_le
   · letI : IsEmpty Outcome := not_nonempty_iff.mp hOutcome
     exfalso
     obtain ⟨i⟩ := (inferInstance : Nonempty ι)
