@@ -92,6 +92,34 @@ instance {params : Parameters} [FieldModel params.q] :
     CoeFun (DiagonalLinePolynomial params) (fun _ => Fq params → Fq params) :=
   ⟨DiagonalLinePolynomial.toFun⟩
 
+/-- Reparametrize a diagonal-line answer by translating the line parameter:
+`(reparamAt params f t) s = f (t + s)`.
+
+This is the answer-level geometric fact behind rebasing a diagonal line at
+parameter `t`: the old parameter `t + s` becomes the new parameter `s`. -/
+noncomputable def reparamAt {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t : Fq params) : DiagonalLinePolynomial params where
+  poly := f.poly.comp (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)
+  degreeBounded := by
+    refine le_trans
+      (_root_.Polynomial.natDegree_comp_le
+        (p := f.poly)
+        (q := _root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)) ?_
+    have hdegq : (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X).natDegree = 1 := by
+      simp
+    rw [hdegq, Nat.mul_one]
+    exact f.degreeBounded
+
+@[simp] theorem reparamAt_apply {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t s : Fq params) :
+    reparamAt f t s = f (addCoord t s) := by
+  simp [reparamAt, DiagonalLinePolynomial.toFun, evalLinePolynomialModel, addCoord]
+
+@[simp] theorem reparamAt_apply_zero {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t : Fq params) :
+    reparamAt f t zeroCoord = f t := by
+  simp [reparamAt_apply, addCoord, zeroCoord]
+
 /-- The stored polynomial really witnesses the advertised degree bound. -/
 theorem hasUnivariateDegreeAtMost {params : Parameters} [FieldModel params.q]
     (f : DiagonalLinePolynomial params) :
