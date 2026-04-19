@@ -39,8 +39,6 @@ private lemma diagonalLineProduct_outcome_swap
     (fun f => f q.2.2)
     (fun f => f q.2.1) b a
 
-set_option maxHeartbeats 1000000 in
--- Reindexing and outcome-congruence for this bridge create a large elaboration problem.
 private lemma reversedDropFromLineBridge
     (params : Parameters)
     [FieldModel params.q]
