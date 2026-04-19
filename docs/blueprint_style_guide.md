@@ -10,7 +10,7 @@ The blueprint is a **bridge between the mathematics and the Lean formalization**
 4. **No filler prose.** Only precise definitions, theorem statements, and proof sketches. No "this is important because..." or "the self-improvement step governs the induction...".
 5. **Cite non-trivial things.** Basic definitions don't need citations. Important results and non-obvious definitions should cite the source paper.
 6. **Don't invent terminology or notation.** Don't create ad-hoc notation when standard notation exists. Don't name things that the literature doesn't name.
-7. **Match Lean's theorem/lemma/def exactly.** If Lean says `theorem X`, use `\begin{theorem}`. If Lean says `lemma X`, use `\begin{lemma}`. Never use `\begin{proposition}` (Lean has no `proposition` keyword). Label prefix: `thm:` for theorem, `lem:` for lemma, `def:` for definition.
+7. **Match Lean's theorem/lemma/def exactly.** If Lean says `theorem X`, use `\begin{theorem}`. If Lean says `lemma X`, use `\begin{lemma}`. `\begin{proposition}` is allowed in blueprint prose when it improves mathematical readability, but still map it to an actual Lean `theorem`/`lemma` declaration via `\lean{...}`. Label prefix: `thm:` for theorem, `lem:` for lemma, `def:` for definition, `prop:` for proposition.
 
 ## Proof Sketches Must Match Lean
 This is the most important rule. Every proof in the blueprint must faithfully describe what the Lean proof does:
@@ -77,15 +77,15 @@ The blueprint reads as a **mathematical document**, not software documentation. 
 - `\leanok` — context-sensitive marker; see "Statement-level vs proof-level `\leanok`" below
 - `\uses{label1, label2}` — declares dependency edges for the graph
 - `\notready` — marks as not ready for formalization (orange in graph)
-- `\mathlibok` — already in Mathlib (dark green in graph)
+- `\mathlibok` — already in Mathlib (dark green in graph; see legend note below)
 
 ### Statement-level vs proof-level `\leanok`
 
-`\leanok` is context-sensitive. The same macro is used for two different claims, so reviews, graph interpretation, and CI should read it by placement rather than by raw token count.
+`\leanok` is context-sensitive for human review and graph interpretation. The same macro is used for two different claims, so reviewers should read it by placement rather than by raw token count.
 
 **Statement-level `\leanok`.** Place this inside a `theorem`, `lemma`, `proposition`, `corollary`, or `definition` environment, on its own line immediately after `\lean{...}`. It says that the corresponding Lean declaration exists and that its statement matches the blueprint or paper statement. It does **not** say that the Lean proof already exists or is complete. For definitions, this is the only `\leanok` marker.
 
-**Proof-level `\leanok`.** Place this inside the matching `proof` environment, preferably as the first line after `\begin{proof}`. The canonical current placement is the theorem `thm:commutativity-points` in `blueprint/src/chapter/ch08_commutativity.tex:8-19`, where the statement block has `\leanok` immediately after `\lean{...}` and the proof block begins with another `\leanok`. This marker says that the Lean proof is complete and free of unresolved `sorry` or unjustified project-level `axiom` shortcuts. In particular, `#print axioms <decl>` must show no `sorryAx`, and the declaration must satisfy the broader blocker rules in [`docs/PROOF_INTEGRITY.md`](PROOF_INTEGRITY.md). The advisory Blueprint ↔ Lean sync workflow added in PR #438 checks this `#print axioms` condition; see [`docs/ci-blueprint-sync.md`](ci-blueprint-sync.md).
+**Proof-level `\leanok`.** Place this inside the matching `proof` environment, preferably as the first line after `\begin{proof}`. The canonical current placement is the theorem `thm:commutativity-points` in `blueprint/src/chapter/ch08_commutativity.tex:8-19`, where the statement block has `\leanok` immediately after `\lean{...}` and the proof block begins with another `\leanok`. This marker says that the Lean proof is complete and free of unresolved `sorry` or unjustified project-level `axiom` shortcuts. In particular, `#print axioms <decl>` must show no `sorryAx`, and the declaration must satisfy the broader blocker rules in [`docs/PROOF_INTEGRITY.md`](PROOF_INTEGRITY.md).
 
 A theorem, lemma, proposition, or corollary node is **fully formalized in Lean if and only if it has both markers**: statement-level `\leanok` in the statement block and proof-level `\leanok` in the proof block. Statement-level without proof-level means “the statement has been transcribed and matched, but the proof is not yet certified complete.” Definitions have no proof block, so statement-level `\leanok` alone is enough there.
 
@@ -104,12 +104,14 @@ Excerpt from `blueprint/src/chapter/ch08_commutativity.tex:8-19`:
 \end{proof}
 ```
 
+**Important current CI behavior.** The advisory Blueprint ↔ Lean sync check in [`docs/ci-blueprint-sync.md`](ci-blueprint-sync.md) currently treats *any* `\leanok` (statement-level or proof-level) as a claim that must be `sorryAx`-free; it does not yet enforce the placement distinction above. So placement still communicates review intent, but either marker can trigger the same CI error today.
+
 `leanblueprint` does not use distinct macro names for these two claims, so audits must distinguish them by environment context rather than by raw `\leanok` counts. A future split such as `\leanokstmt` / `\leanokproof` could make that distinction explicit, but that is only a possible later cleanup; the current convention is to keep `\leanok` and rely on placement.
 
 ## Dependency Graph Colors (web)
 - **Light green box**: definition with `\lean` + `\leanok` (defined in Lean)
 - **Green**: theorem/lemma/proposition/corollary with `\lean` + statement-level `\leanok` (statement matched in Lean)
-- **Dark green**: theorem/lemma/proposition/corollary with both statement-level and proof-level `\leanok` (fully formalized in Lean)
+- **Dark green**: either (i) theorem/lemma/proposition/corollary with both statement-level and proof-level `\leanok` (fully formalized in Lean), or (ii) a `\mathlibok` node
 - **Blue**: ready to state/prove (all deps are done)
 - **Orange**: `\notready` (needs more blueprint work)
 
