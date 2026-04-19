@@ -76,10 +76,8 @@ private lemma questionConsistency_le_questionSDD_of_projective
     intro a
     have hcomm :
         ev ψ (BRight.outcome a * ALeft.outcome a) =
-          ev ψ (ALeft.outcome a * BRight.outcome a) := by
-      simp [ALeft, BRight, SubMeas.liftLeft, SubMeas.liftRight,
-        leftTensor_mul_rightTensor_eq_opTensor,
-        rightTensor_mul_leftTensor_eq_opTensor]
+          ev ψ (ALeft.outcome a * BRight.outcome a) :=
+      ev_mul_comm_of_psd ψ _ _ (BRight.outcome_pos a) (ALeft.outcome_pos a)
     calc
       ev ψ (((ALeft.outcome a - BRight.outcome a)ᴴ) *
             (ALeft.outcome a - BRight.outcome a))
@@ -151,10 +149,8 @@ private lemma questionConsistency_le_questionSDD_of_projective
     _ = qSDD ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight := by
           rw [hqSDD]
 
-/-- `prop:simeq-to-approx` converse under projective measurements.
-
-TODO(#456): re-home this next to `simeqToApprox` in `ComparisonCore.lean` once the
-file-overlap restriction on `Theorems.lean` is lifted. -/
+/-- Projective converse of `prop:simeq-to-approx` (Proposition 4.9 of
+`references/ldt-paper/preliminaries.tex`, lines 426--455). -/
 theorem approxToSimeq {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
