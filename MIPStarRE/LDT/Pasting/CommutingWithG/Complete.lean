@@ -192,7 +192,7 @@ error. The proof uses `firstSwitcherooError_le_eighth_stage` to bound `θ₁` by
 private lemma secondSwitcherooError_le_commutingWithGCompleteError
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error)
-    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
     (hd_le_q : params.d ≤ params.q) :
     commutativitySwitcherooError zeta zeta
@@ -378,7 +378,6 @@ theorem commutingWithGComplete
         zeta zeta (pairwiseCompletePartCommutationError params gamma zeta) := by
     simpa [pairwiseCompletePartCommutationError] using
       commutativitySwitcheroo params strategy.state strategy.isNormalized
-        strategy.permInvState
         family family.meas zeta zeta
         (Commutativity.comMainError params gamma zeta)
         hself hself.completePartSelfConsistency hcom.fullSliceCommutation
@@ -431,7 +430,7 @@ theorem commutingWithGComplete
         (commutativitySwitcherooError zeta zeta
           (pairwiseCompletePartCommutationError params gamma zeta)) := by
     apply commutativitySwitcheroo params strategy.state strategy.isNormalized
-      strategy.permInvState family
+      family
       (completePartProjFamily params family) zeta zeta
       (commutativitySwitcherooError zeta zeta
         (pairwiseCompletePartCommutationError params gamma zeta))
@@ -470,6 +469,6 @@ theorem commutingWithGComplete
           (commutingWithGCompleteError params gamma zeta)
           htotal_raw
           (secondSwitcherooError_le_commutingWithGCompleteError params gamma zeta
-            hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q) }
+            hgamma_nonneg hzeta_nonneg hzeta hd_le_q) }
 
 end MIPStarRE.LDT.Pasting
