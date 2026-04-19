@@ -193,6 +193,32 @@ lemma projectiveNonMeasurement {Outcome : Type uOutcome}
   rcases hbridge.fromSourceAlmostProjective hsource with ⟨R, hR, _⟩
   exact ⟨R, hR⟩
 
+/-- **Degenerate empty-outcome branch** for `lem:projective-low-rank-sum`.
+
+In `references/ldt-paper/orthonormalization.tex`, lines 540--658, the rank-
+reduction argument starts from an honest measurement `A = {A_a}` on a nontrivial
+ambient space. If `Outcome` were empty, then `∑ a, A_a = 0` while
+`A.total_eq_one` forces the same sum to be `1`, so this branch is impossible.
+We isolate that contradiction here so `projectiveLowRankSum` can focus on the
+spectral construction in the nonempty case. -/
+private lemma rankReduction_emptyOutcome
+    {Outcome : Type uOutcome} {ι : Type uι}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    [Fintype Outcome] [DecidableEq Outcome] [IsEmpty Outcome]
+    (ψ : QuantumState ι)
+    (A : Measurement Outcome ι) (ζ : Error) :
+    ∃ data : QLayerData Outcome ι,
+      RankReductionWitness ψ A ζ data := by
+  exfalso
+  obtain ⟨i⟩ := (inferInstance : Nonempty ι)
+  have htotal_zero : A.toSubMeas.total = 0 := by
+    simpa using A.toSubMeas.sum_eq_total.symm
+  have hzero_one : (0 : MIPStarRE.Quantum.Op ι) = 1 := by
+    rw [← htotal_zero, A.total_eq_one]
+  have hentry : (0 : ℂ) = 1 := by
+    simpa using congrFun (congrFun hzero_one i) i
+  norm_num at hentry
+
 /-- **Rank reduction** (`lem:projective-low-rank-sum`).
 
 Construct the paper's rank-reduced family `Q_a`, together with the auxiliary
@@ -221,9 +247,7 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
       RankReductionWitness ψ A ζ data := by
   classical
   by_cases hOutcome : Nonempty Outcome
-  · letI : Nonempty Outcome := hOutcome
-    letI : Inhabited Outcome := Classical.inhabited_of_nonempty hOutcome
-    obtain ⟨q, hrounded, hsum⟩ := hbridge.fromSourceAlmostProjective source_almost_projective
+  · obtain ⟨q, hrounded, hsum⟩ := hbridge.fromSourceAlmostProjective source_almost_projective
     let aux : RankReductionAuxOutput Outcome ι := (hrankBridge q hrounded).out
     let data : QLayerData Outcome ι :=
       { auxSpace := aux.auxSpace
@@ -252,15 +276,7 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
             (1 : MIPStarRE.Quantum.Op ι) := hrounded.total_le
     · exact aux.auxDim_le
   · letI : IsEmpty Outcome := not_nonempty_iff.mp hOutcome
-    exfalso
-    obtain ⟨i⟩ := (inferInstance : Nonempty ι)
-    have htotal_zero : A.toSubMeas.total = 0 := by
-      simpa using A.toSubMeas.sum_eq_total.symm
-    have hzero_one : (0 : MIPStarRE.Quantum.Op ι) = 1 := by
-      rw [← htotal_zero, A.total_eq_one]
-    have hentry : (0 : ℂ) = 1 := by
-      simpa using congrFun (congrFun hzero_one i) i
-    norm_num at hentry
+    exact rankReduction_emptyOutcome (ψ := ψ) (A := A) (ζ := ζ)
 
 
 end
