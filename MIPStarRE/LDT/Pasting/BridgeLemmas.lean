@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.Pasting.GHatFacts
 import MIPStarRE.LDT.Pasting.Core.Bounds
 import MIPStarRE.LDT.Basic.LowDegreePolynomial
+import MIPStarRE.LDT.Preliminaries.Triangles.Consistency
 
 /-!
 # Section 12 pasting: sandwich-chain bridge lemmas
@@ -28,67 +29,6 @@ private lemma postprocess_postprocess
       eq_comm, and_left_comm, and_assoc]
   · simp [postprocess_total]
 
-private lemma restrictToAxisParallelLine_eval_at_pointHeight
-    (params : Parameters) [FieldModel params.q]
-    (h : Polynomial params.next) (u : Point params.next) :
-    let verticalLine : AxisParallelLine params.next :=
-      { base := appendPoint params (truncatePoint params u) zeroCoord
-        direction := lastCoord params }
-    (Polynomial.restrictToAxisParallelLine params.next h verticalLine)
-        (pointHeight params u) = h u := by
-  let verticalLine : AxisParallelLine params.next :=
-    { base := appendPoint params (truncatePoint params u) zeroCoord
-      direction := lastCoord params }
-  change encodeScalar
-      (_root_.Polynomial.eval (decodeScalar (pointHeight params u))
-        (MvPolynomial.eval₂ _root_.Polynomial.C
-          (Polynomial.axisCoordinatePolynomial params.next verticalLine) h.poly)) =
-    encodeScalar (MvPolynomial.eval (decodePoint u) h.poly)
-  rw [MvPolynomial.polynomial_eval_eval₂]
-  have hC :
-      (_root_.Polynomial.evalRingHom (decodeScalar (pointHeight params u))).comp
-          _root_.Polynomial.C = RingHom.id (Scalar params.next) := by
-    ext r
-    change _root_.Polynomial.eval (decodeScalar (pointHeight params u)) (_root_.Polynomial.C r) = r
-    simp
-  rw [hC]
-  have hvars :
-      (fun s : Fin params.next.m =>
-        _root_.Polynomial.eval (decodeScalar (pointHeight params u))
-          (Polynomial.axisCoordinatePolynomial params.next verticalLine s)) = decodePoint u := by
-    funext s
-    by_cases hs : s = lastCoord params
-    · subst hs
-      rw [show pointHeight params u = u (lastCoord params) by simp [pointHeight, lastCoord]]
-      have hbase : verticalLine.base (lastCoord params) = zeroCoord := by
-        simpa [verticalLine, pointHeight] using
-          (pointHeight_appendPoint params (truncatePoint params u) zeroCoord)
-      rw [Polynomial.axisCoordinatePolynomial, if_pos rfl, hbase]
-      change _root_.Polynomial.eval (decodeScalar (u (lastCoord params)))
-          (_root_.Polynomial.C (decodeScalar zeroCoord) + _root_.Polynomial.X) =
-        decodeScalar (u (lastCoord params))
-      simp [zeroCoord]
-    · have hs_lt : s.1 < params.m := by
-        have hs_succ : s.1 < params.m + 1 := by
-          simpa [Parameters.next] using s.2
-        have hs_ne : s.1 ≠ params.m := by
-          intro h
-          apply hs
-          exact Fin.ext h
-        omega
-      have hs' : s ≠ verticalLine.direction := by
-        simpa [verticalLine] using hs
-      have hbase : verticalLine.base s = u s := by
-        simp [verticalLine, appendPoint, truncatePoint, hs_lt]
-      rw [Polynomial.axisCoordinatePolynomial, if_neg hs', hbase]
-      change _root_.Polynomial.eval (decodeScalar (pointHeight params u))
-          (_root_.Polynomial.C (decodeScalar (u s))) = decodeScalar (u s)
-      simp
-      rfl
-  rw [hvars]
-  exact congrArg encodeScalar (show MvPolynomial.eval₂ (RingHom.id (Scalar params.next)) (decodePoint u) h.poly =
-    MvPolynomial.eval (decodePoint u) h.poly by rfl)
-
 private lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
     (params : Parameters) [FieldModel params.q]
     (H : SubMeas (Polynomial params.next) ι) (u : Point params.next) :
@@ -103,12 +43,76 @@ private lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
       postprocess H (fun h => Polynomial.restrictToAxisParallelLine params.next h verticalLine) by
       rfl]
   rw [postprocess_postprocess]
+  have hrestrict_apply
+      (h : Polynomial params.next) (ℓ : AxisParallelLine params.next) (t : Fq params.next) :
+      (Polynomial.restrictToAxisParallelLine params.next h ℓ) t = h (AxisParallelLine.pointAt ℓ t) := by
+    have haxis :
+        (fun i => _root_.Polynomial.eval (decodeScalar t)
+            (Polynomial.axisCoordinatePolynomial params.next ℓ i)) =
+          decodePoint (AxisParallelLine.pointAt ℓ t) := by
+      funext i
+      by_cases hi : i = ℓ.direction
+      · subst hi
+        simpa [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
+          addCoord, decodePoint, decode_encodeScalar, _root_.Polynomial.eval_add,
+          _root_.Polynomial.eval_C, _root_.Polynomial.eval_X]
+      · simpa [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
+          hi, decodePoint, _root_.Polynomial.eval_C]
+    have hconst :
+        (Polynomial.evalRingHom (decodeScalar t)).comp _root_.Polynomial.C = RingHom.id _ := by
+      ext a
+      simp
+    calc
+      (Polynomial.restrictToAxisParallelLine params.next h ℓ) t
+        = encodeScalar
+            (MvPolynomial.eval₂
+              ((Polynomial.evalRingHom (decodeScalar t)).comp _root_.Polynomial.C)
+              (fun i => _root_.Polynomial.eval (decodeScalar t)
+                (Polynomial.axisCoordinatePolynomial params.next ℓ i))
+              h.poly) := by
+                simp [Polynomial.restrictToAxisParallelLine, AxisLinePolynomial.toFun,
+                  evalLinePolynomialModel]
+                rw [MvPolynomial.polynomial_eval_eval₂]
+      _ = encodeScalar
+            (MvPolynomial.eval₂ (RingHom.id _)
+              (decodePoint (AxisParallelLine.pointAt ℓ t)) h.poly) := by
+                rw [hconst]
+                simpa using congrArg
+                  (fun g => encodeScalar (MvPolynomial.eval₂ (RingHom.id _) g h.poly)) haxis
+      _ = h (AxisParallelLine.pointAt ℓ t) := by
+            rfl
+  have hbase : AxisParallelLine.pointAt verticalLine (pointHeight params u) = u := by
+    calc
+      AxisParallelLine.pointAt verticalLine (pointHeight params u)
+        = appendPoint params (truncatePoint params u) (pointHeight params u) := by
+            funext i
+            by_cases hi : i = lastCoord params
+            · subst hi
+              simp [verticalLine, AxisParallelLine.pointAt, appendPoint, pointHeight, lastCoord]
+              change addCoord zeroCoord (u (lastCoord params)) = u (lastCoord params)
+              rw [← encode_decodeScalar (u (lastCoord params))]
+              simp [addCoord, zeroCoord]
+            · have hi_lt : i.1 < params.m := by
+                have hi_succ : i.1 < params.m + 1 := by
+                  simpa [Parameters.next] using i.2
+                have hne : i.1 ≠ params.m := by
+                  intro h
+                  apply hi
+                  exact Fin.ext h
+                omega
+              simp [verticalLine, AxisParallelLine.pointAt, appendPoint, truncatePoint, hi, hi_lt]
+      _ = u := (pointNextEquiv params).left_inv u
   have hfun :
       (fun h => (Polynomial.restrictToAxisParallelLine params.next h verticalLine) (pointHeight params u)) =
         fun h => h u := by
           funext h
-          simpa [verticalLine] using restrictToAxisParallelLine_eval_at_pointHeight params h u
+          calc
+            (Polynomial.restrictToAxisParallelLine params.next h verticalLine) (pointHeight params u)
+              = h (AxisParallelLine.pointAt verticalLine (pointHeight params u)) :=
+                  hrestrict_apply h verticalLine (pointHeight params u)
+            _ = h u := by simpa [hbase]
   simpa [evaluateAt, Function.comp] using congrArg (postprocess H) hfun
+
 
 private lemma consRel_uniform_fst
     {α β Outcome : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
@@ -512,6 +516,28 @@ private def gHatTupleOutcomeConsEquiv' (params : Parameters) [FieldModel params.
     cases p
     rfl
 
+private lemma conjTranspose_mul_mono_local
+    {X Y Z : MIPStarRE.Quantum.Op ι}
+    (hXY : X ≤ Y) :
+    Zᴴ * X * Z ≤ Zᴴ * Y * Z := by
+  apply sub_nonneg.mp
+  have hnonneg : 0 ≤ Zᴴ * (Y - X) * Z := by
+    simpa [Matrix.conjTranspose_conjTranspose] using
+      (Matrix.PosSemidef.mul_mul_conjTranspose_same
+        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hXY))
+        Zᴴ).nonneg
+  simpa [mul_sub, sub_mul, Matrix.conjTranspose_conjTranspose, mul_assoc] using hnonneg
+
+private noncomputable def gHatReverseHalfProductOutcomeOperator
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → MIPStarRE.Quantum.Op ι
+  | 0, _xs, _gs =>
+      1
+  | k + 1, xs, gs =>
+      gHatReverseHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs) *
+        ((gHatIdxMeas params family (xs 0)).toSubMeas).outcome (gs 0)
+
 private noncomputable def headTailOrderedFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -556,7 +582,7 @@ private noncomputable def commuteGHalfSandwich_moveFamily
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome ogs.1) *
           leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           rightTensor (ι₁ := ι)
-            (gHatHalfProductOutcomeOperator params family r q.2.2 ogs.2.2)
+            (gHatReverseHalfProductOutcomeOperator params family r q.2.2 ogs.2.2)
       total :=
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
           leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
@@ -575,7 +601,7 @@ private noncomputable def commuteGHalfSandwich_commuteFamily
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome ogs.1) *
           rightTensor (ι₁ := ι)
-            (gHatHalfProductOutcomeOperator params family r q.2.2 ogs.2.2)
+            (gHatReverseHalfProductOutcomeOperator params family r q.2.2 ogs.2.2)
       total :=
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
           leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
@@ -858,99 +884,170 @@ private lemma gHatPairProduct_sddOpRel_triple
     (fun q => gHatPairProductRight params family q.1)
     (gHatCommutationError params gamma zeta)).1 hfst
 
-/- private lemma commuteGHalfSandwich_step_commute
+private lemma gHatIdxMeas_proj
     (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error) (r : ℕ)
-    (hcom : SDDOpRel ψbi
-      (uniformDistribution (SlicePairQuestion params))
-      (gHatPairProductLeft params family)
-      (gHatPairProductRight params family)
-      (gHatCommutationError params gamma zeta)) :
-    SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (commuteGHalfSandwich_moveFamily params family r)
-      (commuteGHalfSandwich_commuteFamily params family r)
-      (gHatCommutationError params gamma zeta) := by
-  let C : (SliceQuestion params × SliceQuestion params × PointTuple params r) →
-      (GHatOutcome params × GHatOutcome params) → GHatTupleOutcome params r →
-      MIPStarRE.Quantum.Op (ι × ι) :=
-    fun q _ gt => rightTensor (ι₁ := ι)
-      (gHatHalfProductOutcomeOperator params family r q.2.2 gt)
-  have hC :
-      ∀ q a,
-        ∑ gt : GHatTupleOutcome params r, (C q a gt)ᴴ * C q a gt ≤ 1 := by
-    intro q a
-    calc
-      ∑ gt : GHatTupleOutcome params r, (C q a gt)ᴴ * C q a gt
-        = rightTensor (ι₁ := ι)
-            (∑ gt : GHatTupleOutcome params r,
-              ((gHatHalfProductOutcomeOperator params family r q.2.2 gt)ᴴ) *
-                gHatHalfProductOutcomeOperator params family r q.2.2 gt) := by
-                  refine Finset.sum_congr rfl ?_
-                  intro gt _
-                  rw [show (rightTensor (ι₁ := ι)
-                      (gHatHalfProductOutcomeOperator params family r q.2.2 gt))ᴴ =
-                      rightTensor (ι₁ := ι)
-                        ((gHatHalfProductOutcomeOperator params family r q.2.2 gt)ᴴ) by
-                    simpa [rightTensor, opTensor] using
-                      (conjTranspose_opTensor (1 : MIPStarRE.Quantum.Op ι)
-                        (gHatHalfProductOutcomeOperator params family r q.2.2 gt))]
-                  simp [C, rightTensor_mul_rightTensor]
-      _ ≤ rightTensor (ι₁ := ι) (1 : MIPStarRE.Quantum.Op ι) := by
-            simpa [rightTensor_finset_sum] using
-              opTensor_mono_right (ι₁ := ι) (A := (1 : MIPStarRE.Quantum.Op ι))
-                (gHatHalfProduct_sum_adjoint_mul_le_one params family r q.2.2)
-                (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one)
-      _ = 1 := by simp [rightTensor]
-  let rawSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r) (ι × ι) :=
-    fun q =>
-      { outcome := fun ag => C q ag.1 ag.2 * (gHatPairProductLeft params family (q.1, q.2.1)).outcome ag.1
-        total := ∑ ag, C q ag.1 ag.2 * (gHatPairProductLeft params family (q.1, q.2.1)).outcome ag.1 }
-  let rawTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r) (ι × ι) :=
-    fun q =>
-      { outcome := fun ag => C q ag.1 ag.2 * (gHatPairProductRight params family (q.1, q.2.1)).outcome ag.1
-        total := ∑ ag, C q ag.1 ag.2 * (gHatPairProductRight params family (q.1, q.2.1)).outcome ag.1 }
-  have hcab :=
-    Preliminaries.cabApproxDelta_raw ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (fun q => gHatPairProductLeft params family (q.1, q.2.1))
-      (fun q => gHatPairProductRight params family (q.1, q.2.1))
-      C (gHatCommutationError params gamma zeta)
-      (gHatPairProduct_sddOpRel_triple params ψbi family gamma zeta r hcom)
-      hC
-  have hreindex := CommutativityPoints.sddOpRel_reindex (pairTailOutcomeEquiv params r)
-    ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-    rawSource rawTarget (gHatCommutationError params gamma zeta) hcab
-  let reindexedSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
-    fun q =>
-      { outcome := fun a' => (rawSource q).outcome ((pairTailOutcomeEquiv params r).symm a')
-        total := (rawSource q).total }
-  let reindexedTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
-    fun q =>
-      { outcome := fun a' => (rawTarget q).outcome ((pairTailOutcomeEquiv params r).symm a')
-        total := (rawTarget q).total }
-  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-    reindexedSource reindexedTarget
-    (commuteGHalfSandwich_moveFamily params family r)
-    (commuteGHalfSandwich_commuteFamily params family r)
-    (gHatCommutationError params gamma zeta)
-    (fun q ogs => by
-      simp [reindexedSource, rawSource, commuteGHalfSandwich_moveFamily,
-        pairTailOutcomeEquiv, C, rightTensor_mul_leftTensor_eq_opTensor,
-        leftTensor_mul_rightTensor_eq_opTensor, mul_assoc])
-    (fun q ogs => by
-      simp [reindexedTarget, rawTarget, commuteGHalfSandwich_commuteFamily,
-        pairTailOutcomeEquiv, C, rightTensor_mul_leftTensor_eq_opTensor,
-        leftTensor_mul_rightTensor_eq_opTensor, mul_assoc])
-    hreindex -/
+    (family : IdxPolyFamily params ι) (x : Fq params) (g : GHatOutcome params) :
+    (gHatIdxMeas params family x).outcome g * (gHatIdxMeas params family x).outcome g =
+      (gHatIdxMeas params family x).outcome g := by
+  cases g with
+  | none =>
+      let T := (family.meas x).total
+      change (1 - T) * (1 - T) = 1 - T
+      have hTT : T * T = T := by
+        simpa [T] using MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x)
+      calc
+        (1 - T) * (1 - T) = 1 - T - T + T * T := by
+          noncomm_ring
+        _ = 1 - T := by
+          rw [hTT]
+          abel
+  | some p =>
+      simp [gHatIdxMeas, completeSubMeas, (family.meas x).proj p]
+
+private lemma gHatHalfProduct_sum_adjoint_mul_le_one
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    ∀ r (xs : PointTuple params r),
+      ∑ gs : GHatTupleOutcome params r,
+          (gHatHalfProductOutcomeOperator params family r xs gs)ᴴ *
+            gHatHalfProductOutcomeOperator params family r xs gs ≤ 1 := by
+  intro r
+  induction r with
+  | zero =>
+      intro xs
+      simp [gHatHalfProductOutcomeOperator]
+  | succ r ihr =>
+      intro xs
+      let G : GHatOutcome params → MIPStarRE.Quantum.Op ι :=
+        fun g => (gHatIdxMeas params family (xs 0)).outcome g
+      let T : GHatTupleOutcome params r → MIPStarRE.Quantum.Op ι :=
+        fun gs => gHatHalfProductOutcomeOperator params family r (pointTupleTail xs) gs
+      have hsplit :
+          (∑ gs : GHatTupleOutcome params (r + 1),
+              (gHatHalfProductOutcomeOperator params family (r + 1) xs gs)ᴴ *
+                gHatHalfProductOutcomeOperator params family (r + 1) xs gs) =
+            ∑ p : GHatOutcome params × GHatTupleOutcome params r,
+              ((G p.1 * T p.2)ᴴ) * (G p.1 * T p.2) := by
+        exact Fintype.sum_equiv (gHatTupleOutcomeConsEquiv' params r)
+          (fun gs : GHatTupleOutcome params (r + 1) =>
+            (gHatHalfProductOutcomeOperator params family (r + 1) xs gs)ᴴ *
+              gHatHalfProductOutcomeOperator params family (r + 1) xs gs)
+          (fun p : GHatOutcome params × GHatTupleOutcome params r =>
+            ((G p.1 * T p.2)ᴴ) * (G p.1 * T p.2))
+          (by
+            intro gs
+            rfl)
+      rw [hsplit, ← Finset.univ_product_univ, Finset.sum_product]
+      calc
+        ∑ g : GHatOutcome params,
+            ∑ gs : GHatTupleOutcome params r, ((G g * T gs)ᴴ) * (G g * T gs)
+          = ∑ gs : GHatTupleOutcome params r,
+              ∑ g : GHatOutcome params, (T gs)ᴴ * G g * T gs := by
+                rw [Finset.sum_comm]
+                refine Finset.sum_congr rfl ?_
+                intro gs _
+                refine Finset.sum_congr rfl ?_
+                intro g _
+                calc
+                  ((G g * T gs)ᴴ) * (G g * T gs)
+                    = (T gs)ᴴ * ((G g)ᴴ * G g) * T gs := by
+                        simp [Matrix.conjTranspose_mul, mul_assoc]
+                  _ = (T gs)ᴴ * G g * T gs := by
+                        have hherm : (G g)ᴴ = G g := by
+                          simpa [G] using (gHatIdxMeas params family (xs 0)).outcome_hermitian g
+                        have hproj : G g * G g = G g := by
+                          simpa [G] using gHatIdxMeas_proj params family (xs 0) g
+                        simp [hherm, hproj, mul_assoc]
+        _ = ∑ gs : GHatTupleOutcome params r, (T gs)ᴴ * (∑ g : GHatOutcome params, G g) * T gs := by
+              refine Finset.sum_congr rfl ?_
+              intro gs _
+              rw [← Finset.sum_mul, ← Matrix.mul_sum]
+        _ = ∑ gs : GHatTupleOutcome params r, (T gs)ᴴ * T gs := by
+              refine Finset.sum_congr rfl ?_
+              intro gs _
+              rw [(gHatIdxMeas params family (xs 0)).sum_eq_total]
+              rw [(gHatIdxMeas params family (xs 0)).total_eq_one]
+              simp [G, mul_assoc]
+        _ ≤ 1 := by
+              simpa [T] using ihr (pointTupleTail xs)
+
+private lemma gHatReverseHalfProduct_sum_adjoint_mul_le_one
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    ∀ r (xs : PointTuple params r),
+      ∑ gs : GHatTupleOutcome params r,
+          (gHatReverseHalfProductOutcomeOperator params family r xs gs)ᴴ *
+            gHatReverseHalfProductOutcomeOperator params family r xs gs ≤ 1 := by
+  intro r
+  induction r with
+  | zero =>
+      intro xs
+      simp [gHatReverseHalfProductOutcomeOperator]
+  | succ r ihr =>
+      intro xs
+      let T : GHatTupleOutcome params r → MIPStarRE.Quantum.Op ι :=
+        fun gs => gHatReverseHalfProductOutcomeOperator params family r (pointTupleTail xs) gs
+      let G : GHatOutcome params → MIPStarRE.Quantum.Op ι :=
+        fun g => ((gHatIdxMeas params family (xs 0)).toSubMeas).outcome g
+      have hsplit :
+          (∑ gs : GHatTupleOutcome params (r + 1),
+              (gHatReverseHalfProductOutcomeOperator params family (r + 1) xs gs)ᴴ *
+                gHatReverseHalfProductOutcomeOperator params family (r + 1) xs gs) =
+            ∑ p : GHatOutcome params × GHatTupleOutcome params r,
+              ((T p.2 * G p.1)ᴴ) * (T p.2 * G p.1) := by
+        exact Fintype.sum_equiv (gHatTupleOutcomeConsEquiv' params r)
+          (fun gs : GHatTupleOutcome params (r + 1) =>
+            (gHatReverseHalfProductOutcomeOperator params family (r + 1) xs gs)ᴴ *
+              gHatReverseHalfProductOutcomeOperator params family (r + 1) xs gs)
+          (fun p : GHatOutcome params × GHatTupleOutcome params r =>
+            ((T p.2 * G p.1)ᴴ) * (T p.2 * G p.1))
+          (by intro gs; rfl)
+      rw [hsplit, ← Finset.univ_product_univ, Finset.sum_product]
+      calc
+        ∑ g : GHatOutcome params,
+            ∑ gs : GHatTupleOutcome params r, ((T gs * G g)ᴴ) * (T gs * G g)
+          = ∑ g : GHatOutcome params,
+              G g * (∑ gs : GHatTupleOutcome params r, (T gs)ᴴ * T gs) * G g := by
+                refine Finset.sum_congr rfl ?_
+                intro g _
+                calc
+                  ∑ gs : GHatTupleOutcome params r, ((T gs * G g)ᴴ) * (T gs * G g)
+                    = ∑ gs : GHatTupleOutcome params r, G g * ((T gs)ᴴ * T gs) * G g := by
+                        refine Finset.sum_congr rfl ?_
+                        intro gs _
+                        have hherm : (G g)ᴴ = G g := by
+                          simpa [G] using (gHatIdxMeas params family (xs 0)).outcome_hermitian g
+                        calc
+                          ((T gs * G g)ᴴ) * (T gs * G g)
+                            = (G g)ᴴ * ((T gs)ᴴ * T gs) * G g := by
+                                simp [Matrix.conjTranspose_mul, mul_assoc]
+                          _ = G g * ((T gs)ᴴ * T gs) * G g := by
+                                simp [hherm]
+                  _ = G g * (∑ gs : GHatTupleOutcome params r, (T gs)ᴴ * T gs) * G g := by
+                        rw [← Finset.sum_mul, ← Matrix.mul_sum]
+        _ ≤ ∑ g : GHatOutcome params, G g * (1 : MIPStarRE.Quantum.Op ι) * G g := by
+              refine Finset.sum_le_sum ?_
+              intro g _
+              let X : MIPStarRE.Quantum.Op ι :=
+                ∑ gs : GHatTupleOutcome params r, (T gs)ᴴ * T gs
+              have hX : X ≤ 1 := by
+                simpa [X] using ihr (pointTupleTail xs)
+              have hherm : (G g)ᴴ = G g := by
+                simpa [G] using (gHatIdxMeas params family (xs 0)).outcome_hermitian g
+              simpa [X, hherm] using conjTranspose_mul_mono_local (Z := G g) hX
+        _ = ∑ g : GHatOutcome params, G g := by
+              refine Finset.sum_congr rfl ?_
+              intro g _
+              have hherm : (G g)ᴴ = G g := by
+                simpa [G] using (gHatIdxMeas params family (xs 0)).outcome_hermitian g
+              have hproj : G g * G g = G g := by
+                simpa [G] using gHatIdxMeas_proj params family (xs 0) g
+              simp [hherm, hproj, mul_assoc]
+        _ = 1 := by
+              calc
+                ∑ g : GHatOutcome params, G g = (gHatIdxMeas params family (xs 0)).total := by
+                  simpa [G] using (gHatIdxMeas params family (xs 0)).sum_eq_total
+                _ = 1 := (gHatIdxMeas params family (xs 0)).total_eq_one
 
 private def thirdSliceFrontEquiv (params : Parameters) (r : ℕ) :
     (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) ≃
@@ -975,6 +1072,102 @@ private def firstTwoSlicesFrontEquiv (params : Parameters) (r : ℕ) :
   right_inv q := by
     rcases q with ⟨⟨x₁, x₂⟩, x₃, xs⟩
     rfl
+
+private lemma gHatSelfConsistency_sddOpRel_quadThird
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error) (r : ℕ)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family)) q.2.2.1)
+      (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family)) q.2.2.1)
+      (gHatSelfConsistencyError zeta) := by
+  have hfst :
+      SDDOpRel ψbi
+        (uniformDistribution (SliceQuestion params ×
+          (SliceQuestion params × SliceQuestion params × PointTuple params r)))
+        (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family)) q.1)
+        (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family)) q.1)
+        (gHatSelfConsistencyError zeta) :=
+    sddOpRel_uniform_fst ψbi
+      (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family))
+      (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family))
+      (gHatSelfConsistencyError zeta)
+      (gHatSelfConsistency_sddOpRel params ψbi family zeta hsc)
+  simpa [thirdSliceFrontEquiv] using
+    (sddOpRel_uniform_equiv (thirdSliceFrontEquiv params r).symm ψbi
+      (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family)) q.1)
+      (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family)) q.1)
+      (gHatSelfConsistencyError zeta)).1 hfst
+
+/- private lemma gHatSelfConsistency_sddOpRel_quadThird
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error) (r : ℕ)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family)) q.2.2.1)
+      (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family)) q.2.2.1)
+      (gHatSelfConsistencyError zeta) := by
+  have hfst :
+      SDDOpRel ψbi
+        (uniformDistribution (SliceQuestion params × (SliceQuestion params × SliceQuestion params × PointTuple params r)))
+        (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family)) q.1)
+        (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family)) q.1)
+        (gHatSelfConsistencyError zeta) :=
+    sddOpRel_uniform_fst ψbi
+      (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family))
+      (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family))
+      (gHatSelfConsistencyError zeta)
+      (gHatSelfConsistency_sddOpRel params ψbi family zeta hsc)
+  exact (sddOpRel_uniform_equiv (thirdSliceFrontEquiv params r) ψbi
+    (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family)) q.1)
+    (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family)) q.1)
+    (gHatSelfConsistencyError zeta)).1 hfst
+
+private lemma gHatPairProduct_sddOpRel_quadFirstTwo
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (r : ℕ)
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (fun q => gHatPairProductLeft params family (q.1, q.2.1))
+      (fun q => gHatPairProductRight params family (q.1, q.2.1))
+      (gHatCommutationError params gamma zeta) := by
+  have hfst :
+      SDDOpRel ψbi
+        (uniformDistribution (SlicePairQuestion params × (SliceQuestion params × PointTuple params r)))
+        (fun q => gHatPairProductLeft params family q.1)
+        (fun q => gHatPairProductRight params family q.1)
+        (gHatCommutationError params gamma zeta) :=
+    sddOpRel_uniform_fst ψbi
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)
+      hcom
+  exact (sddOpRel_uniform_equiv (firstTwoSlicesFrontEquiv params r) ψbi
+    (fun q => gHatPairProductLeft params family q.1)
+    (fun q => gHatPairProductRight params family q.1)
+    (gHatCommutationError params gamma zeta)).1 hfst -/
 
 private lemma commuteGHalfSandwich_error_bound
     (params : Parameters) [FieldModel params.q]
@@ -1051,6 +1244,175 @@ private def pairTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r 
   left_inv og := by cases og; rfl
   right_inv og := by cases og; rfl
 
+private lemma commuteGHalfSandwich_step_commute
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (r : ℕ)
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveFamily params family r)
+      (commuteGHalfSandwich_commuteFamily params family r)
+      (gHatCommutationError params gamma zeta) := by
+  let C : (SliceQuestion params × SliceQuestion params × PointTuple params r) →
+      (GHatOutcome params × GHatOutcome params) → GHatTupleOutcome params r →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q _ gt => rightTensor (ι₁ := ι)
+      (gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt)
+  have hC :
+      ∀ q a,
+        ∑ gt : GHatTupleOutcome params r, (C q a gt)ᴴ * C q a gt ≤ 1 := by
+    intro q a
+    calc
+      ∑ gt : GHatTupleOutcome params r, (C q a gt)ᴴ * C q a gt
+        = ∑ gt : GHatTupleOutcome params r,
+            rightTensor (ι₁ := ι)
+              (((gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt)ᴴ) *
+                gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt) := by
+                  refine Finset.sum_congr rfl ?_
+                  intro gt _
+                  rw [show (rightTensor (ι₁ := ι)
+                      (gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt))ᴴ =
+                      rightTensor (ι₁ := ι)
+                        ((gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt)ᴴ) by
+                    simpa [rightTensor, opTensor] using
+                      (conjTranspose_opTensor (1 : MIPStarRE.Quantum.Op ι)
+                        (gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt))]
+                  simp [C, rightTensor_mul_rightTensor]
+      _ = rightTensor (ι₁ := ι)
+            (∑ gt : GHatTupleOutcome params r,
+              ((gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt)ᴴ) *
+                gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt) := by
+                  simpa using (rightTensor_finset_sum (ι₁ := ι) Finset.univ
+                    (fun gt => ((gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt)ᴴ) *
+                      gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt))
+      _ ≤ 1 := by
+            exact rightTensor_le_one (ι₁ := ι)
+              (A := ∑ gt : GHatTupleOutcome params r,
+                ((gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt)ᴴ) *
+                  gHatReverseHalfProductOutcomeOperator params family r q.2.2 gt)
+              (gHatReverseHalfProduct_sum_adjoint_mul_le_one params family r q.2.2)
+  let rawSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun ag : (GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r =>
+          C q ag.1 ag.2 * (gHatPairProductLeft params family (q.1, q.2.1)).outcome ag.1
+        total := ∑ ag : (GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r,
+          C q ag.1 ag.2 * (gHatPairProductLeft params family (q.1, q.2.1)).outcome ag.1 }
+  let rawTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun ag : (GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r =>
+          C q ag.1 ag.2 * (gHatPairProductRight params family (q.1, q.2.1)).outcome ag.1
+        total := ∑ ag : (GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r,
+          C q ag.1 ag.2 * (gHatPairProductRight params family (q.1, q.2.1)).outcome ag.1 }
+  have hcab :=
+    Preliminaries.cabApproxDelta_raw ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (fun q => gHatPairProductLeft params family (q.1, q.2.1))
+      (fun q => gHatPairProductRight params family (q.1, q.2.1))
+      C (gHatCommutationError params gamma zeta)
+      (gHatPairProduct_sddOpRel_triple params ψbi family gamma zeta r hcom)
+      hC
+  have hreindex := CommutativityPoints.sddOpRel_reindex (pairTailOutcomeEquiv params r)
+    ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    rawSource rawTarget (gHatCommutationError params gamma zeta) hcab
+  let reindexedSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun a' => (rawSource q).outcome ((pairTailOutcomeEquiv params r).symm a')
+        total := (rawSource q).total }
+  let reindexedTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun a' => (rawTarget q).outcome ((pairTailOutcomeEquiv params r).symm a')
+        total := (rawTarget q).total }
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    reindexedSource reindexedTarget
+    (commuteGHalfSandwich_moveFamily params family r)
+    (commuteGHalfSandwich_commuteFamily params family r)
+    (gHatCommutationError params gamma zeta)
+    (fun q ogs => by
+      let A := (gHatIdxMeas params family q.1).outcome ogs.1
+      let B := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+      let T := gHatReverseHalfProductOutcomeOperator params family r q.2.2 ogs.2.2
+      calc
+        (reindexedSource q).outcome ogs
+          = rightTensor (ι₁ := ι) T * leftTensor (ι₂ := ι) (A * B) := by
+              simp [reindexedSource, rawSource, pairTailOutcomeEquiv, C,
+                gHatPairProductLeft, orderedProductOpFamily, OpFamily.leftPlacedOpFamily,
+                A, B, T, leftTensor_mul_leftTensor, mul_assoc]
+        _ = opTensor (A * B) T := by
+              rw [rightTensor_mul_leftTensor_eq_opTensor]
+        _ = leftTensor (ι₂ := ι) (A * B) * rightTensor (ι₁ := ι) T := by
+              rw [leftTensor_mul_rightTensor_eq_opTensor]
+        _ = leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) T := by
+              rw [leftTensor_mul_leftTensor]
+        _ = (commuteGHalfSandwich_moveFamily params family r q).outcome ogs := by
+              simp [commuteGHalfSandwich_moveFamily, A, B, T, mul_assoc]
+    )
+    (fun q ogs => by
+      let A := (gHatIdxMeas params family q.1).outcome ogs.1
+      let B := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+      let T := gHatReverseHalfProductOutcomeOperator params family r q.2.2 ogs.2.2
+      calc
+        (reindexedTarget q).outcome ogs
+          = rightTensor (ι₁ := ι) T * leftTensor (ι₂ := ι) (B * A) := by
+              simp [reindexedTarget, rawTarget, pairTailOutcomeEquiv, C,
+                gHatPairProductRight, reversedProductOpFamily, OpFamily.leftPlacedOpFamily,
+                A, B, T, leftTensor_mul_leftTensor, mul_assoc]
+        _ = opTensor (B * A) T := by
+              rw [rightTensor_mul_leftTensor_eq_opTensor]
+        _ = leftTensor (ι₂ := ι) (B * A) * rightTensor (ι₁ := ι) T := by
+              rw [leftTensor_mul_rightTensor_eq_opTensor]
+        _ = leftTensor (ι₂ := ι) B * leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) T := by
+              rw [leftTensor_mul_leftTensor]
+        _ = (commuteGHalfSandwich_commuteFamily params family r q).outcome ogs := by
+              simp [commuteGHalfSandwich_commuteFamily, A, B, T, mul_assoc]
+    )
+    hreindex
+
+private def splitSuccQuestionEquiv (params : Parameters) (r : ℕ) :
+    (SliceQuestion params × PointTuple params (r + 1)) ≃
+      (SliceQuestion params × SliceQuestion params × PointTuple params r) where
+  toFun q := (q.1, q.2 0, pointTupleTail q.2)
+  invFun q := (q.1, Fin.cons q.2.1 q.2.2)
+  left_inv q := by
+    rcases q with ⟨x, xs⟩
+    change (x, Fin.cons (xs 0) (pointTupleTail xs)) = (x, xs)
+    congr
+    funext i
+    cases i using Fin.cases with
+    | zero => rfl
+    | succ j => rfl
+  right_inv q := by
+    cases q
+    rfl
+
+private def splitSuccOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
+    (GHatOutcome params × GHatTupleOutcome params (r + 1)) ≃
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
+  toFun og := (og.1, og.2 0, gHatTupleOutcomeTail og.2)
+  invFun og := (og.1, Fin.cons og.2.1 og.2.2)
+  left_inv og := by
+    rcases og with ⟨g, gs⟩
+    change (g, Fin.cons (gs 0) (gHatTupleOutcomeTail gs)) = (g, gs)
+    congr
+    funext i
+    cases i using Fin.cases with
+    | zero => rfl
+    | succ j => rfl
+  right_inv og := by
+    cases og
+    rfl
+
 private def moveTailQuestionEquiv (params : Parameters) (r : ℕ) :
     (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) ≃
       (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) where
@@ -1085,6 +1447,30 @@ private def moveTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r 
     cases og
     rfl
 
+private def firstSliceBackQuestionEquiv (params : Parameters) (r : ℕ) :
+    ((SliceQuestion params × SliceQuestion params × PointTuple params r) × SliceQuestion params) ≃
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) where
+  toFun q := (q.2, q.1.1, q.1.2.1, q.1.2.2)
+  invFun q := ((q.2.1, q.2.2.1, q.2.2.2), q.1)
+  left_inv q := by
+    rcases q with ⟨⟨x₂, x₃, xs⟩, x₁⟩
+    rfl
+  right_inv q := by
+    rcases q with ⟨x₁, x₂, x₃, xs⟩
+    rfl
+
+private def firstSliceBackOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
+    ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) ≃
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
+  toFun og := (og.2, og.1.1, og.1.2.1, og.1.2.2)
+  invFun og := ((og.2.1, og.2.2.1, og.2.2.2), og.1)
+  left_inv og := by
+    rcases og with ⟨⟨g₂, g₃, gs⟩, g₁⟩
+    rfl
+  right_inv og := by
+    rcases og with ⟨g₁, g₂, g₃, gs⟩
+    rfl
+
 private noncomputable def commuteGHalfSandwich_moveStepSourceFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -1117,9 +1503,9 @@ private noncomputable def commuteGHalfSandwich_moveStepTargetFamily
     { outcome := fun ogs =>
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome ogs.1) *
           leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
-          rightTensor (ι₁ := ι) ((gHatIdxMeas params family q.2.2.1).outcome ogs.2.2.1) *
           rightTensor (ι₁ := ι)
-            (gHatHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2)
+            (gHatReverseHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2) *
+          rightTensor (ι₁ := ι) ((gHatIdxMeas params family q.2.2.1).outcome ogs.2.2.1)
       total :=
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
           leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
@@ -1140,7 +1526,7 @@ private noncomputable def commuteGHalfSandwich_moveStepMidFamily
           leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.2.1).outcome ogs.2.2.1) *
           rightTensor (ι₁ := ι)
-            (gHatHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2)
+            (gHatReverseHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2)
       total :=
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
           leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
@@ -1166,6 +1552,188 @@ private noncomputable def commuteGHalfSandwich_moveSourceFamily
           leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
           leftTensor (ι₂ := ι)
             (gHatHalfProductTotalOperator params family r q.2.2) }
+
+private lemma commuteGHalfSandwich_prefixFirstSliceLeft_move
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (δ : Error)
+    (hAB : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveSourceFamily params family r)
+      (commuteGHalfSandwich_moveFamily params family r)
+      δ) :
+    SDDOpRel ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveStepSourceFamily params family r)
+      (commuteGHalfSandwich_moveStepMidFamily params family r)
+      δ := by
+  have hABfst :
+      SDDOpRel ψbi
+        (uniformDistribution
+          ((SliceQuestion params × SliceQuestion params × PointTuple params r) × SliceQuestion params))
+        (fun q => commuteGHalfSandwich_moveSourceFamily params family r q.1)
+        (fun q => commuteGHalfSandwich_moveFamily params family r q.1)
+        δ :=
+    sddOpRel_uniform_fst ψbi
+      (commuteGHalfSandwich_moveSourceFamily params family r)
+      (commuteGHalfSandwich_moveFamily params family r)
+      δ hAB
+  have hABquad :
+      SDDOpRel ψbi
+        (uniformDistribution
+          (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+        (fun q => commuteGHalfSandwich_moveSourceFamily params family r (q.2.1, q.2.2.1, q.2.2.2))
+        (fun q => commuteGHalfSandwich_moveFamily params family r (q.2.1, q.2.2.1, q.2.2.2))
+        δ :=
+    (sddOpRel_uniform_equiv (firstSliceBackQuestionEquiv params r) ψbi
+      (fun q => commuteGHalfSandwich_moveSourceFamily params family r q.1)
+      (fun q => commuteGHalfSandwich_moveFamily params family r q.1)
+      δ).1 hABfst
+  let C : (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) →
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) → GHatOutcome params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q _ g₁ => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g₁)
+  have hC :
+      ∀ q a,
+        ∑ g₁ : GHatOutcome params, (C q a g₁)ᴴ * C q a g₁ ≤ 1 := by
+    intro q a
+    calc
+      ∑ g₁ : GHatOutcome params, (C q a g₁)ᴴ * C q a g₁
+        = ∑ g₁ : GHatOutcome params,
+            leftTensor (ι₂ := ι)
+              ((((gHatIdxMeas params family q.1).outcome g₁)ᴴ) *
+                (gHatIdxMeas params family q.1).outcome g₁) := by
+                  refine Finset.sum_congr rfl ?_
+                  intro g₁ _
+                  rw [show (leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g₁))ᴴ =
+                      leftTensor (ι₂ := ι) (((gHatIdxMeas params family q.1).outcome g₁)ᴴ) by
+                    simpa [leftTensor, opTensor] using
+                      (conjTranspose_opTensor ((gHatIdxMeas params family q.1).outcome g₁)
+                        (1 : MIPStarRE.Quantum.Op ι))]
+                  simp [C, leftTensor_mul_leftTensor]
+      _ = leftTensor (ι₂ := ι)
+            (∑ g₁ : GHatOutcome params,
+              (((gHatIdxMeas params family q.1).outcome g₁)ᴴ) *
+                (gHatIdxMeas params family q.1).outcome g₁) := by
+                  rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ]
+      _ ≤ 1 := by
+            have hinner :
+                ∑ g₁ : GHatOutcome params,
+                    (((gHatIdxMeas params family q.1).outcome g₁)ᴴ) *
+                      (gHatIdxMeas params family q.1).outcome g₁ ≤ 1 :=
+              CommutativityPoints.subMeas_sum_adjoint_mul_le_one
+                ((gHatIdxMeas params family q.1).toSubMeas)
+            exact leftTensor_le_one (ι₂ := ι) (A := _ ) hinner
+  let rawSource : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r)
+      ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params)
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun ag => C q ag.1 ag.2 *
+          (commuteGHalfSandwich_moveSourceFamily params family r (q.2.1, q.2.2.1, q.2.2.2)).outcome ag.1
+        total := ∑ ag : (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params,
+          C q ag.1 ag.2 *
+            (commuteGHalfSandwich_moveSourceFamily params family r (q.2.1, q.2.2.1, q.2.2.2)).outcome ag.1 }
+  let rawTarget : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r)
+      ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params)
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun ag => C q ag.1 ag.2 *
+          (commuteGHalfSandwich_moveFamily params family r (q.2.1, q.2.2.1, q.2.2.2)).outcome ag.1
+        total := ∑ ag : (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params,
+          C q ag.1 ag.2 *
+            (commuteGHalfSandwich_moveFamily params family r (q.2.1, q.2.2.1, q.2.2.2)).outcome ag.1 }
+  have hcab :=
+    Preliminaries.cabApproxDelta_raw ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (fun q => commuteGHalfSandwich_moveSourceFamily params family r (q.2.1, q.2.2.1, q.2.2.2))
+      (fun q => commuteGHalfSandwich_moveFamily params family r (q.2.1, q.2.2.1, q.2.2.2))
+      C δ hABquad hC
+  have hreindex := CommutativityPoints.sddOpRel_reindex (firstSliceBackOutcomeEquiv params r)
+    ψbi
+    (uniformDistribution
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+    rawSource rawTarget δ hcab
+  let reindexedSource : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun a' => (rawSource q).outcome ((firstSliceBackOutcomeEquiv params r).symm a')
+        total := (rawSource q).total }
+  let reindexedTarget : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun a' => (rawTarget q).outcome ((firstSliceBackOutcomeEquiv params r).symm a')
+        total := (rawTarget q).total }
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+    reindexedSource reindexedTarget
+    (commuteGHalfSandwich_moveStepSourceFamily params family r)
+    (commuteGHalfSandwich_moveStepMidFamily params family r)
+    δ
+    (fun q ogs => by
+      let A := (gHatIdxMeas params family q.1).outcome ogs.1
+      let B := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+      let G := (gHatIdxMeas params family q.2.2.1).outcome ogs.2.2.1
+      let T := gHatReverseHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2
+      calc
+        (reindexedSource q).outcome ogs
+          = leftTensor (ι₂ := ι) A *
+              (leftTensor (ι₂ := ι) ((B * G) * gHatHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2)) := by
+                simp [reindexedSource, rawSource, firstSliceBackOutcomeEquiv, C,
+                  commuteGHalfSandwich_moveSourceFamily, A, B, G,
+                  leftTensor_mul_leftTensor, mul_assoc]
+        _ = (commuteGHalfSandwich_moveStepSourceFamily params family r q).outcome ogs := by
+              simp [commuteGHalfSandwich_moveStepSourceFamily, A, B, G,
+                gHatHalfProductOutcomeOperator, mul_assoc, leftTensor_mul_leftTensor]
+    )
+    (fun q ogs => by
+      let A := (gHatIdxMeas params family q.1).outcome ogs.1
+      let B := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+      let G := (gHatIdxMeas params family q.2.2.1).outcome ogs.2.2.1
+      let T := gHatReverseHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2
+      calc
+        (reindexedTarget q).outcome ogs
+          = leftTensor (ι₂ := ι) A * (leftTensor (ι₂ := ι) B * (leftTensor (ι₂ := ι) G * rightTensor (ι₁ := ι) T)) := by
+                simp [reindexedTarget, rawTarget, firstSliceBackOutcomeEquiv, C,
+                  commuteGHalfSandwich_moveFamily, A, B, G, T, mul_assoc]
+        _ = (commuteGHalfSandwich_moveStepMidFamily params family r q).outcome ogs := by
+              calc
+                leftTensor (ι₂ := ι) A *
+                    (leftTensor (ι₂ := ι) B *
+                      (leftTensor (ι₂ := ι) G * rightTensor (ι₁ := ι) T))
+                  = (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B * leftTensor (ι₂ := ι) G) *
+                      rightTensor (ι₁ := ι) T := by
+                        simp [mul_assoc]
+                _ = (leftTensor (ι₂ := ι) (A * B) * leftTensor (ι₂ := ι) G) * rightTensor (ι₁ := ι) T := by
+                      rw [leftTensor_mul_leftTensor]
+                _ = leftTensor (ι₂ := ι) ((A * B) * G) * rightTensor (ι₁ := ι) T := by
+                      rw [leftTensor_mul_leftTensor]
+                _ = leftTensor (ι₂ := ι) (A * (B * G)) * rightTensor (ι₁ := ι) T := by
+                      simp [mul_assoc]
+                _ = (commuteGHalfSandwich_moveStepMidFamily params family r q).outcome ogs := by
+                      symm
+                      calc
+                        (commuteGHalfSandwich_moveStepMidFamily params family r q).outcome ogs
+                          = (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B * leftTensor (ι₂ := ι) G) *
+                              rightTensor (ι₁ := ι) T := by
+                                simp [commuteGHalfSandwich_moveStepMidFamily, A, B, G, T, mul_assoc]
+                        _ = (leftTensor (ι₂ := ι) (A * B) * leftTensor (ι₂ := ι) G) * rightTensor (ι₁ := ι) T := by
+                              rw [leftTensor_mul_leftTensor]
+                        _ = leftTensor (ι₂ := ι) ((A * B) * G) * rightTensor (ι₁ := ι) T := by
+                              rw [leftTensor_mul_leftTensor]
+                        _ = leftTensor (ι₂ := ι) (A * (B * G)) * rightTensor (ι₁ := ι) T := by
+                              simp [mul_assoc]
+    )
+    hreindex
 
 private lemma commuteGHalfSandwich_moveSource_eq_split
     (params : Parameters) [FieldModel params.q]
@@ -1211,7 +1779,8 @@ private lemma commuteGHalfSandwich_move_recursive_zero
       0 := by
   refine ⟨?_⟩
   unfold sddErrorOp qSDDOp qSDDCore commuteGHalfSandwich_moveSourceFamily commuteGHalfSandwich_moveFamily
-  simp [gHatHalfProductOutcomeOperator, leftTensor_mul_leftTensor,
+  simp [gHatHalfProductOutcomeOperator, gHatReverseHalfProductOutcomeOperator,
+    leftTensor_mul_leftTensor,
     leftTensor_mul_rightTensor_eq_opTensor]
   have hzero :
       avgOver (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params 0))
@@ -1262,6 +1831,1359 @@ private def splitOutcomeEquivOne (params : Parameters) [FieldModel params.q] :
     rcases og with ⟨g₁, g₂⟩
     simpa using congrArg (fun hs => (g₁, hs)) ((gHatTupleOutcomeOneEquiv params).right_inv g₂)
 
+private lemma commuteGHalfSandwich_split_one_iff
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (δ : Error) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × PointTuple params 1))
+      (headTailOrderedFamily params family 1)
+      (headTailRotatedFamily params family 1)
+      δ ↔
+    SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      δ := by
+  constructor
+  · intro h
+    have hq :=
+      (sddOpRel_uniform_equiv (splitQuestionEquivOne params) ψbi
+        (headTailOrderedFamily params family 1)
+        (headTailRotatedFamily params family 1) δ).1 h
+    have ho := CommutativityPoints.sddOpRel_reindex (splitOutcomeEquivOne params)
+      ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (fun q => headTailOrderedFamily params family 1 ((splitQuestionEquivOne params).symm q))
+      (fun q => headTailRotatedFamily params family 1 ((splitQuestionEquivOne params).symm q))
+      δ hq
+    exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      _ _
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      δ
+      (fun q og => by
+        rcases og with ⟨g₁, g₂⟩
+        simp [gHatPairProductLeft, headTailOrderedFamily,
+          splitQuestionEquivOne, splitOutcomeEquivOne, pointTupleOneEquiv,
+          gHatTupleOutcomeOneEquiv, gHatHalfProductOutcomeOperator,
+          orderedProductOpFamily, OpFamily.leftPlacedOpFamily,
+          leftTensor_mul_leftTensor, mul_assoc])
+      (fun q og => by
+        rcases og with ⟨g₁, g₂⟩
+        simp [gHatPairProductRight, headTailRotatedFamily,
+          splitQuestionEquivOne, splitOutcomeEquivOne, pointTupleOneEquiv,
+          gHatTupleOutcomeOneEquiv, gHatHalfProductOutcomeOperator,
+          gHatRotatedHalfProductOutcomeOperator, reversedProductOpFamily,
+          OpFamily.leftPlacedOpFamily, leftTensor_mul_leftTensor, mul_assoc])
+      ho
+  · intro h
+    have ho := CommutativityPoints.sddOpRel_reindex (splitOutcomeEquivOne params).symm
+      ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      δ h
+    have hq := CommutativityPoints.sddOpRel_congr_outcome ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      _ _
+      (fun q => headTailOrderedFamily params family 1 ((splitQuestionEquivOne params).symm q))
+      (fun q => headTailRotatedFamily params family 1 ((splitQuestionEquivOne params).symm q))
+      δ
+      (fun q og => by
+        rcases og with ⟨g₁, g₂⟩
+        simp [gHatPairProductLeft, headTailOrderedFamily,
+          splitQuestionEquivOne, splitOutcomeEquivOne, pointTupleOneEquiv,
+          gHatTupleOutcomeOneEquiv, gHatHalfProductOutcomeOperator,
+          orderedProductOpFamily, OpFamily.leftPlacedOpFamily,
+          leftTensor_mul_leftTensor, mul_assoc])
+      (fun q og => by
+        rcases og with ⟨g₁, g₂⟩
+        simp [gHatPairProductRight, headTailRotatedFamily,
+          splitQuestionEquivOne, splitOutcomeEquivOne, pointTupleOneEquiv,
+          gHatTupleOutcomeOneEquiv, gHatHalfProductOutcomeOperator,
+          gHatRotatedHalfProductOutcomeOperator, reversedProductOpFamily,
+          OpFamily.leftPlacedOpFamily, leftTensor_mul_leftTensor, mul_assoc])
+      ho
+    exact (sddOpRel_uniform_equiv (splitQuestionEquivOne params) ψbi
+      (headTailOrderedFamily params family 1)
+      (headTailRotatedFamily params family 1) δ).2 hq
+
+private lemma commuteGHalfSandwich_core_two
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (PointTuple params 2))
+      (gHatHalfSandwichLeft params family 2)
+      (gHatHalfSandwichRight params family 2)
+      (commuteGHalfSandwichError params gamma zeta 2) := by
+  have hsplit : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × PointTuple params 1))
+      (headTailOrderedFamily params family 1)
+      (headTailRotatedFamily params family 1)
+      (gHatCommutationError params gamma zeta) :=
+    (commuteGHalfSandwich_split_one_iff params ψbi family (gHatCommutationError params gamma zeta)).2 hcom
+  have hpoint : SDDOpRel ψbi
+      (uniformDistribution (PointTuple params 2))
+      (gHatHalfSandwichLeft params family 2)
+      (gHatHalfSandwichRight params family 2)
+      (gHatCommutationError params gamma zeta) :=
+    (commuteGHalfSandwich_split_iff params ψbi family 1 (gHatCommutationError params gamma zeta)).2 hsplit
+  rcases hcom with ⟨hν3⟩
+  have hν3_nonneg : 0 ≤ gHatCommutationError params gamma zeta := by
+    exact le_trans
+      (avgOver_nonneg (uniformDistribution (SlicePairQuestion params))
+        (fun q => qSDDOp ψbi (gHatPairProductLeft params family q) (gHatPairProductRight params family q))
+        (fun q => Preliminaries.qSDDOp_nonneg ψbi _ _))
+      hν3
+  have hS_nonneg :
+      0 ≤ Real.rpow gamma (1 / (16 : Error)) +
+            Real.rpow zeta (1 / (16 : Error)) +
+            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
+    unfold gHatCommutationError at hν3_nonneg
+    have hm : 0 < (params.m : Error) := by exact_mod_cast params.hm
+    have hm_pos : 0 < (138 : Error) * (params.m : Error) := by positivity
+    nlinarith
+  have hbound :
+      gHatCommutationError params gamma zeta ≤ commuteGHalfSandwichError params gamma zeta 2 := by
+    let S : Error :=
+      Real.rpow gamma (1 / (16 : Error)) +
+        Real.rpow zeta (1 / (16 : Error)) +
+        Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
+    have : 138 * (params.m : Error) * S ≤ 426 * ((2 : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by
+      have hm_nonneg : 0 ≤ (params.m : Error) := by positivity
+      have hS' : 0 ≤ S := by simpa [S] using hS_nonneg
+      nlinarith
+    simpa [gHatCommutationError, commuteGHalfSandwichError, S] using this
+  exact Preliminaries.sddOpRel_mono ψbi
+    (uniformDistribution (PointTuple params 2))
+    (gHatHalfSandwichLeft params family 2)
+    (gHatHalfSandwichRight params family 2)
+    (gHatCommutationError params gamma zeta)
+    (commuteGHalfSandwichError params gamma zeta 2)
+    hpoint hbound
+
+private def thirdSliceFrontOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
+    (GHatOutcome params × ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r)) ≃
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
+  toFun og := (og.2.1.1, og.2.1.2, og.1, og.2.2)
+  invFun og := (og.2.2.1, ((og.1, og.2.1), og.2.2.2))
+  left_inv og := by
+    rcases og with ⟨g₃, ⟨⟨g₁, g₂⟩, gs⟩⟩
+    rfl
+  right_inv og := by
+    rcases og with ⟨g₁, g₂, g₃, gs⟩
+    rfl
+
+private lemma gHatPairPrefix_sum_adjoint_mul_le_one
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (q : SlicePairQuestion params) :
+    ∑ og : GHatOutcome params × GHatOutcome params,
+        ((((gHatIdxMeas params family q.1).outcome og.1) *
+            ((gHatIdxMeas params family q.2).outcome og.2))ᴴ) *
+          (((gHatIdxMeas params family q.1).outcome og.1) *
+            ((gHatIdxMeas params family q.2).outcome og.2)) ≤ 1 := by
+  let xs : PointTuple params 2 := Fin.cons q.1 (fun _ => q.2)
+  have hsum := gHatHalfProduct_sum_adjoint_mul_le_one params family 2 xs
+  have hEq :
+      (∑ gs : GHatTupleOutcome params 2,
+          (gHatHalfProductOutcomeOperator params family 2 xs gs)ᴴ *
+            gHatHalfProductOutcomeOperator params family 2 xs gs) =
+        ∑ og : GHatOutcome params × GHatOutcome params,
+          ((((gHatIdxMeas params family q.1).outcome og.1) *
+              ((gHatIdxMeas params family q.2).outcome og.2))ᴴ) *
+            (((gHatIdxMeas params family q.1).outcome og.1) *
+              ((gHatIdxMeas params family q.2).outcome og.2)) := by
+    exact Fintype.sum_equiv
+      ((gHatTupleOutcomeConsEquiv' params 1).trans (splitOutcomeEquivOne params))
+      (fun gs : GHatTupleOutcome params 2 =>
+        (gHatHalfProductOutcomeOperator params family 2 xs gs)ᴴ *
+          gHatHalfProductOutcomeOperator params family 2 xs gs)
+      (fun og : GHatOutcome params × GHatOutcome params =>
+        ((((gHatIdxMeas params family q.1).outcome og.1) *
+            ((gHatIdxMeas params family q.2).outcome og.2))ᴴ) *
+          (((gHatIdxMeas params family q.1).outcome og.1) *
+            ((gHatIdxMeas params family q.2).outcome og.2)))
+      (by
+        intro gs
+        simp [xs, gHatHalfProductOutcomeOperator, splitOutcomeEquivOne,
+          gHatTupleOutcomeOneEquiv, pointTupleTail, gHatTupleOutcomeTail,
+          gHatTupleOutcomeConsEquiv'])
+  rw [hEq] at hsum
+  exact hsum
+
+private lemma commuteGHalfSandwich_moveStepMid_toTarget
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error) (r : ℕ)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveStepMidFamily params family r)
+      (commuteGHalfSandwich_moveStepTargetFamily params family r)
+      (gHatSelfConsistencyError zeta) := by
+  let Q := SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r
+  let Aop : IdxOpFamily Q (GHatOutcome params) (ι × ι) :=
+    fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family)) q.2.2.1
+  let Bop : IdxOpFamily Q (GHatOutcome params) (ι × ι) :=
+    fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family)) q.2.2.1
+  let C : Q → GHatOutcome params → ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r) →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q _ ag =>
+      leftTensor (ι₂ := ι)
+          (((gHatIdxMeas params family q.1).outcome ag.1.1) *
+            ((gHatIdxMeas params family q.2.1).outcome ag.1.2)) *
+        rightTensor (ι₁ := ι)
+          (gHatReverseHalfProductOutcomeOperator params family r q.2.2.2 ag.2)
+  have hAB :
+      SDDOpRel ψbi
+        (uniformDistribution Q)
+        Aop Bop
+        (gHatSelfConsistencyError zeta) :=
+    gHatSelfConsistency_sddOpRel_quadThird params ψbi family zeta r hsc
+  have hC :
+      ∀ q a,
+        ∑ ag : ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r),
+            (C q a ag)ᴴ * C q a ag ≤ 1 := by
+    intro q a
+    let pairProd : GHatOutcome params × GHatOutcome params → MIPStarRE.Quantum.Op ι :=
+      fun og => ((gHatIdxMeas params family q.1).outcome og.1) *
+        ((gHatIdxMeas params family q.2.1).outcome og.2)
+    let pairTerm : GHatOutcome params × GHatOutcome params → MIPStarRE.Quantum.Op ι :=
+      fun og => (pairProd og)ᴴ * pairProd og
+    let tailOp : GHatTupleOutcome params r → MIPStarRE.Quantum.Op ι :=
+      fun gs => gHatReverseHalfProductOutcomeOperator params family r q.2.2.2 gs
+    let tailTerm : GHatTupleOutcome params r → MIPStarRE.Quantum.Op ι :=
+      fun gs => (tailOp gs)ᴴ * tailOp gs
+    have hpair : ∑ og : GHatOutcome params × GHatOutcome params, pairTerm og ≤ 1 := by
+      simpa [pairProd, pairTerm] using
+        gHatPairPrefix_sum_adjoint_mul_le_one params family (q.1, q.2.1)
+    have htail : ∑ gs : GHatTupleOutcome params r, tailTerm gs ≤ 1 := by
+      simpa [tailOp, tailTerm] using
+        gHatReverseHalfProduct_sum_adjoint_mul_le_one params family r q.2.2.2
+    calc
+      ∑ ag : ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r),
+          (C q a ag)ᴴ * C q a ag
+        = ∑ og : GHatOutcome params × GHatOutcome params,
+            ∑ gs : GHatTupleOutcome params r,
+              leftTensor (ι₂ := ι) (pairTerm og) * rightTensor (ι₁ := ι) (tailTerm gs) := by
+                rw [← Finset.univ_product_univ, Finset.sum_product]
+                refine Finset.sum_congr rfl ?_
+                intro og _
+                refine Finset.sum_congr rfl ?_
+                intro gs _
+                have hmul :
+                    leftTensor (ι₂ := ι) (pairProd og) * rightTensor (ι₁ := ι) (tailOp gs) =
+                      opTensor (pairProd og) (tailOp gs) := by
+                  rw [leftTensor_mul_rightTensor_eq_opTensor]
+                have hCeq : C q a (og, gs) = opTensor (pairProd og) (tailOp gs) := by
+                  simpa [C] using hmul
+                calc
+                  (C q a (og, gs))ᴴ * C q a (og, gs)
+                    = (opTensor (pairProd og) (tailOp gs))ᴴ * opTensor (pairProd og) (tailOp gs) := by
+                        rw [hCeq]
+                  _ = opTensor ((pairProd og)ᴴ) ((tailOp gs)ᴴ) * opTensor (pairProd og) (tailOp gs) := by
+                        rw [conjTranspose_opTensor]
+                  _ = leftTensor (ι₂ := ι) (pairTerm og) * rightTensor (ι₁ := ι) (tailTerm gs) := by
+                        simp [pairTerm, tailTerm, opTensor_mul, leftTensor_mul_rightTensor_eq_opTensor]
+      _ = ∑ og : GHatOutcome params × GHatOutcome params,
+            leftTensor (ι₂ := ι) (pairTerm og) *
+              rightTensor (ι₁ := ι) (∑ gs : GHatTupleOutcome params r, tailTerm gs) := by
+                refine Finset.sum_congr rfl ?_
+                intro og _
+                rw [← rightTensor_finset_sum (ι₁ := ι) Finset.univ tailTerm, ← Finset.mul_sum]
+      _ ≤ ∑ og : GHatOutcome params × GHatOutcome params, leftTensor (ι₂ := ι) (pairTerm og) := by
+            refine Finset.sum_le_sum ?_
+            intro og _
+            have hpair_nonneg : 0 ≤ pairTerm og := by
+              change 0 ≤ star (pairProd og) * pairProd og
+              exact (CStarAlgebra.nonneg_iff_eq_star_mul_self).2 ⟨pairProd og, rfl⟩
+            calc
+              leftTensor (ι₂ := ι) (pairTerm og) *
+                  rightTensor (ι₁ := ι) (∑ gs : GHatTupleOutcome params r, tailTerm gs)
+                = opTensor (pairTerm og) (∑ gs : GHatTupleOutcome params r, tailTerm gs) := by
+                    rw [leftTensor_mul_rightTensor_eq_opTensor]
+              _ ≤ leftTensor (ι₂ := ι) (pairTerm og) := by
+                    exact opTensor_le_leftTensor hpair_nonneg htail
+      _ = leftTensor (ι₂ := ι)
+            (∑ og : GHatOutcome params × GHatOutcome params, pairTerm og) := by
+              rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ pairTerm]
+      _ ≤ 1 := by
+            exact leftTensor_le_one (ι₂ := ι) (A := _) hpair
+  let rawSource : IdxOpFamily Q
+      (GHatOutcome params × ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r))
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun ag => C q ag.1 ag.2 * (Aop q).outcome ag.1
+        total := ∑ ag : GHatOutcome params × ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r),
+          C q ag.1 ag.2 * (Aop q).outcome ag.1 }
+  let rawTarget : IdxOpFamily Q
+      (GHatOutcome params × ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r))
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun ag => C q ag.1 ag.2 * (Bop q).outcome ag.1
+        total := ∑ ag : GHatOutcome params × ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r),
+          C q ag.1 ag.2 * (Bop q).outcome ag.1 }
+  have hcab :=
+    Preliminaries.cabApproxDelta_raw ψbi
+      (uniformDistribution Q) Aop Bop C (gHatSelfConsistencyError zeta) hAB hC
+  have hreindex := CommutativityPoints.sddOpRel_reindex (thirdSliceFrontOutcomeEquiv params r)
+    ψbi (uniformDistribution Q) rawSource rawTarget (gHatSelfConsistencyError zeta) hcab
+  let reindexedSource : IdxOpFamily Q
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun a' => (rawSource q).outcome ((thirdSliceFrontOutcomeEquiv params r).symm a')
+        total := (rawSource q).total }
+  let reindexedTarget : IdxOpFamily Q
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun a' => (rawTarget q).outcome ((thirdSliceFrontOutcomeEquiv params r).symm a')
+        total := (rawTarget q).total }
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution Q)
+    reindexedSource reindexedTarget
+    (commuteGHalfSandwich_moveStepMidFamily params family r)
+    (commuteGHalfSandwich_moveStepTargetFamily params family r)
+    (gHatSelfConsistencyError zeta)
+    (fun q ogs => by
+      let A := (gHatIdxMeas params family q.1).outcome ogs.1
+      let B := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+      let G := (gHatIdxMeas params family q.2.2.1).outcome ogs.2.2.1
+      let T := gHatReverseHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2
+      have hAop : (Aop q).outcome ogs.2.2.1 = leftTensor (ι₂ := ι) G := by
+        rfl
+      have hcomm : rightTensor (ι₁ := ι) T * leftTensor (ι₂ := ι) G =
+          leftTensor (ι₂ := ι) G * rightTensor (ι₁ := ι) T := by
+        rw [rightTensor_mul_leftTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
+      calc
+        (reindexedSource q).outcome ogs
+          = leftTensor (ι₂ := ι) (A * B) * (rightTensor (ι₁ := ι) T * (Aop q).outcome ogs.2.2.1) := by
+              simp [reindexedSource, rawSource, thirdSliceFrontOutcomeEquiv, C, A, B, T, mul_assoc]
+        _ = leftTensor (ι₂ := ι) (A * B) * (rightTensor (ι₁ := ι) T * leftTensor (ι₂ := ι) G) := by
+              rw [hAop]
+        _ = leftTensor (ι₂ := ι) (A * B) * (leftTensor (ι₂ := ι) G * rightTensor (ι₁ := ι) T) := by
+              rw [hcomm]
+        _ = (commuteGHalfSandwich_moveStepMidFamily params family r q).outcome ogs := by
+              calc
+                leftTensor (ι₂ := ι) (A * B) * (leftTensor (ι₂ := ι) G * rightTensor (ι₁ := ι) T)
+                  = (leftTensor (ι₂ := ι) (A * B) * leftTensor (ι₂ := ι) G) * rightTensor (ι₁ := ι) T := by
+                      simp [mul_assoc]
+                _ = leftTensor (ι₂ := ι) ((A * B) * G) * rightTensor (ι₁ := ι) T := by
+                      rw [leftTensor_mul_leftTensor]
+                _ = leftTensor (ι₂ := ι) (A * (B * G)) * rightTensor (ι₁ := ι) T := by
+                      simp [mul_assoc]
+                _ = (commuteGHalfSandwich_moveStepMidFamily params family r q).outcome ogs := by
+                      simp [commuteGHalfSandwich_moveStepMidFamily, A, B, G, T,
+                        leftTensor_mul_leftTensor, mul_assoc]
+    )
+    (fun q ogs => by
+      let A := (gHatIdxMeas params family q.1).outcome ogs.1
+      let B := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+      let G := (gHatIdxMeas params family q.2.2.1).outcome ogs.2.2.1
+      let T := gHatReverseHalfProductOutcomeOperator params family r q.2.2.2 ogs.2.2.2
+      have hBop : (Bop q).outcome ogs.2.2.1 = rightTensor (ι₁ := ι) G := by
+        rfl
+      calc
+        (reindexedTarget q).outcome ogs
+          = leftTensor (ι₂ := ι) (A * B) *
+              (rightTensor (ι₁ := ι) T * (Bop q).outcome ogs.2.2.1) := by
+                simp [reindexedTarget, rawTarget, thirdSliceFrontOutcomeEquiv, C, A, B, T, mul_assoc]
+        _ = leftTensor (ι₂ := ι) (A * B) *
+              (rightTensor (ι₁ := ι) T * rightTensor (ι₁ := ι) G) := by
+                rw [hBop]
+        _ = (commuteGHalfSandwich_moveStepTargetFamily params family r q).outcome ogs := by
+              symm
+              calc
+                (commuteGHalfSandwich_moveStepTargetFamily params family r q).outcome ogs
+                  = leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B *
+                      (rightTensor (ι₁ := ι) T * rightTensor (ι₁ := ι) G) := by
+                        simp [commuteGHalfSandwich_moveStepTargetFamily, A, B, G, T, mul_assoc]
+                _ = leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) (T * G) := by
+                      rw [rightTensor_mul_rightTensor]
+                _ = leftTensor (ι₂ := ι) (A * B) * rightTensor (ι₁ := ι) (T * G) := by
+                      rw [leftTensor_mul_leftTensor]
+                _ = leftTensor (ι₂ := ι) (A * B) *
+                      (rightTensor (ι₁ := ι) T * rightTensor (ι₁ := ι) G) := by
+                        rw [rightTensor_mul_rightTensor]
+    )
+    hreindex
+
+private lemma axisLinePolynomial_ne_gives_support_eval_ne
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (σ : Finset (Fin k))
+    (hσcard : σ.card = params.d + 1)
+    {f g : AxisLinePolynomial params.next}
+    (hne : f ≠ g) :
+    ∃ i : Fin k, i ∈ σ ∧ f (xs i) ≠ g (xs i) := by
+  classical
+  by_contra hcontra
+  push_neg at hcontra
+  let s : Finset (Scalar params.next) := σ.image (fun i => decodeScalar (xs i))
+  have hs_card : s.card = params.d + 1 := by
+    rw [Finset.card_image_of_injective]
+    · exact hσcard
+    · exact fun i j hij => hxs (by simpa using congrArg encodeScalar hij)
+  have hs_eval : ∀ y ∈ s, _root_.Polynomial.eval y f.poly = _root_.Polynomial.eval y g.poly := by
+    intro y hy
+    rcases Finset.mem_image.mp hy with ⟨i, hiσ, rfl⟩
+    have hfg : f (xs i) = g (xs i) := hcontra i hiσ
+    exact by
+      simpa [AxisLinePolynomial.toFun, evalLinePolynomialModel] using congrArg decodeScalar hfg
+  have hdeg_f : f.poly.natDegree ≤ params.d := f.degreeBounded
+  have hdeg_g : g.poly.natDegree ≤ params.d := g.degreeBounded
+  have hcard : max f.poly.natDegree g.poly.natDegree < s.card := by
+    rw [hs_card]
+    have hmax_le : max f.poly.natDegree g.poly.natDegree ≤ params.d := by
+      exact max_le hdeg_f hdeg_g
+    omega
+  have hpoly : f.poly = g.poly := by
+    exact _root_.Polynomial.eq_of_natDegree_lt_card_of_eval_eq' f.poly g.poly s hs_eval hcard
+  apply hne
+  cases f
+  cases g
+  cases hpoly
+  rfl
+
+private lemma exists_onePoint_family_witness_of_eval_mismatch
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k)
+    {f : AxisLinePolynomial params.next}
+    (hmismatch :
+      ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)) :
+    ∃ i : Fin k,
+      Option.map (fun g : Polynomial params => g u) (gs i) ≠ some (f (xs i)) := by
+  classical
+  rcases hmismatch with ⟨i, hiSome, hiNe⟩
+  refine ⟨i, ?_⟩
+  cases hgi : gs i with
+  | none =>
+      simp [Option.isSome, hgi] at hiSome
+  | some g =>
+      simp [hgi] at hiSome
+      simpa [hgi] using hiNe
+
+private lemma nonglobal_gives_slice_mismatch_against_interpolant
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k)
+    (hNGlobal : ¬ IsGloballyConsistent params xs gs) :
+    ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+      Polynomial.restrictAtHeight params
+        (interpolateCompletedSlices params k xs gs) (xs i) ≠
+      (gs i).get hiSome := by
+  classical
+  let hStar := interpolateCompletedSlices params k xs gs
+  by_contra hcontra
+  push_neg at hcontra
+  apply hNGlobal
+  refine ⟨hStar, ?_⟩
+  intro i hiSome
+  exact congrArg Polynomial.poly (hcontra i hiSome)
+
+/- private lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (σ : Finset (Fin k))
+    (hσsubset : σ ⊆ gHatTupleSupport gs)
+    (hσcard : σ.card = params.d + 1)
+    {i : Fin k} (hi : i ∈ σ) :
+    MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+      (interpolateCompletedSlicesFromSupport params xs gs σ hσcard).poly =
+      ((gs i).get (by simpa [gHatTupleSupport] using hσsubset hi)).poly := by
+  let v : Fin k → Scalar params.next := fun j => decodeScalar (xs j)
+  have hgi : (gs i).isSome = true := by
+    simpa [gHatTupleSupport] using hσsubset hi
+  have hvinj : Set.InjOn v (↑σ : Set (Fin k)) := by
+    intro a ha b hb hab
+    apply hxs
+    simpa [v] using congrArg encodeScalar hab
+  have hcomp :
+      ((MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+        MvPolynomial.C) = MvPolynomial.C := by
+    ext r
+    simp
+  have hx :
+      MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.X (lastCoord params)) =
+        MvPolynomial.C (decodeScalar (xs i)) := by
+    simp [Polynomial.restrictAtHeightCoordinateMap, lastCoord]
+  have hx' :
+      Polynomial.restrictAtHeightCoordinateMap params (xs i) (lastCoord params) =
+        MvPolynomial.C (decodeScalar (xs i)) := by
+    simp [Polynomial.restrictAtHeightCoordinateMap, lastCoord]
+  unfold interpolateCompletedSlicesFromSupport
+  rw [map_sum]
+  rw [Finset.sum_eq_single i]
+  · simp_rw [map_mul]
+    have hslice :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs i))) =
+          extractSliceOr0 (gs i) := by
+            rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
+            have hmap :
+                Polynomial.restrictAtHeightCoordinateMap params (xs i) ∘ embedCoord params =
+                  MvPolynomial.X := by
+              funext j
+              simp [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord]
+            rw [hmap, MvPolynomial.bind₁_X_left]
+            rfl
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))) = 1 := by
+            calc
+              MvPolynomial.eval₂Hom MvPolynomial.C
+                  (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+                  (_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+                    (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))
+                  = _root_.Polynomial.eval₂
+                      (((MvPolynomial.eval₂Hom MvPolynomial.C
+                          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                        MvPolynomial.C))
+                      (MvPolynomial.eval₂Hom MvPolynomial.C
+                        (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+                        (MvPolynomial.X (lastCoord params)))
+                      (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i) := by
+                        simpa using (_root_.Polynomial.hom_eval₂
+                          (p := Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i)
+                          (f := MvPolynomial.C)
+                          (g := MvPolynomial.eval₂Hom MvPolynomial.C
+                            (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+                          (x := MvPolynomial.X (lastCoord params)))
+              _ = _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.C (decodeScalar (xs i)))
+                    (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i) := by
+                      calc
+                        _root_.Polynomial.eval₂
+                            ((MvPolynomial.eval₂Hom MvPolynomial.C
+                                (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                              MvPolynomial.C)
+                            ((MvPolynomial.eval₂Hom MvPolynomial.C
+                                (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+                              (MvPolynomial.X (lastCoord params)))
+                            (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i)
+                            = _root_.Polynomial.eval₂
+                                ((MvPolynomial.eval₂Hom MvPolynomial.C
+                                    (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                                  MvPolynomial.C)
+                                (MvPolynomial.C (decodeScalar (xs i)))
+                                (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i) := by
+                                  simpa using congrArg
+                                    (fun x =>
+                                      _root_.Polynomial.eval₂
+                                        ((MvPolynomial.eval₂Hom MvPolynomial.C
+                                            (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                                          MvPolynomial.C)
+                                        x (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))
+                                    hx
+                        _ = _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.C (decodeScalar (xs i)))
+                              (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i) := by
+                                simpa [MvPolynomial.eval₂Hom] using congrArg
+                                  (fun F =>
+                                    _root_.Polynomial.eval₂ F (MvPolynomial.C (decodeScalar (xs i)))
+                                      (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))
+                                  hcomp
+              _ = 1 := by
+                    rw [_root_.Polynomial.eval₂_at_apply]
+                    simpa using congrArg
+                      (fun x : Scalar params => (MvPolynomial.C x : PolynomialModel params))
+                      (Lagrange.eval_basis_self hvinj hi)
+    have hextract {o : GHatOutcome params} (ho : o.isSome = true) :
+        extractSliceOr0 o = (o.get ho).poly := by
+      cases o with
+      | none => simp at ho
+      | some p => simp [extractSliceOr0]
+    rw [hLi, hslice, hextract hgi]
+    simp
+  · intro j hj hji
+    simp_rw [map_mul]
+    have hslice :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) =
+          extractSliceOr0 (gs j) := by
+            rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
+            have hmap :
+                Polynomial.restrictAtHeightCoordinateMap params (xs i) ∘ embedCoord params =
+                  MvPolynomial.X := by
+              funext m
+              simp [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord]
+            rw [hmap, MvPolynomial.bind₁_X_left]
+            rfl
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j))) = 0 := by
+            calc
+              MvPolynomial.eval₂Hom MvPolynomial.C
+                  (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+                  (_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+                    (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j))
+                  = _root_.Polynomial.eval₂
+                      (((MvPolynomial.eval₂Hom MvPolynomial.C
+                          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                        MvPolynomial.C))
+                      (MvPolynomial.eval₂Hom MvPolynomial.C
+                        (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+                        (MvPolynomial.X (lastCoord params)))
+                      (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j) := by
+                        simpa using (_root_.Polynomial.hom_eval₂
+                          (p := Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j)
+                          (f := MvPolynomial.C)
+                          (g := MvPolynomial.eval₂Hom MvPolynomial.C
+                            (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+                          (x := MvPolynomial.X (lastCoord params)))
+              _ = _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.C (decodeScalar (xs i)))
+                    (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j) := by
+                      calc
+                        _root_.Polynomial.eval₂
+                            ((MvPolynomial.eval₂Hom MvPolynomial.C
+                                (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                              MvPolynomial.C)
+                            ((MvPolynomial.eval₂Hom MvPolynomial.C
+                                (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+                              (MvPolynomial.X (lastCoord params)))
+                            (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j)
+                            = _root_.Polynomial.eval₂
+                                ((MvPolynomial.eval₂Hom MvPolynomial.C
+                                    (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                                  MvPolynomial.C)
+                                (MvPolynomial.C (decodeScalar (xs i)))
+                                (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j) := by
+                                  simpa using congrArg
+                                    (fun x =>
+                                      _root_.Polynomial.eval₂
+                                        ((MvPolynomial.eval₂Hom MvPolynomial.C
+                                            (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                                          MvPolynomial.C)
+                                        x (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j))
+                                    hx
+                        _ = _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.C (decodeScalar (xs i)))
+                              (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j) := by
+                                simpa [MvPolynomial.eval₂Hom] using congrArg
+                                  (fun F =>
+                                    _root_.Polynomial.eval₂ F (MvPolynomial.C (decodeScalar (xs i)))
+                                      (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j))
+                                  hcomp
+              _ = 0 := by
+                    have hbasis :
+                        (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j).eval
+                          (decodeScalar (xs i)) = 0 := by
+                      simpa using
+                        (Lagrange.eval_basis_of_ne
+                          (s := σ) (v := fun j : Fin k => decodeScalar (xs j))
+                          (i := j) (j := i) hji hi)
+                    rw [_root_.Polynomial.eval₂_at_apply]
+                    simpa using congrArg
+                      (fun x : Scalar params => (MvPolynomial.C x : PolynomialModel params))
+                      hbasis
+    rw [hLi, hslice]
+    simp
+  · intro hnot
+    exact (hnot hi).elim -/
+
+private lemma not_interpolationEligible_exists_none
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (gs : GHatTupleOutcome params k)
+    (hk : params.d + 1 ≤ k)
+    (hNot : ¬ InterpolationEligible params gs) :
+    ∃ i : Fin k, (gs i).isSome = false := by
+  by_contra hnone
+  push_neg at hnone
+  apply hNot
+  unfold InterpolationEligible gHatTupleHammingWeight gHatTupleSupport
+  have hfull : (Finset.univ.filter fun i : Fin k => (gs i).isSome).card = k := by
+    have hEq : (Finset.univ.filter fun i : Fin k => (gs i).isSome) = Finset.univ := by
+      refine Finset.eq_univ_iff_forall.2 ?_
+      intro i
+      simp [hnone i]
+    simpa [hEq]
+  rw [hfull]
+  exact hk
+
+/- private lemma ldSandwichLineOnePoint_isSome_false_mass_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error)
+    (k i : ℕ) (hi : i < k)
+    (hline : LdSandwichLineOnePointStatement params strategy family eps delta gamma zeta k i) :
+    avgOver (uniformDistribution (SandwichedLineQuestion params k))
+      (fun q =>
+        ev strategy.state <|
+          opTensor
+            ((postprocess (gHatSandwichFamily params family k q.2)
+                (fun gs => Option.isSome (gs ⟨i, hi⟩))).outcome false)
+            ((verticalLineMeasurementFamily params strategy q.1).total))
+      ≤ ldSandwichLineOnePointError params eps delta gamma zeta k := by
+  have hproc :
+      ConsRel strategy.state
+        (uniformDistribution (SandwichedLineQuestion params k))
+        (fun q => postprocess ((ldSandwichLineOnePointLeftFamily params strategy family k i) q) Option.isSome)
+        (fun q => postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome)
+        (ldSandwichLineOnePointError params eps delta gamma zeta k) := by
+    exact Preliminaries.consRelDataProcessing_questionDependent
+      strategy.state
+      (uniformDistribution (SandwichedLineQuestion params k))
+      (ldSandwichLineOnePointLeftFamily params strategy family k i)
+      (ldSandwichLineOnePointRightFamily params strategy family k i)
+      (ldSandwichLineOnePointError params eps delta gamma zeta k)
+      (fun _ => Option.isSome)
+      hline.linePointComparison
+  rcases hproc with ⟨hproc_bound⟩
+  unfold bipartiteConsError at hproc_bound
+  calc
+    avgOver (uniformDistribution (SandwichedLineQuestion params k))
+        (fun q =>
+          ev strategy.state <|
+            opTensor
+              ((postprocess (gHatSandwichFamily params family k q.2)
+                  (fun gs => Option.isSome (gs ⟨i, hi⟩))).outcome false)
+              ((verticalLineMeasurementFamily params strategy q.1).total))
+      = avgOver (uniformDistribution (SandwichedLineQuestion params k))
+          (fun q =>
+            qBipartiteConsDefect strategy.state
+              (postprocess (gHatSandwichFamily params family k q.2)
+                (fun gs => Option.isSome (gs ⟨i, hi⟩)))
+              (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q)
+                Option.isSome)) := by
+              apply avgOver_congr
+              intro q
+              have hleft := ldSandwichLineOnePointLeftFamily_isSome params strategy family k i hi q
+              let B := postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome
+              have hfalse : B.outcome false = 0 := by
+                simp [B, postprocess, ldSandwichLineOnePointRightFamily, hi, Option.isSome]
+              have htrue : B.outcome true = B.total := by
+                have hsum : B.outcome false + B.outcome true = B.total := by
+                  simpa [Bool.forall_bool, add_comm] using B.sum_eq_total
+                nlinarith [hfalse, hsum]
+              rw [← hleft]
+              have hBtotal : B.total = (verticalLineMeasurementFamily params strategy q.1).total := by
+                simp [B, ldSandwichLineOnePointRightFamily, hi, postprocess_total]
+              rw [qBipartiteConsDefect_eq_false_mass_of_bool_right_true strategy.state
+                (postprocess ((ldSandwichLineOnePointLeftFamily params strategy family k i) q) Option.isSome)
+                B hfalse htrue]
+              rw [hBtotal]
+    _ ≤ ldSandwichLineOnePointError params eps delta gamma zeta k := hproc_bound -/
+
+private lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
+    (ψ : QuantumState (ι × ι))
+    (A B : SubMeas Bool ι)
+    (hfalse : B.outcome false = 0)
+    (htrue : B.outcome true = B.total) :
+    qBipartiteConsDefect ψ A B = ev ψ (opTensor (A.outcome false) B.total) := by
+  have hsumA : A.outcome false + A.outcome true = A.total := by
+    simpa [Bool.forall_bool, add_comm] using A.sum_eq_total
+  have hsumB : B.outcome false + B.outcome true = B.total := by
+    simpa [Bool.forall_bool, add_comm] using B.sum_eq_total
+  have hnonneg : 0 ≤ ev ψ (opTensor (A.outcome false) B.total) := by
+    exact ev_nonneg_of_psd ψ _ <| opTensor_nonneg (A.outcome_pos false) B.total_nonneg
+  unfold qBipartiteConsDefect qBipartiteMatchMass
+  simp [Bool.forall_bool]
+  have hexpr :
+      ev ψ (opTensor A.total B.total) -
+          (ev ψ (opTensor (A.outcome true) (B.outcome true)) +
+            ev ψ (opTensor (A.outcome false) (B.outcome false))) =
+        ev ψ (opTensor (A.outcome false) B.total) := by
+    calc
+      ev ψ (opTensor A.total B.total) -
+          (ev ψ (opTensor (A.outcome true) (B.outcome true)) +
+            ev ψ (opTensor (A.outcome false) (B.outcome false)))
+        = ev ψ (opTensor (A.outcome false + A.outcome true) B.total) -
+            (ev ψ (opTensor (A.outcome true) B.total) + ev ψ (opTensor (A.outcome false) 0)) := by
+              rw [hsumA, htrue, hfalse]
+      _ = ev ψ (opTensor (A.outcome false) B.total + opTensor (A.outcome true) B.total) -
+            (ev ψ (opTensor (A.outcome true) B.total) + ev ψ (opTensor (A.outcome false) 0)) := by
+              rw [opTensor_add_left]
+      _ = ev ψ (opTensor (A.outcome false) B.total) := by
+            have hfalse_zero : ev ψ (opTensor (A.outcome false) 0) = 0 := by
+              simp [opTensor, ev]
+            nlinarith [ev_add ψ (opTensor (A.outcome false) B.total) (opTensor (A.outcome true) B.total), hfalse_zero]
+  calc
+    max 0
+        (ev ψ (opTensor A.total B.total) -
+          (ev ψ (opTensor (A.outcome true) (B.outcome true)) +
+            ev ψ (opTensor (A.outcome false) (B.outcome false))))
+      = max 0 (ev ψ (opTensor (A.outcome false) B.total)) := by rw [hexpr]
+    _ = ev ψ (opTensor (A.outcome false) B.total) := by rw [max_eq_right hnonneg]
+
+/- private lemma processed_ldSandwichLineOnePointRightFamily_false_zero
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (k i : ℕ) (hi : i < k)
+    (q : SandwichedLineQuestion params k) :
+    (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).outcome false = 0 := by
+  simp [postprocess, ldSandwichLineOnePointRightFamily, hi, Option.isSome]
+
+private lemma processed_ldSandwichLineOnePointRightFamily_true_eq_total
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (k i : ℕ) (hi : i < k)
+    (q : SandwichedLineQuestion params k) :
+    (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).outcome true =
+      (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).total := by
+  let B := postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome
+  have hfalse : B.outcome false = 0 := by
+    simpa [B] using processed_ldSandwichLineOnePointRightFamily_false_zero
+      params strategy family k i hi q
+  have hsum : B.outcome false + B.outcome true = B.total := by
+    simpa [Bool.forall_bool, add_comm] using B.sum_eq_total
+  nlinarith [hfalse, hsum] -/
+
+/- private lemma processed_ldSandwichLineOnePointRightFamily_isSome_false_eq_zero
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (k i : ℕ) (hi : i < k)
+    (q : SandwichedLineQuestion params k) :
+    (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).outcome false = 0 := by
+  simp [postprocess, ldSandwichLineOnePointRightFamily, hi, Option.isSome]
+
+private lemma processed_ldSandwichLineOnePointRightFamily_isSome_true_eq_total
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (k i : ℕ) (hi : i < k)
+    (q : SandwichedLineQuestion params k) :
+    (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).outcome true =
+      (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).total := by
+  let B := postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome
+  have hfalse : B.outcome false = 0 := by
+    simpa [B] using processed_ldSandwichLineOnePointRightFamily_isSome_false_eq_zero
+      params strategy family k i hi q
+  have hsum : B.outcome false + B.outcome true = B.total := by
+    simpa [Bool.forall_bool, add_comm] using B.sum_eq_total
+  nlinarith [hfalse, hsum] -/
+
+/- private lemma ldSandwichLineOnePointRightFamily_isSome_true
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (k i : ℕ) (hi : i < k)
+    (q : SandwichedLineQuestion params k) :
+    postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome =
+      postprocess (verticalLineMeasurementFamily params strategy q.1) (fun _ : AxisLinePolynomial params.next => true) := by
+  let R := (ldSandwichLineOnePointRightFamily params strategy family k i) q
+  have hnone : R.outcome none = 0 := by
+    simp [R, ldSandwichLineOnePointRightFamily, hi, postprocess]
+  have htrue : (postprocess R Option.isSome).outcome true = R.total := by
+    rw [show (postprocess R Option.isSome).outcome true = ∑ a : Fq params, R.outcome (some a) by
+      simp [postprocess, Option.isSome]]
+    simpa [hnone] using R.sum_eq_total
+  refine SubMeas.ext ?_ ?_
+  · intro b
+    cases b
+    · simp [postprocess, Option.isSome, hnone]
+    · simpa [htrue, R, ldSandwichLineOnePointRightFamily, hi, postprocess_total] using htrue
+  · simp [R, ldSandwichLineOnePointRightFamily, hi, postprocess_total] -/
+
+/- private lemma ldSandwichLineOnePointLeftFamily_isSome
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (k i : ℕ) (hi : i < k)
+    (q : SandwichedLineQuestion params k) :
+    postprocess ((ldSandwichLineOnePointLeftFamily params strategy family k i) q) Option.isSome =
+      postprocess (gHatSandwichFamily params family k q.2) (fun gs => Option.isSome (gs ⟨i, hi⟩)) := by
+  refine SubMeas.ext ?_ ?_
+  · intro b
+    cases b <;>
+      simp [ldSandwichLineOnePointLeftFamily, postprocess, hi, Option.isSome,
+        Finset.sum_filter, Finset.sum_comm]
+  · simp [ldSandwichLineOnePointLeftFamily, hi, postprocess_total] -/
+
+/- private lemma ldSandwichLineOnePointRightFamily_isSome_true
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (k i : ℕ) (hi : i < k)
+    (q : SandwichedLineQuestion params k) :
+    postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome =
+      postprocess (verticalLineMeasurementFamily params strategy q.1) (fun _ : AxisLinePolynomial params.next => true) := by
+  refine SubMeas.ext ?_ ?_
+  · intro b
+    cases b
+    · calc
+        (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).outcome false
+          = 0 := by
+              simp [postprocess, ldSandwichLineOnePointRightFamily, hi, Option.isSome]
+        _ = (postprocess (verticalLineMeasurementFamily params strategy q.1)
+              (fun _ : AxisLinePolynomial params.next => true)).outcome false := by
+              simp [postprocess]
+    · calc
+        (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).outcome true
+          = ((ldSandwichLineOnePointRightFamily params strategy family k i) q).total := by
+              simp [postprocess, ldSandwichLineOnePointRightFamily, hi, Option.isSome,
+                Finset.sum_filter, Finset.sum_comm]
+        _ = (verticalLineMeasurementFamily params strategy q.1).total := by
+              simp [ldSandwichLineOnePointRightFamily, hi, postprocess_total]
+        _ = (postprocess (verticalLineMeasurementFamily params strategy q.1)
+              (fun _ : AxisLinePolynomial params.next => true)).outcome true := by
+              simp [postprocess, postprocess_total]
+  · simp [ldSandwichLineOnePointRightFamily, hi, postprocess_total] -/
+
+/- private lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_eq_get
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (σ : Finset (Fin k))
+    (hσsubset : σ ⊆ gHatTupleSupport gs)
+    (hσcard : σ.card = params.d + 1)
+    {i : Fin k} (hi : i ∈ σ) :
+    (Polynomial.restrictAtHeight params
+      (interpolateCompletedSlicesFromSupport params xs gs σ hσcard) (xs i)).poly =
+      ((gs i).get (by simpa [gHatTupleSupport] using hσsubset hi)).poly := by
+  simpa [Polynomial.restrictAtHeight] using
+    interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get
+      params xs hxs gs σ hσsubset hσcard hi -/
+
+/- private lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_active
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (σ : Finset (Fin k))
+    (hσsubset : σ ⊆ gHatTupleSupport gs)
+    (hσcard : σ.card = params.d + 1)
+    {i : Fin k} (hi : i ∈ σ) :
+    MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+      (interpolateCompletedSlicesFromSupport params xs gs σ hσcard).poly =
+      ((gs i).get (by simpa [gHatTupleSupport] using hσsubset hi)).poly := by
+  let v : Fin k → Scalar params.next := fun j => decodeScalar (xs j)
+  have hgi : (gs i).isSome = true := by
+    simpa [gHatTupleSupport] using hσsubset hi
+  have hvinj : Set.InjOn v (↑σ : Set (Fin k)) := by
+    intro a ha b hb hab
+    apply hxs
+    simpa [v] using congrArg encodeScalar hab
+  have hcomp :
+      ((MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+        MvPolynomial.C) = MvPolynomial.C := by
+    ext r
+    simp
+  have hx :
+      MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.X (lastCoord params)) =
+        MvPolynomial.C (v i) := by
+    change MvPolynomial.C (decodeScalar (xs i)) = MvPolynomial.C (v i)
+    simp [v, Polynomial.restrictAtHeightCoordinateMap, lastCoord]
+  unfold interpolateCompletedSlicesFromSupport
+  rw [map_sum]
+  rw [Finset.sum_eq_single i]
+  · simp_rw [map_mul]
+    have hslice :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs i))) =
+          extractSliceOr0 (gs i) := by
+      have h0 := MvPolynomial.eval₂Hom_rename
+        (f := MvPolynomial.C)
+        (g := Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        (k := embedCoord params)
+        (p := extractSliceOr0 (gs i))
+      rw [MvPolynomial.eval₂Hom_C_eq_bind₁] at h0
+      have hmap :
+          Polynomial.restrictAtHeightCoordinateMap params (xs i) ∘ embedCoord params =
+            MvPolynomial.X := by
+        funext j
+        simp [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord]
+      rw [hmap, MvPolynomial.bind₁_X_left] at h0
+      simpa using h0
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ v i))) = 1 := by
+      have h0 := (_root_.Polynomial.hom_eval₂
+        (p := Lagrange.basis σ v i)
+        (f := MvPolynomial.C)
+        (g := MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+        (x := MvPolynomial.X (lastCoord params)))
+      rw [hcomp, hx, _root_.Polynomial.eval₂_at_apply] at h0
+      calc
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+            ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+              (Lagrange.basis σ v i)))
+          = MvPolynomial.C ((Lagrange.basis σ v i).eval (v i)) := by
+              simpa using h0
+        _ = 1 := by
+              simpa using congrArg
+                (fun x : Scalar params.next => (MvPolynomial.C x : PolynomialModel params.next))
+                (Lagrange.eval_basis_self hvinj hi)
+    have hextract {o : GHatOutcome params} (ho : o.isSome = true) :
+        extractSliceOr0 o = (o.get ho).poly := by
+      cases o with
+      | none => simp at ho
+      | some p => simp [extractSliceOr0]
+    rw [hslice, hLi, hextract hgi]
+    simp
+  · intro j hj hji
+    simp_rw [map_mul]
+    have hslice :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) =
+          extractSliceOr0 (gs j) := by
+      have h0 := MvPolynomial.eval₂Hom_rename
+        (f := MvPolynomial.C)
+        (g := Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        (k := embedCoord params)
+        (p := extractSliceOr0 (gs j))
+      rw [MvPolynomial.eval₂Hom_C_eq_bind₁] at h0
+      have hmap :
+          Polynomial.restrictAtHeightCoordinateMap params (xs i) ∘ embedCoord params =
+            MvPolynomial.X := by
+        funext m
+        simp [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord]
+      rw [hmap, MvPolynomial.bind₁_X_left] at h0
+      simpa using h0
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ v j))) = 0 := by
+      have h0 := (_root_.Polynomial.hom_eval₂
+        (p := Lagrange.basis σ v j)
+        (f := MvPolynomial.C)
+        (g := MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+        (x := MvPolynomial.X (lastCoord params)))
+      rw [hcomp, hx, _root_.Polynomial.eval₂_at_apply] at h0
+      calc
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+            ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+              (Lagrange.basis σ v j)))
+          = MvPolynomial.C ((Lagrange.basis σ v j).eval (v i)) := by
+              simpa using h0
+        _ = 0 := by
+              simpa using congrArg
+                (fun x : Scalar params.next => (MvPolynomial.C x : PolynomialModel params.next))
+                (Lagrange.eval_basis_of_ne hji hi)
+    rw [hslice, hLi]
+    simp
+  · intro hnot
+    exact (hnot hi).elim -/
+
+/- private lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get'
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (σ : Finset (Fin k))
+    (hσsubset : σ ⊆ gHatTupleSupport gs)
+    (hσcard : σ.card = params.d + 1)
+    {i : Fin k} (hi : i ∈ σ) :
+    MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+      (interpolateCompletedSlicesFromSupport params xs gs σ hσcard).poly =
+      ((gs i).get (by simpa [gHatTupleSupport] using hσsubset hi)).poly := by
+  let v : Fin k → Scalar params.next := fun j => decodeScalar (xs j)
+  have hgi : (gs i).isSome = true := by
+    simpa [gHatTupleSupport] using hσsubset hi
+  have hvinj : Set.InjOn v (↑σ : Set (Fin k)) := by
+    intro a ha b hb hab
+    apply hxs
+    simpa [v] using congrArg encodeScalar hab
+  have hcomp :
+      ((MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp MvPolynomial.C) = MvPolynomial.C := by
+    ext r
+    simp
+  have hx :
+      MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.X (lastCoord params)) = MvPolynomial.C (v i) := by
+    simpa [v, Polynomial.restrictAtHeightCoordinateMap, lastCoord]
+  have hextract {o : GHatOutcome params} (ho : o.isSome = true) :
+      extractSliceOr0 o = (o.get ho).poly := by
+    cases o with
+    | none => simp at ho
+    | some p => simp [extractSliceOr0]
+  unfold interpolateCompletedSlicesFromSupport
+  rw [map_sum]
+  rw [Finset.sum_eq_single i]
+  · simp_rw [map_mul]
+    have hslice :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs i))) =
+          extractSliceOr0 (gs i) := by
+      rw [MvPolynomial.eval₂Hom_rename]
+      simpa [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord] using
+        (MvPolynomial.eval₂_eta (extractSliceOr0 (gs i)))
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ v i))) = 1 := by
+      have h0 := (_root_.Polynomial.hom_eval₂
+        (p := Lagrange.basis σ v i)
+        (f := MvPolynomial.C)
+        (g := MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+        (x := MvPolynomial.X (lastCoord params)))
+      rw [hcomp, hx] at h0
+      have h1 := (_root_.Polynomial.eval₂_hom (p := Lagrange.basis σ v i)
+        (f := MvPolynomial.C) (x := v i))
+      calc
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+            ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+              (Lagrange.basis σ v i)))
+          = MvPolynomial.C ((Lagrange.basis σ v i).eval (v i)) := by
+              simpa using h0
+        _ = 1 := by
+              simpa using congrArg
+                (fun x : Scalar params.next => (MvPolynomial.C x : PolynomialModel params.next))
+                (Lagrange.eval_basis_self hvinj hi)
+    rw [hslice, hLi, hextract hgi]
+    simp
+  · intro j hj hji
+    simp_rw [map_mul]
+    have hslice :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) =
+          extractSliceOr0 (gs j) := by
+      rw [MvPolynomial.eval₂Hom_rename]
+      simpa [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord] using
+        (MvPolynomial.eval₂_eta (extractSliceOr0 (gs j)))
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ v j))) = 0 := by
+      have h0 := (_root_.Polynomial.hom_eval₂
+        (p := Lagrange.basis σ v j)
+        (f := MvPolynomial.C)
+        (g := MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+        (x := MvPolynomial.X (lastCoord params)))
+      rw [hcomp, hx] at h0
+      calc
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+            ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+              (Lagrange.basis σ v j)))
+          = MvPolynomial.C ((Lagrange.basis σ v j).eval (v i)) := by
+              simpa using h0
+        _ = 0 := by
+              simpa using congrArg
+                (fun x : Scalar params.next => (MvPolynomial.C x : PolynomialModel params.next))
+                (Lagrange.eval_basis_of_ne hji hi)
+    rw [hslice, hLi]
+    simp
+  · intro hnot
+    exact (hnot hi).elim -/
+
+/- private lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get'
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (σ : Finset (Fin k))
+    (hσsubset : σ ⊆ gHatTupleSupport gs)
+    (hσcard : σ.card = params.d + 1)
+    {i : Fin k} (hi : i ∈ σ) :
+    MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+      (interpolateCompletedSlicesFromSupport params xs gs σ hσcard).poly =
+      ((gs i).get (by simpa [gHatTupleSupport] using hσsubset hi)).poly := by
+  let v : Fin k → Scalar params.next := fun j => decodeScalar (xs j)
+  have hgi : (gs i).isSome = true := by
+    simpa [gHatTupleSupport] using hσsubset hi
+  have hvinj : Set.InjOn v (↑σ : Set (Fin k)) := by
+    intro a ha b hb hab
+    apply hxs
+    simpa [v] using congrArg encodeScalar hab
+  have hcomp :
+      ((MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+        MvPolynomial.C) = MvPolynomial.C := by
+    ext r
+    simp
+  have hx :
+      MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.X (lastCoord params)) = MvPolynomial.C (v i) := by
+    simp [v, Polynomial.restrictAtHeightCoordinateMap, lastCoord]
+  have hextract {o : GHatOutcome params} (ho : o.isSome = true) :
+      extractSliceOr0 o = (o.get ho).poly := by
+    cases o with
+    | none => simp at ho
+    | some p => simp [extractSliceOr0]
+  unfold interpolateCompletedSlicesFromSupport
+  rw [map_sum]
+  rw [Finset.sum_eq_single i]
+  · simp_rw [map_mul]
+    have hslice :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs i))) =
+          extractSliceOr0 (gs i) := by
+      rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
+      have hmap :
+          Polynomial.restrictAtHeightCoordinateMap params (xs i) ∘ embedCoord params =
+            MvPolynomial.X := by
+        funext j
+        simp [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord]
+      rw [hmap, MvPolynomial.bind₁_X_left]
+      rfl
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ v i))) = 1 := by
+      have h0 := (_root_.Polynomial.hom_eval₂
+        (p := Lagrange.basis σ v i)
+        (f := MvPolynomial.C)
+        (g := MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+        (x := MvPolynomial.X (lastCoord params)))
+      have h0' :
+          MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+              ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+                (Lagrange.basis σ v i))) =
+            MvPolynomial.C ((Lagrange.basis σ v i).eval (v i)) := by
+        simpa [hcomp, hx, _root_.Polynomial.eval₂_at_apply] using h0
+      calc
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+            ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+              (Lagrange.basis σ v i)))
+          = MvPolynomial.C ((Lagrange.basis σ v i).eval (v i)) := by
+              exact h0'
+        _ = 1 := by
+              simpa using congrArg
+                (fun x : Scalar params.next => (MvPolynomial.C x : PolynomialModel params))
+                (Lagrange.eval_basis_self hvinj hi)
+    simpa [hLi, hslice, hextract hgi]
+  · intro j hj hji
+    simp_rw [map_mul]
+    have hslice :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) =
+          extractSliceOr0 (gs j) := by
+      rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
+      have hmap :
+          Polynomial.restrictAtHeightCoordinateMap params (xs i) ∘ embedCoord params =
+            MvPolynomial.X := by
+        funext m
+        simp [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord]
+      rw [hmap, MvPolynomial.bind₁_X_left]
+      rfl
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ v j))) = 0 := by
+      have h0 := (_root_.Polynomial.hom_eval₂
+        (p := Lagrange.basis σ v j)
+        (f := MvPolynomial.C)
+        (g := MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+        (x := MvPolynomial.X (lastCoord params)))
+      have h0' :
+          MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+              ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+                (Lagrange.basis σ v j))) =
+            MvPolynomial.C ((Lagrange.basis σ v j).eval (v i)) := by
+        simpa [hcomp, hx, _root_.Polynomial.eval₂_at_apply] using h0
+      calc
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+            ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+              (Lagrange.basis σ v j)))
+          = MvPolynomial.C ((Lagrange.basis σ v j).eval (v i)) := by
+              exact h0'
+        _ = 0 := by
+              simpa using congrArg
+                (fun x : Scalar params.next => (MvPolynomial.C x : PolynomialModel params))
+                (Lagrange.eval_basis_of_ne hji hi)
+    simpa [hLi, hslice]
+  · intro hnot
+    exact (hnot hi).elim -/
+
+/- private lemma interpolateCompletedSlices_restrictAtHeight_eq_get_of_mem_supportSubset
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (hEligible : InterpolationEligible params gs)
+    {i : Fin k} (hi : i ∈ interpolationSupportSubset gs hEligible) :
+    (Polynomial.restrictAtHeight params
+      (interpolateCompletedSlices params k xs gs) (xs i)).poly =
+      ((gs i).get (by
+        have hisup : i ∈ gHatTupleSupport gs :=
+          interpolationSupportSubset_subset gs hEligible hi
+        simpa [gHatTupleSupport] using hisup)).poly := by
+  classical
+  let σ := interpolationSupportSubset gs hEligible
+  have hσcard : σ.card = params.d + 1 := interpolationSupportSubset_card gs hEligible
+  have hisup : i ∈ gHatTupleSupport gs := interpolationSupportSubset_subset gs hEligible hi
+  have hgi : (gs i).isSome = true := by
+    simpa [gHatTupleSupport] using hisup
+  have hvinj : Set.InjOn (fun j : Fin k => decodeScalar (xs j)) (↑σ : Set (Fin k)) := by
+    intro a ha b hb hab
+    apply hxs
+    simpa using congrArg encodeScalar hab
+  cases k with
+  | zero => cases i.2
+  | succ k =>
+      simp [interpolateCompletedSlices, hEligible, σ, hσcard]
+  unfold Polynomial.restrictAtHeight interpolateCompletedSlicesFromSupport
+  rw [map_sum]
+  rw [Finset.sum_eq_single i]
+  · simp_rw [MvPolynomial.eval₂Hom_mul]
+    have hrename :
+        MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs i))) =
+          extractSliceOr0 (gs i) := by
+            rw [MvPolynomial.eval₂Hom_rename]
+            ext j
+            simp [Function.comp, restrictAtHeightCoordinateMap, embedCoord]
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))) = 1 := by
+            rw [_root_.Polynomial.eval₂_at_apply]
+            simp [Lagrange.eval_basis_self hvinj hi]
+    have hextract : extractSliceOr0 (gs i) = ((gs i).get hgi).poly := by
+      cases hgi' : gs i with
+      | none => simp [Option.isSome, hgi'] at hgi
+      | some p => simp [extractSliceOr0, hgi']
+    simpa [hrename, hLi, hextract]
+  · intro j hj hji
+    simp_rw [MvPolynomial.eval₂Hom_mul]
+    have hrename :
+        MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) =
+          extractSliceOr0 (gs j) := by
+            rw [MvPolynomial.eval₂Hom_rename]
+            ext m
+            simp [Function.comp, restrictAtHeightCoordinateMap, embedCoord]
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j))) = 0 := by
+            rw [_root_.Polynomial.eval₂_at_apply]
+            simp [Lagrange.eval_basis_of_ne hji hi]
+    simp [hrename, hLi]
+  · intro hnot
+    exact (hnot hi).elim -/
+
 private noncomputable def commuteGHalfSandwich_recursiveSourceFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -1295,6 +3217,106 @@ private lemma commuteGHalfSandwich_moveBack_eq_recursiveSource
       (commuteGHalfSandwich_recursiveSourceFamily params family r q).outcome ogs := by
   simp [commuteGHalfSandwich_moveBackFamily, commuteGHalfSandwich_recursiveSourceFamily,
     headTailOrderedFamily, leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_recursiveTarget_eq_split
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params r)
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :
+    (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs =
+      (headTailRotatedFamily params family (r + 1) (q.1, Fin.cons q.2.1 q.2.2)).outcome
+        (ogs.1, Fin.cons ogs.2.1 ogs.2.2) := by
+  let A := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+  let T := gHatHalfProductOutcomeOperator params family r q.2.2 ogs.2.2
+  let G := (gHatIdxMeas params family q.1).outcome ogs.1
+  have htail :
+      T = gHatHalfProductOutcomeOperator params family r
+        (pointTupleTail (Fin.cons q.2.1 q.2.2))
+        (gHatTupleOutcomeTail (Fin.cons ogs.2.1 ogs.2.2)) := by
+    rfl
+  calc
+    (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs
+      = leftTensor (ι₂ := ι) (A * (T * G)) := by
+          simp [commuteGHalfSandwich_recursiveTargetFamily, headTailRotatedFamily,
+            A, T, G, leftTensor_mul_leftTensor, mul_assoc]
+    _ = leftTensor (ι₂ := ι)
+          (A * (gHatHalfProductOutcomeOperator params family r
+            (pointTupleTail (Fin.cons q.2.1 q.2.2))
+            (gHatTupleOutcomeTail (Fin.cons ogs.2.1 ogs.2.2)) * G)) := by
+              exact congrArg (fun X => leftTensor (ι₂ := ι) (A * (X * G))) htail.symm
+    _ = (headTailRotatedFamily params family (r + 1) (q.1, Fin.cons q.2.1 q.2.2)).outcome
+          (ogs.1, Fin.cons ogs.2.1 ogs.2.2) := by
+            simp [headTailRotatedFamily, A, G, gHatHalfProductOutcomeOperator,
+              gHatRotatedHalfProductOutcomeOperator, leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_split_succ_iff
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (r : ℕ) (δ : Error) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × PointTuple params (r + 1)))
+      (headTailOrderedFamily params family (r + 1))
+      (headTailRotatedFamily params family (r + 1))
+      δ ↔
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveSourceFamily params family r)
+      (commuteGHalfSandwich_recursiveTargetFamily params family r)
+      δ := by
+  constructor
+  · intro h
+    have hq :=
+      (sddOpRel_uniform_equiv (splitSuccQuestionEquiv params r) ψbi
+        (headTailOrderedFamily params family (r + 1))
+        (headTailRotatedFamily params family (r + 1)) δ).1 h
+    have ho := CommutativityPoints.sddOpRel_reindex (splitSuccOutcomeEquiv params r)
+      ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (fun q => headTailOrderedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
+      (fun q => headTailRotatedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
+      δ hq
+    exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      _ _
+      (commuteGHalfSandwich_moveSourceFamily params family r)
+      (commuteGHalfSandwich_recursiveTargetFamily params family r)
+      δ
+      (fun q ogs => by
+        simpa [splitSuccQuestionEquiv, splitSuccOutcomeEquiv] using
+          (commuteGHalfSandwich_moveSource_eq_split params family r
+            q
+            ogs).symm)
+      (fun q ogs => by
+        simpa [splitSuccQuestionEquiv, splitSuccOutcomeEquiv] using
+          (commuteGHalfSandwich_recursiveTarget_eq_split params family r
+            q
+            ogs).symm)
+      ho
+  · intro h
+    have ho := CommutativityPoints.sddOpRel_reindex (splitSuccOutcomeEquiv params r).symm
+      ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveSourceFamily params family r)
+      (commuteGHalfSandwich_recursiveTargetFamily params family r)
+      δ h
+    have hq := CommutativityPoints.sddOpRel_congr_outcome ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      _ _
+      (fun q => headTailOrderedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
+      (fun q => headTailRotatedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
+      δ
+      (fun q ogs => by
+        simpa [splitSuccQuestionEquiv, splitSuccOutcomeEquiv] using
+          (commuteGHalfSandwich_moveSource_eq_split params family r
+            q ((splitSuccOutcomeEquiv params r) ogs)))
+      (fun q ogs => by
+        simpa [splitSuccQuestionEquiv, splitSuccOutcomeEquiv] using
+          (commuteGHalfSandwich_recursiveTarget_eq_split params family r
+            q ((splitSuccOutcomeEquiv params r) ogs)))
+      ho
+    exact (sddOpRel_uniform_equiv (splitSuccQuestionEquiv params r) ψbi
+      (headTailOrderedFamily params family (r + 1))
+      (headTailRotatedFamily params family (r + 1)) δ).2 hq
 
 /- private lemma commuteGHalfSandwich_recursiveTarget_eq_rotated
     (params : Parameters) [FieldModel params.q]
@@ -1477,7 +3499,11 @@ private lemma commuteGHalfSandwich_core
       (gHatHalfSandwichLeft params family k)
       (gHatHalfSandwichRight params family k)
       (commuteGHalfSandwichError params gamma zeta k) := by
-  sorry
+  by_cases hk2 : k = 2
+  · subst hk2
+    exact commuteGHalfSandwich_core_two params ψbi family gamma zeta hcom
+  · have hk3 : 3 ≤ k := by omega
+    sorry
 
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
