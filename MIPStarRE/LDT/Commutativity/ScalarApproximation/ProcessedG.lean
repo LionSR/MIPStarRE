@@ -341,7 +341,7 @@ lemma commDataProcessedG
           (uniformDistribution (Fq params))
           (IdxProjSubMeas.toIdxSubMeas family.meas)
           (zeta / 2)
-          (fun g => g u)
+          (fun (_ : Fq params) (g : Polynomial params) => g u)
           hsliceSSC
       refine ⟨?_⟩
       have hbound :

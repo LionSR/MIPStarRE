@@ -329,24 +329,6 @@ abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
         (constSubMeasFamily H.toSubMeas.liftLeft)
         (selfImprovementOrthogonalizationError params eps delta)
 
-/-- The post-orthonormalization data-processing input still required by the
-reduced wrapper chain. -/
-abbrev EvaluationDataProcessingInput (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (eps delta : Error) : Prop :=
-  ∀ {Hhat : SubMeas (Polynomial params) ι}
-    {H : ProjSubMeas (Polynomial params) ι},
-    BipartiteSSCRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily Hhat)
-      (selfImprovementHelperError params eps delta) →
-    SDDRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily Hhat.liftLeft)
-      (constSubMeasFamily H.toSubMeas.liftLeft)
-      (selfImprovementOrthogonalizationError params eps delta) →
-    SDDRel strategy.state (uniformDistribution (Point params))
-      ((polynomialEvaluationFamily params Hhat).liftLeft)
-      ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
-      (selfImprovementDataProcessingError params eps delta)
-
 /-- The remaining Section 9 output fields still not produced directly by the
 reduced helper and orthonormalization wrappers. -/
 abbrev FinalFieldsInput (params : Parameters) [FieldModel params.q]

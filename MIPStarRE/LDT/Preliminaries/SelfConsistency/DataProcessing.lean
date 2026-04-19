@@ -24,15 +24,15 @@ open MIPStarRE.LDT
 
 Proof:
 1. First prove the “wrong-side” estimate
-   `P_[f] ⊗ I ≈_{2δ + 4√ε} I ⊗ A_[f]` by:
+   `P_[f_q] ⊗ I ≈_{2δ + 4√ε} I ⊗ A_[f_q]` by:
    - expanding the `qSDD` square,
    - bounding the mass of `P` via `completenessTransferProjectiveP`,
    - comparing the mixed overlap with the diagonal overlap of `A`,
-   - and using SSC plus postprocessing monotonicity.
+   - and using SSC plus question-dependent postprocessing monotonicity.
 2. Apply `twoNotionsOfSelfConsistencyAfterEvaluation` to obtain
-   `A_[f] ⊗ I ≈_{2δ} I ⊗ A_[f]`.
+   `A_[f_q] ⊗ I ≈_{2δ} I ⊗ A_[f_q]`.
 3. Use the `SDDRel` triangle inequality to conclude
-   `P_[f] ⊗ I ≈_{8δ + 8√ε} A_[f] ⊗ I`. -/
+   `P_[f_q] ⊗ I ≈_{8δ + 8√ε} A_[f_q] ⊗ I`. -/
 private lemma wrongSideEstimate
     {Question α β : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype α] [Fintype β]
@@ -43,14 +43,14 @@ private lemma wrongSideEstimate
     (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
     (A : IdxSubMeas Question α ι)
     (P : IdxProjSubMeas Question α ι)
-    (δ ε : Error) (f : α → β) :
+    (δ ε : Error) (f : Question → α → β) :
     BipartiteSSCRel ψ 𝒟 A δ →
     SDDRel ψ 𝒟
       (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas P))
       (IdxSubMeas.liftLeft A) ε →
       SDDRel ψ 𝒟
-        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
-        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
+        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) (f q)))
+        (IdxSubMeas.liftRight (fun q => postprocess (A q) (f q)))
         (2 * δ + 4 * Real.sqrt ε) := by
   intro hssc ⟨hε⟩
   let PL : IdxProjSubMeas Question α (ι × ι) := fun q =>
@@ -59,9 +59,9 @@ private lemma wrongSideEstimate
         intro a
         simp [SubMeas.liftLeft, leftTensor_mul_leftTensor, (P q).proj a] }
   let LPf : IdxSubMeas Question β (ι × ι) :=
-    IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f)
+    IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) (f q))
   let RAf : IdxSubMeas Question β (ι × ι) :=
-    IdxSubMeas.liftRight (fun q => postprocess (A q) f)
+    IdxSubMeas.liftRight (fun q => postprocess (A q) (f q))
   let crossPost : Question → Error := fun q =>
     qMatchMass ψ (LPf q) (RAf q)
   let crossOrig : Question → Error := fun q =>
@@ -89,7 +89,7 @@ private lemma wrongSideEstimate
       intro q hq
       change
         𝒟.weight q *
-            ev ψ (((postprocess ((P q).toSubMeas) f).liftLeft).total) =
+            ev ψ (((postprocess ((P q).toSubMeas) (f q)).liftLeft).total) =
           𝒟.weight q * ev ψ ((((P q).toSubMeas).liftLeft).total)
       simp [SubMeas.liftLeft, postprocess_total]
     have hbase := hcomp.completenessTransfer
@@ -103,8 +103,8 @@ private lemma wrongSideEstimate
     intro q hq
     change
       𝒟.weight q *
-          ev ψ (rightTensor (ι₁ := ι) ((postprocess (A q) f).total)) =
-        𝒟.weight q * ev ψ (leftTensor (ι₂ := ι) ((A q).total))
+          ev ψ (rightTensor (ι₁ := ι) ((postprocess (A q) (f q)).total)) =
+      𝒟.weight q * ev ψ (leftTensor (ι₂ := ι) ((A q).total))
     rw [postprocess_total, ← hperm.swap_ev ((A q).total)]
   have hcross_post_ge :
       avgOver 𝒟 crossPost ≥ avgOver 𝒟 crossOrig := by
@@ -112,7 +112,7 @@ private lemma wrongSideEstimate
     refine Finset.sum_le_sum ?_
     intro q hq
     exact mul_le_mul_of_nonneg_left
-      (qMatchMass_leftRight_postprocess_ge ψ ((P q).toSubMeas) (A q) f)
+      (qMatchMass_leftRight_postprocess_ge ψ ((P q).toSubMeas) (A q) (f q))
       (𝒟.nonnegative q)
   have hcross_close :
       |avgOver 𝒟 crossOrig - avgOver 𝒟 overlapA| ≤ Real.sqrt ε := by
@@ -148,7 +148,6 @@ private lemma wrongSideEstimate
                   max 0 (subMeasMass ψ ((IdxSubMeas.liftLeft A) q) - overlapA q) := by
               simp [qBipartiteSSCDefect, overlapA, qMatchMass, subMeasMass,
                 IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
-                SubMeas.liftLeft, SubMeas.liftRight,
                 leftTensor_mul_rightTensor_eq_opTensor]
             rw [hdef]
             exact le_max_right 0 _
@@ -284,54 +283,54 @@ theorem selfConsistencyImpliesDataProcessing
     (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
     (A : IdxSubMeas Question α ι)
     (P : IdxProjSubMeas Question α ι)
-    (δ ε : Error) (f : α → β) :
+    (δ ε : Error) (f : Question → α → β) :
     BipartiteSSCRel ψ 𝒟 A δ →
     SDDRel ψ 𝒟
       (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas P))
       (IdxSubMeas.liftLeft A) ε →
       SDDRel ψ 𝒟
-        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
-        (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) (f q)))
+        (IdxSubMeas.liftLeft (fun q => postprocess (A q) (f q)))
         (8 * δ + 8 * Real.sqrt ε) := by
   intro hssc hsdd
   have hwrong :
       SDDRel ψ 𝒟
-        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
-        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
+        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) (f q)))
+        (IdxSubMeas.liftRight (fun q => postprocess (A q) (f q)))
         (2 * δ + 4 * Real.sqrt ε) :=
     wrongSideEstimate ψ hperm hψ 𝒟 h𝒟 A P δ ε f hssc hsdd
   have hself :
       SDDRel ψ 𝒟
-        (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
-        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
+        (IdxSubMeas.liftLeft (fun q => postprocess (A q) (f q)))
+        (IdxSubMeas.liftRight (fun q => postprocess (A q) (f q)))
         (2 * δ) :=
     twoNotionsOfSelfConsistencyAfterEvaluation ψ hperm 𝒟 A δ f hssc
   have hself_symm :
       SDDRel ψ 𝒟
-        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
-        (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+        (IdxSubMeas.liftRight (fun q => postprocess (A q) (f q)))
+        (IdxSubMeas.liftLeft (fun q => postprocess (A q) (f q)))
         (2 * δ) :=
     sddRel_symm ψ 𝒟
-      (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
-      (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
+      (IdxSubMeas.liftLeft (fun q => postprocess (A q) (f q)))
+      (IdxSubMeas.liftRight (fun q => postprocess (A q) (f q)))
       (2 * δ)
       hself
   have htri :
       SDDRel ψ 𝒟
-        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
-        (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) (f q)))
+        (IdxSubMeas.liftLeft (fun q => postprocess (A q) (f q)))
         (2 * ((2 * δ + 4 * Real.sqrt ε) + (2 * δ))) := by
     exact
       stateDependentDistanceRel_triangle ψ 𝒟
-        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
-        (IdxSubMeas.liftRight (fun q => postprocess (A q) f))
-        (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+        (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) (f q)))
+        (IdxSubMeas.liftRight (fun q => postprocess (A q) (f q)))
+        (IdxSubMeas.liftLeft (fun q => postprocess (A q) (f q)))
         (2 * δ + 4 * Real.sqrt ε) (2 * δ)
         hwrong hself_symm
   exact
     stateDependentDistanceRel_mono ψ 𝒟
-      (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) f))
-      (IdxSubMeas.liftLeft (fun q => postprocess (A q) f))
+      (IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) (f q)))
+      (IdxSubMeas.liftLeft (fun q => postprocess (A q) (f q)))
       (2 * ((2 * δ + 4 * Real.sqrt ε) + (2 * δ)))
       (8 * δ + 8 * Real.sqrt ε)
       (by linarith)
