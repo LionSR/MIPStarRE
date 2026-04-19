@@ -475,7 +475,6 @@ private lemma fullSliceCommutation_qSDDOp_avg_expand_full
           simp [fullSliceBABTerm, fullSliceABATerm,
             fullSliceBABATerm, fullSliceABABTerm, A, B]
 
-set_option maxHeartbeats 2000000 in
 /-- Swapping the full-slice question and outcome identifies the averaged
 `BAB`/`ABA` terms and the averaged `BABA`/`ABAB` terms. -/
 private lemma fullSliceCommutation_avg_swap_terms
@@ -574,7 +573,6 @@ private lemma fullSliceCommutation_avg_swap_terms
               exact avgOver_sum_eq_card_mul_avgOver_prod
                 (fun q gh => fullSliceABABTerm params strategy family q gh)
 
-set_option maxHeartbeats 2000000 in
 /-- Paper `eq:gcomterms` (`commutativity-G.tex` lines 286-290).
 
 Full-slice analog of `evaluatedSliceCommutation_qSDDOp_avg_eq` (line 878): the

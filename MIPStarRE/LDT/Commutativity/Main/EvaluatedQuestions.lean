@@ -19,8 +19,6 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
--- Heavy sqrt/rpow arithmetic in hArith step.
-set_option maxHeartbeats 800000 in
 /-- Core Schwartz-Zippel transport on the evaluated-question space.
 
 This is the substantive remaining step: compare the full polynomial outcomes
