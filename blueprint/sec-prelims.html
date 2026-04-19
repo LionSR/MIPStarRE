@@ -1553,6 +1553,8 @@
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.simeqToApprox" class="lean_decl">MIPStarRE.LDT.Preliminaries.simeqToApprox</a></li>
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.approxToSimeq" class="lean_decl">MIPStarRE.LDT.Preliminaries.approxToSimeq</a></li>
+          
         </ul>
     
       </div>
@@ -1566,7 +1568,7 @@
 <div class="displaymath" id="a0000000060">
   \[  A_a^x \otimes I \approx _{2\delta } I \otimes B_a^x.  \]
 </div>
-<p> If both measurements are projective, the converse also holds. </p>
+<p> If both measurements are projective, the converse also holds: if \(A_a^x \otimes I \approx _{2\delta } I \otimes B_a^x\) then \(A_a^x \otimes I \simeq _\delta I \otimes B_a^x\). </p>
 
   </div>
 </div>
@@ -1578,7 +1580,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Expand the squared norm of \((A_a^x \otimes I - I \otimes B_a^x)\lvert \psi  \rangle \) and use the diagonal-overlap formula from Lemma&#160;<a href="sec-prelims.html#prop:simeq-for-measurements">3.17</a>. </p>
+  <p>Expand the squared norm of \((A_a^x \otimes I - I \otimes B_a^x)\lvert \psi  \rangle \) and use the diagonal-overlap formula from Lemma&#160;<a href="sec-prelims.html#prop:simeq-for-measurements">3.17</a>; projectivity turns the diagonal inequality into an equality, giving the converse. </p>
 
   </div>
 </div>
