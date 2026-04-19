@@ -277,20 +277,31 @@ lemma localRewrite (params : Parameters)
       rw [localVariance_eq_zero_of_isEmpty hι params A ψ,
         localVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ]⟩
 
+/-- Placeholder witness for `lem:global-rewrite`.
+
+TODO(#452): the paper gives a concrete decomposition of `Acombine`, but the
+current `GlobalVarianceDecomposition` fields do not encode that decomposition,
+and `globalVarianceTraceWitness` ignores the witness entirely. Once the
+statement is strengthened to carry the paper data, replace this placeholder
+with the concrete decomposition. -/
+private def placeholderGlobalVarianceDecomposition (params : Parameters)
+    (A : Point params → MIPStarRE.Quantum.Op ι) :
+    GlobalVarianceDecomposition params A :=
+  default
+
 /-- `lem:global-rewrite`. -/
--- NOTE: the existential witness `default` works because `GlobalRewriteStatement`
--- only claims *existence* of a decomposition. A future refactor could propagate
--- the concrete decomposition from the matrix realization layer.
 lemma globalRewrite (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     GlobalRewriteStatement params A ψ := by
+  let decomp : GlobalVarianceDecomposition params A :=
+    placeholderGlobalVarianceDecomposition params A
   by_cases hι : Nonempty ι
   · letI := hι
-    exact ⟨default, by
-      simpa [abstractMatrixModel] using
+    exact ⟨decomp, by
+      simpa [decomp, placeholderGlobalVarianceDecomposition, abstractMatrixModel] using
         (matrixGlobalRewrite params (abstractMatrixModel params A ψ)).traceFormula⟩
-  · exact ⟨default, by
+  · exact ⟨decomp, by
       rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
-        globalVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ default]⟩
+        globalVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ decomp]⟩
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph

@@ -312,121 +312,168 @@ noncomputable def laplacianEigenvalue (params : Parameters) (α : Point params) 
 noncomputable def hypercubeSpectralGap (params : Parameters) : Error :=
   1 / ((params.m : Error) * (hypercubeVertexCount params : Error))
 
-/-- Output package for `prop:eigenvectors`.
-Now includes the matrix-level eigenvector equation `K · |φ_α⟩ = λ_α · |φ_α⟩`
-since `adjacency` and `fourierBasisState` both operate on `Point params`. -/
-structure EigenvectorsStatement (params : Parameters) : Prop where
-  orthonormality :
-    ∀ α β : Point params,
-      fourierBasisInnerProduct params α β = if α = β then 1 else 0
-  basisCardinality :
-    Fintype.card (Point params) = hypercubeVertexCount params
-  eigenvectorProperty :
-    ∀ α : Point params,
-      (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) =
-        ((adjacencyEigenvalue params α : ℝ) : ℂ) • fourierBasisState params α
+/-- The exact inner-product formula for the hypercube Fourier basis. -/
+lemma fourierBasisInnerProduct_eq (params : Parameters)
+    (α β : Point params) :
+    fourierBasisInnerProduct params α β = if α = β then 1 else 0 := rfl
 
-/-- Output package for `cor:laplacian-spectral-gap`.
-Includes the eigenvector equation `L · |φ_0⟩ = 0` and the spectral gap bound. -/
-structure LaplacianSpectralGapStatement (params : Parameters) : Prop where
-  eigenvalueRelation :
-    ∀ α : Point params,
-      laplacianEigenvalue params α =
-        (1 / (hypercubeVertexCount params : Error)) - adjacencyEigenvalue params α
-  positiveModesLowerBound :
-    ∀ α : Point params,
-      0 < frequencyWeight params α →
-        hypercubeSpectralGap params ≤ laplacianEigenvalue params α
-  unitWeightModesAttainGap :
-    ∀ α : Point params,
-      frequencyWeight params α = 1 →
-        laplacianEigenvalue params α = hypercubeSpectralGap params
+/-- The hypercube Fourier basis is indexed by all `q^m` vertices. -/
+lemma fourierBasisCardinality (params : Parameters) :
+    Fintype.card (Point params) = hypercubeVertexCount params := by
+  simp [hypercubeVertexCount, Fintype.card_fin]
+
+/-- Each Fourier basis vector is an eigenvector of the adjacency operator. -/
+lemma fourierBasisAdjacencyEigenvector (params : Parameters) (α : Point params) :
+    (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) =
+      ((adjacencyEigenvalue params α : ℝ) : ℂ) • fourierBasisState params α := by
+  ext u
+  let c : ℂ := (((params.m : ℂ) * (params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹)
+  have hmul :
+      (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) u =
+        c * ∑ i : Fin params.m, ∑ x : Fq params,
+          fourierBasisState params α (Function.update u i x) := by
+    calc
+      (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) u
+        = c * ∑ p : Fin params.m × Fq params,
+            fourierBasisState params α (Function.update u p.1 p.2) := by
+              change ∑ v : Point params,
+                  (c * ∑ p : Fin params.m × Fq params,
+                    if Function.update u p.1 p.2 = v then (1 : ℂ) else 0) *
+                    fourierBasisState params α v =
+                c * ∑ p : Fin params.m × Fq params,
+                  fourierBasisState params α (Function.update u p.1 p.2)
+              simp_rw [mul_assoc]
+              rw [← Finset.mul_sum]
+              apply congrArg (fun z : ℂ => c * z)
+              calc
+                ∑ v : Point params,
+                    (∑ p : Fin params.m × Fq params,
+                      if Function.update u p.1 p.2 = v then (1 : ℂ) else 0) *
+                      fourierBasisState params α v
+                  = ∑ v : Point params, ∑ p : Fin params.m × Fq params,
+                      (if Function.update u p.1 p.2 = v then (1 : ℂ) else 0) *
+                        fourierBasisState params α v := by
+                          refine Finset.sum_congr rfl ?_
+                          intro v _
+                          rw [Finset.sum_mul]
+                _ = ∑ p : Fin params.m × Fq params, ∑ v : Point params,
+                      (if Function.update u p.1 p.2 = v then (1 : ℂ) else 0) *
+                        fourierBasisState params α v := by
+                          rw [Finset.sum_comm]
+                _ = ∑ p : Fin params.m × Fq params,
+                      fourierBasisState params α (Function.update u p.1 p.2) := by
+                          refine Finset.sum_congr rfl ?_
+                          intro p _
+                          simp [eq_comm]
+      _ = c * ∑ i : Fin params.m, ∑ x : Fq params,
+            fourierBasisState params α (Function.update u i x) := by
+              rw [Fintype.sum_prod_type]
+  rw [hmul, fourierBasisState_total_update_sum]
+  have hw := frequencyWeight_le_m params α
+  have hm : (params.m : ℂ) ≠ 0 := by
+    exact_mod_cast params.hm.ne'
+  have hq : (params.q : ℂ) ≠ 0 := by
+    exact_mod_cast params.hq.ne'
+  have hM : (hypercubeVertexCount params : ℂ) ≠ 0 := by
+    exact_mod_cast (pow_pos params.hq params.m).ne'
+  simp only [mul_inv_rev, adjacencyEigenvalue, one_div, Complex.ofReal_mul,
+    Complex.ofReal_inv, Complex.ofReal_natCast, Complex.ofReal_div, Pi.smul_apply,
+    smul_eq_mul, c]
+  rw [Nat.cast_sub hw]
+  field_simp [hm, hq, hM]
 
 /-- `prop:eigenvectors`. -/
 theorem eigenvectors (params : Parameters) :
-    EigenvectorsStatement params where
-  orthonormality _ _ := rfl
-  basisCardinality := by
-    simp [hypercubeVertexCount, Fintype.card_fin]
-  eigenvectorProperty := by
+    (∀ α β : Point params,
+      fourierBasisInnerProduct params α β = if α = β then 1 else 0) ∧
+    Fintype.card (Point params) = hypercubeVertexCount params ∧
+    ∀ α : Point params,
+      (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) =
+        ((adjacencyEigenvalue params α : ℝ) : ℂ) • fourierBasisState params α := by
+  refine ⟨?_, ?_⟩
+  · intro α β
+    exact fourierBasisInnerProduct_eq params α β
+  · refine ⟨fourierBasisCardinality params, ?_⟩
     intro α
-    ext u
-    let c : ℂ := (((params.m : ℂ) * (params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹)
-    have hmul :
-        (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) u =
-          c * ∑ i : Fin params.m, ∑ x : Fq params,
-            fourierBasisState params α (Function.update u i x) := by
-      calc
-        (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) u
-          = c * ∑ p : Fin params.m × Fq params,
-              fourierBasisState params α (Function.update u p.1 p.2) := by
-                change ∑ v : Point params,
-                    (c * ∑ p : Fin params.m × Fq params,
-                      if Function.update u p.1 p.2 = v then (1 : ℂ) else 0) *
-                      fourierBasisState params α v =
-                  c * ∑ p : Fin params.m × Fq params,
-                    fourierBasisState params α (Function.update u p.1 p.2)
-                simp_rw [mul_assoc]
-                rw [← Finset.mul_sum]
-                apply congrArg (fun z : ℂ => c * z)
-                calc
-                  ∑ v : Point params,
-                      (∑ p : Fin params.m × Fq params,
-                        if Function.update u p.1 p.2 = v then (1 : ℂ) else 0) *
-                        fourierBasisState params α v
-                    = ∑ v : Point params, ∑ p : Fin params.m × Fq params,
-                        (if Function.update u p.1 p.2 = v then (1 : ℂ) else 0) *
-                          fourierBasisState params α v := by
-                            refine Finset.sum_congr rfl ?_
-                            intro v _
-                            rw [Finset.sum_mul]
-                  _ = ∑ p : Fin params.m × Fq params, ∑ v : Point params,
-                        (if Function.update u p.1 p.2 = v then (1 : ℂ) else 0) *
-                          fourierBasisState params α v := by
-                            rw [Finset.sum_comm]
-                  _ = ∑ p : Fin params.m × Fq params,
-                        fourierBasisState params α (Function.update u p.1 p.2) := by
-                            refine Finset.sum_congr rfl ?_
-                            intro p _
-                            simp [eq_comm]
-        _ = c * ∑ i : Fin params.m, ∑ x : Fq params,
-              fourierBasisState params α (Function.update u i x) := by
-                rw [Fintype.sum_prod_type]
-    rw [hmul, fourierBasisState_total_update_sum]
-    have hw := frequencyWeight_le_m params α
-    have hm : (params.m : ℂ) ≠ 0 := by
-      exact_mod_cast params.hm.ne'
-    have hq : (params.q : ℂ) ≠ 0 := by
-      exact_mod_cast params.hq.ne'
-    have hM : (hypercubeVertexCount params : ℂ) ≠ 0 := by
-      exact_mod_cast (pow_pos params.hq params.m).ne'
-    simp only [mul_inv_rev, adjacencyEigenvalue, one_div, Complex.ofReal_mul,
-      Complex.ofReal_inv, Complex.ofReal_natCast, Complex.ofReal_div, Pi.smul_apply,
-      smul_eq_mul, c]
-    rw [Nat.cast_sub hw]
-    field_simp [hm, hq, hM]
+    exact fourierBasisAdjacencyEigenvector params α
+
+lemma eigenvectors_orthonormality (params : Parameters)
+    (α β : Point params) :
+    fourierBasisInnerProduct params α β = if α = β then 1 else 0 :=
+  (eigenvectors params).1 α β
+
+lemma eigenvectors_basisCardinality (params : Parameters) :
+    Fintype.card (Point params) = hypercubeVertexCount params :=
+  (eigenvectors params).2.1
+
+lemma eigenvectors_eigenvectorProperty (params : Parameters) (α : Point params) :
+    (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) =
+      ((adjacencyEigenvalue params α : ℝ) : ℂ) • fourierBasisState params α :=
+  (eigenvectors params).2.2 α
+
+/-- The Laplacian eigenvalue is the complement of the adjacency eigenvalue. -/
+lemma laplacianEigenvalueRelation (params : Parameters) (α : Point params) :
+    laplacianEigenvalue params α =
+      (1 / (hypercubeVertexCount params : Error)) - adjacencyEigenvalue params α := by
+  simp only [laplacianEigenvalue, adjacencyEigenvalue, hypercubeVertexCount]
+  have hm : (params.m : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr params.hm.ne'
+  have hM : (↑(params.q ^ params.m) : ℝ) ≠ 0 := by
+    exact_mod_cast (pow_pos params.hq params.m).ne'
+  have hw := frequencyWeight_le_m params α
+  rw [Nat.cast_sub hw]
+  field_simp [hm, hM]
+  ring_nf
+
+/-- Every non-constant Fourier mode has Laplacian eigenvalue at least the spectral gap. -/
+lemma laplacianEigenvalue_ge_hypercubeSpectralGap_of_weight_pos (params : Parameters)
+    (α : Point params) (hα : 0 < frequencyWeight params α) :
+    hypercubeSpectralGap params ≤ laplacianEigenvalue params α := by
+  simp only [hypercubeSpectralGap, laplacianEigenvalue, hypercubeVertexCount]
+  apply div_le_div_of_nonneg_right _ (by positivity)
+  exact_mod_cast hα
+
+/-- Weight-one Fourier modes attain the hypercube spectral gap exactly. -/
+lemma laplacianEigenvalue_eq_hypercubeSpectralGap_of_weight_one (params : Parameters)
+    (α : Point params) (hα : frequencyWeight params α = 1) :
+    laplacianEigenvalue params α = hypercubeSpectralGap params := by
+  simp only [laplacianEigenvalue, hypercubeSpectralGap, hypercubeVertexCount, hα]
+  norm_cast
 
 /-- `cor:laplacian-spectral-gap`. \leanok -/
 theorem laplacianSpectralGap (params : Parameters) :
-    LaplacianSpectralGapStatement params where
-  eigenvalueRelation := by
-    intro α
-    simp only [laplacianEigenvalue, adjacencyEigenvalue, hypercubeVertexCount]
-    have hm : (params.m : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr params.hm.ne'
-    have hM : (↑(params.q ^ params.m) : ℝ) ≠ 0 := by
-      exact_mod_cast (pow_pos params.hq params.m).ne'
-    have hw := frequencyWeight_le_m params α
-    rw [Nat.cast_sub hw]
-    field_simp [hm, hM]
-    ring
-  positiveModesLowerBound := by
-    intro α hα
-    simp only [hypercubeSpectralGap, laplacianEigenvalue, hypercubeVertexCount]
-    apply div_le_div_of_nonneg_right _ (by positivity)
-    exact_mod_cast hα
-  unitWeightModesAttainGap := by
-    intro α hα
-    simp only [laplacianEigenvalue, hypercubeSpectralGap, hypercubeVertexCount, hα]
-    norm_cast
+    (∀ α : Point params,
+      laplacianEigenvalue params α =
+        (1 / (hypercubeVertexCount params : Error)) - adjacencyEigenvalue params α) ∧
+    (∀ α : Point params,
+      0 < frequencyWeight params α →
+        hypercubeSpectralGap params ≤ laplacianEigenvalue params α) ∧
+    ∀ α : Point params,
+      frequencyWeight params α = 1 →
+        laplacianEigenvalue params α = hypercubeSpectralGap params := by
+  refine ⟨?_, ?_⟩
+  · intro α
+    exact laplacianEigenvalueRelation params α
+  · refine ⟨?_, ?_⟩
+    · intro α hα
+      exact laplacianEigenvalue_ge_hypercubeSpectralGap_of_weight_pos params α hα
+    · intro α hα
+      exact laplacianEigenvalue_eq_hypercubeSpectralGap_of_weight_one params α hα
+
+lemma laplacianSpectralGap_eigenvalueRelation (params : Parameters) (α : Point params) :
+    laplacianEigenvalue params α =
+      (1 / (hypercubeVertexCount params : Error)) - adjacencyEigenvalue params α :=
+  (laplacianSpectralGap params).1 α
+
+lemma laplacianSpectralGap_positiveModesLowerBound (params : Parameters)
+    (α : Point params) :
+    0 < frequencyWeight params α →
+      hypercubeSpectralGap params ≤ laplacianEigenvalue params α :=
+  (laplacianSpectralGap params).2.1 α
+
+lemma laplacianSpectralGap_unitWeightModesAttainGap (params : Parameters)
+    (α : Point params) :
+    frequencyWeight params α = 1 →
+      laplacianEigenvalue params α = hypercubeSpectralGap params :=
+  (laplacianSpectralGap params).2.2 α
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph
