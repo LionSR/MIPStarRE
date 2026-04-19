@@ -111,20 +111,14 @@ structure SpectralTruncationStatement {Outcome : Type*}
     roundedFamily.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
 
-/-- Temporary bridge package for the spectral-truncation construction.
-
-This isolates the still-unformalized linear-algebra step that turns an
-almost-projective measurement into the paper's raw projective family `R_a`.
-Because the resulting error bounds are state-dependent, the bridge is stated
-only for normalized states. -/
-structure SpectralTruncationBridgePackage {Outcome : Type*}
+/-- Explicit input exposing the paper's spectral truncation stage. -/
+abbrev SpectralTruncationInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
-  fromSourceAlmostProjective :
-    ψ.IsNormalized →
-      (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
-        SpectralTruncationStatement ψ A ζ
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :=
+  ψ.IsNormalized →
+    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
+      SpectralTruncationStatement ψ A ζ
 
 /-- Output package for the rounding-to-projective step. -/
 structure RoundedProjMeasStatement {Outcome : Type*}
@@ -138,34 +132,28 @@ structure RoundedProjMeasStatement {Outcome : Type*}
       (constSubMeasFamily P.toSubMeas)
       ζ
 
-/-- Temporary bridge package for the late Section 5 repair from the raw rounded
-family to a genuine projective submeasurement on the same space. -/
-structure ProjectivizationRepairPackage {Outcome : Type*}
+/-- Explicit input exposing the late repair from a rounded family to a genuine
+projective submeasurement. -/
+abbrev ProjectivizationRepairInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
-  fromSpectral :
-    SpectralTruncationStatement ψ A ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement ψ A P (roundingToProjectiveError ζ)
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :=
+  SpectralTruncationStatement ψ A ζ →
+    ∃ P : ProjSubMeas Outcome ι,
+      RoundedProjMeasStatement ψ A P (roundingToProjectiveError ζ)
 
-/-- Temporary bridge package for the final descent from the product-space
-measurement lemma back to the local orthonormalization theorem.
-
-The paper's `100 · ζ^{1/4}` bound is state-dependent, so the bridge records the
-missing normalized-state hypothesis explicitly. -/
-structure OrthonormalizationBridgePackage {Outcome : Type*}
+/-- Explicit input exposing the final product-space orthonormalization step. -/
+abbrev OrthonormalizationInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
-  fromSSC :
-    ψ.IsNormalized →
-      BipartiteSSCRel ψ (uniformDistribution Unit)
-        (constSubMeasFamily A) ζ →
-        ∃ P : ProjSubMeas Outcome ι,
-          SDDRel ψ (uniformDistribution Unit)
-            (constSubMeasFamily A.liftLeft)
-            (constSubMeasFamily P.toSubMeas.liftLeft)
-            (orthonormalizationError ζ)
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) :=
+  ψ.IsNormalized →
+    BipartiteSSCRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationError ζ)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

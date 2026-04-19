@@ -220,7 +220,7 @@ private lemma gCommOverlap_avgOver_snd
 
 /-- Averaging the overlap term over evaluated-slice questions through the
 first point coordinate marginalizes to the uniform `x : F_q` average. -/
-private lemma gCommOverlap_avgOver_fst
+private lemma gCommOverlap_avgOver_fst_local
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -275,7 +275,7 @@ private lemma gCommOverlapTerm_le_one
 set_option maxHeartbeats 2000000 in
 /-- Any pointwise defect bound by the common overlap term inherits a raw
 `zeta / 2` estimate after marginalizing to the slice SSC defect of `G`. -/
-private lemma gCommStability_raw_le_half_of
+private lemma gCommStability_raw_le_half_of_local
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -321,7 +321,7 @@ private lemma gCommStability_raw_le_half_of
 set_option maxHeartbeats 2000000 in
 /-- Any pointwise defect bound by the common overlap term is trivially at most
 `1`. -/
-private lemma gCommStability_raw_le_one_of
+private lemma gCommStability_raw_le_one_of_local
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -359,7 +359,7 @@ private lemma gCommStability_raw_le_one_of
 
 set_option maxHeartbeats 2000000 in
 /-- Upgrade raw `zeta / 2` and `1` bounds to the displayed `sqrt zeta` relation. -/
-private lemma sddOpRel_of_sqrt_bound_from_half_one
+private lemma sddOpRel_of_sqrt_bound_from_half_one_local
     {Question Outcome : Type*}
     [Fintype Outcome]
     (ψ : QuantumState ι)
@@ -399,7 +399,7 @@ private lemma gCommStability_raw_le_half
       (commDataProcessedGStabilityOneRight params strategy family G) ≤
     zeta / 2 := by
   exact
-    gCommStability_raw_le_half_of params strategy zeta family G hG hself
+    gCommStability_raw_le_half_of_local params strategy zeta family G hG hself
       (commDataProcessedGStabilityOneLeft params strategy family G)
       (commDataProcessedGStabilityOneRight params strategy family G)
       Prod.snd
@@ -423,7 +423,7 @@ private lemma gCommStability_raw_le_one
       (commDataProcessedGStabilityOneRight params strategy family G) ≤
     1 := by
   exact
-    gCommStability_raw_le_one_of params strategy hnorm G
+    gCommStability_raw_le_one_of_local params strategy hnorm G
       (commDataProcessedGStabilityOneLeft params strategy family G)
       (commDataProcessedGStabilityOneRight params strategy family G)
       Prod.snd
@@ -552,7 +552,9 @@ private lemma gCommStability_scalar_pointwise_bound
             opTensor (CFC.sqrt (R.outcome g)) (1 : MIPStarRE.Quantum.Op ι) := by
               rw [conjTranspose_opTensor]
               simp [hsqrt_herm]
-      _ = opTensor (CFC.sqrt (R.outcome g) * CFC.sqrt (R.outcome g)) (1 : MIPStarRE.Quantum.Op ι) := by
+      _ = opTensor
+            (CFC.sqrt (R.outcome g) * CFC.sqrt (R.outcome g))
+            (1 : MIPStarRE.Quantum.Op ι) := by
               rw [opTensor_mul]
               simp
       _ = leftTensor (ι₂ := ι) (R.outcome g) := by
@@ -927,7 +929,9 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
             opTensor (CFC.sqrt (R.outcome g)) (1 : MIPStarRE.Quantum.Op ι) := by
               rw [conjTranspose_opTensor]
               simp [hsqrt_herm]
-      _ = opTensor (CFC.sqrt (R.outcome g) * CFC.sqrt (R.outcome g)) (1 : MIPStarRE.Quantum.Op ι) := by
+      _ = opTensor
+            (CFC.sqrt (R.outcome g) * CFC.sqrt (R.outcome g))
+            (1 : MIPStarRE.Quantum.Op ι) := by
               rw [opTensor_mul]
               simp
       _ = leftTensor (ι₂ := ι) (R.outcome g) := by

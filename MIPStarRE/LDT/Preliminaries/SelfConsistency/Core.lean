@@ -159,7 +159,6 @@ theorem otherTwoNotionsOfSelfConsistency {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
-    (_hperm : PermInvState ψ)
     (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι) (δ : Error) :
     BipartiteSSCRel ψ 𝒟 A δ →

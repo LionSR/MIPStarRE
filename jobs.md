@@ -1,11 +1,11 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-14
+Last updated: 2026-04-18
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
-- **Current**: 19 executable sorrys across 6 files
-- **Eliminated**: 47 executable sorrys
+- **Current**: 16 executable sorrys across 7 files
+- **Eliminated**: 50 executable sorrys
 - **Infrastructure fixes landed on this branch**:
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
   - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
@@ -15,11 +15,10 @@ Last updated: 2026-04-14
 ## Active Test Wave
 - **Owner**: OpenCode
 - **Scope**: `MIPStarRE/LDT/Test/*.lean`
-- **Live executable sorrys in scope**: 2
+- **Live executable sorrys in scope**: 1
 - **Current live targets**:
-  - `Test/MainTheorem.lean`: `razSafra`
   - `Test/MainTheorem.lean`: `mainFormal`
-- **Status**: IN PROGRESS
+- **Status**: BLOCKED ON UPSTREAM SECTION 3/5/8/12 GAPS
 - **Dependency chain**:
   - `Test/Strategy.lean` is now paper-faithful in its failure-surrogate branch
     decomposition: the general test uses point agreement as its
@@ -32,9 +31,10 @@ Last updated: 2026-04-14
   - The `d = 0` / `k = 0` corner has been excluded in the Lean and blueprint
     statements.
   - `Test.classicalTestSoundness` now closes through the explicit quoted
-    Polishchuk-Spielman interface added on `main`; `Test.razSafra` remains a
-    genuine placeholder because the surface-vs-point test is still not
-    formalized in Lean.
+    Polishchuk-Spielman interface added on `main`.
+  - `Test.razSafra` is now proved against the current placeholder
+    `SurfaceVsPointPassCondition` / `PointAnswerSoundnessConclusion` interface,
+    so the only remaining Test-level hole is `mainFormal`.
 - **Priority order**:
   1. keep `Test/Strategy.lean` aligned with the paper
   2. if we revisit the sampled-line model, land the geometric-line
@@ -44,6 +44,8 @@ Last updated: 2026-04-14
   4. only then return to the Section 3 assembly for `mainFormal`
 - **Checklist**:
   - [x] Survey all `sorry`s in `MIPStarRE/LDT/Test`
+  - [x] Confirm the only live `sorry`s in scope are both in the forbidden file
+    `Test/MainTheorem.lean`
   - [x] Resolve the Test-level failure-surrogate mismatch behind
     `point_agreement_le_three_mul`
   - [x] Replace the stale left/right surrogate goals by the paper-faithful
@@ -53,9 +55,55 @@ Last updated: 2026-04-14
   - [x] Eliminate `mainInformal`
   - [ ] Repair the top-level Test model so sampled line questions use unique
     geometric representatives
-  - [ ] Eliminate `razSafra` and `mainFormal`
+  - [x] Close placeholder `razSafra` wrapper
+  - [ ] Eliminate `mainFormal`
+  - [x] Remove `BridgePackage` wrappers on the `mainFormal` dependency path
   - [ ] Sync any blueprint tags justified by exact Lean/theorem agreement
 - **Completed on this pass**:
+  - closed the placeholder `Test.razSafra` wrapper against the current reduced
+    surface-versus-point interfaces; this removes the local `sorry`, but it is
+    not yet a paper-faithful Raz-Safra formalization
+  - re-surveyed `MIPStarRE/LDT/Test` and confirmed the directory now contains
+    exactly one live executable `sorry`, in `Test/MainTheorem.lean`
+    (`Test.mainFormal`)
+  - verified `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean`; it now reports
+    only the single remaining `mainFormal` declaration-level `sorry`
+  - removed the `BridgePackage` API wrappers on the `mainFormal` dependency
+    path, replacing them by explicit theorem hypotheses in:
+    `MainInductionStep/Theorems.lean`,
+    `MakingMeasurementsProjective/Projectivization.lean`,
+    `MakingMeasurementsProjective/Orthonormalization.lean`,
+    `MakingMeasurementsProjective/QXPLayerData.lean`, and
+    `SelfImprovement/Theorems.lean`
+  - removed the now-dead bridge-package structure declarations from
+    `MainInductionStep/Statements.lean` and
+    `MakingMeasurementsProjective/Statements.lean`
+  - follow-up cleanup for PR review: deduplicated the repeated
+    self-improvement and projectivization obligation blocks into named input
+    abbreviations, while keeping the theorem surfaces explicit instead of
+    introducing a new bundled hypothesis
+  - verified `grep` finds no remaining `BridgePackage` names anywhere under
+    `MIPStarRE/LDT`
+  - repaired the commutativity rebuild failure in
+    `Commutativity/ScalarApproximation.lean` by rewriting the two
+    left/right-expectation symmetry sites directly through
+    `PermInvState.swap_ev`; `lake env lean
+    MIPStarRE/LDT/Commutativity/ScalarApproximation.lean` now succeeds again
+  - eliminated both `Commutativity/Transport.lean` sorries:
+    `normalizationCondition_sandwich_bound` now closes directly from
+    `normalizationConditionSquareFamily.total_le_one`, and
+    `fullSliceCommutation_qSDDOp_avg_eq` now follows by exposing the proved
+    full-slice `qSDDOp` expansion and replaying the evaluated-slice swap
+    symmetry argument on full-slice questions/outcomes
+  - verified `lake env lean MIPStarRE/LDT/Commutativity/Transport.lean`
+    succeeds with no local `sorry`
+  - verified `lake env lean MIPStarRE/LDT/Commutativity/EvaluatedSliceCommutation.lean`
+    succeeds after promoting the full-slice expansion lemma for reuse
+  - verified `lake build MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization`
+    succeeds
+  - verified `lake build MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization`
+    succeeds
+  - verified `lake build MIPStarRE.LDT.SelfImprovement.Theorems` succeeds
   - repaired `ProjStrat.lowIndividualDegreeFailureProbability` so its
     self-consistency branch is the paper's cross-player point-agreement test
   - proved `ProjStrat.point_agreement_le_three_mul`
@@ -80,7 +128,6 @@ Last updated: 2026-04-14
   - verified `lake env lean MIPStarRE/LDT/Test/Strategy.lean`
   - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Defs.lean`
   - verified `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean`
-  - verified `lake build` succeeds with the current edits
   - traced the remaining `Test.mainFormal` path far enough to isolate two
     paper-level structural gaps:
     1. `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
@@ -93,9 +140,14 @@ Last updated: 2026-04-14
   - `Test.mainFormal` is still blocked by the sampled-line modeling question as
     well as the still-missing Section 3 assembly from the repaired symmetrized
     Test theorem to the final unsymmetrized/projectivized witnesses.
+  - The explicit `BridgePackage` wrappers are now gone, but the same missing
+    mathematical obligations remain, just surfaced honestly as theorem
+    hypotheses on the Section 5/8/10 wrappers. There is still no theorem on the
+    current proof path deriving those hypotheses directly from
+    `strategy.PassesLowIndividualDegreeTest eps`.
   - Concretely, `mainFormal` still needs the bridge chain through the upstream
-    remaining sorries in `MakingMeasurementsProjective`, `Commutativity`,
-    `CommutativityPoints`, `Projectivization`, and `Pasting`.
+    remaining sorries in `Commutativity/ScalarApproximation.lean`,
+    `Commutativity/Main.lean`, and the Section 12 `Pasting` files.
   - The geometric-line canonicalization is not merged on the live proof path in
     this branch: the commutativity bridge remains proved only for the older raw
     `PointDiagonalLineQuestion = DiagonalLine × Fq` model.
@@ -116,15 +168,17 @@ Last updated: 2026-04-14
   - A paper-faithful Section 5 repair will need to refactor this intermediate
     statement back to the raw projective-family / total-bound form from
     `orthonormalization.tex`, then rebuild the later adjustment step honestly.
-  - `Test.razSafra` is still a genuine placeholder for the surface-vs-point
-    classical test, which is not formalized anywhere else in the repository.
 - **Best next step once unblocked**:
+  - continue the Section 3 assembly for `mainFormal`, starting from the
+    now-explicit Section 5/8/10 hypotheses and either proving them directly or
+    replacing those wrapper surfaces by the real theorems they are standing in
+    for, without adding new assumptions to `Test.mainFormal`
   - continue up the Section 3 dependency chain, starting with the remaining
     projectivization / orthonormalization / commutativity / pasting wrappers
     needed to produce the witness consumed by `Test.mainFormal`.
   - No blueprint `\leanok` tags were added on this pass: the remaining `Test`
-    theorems are still blocked by modeling issues, and the Chapter 1 classical
-    theorems are still intentionally opaque.
+    theorem is still blocked by modeling issues and upstream assembly gaps, and
+    the Chapter 1 classical theorems are still intentionally opaque.
 
 ## Active Preliminaries Wave
 - **Owner**: OpenCode

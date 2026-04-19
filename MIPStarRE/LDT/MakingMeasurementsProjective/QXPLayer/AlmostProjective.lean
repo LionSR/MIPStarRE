@@ -46,19 +46,15 @@ lemma qAlmostProjective {Outcome : Type*}
               exact MIPStarRE.Quantum.sandwich_mono (M := Qa data a) hQa_herm hRank.total_le
       _ = (((1 : Error) + 2 * ε) : ℂ) • Qa data a := by
             simp [hQa_sq]
-  have hsum_smul (s : Finset Outcome) :
-      Finset.sum s (fun a => (((1 : Error) + 2 * ε) : ℂ) • Qa data a) =
-        (((1 : Error) + 2 * ε) : ℂ) • Finset.sum s (fun a => Qa data a) := by
-    simpa using
-      (Finset.smul_sum (s := s) (r := (((1 : Error) + 2 * ε) : ℂ))
-        (f := fun a : Outcome => Qa data a)).symm
   have hsum_le :
       (∑ a, sandwiched a) ≤ (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) := by
     calc
       (∑ a, sandwiched a) ≤ ∑ a, (((1 : Error) + 2 * ε) : ℂ) • Qa data a := by
         exact Finset.sum_le_sum fun a _ => hsandwiched_le a
       _ = (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) := by
-        simpa using hsum_smul Finset.univ
+        simpa using
+          (Finset.smul_sum (s := Finset.univ) (r := (((1 : Error) + 2 * ε) : ℂ))
+            (f := fun a : Outcome => Qa data a)).symm
   have hsub_le :
       (∑ a, sandwiched a) - ∑ a, Qa data a ≤
         (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) - ∑ a, Qa data a := by
@@ -83,24 +79,23 @@ lemma qAlmostProjective {Outcome : Type*}
             simp [sandwiched, Finset.sum_sub_distrib]
     _ ≤ (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) - ∑ a, Qa data a := hsub_le
     _ = (2 * ε) • QTotal data := by
-          rw [hRank.sum_eq_total]
-          ext i j
-          simp only [Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul,
-            Complex.real_smul]
-          push_cast
-          ring
+          rw [hRank.sum_eq_total, add_smul,
+              show (((1 : Error) : ℂ)) = (1 : ℂ) from Complex.ofReal_one, one_smul,
+              add_sub_cancel_left,
+              show ((2 : ℂ) * ((ε : Error) : ℂ)) = (((2 * ε : Error)) : ℂ) from by
+                push_cast; ring,
+              Complex.coe_smul]
     _ ≤ (2 * ε) • ((((1 : Error) + 2 * ε) : ℂ) • (1 : MIPStarRE.Quantum.Op ι)) := hscaled_total
     _ = ((2 * ε) * ((1 : Error) + 2 * ε)) • (1 : MIPStarRE.Quantum.Op ι) := by
-          ext i j
-          simp only [Matrix.smul_apply, Matrix.one_apply, smul_eq_mul,
-            Complex.real_smul]
-          split_ifs <;> push_cast <;> ring
+          rw [show (((1 : Error) + 2 * ε) : ℂ) = ((((1 : Error) + 2 * ε : ℝ)) : ℂ) from by
+                push_cast; ring,
+              Complex.coe_smul, smul_smul]
     _ ≤ ((4 : Error) * ε) • (1 : MIPStarRE.Quantum.Op ι) := hcoeff_op
     _ = (((4 : Error) * spectralTruncationError ζ) : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
-          ext i j
-          simp only [Matrix.smul_apply, Matrix.one_apply, smul_eq_mul,
-            Complex.real_smul]
-          split_ifs <;> push_cast <;> ring
+          rw [show (((4 : Error) : ℂ) * ((spectralTruncationError ζ : Error) : ℂ))
+                 = (((4 : Error) * spectralTruncationError ζ : Error) : ℂ) from by
+                push_cast; ring,
+              Complex.coe_smul]
 
 
 end
