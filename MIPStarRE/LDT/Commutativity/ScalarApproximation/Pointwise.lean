@@ -307,12 +307,6 @@ lemma gCommStability_pointwise_bound
   let y := pointHeight params q.2
   let T : MIPStarRE.Quantum.Op ι := (G y).total
   let A : SubMeas (Fq params) ι := evaluatedPointFamily params family q.1
-  have hT_herm : Tᴴ = T := by
-    exact
-      (Matrix.nonneg_iff_posSemidef.mp <| by
-        simpa [T] using (G y).total_nonneg).isHermitian.eq
-  have hTc_herm : (1 - T)ᴴ = 1 - T := by
-    simp [hT_herm]
   calc
     ∑ ah : StabilityOneOutcome params,
         ev strategy.state
@@ -407,7 +401,7 @@ lemma gCommStability_ssc_point
                               cases j with
                               | mk j1 j2 =>
                                   by_cases h1 : i1 = j1 <;> by_cases h2 : i2 = j2 <;>
-                                    simp [leftTensor, sub_eq_add_neg, Matrix.one_apply, h1, h2]
+                                    simp [leftTensor, sub_eq_add_neg, h1, h2]
                           calc
                             leftTensor (ι₂ := ι) (1 - T) * rightTensor (ι₁ := ι) T
                               = (leftTensor (ι₂ := ι) 1 - leftTensor (ι₂ := ι) T) *
@@ -428,11 +422,7 @@ lemma gCommStability_ssc_point
             ev strategy.state (opTensor ((G x).outcome h) ((G x).outcome h)) := by
             linarith
     _ ≤ qBipartiteSSCDefect strategy.state (G x) := by
-          simpa [qBipartiteSSCDefect, T] using
-            (le_max_right 0
-              (ev strategy.state (leftTensor (ι₂ := ι) T) -
-                ∑ h : Polynomial params,
-                  ev strategy.state (opTensor ((G x).outcome h) ((G x).outcome h))))
+          simp [qBipartiteSSCDefect, T]
 
 
 

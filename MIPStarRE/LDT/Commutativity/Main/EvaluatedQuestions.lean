@@ -218,9 +218,6 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
                   Real.sqrt
                     (commDataProcessedGError params gamma zeta)) +
                 ((↑params.m : Error) * ↑params.d / ↑params.q)) := by
-              have := abs_nonneg
-                (fullSliceABAAvg params strategy family -
-                  fullSliceABABAvg params strategy family)
               linarith [hMargX, hMargY', hClose]
         _ = 12 * Real.sqrt zeta +
               4 * (↑params.m * ↑params.d / ↑params.q) +
