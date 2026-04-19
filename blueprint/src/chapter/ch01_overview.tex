@@ -28,6 +28,17 @@
 	See Polishchuk--Spielman [PS94].
 \end{proof}
 
+% Paper source: references/ldt-paper/introduction.tex, lines 236--264.
+\begin{remark}[A degree-$(d+1)$ strategy that passes with probability $1-\frac{1}{m}$]\label{ex:bad-individual-degree-example}
+		Fix the polynomial $h(x_1, \ldots, x_m) = x_1^{d+1}$. Consider the following classical strategy for the degree-$d$ low individual degree test. On a point query $u \in \F_q^m$, Prover~$\mathrm{A}$ answers $a = h(u)$. On an axis-parallel line query $\ell = \{u + x e_i : x \in \F_q\}$, Prover~$\mathrm{B}$ returns the restriction $h\vert_{\ell}$ when $i \neq 1$, since $h$ is then constant along $\ell$, and returns the zero polynomial when $i = 1$.
+
+		The verifier certainly accepts whenever $i \neq 1$, which happens with probability $1 - \frac{1}{m}$. Thus the strategy passes the degree-$d$ test with probability at least $1-\eps$ for $\eps = \frac{1}{m}$. However, Prover~$\mathrm{A}$ is answering according to a polynomial whose individual degree in the first variable is $d+1$. By Schwartz--Zippel, any polynomial $g$ of individual degree at most $d$ agrees with $h$ on at most a $\frac{d+1}{q}$ fraction of all inputs, so
+		\[
+			\Prb_{u \sim \F_q^m}[g(u)=a] \le 1 - m\eps + \frac{d+1}{q}.
+		\]
+		This shows that the $m$-dependent slack in Theorems~\ref{thm:classical-test-soundness} and~\ref{thm:main-informal} is unavoidable up to polynomial factors.
+\end{remark}
+
 \begin{theorem}[Main theorem, informal]\label{thm:main-informal}
 	If $d > 0$ and a two-prover projective strategy passes the $(m,q,d)$ low individual degree test with probability $1-\eps$, then there are global polynomial measurements whose evaluations agree with the point answers except with error $\poly(m)(\poly(\eps)+\poly(d/q))$.
 \end{theorem}
