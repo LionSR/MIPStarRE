@@ -13,7 +13,7 @@ class. This is the building block invoked at:
   `comMain` (issue #297).
 
 The earlier private form of this lemma lived in
-`MIPStarRE.LDT.Commutativity.Theorems`. Promoting it lets both `comMain`
+`MIPStarRE.LDT.Commutativity.Scaffold.Symmetry`. Promoting it lets both `comMain`
 and `mainFormal` Step 5 (#425) share one proof.
 
 ## References
