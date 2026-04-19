@@ -318,7 +318,7 @@ lemma fourierBasisInnerProduct_eq (params : Parameters)
     fourierBasisInnerProduct params α β = if α = β then 1 else 0 := rfl
 
 /-- The hypercube Fourier basis is indexed by all `q^m` vertices. -/
-lemma fourierBasisCardinality (params : Parameters) :
+lemma fourierBasis_card (params : Parameters) :
     Fintype.card (Point params) = hypercubeVertexCount params := by
   simp [hypercubeVertexCount, Fintype.card_fin]
 
@@ -393,19 +393,13 @@ theorem eigenvectors (params : Parameters) :
   refine ⟨?_, ?_⟩
   · intro α β
     exact fourierBasisInnerProduct_eq params α β
-  · refine ⟨fourierBasisCardinality params, ?_⟩
+  · refine ⟨fourierBasis_card params, ?_⟩
     intro α
     exact fourierBasisAdjacencyEigenvector params α
 
-lemma eigenvectors_orthonormality (params : Parameters)
-    (α β : Point params) :
-    fourierBasisInnerProduct params α β = if α = β then 1 else 0 :=
-  (eigenvectors params).1 α β
-
-lemma eigenvectors_basisCardinality (params : Parameters) :
-    Fintype.card (Point params) = hypercubeVertexCount params :=
-  (eigenvectors params).2.1
-
+/-- Projection of `eigenvectors` onto the eigenvector conjunct: every Fourier
+basis state is an eigenvector of the adjacency operator with the paper's
+eigenvalue `adjacencyEigenvalue params α`. -/
 lemma eigenvectors_eigenvectorProperty (params : Parameters) (α : Point params) :
     (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) =
       ((adjacencyEigenvalue params α : ℝ) : ℂ) • fourierBasisState params α :=
@@ -459,21 +453,20 @@ theorem laplacianSpectralGap (params : Parameters) :
     · intro α hα
       exact laplacianEigenvalue_eq_hypercubeSpectralGap_of_weight_one params α hα
 
+/-- Projection of `laplacianSpectralGap` onto the eigenvalue-relation conjunct:
+the Laplacian eigenvalue on `φ_α` equals `1/M` minus the adjacency eigenvalue. -/
 lemma laplacianSpectralGap_eigenvalueRelation (params : Parameters) (α : Point params) :
     laplacianEigenvalue params α =
       (1 / (hypercubeVertexCount params : Error)) - adjacencyEigenvalue params α :=
   (laplacianSpectralGap params).1 α
 
+/-- Projection of `laplacianSpectralGap` onto the lower-bound conjunct: every
+non-constant Fourier mode has Laplacian eigenvalue at least the spectral gap
+`hypercubeSpectralGap params = 1/(mM)`. -/
 lemma laplacianSpectralGap_positiveModesLowerBound (params : Parameters)
     (α : Point params) :
     0 < frequencyWeight params α →
       hypercubeSpectralGap params ≤ laplacianEigenvalue params α :=
   (laplacianSpectralGap params).2.1 α
-
-lemma laplacianSpectralGap_unitWeightModesAttainGap (params : Parameters)
-    (α : Point params) :
-    frequencyWeight params α = 1 →
-      laplacianEigenvalue params α = hypercubeSpectralGap params :=
-  (laplacianSpectralGap params).2.2 α
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph
