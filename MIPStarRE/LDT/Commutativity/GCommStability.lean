@@ -542,7 +542,7 @@ private lemma gCommStability_scalar_pointwise_bound
     have hsqrt_herm : (CFC.sqrt (R.outcome g))ᴴ = CFC.sqrt (R.outcome g) := by
       exact
         (Matrix.nonneg_iff_posSemidef.mp <| by
-          simpa using CFC.sqrt_nonneg (R.outcome g)).isHermitian.eq
+          exact CFC.sqrt_nonneg (R.outcome g)).isHermitian.eq
     calc
       X g * (X g)ᴴ
           = opTensor (CFC.sqrt (R.outcome g)) (1 : MIPStarRE.Quantum.Op ι) *
@@ -568,7 +568,7 @@ private lemma gCommStability_scalar_pointwise_bound
     have hsqrt_herm : (CFC.sqrt (R.outcome g))ᴴ = CFC.sqrt (R.outcome g) := by
       exact
         (Matrix.nonneg_iff_posSemidef.mp <| by
-          simpa using CFC.sqrt_nonneg (R.outcome g)).isHermitian.eq
+          exact CFC.sqrt_nonneg (R.outcome g)).isHermitian.eq
     have hW_herm : (W g)ᴴ = W g :=
       averagedSlicePointEvaluationOperator_hermitian params strategy y g
     calc
@@ -919,7 +919,7 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
     have hsqrt_herm : (CFC.sqrt (R.outcome g))ᴴ = CFC.sqrt (R.outcome g) := by
       exact
         (Matrix.nonneg_iff_posSemidef.mp <| by
-          simpa using CFC.sqrt_nonneg (R.outcome g)).isHermitian.eq
+          exact CFC.sqrt_nonneg (R.outcome g)).isHermitian.eq
     calc
       X g * (X g)ᴴ
           = opTensor (CFC.sqrt (R.outcome g)) (1 : MIPStarRE.Quantum.Op ι) *
@@ -945,7 +945,7 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
     have hsqrt_herm : (CFC.sqrt (R.outcome g))ᴴ = CFC.sqrt (R.outcome g) := by
       exact
         (Matrix.nonneg_iff_posSemidef.mp <| by
-          simpa using CFC.sqrt_nonneg (R.outcome g)).isHermitian.eq
+          exact CFC.sqrt_nonneg (R.outcome g)).isHermitian.eq
     have hW_herm : (W g)ᴴ = W g :=
       averagedSlicePointEvaluationOperator_hermitian params strategy x g
     calc
