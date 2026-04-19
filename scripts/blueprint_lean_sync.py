@@ -127,7 +127,6 @@ class ProofFrame:
 
     attach_entry_start: int | None
     attach_entry_end: int | None
-    attach_label: str | None
     has_leanok: bool = False
 
 
@@ -343,7 +342,6 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
                     ProofFrame(
                         attach_entry_start=last_env.get("_entry_start") if last_env else None,
                         attach_entry_end=last_env.get("_entry_end") if last_env else None,
-                        attach_label=last_env.get("label") if last_env else None,
                         has_leanok=bool(_TEX_LEANOK_RE.search(line)),
                     )
                 )
