@@ -111,6 +111,25 @@
 	\]
 \end{proof}
 
+% Paper source: references/ldt-paper/orthonormalization.tex, lines 189--271.
+\begin{remark}[Naimark dilation does not preserve $\approx_\delta$]\label{ex:easy-but-long}
+		Let $\ket{\psi}$ be any state in $\C^d \ot \C^d$, and consider the two-outcome measurements $A = \{A_0, A_1\}$ and $B = \{B_0, B_1\}$ with
+		\[
+			A_0 = A_1 = B_0 = B_1 = \tfrac{1}{2} I.
+		\]
+		For each outcome $a \in \{0,1\}$, the operators $A_a \ot I$ and $I \ot B_a$ are both equal to $\tfrac{1}{2} I \ot I$, so $A_a \ot I \approx_0 I \ot B_a$ on the state $\ket{\psi}$.
+
+		Now apply the Naimark construction with a qubit auxiliary space on each side and auxiliary state $\ket{+} = \tfrac{1}{\sqrt 2}(\ket{0}+\ket{1})$. Since $A$ and $B$ are genuine measurements rather than sub-measurements, the extra $\ket{\bot}$ direction from \ref{lem:naimark-helper} is unnecessary in this example. The unitary from \ref{lem:naimark-helper} can then be taken to be the identity, so the dilated measurements are
+		\[
+			\widehat A_a = I \ot \ket{a}\bra{a}, \qquad \widehat B_a = I \ot \ket{a}\bra{a}.
+		\]
+		If $\ket{\widehat{\psi}} = \ket{\psi} \ot \ket{+} \ot \ket{+}$, then a direct calculation gives
+		\[
+			\sum_{a \in \{0,1\}} \bigl\lVert (\widehat A_a \ot I - I \ot \widehat B_a) \ket{\widehat{\psi}} \bigr\rVert^2 = 1.
+		\]
+		Thus on the state $\ket{\widehat{\psi}}$ the dilated family satisfies $\widehat A_a \ot I \approx_\delta I \ot \widehat B_a$ only for $\delta \ge 1$, even though the original family satisfied the same relation with $\delta = 0$. This is why we use Theorem~\ref{thm:orthonormalization} rather than simply applying Theorem~\ref{thm:naimark}: Naimark preserves the outcome probabilities, but it need not preserve the state-dependent $\approx_\delta$ estimates needed later.
+\end{remark}
+
 \subsection{Orthogonalization lemma}\label{sec:orthogonalization}
 
 \begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
