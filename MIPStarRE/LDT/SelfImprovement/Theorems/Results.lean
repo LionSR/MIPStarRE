@@ -142,7 +142,6 @@ theorem selfImprovement
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hnormalizedState : strategy.state.IsNormalized)
     (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
       HelperStrongSelfConsistencyInput params strategy eps delta)
@@ -162,10 +161,15 @@ theorem selfImprovement
         (constSubMeasFamily Hhat)
         (selfImprovementHelperError params eps delta) :=
     hhelperStrongSelfConsistency hhelper
-  rcases orthonormalization strategy.state hnormalizedState
+  have horthBridge :
+      MakingMeasurementsProjective.OrthonormalizationInput strategy.state Hhat
+        (selfImprovementHelperError params eps delta) := by
+    intro _hψ hssc
+    exact horthonormalization hssc
+  rcases orthonormalization strategy.state strategy.isNormalized
       Hhat
       (selfImprovementHelperError params eps delta)
-      hssc horthonormalization with ⟨H, horth⟩
+      hssc horthBridge with ⟨H, horth⟩
   have hdata :
       SDDRel strategy.state (uniformDistribution (Point params))
         ((polynomialEvaluationFamily params Hhat).liftLeft)
@@ -195,7 +199,6 @@ theorem selfImprovementFromSubMeas
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hnormalizedState : strategy.state.IsNormalized)
     (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
       HelperStrongSelfConsistencyInput params strategy eps delta)
@@ -211,7 +214,7 @@ theorem selfImprovementFromSubMeas
       SelfImprovementSubMeasConclusion params strategy G H Z
         eps delta gamma nu := by
   rcases selfImprovement params strategy eps delta gamma nu
-      hnormalizedState hglobalVarianceProofInputs hhelperStrongSelfConsistency
+      hglobalVarianceProofInputs hhelperStrongSelfConsistency
       horthonormalization hevaluationDataProcessing hfinalFields hgood Gmeas
       with ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩

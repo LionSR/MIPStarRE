@@ -58,7 +58,6 @@ theorem selfImprovementInInductionSection
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hnormalizedState : strategy.state.IsNormalized)
     (hglobalVarianceProofInputs :
       SelfImprovement.GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
@@ -78,7 +77,7 @@ theorem selfImprovementInInductionSection
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   rcases SelfImprovement.selfImprovementFromSubMeas
-      params strategy eps delta gamma nu hnormalizedState
+      params strategy eps delta gamma nu
       hglobalVarianceProofInputs hhelperStrongSelfConsistency
       horthonormalization hevaluationDataProcessing hfinalFields
       hgood G Gmeas hbridge with
