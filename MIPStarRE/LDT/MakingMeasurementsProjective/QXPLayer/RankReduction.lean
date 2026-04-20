@@ -195,7 +195,7 @@ lemma projectiveNonMeasurement {Outcome : Type uOutcome}
 
 /-- **Degenerate empty-outcome branch** for `lem:projective-low-rank-sum`.
 
-In `references/ldt-paper/orthonormalization.tex`, lines 540--658, the rank-
+In `references/ldt-paper/orthonormalization.tex`, lines 540-658, the rank-
 reduction argument starts from an honest measurement `A = {A_a}` on a nontrivial
 ambient space. If `Outcome` were empty, then `∑ a, A_a = 0` while
 `A.total_eq_one` forces the same sum to be `1`, so this branch is impossible.
@@ -231,13 +231,14 @@ caller-supplied parameters rather than via a dedicated `*BridgePackage` wrapper.
 In the paper (orthonormalization.tex), Lem 5.5 itself only produces `{Q_a}`;
 the auxiliary space `ℂ^m` and the projective measurement
 `T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent
-"Matrix decomposition of `Q_a`" definition, which requires an orthonormal
-eigenbasis of each rounded projector `R_a`'s 1-eigenspace — a construction
-not currently available in Mathlib (no matrix SVD; no restriction of
-`Matrix.IsHermitian.eigenvectorBasis` to a projector's 1-eigenspace; no
-matrix-level `rank_of_isProj` adapter).  Exposing `(auxSpace, t, hAuxDim)`
-as direct parameters localises this debt to call sites without hiding it
-behind a vacuous `default` witness. -/
+"Matrix decomposition of `Q_a`" definition (orthonormalization.tex:777-795).
+That step needs an orthonormal basis of each rounded projector `R_a`'s
+1-eigenspace together with a matrix-level `rank_of_isProj` adapter. Mathlib
+does not currently expose that restricted eigenbasis construction, so
+`(auxSpace, t, hAuxDim)` remain explicit parameters here rather than being
+hidden behind a vacuous `default` witness. The broader downstream
+`QXPLayerData` pipeline also still lacks a complex-matrix SVD API, as tracked
+in issue #525. -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -245,6 +246,10 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
     (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 ≤ ζ)
     (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ)
+    -- TODO(#525): Materialise `(auxSpace, t, hAuxDim)` from the paper's
+    -- "Matrix decomposition of `Q_a`" (orthonormalization.tex:777-795),
+    -- i.e. from a 1-eigenspace ONB for each rounded projector `q.outcome a`
+    -- produced by `hbridge.fromSourceAlmostProjective` (the paper's `R_a`).
     (auxSpace : FiniteHilbertSpace.{uι})
     (t : ProjMeas Outcome auxSpace.carrier)
     (hAuxDim : Fintype.card auxSpace.carrier ≤ Fintype.card ι)
