@@ -277,37 +277,20 @@ lemma localRewrite (params : Parameters)
       rw [localVariance_eq_zero_of_isEmpty hι params A ψ,
         localVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ]⟩
 
-/-- Placeholder witness for `lem:global-rewrite`.
-
-TODO(#452): the paper gives a concrete decomposition of `Acombine`, but the
-current `GlobalVarianceDecomposition` fields do not encode that decomposition,
-and `globalVarianceTraceWitness` ignores the witness entirely. Once the
-statement is strengthened to carry the paper data, replace this placeholder
-with the concrete decomposition. -/
-private def placeholderGlobalVarianceDecomposition (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) :
-    GlobalVarianceDecomposition params A :=
-  default
-
 /-- `lem:global-rewrite`.
-
-NOTE: the witness used here is `placeholderGlobalVarianceDecomposition`, an
-unstructured `default` element. `GlobalVarianceDecomposition` is currently a
-trivially-inhabited `Prop` class and `globalVarianceTraceWitness` ignores its
-argument, so this existential is strictly weaker than the paper's `‖A_+‖₂² +
-‖A_-‖₂²` decomposition. Strengthening this is tracked under #452. -/
+The existential witness is the canonical `canonicalGlobalVarianceDecomposition`,
+determined by `params` and `A`, whose `averageComponent` is the paper's
+`A_0 = M^{-1/2} · ∑_u A^u` (expansion.tex §7.2, *Local and global variance*). -/
 lemma globalRewrite (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     GlobalRewriteStatement params A ψ := by
-  let decomp : GlobalVarianceDecomposition params A :=
-    placeholderGlobalVarianceDecomposition params A
+  refine ⟨canonicalGlobalVarianceDecomposition params A, ?_⟩
   by_cases hι : Nonempty ι
   · letI := hι
-    exact ⟨decomp, by
-      simpa [decomp, placeholderGlobalVarianceDecomposition, abstractMatrixModel] using
-        (matrixGlobalRewrite params (abstractMatrixModel params A ψ)).traceFormula⟩
-  · exact ⟨decomp, by
-      rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
-        globalVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ decomp]⟩
+    simpa [abstractMatrixModel] using
+      (matrixGlobalRewrite params (abstractMatrixModel params A ψ)).traceFormula
+  · rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
+      globalVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ
+        (canonicalGlobalVarianceDecomposition params A)]
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph

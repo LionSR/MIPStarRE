@@ -193,6 +193,32 @@ lemma projectiveNonMeasurement {Outcome : Type uOutcome}
   rcases hbridge.fromSourceAlmostProjective hsource with ⟨R, hR, _⟩
   exact ⟨R, hR⟩
 
+/-- **Degenerate empty-outcome branch** for `lem:projective-low-rank-sum`.
+
+In `references/ldt-paper/orthonormalization.tex`, lines 540--658, the rank-
+reduction argument starts from an honest measurement `A = {A_a}` on a nontrivial
+ambient space. If `Outcome` were empty, then `∑ a, A_a = 0` while
+`A.total_eq_one` forces the same sum to be `1`, so this branch is impossible.
+We isolate that contradiction here so `projectiveLowRankSum` can focus on the
+spectral construction in the nonempty case. -/
+private lemma rankReduction_emptyOutcome
+    {Outcome : Type uOutcome} {ι : Type uι}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    [Fintype Outcome] [DecidableEq Outcome] [IsEmpty Outcome]
+    (ψ : QuantumState ι)
+    (A : Measurement Outcome ι) (ζ : Error) :
+    ∃ data : QLayerData Outcome ι,
+      RankReductionWitness ψ A ζ data := by
+  exfalso
+  obtain ⟨i⟩ := (inferInstance : Nonempty ι)
+  have htotal_zero : A.toSubMeas.total = 0 := by
+    simpa using A.toSubMeas.sum_eq_total.symm
+  have hzero_one : (0 : MIPStarRE.Quantum.Op ι) = 1 := by
+    rw [← htotal_zero, A.total_eq_one]
+  have hentry : (0 : ℂ) = 1 := by
+    simpa using congrFun (congrFun hzero_one i) i
+  norm_num at hentry
+
 /-- **Rank reduction** (`lem:projective-low-rank-sum`).
 
 Construct the paper's rank-reduced family `Q_a`, together with the auxiliary
@@ -200,11 +226,18 @@ projective measurement `T_a`, so that `Q_a` remains close to `A_a`, its total
 stays bounded by `(1 + 2√ζ)I`, and the auxiliary dimension is at most the
 original ambient dimension.
 
-The auxiliary-space-and-`T` data is supplied via
-`RankReductionBridgePackage`, parametric on the specific rounded family
-`(q, hq)`; this keeps the paper's spectral derivation of `(auxSpace, T_a)`
-from the rounded family `R_a` localized to one bridge rather than silently
-filled in with a vacuous `default` witness. -/
+The auxiliary-space-and-`T` data `(auxSpace, t, hAuxDim)` is taken as explicit
+caller-supplied parameters rather than via a dedicated `*BridgePackage` wrapper.
+In the paper (orthonormalization.tex), Lem 5.5 itself only produces `{Q_a}`;
+the auxiliary space `ℂ^m` and the projective measurement
+`T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent
+"Matrix decomposition of `Q_a`" definition, which requires an orthonormal
+eigenbasis of each rounded projector `R_a`'s 1-eigenspace — a construction
+not currently available in Mathlib (no matrix SVD; no restriction of
+`Matrix.IsHermitian.eigenvectorBasis` to a projector's 1-eigenspace; no
+matrix-level `rank_of_isProj` adapter).  Exposing `(auxSpace, t, hAuxDim)`
+as direct parameters localises this debt to call sites without hiding it
+behind a vacuous `default` witness. -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -212,23 +245,20 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
     (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 ≤ ζ)
     (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ)
-    (hrankBridge : ∀ (q : OpFamily Outcome ι)
-        (hq : RoundingToProjectorsWitness ψ A ζ q),
-      RankReductionBridgePackage ψ A ζ q hq)
+    (auxSpace : FiniteHilbertSpace.{uι})
+    (t : ProjMeas Outcome auxSpace.carrier)
+    (hAuxDim : Fintype.card auxSpace.carrier ≤ Fintype.card ι)
     (source_almost_projective :
       ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
       RankReductionWitness ψ A ζ data := by
   classical
   by_cases hOutcome : Nonempty Outcome
-  · letI : Nonempty Outcome := hOutcome
-    letI : Inhabited Outcome := Classical.inhabited_of_nonempty hOutcome
-    obtain ⟨q, hrounded, hsum⟩ := hbridge.fromSourceAlmostProjective source_almost_projective
-    let aux : RankReductionAuxOutput Outcome ι := (hrankBridge q hrounded).out
+  · obtain ⟨q, hrounded, hsum⟩ := hbridge.fromSourceAlmostProjective source_almost_projective
     let data : QLayerData Outcome ι :=
-      { auxSpace := aux.auxSpace
+      { auxSpace := auxSpace
         q := q
-        t := aux.t }
+        t := t }
     refine ⟨data, ?_⟩
     refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_⟩
     · intro a
@@ -250,17 +280,9 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
         QTotal data = q.total := rfl
         _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
             (1 : MIPStarRE.Quantum.Op ι) := hrounded.total_le
-    · exact aux.auxDim_le
+    · exact hAuxDim
   · letI : IsEmpty Outcome := not_nonempty_iff.mp hOutcome
-    exfalso
-    obtain ⟨i⟩ := (inferInstance : Nonempty ι)
-    have htotal_zero : A.toSubMeas.total = 0 := by
-      simpa using A.toSubMeas.sum_eq_total.symm
-    have hzero_one : (0 : MIPStarRE.Quantum.Op ι) = 1 := by
-      rw [← htotal_zero, A.total_eq_one]
-    have hentry : (0 : ℂ) = 1 := by
-      simpa using congrFun (congrFun hzero_one i) i
-    norm_num at hentry
+    exact rankReduction_emptyOutcome (ψ := ψ) (A := A) (ζ := ζ)
 
 
 end

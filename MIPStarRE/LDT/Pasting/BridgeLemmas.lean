@@ -298,7 +298,6 @@ theorem hAConsistency_completed
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
     (family : IdxPolyFamily params ι)
     (k : ℕ)
     (hsubmeas :
@@ -355,7 +354,7 @@ theorem hAConsistency_completed
               by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
                 simp [leftTensor, h₁, h₂, sub_eq_add_neg]
             rw [hleftSub, ev_sub]
-            simp [ev_one_of_isNormalized strategy.state hnorm]
+            simp [ev_one_of_isNormalized strategy.state strategy.isNormalized]
       _ ≤ 1 - ldPastingCompletenessLowerBound params kappa ν k := by
             linarith
       _ = kappa * (1 + 1 / (100 * (params.m : Error))) + ν +

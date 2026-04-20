@@ -272,18 +272,18 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Consistency implies state-dependent distance for measurements]\label{prop:simeq-to-approx}
-	\lean{MIPStarRE.LDT.Preliminaries.simeqToApprox}
+	\lean{MIPStarRE.LDT.Preliminaries.simeqToApprox, MIPStarRE.LDT.Preliminaries.approxToSimeq}
 	\leanok
 	\uses{def:simeq, def:approx_delta, prop:simeq-for-measurements}
 	If $A$ and $B$ are measurements and $A_a^x \ot I \simeq_\delta I \ot B_a^x$, then
 	\[
 		A_a^x \ot I \approx_{2\delta} I \ot B_a^x.
 	\]
-	If both measurements are projective, the converse also holds.
+	If both measurements are projective, the converse also holds: if $A_a^x \ot I \approx_{2\delta} I \ot B_a^x$ then $A_a^x \ot I \simeq_\delta I \ot B_a^x$.
 \end{lemma}
 \begin{proof}
 	\leanok
-	Expand the squared norm of $(A_a^x \ot I - I \ot B_a^x)\ket{\psi}$ and use the diagonal-overlap formula from Lemma~\ref{prop:simeq-for-measurements}.
+	Expand the squared norm of $(A_a^x \ot I - I \ot B_a^x)\ket{\psi}$ and use the diagonal-overlap formula from Lemma~\ref{prop:simeq-for-measurements}; projectivity turns the diagonal inequality into an equality, giving the converse.
 \end{proof}
 
 \begin{remark}\label{rem:simeq-not-approx-submeas}

@@ -22,7 +22,6 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (hnorm : ψbi.IsNormalized)
-    (_hperm : PermInvState ψbi)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta omega chi : Error)

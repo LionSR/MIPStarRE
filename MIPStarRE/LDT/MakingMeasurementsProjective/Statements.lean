@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
+import MIPStarRE.LDT.Basic.SubMeasurement
 
 /-!
 # Section 5 — Statements
@@ -142,7 +143,27 @@ abbrev ProjectivizationRepairInput {Outcome : Type*}
     ∃ P : ProjSubMeas Outcome ι,
       RoundedProjMeasStatement ψ A P (roundingToProjectiveError ζ)
 
-/-- Explicit input exposing the final product-space orthonormalization step. -/
+/-- Locality-preserving repair input for a left-lifted measurement.
+
+This is the structural invariant needed to descend the lifted-space output of
+`orthonormalizationMainLemma` back to a local projective submeasurement: when
+the input measurement already has the form `A_a ⊗ I`, the repaired family can
+be chosen in the same form `P_a ⊗ I`. -/
+abbrev LeftLiftedProjectivizationRepairInput {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (A : Measurement Outcome ι) (ζ : Error) :=
+  SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A) ζ →
+    ∃ P : ProjSubMeas Outcome ι,
+      RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
+        (ProjSubMeas.liftLeft P) (roundingToProjectiveError ζ)
+
+/-- Explicit input exposing the remaining public orthonormalization wrapper.
+
+The measurement-level descent from a left-lifted repair witness is now
+formalized separately by `orthonormalizationMainLemma_local`; downstream code
+still assumes this full wrapper until the submeasurement-level transport is
+spelled out directly. -/
 abbrev OrthonormalizationInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]

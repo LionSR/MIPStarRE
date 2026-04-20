@@ -47,13 +47,17 @@ theorem mainInduction
   refine ⟨G, ?_⟩
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 
-/-- `thm:self-improvement-in-induction-section`. -/
+/-- `thm:self-improvement-in-induction-section`.
+
+The induction-section wrapper keeps the point-consistency hypothesis `_hcons`
+explicit because it is part of the paper's bookkeeping, even though the current
+proof factors through `selfImprovementFromSubMeas`, which no longer consumes it
+separately. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hnormalizedState : strategy.state.IsNormalized)
     (hglobalVarianceProofInputs :
       SelfImprovement.GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
@@ -67,16 +71,16 @@ theorem selfImprovementInInductionSection
     (G : SubMeas (Polynomial params) ι)
     (Gmeas : Measurement (Polynomial params) ι)
     (hbridge : Gmeas.toSubMeas = G)
-    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+    (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   rcases SelfImprovement.selfImprovementFromSubMeas
-      params strategy eps delta gamma nu hnormalizedState
+      params strategy eps delta gamma nu
       hglobalVarianceProofInputs hhelperStrongSelfConsistency
       horthonormalization hevaluationDataProcessing hfinalFields
-      hgood G Gmeas hbridge hcons with
+      hgood G Gmeas hbridge with
     ⟨H, Z, hH⟩
   rcases hH.measurementBridge with ⟨_, _, hfinal⟩
   refine ⟨H, Z, ?_⟩

@@ -209,13 +209,20 @@ structure GlobalVarianceDecomposition (params : Parameters)
   orthogonal_to_constant :
     constantModeProjector params * orthogonalVector = 0
 
-instance (params : Parameters) (A : Point params → MIPStarRE.Quantum.Op ι) :
-    Inhabited (GlobalVarianceDecomposition params A) where
-  default :=
-    { averageComponent := 0
-      orthogonalVector := 0
-      orthogonalOperator := 0
-      orthogonal_to_constant := by simp }
+/-- The paper's canonical decomposition from `lem:global-rewrite`
+(expansion.tex §7.2, *Local and global variance* subsection):
+`A_comb = |φ_0⟩ ⊗ A_0 + |φ_⊥⟩ ⊗ A_⊥`, where the constant-mode coefficient is
+`A_0 = M^{-1/2} · ∑_u A^u`. The orthogonal component is not representable as
+a rank-one tensor on `Point params ⊗ ι`, so its slots remain zero; the
+`GlobalRewriteStatement` existential only records `A_0`. -/
+noncomputable def canonicalGlobalVarianceDecomposition (params : Parameters)
+    (A : Point params → MIPStarRE.Quantum.Op ι) :
+    GlobalVarianceDecomposition params A where
+  averageComponent :=
+    ((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) • ∑ u, A u
+  orthogonalVector := 0
+  orthogonalOperator := 0
+  orthogonal_to_constant := by simp
 
 /-- The trace witness from `lem:global-rewrite`.
 This uses the orthogonal projector onto the non-constant Fourier modes. -/
@@ -312,22 +319,18 @@ noncomputable def laplacianEigenvalue (params : Parameters) (α : Point params) 
 noncomputable def hypercubeSpectralGap (params : Parameters) : Error :=
   1 / ((params.m : Error) * (hypercubeVertexCount params : Error))
 
-/-- Unfolds `fourierBasisInnerProduct` to its Kronecker-delta pattern. The
-underlying `def` is *defined* as the Kronecker delta, so this lemma is `rfl`
-and exists only to expose the pattern for downstream rewrites. -/
-lemma fourierBasisInnerProduct_eq (params : Parameters)
-    (α β : Point params) :
+/-- `prop:eigenvectors`, item 1: orthonormality of the Fourier basis. -/
+lemma eigenvectors_orthonormality (params : Parameters) (α β : Point params) :
     fourierBasisInnerProduct params α β = if α = β then 1 else 0 := rfl
 
-/-- The hypercube Fourier basis is indexed by all `q^m` vertices. -/
-lemma fourierBasis_card (params : Parameters) :
+/-- The Fourier index set `F_q^m` has cardinality `M = q^m`. -/
+lemma eigenvectors_card (params : Parameters) :
     Fintype.card (Point params) = hypercubeVertexCount params := by
   simp [hypercubeVertexCount, Fintype.card_fin]
 
-/-- Each Fourier basis vector is an eigenvector of the adjacency operator
-`K` with eigenvalue `adjacencyEigenvalue params α`. -/
-lemma matrixAdjacencyOperator_mulVec_fourierBasisState (params : Parameters)
-    (α : Point params) :
+/-- `prop:eigenvectors`, item 2: each `|φ_α⟩` is an eigenvector of the
+adjacency matrix `K` with eigenvalue `λ_α`. -/
+theorem eigenvectors (params : Parameters) (α : Point params) :
     (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) =
       ((adjacencyEigenvalue params α : ℝ) : ℂ) • fourierBasisState params α := by
   ext u
@@ -386,23 +389,8 @@ lemma matrixAdjacencyOperator_mulVec_fourierBasisState (params : Parameters)
   rw [Nat.cast_sub hw]
   field_simp [hm, hq, hM]
 
-/-- `prop:eigenvectors`. -/
-theorem eigenvectors (params : Parameters) :
-    (∀ α β : Point params,
-      fourierBasisInnerProduct params α β = if α = β then 1 else 0) ∧
-    Fintype.card (Point params) = hypercubeVertexCount params ∧
-    ∀ α : Point params,
-      (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) =
-        ((adjacencyEigenvalue params α : ℝ) : ℂ) • fourierBasisState params α := by
-  refine ⟨?_, ?_⟩
-  · intro α β
-    exact fourierBasisInnerProduct_eq params α β
-  · refine ⟨fourierBasis_card params, ?_⟩
-    intro α
-    exact matrixAdjacencyOperator_mulVec_fourierBasisState params α
-
-/-- The Laplacian eigenvalue is the complement of the adjacency eigenvalue. -/
-lemma laplacianEigenvalue_eq_sub_adjacencyEigenvalue (params : Parameters) (α : Point params) :
+/-- `cor:laplacian-spectral-gap`, eigenvalue relation: `λ_L(α) = 1/M − λ_K(α)`. -/
+theorem laplacianEigenvalue_eq (params : Parameters) (α : Point params) :
     laplacianEigenvalue params α =
       (1 / (hypercubeVertexCount params : Error)) - adjacencyEigenvalue params α := by
   simp only [laplacianEigenvalue, adjacencyEigenvalue, hypercubeVertexCount]
@@ -414,39 +402,21 @@ lemma laplacianEigenvalue_eq_sub_adjacencyEigenvalue (params : Parameters) (α :
   field_simp [hm, hM]
   ring
 
-/-- Every non-constant Fourier mode has Laplacian eigenvalue at least the spectral gap. -/
-lemma laplacianEigenvalue_ge_hypercubeSpectralGap_of_weight_pos (params : Parameters)
-    (α : Point params) (hα : 0 < frequencyWeight params α) :
+/-- `cor:laplacian-spectral-gap`, spectral gap bound: for `α ≠ 0`, the
+spectral gap `1/(mM)` lower-bounds the Laplacian eigenvalue `λ_L(α)`. -/
+theorem hypercubeSpectralGap_le_laplacianEigenvalue (params : Parameters) (α : Point params)
+    (hα : 0 < frequencyWeight params α) :
     hypercubeSpectralGap params ≤ laplacianEigenvalue params α := by
   simp only [hypercubeSpectralGap, laplacianEigenvalue, hypercubeVertexCount]
   apply div_le_div_of_nonneg_right _ (by positivity)
   exact_mod_cast hα
 
-/-- Weight-one Fourier modes attain the hypercube spectral gap exactly. -/
-lemma laplacianEigenvalue_eq_hypercubeSpectralGap_of_weight_one (params : Parameters)
-    (α : Point params) (hα : frequencyWeight params α = 1) :
+/-- `cor:laplacian-spectral-gap`, attainment: for `|α| = 1`, the spectral gap
+is attained: `λ_L(α) = 1/(mM)`. -/
+theorem laplacianEigenvalue_of_weight_one (params : Parameters) (α : Point params)
+    (hα : frequencyWeight params α = 1) :
     laplacianEigenvalue params α = hypercubeSpectralGap params := by
   simp only [laplacianEigenvalue, hypercubeSpectralGap, hypercubeVertexCount, hα]
   norm_cast
-
-/-- `cor:laplacian-spectral-gap`. \leanok -/
-theorem laplacianSpectralGap (params : Parameters) :
-    (∀ α : Point params,
-      laplacianEigenvalue params α =
-        (1 / (hypercubeVertexCount params : Error)) - adjacencyEigenvalue params α) ∧
-    (∀ α : Point params,
-      0 < frequencyWeight params α →
-        hypercubeSpectralGap params ≤ laplacianEigenvalue params α) ∧
-    ∀ α : Point params,
-      frequencyWeight params α = 1 →
-        laplacianEigenvalue params α = hypercubeSpectralGap params := by
-  refine ⟨?_, ?_⟩
-  · intro α
-    exact laplacianEigenvalue_eq_sub_adjacencyEigenvalue params α
-  · refine ⟨?_, ?_⟩
-    · intro α hα
-      exact laplacianEigenvalue_ge_hypercubeSpectralGap_of_weight_pos params α hα
-    · intro α hα
-      exact laplacianEigenvalue_eq_hypercubeSpectralGap_of_weight_one params α hα
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph
