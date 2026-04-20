@@ -409,10 +409,6 @@ private lemma fullSliceCommutation_qSDDOp_avg_expand_full
   let B : MIPStarRE.Quantum.Op ι := (fullSliceSecondFactor params family q).outcome h
   let LA : MIPStarRE.Quantum.Op (ι × ι) := leftTensor (ι₂ := ι) A
   let LB : MIPStarRE.Quantum.Op (ι × ι) := leftTensor (ι₂ := ι) B
-  have hA_herm : Aᴴ = A := by
-    simpa [A, fullSliceFirstFactor] using (family.meas q.1).outcome_hermitian g
-  have hB_herm : Bᴴ = B := by
-    simpa [B, fullSliceSecondFactor] using (family.meas q.2).outcome_hermitian h
   have hA_proj : A * A = A := by
     simpa [A, fullSliceFirstFactor] using (family.meas q.1).proj g
   have hB_proj : B * B = B := by
@@ -475,7 +471,6 @@ private lemma fullSliceCommutation_qSDDOp_avg_expand_full
           simp [fullSliceBABTerm, fullSliceABATerm,
             fullSliceBABATerm, fullSliceABABTerm, A, B]
 
-set_option maxHeartbeats 2000000 in
 /-- Swapping the full-slice question and outcome identifies the averaged
 `BAB`/`ABA` terms and the averaged `BABA`/`ABAB` terms. -/
 private lemma fullSliceCommutation_avg_swap_terms
@@ -574,7 +569,6 @@ private lemma fullSliceCommutation_avg_swap_terms
               exact avgOver_sum_eq_card_mul_avgOver_prod
                 (fun q gh => fullSliceABABTerm params strategy family q gh)
 
-set_option maxHeartbeats 2000000 in
 /-- Paper `eq:gcomterms` (`commutativity-G.tex` lines 286-290).
 
 Full-slice analog of `evaluatedSliceCommutation_qSDDOp_avg_eq` (line 878): the

@@ -37,6 +37,8 @@ structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   /-- The bipartite state carried by the restricted strategy. -/
   state : QuantumState (ι × ι)
+  /-- The restricted strategy reuses the ambient state's normalization witness. -/
+  isNormalized : state.IsNormalized
   /-- The restricted point measurement. -/
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
   /-- The restricted axis-parallel line measurement. -/
@@ -293,6 +295,7 @@ noncomputable def restrictDiagonalMeasurement (params : Parameters)
 noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) : RestrictedSymStrat params ι where
   state := strategy.state
+  isNormalized := strategy.isNormalized
   pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
   axisParallelMeasurement := restrictAxisParallelMeasurement params strategy x
   axisParallelReparamInvariant :=
@@ -304,6 +307,13 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
     (xRestrictedStrategy params strategy x).state = strategy.state :=
+  rfl
+
+/-- Restricting a strategy reuses the parent strategy's normalization witness. -/
+@[simp] theorem xRestrictedStrategy_isNormalized (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    (xRestrictedStrategy params strategy x).isNormalized = strategy.isNormalized :=
   rfl
 
 /-- Restricting a strategy reindexes point questions by appending the slice height. -/

@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
+import MIPStarRE.LDT.Basic.SubMeasurement
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
@@ -82,22 +83,17 @@ private lemma orthonormalizationMainLemma_error_bound (ζ : Error)
         exact mul_le_mul_of_nonneg_left hsqrt_two_le_seven (by norm_num)
       simpa using hcoeff.trans_eq (by norm_num : (12 : Error) * 7 = 84)
 
-private def leftLiftedMeasurement {Outcome : Type*}
-    {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome]
-    (A : Measurement Outcome ιA) :
-    Measurement Outcome (ιA × ιB) :=
-  { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-    total_eq_one := by
-      calc
-        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).total
-            = leftTensor (ι₂ := ιB) A.total :=
-              rfl
-        _ = leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA) := by
-              rw [A.total_eq_one]
-        _ = 1 := by
-              simp [leftTensor] }
+/-- The scalar weakening `84·ζ^{1/4} ≤ 100·ζ^{1/4}` from the local
+orthonormalization bound to the paper's wrapper error. Factored out as a named
+lemma because the same bookkeeping reappears in any top-level wrapper that
+derives `orthonormalization` from `orthonormalizationMeasurement` via
+submeasurement completion. -/
+lemma orthonormalizationMainLemmaError_le_orthonormalizationError
+    (ζ : Error) (hζ : 0 ≤ ζ) :
+    orthonormalizationMainLemmaError ζ ≤ orthonormalizationError ζ := by
+  dsimp [orthonormalizationMainLemmaError, orthonormalizationError]
+  exact mul_le_mul_of_nonneg_right
+    (by norm_num : (84 : Error) ≤ 100) (Real.rpow_nonneg hζ _)
 
 /-- `lem:orthonormalization-main-lemma`.
 
@@ -150,5 +146,140 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
     (MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono hRounded
       (orthonormalizationMainLemma_error_bound ζ hζ hζ1))
 
+/-- Pointwise collapse for a complete measurement `A`: the bipartite
+self-consistency defect equals the bipartite consistency defect of `A` with
+itself. Both reduce to `max 0 (ev ψ 1 − ∑ a, ev ψ (A_a ⊗ A_a))`, since
+`A.total = 1` forces `leftTensor A.total = opTensor A.total A.total`. -/
+private lemma qBipartiteSSCDefect_eq_qBipartiteConsDefect_of_measurement
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (A : Measurement Outcome ι) :
+    qBipartiteSSCDefect ψ A.toSubMeas =
+      qBipartiteConsDefect ψ A.toSubMeas A.toSubMeas := by
+  simp [qBipartiteSSCDefect, qBipartiteConsDefect, qBipartiteMatchMass,
+    A.total_eq_one, leftTensor, opTensor]
+
+/-- For a complete measurement, bipartite SSC is exactly bipartite
+consistency of `A` with itself. -/
+private lemma bipartiteSSCRel_self_of_measurement {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (A : Measurement Outcome ι) (ζ : Error) :
+    BipartiteSSCRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas) ζ →
+      ConsRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A.toSubMeas)
+        (constSubMeasFamily A.toSubMeas)
+        ζ := by
+  intro hssc
+  rcases hssc with ⟨hssc⟩
+  refine ⟨?_⟩
+  have heq :
+      bipartiteSSCError ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.toSubMeas) =
+        bipartiteConsError ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.toSubMeas) (constSubMeasFamily A.toSubMeas) := by
+    unfold bipartiteSSCError bipartiteConsError
+    refine congrArg (avgOver _) ?_
+    funext _
+    exact qBipartiteSSCDefect_eq_qBipartiteConsDefect_of_measurement ψ A
+  exact heq ▸ hssc
+
+/-- A rounded-projective witness for `leftLiftedMeasurement A` coming from a
+left-lifted local projective submeasurement immediately yields the local lifted
+`≈`-statement. -/
+private lemma leftLiftedRoundedProjMeasStatement_to_local {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState (ι × ι)} {A : Measurement Outcome ι}
+    {P : ProjSubMeas Outcome ι} {ζ : Error}
+    (h : RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
+      (ProjSubMeas.liftLeft P) ζ) :
+    SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas.liftLeft)
+      (constSubMeasFamily P.toSubMeas.liftLeft)
+      ζ := by
+  simpa [leftLiftedMeasurement, leftPlacedSubMeas, SubMeas.liftLeft,
+    ProjSubMeas.liftLeft] using h.closeness
+
+/-- Local version of `orthonormalizationMainLemma` under the explicit
+left-lifted repair invariant.
+
+This isolates the exact descent needed for issue #450: once the repair step for
+`leftLiftedMeasurement A` is known to return a left-lifted local projective
+submeasurement, the paper's local conclusion follows formally. -/
+lemma orthonormalizationMainLemma_local {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
+    (hspectral : SpectralTruncationInput
+      ψ (leftLiftedMeasurement (ιB := ι) A)
+      (consistencyToAlmostProjectiveError ζ))
+    (hrepair : LeftLiftedProjectivizationRepairInput
+      ψ A (consistencyToAlmostProjectiveError ζ)) :
+    BipartiteSSCRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.toSubMeas.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationMainLemmaError ζ) := by
+  intro hssc
+  have hCons :
+      ConsRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A.toSubMeas)
+        (constSubMeasFamily A.toSubMeas)
+        ζ :=
+    bipartiteSSCRel_self_of_measurement (ψ := ψ) A ζ hssc
+  have hAlmost :
+      MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
+        ψ (leftLiftedMeasurement (ιB := ι) A)
+        (consistencyToAlmostProjectiveError ζ) := by
+    exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
+      (ψ := ψ) (A := A) (B := A) (ζ := ζ) hCons
+  have hSpectral :
+      SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A)
+        (consistencyToAlmostProjectiveError ζ) := by
+    exact MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncateAlmostProjective
+      (ψ := ψ) (hψ := hψ) (A := leftLiftedMeasurement (ιB := ι) A)
+      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost hspectral
+  obtain ⟨P, hRounded⟩ := hrepair hSpectral
+  refine ⟨P, ?_⟩
+  exact leftLiftedRoundedProjMeasStatement_to_local <|
+    MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono
+      hRounded (orthonormalizationMainLemma_error_bound ζ hζ hζ1)
+
+/-- Measurement-level orthonormalization once the left-lifted repair witness is
+available explicitly. -/
+lemma orthonormalizationMeasurement {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
+    (hspectral : SpectralTruncationInput
+      ψ (leftLiftedMeasurement (ιB := ι) A)
+      (consistencyToAlmostProjectiveError ζ))
+    (hrepair : LeftLiftedProjectivizationRepairInput
+      ψ A (consistencyToAlmostProjectiveError ζ)) :
+    BipartiteSSCRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.toSubMeas.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationError ζ) := by
+  intro hssc
+  obtain ⟨P, hP⟩ :=
+    orthonormalizationMainLemma_local (ψ := ψ) (hψ := hψ) (A := A) (ζ := ζ)
+      hζ hζ1 hspectral hrepair hssc
+  refine ⟨P, ?_⟩
+  rcases hP with ⟨hP⟩
+  exact ⟨hP.trans (orthonormalizationMainLemmaError_le_orthonormalizationError ζ hζ)⟩
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

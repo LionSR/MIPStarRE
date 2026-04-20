@@ -19,8 +19,6 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
--- Heavy sqrt/rpow arithmetic in hArith step.
-set_option maxHeartbeats 800000 in
 /-- Core Schwartz-Zippel transport on the evaluated-question space.
 
 This is the substantive remaining step: compare the full polynomial outcomes
@@ -220,9 +218,6 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
                   Real.sqrt
                     (commDataProcessedGError params gamma zeta)) +
                 ((↑params.m : Error) * ↑params.d / ↑params.q)) := by
-              have := abs_nonneg
-                (fullSliceABAAvg params strategy family -
-                  fullSliceABABAvg params strategy family)
               linarith [hMargX, hMargY', hClose]
         _ = 12 * Real.sqrt zeta +
               4 * (↑params.m * ↑params.d / ↑params.q) +

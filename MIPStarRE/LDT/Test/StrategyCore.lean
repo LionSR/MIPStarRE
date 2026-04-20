@@ -40,7 +40,12 @@ structure PermInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Reparametrization invariance for diagonal-line measurements: evaluating a
 rebased line at `zeroCoord` agrees outcome-wise with evaluating the original
-line at the rebasing parameter. -/
+line at the rebasing parameter.
+
+At the answer level, the geometric identity is
+`DiagonalLinePolynomial.reparamAt_apply_zero`. This predicate is stronger: it
+asserts that the *measurement family itself* is covariant under rebasing the
+question index. -/
 def DiagonalEvaluationReparamInvariant (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι) : Prop :=
@@ -65,8 +70,10 @@ fields encode that line measurements are geometrically covariant:
 evaluating at a rebased line's base point (`zeroCoord`) agrees with
 evaluating at the original parameter. The paper treats this as
 implicit (lines are geometric objects), but in the Lean model
-`AxisParallelLine` and `DiagonalLine` include the parametrization, so
-we state it explicitly.
+`AxisParallelLine` and `DiagonalLine` index *parametrized* line
+questions rather than quotienting by reparametrization, so we state
+this covariance explicitly. The underlying answer-level identity for
+diagonal polynomials is `DiagonalLinePolynomial.reparamAt_apply_zero`.
 
 The `isNormalized` field records that the bipartite state's density
 operator has normalized trace `1`. For pure states, this coincides
