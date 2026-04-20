@@ -209,6 +209,57 @@ structure SliceBoundednessInput {params : Parameters} [FieldModel params.q]
       family.dominationTarget x g =
         averagedSlicePointEvaluationOperator strategy x g
 
+namespace SliceBoundednessInput
+
+/-- The boundedness residual obtained from a concrete slice family `G`.
+
+This is the induction-oriented `Z^x ⊗ (I - G^x)` term after replacing the
+abstract slice family by the concrete `G`, written in the paper's
+`(I - G^x) ⊗ Z^x` orientation. -/
+noncomputable def storedResidual {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SymStrat params.next ι}
+    {family : IdxPolyFamily params ι} {zeta : Error}
+    (_hbound : SliceBoundednessInput strategy family zeta)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (x : Fq params) : Error :=
+  ev strategy.state
+    (leftTensor (ι₂ := ι) (1 - (G x).total) *
+      rightTensor (ι₁ := ι) (family.witness x))
+
+/-- Stored residual half of the boundedness hypothesis.
+
+This is exactly the paper's `(I-G^x) ⊗ Z^x` residual bound from
+`references/ldt-paper/commutativity-G.tex`. -/
+theorem storedBoundedResidualBound {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SymStrat params.next ι}
+    {family : IdxPolyFamily params ι} {zeta : Error}
+    (hbound : SliceBoundednessInput strategy family zeta)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas) :
+    avgOver (uniformDistribution (Fq params))
+      (fun x => hbound.storedResidual G x) ≤ zeta := by
+  simpa [storedResidual, hG] using hbound.bounded.sliceBoundedness
+
+/-- Paper-faithful domination half of the boundedness hypothesis.
+
+This is the line `Z^x ≥ E_u A^{u,x}_{g(u)}` from
+`references/ldt-paper/commutativity-G.tex`. -/
+theorem averagedPoint_le_witness {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SymStrat params.next ι}
+    {family : IdxPolyFamily params ι} {zeta : Error}
+    (hbound : SliceBoundednessInput strategy family zeta) :
+    ∀ x : Fq params, ∀ g : Polynomial params,
+      averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x := by
+  intro x g
+  have hdom : family.dominationTarget x g ≤ family.witness x :=
+    sub_nonneg.mp (hbound.bounded.sliceDominatesTarget x g)
+  simpa [hbound.dominationTargetAgrees x g] using hdom
+
+end SliceBoundednessInput
+
 end IdxPolyFamily
 
 end MIPStarRE.LDT

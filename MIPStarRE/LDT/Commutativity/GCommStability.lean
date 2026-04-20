@@ -164,40 +164,7 @@ private lemma averagedSlicePointEvaluationOperator_sq_le_self
     (averagedSlicePointEvaluationOperator_nonneg params strategy x g)
     (averagedSlicePointEvaluationOperator_le_one params strategy x g)
 
-/-- The boundedness residual currently stored by `IdxPolyFamily.Bounded`.
-
-This is the induction-oriented `Z^x ⊗ (I - G^x)` term after replacing the
-abstract slice family by the concrete `G` supplied to the commutativity theorem,
-in the paper's `(I - G^x) ⊗ Z^x` orientation. -/
-noncomputable def gCommStabilityBoundedResidual
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (x : Fq params) : Error :=
-  ev strategy.state
-    (leftTensor (ι₂ := ι) (1 - (G x).total) *
-      rightTensor (ι₁ := ι) (family.witness x))
-
-/-- Stored residual half of the boundedness hypothesis.
-
-This is exactly the paper's `(I-G^x) ⊗ Z^x` residual bound from
-`references/ldt-paper/commutativity-G.tex`. -/
-theorem gCommStability_storedBoundedResidualBound
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (zeta : Error)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    avgOver (uniformDistribution (Fq params))
-      (fun x => gCommStabilityBoundedResidual params strategy family G x) ≤ zeta := by
-  simpa [gCommStabilityBoundedResidual, hG] using hbound.bounded.sliceBoundedness
-
-theorem gCommStabilityBoundedResidual_nonneg
+private theorem storedResidual_nonneg
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -205,33 +172,15 @@ theorem gCommStabilityBoundedResidual_nonneg
     (G : Fq params → SubMeas (Polynomial params) ι)
     (zeta : Error)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    ∀ x : Fq params, 0 ≤ gCommStabilityBoundedResidual params strategy family G x := by
+    ∀ x : Fq params, 0 ≤ hbound.storedResidual G x := by
   intro x
-  unfold gCommStabilityBoundedResidual
+  unfold IdxPolyFamily.SliceBoundednessInput.storedResidual
   apply ev_nonneg_of_psd
   rw [leftTensor_mul_rightTensor_eq_opTensor]
   simpa [opTensor] using
     MIPStarRE.Quantum.kronecker_nonneg
       (sub_nonneg.mpr (G x).total_le_one)
       (hbound.bounded.sliceOpPSD x)
-
-/-- Paper-faithful domination half of the boundedness hypothesis.
-
-This is the line `Z^x ≥ E_u A^{u,x}_{g(u)}` from
-`references/ldt-paper/commutativity-G.tex`. -/
-theorem gCommStability_averagedPoint_le_witness
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (zeta : Error)
-    (family : IdxPolyFamily params ι)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    ∀ x : Fq params, ∀ g : Polynomial params,
-      IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x := by
-  intro x g
-  have hdom : family.dominationTarget x g ≤ family.witness x :=
-    sub_nonneg.mp (hbound.bounded.sliceDominatesTarget x g)
-  simpa [hbound.dominationTargetAgrees x g] using hdom
 
 set_option maxHeartbeats 2000000 in
 private lemma gCommStability_scalar_pointwise_bound
@@ -251,7 +200,7 @@ private lemma gCommStability_scalar_pointwise_bound
                 ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
               rightTensor (ι₁ := ι)
                 (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g))| ≤
-        Real.sqrt (gCommStabilityBoundedResidual params strategy family G y) := by
+        Real.sqrt (hbound.storedResidual G y) := by
   intro y
   let R := gCommStabilityR params family y
   let T : MIPStarRE.Quantum.Op ι := (G y).total
@@ -336,7 +285,7 @@ private lemma gCommStability_scalar_pointwise_bound
               gCommStabilityR_first_factor_le_one params strategy hnorm family y
   have hsecond :
       ∑ g : Polynomial params, ev strategy.state ((Y g)ᴴ * Y g) ≤
-        gCommStabilityBoundedResidual params strategy family G y := by
+        hbound.storedResidual G y := by
     have hop_mono_right :
         ∀ {A : MIPStarRE.Quantum.Op ι} {B₁ B₂ : MIPStarRE.Quantum.Op ι},
           0 ≤ A → B₁ ≤ B₂ → opTensor A B₁ ≤ opTensor A B₂ := by
@@ -430,8 +379,7 @@ private lemma gCommStability_scalar_pointwise_bound
                   leftTensor_mul_rightTensor_eq_opTensor]
                 exact hop_mono_right
                   (MIPStarRE.Quantum.sandwich_nonneg (R.outcome_pos g) hTc_herm)
-                  (gCommStability_averagedPoint_le_witness
-                    params strategy zeta family hbound y g)
+                  (hbound.averagedPoint_le_witness y g)
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) (((1 - T) * R.total * (1 - T))) *
               rightTensor (ι₁ := ι) (family.witness y)) := hsum_eq
@@ -452,11 +400,11 @@ private lemma gCommStability_scalar_pointwise_bound
                       _ = 1 - T - T + T * T := by noncomm_ring
                       _ = 1 - T := by simp [hT_proj])
               (hbound.bounded.sliceOpPSD y)
-      _ = gCommStabilityBoundedResidual params strategy family G y := by
+      _ = hbound.storedResidual G y := by
             rfl
   have hcs := MIPStarRE.LDT.Preliminaries.sum_ev_mul_le_sqrt strategy.state X Y
-  have hres_nonneg : 0 ≤ gCommStabilityBoundedResidual params strategy family G y :=
-    gCommStabilityBoundedResidual_nonneg params strategy family G zeta hbound y
+  have hres_nonneg : 0 ≤ hbound.storedResidual G y :=
+    storedResidual_nonneg params strategy family G zeta hbound y
   have hXY :
       ∀ g : Polynomial params,
         X g * Y g = leftTensor (ι₂ := ι) (R.outcome g * (1 - T)) *
@@ -489,13 +437,13 @@ private lemma gCommStability_scalar_pointwise_bound
           rw [hXY g]
     _ ≤ Real.sqrt (∑ g : Polynomial params, ev strategy.state (X g * (X g)ᴴ)) *
           Real.sqrt (∑ g : Polynomial params, ev strategy.state ((Y g)ᴴ * Y g)) := hcs
-    _ ≤ Real.sqrt 1 * Real.sqrt (gCommStabilityBoundedResidual params strategy family G y) := by
+    _ ≤ Real.sqrt 1 * Real.sqrt (hbound.storedResidual G y) := by
           apply mul_le_mul
           · exact Real.sqrt_le_sqrt hfirst
           · exact Real.sqrt_le_sqrt hsecond
           · exact Real.sqrt_nonneg _
           · exact Real.sqrt_nonneg _
-    _ = Real.sqrt (gCommStabilityBoundedResidual params strategy family G y) := by simp
+    _ = Real.sqrt (hbound.storedResidual G y) := by simp
 
 set_option maxHeartbeats 2000000 in
 theorem gCommStability_scalar
@@ -531,7 +479,7 @@ theorem gCommStability_scalar
                 (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g)))|
       ≤ Real.sqrt
           (avgOver (uniformDistribution (Fq params))
-            (fun y => gCommStabilityBoundedResidual params strategy family G y)) := by
+            (fun y => hbound.storedResidual G y)) := by
           exact
             MIPStarRE.LDT.Preliminaries.avgOver_abs_le_sqrt_of_pointwise
               (uniformDistribution (Fq params))
@@ -542,16 +490,15 @@ theorem gCommStability_scalar
                         ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
                       rightTensor (ι₁ := ι)
                         (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g)))
-              (fun y => gCommStabilityBoundedResidual params strategy family G y)
+              (fun y => hbound.storedResidual G y)
               (gCommStability_scalar_pointwise_bound
                 params strategy zeta hnorm family G hG hbound)
-              (gCommStabilityBoundedResidual_nonneg
+              (storedResidual_nonneg
                 params strategy family G zeta hbound)
               h𝒟
     _ ≤ Real.sqrt zeta := by
           exact Real.sqrt_le_sqrt <|
-            gCommStability_storedBoundedResidualBound
-              params strategy zeta family G hG hbound
+            hbound.storedBoundedResidualBound G hG
 
 /-- The paper's mirrored slice submeasurement
 `R'^x_g = E_{v,y} \sum_b G^{v,y}_b G^x_g G^{v,y}_b`. -/
@@ -626,7 +573,7 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
                 ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
               rightTensor (ι₁ := ι)
                 (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))| ≤
-        Real.sqrt (gCommStabilityBoundedResidual params strategy family G x) := by
+        Real.sqrt (hbound.storedResidual G x) := by
   intro x
   let R := gCommStabilityTwoR params family G x
   let T : MIPStarRE.Quantum.Op ι := (G x).total
@@ -711,7 +658,7 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
               gCommStabilityTwoR_first_factor_le_one params strategy hnorm family G x
   have hsecond :
       ∑ g : Polynomial params, ev strategy.state ((Y g)ᴴ * Y g) ≤
-        gCommStabilityBoundedResidual params strategy family G x := by
+        hbound.storedResidual G x := by
     have hop_mono_right :
         ∀ {A : MIPStarRE.Quantum.Op ι} {B₁ B₂ : MIPStarRE.Quantum.Op ι},
           0 ≤ A → B₁ ≤ B₂ → opTensor A B₁ ≤ opTensor A B₂ := by
@@ -805,8 +752,7 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
                   leftTensor_mul_rightTensor_eq_opTensor]
                 exact hop_mono_right
                   (MIPStarRE.Quantum.sandwich_nonneg (R.outcome_pos g) hTc_herm)
-                  (gCommStability_averagedPoint_le_witness
-                    params strategy zeta family hbound x g)
+                  (hbound.averagedPoint_le_witness x g)
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) (((1 - T) * R.total * (1 - T))) *
               rightTensor (ι₁ := ι) (family.witness x)) := hsum_eq
@@ -827,11 +773,11 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
                       _ = 1 - T - T + T * T := by noncomm_ring
                       _ = 1 - T := by simp [hT_proj])
               (hbound.bounded.sliceOpPSD x)
-      _ = gCommStabilityBoundedResidual params strategy family G x := by
+      _ = hbound.storedResidual G x := by
             rfl
   have hcs := MIPStarRE.LDT.Preliminaries.sum_ev_mul_le_sqrt strategy.state X Y
-  have hres_nonneg : 0 ≤ gCommStabilityBoundedResidual params strategy family G x :=
-    gCommStabilityBoundedResidual_nonneg params strategy family G zeta hbound x
+  have hres_nonneg : 0 ≤ hbound.storedResidual G x :=
+    storedResidual_nonneg params strategy family G zeta hbound x
   have hXY :
       ∀ g : Polynomial params,
         X g * Y g = leftTensor (ι₂ := ι) (R.outcome g * (1 - T)) *
@@ -864,13 +810,13 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
           rw [hXY g]
     _ ≤ Real.sqrt (∑ g : Polynomial params, ev strategy.state (X g * (X g)ᴴ)) *
           Real.sqrt (∑ g : Polynomial params, ev strategy.state ((Y g)ᴴ * Y g)) := hcs
-    _ ≤ Real.sqrt 1 * Real.sqrt (gCommStabilityBoundedResidual params strategy family G x) := by
+    _ ≤ Real.sqrt 1 * Real.sqrt (hbound.storedResidual G x) := by
           apply mul_le_mul
           · exact Real.sqrt_le_sqrt hfirst
           · exact Real.sqrt_le_sqrt hsecond
           · exact Real.sqrt_nonneg _
           · exact Real.sqrt_nonneg _
-    _ = Real.sqrt (gCommStabilityBoundedResidual params strategy family G x) := by simp
+    _ = Real.sqrt (hbound.storedResidual G x) := by simp
 
 set_option maxHeartbeats 2000000 in
 theorem gCommStabilityTwo_scalar
@@ -906,7 +852,7 @@ theorem gCommStabilityTwo_scalar
                 (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g)))|
       ≤ Real.sqrt
           (avgOver (uniformDistribution (Fq params))
-            (fun x => gCommStabilityBoundedResidual params strategy family G x)) := by
+            (fun x => hbound.storedResidual G x)) := by
           exact
             MIPStarRE.LDT.Preliminaries.avgOver_abs_le_sqrt_of_pointwise
               (uniformDistribution (Fq params))
@@ -917,15 +863,14 @@ theorem gCommStabilityTwo_scalar
                         ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
                       rightTensor (ι₁ := ι)
                         (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g)))
-              (fun x => gCommStabilityBoundedResidual params strategy family G x)
+              (fun x => hbound.storedResidual G x)
               (gCommStabilityTwo_scalar_pointwise_bound
                 params strategy zeta hnorm family G hG hbound)
-              (gCommStabilityBoundedResidual_nonneg
+              (storedResidual_nonneg
                 params strategy family G zeta hbound)
               h𝒟
     _ ≤ Real.sqrt zeta := by
           exact Real.sqrt_le_sqrt <|
-            gCommStability_storedBoundedResidualBound
-              params strategy zeta family G hG hbound
+            hbound.storedBoundedResidualBound G hG
 
 end MIPStarRE.LDT.Commutativity
