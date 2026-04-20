@@ -262,22 +262,36 @@ theorem hAConsistency_submeas
       LdSandwichLineOnePointStatement params strategy family
         eps delta gamma zeta k i := by
     have hfacts : GHatFactsStatement params strategy.state family gamma zeta := by
-      /-
-      TODO(#299): derive the full `GHatFactsStatement` package here.
-
-      The available local hypotheses already provide the inputs for the
-      one-point sandwich lemma once `hfacts` is available:
-      `hgood`, `hcons`, `hself`, and `hbound`.
-
-      Constructing `hfacts` itself must package the earlier chain
-      `gCompleteSelfConsistency → gBotSelfConsistency →
-      Commutativity.comMain → commutingWithGComplete →
-      commutingWithGIncomplete → gHatFacts` from the now-threaded local
-      hypotheses `hgood`, `hcons`, `hself`, `hbound`,
-      `hgamma_le`, `hzeta_le`, and `hdq_le`
-      (normalization is available as `strategy.isNormalized`).
-      -/
-      sorry
+      have hzeta_nonneg : 0 ≤ zeta :=
+        le_trans (sddError_nonneg _ _ _ _)
+          hself.sliceSelfConsistency.squaredDistanceBound
+      have hgamma_nonneg : 0 ≤ gamma := by
+        have : 0 ≤ strategy.diagonalFailureProbability := by
+          unfold SymStrat.diagonalFailureProbability
+          exact mul_nonneg (by positivity)
+            (Finset.sum_nonneg fun j _ =>
+              bipartiteConsError_nonneg strategy.state _ _ _)
+        exact le_trans this hgood.diagonalLineTest
+      let complete_self :=
+        gCompleteSelfConsistency params strategy.state family zeta hself
+      let bot_self :=
+        gBotSelfConsistency params strategy.state family zeta complete_self
+      let com :=
+        Commutativity.comMain params strategy eps delta gamma zeta
+          strategy.isNormalized hgood family
+          (fun x => (family.meas x).toSubMeas) (fun _ => rfl)
+          hcons hself hbound
+      let withComplete :=
+        commutingWithGComplete params strategy family
+          (fun x => (family.meas x).toSubMeas) gamma zeta
+          hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
+          com complete_self
+      let withIncomplete :=
+        commutingWithGIncomplete params strategy.state family gamma zeta
+          withComplete
+      exact gHatFacts params strategy.state family gamma zeta
+        hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
+        complete_self bot_self withComplete withIncomplete
     intro i hi
     exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
       hgood hgamma_le hzeta_le hdq_le
