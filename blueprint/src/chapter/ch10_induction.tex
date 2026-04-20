@@ -371,12 +371,12 @@
 \begin{theorem}[Consolidated error cascade]\label{thm:error-cascade-main-formal}
 	\lean{MIPStarRE.LDT.Test.errorCascade_le_mainFormalError}
 	\uses{def:main-formal-envelope, def:main-formal-error-cascade, thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
-	Assume the standing hypotheses, the input bound from Theorem~\ref{thm:sigma-bound-main-formal}, and the envelope-level bounds of Theorem~\ref{thm:zeta-bounds-main-formal}. Assume in addition the explicit uniform bound
+	Assume the standing hypotheses, the input bound from Theorem~\ref{thm:sigma-bound-main-formal}, and the envelope-level bounds of Theorem~\ref{thm:zeta-bounds-main-formal}. Assume in addition the explicit bound for the concrete cascade triple $(\sigma,\zeta_1,\zeta_3)$:
 	\[
-		2\sigma' + 2\sqrt{\zeta_1' + \zeta_3'/2}
-		\le 40000k^2m^4 E
+		\zeta_4 = 2\sigma + 2\sqrt{\zeta_1 + \zeta_3/2}
+		\le 40000k^2m^4 E.
 	\]
-	for every triple $(\sigma',\zeta_1',\zeta_3')$. Then
+	Then
 	\[
 		\sigma \le 100000k^2m^4 E,
 		\qquad
@@ -391,7 +391,7 @@
 \end{theorem}
 \begin{proof}
 	\uses{thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
-	This is obtained by substituting the cascade definitions and combining the preceding inequalities. The extra uniform bound on $2\sigma' + 2\sqrt{\zeta_1' + \zeta_3'/2}$ is stronger than the specialised input used in the paper.
+	This is obtained by substituting the cascade definitions and combining the preceding inequalities. The bound on $\zeta_4$ uses the hypothesis about the concrete cascade triple $(\sigma,\zeta_1,\zeta_3)$ together with $\zeta_4 = 2\sigma + 2\sqrt{\zeta_1+\zeta_3/2}$.
 \end{proof}
 
 \begin{proof}
