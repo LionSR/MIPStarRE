@@ -174,9 +174,6 @@ of the left-placed version of `A`. The Cauchy–Schwarz chain and tensor
 hermitian identities have been factored out above, so the main proof is now a
 straightforward combination of those helpers.
 -/
-set_option maxHeartbeats 800000 in
--- The proof threads together several bipartite-tensor identities; a small bump
--- over the default (200k) remains needed for the closing `simpa` unfolds.
 private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
     {Outcome : Type*} {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]

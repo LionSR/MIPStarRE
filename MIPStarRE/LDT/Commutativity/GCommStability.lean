@@ -182,7 +182,6 @@ private theorem storedResidual_nonneg
       (sub_nonneg.mpr (G x).total_le_one)
       (hbound.bounded.sliceOpPSD x)
 
-set_option maxHeartbeats 2000000 in
 private lemma gCommStability_scalar_pointwise_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -445,7 +444,6 @@ private lemma gCommStability_scalar_pointwise_bound
           · exact Real.sqrt_nonneg _
     _ = Real.sqrt (hbound.storedResidual G y) := by simp
 
-set_option maxHeartbeats 2000000 in
 theorem gCommStability_scalar
     (params : Parameters)
     [FieldModel params.q]
@@ -555,7 +553,6 @@ private lemma gCommStabilityTwoR_first_factor_le_one
             leftTensor_le_one (ι₂ := ι) (gCommStabilityTwoR params family G x).total_le_one
     _ = 1 := ev_one_of_isNormalized strategy.state hnorm
 
-set_option maxHeartbeats 2000000 in
 private lemma gCommStabilityTwo_scalar_pointwise_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -818,7 +815,6 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
           · exact Real.sqrt_nonneg _
     _ = Real.sqrt (hbound.storedResidual G x) := by simp
 
-set_option maxHeartbeats 2000000 in
 theorem gCommStabilityTwo_scalar
     (params : Parameters)
     [FieldModel params.q]
