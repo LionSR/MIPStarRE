@@ -124,7 +124,7 @@ theorem transportMeasurement_postprocess_zero
 end DiagonalLine
 
 /-- Stronger rebasing compatibility for axis-parallel-line measurements: the
-measurement indexed by the rebased line is definitionally the transport of the
+measurement indexed by the rebased line is equal to the transport of the
 original measurement along the answer reparametrization equivalence. -/
 def AxisParallelMeasurementTransportInvariant (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -134,7 +134,7 @@ def AxisParallelMeasurementTransportInvariant (params : Parameters)
       AxisParallelLine.transportMeasurement (params := params) (M ℓ) t
 
 /-- Stronger rebasing compatibility for diagonal-line measurements: the
-measurement indexed by the rebased line is definitionally the transport of the
+measurement indexed by the rebased line is equal to the transport of the
 original measurement along the answer reparametrization equivalence. -/
 def DiagonalMeasurementTransportInvariant (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
