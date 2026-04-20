@@ -672,6 +672,8 @@
 			X^\dagger \cdot X = Q = V \cdot (\Sigma_{d \times d})^2 \cdot V^\dagger.
 		\end{equation*}
 	\end{lemma}
+	% No proof-level marker here: the Lean declaration only projects the stored
+	% singular-value data of the chosen $X/\widehat X/P$ witness.
 	\begin{proof}
 		\uses{lem:qa-restated}
 		The first identity is the standard computation from the singular value decomposition:
@@ -767,6 +769,8 @@
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
 		\end{equation*}
 	\end{lemma}
+	% No proof-level marker here: the Lean declaration only projects the stored
+	% coisometry identity of $\widehat X$.
 	\begin{proof}
 		Multiply out the definition of $\widehat X$ and use the unitarity of $U$ and $V$:
 		\[
@@ -791,6 +795,8 @@
 			X^\dagger \cdot \widehat{X} = \sqrt{Q}.
 		\end{equation*}
 	\end{lemma}
+	% No proof-level marker here: the Lean declaration only projects the stored
+	% mixed-product identities of the chosen $X/\widehat X/P$ witness.
 	\begin{proof}
 		\uses{lem:X-squared}
 		The first identity follows directly from the singular value decomposition:
@@ -875,6 +881,8 @@
 			Q_a \ot I \approx_{30\zeta^{1/4}} P_a \ot I.
 		\end{equation*}
 	\end{lemma}
+	% No proof-level marker here: the Lean declaration only projects the stored
+	% comparison bound between $P$ and $Q$ from the chosen witness.
 	\begin{proof}
 		\uses{lem:projective-low-rank-sum, lem:q-almost-projective, lem:sqrt-Q-completeness, lem:xa-t, lem:qa-restated, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity}
 		The quantity to bound is
