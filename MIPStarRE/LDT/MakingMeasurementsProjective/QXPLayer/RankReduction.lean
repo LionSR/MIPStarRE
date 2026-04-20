@@ -195,7 +195,7 @@ lemma projectiveNonMeasurement {Outcome : Type uOutcome}
 
 /-- **Degenerate empty-outcome branch** for `lem:projective-low-rank-sum`.
 
-In `references/ldt-paper/orthonormalization.tex`, lines 540--658, the rank-
+In `references/ldt-paper/orthonormalization.tex`, lines 540-658, the rank-
 reduction argument starts from an honest measurement `A = {A_a}` on a nontrivial
 ambient space. If `Outcome` were empty, then `∑ a, A_a = 0` while
 `A.total_eq_one` forces the same sum to be `1`, so this branch is impossible.
@@ -231,7 +231,7 @@ caller-supplied parameters rather than via a dedicated `*BridgePackage` wrapper.
 In the paper (orthonormalization.tex), Lem 5.5 itself only produces `{Q_a}`;
 the auxiliary space `ℂ^m` and the projective measurement
 `T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent
-"Matrix decomposition of `Q_a`" definition (orthonormalization.tex:777–795).
+"Matrix decomposition of `Q_a`" definition (orthonormalization.tex:777-795).
 That step needs an orthonormal basis of each rounded projector `R_a`'s
 1-eigenspace together with a matrix-level `rank_of_isProj` adapter. Mathlib
 does not currently expose that restricted eigenbasis construction, so
