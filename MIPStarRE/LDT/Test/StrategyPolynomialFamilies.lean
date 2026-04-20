@@ -32,7 +32,9 @@ structure IdxPolyFamily (params : Parameters) [FieldModel params.q]
   witness : Fq params → MIPStarRE.Quantum.Op ι := fun x => (meas x).toSubMeas.total
   dominationTarget : Fq params → Polynomial params → MIPStarRE.Quantum.Op ι :=
     fun x g => (meas x).toSubMeas.outcome g
-  deriving Inhabited
+
+-- NOTE: no global `Inhabited` instance for `IdxPolyFamily`; without an actual
+-- slice family, any default would be a degenerate zero-family placeholder.
 
 namespace IdxPolyFamily
 

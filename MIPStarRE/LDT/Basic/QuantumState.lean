@@ -12,14 +12,14 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT
 
 /-- A PSD density matrix indexed by `ι`.
-Default density is `0` (not a physical state — trace ≠ 1 — but PSD by construction).
-Use `IsNormalized` to additionally require `τ(ρ) = 1`. -/
+
+There is intentionally no global `Inhabited` instance: the zero matrix is PSD but
+not a physical state of unit trace, so an ambient default would silently
+trivialize later statements. Use `IsNormalized` to additionally require
+`τ(ρ) = 1`. -/
 structure QuantumState (ι : Type*) [Fintype ι] [DecidableEq ι] where
   density : MIPStarRE.Quantum.Op ι := 0
   density_psd : 0 ≤ density := by positivity
-
-instance {ι : Type*} [Fintype ι] [DecidableEq ι] : Inhabited (QuantumState ι) where
-  default := {}
 
 /-- Unit normalized trace for the concrete matrix carried by a state. -/
 def QuantumState.IsNormalized {ι : Type*} [Fintype ι] [DecidableEq ι]
