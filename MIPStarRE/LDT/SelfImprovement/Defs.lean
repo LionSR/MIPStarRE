@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.GlobalVariance.Defs.Families
 import MIPStarRE.LDT.MainInductionStep.Defs
+import MIPStarRE.LDT.Preliminaries.Defs
 
 /-!
 # Section 9 — Definitions
@@ -23,6 +24,97 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- The zero polynomial used as the distinguished completion outcome for the
+reduced Lean wrapper around the paper's strict-feasible primal SDP witness. -/
+noncomputable def sdpDistinguishedPolynomial (params : Parameters) [FieldModel params.q] :
+    Polynomial params :=
+  ⟨0, by
+    intro i
+    simp [MvPolynomial.degreeOf_zero]⟩
+
+/-- The paper's strict-feasibility weight `1 / (2 |\polyfunc{m}{q}{d}|)`. -/
+noncomputable def sdpStrictPrimalWeight (params : Parameters)
+    [FieldModel params.q] : Error :=
+  1 / (2 * (Fintype.card (Polynomial params) : Error))
+
+private theorem sdpStrictPrimalConstantSum (params : Parameters)
+    [FieldModel params.q] :
+    ∑ _ : Polynomial params, sdpStrictPrimalWeight params •
+        (1 : MIPStarRE.Quantum.Op ι) =
+      ((1 / 2 : Error) • (1 : MIPStarRE.Quantum.Op ι)) := by
+  have hdenom : (2 * (Fintype.card (Polynomial params) : Error)) ≠ 0 := by
+    positivity
+  calc
+    ∑ g : Polynomial params, sdpStrictPrimalWeight params •
+        (1 : MIPStarRE.Quantum.Op ι)
+        = ((∑ g : Polynomial params, sdpStrictPrimalWeight params) : Error) •
+            (1 : MIPStarRE.Quantum.Op ι) := by
+              simpa using
+                (Finset.sum_smul (s := Finset.univ)
+                  (f := fun _ : Polynomial params => sdpStrictPrimalWeight params)
+                  (x := (1 : MIPStarRE.Quantum.Op ι))).symm
+    _ = ((Fintype.card (Polynomial params) : Error) *
+          sdpStrictPrimalWeight params) •
+          (1 : MIPStarRE.Quantum.Op ι) := by
+            simp [Finset.sum_const, nsmul_eq_mul]
+    _ = ((1 / 2 : Error) • (1 : MIPStarRE.Quantum.Op ι)) := by
+          congr 1
+          unfold sdpStrictPrimalWeight
+          field_simp [hdenom]
+
+/-- The paper's strict-feasible primal SDP witness
+`T_g = (2 |\polyfunc{m}{q}{d}|)^{-1} I`. -/
+noncomputable def sdpStrictPrimalSubMeas (params : Parameters)
+    [FieldModel params.q] : SubMeas (Polynomial params) ι :=
+  { outcome := fun _ => sdpStrictPrimalWeight params • (1 : MIPStarRE.Quantum.Op ι)
+    total := ∑ g : Polynomial params,
+      sdpStrictPrimalWeight params • (1 : MIPStarRE.Quantum.Op ι)
+    outcome_pos := by
+      intro _
+      have hweight : 0 ≤ sdpStrictPrimalWeight params := by
+        unfold sdpStrictPrimalWeight
+        positivity
+      exact smul_nonneg hweight (op_one_nonneg (d := ι))
+    sum_eq_total := rfl
+    total_le_one := by
+      rw [sdpStrictPrimalConstantSum (ι := ι) params]
+      simpa using
+        (smul_le_smul_of_nonneg_right
+          (show (1 / 2 : Error) ≤ 1 by norm_num)
+          (op_one_nonneg (d := ι))) }
+
+@[simp] theorem sdpStrictPrimalSubMeas_total (params : Parameters)
+    [FieldModel params.q] :
+    (sdpStrictPrimalSubMeas (ι := ι) params).total =
+      ((1 / 2 : Error) • (1 : MIPStarRE.Quantum.Op ι)) := by
+  simpa [sdpStrictPrimalSubMeas] using
+    sdpStrictPrimalConstantSum (ι := ι) params
+
+/-- The reduced Lean wrapper completes the paper's strict-feasible primal SDP
+submeasurement at the zero polynomial so that downstream lemmas can keep using a
+full measurement. -/
+noncomputable def sdpPrimalWitness (params : Parameters)
+    [FieldModel params.q] : Measurement (Polynomial params) ι :=
+  Preliminaries.completeAtOutcome
+    (sdpStrictPrimalSubMeas (ι := ι) params)
+    (sdpDistinguishedPolynomial params)
+
+/-- The paper's strict-feasible dual SDP witness `Z = 2I`. -/
+noncomputable def sdpStrictDualWitness : MIPStarRE.Quantum.Op ι :=
+  (2 : Error) • (1 : MIPStarRE.Quantum.Op ι)
+
+@[simp] theorem sdpStrictDualWitness_nonneg :
+    0 ≤ (sdpStrictDualWitness (ι := ι)) := by
+  unfold sdpStrictDualWitness
+  exact smul_nonneg (by norm_num) (op_one_nonneg (d := ι))
+
+theorem one_le_sdpStrictDualWitness :
+    (1 : MIPStarRE.Quantum.Op ι) ≤ sdpStrictDualWitness (ι := ι) := by
+  simpa [sdpStrictDualWitness] using
+    (smul_le_smul_of_nonneg_right
+      (show (1 : Error) ≤ 2 by norm_num)
+      (op_one_nonneg (d := ι)))
 
 /-- The averaged point operator `A_g = E_u A^u_{g(u)}`. -/
 noncomputable def averagedPointOperator (params : Parameters)
