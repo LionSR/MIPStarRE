@@ -248,7 +248,8 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
     (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ)
     -- TODO(#525): Materialise `(auxSpace, t, hAuxDim)` from the paper's
     -- "Matrix decomposition of `Q_a`" (orthonormalization.tex:777-795),
-    -- i.e. from a 1-eigenspace ONB for each rounded projector `R_a`.
+    -- i.e. from a 1-eigenspace ONB for each rounded projector `q.outcome a`
+    -- produced by `hbridge.fromSourceAlmostProjective` (the paper's `R_a`).
     (auxSpace : FiniteHilbertSpace.{uι})
     (t : ProjMeas Outcome auxSpace.carrier)
     (hAuxDim : Fintype.card auxSpace.carrier ≤ Fintype.card ι)
