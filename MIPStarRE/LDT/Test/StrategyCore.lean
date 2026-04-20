@@ -63,6 +63,110 @@ def AxisParallelEvaluationReparamInvariant (params : Parameters)
     (postprocess ((M (AxisParallelLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a =
       (postprocess ((M ℓ).toSubMeas) (fun f => f t)).outcome a
 
+namespace AxisParallelLine
+
+/-- Transport an axis-parallel-line measurement along rebasing of the line
+question by translating its polynomial outcomes. -/
+noncomputable def transportMeasurement {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : ProjMeas (AxisLinePolynomial params) ι) (t : Fq params) :
+    ProjMeas (AxisLinePolynomial params) ι :=
+  ProjMeas.transport (AxisLinePolynomial.reparamAtEquiv (params := params) t) M
+
+/-- Evaluating a transported axis-line measurement at `zeroCoord` agrees with
+reading the original measurement at the rebasing parameter. -/
+theorem transportMeasurement_postprocess_zero
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : ProjMeas (AxisLinePolynomial params) ι) (t a : Fq params) :
+    (postprocess (transportMeasurement (params := params) M t).toSubMeas
+        (· zeroCoord)).outcome a =
+      (postprocess M.toSubMeas (fun f => f t)).outcome a := by
+  have h :=
+    SubMeas.postprocess_transport
+      (e := AxisLinePolynomial.reparamAtEquiv (params := params) t)
+      (A := M.toSubMeas)
+      (f := fun g : AxisLinePolynomial params => g zeroCoord)
+  simpa [transportMeasurement, AxisLinePolynomial.reparamAtEquiv,
+    AxisLinePolynomial.reparamAt_apply_zero, addCoord, zeroCoord] using
+    congrArg (fun A => A.outcome a) h
+
+end AxisParallelLine
+
+namespace DiagonalLine
+
+/-- Transport a diagonal-line measurement along rebasing of the line question by
+translating its polynomial outcomes. -/
+noncomputable def transportMeasurement {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : ProjMeas (DiagonalLinePolynomial params) ι) (t : Fq params) :
+    ProjMeas (DiagonalLinePolynomial params) ι :=
+  ProjMeas.transport (DiagonalLinePolynomial.reparamAtEquiv (params := params) t) M
+
+/-- Evaluating a transported diagonal-line measurement at `zeroCoord` agrees with
+reading the original measurement at the rebasing parameter. -/
+theorem transportMeasurement_postprocess_zero
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : ProjMeas (DiagonalLinePolynomial params) ι) (t a : Fq params) :
+    (postprocess (transportMeasurement (params := params) M t).toSubMeas
+        (· zeroCoord)).outcome a =
+      (postprocess M.toSubMeas (fun f => f t)).outcome a := by
+  have h :=
+    SubMeas.postprocess_transport
+      (e := DiagonalLinePolynomial.reparamAtEquiv (params := params) t)
+      (A := M.toSubMeas)
+      (f := fun g : DiagonalLinePolynomial params => g zeroCoord)
+  simpa [transportMeasurement, DiagonalLinePolynomial.reparamAtEquiv,
+    DiagonalLinePolynomial.reparamAt_apply_zero, addCoord, zeroCoord] using
+    congrArg (fun A => A.outcome a) h
+
+end DiagonalLine
+
+/-- Stronger rebasing compatibility for axis-parallel-line measurements: the
+measurement indexed by the rebased line is definitionally the transport of the
+original measurement along the answer reparametrization equivalence. -/
+def AxisParallelMeasurementTransportInvariant (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι) : Prop :=
+  ∀ (ℓ : AxisParallelLine params) (t : Fq params),
+    M (AxisParallelLine.rebaseAt ℓ t) =
+      AxisParallelLine.transportMeasurement (params := params) (M ℓ) t
+
+/-- Stronger rebasing compatibility for diagonal-line measurements: the
+measurement indexed by the rebased line is definitionally the transport of the
+original measurement along the answer reparametrization equivalence. -/
+def DiagonalMeasurementTransportInvariant (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι) : Prop :=
+  ∀ (ℓ : DiagonalLine params) (t : Fq params),
+    M (DiagonalLine.rebaseAt ℓ t) =
+      DiagonalLine.transportMeasurement (params := params) (M ℓ) t
+
+/-- The stronger transport-level axis-parallel compatibility implies the older
+outcome-level reparametrization invariant predicate. -/
+theorem AxisParallelMeasurementTransportInvariant.toEvaluationReparamInvariant
+    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M : IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι}
+    (hM : AxisParallelMeasurementTransportInvariant params M) :
+    AxisParallelEvaluationReparamInvariant params M := by
+  intro ℓ t a
+  rw [hM ℓ t]
+  exact AxisParallelLine.transportMeasurement_postprocess_zero
+    (params := params) (M := M ℓ) t a
+
+/-- The stronger transport-level diagonal compatibility implies the older
+outcome-level reparametrization invariant predicate. -/
+theorem DiagonalMeasurementTransportInvariant.toEvaluationReparamInvariant
+    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι}
+    (hM : DiagonalMeasurementTransportInvariant params M) :
+    DiagonalEvaluationReparamInvariant params M := by
+  intro ℓ t a
+  rw [hM ℓ t]
+  exact DiagonalLine.transportMeasurement_postprocess_zero
+    (params := params) (M := M ℓ) t a
+
 /-- Paper-local symmetric strategy data.
 
 The `axisParallelReparamInvariant` and `diagonalReparamInvariant`
