@@ -312,7 +312,9 @@ noncomputable def laplacianEigenvalue (params : Parameters) (α : Point params) 
 noncomputable def hypercubeSpectralGap (params : Parameters) : Error :=
   1 / ((params.m : Error) * (hypercubeVertexCount params : Error))
 
-/-- The exact inner-product formula for the hypercube Fourier basis. -/
+/-- Unfolds `fourierBasisInnerProduct` to its Kronecker-delta pattern. The
+underlying `def` is *defined* as the Kronecker delta, so this lemma is `rfl`
+and exists only to expose the pattern for downstream rewrites. -/
 lemma fourierBasisInnerProduct_eq (params : Parameters)
     (α β : Point params) :
     fourierBasisInnerProduct params α β = if α = β then 1 else 0 := rfl
@@ -322,8 +324,10 @@ lemma fourierBasis_card (params : Parameters) :
     Fintype.card (Point params) = hypercubeVertexCount params := by
   simp [hypercubeVertexCount, Fintype.card_fin]
 
-/-- Each Fourier basis vector is an eigenvector of the adjacency operator. -/
-lemma fourierBasisAdjacencyEigenvector (params : Parameters) (α : Point params) :
+/-- Each Fourier basis vector is an eigenvector of the adjacency operator
+`K` with eigenvalue `adjacencyEigenvalue params α`. -/
+lemma matrixAdjacencyOperator_mulVec_fourierBasisState (params : Parameters)
+    (α : Point params) :
     (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) =
       ((adjacencyEigenvalue params α : ℝ) : ℂ) • fourierBasisState params α := by
   ext u
@@ -395,15 +399,7 @@ theorem eigenvectors (params : Parameters) :
     exact fourierBasisInnerProduct_eq params α β
   · refine ⟨fourierBasis_card params, ?_⟩
     intro α
-    exact fourierBasisAdjacencyEigenvector params α
-
-/-- Projection of `eigenvectors` onto the eigenvector conjunct: every Fourier
-basis state is an eigenvector of the adjacency operator with the paper's
-eigenvalue `adjacencyEigenvalue params α`. -/
-lemma eigenvectors_eigenvectorProperty (params : Parameters) (α : Point params) :
-    (matrixAdjacencyOperator params).mulVec (fourierBasisState params α) =
-      ((adjacencyEigenvalue params α : ℝ) : ℂ) • fourierBasisState params α :=
-  (eigenvectors params).2.2 α
+    exact matrixAdjacencyOperator_mulVec_fourierBasisState params α
 
 /-- The Laplacian eigenvalue is the complement of the adjacency eigenvalue. -/
 lemma laplacianEigenvalueRelation (params : Parameters) (α : Point params) :
@@ -416,7 +412,7 @@ lemma laplacianEigenvalueRelation (params : Parameters) (α : Point params) :
   have hw := frequencyWeight_le_m params α
   rw [Nat.cast_sub hw]
   field_simp [hm, hM]
-  ring_nf
+  ring
 
 /-- Every non-constant Fourier mode has Laplacian eigenvalue at least the spectral gap. -/
 lemma laplacianEigenvalue_ge_hypercubeSpectralGap_of_weight_pos (params : Parameters)
@@ -452,21 +448,5 @@ theorem laplacianSpectralGap (params : Parameters) :
       exact laplacianEigenvalue_ge_hypercubeSpectralGap_of_weight_pos params α hα
     · intro α hα
       exact laplacianEigenvalue_eq_hypercubeSpectralGap_of_weight_one params α hα
-
-/-- Projection of `laplacianSpectralGap` onto the eigenvalue-relation conjunct:
-the Laplacian eigenvalue on `φ_α` equals `1/M` minus the adjacency eigenvalue. -/
-lemma laplacianSpectralGap_eigenvalueRelation (params : Parameters) (α : Point params) :
-    laplacianEigenvalue params α =
-      (1 / (hypercubeVertexCount params : Error)) - adjacencyEigenvalue params α :=
-  (laplacianSpectralGap params).1 α
-
-/-- Projection of `laplacianSpectralGap` onto the lower-bound conjunct: every
-non-constant Fourier mode has Laplacian eigenvalue at least the spectral gap
-`hypercubeSpectralGap params = 1/(mM)`. -/
-lemma laplacianSpectralGap_positiveModesLowerBound (params : Parameters)
-    (α : Point params) :
-    0 < frequencyWeight params α →
-      hypercubeSpectralGap params ≤ laplacianEigenvalue params α :=
-  (laplacianSpectralGap params).2.1 α
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph

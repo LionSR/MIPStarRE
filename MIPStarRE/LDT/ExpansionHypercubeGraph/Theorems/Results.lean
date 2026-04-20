@@ -289,7 +289,13 @@ private def placeholderGlobalVarianceDecomposition (params : Parameters)
     GlobalVarianceDecomposition params A :=
   default
 
-/-- `lem:global-rewrite`. -/
+/-- `lem:global-rewrite`.
+
+NOTE: the witness used here is `placeholderGlobalVarianceDecomposition`, an
+unstructured `default` element. `GlobalVarianceDecomposition` is currently a
+trivially-inhabited `Prop` class and `globalVarianceTraceWitness` ignores its
+argument, so this existential is strictly weaker than the paper's `‖A_+‖₂² +
+‖A_-‖₂²` decomposition. Strengthening this is tracked under #452. -/
 lemma globalRewrite (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     GlobalRewriteStatement params A ψ := by

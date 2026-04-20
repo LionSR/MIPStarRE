@@ -252,7 +252,7 @@ private lemma matrixAdjacencyOperator_spectral_decomp (params : Parameters) :
             fourierBasisProjector params α) u v := by
           refine Finset.sum_congr rfl ?_
           intro α _
-          have hα := congrFun (eigenvectors_eigenvectorProperty params α) u
+          have hα := congrFun (matrixAdjacencyOperator_mulVec_fourierBasisState params α) u
           simp only [Pi.smul_apply] at hα
           simp [fourierBasisProjector, Matrix.vecMulVec_apply, hα, mul_assoc, mul_comm]
 
@@ -268,7 +268,7 @@ private lemma matrixLaplacianOperator_spectral_decomp (params : Parameters) :
     intro α
     simpa [one_div] using
       congrArg (fun x : Error => (x : ℂ))
-        (laplacianSpectralGap_eigenvalueRelation params α)
+        (laplacianEigenvalueRelation params α)
   calc
     matrixLaplacianOperator params
       = ((hypercubeVertexCount params : ℂ)⁻¹) •
@@ -305,7 +305,7 @@ private lemma hypercubeSpectralGap_operator_posSemidef (params : Parameters) :
     intro α hα
     have hα0 : α ≠ 0 := by simpa using Finset.mem_erase.mp hα |>.1
     exact sub_nonneg.mpr <|
-      laplacianSpectralGap_positiveModesLowerBound params α
+      laplacianEigenvalue_ge_hypercubeSpectralGap_of_weight_pos params α
         (frequencyWeight_pos_of_ne_zero params hα0)
   have hdecomp :
       matrixLaplacianOperator params -
