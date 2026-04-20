@@ -223,14 +223,15 @@ lemma globalVarianceTraceForm_eq_orthogonalClosedForm (params : Parameters)
   by_cases hι : Nonempty ι
   · letI := hι
     let model := abstractMatrixModel params decomp.orthogonalComponent ψ
+    let w := globalVarianceTraceWitness params A ψ decomp
     have htrace :
-        Complex.re (MIPStarRE.Quantum.normalizedTrace (globalVarianceTraceWitness params A ψ decomp)) =
+        Complex.re (MIPStarRE.Quantum.normalizedTrace w) =
           Complex.re
             (∑ u, ∑ v,
               (1 : MatrixOperator (pointHilbertSpace params)) u v *
                 matrixExpectation model.state ((model.family v)ᴴ * model.family u)) := by
-      simpa [model, abstractMatrixModel, globalVarianceTraceWitness, matrixTensorOperator,
-        matrixCombinedOperator, combinedOperator] using
+      simpa [model, w, abstractMatrixModel, globalVarianceTraceWitness,
+        matrixTensorOperator, matrixCombinedOperator, combinedOperator] using
         congrArg Complex.re
           (normalizedTrace_combined_tensor_eq params model
             (P := (1 : MatrixOperator (pointHilbertSpace params))))
@@ -251,7 +252,8 @@ lemma globalVarianceTraceForm_eq_orthogonalClosedForm (params : Parameters)
                     matrixExpectation model.state ((model.family v)ᴴ * model.family u)) := by
                 simp
         _ = ∑ u, ∑ v,
-              if u = v then ev ψ ((decomp.orthogonalComponent v)ᴴ * decomp.orthogonalComponent u)
+              if u = v then ev ψ ((decomp.orthogonalComponent v)ᴴ *
+                decomp.orthogonalComponent u)
               else 0 := by
                 refine Finset.sum_congr rfl ?_
                 intro u hu
@@ -261,13 +263,14 @@ lemma globalVarianceTraceForm_eq_orthogonalClosedForm (params : Parameters)
                 · subst huv
                   simp [model, abstractMatrixModel, matrixExpectation, ev]
                 · simp [huv, model, abstractMatrixModel, matrixExpectation]
-        _ = ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u) := by
+        _ = ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ *
+              decomp.orthogonalComponent u) := by
               simp
     calc
       globalVarianceTraceForm params A ψ decomp
           = (hypercubeVertexCount params : Error)⁻¹ *
-              Complex.re (MIPStarRE.Quantum.normalizedTrace (globalVarianceTraceWitness params A ψ decomp)) := by
-                simp [globalVarianceTraceForm]
+              Complex.re (MIPStarRE.Quantum.normalizedTrace w) := by
+                simp [globalVarianceTraceForm, w]
       _ = (hypercubeVertexCount params : Error)⁻¹ *
             Complex.re
               (∑ u, ∑ v,
