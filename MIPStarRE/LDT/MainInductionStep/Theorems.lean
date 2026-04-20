@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.CommutativityPoints.Theorem
 import MIPStarRE.LDT.Commutativity.Theorems
+import MIPStarRE.LDT.Pasting.Theorems
 -- Used by `selfImprovementInInductionSection`.
 import MIPStarRE.LDT.SelfImprovement.Theorems
 
@@ -148,98 +149,60 @@ theorem selfImprovementInInductionSection
           GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
         simpa using Matrix.nonneg_iff_posSemidef.mp hdom' }
 
-/-- `thm:ld-pasting-in-induction-section`.
-
-This wrapper keeps the induction-level pasting hypotheses explicit and packages
-an already-constructed pasted measurement into the local conclusion structure.
-The concrete Section 12 pasting construction is therefore an input here rather
-than a dependency of this file. -/
+/-- `thm:ld-pasting-in-induction-section`. -/
+-- NOTE: `FieldModel.{0}` is needed to match the universe at which
+-- `Pasting.ldPasting` was elaborated. See PR #288 discussion.
 theorem ldPastingInInductionSection
     (params : Parameters)
-    [FieldModel params.q]
+    [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
+    (hgood : strategy.IsGood eps delta gamma)
     (_hgamma_le : gamma ≤ 1)
     (_hzeta_le : zeta ≤ 1)
     (_hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
-    (_hcomplete : family.Complete strategy.state kappa)
-    (_hcons : family.ConsistentWithPoints strategy zeta)
-    (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hbound : PastingBoundednessInput params strategy family zeta)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : PastingBoundednessInput params strategy family zeta)
     (k : ℕ)
-    (_hk : 400 * params.m * params.d ≤ k)
-    (H : Measurement (Polynomial params.next) ι)
-    (hpointConsistency :
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next H.toSubMeas)
-        (ldPastingInInductionError params k eps delta gamma kappa zeta)) :
+    (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingInInductionSectionConclusion params strategy family H
         eps delta gamma kappa zeta k := by
+  have hldPasting :=
+    Pasting.ldPasting params strategy eps delta gamma kappa zeta
+      strategy.isNormalized hgood _hgamma_le _hzeta_le _hdq_le
+      family hcomplete hcons hself hbound k hk
+  obtain ⟨H, hH⟩ := hldPasting
   refine ⟨H, ?_⟩
-  exact ⟨hpointConsistency⟩
+  exact ⟨hH.pointConsistency⟩
 
 /-! ## Main-induction bridge assembly
 
-The theorems in this section package the final compositional step of the
-`thm:main-induction` proof at dimension `m + 1`, assuming the per-slice data at
-dimension `m` has already been assembled into an ambient polynomial family.
+The concrete Section 12 → Section 6 hand-off is not yet formalized as a
+producer theorem, so the missing assembly remains tracked by the named
+`MainInductionBridgePackage`. The wrapper below merely exposes that bundled
+witness in the existential form consumed by `mainInduction`. -/
 
-The concrete recursion/slice-averaging/pasting construction is still supplied
-to this file as explicit witness data. In particular, the final Section 12
-output enters through an existential hypothesis
-`hpasted : ∃ H, LdPastingInInductionSectionConclusion ...`; the theorem below
-only repackages that witness into the existential conclusion consumed directly
-by `mainInduction`. -/
-
-/-- Bridge assembly (final repackaging step for `thm:main-induction`).
-
-Assume the induction-level pasting hypotheses together with an explicit pasted
-measurement witness `hpasted`. If its point-consistency error is bounded by
-`mainInductionError params.next k eps delta gamma`, then this witness can be
-passed directly to `mainInduction`.
-
-The remaining assembly obligations (restriction to slices, per-slice
-induction, per-slice self-improvement, construction of the pasted witness, and
-the error-telescoping inequality) therefore enter as explicit hypotheses,
-matching the paper's bookkeeping in
-`references/ldt-paper/inductive_step.tex:414-622`. -/
+/-- Temporary wrapper from the named induction bridge package to the witness
+shape consumed by `thm:main-induction`. -/
 theorem mainInductionBridgeFromPastedFamily
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma kappa zeta : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
-    (_hgamma_le : gamma ≤ 1)
-    (_hzeta_le : zeta ≤ 1)
-    (_hdq_le : params.d ≤ params.q)
-    (family : IdxPolyFamily params ι)
-    (_hcomplete : family.Complete strategy.state kappa)
-    (_hcons : family.ConsistentWithPoints strategy zeta)
-    (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hbound : PastingBoundednessInput params strategy family zeta)
+    (eps delta gamma : Error)
     (k : ℕ)
-    (_hk : 400 * params.m * params.d ≤ k)
-    (hpasted :
-      ∃ H : Measurement (Polynomial params.next) ι,
-        LdPastingInInductionSectionConclusion params strategy family H
-          eps delta gamma kappa zeta k)
-    (herror :
-      ldPastingInInductionError params k eps delta gamma kappa zeta ≤
-        mainInductionError params.next k eps delta gamma) :
+    (bundle : MainInductionBridgePackage params.next strategy eps delta gamma k) :
     ∃ error : Error, ∃ G : Measurement (Polynomial params.next) ι,
       ConsRel strategy.state (uniformDistribution (Point params.next))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
           (polynomialEvaluationFamily params.next G.toSubMeas)
           error ∧
         error ≤ mainInductionError params.next k eps delta gamma := by
-  obtain ⟨H, hH⟩ := hpasted
-  exact
-    ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
-      hH.pointConsistency, herror⟩
+  obtain ⟨error, G, hG, herror⟩ := bundle.witness
+  exact ⟨error, G, hG, herror⟩
 
 /-! ## Restricted-probability bookkeeping -/
 
