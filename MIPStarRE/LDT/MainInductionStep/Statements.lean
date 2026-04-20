@@ -131,6 +131,7 @@ abbrev PastingBoundednessInput (params : Parameters)
 This isolates the missing recursion/self-improvement/pasting assembly behind an
 explicit witness, matching the temporary bridge style already used in Section 9
 for `SelfImprovementBridgePackage`. -/
+-- TODO(#502, #449): concrete producer pending Section 12 → Section 6 hand-off.
 structure MainInductionBridgePackage (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
