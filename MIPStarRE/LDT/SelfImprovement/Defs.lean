@@ -84,6 +84,9 @@ noncomputable def sdpStrictPrimalSubMeas (params : Parameters)
           (show (1 / 2 : Error) ≤ 1 by norm_num)
           (op_one_nonneg (d := ι))) }
 
+/-- The paper's uniform strict-feasible primal witness has total mass
+`(1 / 2) • I`, leaving the residual `(1 / 2) • I` used by
+`sdpPrimalWitness`'s completion step. -/
 @[simp] theorem sdpStrictPrimalSubMeas_total (params : Parameters)
     [FieldModel params.q] :
     (sdpStrictPrimalSubMeas (ι := ι) params).total =
@@ -91,9 +94,13 @@ noncomputable def sdpStrictPrimalSubMeas (params : Parameters)
   simpa [sdpStrictPrimalSubMeas] using
     sdpStrictPrimalConstantSum (ι := ι) params
 
-/-- The reduced Lean wrapper completes the paper's strict-feasible primal SDP
-submeasurement at the zero polynomial so that downstream lemmas can keep using a
-full measurement. -/
+/-- The reduced Lean wrapper completes `sdpStrictPrimalSubMeas` at the zero
+polynomial so that downstream lemmas can keep using a full measurement.
+
+After this completion, the zero-polynomial outcome is no longer the paper's
+uniform Slater witness `(2 |\polyfunc{m}{q}{d}|)^{-1} I`; the strict-feasibility
+claim from Section 9 applies to the pre-completion submeasurement
+`sdpStrictPrimalSubMeas`. -/
 noncomputable def sdpPrimalWitness (params : Parameters)
     [FieldModel params.q] : Measurement (Polynomial params) ι :=
   Preliminaries.completeAtOutcome
@@ -104,11 +111,13 @@ noncomputable def sdpPrimalWitness (params : Parameters)
 noncomputable def sdpStrictDualWitness : MIPStarRE.Quantum.Op ι :=
   (2 : Error) • (1 : MIPStarRE.Quantum.Op ι)
 
+/-- The paper's strict-feasible dual witness `2I` is positive semidefinite. -/
 @[simp] theorem sdpStrictDualWitness_nonneg :
     0 ≤ (sdpStrictDualWitness (ι := ι)) := by
   unfold sdpStrictDualWitness
   exact smul_nonneg (by norm_num) (op_one_nonneg (d := ι))
 
+/-- The paper's strict-feasible dual witness dominates the identity: `I ≤ 2I`. -/
 theorem one_le_sdpStrictDualWitness :
     (1 : MIPStarRE.Quantum.Op ι) ≤ sdpStrictDualWitness (ι := ι) := by
   simpa [sdpStrictDualWitness] using

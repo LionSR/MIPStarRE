@@ -49,8 +49,7 @@ lemma sdp
   refine
     { primalTotalOperator := T.total_eq_one
       dualPositive := by
-        change 0 ≤ sdpStrictDualWitness (ι := ι)
-        exact sdpStrictDualWitness_nonneg (ι := ι)
+        simp [Z]
       dualFeasible := ?_ }
   intro g
   simpa [Z, sdpDualSlackOperator] using
