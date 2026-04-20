@@ -80,7 +80,7 @@ lemma dotProductZMod_update (params : Parameters) (u α : Point params)
     by_cases h : j = i
     · subst h
       simp [Function.update]
-      ring
+      ring_nf
     · simp [Function.update, h]
   rw [hfun]
   simp_rw [Pi.add_apply]
@@ -133,7 +133,7 @@ lemma fourierBasisState_update_sum (params : Parameters) (u α : Point params)
           ψ ((dotProductZMod params u α - ui * ai) + ((x.val : ZMod params.q) * ai)) := by
             rw [dotProductZMod_update]
             simp [ui, ai]
-            ring
+            ring_nf
       _ = ψ (dotProductZMod params u α - ui * ai) * ψ ((x.val : ZMod params.q) * ai) := by
             rw [AddChar.map_add_eq_mul]
   have hsum :
@@ -160,7 +160,7 @@ lemma fourierBasisState_update_sum (params : Parameters) (u α : Point params)
       _ = (((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) *
             ψ (dotProductZMod params u α - ui * ai)) *
             ∑ x : Fq params, ψ ((x.val : ZMod params.q) * ai) := by
-            ring
+            ring_nf
   rw [hsum, sum_stdAddChar_mul_fin]
   by_cases hαi : α i = (0 : Fq params)
   · simp [ai, ui, ψ, hαi, fourierBasisState,
@@ -217,8 +217,8 @@ structure GlobalVarianceDecomposition (params : Parameters)
   decomposition :
     ∀ u, A u = averageComponent + orthogonalComponent u
 
-/-- Recover the centered residual as `A^u - A_avg`. -/
 omit [Fintype ι] [DecidableEq ι] in
+/-- Recover the centered residual as `A^u - A_avg`. -/
 lemma GlobalVarianceDecomposition.orthogonalComponent_eq_sub_average
     {params : Parameters} {A : Point params → MIPStarRE.Quantum.Op ι}
     (decomp : GlobalVarianceDecomposition params A) (u : Point params) :
@@ -241,8 +241,6 @@ noncomputable def canonicalGlobalVarianceDecomposition (params : Parameters)
   averageComponent_eq := rfl
   orthogonal_sum_zero := by
     classical
-    let avg : MIPStarRE.Quantum.Op ι :=
-      ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ v, A v
     have hM_ne : (hypercubeVertexCount params : ℂ) ≠ 0 := by
       exact_mod_cast (Nat.ne_of_gt (pow_pos params.hq params.m))
     ext i j
@@ -256,14 +254,13 @@ noncomputable def canonicalGlobalVarianceDecomposition (params : Parameters)
       _ = ((hypercubeVertexCount params : ℂ) * (hypercubeVertexCount params : ℂ)⁻¹) * A x i j := by
             simp [hM_ne]
       _ = (hypercubeVertexCount params : ℂ) * ((hypercubeVertexCount params : ℂ)⁻¹ * A x i j) := by
-            ring
+            ring_nf
       _ = (params.q ^ params.m : ℂ) * (((params.q ^ params.m : ℂ)⁻¹) * A x i j) := by
             simp [hypercubeVertexCount]
   decomposition := by
     intro u
-    let avg : MIPStarRE.Quantum.Op ι :=
-      ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ v, A v
-    simp [avg, sub_eq_add_neg, add_comm, add_left_comm, add_assoc]
+    rw [sub_eq_add_neg]
+    abel
 
 /-- The trace witness from `lem:global-rewrite`.
 This uses the orthogonal residual family supplied by the decomposition. -/
@@ -441,7 +438,7 @@ theorem laplacianEigenvalue_eq (params : Parameters) (α : Point params) :
   have hw := frequencyWeight_le_m params α
   rw [Nat.cast_sub hw]
   field_simp [hm, hM]
-  ring
+  ring_nf
 
 /-- `cor:laplacian-spectral-gap`, spectral gap bound: for `α ≠ 0`, the
 spectral gap `1/(mM)` lower-bounds the Laplacian eigenvalue `λ_L(α)`. -/

@@ -259,8 +259,8 @@ lemma globalVarianceTraceForm_eq_orthogonalClosedForm (params : Parameters)
                 intro v hv
                 by_cases huv : u = v
                 · subst huv
-                  simp [Matrix.one_apply, model, abstractMatrixModel, matrixExpectation, ev]
-                · simp [Matrix.one_apply, huv, model, abstractMatrixModel, matrixExpectation, ev]
+                  simp [model, abstractMatrixModel, matrixExpectation, ev]
+                · simp [huv, model, abstractMatrixModel, matrixExpectation]
         _ = ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u) := by
               simp
     calc
