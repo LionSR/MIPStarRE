@@ -83,6 +83,18 @@ private lemma orthonormalizationMainLemma_error_bound (ζ : Error)
         exact mul_le_mul_of_nonneg_left hsqrt_two_le_seven (by norm_num)
       simpa using hcoeff.trans_eq (by norm_num : (12 : Error) * 7 = 84)
 
+/-- The scalar weakening `84·ζ^{1/4} ≤ 100·ζ^{1/4}` from the local
+orthonormalization bound to the paper's wrapper error. Factored out as a named
+lemma because the same bookkeeping reappears in any top-level wrapper that
+derives `orthonormalization` from `orthonormalizationMeasurement` via
+submeasurement completion. -/
+lemma orthonormalizationMainLemmaError_le_orthonormalizationError
+    (ζ : Error) (hζ : 0 ≤ ζ) :
+    orthonormalizationMainLemmaError ζ ≤ orthonormalizationError ζ := by
+  dsimp [orthonormalizationMainLemmaError, orthonormalizationError]
+  exact mul_le_mul_of_nonneg_right
+    (by norm_num : (84 : Error) ≤ 100) (Real.rpow_nonneg hζ _)
+
 /-- `lem:orthonormalization-main-lemma`.
 
 The still-unformalized spectral truncation and late repair are exposed here as
@@ -134,6 +146,19 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
     (MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono hRounded
       (orthonormalizationMainLemma_error_bound ζ hζ hζ1))
 
+/-- Pointwise collapse for a complete measurement `A`: the bipartite
+self-consistency defect equals the bipartite consistency defect of `A` with
+itself. Both reduce to `max 0 (ev ψ 1 − ∑ a, ev ψ (A_a ⊗ A_a))`, since
+`A.total = 1` forces `leftTensor A.total = opTensor A.total A.total`. -/
+private lemma qBipartiteSSCDefect_eq_qBipartiteConsDefect_of_measurement
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (A : Measurement Outcome ι) :
+    qBipartiteSSCDefect ψ A.toSubMeas =
+      qBipartiteConsDefect ψ A.toSubMeas A.toSubMeas := by
+  simp [qBipartiteSSCDefect, qBipartiteConsDefect, qBipartiteMatchMass,
+    A.total_eq_one, leftTensor, opTensor]
+
 /-- For a complete measurement, bipartite SSC is exactly bipartite
 consistency of `A` with itself. -/
 private lemma bipartiteSSCRel_self_of_measurement {Outcome : Type*}
@@ -149,10 +174,17 @@ private lemma bipartiteSSCRel_self_of_measurement {Outcome : Type*}
         ζ := by
   intro hssc
   rcases hssc with ⟨hssc⟩
-  constructor
-  simpa [bipartiteSSCError, bipartiteConsError, avgOver, uniformDistribution,
-    constSubMeasFamily, qBipartiteSSCDefect, qBipartiteConsDefect,
-    qBipartiteMatchMass, A.total_eq_one, leftTensor, opTensor] using hssc
+  refine ⟨?_⟩
+  have heq :
+      bipartiteSSCError ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.toSubMeas) =
+        bipartiteConsError ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.toSubMeas) (constSubMeasFamily A.toSubMeas) := by
+    unfold bipartiteSSCError bipartiteConsError
+    refine congrArg (avgOver _) ?_
+    funext _
+    exact qBipartiteSSCDefect_eq_qBipartiteConsDefect_of_measurement ψ A
+  exact heq ▸ hssc
 
 /-- A rounded-projective witness for `leftLiftedMeasurement A` coming from a
 left-lifted local projective submeasurement immediately yields the local lifted
@@ -248,12 +280,6 @@ lemma orthonormalizationMeasurement {Outcome : Type*}
       hζ hζ1 hspectral hrepair hssc
   refine ⟨P, ?_⟩
   rcases hP with ⟨hP⟩
-  constructor
-  have hquarter_nonneg : 0 ≤ Real.rpow ζ (1 / (4 : Error)) := Real.rpow_nonneg hζ _
-  have hmain_le :
-      orthonormalizationMainLemmaError ζ ≤ orthonormalizationError ζ := by
-    dsimp [orthonormalizationMainLemmaError, orthonormalizationError]
-    exact mul_le_mul_of_nonneg_right (by norm_num : (84 : Error) ≤ 100) hquarter_nonneg
-  exact le_trans hP hmain_le
+  exact ⟨hP.trans (orthonormalizationMainLemmaError_le_orthonormalizationError ζ hζ)⟩
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
