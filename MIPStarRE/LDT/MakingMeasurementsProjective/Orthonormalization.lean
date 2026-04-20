@@ -134,8 +134,8 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
     (MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono hRounded
       (orthonormalizationMainLemma_error_bound ζ hζ hζ1))
 
-/-- For a complete measurement, the paper's bipartite self-consistency defect is
-exactly the self-consistency consistency defect. -/
+/-- For a complete measurement, bipartite SSC is exactly bipartite
+consistency of `A` with itself. -/
 private lemma bipartiteSSCRel_self_of_measurement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
