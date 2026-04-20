@@ -402,7 +402,7 @@ theorem eigenvectors (params : Parameters) :
     exact matrixAdjacencyOperator_mulVec_fourierBasisState params α
 
 /-- The Laplacian eigenvalue is the complement of the adjacency eigenvalue. -/
-lemma laplacianEigenvalueRelation (params : Parameters) (α : Point params) :
+lemma laplacianEigenvalue_eq_sub_adjacencyEigenvalue (params : Parameters) (α : Point params) :
     laplacianEigenvalue params α =
       (1 / (hypercubeVertexCount params : Error)) - adjacencyEigenvalue params α := by
   simp only [laplacianEigenvalue, adjacencyEigenvalue, hypercubeVertexCount]
@@ -442,7 +442,7 @@ theorem laplacianSpectralGap (params : Parameters) :
         laplacianEigenvalue params α = hypercubeSpectralGap params := by
   refine ⟨?_, ?_⟩
   · intro α
-    exact laplacianEigenvalueRelation params α
+    exact laplacianEigenvalue_eq_sub_adjacencyEigenvalue params α
   · refine ⟨?_, ?_⟩
     · intro α hα
       exact laplacianEigenvalue_ge_hypercubeSpectralGap_of_weight_pos params α hα

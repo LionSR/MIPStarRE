@@ -268,7 +268,7 @@ private lemma matrixLaplacianOperator_spectral_decomp (params : Parameters) :
     intro α
     simpa [one_div] using
       congrArg (fun x : Error => (x : ℂ))
-        (laplacianEigenvalueRelation params α)
+        (laplacianEigenvalue_eq_sub_adjacencyEigenvalue params α)
   calc
     matrixLaplacianOperator params
       = ((hypercubeVertexCount params : ℂ)⁻¹) •
