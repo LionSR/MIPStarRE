@@ -418,17 +418,6 @@ def IdxSubMeas.liftRight {Question Outcome : Type*} {ι : Type*}
     (A : IdxSubMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι) :=
   fun q => mkRightPlacedSubMeas (ιA := ι) (A q)
 
-/-- Lift a projective submeasurement to the right tensor factor of a bipartite
-space `ι × ι`. -/
-def ProjSubMeas.liftRight {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι]
-    (A : ProjSubMeas α ι) : ProjSubMeas α (ι × ι) :=
-  { toSubMeas := A.toSubMeas.liftRight
-    proj := by
-      intro a
-      change rightTensor (ι₁ := ι) (A.outcome a) * rightTensor (ι₁ := ι) (A.outcome a) =
-        rightTensor (ι₁ := ι) (A.outcome a)
-      simpa [rightTensor_mul_rightTensor] using congrArg (rightTensor (ι₁ := ι)) (A.proj a) }
-
 /-- Lift an indexed projective measurement family to an indexed submeasurement family
 on the left tensor factor. -/
 def IdxProjMeas.toIdxSubMeasLeft {Question Outcome : Type*} {ι : Type*}
