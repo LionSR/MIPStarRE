@@ -212,4 +212,203 @@ lemma normalizedTrace_combined_tensor_eq (params : Parameters)
       (f := fun u v => P u v * (model.state.matrix * ((model.family v)ᴴ * model.family u)).trace)
       (c := (Fintype.card model.space.carrier : ℂ)⁻¹))
 
+/-- Closed form of `globalVarianceTraceForm` as the average squared norm of the
+orthogonal residual family carried by the decomposition. -/
+lemma globalVarianceTraceForm_eq_orthogonalClosedForm (params : Parameters)
+    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
+    (decomp : GlobalVarianceDecomposition params A) :
+    globalVarianceTraceForm params A ψ decomp =
+      (hypercubeVertexCount params : Error)⁻¹ *
+        ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u) := by
+  by_cases hι : Nonempty ι
+  · letI := hι
+    let model := abstractMatrixModel params decomp.orthogonalComponent ψ
+    have htrace :
+        Complex.re (MIPStarRE.Quantum.normalizedTrace (globalVarianceTraceWitness params A ψ decomp)) =
+          Complex.re
+            (∑ u, ∑ v,
+              (1 : MatrixOperator (pointHilbertSpace params)) u v *
+                matrixExpectation model.state ((model.family v)ᴴ * model.family u)) := by
+      simpa [model, abstractMatrixModel, globalVarianceTraceWitness, matrixTensorOperator,
+        matrixCombinedOperator, combinedOperator] using
+        congrArg Complex.re
+          (normalizedTrace_combined_tensor_eq params model
+            (P := (1 : MatrixOperator (pointHilbertSpace params))))
+    have hdiag :
+        Complex.re
+          (∑ u, ∑ v,
+            (1 : MatrixOperator (pointHilbertSpace params)) u v *
+              matrixExpectation model.state ((model.family v)ᴴ * model.family u)) =
+          ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u) := by
+      calc
+        Complex.re
+            (∑ u, ∑ v,
+              (1 : MatrixOperator (pointHilbertSpace params)) u v *
+                matrixExpectation model.state ((model.family v)ᴴ * model.family u))
+            = ∑ u, ∑ v,
+                Complex.re
+                  ((1 : MatrixOperator (pointHilbertSpace params)) u v *
+                    matrixExpectation model.state ((model.family v)ᴴ * model.family u)) := by
+                simp
+        _ = ∑ u, ∑ v,
+              if u = v then ev ψ ((decomp.orthogonalComponent v)ᴴ * decomp.orthogonalComponent u)
+              else 0 := by
+                refine Finset.sum_congr rfl ?_
+                intro u hu
+                refine Finset.sum_congr rfl ?_
+                intro v hv
+                by_cases huv : u = v
+                · subst huv
+                  simp [Matrix.one_apply, model, abstractMatrixModel, matrixExpectation, ev]
+                · simp [Matrix.one_apply, huv, model, abstractMatrixModel, matrixExpectation, ev]
+        _ = ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u) := by
+              simp
+    calc
+      globalVarianceTraceForm params A ψ decomp
+          = (hypercubeVertexCount params : Error)⁻¹ *
+              Complex.re (MIPStarRE.Quantum.normalizedTrace (globalVarianceTraceWitness params A ψ decomp)) := by
+                simp [globalVarianceTraceForm]
+      _ = (hypercubeVertexCount params : Error)⁻¹ *
+            Complex.re
+              (∑ u, ∑ v,
+                (1 : MatrixOperator (pointHilbertSpace params)) u v *
+                  matrixExpectation model.state ((model.family v)ᴴ * model.family u)) := by
+              rw [htrace]
+      _ = (hypercubeVertexCount params : Error)⁻¹ *
+            ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u) := by
+              rw [hdiag]
+  · rw [globalVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ decomp]
+    haveI : IsEmpty ι := not_nonempty_iff.mp hι
+    simp [ev, MIPStarRE.Quantum.normalizedTrace]
+
+/-- Closed form of `globalVarianceTraceForm` in the same centered-correlation
+coordinates as `matrixGlobalVariance_eq_closedForm`. -/
+lemma globalVarianceTraceForm_eq_closedForm (params : Parameters)
+    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
+    (decomp : GlobalVarianceDecomposition params A) :
+    globalVarianceTraceForm params A ψ decomp =
+      (hypercubeVertexCount params : Error)⁻¹ *
+          ∑ u, ev ψ ((A u)ᴴ * A u) -
+        (hypercubeVertexCount params : Error)⁻¹ *
+          (hypercubeVertexCount params : Error)⁻¹ *
+            ∑ u, ∑ v, ev ψ ((A v)ᴴ * A u) := by
+  let c : Error := (hypercubeVertexCount params : Error)⁻¹
+  let avg : MIPStarRE.Quantum.Op ι := decomp.averageComponent
+  let diag : Point params → Error := fun u => ev ψ ((A u)ᴴ * A u)
+  let corr : Point params → Point params → Error := fun u v => ev ψ ((A u)ᴴ * A v)
+  let corrSum : Error := ∑ u, ∑ v, corr u v
+  have hM_ne : (hypercubeVertexCount params : Error) ≠ 0 := by
+    exact_mod_cast (Nat.ne_of_gt (pow_pos params.hq params.m))
+  have havg_eq : avg = (c : ℂ) • ∑ u, A u := by
+    simpa [avg, c] using decomp.averageComponent_eq
+  have hcross :
+      ∑ u, ev ψ ((A u)ᴴ * avg) = c * corrSum := by
+    rw [havg_eq]
+    calc
+      ∑ u, ev ψ ((A u)ᴴ * ((c : ℂ) • ∑ v, A v)) =
+          ∑ u, c * ev ψ ((A u)ᴴ * ∑ v, A v) := by
+            refine Finset.sum_congr rfl ?_
+            intro u hu
+            rw [mul_smul_comm, ev_scale]
+      _ = ∑ u, c * ∑ v, ev ψ ((A u)ᴴ * A v) := by
+            refine Finset.sum_congr rfl ?_
+            intro u hu
+            rw [Matrix.mul_sum, ev_sum]
+      _ = c * ∑ u, ∑ v, ev ψ ((A u)ᴴ * A v) := by
+            simpa using
+              (Finset.mul_sum (s := (Finset.univ : Finset (Point params)))
+                (f := fun u => ∑ v, ev ψ ((A u)ᴴ * A v))
+                (a := c)).symm
+      _ = c * corrSum := by
+            rfl
+  have havg_conj :
+      avgᴴ = (c : ℂ) • ∑ u, (A u)ᴴ := by
+    rw [havg_eq, Matrix.conjTranspose_smul, Matrix.conjTranspose_sum]
+    simp
+  have havg_sq :
+      ev ψ (avgᴴ * avg) = c * (c * corrSum) := by
+    calc
+      ev ψ (avgᴴ * avg)
+          = ev ψ (((c : ℂ) • ∑ u, (A u)ᴴ) * avg) := by
+              rw [havg_conj]
+      _ = ev ψ ((c : ℂ) • ((∑ u, (A u)ᴴ) * avg)) := by
+              rw [smul_mul_assoc]
+      _ = c * ev ψ ((∑ u, (A u)ᴴ) * avg) := by
+              rw [ev_scale]
+      _ = c * ∑ u, ev ψ ((A u)ᴴ * avg) := by
+              rw [Matrix.sum_mul, ev_sum]
+      _ = c * (c * corrSum) := by rw [hcross]
+  have hcross_symm :
+      ∑ u, ev ψ (avgᴴ * A u) = ∑ u, ev ψ ((A u)ᴴ * avg) := by
+    refine Finset.sum_congr rfl ?_
+    intro u hu
+    simpa [Matrix.conjTranspose_mul] using (ev_conjTranspose ψ (avgᴴ * A u)).symm
+  have hresidual :
+      ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u) =
+        (∑ u, diag u) + (∑ u : Point params, ev ψ (avgᴴ * avg)) -
+          (∑ u, ev ψ ((A u)ᴴ * avg)) - (∑ u, ev ψ (avgᴴ * A u)) := by
+    calc
+      ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u)
+          = ∑ u, ev ψ (((A u - avg)ᴴ) * (A u - avg)) := by
+              refine Finset.sum_congr rfl ?_
+              intro u hu
+              rw [decomp.orthogonalComponent_eq_sub_average u]
+      _ = ∑ u, (diag u + ev ψ (avgᴴ * avg) - ev ψ ((A u)ᴴ * avg) - ev ψ (avgᴴ * A u)) := by
+              refine Finset.sum_congr rfl ?_
+              intro u hu
+              have hexpand :
+                  (((A u - avg)ᴴ) * (A u - avg)) =
+                    (A u)ᴴ * A u + avgᴴ * avg - (A u)ᴴ * avg - avgᴴ * A u := by
+                simp [mul_add, add_mul, sub_eq_add_neg]
+                abel
+              rw [hexpand, ev_sub, ev_sub, ev_add]
+      _ = (∑ u, diag u) + (∑ u : Point params, ev ψ (avgᴴ * avg)) -
+            (∑ u, ev ψ ((A u)ᴴ * avg)) - (∑ u, ev ψ (avgᴴ * A u)) := by
+              rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, Finset.sum_add_distrib]
+  have hconst_avg :
+      (∑ u : Point params, ev ψ (avgᴴ * avg)) =
+        (hypercubeVertexCount params : Error) * ev ψ (avgᴴ * avg) := by
+    simp [hypercubeVertexCount]
+  have hresidual_closed :
+      ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u) =
+        ∑ u, diag u - c * corrSum := by
+    rw [hresidual, hconst_avg, hcross_symm, hcross, havg_sq]
+    have hMc : (hypercubeVertexCount params : Error) * c = 1 := by
+      simp [c, hM_ne]
+    have hMcorr :
+        (hypercubeVertexCount params : Error) * (c * (c * corrSum)) = c * corrSum := by
+      calc
+        (hypercubeVertexCount params : Error) * (c * (c * corrSum)) =
+            ((hypercubeVertexCount params : Error) * c) * (c * corrSum) := by ring
+        _ = c * corrSum := by
+              rw [hMc]
+              simp
+    calc
+      ∑ u, diag u + (hypercubeVertexCount params : Error) * (c * (c * corrSum)) -
+          c * corrSum - c * corrSum
+          = ∑ u, diag u + c * corrSum - c * corrSum - c * corrSum := by
+              rw [hMcorr]
+      _ = ∑ u, diag u - c * corrSum := by ring
+  have hcorr_reindex :
+      corrSum = ∑ u, ∑ v, ev ψ ((A v)ᴴ * A u) := by
+    unfold corrSum corr
+    simpa using
+      (Finset.sum_comm :
+        ∑ u : Point params, ∑ v : Point params, ev ψ ((A u)ᴴ * A v) =
+          ∑ v : Point params, ∑ u : Point params, ev ψ ((A u)ᴴ * A v))
+  calc
+    globalVarianceTraceForm params A ψ decomp
+        = c * ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u) := by
+            simpa [c] using globalVarianceTraceForm_eq_orthogonalClosedForm params A ψ decomp
+    _ = c * (∑ u, diag u - c * corrSum) := by rw [hresidual_closed]
+    _ = c * ∑ u, diag u - c * c * corrSum := by ring
+    _ = c * ∑ u, diag u - c * c * (∑ u, ∑ v, ev ψ ((A v)ᴴ * A u)) := by
+          rw [hcorr_reindex]
+    _ = (hypercubeVertexCount params : Error)⁻¹ *
+          ∑ u, ev ψ ((A u)ᴴ * A u) -
+        (hypercubeVertexCount params : Error)⁻¹ *
+          (hypercubeVertexCount params : Error)⁻¹ *
+            ∑ u, ∑ v, ev ψ ((A v)ᴴ * A u) := by
+          simp [c, diag, mul_assoc]
+
 end MIPStarRE.LDT.ExpansionHypercubeGraph

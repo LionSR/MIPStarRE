@@ -200,40 +200,81 @@ noncomputable def localVarianceTraceWitness (params : Parameters)
     Matrix.kronecker (laplacian params) ψ.density
   Acombineᴴ * (liftedLaplacianState * Acombine)
 
-/-- A packaged orthogonal decomposition for `A_combine`. -/
+/-- A packaged decomposition for `lem:global-rewrite`.
+
+The Lean witness stores the pointwise average `A_avg = E_u A^u` together with the
+full residual family `u ↦ A^u - A_avg`. This carries the same geometric content as
+writing `A_combine = |φ₀⟩ ⊗ A₀ + |φ_⊥⟩ ⊗ A_⊥`, but it does not force the orthogonal
+part to be rank one on `Point params ⊗ ι`. -/
 structure GlobalVarianceDecomposition (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) where
   averageComponent : MIPStarRE.Quantum.Op ι
-  orthogonalVector : MIPStarRE.Quantum.Op (Point params)
-  orthogonalOperator : MIPStarRE.Quantum.Op ι
-  orthogonal_to_constant :
-    constantModeProjector params * orthogonalVector = 0
+  orthogonalComponent : Point params → MIPStarRE.Quantum.Op ι
+  averageComponent_eq :
+    averageComponent = ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ u, A u
+  orthogonal_sum_zero :
+    ∑ u, orthogonalComponent u = 0
+  decomposition :
+    ∀ u, A u = averageComponent + orthogonalComponent u
 
-/-- The paper's canonical decomposition from `lem:global-rewrite`
-(expansion.tex §7.2, *Local and global variance* subsection):
-`A_comb = |φ_0⟩ ⊗ A_0 + |φ_⊥⟩ ⊗ A_⊥`, where the constant-mode coefficient is
-`A_0 = M^{-1/2} · ∑_u A^u`. The orthogonal component is not representable as
-a rank-one tensor on `Point params ⊗ ι`, so its slots remain zero; the
-`GlobalRewriteStatement` existential only records `A_0`. -/
+/-- Recover the centered residual as `A^u - A_avg`. -/
+omit [Fintype ι] [DecidableEq ι] in
+lemma GlobalVarianceDecomposition.orthogonalComponent_eq_sub_average
+    {params : Parameters} {A : Point params → MIPStarRE.Quantum.Op ι}
+    (decomp : GlobalVarianceDecomposition params A) (u : Point params) :
+    decomp.orthogonalComponent u = A u - decomp.averageComponent := by
+  rw [eq_sub_iff_add_eq]
+  simpa [add_comm, add_left_comm, add_assoc] using (decomp.decomposition u).symm
+
+/-- The canonical decomposition from `lem:global-rewrite`.
+
+Its `averageComponent` is the paper's `A_avg = E_u A^u = (1/M) · ∑_u A^u`, and its
+orthogonal component is the centered family `u ↦ A^u - A_avg`. Equivalently, the
+paper's coefficient `A_0 = M^{-1/2} · ∑_u A^u` is `M^{1/2} · A_avg`. -/
 noncomputable def canonicalGlobalVarianceDecomposition (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) :
     GlobalVarianceDecomposition params A where
   averageComponent :=
-    ((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) • ∑ u, A u
-  orthogonalVector := 0
-  orthogonalOperator := 0
-  orthogonal_to_constant := by simp
+    ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ u, A u
+  orthogonalComponent := fun u =>
+    A u - ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ v, A v
+  averageComponent_eq := rfl
+  orthogonal_sum_zero := by
+    classical
+    let avg : MIPStarRE.Quantum.Op ι :=
+      ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ v, A v
+    have hM_ne : (hypercubeVertexCount params : ℂ) ≠ 0 := by
+      exact_mod_cast (Nat.ne_of_gt (pow_pos params.hq params.m))
+    ext i j
+    simp [Matrix.sum_apply, Finset.sum_sub_distrib, smul_eq_mul,
+      Finset.mul_sum, hypercubeVertexCount]
+    rw [sub_eq_zero]
+    refine Finset.sum_congr rfl ?_
+    intro x hx
+    calc
+      A x i j = (1 : ℂ) * A x i j := by simp
+      _ = ((hypercubeVertexCount params : ℂ) * (hypercubeVertexCount params : ℂ)⁻¹) * A x i j := by
+            simp [hM_ne]
+      _ = (hypercubeVertexCount params : ℂ) * ((hypercubeVertexCount params : ℂ)⁻¹ * A x i j) := by
+            ring
+      _ = (params.q ^ params.m : ℂ) * (((params.q ^ params.m : ℂ)⁻¹) * A x i j) := by
+            simp [hypercubeVertexCount]
+  decomposition := by
+    intro u
+    let avg : MIPStarRE.Quantum.Op ι :=
+      ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ v, A v
+    simp [avg, sub_eq_add_neg, add_comm, add_left_comm, add_assoc]
 
 /-- The trace witness from `lem:global-rewrite`.
-This uses the orthogonal projector onto the non-constant Fourier modes. -/
+This uses the orthogonal residual family supplied by the decomposition. -/
 noncomputable def globalVarianceTraceWitness (params : Parameters)
-    (_A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
-    (_decomp : GlobalVarianceDecomposition params _A) : MIPStarRE.Quantum.Op ι :=
-  let Acombine := combinedOperator params _A
-  let liftedOrthogonalState :
+    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
+    (decomp : GlobalVarianceDecomposition params A) : MIPStarRE.Quantum.Op ι :=
+  let orthogonalCombine := combinedOperator params decomp.orthogonalComponent
+  let liftedState :
       Matrix (combinedColumnIndex params ι) (combinedColumnIndex params ι) ℂ :=
-    Matrix.kronecker (orthogonalModeProjector params) ψ.density
-  Acombineᴴ * (liftedOrthogonalState * Acombine)
+    Matrix.kronecker (1 : MIPStarRE.Quantum.Op (Point params)) ψ.density
+  orthogonalCombineᴴ * (liftedState * orthogonalCombine)
 
 /-- The local-variance trace expression from `lem:local-rewrite`. -/
 noncomputable def localVarianceTraceForm (params : Parameters)
