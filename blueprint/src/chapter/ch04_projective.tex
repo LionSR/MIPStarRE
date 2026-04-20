@@ -148,6 +148,61 @@
 	\]
 \end{lemma}
 
+\begin{lemma}[Local orthogonalization lemma for a measurement]\label{lem:orthonormalization-main-lemma-local}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma_local}
+	\leanok
+	\uses{def:strong-self-consistency, def:approx_delta}
+	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
+	let $0 \leq \zeta \leq 1$. Assume bipartite strong self-consistency
+	\[
+		\sum_a \bra{\psi} A_a \ot A_a \ket{\psi}
+		\geq
+		\sum_a \bra{\psi} A_a \ot I \ket{\psi} - \zeta,
+	\]
+	together with a spectral-truncation witness for the left-lifted family
+	$\{A_a \ot I\}$ and a locality-preserving repair witness producing
+	projective families of the form $\widehat P_a = P_a \ot I$. Then there
+	exists a projective sub-measurement $P = \{P_a\}$ on the same space as
+	$A$ such that
+	\[
+		A_a \ot I \approx_{84 \zeta^{1/4}} P_a \ot I.
+	\]
+\end{lemma}
+\begin{proof}
+	\leanok
+	\uses{lem:orthonormalization-main-lemma}
+	Since $A$ is a measurement, $\sum_a A_a = I$, so bipartite strong
+	self-consistency of $A$ with itself is equivalent to bipartite consistency
+	of $A$ with itself. Feed this consistency hypothesis, together with the
+	spectral-truncation and locality-preserving repair witnesses, into the
+	measurement variant of \ref{lem:orthonormalization-main-lemma} with
+	$B = A$. The repair witness chooses the repaired family of the form
+	$P_a \ot I$, so the conclusion descends to a local projective
+	sub-measurement $P = \{P_a\}$ on the space of $A$ with error bound
+	$84\zeta^{1/4}$.
+\end{proof}
+
+\begin{theorem}[Orthogonalization for a measurement]\label{thm:orthonormalization-measurement}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement}
+	\leanok
+	\uses{def:strong-self-consistency, def:approx_delta}
+	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
+	let $0 \leq \zeta \leq 1$. Assume bipartite strong self-consistency of $A$
+	together with the spectral-truncation and locality-preserving repair
+	witnesses for the left-lifted family $\{A_a \ot I\}$. Then there exists a
+	projective sub-measurement $P = \{P_a\}$ such that
+	\[
+		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
+	\]
+\end{theorem}
+\begin{proof}
+	\leanok
+	\uses{lem:orthonormalization-main-lemma-local}
+	Apply \ref{lem:orthonormalization-main-lemma-local} and weaken the error
+	using $84 \leq 100$ and $\zeta^{1/4} \geq 0$. No completion step is
+	needed because $A$ is already a measurement.
+\end{proof}
+
 \begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:orthonormalization-main-lemma}]
 		\uses{prop:other-two-notions-of-self-consistency, lem:orthonormalization-main-lemma}
 
