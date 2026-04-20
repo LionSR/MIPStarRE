@@ -27,10 +27,10 @@ private def zeroProjSubMeas {Outcome : Type*} {ι : Type*}
   toSubMeas :=
     { outcome := fun _ => 0
       total := 0
-      outcome_pos := by intro _; exact le_rfl
+      outcome_pos := fun _ => le_rfl
       sum_eq_total := by simp
-      total_le_one := by exact zero_le_one }
-  proj := by intro _; simp
+      total_le_one := zero_le_one }
+  proj := fun _ => by simp
 
 /-- Discard the fresh `none` outcome from an option-indexed projective
 submeasurement. The remaining `some a` outcomes still form a projective
@@ -42,95 +42,19 @@ private noncomputable def restrictSomeProjSubMeas {Outcome : Type*} {ι : Type*}
   toSubMeas :=
     { outcome := fun a => P.outcome (some a)
       total := ∑ a : Outcome, P.outcome (some a)
-      outcome_pos := by intro a; exact P.outcome_pos (some a)
+      outcome_pos := fun a => P.outcome_pos (some a)
       sum_eq_total := by simp
       total_le_one := by
         calc
           ∑ a : Outcome, P.outcome (some a)
-            ≤ P.outcome none + ∑ a : Outcome, P.outcome (some a) := by
-                exact le_add_of_nonneg_left (P.outcome_pos none)
+            = 0 + ∑ a : Outcome, P.outcome (some a) := by simp
+          _ ≤ P.outcome none + ∑ a : Outcome, P.outcome (some a) := by
+                exact add_le_add_right (P.outcome_pos none) _
           _ = ∑ oa : Option Outcome, P.outcome oa := by
                 simp [Fintype.sum_option]
           _ = P.total := by rw [P.sum_eq_total]
           _ ≤ 1 := P.total_le_one }
-  proj := by intro a; simpa using P.proj (some a)
-
-/-- Postprocessing can only improve bipartite strong self-consistency: merging
-outcomes increases the diagonal overlap term while keeping the total mass fixed.
-Specialized here to a single submeasurement so the top-level orthonormalization
-wrapper can appeal to it directly on the completion `A ↦ ∑ₐ Aₐ`. -/
-private lemma qBipartiteSSCDefect_postprocess_le {α β : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype α] [Fintype β]
-    (ψ : QuantumState (ι × ι)) (M : SubMeas α ι) (f : α → β) :
-    qBipartiteSSCDefect ψ (postprocess M f) ≤ qBipartiteSSCDefect ψ M := by
-  have hmatch :
-      qMatchMass ψ
-          (leftPlacedSubMeas (ιB := ι) (postprocess M f))
-          (rightPlacedSubMeas (ιA := ι) (postprocess M f)) ≥
-        qMatchMass ψ
-          (leftPlacedSubMeas (ιB := ι) M)
-          (rightPlacedSubMeas (ιA := ι) M) :=
-    MIPStarRE.LDT.Preliminaries.qMatchMass_leftRight_postprocess_ge ψ M M f
-  have hsub :
-      ev ψ (leftTensor (ι₂ := ι) M.total) -
-          qMatchMass ψ
-            (leftPlacedSubMeas (ιB := ι) (postprocess M f))
-            (rightPlacedSubMeas (ιA := ι) (postprocess M f))
-        ≤
-      ev ψ (leftTensor (ι₂ := ι) M.total) -
-          qMatchMass ψ
-            (leftPlacedSubMeas (ιB := ι) M)
-            (rightPlacedSubMeas (ιA := ι) M) := by
-    linarith
-  have hmass_post :
-      ev ψ (leftTensor (ι₂ := ι) (postprocess M f).total) =
-        ev ψ (leftTensor (ι₂ := ι) M.total) := by
-    simp [postprocess_total]
-  have hmatch_post :
-      qMatchMass ψ
-          (leftPlacedSubMeas (ιB := ι) (postprocess M f))
-          (rightPlacedSubMeas (ιA := ι) (postprocess M f)) =
-        ∑ b : β,
-          ev ψ
-            (opTensor
-              ((postprocess M f).outcome b)
-              ((postprocess M f).outcome b)) := by
-    simp [qMatchMass, leftPlacedSubMeas, rightPlacedSubMeas,
-      leftTensor_mul_rightTensor_eq_opTensor]
-  have hmatch_orig :
-      qMatchMass ψ
-          (leftPlacedSubMeas (ιB := ι) M)
-          (rightPlacedSubMeas (ιA := ι) M) =
-        ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
-    simp [qMatchMass, leftPlacedSubMeas, rightPlacedSubMeas,
-      leftTensor_mul_rightTensor_eq_opTensor]
-  have hsub' :
-      ev ψ (leftTensor (ι₂ := ι) M.total) -
-          ∑ b : β,
-            ev ψ
-              (opTensor
-                ((postprocess M f).outcome b)
-                ((postprocess M f).outcome b))
-        ≤
-      ev ψ (leftTensor (ι₂ := ι) M.total) -
-          ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
-    rw [← hmatch_post, ← hmatch_orig]
-    exact hsub
-  change
-      max 0
-          (ev ψ (leftTensor (ι₂ := ι) (postprocess M f).total) -
-            ∑ b : β,
-              ev ψ
-                (opTensor
-                  ((postprocess M f).outcome b)
-                  ((postprocess M f).outcome b)))
-        ≤
-      max 0
-          (ev ψ (leftTensor (ι₂ := ι) M.total) -
-            ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)))
-  rw [hmass_post]
-  exact max_le_max le_rfl hsub'
+  proj := fun a => by simpa using P.proj (some a)
 
 /-- Completing a submeasurement by a fresh failure outcome preserves bipartite
 strong self-consistency up to the paper's factor `2`: the original diagonal gap
@@ -163,8 +87,8 @@ private lemma optionCompletion_bipartiteSSCRel {Outcome : Type*}
   have htotal_q :
       qBipartiteSSCDefect ψ (postprocess A (fun _ : Outcome => ())) ≤ ζ := by
     exact le_trans
-      (qBipartiteSSCDefect_postprocess_le (ψ := ψ) (M := A)
-        (f := fun _ : Outcome => ()))
+      (MIPStarRE.LDT.Preliminaries.qBipartiteSSCDefect_postprocess_le
+        (ψ := ψ) (M := A) (f := fun _ : Outcome => ()))
       horig_q
   have htotal_gap :
       ev ψ (leftTensor (ι₂ := ι) A.total) - ev ψ (opTensor A.total A.total) ≤ ζ := by
@@ -217,7 +141,7 @@ private lemma optionCompletion_bipartiteSSCRel {Outcome : Type*}
     simp [ev_one_of_isNormalized ψ hψ]
   have hcompleted_gap :
       1 - (qBipartiteMatchMass ψ A A + ev ψ (opTensor R R)) ≤ 2 * ζ := by
-    linarith
+    linarith [horig_gap, hresidual_gap, hleftR]
   have hoverlap_completion :
       ∑ oa : Option Outcome,
           ev ψ

@@ -182,7 +182,7 @@ noncomputable def optionCompletion {Outcome : Type*}
             exact A.outcome_pos a
       sum_eq_total := by
         rw [Fintype.sum_option, A.sum_eq_total]
-        simp [sub_eq_add_neg, add_comm]
+        simpa using sub_add_cancel (1 : MIPStarRE.Quantum.Op ι) A.total
       total_le_one := le_rfl }
   total_eq_one := rfl
 
@@ -205,7 +205,10 @@ locality-preserving repair witnesses needed for the submeasurement version of
 The lifted/local descent is now formalized by
 `orthonormalizationMainLemma_local`; the only still-opaque inputs are the
 spectral truncation and late repair steps for the option-completed measurement
-`optionCompletion A`. -/
+`optionCompletion A`. Both fields live at error
+`consistencyToAlmostProjectiveError (2 * ζ)` because completing a
+`ζ`-strongly-self-consistent submeasurement to a measurement doubles the defect,
+exactly as in the paper's `1 - 2ζ` lower bound for the completed family. -/
 structure OrthonormalizationInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
