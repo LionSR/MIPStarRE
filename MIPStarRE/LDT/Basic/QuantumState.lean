@@ -12,14 +12,14 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT
 
 /-- A PSD density matrix indexed by `ι`.
-Default density is `0` (not a physical state — trace ≠ 1 — but PSD by construction).
-Use `IsNormalized` to additionally require `τ(ρ) = 1`. -/
+
+There is intentionally no global `Inhabited` instance: the zero matrix is PSD but
+not a physical state of unit trace, so an ambient default would silently
+trivialize later statements. Use `IsNormalized` to additionally require
+`τ(ρ) = 1`. -/
 structure QuantumState (ι : Type*) [Fintype ι] [DecidableEq ι] where
   density : MIPStarRE.Quantum.Op ι := 0
   density_psd : 0 ≤ density := by positivity
-
-instance {ι : Type*} [Fintype ι] [DecidableEq ι] : Inhabited (QuantumState ι) where
-  default := {}
 
 /-- Unit normalized trace for the concrete matrix carried by a state. -/
 def QuantumState.IsNormalized {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -32,9 +32,9 @@ theorem QuantumState.IsNormalized.nonempty {ι : Type*} [Fintype ι] [DecidableE
     {ψ : QuantumState ι} (hψ : ψ.IsNormalized) : Nonempty ι := by
   by_contra h
   rw [not_nonempty_iff] at h
-  apply (zero_ne_one (α := ℂ))
-  simpa [QuantumState.IsNormalized, MIPStarRE.Quantum.normalizedTrace,
-    Matrix.trace_eq_zero_of_isEmpty] using hψ
+  have hψ' := hψ
+  simp [QuantumState.IsNormalized, MIPStarRE.Quantum.normalizedTrace,
+    Matrix.trace_eq_zero_of_isEmpty] at hψ'
 
 /-- The expectation `Re τ(ψ X)`. Dimensions match by construction. -/
 noncomputable def ev {ι : Type*} [Fintype ι] [DecidableEq ι]
