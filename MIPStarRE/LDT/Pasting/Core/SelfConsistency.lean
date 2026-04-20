@@ -21,7 +21,6 @@ lemma gCompleteSelfConsistency
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (zeta : Error)
-    (_hperm : PermInvState ψbi)
     (hself : family.StronglySelfConsistent ψbi zeta) :
     GCompleteSelfConsistencyStatement params ψbi family zeta := by
   /-
@@ -39,7 +38,6 @@ theorem gBotSelfConsistency
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (zeta : Error)
-    (_hperm : PermInvState ψbi)
     (hcomplete : GCompleteSelfConsistencyStatement params ψbi family zeta) :
     GBotSelfConsistencyStatement params ψbi family zeta := by
   refine {

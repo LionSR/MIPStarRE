@@ -19,7 +19,6 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-set_option maxHeartbeats 2000000 in
 /-- Summing the stability-two comparison family leaves only the overlap term
 for `G^x`. -/
 private lemma gCommStabilityTwo_pointwise_sum_bound
@@ -157,7 +156,6 @@ private lemma gCommStabilityTwo_pointwise_summand_bound
       simpa [x, T, B, S, leftTensor_mul_rightTensor_eq_opTensor] using
         opTensor_mono_left hleft ((G x).outcome_pos gb.1)
 
-set_option maxHeartbeats 2000000 in
 /-- The full stability-two defect is bounded by the overlap term for the
 target slice measurement `G^x`. -/
 private lemma gCommStabilityTwo_pointwise_bound
@@ -206,7 +204,6 @@ private lemma gCommStabilityTwo_pointwise_bound
             rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).total)) := by
           simpa using gCommStabilityTwo_pointwise_sum_bound params strategy family G hG q
 
-set_option maxHeartbeats 2000000 in
 /-- The second stability family has raw defect at most `zeta / 2`. -/
 private lemma gCommStabilityTwo_raw_le_half
     (params : Parameters)
@@ -230,7 +227,6 @@ private lemma gCommStabilityTwo_raw_le_half
       (gCommOverlap_avgOver_fst params strategy G)
       (gCommStabilityTwo_pointwise_bound params strategy family G hG)
 
-set_option maxHeartbeats 2000000 in
 /-- The second stability family has raw defect at most `1`. -/
 private lemma gCommStabilityTwo_raw_le_one
     (params : Parameters)
@@ -253,7 +249,6 @@ private lemma gCommStabilityTwo_raw_le_one
       Prod.fst
       (gCommStabilityTwo_pointwise_bound params strategy family G hG)
 
-set_option maxHeartbeats 2000000 in
 /-- Overlap-only version of the second stability estimate.
 
 This removes the trailing `G^x` in the current SDD package via slice SSC overlap.
@@ -319,7 +314,6 @@ theorem gCommStabilityTwo_overlap
       hstrong
       hle
 
-set_option maxHeartbeats 2000000 in
 /-- Unfold the first stability relation into its averaged scalar defect term. -/
 private lemma gCommStabilityOne_scalar_gap
     (params : Parameters) [FieldModel params.q]
@@ -378,7 +372,6 @@ private lemma gCommStabilityOne_scalar_gap
             rfl
     _ ≤ Real.sqrt zeta := hstab
 
-set_option maxHeartbeats 2000000 in
 /-- Unfold the second stability relation into its averaged scalar defect term. -/
 private lemma gCommStabilityTwo_scalar_gap
     (params : Parameters) [FieldModel params.q]

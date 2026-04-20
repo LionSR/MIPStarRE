@@ -319,7 +319,6 @@ chain. -/
 abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta : Error) : Prop :=
   ∀ {Hhat : SubMeas (Polynomial params) ι},
-    strategy.state.IsNormalized →
     BipartiteSSCRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily Hhat)
       (selfImprovementHelperError params eps delta) →

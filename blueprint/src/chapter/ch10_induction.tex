@@ -89,7 +89,6 @@
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
   \lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection}
-	\leanok
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
   \begin{enumerate}
@@ -285,9 +284,117 @@
 	Each of the three subtests (axis-parallel, self-consistency, diagonal) occurs with probability $1/3$, so the total failure probability at most $\eps$ implies each branch is at most $3\eps$. Block-diagonalizing the measurements over the role register preserves the axis-parallel and diagonal branch averages exactly, and the cross-register self-consistency branch of the symmetrized strategy equals the original point-agreement defect, which is itself bounded by $3\eps$.
 \end{proof}
 
+\begin{definition}[Final error envelope]\label{def:main-formal-envelope}
+	\lean{MIPStarRE.LDT.Test.mainFormalEnvelope}\leanok
+	Set
+	\[
+		E = \eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}.
+	\]
+\end{definition}
+
+\begin{theorem}[Basic facts about the final error envelope]\label{thm:main-formal-envelope-basics}
+	\lean{MIPStarRE.LDT.Test.mainFormalError_eq_envelope, MIPStarRE.LDT.Test.mainFormalEnvelope_nonneg}\leanok
+	\uses{def:main-formal-envelope}
+	If $0 \le \eps$, then
+	\[
+		\mainFormalError
+		= 100000k^2m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right)
+		= 100000k^2m^4 E,
+	\]
+	and $E \ge 0$.
+\end{theorem}
+\begin{proof}
+	\leanok
+	Both identities are by definition: the first unfolds $\mainFormalError$ and the second unfolds $E$. Nonnegativity of $E$ follows summand-wise from \texttt{Real.rpow\_nonneg} (using $0 \le \eps$) and \texttt{Real.exp\_nonneg}.
+\end{proof}
+
+\begin{definition}[Cascade parameters and standing hypotheses]\label{def:main-formal-error-cascade}
+	\lean{MIPStarRE.LDT.Test.cascadeSigma, MIPStarRE.LDT.Test.cascadeZeta1, MIPStarRE.LDT.Test.cascadeZeta2, MIPStarRE.LDT.Test.cascadeZeta3, MIPStarRE.LDT.Test.cascadeZeta4, MIPStarRE.LDT.Test.CascadeHypotheses}\leanok
+	\uses{def:main-formal-envelope}
+	Assume $q > 0$, $k \ge 1$, $m \ge 1$, $0 \le \eps \le 1$, and $d \le q$. Fix an incoming error parameter $\nu$. Define
+	\[
+		\sigma = m^2\left(\nu + e^{-k/(80000m^2)}\right),
+		\qquad
+		\zeta_1 = 2\sigma + 2\sqrt{3\eps+2\sigma} + md/q,
+	\]
+	\[
+		\zeta_2 = 200\zeta_1^{1/4} + 40\zeta_1^{1/8},
+		\qquad
+		\zeta_3 = 6\zeta_1 + 6\zeta_2,
+		\qquad
+		\zeta_4 = 2\sigma + 2\sqrt{\zeta_1+\zeta_3/2}.
+	\]
+\end{definition}
+
+\begin{theorem}[Bound for the first cascade term]\label{thm:sigma-bound-main-formal}
+	\lean{MIPStarRE.LDT.Test.sigma_bound}\leanok
+	\uses{def:main-formal-envelope, def:main-formal-error-cascade}
+	Under the standing hypotheses, if
+	\[
+		\nu \le 10000k^2m^2\left(\eps^{1/1024} + (d/q)^{1/1024}\right),
+	\]
+	then
+	\[
+		\sigma \le 10000k^2m^4 E.
+	\]
+\end{theorem}
+\begin{proof}
+	\leanok
+	Multiply the assumed bound by $m^2$, replace $m^2$ by $m^4$, coarsen the exponents from $1/1024$ to $1/40000$, and enlarge the exponential denominator from $80000m^2$ to $2560000m^2$.
+\end{proof}
+
+\begin{theorem}[Structural inflation for the later cascade terms]\label{thm:zeta-bounds-main-formal}
+	\lean{MIPStarRE.LDT.Test.zeta1_bound, MIPStarRE.LDT.Test.zeta2_bound, MIPStarRE.LDT.Test.zeta3_bound, MIPStarRE.LDT.Test.zeta4_bound}
+	\uses{def:main-formal-envelope, def:main-formal-error-cascade}
+	Under the standing hypotheses, assume the envelope-level bounds
+	\begin{align*}
+		\zeta_1 &\le 20204k^2m^4 E, &
+		\zeta_2 &\le 2560km E, \\
+		\zeta_3 &\le 150000k^2m^4 E, &
+		\zeta_4 &\le 40000k^2m^4 E.
+	\end{align*}
+	Then
+	\begin{align*}
+		\zeta_1 &\le 100000k^2m^4 E, &
+		\zeta_2 &\le 100000k^2m^4 E, \\
+		\zeta_3 &\le 2 \cdot 100000k^2m^4 E, &
+		\zeta_4 &\le 100000k^2m^4 E.
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	\uses{thm:main-formal-envelope-basics}
+	Each inequality is a numerical inflation of the corresponding hypothesis. For $\zeta_2$ one also uses $k \le k^2$, $m \le m^4$, and $E \ge 0$. Note that the Lean declarations \texttt{zeta1\_bound}, \texttt{zeta2\_bound}, \texttt{zeta3\_bound}, \texttt{zeta4\_bound} state the upstream hypothesis with the paper-native exponents (e.g.\ $\eps^{1/2048}$, $\eps^{1/16384}$) and decay scales (e.g.\ $e^{-k/(160000m^2)}$) rather than the coarsened envelope $E$; the Lean proofs internally coarsen these to $E$. Hence \texttt{\textbackslash leanok} is intentionally withheld on this blueprint statement, which is stated in terms of $E$.
+\end{proof}
+
+\begin{theorem}[Consolidated error cascade]\label{thm:error-cascade-main-formal}
+	\lean{MIPStarRE.LDT.Test.errorCascade_le_mainFormalError}
+	\uses{def:main-formal-envelope, def:main-formal-error-cascade, thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
+	Assume the standing hypotheses, the input bound from Theorem~\ref{thm:sigma-bound-main-formal}, and the envelope-level bounds of Theorem~\ref{thm:zeta-bounds-main-formal}. Assume in addition the explicit bound for the concrete cascade triple $(\sigma,\zeta_1,\zeta_3)$:
+	\[
+		\zeta_4 = 2\sigma + 2\sqrt{\zeta_1 + \zeta_3/2}
+		\le 40000k^2m^4 E.
+	\]
+	Then
+	\[
+		\sigma \le 100000k^2m^4 E,
+		\qquad
+		\zeta_1,\zeta_2 \le 100000k^2m^4 E,
+		\qquad
+		\zeta_3 \le 2 \cdot 100000k^2m^4 E,
+	\]
+	and any $\zeta_4$ built from $\sigma,\zeta_1,\zeta_3$ also satisfies
+	\[
+		\zeta_4 \le 100000k^2m^4 E.
+	\]
+\end{theorem}
+\begin{proof}
+	\uses{thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
+	This is obtained by substituting the cascade definitions and combining the preceding inequalities. The bound on $\zeta_4$ uses the hypothesis about the concrete cascade triple $(\sigma,\zeta_1,\zeta_3)$ together with $\zeta_4 = 2\sigma + 2\sqrt{\zeta_1+\zeta_3/2}$.
+\end{proof}
+
 \begin{proof}
 	\proves{thm:main-formal}
-	\uses{thm:main-induction, lem:symmetrization-bridge, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual}
+	\uses{thm:main-induction, lem:symmetrization-bridge, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual, def:main-formal-envelope, def:main-formal-error-cascade, thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
 	Let
 	\[
 		(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})
@@ -412,7 +519,7 @@
 		I \ot A_a^{\mathrm B,u} \simeq_{\zeta_4} Q_{[g(u)=a]}^{\mathrm A} \ot I.
 	\end{equation}
 
-	It remains to bound the parameters. First,
+	With $E$ as in Definition~\ref{def:main-formal-envelope}, the quantities $\sigma,\zeta_1,\zeta_2,\zeta_3,\zeta_4$ form the cascade of Definition~\ref{def:main-formal-error-cascade}. Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal} package the final inflation to the scale $100000k^2m^4 E$. The underlying paper estimates are:
 	\[
 		\sigma \le 10000k^2m^4\left(\eps^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).
 	\]

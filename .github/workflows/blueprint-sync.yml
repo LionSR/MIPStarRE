@@ -9,7 +9,11 @@ on:
       - 'lakefile.toml'
       - 'lake-manifest.json'
       - 'lean-toolchain'
+      - 'scripts/blueprint_lean_sync.py'
+      - 'scripts/blueprint_leanok_axioms.py'
       - 'scripts/check_blueprint_sync.py'
+      - 'scripts/tests/**'
+      - '.github/actions/setup-lean/**'
       - '.github/workflows/blueprint-sync.yml'
   workflow_dispatch:
 
@@ -20,7 +24,7 @@ concurrency:
 jobs:
   blueprint-sync:
     runs-on: ubuntu-latest
-    name: Axiom-level blueprint ↔ Lean sync
+    name: Check blueprint ↔ Lean sync and \leanok axioms
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
@@ -29,15 +33,20 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Run blueprint sync unit tests
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+
+      - name: Regenerate blueprint/lean_decls
+        run: python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
+
+      - name: Check blueprint ↔ Lean surface sync
+        run: python3 scripts/blueprint_lean_sync.py --root . --ci
+
       - name: Set up Lean toolchain and fetch Mathlib cache
         uses: ./.github/actions/setup-lean
 
-      - name: Build MIPStarRE (cache expected to cover most of it)
+      - name: Build MIPStarRE
         run: lake build
 
-      - name: Parse blueprint (smoke test)
-        run: python3 scripts/check_blueprint_sync.py --skip-axiom-check
-
-      - name: Run axiom-level blueprint ↔ Lean sync check
-        run: python3 scripts/check_blueprint_sync.py
-        continue-on-error: true
+      - name: Check \leanok declarations are sorry-free
+        run: python3 scripts/blueprint_leanok_axioms.py --ci

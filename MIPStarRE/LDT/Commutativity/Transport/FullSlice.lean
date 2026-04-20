@@ -336,11 +336,7 @@ noncomputable def evaluatedSliceABABAvg
 
 For a sub-measurement `P` and projective sub-measurement `Q`, the sandwiched
 family `C_{a,b} = Q_b · P_a · Q_b` satisfies the `closenessOfIP` normalization
-condition `∑_a (∑_b C_{a,b}) (∑_b C_{a,b})ᴴ ≤ I`.
-
-TODO(#361): the paper proof (lines 319-328) expands the outer product, uses
-projectivity of `Q` to collapse `b ≠ b'` off-diagonals, then `Q_b ≤ I` and the
-sub-measurement property of `P` and `Q`. -/
+condition `∑_a (∑_b C_{a,b}) (∑_b C_{a,b})ᴴ ≤ I`. -/
 lemma normalizationCondition_sandwich_bound
     {α β : Type*} [Fintype α] [Fintype β]
     (P : SubMeas α ι) (Q : ProjSubMeas β ι) :
@@ -413,10 +409,6 @@ private lemma fullSliceCommutation_qSDDOp_avg_expand_full
   let B : MIPStarRE.Quantum.Op ι := (fullSliceSecondFactor params family q).outcome h
   let LA : MIPStarRE.Quantum.Op (ι × ι) := leftTensor (ι₂ := ι) A
   let LB : MIPStarRE.Quantum.Op (ι × ι) := leftTensor (ι₂ := ι) B
-  have hA_herm : Aᴴ = A := by
-    simpa [A, fullSliceFirstFactor] using (family.meas q.1).outcome_hermitian g
-  have hB_herm : Bᴴ = B := by
-    simpa [B, fullSliceSecondFactor] using (family.meas q.2).outcome_hermitian h
   have hA_proj : A * A = A := by
     simpa [A, fullSliceFirstFactor] using (family.meas q.1).proj g
   have hB_proj : B * B = B := by
@@ -478,8 +470,6 @@ private lemma fullSliceCommutation_qSDDOp_avg_expand_full
             fullSliceABABTerm params strategy family q (g, h) := by
           simp [fullSliceBABTerm, fullSliceABATerm,
             fullSliceBABATerm, fullSliceABABTerm, A, B]
-
-set_option maxHeartbeats 2000000
 
 /-- Swapping the full-slice question and outcome identifies the averaged
 `BAB`/`ABA` terms and the averaged `BABA`/`ABAB` terms. -/
@@ -584,11 +574,7 @@ private lemma fullSliceCommutation_avg_swap_terms
 Full-slice analog of `evaluatedSliceCommutation_qSDDOp_avg_eq` (line 878): the
 pulled-back `sddErrorOp` on the full-slice product equals `2·(ABAAvg − ABABAvg)`
 after using projectivity and the `(x,g) ↔ (y,h)` symmetry to collapse
-`BAB + ABA − BABA − ABAB` into the two surviving scalar quartic terms.
-
-TODO(#361): mirror the proof of `evaluatedSliceCommutation_qSDDOp_avg_eq` at
-the full-polynomial level.  Relies on `sddErrorOp_pullback_fullSliceQuestion_eq`
-to descend from `EvaluatedSliceQuestion` to `FullSliceQuestion`. -/
+`BAB + ABA − BABA − ABAB` into the two surviving scalar quartic terms. -/
 lemma fullSliceCommutation_qSDDOp_avg_eq
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
@@ -644,9 +630,5 @@ lemma fullSliceCommutation_qSDDOp_avg_eq
     _ = 2 * (fullSliceABAAvg params strategy family -
           fullSliceABABAvg params strategy family) := by
           rfl
-
-set_option maxHeartbeats 200000
-
-
 
 end MIPStarRE.LDT.Commutativity
