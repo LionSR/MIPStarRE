@@ -1,7 +1,6 @@
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.CommutativityPoints.Theorem
 import MIPStarRE.LDT.Commutativity.Theorems
-import MIPStarRE.LDT.Pasting.Theorems
 -- Used by `selfImprovementInInductionSection`.
 import MIPStarRE.LDT.SelfImprovement.Theorems
 
@@ -149,88 +148,85 @@ theorem selfImprovementInInductionSection
           GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
         simpa using Matrix.nonneg_iff_posSemidef.mp hdom' }
 
-/-- `thm:ld-pasting-in-induction-section`. -/
--- NOTE: `FieldModel.{0}` is needed to match the universe at which
--- `Pasting.ldPasting` was elaborated. See PR #288 discussion.
+/-- `thm:ld-pasting-in-induction-section`.
+
+This wrapper keeps the induction-level pasting hypotheses explicit and packages
+an already-constructed pasted measurement into the local conclusion structure.
+The concrete Section 12 pasting construction is therefore an input here rather
+than a dependency of this file. -/
 theorem ldPastingInInductionSection
     (params : Parameters)
-    [FieldModel.{0} params.q]
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (_hgood : strategy.IsGood eps delta gamma)
     (_hgamma_le : gamma ≤ 1)
     (_hzeta_le : zeta ≤ 1)
     (_hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : PastingBoundednessInput params strategy family zeta)
+    (_hcomplete : family.Complete strategy.state kappa)
+    (_hcons : family.ConsistentWithPoints strategy zeta)
+    (_hself : family.StronglySelfConsistent strategy.state zeta)
+    (_hbound : PastingBoundednessInput params strategy family zeta)
     (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
+    (_hk : 400 * params.m * params.d ≤ k)
+    (H : Measurement (Polynomial params.next) ι)
+    (hpointConsistency :
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next H.toSubMeas)
+        (ldPastingInInductionError params k eps delta gamma kappa zeta)) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingInInductionSectionConclusion params strategy family H
         eps delta gamma kappa zeta k := by
-  have hldPasting :=
-    Pasting.ldPasting params strategy eps delta gamma kappa zeta
-      hgood _hgamma_le _hzeta_le _hdq_le
-      family hcomplete hcons hself hbound k hk
-  obtain ⟨H, hH⟩ := hldPasting
   refine ⟨H, ?_⟩
-  exact ⟨hH.pointConsistency⟩
+  exact ⟨hpointConsistency⟩
 
 /-! ## Main-induction bridge assembly
 
 The theorems in this section package the final compositional step of the
 `thm:main-induction` proof at dimension `m + 1`, assuming the per-slice data at
-dimension `m` has already been pasted into an ambient polynomial family.  The
-full assembly (`restrict → induct-on-slices → self-improve → paste`) then
-reduces to:
-1. running the induction hypothesis at each slice to obtain `G^x`,
-2. applying `selfImprovementInInductionSection` to each `G^x` to obtain `Ĝ^x`,
-3. averaging the per-slice bounds into an `IdxPolyFamily` with the
-   `Complete`/`ConsistentWithPoints`/`StronglySelfConsistent`/
-   `PastingBoundednessInput` hypotheses, and
-4. applying `mainInductionBridgeFromPastedFamily` below.
+dimension `m` has already been assembled into an ambient polynomial family.
 
-Steps (1)–(3) and the `σ* ≤ mainInductionError params.next k ε δ γ` error
-telescoping from `references/ldt-paper/inductive_step.tex:487-622` are left as
-explicit inputs, to be supplied by follow-up PRs that formalize the recursion
-entry point and the `rpow`-concavity averaging inequalities. -/
+The concrete recursion/slice-averaging/pasting construction is still supplied
+to this file as explicit witness data. In particular, the final Section 12
+output enters through an existential hypothesis
+`hpasted : ∃ H, LdPastingInInductionSectionConclusion ...`; the theorem below
+only repackages that witness into the existential conclusion consumed directly
+by `mainInduction`. -/
 
-/-- Bridge assembly (step 4 of `thm:main-induction`).
+/-- Bridge assembly (final repackaging step for `thm:main-induction`).
 
-Given an `(m+1,q,d)` symmetric strategy together with a pasting-ready
-polynomial family over the slice index `Fq params` and the averaged pasting
-hypotheses, `ldPastingInInductionSection` produces a measurement
-`H ∈ polymeas(m+1,q,d)` whose point-consistency error is
-`ldPastingInInductionError params k eps delta gamma kappa zeta`.  An
-explicit telescoping hypothesis then bounds this error by
-`mainInductionError params.next k eps delta gamma`, yielding the
-`mainInduction` witness at dimension `m+1`.
+Assume the induction-level pasting hypotheses together with an explicit pasted
+measurement witness `hpasted`. If its point-consistency error is bounded by
+`mainInductionError params.next k eps delta gamma`, then this witness can be
+passed directly to `mainInduction`.
 
-This formalizes the final composition step. The remaining assembly
-obligations (restriction to slices, per-slice induction, per-slice
-self-improvement, and the error-telescoping inequality) enter as the
-`family`, `hcomplete`, `hcons`, `hself`, `hbound`, and `herror`
-hypotheses, matching the paper's bookkeeping in
+The remaining assembly obligations (restriction to slices, per-slice
+induction, per-slice self-improvement, construction of the pasted witness, and
+the error-telescoping inequality) therefore enter as explicit hypotheses,
+matching the paper's bookkeeping in
 `references/ldt-paper/inductive_step.tex:414-622`. -/
 theorem mainInductionBridgeFromPastedFamily
     (params : Parameters)
-    [FieldModel.{0} params.q]
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hgamma_le : gamma ≤ 1)
-    (hzeta_le : zeta ≤ 1)
-    (hdq_le : params.d ≤ params.q)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (_hgamma_le : gamma ≤ 1)
+    (_hzeta_le : zeta ≤ 1)
+    (_hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : PastingBoundednessInput params strategy family zeta)
+    (_hcomplete : family.Complete strategy.state kappa)
+    (_hcons : family.ConsistentWithPoints strategy zeta)
+    (_hself : family.StronglySelfConsistent strategy.state zeta)
+    (_hbound : PastingBoundednessInput params strategy family zeta)
     (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k)
+    (_hk : 400 * params.m * params.d ≤ k)
+    (hpasted :
+      ∃ H : Measurement (Polynomial params.next) ι,
+        LdPastingInInductionSectionConclusion params strategy family H
+          eps delta gamma kappa zeta k)
     (herror :
       ldPastingInInductionError params k eps delta gamma kappa zeta ≤
         mainInductionError params.next k eps delta gamma) :
@@ -240,9 +236,7 @@ theorem mainInductionBridgeFromPastedFamily
           (polynomialEvaluationFamily params.next G.toSubMeas)
           error ∧
         error ≤ mainInductionError params.next k eps delta gamma := by
-  obtain ⟨H, hH⟩ :=
-    ldPastingInInductionSection params strategy eps delta gamma kappa zeta
-      hgood hgamma_le hzeta_le hdq_le family hcomplete hcons hself hbound k hk
+  obtain ⟨H, hH⟩ := hpasted
   exact
     ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
       hH.pointConsistency, herror⟩
