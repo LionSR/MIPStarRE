@@ -164,8 +164,8 @@ theorem selfImprovement
   have horthBridge :
       MakingMeasurementsProjective.OrthonormalizationInput strategy.state Hhat
         (selfImprovementHelperError params eps delta) := by
-    intro _hψ hssc
-    exact horthonormalization hssc
+    intro _hψ hssc'
+    exact horthonormalization hssc'
   rcases orthonormalization strategy.state strategy.isNormalized
       Hhat
       (selfImprovementHelperError params eps delta)
