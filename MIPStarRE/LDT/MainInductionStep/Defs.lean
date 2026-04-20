@@ -309,6 +309,7 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
     (xRestrictedStrategy params strategy x).state = strategy.state :=
   rfl
 
+/-- Restricting a strategy reuses the parent strategy's normalization witness. -/
 @[simp] theorem xRestrictedStrategy_isNormalized (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
