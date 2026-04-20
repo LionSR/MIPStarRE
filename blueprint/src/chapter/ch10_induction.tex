@@ -305,7 +305,7 @@
 \end{theorem}
 \begin{proof}
 	\leanok
-	Expand the definition of $E$. Each of its three summands is nonnegative.
+	Both identities are by definition: the first unfolds $\mainFormalError$ and the second unfolds $E$. Nonnegativity of $E$ follows summand-wise from \texttt{Real.rpow\_nonneg} (using $0 \le \eps$) and \texttt{Real.exp\_nonneg}.
 \end{proof}
 
 \begin{definition}[Cascade parameters and standing hypotheses]\label{def:main-formal-error-cascade}
@@ -331,9 +331,7 @@
 	\uses{def:main-formal-envelope, def:main-formal-error-cascade}
 	Under the standing hypotheses, if
 	\[
-		0 \le \nu
-		\quad\text{and}\quad
-		\nu \le 1000k^2m^2\left(\eps^{1/1024} + (d/q)^{1/1024}\right),
+		\nu \le 10000k^2m^2\left(\eps^{1/1024} + (d/q)^{1/1024}\right),
 	\]
 	then
 	\[
@@ -365,7 +363,7 @@
 \end{theorem}
 \begin{proof}
 	\uses{thm:main-formal-envelope-basics}
-	Each inequality is a numerical inflation of the corresponding hypothesis. For $\zeta_2$ one also uses $k \le k^2$, $m \le m^4$, and $E \ge 0$.
+	Each inequality is a numerical inflation of the corresponding hypothesis. For $\zeta_2$ one also uses $k \le k^2$, $m \le m^4$, and $E \ge 0$. Note that the Lean declarations \texttt{zeta1\_bound}, \texttt{zeta2\_bound}, \texttt{zeta3\_bound}, \texttt{zeta4\_bound} state the upstream hypothesis with the paper-native exponents (e.g.\ $\eps^{1/2048}$, $\eps^{1/16384}$) and decay scales (e.g.\ $e^{-k/(160000m^2)}$) rather than the coarsened envelope $E$; the Lean proofs internally coarsen these to $E$. Hence \texttt{\textbackslash leanok} is intentionally withheld on this blueprint statement, which is stated in terms of $E$.
 \end{proof}
 
 \begin{theorem}[Consolidated error cascade]\label{thm:error-cascade-main-formal}
