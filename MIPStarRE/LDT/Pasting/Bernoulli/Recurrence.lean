@@ -15,6 +15,222 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+private lemma outcomesByType_prependTypeBit_iff
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (b : Bool) (τ : GHatType k)
+    (gs : GHatTupleOutcome params (k + 1)) :
+    gs ∈ outcomesByType (prependTypeBit b τ) ↔
+      (gs 0).isSome = b ∧ gHatTupleOutcomeTail gs ∈ outcomesByType τ := by
+  constructor
+  · intro h
+    constructor
+    · simpa [outcomesByType, prependTypeBit] using h 0
+    · intro i
+      simpa [outcomesByType, gHatTupleOutcomeTail, prependTypeBit] using h i.succ
+  · rintro ⟨hhead, htail⟩ i
+    cases i using Fin.cases with
+    | zero => simpa [outcomesByType, prependTypeBit] using hhead
+    | succ j => simpa [outcomesByType, gHatTupleOutcomeTail, prependTypeBit] using htail j
+
+private lemma fromHToGRecurrenceRightFamily_eq_leftFamily_succ
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ)
+    (τ : GHatType k) :
+    fromHToGRecurrenceRightFamily params strategy family k ℓ τ =
+      fromHToGRecurrenceLeftFamily params strategy family k (ℓ + 1) τ := by
+  rfl
+
+private lemma gHatTypeSuffix_zero
+    {k : ℕ} (τ : GHatType k) :
+    gHatTypeSuffix 0 τ = τ := by
+  funext i
+  simp [gHatTypeSuffix]
+
+private lemma suffixBernoulliWeightOperator_zero
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ) (τ : GHatType k) :
+    suffixBernoulliWeightOperator params family k 0 τ =
+      fromHToGRecurrenceWeight params family 0 τ := by
+  simpa [suffixBernoulliWeightOperator, gHatTypeSuffix_zero] using
+    (rfl : suffixBernoulliWeightOperator params family k 0 τ =
+      fromHToGRecurrenceWeight params family 0 (gHatTypeSuffix 0 τ))
+
+private lemma fromHToGRecurrenceWeight_zero_eq_indicator
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    fromHToGRecurrenceWeight params family 0 τtail =
+      if params.d + 1 ≤ gHatTypeWeight τtail then (1 : MIPStarRE.Quantum.Op ι) else 0 := by
+  simp [fromHToGRecurrenceWeight, truncatedTypeSums, gHatTypeOperator, gHatTypeWeight]
+
+private lemma suffixBernoulliWeightOperator_zero_eq_indicator
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ) (τ : GHatType k) :
+    suffixBernoulliWeightOperator params family k 0 τ =
+      if params.d + 1 ≤ gHatTypeWeight τ then (1 : MIPStarRE.Quantum.Op ι) else 0 := by
+  rw [suffixBernoulliWeightOperator_zero]
+  simpa using fromHToGRecurrenceWeight_zero_eq_indicator params family τ
+
+private lemma fromHToGRecurrenceWeight_zero_eq_one_of_eligible
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {tailLen : ℕ} (τtail : GHatType tailLen)
+    (hτ : params.d + 1 ≤ gHatTypeWeight τtail) :
+    fromHToGRecurrenceWeight params family 0 τtail = (1 : MIPStarRE.Quantum.Op ι) := by
+  rw [fromHToGRecurrenceWeight_zero_eq_indicator]
+  simp [hτ]
+
+private lemma fromHToGRecurrenceWeight_zero_eq_zero_of_not_eligible
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {tailLen : ℕ} (τtail : GHatType tailLen)
+    (hτ : ¬ params.d + 1 ≤ gHatTypeWeight τtail) :
+    fromHToGRecurrenceWeight params family 0 τtail = 0 := by
+  rw [fromHToGRecurrenceWeight_zero_eq_indicator]
+  simp [hτ]
+
+private lemma suffixBernoulliWeightOperator_zero_eq_one_of_eligible
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ) (τ : GHatType k)
+    (hτ : params.d + 1 ≤ gHatTypeWeight τ) :
+    suffixBernoulliWeightOperator params family k 0 τ = (1 : MIPStarRE.Quantum.Op ι) := by
+  rw [suffixBernoulliWeightOperator_zero_eq_indicator]
+  simp [hτ]
+
+private lemma suffixBernoulliWeightOperator_zero_eq_zero_of_not_eligible
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ) (τ : GHatType k)
+    (hτ : ¬ params.d + 1 ≤ gHatTypeWeight τ) :
+    suffixBernoulliWeightOperator params family k 0 τ = 0 := by
+  rw [suffixBernoulliWeightOperator_zero_eq_indicator]
+  simp [hτ]
+
+private lemma fromHToGRecurrenceLeftFamily_zero_outcome
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) (τ : GHatType k) :
+    ((fromHToGRecurrenceLeftFamily params strategy family k 0 τ) ()).outcome () =
+      if params.d + 1 ≤ gHatTypeWeight τ then
+        (fromHToGRecurrenceSuffixHSubMeas params family k 0 τ).total
+      else 0 := by
+  simp [fromHToGRecurrenceLeftFamily, fromHToGRecurrenceSuffixFamily,
+    suffixBernoulliWeightOperator_zero_eq_indicator]
+
+private lemma fromHToGRecurrenceLeftFamily_zero_total
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) (τ : GHatType k) :
+    ((fromHToGRecurrenceLeftFamily params strategy family k 0 τ) ()).total =
+      if params.d + 1 ≤ gHatTypeWeight τ then
+        (fromHToGRecurrenceSuffixHSubMeas params family k 0 τ).total
+      else 0 := by
+  simp [fromHToGRecurrenceLeftFamily, fromHToGRecurrenceSuffixFamily,
+    suffixBernoulliWeightOperator_zero_eq_indicator]
+
+private lemma fromHToGRecurrenceLeftFamily_zero_outcome_eq_suffix_of_eligible
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) (τ : GHatType k)
+    (hτ : params.d + 1 ≤ gHatTypeWeight τ) :
+    ((fromHToGRecurrenceLeftFamily params strategy family k 0 τ) ()).outcome () =
+      (fromHToGRecurrenceSuffixHSubMeas params family k 0 τ).total := by
+  rw [fromHToGRecurrenceLeftFamily_zero_outcome]
+  simp [hτ]
+
+private lemma fromHToGRecurrenceLeftFamily_zero_total_eq_suffix_of_eligible
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) (τ : GHatType k)
+    (hτ : params.d + 1 ≤ gHatTypeWeight τ) :
+    ((fromHToGRecurrenceLeftFamily params strategy family k 0 τ) ()).total =
+      (fromHToGRecurrenceSuffixHSubMeas params family k 0 τ).total := by
+  rw [fromHToGRecurrenceLeftFamily_zero_total]
+  simp [hτ]
+
+private lemma fromHToGRecurrenceLeftFamily_zero_outcome_eq_zero_of_not_eligible
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) (τ : GHatType k)
+    (hτ : ¬ params.d + 1 ≤ gHatTypeWeight τ) :
+    ((fromHToGRecurrenceLeftFamily params strategy family k 0 τ) ()).outcome () = 0 := by
+  rw [fromHToGRecurrenceLeftFamily_zero_outcome]
+  simp [hτ]
+
+private lemma fromHToGRecurrenceLeftFamily_zero_total_eq_zero_of_not_eligible
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) (τ : GHatType k)
+    (hτ : ¬ params.d + 1 ≤ gHatTypeWeight τ) :
+    ((fromHToGRecurrenceLeftFamily params strategy family k 0 τ) ()).total = 0 := by
+  rw [fromHToGRecurrenceLeftFamily_zero_total]
+  simp [hτ]
+
+private lemma fromHToGRecurrenceLeftFamily_apply_outcome
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) :
+    ((fromHToGRecurrenceLeftFamily params strategy family k ℓ τ) ()).outcome () =
+      (fromHToGRecurrenceSuffixHSubMeas params family k ℓ τ).total *
+        suffixBernoulliWeightOperator params family k ℓ τ := by
+  rfl
+
+private lemma fromHToGRecurrenceLeftFamily_apply_total
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) :
+    ((fromHToGRecurrenceLeftFamily params strategy family k ℓ τ) ()).total =
+      (fromHToGRecurrenceSuffixHSubMeas params family k ℓ τ).total *
+        suffixBernoulliWeightOperator params family k ℓ τ := by
+  rfl
+
+private lemma fromHToGRecurrenceRightFamily_apply_outcome
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) :
+    ((fromHToGRecurrenceRightFamily params strategy family k ℓ τ) ()).outcome () =
+      (fromHToGRecurrenceSuffixHSubMeas params family k (ℓ + 1) τ).total *
+        suffixBernoulliWeightOperator params family k (ℓ + 1) τ := by
+  rfl
+
+private lemma fromHToGRecurrenceRightFamily_apply_total
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) :
+    ((fromHToGRecurrenceRightFamily params strategy family k ℓ τ) ()).total =
+      (fromHToGRecurrenceSuffixHSubMeas params family k (ℓ + 1) τ).total *
+        suffixBernoulliWeightOperator params family k (ℓ + 1) τ := by
+  rfl
+
+private lemma allOutcomesExpansionFamily_apply
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) :
+    allOutcomesExpansionFamily params strategy family k () =
+      postprocess (averagedEligibleSandwichSubMeas params family k) (fun _ => ()) := by
+  rfl
+
+private lemma bernoulliTailFromFamily_apply
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ) :
+    bernoulliTailFromFamily params family k () =
+      let Y := bernoulliTailOperator k params.d ((IdxPolyFamily.averagedSubMeas family).total)
+      ({ outcome := fun _ => Y
+         total := Y
+         outcome_pos := by
+           intro _
+           let G := (IdxPolyFamily.averagedSubMeas family).total
+           have hG : 0 ≤ G := (IdxPolyFamily.averagedSubMeas family).total_nonneg
+           have hGle : G ≤ 1 := (IdxPolyFamily.averagedSubMeas family).total_le_one
+           simpa [G] using bernoulliTailOperator_nonneg k params.d G hG hGle
+         sum_eq_total := by simp
+         total_le_one := by
+           let G := (IdxPolyFamily.averagedSubMeas family).total
+           have hG : 0 ≤ G := (IdxPolyFamily.averagedSubMeas family).total_nonneg
+           have hGle : G ≤ 1 := (IdxPolyFamily.averagedSubMeas family).total_le_one
+           simpa [Y, G] using bernoulliTailOperator_le_one k params.d G hG hGle } : SubMeas Unit ι) := by
+  rfl
+
 /-- Bundle the four proved facts about the averaged total operator `G` used by
 `fromHToGRecurrenceWeight` into a single `truncatedTypeSumRecurrence` call. -/
 private lemma fromHToGRecurrenceWeight_recurrence
@@ -82,6 +298,53 @@ theorem fromHToGRecurrenceWeight_succ
         fromHToGRecurrenceWeight params family prefixLen (prependTypeBit false τtail) *
           (1 - family.averagedSubMeas.total) :=
   (fromHToGRecurrenceWeight_recurrence params family prefixLen τtail).2.2.2
+
+private lemma fromHToG_gHatFacts
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    GHatFactsStatement params strategy.state family gamma zeta := by
+  have hzeta_nonneg : 0 ≤ zeta := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        family.evaluatedAtNextPoint)
+      hcons.pointConsistency.offDiagonalBound
+  have hgamma_nonneg : 0 ≤ gamma := by
+    have : 0 ≤ strategy.diagonalFailureProbability := by
+      unfold SymStrat.diagonalFailureProbability
+      exact mul_nonneg (by positivity)
+        (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
+    exact le_trans this hgood.diagonalLineTest
+  let G : Fq params → SubMeas (Polynomial params) ι := fun x => (family.meas x).toSubMeas
+  have hG : ∀ x, G x = (family.meas x).toSubMeas := by
+    intro x
+    rfl
+  have hselfComplete :=
+    gCompleteSelfConsistency params strategy.state family zeta hself
+  have hselfIncomplete :=
+    gBotSelfConsistency params strategy.state family zeta hselfComplete
+  have hcomMain :=
+    Commutativity.comMain params strategy eps delta gamma zeta
+      strategy.isNormalized hgood family G hG hcons hself hbound
+  have hcommComplete :=
+    commutingWithGComplete params strategy family G gamma zeta
+      hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
+  have hcommIncomplete :=
+    commutingWithGIncomplete params strategy.state family gamma zeta hcommComplete
+  exact gHatFacts params strategy.state family gamma zeta
+    hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
+    hselfComplete hselfIncomplete hcommComplete hcommIncomplete
 
 /-- `lem:from-H-to-G`.
 

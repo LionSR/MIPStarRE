@@ -193,6 +193,43 @@ noncomputable def bernoulliTailFromFamily (params : Parameters) [FieldModel para
         have hGle : G ≤ 1 := (IdxPolyFamily.averagedSubMeas family).total_le_one
         simpa [Y, G] using bernoulliTailOperator_le_one k params.d G hG hGle }
 
+/-- The suffix-indexed `\widehat H` family from the `fromHToG` recurrence.
+
+For a fixed full type `τ ∈ {0,1}^k` and a prefix length `prefixLen`, this is the
+paper's average `\E_{x_{≥ prefixLen}} \sum_{g_{≥ prefixLen} ∈ O_{τ_{≥ prefixLen}}}
+\widehat H^{x_{≥ prefixLen}}_{g_{≥ prefixLen}}`, represented as a submeasurement on
+the remaining completed-slice tuples. -/
+noncomputable def fromHToGRecurrenceSuffixHSubMeas (params : Parameters)
+    [FieldModel params.q] (family : IdxPolyFamily params ι) (k prefixLen : ℕ)
+    (τ : GHatType k) :
+    SubMeas (GHatTupleOutcome params (k - prefixLen)) ι :=
+  averageIdxSubMeas
+    (distinctTupleDistribution params (k - prefixLen))
+    (fun xs =>
+      open Classical in
+        restrictSubMeas
+          (gHatSandwichFamily params family (k - prefixLen) xs)
+          (outcomesByType (gHatTypeSuffix prefixLen τ)))
+    (distinctTupleDistribution_weight_sum_le_one params (k - prefixLen))
+
+/-- Core recurrence family for `lem:from-H-to-G` at a fixed prefix length.
+
+This packages the paper-faithful product
+`\E_{x_{≥ prefixLen}} \sum_{g_{≥ prefixLen} ∈ O_{τ_{≥ prefixLen}}}
+\widehat H^{x_{≥ prefixLen}}_{g_{≥ prefixLen}} \ot S_{τ_{≥ prefixLen}}`
+as a `Unit`-indexed raw operator family, keeping the theorem surface unchanged
+while exposing the correct suffix-level `\widehat H` data underneath. -/
+noncomputable def fromHToGRecurrenceSuffixFamily (params : Parameters) [FieldModel params.q]
+    (_strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k prefixLen : ℕ)
+    (τ : GHatType k) :
+    IdxOpFamily Unit Unit ι :=
+  fun _ =>
+    let hSuffix := fromHToGRecurrenceSuffixHSubMeas params family k prefixLen τ
+    let weight := suffixBernoulliWeightOperator params family k prefixLen τ
+    { outcome := fun _ => hSuffix.total * weight
+      total := hSuffix.total * weight }
+
 /-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`,
 parameterised by the suffix type `τ ∈ {0,1}^k`.
 
@@ -204,11 +241,7 @@ noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters) [FieldModel
     (family : IdxPolyFamily params ι) (k ℓ : ℕ)
     (τ : GHatType k) :
     IdxOpFamily Unit Unit ι :=
-  fun _ =>
-    let base := allOutcomesExpansionFamily params strategy family k ()
-    let weight := suffixBernoulliWeightOperator params family k ℓ τ
-    { outcome := fun _ => base.total * weight
-      total := base.total * weight }
+  fromHToGRecurrenceSuffixFamily params strategy family k ℓ τ
 
 /-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`,
 parameterised by the suffix type `τ ∈ {0,1}^k`.
@@ -216,14 +249,10 @@ parameterised by the suffix type `τ ∈ {0,1}^k`.
 Mirror of `fromHToGRecurrenceLeftFamily` on the Bernoulli-tail side.
 See `references/ldt-paper/ld-pasting.tex` lines 1380–1425. -/
 noncomputable def fromHToGRecurrenceRightFamily (params : Parameters) [FieldModel params.q]
-    (_strategy : SymStrat params.next ι)
+    (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k ℓ : ℕ)
     (τ : GHatType k) :
     IdxOpFamily Unit Unit ι :=
-  fun _ =>
-    let base := bernoulliTailFromFamily params family k ()
-    let weight := suffixBernoulliWeightOperator params family k ℓ τ
-    { outcome := fun _ => base.total * weight
-      total := base.total * weight }
+  fromHToGRecurrenceSuffixFamily params strategy family k (ℓ + 1) τ
 
 end MIPStarRE.LDT.Pasting
