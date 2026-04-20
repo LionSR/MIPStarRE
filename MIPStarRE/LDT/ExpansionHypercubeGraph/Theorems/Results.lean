@@ -278,8 +278,9 @@ lemma localRewrite (params : Parameters)
         localVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ]⟩
 
 /-- `lem:global-rewrite`.
-The existential witness is the strategy-derived `canonicalGlobalVarianceDecomposition`
-whose `averageComponent` is the paper's `A_0 = M^{-1/2} · ∑_u A^u` (expansion.tex §7.1). -/
+The existential witness is the canonical `canonicalGlobalVarianceDecomposition`,
+determined by `params` and `A`, whose `averageComponent` is the paper's
+`A_0 = M^{-1/2} · ∑_u A^u` (expansion.tex §7.2, *Local and global variance*). -/
 lemma globalRewrite (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     GlobalRewriteStatement params A ψ := by

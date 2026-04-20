@@ -209,15 +209,8 @@ structure GlobalVarianceDecomposition (params : Parameters)
   orthogonal_to_constant :
     constantModeProjector params * orthogonalVector = 0
 
-instance (params : Parameters) (A : Point params → MIPStarRE.Quantum.Op ι) :
-    Inhabited (GlobalVarianceDecomposition params A) where
-  default :=
-    { averageComponent := 0
-      orthogonalVector := 0
-      orthogonalOperator := 0
-      orthogonal_to_constant := by simp }
-
-/-- The paper's canonical decomposition from `lem:global-rewrite` §7.1:
+/-- The paper's canonical decomposition from `lem:global-rewrite`
+(expansion.tex §7.2, *Local and global variance* subsection):
 `A_comb = |φ_0⟩ ⊗ A_0 + |φ_⊥⟩ ⊗ A_⊥`, where the constant-mode coefficient is
 `A_0 = M^{-1/2} · ∑_u A^u`. The orthogonal component is not representable as
 a rank-one tensor on `Point params ⊗ ι`, so its slots remain zero; the
@@ -411,7 +404,7 @@ theorem laplacianEigenvalue_eq (params : Parameters) (α : Point params) :
 
 /-- `cor:laplacian-spectral-gap`, spectral gap bound: for `α ≠ 0`, the
 spectral gap `1/(mM)` lower-bounds the Laplacian eigenvalue `λ_L(α)`. -/
-theorem laplacianSpectralGap (params : Parameters) (α : Point params)
+theorem hypercubeSpectralGap_le_laplacianEigenvalue (params : Parameters) (α : Point params)
     (hα : 0 < frequencyWeight params α) :
     hypercubeSpectralGap params ≤ laplacianEigenvalue params α := by
   simp only [hypercubeSpectralGap, laplacianEigenvalue, hypercubeVertexCount]

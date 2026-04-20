@@ -305,7 +305,7 @@ private lemma hypercubeSpectralGap_operator_posSemidef (params : Parameters) :
     intro α hα
     have hα0 : α ≠ 0 := by simpa using Finset.mem_erase.mp hα |>.1
     exact sub_nonneg.mpr <|
-      laplacianSpectralGap params α
+      hypercubeSpectralGap_le_laplacianEigenvalue params α
         (frequencyWeight_pos_of_ne_zero params hα0)
   have hdecomp :
       matrixLaplacianOperator params -
