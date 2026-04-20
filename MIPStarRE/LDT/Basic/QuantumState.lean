@@ -32,9 +32,11 @@ theorem QuantumState.IsNormalized.nonempty {ι : Type*} [Fintype ι] [DecidableE
     {ψ : QuantumState ι} (hψ : ψ.IsNormalized) : Nonempty ι := by
   by_contra h
   rw [not_nonempty_iff] at h
-  have hψ' := hψ
-  simp [QuantumState.IsNormalized, MIPStarRE.Quantum.normalizedTrace,
-    Matrix.trace_eq_zero_of_isEmpty] at hψ'
+  have hψ' : (0 : ℂ) = 1 := by
+    have hψ'' := hψ
+    simp [QuantumState.IsNormalized, MIPStarRE.Quantum.normalizedTrace,
+      Matrix.trace_eq_zero_of_isEmpty] at hψ''
+  exact (zero_ne_one (α := ℂ)) hψ'
 
 /-- The expectation `Re τ(ψ X)`. Dimensions match by construction. -/
 noncomputable def ev {ι : Type*} [Fintype ι] [DecidableEq ι]
