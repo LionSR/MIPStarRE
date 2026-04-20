@@ -137,7 +137,7 @@
 \begin{theorem}[Main induction]\label{thm:main-induction}
   \lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
 	\leanok
-	\uses{def:good-strategy, def:polymeasurements, def:simeq, thm:raz-safra}
+	\uses{def:good-strategy, def:polymeasurements, def:simeq, thm:raz-safra, lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
