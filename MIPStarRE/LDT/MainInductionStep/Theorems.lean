@@ -226,6 +226,7 @@ theorem mainInductionBridgeFromPastedFamily
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : PastingBoundednessInput params strategy family zeta)
     (k : ℕ)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k)
     (herror :
       ldPastingInInductionError params k eps delta gamma kappa zeta ≤
@@ -238,7 +239,7 @@ theorem mainInductionBridgeFromPastedFamily
         error ≤ mainInductionError params.next k eps delta gamma := by
   obtain ⟨H, hH⟩ :=
     ldPastingInInductionSection params strategy eps delta gamma kappa zeta
-      hgood hgamma_le hzeta_le hdq_le family hcomplete hcons hself hbound k hk
+      hgood hgamma_le hzeta_le hdq_le family hcomplete hcons hself hbound k hk_pos hk
   exact
     ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
       hH.pointConsistency, herror⟩
