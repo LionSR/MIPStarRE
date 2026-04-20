@@ -164,10 +164,9 @@ theorem selfImprovement
     hhelperStrongSelfConsistency hhelper
   have horthBridge :
       MakingMeasurementsProjective.OrthonormalizationInput strategy.state Hhat
-        (selfImprovementHelperError params eps delta) := by
-    intro _hψ hssc'
-    exact horthonormalization hssc'
-  rcases orthonormalization strategy.state strategy.isNormalized
+        (selfImprovementHelperError params eps delta) :=
+    horthonormalization hssc
+  rcases orthonormalization strategy.state strategy.permInvState strategy.isNormalized
       Hhat
       (selfImprovementHelperError params eps delta)
       hssc horthBridge with ⟨H, horth⟩
