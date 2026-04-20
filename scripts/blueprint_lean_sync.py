@@ -121,6 +121,31 @@ class SyncReport:
         )
 
 
+@dataclass
+class ProofFrame:
+    """Track one open proof block and the blueprint entries it should credit."""
+
+    attach_entry_start: int | None
+    attach_entry_end: int | None
+    has_leanok: bool = False
+
+
+def _set_proof_has_leanok(entries: list[BlueprintEntry], start: int, end: int) -> None:
+    """Mark a contiguous range of blueprint entries as proof-formalized."""
+
+    for idx in range(start, end):
+        e = entries[idx]
+        entries[idx] = BlueprintEntry(
+            file=e.file,
+            line=e.line,
+            env_type=e.env_type,
+            label=e.label,
+            lean_decl=e.lean_decl,
+            has_leanok=e.has_leanok,
+            proof_has_leanok=True,
+        )
+
+
 # ---------------------------------------------------------------------------
 # Parse Lean source tree
 # ---------------------------------------------------------------------------
@@ -259,11 +284,10 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
         text = tex_file.read_text(errors="replace")
         lines = text.splitlines()
 
-        # State machine: track current environment
+        # State machine: track current environment and proof nesting.
         env_stack: list[dict] = []
-        in_proof = False
-        current_proof: dict | None = None
-        last_env: dict | None = None  # last closed environment
+        proof_stack: list[ProofFrame] = []
+        last_env: dict | None = None  # last closed environment with \lean{} refs
 
         for i, line in enumerate(lines, 1):
             # Check for environment begin
@@ -312,38 +336,20 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
             # Proof begin
             m = _TEX_PROOF_BEGIN_RE.search(line)
             if m:
-                in_proof = True
-                current_proof = {
-                    "has_leanok": bool(_TEX_LEANOK_RE.search(line)),
-                }
+                # Record the environment being proved at proof-open time so an
+                # inner theorem/lemma proof cannot steal the outer attribution.
+                proof_stack.append(
+                    ProofFrame(
+                        attach_entry_start=last_env.get("_entry_start") if last_env else None,
+                        attach_entry_end=last_env.get("_entry_end") if last_env else None,
+                        has_leanok=bool(_TEX_LEANOK_RE.search(line)),
+                    )
+                )
                 continue
 
-            # Inside a proof block: detect \leanok on its own line
-            if in_proof and current_proof and _TEX_LEANOK_RE.search(line):
-                current_proof["has_leanok"] = True
-                continue
-
-            # Proof end
-            m = _TEX_PROOF_END_RE.search(line)
-            if m and in_proof:
-                # Attach proof leanok to all entries from the preceding environment
-                if current_proof and current_proof["has_leanok"] and last_env:
-                    for idx in range(last_env["_entry_start"], last_env["_entry_end"]):
-                        e = entries[idx]
-                        entries[idx] = BlueprintEntry(
-                            file=e.file,
-                            line=e.line,
-                            env_type=e.env_type,
-                            label=e.label,
-                            lean_decl=e.lean_decl,
-                            has_leanok=e.has_leanok,
-                            proof_has_leanok=True,
-                        )
-                in_proof = False
-                current_proof = None
-                continue
-
-            # Inside an environment: collect \lean{} and \leanok
+            # Inside an environment: collect \lean{} and statement-level
+            # \leanok before proof-level handling so nested lemma/theorem tags
+            # do not leak to the surrounding proof.
             if env_stack:
                 for lm in _TEX_LEAN_RE.finditer(line):
                     for decl in lm.group(1).split(","):
@@ -352,6 +358,30 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
                             env_stack[-1]["lean_decls"].append(decl)
                 if _TEX_LEANOK_RE.search(line):
                     env_stack[-1]["has_leanok"] = True
+                    continue
+
+            # Inside a proof block: detect \leanok on its own line
+            if proof_stack and _TEX_LEANOK_RE.search(line):
+                proof_stack[-1].has_leanok = True
+                continue
+
+            # Proof end
+            m = _TEX_PROOF_END_RE.search(line)
+            if m and proof_stack:
+                current_proof = proof_stack.pop()
+                # Attach proof leanok to the environment that was current when
+                # this proof opened, not whichever one closed most recently.
+                if (
+                    current_proof.has_leanok
+                    and current_proof.attach_entry_start is not None
+                    and current_proof.attach_entry_end is not None
+                ):
+                    _set_proof_has_leanok(
+                        entries,
+                        current_proof.attach_entry_start,
+                        current_proof.attach_entry_end,
+                    )
+                continue
 
     return entries
 
