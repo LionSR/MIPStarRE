@@ -43,6 +43,7 @@
 \begin{definition}[Good strategy]\label{def:good-strategy}
 	\lean{MIPStarRE.LDT.SymStrat.IsGood}
 	\leanok
+	\uses{def:low-individual-degree-test}
 	A strategy is $(\eps,\delta,\gamma)$-good if it passes the axis-parallel lines test with probability at least $1-\eps$, the self-consistency test with probability at least $1-\delta$, and the diagonal lines test with probability at least $1-\gamma$.
 \end{definition}
 
@@ -81,7 +82,7 @@
 
 \begin{theorem}[Quantum soundness of the low individual degree test]\label{thm:main-formal}
 	\lean{MIPStarRE.LDT.Test.mainFormal}
-	\uses{def:projective-strategy, def:polymeasurements, def:simeq}
+	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
 	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that passes the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Assume $d > 0$. Let $k > 0$ with $k \ge md$ and set
 	\[
 		\nu = 100000 k^2 m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).

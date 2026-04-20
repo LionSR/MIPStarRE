@@ -68,7 +68,6 @@
 \begin{lemma}[Orthogonality of finite-field characters]\label{lem:character-average-vector}
 	\lean{MIPStarRE.LDT.Preliminaries.fourier_fact_vector}
 	\leanok
-	\uses{lem:character-average-scalar}
 	For $\alpha,\beta \in \F_q^m$,
 	\[
 		\frac{1}{q^m}\sum_{u \in \F_q^m} \omega^{\operatorname{tr}(u\cdot(\beta-\alpha))} =
@@ -80,7 +79,7 @@
 \end{lemma}
 \begin{proof}
 	\leanok
-	Factor the sum over the $m$ coordinates and apply Lemma~\ref{lem:character-average-scalar} to each factor.
+	This is Lemma~\ref{prop:fourier-fact-vector} applied to $v=\beta-\alpha$; both sides are anchored at the same Lean declaration so no additional \texttt{\textbackslash uses} edge is needed.
 \end{proof}
 
 \begin{lemma}[Eigenvectors of the hypercube graph]\label{prop:eigenvectors}

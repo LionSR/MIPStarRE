@@ -13,8 +13,10 @@
 	See Raz--Safra [RS97].
 \end{proof}
 
+% ORPHAN: overview result; the current blueprint has no downstream theorem-level consumer for the classical two-prover statement.
 \begin{theorem}[Polishchuk--Spielman]\label{thm:classical-test-soundness}
 	\lean{MIPStarRE.LDT.Test.classicalTestSoundness}
+	\uses{def:low-individual-degree-test}
 	Suppose Provers~$\mathrm{A}$ and~$\mathrm{B}$ pass the low individual degree test with probability $1-\eps$. Then there exists a polynomial $g \colon \F_q^m \to \F_q$ with individual degree $d$ such that
 	\[
 		\Prb_{u \sim \F_q^m}[g(u)=a] \ge 1-\poly(m)\cdot\bigl(\poly(\eps)+\poly(d/q)\bigr).
@@ -39,7 +41,9 @@
 		This shows that the $m$-dependent slack in Theorems~\ref{thm:classical-test-soundness} and~\ref{thm:main-informal} is unavoidable up to polynomial factors.
 \end{remark}
 
+% ORPHAN: overview theorem; no later theorem-level node in the current blueprint graph cites the informal top-level statement.
 \begin{theorem}[Main theorem, informal]\label{thm:main-informal}
+	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements}
 	If $d > 0$ and a two-prover projective strategy passes the $(m,q,d)$ low individual degree test with probability $1-\eps$, then there are global polynomial measurements whose evaluations agree with the point answers except with error $\poly(m)(\poly(\eps)+\poly(d/q))$.
 \end{theorem}
 \begin{proof}

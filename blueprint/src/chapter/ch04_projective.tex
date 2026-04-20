@@ -1,6 +1,7 @@
 \chapter{Making measurements projective}
 \label{chap:projective}
 
+% ORPHAN: standalone background theorem; the current downstream blueprint proofs do not call the Naimark dilation node.
 \begin{theorem}[Naimark dilation]\label{thm:naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimark}
 	\leanok
@@ -90,6 +91,7 @@
 \end{proof}
 
 \begin{proof}[Proof of \ref{thm:naimark}]
+		\uses{lem:naimark-helper}
 
 	For each question $x$, choose a local auxiliary state $\ket{\mathsf{aux}_{\mathrm A,x}}$ of dimension one larger than the number of outcomes of $A^x$, and apply \ref{lem:naimark-helper} to obtain a projective sub-measurement $\widetilde A^x$. Do the same for each question $y$ on Bob's side, obtaining auxiliary states $\ket{\mathsf{aux}_{\mathrm B,y}}$ and projective sub-measurements $\widetilde B^y$.
 
@@ -147,6 +149,7 @@
 \end{lemma}
 
 \begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:orthonormalization-main-lemma}]
+		\uses{prop:other-two-notions-of-self-consistency, lem:orthonormalization-main-lemma}
 
 	Let $A = \{A_a\}$ be a sub-measurement with outcomes in $\mathcal A$. Write $A=\sum_a A_a$. The strong self-consistency assumption implies
 	\[
@@ -687,6 +690,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\uses{def:projective-P}
 		Since $T$ is projective,
 		\[
 			P_a
