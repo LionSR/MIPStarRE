@@ -173,7 +173,7 @@ theorem ldPastingInInductionSection
         eps delta gamma kappa zeta k := by
   have hldPasting :=
     Pasting.ldPasting params strategy eps delta gamma kappa zeta
-      strategy.isNormalized hgood _hgamma_le _hzeta_le _hdq_le
+      hgood _hgamma_le _hzeta_le _hdq_le
       family hcomplete hcons hself hbound k hk
   obtain ⟨H, hH⟩ := hldPasting
   refine ⟨H, ?_⟩
