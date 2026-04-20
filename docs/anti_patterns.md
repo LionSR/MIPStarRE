@@ -162,14 +162,18 @@ def fourierBasisInnerProduct (params : Parameters)
     (α β : Point params) : Error :=
   if α = β then 1 else 0
 
-structure EigenvectorsStatement (params : Parameters) : Prop where
-  orthonormality :
-    ∀ α β : Point params,
-      fourierBasisInnerProduct params α β = if α = β then 1 else 0
-  ...
+/-- The exact inner-product formula for the hypercube Fourier basis. -/
+lemma fourierBasisInnerProduct_eq (params : Parameters)
+    (α β : Point params) :
+    fourierBasisInnerProduct params α β = if α = β then 1 else 0 := rfl
 
-theorem eigenvectors (params : Parameters) : EigenvectorsStatement params where
-  orthonormality _ _ := rfl    -- castle: the def IS the Kronecker delta
+/-- `prop:eigenvectors`. -/
+theorem eigenvectors (params : Parameters) :
+    (∀ α β : Point params,
+      fourierBasisInnerProduct params α β = if α = β then 1 else 0) ∧ ... := by
+  refine ⟨?_, ?_⟩
+  · intro α β
+    exact fourierBasisInnerProduct_eq params α β    -- castle: def IS Kronecker delta
   ...
 ```
 
