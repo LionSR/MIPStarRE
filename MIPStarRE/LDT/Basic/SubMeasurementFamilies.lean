@@ -92,6 +92,113 @@ noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [Decidab
     total_le_one := A.total_le_one
   }
 
+namespace SubMeas
+
+/-- Transport a submeasurement along an equivalence of outcome types. -/
+noncomputable def transport {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : SubMeas α ι) :
+    SubMeas β ι where
+  outcome := fun b => A.outcome (e.symm b)
+  total := A.total
+  outcome_pos := by
+    intro b
+    exact A.outcome_pos (e.symm b)
+  sum_eq_total := by
+    classical
+    calc
+      ∑ b : β, A.outcome (e.symm b)
+          = ∑ a : α, A.outcome a := by
+              simpa using (Equiv.sum_comp e (fun b => A.outcome (e.symm b))).symm
+      _ = A.total := A.sum_eq_total
+  total_le_one := A.total_le_one
+
+@[simp] theorem transport_outcome {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : SubMeas α ι) (b : β) :
+    (transport e A).outcome b = A.outcome (e.symm b) :=
+  rfl
+
+@[simp] theorem transport_total {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : SubMeas α ι) :
+    (transport e A).total = A.total :=
+  rfl
+
+/-- Postprocessing after transporting outcomes along an equivalence agrees with
+postprocessing the original submeasurement after precomposing the readout map
+with the same equivalence. -/
+theorem postprocess_transport {α β γ : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype γ] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : SubMeas α ι) (f : β → γ) :
+    postprocess (transport e A) f = postprocess A (fun a => f (e a)) := by
+  classical
+  refine SubMeas.ext ?_ rfl
+  intro c
+  have hsum :
+      (∑ b : β, if f b = c then A.outcome (e.symm b) else (0 : MIPStarRE.Quantum.Op ι)) =
+        ∑ a : α, if f (e a) = c then A.outcome a else (0 : MIPStarRE.Quantum.Op ι) := by
+    simpa using
+      (Equiv.sum_comp e
+        (fun b => if f b = c then A.outcome (e.symm b) else (0 : MIPStarRE.Quantum.Op ι))).symm
+  calc
+    (postprocess (transport e A) f).outcome c
+        = ∑ a : β, if f a = c then A.outcome (e.symm a) else (0 : MIPStarRE.Quantum.Op ι) := by
+            simp [postprocess, SubMeas.transport, Finset.sum_filter]
+    _ = ∑ a : α, if f (e a) = c then A.outcome a else (0 : MIPStarRE.Quantum.Op ι) := by
+            simpa using hsum
+    _ = (postprocess A (fun a => f (e a))).outcome c := by
+            symm
+            simp [postprocess, Finset.sum_filter]
+
+end SubMeas
+
+namespace Measurement
+
+/-- Transport a measurement along an equivalence of outcome types. -/
+noncomputable def transport {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : Measurement α ι) :
+    Measurement β ι where
+  toSubMeas := SubMeas.transport e A.toSubMeas
+  total_eq_one := A.total_eq_one
+
+end Measurement
+
+namespace ProjSubMeas
+
+/-- Transport a projective submeasurement along an equivalence of outcome types. -/
+noncomputable def transport {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : ProjSubMeas α ι) :
+    ProjSubMeas β ι where
+  toSubMeas := SubMeas.transport e A.toSubMeas
+  proj := by
+    intro b
+    simpa using A.proj (e.symm b)
+
+end ProjSubMeas
+
+namespace ProjMeas
+
+/-- Transport a projective measurement along an equivalence of outcome types. -/
+noncomputable def transport {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : ProjMeas α ι) :
+    ProjMeas β ι where
+  toMeasurement := Measurement.transport e A.toMeasurement
+  proj := by
+    intro b
+    simpa using A.proj (e.symm b)
+
+@[simp] theorem transport_toSubMeas {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : ProjMeas α ι) :
+    (transport e A).toSubMeas = SubMeas.transport e A.toSubMeas :=
+  rfl
+
+end ProjMeas
+
 /-- Postprocessed outcomes from the same ProjMeas commute. -/
 theorem ProjMeas.postprocess_outcome_commute
     {α β γ : Type*} {ι : Type*}
