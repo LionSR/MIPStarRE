@@ -6,6 +6,10 @@ import MIPStarRE.LDT.Commutativity.Scaffold.Products
 Upstream scalar-approximation lemmas that do not depend on the later averaged
 commutation proof, so they can be shared by both `ProcessedG` and `Pointwise`
 without creating import cycles.
+
+## References
+
+- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
 -/
 
 namespace MIPStarRE.LDT.Commutativity
