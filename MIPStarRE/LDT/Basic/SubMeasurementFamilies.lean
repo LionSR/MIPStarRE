@@ -254,6 +254,54 @@ noncomputable def transport {α β : Type*} {ι : Type*}
     (transport e A).toSubMeas = SubMeas.transport e A.toSubMeas :=
   rfl
 
+/-- Postprocess a projective measurement along a relabeling of the outcome type.
+
+The fiber of each output value is a sum of mutually orthogonal projectors, so
+postprocessing preserves projectivity as well as completeness. -/
+noncomputable def postprocess {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (A : ProjMeas α ι) (f : α → β) :
+    ProjMeas β ι where
+  toMeasurement := {
+    toSubMeas := MIPStarRE.LDT.postprocess A.toSubMeas f
+    total_eq_one := by
+      simpa [MIPStarRE.LDT.postprocess] using A.total_eq_one
+  }
+  proj := by
+    classical
+    intro b
+    let fiber : Finset α := Finset.univ.filter fun a => f a = b
+    calc
+      (MIPStarRE.LDT.postprocess A.toSubMeas f).outcome b *
+          (MIPStarRE.LDT.postprocess A.toSubMeas f).outcome b
+        = (∑ a ∈ fiber, A.outcome a) * (∑ a' ∈ fiber, A.outcome a') := by
+            simp [MIPStarRE.LDT.postprocess, fiber]
+      _ = ∑ a ∈ fiber, ∑ a' ∈ fiber, A.outcome a * A.outcome a' := by
+            rw [Finset.sum_mul]
+            simp_rw [Finset.mul_sum]
+      _ = ∑ a ∈ fiber, ∑ a' ∈ fiber, if a' = a then A.outcome a else 0 := by
+            refine Finset.sum_congr rfl ?_
+            intro a ha
+            refine Finset.sum_congr rfl ?_
+            intro a' ha'
+            by_cases h : a' = a
+            · subst h
+              simp [A.proj]
+            · have hne : a ≠ a' := fun h' => h h'.symm
+              simp [A.outcome_orthogonal _ _ hne, h]
+      _ = ∑ a ∈ fiber, A.outcome a := by
+            refine Finset.sum_congr rfl ?_
+            intro a ha
+            simp [fiber, ha]
+      _ = (MIPStarRE.LDT.postprocess A.toSubMeas f).outcome b := by
+            simp [MIPStarRE.LDT.postprocess, fiber]
+
+@[simp] theorem postprocess_toSubMeas {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (A : ProjMeas α ι) (f : α → β) :
+    (postprocess A f).toSubMeas = MIPStarRE.LDT.postprocess A.toSubMeas f :=
+  rfl
+
 end ProjMeas
 
 /-- Postprocessed outcomes from the same ProjMeas commute. -/
@@ -263,12 +311,12 @@ theorem ProjMeas.postprocess_outcome_commute
     [Fintype ι] [DecidableEq ι]
     (P : ProjMeas α ι) (f : α → β) (g : α → γ)
     (b : β) (c : γ) :
-    (postprocess P.toSubMeas f).outcome b *
-      (postprocess P.toSubMeas g).outcome c =
-    (postprocess P.toSubMeas g).outcome c *
-      (postprocess P.toSubMeas f).outcome b := by
+    (MIPStarRE.LDT.postprocess P.toSubMeas f).outcome b *
+      (MIPStarRE.LDT.postprocess P.toSubMeas g).outcome c =
+    (MIPStarRE.LDT.postprocess P.toSubMeas g).outcome c *
+      (MIPStarRE.LDT.postprocess P.toSubMeas f).outcome b := by
   classical
-  simp only [postprocess]
+  simp only [MIPStarRE.LDT.postprocess]
   simp_rw [Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun x _ => ?_
