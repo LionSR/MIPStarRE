@@ -36,22 +36,30 @@ noncomputable def selfConsistencyFailureProbability
     (uniformDistribution (Point params))
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
 
+-- Paper: the diagonal branch of `fig:test` first fixes the sampled restriction
+-- index `j`, then samples the corresponding `j`-restricted diagonal test.
+/-- Trace-based failure surrogate for the paper's `j`-restricted diagonal lines
+subtest. The sampled direction vector has its last `m - (j + 1)` coordinates
+fixed to zero. -/
+noncomputable def restrictedDiagonalFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params ι) (j : Fin params.m) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (RestrictedDiagonalSample params j))
+    (diagonalPointAnswerFamily strategy j)
+    (diagonalLineAnswerFamily strategy j)
+
 /-- Trace-based failure surrogate for the diagonal lines test.
-Averages over the restriction index `j ∈ {0, …, m − 1}`, then
-over the `j`-restricted diagonal test. For each `j`, direction
-vectors have the last `m − j − 1` coordinates equal to zero. -/
+Averages the `j`-restricted diagonal branch over the uniformly sampled
+restriction index `j ∈ {0, …, m − 1}`. -/
 noncomputable def diagonalFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) : Error :=
   -- `params.hm : 0 < params.m` ensures the averaging denominator is nonzero.
   (1 / (params.m : Error)) *
-    ∑ j : Fin params.m,
-      bipartiteConsError strategy.state
-        (uniformDistribution
-          (RestrictedDiagonalSample params j))
-        (diagonalPointAnswerFamily strategy j)
-        (diagonalLineAnswerFamily strategy j)
+    ∑ j : Fin params.m, strategy.restrictedDiagonalFailureProbability j
 
 /-- The paper's notion of an `(ε,δ,γ)`-good symmetric strategy.
 
@@ -224,10 +232,7 @@ Each of the geometric line branches picks a role `r ∈ {A, B}`:
 - Player `r̄` receives a point and returns a field element.
 
 The self-consistency branch samples a shared point and checks cross-player point
-agreement there.
-
-TODO(#306): `ProjStrat` currently forces both provers onto the
-same index type `ι`; the paper allows `H_A ≠ H_B`. -/
+agreement there. -/
 noncomputable def lowIndividualDegreeFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
