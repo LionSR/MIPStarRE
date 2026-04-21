@@ -170,7 +170,7 @@ lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
 
 /-- Collapse the split-by-`g` raw expression back to the first positive
 switcheroo term. -/
-private lemma switcherooAggregateFirstTerm_eq_split_by_g
+lemma switcherooAggregateFirstTerm_eq_split_by_g
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -262,4 +262,5 @@ private lemma switcherooAggregateFirstTerm_eq_split_by_g
     _ = switcherooAggregateFirstTerm params ψbi family M := by
           unfold switcherooAggregateFirstTerm
           rfl
+
 end MIPStarRE.LDT.Pasting

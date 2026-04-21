@@ -43,7 +43,7 @@ noncomputable def switcherooAggregateFirstTerm
 
 
 /-- Rewrite the first positive switcheroo term as a left-sandwich average. -/
-private lemma switcherooAggregateFirstTerm_eq_leftSandwich
+lemma switcherooAggregateFirstTerm_eq_leftSandwich
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))

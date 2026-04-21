@@ -354,6 +354,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Commutativity with $G_g^x$ implies commutativity with $G^x$]\label{lem:commutativity-switcheroo}
 	\lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo}
+	\leanok
 	\uses{prop:switch-sandwich, lem:g-complete-self-consistency}
 	Let $M=\{M_o^x\}$ be a projective submeasurement with outcomes in a set $\mathcal O$. Suppose that
 	\begin{equation}\label{eq:M-self-consistent}
@@ -368,7 +369,15 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		G^x M_o^y \ot I \approx_{6\sqrt{\zeta}+6\sqrt{\omega}+4\sqrt{\chi}} M_o^y G^x \ot I.
 	\]
 \end{lemma}
+\begin{remark}\label{rem:commutativity-switcheroo-permInv}
+	The Lean formalization \lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo} takes an
+	additional hypothesis \texttt{PermInvState ψbi}, the permutation-invariance of the
+	strategy state under the players' swap. In the paper this is implicit in the symmetric
+	two-prover strategy, and it is used to identify $\bra{\psi} G \ot M \ket{\psi}$ with
+	$\bra{\psi} M \ot G \ket{\psi}$ at the center of the triangle-inequality chain.
+\end{remark}
 \begin{proof}
+	\leanok
 	Let $M = \E_y \sum_o M_o^y$. The error to bound is
 	\begin{align}
 		    & \E_{x,y} \sum_o \|(G^xM_o^y - M_o^yG^x)\ot I \ket{\psi}\|^2 \nonumber \\
