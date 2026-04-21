@@ -325,10 +325,9 @@ theorem classicalRoleSymmStrategy_is_good_three_mul {params : Parameters}
   let diagonalBranch : Error := strategy.diagonalRoleAverage
   have hpoint_nonneg : 0 ≤ pointAgreement := by
     simpa [pointAgreement] using
-      (show 0 ≤ strategy.pointAgreementFailureProbability from
-        bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB))
+      bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
   have haxis_nonneg : 0 ≤ axisParallelBranch := by
     dsimp [axisParallelBranch]
     apply div_nonneg
