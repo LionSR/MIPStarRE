@@ -10,7 +10,7 @@
 	Here $a$ denotes the prover's point answer.
 \end{theorem}
 \begin{remark}
-	The current Lean declaration \lean{MIPStarRE.LDT.Test.razSafra} is a wrapper around the quoted classical Raz--Safra theorem: it takes the auxiliary hypothesis \lean{MIPStarRE.LDT.Test.RazSafraSoundnessStatement}, whose premise is the explicit pass predicate \lean{MIPStarRE.LDT.Test.SurfaceVsPointPassCondition}. The surface test itself is modeled using parameterized genuine $2$-dimensional surfaces, i.e. ordered frames with linearly independent directions, sampled at their base point. Accordingly, this result is not marked \leanok.
+	The current Lean declaration \lean{MIPStarRE.LDT.Test.razSafra} is a wrapper around the quoted classical Raz--Safra theorem: it takes the auxiliary hypothesis \lean{MIPStarRE.LDT.Test.RazSafraSoundnessStatement}, whose premise is the explicit pass predicate \lean{MIPStarRE.LDT.Test.SurfaceVsPointPassCondition}. The surface test itself is modeled using parameterized genuine $2$-dimensional surfaces, i.e. ordered frames with linearly independent directions, together with a hidden parameter specifying the queried point on the surface, so the surface prover does not see that point directly. Its conclusion currently returns the repository-wide Lean type \lean{MIPStarRE.LDT.Polynomial}, which encodes individual degree at most $d$ rather than a separate total-degree-at-most-$d$ object. Accordingly, this result is not marked \leanok.
 \end{remark}
 \begin{proof}
 	See Raz--Safra [RS97].

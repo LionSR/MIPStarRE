@@ -60,8 +60,12 @@ test from `references/ldt-paper/introduction.tex`.
 This records only the paper-faithful classical test-passing data:
 - a deterministic classical strategy for the surface-versus-point test,
 - a proof that Alice's point-answer function is the ambient `a`, and
-- a proof that the strategy passes the modeled random-point / genuine-surface
-  acceptance test with probability at least `1 - eps`.
+- a proof that the strategy passes the modeled distribution of genuine
+  2-dimensional framed surface/point pairs with probability at least `1 - eps`.
+
+In that modeled distribution the hidden surface parameter remains uniform once a
+genuine surface frame is chosen, so the induced queried-point marginal is still
+uniform on `Point params`.
 
 This is intentionally NOT `PassesLowIndividualDegreeTest`, which models a
 different test. -/

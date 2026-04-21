@@ -44,18 +44,13 @@ def pointAt {params : Parameters} [FieldModel params.q]
       (addPoint (smulPoint (t 0) s.direction₁)
         (smulPoint (t 1) s.direction₂))
 
-/-- The queried point on a sampled surface is represented by the zero parameter. -/
-def zeroParameter {params : Parameters} [FieldModel params.q] : SurfaceParameter params :=
-  fun _ => zeroCoord
-
-@[simp] theorem pointAt_zeroParameter {params : Parameters} [FieldModel params.q]
-    (s : Surface params) :
-    s.pointAt zeroParameter = s.base := by
-  funext i
-  simp [zeroParameter, pointAt, addPoint, smulPoint, addCoord, mulCoord, zeroCoord]
-
 /-- The two direction vectors are linearly independent over the coded field, so
-this parameterized affine surface is genuinely 2-dimensional. -/
+this parameterized affine surface is genuinely 2-dimensional.
+
+This is the repository's encoded `Fq params = Fin params.q` formulation of the
+usual linear-independence condition over `Scalar params`; after decoding through
+`decodeScalar`, it is equivalent to saying the two direction vectors are linearly
+independent in the `Scalar params`-vector space `Point params → Scalar params`. -/
 def IsTwoDimensional {params : Parameters} [FieldModel params.q]
     (s : Surface params) : Prop :=
   ∀ a b : Fq params,
@@ -112,38 +107,47 @@ end SurfacePolynomial
 
 namespace Test
 
-/-- A sampled surface-versus-point question is represented by a parameterized
-surface whose base point is the verifier's sampled point. The actual sampling
-measure on this type is `surfaceVsPointDistribution`, which restricts to genuine
-2-dimensional surfaces. -/
+/-- A sampled surface-versus-point question consists of a parameterized surface
+`S` together with a hidden parameter `t ∈ F_q^2`; the queried point is then
+`S.pointAt t`. The surface prover sees only `S`, not `t`. -/
 abbrev SurfaceVsPointSample (params : Parameters) :=
-  Surface params
+  Surface params × SurfaceParameter params
+
+/-- The finite support of the modeled surface-versus-point distribution: the
+sampled surface must be genuinely 2-dimensional, while the point parameter is
+left unrestricted. -/
+noncomputable def surfaceVsPointSupport (params : Parameters) [FieldModel params.q] :
+    Finset (SurfaceVsPointSample params) :=
+  Finset.univ.filter (fun sample => sample.1.IsTwoDimensional)
 
 /-- The distribution of the classical surface-versus-point test questions.
 
 The paper samples `u ∈ F_q^m` uniformly and then a uniformly random
 2-dimensional affine surface containing `u`. Since `Surface params` is encoded
 by a base point together with an ordered pair of direction vectors, we realize
-this as the normalized uniform distribution on the genuine surfaces, i.e. those
-whose directions are linearly independent. The sampled point is the surface base
-point, so the verifier checks the surface answer at parameter `(0, 0)`.
+this as the normalized uniform distribution on the framed incident pairs
+`(S, t)`, where `S` is a genuine 2-dimensional parameterized surface and the
+queried point is `S.pointAt t`. The hidden parameter `t` keeps the queried point
+invisible to the surface prover while still allowing surface answers to be
+modeled by ordinary bivariate polynomials in the chosen coordinates.
 
-This keeps the convenient ordered-frame representation needed for polynomial
-answers while excluding degenerate `0`- or `1`-dimensional cases from the
-sampling measure. -/
+Because the 2-dimensionality constraint depends only on the surface frame, the
+parameter `t` remains uniform conditional on `S`, and the induced queried-point
+marginal is still uniform on `Point params`. When `params.m < 2`, no genuine
+2-dimensional surfaces exist, so this support is empty; the surrounding
+Raz--Safra wrapper remains an explicit quoted-theorem interface in that edge
+case rather than a direct formalization of the classical result. -/
 noncomputable def surfaceVsPointDistribution (params : Parameters) [FieldModel params.q] :
-    Distribution (SurfaceVsPointSample params) := by
-  let support : Finset (SurfaceVsPointSample params) :=
-    Finset.univ.filter (fun s => s.IsTwoDimensional)
-  exact
-    { support := support
-      weight := fun s => if s ∈ support then 1 / (support.card : Error) else 0
-      nonnegative := by
-        intro s
-        by_cases hs : s ∈ support <;> simp [hs]
-      outsideSupport := by
-        intro s hs
-        simp [hs] }
+    Distribution (SurfaceVsPointSample params) :=
+  let support := surfaceVsPointSupport params
+  { support := support
+    weight := fun sample => if sample ∈ support then 1 / (support.card : Error) else 0
+    nonnegative := by
+      intro sample
+      by_cases hs : sample ∈ support <;> simp [hs]
+    outsideSupport := by
+      intro sample hs
+      simp [hs] }
 
 /-- Deterministic classical answers for the `k = 2` surface-versus-point test:
 Prover A answers point queries, and Prover B answers surface queries. -/
@@ -157,13 +161,15 @@ structure TwoProverClassicalSurfaceVsPointStrategy (params : Parameters)
 namespace TwoProverClassicalSurfaceVsPointStrategy
 
 /-- Whether the deterministic classical strategy is accepted on a sampled
-surface-versus-point instance. The queried point is the sampled surface's base
-point, i.e. the parameter `(0, 0)`. -/
+surface-versus-point instance. If `sample = (S, t)`, the point prover is queried
+at `S.pointAt t`, while the surface prover sees only `S` and must answer with a
+surface polynomial whose evaluation at the hidden parameter `t` matches the
+point answer. -/
 def accepts {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalSurfaceVsPointStrategy params)
     (sample : SurfaceVsPointSample params) : Prop :=
-  strategy.surfaceAnswerB sample (Surface.zeroParameter (params := params)) =
-    strategy.pointAnswerA sample.base
+  strategy.surfaceAnswerB sample.1 sample.2 =
+    strategy.pointAnswerA (sample.1.pointAt sample.2)
 
 noncomputable instance {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalSurfaceVsPointStrategy params)
@@ -172,8 +178,8 @@ noncomputable instance {params : Parameters} [FieldModel params.q]
   infer_instance
 
 /-- Acceptance probability of the classical surface-versus-point test, written
-as an average over the modeled distribution of genuine 2-dimensional surface
-questions. -/
+as an average over the modeled distribution of genuine 2-dimensional framed
+surface/point pairs. -/
 noncomputable def acceptanceProbability {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalSurfaceVsPointStrategy params) : Error :=
