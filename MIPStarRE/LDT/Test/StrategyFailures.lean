@@ -265,8 +265,7 @@ theorem lowIndividualDegreeFailureProbability_eq_branchAverage
     (strategy : ProjStrat params ι) :
     strategy.lowIndividualDegreeFailureProbability =
       (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +
-        strategy.diagonalRoleAverage) / 3 := by
-  rfl
+        strategy.diagonalRoleAverage) / 3 := rfl
 
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
@@ -286,10 +285,11 @@ theorem point_agreement_le_three_mul {params : Parameters}
   let axisParallelBranch : Error := strategy.axisParallelRoleAverage
   let diagonalBranch : Error := strategy.diagonalRoleAverage
   have hpoint_nonneg : 0 ≤ pointAgreement := by
-    dsimp [pointAgreement, ProjStrat.pointAgreementFailureProbability]
-    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+    simpa [pointAgreement] using
+      (show 0 ≤ strategy.pointAgreementFailureProbability from
+        bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB))
   have haxis_nonneg : 0 ≤ axisParallelBranch := by
     dsimp [axisParallelBranch]
     apply div_nonneg
