@@ -128,6 +128,45 @@ Last updated: 2026-04-18
   - verified `lake env lean MIPStarRE/LDT/Test/Strategy.lean`
   - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Defs.lean`
   - verified `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean`
+  - added a `Test`-local role-block extraction API in
+    `Test/StrategyRoleProjectors.lean`:
+    `restrictRoleSubMeas` and `restrictRoleMeasurement`, together with simp
+    lemmas recovering the original `A`- and `B`-side outcomes from the
+    symmetrized measurement on the corresponding role block
+  - verified `lake env lean MIPStarRE/LDT/Test/StrategyRoleProjectors.lean`
+    and `lake env lean MIPStarRE/LDT/Test/StrategyRoleSymmetrization.lean`
+    after adding those helpers
+  - ported `MainInductionStep.mainInductionBridgeFromPastedFamily`, so the
+    final `ldPastingInInductionSection -> mainInduction` handoff is now present
+    on this branch under the split-module API
+  - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Theorems.lean`
+    after adding that bridge theorem
+  - re-read `references/ldt-paper/inductive_step.tex` and matched the codebase
+    against the paper-faithful order: the next real divergence is earlier than
+    `Test.mainFormal`, at `MainInductionStep.restrictedProbabilities`, whose
+    extra weighted slice-bound hypotheses are not present in the paper
+  - made the first Section 6 surface repair: `MainInductionStep.restrictedProbabilities`
+    now derives the axis-parallel weighted slice bound directly from
+    `strategy.IsGood`, using a new ambient-to-slice transport lemma
+    `restrictedAxisWeightedBound`
+  - completed the diagonal analogue as well: `restrictedDiagonalWeightedBound`
+    now derives the weighted diagonal slice bound directly from
+    `strategy.IsGood`, so `MainInductionStep.restrictedProbabilities` no longer
+    needs any extra weighted-bound hypotheses and now matches the paper-facing
+    surface of `inductive_step.tex:374-411`
+  - removed the redundant explicit normalization hypothesis from
+    `SelfImprovement.selfImprovement`,
+    `SelfImprovement.selfImprovementFromSubMeas`, and
+    `MainInductionStep.selfImprovementInInductionSection`: these theorems now
+    use the existing `strategy.isNormalized` field from `SymStrat` directly
+  - exposed `restrictAxisParallelMeasurement_postprocess_eval` from
+    `MainInductionStep/Defs.lean` so the axis transport proof can reuse the
+    slice-to-ambient postprocess identity directly
+  - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Defs.lean` and
+    `lake env lean MIPStarRE/LDT/MainInductionStep/Theorems.lean` after the
+    Section 6 restricted-probability repair
+  - verified `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean` still leaves
+    only the single remaining `mainFormal` sorry after this upstream repair
   - traced the remaining `Test.mainFormal` path far enough to isolate two
     paper-level structural gaps:
     1. `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
@@ -148,6 +187,33 @@ Last updated: 2026-04-18
   - Concretely, `mainFormal` still needs the bridge chain through the upstream
     remaining sorries in `Commutativity/ScalarApproximation.lean`,
     `Commutativity/Main.lean`, and the Section 12 `Pasting` files.
+  - More precisely after this pass: the downstream handoff from pasting into
+    `mainInduction` is no longer missing, but there is still no theorem on the
+    current branch deriving the required slice-indexed polynomial family and its
+    `Complete` / `ConsistentWithPoints` / `StronglySelfConsistent` /
+    `SliceBoundednessInput` hypotheses directly from the symmetrized
+    `hpass : strategy.PassesLowIndividualDegreeTest eps`. Without that family
+    assembly, `Test.mainFormal` cannot instantiate the induction witness.
+  - Before that family assembly can be made paper-faithful, the earlier
+    `restrictedProbabilities` wrapper still needs two missing transport lemmas:
+    one showing the weighted average of the `x`-restricted axis-parallel branch
+    is bounded by the ambient axis-parallel failure probability, and one showing
+    the analogous weighted bound for the restricted diagonal branch. Those
+    transport lemmas require explicit equivalences between ambient samples in
+    dimension `m+1` and slice samples at height `x`; they are not yet present in
+    the repository.
+  - After this pass, both transport lemmas are present and
+    `restrictedProbabilities` is paper-faithful. The next paper-facing
+    divergence on the `mainFormal` path is now the larger Section 8/9 wrapper
+    surface: `selfImprovement` / `selfImprovementInInductionSection` still carry
+    explicit extra hypotheses that are not part of the paper theorem.
+  - Concretely, the remaining non-paper hypotheses are now:
+    `GlobalVarianceProofInputs`,
+    `HelperStrongSelfConsistencyInput`,
+    `OrthonormalizationInput`,
+    `EvaluationDataProcessingInput`, and
+    `FinalFieldsInput`. A repo/branch scan on this pass found no existing local
+    theorem that derives these from `strategy.IsGood` on the current branch.
   - The geometric-line canonicalization is not merged on the live proof path in
     this branch: the commutativity bridge remains proved only for the older raw
     `PointDiagonalLineQuestion = DiagonalLine × Fq` model.
@@ -173,6 +239,25 @@ Last updated: 2026-04-18
     now-explicit Section 5/8/10 hypotheses and either proving them directly or
     replacing those wrapper surfaces by the real theorems they are standing in
     for, without adding new assumptions to `Test.mainFormal`
+  - the highest-leverage next theorem is the missing family-assembly step:
+    from the symmetrized strategy and the restricted-probability / per-slice
+    induction outputs, build the `IdxPolyFamily` plus the four hypotheses
+    consumed by `mainInductionBridgeFromPastedFamily`; only after that can the
+    new role-block unsymmetrization helpers be used to finish `Test.mainFormal`
+  - immediately before that, add the two ambient-to-slice transport lemmas for
+    the axis-parallel and diagonal branches and use them to remove the extra
+    weighted-bound hypotheses from `MainInductionStep.restrictedProbabilities`,
+    so the Section 6 surface matches `inductive_step.tex:374-411`
+  - the next concrete theorem repair is upstream of `mainInduction`: eliminate
+    the explicit wrapper hypotheses from
+    `SelfImprovement.selfImprovement` /
+    `MainInductionStep.selfImprovementInInductionSection` by internalizing the
+    Section 8/9 arguments they currently take as assumptions
+  - the first truly missing theorem on that path appears to be one of the
+    Section 8/9 producers for the remaining inputs, not another `Test`-local
+    helper: either a theorem deriving `GlobalVarianceProofInputs` from the
+    existing GlobalVariance results, or the helper-stage strong
+    self-consistency / data-processing transport used in `selfImprovement`
   - continue up the Section 3 dependency chain, starting with the remaining
     projectivization / orthonormalization / commutativity / pasting wrappers
     needed to produce the witness consumed by `Test.mainFormal`.

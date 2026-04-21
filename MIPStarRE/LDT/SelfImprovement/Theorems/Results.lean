@@ -142,11 +142,10 @@ theorem selfImprovement
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hnormalizedState : strategy.state.IsNormalized)
     (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
       HelperStrongSelfConsistencyInput params strategy eps delta)
-    (horthonormalization : OrthonormalizationInput params strategy eps delta)
+    (horthonormalization : SelfImprovement.OrthonormalizationInput params strategy eps delta)
     (hevaluationDataProcessing :
       EvaluationDataProcessingInput params strategy eps delta)
     (hfinalFields : FinalFieldsInput params strategy eps delta nu)
@@ -165,7 +164,7 @@ theorem selfImprovement
         (constSubMeasFamily Hhat)
         (selfImprovementHelperError params eps delta) :=
     hhelperStrongSelfConsistency hhelper
-  rcases orthonormalization strategy.state hnormalizedState
+  rcases orthonormalization strategy.state strategy.isNormalized
       strategy.permInvState Hhat
       (selfImprovementHelperError params eps delta)
       hssc horthonormalization with ⟨H, horth⟩
@@ -198,11 +197,10 @@ theorem selfImprovementFromSubMeas
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hnormalizedState : strategy.state.IsNormalized)
     (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
       HelperStrongSelfConsistencyInput params strategy eps delta)
-    (horthonormalization : OrthonormalizationInput params strategy eps delta)
+    (horthonormalization : SelfImprovement.OrthonormalizationInput params strategy eps delta)
     (hevaluationDataProcessing :
       EvaluationDataProcessingInput params strategy eps delta)
     (hfinalFields : FinalFieldsInput params strategy eps delta nu)
@@ -217,7 +215,7 @@ theorem selfImprovementFromSubMeas
       SelfImprovementSubMeasConclusion params strategy G H Z
         eps delta gamma nu := by
   rcases selfImprovement params strategy eps delta gamma nu
-      hnormalizedState hglobalVarianceProofInputs hhelperStrongSelfConsistency
+      hglobalVarianceProofInputs hhelperStrongSelfConsistency
       horthonormalization hevaluationDataProcessing hfinalFields hgood Gmeas
       (by simpa [hbridge] using hcons) with ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩
