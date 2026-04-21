@@ -2661,7 +2661,9 @@ private lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
               rw [hsumA, htrue, hfalse]
       _ = ev ψ (opTensor (A.outcome false) B.total + opTensor (A.outcome true) B.total) -
             (ev ψ (opTensor (A.outcome true) B.total) + ev ψ (opTensor (A.outcome false) 0)) := by
-              rw [opTensor_add_left]
+              rw [show opTensor (A.outcome false + A.outcome true) B.total =
+                    opTensor (A.outcome false) B.total + opTensor (A.outcome true) B.total from
+                  Matrix.add_kronecker _ _ _]
       _ = ev ψ (opTensor (A.outcome false) B.total) := by
             have hfalse_zero : ev ψ (opTensor (A.outcome false) 0) = 0 := by
               simp [opTensor, ev]
@@ -4172,9 +4174,11 @@ theorem hAConsistency_submeas
         intro x
         rfl
       have hselfComplete :=
-        gCompleteSelfConsistency params strategy.state family zeta hself
+        gCompleteSelfConsistency params strategy.state family zeta
+          strategy.permInvState hself
       have hselfIncomplete :=
-        gBotSelfConsistency params strategy.state family zeta hselfComplete
+        gBotSelfConsistency params strategy.state family zeta
+          strategy.permInvState hselfComplete
       have hcomMain :=
         Commutativity.comMain params strategy eps delta gamma zeta
           strategy.isNormalized hgood family G hG hcons hself hbound
