@@ -151,6 +151,63 @@ theorem postprocess_transport {α β γ : Type*} {ι : Type*}
             symm
             simp [postprocess, Finset.sum_filter]
 
+/-- Postprocessing is functorial: postprocessing by `f` and then by `g`
+agrees with a single postprocessing by the composite `g ∘ f`. -/
+@[simp] theorem postprocess_comp {α β γ : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype γ] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) (f : α → β) (g : β → γ) :
+    postprocess (postprocess A f) g = postprocess A (fun a => g (f a)) := by
+  classical
+  refine SubMeas.ext ?_ rfl
+  intro c
+  calc
+    (postprocess (postprocess A f) g).outcome c
+        = ∑ b : β,
+            if g b = c then
+              ∑ a : α, if f a = b then A.outcome a else 0
+            else 0 := by
+              simp [postprocess, Finset.sum_filter]
+    _ = ∑ b : β, ∑ a : α,
+          if g b = c ∧ f a = b then
+            A.outcome a
+          else (0 : MIPStarRE.Quantum.Op ι) := by
+            refine Finset.sum_congr rfl ?_
+            intro b _
+            by_cases hgc : g b = c
+            · simp [hgc]
+            · simp [hgc]
+    _ = ∑ a : α, ∑ b : β,
+          if g b = c ∧ f a = b then
+            A.outcome a
+          else (0 : MIPStarRE.Quantum.Op ι) := by
+            rw [Finset.sum_comm]
+    _ = ∑ a : α,
+          if g (f a) = c then A.outcome a else (0 : MIPStarRE.Quantum.Op ι) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            by_cases hgc : g (f a) = c
+            · rw [Finset.sum_eq_single (f a)]
+              · simp [hgc]
+              · intro b _ hb
+                by_cases hfa : f a = b
+                · exact (hb hfa.symm).elim
+                · simp [hfa]
+              · simp
+            · have hzero :
+                  (∑ b : β,
+                    if g b = c ∧ f a = b then
+                      A.outcome a
+                    else (0 : MIPStarRE.Quantum.Op ι)) = 0 := by
+                refine Finset.sum_eq_zero ?_
+                intro b _
+                by_cases hfa : f a = b
+                · subst b
+                  simp [hgc]
+                · simp [hfa]
+              simp [hgc, hzero]
+    _ = (postprocess A (fun a => g (f a))).outcome c := by
+          simp [postprocess, Finset.sum_filter]
+
 end SubMeas
 
 namespace Measurement

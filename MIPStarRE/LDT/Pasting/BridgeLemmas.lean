@@ -110,6 +110,13 @@ private lemma ldSandwichLineOnePoint_core
       (ldSandwichLineOnePointLeftFamily params strategy family k i)
       (ldSandwichLineOnePointRightFamily params strategy family k i)
       (ldSandwichLineOnePointError params eps delta gamma zeta k) := by
+  /-
+  The remaining external blocker here is still `ldGbcon`: after the two
+  Cauchy–Schwarz sandwich-elimination steps and the completeness simplifications,
+  the proof reduces to the single-slice consistency comparison `eq:ld-gbcon`.
+  That theorem is currently blocked on the missing `ConsRel` swap API tracked in
+  #411 / #550.
+  -/
   sorry
 
 /-- `lem:ld-sandwich-line-one-point`. -/
@@ -195,6 +202,262 @@ lemma hBConsistency
   exact ⟨hBConsistency_core params strategy eps delta gamma zeta
     hgood family hcons hself hbound k hline⟩
 
+private lemma verticalLine_pointAt_appendPoint
+    (params : Parameters) [FieldModel params.q]
+    (u : Point params) (x : Fq params) :
+    ({ base := appendPoint params u zeroCoord,
+       direction := lastCoord params } : AxisParallelLine params.next).pointAt x =
+      appendPoint params u x := by
+  ext i
+  by_cases hlast : i = lastCoord params
+  · subst i
+    have hzero : addCoord zeroCoord x = x := by
+      unfold addCoord zeroCoord
+      rw [decode_encodeScalar]
+      simp
+    simpa [AxisParallelLine.pointAt, appendPoint, lastCoord] using congrArg Fin.val hzero
+  · have him : i.1 < params.m := by
+      have hi_lt : i.1 < params.m + 1 := by simpa [Parameters.next] using i.2
+      by_cases hlt : i.1 < params.m
+      · exact hlt
+      · have hi_eq : i.1 = params.m := by omega
+        have hi_last : i = lastCoord params := by
+          apply Fin.ext
+          simp [lastCoord, hi_eq]
+        exact (hlast hi_last).elim
+    simp [AxisParallelLine.pointAt, appendPoint, him, hlast]
+
+/-- The last-coordinate axis-parallel branch of the strategy, read at the base
+point of the sampled vertical line.
+
+This is the ambient-space comparison family used to extract a single
+axis-parallel branch from `hgood.axisParallelTest`. -/
+private noncomputable def rawVerticalLineAnswerFamily
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    IdxSubMeas (Point params.next) (Fq params) ι :=
+  fun u =>
+    postprocess
+      ((strategy.axisParallelMeasurement
+        { base := u, direction := lastCoord params }).toSubMeas)
+      (· zeroCoord)
+
+/-- Extract the last-coordinate axis-parallel branch from
+`hgood.axisParallelTest`, losing a factor of `m + 1` when passing from the
+uniform coordinate average to a fixed coordinate. -/
+private lemma rawVerticalLineConsistency
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    ConsRel strategy.state
+      (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (rawVerticalLineAnswerFamily params strategy)
+      (((params.next.m : ℕ) : Error) * eps) := by
+  let err : Fin params.next.m → Error := fun i =>
+    bipartiteConsError strategy.state
+      (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (fun u =>
+        postprocess ((strategy.axisParallelMeasurement { base := u, direction := i }).toSubMeas)
+          (· zeroCoord))
+  have haxis_avg : avgOver (uniformDistribution (Fin params.next.m)) err ≤ eps := by
+    have h_eq :
+        avgOver (uniformDistribution (Fin params.next.m)) err =
+          strategy.axisParallelFailureProbability := by
+      unfold SymStrat.axisParallelFailureProbability err
+      calc
+        avgOver (uniformDistribution (Fin params.next.m))
+            (fun i =>
+              bipartiteConsError strategy.state
+                (uniformDistribution (Point params.next))
+                (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+                (fun u => postprocess ((strategy.axisParallelMeasurement
+                  { base := u, direction := i }).toSubMeas) (· zeroCoord)))
+          = avgOver (uniformDistribution (Fin params.next.m))
+              (fun i => avgOver (uniformDistribution (Point params.next)) (fun u =>
+                qBipartiteConsDefect strategy.state
+                  ((strategy.pointMeasurement u).toSubMeas)
+                  (postprocess ((strategy.axisParallelMeasurement
+                    { base := u, direction := i }).toSubMeas) (· zeroCoord)))) := by
+                rfl
+        _ = avgOver (uniformDistribution (Fin params.next.m × Point params.next))
+              (fun iu =>
+                qBipartiteConsDefect strategy.state
+                  ((strategy.pointMeasurement iu.2).toSubMeas)
+                  (postprocess ((strategy.axisParallelMeasurement
+                    { base := iu.2, direction := iu.1 }).toSubMeas) (· zeroCoord))) := by
+                symm
+                simpa using (avgOver_uniform_prod (f := fun i u =>
+                  qBipartiteConsDefect strategy.state
+                    ((strategy.pointMeasurement u).toSubMeas)
+                    (postprocess ((strategy.axisParallelMeasurement
+                      { base := u, direction := i }).toSubMeas) (· zeroCoord))))
+        _ = avgOver (uniformDistribution (Point params.next × Fin params.next.m))
+              (fun ui =>
+                qBipartiteConsDefect strategy.state
+                  ((strategy.pointMeasurement ui.1).toSubMeas)
+                  (postprocess ((strategy.axisParallelMeasurement
+                    { base := ui.1, direction := ui.2 }).toSubMeas) (· zeroCoord))) := by
+                simpa using (avgOver_uniform_equiv
+                  (e := Equiv.prodComm (Fin params.next.m) (Point params.next))
+                  (f := fun iu : Fin params.next.m × Point params.next =>
+                    qBipartiteConsDefect strategy.state
+                      ((strategy.pointMeasurement iu.2).toSubMeas)
+                      (postprocess ((strategy.axisParallelMeasurement
+                        { base := iu.2, direction := iu.1 }).toSubMeas) (· zeroCoord))))
+        _ = strategy.axisParallelFailureProbability := by
+              rfl
+    rw [h_eq]
+    exact hgood.axisParallelTest
+  have herr_nonneg : ∀ i : Fin params.next.m, 0 ≤ err i := by
+    intro i
+    exact bipartiteConsError_nonneg strategy.state
+      (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (fun u =>
+        postprocess ((strategy.axisParallelMeasurement { base := u, direction := i }).toSubMeas)
+          (· zeroCoord))
+  let mNext : Error := ((params.next.m : ℕ) : Error)
+  have hsum_le : ∑ i : Fin params.next.m, err i ≤ mNext * eps := by
+    have hcard_ne : mNext ≠ 0 := by
+      have hpos : 0 < mNext := by
+        simpa [mNext, Parameters.next] using
+          (show 0 < (((params.m + 1 : ℕ) : Error)) by positivity)
+      exact ne_of_gt hpos
+    have havg :
+        mNext⁻¹ * ∑ i : Fin params.next.m, err i =
+          avgOver (uniformDistribution (Fin params.next.m)) err := by
+      simp [avgOver, uniformDistribution, Finset.mul_sum, mNext]
+    calc
+      ∑ i : Fin params.next.m, err i
+          = mNext * (mNext⁻¹ * ∑ i : Fin params.next.m, err i) := by
+            field_simp [hcard_ne]
+      _ = mNext * avgOver (uniformDistribution (Fin params.next.m)) err := by
+            rw [havg]
+      _ ≤ mNext * eps := by
+            gcongr
+  have hlast_le : err (lastCoord params) ≤ mNext * eps := by
+    calc
+      err (lastCoord params) ≤ ∑ i : Fin params.next.m, err i := by
+        exact Finset.single_le_sum (fun i _ => herr_nonneg i) (Finset.mem_univ _)
+      _ ≤ ((params.next.m : ℕ) : Error) * eps := hsum_le
+  constructor
+  simpa [err, rawVerticalLineAnswerFamily] using hlast_le
+
+/-- Pull back the vertical-line answer family along `truncatePoint`, then read
+its line polynomial at the lifted point's final coordinate.
+
+Equivalently, this turns a vertical-line answer at `u : Point params` into an
+answer family on ambient points `appendPoint params u x`. -/
+private noncomputable def liftedVerticalLineAnswerFamily
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    IdxSubMeas (Point params.next) (Fq params) ι :=
+  fun u =>
+    postprocess (verticalLineMeasurementFamily params strategy (truncatePoint params u))
+      (fun f => f (pointHeight params u))
+
+/-- Transport the vertical-line consistency statement from restricted points
+`u : Point params` to ambient points `appendPoint params u x`. -/
+private lemma liftedVerticalLineConsistency
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (H : SubMeas (Polynomial params.next) ι)
+    (η : Error)
+    (hHB : ConsRel strategy.state
+      (uniformDistribution (Point params))
+      (hRestrictionToVerticalLine params H)
+      (verticalLineMeasurementFamily params strategy)
+      η) :
+    ConsRel strategy.state
+      (uniformDistribution (Point params.next))
+      (polynomialEvaluationFamily params.next H)
+      (liftedVerticalLineAnswerFamily params strategy)
+      η := by
+  have hprod :=
+    Preliminaries.consRel_uniform_prod_fst
+      (α := Point params)
+      (β := Fq params)
+      (Outcome := AxisLinePolynomial params.next)
+      (ιA := ι)
+      (ιB := ι)
+      strategy.state
+      (hRestrictionToVerticalLine params H)
+      (verticalLineMeasurementFamily params strategy)
+      η
+      hHB
+  have hpost :=
+    Preliminaries.consRelDataProcessing_questionDependent
+      strategy.state
+      (uniformDistribution (Point params × Fq params))
+      (fun ux => hRestrictionToVerticalLine params H ux.1)
+      (fun ux => verticalLineMeasurementFamily params strategy ux.1)
+      η
+      (fun ux linePoly => linePoly ux.2)
+      hprod
+  have hleft :
+      ∀ ux : Point params × Fq params,
+        postprocess (hRestrictionToVerticalLine params H ux.1)
+            (fun linePoly => linePoly ux.2) =
+          polynomialEvaluationFamily params.next H (appendPoint params ux.1 ux.2) := by
+    intro ux
+    rcases ux with ⟨u, x⟩
+    change postprocess (hRestrictionToVerticalLine params H u)
+        (fun linePoly => linePoly x) =
+      polynomialEvaluationFamily params.next H (appendPoint params u x)
+    rw [hRestrictionToVerticalLine, SubMeas.postprocess_comp]
+    have hpt' :
+        ({ base := appendPoint params u zeroCoord,
+           direction := lastCoord params } : AxisParallelLine params.next).pointAt x =
+          appendPoint params u x := by
+      simpa using verticalLine_pointAt_appendPoint params u x
+    have hfun :
+        (fun a : Polynomial params.next =>
+          (Polynomial.restrictToAxisParallelLine params.next a
+              { base := appendPoint params u zeroCoord,
+                direction := lastCoord params }).toFun x) =
+          (fun a : Polynomial params.next => a (appendPoint params u x)) := by
+      funext a
+      change
+        (Polynomial.restrictToAxisParallelLine params.next a
+          { base := appendPoint params u zeroCoord,
+            direction := lastCoord params }) x =
+          a (appendPoint params u x)
+      rw [Polynomial.restrictToAxisParallelLine_apply]
+      rw [hpt']
+    change postprocess H
+      (fun a : Polynomial params.next =>
+        (Polynomial.restrictToAxisParallelLine params.next a
+            { base := appendPoint params u zeroCoord,
+              direction := lastCoord params }).toFun x) = _
+    rw [hfun]
+    rfl
+  have hright :
+      ∀ ux : Point params × Fq params,
+        postprocess (verticalLineMeasurementFamily params strategy ux.1)
+            (fun linePoly => linePoly ux.2) =
+          liftedVerticalLineAnswerFamily params strategy
+            (appendPoint params ux.1 ux.2) := by
+    intro ux
+    rcases ux with ⟨u, x⟩
+    simp [liftedVerticalLineAnswerFamily, truncatePoint_appendPoint, pointHeight_appendPoint]
+  have hprod_next :
+      ConsRel strategy.state
+        (uniformDistribution (Point params × Fq params))
+        (fun ux => polynomialEvaluationFamily params.next H (appendPoint params ux.1 ux.2))
+        (fun ux => liftedVerticalLineAnswerFamily params strategy (appendPoint params ux.1 ux.2))
+        η := by
+    simpa [hleft, hright] using hpost
+  exact
+    (Preliminaries.consRel_uniform_equiv
+      (e := CommutativityPoints.pointNextEquiv params)
+      (ψ := strategy.state)
+      (A := polynomialEvaluationFamily params.next H)
+      (B := liftedVerticalLineAnswerFamily params strategy)
+      (δ := η)).mpr (by simpa [CommutativityPoints.pointNextEquiv] using hprod_next)
+
 /-- Bridge: convert vertical-line consistency to point consistency.
 
 Given `hHB : HBConsistencyStatement` (the output of `hBConsistency`), derives
@@ -228,6 +491,23 @@ private lemma hAConsistency_submeas_core
           (constructedPastedSubMeas params family k))
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta) := by
+  /-
+  The non-blocked bookkeeping is now in place:
+  * `liftedVerticalLineConsistency` transports `hHB.lineConsistency` from
+    `Point params` to full points `Point params.next`.
+  * `rawVerticalLineConsistency` extracts the last-coordinate axis-parallel
+    branch from `hgood.axisParallelTest`.
+
+  What remains is the final left/right orientation swap. The available chain
+  yields the reversed statement
+    `ConsRel strategy.state ... (polynomialEvaluationFamily ...)`
+    `  (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) ...`
+  by combining those helpers with the right-register triangle argument from
+  `Preliminaries.Triangles.Consistency`. Closing the theorem *as stated* then
+  needs a public `ConsRel` swap lemma (the `PermInvState.consRel_swap`-style API
+  tracked in #411). Without that stronger symmetry interface, the final step is
+  still blocked paper-faithfully.
+  -/
   sorry
 
 /-- `cor:h-a-consistency`.
@@ -451,7 +731,14 @@ lemma overAllOutcomes
   (3) remove global-polynomial restriction (Schwartz-Zippel: error md/q),
   (4) swap distinct → uniform sampling (`prop:ld-dnoteq`: error 2k²/q),
   (5) bound sandwich errors (`lem:ld-sandwich-line-one-point`: k × ν₅).
-  Requires: Schwartz-Zippel infrastructure, distinct → uniform swap lemma. -/
+
+  Current blockers after the split audit:
+  * the interpolation-to-global-polynomial correctness step still needs the
+    missing `Defs/Interpolation` comparison lemmas in the exact shapes consumed
+    here;
+  * the final sandwich aggregation still depends on `ldSandwichLineOnePoint`,
+    whose remaining blocker is `ldGbcon` / the #411 swap API.
+  -/
   sorry
 
 
