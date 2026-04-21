@@ -271,9 +271,28 @@ private theorem symmetrizedAxisParallelTransportInvariant
   have hB' := hB ℓ t
   apply ProjMeas.ext
   intro a
-  simp [symmetrizedIdxProjMeas, AxisParallelLine.transportMeasurement,
-    ProjMeas.transport, Measurement.transport, SubMeas.transport,
-    hA', hB']
+  calc
+    (symmetrizedIdxProjMeas MA MB (AxisParallelLine.rebaseAt ℓ t)).outcome a
+      = roleCond Role.A ((MA (AxisParallelLine.rebaseAt ℓ t)).outcome a) +
+          roleCond Role.B ((MB (AxisParallelLine.rebaseAt ℓ t)).outcome a) := by
+            simp [symmetrizedIdxProjMeas]
+    _ = roleCond Role.A
+          ((AxisParallelLine.transportMeasurement (params := params) (MA ℓ) t).outcome a) +
+        roleCond Role.B
+          ((AxisParallelLine.transportMeasurement (params := params) (MB ℓ) t).outcome a) := by
+            simp [hA', hB']
+    _ = roleCond Role.A
+          ((MA ℓ).outcome
+            ((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm a)) +
+        roleCond Role.B
+          ((MB ℓ).outcome
+            ((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm a)) := by
+            simp [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+              Measurement.transport]
+    _ = (AxisParallelLine.transportMeasurement (params := params)
+          (symmetrizedIdxProjMeas MA MB ℓ) t).outcome a := by
+            simp [AxisParallelLine.transportMeasurement, symmetrizedIdxProjMeas,
+              ProjMeas.transport, Measurement.transport]
 
 /-- Transport-level rebasing covariance is preserved by block-diagonal
 symmetrization over the role register. -/
@@ -291,9 +310,28 @@ private theorem symmetrizedDiagonalTransportInvariant
   have hB' := hB ℓ t
   apply ProjMeas.ext
   intro a
-  simp [symmetrizedIdxProjMeas, DiagonalLine.transportMeasurement,
-    ProjMeas.transport, Measurement.transport, SubMeas.transport,
-    hA', hB']
+  calc
+    (symmetrizedIdxProjMeas MA MB (DiagonalLine.rebaseAt ℓ t)).outcome a
+      = roleCond Role.A ((MA (DiagonalLine.rebaseAt ℓ t)).outcome a) +
+          roleCond Role.B ((MB (DiagonalLine.rebaseAt ℓ t)).outcome a) := by
+            simp [symmetrizedIdxProjMeas]
+    _ = roleCond Role.A
+          ((DiagonalLine.transportMeasurement (params := params) (MA ℓ) t).outcome a) +
+        roleCond Role.B
+          ((DiagonalLine.transportMeasurement (params := params) (MB ℓ) t).outcome a) := by
+            simp [hA', hB']
+    _ = roleCond Role.A
+          ((MA ℓ).outcome
+            ((DiagonalLinePolynomial.reparamAtEquiv (params := params) t).symm a)) +
+        roleCond Role.B
+          ((MB ℓ).outcome
+            ((DiagonalLinePolynomial.reparamAtEquiv (params := params) t).symm a)) := by
+            simp [DiagonalLine.transportMeasurement, ProjMeas.transport,
+              Measurement.transport]
+    _ = (DiagonalLine.transportMeasurement (params := params)
+          (symmetrizedIdxProjMeas MA MB ℓ) t).outcome a := by
+            simp [DiagonalLine.transportMeasurement, symmetrizedIdxProjMeas,
+              ProjMeas.transport, Measurement.transport]
 
 namespace ProjStrat
 
