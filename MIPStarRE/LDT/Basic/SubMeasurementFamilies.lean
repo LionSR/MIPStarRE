@@ -287,7 +287,7 @@ noncomputable def postprocess {α β : Type*} {ι : Type*}
             by_cases h : a' = a
             · subst h
               simp [A.proj]
-            · have hne : a ≠ a' := by exact fun h' => h h'.symm
+            · have hne : a ≠ a' := fun h' => h h'.symm
               simp [A.outcome_orthogonal _ _ hne, h]
       _ = ∑ a ∈ fiber, A.outcome a := by
             refine Finset.sum_congr rfl ?_
