@@ -204,7 +204,14 @@ $$
 written in the existing `SubMeas Unit` API so that its total operator is the
 relevant suffix-stage matrix.  Unlike the old `fromHToG` recurrence families,
 this keeps the `\widehat H^{x_{\ge \ell}}_{g_{\ge \ell}}` suffix visible instead
-of collapsing immediately to the full `k`-step total mass. -/
+of collapsing immediately to the full `k`-step total mass.
+
+When this is used in `fromHToG`, the suffix length is `tailLen = k - ℓ`.  The
+paper phrases the expectation as the suffix marginal of
+`distinctTupleDistribution params k`; here it is realized directly as
+`distinctTupleDistribution params tailLen`.  This is the same distribution by
+symmetry of uniform injective tuples, but the explicit marginalization lemma has
+not yet been named because the current PR only repairs the family shape. -/
 noncomputable def averagedSandwichByTypeSubMeas (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (tailLen : ℕ) (τtail : GHatType tailLen) :
     SubMeas Unit ι :=
@@ -220,7 +227,7 @@ noncomputable def averagedSandwichByTypeSubMeas (params : Parameters) [FieldMode
       (distinctTupleDistribution_weight_sum_le_one params tailLen)
 
 /-- The stage-`ℓ` suffix family from the proof of `lem:from-H-to-G`, for a fixed
-full type `τ ∈ \{0,1\}^k`.
+full type `τ ∈ {0,1}^k`.
 
 With zero-based indexing, this packages
 $$
@@ -230,7 +237,6 @@ $$
 The dependence on `ℓ` now genuinely changes the `\widehat H` suffix rather than
 reusing the fully averaged `k`-step operator at every stage. -/
 noncomputable def fromHToGIntermediateFamily (params : Parameters) [FieldModel params.q]
-    (_strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k ℓ : ℕ)
     (τ : GHatType k) :
     IdxOpFamily Unit Unit ι :=
@@ -244,13 +250,15 @@ noncomputable def fromHToGIntermediateFamily (params : Parameters) [FieldModel p
 parameterised by the full type `τ ∈ {0,1}^k`.
 
 This is the stage-`ℓ` suffix family `\widehat H^{x_{\ge \ell}}_{g_{\ge \ell}} \otimes
-S_{\tau_{\ge \ell}}`. -/
+S_{\tau_{\ge \ell}}`.  The `strategy` argument is threaded only so the public
+family API matches `FromHToGStatement`; the underlying operator depends only on
+`family`. -/
 noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
+    (_strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k ℓ : ℕ)
     (τ : GHatType k) :
     IdxOpFamily Unit Unit ι :=
-  fromHToGIntermediateFamily params strategy family k ℓ τ
+  fromHToGIntermediateFamily params family k ℓ τ
 
 /-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`,
 parameterised by the full type `τ ∈ {0,1}^k`.
@@ -258,15 +266,19 @@ parameterised by the full type `τ ∈ {0,1}^k`.
 This is the next suffix stage `\widehat H^{x_{>\ell}}_{g_{>\ell}} \otimes
 S_{\tau_{>\ell}}`, i.e. definitionally the `(ℓ + 1)`-st left family. -/
 noncomputable def fromHToGRecurrenceRightFamily (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
+    (_strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k ℓ : ℕ)
     (τ : GHatType k) :
     IdxOpFamily Unit Unit ι :=
-  fromHToGIntermediateFamily params strategy family k (ℓ + 1) τ
+  fromHToGIntermediateFamily params family k (ℓ + 1) τ
 
 /-- The right-hand recurrence family at step `ℓ` is definitionally the left-hand
 family at step `ℓ + 1`, matching the telescoping chain in
-`ld-pasting.tex` lines 1354–1376. -/
+`ld-pasting.tex` lines 1354–1376.
+
+The intended use is `ℓ < k`; the theorem is stated for all `ℓ : ℕ` because the
+same `rfl` proof continues to hold outside that range under the `Nat`-subtraction
+convention built into `gHatTypeSuffix`. -/
 theorem fromHToGRecurrenceRightFamily_eq_left_succ (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
