@@ -263,21 +263,4 @@ lemma switcherooAggregateFirstTerm_eq_split_by_g
           unfold switcherooAggregateFirstTerm
           rfl
 
-/-- Public alias for collapsing the split-by-`g` scalar back to the first positive term. -/
-lemma switcherooFirstSplit_eq_firstTermCore
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (M : IdxProjSubMeas (Fq params) Outcome ι) :
-    avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
-      ∑ go : Polynomial params × Outcome,
-        ev ψbi
-          (leftTensor (ι₂ := ι)
-            ((M q.2).outcome go.2 *
-              (family.meas q.1).outcome go.1 *
-              (M q.2).outcome go.2))) =
-      switcherooAggregateFirstTerm params ψbi family M := by
-  simpa using switcherooAggregateFirstTerm_eq_split_by_g params ψbi family M
-
 end MIPStarRE.LDT.Pasting

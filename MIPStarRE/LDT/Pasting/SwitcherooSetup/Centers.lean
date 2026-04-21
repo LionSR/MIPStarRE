@@ -95,22 +95,6 @@ lemma switcherooAggregateFirstTerm_eq_leftSandwich
             simp [MIPStarRE.LDT.Preliminaries.leftSandwichExpectation,
               avgOver, leftTensor_mul_leftTensor, mul_assoc]
 
-/-- Public alias for rewriting the first positive switcheroo term as a left-sandwich average. -/
-lemma switcherooFirstTerm_eq_leftSandwichCore
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (M : IdxProjSubMeas (Fq params) Outcome ι) :
-    switcherooAggregateFirstTerm params ψbi family M =
-      avgOver (uniformDistribution (SliceQuestion params))
-        (fun x =>
-          MIPStarRE.LDT.Preliminaries.leftSandwichExpectation ψbi
-            (uniformDistribution (SliceQuestion params))
-            M
-            ((completePartSubMeas params family x).total)) := by
-  simpa using switcherooAggregateFirstTerm_eq_leftSandwich params ψbi family M
-
 /-- Rewrite the `G ⊗ M` switcheroo center as a middle-sandwich average. -/
 lemma switcherooAggregateTarget_eq_middleSandwich
     {Outcome : Type*} [Fintype Outcome]

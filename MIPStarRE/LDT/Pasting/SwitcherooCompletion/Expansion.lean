@@ -194,7 +194,7 @@ noncomputable def switcherooFirstSplitCoreScalar
             (family.meas q.1).outcome go.1 *
             (M q.2).outcome go.2)))
 
-set_option maxHeartbeats 50000000 in
+set_option maxHeartbeats 4000000 in
 -- The explicit left-front contraction proof expands several product-indexed sums
 -- and projector-normalization rewrites; the higher heartbeat cap avoids timeout.
 /-- The final `sqrt chi` step in the fourth-term switcheroo chain. -/
@@ -398,7 +398,7 @@ lemma switcherooLeftFront_close_firstSplitCore
     simpa using hclose
   simpa [hleft', hright', abs_sub_comm] using hclose'
 
-set_option maxHeartbeats 10000000 in
+set_option maxHeartbeats 3000000 in
 -- Expanding `qSDDOp` into four averaged scalar terms over a slice-pair question
 -- generates a large normalization expression that otherwise exceeds heartbeats.
 /-- Average the single-question four-term `qSDDOp` expansion over the

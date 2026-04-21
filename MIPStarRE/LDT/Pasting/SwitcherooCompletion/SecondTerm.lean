@@ -221,4 +221,123 @@ lemma switcheroo_second_aggregate_term_close
           simpa [𝒟x] using
             avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt zeta)
 
+/-- The complete-part `M ⊗ G` switcheroo center, repackaged as a slice-pair
+`opTensor` average over the `M`-totals and complete-part `G`-totals. -/
+lemma switcherooAggregateMGCenterComplete_eq_opTensor_avg
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) :
+    avgOver (uniformDistribution (SliceQuestion params))
+        (fun y =>
+          Preliminaries.middleSandwichExpectation ψbi
+            (uniformDistribution (SliceQuestion params))
+            (completePartProjFamily params family) (((M y).toSubMeas).total)) =
+      avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+        ev ψbi
+          (opTensor
+            (((M q.2).toSubMeas).total)
+            ((completePartSubMeas params family q.1).total))) := by
+  let 𝒟x : Distribution (SliceQuestion params) :=
+    uniformDistribution (SliceQuestion params)
+  let Mtotal : Fq params → MIPStarRE.Quantum.Op ι := fun y =>
+    ((M y).toSubMeas).total
+  let Gtotal : Fq params → MIPStarRE.Quantum.Op ι := fun x =>
+    (completePartSubMeas params family x).total
+  let F : Fq params → Fq params → Error := fun x y =>
+    ∑ u : Unit,
+      ev ψbi
+        (leftTensor (ι₂ := ι) (Mtotal y) *
+          rightTensor (ι₁ := ι) ((completePartProjFamily params family x).outcome u))
+  calc
+    avgOver 𝒟x (fun y =>
+        Preliminaries.middleSandwichExpectation ψbi 𝒟x
+          (completePartProjFamily params family) (((M y).toSubMeas).total))
+      = avgOver 𝒟x (fun y => avgOver 𝒟x (fun x => F x y)) := by
+        simp [F, 𝒟x, Preliminaries.middleSandwichExpectation, Mtotal]
+    _ = avgOver (uniformDistribution (SlicePairQuestion params))
+          (fun q => F q.2 q.1) := by
+        symm
+        simpa [𝒟x, SlicePairQuestion, SliceQuestion] using
+          (avgOver_uniform_prod
+            (α := SliceQuestion params)
+            (β := SliceQuestion params)
+            (f := fun y x => F x y))
+    _ = avgOver (uniformDistribution (SlicePairQuestion params))
+          (fun q => F q.1 q.2) := by
+        symm
+        simpa [SlicePairQuestion] using
+          (avgOver_uniform_equiv
+            (α := SlicePairQuestion params)
+            (β := SlicePairQuestion params)
+            (Equiv.prodComm (Fq params) (Fq params))
+            (fun q => F q.1 q.2))
+    _ = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+          ev ψbi
+            (opTensor
+              (((M q.2).toSubMeas).total)
+              ((completePartSubMeas params family q.1).total))) := by
+        apply avgOver_congr
+        intro q
+        rcases q with ⟨x, y⟩
+        have hsingle :
+            (completePartProjFamily params family x).outcome () = Gtotal x := by
+          change (completePartSubMeas params family x).outcome () =
+            (completePartSubMeas params family x).total
+          simpa [completePartSubMeas] using
+            postprocess_unit_outcome_eq_total ((family.meas x).toSubMeas)
+        simp [F, Gtotal, Mtotal, hsingle, leftTensor_mul_rightTensor_eq_opTensor]
+
+/-- The `G ⊗ M` switcheroo center, repackaged as a slice-pair `opTensor` average
+over the complete-part `G`-totals and `M`-totals. -/
+lemma switcherooAggregateTarget_eq_opTensor_avg
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) :
+    switcherooAggregateTarget params ψbi family M =
+      avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+        ev ψbi
+          (opTensor
+            ((completePartSubMeas params family q.1).total)
+            (((M q.2).toSubMeas).total))) := by
+  let Mtotal : Fq params → MIPStarRE.Quantum.Op ι := fun y =>
+    ((M y).toSubMeas).total
+  let Gtotal : Fq params → MIPStarRE.Quantum.Op ι := fun x =>
+    (completePartSubMeas params family x).total
+  unfold switcherooAggregateTarget
+  apply avgOver_congr
+  intro q
+  rcases q with ⟨x, y⟩
+  calc
+    ∑ o : Outcome,
+        ev ψbi
+          (leftTensor (ι₂ := ι) (Gtotal x) *
+            rightTensor (ι₁ := ι) ((M y).outcome o))
+      = ev ψbi
+          (∑ o : Outcome,
+            leftTensor (ι₂ := ι) (Gtotal x) *
+              rightTensor (ι₁ := ι) ((M y).outcome o)) := by
+          rw [← ev_sum ψbi (fun o : Outcome =>
+            leftTensor (ι₂ := ι) (Gtotal x) *
+              rightTensor (ι₁ := ι) ((M y).outcome o))]
+    _ = ev ψbi
+          (leftTensor (ι₂ := ι) (Gtotal x) *
+            ∑ o : Outcome, rightTensor (ι₁ := ι) ((M y).outcome o)) := by
+          congr 1
+          exact (Finset.mul_sum
+            (s := (Finset.univ : Finset Outcome))
+            (f := fun o : Outcome => rightTensor (ι₁ := ι) ((M y).outcome o))
+            (a := leftTensor (ι₂ := ι) (Gtotal x))).symm
+    _ = ev ψbi
+          (leftTensor (ι₂ := ι) (Gtotal x) *
+            rightTensor (ι₁ := ι) (Mtotal y)) := by
+          rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ
+            (fun o : Outcome => (M y).outcome o)]
+          rw [(M y).sum_eq_total]
+    _ = ev ψbi (opTensor (Gtotal x) (Mtotal y)) := by
+          simp [Gtotal, Mtotal, leftTensor_mul_rightTensor_eq_opTensor]
+
 end MIPStarRE.LDT.Pasting
