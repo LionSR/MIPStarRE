@@ -111,7 +111,10 @@ private lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
               = h (AxisParallelLine.pointAt verticalLine (pointHeight params u)) :=
                   hrestrict_apply h verticalLine (pointHeight params u)
             _ = h u := by simpa [hbase]
-  simpa [evaluateAt, Function.comp] using congrArg (postprocess H) hfun
+  unfold evaluateAt
+  refine congrArg (postprocess H) (funext fun h => ?_)
+  show (Polynomial.restrictToAxisParallelLine params.next h verticalLine) (pointHeight params u) = h u
+  exact congrFun hfun h
 
 
 private lemma consRel_uniform_fst
@@ -4114,16 +4117,15 @@ theorem hAConsistency_submeas
           unfold SymStrat.diagonalFailureProbability
           exact mul_nonneg (by positivity)
             (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
-            (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
         exact le_trans this hgood.diagonalLineTest
       let G : Fq params → SubMeas (Polynomial params) ι := fun x => (family.meas x).toSubMeas
       have hG : ∀ x, G x = (family.meas x).toSubMeas := by
         intro x
         rfl
       have hselfComplete :=
-        gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
+        gCompleteSelfConsistency params strategy.state family zeta hself
       have hselfIncomplete :=
-        gBotSelfConsistency params strategy.state family zeta strategy.permInvState hselfComplete
+        gBotSelfConsistency params strategy.state family zeta hselfComplete
       have hcomMain :=
         Commutativity.comMain params strategy eps delta gamma zeta
           strategy.isNormalized hgood family G hG hcons hself hbound
