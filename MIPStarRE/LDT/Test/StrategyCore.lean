@@ -270,6 +270,27 @@ noncomputable def axisParallelLineAnswerFamily
       ((strategy.axisParallelMeasurement ℓ).toSubMeas)
       (· zeroCoord)
 
+-- Paper: `not:conditioned-on-last-direction` abbreviates the axis-parallel
+-- line in the last coordinate direction of `F_q^(m+1)` by its base point `u`.
+/-- The axis-parallel line in `F_q^(m+1)` through `(u, 0)` in the last
+coordinate direction. This is the geometric line denoted `B^u` in the paper's
+last-direction notation. -/
+def lastDirectionLine (params : Parameters) [FieldModel params.q]
+    (u : Point params) : AxisParallelLine params.next where
+  base := appendPoint params u zeroCoord
+  direction := lastCoord params
+
+-- Paper: `not:conditioned-on-last-direction` writes `B^u` for the axis-parallel
+-- line measurement conditioned on the last direction choice.
+/-- The axis-parallel line measurement family restricted to the paper's
+last-direction notation `u ↦ B^u`. -/
+noncomputable def lastDirectionMeasurementFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι) :
+    IdxProjMeas (Point params) (AxisLinePolynomial params.next) ι :=
+  fun u => strategy.axisParallelMeasurement (lastDirectionLine params u)
+
 /-- Sampled point answers in the `j`-restricted diagonal test.
 The point player receives `u` and answers at `u`. -/
 noncomputable def diagonalPointAnswerFamily
