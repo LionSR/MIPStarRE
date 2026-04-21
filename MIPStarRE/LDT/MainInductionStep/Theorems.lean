@@ -1,3 +1,6 @@
+import Mathlib.Analysis.Convex.SpecificFunctions.Pow
+import Mathlib.Analysis.MeanInequalitiesPow
+import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.CommutativityPoints.Theorem
 import MIPStarRE.LDT.Commutativity.Theorems
@@ -175,6 +178,146 @@ theorem ldPastingInInductionSection
   obtain ⟨H, hH⟩ := hldPasting
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
+
+/-- At `m = 1`, `AxisParallelLine.throughPoint u i` does not depend on the
+base point `u`: all axis-parallel lines in direction `i` are geometrically the
+unique line and share the same canonical representative. -/
+private theorem throughPoint_eq_zeroPoint_of_m_eq_one
+    (params : Parameters) [FieldModel params.q]
+    (hm1 : params.m = 1)
+    (u : Point params) (i : Fin params.m) :
+    AxisParallelLine.throughPoint (params := params) u i =
+      AxisParallelLine.throughPoint (params := params) zeroPoint i := by
+  change
+    ({ base := fun j => if j = i then zeroCoord else u j
+       direction := i } : AxisParallelLine params) =
+      { base := fun j => if j = i then zeroCoord else zeroPoint j
+        direction := i }
+  congr
+  funext j
+  haveI : Subsingleton (Fin params.m) := by
+    rw [hm1]
+    infer_instance
+  have hji : j = i := Subsingleton.elim _ _
+  simp [hji]
+
+private lemma min_le_rpow_of_nonneg_of_exponent_le_one {x c : Error}
+    (hx : 0 ≤ x) (hc_nonneg : 0 ≤ c) (hc_le_one : c ≤ 1) :
+    min x 1 ≤ Real.rpow x c := by
+  by_cases hx1 : x ≤ 1
+  · rw [min_eq_left hx1]
+    simpa [Real.rpow_one] using
+      (Real.rpow_le_rpow_of_exponent_ge' hx hx1 hc_nonneg hc_le_one)
+  · rw [min_eq_right (le_of_not_ge hx1)]
+    simpa using Real.rpow_le_rpow (by positivity) (le_of_not_ge hx1) hc_nonneg
+
+private lemma min_eps_one_le_mainInductionError_of_m_eq_one
+    (params : Parameters)
+    [FieldModel params.q]
+    (k : ℕ) (eps delta gamma : Error)
+    (hm1 : params.m = 1)
+    (heps_nonneg : 0 ≤ eps) (hdelta_nonneg : 0 ≤ delta) (hgamma_nonneg : 0 ≤ gamma) :
+    min eps 1 ≤ mainInductionError params k eps delta gamma := by
+  by_cases hk0 : k = 0
+  · subst hk0
+    simp [mainInductionError, mainInductionNu, hm1]
+  · have hmin : min eps 1 ≤ Real.rpow eps (1 / (1024 : Error)) :=
+      min_le_rpow_of_nonneg_of_exponent_le_one heps_nonneg (by positivity)
+        (by norm_num : (1 / (1024 : Error)) ≤ 1)
+    have hother_nonneg :
+        0 ≤ Real.rpow delta (1 / (1024 : Error)) +
+              Real.rpow gamma (1 / (1024 : Error)) +
+              Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
+      have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
+      have hdelta_rpow_nonneg : 0 ≤ Real.rpow delta (1 / (1024 : Error)) :=
+        Real.rpow_nonneg hdelta_nonneg _
+      have hgamma_rpow_nonneg : 0 ≤ Real.rpow gamma (1 / (1024 : Error)) :=
+        Real.rpow_nonneg hgamma_nonneg _
+      have hratio_rpow_nonneg :
+          0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) :=
+        Real.rpow_nonneg hratio_nonneg _
+      nlinarith
+    have hsum_ge :
+        Real.rpow eps (1 / (1024 : Error)) ≤
+          Real.rpow eps (1 / (1024 : Error)) +
+            Real.rpow delta (1 / (1024 : Error)) +
+            Real.rpow gamma (1 / (1024 : Error)) +
+            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
+      nlinarith
+    have hk1 : (1 : Error) ≤ (k : Error) := by
+      exact_mod_cast Nat.succ_le_of_lt (Nat.pos_of_ne_zero hk0)
+    have hk2 : (1 : Error) ≤ ((k : Error) ^ (2 : ℕ)) := by
+      nlinarith
+    have hcoef_nonneg :
+        0 ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) := by
+      positivity
+    have hcoef :
+        (1 : Error) ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) := by
+      simp [hm1]
+      nlinarith
+    have hrpow_nonneg : 0 ≤ Real.rpow eps (1 / (1024 : Error)) := by
+      exact Real.rpow_nonneg heps_nonneg _
+    have hmul :
+        Real.rpow eps (1 / (1024 : Error)) ≤
+          1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
+            Real.rpow eps (1 / (1024 : Error)) := by
+      simpa using (mul_le_mul_of_nonneg_right hcoef hrpow_nonneg)
+    have hsum_mul :
+        1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
+            Real.rpow eps (1 / (1024 : Error)) ≤
+          1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
+            (Real.rpow eps (1 / (1024 : Error)) +
+              Real.rpow delta (1 / (1024 : Error)) +
+              Real.rpow gamma (1 / (1024 : Error)) +
+              Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error))) := by
+      exact mul_le_mul_of_nonneg_left hsum_ge hcoef_nonneg
+    have hexp_nonneg :
+        0 ≤ Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
+      positivity
+    calc
+      min eps 1 ≤ Real.rpow eps (1 / (1024 : Error)) := hmin
+      _ ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
+            Real.rpow eps (1 / (1024 : Error)) := hmul
+      _ ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
+            (Real.rpow eps (1 / (1024 : Error)) +
+              Real.rpow delta (1 / (1024 : Error)) +
+              Real.rpow gamma (1 / (1024 : Error)) +
+              Real.rpow (((params.d : Error) / (params.q : Error)))
+                (1 / (1024 : Error))) := hsum_mul
+      _ ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
+            (Real.rpow eps (1 / (1024 : Error)) +
+              Real.rpow delta (1 / (1024 : Error)) +
+              Real.rpow gamma (1 / (1024 : Error)) +
+              Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error))) +
+            Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
+            linarith
+      _ = mainInductionError params k eps delta gamma := by
+            simp [mainInductionError, mainInductionNu, hm1]
+
+
+private lemma diagonalFailureProbability_nonneg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι) :
+    0 ≤ strategy.diagonalFailureProbability := by
+  unfold SymStrat.diagonalFailureProbability
+  refine mul_nonneg ?_ ?_
+  · positivity
+  · refine Finset.sum_nonneg ?_
+    intro j _
+    exact bipartiteConsError_nonneg strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params j))
+      (diagonalPointAnswerFamily strategy j)
+      (diagonalLineAnswerFamily strategy j)
+
+/-- Throwaway polynomial measurement used only as a witness in the vacuous
+`mainInductionError ≥ 1` fallback branch of `mainInductionByRecursionOnM`.
+All mass is concentrated on `default : Polynomial params`. -/
+private noncomputable def trivialPolynomialMeasurement
+    (params : Parameters) [FieldModel params.q] : Measurement (Polynomial params) ι := by
+  classical
+  haveI : Inhabited (Polynomial params) :=
+    ⟨Classical.choice (inferInstance : Nonempty (Polynomial params))⟩
+  exact default
 
 /-! ## Main-induction bridge assembly
 
@@ -488,14 +631,16 @@ noncomputable def assemblePastingPackage
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (_hsmall : mainInductionError params.next k eps delta gamma < 1)
     (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
     (hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k)
     (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
     (_hk : 400 * params.m * params.d ≤ k) :
     PastingPackage params strategy eps delta gamma k hself := by
-  -- TODO(#552): average the per-slice completeness / consistency /
-  -- strong self-consistency / boundedness conclusions and telescope the
-  -- resulting `ldPastingInInductionError` bound to
+  -- TODO(#552): average the per-slice completeness / consistency / strong
+  -- self-consistency / boundedness conclusions and telescope the resulting
+  -- `ldPastingInInductionError` bound to
   -- `mainInductionError params.next k eps delta gamma`.
   sorry
 
@@ -510,13 +655,144 @@ theorem mainInductionBaseCase
     (eps delta gamma : Error)
     (k : ℕ)
     (hm1 : params.m = 1)
-    (_hgood : strategy.IsGood eps delta gamma) :
+    (hgood : strategy.IsGood eps delta gamma) :
     MainInductionBridgePackage params strategy eps delta gamma k := by
-  -- TODO(#553): identify the unique axis-parallel line in dimension one,
-  -- transport its answer measurement to `Measurement (Polynomial params) ι`,
-  -- and compare the resulting point-consistency error with
-  -- `mainInductionError params k eps delta gamma`.
-  sorry
+  classical
+  haveI hsub : Subsingleton (Fin params.m) := by
+    rw [hm1]
+    infer_instance
+  let i0 : Fin params.m := ⟨0, by simpa [hm1] using params.hm⟩
+  let eSample : AxisParallelTestSample params ≃ Point params :=
+    { toFun := fun s => s.1
+      invFun := fun u => (u, i0)
+      left_inv := by
+        intro s
+        rcases s with ⟨u, j⟩
+        have hj : j = i0 := Subsingleton.elim _ _
+        simp [hj, i0]
+      right_inv := by
+        intro u
+        rfl }
+  let canonicalLine : AxisParallelLine params :=
+    AxisParallelLine.throughPoint (params := params) zeroPoint i0
+  let G : Measurement (Polynomial params) ι :=
+    { toSubMeas :=
+        postprocess ((strategy.axisParallelMeasurement canonicalLine).toSubMeas)
+          (axisLinePolynomialToPolynomial params i0)
+      total_eq_one := (strategy.axisParallelMeasurement canonicalLine).total_eq_one }
+  have haxisRaw :
+      ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy)
+        strategy.axisParallelFailureProbability := by
+    exact ⟨le_rfl⟩
+  have haxisPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (fun u =>
+          postprocess
+            ((strategy.axisParallelMeasurement { base := u, direction := i0 }).toSubMeas)
+            (· zeroCoord))
+        strategy.axisParallelFailureProbability := by
+    simpa [IdxProjMeas.toIdxSubMeas, axisParallelPointAnswerFamily,
+      axisParallelLineAnswerFamily, eSample, i0] using
+      ((Preliminaries.consRel_uniform_equiv
+        (e := eSample)
+        (ψ := strategy.state)
+        (A := axisParallelPointAnswerFamily strategy)
+        (B := axisParallelLineAnswerFamily strategy)
+        (δ := strategy.axisParallelFailureProbability)).mp haxisRaw)
+  have hfamily :
+      (fun u =>
+        postprocess
+          ((strategy.axisParallelMeasurement { base := u, direction := i0 }).toSubMeas)
+          (· zeroCoord)) =
+        polynomialEvaluationFamily params G.toSubMeas := by
+    funext u
+    apply SubMeas.ext
+    · intro a
+      calc
+        (postprocess
+            ((strategy.axisParallelMeasurement { base := u, direction := i0 }).toSubMeas)
+            (· zeroCoord)).outcome a
+          = (postprocess
+              ((strategy.axisParallelMeasurement
+                (AxisParallelLine.rebaseAt
+                  (AxisParallelLine.throughPoint (params := params) u i0)
+                  (AxisParallelLine.sampleParameter (params := params) u i0))).toSubMeas)
+              (· zeroCoord)).outcome a := by
+                simpa [AxisParallelLine.rebaseAt_throughPoint_sampleParameter]
+        _ = (postprocess
+              ((strategy.axisParallelMeasurement
+                (AxisParallelLine.throughPoint (params := params) u i0)).toSubMeas)
+              (fun f =>
+                f (AxisParallelLine.sampleParameter (params := params) u i0))).outcome a := by
+                exact strategy.axisParallelReparamInvariant _ _ _
+        _ = (postprocess
+              ((strategy.axisParallelMeasurement canonicalLine).toSubMeas)
+              (fun f => f (u i0))).outcome a := by
+                have hthrough :
+                    AxisParallelLine.throughPoint (params := params) u i0 = canonicalLine := by
+                  simpa [canonicalLine] using
+                    throughPoint_eq_zeroPoint_of_m_eq_one params hm1 u i0
+                simp [hthrough, AxisParallelLine.sampleParameter]
+        _ = (polynomialEvaluationFamily params G.toSubMeas u).outcome a := by
+              simp [polynomialEvaluationFamily, evaluateAt, G,
+                axisLinePolynomialToPolynomial_apply]
+    · change
+          (postprocess
+              ((strategy.axisParallelMeasurement { base := u, direction := i0 }).toSubMeas)
+              (· zeroCoord)).total =
+            (postprocess ((strategy.axisParallelMeasurement canonicalLine).toSubMeas)
+              (fun f => f (u i0))).total
+      rw [show
+          (postprocess
+              ((strategy.axisParallelMeasurement { base := u, direction := i0 }).toSubMeas)
+              (· zeroCoord)).total =
+            (strategy.axisParallelMeasurement { base := u, direction := i0 }).total by rfl]
+      rw [show
+          (postprocess ((strategy.axisParallelMeasurement canonicalLine).toSubMeas)
+              (fun f => f (u i0))).total =
+            (strategy.axisParallelMeasurement canonicalLine).total by rfl]
+      rw [(strategy.axisParallelMeasurement { base := u, direction := i0 }).total_eq_one,
+        (strategy.axisParallelMeasurement canonicalLine).total_eq_one]
+  have hconsG :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        strategy.axisParallelFailureProbability := by
+    simpa [hfamily] using haxisPoint
+  have heps_nonneg : 0 ≤ eps := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy))
+      hgood.axisParallelTest
+  have hdelta_nonneg : 0 ≤ delta := by
+    exact le_trans
+      (bipartiteSSCError_nonneg strategy.state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      hgood.selfConsistencyTest
+  have hdiag_nonneg : 0 ≤ strategy.diagonalFailureProbability :=
+    diagonalFailureProbability_nonneg params strategy
+  have hgamma_nonneg : 0 ≤ gamma := le_trans hdiag_nonneg hgood.diagonalLineTest
+  have haxis_le_one : strategy.axisParallelFailureProbability ≤ 1 := by
+    simpa [SymStrat.axisParallelFailureProbability] using
+      bipartiteConsError_uniform_le_one
+        strategy.state strategy.isNormalized
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy)
+  have herror_le :
+      strategy.axisParallelFailureProbability ≤ mainInductionError params k eps delta gamma := by
+    exact le_trans
+      (le_min hgood.axisParallelTest haxis_le_one)
+      (min_eps_one_le_mainInductionError_of_m_eq_one
+        params k eps delta gamma hm1 heps_nonneg hdelta_nonneg hgamma_nonneg)
+  exact
+    { witness :=
+        ⟨strategy.axisParallelFailureProbability, G, hconsG, herror_le⟩ }
 
 /-- Successor-step recursion entry point for `thm:main-induction`.
 
@@ -554,15 +830,32 @@ theorem mainInductionByRecursionOnM
       SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
     (hk : 400 * params.m * params.d ≤ k) :
     MainInductionBridgePackage params.next strategy eps delta gamma k := by
-  let hinduction :=
-    PerSliceInductionPackage.ofRecursion params strategy eps delta gamma k
-      hrestrict hrec
-  let hself := hselfProducer hinduction
-  let hpaste :=
-    assemblePastingPackage params strategy eps delta gamma k
-      hrestrict hinduction hself hk
-  exact
-    mainInductionBridgeWitness params strategy eps delta gamma k
-      hgood hrestrict hinduction hself hpaste hk
+  -- TODO(#552): this case split is temporary scaffolding. The `< 1` branch still
+  -- routes through `assemblePastingPackage`, while the `≥ 1` branch packages the
+  -- trivial witness that the eventual small-parameter assembly can subsume.
+  by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
+  · let hinduction :=
+      PerSliceInductionPackage.ofRecursion params strategy eps delta gamma k
+        hrestrict hrec
+    let hself := hselfProducer hinduction
+    let hpaste :=
+      assemblePastingPackage params strategy eps delta gamma k
+        hgood hsmall hrestrict hinduction hself hk
+    exact
+      mainInductionBridgeWitness params strategy eps delta gamma k
+        hgood hrestrict hinduction hself hpaste hk
+  · let G : Measurement (Polynomial params.next) ι :=
+      trivialPolynomialMeasurement (ι := ι) params.next
+    have hcons :
+        ConsRel strategy.state (uniformDistribution (Point params.next))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (polynomialEvaluationFamily params.next G.toSubMeas)
+          1 := by
+      exact ⟨bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)⟩
+    exact
+      { witness :=
+          ⟨1, G, hcons, le_of_not_gt hsmall⟩ }
 
 end MIPStarRE.LDT.MainInductionStep

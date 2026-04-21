@@ -338,6 +338,57 @@ theorem bipartiteConsError_nonneg {Question Outcome : Type*}
   unfold bipartiteConsError
   exact avgOver_nonneg 𝒟 _ fun q => qBipartiteConsDefect_nonneg ψ _ _
 
+/-- The bipartite matching mass is nonnegative because each summand is the
+expectation of a positive semidefinite tensor product. -/
+theorem qBipartiteMatchMass_nonneg {Outcome : Type*}
+    {ιA ιB : Type*} [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB]
+    [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) :
+    0 ≤ qBipartiteMatchMass ψ A B := by
+  unfold qBipartiteMatchMass
+  exact Finset.sum_nonneg fun a _ =>
+    ev_nonneg_of_psd ψ _ (opTensor_nonneg (A.outcome_pos a) (B.outcome_pos a))
+
+/-- For a normalized state, a bipartite consistency defect is at most `1`. -/
+theorem qBipartiteConsDefect_le_one_of_isNormalized {Outcome : Type*}
+    {ιA ιB : Type*} [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB]
+    [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (hψ : ψ.IsNormalized)
+    (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) :
+    qBipartiteConsDefect ψ A B ≤ 1 := by
+  have hmatch_nonneg : 0 ≤ qBipartiteMatchMass ψ A B :=
+    qBipartiteMatchMass_nonneg ψ A B
+  have htotal_le_one : ev ψ (opTensor A.total B.total) ≤ 1 := by
+    calc
+      ev ψ (opTensor A.total B.total)
+        ≤ ev ψ (leftTensor (ι₂ := ιB) A.total) := by
+            exact ev_mono ψ _ _
+              (opTensor_le_leftTensor (ι₂ := ιB) (SubMeas.total_nonneg A) B.total_le_one)
+      _ ≤ ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+            exact ev_mono ψ _ _ (leftTensor_le_one (ι₂ := ιB) A.total_le_one)
+      _ = 1 := ev_one_of_isNormalized ψ hψ
+  unfold qBipartiteConsDefect
+  apply max_le
+  · norm_num
+  · linarith
+
+/-- Under the uniform question distribution, the averaged bipartite consistency
+error is bounded by `1`. -/
+theorem bipartiteConsError_uniform_le_one {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype Question] [DecidableEq Question] [Nonempty Question]
+    [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (hψ : ψ.IsNormalized)
+    (A : IdxSubMeas Question Outcome ιA) (B : IdxSubMeas Question Outcome ιB) :
+    bipartiteConsError ψ (uniformDistribution Question) A B ≤ 1 := by
+  unfold bipartiteConsError
+  calc
+    avgOver (uniformDistribution Question) (fun q => qBipartiteConsDefect ψ (A q) (B q))
+      ≤ avgOver (uniformDistribution Question) (fun _ : Question => 1) := by
+          refine avgOver_mono _ _ _ ?_
+          intro q
+          exact qBipartiteConsDefect_le_one_of_isNormalized ψ hψ (A q) (B q)
+    _ = 1 := avgOver_uniform_const 1
+
 /-- The bipartite strong self-consistency defect is nonneg by definition (`max 0 _`). -/
 theorem qBipartiteSSCDefect_nonneg {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
