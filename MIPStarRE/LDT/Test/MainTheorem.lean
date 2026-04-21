@@ -99,14 +99,16 @@ def TwoProverClassicalLIDPassCondition (params : Parameters)
 surface-versus-point soundness theorem.
 
 This keeps the quoted classical theorem explicit, rather than making it an
-ambient axiom. Downstream wrappers take a term of this `Prop` as an explicit
-hypothesis, mirroring `PolishchukSpielmanClassicalSoundnessStatement`. -/
+ambient axiom. As with `PolishchukSpielmanClassicalSoundnessStatement`, the
+ambient point-answer function `a`, error parameter `eps`, and chosen slack bound
+`slackBound` are explicit parameters of the statement, so downstream wrappers
+ask only for the specialized instance they actually use. -/
 def RazSafraSoundnessStatement (params : Parameters)
-    [FieldModel params.q] : Prop :=
-  ∀ (a : Point params → Fq params) (eps : Error),
-    SurfaceVsPointPassCondition params a eps →
-      ∃ slack : Error,
-        PointAnswerSoundnessConclusion params a (razSafraSlackBound params eps) slack
+    [FieldModel params.q]
+    (a : Point params → Fq params) (eps slackBound : Error) : Prop :=
+  SurfaceVsPointPassCondition params a eps →
+    ∃ slack : Error,
+      PointAnswerSoundnessConclusion params a slackBound slack
 
 /-- Hypothesis-style interface for the classical low-individual-degree
 soundness result of Polishchuk and Spielman.
@@ -137,10 +139,10 @@ theorem razSafra
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps : Error)
     (hpass : SurfaceVsPointPassCondition params a eps)
-    (hRS : RazSafraSoundnessStatement params) :
+    (hRS : RazSafraSoundnessStatement params a eps (razSafraSlackBound params eps)) :
     ∃ slack : Error,
       PointAnswerSoundnessConclusion params a (razSafraSlackBound params eps) slack := by
-  exact hRS a eps hpass
+  exact hRS hpass
 
 /-- `thm:classical-test-soundness`.
 
