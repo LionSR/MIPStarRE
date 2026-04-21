@@ -1,6 +1,6 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-18
+Last updated: 2026-04-21
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
@@ -107,6 +107,9 @@ Last updated: 2026-04-18
   - repaired `ProjStrat.lowIndividualDegreeFailureProbability` so its
     self-consistency branch is the paper's cross-player point-agreement test
   - proved `ProjStrat.point_agreement_le_three_mul`
+  - exposed the paper-faithful branch API
+    `ProjStrat.pointAgreementFailureProbability` together with
+    `ProjStrat.lowIndividualDegreeFailureProbability_eq_branchAverage`
   - removed the stale left/right surrogate theorems and replaced them by the
     paper-faithful symmetrization results
     `ProjStrat.classicalRoleSymmStrategy_axisParallel_eq_roleAverage`,
