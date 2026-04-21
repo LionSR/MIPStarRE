@@ -315,7 +315,7 @@ theorem gCommStabilityTwo_overlap
       hle
 
 /-- Unfold the first stability relation into its averaged scalar defect term. -/
-lemma gCommStabilityOne_scalar_gap
+private lemma gCommStabilityOne_scalar_gap
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
@@ -373,7 +373,7 @@ lemma gCommStabilityOne_scalar_gap
     _ ≤ Real.sqrt zeta := hstab
 
 /-- Unfold the second stability relation into its averaged scalar defect term. -/
-lemma gCommStabilityTwo_scalar_gap
+private lemma gCommStabilityTwo_scalar_gap
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)

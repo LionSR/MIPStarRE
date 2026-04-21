@@ -350,6 +350,8 @@ lemma normalizedTrace_re_two_smul_rolePairCond {ι : Type*}
     _ = (2 : Error)⁻¹ * Complex.re (MIPStarRE.Quantum.normalizedTrace X) := by
           norm_num [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
 
+/-- A swap-invariant density operator induces the cached one-sided expectation
+symmetry packaged by `PermInvState`. -/
 theorem PermInvState.of_density_swap {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι))
     (hfix : swapDensity ψ.density = ψ.density) :
@@ -371,6 +373,8 @@ theorem PermInvState.of_density_swap {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 namespace PermInvState
 
+/-- A permutation-invariant bipartite state has the same expectation against an
+operator and its tensor-factor swap. -/
 lemma ev_swapDensity {ι : Type*} [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState (ι × ι)}
     (hperm : PermInvState ψ)
@@ -385,6 +389,8 @@ lemma ev_swapDensity {ι : Type*} [Fintype ι] [DecidableEq ι]
     _ = MIPStarRE.Quantum.normalizedTrace (ψ.density * Z) :=
           normalizedTrace_swapDensity _
 
+/-- Expectations of simple tensors are invariant under swapping the two local
+factors. -/
 lemma ev_opTensor_swap {ι : Type*} [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState (ι × ι)}
     (hperm : PermInvState ψ)
@@ -397,6 +403,8 @@ lemma ev_opTensor_swap {ι : Type*} [Fintype ι] [DecidableEq ι]
     simp [swapDensity, opTensor, mul_comm]]
   exact (hperm.ev_swapDensity (opTensor X Y)).symm
 
+/-- The bipartite match mass is symmetric in its two submeasurements on a
+permutation-invariant state. -/
 lemma qBipartiteMatchMass_symm {Outcome ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState (ι × ι)}
@@ -408,6 +416,8 @@ lemma qBipartiteMatchMass_symm {Outcome ι : Type*}
   intro a _
   simpa using hperm.ev_opTensor_swap (A.outcome a) (B.outcome a)
 
+/-- The bipartite consistency defect is symmetric in its two submeasurements on
+a permutation-invariant state. -/
 lemma qBipartiteConsDefect_symm {Outcome ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState (ι × ι)}
@@ -417,6 +427,8 @@ lemma qBipartiteConsDefect_symm {Outcome ι : Type*}
   simp [qBipartiteConsDefect, hperm.ev_opTensor_swap A.total B.total,
     hperm.qBipartiteMatchMass_symm A B]
 
+/-- Averaged bipartite consistency error is symmetric under exchanging the two
+indexed submeasurement families. -/
 lemma bipartiteConsError_symm {Question Outcome ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState (ι × ι)}
@@ -429,6 +441,8 @@ lemma bipartiteConsError_symm {Question Outcome ι : Type*}
   intro q
   exact hperm.qBipartiteConsDefect_symm (A q) (B q)
 
+/-- A `ConsRel` hypothesis may be flipped left-to-right on a
+permutation-invariant state without changing the error bound. -/
 lemma consRel_swap {Question Outcome ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState (ι × ι)}

@@ -1,10 +1,5 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
-import MIPStarRE.LDT.Commutativity.Scaffold.Symmetry
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseOneThree
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseTwo
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.PhaseFourFive
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
-import MIPStarRE.LDT.Commutativity.GCommStability.OverlapTwo
 
 namespace MIPStarRE.LDT.Commutativity
 
@@ -91,76 +86,11 @@ private lemma evaluatedSlice_scalar_chain_bound
   -- The algebraic qSDDOp expansions and stability families are defined
   -- in Commutativity/Defs.lean; the Cauchy-Schwarz bridges are in
   -- Preliminaries/CauchySchwarz.lean.
-  let pointMeas : IdxMeas (Point params.next) (Fq params) ι :=
-    fun u => by
-      simpa [Parameters.next] using (strategy.pointMeasurement u).toMeasurement
   have h𝒟 :
       ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
         (uniformDistribution (EvaluatedSliceQuestion params)).weight q ≤ 1 := by
     simpa using
       uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
-  -- `consSubMeas` takes the evaluated family first and the point measurement
-  -- second, so we use the new swapped consistency API here.
-  have hpointCons_swapped :
-      ConsRel strategy.state
-        (uniformDistribution (Point params.next))
-        (evaluatedPointFamily params family)
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        zeta := by
-    exact
-      evaluatedPointFamily_pointConsistency_swapped
-        params strategy family zeta _hcons
-  have hcombined :
-      SDDRel strategy.state
-        (uniformDistribution (Point params.next))
-        (IdxSubMeas.liftLeft (evaluatedPointFamily params family))
-        (MIPStarRE.LDT.Preliminaries.totalSandwichFamily
-          (evaluatedPointFamily params family) pointMeas)
-        (4 * zeta) := by
-    exact
-      (MIPStarRE.LDT.Preliminaries.consSubMeas
-        strategy.state
-        (uniformDistribution (Point params.next))
-        (evaluatedPointFamily params family)
-        pointMeas
-        zeta
-        hpointCons_swapped).combinedControl
-  have hcombined_fst :
-      SDDRel strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q => evaluatedPointFamilyLeft params family q.1)
-        (fun q =>
-          (MIPStarRE.LDT.Preliminaries.totalSandwichFamily
-            (evaluatedPointFamily params family) pointMeas) q.1)
-        (4 * zeta) := by
-    rcases hcombined with ⟨hcombined⟩
-    constructor
-    simpa [sddError, evaluatedPointFamilyLeft, Parameters.next,
-      evaluatedPointFamily, IdxSubMeas.liftLeft, SubMeas.liftLeft, pointMeas] using
-      (avgOver_uniform_fst (α := Point params.next) (β := Point params.next)
-        (f := fun u =>
-          qSDD strategy.state
-            ((IdxSubMeas.liftLeft (evaluatedPointFamily params family)) u)
-            ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
-              (evaluatedPointFamily params family) pointMeas) u))).trans_le hcombined
-  have hcombined_snd :
-      SDDRel strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q => evaluatedPointFamilyLeft params family q.2)
-        (fun q =>
-          (MIPStarRE.LDT.Preliminaries.totalSandwichFamily
-            (evaluatedPointFamily params family) pointMeas) q.2)
-        (4 * zeta) := by
-    rcases hcombined with ⟨hcombined⟩
-    constructor
-    simpa [sddError, evaluatedPointFamilyLeft, Parameters.next,
-      evaluatedPointFamily, IdxSubMeas.liftLeft, SubMeas.liftLeft, pointMeas] using
-      (avgOver_uniform_snd (α := Point params.next) (β := Point params.next)
-        (f := fun u =>
-          qSDD strategy.state
-            ((IdxSubMeas.liftLeft (evaluatedPointFamily params family)) u)
-            ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
-              (evaluatedPointFamily params family) pointMeas) u))).trans_le hcombined
   have hpostSSC_fst :=
     evaluatedPointSelfConsistency_fst params strategy family zeta _hpostSSC
   have hpostSSC_snd :=
@@ -168,26 +98,6 @@ private lemma evaluatedSlice_scalar_chain_bound
   have htail :=
     evaluatedSlice_phaseEightNine_tail_bound
       params strategy zeta _hnorm family _hpostSSC
-  have hphase1 :=
-    evaluatedSlice_phaseOne_insert_bound
-      params strategy zeta _hnorm family hcombined_snd
-  have hphase2 :=
-    evaluatedSlice_phaseTwo_scalar_rewrite params strategy family G _hG
-  have hstab1 :=
-    gCommStability_overlap params strategy zeta _hnorm family G _hG _hself
-  have hgap1 :=
-    gCommStabilityOne_scalar_gap params strategy family G _hG zeta hstab1
-  have hphase3 :=
-    evaluatedSlice_phaseThree_insert_bound
-      params strategy zeta _hnorm family hcombined_fst
-  have hphase5 :=
-    evaluatedSlice_phaseFive_scalar_rewrite params strategy family G _hG
-  have hstab2 :=
-    gCommStabilityTwo_overlap params strategy gamma zeta _hnorm family G _hG _hself
-  have hgap2 :=
-    gCommStabilityTwo_scalar_gap params strategy family G _hG gamma zeta hstab2
-  have hswap :=
-    evaluatedSliceCommutation_avg_swap_terms params strategy family
   sorry
 
 /-- `lem:comm-data-processed-g`. -/
