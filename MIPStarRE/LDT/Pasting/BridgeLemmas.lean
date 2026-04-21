@@ -255,6 +255,12 @@ private lemma verticalLine_pointAt_appendPoint
         exact (hlast hi_last).elim
     simp [AxisParallelLine.pointAt, appendPoint, him, hlast]
 
+/-- The last-coordinate axis-parallel branch of the strategy, evaluated at the
+base point of the sampled vertical line.
+
+This is the ambient-space comparison family used to bridge from the point
+measurement to vertical-line answers before transporting the statement back to
+`Point params.next`. -/
 private noncomputable def rawVerticalLineAnswerFamily
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) :
@@ -441,6 +447,11 @@ private lemma postprocess_comp
     _ = (postprocess A (fun a => g (f a))).outcome c := by
             simp [postprocess, Finset.sum_filter]
 
+/-- Pull back the vertical-line answer family along `truncatePoint`, then read
+its line polynomial at the lifted point's final coordinate.
+
+Equivalently, this turns a vertical-line answer at `u : Point params` into an
+answer family on ambient points `appendPoint params u x`. -/
 private noncomputable def liftedVerticalLineAnswerFamily
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) :
