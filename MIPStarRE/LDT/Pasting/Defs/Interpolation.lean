@@ -36,36 +36,13 @@ noncomputable def fallbackInterpolatedPolynomial (params : Parameters) [FieldMod
     simp [MvPolynomial.degreeOf_zero]
 
 /-- Extract the polynomial from a genuine slice outcome. -/
-noncomputable def extractSlicePoly {params : Parameters} {k : ℕ}
+def extractSlicePoly {params : Parameters} {k : ℕ}
     [FieldModel params.q]
     (gs : GHatTupleOutcome params k) (i : Fin k)
     (hi : i ∈ gHatTupleSupport gs) : Polynomial params := by
-  classical
-  exact (gs i).get (by
-    cases hgi : gs i with
-    | none =>
-        have hisSome : (gs i).isSome = true := by
-          simpa [gHatTupleSupport] using hi
-        simp [Option.isSome, hgi] at hisSome
-    | some p =>
-        simp)
-
-/-- Extract the polynomial from a genuine (Some) slice outcome, or fallback to zero. -/
-noncomputable def extractSliceOr0 {params : Parameters} [FieldModel params.q]
-    (g : GHatOutcome params) : PolynomialModel params :=
-  match g with
-  | some p => p.poly
-  | none => 0
-
-/-- The zero fallback and genuine slice outcomes are low individual degree. -/
-private theorem extractSliceOr0_lowIndividualDegree {params : Parameters} [FieldModel params.q]
-    (g : GHatOutcome params) (i : Fin params.m) :
-    MvPolynomial.degreeOf i (extractSliceOr0 g) ≤ params.d := by
-  cases g with
-  | none =>
-      simp [extractSliceOr0, MvPolynomial.degreeOf_zero]
-  | some p =>
-      exact p.lowIndividualDegree i
+  have hisSome : (gs i).isSome = true := by
+    simpa [gHatTupleSupport] using hi
+  exact (gs i).get hisSome
 
 /-- The old-coordinate embedding into the appended coordinate space is injective. -/
 private theorem embedCoord_injective (params : Parameters) :
@@ -134,41 +111,48 @@ private theorem interpolationEligible_card_le {params : Parameters} {k : ℕ}
     params.d + 1 ≤ (gHatTupleSupport gs).card := by
   simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible
 
-/-- A chosen `d+1`-element subset of the genuine completed-slice support. -/
-noncomputable def interpolationSupportSubset {params : Parameters} {k : ℕ}
+/-- `InterpolationEligible params` is decidable without invoking classical logic:
+it is the finite inequality `d + 1 ≤ |support(gs)|`, where the support is computed
+by filtering the finite index set. -/
+instance interpolationEligible_decidablePred (params : Parameters) [FieldModel params.q]
+    {k : ℕ} : DecidablePred (InterpolationEligible params (k := k)) := by
+  intro gs
+  unfold InterpolationEligible gHatTupleHammingWeight gHatTupleSupport
+  infer_instance
+
+/-- A chosen `d+1`-element interpolation support together with the proof fields that
+show it lies inside the genuine completed-slice support. The choice is arbitrary,
+and the current implementation still obtains it via `Classical.choose`; packaging
+the subset with its properties makes that nonconstructive choice explicit to callers. -/
+structure InterpolationSupportWitness (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (gs : GHatTupleOutcome params k) where
+  support : Finset (Fin k)
+  subset_support : support ⊆ gHatTupleSupport gs
+  card_eq : support.card = params.d + 1
+
+/-- Choose an explicit `d+1`-point interpolation support inside the genuine support of
+an interpolation-eligible tuple. This is currently the only remaining
+nonconstructive step in the interpolation path. -/
+noncomputable def interpolationSupportWitness {params : Parameters} {k : ℕ}
     [FieldModel params.q] (gs : GHatTupleOutcome params k)
-    (hEligible : InterpolationEligible params gs) : Finset (Fin k) :=
-  Classical.choose <|
+    (hEligible : InterpolationEligible params gs) :
+    InterpolationSupportWitness params gs :=
+  let hσ : ∃ σ : Finset (Fin k), σ ⊆ gHatTupleSupport gs ∧ σ.card = params.d + 1 :=
     Finset.exists_subset_card_eq (interpolationEligible_card_le hEligible)
-
-/-- The chosen interpolation support lies inside the genuine support.
-Used downstream to ensure the Lagrange interpolation correctness property
-(`Lagrange.eval_basis_self`) holds when combined with `distinctTupleDistribution`. -/
-theorem interpolationSupportSubset_subset {params : Parameters} {k : ℕ}
-    [FieldModel params.q] (gs : GHatTupleOutcome params k)
-    (hEligible : InterpolationEligible params gs) :
-    interpolationSupportSubset gs hEligible ⊆ gHatTupleSupport gs :=
-  (Classical.choose_spec
-    (Finset.exists_subset_card_eq
-      (interpolationEligible_card_le hEligible))).1
-
-/-- The chosen interpolation support has exactly `d+1` points. -/
-theorem interpolationSupportSubset_card {params : Parameters} {k : ℕ}
-    [FieldModel params.q] (gs : GHatTupleOutcome params k)
-    (hEligible : InterpolationEligible params gs) :
-    (interpolationSupportSubset gs hEligible).card = params.d + 1 :=
-  (Classical.choose_spec
-    (Finset.exists_subset_card_eq
-      (interpolationEligible_card_le hEligible))).2
+  { support := Classical.choose hσ
+    subset_support := (Classical.choose_spec hσ).1
+    card_eq := (Classical.choose_spec hσ).2 }
 
 /-- Interpolate from a specified `d+1`-element index set to recover
 a polynomial in `m+1` variables via Lagrange interpolation.
-The degree bound (`lowIndividualDegree ≤ d`) holds for any `σ`;
-the interpolation correctness property (that `restrictAtHeight`
-of the result agrees with each slice) additionally requires
-`σ ⊆ gHatTupleSupport gs` and distinct evaluation points, which
-are ensured by the caller via `interpolationSupportSubset_subset`
-and `distinctTupleDistribution`.
+The caller must provide `hσsupport : σ ⊆ gHatTupleSupport gs`, i.e. every
+interpolation node is a genuine completed-slice outcome. This keeps the support
+precondition explicit instead of silently falling back to the zero polynomial.
+
+The degree bound (`lowIndividualDegree ≤ d`) holds for any `σ` with
+`σ.card = d+1`; the interpolation correctness property (that `restrictAtHeight`
+of the result agrees with each slice) additionally requires distinct evaluation
+points, which are ensured by the caller together with `hσsupport`.
 
 The coefficient is Mathlib's `Lagrange.basis σ v i`, the polynomial
 `∏ j ∈ σ.erase i, (X - v j) / (v i - v j)`, evaluated at the appended
@@ -176,31 +160,32 @@ coordinate. -/
 noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
     [FieldModel params.q] {k : ℕ} (xs : PointTuple params k)
     (gs : GHatTupleOutcome params k) (σ : Finset (Fin k))
+    (hσsupport : σ ⊆ gHatTupleSupport gs)
     (hσcard : σ.card = params.d + 1) : Polynomial params.next where
-  poly := ∑ i ∈ σ,
+  poly := ∑ idx ∈ σ.attach,
     let slicePoly :=
       MvPolynomial.rename (embedCoord params)
-        (extractSliceOr0 (gs i))
+        (extractSlicePoly gs idx.1 (hσsupport idx.2)).poly
     let Li : _root_.Polynomial (Scalar params) :=
-      Lagrange.basis σ (fun i => decodeScalar (xs i)) i
+      Lagrange.basis σ (fun i => decodeScalar (xs i)) idx.1
     let LiMv :=
       Li.eval₂ MvPolynomial.C
         (MvPolynomial.X (lastCoord params))
     LiMv * slicePoly
   lowIndividualDegree := by
     intro coord
-    refine (MvPolynomial.degreeOf_sum_le coord σ _).trans ?_
-    refine Finset.sup_le fun idx hidx => ?_
+    refine (MvPolynomial.degreeOf_sum_le coord σ.attach _).trans ?_
+    refine Finset.sup_le fun idx _hidx => ?_
+    let slice : Polynomial params := extractSlicePoly gs idx.1 (hσsupport idx.2)
     let slicePoly : PolynomialModel params.next :=
-      MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs idx))
+      MvPolynomial.rename (embedCoord params) slice.poly
     let Li : _root_.Polynomial (Scalar params) :=
-      Lagrange.basis σ (fun i => decodeScalar (xs i)) idx
+      Lagrange.basis σ (fun i => decodeScalar (xs i)) idx.1
     let LiMv : PolynomialModel params.next :=
       Li.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
     have hLi_natDegree : Li.natDegree ≤ params.d := by
-      have hbasis :
-          Li.natDegree ≤ σ.card - 1 := by
-        exact natDegree_lagrangeBasis_le_card_sub_one hidx
+      have hbasis : Li.natDegree ≤ σ.card - 1 := by
+        exact natDegree_lagrangeBasis_le_card_sub_one idx.2
       simpa [Li, hσcard] using hbasis
     by_cases hcoord : coord.val < params.m
     · let oldCoord : Fin params.m := ⟨coord.val, hcoord⟩
@@ -218,11 +203,11 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
             (p := Li) (i := coord) (j := lastCoord params))
       have hslice : MvPolynomial.degreeOf coord slicePoly ≤ params.d := by
         change MvPolynomial.degreeOf coord
-            (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs idx)) :
+            (MvPolynomial.rename (embedCoord params) slice.poly :
               PolynomialModel params.next) ≤ params.d
         rw [← hcoord_eq, MvPolynomial.degreeOf_rename_of_injective
           (embedCoord_injective params)]
-        exact extractSliceOr0_lowIndividualDegree (gs idx) oldCoord
+        exact slice.lowIndividualDegree oldCoord
       calc
         MvPolynomial.degreeOf coord (LiMv * slicePoly)
             ≤ MvPolynomial.degreeOf coord LiMv + MvPolynomial.degreeOf coord slicePoly := by
@@ -246,7 +231,7 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
         exact hLiMv_nat.trans hLi_natDegree
       have hslice_zero : MvPolynomial.degreeOf (lastCoord params) slicePoly ≤ 0 := by
         change MvPolynomial.degreeOf (lastCoord params)
-            (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs idx)) :
+            (MvPolynomial.rename (embedCoord params) slice.poly :
               PolynomialModel params.next) ≤ 0
         rw [degreeOf_rename_embedCoord_last]
       calc

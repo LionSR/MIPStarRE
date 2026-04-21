@@ -31,8 +31,10 @@ def IsGloballyConsistent (params : Parameters) [FieldModel params.q]
       (Polynomial.restrictAtHeight params h (xs i)).poly =
         ((gs i).get hi).poly
 
-/-- `IsGloballyConsistent params xs` is decidable (classically),
-needed for `restrictSubMeas` filtering. -/
+/-- `IsGloballyConsistent params xs` is only classically decidable.
+The predicate quantifies over a witness polynomial in the ambient global polynomial
+space, so there is no finitary decision procedure to search for such a witness.
+This nonconstructive instance is used only for finite `restrictSubMeas` filters. -/
 noncomputable instance isGloballyConsistent_decidablePred
     (params : Parameters) [FieldModel params.q] {k : ℕ}
     (xs : PointTuple params k) :
@@ -58,16 +60,19 @@ def nonglobalOutcomesByType (params : Parameters) [FieldModel params.q]
 
 On the actual pasting path this map is only applied after restricting to tuples in
 `Global_τ(x)`, so it may choose any globally consistent witness. When no such
-witness exists, it falls back to the distinguished zero polynomial. -/
+witness exists, it falls back to the distinguished zero polynomial.
+
+In the eligible branch we make the interpolation support witness explicit: a chosen
+subset `σ ⊆ support(gs)` of size `d+1` is packaged together with its proof fields and
+then passed to `interpolateCompletedSlicesFromSupport`. -/
 noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel params.q] :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
   | 0, _xs, _gs => fallbackInterpolatedPolynomial params
-  | k + 1, xs, gs => by
-      classical
-      exact if hEligible : InterpolationEligible params gs then
-        let σ := interpolationSupportSubset gs hEligible
-        interpolateCompletedSlicesFromSupport params xs gs σ
-          (interpolationSupportSubset_card gs hEligible)
+  | _ + 1, xs, gs =>
+      if hEligible : InterpolationEligible params gs then
+        let supportData := interpolationSupportWitness gs hEligible
+        interpolateCompletedSlicesFromSupport params xs gs
+          supportData.support supportData.subset_support supportData.card_eq
       else
         fallbackInterpolatedPolynomial params
 
