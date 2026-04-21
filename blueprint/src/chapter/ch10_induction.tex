@@ -134,10 +134,25 @@
 	This is exactly Theorem~\ref{thm:ld-pasting}, restated in the induction chapter because it is the pasting input used in the proof of Theorem~\ref{thm:main-induction}.
 \end{proof}
 
+\begin{lemma}[Base case of main induction]\label{lem:main-induction-base}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}
+	\leanok
+	\uses{def:good-strategy, def:polymeasurements, def:simeq}
+	Under the hypotheses of Theorem~\ref{thm:main-induction} with $m=1$, there exists a measurement $G \in \polymeas{1}{q}{d}$ such that, on average over $u \sim \F_q$,
+	\[
+		A_a^u \ot I \simeq_\eps I \ot G_{[g(u)=a]},
+	\]
+	which is stronger than the bound required by Theorem~\ref{thm:main-induction} for $m=1$.
+\end{lemma}
+\begin{proof}
+	\leanok
+	For $m=1$, there is only one axis-parallel line $\ell$ in $\F_q$, so the line measurement $B^\ell$ is already an element of $\polymeas{1}{q}{d}$. Because the strategy fails the axis-parallel lines test with probability at most $\eps$, the consistency bound follows directly from the axis-parallel consistency hypothesis.
+\end{proof}
+
 \begin{theorem}[Main induction]\label{thm:main-induction}
   \lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
 	\leanok
-	\uses{def:good-strategy, def:polymeasurements, def:simeq, thm:raz-safra}
+	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
@@ -152,18 +167,13 @@
   \]
 \end{theorem}
 \begin{proof}
-	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section}
+	\uses{lem:restricted-probabilities, lem:main-induction-base, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section}
 	In Lean, the still-partial assembly is factored through the internal bookkeeping packages
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionPackage, MIPStarRE.LDT.MainInductionStep.PerSliceInductionPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.PastingPackage}
 	which mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
-	The proof is by induction on $m$. For $m=1$, there is only one axis-parallel line $\ell$ in $\F_q$, so the line measurement $B^\ell$ is already an element of $\polymeas{1}{q}{d}$. Because the strategy fails the axis-parallel lines test with probability at most $\eps$,
-	\[
-		A_a^u \ot I \simeq_\eps I \ot B^\ell_{[f(u)=a]}
-	\]
-	on average over $u \sim \F_q$, and this is stronger than the theorem's claim.
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}
+	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.
 
 	For the step from $m$ to $m+1$, let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test, and let $k \ge (m+1)d$. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the $x$-restricted strategy, with failure parameters $\eps_x,\delta_x,\gamma_x$. Apply the induction hypothesis to each restricted strategy with the same integer $k$ and define
 	\[

@@ -181,35 +181,9 @@ theorem ldPastingInInductionSection
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 
-
-private theorem axisParallelThroughPoint_pointAt_sampleParameter
-    (params : Parameters) [FieldModel params.q]
-    (u : Point params) (i : Fin params.m) :
-    (AxisParallelLine.throughPoint (params := params) u i).pointAt
-        (AxisParallelLine.sampleParameter (params := params) u i) = u := by
-  ext j
-  by_cases h : j = i
-  · subst h
-    simp [AxisParallelLine.throughPoint, AxisParallelLine.pointAt,
-      AxisParallelLine.sampleParameter, addCoord, zeroCoord]
-  · simp [AxisParallelLine.throughPoint, AxisParallelLine.pointAt, h]
-
-private theorem rebaseAt_throughPoint_sampleParameter
-    (params : Parameters) [FieldModel params.q]
-    (u : Point params) (i : Fin params.m) :
-    AxisParallelLine.rebaseAt
-        (AxisParallelLine.throughPoint (params := params) u i)
-        (AxisParallelLine.sampleParameter (params := params) u i) =
-      { base := u, direction := i } := by
-  change
-    ({ base :=
-        (AxisParallelLine.throughPoint (params := params) u i).pointAt
-          (AxisParallelLine.sampleParameter (params := params) u i)
-       direction := i } : AxisParallelLine params) =
-      { base := u, direction := i }
-  congr
-  exact axisParallelThroughPoint_pointAt_sampleParameter params u i
-
+/-- At `m = 1`, `AxisParallelLine.throughPoint u i` does not depend on the
+base point `u`: all axis-parallel lines in direction `i` are geometrically the
+unique line and share the same canonical representative. -/
 private theorem throughPoint_eq_zeroPoint_of_m_eq_one
     (params : Parameters) [FieldModel params.q]
     (hm1 : params.m = 1)
@@ -749,7 +723,7 @@ theorem mainInductionBaseCase
                   (AxisParallelLine.throughPoint (params := params) u i0)
                   (AxisParallelLine.sampleParameter (params := params) u i0))).toSubMeas)
               (· zeroCoord)).outcome a := by
-                simpa [rebaseAt_throughPoint_sampleParameter params u i0]
+                simpa [AxisParallelLine.rebaseAt_throughPoint_sampleParameter]
         _ = (postprocess
               ((strategy.axisParallelMeasurement
                 (AxisParallelLine.throughPoint (params := params) u i0)).toSubMeas)

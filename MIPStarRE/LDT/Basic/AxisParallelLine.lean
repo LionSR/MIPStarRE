@@ -78,6 +78,34 @@ def rebaseAt {params : Parameters} [FieldModel params.q]
     (rebaseAt ℓ t).direction = ℓ.direction :=
   rfl
 
+/-- The canonical affine parameterization of `throughPoint u i` at parameter
+`sampleParameter u i = u i` returns the original point `u`. -/
+@[simp] theorem throughPoint_pointAt_sampleParameter {params : Parameters}
+    [FieldModel params.q] (u : Point params) (i : Fin params.m) :
+    (throughPoint (params := params) u i).pointAt
+        (sampleParameter (params := params) u i) = u := by
+  ext j
+  by_cases h : j = i
+  · subst h
+    simp [throughPoint, pointAt, sampleParameter, addCoord, zeroCoord]
+  · simp [throughPoint, pointAt, h]
+
+/-- Rebasing the canonical line `throughPoint u i` at its sample parameter yields
+the axis-parallel line with base `u` and direction `i`. -/
+@[simp] theorem rebaseAt_throughPoint_sampleParameter {params : Parameters}
+    [FieldModel params.q] (u : Point params) (i : Fin params.m) :
+    rebaseAt (throughPoint (params := params) u i)
+        (sampleParameter (params := params) u i) =
+      { base := u, direction := i } := by
+  change
+    ({ base :=
+        (throughPoint (params := params) u i).pointAt
+          (sampleParameter (params := params) u i)
+       direction := i } : AxisParallelLine params) =
+      { base := u, direction := i }
+  congr
+  exact throughPoint_pointAt_sampleParameter u i
+
 /-- Embed an axis-parallel line into the slice at height `x`. -/
 def appendAtHeight (params : Parameters)
     (ℓ : AxisParallelLine params) (x : Fq params) : AxisParallelLine params.next where
