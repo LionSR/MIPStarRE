@@ -292,7 +292,7 @@ structure SelfImprovementPackage (params : Parameters)
 namespace SelfImprovementPackage
 
 /-- The slice-indexed polynomial family obtained by collecting the improved
-slice measurements `Ĝ^x`. -/
+slice measurements `Ĝ^x` together with the slice-wise witnesses `Z^x`. -/
 noncomputable def family {params : Parameters}
     [FieldModel params.q]
     {strategy : SymStrat params.next ι}
@@ -301,8 +301,11 @@ noncomputable def family {params : Parameters}
     {inductionPkg :
       PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k}
     (pkg : SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg) :
-    IdxPolyFamily params ι :=
-  IdxPolyFamily.ofSymStrat strategy pkg.sliceProj
+    IdxPolyFamily params ι where
+  meas := pkg.sliceProj
+  witness := pkg.sliceWitness
+  dominationTarget := fun x g =>
+    IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g
 
 @[simp] theorem family_meas {params : Parameters}
     [FieldModel params.q]
@@ -313,6 +316,31 @@ noncomputable def family {params : Parameters}
       PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k}
     (pkg : SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg) :
     pkg.family.meas = pkg.sliceProj :=
+  rfl
+
+@[simp] theorem family_witness {params : Parameters}
+    [FieldModel params.q]
+    {strategy : SymStrat params.next ι}
+    {eps delta gamma : Error} {k : ℕ}
+    {restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma}
+    {inductionPkg :
+      PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k}
+    (pkg : SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg)
+    (x : Fq params) :
+    pkg.family.witness x = pkg.sliceWitness x :=
+  rfl
+
+@[simp] theorem family_dominationTarget {params : Parameters}
+    [FieldModel params.q]
+    {strategy : SymStrat params.next ι}
+    {eps delta gamma : Error} {k : ℕ}
+    {restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma}
+    {inductionPkg :
+      PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k}
+    (pkg : SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg)
+    (x : Fq params) (g : Polynomial params) :
+    pkg.family.dominationTarget x g =
+      IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g :=
   rfl
 
 end SelfImprovementPackage

@@ -351,11 +351,31 @@ noncomputable def SliceRestrictionPackage.ofRestrictedProbabilities
   classical
   let profile := Classical.choose hrestricted.profileExists
   let hprofile := Classical.choose_spec hrestricted.profileExists
+  have haxisAverage :
+      averageRestrictedAxisParallelError params profile ≤
+        sliceConditioningLoss params * eps := by
+    rcases hprofile with
+      ⟨_haxisWeighted, haxisAverage, _hselfAverage, _hdiagWeighted,
+        _hdiagAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
+    exact haxisAverage
+  have hselfAverage :
+      averageRestrictedSelfConsistencyError params profile ≤ delta := by
+    rcases hprofile with
+      ⟨_haxisWeighted, _haxisAverage, hselfAverage, _hdiagWeighted,
+        _hdiagAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
+    exact hselfAverage
+  have hdiagonalAverage :
+      averageRestrictedDiagonalError params profile ≤
+        sliceDiagonalConditioningLoss params * gamma := by
+    rcases hprofile with
+      ⟨_haxisWeighted, _haxisAverage, _hselfAverage, _hdiagWeighted,
+        hdiagonalAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
+    exact hdiagonalAverage
   exact
     { profile := profile
-      axisAverageBound := hprofile.2.1
-      selfAverageBound := hprofile.2.2.1
-      diagonalAverageBound := hprofile.2.2.2.2.1 }
+      axisAverageBound := haxisAverage
+      selfAverageBound := hselfAverage
+      diagonalAverageBound := hdiagonalAverage }
 
 /-- Turn the recursive family of slice-wise induction witnesses into explicit
 slice data `x ↦ (σ_x, G^x)`. -/
@@ -443,12 +463,6 @@ theorem mainInductionBridgeWitness
     (hpaste : PastingPackage params strategy eps delta gamma k hself)
     (hk : 400 * params.m * params.d ≤ k) :
     MainInductionBridgePackage params.next strategy eps delta gamma k := by
-  let _restrictedStrategy : Fq params → RestrictedSymStrat params ι :=
-    fun x => xRestrictedStrategy params strategy x
-  let _sliceMeasurement : Fq params → Measurement (Polynomial params) ι :=
-    hinduction.sliceMeasurement
-  let _improvedMeasurement : Fq params → ProjSubMeas (Polynomial params) ι :=
-    hself.sliceProj
   let family : IdxPolyFamily params ι := hself.family
   let kappa : Error := hpaste.kappa
   let zeta : Error := hpaste.zeta
@@ -511,7 +525,11 @@ theorem mainInductionBaseCase
 Given the slice restriction package, a recursive producer for the slice
 induction witnesses, and a producer for the corresponding slice-wise
 self-improvement package, this theorem runs the remaining skeletal assembly up
-to the explicit averaged pasting package. -/
+to the explicit averaged pasting package.
+
+Note: the current `hselfProducer` is still an explicit input because the
+paper-faithful hook from `selfImprovementInInductionSection` to the restricted
+slice objects is part of the remaining assembly tracked by `TODO(#552)`. -/
 theorem mainInductionByRecursionOnM
     (params : Parameters)
     [FieldModel.{0} params.q]
