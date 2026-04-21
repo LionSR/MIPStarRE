@@ -117,28 +117,30 @@ lemma fromHToG
     (b) commute leftmost Ĝ past remaining factors (√ν₄),
     (c) move leftmost to 2nd tensor factor (√(2ζ)).
     Per-step error: 2√(2ζ) + 2√ν₄ = fromHToGRecurrenceError. -/
-    /- Outstanding gap (tracked in issue #395):
-    `fromHToGRecurrenceLeftFamily` / `fromHToGRecurrenceRightFamily`
-    (`Sandwich.lean:930-955`) are currently in collapsed form
-    `allOutcomesExpansion.total * suffixBernoulliWeightOperator k ℓ τ` and
-    `bernoulliTailFromFamily.total * suffixBernoulliWeightOperator k ℓ τ`;
-    the paper's recurrence step relates the *intermediate* family
-    `Ĥ^{x_≥ℓ} ⊗ S_{τ_≥ℓ}` to `Ĥ^{x_>ℓ} ⊗ S_{τ_>ℓ}` (eq:i-think-this-is-what-
-    i'm-supposed-to-prove-2). To finish this case the families need to be
-    refactored to expose the per-step Ĥ-on-suffix structure (a new
-    `intermediateHSuffixFamily k ℓ` definition), then the three commutation
-    sub-steps above can be discharged using `hhalf` (for √ν₄) and
-    `cor:G-hat-facts` (for √(2ζ)), each composed via `sddOpRel_mono` /
-    `sddOpRel_trans`, reusing `hself`/`hcons`/`hbound` directly against
-    `strategy.state`. -/
+    /- Remaining obstruction after the issue #395 refactor:
+    `fromHToGRecurrenceLeftFamily` / `fromHToGRecurrenceRightFamily` now carry
+    the correct suffix-stage operators
+    `E_{x_{≥ℓ}} ∑_{g_{≥ℓ} ∈ Outcomes_{τ_{≥ℓ}}} Ĥ^{x_{≥ℓ}}_{g_{≥ℓ}} ⊗ S_{τ_{≥ℓ}}`
+    and `E_{x_{>ℓ}} ∑_{g_{>ℓ} ∈ Outcomes_{τ_{>ℓ}}} Ĥ^{x_{>ℓ}}_{g_{>ℓ}} ⊗ S_{τ_{>ℓ}}`,
+    with `RightFamily ℓ = LeftFamily (ℓ + 1)` by `rfl`. What is still missing is
+    the bridge from these averaged/type-restricted suffix families to the
+    existing commutation infrastructure: the proof needs (1) a suffix-length
+    specialization of `hhalf` (or a strengthened hypothesis `∀ j ≤ k, ... j`),
+    and (2) helper lemmas unpacking one stage into the paper's three substeps
+    move-right / commute / move-right so that `cor:G-hat-facts` supplies the two
+    `√(2ζ)` terms and `hhalf` supplies the `√ν₄` term via `sddOpRel_mono` /
+    `sddOpRel_trans`. -/
     sorry
   · -- bernoulliPolynomialRewrite: aggregate k recurrence steps
     constructor -- SDDRel
-    /- Aggregate k recurrence steps to show allOutcomesExpansion ≈ F(G).
-    Total error ≤ k × per-step error ≤ fromHToGError. The chained
-    `sddOpRel_trans` argument depends on the refactored families above
-    so that `RightFamily ℓ` definitionally equals `LeftFamily (ℓ+1)`,
-    enabling the telescoping in ld-pasting.tex lines 1354–1376. -/
+    /- Aggregate the `k` recurrence steps to show all-outcomes expansion
+    `≈ F(G)`. The family refactor now gives the required telescoping identity
+    `RightFamily ℓ = LeftFamily (ℓ + 1)`, but two endpoint bridges are still
+    missing: stage `0` must be identified with `allOutcomesExpansionFamily`, and
+    stage `k` with `bernoulliTailFromFamily` via the `truncatedTypeSums`
+    polynomial. After those endpoint lemmas are formalized, `sddOpRel_chain`
+    plus summation over the full types `τ : GHatType k` should close this field
+    with total error `k * fromHToGRecurrenceError ≤ fromHToGError`. -/
     sorry
 
 /-- `lem:chernoff-bernoulli-matrix`.
