@@ -271,6 +271,82 @@ lemma qMatchMass_leftRight_postprocess_ge {α β : Type*}
                       (Finset.univ.filter (fun a => f a = b)) (fun a => B.outcome a)]
             _ = fiberPair b := hfiber_expand b
 
+/-- Postprocessing can only decrease the bipartite strong self-consistency
+defect: the total mass is preserved while the diagonal overlap term can only
+increase. -/
+lemma qBipartiteSSCDefect_postprocess_le {α β : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype α] [Fintype β]
+    (ψ : QuantumState (ι × ι)) (M : SubMeas α ι) (f : α → β) :
+    qBipartiteSSCDefect ψ (postprocess M f) ≤ qBipartiteSSCDefect ψ M := by
+  have hmatch :
+      qMatchMass ψ
+          (leftPlacedSubMeas (ιB := ι) (postprocess M f))
+          (rightPlacedSubMeas (ιA := ι) (postprocess M f)) ≥
+        qMatchMass ψ
+          (leftPlacedSubMeas (ιB := ι) M)
+          (rightPlacedSubMeas (ιA := ι) M) :=
+    qMatchMass_leftRight_postprocess_ge ψ M M f
+  have hsub :
+      ev ψ (leftTensor (ι₂ := ι) M.total) -
+          qMatchMass ψ
+            (leftPlacedSubMeas (ιB := ι) (postprocess M f))
+            (rightPlacedSubMeas (ιA := ι) (postprocess M f))
+        ≤
+      ev ψ (leftTensor (ι₂ := ι) M.total) -
+          qMatchMass ψ
+            (leftPlacedSubMeas (ιB := ι) M)
+            (rightPlacedSubMeas (ιA := ι) M) := by
+    linarith
+  have hmass_post :
+      ev ψ (leftTensor (ι₂ := ι) (postprocess M f).total) =
+        ev ψ (leftTensor (ι₂ := ι) M.total) := by
+    simp [postprocess_total]
+  have hmatch_post :
+      qMatchMass ψ
+          (leftPlacedSubMeas (ιB := ι) (postprocess M f))
+          (rightPlacedSubMeas (ιA := ι) (postprocess M f)) =
+        ∑ b : β,
+          ev ψ
+            (opTensor
+              ((postprocess M f).outcome b)
+              ((postprocess M f).outcome b)) := by
+    simp [qMatchMass, leftPlacedSubMeas, rightPlacedSubMeas,
+      leftTensor_mul_rightTensor_eq_opTensor]
+  have hmatch_orig :
+      qMatchMass ψ
+          (leftPlacedSubMeas (ιB := ι) M)
+          (rightPlacedSubMeas (ιA := ι) M) =
+        ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
+    simp [qMatchMass, leftPlacedSubMeas, rightPlacedSubMeas,
+      leftTensor_mul_rightTensor_eq_opTensor]
+  have hsub' :
+      ev ψ (leftTensor (ι₂ := ι) M.total) -
+          ∑ b : β,
+            ev ψ
+              (opTensor
+                ((postprocess M f).outcome b)
+                ((postprocess M f).outcome b))
+        ≤
+      ev ψ (leftTensor (ι₂ := ι) M.total) -
+          ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
+    rw [← hmatch_post, ← hmatch_orig]
+    exact hsub
+  change
+      max 0
+          (ev ψ (leftTensor (ι₂ := ι) (postprocess M f).total) -
+            ∑ b : β,
+              ev ψ
+                (opTensor
+                  ((postprocess M f).outcome b)
+                  ((postprocess M f).outcome b)))
+        ≤
+      max 0
+          (ev ψ (leftTensor (ι₂ := ι) M.total) -
+            ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)))
+  rw [hmass_post]
+  exact max_le_max le_rfl hsub'
+
 private lemma qConsDefect_leftRight_postprocess_le {α β : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype α] [Fintype β]
