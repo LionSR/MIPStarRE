@@ -20,210 +20,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma verticalLine_pointAt_appendPoint
-    (params : Parameters) [FieldModel params.q]
-    (u : Point params) (x : Fq params) :
-    ({ base := appendPoint params u zeroCoord,
-       direction := lastCoord params } : AxisParallelLine params.next).pointAt x =
-      appendPoint params u x := by
-  ext i
-  by_cases hlast : i = lastCoord params
-  · subst i
-    have hzero : addCoord zeroCoord x = x := by
-      unfold addCoord zeroCoord
-      rw [decode_encodeScalar]
-      simp
-    simpa [AxisParallelLine.pointAt, appendPoint, lastCoord] using congrArg Fin.val hzero
-  · have him : i.1 < params.m := by
-      have hi_lt : i.1 < params.m + 1 := by simpa [Parameters.next] using i.2
-      by_cases hlt : i.1 < params.m
-      · exact hlt
-      · have hi_eq : i.1 = params.m := by omega
-        have hi_last : i = lastCoord params := by
-          apply Fin.ext
-          simp [lastCoord, hi_eq]
-        exact (hlast hi_last).elim
-    simp [AxisParallelLine.pointAt, appendPoint, him, hlast]
-
-/-- The last-coordinate axis-parallel branch of the strategy, read at the base
-point of the sampled vertical line. -/
-private noncomputable def rawVerticalLineMeasurementFamily
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) :
-    IdxMeas (Point params.next) (Fq params) ι :=
-  fun u =>
-    (ProjMeas.postprocess
-      (strategy.axisParallelMeasurement { base := u, direction := lastCoord params })
-      (· zeroCoord)).toMeasurement
-
-/-- Extract the last-coordinate axis-parallel branch from
-`hgood.axisParallelTest`, losing a factor of `m + 1` when passing from the
-uniform coordinate average to a fixed coordinate. -/
-private lemma rawVerticalLineConsistency
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma) :
-    ConsRel strategy.state
-      (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy))
-      (((params.next.m : ℕ) : Error) * eps) := by
-  let err : Fin params.next.m → Error := fun i =>
-    bipartiteConsError strategy.state
-      (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (fun u =>
-        postprocess ((strategy.axisParallelMeasurement { base := u, direction := i }).toSubMeas)
-          (· zeroCoord))
-  have haxis_avg : avgOver (uniformDistribution (Fin params.next.m)) err ≤ eps := by
-    have h_eq :
-        avgOver (uniformDistribution (Fin params.next.m)) err =
-          strategy.axisParallelFailureProbability := by
-      unfold SymStrat.axisParallelFailureProbability err
-      calc
-        avgOver (uniformDistribution (Fin params.next.m))
-            (fun i =>
-              bipartiteConsError strategy.state
-                (uniformDistribution (Point params.next))
-                (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-                (fun u => postprocess ((strategy.axisParallelMeasurement
-                  { base := u, direction := i }).toSubMeas) (· zeroCoord)))
-          = avgOver (uniformDistribution (Fin params.next.m))
-              (fun i => avgOver (uniformDistribution (Point params.next)) (fun u =>
-                qBipartiteConsDefect strategy.state
-                  ((strategy.pointMeasurement u).toSubMeas)
-                  (postprocess ((strategy.axisParallelMeasurement
-                    { base := u, direction := i }).toSubMeas) (· zeroCoord)))) := by
-                rfl
-        _ = avgOver (uniformDistribution (Fin params.next.m × Point params.next))
-              (fun iu =>
-                qBipartiteConsDefect strategy.state
-                  ((strategy.pointMeasurement iu.2).toSubMeas)
-                  (postprocess ((strategy.axisParallelMeasurement
-                    { base := iu.2, direction := iu.1 }).toSubMeas) (· zeroCoord))) := by
-                symm
-                simpa using (avgOver_uniform_prod (f := fun i u =>
-                  qBipartiteConsDefect strategy.state
-                    ((strategy.pointMeasurement u).toSubMeas)
-                    (postprocess ((strategy.axisParallelMeasurement
-                      { base := u, direction := i }).toSubMeas) (· zeroCoord))))
-        _ = avgOver (uniformDistribution (Point params.next × Fin params.next.m))
-              (fun ui =>
-                qBipartiteConsDefect strategy.state
-                  ((strategy.pointMeasurement ui.1).toSubMeas)
-                  (postprocess ((strategy.axisParallelMeasurement
-                    { base := ui.1, direction := ui.2 }).toSubMeas) (· zeroCoord))) := by
-                simpa using (avgOver_uniform_equiv
-                  (e := Equiv.prodComm (Fin params.next.m) (Point params.next))
-                  (f := fun iu : Fin params.next.m × Point params.next =>
-                    qBipartiteConsDefect strategy.state
-                      ((strategy.pointMeasurement iu.2).toSubMeas)
-                      (postprocess ((strategy.axisParallelMeasurement
-                        { base := iu.2, direction := iu.1 }).toSubMeas) (· zeroCoord))))
-        _ = strategy.axisParallelFailureProbability := by
-              rfl
-    rw [h_eq]
-    exact hgood.axisParallelTest
-  have herr_nonneg : ∀ i : Fin params.next.m, 0 ≤ err i := by
-    intro i
-    exact bipartiteConsError_nonneg strategy.state
-      (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (fun u =>
-        postprocess ((strategy.axisParallelMeasurement { base := u, direction := i }).toSubMeas)
-          (· zeroCoord))
-  let mNext : Error := ((params.next.m : ℕ) : Error)
-  have hsum_le : ∑ i : Fin params.next.m, err i ≤ mNext * eps := by
-    have hcard_ne : mNext ≠ 0 := by
-      have hpos : 0 < mNext := by
-        simpa [mNext, Parameters.next] using
-          (show 0 < (((params.m + 1 : ℕ) : Error)) by positivity)
-      exact ne_of_gt hpos
-    have havg :
-        mNext⁻¹ * ∑ i : Fin params.next.m, err i =
-          avgOver (uniformDistribution (Fin params.next.m)) err := by
-      simp [avgOver, uniformDistribution, Finset.mul_sum, mNext]
-    calc
-      ∑ i : Fin params.next.m, err i
-          = mNext * (mNext⁻¹ * ∑ i : Fin params.next.m, err i) := by
-            field_simp [hcard_ne]
-      _ = mNext * avgOver (uniformDistribution (Fin params.next.m)) err := by
-            rw [havg]
-      _ ≤ mNext * eps := by
-            gcongr
-  have hlast_le : err (lastCoord params) ≤ mNext * eps := by
-    calc
-      err (lastCoord params) ≤ ∑ i : Fin params.next.m, err i := by
-        exact Finset.single_le_sum (fun i _ => herr_nonneg i) (Finset.mem_univ _)
-      _ ≤ ((params.next.m : ℕ) : Error) * eps := hsum_le
-  constructor
-  simpa [err, rawVerticalLineMeasurementFamily, IdxMeas.toIdxSubMeas] using hlast_le
-
-/-- Reparametrizing the last-coordinate branch to the canonical vertical base
-point matches the target lifted vertical-line answer family. -/
-private lemma rawVerticalLineMeasurementFamily_eq_lifted
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) :
-    IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy) =
-      (fun u =>
-        postprocess
-          (verticalLineMeasurementFamily params strategy (truncatePoint params u))
-          (fun f => f (pointHeight params u))) := by
-  funext u
-  let verticalLine : AxisParallelLine params.next :=
-    { base := appendPoint params (truncatePoint params u) zeroCoord
-      direction := lastCoord params }
-  have happend : appendPoint params (truncatePoint params u) (pointHeight params u) = u := by
-    exact (CommutativityPoints.pointNextEquiv params).left_inv u
-  have hpt : verticalLine.pointAt (pointHeight params u) = u := by
-    calc
-      verticalLine.pointAt (pointHeight params u)
-        = appendPoint params (truncatePoint params u) (pointHeight params u) := by
-            simpa [verticalLine] using
-              verticalLine_pointAt_appendPoint params (truncatePoint params u) (pointHeight params u)
-      _ = u := happend
-  have hrebase :
-      AxisParallelLine.rebaseAt verticalLine (pointHeight params u) =
-        { base := u, direction := lastCoord params } := by
-    simpa [AxisParallelLine.rebaseAt, verticalLine] using
-      congrArg (fun base : Point params.next =>
-        ({ base := base, direction := lastCoord params } : AxisParallelLine params.next)) hpt
-  apply SubMeas.ext
-  · intro a
-    calc
-      ((IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy) u).outcome a)
-          = (postprocess ((strategy.axisParallelMeasurement { base := u, direction := lastCoord params }).toSubMeas)
-              (· zeroCoord)).outcome a := by
-              rfl
-      _ = (postprocess
-            ((strategy.axisParallelMeasurement
-              (AxisParallelLine.rebaseAt verticalLine (pointHeight params u))).toSubMeas)
-            (· zeroCoord)).outcome a := by
-              rw [hrebase]
-      _ = (postprocess ((strategy.axisParallelMeasurement verticalLine).toSubMeas)
-            (fun f => f (pointHeight params u))).outcome a := by
-              exact strategy.axisParallelReparamInvariant verticalLine (pointHeight params u) a
-      _ = (postprocess
-            (verticalLineMeasurementFamily params strategy (truncatePoint params u))
-            (fun f => f (pointHeight params u))).outcome a := by
-              simp [verticalLineMeasurementFamily, verticalLine]
-  · calc
-      ((IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy) u).total)
-          = (strategy.axisParallelMeasurement { base := u, direction := lastCoord params }).total := by
-              rfl
-      _ = 1 := (strategy.axisParallelMeasurement { base := u, direction := lastCoord params }).total_eq_one
-      _ = (strategy.axisParallelMeasurement verticalLine).total := by
-            symm
-            exact (strategy.axisParallelMeasurement verticalLine).total_eq_one
-      _ = (postprocess ((strategy.axisParallelMeasurement verticalLine).toSubMeas)
-            (fun f => f (pointHeight params u))).total := by
-              rfl
-      _ = (postprocess
-            (verticalLineMeasurementFamily params strategy (truncatePoint params u))
-            (fun f => f (pointHeight params u))).total := by
-              simp [verticalLineMeasurementFamily, verticalLine]
-
 /-- `lem:ld-gbcon`.
 
 This is the direct consistency transfer from the slice family `G^x` to the
@@ -246,6 +42,21 @@ theorem ldGbcon
           (verticalLineMeasurementFamily params strategy (truncatePoint params u))
           (fun f => f (pointHeight params u)))
       (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+  let 𝒟 := uniformDistribution (Point params.next)
+  let μ : Error := ((params.next.m : ℕ) : Error) * eps
+  let ν : Error := 8 * (params.m : Error) * eps + 4 * delta
+  let pointSub : IdxSubMeas (Point params.next) (Fq params) ι :=
+    IdxProjMeas.toIdxSubMeas strategy.pointMeasurement
+  let rawMeas : IdxMeas (Point params.next) (Fq params) ι :=
+    rawVerticalLineMeasurementFamily params strategy
+  let rawSub : IdxSubMeas (Point params.next) (Fq params) ι :=
+    rawVerticalLineAnswerFamily params strategy
+  let pointL : IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
+    IdxSubMeas.liftLeft pointSub
+  let pointR : IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
+    IdxSubMeas.liftRight pointSub
+  let rawL : IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
+    IdxSubMeas.liftLeft rawSub
   have heps_nonneg : 0 ≤ eps := by
     exact le_trans
       (bipartiteConsError_nonneg strategy.state
@@ -253,139 +64,68 @@ theorem ldGbcon
         (axisParallelPointAnswerFamily strategy)
         (axisParallelLineAnswerFamily strategy))
       hgood.axisParallelTest
-  have hraw_cons :=
-    rawVerticalLineConsistency params strategy eps delta gamma hgood
+  have hraw_cons :
+      ConsRel strategy.state 𝒟 pointSub rawSub μ := by
+    simpa [𝒟, μ, pointSub, rawMeas, rawSub] using
+      rawVerticalLineConsistency params strategy eps delta gamma hgood
   have hraw_cons_swap :
-      ConsRel strategy.state
-        (uniformDistribution (Point params.next))
-        (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (((params.next.m : ℕ) : Error) * eps) :=
-    PermInvState.consRel_swap strategy.permInvState
-      (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy))
-      (((params.next.m : ℕ) : Error) * eps)
-      hraw_cons
+      ConsRel strategy.state 𝒟 rawSub pointSub μ :=
+    PermInvState.consRel_swap strategy.permInvState 𝒟 pointSub rawSub μ hraw_cons
   have hraw_approx :
-      Preliminaries.BipartiteSDDRel strategy.state
-        (uniformDistribution (Point params.next))
-        (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (2 * (((params.next.m : ℕ) : Error) * eps)) := by
-    exact Preliminaries.simeqToApprox strategy.state
-      (uniformDistribution (Point params.next))
-      (rawVerticalLineMeasurementFamily params strategy)
-      (IdxProjMeas.toIdxMeas strategy.pointMeasurement)
-      (((params.next.m : ℕ) : Error) * eps)
-      hraw_cons_swap
+      Preliminaries.BipartiteSDDRel strategy.state 𝒟 rawSub pointSub (2 * μ) := by
+    simpa [𝒟, μ, pointSub, rawMeas, rawSub] using
+      (Preliminaries.simeqToApprox strategy.state 𝒟 rawMeas
+        (IdxProjMeas.toIdxMeas strategy.pointMeasurement) μ hraw_cons_swap)
+  have hraw_sdd_leftRight :
+      SDDRel strategy.state 𝒟 rawL pointR (2 * μ) := by
+    exact ⟨hraw_approx.leftRightSquaredDistanceBound⟩
   have hraw_sdd_rightLeft :
-      SDDRel strategy.state
-        (uniformDistribution (Point params.next))
-        (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-        (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy)))
-        (2 * (((params.next.m : ℕ) : Error) * eps)) := by
-    have hraw_sdd_leftRight :
-        SDDRel strategy.state
-          (uniformDistribution (Point params.next))
-          (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy)))
-          (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-          (2 * (((params.next.m : ℕ) : Error) * eps)) := by
-      exact ⟨hraw_approx.leftRightSquaredDistanceBound⟩
-    exact Preliminaries.sddRel_symm strategy.state
-      (uniformDistribution (Point params.next))
-      (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy)))
-      (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-      (2 * (((params.next.m : ℕ) : Error) * eps))
+      SDDRel strategy.state 𝒟 pointR rawL (2 * μ) := by
+    exact Preliminaries.sddRel_symm strategy.state 𝒟 rawL pointR (2 * μ)
       hraw_sdd_leftRight
-  have hself_rel :
-      BipartiteSSCRel strategy.state
-        (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        delta := ⟨hgood.selfConsistencyTest⟩
-  have hself_sdd :
-      SDDRel strategy.state
-        (uniformDistribution (Point params.next))
-        (IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-        (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-        (2 * delta) := by
-    exact Preliminaries.twoNotionsOfSelfConsistency strategy.state
-      (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      delta
+  have hself_rel : BipartiteSSCRel strategy.state 𝒟 pointSub delta :=
+    ⟨hgood.selfConsistencyTest⟩
+  have hself_sdd : SDDRel strategy.state 𝒟 pointL pointR (2 * delta) := by
+    exact Preliminaries.twoNotionsOfSelfConsistency strategy.state 𝒟 pointSub delta
       ⟨strategy.permInvState, hself_rel⟩
   have hpoint_raw_sdd_raw :
-      SDDRel strategy.state
-        (uniformDistribution (Point params.next))
-        (IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-        (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy)))
-        (2 * ((2 * delta) + (2 * (((params.next.m : ℕ) : Error) * eps)))) := by
-    exact Preliminaries.stateDependentDistanceRel_triangle strategy.state
-      (uniformDistribution (Point params.next))
-      (IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-      (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-      (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy)))
-      (2 * delta)
-      (2 * (((params.next.m : ℕ) : Error) * eps))
-      hself_sdd
-      hraw_sdd_rightLeft
+      SDDRel strategy.state 𝒟 pointL rawL (2 * ((2 * delta) + (2 * μ))) := by
+    exact Preliminaries.stateDependentDistanceRel_triangle strategy.state 𝒟
+      pointL pointR rawL (2 * delta) (2 * μ) hself_sdd hraw_sdd_rightLeft
   have hnext_le_nat : params.next.m ≤ 2 * params.m := by
     have hm1 : 1 ≤ params.m := Nat.succ_le_of_lt params.hm
     simpa [Parameters.next, two_mul, add_comm, add_left_comm, add_assoc] using
       add_le_add_left hm1 params.m
   have hnext_le : ((params.next.m : ℕ) : Error) ≤ 2 * (params.m : Error) := by
     exact_mod_cast hnext_le_nat
-  have hpoint_raw_sdd_le :
-      2 * ((2 * delta) + (2 * (((params.next.m : ℕ) : Error) * eps))) ≤
-        8 * (params.m : Error) * eps + 4 * delta := by
-    have hraw_le : ((params.next.m : ℕ) : Error) * eps ≤ 2 * (params.m : Error) * eps := by
+  have hpoint_raw_sdd_le : 2 * ((2 * delta) + (2 * μ)) ≤ ν := by
+    have hraw_le : μ ≤ 2 * (params.m : Error) * eps := by
       exact mul_le_mul_of_nonneg_right hnext_le heps_nonneg
     linarith
-  have hpoint_raw_sdd :
-      SDDRel strategy.state
-        (uniformDistribution (Point params.next))
-        (IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-        (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy)))
-        (8 * (params.m : Error) * eps + 4 * delta) := by
-    exact Preliminaries.stateDependentDistanceRel_mono strategy.state
-      (uniformDistribution (Point params.next))
-      (IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-      (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy)))
-      (2 * ((2 * delta) + (2 * (((params.next.m : ℕ) : Error) * eps))))
-      (8 * (params.m : Error) * eps + 4 * delta)
-      hpoint_raw_sdd_le
+  have hpoint_raw_sdd : SDDRel strategy.state 𝒟 pointL rawL ν := by
+    exact Preliminaries.stateDependentDistanceRel_mono strategy.state 𝒟
+      pointL rawL (2 * ((2 * delta) + (2 * μ))) ν hpoint_raw_sdd_le
       hpoint_raw_sdd_raw
   have hraw_family :
-      ConsRel strategy.state
-        (uniformDistribution (Point params.next))
-        (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy))
-        family.evaluatedAtNextPoint
-        (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-    exact Preliminaries.triangleSub strategy.state
-      (uniformDistribution (Point params.next))
-      strategy.isNormalized
-      (uniformDistribution_weight_sum_le_one (Point params.next))
-      (IdxProjMeas.toIdxMeas strategy.pointMeasurement)
-      (rawVerticalLineMeasurementFamily params strategy)
-      family.evaluatedAtNextPoint
-      zeta
-      (8 * (params.m : Error) * eps + 4 * delta)
-      hcons.pointConsistency
-      hpoint_raw_sdd
+      ConsRel strategy.state 𝒟 rawSub family.evaluatedAtNextPoint
+        (zeta + Real.sqrt ν) := by
+    simpa [𝒟, ν, pointSub, rawMeas, rawSub, pointL, rawL] using
+      (Preliminaries.triangleSub strategy.state 𝒟 strategy.isNormalized
+        (uniformDistribution_weight_sum_le_one (Point params.next))
+        (IdxProjMeas.toIdxMeas strategy.pointMeasurement) rawMeas
+        family.evaluatedAtNextPoint zeta ν hcons.pointConsistency hpoint_raw_sdd)
   have hfamily_raw :
-      ConsRel strategy.state
-        (uniformDistribution (Point params.next))
-        family.evaluatedAtNextPoint
-        (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy))
-        (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) :=
-    PermInvState.consRel_swap strategy.permInvState
-      (uniformDistribution (Point params.next))
-      (IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy))
-      family.evaluatedAtNextPoint
-      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))
-      hraw_family
-  simpa [evaluateFiberFamilyAtNextPoint,
-    rawVerticalLineMeasurementFamily_eq_lifted params strategy] using hfamily_raw
+      ConsRel strategy.state 𝒟 family.evaluatedAtNextPoint rawSub
+        (zeta + Real.sqrt ν) :=
+    PermInvState.consRel_swap strategy.permInvState 𝒟 rawSub
+      family.evaluatedAtNextPoint (zeta + Real.sqrt ν) hraw_family
+  have hfamily_lifted :
+      ConsRel strategy.state 𝒟 family.evaluatedAtNextPoint
+        (liftedVerticalLineAnswerFamily params strategy)
+        (zeta + Real.sqrt ν) := by
+    simpa [rawSub, rawVerticalLineAnswerFamily_eq_lifted params strategy] using hfamily_raw
+  simpa [𝒟, ν, IdxPolyFamily.evaluatedAtNextPoint, evaluateFiberFamilyAtNextPoint,
+    liftedVerticalLineAnswerFamily] using hfamily_lifted
 
 /-- `prop:ld-dnoteq`. -/
 theorem ldDnoteq
