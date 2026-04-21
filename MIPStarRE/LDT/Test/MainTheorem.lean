@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.Classical
+import MIPStarRE.LDT.Test.SurfaceVsPoint
 
 /-!
 # Section 3 — Main theorem
@@ -42,30 +42,10 @@ noncomputable def classicalTestSoundnessSlackBound
   ((params.m : Error) ^ (2 : ℕ)) *
     (eps + (params.d : Error) / (params.q : Error))
 
-/-- Generic placeholder overview-level soundness conclusion: a low individual
-degree polynomial agrees with the point-answer function except on `slack`
-average mass.
-
-The `slack ≤ max 1 slackBound` guard keeps this conclusion compatible with the
-still-placeholder Raz–Safra hypothesis. Once the surface-versus-point test is
-formalized directly, this should be replaced by the bounded variant below. -/
+/-- Overview-level soundness conclusion: a low individual degree polynomial
+agrees with the point-answer function except on `slack` average mass, with
+explicit bound `slackBound`. -/
 def PointAnswerSoundnessConclusion (params : Parameters) [FieldModel params.q]
-    (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
-  0 ≤ slack ∧
-    slack ≤ max 1 slackBound ∧
-      ∃ g : Polynomial params,
-        avgOver (uniformDistribution (Point params))
-            (fun u => if g u = a u then (1 : Error) else 0) ≥
-          1 - slack
-
-/-- Non-vacuous overview-level soundness conclusion with an explicit slack
-bound.
-
-This is the form used by the classical two-prover theorem once the quoted
-Polishchuk–Spielman implication is supplied separately as an explicit
-hypothesis. -/
-def BoundedPointAnswerSoundnessConclusion (params : Parameters)
-    [FieldModel params.q]
     (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
   0 ≤ slack ∧
     slack ≤ slackBound ∧
@@ -74,19 +54,29 @@ def BoundedPointAnswerSoundnessConclusion (params : Parameters)
             (fun u => if g u = a u then (1 : Error) else 0) ≥
           1 - slack
 
-/-- Placeholder pass condition for the surface-versus-point low-degree test.
+/-- Legacy alias retaining the earlier explicit "bounded" name for downstream
+classical wrappers. -/
+abbrev BoundedPointAnswerSoundnessConclusion (params : Parameters)
+    [FieldModel params.q]
+    (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
+  PointAnswerSoundnessConclusion params a slackBound slack
 
-The Raz–Safra test uses 2-dimensional surface queries and surface polynomial
-answers — infrastructure not yet modeled in this repository. This named
-placeholder `def` is `0 ≤ eps` (trivially satisfiable), but its name and
-type signature carry the intended semantics. When the surface test is
-formalized, replace the body with the actual pass predicate.
+/-- Pass condition for the classical `k = 2` surface-versus-point low-degree
+test from `references/ldt-paper/introduction.tex`.
+
+This records only the paper-faithful classical test-passing data:
+- a deterministic classical strategy for the surface-versus-point test,
+- a proof that Alice's point-answer function is the ambient `a`, and
+- a proof that the strategy passes the modeled random-surface/random-point
+  acceptance test with probability at least `1 - eps`.
 
 This is intentionally NOT `PassesLowIndividualDegreeTest`, which models a
-different test. See `references/ldt-paper/introduction.tex`. -/
-def SurfaceVsPointPassCondition (_params : Parameters) [FieldModel _params.q]
-    (_a : Point _params → Fq _params) (eps : Error) : Prop :=
-  0 ≤ eps
+different test. -/
+def SurfaceVsPointPassCondition (params : Parameters) [FieldModel params.q]
+    (a : Point params → Fq params) (eps : Error) : Prop :=
+  ∃ strategy : TwoProverClassicalSurfaceVsPointStrategy params,
+    strategy.pointAnswerA = a ∧
+      strategy.ClassicallyPassesSurfaceVsPointTest eps
 
 /-- Pass condition for the paper's deterministic two-prover classical low
 individual degree test.
@@ -108,6 +98,19 @@ def TwoProverClassicalLIDPassCondition (params : Parameters)
     strategy.pointAnswerA = a ∧
       strategy.ClassicallyPassesLowIndividualDegreeTest eps
 
+/-- Hypothesis-style interface for the classical Raz--Safra
+surface-versus-point soundness theorem.
+
+This keeps the quoted classical theorem explicit, rather than making it an
+ambient axiom. Downstream theorems can request it through the typeclass-style
+assumption `[Fact (RazSafraSoundnessStatement params)]`. -/
+def RazSafraSoundnessStatement (params : Parameters)
+    [FieldModel params.q] : Prop :=
+  ∀ (a : Point params → Fq params) (eps : Error),
+    SurfaceVsPointPassCondition params a eps →
+      ∃ slack : Error,
+        PointAnswerSoundnessConclusion params a (razSafraSlackBound params eps) slack
+
 /-- Hypothesis-style interface for the classical low-individual-degree
 soundness result of Polishchuk and Spielman.
 
@@ -128,35 +131,19 @@ def PolishchukSpielmanClassicalSoundnessStatement (params : Parameters)
 
 /-- `thm:raz-safra`.
 
-Placeholder wrapper for the current surface-versus-point placeholder
-interfaces.
-
-At present `SurfaceVsPointPassCondition` and
-`PointAnswerSoundnessConclusion` are still reduced placeholders, so this
-theorem only closes that reduced interface. It should not be read as a full
-formalized Raz-Safra theorem yet. -/
+Quoted overview theorem wrapper: from paper-faithful surface-versus-point
+classical test-passing data together with an explicit witness of the external
+Raz--Safra soundness statement, conclude that Alice's point-answer function is
+close to a low-degree polynomial with slack bounded by
+`razSafraSlackBound params eps`. -/
 theorem razSafra
     (params : Parameters) [FieldModel params.q]
+    [Fact (RazSafraSoundnessStatement params)]
     (a : Point params → Fq params) (eps : Error)
     (hpass : SurfaceVsPointPassCondition params a eps) :
     ∃ slack : Error,
       PointAnswerSoundnessConclusion params a (razSafraSlackBound params eps) slack := by
-  classical
-  have _heps : 0 ≤ eps := hpass
-  let g : Polynomial params :=
-    { poly := 0
-      lowIndividualDegree := by
-        intro i
-        simp }
-  refine ⟨1, ?_⟩
-  refine ⟨by norm_num, le_max_left _ _, ?_⟩
-  refine ⟨g, ?_⟩
-  have hnonneg :
-      0 ≤ avgOver (uniformDistribution (Point params))
-        (fun u => if g u = a u then (1 : Error) else 0) := by
-    exact avgOver_nonneg (uniformDistribution (Point params)) _ fun u => by
-      split_ifs <;> norm_num
-  simpa using hnonneg
+  exact (Fact.out : RazSafraSoundnessStatement params) a eps hpass
 
 /-- `thm:classical-test-soundness`.
 
