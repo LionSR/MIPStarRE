@@ -120,28 +120,65 @@ instance interpolationEligible_decidablePred (params : Parameters) [FieldModel p
   unfold InterpolationEligible gHatTupleHammingWeight gHatTupleSupport
   infer_instance
 
+/-- A computable copy of `gHatTupleSupport`. Using the public support definition
+in the witness's runtime field prevents code generation, so the proof fields rewrite
+this duplicate back to `gHatTupleSupport`. -/
+private def gHatTupleSupportData {params : Parameters} {k : ℕ}
+    [FieldModel params.q]
+    (gs : GHatTupleOutcome params k) : Finset (Fin k) :=
+  Finset.univ.filter fun i => (gs i).isSome
+
+/-- Constructively choose `n` elements of a finite linearly ordered set by sorting it
+and taking the first `n` entries. -/
+private def takeCardSubset {α : Type*} [DecidableEq α] [LinearOrder α]
+    (s : Finset α) (n : ℕ) : Finset α :=
+  (s.sort (· ≤ ·)).take n |>.toFinset
+
+/-- The sorted-take subset produced by `takeCardSubset` stays inside the original
+finset. -/
+private theorem takeCardSubset_subset {α : Type*} [DecidableEq α] [LinearOrder α]
+    (s : Finset α) (n : ℕ) :
+    takeCardSubset s n ⊆ s := by
+  intro a ha
+  have haTake : a ∈ (s.sort (· ≤ ·)).take n := by
+    simpa [takeCardSubset] using ha
+  exact (Finset.mem_sort (s := s) (r := (· ≤ ·))).mp (List.mem_of_mem_take haTake)
+
+/-- If `n` does not exceed the size of `s`, then `takeCardSubset s n` has exactly
+`n` elements. -/
+private theorem takeCardSubset_card {α : Type*} [DecidableEq α] [LinearOrder α]
+    (s : Finset α) {n : ℕ} (hn : n ≤ s.card) :
+    (takeCardSubset s n).card = n := by
+  have hNodup : ((s.sort (· ≤ ·)).take n).Nodup := by
+    exact List.Nodup.sublist (List.take_sublist n (s.sort (· ≤ ·)))
+      (Finset.sort_nodup s (· ≤ ·))
+  rw [takeCardSubset, List.toFinset_card_of_nodup hNodup, List.length_take,
+    Finset.length_sort]
+  exact Nat.min_eq_left hn
+
 /-- A chosen `d+1`-element interpolation support together with the proof fields that
-show it lies inside the genuine completed-slice support. The choice is arbitrary,
-and the current implementation still obtains it via `Classical.choose`; packaging
-the subset with its properties makes that nonconstructive choice explicit to callers. -/
+show it lies inside the genuine completed-slice support. The current implementation
+constructs it by sorting the support and taking the first `d+1` indices. -/
 structure InterpolationSupportWitness (params : Parameters) [FieldModel params.q]
     {k : ℕ} (gs : GHatTupleOutcome params k) where
   support : Finset (Fin k)
   subset_support : support ⊆ gHatTupleSupport gs
   card_eq : support.card = params.d + 1
 
-/-- Choose an explicit `d+1`-point interpolation support inside the genuine support of
-an interpolation-eligible tuple. This is currently the only remaining
-nonconstructive step in the interpolation path. -/
-noncomputable def interpolationSupportWitness {params : Parameters} {k : ℕ}
+/-- Construct an explicit `d+1`-point interpolation support inside the genuine support of
+an interpolation-eligible tuple by taking the first `d+1` indices in sorted order. -/
+def interpolationSupportWitness {params : Parameters} {k : ℕ}
     [FieldModel params.q] (gs : GHatTupleOutcome params k)
     (hEligible : InterpolationEligible params gs) :
     InterpolationSupportWitness params gs :=
-  let hσ : ∃ σ : Finset (Fin k), σ ⊆ gHatTupleSupport gs ∧ σ.card = params.d + 1 :=
-    Finset.exists_subset_card_eq (interpolationEligible_card_le hEligible)
-  { support := Classical.choose hσ
-    subset_support := (Classical.choose_spec hσ).1
-    card_eq := (Classical.choose_spec hσ).2 }
+  { support := takeCardSubset (gHatTupleSupportData gs) (params.d + 1)
+    subset_support := by
+      simpa [gHatTupleSupportData, gHatTupleSupport] using
+        (takeCardSubset_subset (gHatTupleSupportData gs) (params.d + 1))
+    card_eq := by
+      apply takeCardSubset_card
+      simpa [gHatTupleSupportData, gHatTupleSupport] using
+        (interpolationEligible_card_le hEligible) }
 
 /-- Interpolate from a specified `d+1`-element index set to recover
 a polynomial in `m+1` variables via Lagrange interpolation.
