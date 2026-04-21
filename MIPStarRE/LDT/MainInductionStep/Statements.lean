@@ -171,4 +171,187 @@ structure RestrictedProbabilitiesStatement (params : Parameters)
         sliceDiagonalDirectionWeight params *
           averageRestrictedDiagonalError params profile ≤ gamma
 
+/-- Bookkeeping package for the slice-restriction step of `thm:main-induction`.
+
+This records an explicit restricted failure profile together with the averaged
+bounds extracted from `lem:restricted-probabilities`. -/
+structure SliceRestrictionPackage (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error) where
+  /-- Slice-wise failure profile `x ↦ (ε_x, δ_x, γ_x)`. -/
+  profile : RestrictedFailureProfile params strategy
+  /-- Averaged axis-parallel slice error bound. -/
+  axisAverageBound :
+    averageRestrictedAxisParallelError params profile ≤
+      sliceConditioningLoss params * eps
+  /-- Averaged self-consistency slice error bound. -/
+  selfAverageBound :
+    averageRestrictedSelfConsistencyError params profile ≤ delta
+  /-- Averaged diagonal slice error bound. -/
+  diagonalAverageBound :
+    averageRestrictedDiagonalError params profile ≤
+      sliceDiagonalConditioningLoss params * gamma
+
+/-- Explicit per-slice output of the inductive hypothesis.
+
+This is the recursion-entry package: given a slice restriction package, a proof of
+`thm:main-induction` in dimension `m` is expected to produce a measurement `G^x`
+for every slice height `x`. -/
+structure PerSliceInductionPackage (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (k : ℕ) where
+  /-- Slice-wise inductive error `σ_x`. -/
+  sliceError : Fq params → Error
+  /-- Slice-wise inductive measurement `G^x`. -/
+  sliceMeasurement : Fq params → Measurement (Polynomial params) ι
+  /-- Each `G^x` satisfies the dimension-`m` point-consistency conclusion. -/
+  pointConsistency :
+    ∀ x,
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+        (polynomialEvaluationFamily params (sliceMeasurement x).toSubMeas)
+        (sliceError x)
+  /-- The slice-wise error is bounded by the dimension-`m` induction target. -/
+  error_le :
+    ∀ x,
+      sliceError x ≤
+        mainInductionError params k
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x)
+          (restrictionPkg.profile.diagonal x)
+
+/-- The slice-local self-improvement error `ζ_x`. -/
+noncomputable def sliceSelfImprovementError (params : Parameters)
+    [FieldModel params.q]
+    {strategy : SymStrat params.next ι}
+    {eps delta gamma : Error}
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (x : Fq params) : Error :=
+  selfImprovementInInductionError params
+    (restrictionPkg.profile.axisParallel x)
+    (restrictionPkg.profile.selfConsistency x)
+    (restrictionPkg.profile.diagonal x)
+
+/-- Slice-wise output of the induction-level self-improvement stage.
+
+Because `xRestrictedStrategy` is not literally a `SymStrat params` (its diagonal
+answers still live in `DiagonalLinePolynomial params.next`), this package records
+directly the four paper-faithful properties that will later be averaged into the
+pasting inputs. -/
+structure SelfImprovementPackage (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error) (k : ℕ)
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    where
+  /-- Slice-wise projective submeasurement `Ĝ^x`. -/
+  sliceProj : Fq params → ProjSubMeas (Polynomial params) ι
+  /-- Slice-wise PSD witness `Z^x`. -/
+  sliceWitness : Fq params → MIPStarRE.Quantum.Op ι
+  /-- Slice-wise completeness bound. -/
+  completeness :
+    ∀ x,
+      CompletenessAtLeast strategy.state (sliceProj x).toSubMeas.liftLeft
+        ((1 - inductionPkg.sliceError x) -
+          sliceSelfImprovementError params restrictionPkg x)
+  /-- Slice-wise consistency with the restricted point measurement. -/
+  pointConsistency :
+    ∀ x,
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+        (polynomialEvaluationFamily params (sliceProj x).toSubMeas)
+        (sliceSelfImprovementError params restrictionPkg x)
+  /-- Slice-wise strong self-consistency. -/
+  strongSelfConsistency :
+    ∀ x,
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily (sliceProj x).toSubMeas)
+        (sliceSelfImprovementError params restrictionPkg x)
+  /-- Slice-wise left/right closeness needed for the averaged self-consistency package. -/
+  selfCloseness :
+    ∀ x,
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) (sliceProj x).toSubMeas))
+        (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) (sliceProj x).toSubMeas))
+        (sliceSelfImprovementError params restrictionPkg x)
+  /-- Slice-wise boundedness residual. -/
+  bounded :
+    ∀ x,
+      tensorFailureExpectation strategy.state (sliceWitness x) (sliceProj x).toSubMeas
+        ≤ sliceSelfImprovementError params restrictionPkg x
+  /-- Slice-wise domination of the averaged point operator. -/
+  dominatesAveragePointOperator :
+    ∀ x, ∀ h : Polynomial params,
+      IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h ≤ sliceWitness x
+
+namespace SelfImprovementPackage
+
+/-- The slice-indexed polynomial family obtained by collecting the improved
+slice measurements `Ĝ^x`. -/
+noncomputable def family {params : Parameters}
+    [FieldModel params.q]
+    {strategy : SymStrat params.next ι}
+    {eps delta gamma : Error} {k : ℕ}
+    {restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma}
+    {inductionPkg :
+      PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k}
+    (pkg : SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg) :
+    IdxPolyFamily params ι :=
+  IdxPolyFamily.ofSymStrat strategy pkg.sliceProj
+
+@[simp] theorem family_meas {params : Parameters}
+    [FieldModel params.q]
+    {strategy : SymStrat params.next ι}
+    {eps delta gamma : Error} {k : ℕ}
+    {restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma}
+    {inductionPkg :
+      PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k}
+    (pkg : SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg) :
+    pkg.family.meas = pkg.sliceProj :=
+  rfl
+
+end SelfImprovementPackage
+
+/-- Averaged pasting inputs distilled from the per-slice self-improvement data.
+
+This packages exactly the hypotheses needed to invoke
+`thm:ld-pasting-in-induction-section` after the slice-wise self-improvement
+outputs have been averaged. -/
+structure PastingPackage (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error) (k : ℕ)
+    {restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma}
+    {inductionPkg :
+      PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k}
+    (selfPkg : SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg)
+    where
+  /-- Averaged completeness parameter `κ`. -/
+  kappa : Error
+  /-- Averaged self-improvement / pasting interface parameter `ζ`. -/
+  zeta : Error
+  /-- Small-parameter hypothesis for the diagonal test branch. -/
+  gamma_le_one : gamma ≤ 1
+  /-- Small-parameter hypothesis for the averaged self-improvement parameter. -/
+  zeta_le_one : zeta ≤ 1
+  /-- Source-style low-degree hypothesis for the field size. -/
+  dq_le_q : params.d ≤ params.q
+  /-- Averaged completeness of the slice family. -/
+  complete : selfPkg.family.Complete strategy.state kappa
+  /-- Averaged point-consistency of the slice family. -/
+  consistent : selfPkg.family.ConsistentWithPoints strategy zeta
+  /-- Averaged strong self-consistency of the slice family. -/
+  selfConsistent : selfPkg.family.StronglySelfConsistent strategy.state zeta
+  /-- Averaged boundedness input for the pasting theorem. -/
+  bounded : PastingBoundednessInput params strategy selfPkg.family zeta
+  /-- Error telescoping from the induction-section pasting bound to the next-stage target. -/
+  error_le :
+    ldPastingInInductionError params k eps delta gamma kappa zeta ≤
+      mainInductionError params.next k eps delta gamma
+
 end MIPStarRE.LDT.MainInductionStep
