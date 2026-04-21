@@ -120,16 +120,8 @@ instance interpolationEligible_decidablePred (params : Parameters) [FieldModel p
   unfold InterpolationEligible gHatTupleHammingWeight gHatTupleSupport
   infer_instance
 
-/-- A computable copy of `gHatTupleSupport`. Using the public support definition
-in the witness's runtime field prevents code generation, so the proof fields rewrite
-this duplicate back to `gHatTupleSupport`. -/
-private def gHatTupleSupportData {params : Parameters} {k : ℕ}
-    [FieldModel params.q]
-    (gs : GHatTupleOutcome params k) : Finset (Fin k) :=
-  Finset.univ.filter fun i => (gs i).isSome
-
-/-- Constructively choose `n` elements of a finite linearly ordered set by sorting it
-and taking the first `n` entries. -/
+/-- Select the first `n` elements of a finite linearly ordered set by sorting it and
+truncating the resulting list. -/
 private def takeCardSubset {α : Type*} [DecidableEq α] [LinearOrder α]
     (s : Finset α) (n : ℕ) : Finset α :=
   (s.sort (· ≤ ·)).take n |>.toFinset
@@ -156,9 +148,9 @@ private theorem takeCardSubset_card {α : Type*} [DecidableEq α] [LinearOrder �
     Finset.length_sort]
   exact Nat.min_eq_left hn
 
-/-- A chosen `d+1`-element interpolation support together with the proof fields that
-show it lies inside the genuine completed-slice support. The current implementation
-constructs it by sorting the support and taking the first `d+1` indices. -/
+/-- A canonical `d+1`-element interpolation support together with the proof fields
+that show it lies inside the genuine completed-slice support. The support is built
+by sorting the genuine support and taking its first `d+1` indices. -/
 structure InterpolationSupportWitness (params : Parameters) [FieldModel params.q]
     {k : ℕ} (gs : GHatTupleOutcome params k) where
   support : Finset (Fin k)
@@ -171,14 +163,12 @@ def interpolationSupportWitness {params : Parameters} {k : ℕ}
     [FieldModel params.q] (gs : GHatTupleOutcome params k)
     (hEligible : InterpolationEligible params gs) :
     InterpolationSupportWitness params gs :=
-  { support := takeCardSubset (gHatTupleSupportData gs) (params.d + 1)
+  { support := takeCardSubset (gHatTupleSupport gs) (params.d + 1)
     subset_support := by
-      simpa [gHatTupleSupportData, gHatTupleSupport] using
-        (takeCardSubset_subset (gHatTupleSupportData gs) (params.d + 1))
+      simpa using (takeCardSubset_subset (gHatTupleSupport gs) (params.d + 1))
     card_eq := by
       apply takeCardSubset_card
-      simpa [gHatTupleSupportData, gHatTupleSupport] using
-        (interpolationEligible_card_le hEligible) }
+      simpa using (interpolationEligible_card_le hEligible) }
 
 /-- Interpolate from a specified `d+1`-element index set to recover
 a polynomial in `m+1` variables via Lagrange interpolation.
