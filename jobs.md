@@ -371,7 +371,7 @@ Last updated: 2026-04-21
   - `Pasting/Core.lean`: 0 `sorry`s
   - `Pasting/SwitcherooCompletion/Switcheroo.lean`: 0 `sorry`s
   - `Pasting/Core/Bounds.lean`: 0 `sorry`s
-  - `Pasting/BridgeLemmas.lean`: 5 `sorry`s
+  - `Pasting/BridgeLemmas.lean`: 4 `sorry`s
   - `Pasting/Bernoulli/Recurrence.lean`: 2 `sorry`s
   - `Pasting/Bernoulli/Final.lean`: 1 `sorry`
   - total remaining in `MIPStarRE/LDT/Pasting`: 8

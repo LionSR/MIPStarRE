@@ -354,20 +354,21 @@ theorem permInvState_of_density_fixed {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι))
     (hfix : swapDensity ψ.density = ψ.density) :
     PermInvState ψ := by
-  refine ⟨?_⟩
+  refine ⟨hfix, ?_⟩
   intro M
   unfold ev
   apply congrArg Complex.re
   calc
     MIPStarRE.Quantum.normalizedTrace (ψ.density * leftTensor (ι₂ := ι) M)
-      = MIPStarRE.Quantum.normalizedTrace (swapDensity (ψ.density * leftTensor (ι₂ := ι) M)) := by
-          symm
-          exact normalizedTrace_swapDensity _
+      = MIPStarRE.Quantum.normalizedTrace
+          (swapDensity (ψ.density * leftTensor (ι₂ := ι) M)) := by
+            symm
+            exact normalizedTrace_swapDensity _
     _ = MIPStarRE.Quantum.normalizedTrace
           (swapDensity ψ.density * swapDensity (leftTensor (ι₂ := ι) M)) := by
-          rw [swapDensity_mul]
+            rw [swapDensity_mul]
     _ = MIPStarRE.Quantum.normalizedTrace (ψ.density * rightTensor (ι₁ := ι) M) := by
-          rw [hfix, swapDensity_leftTensor]
+            rw [hfix, swapDensity_leftTensor]
 
 /-- The classical role-register symmetrized state is permutation-invariant. -/
 theorem classicalRoleSymmState_permInvState {ι : Type*} [Fintype ι] [DecidableEq ι]

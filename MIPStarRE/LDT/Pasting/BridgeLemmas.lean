@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Pasting.GHatFacts
-import MIPStarRE.LDT.Pasting.Core.Bounds
+import MIPStarRE.LDT.Pasting.Core
 import MIPStarRE.LDT.Basic.LowDegreePolynomial
-import MIPStarRE.LDT.Preliminaries.Triangles.Consistency
+import MIPStarRE.LDT.Preliminaries.Triangles
 
 /-!
 # Section 12 pasting: sandwich-chain bridge lemmas
@@ -44,8 +44,11 @@ private lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
       rfl]
   rw [postprocess_postprocess]
   have hrestrict_apply
-      (h : Polynomial params.next) (ℓ : AxisParallelLine params.next) (t : Fq params.next) :
-      (Polynomial.restrictToAxisParallelLine params.next h ℓ) t = h (AxisParallelLine.pointAt ℓ t) := by
+      (h : Polynomial params.next)
+      (ℓ : AxisParallelLine params.next)
+      (t : Fq params.next) :
+      (Polynomial.restrictToAxisParallelLine params.next h ℓ) t =
+        h (AxisParallelLine.pointAt ℓ t) := by
     have haxis :
         (fun i => _root_.Polynomial.eval (decodeScalar t)
             (Polynomial.axisCoordinatePolynomial params.next ℓ i)) =
@@ -103,11 +106,14 @@ private lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
               simp [verticalLine, AxisParallelLine.pointAt, appendPoint, truncatePoint, hi, hi_lt]
       _ = u := (pointNextEquiv params).left_inv u
   have hfun :
-      (fun h => (Polynomial.restrictToAxisParallelLine params.next h verticalLine) (pointHeight params u)) =
+      (fun h =>
+        (Polynomial.restrictToAxisParallelLine params.next h verticalLine)
+          (pointHeight params u)) =
         fun h => h u := by
           funext h
           calc
-            (Polynomial.restrictToAxisParallelLine params.next h verticalLine) (pointHeight params u)
+            (Polynomial.restrictToAxisParallelLine params.next h verticalLine)
+                (pointHeight params u)
               = h (AxisParallelLine.pointAt verticalLine (pointHeight params u)) :=
                   hrestrict_apply h verticalLine (pointHeight params u)
             _ = h u := by simpa [hbase]
@@ -328,7 +334,8 @@ private lemma sqrt_min_le_rpow32
     Real.sqrt (min x 1) = (min x 1) ^ (1 / (2 : Error)) := by
           rw [Real.sqrt_eq_rpow]
     _ ≤ (min x 1) ^ (1 / (32 : Error)) := by
-          exact Real.rpow_le_rpow_of_exponent_ge' hmin_nonneg hmin_le_one (by norm_num) (by norm_num)
+          exact Real.rpow_le_rpow_of_exponent_ge'
+            hmin_nonneg hmin_le_one (by norm_num) (by norm_num)
     _ ≤ x ^ (1 / (32 : Error)) := by
           exact Real.rpow_le_rpow hmin_nonneg (min_le_left _ _) (by positivity)
 
@@ -362,12 +369,16 @@ private lemma hAConsistency_sqrt_bound_of_pos
     calc
       Real.sqrt (8 * (params.m : Error) * min eps 1)
         = Real.sqrt (8 : Error) * Real.sqrt (params.m : Error) * Real.sqrt (min eps 1) := by
-            rw [show 8 * (params.m : Error) * min eps 1 = (8 : Error) * ((params.m : Error) * min eps 1) by ring]
+            rw [show 8 * (params.m : Error) * min eps 1 =
+                (8 : Error) * ((params.m : Error) * min eps 1) by
+              ring]
             rw [Real.sqrt_mul (show 0 ≤ (8 : Error) by positivity)]
             rw [Real.sqrt_mul hm_nonneg (min eps 1)]
             ring
       _ ≤ 3 * (params.m : Error) * Real.rpow eps (1 / (32 : Error)) := by
-            have hfac : Real.sqrt (8 : Error) * Real.sqrt (params.m : Error) ≤ 3 * (params.m : Error) := by
+            have hfac :
+                Real.sqrt (8 : Error) * Real.sqrt (params.m : Error) ≤
+                  3 * (params.m : Error) := by
               calc
                 Real.sqrt (8 : Error) * Real.sqrt (params.m : Error)
                   ≤ 3 * Real.sqrt (params.m : Error) := by
@@ -376,7 +387,8 @@ private lemma hAConsistency_sqrt_bound_of_pos
                       exact mul_le_mul_of_nonneg_left hsqrt_m_le (by positivity)
             have hmin : Real.sqrt (min eps 1) ≤ Real.rpow eps (1 / (32 : Error)) :=
               sqrt_min_le_rpow32 eps heps_nonneg
-            have hright_nonneg : 0 ≤ Real.rpow eps (1 / (32 : Error)) := Real.rpow_nonneg heps_nonneg _
+            have hright_nonneg : 0 ≤ Real.rpow eps (1 / (32 : Error)) :=
+              Real.rpow_nonneg heps_nonneg _
             have hsqrt_nonneg : 0 ≤ Real.sqrt (min eps 1) := by positivity
             calc
               Real.sqrt (8 : Error) * Real.sqrt (params.m : Error) * Real.sqrt (min eps 1)
@@ -385,12 +397,16 @@ private lemma hAConsistency_sqrt_bound_of_pos
               _ ≤ (3 * (params.m : Error)) * Real.rpow eps (1 / (32 : Error)) := by
                     exact mul_le_mul_of_nonneg_left hmin (by positivity)
       _ ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow eps (1 / (32 : Error)) := by
-            have hroot_nonneg : 0 ≤ Real.rpow eps (1 / (32 : Error)) := Real.rpow_nonneg heps_nonneg _
-            have hmroot_nonneg : 0 ≤ (params.m : Error) * Real.rpow eps (1 / (32 : Error)) := by positivity
+            have hroot_nonneg : 0 ≤ Real.rpow eps (1 / (32 : Error)) :=
+              Real.rpow_nonneg heps_nonneg _
+            have hmroot_nonneg :
+                0 ≤ (params.m : Error) * Real.rpow eps (1 / (32 : Error)) := by
+              positivity
             nlinarith
   have hdelta_term :
       Real.sqrt (4 * min delta 1)
-        ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow delta (1 / (32 : Error)) := by
+        ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+            Real.rpow delta (1 / (32 : Error)) := by
     calc
       Real.sqrt (4 * min delta 1)
         = 2 * Real.sqrt (min delta 1) := by
@@ -401,9 +417,13 @@ private lemma hAConsistency_sqrt_bound_of_pos
             have hmin : Real.sqrt (min delta 1) ≤ Real.rpow delta (1 / (32 : Error)) :=
               sqrt_min_le_rpow32 delta hdelta_nonneg
             nlinarith
-      _ ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow delta (1 / (32 : Error)) := by
-            have hroot_nonneg : 0 ≤ Real.rpow delta (1 / (32 : Error)) := Real.rpow_nonneg hdelta_nonneg _
-            have hmroot_nonneg : 0 ≤ (params.m : Error) * Real.rpow delta (1 / (32 : Error)) := by positivity
+      _ ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+            Real.rpow delta (1 / (32 : Error)) := by
+            have hroot_nonneg : 0 ≤ Real.rpow delta (1 / (32 : Error)) :=
+              Real.rpow_nonneg hdelta_nonneg _
+            have hmroot_nonneg :
+                0 ≤ (params.m : Error) * Real.rpow delta (1 / (32 : Error)) := by
+              positivity
             nlinarith [hk_sq_ge_one, hm_ge_one, hmroot_nonneg]
   have hsqrt_add :
       Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1)
@@ -413,14 +433,18 @@ private lemma hAConsistency_sqrt_bound_of_pos
     refine (Real.sqrt_le_iff).2 ?_
     constructor
     · positivity
-    · have hcross : 0 ≤ 2 * Real.sqrt (8 * (params.m : Error) * min eps 1) * Real.sqrt (4 * min delta 1) := by
+    · have hcross :
+          0 ≤ 2 * Real.sqrt (8 * (params.m : Error) * min eps 1) *
+            Real.sqrt (4 * min delta 1) := by
           positivity
       nlinarith [Real.sq_sqrt ha, Real.sq_sqrt hb, hcross]
   calc
     Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1)
       ≤ Real.sqrt (8 * (params.m : Error) * min eps 1) + Real.sqrt (4 * min delta 1) := hsqrt_add
-    _ ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow eps (1 / (32 : Error)) +
-          3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow delta (1 / (32 : Error)) := by
+    _ ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+          Real.rpow eps (1 / (32 : Error)) +
+          3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+            Real.rpow delta (1 / (32 : Error)) := by
             exact add_le_add heps_term hdelta_term
     _ = 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
           (Real.rpow eps (1 / (32 : Error)) + Real.rpow delta (1 / (32 : Error))) := by
@@ -473,7 +497,9 @@ private lemma hAConsistency_error_le_nu_of_pos
           simp [hBConsistencyError, S]
     _ ≤ 44 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S +
           3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by
-            have hcoeff_nonneg : 0 ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) := by positivity
+            have hcoeff_nonneg :
+                0 ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) := by
+              positivity
             simpa [add_comm, add_left_comm, add_assoc] using
               add_le_add_left (mul_le_mul_of_nonneg_left hsum_le hcoeff_nonneg)
                 (44 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S)
@@ -538,7 +564,8 @@ private noncomputable def gHatReverseHalfProductOutcomeOperator
   | 0, _xs, _gs =>
       1
   | k + 1, xs, gs =>
-      gHatReverseHalfProductOutcomeOperator params family k (pointTupleTail xs) (gHatTupleOutcomeTail gs) *
+      gHatReverseHalfProductOutcomeOperator params family k
+          (pointTupleTail xs) (gHatTupleOutcomeTail gs) *
         ((gHatIdxMeas params family (xs 0)).toSubMeas).outcome (gs 0)
 
 private noncomputable def headTailOrderedFamily
@@ -742,11 +769,13 @@ private lemma commuteGHalfSandwich_split_iff
       δ
       (fun q ogs => by
         simpa [pointTupleConsEquiv, gHatTupleOutcomeConsEquiv'] using
-          gHatHalfSandwichLeft_split_outcome params family k ((pointTupleConsEquiv params k).symm q)
+          gHatHalfSandwichLeft_split_outcome params family k
+            ((pointTupleConsEquiv params k).symm q)
             ((gHatTupleOutcomeConsEquiv' params k).symm ogs))
       (fun q ogs => by
         simpa [pointTupleConsEquiv, gHatTupleOutcomeConsEquiv'] using
-          gHatHalfSandwichRight_split_outcome params family k ((pointTupleConsEquiv params k).symm q)
+          gHatHalfSandwichRight_split_outcome params family k
+            ((pointTupleConsEquiv params k).symm q)
             ((gHatTupleOutcomeConsEquiv' params k).symm ogs))
       ho
   · intro h
@@ -764,10 +793,12 @@ private lemma commuteGHalfSandwich_split_iff
       δ
       (fun q gs => by
         simpa [pointTupleConsEquiv, gHatTupleOutcomeConsEquiv'] using
-          (gHatHalfSandwichLeft_split_outcome params family k ((pointTupleConsEquiv params k).symm q) gs).symm)
+          (gHatHalfSandwichLeft_split_outcome params family k
+            ((pointTupleConsEquiv params k).symm q) gs).symm)
       (fun q gs => by
         simpa [pointTupleConsEquiv, gHatTupleOutcomeConsEquiv'] using
-          (gHatHalfSandwichRight_split_outcome params family k ((pointTupleConsEquiv params k).symm q) gs).symm)
+          (gHatHalfSandwichRight_split_outcome params family k
+            ((pointTupleConsEquiv params k).symm q) gs).symm)
       ho
     exact (sddOpRel_uniform_equiv (pointTupleConsEquiv params k) ψbi
       (gHatHalfSandwichLeft params family (k + 1))
@@ -1178,7 +1209,8 @@ private lemma commuteGHalfSandwich_error_bound
     (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_nonneg : 0 ≤ zeta)
     (hzeta_le : zeta ≤ 1) :
-    3 * (k : Error) * (4 * (k : Error) * zeta + (k : Error) * gHatCommutationError params gamma zeta)
+    3 * (k : Error) *
+      (4 * (k : Error) * zeta + (k : Error) * gHatCommutationError params gamma zeta)
       ≤ commuteGHalfSandwichError params gamma zeta k := by
   let S : Error :=
     Real.rpow gamma (1 / (16 : Error)) +
@@ -1203,14 +1235,17 @@ private lemma commuteGHalfSandwich_error_bound
       dsimp [S]
       nlinarith [Real.rpow_nonneg hgamma_nonneg (1 / (16 : Error)),
         Real.rpow_nonneg hzeta_nonneg (1 / (16 : Error)),
-        Real.rpow_nonneg (by positivity : 0 ≤ ((params.d : Error) / (params.q : Error))) (1 / (16 : Error))]
+        Real.rpow_nonneg
+          (by positivity : 0 ≤ ((params.d : Error) / (params.q : Error)))
+          (1 / (16 : Error))]
     have hm_mul : Real.rpow zeta (1 / (16 : Error)) ≤ (params.m : Error) * S := by
       have : S ≤ (params.m : Error) * S := by
         nlinarith
       exact le_trans hroot_le this
     exact le_trans hzeta_to_rpow hm_mul
   calc
-    3 * (k : Error) * (4 * (k : Error) * zeta + (k : Error) * gHatCommutationError params gamma zeta)
+    3 * (k : Error) *
+      (4 * (k : Error) * zeta + (k : Error) * gHatCommutationError params gamma zeta)
       = 12 * ((k : Error) ^ (2 : ℕ)) * zeta +
           3 * ((k : Error) ^ (2 : ℕ)) * gHatCommutationError params gamma zeta := by ring
     _ ≤ 12 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) * S) +
@@ -1326,12 +1361,14 @@ private lemma commuteGHalfSandwich_step_commute
     ψbi
     (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
     rawSource rawTarget (gHatCommutationError params gamma zeta) hcab
-  let reindexedSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+  let reindexedSource :
+      IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
       (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
     fun q =>
       { outcome := fun a' => (rawSource q).outcome ((pairTailOutcomeEquiv params r).symm a')
         total := (rawSource q).total }
-  let reindexedTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+  let reindexedTarget :
+      IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
       (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
     fun q =>
       { outcome := fun a' => (rawTarget q).outcome ((pairTailOutcomeEquiv params r).symm a')
@@ -1418,7 +1455,8 @@ private def splitSuccOutcomeEquiv (params : Parameters) [FieldModel params.q] (r
 
 private def moveTailQuestionEquiv (params : Parameters) (r : ℕ) :
     (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) ≃
-      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) where
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params ×
+        PointTuple params r) where
   toFun q := (q.1, q.2.1, q.2.2 0, pointTupleTail q.2.2)
   invFun q := (q.1, q.2.1, Fin.cons q.2.2.1 q.2.2.2)
   left_inv q := by
@@ -1435,7 +1473,8 @@ private def moveTailQuestionEquiv (params : Parameters) (r : ℕ) :
 
 private def moveTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
     (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) ≃
-      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params ×
+        GHatTupleOutcome params r) where
   toFun og := (og.1, og.2.1, og.2.2 0, gHatTupleOutcomeTail og.2.2)
   invFun og := (og.1, og.2.1, Fin.cons og.2.2.1 og.2.2.2)
   left_inv og := by
@@ -1452,7 +1491,8 @@ private def moveTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r 
 
 private def firstSliceBackQuestionEquiv (params : Parameters) (r : ℕ) :
     ((SliceQuestion params × SliceQuestion params × PointTuple params r) × SliceQuestion params) ≃
-      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) where
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params ×
+        PointTuple params r) where
   toFun q := (q.2, q.1.1, q.1.2.1, q.1.2.2)
   invFun q := ((q.2.1, q.2.2.1, q.2.2.2), q.1)
   left_inv q := by
@@ -1464,7 +1504,8 @@ private def firstSliceBackQuestionEquiv (params : Parameters) (r : ℕ) :
 
 private def firstSliceBackOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
     ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) ≃
-      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params ×
+        GHatTupleOutcome params r) where
   toFun og := (og.2, og.1.1, og.1.2.1, og.1.2.2)
   invFun og := ((og.2.1, og.2.2.1, og.2.2.2), og.1)
   left_inv og := by
@@ -3506,6 +3547,14 @@ private lemma commuteGHalfSandwich_core
   · subst hk2
     exact commuteGHalfSandwich_core_two params ψbi family gamma zeta hcom
   · have hk3 : 3 ≤ k := by omega
+    /-
+    The remaining `k ≥ 3` branch is the paper's recursive flat-chain argument.
+    All local infrastructure is now in place (`postMoveFlatStep`,
+    `flatChainStep`, `moveBackStage_step`, and the global-chain wrappers), but
+    the final error-summation / endpoint assembly over that chain is still
+    missing. This is the same upstream blocker referenced by the later
+    `overAllOutcomes` / Bernoulli chain.
+    -/
     sorry
 
 /-- `lem:commute-g-half-sandwich`. -/

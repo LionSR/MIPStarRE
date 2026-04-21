@@ -158,7 +158,9 @@ private lemma ldGbcon_rebased_vertical_line
   change ({ base := ℓ.pointAt (pointHeight params u)
           , direction := lastCoord params } : AxisParallelLine params.next) =
     { base := u, direction := lastCoord params }
-  exact congrArg (fun b => ({ base := b, direction := lastCoord params } : AxisParallelLine params.next)) hbase
+  exact congrArg
+    (fun b => ({ base := b, direction := lastCoord params } : AxisParallelLine params.next))
+    hbase
 
 private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
     (params : Parameters) [FieldModel params.q]
@@ -186,7 +188,9 @@ private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
             rfl
   · have hA : (ldGbconAxisLineMeasurement params strategy u).toSubMeas.total = 1 := by
         let ℓ : AxisParallelLine params.next := { base := u, direction := lastCoord params }
-        have hA' : (postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas) (· zeroCoord)).total = 1 := by
+        have hA' :
+            (postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas) (· zeroCoord)).total =
+              1 := by
           simpa [postprocess_total] using (strategy.axisParallelMeasurement ℓ).total_eq_one
         simpa [ldGbconAxisLineMeasurement, ℓ] using hA'
     have hB : (ldGbconVerticalLineMeasurement params strategy u).toSubMeas.total = 1 := by
@@ -282,7 +286,8 @@ private lemma ldGbcon_axis_last_direction_consistency
             avgOver (uniformDistribution (Point params.next)) (fun u =>
               avgOver (uniformDistribution (Fin params.next.m)) (fun i => err (u, i))) := by
                 rw [avgOver_const_mul]
-      _ = (params.next.m : Error) * avgOver (uniformDistribution (AxisParallelTestSample params.next)) err := by
+      _ = (params.next.m : Error) *
+            avgOver (uniformDistribution (AxisParallelTestSample params.next)) err := by
             rw [← avgOver_uniform_prod (f := fun u i => err (u, i))]
       _ ≤ (params.next.m : Error) * eps := by
             exact mul_le_mul_of_nonneg_left haxis (by positivity)
@@ -300,7 +305,8 @@ theorem pointVerticalLineSdd
       (8 * (params.m : Error) * eps + 4 * delta) := by
   let pointMeas : IdxMeas (Point params.next) (Fq params.next) ι :=
     fun u => (strategy.pointMeasurement u).toMeasurement
-  have hchar := (MIPStarRE.LDT.Preliminaries.goodStrategyCharacterization strategy eps delta gamma).mp hgood
+  have hchar :=
+    (MIPStarRE.LDT.Preliminaries.goodStrategyCharacterization strategy eps delta gamma).mp hgood
   have haxis_all : ConsRel strategy.state
       (uniformDistribution (AxisParallelTestSample params.next))
       (axisParallelPointAnswerFamily strategy)
@@ -355,8 +361,9 @@ theorem pointVerticalLineSdd
       (IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
       (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
       (2 * delta) := by
-        exact ⟨(Preliminaries.simeqToApprox strategy.state (uniformDistribution (Point params.next))
-          pointMeas pointMeas delta (by simpa [pointMeas] using hself_cons)).leftRightSquaredDistanceBound⟩
+        exact ⟨(Preliminaries.simeqToApprox strategy.state
+          (uniformDistribution (Point params.next)) pointMeas pointMeas delta
+          (by simpa [pointMeas] using hself_cons)).leftRightSquaredDistanceBound⟩
   have hself_sdd_symm : SDDRel strategy.state
       (uniformDistribution (Point params.next))
       (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
@@ -416,7 +423,8 @@ theorem ldGbcon
       (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
   let pointMeas : IdxMeas (Point params.next) (Fq params.next) ι :=
     fun u => (strategy.pointMeasurement u).toMeasurement
-  have hchar := (MIPStarRE.LDT.Preliminaries.goodStrategyCharacterization strategy eps delta gamma).mp hgood
+  have hchar :=
+    (MIPStarRE.LDT.Preliminaries.goodStrategyCharacterization strategy eps delta gamma).mp hgood
   have haxis_all : ConsRel strategy.state
       (uniformDistribution (AxisParallelTestSample params.next))
       (axisParallelPointAnswerFamily strategy)
@@ -492,8 +500,9 @@ theorem ldGbcon
       (IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
       (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
       (2 * delta) := by
-        exact ⟨(Preliminaries.simeqToApprox strategy.state (uniformDistribution (Point params.next))
-          pointMeas pointMeas delta (by simpa [pointMeas] using hself_cons)).leftRightSquaredDistanceBound⟩
+        exact ⟨(Preliminaries.simeqToApprox strategy.state
+          (uniformDistribution (Point params.next)) pointMeas pointMeas delta
+          (by simpa [pointMeas] using hself_cons)).leftRightSquaredDistanceBound⟩
   have hself_sdd_symm : SDDRel strategy.state
       (uniformDistribution (Point params.next))
       (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))

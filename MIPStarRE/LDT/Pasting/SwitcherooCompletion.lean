@@ -923,6 +923,10 @@ private lemma switcherooAggregateFirstTerm_eq_leftSandwich_local
             simp [MIPStarRE.LDT.Preliminaries.leftSandwichExpectation,
               avgOver, leftTensor_mul_leftTensor, mul_assoc]
 
+/- Heartbeat budget: this `χ`-transfer expands the raw split-by-`g` scalar,
+normalizes adjoints of `G_g M_o`, and then runs one `closenessOfInnerProduct_right`
+step over the full `Polynomial × Outcome` family. The proof is stable but still
+requires substantially more elaboration than the default budget. -/
 set_option maxHeartbeats 50000000 in
 -- The last `χ`-step needs explicit adjoint normalization for the raw `G_g M_o`
 -- factors inside `closenessOfInnerProduct_right`.
@@ -1054,6 +1058,10 @@ private lemma switcherooAggregateLeftFrontRaw_close_firstSplitRaw
     _ ≤ Real.sqrt chi := by
           simpa [abs_sub_comm] using hclose
 
+/- Heartbeat budget: the center-identification proof expands two nested uniform
+averages and rewrites them through SWAP symmetry before collapsing back to the
+target scalar center. This normalization-heavy `avgOver` / `rightTensor` rewrite
+is stable at 10M heartbeats. -/
 set_option maxHeartbeats 10000000 in
 -- Expanding the nested averages and total operators for the center comparison is
 -- expensive enough to require a larger heartbeat budget.
@@ -1096,15 +1104,18 @@ private lemma switcherooCompletePartCenter_eq_target
             have hprod :
                 avgOver (uniformDistribution (SliceQuestion params)) (fun y =>
                     avgOver (uniformDistribution (SliceQuestion params)) (fun x => F y x)) =
-                  avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => F q.1 q.2) := by
+                  avgOver (uniformDistribution (SlicePairQuestion params))
+                    (fun q => F q.1 q.2) := by
               simpa [SlicePairQuestion, SliceQuestion] using
                 (avgOver_uniform_prod
                   (α := SliceQuestion params)
                   (β := SliceQuestion params)
                   (f := F)).symm
             have hswap :
-                avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => F q.1 q.2) =
-                  avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => F q.2 q.1) := by
+                avgOver (uniformDistribution (SlicePairQuestion params))
+                    (fun q => F q.1 q.2) =
+                  avgOver (uniformDistribution (SlicePairQuestion params))
+                    (fun q => F q.2 q.1) := by
               simpa [SlicePairQuestion, F] using
                 (avgOver_uniform_equiv
                   (e := Equiv.prodComm (SliceQuestion params) (SliceQuestion params))
@@ -1112,12 +1123,16 @@ private lemma switcherooCompletePartCenter_eq_target
             calc
               avgOver (uniformDistribution (SliceQuestion params)) (fun y =>
                   avgOver (uniformDistribution (SliceQuestion params)) (fun x => F y x))
-                = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => F q.1 q.2) := hprod
-              _ = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => F q.2 q.1) := hswap
-              _ = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
-                    ev ψbi
-                      (leftTensor (ι₂ := ι) (((M q.2).toSubMeas).total) *
-                        rightTensor (ι₁ := ι) ((completePartSubMeas params family q.1).total))) := by
+                = avgOver (uniformDistribution (SlicePairQuestion params))
+                    (fun q => F q.1 q.2) := hprod
+              _ = avgOver (uniformDistribution (SlicePairQuestion params))
+                    (fun q => F q.2 q.1) := hswap
+              _ = avgOver (uniformDistribution (SlicePairQuestion params))
+                    (fun q =>
+                      ev ψbi
+                        (leftTensor (ι₂ := ι) (((M q.2).toSubMeas).total) *
+                          rightTensor (ι₁ := ι)
+                            ((completePartSubMeas params family q.1).total))) := by
                           rfl
     _ = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
           ev ψbi
@@ -1438,6 +1453,10 @@ private lemma switcheroo_second_aggregate_term_close
 
 -- The four-term expansion + triangle chain contains several large `calc`
 -- blocks and raw-expression rewrites.
+/- Heartbeat budget: `commutativitySwitcheroo` packages the full four-term
+triangle chain from `lem:commutativity-switcheroo`, including the raw `χ, ζ, ζ, χ`
+transfers and the final absolute-value decomposition. The large budget is for
+proof elaboration of those scalar rewrites, not for search. -/
 set_option maxHeartbeats 50000000 in
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
