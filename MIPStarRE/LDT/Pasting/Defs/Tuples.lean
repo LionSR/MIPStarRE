@@ -207,14 +207,13 @@ def gHatTupleType {params : Parameters} {k : ℕ}
 /-- The support of a completed-slice tuple, i.e. the indices whose outcomes are
 genuine polynomials rather than `⊥`. This matches the paper's support of the type
 `τ ∈ {0,1}^k`. -/
-noncomputable def gHatTupleSupport {params : Parameters} {k : ℕ}
+def gHatTupleSupport {params : Parameters} {k : ℕ}
     [FieldModel params.q]
     (gs : GHatTupleOutcome params k) : Finset (Fin k) :=
-  open Classical in
-    Finset.univ.filter fun i => (gs i).isSome
+  Finset.univ.filter fun i => (gs i).isSome
 
 /-- The Hamming weight of a completed-slice tuple. -/
-noncomputable def gHatTupleHammingWeight {params : Parameters} {k : ℕ}
+def gHatTupleHammingWeight {params : Parameters} {k : ℕ}
     [FieldModel params.q]
     (gs : GHatTupleOutcome params k) : ℕ :=
   (gHatTupleSupport gs).card
