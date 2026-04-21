@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Pointwise
 

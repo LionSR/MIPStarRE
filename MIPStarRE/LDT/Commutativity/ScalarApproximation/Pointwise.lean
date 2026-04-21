@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 
 /-!
 # Section 11 commutativity: pointwise scalar approximation
