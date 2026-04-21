@@ -1,4 +1,3 @@
-import Mathlib.Algebra.MvPolynomial.Polynomial
 import MIPStarRE.LDT.Pasting.GHatFacts
 
 /-!
@@ -203,33 +202,6 @@ lemma hBConsistency
   exact ⟨hBConsistency_core params strategy eps delta gamma zeta
     hgood family hcons hself hbound k hline⟩
 
-private lemma restrictToAxisParallelLine_apply
-    (params : Parameters) [FieldModel params.q]
-    (g : Polynomial params) (ℓ : AxisParallelLine params) (t : Fq params) :
-    Polynomial.restrictToAxisParallelLine params g ℓ t = g (ℓ.pointAt t) := by
-  unfold Polynomial.restrictToAxisParallelLine Polynomial.toFun AxisLinePolynomial.toFun
-    evalLinePolynomialModel evalPolynomialModel
-  change encodeScalar (Polynomial.eval (decodeScalar t)
-    (MvPolynomial.eval₂ Polynomial.C (Polynomial.axisCoordinatePolynomial params ℓ) g.poly)) = _
-  rw [MvPolynomial.polynomial_eval_eval₂]
-  change encodeScalar
-    (MvPolynomial.eval₂ ((Polynomial.evalRingHom (decodeScalar t)).comp Polynomial.C)
-      (fun s => Polynomial.eval (decodeScalar t) (Polynomial.axisCoordinatePolynomial params ℓ s)) g.poly) =
-    encodeScalar (MvPolynomial.eval₂ (RingHom.id _) (decodePoint (ℓ.pointAt t)) g.poly)
-  have hcoeff : ((Polynomial.evalRingHom (decodeScalar t)).comp Polynomial.C) = RingHom.id _ := by
-    ext a
-    simp
-  rw [hcoeff]
-  have hvars :
-      (fun s => Polynomial.eval (decodeScalar t) (Polynomial.axisCoordinatePolynomial params ℓ s)) =
-        decodePoint (ℓ.pointAt t) := by
-    funext i
-    by_cases h : i = ℓ.direction
-    · subst h
-      simp [Polynomial.axisCoordinatePolynomial, AxisParallelLine.pointAt, decodePoint, addCoord]
-    · simp [Polynomial.axisCoordinatePolynomial, AxisParallelLine.pointAt, decodePoint, h]
-  rw [hvars]
-
 private lemma verticalLine_pointAt_appendPoint
     (params : Parameters) [FieldModel params.q]
     (u : Point params) (x : Fq params) :
@@ -255,12 +227,11 @@ private lemma verticalLine_pointAt_appendPoint
         exact (hlast hi_last).elim
     simp [AxisParallelLine.pointAt, appendPoint, him, hlast]
 
-/-- The last-coordinate axis-parallel branch of the strategy, evaluated at the
-base point of the sampled vertical line.
+/-- The last-coordinate axis-parallel branch of the strategy, read at the base
+point of the sampled vertical line.
 
-This is the ambient-space comparison family used to bridge from the point
-measurement to vertical-line answers before transporting the statement back to
-`Point params.next`. -/
+This is the ambient-space comparison family used to extract a single
+axis-parallel branch from `hgood.axisParallelTest`. -/
 private noncomputable def rawVerticalLineAnswerFamily
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) :
@@ -271,6 +242,9 @@ private noncomputable def rawVerticalLineAnswerFamily
         { base := u, direction := lastCoord params }).toSubMeas)
       (· zeroCoord)
 
+/-- Extract the last-coordinate axis-parallel branch from
+`hgood.axisParallelTest`, losing a factor of `m + 1` when passing from the
+uniform coordinate average to a fixed coordinate. -/
 private lemma rawVerticalLineConsistency
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -345,107 +319,32 @@ private lemma rawVerticalLineConsistency
       (fun u =>
         postprocess ((strategy.axisParallelMeasurement { base := u, direction := i }).toSubMeas)
           (· zeroCoord))
-  have hsum_le : ∑ i : Fin params.next.m, err i ≤ ((params.next.m : ℕ) : Error) * eps := by
-    have hcard_ne : (((params.next.m : ℕ) : Error)) ≠ 0 := by
-      have hpos : 0 < (((params.next.m : ℕ) : Error)) := by
-        simpa [Parameters.next] using (show 0 < (((params.m + 1 : ℕ) : Error)) by positivity)
+  let mNext : Error := ((params.next.m : ℕ) : Error)
+  have hsum_le : ∑ i : Fin params.next.m, err i ≤ mNext * eps := by
+    have hcard_ne : mNext ≠ 0 := by
+      have hpos : 0 < mNext := by
+        simpa [mNext, Parameters.next] using
+          (show 0 < (((params.m + 1 : ℕ) : Error)) by positivity)
       exact ne_of_gt hpos
     have havg :
-        ((((params.next.m : ℕ) : Error))⁻¹ * ∑ i : Fin params.next.m, err i) =
+        mNext⁻¹ * ∑ i : Fin params.next.m, err i =
           avgOver (uniformDistribution (Fin params.next.m)) err := by
-      simp [avgOver, uniformDistribution, Finset.mul_sum]
+      simp [avgOver, uniformDistribution, Finset.mul_sum, mNext]
     calc
       ∑ i : Fin params.next.m, err i
-        = ((params.next.m : ℕ) : Error) * ((((params.next.m : ℕ) : Error))⁻¹ * ∑ i : Fin params.next.m, err i) := by
+          = mNext * (mNext⁻¹ * ∑ i : Fin params.next.m, err i) := by
             field_simp [hcard_ne]
-      _ = ((params.next.m : ℕ) : Error) * avgOver (uniformDistribution (Fin params.next.m)) err := by
+      _ = mNext * avgOver (uniformDistribution (Fin params.next.m)) err := by
             rw [havg]
-      _ ≤ ((params.next.m : ℕ) : Error) * eps := by
+      _ ≤ mNext * eps := by
             gcongr
-  have hlast_le : err (lastCoord params) ≤ ((params.next.m : ℕ) : Error) * eps := by
+  have hlast_le : err (lastCoord params) ≤ mNext * eps := by
     calc
       err (lastCoord params) ≤ ∑ i : Fin params.next.m, err i := by
         exact Finset.single_le_sum (fun i _ => herr_nonneg i) (Finset.mem_univ _)
       _ ≤ ((params.next.m : ℕ) : Error) * eps := hsum_le
   constructor
   simpa [err, rawVerticalLineAnswerFamily] using hlast_le
-
-private lemma consRel_uniform_prod_fst
-    {α β Outcome : Type*}
-    {ιA ιB : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    [Fintype Outcome]
-    [Fintype ιA] [DecidableEq ιA]
-    [Fintype ιB] [DecidableEq ιB]
-    (ψ : QuantumState (ιA × ιB))
-    (A : IdxSubMeas α Outcome ιA)
-    (B : IdxSubMeas α Outcome ιB)
-    (δ : Error)
-    (hAB : ConsRel ψ (uniformDistribution α) A B δ) :
-    ConsRel ψ (uniformDistribution (α × β))
-      (fun ab => A ab.1)
-      (fun ab => B ab.1)
-      δ := by
-  rcases hAB with ⟨hAB⟩
-  constructor
-  unfold bipartiteConsError at *
-  calc
-    avgOver (uniformDistribution (α × β))
-        (fun ab => qBipartiteConsDefect ψ (A ab.1) (B ab.1))
-      = avgOver (uniformDistribution α)
-          (fun a => qBipartiteConsDefect ψ (A a) (B a)) := by
-            exact avgOver_uniform_fst (α := α) (β := β)
-              (fun a => qBipartiteConsDefect ψ (A a) (B a))
-    _ ≤ δ := hAB
-
-private lemma postprocess_comp
-    {α β γ : Type*} {ι : Type*}
-    [Fintype α] [Fintype β] [Fintype γ] [Fintype ι] [DecidableEq ι]
-    (A : SubMeas α ι) (f : α → β) (g : β → γ) :
-    postprocess (postprocess A f) g = postprocess A (fun a => g (f a)) := by
-  classical
-  refine SubMeas.ext ?_ rfl
-  intro c
-  calc
-    (postprocess (postprocess A f) g).outcome c
-      = ∑ b : β,
-          if g b = c then
-            ∑ a : α, if f a = b then A.outcome a else 0
-          else 0 := by
-            simp [postprocess, Finset.sum_filter]
-    _ = ∑ b : β, ∑ a : α,
-          if g b = c ∧ f a = b then A.outcome a else (0 : MIPStarRE.Quantum.Op ι) := by
-            refine Finset.sum_congr rfl ?_
-            intro b _
-            by_cases hgc : g b = c
-            · simp [hgc]
-            · simp [hgc]
-    _ = ∑ a : α, ∑ b : β,
-          if g b = c ∧ f a = b then A.outcome a else (0 : MIPStarRE.Quantum.Op ι) := by
-            rw [Finset.sum_comm]
-    _ = ∑ a : α, if g (f a) = c then A.outcome a else (0 : MIPStarRE.Quantum.Op ι) := by
-            refine Finset.sum_congr rfl ?_
-            intro a _
-            by_cases hgc : g (f a) = c
-            · rw [Finset.sum_eq_single (f a)]
-              · simp [hgc]
-              · intro b _ hb
-                by_cases hfa : f a = b
-                · exact (hb hfa.symm).elim
-                · simp [hfa]
-              · simp
-            · have hzero :
-                  (∑ b : β, if g b = c ∧ f a = b then A.outcome a else (0 : MIPStarRE.Quantum.Op ι)) = 0 := by
-                refine Finset.sum_eq_zero ?_
-                intro b _
-                by_cases hfa : f a = b
-                · subst b
-                  simp [hgc]
-                · simp [hfa]
-              simp [hgc, hzero]
-    _ = (postprocess A (fun a => g (f a))).outcome c := by
-            simp [postprocess, Finset.sum_filter]
 
 /-- Pull back the vertical-line answer family along `truncatePoint`, then read
 its line polynomial at the lifted point's final coordinate.
@@ -460,6 +359,8 @@ private noncomputable def liftedVerticalLineAnswerFamily
     postprocess (verticalLineMeasurementFamily params strategy (truncatePoint params u))
       (fun f => f (pointHeight params u))
 
+/-- Transport the vertical-line consistency statement from restricted points
+`u : Point params` to ambient points `appendPoint params u x`. -/
 private lemma liftedVerticalLineConsistency
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -476,7 +377,7 @@ private lemma liftedVerticalLineConsistency
       (liftedVerticalLineAnswerFamily params strategy)
       η := by
   have hprod :=
-    consRel_uniform_prod_fst
+    Preliminaries.consRel_uniform_prod_fst
       (α := Point params)
       (β := Fq params)
       (Outcome := AxisLinePolynomial params.next)
@@ -498,11 +399,15 @@ private lemma liftedVerticalLineConsistency
       hprod
   have hleft :
       ∀ ux : Point params × Fq params,
-        postprocess (hRestrictionToVerticalLine params H ux.1) (fun linePoly => linePoly ux.2) =
+        postprocess (hRestrictionToVerticalLine params H ux.1)
+            (fun linePoly => linePoly ux.2) =
           polynomialEvaluationFamily params.next H (appendPoint params ux.1 ux.2) := by
     intro ux
     rcases ux with ⟨u, x⟩
-    rw [hRestrictionToVerticalLine, postprocess_comp]
+    change postprocess (hRestrictionToVerticalLine params H u)
+        (fun linePoly => linePoly x) =
+      polynomialEvaluationFamily params.next H (appendPoint params u x)
+    rw [hRestrictionToVerticalLine, SubMeas.postprocess_comp]
     have hpt' :
         ({ base := appendPoint params u zeroCoord,
            direction := lastCoord params } : AxisParallelLine params.next).pointAt x =
@@ -515,10 +420,13 @@ private lemma liftedVerticalLineConsistency
                 direction := lastCoord params }).toFun x) =
           (fun a : Polynomial params.next => a (appendPoint params u x)) := by
       funext a
-      simpa [hpt'] using
-        restrictToAxisParallelLine_apply (params := params.next) a
+      change
+        (Polynomial.restrictToAxisParallelLine params.next a
           { base := appendPoint params u zeroCoord,
-            direction := lastCoord params } x
+            direction := lastCoord params }) x =
+          a (appendPoint params u x)
+      rw [Polynomial.restrictToAxisParallelLine_apply]
+      rw [hpt']
     change postprocess H
       (fun a : Polynomial params.next =>
         (Polynomial.restrictToAxisParallelLine params.next a
@@ -528,8 +436,10 @@ private lemma liftedVerticalLineConsistency
     rfl
   have hright :
       ∀ ux : Point params × Fq params,
-        postprocess (verticalLineMeasurementFamily params strategy ux.1) (fun linePoly => linePoly ux.2) =
-          liftedVerticalLineAnswerFamily params strategy (appendPoint params ux.1 ux.2) := by
+        postprocess (verticalLineMeasurementFamily params strategy ux.1)
+            (fun linePoly => linePoly ux.2) =
+          liftedVerticalLineAnswerFamily params strategy
+            (appendPoint params ux.1 ux.2) := by
     intro ux
     rcases ux with ⟨u, x⟩
     simp [liftedVerticalLineAnswerFamily, truncatePoint_appendPoint, pointHeight_appendPoint]

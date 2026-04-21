@@ -454,6 +454,38 @@ theorem consRelDataProcessing_questionDependent {Question α β : Type*}
           exact qConsDefect_leftRight_postprocess_le ψ (A q) (B q) (f q)
     _ ≤ δ := hcons
 
+/-- If a uniformly sampled consistency statement depends only on the first
+coordinate of a product question, it lifts to the full product with the same
+error. -/
+lemma consRel_uniform_prod_fst
+    {α β Outcome : Type*}
+    {ιA ιB : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    [Fintype Outcome]
+    [Fintype ιA] [DecidableEq ιA]
+    [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB))
+    (A : IdxSubMeas α Outcome ιA)
+    (B : IdxSubMeas α Outcome ιB)
+    (δ : Error)
+    (hAB : ConsRel ψ (uniformDistribution α) A B δ) :
+    ConsRel ψ (uniformDistribution (α × β))
+      (fun ab => A ab.1)
+      (fun ab => B ab.1)
+      δ := by
+  rcases hAB with ⟨hAB⟩
+  constructor
+  unfold bipartiteConsError at *
+  calc
+    avgOver (uniformDistribution (α × β))
+        (fun ab => qBipartiteConsDefect ψ (A ab.1) (B ab.1))
+      = avgOver (uniformDistribution α)
+          (fun a => qBipartiteConsDefect ψ (A a) (B a)) := by
+            exact avgOver_uniform_fst (α := α) (β := β)
+              (fun a => qBipartiteConsDefect ψ (A a) (B a))
+    _ ≤ δ := hAB
+
 /-- Reindexing a uniformly sampled consistency statement along an equivalence. -/
 lemma consRel_uniform_equiv
     {α β Outcome : Type*}

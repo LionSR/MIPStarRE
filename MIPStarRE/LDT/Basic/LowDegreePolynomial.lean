@@ -1,3 +1,4 @@
+import Mathlib.Algebra.MvPolynomial.Polynomial
 import MIPStarRE.LDT.Basic.LinePolynomials
 
 /-!
@@ -249,6 +250,42 @@ noncomputable def restrictToAxisParallelLine (params : Parameters) [FieldModel p
             · simp [h]
       _ ≤ params.d := by
         exact (MvPolynomial.degreeOf_le_iff.mp (g.lowIndividualDegree ℓ.direction)) n hn
+
+/-- Evaluating an axis-parallel restriction agrees with evaluating the original
+polynomial at the corresponding point on the line. -/
+@[simp] theorem restrictToAxisParallelLine_apply
+    (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (ℓ : AxisParallelLine params) (t : Fq params) :
+    restrictToAxisParallelLine params g ℓ t = g (ℓ.pointAt t) := by
+  unfold restrictToAxisParallelLine Polynomial.toFun AxisLinePolynomial.toFun
+    evalLinePolynomialModel evalPolynomialModel
+  change encodeScalar
+      (Polynomial.eval (decodeScalar t)
+        (MvPolynomial.eval₂ Polynomial.C
+          (axisCoordinatePolynomial params ℓ) g.poly)) = _
+  rw [MvPolynomial.polynomial_eval_eval₂]
+  change encodeScalar
+      (MvPolynomial.eval₂
+        ((Polynomial.evalRingHom (decodeScalar t)).comp Polynomial.C)
+        (fun s => Polynomial.eval (decodeScalar t)
+          (axisCoordinatePolynomial params ℓ s)) g.poly) =
+    encodeScalar (MvPolynomial.eval₂ (RingHom.id _) (decodePoint (ℓ.pointAt t)) g.poly)
+  have hcoeff :
+      ((Polynomial.evalRingHom (decodeScalar t)).comp Polynomial.C) =
+        RingHom.id _ := by
+    ext a
+    simp
+  rw [hcoeff]
+  have hvars :
+      (fun s => Polynomial.eval (decodeScalar t)
+        (axisCoordinatePolynomial params ℓ s)) =
+        decodePoint (ℓ.pointAt t) := by
+    funext i
+    by_cases h : i = ℓ.direction
+    · subst h
+      simp [axisCoordinatePolynomial, AxisParallelLine.pointAt, decodePoint, addCoord]
+    · simp [axisCoordinatePolynomial, AxisParallelLine.pointAt, decodePoint, h]
+  rw [hvars]
 
 /-- Coordinate polynomial for restricting to a diagonal affine line. -/
 noncomputable def diagonalCoordinatePolynomial (params : Parameters) [FieldModel params.q]
