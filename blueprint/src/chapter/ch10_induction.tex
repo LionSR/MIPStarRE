@@ -153,6 +153,9 @@
 \end{theorem}
 \begin{proof}
 	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section}
+	In Lean, the still-partial assembly is factored through the internal bookkeeping packages
+	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionPackage, MIPStarRE.LDT.MainInductionStep.PerSliceInductionPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.PastingPackage}
+	which mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
 	The proof is by induction on $m$. For $m=1$, there is only one axis-parallel line $\ell$ in $\F_q$, so the line measurement $B^\ell$ is already an element of $\polymeas{1}{q}{d}$. Because the strategy fails the axis-parallel lines test with probability at most $\eps$,
