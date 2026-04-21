@@ -38,9 +38,10 @@ noncomputable def selfConsistencyFailureProbability
 
 -- Paper: the diagonal branch of `fig:test` first fixes the sampled restriction
 -- index `j`, then samples the corresponding `j`-restricted diagonal test.
-/-- Trace-based failure surrogate for the paper's `j`-restricted diagonal lines
-subtest. The sampled direction vector has its last `m - (j + 1)` coordinates
-fixed to zero. -/
+/-- Trace-based failure surrogate for the paper's restricted diagonal lines
+subtest at 0-indexed restriction index `j : Fin params.m`, corresponding to the
+paper's `i = j + 1 ∈ {1, …, m}`. The sampled direction vector has its last
+`m - (j + 1)` coordinates fixed to zero. -/
 noncomputable def restrictedDiagonalFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
