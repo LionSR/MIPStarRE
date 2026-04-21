@@ -238,10 +238,11 @@ noncomputable def sliceSelfImprovementError (params : Parameters)
 
 /-- Slice-wise output of the induction-level self-improvement stage.
 
-Because `xRestrictedStrategy` is not literally a `SymStrat params` (its diagonal
-answers still live in `DiagonalLinePolynomial params.next`), this package records
-directly the four paper-faithful properties that will later be averaged into the
-pasting inputs. -/
+Because `xRestrictedStrategy` is a section-local wrapper rather than literally a
+`SymStrat params` interface (it only bundles the slice data needed in Chapter 10,
+not the full permutation/reparametrization API), this package records directly
+the four paper-faithful properties that will later be averaged into the pasting
+inputs. -/
 structure SelfImprovementPackage (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
