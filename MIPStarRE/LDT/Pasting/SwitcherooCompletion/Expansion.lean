@@ -23,18 +23,18 @@ private lemma switcherooAggregateLeftFront_contraction
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (q : SlicePairQuestion params) :
     (∑ go : Polynomial params × Outcome,
-        (∑ u : Unit,
+        (∑ _u : Unit,
             leftTensor (ι₂ := ι)
               (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))ᴴ *
-          (∑ u : Unit,
+          (∑ _u : Unit,
             leftTensor (ι₂ := ι)
               (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))) ≤ 1 := by
   calc
     (∑ go : Polynomial params × Outcome,
-        (∑ u : Unit,
+        (∑ _u : Unit,
             leftTensor (ι₂ := ι)
               (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))ᴴ *
-          (∑ u : Unit,
+          (∑ _u : Unit,
             leftTensor (ι₂ := ι)
               (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2)))
       = ∑ go : Polynomial params × Outcome,
@@ -45,10 +45,10 @@ private lemma switcherooAggregateLeftFront_contraction
             refine Finset.sum_congr rfl ?_
             intro go _
             calc
-              (∑ u : Unit,
+              (∑ _u : Unit,
                   leftTensor (ι₂ := ι)
                     (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))ᴴ *
-                (∑ u : Unit,
+                (∑ _u : Unit,
                   leftTensor (ι₂ := ι)
                     (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))
                 = (leftTensor (ι₂ := ι)
@@ -163,7 +163,244 @@ private lemma switcherooAggregateLeftFront_contraction
                       hmid_le (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
             _ = 1 := by simp [leftTensor]
 
+/-- The left-front explicit scalar appearing in the final `sqrt chi` switcheroo step. -/
+noncomputable def switcherooLeftFrontCoreScalar
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
+  avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+    ∑ go : Polynomial params × Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          (((family.meas q.1).outcome go.1) *
+            (M q.2).outcome go.2 *
+            (family.meas q.1).outcome go.1 *
+            (M q.2).outcome go.2)))
+
+/-- The split-by-`g` scalar that collapses to the first positive switcheroo term. -/
+noncomputable def switcherooFirstSplitCoreScalar
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
+  avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+    ∑ go : Polynomial params × Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          ((M q.2).outcome go.2 *
+            (family.meas q.1).outcome go.1 *
+            (M q.2).outcome go.2)))
+
+set_option maxHeartbeats 4000000 in
+-- The explicit left-front contraction proof expands several product-indexed sums
+-- and projector-normalization rewrites; the higher heartbeat cap avoids timeout.
+/-- The final `sqrt chi` step in the fourth-term switcheroo chain. -/
+lemma switcherooLeftFront_close_firstSplitCore
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (chi : Error)
+    (hcomm : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (switcherooPointProductLeft params family M)
+      (switcherooPointProductRight params family M)
+      chi) :
+    |switcherooLeftFrontCoreScalar params ψbi family M -
+        switcherooFirstSplitCoreScalar params ψbi family M| ≤
+      Real.sqrt chi := by
+  let 𝒟q : Distribution (SlicePairQuestion params) :=
+    uniformDistribution (SlicePairQuestion params)
+  let A : SlicePairQuestion params → Polynomial params × Outcome → MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q go => ((switcherooPointProductLeft params family M q).outcome go)ᴴ
+  let B : SlicePairQuestion params → Polynomial params × Outcome → MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q go => ((switcherooPointProductRight params family M q).outcome go)ᴴ
+  let C : SlicePairQuestion params →
+      Polynomial params × Outcome → Unit → MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q go () => (switcherooPointProductLeft params family M q).outcome go
+  have h𝒟q : ∑ q ∈ 𝒟q.support, 𝒟q.weight q ≤ 1 := by
+    simpa [𝒟q] using uniformDistribution_weight_sum_le_one (SlicePairQuestion params)
+  have hAB :
+      avgOver 𝒟q
+        (fun q => qSDDCore ψbi (fun go => (A q go)ᴴ) (fun go => (B q go)ᴴ)) ≤ chi := by
+    simpa [𝒟q, A, B] using
+      switcherooPointProductCommutation_coreBound params ψbi family M chi hcomm
+  have hC :
+      ∀ q,
+        (∑ go : Polynomial params × Outcome,
+            (∑ u : Unit, C q go u)ᴴ * (∑ u : Unit, C q go u)) ≤ 1 := by
+    intro q
+    simpa [C] using switcherooAggregateLeftFront_contraction params family M q
+  have hclose :=
+    Preliminaries.closenessOfInnerProduct_right ψbi hnorm 𝒟q h𝒟q A B C chi hAB hC
+  have hleft_point :
+      ∀ q go,
+        ev ψbi (A q go * C q go ()) =
+          ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1 *
+                (family.meas q.1).outcome go.1 *
+                (M q.2).outcome go.2)) := by
+    intro q go
+    let G : MIPStarRE.Quantum.Op ι := (family.meas q.1).outcome go.1
+    let Mo : MIPStarRE.Quantum.Op ι := (M q.2).outcome go.2
+    have hGherm : Gᴴ = G := (family.meas q.1).outcome_hermitian go.1
+    have hMoherm : Moᴴ = Mo := (M q.2).outcome_hermitian go.2
+    calc
+      ev ψbi (A q go * C q go ())
+        = ev ψbi ((leftTensor (ι₂ := ι) (G * Mo))ᴴ * leftTensor (ι₂ := ι) (G * Mo)) := by
+            simp [A, C, switcherooPointProductLeft, orderedProductOpFamily,
+              OpFamily.leftPlacedOpFamily, G, Mo]
+      _ = ev ψbi (leftTensor (ι₂ := ι) (((G * Mo)ᴴ) * (G * Mo))) := by
+            rw [show (leftTensor (ι₂ := ι) (G * Mo))ᴴ =
+                leftTensor (ι₂ := ι) ((G * Mo)ᴴ) by
+                  simpa [leftTensor, opTensor] using
+                    (conjTranspose_opTensor (G * Mo) (1 : MIPStarRE.Quantum.Op ι))]
+            rw [leftTensor_mul_leftTensor]
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι)
+              (Mo * G * G * Mo)) := by
+            congr 1
+            simp [Matrix.conjTranspose_mul, hGherm, hMoherm, mul_assoc]
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1 *
+                (family.meas q.1).outcome go.1 *
+                (M q.2).outcome go.2)) := by
+            simp [G, Mo]
+  have hright_point :
+      ∀ q go,
+        ev ψbi (B q go * C q go ()) =
+          ev ψbi
+            (leftTensor (ι₂ := ι)
+              (((family.meas q.1).outcome go.1) *
+                (M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1 *
+                (M q.2).outcome go.2)) := by
+    intro q go
+    let G : MIPStarRE.Quantum.Op ι := (family.meas q.1).outcome go.1
+    let Mo : MIPStarRE.Quantum.Op ι := (M q.2).outcome go.2
+    have hGherm : Gᴴ = G := (family.meas q.1).outcome_hermitian go.1
+    have hMoherm : Moᴴ = Mo := (M q.2).outcome_hermitian go.2
+    calc
+      ev ψbi (B q go * C q go ())
+        = ev ψbi ((leftTensor (ι₂ := ι) (Mo * G))ᴴ * leftTensor (ι₂ := ι) (G * Mo)) := by
+            simp [B, C, switcherooPointProductLeft, switcherooPointProductRight,
+              orderedProductOpFamily, reversedProductOpFamily,
+              OpFamily.leftPlacedOpFamily, G, Mo]
+      _ = ev ψbi (leftTensor (ι₂ := ι) (((Mo * G)ᴴ) * (G * Mo))) := by
+            rw [show (leftTensor (ι₂ := ι) (Mo * G))ᴴ =
+                leftTensor (ι₂ := ι) ((Mo * G)ᴴ) by
+                  simpa [leftTensor, opTensor] using
+                    (conjTranspose_opTensor (Mo * G) (1 : MIPStarRE.Quantum.Op ι))]
+            rw [leftTensor_mul_leftTensor]
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι)
+              (G * Mo * G * Mo)) := by
+            congr 1
+            simp [Matrix.conjTranspose_mul, hGherm, hMoherm, mul_assoc]
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι)
+              (((family.meas q.1).outcome go.1) *
+                (M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1 *
+                (M q.2).outcome go.2)) := by
+            simp [G, Mo]
+  have hleft :
+      avgOver 𝒟q (fun q =>
+          ∑ a : Polynomial params × Outcome,
+            ∑ b : Unit, ev ψbi (A q a * C q a b)) =
+        switcherooFirstSplitCoreScalar params ψbi family M := by
+    unfold switcherooFirstSplitCoreScalar
+    apply avgOver_congr
+    intro q
+    refine Finset.sum_congr rfl ?_
+    intro go _
+    calc
+      ∑ b : Unit, ev ψbi (A q go * C q go b)
+        = ev ψbi (A q go * C q go ()) := by simp
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1 *
+                (family.meas q.1).outcome go.1 *
+                (M q.2).outcome go.2)) := hleft_point q go
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1 *
+                (M q.2).outcome go.2)) := by
+            have hproj :
+                (family.meas q.1).outcome go.1 * (family.meas q.1).outcome go.1 =
+                  (family.meas q.1).outcome go.1 := (family.meas q.1).proj go.1
+            have hcollapse :
+                (M q.2).outcome go.2 *
+                    (family.meas q.1).outcome go.1 *
+                    (family.meas q.1).outcome go.1 *
+                    (M q.2).outcome go.2 =
+                  (M q.2).outcome go.2 *
+                    (family.meas q.1).outcome go.1 *
+                    (M q.2).outcome go.2 := by
+              calc
+                (M q.2).outcome go.2 *
+                    (family.meas q.1).outcome go.1 *
+                    (family.meas q.1).outcome go.1 *
+                    (M q.2).outcome go.2
+                  = (M q.2).outcome go.2 *
+                      ((family.meas q.1).outcome go.1 * (family.meas q.1).outcome go.1) *
+                      (M q.2).outcome go.2 := by simp [mul_assoc]
+                _ = (M q.2).outcome go.2 *
+                      (family.meas q.1).outcome go.1 *
+                      (M q.2).outcome go.2 := by rw [hproj]
+            exact congrArg (fun X => ev ψbi (leftTensor (ι₂ := ι) X)) hcollapse
+  have hright :
+      avgOver 𝒟q (fun q =>
+          ∑ a : Polynomial params × Outcome,
+            ∑ b : Unit, ev ψbi (B q a * C q a b)) =
+        switcherooLeftFrontCoreScalar params ψbi family M := by
+    unfold switcherooLeftFrontCoreScalar
+    apply avgOver_congr
+    intro q
+    refine Finset.sum_congr rfl ?_
+    intro go _
+    calc
+      ∑ b : Unit, ev ψbi (B q go * C q go b)
+        = ev ψbi (B q go * C q go ()) := by simp
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι)
+              (((family.meas q.1).outcome go.1) *
+                (M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1 *
+                (M q.2).outcome go.2)) := hright_point q go
+  have hleft' :
+      avgOver 𝒟q (fun q =>
+          ∑ a : Polynomial params × Outcome, ev ψbi (A q a * C q a ())) =
+        switcherooFirstSplitCoreScalar params ψbi family M := by
+    simpa using hleft
+  have hright' :
+      avgOver 𝒟q (fun q =>
+          ∑ a : Polynomial params × Outcome, ev ψbi (B q a * C q a ())) =
+        switcherooLeftFrontCoreScalar params ψbi family M := by
+    simpa using hright
+  have hclose' :
+      |avgOver 𝒟q (fun q =>
+          ∑ a : Polynomial params × Outcome, ev ψbi (A q a * C q a ())) -
+        avgOver 𝒟q (fun q =>
+          ∑ a : Polynomial params × Outcome, ev ψbi (B q a * C q a ()))| ≤
+        Real.sqrt chi := by
+    simpa using hclose
+  simpa [hleft', hright', abs_sub_comm] using hclose'
+
 set_option maxHeartbeats 3000000 in
+-- Expanding `qSDDOp` into four averaged scalar terms over a slice-pair question
+-- generates a large normalization expression that otherwise exceeds heartbeats.
 /-- Average the single-question four-term `qSDDOp` expansion over the
 slice-pair distribution. -/
 lemma switcherooAggregate_qSDDOp_expand_avg

@@ -15,12 +15,14 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
--- The four-term expansion + triangle chain involves many `simpa`/`calc` steps.
-set_option maxHeartbeats 400000 in
+set_option maxHeartbeats 4000000 in
+-- The four-term expansion + triangle chain expands several explicit scalar centers
+-- and contraction witnesses; the higher heartbeat cap keeps elaboration stable.
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
+    (hperm : PermInvState ψbi)
     (hnorm : ψbi.IsNormalized)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι)
@@ -44,21 +46,19 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
   `G^x_g` to commutation with the total `G^x`.
 
   The paper informally compares all four `qSDDOp` expansion terms to a single
-  scalar center. In Lean it is cleaner to use two centers whose contributions
-  cancel algebraically:
+  scalar center. We keep the two natural centers separate in the intermediate
+  estimates:
 
-  * `G ⊗ M` for the first/third terms
-  * `M ⊗ G` for the second/fourth terms
+  * `G ⊗ M` for the first term and the negative-term contraction chain
+  * `M ⊗ G` for the second term
 
-  This avoids inserting an extra symmetry assumption on `ψbi` at this stage.
+  The permutation-invariance hypothesis `hperm` then identifies these two
+  centers at the end via `ev (A ⊗ B) = ev (B ⊗ A)`.
   -/
   refine ⟨?_⟩
   let 𝒟x : Distribution (SliceQuestion params) :=
     uniformDistribution (SliceQuestion params)
-  let firstTerm :=
-    avgOver 𝒟x (fun x =>
-      Preliminaries.leftSandwichExpectation ψbi 𝒟x M
-        ((completePartSubMeas params family x).total))
+  let firstTerm := switcherooAggregateFirstTerm params ψbi family M
   let secondTerm := switcherooAggregateSecondTerm params ψbi family M
   let thirdTerm := switcherooAggregateThirdTerm params ψbi family M
   let fourthTerm := switcherooAggregateFourthTerm params ψbi family M
@@ -68,24 +68,306 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
       Preliminaries.middleSandwichExpectation ψbi 𝒟x
         (completePartProjFamily params family) (((M y).toSubMeas).total))
   have hfirst : |firstTerm - centerGM| ≤ 2 * Real.sqrt omega := by
-    simpa [firstTerm, centerGM, switcherooAggregateTarget_eq_middleSandwich] using
+    simpa [firstTerm, centerGM, switcherooAggregateFirstTerm_eq_leftSandwich,
+      switcherooAggregateTarget_eq_middleSandwich] using
       switcheroo_first_term_close params ψbi hnorm family M omega hselfM
   have hsecond : |secondTerm - centerMGComplete| ≤ 2 * Real.sqrt zeta := by
     simpa [secondTerm, centerMGComplete, 𝒟x] using
       switcheroo_second_aggregate_term_close params ψbi hnorm family M zeta hselfG
-  have hexpand := switcherooAggregate_qSDDOp_expand_avg params ψbi family M
+  have hexpand :
+      avgOver (uniformDistribution (SlicePairQuestion params))
+          (fun q => qSDDOp ψbi
+            (switcherooAggregateLeft params family M q)
+            (switcherooAggregateRight params family M q)) =
+        firstTerm + secondTerm - thirdTerm - fourthTerm := by
+    simpa [firstTerm, secondTerm, thirdTerm, fourthTerm] using
+      switcherooAggregate_qSDDOp_expand_avg params ψbi family M
   have hthird_eq : thirdTerm = fourthTerm := by
     simpa [thirdTerm, fourthTerm] using
       switcherooAggregateThirdTerm_eq_fourthTerm params ψbi family M
-  constructor
-  unfold sddErrorOp
-  rw [hexpand]
-  /-
-  Remaining blocker: the fourth-term chain is reduced to packaging the raw helper
-  bounds into a final negative-term estimate and then transferring it to the third
-  term via `hthird_eq`.
-  -/
-  sorry
+  let onceCommuted : Error :=
+    avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+      ∑ g : Polynomial params, ∑ o : Outcome,
+        ev ψbi
+          (leftTensor (ι₂ := ι)
+            ((completePartSubMeas params family q.1).total *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g)))
+  let mixed : Error :=
+    avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+      ∑ g : Polynomial params, ∑ o : Outcome,
+        ev ψbi
+          ((leftTensor (ι₂ := ι)
+            ((completePartSubMeas params family q.1).total *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g *
+              (M q.2).outcome o)) *
+            rightTensor (ι₁ := ι) ((family.meas q.1).outcome g)))
+  let leftFront : Error :=
+    MIPStarRE.LDT.Pasting.switcherooLeftFrontCoreScalar params ψbi family M
+  let firstSplit : Error :=
+    MIPStarRE.LDT.Pasting.switcherooFirstSplitCoreScalar params ψbi family M
+  let Gtotal : Fq params → MIPStarRE.Quantum.Op ι := fun x =>
+    (completePartSubMeas params family x).total
+  let Mtotal : Fq params → MIPStarRE.Quantum.Op ι := fun y =>
+    ((M y).toSubMeas).total
+  have hcenterMG_pair :
+      centerMGComplete =
+        avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+          ev ψbi (opTensor (Mtotal q.2) (Gtotal q.1))) := by
+    simpa [centerMGComplete, Mtotal, Gtotal, 𝒟x] using
+      switcherooAggregateMGCenterComplete_eq_opTensor_avg params ψbi family M
+  have hcenterGM_pair :
+      centerGM =
+        avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+          ev ψbi (opTensor (Gtotal q.1) (Mtotal q.2))) := by
+    simpa [centerGM, Gtotal, Mtotal] using
+      switcherooAggregateTarget_eq_opTensor_avg params ψbi family M
+  have hcenter_eq : centerMGComplete = centerGM := by
+    rw [hcenterMG_pair, hcenterGM_pair]
+    apply avgOver_congr
+    intro q
+    simpa [Gtotal, Mtotal] using hperm.ev_opTensor_swap (Mtotal q.2) (Gtotal q.1)
+  have honce_prod_eq :
+      avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+        ∑ go : Polynomial params × Outcome,
+          ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((completePartSubMeas params family q.1).total *
+                (M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1 *
+                (M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1))) = onceCommuted := by
+    unfold onceCommuted
+    apply avgOver_congr
+    intro q
+    simpa using
+      (Fintype.sum_prod_type' (f := fun g o =>
+        ev ψbi
+          (leftTensor (ι₂ := ι)
+            ((completePartSubMeas params family q.1).total *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g))))
+  have hfourth_once_raw :
+      |fourthTerm -
+          avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+            ∑ go : Polynomial params × Outcome,
+              ev ψbi
+                (leftTensor (ι₂ := ι)
+                  ((completePartSubMeas params family q.1).total *
+                    (M q.2).outcome go.2 *
+                    (family.meas q.1).outcome go.1 *
+                    (M q.2).outcome go.2 *
+                    (family.meas q.1).outcome go.1)))| ≤ Real.sqrt chi := by
+    simpa [fourthTerm] using
+      switcherooAggregateFourthTerm_split_close_once_commuted params ψbi hnorm family M chi hcomm
+  have hfourth_once : |fourthTerm - onceCommuted| ≤ Real.sqrt chi := by
+    rwa [honce_prod_eq] at hfourth_once_raw
+  have honce_mixed : |onceCommuted - mixed| ≤ Real.sqrt zeta := by
+    simpa [onceCommuted, mixed] using
+      (switcherooAggregateFourthTerm_once_commuted_close_mixed
+        params ψbi hnorm family M zeta hselfG)
+  -- Identify `mixed` with the `rightTensor·leftTensor` form expected by the
+  -- raw left-front transfer lemma.
+  have hmixed_eq :
+      mixed =
+        avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+          ∑ g : Polynomial params, ∑ o : Outcome,
+            ev ψbi
+              (rightTensor (ι₁ := ι) ((family.meas q.1).outcome g) *
+                leftTensor (ι₂ := ι)
+                  ((completePartSubMeas params family q.1).total *
+                    (M q.2).outcome o *
+                    (family.meas q.1).outcome g *
+                    (M q.2).outcome o))) := by
+    change avgOver _ _ = _
+    apply avgOver_congr
+    intro q
+    refine Finset.sum_congr rfl ?_
+    intro g _
+    refine Finset.sum_congr rfl ?_
+    intro o _
+    rw [leftTensor_mul_rightTensor_eq_opTensor,
+      ← rightTensor_mul_leftTensor_eq_opTensor]
+  -- Identify `leftFront` with the `leftTensor·leftTensor` form expected by the
+  -- raw left-front transfer lemma. Uses the projector-absorption identity
+  -- `G_g · G^x = G_g`.
+  have hleftFront_eq :
+      leftFront =
+        avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+          ∑ g : Polynomial params, ∑ o : Outcome,
+            ev ψbi
+              (leftTensor (ι₂ := ι) ((family.meas q.1).outcome g) *
+                leftTensor (ι₂ := ι)
+                  ((completePartSubMeas params family q.1).total *
+                    (M q.2).outcome o *
+                    (family.meas q.1).outcome g *
+                    (M q.2).outcome o))) := by
+    change switcherooLeftFrontCoreScalar params ψbi family M = _
+    unfold switcherooLeftFrontCoreScalar
+    apply avgOver_congr
+    intro q
+    rw [show
+        (∑ go : Polynomial params × Outcome,
+            ev ψbi
+              (leftTensor (ι₂ := ι)
+                (((family.meas q.1).outcome go.1) *
+                  (M q.2).outcome go.2 *
+                  (family.meas q.1).outcome go.1 *
+                  (M q.2).outcome go.2))) =
+          ∑ g : Polynomial params, ∑ o : Outcome,
+            ev ψbi
+              (leftTensor (ι₂ := ι)
+                ((family.meas q.1).outcome g *
+                  (M q.2).outcome o *
+                  (family.meas q.1).outcome g *
+                  (M q.2).outcome o)) by
+      simpa using
+        (Fintype.sum_prod_type' (f := fun g o =>
+          ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((family.meas q.1).outcome g *
+                (M q.2).outcome o *
+                (family.meas q.1).outcome g *
+                (M q.2).outcome o))))]
+    refine Finset.sum_congr rfl ?_
+    intro g _
+    refine Finset.sum_congr rfl ?_
+    intro o _
+    have hGabsorb :
+        (family.meas q.1).outcome g *
+            (completePartSubMeas params family q.1).total =
+          (family.meas q.1).outcome g := by
+      rw [completePartSubMeas_total]
+      exact Preliminaries.projSubMeas_outcome_mul_total_eq_outcome
+        (family.meas q.1) g
+    have hcollapse :
+        (family.meas q.1).outcome g *
+            ((completePartSubMeas params family q.1).total *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g *
+              (M q.2).outcome o) =
+          (family.meas q.1).outcome g *
+            (M q.2).outcome o *
+            (family.meas q.1).outcome g *
+            (M q.2).outcome o := by
+      calc
+        (family.meas q.1).outcome g *
+            ((completePartSubMeas params family q.1).total *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g *
+              (M q.2).outcome o)
+          = ((family.meas q.1).outcome g *
+                (completePartSubMeas params family q.1).total) *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g *
+              (M q.2).outcome o := by
+            simp [mul_assoc]
+        _ = (family.meas q.1).outcome g *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g *
+              (M q.2).outcome o := by rw [hGabsorb]
+    rw [leftTensor_mul_leftTensor]
+    exact congrArg (fun X => ev ψbi (leftTensor (ι₂ := ι) X)) hcollapse.symm
+  have hmixed_leftFront : |mixed - leftFront| ≤ Real.sqrt zeta := by
+    rw [hmixed_eq, hleftFront_eq, abs_sub_comm]
+    exact switcherooAggregateFourthTerm_mixed_close_left_front_raw
+      params ψbi hnorm family M zeta hselfG
+  have hleftFront_firstSplit :
+      |leftFront - firstSplit| ≤ Real.sqrt chi := by
+    change |switcherooLeftFrontCoreScalar params ψbi family M -
+            switcherooFirstSplitCoreScalar params ψbi family M| ≤ Real.sqrt chi
+    exact switcherooLeftFront_close_firstSplitCore
+      params ψbi hnorm family M chi hcomm
+  have hfirstSplit_eq : firstSplit = firstTerm := by
+    change switcherooFirstSplitCoreScalar params ψbi family M =
+        switcherooAggregateFirstTerm params ψbi family M
+    exact switcherooAggregateFirstTerm_eq_split_by_g params ψbi family M
+  -- Triangle-inequality chain: |fourthTerm - firstTerm| ≤ 2·√ζ + 2·√χ.
+  have hfourth_firstTerm :
+      |fourthTerm - firstTerm| ≤ 2 * Real.sqrt zeta + 2 * Real.sqrt chi := by
+    rw [← hfirstSplit_eq]
+    have hchain :
+        |fourthTerm - firstSplit| ≤
+          Real.sqrt chi + Real.sqrt zeta +
+            (Real.sqrt zeta + Real.sqrt chi) := by
+      calc
+        |fourthTerm - firstSplit|
+            ≤ |fourthTerm - onceCommuted| + |onceCommuted - firstSplit| :=
+              abs_sub_le _ _ _
+        _ ≤ |fourthTerm - onceCommuted| +
+              (|onceCommuted - mixed| + |mixed - firstSplit|) := by
+              gcongr
+              exact abs_sub_le _ _ _
+        _ ≤ |fourthTerm - onceCommuted| +
+              (|onceCommuted - mixed| +
+                (|mixed - leftFront| + |leftFront - firstSplit|)) := by
+              gcongr
+              exact abs_sub_le _ _ _
+        _ ≤ Real.sqrt chi +
+              (Real.sqrt zeta + (Real.sqrt zeta + Real.sqrt chi)) := by
+              gcongr
+        _ = Real.sqrt chi + Real.sqrt zeta +
+              (Real.sqrt zeta + Real.sqrt chi) := by ring
+    linarith [hchain]
+  have hsecond_centerGM : |secondTerm - centerGM| ≤ 2 * Real.sqrt zeta := by
+    rw [← hcenter_eq]; exact hsecond
+  have hfourth_centerGM :
+      |fourthTerm - centerGM| ≤
+        2 * Real.sqrt omega + 2 * Real.sqrt zeta + 2 * Real.sqrt chi := by
+    calc
+      |fourthTerm - centerGM|
+          ≤ |fourthTerm - firstTerm| + |firstTerm - centerGM| :=
+            abs_sub_le _ _ _
+      _ ≤ (2 * Real.sqrt zeta + 2 * Real.sqrt chi) + 2 * Real.sqrt omega := by
+            gcongr
+      _ = 2 * Real.sqrt omega + 2 * Real.sqrt zeta + 2 * Real.sqrt chi := by
+            ring
+  -- Discharge the SDDOpRel goal: show the averaged squared-distance defect is
+  -- below the displayed error.
+  refine ⟨?_⟩
+  have hreduce :
+      sddErrorOp ψbi (uniformDistribution (SlicePairQuestion params))
+          (switcherooAggregateLeft params family M)
+          (switcherooAggregateRight params family M) =
+        firstTerm + secondTerm - 2 * fourthTerm := by
+    unfold sddErrorOp
+    rw [hexpand, hthird_eq]; ring
+  rw [hreduce]
+  have habs :
+      |firstTerm + secondTerm - 2 * fourthTerm| ≤
+        6 * Real.sqrt zeta + 6 * Real.sqrt omega + 4 * Real.sqrt chi := by
+    have hsplit :
+        firstTerm + secondTerm - 2 * fourthTerm =
+          (firstTerm - centerGM) + (secondTerm - centerGM) -
+            2 * (fourthTerm - centerGM) := by ring
+    rw [hsplit]
+    calc
+      |((firstTerm - centerGM) + (secondTerm - centerGM)) -
+            2 * (fourthTerm - centerGM)|
+          ≤ |(firstTerm - centerGM) + (secondTerm - centerGM)| +
+              |2 * (fourthTerm - centerGM)| := abs_sub _ _
+      _ ≤ (|firstTerm - centerGM| + |secondTerm - centerGM|) +
+              2 * |fourthTerm - centerGM| := by
+            refine add_le_add (abs_add_le _ _) ?_
+            rw [abs_mul]
+            simp
+      _ ≤ 2 * Real.sqrt omega + 2 * Real.sqrt zeta +
+              2 * (2 * Real.sqrt omega + 2 * Real.sqrt zeta +
+                2 * Real.sqrt chi) := by
+            gcongr
+      _ = 6 * Real.sqrt zeta + 6 * Real.sqrt omega + 4 * Real.sqrt chi := by
+            ring
+  calc
+    firstTerm + secondTerm - 2 * fourthTerm
+        ≤ |firstTerm + secondTerm - 2 * fourthTerm| := le_abs_self _
+    _ ≤ 6 * Real.sqrt zeta + 6 * Real.sqrt omega + 4 * Real.sqrt chi := habs
+    _ = commutativitySwitcherooError zeta omega chi := by
+          simp [commutativitySwitcherooError, Real.sqrt_eq_rpow]
 
 /-- Reindexing a uniform slice-pair average along `Prod.swap` preserves `SDDOpRel`. -/
 lemma sddOpRel_swap_questions

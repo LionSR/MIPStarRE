@@ -378,7 +378,7 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
             ((completePartSubMeas params family q.1).total_le_one)
 
 /-- The first `sqrt zeta` step in the fourth-term switcheroo chain. -/
-private lemma switcherooAggregateFourthTerm_once_commuted_close_mixed
+lemma switcherooAggregateFourthTerm_once_commuted_close_mixed
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
