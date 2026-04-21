@@ -122,7 +122,8 @@ instance interpolationEligible_decidablePred (params : Parameters) [FieldModel p
 
 /-- A chosen `d+1`-element interpolation support together with the proof fields that
 show it lies inside the genuine completed-slice support. The choice is arbitrary,
-but packaging the subset with its properties makes that choice explicit to callers. -/
+and the current implementation still obtains it via `Classical.choose`; packaging
+the subset with its properties makes that nonconstructive choice explicit to callers. -/
 structure InterpolationSupportWitness (params : Parameters) [FieldModel params.q]
     {k : ℕ} (gs : GHatTupleOutcome params k) where
   support : Finset (Fin k)
@@ -130,7 +131,8 @@ structure InterpolationSupportWitness (params : Parameters) [FieldModel params.q
   card_eq : support.card = params.d + 1
 
 /-- Choose an explicit `d+1`-point interpolation support inside the genuine support of
-an interpolation-eligible tuple. -/
+an interpolation-eligible tuple. This is currently the only remaining
+nonconstructive step in the interpolation path. -/
 noncomputable def interpolationSupportWitness {params : Parameters} {k : ℕ}
     [FieldModel params.q] (gs : GHatTupleOutcome params k)
     (hEligible : InterpolationEligible params gs) :
@@ -160,7 +162,7 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
     (gs : GHatTupleOutcome params k) (σ : Finset (Fin k))
     (hσsupport : σ ⊆ gHatTupleSupport gs)
     (hσcard : σ.card = params.d + 1) : Polynomial params.next where
-  poly := Finset.sum σ.attach fun idx =>
+  poly := ∑ idx ∈ σ.attach,
     let slicePoly :=
       MvPolynomial.rename (embedCoord params)
         (extractSlicePoly gs idx.1 (hσsupport idx.2)).poly
