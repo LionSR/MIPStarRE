@@ -18,7 +18,7 @@ The upstream hypotheses are stated at the paper's native exponents and decay
 scales (`1/1024`, `1/2048`, `1/16384`, `1/32768`) and are coarsened to this
 common envelope inside the Lean proofs.
 
-Each cascade-step lemma has two components:
+Each cascade-step lemma has three components:
 
 * The **cascade variable** (`cascadeSigma`, `cascadeZeta1`, …), a
   paper-faithful definition of the intermediate quantity.
