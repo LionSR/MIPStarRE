@@ -173,6 +173,8 @@ private theorem mainFormalEnvelope_eq_stepEnvelope (params : Parameters) (k : �
     mainFormalEnvelope params k eps =
       stepEnvelope params k eps (40000 : Error) (2560000 : Error) := rfl
 
+/-- For `x ∈ [0, 1]`, enlarging the denominator in `x^(1/n)` makes the
+exponent smaller and therefore the value larger. -/
 private theorem rpow_le_of_denom_le {x : Error} (hx : 0 ≤ x) (hx1 : x ≤ 1)
     {n₁ n₂ : Error} (hn₁Pos : 0 < n₁) (hn : n₁ ≤ n₂) :
     Real.rpow x (1 / n₁) ≤ Real.rpow x (1 / n₂) := by
@@ -180,6 +182,8 @@ private theorem rpow_le_of_denom_le {x : Error} (hx : 0 ≤ x) (hx1 : x ≤ 1)
   have hdiv : 1 / n₂ ≤ 1 / n₁ := one_div_le_one_div_of_le hn₁Pos hn
   exact Real.rpow_le_rpow_of_exponent_ge' hx hx1 (show 0 ≤ 1 / n₂ by positivity) hdiv
 
+/-- For `k ≥ 0`, `m > 0`, and `N₁ ≤ N₂`, the larger decay denominator gives
+the weaker exponential bound `exp(-k/(N₁ m²)) ≤ exp(-k/(N₂ m²))`. -/
 private theorem exp_neg_le_of_denom_ge (k : ℕ) (m : Error) (hm : 0 < m)
     {N₁ N₂ : Error} (h₁ : 0 < N₁) (h₁₂ : N₁ ≤ N₂) :
     Real.exp (-((k : Error) / (N₁ * m ^ (2 : ℕ)))) ≤
@@ -210,6 +214,8 @@ private theorem stepEnvelope_le_stepEnvelope {params : Parameters} {k : ℕ} {ep
   have hExp := exp_neg_le_of_denom_ge k (params.m : Error) hmPos hN₁Pos hN
   linarith
 
+/-- A paper-local envelope with exponent `1/n` and decay scale `N` is absorbed
+by `mainFormalEnvelope` whenever `n ≤ 40000` and `N ≤ 2560000`. -/
 private theorem stepEnvelope_le_mainFormalEnvelope {params : Parameters} {k : ℕ} {eps : Error}
     (h : CascadeHypotheses params k eps) {n N : Error}
     (hnPos : 0 < n) (hn : n ≤ 40000) (hNPos : 0 < N) (hN : N ≤ 2560000) :
