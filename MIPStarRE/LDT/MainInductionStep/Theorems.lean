@@ -1,4 +1,3 @@
-import Mathlib.Analysis.Convex.Jensen
 import Mathlib.Analysis.Convex.SpecificFunctions.Pow
 import Mathlib.Analysis.MeanInequalitiesPow
 import MIPStarRE.LDT.MainInductionStep.Statements
@@ -431,24 +430,6 @@ private lemma min_eps_one_le_mainInductionError_of_m_eq_one
       _ = mainInductionError params k eps delta gamma := by
             simp [mainInductionError, mainInductionNu, hm1]
 
-private lemma avgOver_uniform_rpow_le_rpow_avg
-    {α : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
-    (f : α → Error) (hf_nonneg : ∀ a, 0 ≤ f a)
-    (c : Error) (hc_nonneg : 0 ≤ c) (hc_le_one : c ≤ 1) :
-    avgOver (uniformDistribution α) (fun a => Real.rpow (f a) c) ≤
-      Real.rpow (avgOver (uniformDistribution α) f) c := by
-  simpa [avgOver, uniformDistribution, mul_comm, mul_left_comm, mul_assoc] using
-    (Real.concaveOn_rpow hc_nonneg hc_le_one).le_map_sum
-      (t := Finset.univ)
-      (w := fun a : α => (uniformDistribution α).weight a)
-      (p := f)
-      (by
-        intro a _
-        exact (uniformDistribution α).nonnegative a)
-      (by simp [uniformDistribution])
-      (by
-        intro a _
-        exact hf_nonneg a)
 
 private lemma diagonalFailureProbability_nonneg
     (params : Parameters) [FieldModel params.q]
@@ -783,8 +764,8 @@ noncomputable def assemblePastingPackage
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (_hsmall : mainInductionError params.next k eps delta gamma < 1)
     (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
     (hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k)
     (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
@@ -794,7 +775,6 @@ noncomputable def assemblePastingPackage
   -- self-consistency / boundedness conclusions and telescope the resulting
   -- `ldPastingInInductionError` bound to
   -- `mainInductionError params.next k eps delta gamma`.
-  clear hgood hsmall
   sorry
 
 /-- Direct base case of `thm:main-induction` when `m = 1`.
@@ -928,16 +908,8 @@ theorem mainInductionBaseCase
         (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
       hgood.selfConsistencyTest
-  have hdiag_nonneg : 0 ≤ strategy.diagonalFailureProbability := by
-    unfold SymStrat.diagonalFailureProbability
-    refine mul_nonneg ?_ ?_
-    · positivity
-    · refine Finset.sum_nonneg ?_
-      intro j _
-      exact bipartiteConsError_nonneg strategy.state
-        (uniformDistribution (RestrictedDiagonalSample params j))
-        (diagonalPointAnswerFamily strategy j)
-        (diagonalLineAnswerFamily strategy j)
+  have hdiag_nonneg : 0 ≤ strategy.diagonalFailureProbability :=
+    diagonalFailureProbability_nonneg params strategy
   have hgamma_nonneg : 0 ≤ gamma := le_trans hdiag_nonneg hgood.diagonalLineTest
   have haxis_le_one : strategy.axisParallelFailureProbability ≤ 1 := by
     simpa [SymStrat.axisParallelFailureProbability] using
