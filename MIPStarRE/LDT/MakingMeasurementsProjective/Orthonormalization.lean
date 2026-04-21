@@ -43,7 +43,7 @@ private noncomputable def restrictSomeProjSubMeas {Outcome : Type*} {ι : Type*}
     { outcome := fun a => P.outcome (some a)
       total := ∑ a : Outcome, P.outcome (some a)
       outcome_pos := fun a => P.outcome_pos (some a)
-      sum_eq_total := by simp
+      sum_eq_total := rfl
       total_le_one := by
         calc
           ∑ a : Outcome, P.outcome (some a)
@@ -220,8 +220,8 @@ private lemma qSDD_liftLeft_restrictSomeProjSubMeas_le {Outcome : Type*}
               ((((optionCompletion A).toSubMeas.liftLeft).outcome (some a) -
                     (P.toSubMeas.liftLeft).outcome (some a))ᴴ *
                   (((optionCompletion A).toSubMeas.liftLeft).outcome (some a) -
-                    (P.toSubMeas.liftLeft).outcome (some a))) := by
-            exact le_add_of_nonneg_left hnone_nonneg
+                    (P.toSubMeas.liftLeft).outcome (some a))) :=
+            le_add_of_nonneg_left hnone_nonneg
     _ = qSDD ψ (optionCompletion A).toSubMeas.liftLeft P.toSubMeas.liftLeft := by
           unfold qSDD qSDDCore
           rw [Fintype.sum_option]
@@ -611,8 +611,8 @@ theorem orthonormalization {Outcome : Type*}
   intro hssc hbridge
   rcases hbridge with ⟨hspectral, hrepair⟩
   by_cases hζhalf : ζ ≤ 1 / 2
-  · have hζ_nonneg : 0 ≤ ζ := by
-      exact le_trans
+  · have hζ_nonneg : 0 ≤ ζ :=
+      le_trans
         (bipartiteSSCError_nonneg ψ (uniformDistribution Unit)
           (constSubMeasFamily A))
         hssc.overlapBound
@@ -664,8 +664,8 @@ theorem orthonormalization {Outcome : Type*}
       simpa [P] using
         qSDD_liftLeft_zeroProjSubMeas_le_one (ψ := ψ) (hψ := hψ) (A := A)
     have hδ :
-        1 ≤ orthonormalizationError ζ := by
-      exact orthonormalizationError_ge_one_of_half_lt ζ (lt_of_not_ge hζhalf)
+        1 ≤ orthonormalizationError ζ :=
+      orthonormalizationError_ge_one_of_half_lt ζ (lt_of_not_ge hζhalf)
     refine ⟨P, ?_⟩
     constructor
     simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
