@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Main.EvaluatedQuestions
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG
 
 /-!
 # Section 11 commutativity: final results

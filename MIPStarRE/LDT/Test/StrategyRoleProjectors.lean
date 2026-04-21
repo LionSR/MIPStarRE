@@ -350,11 +350,13 @@ lemma normalizedTrace_re_two_smul_rolePairCond {ι : Type*}
     _ = (2 : Error)⁻¹ * Complex.re (MIPStarRE.Quantum.normalizedTrace X) := by
           norm_num [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
 
-private lemma permInvState_of_density_fixed {ι : Type*} [Fintype ι] [DecidableEq ι]
+/-- A swap-invariant density operator induces the cached one-sided expectation
+symmetry packaged by `PermInvState`. -/
+theorem PermInvState.of_density_swap {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι))
     (hfix : swapDensity ψ.density = ψ.density) :
     PermInvState ψ := by
-  refine ⟨?_⟩
+  refine ⟨hfix, ?_⟩
   intro M
   unfold ev
   apply congrArg Complex.re
@@ -369,11 +371,103 @@ private lemma permInvState_of_density_fixed {ι : Type*} [Fintype ι] [Decidable
     _ = MIPStarRE.Quantum.normalizedTrace (ψ.density * rightTensor (ι₁ := ι) M) := by
           rw [hfix, swapDensity_leftTensor]
 
+namespace PermInvState
+
+/-- A permutation-invariant bipartite state has the same expectation against an
+operator and its tensor-factor swap. -/
+lemma ev_swapDensity {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)}
+    (hperm : PermInvState ψ)
+    (Z : MIPStarRE.Quantum.Op (ι × ι)) :
+    ev ψ (swapDensity Z) = ev ψ Z := by
+  unfold ev
+  apply congrArg Complex.re
+  calc
+    MIPStarRE.Quantum.normalizedTrace (ψ.density * swapDensity Z)
+      = MIPStarRE.Quantum.normalizedTrace (swapDensity (ψ.density * Z)) := by
+          rw [swapDensity_mul, hperm.density_swap]
+    _ = MIPStarRE.Quantum.normalizedTrace (ψ.density * Z) :=
+          normalizedTrace_swapDensity _
+
+/-- Expectations of simple tensors are invariant under swapping the two local
+factors. -/
+lemma ev_opTensor_swap {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)}
+    (hperm : PermInvState ψ)
+    (X Y : MIPStarRE.Quantum.Op ι) :
+    ev ψ (opTensor X Y) = ev ψ (opTensor Y X) := by
+  rw [show opTensor Y X = swapDensity (opTensor X Y) by
+    ext x y
+    rcases x with ⟨i₁, i₂⟩
+    rcases y with ⟨j₁, j₂⟩
+    simp [swapDensity, opTensor, mul_comm]]
+  exact (hperm.ev_swapDensity (opTensor X Y)).symm
+
+/-- The bipartite match mass is symmetric in its two submeasurements on a
+permutation-invariant state. -/
+lemma qBipartiteMatchMass_symm {Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)}
+    (hperm : PermInvState ψ)
+    (A B : SubMeas Outcome ι) :
+    qBipartiteMatchMass ψ A B = qBipartiteMatchMass ψ B A := by
+  unfold qBipartiteMatchMass
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  simpa using hperm.ev_opTensor_swap (A.outcome a) (B.outcome a)
+
+/-- The bipartite consistency defect is symmetric in its two submeasurements on
+a permutation-invariant state. -/
+lemma qBipartiteConsDefect_symm {Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)}
+    (hperm : PermInvState ψ)
+    (A B : SubMeas Outcome ι) :
+    qBipartiteConsDefect ψ A B = qBipartiteConsDefect ψ B A := by
+  simp [qBipartiteConsDefect, hperm.ev_opTensor_swap A.total B.total,
+    hperm.qBipartiteMatchMass_symm A B]
+
+/-- Averaged bipartite consistency error is symmetric under exchanging the two
+indexed submeasurement families. -/
+lemma bipartiteConsError_symm {Question Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)}
+    (hperm : PermInvState ψ)
+    (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question Outcome ι) :
+    bipartiteConsError ψ 𝒟 A B = bipartiteConsError ψ 𝒟 B A := by
+  unfold bipartiteConsError
+  apply avgOver_congr
+  intro q
+  exact hperm.qBipartiteConsDefect_symm (A q) (B q)
+
+/-- A `ConsRel` hypothesis may be flipped left-to-right on a
+permutation-invariant state without changing the error bound. -/
+lemma consRel_swap {Question Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)}
+    (hperm : PermInvState ψ)
+    (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question Outcome ι)
+    (δ : Error) :
+    ConsRel ψ 𝒟 A B δ → ConsRel ψ 𝒟 B A δ := by
+  intro hAB
+  rcases hAB with ⟨hAB⟩
+  constructor
+  calc
+    bipartiteConsError ψ 𝒟 B A
+      = bipartiteConsError ψ 𝒟 A B := by
+          symm
+          exact hperm.bipartiteConsError_symm 𝒟 A B
+    _ ≤ δ := hAB
+
+end PermInvState
+
 /-- The classical role-register symmetrized state is permutation-invariant. -/
 theorem classicalRoleSymmState_permInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) :
     PermInvState (classicalRoleSymmState ψ) :=
-  permInvState_of_density_fixed (classicalRoleSymmState ψ)
+  PermInvState.of_density_swap (classicalRoleSymmState ψ)
     (classicalRoleSymmState_density_fixed ψ)
 
 /-- The classical role-register symmetrized state preserves normalization. -/

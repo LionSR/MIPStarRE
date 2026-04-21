@@ -23,17 +23,18 @@ def swapDensity {ι : Type*} (M : MIPStarRE.Quantum.Op (ι × ι)) :
 
 /-- Permutation-invariance for a bipartite state on `ι × ι`.
 
-The key property (`swap_ev`) is that expectation values are symmetric
-under swapping the two tensor factors:
-  `ev ψ (leftTensor M) = ev ψ (rightTensor M)`.
-This is the formal content of "ψ is permutation-invariant" in the paper
-(see Section 3).
-
-For concrete strategies, this should be discharged via
-`ψ.density = swapDensity ψ.density`. -/
+The primary datum is that the density operator is fixed by the SWAP reindexing,
+`swapDensity ψ.density = ψ.density`.  We also cache the frequently used
+one-sided expectation consequence
+`ev ψ (leftTensor M) = ev ψ (rightTensor M)`.
+This matches the symmetric-strategy construction used in the paper
+(Section 3) and exposes enough symmetry to swap fully bipartite
+consistency expressions. -/
 structure PermInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) : Prop where
-  /-- Swapping tensor factors preserves expectation values. -/
+  /-- The density operator is fixed by the SWAP reindexing. -/
+  density_swap : swapDensity ψ.density = ψ.density
+  /-- Swapping tensor factors preserves one-sided expectation values. -/
   swap_ev : ∀ (M : MIPStarRE.Quantum.Op ι),
     ev ψ (leftTensor (ι₂ := ι) M) =
       ev ψ (rightTensor (ι₁ := ι) M)
