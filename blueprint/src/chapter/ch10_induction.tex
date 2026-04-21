@@ -343,38 +343,47 @@
 	Multiply the assumed bound by $m^2$, replace $m^2$ by $m^4$, coarsen the exponents from $1/1024$ to $1/40000$, and enlarge the exponential denominator from $80000m^2$ to $2560000m^2$.
 \end{proof}
 
-\begin{theorem}[Structural inflation for the later cascade terms]\label{thm:zeta-bounds-main-formal}
-	\lean{MIPStarRE.LDT.Test.zeta1_bound, MIPStarRE.LDT.Test.zeta2_bound, MIPStarRE.LDT.Test.zeta3_bound, MIPStarRE.LDT.Test.zeta4_bound}
-	\uses{def:main-formal-envelope, def:main-formal-error-cascade}
-	Under the standing hypotheses, assume the envelope-level bounds
-	\begin{align*}
-		\zeta_1 &\le 20204k^2m^4 E, &
-		\zeta_2 &\le 2560km E, \\
-		\zeta_3 &\le 150000k^2m^4 E, &
-		\zeta_4 &\le 40000k^2m^4 E.
-	\end{align*}
+\begin{theorem}[Cascade bounds for the later cascade terms]\label{thm:zeta-bounds-main-formal}
+	\lean{MIPStarRE.LDT.Test.zeta1_bound, MIPStarRE.LDT.Test.zeta2_bound, MIPStarRE.LDT.Test.zeta3_bound, MIPStarRE.LDT.Test.zeta4_bound}\leanok
+	\uses{def:main-formal-envelope, def:main-formal-error-cascade, thm:sigma-bound-main-formal}
+	Under the standing hypotheses, assume
+	\[
+		0 \le \nu \le 10000k^2m^2\left(\eps^{1/1024} + (d/q)^{1/1024}\right).
+	\]
+	Define
+	\[
+		\sigma = m^2\left(\nu + e^{-k/(80000m^2)}\right),
+	\]
+	\[
+		\zeta_1 = 2\sigma + 2\sqrt{3\eps + 2\sigma} + md/q,
+		\qquad
+		\zeta_2 = 200\zeta_1^{1/4} + 40\zeta_1^{1/8},
+	\]
+	\[
+		\zeta_3 = 6\zeta_1 + 6\zeta_2,
+		\qquad
+		\zeta_4 = 2\sigma + 2\sqrt{\zeta_1 + \zeta_3/2}.
+	\]
 	Then
-	\begin{align*}
-		\zeta_1 &\le 100000k^2m^4 E, &
-		\zeta_2 &\le 100000k^2m^4 E, \\
-		\zeta_3 &\le 2 \cdot 100000k^2m^4 E, &
-		\zeta_4 &\le 100000k^2m^4 E.
-	\end{align*}
+	\[
+		\zeta_1, \zeta_2, \zeta_4 \le 100000k^2m^4 E,
+		\qquad
+		\zeta_3 \le 2 \cdot 100000k^2m^4 E.
+	\]
 \end{theorem}
 \begin{proof}
-	\uses{thm:main-formal-envelope-basics}
-	Each inequality is a numerical inflation of the corresponding hypothesis. For $\zeta_2$ one also uses $k \le k^2$, $m \le m^4$, and $E \ge 0$. Note that the Lean declarations \texttt{zeta1\_bound}, \texttt{zeta2\_bound}, \texttt{zeta3\_bound}, \texttt{zeta4\_bound} state the upstream hypothesis with the paper-native exponents (e.g.\ $\eps^{1/2048}$, $\eps^{1/16384}$) and decay scales (e.g.\ $e^{-k/(160000m^2)}$) rather than the coarsened envelope $E$; the Lean proofs internally coarsen these to $E$. Hence \texttt{\textbackslash leanok} is intentionally withheld on this blueprint statement, which is stated in terms of $E$.
+	\leanok
+	The Lean declarations first derive the paper-native bounds for $\zeta_1,\dots,\zeta_4$ from the cascade definitions using square-root and $rpow$ monotonicity, and then coarsen those bounds to the common envelope $E$. The $\zeta_2$ proof additionally uses $k \le k^2$, $m \le m^4$, and the nonnegativity of the earlier cascade variables.
 \end{proof}
 
 \begin{theorem}[Consolidated error cascade]\label{thm:error-cascade-main-formal}
-	\lean{MIPStarRE.LDT.Test.errorCascade_le_mainFormalError}
+	\lean{MIPStarRE.LDT.Test.errorCascade_le_mainFormalError}\leanok
 	\uses{def:main-formal-envelope, def:main-formal-error-cascade, thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
-	Assume the standing hypotheses, the input bound from Theorem~\ref{thm:sigma-bound-main-formal}, and the envelope-level bounds of Theorem~\ref{thm:zeta-bounds-main-formal}. Assume in addition the explicit bound for the concrete cascade triple $(\sigma,\zeta_1,\zeta_3)$:
+	Assume the standing hypotheses and
 	\[
-		\zeta_4 = 2\sigma + 2\sqrt{\zeta_1 + \zeta_3/2}
-		\le 40000k^2m^4 E.
+		0 \le \nu \le 10000k^2m^2\left(\eps^{1/1024} + (d/q)^{1/1024}\right).
 	\]
-	Then
+	Let $\sigma,\zeta_1,\zeta_2,\zeta_3$ be the cascade quantities defined above. Then
 	\[
 		\sigma \le 100000k^2m^4 E,
 		\qquad
@@ -382,14 +391,18 @@
 		\qquad
 		\zeta_3 \le 2 \cdot 100000k^2m^4 E,
 	\]
-	and any $\zeta_4$ built from $\sigma,\zeta_1,\zeta_3$ also satisfies
+	and the concrete quantity
+	\[
+		\zeta_4 = 2\sigma + 2\sqrt{\zeta_1 + \zeta_3/2}
+	\]
+	also satisfies
 	\[
 		\zeta_4 \le 100000k^2m^4 E.
 	\]
 \end{theorem}
 \begin{proof}
-	\uses{thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
-	This is obtained by substituting the cascade definitions and combining the preceding inequalities. The bound on $\zeta_4$ uses the hypothesis about the concrete cascade triple $(\sigma,\zeta_1,\zeta_3)$ together with $\zeta_4 = 2\sigma + 2\sqrt{\zeta_1+\zeta_3/2}$.
+	\leanok
+	This is the direct packaging of Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal}. The Lean declaration uses the explicit equalities naming $\sigma,\zeta_1,\zeta_2,\zeta_3$ as the corresponding cascade expressions.
 \end{proof}
 
 \begin{proof}
