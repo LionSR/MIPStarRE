@@ -22,7 +22,9 @@ with two direction vectors.
 The intended geometric surface is the image of
 `(t₁, t₂) ↦ base + t₁ • direction₁ + t₂ • direction₂`. We keep this ordered
 frame representation, rather than quotienting by reparametrizations, because the
-surface prover's answer is a polynomial on a specific chosen parameterization. -/
+surface prover's answer is a polynomial on a specific chosen parameterization.
+The actual verifier sampling later restricts to the genuine 2-dimensional cases,
+i.e. those with linearly independent directions. -/
 structure Surface (params : Parameters) where
   base : Point params
   direction₁ : Point params
@@ -41,6 +43,30 @@ def pointAt {params : Parameters} [FieldModel params.q]
     addPoint s.base
       (addPoint (smulPoint (t 0) s.direction₁)
         (smulPoint (t 1) s.direction₂))
+
+/-- The queried point on a sampled surface is represented by the zero parameter. -/
+def zeroParameter {params : Parameters} [FieldModel params.q] : SurfaceParameter params :=
+  fun _ => zeroCoord
+
+@[simp] theorem pointAt_zeroParameter {params : Parameters} [FieldModel params.q]
+    (s : Surface params) :
+    s.pointAt zeroParameter = s.base := by
+  funext i
+  simp [zeroParameter, pointAt, addPoint, smulPoint, addCoord, mulCoord, zeroCoord]
+
+/-- The two direction vectors are linearly independent over the coded field, so
+this parameterized affine surface is genuinely 2-dimensional. -/
+def IsTwoDimensional {params : Parameters} [FieldModel params.q]
+    (s : Surface params) : Prop :=
+  ∀ a b : Fq params,
+    addPoint (smulPoint a s.direction₁) (smulPoint b s.direction₂) = zeroPoint →
+      a = zeroCoord ∧ b = zeroCoord
+
+instance {params : Parameters} [FieldModel params.q] :
+    DecidablePred (Surface.IsTwoDimensional (params := params)) := by
+  intro s
+  unfold Surface.IsTwoDimensional
+  infer_instance
 
 end Surface
 
@@ -77,22 +103,47 @@ noncomputable instance {params : Parameters} [FieldModel params.q] :
 
 @[ext] theorem ext {params : Parameters} [FieldModel params.q]
     {f g : SurfacePolynomial params} (hpoly : f.poly = g.poly) : f = g := by
-  cases f with
-  | mk polyf hdegf =>
-      cases g with
-      | mk polyg hdegg =>
-          cases hpoly
-          congr
+  cases f
+  cases g
+  cases hpoly
+  congr
 
 end SurfacePolynomial
 
 namespace Test
 
-/-- A sampled surface together with the sampled point on that surface, encoded
-through its two affine parameters. This is the product-form presentation of the
-paper's random-surface/random-point experiment. -/
+/-- A sampled surface-versus-point question is represented by a parameterized
+surface whose base point is the verifier's sampled point. The actual sampling
+measure on this type is `surfaceVsPointDistribution`, which restricts to genuine
+2-dimensional surfaces. -/
 abbrev SurfaceVsPointSample (params : Parameters) :=
-  Surface params × SurfaceParameter params
+  Surface params
+
+/-- The distribution of the classical surface-versus-point test questions.
+
+The paper samples `u ∈ F_q^m` uniformly and then a uniformly random
+2-dimensional affine surface containing `u`. Since `Surface params` is encoded
+by a base point together with an ordered pair of direction vectors, we realize
+this as the normalized uniform distribution on the genuine surfaces, i.e. those
+whose directions are linearly independent. The sampled point is the surface base
+point, so the verifier checks the surface answer at parameter `(0, 0)`.
+
+This keeps the convenient ordered-frame representation needed for polynomial
+answers while excluding degenerate `0`- or `1`-dimensional cases from the
+sampling measure. -/
+noncomputable def surfaceVsPointDistribution (params : Parameters) [FieldModel params.q] :
+    Distribution (SurfaceVsPointSample params) := by
+  let support : Finset (SurfaceVsPointSample params) :=
+    Finset.univ.filter (fun s => s.IsTwoDimensional)
+  exact
+    { support := support
+      weight := fun s => if s ∈ support then 1 / (support.card : Error) else 0
+      nonnegative := by
+        intro s
+        by_cases hs : s ∈ support <;> simp [hs]
+      outsideSupport := by
+        intro s hs
+        simp [hs] }
 
 /-- Deterministic classical answers for the `k = 2` surface-versus-point test:
 Prover A answers point queries, and Prover B answers surface queries. -/
@@ -106,22 +157,27 @@ structure TwoProverClassicalSurfaceVsPointStrategy (params : Parameters)
 namespace TwoProverClassicalSurfaceVsPointStrategy
 
 /-- Whether the deterministic classical strategy is accepted on a sampled
-surface-versus-point instance. -/
+surface-versus-point instance. The queried point is the sampled surface's base
+point, i.e. the parameter `(0, 0)`. -/
 def accepts {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalSurfaceVsPointStrategy params)
     (sample : SurfaceVsPointSample params) : Prop :=
-  let s := sample.1
-  let t := sample.2
-  strategy.surfaceAnswerB s t = strategy.pointAnswerA (s.pointAt t)
+  strategy.surfaceAnswerB sample (Surface.zeroParameter (params := params)) =
+    strategy.pointAnswerA sample.base
+
+noncomputable instance {params : Parameters} [FieldModel params.q]
+    (strategy : TwoProverClassicalSurfaceVsPointStrategy params)
+    (sample : SurfaceVsPointSample params) : Decidable (strategy.accepts sample) := by
+  unfold TwoProverClassicalSurfaceVsPointStrategy.accepts
+  infer_instance
 
 /-- Acceptance probability of the classical surface-versus-point test, written
-as an average over a uniformly random surface together with a uniformly random
-point on that surface. -/
+as an average over the modeled distribution of genuine 2-dimensional surface
+questions. -/
 noncomputable def acceptanceProbability {params : Parameters}
     [FieldModel params.q]
-    (strategy : TwoProverClassicalSurfaceVsPointStrategy params) : Error := by
-  classical
-  exact avgOver (uniformDistribution (SurfaceVsPointSample params)) fun sample =>
+    (strategy : TwoProverClassicalSurfaceVsPointStrategy params) : Error :=
+  avgOver (surfaceVsPointDistribution params) fun sample =>
     if strategy.accepts sample then (1 : Error) else 0
 
 /-- Passing the classical surface-versus-point test with error `eps`, stated in

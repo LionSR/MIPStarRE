@@ -54,20 +54,13 @@ def PointAnswerSoundnessConclusion (params : Parameters) [FieldModel params.q]
             (fun u => if g u = a u then (1 : Error) else 0) ≥
           1 - slack
 
-/-- Legacy alias retaining the earlier explicit "bounded" name for downstream
-classical wrappers. -/
-abbrev BoundedPointAnswerSoundnessConclusion (params : Parameters)
-    [FieldModel params.q]
-    (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
-  PointAnswerSoundnessConclusion params a slackBound slack
-
 /-- Pass condition for the classical `k = 2` surface-versus-point low-degree
 test from `references/ldt-paper/introduction.tex`.
 
 This records only the paper-faithful classical test-passing data:
 - a deterministic classical strategy for the surface-versus-point test,
 - a proof that Alice's point-answer function is the ambient `a`, and
-- a proof that the strategy passes the modeled random-surface/random-point
+- a proof that the strategy passes the modeled random-point / genuine-surface
   acceptance test with probability at least `1 - eps`.
 
 This is intentionally NOT `PassesLowIndividualDegreeTest`, which models a
@@ -102,8 +95,8 @@ def TwoProverClassicalLIDPassCondition (params : Parameters)
 surface-versus-point soundness theorem.
 
 This keeps the quoted classical theorem explicit, rather than making it an
-ambient axiom. Downstream theorems can request it through the typeclass-style
-assumption `[Fact (RazSafraSoundnessStatement params)]`. -/
+ambient axiom. Downstream wrappers take a term of this `Prop` as an explicit
+hypothesis, mirroring `PolishchukSpielmanClassicalSoundnessStatement`. -/
 def RazSafraSoundnessStatement (params : Parameters)
     [FieldModel params.q] : Prop :=
   ∀ (a : Point params → Fq params) (eps : Error),
@@ -127,7 +120,7 @@ def PolishchukSpielmanClassicalSoundnessStatement (params : Parameters)
     (a : Point params → Fq params) (eps slackBound : Error) : Prop :=
   TwoProverClassicalLIDPassCondition params a eps →
     ∃ slack : Error,
-      BoundedPointAnswerSoundnessConclusion params a slackBound slack
+      PointAnswerSoundnessConclusion params a slackBound slack
 
 /-- `thm:raz-safra`.
 
@@ -138,12 +131,12 @@ close to a low-degree polynomial with slack bounded by
 `razSafraSlackBound params eps`. -/
 theorem razSafra
     (params : Parameters) [FieldModel params.q]
-    [Fact (RazSafraSoundnessStatement params)]
     (a : Point params → Fq params) (eps : Error)
-    (hpass : SurfaceVsPointPassCondition params a eps) :
+    (hpass : SurfaceVsPointPassCondition params a eps)
+    (hRS : RazSafraSoundnessStatement params) :
     ∃ slack : Error,
       PointAnswerSoundnessConclusion params a (razSafraSlackBound params eps) slack := by
-  exact (Fact.out : RazSafraSoundnessStatement params) a eps hpass
+  exact hRS a eps hpass
 
 /-- `thm:classical-test-soundness`.
 
@@ -158,7 +151,7 @@ theorem classicalTestSoundness
     (hpass : TwoProverClassicalLIDPassCondition params a eps)
     (hPS : PolishchukSpielmanClassicalSoundnessStatement params a eps slackBound) :
     ∃ slack : Error,
-      BoundedPointAnswerSoundnessConclusion params a slackBound slack := by
+      PointAnswerSoundnessConclusion params a slackBound slack := by
   exact hPS hpass
 
 /-- Placeholder convenience instantiation of `classicalTestSoundness` using the
@@ -174,7 +167,7 @@ theorem classicalTestSoundnessWithPlaceholderBound
     (hPS : PolishchukSpielmanClassicalSoundnessStatement params a eps
       (classicalTestSoundnessSlackBound params eps)) :
     ∃ slack : Error,
-      BoundedPointAnswerSoundnessConclusion params a
+      PointAnswerSoundnessConclusion params a
         (classicalTestSoundnessSlackBound params eps) slack := by
   exact classicalTestSoundness params a eps
     (classicalTestSoundnessSlackBound params eps) hpass hPS
