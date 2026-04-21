@@ -15,7 +15,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private noncomputable def switcherooAggregateLeftFrontRaw
+noncomputable def switcherooAggregateLeftFrontRaw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -31,7 +31,7 @@ private noncomputable def switcherooAggregateLeftFrontRaw
             (M q.2).outcome go.2)))
 
 /-- The split-by-`g` expression that collapses back to the first positive term. -/
-private noncomputable def switcherooAggregateFirstSplitRaw
+noncomputable def switcherooAggregateFirstSplitRaw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -46,7 +46,7 @@ private noncomputable def switcherooAggregateFirstSplitRaw
               (M q.2).outcome go.2))))
 
 /-- The post-first-`√χ` raw expression in the fourth-term chain. -/
-private noncomputable def switcherooAggregateOnceCommutedRaw
+noncomputable def switcherooAggregateOnceCommutedRaw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -63,7 +63,7 @@ private noncomputable def switcherooAggregateOnceCommutedRaw
             (family.meas q.1).outcome go.1)))
 
 /-- Repackage the first `sqrt chi` step using the named raw scalar. -/
-private lemma switcherooAggregateFourthTerm_close_once_commuted_raw
+lemma switcherooAggregateFourthTerm_close_once_commuted_raw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -84,7 +84,7 @@ private lemma switcherooAggregateFourthTerm_close_once_commuted_raw
       params ψbi hnorm family M chi hcomm
 
 /-- The post-first-`√ζ` mixed-tensor raw expression in the fourth-term chain. -/
-private noncomputable def switcherooAggregateMixedRaw
+noncomputable def switcherooAggregateMixedRaw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -102,7 +102,7 @@ private noncomputable def switcherooAggregateMixedRaw
 
 /-- Repackage the second `sqrt zeta` step using the named raw left-front
 scalar. -/
-private lemma switcherooAggregateFourthTerm_mixed_close_left_front_raw
+lemma switcherooAggregateFourthTerm_mixed_close_left_front_raw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -179,5 +179,37 @@ private lemma switcherooAggregateFourthTerm_mixed_close_left_front_raw
       switcherooAggregateFourthTerm_once_commuted_contraction_right params family M q
   simpa [𝒟q, A, B, C] using
     (Preliminaries.closenessOfInnerProduct_right ψbi hnorm 𝒟q h𝒟q A B C zeta hAB hC)
+
+/-- Public alias for the second `sqrt zeta` switcheroo transfer in explicit scalar form. -/
+lemma switcherooMixed_close_leftFrontCore
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (zeta : Error)
+    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
+    |avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+        ∑ g : Polynomial params, ∑ o : Outcome,
+          ev ψbi
+            (leftTensor (ι₂ := ι) ((family.meas q.1).outcome g) *
+              leftTensor (ι₂ := ι)
+                ((completePartSubMeas params family q.1).total *
+                  (M q.2).outcome o *
+                  (family.meas q.1).outcome g *
+                  (M q.2).outcome o))) -
+      avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+        ∑ g : Polynomial params, ∑ o : Outcome,
+          ev ψbi
+            (rightTensor (ι₁ := ι) ((family.meas q.1).outcome g) *
+              leftTensor (ι₂ := ι)
+                ((completePartSubMeas params family q.1).total *
+                  (M q.2).outcome o *
+                  (family.meas q.1).outcome g *
+                  (M q.2).outcome o)))| ≤
+      Real.sqrt zeta := by
+  simpa using
+    switcherooAggregateFourthTerm_mixed_close_left_front_raw params ψbi hnorm family M zeta hselfG
 
 end MIPStarRE.LDT.Pasting

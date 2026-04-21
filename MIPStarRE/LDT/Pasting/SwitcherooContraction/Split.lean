@@ -378,7 +378,7 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
             ((completePartSubMeas params family q.1).total_le_one)
 
 /-- The first `sqrt zeta` step in the fourth-term switcheroo chain. -/
-private lemma switcherooAggregateFourthTerm_once_commuted_close_mixed
+lemma switcherooAggregateFourthTerm_once_commuted_close_mixed
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -435,5 +435,37 @@ private lemma switcherooAggregateFourthTerm_once_commuted_close_mixed
     Preliminaries.closenessOfInnerProduct_left ψbi hnorm 𝒟q h𝒟q A B C zeta hAB hC
   simpa [𝒟q, A, B, C, leftTensor_mul_leftTensor, rightTensor_mul_leftTensor_eq_opTensor,
     leftTensor_mul_rightTensor_eq_opTensor, mul_assoc] using hclose
+
+/-- Public alias for the first `sqrt zeta` switcheroo transfer. -/
+lemma switcherooOnceCommuted_close_mixedCore
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (zeta : Error)
+    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
+    |avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+        ∑ g : Polynomial params, ∑ o : Outcome,
+          ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((completePartSubMeas params family q.1).total *
+                (M q.2).outcome o *
+                (family.meas q.1).outcome g *
+                (M q.2).outcome o *
+                (family.meas q.1).outcome g))) -
+      avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+        ∑ g : Polynomial params, ∑ o : Outcome,
+          ev ψbi
+            ((leftTensor (ι₂ := ι)
+              ((completePartSubMeas params family q.1).total *
+                (M q.2).outcome o *
+                (family.meas q.1).outcome g *
+                (M q.2).outcome o)) *
+              rightTensor (ι₁ := ι) ((family.meas q.1).outcome g)))| ≤
+      Real.sqrt zeta := by
+  simpa using
+    switcherooAggregateFourthTerm_once_commuted_close_mixed params ψbi hnorm family M zeta hselfG
 
 end MIPStarRE.LDT.Pasting

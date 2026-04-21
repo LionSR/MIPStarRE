@@ -15,12 +15,14 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
--- The four-term expansion + triangle chain involves many `simpa`/`calc` steps.
-set_option maxHeartbeats 400000 in
+set_option maxHeartbeats 10000000 in
+-- The four-term expansion + triangle chain expands several explicit scalar centers
+-- and contraction witnesses; the higher heartbeat cap keeps elaboration stable.
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
+    (hperm : PermInvState ψbi)
     (hnorm : ψbi.IsNormalized)
     (family : IdxPolyFamily params ι)
     (M : IdxProjSubMeas (Fq params) Outcome ι)
@@ -44,21 +46,19 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
   `G^x_g` to commutation with the total `G^x`.
 
   The paper informally compares all four `qSDDOp` expansion terms to a single
-  scalar center. In Lean it is cleaner to use two centers whose contributions
-  cancel algebraically:
+  scalar center. We keep the two natural centers separate in the intermediate
+  estimates:
 
-  * `G ⊗ M` for the first/third terms
-  * `M ⊗ G` for the second/fourth terms
+  * `G ⊗ M` for the first term and the negative-term contraction chain
+  * `M ⊗ G` for the second term
 
-  This avoids inserting an extra symmetry assumption on `ψbi` at this stage.
+  The permutation-invariance hypothesis `hperm` then identifies these two
+  centers at the end via `ev (A ⊗ B) = ev (B ⊗ A)`.
   -/
   refine ⟨?_⟩
   let 𝒟x : Distribution (SliceQuestion params) :=
     uniformDistribution (SliceQuestion params)
-  let firstTerm :=
-    avgOver 𝒟x (fun x =>
-      Preliminaries.leftSandwichExpectation ψbi 𝒟x M
-        ((completePartSubMeas params family x).total))
+  let firstTerm := switcherooAggregateFirstTerm params ψbi family M
   let secondTerm := switcherooAggregateSecondTerm params ψbi family M
   let thirdTerm := switcherooAggregateThirdTerm params ψbi family M
   let fourthTerm := switcherooAggregateFourthTerm params ψbi family M
@@ -68,22 +68,182 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
       Preliminaries.middleSandwichExpectation ψbi 𝒟x
         (completePartProjFamily params family) (((M y).toSubMeas).total))
   have hfirst : |firstTerm - centerGM| ≤ 2 * Real.sqrt omega := by
-    simpa [firstTerm, centerGM, switcherooAggregateTarget_eq_middleSandwich] using
+    simpa [firstTerm, centerGM, MIPStarRE.LDT.Pasting.switcherooFirstTerm_eq_leftSandwichCore,
+      switcherooAggregateTarget_eq_middleSandwich] using
       switcheroo_first_term_close params ψbi hnorm family M omega hselfM
   have hsecond : |secondTerm - centerMGComplete| ≤ 2 * Real.sqrt zeta := by
     simpa [secondTerm, centerMGComplete, 𝒟x] using
       switcheroo_second_aggregate_term_close params ψbi hnorm family M zeta hselfG
-  have hexpand := switcherooAggregate_qSDDOp_expand_avg params ψbi family M
+  have hexpand :
+      avgOver (uniformDistribution (SlicePairQuestion params))
+          (fun q => qSDDOp ψbi
+            (switcherooAggregateLeft params family M q)
+            (switcherooAggregateRight params family M q)) =
+        firstTerm + secondTerm - thirdTerm - fourthTerm := by
+    simpa [firstTerm, secondTerm, thirdTerm, fourthTerm] using
+      switcherooAggregate_qSDDOp_expand_avg params ψbi family M
   have hthird_eq : thirdTerm = fourthTerm := by
     simpa [thirdTerm, fourthTerm] using
       switcherooAggregateThirdTerm_eq_fourthTerm params ψbi family M
-  constructor
-  unfold sddErrorOp
-  rw [hexpand]
+  let onceCommuted : Error :=
+    avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+      ∑ g : Polynomial params, ∑ o : Outcome,
+        ev ψbi
+          (leftTensor (ι₂ := ι)
+            ((completePartSubMeas params family q.1).total *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g)))
+  let mixed : Error :=
+    avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+      ∑ g : Polynomial params, ∑ o : Outcome,
+        ev ψbi
+          ((leftTensor (ι₂ := ι)
+            ((completePartSubMeas params family q.1).total *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g *
+              (M q.2).outcome o)) *
+            rightTensor (ι₁ := ι) ((family.meas q.1).outcome g)))
+  let leftFront : Error :=
+    MIPStarRE.LDT.Pasting.switcherooLeftFrontCoreScalar params ψbi family M
+  let firstSplit : Error :=
+    MIPStarRE.LDT.Pasting.switcherooFirstSplitCoreScalar params ψbi family M
+  let Gtotal : Fq params → MIPStarRE.Quantum.Op ι := fun x =>
+    (completePartSubMeas params family x).total
+  let Mtotal : Fq params → MIPStarRE.Quantum.Op ι := fun y =>
+    ((M y).toSubMeas).total
+  have hcenterMG_pair :
+      centerMGComplete =
+        avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+          ev ψbi (opTensor (Mtotal q.2) (Gtotal q.1))) := by
+    let F : Fq params → Fq params → Error := fun x y =>
+      ∑ u : Unit,
+        ev ψbi
+          (leftTensor (ι₂ := ι) (Mtotal y) *
+            rightTensor (ι₁ := ι) ((completePartProjFamily params family x).outcome u))
+    calc
+      centerMGComplete = avgOver 𝒟x (fun y => avgOver 𝒟x (fun x => F x y)) := by
+        simp [centerMGComplete, F, 𝒟x, Preliminaries.middleSandwichExpectation, Mtotal]
+      _ = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => F q.2 q.1) := by
+        symm
+        simpa [𝒟x, SlicePairQuestion, SliceQuestion] using
+          (avgOver_uniform_prod
+            (α := SliceQuestion params)
+            (β := SliceQuestion params)
+            (f := fun y x => F x y))
+      _ = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q => F q.1 q.2) := by
+        symm
+        simpa [SlicePairQuestion] using
+          (avgOver_uniform_equiv
+            (α := SlicePairQuestion params)
+            (β := SlicePairQuestion params)
+            (Equiv.prodComm (Fq params) (Fq params))
+            (fun q => F q.1 q.2))
+      _ = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+            ev ψbi (opTensor (Mtotal q.2) (Gtotal q.1))) := by
+        apply avgOver_congr
+        intro q
+        rcases q with ⟨x, y⟩
+        have hsingle :
+            (completePartProjFamily params family x).outcome () = Gtotal x := by
+          change (completePartSubMeas params family x).outcome () =
+            (completePartSubMeas params family x).total
+          simpa [completePartSubMeas] using
+            postprocess_unit_outcome_eq_total ((family.meas x).toSubMeas)
+        simp [F, Gtotal, Mtotal, hsingle, leftTensor_mul_rightTensor_eq_opTensor]
+  have hcenterGM_pair :
+      centerGM =
+        avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+          ev ψbi (opTensor (Gtotal q.1) (Mtotal q.2))) := by
+    unfold centerGM switcherooAggregateTarget
+    apply avgOver_congr
+    intro q
+    rcases q with ⟨x, y⟩
+    calc
+      ∑ o : Outcome,
+          ev ψbi
+            (leftTensor (ι₂ := ι) (Gtotal x) *
+              rightTensor (ι₁ := ι) ((M y).outcome o))
+        = ev ψbi
+            (∑ o : Outcome,
+              leftTensor (ι₂ := ι) (Gtotal x) *
+                rightTensor (ι₁ := ι) ((M y).outcome o)) := by
+            rw [← ev_sum ψbi (fun o : Outcome =>
+              leftTensor (ι₂ := ι) (Gtotal x) *
+                rightTensor (ι₁ := ι) ((M y).outcome o))]
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι) (Gtotal x) *
+              ∑ o : Outcome, rightTensor (ι₁ := ι) ((M y).outcome o)) := by
+            congr 1
+            exact (Finset.mul_sum
+              (s := (Finset.univ : Finset Outcome))
+              (f := fun o : Outcome => rightTensor (ι₁ := ι) ((M y).outcome o))
+              (a := leftTensor (ι₂ := ι) (Gtotal x))).symm
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι) (Gtotal x) *
+              rightTensor (ι₁ := ι) (Mtotal y)) := by
+            rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ (fun o : Outcome => (M y).outcome o)]
+            rw [(M y).sum_eq_total]
+      _ = ev ψbi (opTensor (Gtotal x) (Mtotal y)) := by
+            simp [Gtotal, Mtotal, leftTensor_mul_rightTensor_eq_opTensor]
+  have hcenter_eq : centerMGComplete = centerGM := by
+    rw [hcenterMG_pair, hcenterGM_pair]
+    apply avgOver_congr
+    intro q
+    simpa [Gtotal, Mtotal] using hperm.ev_opTensor_swap (Mtotal q.2) (Gtotal q.1)
+  have honce_prod_eq :
+      avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+        ∑ go : Polynomial params × Outcome,
+          ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((completePartSubMeas params family q.1).total *
+                (M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1 *
+                (M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1))) = onceCommuted := by
+    unfold onceCommuted
+    apply avgOver_congr
+    intro q
+    simpa using
+      (Fintype.sum_prod_type' (f := fun g o =>
+        ev ψbi
+          (leftTensor (ι₂ := ι)
+            ((completePartSubMeas params family q.1).total *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g *
+              (M q.2).outcome o *
+              (family.meas q.1).outcome g))))
+  have hfourth_once_raw :
+      |fourthTerm -
+          avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+            ∑ go : Polynomial params × Outcome,
+              ev ψbi
+                (leftTensor (ι₂ := ι)
+                  ((completePartSubMeas params family q.1).total *
+                    (M q.2).outcome go.2 *
+                    (family.meas q.1).outcome go.1 *
+                    (M q.2).outcome go.2 *
+                    (family.meas q.1).outcome go.1)))| ≤ Real.sqrt chi := by
+    simpa [fourthTerm] using
+      switcherooAggregateFourthTerm_split_close_once_commuted params ψbi hnorm family M chi hcomm
+  have hfourth_once : |fourthTerm - onceCommuted| ≤ Real.sqrt chi := by
+    rwa [honce_prod_eq] at hfourth_once_raw
+  have honce_mixed : |onceCommuted - mixed| ≤ Real.sqrt zeta := by
+    simpa [onceCommuted, mixed] using
+      (MIPStarRE.LDT.Pasting.switcherooOnceCommuted_close_mixedCore
+        params ψbi hnorm family M zeta hselfG)
   /-
-  Remaining blocker: the fourth-term chain is reduced to packaging the raw helper
-  bounds into a final negative-term estimate and then transferring it to the third
-  term via `hthird_eq`.
+  Remaining blocker: the final left-front contraction step still needs the
+  explicit identification of the nested expression in
+  `switcherooMixed_close_leftFrontCore` with
+  `switcherooLeftFrontCoreScalar params ψbi family M`, followed by the already
+  prepared chain
+  $$
+    \text{fourthTerm} \to \text{onceCommuted} \to \text{mixed}
+      \to \text{leftFront} \to \text{firstSplit} \to \text{centerGM}.
+  $$
+  The new facts proved above reduce the gap to this remaining transport.
   -/
   sorry
 
