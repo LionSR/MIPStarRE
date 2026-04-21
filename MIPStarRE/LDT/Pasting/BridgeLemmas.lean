@@ -493,26 +493,26 @@ private lemma liftedVerticalLineConsistency
     rcases ux with ⟨u, x⟩
     rw [hRestrictionToVerticalLine, postprocess_comp]
     have hpt' :
-        ({ base := appendPoint params (u, x).1 zeroCoord,
-           direction := lastCoord params } : AxisParallelLine params.next).pointAt (u, x).2 =
-          appendPoint params (u, x).1 (u, x).2 := by
+        ({ base := appendPoint params u zeroCoord,
+           direction := lastCoord params } : AxisParallelLine params.next).pointAt x =
+          appendPoint params u x := by
       simpa using verticalLine_pointAt_appendPoint params u x
     have hfun :
         (fun a : Polynomial params.next =>
           (Polynomial.restrictToAxisParallelLine params.next a
-              { base := appendPoint params (u, x).1 zeroCoord,
-                direction := lastCoord params }).toFun (u, x).2) =
-          (fun a : Polynomial params.next => a (appendPoint params (u, x).1 (u, x).2)) := by
+              { base := appendPoint params u zeroCoord,
+                direction := lastCoord params }).toFun x) =
+          (fun a : Polynomial params.next => a (appendPoint params u x)) := by
       funext a
       simpa [hpt'] using
         restrictToAxisParallelLine_apply (params := params.next) a
-          { base := appendPoint params (u, x).1 zeroCoord,
-            direction := lastCoord params } (u, x).2
+          { base := appendPoint params u zeroCoord,
+            direction := lastCoord params } x
     change postprocess H
       (fun a : Polynomial params.next =>
         (Polynomial.restrictToAxisParallelLine params.next a
-            { base := appendPoint params (u, x).1 zeroCoord,
-              direction := lastCoord params }).toFun (u, x).2) = _
+            { base := appendPoint params u zeroCoord,
+              direction := lastCoord params }).toFun x) = _
     rw [hfun]
     rfl
   have hright :
