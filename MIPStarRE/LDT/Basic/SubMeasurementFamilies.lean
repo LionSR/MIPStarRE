@@ -92,6 +92,218 @@ noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [Decidab
     total_le_one := A.total_le_one
   }
 
+namespace SubMeas
+
+/-- Transport a submeasurement along an equivalence of outcome types. -/
+noncomputable def transport {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : SubMeas α ι) :
+    SubMeas β ι where
+  outcome := fun b => A.outcome (e.symm b)
+  total := A.total
+  outcome_pos := by
+    intro b
+    exact A.outcome_pos (e.symm b)
+  sum_eq_total := by
+    classical
+    calc
+      ∑ b : β, A.outcome (e.symm b)
+          = ∑ a : α, A.outcome a := by
+              simpa using (Equiv.sum_comp e (fun b => A.outcome (e.symm b))).symm
+      _ = A.total := A.sum_eq_total
+  total_le_one := A.total_le_one
+
+@[simp] theorem transport_outcome {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : SubMeas α ι) (b : β) :
+    (transport e A).outcome b = A.outcome (e.symm b) :=
+  rfl
+
+@[simp] theorem transport_total {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : SubMeas α ι) :
+    (transport e A).total = A.total :=
+  rfl
+
+/-- Postprocessing after transporting outcomes along an equivalence agrees with
+postprocessing the original submeasurement after precomposing the readout map
+with the same equivalence. -/
+theorem postprocess_transport {α β γ : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype γ] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : SubMeas α ι) (f : β → γ) :
+    postprocess (transport e A) f = postprocess A (fun a => f (e a)) := by
+  classical
+  refine SubMeas.ext ?_ rfl
+  intro c
+  have hsum :
+      (∑ b : β, if f b = c then A.outcome (e.symm b) else (0 : MIPStarRE.Quantum.Op ι)) =
+        ∑ a : α, if f (e a) = c then A.outcome a else (0 : MIPStarRE.Quantum.Op ι) := by
+    simpa using
+      (Equiv.sum_comp e
+        (fun b => if f b = c then A.outcome (e.symm b) else (0 : MIPStarRE.Quantum.Op ι))).symm
+  calc
+    (postprocess (transport e A) f).outcome c
+        = ∑ a : β, if f a = c then A.outcome (e.symm a) else (0 : MIPStarRE.Quantum.Op ι) := by
+            simp [postprocess, SubMeas.transport, Finset.sum_filter]
+    _ = ∑ a : α, if f (e a) = c then A.outcome a else (0 : MIPStarRE.Quantum.Op ι) := by
+            simpa using hsum
+    _ = (postprocess A (fun a => f (e a))).outcome c := by
+            symm
+            simp [postprocess, Finset.sum_filter]
+
+/-- Postprocessing is functorial: postprocessing by `f` and then by `g`
+agrees with a single postprocessing by the composite `g ∘ f`. -/
+@[simp] theorem postprocess_comp {α β γ : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype γ] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) (f : α → β) (g : β → γ) :
+    postprocess (postprocess A f) g = postprocess A (fun a => g (f a)) := by
+  classical
+  refine SubMeas.ext ?_ rfl
+  intro c
+  calc
+    (postprocess (postprocess A f) g).outcome c
+        = ∑ b : β,
+            if g b = c then
+              ∑ a : α, if f a = b then A.outcome a else 0
+            else 0 := by
+              simp [postprocess, Finset.sum_filter]
+    _ = ∑ b : β, ∑ a : α,
+          if g b = c ∧ f a = b then
+            A.outcome a
+          else (0 : MIPStarRE.Quantum.Op ι) := by
+            refine Finset.sum_congr rfl ?_
+            intro b _
+            by_cases hgc : g b = c
+            · simp [hgc]
+            · simp [hgc]
+    _ = ∑ a : α, ∑ b : β,
+          if g b = c ∧ f a = b then
+            A.outcome a
+          else (0 : MIPStarRE.Quantum.Op ι) := by
+            rw [Finset.sum_comm]
+    _ = ∑ a : α,
+          if g (f a) = c then A.outcome a else (0 : MIPStarRE.Quantum.Op ι) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            by_cases hgc : g (f a) = c
+            · rw [Finset.sum_eq_single (f a)]
+              · simp [hgc]
+              · intro b _ hb
+                by_cases hfa : f a = b
+                · exact (hb hfa.symm).elim
+                · simp [hfa]
+              · simp
+            · have hzero :
+                  (∑ b : β,
+                    if g b = c ∧ f a = b then
+                      A.outcome a
+                    else (0 : MIPStarRE.Quantum.Op ι)) = 0 := by
+                refine Finset.sum_eq_zero ?_
+                intro b _
+                by_cases hfa : f a = b
+                · subst b
+                  simp [hgc]
+                · simp [hfa]
+              simp [hgc, hzero]
+    _ = (postprocess A (fun a => g (f a))).outcome c := by
+          simp [postprocess, Finset.sum_filter]
+
+end SubMeas
+
+namespace Measurement
+
+/-- Transport a measurement along an equivalence of outcome types. -/
+noncomputable def transport {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : Measurement α ι) :
+    Measurement β ι where
+  toSubMeas := SubMeas.transport e A.toSubMeas
+  total_eq_one := A.total_eq_one
+
+end Measurement
+
+namespace ProjSubMeas
+
+/-- Transport a projective submeasurement along an equivalence of outcome types. -/
+noncomputable def transport {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : ProjSubMeas α ι) :
+    ProjSubMeas β ι where
+  toSubMeas := SubMeas.transport e A.toSubMeas
+  proj := by
+    intro b
+    simpa using A.proj (e.symm b)
+
+end ProjSubMeas
+
+namespace ProjMeas
+
+/-- Transport a projective measurement along an equivalence of outcome types. -/
+noncomputable def transport {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : ProjMeas α ι) :
+    ProjMeas β ι where
+  toMeasurement := Measurement.transport e A.toMeasurement
+  proj := by
+    intro b
+    simpa using A.proj (e.symm b)
+
+@[simp] theorem transport_toSubMeas {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ β) (A : ProjMeas α ι) :
+    (transport e A).toSubMeas = SubMeas.transport e A.toSubMeas :=
+  rfl
+
+/-- Postprocess a projective measurement along a relabeling of the outcome type.
+
+The fiber of each output value is a sum of mutually orthogonal projectors, so
+postprocessing preserves projectivity as well as completeness. -/
+noncomputable def postprocess {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (A : ProjMeas α ι) (f : α → β) :
+    ProjMeas β ι where
+  toMeasurement := {
+    toSubMeas := MIPStarRE.LDT.postprocess A.toSubMeas f
+    total_eq_one := by
+      simpa [MIPStarRE.LDT.postprocess] using A.total_eq_one
+  }
+  proj := by
+    classical
+    intro b
+    let fiber : Finset α := Finset.univ.filter fun a => f a = b
+    calc
+      (MIPStarRE.LDT.postprocess A.toSubMeas f).outcome b *
+          (MIPStarRE.LDT.postprocess A.toSubMeas f).outcome b
+        = (∑ a ∈ fiber, A.outcome a) * (∑ a' ∈ fiber, A.outcome a') := by
+            simp [MIPStarRE.LDT.postprocess, fiber]
+      _ = ∑ a ∈ fiber, ∑ a' ∈ fiber, A.outcome a * A.outcome a' := by
+            rw [Finset.sum_mul]
+            simp_rw [Finset.mul_sum]
+      _ = ∑ a ∈ fiber, ∑ a' ∈ fiber, if a' = a then A.outcome a else 0 := by
+            refine Finset.sum_congr rfl ?_
+            intro a ha
+            refine Finset.sum_congr rfl ?_
+            intro a' ha'
+            by_cases h : a' = a
+            · subst h
+              simp [A.proj]
+            · have hne : a ≠ a' := fun h' => h h'.symm
+              simp [A.outcome_orthogonal _ _ hne, h]
+      _ = ∑ a ∈ fiber, A.outcome a := by
+            refine Finset.sum_congr rfl ?_
+            intro a ha
+            simp [fiber, ha]
+      _ = (MIPStarRE.LDT.postprocess A.toSubMeas f).outcome b := by
+            simp [MIPStarRE.LDT.postprocess, fiber]
+
+@[simp] theorem postprocess_toSubMeas {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (A : ProjMeas α ι) (f : α → β) :
+    (postprocess A f).toSubMeas = MIPStarRE.LDT.postprocess A.toSubMeas f :=
+  rfl
+
+end ProjMeas
+
 /-- Postprocessed outcomes from the same ProjMeas commute. -/
 theorem ProjMeas.postprocess_outcome_commute
     {α β γ : Type*} {ι : Type*}
@@ -99,12 +311,12 @@ theorem ProjMeas.postprocess_outcome_commute
     [Fintype ι] [DecidableEq ι]
     (P : ProjMeas α ι) (f : α → β) (g : α → γ)
     (b : β) (c : γ) :
-    (postprocess P.toSubMeas f).outcome b *
-      (postprocess P.toSubMeas g).outcome c =
-    (postprocess P.toSubMeas g).outcome c *
-      (postprocess P.toSubMeas f).outcome b := by
+    (MIPStarRE.LDT.postprocess P.toSubMeas f).outcome b *
+      (MIPStarRE.LDT.postprocess P.toSubMeas g).outcome c =
+    (MIPStarRE.LDT.postprocess P.toSubMeas g).outcome c *
+      (MIPStarRE.LDT.postprocess P.toSubMeas f).outcome b := by
   classical
-  simp only [postprocess]
+  simp only [MIPStarRE.LDT.postprocess]
   simp_rw [Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun x _ => ?_
@@ -287,6 +499,17 @@ def IdxSubMeas.liftLeft {Question Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (A : IdxSubMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι) :=
   fun q => mkLeftPlacedSubMeas (ιB := ι) (A q)
+
+/-- Lift a projective submeasurement to the left tensor factor of a bipartite
+space `ι × ι`. -/
+def ProjSubMeas.liftLeft {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι]
+    (A : ProjSubMeas α ι) : ProjSubMeas α (ι × ι) :=
+  { toSubMeas := A.toSubMeas.liftLeft
+    proj := by
+      intro a
+      change leftTensor (ι₂ := ι) (A.outcome a) * leftTensor (ι₂ := ι) (A.outcome a) =
+        leftTensor (ι₂ := ι) (A.outcome a)
+      simpa [leftTensor_mul_leftTensor] using congrArg (leftTensor (ι₂ := ι)) (A.proj a) }
 
 /-- Lift a submeasurement to the right tensor factor of a bipartite space `ι × ι`.
 Each outcome operator `A_a : Op ι` becomes `I ⊗ A_a : Op (ι × ι)`. -/

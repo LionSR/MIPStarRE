@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
 import MIPStarRE.LDT.Test.Strategy
 
@@ -25,18 +26,28 @@ def liftAxisAnswer (params : Parameters) [FieldModel params.q] (x : Fq params) :
   fun f => AxisLinePolynomial.appendAtHeight params f x
 
 /-- Restricted slice data keeps the point and axis-parallel measurements
-complete, and reindexes the ambient diagonal measurement onto slice-preserving
-lines.
+complete, and packages a genuine projective measurement on the slice's diagonal
+answer space.
 
-For the diagonal branch we retain the ambient answer space
-`DiagonalLinePolynomial params.next`. This keeps the restricted family a genuine
-projective measurement instead of the earlier lossy submeasurement, while still
-supporting the slice-local evaluation operators used in the induction-step
-bookkeeping. -/
+The paper's outcome-level formula would send a slice polynomial `f` to the
+ambient outcome `append_x(f)`. With the current ambient diagonal answer
+encoding, that map is not total on all ambient outcomes, so here we preserve the
+verifier-visible base-point readout used in Chapter 10 instead: first
+postprocess the ambient slice-preserving diagonal measurement to its value at
+`zeroCoord` in `F_q`, then re-embed that `F_q`-valued projective measurement
+into the honest slice answer space `DiagonalLinePolynomial params` using
+canonical representatives.
+
+This yields a complete projective measurement on the `(m,q,d)` diagonal answer
+space whose base-point evaluation agrees with the ambient slice-preserving
+branch, eliminating the earlier lossy submeasurement while remaining faithful
+to the restricted diagonal test actually formalized here. -/
 structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   /-- The bipartite state carried by the restricted strategy. -/
   state : QuantumState (ι × ι)
+  /-- The restricted strategy reuses the ambient state's normalization witness. -/
+  isNormalized : state.IsNormalized
   /-- The restricted point measurement. -/
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
   /-- The restricted axis-parallel line measurement. -/
@@ -45,9 +56,9 @@ structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
   /-- Reparametrizing an axis-parallel line agrees with evaluating at the new base point. -/
   axisParallelReparamInvariant :
     MIPStarRE.LDT.AxisParallelEvaluationReparamInvariant params axisParallelMeasurement
-  /-- The restricted diagonal-line measurement. -/
+  /-- The restricted diagonal-line measurement on the honest slice answer space. -/
   diagonalMeasurement :
-    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params.next) ι
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
 
 namespace RestrictedSymStrat
 
@@ -281,18 +292,57 @@ private theorem restrictAxisParallelMeasurement_reparamInvariant
             simpa using
               restrictAxisParallelMeasurement_postprocess_eval params strategy x ℓ t a
 
-/-- Restrict a diagonal-line measurement to the slice at height `x` by
-reindexing the ambient family along slice-preserving lines. -/
+/-- Canonical honest slice answer with prescribed value at the base point.
+
+We use the constant polynomial because the restricted diagonal branch only reads
+line answers at `zeroCoord`. -/
+private noncomputable def diagonalValueRepresentative (params : Parameters)
+    [FieldModel params.q] (a : Fq params) :
+    DiagonalLinePolynomial params where
+  poly := _root_.Polynomial.C (decodeScalar a)
+  degreeBounded := by
+    simp
+
+@[simp] private theorem diagonalValueRepresentative_apply (params : Parameters)
+    [FieldModel params.q] (a t : Fq params) :
+    diagonalValueRepresentative params a t = a := by
+  simp [diagonalValueRepresentative, DiagonalLinePolynomial.toFun,
+    evalLinePolynomialModel]
+
+/-- Restrict a diagonal-line measurement to the slice at height `x`.
+
+This is not literally the paper's outcome reindexing
+`f ↦ DiagonalLinePolynomial.appendAtHeight params f x`; that map only covers the
+degree-`params.m * params.d` ambient outcomes. Instead we preserve the only
+statistic used by the restricted diagonal test formalized here, namely the
+base-point answer at `zeroCoord`.
+
+Concretely we:
+1. restrict the ambient line question to the slice-preserving line,
+2. postprocess the ambient projective measurement to its `zeroCoord` value in
+   `F_q`, and
+3. re-embed that `F_q`-valued projective measurement into the honest slice
+   answer space via `diagonalValueRepresentative`.
+
+This produces a complete projective measurement on
+`DiagonalLinePolynomial params` whose induced base-point answer distribution is
+exactly the same as the ambient slice-preserving diagonal measurement. -/
 noncomputable def restrictDiagonalMeasurement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
-    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params.next) ι :=
-  fun ℓ => strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι :=
+  fun ℓ =>
+    ProjMeas.postprocess
+      (ProjMeas.postprocess
+        (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x))
+        (fun f : DiagonalLinePolynomial params.next => f zeroCoord))
+      (diagonalValueRepresentative params)
 
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
 noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) : RestrictedSymStrat params ι where
   state := strategy.state
+  isNormalized := strategy.isNormalized
   pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
   axisParallelMeasurement := restrictAxisParallelMeasurement params strategy x
   axisParallelReparamInvariant :=
@@ -304,6 +354,13 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
     (xRestrictedStrategy params strategy x).state = strategy.state :=
+  rfl
+
+/-- Restricting a strategy reuses the parent strategy's normalization witness. -/
+@[simp] theorem xRestrictedStrategy_isNormalized (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    (xRestrictedStrategy params strategy x).isNormalized = strategy.isNormalized :=
   rfl
 
 /-- Restricting a strategy reindexes point questions by appending the slice height. -/
@@ -325,15 +382,25 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
         (liftAxisAnswer params x f) :=
   rfl
 
-/-- Restricting a diagonal measurement only reindexes the ambient diagonal line. -/
-@[simp] theorem restrictDiagonalMeasurement_outcome (params : Parameters)
+/-- Postprocessing the restricted diagonal measurement at the base point recovers
+exactly the ambient slice-preserving diagonal answer distribution at the base
+point. -/
+@[simp] theorem restrictDiagonalMeasurement_postprocess_zero (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params)
-    (ℓ : DiagonalLine params) (f : DiagonalLinePolynomial params.next) :
-    (restrictDiagonalMeasurement params strategy x ℓ).toSubMeas.outcome f =
-      (strategy.diagonalMeasurement
-        (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas.outcome f :=
-  rfl
+    (ℓ : DiagonalLine params) :
+    postprocess ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeas)
+        (fun f : DiagonalLinePolynomial params => f zeroCoord) =
+      postprocess
+        ((strategy.diagonalMeasurement
+          (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas)
+        (fun f : DiagonalLinePolynomial params.next => f zeroCoord) := by
+  classical
+  let evalNext : DiagonalLinePolynomial params.next → Fq params := fun f => f zeroCoord
+  let evalSlice : DiagonalLinePolynomial params → Fq params := fun f => f zeroCoord
+  simp only [restrictDiagonalMeasurement, ProjMeas.postprocess_toSubMeas,
+    SubMeas.postprocess_comp]
+  simp [diagonalValueRepresentative_apply]
 
 /-- The intermediate `ν` from `thm:main-induction`. -/
 noncomputable def mainInductionNu (params : Parameters) (k : ℕ)

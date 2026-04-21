@@ -52,8 +52,9 @@ absorbed form as a downstream calculation.
 ## Status
 
 - The orthonormalization step is mediated by
-  `OrthonormalizationInput`, isolating the still-unformalized linear
-  algebra (cf. `MakingMeasurementsProjective/Statements.lean`).
+  `OrthonormalizationInput`, which now packages only the spectral-truncation
+  and locality-preserving repair witnesses for the option-completed
+  measurement used in the paper's reduction.
 - The completion step uses the **fully-formalized** `completingToMeasurement`
   (`\leanok` in `blueprint/src/chapter/ch03_preliminaries.tex`), so no new
   bridge is introduced here.
@@ -136,7 +137,7 @@ is intentionally separated from the closeness statement here and tracked as
 a follow-up. -/
 structure OrthonormalizeAndCompleteStatement
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
+    [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ι × ι))
     (A : Measurement Outcome ι)
     (P : ProjSubMeas Outcome ι)
@@ -175,8 +176,8 @@ Given:
   (paper: `inductive_step.tex` line 130, `eq:G-self-consistency`);
 * a distinguished outcome `a₀ : Outcome` to absorb the residual mass during
   completion (paper: line 143, `prop:completing-to-measurement`);
-* the orthonormalization bridge package isolating the still-unformalized
-  linear-algebra step inside `thm:orthonormalization`,
+* the orthonormalization bridge package carrying the spectral-truncation and
+  locality-preserving repair witnesses for the option-completed measurement,
 
 we obtain a projective sub-measurement `P` together with a measurement `Q`
 satisfying the chain bound `A ≈_{orthonormalizeAndCompleteError ζ} Q` from
@@ -198,7 +199,7 @@ which matches the closeness conclusion of `completingToMeasurement` after
 substituting `δ := orthonormalizationError ζ`. -/
 theorem orthonormalizeAndComplete
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
+    [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ι × ι))
     (hψ : ψ.IsNormalized)
     (hperm : PermInvState ψ)
@@ -211,7 +212,7 @@ theorem orthonormalizeAndComplete
       OrthonormalizeAndCompleteStatement ψ A P Q a0 ζ := by
   -- Step 6a: apply orthonormalization to A.toSubMeas.
   obtain ⟨P, hClose⟩ :=
-    orthonormalization (Outcome := Outcome) (ι := ι) ψ hψ
+    orthonormalization (Outcome := Outcome) (ι := ι) ψ hperm hψ
       A.toSubMeas ζ hssc hbridge
   -- Step 6b: complete P to a measurement Q via completeAtOutcome at a0.
   obtain ⟨Q, hQstmt⟩ :=

@@ -307,23 +307,22 @@ mass from the total operator. -/
 noncomputable def restrictSubMeas {α : Type*} [Fintype α]
     (A : SubMeas α ι) (p : α → Prop) [DecidablePred p] :
     SubMeas α ι :=
-  open Classical in
-    { outcome := fun a => if p a then A.outcome a else 0
-      total := ∑ a ∈ Finset.univ.filter p, A.outcome a
-      outcome_pos := by
-        intro a
-        by_cases ha : p a <;> simp [ha, A.outcome_pos a]
-      sum_eq_total := by
-        simp [Finset.sum_filter]
-      total_le_one := by
-        calc
-          ∑ a ∈ Finset.univ.filter p, A.outcome a ≤ ∑ a : α, A.outcome a := by
-            exact Finset.sum_le_univ_sum_of_nonneg
-              (s := Finset.univ.filter p)
-              (w := fun a => A.outcome_pos a)
-          _ = A.total := by
-            rw [A.sum_eq_total]
-          _ ≤ 1 := A.total_le_one }
+  { outcome := fun a => if p a then A.outcome a else 0
+    total := ∑ a ∈ Finset.univ.filter p, A.outcome a
+    outcome_pos := by
+      intro a
+      by_cases ha : p a <;> simp [ha, A.outcome_pos a]
+    sum_eq_total := by
+      simp [Finset.sum_filter]
+    total_le_one := by
+      calc
+        ∑ a ∈ Finset.univ.filter p, A.outcome a ≤ ∑ a : α, A.outcome a := by
+          exact Finset.sum_le_univ_sum_of_nonneg
+            (s := Finset.univ.filter p)
+            (w := fun a => A.outcome_pos a)
+        _ = A.total := by
+          rw [A.sum_eq_total]
+        _ ≤ 1 := A.total_le_one }
 
 /-- Restrict the sandwiched completed-slice family to tuples with support of size at
 least `d + 1`, matching the `|τ| ≥ d+1` filter in the paper before interpolation. -/
@@ -331,10 +330,9 @@ noncomputable def interpolationEligibleSandwichFamily (params : Parameters) [Fie
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas (PointTuple params k) (GHatTupleOutcome params k) ι :=
   fun xs =>
-    open Classical in
-      restrictSubMeas
-        (gHatSandwichFamily params family k xs)
-        (InterpolationEligible params)
+    restrictSubMeas
+      (gHatSandwichFamily params family k xs)
+      (InterpolationEligible params)
 
 /-- Concrete family for the half-sandwich product of `k` completed slices. -/
 noncomputable def gHatHalfSandwichLeft (params : Parameters) [FieldModel params.q]

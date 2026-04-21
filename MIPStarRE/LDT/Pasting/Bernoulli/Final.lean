@@ -49,7 +49,15 @@ theorem ldPastingNCompleteness
     SDDRel → mass transfer: ev ψ H ≥ ev ψ F(G) - √(ν₇+ν₈);
     parameter match: κ/(1-θ) ≤ κ(1+1/(100m)),
     exp(-θ²k/2) = exp(-k/(80000m²)).
-    Requires: SDDRel → completeness transfer for Unit-indexed families. -/
+
+    Current blockers after the split audit:
+    * `overAllOutcomes` still depends on the interpolation / `ldGbcon` gaps in
+      `BridgeLemmas.lean`;
+    * `fromHToG` is still blocked by the collapsed recurrence-family shape from
+      issue #395;
+    * after those land, this corollary still needs the final Unit-indexed
+      completeness-transfer step spelled out in Lean.
+    -/
     sorry
 
 /-- `lem:ld-pasting-sub-measurement`. -/
@@ -118,7 +126,7 @@ theorem ldPasting
       family hcomplete hcons hself hbound k hk_pos hk
   have hconsistency :=
     hAConsistency_completed params strategy eps delta gamma kappa zeta
-      strategy.isNormalized family k hsubmeasConsistency hcompleteness.completenessBound
+      family k hsubmeasConsistency hcompleteness.completenessBound
   exact
     { largeEnough := hk
       constructedMeasurement := rfl

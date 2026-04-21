@@ -32,20 +32,19 @@ private lemma averagedPointOperator_le_one
 
 /-- Reduced version of `lem:sdp`.
 
-This currently produces only the weak SDP witness used by the formalized
-self-improvement pipeline: a measurement-valued primal witness together with a
-PSD dual witness that dominates every averaged point operator. The paper's
-strong-duality and complementary-slackness conclusions are still omitted. -/
+This reduced wrapper now instantiates the paper's explicit Slater witnesses: the
+primal uses the uniform strict-feasible submeasurement
+`T_g = (2 |\polyfunc{m}{q}{d}|)^{-1} I`, canonically completed at the zero
+polynomial to fit the downstream `Measurement` interface, and the dual uses
+`Z = 2I`. The paper's strong-duality and complementary-slackness conclusions are
+still omitted from the current Lean statement. -/
 lemma sdp
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) :
     SdpStatement params strategy := by
-  classical
-  letI : Inhabited (Polynomial params) :=
-    ⟨Classical.arbitrary (Polynomial params)⟩
-  let T : Measurement (Polynomial params) ι := default
-  let Z : MIPStarRE.Quantum.Op ι := 1
+  let T : Measurement (Polynomial params) ι := sdpPrimalWitness (ι := ι) params
+  let Z : MIPStarRE.Quantum.Op ι := sdpStrictDualWitness (ι := ι)
   refine ⟨T.toSubMeas, Z, ?_⟩
   refine
     { primalTotalOperator := T.total_eq_one
@@ -54,7 +53,9 @@ lemma sdp
       dualFeasible := ?_ }
   intro g
   simpa [Z, sdpDualSlackOperator] using
-    sub_nonneg.mpr (averagedPointOperator_le_one params strategy g)
+    sub_nonneg.mpr
+      (le_trans (averagedPointOperator_le_one params strategy g)
+        (one_le_sdpStrictDualWitness (ι := ι)))
 
 /-- Reduced version of `lem:add-in-u`.
 
@@ -142,7 +143,6 @@ theorem selfImprovement
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hnormalizedState : strategy.state.IsNormalized)
     (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
       HelperStrongSelfConsistencyInput params strategy eps delta)
@@ -162,10 +162,14 @@ theorem selfImprovement
         (constSubMeasFamily Hhat)
         (selfImprovementHelperError params eps delta) :=
     hhelperStrongSelfConsistency hhelper
-  rcases orthonormalization strategy.state hnormalizedState
+  have horthBridge :
+      MakingMeasurementsProjective.OrthonormalizationInput strategy.state Hhat
+        (selfImprovementHelperError params eps delta) :=
+    horthonormalization hssc
+  rcases orthonormalization strategy.state strategy.permInvState strategy.isNormalized
       Hhat
       (selfImprovementHelperError params eps delta)
-      hssc horthonormalization with ⟨H, horth⟩
+      hssc horthBridge with ⟨H, horth⟩
   have hdata :
       SDDRel strategy.state (uniformDistribution (Point params))
         ((polynomialEvaluationFamily params Hhat).liftLeft)
@@ -195,7 +199,6 @@ theorem selfImprovementFromSubMeas
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hnormalizedState : strategy.state.IsNormalized)
     (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
       HelperStrongSelfConsistencyInput params strategy eps delta)
@@ -206,15 +209,12 @@ theorem selfImprovementFromSubMeas
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
     (Gmeas : Measurement (Polynomial params) ι)
-    (hbridge : Gmeas.toSubMeas = G)
-    (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params G) nu) :
+    (hbridge : Gmeas.toSubMeas = G) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementSubMeasConclusion params strategy G H Z
         eps delta gamma nu := by
   rcases selfImprovement params strategy eps delta gamma nu
-      hnormalizedState hglobalVarianceProofInputs hhelperStrongSelfConsistency
+      hglobalVarianceProofInputs hhelperStrongSelfConsistency
       horthonormalization hevaluationDataProcessing hfinalFields hgood Gmeas
       with ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩

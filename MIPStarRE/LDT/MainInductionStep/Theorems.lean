@@ -47,13 +47,17 @@ theorem mainInduction
   refine ⟨G, ?_⟩
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 
-/-- `thm:self-improvement-in-induction-section`. -/
+/-- `thm:self-improvement-in-induction-section`.
+
+The induction-section wrapper keeps the point-consistency hypothesis `_hcons`
+explicit because it is part of the paper's bookkeeping, even though the current
+proof factors through `selfImprovementFromSubMeas`, which no longer consumes it
+separately. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hnormalizedState : strategy.state.IsNormalized)
     (hglobalVarianceProofInputs :
       SelfImprovement.GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
@@ -67,16 +71,16 @@ theorem selfImprovementInInductionSection
     (G : SubMeas (Polynomial params) ι)
     (Gmeas : Measurement (Polynomial params) ι)
     (hbridge : Gmeas.toSubMeas = G)
-    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+    (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   rcases SelfImprovement.selfImprovementFromSubMeas
-      params strategy eps delta gamma nu hnormalizedState
+      params strategy eps delta gamma nu
       hglobalVarianceProofInputs hhelperStrongSelfConsistency
       horthonormalization hevaluationDataProcessing hfinalFields
-      hgood G Gmeas hbridge hcons with
+      hgood G Gmeas hbridge with
     ⟨H, Z, hH⟩
   rcases hH.measurementBridge with ⟨_, _, hfinal⟩
   refine ⟨H, Z, ?_⟩
@@ -177,71 +181,28 @@ theorem ldPastingInInductionSection
 
 /-! ## Main-induction bridge assembly
 
-The theorems in this section package the final compositional step of the
-`thm:main-induction` proof at dimension `m + 1`, assuming the per-slice data at
-dimension `m` has already been pasted into an ambient polynomial family.  The
-full assembly (`restrict → induct-on-slices → self-improve → paste`) then
-reduces to:
-1. running the induction hypothesis at each slice to obtain `G^x`,
-2. applying `selfImprovementInInductionSection` to each `G^x` to obtain `Ĝ^x`,
-3. averaging the per-slice bounds into an `IdxPolyFamily` with the
-   `Complete`/`ConsistentWithPoints`/`StronglySelfConsistent`/
-   `PastingBoundednessInput` hypotheses, and
-4. applying `mainInductionBridgeFromPastedFamily` below.
+The concrete Section 12 → Section 6 hand-off is not yet formalized as a
+producer theorem, so the missing assembly remains tracked by the named
+`MainInductionBridgePackage`. The wrapper below merely exposes that bundled
+witness in the existential form consumed by `mainInduction`. -/
 
-Steps (1)–(3) and the `σ* ≤ mainInductionError params.next k ε δ γ` error
-telescoping from `references/ldt-paper/inductive_step.tex:487-622` are left as
-explicit inputs, to be supplied by follow-up PRs that formalize the recursion
-entry point and the `rpow`-concavity averaging inequalities. -/
-
-/-- Bridge assembly (step 4 of `thm:main-induction`).
-
-Given an `(m+1,q,d)` symmetric strategy together with a pasting-ready
-polynomial family over the slice index `Fq params` and the averaged pasting
-hypotheses, `ldPastingInInductionSection` produces a measurement
-`H ∈ polymeas(m+1,q,d)` whose point-consistency error is
-`ldPastingInInductionError params k eps delta gamma kappa zeta`.  An
-explicit telescoping hypothesis then bounds this error by
-`mainInductionError params.next k eps delta gamma`, yielding the
-`mainInduction` witness at dimension `m+1`.
-
-This formalizes the final composition step. The remaining assembly
-obligations (restriction to slices, per-slice induction, per-slice
-self-improvement, and the error-telescoping inequality) enter as the
-`family`, `hcomplete`, `hcons`, `hself`, `hbound`, and `herror`
-hypotheses, matching the paper's bookkeeping in
-`references/ldt-paper/inductive_step.tex:414-622`. -/
+/-- Temporary wrapper from the named induction bridge package to the witness
+shape consumed by `thm:main-induction`. -/
 theorem mainInductionBridgeFromPastedFamily
     (params : Parameters)
-    [FieldModel.{0} params.q]
+    [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hgamma_le : gamma ≤ 1)
-    (hzeta_le : zeta ≤ 1)
-    (hdq_le : params.d ≤ params.q)
-    (family : IdxPolyFamily params ι)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : PastingBoundednessInput params strategy family zeta)
+    (eps delta gamma : Error)
     (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k)
-    (herror :
-      ldPastingInInductionError params k eps delta gamma kappa zeta ≤
-        mainInductionError params.next k eps delta gamma) :
+    (bundle : MainInductionBridgePackage params.next strategy eps delta gamma k) :
     ∃ error : Error, ∃ G : Measurement (Polynomial params.next) ι,
       ConsRel strategy.state (uniformDistribution (Point params.next))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
           (polynomialEvaluationFamily params.next G.toSubMeas)
           error ∧
         error ≤ mainInductionError params.next k eps delta gamma := by
-  obtain ⟨H, hH⟩ :=
-    ldPastingInInductionSection params strategy eps delta gamma kappa zeta
-      hgood hgamma_le hzeta_le hdq_le family hcomplete hcons hself hbound k hk
-  exact
-    ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
-      hH.pointConsistency, herror⟩
+  obtain ⟨error, G, hG, herror⟩ := bundle.witness
+  exact ⟨error, G, hG, herror⟩
 
 /-! ## Restricted-probability bookkeeping -/
 
@@ -375,5 +336,236 @@ lemma restrictedProbabilities
               selfConsistencyRestrictedAverage_eq params strategy
       _ ≤ delta := hgood.selfConsistencyTest
   · exact weighted_diagonal_bound_to_average params hdiag_weighted_avg
+
+
+/-! ## Package constructors and skeletal assembly -/
+
+/-- Extract a concrete slice-restriction package from
+`lem:restricted-probabilities`. -/
+noncomputable def SliceRestrictionPackage.ofRestrictedProbabilities
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hrestricted : RestrictedProbabilitiesStatement params strategy eps delta gamma) :
+    SliceRestrictionPackage params strategy eps delta gamma := by
+  classical
+  let profile := Classical.choose hrestricted.profileExists
+  let hprofile := Classical.choose_spec hrestricted.profileExists
+  have haxisAverage :
+      averageRestrictedAxisParallelError params profile ≤
+        sliceConditioningLoss params * eps := by
+    rcases hprofile with
+      ⟨_haxisWeighted, haxisAverage, _hselfAverage, _hdiagWeighted,
+        _hdiagAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
+    exact haxisAverage
+  have hselfAverage :
+      averageRestrictedSelfConsistencyError params profile ≤ delta := by
+    rcases hprofile with
+      ⟨_haxisWeighted, _haxisAverage, hselfAverage, _hdiagWeighted,
+        _hdiagAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
+    exact hselfAverage
+  have hdiagonalAverage :
+      averageRestrictedDiagonalError params profile ≤
+        sliceDiagonalConditioningLoss params * gamma := by
+    rcases hprofile with
+      ⟨_haxisWeighted, _haxisAverage, _hselfAverage, _hdiagWeighted,
+        hdiagonalAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
+    exact hdiagonalAverage
+  exact
+    { profile := profile
+      axisAverageBound := haxisAverage
+      selfAverageBound := hselfAverage
+      diagonalAverageBound := hdiagonalAverage }
+
+/-- Turn the recursive family of slice-wise induction witnesses into explicit
+slice data `x ↦ (σ_x, G^x)`. -/
+noncomputable def PerSliceInductionPackage.ofRecursion
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (hrec :
+      ∀ x,
+        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+            (polynomialEvaluationFamily params G.toSubMeas)
+            error ∧
+          error ≤
+            mainInductionError params k
+              (restrictionPkg.profile.axisParallel x)
+              (restrictionPkg.profile.selfConsistency x)
+              (restrictionPkg.profile.diagonal x)) :
+    PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k := by
+  classical
+  let sliceError : Fq params → Error := fun x => Classical.choose (hrec x)
+  let sliceMeasurement : Fq params → Measurement (Polynomial params) ι :=
+    fun x => Classical.choose (Classical.choose_spec (hrec x))
+  let hslice :
+      ∀ x,
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+          (polynomialEvaluationFamily params (sliceMeasurement x).toSubMeas)
+          (sliceError x) ∧
+        sliceError x ≤
+          mainInductionError params k
+            (restrictionPkg.profile.axisParallel x)
+            (restrictionPkg.profile.selfConsistency x)
+            (restrictionPkg.profile.diagonal x) := by
+    intro x
+    simpa [sliceError, sliceMeasurement] using
+      (Classical.choose_spec (Classical.choose_spec (hrec x)))
+  exact
+    { sliceError := sliceError
+      sliceMeasurement := sliceMeasurement
+      pointConsistency := fun x => (hslice x).1
+      error_le := fun x => (hslice x).2 }
+
+/-- Invoke `thm:ld-pasting-in-induction-section` from an averaged pasting
+package. -/
+theorem PastingPackage.output
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    {restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma}
+    {inductionPkg :
+      PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k}
+    {selfPkg :
+      SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg}
+    (pkg : PastingPackage params strategy eps delta gamma k selfPkg)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ H : Measurement (Polynomial params.next) ι,
+      LdPastingInInductionSectionConclusion params strategy selfPkg.family H
+        eps delta gamma pkg.kappa pkg.zeta k := by
+  exact
+    ldPastingInInductionSection params strategy eps delta gamma pkg.kappa pkg.zeta
+      hgood pkg.gamma_le_one pkg.zeta_le_one pkg.dq_le_q
+      selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk
+
+/-- Compose the four paper-faithful induction-step packages
+`restrict → induct → self-improve → paste` into the witness consumed by
+`thm:main-induction`. -/
+theorem mainInductionBridgeWitness
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
+    (hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k)
+    (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
+    (hpaste : PastingPackage params strategy eps delta gamma k hself)
+    (hk : 400 * params.m * params.d ≤ k) :
+    MainInductionBridgePackage params.next strategy eps delta gamma k := by
+  let family : IdxPolyFamily params ι := hself.family
+  let kappa : Error := hpaste.kappa
+  let zeta : Error := hpaste.zeta
+  have hpasted :
+      ∃ H : Measurement (Polynomial params.next) ι,
+        LdPastingInInductionSectionConclusion params strategy family H
+          eps delta gamma kappa zeta k := by
+    simpa [family, kappa, zeta] using
+      hpaste.output (params := params) (strategy := strategy)
+        (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hk
+  rcases hpasted with ⟨H, hH⟩
+  exact
+    { witness :=
+        ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
+          hH.pointConsistency, by simpa [kappa, zeta] using hpaste.error_le⟩ }
+
+/-- The remaining averaged step from per-slice self-improvement data to the
+pasting hypotheses.
+
+This is where the paper's `E_x[σ_x]`, `E_x[ζ_x]`, and
+`σ* ≤ mainInductionError` bookkeeping will eventually live. -/
+noncomputable def assemblePastingPackage
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
+    (hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k)
+    (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
+    (_hk : 400 * params.m * params.d ≤ k) :
+    PastingPackage params strategy eps delta gamma k hself := by
+  -- TODO(#552): average the per-slice completeness / consistency /
+  -- strong self-consistency / boundedness conclusions and telescope the
+  -- resulting `ldPastingInInductionError` bound to
+  -- `mainInductionError params.next k eps delta gamma`.
+  sorry
+
+/-- Direct base case of `thm:main-induction` when `m = 1`.
+
+The paper uses the unique axis-parallel line measurement as the global
+polynomial measurement in this case. -/
+theorem mainInductionBaseCase
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hm1 : params.m = 1)
+    (_hgood : strategy.IsGood eps delta gamma) :
+    MainInductionBridgePackage params strategy eps delta gamma k := by
+  -- TODO(#553): identify the unique axis-parallel line in dimension one,
+  -- transport its answer measurement to `Measurement (Polynomial params) ι`,
+  -- and compare the resulting point-consistency error with
+  -- `mainInductionError params k eps delta gamma`.
+  sorry
+
+/-- Successor-step recursion entry point for `thm:main-induction`.
+
+Given the slice restriction package, a recursive producer for the slice
+induction witnesses, and a producer for the corresponding slice-wise
+self-improvement package, this theorem runs the remaining skeletal assembly up
+to the explicit averaged pasting package.
+
+Note: the current `hselfProducer` is still an explicit input because the
+paper-faithful hook from `selfImprovementInInductionSection` to the restricted
+slice objects is part of the remaining assembly tracked by `TODO(#552)`. -/
+theorem mainInductionByRecursionOnM
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
+    (hrec :
+      ∀ x,
+        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+            (polynomialEvaluationFamily params G.toSubMeas)
+            error ∧
+          error ≤
+            mainInductionError params k
+              (hrestrict.profile.axisParallel x)
+              (hrestrict.profile.selfConsistency x)
+              (hrestrict.profile.diagonal x))
+    (hselfProducer :
+      ∀ hinduction :
+        PerSliceInductionPackage params strategy eps delta gamma hrestrict k,
+      SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
+    (hk : 400 * params.m * params.d ≤ k) :
+    MainInductionBridgePackage params.next strategy eps delta gamma k := by
+  let hinduction :=
+    PerSliceInductionPackage.ofRecursion params strategy eps delta gamma k
+      hrestrict hrec
+  let hself := hselfProducer hinduction
+  let hpaste :=
+    assemblePastingPackage params strategy eps delta gamma k
+      hrestrict hinduction hself hk
+  exact
+    mainInductionBridgeWitness params strategy eps delta gamma k
+      hgood hrestrict hinduction hself hpaste hk
 
 end MIPStarRE.LDT.MainInductionStep

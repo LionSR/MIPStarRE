@@ -136,15 +136,14 @@ private lemma qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect
   rw [htotal, hoverlap]
 
 /-- The self-consistency branch of the role-register symmetrized strategy equals
-the original point-agreement defect. -/
+the original point-agreement branch. -/
 theorem classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (strategy : ProjStrat params ι) :
     (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability =
-      bipartiteConsError strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) := by
+      strategy.pointAgreementFailureProbability := by
+  unfold ProjStrat.pointAgreementFailureProbability
   unfold SymStrat.selfConsistencyFailureProbability bipartiteSSCError bipartiteConsError
   refine Finset.sum_congr rfl ?_
   intro u _
@@ -165,18 +164,15 @@ theorem classicalRoleSymmStrategy_selfConsistency_le_three_mul
 /-- The role-register symmetrized strategy's self-consistency is bounded by any
 available cross-prover point-agreement bound.
 
-The full low-individual-degree failure surrogate does not itself provide such a
-point-agreement bound: its self-consistency branch contains the separate SSC
-defects of the two point measurements. This conditional lemma records the
-correct bridge when an independent point-agreement estimate is available. -/
+The specialization `classicalRoleSymmStrategy_selfConsistency_le_three_mul`
+instantiates this with `point_agreement_le_three_mul`; this lemma keeps the
+more flexible implication form for callers that already control
+`pointAgreementFailureProbability` directly. -/
 theorem classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     {strategy : ProjStrat params ι} {delta : Error}
-    (hpoint :
-      bipartiteConsError strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) ≤ delta) :
+    (hpoint : strategy.pointAgreementFailureProbability ≤ delta) :
     (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤ delta := by
   rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
   exact hpoint

@@ -315,19 +315,20 @@ abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params
         (selfImprovementHelperError params eps delta)
 
 /-- The final orthonormalization input still required by the reduced wrapper
-chain. -/
+chain.
+
+The top-level orthonormalization theorem is now proved from the paper's
+completion-to-`Option` reduction, so the remaining bridge only has to supply
+the spectral-truncation and locality-preserving repair witnesses for the helper
+submeasurement `Hhat`. -/
 abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (eps delta : Error) : Prop :=
+    (strategy : SymStrat params ι) (eps delta : Error) :=
   ∀ {Hhat : SubMeas (Polynomial params) ι},
-    strategy.state.IsNormalized →
     BipartiteSSCRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily Hhat)
       (selfImprovementHelperError params eps delta) →
-    ∃ H : ProjSubMeas (Polynomial params) ι,
-      SDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat.liftLeft)
-        (constSubMeasFamily H.toSubMeas.liftLeft)
-        (selfImprovementOrthogonalizationError params eps delta)
+    MakingMeasurementsProjective.OrthonormalizationInput strategy.state Hhat
+      (selfImprovementHelperError params eps delta)
 
 /-- The post-orthonormalization data-processing input still required by the
 reduced wrapper chain. -/

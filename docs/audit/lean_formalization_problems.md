@@ -120,15 +120,15 @@ Why this is a problem:
 
 ### 5. `interpolateCompletedSlices` — definition faithful, degree bound proven
 
-- Lean location: `MIPStarRE/LDT/Pasting/Defs.lean`
+- Lean location: `MIPStarRE/LDT/Pasting/Defs/Interpolation.lean`
 - Severity: **low** (was **critical**; definition now faithful and the
   `lowIndividualDegree` proof is complete)
 
 The definition uses proper Lagrange interpolation via Mathlib's
 `Lagrange.basis`, embedded into `MvPolynomial` at the last coordinate,
-and restricts the sum to a chosen `(d+1)`-sized subset `σ` of the
-genuine support (via `interpolationSupportSubset`). The
-`lowIndividualDegree` proof is fully discharged: for the first `m`
+and restricts the sum to a chosen `(d+1)`-sized support witness
+`σ ⊆ gHatTupleSupport gs` (packaged by `InterpolationSupportWitness`).
+The `lowIndividualDegree` proof is fully discharged: for the first `m`
 coordinates the bound follows from `degreeOf_mul_le` plus the fact that
 `Li.eval₂ C (X (lastCoord))` has degree `0` in those coordinates; for
 the last coordinate the bound follows from
@@ -145,10 +145,12 @@ Remaining gaps:
   correct degree bound unconditionally, but to prove the paper's
   restriction property (that `restrictAtHeight` of the result agrees
   with each slice on `σ`) one needs `Set.InjOn (decodeScalar ∘ xs) ↑σ`
-  and `σ ⊆ gHatTupleSupport gs`. The latter is supplied by
-  `interpolationSupportSubset_subset`; the former holds when `xs` is
-  drawn from `distinctTupleDistribution`, but is a proof obligation at
-  each downstream call site, not in the definition itself.
+  and `σ ⊆ gHatTupleSupport gs`. The latter is now threaded explicitly
+  into `interpolateCompletedSlicesFromSupport` and, in the default
+  interpolation path, is supplied by
+  `InterpolationSupportWitness.subset_support`; the former holds when
+  `xs` is drawn from `distinctTupleDistribution`, but is a proof
+  obligation at each downstream call site, not in the definition itself.
 
 ### 6. `laplacianDifferenceForm` is definitionally equal to `laplacian`, so `laplacianRewrite` is vacuous
 

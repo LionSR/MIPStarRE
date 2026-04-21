@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 
 /-!
 # Section 11 commutativity: pointwise scalar approximation
@@ -31,7 +31,6 @@ noncomputable def gCommOverlapTerm
     (leftTensor (ι₂ := ι) (1 - (G x).total) *
       rightTensor (ι₁ := ι) ((G x).total))
 
-set_option maxHeartbeats 2000000 in
 /-- The slice self-consistency defect of `G` is at most `zeta / 2`. -/
 lemma gCommStability_sliceSSC
     (params : Parameters)
@@ -97,7 +96,6 @@ lemma gCommStability_sliceSSC
             hhalf_nonneg
     _ = zeta / 2 := by ring
 
-set_option maxHeartbeats 2000000 in
 /-- A sandwiched product of two submeasurements is controlled by the overlap of
 the right-hand total with its complement. -/
 lemma gCommStability_pointwise_sum_bound_core
@@ -185,7 +183,6 @@ lemma gCommStability_pointwise_sum_bound_core
           rw [show (1 - T) * 1 * (1 - T) = (1 - T) * (1 - T) by simp]
           rw [hcollapse]
 
-set_option maxHeartbeats 2000000 in
 /-- Summing the stability-one comparison family leaves only the overlap term
 for `G^y`. -/
 private lemma gCommStability_pointwise_sum_bound
@@ -212,7 +209,6 @@ private lemma gCommStability_pointwise_sum_bound
   simpa [y, A, gCommOverlapTerm] using
     gCommStability_pointwise_sum_bound_core strategy.state A (G y) hGy_sq
 
-set_option maxHeartbeats 2000000 in
 /-- A single stability-one summand is controlled by replacing the inner
 evaluated slice sandwich with the corresponding evaluated point outcome. -/
 private lemma gCommStability_pointwise_summand_bound
@@ -290,7 +286,6 @@ private lemma gCommStability_pointwise_summand_bound
       simpa [y, T, A, S, leftTensor_mul_rightTensor_eq_opTensor] using
         opTensor_mono_left hleft ((G y).outcome_pos ah.2)
 
-set_option maxHeartbeats 2000000 in
 /-- The full stability-one defect is bounded by the overlap term for the
 target slice measurement `G^y`. -/
 lemma gCommStability_pointwise_bound
@@ -312,12 +307,6 @@ lemma gCommStability_pointwise_bound
   let y := pointHeight params q.2
   let T : MIPStarRE.Quantum.Op ι := (G y).total
   let A : SubMeas (Fq params) ι := evaluatedPointFamily params family q.1
-  have hT_herm : Tᴴ = T := by
-    exact
-      (Matrix.nonneg_iff_posSemidef.mp <| by
-        simpa [T] using (G y).total_nonneg).isHermitian.eq
-  have hTc_herm : (1 - T)ᴴ = 1 - T := by
-    simp [hT_herm]
   calc
     ∑ ah : StabilityOneOutcome params,
         ev strategy.state
@@ -342,7 +331,6 @@ lemma gCommStability_pointwise_bound
           simpa [y, T, A] using
             gCommStability_pointwise_sum_bound params strategy family G hG q
 
-set_option maxHeartbeats 2000000 in
 /-- The overlap term at `x` is bounded by the bipartite SSC defect of `G x`. -/
 lemma gCommStability_ssc_point
     (params : Parameters)
@@ -413,7 +401,7 @@ lemma gCommStability_ssc_point
                               cases j with
                               | mk j1 j2 =>
                                   by_cases h1 : i1 = j1 <;> by_cases h2 : i2 = j2 <;>
-                                    simp [leftTensor, sub_eq_add_neg, Matrix.one_apply, h1, h2]
+                                    simp [leftTensor, sub_eq_add_neg, h1, h2]
                           calc
                             leftTensor (ι₂ := ι) (1 - T) * rightTensor (ι₁ := ι) T
                               = (leftTensor (ι₂ := ι) 1 - leftTensor (ι₂ := ι) T) *
@@ -434,11 +422,7 @@ lemma gCommStability_ssc_point
             ev strategy.state (opTensor ((G x).outcome h) ((G x).outcome h)) := by
             linarith
     _ ≤ qBipartiteSSCDefect strategy.state (G x) := by
-          simpa [qBipartiteSSCDefect, T] using
-            (le_max_right 0
-              (ev strategy.state (leftTensor (ι₂ := ι) T) -
-                ∑ h : Polynomial params,
-                  ev strategy.state (opTensor ((G x).outcome h) ((G x).outcome h))))
+          simp [qBipartiteSSCDefect, T]
 
 
 

@@ -10,29 +10,17 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT
 
-/-- A paper-local submeasurement with outcomes in `α` and Hilbert space index `ι`. -/
+/-- A paper-local submeasurement with outcomes in `α` and Hilbert space index `ι`.
+
+There is intentionally no global `Inhabited` instance: the zero family satisfies
+these raw axioms, but using it as an ambient default would silently turn later
+arguments into vacuous submeasurement statements. -/
 structure SubMeas (α : Type*) [Fintype α] (ι : Type*) [Fintype ι] [DecidableEq ι] where
   outcome : α → MIPStarRE.Quantum.Op ι := fun _ => 0
   total : MIPStarRE.Quantum.Op ι := 0
   outcome_pos : ∀ a, 0 ≤ outcome a
   sum_eq_total : ∑ a, outcome a = total
   total_le_one : total ≤ 1
-
-instance {α : Type*} [Fintype α] {ι : Type*} [Fintype ι] [DecidableEq ι] :
-    Inhabited (SubMeas α ι) where
-  default := {
-    outcome := fun _ => 0
-    -- This default object is the zero family; downstream raw-operator scaffolding
-    -- sometimes keeps `total := 0` as an explicit sentinel when only outcomes matter.
-    total := 0
-    outcome_pos := by
-      intro a
-      positivity
-    sum_eq_total := by
-      simp
-    total_le_one := by
-      exact (zero_le_one : (0 : MIPStarRE.Quantum.Op ι) ≤ 1)
-  }
 
 /-- A paper-local measurement: a POVM whose PSD effects sum to the identity. -/
 structure Measurement (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [DecidableEq ι]
@@ -58,14 +46,13 @@ noncomputable instance {α : Type*} {ι : Type*}
         }
         total_eq_one := rfl }
 
-/-- A paper-local projective submeasurement (each effect is idempotent). -/
+/-- A paper-local projective submeasurement (each effect is idempotent).
+
+There is intentionally no global `Inhabited` instance: any such default would
+again collapse to the degenerate zero family. -/
 structure ProjSubMeas (α : Type*) [Fintype α] (ι : Type*) [Fintype ι] [DecidableEq ι]
     extends SubMeas α ι where
   proj : ∀ a, outcome a * outcome a = outcome a
-
-instance {α : Type*} [Fintype α] {ι : Type*} [Fintype ι] [DecidableEq ι] :
-    Inhabited (ProjSubMeas α ι) where
-  default := { toSubMeas := default, proj := fun _ => mul_zero _ }
 
 /-- A paper-local projective measurement (complete POVM + projective). -/
 structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [DecidableEq ι]

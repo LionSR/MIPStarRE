@@ -20,7 +20,6 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-set_option maxHeartbeats 2000000 in
 /-- Averaging the common overlap term over `Point params.next` depends only on
 the final coordinate `x : F_q`. -/
 private lemma gCommOverlap_avgOver_point
@@ -128,7 +127,6 @@ private lemma gCommOverlapTerm_le_one
                 (sub_le_self (1 : MIPStarRE.Quantum.Op ι) (G x).total_nonneg)
     _ = 1 := ev_one_of_isNormalized strategy.state hnorm
 
-set_option maxHeartbeats 2000000 in
 /-- Any pointwise defect bound by the common overlap term inherits a raw
 `zeta / 2` estimate after marginalizing to the slice SSC defect of `G`. -/
 lemma gCommStability_raw_le_half_of
@@ -174,7 +172,6 @@ lemma gCommStability_raw_le_half_of
           rfl
     _ ≤ zeta / 2 := hsliceSSC.overlapBound
 
-set_option maxHeartbeats 2000000 in
 /-- Any pointwise defect bound by the common overlap term is trivially at most
 `1`. -/
 lemma gCommStability_raw_le_one_of
@@ -213,7 +210,6 @@ lemma gCommStability_raw_le_one_of
           simpa using
             uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
 
-set_option maxHeartbeats 2000000 in
 /-- Upgrade raw `zeta / 2` and `1` bounds to the displayed `sqrt zeta` relation. -/
 lemma sddOpRel_of_sqrt_bound_from_half_one
     {Question Outcome : Type*}
@@ -238,7 +234,6 @@ lemma sddOpRel_of_sqrt_bound_from_half_one
       nlinarith [Real.sq_sqrt hz_nonneg]
     exact le_trans hone hbig
 
-set_option maxHeartbeats 2000000 in
 /-- The first stability family has raw defect at most `zeta / 2`. -/
 private lemma gCommStability_raw_le_half
     (params : Parameters)
@@ -262,7 +257,6 @@ private lemma gCommStability_raw_le_half
       (gCommOverlap_avgOver_snd params strategy G)
       (gCommStability_pointwise_bound params strategy family G hG)
 
-set_option maxHeartbeats 2000000 in
 /-- The first stability family has raw defect at most `1`. -/
 private lemma gCommStability_raw_le_one
     (params : Parameters)
@@ -285,7 +279,6 @@ private lemma gCommStability_raw_le_one
       Prod.snd
       (gCommStability_pointwise_bound params strategy family G hG)
 
-set_option maxHeartbeats 2000000 in
 /-- Overlap-only version of the first stability estimate.
 
 This is not the paper's boundedness-driven scalar proof of

@@ -19,6 +19,7 @@ import MIPStarRE.LDT.Test.StrategySelfConsistency
 import MIPStarRE.LDT.Test.StrategyRoleAverage
 import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 import MIPStarRE.LDT.Test.Classical
+import MIPStarRE.LDT.Test.SurfaceVsPoint
 import MIPStarRE.LDT.Test.SymmetrizationBridge
 import MIPStarRE.LDT.Test.MainTheorem
 import MIPStarRE.LDT.Test.ErrorCascade
@@ -135,3 +136,4 @@ import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.Preliminaries.Polynomials
+import MIPStarRE.LDT.Preliminaries.PolynomialAgreement

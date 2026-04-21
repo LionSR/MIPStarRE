@@ -277,20 +277,33 @@ lemma localRewrite (params : Parameters)
       rw [localVariance_eq_zero_of_isEmpty hι params A ψ,
         localVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ]⟩
 
-/-- `lem:global-rewrite`. -/
--- NOTE: the existential witness `default` works because `GlobalRewriteStatement`
--- only claims *existence* of a decomposition. A future refactor could propagate
--- the concrete decomposition from the matrix realization layer.
+/-- `lem:global-rewrite`.
+The existential witness is the canonical `canonicalGlobalVarianceDecomposition`,
+determined by `params` and `A`, whose `averageComponent` is the paper's
+`A_avg = E_u A^u = (1/M) · ∑_u A^u`; equivalently,
+`A_0 = M^{1/2} · A_avg` (expansion.tex §7.2, *Local and global variance*). -/
 lemma globalRewrite (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     GlobalRewriteStatement params A ψ := by
+  refine ⟨canonicalGlobalVarianceDecomposition params A, ?_⟩
   by_cases hι : Nonempty ι
   · letI := hι
-    exact ⟨default, by
-      simpa [abstractMatrixModel] using
-        (matrixGlobalRewrite params (abstractMatrixModel params A ψ)).traceFormula⟩
-  · exact ⟨default, by
-      rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
-        globalVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ default]⟩
+    calc
+      globalVariance params A ψ
+          = (hypercubeVertexCount params : Error)⁻¹ *
+              ∑ u, ev ψ ((A u)ᴴ * A u) -
+            (hypercubeVertexCount params : Error)⁻¹ *
+              (hypercubeVertexCount params : Error)⁻¹ *
+                ∑ u, ∑ v, ev ψ ((A v)ᴴ * A u) := by
+              simpa [abstractMatrixModel] using
+                (matrixGlobalVariance_eq_closedForm params (abstractMatrixModel params A ψ))
+      _ = globalVarianceTraceForm params A ψ (canonicalGlobalVarianceDecomposition params A) := by
+              symm
+              simpa using
+                (globalVarianceTraceForm_eq_closedForm params A ψ
+                  (canonicalGlobalVarianceDecomposition params A))
+  · rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
+      globalVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ
+        (canonicalGlobalVarianceDecomposition params A)]
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph

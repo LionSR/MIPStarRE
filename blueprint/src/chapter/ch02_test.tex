@@ -21,6 +21,8 @@
 \end{definition}
 
 \begin{remark}\label{fig:test}
+		\lean{MIPStarRE.LDT.Test.TwoProverClassicalLIDStrategy.lowIndividualDegreeAcceptanceProbability_eq_branchAverage}
+		\leanok
 	With probability $\tfrac13$ each, the verifier performs the axis-parallel lines test, the self-consistency test, or the diagonal lines test from Definition~\ref{def:low-individual-degree-test}.
 \end{remark}
 
@@ -32,7 +34,8 @@
 
 \begin{definition}[General projective strategy]\label{def:projective-strategy}
 	\lean{MIPStarRE.LDT.ProjStrat}
-	\leanok
+	% Lean-local gap: `ProjStrat` still uses a common finite index type for both
+	% provers. The paper-faithful two-space version is tracked by Issue #560.
 	A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
 \end{definition}
 
@@ -43,10 +46,13 @@
 \begin{definition}[Good strategy]\label{def:good-strategy}
 	\lean{MIPStarRE.LDT.SymStrat.IsGood}
 	\leanok
+	\uses{def:low-individual-degree-test}
 	A strategy is $(\eps,\delta,\gamma)$-good if it passes the axis-parallel lines test with probability at least $1-\eps$, the self-consistency test with probability at least $1-\delta$, and the diagonal lines test with probability at least $1-\gamma$.
 \end{definition}
 
 \begin{remark}\label{rem:good-strat-characterization}
+		\lean{MIPStarRE.LDT.Preliminaries.goodStrategyCharacterization}
+		\leanok
 	\uses{def:simeq}
 	Using notation which will be introduced in Chapter~\ref{chap:preliminaries} below, a symmetric strategy is $(\eps,\delta,\gamma)$-good if and only if it satisfies the following three conditions. For $\ell$ and $u$ as in the axis-parallel lines test,
 	\[
@@ -63,6 +69,8 @@
 \end{remark}
 
 \begin{remark}[Notation]\label{not:conditioned-on-last-direction}
+		\lean{MIPStarRE.LDT.lastDirectionLine, MIPStarRE.LDT.lastDirectionMeasurementFamily}
+		\leanok
 	\uses{def:symmetric-projective-strategy}
 	Our proof is by induction, proving soundness of the $(m+1,q,d)$ low individual degree test from the soundness of the $(m,q,d)$ low individual degree test. To do this, we frequently use the axis-parallel line test in the specific case of the last direction. Let $(\psi,A,B,L)$ be a symmetric strategy for the $(m+1,q,d)$ low individual degree test. Then for each $u \in \F_q^m$ we write $B_f^u$ as shorthand for $B_f^\ell$, where
 	\[
@@ -72,7 +80,7 @@
 \end{remark}
 
 \begin{definition}[Restricted diagonal lines test]\label{def:restricted-diagonal-lines-test}
-	\lean{MIPStarRE.LDT.RestrictedDiagonalSample}
+	\lean{MIPStarRE.LDT.RestrictedDiagonalSample, MIPStarRE.LDT.SymStrat.restrictedDiagonalFailureProbability}
 	\leanok
 	Consider the $(m,q,d)$ low individual degree test. For $j \in \{1,\dots,m\}$, the $j$-restricted diagonal lines test is the diagonal lines test conditioned on $i=j$. In particular, the $m$-restricted diagonal lines test is the diagonal lines test in which the sampled line is a uniformly random line in $\F_q^m$.
 \end{definition}
@@ -81,7 +89,7 @@
 
 \begin{theorem}[Quantum soundness of the low individual degree test]\label{thm:main-formal}
 	\lean{MIPStarRE.LDT.Test.mainFormal}
-	\uses{def:projective-strategy, def:polymeasurements, def:simeq}
+	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
 	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that passes the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Assume $d > 0$. Let $k > 0$ with $k \ge md$ and set
 	\[
 		\nu = 100000 k^2 m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).

@@ -162,14 +162,18 @@ def fourierBasisInnerProduct (params : Parameters)
     (α β : Point params) : Error :=
   if α = β then 1 else 0
 
-structure EigenvectorsStatement (params : Parameters) : Prop where
-  orthonormality :
-    ∀ α β : Point params,
-      fourierBasisInnerProduct params α β = if α = β then 1 else 0
-  ...
+/-- The exact inner-product formula for the hypercube Fourier basis. -/
+lemma fourierBasisInnerProduct_eq (params : Parameters)
+    (α β : Point params) :
+    fourierBasisInnerProduct params α β = if α = β then 1 else 0 := rfl
 
-theorem eigenvectors (params : Parameters) : EigenvectorsStatement params where
-  orthonormality _ _ := rfl    -- castle: the def IS the Kronecker delta
+/-- `prop:eigenvectors`. -/
+theorem eigenvectors (params : Parameters) :
+    (∀ α β : Point params,
+      fourierBasisInnerProduct params α β = if α = β then 1 else 0) ∧ ... := by
+  refine ⟨?_, ?_⟩
+  · intro α β
+    exact fourierBasisInnerProduct_eq params α β    -- castle: def IS Kronecker delta
   ...
 ```
 
@@ -242,9 +246,9 @@ match.
 - Functions that return `Polynomial params` but can return the zero polynomial
   on inputs that shouldn't be in the domain.
 
-### Concrete example
+### Concrete example (historical; resolved by PR #561)
 
-From `MIPStarRE/LDT/Pasting/Defs/Interpolation.lean`:
+Until PR #561, `MIPStarRE/LDT/Pasting/Defs/Interpolation.lean` contained:
 
 ```lean
 /-- Extract the polynomial from a completed slice outcome; returns 0 on ⊥. -/
@@ -255,13 +259,19 @@ noncomputable def extractSliceOr0 {params : Parameters} [FieldModel params.q]
   | none   => 0
 ```
 
-The consumer `interpolateCompletedSlicesFromSupport` runs Lagrange
-interpolation on `extractSliceOr0`-extracted values. If the support contains
-a `none`, the interpolant silently pretends that slice evaluated to zero.
+The consumer `interpolateCompletedSlicesFromSupport` ran Lagrange
+interpolation on `extractSliceOr0`-extracted values. If the support contained
+a `none`, the interpolant silently pretended that slice evaluated to zero.
 The paper's Lagrange step is quantified over *eligible* slices only, so the
 Lean API should carry `∀ i ∈ support, (g i).isSome` as a hypothesis; instead
-it carries nothing, and the theorem technically type-checks on inputs for
-which its conclusion is meaningless.
+it carried nothing, and the theorem technically type-checked on inputs for
+which its conclusion was meaningless.
+
+**Current status:** resolved. The live API now removes `extractSliceOr0`,
+threads the explicit hypothesis `hσsupport : σ ⊆ gHatTupleSupport gs` into
+`interpolateCompletedSlicesFromSupport`, and packages the chosen support subset
+as `InterpolationSupportWitness` so the arbitrary choice and its proof fields
+are visible at call sites.
 
 ### Acceptable uses of this pattern
 
@@ -290,13 +300,14 @@ Pick one of:
 
 A sibling smell in this pattern: `DecidablePred` / `DecidableEq` instances
 that silently use `Classical.dec` to fill in decidability that should be
-constructive (e.g.,
-`interpolationEligibleSandwichFamily` does `open Classical in ...` to gate
-a predicate that is actually decidable by a finite-support check). Those
-are acceptable only when the predicate is genuinely non-constructive; if a
-constructive instance is plausible, write it, don't bottom out in
-`Classical.dec`. See [#495] for the full catalogue of classical-logic uses
-in `LDT/Pasting/`.
+constructive. The historical `interpolationEligibleSandwichFamily`
+implementation was exactly such a case: it used `open Classical in ...` to
+gate a predicate that is actually decidable by a finite-support check. PR
+#561 fixed that example by adding `interpolationEligible_decidablePred`.
+Those classical instances are acceptable only when the predicate is genuinely
+non-constructive; if a constructive instance is plausible, write it, don't
+bottom out in `Classical.dec`. See [#495] for the full catalogue of
+classical-logic uses in `LDT/Pasting/`.
 
 ### Related issues
 

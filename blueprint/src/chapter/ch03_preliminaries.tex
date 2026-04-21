@@ -115,6 +115,21 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 	The difference $g-h$ is a nonzero polynomial of total degree at most $md$. Apply Lemma~\ref{lem:schwartz-zippel-total-degree}.
 \end{proof}
 
+\begin{lemma}[Polynomial agreement bound on coded points]\label{lem:polynomial-agreement-mdq}
+	\lean{MIPStarRE.LDT.Preliminaries.polynomialAgreement_avg_le_mdq}
+	\leanok
+	\uses{lem:schwartz-zippel-individual}
+	Let $g, g' : \mathrm{Polynomial}\,\mathrm{params}$ be two distinct full polynomial outcomes with individual degrees at most $d$. Then
+	\[
+		\E_{u \sim \mathrm{Point}\,\mathrm{params}}\bigl[\mathbf{1}[g(u) = g'(u)]\bigr] \le \frac{md}{q}.
+	\]
+	This packages the $md/q$ loss term used in the \texttt{mainFormal} self-consistency cascade (\texttt{inductive\_step.tex}, lines 119--133) and in \texttt{comMain} (\texttt{commutativity-G.tex}).
+\end{lemma}
+\begin{proof}
+	\leanok
+	Transport along the equivalence between coded $\F_q$ points and the underlying scalar function space, then apply Lemma~\ref{lem:schwartz-zippel-individual}.
+\end{proof}
+
 \begin{definition}[Measurements and submeasurements]\label{def:submeasurement}
 	\lean{MIPStarRE.LDT.SubMeas, MIPStarRE.LDT.Measurement, MIPStarRE.LDT.ProjSubMeas}
 	\leanok
@@ -257,18 +272,18 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Consistency implies state-dependent distance for measurements]\label{prop:simeq-to-approx}
-	\lean{MIPStarRE.LDT.Preliminaries.simeqToApprox}
+	\lean{MIPStarRE.LDT.Preliminaries.simeqToApprox, MIPStarRE.LDT.Preliminaries.approxToSimeq}
 	\leanok
 	\uses{def:simeq, def:approx_delta, prop:simeq-for-measurements}
 	If $A$ and $B$ are measurements and $A_a^x \ot I \simeq_\delta I \ot B_a^x$, then
 	\[
 		A_a^x \ot I \approx_{2\delta} I \ot B_a^x.
 	\]
-	If both measurements are projective, the converse also holds.
+	If both measurements are projective, the converse also holds: if $A_a^x \ot I \approx_{2\delta} I \ot B_a^x$ then $A_a^x \ot I \simeq_\delta I \ot B_a^x$.
 \end{lemma}
 \begin{proof}
 	\leanok
-	Expand the squared norm of $(A_a^x \ot I - I \ot B_a^x)\ket{\psi}$ and use the diagonal-overlap formula from Lemma~\ref{prop:simeq-for-measurements}.
+	Expand the squared norm of $(A_a^x \ot I - I \ot B_a^x)\ket{\psi}$ and use the diagonal-overlap formula from Lemma~\ref{prop:simeq-for-measurements}; projectivity turns the diagonal inequality into an equality, giving the converse.
 \end{proof}
 
 \begin{remark}\label{rem:simeq-not-approx-submeas}

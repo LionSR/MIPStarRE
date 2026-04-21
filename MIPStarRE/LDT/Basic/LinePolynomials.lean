@@ -47,6 +47,68 @@ instance {params : Parameters} [FieldModel params.q] :
     CoeFun (AxisLinePolynomial params) (fun _ => Fq params → Fq params) :=
   ⟨AxisLinePolynomial.toFun⟩
 
+@[ext] theorem ext {params : Parameters} [FieldModel params.q]
+    {f g : AxisLinePolynomial params} (hpoly : f.poly = g.poly) : f = g := by
+  cases f with
+  | mk polyf hpolyf =>
+      cases g with
+      | mk polyg hpolyg =>
+          cases hpoly
+          congr
+
+/-- Reparametrize an axis-line answer by translating the line parameter. -/
+noncomputable def reparamAt {params : Parameters} [FieldModel params.q]
+    (f : AxisLinePolynomial params) (t : Fq params) : AxisLinePolynomial params where
+  poly := f.poly.comp (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)
+  degreeBounded := by
+    refine le_trans
+      (_root_.Polynomial.natDegree_comp_le
+        (p := f.poly)
+        (q := _root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)) ?_
+    have hdegq : (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X).natDegree = 1 := by
+      simp
+    rw [hdegq, Nat.mul_one]
+    exact f.degreeBounded
+
+@[simp] theorem reparamAt_apply {params : Parameters} [FieldModel params.q]
+    (f : AxisLinePolynomial params) (t s : Fq params) :
+    reparamAt f t s = f (addCoord t s) := by
+  simp [reparamAt, AxisLinePolynomial.toFun, evalLinePolynomialModel, addCoord]
+
+@[simp] theorem reparamAt_apply_zero {params : Parameters} [FieldModel params.q]
+    (f : AxisLinePolynomial params) (t : Fq params) :
+    reparamAt f t zeroCoord = f t := by
+  simp [reparamAt_apply, addCoord, zeroCoord]
+
+@[simp] theorem reparamAt_zero {params : Parameters} [FieldModel params.q]
+    (f : AxisLinePolynomial params) :
+    reparamAt f zeroCoord = f := by
+  refine AxisLinePolynomial.ext ?_
+  simp [reparamAt, zeroCoord]
+
+theorem reparamAt_reparamAt {params : Parameters} [FieldModel params.q]
+    (f : AxisLinePolynomial params) (t s : Fq params) :
+    reparamAt (reparamAt f t) s = reparamAt f (addCoord t s) := by
+  refine AxisLinePolynomial.ext ?_
+  change
+    (f.poly.comp (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)).comp
+        (_root_.Polynomial.C (decodeScalar s) + _root_.Polynomial.X) =
+      f.poly.comp (_root_.Polynomial.C (decodeScalar (addCoord t s)) + _root_.Polynomial.X)
+  rw [_root_.Polynomial.comp_assoc]
+  simp [addCoord, add_left_comm, add_comm]
+
+/-- Reparametrization by translation is an equivalence on axis-line answers. -/
+noncomputable def reparamAtEquiv {params : Parameters} [FieldModel params.q]
+    (t : Fq params) : AxisLinePolynomial params ≃ AxisLinePolynomial params where
+  toFun := fun f => reparamAt f t
+  invFun := fun f => reparamAt f (subCoord zeroCoord t)
+  left_inv := by
+    intro f
+    simpa using reparamAt_reparamAt f t (subCoord zeroCoord t)
+  right_inv := by
+    intro f
+    simpa using reparamAt_reparamAt f (subCoord zeroCoord t) t
+
 /-- The stored polynomial really witnesses the advertised degree bound. -/
 theorem hasUnivariateDegreeAtMost {params : Parameters} [FieldModel params.q]
     (f : AxisLinePolynomial params) :
@@ -91,6 +153,80 @@ def toFun {params : Parameters} [FieldModel params.q] (f : DiagonalLinePolynomia
 instance {params : Parameters} [FieldModel params.q] :
     CoeFun (DiagonalLinePolynomial params) (fun _ => Fq params → Fq params) :=
   ⟨DiagonalLinePolynomial.toFun⟩
+
+@[ext] theorem ext {params : Parameters} [FieldModel params.q]
+    {f g : DiagonalLinePolynomial params} (hpoly : f.poly = g.poly) : f = g := by
+  cases f with
+  | mk polyf hpolyf =>
+      cases g with
+      | mk polyg hpolyg =>
+          cases hpoly
+          congr
+
+/-- Reparametrize a diagonal-line answer by translating the line parameter.
+
+Concretely, the underlying univariate polynomial `f.poly` (over `Scalar params` in
+the chosen field model) is precomposed with `X + C (decodeScalar t)`, i.e. the
+coefficients are shifted using genuine *field* addition on `Scalar params` — not
+the `Fin q` arithmetic on `Fq params`. Transporting back through `encodeScalar`
+gives the answer-level identity `reparamAt f t s = f (addCoord t s)` (see
+`reparamAt_apply`), where `addCoord` is field addition lifted through the coding
+`FieldModel.equiv`. Composition with a degree-one polynomial preserves the
+`natDegree ≤ params.m * params.d` bound.
+
+This is the answer-level geometric fact behind rebasing a diagonal line at
+parameter `t`: the old parameter `addCoord t s` becomes the new parameter `s`. -/
+noncomputable def reparamAt {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t : Fq params) : DiagonalLinePolynomial params where
+  poly := f.poly.comp (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)
+  degreeBounded := by
+    refine le_trans
+      (_root_.Polynomial.natDegree_comp_le
+        (p := f.poly)
+        (q := _root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)) ?_
+    have hdegq : (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X).natDegree = 1 := by
+      simp
+    rw [hdegq, Nat.mul_one]
+    exact f.degreeBounded
+
+@[simp] theorem reparamAt_apply {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t s : Fq params) :
+    reparamAt f t s = f (addCoord t s) := by
+  simp [reparamAt, DiagonalLinePolynomial.toFun, evalLinePolynomialModel, addCoord]
+
+@[simp] theorem reparamAt_apply_zero {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t : Fq params) :
+    reparamAt f t zeroCoord = f t := by
+  simp [reparamAt_apply, addCoord, zeroCoord]
+
+@[simp] theorem reparamAt_zero {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) :
+    reparamAt f zeroCoord = f := by
+  refine DiagonalLinePolynomial.ext ?_
+  simp [reparamAt, zeroCoord]
+
+theorem reparamAt_reparamAt {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t s : Fq params) :
+    reparamAt (reparamAt f t) s = reparamAt f (addCoord t s) := by
+  refine DiagonalLinePolynomial.ext ?_
+  change
+    (f.poly.comp (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)).comp
+        (_root_.Polynomial.C (decodeScalar s) + _root_.Polynomial.X) =
+      f.poly.comp (_root_.Polynomial.C (decodeScalar (addCoord t s)) + _root_.Polynomial.X)
+  rw [_root_.Polynomial.comp_assoc]
+  simp [addCoord, add_left_comm, add_comm]
+
+/-- Reparametrization by translation is an equivalence on diagonal-line answers. -/
+noncomputable def reparamAtEquiv {params : Parameters} [FieldModel params.q]
+    (t : Fq params) : DiagonalLinePolynomial params ≃ DiagonalLinePolynomial params where
+  toFun := fun f => reparamAt f t
+  invFun := fun f => reparamAt f (subCoord zeroCoord t)
+  left_inv := by
+    intro f
+    simpa using reparamAt_reparamAt f t (subCoord zeroCoord t)
+  right_inv := by
+    intro f
+    simpa using reparamAt_reparamAt f (subCoord zeroCoord t) t
 
 /-- The stored polynomial really witnesses the advertised degree bound. -/
 theorem hasUnivariateDegreeAtMost {params : Parameters} [FieldModel params.q]

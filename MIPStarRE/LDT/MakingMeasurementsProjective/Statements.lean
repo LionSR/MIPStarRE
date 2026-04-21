@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
+import MIPStarRE.LDT.Basic.SubMeasurement
 
 /-!
 # Section 5 — Statements
@@ -142,18 +143,85 @@ abbrev ProjectivizationRepairInput {Outcome : Type*}
     ∃ P : ProjSubMeas Outcome ι,
       RoundedProjMeasStatement ψ A P (roundingToProjectiveError ζ)
 
-/-- Explicit input exposing the final product-space orthonormalization step. -/
-abbrev OrthonormalizationInput {Outcome : Type*}
+/-- Locality-preserving repair input for a left-lifted measurement.
+
+This is the structural invariant needed to descend the lifted-space output of
+`orthonormalizationMainLemma` back to a local projective submeasurement: when
+the input measurement already has the form `A_a ⊗ I`, the repaired family can
+be chosen in the same form `P_a ⊗ I`. -/
+abbrev LeftLiftedProjectivizationRepairInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) :=
-  ψ.IsNormalized →
-    BipartiteSSCRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily A) ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        SDDRel ψ (uniformDistribution Unit)
-          (constSubMeasFamily A.liftLeft)
-          (constSubMeasFamily P.toSubMeas.liftLeft)
-          (orthonormalizationError ζ)
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (A : Measurement Outcome ι) (ζ : Error) :=
+  SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A) ζ →
+    ∃ P : ProjSubMeas Outcome ι,
+      RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
+        (ProjSubMeas.liftLeft P) (roundingToProjectiveError ζ)
+
+/-- Complete a submeasurement by adjoining the residual `I - ∑ₐ Aₐ` at the
+fresh `none` outcome.
+
+This is the completion used in the paper's proof of
+`thm:orthonormalization`: the original outcomes are kept as `some a`, and the
+missing mass is recorded separately at `none`. -/
+noncomputable def optionCompletion {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (A : SubMeas Outcome ι) : Measurement (Option Outcome) ι where
+  toSubMeas :=
+    { outcome := fun
+        | none => 1 - A.total
+        | some a => A.outcome a
+      total := 1
+      outcome_pos := by
+        intro oa
+        cases oa with
+        | none =>
+            exact sub_nonneg.mpr A.total_le_one
+        | some a =>
+            exact A.outcome_pos a
+      sum_eq_total := by
+        rw [Fintype.sum_option, A.sum_eq_total]
+        exact sub_add_cancel (1 : MIPStarRE.Quantum.Op ι) A.total
+      total_le_one := le_rfl }
+  total_eq_one := rfl
+
+@[simp] lemma optionCompletion_outcome_none {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (A : SubMeas Outcome ι) :
+    (optionCompletion A).outcome none = 1 - A.total := rfl
+
+@[simp] lemma optionCompletion_outcome_some {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (A : SubMeas Outcome ι) (a : Outcome) :
+    (optionCompletion A).outcome (some a) = A.outcome a := rfl
+
+/-- Explicit input exposing only the remaining spectral-truncation and
+locality-preserving repair witnesses needed for the submeasurement version of
+`thm:orthonormalization`.
+
+The lifted/local descent is now formalized by
+`orthonormalizationMainLemma_local`; the only still-opaque inputs are the
+spectral truncation and late repair steps for the option-completed measurement
+`optionCompletion A`. Both fields live at error
+`consistencyToAlmostProjectiveError (2 * ζ)` because completing a
+`ζ`-strongly-self-consistent submeasurement to a measurement doubles the defect,
+exactly as in the paper's `1 - 2ζ` lower bound for the completed family. -/
+structure OrthonormalizationInput {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
+  /-- Spectral truncation on the option-completed measurement. -/
+  spectral :
+    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
+    SpectralTruncationInput ψ (leftLiftedMeasurement (ιB := ι) Ahat)
+      (consistencyToAlmostProjectiveError (2 * ζ))
+  /-- Locality-preserving repair on the option-completed measurement. -/
+  repair :
+    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
+    LeftLiftedProjectivizationRepairInput ψ Ahat
+      (consistencyToAlmostProjectiveError (2 * ζ))
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
