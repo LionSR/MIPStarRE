@@ -185,18 +185,12 @@ instance {params : Parameters} [FieldModel params.q] {ι : Type*}
 
 namespace AxisParallelCovariantMeasurement
 
-@[simp] theorem toIdxProjMeas_apply {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (M : AxisParallelCovariantMeasurement params ι) (ℓ : AxisParallelLine params) :
-    M.toIdxProjMeas ℓ = M ℓ :=
-  rfl
-
 /-- A covariant wrapper automatically satisfies the older evaluation-level
 rebasing invariant. -/
 theorem reparamInvariant {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (M : AxisParallelCovariantMeasurement params ι) :
-    AxisParallelEvaluationReparamInvariant params M :=
+    AxisParallelEvaluationReparamInvariant params M.toIdxProjMeas :=
   M.transportInvariant.toEvaluationReparamInvariant
 
 end AxisParallelCovariantMeasurement
@@ -218,18 +212,12 @@ instance {params : Parameters} [FieldModel params.q] {ι : Type*}
 
 namespace DiagonalCovariantMeasurement
 
-@[simp] theorem toIdxProjMeas_apply {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (M : DiagonalCovariantMeasurement params ι) (ℓ : DiagonalLine params) :
-    M.toIdxProjMeas ℓ = M ℓ :=
-  rfl
-
 /-- A covariant wrapper automatically satisfies the older evaluation-level
 rebasing invariant. -/
 theorem reparamInvariant {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (M : DiagonalCovariantMeasurement params ι) :
-    DiagonalEvaluationReparamInvariant params M :=
+    DiagonalEvaluationReparamInvariant params M.toIdxProjMeas :=
   M.transportInvariant.toEvaluationReparamInvariant
 
 end DiagonalCovariantMeasurement

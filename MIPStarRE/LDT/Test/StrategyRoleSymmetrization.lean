@@ -255,43 +255,6 @@ noncomputable def symmetrizedIdxProjMeas
         simp [add_mul, mul_add, roleCond_mul_same, roleCond_A_mul_B,
           roleCond_B_mul_A, (MA q).proj a, (MB q).proj a] }
 
-private theorem measurement_ext {α : Type*} {ι : Type*}
-    [Fintype α] [Fintype ι] [DecidableEq ι]
-    {A B : Measurement α ι}
-    (houtcome : ∀ a : α, A.outcome a = B.outcome a) :
-    A = B := by
-  cases A with
-  | mk AtoSubMeas AtotalEqOne =>
-      cases B with
-      | mk BtoSubMeas BtotalEqOne =>
-          have hsub : AtoSubMeas = BtoSubMeas := by
-            apply SubMeas.ext
-            · intro a
-              simpa using houtcome a
-            · calc
-                AtoSubMeas.total = 1 := AtotalEqOne
-                _ = BtoSubMeas.total := BtotalEqOne.symm
-          cases hsub
-          cases Subsingleton.elim BtotalEqOne AtotalEqOne
-          rfl
-
-private theorem projMeas_ext {α : Type*} {ι : Type*}
-    [Fintype α] [Fintype ι] [DecidableEq ι]
-    {A B : ProjMeas α ι}
-    (houtcome : ∀ a : α, A.outcome a = B.outcome a) :
-    A = B := by
-  cases A with
-  | mk AtoMeasurement Aproj =>
-      cases B with
-      | mk BtoMeasurement Bproj =>
-          have hmeas : AtoMeasurement = BtoMeasurement := by
-            apply measurement_ext
-            intro a
-            simpa using houtcome a
-          cases hmeas
-          cases Subsingleton.elim Bproj Aproj
-          rfl
-
 /-- Transport-level rebasing covariance is preserved by block-diagonal
 symmetrization over the role register. -/
 private theorem symmetrizedAxisParallelTransportInvariant
@@ -304,11 +267,13 @@ private theorem symmetrizedAxisParallelTransportInvariant
     AxisParallelMeasurementTransportInvariant params
       (symmetrizedIdxProjMeas MA MB) := by
   intro ℓ t
-  apply projMeas_ext
+  have hA' := hA ℓ t
+  have hB' := hB ℓ t
+  apply ProjMeas.ext
   intro a
   simp [symmetrizedIdxProjMeas, AxisParallelLine.transportMeasurement,
     ProjMeas.transport, Measurement.transport, SubMeas.transport,
-    hA ℓ t, hB ℓ t]
+    hA', hB']
 
 /-- Transport-level rebasing covariance is preserved by block-diagonal
 symmetrization over the role register. -/
@@ -322,11 +287,13 @@ private theorem symmetrizedDiagonalTransportInvariant
     DiagonalMeasurementTransportInvariant params
       (symmetrizedIdxProjMeas MA MB) := by
   intro ℓ t
-  apply projMeas_ext
+  have hA' := hA ℓ t
+  have hB' := hB ℓ t
+  apply ProjMeas.ext
   intro a
   simp [symmetrizedIdxProjMeas, DiagonalLine.transportMeasurement,
     ProjMeas.transport, Measurement.transport, SubMeas.transport,
-    hA ℓ t, hB ℓ t]
+    hA', hB']
 
 namespace ProjStrat
 

@@ -98,6 +98,46 @@ the same total operator. -/
           cases Subsingleton.elim leB leA
           rfl
 
+/-- Two measurements are equal when they have the same outcome operators. -/
+@[ext] theorem Measurement.ext {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    {A B : Measurement α ι}
+    (houtcome : ∀ a : α, A.outcome a = B.outcome a) :
+    A = B := by
+  cases A with
+  | mk AtoSubMeas AtotalEqOne =>
+      cases B with
+      | mk BtoSubMeas BtotalEqOne =>
+          have hsub : AtoSubMeas = BtoSubMeas := by
+            apply SubMeas.ext
+            · intro a
+              simpa using houtcome a
+            · calc
+                AtoSubMeas.total = 1 := AtotalEqOne
+                _ = BtoSubMeas.total := BtotalEqOne.symm
+          cases hsub
+          cases Subsingleton.elim BtotalEqOne AtotalEqOne
+          rfl
+
+/-- Two projective measurements are equal when they have the same outcome
+operators. -/
+@[ext] theorem ProjMeas.ext {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    {A B : ProjMeas α ι}
+    (houtcome : ∀ a : α, A.outcome a = B.outcome a) :
+    A = B := by
+  cases A with
+  | mk AtoMeasurement Aproj =>
+      cases B with
+      | mk BtoMeasurement Bproj =>
+          have hmeas : AtoMeasurement = BtoMeasurement := by
+            apply Measurement.ext
+            intro a
+            simpa using houtcome a
+          cases hmeas
+          cases Subsingleton.elim Bproj Aproj
+          rfl
+
 /-- PSD outcomes are Hermitian. -/
 theorem SubMeas.outcome_hermitian {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
