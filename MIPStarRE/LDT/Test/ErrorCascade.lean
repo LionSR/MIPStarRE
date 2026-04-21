@@ -318,7 +318,8 @@ private theorem dq_rpow2048_le_stepEnvelope2048 {params : Parameters} {k : ℕ} 
       stepEnvelope params k eps (2048 : Error) (160000 : Error) := by
   unfold stepEnvelope
   have hepsNN' : 0 ≤ Real.rpow eps (1 / (2048 : Error)) := Real.rpow_nonneg h.hepsNN _
-  have hExpNN' : 0 ≤ Real.exp (-((k : Error) / ((160000 : Error) * ((params.m : Error) ^ (2 : ℕ))))) :=
+  have hExpNN' :
+      0 ≤ Real.exp (-((k : Error) / ((160000 : Error) * ((params.m : Error) ^ (2 : ℕ))))) :=
     Real.exp_nonneg _
   exact (le_add_of_nonneg_left hepsNN').trans (le_add_of_nonneg_right hExpNN')
 
@@ -329,7 +330,9 @@ private theorem mdq_le_k2m4_stepEnvelope2048 {params : Parameters} {k : ℕ} {ep
         stepEnvelope params k eps (2048 : Error) (160000 : Error) := by
   have hTNN : 0 ≤ stepEnvelope params k eps (2048 : Error) (160000 : Error) :=
     stepEnvelope_nonneg (h := h) (n := (2048 : Error)) (N := (160000 : Error))
-  have hdq_to_T : (params.d : Error) / (params.q : Error) ≤ stepEnvelope params k eps (2048 : Error) (160000 : Error) :=
+  have hdq_to_T :
+      (params.d : Error) / (params.q : Error) ≤
+        stepEnvelope params k eps (2048 : Error) (160000 : Error) :=
     (dq_le_rpow2048 h).trans (dq_rpow2048_le_stepEnvelope2048 h)
   have hmdq_to_mT : (params.m : Error) * ((params.d : Error) / (params.q : Error)) ≤
       (params.m : Error) * stepEnvelope params k eps (2048 : Error) (160000 : Error) :=
@@ -439,7 +442,9 @@ private theorem m4_rpow_eighth_le {params : Parameters} {k : ℕ} {eps : Error}
 private theorem rpow_one_four_eq_sqrt_sqrt {x : Error} (hx : 0 ≤ x) :
     Real.rpow x (1 / (4 : Error)) = Real.sqrt (Real.sqrt x) := by
   calc
-    Real.rpow x (1 / (4 : Error)) = Real.rpow x ((1 / (2 : Error)) * (1 / (2 : Error))) := by norm_num
+    Real.rpow x (1 / (4 : Error)) =
+        Real.rpow x ((1 / (2 : Error)) * (1 / (2 : Error))) := by
+      norm_num
     _ = Real.rpow (Real.rpow x (1 / (2 : Error))) (1 / (2 : Error)) := by
       simpa using (Real.rpow_mul hx (1 / (2 : Error)) (1 / (2 : Error)))
     _ = Real.sqrt (Real.sqrt x) := by
@@ -449,7 +454,9 @@ private theorem rpow_one_four_eq_sqrt_sqrt {x : Error} (hx : 0 ≤ x) :
 private theorem rpow_one_eight_eq_sqrt_sqrt_sqrt {x : Error} (hx : 0 ≤ x) :
     Real.rpow x (1 / (8 : Error)) = Real.sqrt (Real.sqrt (Real.sqrt x)) := by
   calc
-    Real.rpow x (1 / (8 : Error)) = Real.rpow x ((1 / (4 : Error)) * (1 / (2 : Error))) := by norm_num
+    Real.rpow x (1 / (8 : Error)) =
+        Real.rpow x ((1 / (4 : Error)) * (1 / (2 : Error))) := by
+      norm_num
     _ = Real.rpow (Real.rpow x (1 / (4 : Error))) (1 / (2 : Error)) := by
       simpa using (Real.rpow_mul hx (1 / (4 : Error)) (1 / (2 : Error)))
     _ = Real.sqrt (Real.sqrt (Real.sqrt x)) := by
@@ -507,8 +514,10 @@ private theorem stepEnvelope_rpow_eighth_le {params : Parameters} {k : ℕ} {eps
   have hnn : 0 ≤ stepEnvelope params k eps (2048 : Error) (160000 : Error) :=
     stepEnvelope_nonneg (h := h) (n := (2048 : Error)) (N := (160000 : Error))
   calc
-    Real.rpow (stepEnvelope params k eps (2048 : Error) (160000 : Error)) (1 / (8 : Error))
-      = Real.sqrt (Real.sqrt (Real.sqrt (stepEnvelope params k eps (2048 : Error) (160000 : Error)))) :=
+    Real.rpow (stepEnvelope params k eps (2048 : Error) (160000 : Error))
+        (1 / (8 : Error))
+      = Real.sqrt
+          (Real.sqrt (Real.sqrt (stepEnvelope params k eps (2048 : Error) (160000 : Error)))) :=
         rpow_one_eight_eq_sqrt_sqrt_sqrt hnn
     _ ≤ Real.sqrt (Real.sqrt (stepEnvelope params k eps (4096 : Error) (320000 : Error))) :=
       Real.sqrt_le_sqrt (Real.sqrt_le_sqrt h1)
@@ -543,9 +552,12 @@ private theorem sqrt_scaled_stepEnvelope_le {params : Parameters} {k : ℕ} {eps
     positivity [hENN]
   have hsqrt := Real.sqrt_le_sqrt hx'
   calc
-    Real.sqrt x ≤ Real.sqrt (C * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) * E ^ (2 : ℕ)) := hsqrt
+    Real.sqrt x ≤
+        Real.sqrt (C * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) * E ^ (2 : ℕ)) :=
+      hsqrt
     _ = Real.sqrt (C * (u ^ (2 : ℕ))) := by
-      rw [show C * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) * E ^ (2 : ℕ) = C * (u ^ (2 : ℕ)) by
+      rw [show C * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) * E ^ (2 : ℕ) =
+          C * (u ^ (2 : ℕ)) by
         dsimp [u]
         ring]
     _ = Real.sqrt C * u := by
@@ -554,6 +566,72 @@ private theorem sqrt_scaled_stepEnvelope_le {params : Parameters} {k : ℕ} {eps
           stepEnvelope params k eps (2 * n) (2 * N) := by
       simp [u, E]
       ring
+
+private theorem rpow_Z1_factor_le {params : Parameters} {k : ℕ}
+    {Z1 k2 m4 E2048 r Crpow Erpow : Error}
+    (hZ1NN : 0 ≤ Z1)
+    (hZ1 : Z1 ≤ 20204 * k2 * m4 * E2048)
+    (hrNN : 0 ≤ r)
+    (hk2NN : 0 ≤ k2)
+    (hm4NN : 0 ≤ m4)
+    (hE2048NN : 0 ≤ E2048)
+    (hA : Real.rpow (20204 : Error) r ≤ Crpow)
+    (hB : Real.rpow k2 r ≤ (k : Error))
+    (hC : Real.rpow m4 r ≤ (params.m : Error))
+    (hD : Real.rpow E2048 r ≤ Erpow) :
+    Real.rpow Z1 r ≤ Crpow * (k : Error) * (params.m : Error) * Erpow := by
+  set A : Error := Real.rpow (20204 : Error) r
+  set B : Error := Real.rpow k2 r
+  set C : Error := Real.rpow m4 r
+  set D : Error := Real.rpow E2048 r
+  have hAnn : 0 ≤ A := by
+    simpa [A] using Real.rpow_nonneg (by norm_num : 0 ≤ (20204 : Error)) r
+  have hBnn : 0 ≤ B := by
+    simpa [B] using Real.rpow_nonneg hk2NN r
+  have hCnn : 0 ≤ C := by
+    simpa [C] using Real.rpow_nonneg hm4NN r
+  have hDnn : 0 ≤ D := by
+    simpa [D] using Real.rpow_nonneg hE2048NN r
+  have hCrpowNN : 0 ≤ Crpow := le_trans hAnn hA
+  have hkNN : 0 ≤ (k : Error) := Nat.cast_nonneg _
+  have hmNN : 0 ≤ (params.m : Error) := Nat.cast_nonneg _
+  have hAB : A * B ≤ Crpow * (k : Error) :=
+    mul_le_mul hA hB hBnn hCrpowNN
+  have hABC : A * B * C ≤ (Crpow * (k : Error)) * (params.m : Error) := by
+    exact mul_le_mul hAB hC hCnn (mul_nonneg hCrpowNN hkNN)
+  have hABCD : A * B * C * D ≤ ((Crpow * (k : Error)) * (params.m : Error)) * Erpow := by
+    exact mul_le_mul hABC hD hDnn (mul_nonneg (mul_nonneg hCrpowNN hkNN) hmNN)
+  have hsplit1 :
+      Real.rpow (((20204 : Error) * k2) * (m4 * E2048)) r =
+        Real.rpow ((20204 : Error) * k2) r * Real.rpow (m4 * E2048) r := by
+    simpa using
+      (Real.mul_rpow (x := ((20204 : Error) * k2)) (y := (m4 * E2048)) (z := r)
+        (by positivity) (mul_nonneg hm4NN hE2048NN))
+  have hsplit2a :
+      Real.rpow ((20204 : Error) * k2) r =
+        Real.rpow (20204 : Error) r * Real.rpow k2 r := by
+    simpa using
+      (Real.mul_rpow (x := (20204 : Error)) (y := k2) (z := r) (by positivity) hk2NN)
+  have hsplit2b :
+      Real.rpow (m4 * E2048) r = Real.rpow m4 r * Real.rpow E2048 r := by
+    simpa using (Real.mul_rpow (x := m4) (y := E2048) (z := r) hm4NN hE2048NN)
+  have hFactor : Real.rpow (20204 * k2 * m4 * E2048) r = A * B * C * D := by
+    calc
+      Real.rpow (20204 * k2 * m4 * E2048) r
+          = Real.rpow (((20204 : Error) * k2) * (m4 * E2048)) r := by
+              congr 1
+              ring
+      _ = Real.rpow ((20204 : Error) * k2) r * Real.rpow (m4 * E2048) r := hsplit1
+      _ = (Real.rpow (20204 : Error) r * Real.rpow k2 r) *
+            (Real.rpow m4 r * Real.rpow E2048 r) := by
+            rw [hsplit2a, hsplit2b]
+      _ = A * B * C * D := by simp [A, B, C, D, mul_assoc, mul_left_comm, mul_comm]
+  calc
+    Real.rpow Z1 r ≤ Real.rpow (20204 * k2 * m4 * E2048) r :=
+      Real.rpow_le_rpow hZ1NN hZ1 hrNN
+    _ = A * B * C * D := hFactor
+    _ ≤ Crpow * (k : Error) * (params.m : Error) * Erpow := by
+      simpa [mul_assoc] using hABCD
 
 private theorem cascadeSigma_tight_bound {params : Parameters} {k : ℕ} {eps : Error}
     (h : CascadeHypotheses params k eps) {ν : Error}
@@ -596,7 +674,9 @@ private theorem cascadeSigma_tight_bound {params : Parameters} {k : ℕ} {eps : 
               Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error))) := hreorder
       _ = 10000 * k2 * m4 *
             (Real.rpow eps (1 / (1024 : Error)) +
-              Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error))) := by rw [hm2_sq_m4]
+              Real.rpow ((params.d : Error) / (params.q : Error))
+                (1 / (1024 : Error))) := by
+            rw [hm2_sq_m4]
   have hScaleGeOne : (1 : Error) ≤ 10000 * k2 := by
     nlinarith [hk2_ge_one]
   have hm2_le_10k2m4 : m2 ≤ 10000 * k2 * m4 := by
@@ -689,7 +769,8 @@ private theorem cascadeZeta1_bound_special {params : Parameters} {k : ℕ} {eps 
           Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error))) := by
             simpa [hm_cast] using hν
       _ ≤ 10000 * (a + b) := by nlinarith [heps1024, hdq1024]
-  have hExp80000_le_c : Real.exp (-((1 : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) ≤ c := by
+  have hExp80000_le_c :
+      Real.exp (-((1 : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) ≤ c := by
     calc
       Real.exp (-((1 : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))
           = Real.exp (-(1 : Error) / (80000 : Error)) := by norm_num [hm_cast]
@@ -789,7 +870,8 @@ private theorem cascadeZeta1_bound_general {params : Parameters} {k : ℕ} {eps 
     unfold T stepEnvelope
     have hdqNN' : 0 ≤ Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2048 : Error)) :=
       Real.rpow_nonneg h.dqNN _
-    have hExpNN' : 0 ≤ Real.exp (-((k : Error) / ((160000 : Error) * ((params.m : Error) ^ (2 : ℕ))))) :=
+    have hExpNN' :
+        0 ≤ Real.exp (-((k : Error) / ((160000 : Error) * ((params.m : Error) ^ (2 : ℕ))))) :=
       Real.exp_nonneg _
     nlinarith
   have hsqrt_eps : Real.sqrt eps ≤ Real.rpow eps (1 / (2048 : Error)) := by
@@ -821,7 +903,8 @@ private theorem cascadeZeta1_bound_general {params : Parameters} {k : ℕ} {eps 
         ≤ Real.sqrt (20000 : Error) * (k : Error) * m2 * T := hsqrtScaled
       _ ≤ 142 * (k : Error) * m2 * T := by
         simpa [mul_assoc, mul_left_comm, mul_comm] using
-          mul_le_mul_of_nonneg_right sqrt20000_le_142 (show 0 ≤ (k : Error) * m2 * T by positivity [hTNN])
+          mul_le_mul_of_nonneg_right sqrt20000_le_142
+            (show 0 ≤ (k : Error) * m2 * T by positivity [hTNN])
   have hsqrtTmp : Real.sqrt (3 * eps + 2 * σ) ≤
       Real.sqrt (3 * eps) + Real.sqrt (20000 * k2 * m4 * S) := by
     have harg : 3 * eps + 2 * σ ≤ 3 * eps + 20000 * k2 * m4 * S := by
@@ -889,7 +972,8 @@ private theorem cascadeZeta1_bound_general {params : Parameters} {k : ℕ} {eps 
         2 * Real.sqrt (3 * eps) + 2 * Real.sqrt (20000 * k2 * m4 * S) := by
       exact hsqrtTmp2'.trans_eq hEq
     exact hsqrtTmp2.trans (add_le_add hsqrt3Term hsqrtBig)
-  have hmdq_to_k2m4T : (params.m : Error) * ((params.d : Error) / (params.q : Error)) ≤ k2 * m4 * T := by
+  have hmdq_to_k2m4T :
+      (params.m : Error) * ((params.d : Error) / (params.q : Error)) ≤ k2 * m4 * T := by
     dsimp [k2, m4, T]
     exact mdq_le_k2m4_stepEnvelope2048 (h := h)
   have hfourT : 4 * T ≤ 4 * (k2 * m4) * T := by
@@ -898,7 +982,8 @@ private theorem cascadeZeta1_bound_general {params : Parameters} {k : ℕ} {eps 
   rw [show cascadeZeta1 params eps σ =
       2 * σ + 2 * Real.sqrt (3 * eps + 2 * σ) +
         (params.m : Error) * (params.d : Error) / (params.q : Error) by rfl]
-  have hmdq_to_k2m4T' : (params.m : Error) * (params.d : Error) / (params.q : Error) ≤ k2 * m4 * T := by
+  have hmdq_to_k2m4T' :
+      (params.m : Error) * (params.d : Error) / (params.q : Error) ≤ k2 * m4 * T := by
     calc
       (params.m : Error) * (params.d : Error) / (params.q : Error)
         = (params.m : Error) * ((params.d : Error) / (params.q : Error)) := by ring
@@ -926,6 +1011,7 @@ private theorem cascadeZeta1_bound {params : Parameters} {k : ℕ} {eps : Error}
   by_cases hkm1 : k = 1 ∧ params.m = 1
   · exact cascadeZeta1_bound_special (h := h) (ν := ν) hν hkm1
   · exact cascadeZeta1_bound_general (h := h) (ν := ν) hν hkm1
+
 /-- **Paper lines 196–201.** The concrete `ζ₁` built from `σ = cascadeSigma params k ν`
 is absorbed by `mainFormalError`. -/
 theorem zeta1_bound {params : Parameters} {k : ℕ} {eps : Error}
@@ -986,116 +1072,30 @@ private theorem cascadeZeta2_bound {params : Parameters} {k : ℕ} {eps : Error}
       (n₁ := (8192 : Error)) (n₂ := (16384 : Error)) (N₁ := (640000 : Error))
       (N₂ := (1280000 : Error)) (hn₁Pos := by norm_num) (hn := by norm_num)
       (hN₁Pos := by norm_num) (hN := by norm_num)
-  have hQuarterRoot : Real.rpow Z1 (1 / (4 : Error)) ≤ 12 * (k : Error) * (params.m : Error) * E8192 := by
-    set A : Error := Real.rpow (20204 : Error) (1 / (4 : Error))
-    set B : Error := Real.rpow k2 (1 / (4 : Error))
-    set C : Error := Real.rpow m4 (1 / (4 : Error))
-    set D : Error := Real.rpow E2048 (1 / (4 : Error))
-    have hA : A ≤ 12 := by simpa [A] using rpow20204_quarter_le_12
-    have hB : B ≤ (k : Error) := by simpa [B, k2] using k2_rpow_quarter_le (h := h)
-    have hC : C ≤ (params.m : Error) := by
-      simpa [C, m4] using (m4_rpow_quarter_eq (params := params)).le
-    have hD : D ≤ E8192 := by simpa [D, E2048, E8192] using stepEnvelope_rpow_quarter_le (h := h)
-    have hAnn : 0 ≤ A := by
-      simpa [A] using Real.rpow_nonneg (by norm_num : 0 ≤ (20204 : Error)) (1 / (4 : Error))
-    have hBnn : 0 ≤ B := by
-      simpa [B] using Real.rpow_nonneg (show 0 ≤ k2 by positivity) (1 / (4 : Error))
-    have hCnn : 0 ≤ C := by
-      simpa [C] using Real.rpow_nonneg (show 0 ≤ m4 by positivity) (1 / (4 : Error))
-    have hDnn : 0 ≤ D := by
-      simpa [D] using Real.rpow_nonneg hE2048NN (1 / (4 : Error))
-    have hAB : A * B ≤ 12 * (k : Error) := by
-      exact mul_le_mul hA hB hBnn (by positivity)
-    have hABC : A * B * C ≤ 12 * (k : Error) * (params.m : Error) := by
-      exact mul_le_mul hAB hC hCnn (by positivity)
-    have hABCD : A * B * C * D ≤ 12 * (k : Error) * (params.m : Error) * E8192 := by
-      exact mul_le_mul hABC hD hDnn (by positivity)
-    have hsplit1 : Real.rpow (((20204 : Error) * k2) * (m4 * E2048)) (1 / (4 : Error)) =
-        Real.rpow ((20204 : Error) * k2) (1 / (4 : Error)) * Real.rpow (m4 * E2048) (1 / (4 : Error)) := by
-      simpa using (Real.mul_rpow (x := ((20204 : Error) * k2)) (y := (m4 * E2048))
-        (z := (1 / (4 : Error))) (by positivity) (by positivity [hE2048NN]))
-    have hsplit2a : Real.rpow ((20204 : Error) * k2) (1 / (4 : Error)) =
-        Real.rpow (20204 : Error) (1 / (4 : Error)) * Real.rpow k2 (1 / (4 : Error)) := by
-      simpa using (Real.mul_rpow (x := (20204 : Error)) (y := k2) (z := (1 / (4 : Error)))
-        (by positivity) (by positivity))
-    have hsplit2b : Real.rpow (m4 * E2048) (1 / (4 : Error)) =
-        Real.rpow m4 (1 / (4 : Error)) * Real.rpow E2048 (1 / (4 : Error)) := by
-      simpa using (Real.mul_rpow (x := m4) (y := E2048) (z := (1 / (4 : Error)))
-        (by positivity) hE2048NN)
-    have hFactor : Real.rpow (20204 * k2 * m4 * E2048) (1 / (4 : Error)) = A * B * C * D := by
-      calc
-        Real.rpow (20204 * k2 * m4 * E2048) (1 / (4 : Error))
-            = Real.rpow (((20204 : Error) * k2) * (m4 * E2048)) (1 / (4 : Error)) := by
-                congr 1
-                ring
-        _ = Real.rpow ((20204 : Error) * k2) (1 / (4 : Error)) * Real.rpow (m4 * E2048) (1 / (4 : Error)) := hsplit1
-        _ = (Real.rpow (20204 : Error) (1 / (4 : Error)) * Real.rpow k2 (1 / (4 : Error))) *
-              (Real.rpow m4 (1 / (4 : Error)) * Real.rpow E2048 (1 / (4 : Error))) := by
-              rw [hsplit2a, hsplit2b]
-        _ = A * B * C * D := by simp [A, B, C, D, mul_assoc, mul_left_comm, mul_comm]
-    calc
-      Real.rpow Z1 (1 / (4 : Error))
-        ≤ Real.rpow (20204 * k2 * m4 * E2048) (1 / (4 : Error)) :=
-          Real.rpow_le_rpow hZ1NN hZ1 (by positivity)
-      _ = A * B * C * D := hFactor
-      _ ≤ 12 * (k : Error) * (params.m : Error) * E8192 := by simpa [mul_assoc] using hABCD
-  have hQuarterRoot' : Real.rpow Z1 (1 / (4 : Error)) ≤ 12 * (k : Error) * (params.m : Error) * E16384 := by
+  have hQuarterRoot : Real.rpow Z1 (1 / (4 : Error)) ≤
+      12 * (k : Error) * (params.m : Error) * E8192 := by
+    exact rpow_Z1_factor_le (params := params) (k := k)
+      (hZ1NN := hZ1NN) (hZ1 := hZ1) (hrNN := by positivity)
+      (hk2NN := by positivity) (hm4NN := by positivity) (hE2048NN := hE2048NN)
+      (hA := by simpa using rpow20204_quarter_le_12)
+      (hB := by simpa [k2] using k2_rpow_quarter_le (h := h))
+      (hC := by simpa [m4] using (m4_rpow_quarter_eq (params := params)).le)
+      (hD := by simpa [E2048, E8192] using stepEnvelope_rpow_quarter_le (h := h))
+  have hQuarterRoot' : Real.rpow Z1 (1 / (4 : Error)) ≤
+      12 * (k : Error) * (params.m : Error) * E16384 := by
     calc
       Real.rpow Z1 (1 / (4 : Error)) ≤ 12 * (k : Error) * (params.m : Error) * E8192 := hQuarterRoot
       _ ≤ 12 * (k : Error) * (params.m : Error) * E16384 :=
         mul_le_mul_of_nonneg_left hE8192 (by positivity)
-  have hEighthRoot : Real.rpow Z1 (1 / (8 : Error)) ≤ 4 * (k : Error) * (params.m : Error) * E16384 := by
-    set A : Error := Real.rpow (20204 : Error) (1 / (8 : Error))
-    set B : Error := Real.rpow k2 (1 / (8 : Error))
-    set C : Error := Real.rpow m4 (1 / (8 : Error))
-    set D : Error := Real.rpow E2048 (1 / (8 : Error))
-    have hA : A ≤ 4 := by simpa [A] using rpow20204_eighth_le_4
-    have hB : B ≤ (k : Error) := by simpa [B, k2] using k2_rpow_eighth_le (h := h)
-    have hC : C ≤ (params.m : Error) := by simpa [C, m4] using m4_rpow_eighth_le (h := h)
-    have hD : D ≤ E16384 := by simpa [D, E2048, E16384] using stepEnvelope_rpow_eighth_le (h := h)
-    have hAnn : 0 ≤ A := by
-      simpa [A] using Real.rpow_nonneg (by norm_num : 0 ≤ (20204 : Error)) (1 / (8 : Error))
-    have hBnn : 0 ≤ B := by
-      simpa [B] using Real.rpow_nonneg (show 0 ≤ k2 by positivity) (1 / (8 : Error))
-    have hCnn : 0 ≤ C := by
-      simpa [C] using Real.rpow_nonneg (show 0 ≤ m4 by positivity) (1 / (8 : Error))
-    have hDnn : 0 ≤ D := by
-      simpa [D] using Real.rpow_nonneg hE2048NN (1 / (8 : Error))
-    have hAB : A * B ≤ 4 * (k : Error) := by
-      exact mul_le_mul hA hB hBnn (by positivity)
-    have hABC : A * B * C ≤ 4 * (k : Error) * (params.m : Error) := by
-      exact mul_le_mul hAB hC hCnn (by positivity)
-    have hABCD : A * B * C * D ≤ 4 * (k : Error) * (params.m : Error) * E16384 := by
-      exact mul_le_mul hABC hD hDnn (by positivity)
-    have hsplit1 : Real.rpow (((20204 : Error) * k2) * (m4 * E2048)) (1 / (8 : Error)) =
-        Real.rpow ((20204 : Error) * k2) (1 / (8 : Error)) * Real.rpow (m4 * E2048) (1 / (8 : Error)) := by
-      simpa using (Real.mul_rpow (x := ((20204 : Error) * k2)) (y := (m4 * E2048))
-        (z := (1 / (8 : Error))) (by positivity) (by positivity [hE2048NN]))
-    have hsplit2a : Real.rpow ((20204 : Error) * k2) (1 / (8 : Error)) =
-        Real.rpow (20204 : Error) (1 / (8 : Error)) * Real.rpow k2 (1 / (8 : Error)) := by
-      simpa using (Real.mul_rpow (x := (20204 : Error)) (y := k2) (z := (1 / (8 : Error)))
-        (by positivity) (by positivity))
-    have hsplit2b : Real.rpow (m4 * E2048) (1 / (8 : Error)) =
-        Real.rpow m4 (1 / (8 : Error)) * Real.rpow E2048 (1 / (8 : Error)) := by
-      simpa using (Real.mul_rpow (x := m4) (y := E2048) (z := (1 / (8 : Error)))
-        (by positivity) hE2048NN)
-    have hFactor : Real.rpow (20204 * k2 * m4 * E2048) (1 / (8 : Error)) = A * B * C * D := by
-      calc
-        Real.rpow (20204 * k2 * m4 * E2048) (1 / (8 : Error))
-            = Real.rpow (((20204 : Error) * k2) * (m4 * E2048)) (1 / (8 : Error)) := by
-                congr 1
-                ring
-        _ = Real.rpow ((20204 : Error) * k2) (1 / (8 : Error)) * Real.rpow (m4 * E2048) (1 / (8 : Error)) := hsplit1
-        _ = (Real.rpow (20204 : Error) (1 / (8 : Error)) * Real.rpow k2 (1 / (8 : Error))) *
-              (Real.rpow m4 (1 / (8 : Error)) * Real.rpow E2048 (1 / (8 : Error))) := by
-              rw [hsplit2a, hsplit2b]
-        _ = A * B * C * D := by simp [A, B, C, D, mul_assoc, mul_left_comm, mul_comm]
-    calc
-      Real.rpow Z1 (1 / (8 : Error))
-        ≤ Real.rpow (20204 * k2 * m4 * E2048) (1 / (8 : Error)) :=
-          Real.rpow_le_rpow hZ1NN hZ1 (by positivity)
-      _ = A * B * C * D := hFactor
-      _ ≤ 4 * (k : Error) * (params.m : Error) * E16384 := by simpa [mul_assoc] using hABCD
+  have hEighthRoot : Real.rpow Z1 (1 / (8 : Error)) ≤
+      4 * (k : Error) * (params.m : Error) * E16384 := by
+    exact rpow_Z1_factor_le (params := params) (k := k)
+      (hZ1NN := hZ1NN) (hZ1 := hZ1) (hrNN := by positivity)
+      (hk2NN := by positivity) (hm4NN := by positivity) (hE2048NN := hE2048NN)
+      (hA := by simpa using rpow20204_eighth_le_4)
+      (hB := by simpa [k2] using k2_rpow_eighth_le (h := h))
+      (hC := by simpa [m4] using m4_rpow_eighth_le (h := h))
+      (hD := by simpa [E2048, E16384] using stepEnvelope_rpow_eighth_le (h := h))
   unfold cascadeZeta2
   calc
     200 * Real.rpow Z1 (1 / (4 : Error)) + 40 * Real.rpow Z1 (1 / (8 : Error))
@@ -1117,7 +1117,8 @@ theorem zeta2_bound {params : Parameters} {k : ℕ} {eps : Error}
   rw [hζ₁Eq, hσEq, mainFormalError_eq_envelope]
   have hζ₂ := cascadeZeta2_bound (h := h) (ν := ν) hνNN hν
   have hTightEnvelope :
-      stepEnvelope params k eps (16384 : Error) (1280000 : Error) ≤ mainFormalEnvelope params k eps :=
+      stepEnvelope params k eps (16384 : Error) (1280000 : Error) ≤
+        mainFormalEnvelope params k eps :=
     stepEnvelope_le_mainFormalEnvelope (h := h) (n := (16384 : Error)) (N := (1280000 : Error))
       (hnPos := by norm_num) (hn := by norm_num) (hNPos := by norm_num) (hN := by norm_num)
   have hENN := h.envelope_nonneg
@@ -1180,7 +1181,8 @@ private theorem cascadeZeta3_bound {params : Parameters} {k : ℕ} {eps : Error}
   have hZ2 : Z2 ≤ 2560 * (k : Error) * (params.m : Error) * E16384 := by
     simpa [Z1, Z2, E16384] using cascadeZeta2_bound (h := h) (ν := ν) hνNN hν
   have hE16384NN : 0 ≤ E16384 := by
-    simpa [E16384] using stepEnvelope_nonneg (h := h) (n := (16384 : Error)) (N := (1280000 : Error))
+    simpa [E16384] using
+      stepEnvelope_nonneg (h := h) (n := (16384 : Error)) (N := (1280000 : Error))
   have hZ2' : Z2 ≤ 2560 * k2 * m4 * E16384 := by
     have hkm_le : (k : Error) * (params.m : Error) ≤ k2 * m4 := by
       calc
@@ -1225,7 +1227,8 @@ theorem zeta3_bound {params : Parameters} {k : ℕ} {eps : Error}
   rw [hζ₂Eq, hζ₁Eq, hσEq, mainFormalError_eq_envelope]
   have hζ₃ := cascadeZeta3_bound (h := h) (ν := ν) hνNN hν
   have hTightEnvelope :
-      stepEnvelope params k eps (16384 : Error) (1280000 : Error) ≤ mainFormalEnvelope params k eps :=
+      stepEnvelope params k eps (16384 : Error) (1280000 : Error) ≤
+        mainFormalEnvelope params k eps :=
     stepEnvelope_le_mainFormalEnvelope (h := h) (n := (16384 : Error)) (N := (1280000 : Error))
       (hnPos := by norm_num) (hn := by norm_num) (hNPos := by norm_num) (hN := by norm_num)
   have hENN := h.envelope_nonneg
@@ -1278,9 +1281,11 @@ private theorem cascadeZeta4_bound {params : Parameters} {k : ℕ} {eps : Error}
   have hE4096NN : 0 ≤ E4096 := by
     simpa [E4096] using stepEnvelope_nonneg (h := h) (n := (4096 : Error)) (N := (320000 : Error))
   have hE16384NN : 0 ≤ E16384 := by
-    simpa [E16384] using stepEnvelope_nonneg (h := h) (n := (16384 : Error)) (N := (1280000 : Error))
+    simpa [E16384] using
+      stepEnvelope_nonneg (h := h) (n := (16384 : Error)) (N := (1280000 : Error))
   have hE32768NN : 0 ≤ E32768 := by
-    simpa [E32768] using stepEnvelope_nonneg (h := h) (n := (32768 : Error)) (N := (2560000 : Error))
+    simpa [E32768] using
+      stepEnvelope_nonneg (h := h) (n := (32768 : Error)) (N := (2560000 : Error))
   have hσ : σ ≤ 10000 * k2 * m4 * E1024 := by
     simpa [σ, k2, m4, E1024] using cascadeSigma_tight_bound (h := h) (ν := ν) hν
   have hσ' : σ ≤ 10000 * k2 * m4 * E32768 := by
@@ -1395,7 +1400,8 @@ theorem zeta4_bound {params : Parameters} {k : ℕ} {eps : Error}
   rw [hζ₃Eq, hζ₂Eq, hζ₁Eq, hσEq, mainFormalError_eq_envelope]
   have hζ₄ := cascadeZeta4_bound (h := h) (ν := ν) hνNN hν
   have hTightEnvelope :
-      stepEnvelope params k eps (32768 : Error) (2560000 : Error) ≤ mainFormalEnvelope params k eps :=
+      stepEnvelope params k eps (32768 : Error) (2560000 : Error) ≤
+        mainFormalEnvelope params k eps :=
     stepEnvelope_le_mainFormalEnvelope (h := h) (n := (32768 : Error)) (N := (2560000 : Error))
       (hnPos := by norm_num) (hn := by norm_num) (hNPos := by norm_num) (hN := by norm_num)
   have hENN := h.envelope_nonneg
