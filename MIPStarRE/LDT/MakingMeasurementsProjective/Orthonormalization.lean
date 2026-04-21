@@ -47,9 +47,8 @@ private noncomputable def restrictSomeProjSubMeas {Outcome : Type*} {ι : Type*}
       total_le_one := by
         calc
           ∑ a : Outcome, P.outcome (some a)
-            = 0 + ∑ a : Outcome, P.outcome (some a) := by simp
-          _ ≤ P.outcome none + ∑ a : Outcome, P.outcome (some a) := by
-                exact add_le_add_right (P.outcome_pos none) _
+            ≤ P.outcome none + ∑ a : Outcome, P.outcome (some a) :=
+                le_add_of_nonneg_left (P.outcome_pos none)
           _ = ∑ oa : Option Outcome, P.outcome oa := by
                 simp [Fintype.sum_option]
           _ = P.total := by rw [P.sum_eq_total]
@@ -73,8 +72,8 @@ private lemma optionCompletion_bipartiteSSCRel {Outcome : Type*}
         (2 * ζ) := by
   intro hssc
   let R : MIPStarRE.Quantum.Op ι := 1 - A.total
-  have hζ_nonneg : 0 ≤ ζ := by
-    exact le_trans
+  have hζ_nonneg : 0 ≤ ζ :=
+    le_trans
       (bipartiteSSCError_nonneg ψ (uniformDistribution Unit)
         (constSubMeasFamily A))
       hssc.overlapBound
@@ -82,17 +81,17 @@ private lemma optionCompletion_bipartiteSSCRel {Outcome : Type*}
     simpa [bipartiteSSCError, avgOver, uniformDistribution, constSubMeasFamily]
       using hssc.overlapBound
   have horig_gap :
-      ev ψ (leftTensor (ι₂ := ι) A.total) - qBipartiteMatchMass ψ A A ≤ ζ := by
-    exact le_trans (le_max_right 0 _) horig_q
+      ev ψ (leftTensor (ι₂ := ι) A.total) - qBipartiteMatchMass ψ A A ≤ ζ :=
+    le_trans (le_max_right 0 _) horig_q
   have htotal_q :
-      qBipartiteSSCDefect ψ (postprocess A (fun _ : Outcome => ())) ≤ ζ := by
-    exact le_trans
+      qBipartiteSSCDefect ψ (postprocess A (fun _ : Outcome => ())) ≤ ζ :=
+    le_trans
       (MIPStarRE.LDT.Preliminaries.qBipartiteSSCDefect_postprocess_le
         (ψ := ψ) (M := A) (f := fun _ : Outcome => ()))
       horig_q
   have htotal_gap :
-      ev ψ (leftTensor (ι₂ := ι) A.total) - ev ψ (opTensor A.total A.total) ≤ ζ := by
-    exact le_trans (le_max_right 0 _) <| by
+      ev ψ (leftTensor (ι₂ := ι) A.total) - ev ψ (opTensor A.total A.total) ≤ ζ :=
+    le_trans (le_max_right 0 _) <| by
       simpa [qBipartiteSSCDefect, postprocess, A.sum_eq_total] using htotal_q
   have hresidual_eq :
       ev ψ (leftTensor (ι₂ := ι) R) - ev ψ (opTensor R R) =

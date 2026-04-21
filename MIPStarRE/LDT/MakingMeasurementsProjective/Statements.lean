@@ -182,7 +182,7 @@ noncomputable def optionCompletion {Outcome : Type*}
             exact A.outcome_pos a
       sum_eq_total := by
         rw [Fintype.sum_option, A.sum_eq_total]
-        simpa using sub_add_cancel (1 : MIPStarRE.Quantum.Op ι) A.total
+        exact sub_add_cancel (1 : MIPStarRE.Quantum.Op ι) A.total
       total_le_one := le_rfl }
   total_eq_one := rfl
 
