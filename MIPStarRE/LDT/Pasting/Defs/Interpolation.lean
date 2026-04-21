@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
 import MIPStarRE.LDT.Pasting.Defs.Tuples
 
 /-!
@@ -86,28 +87,6 @@ private theorem degreeOf_rename_embedCoord_last (params : Parameters) [FieldMode
   simp only [embedCoord, lastCoord, Fin.ext_iff] at hb
   omega
 
-/-- Substituting a univariate polynomial into one multivariate variable preserves its
-degree bound in that variable and gives degree zero in all other variables. -/
-private theorem degreeOf_eval₂_C_X_le_natDegree {K σ : Type*} [Field K] [DecidableEq σ]
-    (p : _root_.Polynomial K) (i j : σ) :
-    MvPolynomial.degreeOf i
-      (p.eval₂ MvPolynomial.C (MvPolynomial.X j) : MvPolynomial σ K) ≤
-        if i = j then p.natDegree else 0 := by
-  rw [_root_.Polynomial.eval₂_eq_sum_range]
-  refine (MvPolynomial.degreeOf_sum_le i (Finset.range (p.natDegree + 1)) _).trans ?_
-  refine Finset.sup_le fun n hn => ?_
-  calc
-    MvPolynomial.degreeOf i
-        (MvPolynomial.C (p.coeff n) * MvPolynomial.X j ^ n : MvPolynomial σ K)
-        ≤ MvPolynomial.degreeOf i (MvPolynomial.X j ^ n : MvPolynomial σ K) := by
-          exact MvPolynomial.degreeOf_C_mul_le _ _ _
-    _ ≤ n * MvPolynomial.degreeOf i (MvPolynomial.X j : MvPolynomial σ K) := by
-          exact MvPolynomial.degreeOf_pow_le _ _ _
-    _ ≤ if i = j then p.natDegree else 0 := by
-          by_cases hij : i = j
-          · have hn_le : n ≤ p.natDegree := Nat.lt_succ_iff.mp (Finset.mem_range.mp hn)
-            simp [hij, MvPolynomial.degreeOf_X, hn_le]
-          · simp [hij, MvPolynomial.degreeOf_X]
 
 /-- Each Lagrange basis polynomial has degree at most one less than the size of the
 interpolation support, without requiring distinct interpolation nodes. -/

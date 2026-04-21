@@ -1,5 +1,6 @@
 import Mathlib.Analysis.Convex.SpecificFunctions.Pow
 import Mathlib.Analysis.MeanInequalitiesPow
+import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.CommutativityPoints.Theorem
 import MIPStarRE.LDT.Commutativity.Theorems
@@ -180,66 +181,6 @@ theorem ldPastingInInductionSection
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 
-private theorem degreeOf_eval₂_C_X_le_natDegree {K σ : Type*} [Field K] [DecidableEq σ]
-    (p : _root_.Polynomial K) (i j : σ) :
-    MvPolynomial.degreeOf i
-      (p.eval₂ MvPolynomial.C (MvPolynomial.X j) : MvPolynomial σ K) ≤
-        if i = j then p.natDegree else 0 := by
-  rw [_root_.Polynomial.eval₂_eq_sum_range]
-  refine (MvPolynomial.degreeOf_sum_le i (Finset.range (p.natDegree + 1)) _).trans ?_
-  refine Finset.sup_le fun n hn => ?_
-  calc
-    MvPolynomial.degreeOf i
-        (MvPolynomial.C (p.coeff n) * MvPolynomial.X j ^ n : MvPolynomial σ K)
-        ≤ MvPolynomial.degreeOf i (MvPolynomial.X j ^ n : MvPolynomial σ K) := by
-          exact MvPolynomial.degreeOf_C_mul_le _ _ _
-    _ ≤ n * MvPolynomial.degreeOf i (MvPolynomial.X j : MvPolynomial σ K) := by
-          exact MvPolynomial.degreeOf_pow_le _ _ _
-    _ ≤ if i = j then p.natDegree else 0 := by
-          by_cases hij : i = j
-          · have hn_le : n ≤ p.natDegree := Nat.lt_succ_iff.mp (Finset.mem_range.mp hn)
-            simp [hij, MvPolynomial.degreeOf_X, hn_le]
-          · simp [hij, MvPolynomial.degreeOf_X]
-
-private noncomputable def axisLinePolynomialToPolynomial
-    (params : Parameters) [FieldModel params.q]
-    (i : Fin params.m) (f : AxisLinePolynomial params) : Polynomial params where
-  poly := f.poly.eval₂ MvPolynomial.C (MvPolynomial.X i)
-  lowIndividualDegree := by
-    intro j
-    calc
-      MvPolynomial.degreeOf j
-          (f.poly.eval₂ MvPolynomial.C (MvPolynomial.X i) : PolynomialModel params)
-        ≤ if j = i then f.poly.natDegree else 0 :=
-          degreeOf_eval₂_C_X_le_natDegree f.poly j i
-      _ ≤ params.d := by
-        by_cases hji : j = i
-        · simp [hji, f.degreeBounded]
-        · simp [hji]
-
-@[simp] private theorem axisLinePolynomialToPolynomial_apply
-    (params : Parameters) [FieldModel params.q]
-    (i : Fin params.m) (f : AxisLinePolynomial params) (u : Point params) :
-    axisLinePolynomialToPolynomial params i f u = f (u i) := by
-  unfold axisLinePolynomialToPolynomial Polynomial.toFun AxisLinePolynomial.toFun
-    evalPolynomialModel evalLinePolynomialModel
-  rw [show
-      MvPolynomial.eval (decodePoint u)
-          (f.poly.eval₂ MvPolynomial.C (MvPolynomial.X i) : PolynomialModel params) =
-        f.poly.eval₂
-          ((MvPolynomial.eval (decodePoint u)).comp MvPolynomial.C)
-          (MvPolynomial.eval (decodePoint u) (MvPolynomial.X i)) by
-    simpa using
-      (_root_.Polynomial.hom_eval₂ (p := f.poly)
-        (f := MvPolynomial.C) (g := MvPolynomial.eval (decodePoint u))
-        (x := MvPolynomial.X i))]
-  have hcomp :
-      ((MvPolynomial.eval (decodePoint u)).comp MvPolynomial.C) =
-        RingHom.id (Scalar params) := by
-    ext a
-    simp
-  rw [hcomp]
-  simp [decodePoint]
 
 private theorem axisParallelThroughPoint_pointAt_sampleParameter
     (params : Parameters) [FieldModel params.q]
@@ -282,72 +223,21 @@ private theorem throughPoint_eq_zeroPoint_of_m_eq_one
         direction := i }
   congr
   funext j
-  have hsub : Subsingleton (Fin params.m) := by
+  haveI : Subsingleton (Fin params.m) := by
     rw [hm1]
     infer_instance
-  letI := hsub
   have hji : j = i := Subsingleton.elim _ _
   simp [hji]
 
-private lemma qBipartiteMatchMass_nonneg
-    {Outcome : Type*} {ιA ιB : Type*}
-    [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (ψ : QuantumState (ιA × ιB)) (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) :
-    0 ≤ qBipartiteMatchMass ψ A B := by
-  unfold qBipartiteMatchMass
-  exact Finset.sum_nonneg fun a _ =>
-    ev_nonneg_of_psd ψ _ (opTensor_nonneg (A.outcome_pos a) (B.outcome_pos a))
-
-private lemma qBipartiteConsDefect_le_one_of_isNormalized
-    {Outcome : Type*} {ιA ιB : Type*}
-    [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (ψ : QuantumState (ιA × ιB)) (hψ : ψ.IsNormalized)
-    (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) :
-    qBipartiteConsDefect ψ A B ≤ 1 := by
-  have hmatch_nonneg : 0 ≤ qBipartiteMatchMass ψ A B :=
-    qBipartiteMatchMass_nonneg ψ A B
-  have htotal_le_one : ev ψ (opTensor A.total B.total) ≤ 1 := by
-    calc
-      ev ψ (opTensor A.total B.total)
-        ≤ ev ψ (leftTensor (ι₂ := ιB) A.total) := by
-            exact ev_mono ψ _ _
-              (opTensor_le_leftTensor (ι₂ := ιB) (SubMeas.total_nonneg A) B.total_le_one)
-      _ ≤ ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
-            exact ev_mono ψ _ _ (leftTensor_le_one (ι₂ := ιB) A.total_le_one)
-      _ = 1 := ev_one_of_isNormalized ψ hψ
-  unfold qBipartiteConsDefect
-  apply max_le
-  · norm_num
-  · linarith
-
-private lemma bipartiteConsError_uniform_le_one
-    {Question Outcome : Type*} {ιA ιB : Type*}
-    [Fintype Question] [DecidableEq Question] [Nonempty Question]
-    [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (ψ : QuantumState (ιA × ιB)) (hψ : ψ.IsNormalized)
-    (A : IdxSubMeas Question Outcome ιA) (B : IdxSubMeas Question Outcome ιB) :
-    bipartiteConsError ψ (uniformDistribution Question) A B ≤ 1 := by
-  unfold bipartiteConsError
-  calc
-    avgOver (uniformDistribution Question)
-        (fun q => qBipartiteConsDefect ψ (A q) (B q))
-      ≤ avgOver (uniformDistribution Question) (fun _ : Question => 1) := by
-          refine avgOver_mono _ _ _ ?_
-          intro q
-          exact qBipartiteConsDefect_le_one_of_isNormalized ψ hψ (A q) (B q)
-    _ = 1 := avgOver_uniform_const 1
-
-private lemma min_le_rpow_one_div_1024 {x : Error} (hx : 0 ≤ x) :
-    min x 1 ≤ Real.rpow x (1 / (1024 : Error)) := by
+private lemma min_le_rpow_of_nonneg_of_exponent_le_one {x c : Error}
+    (hx : 0 ≤ x) (hc_nonneg : 0 ≤ c) (hc_le_one : c ≤ 1) :
+    min x 1 ≤ Real.rpow x c := by
   by_cases hx1 : x ≤ 1
   · rw [min_eq_left hx1]
     simpa [Real.rpow_one] using
-      (Real.rpow_le_rpow_of_exponent_ge' hx hx1 (by positivity)
-        (by norm_num : (1 : Error) ≥ 1 / (1024 : Error)))
+      (Real.rpow_le_rpow_of_exponent_ge' hx hx1 hc_nonneg hc_le_one)
   · rw [min_eq_right (le_of_not_ge hx1)]
-    simpa using
-      (Real.rpow_le_rpow (by positivity) (le_of_not_ge hx1)
-        (by positivity : 0 ≤ (1 / (1024 : Error))))
+    simpa using Real.rpow_le_rpow (by positivity) (le_of_not_ge hx1) hc_nonneg
 
 private lemma min_eps_one_le_mainInductionError_of_m_eq_one
     (params : Parameters)
@@ -360,7 +250,8 @@ private lemma min_eps_one_le_mainInductionError_of_m_eq_one
   · subst hk0
     simp [mainInductionError, mainInductionNu, hm1]
   · have hmin : min eps 1 ≤ Real.rpow eps (1 / (1024 : Error)) :=
-      min_le_rpow_one_div_1024 heps_nonneg
+      min_le_rpow_of_nonneg_of_exponent_le_one heps_nonneg (by positivity)
+        (by norm_num : (1 / (1024 : Error)) ≤ 1)
     have hother_nonneg :
         0 ≤ Real.rpow delta (1 / (1024 : Error)) +
               Real.rpow gamma (1 / (1024 : Error)) +
@@ -419,7 +310,8 @@ private lemma min_eps_one_le_mainInductionError_of_m_eq_one
             (Real.rpow eps (1 / (1024 : Error)) +
               Real.rpow delta (1 / (1024 : Error)) +
               Real.rpow gamma (1 / (1024 : Error)) +
-              Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error))) := hsum_mul
+              Real.rpow (((params.d : Error) / (params.q : Error)))
+                (1 / (1024 : Error))) := hsum_mul
       _ ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
             (Real.rpow eps (1 / (1024 : Error)) +
               Real.rpow delta (1 / (1024 : Error)) +
@@ -445,10 +337,13 @@ private lemma diagonalFailureProbability_nonneg
       (diagonalPointAnswerFamily strategy j)
       (diagonalLineAnswerFamily strategy j)
 
+/-- Throwaway polynomial measurement used only as a witness in the vacuous
+`mainInductionError ≥ 1` fallback branch of `mainInductionByRecursionOnM`.
+All mass is concentrated on `default : Polynomial params`. -/
 private noncomputable def trivialPolynomialMeasurement
     (params : Parameters) [FieldModel params.q] : Measurement (Polynomial params) ι := by
   classical
-  letI : Inhabited (Polynomial params) :=
+  haveI : Inhabited (Polynomial params) :=
     ⟨Classical.choice (inferInstance : Nonempty (Polynomial params))⟩
   exact default
 
@@ -791,7 +686,7 @@ theorem mainInductionBaseCase
     (hgood : strategy.IsGood eps delta gamma) :
     MainInductionBridgePackage params strategy eps delta gamma k := by
   classical
-  let hsub : Subsingleton (Fin params.m) := by
+  haveI hsub : Subsingleton (Fin params.m) := by
     rw [hm1]
     infer_instance
   let i0 : Fin params.m := ⟨0, by simpa [hm1] using params.hm⟩
@@ -801,7 +696,6 @@ theorem mainInductionBaseCase
       left_inv := by
         intro s
         rcases s with ⟨u, j⟩
-        letI := hsub
         have hj : j = i0 := Subsingleton.elim _ _
         simp [hj, i0]
       right_inv := by
@@ -859,7 +753,8 @@ theorem mainInductionBaseCase
         _ = (postprocess
               ((strategy.axisParallelMeasurement
                 (AxisParallelLine.throughPoint (params := params) u i0)).toSubMeas)
-              (fun f => f (AxisParallelLine.sampleParameter (params := params) u i0))).outcome a := by
+              (fun f =>
+                f (AxisParallelLine.sampleParameter (params := params) u i0))).outcome a := by
                 exact strategy.axisParallelReparamInvariant _ _ _
         _ = (postprocess
               ((strategy.axisParallelMeasurement canonicalLine).toSubMeas)
@@ -963,6 +858,9 @@ theorem mainInductionByRecursionOnM
       SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
     (hk : 400 * params.m * params.d ≤ k) :
     MainInductionBridgePackage params.next strategy eps delta gamma k := by
+  -- TODO(#552): this case split is temporary scaffolding. The `< 1` branch still
+  -- routes through `assemblePastingPackage`, while the `≥ 1` branch packages the
+  -- trivial witness that the eventual small-parameter assembly can subsume.
   by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
   · let hinduction :=
       PerSliceInductionPackage.ofRecursion params strategy eps delta gamma k
@@ -974,7 +872,8 @@ theorem mainInductionByRecursionOnM
     exact
       mainInductionBridgeWitness params strategy eps delta gamma k
         hgood hrestrict hinduction hself hpaste hk
-  · let G : Measurement (Polynomial params.next) ι := trivialPolynomialMeasurement (ι := ι) params.next
+  · let G : Measurement (Polynomial params.next) ι :=
+      trivialPolynomialMeasurement (ι := ι) params.next
     have hcons :
         ConsRel strategy.state (uniformDistribution (Point params.next))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
