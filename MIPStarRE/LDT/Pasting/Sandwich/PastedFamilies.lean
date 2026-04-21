@@ -193,37 +193,87 @@ noncomputable def bernoulliTailFromFamily (params : Parameters) [FieldModel para
         have hGle : G ≤ 1 := (IdxPolyFamily.averagedSubMeas family).total_le_one
         simpa [Y, G] using bernoulliTailOperator_le_one k params.d G hG hGle }
 
-/-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`,
-parameterised by the suffix type `τ ∈ {0,1}^k`.
+/-- Average the sandwiched completed-slice family over tuples whose completed/
+incomplete pattern is exactly `τtail`.
 
-For each step `ℓ`, the paper (`references/ldt-paper/ld-pasting.tex` lines 1380–1425)
-forms the product `Ĥ^{x_{≥ℓ}}_{g_{≥ℓ}} ⊗ S_{τ_{≥ℓ}}` where `S_{τ_{≥ℓ}}` is the
-Bernoulli weight operator depending on the suffix type `τ`. -/
-noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ)
-    (τ : GHatType k) :
-    IdxOpFamily Unit Unit ι :=
-  fun _ =>
-    let base := allOutcomesExpansionFamily params strategy family k ()
-    let weight := suffixBernoulliWeightOperator params family k ℓ τ
-    { outcome := fun _ => base.total * weight
-      total := base.total * weight }
+This is the paper's operator
+$$
+\mathbb E_{x_{\ge \ell}} \sum_{g_{\ge \ell} \in \mathsf{Outcomes}_{\tau_{\ge \ell}}}
+  \widehat H^{x_{\ge \ell}}_{g_{\ge \ell}},
+$$
+written in the existing `SubMeas Unit` API so that its total operator is the
+relevant suffix-stage matrix.  Unlike the old `fromHToG` recurrence families,
+this keeps the `\widehat H^{x_{\ge \ell}}_{g_{\ge \ell}}` suffix visible instead
+of collapsing immediately to the full `k`-step total mass. -/
+noncomputable def averagedSandwichByTypeSubMeas (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (tailLen : ℕ) (τtail : GHatType tailLen) :
+    SubMeas Unit ι :=
+  open Classical in
+    averageIdxSubMeas
+      (distinctTupleDistribution params tailLen)
+      (fun xs =>
+        postprocess
+          (restrictSubMeas
+            (gHatSandwichFamily params family tailLen xs)
+            (fun gs => gs ∈ outcomesByType τtail))
+          (fun _ => ()))
+      (distinctTupleDistribution_weight_sum_le_one params tailLen)
 
-/-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`,
-parameterised by the suffix type `τ ∈ {0,1}^k`.
+/-- The stage-`ℓ` suffix family from the proof of `lem:from-H-to-G`, for a fixed
+full type `τ ∈ \{0,1\}^k`.
 
-Mirror of `fromHToGRecurrenceLeftFamily` on the Bernoulli-tail side.
-See `references/ldt-paper/ld-pasting.tex` lines 1380–1425. -/
-noncomputable def fromHToGRecurrenceRightFamily (params : Parameters) [FieldModel params.q]
+With zero-based indexing, this packages
+$$
+\mathbb E_{x_{\ge \ell}} \sum_{g_{\ge \ell} \in \mathsf{Outcomes}_{\tau_{\ge \ell}}}
+  \widehat H^{x_{\ge \ell}}_{g_{\ge \ell}} \otimes S_{\tau_{\ge \ell}}.
+$$
+The dependence on `ℓ` now genuinely changes the `\widehat H` suffix rather than
+reusing the fully averaged `k`-step operator at every stage. -/
+noncomputable def fromHToGIntermediateFamily (params : Parameters) [FieldModel params.q]
     (_strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k ℓ : ℕ)
     (τ : GHatType k) :
     IdxOpFamily Unit Unit ι :=
   fun _ =>
-    let base := bernoulliTailFromFamily params family k ()
+    let base := averagedSandwichByTypeSubMeas params family (k - ℓ) (gHatTypeSuffix ℓ τ)
     let weight := suffixBernoulliWeightOperator params family k ℓ τ
     { outcome := fun _ => base.total * weight
       total := base.total * weight }
+
+/-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`,
+parameterised by the full type `τ ∈ {0,1}^k`.
+
+This is the stage-`ℓ` suffix family `\widehat H^{x_{\ge \ell}}_{g_{\ge \ell}} \otimes
+S_{\tau_{\ge \ell}}`. -/
+noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ)
+    (τ : GHatType k) :
+    IdxOpFamily Unit Unit ι :=
+  fromHToGIntermediateFamily params strategy family k ℓ τ
+
+/-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`,
+parameterised by the full type `τ ∈ {0,1}^k`.
+
+This is the next suffix stage `\widehat H^{x_{>\ell}}_{g_{>\ell}} \otimes
+S_{\tau_{>\ell}}`, i.e. definitionally the `(ℓ + 1)`-st left family. -/
+noncomputable def fromHToGRecurrenceRightFamily (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ)
+    (τ : GHatType k) :
+    IdxOpFamily Unit Unit ι :=
+  fromHToGIntermediateFamily params strategy family k (ℓ + 1) τ
+
+/-- The right-hand recurrence family at step `ℓ` is definitionally the left-hand
+family at step `ℓ + 1`, matching the telescoping chain in
+`ld-pasting.tex` lines 1354–1376. -/
+theorem fromHToGRecurrenceRightFamily_eq_left_succ (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ)
+    (τ : GHatType k) :
+    fromHToGRecurrenceRightFamily params strategy family k ℓ τ =
+      fromHToGRecurrenceLeftFamily params strategy family k (ℓ + 1) τ :=
+  rfl
 
 end MIPStarRE.LDT.Pasting
