@@ -320,13 +320,11 @@ theorem classicalRoleSymmStrategy_is_good_three_mul {params : Parameters}
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     (strategy.classicalRoleSymmStrategy).IsGood (3 * eps) (3 * eps) (3 * eps) := by
-  let pointAgreement : Error :=
-    bipartiteConsError strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  let pointAgreement : Error := strategy.pointAgreementFailureProbability
   let axisParallelBranch : Error := strategy.axisParallelRoleAverage
   let diagonalBranch : Error := strategy.diagonalRoleAverage
   have hpoint_nonneg : 0 ≤ pointAgreement := by
+    dsimp [pointAgreement, ProjStrat.pointAgreementFailureProbability]
     exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
@@ -360,10 +358,7 @@ theorem classicalRoleSymmStrategy_is_good_three_mul {params : Parameters}
       · norm_num
   have hmain : (axisParallelBranch + pointAgreement + diagonalBranch) / 3 ≤ eps := by
     simpa [axisParallelBranch, pointAgreement, diagonalBranch,
-      ProjStrat.lowIndividualDegreeFailureProbability,
-      ProjStrat.axisParallelRoleAverage, ProjStrat.diagonalRoleAverage,
-      ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
-      SymStrat.axisParallelFailureProbability, SymStrat.diagonalFailureProbability] using
+      ProjStrat.lowIndividualDegreeFailureProbability_eq_branchAverage] using
       hpass.soundnessHypothesis
   have haxis : axisParallelBranch ≤ 3 * eps := by
     linarith

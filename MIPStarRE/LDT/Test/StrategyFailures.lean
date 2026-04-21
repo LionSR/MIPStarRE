@@ -130,7 +130,11 @@ noncomputable def axisParallelPointLeftLineRightFailureProbability
     (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
     (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
 
-/-- Self-consistency branch component for the left prover's point measurement. -/
+/-- Auxiliary left-local SSC defect of the point measurement.
+
+This is not the actual self-consistency branch of
+`lowIndividualDegreeFailureProbability`; the full test uses the cross-prover
+point-agreement branch `pointAgreementFailureProbability`. -/
 noncomputable def pointLeftSelfConsistencyFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -139,7 +143,11 @@ noncomputable def pointLeftSelfConsistencyFailureProbability
     (uniformDistribution (Point params))
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
 
-/-- Self-consistency branch component for the right prover's point measurement. -/
+/-- Auxiliary right-local SSC defect of the point measurement.
+
+This is not the actual self-consistency branch of
+`lowIndividualDegreeFailureProbability`; the full test uses the cross-prover
+point-agreement branch `pointAgreementFailureProbability`. -/
 noncomputable def pointRightSelfConsistencyFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -216,6 +224,17 @@ noncomputable def diagonalRoleAverage
           (diagonalPointAnswerFamily left j)
           (diagonalLineAnswerFamily right j)) / 2
 
+/-- The paper's self-consistency branch for a general strategy: both provers
+receive the same sampled point and are checked for agreement there. -/
+noncomputable def pointAgreementFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (Point params))
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+
 /-- Trace-based failure surrogate for the full low-individual-degree
 test, matching the paper's `fig:test` with role-based decomposition.
 
@@ -233,16 +252,21 @@ noncomputable def lowIndividualDegreeFailureProbability
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) : Error :=
   let axisParallelBranch := strategy.axisParallelRoleAverage
-  -- Self-consistency: the paper samples the same point for Alice and Bob and
-  -- checks agreement of their point answers.
-  let selfConsistencyBranch :=
-    bipartiteConsError strategy.state
-      (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  let selfConsistencyBranch := strategy.pointAgreementFailureProbability
   let diagonalBranch := strategy.diagonalRoleAverage
   (axisParallelBranch + selfConsistencyBranch +
     diagonalBranch) / 3
+
+/-- The full low-individual-degree failure surrogate is the arithmetic mean of
+its axis-parallel, point-agreement, and diagonal branches. -/
+theorem lowIndividualDegreeFailureProbability_eq_branchAverage
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    strategy.lowIndividualDegreeFailureProbability =
+      (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +
+        strategy.diagonalRoleAverage) / 3 := by
+  rfl
 
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
@@ -257,16 +281,12 @@ theorem point_agreement_le_three_mul {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    bipartiteConsError strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) ≤ 3 * eps := by
-  let pointAgreement : Error :=
-    bipartiteConsError strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+    strategy.pointAgreementFailureProbability ≤ 3 * eps := by
+  let pointAgreement : Error := strategy.pointAgreementFailureProbability
   let axisParallelBranch : Error := strategy.axisParallelRoleAverage
   let diagonalBranch : Error := strategy.diagonalRoleAverage
   have hpoint_nonneg : 0 ≤ pointAgreement := by
+    dsimp [pointAgreement, ProjStrat.pointAgreementFailureProbability]
     exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
@@ -300,10 +320,7 @@ theorem point_agreement_le_three_mul {params : Parameters}
       · norm_num
   have hmain : (axisParallelBranch + pointAgreement + diagonalBranch) / 3 ≤ eps := by
     simpa [axisParallelBranch, pointAgreement, diagonalBranch,
-      ProjStrat.lowIndividualDegreeFailureProbability,
-      ProjStrat.axisParallelRoleAverage, ProjStrat.diagonalRoleAverage,
-      ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
-      SymStrat.axisParallelFailureProbability, SymStrat.diagonalFailureProbability] using
+      ProjStrat.lowIndividualDegreeFailureProbability_eq_branchAverage] using
       hpass.soundnessHypothesis
   linarith
 
