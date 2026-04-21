@@ -64,8 +64,6 @@ theorem selfImprovementInInductionSection
       SelfImprovement.HelperStrongSelfConsistencyInput params strategy eps delta)
     (horthonormalization :
       SelfImprovement.OrthonormalizationInput params strategy eps delta)
-    (hevaluationDataProcessing :
-      SelfImprovement.EvaluationDataProcessingInput params strategy eps delta)
     (hfinalFields : SelfImprovement.FinalFieldsInput params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
@@ -79,7 +77,7 @@ theorem selfImprovementInInductionSection
   rcases SelfImprovement.selfImprovementFromSubMeas
       params strategy eps delta gamma nu
       hglobalVarianceProofInputs hhelperStrongSelfConsistency
-      horthonormalization hevaluationDataProcessing hfinalFields
+      horthonormalization hfinalFields
       hgood G Gmeas hbridge with
     ⟨H, Z, hH⟩
   rcases hH.measurementBridge with ⟨_, _, hfinal⟩

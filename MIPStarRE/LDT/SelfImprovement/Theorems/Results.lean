@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems.Results
+import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 namespace MIPStarRE.LDT.SelfImprovement
@@ -29,6 +30,33 @@ private lemma averagedPointOperator_le_one
         simpa [pointConditionedOutcomeOperatorAtPolynomial] using
           Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u))
   simpa [A, averagedPointOperator, averageUnitSubMeas_outcome] using A.outcome_le_one ()
+
+private lemma bipartiteSSCRel_uniform_const
+    {Question Outcome : Type*}
+    [Fintype Question] [DecidableEq Question] [Nonempty Question]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (A : SubMeas Outcome ι) (δ : Error) :
+    BipartiteSSCRel ψ (uniformDistribution Unit) (constSubMeasFamily A) δ →
+      BipartiteSSCRel ψ (uniformDistribution Question) (fun _ : Question => A) δ := by
+  intro hssc
+  rcases hssc with ⟨hssc⟩
+  constructor
+  simpa [bipartiteSSCError, avgOver, uniformDistribution, constSubMeasFamily] using hssc
+
+private lemma sddRel_uniform_const
+    {κ Question Outcome : Type*}
+    [Fintype κ] [DecidableEq κ]
+    [Fintype Question] [DecidableEq Question] [Nonempty Question]
+    [Fintype Outcome]
+    (ψ : QuantumState κ)
+    (A B : SubMeas Outcome κ) (δ : Error) :
+    SDDRel ψ (uniformDistribution Unit) (constSubMeasFamily A) (constSubMeasFamily B) δ →
+      SDDRel ψ (uniformDistribution Question) (fun _ : Question => A) (fun _ : Question => B) δ := by
+  intro hsdd
+  rcases hsdd with ⟨hsdd⟩
+  constructor
+  simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using hsdd
 
 /-- Reduced version of `lem:sdp`.
 
@@ -134,10 +162,13 @@ lemma selfImprovementHelper
     -- directly.
     exact addInU params strategy eps delta gamma hgood T hlocalDev hlocalVar hglobalDev
 
+set_option maxHeartbeats 800000 in
 /-- `thm:self-improvement`.
 
-The remaining Section 8/9 obligations are exposed as explicit theorem
-hypotheses, rather than bundled behind a dedicated bridge-package structure. -/
+The remaining Section 5/8/9 obligations are exposed as explicit theorem
+hypotheses, rather than bundled behind a dedicated bridge-package structure. The
+evaluation-map data-processing step is now discharged internally using the
+question-dependent preliminaries theorem. -/
 theorem selfImprovement
     (params : Parameters)
     [FieldModel params.q]
@@ -147,8 +178,6 @@ theorem selfImprovement
     (hhelperStrongSelfConsistency :
       HelperStrongSelfConsistencyInput params strategy eps delta)
     (horthonormalization : OrthonormalizationInput params strategy eps delta)
-    (hevaluationDataProcessing :
-      EvaluationDataProcessingInput params strategy eps delta)
     (hfinalFields : FinalFieldsInput params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι) :
@@ -170,12 +199,55 @@ theorem selfImprovement
       Hhat
       (selfImprovementHelperError params eps delta)
       hssc horthBridge with ⟨H, horth⟩
+  have hsscPoint :
+      BipartiteSSCRel strategy.state
+        (uniformDistribution (Point params))
+        (fun _ : Point params => Hhat)
+        (selfImprovementHelperError params eps delta) :=
+    bipartiteSSCRel_uniform_const strategy.state Hhat
+      (selfImprovementHelperError params eps delta) hssc
+  have horthPoint :
+      SDDRel strategy.state
+        (uniformDistribution (Point params))
+        (fun _ : Point params => H.toSubMeas.liftLeft)
+        (fun _ : Point params => Hhat.liftLeft)
+        (selfImprovementOrthogonalizationError params eps delta) := by
+    apply sddRel_uniform_const (ψ := strategy.state)
+    exact Preliminaries.sddRel_symm strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily Hhat.liftLeft)
+      (constSubMeasFamily H.toSubMeas.liftLeft)
+      (selfImprovementOrthogonalizationError params eps delta) horth
+  have hdata' :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        (selfImprovementDataProcessingError params eps delta) := by
+    change SDDRel strategy.state (uniformDistribution (Point params))
+      (IdxSubMeas.liftLeft (fun q => postprocess H.toSubMeas (fun h => h q)))
+      (IdxSubMeas.liftLeft (fun q => postprocess Hhat (fun h => h q)))
+      (8 * selfImprovementHelperError params eps delta +
+        8 * Real.rpow (selfImprovementOrthogonalizationError params eps delta)
+          (1 / (2 : Error)))
+    simpa [Real.sqrt_eq_rpow] using
+      Preliminaries.selfConsistencyImpliesDataProcessing
+        strategy.state strategy.permInvState strategy.isNormalized
+        (uniformDistribution (Point params))
+        (uniformDistribution_weight_sum_le_one (Point params))
+        (fun _ : Point params => Hhat)
+        (fun _ : Point params => H)
+        (selfImprovementHelperError params eps delta)
+        (selfImprovementOrthogonalizationError params eps delta)
+        (fun (u : Point params) (h : Polynomial params) => h u)
+        hsscPoint horthPoint
   have hdata :
       SDDRel strategy.state (uniformDistribution (Point params))
         ((polynomialEvaluationFamily params Hhat).liftLeft)
         ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
         (selfImprovementDataProcessingError params eps delta) :=
-    hevaluationDataProcessing hssc horth
+    Preliminaries.sddRel_symm strategy.state (uniformDistribution (Point params))
+      ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+      ((polynomialEvaluationFamily params Hhat).liftLeft)
+      (selfImprovementDataProcessingError params eps delta) hdata'
   have hfinal :
       SelfImprovementFinalFields params strategy H Z eps delta nu :=
     hfinalFields hhelper horth hdata
@@ -190,6 +262,7 @@ theorem selfImprovement
       projectiveResidualBound := hfinal.projectiveResidualBound
       bounded := hfinal.bounded }
 
+set_option maxHeartbeats 800000 in
 /--
 Bridge from the measurement-input version in `self_improvement.tex` to the
 submeasurement-input version used in `inductive_step.tex`.
@@ -203,8 +276,6 @@ theorem selfImprovementFromSubMeas
     (hhelperStrongSelfConsistency :
       HelperStrongSelfConsistencyInput params strategy eps delta)
     (horthonormalization : OrthonormalizationInput params strategy eps delta)
-    (hevaluationDataProcessing :
-      EvaluationDataProcessingInput params strategy eps delta)
     (hfinalFields : FinalFieldsInput params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
@@ -215,7 +286,7 @@ theorem selfImprovementFromSubMeas
         eps delta gamma nu := by
   rcases selfImprovement params strategy eps delta gamma nu
       hglobalVarianceProofInputs hhelperStrongSelfConsistency
-      horthonormalization hevaluationDataProcessing hfinalFields hgood Gmeas
+      horthonormalization hfinalFields hgood Gmeas
       with ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩
   exact
