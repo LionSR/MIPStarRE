@@ -125,7 +125,7 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
         fullSlice_scalar_marginalize_y params strategy family
       have hClose :=
         fullSlice_closenessOfIP_CAB_hEval params strategy family gamma zeta
-          hgamma_nonneg hzeta_nonneg _hself hEval
+          hnorm hgamma_nonneg hzeta_nonneg _hself hEval
       -- Triangle inequality on the three intermediate quantities.
       have hTri :
           |fullSliceABAAvg params strategy family -
@@ -348,7 +348,7 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
         nlinarith [hm_ge]
       -- Combine the three parts
       have hA : 12 * Real.sqrt zeta ≤
-          12 * ↑params.m *
+          16 * ↑params.m *
             Real.rpow zeta (1 / (4 : Error)) := by
         nlinarith [h_sqrt_z, hm_ge, hz4]
       have hB :
