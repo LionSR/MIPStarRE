@@ -31,7 +31,11 @@ comparison `BAB ⊗ A` (paper `eq:gcom4-diff`), but the current Lean stub is
 phrased on the scalar `ABA ⊗ I` average.  So the direct positivity argument does
 not apply verbatim here.  To close this theorem, we likely need either:
 1. a bridge from `fullSliceABAAvg` / `evaluatedSliceABAAvg` to the paper's PSD
-   tensor form before applying `polynomialAgreement_avg_le_mdq`, or
+   tensor form; after that bridge, the old tactical step should still be to
+   apply `polynomialAgreement_avg_le_mdq` (or directly
+   `schwartzZippel_individualDegree`) to the off-diagonal collision term
+   `1[g(u) = g'(u)]`, then bound the remaining fiber sum by the
+   sub-measurement property of `G^x`, or
 2. a genuinely new operator bound for the `ABA ⊗ I` difference.
 -/
 lemma fullSlice_scalar_marginalize_x
@@ -55,9 +59,12 @@ approximation statement.
 TODO(#361): as for `fullSlice_scalar_marginalize_x`, the paper's
 Schwartz-Zippel argument is manifestly PSD on the tensor-form `ABA ⊗ B`, while
 this Lean stub is phrased on `ABAB ⊗ I`.  So the clean paper-faithful route is
-to first bridge to the tensor form and only then apply
-`polynomialAgreement_avg_le_mdq`; otherwise one needs a new large-fiber bound
-specific to the scalar `ABAB ⊗ I` expression. -/
+to first bridge to the tensor form; after that bridge, one should again apply
+`polynomialAgreement_avg_le_mdq` (or directly
+`schwartzZippel_individualDegree`) to the off-diagonal collision term
+`1[h(v) = h'(v)]`, then use the sub-measurement property of `G^y` to control
+the remaining fiber sum.  Otherwise one needs a new large-fiber bound specific
+to the scalar `ABAB ⊗ I` expression. -/
 lemma fullSlice_scalar_marginalize_y
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
