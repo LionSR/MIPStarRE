@@ -77,20 +77,20 @@ theorem globallyConsistentWitness_spec (params : Parameters) [FieldModel params.
 /-- Recover a global polynomial from a completed-slice tuple.
 
 On the actual pasting path this map is only applied after restricting to tuples in
-`Global_τ(x)` with `|τ| ≥ d+1`, so the remaining fallback value is outside the
-support of `pastedInterpolationFamily`. For ineligible but globally consistent
-tuples we therefore return a chosen witness polynomial rather than a placeholder.
+`Global_τ(x)` with `|τ| ≥ d+1`, so the ineligible branch lies outside the support
+of `pastedInterpolationFamily`. We nevertheless make the nonempty ineligible branch
+honest: for globally consistent tuples of length `k + 1` that fail the eligibility
+cutoff, we return a chosen witness polynomial rather than a placeholder.
+
+The empty-tuple branch keeps the distinguished fallback outcome `h₀`, matching the
+completion outcome used in `constructedPastedMeasurement`.
 
 In the eligible branch we still keep the explicit interpolation support witness: a
 chosen subset `σ ⊆ support(gs)` of size `d+1` is packaged together with its proof
 fields and then passed to `interpolateCompletedSlicesFromSupport`. -/
 noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel params.q] :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
-  | 0, xs, gs =>
-      if hGlobal : IsGloballyConsistent params xs gs then
-        globallyConsistentWitness params xs gs hGlobal
-      else
-        fallbackInterpolatedPolynomial params
+  | 0, _xs, _gs => fallbackInterpolatedPolynomial params
   | _ + 1, xs, gs =>
       if hEligible : InterpolationEligible params gs then
         let supportData := interpolationSupportWitness gs hEligible
