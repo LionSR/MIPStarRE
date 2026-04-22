@@ -50,12 +50,8 @@ structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
   isNormalized : state.IsNormalized
   /-- The restricted point measurement. -/
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
-  /-- The restricted axis-parallel line measurement. -/
-  axisParallelMeasurement :
-    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
-  /-- Reparametrizing an axis-parallel line agrees with evaluating at the new base point. -/
-  axisParallelReparamInvariant :
-    MIPStarRE.LDT.AxisParallelEvaluationReparamInvariant params axisParallelMeasurement
+  /-- The restricted axis-parallel line measurement, packaged with transport covariance. -/
+  axisParallelMeasurement : MIPStarRE.LDT.AxisParallelCovariantMeasurement params ι
   /-- The restricted diagonal-line measurement on the honest slice answer space. -/
   diagonalMeasurement :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
@@ -221,78 +217,59 @@ noncomputable def restrictAxisParallelMeasurement (params : Parameters) [FieldMo
           rfl }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
-private theorem restrictAxisParallelMeasurement_postprocess_eval
+@[simp] private theorem reparamAtEquiv_symm_liftAxisAnswer
     (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (x : Fq params)
-    (ℓ : AxisParallelLine params) (t a : Fq params) :
-    (postprocess ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas)
-      (fun f => f t)).outcome a =
-      (postprocess ((strategy.axisParallelMeasurement
-        (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas)
-        (fun f => f t)).outcome a := by
-  classical
-  let lifted := strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)
-  calc
-    (postprocess ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas)
-        (fun f => f t)).outcome a
-      = ∑ f : AxisLinePolynomial params,
-          if f t = a then lifted.toSubMeas.outcome (liftAxisAnswer params x f) else 0 := by
-            simp [
-              postprocess, restrictAxisParallelMeasurement, lifted,
-              liftAxisAnswer, Finset.sum_filter
-            ]
-            apply Finset.sum_congr rfl
-            intro f hf
-            by_cases h : f t = a <;> simp [h]
-    _ = ∑ g : AxisLinePolynomial params.next,
-          if g t = a then lifted.toSubMeas.outcome g else 0 := by
-            simpa [axisLinePolynomialEquiv, liftAxisAnswer, lifted] using
-              (Fintype.sum_equiv (axisLinePolynomialEquiv params x)
-                (fun f : AxisLinePolynomial params =>
-                  if f t = a then lifted.toSubMeas.outcome (liftAxisAnswer params x f) else 0)
-                (fun g : AxisLinePolynomial params.next =>
-                  if g t = a then lifted.toSubMeas.outcome g else 0)
-                (by
-                  intro f
-                  simp [axisLinePolynomialEquiv, liftAxisAnswer,
-                    AxisLinePolynomial.appendAtHeight_apply]))
-    _ = (postprocess (lifted.toSubMeas) (fun f => f t)).outcome a := by
-          simp [postprocess, lifted, Finset.sum_filter]
-          apply Finset.sum_congr rfl
-          intro g hg
-          by_cases h : g t = a <;> simp [h]
+    (x t : Fq params) (f : AxisLinePolynomial params) :
+    ((AxisLinePolynomial.reparamAtEquiv (params := params.next) t).symm
+        (liftAxisAnswer params x f)) =
+      liftAxisAnswer params x
+        (((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm) f) := by
+  apply AxisLinePolynomial.ext
+  rfl
 
-private theorem restrictAxisParallelMeasurement_reparamInvariant
+private theorem restrictAxisParallelMeasurement_transportInvariant
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
-    MIPStarRE.LDT.AxisParallelEvaluationReparamInvariant params
+    MIPStarRE.LDT.AxisParallelMeasurementTransportInvariant params
       (restrictAxisParallelMeasurement params strategy x) := by
-  intro ℓ t a
+  intro ℓ t
+  have htransport :=
+    MIPStarRE.LDT.AxisParallelCovariantMeasurement.transportInvariant
+      strategy.axisParallelMeasurement
+      (AxisParallelLine.appendAtHeight params ℓ x) t
+  apply ProjMeas.ext
+  intro a
   calc
-    (postprocess (((restrictAxisParallelMeasurement params strategy x)
-      (AxisParallelLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a
-      = (postprocess ((strategy.axisParallelMeasurement
-          (AxisParallelLine.appendAtHeight params (AxisParallelLine.rebaseAt ℓ t) x)).toSubMeas)
-          (· zeroCoord)).outcome a := by
-            simpa using
-              restrictAxisParallelMeasurement_postprocess_eval params strategy x
-                (AxisParallelLine.rebaseAt ℓ t) zeroCoord a
-    _ = (postprocess ((strategy.axisParallelMeasurement
-          (AxisParallelLine.rebaseAt (AxisParallelLine.appendAtHeight params ℓ x) t)).toSubMeas)
-          (· zeroCoord)).outcome a := by
+    (restrictAxisParallelMeasurement params strategy x
+        (AxisParallelLine.rebaseAt ℓ t)).outcome a
+      = (strategy.axisParallelMeasurement
+          (AxisParallelLine.appendAtHeight params (AxisParallelLine.rebaseAt ℓ t) x)).outcome
+          (liftAxisAnswer params x a) := by
+            rfl
+    _ = (strategy.axisParallelMeasurement
+          (AxisParallelLine.rebaseAt (AxisParallelLine.appendAtHeight params ℓ x) t)).outcome
+          (liftAxisAnswer params x a) := by
             simp
-    _ = (postprocess ((strategy.axisParallelMeasurement
-          (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas)
-          (fun f => f t)).outcome a := by
-            exact
-              (AxisParallelCovariantMeasurement.reparamInvariant
-                strategy.axisParallelMeasurement)
-                (AxisParallelLine.appendAtHeight params ℓ x) t a
-    _ = (postprocess (((restrictAxisParallelMeasurement params strategy x) ℓ).toSubMeas)
-          (fun f => f t)).outcome a := by
-            symm
-            simpa using
-              restrictAxisParallelMeasurement_postprocess_eval params strategy x ℓ t a
+    _ = (AxisParallelLine.transportMeasurement (params := params.next)
+          (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)) t).outcome
+          (liftAxisAnswer params x a) := by
+            simp [htransport]
+    _ = (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).outcome
+          (((AxisLinePolynomial.reparamAtEquiv (params := params.next) t).symm)
+            (liftAxisAnswer params x a)) := by
+            simp [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+              Measurement.transport, SubMeas.transport]
+    _ = (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).outcome
+          (liftAxisAnswer params x
+            (((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm) a)) := by
+            simp
+    _ = (restrictAxisParallelMeasurement params strategy x ℓ).outcome
+          (((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm) a) := by
+            rfl
+    _ = (AxisParallelLine.transportMeasurement (params := params)
+          (restrictAxisParallelMeasurement params strategy x ℓ) t).outcome a := by
+            simp [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+              Measurement.transport, SubMeas.transport]
 
 /-- Canonical honest slice answer with prescribed value at the base point.
 
@@ -346,9 +323,10 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
   state := strategy.state
   isNormalized := strategy.isNormalized
   pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
-  axisParallelMeasurement := restrictAxisParallelMeasurement params strategy x
-  axisParallelReparamInvariant :=
-    restrictAxisParallelMeasurement_reparamInvariant params strategy x
+  axisParallelMeasurement :=
+    { toIdxProjMeas := restrictAxisParallelMeasurement params strategy x
+      transportInvariant :=
+        restrictAxisParallelMeasurement_transportInvariant params strategy x }
   diagonalMeasurement := restrictDiagonalMeasurement params strategy x
 
 /-- Restricting a strategy does not change its bipartite state. -/
