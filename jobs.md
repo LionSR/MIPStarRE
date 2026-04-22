@@ -1,6 +1,6 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-21
+Last updated: 2026-04-22
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
@@ -276,7 +276,41 @@ Last updated: 2026-04-21
   - proved `fullSliceCommutation_qSDDOp_avg_eq` by expanding the full-slice `qSDDOp`, reindexing the joint `(question, outcome)` average by the simultaneous swap equivalence, and collapsing the averaged `BAB/BABA` terms to `ABA/ABAB`
   - exposed `Commutativity.fullPolynomial_agreement_avg_le_mdq` from `Scaffold.lean` so the remaining `md/q` transport lemmas can reuse the existing Schwartz-Zippel package once their statements line up with the paper argument
   - verified `lake env lean MIPStarRE/LDT/Commutativity/Transport.lean`
+  - exposed the evaluated-slice insertion/swap lemmas now needed directly by
+    `ProcessedG.lean`:
+    `evaluatedSlice_phaseOne_insert_bound`,
+    `evaluatedSlice_phaseThree_insert_bound`, and
+    `evaluatedSlice_phaseFour_pointSwap_bound`
+  - added the phase-2 / phase-5 scalar bridge infrastructure in
+    `Commutativity/GCommStability.lean`:
+    `ev_leftTensor_average_mul_rightTensor_average`,
+    `gCommStability_scalar_defect_eq_nested_avg`,
+    `gCommStabilityTwo_scalar_defect_eq_nested_avg`,
+    `evaluatedSlice_phaseTwo_removeGy_bound`, and
+    `evaluatedSlice_phaseFive_removeGx_bound`
+  - rewired `ProcessedG.lean` so the target theorem now derives the needed
+    first/second-coordinate `combinedControl` inputs from
+    `evaluatedPointFamily_pointConsistency_swapped` and
+    `Preliminaries.consSubMeas`
 - **Concrete blocker**:
+- `Commutativity/ScalarApproximation/ProcessedG.lean` is now blocked one step
+  later in the scalar chain: the paper-faithful phase-2 / phase-5 scalar
+  bridges have been formalized, but the final assembly still lacks the middle
+  theorem that connects the current inserted/removed one-measurement terms to
+  the actual `eq:gcom10` / reverse-insertion part of the paper chain, instead
+  of closing a loop back to `ABAB` / `BABA`.
+- Concretely, the current available wrappers line up with the explicit
+  `eq:gcom9` and `clm:g-comm-stability2` scalar defects, but the remaining Lean
+  work is to formalize the bridge that keeps Bob's two point measurements in the
+  right order through the commutativity step, or equivalently to package the
+  correct reverse-insertion target that leads onward to `BAB` / `ABA` rather
+  than back to `ABAB` / `BABA`.
+- The mathematics is still understood and matches
+  `references/ldt-paper/commutativity-G.tex`; the remaining obstacle is now the
+  exact theorem surface for that middle bridge, not the earlier distribution
+  reindexing.
+- Notes for the current branch are recorded in
+  `outline-fix-processedg-scalar-chain.md`.
 - **Current refactor direction**:
   - the actual mismatch is deeper and now understood precisely: `IdxPolyFamily.Bounded.sliceBoundedness` is stored in the swapped orientation `Z^x ⊗ (I - G^x)`, while the paper's claims `clm:g-comm-stability` and `clm:g-comm-stability2` require `(I - G^x) ⊗ Z^x`. The overlap-only `SDDOpRel` theorems were added to work around that mismatch, but they are too weak for the scalar chain because `closenessOfIP` would introduce an extra square root.
   - the fix in progress is therefore to make the boundedness interface paper-faithful inside the Lean code, expose the phase-1/3/4/5 helper lemmas currently marked `private`, and then prove the scalar phase-2 / phase-5 bounds directly by the paper's Cauchy-Schwarz + witness-domination argument.

@@ -108,7 +108,7 @@ pointwise `consSubMeas` control to the second coordinate of an evaluated-slice
 question, then apply `closenessOfIP` with the left-sandwich family
 `G_a^{u,x} G_b^{v,y} G_a^{u,x}`.  The inserted term is kept in the explicit
 `G^y \otimes A_b^{v,y}` form coming from `totalSandwichFamily`. -/
-private lemma evaluatedSlice_phaseOne_insert_bound
+lemma evaluatedSlice_phaseOne_insert_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (zeta : Error)
@@ -244,7 +244,7 @@ evaluated points swapped: transport the `consSubMeas` control to the first
 coordinate of an evaluated-slice question, then apply `closenessOfIP` to the
 explicit `B A B * (G^x \otimes A_a^{u,x})` summand that feeds the later
 `commutativityPoints` step. -/
-private lemma evaluatedSlice_phaseThree_insert_bound
+lemma evaluatedSlice_phaseThree_insert_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (zeta : Error)

@@ -498,6 +498,444 @@ theorem gCommStability_scalar
           exact Real.sqrt_le_sqrt <|
             hbound.storedBoundedResidualBound G hG
 
+private lemma ev_leftTensor_average_mul_rightTensor_average
+    {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (ψ : QuantumState (ι × ι))
+    (F : α → MIPStarRE.Quantum.Op ι)
+    (H : β → MIPStarRE.Quantum.Op ι) :
+    ev ψ
+      (leftTensor (ι₂ := ι)
+          (averageOperatorOverDistribution (uniformDistribution α) F) *
+        rightTensor (ι₁ := ι)
+          (averageOperatorOverDistribution (uniformDistribution β) H)) =
+      avgOver (uniformDistribution α)
+        (fun a => avgOver (uniformDistribution β)
+          (fun b => ev ψ
+            (leftTensor (ι₂ := ι) (F a) *
+              rightTensor (ι₁ := ι) (H b)))) := by
+  rw [← avgOver_uniform_prod (f := fun a : α => fun b : β =>
+    ev ψ (leftTensor (ι₂ := ι) (F a) * rightTensor (ι₁ := ι) (H b)))]
+  let cα : Error := (Fintype.card α : Error)⁻¹
+  let cβ : Error := (Fintype.card β : Error)⁻¹
+  have hleft :
+      leftTensor (ι₂ := ι) (∑ a : α, cα • F a) =
+        ∑ a : α, cα • leftTensor (ι₂ := ι) (F a) := by
+    calc
+      leftTensor (ι₂ := ι) (∑ a : α, cα • F a)
+        = ∑ a : α, leftTensor (ι₂ := ι) (cα • F a) := by
+            simpa using
+              (leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a : α => cα • F a)).symm
+      _ = ∑ a : α, cα • leftTensor (ι₂ := ι) (F a) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            simpa [leftTensor] using
+              (Matrix.smul_kronecker (cα : ℂ) (F a) (1 : MIPStarRE.Quantum.Op ι))
+  have hright :
+      rightTensor (ι₁ := ι) (∑ b : β, cβ • H b) =
+        ∑ b : β, cβ • rightTensor (ι₁ := ι) (H b) := by
+    calc
+      rightTensor (ι₁ := ι) (∑ b : β, cβ • H b)
+        = ∑ b : β, rightTensor (ι₁ := ι) (cβ • H b) := by
+            simpa using
+              (rightTensor_finset_sum (ι₁ := ι) Finset.univ (fun b : β => cβ • H b)).symm
+      _ = ∑ b : β, cβ • rightTensor (ι₁ := ι) (H b) := by
+            refine Finset.sum_congr rfl ?_
+            intro b _
+            simpa [rightTensor] using
+              (Matrix.kronecker_smul (cβ : ℂ) (1 : MIPStarRE.Quantum.Op ι) (H b))
+  calc
+    ev ψ
+        (leftTensor (ι₂ := ι)
+            (averageOperatorOverDistribution (uniformDistribution α) F) *
+          rightTensor (ι₁ := ι)
+            (averageOperatorOverDistribution (uniformDistribution β) H))
+      = ev ψ
+          ((∑ a : α, cα • leftTensor (ι₂ := ι) (F a)) *
+            ∑ b : β, cβ • rightTensor (ι₁ := ι) (H b)) := by
+            simp [averageOperatorOverDistribution, uniformDistribution, cα, cβ]
+            rw [hleft, hright]
+    _ = ev ψ
+          (∑ a : α, ∑ b : β,
+            (cα * cβ) •
+              (leftTensor (ι₂ := ι) (F a) * rightTensor (ι₁ := ι) (H b))) := by
+            congr 1
+            rw [Finset.sum_mul]
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            rw [Finset.mul_sum]
+            refine Finset.sum_congr rfl ?_
+            intro b _
+            simp [cα, cβ, smul_smul, mul_comm]
+    _ = ∑ a : α, ∑ b : β,
+          ev ψ ((cα * cβ) •
+            (leftTensor (ι₂ := ι) (F a) * rightTensor (ι₁ := ι) (H b))) := by
+            rw [ev_sum]
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            rw [ev_sum]
+    _ = ∑ a : α, ∑ b : β,
+          cβ * (cα * ev ψ
+            (leftTensor (ι₂ := ι) (F a) * rightTensor (ι₁ := ι) (H b))) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            refine Finset.sum_congr rfl ?_
+            intro b _
+            have hcoef : cα * cβ = cβ * cα := by ring
+            rw [hcoef]
+            change ev ψ (((cβ * cα : Error) : ℂ) •
+              (leftTensor (ι₂ := ι) (F a) * rightTensor (ι₁ := ι) (H b))) = _
+            rw [ev_scale]
+            ring
+    _ = avgOver (uniformDistribution (α × β))
+          (fun ab => ev ψ
+            (leftTensor (ι₂ := ι) (F ab.1) * rightTensor (ι₁ := ι) (H ab.2))) := by
+            rw [avgOver, uniformDistribution]
+            simpa [cα, cβ, Fintype.card_prod, mul_assoc] using
+              (Fintype.sum_prod_type'
+                (f := fun a : α => fun b : β =>
+                  cβ * (cα * ev ψ
+                    (leftTensor (ι₂ := ι) (F a) * rightTensor (ι₁ := ι) (H b))))).symm
+
+private lemma gCommStability_scalar_defect_eq_nested_avg
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (y : Fq params) :
+    let defectY : Error :=
+      ∑ g : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
+            rightTensor (ι₁ := ι)
+              (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g))
+    defectY =
+      avgOver (uniformDistribution (Point params.next))
+        (fun q1 =>
+          avgOver (uniformDistribution (Point params))
+            (fun u =>
+              ∑ g : Polynomial params,
+                ev strategy.state
+                  ((leftTensor (ι₂ := ι)
+                      (((postprocess
+                          (sandwichByOuterSubMeas
+                            (evaluatedPointFamily params family q1)
+                            (G y))
+                          Prod.snd).outcome g) *
+                        (1 - (G y).total))) *
+                    rightTensor (ι₁ := ι)
+                      ((strategy.pointMeasurement (appendPoint params u y)).outcome (g.toFun u))))) := by
+  dsimp
+  calc
+    ∑ g : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
+            rightTensor (ι₁ := ι)
+              (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g))
+      = ∑ g : Polynomial params,
+          avgOver (uniformDistribution (Point params.next))
+            (fun q1 =>
+              avgOver (uniformDistribution (Point params))
+                (fun u =>
+                  ev strategy.state
+                    ((leftTensor (ι₂ := ι)
+                        (((postprocess
+                            (sandwichByOuterSubMeas
+                              (evaluatedPointFamily params family q1)
+                              (G y))
+                            Prod.snd).outcome g) *
+                          (1 - (G y).total))) *
+                      rightTensor (ι₁ := ι)
+                        ((strategy.pointMeasurement (appendPoint params u y)).outcome (g.toFun u))))) := by
+            refine Finset.sum_congr rfl ?_
+            intro g _
+            have hR :
+                (gCommStabilityR params family y).outcome g =
+                  averageOperatorOverDistribution (uniformDistribution (Point params.next))
+                    (fun q1 =>
+                      (postprocess
+                        (sandwichByOuterSubMeas
+                          (evaluatedPointFamily params family q1)
+                          (G y))
+                        Prod.snd).outcome g) := by
+              simp [gCommStabilityR, averageIdxSubMeas, averageOperatorOverDistribution, hG y]
+            have hW :
+                IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g =
+                  averageOperatorOverDistribution (uniformDistribution (Point params))
+                    (fun u =>
+                      (strategy.pointMeasurement (appendPoint params u y)).outcome (g u)) := by
+              unfold IdxPolyFamily.averagedSlicePointEvaluationOperator
+              rfl
+            have hRmul :
+                (averageOperatorOverDistribution (uniformDistribution (Point params.next))
+                    (fun q1 =>
+                      (postprocess
+                        (sandwichByOuterSubMeas
+                          (evaluatedPointFamily params family q1)
+                          (G y))
+                        Prod.snd).outcome g)) *
+                  (1 - (G y).total) =
+                averageOperatorOverDistribution (uniformDistribution (Point params.next))
+                  (fun q1 =>
+                    ((postprocess
+                        (sandwichByOuterSubMeas
+                          (evaluatedPointFamily params family q1)
+                          (G y))
+                        Prod.snd).outcome g) *
+                      (1 - (G y).total)) := by
+              simp [averageOperatorOverDistribution, Finset.sum_mul]
+            rw [hR, hW]
+            rw [hRmul]
+            exact ev_leftTensor_average_mul_rightTensor_average strategy.state
+                (fun q1 =>
+                  ((postprocess
+                      (sandwichByOuterSubMeas
+                        (evaluatedPointFamily params family q1)
+                        (G y))
+                      Prod.snd).outcome g) *
+                    (1 - (G y).total))
+                (fun u =>
+                  (strategy.pointMeasurement (appendPoint params u y)).outcome (g u))
+    _ = avgOver (uniformDistribution (Point params.next))
+          (fun q1 =>
+            ∑ g : Polynomial params,
+              avgOver (uniformDistribution (Point params))
+                (fun u =>
+                  ev strategy.state
+                    ((leftTensor (ι₂ := ι)
+                        (((postprocess
+                            (sandwichByOuterSubMeas
+                              (evaluatedPointFamily params family q1)
+                              (G y))
+                            Prod.snd).outcome g) *
+                          (1 - (G y).total))) *
+                      rightTensor (ι₁ := ι)
+                        ((strategy.pointMeasurement (appendPoint params u y)).outcome (g u))))) := by
+            unfold avgOver
+            rw [Finset.sum_comm]
+            refine Finset.sum_congr rfl ?_
+            intro q1 _
+            rw [Finset.mul_sum]
+    _ = avgOver (uniformDistribution (Point params.next))
+          (fun q1 =>
+            avgOver (uniformDistribution (Point params))
+              (fun u =>
+                ∑ g : Polynomial params,
+                  ev strategy.state
+                    ((leftTensor (ι₂ := ι)
+                        (((postprocess
+                            (sandwichByOuterSubMeas
+                              (evaluatedPointFamily params family q1)
+                              (G y))
+                            Prod.snd).outcome g) *
+                          (1 - (G y).total))) *
+                      rightTensor (ι₁ := ι)
+                        ((strategy.pointMeasurement (appendPoint params u y)).outcome (g u))))) := by
+            apply avgOver_congr
+            intro q1
+            unfold avgOver
+            simp [uniformDistribution]
+            let c : Error := ((params.q : Error) ^ params.m)⁻¹
+            let f : Point params → Polynomial params → Error := fun u g =>
+              ev strategy.state <|
+                (leftTensor (ι₂ := ι)
+                    (((postprocess
+                        (sandwichByOuterSubMeas
+                          (evaluatedPointFamily params family q1)
+                          (G y))
+                        Prod.snd).outcome g) *
+                      (1 - (G y).total))) *
+                  rightTensor (ι₁ := ι)
+                    ((strategy.pointMeasurement (appendPoint params u y)).outcome (g.toFun u))
+            calc
+              ∑ g : Polynomial params, ∑ u : Point params, c * f u g
+                = ∑ u : Point params, ∑ g : Polynomial params, c * f u g := by
+                    rw [Finset.sum_comm]
+              _ = ∑ u : Point params, c * ∑ g : Polynomial params, f u g := by
+                    refine Finset.sum_congr rfl ?_
+                    intro u _
+                    rw [Finset.mul_sum]
+              _ = avgOver (uniformDistribution (Point params))
+                    (fun u => ∑ g : Polynomial params, f u g) := by
+                    simp [avgOver, uniformDistribution, c]
+              _ = _ := by
+                    symm
+                    simp [avgOver, uniformDistribution, f]
+
+private noncomputable def phaseTwoInserted
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι) :
+    EvaluatedSliceQuestion params → Error := fun q =>
+  ∑ b : Fq params, ∑ a : Fq params,
+    ev strategy.state
+      ((leftTensor (ι₂ := ι)
+          (((evaluatedSliceFirstFactor params family q).outcome a) *
+            ((evaluatedSliceSecondFactor params family q).outcome b) *
+            ((evaluatedSliceFirstFactor params family q).outcome a) *
+            ((G (pointHeight params q.2)).total))) *
+        rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.2).outcome b))
+
+private noncomputable def phaseTwoRemoved
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) :
+    EvaluatedSliceQuestion params → Error := fun q =>
+  ∑ b : Fq params, ∑ a : Fq params,
+    ev strategy.state
+      ((leftTensor (ι₂ := ι)
+          (((evaluatedSliceFirstFactor params family q).outcome a) *
+            ((evaluatedSliceSecondFactor params family q).outcome b) *
+            ((evaluatedSliceFirstFactor params family q).outcome a))) *
+        rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.2).outcome b))
+
+private noncomputable def phaseTwoDefectY
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι) :
+    Fq params → Error := fun y =>
+  ∑ g : Polynomial params,
+    ev strategy.state
+      ((leftTensor (ι₂ := ι)
+          ((gCommStabilityR params family y).outcome g * (1 - (G y).total))) *
+        rightTensor (ι₁ := ι)
+          (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g))
+
+private noncomputable def phaseTwoExpr
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι) :
+    Point params.next → Point params → Fq params → Error := fun q1 u y =>
+  ∑ g : Polynomial params,
+    ev strategy.state
+      ((leftTensor (ι₂ := ι)
+          (((postprocess
+              (sandwichByOuterSubMeas
+                (evaluatedPointFamily params family q1)
+                (G y))
+              Prod.snd).outcome g) *
+            (1 - (G y).total))) *
+        rightTensor (ι₁ := ι)
+          ((strategy.pointMeasurement (appendPoint params u y)).outcome (g.toFun u)))
+
+set_option maxHeartbeats 10000000 in
+-- The phase-2 transport expands three independent uniform averages and then
+-- reindexes `(u, y)` back to `Point params.next`; Lean needs extra heartbeats
+-- for the resulting equivalence/simp normalization.
+lemma evaluatedSlice_phaseTwo_removeGy_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    |avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (phaseTwoInserted params strategy family G) -
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (phaseTwoRemoved params strategy family)| ≤ Real.sqrt zeta := by
+  classical
+  have hscalar :
+      |avgOver (uniformDistribution (Fq params))
+          (phaseTwoDefectY params strategy family G)| ≤ Real.sqrt zeta := by
+    simpa [phaseTwoDefectY] using
+      gCommStability_scalar params strategy zeta hnorm family G hG hbound
+  have hdefect :
+      avgOver (uniformDistribution (Fq params))
+          (phaseTwoDefectY params strategy family G) =
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q =>
+            phaseTwoExpr params strategy family G q.1
+              (truncatePoint params q.2) (pointHeight params q.2)) := by
+    let e : Point params.next × (Point params × Fq params) ≃ EvaluatedSliceQuestion params :=
+      Equiv.prodCongr (Equiv.refl _) (CommutativityPoints.pointNextEquiv params).symm
+    let F : Point params.next × (Point params × Fq params) → Error :=
+      fun t => phaseTwoExpr params strategy family G t.1 t.2.1 t.2.2
+    let Fyq1 : Fq params × Point params.next → Error :=
+      fun yp => avgOver (uniformDistribution (Point params))
+        (fun u => phaseTwoExpr params strategy family G yp.2 u yp.1)
+    let Fq1y : Point params.next × Fq params → Error :=
+      fun py => avgOver (uniformDistribution (Point params))
+        (fun u => phaseTwoExpr params strategy family G py.1 u py.2)
+    calc
+      avgOver (uniformDistribution (Fq params)) (phaseTwoDefectY params strategy family G)
+        = avgOver (uniformDistribution (Fq params))
+            (fun y =>
+              avgOver (uniformDistribution (Point params.next))
+                (fun q1 =>
+                  avgOver (uniformDistribution (Point params))
+                    (fun u => phaseTwoExpr params strategy family G q1 u y))) := by
+              apply avgOver_congr
+              intro y
+              simpa [phaseTwoDefectY, phaseTwoExpr] using
+                gCommStability_scalar_defect_eq_nested_avg params strategy family G hG y
+      _ = avgOver (uniformDistribution (Fq params × Point params.next)) Fyq1 := by
+              symm
+              exact avgOver_uniform_prod (f := fun y q1 =>
+                avgOver (uniformDistribution (Point params))
+                  (fun u => phaseTwoExpr params strategy family G q1 u y))
+      _ = avgOver (uniformDistribution (Point params.next × Fq params)) Fq1y := by
+              simpa [Fyq1, Fq1y] using
+                (avgOver_uniform_equiv (e := Equiv.prodComm (Fq params) (Point params.next))
+                  (f := Fyq1))
+      _ = avgOver (uniformDistribution (Point params.next × (Point params × Fq params))) F := by
+              symm
+              simpa [Fq1y, F] using
+                (avgOver_uniform_prod (f := fun py uy =>
+                  phaseTwoExpr params strategy family G py.1 uy.1 py.2))
+      _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+            (fun q => phaseTwoExpr params strategy family G q.1
+              (truncatePoint params q.2) (pointHeight params q.2)) := by
+              simpa [e, F, truncatePoint_appendPoint, pointHeight_appendPoint] using
+                (avgOver_uniform_equiv e F)
+  have hpoint :
+      ∀ q : EvaluatedSliceQuestion params,
+        phaseTwoExpr params strategy family G q.1
+            (truncatePoint params q.2) (pointHeight params q.2) =
+          phaseTwoRemoved params strategy family q -
+            phaseTwoInserted params strategy family G q := by
+    intro q
+    rcases q with ⟨q1, q2⟩
+    simp [phaseTwoExpr, phaseTwoInserted, phaseTwoRemoved,
+      evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
+      evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
+      postprocess, sandwichByOuterSubMeas, hG, mul_assoc,
+      truncatePoint_appendPoint, pointHeight_appendPoint, Finset.sum_sub_distrib,
+      Finset.mul_sum, Finset.sum_mul]
+  have hpointAvg :
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => phaseTwoExpr params strategy family G q.1
+          (truncatePoint params q.2) (pointHeight params q.2)) =
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => phaseTwoRemoved params strategy family q -
+          phaseTwoInserted params strategy family G q) := by
+    apply avgOver_congr
+    intro q
+    exact hpoint q
+  calc
+    |avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (phaseTwoInserted params strategy family G) -
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (phaseTwoRemoved params strategy family)|
+      = |avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => phaseTwoExpr params strategy family G q.1
+            (truncatePoint params q.2) (pointHeight params q.2))| := by
+            rw [hdefect, hpointAvg]
+            unfold avgOver
+            ring_nf
+            rw [abs_neg]
+    _ ≤ Real.sqrt zeta := hscalar
+
 /-- The paper's mirrored slice submeasurement
 `R'^x_g = E_{v,y} \sum_b G^{v,y}_b G^x_g G^{v,y}_b`. -/
 private noncomputable def gCommStabilityTwoR
@@ -868,5 +1306,343 @@ theorem gCommStabilityTwo_scalar
     _ ≤ Real.sqrt zeta := by
           exact Real.sqrt_le_sqrt <|
             hbound.storedBoundedResidualBound G hG
+
+private lemma gCommStabilityTwo_scalar_defect_eq_nested_avg
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (x : Fq params) :
+    let defectX : Error :=
+      ∑ g : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
+            rightTensor (ι₁ := ι)
+              (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))
+    defectX =
+      avgOver (uniformDistribution (Point params.next))
+        (fun q2 =>
+          avgOver (uniformDistribution (Point params))
+            (fun v =>
+              ∑ g : Polynomial params,
+                ev strategy.state
+                  ((leftTensor (ι₂ := ι)
+                      (((postprocess
+                          (sandwichByOuterSubMeas
+                            (evaluatedPointFamily params family q2)
+                            (G x))
+                          Prod.snd).outcome g) *
+                        (1 - (G x).total))) *
+                    rightTensor (ι₁ := ι)
+                      ((strategy.pointMeasurement (appendPoint params v x)).outcome
+                        (g.toFun v))))) := by
+  dsimp
+  calc
+    ∑ g : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
+            rightTensor (ι₁ := ι)
+              (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))
+      = ∑ g : Polynomial params,
+          avgOver (uniformDistribution (Point params.next))
+            (fun q2 =>
+              avgOver (uniformDistribution (Point params))
+                (fun v =>
+                  ev strategy.state
+                    ((leftTensor (ι₂ := ι)
+                        (((postprocess
+                            (sandwichByOuterSubMeas
+                              (evaluatedPointFamily params family q2)
+                              (G x))
+                            Prod.snd).outcome g) *
+                          (1 - (G x).total))) *
+                      rightTensor (ι₁ := ι)
+                        ((strategy.pointMeasurement (appendPoint params v x)).outcome (g v)))))) := by
+            refine Finset.sum_congr rfl ?_
+            intro g _
+            have hR :
+                (gCommStabilityTwoR params family G x).outcome g =
+                  averageOperatorOverDistribution (uniformDistribution (Point params.next))
+                    (fun q2 =>
+                      (postprocess
+                        (sandwichByOuterSubMeas
+                          (evaluatedPointFamily params family q2)
+                          (G x))
+                        Prod.snd).outcome g) := by
+              simp [gCommStabilityTwoR, averageIdxSubMeas, averageOperatorOverDistribution, hG x]
+            have hW :
+                IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g =
+                  averageOperatorOverDistribution (uniformDistribution (Point params))
+                    (fun v =>
+                      (strategy.pointMeasurement (appendPoint params v x)).outcome (g v)) := by
+              unfold IdxPolyFamily.averagedSlicePointEvaluationOperator
+              rfl
+            have hRmul :
+                (averageOperatorOverDistribution (uniformDistribution (Point params.next))
+                    (fun q2 =>
+                      (postprocess
+                        (sandwichByOuterSubMeas
+                          (evaluatedPointFamily params family q2)
+                          (G x))
+                        Prod.snd).outcome g)) *
+                  (1 - (G x).total) =
+                averageOperatorOverDistribution (uniformDistribution (Point params.next))
+                  (fun q2 =>
+                    ((postprocess
+                        (sandwichByOuterSubMeas
+                          (evaluatedPointFamily params family q2)
+                          (G x))
+                        Prod.snd).outcome g) *
+                      (1 - (G x).total)) := by
+              simp [averageOperatorOverDistribution, Finset.sum_mul]
+            rw [hR, hW, hRmul]
+            exact ev_leftTensor_average_mul_rightTensor_average strategy.state
+              (fun q2 =>
+                ((postprocess
+                    (sandwichByOuterSubMeas
+                      (evaluatedPointFamily params family q2)
+                      (G x))
+                    Prod.snd).outcome g) *
+                  (1 - (G x).total))
+              (fun v =>
+                (strategy.pointMeasurement (appendPoint params v x)).outcome (g v))
+    _ = avgOver (uniformDistribution (Point params.next))
+          (fun q2 =>
+            ∑ g : Polynomial params,
+              avgOver (uniformDistribution (Point params))
+                (fun v =>
+                  ev strategy.state
+                    ((leftTensor (ι₂ := ι)
+                        (((postprocess
+                            (sandwichByOuterSubMeas
+                              (evaluatedPointFamily params family q2)
+                              (G x))
+                            Prod.snd).outcome g) *
+                          (1 - (G x).total))) *
+                      rightTensor (ι₁ := ι)
+                        ((strategy.pointMeasurement (appendPoint params v x)).outcome (g v)))))) := by
+            unfold avgOver
+            rw [Finset.sum_comm]
+            refine Finset.sum_congr rfl ?_
+            intro q2 _
+            rw [Finset.mul_sum]
+    _ = avgOver (uniformDistribution (Point params.next))
+          (fun q2 =>
+            avgOver (uniformDistribution (Point params))
+              (fun v =>
+                ∑ g : Polynomial params,
+                  ev strategy.state
+                    ((leftTensor (ι₂ := ι)
+                        (((postprocess
+                            (sandwichByOuterSubMeas
+                              (evaluatedPointFamily params family q2)
+                              (G x))
+                            Prod.snd).outcome g) *
+                          (1 - (G x).total))) *
+                      rightTensor (ι₁ := ι)
+                        ((strategy.pointMeasurement (appendPoint params v x)).outcome (g v)))))) := by
+            apply avgOver_congr
+            intro q2
+            unfold avgOver
+            simp [uniformDistribution]
+            let c : Error := ((params.q : Error) ^ params.m)⁻¹
+            let f : Point params → Polynomial params → Error := fun v g =>
+              ev strategy.state <|
+                (leftTensor (ι₂ := ι)
+                    (((postprocess
+                        (sandwichByOuterSubMeas
+                          (evaluatedPointFamily params family q2)
+                          (G x))
+                        Prod.snd).outcome g) *
+                      (1 - (G x).total))) *
+                  rightTensor (ι₁ := ι)
+                    ((strategy.pointMeasurement (appendPoint params v x)).outcome (g.toFun v))
+            calc
+              ∑ g : Polynomial params, ∑ v : Point params, c * f v g
+                = ∑ v : Point params, ∑ g : Polynomial params, c * f v g := by
+                    rw [Finset.sum_comm]
+              _ = ∑ v : Point params, c * ∑ g : Polynomial params, f v g := by
+                    refine Finset.sum_congr rfl ?_
+                    intro v _
+                    rw [Finset.mul_sum]
+              _ = avgOver (uniformDistribution (Point params))
+                    (fun v => ∑ g : Polynomial params, f v g) := by
+                    simp [avgOver, uniformDistribution, c]
+              _ = _ := by
+                    symm
+                    simp [avgOver, uniformDistribution, f]
+
+set_option maxHeartbeats 10000000 in
+lemma evaluatedSlice_phaseFive_removeGx_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (zeta gamma : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    let 𝒟 := uniformDistribution (EvaluatedSliceQuestion params)
+    let swapped : EvaluatedSliceQuestion params → Error := fun q =>
+      ∑ a : Fq params, ∑ b : Fq params,
+        ev strategy.state
+          ((leftTensor (ι₂ := ι)
+              (((evaluatedSliceSecondFactor params family q).outcome b) *
+                ((evaluatedSliceFirstFactor params family q).outcome a) *
+                ((evaluatedSliceSecondFactor params family q).outcome b) *
+                ((G (pointHeight params q.1)).total))) *
+            rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.1).outcome a))
+    let removed : EvaluatedSliceQuestion params → Error := fun q =>
+      ∑ a : Fq params, ∑ b : Fq params,
+        ev strategy.state
+          ((leftTensor (ι₂ := ι)
+              (((evaluatedSliceSecondFactor params family q).outcome b) *
+                ((evaluatedSliceFirstFactor params family q).outcome a) *
+                ((evaluatedSliceSecondFactor params family q).outcome b))) *
+            rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.1).outcome a))
+    |avgOver 𝒟 swapped - avgOver 𝒟 removed| ≤ Real.sqrt zeta := by
+  classical
+  let defectX : Fq params → Error := fun x =>
+    ∑ g : Polynomial params,
+      ev strategy.state
+        ((leftTensor (ι₂ := ι)
+            ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total))) *
+          rightTensor (ι₁ := ι)
+            (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))
+  let expr : Point params.next → Point params → Fq params → Error := fun q2 v x =>
+    ∑ g : Polynomial params,
+      ev strategy.state
+        ((leftTensor (ι₂ := ι)
+            (((postprocess
+                (sandwichByOuterSubMeas
+                  (evaluatedPointFamily params family q2)
+                  (G x))
+                Prod.snd).outcome g) *
+              (1 - (G x).total))) *
+          rightTensor (ι₁ := ι)
+            ((strategy.pointMeasurement (appendPoint params v x)).outcome (g.toFun v)))
+  have hscalar : |avgOver (uniformDistribution (Fq params)) defectX| ≤ Real.sqrt zeta := by
+    simpa [defectX] using
+      gCommStabilityTwo_scalar params strategy zeta hnorm family G hG hbound
+  have hdefect :
+      avgOver (uniformDistribution (Fq params)) defectX =
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => expr q.2 (truncatePoint params q.1) (pointHeight params q.1)) := by
+    let e : Point params.next × (Point params × Fq params) ≃ EvaluatedSliceQuestion params :=
+      Equiv.prodCongr (Equiv.refl _) (CommutativityPoints.pointNextEquiv params).symm
+    let F : Point params.next × (Point params × Fq params) → Error :=
+      fun t => expr t.1 t.2.1 t.2.2
+    let Fxq2 : Fq params × Point params.next → Error :=
+      fun xq => avgOver (uniformDistribution (Point params)) (fun v => expr xq.2 v xq.1)
+    let Fq2x : Point params.next × Fq params → Error :=
+      fun qx => avgOver (uniformDistribution (Point params)) (fun v => expr qx.1 v qx.2)
+    calc
+      avgOver (uniformDistribution (Fq params)) defectX
+        = avgOver (uniformDistribution (Fq params))
+            (fun x =>
+              avgOver (uniformDistribution (Point params.next))
+                (fun q2 =>
+                  avgOver (uniformDistribution (Point params))
+                    (fun v => expr q2 v x))) := by
+              apply avgOver_congr
+              intro x
+              simpa [defectX, expr] using
+                gCommStabilityTwo_scalar_defect_eq_nested_avg params strategy family G hG x
+      _ = avgOver (uniformDistribution (Fq params × Point params.next)) Fxq2 := by
+              symm
+              exact avgOver_uniform_prod (f := fun x q2 =>
+                avgOver (uniformDistribution (Point params)) (fun v => expr q2 v x))
+      _ = avgOver (uniformDistribution (Point params.next × Fq params)) Fq2x := by
+              simpa [Fxq2, Fq2x] using
+                (avgOver_uniform_equiv (e := Equiv.prodComm (Fq params) (Point params.next))
+                  (f := Fxq2)
+      _ = avgOver (uniformDistribution (Point params.next × (Point params × Fq params))) F := by
+              symm
+              simpa [Fq2x, F] using
+                (avgOver_uniform_prod (f := fun qx vx => expr qx.1 vx.1 qx.2))
+      _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+            (fun q => expr q.2 (truncatePoint params q.1) (pointHeight params q.1)) := by
+              simpa [e, F, truncatePoint_appendPoint, pointHeight_appendPoint] using
+                (avgOver_uniform_equiv e F)
+  have hpoint :
+      ∀ q : EvaluatedSliceQuestion params,
+        expr q.2 (truncatePoint params q.1) (pointHeight params q.1) =
+          (∑ a : Fq params, ∑ b : Fq params,
+              ev strategy.state
+                ((leftTensor (ι₂ := ι)
+                    (((evaluatedSliceSecondFactor params family q).outcome b) *
+                      ((evaluatedSliceFirstFactor params family q).outcome a) *
+                      ((evaluatedSliceSecondFactor params family q).outcome b))) *
+                  rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.1).outcome a))) -
+            (∑ a : Fq params, ∑ b : Fq params,
+              ev strategy.state
+                ((leftTensor (ι₂ := ι)
+                    (((evaluatedSliceSecondFactor params family q).outcome b) *
+                      ((evaluatedSliceFirstFactor params family q).outcome a) *
+                      ((evaluatedSliceSecondFactor params family q).outcome b) *
+                      ((G (pointHeight params q.1)).total))) *
+                  rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.1).outcome a))) := by
+    intro q
+    rcases q with ⟨q1, q2⟩
+    simp [expr, evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
+      evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
+      postprocess, sandwichByOuterSubMeas, hG, mul_assoc,
+      truncatePoint_appendPoint, pointHeight_appendPoint, Finset.sum_sub_distrib,
+      Finset.mul_sum, Finset.sum_mul]
+  have hpointAvg :
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => expr q.2 (truncatePoint params q.1) (pointHeight params q.1)) =
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q =>
+          (∑ a : Fq params, ∑ b : Fq params,
+              ev strategy.state
+                ((leftTensor (ι₂ := ι)
+                    (((evaluatedSliceSecondFactor params family q).outcome b) *
+                      ((evaluatedSliceFirstFactor params family q).outcome a) *
+                      ((evaluatedSliceSecondFactor params family q).outcome b))) *
+                  rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.1).outcome a))) -
+            (∑ a : Fq params, ∑ b : Fq params,
+              ev strategy.state
+                ((leftTensor (ι₂ := ι)
+                    (((evaluatedSliceSecondFactor params family q).outcome b) *
+                      ((evaluatedSliceFirstFactor params family q).outcome a) *
+                      ((evaluatedSliceSecondFactor params family q).outcome b) *
+                      ((G (pointHeight params q.1)).total))) *
+                  rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.1).outcome a)))) := by
+    apply avgOver_congr
+    intro q
+    exact hpoint q
+  calc
+    |avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q =>
+          ∑ a : Fq params, ∑ b : Fq params,
+            ev strategy.state
+              ((leftTensor (ι₂ := ι)
+                  (((evaluatedSliceSecondFactor params family q).outcome b) *
+                    ((evaluatedSliceFirstFactor params family q).outcome a) *
+                    ((evaluatedSliceSecondFactor params family q).outcome b) *
+                    ((G (pointHeight params q.1)).total))) *
+                rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.1).outcome a))) -
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q =>
+          ∑ a : Fq params, ∑ b : Fq params,
+            ev strategy.state
+              ((leftTensor (ι₂ := ι)
+                  (((evaluatedSliceSecondFactor params family q).outcome b) *
+                    ((evaluatedSliceFirstFactor params family q).outcome a) *
+                    ((evaluatedSliceSecondFactor params family q).outcome b))) *
+                rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.1).outcome a)))|
+      = |avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => expr q.2 (truncatePoint params q.1) (pointHeight params q.1))| := by
+            rw [hdefect, hpointAvg]
+            unfold avgOver
+            ring_nf
+            rw [abs_neg]
+    _ ≤ Real.sqrt zeta := hscalar
 
 end MIPStarRE.LDT.Commutativity

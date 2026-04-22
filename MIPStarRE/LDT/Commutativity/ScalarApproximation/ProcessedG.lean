@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
+import MIPStarRE.LDT.Commutativity.GCommStability
 
 namespace MIPStarRE.LDT.Commutativity
 
@@ -36,7 +37,7 @@ Error: `√ζ + √ζ`.
 
 Total: `12√ζ + 12√(γ(m+1))`. Then `2 * total ≤ 48m(√γ + √ζ)`. -/
 
-/-- Scalar approximation chain for the evaluated-slice commutation.
+/- Scalar approximation chain for the evaluated-slice commutation.
 
 This is the core of the paper's proof of `lem:comm-data-processed-g`
 (`references/ldt-paper/commutativity-G.tex`, lines 72–131).
@@ -54,6 +55,10 @@ Starting from `E[∑ ABAB]`, the proof applies ten approximation steps:
 8–9. `≈_{√ζ + √ζ}`: apply postprocessed self-consistency twice
 
 Summing: `Σεᵢ = 12√ζ + 12√(γ(m+1))`, so `2 * Σεᵢ ≤ 48m(√γ + √ζ)`. -/
+-- The scalar-chain assembly imports several large paper-faithful bridge lemmas;
+-- a local heartbeat bump keeps elaboration stable while the final chain is
+-- being assembled.
+set_option maxHeartbeats 2000000 in
 private lemma evaluatedSlice_scalar_chain_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -95,6 +100,63 @@ private lemma evaluatedSlice_scalar_chain_bound
     evaluatedPointSelfConsistency_fst params strategy family zeta _hpostSSC
   have hpostSSC_snd :=
     evaluatedPointSelfConsistency_snd params strategy family zeta _hpostSSC
+  let pointMeas : IdxMeas (Point params.next) (Fq params) ι :=
+    fun u => by
+      simpa [Parameters.next] using (strategy.pointMeasurement u).toMeasurement
+  have hcons_swapped :=
+    evaluatedPointFamily_pointConsistency_swapped params strategy family zeta _hcons
+  have hconsSub :=
+    MIPStarRE.LDT.Preliminaries.consSubMeas
+      strategy.state
+      (uniformDistribution (Point params.next))
+      (evaluatedPointFamily params family)
+      pointMeas
+      zeta
+      hcons_swapped
+  have hcombined_snd :
+      SDDRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => evaluatedPointFamilyLeft params family q.2)
+        (fun q =>
+          (MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+            (evaluatedPointFamily params family)
+            pointMeas q.2))
+        (4 * zeta) := by
+    rcases hconsSub.combinedControl with ⟨h⟩
+    constructor
+    simpa [sddError, evaluatedPointFamilyLeft] using
+      (avgOver_uniform_snd (α := Point params.next) (β := Point params.next)
+        (f := fun u =>
+          qSDD strategy.state
+            ((IdxSubMeas.liftLeft (evaluatedPointFamily params family)) u)
+            ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+              (evaluatedPointFamily params family)
+              pointMeas u)))).trans_le h
+  have hcombined_fst :
+      SDDRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => evaluatedPointFamilyLeft params family q.1)
+        (fun q =>
+          (MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+            (evaluatedPointFamily params family)
+            pointMeas q.1))
+        (4 * zeta) := by
+    rcases hconsSub.combinedControl with ⟨h⟩
+    constructor
+    simpa [sddError, evaluatedPointFamilyLeft] using
+      (avgOver_uniform_fst (α := Point params.next) (β := Point params.next)
+        (f := fun u =>
+          qSDD strategy.state
+            ((IdxSubMeas.liftLeft (evaluatedPointFamily params family)) u)
+            ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+              (evaluatedPointFamily params family)
+              pointMeas u)))).trans_le h
+  have hphase1 :=
+    evaluatedSlice_phaseOne_insert_bound
+      params strategy zeta _hnorm family hcombined_snd
+  have hphase3 :=
+    evaluatedSlice_phaseThree_insert_bound
+      params strategy zeta _hnorm family hcombined_fst
   have htail :=
     evaluatedSlice_phaseEightNine_tail_bound
       params strategy zeta _hnorm family _hpostSSC

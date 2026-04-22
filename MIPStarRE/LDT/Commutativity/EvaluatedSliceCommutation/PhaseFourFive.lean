@@ -26,7 +26,7 @@ This is the abstract `commutativityPoints` corollary needed in the middle of
 `evaluatedSlice_scalar_chain_bound`: once the inserted factor is packaged as a
 family `C q ab` with `∑_{ab} C_{q,ab} C_{q,ab}† ≤ I`, the ordered and reversed
 point-measurement products can be swapped at loss `O(√(γ (m+1)))`. -/
-private lemma evaluatedSlice_phaseFour_pointSwap_bound
+lemma evaluatedSlice_phaseFour_pointSwap_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
