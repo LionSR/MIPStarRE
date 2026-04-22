@@ -2214,7 +2214,8 @@ noncomputable def assemblePastingPackage
               intro x
               simpa [tensorFailureExpectation, SelfImprovementPackage.family,
                 leftTensor_mul_rightTensor_eq_opTensor] using
-                (strategy.permInvState.ev_opTensor_swap
+                (ev_opTensor_swap_of_density_fixed strategy.state
+                  strategy.permInvState.density_swap
                   (1 - (hself.sliceProj x).toSubMeas.total) (hself.sliceWitness x))
             rw [hswap]
             calc
