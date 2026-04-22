@@ -323,8 +323,9 @@ theorem rawVerticalLineAnswerFamily_eq_lifted
               rw [hrebase]
       _ = (postprocess ((strategy.axisParallelMeasurement verticalLine).toSubMeas)
             (fun f => f (pointHeight params u))).outcome a := by
-              exact strategy.axisParallelReparamInvariant verticalLine
-                (pointHeight params u) a
+              exact
+                (AxisParallelCovariantMeasurement.reparamInvariant
+                  strategy.axisParallelMeasurement) _ _ _
       _ = (liftedVerticalLineAnswerFamily params strategy u).outcome a := by
               simp [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, verticalLine]
   · calc
