@@ -27,21 +27,6 @@ the classical result. -/
 noncomputable def razSafraSlackBound (params : Parameters) (eps : Error) : Error :=
   eps + (params.m : Error) * ((params.d : Error) / (params.q : Error))
 
-/-- Placeholder polynomial-size slack for classical low-individual-degree soundness.
-
-The Chapter 1 overview records the dependence only schematically as
-`poly(m) * (poly(eps) + poly(d/q))`. The cited bivariate
-Polishchuk--Spielman estimate [PS94, Theorem 9] has a square-root shape: a
-`δ^2` disagreement hypothesis yields a `2δ` conclusion. We nevertheless use
-the simpler linear placeholder `eps` here so the Lean bookkeeping follows the
-same integer-polynomial convention as the overview theorem, rather than fixing a
-specific fractional exponent before the full classical soundness theorem is
-formalized directly. -/
-noncomputable def classicalTestSoundnessSlackBound
-    (params : Parameters) (eps : Error) : Error :=
-  ((params.m : Error) ^ (2 : ℕ)) *
-    (eps + (params.d : Error) / (params.q : Error))
-
 /-- Overview-level soundness conclusion: a low individual degree polynomial
 agrees with the point-answer function except on `slack` average mass, with
 explicit bound `slackBound`. -/
@@ -114,11 +99,11 @@ def RazSafraSoundnessStatement (params : Parameters)
 soundness result of Polishchuk and Spielman.
 
 This issue-#408 `Prop`-valued interface replaces the earlier ambient axiom with
-an explicit hypothesis at each call site. The external witness now carries its
-own slack bound parameter `slackBound`, so issue #408 no longer bakes the
-still-unaudited placeholder `classicalTestSoundnessSlackBound` into the quoted
-external statement. The current placeholder instantiation is kept separate in
-`classicalTestSoundnessWithPlaceholderBound`. The regression audit in
+an explicit hypothesis at each call site. The external witness carries its own
+slack bound parameter `slackBound`, so downstream users must supply the specific
+error dependence they want to quote rather than inheriting any
+repository-chosen placeholder formula for the schematic Chapter 1
+`poly(m) * (poly(eps) + poly(d/q))` bound. The regression audit in
 `MIPStarRE.LDT.Test.AxiomAudit` checks that `classicalTestSoundness` remains
 kernel-clean apart from the standard Lean axioms. -/
 def PolishchukSpielmanClassicalSoundnessStatement (params : Parameters)
@@ -150,7 +135,10 @@ Quoted classical overview theorem wrapper: from paper-faithful classical LID
 test-passing data together with an explicit witness of the
 Polishchuk–Spielman soundness statement at a chosen slack bound `slackBound`,
 conclude that prover A's point-answer function is close to a low-degree
-polynomial with that same bound. -/
+polynomial with that same bound. Any concrete overview-style rate must
+therefore be supplied by instantiating `slackBound` and the external hypothesis
+`hPS`; this module intentionally maintains no repository-chosen placeholder
+bound. -/
 theorem classicalTestSoundness
     (params : Parameters) [FieldModel params.q]
     (a : Point params → Fq params) (eps slackBound : Error)
@@ -159,24 +147,6 @@ theorem classicalTestSoundness
     ∃ slack : Error,
       PointAnswerSoundnessConclusion params a slackBound slack := by
   exact hPS hpass
-
-/-- Placeholder convenience instantiation of `classicalTestSoundness` using the
-repository's current named slack bound.
-
-This wrapper fixes the slack bound to the overview-level linear placeholder
-`classicalTestSoundnessSlackBound`, which matches the schematic `poly(eps)`
-convention used in Chapter 1. -/
-theorem classicalTestSoundnessWithPlaceholderBound
-    (params : Parameters) [FieldModel params.q]
-    (a : Point params → Fq params) (eps : Error)
-    (hpass : TwoProverClassicalLIDPassCondition params a eps)
-    (hPS : PolishchukSpielmanClassicalSoundnessStatement params a eps
-      (classicalTestSoundnessSlackBound params eps)) :
-    ∃ slack : Error,
-      PointAnswerSoundnessConclusion params a
-        (classicalTestSoundnessSlackBound params eps) slack := by
-  exact classicalTestSoundness params a eps
-    (classicalTestSoundnessSlackBound params eps) hpass hPS
 
 /--
 `thm:main-formal` from `test_definition.tex`.
