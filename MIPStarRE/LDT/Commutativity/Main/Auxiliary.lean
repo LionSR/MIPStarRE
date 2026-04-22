@@ -95,7 +95,7 @@ private noncomputable def evaluatedSliceLinearRightAvg
 `\(\sqrt{\nu_{\mathrm{evaluation}}}\)` step: after specializing the full-slice
 products to evaluated questions, one `closenessOfIP` application transports the
 sandwiched right-register term to the linear right-register term. -/
-lemma evaluatedSlice_hEval_sandwichedRight_to_linearRight
+private lemma evaluatedSlice_hEval_sandwichedRight_to_linearRight
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
@@ -132,7 +132,8 @@ lemma evaluatedSlice_hEval_sandwichedRight_to_linearRight
       avgOver 𝒟 (fun q => qSDDCore strategy.state (A q) (B q)) ≤
         commDataProcessedGError params gamma zeta := by
     simpa [𝒟, A, B, qSDDOp] using
-      (evaluationSpecialization_sddOpRel params strategy family
+      (evaluatedSliceCommutation_of_evaluationSpecialization
+        params strategy family
         (commDataProcessedGError params gamma zeta) hEval).squaredDistanceBound
   have hC :
       ∀ q,
