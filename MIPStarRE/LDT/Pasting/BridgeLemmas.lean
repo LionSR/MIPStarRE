@@ -2568,7 +2568,7 @@ private lemma not_interpolationEligible_exists_none
   rw [hfull]
   exact hk
 
-/- private lemma ldSandwichLineOnePoint_isSome_false_mass_bound
+private lemma ldSandwichLineOnePoint_isSome_false_mass_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
@@ -2616,22 +2616,34 @@ private lemma not_interpolationEligible_exists_none
                 Option.isSome)) := by
               apply avgOver_congr
               intro q
-              have hleft := ldSandwichLineOnePointLeftFamily_isSome params strategy family k i hi q
-              let B := postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome
+              have hleft :
+                  postprocess ((ldSandwichLineOnePointLeftFamily params strategy family k i) q) Option.isSome =
+                    postprocess (gHatSandwichFamily params family k q.2)
+                      (fun gs => Option.isSome (gs ⟨i, hi⟩)) := by
+                rw [ldSandwichLineOnePointLeftFamily, postprocess_postprocess]
+                congr
+                funext gs
+                simp [hi]
+              have hright :
+                  postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome =
+                    postprocess (verticalLineMeasurementFamily params strategy q.1)
+                      (fun _ : AxisLinePolynomial params.next => true) := by
+                rw [ldSandwichLineOnePointRightFamily, postprocess_postprocess]
+                congr
+                funext f
+                simp [hi]
+              let B := postprocess (verticalLineMeasurementFamily params strategy q.1)
+                (fun _ : AxisLinePolynomial params.next => true)
               have hfalse : B.outcome false = 0 := by
-                simp [B, postprocess, ldSandwichLineOnePointRightFamily, hi, Option.isSome]
+                simp [B, postprocess]
               have htrue : B.outcome true = B.total := by
-                have hsum : B.outcome false + B.outcome true = B.total := by
-                  simpa [Bool.forall_bool, add_comm] using B.sum_eq_total
-                nlinarith [hfalse, hsum]
-              rw [← hleft]
-              have hBtotal : B.total = (verticalLineMeasurementFamily params strategy q.1).total := by
-                simp [B, ldSandwichLineOnePointRightFamily, hi, postprocess_total]
+                simp [B, postprocess, postprocess_total]
+              rw [← hleft, hright]
               rw [qBipartiteConsDefect_eq_false_mass_of_bool_right_true strategy.state
                 (postprocess ((ldSandwichLineOnePointLeftFamily params strategy family k i) q) Option.isSome)
                 B hfalse htrue]
-              rw [hBtotal]
-    _ ≤ ldSandwichLineOnePointError params eps delta gamma zeta k := hproc_bound -/
+              simp [B, postprocess_total]
+    _ ≤ ldSandwichLineOnePointError params eps delta gamma zeta k := hproc_bound
 
 private lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
     (ψ : QuantumState (ι × ι))
@@ -3612,11 +3624,17 @@ private lemma ldSandwichLineOnePoint_core
       (ldSandwichLineOnePointRightFamily params strategy family k i)
       (ldSandwichLineOnePointError params eps delta gamma zeta k) := by
   /-
-  The remaining external blocker here is still `ldGbcon`: after the two
-  Cauchy–Schwarz sandwich-elimination steps and the completeness simplifications,
-  the proof reduces to the single-slice consistency comparison `eq:ld-gbcon`.
-  That theorem is currently blocked on the missing `ConsRel` swap API tracked in
-  #411 / #550.
+  The old `ldGbcon` / swap-orientation blocker is gone: `Pasting.ldGbcon` now
+  provides the final single-slice `A/B` comparison in exactly the shape needed
+  after the sandwich is collapsed.
+
+  What still remains from the paper proof is local to issue #299:
+  * sum out the coordinates to the right of `i`;
+  * package the two `closenessOfIP` / `closenessOfIPAdjoint` Cauchy–Schwarz
+    steps around `commuteGHalfSandwich` (`eq:gonna-need-a-bigger-cauchy-schwarz`
+    and `eq:even-bigger-CS`);
+  * collapse the middle `Ĝ_{<i} (Ĝ_{<i})†` factor to `I`, then finish with
+    `ldGbcon`.
   -/
   sorry
 
@@ -3681,6 +3699,21 @@ private lemma hBConsistency_core
         (constructedPastedSubMeas params family k))
       (verticalLineMeasurementFamily params strategy)
       (hBConsistencyError params eps delta gamma zeta k) := by
+  /-
+  After `ldSandwichLineOnePoint_core`, the remaining work is the outcome-side
+  expansion of `constructedPastedSubMeas`:
+  * rewrite the pasted interpolation family as a sum over globally consistent
+    eligible tuples;
+  * use that, for a globally consistent tuple and a disagreeing line polynomial,
+    some active coordinate must violate the `ldSandwichLineOnePoint` predicate;
+  * pay the `ldDnoteq` distinct-vs-uniform cost and union-bound over the
+    offending coordinate.
+
+  The genuine remaining technical blocker is the missing interpolation
+  correctness API for `interpolateCompletedSlices`: we still need lemmas showing
+  that the canonical interpolant chosen by `interpolateCompletedSlices` agrees
+  with each supported completed slice whenever the tuple is globally consistent.
+  -/
   sorry
 
 /-- `lem:h-b-consistency`. -/
@@ -4210,8 +4243,10 @@ lemma overAllOutcomes
   * the interpolation-to-global-polynomial correctness step still needs the
     missing `Defs/Interpolation` comparison lemmas in the exact shapes consumed
     here;
-  * the final sandwich aggregation still depends on `ldSandwichLineOnePoint`,
-    whose remaining blocker is `ldGbcon` / the #411 swap API.
+  * the final sandwich aggregation still depends on `ldSandwichLineOnePoint`.
+    The old `ldGbcon` / swap-orientation blocker is gone, but the two local
+    Cauchy–Schwarz transport steps in `ldSandwichLineOnePoint_core` are still
+    open.
   -/
   sorry
 
