@@ -433,14 +433,14 @@ lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
     (R : OpFamily Outcome ι)
     (hR : RoundingToProjectorsWitness ψ A ζ R)
     (hsum_total : ∑ a, R.outcome a = R.total)
-    (htotal_le_one : R.total ≤ (1 : MIPStarRE.Quantum.Op ι))
+    (hsum_le_one : ∑ a, R.outcome a ≤ (1 : MIPStarRE.Quantum.Op ι))
     (source_almost_projective :
       ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
       RankReductionWitness ψ A ζ data := by
   obtain ⟨auxSpace, t, _, hAuxDim⟩ :=
     projectiveLowRankSum_auxData_of_projectors (R := R.outcome) (hproj := hR.projective)
-      (by simpa [hsum_total] using htotal_le_one)
+      hsum_le_one
   let data : QLayerData Outcome ι :=
     { auxSpace := auxSpace
       q := R
