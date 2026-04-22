@@ -130,8 +130,8 @@ structure PrimePowerFieldSpec (params : Parameters) where
 /-- Recover the prime-power specification bundled inside `Parameters`. -/
 noncomputable def Parameters.primePowerFieldSpec
     (params : Parameters) : PrimePowerFieldSpec params :=
-  Classical.choice <| by
-    rcases params.hqPrimePower with ⟨p, n, hp, hn, hq⟩
+  have : Nonempty (PrimePowerFieldSpec params) := by
+    obtain ⟨p, n, hp, hn, hq⟩ := params.hqPrimePower
     exact ⟨{
       p := p
       n := n
@@ -139,6 +139,7 @@ noncomputable def Parameters.primePowerFieldSpec
       nPos := hn
       cardEq := hq
     }⟩
+  this.some
 
 /-- An honest finite field of order `q`, obtained from the prime-power
 witness bundled in `Parameters`. -/
@@ -175,17 +176,19 @@ noncomputable def PrimePowerFieldSpec.toFieldModel (params : Parameters)
       equiv := Fintype.equivFinOfCardEq hcard }
 
 /-- The canonical field model associated to the paper-faithful prime-power data
-stored in `params`. Its priority `100` is deliberately lower than the
-`params.next` transport instance's priority `200` below, so instance search
-reuses an already chosen model when one is available. This instance is
-noncomputable because the coding equivalence to `Fin q` is obtained from finite
-cardinality data, so declarations that discover it through typeclass search may
-also need to be marked `noncomputable` when they reduce the model. -/
+stored in `params`. Lean prefers larger numeric priorities, so this fallback
+uses `100` while the `params.next` transport below uses `200`; that lets
+instance search reuse an already chosen model when one is available. This
+instance is noncomputable because the coding equivalence to `Fin q` is obtained
+from finite cardinality data, so declarations that discover it through
+typeclass search may also need to be marked `noncomputable` when they reduce
+the model. -/
 noncomputable instance (priority := 100) (params : Parameters) : FieldModel params.q :=
   PrimePowerFieldSpec.toFieldModel params (Parameters.primePowerFieldSpec params)
 
-/-- Reuse an already chosen field model for successor parameters. Its priority
-`200` is intentionally higher than the canonical `100` above. -/
+/-- Reuse an already chosen field model for successor parameters. Since Lean
+prefers larger numeric priorities, this transport uses `200` so it is tried
+before the canonical fallback above. -/
 instance (priority := 200) {params : Parameters} [inst : FieldModel params.q] :
     FieldModel params.next.q := by
   simpa [Parameters.next] using inst
