@@ -127,9 +127,10 @@ The chain takes a measurement `A : Measurement Outcome ι` together with a
   line 146, `eq:G-with-Q-A`).
 
 The theorem `orthonormalizeAndComplete` separately records that the returned
-`Q` is exactly the canonical completion `completeAtOutcome P.toSubMeas a0`.
-Projectivity of that witness is supplied by `Preliminaries.completeAtOutcomeProj`,
-so the structure below stores only the analytic closeness obligations. -/
+`Q` has underlying measurement exactly
+`completeAtOutcome P.toSubMeas a0`. Projectivity of that witness is supplied by
+`Preliminaries.completeAtOutcomeProj`, so the structure below stores only the
+analytic closeness obligations. -/
 structure OrthonormalizeAndCompleteStatement
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
