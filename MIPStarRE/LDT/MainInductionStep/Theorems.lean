@@ -167,6 +167,7 @@ theorem ldPastingInInductionSection
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : PastingBoundednessInput params strategy family zeta)
     (k : ℕ)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingInInductionSectionConclusion params strategy family H
@@ -174,7 +175,7 @@ theorem ldPastingInInductionSection
   have hldPasting :=
     Pasting.ldPasting params strategy eps delta gamma kappa zeta
       hgood _hgamma_le _hzeta_le _hdq_le
-      family hcomplete hcons hself hbound k hk
+      family hcomplete hcons hself hbound k hk_pos hk
   obtain ⟨H, hH⟩ := hldPasting
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
@@ -579,6 +580,7 @@ theorem PastingPackage.output
       SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg}
     (pkg : PastingPackage params strategy eps delta gamma k selfPkg)
     (hgood : strategy.IsGood eps delta gamma)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingInInductionSectionConclusion params strategy selfPkg.family H
@@ -586,7 +588,7 @@ theorem PastingPackage.output
   exact
     ldPastingInInductionSection params strategy eps delta gamma pkg.kappa pkg.zeta
       hgood pkg.gamma_le_one pkg.zeta_le_one pkg.dq_le_q
-      selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk
+      selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk_pos hk
 
 /-- Compose the four paper-faithful induction-step packages
 `restrict → induct → self-improve → paste` into the witness consumed by
@@ -602,6 +604,7 @@ theorem mainInductionBridgeWitness
     (hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k)
     (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
     (hpaste : PastingPackage params strategy eps delta gamma k hself)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     MainInductionBridgePackage params.next strategy eps delta gamma k := by
   let family : IdxPolyFamily params ι := hself.family
@@ -613,7 +616,7 @@ theorem mainInductionBridgeWitness
           eps delta gamma kappa zeta k := by
     simpa [family, kappa, zeta] using
       hpaste.output (params := params) (strategy := strategy)
-        (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hk
+        (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hk_pos hk
   rcases hpasted with ⟨H, hH⟩
   exact
     { witness :=
@@ -830,6 +833,7 @@ theorem mainInductionByRecursionOnM
       ∀ hinduction :
         PerSliceInductionPackage params strategy eps delta gamma hrestrict k,
       SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     MainInductionBridgePackage params.next strategy eps delta gamma k := by
   -- TODO(#552): this case split is temporary scaffolding. The `< 1` branch still
@@ -845,13 +849,13 @@ theorem mainInductionByRecursionOnM
         hgood hsmall hrestrict hinduction hself hk
     exact
       mainInductionBridgeWitness params strategy eps delta gamma k
-        hgood hrestrict hinduction hself hpaste hk
+        hgood hrestrict hinduction hself hpaste hk_pos hk
   · let G : Measurement (Polynomial params.next) ι :=
       trivialPolynomialMeasurement (ι := ι) params.next
     have hcons :
         ConsRel strategy.state (uniformDistribution (Point params.next))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-          (polynomialEvaluationFamily params.next G.toSubMeas)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
           1 := by
       exact ⟨bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)

@@ -53,7 +53,7 @@ lemma evaluatedPointFamily_pointConsistency_swapped
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       zeta := by
   exact
-    strategy.permInvState.consRel_swap
+    consRel_symm_of_density_fixed strategy.state strategy.densityFixed
       (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (evaluatedPointFamily params family)

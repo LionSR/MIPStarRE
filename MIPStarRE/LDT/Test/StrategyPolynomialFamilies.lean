@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.StrategyRoleAverage
+import MIPStarRE.LDT.Test.StrategySymmetrized
 
 /-!
 # Polynomial-family interfaces for the low individual degree test

@@ -31,6 +31,7 @@ theorem ldPastingNCompleteness
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     LdPastingNCompletenessStatement params strategy family kappa
       (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
@@ -75,6 +76,7 @@ lemma ldPastingSubMeas
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : SubMeas (Polynomial params.next) ι,
       LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
@@ -82,11 +84,11 @@ lemma ldPastingSubMeas
   have hconsistency :=
     hAConsistency_submeas params strategy eps delta gamma kappa zeta
       hgood hgamma_le hzeta_le hdq_le
-      family hcomplete hcons hself hbound k hk
+      family hcomplete hcons hself hbound k hk_pos hk
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
       hgood hgamma_le hzeta_le hdq_le
-      family hcomplete hcons hself hbound k hk
+      family hcomplete hcons hself hbound k hk_pos hk
   exact
     { largeEnough := hk
       constructedSubMeas := rfl
@@ -109,6 +111,7 @@ theorem ldPasting
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
@@ -116,11 +119,11 @@ theorem ldPasting
   have hsubmeasConsistency :=
     hAConsistency_submeas params strategy eps delta gamma kappa zeta
       hgood hgamma_le hzeta_le hdq_le
-      family hcomplete hcons hself hbound k hk
+      family hcomplete hcons hself hbound k hk_pos hk
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
       hgood hgamma_le hzeta_le hdq_le
-      family hcomplete hcons hself hbound k hk
+      family hcomplete hcons hself hbound k hk_pos hk
   have hconsistency :=
     hAConsistency_completed params strategy eps delta gamma kappa zeta
       family k hsubmeasConsistency hcompleteness.completenessBound

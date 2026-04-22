@@ -242,6 +242,7 @@ structure SymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
   permInvState : PermInvState state
+  densityFixed : swapDensity state.density = state.density
   isNormalized : state.IsNormalized
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurement : AxisParallelCovariantMeasurement params ι
@@ -377,6 +378,7 @@ structure ProjStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
   permInvState : PermInvState state
+  densityFixed : swapDensity state.density = state.density
   isNormalized : state.IsNormalized
   pointMeasurementA : IdxProjMeas (Point params) (Fq params) ι
   axisParallelMeasurementA : AxisParallelCovariantMeasurement params ι

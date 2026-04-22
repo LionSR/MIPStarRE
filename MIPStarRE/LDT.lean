@@ -11,13 +11,7 @@ import MIPStarRE.LDT.Basic.SubMeasurementCore
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.Basic.OpFamily
 import MIPStarRE.LDT.Test.Defs
-import MIPStarRE.LDT.Test.StrategyCore
-import MIPStarRE.LDT.Test.StrategyRoleProjectors
-import MIPStarRE.LDT.Test.StrategyRoleSymmetrization
-import MIPStarRE.LDT.Test.StrategyFailures
-import MIPStarRE.LDT.Test.StrategySelfConsistency
-import MIPStarRE.LDT.Test.StrategyRoleAverage
-import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
+import MIPStarRE.LDT.Test.Strategy
 import MIPStarRE.LDT.Test.Classical
 import MIPStarRE.LDT.Test.SurfaceVsPoint
 import MIPStarRE.LDT.Test.SymmetrizationBridge
@@ -41,9 +35,7 @@ import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
-import MIPStarRE.LDT.Preliminaries.Triangles.Core
-import MIPStarRE.LDT.Preliminaries.Triangles.Consistency
-import MIPStarRE.LDT.Preliminaries.Triangles.ApproxDelta
+import MIPStarRE.LDT.Preliminaries.Triangles
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Core
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
@@ -115,9 +107,7 @@ import MIPStarRE.LDT.Pasting.Sandwich.Switcheroo
 import MIPStarRE.LDT.Pasting.Sandwich.GHatSandwich
 import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 import MIPStarRE.LDT.Pasting.Statements
-import MIPStarRE.LDT.Pasting.Core.Bounds
-import MIPStarRE.LDT.Pasting.Core.CompletePart
-import MIPStarRE.LDT.Pasting.Core.SelfConsistency
+import MIPStarRE.LDT.Pasting.Core
 import MIPStarRE.LDT.Pasting.SwitcherooSetup.Infrastructure
 import MIPStarRE.LDT.Pasting.SwitcherooSetup.Centers
 import MIPStarRE.LDT.Pasting.SwitcherooSetup.Terms
@@ -128,8 +118,7 @@ import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Switcheroo
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.CompletePart
-import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
-import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
+import MIPStarRE.LDT.Pasting.CommutingWithG
 import MIPStarRE.LDT.Pasting.GHatFacts
 import MIPStarRE.LDT.Pasting.BridgeLemmas
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
