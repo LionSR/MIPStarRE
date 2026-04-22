@@ -157,47 +157,6 @@ noncomputable def multiplyByTotalOnLeft {α β : Type*} [Fintype α] [Fintype β
   outcome := fun b => A.total * B.outcome b
   total := A.total * B.total
 
-/-- Average an indexed family against a named distribution. -/
-noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
-    (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome ι)
-    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1) :
-    SubMeas Outcome ι where
-  outcome := fun a =>
-    averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
-  total := averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
-  outcome_pos := by
-    intro a
-    exact Finset.sum_nonneg fun q _ => smul_nonneg (𝒟.nonnegative q) ((A q).outcome_pos a)
-  sum_eq_total := by
-    classical
-    calc
-      ∑ a, averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
-          = ∑ q ∈ 𝒟.support, ∑ a, 𝒟.weight q • (A q).outcome a := by
-              simp_rw [averageOperatorOverDistribution]
-              rw [Finset.sum_comm]
-      _ = ∑ q ∈ 𝒟.support, 𝒟.weight q • ∑ a, (A q).outcome a := by
-            apply Finset.sum_congr rfl
-            intro q _
-            rw [← Finset.smul_sum]
-      _ = ∑ q ∈ 𝒟.support, 𝒟.weight q • (A q).total := by
-            apply Finset.sum_congr rfl
-            intro q _
-            rw [(A q).sum_eq_total]
-      _ = averageOperatorOverDistribution 𝒟 (fun q => (A q).total) := by
-            simp [averageOperatorOverDistribution]
-  total_le_one := by
-    calc
-      averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
-        ≤ ∑ q ∈ 𝒟.support, 𝒟.weight q • (1 : MIPStarRE.Quantum.Op ι) := by
-            simp only [averageOperatorOverDistribution]
-            exact Finset.sum_le_sum fun q _ =>
-              smul_le_smul_of_nonneg_left (A q).total_le_one (𝒟.nonnegative q)
-      _ = (∑ q ∈ 𝒟.support, 𝒟.weight q) • (1 : MIPStarRE.Quantum.Op ι) := by
-            rw [Finset.sum_smul]
-      _ ≤ (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
-            exact smul_le_smul_of_nonneg_right h𝒟 zero_le_one
-      _ = 1 := by simp
-
 /-- Record which completed-slice outcomes are genuine polynomial outcomes. -/
 def gHatTupleType {params : Parameters} {k : ℕ}
     [FieldModel params.q]
