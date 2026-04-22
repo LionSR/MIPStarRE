@@ -785,6 +785,56 @@ private theorem symmetrizedDiagonalReparamInvariant
     roleCond_finset_sum, roleCond_finset_sum,
     hA', hB']
 
+/-- Transport covariance is preserved by block-diagonal symmetrization over the
+role register. -/
+private theorem symmetrizedAxisParallelTransportInvariant
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (MA MB : AxisParallelCovariantMeasurement params ι) :
+    AxisParallelMeasurementTransportInvariant params
+      (symmetrizedIdxProjMeas MA.toIdxProjMeas MB.toIdxProjMeas) := by
+  intro ℓ t
+  ext a
+  have hA :
+      (MA.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+        (MA.toIdxProjMeas ℓ).outcome ((AxisLinePolynomial.reparamAtEquiv t).symm a) := by
+    simpa [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport] using
+      congrArg (fun N => N.outcome a) (MA.transportInvariant ℓ t)
+  have hB :
+      (MB.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+        (MB.toIdxProjMeas ℓ).outcome ((AxisLinePolynomial.reparamAtEquiv t).symm a) := by
+    simpa [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport] using
+      congrArg (fun N => N.outcome a) (MB.transportInvariant ℓ t)
+  simp [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+    Measurement.transport, SubMeas.transport, symmetrizedIdxProjMeas, hA, hB]
+
+/-- Transport covariance is preserved by block-diagonal symmetrization over the
+role register. -/
+private theorem symmetrizedDiagonalTransportInvariant
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (MA MB : DiagonalCovariantMeasurement params ι) :
+    DiagonalMeasurementTransportInvariant params
+      (symmetrizedIdxProjMeas MA.toIdxProjMeas MB.toIdxProjMeas) := by
+  intro ℓ t
+  ext a
+  have hA :
+      (MA.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+        (MA.toIdxProjMeas ℓ).outcome ((DiagonalLinePolynomial.reparamAtEquiv t).symm a) := by
+    simpa [DiagonalLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport] using
+      congrArg (fun N => N.outcome a) (MA.transportInvariant ℓ t)
+  have hB :
+      (MB.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+        (MB.toIdxProjMeas ℓ).outcome ((DiagonalLinePolynomial.reparamAtEquiv t).symm a) := by
+    simpa [DiagonalLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport] using
+      congrArg (fun N => N.outcome a) (MB.transportInvariant ℓ t)
+  simp [DiagonalLine.transportMeasurement, ProjMeas.transport,
+    Measurement.transport, SubMeas.transport, symmetrizedIdxProjMeas, hA, hB]
+
 namespace ProjStrat
 
 /-- The paper's symmetrized point measurement, obtained by putting Alice's and
@@ -827,16 +877,18 @@ noncomputable def classicalRoleSymmStrategy {params : Parameters}
     isNormalized :=
       classicalRoleSymmState_isNormalized strategy.state strategy.isNormalized
     pointMeasurement := strategy.symmetrizedPointMeasurement
-    axisParallelMeasurement := strategy.symmetrizedAxisParallelMeasurement
-    axisParallelReparamInvariant :=
-      symmetrizedAxisParallelReparamInvariant
-        strategy.axisParallelReparamInvariantA
-        strategy.axisParallelReparamInvariantB
-    diagonalMeasurement := strategy.symmetrizedDiagonalMeasurement
-    diagonalReparamInvariant :=
-      symmetrizedDiagonalReparamInvariant
-        strategy.diagonalReparamInvariantA
-        strategy.diagonalReparamInvariantB }
+    axisParallelMeasurement :=
+      { toIdxProjMeas := strategy.symmetrizedAxisParallelMeasurement
+        transportInvariant :=
+          symmetrizedAxisParallelTransportInvariant
+            strategy.axisParallelMeasurementA
+            strategy.axisParallelMeasurementB }
+    diagonalMeasurement :=
+      { toIdxProjMeas := strategy.symmetrizedDiagonalMeasurement
+        transportInvariant :=
+          symmetrizedDiagonalTransportInvariant
+            strategy.diagonalMeasurementA
+            strategy.diagonalMeasurementB } }
 
 /-- The classical role-register symmetrized strategy preserves normalization. -/
 theorem classicalRoleSymmStrategy_isNormalized {params : Parameters}
