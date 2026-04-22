@@ -38,7 +38,10 @@ structure Parameters where
   q : ℕ
   d : ℕ
   hm : 0 < m
+  /-- Kept as a compatibility field so existing positivity proofs can continue
+  to use `params.hq`; it is derivable from `hqPrimePower`. -/
   hq : 0 < q
+  /-- Paper-faithful witness that `q` is a prime power. -/
   hqPrimePower : ∃ p n, Nat.Prime p ∧ 0 < n ∧ q = p ^ n
   deriving DecidableEq
 
@@ -55,18 +58,6 @@ theorem prime_primePower {q : ℕ} (hqPrime : Nat.Prime q) :
     ∃ p n, Nat.Prime p ∧ 0 < n ∧ q = p ^ n := by
   exact ⟨q, 1, hqPrime, by decide, by simp⟩
 
-/-- The field size `2` is a prime power witnessable as `2 = 2^1`. -/
-theorem primePower_two : ∃ p n, Nat.Prime p ∧ 0 < n ∧ 2 = p ^ n := by
-  exact ⟨2, 1, Nat.prime_two, by decide, by decide⟩
-
-/-- The field size `3` is a prime power witnessable as `3 = 3^1`. -/
-theorem primePower_three : ∃ p n, Nat.Prime p ∧ 0 < n ∧ 3 = p ^ n := by
-  exact ⟨3, 1, Nat.prime_three, by decide, by decide⟩
-
-/-- The field size `4` is a prime power witnessable as `4 = 2^2`. -/
-theorem primePower_four : ∃ p n, Nat.Prime p ∧ 0 < n ∧ 4 = p ^ n := by
-  exact ⟨2, 2, Nat.prime_two, by decide, by decide⟩
-
 /-- Build parameters from explicit prime-power data `q = p^n`. -/
 def ofPrimePower (m q d p n : ℕ) (hm : 0 < m) (hp : Nat.Prime p) (hn : 0 < n)
     (hq : q = p ^ n) : Parameters :=
@@ -79,7 +70,12 @@ def ofPrimePower (m q d p n : ℕ) (hm : 0 < m) (hp : Nat.Prime p) (hn : 0 < n)
 
 /-- Build parameters when `q` itself is prime. -/
 def ofPrime (m q d : ℕ) (hm : 0 < m) (hqPrime : Nat.Prime q) : Parameters :=
-  ofPrimePower m q d q 1 hm hqPrime (by decide) (by simp)
+  { m := m
+    q := q
+    d := d
+    hm := hm
+    hq := hqPrime.pos
+    hqPrimePower := prime_primePower hqPrime }
 
 /-- Convenience constructor for the ubiquitous binary field. -/
 def ofTwo (m d : ℕ) (hm : 0 < m) : Parameters :=
@@ -133,11 +129,16 @@ structure PrimePowerFieldSpec (params : Parameters) where
 
 /-- Recover the prime-power specification bundled inside `Parameters`. -/
 noncomputable def Parameters.primePowerFieldSpec
-    (params : Parameters) : PrimePowerFieldSpec params := by
-  classical
-  exact Classical.choice <| by
+    (params : Parameters) : PrimePowerFieldSpec params :=
+  Classical.choice <| by
     rcases params.hqPrimePower with ⟨p, n, hp, hn, hq⟩
-    exact ⟨⟨p, n, hp, hn, hq⟩⟩
+    exact ⟨{
+      p := p
+      n := n
+      pPrime := hp
+      nPos := hn
+      cardEq := hq
+    }⟩
 
 /-- An honest finite field of order `q`, obtained from the prime-power
 witness bundled in `Parameters`. -/
@@ -178,7 +179,8 @@ stored in `params`. Its priority `100` is deliberately lower than the
 `params.next` transport instance's priority `200` below, so instance search
 reuses an already chosen model when one is available. This instance is
 noncomputable because the coding equivalence to `Fin q` is obtained from finite
-cardinality data. -/
+cardinality data, so declarations that discover it through typeclass search may
+also need to be marked `noncomputable` when they reduce the model. -/
 noncomputable instance (priority := 100) (params : Parameters) : FieldModel params.q :=
   PrimePowerFieldSpec.toFieldModel params (Parameters.primePowerFieldSpec params)
 
