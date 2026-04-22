@@ -18,7 +18,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Average an indexed submeasurement against a finite distribution. -/
-private noncomputable def averageIdxSubMeas
+noncomputable def averageIdxSubMeas
     {Question Outcome : Type*} [Fintype Outcome]
     (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome ι)
     (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1) :
@@ -61,7 +61,7 @@ private noncomputable def averageIdxSubMeas
       _ = 1 := by simp
 
 /-- The paper's slice submeasurement `R^y_g = E_{u,x} \sum_a G^{u,x}_a G^y_g G^{u,x}_a`. -/
-private noncomputable def gCommStabilityR
+noncomputable def gCommStabilityR
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (y : Fq params) :
     SubMeas (Polynomial params) ι :=
@@ -500,7 +500,7 @@ theorem gCommStability_scalar
 
 /-- The paper's mirrored slice submeasurement
 `R'^x_g = E_{v,y} \sum_b G^{v,y}_b G^x_g G^{v,y}_b`. -/
-private noncomputable def gCommStabilityTwoR
+noncomputable def gCommStabilityTwoR
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
