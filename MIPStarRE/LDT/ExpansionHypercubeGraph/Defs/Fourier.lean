@@ -414,26 +414,31 @@ noncomputable def pointAddCharRight (params : Parameters) (u : Point params) :
               simp [dotProductZMod, Finset.sum_add_distrib]
     rw [hdot, AddChar.map_add_eq_mul]
 
-private def unitFq (params : Parameters) : Fq params :=
-  ⟨1 % params.q, Nat.mod_lt 1 params.hq⟩
-
+/-- Updating the zero point at coordinate `i` with the field element `1` yields the
+standard basis vector `e_i`, whose `ZMod q` dot product with `α` is the `i`-th
+coordinate of `α`. -/
 lemma dotProductZMod_single_one (params : Parameters) (α : Point params) (i : Fin params.m) :
     dotProductZMod params
-      (Function.update (0 : Point params) i (unitFq params)) α =
+      (Function.update (0 : Point params) i ⟨1 % params.q, Nat.mod_lt 1 params.hq⟩) α =
         ((α i).val : ZMod params.q) := by
   unfold dotProductZMod
   rw [Finset.sum_eq_single i]
-  · simp [Function.update, unitFq]
-  · intro j hj hji
+  · simp [Function.update]
+  · intro j _ hji
     simp [Function.update, hji]
   · simp
 
+/-- `pointAddChar params α` is trivial exactly when `α = 0`.
+
+Here the `0` on the left is the `Zero` instance on `AddChar`, i.e. the trivial
+character `u ↦ 1`, not the pointwise-zero function. -/
 lemma pointAddChar_eq_zero_iff (params : Parameters) (α : Point params) :
     pointAddChar params α = 0 ↔ α = 0 := by
   constructor
   · intro h
     funext i
-    let e : Point params := Function.update (0 : Point params) i (unitFq params)
+    let e : Point params :=
+      Function.update (0 : Point params) i ⟨1 % params.q, Nat.mod_lt 1 params.hq⟩
     have hchar :
         ZMod.stdAddChar (N := params.q) (((α i).val : ZMod params.q)) = 1 := by
       simpa [pointAddChar, e, dotProductZMod_single_one] using
@@ -458,19 +463,13 @@ lemma fourierBasisState_inner_product (params : Parameters) (α β : Point param
     simp [hypercubeVertexCount, Fintype.card_fin]
   have hMpos : 0 < (hypercubeVertexCount params : ℝ) := by
     exact_mod_cast (pow_pos params.hq params.m)
+  have hM_nonneg : 0 ≤ (hypercubeVertexCount params : ℝ) := by
+    positivity
   have hnormR :
       (Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ *
           (Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ =
         (hypercubeVertexCount params : ℝ)⁻¹ := by
-    have hsqrt_neR : Real.sqrt (hypercubeVertexCount params : ℝ) ≠ 0 :=
-      Real.sqrt_ne_zero'.2 hMpos
-    field_simp [hsqrt_neR]
-    have hsq :
-        (Real.sqrt (hypercubeVertexCount params : ℝ)) ^ 2 =
-          (hypercubeVertexCount params : ℝ) := by
-      rw [Real.sq_sqrt]
-      positivity
-    nlinarith
+    rw [← mul_inv_rev, ← sq, Real.sq_sqrt hM_nonneg]
   have hnorm :
       (((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) *
           ((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ)) =
@@ -501,20 +500,9 @@ lemma fourierBasisState_inner_product (params : Parameters) (α β : Point param
                       (star (ZMod.stdAddChar (N := params.q) (dotProductZMod params u α)) *
                         ZMod.stdAddChar (N := params.q) (dotProductZMod params u β)) := by
                           rw [hnorm]
-    _ = 𝔼 u : Point params, star (pointAddChar params α u) * pointAddChar params β u := by
-          rw [Fintype.expect_eq_sum_div_card]
-          rw [div_eq_mul_inv]
-          simpa [mul_assoc, mul_left_comm, mul_comm] using
-            (Finset.mul_sum
-              (s := (Finset.univ : Finset (Point params)))
-              (a := ((Fintype.card (Point params) : ℂ)⁻¹))
-              (f := fun u => star (pointAddChar params α u) * pointAddChar params β u)).symm
-    _ = ((Fintype.card (Point params) : ℂ)⁻¹) *
-          ∑ u : Point params, star (pointAddChar params α u) * pointAddChar params β u := by
-          rw [Fintype.expect_eq_sum_div_card, div_eq_mul_inv]
-          simp [mul_comm]
     _ = ((Fintype.card (Point params) : ℂ)⁻¹) *
           ∑ u : Point params, pointAddChar params (β - α) u := by
+          rw [← Finset.mul_sum]
           apply congrArg (fun z : ℂ => ((Fintype.card (Point params) : ℂ)⁻¹) * z)
           refine Finset.sum_congr rfl ?_
           intro u _
@@ -550,15 +538,10 @@ lemma fourierBasisState_inner_product (params : Parameters) (α β : Point param
               simp [hab]
             simp [h0, hab]
 
-/-- The packaged Fourier-basis inner product equals the Kronecker delta. -/
-lemma fourierBasisInnerProduct_eq (params : Parameters) (α β : Point params) :
-    fourierBasisInnerProduct params α β = if α = β then 1 else 0 := by
-  simpa [fourierBasisInnerProduct] using fourierBasisState_inner_product params α β
-
 /-- `prop:eigenvectors`, item 1: orthonormality of the Fourier basis. -/
 lemma eigenvectors_orthonormality (params : Parameters) (α β : Point params) :
-    fourierBasisInnerProduct params α β = if α = β then 1 else 0 :=
-  fourierBasisInnerProduct_eq params α β
+    fourierBasisInnerProduct params α β = if α = β then 1 else 0 := by
+  simpa [fourierBasisInnerProduct] using fourierBasisState_inner_product params α β
 
 /-- The eigenvalue of `K` on `φ_α`. -/
 noncomputable def adjacencyEigenvalue (params : Parameters) (α : Point params) : Error :=
