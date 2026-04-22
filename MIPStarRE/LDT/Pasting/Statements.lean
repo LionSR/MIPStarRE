@@ -351,7 +351,50 @@ structure OverAllOutcomesStatement (params : Parameters)
         (allOutcomesExpansionFamily params strategy family k))
       (overAllOutcomesError params eps delta gamma zeta k)
 
-/-- Output package for `lem:from-H-to-G`. -/
+/-- Scalar expectation of the stage-`ℓ` left recurrence operator from
+`lem:from-H-to-G`. -/
+noncomputable def fromHToGRecurrenceLeftMass (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : Error :=
+  ev ψbi ((IdxOpFamily.liftLeft
+    (fromHToGRecurrenceLeftFamily params strategy family k ℓ τ)) ().total)
+
+/-- Scalar expectation of the stage-`ℓ` right recurrence operator from
+`lem:from-H-to-G`. -/
+noncomputable def fromHToGRecurrenceRightMass (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : Error :=
+  ev ψbi ((IdxOpFamily.liftLeft
+    (fromHToGRecurrenceRightFamily params strategy family k ℓ τ)) ().total)
+
+/-- Scalar expectation of the left-hand side of `lem:from-H-to-G`, i.e. the
+uniform average of the eligible pasted-sandwich total mass. -/
+noncomputable def fromHToGAllOutcomesMass (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k : ℕ) : Error :=
+  subMeasMass ψbi ((IdxSubMeas.liftLeft
+    (allOutcomesExpansionFamily params strategy family k)) ())
+
+/-- Scalar expectation of the Bernoulli-tail polynomial `F(G)` on the bipartite
+state from `lem:from-H-to-G`. -/
+noncomputable def fromHToGBernoulliTailMass (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k : ℕ) : Error :=
+  subMeasMass ψbi ((IdxSubMeas.liftLeft
+    (bernoulliTailFromFamily params family k)) ())
+
+/-- Output package for `lem:from-H-to-G`.
+
+The paper's displayed statement is a scalar approximation of expectation values,
+not a new `≈_δ` relation between submeasurements.  Accordingly, this bundle
+stores the per-step and final absolute-value inequalities for those masses. -/
 structure FromHToGStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -360,19 +403,13 @@ structure FromHToGStatement (params : Parameters)
     (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceStep :
     ∀ ℓ : ℕ, ℓ < k → ∀ (τ : GHatType k),
-      SDDOpRel ψbi (uniformDistribution Unit)
-        (IdxOpFamily.liftLeft
-          (fromHToGRecurrenceLeftFamily params strategy family k ℓ τ))
-        (IdxOpFamily.liftLeft
-          (fromHToGRecurrenceRightFamily params strategy family k ℓ τ))
-        (fromHToGRecurrenceError params gamma zeta k)
+      |fromHToGRecurrenceLeftMass params strategy ψbi family k ℓ τ -
+          fromHToGRecurrenceRightMass params strategy ψbi family k ℓ τ| ≤
+        fromHToGRecurrenceError params gamma zeta k
   bernoulliPolynomialRewrite :
-    SDDRel ψbi (uniformDistribution Unit)
-      (IdxSubMeas.liftLeft
-        (allOutcomesExpansionFamily params strategy family k))
-      (IdxSubMeas.liftLeft
-        (bernoulliTailFromFamily params family k))
-      (fromHToGError params gamma zeta k)
+    |fromHToGAllOutcomesMass params strategy ψbi family k -
+        fromHToGBernoulliTailMass params ψbi family k| ≤
+      fromHToGError params gamma zeta k
 
 /-- Output package for `lem:chernoff-bernoulli-matrix`. -/
 structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableEq ι]

@@ -53,8 +53,9 @@ theorem ldPastingNCompleteness
     Current blockers after the split audit:
     * `overAllOutcomes` still depends on the interpolation / `ldGbcon` gaps in
       `BridgeLemmas.lean`;
-    * `fromHToG` is still blocked by the collapsed recurrence-family shape from
-      issue #395;
+    * `fromHToG` now has the paper-faithful uniform/scalar API, but the three
+      per-step scalar bridge lemmas from the proof of `lem:from-H-to-G` are
+      still pending (#395);
     * after those land, this corollary still needs the final Unit-indexed
       completeness-transfer step spelled out in Lean.
     -/

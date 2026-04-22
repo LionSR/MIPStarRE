@@ -85,62 +85,50 @@ theorem fromHToGRecurrenceWeight_succ
 
 /-- `lem:from-H-to-G`.
 
-The bipartite state in the goal `FromHToGStatement` and in the recurrence
-hypothesis `hhalf` is taken to be `strategy.state` directly, matching the
-paper's identification of `\ket{\psi_{\mathrm{bi}}}` with the symmetric
-strategy's bipartite state (both are typed `QuantumState (ι × ι)` since
-`SymStrat.state` is itself bipartite — see
-`MIPStarRE/LDT/Test/Strategy.lean:75`). This keeps the Lean signature in
-lockstep with the blueprint statement (`blueprint/src/chapter/ch09_pasting.tex:887–903`)
-and lets `hself`/`hcons`/`hbound`, which are phrased over `strategy.state`,
-be reused without an equality bridge. -/
+The proof of the paper's Bernoulli-recurrence lemma uses exactly the two named
+upstream ingredients cited in the blueprint: `cor:G-hat-facts` for the
+`\sqrt{2ζ}` moves of `\widehat G` across the tensor factors, and
+`lem:commute-g-half-sandwich` for every suffix length appearing in the two
+`\sqrt{ν₄}` commutation moves.  The conclusion package records the displayed
+scalar expectation inequalities from the paper, rather than a stronger `≈_δ`
+statement between the already-averaged recurrence families. -/
 lemma fromHToG
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (k : ℕ)
-    (hhalf : CommuteGHalfSandwichStatement params strategy.state family gamma zeta k) :
-    FromHToGStatement params strategy strategy.state family gamma zeta k := by
-  constructor -- FromHToGStatement
-  · -- recurrenceStep: per-step Bernoulli-tail commutation
-    intro ℓ hℓ τ
-    constructor -- SDDOpRel
-    /- Inductive step ℓ of the Bernoulli-tail recurrence (ld-pasting.tex
-    lines 1346–1666). Three commutation sub-steps per induction step:
-    (a) move rightmost Ĝ^{x_ℓ} to 2nd tensor factor (√(2ζ)),
-    (b) commute leftmost Ĝ past remaining factors (√ν₄),
-    (c) move leftmost to 2nd tensor factor (√(2ζ)).
-    Per-step error: 2√(2ζ) + 2√ν₄ = fromHToGRecurrenceError. -/
-    /- Remaining obstruction after the issue #395 refactor:
-    `fromHToGRecurrenceLeftFamily` / `fromHToGRecurrenceRightFamily` now carry
-    the correct suffix-stage operators
-    `E_{x_{≥ℓ}} ∑_{g_{≥ℓ} ∈ Outcomes_{τ_{≥ℓ}}} Ĥ^{x_{≥ℓ}}_{g_{≥ℓ}} ⊗ S_{τ_{≥ℓ}}`
-    and `E_{x_{>ℓ}} ∑_{g_{>ℓ} ∈ Outcomes_{τ_{>ℓ}}} Ĥ^{x_{>ℓ}}_{g_{>ℓ}} ⊗ S_{τ_{>ℓ}}`,
-    with `RightFamily ℓ = LeftFamily (ℓ + 1)` by `rfl`. What is still missing is
-    the bridge from these averaged/type-restricted suffix families to the
-    existing commutation infrastructure: the proof needs (1) a suffix-length
-    specialization of `hhalf` (or a strengthened hypothesis `∀ j ≤ k, ... j`),
-    and (2) helper lemmas unpacking one stage into the paper's three substeps
-    move-right / commute / move-right so that `cor:G-hat-facts` supplies the two
-    `√(2ζ)` terms and `hhalf` supplies the `√ν₄` term via `sddOpRel_mono` /
-    `sddOpRel_trans`. -/
+    (gamma zeta : Error)
+    (hfacts : GHatFactsStatement params ψbi family gamma zeta)
+    (hhalf : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
+    (k : ℕ) :
+    FromHToGStatement params strategy ψbi family gamma zeta k := by
+  constructor
+  · intro ℓ hℓ τ
+    /- Inductive step `ℓ` of the Bernoulli-tail recurrence
+    (`ld-pasting.tex` / blueprint lines 961–1210).  With the statement now
+    phrased at the scalar-expectation level and the suffix averages built over
+    the paper's independent uniform distribution, the remaining work is to
+    formalize the three scalar bridge lemmas corresponding to the proof's
+    move-right / commute / move-right sequence:
+    1. two `easyApproxFromApproxDelta` / `closenessOfIP` applications driven by
+       `hfacts.completedSelfConsistency`, each contributing `√(2ζ)`;
+    2. two `closenessOfIP` applications driven by the suffix-length witness
+       `hhalf (k - ℓ)`, together contributing `2√ν₄`;
+    3. the exact algebraic rewrite from the final `S_{τ_{≥ℓ}} G_{g_ℓ}^{x_ℓ}`
+       expression to the next suffix weight via `fromHToGRecurrenceWeight_succ`.
+    -/
     sorry
-  · -- bernoulliPolynomialRewrite: aggregate k recurrence steps
-    constructor -- SDDRel
-    /- Aggregate the `k` recurrence steps to show all-outcomes expansion
-    `≈ F(G)`. The family refactor now gives the required telescoping identity
-    `RightFamily ℓ = LeftFamily (ℓ + 1)`, but two endpoint bridges are still
-    missing: stage `0` must be identified with `allOutcomesExpansionFamily`, and
-    stage `k` with `bernoulliTailFromFamily` via the `truncatedTypeSums`
-    polynomial. After those endpoint lemmas are formalized, `sddOpRel_chain`
-    plus summation over the full types `τ : GHatType k` should close this field
-    with total error `k * fromHToGRecurrenceError ≤ fromHToGError`. -/
+  · /- Aggregate the `k` scalar recurrence steps to show the uniform all-outcomes
+    expansion equals the Bernoulli polynomial up to `ν₈`.  After the per-step
+    scalar bridge above is formalized, the remaining endpoint work is:
+    1. identify stage `0` with `fromHToGAllOutcomesMass`;
+    2. identify stage `k` with `fromHToGBernoulliTailMass` using the
+       `truncatedTypeSums` polynomial;
+    3. telescope over `ℓ = 0, …, k - 1` and sum the per-step errors, then use
+       the displayed bound `k * fromHToGRecurrenceError ≤ fromHToGError`.
+    -/
     sorry
 
 /-- `lem:chernoff-bernoulli-matrix`.
