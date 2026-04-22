@@ -730,7 +730,9 @@ theorem mainInductionBaseCase
                 (AxisParallelLine.throughPoint (params := params) u i0)).toSubMeas)
               (fun f =>
                 f (AxisParallelLine.sampleParameter (params := params) u i0))).outcome a := by
-                exact strategy.axisParallelReparamInvariant _ _ _
+                exact
+                  (AxisParallelCovariantMeasurement.reparamInvariant
+                    strategy.axisParallelMeasurement) _ _ _
         _ = (postprocess
               ((strategy.axisParallelMeasurement canonicalLine).toSubMeas)
               (fun f => f (u i0))).outcome a := by

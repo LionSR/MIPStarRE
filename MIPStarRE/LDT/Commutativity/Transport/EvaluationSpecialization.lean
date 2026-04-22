@@ -170,7 +170,7 @@ lemma evaluationSpecialization_sddErrorOp_eq
 
 /-- Repackage the evaluated-from-full-slice commutation bound as a bound for the
 evaluated-slice product families, using the pointwise postprocessing identities. -/
-private lemma evaluatedSliceCommutation_of_evaluationSpecialization
+lemma evaluatedSliceCommutation_of_evaluationSpecialization
     (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (δ : Error)
@@ -198,6 +198,5 @@ private lemma evaluatedSliceCommutation_of_evaluationSpecialization
       (fun q ab =>
         evaluatedFromFullSliceProductRight_outcome_eq params strategy family q ab)
       hEval
-
 
 end MIPStarRE.LDT.Commutativity

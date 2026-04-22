@@ -393,7 +393,8 @@ lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
                       (rawDiagonalLineAnswerFamily params strategy j)) s).outcome a) := by
               intro a
               have hreparam :=
-                strategy.diagonalReparamInvariant
+                (DiagonalCovariantMeasurement.reparamInvariant
+                  strategy.diagonalMeasurement)
                   (DiagonalLine.rebaseAt ℓ₀ (subCoord zeroCoord t)) t a
               have hline :
                   ((sampledDiagonalLineEvaluation params strategy) (e (s, t))).outcome a =
