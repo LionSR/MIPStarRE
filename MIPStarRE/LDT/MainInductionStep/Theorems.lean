@@ -375,6 +375,11 @@ private lemma gamma_nonneg_of_isGood
   exact le_trans (diagonalFailureProbability_nonneg params strategy)
     hgood.diagonalLineTest
 
+/-- Jensen's inequality for `Real.rpow (1/n)` against a uniform distribution:
+the average of `(f a)^{1/n}` is at most `(average f)^{1/n}`. This is the
+workhorse used inside each of the averaged-slice bounds (`average_slice…_le`)
+to push `rpow (1/32)` or `rpow (1/1024)` through a uniform `avgOver` on
+`Fq params`. -/
 private lemma avgOver_uniform_rpow_one_div_le_rpow_avg
     {α : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
     (f : α → Error) (n : ℕ) (hn : 1 ≤ n) (hf : ∀ a, 0 ≤ f a) :
@@ -1675,6 +1680,11 @@ private lemma selfImprovementInInductionError_le_mainInductionNu
           have hmul := mul_le_mul_of_nonneg_left hsum_le hcoef_nonneg
           simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
 
+/-- Paper `inductive_step.tex:552-566`: in the small-parameter regime, the
+induction-side `ldPastingInInductionNu` constructed from `ζ =
+selfImprovementInInductionError` is bounded by `(1/5) · ν` where `ν =
+mainInductionNu`. This bound discharges the first factor of the telescoping
+derivation inside `assemblePastingPackage.error_le`. -/
 private lemma ldPastingInInductionNu_le_fifth_mainInductionNu
     (params : Parameters)
     [FieldModel params.q]
@@ -2292,8 +2302,10 @@ noncomputable def assemblePastingPackage
           exact hneg
         -- The paper uses the stronger coefficient estimate
         -- `(1 + 1 / (100m)) * (m^2 + 3) ≤ (m + 1)^2`, which needs `m ≥ 2`.
-        -- For the Lean telescoping inequality we only need this weaker variant,
-        -- which already holds for every `m ≥ 1`.
+        -- Here we apply `ζ ≤ ν` (`hzeta_le_nu`) *before* telescoping, which
+        -- collapses the paper's `2ν` contribution to `(2/5)ν` and yields the
+        -- weaker `((m^2 + 1)(1 + 1/(100m)) + 2/5) ≤ (m + 1)^2`, already valid
+        -- for every `m ≥ 1`.
         have hcoef_nu :
             ((((params.m : Error) ^ (2 : ℕ)) + 1) *
                 (1 + 1 / (100 * (params.m : Error))) + 2 / 5 : Error) ≤
