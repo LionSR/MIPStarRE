@@ -17,8 +17,8 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Average an indexed submeasurement against a finite distribution. -/
-noncomputable def averageIdxSubMeas
+/-- Commutativity-specific average of an indexed submeasurement against a finite distribution. -/
+noncomputable def commutativityAverageIdxSubMeas
     {Question Outcome : Type*} [Fintype Outcome]
     (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome ι)
     (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1) :
@@ -65,7 +65,7 @@ noncomputable def gCommStabilityR
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (y : Fq params) :
     SubMeas (Polynomial params) ι :=
-  averageIdxSubMeas
+  commutativityAverageIdxSubMeas
     (uniformDistribution (Point params.next))
     (fun ux =>
       postprocess
@@ -506,7 +506,7 @@ noncomputable def gCommStabilityTwoR
     (G : Fq params → SubMeas (Polynomial params) ι)
     (x : Fq params) :
     SubMeas (Polynomial params) ι :=
-  averageIdxSubMeas
+  commutativityAverageIdxSubMeas
     (uniformDistribution (Point params.next))
     (fun vy =>
       postprocess
