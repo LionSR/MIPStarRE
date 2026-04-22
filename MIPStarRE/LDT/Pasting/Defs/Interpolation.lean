@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
 import MIPStarRE.LDT.Pasting.Defs.Tuples
 
 /-!
@@ -63,28 +64,6 @@ private theorem degreeOf_rename_embedCoord_last (params : Parameters) [FieldMode
   simp only [embedCoord, lastCoord, Fin.ext_iff] at hb
   omega
 
-/-- Substituting a univariate polynomial into one multivariate variable preserves its
-degree bound in that variable and gives degree zero in all other variables. -/
-private theorem degreeOf_eval₂_C_X_le_natDegree {K σ : Type*} [Field K] [DecidableEq σ]
-    (p : _root_.Polynomial K) (i j : σ) :
-    MvPolynomial.degreeOf i
-      (p.eval₂ MvPolynomial.C (MvPolynomial.X j) : MvPolynomial σ K) ≤
-        if i = j then p.natDegree else 0 := by
-  rw [_root_.Polynomial.eval₂_eq_sum_range]
-  refine (MvPolynomial.degreeOf_sum_le i (Finset.range (p.natDegree + 1)) _).trans ?_
-  refine Finset.sup_le fun n hn => ?_
-  calc
-    MvPolynomial.degreeOf i
-        (MvPolynomial.C (p.coeff n) * MvPolynomial.X j ^ n : MvPolynomial σ K)
-        ≤ MvPolynomial.degreeOf i (MvPolynomial.X j ^ n : MvPolynomial σ K) := by
-          exact MvPolynomial.degreeOf_C_mul_le _ _ _
-    _ ≤ n * MvPolynomial.degreeOf i (MvPolynomial.X j : MvPolynomial σ K) := by
-          exact MvPolynomial.degreeOf_pow_le _ _ _
-    _ ≤ if i = j then p.natDegree else 0 := by
-          by_cases hij : i = j
-          · have hn_le : n ≤ p.natDegree := Nat.lt_succ_iff.mp (Finset.mem_range.mp hn)
-            simp [hij, MvPolynomial.degreeOf_X, hn_le]
-          · simp [hij, MvPolynomial.degreeOf_X]
 
 /-- Each Lagrange basis polynomial has degree at most one less than the size of the
 interpolation support, without requiring distinct interpolation nodes. -/
@@ -120,28 +99,55 @@ instance interpolationEligible_decidablePred (params : Parameters) [FieldModel p
   unfold InterpolationEligible gHatTupleHammingWeight gHatTupleSupport
   infer_instance
 
-/-- A chosen `d+1`-element interpolation support together with the proof fields that
-show it lies inside the genuine completed-slice support. The choice is arbitrary,
-and the current implementation still obtains it via `Classical.choose`; packaging
-the subset with its properties makes that nonconstructive choice explicit to callers. -/
+/-- Select the first `n` elements of a finite linearly ordered set by sorting it and
+truncating the resulting list. -/
+private def takeCardSubset {α : Type*} [DecidableEq α] [LinearOrder α]
+    (s : Finset α) (n : ℕ) : Finset α :=
+  (s.sort (· ≤ ·)).take n |>.toFinset
+
+/-- The sorted-take subset produced by `takeCardSubset` stays inside the original
+finset. -/
+private theorem takeCardSubset_subset {α : Type*} [DecidableEq α] [LinearOrder α]
+    (s : Finset α) (n : ℕ) :
+    takeCardSubset s n ⊆ s := by
+  intro a ha
+  have haTake : a ∈ (s.sort (· ≤ ·)).take n := by
+    simpa [takeCardSubset] using ha
+  exact (Finset.mem_sort (s := s) (r := (· ≤ ·))).mp (List.mem_of_mem_take haTake)
+
+/-- If `n` does not exceed the size of `s`, then `takeCardSubset s n` has exactly
+`n` elements. -/
+private theorem takeCardSubset_card {α : Type*} [DecidableEq α] [LinearOrder α]
+    (s : Finset α) {n : ℕ} (hn : n ≤ s.card) :
+    (takeCardSubset s n).card = n := by
+  have hNodup : ((s.sort (· ≤ ·)).take n).Nodup := by
+    exact List.Nodup.sublist (List.take_sublist n (s.sort (· ≤ ·)))
+      (Finset.sort_nodup s (· ≤ ·))
+  rw [takeCardSubset, List.toFinset_card_of_nodup hNodup, List.length_take,
+    Finset.length_sort]
+  exact Nat.min_eq_left hn
+
+/-- A canonical `d+1`-element interpolation support together with the proof fields
+that show it lies inside the genuine completed-slice support. The support is built
+by sorting the genuine support and taking its first `d+1` indices. -/
 structure InterpolationSupportWitness (params : Parameters) [FieldModel params.q]
     {k : ℕ} (gs : GHatTupleOutcome params k) where
   support : Finset (Fin k)
   subset_support : support ⊆ gHatTupleSupport gs
   card_eq : support.card = params.d + 1
 
-/-- Choose an explicit `d+1`-point interpolation support inside the genuine support of
-an interpolation-eligible tuple. This is currently the only remaining
-nonconstructive step in the interpolation path. -/
-noncomputable def interpolationSupportWitness {params : Parameters} {k : ℕ}
+/-- Construct an explicit `d+1`-point interpolation support inside the genuine support of
+an interpolation-eligible tuple by taking the first `d+1` indices in sorted order. -/
+def interpolationSupportWitness {params : Parameters} {k : ℕ}
     [FieldModel params.q] (gs : GHatTupleOutcome params k)
     (hEligible : InterpolationEligible params gs) :
     InterpolationSupportWitness params gs :=
-  let hσ : ∃ σ : Finset (Fin k), σ ⊆ gHatTupleSupport gs ∧ σ.card = params.d + 1 :=
-    Finset.exists_subset_card_eq (interpolationEligible_card_le hEligible)
-  { support := Classical.choose hσ
-    subset_support := (Classical.choose_spec hσ).1
-    card_eq := (Classical.choose_spec hσ).2 }
+  { support := takeCardSubset (gHatTupleSupport gs) (params.d + 1)
+    subset_support := by
+      simpa using (takeCardSubset_subset (gHatTupleSupport gs) (params.d + 1))
+    card_eq := by
+      apply takeCardSubset_card
+      simpa using (interpolationEligible_card_le hEligible) }
 
 /-- Interpolate from a specified `d+1`-element index set to recover
 a polynomial in `m+1` variables via Lagrange interpolation.

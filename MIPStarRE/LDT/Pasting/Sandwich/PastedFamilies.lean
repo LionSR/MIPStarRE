@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Sandwich.GHatSandwich
+import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!
 # Section 12 — Sandwich constructions: pasted families
@@ -116,6 +117,232 @@ noncomputable def verticalLineMeasurementFamily (params : Parameters) [FieldMode
       { base := appendPoint params u zeroCoord
         direction := lastCoord params }
     (strategy.axisParallelMeasurement ℓ).toSubMeas
+
+/-- The canonical vertical line through `u : Point params` reaches `appendPoint u x`
+at parameter `x`. -/
+theorem verticalLine_pointAt_appendPoint
+    (params : Parameters) [FieldModel params.q]
+    (u : Point params) (x : Fq params) :
+    ({ base := appendPoint params u zeroCoord,
+       direction := lastCoord params } : AxisParallelLine params.next).pointAt x =
+      appendPoint params u x := by
+  ext i
+  by_cases hlast : i = lastCoord params
+  · subst i
+    have hzero : addCoord zeroCoord x = x := by
+      unfold addCoord zeroCoord
+      rw [decode_encodeScalar]
+      simp
+    simpa [AxisParallelLine.pointAt, appendPoint, lastCoord] using congrArg Fin.val hzero
+  · have him : i.1 < params.m := by
+      have hi_lt : i.1 < params.m + 1 := by simpa [Parameters.next] using i.2
+      by_cases hlt : i.1 < params.m
+      · exact hlt
+      · have hi_eq : i.1 = params.m := by omega
+        have hi_last : i = lastCoord params := by
+          apply Fin.ext
+          simp [lastCoord, hi_eq]
+        exact (hlast hi_last).elim
+    simp [AxisParallelLine.pointAt, appendPoint, him, hlast]
+
+/-- The last-coordinate axis-parallel branch of the strategy, read at the base
+point of the sampled vertical line.
+
+This is the ambient-space comparison family used to extract a single
+axis-parallel branch from `hgood.axisParallelTest`. -/
+noncomputable def rawVerticalLineMeasurementFamily
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    IdxMeas (Point params.next) (Fq params) ι :=
+  fun u =>
+    (ProjMeas.postprocess
+      (strategy.axisParallelMeasurement { base := u, direction := lastCoord params })
+      (· zeroCoord)).toMeasurement
+
+/-- The submeasurement family underlying `rawVerticalLineMeasurementFamily`. -/
+noncomputable def rawVerticalLineAnswerFamily
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    IdxSubMeas (Point params.next) (Fq params) ι :=
+  IdxMeas.toIdxSubMeas (rawVerticalLineMeasurementFamily params strategy)
+
+/-- Extract the last-coordinate axis-parallel branch from
+`hgood.axisParallelTest`, losing a factor of `m + 1` when passing from the
+uniform coordinate average to a fixed coordinate. -/
+theorem rawVerticalLineConsistency
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    ConsRel strategy.state
+      (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (rawVerticalLineAnswerFamily params strategy)
+      (((params.next.m : ℕ) : Error) * eps) := by
+  let err : Fin params.next.m → Error := fun i =>
+    bipartiteConsError strategy.state
+      (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (fun u =>
+        postprocess ((strategy.axisParallelMeasurement { base := u, direction := i }).toSubMeas)
+          (· zeroCoord))
+  have haxis_avg : avgOver (uniformDistribution (Fin params.next.m)) err ≤ eps := by
+    have h_eq :
+        avgOver (uniformDistribution (Fin params.next.m)) err =
+          strategy.axisParallelFailureProbability := by
+      unfold SymStrat.axisParallelFailureProbability err
+      calc
+        avgOver (uniformDistribution (Fin params.next.m))
+            (fun i =>
+              bipartiteConsError strategy.state
+                (uniformDistribution (Point params.next))
+                (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+                (fun u =>
+                  postprocess ((strategy.axisParallelMeasurement
+                    { base := u, direction := i }).toSubMeas) (· zeroCoord)))
+          = avgOver (uniformDistribution (Fin params.next.m))
+              (fun i =>
+                avgOver (uniformDistribution (Point params.next)) fun u =>
+                  qBipartiteConsDefect strategy.state
+                    ((strategy.pointMeasurement u).toSubMeas)
+                    (postprocess ((strategy.axisParallelMeasurement
+                      { base := u, direction := i }).toSubMeas) (· zeroCoord))) := by
+                rfl
+        _ = avgOver (uniformDistribution (Fin params.next.m × Point params.next))
+              (fun iu =>
+                qBipartiteConsDefect strategy.state
+                  ((strategy.pointMeasurement iu.2).toSubMeas)
+                  (postprocess ((strategy.axisParallelMeasurement
+                    { base := iu.2, direction := iu.1 }).toSubMeas) (· zeroCoord))) := by
+                symm
+                simpa using (avgOver_uniform_prod (f := fun i u =>
+                  qBipartiteConsDefect strategy.state
+                    ((strategy.pointMeasurement u).toSubMeas)
+                    (postprocess ((strategy.axisParallelMeasurement
+                      { base := u, direction := i }).toSubMeas) (· zeroCoord))))
+        _ = avgOver (uniformDistribution (Point params.next × Fin params.next.m))
+              (fun ui =>
+                qBipartiteConsDefect strategy.state
+                  ((strategy.pointMeasurement ui.1).toSubMeas)
+                  (postprocess ((strategy.axisParallelMeasurement
+                    { base := ui.1, direction := ui.2 }).toSubMeas) (· zeroCoord))) := by
+                simpa using (avgOver_uniform_equiv
+                  (e := Equiv.prodComm (Fin params.next.m) (Point params.next))
+                  (f := fun iu : Fin params.next.m × Point params.next =>
+                    qBipartiteConsDefect strategy.state
+                      ((strategy.pointMeasurement iu.2).toSubMeas)
+                      (postprocess ((strategy.axisParallelMeasurement
+                        { base := iu.2, direction := iu.1 }).toSubMeas) (· zeroCoord))))
+        _ = strategy.axisParallelFailureProbability := by
+              rfl
+    rw [h_eq]
+    exact hgood.axisParallelTest
+  have herr_nonneg : ∀ i : Fin params.next.m, 0 ≤ err i := by
+    intro i
+    exact bipartiteConsError_nonneg strategy.state
+      (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (fun u =>
+        postprocess ((strategy.axisParallelMeasurement { base := u, direction := i }).toSubMeas)
+          (· zeroCoord))
+  let mNext : Error := ((params.next.m : ℕ) : Error)
+  have hsum_le : ∑ i : Fin params.next.m, err i ≤ mNext * eps := by
+    have hcard_pos : 0 < mNext := by
+      have hpos : (0 : Error) < ((params.next.m : ℕ) : Error) := by
+        exact_mod_cast params.next.hm
+      simpa [mNext] using hpos
+    have hcard_ne : mNext ≠ 0 := ne_of_gt hcard_pos
+    calc
+      ∑ i : Fin params.next.m, err i
+          = mNext * avgOver (uniformDistribution (Fin params.next.m)) err := by
+              simp [avgOver, uniformDistribution, Finset.mul_sum, mNext, hcard_ne]
+      _ ≤ mNext * eps := by
+            gcongr
+  have hlast_le : err (lastCoord params) ≤ mNext * eps := by
+    calc
+      err (lastCoord params) ≤ ∑ i : Fin params.next.m, err i := by
+        exact Finset.single_le_sum (fun i _ => herr_nonneg i) (Finset.mem_univ _)
+      _ ≤ ((params.next.m : ℕ) : Error) * eps := hsum_le
+  constructor
+  simpa [err, rawVerticalLineAnswerFamily, rawVerticalLineMeasurementFamily,
+    IdxMeas.toIdxSubMeas] using hlast_le
+
+/-- Pull back the vertical-line answer family along `truncatePoint`, then read
+its line polynomial at the lifted point's final coordinate. -/
+noncomputable def liftedVerticalLineAnswerFamily
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    IdxSubMeas (Point params.next) (Fq params) ι :=
+  fun u =>
+    postprocess
+      (verticalLineMeasurementFamily params strategy (truncatePoint params u))
+      (fun f => f (pointHeight params u))
+
+/-- Reparametrizing the fixed last-coordinate branch to the canonical vertical
+base point matches `liftedVerticalLineAnswerFamily`. -/
+theorem rawVerticalLineAnswerFamily_eq_lifted
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    rawVerticalLineAnswerFamily params strategy =
+      liftedVerticalLineAnswerFamily params strategy := by
+  funext u
+  let verticalLine : AxisParallelLine params.next :=
+    { base := appendPoint params (truncatePoint params u) zeroCoord
+      direction := lastCoord params }
+  have happend : appendPoint params (truncatePoint params u) (pointHeight params u) = u := by
+    exact (CommutativityPoints.pointNextEquiv params).left_inv u
+  have hpt : verticalLine.pointAt (pointHeight params u) = u := by
+    calc
+      verticalLine.pointAt (pointHeight params u)
+          = appendPoint params (truncatePoint params u) (pointHeight params u) := by
+              simpa [verticalLine] using
+                verticalLine_pointAt_appendPoint params
+                  (truncatePoint params u) (pointHeight params u)
+      _ = u := happend
+  have hrebase :
+      AxisParallelLine.rebaseAt verticalLine (pointHeight params u) =
+        { base := u, direction := lastCoord params } := by
+    simpa [AxisParallelLine.rebaseAt, verticalLine] using
+      congrArg
+        (fun base : Point params.next =>
+          ({ base := base, direction := lastCoord params } : AxisParallelLine params.next))
+        hpt
+  apply SubMeas.ext
+  · intro a
+    calc
+      (rawVerticalLineAnswerFamily params strategy u).outcome a
+          = (postprocess
+              ((strategy.axisParallelMeasurement
+                { base := u, direction := lastCoord params }).toSubMeas)
+              (· zeroCoord)).outcome a := by
+              rfl
+      _ = (postprocess
+            ((strategy.axisParallelMeasurement
+              (AxisParallelLine.rebaseAt verticalLine (pointHeight params u))).toSubMeas)
+            (· zeroCoord)).outcome a := by
+              rw [hrebase]
+      _ = (postprocess ((strategy.axisParallelMeasurement verticalLine).toSubMeas)
+            (fun f => f (pointHeight params u))).outcome a := by
+              exact strategy.axisParallelReparamInvariant verticalLine
+                (pointHeight params u) a
+      _ = (liftedVerticalLineAnswerFamily params strategy u).outcome a := by
+              simp [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, verticalLine]
+  · calc
+      (rawVerticalLineAnswerFamily params strategy u).total
+          = (strategy.axisParallelMeasurement
+              { base := u, direction := lastCoord params }).total := by
+              rfl
+      _ = 1 :=
+            (strategy.axisParallelMeasurement
+              { base := u, direction := lastCoord params }).total_eq_one
+      _ = (strategy.axisParallelMeasurement verticalLine).total := by
+            symm
+            exact (strategy.axisParallelMeasurement verticalLine).total_eq_one
+      _ = (postprocess ((strategy.axisParallelMeasurement verticalLine).toSubMeas)
+            (fun f => f (pointHeight params u))).total := by
+              rfl
+      _ = (liftedVerticalLineAnswerFamily params strategy u).total := by
+              simp [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, verticalLine]
 
 /-- Explicit value extracted from the `i`-th completed slice outcome at the test point. -/
 noncomputable def ldSandwichLineOnePointLeftFamily (params : Parameters) [FieldModel params.q]
