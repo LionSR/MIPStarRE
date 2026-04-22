@@ -229,23 +229,24 @@ lemma projector_eigenvalues_zero_or_one {ι : Type*} [Fintype ι] [DecidableEq �
     linarith
 
 /-- The trace of a finite-dimensional orthogonal projector equals its rank. -/
-lemma rank_of_isProj {ι : Type*} [Fintype ι] [DecidableEq ι]
+lemma trace_eq_rank_of_isProj {ι : Type*} [Fintype ι] [DecidableEq ι]
     (P : MIPStarRE.Quantum.Op ι) (hP : MIPStarRE.Quantum.IsProj P) :
     P.trace = (P.rank : ℂ) := by
   let p : ι → Prop := fun i => hP.isHermitian.eigenvalues i ≠ 0
-  have hp_nat : Fintype.card {i // p i} = ∑ i, if p i then 1 else 0 := by
+  let indicator : ι → ℕ := fun i => if p i then 1 else 0
+  have hp_nat : Fintype.card {i // p i} = ∑ i, indicator i := by
     rw [Fintype.card_subtype p]
-    simpa [p] using Finset.card_filter p (Finset.univ : Finset ι)
-  have hp_complex : (Fintype.card {i // p i} : ℂ) = ∑ i, (((if p i then 1 else 0) : ℕ) : ℂ) := by
+    simpa [p, indicator] using Finset.card_filter p (Finset.univ : Finset ι)
+  have hp_complex : (Fintype.card {i // p i} : ℂ) = ∑ i, (indicator i : ℂ) := by
     exact_mod_cast hp_nat
-  have h_indicator : ∀ i, ((((if p i then 1 else 0) : ℕ) : ℂ)) = (hP.isHermitian.eigenvalues i : ℂ) := by
+  have h_indicator : ∀ i, (indicator i : ℂ) = (hP.isHermitian.eigenvalues i : ℂ) := by
     intro i
     rcases projector_eigenvalues_zero_or_one P hP i with hzero | hone
-    · simp [p, hzero]
-    · simp [p, hone]
+    · simp [p, indicator, hzero]
+    · simp [p, indicator, hone]
   calc
     P.trace = ∑ i, (hP.isHermitian.eigenvalues i : ℂ) := hP.isHermitian.trace_eq_sum_eigenvalues
-    _ = ∑ i, ((((if p i then 1 else 0) : ℕ) : ℂ)) := by
+    _ = ∑ i, (indicator i : ℂ) := by
           refine Finset.sum_congr rfl ?_
           intro i _
           symm
@@ -268,7 +269,7 @@ lemma sum_rank_le_card_of_projectors_le_one {Outcome : Type*} [Fintype Outcome]
   have htrace_rank : (∑ a, Complex.re (Matrix.trace (R a))) = ∑ a, ((R a).rank : ℝ) := by
     refine Finset.sum_congr rfl ?_
     intro a _
-    rw [rank_of_isProj (R a) (hproj a)]
+    rw [trace_eq_rank_of_isProj (R a) (hproj a)]
     simp
   have hreal_bound' : ∑ a, Complex.re (Matrix.trace (R a)) ≤ Fintype.card ι := by
     simpa [Matrix.trace_sub, Matrix.trace_one, Matrix.trace_sum] using hreal_nonneg
@@ -278,29 +279,55 @@ lemma sum_rank_le_card_of_projectors_le_one {Outcome : Type*} [Fintype Outcome]
 
 namespace FiniteHilbertSpace
 
-/-- The finite Hilbert space whose preferred basis is indexed by `Σ a, Fin (m a)`. -/
-def sigmaFin {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
-    (m : Outcome → ℕ) [Nonempty (Σ a, Fin (m a))] :
-    FiniteHilbertSpace where
-  carrier := Σ a, Fin (m a)
+/-- A chosen finite-enumeration model of the paper's carrier `Σ a, Fin (m a)`.
+Using `Fin (Fintype.card Outcome)` keeps the base carrier in a small universe;
+`sigmaFin` then lifts it to the requested auxiliary-space universe with `ULift`. -/
+noncomputable abbrev sigmaFinCarrier {Outcome : Type*} [Fintype Outcome]
+    (m : Outcome → ℕ) :=
+  Σ i : Fin (Fintype.card Outcome), Fin (m ((Fintype.equivFin Outcome).symm i))
+
+/-- The finite Hilbert space whose preferred basis is a lifted finite-enumeration
+model of `Σ a, Fin (m a)`. -/
+def sigmaFin {Outcome : Type*} [Fintype Outcome]
+    (m : Outcome → ℕ) [Nonempty (sigmaFinCarrier m)] :
+    FiniteHilbertSpace.{uι} where
+  carrier := ULift.{uι} (sigmaFinCarrier m)
   instFintype := inferInstance
   instDecidableEq := inferInstance
   instNonempty := inferInstance
 
 end FiniteHilbertSpace
 
-/-- The block projective measurement on `Σ a, Fin (m a)` selecting the `a`-block. -/
-noncomputable def sigmaFinProjMeas {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
+/-- A finite-enumeration carrier is equivalent to the paper's literal sigma type
+`Σ a, Fin (m a)`. -/
+private noncomputable def sigmaFinCarrierEquiv {Outcome : Type*} [Fintype Outcome]
     (m : Outcome → ℕ) :
-    ProjMeas Outcome (Σ a, Fin (m a)) where
-  outcome := fun a => Matrix.diagonal fun x : Σ a, Fin (m a) => if x.1 = a then 1 else 0
+    (Σ a : Outcome, Fin (m a)) ≃ FiniteHilbertSpace.sigmaFinCarrier m := by
+  classical
+  let e : Outcome ≃ Fin (Fintype.card Outcome) := Fintype.equivFin Outcome
+  refine
+    { toFun := fun x => ⟨e x.1, by simpa [e] using x.2⟩
+      invFun := fun x => ⟨e.symm x.1, by simpa [e] using x.2⟩
+      left_inv := ?_
+      right_inv := ?_ }
+  · intro x
+    ext <;> simp [e]
+  · intro x
+    ext <;> simp [e]
+
+/-- The canonical block projective measurement on the lifted sigma carrier
+indexed by `Fin n`. -/
+private noncomputable def finSigmaProjMeas (n : ℕ) (m : Fin n → ℕ) :
+    ProjMeas (Fin n) (ULift.{uι} (Σ i : Fin n, Fin (m i))) where
+  outcome := fun i =>
+    Matrix.diagonal fun x : ULift.{uι} (Σ i : Fin n, Fin (m i)) => if x.down.1 = i then 1 else 0
   total := 1
   outcome_pos := by
-    intro a
+    intro i
     refine Matrix.nonneg_iff_posSemidef.mpr ?_
     exact Matrix.PosSemidef.diagonal <| by
       intro x
-      by_cases hx : x.1 = a <;> simp [hx]
+      by_cases hx : x.down.1 = i <;> simp [hx]
   sum_eq_total := by
     ext x y
     rw [Matrix.sum_apply]
@@ -311,19 +338,28 @@ noncomputable def sigmaFinProjMeas {Outcome : Type*} [Fintype Outcome] [Decidabl
   total_le_one := le_rfl
   total_eq_one := rfl
   proj := by
-    intro a
+    intro i
     rw [Matrix.diagonal_mul_diagonal]
     ext x y
     by_cases hxy : x = y
     · subst hxy
-      by_cases hx : x.1 = a <;> simp [hx]
+      by_cases hx : x.down.1 = i <;> simp [hx]
     · simp [hxy]
+
+/-- The block projective measurement on the lifted finite-enumeration model of
+`Σ a, Fin (m a)` selecting the `a`-block. -/
+noncomputable def sigmaFinProjMeas {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
+    (m : Outcome → ℕ) :
+    ProjMeas Outcome (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier m)) :=
+  ProjMeas.transport (Fintype.equivFin Outcome).symm
+    (finSigmaProjMeas (n := Fintype.card Outcome)
+      (m := fun i => m ((Fintype.equivFin Outcome).symm i)))
 
 /-- A one-point projective measurement concentrating all mass on the chosen outcome. -/
 private noncomputable def pointProjMeas {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
     (a0 : Outcome) :
-    ProjMeas Outcome (ULift.{uOutcome} Unit) where
+    ProjMeas Outcome (ULift.{uι} Unit) where
   outcome := fun a => if a = a0 then 1 else 0
   total := 1
   outcome_pos := by
@@ -337,24 +373,28 @@ private noncomputable def pointProjMeas {Outcome : Type uOutcome}
     intro a
     by_cases h : a = a0 <;> simp [h]
 
-/-- If `R_a` are orthogonal projectors with `∑_a R_a ≤ I`, then the sigma-carrier
-`Σ a, Fin (rank R_a)` has dimension at most the ambient one. -/
-lemma sigmaFinCard_le_ofProjectors {Outcome : Type*} [Fintype Outcome]
+/-- If `R_a` are orthogonal projectors with `∑_a R_a ≤ I`, then the lifted
+finite-enumeration model of `Σ a, Fin (rank R_a)` has dimension at most the
+ambient one. -/
+lemma sigmaFinCard_le_of_projectors {Outcome : Type*} [Fintype Outcome]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (R : Outcome → MIPStarRE.Quantum.Op ι)
     (hproj : ∀ a, MIPStarRE.Quantum.IsProj (R a))
     (htotal_le_one : (∑ a, R a) ≤ (1 : MIPStarRE.Quantum.Op ι)) :
-    Fintype.card (Σ a, Fin ((R a).rank)) ≤ Fintype.card ι := by
+    Fintype.card (FiniteHilbertSpace.sigmaFinCarrier (fun a : Outcome => (R a).rank)) ≤
+      Fintype.card ι := by
+  rw [← Fintype.card_congr (sigmaFinCarrierEquiv (m := fun a : Outcome => (R a).rank))]
   rw [Fintype.card_sigma]
   simp only [Fintype.card_fin]
   exact sum_rank_le_card_of_projectors_le_one R hproj htotal_le_one
 
 /-- Concrete auxiliary-space producer for the exact-projector case.
 
-When the honest sigma-carrier `Σ a, Fin (rank R_a)` is nonempty, we use it directly.
-If all ranks vanish, then the sigma-carrier is empty, but `FiniteHilbertSpace`
-requires a nonempty carrier; in that degenerate branch we fall back to `PUnit`. -/
-lemma projectiveLowRankSum_auxDataOfProjectors {Outcome : Type uι}
+When the honest sigma-carrier `Σ a, Fin (rank R_a)` is nonempty, we use its
+lifted finite-enumeration model. If all ranks vanish, then that carrier is
+empty, but `FiniteHilbertSpace` requires a nonempty carrier; in that degenerate
+branch we fall back to the one-point space `ULift Unit`. -/
+lemma projectiveLowRankSum_auxData_of_projectors {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (R : Outcome → MIPStarRE.Quantum.Op ι)
@@ -364,17 +404,13 @@ lemma projectiveLowRankSum_auxDataOfProjectors {Outcome : Type uι}
       t.total = 1 ∧ Fintype.card auxSpace.carrier ≤ Fintype.card ι := by
   classical
   let m : Outcome → ℕ := fun a => (R a).rank
-  by_cases hsigma : Nonempty (Σ a, Fin (m a))
+  by_cases hsigma : Nonempty (FiniteHilbertSpace.sigmaFinCarrier m)
   · letI := hsigma
-    let auxSpace : FiniteHilbertSpace.{uι} :=
-      { carrier := Σ a, Fin (m a)
-        instFintype := inferInstance
-        instDecidableEq := inferInstance
-        instNonempty := inferInstance }
+    let auxSpace : FiniteHilbertSpace.{uι} := FiniteHilbertSpace.sigmaFin m
     refine ⟨auxSpace, sigmaFinProjMeas m, ?_⟩
     refine ⟨rfl, ?_⟩
-    simpa [auxSpace, m] using
-      sigmaFinCard_le_ofProjectors (R := R) hproj htotal_le_one
+    simpa [auxSpace, FiniteHilbertSpace.sigmaFin, m, Fintype.card_ulift] using
+      sigmaFinCard_le_of_projectors (R := R) hproj htotal_le_one
   · let a0 : Outcome := Classical.choice (inferInstance : Nonempty Outcome)
     let auxSpace : FiniteHilbertSpace.{uι} :=
       { carrier := ULift.{uι} Unit
@@ -388,7 +424,7 @@ lemma projectiveLowRankSum_auxDataOfProjectors {Outcome : Type uι}
 
 /-- Concrete rank-reduction producer once the rounded family is already an exact
 projector submeasurement `∑_a R_a ≤ I`. -/
-lemma projectiveLowRankSum_ofProjectors {Outcome : Type uι}
+lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
     (ψ : QuantumState ι)
@@ -403,7 +439,7 @@ lemma projectiveLowRankSum_ofProjectors {Outcome : Type uι}
     ∃ data : QLayerData Outcome ι,
       RankReductionWitness ψ A ζ data := by
   obtain ⟨auxSpace, t, _, hAuxDim⟩ :=
-    projectiveLowRankSum_auxDataOfProjectors (R := R.outcome) (hproj := hR.projective)
+    projectiveLowRankSum_auxData_of_projectors (R := R.outcome) (hproj := hR.projective)
       (by simpa [hsum_total] using htotal_le_one)
   let data : QLayerData Outcome ι :=
     { auxSpace := auxSpace
@@ -470,7 +506,7 @@ In the paper (orthonormalization.tex), Lem 5.5 itself only produces `{Q_a}`;
 the auxiliary space `ℂ^m` and the projective measurement
 `T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent
 "Matrix decomposition of `Q_a`" definition (orthonormalization.tex:777-795).
-Below, `projectiveLowRankSum_ofProjectors` materialises these data from an
+Below, `projectiveLowRankSum_of_projectors` materialises these data from an
 exact projector submeasurement `R` satisfying `∑_a R_a ≤ I`, using the
 spectral theorem to prove the matrix identity `rank R_a = trace R_a` and hence
 `∑_a rank(R_a) ≤ dim(ι)`. The public theorem `projectiveLowRankSum` still keeps
