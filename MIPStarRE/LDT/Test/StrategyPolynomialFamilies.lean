@@ -93,20 +93,13 @@ noncomputable def evaluatedAtNextPoint {params : Parameters} [FieldModel params.
     evaluateAt params (truncatePoint params u)
       ((family.meas (pointHeight params u)).toSubMeas)
 
-/-- Weighted sum of operators over a distribution's finite support. -/
-private noncomputable def averageOperatorOverDistribution' {α : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) :
-    MIPStarRE.Quantum.Op ι :=
-  ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
-
 /-- Averaged point operator `E_u A^u_{h(u)}` appearing in source-style
 boundedness assumptions. -/
 noncomputable def averagedPointEvaluationOperator {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) (h : Polynomial params) :
     MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution' (uniformDistribution (Point params))
+  averageOperatorOverDistribution (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement u).toSubMeas.outcome (h u))
 
 /-- Slice-wise averaged point operator `E_u A^{u,x}_{g(u)}` from the paper's
@@ -115,7 +108,7 @@ noncomputable def averagedSlicePointEvaluationOperator {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι)
     (x : Fq params) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution' (uniformDistribution (Point params))
+  averageOperatorOverDistribution (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
 
 /-- Paper-faithful smart constructor: bundle a slice submeasurement with a
