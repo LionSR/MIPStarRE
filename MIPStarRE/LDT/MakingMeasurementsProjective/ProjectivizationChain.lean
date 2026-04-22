@@ -126,9 +126,10 @@ The chain takes a measurement `A : Measurement Outcome ι` together with a
   `A ≈_{orthonormalizeAndCompleteError ζ} Q` (paper `inductive_step.tex`
   line 146, `eq:G-with-Q-A`).
 
-The `completionFormula` field records the underlying measurement equality
-`Q.toMeasurement = completeAtOutcome P.toSubMeas a0`. Projectivity of `Q`
-is supplied by `Preliminaries.completeAtOutcomeProj`. -/
+The theorem `orthonormalizeAndComplete` separately records that the returned
+`Q` is exactly the canonical completion `completeAtOutcome P.toSubMeas a0`.
+Projectivity of that witness is supplied by `Preliminaries.completeAtOutcomeProj`,
+so the structure below stores only the analytic closeness obligations. -/
 structure OrthonormalizeAndCompleteStatement
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -145,11 +146,6 @@ structure OrthonormalizeAndCompleteStatement
       (constSubMeasFamily A.toSubMeas.liftLeft)
       (constSubMeasFamily P.toSubMeas.liftLeft)
       (orthonormalizationError ζ)
-  /-- `Q` is the canonical completion of `P` at the distinguished outcome
-  `a₀` (`Preliminaries.completeAtOutcome`), viewed as a projective
-  measurement. -/
-  completionFormula :
-    Q.toMeasurement = completeAtOutcome P.toSubMeas a0
   /-- The chain closeness statement
   `A ≈_{orthonormalizeAndCompleteError ζ} Q` (paper:
   `inductive_step.tex` line 146, `eq:G-with-Q-A`). -/
@@ -206,7 +202,8 @@ theorem orthonormalizeAndComplete
         (constSubMeasFamily A.toSubMeas) ζ)
     (hbridge : OrthonormalizationInput ψ A.toSubMeas ζ) :
     ∃ P : ProjSubMeas Outcome ι, ∃ Q : ProjMeas Outcome ι,
-      OrthonormalizeAndCompleteStatement ψ A P Q a0 ζ := by
+      Q.toMeasurement = completeAtOutcome P.toSubMeas a0 ∧
+        OrthonormalizeAndCompleteStatement ψ A P Q a0 ζ := by
   -- Step 6a: apply orthonormalization to `A.toSubMeas`.
   obtain ⟨P, hClose⟩ :=
     orthonormalization (Outcome := Outcome) (ι := ι) ψ hperm hψ
@@ -218,15 +215,14 @@ theorem orthonormalizeAndComplete
         (constSubMeasFamily A.toSubMeas.liftLeft)
         (constSubMeasFamily (completeAtOutcome P.toSubMeas a0).toSubMeas.liftLeft)
         (orthonormalizeAndCompleteError ζ) := by
-    obtain ⟨Q, hQstmt⟩ :=
+    obtain ⟨Q, hQeq, hQstmt⟩ :=
       completingToMeasurement (Outcome := Outcome) (ι := ι) ψ hperm hψ
         A P.toSubMeas a0 (orthonormalizationError ζ) ζ hssc hClose
-    simpa [orthonormalizeAndCompleteError, hQstmt.completionFormula] using
+    simpa [orthonormalizeAndCompleteError, hQeq] using
       hQstmt.closenessAfterCompletion
-  refine ⟨P, completeAtOutcomeProj P a0, ?_⟩
+  refine ⟨P, completeAtOutcomeProj P a0, rfl, ?_⟩
   refine
     { orthonormalizationCloseness := hClose
-      completionFormula := rfl
       completedCloseness := ?_ }
   simpa using hCompletedCloseness
 

@@ -122,7 +122,11 @@ noncomputable def fromHToGRecurrenceError (params : Parameters)
   2 * Real.rpow (2 * zeta) (1 / (2 : Error)) +
     2 * Real.rpow (commuteGHalfSandwichError params gamma zeta k) (1 / (2 : Error))
 
-/-- Output package for `thm:ld-pasting`. -/
+/-- Analytic conclusion for `thm:ld-pasting` once a witness `H` has been fixed.
+
+The theorem `ldPasting` separately records that the chosen witness is the
+canonical construction `constructedPastedMeasurement params family k`, so this
+structure stores only the paper-facing quantitative conclusion. -/
 structure LdPastingConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -130,8 +134,6 @@ structure LdPastingConclusion (params : Parameters)
     (H : Measurement (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   largeEnough : 400 * params.m * params.d ≤ k
-  constructedMeasurement :
-    H = constructedPastedMeasurement params family k
   -- Naming note: this is not a `ν` field from the paper. The point-consistency
   -- bound here continues to use the induction-section error term, while `ν`
   -- tracks the completeness loss below.
@@ -142,7 +144,12 @@ structure LdPastingConclusion (params : Parameters)
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta)
 
-/-- Output package for `lem:ld-pasting-sub-measurement`. -/
+/-- Analytic conclusion for `lem:ld-pasting-sub-measurement` once a witness `H`
+has been fixed.
+
+The theorem `ldPastingSubMeas` separately records that the chosen witness is the
+canonical construction `constructedPastedSubMeas params family k`, so this
+structure stores only the quantitative properties proved about that witness. -/
 structure LdPastingSubMeasConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -150,8 +157,6 @@ structure LdPastingSubMeasConclusion (params : Parameters)
     (H : SubMeas (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   largeEnough : 400 * params.m * params.d ≤ k
-  constructedSubMeas :
-    H = constructedPastedSubMeas params family k
   -- Naming note: this is not a `ν` field from the paper. The point-consistency
   -- bound here is the paper's intermediate `ν`, while the completeness field
   -- carries the missing-mass term needed for the final `σ` after completion.

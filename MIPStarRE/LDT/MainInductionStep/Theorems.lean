@@ -176,7 +176,7 @@ theorem ldPastingInInductionSection
     Pasting.ldPasting params strategy eps delta gamma kappa zeta
       hgood _hgamma_le _hzeta_le _hdq_le
       family hcomplete hcons hself hbound k hk_pos hk
-  obtain ⟨H, hH⟩ := hldPasting
+  obtain ⟨H, _hHdef, hH⟩ := hldPasting
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 

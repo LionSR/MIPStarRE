@@ -79,8 +79,9 @@ lemma ldPastingSubMeas
     (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : SubMeas (Polynomial params.next) ι,
-      LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
-  refine ⟨constructedPastedSubMeas params family k, ?_⟩
+      H = constructedPastedSubMeas params family k ∧
+        LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
+  refine ⟨constructedPastedSubMeas params family k, rfl, ?_⟩
   have hconsistency :=
     hAConsistency_submeas params strategy eps delta gamma kappa zeta
       hgood hgamma_le hzeta_le hdq_le
@@ -91,7 +92,6 @@ lemma ldPastingSubMeas
       family hcomplete hcons hself hbound k hk_pos hk
   exact
     { largeEnough := hk
-      constructedSubMeas := rfl
       pointConsistency := hconsistency
       completeness := hcompleteness.completenessBound }
 
@@ -114,8 +114,9 @@ theorem ldPasting
     (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
-      LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  refine ⟨constructedPastedMeasurement params family k, ?_⟩
+      H = constructedPastedMeasurement params family k ∧
+        LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
+  refine ⟨constructedPastedMeasurement params family k, rfl, ?_⟩
   have hsubmeasConsistency :=
     hAConsistency_submeas params strategy eps delta gamma kappa zeta
       hgood hgamma_le hzeta_le hdq_le
@@ -129,7 +130,6 @@ theorem ldPasting
       family k hsubmeasConsistency hcompleteness.completenessBound
   exact
     { largeEnough := hk
-      constructedMeasurement := rfl
       pointConsistency := hconsistency }
 
 end MIPStarRE.LDT.Pasting
