@@ -174,11 +174,16 @@ noncomputable def PrimePowerFieldSpec.toFieldModel (params : Parameters)
       equiv := Fintype.equivFinOfCardEq hcard }
 
 /-- The canonical field model associated to the paper-faithful prime-power data
-stored in `params`. We keep the priority low so that more specific transports,
-such as the `params.next` reuse below, preserve an already chosen model. -/
+stored in `params`. Its priority `100` is deliberately lower than the
+`params.next` transport instance's priority `200` below, so instance search
+reuses an already chosen model when one is available. This instance is
+noncomputable because the coding equivalence to `Fin q` is obtained from finite
+cardinality data. -/
 noncomputable instance (priority := 100) (params : Parameters) : FieldModel params.q :=
   PrimePowerFieldSpec.toFieldModel params (Parameters.primePowerFieldSpec params)
 
+/-- Reuse an already chosen field model for successor parameters. Its priority
+`200` is intentionally higher than the canonical `100` above. -/
 instance (priority := 200) {params : Parameters} [inst : FieldModel params.q] :
     FieldModel params.next.q := by
   simpa [Parameters.next] using inst
