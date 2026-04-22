@@ -23,6 +23,7 @@ import MIPStarRE.LDT.Preliminaries.ComparisonCore
 import MIPStarRE.LDT.Preliminaries.DistanceBounds
 import MIPStarRE.LDT.Preliminaries.ConsistencyBridges
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
+import MIPStarRE.LDT.Preliminaries.Completion
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Core
