@@ -28,8 +28,6 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-set_option maxHeartbeats 1000000
-
 /-- `thm:main-induction`. -/
 theorem mainInduction
     (params : Parameters)
@@ -215,7 +213,7 @@ private lemma min_le_rpow_of_nonneg_of_exponent_le_one {x c : Error}
     simpa using Real.rpow_le_rpow (by positivity) (le_of_not_ge hx1) hc_nonneg
 
 private lemma le_one_of_rpow_le_one {x c : Error}
-    (_hx_nonneg : 0 ≤ x) (hc_pos : 0 < c) (h : Real.rpow x c ≤ 1) :
+    (hc_pos : 0 < c) (h : Real.rpow x c ≤ 1) :
     x ≤ 1 := by
   by_contra hx_gt
   have hx_gt' : 1 < x := lt_of_not_ge hx_gt
@@ -540,6 +538,70 @@ private lemma mainInductionNu_lt_one_of_mainInductionError_lt_one
     exact lt_of_le_of_lt hnu_le hsmall
   · linarith
 
+private lemma mainInductionCoeff_ge_one
+    (params : Parameters) {k : ℕ}
+    (hk0 : k ≠ 0) :
+    (1 : Error) ≤
+      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
+  have hk_one : (1 : Error) ≤ (k : Error) := by
+    have hk_nat_one : 1 ≤ k := Nat.succ_le_of_lt (Nat.pos_of_ne_zero hk0)
+    exact_mod_cast hk_nat_one
+  have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
+    exact_mod_cast params.next.hm
+  have hk_sq_ge_one : (1 : Error) ≤ ((k : Error) ^ (2 : ℕ)) := by
+    nlinarith [hk_one]
+  have hm_sq_ge_one : (1 : Error) ≤ ((params.next.m : Error) ^ (2 : ℕ)) := by
+    nlinarith [hm_one]
+  nlinarith
+
+private lemma le_one_of_mainInductionError_lt_one_of_scaled_bound
+    (params : Parameters) {k : ℕ} {eps delta gamma x : Error}
+    (hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (hscaled_le :
+      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
+          Real.rpow x (1 / (1024 : Error)) ≤
+        mainInductionNu params.next k eps delta gamma) :
+    x ≤ 1 := by
+  have hk0 :=
+    k_ne_zero_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
+  have hcoef_ge_one := mainInductionCoeff_ge_one params hk0
+  have hnu_lt :=
+    mainInductionNu_lt_one_of_mainInductionError_lt_one
+      params.next k eps delta gamma hsmall
+  have hroot_lt : Real.rpow x (1 / (1024 : Error)) < 1 := by
+    by_contra hroot
+    have hroot_ge : 1 ≤ Real.rpow x (1 / (1024 : Error)) :=
+      le_of_not_gt hroot
+    have : 1 ≤
+        1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
+          Real.rpow x (1 / (1024 : Error)) := by
+      nlinarith [hcoef_ge_one]
+    linarith
+  exact le_one_of_rpow_le_one (by positivity) hroot_lt.le
+
+private lemma selfImprovementCoeff_ge_one
+    (params : Parameters) :
+    (1 : Error) ≤ 3000 * (params.next.m : Error) := by
+  have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
+    exact_mod_cast params.next.hm
+  nlinarith
+
+private lemma le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
+    (params : Parameters) {eps delta gamma x : Error}
+    (hzeta_le : selfImprovementInInductionError params.next eps delta gamma ≤ 1)
+    (hscaled_le :
+      3000 * (params.next.m : Error) * Real.rpow x (1 / (32 : Error)) ≤
+        selfImprovementInInductionError params.next eps delta gamma) :
+    x ≤ 1 := by
+  have hcoef_ge_one := selfImprovementCoeff_ge_one params
+  have hroot_le_one : Real.rpow x (1 / (32 : Error)) ≤ 1 := by
+    by_contra hroot
+    have hroot_gt : 1 < Real.rpow x (1 / (32 : Error)) := lt_of_not_ge hroot
+    have : 1 < 3000 * (params.next.m : Error) * Real.rpow x (1 / (32 : Error)) := by
+      nlinarith [hcoef_ge_one]
+    linarith [hscaled_le, hzeta_le]
+  exact le_one_of_rpow_le_one (by positivity) hroot_le_one
+
 private lemma eps_le_one_of_mainInductionError_lt_one
     (params : Parameters)
     [FieldModel params.q]
@@ -548,27 +610,11 @@ private lemma eps_le_one_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     eps ≤ 1 := by
-  have hk0 := k_ne_zero_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
-  have hnu_lt :=
-    mainInductionNu_lt_one_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
   have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
   have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
   have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
-  have hcoef_ge_one :
-      (1 : Error) ≤
-        1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
-    have hk_one : (1 : Error) ≤ (k : Error) := by
-      have hk_nat_one : 1 ≤ k := Nat.succ_le_of_lt (Nat.pos_of_ne_zero hk0)
-      exact_mod_cast hk_nat_one
-    have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
-      exact_mod_cast params.next.hm
-    have hk_sq_ge_one : (1 : Error) ≤ ((k : Error) ^ (2 : ℕ)) := by
-      nlinarith [hk_one]
-    have hm_sq_ge_one : (1 : Error) ≤ ((params.next.m : Error) ^ (2 : ℕ)) := by
-      nlinarith [hm_one]
-    nlinarith
   have hrest_nonneg :
       0 ≤ Real.rpow delta (1 / (1024 : Error)) +
             Real.rpow gamma (1 / (1024 : Error)) +
@@ -597,19 +643,9 @@ private lemma eps_le_one_of_mainInductionError_lt_one
       positivity
     have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
     simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
-  have heps_scaled_lt :
-      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
-          Real.rpow eps (1 / (1024 : Error)) < 1 :=
-    lt_of_le_of_lt heps_scaled_le hnu_lt
-  have heps_root_lt : Real.rpow eps (1 / (1024 : Error)) < 1 := by
-    by_contra hroot
-    have hroot_ge : 1 ≤ Real.rpow eps (1 / (1024 : Error)) := le_of_not_gt hroot
-    have : 1 ≤
-        1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
-          Real.rpow eps (1 / (1024 : Error)) := by
-      nlinarith [hcoef_ge_one]
-    linarith
-  exact le_one_of_rpow_le_one heps_nonneg (by positivity) heps_root_lt.le
+  exact
+    le_one_of_mainInductionError_lt_one_of_scaled_bound
+      params hsmall heps_scaled_le
 
 private lemma delta_le_one_of_mainInductionError_lt_one
     (params : Parameters)
@@ -619,27 +655,11 @@ private lemma delta_le_one_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     delta ≤ 1 := by
-  have hk0 := k_ne_zero_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
-  have hnu_lt :=
-    mainInductionNu_lt_one_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
   have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
   have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
   have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
-  have hcoef_ge_one :
-      (1 : Error) ≤
-        1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
-    have hk_one : (1 : Error) ≤ (k : Error) := by
-      have hk_nat_one : 1 ≤ k := Nat.succ_le_of_lt (Nat.pos_of_ne_zero hk0)
-      exact_mod_cast hk_nat_one
-    have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
-      exact_mod_cast params.next.hm
-    have hk_sq_ge_one : (1 : Error) ≤ ((k : Error) ^ (2 : ℕ)) := by
-      nlinarith [hk_one]
-    have hm_sq_ge_one : (1 : Error) ≤ ((params.next.m : Error) ^ (2 : ℕ)) := by
-      nlinarith [hm_one]
-    nlinarith
   have hrest_nonneg :
       0 ≤ Real.rpow eps (1 / (1024 : Error)) +
             Real.rpow gamma (1 / (1024 : Error)) +
@@ -668,19 +688,9 @@ private lemma delta_le_one_of_mainInductionError_lt_one
       positivity
     have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
     simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
-  have hdelta_scaled_lt :
-      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
-          Real.rpow delta (1 / (1024 : Error)) < 1 :=
-    lt_of_le_of_lt hdelta_scaled_le hnu_lt
-  have hdelta_root_lt : Real.rpow delta (1 / (1024 : Error)) < 1 := by
-    by_contra hroot
-    have hroot_ge : 1 ≤ Real.rpow delta (1 / (1024 : Error)) := le_of_not_gt hroot
-    have : 1 ≤
-        1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
-          Real.rpow delta (1 / (1024 : Error)) := by
-      nlinarith [hcoef_ge_one]
-    linarith
-  exact le_one_of_rpow_le_one hdelta_nonneg (by positivity) hdelta_root_lt.le
+  exact
+    le_one_of_mainInductionError_lt_one_of_scaled_bound
+      params hsmall hdelta_scaled_le
 
 private lemma three_le_k_sq_mul_next_m_of_hsmall
     (params : Parameters)
@@ -782,27 +792,11 @@ private lemma gamma_le_one_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     gamma ≤ 1 := by
-  have hk0 := k_ne_zero_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
-  have hnu_lt :=
-    mainInductionNu_lt_one_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
   have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
   have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
   have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
-  have hcoef_ge_one :
-      (1 : Error) ≤
-        1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
-    have hk_one : (1 : Error) ≤ (k : Error) := by
-      have hk_nat_one : 1 ≤ k := Nat.succ_le_of_lt (Nat.pos_of_ne_zero hk0)
-      exact_mod_cast hk_nat_one
-    have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
-      exact_mod_cast params.next.hm
-    have hk_sq_ge_one : (1 : Error) ≤ ((k : Error) ^ (2 : ℕ)) := by
-      nlinarith [hk_one]
-    have hm_sq_ge_one : (1 : Error) ≤ ((params.next.m : Error) ^ (2 : ℕ)) := by
-      nlinarith [hm_one]
-    nlinarith
   have hrest_nonneg :
       0 ≤ Real.rpow eps (1 / (1024 : Error)) +
             Real.rpow delta (1 / (1024 : Error)) +
@@ -831,19 +825,9 @@ private lemma gamma_le_one_of_mainInductionError_lt_one
       positivity
     have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
     simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
-  have hgamma_scaled_lt :
-      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
-          Real.rpow gamma (1 / (1024 : Error)) < 1 :=
-    lt_of_le_of_lt hgamma_scaled_le hnu_lt
-  have hgamma_root_lt : Real.rpow gamma (1 / (1024 : Error)) < 1 := by
-    by_contra hroot
-    have hroot_ge : 1 ≤ Real.rpow gamma (1 / (1024 : Error)) := le_of_not_gt hroot
-    have : 1 ≤
-        1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
-          Real.rpow gamma (1 / (1024 : Error)) := by
-      nlinarith [hcoef_ge_one]
-    linarith
-  exact le_one_of_rpow_le_one hgamma_nonneg (by positivity) hgamma_root_lt.le
+  exact
+    le_one_of_mainInductionError_lt_one_of_scaled_bound
+      params hsmall hgamma_scaled_le
 
 private lemma dq_le_q_of_mainInductionError_lt_one
     (params : Parameters)
@@ -853,27 +837,11 @@ private lemma dq_le_q_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     params.d ≤ params.q := by
-  have hk0 := k_ne_zero_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
-  have hnu_lt :=
-    mainInductionNu_lt_one_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
   have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
   have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
   have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
-  have hcoef_ge_one :
-      (1 : Error) ≤
-        1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
-    have hk_one : (1 : Error) ≤ (k : Error) := by
-      have hk_nat_one : 1 ≤ k := Nat.succ_le_of_lt (Nat.pos_of_ne_zero hk0)
-      exact_mod_cast hk_nat_one
-    have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
-      exact_mod_cast params.next.hm
-    have hk_sq_ge_one : (1 : Error) ≤ ((k : Error) ^ (2 : ℕ)) := by
-      nlinarith [hk_one]
-    have hm_sq_ge_one : (1 : Error) ≤ ((params.next.m : Error) ^ (2 : ℕ)) := by
-      nlinarith [hm_one]
-    nlinarith
   have hrest_nonneg :
       0 ≤ Real.rpow eps (1 / (1024 : Error)) +
             Real.rpow delta (1 / (1024 : Error)) +
@@ -901,30 +869,13 @@ private lemma dq_le_q_of_mainInductionError_lt_one
       positivity
     have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
     simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
-  have hratio_scaled_lt :
-      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
-          Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) < 1 :=
-    lt_of_le_of_lt hratio_scaled_le hnu_lt
-  have hratio_root_lt :
-      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) < 1 := by
-    by_contra hroot
-    have hroot_ge :
-        1 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) :=
-      le_of_not_gt hroot
-    have : 1 ≤
-        1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
-          Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
-      nlinarith [hcoef_ge_one]
-    linarith
   have hratio_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 := by
-    exact le_one_of_rpow_le_one hratio_nonneg (by positivity) hratio_root_lt.le
+    exact
+      le_one_of_mainInductionError_lt_one_of_scaled_bound
+        params hsmall hratio_scaled_le
   have hq_pos : (0 : Error) < (params.q : Error) := by
     exact_mod_cast params.hq
-  have hdq_real : (params.d : Error) ≤ (params.q : Error) := by
-    have hmul : (params.d : Error) ≤ 1 * (params.q : Error) := by
-      exact (div_le_iff₀ hq_pos).mp hratio_le_one
-    simpa using hmul
-  exact_mod_cast hdq_real
+  exact_mod_cast ((div_le_one hq_pos).1 hratio_le_one)
 
 private lemma eps_le_one_of_selfImprovementInInductionError_le_one
     (params : Parameters)
@@ -938,10 +889,6 @@ private lemma eps_le_one_of_selfImprovementInInductionError_le_one
   have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
-  have hcoef_ge_one : (1 : Error) ≤ 3000 * (params.next.m : Error) := by
-    have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
-      exact_mod_cast params.next.hm
-    nlinarith
   have hrest_nonneg :
       0 ≤ Real.rpow delta (1 / (32 : Error)) +
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
@@ -964,13 +911,9 @@ private lemma eps_le_one_of_selfImprovementInInductionError_le_one
       positivity
     have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
     simpa [selfImprovementInInductionError, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
-  have heps_root_le_one : Real.rpow eps (1 / (32 : Error)) ≤ 1 := by
-    by_contra hroot
-    have hroot_gt : 1 < Real.rpow eps (1 / (32 : Error)) := lt_of_not_ge hroot
-    have : 1 < 3000 * (params.next.m : Error) * Real.rpow eps (1 / (32 : Error)) := by
-      nlinarith [hcoef_ge_one]
-    linarith [heps_scaled_le, hzeta_le]
-  exact le_one_of_rpow_le_one heps_nonneg (by positivity) heps_root_le_one
+  exact
+    le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
+      params hzeta_le heps_scaled_le
 
 private lemma delta_le_one_of_selfImprovementInInductionError_le_one
     (params : Parameters)
@@ -980,14 +923,10 @@ private lemma delta_le_one_of_selfImprovementInInductionError_le_one
     (hgood : strategy.IsGood eps delta gamma)
     (hzeta_le : selfImprovementInInductionError params.next eps delta gamma ≤ 1) :
     delta ≤ 1 := by
-  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
   have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
-  have hcoef_ge_one : (1 : Error) ≤ 3000 * (params.next.m : Error) := by
-    have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
-      exact_mod_cast params.next.hm
-    nlinarith
   have hrest_nonneg :
       0 ≤ Real.rpow eps (1 / (32 : Error)) +
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
@@ -1010,13 +949,9 @@ private lemma delta_le_one_of_selfImprovementInInductionError_le_one
       positivity
     have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
     simpa [selfImprovementInInductionError, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
-  have hdelta_root_le_one : Real.rpow delta (1 / (32 : Error)) ≤ 1 := by
-    by_contra hroot
-    have hroot_gt : 1 < Real.rpow delta (1 / (32 : Error)) := lt_of_not_ge hroot
-    have : 1 < 3000 * (params.next.m : Error) * Real.rpow delta (1 / (32 : Error)) := by
-      nlinarith [hcoef_ge_one]
-    linarith [hdelta_scaled_le, hzeta_le]
-  exact le_one_of_rpow_le_one hdelta_nonneg (by positivity) hdelta_root_le_one
+  exact
+    le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
+      params hzeta_le hdelta_scaled_le
 
 /-! ## Main-induction bridge assembly
 
@@ -1385,6 +1320,9 @@ private lemma restricted_diag_nonneg
     (restrictedDiagonalFailureProbability_nonneg params (xRestrictedStrategy params strategy x))
     (profile.restrictedGood x).diagonalLineTest
 
+/-- Averaging the slice self-improvement errors gives the paper's displayed
+bound on `\mathbb{E}_x[\zeta_x]`, i.e. the first inequality from
+`inductive_step.tex:555-567`. -/
 private lemma average_sliceSelfImprovementError_le
     (params : Parameters)
     [FieldModel params.q]
@@ -1484,6 +1422,9 @@ private lemma average_sliceSelfImprovementError_le
     _ = selfImprovementInInductionError params.next eps delta gamma := by
           simp [selfImprovementInInductionError, Parameters.next]
 
+/-- Jensen/conditioning estimate controlling the averaged slice induction
+parameter `\mathbb{E}_x[\nu_x]` by the next-stage `\nu`, corresponding to the
+second displayed inequality in `inductive_step.tex:555-567`. -/
 private lemma average_sliceMainInductionNu_le
     (params : Parameters)
     [FieldModel params.q]
@@ -1621,6 +1562,9 @@ private lemma average_sliceMainInductionNu_le
     _ = mainInductionNu params.next k eps delta gamma := by
           simp [mainInductionNu, Parameters.next]
 
+/-- Averaging the recursive slice errors `\sigma_x` and telescoping the slice
+main-induction bound yields the paper's `\mathbb{E}_x[\sigma_x]` estimate used
+in the final pasting-package error calculation. -/
 private lemma average_sliceError_le
     (params : Parameters)
     [FieldModel params.q]
@@ -1657,6 +1601,9 @@ private lemma average_sliceError_le
           gcongr
           exact average_sliceMainInductionNu_le params strategy eps delta gamma k hgood hrestrict
 
+/-- Paper's `\eqref{eq:zeta-smaller-than-nu}`: under the small-parameter
+hypotheses, the averaged self-improvement interface error `\zeta` is bounded by
+the next-stage induction parameter `\nu`. -/
 private lemma selfImprovementInInductionError_le_mainInductionNu
     (params : Parameters)
     [FieldModel params.q]
@@ -2103,6 +2050,9 @@ private lemma family_pointConsistencyError_eq_avg
           simp [g, IdxPolyFamily.evaluatedAtNextPoint, polynomialEvaluationFamily,
             IdxProjMeas.toIdxSubMeas]
 
+-- The averaged slice-to-pasting assembly generates several large nonlinear
+-- arithmetic goals in the final telescoping estimate.
+set_option maxHeartbeats 1000000 in
 /-- The remaining averaged step from per-slice self-improvement data to the
 pasting hypotheses.
 
@@ -2267,7 +2217,7 @@ noncomputable def assemblePastingPackage
           · intro x g
             simpa [sub_nonneg] using hself.dominatesAveragePointOperator x g
         · intro x g
-          simpa using (SelfImprovementPackage.family_dominationTarget (pkg := hself) x g)
+          exact SelfImprovementPackage.family_dominationTarget (pkg := hself) x g
       error_le := by
         have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
         have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
@@ -2340,6 +2290,10 @@ noncomputable def assemblePastingPackage
                 -((k : Error) / (80000 * ((params.next.m : Error) ^ (2 : ℕ)))) := by
             nlinarith [hdiv]
           exact hneg
+        -- The paper uses the stronger coefficient estimate
+        -- `(1 + 1 / (100m)) * (m^2 + 3) ≤ (m + 1)^2`, which needs `m ≥ 2`.
+        -- For the Lean telescoping inequality we only need this weaker variant,
+        -- which already holds for every `m ≥ 1`.
         have hcoef_nu :
             ((((params.m : Error) ^ (2 : ℕ)) + 1) *
                 (1 + 1 / (100 * (params.m : Error))) + 2 / 5 : Error) ≤
@@ -2361,15 +2315,13 @@ noncomputable def assemblePastingPackage
               ((params.next.m : Error) ^ (2 : ℕ)) := by
           have hm0 : (params.m : Error) ≠ 0 := by
             exact_mod_cast Nat.ne_of_gt params.hm
-          have hm_one : (1 : Error) ≤ (params.m : Error) := by
-            exact_mod_cast params.hm
           have hnext_eq : (params.next.m : Error) = (params.m : Error) + 1 := by
             norm_num [Parameters.next]
           rw [hnext_eq]
-          have hpoly : 0 ≤ 199 * ((params.m : Error) ^ (2 : ℕ)) + 100 * (params.m : Error) - 1 := by
-            nlinarith [hm_one]
+          have hsq : 0 ≤ ((params.m : Error) ^ (2 : ℕ)) := by
+            positivity
           field_simp [hm0]
-          nlinarith [hpoly]
+          nlinarith [hsq]
         have hnu_bound :
             ((((params.m : Error) ^ (2 : ℕ)) + 1) *
                 (1 + 1 / (100 * (params.m : Error))) + 2 / 5 : Error) * ν ≤
@@ -2527,10 +2479,16 @@ theorem mainInductionBaseCase
                 (AxisParallelLine.throughPoint (params := params) u i0)).toSubMeas)
               (fun f =>
                 f (AxisParallelLine.sampleParameter (params := params) u i0))).outcome a := by
-                exact strategy.axisParallelReparamInvariant
-                  (AxisParallelLine.throughPoint (params := params) u i0)
-                  (AxisParallelLine.sampleParameter (params := params) u i0)
-                  a
+                let haxisInv :
+                    AxisParallelEvaluationReparamInvariant params
+                      strategy.axisParallelMeasurement.toIdxProjMeas :=
+                  AxisParallelMeasurementTransportInvariant.toEvaluationReparamInvariant
+                    strategy.axisParallelMeasurement.transportInvariant
+                simpa using
+                  haxisInv
+                    (AxisParallelLine.throughPoint (params := params) u i0)
+                    (AxisParallelLine.sampleParameter (params := params) u i0)
+                    a
         _ = (postprocess
               ((strategy.axisParallelMeasurement canonicalLine).toSubMeas)
               (fun f => f (u i0))).outcome a := by
