@@ -36,22 +36,26 @@ abbrev ProbabilityDistribution (α : Type*) :=
   {𝒟 : Distribution α // 𝒟.IsProbability}
 
 /-- Total mass is nonnegative because each weight is nonnegative. -/
-theorem distributionTotalWeight_nonneg {α : Type*} (𝒟 : Distribution α) :
+theorem Distribution.totalWeight_nonneg {α : Type*} (𝒟 : Distribution α) :
     0 ≤ 𝒟.totalWeight := by
   unfold Distribution.totalWeight
   exact Finset.sum_nonneg fun a _ => 𝒟.nonnegative a
 
+namespace Distribution.IsProbability
+
 /-- Unpack the equality form of the probability invariant. -/
-theorem isProbability_weight_sum_eq_one {α : Type*}
+theorem weight_sum_eq_one {α : Type*}
     {𝒟 : Distribution α} (h𝒟 : 𝒟.IsProbability) :
     ∑ a ∈ 𝒟.support, 𝒟.weight a = 1 := by
   simpa [Distribution.IsProbability, Distribution.totalWeight] using h𝒟
 
 /-- A probability distribution has total weight at most `1`. -/
-theorem isProbability_weight_sum_le_one {α : Type*}
+theorem weight_sum_le_one {α : Type*}
     {𝒟 : Distribution α} (h𝒟 : 𝒟.IsProbability) :
-    ∑ a ∈ 𝒟.support, 𝒟.weight a ≤ 1 := by
-  exact le_of_eq (isProbability_weight_sum_eq_one h𝒟)
+    ∑ a ∈ 𝒟.support, 𝒟.weight a ≤ 1 :=
+  le_of_eq h𝒟.weight_sum_eq_one
+
+end Distribution.IsProbability
 
 /-- Average a scalar function against the stored finite support of a distribution. -/
 def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
@@ -129,11 +133,33 @@ theorem avgOver_const_of_isProbability {α : Type*} (𝒟 : Distribution α)
   calc
     avgOver 𝒟 (fun _ : α => c)
       = ∑ a ∈ 𝒟.support, 𝒟.weight a * c := by simp [avgOver]
-    _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) * c := by
-          rw [← Finset.sum_mul]
-    _ = 1 * c := by rw [isProbability_weight_sum_eq_one h𝒟]
-    _ = c := by ring
+    _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) * c := by rw [← Finset.sum_mul]
+    _ = c := by rw [h𝒟.weight_sum_eq_one, one_mul]
 
+namespace ProbabilityDistribution
+
+/-- Unpack the equality form of the bundled probability invariant. -/
+theorem weight_sum_eq_one {α : Type*} (𝒟 : ProbabilityDistribution α) :
+    ∑ a ∈ (𝒟 : Distribution α).support, (𝒟 : Distribution α).weight a = 1 := by
+  have h𝒟 : (𝒟 : Distribution α).IsProbability := 𝒟.2
+  exact h𝒟.weight_sum_eq_one
+
+/-- A bundled probability distribution has total weight at most `1`. -/
+theorem weight_sum_le_one {α : Type*} (𝒟 : ProbabilityDistribution α) :
+    ∑ a ∈ (𝒟 : Distribution α).support, (𝒟 : Distribution α).weight a ≤ 1 :=
+  le_of_eq 𝒟.weight_sum_eq_one
+
+/-- The total mass of a bundled probability distribution is nonnegative. -/
+theorem totalWeight_nonneg {α : Type*} (𝒟 : ProbabilityDistribution α) :
+    0 ≤ (𝒟 : Distribution α).totalWeight :=
+  (𝒟 : Distribution α).totalWeight_nonneg
+
+/-- Averaging a constant against a bundled probability distribution returns that constant. -/
+theorem avgOver_const {α : Type*} (𝒟 : ProbabilityDistribution α) (c : Error) :
+    avgOver (𝒟 : Distribution α) (fun _ : α => c) = c :=
+  avgOver_const_of_isProbability (𝒟 : Distribution α) 𝒟.2 c
+
+end ProbabilityDistribution
 
 /-- The weights of a uniform distribution sum to exactly `1`. -/
 theorem uniformDistribution_weight_sum_eq_one (α : Type*)
@@ -148,19 +174,24 @@ theorem uniformDistribution_isProbability (α : Type*)
   simpa [Distribution.IsProbability, Distribution.totalWeight] using
     uniformDistribution_weight_sum_eq_one α
 
+/-- The uniform distribution packaged as a bundled probability distribution. -/
+noncomputable def uniformProbabilityDistribution (α : Type*)
+    [Fintype α] [DecidableEq α] [Nonempty α] : ProbabilityDistribution α :=
+  ⟨uniformDistribution α, uniformDistribution_isProbability α⟩
+
 /-- The weights of a uniform distribution sum to at most `1`. -/
 theorem uniformDistribution_weight_sum_le_one (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] :
-    ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a ≤ 1 := by
-  exact le_of_eq (uniformDistribution_weight_sum_eq_one α)
+    ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a ≤ 1 :=
+  le_of_eq (uniformDistribution_weight_sum_eq_one α)
 
 /-- Averaging a constant against the uniform distribution on a nonempty finite type
 returns that constant. -/
 theorem avgOver_uniform_const {α : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α] (c : Error) :
     avgOver (uniformDistribution α) (fun _ : α => c) = c := by
-  exact avgOver_const_of_isProbability (uniformDistribution α)
-    (uniformDistribution_isProbability α) c
+  simpa [uniformProbabilityDistribution] using
+    (ProbabilityDistribution.avgOver_const (uniformProbabilityDistribution α) c)
 
 /-- Reindexing a uniform average along an equivalence preserves its value. -/
 theorem avgOver_uniform_equiv
