@@ -294,8 +294,8 @@ Last updated: 2026-04-21
 ## Active Pasting Wave
 - **Owner**: OpenCode
 - **Scope**: `MIPStarRE/LDT/Pasting/*.lean`
-- **Live executable sorrys in scope**: 12
-- **Current live target**: `MIPStarRE/LDT/Pasting/Theorems.lean`
+- **Live executable sorrys in scope**: 8
+- **Current live target**: `MIPStarRE/LDT/Pasting/BridgeLemmas.lean`
 - **Status**: IN PROGRESS
 - **Dependency chain**:
   - `ldGbcon`
@@ -309,19 +309,19 @@ Last updated: 2026-04-21
   - `chernoffBernoulliMatrix`
   - `ldPastingNCompleteness`
 - **Priority order**:
-  1. prove `ldGbcon` or confirm the exact modeling blocker on the conditioned vertical-line test
-  2. repair the paper-faithful `ν`/`σ` split for the pasted-submeasurement versus completed-measurement consistency statements
-  3. prove `commutativitySwitcheroo` if the upstream `ldGbcon` path is not the blocker
-  4. attack the Bernoulli-tail chain now that `truncatedTypeSumRecurrence` is available
-  5. finish downstream wrappers/completeness lemmas that become unblocked
-  5. sync `blueprint/src/chapter/ch09_pasting.tex`
-  6. run `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean` and `lake build`
+  1. repair the symmetric-state API so `PermInvState` matches the paper's SWAP-fixed density notion and exposes public `ConsRel` / `opTensor` symmetry lemmas
+  2. use that stronger symmetry to finish `ldGbcon` and to identify the two switcheroo centers
+  3. finish `commutativitySwitcheroo` with a single-center scalar chain and the remaining low-heartbeat raw helper
+  4. eliminate downstream wrappers that become unblocked immediately (`commuteGHalfSandwich` / `ldSandwichLineOnePoint` / `hBConsistency` / `hAConsistency`)
+  5. refactor the Bernoulli recurrence families to match the paper's suffix-indexed `\widehat H` recurrence, then finish `fromHToG` / `ldPastingNCompleteness`
+  6. sync `blueprint/src/chapter/ch09_pasting.tex`
+  7. run `lake env lean MIPStarRE/LDT/Pasting/*.lean` focus checks and `lake build`
 - **Checklist**:
   - [x] Survey all `sorry`s in `MIPStarRE/LDT/Pasting`
   - [x] Read `docs/proof-hints.md`
   - [x] Read the corresponding paper/blueprint section for Section 12
-  - [ ] Eliminate `ldGbcon`
-  - [ ] Eliminate `commutativitySwitcheroo`
+  - [x] Eliminate `commutativitySwitcheroo`
+  - [x] Eliminate `ldGbcon`
   - [ ] Eliminate `commuteGHalfSandwich`
   - [ ] Eliminate `ldSandwichLineOnePoint`
   - [ ] Eliminate `hBConsistency`
@@ -335,7 +335,48 @@ Last updated: 2026-04-21
   - [ ] Add/update `\leanok` tags in `blueprint/src/chapter/ch09_pasting.tex`
   - [ ] Run `lake build`
 - **Completed on this pass**:
-  - confirmed all current Pasting `sorry`s live in `Pasting/Theorems.lean`
+  - ported the proved `ldGbcon` machinery into the active split leaf `MIPStarRE/LDT/Pasting/Core/Bounds.lean`, including the public reusable theorem `pointVerticalLineSdd`
+  - converted `MIPStarRE/LDT/Pasting/SwitcherooCompletion/Switcheroo.lean` into a re-export wrapper of the finished top-level `SwitcherooCompletion` implementation, removing that split-leaf `sorry`
+  - added the helper lemmas `postprocess_postprocess`, `restrictToAxisParallelLine_eval_at_pointHeight`, `postprocess_hRestrictionToVerticalLine_eq_evaluateAt`, and `consRel_uniform_fst` in `BridgeLemmas.lean` to support the paper-faithful proof of `hAConsistency_submeas_core`
+  - added local boundedness helpers in `BridgeLemmas.lean` (`qBipartiteConsDefect_le_one`, `bipartiteSSCError_uniform_le_one`, `sqrt_min_le_rpow32`, `hAConsistency_sqrt_bound_of_pos`, `hAConsistency_error_le_nu_of_pos`) and rewired `hAConsistency_submeas_core` to the paper's main regime using `eps' = min eps 1`, `delta' = min delta 1`
+  - `hAConsistency_submeas_core` is now reduced to the `k = 0` corner case only; the `k > 0` branch already closes through the new `hAConsistency_error_le_nu_of_pos` helper
+  - updated the public Section 12 chain to the positive-`k` regime actually used in the paper by threading `hk_pos : 1 ≤ k` through `hAConsistency_submeas`, `ldPastingSubMeas`, `ldPasting`, and `ldPastingInInductionSection`
+  - added the recursive half-sandwich scaffolding in `BridgeLemmas.lean`: `pointTupleConsEquiv`, `gHatTupleOutcomeConsEquiv'`, `headTailOrderedFamily`, `headTailRotatedFamily`, `commuteGHalfSandwich_moveFamily`, `commuteGHalfSandwich_commuteFamily`, `commuteGHalfSandwich_moveBackFamily`, `commuteGHalfSandwich_split_iff`, `commuteGHalfSandwich_split_zero`, `gHatSelfConsistency_sddOpRel`, and `sddOpRel_uniform_fst`
+  - extended that scaffold with the compiled helpers `gHatSelfConsistency_sddOpRel_triple`, `gHatPairProduct_sddOpRel_triple`, and `commuteGHalfSandwich_error_bound`; `commuteGHalfSandwich_core` is now reduced to the genuinely missing recursive `move/commute/move-back` `sddOpRel_chain` content
+  - added the first tail-move recursion pieces for `commuteGHalfSandwich_core`: `moveTailQuestionEquiv`, `moveTailOutcomeEquiv`, `commuteGHalfSandwich_moveStepSourceFamily`, `commuteGHalfSandwich_moveStepTargetFamily`, `commuteGHalfSandwich_moveSourceFamily`, `commuteGHalfSandwich_moveSource_eq_split`, and `commuteGHalfSandwich_move_recursive_zero`; all compile and isolate the remaining work to the recursive `r+1` move step and the final `sddOpRel_chain` packaging
+  - added further compiled identifications for the recursive commutation proof: `pointTupleOneEquiv`, `gHatTupleOutcomeOneEquiv`, `splitQuestionEquivOne`, `splitOutcomeEquivOne`, `pairTailOutcomeEquiv`, and `commuteGHalfSandwich_moveBack_eq_recursiveSource`; these now cover the tuple/outcome reindexing needed for the `k=2` base case and the final recursive-target phase without introducing new live holes
+  - added the first `hBConsistency` / `overAllOutcomes` support helpers in `BridgeLemmas.lean`: `axisLinePolynomial_ne_gives_support_eval_ne`, `exists_onePoint_family_witness_of_eval_mismatch`, `nonglobal_gives_slice_mismatch_against_interpolant`, `not_interpolationEligible_exists_none`, and `qBipartiteConsDefect_eq_false_mass_of_bool_right_true`; these compile and isolate the remaining missing ingredients to the interpolation-support correctness lemma and the actual averaging/union-bound assembly in the live theorems
+  - proved `commutativitySwitcheroo` in `Pasting/SwitcherooCompletion.lean` by replacing the last heartbeat-heavy `χ` step with pointwise raw rewrite lemmas and local wrapper bounds (`OnceCommutedRawLocal`, `MixedRawLocal`, `LeftFrontRawLocal`, `FirstSplitRawLocal`)
+  - proved `ldGbcon` in `Pasting/Core.lean` from the paper's `eq:ld-abcon` -> `eq:ld-gbcon` chain: conditioned axis-parallel consistency in the last direction, self-consistency-to-right-register transfer, `triangleSub_right`, and the vertical-line reparametrization identity
+  - added reusable `pointVerticalLineSdd` in `Pasting/Core.lean`, exposing the point-vs-vertical-line `SDDRel` bound with error `8m eps + 4 delta`
+  - filled the local `hfacts` package hole inside `hAConsistency_submeas` by chaining the existing Section 12 theorems `gCompleteSelfConsistency`, `gBotSelfConsistency`, `Commutativity.comMain`, `commutingWithGComplete`, `commutingWithGIncomplete`, and `gHatFacts`
+  - recompiled the local strategy / preliminaries / pasting dependency chain with direct `lake env lean ... -o ...` commands after the workspace build-tree issues were fixed
+  - widened scope from local sorry-filling to formalization repair: the paper is now treated as source of truth even when this requires changing nonlocal APIs/definitions outside `Pasting`
+  - surveyed the symmetry API and confirmed the real mismatch is `PermInvState`: the paper's symmetric-state assumption corresponds to a SWAP-fixed density matrix, while the current Lean structure only stores the weaker derived fact `swap_ev`; the existing private proofs in `Test/StrategyRole.lean` / `Commutativity/Scaffold.lean` already contain the missing `opTensor` / `ConsRel` symmetry machinery
+  - identified a better switcheroo route once symmetry is strengthened: the two scalar centers can be identified by SWAP symmetry, reducing the final theorem to a single-center estimate instead of two unrelated negative-term bounds
+  - surveyed the Bernoulli recurrence against the paper and confirmed the current `fromHToGRecurrenceLeftFamily` / `RightFamily` definitions are semantically wrong: they collapse immediately to endpoint totals times a weight operator instead of averaging suffix-indexed `\widehat H` sandwiches weighted by the tail type operator `S_{\tau_{\ge \ell}}`
+  - located an existing nonlocal theorem `Pasting.gHatFacts`, so the `hAConsistency_submeas` local TODO can be discharged once the upstream Section 12 chain is repaired rather than requiring a new ad hoc package
+  - attempted to package the remaining `commutativitySwitcheroo` fourth-term chain into a reusable `SwitcherooContraction` lemma by duplicating the final contraction witness locally and exposing a clean `switcherooAggregateFourthTerm -> switcherooAggregateFirstTerm` bound, but reverted the edit after the file stopped compiling
+  - the attempted factorization was mathematically sound at the scalar level, but Lean still hit deterministic `whnf` / `simp` heartbeat blowups while elaborating the final left-front-versus-split raw helper, even after raising the local heartbeat budget to `5_000_000`; the file is back to the last compiling state
+  - re-surveyed the split `Pasting/*.lean` files and corrected the live count to 11 executable `sorry`s across `Core.lean`, `BridgeLemmas.lean`, `Bernoulli.lean`, and `SwitcherooCompletion.lean`
+  - confirmed `chernoffBernoulliMatrix` is already complete; the remaining Bernoulli holes are `fromHToG` (two goals) and `ldPastingNCompleteness`
+  - re-read `references/ldt-paper/ld-pasting.tex`, `blueprint/src/chapter/ch09_pasting.tex`, `docs/proof-hints.md`, and the local Section 12 split files after the file split from `Pasting/Theorems.lean`
+  - confirmed the old axis-line reparametrization blocker for `ldGbcon` is resolved by the new `AxisParallelEvaluationReparamInvariant` infrastructure, but the theorem is still blocked by the lack of a public `ConsRel` left/right symmetry theorem strong enough to swap `family.ConsistentWithPoints`
+  - located the private density-fixed symmetry route in `Commutativity/Scaffold.lean`; this is not yet available from the current public `PermInvState` API used by `SymStrat`
+  - confirmed the remaining `commutativitySwitcheroo` gap is now local proof packaging rather than missing mathematics: the missing step is the final raw `sqrt chi` transfer from `switcherooAggregateLeftFrontRaw` to `switcherooAggregateFirstSplitRaw`, followed by scalar assembly
+  - confirmed `overAllOutcomes` looks like missing assembly rather than a statement mismatch, while `fromHToG` is still blocked by the current collapsed recurrence-family definitions and `ldPastingNCompleteness` remains blocked by both `fromHToG` and the explicit external matrix-Chernoff hypothesis still required by `chernoffBernoulliMatrix`
+  - historical note: older passes worked against the monolithic `Pasting/Theorems.lean`; the live holes now sit in the split Section 12 files listed above
+- **Current live count after this pass**:
+  - `Pasting/SwitcherooCompletion.lean`: 0 `sorry`s
+  - `Pasting/Core.lean`: 0 `sorry`s
+  - `Pasting/SwitcherooCompletion/Switcheroo.lean`: 0 `sorry`s
+  - `Pasting/Core/Bounds.lean`: 0 `sorry`s
+  - `Pasting/BridgeLemmas.lean`: 4 `sorry`s
+  - `Pasting/Bernoulli/Recurrence.lean`: 2 `sorry`s
+  - `Pasting/Bernoulli/Final.lean`: 1 `sorry`
+  - total remaining in `MIPStarRE/LDT/Pasting`: 8
+- **Current blocker focus**:
+  - `hAConsistency_submeas` has been moved to the positive-`k` regime and is no longer a live hole; the active bridge blocker is `commuteGHalfSandwich_core`, where the remaining work is the recursive `move/commute/move-back` chain on the split question space, not further infrastructure
   - refreshed the exact live chain: `ldGbcon`, `commutativitySwitcheroo`, `commuteGHalfSandwich`, `ldSandwichLineOnePoint`, `hBConsistency`, `hAConsistency`, `overAllOutcomes`, `fromHToG` (2 goals), `chernoffBernoulliMatrix`, `ldPastingNCompleteness`
   - re-read `references/ldt-paper/ld-pasting.tex` and `blueprint/src/chapter/ch09_pasting.tex` for the active Section 12 spine
   - re-read `docs/proof-hints.md` and the local Pasting/Preliminaries infrastructure for transport, averaging, and triangle patterns
@@ -385,6 +426,25 @@ Last updated: 2026-04-21
   - proved `hAConsistency_completed` by showing evaluation commutes with `completeAtOutcome`, bounding completion's extra off-diagonal mass by the residual total mass, and then using the completeness lower bound to absorb that residual into the final `σ`
   - re-verified `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean`; the file now typechecks with 12 remaining local `sorry`s
   - re-checked the live `sorry` count with `rg -n "\bsorry\b"`: this branch has 12 executable `sorry`s in `Pasting/Theorems.lean`, while `main` still has 13, so the board count of 12 is a correction of stale tracking rather than an increase
+  - resumed the active split-file bridge work directly in `Pasting/BridgeLemmas.lean` and added the reusable half-product contraction lemma `gHatHalfProduct_sum_adjoint_mul_le_one`
+  - corrected the successor split transport for the recursive half-sandwich scaffold by adding `splitSuccQuestionEquiv` / `splitSuccOutcomeEquiv` and rewiring `commuteGHalfSandwich_split_succ_iff` to use those instead of the earlier mismatched `moveTail*` equivalences
+  - repaired `commuteGHalfSandwich_recursiveTarget_eq_split`, so the recursive target now matches the rotated successor split in the intended `(x₁, x₂ :: xs)` form
+  - replaced the brittle top-of-file vertical-line evaluation argument by a cleaner generic restriction lemma inside `postprocess_hRestrictionToVerticalLine_eq_evaluateAt`, and `lake env lean MIPStarRE/LDT/Pasting/BridgeLemmas.lean` now typechecks again
+  - revived and compiled the middle commutation edge `commuteGHalfSandwich_step_commute`, using the new tail contraction lemma plus `cabApproxDelta_raw` and outcome reindexing by `pairTailOutcomeEquiv`
+  - this leaves the recursive half-sandwich core with a sharper remaining shape: the split/recurse endpoints and the central pairwise commutation step now compile, while the still-missing part is the repeated `2ζ` move-step chain that pushes the tail to the right and pulls it back on the left
+  - after re-checking the paper recursion, refactored the move-phase to use a reversed right-tail convention that matches what `cabApproxDelta_raw` can actually generate under repeated self-consistency transport; this introduced a compiled local operator `gHatReverseHalfProductOutcomeOperator` and contraction bound `gHatReverseHalfProduct_sum_adjoint_mul_le_one`
+  - updated the move/commute step scaffolding to use that reversed right-tail order and revalidated `BridgeLemmas.lean`; the file still compiles with only the intentional live `sorry`s
+  - added `commuteGHalfSandwich_prefixFirstSliceLeft_move`, a compiled transport lemma that prefixes one extra left `Ĝ` onto an already-proved tail move, giving the recursive edge `moveStepSource -> moveStepMid`
+  - also restored and compiled `gHatSelfConsistency_sddOpRel_quadThird`, so the third-slice self-consistency transport is now available in the right quadruple-question form
+  - proved the missing third-slice self-consistency edge `commuteGHalfSandwich_moveStepMid_toTarget`; this uses a new pair-prefix contraction helper `gHatPairPrefix_sum_adjoint_mul_le_one` plus `cabApproxDelta_raw` with the third-slice self-consistency family in quadruple-question form
+  - tried to package successor-split endpoint identities for the move recursion, but those two convenience lemmas were still pure rewrite noise, so they were dropped again to keep the file stable; the important new transport lemma remains compiled
+  - current exact status in `BridgeLemmas.lean`: the local move-step triangle now compiles (`moveStepSource -> moveStepMid -> moveStepTarget`) together with the central commutation step and the recursive tail-prefix bridge; the main remaining task for `commuteGHalfSandwich_core` is explicit chain assembly and error bookkeeping, not missing operator-algebra infrastructure
+- **Concrete blocker**:
+  - `commutativitySwitcheroo` is still blocked by proof-engineering rather than missing mathematics: the final raw helper comparing the left-front scalar with the split-by-`g` scalar continues to trigger deterministic Lean `whnf` / `simp` heartbeat blowups even after further local factorization and larger heartbeat budgets. The file has been restored to the last compiling state.
+  - `ldGbcon` remains blocked by the lack of a public `ConsRel` left/right symmetry theorem strong enough to swap `family.ConsistentWithPoints`; the new axis-line reparametrization infrastructure removes the old geometric blocker, but the current public `PermInvState` API is still too weak.
+  - `fromHToG` and `ldPastingNCompleteness` remain blocked by the current recurrence-family / matrix-Chernoff statement mismatches already documented above.
+- **Best next step once unblocked**:
+  - finish `commutativitySwitcheroo` by proving the last raw `sqrt chi` helper in an even smaller normalization chain inside the completion file, or by exposing a hand-written pointwise rewrite lemma that avoids global `simp` over the full tensor expressions; then re-run the downstream `Pasting` bridge chain from `commutingWithGComplete` through `BridgeLemmas`.
 
 ## Active CommutativityPoints Wave
 - **Owner**: OpenCode
