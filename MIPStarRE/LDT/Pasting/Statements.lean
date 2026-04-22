@@ -358,8 +358,8 @@ noncomputable def fromHToGRecurrenceLeftMass (params : Parameters)
     (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : Error :=
-  ev ψbi ((IdxOpFamily.liftLeft
-    (fromHToGRecurrenceLeftFamily params strategy family k ℓ τ)) ().total)
+  ev ψbi (((IdxOpFamily.liftLeft
+    (fromHToGRecurrenceLeftFamily params strategy family k ℓ τ)) ()).total)
 
 /-- Scalar expectation of the stage-`ℓ` right recurrence operator from
 `lem:from-H-to-G`. -/
@@ -368,8 +368,8 @@ noncomputable def fromHToGRecurrenceRightMass (params : Parameters)
     (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : Error :=
-  ev ψbi ((IdxOpFamily.liftLeft
-    (fromHToGRecurrenceRightFamily params strategy family k ℓ τ)) ().total)
+  ev ψbi (((IdxOpFamily.liftLeft
+    (fromHToGRecurrenceRightFamily params strategy family k ℓ τ)) ()).total)
 
 /-- Scalar expectation of the left-hand side of `lem:from-H-to-G`, i.e. the
 uniform average of the eligible pasted-sandwich total mass. -/
