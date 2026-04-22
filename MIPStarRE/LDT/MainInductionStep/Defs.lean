@@ -217,16 +217,6 @@ noncomputable def restrictAxisParallelMeasurement (params : Parameters) [FieldMo
           rfl }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
-@[simp] private theorem reparamAtEquiv_symm_liftAxisAnswer
-    (params : Parameters) [FieldModel params.q]
-    (x t : Fq params) (f : AxisLinePolynomial params) :
-    ((AxisLinePolynomial.reparamAtEquiv (params := params.next) t).symm
-        (liftAxisAnswer params x f)) =
-      liftAxisAnswer params x
-        (((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm) f) := by
-  apply AxisLinePolynomial.ext
-  rfl
-
 private theorem restrictAxisParallelMeasurement_transportInvariant
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
@@ -262,7 +252,19 @@ private theorem restrictAxisParallelMeasurement_transportInvariant
     _ = (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).outcome
           (liftAxisAnswer params x
             (((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm) a)) := by
-            simp
+            have hcomm :
+                ((AxisLinePolynomial.reparamAtEquiv (params := params.next) t).symm
+                    (liftAxisAnswer params x a)) =
+                  liftAxisAnswer params x
+                    (((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm) a) := by
+              simpa only [liftAxisAnswer, AxisLinePolynomial.reparamAtEquiv] using
+                (AxisLinePolynomial.reparamAt_appendAtHeight
+                  (f := a) (t := subCoord zeroCoord t) (x := x))
+            exact congrArg
+              (fun b =>
+                (strategy.axisParallelMeasurement
+                  (AxisParallelLine.appendAtHeight params ℓ x)).outcome b)
+              hcomm
     _ = (restrictAxisParallelMeasurement params strategy x ℓ).outcome
           (((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm) a) := by
             rfl

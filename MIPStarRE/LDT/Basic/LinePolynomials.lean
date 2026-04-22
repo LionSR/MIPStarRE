@@ -129,6 +129,12 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
     appendAtHeight params f x t = f t :=
   rfl
 
+@[simp] theorem reparamAt_appendAtHeight {params : Parameters} [FieldModel params.q]
+    (f : AxisLinePolynomial params) (t x : Fq params) :
+    reparamAt (appendAtHeight params f x) t = appendAtHeight params (reparamAt f t) x := by
+  apply AxisLinePolynomial.ext
+  rfl
+
 /-- Restrict an axis-line answer in `m + 1` variables to the slice at height `x`. -/
 def restrictAtHeight (params : Parameters) [FieldModel params.q]
     (f : AxisLinePolynomial params.next) (_x : Fq params) : AxisLinePolynomial params where
@@ -242,6 +248,12 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
   poly := f.poly
   degreeBounded := by
     exact le_trans f.degreeBounded (Nat.mul_le_mul_right _ (Nat.le_succ _))
+
+@[simp] theorem reparamAt_appendAtHeight {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t x : Fq params) :
+    reparamAt (appendAtHeight params f x) t = appendAtHeight params (reparamAt f t) x := by
+  apply DiagonalLinePolynomial.ext
+  rfl
 
 /-- Restrict a diagonal-line answer in `m + 1` variables to the slice at height `x`.
 This interface now makes the stronger slice-wise degree requirement explicit. -/
