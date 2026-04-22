@@ -60,7 +60,7 @@ lemma fullSlice_scalar_marginalize_y
 factor, i.e.
 `\(\mathbb E_{u,v,x,y} \sum_{a,b} \langle\psi,
    G^x_{[g(u)=a]} G^y_{[h(v)=b]} G^x_{[g(u)=a]} \otimes G^y_{[h(v)=b]}\, \psi\rangle\)`. -/
-noncomputable def evaluatedSliceSandwichedRightAvg
+private noncomputable def evaluatedSliceSandwichedRightAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
   avgOver (uniformDistribution (EvaluatedSliceQuestion params))
@@ -78,7 +78,7 @@ noncomputable def evaluatedSliceSandwichedRightAvg
 left and the right-register copy of the second factor, i.e.
 `\(\mathbb E_{u,v,x,y} \sum_{a,b} \langle\psi,
    G^x_{[g(u)=a]} G^y_{[h(v)=b]} \otimes G^y_{[h(v)=b]}\, \psi\rangle\)`. -/
-noncomputable def evaluatedSliceLinearRightAvg
+private noncomputable def evaluatedSliceLinearRightAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
   avgOver (uniformDistribution (EvaluatedSliceQuestion params))
@@ -131,9 +131,9 @@ lemma evaluatedSlice_hEval_sandwichedRight_to_linearRight
   have hAB :
       avgOver 𝒟 (fun q => qSDDCore strategy.state (A q) (B q)) ≤
         commDataProcessedGError params gamma zeta := by
-    have hEval' := hEval.squaredDistanceBound
-    rw [evaluationSpecialization_sddErrorOp_eq params strategy family] at hEval'
-    simpa [𝒟, A, B, sddErrorOp, qSDDOp] using hEval'
+    simpa [𝒟, A, B, qSDDOp] using
+      (evaluationSpecialization_sddOpRel params strategy family
+        (commDataProcessedGError params gamma zeta) hEval).squaredDistanceBound
   have hC :
       ∀ q,
         ∑ ab : EvaluatedSliceOutcome params,
@@ -228,7 +228,7 @@ lemma evaluatedSlice_hEval_sandwichedRight_to_linearRight
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) P * (rightTensor (ι₁ := ι) Q *
               leftTensor (ι₂ := ι) (P * Q))) := by
-            simp [mul_assoc]
+            rw [mul_assoc]
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) P * (leftTensor (ι₂ := ι) (P * Q) *
               rightTensor (ι₁ := ι) Q)) := by
@@ -237,7 +237,7 @@ lemma evaluatedSlice_hEval_sandwichedRight_to_linearRight
       _ = ev strategy.state
             ((leftTensor (ι₂ := ι) P * leftTensor (ι₂ := ι) (P * Q)) *
               rightTensor (ι₁ := ι) Q) := by
-            simp [mul_assoc]
+            rw [← mul_assoc]
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) (P * (P * Q)) *
               rightTensor (ι₁ := ι) Q) := by
@@ -245,7 +245,8 @@ lemma evaluatedSlice_hEval_sandwichedRight_to_linearRight
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) ((P * P) * Q) *
               rightTensor (ι₁ := ι) Q) := by
-            simp [mul_assoc]
+            congr 1
+            rw [mul_assoc]
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) (P * Q) * rightTensor (ι₁ := ι) Q) := by
             rw [hPproj]
@@ -272,7 +273,7 @@ lemma evaluatedSlice_hEval_sandwichedRight_to_linearRight
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) P * (rightTensor (ι₁ := ι) Q *
               leftTensor (ι₂ := ι) (Q * P))) := by
-            simp [mul_assoc]
+            rw [mul_assoc]
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) P * (leftTensor (ι₂ := ι) (Q * P) *
               rightTensor (ι₁ := ι) Q)) := by
@@ -281,7 +282,7 @@ lemma evaluatedSlice_hEval_sandwichedRight_to_linearRight
       _ = ev strategy.state
             ((leftTensor (ι₂ := ι) P * leftTensor (ι₂ := ι) (Q * P)) *
               rightTensor (ι₁ := ι) Q) := by
-            simp [mul_assoc]
+            rw [← mul_assoc]
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) (P * (Q * P)) *
               rightTensor (ι₁ := ι) Q) := by
@@ -289,7 +290,8 @@ lemma evaluatedSlice_hEval_sandwichedRight_to_linearRight
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) (((P * Q) * P)) *
               rightTensor (ι₁ := ι) Q) := by
-            simp [mul_assoc]
+            congr 1
+            rw [mul_assoc]
   calc
     |evaluatedSliceSandwichedRightAvg params strategy family -
         evaluatedSliceLinearRightAvg params strategy family|
