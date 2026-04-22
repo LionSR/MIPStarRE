@@ -129,6 +129,8 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
     appendAtHeight params f x t = f t :=
   rfl
 
+/-- Reparametrizing after embedding an axis-line answer into a slice agrees with
+reparametrizing before the embedding. -/
 @[simp] theorem reparamAt_appendAtHeight {params : Parameters} [FieldModel params.q]
     (f : AxisLinePolynomial params) (t x : Fq params) :
     reparamAt (appendAtHeight params f x) t = appendAtHeight params (reparamAt f t) x := by
@@ -249,6 +251,8 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
   degreeBounded := by
     exact le_trans f.degreeBounded (Nat.mul_le_mul_right _ (Nat.le_succ _))
 
+/-- Reparametrizing after embedding a diagonal-line answer into a slice agrees with
+reparametrizing before the embedding. -/
 @[simp] theorem reparamAt_appendAtHeight {params : Parameters} [FieldModel params.q]
     (f : DiagonalLinePolynomial params) (t x : Fq params) :
     reparamAt (appendAtHeight params f x) t = appendAtHeight params (reparamAt f t) x := by
