@@ -354,26 +354,32 @@ def constSubMeasFamily {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [Deci
     IdxSubMeas Unit α ι :=
   fun _ => A
 
-/-- Average an indexed submeasurement family against a finite distribution. -/
+/-- Average an indexed submeasurement family against a finite distribution.
+The hypothesis
+`h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1`
+says that `𝒟` is a sub-probability distribution. -/
 noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (𝒟 : Distribution Question) (A : IdxSubMeas Question Outcome ι)
     (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1) :
     SubMeas Outcome ι where
   outcome := fun a =>
-    ∑ q ∈ 𝒟.support, 𝒟.weight q • (A q).outcome a
+    averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
   total :=
-    ∑ q ∈ 𝒟.support, 𝒟.weight q • (A q).total
+    averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
   outcome_pos := by
     intro a
+    simp only [averageOperatorOverDistribution]
     exact Finset.sum_nonneg fun q _ =>
       smul_nonneg (𝒟.nonnegative q) ((A q).outcome_pos a)
   sum_eq_total := by
     classical
     calc
-      ∑ a, ∑ q ∈ 𝒟.support, 𝒟.weight q • (A q).outcome a
-          = ∑ q ∈ 𝒟.support, ∑ a, 𝒟.weight q • (A q).outcome a := by
-              rw [Finset.sum_comm]
+      ∑ a, averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
+          = ∑ a, ∑ q ∈ 𝒟.support, 𝒟.weight q • (A q).outcome a := by
+              simp [averageOperatorOverDistribution]
+      _ = ∑ q ∈ 𝒟.support, ∑ a, 𝒟.weight q • (A q).outcome a := by
+            rw [Finset.sum_comm]
       _ = ∑ q ∈ 𝒟.support, 𝒟.weight q • ∑ a, (A q).outcome a := by
             apply Finset.sum_congr rfl
             intro q _
@@ -382,10 +388,14 @@ noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
             apply Finset.sum_congr rfl
             intro q _
             rw [(A q).sum_eq_total]
+      _ = averageOperatorOverDistribution 𝒟 (fun q => (A q).total) := by
+            simp [averageOperatorOverDistribution]
   total_le_one := by
     calc
-      (∑ q ∈ 𝒟.support, 𝒟.weight q • (A q).total)
-        ≤ ∑ q ∈ 𝒟.support, 𝒟.weight q • (1 : MIPStarRE.Quantum.Op ι) := by
+      averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
+        = ∑ q ∈ 𝒟.support, 𝒟.weight q • (A q).total := by
+            simp [averageOperatorOverDistribution]
+      _ ≤ ∑ q ∈ 𝒟.support, 𝒟.weight q • (1 : MIPStarRE.Quantum.Op ι) := by
             exact Finset.sum_le_sum fun q _ =>
               smul_le_smul_of_nonneg_left (A q).total_le_one (𝒟.nonnegative q)
       _ = (∑ q ∈ 𝒟.support, 𝒟.weight q) • (1 : MIPStarRE.Quantum.Op ι) := by
