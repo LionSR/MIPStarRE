@@ -56,8 +56,8 @@ private lemma closenessAfterCompletion_core_local {Outcome : Type*}
       |diagA - overlap| ≤ Real.sqrt δ ∧
         |overlap - diagB| ≤ Real.sqrt δ := by
     simpa [diagA, diagB, overlap, constSubMeasFamily, avgOver, uniformDistribution] using
-      easyApproxFromApproxDelta_twoFamily ψ (uniformDistribution Unit) hψ
-        (uniformDistribution_weight_sum_le_one Unit)
+      easyApproxFromApproxDelta_twoFamily_of_isProbability ψ (uniformDistribution Unit) hψ
+        (uniformDistribution_isProbability Unit)
         (constSubMeasFamily A.toSubMeas)
         (constSubMeasFamily B) δ (by exact ⟨hδ⟩)
   have hgapA_raw :

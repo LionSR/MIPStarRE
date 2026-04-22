@@ -230,4 +230,22 @@ theorem easyApproxFromApproxDelta_twoFamily {Question Outcome : Type*}
       _ ≤ Real.sqrt δ := by
             exact Real.sqrt_le_sqrt hδ
 
+/-- Probability-distribution variant of `easyApproxFromApproxDelta_twoFamily`. -/
+theorem easyApproxFromApproxDelta_twoFamily_of_isProbability {Question Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (hψ : ψ.IsNormalized)
+    (h𝒟 : 𝒟.IsProbability)
+    (A B : IdxSubMeas Question Outcome ι) (δ : Error) :
+    SDDRel ψ 𝒟 A B δ →
+      |avgOver 𝒟 (fun q => ∑ a : Outcome, ev ψ ((A q).outcome a * (A q).outcome a)) -
+          avgOver 𝒟 (fun q => ∑ a : Outcome, ev ψ ((A q).outcome a * (B q).outcome a))|
+          ≤ Real.sqrt δ ∧
+      |avgOver 𝒟 (fun q => ∑ a : Outcome, ev ψ ((A q).outcome a * (B q).outcome a)) -
+          avgOver 𝒟 (fun q => ∑ a : Outcome, ev ψ ((B q).outcome a * (B q).outcome a))|
+          ≤ Real.sqrt δ := by
+  exact easyApproxFromApproxDelta_twoFamily ψ 𝒟 hψ
+    (isProbability_weight_sum_le_one h𝒟) A B δ
+
 end MIPStarRE.LDT.Preliminaries

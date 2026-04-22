@@ -372,6 +372,24 @@ theorem qBipartiteConsDefect_le_one_of_isNormalized {Outcome : Type*}
   · norm_num
   · linarith
 
+/-- Under a probability question distribution, the averaged bipartite consistency
+error is bounded by `1`. -/
+theorem bipartiteConsError_le_one_of_isProbability {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB]
+    [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (h𝒟 : 𝒟.IsProbability) (hψ : ψ.IsNormalized)
+    (A : IdxSubMeas Question Outcome ιA) (B : IdxSubMeas Question Outcome ιB) :
+    bipartiteConsError ψ 𝒟 A B ≤ 1 := by
+  unfold bipartiteConsError
+  calc
+    avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (A q) (B q))
+      ≤ avgOver 𝒟 (fun _ : Question => 1) := by
+          refine avgOver_mono _ _ _ ?_
+          intro q
+          exact qBipartiteConsDefect_le_one_of_isNormalized ψ hψ (A q) (B q)
+    _ = 1 := avgOver_const_of_isProbability 𝒟 h𝒟 1
+
 /-- Under the uniform question distribution, the averaged bipartite consistency
 error is bounded by `1`. -/
 theorem bipartiteConsError_uniform_le_one {Question Outcome : Type*}
@@ -380,14 +398,8 @@ theorem bipartiteConsError_uniform_le_one {Question Outcome : Type*}
     (ψ : QuantumState (ιA × ιB)) (hψ : ψ.IsNormalized)
     (A : IdxSubMeas Question Outcome ιA) (B : IdxSubMeas Question Outcome ιB) :
     bipartiteConsError ψ (uniformDistribution Question) A B ≤ 1 := by
-  unfold bipartiteConsError
-  calc
-    avgOver (uniformDistribution Question) (fun q => qBipartiteConsDefect ψ (A q) (B q))
-      ≤ avgOver (uniformDistribution Question) (fun _ : Question => 1) := by
-          refine avgOver_mono _ _ _ ?_
-          intro q
-          exact qBipartiteConsDefect_le_one_of_isNormalized ψ hψ (A q) (B q)
-    _ = 1 := avgOver_uniform_const 1
+  exact bipartiteConsError_le_one_of_isProbability ψ (uniformDistribution Question)
+    (uniformDistribution_isProbability Question) hψ A B
 
 /-- The bipartite strong self-consistency defect is nonneg by definition (`max 0 _`). -/
 theorem qBipartiteSSCDefect_nonneg {Outcome : Type*}
