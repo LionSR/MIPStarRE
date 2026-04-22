@@ -59,7 +59,11 @@ lemma fullSlice_scalar_marginalize_y
 /-- The evaluated-slice mixed term with a right-register copy of the second
 factor, i.e.
 `\(\mathbb E_{u,v,x,y} \sum_{a,b} \langle\psi,
-   G^x_{[g(u)=a]} G^y_{[h(v)=b]} G^x_{[g(u)=a]} \otimes G^y_{[h(v)=b]}\, \psi\rangle\)`. -/
+   G^x_{[g(u)=a]} G^y_{[h(v)=b]} G^x_{[g(u)=a]} \otimes G^y_{[h(v)=b]}\, \psi\rangle\)`.
+
+This remains a private `def` (rather than a local `let`) because the remaining
+`TODO(#361)` transport bridges are expected to reuse the same named intermediate
+scalar quantities. -/
 private noncomputable def evaluatedSliceSandwichedRightAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
@@ -77,7 +81,11 @@ private noncomputable def evaluatedSliceSandwichedRightAvg
 /-- The evaluated-slice mixed term with only the linear ordered product on the
 left and the right-register copy of the second factor, i.e.
 `\(\mathbb E_{u,v,x,y} \sum_{a,b} \langle\psi,
-   G^x_{[g(u)=a]} G^y_{[h(v)=b]} \otimes G^y_{[h(v)=b]}\, \psi\rangle\)`. -/
+   G^x_{[g(u)=a]} G^y_{[h(v)=b]} \otimes G^y_{[h(v)=b]}\, \psi\rangle\)`.
+
+As with `evaluatedSliceSandwichedRightAvg`, we keep this as a private named
+intermediate because the remaining evaluated-side `TODO(#361)` bridges are
+expected to reference the same quantity. -/
 private noncomputable def evaluatedSliceLinearRightAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
