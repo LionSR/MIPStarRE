@@ -777,6 +777,56 @@ private theorem symmetrizedDiagonalReparamInvariant
   simp [symmetrizedIdxProjMeas, DiagonalLine.transportMeasurement,
     ProjMeas.transport, Measurement.transport, SubMeas.transport, hA ℓ t, hB ℓ t]
 
+/-- Transport covariance is preserved by block-diagonal symmetrization over the
+role register. -/
+private theorem symmetrizedAxisParallelTransportInvariant
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (MA MB : AxisParallelCovariantMeasurement params ι) :
+    AxisParallelMeasurementTransportInvariant params
+      (symmetrizedIdxProjMeas MA.toIdxProjMeas MB.toIdxProjMeas) := by
+  intro ℓ t
+  ext a
+  have hA :
+      (MA.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+        (MA.toIdxProjMeas ℓ).outcome ((AxisLinePolynomial.reparamAtEquiv t).symm a) := by
+    simpa [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport] using
+      congrArg (fun N => N.outcome a) (MA.transportInvariant ℓ t)
+  have hB :
+      (MB.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+        (MB.toIdxProjMeas ℓ).outcome ((AxisLinePolynomial.reparamAtEquiv t).symm a) := by
+    simpa [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport] using
+      congrArg (fun N => N.outcome a) (MB.transportInvariant ℓ t)
+  simp [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+    Measurement.transport, SubMeas.transport, symmetrizedIdxProjMeas, hA, hB]
+
+/-- Transport covariance is preserved by block-diagonal symmetrization over the
+role register. -/
+private theorem symmetrizedDiagonalTransportInvariant
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (MA MB : DiagonalCovariantMeasurement params ι) :
+    DiagonalMeasurementTransportInvariant params
+      (symmetrizedIdxProjMeas MA.toIdxProjMeas MB.toIdxProjMeas) := by
+  intro ℓ t
+  ext a
+  have hA :
+      (MA.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+        (MA.toIdxProjMeas ℓ).outcome ((DiagonalLinePolynomial.reparamAtEquiv t).symm a) := by
+    simpa [DiagonalLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport] using
+      congrArg (fun N => N.outcome a) (MA.transportInvariant ℓ t)
+  have hB :
+      (MB.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+        (MB.toIdxProjMeas ℓ).outcome ((DiagonalLinePolynomial.reparamAtEquiv t).symm a) := by
+    simpa [DiagonalLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport] using
+      congrArg (fun N => N.outcome a) (MB.transportInvariant ℓ t)
+  simp [DiagonalLine.transportMeasurement, ProjMeas.transport,
+    Measurement.transport, SubMeas.transport, symmetrizedIdxProjMeas, hA, hB]
+
 namespace ProjStrat
 
 /-- The paper's symmetrized point measurement, obtained by putting Alice's and
@@ -791,25 +841,16 @@ noncomputable def symmetrizedPointMeasurement {params : Parameters}
 noncomputable def symmetrizedAxisParallelMeasurement {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) :
-    AxisParallelCovariantMeasurement params (Role × ι) where
-  toIdxProjMeas := symmetrizedIdxProjMeas strategy.axisParallelMeasurementA
+    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) (Role × ι) :=
+  symmetrizedIdxProjMeas strategy.axisParallelMeasurementA
     strategy.axisParallelMeasurementB
-  transportInvariant :=
-    symmetrizedAxisParallelReparamInvariant
-      strategy.axisParallelMeasurementA.transportInvariant
-      strategy.axisParallelMeasurementB.transportInvariant
 
 /-- The paper's symmetrized diagonal-line measurement. -/
 noncomputable def symmetrizedDiagonalMeasurement {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) :
-    DiagonalCovariantMeasurement params (Role × ι) where
-  toIdxProjMeas := symmetrizedIdxProjMeas strategy.diagonalMeasurementA
-    strategy.diagonalMeasurementB
-  transportInvariant :=
-    symmetrizedDiagonalReparamInvariant
-      strategy.diagonalMeasurementA.transportInvariant
-      strategy.diagonalMeasurementB.transportInvariant
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) (Role × ι) :=
+  symmetrizedIdxProjMeas strategy.diagonalMeasurementA strategy.diagonalMeasurementB
 
 /-- Package the role-register symmetrized measurements with an external
 permutation-invariant classical role-register state.
@@ -828,9 +869,18 @@ noncomputable def classicalRoleSymmStrategy {params : Parameters}
     isNormalized :=
       classicalRoleSymmState_isNormalized strategy.state strategy.isNormalized
     pointMeasurement := strategy.symmetrizedPointMeasurement
-    axisParallelMeasurement := strategy.symmetrizedAxisParallelMeasurement
-    diagonalMeasurement := strategy.symmetrizedDiagonalMeasurement
-  }
+    axisParallelMeasurement :=
+      { toIdxProjMeas := strategy.symmetrizedAxisParallelMeasurement
+        transportInvariant :=
+          symmetrizedAxisParallelTransportInvariant
+            strategy.axisParallelMeasurementA
+            strategy.axisParallelMeasurementB }
+    diagonalMeasurement :=
+      { toIdxProjMeas := strategy.symmetrizedDiagonalMeasurement
+        transportInvariant :=
+          symmetrizedDiagonalTransportInvariant
+            strategy.diagonalMeasurementA
+            strategy.diagonalMeasurementB } }
 
 /-- The classical role-register symmetrized strategy preserves normalization. -/
 theorem classicalRoleSymmStrategy_isNormalized {params : Parameters}

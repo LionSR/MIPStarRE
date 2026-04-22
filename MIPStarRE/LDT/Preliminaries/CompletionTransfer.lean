@@ -57,7 +57,7 @@ private lemma closenessAfterCompletion_core_local {Outcome : Type*}
         |overlap - diagB| ≤ Real.sqrt δ := by
     simpa [diagA, diagB, overlap, constSubMeasFamily, avgOver,
         uniformDistribution, uniformProbabilityDistribution] using
-      easyApproxFromApproxDelta_twoFamily_of_probabilityDistribution ψ
+      MIPStarRE.LDT.Preliminaries.easyApproxFromApproxDelta_twoFamily_of_probabilityDistribution ψ
         (uniformProbabilityDistribution Unit) hψ
         (constSubMeasFamily A.toSubMeas)
         (constSubMeasFamily B) δ (by exact ⟨hδ⟩)
@@ -252,6 +252,7 @@ theorem completingToMeasurement {Outcome : Type*}
     closenessAfterCompletion :=
       closenessAfterCompletion_core ψ hperm hψ A B a0 δ ζ hsc hdist
   }⟩
+
 
 /-- Triangle inequality for state-dependent operator distance. -/
 lemma sddOpRel_triangle
