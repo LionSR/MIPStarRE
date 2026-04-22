@@ -183,7 +183,7 @@ private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
               simp [ldGbconAxisLineMeasurement, ldGbcon_rebased_vertical_line, ℓ]
       _ = (postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas)
             (fun f => f (pointHeight params u))).outcome a := by
-              exact strategy.axisParallelReparamInvariant ℓ (pointHeight params u) a
+              exact strategy.axisParallelMeasurement.reparamInvariant ℓ (pointHeight params u) a
       _ = (ldGbconVerticalLineMeasurement params strategy u).toSubMeas.outcome a := by
             rfl
   · have hA : (ldGbconAxisLineMeasurement params strategy u).toSubMeas.total = 1 := by
