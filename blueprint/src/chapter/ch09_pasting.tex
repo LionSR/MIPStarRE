@@ -122,6 +122,7 @@ where
 
 \begin{lemma}[Slice measurements are consistent with line answers]\label{lem:ld-gbcon}
 	\lean{MIPStarRE.LDT.Pasting.ldGbcon}
+	\leanok
 	\uses{prop:simeq-to-approx, prop:triangle-inequality-for-approx_delta, prop:triangle-sub}
 	Under the hypotheses of Theorem~\ref{thm:ld-pasting}, set
 	\[
@@ -132,7 +133,7 @@ where
 		G^x_{[g(u)=a]} \ot I \simeq_{\nu_1} I \ot B^u_{[f(x)=a]}.
 	\]
 \end{lemma}
-\begin{proof}
+\begin{proof}\leanok
 	This is exactly \ref{eq:ld-gbcon}, with \ref{eq:ld-nu1-def}.
 \end{proof}
 

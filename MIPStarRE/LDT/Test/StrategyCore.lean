@@ -168,17 +168,69 @@ theorem DiagonalMeasurementTransportInvariant.toEvaluationReparamInvariant
   exact DiagonalLine.transportMeasurement_postprocess_zero
     (params := params) (M := M ℓ) t a
 
+/-- Axis-parallel line measurements bundled with the stronger transport-level
+rebasing covariance. -/
+structure AxisParallelCovariantMeasurement (params : Parameters)
+    [FieldModel params.q] (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  toIdxProjMeas :
+    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
+  transportInvariant :
+    AxisParallelMeasurementTransportInvariant params toIdxProjMeas
+
+instance {params : Parameters} [FieldModel params.q] {ι : Type*}
+    [Fintype ι] [DecidableEq ι] :
+    CoeFun (AxisParallelCovariantMeasurement params ι)
+      (fun _ => AxisParallelLine params → ProjMeas (AxisLinePolynomial params) ι) where
+  coe M := M.toIdxProjMeas
+
+namespace AxisParallelCovariantMeasurement
+
+/-- A covariant wrapper automatically satisfies the older evaluation-level
+rebasing invariant. -/
+theorem reparamInvariant {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : AxisParallelCovariantMeasurement params ι) :
+    AxisParallelEvaluationReparamInvariant params M.toIdxProjMeas :=
+  M.transportInvariant.toEvaluationReparamInvariant
+
+end AxisParallelCovariantMeasurement
+
+/-- Diagonal line measurements bundled with the stronger transport-level
+rebasing covariance. -/
+structure DiagonalCovariantMeasurement (params : Parameters)
+    [FieldModel params.q] (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  toIdxProjMeas :
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+  transportInvariant :
+    DiagonalMeasurementTransportInvariant params toIdxProjMeas
+
+instance {params : Parameters} [FieldModel params.q] {ι : Type*}
+    [Fintype ι] [DecidableEq ι] :
+    CoeFun (DiagonalCovariantMeasurement params ι)
+      (fun _ => DiagonalLine params → ProjMeas (DiagonalLinePolynomial params) ι) where
+  coe M := M.toIdxProjMeas
+
+namespace DiagonalCovariantMeasurement
+
+/-- A covariant wrapper automatically satisfies the older evaluation-level
+rebasing invariant. -/
+theorem reparamInvariant {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : DiagonalCovariantMeasurement params ι) :
+    DiagonalEvaluationReparamInvariant params M.toIdxProjMeas :=
+  M.transportInvariant.toEvaluationReparamInvariant
+
+end DiagonalCovariantMeasurement
+
 /-- Paper-local symmetric strategy data.
 
-The `axisParallelReparamInvariant` and `diagonalReparamInvariant`
-fields encode that line measurements are geometrically covariant:
-evaluating at a rebased line's base point (`zeroCoord`) agrees with
-evaluating at the original parameter. The paper treats this as
-implicit (lines are geometric objects), but in the Lean model
-`AxisParallelLine` and `DiagonalLine` index *parametrized* line
-questions rather than quotienting by reparametrization, so we state
-this covariance explicitly. The underlying answer-level identity for
-diagonal polynomials is `DiagonalLinePolynomial.reparamAt_apply_zero`.
+The line-measurement fields are bundled as transport-covariant wrappers:
+rebasing the question index is required to agree with transporting the
+projective measurement along the corresponding answer reparametrization
+equivalence. This is stronger than the older evaluation-level formulas
+at `zeroCoord`, but those formulas remain available as derived lemmas via
+`AxisParallelCovariantMeasurement.reparamInvariant` and
+`DiagonalCovariantMeasurement.reparamInvariant`.
 
 The `isNormalized` field records that the bipartite state's density
 operator has normalized trace `1`. For pure states, this coincides
@@ -190,16 +242,11 @@ structure SymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
   permInvState : PermInvState state
+  densityFixed : swapDensity state.density = state.density
   isNormalized : state.IsNormalized
   pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
-  axisParallelMeasurement :
-    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
-  axisParallelReparamInvariant :
-    AxisParallelEvaluationReparamInvariant params axisParallelMeasurement
-  diagonalMeasurement :
-    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
-  diagonalReparamInvariant :
-    DiagonalEvaluationReparamInvariant params diagonalMeasurement
+  axisParallelMeasurement : AxisParallelCovariantMeasurement params ι
+  diagonalMeasurement : DiagonalCovariantMeasurement params ι
 
 -- NOTE: no global `Inhabited` instance for `SymStrat`; constructing default
 -- projective measurement families is non-canonical and requires additional
@@ -331,25 +378,14 @@ structure ProjStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
   permInvState : PermInvState state
+  densityFixed : swapDensity state.density = state.density
   isNormalized : state.IsNormalized
   pointMeasurementA : IdxProjMeas (Point params) (Fq params) ι
-  axisParallelMeasurementA :
-    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
-  diagonalMeasurementA :
-    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
+  axisParallelMeasurementA : AxisParallelCovariantMeasurement params ι
+  diagonalMeasurementA : DiagonalCovariantMeasurement params ι
   pointMeasurementB : IdxProjMeas (Point params) (Fq params) ι
-  axisParallelMeasurementB :
-    IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι
-  diagonalMeasurementB :
-    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
-  axisParallelReparamInvariantA :
-    AxisParallelEvaluationReparamInvariant params axisParallelMeasurementA
-  axisParallelReparamInvariantB :
-    AxisParallelEvaluationReparamInvariant params axisParallelMeasurementB
-  diagonalReparamInvariantA :
-    DiagonalEvaluationReparamInvariant params diagonalMeasurementA
-  diagonalReparamInvariantB :
-    DiagonalEvaluationReparamInvariant params diagonalMeasurementB
+  axisParallelMeasurementB : AxisParallelCovariantMeasurement params ι
+  diagonalMeasurementB : DiagonalCovariantMeasurement params ι
 
 
 end MIPStarRE.LDT

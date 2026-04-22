@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.Core.SelfConsistency
+import MIPStarRE.LDT.Pasting.Core
 
 /-!
 # Section 12 pasting: switcheroo infrastructure

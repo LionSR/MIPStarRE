@@ -174,7 +174,7 @@ private lemma evaluatedSlice_phaseTwo_right_weighted_outcome
 This is the bookkeeping bridge between the explicit `G^y`-inserted / `G^y`-removed
 summands and the stability-one operator families used by
 `gCommStability_overlap`. -/
-private lemma evaluatedSlice_phaseTwo_scalar_rewrite
+lemma evaluatedSlice_phaseTwo_scalar_rewrite
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
