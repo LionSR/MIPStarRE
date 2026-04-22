@@ -91,9 +91,7 @@ def leftAsSymmetric {params : Parameters} [FieldModel params.q]
   isNormalized := strategy.isNormalized
   pointMeasurement := strategy.pointMeasurementA
   axisParallelMeasurement := strategy.axisParallelMeasurementA
-  axisParallelReparamInvariant := strategy.axisParallelReparamInvariantA
   diagonalMeasurement := strategy.diagonalMeasurementA
-  diagonalReparamInvariant := strategy.diagonalReparamInvariantA
 
 /-- View the right prover's local data as a symmetric-strategy-style package. -/
 def rightAsSymmetric {params : Parameters} [FieldModel params.q]
@@ -105,9 +103,7 @@ def rightAsSymmetric {params : Parameters} [FieldModel params.q]
   isNormalized := strategy.isNormalized
   pointMeasurement := strategy.pointMeasurementB
   axisParallelMeasurement := strategy.axisParallelMeasurementB
-  axisParallelReparamInvariant := strategy.axisParallelReparamInvariantB
   diagonalMeasurement := strategy.diagonalMeasurementB
-  diagonalReparamInvariant := strategy.diagonalReparamInvariantB
 
 /-- Axis-parallel branch component where the left prover is queried with a line
 and the right prover is queried with the sampled base point.

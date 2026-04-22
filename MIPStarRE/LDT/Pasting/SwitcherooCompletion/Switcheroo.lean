@@ -15,9 +15,9 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-set_option maxHeartbeats 4000000 in
--- The four-term expansion + triangle chain expands several explicit scalar centers
--- and contraction witnesses; the higher heartbeat cap keeps elaboration stable.
+set_option maxHeartbeats 200000 in
+-- The four-term expansion + triangle chain still expands several explicit scalar
+-- centers, but the tensor-order rewrites now come from reusable helper lemmas.
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -171,8 +171,6 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     simpa [onceCommuted, mixed] using
       (switcherooAggregateFourthTerm_once_commuted_close_mixed
         params ψbi hnorm family M zeta hselfG)
-  -- Identify `mixed` with the `rightTensor·leftTensor` form expected by the
-  -- raw left-front transfer lemma.
   have hmixed_eq :
       mixed =
         avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
@@ -184,18 +182,9 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
                     (M q.2).outcome o *
                     (family.meas q.1).outcome g *
                     (M q.2).outcome o))) := by
-    change avgOver _ _ = _
-    apply avgOver_congr
-    intro q
-    refine Finset.sum_congr rfl ?_
-    intro g _
-    refine Finset.sum_congr rfl ?_
-    intro o _
-    rw [leftTensor_mul_rightTensor_eq_opTensor,
-      ← rightTensor_mul_leftTensor_eq_opTensor]
-  -- Identify `leftFront` with the `leftTensor·leftTensor` form expected by the
-  -- raw left-front transfer lemma. Uses the projector-absorption identity
-  -- `G_g · G^x = G_g`.
+    simpa [mixed] using
+      switcherooMixed_eq_rightTensor_leftTensor
+        (params := params) (ψbi := ψbi) (family := family) (M := M)
   have hleftFront_eq :
       leftFront =
         avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
@@ -207,72 +196,9 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
                     (M q.2).outcome o *
                     (family.meas q.1).outcome g *
                     (M q.2).outcome o))) := by
-    change switcherooLeftFrontCoreScalar params ψbi family M = _
-    unfold switcherooLeftFrontCoreScalar
-    apply avgOver_congr
-    intro q
-    rw [show
-        (∑ go : Polynomial params × Outcome,
-            ev ψbi
-              (leftTensor (ι₂ := ι)
-                (((family.meas q.1).outcome go.1) *
-                  (M q.2).outcome go.2 *
-                  (family.meas q.1).outcome go.1 *
-                  (M q.2).outcome go.2))) =
-          ∑ g : Polynomial params, ∑ o : Outcome,
-            ev ψbi
-              (leftTensor (ι₂ := ι)
-                ((family.meas q.1).outcome g *
-                  (M q.2).outcome o *
-                  (family.meas q.1).outcome g *
-                  (M q.2).outcome o)) by
-      simpa using
-        (Fintype.sum_prod_type' (f := fun g o =>
-          ev ψbi
-            (leftTensor (ι₂ := ι)
-              ((family.meas q.1).outcome g *
-                (M q.2).outcome o *
-                (family.meas q.1).outcome g *
-                (M q.2).outcome o))))]
-    refine Finset.sum_congr rfl ?_
-    intro g _
-    refine Finset.sum_congr rfl ?_
-    intro o _
-    have hGabsorb :
-        (family.meas q.1).outcome g *
-            (completePartSubMeas params family q.1).total =
-          (family.meas q.1).outcome g := by
-      rw [completePartSubMeas_total]
-      exact Preliminaries.projSubMeas_outcome_mul_total_eq_outcome
-        (family.meas q.1) g
-    have hcollapse :
-        (family.meas q.1).outcome g *
-            ((completePartSubMeas params family q.1).total *
-              (M q.2).outcome o *
-              (family.meas q.1).outcome g *
-              (M q.2).outcome o) =
-          (family.meas q.1).outcome g *
-            (M q.2).outcome o *
-            (family.meas q.1).outcome g *
-            (M q.2).outcome o := by
-      calc
-        (family.meas q.1).outcome g *
-            ((completePartSubMeas params family q.1).total *
-              (M q.2).outcome o *
-              (family.meas q.1).outcome g *
-              (M q.2).outcome o)
-          = ((family.meas q.1).outcome g *
-                (completePartSubMeas params family q.1).total) *
-              (M q.2).outcome o *
-              (family.meas q.1).outcome g *
-              (M q.2).outcome o := by
-            simp [mul_assoc]
-        _ = (family.meas q.1).outcome g *
-              (M q.2).outcome o *
-              (family.meas q.1).outcome g *
-              (M q.2).outcome o := by rw [hGabsorb]
-    rw [leftTensor_mul_leftTensor]
-    exact congrArg (fun X => ev ψbi (leftTensor (ι₂ := ι) X)) hcollapse.symm
+    simpa [leftFront] using
+      switcherooLeftFrontCoreScalar_eq_leftTensor_mul_leftTensor
+        (params := params) (ψbi := ψbi) (family := family) (M := M)
   have hmixed_leftFront : |mixed - leftFront| ≤ Real.sqrt zeta := by
     rw [hmixed_eq, hleftFront_eq, abs_sub_comm]
     exact switcherooAggregateFourthTerm_mixed_close_left_front_raw

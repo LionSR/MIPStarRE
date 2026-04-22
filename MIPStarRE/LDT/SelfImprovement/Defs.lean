@@ -324,9 +324,8 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
                   (𝒟.nonnegative u)
         _ = (∑ u ∈ 𝒟.support, 𝒟.weight u) • (1 : MIPStarRE.Quantum.Op ι) := by
               rw [Finset.sum_smul]
-        _ ≤ (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
-              exact smul_le_smul_of_nonneg_right
-                (uniformDistribution_weight_sum_le_one (Point params)) zero_le_one
+        _ = (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
+              rw [uniformDistribution_weight_sum_eq_one]
         _ = 1 := by simp }
 
 /-- The variance error entering `lem:add-in-u`. -/
