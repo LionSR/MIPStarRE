@@ -29,22 +29,74 @@ def Role.other : Role → Role
 @[simp] theorem Role.other_other (r : Role) : r.other.other = r := by
   cases r <;> rfl
 
-/-- Parameters for the `(m,q,d)` low individual degree test. -/
+/-- Parameters for the `(m,q,d)` low individual degree test.
+
+Besides the usual positivity assumptions, we bundle the paper-faithful witness
+that `q = p^n` is a prime power. -/
 structure Parameters where
   m : ℕ
   q : ℕ
   d : ℕ
   hm : 0 < m
   hq : 0 < q
+  hqPrimePower : ∃ p n, Nat.Prime p ∧ 0 < n ∧ q = p ^ n
   deriving DecidableEq
 
+namespace Parameters
+
+/-- Any number presented as a prime power is automatically positive. -/
+theorem q_pos_of_primePower {q : ℕ}
+    (hqPrimePower : ∃ p n, Nat.Prime p ∧ 0 < n ∧ q = p ^ n) : 0 < q := by
+  rcases hqPrimePower with ⟨p, n, hp, hn, rfl⟩
+  exact Nat.pow_pos hp.pos
+
+/-- Prime numbers are prime powers of exponent `1`. -/
+theorem prime_primePower {q : ℕ} (hqPrime : Nat.Prime q) :
+    ∃ p n, Nat.Prime p ∧ 0 < n ∧ q = p ^ n := by
+  exact ⟨q, 1, hqPrime, by decide, by simp⟩
+
+/-- The field size `2` is a prime power witnessable as `2 = 2^1`. -/
+theorem primePower_two : ∃ p n, Nat.Prime p ∧ 0 < n ∧ 2 = p ^ n := by
+  exact ⟨2, 1, Nat.prime_two, by decide, by decide⟩
+
+/-- The field size `3` is a prime power witnessable as `3 = 3^1`. -/
+theorem primePower_three : ∃ p n, Nat.Prime p ∧ 0 < n ∧ 3 = p ^ n := by
+  exact ⟨3, 1, Nat.prime_three, by decide, by decide⟩
+
+/-- The field size `4` is a prime power witnessable as `4 = 2^2`. -/
+theorem primePower_four : ∃ p n, Nat.Prime p ∧ 0 < n ∧ 4 = p ^ n := by
+  exact ⟨2, 2, Nat.prime_two, by decide, by decide⟩
+
+/-- Build parameters from explicit prime-power data `q = p^n`. -/
+def ofPrimePower (m q d p n : ℕ) (hm : 0 < m) (hp : Nat.Prime p) (hn : 0 < n)
+    (hq : q = p ^ n) : Parameters :=
+  { m := m
+    q := q
+    d := d
+    hm := hm
+    hq := q_pos_of_primePower ⟨p, n, hp, hn, hq⟩
+    hqPrimePower := ⟨p, n, hp, hn, hq⟩ }
+
+/-- Build parameters when `q` itself is prime. -/
+def ofPrime (m q d : ℕ) (hm : 0 < m) (hqPrime : Nat.Prime q) : Parameters :=
+  ofPrimePower m q d q 1 hm hqPrime (by decide) (by simp)
+
+/-- Convenience constructor for the ubiquitous binary field. -/
+def ofTwo (m d : ℕ) (hm : 0 < m) : Parameters :=
+  ofPrime m 2 d hm Nat.prime_two
+
+/-- Convenience constructor for the ternary field. -/
+def ofThree (m d : ℕ) (hm : 0 < m) : Parameters :=
+  ofPrime m 3 d hm Nat.prime_three
+
+/-- Convenience constructor for the quadratic extension field of size `4`. -/
+def ofFour (m d : ℕ) (hm : 0 < m) : Parameters :=
+  ofPrimePower m 4 d 2 2 hm Nat.prime_two (by decide) (by decide)
+
+end Parameters
+
 instance : Inhabited Parameters where
-  default :=
-    { m := 1
-      q := 2
-      d := 0
-      hm := by decide
-      hq := by decide }
+  default := Parameters.ofTwo 1 0 (by decide)
 
 /-- The successor test obtained by appending one coordinate. -/
 def Parameters.next (params : Parameters) : Parameters :=
@@ -52,7 +104,8 @@ def Parameters.next (params : Parameters) : Parameters :=
     q := params.q
     d := params.d
     hm := Nat.succ_pos _
-    hq := params.hq }
+    hq := params.hq
+    hqPrimePower := params.hqPrimePower }
 
 instance {params : Parameters} : NeZero params.q :=
   ⟨Nat.ne_of_gt params.hq⟩
@@ -68,8 +121,9 @@ instance {params : Parameters} : Inhabited (Fin params.m) :=
 instance {params : Parameters} : Inhabited (Fq params) :=
   ⟨⟨0, params.hq⟩⟩
 
-/-- Prime-power metadata exposing the genuine finite-field carrier `GaloisField p n`
-underlying the paper's notation `F_q` when such a witness is available. -/
+/-- Prime-power metadata extracted from `params.hqPrimePower`, exposing the
+honest finite-field carrier `GaloisField p n` underlying the paper's notation
+`F_q`. -/
 structure PrimePowerFieldSpec (params : Parameters) where
   p : ℕ
   n : ℕ
@@ -77,7 +131,16 @@ structure PrimePowerFieldSpec (params : Parameters) where
   nPos : 0 < n
   cardEq : params.q = p ^ n
 
-/-- An honest finite field of order `q`, obtained from a prime-power decomposition of `q`. -/
+/-- Recover the prime-power specification bundled inside `Parameters`. -/
+noncomputable def Parameters.primePowerFieldSpec
+    (params : Parameters) : PrimePowerFieldSpec params := by
+  classical
+  exact Classical.choice <| by
+    rcases params.hqPrimePower with ⟨p, n, hp, hn, hq⟩
+    exact ⟨⟨p, n, hp, hn, hq⟩⟩
+
+/-- An honest finite field of order `q`, obtained from the prime-power
+witness bundled in `Parameters`. -/
 noncomputable abbrev HonestFq (params : Parameters) (spec : PrimePowerFieldSpec params) :=
   letI : Fact spec.p.Prime := ⟨spec.pPrime⟩
   GaloisField spec.p spec.n
@@ -110,6 +173,16 @@ noncomputable def PrimePowerFieldSpec.toFieldModel (params : Parameters)
       instDecidableEq := inferInstance
       equiv := Fintype.equivFinOfCardEq hcard }
 
+/-- The canonical field model associated to the paper-faithful prime-power data
+stored in `params`. We keep the priority low so that more specific transports,
+such as the `params.next` reuse below, preserve an already chosen model. -/
+noncomputable instance (priority := 100) (params : Parameters) : FieldModel params.q :=
+  PrimePowerFieldSpec.toFieldModel params (Parameters.primePowerFieldSpec params)
+
+instance (priority := 200) {params : Parameters} [inst : FieldModel params.q] :
+    FieldModel params.next.q := by
+  simpa [Parameters.next] using inst
+
 abbrev Scalar (params : Parameters) [FieldModel params.q] := FieldModel.K params.q
 abbrev PolynomialModel (params : Parameters) [FieldModel params.q] :=
   MvPolynomial (Fin params.m) (Scalar params)
@@ -119,9 +192,6 @@ abbrev LinePolynomialModel (params : Parameters) [FieldModel params.q] :=
 @[simp] theorem scalar_card (params : Parameters) [FieldModel params.q] :
     Fintype.card (Scalar params) = params.q := by
   simpa [Scalar, Fq] using Fintype.card_congr (FieldModel.equiv (q := params.q))
-
-instance {params : Parameters} [FieldModel params.q] : FieldModel params.next.q := by
-  simpa [Parameters.next] using (inferInstance : FieldModel params.q)
 
 /-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
 def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
