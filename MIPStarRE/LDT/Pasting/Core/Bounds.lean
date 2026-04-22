@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.Preliminaries.Triangles.Consistency
 
 /-!
 # Section 12 pasting: core bounds
@@ -41,25 +42,90 @@ theorem ldGbcon
           (verticalLineMeasurementFamily params strategy (truncatePoint params u))
           (fun f => f (pointHeight params u)))
       (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  /-
-  Paper reference: `references/ldt-paper/ld-pasting.tex`, `lem:ld-gbcon`.
-  The proof is the displayed chain leading to equation `eq:ld-gbcon` in the
-  blueprint: combine good-strategy consistency, `simeqToApprox`, and
-  `triangleSub`.
-
-  Current API blocker:
-  * `family.ConsistentWithPoints` is oriented as point measurement on the left
-    and slice family on the right; the paper step and this theorem need the
-    slice family on the left and the point/line measurement on the right. A
-    general `ConsRel` swap lemma needs stronger permutation invariance than the
-    current `PermInvState.swap_ev`, which only swaps `A ⊗ I` with `I ⊗ A`
-    (blocked on #411 — stronger PermInvState / ConsRel swap).
-
-  The earlier axis-parallel reparametrization and normalization blockers are
-  now resolved: `strategy.axisParallelReparamInvariant` handles the reindexing
-  step, and `triangleSub` can use `strategy.isNormalized` directly.
-  -/
-  sorry
+  let 𝒟 := uniformDistribution (Point params.next)
+  let μ : Error := ((params.next.m : ℕ) : Error) * eps
+  let ν : Error := 8 * (params.m : Error) * eps + 4 * delta
+  let pointSub : IdxSubMeas (Point params.next) (Fq params) ι :=
+    IdxProjMeas.toIdxSubMeas strategy.pointMeasurement
+  let rawMeas : IdxMeas (Point params.next) (Fq params) ι :=
+    rawVerticalLineMeasurementFamily params strategy
+  let rawSub : IdxSubMeas (Point params.next) (Fq params) ι :=
+    rawVerticalLineAnswerFamily params strategy
+  let pointL : IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
+    IdxSubMeas.liftLeft pointSub
+  let pointR : IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
+    IdxSubMeas.liftRight pointSub
+  let rawL : IdxSubMeas (Point params.next) (Fq params) (ι × ι) :=
+    IdxSubMeas.liftLeft rawSub
+  have heps_nonneg : 0 ≤ eps := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params.next))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy))
+      hgood.axisParallelTest
+  have hraw_cons :
+      ConsRel strategy.state 𝒟 pointSub rawSub μ := by
+    simpa [𝒟, μ, pointSub, rawMeas, rawSub] using
+      rawVerticalLineConsistency params strategy eps delta gamma hgood
+  have hraw_cons_swap :
+      ConsRel strategy.state 𝒟 rawSub pointSub μ :=
+    PermInvState.consRel_swap strategy.permInvState 𝒟 pointSub rawSub μ hraw_cons
+  have hraw_approx :
+      Preliminaries.BipartiteSDDRel strategy.state 𝒟 rawSub pointSub (2 * μ) := by
+    simpa [𝒟, μ, pointSub, rawMeas, rawSub] using
+      (Preliminaries.simeqToApprox strategy.state 𝒟 rawMeas
+        (IdxProjMeas.toIdxMeas strategy.pointMeasurement) μ hraw_cons_swap)
+  have hraw_sdd_leftRight :
+      SDDRel strategy.state 𝒟 rawL pointR (2 * μ) := by
+    exact ⟨hraw_approx.leftRightSquaredDistanceBound⟩
+  have hraw_sdd_rightLeft :
+      SDDRel strategy.state 𝒟 pointR rawL (2 * μ) := by
+    exact Preliminaries.sddRel_symm strategy.state 𝒟 rawL pointR (2 * μ)
+      hraw_sdd_leftRight
+  have hself_rel : BipartiteSSCRel strategy.state 𝒟 pointSub delta :=
+    ⟨hgood.selfConsistencyTest⟩
+  have hself_sdd : SDDRel strategy.state 𝒟 pointL pointR (2 * delta) := by
+    exact Preliminaries.twoNotionsOfSelfConsistency strategy.state 𝒟 pointSub delta
+      ⟨strategy.permInvState, hself_rel⟩
+  have hpoint_raw_sdd_raw :
+      SDDRel strategy.state 𝒟 pointL rawL (2 * ((2 * delta) + (2 * μ))) := by
+    exact Preliminaries.stateDependentDistanceRel_triangle strategy.state 𝒟
+      pointL pointR rawL (2 * delta) (2 * μ) hself_sdd hraw_sdd_rightLeft
+  have hnext_le_nat : params.next.m ≤ 2 * params.m := by
+    have hm1 : 1 ≤ params.m := Nat.succ_le_of_lt params.hm
+    simpa [Parameters.next, two_mul, add_comm, add_left_comm, add_assoc] using
+      add_le_add_left hm1 params.m
+  have hnext_le : ((params.next.m : ℕ) : Error) ≤ 2 * (params.m : Error) := by
+    exact_mod_cast hnext_le_nat
+  have hpoint_raw_sdd_le : 2 * ((2 * delta) + (2 * μ)) ≤ ν := by
+    have hraw_le : μ ≤ 2 * (params.m : Error) * eps := by
+      exact mul_le_mul_of_nonneg_right hnext_le heps_nonneg
+    linarith
+  have hpoint_raw_sdd : SDDRel strategy.state 𝒟 pointL rawL ν := by
+    exact Preliminaries.stateDependentDistanceRel_mono strategy.state 𝒟
+      pointL rawL (2 * ((2 * delta) + (2 * μ))) ν hpoint_raw_sdd_le
+      hpoint_raw_sdd_raw
+  have hraw_family :
+      ConsRel strategy.state 𝒟 rawSub family.evaluatedAtNextPoint
+        (zeta + Real.sqrt ν) := by
+    simpa [𝒟, ν, pointSub, rawMeas, rawSub, pointL, rawL] using
+      (Preliminaries.triangleSub strategy.state 𝒟 strategy.isNormalized
+        (uniformDistribution_weight_sum_le_one (Point params.next))
+        (IdxProjMeas.toIdxMeas strategy.pointMeasurement) rawMeas
+        family.evaluatedAtNextPoint zeta ν hcons.pointConsistency hpoint_raw_sdd)
+  have hfamily_raw :
+      ConsRel strategy.state 𝒟 family.evaluatedAtNextPoint rawSub
+        (zeta + Real.sqrt ν) :=
+    PermInvState.consRel_swap strategy.permInvState 𝒟 rawSub
+      family.evaluatedAtNextPoint (zeta + Real.sqrt ν) hraw_family
+  have hfamily_lifted :
+      ConsRel strategy.state 𝒟 family.evaluatedAtNextPoint
+        (liftedVerticalLineAnswerFamily params strategy)
+        (zeta + Real.sqrt ν) := by
+    simpa [rawSub, rawVerticalLineAnswerFamily_eq_lifted params strategy] using hfamily_raw
+  simpa [𝒟, ν, IdxPolyFamily.evaluatedAtNextPoint, evaluateFiberFamilyAtNextPoint,
+    liftedVerticalLineAnswerFamily] using hfamily_lifted
 
 /-- `prop:ld-dnoteq`. -/
 theorem ldDnoteq

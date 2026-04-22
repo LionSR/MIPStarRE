@@ -2479,16 +2479,9 @@ theorem mainInductionBaseCase
                 (AxisParallelLine.throughPoint (params := params) u i0)).toSubMeas)
               (fun f =>
                 f (AxisParallelLine.sampleParameter (params := params) u i0))).outcome a := by
-                let haxisInv :
-                    AxisParallelEvaluationReparamInvariant params
-                      strategy.axisParallelMeasurement.toIdxProjMeas :=
-                  AxisParallelMeasurementTransportInvariant.toEvaluationReparamInvariant
-                    strategy.axisParallelMeasurement.transportInvariant
-                simpa using
-                  haxisInv
-                    (AxisParallelLine.throughPoint (params := params) u i0)
-                    (AxisParallelLine.sampleParameter (params := params) u i0)
-                    a
+                exact
+                  (AxisParallelCovariantMeasurement.reparamInvariant
+                    strategy.axisParallelMeasurement) _ _ _
         _ = (postprocess
               ((strategy.axisParallelMeasurement canonicalLine).toSubMeas)
               (fun f => f (u i0))).outcome a := by

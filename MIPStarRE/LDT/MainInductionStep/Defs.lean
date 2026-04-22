@@ -284,8 +284,10 @@ private theorem restrictAxisParallelMeasurement_reparamInvariant
     _ = (postprocess ((strategy.axisParallelMeasurement
           (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas)
           (fun f => f t)).outcome a := by
-            exact strategy.axisParallelReparamInvariant
-              (AxisParallelLine.appendAtHeight params ℓ x) t a
+            exact
+              (AxisParallelCovariantMeasurement.reparamInvariant
+                strategy.axisParallelMeasurement)
+                (AxisParallelLine.appendAtHeight params ℓ x) t a
     _ = (postprocess (((restrictAxisParallelMeasurement params strategy x) ℓ).toSubMeas)
           (fun f => f t)).outcome a := by
             symm
