@@ -294,7 +294,7 @@ Last updated: 2026-04-21
 ## Active Pasting Wave
 - **Owner**: OpenCode
 - **Scope**: `MIPStarRE/LDT/Pasting/*.lean`
-- **Live executable sorrys in scope**: 8
+- **Live executable sorrys in scope**: 6
 - **Current live target**: `MIPStarRE/LDT/Pasting/BridgeLemmas.lean`
 - **Status**: IN PROGRESS
 - **Dependency chain**:
@@ -322,7 +322,7 @@ Last updated: 2026-04-21
   - [x] Read the corresponding paper/blueprint section for Section 12
   - [x] Eliminate `commutativitySwitcheroo`
   - [x] Eliminate `ldGbcon`
-  - [ ] Eliminate `commuteGHalfSandwich`
+  - [x] Eliminate `commuteGHalfSandwich`
   - [ ] Eliminate `ldSandwichLineOnePoint`
   - [ ] Eliminate `hBConsistency`
   - [x] Repair the `hAConsistency_*` statement split to match the paper (`ν` before completion, `σ` after completion)
@@ -346,6 +346,10 @@ Last updated: 2026-04-21
   - added the first tail-move recursion pieces for `commuteGHalfSandwich_core`: `moveTailQuestionEquiv`, `moveTailOutcomeEquiv`, `commuteGHalfSandwich_moveStepSourceFamily`, `commuteGHalfSandwich_moveStepTargetFamily`, `commuteGHalfSandwich_moveSourceFamily`, `commuteGHalfSandwich_moveSource_eq_split`, and `commuteGHalfSandwich_move_recursive_zero`; all compile and isolate the remaining work to the recursive `r+1` move step and the final `sddOpRel_chain` packaging
   - added further compiled identifications for the recursive commutation proof: `pointTupleOneEquiv`, `gHatTupleOutcomeOneEquiv`, `splitQuestionEquivOne`, `splitOutcomeEquivOne`, `pairTailOutcomeEquiv`, and `commuteGHalfSandwich_moveBack_eq_recursiveSource`; these now cover the tuple/outcome reindexing needed for the `k=2` base case and the final recursive-target phase without introducing new live holes
   - added the first `hBConsistency` / `overAllOutcomes` support helpers in `BridgeLemmas.lean`: `axisLinePolynomial_ne_gives_support_eval_ne`, `exists_onePoint_family_witness_of_eval_mismatch`, `nonglobal_gives_slice_mismatch_against_interpolant`, `not_interpolationEligible_exists_none`, and `qBipartiteConsDefect_eq_false_mass_of_bool_right_true`; these compile and isolate the remaining missing ingredients to the interpolation-support correctness lemma and the actual averaging/union-bound assembly in the live theorems
+  - added `proof-guide-bridge-lemmas-sorry-elim.md`, copying the Chapter 9 paper fragment for the active bridge chain and recording the Lean proof spine for the rebuilt commute argument together with the remaining one-point / line-consistency / all-outcomes obligations
+  - restored the endpoint scaffolding for the remaining one-point proof directly in `BridgeLemmas.lean`: `postprocessMeasurement`, `sandwichedLineQuestionOneEquiv`, `ldSandwichLineOnePointRightEndpointMeasurement`, `ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas`, the product-question wrapper `ldSandwichLineOnePoint_endpoint_ldGbcon`, and the `SandwichedLineQuestion params 1` wrapper `ldSandwichLineOnePoint_oneQuestion_ldGbcon`; the file still typechecks with only the three live theorem holes
+  - fully reconstructed the half-sandwich flat-chain commutation proof in `BridgeLemmas.lean`: ported the split-lift, second-slice, move-chain, move-back, post-move, and flat-chain helper families from the historical split development, restored the paper-faithful `sddOpRel_chain` endpoint assembly, and discharged `commuteGHalfSandwich_core`
+  - `BridgeLemmas.lean` now has only 3 live executable `sorry`s (`ldSandwichLineOnePoint_core`, `hBConsistency_core`, `overAllOutcomes`), and total remaining `Pasting` `sorry`s are down to 6
   - proved `commutativitySwitcheroo` in `Pasting/SwitcherooCompletion.lean` by replacing the last heartbeat-heavy `χ` step with pointwise raw rewrite lemmas and local wrapper bounds (`OnceCommutedRawLocal`, `MixedRawLocal`, `LeftFrontRawLocal`, `FirstSplitRawLocal`)
   - proved `ldGbcon` in `Pasting/Core.lean` from the paper's `eq:ld-abcon` -> `eq:ld-gbcon` chain: conditioned axis-parallel consistency in the last direction, self-consistency-to-right-register transfer, `triangleSub_right`, and the vertical-line reparametrization identity
   - added reusable `pointVerticalLineSdd` in `Pasting/Core.lean`, exposing the point-vs-vertical-line `SDDRel` bound with error `8m eps + 4 delta`
@@ -371,13 +375,14 @@ Last updated: 2026-04-21
   - `Pasting/Core.lean`: 0 `sorry`s
   - `Pasting/SwitcherooCompletion/Switcheroo.lean`: 0 `sorry`s
   - `Pasting/Core/Bounds.lean`: 0 `sorry`s
-  - `Pasting/BridgeLemmas.lean`: 4 `sorry`s
+  - `Pasting/BridgeLemmas.lean`: 3 `sorry`s
   - `Pasting/Bernoulli/Recurrence.lean`: 2 `sorry`s
   - `Pasting/Bernoulli/Final.lean`: 1 `sorry`
-  - total remaining in `MIPStarRE/LDT/Pasting`: 8
+  - total remaining in `MIPStarRE/LDT/Pasting`: 6
 - **Current blocker focus**:
-  - `hAConsistency_submeas` has been moved to the positive-`k` regime and is no longer a live hole; the active bridge blocker is `commuteGHalfSandwich_core`, where the remaining work is the recursive `move/commute/move-back` chain on the split question space, not further infrastructure
-  - refreshed the exact live chain: `ldGbcon`, `commutativitySwitcheroo`, `commuteGHalfSandwich`, `ldSandwichLineOnePoint`, `hBConsistency`, `hAConsistency`, `overAllOutcomes`, `fromHToG` (2 goals), `chernoffBernoulliMatrix`, `ldPastingNCompleteness`
+  - `commuteGHalfSandwich_core` is now closed; the active blockers in `BridgeLemmas.lean` are the one-point Cauchy-Schwarz transport (`ldSandwichLineOnePoint_core`) and the interpolation / bad-mass aggregation needed for `hBConsistency_core` and `overAllOutcomes`
+  - the next concrete local target for `ldSandwichLineOnePoint_core` is the paper-faithful endpoint collapse to `ldGbcon`; the right-endpoint measurement and `SandwichedLineQuestion params 1` reindex helpers are now available in the monolithic target file
+  - refreshed the exact live chain: `ldGbcon`, `commutativitySwitcheroo`, `commuteGHalfSandwich`, `ldSandwichLineOnePoint`, `hBConsistency`, `hAConsistency`, `overAllOutcomes`, `fromHToG` (2 goals), `ldPastingNCompleteness`
   - re-read `references/ldt-paper/ld-pasting.tex` and `blueprint/src/chapter/ch09_pasting.tex` for the active Section 12 spine
   - re-read `docs/proof-hints.md` and the local Pasting/Preliminaries infrastructure for transport, averaging, and triangle patterns
   - identified that `ldGbcon` is blocked by the conditioned last-direction axis-line encoding: the axis test uses the sampled ambient basepoint, while the pasting theorem needs the canonical vertical-line family based at height `0`
