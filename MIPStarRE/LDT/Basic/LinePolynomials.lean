@@ -129,6 +129,25 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
     appendAtHeight params f x t = f t :=
   rfl
 
+/-- Slice extension commutes with translating the line parameter on axis-line answers. -/
+@[simp] theorem appendAtHeight_reparamAt {params : Parameters} [FieldModel params.q]
+    (f : AxisLinePolynomial params) (t x : Fq params) :
+    appendAtHeight params (reparamAt f t) x =
+      reparamAt (appendAtHeight params f x) t := by
+  apply AxisLinePolynomial.ext
+  rfl
+
+/-- The inverse reparametrization equivalence commutes with slice extension on
+axis-line answers. -/
+@[simp] theorem reparamAtEquiv_symm_appendAtHeight
+    {params : Parameters} [FieldModel params.q]
+    (f : AxisLinePolynomial params) (t x : Fq params) :
+    ((reparamAtEquiv (params := params.next) t).symm
+        (appendAtHeight params f x)) =
+      appendAtHeight params (((reparamAtEquiv (params := params) t).symm) f) x := by
+  apply AxisLinePolynomial.ext
+  rfl
+
 /-- Restrict an axis-line answer in `m + 1` variables to the slice at height `x`. -/
 def restrictAtHeight (params : Parameters) [FieldModel params.q]
     (f : AxisLinePolynomial params.next) (_x : Fq params) : AxisLinePolynomial params where
@@ -242,6 +261,25 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
   poly := f.poly
   degreeBounded := by
     exact le_trans f.degreeBounded (Nat.mul_le_mul_right _ (Nat.le_succ _))
+
+/-- Slice extension commutes with translating the line parameter on diagonal-line answers. -/
+@[simp] theorem appendAtHeight_reparamAt {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t x : Fq params) :
+    appendAtHeight params (reparamAt f t) x =
+      reparamAt (appendAtHeight params f x) t := by
+  apply DiagonalLinePolynomial.ext
+  rfl
+
+/-- The inverse reparametrization equivalence commutes with slice extension on
+diagonal-line answers. -/
+@[simp] theorem reparamAtEquiv_symm_appendAtHeight
+    {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t x : Fq params) :
+    ((reparamAtEquiv (params := params.next) t).symm
+        (appendAtHeight params f x)) =
+      appendAtHeight params (((reparamAtEquiv (params := params) t).symm) f) x := by
+  apply DiagonalLinePolynomial.ext
+  rfl
 
 /-- Restrict a diagonal-line answer in `m + 1` variables to the slice at height `x`.
 This interface now makes the stronger slice-wise degree requirement explicit. -/
