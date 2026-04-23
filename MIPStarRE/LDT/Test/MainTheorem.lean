@@ -237,25 +237,27 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  -- TODO(#634): The remaining proof case-splits on the `k`-bound boundary
-  -- made explicit above.
+  -- TODO(#634): The remaining proof still case-splits on the `k`-bound
+  -- boundary made explicit above.
   -- * `hlarge : 400 * params.m * params.d ≤ k` branch: Step 1 symmetrization
   --   (`strategySymmetrization_*`) and the final scalar envelope
-  --   (`errorCascade_le_mainFormalError`) are now formalized. Section 6 has the
-  --   internal base-case / successor-step assembly (`mainInductionBaseCase`,
-  --   `mainInductionFromPackages`, `mainInductionByRecursionOnM`), so the
-  --   induction-side gap here, tracked by #630, is to furnish the high-level
-  --   inputs those theorems still expect: the weighted restricted-probability
-  --   bounds and a restricted-strategy self-improvement producer. After that,
-  --   this file still needs the paper's unsymmetrization, Schwartz-Zippel, and
-  --   final orthonormalization/projectivization transport into the three
-  --   displayed `ConsRel` conclusions; those last three transports will apply
-  --   `errorCascade_le_mainFormalError` directly at the point-A consistency,
-  --   point-B consistency, and self-consistency usage sites.
+  --   (`errorCascade_le_mainFormalError`) are already formalized. Section 6 now
+  --   exposes the public induction-step boundary theorem
+  --   `mainInductionPublicWrapper`, so the remaining induction-side gap is to
+  --   package the symmetrized strategy inputs into the weighted
+  --   restricted-probability bounds, recursive slice witnesses, and
+  --   restricted-strategy self-improvement producer that theorem expects. After
+  --   that, this file still needs the paper's unsymmetrization,
+  --   Schwartz-Zippel, and final orthonormalization/projectivization transport
+  --   into the three displayed `ConsRel` conclusions; those last three
+  --   transports will apply `errorCascade_le_mainFormalError` directly at the
+  --   point-A consistency, point-B consistency, and self-consistency usage
+  --   sites.
   -- * `hsmall : k < 400 * params.m * params.d` branch: combine the cascade
   --   bounds with `params.m * params.d ≤ k` and `0 < k` to conclude
   --   `1 ≤ mainFormalError params k eps`, then invoke
   --   `mainFormal_trivial_witness`.
+
   sorry
 
 end Test
