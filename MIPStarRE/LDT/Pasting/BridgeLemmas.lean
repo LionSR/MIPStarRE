@@ -4961,15 +4961,20 @@ lemma overAllOutcomes
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
-  -- `OverAllOutcomesStatement` is a single-field wrapper around the scalar `SDDRel` bound below.
+  -- `OverAllOutcomesStatement` is a single-field wrapper around the scalar bound below.
   refine ⟨?_⟩
   /- Paper: `lem:over-all-outcomes` (ld-pasting.tex §9.4, lines 1140–1289).
-  Expand pasted-measurement total mass over all outcome types τ with |τ| ≥ d+1.
-  Steps: (1) expand over distinct k-tuples via `distinctTupleDistribution`,
-  (2) decompose by outcome type with |τ| ≥ d+1,
-  (3) remove global-polynomial restriction (Schwartz-Zippel: error md/q),
-  (4) swap distinct → uniform sampling (`prop:ld-dnoteq`: error 2k²/q),
-  (5) bound sandwich errors (`lem:ld-sandwich-line-one-point`: k × ν₅).
+  The displayed statement is the scalar approximation
+  $$
+    \bra{\psi} H \ot I \ket{\psi}
+      \approx_{\nu_7}
+      \mathbb E_{x_1,\dots,x_k}
+        \sum_{\tau : |\tau| \ge d+1}
+        \sum_{g \in \mathsf{Outcomes}_\tau}
+          \bra{\psi} \widehat H^x_g \ot I \ket{\psi},
+  $$
+  so the Lean target now records that scalar mass difference directly rather than
+  an over-strong `SDDRel` on `Unit`-indexed totals.
 
   Current blockers after the split audit:
   * the interpolation-to-global-polynomial correctness step still needs the

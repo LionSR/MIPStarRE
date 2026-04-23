@@ -342,19 +342,38 @@ structure HBConsistencyStatement (params : Parameters)
       (verticalLineMeasurementFamily params strategy)
       (hBConsistencyError params eps delta gamma zeta k)
 
-/-- Output package for `lem:over-all-outcomes`. -/
+/-- Scalar expectation of the pasted submeasurement mass appearing on the
+left-hand side of `lem:over-all-outcomes`. -/
+noncomputable def overAllOutcomesPastedMass (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) : Error :=
+  subMeasMass strategy.state ((constructedPastedSubMeas params family k).liftLeft)
+
+/-- Scalar expectation of the all-outcomes expansion on the right-hand side of
+`lem:over-all-outcomes`. -/
+noncomputable def overAllOutcomesExpansionMass (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) : Error :=
+  subMeasMass strategy.state ((IdxSubMeas.liftLeft
+    (allOutcomesExpansionFamily params strategy family k)) ())
+
+/-- Output package for `lem:over-all-outcomes`.
+
+The paper's displayed statement is a scalar approximation of expectation values,
+not a stronger `≈_δ` relation between already-collapsed `Unit`-indexed
+submeasurements.  Accordingly, this bundle stores only the absolute-value bound
+between the pasted mass and the all-outcomes expansion mass. -/
 structure OverAllOutcomesStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (eps delta gamma zeta : Error) (k : ℕ) : Prop where
   totalOutcomeExpansion :
-    SDDRel strategy.state (uniformDistribution Unit)
-      (IdxSubMeas.liftLeft
-        (constructedPastedMeasurementTotal params family k))
-      (IdxSubMeas.liftLeft
-        (allOutcomesExpansionFamily params strategy family k))
-      (overAllOutcomesError params eps delta gamma zeta k)
+    |overAllOutcomesPastedMass params strategy family k -
+        overAllOutcomesExpansionMass params strategy family k| ≤
+      overAllOutcomesError params eps delta gamma zeta k
 
 /-- Scalar expectation of the stage-`ℓ` left recurrence operator from
 `lem:from-H-to-G`. -/
