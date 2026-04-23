@@ -306,7 +306,7 @@ Why this is a problem:
 ### 11. [resolved] The restricted diagonal strategy now uses a measurement-valued encoding
 
 - Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:28-58`, `:281-320`
-- Status: **resolved on `main`**
+- Status: **resolved in #593**
 
 Lean code:
 
@@ -325,7 +325,7 @@ Resolution:
 ### 12. [resolved] The diagonal branch in `restrictedProbabilities` now uses the paper's `m/(m+1)` and `(m+1)/m` factors
 
 - Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:429-438`, `MIPStarRE/LDT/MainInductionStep/Statements.lean:148-191`, `MIPStarRE/LDT/MainInductionStep/Theorems.lean:1039-1120`
-- Status: **resolved on `main`**
+- Status: **resolved in #593**
 
 Lean code:
 
@@ -362,7 +362,7 @@ Why this is a problem:
 ### 14. [resolved] The stale diagonal-branch mismatch TODOs were cleared from the induction-step layer
 
 - Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean`, `Statements.lean`, `Theorems.lean`
-- Status: **resolved on `main`**
+- Status: **resolved in #593**
 
 Resolution:
 
