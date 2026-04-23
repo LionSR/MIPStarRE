@@ -56,15 +56,38 @@ def nonglobalOutcomesByType (params : Parameters) [FieldModel params.q]
     Set (GHatTupleOutcome params k) :=
   outcomesByType τ \ globallyConsistentOutcomesByType params xs τ
 
+/-- Choose a witness polynomial for a globally consistent tuple. -/
+noncomputable def globallyConsistentWitness (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k) (gs : GHatTupleOutcome params k)
+    (hGlobal : IsGloballyConsistent params xs gs) : Polynomial params.next :=
+  open Classical in
+    Classical.choose hGlobal
+
+/-- The chosen witness polynomial agrees with every genuine completed slice. -/
+theorem globallyConsistentWitness_spec (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k) (gs : GHatTupleOutcome params k)
+    (hGlobal : IsGloballyConsistent params xs gs)
+    (i : Fin k) (hi : (gs i).isSome = true) :
+    (Polynomial.restrictAtHeight params
+      (globallyConsistentWitness params xs gs hGlobal) (xs i)).poly =
+        ((gs i).get hi).poly := by
+  open Classical in
+    simpa [globallyConsistentWitness] using (Classical.choose_spec hGlobal i hi)
+
 /-- Recover a global polynomial from a completed-slice tuple.
 
 On the actual pasting path this map is only applied after restricting to tuples in
-`Global_τ(x)`, so it may choose any globally consistent witness. When no such
-witness exists, it falls back to the distinguished zero polynomial.
+`Global_τ(x)` with `|τ| ≥ d+1`, so the ineligible branch lies outside the support
+of `pastedInterpolationFamily`. We nevertheless make the nonempty ineligible branch
+honest: for globally consistent tuples of length `k + 1` that fail the eligibility
+cutoff, we return a chosen witness polynomial rather than a placeholder.
 
-In the eligible branch we make the interpolation support witness explicit: a chosen
-subset `σ ⊆ support(gs)` of size `d+1` is packaged together with its proof fields and
-then passed to `interpolateCompletedSlicesFromSupport`. -/
+The empty-tuple branch keeps the distinguished fallback outcome `h₀`, matching the
+completion outcome used in `constructedPastedMeasurement`.
+
+In the eligible branch we still keep the explicit interpolation support witness: a
+chosen subset `σ ⊆ support(gs)` of size `d+1` is packaged together with its proof
+fields and then passed to `interpolateCompletedSlicesFromSupport`. -/
 noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel params.q] :
     (k : ℕ) → PointTuple params k → GHatTupleOutcome params k → Polynomial params.next
   | 0, _xs, _gs => fallbackInterpolatedPolynomial params
@@ -73,8 +96,27 @@ noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel p
         let supportData := interpolationSupportWitness gs hEligible
         interpolateCompletedSlicesFromSupport params xs gs
           supportData.support supportData.subset_support supportData.card_eq
+      else if hGlobal : IsGloballyConsistent params xs gs then
+        globallyConsistentWitness params xs gs hGlobal
       else
         fallbackInterpolatedPolynomial params
+
+/-- On ineligible but globally consistent tuples, `interpolateCompletedSlices`
+returns an actual witness polynomial. -/
+theorem interpolateCompletedSlices_spec_of_not_eligible
+    (params : Parameters) [FieldModel params.q] {k : ℕ}
+    (xs : PointTuple params k) (gs : GHatTupleOutcome params k)
+    (hNotEligible : ¬ InterpolationEligible params gs)
+    (hGlobal : IsGloballyConsistent params xs gs)
+    (i : Fin k) (hi : (gs i).isSome = true) :
+    (Polynomial.restrictAtHeight params
+      (interpolateCompletedSlices params k xs gs) (xs i)).poly =
+        ((gs i).get hi).poly := by
+  cases k with
+  | zero => cases i.2
+  | succ k =>
+      simpa [interpolateCompletedSlices, hNotEligible, hGlobal] using
+        globallyConsistentWitness_spec params xs gs hGlobal i hi
 
 /-- Aggregate the polynomial outcomes of `G^x` into its complete part `G^x`. -/
 noncomputable def completePartSubMeas (params : Parameters) [FieldModel params.q]

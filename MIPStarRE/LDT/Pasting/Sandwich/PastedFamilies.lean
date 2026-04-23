@@ -61,9 +61,12 @@ globally consistent with a single polynomial.
 
 The paper's definition (`references/ldt-paper/ld-pasting.tex` lines 474–495) sums
 only tuples `(g_1,…,g_k)` in `Global_τ(x)` — those consistent with a single
-polynomial `h` — and then interpolates.  The `|τ| ≥ d+1` eligibility filter is
+polynomial `h` — and then interpolates. The `|τ| ≥ d+1` eligibility filter is
 applied by `interpolationEligibleSandwichFamily`; this definition additionally
-restricts to globally consistent tuples via `IsGloballyConsistent`. -/
+restricts to globally consistent tuples via `IsGloballyConsistent`.
+Consequently, `pastedInterpolationFamily` is supported only on tuples satisfying
+both restrictions, and any fallback or default value in
+`interpolateCompletedSlices` is irrelevant off that restricted support. -/
 noncomputable def pastedInterpolationFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas (PointTuple params k) (Polynomial params.next) ι :=
