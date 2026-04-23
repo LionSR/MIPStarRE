@@ -22,6 +22,38 @@
 	\]
 	In addition, $\ket{\mathsf{aux}}$ is a product state.
 \end{theorem}
+\begin{proof}
+	\uses{lem:naimark-helper}
+
+	For each question $x$, choose a local auxiliary state
+	$\ket{\mathsf{aux}_{\mathrm A,x}}$ of dimension one larger than the number of
+	outcomes of $A^x$, and apply Lemma~\ref{lem:naimark-helper} to obtain a
+	projective sub-measurement $\widetilde A^x$. Do the same for each question $y$
+	on Bob's side, obtaining auxiliary states $\ket{\mathsf{aux}_{\mathrm B,y}}$
+	and projective sub-measurements $\widetilde B^y$.
+
+	Let
+	\[
+		\ket{\mathsf{aux}}
+		=
+		\Big(\bigotimes_x \ket{\mathsf{aux}_{\mathrm A,x}}\Big)
+		\ot
+		\Big(\bigotimes_y \ket{\mathsf{aux}_{\mathrm B,y}}\Big),
+		\qquad
+		\ket{\widehat{\psi}} = \ket{\psi} \ot \ket{\mathsf{aux}},
+	\]
+	and let $\widehat A^x_a$ and $\widehat B^y_b$ be obtained by letting
+	$\widetilde A^x_a$ or $\widetilde B^y_b$ act on the relevant auxiliary factor
+	and the identity act on every other auxiliary factor. Because the auxiliary
+	state is a product state and the two dilations act on disjoint tensor factors,
+	the correlation for fixed $(x,y)$ reduces to the compression identity from
+	Lemma~\ref{lem:naimark-helper} on the $x$- and $y$-registers. Hence
+	\[
+		\bra{\widehat{\psi}} \widehat A^x_a \ot \widehat B^y_b \ket{\widehat{\psi}}
+		=
+		\bra{\psi} A^x_a \ot B^y_b \ket{\psi}.
+	\]
+\end{proof}
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
@@ -88,29 +120,6 @@
 		=
 		A_a.
 	\end{align*}
-\end{proof}
-
-\begin{proof}[Proof of \ref{thm:naimark}]
-		\uses{lem:naimark-helper}
-
-	For each question $x$, choose a local auxiliary state $\ket{\mathsf{aux}_{\mathrm A,x}}$ of dimension one larger than the number of outcomes of $A^x$, and apply \ref{lem:naimark-helper} to obtain a projective sub-measurement $\widetilde A^x$. Do the same for each question $y$ on Bob's side, obtaining auxiliary states $\ket{\mathsf{aux}_{\mathrm B,y}}$ and projective sub-measurements $\widetilde B^y$.
-
-	Let
-	\[
-		\ket{\mathsf{aux}}
-		=
-		\Big(\bigotimes_x \ket{\mathsf{aux}_{\mathrm A,x}}\Big)
-		\ot
-		\Big(\bigotimes_y \ket{\mathsf{aux}_{\mathrm B,y}}\Big),
-		\qquad
-		\ket{\widehat{\psi}} = \ket{\psi} \ot \ket{\mathsf{aux}},
-	\]
-	and let $\widehat A^x_a$ and $\widehat B^y_b$ be obtained by letting $\widetilde A^x_a$ or $\widetilde B^y_b$ act on the relevant auxiliary factor and the identity act on every other auxiliary factor. Because the auxiliary state is a product state and the two dilations act on disjoint tensor factors, the correlation for fixed $(x,y)$ reduces to the compression identity from \ref{lem:naimark-helper} on the $x$- and $y$-registers. Hence
-	\[
-		\bra{\widehat{\psi}} \widehat A^x_a \ot \widehat B^y_b \ket{\widehat{\psi}}
-		=
-		\bra{\psi} A^x_a \ot B^y_b \ket{\psi}.
-	\]
 \end{proof}
 
 % Paper source: references/ldt-paper/orthonormalization.tex, lines 189--271.
@@ -204,8 +213,9 @@
 \end{proof}
 
 \begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:orthonormalization-main-lemma}]
-		\leanok
-		\uses{prop:other-two-notions-of-self-consistency, lem:orthonormalization-main-lemma}
+	\proves{thm:orthonormalization}
+	\leanok
+	\uses{prop:other-two-notions-of-self-consistency, lem:orthonormalization-main-lemma}
 
 	Let $A = \{A_a\}$ be a sub-measurement with outcomes in $\mathcal A$. Write $A=\sum_a A_a$. The strong self-consistency assumption implies
 	\[
@@ -240,6 +250,7 @@
 \end{proof}
 
 \begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
+	\proves{lem:orthonormalization-main-lemma}
 	\uses{prop:simeq-for-measurements, lem:projective-non-measurement, lem:projective-low-rank-sum, lem:Q-completeness, lem:sqrt-Q-completeness, lem:q-almost-projective, lem:xa-t, lem:qa-restated, lem:X-squared, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity, lem:P-Q-approx, prop:triangle-inequality-for-approx_delta}
 	The statement is trivial when $\zeta > 1/4$, so assume
 	\begin{equation}\label{eq:assumption-on-zeta}
