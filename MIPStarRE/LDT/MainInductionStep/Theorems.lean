@@ -2,6 +2,7 @@ import Mathlib.Analysis.Convex.SpecificFunctions.Pow
 import Mathlib.Analysis.MeanInequalitiesPow
 import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
 import MIPStarRE.LDT.MainInductionStep.Statements
+import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.CommutativityPoints.Theorem
 import MIPStarRE.LDT.Commutativity.Theorems
 import MIPStarRE.LDT.Pasting.Theorems
@@ -569,9 +570,9 @@ private lemma eps_le_one_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     eps ≤ 1 := by
-  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -614,9 +615,9 @@ private lemma delta_le_one_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     delta ≤ 1 := by
-  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -664,9 +665,9 @@ private lemma three_le_k_sq_mul_next_m_of_hsmall
   by_cases hk1 : k = 1
   · subst hk1
     by_cases hnext_two : params.next.m = 2
-    · have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-      have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
-      have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
+    · have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+      have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+      have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
       have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
         positivity
       have hnu_nonneg : 0 ≤ mainInductionNu params.next 1 eps delta gamma := by
@@ -751,9 +752,9 @@ private lemma gamma_le_one_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     gamma ≤ 1 := by
-  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -796,9 +797,9 @@ private lemma dq_le_q_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     params.d ≤ params.q := by
-  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -844,8 +845,8 @@ private lemma eps_le_one_of_selfImprovementInInductionError_le_one
     (hgood : strategy.IsGood eps delta gamma)
     (hzeta_le : selfImprovementInInductionError params.next eps delta gamma ≤ 1) :
     eps ≤ 1 := by
-  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -882,8 +883,8 @@ private lemma delta_le_one_of_selfImprovementInInductionError_le_one
     (hgood : strategy.IsGood eps delta gamma)
     (hzeta_le : selfImprovementInInductionError params.next eps delta gamma ≤ 1) :
     delta ≤ 1 := by
-  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
-  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -965,6 +966,640 @@ private lemma selfConsistencyRestrictedAverage_eq
     _ = strategy.selfConsistencyFailureProbability := by
           rfl
 
+private def pointAppendProdEquiv (params : Parameters) [FieldModel params.q] (β : Type*) :
+    Fq params × (Point params × β) ≃ Point params.next × β where
+  toFun := fun xb => (appendPoint params xb.2.1 xb.1, xb.2.2)
+  invFun := fun ub => (pointHeight params ub.1, (truncatePoint params ub.1, ub.2))
+  left_inv := by
+    rintro ⟨x, u, b⟩
+    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
+  right_inv := by
+    rintro ⟨u, b⟩
+    exact Prod.ext ((CommutativityPoints.pointNextEquiv params).left_inv u) rfl
+
+private def axisLineSliceEquiv (params : Parameters) [FieldModel params.q] (x : Fq params) :
+    AxisLinePolynomial params.next ≃ AxisLinePolynomial params where
+  toFun := fun f => AxisLinePolynomial.restrictAtHeight params f x
+  invFun := liftAxisAnswer params x
+  left_inv := by
+    intro f
+    cases f
+    rfl
+  right_inv := by
+    intro f
+    cases f
+    rfl
+
+private lemma restrictAxisParallelMeasurement_toSubMeas_eq_transport
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (x : Fq params)
+    (ℓ : AxisParallelLine params) :
+    (restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas =
+      SubMeas.transport (axisLineSliceEquiv params x)
+        ((strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas) := by
+  refine SubMeas.ext ?_ ?_
+  · intro f
+    rfl
+  · simpa [SubMeas.transport,
+      (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).total_eq_one] using
+      (restrictAxisParallelMeasurement params strategy x ℓ).total_eq_one
+
+private lemma restrictAxisParallelMeasurement_postprocess_zero
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (x : Fq params)
+    (ℓ : AxisParallelLine params) :
+    postprocess ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas) (· zeroCoord) =
+      postprocess
+        ((strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas)
+        (fun f : AxisLinePolynomial params.next => f zeroCoord) := by
+  rw [restrictAxisParallelMeasurement_toSubMeas_eq_transport params strategy x ℓ]
+  rw [SubMeas.postprocess_transport]
+  have hreadout :
+      (fun a : AxisLinePolynomial params.next => (axisLineSliceEquiv params x a) zeroCoord) =
+        (fun f : AxisLinePolynomial params.next => f zeroCoord) := by
+    funext a
+    cases a
+    rfl
+  simp [hreadout]
+
+private lemma restrictedAxisSampleError_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (x : Fq params)
+    (u : Point params)
+    (i : Fin params.m) :
+    qBipartiteConsDefect strategy.state
+      (RestrictedSymStrat.axisParallelPointAnswerFamily (xRestrictedStrategy params strategy x) (u, i))
+      (RestrictedSymStrat.axisParallelLineAnswerFamily (xRestrictedStrategy params strategy x) (u, i)) =
+    qBipartiteConsDefect strategy.state
+      (axisParallelPointAnswerFamily strategy (appendPoint params u x, embedCoord params i))
+      (axisParallelLineAnswerFamily strategy (appendPoint params u x, embedCoord params i)) := by
+  simp [RestrictedSymStrat.axisParallelPointAnswerFamily,
+    RestrictedSymStrat.axisParallelLineAnswerFamily, axisParallelPointAnswerFamily,
+    axisParallelLineAnswerFamily, xRestrictedStrategy]
+  simpa [AxisParallelLine.appendAtHeight] using
+    congrArg
+      (fun B =>
+        qBipartiteConsDefect strategy.state
+          ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas) B)
+      (restrictAxisParallelMeasurement_postprocess_zero params strategy x
+        { base := u, direction := i })
+
+private noncomputable def sliceAxisDirectionError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (x : Fq params)
+    (i : Fin params.m) : Error :=
+  avgOver (uniformDistribution (Point params)) fun u =>
+    qBipartiteConsDefect strategy.state
+      (RestrictedSymStrat.axisParallelPointAnswerFamily (xRestrictedStrategy params strategy x) (u, i))
+      (RestrictedSymStrat.axisParallelLineAnswerFamily (xRestrictedStrategy params strategy x) (u, i))
+
+private noncomputable def axisDirectionError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (i : Fin params.next.m) : Error :=
+  avgOver (uniformDistribution (Point params.next)) fun u =>
+    qBipartiteConsDefect strategy.state
+      (axisParallelPointAnswerFamily strategy (u, i))
+      (axisParallelLineAnswerFamily strategy (u, i))
+
+private lemma axisDirectionError_nonneg
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (i : Fin params.next.m) :
+    0 ≤ axisDirectionError params strategy i := by
+  unfold axisDirectionError
+  refine avgOver_nonneg (uniformDistribution (Point params.next)) _ ?_
+  intro u
+  exact qBipartiteConsDefect_nonneg strategy.state
+    (axisParallelPointAnswerFamily strategy (u, i))
+    (axisParallelLineAnswerFamily strategy (u, i))
+
+private lemma sliceAxisDirectionErrorAverage_eq_axisDirectionError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (i : Fin params.m) :
+    avgOver (uniformDistribution (Fq params))
+      (fun x => sliceAxisDirectionError params strategy x i) =
+      axisDirectionError params strategy (embedCoord params i) := by
+  let g : Point params.next → Error := fun u =>
+    qBipartiteConsDefect strategy.state
+      (axisParallelPointAnswerFamily strategy (u, embedCoord params i))
+      (axisParallelLineAnswerFamily strategy (u, embedCoord params i))
+  have hprod :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => avgOver (uniformDistribution (Point params))
+            (fun u => g (appendPoint params u x))) =
+        avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => g (appendPoint params xu.2 xu.1)) := by
+    simpa using
+      (avgOver_uniform_prod (α := Fq params) (β := Point params)
+        (f := fun x u => g (appendPoint params u x))).symm
+  have hswap :
+      avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => g (appendPoint params xu.2 xu.1)) =
+        avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => g (appendPoint params ux.1 ux.2)) := by
+    simpa using
+      (CommutativityPoints.avgOver_uniform_equiv (e := Equiv.prodComm (Fq params) (Point params))
+        (f := fun xu : Fq params × Point params => g (appendPoint params xu.2 xu.1)))
+  have hequiv :
+      avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => g (appendPoint params ux.1 ux.2)) =
+        avgOver (uniformDistribution (Point params.next)) g := by
+    simpa using
+      (CommutativityPoints.avgOver_uniform_equiv
+        (e := CommutativityPoints.pointNextEquiv params)
+        (f := g)).symm
+  calc
+    avgOver (uniformDistribution (Fq params))
+        (fun x => sliceAxisDirectionError params strategy x i)
+      = avgOver (uniformDistribution (Fq params))
+          (fun x => avgOver (uniformDistribution (Point params))
+            (fun u => g (appendPoint params u x))) := by
+              refine avgOver_congr _ _ _ ?_
+              intro x
+              unfold sliceAxisDirectionError
+              refine avgOver_congr _ _ _ ?_
+              intro u
+              simpa [g] using restrictedAxisSampleError_eq params strategy x u i
+    _ = avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => g (appendPoint params xu.2 xu.1)) := hprod
+    _ = avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => g (appendPoint params ux.1 ux.2)) := hswap
+    _ = avgOver (uniformDistribution (Point params.next)) g := hequiv
+    _ = axisDirectionError params strategy (embedCoord params i) := by
+          rfl
+
+private lemma axisFailure_eq_average_directionError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    avgOver (uniformDistribution (Fin params.next.m))
+      (axisDirectionError params strategy) =
+      strategy.axisParallelFailureProbability := by
+  let err : Fin params.next.m × Point params.next → Error := fun iu =>
+    qBipartiteConsDefect strategy.state
+      (axisParallelPointAnswerFamily strategy (iu.2, iu.1))
+      (axisParallelLineAnswerFamily strategy (iu.2, iu.1))
+  have hprod :
+      avgOver (uniformDistribution (Fin params.next.m))
+          (fun i => avgOver (uniformDistribution (Point params.next))
+            (fun u => err (i, u))) =
+        avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err := by
+    simpa using
+      (avgOver_uniform_prod (α := Fin params.next.m) (β := Point params.next)
+        (f := fun i u => err (i, u))).symm
+  have hswap :
+      avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err =
+        avgOver (uniformDistribution (Point params.next × Fin params.next.m))
+          (fun ui => err (ui.2, ui.1)) := by
+    simpa using
+      (CommutativityPoints.avgOver_uniform_equiv
+        (e := Equiv.prodComm (Fin params.next.m) (Point params.next))
+        (f := err))
+  calc
+    avgOver (uniformDistribution (Fin params.next.m)) (axisDirectionError params strategy)
+      = avgOver (uniformDistribution (Fin params.next.m))
+          (fun i => avgOver (uniformDistribution (Point params.next))
+            (fun u => err (i, u))) := by
+              refine avgOver_congr _ _ _ ?_
+              intro i
+              rfl
+    _ = avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err := hprod
+    _ = avgOver (uniformDistribution (Point params.next × Fin params.next.m))
+          (fun ui => err (ui.2, ui.1)) := hswap
+    _ = strategy.axisParallelFailureProbability := by
+          rfl
+
+private lemma averageRestrictedAxisFailure_eq_embeddedAxisDirections
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    avgOver (uniformDistribution (Fq params))
+      (fun x => (xRestrictedStrategy params strategy x).axisParallelFailureProbability) =
+    avgOver (uniformDistribution (Fin params.m))
+      (fun i => axisDirectionError params strategy (embedCoord params i)) := by
+  calc
+    avgOver (uniformDistribution (Fq params))
+        (fun x => (xRestrictedStrategy params strategy x).axisParallelFailureProbability)
+      = avgOver (uniformDistribution (Fq params))
+          (fun x => avgOver (uniformDistribution (Fin params.m))
+            (fun i => sliceAxisDirectionError params strategy x i)) := by
+              refine avgOver_congr _ _ _ ?_
+              intro x
+              unfold RestrictedSymStrat.axisParallelFailureProbability bipartiteConsError
+              calc
+                avgOver (uniformDistribution (Point params × Fin params.m))
+                    (fun s =>
+                      qBipartiteConsDefect strategy.state
+                        (RestrictedSymStrat.axisParallelPointAnswerFamily
+                          (xRestrictedStrategy params strategy x) s)
+                        (RestrictedSymStrat.axisParallelLineAnswerFamily
+                          (xRestrictedStrategy params strategy x) s))
+                  = avgOver (uniformDistribution (Fin params.m × Point params))
+                      (fun iu =>
+                        qBipartiteConsDefect strategy.state
+                          (RestrictedSymStrat.axisParallelPointAnswerFamily
+                            (xRestrictedStrategy params strategy x) (iu.2, iu.1))
+                          (RestrictedSymStrat.axisParallelLineAnswerFamily
+                            (xRestrictedStrategy params strategy x) (iu.2, iu.1))) := by
+                              simpa using
+                                (CommutativityPoints.avgOver_uniform_equiv
+                                  (e := Equiv.prodComm (Point params) (Fin params.m))
+                                  (f := fun s : Point params × Fin params.m =>
+                                    qBipartiteConsDefect strategy.state
+                                      (RestrictedSymStrat.axisParallelPointAnswerFamily
+                                        (xRestrictedStrategy params strategy x) s)
+                                      (RestrictedSymStrat.axisParallelLineAnswerFamily
+                                        (xRestrictedStrategy params strategy x) s)))
+                _ = avgOver (uniformDistribution (Fin params.m))
+                      (fun i => avgOver (uniformDistribution (Point params))
+                        (fun u =>
+                          qBipartiteConsDefect strategy.state
+                            (RestrictedSymStrat.axisParallelPointAnswerFamily
+                              (xRestrictedStrategy params strategy x) (u, i))
+                            (RestrictedSymStrat.axisParallelLineAnswerFamily
+                              (xRestrictedStrategy params strategy x) (u, i)))) := by
+                                simpa using
+                                  (avgOver_uniform_prod (α := Fin params.m) (β := Point params)
+                                    (f := fun i u =>
+                                      qBipartiteConsDefect strategy.state
+                                        (RestrictedSymStrat.axisParallelPointAnswerFamily
+                                          (xRestrictedStrategy params strategy x) (u, i))
+                                        (RestrictedSymStrat.axisParallelLineAnswerFamily
+                                          (xRestrictedStrategy params strategy x) (u, i))))
+                _ = avgOver (uniformDistribution (Fin params.m))
+                      (fun i => sliceAxisDirectionError params strategy x i) := by
+                                rfl
+    _ = avgOver (uniformDistribution (Fq params × Fin params.m))
+          (fun xi => sliceAxisDirectionError params strategy xi.1 xi.2) := by
+            simpa using
+              (avgOver_uniform_prod (α := Fq params) (β := Fin params.m)
+                (f := fun x i => sliceAxisDirectionError params strategy x i)).symm
+    _ = avgOver (uniformDistribution (Fin params.m × Fq params))
+          (fun ix => sliceAxisDirectionError params strategy ix.2 ix.1) := by
+            simpa using
+              (CommutativityPoints.avgOver_uniform_equiv
+                (e := Equiv.prodComm (Fq params) (Fin params.m))
+                (f := fun xi : Fq params × Fin params.m =>
+                  sliceAxisDirectionError params strategy xi.1 xi.2))
+    _ = avgOver (uniformDistribution (Fin params.m))
+          (fun i => avgOver (uniformDistribution (Fq params))
+            (fun x => sliceAxisDirectionError params strategy x i)) := by
+            simpa using
+              (avgOver_uniform_prod (α := Fin params.m) (β := Fq params)
+                (f := fun i x => sliceAxisDirectionError params strategy x i))
+    _ = avgOver (uniformDistribution (Fin params.m))
+          (fun i => axisDirectionError params strategy (embedCoord params i)) := by
+            refine avgOver_congr _ _ _ ?_
+            intro i
+            exact sliceAxisDirectionErrorAverage_eq_axisDirectionError params strategy i
+
+private lemma embedCoord_injective (params : Parameters) :
+    Function.Injective (embedCoord params) := by
+  intro i j hij
+  apply Fin.ext
+  simpa [embedCoord] using congrArg Fin.val hij
+
+private lemma weighted_embedded_average_le_full_average
+    (params : Parameters)
+    (f : Fin params.next.m → Error)
+    (hf : ∀ i, 0 ≤ f i) :
+    sliceTransverseDirectionWeight params *
+        avgOver (uniformDistribution (Fin params.m)) (fun i => f (embedCoord params i)) ≤
+      avgOver (uniformDistribution (Fin params.next.m)) f := by
+  have hm : (params.m : Error) ≠ 0 := by
+    exact_mod_cast (Nat.ne_of_gt params.hm)
+  have hnextm : (params.next.m : Error) ≠ 0 := by
+    exact_mod_cast (Nat.ne_of_gt params.next.hm)
+  have hsum_le :
+      ∑ i : Fin params.m, f (embedCoord params i) ≤ ∑ j : Fin params.next.m, f j := by
+    classical
+    calc
+      ∑ i : Fin params.m, f (embedCoord params i)
+        = Finset.sum (((Finset.univ : Finset (Fin params.m)).image (embedCoord params))) (fun j => f j) := by
+            symm
+            refine Finset.sum_image ?_
+            intro a _ b _ hab
+            exact embedCoord_injective params hab
+      _ ≤ ∑ j : Fin params.next.m, f j := by
+            refine Finset.sum_le_sum_of_subset_of_nonneg (by simp) ?_
+            intro j _ _
+            exact hf j
+  calc
+    sliceTransverseDirectionWeight params *
+        avgOver (uniformDistribution (Fin params.m)) (fun i => f (embedCoord params i))
+      = sliceTransverseDirectionWeight params *
+          ∑ i : Fin params.m, (1 / (params.m : Error)) * f (embedCoord params i) := by
+            simp [avgOver, uniformDistribution, Fintype.card_fin]
+    _ = ∑ i : Fin params.m,
+          (sliceTransverseDirectionWeight params * (1 / (params.m : Error))) * f (embedCoord params i) := by
+            rw [Finset.mul_sum]
+            refine Finset.sum_congr rfl ?_
+            intro i _
+            ring
+    _ = ∑ i : Fin params.m, (1 / (params.next.m : Error)) * f (embedCoord params i) := by
+            refine Finset.sum_congr rfl ?_
+            intro i _
+            unfold sliceTransverseDirectionWeight
+            field_simp [hm, hnextm]
+            simp [Parameters.next]
+            ring_nf
+    _ = (1 / (params.next.m : Error)) * ∑ i : Fin params.m, f (embedCoord params i) := by
+            symm
+            rw [Finset.mul_sum]
+    _ ≤ (1 / (params.next.m : Error)) * ∑ j : Fin params.next.m, f j := by
+            exact mul_le_mul_of_nonneg_left hsum_le (by positivity)
+    _ = ∑ j : Fin params.next.m, (1 / (params.next.m : Error)) * f j := by
+            rw [Finset.mul_sum]
+    _ = avgOver (uniformDistribution (Fin params.next.m)) f := by
+            simp [avgOver, uniformDistribution, Fintype.card_fin]
+
+private lemma restrictedDiagonalSampleError_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (x : Fq params)
+    (j : Fin params.m)
+    (s : RestrictedDiagonalSample params j) :
+    qBipartiteConsDefect strategy.state
+      (RestrictedSymStrat.restrictedDiagonalPointAnswerFamily (xRestrictedStrategy params strategy x) j s)
+      (RestrictedSymStrat.restrictedDiagonalLineAnswerFamily (xRestrictedStrategy params strategy x) j s) =
+    qBipartiteConsDefect strategy.state
+      (diagonalPointAnswerFamily strategy (embedCoord params j) (appendPoint params s.1 x, s.2))
+      (diagonalLineAnswerFamily strategy (embedCoord params j) (appendPoint params s.1 x, s.2)) := by
+  have hdir :
+      appendPoint params (extendRestrictedDirection j s.2) zeroCoord =
+        extendRestrictedDirection (params := params.next) (embedCoord params j) s.2 := by
+    funext k
+    by_cases hkm : k.1 < params.m
+    · by_cases hk : k.1 ≤ j.1
+      · simp [appendPoint, extendRestrictedDirection, embedCoord, hkm, hk]
+      · simp [appendPoint, extendRestrictedDirection, embedCoord, hkm, hk]
+        rfl
+    · have hnotle : ¬ k.1 ≤ j.1 := by
+          intro hk
+          exact hkm (lt_of_le_of_lt hk j.2)
+      simp [appendPoint, extendRestrictedDirection, embedCoord, hkm, hnotle]
+      rfl
+  have hline :
+      DiagonalLine.appendAtHeight params
+          { base := s.1, direction := extendRestrictedDirection j s.2 } x =
+        ({ base := appendPoint params s.1 x,
+           direction := extendRestrictedDirection (params := params.next) (embedCoord params j) s.2 } :
+          DiagonalLine params.next) := by
+    simp [DiagonalLine.appendAtHeight, hdir]
+  simp [RestrictedSymStrat.restrictedDiagonalPointAnswerFamily,
+    RestrictedSymStrat.restrictedDiagonalLineAnswerFamily, diagonalPointAnswerFamily,
+    diagonalLineAnswerFamily, xRestrictedStrategy]
+  simp [hline]
+
+private noncomputable def diagonalSliceIndexError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (x : Fq params)
+    (j : Fin params.m) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (RestrictedDiagonalSample params j))
+    (RestrictedSymStrat.restrictedDiagonalPointAnswerFamily (xRestrictedStrategy params strategy x) j)
+    (RestrictedSymStrat.restrictedDiagonalLineAnswerFamily (xRestrictedStrategy params strategy x) j)
+
+private noncomputable def diagonalIndexError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (j : Fin params.next.m) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (RestrictedDiagonalSample params.next j))
+    (diagonalPointAnswerFamily strategy j)
+    (diagonalLineAnswerFamily strategy j)
+
+private lemma diagonalIndexError_nonneg
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (j : Fin params.next.m) :
+    0 ≤ diagonalIndexError params strategy j := by
+  unfold diagonalIndexError
+  exact bipartiteConsError_nonneg strategy.state
+    (uniformDistribution (RestrictedDiagonalSample params.next j))
+    (diagonalPointAnswerFamily strategy j)
+    (diagonalLineAnswerFamily strategy j)
+
+private lemma diagonalSliceIndexErrorAverage_eq_diagonalIndexError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (j : Fin params.m) :
+    avgOver (uniformDistribution (Fq params))
+      (fun x => diagonalSliceIndexError params strategy x j) =
+      diagonalIndexError params strategy (embedCoord params j) := by
+  let g : RestrictedDiagonalSample params.next (embedCoord params j) → Error := fun s =>
+    qBipartiteConsDefect strategy.state
+      (diagonalPointAnswerFamily strategy (embedCoord params j) s)
+      (diagonalLineAnswerFamily strategy (embedCoord params j) s)
+  calc
+    avgOver (uniformDistribution (Fq params))
+        (fun x => diagonalSliceIndexError params strategy x j)
+      = avgOver (uniformDistribution (Fq params))
+          (fun x => avgOver (uniformDistribution (RestrictedDiagonalSample params j))
+            (fun s => g (appendPoint params s.1 x, s.2))) := by
+              refine avgOver_congr _ _ _ ?_
+              intro x
+              unfold diagonalSliceIndexError bipartiteConsError
+              refine avgOver_congr _ _ _ ?_
+              intro s
+              simpa [g] using restrictedDiagonalSampleError_eq params strategy x j s
+    _ = avgOver (uniformDistribution (Fq params × RestrictedDiagonalSample params j))
+          (fun xs => g (appendPoint params xs.2.1 xs.1, xs.2.2)) := by
+            simpa using
+              (avgOver_uniform_prod (α := Fq params)
+                (β := RestrictedDiagonalSample params j)
+                (f := fun x s => g (appendPoint params s.1 x, s.2))).symm
+    _ = avgOver (uniformDistribution (RestrictedDiagonalSample params.next (embedCoord params j))) g := by
+            simpa using
+              (CommutativityPoints.avgOver_uniform_equiv
+                (e := pointAppendProdEquiv params (Fin (j.val + 1) → Fq params))
+                (f := fun xs : Fq params × RestrictedDiagonalSample params j =>
+                  g ((pointAppendProdEquiv params (Fin (j.val + 1) → Fq params)) xs)))
+    _ = diagonalIndexError params strategy (embedCoord params j) := by
+            rfl
+
+private lemma diagonalFailure_eq_average_indexError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    avgOver (uniformDistribution (Fin params.next.m))
+      (diagonalIndexError params strategy) =
+      strategy.diagonalFailureProbability := by
+  unfold diagonalIndexError SymStrat.diagonalFailureProbability
+  calc
+    avgOver (uniformDistribution (Fin params.next.m))
+        (fun j =>
+          bipartiteConsError strategy.state
+            (uniformDistribution (RestrictedDiagonalSample params.next j))
+            (diagonalPointAnswerFamily strategy j)
+            (diagonalLineAnswerFamily strategy j))
+      = ∑ j : Fin params.next.m,
+          (1 / (params.next.m : Error)) *
+            bipartiteConsError strategy.state
+              (uniformDistribution (RestrictedDiagonalSample params.next j))
+              (diagonalPointAnswerFamily strategy j)
+              (diagonalLineAnswerFamily strategy j) := by
+                simp [avgOver, uniformDistribution, Fintype.card_fin]
+    _ = (1 / (params.next.m : Error)) *
+          ∑ j : Fin params.next.m,
+            bipartiteConsError strategy.state
+              (uniformDistribution (RestrictedDiagonalSample params.next j))
+              (diagonalPointAnswerFamily strategy j)
+              (diagonalLineAnswerFamily strategy j) := by
+                symm
+                rw [Finset.mul_sum]
+    _ = strategy.diagonalFailureProbability := by
+          rfl
+
+private lemma averageRestrictedDiagonalFailure_eq_embeddedDiagonalIndices
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) :
+    avgOver (uniformDistribution (Fq params))
+      (fun x => (xRestrictedStrategy params strategy x).diagonalFailureProbability) =
+    avgOver (uniformDistribution (Fin params.m))
+      (fun j => diagonalIndexError params strategy (embedCoord params j)) := by
+  calc
+    avgOver (uniformDistribution (Fq params))
+        (fun x => (xRestrictedStrategy params strategy x).diagonalFailureProbability)
+      = avgOver (uniformDistribution (Fq params))
+          (fun x => avgOver (uniformDistribution (Fin params.m))
+            (fun j => diagonalSliceIndexError params strategy x j)) := by
+              refine avgOver_congr _ _ _ ?_
+              intro x
+              unfold RestrictedSymStrat.diagonalFailureProbability diagonalSliceIndexError
+              calc
+                (1 / (params.m : Error)) *
+                    ∑ j : Fin params.m,
+                      bipartiteConsError strategy.state
+                        (uniformDistribution (RestrictedDiagonalSample params j))
+                        ((xRestrictedStrategy params strategy x).restrictedDiagonalPointAnswerFamily j)
+                        ((xRestrictedStrategy params strategy x).restrictedDiagonalLineAnswerFamily j)
+                  = ∑ j : Fin params.m,
+                      (1 / (params.m : Error)) *
+                        bipartiteConsError strategy.state
+                          (uniformDistribution (RestrictedDiagonalSample params j))
+                          ((xRestrictedStrategy params strategy x).restrictedDiagonalPointAnswerFamily j)
+                          ((xRestrictedStrategy params strategy x).restrictedDiagonalLineAnswerFamily j) := by
+                              rw [Finset.mul_sum]
+                _ = avgOver (uniformDistribution (Fin params.m))
+                      (fun j => diagonalSliceIndexError params strategy x j) := by
+                              simp [avgOver, uniformDistribution, Fintype.card_fin,
+                                diagonalSliceIndexError]
+    _ = avgOver (uniformDistribution (Fq params × Fin params.m))
+          (fun xj => diagonalSliceIndexError params strategy xj.1 xj.2) := by
+            simpa using
+              (avgOver_uniform_prod (α := Fq params) (β := Fin params.m)
+                (f := fun x j => diagonalSliceIndexError params strategy x j)).symm
+    _ = avgOver (uniformDistribution (Fin params.m × Fq params))
+          (fun jx => diagonalSliceIndexError params strategy jx.2 jx.1) := by
+            simpa using
+              (CommutativityPoints.avgOver_uniform_equiv
+                (e := Equiv.prodComm (Fq params) (Fin params.m))
+                (f := fun xj : Fq params × Fin params.m =>
+                  diagonalSliceIndexError params strategy xj.1 xj.2))
+    _ = avgOver (uniformDistribution (Fin params.m))
+          (fun j => avgOver (uniformDistribution (Fq params))
+            (fun x => diagonalSliceIndexError params strategy x j)) := by
+            simpa using
+              (avgOver_uniform_prod (α := Fin params.m) (β := Fq params)
+                (f := fun j x => diagonalSliceIndexError params strategy x j))
+    _ = avgOver (uniformDistribution (Fin params.m))
+          (fun j => diagonalIndexError params strategy (embedCoord params j)) := by
+            refine avgOver_congr _ _ _ ?_
+            intro j
+            exact diagonalSliceIndexErrorAverage_eq_diagonalIndexError params strategy j
+
+/-- The weighted average of the restricted axis-parallel slice errors is bounded
+by the ambient axis-parallel test error. -/
+lemma weighted_axisParallel_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    avgOver (uniformDistribution (Fq params))
+        (fun x => sliceTransverseDirectionWeight params *
+          (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps := by
+  calc
+    avgOver (uniformDistribution (Fq params))
+        (fun x => sliceTransverseDirectionWeight params *
+          (xRestrictedStrategy params strategy x).axisParallelFailureProbability)
+      = sliceTransverseDirectionWeight params *
+          avgOver (uniformDistribution (Fq params))
+            (fun x => (xRestrictedStrategy params strategy x).axisParallelFailureProbability) := by
+              rw [avgOver_const_mul]
+    _ = sliceTransverseDirectionWeight params *
+          avgOver (uniformDistribution (Fin params.m))
+            (fun i => axisDirectionError params strategy (embedCoord params i)) := by
+              rw [averageRestrictedAxisFailure_eq_embeddedAxisDirections params strategy]
+    _ ≤ avgOver (uniformDistribution (Fin params.next.m))
+          (axisDirectionError params strategy) :=
+        weighted_embedded_average_le_full_average params
+          (f := axisDirectionError params strategy)
+          (hf := axisDirectionError_nonneg params strategy)
+    _ = strategy.axisParallelFailureProbability :=
+        axisFailure_eq_average_directionError params strategy
+    _ ≤ eps := hgood.axisParallelTest
+
+/-- The weighted average of the restricted diagonal slice errors is bounded by
+ the ambient diagonal-line test error. -/
+lemma weighted_diagonal_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    avgOver (uniformDistribution (Fq params))
+        (fun x => sliceDiagonalDirectionWeight params *
+          (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma := by
+  have hweighted :
+      sliceDiagonalDirectionWeight params *
+          avgOver (uniformDistribution (Fin params.m))
+            (fun j => diagonalIndexError params strategy (embedCoord params j)) ≤
+        avgOver (uniformDistribution (Fin params.next.m))
+          (diagonalIndexError params strategy) := by
+    simpa [sliceDiagonalDirectionWeight] using
+      (weighted_embedded_average_le_full_average params
+        (f := diagonalIndexError params strategy)
+        (hf := diagonalIndexError_nonneg params strategy))
+  calc
+    avgOver (uniformDistribution (Fq params))
+        (fun x => sliceDiagonalDirectionWeight params *
+          (xRestrictedStrategy params strategy x).diagonalFailureProbability)
+      = sliceDiagonalDirectionWeight params *
+          avgOver (uniformDistribution (Fq params))
+            (fun x => (xRestrictedStrategy params strategy x).diagonalFailureProbability) := by
+              rw [avgOver_const_mul]
+    _ = sliceDiagonalDirectionWeight params *
+          avgOver (uniformDistribution (Fin params.m))
+            (fun j => diagonalIndexError params strategy (embedCoord params j)) := by
+              rw [averageRestrictedDiagonalFailure_eq_embeddedDiagonalIndices params strategy]
+    _ ≤ avgOver (uniformDistribution (Fin params.next.m))
+          (diagonalIndexError params strategy) := hweighted
+    _ = strategy.diagonalFailureProbability :=
+        diagonalFailure_eq_average_indexError params strategy
+    _ ≤ gamma := hgood.diagonalLineTest
+
 private lemma weighted_bound_to_average
     (params : Parameters)
     {a b : Error}
@@ -998,8 +1633,9 @@ private lemma weighted_diagonal_bound_to_average
   simpa [sliceDiagonalDirectionWeight, sliceDiagonalConditioningLoss] using
     weighted_bound_to_average params h
 
-/-- `lem:restricted-probabilities`. -/
-lemma restrictedProbabilities
+/-- Package weighted restricted axis/diagonal bounds into the public
+`RestrictedProbabilitiesStatement`. -/
+lemma RestrictedProbabilitiesStatement.ofWeightedBounds
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -1045,6 +1681,18 @@ lemma restrictedProbabilities
               selfConsistencyRestrictedAverage_eq params strategy
       _ ≤ delta := hgood.selfConsistencyTest
   · exact weighted_diagonal_bound_to_average params hdiag_weighted_avg
+
+/-- `lem:restricted-probabilities`. -/
+lemma restrictedProbabilities
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    RestrictedProbabilitiesStatement params strategy eps delta gamma := by
+  exact RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma hgood
+    (weighted_axisParallel_bound params strategy eps delta gamma hgood)
+    (weighted_diagonal_bound params strategy eps delta gamma hgood)
 
 
 /-! ## Package constructors and skeletal assembly -/
@@ -1282,8 +1930,8 @@ private lemma average_sliceSelfImprovementError_le
         (fun x => sliceSelfImprovementError params hrestrict x) ≤
       selfImprovementInInductionError params.next eps delta gamma := by
   let 𝒟 := uniformDistribution (Fq params)
-  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have haxis_avg :
@@ -1389,9 +2037,9 @@ private lemma average_sliceMainInductionNu_le
             (hrestrict.profile.diagonal x)) ≤
       mainInductionNu params.next k eps delta gamma := by
   let 𝒟 := uniformDistribution (Fq params)
-  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have haxis_avg :
@@ -1564,9 +2212,9 @@ private lemma selfImprovementInInductionError_le_mainInductionNu
     (hdq_le_q : params.d ≤ params.q) :
     selfImprovementInInductionError params.next eps delta gamma ≤
       mainInductionNu params.next k eps delta gamma := by
-  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_le_one := dq_ratio_le_one params hdq_le_q
   have hthree := three_le_k_sq_mul_next_m_of_hsmall params strategy hgood hsmall
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
@@ -1647,9 +2295,9 @@ private lemma ldPastingInInductionNu_le_fifth_mainInductionNu
   let B : Error := Real.rpow delta (1 / (1024 : Error))
   let C : Error := Real.rpow gamma (1 / (1024 : Error))
   let D : Error := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error))
-  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
   have heps_le_one :=
     eps_le_one_of_selfImprovementInInductionError_le_one params strategy hgood hzeta_le
   have hdelta_le_one :=
@@ -2178,9 +2826,9 @@ noncomputable def assemblePastingPackage
         · intro x g
           exact SelfImprovementPackage.family_dominationTarget (pkg := hself) x g
       error_le := by
-        have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-        have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
-        have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
+        have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+        have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+        have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
         have heps_le_one :=
           eps_le_one_of_selfImprovementInInductionError_le_one
             params strategy hgood hzeta_le
@@ -2503,7 +3151,7 @@ theorem mainInductionBaseCase
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
       hgood.selfConsistencyTest
   have hdiag_nonneg : 0 ≤ strategy.diagonalFailureProbability :=
-    diagonalFailureProbability_nonneg params strategy
+    MIPStarRE.LDT.diagonalFailureProbability_nonneg params strategy
   have hgamma_nonneg : 0 ≤ gamma := le_trans hdiag_nonneg hgood.diagonalLineTest
   have haxis_le_one : strategy.axisParallelFailureProbability ≤ 1 := by
     simpa [SymStrat.axisParallelFailureProbability] using
@@ -2530,9 +3178,10 @@ self-improvement package, this theorem executes the remaining
 higher-dimensional point-consistency conclusion.
 
 Note: `hselfProducer` remains an explicit input because the current development
-still lacks the public boundary wrapper from `restrictedProbabilities` and
-`selfImprovementInInductionSection` to the restricted-strategy objects recorded
-in `SelfImprovementPackage`; that remaining hand-off is tracked by TODO(#630). -/
+still lacks the public hand-off from `selfImprovementInInductionSection` to the
+restricted-strategy objects recorded in `SelfImprovementPackage`; the
+restricted-probabilities boundary is now exposed separately via
+`restrictedProbabilities`. That remaining wrapper work is tracked by TODO(#630). -/
 theorem mainInductionByRecursionOnM
     (params : Parameters)
     [FieldModel.{0} params.q]
