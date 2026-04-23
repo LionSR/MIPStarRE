@@ -55,27 +55,6 @@ theorem mainInductionOfWitness
   refine ⟨G, ?_⟩
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 
-/-- Backwards-compatible alias for `mainInductionOfWitness`. -/
-theorem mainInduction
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (hwitness :
-      ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
-        ConsRel strategy.state (uniformDistribution (Point params))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-          (polynomialEvaluationFamily params G.toSubMeas)
-          error ∧
-        error ≤ mainInductionError params k eps delta gamma) :
-    ∃ G : Measurement (Polynomial params) ι,
-      ConsRel strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params G.toSubMeas)
-        (mainInductionError params k eps delta gamma) :=
-  mainInductionOfWitness params strategy eps delta gamma k hwitness
-
 /-- `thm:self-improvement-in-induction-section`.
 
 The induction-section wrapper keeps the point-consistency hypothesis `_hcons`
@@ -2169,8 +2148,8 @@ noncomputable def assemblePastingPackage
                 exact avgOver_mono 𝒟 _ _ fun x => (hself.pointConsistency x).offDiagonalBound
           _ ≤ zeta := by
                 simpa [zeta, 𝒟] using
-                  average_sliceSelfImprovementError_le
-                    params strategy eps delta gamma hgood hrestrict
+                  (average_sliceSelfImprovementError_le
+                    params strategy eps delta gamma hgood hrestrict)
       selfConsistent := by
         refine ⟨?_⟩
         refine ⟨?_⟩
@@ -2195,8 +2174,8 @@ noncomputable def assemblePastingPackage
                 exact avgOver_mono 𝒟 _ _ hpointwise
           _ ≤ zeta := by
                 simpa [zeta, 𝒟] using
-                  average_sliceSelfImprovementError_le
-                    params strategy eps delta gamma hgood hrestrict
+                  (average_sliceSelfImprovementError_le
+                    params strategy eps delta gamma hgood hrestrict)
       bounded := by
         refine
           { bounded := ?_

@@ -86,16 +86,18 @@ theorem mainInduction
 
 Here `MainInductionBridgePackage.witness` has type
 `∃ error, ∃ G, ConsRel ... error ∧ error ≤ mainInductionError ...` — literally
-the conclusion. The code has since been refactored to remove this specific
-MainInductionStep bridge, but the snippet remains the archetypal example of the
-anti-pattern.
+the conclusion. The code has since been refactored to remove both this
+specific MainInductionStep bridge and the interim theorem alias that exposed
+the same witness shape under the paper theorem's name, but the snippet remains
+the archetypal example of the anti-pattern.
 
 PR [#491] proposed to delete the `*BridgePackage` by **inlining** the bundle's
 fields as explicit hypotheses. That only scatters the same pattern across
 individual signatures without producing any proof — it's strictly worse
 because the named bundle at least shows up in one tracker. Do not accept PRs
 that discharge an ungrounded bridge by flattening it into conclusion-shaped
-existential hypotheses.
+existential hypotheses, or by reintroducing the same shape under a theorem name
+that suggests the paper result has been proved.
 
 ### How to fix it
 
