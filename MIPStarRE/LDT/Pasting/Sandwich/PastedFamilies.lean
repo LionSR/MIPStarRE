@@ -83,9 +83,9 @@ noncomputable def averagedEligibleSandwichSubMeas (params : Parameters) [FieldMo
     (family : IdxPolyFamily params ι) (k : ℕ) :
     SubMeas (GHatTupleOutcome params k) ι :=
   averageIdxSubMeas
-    (distinctTupleDistribution params k)
+    (uniformDistribution (PointTuple params k))
     (interpolationEligibleSandwichFamily params family k)
-    (distinctTupleDistribution_weight_sum_le_one params k)
+    (uniformDistribution_weight_sum_le_one (PointTuple params k))
 
 /-- The specific pasted submeasurement constructed from the sandwich/interpolation scheme. -/
 noncomputable def constructedPastedSubMeas (params : Parameters) [FieldModel params.q]
@@ -438,25 +438,22 @@ relevant suffix-stage matrix.  Unlike the old `fromHToG` recurrence families,
 this keeps the `\widehat H^{x_{\ge \ell}}_{g_{\ge \ell}}` suffix visible instead
 of collapsing immediately to the full `k`-step total mass.
 
-When this is used in `fromHToG`, the suffix length is `tailLen = k - ℓ`.  The
-paper phrases the expectation as the suffix marginal of
-`distinctTupleDistribution params k`; here it is realized directly as
-`distinctTupleDistribution params tailLen`.  This is the same distribution by
-symmetry of uniform injective tuples, but the explicit marginalization lemma has
-not yet been named because the current PR only repairs the family shape. -/
+When this is used in `fromHToG`, the suffix length is `tailLen = k - ℓ`, and
+the expectation is the paper's independent uniform average over the remaining
+slice points `x_{≥ℓ}`. -/
 noncomputable def averagedSandwichByTypeSubMeas (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (tailLen : ℕ) (τtail : GHatType tailLen) :
     SubMeas Unit ι :=
   open Classical in
     averageIdxSubMeas
-      (distinctTupleDistribution params tailLen)
+      (uniformDistribution (PointTuple params tailLen))
       (fun xs =>
         postprocess
           (restrictSubMeas
             (gHatSandwichFamily params family tailLen xs)
             (fun gs => gs ∈ outcomesByType τtail))
           (fun _ => ()))
-      (distinctTupleDistribution_weight_sum_le_one params tailLen)
+      (uniformDistribution_weight_sum_le_one (PointTuple params tailLen))
 
 /-- The stage-`ℓ` suffix family from the proof of `lem:from-H-to-G`, for a fixed
 full type `τ ∈ {0,1}^k`.
