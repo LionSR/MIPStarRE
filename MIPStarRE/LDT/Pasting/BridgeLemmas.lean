@@ -1489,6 +1489,33 @@ private def moveTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r 
     cases og
     rfl
 
+
+/-- Swap the first two `SliceQuestion` entries, leaving the tail tuple untouched. -/
+private def swapFirstTwoQuestionEquiv (params : Parameters) (r : ℕ) :
+    (SliceQuestion params × SliceQuestion params × PointTuple params r) ≃
+      (SliceQuestion params × SliceQuestion params × PointTuple params r) where
+  toFun q := (q.2.1, q.1, q.2.2)
+  invFun q := (q.2.1, q.1, q.2.2)
+  left_inv q := by
+    rcases q with ⟨x₁, x₂, xs⟩
+    rfl
+  right_inv q := by
+    rcases q with ⟨x₁, x₂, xs⟩
+    rfl
+
+/-- Swap the first two `GHatOutcome` entries, leaving the tail tuple untouched. -/
+private def swapFirstTwoOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
+    (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) ≃
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
+  toFun og := (og.2.1, og.1, og.2.2)
+  invFun og := (og.2.1, og.1, og.2.2)
+  left_inv og := by
+    rcases og with ⟨g₁, g₂, gs⟩
+    rfl
+  right_inv og := by
+    rcases og with ⟨g₁, g₂, gs⟩
+    rfl
+
 private def firstSliceBackQuestionEquiv (params : Parameters) (r : ℕ) :
     ((SliceQuestion params × SliceQuestion params × PointTuple params r) × SliceQuestion params) ≃
       (SliceQuestion params × SliceQuestion params × SliceQuestion params ×
@@ -1832,6 +1859,186 @@ private lemma commuteGHalfSandwich_move_recursive_zero
           ((Fintype.card (Polynomial params) : Error) + 1) * ev ψbi 0) = 0 := by
     simp [avgOver, uniformDistribution, ev_zero]
   nlinarith [hzero]
+
+
+private lemma commuteGHalfSandwich_moveStepSource_eq_split
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_moveSourceFamily params family (r + 1) q).outcome ogs =
+      (commuteGHalfSandwich_moveStepSourceFamily params family r
+        ((moveTailQuestionEquiv params r) q)).outcome
+        ((moveTailOutcomeEquiv params r) ogs) := by
+  simp [moveTailQuestionEquiv, moveTailOutcomeEquiv,
+    commuteGHalfSandwich_moveSourceFamily,
+    commuteGHalfSandwich_moveStepSourceFamily,
+    gHatHalfProductOutcomeOperator,
+    leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_moveStepTarget_eq_split
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_moveFamily params family (r + 1) q).outcome ogs =
+      (commuteGHalfSandwich_moveStepTargetFamily params family r
+        ((moveTailQuestionEquiv params r) q)).outcome
+        ((moveTailOutcomeEquiv params r) ogs) := by
+  simp [moveTailQuestionEquiv, moveTailOutcomeEquiv,
+    commuteGHalfSandwich_moveFamily,
+    commuteGHalfSandwich_moveStepTargetFamily,
+    gHatReverseHalfProductOutcomeOperator,
+    leftTensor_mul_leftTensor, rightTensor_mul_rightTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_moveStep_iff
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (r : ℕ) (δ : Error) :
+    SDDOpRel ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
+      (commuteGHalfSandwich_moveFamily params family (r + 1))
+      δ ↔
+    SDDOpRel ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveStepSourceFamily params family r)
+      (commuteGHalfSandwich_moveStepTargetFamily params family r)
+      δ := by
+  constructor
+  · intro h
+    have hq :=
+      (sddOpRel_uniform_equiv (moveTailQuestionEquiv params r) ψbi
+        (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
+        (commuteGHalfSandwich_moveFamily params family (r + 1)) δ).1 h
+    have ho := CommutativityPoints.sddOpRel_reindex (moveTailOutcomeEquiv params r)
+      ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (fun q => commuteGHalfSandwich_moveSourceFamily params family (r + 1)
+        ((moveTailQuestionEquiv params r).symm q))
+      (fun q => commuteGHalfSandwich_moveFamily params family (r + 1)
+        ((moveTailQuestionEquiv params r).symm q))
+      δ hq
+    exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      _ _
+      (commuteGHalfSandwich_moveStepSourceFamily params family r)
+      (commuteGHalfSandwich_moveStepTargetFamily params family r)
+      δ
+      (fun q ogs => by
+        simpa [moveTailQuestionEquiv, moveTailOutcomeEquiv] using
+          commuteGHalfSandwich_moveStepSource_eq_split params family r
+            ((moveTailQuestionEquiv params r).symm q)
+            ((moveTailOutcomeEquiv params r).symm ogs))
+      (fun q ogs => by
+        simpa [moveTailQuestionEquiv, moveTailOutcomeEquiv] using
+          commuteGHalfSandwich_moveStepTarget_eq_split params family r
+            ((moveTailQuestionEquiv params r).symm q)
+            ((moveTailOutcomeEquiv params r).symm ogs))
+      ho
+  · intro h
+    have ho := CommutativityPoints.sddOpRel_reindex (moveTailOutcomeEquiv params r).symm
+      ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveStepSourceFamily params family r)
+      (commuteGHalfSandwich_moveStepTargetFamily params family r)
+      δ h
+    have hq := CommutativityPoints.sddOpRel_congr_outcome ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      _ _
+      (fun q => commuteGHalfSandwich_moveSourceFamily params family (r + 1)
+        ((moveTailQuestionEquiv params r).symm q))
+      (fun q => commuteGHalfSandwich_moveFamily params family (r + 1)
+        ((moveTailQuestionEquiv params r).symm q))
+      δ
+      (fun q ogs => by
+        simpa [moveTailQuestionEquiv, moveTailOutcomeEquiv] using
+          (commuteGHalfSandwich_moveStepSource_eq_split params family r
+            ((moveTailQuestionEquiv params r).symm q)
+            ogs).symm)
+      (fun q ogs => by
+        simpa [moveTailQuestionEquiv, moveTailOutcomeEquiv] using
+          (commuteGHalfSandwich_moveStepTarget_eq_split params family r
+            ((moveTailQuestionEquiv params r).symm q)
+            ogs).symm)
+      ho
+    exact (sddOpRel_uniform_equiv (moveTailQuestionEquiv params r) ψbi
+      (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
+      (commuteGHalfSandwich_moveFamily params family (r + 1)) δ).2 hq
+
+/-- Swap the first two completed-slice slots in the move stage, turning the
+`move` family pair into the `moveBack`/`commute` pair used in the flat chain. -/
+private lemma commuteGHalfSandwich_moveStage_swap
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (r : ℕ) (δ : Error)
+    (hmove : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveSourceFamily params family r)
+      (commuteGHalfSandwich_moveFamily params family r)
+      δ) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveBackFamily params family r)
+      (commuteGHalfSandwich_commuteFamily params family r)
+      δ := by
+  have hq :=
+    (sddOpRel_uniform_equiv (swapFirstTwoQuestionEquiv params r) ψbi
+      (commuteGHalfSandwich_moveSourceFamily params family r)
+      (commuteGHalfSandwich_moveFamily params family r)
+      δ).1 hmove
+  have ho := CommutativityPoints.sddOpRel_reindex (swapFirstTwoOutcomeEquiv params r)
+    ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    (fun q => commuteGHalfSandwich_moveSourceFamily params family r
+      ((swapFirstTwoQuestionEquiv params r).symm q))
+    (fun q => commuteGHalfSandwich_moveFamily params family r
+      ((swapFirstTwoQuestionEquiv params r).symm q))
+    δ hq
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    _ _
+    (commuteGHalfSandwich_moveBackFamily params family r)
+    (commuteGHalfSandwich_commuteFamily params family r)
+    δ
+    (fun q ogs => by
+      simp [swapFirstTwoQuestionEquiv, swapFirstTwoOutcomeEquiv,
+        commuteGHalfSandwich_moveBackFamily,
+        commuteGHalfSandwich_moveSourceFamily,
+        leftTensor_mul_leftTensor, mul_assoc])
+    (fun q ogs => by
+      simp [swapFirstTwoQuestionEquiv, swapFirstTwoOutcomeEquiv,
+        commuteGHalfSandwich_commuteFamily,
+        commuteGHalfSandwich_moveFamily,
+        leftTensor_mul_leftTensor, rightTensor_mul_rightTensor, mul_assoc])
+    ho
+
+private lemma commuteGHalfSandwich_moveBackStage
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (r : ℕ) (δ : Error)
+    (hmove : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveSourceFamily params family r)
+      (commuteGHalfSandwich_moveFamily params family r)
+      δ) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_commuteFamily params family r)
+      (commuteGHalfSandwich_moveBackFamily params family r)
+      δ := by
+  exact Preliminaries.sddOpRel_symm ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    (commuteGHalfSandwich_moveBackFamily params family r)
+    (commuteGHalfSandwich_commuteFamily params family r)
+    δ
+    (commuteGHalfSandwich_moveStage_swap params ψbi family r δ hmove)
 
 private def pointTupleOneEquiv (params : Parameters) :
     PointTuple params 1 ≃ SliceQuestion params where
@@ -2265,6 +2472,43 @@ private lemma commuteGHalfSandwich_moveStepMid_toTarget
                         rw [rightTensor_mul_rightTensor]
     )
     hreindex
+
+private lemma commuteGHalfSandwich_moveStage_succ
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error) (r : ℕ) (δ : Error)
+    (hmove : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveSourceFamily params family r)
+      (commuteGHalfSandwich_moveFamily params family r)
+      δ)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
+      (commuteGHalfSandwich_moveFamily params family (r + 1))
+      (2 * (δ + gHatSelfConsistencyError zeta)) := by
+  have hmid :=
+    commuteGHalfSandwich_prefixFirstSliceLeft_move params ψbi family r δ hmove
+  have htarget :=
+    commuteGHalfSandwich_moveStepMid_toTarget params ψbi family zeta r hsc
+  have hstep := Preliminaries.sddOpRel_triangle ψbi
+    (uniformDistribution
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+    (commuteGHalfSandwich_moveStepSourceFamily params family r)
+    (commuteGHalfSandwich_moveStepMidFamily params family r)
+    (commuteGHalfSandwich_moveStepTargetFamily params family r)
+    δ
+    (gHatSelfConsistencyError zeta)
+    hmid htarget
+  exact (commuteGHalfSandwich_moveStep_iff params ψbi family r
+    (2 * (δ + gHatSelfConsistencyError zeta))).2 hstep
 
 private lemma axisLinePolynomial_ne_gives_support_eval_ne
     (params : Parameters) [FieldModel params.q]
@@ -3242,6 +3486,31 @@ private lemma commuteGHalfSandwich_moveBack_eq_recursiveSource
   simp [commuteGHalfSandwich_moveBackFamily, commuteGHalfSandwich_recursiveSourceFamily,
     headTailOrderedFamily, leftTensor_mul_leftTensor, mul_assoc]
 
+private lemma commuteGHalfSandwich_moveBack_to_recursiveTarget
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (r : ℕ) (δ : Error)
+    (hrec : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_recursiveSourceFamily params family r)
+      (commuteGHalfSandwich_recursiveTargetFamily params family r)
+      δ) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveBackFamily params family r)
+      (commuteGHalfSandwich_recursiveTargetFamily params family r)
+      δ := by
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    (commuteGHalfSandwich_recursiveSourceFamily params family r)
+    (commuteGHalfSandwich_recursiveTargetFamily params family r)
+    (commuteGHalfSandwich_moveBackFamily params family r)
+    (commuteGHalfSandwich_recursiveTargetFamily params family r)
+    δ
+    (fun q ogs => (commuteGHalfSandwich_moveBack_eq_recursiveSource params family r q ogs).symm)
+    (fun _ _ => rfl)
+    hrec
+
 private lemma commuteGHalfSandwich_recursiveTarget_eq_split
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
@@ -3491,6 +3760,489 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeft
         prefixTripleOutcomeEquiv, C])
     hreindex
 
+
+private lemma gHatSelfConsistencyError_nonneg_of_hsc
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta)) :
+    0 ≤ gHatSelfConsistencyError zeta := by
+  rcases hsc with ⟨hζ⟩
+  exact le_trans
+    (sddError_nonneg ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family))
+    hζ
+
+private lemma zeta_nonneg_of_hsc
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta)) :
+    0 ≤ zeta := by
+  have hnonneg :=
+    gHatSelfConsistencyError_nonneg_of_hsc params ψbi family zeta hsc
+  simpa [gHatSelfConsistencyError] using hnonneg
+
+/-- The fixed paper exponent `1/16` keeps `Real.rpow` nonnegative even on the
+negative branch, because `cos (π / 16) > 0`. This lets the short-length
+`commuteGHalfSandwich` envelope proofs avoid threading an extra `0 ≤ gamma`
+hypothesis. -/
+private lemma rpow_oneSixteenth_nonneg (x : Error) :
+    0 ≤ Real.rpow x (1 / (16 : Error)) := by
+  simpa [Real.rpow_eq_pow] using (show 0 ≤ x ^ (1 / (16 : Error)) by
+    rcases le_or_gt 0 x with hx | hx
+    · exact Real.rpow_nonneg hx _
+    · rw [Real.rpow_def_of_neg hx]
+      have hexp_nonneg : 0 ≤ Real.exp (Real.log x * (1 / (16 : Error))) := by
+        exact le_of_lt (Real.exp_pos _)
+      have hmem : ((1 / (16 : Error)) * Real.pi) ∈ Set.Ioo (-(Real.pi / 2)) (Real.pi / 2) := by
+        constructor <;> have hpi_pos : 0 < Real.pi := Real.pi_pos <;> nlinarith
+      have hcos_nonneg : 0 ≤ Real.cos ((1 / (16 : Error)) * Real.pi) := by
+        exact le_of_lt (Real.cos_pos_of_mem_Ioo hmem)
+      exact mul_nonneg hexp_nonneg hcos_nonneg)
+
+private lemma zeta_le_gHatCommutationScale
+    (params : Parameters) [FieldModel params.q]
+    (gamma zeta : Error)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hzeta_le : zeta ≤ 1) :
+    zeta ≤ (params.m : Error) *
+      (Real.rpow gamma (1 / (16 : Error)) +
+        Real.rpow zeta (1 / (16 : Error)) +
+        Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))) := by
+  let S : Error :=
+    Real.rpow gamma (1 / (16 : Error)) +
+      Real.rpow zeta (1 / (16 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
+  have hS_nonneg : 0 ≤ S := by
+    have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
+    dsimp [S]
+    exact add_nonneg
+      (add_nonneg
+        (rpow_oneSixteenth_nonneg gamma)
+        (Real.rpow_nonneg hzeta_nonneg (1 / (16 : Error))))
+      (Real.rpow_nonneg hratio_nonneg (1 / (16 : Error)))
+  have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
+    exact_mod_cast (Nat.succ_le_of_lt params.hm)
+  have hzeta_to_rpow : zeta ≤ Real.rpow zeta (1 / (16 : Error)) := by
+    have hpow : (1 / (16 : Error)) ≤ (1 : Error) := by norm_num
+    simpa [Real.rpow_one] using
+      (Real.rpow_le_rpow_of_exponent_ge' hzeta_nonneg hzeta_le (by norm_num) hpow)
+  have hroot_le : Real.rpow zeta (1 / (16 : Error)) ≤ S := by
+    have hgamma_rpow_nonneg : 0 ≤ Real.rpow gamma (1 / (16 : Error)) :=
+      rpow_oneSixteenth_nonneg gamma
+    have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
+    have hratio_rpow_nonneg :
+        0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
+      exact Real.rpow_nonneg hratio_nonneg (1 / (16 : Error))
+    calc
+      Real.rpow zeta (1 / (16 : Error))
+        ≤ Real.rpow zeta (1 / (16 : Error)) + Real.rpow gamma (1 / (16 : Error)) := by
+            nlinarith
+      _ ≤ Real.rpow zeta (1 / (16 : Error)) + Real.rpow gamma (1 / (16 : Error)) +
+            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
+            nlinarith
+      _ = S := by
+            simp [S, add_assoc, add_comm]
+  have hscale : S ≤ (params.m : Error) * S := by
+    nlinarith
+  calc
+    zeta ≤ Real.rpow zeta (1 / (16 : Error)) := hzeta_to_rpow
+    _ ≤ S := hroot_le
+    _ ≤ (params.m : Error) * S := hscale
+
+private lemma commuteGHalfSandwich_moveStage_one
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params 1))
+      (commuteGHalfSandwich_moveSourceFamily params family 1)
+      (commuteGHalfSandwich_moveFamily params family 1)
+      (4 * zeta) := by
+  have hzero := commuteGHalfSandwich_move_recursive_zero params ψbi family
+  have hsucc :=
+    commuteGHalfSandwich_moveStage_succ params ψbi family zeta 0 0 hzero hsc
+  convert hsucc using 1
+  simp [gHatSelfConsistencyError]
+  ring
+
+private lemma commuteGHalfSandwich_moveStage_two
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params 2))
+      (commuteGHalfSandwich_moveSourceFamily params family 2)
+      (commuteGHalfSandwich_moveFamily params family 2)
+      (12 * zeta) := by
+  have hone := commuteGHalfSandwich_moveStage_one params ψbi family zeta hsc
+  have hsucc :=
+    commuteGHalfSandwich_moveStage_succ params ψbi family zeta 1 (4 * zeta) hone hsc
+  convert hsucc using 1
+  simp [gHatSelfConsistencyError]
+  ring
+
+private lemma commuteGHalfSandwich_core_three_raw
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta))
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (PointTuple params 3))
+      (gHatHalfSandwichLeft params family 3)
+      (gHatHalfSandwichRight params family 3)
+      (32 * zeta + 8 * gHatCommutationError params gamma zeta) := by
+  let ν3 := gHatCommutationError params gamma zeta
+  let Q := SliceQuestion params × SliceQuestion params × PointTuple params 1
+  have hsplit1 : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × PointTuple params 1))
+      (headTailOrderedFamily params family 1)
+      (headTailRotatedFamily params family 1)
+      ν3 :=
+    (commuteGHalfSandwich_split_one_iff params ψbi family ν3).2 hcom
+  have hmove := commuteGHalfSandwich_moveStage_one params ψbi family zeta hsc
+  have hback :=
+    commuteGHalfSandwich_moveBackStage params ψbi family 1 (4 * zeta) hmove
+  have htail : SDDOpRel ψbi
+      (uniformDistribution Q)
+      (commuteGHalfSandwich_recursiveSourceFamily params family 1)
+      (commuteGHalfSandwich_recursiveTargetFamily params family 1)
+      ν3 := by
+    simpa [Q] using
+      commuteGHalfSandwich_prefixSecondSliceLeft params ψbi family 1 ν3 hsplit1
+  have htail' : SDDOpRel ψbi
+      (uniformDistribution Q)
+      (commuteGHalfSandwich_moveBackFamily params family 1)
+      (commuteGHalfSandwich_recursiveTargetFamily params family 1)
+      ν3 :=
+    commuteGHalfSandwich_moveBack_to_recursiveTarget params ψbi family 1 ν3 htail
+  let families : Fin 5 →
+      IdxOpFamily Q (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params 1) (ι × ι)
+    | ⟨0, _⟩ => commuteGHalfSandwich_moveSourceFamily params family 1
+    | ⟨1, _⟩ => commuteGHalfSandwich_moveFamily params family 1
+    | ⟨2, _⟩ => commuteGHalfSandwich_commuteFamily params family 1
+    | ⟨3, _⟩ => commuteGHalfSandwich_moveBackFamily params family 1
+    | ⟨4, _⟩ => commuteGHalfSandwich_recursiveTargetFamily params family 1
+  let errors : Fin 4 → Error
+    | ⟨0, _⟩ => 4 * zeta
+    | ⟨1, _⟩ => ν3
+    | ⟨2, _⟩ => 4 * zeta
+    | ⟨3, _⟩ => ν3
+  have hsteps : ∀ i : Fin 4,
+      SDDOpRel ψbi (uniformDistribution Q)
+        (families i.castSucc) (families i.succ) (errors i) := by
+    intro i
+    fin_cases i
+    · simpa [families, errors, Q] using hmove
+    · simpa [families, errors, Q, ν3] using
+        commuteGHalfSandwich_step_commute params ψbi family gamma zeta 1 hcom
+    · simpa [families, errors, Q] using hback
+    · simpa [families, errors, Q] using htail'
+  have hchain :=
+    Preliminaries.sddOpRel_chain ψbi (uniformDistribution Q) 4 families errors hsteps
+  have hsum_errors : ∑ i : Fin 4, errors i = 8 * zeta + 2 * ν3 := by
+    simp [errors, ν3, Fin.sum_univ_four]
+    ring
+  have hchain' : SDDOpRel ψbi
+      (uniformDistribution Q)
+      (commuteGHalfSandwich_moveSourceFamily params family 1)
+      (commuteGHalfSandwich_recursiveTargetFamily params family 1)
+      (32 * zeta + 8 * ν3) := by
+    have hmono := Preliminaries.sddOpRel_mono ψbi
+      (uniformDistribution Q)
+      (commuteGHalfSandwich_moveSourceFamily params family 1)
+      (commuteGHalfSandwich_recursiveTargetFamily params family 1)
+      ((4 : Error) * ∑ i : Fin 4, errors i)
+      (32 * zeta + 8 * ν3)
+      hchain
+      (by rw [hsum_errors]; linarith)
+    simpa [families, Q] using hmono
+  have hsplit2 : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × PointTuple params 2))
+      (headTailOrderedFamily params family 2)
+      (headTailRotatedFamily params family 2)
+      (32 * zeta + 8 * ν3) := by
+    exact (commuteGHalfSandwich_split_succ_iff params ψbi family 1
+      (32 * zeta + 8 * ν3)).2 hchain'
+  exact (commuteGHalfSandwich_split_iff params ψbi family 2
+    (32 * zeta + 8 * ν3)).2 hsplit2
+
+private lemma commuteGHalfSandwich_core_three_error_le
+    (params : Parameters) [FieldModel params.q]
+    (gamma zeta : Error)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hzeta_le : zeta ≤ 1) :
+    32 * zeta + 8 * gHatCommutationError params gamma zeta ≤
+      commuteGHalfSandwichError params gamma zeta 3 := by
+  let S : Error :=
+    Real.rpow gamma (1 / (16 : Error)) +
+      Real.rpow zeta (1 / (16 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
+  have hzeta_term : zeta ≤ (params.m : Error) * S := by
+    simpa [S] using
+      zeta_le_gHatCommutationScale params gamma zeta hzeta_nonneg hzeta_le
+  have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
+  have hS_nonneg : 0 ≤ S := by
+    dsimp [S]
+    exact add_nonneg
+      (add_nonneg
+        (rpow_oneSixteenth_nonneg gamma)
+        (Real.rpow_nonneg hzeta_nonneg (1 / (16 : Error))))
+      (Real.rpow_nonneg hratio_nonneg (1 / (16 : Error)))
+  calc
+    32 * zeta + 8 * gHatCommutationError params gamma zeta
+      ≤ 32 * ((params.m : Error) * S) + 8 * gHatCommutationError params gamma zeta := by
+          gcongr
+    _ = 32 * ((params.m : Error) * S) + 8 * (138 * (params.m : Error) * S) := by
+          simp [gHatCommutationError, S]
+    _ = 1136 * (params.m : Error) * S := by ring
+    _ ≤ 426 * ((3 : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by
+          have hmS_nonneg : 0 ≤ (params.m : Error) * S := by
+            nlinarith [hS_nonneg]
+          norm_num
+          nlinarith
+    _ = commuteGHalfSandwichError params gamma zeta 3 := by
+          simp [commuteGHalfSandwichError, S]
+
+private lemma commuteGHalfSandwich_core_three
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hzeta_le : zeta ≤ 1)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta))
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (PointTuple params 3))
+      (gHatHalfSandwichLeft params family 3)
+      (gHatHalfSandwichRight params family 3)
+      (commuteGHalfSandwichError params gamma zeta 3) := by
+  have hraw :=
+    commuteGHalfSandwich_core_three_raw params ψbi family gamma zeta hsc hcom
+  have hzeta_nonneg := zeta_nonneg_of_hsc params ψbi family zeta hsc
+  exact Preliminaries.sddOpRel_mono ψbi
+    (uniformDistribution (PointTuple params 3))
+    (gHatHalfSandwichLeft params family 3)
+    (gHatHalfSandwichRight params family 3)
+    (32 * zeta + 8 * gHatCommutationError params gamma zeta)
+    (commuteGHalfSandwichError params gamma zeta 3)
+    hraw
+    (commuteGHalfSandwich_core_three_error_le params gamma zeta
+      hzeta_nonneg hzeta_le)
+
+private lemma commuteGHalfSandwich_core_four_raw
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta))
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (PointTuple params 4))
+      (gHatHalfSandwichLeft params family 4)
+      (gHatHalfSandwichRight params family 4)
+      (224 * zeta + 36 * gHatCommutationError params gamma zeta) := by
+  let ν3 := gHatCommutationError params gamma zeta
+  let E3 : Error := 32 * zeta + 8 * ν3
+  let Q := SliceQuestion params × SliceQuestion params × PointTuple params 2
+  have hmove := commuteGHalfSandwich_moveStage_two params ψbi family zeta hsc
+  have hback :=
+    commuteGHalfSandwich_moveBackStage params ψbi family 2 (12 * zeta) hmove
+  have hthree_raw :=
+    commuteGHalfSandwich_core_three_raw params ψbi family gamma zeta hsc hcom
+  have hsplit3 : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × PointTuple params 2))
+      (headTailOrderedFamily params family 2)
+      (headTailRotatedFamily params family 2)
+      E3 := by
+    simpa [E3, ν3] using
+      (commuteGHalfSandwich_split_iff params ψbi family 2 E3).1 hthree_raw
+  have htail : SDDOpRel ψbi
+      (uniformDistribution Q)
+      (commuteGHalfSandwich_recursiveSourceFamily params family 2)
+      (commuteGHalfSandwich_recursiveTargetFamily params family 2)
+      E3 := by
+    simpa [Q] using
+      commuteGHalfSandwich_prefixSecondSliceLeft params ψbi family 2 E3 hsplit3
+  have htail' : SDDOpRel ψbi
+      (uniformDistribution Q)
+      (commuteGHalfSandwich_moveBackFamily params family 2)
+      (commuteGHalfSandwich_recursiveTargetFamily params family 2)
+      E3 :=
+    commuteGHalfSandwich_moveBack_to_recursiveTarget params ψbi family 2 E3 htail
+  let families : Fin 5 →
+      IdxOpFamily Q (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params 2) (ι × ι)
+    | ⟨0, _⟩ => commuteGHalfSandwich_moveSourceFamily params family 2
+    | ⟨1, _⟩ => commuteGHalfSandwich_moveFamily params family 2
+    | ⟨2, _⟩ => commuteGHalfSandwich_commuteFamily params family 2
+    | ⟨3, _⟩ => commuteGHalfSandwich_moveBackFamily params family 2
+    | ⟨4, _⟩ => commuteGHalfSandwich_recursiveTargetFamily params family 2
+  let errors : Fin 4 → Error
+    | ⟨0, _⟩ => 12 * zeta
+    | ⟨1, _⟩ => ν3
+    | ⟨2, _⟩ => 12 * zeta
+    | ⟨3, _⟩ => E3
+  have hsteps : ∀ i : Fin 4,
+      SDDOpRel ψbi (uniformDistribution Q)
+        (families i.castSucc) (families i.succ) (errors i) := by
+    intro i
+    fin_cases i
+    · simpa [families, errors, Q] using hmove
+    · simpa [families, errors, Q, ν3] using
+        commuteGHalfSandwich_step_commute params ψbi family gamma zeta 2 hcom
+    · simpa [families, errors, Q] using hback
+    · simpa [families, errors, Q] using htail'
+  have hchain :=
+    Preliminaries.sddOpRel_chain ψbi (uniformDistribution Q) 4 families errors hsteps
+  have hsum_errors : ∑ i : Fin 4, errors i = 56 * zeta + 9 * ν3 := by
+    simp [errors, E3, ν3, Fin.sum_univ_four]
+    ring
+  have hchain' : SDDOpRel ψbi
+      (uniformDistribution Q)
+      (commuteGHalfSandwich_moveSourceFamily params family 2)
+      (commuteGHalfSandwich_recursiveTargetFamily params family 2)
+      (224 * zeta + 36 * ν3) := by
+    have hmono := Preliminaries.sddOpRel_mono ψbi
+      (uniformDistribution Q)
+      (commuteGHalfSandwich_moveSourceFamily params family 2)
+      (commuteGHalfSandwich_recursiveTargetFamily params family 2)
+      ((4 : Error) * ∑ i : Fin 4, errors i)
+      (224 * zeta + 36 * ν3)
+      hchain
+      (by rw [hsum_errors]; linarith)
+    simpa [families, Q] using hmono
+  have hsplit4 : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × PointTuple params 3))
+      (headTailOrderedFamily params family 3)
+      (headTailRotatedFamily params family 3)
+      (224 * zeta + 36 * ν3) := by
+    exact (commuteGHalfSandwich_split_succ_iff params ψbi family 2
+      (224 * zeta + 36 * ν3)).2 hchain'
+  exact (commuteGHalfSandwich_split_iff params ψbi family 3
+    (224 * zeta + 36 * ν3)).2 hsplit4
+
+private lemma commuteGHalfSandwich_core_four_error_le
+    (params : Parameters) [FieldModel params.q]
+    (gamma zeta : Error)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hzeta_le : zeta ≤ 1) :
+    224 * zeta + 36 * gHatCommutationError params gamma zeta ≤
+      commuteGHalfSandwichError params gamma zeta 4 := by
+  let S : Error :=
+    Real.rpow gamma (1 / (16 : Error)) +
+      Real.rpow zeta (1 / (16 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
+  have hzeta_term : zeta ≤ (params.m : Error) * S := by
+    simpa [S] using
+      zeta_le_gHatCommutationScale params gamma zeta hzeta_nonneg hzeta_le
+  have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
+  have hS_nonneg : 0 ≤ S := by
+    dsimp [S]
+    exact add_nonneg
+      (add_nonneg
+        (rpow_oneSixteenth_nonneg gamma)
+        (Real.rpow_nonneg hzeta_nonneg (1 / (16 : Error))))
+      (Real.rpow_nonneg hratio_nonneg (1 / (16 : Error)))
+  calc
+    224 * zeta + 36 * gHatCommutationError params gamma zeta
+      ≤ 224 * ((params.m : Error) * S) + 36 * gHatCommutationError params gamma zeta := by
+          gcongr
+    _ = 224 * ((params.m : Error) * S) + 36 * (138 * (params.m : Error) * S) := by
+          simp [gHatCommutationError, S]
+    _ = 5192 * (params.m : Error) * S := by ring
+    _ ≤ 426 * ((4 : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by
+          have hmS_nonneg : 0 ≤ (params.m : Error) * S := by
+            nlinarith [hS_nonneg]
+          norm_num
+          nlinarith
+    _ = commuteGHalfSandwichError params gamma zeta 4 := by
+          simp [commuteGHalfSandwichError, S]
+
+private lemma commuteGHalfSandwich_core_four
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hzeta_le : zeta ≤ 1)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta))
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (PointTuple params 4))
+      (gHatHalfSandwichLeft params family 4)
+      (gHatHalfSandwichRight params family 4)
+      (commuteGHalfSandwichError params gamma zeta 4) := by
+  have hraw :=
+    commuteGHalfSandwich_core_four_raw params ψbi family gamma zeta hsc hcom
+  have hzeta_nonneg := zeta_nonneg_of_hsc params ψbi family zeta hsc
+  exact Preliminaries.sddOpRel_mono ψbi
+    (uniformDistribution (PointTuple params 4))
+    (gHatHalfSandwichLeft params family 4)
+    (gHatHalfSandwichRight params family 4)
+    (224 * zeta + 36 * gHatCommutationError params gamma zeta)
+    (commuteGHalfSandwichError params gamma zeta 4)
+    hraw
+    (commuteGHalfSandwich_core_four_error_le params gamma zeta
+      hzeta_nonneg hzeta_le)
+
 /-- Bridge: the staged move-commute-move chain for `commuteGHalfSandwich`.
 
 Constructs the sequence of `3k` intermediate bipartite operator families
@@ -3526,16 +4278,30 @@ private lemma commuteGHalfSandwich_core
   by_cases hk2 : k = 2
   · subst hk2
     exact commuteGHalfSandwich_core_two params ψbi family gamma zeta hcom
-  · have hk3 : 3 ≤ k := by omega
-    /-
-    The remaining `k ≥ 3` branch is the paper's recursive flat-chain argument.
-    All local infrastructure is now in place (`postMoveFlatStep`,
-    `flatChainStep`, `moveBackStage_step`, and the global-chain wrappers), but
-    the final error-summation / endpoint assembly over that chain is still
-    missing. This is the same upstream blocker referenced by the later
-    `overAllOutcomes` / Bernoulli chain.
-    -/
-    sorry
+  · by_cases hk3 : k = 3
+    · subst hk3
+      exact commuteGHalfSandwich_core_three params ψbi family gamma zeta hzeta_le hsc hcom
+    · by_cases hk4 : k = 4
+      · subst hk4
+        exact commuteGHalfSandwich_core_four params ψbi family gamma zeta hzeta_le hsc hcom
+      · have hk5 : 5 ≤ k := by omega
+        /-
+        New progress in this file now reaches the first two genuinely nontrivial
+        sandwich lengths: `commuteGHalfSandwich_core_three` and
+        `commuteGHalfSandwich_core_four` are fully proved from the staged
+        move/commute/move-back chain.
+
+        What still blocks the general `k ≥ 5` branch is the paper's full linear
+        flat-chain assembly: we still need an inductive package that iterates the
+        move/commute/move-back step for arbitrary tail length and then sums the
+        resulting `ζ`/`ν₃` contributions into the displayed
+        `426 k² m (γ^{1/16} + ζ^{1/16} + (d/q)^{1/16})` envelope.
+
+        Tracked separately by issue #639; the likely clean closure is to unify
+        the current `k = 3`/`k = 4` raw chains into one recursive flat-chain
+        lemma instead of duplicating the arithmetic case-by-case.
+        -/
+        sorry
 
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
@@ -4195,8 +4961,8 @@ lemma overAllOutcomes
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
-  constructor -- OverAllOutcomesStatement
-  constructor -- SDDRel
+  -- `OverAllOutcomesStatement` is a single-field wrapper around the scalar `SDDRel` bound below.
+  refine ⟨?_⟩
   /- Paper: `lem:over-all-outcomes` (ld-pasting.tex §9.4, lines 1140–1289).
   Expand pasted-measurement total mass over all outcome types τ with |τ| ≥ d+1.
   Steps: (1) expand over distinct k-tuples via `distinctTupleDistribution`,
