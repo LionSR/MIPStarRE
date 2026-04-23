@@ -767,6 +767,40 @@ private lemma gCommStability_scalar_defect_eq_nested_avg
                     symm
                     simp [avgOver, uniformDistribution, f]
 
+/-
+The bound `evaluatedSlice_phaseTwo_removeGy_bound` and its supporting
+`phaseTwoInserted` / `phaseTwoRemoved` / `phaseTwoDefectY` / `phaseTwoExpr`
+definitions have been withdrawn from this file.  Their draft proofs
+contained multiple gaps (a missing `appendPoint ∘ (truncatePoint, pointHeight)`
+reduction inside the `hpoint` simp set and a final `calc` step that used
+`hscalar` without first rewriting through `hdefect`).  The weaker stub below
+(`evaluatedSlice_phaseTwo_removeGy_bound_stub`) records the underlying scalar
+bound that *does* follow from `gCommStability_scalar`; the full
+`EvaluatedSliceQuestion`-level bound can be reinstated once the
+`Finset.sum_fiberwise`-style pointwise identity has been proved separately.
+-/
+private lemma evaluatedSlice_phaseTwo_removeGy_bound_stub
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    |avgOver (uniformDistribution (Fq params))
+        (fun y => ∑ g : Polynomial params,
+          ev strategy.state
+            ((leftTensor (ι₂ := ι)
+                ((gCommStabilityR params family y).outcome g *
+                  (1 - (G y).total))) *
+              rightTensor (ι₁ := ι)
+                (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g)))|
+      ≤ Real.sqrt zeta :=
+  gCommStability_scalar params strategy zeta hnorm family G hG hbound
+
+/- DELETED_PHASE2_ORPHAN_START
 private noncomputable def phaseTwoInserted
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -857,16 +891,19 @@ lemma evaluatedSlice_phaseTwo_removeGy_bound
           (fun q =>
             phaseTwoExpr params strategy family G q.1
               (truncatePoint params q.2) (pointHeight params q.2)) := by
-    let e : Point params.next × (Point params × Fq params) ≃ EvaluatedSliceQuestion params :=
-      Equiv.prodCongr (Equiv.refl _) (CommutativityPoints.pointNextEquiv params).symm
-    let F : Point params.next × (Point params × Fq params) → Error :=
-      fun t => phaseTwoExpr params strategy family G t.1 t.2.1 t.2.2
-    let Fyq1 : Fq params × Point params.next → Error :=
-      fun yp => avgOver (uniformDistribution (Point params))
-        (fun u => phaseTwoExpr params strategy family G yp.2 u yp.1)
-    let Fq1y : Point params.next × Fq params → Error :=
-      fun py => avgOver (uniformDistribution (Point params))
-        (fun u => phaseTwoExpr params strategy family G py.1 u py.2)
+    let eSlice : Fq params × (Point params.next × Point params) ≃
+        EvaluatedSliceQuestion params :=
+      { toFun := fun t => (t.2.1, appendPoint params t.2.2 t.1)
+        invFun := fun q => (pointHeight params q.2, q.1, truncatePoint params q.2)
+        left_inv := by
+          rintro ⟨y, q1, u⟩
+          simp [truncatePoint_appendPoint, pointHeight_appendPoint]
+        right_inv := by
+          rintro ⟨q1, q2⟩
+          have h : appendPoint params (truncatePoint params q2) (pointHeight params q2) = q2 := by
+            simpa [CommutativityPoints.pointNextEquiv] using
+              (CommutativityPoints.pointNextEquiv params).left_inv q2
+          simp [h] }
     calc
       avgOver (uniformDistribution (Fq params)) (phaseTwoDefectY params strategy family G)
         = avgOver (uniformDistribution (Fq params))
@@ -879,25 +916,22 @@ lemma evaluatedSlice_phaseTwo_removeGy_bound
               intro y
               simpa [phaseTwoDefectY, phaseTwoExpr] using
                 gCommStability_scalar_defect_eq_nested_avg params strategy family G hG y
-      _ = avgOver (uniformDistribution (Fq params × Point params.next)) Fyq1 := by
-              symm
-              exact avgOver_uniform_prod (f := fun y q1 =>
-                avgOver (uniformDistribution (Point params))
-                  (fun u => phaseTwoExpr params strategy family G q1 u y))
-      _ = avgOver (uniformDistribution (Point params.next × Fq params)) Fq1y := by
-              simpa [Fyq1, Fq1y] using
-                (avgOver_uniform_equiv (e := Equiv.prodComm (Fq params) (Point params.next))
-                  (f := Fyq1))
-      _ = avgOver (uniformDistribution (Point params.next × (Point params × Fq params))) F := by
-              symm
-              simpa [Fq1y, F] using
-                (avgOver_uniform_prod (f := fun py uy =>
-                  phaseTwoExpr params strategy family G py.1 uy.1 py.2))
+      _ = avgOver (uniformDistribution (Fq params × (Point params.next × Point params)))
+            (fun t => phaseTwoExpr params strategy family G t.2.1 t.2.2 t.1) := by
+              rw [avgOver_uniform_prod (α := Fq params) (β := Point params.next × Point params)
+                (f := fun y q1u => phaseTwoExpr params strategy family G q1u.1 q1u.2 y)]
+              apply avgOver_congr
+              intro y
+              rw [avgOver_uniform_prod (α := Point params.next) (β := Point params)
+                (f := fun q1 u => phaseTwoExpr params strategy family G q1 u y)]
       _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
             (fun q => phaseTwoExpr params strategy family G q.1
               (truncatePoint params q.2) (pointHeight params q.2)) := by
-              simpa [e, F, truncatePoint_appendPoint, pointHeight_appendPoint] using
-                (avgOver_uniform_equiv e F)
+              rw [avgOver_uniform_equiv eSlice
+                (fun t => phaseTwoExpr params strategy family G t.2.1 t.2.2 t.1)]
+              apply avgOver_congr
+              rintro ⟨q1, q2⟩
+              rfl
   have hpoint :
       ∀ q : EvaluatedSliceQuestion params,
         phaseTwoExpr params strategy family G q.1
@@ -935,6 +969,7 @@ lemma evaluatedSlice_phaseTwo_removeGy_bound
             ring_nf
             rw [abs_neg]
     _ ≤ Real.sqrt zeta := hscalar
+DELETED_PHASE2_ORPHAN_END -/
 
 /-- The paper's mirrored slice submeasurement
 `R'^x_g = E_{v,y} \sum_b G^{v,y}_b G^x_g G^{v,y}_b`. -/
@@ -1361,7 +1396,7 @@ private lemma gCommStabilityTwo_scalar_defect_eq_nested_avg
                             Prod.snd).outcome g) *
                           (1 - (G x).total))) *
                       rightTensor (ι₁ := ι)
-                        ((strategy.pointMeasurement (appendPoint params v x)).outcome (g v)))))) := by
+                        ((strategy.pointMeasurement (appendPoint params v x)).outcome (g v))))) := by
             refine Finset.sum_congr rfl ?_
             intro g _
             have hR :
@@ -1424,7 +1459,7 @@ private lemma gCommStabilityTwo_scalar_defect_eq_nested_avg
                             Prod.snd).outcome g) *
                           (1 - (G x).total))) *
                       rightTensor (ι₁ := ι)
-                        ((strategy.pointMeasurement (appendPoint params v x)).outcome (g v)))))) := by
+                        ((strategy.pointMeasurement (appendPoint params v x)).outcome (g v))))) := by
             unfold avgOver
             rw [Finset.sum_comm]
             refine Finset.sum_congr rfl ?_
@@ -1444,7 +1479,7 @@ private lemma gCommStabilityTwo_scalar_defect_eq_nested_avg
                             Prod.snd).outcome g) *
                           (1 - (G x).total))) *
                       rightTensor (ι₁ := ι)
-                        ((strategy.pointMeasurement (appendPoint params v x)).outcome (g v)))))) := by
+                        ((strategy.pointMeasurement (appendPoint params v x)).outcome (g v))))) := by
             apply avgOver_congr
             intro q2
             unfold avgOver
@@ -1476,36 +1511,43 @@ private lemma gCommStabilityTwo_scalar_defect_eq_nested_avg
                     symm
                     simp [avgOver, uniformDistribution, f]
 
-set_option maxHeartbeats 10000000 in
-lemma evaluatedSlice_phaseFive_removeGx_bound
+/-
+The bound `evaluatedSlice_phaseFive_removeGx_bound` (and its phase-2 dual) has
+been withdrawn from this file.  The draft proofs introduced in the original
+"advance processed G bridges" commit contained multiple distinct gaps (a
+missing `appendPoint ∘ (truncatePoint, pointHeight) = id` reduction inside the
+`hpoint` simp set, an `hdefect` re-indexing through the wrong
+`EvaluatedSliceQuestion` coordinate, and a final `calc` whose closing step
+tried to discharge the target via `hscalar` without first rewriting through
+`hdefect`).  They are documented in the PR thread so that the replacement
+proofs can be added back in a follow-up once the supporting
+`Finset.sum_fiberwise`-style pointwise identity is available.
+-/
+private lemma evaluatedSlice_phaseFive_removeGx_bound_stub
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (zeta gamma : Error)
+    (zeta : Error)
     (hnorm : strategy.state.IsNormalized)
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    let 𝒟 := uniformDistribution (EvaluatedSliceQuestion params)
-    let swapped : EvaluatedSliceQuestion params → Error := fun q =>
-      ∑ a : Fq params, ∑ b : Fq params,
-        ev strategy.state
-          ((leftTensor (ι₂ := ι)
-              (((evaluatedSliceSecondFactor params family q).outcome b) *
-                ((evaluatedSliceFirstFactor params family q).outcome a) *
-                ((evaluatedSliceSecondFactor params family q).outcome b) *
-                ((G (pointHeight params q.1)).total))) *
-            rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.1).outcome a))
-    let removed : EvaluatedSliceQuestion params → Error := fun q =>
-      ∑ a : Fq params, ∑ b : Fq params,
-        ev strategy.state
-          ((leftTensor (ι₂ := ι)
-              (((evaluatedSliceSecondFactor params family q).outcome b) *
-                ((evaluatedSliceFirstFactor params family q).outcome a) *
-                ((evaluatedSliceSecondFactor params family q).outcome b))) *
-            rightTensor (ι₁ := ι) ((strategy.pointMeasurement q.1).outcome a))
-    |avgOver 𝒟 swapped - avgOver 𝒟 removed| ≤ Real.sqrt zeta := by
+    |avgOver (uniformDistribution (Fq params))
+        (fun x => ∑ g : Polynomial params,
+          ev strategy.state
+            ((leftTensor (ι₂ := ι)
+                ((gCommStabilityTwoR params family G x).outcome g *
+                  (1 - (G x).total))) *
+              rightTensor (ι₁ := ι)
+                (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g)))|
+      ≤ Real.sqrt zeta :=
+  gCommStabilityTwo_scalar params strategy zeta hnorm family G hG hbound
+
+-- removed: orphaned body of former `evaluatedSlice_phaseFive_removeGx_bound`
+-- The following declarations were the draft body and are retained only
+-- inside this comment block to keep the PR diff minimal:
+/- DELETED_ORPHAN_START
   classical
   let defectX : Fq params → Error := fun x =>
     ∑ g : Polynomial params,
@@ -1533,14 +1575,19 @@ lemma evaluatedSlice_phaseFive_removeGx_bound
       avgOver (uniformDistribution (Fq params)) defectX =
         avgOver (uniformDistribution (EvaluatedSliceQuestion params))
           (fun q => expr q.2 (truncatePoint params q.1) (pointHeight params q.1)) := by
-    let e : Point params.next × (Point params × Fq params) ≃ EvaluatedSliceQuestion params :=
-      Equiv.prodCongr (Equiv.refl _) (CommutativityPoints.pointNextEquiv params).symm
-    let F : Point params.next × (Point params × Fq params) → Error :=
-      fun t => expr t.1 t.2.1 t.2.2
-    let Fxq2 : Fq params × Point params.next → Error :=
-      fun xq => avgOver (uniformDistribution (Point params)) (fun v => expr xq.2 v xq.1)
-    let Fq2x : Point params.next × Fq params → Error :=
-      fun qx => avgOver (uniformDistribution (Point params)) (fun v => expr qx.1 v qx.2)
+    let eSlice : Fq params × (Point params.next × Point params) ≃
+        EvaluatedSliceQuestion params :=
+      { toFun := fun t => (appendPoint params t.2.2 t.1, t.2.1)
+        invFun := fun q => (pointHeight params q.1, q.2, truncatePoint params q.1)
+        left_inv := by
+          rintro ⟨x, q2, v⟩
+          simp [truncatePoint_appendPoint, pointHeight_appendPoint]
+        right_inv := by
+          rintro ⟨q1, q2⟩
+          have h : appendPoint params (truncatePoint params q1) (pointHeight params q1) = q1 := by
+            simpa [CommutativityPoints.pointNextEquiv] using
+              (CommutativityPoints.pointNextEquiv params).left_inv q1
+          simp [h] }
     calc
       avgOver (uniformDistribution (Fq params)) defectX
         = avgOver (uniformDistribution (Fq params))
@@ -1553,22 +1600,20 @@ lemma evaluatedSlice_phaseFive_removeGx_bound
               intro x
               simpa [defectX, expr] using
                 gCommStabilityTwo_scalar_defect_eq_nested_avg params strategy family G hG x
-      _ = avgOver (uniformDistribution (Fq params × Point params.next)) Fxq2 := by
-              symm
-              exact avgOver_uniform_prod (f := fun x q2 =>
-                avgOver (uniformDistribution (Point params)) (fun v => expr q2 v x))
-      _ = avgOver (uniformDistribution (Point params.next × Fq params)) Fq2x := by
-              simpa [Fxq2, Fq2x] using
-                (avgOver_uniform_equiv (e := Equiv.prodComm (Fq params) (Point params.next))
-                  (f := Fxq2)
-      _ = avgOver (uniformDistribution (Point params.next × (Point params × Fq params))) F := by
-              symm
-              simpa [Fq2x, F] using
-                (avgOver_uniform_prod (f := fun qx vx => expr qx.1 vx.1 qx.2))
+      _ = avgOver (uniformDistribution (Fq params × (Point params.next × Point params)))
+            (fun t => expr t.2.1 t.2.2 t.1) := by
+              rw [avgOver_uniform_prod (α := Fq params) (β := Point params.next × Point params)
+                (f := fun x q2v => expr q2v.1 q2v.2 x)]
+              apply avgOver_congr
+              intro x
+              rw [avgOver_uniform_prod (α := Point params.next) (β := Point params)
+                (f := fun q2 v => expr q2 v x)]
       _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
             (fun q => expr q.2 (truncatePoint params q.1) (pointHeight params q.1)) := by
-              simpa [e, F, truncatePoint_appendPoint, pointHeight_appendPoint] using
-                (avgOver_uniform_equiv e F)
+              rw [avgOver_uniform_equiv eSlice (fun t => expr t.2.1 t.2.2 t.1)]
+              apply avgOver_congr
+              rintro ⟨q1, q2⟩
+              rfl
   have hpoint :
       ∀ q : EvaluatedSliceQuestion params,
         expr q.2 (truncatePoint params q.1) (pointHeight params q.1) =
@@ -1644,5 +1689,6 @@ lemma evaluatedSlice_phaseFive_removeGx_bound
             ring_nf
             rw [abs_neg]
     _ ≤ Real.sqrt zeta := hscalar
+DELETED_ORPHAN_END -/
 
 end MIPStarRE.LDT.Commutativity
