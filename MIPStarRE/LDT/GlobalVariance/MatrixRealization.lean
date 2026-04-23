@@ -27,12 +27,17 @@ variable (params : Parameters) [FieldModel params.q]
 /-! ## Matrix realizations -/
 
 /-- Concrete matrix data realizing the operators and distributions used in the
-variance-transfer statements. -/
+variance-transfer statements.
+
+The local measurement families live on a single prover space `space`, while the
+ambient state lives on the bipartite tensor product `space ⊗ space`. This
+matches the paper's convention that point and line operators act on the left
+register and polynomial weights act on the right register. -/
 structure MatrixVarianceTransferRealization (params : Parameters) [FieldModel params.q] where
-  /-- The finite-dimensional Hilbert space on which the realization lives. -/
+  /-- The local finite-dimensional Hilbert space carrying the point/line measurements. -/
   space : FiniteHilbertSpace
-  /-- The ambient positive matrix state. -/
-  state : PositiveMatrixState space
+  /-- The ambient bipartite positive matrix state. -/
+  state : PositiveMatrixState (tensorHilbertSpace space space)
   /-- The point measurement family `u ↦ A^u`. -/
   pointMeasurement : Point params → MatrixSubmeasurement (Fq params) space
   /-- The axis-parallel line measurement family `ℓ ↦ B^ℓ`. -/
@@ -47,43 +52,76 @@ structure MatrixVarianceTransferRealization (params : Parameters) [FieldModel pa
 
 /-! ## Concrete operators and variances -/
 
-/-- The concrete operator `G_g`. -/
+/-- The local operator `G_g`. -/
 def matrixPolynomialWeightOperator (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : MatrixOperator model.space :=
   model.polynomialMeasurement.effect g
 
-/--
-The concrete stand-in for `(G_g)^{1/2}`. The source uses the square root; this
-placeholder omits it and reuses `G_g` itself.
--/
+private noncomputable def matrixPolynomialWeightSqrtOperatorCore
+    (params : Parameters) [FieldModel params.q]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (G : MIPStarRE.Quantum.Submeasurement (DegreeBoundedPolynomialAnswer params) d)
+    (g : Polynomial params) : MIPStarRE.Quantum.Op d :=
+  CFC.sqrt (G.effect g)
+
+/-- The actual matrix square root `(G_g)^{1/2}` on the local register. -/
 noncomputable def matrixPolynomialWeightSqrtOperator (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : MatrixOperator model.space :=
-  matrixPolynomialWeightOperator params model g
+  let _ : Fintype model.space.carrier := model.space.instFintype
+  let _ : DecidableEq model.space.carrier := model.space.instDecidableEq
+  matrixPolynomialWeightSqrtOperatorCore params model.polynomialMeasurement g
 
-/-- The concrete operator `A^u_{g(u)}`. -/
+/-- The right-register tensor factor `I ⊗ (G_g)^{1/2}` used to weight the bipartite state. -/
+noncomputable def matrixPolynomialWeightRightTensorOperator
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixVarianceTransferRealization params)
+    (g : Polynomial params) : MatrixOperator (tensorHilbertSpace model.space model.space) :=
+  matrixTensorOperator (1 : MatrixOperator model.space)
+    (matrixPolynomialWeightSqrtOperator params model g)
+
+/-- The weighted bipartite state `ρ_g = (I ⊗ (G_g)^{1/2}) ρ (I ⊗ (G_g)^{1/2})†`. -/
+noncomputable def matrixWeightedPolynomialState (params : Parameters) [FieldModel params.q]
+    (model : MatrixVarianceTransferRealization params)
+    (g : Polynomial params) : PositiveMatrixState (tensorHilbertSpace model.space model.space) :=
+  let W := matrixPolynomialWeightRightTensorOperator params model g
+  { matrix := W * model.state.matrix * Wᴴ
+    positive :=
+      ((Matrix.nonneg_iff_posSemidef.mp model.state.positive).mul_mul_conjTranspose_same W).nonneg }
+
+/-- The local operator `A^u_{g(u)}`. -/
 def matrixPointConditionedOutcomeOperatorAtPolynomial (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) (u : Point params) : MatrixOperator model.space :=
   (model.pointMeasurement u).effect (g u)
 
-/-- The weighted operator `A^u_{g(u)} (G_g)^{1/2}` on one ambient matrix algebra. -/
+/-- The lifted operator `A^u_{g(u)} ⊗ I` on the bipartite space. -/
+noncomputable def matrixLiftedPointConditionedOperatorAtPolynomial
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixVarianceTransferRealization params)
+    (g : Polynomial params) (u : Point params) :
+    MatrixOperator (tensorHilbertSpace model.space model.space) :=
+  matrixTensorOperator (matrixPointConditionedOutcomeOperatorAtPolynomial params model g u)
+    (1 : MatrixOperator model.space)
+
+/-- The weighted operator `A^u_{g(u)} ⊗ (G_g)^{1/2}` on the bipartite space. -/
 noncomputable def matrixWeightedPointConditionedOperatorAtPolynomial
     (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
-    (g : Polynomial params) (u : Point params) : MatrixOperator model.space :=
-  matrixPointConditionedOutcomeOperatorAtPolynomial params model g u *
-    matrixPolynomialWeightSqrtOperator params model g
+    (g : Polynomial params) (u : Point params) :
+    MatrixOperator (tensorHilbertSpace model.space model.space) :=
+  matrixTensorOperator (matrixPointConditionedOutcomeOperatorAtPolynomial params model g u)
+    (matrixPolynomialWeightSqrtOperator params model g)
 
-/-- The matrix family attached to a fixed polynomial `g`. -/
+/-- The matrix realization of the family `u ↦ A^u_{g(u)}` acting on the weighted state `ρ_g`. -/
 noncomputable def matrixPointConditionedRealizationAtPolynomial
     (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : MatrixOperatorFamilyRealization params where
-  space := model.space
-  state := model.state
-  family := matrixWeightedPointConditionedOperatorAtPolynomial params model g
+  space := tensorHilbertSpace model.space model.space
+  state := matrixWeightedPolynomialState params model g
+  family := matrixLiftedPointConditionedOperatorAtPolynomial params model g
 
 /-- The actual local variance of the conditioned points family at a fixed polynomial. -/
 noncomputable def matrixPointConditionedLocalVarianceAtPolynomial
@@ -113,7 +151,7 @@ noncomputable def matrixPointConditionedGlobalVariance
   avgOver (polynomialDistribution params) (fun g =>
     matrixPointConditionedGlobalVarianceAtPolynomial params model g)
 
-/-- The concrete left event operator `[f(u) = g(u)]`. -/
+/-- The local event operator `[f(u) = g(u)]`. -/
 noncomputable def matrixGeneralizeBLeftOperatorAtPolynomial
     (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
@@ -124,7 +162,7 @@ noncomputable def matrixGeneralizeBLeftOperatorAtPolynomial
       (fun f => f (model.axisQuestionParameter qu))
   valueFamily.effect (g qu.2)
 
-/-- The concrete right event operator `[f = g|_ℓ]`. -/
+/-- The local event operator `[f = g|_ℓ]`. -/
 noncomputable def matrixGeneralizeBRightOperatorAtPolynomial
     (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
@@ -133,23 +171,27 @@ noncomputable def matrixGeneralizeBRightOperatorAtPolynomial
   (model.axisMeasurement qu.1).effect
     (Polynomial.restrictToAxisParallelLine params g qu.1)
 
-/-- The weighted left operator in the matrix-level `generalize-b` estimate. -/
+/-- The weighted left operator in the matrix-level `generalize-b` estimate,
+realized as `B^ℓ_{[f(u)=g(u)]} ⊗ (G_g)^{1/2}`. -/
 noncomputable def matrixWeightedGeneralizeBLeftOperatorAtPolynomial
     (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) : MatrixOperator model.space :=
-  matrixGeneralizeBLeftOperatorAtPolynomial params model g qu *
-    matrixPolynomialWeightSqrtOperator params model g
+    (qu : AxisParallelLineQuestion params) :
+    MatrixOperator (tensorHilbertSpace model.space model.space) :=
+  matrixTensorOperator (matrixGeneralizeBLeftOperatorAtPolynomial params model g qu)
+    (matrixPolynomialWeightSqrtOperator params model g)
 
-/-- The weighted right operator in the matrix-level `generalize-b` estimate. -/
+/-- The weighted right operator in the matrix-level `generalize-b` estimate,
+realized as `B^ℓ_{[f = g|_ℓ]} ⊗ (G_g)^{1/2}`. -/
 noncomputable def matrixWeightedGeneralizeBRightOperatorAtPolynomial
     (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) : MatrixOperator model.space :=
-  matrixGeneralizeBRightOperatorAtPolynomial params model g qu *
-    matrixPolynomialWeightSqrtOperator params model g
+    (qu : AxisParallelLineQuestion params) :
+    MatrixOperator (tensorHilbertSpace model.space model.space) :=
+  matrixTensorOperator (matrixGeneralizeBRightOperatorAtPolynomial params model g qu)
+    (matrixPolynomialWeightSqrtOperator params model g)
 
 /-- The actual squared difference appearing in the matrix-level `generalize-b` estimate. -/
 noncomputable def matrixGeneralizeBDeviationAtPolynomial
@@ -168,19 +210,28 @@ noncomputable def matrixGeneralizeBDeviation
   avgOver (polynomialDistribution params) (fun g =>
     matrixGeneralizeBDeviationAtPolynomial params model g)
 
-/-- The matrix-level local deviation agrees with the concrete local variance. -/
+/-- The edgewise squared-norm expression corresponding to the matrix local-variance
+comparison for a fixed polynomial. This keeps the original state `ρ` and moves
+`(G_g)^{1/2}` into the operators, matching `eq:equivalent-local-variance` in the paper. -/
 noncomputable def matrixLocalVarianceDeviationAtPolynomial
     (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : Error :=
-  matrixPointConditionedLocalVarianceAtPolynomial params model g
+  avgOver (rerandomizeCoord params) (fun uv =>
+    matrixSquaredDifferenceExpectation model.state
+      (matrixWeightedPointConditionedOperatorAtPolynomial params model g uv.1)
+      (matrixWeightedPointConditionedOperatorAtPolynomial params model g uv.2))
 
-/-- The matrix-level global deviation agrees with the concrete global variance. -/
+/-- The independently sampled squared-norm expression corresponding to the matrix
+global-variance comparison for a fixed polynomial. -/
 noncomputable def matrixGlobalVarianceDeviationAtPolynomial
     (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) : Error :=
-  matrixPointConditionedGlobalVarianceAtPolynomial params model g
+  avgOver (independentPointPair params) (fun uv =>
+    matrixSquaredDifferenceExpectation model.state
+      (matrixWeightedPointConditionedOperatorAtPolynomial params model g uv.1)
+      (matrixWeightedPointConditionedOperatorAtPolynomial params model g uv.2))
 
 /-! ## Matrix statement packages -/
 
