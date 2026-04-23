@@ -1,3 +1,10 @@
+> **Update (2026-04-23):** Historical scouting snapshot. The Chapter 5 expansion
+> theorem layer has since been completed on current `main`: `matrixLocalToGlobal`,
+> `matrixLocalRewrite`, `matrixGlobalRewrite`, `localToGlobal`, `localRewrite`, and
+> `globalRewrite` are all proved, and `globalRewrite` now uses the operational
+> `canonicalGlobalVarianceDecomposition` witness rather than `default`. The section
+> below is preserved as pre-fix scouting context only.
+
 ## matrixLocalToGlobal (line 34)
 - Paper reference: `lem:local-to-global`
 - Paper proof strategy: Rewrite the local variance as a trace against the hypercube Laplacian using `lem:local-rewrite`, rewrite the global variance as the norm of the orthogonal-to-constant component using `lem:global-rewrite`, then apply the spectral gap lower bound `L >= (1 / (mM)) P_perp` on the nonconstant subspace.
@@ -44,4 +51,4 @@
 - Key Mathlib lemmas needed: `matrixGlobalRewrite`, bridge lemmas to matrix realizations, `Fintype.sum_prod_type'`, `Finset.sum_add_distrib`, `MIPStarRE.Quantum.normalizedTrace_mul_comm`
 - Estimated difficulty: hard
 - Estimated Lean proof lines: 25
-- Blockers: `GlobalVarianceDecomposition` is only a placeholder container and does not assert the identities the paper uses; `globalVarianceTraceWitness` ignores the point-register orthogonal vector structure; as with `localRewrite`, the abstract theorem needs a real tensor/column-operator bridge before a faithful proof is possible
+- Historical blockers (resolved on current `main`): `GlobalVarianceDecomposition` used to be a placeholder container and `globalVarianceTraceWitness` used to ignore the decomposition. The live Chapter 5 code now records the centered-family decomposition and makes the trace witness consume it.

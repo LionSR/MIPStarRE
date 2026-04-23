@@ -19,6 +19,15 @@ Build check:
 - `lake build MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems` succeeds, with `sorry` warnings in `ExpansionHypercubeGraph/Theorems.lean`.
 - `lake build MIPStarRE.LDT.GlobalVariance.Theorems` succeeds, with `sorry` warnings in both `ExpansionHypercubeGraph/Theorems.lean` and `GlobalVariance/Theorems.lean`.
 
+> **Update (2026-04-23):** The Chapter 5 expansion-side gaps recorded below are no
+> longer current on `main`. In particular, the old `EigenvectorsStatement` /
+> `LaplacianSpectralGapStatement` wrappers were removed, `fourierBasisInnerProduct`
+> is now derived from the actual Fourier basis, `matrixLocalRewrite` /
+> `matrixGlobalRewrite` / `matrixLocalToGlobal` are proved, and `globalRewrite`
+> now uses the operational `canonicalGlobalVarianceDecomposition` witness rather
+> than `default`. The remaining live debt in this audit is the Chapter 6
+> global-variance layer, not the old Chapter 5 rewrite/spectral scaffolding.
+
 ## Executive summary
 
 - The blueprint covers all of the main named results from the paper for these chapters.
@@ -196,13 +205,13 @@ Gap relative to the paper:
 
 Consequences:
 
-- The public chapter theorems `localToGlobal`, `localRewrite`, and `globalRewrite` are only wrappers around these unfinished matrix lemmas.
-- So the blueprint-facing theorems exist and compile, but the core proofs for the chapter are still missing.
+- Historical note: at the time of this audit, the public chapter theorems `localToGlobal`, `localRewrite`, and `globalRewrite` were only wrappers around unfinished matrix lemmas.
+- Current status (2026-04-23): these matrix lemmas are now proved, so the blueprint-facing theorems are no longer scaffolding.
 
 Proof-structure match assessment:
 
 - `localToGlobal` wrapper matches the paper's intended structure: reduce to a matrix model, then compare local and global forms.
-- `globalRewrite` is materially weaker than the paper's proof structure. The statement only asks for existence of a decomposition, and the wrapper uses `default` as a witness because the underlying theorem only proves equality of trace forms, not a concrete decomposition tied to `A_{\mathrm{comb}} = |φ_0> \ot A_0 + |φ_\perp> \ot A_\perp`.
+- Historical note: the old `globalRewrite` mismatch is resolved on current `main`. The theorem still packages the paper's displayed decomposition as `∃ decomp`, but the witness is now `canonicalGlobalVarianceDecomposition params A`, and `globalVarianceTraceWitness` consumes that centered-family decomposition rather than `default`.
 
 ### 1.5 Nontrivial intermediate equations in the paper
 
@@ -424,14 +433,14 @@ Variance chapter:
 
 ### Priority gaps if the goal is to close Chapters 05-06
 
-1. Finish the matrix realization proofs in `ExpansionHypercubeGraph/Theorems.lean`:
-   - `matrixLocalRewrite`
-   - `matrixGlobalRewrite`
-   - `matrixLocalToGlobal`
+1. ~~Finish the matrix realization proofs in `ExpansionHypercubeGraph/Theorems.lean`~~ **Resolved on current `main`**:
+   - ~~`matrixLocalRewrite`~~
+   - ~~`matrixGlobalRewrite`~~
+   - ~~`matrixLocalToGlobal`~~
 
-2. Strengthen the expansion-side formalization so it matches the paper more literally:
-   - derive orthogonality from `fourierBasisState`, rather than defining `fourierBasisInnerProduct` by fiat
-   - connect `globalRewrite` to an actual decomposition witness instead of `default`
+2. ~~Strengthen the expansion-side formalization so it matches the paper more literally~~ **Resolved for the old Chapter 5 blocker**:
+   - ~~derive orthogonality from `fourierBasisState`, rather than defining `fourierBasisInnerProduct` by fiat~~
+   - ~~connect `globalRewrite` to an actual decomposition witness instead of `default`~~
 
 3. Replace placeholders in `GlobalVariance/MatrixRealization.lean`:
    - use the actual square root `(G_g)^{1/2}`
