@@ -430,22 +430,12 @@ noncomputable def tensorFailureExpectation {Outcome : Type*}
 noncomputable def sliceTransverseDirectionWeight (params : Parameters) : Error :=
   (params.m : Error) / (((params.m + 1 : ℕ) : Error))
 
-/-- Reciprocal loss incurred when conditioning away the new axis direction. -/
+/-- Reciprocal loss incurred when conditioning away the new axis direction.
+
+In `lem:restricted-probabilities`, the axis-parallel and diagonal branches use
+this same conditioning step, so both averaged slice bounds carry the paper's
+common factor `((m + 1) / m)`. -/
 noncomputable def sliceConditioningLoss (params : Parameters) : Error :=
   (((params.m + 1 : ℕ) : Error) / (params.m : Error))
-
-/-- The paper-faithful diagonal conditioning weight matches the axis-parallel
-branch: one conditions away the new coordinate direction, which occurs with
-probability `m / (m + 1)`.
-
-Note: `references/ldt-paper/inductive_step.tex` uses the same `((m + 1) / m)`
-loss for both the axis-parallel and diagonal branches (around line 374). The
-earlier `q`-based model was only a temporary placeholder. -/
-noncomputable def sliceDiagonalDirectionWeight (params : Parameters) : Error :=
-  sliceTransverseDirectionWeight params
-
-/-- Reciprocal loss incurred by the paper-faithful diagonal conditioning step. -/
-noncomputable def sliceDiagonalConditioningLoss (params : Parameters) : Error :=
-  sliceConditioningLoss params
 
 end MIPStarRE.LDT.MainInductionStep

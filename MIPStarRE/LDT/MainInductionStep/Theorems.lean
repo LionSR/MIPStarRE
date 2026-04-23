@@ -1061,14 +1061,6 @@ private lemma weighted_bound_to_average
           exact hcancel
     _ ≤ sliceConditioningLoss params * b := hmul
 
-private lemma weighted_diagonal_bound_to_average
-    (params : Parameters)
-    {a b : Error}
-    (h : sliceDiagonalDirectionWeight params * a ≤ b) :
-    a ≤ sliceDiagonalConditioningLoss params * b := by
-  simpa [sliceDiagonalDirectionWeight, sliceDiagonalConditioningLoss] using
-    weighted_bound_to_average params h
-
 /-- `lem:restricted-probabilities`. -/
 lemma restrictedProbabilities
     (params : Parameters)
@@ -1082,7 +1074,7 @@ lemma restrictedProbabilities
             (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps)
     (hdiagonalWeightedBound :
       avgOver (uniformDistribution (Fq params))
-          (fun x => sliceDiagonalDirectionWeight params *
+          (fun x => sliceTransverseDirectionWeight params *
             (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma) :
     RestrictedProbabilitiesStatement params strategy eps delta gamma := by
   let profile : RestrictedFailureProfile params strategy :=
@@ -1095,27 +1087,25 @@ lemma restrictedProbabilities
       restrictedGood := by
         intro x
         exact ⟨le_rfl, le_rfl, le_rfl⟩ }
-  refine ⟨profile, ?_⟩
   have haxis_weighted_avg :
       sliceTransverseDirectionWeight params *
           averageRestrictedAxisParallelError params profile ≤ eps := by
     simpa [profile, averageRestrictedAxisParallelError, avgOver_const_mul] using
       haxisWeightedBound
   have hdiag_weighted_avg :
-      sliceDiagonalDirectionWeight params *
+      sliceTransverseDirectionWeight params *
           averageRestrictedDiagonalError params profile ≤ gamma := by
     simpa [profile, averageRestrictedDiagonalError, avgOver_const_mul] using
       hdiagonalWeightedBound
-  refine ⟨haxisWeightedBound, ?_, ?_, hdiagonalWeightedBound, ?_,
-    haxis_weighted_avg, hdiag_weighted_avg⟩
-  · exact weighted_bound_to_average params haxis_weighted_avg
+  refine ⟨profile, ?_⟩
+  refine ⟨weighted_bound_to_average params haxis_weighted_avg, ?_, ?_⟩
   · calc
       averageRestrictedSelfConsistencyError params profile
         = strategy.selfConsistencyFailureProbability := by
             simpa [profile, averageRestrictedSelfConsistencyError] using
               selfConsistencyRestrictedAverage_eq params strategy
       _ ≤ delta := hgood.selfConsistencyTest
-  · exact weighted_diagonal_bound_to_average params hdiag_weighted_avg
+  · exact weighted_bound_to_average params hdiag_weighted_avg
 
 
 /-! ## Package constructors and skeletal assembly -/
@@ -1132,26 +1122,7 @@ noncomputable def SliceRestrictionPackage.ofRestrictedProbabilities
   classical
   let profile := Classical.choose hrestricted.profileExists
   let hprofile := Classical.choose_spec hrestricted.profileExists
-  have haxisAverage :
-      averageRestrictedAxisParallelError params profile ≤
-        sliceConditioningLoss params * eps := by
-    rcases hprofile with
-      ⟨_haxisWeighted, haxisAverage, _hselfAverage, _hdiagWeighted,
-        _hdiagAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
-    exact haxisAverage
-  have hselfAverage :
-      averageRestrictedSelfConsistencyError params profile ≤ delta := by
-    rcases hprofile with
-      ⟨_haxisWeighted, _haxisAverage, hselfAverage, _hdiagWeighted,
-        _hdiagAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
-    exact hselfAverage
-  have hdiagonalAverage :
-      averageRestrictedDiagonalError params profile ≤
-        sliceDiagonalConditioningLoss params * gamma := by
-    rcases hprofile with
-      ⟨_haxisWeighted, _haxisAverage, _hselfAverage, _hdiagWeighted,
-        hdiagonalAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
-    exact hdiagonalAverage
+  rcases hprofile with ⟨haxisAverage, hselfAverage, hdiagonalAverage⟩
   exact
     { profile := profile
       axisAverageBound := haxisAverage
@@ -1501,7 +1472,7 @@ private lemma average_sliceMainInductionNu_le
     exact Real.rpow_le_rpow hself_nonneg hrestrict.selfAverageBound (by positivity)
   have hdiag_rpow_le :
       Real.rpow (averageRestrictedDiagonalError params hrestrict.profile) (1 / (1024 : Error)) ≤
-        Real.rpow (sliceDiagonalConditioningLoss params * gamma) (1 / (1024 : Error)) := by
+        Real.rpow (sliceConditioningLoss params * gamma) (1 / (1024 : Error)) := by
     exact Real.rpow_le_rpow hdiag_nonneg hrestrict.diagonalAverageBound (by positivity)
   have haxis_term :
       ((params.m : Error) ^ (2 : ℕ)) *
@@ -1529,7 +1500,7 @@ private lemma average_sliceMainInductionNu_le
         ((params.next.m : Error) ^ (2 : ℕ)) * Real.rpow gamma (1 / (1024 : Error)) := by
     have htmp := mul_le_mul_of_nonneg_left (le_trans hdiag_avg hdiag_rpow_le)
       (by positivity : 0 ≤ ((params.m : Error) ^ (2 : ℕ)))
-    simpa [sliceDiagonalConditioningLoss] using le_trans htmp
+    exact le_trans htmp
       (m_sq_mul_sliceConditioningLoss_rpow_le_next_sq_mul_rpow params hgamma_nonneg (by positivity)
         (by norm_num : (1 / (1024 : Error)) ≤ 1))
   have hratio_term :

@@ -303,10 +303,10 @@ Why this is a problem:
 - The Lean statement only stores a witness type.
 - It omits the actual mathematical content of the paper’s lemma.
 
-### 11. The restricted diagonal strategy is modeled as a submeasurement, not a measurement
+### 11. [resolved] The restricted diagonal strategy now uses a measurement-valued encoding
 
-- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:30-46`, `:177-186`
-- Severity: **critical**
+- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:28-58`, `:281-320`
+- Status: **resolved on `main`**
 
 Lean code:
 
@@ -314,57 +314,30 @@ Lean code:
 structure RestrictedSymStrat ... where
   ...
   diagonalMeasurement :
-    IdxProjSubMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
-
-TODO(#195): This currently drops ambient outcomes whose restriction is not
-represented in `DiagonalLinePolynomial params`, so it only produces a
-submeasurement.
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
 ```
 
-What the paper says:
+Resolution:
 
-- `references/ldt-paper/inductive_step.tex:374-412` treats the restricted diagonal-line branch as a genuine restricted test, exactly parallel to the axis-parallel branch.
-- The blueprint says the same in `blueprint/src/chapter/ch10_induction.tex:23-37`.
+- `restrictDiagonalMeasurement` now postprocesses the ambient diagonal measurement to its base-point value and re-embeds it into the honest slice answer space, so the restricted diagonal branch is packaged as a genuine projective measurement.
+- This removes the earlier completeness loss that motivated the old audit warning.
 
-Why this is a problem:
+### 12. [resolved] The diagonal branch in `restrictedProbabilities` now uses the paper's `m/(m+1)` and `(m+1)/m` factors
 
-- The Lean model drops outcomes and loses completeness on the diagonal branch.
-- This is the root cause of the later wrong loss factors.
-
-### 12. The diagonal branch in `restrictedProbabilities` uses `1 / q` and `q` instead of `m/(m+1)` and `(m+1)/m`
-
-- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:337-353`, `MIPStarRE/LDT/MainInductionStep/Statements.lean:101-125`, `MIPStarRE/LDT/MainInductionStep/Theorems.lean:81-99`
-- Severity: **critical**
+- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:429-438`, `MIPStarRE/LDT/MainInductionStep/Statements.lean:148-191`, `MIPStarRE/LDT/MainInductionStep/Theorems.lean:1039-1120`
+- Status: **resolved on `main`**
 
 Lean code:
 
 ```lean
-noncomputable def sliceDiagonalDirectionWeight (params : Parameters) : Error :=
-  1 / (params.q : Error)
-
-noncomputable def sliceDiagonalConditioningLoss (params : Parameters) : Error :=
-  (params.q : Error)
+averageRestrictedDiagonalError params profile ≤
+  sliceConditioningLoss params * gamma
 ```
 
-and
+Resolution:
 
-```lean
-avgOver ... (fun x => sliceDiagonalDirectionWeight params * profile.diagonal x) ≤ gamma ∧
-averageRestrictedDiagonalError params profile
-  ≤ sliceDiagonalConditioningLoss params * gamma
-```
-
-What the paper says:
-
-- `references/ldt-paper/inductive_step.tex:374-388` states
-  `E_x γ_x ≤ ((m+1)/m) γ`,
-  exactly parallel to the axis-parallel branch.
-- The blueprint matches this at `blueprint/src/chapter/ch10_induction.tex:23-33`.
-
-Why this is a problem:
-
-- The Lean statement has a different theorem type from the paper and blueprint.
-- This is not just weaker bookkeeping; it is a different quantitative claim.
+- `references/ldt-paper/inductive_step.tex:374-388` and `blueprint/src/chapter/ch10_induction.tex:27-38` use the same conditioning loss `((m+1)/m)` for the axis-parallel and diagonal branches.
+- The Lean statement now packages the diagonal average bound with that same constant and no longer routes it through a separate diagonal-only surrogate API.
 
 ### 13. The global-variance layer still carries stale mismatch TODOs
 
@@ -386,28 +359,15 @@ Why this is a problem:
 
 - These TODOs are not stale editorial notes; they identify a still-live model mismatch.
 
-### 14. The induction-step files still carry stale mismatch TODOs for the diagonal branch
+### 14. [resolved] The stale diagonal-branch mismatch TODOs were cleared from the induction-step layer
 
-- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:35-39`, `:179-183`, `:341-350`; `MIPStarRE/LDT/MainInductionStep/Statements.lean:103-107`; `MIPStarRE/LDT/MainInductionStep/Theorems.lean:93-97`
-- Severity: **medium**
+- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean`, `Statements.lean`, `Theorems.lean`
+- Status: **resolved on `main`**
 
-Lean code:
+Resolution:
 
-```lean
-TODO(#195): The paper's restricted strategy treats the diagonal branch as a
-genuine projective measurement ...
-
-TODO(#195): The paper/blueprint statement uses the same `((m + 1) / m)` loss ...
-```
-
-What the paper says:
-
-- `references/ldt-paper/inductive_step.tex:374-412` and `blueprint/src/chapter/ch10_induction.tex:23-37` do not introduce a special `q`-dependent diagonal loss.
-
-Why this is a problem:
-
-- These comments correctly record an unfixed theorem-faithfulness bug.
-- They should be treated as active audit findings, not harmless TODO noise.
+- The old closed-issue TODO comments were removed once the diagonal branch was upgraded to a projective-measurement encoding and `RestrictedProbabilitiesStatement` was aligned with the paper's shared `((m + 1) / m)` conditioning loss.
+- The remaining MainInductionStep commentary now explains the current encoding instead of pointing to a closed issue.
 
 ### 15. The expansion layer still carries a stale normalization-convention TODO
 
