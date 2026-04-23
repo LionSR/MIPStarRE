@@ -66,7 +66,11 @@ def Ta {Outcome : Type*} [Fintype Outcome]
     MIPStarRE.Quantum.Op data.auxSpace.carrier :=
   data.t.outcome a
 
-/-- Witness package for `lem:projective-non-measurement`. -/
+/-- Witness package for the paper's `lem:projective-non-measurement`.
+
+A value `RoundingToProjectorsWitness ψ A ζ R` is the honest output consumed by
+this QXP rank-reduction layer: a chosen rounded family `R_a` together with the
+paper's `2√ζ` closeness estimate and `(1 + 2√ζ) I` total-mass bound. -/
 structure RoundingToProjectorsWitness {Outcome : Type*}
     [Fintype Outcome]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -109,22 +113,6 @@ structure RankReductionWitness {Outcome : Type*}
       (1 : MIPStarRE.Quantum.Op ι)
   auxDim_le :
     Fintype.card data.auxSpace.carrier ≤ Fintype.card ι
-
-/-- Temporary bridge package for the paper's `lem:projective-non-measurement`
-stage.
-
-Unlike the downstream rank-reduction step, this stage still needs a dedicated
-producer for the paper's sharper truncation output: starting from the
-`2 * ζ` source-idempotence defect, construct a rounded family `R_a` with the
-paper's `2 * sqrt ζ` closeness and `(1 + 2 * sqrt ζ) I` total-mass bound. -/
-structure ProjectiveNonMeasurementBridgePackage {Outcome : Type*}
-    [Fintype Outcome]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) : Prop where
-  fromSourceAlmostProjective :
-    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
-      ∃ R : OpFamily Outcome ι,
-        RoundingToProjectorsWitness ψ A ζ R
 
 /-- The raw operator family obtained by sandwiching the auxiliary projectors
 `T_a` with a candidate `XHat`. This is the family later named `P`. -/
