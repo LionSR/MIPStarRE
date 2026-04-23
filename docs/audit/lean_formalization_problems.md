@@ -180,12 +180,19 @@ Why this is a problem:
 - The Lean “rewrite” theorem does not state or prove the paper’s rewrite formula.
 - It replaces the proposition by a definitional equality placeholder.
 
-### 7. Fourier orthonormality is hard-coded instead of derived from `fourierBasisState`
+### 7. Historical note (resolved by PRs #527, #542, and #576): Fourier orthonormality was hard-coded instead of derived from `fourierBasisState`
 
-- Lean location: `MIPStarRE/LDT/ExpansionHypercubeGraph/Defs.lean:517-520`, `:539-543`, `:567-569`
-- Severity: **critical**
+- Historical Lean location: `MIPStarRE/LDT/ExpansionHypercubeGraph/Defs.lean:517-520`, `:539-543`, `:567-569`
+- Historical severity: **critical**
 
-Lean code:
+**Update (2026-04-23): resolved on current `main`.** The live Chapter 5 code no longer
+hard-codes `fourierBasisInnerProduct := if α = β then 1 else 0`, and the orphan
+`EigenvectorsStatement` wrapper is gone. Instead, `Defs/Fourier.lean` computes the
+inner product from the actual Fourier basis via `fourierBasisState_inner_product` and
+exposes the paper-facing spectral facts as standalone lemmas
+`eigenvectors_orthonormality`, `eigenvectors_card`, and `eigenvectors`.
+
+Historical Lean code:
 
 ```lean
 def fourierBasisInnerProduct (params : Parameters)
@@ -202,17 +209,25 @@ What the paper says:
 - `references/ldt-paper/expansion.tex:50-72` computes
   `⟨φ_α | φ_β⟩ = 1` if `α = β` and `0` otherwise from the explicit Fourier basis vector formula, using `prop:fourier-fact-vector`.
 
-Why this is a problem:
+Why this was a problem:
 
-- The Lean orthonormality statement is satisfied by definition rather than by the actual vector formula.
-- This is a placeholder definition masquerading as a proved theorem.
+- The old Lean orthonormality statement was satisfied by definition rather than by the actual vector formula.
+- The old API hid that scaffolding behind a theorem-shaped wrapper.
 
-### 8. `globalRewrite` is weakened to existential packaging and uses `default` as witness
+### 8. Historical note (resolved by PRs #527 and #542): `globalRewrite` packaged an existential and used `default` as witness
 
-- Lean location: `MIPStarRE/LDT/ExpansionHypercubeGraph/Theorems.lean:26-30`, `:139-153`
-- Severity: **medium**
+- Historical Lean location: `MIPStarRE/LDT/ExpansionHypercubeGraph/Theorems.lean:26-30`, `:139-153`
+- Historical severity: **medium**
 
-Lean code:
+**Update (2026-04-23): resolved on current `main`.** `globalRewrite` still packages the
+paper's displayed decomposition as an existential `∃ decomp`, but the witness is now the
+canonical centered-family decomposition `canonicalGlobalVarianceDecomposition params A`,
+and `globalVarianceTraceWitness` consumes `decomp.orthogonalComponent` rather than
+ignoring the decomposition. The live `GlobalVarianceDecomposition` records
+`averageComponent`, the centered residual family `u ↦ A u - A_avg`,
+`orthogonal_sum_zero`, and the pointwise decomposition `A u = A_avg + A_⊥^u`.
+
+Historical Lean code:
 
 ```lean
 structure GlobalRewriteStatement ... where
@@ -230,10 +245,10 @@ What the paper says:
   `A_comb = |φ_0⟩ ⊗ A_0 + |φ_⊥⟩ ⊗ A_⊥`
   and then identifies the global variance with the orthogonal component.
 
-Why this is a problem:
+Why this was a problem:
 
-- The Lean statement is materially weaker than the paper: it only asks for existence of some decomposition.
-- The implementation then uses `default`, so the proof object does not carry the paper’s actual decomposition.
+- The old Lean statement was materially weaker than the paper: it only asked for existence of some decomposition.
+- The old implementation then used `default`, so the proof object did not carry the paper’s actual decomposition.
 
 ### 9. `AlmostProjMeasStatement` does not encode the paper’s almost-projectivity claim
 
@@ -433,10 +448,10 @@ I searched `MIPStarRE/LDT` for definitions whose names appear only at their defi
   - `matrixPolynomialWeightSqrtOperator`
   - ~~`interpolateCompletedSlices`~~ (resolved: definition faithful and degree bound proven; see §5)
   - `laplacianDifferenceForm`
-  - `fourierBasisInnerProduct`
+  - ~~`fourierBasisInnerProduct`~~ (resolved: now derived from the actual Fourier basis inner product; see §7)
 - Wrong or weakened theorem statements:
   - `generalizeB` / `localVarianceOfPoints` / `globalVarianceOfPoints`
-  - `globalRewrite`
+  - ~~`globalRewrite`~~ (resolved: canonical decomposition witness is operational; see §8)
   - `AlmostProjMeasStatement` / `consistencyToAlmostProjective`
   - `SpectralTruncationStatement` / `spectralTruncateAlmostProjective`
   - `RestrictedProbabilitiesStatement`

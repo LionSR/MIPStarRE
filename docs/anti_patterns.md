@@ -356,9 +356,11 @@ From the ledger in [#449]:
   constructs `(auxSpace, T_a)` from the eigenvector basis of each rounded
   `R_a`; the Lean version picks a zero-dimensional placeholder, which is
   disconnected from the paper's SVD derivation.
-- `lem:global-rewrite` / `globalRewrite` — decomposition witness is
-  `default`. The paper gives the concrete `|φ₀⟩ ⊗ A₀ + |φ_⊥⟩ ⊗ A_⊥`; Lean
-  proves the weaker existential.
+- ~~`lem:global-rewrite` / `globalRewrite` — decomposition witness is
+  `default`~~ (historical; resolved by PRs #527 and #542). The live theorem now
+  uses `canonicalGlobalVarianceDecomposition`, and
+  `globalVarianceTraceWitness` consumes the centered residual family
+  `u ↦ A^u - A_{\mathrm{avg}}` rather than ignoring the witness.
 
 ### Acceptable uses
 

@@ -79,9 +79,9 @@ Affected:
 | Edge distribution | ✅ MATCH | `rerandomizeCoord` correct |
 | `localToGlobal` | ✅ MATCH | Factor m correct |
 | `localRewrite` | ⚠️ EQUIV | normalizedTrace vs Tr |
-| `globalRewrite` | ❌ MISMATCH | Decomposition not used |
+| `globalRewrite` | ⚠️ EQUIV | Packages the paper's displayed decomposition as `∃ decomp`, but the witness is canonical and operational (`canonicalGlobalVarianceDecomposition`, `globalVarianceTraceWitness`) |
 | `combinedOperator` | ❌ MISMATCH | Stores A† not A |
-| `GlobalVarianceDecomposition` | ❌ MISMATCH | No orthogonality condition |
+| `GlobalVarianceDecomposition` | ⚠️ EQUIV | Encodes the orthogonal Fourier part as the centered family `u ↦ A^u - A_{\mathrm{avg}}` with `orthogonal_sum_zero`, rather than a literal `|φ_\perp⟩ ⊗ A_\perp` tensor factor |
 | Fourier basis | ⚠️ PARTIAL | Only prime field |
 
 ### Section 8 — GlobalVariance (`expansion.tex` continued)
