@@ -315,20 +315,6 @@ private lemma min_eps_one_le_mainInductionError_of_m_eq_one
             simp [mainInductionError, mainInductionNu, hm1]
 
 
-private lemma diagonalFailureProbability_nonneg
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    0 ≤ strategy.diagonalFailureProbability := by
-  unfold SymStrat.diagonalFailureProbability
-  refine mul_nonneg ?_ ?_
-  · positivity
-  · refine Finset.sum_nonneg ?_
-    intro j _
-    exact bipartiteConsError_nonneg strategy.state
-      (uniformDistribution (RestrictedDiagonalSample params j))
-      (diagonalPointAnswerFamily strategy j)
-      (diagonalLineAnswerFamily strategy j)
-
 /-- Throwaway polynomial measurement used only as a witness in the vacuous
 `mainInductionError ≥ 1` fallback branch of `mainInductionByRecursionOnM`.
 All mass is concentrated on `default : Polynomial params`. -/
@@ -338,43 +324,6 @@ private noncomputable def trivialPolynomialMeasurement
   haveI : Inhabited (Polynomial params) :=
     ⟨Classical.choice (inferInstance : Nonempty (Polynomial params))⟩
   exact default
-
-private lemma eps_nonneg_of_isGood
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    {eps delta gamma : Error}
-    (hgood : strategy.IsGood eps delta gamma) :
-    0 ≤ eps := by
-  exact le_trans
-    (bipartiteConsError_nonneg strategy.state
-      (uniformDistribution (AxisParallelTestSample params))
-      (axisParallelPointAnswerFamily strategy)
-      (axisParallelLineAnswerFamily strategy))
-    hgood.axisParallelTest
-
-private lemma delta_nonneg_of_isGood
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    {eps delta gamma : Error}
-    (hgood : strategy.IsGood eps delta gamma) :
-    0 ≤ delta := by
-  exact le_trans
-    (bipartiteSSCError_nonneg strategy.state
-      (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-    hgood.selfConsistencyTest
-
-private lemma gamma_nonneg_of_isGood
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    {eps delta gamma : Error}
-    (hgood : strategy.IsGood eps delta gamma) :
-    0 ≤ gamma := by
-  exact le_trans (diagonalFailureProbability_nonneg params strategy)
-    hgood.diagonalLineTest
 
 /-- Jensen's inequality for `Real.rpow (1/n)` against a uniform distribution:
 the average of `(f a)^{1/n}` is at most `(average f)^{1/n}`. This is the

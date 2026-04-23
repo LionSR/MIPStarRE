@@ -15,46 +15,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma eps_nonneg_of_isGood
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    {eps delta gamma : Error}
-    (hgood : strategy.IsGood eps delta gamma) :
-    0 ≤ eps := by
-  exact le_trans
-    (bipartiteConsError_nonneg strategy.state
-      (uniformDistribution (AxisParallelTestSample params))
-      (axisParallelPointAnswerFamily strategy)
-      (axisParallelLineAnswerFamily strategy))
-    hgood.axisParallelTest
-
-private lemma delta_nonneg_of_isGood
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    {eps delta gamma : Error}
-    (hgood : strategy.IsGood eps delta gamma) :
-    0 ≤ delta := by
-  exact le_trans
-    (bipartiteSSCError_nonneg strategy.state
-      (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-    hgood.selfConsistencyTest
-
-private lemma gamma_nonneg_of_isGood
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    {eps delta gamma : Error}
-    (hgood : strategy.IsGood eps delta gamma) :
-    0 ≤ gamma := by
-  have hdiag_nonneg : 0 ≤ strategy.diagonalFailureProbability := by
-    unfold SymStrat.diagonalFailureProbability
-    exact mul_nonneg (by positivity)
-      (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
-  exact le_trans hdiag_nonneg hgood.diagonalLineTest
-
 private lemma overAllOutcomesError_add_fromHToGError_le_ldPastingNu
     (params : Parameters)
     [FieldModel params.q]
