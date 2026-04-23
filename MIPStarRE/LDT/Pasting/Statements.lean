@@ -356,25 +356,30 @@ structure OverAllOutcomesStatement (params : Parameters)
         (allOutcomesExpansionFamily params strategy family k))
       (overAllOutcomesError params eps delta gamma zeta k)
 
-/-- Scalar expectation of the stage-`ℓ` left recurrence operator from
-`lem:from-H-to-G`. -/
-noncomputable def fromHToGRecurrenceLeftMass (params : Parameters)
+/-- Scalar expectation of one stage-`ℓ` tail contribution from
+`lem:from-H-to-G`, for a fixed remaining type `τ_{≥ℓ}`. -/
+noncomputable def fromHToGTailStageMass (params : Parameters)
     [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : Error :=
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) : Error :=
   ev ψbi (((IdxOpFamily.liftLeft
-    (fromHToGRecurrenceLeftFamily params strategy family k ℓ τ)) ()).total)
+    (fromHToGTailStageFamily params family prefixLen τtail)) ()).total)
 
-/-- Scalar expectation of the stage-`ℓ` right recurrence operator from
-`lem:from-H-to-G`. -/
-noncomputable def fromHToGRecurrenceRightMass (params : Parameters)
+/-- Scalar expectation of the full stage-`ℓ` quantity from `lem:from-H-to-G`.
+
+This is the paper's sum over all remaining tail types
+`τ_{≥ℓ} ∈ {0,1}^{k-ℓ}`.  The next stage `ℓ + 1` sums over the shorter tails
+`τ_{>ℓ}`, so the recurrence field in `FromHToGStatement` compares these
+adjacent stage masses directly rather than quantifying over a fixed full
+`τ : GHatType k`. -/
+noncomputable def fromHToGStageMass (params : Parameters)
     [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
+    (_strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : Error :=
-  ev ψbi (((IdxOpFamily.liftLeft
-    (fromHToGRecurrenceRightFamily params strategy family k ℓ τ)) ()).total)
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) : Error :=
+  ∑ τtail : GHatType (k - ℓ),
+    fromHToGTailStageMass params ψbi family ℓ τtail
 
 /-- Scalar expectation of the left-hand side of `lem:from-H-to-G`, i.e. the
 uniform average of the eligible pasted-sandwich total mass. -/
@@ -399,7 +404,8 @@ noncomputable def fromHToGBernoulliTailMass (params : Parameters)
 
 The paper's displayed statement is a scalar approximation of expectation values,
 not a new `≈_δ` relation between submeasurements.  Accordingly, this bundle
-stores the per-step and final absolute-value inequalities for those masses. -/
+stores the adjacent stage-mass inequalities and the final all-outcomes vs.
+Bernoulli-tail comparison. -/
 structure FromHToGStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -407,9 +413,9 @@ structure FromHToGStatement (params : Parameters)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceStep :
-    ∀ ℓ : ℕ, ℓ < k → ∀ (τ : GHatType k),
-      |fromHToGRecurrenceLeftMass params strategy ψbi family k ℓ τ -
-          fromHToGRecurrenceRightMass params strategy ψbi family k ℓ τ| ≤
+    ∀ ℓ : ℕ, ℓ < k →
+      |fromHToGStageMass params strategy ψbi family k ℓ -
+          fromHToGStageMass params strategy ψbi family k (ℓ + 1)| ≤
         fromHToGRecurrenceError params gamma zeta k
   bernoulliPolynomialRewrite :
     |fromHToGAllOutcomesMass params strategy ψbi family k -

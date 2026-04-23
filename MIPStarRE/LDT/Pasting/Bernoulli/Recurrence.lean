@@ -105,19 +105,25 @@ lemma fromHToG
     (k : ℕ) :
     FromHToGStatement params strategy ψbi family gamma zeta k := by
   constructor
-  · intro ℓ hℓ τ
+  · intro ℓ hℓ
     /- Inductive step `ℓ` of the Bernoulli-tail recurrence
-    (`ld-pasting.tex` / blueprint lines 961–1210).  With the statement now
-    phrased at the scalar-expectation level and the suffix averages built over
-    the paper's independent uniform distribution, the remaining work is to
-    formalize the three scalar bridge lemmas corresponding to the proof's
-    move-right / commute / move-right sequence:
+    (`ld-pasting.tex` / blueprint lines 961–1210).  The corrected stage API in
+    `Statements.lean` now matches the paper's aggregate quantity
+    $$
+      \mathbb E_{x_{\ge \ell}} \sum_{\tau_{\ge \ell}}
+        \sum_{g_{\ge \ell} \in \mathsf{Outcomes}_{\tau_{\ge \ell}}}
+          \langle \psi, \widehat H^{x_{\ge \ell}}_{g_{\ge \ell}}
+            \otimes S_{\tau_{\ge \ell}} \psi \rangle,
+    $$
+    so the remaining work is to formalize the three scalar bridge lemmas for the
+    move-right / commute / move-right sequence on these adjacent stage masses:
     1. two `easyApproxFromApproxDelta` / `closenessOfIP` applications driven by
        `hfacts.completedSelfConsistency`, each contributing `√(2ζ)`;
     2. two `closenessOfIP` applications driven by the suffix-length witness
        `hhalf (k - ℓ)`, together contributing `2√ν₄`;
-    3. the exact algebraic rewrite from the final `S_{τ_{≥ℓ}} G_{g_ℓ}^{x_ℓ}`
-       expression to the next suffix weight via `fromHToGRecurrenceWeight_succ`.
+    3. the exact recurrence rewrite from `S_{τ_{≥ℓ}}` to `S_{τ_{>ℓ}}` via
+       `fromHToGRecurrenceWeight_succ`, after splitting the `τ_ℓ = 1/0`
+       branches of the stage-`ℓ` sum.
     -/
     sorry
   · /- Aggregate the `k` scalar recurrence steps to show the uniform all-outcomes

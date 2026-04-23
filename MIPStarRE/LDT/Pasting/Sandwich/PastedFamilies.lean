@@ -456,6 +456,28 @@ noncomputable def averagedSandwichByTypeSubMeas (params : Parameters) [FieldMode
       (uniformDistribution_weight_sum_le_one (PointTuple params tailLen))
 
 /-- The stage-`ℓ` suffix family from the proof of `lem:from-H-to-G`, for a fixed
+remaining tail type `τ_{≥ℓ}`.
+
+The parameter `prefixLen` is the number of already-converted Bernoulli bits; the
+remaining tail length is `tailLen`.  This packages the paper's stage quantity
+$$
+\mathbb E_{x_{\ge \ell}} \sum_{g_{\ge \ell} \in \mathsf{Outcomes}_{\tau_{\ge \ell}}}
+  \widehat H^{x_{\ge \ell}}_{g_{\ge \ell}} \otimes S_{\tau_{\ge \ell}}
+$$
+for a single tail type.  The public `fromHToGIntermediateFamily` below simply
+specializes this to the tail `gHatTypeSuffix ℓ τ` cut out from a full
+`τ ∈ {0,1}^k`. -/
+noncomputable def fromHToGTailStageFamily (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    IdxOpFamily Unit Unit ι :=
+  fun _ =>
+    let base := averagedSandwichByTypeSubMeas params family tailLen τtail
+    let weight := fromHToGRecurrenceWeight params family prefixLen τtail
+    { outcome := fun _ => base.total * weight
+      total := base.total * weight }
+
+/-- The stage-`ℓ` suffix family from the proof of `lem:from-H-to-G`, for a fixed
 full type `τ ∈ {0,1}^k`.
 
 With zero-based indexing, this packages
@@ -469,11 +491,7 @@ noncomputable def fromHToGIntermediateFamily (params : Parameters) [FieldModel p
     (family : IdxPolyFamily params ι) (k ℓ : ℕ)
     (τ : GHatType k) :
     IdxOpFamily Unit Unit ι :=
-  fun _ =>
-    let base := averagedSandwichByTypeSubMeas params family (k - ℓ) (gHatTypeSuffix ℓ τ)
-    let weight := suffixBernoulliWeightOperator params family k ℓ τ
-    { outcome := fun _ => base.total * weight
-      total := base.total * weight }
+  fromHToGTailStageFamily params family ℓ (gHatTypeSuffix ℓ τ)
 
 /-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`,
 parameterised by the full type `τ ∈ {0,1}^k`.
