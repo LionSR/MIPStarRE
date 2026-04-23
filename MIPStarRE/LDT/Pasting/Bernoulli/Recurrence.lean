@@ -134,12 +134,6 @@ lemma fromHToG
     -/
     sorry
 
-/-- `ev` is linear for real scalar multiplication as written in this file. -/
-private lemma ev_real_scale
-    (ψ : QuantumState ι) (c : Error) (A : MIPStarRE.Quantum.Op ι) :
-    ev ψ (c • A) = c * ev ψ A := by
-  simpa using ev_scale ψ c A
-
 /-- The scalar Bernoulli tail polynomial lifted through continuous functional
 calculus is exactly the matrix Bernoulli tail operator. -/
 private lemma cfc_scalarBernoulliTail_eq_bernoulliTailOperator
@@ -261,8 +255,18 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
       have hdiv : (1 - ev ψ X) / (1 - theta) ≤ kappa / (1 - theta) :=
         div_le_div_of_nonneg_right hEvOneSub hθden.le
       simpa [div_eq_mul_inv, mul_assoc, mul_left_comm, mul_comm] using hdiv
-    rw [cfc_bernoulliTailLowerAffine_eq X hXsa theta expTerm]
-    rw [ev_sub, ev_real_scale, ev_real_scale, ev_sub, ev_one_of_isNormalized ψ hnorm]
+    have hscale1 :
+        ev ψ ((1 - expTerm : Error) • (1 : MIPStarRE.Quantum.Op ι)) =
+          (1 - expTerm) * ev ψ (1 : MIPStarRE.Quantum.Op ι) := by
+      rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
+      simpa using (ev_scale ψ (1 - expTerm) (1 : MIPStarRE.Quantum.Op ι))
+    have hscale2 :
+        ev ψ ((1 / (1 - theta) : Error) • (1 - X)) =
+          (1 / (1 - theta)) * ev ψ (1 - X) := by
+      rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
+      simpa using (ev_scale ψ (1 / (1 - theta)) (1 - X))
+    rw [cfc_bernoulliTailLowerAffine_eq X hXsa theta expTerm, ev_sub, hscale1, hscale2,
+      ev_sub, ev_one_of_isNormalized ψ hnorm]
     linarith
   refine { tail_le_one := htail, matrixTailBound := ⟨?_⟩ }
   show _ ≥ _

@@ -111,7 +111,8 @@ theorem bernoulliTailLowerAffine_le_scalarBernoulliTail
     have hpd_half : theta / 2 ≤ p - (degree : Error) / (k : Error) := by
       linarith
     have hsq : theta ^ (2 : ℕ) / 4 ≤ (p - (degree : Error) / (k : Error)) ^ (2 : ℕ) := by
-      nlinarith
+      nlinarith [hpd_half, hθ0.le,
+        sq_nonneg (p - (degree : Error) / (k : Error) - theta / 2)]
     have hExpCompare :
         Real.exp (-(2 * ((p - (degree : Error) / (k : Error)) ^ (2 : ℕ)) * (k : Error))) ≤
           Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2) := by
