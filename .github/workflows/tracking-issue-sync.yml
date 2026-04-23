@@ -109,12 +109,15 @@ jobs:
 
             Use the project's established labels (see `docs/CONTRIBUTING.md` §4):
 
-            **Area**: `formalization`, `infrastructure`, `documentation`, `ci`, `cleanup`
+            **Area / work type**: `formalization`, `infrastructure`, `documentation`,
+              `cleanup`, `refactor`, `ci`
             **Paper**: `2009.12982`
-            **Topic**: `ldt-basic`, `self-improvement`, `pasting`, `main-induction`,
-              `commutativity`, `expansion-graph`, `quantum-foundations`
-            **Workflow**: `tracking`, `blueprint-sync`, `automation`
-            **Follow-ups**: use `follow-up` label (create it if it doesn't exist)
+            **Chapter / workstream**: `ldt-basic`, `preliminaries`, `commutativity`,
+              `pasting`, `main-induction`, `proof`, `proof-infra`,
+              `sorry-elimination`, `statement-fix`, `mismatch`, `blueprint`,
+              `blueprint-sync`
+            **Tracking / operations**: `tracking`, `chapter-tracking`, `follow-up`,
+              `auto-fix-claude`, `codex`, `standup`
 
             ### Issue Linking
 
@@ -145,11 +148,10 @@ jobs:
                unchecks them. Playbook B never touches checkboxes — issue
                closures from `Closes`/`Fixes` will fire Playbook A separately.
 
-            2. **`all-resolved` label.** After any checkbox change, count
-               checked vs total items. If all are checked, add `all-resolved`
-               and comment "🎉 All tasks complete — this tracking issue can
-               be closed." If any are unchecked, remove `all-resolved`
-               (ignore errors if the label doesn't exist).
+            2. **No dedicated completion label.** After any checkbox change, count
+               checked vs total items for the progress summary, but do **not**
+               add or remove an `all-resolved` label; that label is not part of
+               the live repository taxonomy.
 
             3. **No duplicate comments.** Before commenting, consider whether
                another workflow already covers this event (see above).
@@ -172,7 +174,7 @@ jobs:
             1. Search for **open** tracking issues (label `tracking`) whose
                tasklist contains `#N` (the closed issue number).
             2. For each match, update the body: `- [ ] #N` → `- [x] #N`
-            3. Apply the `all-resolved` rule (see Key Rules §2).
+            3. Recount checked vs total items for the progress summary (see Key Rules §2).
             4. Suggest next steps (see §5 below).
             5. Comment on the tracking issue (check recent comments first
                to avoid duplicates — Key Rules §3):
@@ -191,7 +193,7 @@ jobs:
                — a closed tracking issue still needs its checkbox fixed)
                whose tasklist contains `#N` (the reopened issue number).
             2. For each match, uncheck: `- [x] #N` → `- [ ] #N`
-            3. Apply the `all-resolved` rule (see Key Rules §2).
+            3. Recount checked vs total items for the progress summary (see Key Rules §2).
             4. Read the reopened issue to understand why it was reopened
                (check recent comments, linked PRs). Suggest what needs
                to happen to re-resolve it (see §5, linked-issue variant).
@@ -297,8 +299,8 @@ jobs:
             Then add each new issue to the relevant **open** tracking
             issue checklists:
             - Append `- [ ] #<issue>` inside the tasklist block
-            - If the tracking issue had the `all-resolved` label, remove
-              it (new unchecked items mean it's no longer all-resolved).
+            - Leave tracking-issue labels unchanged; the tasklist body already
+              records that new unchecked work was added.
             - Comment (check recent comments first — Key Rules §3):
               "📋 Added follow-up issues from #<PR>: #<issue1>, …
               [X/Y tasks complete]"
@@ -425,6 +427,6 @@ jobs:
             - What linked issues were commented on
             - What follow-up issues were created (if any)
             - What was suggested as next steps
-            - Whether `all-resolved` was added/removed
+            - What the resulting checked/total task counts were
             - Whether any comments were skipped to avoid duplication
             - Or note that no action was needed
