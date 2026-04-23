@@ -3308,25 +3308,6 @@ theorem mainInductionByRecursionOnM
       mainInductionOfWitness params.next strategy eps delta gamma k
         ⟨1, G, hcons, le_of_not_gt hsmall⟩
 
-private noncomputable def mainInductionPublicRestrictionPackage
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (haxisWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps)
-    (hdiagonalWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceDiagonalDirectionWeight params *
-            (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma) :
-    SliceRestrictionPackage params strategy eps delta gamma :=
-  SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
-    (restrictedProbabilities params strategy eps delta gamma hgood
-      haxisWeightedBound hdiagonalWeightedBound)
-
 /-- `thm:main-induction-public-wrapper`.
 
 This public successor-step wrapper combines the five explicit Section 6 inputs
@@ -3362,6 +3343,10 @@ theorem mainInductionPublicWrapper
           (fun x => sliceDiagonalDirectionWeight params *
             (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma)
     (hrec :
+      let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
+        SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
+          (restrictedProbabilities params strategy eps delta gamma hgood
+            haxisWeightedBound hdiagonalWeightedBound)
       ∀ x,
         ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
           ConsRel strategy.state (uniformDistribution (Point params))
@@ -3370,22 +3355,16 @@ theorem mainInductionPublicWrapper
             error ∧
           error ≤
             mainInductionError params k
-              ((mainInductionPublicRestrictionPackage params strategy eps delta gamma hgood
-                  haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
-              ((mainInductionPublicRestrictionPackage params strategy eps delta gamma hgood
-                  haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x)
-              ((mainInductionPublicRestrictionPackage params strategy eps delta gamma hgood
-                  haxisWeightedBound hdiagonalWeightedBound).profile.diagonal x))
+              (hrestrict.profile.axisParallel x)
+              (hrestrict.profile.selfConsistency x)
+              (hrestrict.profile.diagonal x))
     (hselfProducer :
-      ∀ hinduction :
-        PerSliceInductionPackage params strategy eps delta gamma
-          (mainInductionPublicRestrictionPackage params strategy eps delta gamma hgood
+      let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
+        SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
+          (restrictedProbabilities params strategy eps delta gamma hgood
             haxisWeightedBound hdiagonalWeightedBound)
-          k,
-        SelfImprovementPackage params strategy eps delta gamma k
-          (mainInductionPublicRestrictionPackage params strategy eps delta gamma hgood
-            haxisWeightedBound hdiagonalWeightedBound)
-          hinduction)
+      ∀ hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k,
+        SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
     (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ G : Measurement (Polynomial params.next) ι,
@@ -3394,8 +3373,9 @@ theorem mainInductionPublicWrapper
         (polynomialEvaluationFamily params.next G.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
   let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
-    mainInductionPublicRestrictionPackage params strategy eps delta gamma hgood
-      haxisWeightedBound hdiagonalWeightedBound
+    SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
+      (restrictedProbabilities params strategy eps delta gamma hgood
+        haxisWeightedBound hdiagonalWeightedBound)
   exact
     mainInductionByRecursionOnM params strategy eps delta gamma k hgood hd hrestrict hrec
       hselfProducer hk_pos hk
