@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
+import MIPStarRE.LDT.Commutativity.GCommStability.OverlapTwo
 
 namespace MIPStarRE.LDT.Commutativity
 
@@ -35,6 +36,133 @@ self-consistency twice.
 Error: `√ζ + √ζ`.
 
 Total: `12√ζ + 12√(γ(m+1))`. Then `2 * total ≤ 48m(√γ + √ζ)`. -/
+
+/-- Unfold the phase-2 stability relation into the scalar defect term used in
+`eq:gcom9`.  This is copied locally from the overlap proof so that the scalar
+chain can cite the averaged inequality directly. -/
+private lemma evaluatedSlice_phaseTwo_stability_gap
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (zeta : Error)
+    (hstab : SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
+      (Real.sqrt zeta)) :
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q =>
+        ∑ ah : StabilityOneOutcome params,
+          ev strategy.state
+            ((leftTensor (ι₂ := ι)
+                ((1 - (G (pointHeight params q.2)).total) *
+                  (((evaluatedSliceSandwichRaw params strategy family q).outcome
+                    (ah.1, ah.2 (truncatePoint params q.2)))ᴴ *
+                    (evaluatedSliceSandwichRaw params strategy family q).outcome
+                      (ah.1, ah.2 (truncatePoint params q.2))) *
+                  (1 - (G (pointHeight params q.2)).total))) *
+              rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2))) ≤
+      Real.sqrt zeta := by
+  rcases hstab with ⟨hstab⟩
+  calc
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q =>
+          ∑ ah : StabilityOneOutcome params,
+            ev strategy.state
+              ((leftTensor (ι₂ := ι)
+                  ((1 - (G (pointHeight params q.2)).total) *
+                    (((evaluatedSliceSandwichRaw params strategy family q).outcome
+                      (ah.1, ah.2 (truncatePoint params q.2)))ᴴ *
+                      (evaluatedSliceSandwichRaw params strategy family q).outcome
+                        (ah.1, ah.2 (truncatePoint params q.2))) *
+                    (1 - (G (pointHeight params q.2)).total))) *
+                rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2)))
+      = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q =>
+            qSDDOp strategy.state
+              (commDataProcessedGStabilityOneLeft params strategy family G q)
+              (commDataProcessedGStabilityOneRight params strategy family G q)) := by
+            apply avgOver_congr
+            intro q
+            symm
+            exact
+              commDataProcessedGStabilityOne_qSDDOp_expand
+                params strategy family G hG q
+    _ = sddErrorOp strategy.state
+          (uniformDistribution (EvaluatedSliceQuestion params))
+          (commDataProcessedGStabilityOneLeft params strategy family G)
+          (commDataProcessedGStabilityOneRight params strategy family G) := by
+            rfl
+    _ ≤ Real.sqrt zeta := hstab
+
+/-- Unfold the phase-5 stability relation into the scalar defect term used in
+`eq:gcom10`. -/
+private lemma evaluatedSlice_phaseFive_stability_gap
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (gamma zeta : Error)
+    (hstab : SDDOpRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (commDataProcessedGStabilityTwoLeft params strategy family G)
+      (commDataProcessedGStabilityTwoRight params strategy family G)
+      (Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)))) :
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q =>
+        ∑ gb : StabilityTwoOutcome params,
+          ev strategy.state
+            ((leftTensor (ι₂ := ι)
+                ((1 - (G (pointHeight params q.1)).total) *
+                  (((orderedProductOpFamily
+                      (evaluatedSliceFirstFactor params family q)
+                      (evaluatedSliceSecondFactor params family q)).outcome
+                      (gb.1 (truncatePoint params q.1), gb.2))ᴴ *
+                    (orderedProductOpFamily
+                      (evaluatedSliceFirstFactor params family q)
+                      (evaluatedSliceSecondFactor params family q)).outcome
+                      (gb.1 (truncatePoint params q.1), gb.2)) *
+                  (1 - (G (pointHeight params q.1)).total))) *
+              rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).outcome gb.1))) ≤
+      Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
+  rcases hstab with ⟨hstab⟩
+  calc
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q =>
+          ∑ gb : StabilityTwoOutcome params,
+            ev strategy.state
+              ((leftTensor (ι₂ := ι)
+                  ((1 - (G (pointHeight params q.1)).total) *
+                    (((orderedProductOpFamily
+                        (evaluatedSliceFirstFactor params family q)
+                        (evaluatedSliceSecondFactor params family q)).outcome
+                        (gb.1 (truncatePoint params q.1), gb.2))ᴴ *
+                      (orderedProductOpFamily
+                        (evaluatedSliceFirstFactor params family q)
+                        (evaluatedSliceSecondFactor params family q)).outcome
+                        (gb.1 (truncatePoint params q.1), gb.2)) *
+                    (1 - (G (pointHeight params q.1)).total))) *
+                rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).outcome gb.1)))
+      = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q =>
+            qSDDOp strategy.state
+              (commDataProcessedGStabilityTwoLeft params strategy family G q)
+              (commDataProcessedGStabilityTwoRight params strategy family G q)) := by
+            apply avgOver_congr
+            intro q
+            symm
+            exact
+              commDataProcessedGStabilityTwo_qSDDOp_expand
+                params strategy family G hG q
+    _ = sddErrorOp strategy.state
+          (uniformDistribution (EvaluatedSliceQuestion params))
+          (commDataProcessedGStabilityTwoLeft params strategy family G)
+          (commDataProcessedGStabilityTwoRight params strategy family G) := by
+            rfl
+    _ ≤ Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := hstab
 
 /-- Scalar approximation chain for the evaluated-slice commutation.
 
@@ -95,10 +223,161 @@ private lemma evaluatedSlice_scalar_chain_bound
     evaluatedPointSelfConsistency_fst params strategy family zeta _hpostSSC
   have hpostSSC_snd :=
     evaluatedPointSelfConsistency_snd params strategy family zeta _hpostSSC
-  have htail :=
-    evaluatedSlice_phaseEightNine_tail_bound
-      params strategy zeta _hnorm family _hpostSSC
-  sorry
+  let 𝒟 : Distribution (EvaluatedSliceQuestion params) :=
+    uniformDistribution (EvaluatedSliceQuestion params)
+  let avgABAB : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ ab : EvaluatedSliceOutcome params,
+      evaluatedSliceABABTerm params strategy family q ab
+  let avgABA : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ ab : EvaluatedSliceOutcome params,
+      evaluatedSliceABATerm params strategy family q ab
+  let avgBABA : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ ab : EvaluatedSliceOutcome params,
+      evaluatedSliceBABATerm params strategy family q ab
+  let avgBAB : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ ab : EvaluatedSliceOutcome params,
+      evaluatedSliceBABTerm params strategy family q ab
+  let pointMeas : IdxMeas (Point params.next) (Fq params) ι :=
+    fun u => by
+      simpa [Parameters.next] using (strategy.pointMeasurement u).toMeasurement
+  have hcons_swapped :=
+    evaluatedPointFamily_pointConsistency_swapped params strategy family zeta _hcons
+  have hconsSub :=
+    MIPStarRE.LDT.Preliminaries.consSubMeas
+      strategy.state
+      (uniformDistribution (Point params.next))
+      (evaluatedPointFamily params family)
+      pointMeas
+      zeta
+      hcons_swapped
+  have hcombined_snd :
+      SDDRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => evaluatedPointFamilyLeft params family q.2)
+        (fun q =>
+          (MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+            (evaluatedPointFamily params family)
+            pointMeas q.2))
+        (4 * zeta) := by
+    rcases hconsSub.combinedControl with ⟨h⟩
+    constructor
+    simpa [sddError, evaluatedPointFamilyLeft] using
+      (avgOver_uniform_snd (α := Point params.next) (β := Point params.next)
+        (f := fun u =>
+          qSDD strategy.state
+            ((IdxSubMeas.liftLeft (evaluatedPointFamily params family)) u)
+            ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+              (evaluatedPointFamily params family)
+              pointMeas u)))).trans_le h
+  have hcombined_fst :
+      SDDRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => evaluatedPointFamilyLeft params family q.1)
+        (fun q =>
+          (MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+            (evaluatedPointFamily params family)
+            pointMeas q.1))
+        (4 * zeta) := by
+    rcases hconsSub.combinedControl with ⟨h⟩
+    constructor
+    simpa [sddError, evaluatedPointFamilyLeft] using
+      (avgOver_uniform_fst (α := Point params.next) (β := Point params.next)
+        (f := fun u =>
+          qSDD strategy.state
+            ((IdxSubMeas.liftLeft (evaluatedPointFamily params family)) u)
+            ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+              (evaluatedPointFamily params family)
+              pointMeas u)))).trans_le h
+  let phase1Inserted : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ b : Fq params, ∑ a : Fq params,
+      ev strategy.state
+        (leftTensor (ι₂ := ι)
+            (((evaluatedSliceFirstFactor params family q).outcome a) *
+              ((evaluatedSliceSecondFactor params family q).outcome b) *
+              ((evaluatedSliceFirstFactor params family q).outcome a)) *
+          ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+            (evaluatedPointFamily params family)
+            (evaluatedSlicePointMeas params strategy) q.2).outcome b))
+  let phase3Inserted : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ a : Fq params, ∑ b : Fq params,
+      ev strategy.state
+        (leftTensor (ι₂ := ι)
+            (((evaluatedSliceSecondFactor params family q).outcome b) *
+              ((evaluatedSliceFirstFactor params family q).outcome a) *
+              ((evaluatedSliceSecondFactor params family q).outcome b)) *
+          ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+            (evaluatedPointFamily params family)
+            (evaluatedSlicePointMeas params strategy) q.1).outcome a))
+  let phase2Removed : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ ah : StabilityOneOutcome params,
+      ev strategy.state
+        (leftTensor (ι₂ := ι)
+            (((evaluatedSliceFirstFactor params family q).outcome ah.1) *
+              ((evaluatedSliceSecondFactor params family q).outcome
+                (ah.2 (truncatePoint params q.2))) *
+              ((evaluatedSliceFirstFactor params family q).outcome ah.1)) *
+          rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2))
+  let phase5Inserted : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ gb : StabilityTwoOutcome params,
+      ev strategy.state
+        (leftTensor (ι₂ := ι)
+            (((evaluatedSliceFirstFactor params family q).outcome
+                (gb.1 (truncatePoint params q.1))) *
+              ((evaluatedSliceSecondFactor params family q).outcome gb.2) *
+              ((G (pointHeight params q.1)).total)) *
+          rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).outcome gb.1))
+  let phase5Removed : EvaluatedSliceQuestion params → Error := fun q =>
+    ∑ gb : StabilityTwoOutcome params,
+      ev strategy.state
+        (leftTensor (ι₂ := ι)
+            (((evaluatedSliceFirstFactor params family q).outcome
+                (gb.1 (truncatePoint params q.1))) *
+              ((evaluatedSliceSecondFactor params family q).outcome gb.2)) *
+          rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).outcome gb.1))
+  -- Phase 1: `eq:gcom8 -> eq:apply-add-an-a-once`.
+  have hphase1 :
+      |avgOver 𝒟 avgABAB - avgOver 𝒟 phase1Inserted| ≤ 2 * Real.sqrt zeta := by
+    simpa [𝒟, avgABAB, phase1Inserted] using
+      evaluatedSlice_phaseOne_insert_bound
+        params strategy zeta _hnorm family hcombined_snd
+  -- Phase 2: remove the trailing `G^y` from the phase-1 inserted term via
+  -- `gCommStability_overlap` and the scalar rewrite to the stability-one family.
+  have hphase2 :
+      avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed ≤ Real.sqrt zeta := by
+    sorry
+  -- Phase 3: insert Alice's measurement on the first coordinate (the BABA-side
+  -- insertion used before the point-commutation step).
+  have hphase3 :
+      |avgOver 𝒟 avgBABA - avgOver 𝒟 phase3Inserted| ≤ 2 * Real.sqrt zeta := by
+    simpa [𝒟, avgBABA, phase3Inserted] using
+      evaluatedSlice_phaseThree_insert_bound
+        params strategy zeta _hnorm family hcombined_fst
+  -- Phase 4: swap the two point measurements in the middle term using
+  -- `evaluatedSlice_phaseFour_pointSwap_bound`.
+  have hphase4 : True := by
+    sorry
+  -- Phase 5: remove the trailing `G^x` from the swapped middle term via
+  -- `gCommStabilityTwo_overlap` and the phase-5 scalar rewrite.
+  have hphase5 :
+      avgOver 𝒟 phase5Inserted - avgOver 𝒟 phase5Removed ≤
+        Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
+    sorry
+  -- Phases 6/7: reverse the two `eq:add-an-a` insertions using projectivity.
+  have hphase67 : True := by
+    sorry
+  -- Phases 8/9: postprocessed self-consistency transports `BAB` to `ABA`.
+  have htail :
+      |avgOver 𝒟 avgBAB - avgOver 𝒟 avgABA| ≤ 2 * Real.sqrt zeta := by
+    simpa [𝒟, avgBAB, avgABA] using
+      evaluatedSlice_phaseEightNine_tail_bound
+        params strategy zeta _hnorm family _hpostSSC
+  -- Final assembly: combine the phase bounds by triangle inequalities and
+  -- conclude the displayed error estimate.
+  have hassemble :
+      2 * (avgOver 𝒟 avgABA - avgOver 𝒟 avgABAB) ≤
+        commDataProcessedGError params gamma zeta := by
+    sorry
+  simpa [𝒟, avgABA, avgABAB] using hassemble
 
 /-- `lem:comm-data-processed-g`. -/
 lemma commDataProcessedG

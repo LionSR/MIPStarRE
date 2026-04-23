@@ -1,6 +1,6 @@
 # LDT Sorry Elimination — Status Report
 
-Last updated: 2026-04-21
+Last updated: 2026-04-23
 
 ## Progress Summary
 - **Started**: 66 sorrys across 9 files in `MIPStarRE/LDT/`
@@ -227,12 +227,12 @@ Last updated: 2026-04-21
 ## Active Commutativity Wave
 - **Owner**: OpenCode
 - **Scope**: `MIPStarRE/LDT/Commutativity/*.lean`
-- **Live executable sorrys in scope**: 4
+- **Live executable sorrys in scope**: 7
 - **Current live targets**:
-  - `Commutativity/ScalarApproximation.lean`: `evaluatedSlice_scalar_chain_bound`
-  - `Commutativity/Main.lean`: `fullSlice_scalar_marginalize_x`
-  - `Commutativity/Main.lean`: `fullSlice_scalar_marginalize_y`
-  - `Commutativity/Main.lean`: `fullSlice_closenessOfIP_CAB_hEval`
+  - `Commutativity/ScalarApproximation/ProcessedG.lean`: `evaluatedSlice_scalar_chain_bound` (temporarily split into local phase placeholders `hphase2`, `hphase4`, `hphase5`, `hphase67`, `hassemble` on branch `fix-processedg-sorries`)
+  - `Commutativity/Main/Auxiliary.lean`: `fullSlice_scalar_marginalize_x`
+  - `Commutativity/Main/Auxiliary.lean`: `fullSlice_scalar_marginalize_y`
+  - `Commutativity/Main/Auxiliary.lean`: `fullSlice_closenessOfIP_CAB_hEval`
 - **Status**: IN PROGRESS
 - **Dependency chain**:
   - `MIPStarRE.LDT.Commutativity.normalizationCondition_sandwich_bound`
@@ -268,7 +268,11 @@ Last updated: 2026-04-21
   - [ ] Add `\leanok` / `\uses` updates in `ch08_commutativity.tex`
   - [ ] Run `lake build`
 - **Completed on this pass**:
-  - re-surveyed the split commutativity module and confirmed the live `sorry`s now sit in `Transport.lean`, `ScalarApproximation.lean`, and `Main.lean` rather than the old monolithic `Theorems.lean`
+  - started branch `fix-processedg-sorries` for the remaining `ProcessedG.lean` scalar-chain proof
+  - created `outline-fix-processedg-sorries.md` with the copied `commutativity-G.tex` fragment, the phase-by-phase informal reasoning, and the Lean formalization plan
+  - replaced the single terminal `sorry` in `Commutativity/ScalarApproximation/ProcessedG.lean` by a phase-structured scaffold: local averages (`avgABAB`, `avgABA`, `avgBABA`, `avgBAB`), the `consSubMeas`-derived first/second-coordinate controls, explicit phase-1 and phase-3 inserted terms, and temporary local placeholder subgoals `hphase2`, `hphase4`, `hphase5`, `hphase67`, and `hassemble`
+  - verified `lake env lean MIPStarRE/LDT/Commutativity/ScalarApproximation/ProcessedG.lean` still elaborates, now with the temporary scaffold `sorry`s only
+  - re-surveyed the split commutativity module and confirmed the live `sorry`s now sit in `Main/Auxiliary.lean` and the temporarily scaffolded `ScalarApproximation/ProcessedG.lean` rather than the old monolithic `Theorems.lean`
   - read `docs/proof-hints.md`, `references/ldt-paper/commutativity-G.tex`, and `blueprint/src/chapter/ch08_commutativity.tex` against the current Lean layout
   - confirmed the lowest-risk first moves are to reuse the existing normalization-condition API from `Commutativity/Defs.lean` and to mirror the already-proved evaluated-slice swap argument for the full-slice `qSDDOp` identity
   - confirmed `evaluatedSlice_scalar_chain_bound` is now a proof-assembly task: the phase-1, phase-3, phase-4, phase-5, phase-8/9, and stability scalar-gap helpers already exist and compile
