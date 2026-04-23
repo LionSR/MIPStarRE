@@ -6,8 +6,8 @@ import MIPStarRE.LDT.MainInductionStep.Defs
 This file packages the intermediate conclusion structures and bookkeeping
 statements used in the induction step. It contains conclusion packages for the
 induction-level self-improvement and pasting theorems, together with restricted
-failure profiles and temporary bridge statements for the still-partial assembly
-of the main induction argument.
+failure profiles and the stage packages for the paper's
+`restrict → induct → self-improve → paste` assembly.
 
 ## References
 
@@ -125,25 +125,6 @@ abbrev PastingBoundednessInput (params : Parameters)
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (zeta : Error) : Prop :=
   IdxPolyFamily.SliceBoundednessInput strategy family zeta
-
-/-- Temporary bridge package for the still-unformalized induction assembly.
-
-This isolates the missing recursion/self-improvement/pasting assembly behind an
-explicit witness, matching the temporary bridge style already used in Section 9
-for `SelfImprovementBridgePackage`. -/
--- TODO(#502, #449): concrete producer pending Section 12 → Section 6 hand-off.
-structure MainInductionBridgePackage (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error) (k : ℕ) : Prop where
-  /-- Temporary witness measurement already satisfying the target consistency bound. -/
-  witness :
-    ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
-      ConsRel strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params G.toSubMeas)
-        error ∧
-      error ≤ mainInductionError params k eps delta gamma
 
 /-- Bookkeeping package for the restricted-probabilities lemma.
 

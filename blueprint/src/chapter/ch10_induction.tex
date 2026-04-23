@@ -150,8 +150,6 @@
 \end{proof}
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
-  \lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
-	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
   \[
@@ -168,9 +166,11 @@
 \end{theorem}
 \begin{proof}
 	\uses{lem:restricted-probabilities, lem:main-induction-base, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section}
-	In Lean, the still-partial assembly is factored through the internal bookkeeping packages
+	In Lean, the base case and the internal successor-step assembly are now formalized through
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase, MIPStarRE.LDT.MainInductionStep.mainInductionFromPackages, MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}
+	together with the bookkeeping packages
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionPackage, MIPStarRE.LDT.MainInductionStep.PerSliceInductionPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.PastingPackage}
-	which mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$.
+	that mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$. The remaining gap, tracked by issue \#630, is a public wrapper that supplies the weighted restricted-probability inputs and the restricted-strategy self-improvement producer needed to invoke the successor theorem directly, so the displayed theorem is not yet marked \leanok.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
 	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.

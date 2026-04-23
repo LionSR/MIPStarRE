@@ -68,7 +68,7 @@ misrepresents the actual state of the proof.
 
 ### Concrete example
 
-From `MIPStarRE/LDT/MainInductionStep/Theorems.lean`:
+Historical example (before the MainInductionStep cleanup):
 
 ```lean
 theorem mainInduction
@@ -84,17 +84,20 @@ theorem mainInduction
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 ```
 
-`MainInductionBridgePackage.witness` has type
+Here `MainInductionBridgePackage.witness` has type
 `∃ error, ∃ G, ConsRel ... error ∧ error ≤ mainInductionError ...` — literally
-the conclusion. No theorem in the codebase produces a
-`MainInductionBridgePackage`, so the "proof" of `mainInduction` is vacuous.
+the conclusion. The code has since been refactored to remove both this
+specific MainInductionStep bridge and the interim theorem alias that exposed
+the same witness shape under the paper theorem's name, but the snippet remains
+the archetypal example of the anti-pattern.
 
 PR [#491] proposed to delete the `*BridgePackage` by **inlining** the bundle's
 fields as explicit hypotheses. That only scatters the same pattern across
 individual signatures without producing any proof — it's strictly worse
 because the named bundle at least shows up in one tracker. Do not accept PRs
 that discharge an ungrounded bridge by flattening it into conclusion-shaped
-existential hypotheses.
+existential hypotheses, or by reintroducing the same shape under a theorem name
+that suggests the paper result has been proved.
 
 ### How to fix it
 
