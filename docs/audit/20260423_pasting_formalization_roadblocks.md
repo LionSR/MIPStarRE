@@ -8,7 +8,7 @@ Chapter 9 Pasting is still the least-formalized LDT chapter because it is the la
 
 - slice commutativity from Chapter 8,
 - tuple/interpolation geometry,
-- repeated sandwich and Cauchy--Schwarz transport,
+- repeated sandwich and Cauchy–Schwarz transport,
 - Bernoulli-type recurrence bookkeeping, and
 - a matrix Chernoff tail bound.
 
@@ -58,11 +58,11 @@ This is important context for issue #569: Pasting is no longer broadly unformali
 
 `MIPStarRE/LDT/Pasting` currently contains 11 declarations with explicit `set_option maxHeartbeats` caps. That is a stronger concentration of elaboration-management than in the nearby unfinished subtrees.
 
-Some live caps are well above the warning threshold recorded in `docs/PROOF_INTEGRITY.md`:
+Some live caps are materially above the default elaboration budget, and two are above the warning threshold recorded in `docs/PROOF_INTEGRITY.md` (>= 4M heartbeats):
 
-- `SwitcherooCompletion.lean` contains declarations capped at 10M and 50M heartbeats.
-- `SwitcherooCompletion/Expansion.lean` still uses 3M.
-- `GHatFacts.lean` still uses 2M.
+- `SwitcherooCompletion.lean` contains declarations capped at 10M and 50M heartbeats, so both sit above the warning threshold.
+- `SwitcherooCompletion/Expansion.lean` still uses 3M, which is below the warning threshold but still well above the default budget.
+- `GHatFacts.lean` still uses 2M, which is likewise below the warning threshold but still above the default budget.
 
 This is a concrete repository signal that Pasting is not just mathematically hard; it is also mechanically expensive to elaborate and maintain.
 
@@ -126,11 +126,11 @@ The remaining work crosses three layers that the rest of the project often treat
    - distinct-vs-uniform sampling,
    - globally consistent tuples,
    - interpolation support witnesses,
-   - Schwartz--Zippel restrictions.
+   - Schwartz–Zippel restrictions.
 2. **Operator transport and sandwich arguments**
    - `ConsRel` / `SDDRel` bookkeeping,
    - repeated commutation through half-sandwich products,
-   - Cauchy--Schwarz and tensor-register normalization steps.
+   - Cauchy–Schwarz and tensor-register normalization steps.
 3. **Spectral tail bounds**
    - the Bernoulli-tail operator polynomial,
    - matrix/spectral Chernoff infrastructure.
