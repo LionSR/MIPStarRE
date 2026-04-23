@@ -294,13 +294,17 @@ noncomputable def completeAtOutcome {Outcome : Type*}
     total_eq_one := rfl
   }
 
-/-- Output package for `prop:completing-to-measurement`. -/
+/-- Analytic conclusion for `prop:completing-to-measurement` once a witness
+`C` has been fixed.
+
+The theorem `completingToMeasurement` separately records that the chosen witness
+is the canonical completion `completeAtOutcome B a0`, so this structure stores
+only the paper-facing closeness statement. -/
 structure CompletingToMeasStmt {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (A : Measurement Outcome ι) (B : SubMeas Outcome ι)
     (C : Measurement Outcome ι) (a0 : Outcome) (δ ζ : Error) : Prop where
-  completionFormula : C = completeAtOutcome B a0
   closenessAfterCompletion :
     SDDRel ψ (uniformDistribution Unit)
       (constSubMeasFamily A.toSubMeas.liftLeft)

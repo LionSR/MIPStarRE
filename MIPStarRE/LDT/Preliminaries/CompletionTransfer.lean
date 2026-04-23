@@ -245,13 +245,13 @@ theorem completingToMeasurement {Outcome : Type*}
         (constSubMeasFamily A.toSubMeas.liftLeft)
         (constSubMeasFamily B.liftLeft) δ →
       ∃ C : Measurement Outcome ι,
-        CompletingToMeasStmt ψ A B C a0 δ ζ := by
+        C = completeAtOutcome B a0 ∧ CompletingToMeasStmt ψ A B C a0 δ ζ := by
   intro hsc hdist
-  exact ⟨completeAtOutcome B a0, {
-    completionFormula := rfl
+  refine ⟨completeAtOutcome B a0, rfl, ?_⟩
+  exact {
     closenessAfterCompletion :=
       closenessAfterCompletion_core ψ hperm hψ A B a0 δ ζ hsc hdist
-  }⟩
+  }
 
 
 /-- Triangle inequality for state-dependent operator distance. -/
