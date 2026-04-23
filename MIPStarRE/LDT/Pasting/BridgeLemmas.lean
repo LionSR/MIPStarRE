@@ -2568,6 +2568,7 @@ private lemma not_interpolationEligible_exists_none
   rw [hfull]
   exact hk
 
+set_option maxHeartbeats 400000 in
 private lemma ldSandwichLineOnePoint_isSome_false_mass_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -2616,33 +2617,26 @@ private lemma ldSandwichLineOnePoint_isSome_false_mass_bound
                 Option.isSome)) := by
               apply avgOver_congr
               intro q
-              have hleft :
-                  postprocess ((ldSandwichLineOnePointLeftFamily params strategy family k i) q) Option.isSome =
-                    postprocess (gHatSandwichFamily params family k q.2)
-                      (fun gs => Option.isSome (gs ⟨i, hi⟩)) := by
-                rw [ldSandwichLineOnePointLeftFamily, postprocess_postprocess]
-                congr
-                funext gs
-                simp [hi]
-              have hright :
-                  postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome =
-                    postprocess (verticalLineMeasurementFamily params strategy q.1)
-                      (fun _ : AxisLinePolynomial params.next => true) := by
-                rw [ldSandwichLineOnePointRightFamily, postprocess_postprocess]
-                congr
-                funext f
-                simp [hi]
+              let A := postprocess (gHatSandwichFamily params family k q.2)
+                (fun gs => Option.isSome (gs ⟨i, hi⟩))
               let B := postprocess (verticalLineMeasurementFamily params strategy q.1)
                 (fun _ : AxisLinePolynomial params.next => true)
               have hfalse : B.outcome false = 0 := by
                 simp [B, postprocess]
               have htrue : B.outcome true = B.total := by
                 simp [B, postprocess, postprocess_total]
-              rw [← hleft, hright]
-              rw [qBipartiteConsDefect_eq_false_mass_of_bool_right_true strategy.state
-                (postprocess ((ldSandwichLineOnePointLeftFamily params strategy family k i) q) Option.isSome)
-                B hfalse htrue]
-              simp [B, postprocess_total]
+              calc
+                ev strategy.state (opTensor A.outcome false ((verticalLineMeasurementFamily params strategy q.1).total))
+                  = ev strategy.state (opTensor A.outcome false B.total) := by
+                      simp [B, postprocess_total]
+                _ = qBipartiteConsDefect strategy.state A B := by
+                      rw [qBipartiteConsDefect_eq_false_mass_of_bool_right_true strategy.state A B hfalse htrue]
+                _ = qBipartiteConsDefect strategy.state
+                      (postprocess ((ldSandwichLineOnePointLeftFamily params strategy family k i) q) Option.isSome)
+                      (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome) := by
+                      rw [ldSandwichLineOnePointLeftFamily_isSome params strategy family k i hi q,
+                        ldSandwichLineOnePointRightFamily_isSome_true params strategy family k i hi q,
+                        A, B]
     _ ≤ ldSandwichLineOnePointError params eps delta gamma zeta k := hproc_bound
 
 private lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
@@ -2688,13 +2682,14 @@ private lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
       = max 0 (ev ψ (opTensor (A.outcome false) B.total)) := by rw [hexpr]
     _ = ev ψ (opTensor (A.outcome false) B.total) := by rw [max_eq_right hnonneg]
 
-/- private lemma processed_ldSandwichLineOnePointRightFamily_false_zero
+private lemma processed_ldSandwichLineOnePointRightFamily_false_zero
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (k i : ℕ) (hi : i < k)
     (q : SandwichedLineQuestion params k) :
-    (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).outcome false = 0 := by
+    (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q)
+      Option.isSome).outcome false = 0 := by
   simp [postprocess, ldSandwichLineOnePointRightFamily, hi, Option.isSome]
 
 private lemma processed_ldSandwichLineOnePointRightFamily_true_eq_total
@@ -2703,64 +2698,20 @@ private lemma processed_ldSandwichLineOnePointRightFamily_true_eq_total
     (family : IdxPolyFamily params ι)
     (k i : ℕ) (hi : i < k)
     (q : SandwichedLineQuestion params k) :
-    (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).outcome true =
-      (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).total := by
-  let B := postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome
+    (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q)
+      Option.isSome).outcome true =
+      (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q)
+        Option.isSome).total := by
+  let B := postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q)
+    Option.isSome
   have hfalse : B.outcome false = 0 := by
-    simpa [B] using processed_ldSandwichLineOnePointRightFamily_false_zero
-      params strategy family k i hi q
+    simpa [B] using
+      processed_ldSandwichLineOnePointRightFamily_false_zero params strategy family k i hi q
   have hsum : B.outcome false + B.outcome true = B.total := by
     simpa [Bool.forall_bool, add_comm] using B.sum_eq_total
-  nlinarith [hfalse, hsum] -/
+  nlinarith [hfalse, hsum]
 
-/- private lemma processed_ldSandwichLineOnePointRightFamily_isSome_false_eq_zero
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (k i : ℕ) (hi : i < k)
-    (q : SandwichedLineQuestion params k) :
-    (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).outcome false = 0 := by
-  simp [postprocess, ldSandwichLineOnePointRightFamily, hi, Option.isSome]
-
-private lemma processed_ldSandwichLineOnePointRightFamily_isSome_true_eq_total
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (k i : ℕ) (hi : i < k)
-    (q : SandwichedLineQuestion params k) :
-    (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).outcome true =
-      (postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome).total := by
-  let B := postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome
-  have hfalse : B.outcome false = 0 := by
-    simpa [B] using processed_ldSandwichLineOnePointRightFamily_isSome_false_eq_zero
-      params strategy family k i hi q
-  have hsum : B.outcome false + B.outcome true = B.total := by
-    simpa [Bool.forall_bool, add_comm] using B.sum_eq_total
-  nlinarith [hfalse, hsum] -/
-
-/- private lemma ldSandwichLineOnePointRightFamily_isSome_true
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (k i : ℕ) (hi : i < k)
-    (q : SandwichedLineQuestion params k) :
-    postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome =
-      postprocess (verticalLineMeasurementFamily params strategy q.1) (fun _ : AxisLinePolynomial params.next => true) := by
-  let R := (ldSandwichLineOnePointRightFamily params strategy family k i) q
-  have hnone : R.outcome none = 0 := by
-    simp [R, ldSandwichLineOnePointRightFamily, hi, postprocess]
-  have htrue : (postprocess R Option.isSome).outcome true = R.total := by
-    rw [show (postprocess R Option.isSome).outcome true = ∑ a : Fq params, R.outcome (some a) by
-      simp [postprocess, Option.isSome]]
-    simpa [hnone] using R.sum_eq_total
-  refine SubMeas.ext ?_ ?_
-  · intro b
-    cases b
-    · simp [postprocess, Option.isSome, hnone]
-    · simpa [htrue, R, ldSandwichLineOnePointRightFamily, hi, postprocess_total] using htrue
-  · simp [R, ldSandwichLineOnePointRightFamily, hi, postprocess_total] -/
-
-/- private lemma ldSandwichLineOnePointLeftFamily_isSome
+private lemma ldSandwichLineOnePointLeftFamily_isSome
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
@@ -2773,16 +2724,17 @@ private lemma processed_ldSandwichLineOnePointRightFamily_isSome_true_eq_total
     cases b <;>
       simp [ldSandwichLineOnePointLeftFamily, postprocess, hi, Option.isSome,
         Finset.sum_filter, Finset.sum_comm]
-  · simp [ldSandwichLineOnePointLeftFamily, hi, postprocess_total] -/
+  · simp [ldSandwichLineOnePointLeftFamily, hi, postprocess_total]
 
-/- private lemma ldSandwichLineOnePointRightFamily_isSome_true
+private lemma ldSandwichLineOnePointRightFamily_isSome_true
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (k i : ℕ) (hi : i < k)
     (q : SandwichedLineQuestion params k) :
     postprocess ((ldSandwichLineOnePointRightFamily params strategy family k i) q) Option.isSome =
-      postprocess (verticalLineMeasurementFamily params strategy q.1) (fun _ : AxisLinePolynomial params.next => true) := by
+      postprocess (verticalLineMeasurementFamily params strategy q.1)
+        (fun _ : AxisLinePolynomial params.next => true) := by
   refine SubMeas.ext ?_ ?_
   · intro b
     cases b
@@ -2803,7 +2755,7 @@ private lemma processed_ldSandwichLineOnePointRightFamily_isSome_true_eq_total
         _ = (postprocess (verticalLineMeasurementFamily params strategy q.1)
               (fun _ : AxisLinePolynomial params.next => true)).outcome true := by
               simp [postprocess, postprocess_total]
-  · simp [ldSandwichLineOnePointRightFamily, hi, postprocess_total] -/
+  · simp [ldSandwichLineOnePointRightFamily, hi, postprocess_total]
 
 /- private lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_eq_get
     (params : Parameters) [FieldModel params.q]
