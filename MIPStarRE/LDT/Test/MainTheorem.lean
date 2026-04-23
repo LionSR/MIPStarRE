@@ -173,28 +173,9 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  have hStep8Absorb :
-      ∀ {ν σ ζ₁ ζ₂ ζ₃ : Error},
-        CascadeHypotheses params k eps →
-        0 ≤ ν →
-        ν ≤ 10000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
-          (Real.rpow eps (1 / (1024 : Error)) +
-            Real.rpow ((params.d : Error) / (params.q : Error))
-              (1 / (1024 : Error))) →
-        σ = cascadeSigma params k ν →
-        ζ₁ = cascadeZeta1 params eps σ →
-        ζ₂ = cascadeZeta2 ζ₁ →
-        ζ₃ = cascadeZeta3 ζ₁ ζ₂ →
-        σ ≤ mainFormalError params k eps ∧
-          ζ₁ ≤ mainFormalError params k eps ∧
-          ζ₂ ≤ mainFormalError params k eps ∧
-          ζ₃ ≤ 2 * mainFormalError params k eps ∧
-          cascadeZeta4 σ ζ₁ ζ₃ ≤ mainFormalError params k eps := by
-    intro ν σ ζ₁ ζ₂ ζ₃ hCascadeHyp hνNN hν hσEq hζ₁Eq hζ₂Eq hζ₃Eq
-    exact errorCascade_le_mainFormalError hCascadeHyp hνNN hν hσEq hζ₁Eq hζ₂Eq hζ₃Eq
   -- TODO(Section 3): Step 1 symmetrization (`strategySymmetrization_*`) and
-  -- the final scalar envelope (`hStep8Absorb`) are now formalized. Section 6
-  -- has the internal base-case / successor-step assembly
+  -- the final scalar envelope (`errorCascade_le_mainFormalError`) are now
+  -- formalized. Section 6 has the internal base-case / successor-step assembly
   -- (`mainInductionBaseCase`, `mainInductionFromPackages`,
   -- `mainInductionByRecursionOnM`), so the remaining induction-side gap here,
   -- tracked by TODO(#630), is to furnish the high-level inputs those theorems
@@ -203,8 +184,8 @@ theorem mainFormal
   -- needs the paper's unsymmetrization, Schwartz-Zippel, and final
   -- orthonormalization/projectivization transport into the three displayed
   -- `ConsRel` conclusions; those last three transports will apply
-  -- `hStep8Absorb` at the point-A consistency, point-B consistency, and
-  -- self-consistency usage sites.
+  -- `errorCascade_le_mainFormalError` directly at the point-A consistency,
+  -- point-B consistency, and self-consistency usage sites.
   sorry
 
 end Test
