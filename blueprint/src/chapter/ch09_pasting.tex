@@ -1014,6 +1014,11 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\bra{\psi} \widehat H_{g_{>\ell}}^{x_{>\ell}} \ot S_{\tau_{>\ell}} \ket{\psi}.
 		\label{eq:i-think-this-is-what-i'm-supposed-to-prove-2}
 	\end{align}
+	\begin{remark}[Lean proof-stage notation]
+		\lean{MIPStarRE.LDT.Pasting.averagedSandwichByTypeSubMeas, MIPStarRE.LDT.Pasting.fromHToGTailStageFamily, MIPStarRE.LDT.Pasting.fromHToGTailStageMass, MIPStarRE.LDT.Pasting.fromHToGStageMass, MIPStarRE.LDT.Pasting.fromHToGBernoulliTailMass}
+		\leanok
+		In Lean, the type-restricted averaged submeasurement, the per-tail operator/mass, the aggregated stage quantity, and the final Bernoulli-tail scalar from this proof are recorded by the declarations above. Their indexing is shifted to the repository's 0-based convention: Lean stage $\ell$ is the paper's stage $\ell+1$.
+	\end{remark}
 	The operators $S_{\tau_{\ge \ell}}$ are Hermitian and positive semidefinite, and
 	\begin{align}
 		S_{\tau_{\ge \ell}}
