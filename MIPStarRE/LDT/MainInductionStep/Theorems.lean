@@ -2223,7 +2223,7 @@ noncomputable def assemblePastingPackage
               _ ≤ zeta := by
                     simpa [zeta, 𝒟] using
                       average_sliceSelfImprovementError_le
-                    params strategy eps delta gamma hgood hrestrict
+                        params strategy eps delta gamma hgood hrestrict
           · intro x g
             simpa [sub_nonneg] using hself.dominatesAveragePointOperator x g
         · intro x g
