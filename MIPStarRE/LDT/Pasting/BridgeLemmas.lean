@@ -1490,6 +1490,7 @@ private def moveTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r 
     rfl
 
 
+/-- Swap the first two `SliceQuestion` entries, leaving the tail tuple untouched. -/
 private def swapFirstTwoQuestionEquiv (params : Parameters) (r : ℕ) :
     (SliceQuestion params × SliceQuestion params × PointTuple params r) ≃
       (SliceQuestion params × SliceQuestion params × PointTuple params r) where
@@ -1502,6 +1503,7 @@ private def swapFirstTwoQuestionEquiv (params : Parameters) (r : ℕ) :
     rcases q with ⟨x₁, x₂, xs⟩
     rfl
 
+/-- Swap the first two `GHatOutcome` entries, leaving the tail tuple untouched. -/
 private def swapFirstTwoOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
     (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) ≃
       (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
@@ -1894,7 +1896,8 @@ private lemma commuteGHalfSandwich_moveStep_iff
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι) (r : ℕ) (δ : Error) :
     SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
       (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
       (commuteGHalfSandwich_moveFamily params family (r + 1))
       δ ↔
@@ -1969,6 +1972,8 @@ private lemma commuteGHalfSandwich_moveStep_iff
       (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
       (commuteGHalfSandwich_moveFamily params family (r + 1)) δ).2 hq
 
+/-- Swap the first two completed-slice slots in the move stage, turning the
+`move` family pair into the `moveBack`/`commute` pair used in the flat chain. -/
 private lemma commuteGHalfSandwich_moveStage_swap
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -2484,7 +2489,8 @@ private lemma commuteGHalfSandwich_moveStage_succ
       (gHatSelfConsistencyRightFamily params family)
       (gHatSelfConsistencyError zeta)) :
     SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
       (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
       (commuteGHalfSandwich_moveFamily params family (r + 1))
       (2 * (δ + gHatSelfConsistencyError zeta)) := by
@@ -3789,25 +3795,10 @@ private lemma zeta_nonneg_of_hsc
     gHatSelfConsistencyError_nonneg_of_hsc params ψbi family zeta hsc
   simpa [gHatSelfConsistencyError] using hnonneg
 
-private lemma gHatCommutationError_nonneg_of_hcom
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    (hcom : SDDOpRel ψbi
-      (uniformDistribution (SlicePairQuestion params))
-      (gHatPairProductLeft params family)
-      (gHatPairProductRight params family)
-      (gHatCommutationError params gamma zeta)) :
-    0 ≤ gHatCommutationError params gamma zeta := by
-  rcases hcom with ⟨hν3⟩
-  exact le_trans
-    (avgOver_nonneg (uniformDistribution (SlicePairQuestion params))
-      (fun q => qSDDOp ψbi (gHatPairProductLeft params family q)
-        (gHatPairProductRight params family q))
-      (fun q => Preliminaries.qSDDOp_nonneg ψbi _ _))
-    hν3
-
+/-- The fixed paper exponent `1/16` keeps `Real.rpow` nonnegative even on the
+negative branch, because `cos (π / 16) > 0`. This lets the short-length
+`commuteGHalfSandwich` envelope proofs avoid threading an extra `0 ≤ gamma`
+hypothesis. -/
 private lemma rpow_oneSixteenth_nonneg (x : Error) :
     0 ≤ Real.rpow x (1 / (16 : Error)) := by
   simpa [Real.rpow_eq_pow] using (show 0 ≤ x ^ (1 / (16 : Error)) by
@@ -4305,6 +4296,10 @@ private lemma commuteGHalfSandwich_core
         move/commute/move-back step for arbitrary tail length and then sums the
         resulting `ζ`/`ν₃` contributions into the displayed
         `426 k² m (γ^{1/16} + ζ^{1/16} + (d/q)^{1/16})` envelope.
+
+        Tracked separately by issue #639; the likely clean closure is to unify
+        the current `k = 3`/`k = 4` raw chains into one recursive flat-chain
+        lemma instead of duplicating the arithmetic case-by-case.
         -/
         sorry
 
@@ -4966,6 +4961,7 @@ lemma overAllOutcomes
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
+  -- `OverAllOutcomesStatement` is a single-field wrapper around the scalar `SDDRel` bound below.
   refine ⟨?_⟩
   /- Paper: `lem:over-all-outcomes` (ld-pasting.tex §9.4, lines 1140–1289).
   Expand pasted-measurement total mass over all outcome types τ with |τ| ≥ d+1.
