@@ -1,5 +1,6 @@
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
 import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
+import MIPStarRE.LDT.Pasting.Bernoulli.Scalar
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 
 /-!
@@ -133,54 +134,6 @@ lemma fromHToG
     -/
     sorry
 
-/-- Scalar Bernoulli tail polynomial
-`F(p) = ∑_{r=degree+1}^k C(k,r) p^r (1-p)^{k-r}` from
-`lem:chernoff-bernoulli-matrix`. -/
-noncomputable def scalarBernoulliTail (k degree : ℕ) (p : Error) : Error :=
-  ∑ r ∈ Finset.Icc (degree + 1) k,
-    (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r))
-
-/-- The scalar Bernoulli tail polynomial is nonnegative on `[0,1]`. -/
-private lemma scalarBernoulliTail_nonneg
-    (k degree : ℕ) {p : Error} (hp0 : 0 ≤ p) (hp1 : p ≤ 1) :
-    0 ≤ scalarBernoulliTail k degree p := by
-  unfold scalarBernoulliTail
-  refine Finset.sum_nonneg ?_
-  intro r hr
-  apply mul_nonneg
-  · exact_mod_cast Nat.zero_le (Nat.choose k r)
-  · apply mul_nonneg
-    · exact pow_nonneg hp0 _
-    · exact pow_nonneg (sub_nonneg.mpr hp1) _
-
-/-- Scalar Chernoff bound for the Bernoulli tail polynomial.
-
-This is the single remaining live blocker in issue #597. The matrix theorem
-below now reduces completely to this scalar inequality via continuous
-functional calculus; once this theorem is discharged from Hoeffding/Chernoff
-for sums of iid Bernoullis, no further operator work is needed in the matrix
-layer. -/
-theorem scalarBernoulliTail_lower_bound
-    (k degree : ℕ) {p : Error}
-    (hpd : (degree : Error) / (k : Error) ≤ p) (hp1 : p ≤ 1) :
-    1 - Real.exp (-(2 * ((p - (degree : Error) / (k : Error)) ^ (2 : ℕ)) * (k : Error))) ≤
-      scalarBernoulliTail k degree p := by
-  /- The operator-to-scalar reduction in `chernoffBernoulliMatrix` is complete.
-  What remains is the purely scalar lower-tail Chernoff estimate for the
-  binomial polynomial above, e.g. via Hoeffding's inequality on a sum of iid
-  Bernoulli variables or an equivalent PMF-level argument. -/
-  sorry
-
-/-- Real scalars act on `Op ι` as scalar multiples of the identity. -/
-private lemma algebraMap_real_op_eq_smul_one (r : Error) :
-    (algebraMap Error (MIPStarRE.Quantum.Op ι) r) =
-      (r • (1 : MIPStarRE.Quantum.Op ι)) := by
-  ext i j
-  by_cases hij : i = j
-  · subst hij
-    simp [Matrix.algebraMap_matrix_apply]
-  · simp [Matrix.algebraMap_matrix_apply, hij]
-
 /-- `ev` is linear for real scalar multiplication as written in this file. -/
 private lemma ev_real_scale
     (ψ : QuantumState ι) (c : Error) (A : MIPStarRE.Quantum.Op ι) :
@@ -213,16 +166,12 @@ private lemma cfc_scalarBernoulliTail_eq_bernoulliTailOperator
           rw [cfc_pow (a := A) (f := fun p => p) (n := r) (ha := hA)]
           rw [cfc_pow (a := A) (f := fun p => 1 - p) (n := k - r) (ha := hA)]
           rw [cfc_sub (a := A) (f := fun _ => 1) (g := fun p => p)]
-          rw [cfc_const (a := A) (r := (1 : Error)), algebraMap_real_op_eq_smul_one]
+          rw [cfc_const (a := A) (r := (1 : Error)), Algebra.algebraMap_eq_smul_one]
           rw [cfc_id' (R := Error) (a := A) (ha := hA)]
           ext i j
           simp
     _ = bernoulliTailOperator k degree A := by
           simp [bernoulliTailOperator, s]
-
-/-- The affine lower envelope used in the matrix Chernoff reduction. -/
-private noncomputable def bernoulliTailLowerAffine (theta c : Error) (p : Error) : Error :=
-  (1 - c) - ((1 / (1 - theta)) * (1 - p))
 
 /-- Continuous functional calculus sends the affine lower envelope to the
 expected affine operator expression. -/
@@ -234,113 +183,20 @@ private lemma cfc_bernoulliTailLowerAffine_eq
   unfold bernoulliTailLowerAffine
   rw [cfc_sub (a := A) (f := fun _ => 1 - c)
     (g := fun p => (1 / (1 - theta)) * (1 - p))]
-  rw [cfc_const (a := A) (r := (1 - c : Error)), algebraMap_real_op_eq_smul_one]
+  rw [cfc_const (a := A) (r := (1 - c : Error)), Algebra.algebraMap_eq_smul_one]
   rw [cfc_const_mul (a := A) (r := (1 / (1 - theta) : Error)) (f := fun p => 1 - p)]
   rw [cfc_sub (a := A) (f := fun _ => 1) (g := fun p => p)]
-  rw [cfc_const (a := A) (r := (1 : Error)), algebraMap_real_op_eq_smul_one]
+  rw [cfc_const (a := A) (r := (1 : Error)), Algebra.algebraMap_eq_smul_one]
   rw [cfc_id' (R := Error) (a := A) (ha := hA)]
   simp
-
-/-- The paper's size condition `k ≥ 2d/θ` implies `d/k ≤ θ/2`. -/
-private lemma degree_div_le_theta_half
-    (theta : Error) (k degree : ℕ)
-    (hθ0 : 0 < theta) (hk : (2 * (degree : Error)) / theta ≤ (k : Error)) :
-    (degree : Error) / (k : Error) ≤ theta / 2 := by
-  by_cases hk0 : k = 0
-  · subst hk0
-    have hdeg : degree = 0 := by
-      by_contra hdeg
-      have hdegpos : 0 < (degree : Error) := by
-        exact_mod_cast Nat.pos_iff_ne_zero.mpr hdeg
-      have hfracpos : 0 < (2 * (degree : Error)) / theta := by
-        positivity
-      linarith
-    subst hdeg
-    have hnonneg : 0 ≤ theta / 2 := by
-      positivity
-    simpa using hnonneg
-  · have hkpos : 0 < (k : Error) := by
-      exact_mod_cast Nat.pos_iff_ne_zero.mpr hk0
-    have hk' := hk
-    field_simp [hθ0.ne', hkpos.ne'] at hk'
-    have h2 : (2 * (degree : Error)) / (k : Error) ≤ theta := by
-      rw [div_le_iff₀ hkpos]
-      simpa [mul_comm, mul_left_comm, mul_assoc] using hk'
-    have h2' : 2 * ((degree : Error) / (k : Error)) ≤ theta := by
-      simpa [div_eq_mul_inv, mul_assoc, mul_left_comm, mul_comm] using h2
-    linarith
-
-/-- Pointwise lower bound on `[0,1]` combining the scalar Chernoff estimate with
-`k ≥ 2d/θ`. -/
-private lemma bernoulliTailLowerAffine_le_scalarBernoulliTail
-    (theta : Error) (k degree : ℕ)
-    (hθ0 : 0 < theta) (hθ1 : theta < 1)
-    (hk : (2 * (degree : Error)) / theta ≤ (k : Error))
-    {p : Error} (hp0 : 0 ≤ p) (hp1 : p ≤ 1) :
-    bernoulliTailLowerAffine theta
-      (Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2)) p ≤
-        scalarBernoulliTail k degree p := by
-  by_cases hpθ : p < theta
-  · have htail_nonneg : 0 ≤ scalarBernoulliTail k degree p :=
-      scalarBernoulliTail_nonneg k degree hp0 hp1
-    have hθden : 0 < 1 - theta := sub_pos.mpr hθ1
-    have hfrac_ge_one : 1 ≤ (1 - p) / (1 - theta) := by
-      rw [one_le_div₀ hθden]
-      linarith
-    have hbase : 1 - (1 - p) / (1 - theta) ≤ 0 := by
-      linarith
-    have hexp_nonneg : 0 ≤ Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2) := by
-      positivity
-    have hLower :
-        bernoulliTailLowerAffine theta
-            (Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2)) p ≤ 0 := by
-      unfold bernoulliTailLowerAffine
-      have hrew : (1 / (1 - theta)) * (1 - p) = (1 - p) / (1 - theta) := by
-        ring
-      rw [hrew]
-      linarith
-    exact hLower.trans htail_nonneg
-  · have hpθ' : theta ≤ p := le_of_not_gt hpθ
-    have hdk_half : (degree : Error) / (k : Error) ≤ theta / 2 :=
-      degree_div_le_theta_half theta k degree hθ0 hk
-    have hdk_le_p : (degree : Error) / (k : Error) ≤ p := by
-      linarith
-    have hScalar := scalarBernoulliTail_lower_bound k degree hdk_le_p hp1
-    have hk_nonneg : 0 ≤ (k : Error) := by
-      positivity
-    have hpd_half : theta / 2 ≤ p - (degree : Error) / (k : Error) := by
-      linarith
-    have hsq : theta ^ (2 : ℕ) / 4 ≤ (p - (degree : Error) / (k : Error)) ^ (2 : ℕ) := by
-      nlinarith
-    have hExpCompare :
-        Real.exp (-(2 * ((p - (degree : Error) / (k : Error)) ^ (2 : ℕ)) * (k : Error))) ≤
-          Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2) := by
-      apply Real.exp_le_exp.mpr
-      nlinarith
-    have hConst :
-        1 - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2) ≤
-          1 - Real.exp (-(2 * ((p - (degree : Error) / (k : Error)) ^ (2 : ℕ)) *
-            (k : Error))) := by
-      linarith
-    have hterm_nonneg : 0 ≤ (1 / (1 - theta)) * (1 - p) := by
-      have hθden : 0 < 1 - theta := sub_pos.mpr hθ1
-      have hθinv_nonneg : 0 ≤ 1 / (1 - theta) := one_div_nonneg.mpr hθden.le
-      have hp_nonneg : 0 ≤ 1 - p := sub_nonneg.mpr hp1
-      exact mul_nonneg hθinv_nonneg hp_nonneg
-    have hLowerConst :
-        bernoulliTailLowerAffine theta
-            (Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2)) p ≤
-          1 - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2) := by
-      unfold bernoulliTailLowerAffine
-      linarith
-    exact hLowerConst.trans (hConst.trans hScalar)
 
 /-- `lem:chernoff-bernoulli-matrix`.
 
 The operator-level reduction is now fully internal: continuous functional
 calculus compares the Bernoulli-tail polynomial `F(X)` against an affine lower
-envelope, so the only remaining issue-#597 debt is the isolated scalar theorem
-`scalarBernoulliTail_lower_bound`. -/
+envelope. The only remaining live blocker is an explicit **scalar** Chernoff
+hypothesis, kept as a proposition parameter rather than a proof hole in order
+to satisfy the repository proof-integrity policy. -/
 lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
     (hnorm : ψ.IsNormalized)
@@ -359,7 +215,11 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
            simp
          total_le_one := by
            exact hXleOne } : SubMeas Unit ι)
-      (1 - kappa)) :
+      (1 - kappa))
+    (hScalarTail :
+      ∀ {p : Error}, (degree : Error) / (k : Error) ≤ p → p ≤ 1 →
+        1 - Real.exp (-(2 * ((p - (degree : Error) / (k : Error)) ^ (2 : ℕ)) * (k : Error))) ≤
+          scalarBernoulliTail k degree p) :
     ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd hXleOne := by
   let expTerm : Error := Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2)
   have htail := bernoulliTailOperator_le_one k degree X hXpsd hXleOne
@@ -370,7 +230,8 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     intro x hx
     have hx0 : 0 ≤ x := spectrum_nonneg_of_nonneg hXpsd hx
     have hx1 : x ≤ 1 := (CFC.le_one_iff (R := Error) X (ha := hXsa)).1 hXleOne x hx
-    exact bernoulliTailLowerAffine_le_scalarBernoulliTail theta k degree hθ0 hθ1 hk hx0 hx1
+    exact bernoulliTailLowerAffine_le_scalarBernoulliTail theta k degree hθ0 hθ1 hk
+      hScalarTail hx0 hx1
   have hContLower : ContinuousOn (bernoulliTailLowerAffine theta expTerm) (spectrum Error X) := by
     unfold bernoulliTailLowerAffine
     fun_prop
