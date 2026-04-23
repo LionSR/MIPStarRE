@@ -28,8 +28,12 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- `thm:main-induction`. -/
-theorem mainInduction
+/-- Monotone postprocessing of an explicit witness for the main-induction conclusion.
+
+This helper is the final `error ≤ mainInductionError` cleanup step only; the
+actual Section 6 assembly is carried by `mainInductionBaseCase`,
+`mainInductionFromPackages`, and `mainInductionByRecursionOnM`. -/
+theorem mainInductionOfWitness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -50,6 +54,27 @@ theorem mainInduction
   rcases hwitness with ⟨error, G, hG, herror⟩
   refine ⟨G, ?_⟩
   exact ⟨le_trans hG.offDiagonalBound herror⟩
+
+/-- Backwards-compatible alias for `mainInductionOfWitness`. -/
+theorem mainInduction
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hwitness :
+      ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (polynomialEvaluationFamily params G.toSubMeas)
+          error ∧
+        error ≤ mainInductionError params k eps delta gamma) :
+    ∃ G : Measurement (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        (mainInductionError params k eps delta gamma) :=
+  mainInductionOfWitness params strategy eps delta gamma k hwitness
 
 /-- `thm:self-improvement-in-induction-section`.
 
@@ -959,30 +984,6 @@ private lemma delta_le_one_of_selfImprovementInInductionError_le_one
     le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
       params hzeta_le hdelta_scaled_le
 
-/-! ## Main-induction bridge assembly
-
-The concrete Section 12 → Section 6 hand-off is not yet formalized as a
-producer theorem, so the missing assembly remains tracked by the named
-`MainInductionBridgePackage`. The wrapper below merely exposes that bundled
-witness in the existential form consumed by `mainInduction`. -/
-
-/-- Temporary wrapper from the named induction bridge package to the witness
-shape consumed by `thm:main-induction`. -/
-theorem mainInductionBridgeFromPastedFamily
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (bundle : MainInductionBridgePackage params.next strategy eps delta gamma k) :
-    ∃ error : Error, ∃ G : Measurement (Polynomial params.next) ι,
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-          (polynomialEvaluationFamily params.next G.toSubMeas)
-          error ∧
-        error ≤ mainInductionError params.next k eps delta gamma := by
-  obtain ⟨error, G, hG, herror⟩ := bundle.witness
-  exact ⟨error, G, hG, herror⟩
 
 /-! ## Restricted-probability bookkeeping -/
 
@@ -1230,9 +1231,9 @@ theorem PastingPackage.output
       selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk_pos hk
 
 /-- Compose the four paper-faithful induction-step packages
-`restrict → induct → self-improve → paste` into the witness consumed by
-`thm:main-induction`. -/
-theorem mainInductionBridgeWitness
+`restrict → induct → self-improve → paste` into the main-induction conclusion in
+one higher dimension. -/
+theorem mainInductionFromPackages
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
@@ -1245,22 +1246,33 @@ theorem mainInductionBridgeWitness
     (hpaste : PastingPackage params strategy eps delta gamma k hself)
     (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
-    MainInductionBridgePackage params.next strategy eps delta gamma k := by
+    ∃ H : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next H.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
   let family : IdxPolyFamily params ι := hself.family
   let kappa : Error := hpaste.kappa
   let zeta : Error := hpaste.zeta
-  have hpasted :
-      ∃ H : Measurement (Polynomial params.next) ι,
-        LdPastingInInductionSectionConclusion params strategy family H
-          eps delta gamma kappa zeta k := by
-    simpa [family, kappa, zeta] using
-      hpaste.output (params := params) (strategy := strategy)
-        (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hk_pos hk
-  rcases hpasted with ⟨H, hH⟩
-  exact
-    { witness :=
-        ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
-          hH.pointConsistency, by simpa [kappa, zeta] using hpaste.error_le⟩ }
+  have hwitness :
+      ∃ error : Error, ∃ H : Measurement (Polynomial params.next) ι,
+        ConsRel strategy.state (uniformDistribution (Point params.next))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (polynomialEvaluationFamily params.next H.toSubMeas)
+          error ∧
+        error ≤ mainInductionError params.next k eps delta gamma := by
+    have hpasted :
+        ∃ H : Measurement (Polynomial params.next) ι,
+          LdPastingInInductionSectionConclusion params strategy family H
+            eps delta gamma kappa zeta k := by
+      simpa [family, kappa, zeta] using
+        hpaste.output (params := params) (strategy := strategy)
+          (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hk_pos hk
+    rcases hpasted with ⟨H, hH⟩
+    exact
+      ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
+        hH.pointConsistency, by simpa [kappa, zeta] using hpaste.error_le⟩
+  exact mainInductionOfWitness params.next strategy eps delta gamma k hwitness
 
 private lemma restrictedAxisParallelFailureProbability_nonneg
     (params : Parameters) [FieldModel params.q]
@@ -2157,7 +2169,8 @@ noncomputable def assemblePastingPackage
                 exact avgOver_mono 𝒟 _ _ fun x => (hself.pointConsistency x).offDiagonalBound
           _ ≤ zeta := by
                 simpa [zeta, 𝒟] using
-                  average_sliceSelfImprovementError_le params strategy eps delta gamma hgood hrestrict
+                  average_sliceSelfImprovementError_le
+                    params strategy eps delta gamma hgood hrestrict
       selfConsistent := by
         refine ⟨?_⟩
         refine ⟨?_⟩
@@ -2182,7 +2195,8 @@ noncomputable def assemblePastingPackage
                 exact avgOver_mono 𝒟 _ _ hpointwise
           _ ≤ zeta := by
                 simpa [zeta, 𝒟] using
-                  average_sliceSelfImprovementError_le params strategy eps delta gamma hgood hrestrict
+                  average_sliceSelfImprovementError_le
+                    params strategy eps delta gamma hgood hrestrict
       bounded := by
         refine
           { bounded := ?_
@@ -2194,11 +2208,13 @@ noncomputable def assemblePastingPackage
           · intro x
             let g0 : Polynomial params :=
               Classical.choice (inferInstance : Nonempty (Polynomial params))
-            have htarget_nonneg : 0 ≤ IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g0 := by
+            have htarget_nonneg :
+                0 ≤ IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g0 := by
               unfold IdxPolyFamily.averagedSlicePointEvaluationOperator
               exact Finset.sum_nonneg fun u hu =>
                 smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
-                  ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome_pos (g0 u))
+                  ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome_pos
+                    (g0 u))
             exact le_trans htarget_nonneg (hself.dominatesAveragePointOperator x g0)
           · have hswap :
                 avgOver 𝒟
@@ -2227,7 +2243,8 @@ noncomputable def assemblePastingPackage
                     exact avgOver_mono 𝒟 _ _ hself.bounded
               _ ≤ zeta := by
                     simpa [zeta, 𝒟] using
-                      average_sliceSelfImprovementError_le params strategy eps delta gamma hgood hrestrict
+                      average_sliceSelfImprovementError_le
+                    params strategy eps delta gamma hgood hrestrict
           · intro x g
             simpa [sub_nonneg] using hself.dominatesAveragePointOperator x g
         · intro x g
@@ -2237,21 +2254,29 @@ noncomputable def assemblePastingPackage
         have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
         have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
         have heps_le_one :=
-          eps_le_one_of_selfImprovementInInductionError_le_one params strategy hgood hzeta_le
+          eps_le_one_of_selfImprovementInInductionError_le_one
+            params strategy hgood hzeta_le
         have hdelta_le_one :=
-          delta_le_one_of_selfImprovementInInductionError_le_one params strategy hgood hzeta_le
+          delta_le_one_of_selfImprovementInInductionError_le_one
+            params strategy hgood hzeta_le
         have hkappa_le :
             kappa ≤ ((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta := by
           dsimp [kappa, zeta, ν, E]
-          nlinarith [average_sliceError_le params strategy eps delta gamma k hgood hrestrict hinduction,
-            average_sliceSelfImprovementError_le params strategy eps delta gamma hgood hrestrict]
+          nlinarith
+            [average_sliceError_le params strategy eps delta gamma k hgood hrestrict hinduction,
+              average_sliceSelfImprovementError_le
+                params strategy eps delta gamma hgood hrestrict]
         have hzeta_le_nu : zeta ≤ ν := by
           simpa [zeta, ν] using
-            selfImprovementInInductionError_le_mainInductionNu params strategy eps delta gamma k
+            selfImprovementInInductionError_le_mainInductionNu
+              params strategy eps delta gamma k
               hgood hsmall heps_le_one hdelta_le_one hdq_le_q
-        have hnu_le : ldPastingInInductionNu params k eps delta gamma zeta ≤ (1 / (5 : Error)) * ν := by
+        have hnu_le :
+            ldPastingInInductionNu params k eps delta gamma zeta ≤
+              (1 / (5 : Error)) * ν := by
           simpa [zeta, ν] using
-            ldPastingInInductionNu_le_fifth_mainInductionNu params strategy eps delta gamma k
+            ldPastingInInductionNu_le_fifth_mainInductionNu
+              params strategy eps delta gamma k
               hgood hzeta_le hgamma_le hdq_le_q
         have hnu_nonneg : 0 ≤ ν := by
           have heps_root_nonneg : 0 ≤ Real.rpow eps (1 / (1024 : Error)) :=
@@ -2424,7 +2449,11 @@ theorem mainInductionBaseCase
     (k : ℕ)
     (hm1 : params.m = 1)
     (hgood : strategy.IsGood eps delta gamma) :
-    MainInductionBridgePackage params strategy eps delta gamma k := by
+    ∃ G : Measurement (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        (mainInductionError params k eps delta gamma) := by
   classical
   haveI hsub : Subsingleton (Fin params.m) := by
     rw [hm1]
@@ -2561,19 +2590,21 @@ theorem mainInductionBaseCase
       (min_eps_one_le_mainInductionError_of_m_eq_one
         params k eps delta gamma hm1 heps_nonneg hdelta_nonneg hgamma_nonneg)
   exact
-    { witness :=
-        ⟨strategy.axisParallelFailureProbability, G, hconsG, herror_le⟩ }
+    mainInductionOfWitness params strategy eps delta gamma k
+      ⟨strategy.axisParallelFailureProbability, G, hconsG, herror_le⟩
 
-/-- Successor-step recursion entry point for `thm:main-induction`.
+/-- Successor-step recursion entry point for the main-induction conclusion.
 
-Given the slice restriction package, a recursive producer for the slice
-induction witnesses, and a producer for the corresponding slice-wise
-self-improvement package, this theorem runs the remaining skeletal assembly up
-to the explicit averaged pasting package.
+Given the slice restriction package, a recursive producer for the slice-level
+main-induction conclusions, and a producer for the corresponding slice-wise
+self-improvement package, this theorem executes the remaining
+`restrict → induct → self-improve → paste` assembly and returns the
+higher-dimensional point-consistency conclusion.
 
-Note: the current `hselfProducer` is still an explicit input because the
-paper-faithful hook from `selfImprovementInInductionSection` to the restricted
-slice objects is part of the remaining assembly tracked by `TODO(#552)`. -/
+Note: `hselfProducer` remains an explicit input because the current development
+still lacks the public boundary wrapper from `restrictedProbabilities` and
+`selfImprovementInInductionSection` to the restricted-strategy objects recorded
+in `SelfImprovementPackage`; that remaining hand-off is tracked by TODO(#630). -/
 theorem mainInductionByRecursionOnM
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -2600,10 +2631,13 @@ theorem mainInductionByRecursionOnM
       SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
     (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
-    MainInductionBridgePackage params.next strategy eps delta gamma k := by
-  -- TODO(#552): this case split is temporary scaffolding. The `< 1` branch still
-  -- routes through `assemblePastingPackage`, while the `≥ 1` branch packages the
-  -- trivial witness that the eventual small-parameter assembly can subsume.
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  -- Split into the informative small-error regime and the trivial
+  -- `mainInductionError ≥ 1` regime.
   by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
   · let hinduction :=
       PerSliceInductionPackage.ofRecursion params strategy eps delta gamma k
@@ -2628,7 +2662,7 @@ theorem mainInductionByRecursionOnM
       assemblePastingPackage params strategy eps delta gamma k
         hgood hsmall hgamma_le hzeta_le hdq_le_q hrestrict hinduction hself hk
     exact
-      mainInductionBridgeWitness params strategy eps delta gamma k
+      mainInductionFromPackages params strategy eps delta gamma k
         hgood hrestrict hinduction hself hpaste hk_pos hk
   · let G : Measurement (Polynomial params.next) ι :=
       trivialPolynomialMeasurement (ι := ι) params.next
@@ -2641,7 +2675,7 @@ theorem mainInductionByRecursionOnM
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next G.toSubMeas)⟩
     exact
-      { witness :=
-          ⟨1, G, hcons, le_of_not_gt hsmall⟩ }
+      mainInductionOfWitness params.next strategy eps delta gamma k
+        ⟨1, G, hcons, le_of_not_gt hsmall⟩
 
 end MIPStarRE.LDT.MainInductionStep

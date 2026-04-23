@@ -68,7 +68,7 @@ misrepresents the actual state of the proof.
 
 ### Concrete example
 
-From `MIPStarRE/LDT/MainInductionStep/Theorems.lean`:
+Historical example (before the MainInductionStep cleanup):
 
 ```lean
 theorem mainInduction
@@ -84,10 +84,11 @@ theorem mainInduction
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 ```
 
-`MainInductionBridgePackage.witness` has type
+Here `MainInductionBridgePackage.witness` has type
 `∃ error, ∃ G, ConsRel ... error ∧ error ≤ mainInductionError ...` — literally
-the conclusion. No theorem in the codebase produces a
-`MainInductionBridgePackage`, so the "proof" of `mainInduction` is vacuous.
+the conclusion. The code has since been refactored to remove this specific
+MainInductionStep bridge, but the snippet remains the archetypal example of the
+anti-pattern.
 
 PR [#491] proposed to delete the `*BridgePackage` by **inlining** the bundle's
 fields as explicit hypotheses. That only scatters the same pattern across
