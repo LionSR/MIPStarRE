@@ -79,6 +79,8 @@ structure RoundingToProjectorsWitness {Outcome : Type*}
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
       (constOpFamily R)
       (2 * spectralTruncationError ζ)
+  sum_eq_total :
+    ∑ a, R.outcome a = R.total
   total_le :
     R.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
@@ -109,9 +111,12 @@ structure RankReductionWitness {Outcome : Type*}
     Fintype.card data.auxSpace.carrier ≤ Fintype.card ι
 
 /-- Temporary bridge package for the paper's `lem:projective-non-measurement`
-stage, which starts from the `2 * ζ` source-idempotence defect and directly
-produces the rounded family `R_a` with the paper's `2 * sqrt ζ` closeness and
-`(1 + 2 * sqrt ζ) I` total-mass bound. -/
+stage.
+
+Unlike the downstream rank-reduction step, this stage still needs a dedicated
+producer for the paper's sharper truncation output: starting from the
+`2 * ζ` source-idempotence defect, construct a rounded family `R_a` with the
+paper's `2 * sqrt ζ` closeness and `(1 + 2 * sqrt ζ) I` total-mass bound. -/
 structure ProjectiveNonMeasurementBridgePackage {Outcome : Type*}
     [Fintype Outcome]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -119,8 +124,7 @@ structure ProjectiveNonMeasurementBridgePackage {Outcome : Type*}
   fromSourceAlmostProjective :
     (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
       ∃ R : OpFamily Outcome ι,
-        RoundingToProjectorsWitness ψ A ζ R ∧
-          ∑ a, R.outcome a = R.total
+        RoundingToProjectorsWitness ψ A ζ R
 
 /-- The raw operator family obtained by sandwiching the auxiliary projectors
 `T_a` with a candidate `XHat`. This is the family later named `P`. -/
