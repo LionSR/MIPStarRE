@@ -232,7 +232,9 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
   have hContTail : ContinuousOn (scalarBernoulliTail k degree) (spectrum Error X) := by
     unfold scalarBernoulliTail
     fun_prop
-  have hCfcLe : cfc (bernoulliTailLowerAffine theta expTerm) X ≤ bernoulliTailOperator k degree X := by
+  have hCfcLe :
+      cfc (bernoulliTailLowerAffine theta expTerm) X ≤
+        bernoulliTailOperator k degree X := by
     calc
       cfc (bernoulliTailLowerAffine theta expTerm) X ≤ cfc (scalarBernoulliTail k degree) X := by
         exact (cfc_le_iff (f := bernoulliTailLowerAffine theta expTerm)
