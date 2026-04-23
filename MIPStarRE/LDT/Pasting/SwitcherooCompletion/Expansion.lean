@@ -412,9 +412,9 @@ lemma switcherooLeftFrontCoreScalar_eq_leftTensor_mul_leftTensor
   rw [leftTensor_mul_leftTensor]
   exact congrArg (fun X => ev ψbi (leftTensor (ι₂ := ι) X)) hcollapse.symm
 
-set_option maxHeartbeats 200000 in
 -- The explicit left-front contraction proof still expands several product-indexed sums,
--- but the expensive pointwise normalizations now live in reusable helper lemmas.
+-- but the expensive pointwise normalizations now live in reusable helper lemmas,
+-- so it now elaborates within the default heartbeat budget.
 /-- The final `sqrt chi` step in the fourth-term switcheroo chain. -/
 lemma switcherooLeftFront_close_firstSplitCore
     {Outcome : Type*} [Fintype Outcome]

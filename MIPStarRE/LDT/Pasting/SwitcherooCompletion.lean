@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.SwitcherooContraction
+import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
 
 /-!
 # Section 12 pasting: switcheroo completion bounds
@@ -923,13 +924,9 @@ private lemma switcherooAggregateFirstTerm_eq_leftSandwich_local
             simp [MIPStarRE.LDT.Preliminaries.leftSandwichExpectation,
               avgOver, leftTensor_mul_leftTensor, mul_assoc]
 
-/- Heartbeat budget: this `χ`-transfer expands the raw split-by-`g` scalar,
-normalizes adjoints of `G_g M_o`, and then runs one `closenessOfInnerProduct_right`
-step over the full `Polynomial × Outcome` family. The proof is stable but still
-requires substantially more elaboration than the default budget. -/
-set_option maxHeartbeats 50000000 in
--- The last `χ`-step needs explicit adjoint normalization for the raw `G_g M_o`
--- factors inside `closenessOfInnerProduct_right`.
+-- The last `χ`-step needs only pointwise normalization for the raw `G_g M_o`
+-- factors inside `closenessOfInnerProduct_right`; the heavy adjoint rewrites are
+-- isolated in the two pointwise helper lemmas above.
 /-- The final `sqrt chi` bridge in the fourth-term chain: compare the left-front
 raw scalar with the split-by-`g` scalar that later collapses to the first
 positive switcheroo term. -/
@@ -952,73 +949,19 @@ private lemma switcherooAggregateLeftFrontRaw_close_firstSplitRaw
   let 𝒟q : Distribution (SlicePairQuestion params) :=
     uniformDistribution (SlicePairQuestion params)
   let A : SlicePairQuestion params → Polynomial params × Outcome → MIPStarRE.Quantum.Op (ι × ι) :=
-    fun q go => (switcherooPointProductRight params family M q).outcome go
+    fun q go => ((switcherooPointProductLeft params family M q).outcome go)ᴴ
   let B : SlicePairQuestion params → Polynomial params × Outcome → MIPStarRE.Quantum.Op (ι × ι) :=
-    fun q go => (switcherooPointProductLeft params family M q).outcome go
+    fun q go => ((switcherooPointProductRight params family M q).outcome go)ᴴ
   let C : SlicePairQuestion params → Polynomial params × Outcome → Unit →
       MIPStarRE.Quantum.Op (ι × ι) :=
-    fun q go _ => leftTensor (ι₂ := ι)
-      (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2)
+    fun q go () => (switcherooPointProductLeft params family M q).outcome go
   have h𝒟q : ∑ q ∈ 𝒟q.support, 𝒟q.weight q ≤ 1 := by
     simpa [𝒟q] using uniformDistribution_weight_sum_le_one (SlicePairQuestion params)
-  have hAfun : ∀ q,
-      (fun go => (A q go)ᴴ) =
-        fun go => (switcherooPointProductLeft params family M q).outcome go := by
-    intro q
-    funext go
-    rcases go with ⟨g, o⟩
-    change (leftTensor (ι₂ := ι)
-        (((M q.2).outcome o * (family.meas q.1).outcome g)))ᴴ =
-      leftTensor (ι₂ := ι)
-        ((family.meas q.1).outcome g * (M q.2).outcome o)
-    rw [show
-      (leftTensor (ι₂ := ι)
-          (((M q.2).outcome o * (family.meas q.1).outcome g)))ᴴ =
-        leftTensor (ι₂ := ι)
-          ((((M q.2).outcome o * (family.meas q.1).outcome g))ᴴ) by
-        simpa [leftTensor, opTensor] using
-          (conjTranspose_opTensor
-            (((M q.2).outcome o * (family.meas q.1).outcome g))
-            (1 : MIPStarRE.Quantum.Op ι))]
-    simp [Matrix.conjTranspose_mul,
-      (family.meas q.1).outcome_hermitian g, (M q.2).outcome_hermitian o]
-  have hBfun : ∀ q,
-      (fun go => (B q go)ᴴ) =
-        fun go => (switcherooPointProductRight params family M q).outcome go := by
-    intro q
-    funext go
-    rcases go with ⟨g, o⟩
-    change (leftTensor (ι₂ := ι)
-        (((family.meas q.1).outcome g * (M q.2).outcome o)))ᴴ =
-      leftTensor (ι₂ := ι)
-        ((M q.2).outcome o * (family.meas q.1).outcome g)
-    rw [show
-      (leftTensor (ι₂ := ι)
-          (((family.meas q.1).outcome g * (M q.2).outcome o)))ᴴ =
-        leftTensor (ι₂ := ι)
-          ((((family.meas q.1).outcome g * (M q.2).outcome o))ᴴ) by
-        simpa [leftTensor, opTensor] using
-          (conjTranspose_opTensor
-            (((family.meas q.1).outcome g * (M q.2).outcome o))
-            (1 : MIPStarRE.Quantum.Op ι))]
-    simp [Matrix.conjTranspose_mul,
-      (family.meas q.1).outcome_hermitian g, (M q.2).outcome_hermitian o]
   have hAB :
       avgOver 𝒟q
         (fun q => qSDDCore ψbi (fun go => (A q go)ᴴ) (fun go => (B q go)ᴴ)) ≤ chi := by
-    calc
-      avgOver 𝒟q
-          (fun q => qSDDCore ψbi (fun go => (A q go)ᴴ) (fun go => (B q go)ᴴ)) =
-        avgOver 𝒟q
-          (fun q => qSDDCore ψbi
-            (fun go => (switcherooPointProductLeft params family M q).outcome go)
-            (fun go => (switcherooPointProductRight params family M q).outcome go)) := by
-              apply avgOver_congr
-              intro q
-              rw [hAfun q, hBfun q]
-      _ ≤ chi := by
-            simpa [𝒟q] using
-              switcherooPointProductCommutation_coreBound params ψbi family M chi hcomm
+    simpa [𝒟q, A, B] using
+      switcherooPointProductCommutation_coreBound params ψbi family M chi hcomm
   have hC :
       ∀ q,
         (∑ go : Polynomial params × Outcome,
@@ -1027,36 +970,72 @@ private lemma switcherooAggregateLeftFrontRaw_close_firstSplitRaw
     simpa [C] using switcherooAggregateLeftFront_contraction params family M q
   have hleft :
       avgOver 𝒟q (fun q =>
-          ∑ go : Polynomial params × Outcome,
-            ∑ u : Unit, ev ψbi (B q go * C q go u)) =
-        switcherooAggregateLeftFrontRawLocal params ψbi family M := by
+          ∑ a : Polynomial params × Outcome,
+            ∑ b : Unit, ev ψbi (A q a * C q a b)) =
+        switcherooAggregateFirstSplitRawLocal params ψbi family M := by
+    unfold switcherooAggregateFirstSplitRawLocal
     apply avgOver_congr
     intro q
-    simpa [B, C, switcherooAggregateLeftFrontRawLocal] using
-      switcherooAggregateLeftFrontRawLocal_point params ψbi family M q
+    refine Finset.sum_congr rfl ?_
+    intro go _
+    calc
+      ∑ b : Unit, ev ψbi (A q go * C q go b)
+        = ev ψbi (A q go * C q go ()) := by simp
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1 *
+                (M q.2).outcome go.2)) := by
+            simpa [A, C] using
+              switcherooPointProductLeft_self_eq_firstSplit_point
+                (params := params) (ψbi := ψbi) (family := family) (M := M) q go
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι)
+              ((M q.2).outcome go.2 *
+                ((family.meas q.1).outcome go.1 * (M q.2).outcome go.2))) := by
+            simp [mul_assoc]
   have hright :
       avgOver 𝒟q (fun q =>
-          ∑ go : Polynomial params × Outcome,
-            ∑ u : Unit, ev ψbi (A q go * C q go u)) =
-        switcherooAggregateFirstSplitRawLocal params ψbi family M := by
+          ∑ a : Polynomial params × Outcome,
+            ∑ b : Unit, ev ψbi (B q a * C q a b)) =
+        switcherooAggregateLeftFrontRawLocal params ψbi family M := by
+    unfold switcherooAggregateLeftFrontRawLocal
     apply avgOver_congr
     intro q
-    simpa [A, C, switcherooAggregateFirstSplitRawLocal, mul_assoc] using
-      switcherooAggregateFirstSplitRawLocal_point params ψbi family M q
+    refine Finset.sum_congr rfl ?_
+    intro go _
+    calc
+      ∑ b : Unit, ev ψbi (B q go * C q go b)
+        = ev ψbi (B q go * C q go ()) := by simp
+      _ = ev ψbi
+            (leftTensor (ι₂ := ι)
+              (((family.meas q.1).outcome go.1) *
+                (M q.2).outcome go.2 *
+                (family.meas q.1).outcome go.1 *
+                (M q.2).outcome go.2)) := by
+            simpa [B, C] using
+              switcherooPointProductRightLeft_eq_leftFront_point
+                (params := params) (ψbi := ψbi) (family := family) (M := M) q go
+  have hleft' :
+      avgOver 𝒟q (fun q =>
+          ∑ a : Polynomial params × Outcome, ev ψbi (A q a * C q a ())) =
+        switcherooAggregateFirstSplitRawLocal params ψbi family M := by
+    simpa using hleft
+  have hright' :
+      avgOver 𝒟q (fun q =>
+          ∑ a : Polynomial params × Outcome, ev ψbi (B q a * C q a ())) =
+        switcherooAggregateLeftFrontRawLocal params ψbi family M := by
+    simpa using hright
   have hclose :=
     Preliminaries.closenessOfInnerProduct_right ψbi hnorm 𝒟q h𝒟q A B C chi hAB hC
-  calc
-    |switcherooAggregateLeftFrontRawLocal params ψbi family M -
-        switcherooAggregateFirstSplitRawLocal params ψbi family M|
-      = |avgOver 𝒟q (fun q =>
-            ∑ go : Polynomial params × Outcome,
-              ∑ u : Unit, ev ψbi (B q go * C q go u)) -
-          avgOver 𝒟q (fun q =>
-            ∑ go : Polynomial params × Outcome,
-              ∑ u : Unit, ev ψbi (A q go * C q go u))| := by
-            rw [hleft, hright, abs_sub_comm]
-    _ ≤ Real.sqrt chi := by
-          simpa [abs_sub_comm] using hclose
+  have hclose' :
+      |avgOver 𝒟q (fun q =>
+          ∑ a : Polynomial params × Outcome, ev ψbi (A q a * C q a ())) -
+        avgOver 𝒟q (fun q =>
+          ∑ a : Polynomial params × Outcome, ev ψbi (B q a * C q a ()))| ≤
+        Real.sqrt chi := by
+    simpa using hclose
+  simpa [hleft', hright', abs_sub_comm] using hclose'
 
 /- Heartbeat budget: the center-identification proof expands two nested uniform
 averages and rewrites them through SWAP symmetry before collapsing back to the
@@ -1168,82 +1147,6 @@ private lemma switcherooCompletePartCenter_eq_target
                     (leftTensor (ι₂ := ι) ((completePartSubMeas params family q.1).total) *
                       rightTensor (ι₁ := ι) ((M q.2).outcome o)) := by
                         rw [ev_sum]
-
-set_option maxHeartbeats 3000000 in
-/-- Average the single-question four-term `qSDDOp` expansion over the
-slice-pair distribution. -/
-private lemma switcherooAggregate_qSDDOp_expand_avg
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (M : IdxProjSubMeas (Fq params) Outcome ι) :
-    avgOver (uniformDistribution (SlicePairQuestion params))
-        (fun q => qSDDOp ψbi
-          (switcherooAggregateLeft params family M q)
-          (switcherooAggregateRight params family M q)) =
-      switcherooAggregateFirstTerm params ψbi family M +
-        switcherooAggregateSecondTerm params ψbi family M -
-        switcherooAggregateThirdTerm params ψbi family M -
-        switcherooAggregateFourthTerm params ψbi family M := by
-  let A : SlicePairQuestion params → Error := fun q =>
-    ∑ o : Outcome,
-      ev ψbi
-        (leftTensor (ι₂ := ι)
-          ((M q.2).outcome o *
-            (completePartSubMeas params family q.1).total *
-            (M q.2).outcome o))
-  let B : SlicePairQuestion params → Error := fun q =>
-    ∑ o : Outcome,
-      ev ψbi
-        (leftTensor (ι₂ := ι)
-          ((completePartSubMeas params family q.1).total *
-            (M q.2).outcome o *
-            (completePartSubMeas params family q.1).total))
-  let C : SlicePairQuestion params → Error := fun q =>
-    ∑ o : Outcome,
-      ev ψbi
-        (leftTensor (ι₂ := ι)
-          ((M q.2).outcome o *
-            (completePartSubMeas params family q.1).total *
-            (M q.2).outcome o *
-            (completePartSubMeas params family q.1).total))
-  let D : SlicePairQuestion params → Error := fun q =>
-    ∑ o : Outcome,
-      ev ψbi
-        (leftTensor (ι₂ := ι)
-          ((completePartSubMeas params family q.1).total *
-            (M q.2).outcome o *
-            (completePartSubMeas params family q.1).total *
-            (M q.2).outcome o))
-  calc
-    avgOver (uniformDistribution (SlicePairQuestion params))
-        (fun q => qSDDOp ψbi
-          (switcherooAggregateLeft params family M q)
-          (switcherooAggregateRight params family M q))
-      = avgOver (uniformDistribution (SlicePairQuestion params))
-          (fun q => A q + B q - C q - D q) := by
-              apply avgOver_congr
-              intro q
-              rw [switcherooAggregate_qSDDOp_expand]
-              simp [A, B, C, D, Finset.sum_add_distrib, Finset.sum_sub_distrib]
-    _ = avgOver (uniformDistribution (SlicePairQuestion params)) A +
-          avgOver (uniformDistribution (SlicePairQuestion params)) B -
-          avgOver (uniformDistribution (SlicePairQuestion params)) C -
-          avgOver (uniformDistribution (SlicePairQuestion params)) D := by
-            rw [show (fun q => A q + B q - C q - D q) =
-                fun q => (A q + B q) + ((-1 : Error) * C q + (-1 : Error) * D q) by
-                  funext q
-                  ring]
-            rw [avgOver_add, avgOver_add, avgOver_add, avgOver_const_mul, avgOver_const_mul]
-            simp [sub_eq_add_neg]
-            ring
-    _ = switcherooAggregateFirstTerm params ψbi family M +
-          switcherooAggregateSecondTerm params ψbi family M -
-          switcherooAggregateThirdTerm params ψbi family M -
-          switcherooAggregateFourthTerm params ψbi family M := by
-            simp [switcherooAggregateFirstTerm, switcherooAggregateSecondTerm,
-              switcherooAggregateThirdTerm, switcherooAggregateFourthTerm, A, B, C, D]
 
 /-- The one-outcome complete-part family inherits self-consistency from the slice family. -/
 lemma completePartProjFamily_selfConsistency_generic
@@ -1451,13 +1354,8 @@ private lemma switcheroo_second_aggregate_term_close
           simpa [𝒟x] using
             avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt zeta)
 
--- The four-term expansion + triangle chain contains several large `calc`
--- blocks and raw-expression rewrites.
-/- Heartbeat budget: `commutativitySwitcheroo` packages the full four-term
-triangle chain from `lem:commutativity-switcheroo`, including the raw `χ, ζ, ζ, χ`
-transfers and the final absolute-value decomposition. The large budget is for
-proof elaboration of those scalar rewrites, not for search. -/
-set_option maxHeartbeats 50000000 in
+-- After extracting the pointwise normalization helpers above, the final
+-- four-term packaging proof elaborates within the default heartbeat budget.
 /-- `lem:commutativity-switcheroo`. -/
 lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
