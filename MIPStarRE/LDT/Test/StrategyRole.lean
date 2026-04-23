@@ -199,6 +199,16 @@ private lemma swapDensity_eq_reindex {ι : Type*}
   by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
     simp [swapDensity, leftTensor, rightTensor, h₁, h₂, mul_comm]
 
+/-- Swapping the density of a rank-one pure state swaps the underlying state
+vector. -/
+lemma swapDensity_pureDensity {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : (ι × ι) → ℂ) :
+    swapDensity (pureDensity ψ) = pureDensity (swapVector ψ) := by
+  ext x y
+  rcases x with ⟨i₁, i₂⟩
+  rcases y with ⟨j₁, j₂⟩
+  simp [pureDensity, swapVector, swapDensity, Matrix.vecMulVec]
+
 private lemma swapDensity_nonneg {ι : Type*} [Finite ι]
     {X : MIPStarRE.Quantum.Op (ι × ι)} (hX : 0 ≤ X) :
     0 ≤ swapDensity X := by
@@ -369,6 +379,25 @@ theorem permInvState_of_density_fixed {ι : Type*} [Fintype ι] [DecidableEq ι]
             rw [swapDensity_mul]
     _ = MIPStarRE.Quantum.normalizedTrace (ψ.density * rightTensor (ι₁ := ι) M) := by
             rw [hfix, swapDensity_leftTensor]
+
+/-- A vector-level SWAP-invariant pure state induces the mixed-state symmetry API
+used throughout the current development. -/
+theorem PureState.isSwapInvariant_density_fixed {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : PureState (ι × ι)) (hψ : ψ.IsSwapInvariant) :
+    swapDensity ((ψ : QuantumState (ι × ι)).density) = (ψ : QuantumState (ι × ι)).density := by
+  change swapDensity (pureDensity ψ.vector) = pureDensity ψ.vector
+  rw [swapDensity_pureDensity, hψ]
+
+/-- A vector-level SWAP-invariant pure state automatically satisfies
+`PermInvState`. This is the intended bridge from the paper's pure-state symmetry
+assumption to the density-matrix API used in Lean. -/
+theorem PureState.isSwapInvariant_permInvState {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : PureState (ι × ι)) (hψ : ψ.IsSwapInvariant) :
+    PermInvState (ψ : QuantumState (ι × ι)) :=
+  permInvState_of_density_fixed (ψ := (ψ : QuantumState (ι × ι)))
+    (ψ.isSwapInvariant_density_fixed hψ)
 
 /-- The classical role-register symmetrized state is permutation-invariant. -/
 theorem classicalRoleSymmState_permInvState {ι : Type*} [Fintype ι] [DecidableEq ι]
