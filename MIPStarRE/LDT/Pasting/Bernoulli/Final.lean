@@ -15,6 +15,13 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- Arithmetic helper for `cor:ld-pasting-N-completeness`: absorb the
+`overAllOutcomes` and `fromHToG` scalar losses into
+`ldPastingInInductionNu`.
+
+The proof uses that the `fromHToGError` tail sum is a sub-sum of the full
+`overAllOutcomesError` sum, that `1 ≤ k` implies `k ≤ k^2`, and the slack
+`46 + 46 ≤ 100`. -/
 private lemma overAllOutcomesError_add_fromHToGError_le_ldPastingNu
     (params : Parameters)
     [FieldModel params.q]
@@ -37,6 +44,8 @@ private lemma overAllOutcomesError_add_fromHToGError_le_ldPastingNu
   let dqTerm : Error := Real.rpow ratio (1 / (32 : Error))
   let fullSum : Error := epsTerm + deltaTerm + gammaTerm + zetaTerm + dqTerm
   let tailSum : Error := gammaTerm + zetaTerm + dqTerm
+  -- This is the `1 ≤ k` input that the downstream `nlinarith` call uses to
+  -- trade the linear `k` term for `k^2`.
   have hkE_one : (1 : Error) ≤ kE := by
     dsimp [kE]
     exact_mod_cast hk_pos
@@ -88,7 +97,15 @@ private lemma overAllOutcomesError_add_fromHToGError_le_ldPastingNu
           simp [MainInductionStep.ldPastingInInductionNu, kE, mE, fullSum,
             epsTerm, deltaTerm, gammaTerm, zetaTerm, dqTerm, ratio]
 
-private theorem ldPastingNCompleteness_of_tailLowerBound
+/-- `cor:ld-pasting-N-completeness` once the Bernoulli-tail lower bound is
+supplied explicitly.
+
+This packages the downstream scalar algebra after `lem:over-all-outcomes` and
+`lem:from-H-to-G`. The hypothesis `htail` is exactly the `θ = 1 / (200m)`
+specialization of `lem:chernoff-bernoulli-matrix` for the averaged complete
+operator `G = \mathbb E_x \sum_g G^x_g`; issue #597 tracks deriving that lower
+bound internally. -/
+theorem ldPastingNCompleteness_of_tailLowerBound
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
