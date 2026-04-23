@@ -113,7 +113,7 @@ structure RankReductionWitness {Outcome : Type*}
 /-- Temporary bridge package for the paper's `lem:projective-non-measurement`
 stage.
 
-Unlike the downstream rank-reduction step, this lemma still needs a dedicated
+Unlike the downstream rank-reduction step, this stage still needs a dedicated
 producer for the paper's sharper truncation output: starting from the
 `2 * ζ` source-idempotence defect, construct a rounded family `R_a` with the
 paper's `2 * sqrt ζ` closeness and `(1 + 2 * sqrt ζ) I` total-mass bound. -/
