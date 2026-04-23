@@ -356,8 +356,14 @@ structure OverAllOutcomesStatement (params : Parameters)
         (allOutcomesExpansionFamily params strategy family k))
       (overAllOutcomesError params eps delta gamma zeta k)
 
-/-- Scalar expectation of one stage-`ℓ` tail contribution from
-`lem:from-H-to-G`, for a fixed remaining type `τ_{≥ℓ}`. -/
+/-- Scalar expectation of one per-tail contribution in `lem:from-H-to-G`.
+
+This is the single-`τ_{≥ℓ}` term appearing inside the aggregate stage mass from
+`references/ldt-paper/ld-pasting.tex`, equation
+`eq:i-think-this-is-what-i'm-supposed-to-prove-2` (lines 1386–1391), and the
+mirrored blueprint discussion in `blueprint/src/chapter/ch09_pasting.tex`.
+The parameter `prefixLen` is the Lean 0-based stage index. In the ambient
+`k`-step recurrence, the remaining tail length is `tailLen = k - prefixLen`. -/
 noncomputable def fromHToGTailStageMass (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -366,16 +372,18 @@ noncomputable def fromHToGTailStageMass (params : Parameters)
   ev ψbi (((IdxOpFamily.liftLeft
     (fromHToGTailStageFamily params family prefixLen τtail)) ()).total)
 
-/-- Scalar expectation of the full stage-`ℓ` quantity from `lem:from-H-to-G`.
+/-- Scalar expectation of the full Lean stage-`ℓ` quantity from `lem:from-H-to-G`.
 
-This is the paper's sum over all remaining tail types
-`τ_{≥ℓ} ∈ {0,1}^{k-ℓ}`.  The next stage `ℓ + 1` sums over the shorter tails
-`τ_{>ℓ}`, so the recurrence field in `FromHToGStatement` compares these
-adjacent stage masses directly rather than quantifying over a fixed full
-`τ : GHatType k`. -/
+This is the aggregate quantity displayed in
+`references/ldt-paper/ld-pasting.tex`, equation
+`eq:i-think-this-is-what-i'm-supposed-to-prove-2` (lines 1386–1391), and in the
+matching blueprint section `blueprint/src/chapter/ch09_pasting.tex`.
+Lean uses 0-based indexing: stage `ℓ` here corresponds to the paper's stage
+`ℓ + 1`, so the remaining tail has length `k - ℓ`. Accordingly, this sums over
+all remaining tail types `τ_{≥ℓ} ∈ {0,1}^{k-ℓ}`, while the next Lean stage
+`ℓ + 1` sums over the shorter tails `τ_{>ℓ}`. -/
 noncomputable def fromHToGStageMass (params : Parameters)
     [FieldModel params.q]
-    (_strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι) (k ℓ : ℕ) : Error :=
   ∑ τtail : GHatType (k - ℓ),
@@ -414,8 +422,8 @@ structure FromHToGStatement (params : Parameters)
     (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceStep :
     ∀ ℓ : ℕ, ℓ < k →
-      |fromHToGStageMass params strategy ψbi family k ℓ -
-          fromHToGStageMass params strategy ψbi family k (ℓ + 1)| ≤
+      |fromHToGStageMass params ψbi family k ℓ -
+          fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
         fromHToGRecurrenceError params gamma zeta k
   bernoulliPolynomialRewrite :
     |fromHToGAllOutcomesMass params strategy ψbi family k -

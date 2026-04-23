@@ -27,35 +27,6 @@ noncomputable def fromHToGRecurrenceWeight (params : Parameters) [FieldModel par
     (τtail : GHatType tailLen) : MIPStarRE.Quantum.Op ι :=
   truncatedTypeSums family.averagedSubMeas.total params.d prefixLen τtail
 
-/-- The suffix-specialized recurrence weight used by the `fromHToG` families.
-
-Semantics/indexing fix: the previous grouped Bernoulli encoding
-`∑_r C(ℓ-1, r) G^r (I-G)^(ℓ-1-r)` interpreted `ℓ` as the paper's 1-indexed
-prefix length, whereas the callers (`FromHToGStatement.recurrenceStep` uses
-`∀ ℓ < k`) and the rest of `Pasting/` treat `ℓ` as 0-indexed — the off-by-one
-produced a binomial of degree `ℓ - 1` instead of the paper's
-`\binom{\ell}{r}` (see `references/ldt-paper/ld-pasting.tex` eq. (S-def)).
-The new definition uses `truncatedTypeSums` at `prefixLen = ℓ`, which sums
-over `GHatType ℓ` and matches both the 0-indexed convention and the proved
-recurrence in `truncatedTypeSumRecurrence`.  The index `ℓ` is zero-based:
-the suffix is `τ_{≥ℓ}` and the prefix has length `ℓ`. -/
-noncomputable def suffixBernoulliWeightOperator (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : MIPStarRE.Quantum.Op ι :=
-  fromHToGRecurrenceWeight params family ℓ (gHatTypeSuffix ℓ τ)
-
-/-- Definitional bridge from the suffix API to the proved truncated-sum API.
-
-Not tagged `@[simp]`: eager unfolding would eliminate every mention of the
-named `suffixBernoulliWeightOperator` abstraction and leak the
-`gHatTypeSuffix` wrapper into downstream goals.  Call sites that need the
-expansion should use `unfold` or `show` explicitly. -/
-lemma suffixBernoulliWeightOperator_eq_truncatedTypeSums
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) :
-    suffixBernoulliWeightOperator params family k ℓ τ =
-      truncatedTypeSums family.averagedSubMeas.total params.d ℓ (gHatTypeSuffix ℓ τ) := by
-  rfl
-
 /-- The interpolated operator `H^{x_1,\dots,x_k}_h` restricted to tuples that are
 globally consistent with a single polynomial.
 
@@ -458,15 +429,20 @@ noncomputable def averagedSandwichByTypeSubMeas (params : Parameters) [FieldMode
 /-- The stage-`ℓ` suffix family from the proof of `lem:from-H-to-G`, for a fixed
 remaining tail type `τ_{≥ℓ}`.
 
-The parameter `prefixLen` is the number of already-converted Bernoulli bits; the
-remaining tail length is `tailLen`.  This packages the paper's stage quantity
+This is the operator-valued quantity displayed termwise in
+`references/ldt-paper/ld-pasting.tex`, equation
+`eq:i-think-this-is-what-i'm-supposed-to-prove-2` (lines 1386–1391), and in the
+parallel blueprint discussion in `blueprint/src/chapter/ch09_pasting.tex`.
+The parameter `prefixLen` is the Lean 0-based stage index. In the ambient
+`k`-step recurrence where this family is used, the remaining tail length is
+`tailLen = k - prefixLen`, so Lean stage `prefixLen` corresponds to the paper's
+stage `prefixLen + 1`.
+
+Concretely, this packages
 $$
 \mathbb E_{x_{\ge \ell}} \sum_{g_{\ge \ell} \in \mathsf{Outcomes}_{\tau_{\ge \ell}}}
-  \widehat H^{x_{\ge \ell}}_{g_{\ge \ell}} \otimes S_{\tau_{\ge \ell}}
-$$
-for a single tail type.  The public `fromHToGIntermediateFamily` below simply
-specializes this to the tail `gHatTypeSuffix ℓ τ` cut out from a full
-`τ ∈ {0,1}^k`. -/
+  \widehat H^{x_{\ge \ell}}_{g_{\ge \ell}} \otimes S_{\tau_{\ge \ell}}.
+$$ -/
 noncomputable def fromHToGTailStageFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (prefixLen : ℕ)
     {tailLen : ℕ} (τtail : GHatType tailLen) :
@@ -476,63 +452,5 @@ noncomputable def fromHToGTailStageFamily (params : Parameters) [FieldModel para
     let weight := fromHToGRecurrenceWeight params family prefixLen τtail
     { outcome := fun _ => base.total * weight
       total := base.total * weight }
-
-/-- The stage-`ℓ` suffix family from the proof of `lem:from-H-to-G`, for a fixed
-full type `τ ∈ {0,1}^k`.
-
-With zero-based indexing, this packages
-$$
-\mathbb E_{x_{\ge \ell}} \sum_{g_{\ge \ell} \in \mathsf{Outcomes}_{\tau_{\ge \ell}}}
-  \widehat H^{x_{\ge \ell}}_{g_{\ge \ell}} \otimes S_{\tau_{\ge \ell}}.
-$$
-The dependence on `ℓ` now genuinely changes the `\widehat H` suffix rather than
-reusing the fully averaged `k`-step operator at every stage. -/
-noncomputable def fromHToGIntermediateFamily (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ)
-    (τ : GHatType k) :
-    IdxOpFamily Unit Unit ι :=
-  fromHToGTailStageFamily params family ℓ (gHatTypeSuffix ℓ τ)
-
-/-- One recurrence-step left-hand family from the proof of `lem:from-H-to-G`,
-parameterised by the full type `τ ∈ {0,1}^k`.
-
-This is the stage-`ℓ` suffix family `\widehat H^{x_{\ge \ell}}_{g_{\ge \ell}} \otimes
-S_{\tau_{\ge \ell}}`.  The `strategy` argument is threaded only so the public
-family API matches `FromHToGStatement`; the underlying operator depends only on
-`family`. -/
-noncomputable def fromHToGRecurrenceLeftFamily (params : Parameters) [FieldModel params.q]
-    (_strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ)
-    (τ : GHatType k) :
-    IdxOpFamily Unit Unit ι :=
-  fromHToGIntermediateFamily params family k ℓ τ
-
-/-- One recurrence-step right-hand family from the proof of `lem:from-H-to-G`,
-parameterised by the full type `τ ∈ {0,1}^k`.
-
-This is the next suffix stage `\widehat H^{x_{>\ell}}_{g_{>\ell}} \otimes
-S_{\tau_{>\ell}}`, i.e. definitionally the `(ℓ + 1)`-st left family. -/
-noncomputable def fromHToGRecurrenceRightFamily (params : Parameters) [FieldModel params.q]
-    (_strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ)
-    (τ : GHatType k) :
-    IdxOpFamily Unit Unit ι :=
-  fromHToGIntermediateFamily params family k (ℓ + 1) τ
-
-/-- The right-hand recurrence family at step `ℓ` is definitionally the left-hand
-family at step `ℓ + 1`, matching the telescoping chain in
-`ld-pasting.tex` lines 1354–1376.
-
-The intended use is `ℓ < k`; the theorem is stated for all `ℓ : ℕ` because the
-same `rfl` proof continues to hold outside that range under the `Nat`-subtraction
-convention built into `gHatTypeSuffix`. -/
-theorem fromHToGRecurrenceRightFamily_eq_left_succ (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ)
-    (τ : GHatType k) :
-    fromHToGRecurrenceRightFamily params strategy family k ℓ τ =
-      fromHToGRecurrenceLeftFamily params strategy family k (ℓ + 1) τ :=
-  rfl
 
 end MIPStarRE.LDT.Pasting
