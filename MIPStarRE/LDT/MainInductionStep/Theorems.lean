@@ -2222,8 +2222,8 @@ noncomputable def assemblePastingPackage
                     exact avgOver_mono 𝒟 _ _ hself.bounded
               _ ≤ zeta := by
                     simpa [zeta, 𝒟] using
-                      average_sliceSelfImprovementError_le
-                        params strategy eps delta gamma hgood hrestrict
+                      (average_sliceSelfImprovementError_le
+                        params strategy eps delta gamma hgood hrestrict)
           · intro x g
             simpa [sub_nonneg] using hself.dominatesAveragePointOperator x g
         · intro x g
