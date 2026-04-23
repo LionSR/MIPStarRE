@@ -154,6 +154,81 @@ theorem selfImprovementInInductionSection
           GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
         simpa using hdom' }
 
+/-- Package the slice-wise outputs feeding `selfImprovementInInductionSection`
+into the bookkeeping object expected by the later induction-step assembly.
+
+Because `xRestrictedStrategy params strategy x` is only a
+`RestrictedSymStrat params ι` rather than a full `SymStrat params ι`, the
+restricted-strategy outputs are supplied directly as the six paper-faithful
+fields recorded by `SelfImprovementPackage`. -/
+noncomputable def SelfImprovementPackage.ofSelfImprovementInInductionSection
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (hslice :
+      ∀ x,
+        ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+          CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
+            ((1 - inductionPkg.sliceError x) -
+              sliceSelfImprovementError params restrictionPkg x) ∧
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+            (polynomialEvaluationFamily params H.toSubMeas)
+            (sliceSelfImprovementError params restrictionPkg x) ∧
+          BipartiteSSCRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily H.toSubMeas)
+            (sliceSelfImprovementError params restrictionPkg x) ∧
+          SDDRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
+            (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
+            (sliceSelfImprovementError params restrictionPkg x) ∧
+          tensorFailureExpectation strategy.state Z H.toSubMeas ≤
+            sliceSelfImprovementError params restrictionPkg x ∧
+          (∀ h : Polynomial params,
+            IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h ≤ Z)) :
+    SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg := by
+  classical
+  let sliceProj : Fq params → ProjSubMeas (Polynomial params) ι :=
+    fun x => Classical.choose (hslice x)
+  let sliceWitness : Fq params → MIPStarRE.Quantum.Op ι :=
+    fun x => Classical.choose (Classical.choose_spec (hslice x))
+  have hslice_props :
+      ∀ x,
+        CompletenessAtLeast strategy.state (sliceProj x).toSubMeas.liftLeft
+          ((1 - inductionPkg.sliceError x) -
+            sliceSelfImprovementError params restrictionPkg x) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+          (polynomialEvaluationFamily params (sliceProj x).toSubMeas)
+          (sliceSelfImprovementError params restrictionPkg x) ∧
+        BipartiteSSCRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily (sliceProj x).toSubMeas)
+          (sliceSelfImprovementError params restrictionPkg x) ∧
+        SDDRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) (sliceProj x).toSubMeas))
+          (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) (sliceProj x).toSubMeas))
+          (sliceSelfImprovementError params restrictionPkg x) ∧
+        tensorFailureExpectation strategy.state (sliceWitness x) (sliceProj x).toSubMeas ≤
+          sliceSelfImprovementError params restrictionPkg x ∧
+        (∀ h : Polynomial params,
+          IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h ≤ sliceWitness x) := by
+    intro x
+    simpa [sliceProj, sliceWitness] using
+      (Classical.choose_spec (Classical.choose_spec (hslice x)))
+  exact
+    { sliceProj := sliceProj
+      sliceWitness := sliceWitness
+      completeness := fun x => (hslice_props x).1
+      pointConsistency := fun x => (hslice_props x).2.1
+      strongSelfConsistency := fun x => (hslice_props x).2.2.1
+      selfCloseness := fun x => (hslice_props x).2.2.2.1
+      bounded := fun x => (hslice_props x).2.2.2.2.1
+      dominatesAveragePointOperator := fun x h => (hslice_props x).2.2.2.2.2 h }
+
 /-- `thm:ld-pasting-in-induction-section`. -/
 -- NOTE: `FieldModel.{0}` is needed to match the universe at which
 -- `Pasting.ldPasting` was elaborated. See PR #288 discussion.
@@ -2529,10 +2604,11 @@ self-improvement package, this theorem executes the remaining
 `restrict → induct → self-improve → paste` assembly and returns the
 higher-dimensional point-consistency conclusion.
 
-Note: `hselfProducer` remains an explicit input because the current development
-still lacks the public boundary wrapper from `restrictedProbabilities` and
-`selfImprovementInInductionSection` to the restricted-strategy objects recorded
-in `SelfImprovementPackage`; that remaining hand-off is tracked by TODO(#630). -/
+Note: `SelfImprovementPackage.ofSelfImprovementInInductionSection` now packages
+slice-wise restricted-strategy self-improvement outputs once they are supplied,
+but `hselfProducer` remains an explicit input because the current development
+still lacks the public boundary wrapper that produces those slice-wise outputs
+from the restricted-strategy self-improvement hypotheses. -/
 theorem mainInductionByRecursionOnM
     (params : Parameters)
     [FieldModel.{0} params.q]
