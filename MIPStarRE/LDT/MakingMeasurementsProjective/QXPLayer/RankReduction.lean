@@ -512,10 +512,12 @@ Below, `projectiveLowRankSum_of_projectors` materialises these data from an
 exact projector submeasurement `R` satisfying `∑_a R_a ≤ I`, using the
 spectral theorem to prove the matrix identity `rank R_a = trace R_a` and hence
 `∑_a rank(R_a) ≤ dim(ι)`. The public theorem `projectiveLowRankSum` still
-keeps `(auxSpace, t, hAuxDim)` explicit because the rounded family `q` only
-carries the weaker bound `∑_a q_a ≤ (1 + 2√ζ)I`. The broader downstream
-`QXPLayerData` pipeline also still lacks a complex-matrix SVD API, as tracked
-in issue #525. -/
+keeps `(auxSpace, t, hAuxDim)` explicit because the remaining `r > d`
+truncation branch from orthonormalization.tex:559-658 has not yet been
+formalized; `RoundingToProjectorsWitness` only gives the weaker bound
+`∑_a q_a ≤ (1 + 2√ζ)I` (issue #651). The broader downstream `QXPLayerData`
+pipeline still lacks a concrete `X / XHat / P` producer because Mathlib has no
+general complex-matrix SVD API (issue #652). -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome]
@@ -524,10 +526,10 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
     (hζ : 0 ≤ ζ)
     (q : OpFamily Outcome ι)
     (hrounded : RoundingToProjectorsWitness ψ A ζ q)
-    -- TODO(#525): Materialise `(auxSpace, t, hAuxDim)` from the paper's
-    -- "Matrix decomposition of `Q_a`" (orthonormalization.tex:777-795),
-    -- i.e. from a 1-eigenspace ONB for each rounded projector `q.outcome a`
-    -- supplied by `projectiveNonMeasurement` (the paper's `R_a`).
+    -- TODO(#651): Eliminate the explicit `(auxSpace, t, hAuxDim)` parameters
+    -- by formalizing the paper's `r > d` truncation branch
+    -- (orthonormalization.tex:559-658), or equivalently by strengthening the
+    -- rounded-family input to an exact projector submeasurement `∑_a q_a ≤ I`.
     (auxSpace : FiniteHilbertSpace.{uι})
     (t : ProjMeas Outcome auxSpace.carrier)
     (hAuxDim : Fintype.card auxSpace.carrier ≤ Fintype.card ι)
