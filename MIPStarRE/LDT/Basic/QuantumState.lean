@@ -16,7 +16,12 @@ namespace MIPStarRE.LDT
 There is intentionally no global `Inhabited` instance: the zero matrix is PSD but
 not a physical state of unit trace, so an ambient default would silently
 trivialize later statements. Use `IsNormalized` to additionally require
-`τ(ρ) = 1`. -/
+`τ(ρ) = 1`.
+
+This remains the ambient state space for the current LDT development: strategy
+packages in `LDT/Test/StrategyCore.lean`, the SWAP-symmetry API `PermInvState`,
+and the expectation-value lemmas in `LDT/Basic/OperatorExpectations.lean` are all
+stated for arbitrary density matrices, not only pure states. -/
 structure QuantumState (ι : Type*) [Fintype ι] [DecidableEq ι] where
   density : MIPStarRE.Quantum.Op ι := 0
   density_psd : 0 ≤ density := by positivity
@@ -33,7 +38,10 @@ theorem QuantumState.IsNormalized.nonempty {ι : Type*} [Fintype ι] [DecidableE
   by_contra h
   rw [not_nonempty_iff] at h
   letI := h
-  simp [QuantumState.IsNormalized, MIPStarRE.Quantum.normalizedTrace] at hψ
+  rw [QuantumState.IsNormalized] at hψ
+  have hzero : MIPStarRE.Quantum.normalizedTrace ψ.density = 0 := by
+    simp [MIPStarRE.Quantum.normalizedTrace]
+  exact zero_ne_one (hzero.symm.trans hψ)
 
 /-- The scaled rank-one density matrix attached to a state vector.
 

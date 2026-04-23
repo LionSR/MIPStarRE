@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.QuantumState
 import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
