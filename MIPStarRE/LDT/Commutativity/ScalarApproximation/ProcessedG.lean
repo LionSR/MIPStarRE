@@ -1,6 +1,6 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
-import MIPStarRE.LDT.Commutativity.GCommStability.OverlapTwo
+import MIPStarRE.LDT.Commutativity.GCommStability
 
 namespace MIPStarRE.LDT.Commutativity
 
@@ -10,6 +10,56 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+private lemma avgOver_uniform_pointNext_decompose
+    (params : Parameters) [FieldModel params.q]
+    (f : Point params.next → Error) :
+    avgOver (uniformDistribution (Point params.next)) f =
+      avgOver (uniformDistribution (Fq params))
+        (fun x => avgOver (uniformDistribution (Point params))
+          (fun u => f (appendPoint params u x))) := by
+  have hprod :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => avgOver (uniformDistribution (Point params))
+            (fun u => f (appendPoint params u x))) =
+        avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => f (appendPoint params xu.2 xu.1)) := by
+    simpa using
+      (avgOver_uniform_prod (α := Fq params) (β := Point params)
+        (f := fun x u => f (appendPoint params u x))).symm
+  have hswap :
+      avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => f (appendPoint params xu.2 xu.1)) =
+        avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => f (appendPoint params ux.1 ux.2)) := by
+    simpa using
+      (CommutativityPoints.avgOver_uniform_equiv
+        (e := Equiv.prodComm (Fq params) (Point params))
+        (f := fun xu : Fq params × Point params => f (appendPoint params xu.2 xu.1)))
+  have hequiv :
+      avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => f (appendPoint params ux.1 ux.2)) =
+        avgOver (uniformDistribution (Point params.next)) f := by
+    simpa using
+      (CommutativityPoints.avgOver_uniform_equiv
+        (e := CommutativityPoints.pointNextEquiv params)
+        (f := f)).symm
+  calc
+    avgOver (uniformDistribution (Point params.next)) f
+      = avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => f (appendPoint params ux.1 ux.2)) := by
+            simpa using
+              (CommutativityPoints.avgOver_uniform_equiv
+                (e := CommutativityPoints.pointNextEquiv params)
+                (f := f))
+    _ = avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => f (appendPoint params xu.2 xu.1)) := by
+            simpa using hswap.symm
+    _ = avgOver (uniformDistribution (Fq params))
+          (fun x => avgOver (uniformDistribution (Point params))
+            (fun u => f (appendPoint params u x))) := by
+            simpa using hprod.symm
+
 /-! ### Scalar approximation chain (proof of `lem:comm-data-processed-g`)
 
 The paper's proof (`commutativity-G.tex`, lines 72–131) converts
@@ -309,31 +359,21 @@ private lemma evaluatedSlice_scalar_chain_bound
             (evaluatedPointFamily params family)
             (evaluatedSlicePointMeas params strategy) q.1).outcome a))
   let phase2Removed : EvaluatedSliceQuestion params → Error := fun q =>
-    ∑ ah : StabilityOneOutcome params,
+    ∑ b : Fq params, ∑ a : Fq params,
       ev strategy.state
         (leftTensor (ι₂ := ι)
-            (((evaluatedSliceFirstFactor params family q).outcome ah.1) *
-              ((evaluatedSliceSecondFactor params family q).outcome
-                (ah.2 (truncatePoint params q.2))) *
-              ((evaluatedSliceFirstFactor params family q).outcome ah.1)) *
-          rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2))
-  let phase5Inserted : EvaluatedSliceQuestion params → Error := fun q =>
-    ∑ gb : StabilityTwoOutcome params,
-      ev strategy.state
-        (leftTensor (ι₂ := ι)
-            (((evaluatedSliceFirstFactor params family q).outcome
-                (gb.1 (truncatePoint params q.1))) *
-              ((evaluatedSliceSecondFactor params family q).outcome gb.2) *
-              ((G (pointHeight params q.1)).total)) *
-          rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).outcome gb.1))
+            (((evaluatedSliceFirstFactor params family q).outcome a) *
+              ((evaluatedSliceSecondFactor params family q).outcome b) *
+              ((evaluatedSliceFirstFactor params family q).outcome a)) *
+          rightTensor (ι₁ := ι) ((evaluatedSlicePointMeas params strategy q.2).outcome b))
   let phase5Removed : EvaluatedSliceQuestion params → Error := fun q =>
-    ∑ gb : StabilityTwoOutcome params,
+    ∑ a : Fq params, ∑ b : Fq params,
       ev strategy.state
         (leftTensor (ι₂ := ι)
-            (((evaluatedSliceFirstFactor params family q).outcome
-                (gb.1 (truncatePoint params q.1))) *
-              ((evaluatedSliceSecondFactor params family q).outcome gb.2)) *
-          rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).outcome gb.1))
+            (((evaluatedSliceSecondFactor params family q).outcome b) *
+              ((evaluatedSliceFirstFactor params family q).outcome a) *
+              ((evaluatedSliceSecondFactor params family q).outcome b)) *
+          rightTensor (ι₁ := ι) ((evaluatedSlicePointMeas params strategy q.1).outcome a))
   -- Phase 1: `eq:gcom8 -> eq:apply-add-an-a-once`.
   have hphase1 :
       |avgOver 𝒟 avgABAB - avgOver 𝒟 phase1Inserted| ≤ 2 * Real.sqrt zeta := by
@@ -343,8 +383,25 @@ private lemma evaluatedSlice_scalar_chain_bound
   -- Phase 2: remove the trailing `G^y` from the phase-1 inserted term via
   -- `gCommStability_overlap` and the scalar rewrite to the stability-one family.
   have hphase2 :
-      avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed ≤ Real.sqrt zeta := by
-    sorry
+      |avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed| ≤ Real.sqrt zeta := by
+    let defectY : Fq params → Error := fun y =>
+      ∑ g : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
+            rightTensor (ι₁ := ι)
+              (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g))
+    have hscalar :=
+      gCommStability_scalar params strategy zeta _hnorm family G _hG _hbound
+    -- rewrite the averaged evaluated-slice difference to the paper-faithful
+    -- scalar defect from `gCommStability_scalar`
+    simpa [defectY, 𝒟, phase1Inserted, phase2Removed, gCommStabilityR,
+      IdxPolyFamily.averagedSlicePointEvaluationOperator,
+      evaluatedSlicePointMeas, averageIdxSubMeas, avgOver,
+      evaluatedSliceFirstFactor, evaluatedSliceSecondFactor, evaluatedPointFamily,
+      IdxPolyFamily.evaluatedAtNextPoint, evaluateAt, pointHeight_appendPoint,
+      truncatePoint_appendPoint, leftTensor_mul_leftTensor, mul_assoc,
+      sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using hscalar
   -- Phase 3: insert Alice's measurement on the first coordinate (the BABA-side
   -- insertion used before the point-commutation step).
   have hphase3 :
@@ -352,19 +409,26 @@ private lemma evaluatedSlice_scalar_chain_bound
     simpa [𝒟, avgBABA, phase3Inserted] using
       evaluatedSlice_phaseThree_insert_bound
         params strategy zeta _hnorm family hcombined_fst
-  -- Phase 4: swap the two point measurements in the middle term using
-  -- `evaluatedSlice_phaseFour_pointSwap_bound`.
-  have hphase4 : True := by
-    sorry
-  -- Phase 5: remove the trailing `G^x` from the swapped middle term via
-  -- `gCommStabilityTwo_overlap` and the phase-5 scalar rewrite.
+  -- Phase 5: remove the trailing `G^x` from the BABA-side inserted term via
+  -- the direct boundedness estimate `gCommStabilityTwo_scalar`.
   have hphase5 :
-      avgOver 𝒟 phase5Inserted - avgOver 𝒟 phase5Removed ≤
-        Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
-    sorry
-  -- Phases 6/7: reverse the two `eq:add-an-a` insertions using projectivity.
-  have hphase67 : True := by
-    sorry
+      |avgOver 𝒟 phase3Inserted - avgOver 𝒟 phase5Removed| ≤ Real.sqrt zeta := by
+    let defectX : Fq params → Error := fun x =>
+      ∑ g : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
+            rightTensor (ι₁ := ι)
+              (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))
+    have hscalar :=
+      gCommStabilityTwo_scalar params strategy zeta _hnorm family G _hG _hbound
+    simpa [defectX, 𝒟, phase3Inserted, phase5Removed, gCommStabilityTwoR,
+      IdxPolyFamily.averagedSlicePointEvaluationOperator,
+      evaluatedSlicePointMeas, averageIdxSubMeas, avgOver,
+      evaluatedSliceFirstFactor, evaluatedSliceSecondFactor, evaluatedPointFamily,
+      IdxPolyFamily.evaluatedAtNextPoint, evaluateAt, pointHeight_appendPoint,
+      truncatePoint_appendPoint, leftTensor_mul_leftTensor, mul_assoc,
+      sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using hscalar
   -- Phases 8/9: postprocessed self-consistency transports `BAB` to `ABA`.
   have htail :
       |avgOver 𝒟 avgBAB - avgOver 𝒟 avgABA| ≤ 2 * Real.sqrt zeta := by
