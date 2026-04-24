@@ -256,7 +256,7 @@ theorem ldPastingInInductionSection
         eps delta gamma kappa zeta k := by
   have hldPasting :=
     Pasting.ldPasting params strategy eps delta gamma kappa zeta
-      hgood _hgamma_le _hzeta_le _hdq_le hd
+      hgood _hgamma_le _hzeta_le _hdq_le
       family hcomplete hcons hself hbound k hk_pos hk
   obtain ⟨H, _hHdef, hH⟩ := hldPasting
   refine ⟨H, ?_⟩
@@ -3345,8 +3345,7 @@ theorem mainInductionPublicWrapper
     (hrec :
       let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
         SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
-          (restrictedProbabilities params strategy eps delta gamma hgood
-            haxisWeightedBound hdiagonalWeightedBound)
+          (restrictedProbabilities params strategy eps delta gamma hgood)
       ∀ x,
         ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
           ConsRel strategy.state (uniformDistribution (Point params))
@@ -3361,8 +3360,7 @@ theorem mainInductionPublicWrapper
     (hselfProducer :
       let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
         SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
-          (restrictedProbabilities params strategy eps delta gamma hgood
-            haxisWeightedBound hdiagonalWeightedBound)
+          (restrictedProbabilities params strategy eps delta gamma hgood)
       ∀ hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k,
         SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
     (hk_pos : 1 ≤ k)
