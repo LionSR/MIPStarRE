@@ -179,19 +179,22 @@ lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
 
 /-- **Rounding to projectors** (`lem:projective-non-measurement`).
 
-From the estimate `eq:A-looks-projective`, construct a family `R_a` of
-projectors close to `A_a` whose total is bounded by `(1 + 2√ζ)I`. -/
-lemma projectiveNonMeasurement {Outcome : Type uOutcome}
+This declaration now records the honest paper-facing statement consumed by the
+QXP rank-reduction layer: a chosen family `R_a` equipped with
+`RoundingToProjectorsWitness ψ A ζ R`. The abbrev gives that statement a stable
+Lean name for the blueprint and for later API cleanup, while downstream local
+lemmas usually carry a chosen witness `(q, hrounded)` directly once the rounded
+family has been fixed. The old `ProjectiveNonMeasurementBridgePackage`
+placeholder has been deleted; producing such a witness from
+`eq:A-looks-projective` remains an upstream spectral-truncation obligation
+rather than a downstream QXP bridge. -/
+abbrev projectiveNonMeasurement {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (ζ : Error)
-    (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ) :
-    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
-      ∃ R : OpFamily Outcome ι,
-        RoundingToProjectorsWitness ψ A ζ R := by
-  intro hsource
-  exact hbridge.fromSourceAlmostProjective hsource
+    (A : Measurement Outcome ι) (ζ : Error) : Prop :=
+  ∃ R : OpFamily Outcome ι,
+    RoundingToProjectorsWitness ψ A ζ R
 
 /-- For a Hermitian idempotent matrix, every eigenvalue is either `0` or `1`. -/
 lemma projector_eigenvalues_zero_or_one {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -499,11 +502,13 @@ projective measurement `T_a`, so that `Q_a` remains close to `A_a`, its total
 stays bounded by `(1 + 2√ζ)I`, and the auxiliary dimension is at most the
 original ambient dimension.
 
-This theorem starts from a chosen rounded family `R_a` carrying the previous
-step's witness `RoundingToProjectorsWitness ψ A ζ q`. In the paper
-(orthonormalization.tex), Lem 5.5 begins exactly from the family `R_a` supplied
-by `lem:projective-non-measurement`; threading that witness directly removes the
-downstream dependence on `ProjectiveNonMeasurementBridgePackage`.
+This theorem starts from a chosen rounded family `R_a` carrying the explicit
+witness `RoundingToProjectorsWitness ψ A ζ q`; equivalently, it consumes a
+concrete witness of the statement `projectiveNonMeasurement ψ A ζ`. In the
+paper (orthonormalization.tex), Lem 5.5 begins exactly from the family `R_a`
+supplied by `lem:projective-non-measurement`, so the downstream QXP layer now
+threads that witness directly instead of passing through a separate bridge
+package.
 
 The auxiliary space `ℂ^m` and the projective measurement
 `T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent
