@@ -141,6 +141,58 @@ theorem classicalTestSoundness
       PointAnswerSoundnessConclusion params a slackBound slack := by
   exact hPS hpass
 
+/-- Vacuous-regime fallback for `thm:main-formal`.
+
+Whenever the envelope `mainFormalError params k eps` has already saturated past
+`1`, the three target `ConsRel` relations hold trivially because
+`bipartiteConsError` under a probability question distribution is bounded by
+`1`. This is the Lean counterpart of the paper's observation that the bound it
+is proving is trivial when the error scale exceeds `1` (see
+`references/ldt-paper/inductive_step.tex:415`).
+
+In the `mainFormal` assembly this wrapper handles the regime
+`params.m * params.d ≤ k < 400 * params.m * params.d`, where the Section 6 /
+Pasting-side hypothesis `400 * params.m * params.d ≤ k` fails. The
+complementary regime `400 * params.m * params.d ≤ k` feeds directly into the
+public induction/pasting wrappers (`mainInductionByRecursionOnM` in
+`MIPStarRE.LDT.MainInductionStep`). The arithmetic bridge
+`1 ≤ mainFormalError params k eps` itself is discharged inside the proof of
+`mainFormal` from the envelope inflation chain already packaged by
+`errorCascade_le_mainFormalError`; see TODO(#634).
+
+Witness choice: the `default` projective measurement concentrates all mass on
+the distinguished polynomial, yielding valid `ProjMeas` instances whose role is
+purely to witness the existential in the trivial regime. -/
+theorem mainFormal_trivial_witness
+    (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι)
+    (eps : Error) (k : ℕ)
+    (herr : 1 ≤ mainFormalError params k eps) :
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params G_A.toSubMeas)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
+          (mainFormalError params k eps) := by
+  classical
+  haveI : Inhabited (Polynomial params) :=
+    ⟨⟨0, by intro i; simp [MvPolynomial.degreeOf_zero]⟩⟩
+  let trivialG : ProjMeas (Polynomial params) ι := default
+  refine ⟨trivialG, trivialG, ?_, ?_, ?_⟩
+  · exact ⟨le_trans
+      (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized _ _) herr⟩
+  · exact ⟨le_trans
+      (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized _ _) herr⟩
+  · exact ⟨le_trans
+      (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized _ _) herr⟩
+
 /--
 `thm:main-formal` from `test_definition.tex`.
 
@@ -148,6 +200,20 @@ The bipartite tensor placement follows the paper:
 - **1a**: `A^A_u ⊗ I ≈_ν I ⊗ G^B_{[g(u)=a]}` — G_B on **right**
 - **1b**: `I ⊗ A^B_u ≈_ν G^A_{[g(u)=a]} ⊗ I` — G_A on **left**, A^B on **right**
 - **2**: `G^A_g ⊗ I ≈_ν I ⊗ G^B_g` — G_B on **right**
+
+The `k`-bound boundary matches the paper (`references/ldt-paper/test_definition.tex:183`):
+the public hypothesis is `params.m * params.d ≤ k`, not the stronger
+`400 * params.m * params.d ≤ k` used by the Section 6 / Pasting-side wrappers.
+The planned assembly case-splits on `k`:
+
+* Regime `400 * params.m * params.d ≤ k`: invoke the induction / pasting
+  wrappers (`MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM` and
+  the still-pending Section 6 public wrapper tracked by #630) to discharge the
+  three `ConsRel` targets through the paper's cascade.
+* Regime `params.m * params.d ≤ k < 400 * params.m * params.d`: the final
+  envelope `mainFormalError params k eps` saturates past `1` (paper
+  observation from `references/ldt-paper/inductive_step.tex:415`), and
+  `mainFormal_trivial_witness` supplies the witness directly.
 
 Fixes #137, #239.
 -/
@@ -173,19 +239,25 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  -- TODO(Section 3): Step 1 symmetrization (`strategySymmetrization_*`) and
-  -- the final scalar envelope (`errorCascade_le_mainFormalError`) are now
-  -- formalized. Section 6 has the internal base-case / successor-step assembly
-  -- (`mainInductionBaseCase`, `mainInductionFromPackages`,
-  -- `mainInductionByRecursionOnM`), so the remaining induction-side gap here,
-  -- tracked by TODO(#630), is to furnish the high-level inputs those theorems
-  -- still expect: the weighted restricted-probability bounds and a
-  -- restricted-strategy self-improvement producer. After that, this file still
-  -- needs the paper's unsymmetrization, Schwartz-Zippel, and final
-  -- orthonormalization/projectivization transport into the three displayed
-  -- `ConsRel` conclusions; those last three transports will apply
-  -- `errorCascade_le_mainFormalError` directly at the point-A consistency,
-  -- point-B consistency, and self-consistency usage sites.
+  -- TODO(#634): The remaining proof case-splits on the `k`-bound boundary
+  -- made explicit above.
+  -- * `hlarge : 400 * params.m * params.d ≤ k` branch: Step 1 symmetrization
+  --   (`strategySymmetrization_*`) and the final scalar envelope
+  --   (`errorCascade_le_mainFormalError`) are now formalized. Section 6 has the
+  --   internal base-case / successor-step assembly (`mainInductionBaseCase`,
+  --   `mainInductionFromPackages`, `mainInductionByRecursionOnM`), so the
+  --   induction-side gap here, tracked by #630, is to furnish the high-level
+  --   inputs those theorems still expect: the weighted restricted-probability
+  --   bounds and a restricted-strategy self-improvement producer. After that,
+  --   this file still needs the paper's unsymmetrization, Schwartz-Zippel, and
+  --   final orthonormalization/projectivization transport into the three
+  --   displayed `ConsRel` conclusions; those last three transports will apply
+  --   `errorCascade_le_mainFormalError` directly at the point-A consistency,
+  --   point-B consistency, and self-consistency usage sites.
+  -- * `hsmall : k < 400 * params.m * params.d` branch: combine the cascade
+  --   bounds with `params.m * params.d ≤ k` and `0 < k` to conclude
+  --   `1 ≤ mainFormalError params k eps`, then invoke
+  --   `mainFormal_trivial_witness`.
   sorry
 
 end Test
