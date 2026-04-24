@@ -575,7 +575,8 @@ Last updated: 2026-04-21
   direct self-consistency reindexing proof plus bridge-packaged conditioning
   bounds.
 - Proof agent B: completed `MainInductionStep.mainInduction` by replacing the
-  local `sorry` with an explicit `MainInductionBridgePackage` witness handoff.
+  local `sorry` with an explicit `MainInductionBridgePackage` witness handoff
+  (historical; that bridge was later removed by PR #640).
 - Proof agent C: completed `Test.mainFormal` via an explicit
   `MainFormalBridgePackage` witness handoff, then reverted that theorem
   weakening after review.
@@ -657,7 +658,7 @@ Last updated: 2026-04-21
 
 **Infrastructure added:**
 - `MainInductionStep/Statements.lean`: `RestrictedProbabilitiesBridgePackage`
-- `MainInductionStep/Statements.lean`: `MainInductionBridgePackage`
+- `MainInductionStep/Statements.lean`: `MainInductionBridgePackage` (historical; removed by PR #640)
 - `MainInductionStep/Theorems.lean`: local reindexing helpers for the
   restricted self-consistency average
 
@@ -719,7 +720,7 @@ Last updated: 2026-04-21
 ### MainInductionStep/Theorems.lean (0 sorrys)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
-| `mainInduction` | COMPLETED | Replaced the local `sorry` by an explicit `MainInductionBridgePackage` witness handoff, matching the repository's bridge-package style for unformalized upstream assembly |
+| `mainInduction` | COMPLETED (historical) | Replaced the local `sorry` by an explicit `MainInductionBridgePackage` witness handoff, matching the repository's bridge-package style for unformalized upstream assembly; the bridge itself was later removed by PR #640 |
 
 ### Test/MainTheorem.lean (1 sorry)
 | Lemma | Status | Blocker |
@@ -754,7 +755,8 @@ Last updated: 2026-04-21
 - `MainInductionStep.mainInduction` proved.
 - `MainInductionStep`: added `MainInductionBridgePackage` so the final theorem
   now exposes the still-unformalized induction assembly through an explicit
-  bridge witness instead of a local `sorry`.
+  bridge witness instead of a local `sorry` (historical; the bridge was later
+  removed by PR #640).
 - `MainInductionStep`: `lake build MIPStarRE.LDT.MainInductionStep.Theorems`
   now succeeds, and `grep` finds no executable `sorry`s anywhere under
   `MIPStarRE/LDT/MainInductionStep`.

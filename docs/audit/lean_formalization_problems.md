@@ -180,12 +180,19 @@ Why this is a problem:
 - The Lean “rewrite” theorem does not state or prove the paper’s rewrite formula.
 - It replaces the proposition by a definitional equality placeholder.
 
-### 7. Fourier orthonormality is hard-coded instead of derived from `fourierBasisState`
+### 7. Historical note (resolved by PRs #527, #542, and #576): Fourier orthonormality was hard-coded instead of derived from `fourierBasisState`
 
-- Lean location: `MIPStarRE/LDT/ExpansionHypercubeGraph/Defs.lean:517-520`, `:539-543`, `:567-569`
-- Severity: **critical**
+- Historical Lean location: `MIPStarRE/LDT/ExpansionHypercubeGraph/Defs.lean:517-520`, `:539-543`, `:567-569`
+- Historical severity: **critical**
 
-Lean code:
+**Update (2026-04-23): resolved on current `main`.** The live Chapter 5 code no longer
+hard-codes `fourierBasisInnerProduct := if α = β then 1 else 0`, and the orphan
+`EigenvectorsStatement` wrapper is gone. Instead, `Defs/Fourier.lean` computes the
+inner product from the actual Fourier basis via `fourierBasisState_inner_product` and
+exposes the paper-facing spectral facts as standalone lemmas
+`eigenvectors_orthonormality`, `eigenvectors_card`, and `eigenvectors`.
+
+Historical Lean code:
 
 ```lean
 def fourierBasisInnerProduct (params : Parameters)
@@ -202,17 +209,25 @@ What the paper says:
 - `references/ldt-paper/expansion.tex:50-72` computes
   `⟨φ_α | φ_β⟩ = 1` if `α = β` and `0` otherwise from the explicit Fourier basis vector formula, using `prop:fourier-fact-vector`.
 
-Why this is a problem:
+Why this was a problem:
 
-- The Lean orthonormality statement is satisfied by definition rather than by the actual vector formula.
-- This is a placeholder definition masquerading as a proved theorem.
+- The old Lean orthonormality statement was satisfied by definition rather than by the actual vector formula.
+- The old API hid that scaffolding behind a theorem-shaped wrapper.
 
-### 8. `globalRewrite` is weakened to existential packaging and uses `default` as witness
+### 8. Historical note (resolved by PRs #527 and #542): `globalRewrite` packaged an existential and used `default` as witness
 
-- Lean location: `MIPStarRE/LDT/ExpansionHypercubeGraph/Theorems.lean:26-30`, `:139-153`
-- Severity: **medium**
+- Historical Lean location: `MIPStarRE/LDT/ExpansionHypercubeGraph/Theorems.lean:26-30`, `:139-153`
+- Historical severity: **medium**
 
-Lean code:
+**Update (2026-04-23): resolved on current `main`.** `globalRewrite` still packages the
+paper's displayed decomposition as an existential `∃ decomp`, but the witness is now the
+canonical centered-family decomposition `canonicalGlobalVarianceDecomposition params A`,
+and `globalVarianceTraceWitness` consumes `decomp.orthogonalComponent` rather than
+ignoring the decomposition. The live `GlobalVarianceDecomposition` records
+`averageComponent`, the centered residual family `u ↦ A u - A_avg`,
+`orthogonal_sum_zero`, and the pointwise decomposition `A u = A_avg + A_⊥^u`.
+
+Historical Lean code:
 
 ```lean
 structure GlobalRewriteStatement ... where
@@ -230,10 +245,10 @@ What the paper says:
   `A_comb = |φ_0⟩ ⊗ A_0 + |φ_⊥⟩ ⊗ A_⊥`
   and then identifies the global variance with the orthogonal component.
 
-Why this is a problem:
+Why this was a problem:
 
-- The Lean statement is materially weaker than the paper: it only asks for existence of some decomposition.
-- The implementation then uses `default`, so the proof object does not carry the paper’s actual decomposition.
+- The old Lean statement was materially weaker than the paper: it only asked for existence of some decomposition.
+- The old implementation then used `default`, so the proof object did not carry the paper’s actual decomposition.
 
 ### 9. `AlmostProjMeasStatement` does not encode the paper’s almost-projectivity claim
 
@@ -288,10 +303,10 @@ Why this is a problem:
 - The Lean statement only stores a witness type.
 - It omits the actual mathematical content of the paper’s lemma.
 
-### 11. The restricted diagonal strategy is modeled as a submeasurement, not a measurement
+### 11. [resolved] The restricted diagonal strategy now uses a measurement-valued encoding
 
-- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:30-46`, `:177-186`
-- Severity: **critical**
+- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:28-58`, `:281-320`
+- Status: **resolved in #593**
 
 Lean code:
 
@@ -299,57 +314,30 @@ Lean code:
 structure RestrictedSymStrat ... where
   ...
   diagonalMeasurement :
-    IdxProjSubMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
-
-TODO(#195): This currently drops ambient outcomes whose restriction is not
-represented in `DiagonalLinePolynomial params`, so it only produces a
-submeasurement.
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι
 ```
 
-What the paper says:
+Resolution:
 
-- `references/ldt-paper/inductive_step.tex:374-412` treats the restricted diagonal-line branch as a genuine restricted test, exactly parallel to the axis-parallel branch.
-- The blueprint says the same in `blueprint/src/chapter/ch10_induction.tex:23-37`.
+- `restrictDiagonalMeasurement` now postprocesses the ambient diagonal measurement to its base-point value and re-embeds it into the honest slice answer space, so the restricted diagonal branch is packaged as a genuine projective measurement.
+- This removes the earlier completeness loss that motivated the old audit warning.
 
-Why this is a problem:
+### 12. [resolved] The diagonal branch in `restrictedProbabilities` now uses the paper's `m/(m+1)` and `(m+1)/m` factors
 
-- The Lean model drops outcomes and loses completeness on the diagonal branch.
-- This is the root cause of the later wrong loss factors.
-
-### 12. The diagonal branch in `restrictedProbabilities` uses `1 / q` and `q` instead of `m/(m+1)` and `(m+1)/m`
-
-- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:337-353`, `MIPStarRE/LDT/MainInductionStep/Statements.lean:101-125`, `MIPStarRE/LDT/MainInductionStep/Theorems.lean:81-99`
-- Severity: **critical**
+- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:429-438`, `MIPStarRE/LDT/MainInductionStep/Statements.lean:148-191`, `MIPStarRE/LDT/MainInductionStep/Theorems.lean:1039-1120`
+- Status: **resolved in #593**
 
 Lean code:
 
 ```lean
-noncomputable def sliceDiagonalDirectionWeight (params : Parameters) : Error :=
-  1 / (params.q : Error)
-
-noncomputable def sliceDiagonalConditioningLoss (params : Parameters) : Error :=
-  (params.q : Error)
+averageRestrictedDiagonalError params profile ≤
+  sliceConditioningLoss params * gamma
 ```
 
-and
+Resolution:
 
-```lean
-avgOver ... (fun x => sliceDiagonalDirectionWeight params * profile.diagonal x) ≤ gamma ∧
-averageRestrictedDiagonalError params profile
-  ≤ sliceDiagonalConditioningLoss params * gamma
-```
-
-What the paper says:
-
-- `references/ldt-paper/inductive_step.tex:374-388` states
-  `E_x γ_x ≤ ((m+1)/m) γ`,
-  exactly parallel to the axis-parallel branch.
-- The blueprint matches this at `blueprint/src/chapter/ch10_induction.tex:23-33`.
-
-Why this is a problem:
-
-- The Lean statement has a different theorem type from the paper and blueprint.
-- This is not just weaker bookkeeping; it is a different quantitative claim.
+- `references/ldt-paper/inductive_step.tex:374-388` and `blueprint/src/chapter/ch10_induction.tex:27-38` use the same conditioning loss `((m+1)/m)` for the axis-parallel and diagonal branches.
+- The Lean statement now packages the diagonal average bound with that same constant and no longer routes it through a separate diagonal-only surrogate API.
 
 ### 13. The global-variance layer still carries stale mismatch TODOs
 
@@ -371,28 +359,15 @@ Why this is a problem:
 
 - These TODOs are not stale editorial notes; they identify a still-live model mismatch.
 
-### 14. The induction-step files still carry stale mismatch TODOs for the diagonal branch
+### 14. [resolved] The stale diagonal-branch mismatch TODOs were cleared from the induction-step layer
 
-- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean:35-39`, `:179-183`, `:341-350`; `MIPStarRE/LDT/MainInductionStep/Statements.lean:103-107`; `MIPStarRE/LDT/MainInductionStep/Theorems.lean:93-97`
-- Severity: **medium**
+- Lean location: `MIPStarRE/LDT/MainInductionStep/Defs.lean`, `Statements.lean`, `Theorems.lean`
+- Status: **resolved in #593**
 
-Lean code:
+Resolution:
 
-```lean
-TODO(#195): The paper's restricted strategy treats the diagonal branch as a
-genuine projective measurement ...
-
-TODO(#195): The paper/blueprint statement uses the same `((m + 1) / m)` loss ...
-```
-
-What the paper says:
-
-- `references/ldt-paper/inductive_step.tex:374-412` and `blueprint/src/chapter/ch10_induction.tex:23-37` do not introduce a special `q`-dependent diagonal loss.
-
-Why this is a problem:
-
-- These comments correctly record an unfixed theorem-faithfulness bug.
-- They should be treated as active audit findings, not harmless TODO noise.
+- The old closed-issue TODO comments were removed once the diagonal branch was upgraded to a projective-measurement encoding and `RestrictedProbabilitiesStatement` was aligned with the paper's shared `((m + 1) / m)` conditioning loss.
+- The remaining MainInductionStep commentary now explains the current encoding instead of pointing to a closed issue.
 
 ### 15. The expansion layer still carries a stale normalization-convention TODO
 
@@ -433,10 +408,10 @@ I searched `MIPStarRE/LDT` for definitions whose names appear only at their defi
   - `matrixPolynomialWeightSqrtOperator`
   - ~~`interpolateCompletedSlices`~~ (resolved: definition faithful and degree bound proven; see §5)
   - `laplacianDifferenceForm`
-  - `fourierBasisInnerProduct`
+  - ~~`fourierBasisInnerProduct`~~ (resolved: now derived from the actual Fourier basis inner product; see §7)
 - Wrong or weakened theorem statements:
   - `generalizeB` / `localVarianceOfPoints` / `globalVarianceOfPoints`
-  - `globalRewrite`
+  - ~~`globalRewrite`~~ (resolved: canonical decomposition witness is operational; see §8)
   - `AlmostProjMeasStatement` / `consistencyToAlmostProjective`
   - `SpectralTruncationStatement` / `spectralTruncateAlmostProjective`
   - `RestrictedProbabilitiesStatement`

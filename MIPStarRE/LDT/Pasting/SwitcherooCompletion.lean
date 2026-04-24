@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Pasting.SwitcherooContraction
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
+import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
 
 /-!
 # Section 12 pasting: switcheroo completion bounds
@@ -1037,13 +1037,6 @@ private lemma switcherooAggregateLeftFrontRaw_close_firstSplitRaw
     simpa using hclose
   simpa [hleft', hright', abs_sub_comm] using hclose'
 
-/- Heartbeat budget: the center-identification proof expands two nested uniform
-averages and rewrites them through SWAP symmetry before collapsing back to the
-target scalar center. This normalization-heavy `avgOver` / `rightTensor` rewrite
-is stable at 10M heartbeats. -/
-set_option maxHeartbeats 10000000 in
--- Expanding the nested averages and total operators for the center comparison is
--- expensive enough to require a larger heartbeat budget.
 /-- SWAP symmetry identifies the two scalar centers used in the switcheroo
 argument. -/
 private lemma switcherooCompletePartCenter_eq_target
@@ -1063,296 +1056,29 @@ private lemma switcherooCompletePartCenter_eq_target
         Preliminaries.middleSandwichExpectation ψbi
           (uniformDistribution (SliceQuestion params))
           (completePartProjFamily params family) (((M y).toSubMeas).total))
-      = avgOver (uniformDistribution (SliceQuestion params)) (fun y =>
-          avgOver (uniformDistribution (SliceQuestion params)) (fun x =>
-            ev ψbi
-              (leftTensor (ι₂ := ι) (((M y).toSubMeas).total) *
-                rightTensor (ι₁ := ι) ((completePartSubMeas params family x).total)))) := by
-            apply avgOver_congr
-            intro y
-            simp [Preliminaries.middleSandwichExpectation, completePartProjFamily]
+      = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+          ev ψbi
+            (opTensor
+              (((M q.2).toSubMeas).total)
+              ((completePartSubMeas params family q.1).total))) := by
+          simpa using
+            switcherooAggregateMGCenterComplete_eq_opTensor_avg
+              (ι := ι) (params := params) (ψbi := ψbi) (family := family) (M := M)
     _ = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
           ev ψbi
-            (leftTensor (ι₂ := ι) (((M q.2).toSubMeas).total) *
-              rightTensor (ι₁ := ι) ((completePartSubMeas params family q.1).total))) := by
-            let F : SliceQuestion params → SliceQuestion params → Error :=
-              fun y x =>
-                ev ψbi
-                  (leftTensor (ι₂ := ι) (((M y).toSubMeas).total) *
-                    rightTensor (ι₁ := ι) ((completePartSubMeas params family x).total))
-            have hprod :
-                avgOver (uniformDistribution (SliceQuestion params)) (fun y =>
-                    avgOver (uniformDistribution (SliceQuestion params)) (fun x => F y x)) =
-                  avgOver (uniformDistribution (SlicePairQuestion params))
-                    (fun q => F q.1 q.2) := by
-              simpa [SlicePairQuestion, SliceQuestion] using
-                (avgOver_uniform_prod
-                  (α := SliceQuestion params)
-                  (β := SliceQuestion params)
-                  (f := F)).symm
-            have hswap :
-                avgOver (uniformDistribution (SlicePairQuestion params))
-                    (fun q => F q.1 q.2) =
-                  avgOver (uniformDistribution (SlicePairQuestion params))
-                    (fun q => F q.2 q.1) := by
-              simpa [SlicePairQuestion, F] using
-                (avgOver_uniform_equiv
-                  (e := Equiv.prodComm (SliceQuestion params) (SliceQuestion params))
-                  (f := fun q : SlicePairQuestion params => F q.1 q.2))
-            calc
-              avgOver (uniformDistribution (SliceQuestion params)) (fun y =>
-                  avgOver (uniformDistribution (SliceQuestion params)) (fun x => F y x))
-                = avgOver (uniformDistribution (SlicePairQuestion params))
-                    (fun q => F q.1 q.2) := hprod
-              _ = avgOver (uniformDistribution (SlicePairQuestion params))
-                    (fun q => F q.2 q.1) := hswap
-              _ = avgOver (uniformDistribution (SlicePairQuestion params))
-                    (fun q =>
-                      ev ψbi
-                        (leftTensor (ι₂ := ι) (((M q.2).toSubMeas).total) *
-                          rightTensor (ι₁ := ι)
-                            ((completePartSubMeas params family q.1).total))) := by
-                          rfl
-    _ = avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
-          ev ψbi
-            (leftTensor (ι₂ := ι) ((completePartSubMeas params family q.1).total) *
-              rightTensor (ι₁ := ι) (((M q.2).toSubMeas).total))) := by
-            apply avgOver_congr
-            intro q
-            simpa [leftTensor_mul_rightTensor_eq_opTensor] using
-              switcheroo_ev_opTensor_swap ψbi hfix (((M q.2).toSubMeas).total)
-                ((completePartSubMeas params family q.1).total)
-    _ = switcherooAggregateTarget params ψbi family M := by
-          unfold switcherooAggregateTarget
+            (opTensor
+              ((completePartSubMeas params family q.1).total)
+              (((M q.2).toSubMeas).total))) := by
           apply avgOver_congr
           intro q
-          rw [show ((M q.2).toSubMeas).total = ∑ o : Outcome, (M q.2).outcome o by
-            exact (M q.2).sum_eq_total.symm]
-          calc
-            ev ψbi
-                (leftTensor (ι₂ := ι) ((completePartSubMeas params family q.1).total) *
-                  rightTensor (ι₁ := ι) (∑ o : Outcome, (M q.2).outcome o))
-              = ev ψbi
-                  (leftTensor (ι₂ := ι) ((completePartSubMeas params family q.1).total) *
-                    ∑ o : Outcome, rightTensor (ι₁ := ι) ((M q.2).outcome o)) := by
-                      congr 1
-                      rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ]
-            _ = ev ψbi
-                  (∑ o : Outcome,
-                    leftTensor (ι₂ := ι) ((completePartSubMeas params family q.1).total) *
-                      rightTensor (ι₁ := ι) ((M q.2).outcome o)) := by
-                        rw [Matrix.mul_sum]
-            _ = ∑ o : Outcome,
-                  ev ψbi
-                    (leftTensor (ι₂ := ι) ((completePartSubMeas params family q.1).total) *
-                      rightTensor (ι₁ := ι) ((M q.2).outcome o)) := by
-                        rw [ev_sum]
-
-/-- The one-outcome complete-part family inherits self-consistency from the slice family. -/
-lemma completePartProjFamily_selfConsistency_generic
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (zeta : Error)
-    (hself : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    SDDRel ψbi
-      (uniformDistribution (SliceQuestion params))
-      (switcherooSelfConsistencyLeft params (completePartProjFamily params family))
-      (switcherooSelfConsistencyRight params (completePartProjFamily params family))
-      zeta := by
-  rcases hself.completePartSelfConsistency with ⟨hself_bound⟩
-  constructor
-  unfold sddError at *
-  calc
-    avgOver (uniformDistribution (SliceQuestion params))
-        (fun x =>
-          qSDD ψbi
-            ((switcherooSelfConsistencyLeft params (completePartProjFamily params family)) x)
-            ((switcherooSelfConsistencyRight params (completePartProjFamily params family)) x))
-      ≤
-        avgOver (uniformDistribution (SliceQuestion params))
-          (fun x =>
-            qSDD ψbi
-              ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
-              ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x)) := by
-            apply avgOver_mono
-            intro x
-            simpa [switcherooSelfConsistencyLeft, switcherooSelfConsistencyRight,
-              completePartProjFamily, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
-              qSDD_completePart_le_slice params ψbi family x
-    _ ≤ zeta := hself_bound
-
-/-- The second positive switcheroo term is close to the swapped center coming
-from the complete-part family.
-
-This aggregate form matches the four-term `qSDDOp` expansion: the projective
-family in the sandwich is the one-outcome complete part `G^x`, not the original
-slice-outcome family. -/
-private lemma switcheroo_second_aggregate_term_close
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (hnorm : ψbi.IsNormalized)
-    (family : IdxPolyFamily params ι)
-    (M : IdxProjSubMeas (Fq params) Outcome ι)
-    (zeta : Error)
-    (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    let secondTerm := switcherooAggregateSecondTerm params ψbi family M
-    let commonTerm :=
-      avgOver (uniformDistribution (SliceQuestion params))
-        (fun y => Preliminaries.middleSandwichExpectation ψbi
-          (uniformDistribution (SliceQuestion params))
-          (completePartProjFamily params family) (((M y).toSubMeas).total))
-    |secondTerm - commonTerm| ≤ 2 * Real.sqrt zeta := by
-  let 𝒟x : Distribution (SliceQuestion params) := uniformDistribution (SliceQuestion params)
-  let Gcomplete : IdxProjSubMeas (SliceQuestion params) Unit ι :=
-    completePartProjFamily params family
-  let L : Fq params → Error := fun y =>
-    Preliminaries.leftSandwichExpectation ψbi 𝒟x Gcomplete (((M y).toSubMeas).total)
-  let C : Fq params → Error := fun y =>
-    Preliminaries.middleSandwichExpectation ψbi 𝒟x Gcomplete (((M y).toSubMeas).total)
-  change |switcherooAggregateSecondTerm params ψbi family M - avgOver 𝒟x C| ≤
-    2 * Real.sqrt zeta
-  have hselfG_complete :
-      SDDRel ψbi 𝒟x
-        (switcherooSelfConsistencyLeft params Gcomplete)
-        (switcherooSelfConsistencyRight params Gcomplete)
-        zeta := by
-    simpa [𝒟x, Gcomplete] using
-      completePartProjFamily_selfConsistency_generic params ψbi family zeta hselfG
-  have hselfG_bip := switcherooSelfConsistency_bip params ψbi Gcomplete zeta hselfG_complete
-  have hpoint : ∀ y, |L y - C y| ≤ 2 * Real.sqrt zeta := by
-    intro y
-    have hB : Preliminaries.OpBounded01 (((M y).toSubMeas).total) := by
-      refine ⟨?_, ?_⟩
-      · exact SubMeas.total_nonneg ((M y).toSubMeas)
-      · exact sub_nonneg.mpr ((M y).toSubMeas).total_le_one
-    simpa [L, C, 𝒟x, Gcomplete] using
-      (Preliminaries.switchSandwich ψbi
-        𝒟x
-        hnorm
-        (by simpa [𝒟x] using uniformDistribution_weight_sum_le_one (SliceQuestion params))
-        Gcomplete
-        (((M y).toSubMeas).total)
-        hB
-        zeta
-        hselfG_bip).leftSandwichTransfer
-  have hsecond_eq :
-      switcherooAggregateSecondTerm params ψbi family M =
-        avgOver 𝒟x L := by
-    change
-      avgOver (uniformDistribution (SlicePairQuestion params))
-          (fun q =>
-            ∑ o : Outcome,
-              ev ψbi
-                (leftTensor
-                  ((completePartSubMeas params family q.1).total * (M q.2).outcome o *
-                    (completePartSubMeas params family q.1).total))) =
-        avgOver 𝒟x L
-    calc
-      avgOver (uniformDistribution (SlicePairQuestion params))
-          (fun q =>
-            ∑ o : Outcome,
-              ev ψbi
-                (leftTensor
-                  ((completePartSubMeas params family q.1).total * (M q.2).outcome o *
-                    (completePartSubMeas params family q.1).total)))
-        = avgOver (uniformDistribution (SliceQuestion params))
-            (fun y =>
-              avgOver (uniformDistribution (SliceQuestion params))
-                (fun x =>
-                  ∑ o : Outcome,
-                    ev ψbi
-                      (leftTensor
-                        ((completePartSubMeas params family x).total * (M y).outcome o *
-                          (completePartSubMeas params family x).total)))) := by
-              calc
-                avgOver (uniformDistribution (SlicePairQuestion params))
-                    (fun q =>
-                      ∑ o : Outcome,
-                        ev ψbi
-                          (leftTensor
-                            ((completePartSubMeas params family q.1).total *
-                              (M q.2).outcome o *
-                              (completePartSubMeas params family q.1).total))) =
-                  avgOver (uniformDistribution (SlicePairQuestion params))
-                    (fun q =>
-                      ∑ o : Outcome,
-                        ev ψbi
-                          (leftTensor
-                            ((completePartSubMeas params family q.2).total *
-                              (M q.1).outcome o *
-                              (completePartSubMeas params family q.2).total))) := by
-                        simpa [SlicePairQuestion] using
-                          (avgOver_uniform_equiv
-                            (α := SlicePairQuestion params)
-                            (β := SlicePairQuestion params)
-                            (Equiv.prodComm (Fq params) (Fq params))
-                            (fun q =>
-                              ∑ o : Outcome,
-                                ev ψbi
-                                  (leftTensor
-                                    ((completePartSubMeas params family q.1).total *
-                                      (M q.2).outcome o *
-                                      (completePartSubMeas params family q.1).total))))
-                _ = avgOver (uniformDistribution (SliceQuestion params))
-                      (fun y =>
-                        avgOver (uniformDistribution (SliceQuestion params))
-                          (fun x =>
-                            ∑ o : Outcome,
-                              ev ψbi
-                                (leftTensor
-                                  ((completePartSubMeas params family x).total *
-                                    (M y).outcome o *
-                                    (completePartSubMeas params family x).total)))) := by
-                        simpa [SlicePairQuestion, SliceQuestion] using
-                          (avgOver_uniform_prod
-                            (α := SliceQuestion params)
-                            (β := SliceQuestion params)
-                            (f := fun y x =>
-                              ∑ o : Outcome,
-                                ev ψbi
-                                  (leftTensor
-                                    ((completePartSubMeas params family x).total *
-                                      (M y).outcome o *
-                                      (completePartSubMeas params family x).total))))
-      _ = avgOver 𝒟x L := by
-            apply avgOver_congr
-            intro y
-            unfold L Preliminaries.leftSandwichExpectation
-            apply avgOver_congr
-            intro x
-            let G : MIPStarRE.Quantum.Op ι := (completePartSubMeas params family x).total
-            have hGout : (Gcomplete x).outcome () = G := by
-              simpa [Gcomplete, completePartProjFamily, G, completePartSubMeas,
-                postprocess] using (family.meas x).sum_eq_total
-            calc
-              ∑ o : Outcome,
-                  ev ψbi (leftTensor (G * (M y).outcome o * G))
-                = ev ψbi (leftTensor (G * ((M y).toSubMeas).total * G)) := by
-                    rw [← ev_sum ψbi (fun o : Outcome =>
-                      leftTensor (G * (M y).outcome o * G))]
-                    rw [leftTensor_finset_sum]
-                    congr 1
-                    rw [← Finset.sum_mul, ← Finset.mul_sum, (M y).sum_eq_total]
-              _ = ∑ _u : Unit,
-                    ev ψbi
-                      (leftTensor ((Gcomplete x).outcome ()) *
-                        leftTensor (((M y).toSubMeas).total) *
-                        leftTensor ((Gcomplete x).outcome ())) := by
-                    simp [hGout, leftTensor_mul_leftTensor, mul_assoc]
-  calc
-    |switcherooAggregateSecondTerm params ψbi family M - avgOver 𝒟x C|
-      = |avgOver 𝒟x L - avgOver 𝒟x C| := by rw [hsecond_eq]
-    _ = |avgOver 𝒟x (fun y => L y - C y)| := by
-          simp [avgOver, Finset.sum_sub_distrib, mul_sub]
-    _ ≤ avgOver 𝒟x (fun y => |L y - C y|) := by
-          exact avgOver_abs_le_avgOver_abs _ _
-    _ ≤ avgOver 𝒟x (fun _ => 2 * Real.sqrt zeta) := by
-          exact avgOver_mono _ _ _ hpoint
-    _ = 2 * Real.sqrt zeta := by
-          simpa [𝒟x] using
-            avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt zeta)
+          simpa using
+            (switcheroo_ev_opTensor_swap ψbi hfix
+              (((M q.2).toSubMeas).total)
+              ((completePartSubMeas params family q.1).total))
+    _ = switcherooAggregateTarget params ψbi family M := by
+          simpa using
+            (switcherooAggregateTarget_eq_opTensor_avg
+              (ι := ι) (params := params) (ψbi := ψbi) (family := family) (M := M)).symm
 
 -- After extracting the pointwise normalization helpers above, the final
 -- four-term packaging proof elaborates within the default heartbeat budget.

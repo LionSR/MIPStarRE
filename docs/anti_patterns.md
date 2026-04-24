@@ -68,7 +68,7 @@ misrepresents the actual state of the proof.
 
 ### Concrete example
 
-From `MIPStarRE/LDT/MainInductionStep/Theorems.lean`:
+Historical example (before the MainInductionStep cleanup):
 
 ```lean
 theorem mainInduction
@@ -84,17 +84,20 @@ theorem mainInduction
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 ```
 
-`MainInductionBridgePackage.witness` has type
+Here `MainInductionBridgePackage.witness` has type
 `∃ error, ∃ G, ConsRel ... error ∧ error ≤ mainInductionError ...` — literally
-the conclusion. No theorem in the codebase produces a
-`MainInductionBridgePackage`, so the "proof" of `mainInduction` is vacuous.
+the conclusion. The code has since been refactored to remove both this
+specific MainInductionStep bridge and the interim theorem alias that exposed
+the same witness shape under the paper theorem's name, but the snippet remains
+the archetypal example of the anti-pattern.
 
 PR [#491] proposed to delete the `*BridgePackage` by **inlining** the bundle's
 fields as explicit hypotheses. That only scatters the same pattern across
 individual signatures without producing any proof — it's strictly worse
 because the named bundle at least shows up in one tracker. Do not accept PRs
 that discharge an ungrounded bridge by flattening it into conclusion-shaped
-existential hypotheses.
+existential hypotheses, or by reintroducing the same shape under a theorem name
+that suggests the paper result has been proved.
 
 ### How to fix it
 
@@ -115,7 +118,9 @@ A signature passes the smell test if:
 ### Related issues and patterns
 
 - [#449] — paper-wide gap tracker
-- [#451] — the seven ungrounded `BridgePackage` producers
+- [#451] — the tracked `BridgePackage` producer catalogue
+- [#595] — resolved the QXP `ProjectiveNonMeasurementBridgePackage` offender by
+  deleting the bridge and threading `RoundingToProjectorsWitness` directly
 - [#477] — `QXPLayerData` axiom-field projection (a definitional variant)
 - [#493] — the inline-existential mutation of this pattern
 - [#491] — PR that introduced the mutation
@@ -356,9 +361,11 @@ From the ledger in [#449]:
   constructs `(auxSpace, T_a)` from the eigenvector basis of each rounded
   `R_a`; the Lean version picks a zero-dimensional placeholder, which is
   disconnected from the paper's SVD derivation.
-- `lem:global-rewrite` / `globalRewrite` — decomposition witness is
-  `default`. The paper gives the concrete `|φ₀⟩ ⊗ A₀ + |φ_⊥⟩ ⊗ A_⊥`; Lean
-  proves the weaker existential.
+- ~~`lem:global-rewrite` / `globalRewrite` — decomposition witness is
+  `default`~~ (historical; resolved by PRs #527 and #542). The live theorem now
+  uses `canonicalGlobalVarianceDecomposition`, and
+  `globalVarianceTraceWitness` consumes the centered residual family
+  `u ↦ A^u - A_{\mathrm{avg}}` rather than ignoring the witness.
 
 ### Acceptable uses
 
@@ -502,14 +509,16 @@ Grep for these suffixes: `*Statement`, `*Witness`, `*Claim`,
 
 If any answer is "no", the structure is an unacceptable smuggle.
 
-### Current status (audited 2026-04-18)
+### Current status (audited 2026-04-18; updated 2026-04-23)
 
 All 34 `*Statement` / 9 `*Conclusion` / 8 `*Witness` structures on `main`
 are either grounded (have producer theorems) or are the known tracked
-items in [#449] / [#451] / [#477]. No new unacceptable smuggles were
-found in that sweep. If you add a new `*Statement`-style structure to
-this codebase, include a docstring explaining its grounding plan and
-(if no producer exists yet) file a sub-issue in [#449].
+items in [#449] / [#451] / [#477]. The former QXP
+`ProjectiveNonMeasurementBridgePackage` offender has been removed from that
+live list (resolved in [#595]). No new unacceptable smuggles were found in
+that sweep. If you add a new `*Statement`-style structure to this codebase,
+include a docstring explaining its grounding plan and (if no producer exists
+yet) file a sub-issue in [#449].
 
 ### Related issues
 
@@ -596,5 +605,6 @@ PR [#438]) are the natural home for extensions that add these checks.
 [#477]: https://github.com/LionSR/MIPStarRE/issues/477
 [#491]: https://github.com/LionSR/MIPStarRE/pull/491
 [#493]: https://github.com/LionSR/MIPStarRE/issues/493
+[#595]: https://github.com/LionSR/MIPStarRE/issues/595
 [#494]: https://github.com/LionSR/MIPStarRE/issues/494
 [#495]: https://github.com/LionSR/MIPStarRE/issues/495

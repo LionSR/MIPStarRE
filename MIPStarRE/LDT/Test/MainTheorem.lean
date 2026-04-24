@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.SurfaceVsPoint
+import MIPStarRE.LDT.Test.ErrorCascade
 
 /-!
 # Section 3 — Main theorem
@@ -11,13 +11,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT
 
 namespace Test
-
-/-- The explicit `ν` from `thm:main-formal`, recorded with the paper's formula. -/
-noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) : Error :=
-  100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
-    (Real.rpow eps (1 / (40000 : Error)) +
-      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (40000 : Error)) +
-      Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))))
 
 /-- Placeholder polynomial-size slack for the overview Raz–Safra statement.
 
@@ -181,15 +174,18 @@ theorem mainFormal
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
   -- TODO(Section 3): Step 1 symmetrization (`strategySymmetrization_*`) and
-  -- the final scalar envelope (`errorCascade_le_mainFormalError`) are already
-  -- formalized. The current missing bridge is the Section 6 witness hand-off:
-  -- `mainInduction` itself is available, but producing its witness still runs
-  -- through `MainInductionBridgePackage` / `assemblePastingPackage` in
-  -- `MainInductionStep`, where the Section 12 → Section 6 averaging assembly
-  -- remains sorry-backed. Once that witness exists, the remaining work here is
-  -- the paper's unsymmetrization, Schwartz-Zippel, and final
+  -- the final scalar envelope (`errorCascade_le_mainFormalError`) are now
+  -- formalized. Section 6 has the internal base-case / successor-step assembly
+  -- (`mainInductionBaseCase`, `mainInductionFromPackages`,
+  -- `mainInductionByRecursionOnM`), so the remaining induction-side gap here,
+  -- tracked by TODO(#630), is to furnish the high-level inputs those theorems
+  -- still expect: the weighted restricted-probability bounds and a
+  -- restricted-strategy self-improvement producer. After that, this file still
+  -- needs the paper's unsymmetrization, Schwartz-Zippel, and final
   -- orthonormalization/projectivization transport into the three displayed
-  -- `ConsRel` conclusions.
+  -- `ConsRel` conclusions; those last three transports will apply
+  -- `errorCascade_le_mainFormalError` directly at the point-A consistency,
+  -- point-B consistency, and self-consistency usage sites.
   sorry
 
 end Test

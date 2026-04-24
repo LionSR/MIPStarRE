@@ -6,8 +6,8 @@ import MIPStarRE.LDT.MainInductionStep.Defs
 This file packages the intermediate conclusion structures and bookkeeping
 statements used in the induction step. It contains conclusion packages for the
 induction-level self-improvement and pasting theorems, together with restricted
-failure profiles and temporary bridge statements for the still-partial assembly
-of the main induction argument.
+failure profiles and the stage packages for the paper's
+`restrict → induct → self-improve → paste` assembly.
 
 ## References
 
@@ -126,50 +126,24 @@ abbrev PastingBoundednessInput (params : Parameters)
     (family : IdxPolyFamily params ι) (zeta : Error) : Prop :=
   IdxPolyFamily.SliceBoundednessInput strategy family zeta
 
-/-- Temporary bridge package for the still-unformalized induction assembly.
-
-This isolates the missing recursion/self-improvement/pasting assembly behind an
-explicit witness, matching the temporary bridge style already used in Section 9
-for `SelfImprovementBridgePackage`. -/
--- TODO(#502, #449): concrete producer pending Section 12 → Section 6 hand-off.
-structure MainInductionBridgePackage (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error) (k : ℕ) : Prop where
-  /-- Temporary witness measurement already satisfying the target consistency bound. -/
-  witness :
-    ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
-      ConsRel strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params G.toSubMeas)
-        error ∧
-      error ≤ mainInductionError params k eps delta gamma
-
 /-- Bookkeeping package for the restricted-probabilities lemma.
 
-The self-consistency branch is formalized directly. The axis-parallel and
-diagonal conditioning bounds now appear as explicit theorem hypotheses rather
-than a dedicated bridge-package structure. -/
+This packages a slice-wise error profile together with the three averaged bounds
+that appear in the paper: the axis-parallel and diagonal branches both incur the
+same conditioning loss `((m + 1) / m)`, while the self-consistency branch
+restricts exactly. -/
 structure RestrictedProbabilitiesStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error) : Prop where
-  /-- There is a slice-wise error profile satisfying all averaged restricted bounds. -/
+  /-- There is a slice-wise error profile realizing the three averaged restricted bounds. -/
   profileExists :
     ∃ profile : RestrictedFailureProfile params strategy,
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params * profile.axisParallel x) ≤ eps ∧
-        averageRestrictedAxisParallelError params profile
-          ≤ sliceConditioningLoss params * eps ∧
+      averageRestrictedAxisParallelError params profile ≤
+          sliceConditioningLoss params * eps ∧
         averageRestrictedSelfConsistencyError params profile ≤ delta ∧
-        avgOver (uniformDistribution (Fq params))
-          (fun x => sliceDiagonalDirectionWeight params * profile.diagonal x) ≤ gamma ∧
-        averageRestrictedDiagonalError params profile
-          ≤ sliceDiagonalConditioningLoss params * gamma ∧
-        sliceTransverseDirectionWeight params *
-          averageRestrictedAxisParallelError params profile ≤ eps ∧
-        sliceDiagonalDirectionWeight params *
-          averageRestrictedDiagonalError params profile ≤ gamma
+        averageRestrictedDiagonalError params profile ≤
+          sliceConditioningLoss params * gamma
 
 /-- Bookkeeping package for the slice-restriction step of `thm:main-induction`.
 
@@ -191,7 +165,7 @@ structure SliceRestrictionPackage (params : Parameters)
   /-- Averaged diagonal slice error bound. -/
   diagonalAverageBound :
     averageRestrictedDiagonalError params profile ≤
-      sliceDiagonalConditioningLoss params * gamma
+      sliceConditioningLoss params * gamma
 
 /-- Explicit per-slice output of the inductive hypothesis.
 

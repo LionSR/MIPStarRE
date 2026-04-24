@@ -43,21 +43,25 @@ Scope:
 
 ## Findings
 
-### 1. Paper-faithfulness mismatch remains in the induction restricted diagonal branch
+### 1. Historical audit note — resolved in #593: the induction restricted diagonal branch now matches the paper's measurement packaging and conditioning factors
 
-- Severity: high
-- File: `MIPStarRE/LDT/MainInductionStep/Defs.lean`
-- Lines: 35-39, 45-46, 179-183, 341-352
+- Severity at audit time: high
+- Files: `MIPStarRE/LDT/MainInductionStep/{Defs,Statements,Theorems}.lean`
+- Historical Lean locations: `Defs.lean:35-39, 45-46, 179-183, 341-352`
 
-The new TODO comments correctly document a real mathematical mismatch, not just a missing proof:
+At the time of this audit, Lean had a real mathematical mismatch, not just a missing proof:
 
-- `RestrictedSymStrat` still stores the diagonal branch as `IdxProjSubMeas`, whereas the paper's restricted strategy uses a genuine projective measurement.
-- `restrictDiagonalMeasurement` still drops ambient outcomes and therefore only returns a submeasurement.
-- `sliceDiagonalDirectionWeight` and `sliceDiagonalConditioningLoss` still use `1 / q` and `q`, while the paper's slice argument uses the same transverse-direction factors as the axis-parallel branch, namely `m / (m + 1)` and `(m + 1) / m`.
+- `RestrictedSymStrat` stored the diagonal branch as `IdxProjSubMeas`, whereas the paper's restricted strategy uses a genuine projective measurement.
+- `restrictDiagonalMeasurement` dropped ambient outcomes and therefore only returned a submeasurement.
+- `sliceDiagonalDirectionWeight` and `sliceDiagonalConditioningLoss` used `1 / q` and `q`, while the paper's slice argument uses the same transverse-direction factors as the axis-parallel branch, namely `m / (m + 1)` and `(m + 1) / m`.
 
-This means the current Lean slice-analysis problem is still weaker/different on the diagonal branch than the paper statement it is meant to formalize.
+Update — resolved in #593:
 
-Fix:
+- `RestrictedSymStrat.diagonalMeasurement` and `restrictDiagonalMeasurement` are now measurement-valued.
+- The diagonal branch of `RestrictedProbabilitiesStatement` now uses the shared paper-faithful factors `sliceTransverseDirectionWeight = m / (m + 1)` and `sliceConditioningLoss = (m + 1) / m`.
+- The old fix checklist below is now complete; keep this entry only as historical audit context.
+
+Historical fix checklist (completed in #593):
 
 - Refactor the diagonal answer encoding so that restricting an ambient diagonal answer to a slice lands in a total diagonal measurement on the `(m, q, d)` answer space.
 - Upgrade `RestrictedSymStrat.diagonalMeasurement` and `restrictDiagonalMeasurement` from submeasurement to measurement.
