@@ -1,4 +1,7 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
+import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
+import MIPStarRE.LDT.Pasting.BridgeLemmas.HAConsistency
+import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes
 
 /-!
 # Section 12 pasting: final pasting theorems

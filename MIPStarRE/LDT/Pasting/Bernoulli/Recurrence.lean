@@ -1,5 +1,6 @@
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
 import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
+import MIPStarRE.LDT.Pasting.Statements
 import MIPStarRE.LDT.Pasting.Bernoulli.Scalar
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 
