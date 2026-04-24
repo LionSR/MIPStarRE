@@ -1,3 +1,5 @@
+import MIPStarRE.LDT.Preliminaries.ComparisonCore
+import MIPStarRE.LDT.Preliminaries.ConsistencyBridges
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
 
 /-!
@@ -7,6 +9,12 @@ Projective-case converse of `prop:simeq-to-approx`. This lemma lives in a
 sibling module to `ComparisonCore` because its proof uses
 `projSubMeas_diagMass_eq_mass`, which is introduced in
 `SwitchSandwichPrep.Core`, downstream of `ComparisonCore`.
+
+The imports above are chosen to make the direct dependencies explicit rather
+than relying on transitive re-exports through `SwitchSandwichPrep.Core`:
+`ComparisonCore` is the sibling comparison module, `ConsistencyBridges`
+supplies the `BipartiteSDDRel`/`ConsRel` bridging machinery, and
+`SwitchSandwichPrep.Core` provides `projSubMeas_diagMass_eq_mass`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
