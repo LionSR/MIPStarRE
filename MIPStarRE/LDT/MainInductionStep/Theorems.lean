@@ -645,9 +645,9 @@ private lemma eps_le_one_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     eps ≤ 1 := by
-  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -690,9 +690,9 @@ private lemma delta_le_one_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     delta ≤ 1 := by
-  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -740,9 +740,9 @@ private lemma three_le_k_sq_mul_next_m_of_hsmall
   by_cases hk1 : k = 1
   · subst hk1
     by_cases hnext_two : params.next.m = 2
-    · have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
-      have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
-      have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
+    · have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+      have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+      have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
       have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
         positivity
       have hnu_nonneg : 0 ≤ mainInductionNu params.next 1 eps delta gamma := by
@@ -827,9 +827,9 @@ private lemma gamma_le_one_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     gamma ≤ 1 := by
-  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -872,9 +872,9 @@ private lemma dq_le_q_of_mainInductionError_lt_one
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     params.d ≤ params.q := by
-  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -920,8 +920,8 @@ private lemma eps_le_one_of_selfImprovementInInductionError_le_one
     (hgood : strategy.IsGood eps delta gamma)
     (hzeta_le : selfImprovementInInductionError params.next eps delta gamma ≤ 1) :
     eps ≤ 1 := by
-  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -958,8 +958,8 @@ private lemma delta_le_one_of_selfImprovementInInductionError_le_one
     (hgood : strategy.IsGood eps delta gamma)
     (hzeta_le : selfImprovementInInductionError params.next eps delta gamma ≤ 1) :
     delta ≤ 1 := by
-  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
-  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have hrest_nonneg :
@@ -1041,6 +1041,9 @@ private lemma selfConsistencyRestrictedAverage_eq
     _ = strategy.selfConsistencyFailureProbability := by
           rfl
 
+/-- Equivalence repackaging a slice point `u : Point params`, a height `x : Fq params`
+and an auxiliary index `β` as an ambient point `Point params.next` paired with the same
+auxiliary index. This is the product-compatible form of `CommutativityPoints.pointNextEquiv`. -/
 private def pointAppendProdEquiv (params : Parameters) [FieldModel params.q] (β : Type*) :
     Fq params × (Point params × β) ≃ Point params.next × β where
   toFun := fun xb => (appendPoint params xb.2.1 xb.1, xb.2.2)
@@ -1052,19 +1055,6 @@ private def pointAppendProdEquiv (params : Parameters) [FieldModel params.q] (β
     rintro ⟨u, b⟩
     exact Prod.ext ((CommutativityPoints.pointNextEquiv params).left_inv u) rfl
 
-private def axisLineSliceEquiv (params : Parameters) [FieldModel params.q] (x : Fq params) :
-    AxisLinePolynomial params.next ≃ AxisLinePolynomial params where
-  toFun := fun f => AxisLinePolynomial.restrictAtHeight params f x
-  invFun := liftAxisAnswer params x
-  left_inv := by
-    intro f
-    cases f
-    rfl
-  right_inv := by
-    intro f
-    cases f
-    rfl
-
 private lemma restrictAxisParallelMeasurement_toSubMeas_eq_transport
     (params : Parameters)
     [FieldModel params.q]
@@ -1072,7 +1062,7 @@ private lemma restrictAxisParallelMeasurement_toSubMeas_eq_transport
     (x : Fq params)
     (ℓ : AxisParallelLine params) :
     (restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas =
-      SubMeas.transport (axisLineSliceEquiv params x)
+      SubMeas.transport (axisLinePolynomialEquiv params x).symm
         ((strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas) := by
   refine SubMeas.ext ?_ ?_
   · intro f
@@ -1094,7 +1084,8 @@ private lemma restrictAxisParallelMeasurement_postprocess_zero
   rw [restrictAxisParallelMeasurement_toSubMeas_eq_transport params strategy x ℓ]
   rw [SubMeas.postprocess_transport]
   have hreadout :
-      (fun a : AxisLinePolynomial params.next => (axisLineSliceEquiv params x a) zeroCoord) =
+      (fun a : AxisLinePolynomial params.next =>
+          ((axisLinePolynomialEquiv params x).symm a) zeroCoord) =
         (fun f : AxisLinePolynomial params.next => f zeroCoord) := by
     funext a
     cases a
@@ -1125,6 +1116,9 @@ private lemma restrictedAxisSampleError_eq
       (restrictAxisParallelMeasurement_postprocess_zero params strategy x
         { base := u, direction := i })
 
+/-- Per-direction axis-parallel consistency defect of the restricted `x`-slice
+strategy at embedded direction `i`, averaged over the slice point space
+`Point params`. -/
 private noncomputable def sliceAxisDirectionError
     (params : Parameters)
     [FieldModel params.q]
@@ -1136,6 +1130,8 @@ private noncomputable def sliceAxisDirectionError
       (RestrictedSymStrat.axisParallelPointAnswerFamily (xRestrictedStrategy params strategy x) (u, i))
       (RestrictedSymStrat.axisParallelLineAnswerFamily (xRestrictedStrategy params strategy x) (u, i))
 
+/-- Per-direction axis-parallel consistency defect of the ambient `(m+1)`-dimensional
+strategy at direction `i`, averaged over the ambient point space `Point params.next`. -/
 private noncomputable def axisDirectionError
     (params : Parameters)
     [FieldModel params.q]
@@ -1385,12 +1381,19 @@ private lemma weighted_embedded_average_le_full_average
             intro i _
             ring
     _ = ∑ i : Fin params.m, (1 / (params.next.m : Error)) * f (embedCoord params i) := by
+            have hnext : (params.next.m : Error) = (params.m : Error) + 1 := by
+              simp [Parameters.next]
+            have hplus_ne : (params.m : Error) + 1 ≠ 0 := hnext ▸ hnextm
+            have hweight :
+                sliceTransverseDirectionWeight params =
+                  (params.m : Error) / ((params.m : Error) + 1) := by
+              unfold sliceTransverseDirectionWeight
+              push_cast
+              ring
             refine Finset.sum_congr rfl ?_
             intro i _
-            unfold sliceTransverseDirectionWeight
-            field_simp [hm, hnextm]
-            simp [Parameters.next]
-            ring_nf
+            rw [hweight, hnext]
+            field_simp
     _ = (1 / (params.next.m : Error)) * ∑ i : Fin params.m, f (embedCoord params i) := by
             symm
             rw [Finset.mul_sum]
@@ -1440,6 +1443,8 @@ private lemma restrictedDiagonalSampleError_eq
     diagonalLineAnswerFamily, xRestrictedStrategy]
   simp [hline]
 
+/-- Per-index diagonal-line consistency defect of the restricted `x`-slice strategy
+at embedded index `j`, averaged over the restricted diagonal sample space. -/
 private noncomputable def diagonalSliceIndexError
     (params : Parameters)
     [FieldModel params.q]
@@ -1451,6 +1456,8 @@ private noncomputable def diagonalSliceIndexError
     (RestrictedSymStrat.restrictedDiagonalPointAnswerFamily (xRestrictedStrategy params strategy x) j)
     (RestrictedSymStrat.restrictedDiagonalLineAnswerFamily (xRestrictedStrategy params strategy x) j)
 
+/-- Per-index diagonal-line consistency defect of the ambient `(m+1)`-dimensional
+strategy at index `j`, averaged over the ambient restricted diagonal sample space. -/
 private noncomputable def diagonalIndexError
     (params : Parameters)
     [FieldModel params.q]
@@ -1969,8 +1976,8 @@ private lemma average_sliceSelfImprovementError_le
         (fun x => sliceSelfImprovementError params hrestrict x) ≤
       selfImprovementInInductionError params.next eps delta gamma := by
   let 𝒟 := uniformDistribution (Fq params)
-  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have haxis_avg :
@@ -2076,9 +2083,9 @@ private lemma average_sliceMainInductionNu_le
             (hrestrict.profile.diagonal x)) ≤
       mainInductionNu params.next k eps delta gamma := by
   let 𝒟 := uniformDistribution (Fq params)
-  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
     positivity
   have haxis_avg :
@@ -2251,9 +2258,9 @@ private lemma selfImprovementInInductionError_le_mainInductionNu
     (hdq_le_q : params.d ≤ params.q) :
     selfImprovementInInductionError params.next eps delta gamma ≤
       mainInductionNu params.next k eps delta gamma := by
-  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
   have hratio_le_one := dq_ratio_le_one params hdq_le_q
   have hthree := three_le_k_sq_mul_next_m_of_hsmall params strategy hgood hsmall
   have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
@@ -2334,9 +2341,9 @@ private lemma ldPastingInInductionNu_le_fifth_mainInductionNu
   let B : Error := Real.rpow delta (1 / (1024 : Error))
   let C : Error := Real.rpow gamma (1 / (1024 : Error))
   let D : Error := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error))
-  have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
+  have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
   have heps_le_one :=
     eps_le_one_of_selfImprovementInInductionError_le_one params strategy hgood hzeta_le
   have hdelta_le_one :=
@@ -2865,9 +2872,9 @@ noncomputable def assemblePastingPackage
         · intro x g
           exact SelfImprovementPackage.family_dominationTarget (pkg := hself) x g
       error_le := by
-        have heps_nonneg := MIPStarRE.LDT.eps_nonneg_of_isGood params.next strategy hgood
-        have hdelta_nonneg := MIPStarRE.LDT.delta_nonneg_of_isGood params.next strategy hgood
-        have hgamma_nonneg := MIPStarRE.LDT.gamma_nonneg_of_isGood params.next strategy hgood
+        have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+        have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+        have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
         have heps_le_one :=
           eps_le_one_of_selfImprovementInInductionError_le_one
             params strategy hgood hzeta_le
@@ -3190,7 +3197,7 @@ theorem mainInductionBaseCase
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
       hgood.selfConsistencyTest
   have hdiag_nonneg : 0 ≤ strategy.diagonalFailureProbability :=
-    MIPStarRE.LDT.diagonalFailureProbability_nonneg params strategy
+    diagonalFailureProbability_nonneg params strategy
   have hgamma_nonneg : 0 ≤ gamma := le_trans hdiag_nonneg hgood.diagonalLineTest
   have haxis_le_one : strategy.axisParallelFailureProbability ≤ 1 := by
     simpa [SymStrat.axisParallelFailureProbability] using

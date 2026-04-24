@@ -167,7 +167,10 @@ structure IsGood {params : Parameters}
 
 end RestrictedSymStrat
 
-private def axisLinePolynomialEquiv (params : Parameters) [FieldModel params.q] (x : Fq params) :
+/-- Equivalence between slice and ambient axis-line polynomials at a fixed height `x`:
+`liftAxisAnswer` sends a slice polynomial to its ambient lift, with
+`AxisLinePolynomial.restrictAtHeight` as inverse. -/
+def axisLinePolynomialEquiv (params : Parameters) [FieldModel params.q] (x : Fq params) :
     AxisLinePolynomial params ≃ AxisLinePolynomial params.next where
   toFun := liftAxisAnswer params x
   invFun := fun f => AxisLinePolynomial.restrictAtHeight params f x
