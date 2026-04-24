@@ -87,41 +87,6 @@ theorem fromHToGRecurrenceWeight_succ
           (1 - family.averagedSubMeas.total) :=
   (fromHToGRecurrenceWeight_recurrence params family prefixLen τtail).2.2.2
 
-/-- Residual bridge package for `lem:from-H-to-G`.
-
-This isolates the only remaining Bernoulli-recurrence gap after the stage-API
-repair from #351: formalize the adjacent-stage scalar bridge together with the
-stage-`0` / stage-`k` endpoint identifications so the telescoping argument can be
-packaged once and for all.  Issue #673 asked for exactly this roadmap; if the
-proof is still unfinished, this theorem is the single honest placeholder that
-tracks the remaining work. -/
-private theorem fromHToGRemainingBridge
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    (hfacts : GHatFactsStatement params ψbi family gamma zeta)
-    (hhalf : ∀ j : ℕ, 2 ≤ j →
-      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
-    (k : ℕ) :
-    FromHToGStatement params strategy ψbi family gamma zeta k := by
-  /- Remaining work from #673, stated at a single proof site:
-     1. prove each adjacent-stage recurrence step by the paper's
-        move-right / commute / move-right chain, using two
-        `easyApproxFromApproxDelta` / `closenessOfIP` moves from
-        `hfacts.completedSelfConsistency`, then two suffix-commutation moves from
-        `hhalf (k - ℓ)`, and finally the exact branch split via
-        `fromHToGRecurrenceWeight_succ`;
-     2. identify Lean stage `0` with `fromHToGAllOutcomesMass`;
-     3. identify Lean stage `k` with `fromHToGBernoulliTailMass` through the
-        `truncatedTypeSums` polynomial;
-     4. telescope the `k` adjacent-stage errors and discharge the displayed
-        arithmetic bound `k * fromHToGRecurrenceError ≤ fromHToGError`.
-  -/
-  sorry
-
 /-- `lem:from-H-to-G`.
 
 The proof of the paper's Bernoulli-recurrence lemma uses exactly the two named
@@ -143,7 +108,28 @@ lemma fromHToG
       CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
     (k : ℕ) :
     FromHToGStatement params strategy ψbi family gamma zeta k := by
-  exact fromHToGRemainingBridge params strategy ψbi family gamma zeta hfacts hhalf k
+  /- Remaining work from #673, stated at the single live proof gap.
+
+     Paper / blueprint anchor:
+     * `references/ldt-paper/ld-pasting.tex`, proof of `lem:from-H-to-G`
+       (roughly lines 1379–1664 in the current source);
+     * `blueprint/src/chapter/ch09_pasting.tex`, proof of `lem:from-H-to-G`
+       (roughly lines 979–1233 in the current source).
+
+     What remains to formalize:
+     1. prove each adjacent-stage recurrence step by the paper's
+        move-right / commute / move-right chain, using two
+        `easyApproxFromApproxDelta` / `closenessOfIP` moves from
+        `hfacts.completedSelfConsistency`, then two suffix-commutation moves from
+        `hhalf (k - ℓ)`, and finally the exact branch split via
+        `fromHToGRecurrenceWeight_succ`;
+     2. identify Lean stage `0` with `fromHToGAllOutcomesMass`;
+     3. identify Lean stage `k` with `fromHToGBernoulliTailMass` through the
+        `truncatedTypeSums` polynomial;
+     4. telescope the `k` adjacent-stage errors and discharge the displayed
+        arithmetic bound `k * fromHToGRecurrenceError ≤ fromHToGError`.
+  -/
+  sorry
 
 /-- The scalar Bernoulli tail polynomial lifted through continuous functional
 calculus is exactly the matrix Bernoulli tail operator. -/
