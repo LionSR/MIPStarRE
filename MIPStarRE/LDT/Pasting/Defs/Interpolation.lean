@@ -255,14 +255,15 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
 /-- **Lagrange interpolation correctness on the support.**
 
 Restricting `interpolateCompletedSlicesFromSupport` at the height `xs i` for `i ∈ σ`
-recovers the completed slice polynomial `(gs i).get _`. This is the defining property
-of Lagrange interpolation: with `d+1` distinct nodes `xs j` for `j ∈ σ`, the canonical
-interpolant agrees with the interpolating values exactly at those nodes.
+recovers the completed slice polynomial `(extractSlicePoly gs i (hσsupport hi)).poly`.
+This is the defining property of Lagrange interpolation: with `d+1` distinct nodes
+`xs j` for `j ∈ σ`, the canonical interpolant agrees with the interpolating slice
+polynomials exactly at those nodes.
 
 The proof collapses the sum via `Finset.sum_eq_single` at `⟨i, hi⟩`: the Lagrange basis
 polynomial `Lⱼ` evaluates to `1` at `v i = decodeScalar (xs i)` when `j = i`, and to `0`
-otherwise, and the `rename` + `eval₂Hom` simplification on each slice term returns the
-original slice polynomial.
+otherwise, and the `rename` + `eval₂Hom` simplification on each slice term returns
+`(extractSlicePoly gs i (hσsupport hi)).poly`.
 
 This lemma is the core reusable interpolation-correctness API used by
 `hBConsistency_core` and `overAllOutcomes`: their paper arguments hinge on the
@@ -342,8 +343,16 @@ theorem interpolateCompletedSlicesFromSupport_restrictAtHeight_of_mem
   · rintro ⟨j, hjσ⟩ _hmem hne
     rw [map_mul, hLi j, hrename j hjσ]
     have hne' : j ≠ i := fun heq => hne (Subtype.ext heq)
-    simp [Lagrange.eval_basis_of_ne hne' hi]
+    have hbasis :
+        (Lagrange.basis σ (fun j' => decodeScalar (xs j')) j).eval
+          (decodeScalar (xs i)) = 0 :=
+      Lagrange.eval_basis_of_ne (v := fun j' => decodeScalar (xs j')) hne' hi
+    rw [hbasis, MvPolynomial.C_0, zero_mul]
   · rw [map_mul, hLi i, hrename i hi]
-    simp [Lagrange.eval_basis_self hvinj hi]
+    have hbasis :
+        (Lagrange.basis σ (fun j' => decodeScalar (xs j')) i).eval
+          (decodeScalar (xs i)) = 1 :=
+      Lagrange.eval_basis_self (v := fun j' => decodeScalar (xs j')) hvinj hi
+    rw [hbasis, MvPolynomial.C_1, one_mul]
 
 end MIPStarRE.LDT.Pasting
