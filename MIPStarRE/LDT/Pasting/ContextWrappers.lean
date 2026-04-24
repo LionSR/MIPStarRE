@@ -1,4 +1,11 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
+import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
+import MIPStarRE.LDT.Pasting.BridgeLemmas.HAConsistency
+import MIPStarRE.LDT.Pasting.BridgeLemmas.HBConsistency
+import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint
+import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes
+import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
+import MIPStarRE.LDT.Pasting.Core
 import MIPStarRE.LDT.Pasting.Defs.Context
 
 /-!
@@ -6,11 +13,11 @@ import MIPStarRE.LDT.Pasting.Defs.Context
 
 Thin wrappers that restate `thm:ld-pasting`, `lem:ld-pasting-sub-measurement`,
 and the downstream pasting bridge lemmas using a single
-`LdPastingContext` argument instead of the un-bundled 15-argument
+`LdPastingContext` argument instead of the un-bundled Section-12
 hypothesis list.
 
-These wrappers introduce no new proof content: each body is a single
-destructure-and-apply against the corresponding un-bundled statement.
+These wrappers introduce no new proof content: each body is a thin
+projection-and-apply wrapper around the corresponding un-bundled statement.
 
 ## References
 
@@ -33,7 +40,7 @@ theorem ldPasting_of_context
         LdPastingConclusion params ctx.strategy ctx.family H
           ctx.eps ctx.delta ctx.gamma ctx.kappa ctx.zeta ctx.k :=
   ldPasting params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.kappa ctx.zeta
-    ctx.hgood ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
+    ctx.hgood ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q ctx.hd
     ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
     ctx.k ctx.hk_pos ctx.hk
 
@@ -46,7 +53,7 @@ lemma ldPastingSubMeas_of_context
         LdPastingSubMeasConclusion params ctx.strategy ctx.family H
           ctx.eps ctx.delta ctx.gamma ctx.kappa ctx.zeta ctx.k :=
   ldPastingSubMeas params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.kappa
-    ctx.zeta ctx.hgood ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
+    ctx.zeta ctx.hgood ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q ctx.hd
     ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
     ctx.k ctx.hk_pos ctx.hk
 
@@ -91,7 +98,7 @@ theorem hAConsistency_submeas_of_context
         ctx.nu :=
   hAConsistency_submeas params ctx.strategy ctx.eps ctx.delta ctx.gamma
     ctx.kappa ctx.zeta ctx.hgood ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
-    ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
+    ctx.hd ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
     ctx.k ctx.hk_pos ctx.hk
 
 /-- `lem:over-all-outcomes` restated against the standing pasting context. -/
@@ -117,7 +124,7 @@ lemma hBConsistency_of_context
     HBConsistencyStatement params ctx.strategy ctx.family
       ctx.eps ctx.delta ctx.gamma ctx.zeta ctx.k :=
   hBConsistency params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.zeta
-    ctx.hgood ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k hline
+    ctx.hgood ctx.hd ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k hline
 
 /-- `lem:ld-sandwich-line-one-point` restated against the standing pasting
 context.
