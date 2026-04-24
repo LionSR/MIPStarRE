@@ -98,21 +98,21 @@ structure RestrictedFailureProfile (params : Parameters)
         (diagonal x)
 
 /-- Average restricted axis-parallel error over slices. -/
-noncomputable def averageRestrictedAxisParallelError (params : Parameters)
+noncomputable def avgRestrictedAxisError (params : Parameters)
     [FieldModel params.q]
     {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   avgOver (uniformDistribution (Fq params)) profile.axisParallel
 
 /-- Average restricted self-consistency error over slices. -/
-noncomputable def averageRestrictedSelfConsistencyError (params : Parameters)
+noncomputable def avgRestrictedSelfError (params : Parameters)
     [FieldModel params.q]
     {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
   avgOver (uniformDistribution (Fq params)) profile.selfConsistency
 
 /-- Average restricted diagonal-line error over slices. -/
-noncomputable def averageRestrictedDiagonalError (params : Parameters)
+noncomputable def avgRestrictedDiagError (params : Parameters)
     [FieldModel params.q]
     {strategy : SymStrat params.next ι}
     (profile : RestrictedFailureProfile params strategy) : Error :=
@@ -140,10 +140,10 @@ structure RestrictedProbabilitiesStatement (params : Parameters)
   /-- There is a slice-wise error profile realizing the three averaged restricted bounds. -/
   profileExists :
     ∃ profile : RestrictedFailureProfile params strategy,
-      averageRestrictedAxisParallelError params profile ≤
+      avgRestrictedAxisError params profile ≤
           sliceConditioningLoss params * eps ∧
-        averageRestrictedSelfConsistencyError params profile ≤ delta ∧
-        averageRestrictedDiagonalError params profile ≤
+        avgRestrictedSelfError params profile ≤ delta ∧
+        avgRestrictedDiagError params profile ≤
           sliceConditioningLoss params * gamma
 
 /-- Bookkeeping package for the slice-restriction step of `thm:main-induction`.
@@ -158,14 +158,14 @@ structure SliceRestrictionPackage (params : Parameters)
   profile : RestrictedFailureProfile params strategy
   /-- Averaged axis-parallel slice error bound. -/
   axisAverageBound :
-    averageRestrictedAxisParallelError params profile ≤
+    avgRestrictedAxisError params profile ≤
       sliceConditioningLoss params * eps
   /-- Averaged self-consistency slice error bound. -/
   selfAverageBound :
-    averageRestrictedSelfConsistencyError params profile ≤ delta
+    avgRestrictedSelfError params profile ≤ delta
   /-- Averaged diagonal slice error bound. -/
   diagonalAverageBound :
-    averageRestrictedDiagonalError params profile ≤
+    avgRestrictedDiagError params profile ≤
       sliceConditioningLoss params * gamma
 
 /-- Explicit per-slice output of the inductive hypothesis.

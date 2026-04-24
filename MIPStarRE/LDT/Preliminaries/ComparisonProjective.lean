@@ -179,7 +179,7 @@ theorem approxToSimeq {Question Outcome : Type*}
     intro q
     simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjMeas.toIdxSubMeas] using
       two_questionConsistency_eq_questionSDD_of_projective ψ (A q) (B q)
-  show avgOver 𝒟
+  change avgOver 𝒟
       (fun q =>
         qConsDefect ψ
           ((IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas A)) q)

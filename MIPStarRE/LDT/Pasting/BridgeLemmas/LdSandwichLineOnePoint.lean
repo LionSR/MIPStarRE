@@ -58,7 +58,8 @@ private noncomputable def sandwichedLineQuestionSplitAtEquiv
         ((Equiv.funSplitAt i (Fq params)).left_inv xs)
   right_inv := by
     rintro ⟨⟨u, x⟩, xs⟩
-    simp [Equiv.funSplitAt]
+    simp only [ne_eq, Equiv.funSplitAt_symm_apply, ↓reduceDIte, Subtype.coe_eta, dite_eq_ite,
+      Prod.mk.injEq, true_and]
     funext j
     simp [j.2]
 
@@ -1691,6 +1692,7 @@ private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_qSDDCore_bound
   simpa [sddErrorOp, qSDDOp] using hprefixRaw.squaredDistanceBound
 
 set_option maxHeartbeats 400000 in
+-- This arithmetic absorption proof expands several nested error estimates from the paper.
 /-- Scalar absorption for the post-tail-deletion one-point estimate.
 
 This is the arithmetic at `references/ldt-paper/ld-pasting.tex:1028--1033`,

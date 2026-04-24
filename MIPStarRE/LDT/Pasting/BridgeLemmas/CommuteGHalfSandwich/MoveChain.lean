@@ -28,36 +28,51 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+private abbrev MoveQ (params : Parameters) (r : ℕ) :=
+  SliceQuestion params × SliceQuestion params × PointTuple params r
+
+private abbrev MoveO (params : Parameters) [FieldModel params.q] (r : ℕ) :=
+  GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r
+
+private abbrev MoveTailQ (params : Parameters) (r : ℕ) :=
+  SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r
+
+private abbrev MoveTailO (params : Parameters) [FieldModel params.q] (r : ℕ) :=
+  GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r
+
 private noncomputable def commuteGHalfSandwich_recursiveSourceFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
-    IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+    IdxOpFamily (MoveQ params r)
+      (MoveO params r)
       (ι × ι) :=
   fun q =>
     { outcome := fun ogs =>
-        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+        leftTensor (ι₂ := ι)
+                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           (headTailOrderedFamily params family r (q.1, q.2.2)).outcome (ogs.1, ogs.2.2)
       total := 0 }
 
 private noncomputable def commuteGHalfSandwich_recursiveTargetFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
-    IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+    IdxOpFamily (MoveQ params r)
+      (MoveO params r)
       (ι × ι) :=
   fun q =>
     { outcome := fun ogs =>
-        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+        leftTensor (ι₂ := ι)
+                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           (headTailRotatedFamily params family r (q.1, q.2.2)).outcome (ogs.1, ogs.2.2)
       total := 0 }
 
 private lemma commuteGHalfSandwich_moveBack_eq_recursiveSource
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params r)
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :
-    (commuteGHalfSandwich_moveBackFamily params family r q).outcome ogs =
+    (q : MoveQ params r)
+    (ogs : MoveO params r) :
+    (commuteGHalfSandwich_moveBackFamily params family r q).outcome
+      ogs =
       (commuteGHalfSandwich_recursiveSourceFamily params family r q).outcome ogs := by
   simp [commuteGHalfSandwich_moveBackFamily, commuteGHalfSandwich_recursiveSourceFamily,
     headTailOrderedFamily, leftTensor_mul_leftTensor, mul_assoc]
@@ -65,9 +80,10 @@ private lemma commuteGHalfSandwich_moveBack_eq_recursiveSource
 private lemma commuteGHalfSandwich_recursiveTarget_eq_split
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params r)
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :
-    (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs =
+    (q : MoveQ params r)
+    (ogs : MoveO params r) :
+    (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome
+      ogs =
       (headTailRotatedFamily params family (r + 1) (q.1, Fin.cons q.2.1 q.2.2)).outcome
         (ogs.1, Fin.cons ogs.2.1 ogs.2.2) := by
   let A := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
@@ -82,7 +98,7 @@ private lemma commuteGHalfSandwich_recursiveTarget_eq_split
     (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs
       = leftTensor (ι₂ := ι) (A * (T * G)) := by
           simp [commuteGHalfSandwich_recursiveTargetFamily, headTailRotatedFamily,
-            A, T, G, leftTensor_mul_leftTensor, mul_assoc]
+            A, T, G, leftTensor_mul_leftTensor]
     _ = leftTensor (ι₂ := ι)
           (A * (gHatHalfProductOutcomeOperator params family r
             (pointTupleTail (Fin.cons q.2.1 q.2.2))
@@ -91,7 +107,7 @@ private lemma commuteGHalfSandwich_recursiveTarget_eq_split
     _ = (headTailRotatedFamily params family (r + 1) (q.1, Fin.cons q.2.1 q.2.2)).outcome
           (ogs.1, Fin.cons ogs.2.1 ogs.2.2) := by
             simp [headTailRotatedFamily, A, G, gHatHalfProductOutcomeOperator,
-              gHatRotatedHalfProductOutcomeOperator, leftTensor_mul_leftTensor, mul_assoc]
+               leftTensor_mul_leftTensor, mul_assoc]
 
 private lemma commuteGHalfSandwich_split_succ_iff
     (params : Parameters) [FieldModel params.q]
@@ -103,7 +119,7 @@ private lemma commuteGHalfSandwich_split_succ_iff
       (headTailRotatedFamily params family (r + 1))
       δ ↔
     SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       (commuteGHalfSandwich_moveSourceFamily params family r)
       (commuteGHalfSandwich_recursiveTargetFamily params family r)
       δ := by
@@ -115,12 +131,14 @@ private lemma commuteGHalfSandwich_split_succ_iff
         (headTailRotatedFamily params family (r + 1)) δ).1 h
     have ho := CommutativityPoints.sddOpRel_reindex (splitSuccOutcomeEquiv params r)
       ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (fun q => headTailOrderedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
-      (fun q => headTailRotatedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
+      (uniformDistribution (MoveQ params r))
+      (fun q =>
+        headTailOrderedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
+      (fun q =>
+        headTailRotatedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
       δ hq
     exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       _ _
       (commuteGHalfSandwich_moveSourceFamily params family r)
       (commuteGHalfSandwich_recursiveTargetFamily params family r)
@@ -139,15 +157,17 @@ private lemma commuteGHalfSandwich_split_succ_iff
   · intro h
     have ho := CommutativityPoints.sddOpRel_reindex (splitSuccOutcomeEquiv params r).symm
       ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       (commuteGHalfSandwich_moveSourceFamily params family r)
       (commuteGHalfSandwich_recursiveTargetFamily params family r)
       δ h
     have hq := CommutativityPoints.sddOpRel_congr_outcome ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       _ _
-      (fun q => headTailOrderedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
-      (fun q => headTailRotatedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
+      (fun q =>
+        headTailOrderedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
+      (fun q =>
+        headTailRotatedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
       δ
       (fun q ogs => by
         simpa [splitSuccQuestionEquiv, splitSuccOutcomeEquiv] using
@@ -165,9 +185,10 @@ private lemma commuteGHalfSandwich_split_succ_iff
 /- private lemma commuteGHalfSandwich_recursiveTarget_eq_rotated
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params r)
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :
-    (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs =
+    (q : MoveQ params r)
+    (ogs : MoveO params r) :
+    (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome
+      ogs =
       (headTailRotatedFamily params family (r + 1) (q.1, Fin.cons q.2.1 q.2.2)).outcome
         (ogs.1, Fin.cons ogs.2.1 ogs.2.2) := by
   let A := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
@@ -207,13 +228,14 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeft
       (headTailRotatedFamily params family r)
       δ) :
     SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       (commuteGHalfSandwich_recursiveSourceFamily params family r)
       (commuteGHalfSandwich_recursiveTargetFamily params family r)
       δ := by
   have hABfst :
       SDDOpRel ψbi
-        (uniformDistribution ((SliceQuestion params × PointTuple params r) × SliceQuestion params))
+        (uniformDistribution
+          ((SliceQuestion params × PointTuple params r) × SliceQuestion params))
         (fun q => headTailOrderedFamily params family r q.1)
         (fun q => headTailRotatedFamily params family r q.1)
         δ :=
@@ -223,7 +245,7 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeft
       δ hAB
   have hABtriple :
       SDDOpRel ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+        (uniformDistribution (MoveQ params r))
         (fun q => headTailOrderedFamily params family r (q.1, q.2.2))
         (fun q => headTailRotatedFamily params family r (q.1, q.2.2))
         δ :=
@@ -231,7 +253,7 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeft
       (fun q => headTailOrderedFamily params family r q.1)
       (fun q => headTailRotatedFamily params family r q.1)
       δ).1 hABfst
-  let C : (SliceQuestion params × SliceQuestion params × PointTuple params r) →
+  let C : (MoveQ params r) →
       (GHatOutcome params × GHatTupleOutcome params r) → GHatOutcome params →
       MIPStarRE.Quantum.Op (ι × ι) :=
     fun q _ gy => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome gy)
@@ -247,8 +269,11 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeft
                 (gHatIdxMeas params family q.2.1).outcome gy) := by
                   refine Finset.sum_congr rfl ?_
                   intro gy _
-                  rw [show (leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome gy))ᴴ =
-                      leftTensor (ι₂ := ι) (((gHatIdxMeas params family q.2.1).outcome gy)ᴴ) by
+                  rw [show
+                      (leftTensor (ι₂ := ι)
+                        ((gHatIdxMeas params family q.2.1).outcome gy))ᴴ =
+                        leftTensor (ι₂ := ι)
+                          (((gHatIdxMeas params family q.2.1).outcome gy)ᴴ) by
                     simpa [leftTensor, opTensor] using
                       (conjTranspose_opTensor ((gHatIdxMeas params family q.2.1).outcome gy)
                         (1 : MIPStarRE.Quantum.Op ι))]
@@ -265,40 +290,44 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeft
                   ((gHatIdxMeas params family q.2.1).toSubMeas))
                 (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one)
       _ = 1 := by simp [leftTensor]
-  let rawSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+  let rawSource : IdxOpFamily (MoveQ params r)
       ((GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) (ι × ι) :=
     fun q =>
-      { outcome := fun ag => C q ag.1 ag.2 * (headTailOrderedFamily params family r (q.1, q.2.2)).outcome ag.1
+      { outcome := fun ag => C q ag.1 ag.2 * (headTailOrderedFamily params family r (q.1,
+          q.2.2)).outcome ag.1
         total := ∑ ag : (GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params,
           C q ag.1 ag.2 * (headTailOrderedFamily params family r (q.1, q.2.2)).outcome ag.1 }
-  let rawTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+  let rawTarget : IdxOpFamily (MoveQ params r)
       ((GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) (ι × ι) :=
     fun q =>
-      { outcome := fun ag => C q ag.1 ag.2 * (headTailRotatedFamily params family r (q.1, q.2.2)).outcome ag.1
+      { outcome := fun ag => C q ag.1 ag.2 * (headTailRotatedFamily params family r (q.1,
+          q.2.2)).outcome ag.1
         total := ∑ ag : (GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params,
           C q ag.1 ag.2 * (headTailRotatedFamily params family r (q.1, q.2.2)).outcome ag.1 }
   have hcab :=
     Preliminaries.cabApproxDelta_raw ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       (fun q => headTailOrderedFamily params family r (q.1, q.2.2))
       (fun q => headTailRotatedFamily params family r (q.1, q.2.2))
       C δ hABtriple hC
   have hreindex := CommutativityPoints.sddOpRel_reindex (prefixTripleOutcomeEquiv params r)
     ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    (uniformDistribution (MoveQ params r))
     rawSource rawTarget δ hcab
-  let reindexedSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+  let reindexedSource : IdxOpFamily (SliceQuestion params × SliceQuestion params ×
+      PointTuple params r)
+      (MoveO params r) (ι × ι) :=
     fun q =>
       { outcome := fun a' => (rawSource q).outcome ((prefixTripleOutcomeEquiv params r).symm a')
         total := (rawSource q).total }
-  let reindexedTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+  let reindexedTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params ×
+      PointTuple params r)
+      (MoveO params r) (ι × ι) :=
     fun q =>
       { outcome := fun a' => (rawTarget q).outcome ((prefixTripleOutcomeEquiv params r).symm a')
         total := (rawTarget q).total }
   exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    (uniformDistribution (MoveQ params r))
     reindexedSource reindexedTarget
     (commuteGHalfSandwich_recursiveSourceFamily params family r)
     (commuteGHalfSandwich_recursiveTargetFamily params family r)
@@ -312,8 +341,9 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeft
     hreindex
 
 private def swappedFrontQuestionEquiv (params : Parameters) (r : ℕ) :
-    (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) ≃
-      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) where
+    (MoveTailQ params r) ≃
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params ×
+          PointTuple params r) where
   toFun q := (q.2.1, q.1, q.2.2.1, q.2.2.2)
   invFun q := (q.2.1, q.1, q.2.2.1, q.2.2.2)
   left_inv q := by
@@ -324,8 +354,9 @@ private def swappedFrontQuestionEquiv (params : Parameters) (r : ℕ) :
     rfl
 
 private def swappedFrontOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
-    (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) ≃
-      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
+    (MoveTailO params r) ≃
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params ×
+          GHatTupleOutcome params r) where
   toFun og := (og.2.1, og.1, og.2.2.1, og.2.2.2)
   invFun og := (og.2.1, og.1, og.2.2.1, og.2.2.2)
   left_inv og := by
@@ -336,21 +367,22 @@ private def swappedFrontOutcomeEquiv (params : Parameters) [FieldModel params.q]
     rfl
 
 private def moveTailSwappedFrontQuestionEquiv (params : Parameters) (r : ℕ) :
-    (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) ≃
-      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) :=
+    (MoveQ params (r + 1)) ≃
+      (MoveTailQ params r) :=
   (moveTailQuestionEquiv params r).trans (swappedFrontQuestionEquiv params r)
 
-private def moveTailSwappedFrontOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
-    (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) ≃
-      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :=
+private def moveTailSwappedFrontOutcomeEquiv
+    (params : Parameters) [FieldModel params.q] (r : ℕ) :
+    (MoveO params (r + 1)) ≃
+      (MoveTailO params r) :=
   (moveTailOutcomeEquiv params r).trans (swappedFrontOutcomeEquiv params r)
 
 private noncomputable def commuteGHalfSandwich_splitSuccLiftFamily
     (params : Parameters) [FieldModel params.q]
     (r : ℕ)
     (F : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (MoveQ params r)
+      (MoveO params r)
       (ι × ι)) :
     IdxOpFamily
       (SliceQuestion params × PointTuple params (r + 1))
@@ -369,12 +401,13 @@ private noncomputable def commuteGHalfSandwich_prefixSecondSliceLeftFamily
       (GHatOutcome params × GHatTupleOutcome params r)
       (ι × ι)) :
     IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (MoveQ params r)
+      (MoveO params r)
       (ι × ι) :=
   fun q =>
     { outcome := fun ogs =>
-        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+        leftTensor (ι₂ := ι)
+                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           (F (q.1, q.2.2)).outcome (ogs.1, ogs.2.2)
       total :=
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
@@ -394,20 +427,21 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeftLift
       A B
       δ) :
     SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family r A)
       (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family r B)
       δ := by
   have hABfst :
       SDDOpRel ψbi
-        (uniformDistribution ((SliceQuestion params × PointTuple params r) × SliceQuestion params))
+        (uniformDistribution
+          ((SliceQuestion params × PointTuple params r) × SliceQuestion params))
         (fun q => A q.1)
         (fun q => B q.1)
         δ :=
     sddOpRel_uniform_fst ψbi A B δ hAB
   have hABtriple :
       SDDOpRel ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+        (uniformDistribution (MoveQ params r))
         (fun q => A (q.1, q.2.2))
         (fun q => B (q.1, q.2.2))
         δ :=
@@ -415,7 +449,7 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeftLift
       (fun q => A q.1)
       (fun q => B q.1)
       δ).1 hABfst
-  let C : (SliceQuestion params × SliceQuestion params × PointTuple params r) →
+  let C : (MoveQ params r) →
       (GHatOutcome params × GHatTupleOutcome params r) → GHatOutcome params →
       MIPStarRE.Quantum.Op (ι × ι) :=
     fun q _ gy => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome gy)
@@ -431,8 +465,11 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeftLift
                 (gHatIdxMeas params family q.2.1).outcome gy) := by
                   refine Finset.sum_congr rfl ?_
                   intro gy _
-                  rw [show (leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome gy))ᴴ =
-                      leftTensor (ι₂ := ι) (((gHatIdxMeas params family q.2.1).outcome gy)ᴴ) by
+                  rw [show
+                      (leftTensor (ι₂ := ι)
+                        ((gHatIdxMeas params family q.2.1).outcome gy))ᴴ =
+                        leftTensor (ι₂ := ι)
+                          (((gHatIdxMeas params family q.2.1).outcome gy)ᴴ) by
                     simpa [leftTensor, opTensor] using
                       (conjTranspose_opTensor ((gHatIdxMeas params family q.2.1).outcome gy)
                         (1 : MIPStarRE.Quantum.Op ι))]
@@ -449,13 +486,13 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeftLift
                   ((gHatIdxMeas params family q.2.1).toSubMeas))
                 (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one)
       _ = 1 := by simp [leftTensor]
-  let rawSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+  let rawSource : IdxOpFamily (MoveQ params r)
       ((GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) (ι × ι) :=
     fun q =>
       { outcome := fun ag => C q ag.1 ag.2 * (A (q.1, q.2.2)).outcome ag.1
         total := ∑ ag : (GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params,
           C q ag.1 ag.2 * (A (q.1, q.2.2)).outcome ag.1 }
-  let rawTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+  let rawTarget : IdxOpFamily (MoveQ params r)
       ((GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) (ι × ι) :=
     fun q =>
       { outcome := fun ag => C q ag.1 ag.2 * (B (q.1, q.2.2)).outcome ag.1
@@ -463,26 +500,28 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeftLift
           C q ag.1 ag.2 * (B (q.1, q.2.2)).outcome ag.1 }
   have hcab :=
     Preliminaries.cabApproxDelta_raw ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       (fun q => A (q.1, q.2.2))
       (fun q => B (q.1, q.2.2))
       C δ hABtriple hC
   have hreindex := CommutativityPoints.sddOpRel_reindex (prefixTripleOutcomeEquiv params r)
     ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    (uniformDistribution (MoveQ params r))
     rawSource rawTarget δ hcab
-  let reindexedSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+  let reindexedSource : IdxOpFamily (SliceQuestion params × SliceQuestion params ×
+      PointTuple params r)
+      (MoveO params r) (ι × ι) :=
     fun q =>
       { outcome := fun a' => (rawSource q).outcome ((prefixTripleOutcomeEquiv params r).symm a')
         total := (rawSource q).total }
-  let reindexedTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+  let reindexedTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params ×
+      PointTuple params r)
+      (MoveO params r) (ι × ι) :=
     fun q =>
       { outcome := fun a' => (rawTarget q).outcome ((prefixTripleOutcomeEquiv params r).symm a')
         total := (rawTarget q).total }
   exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    (uniformDistribution (MoveQ params r))
     reindexedSource reindexedTarget
     (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family r A)
     (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family r B)
@@ -500,12 +539,12 @@ private lemma commuteGHalfSandwich_splitSuccLift
     (ψbi : QuantumState (ι × ι))
     (r : ℕ)
     (A B : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (MoveQ params r)
+      (MoveO params r)
       (ι × ι))
     (δ : Error)
     (hAB : SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       A B
       δ) :
     SDDOpRel ψbi
@@ -514,14 +553,14 @@ private lemma commuteGHalfSandwich_splitSuccLift
       (commuteGHalfSandwich_splitSuccLiftFamily params r B)
       δ := by
   let A' : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (MoveQ params r)
       (GHatOutcome params × GHatTupleOutcome params (r + 1))
       (ι × ι) :=
     fun q =>
       { outcome := fun ogs => A q |>.outcome ((splitSuccOutcomeEquiv params r) ogs)
         total := (A q).total }
   let B' : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (MoveQ params r)
       (GHatOutcome params × GHatTupleOutcome params (r + 1))
       (ι × ι) :=
     fun q =>
@@ -529,10 +568,10 @@ private lemma commuteGHalfSandwich_splitSuccLift
         total := (B q).total }
   have ho := CommutativityPoints.sddOpRel_reindex (splitSuccOutcomeEquiv params r).symm
     ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    (uniformDistribution (MoveQ params r))
     A B δ hAB
   have hq := CommutativityPoints.sddOpRel_congr_outcome ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    (uniformDistribution (MoveQ params r))
     _ _
     A' B'
     δ
@@ -567,9 +606,11 @@ private lemma commuteGHalfSandwich_splitSuccLift_moveSource
     (q : SliceQuestion params × PointTuple params (r + 1))
     (ogs : GHatOutcome params × GHatTupleOutcome params (r + 1)) :
     (commuteGHalfSandwich_splitSuccLiftFamily params r
-      (commuteGHalfSandwich_moveSourceFamily params family r) q).outcome ogs =
+      (commuteGHalfSandwich_moveSourceFamily params family r) q).outcome
+        ogs =
       (headTailOrderedFamily params family (r + 1) q).outcome ogs := by
-  simpa [commuteGHalfSandwich_splitSuccLiftFamily, splitSuccQuestionEquiv, splitSuccOutcomeEquiv] using
+  simpa [commuteGHalfSandwich_splitSuccLiftFamily, splitSuccQuestionEquiv,
+      splitSuccOutcomeEquiv] using
     commuteGHalfSandwich_moveSource_eq_split params family r
       ((splitSuccQuestionEquiv params r) q)
       ((splitSuccOutcomeEquiv params r) ogs)
@@ -578,16 +619,17 @@ private noncomputable def commuteGHalfSandwich_secondSliceLiftFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
     (F : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (MoveQ params r)
+      (MoveO params r)
       (ι × ι)) :
     IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (MoveQ params (r + 1))
+      (MoveO params (r + 1))
       (ι × ι) :=
   fun q =>
     { outcome := fun ogs =>
-        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+        leftTensor (ι₂ := ι)
+                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           (F (q.1, q.2.2 0, pointTupleTail q.2.2)).outcome
             (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
       total :=
@@ -597,10 +639,11 @@ private noncomputable def commuteGHalfSandwich_secondSliceLiftFamily
 private lemma commuteGHalfSandwich_secondSliceLift_moveSource
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (q : MoveQ params (r + 1))
+    (ogs : MoveO params (r + 1)) :
     (commuteGHalfSandwich_secondSliceLiftFamily params family r
-      (commuteGHalfSandwich_moveSourceFamily params family r) q).outcome ogs =
+      (commuteGHalfSandwich_moveSourceFamily params family r) q).outcome
+        ogs =
       (commuteGHalfSandwich_recursiveSourceFamily params family (r + 1) q).outcome ogs := by
   simp [commuteGHalfSandwich_secondSliceLiftFamily,
     commuteGHalfSandwich_recursiveSourceFamily, commuteGHalfSandwich_moveSourceFamily,
@@ -610,25 +653,27 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeft_splitSuccLift_eq_second
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
     (F : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (MoveQ params r)
+      (MoveO params r)
       (ι × ι))
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (q : MoveQ params (r + 1))
+    (ogs : MoveO params (r + 1)) :
     (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
-      (commuteGHalfSandwich_splitSuccLiftFamily params r F) q).outcome ogs =
+      (commuteGHalfSandwich_splitSuccLiftFamily params r F) q).outcome
+        ogs =
       (commuteGHalfSandwich_secondSliceLiftFamily params family r F q).outcome ogs := by
   simp [commuteGHalfSandwich_prefixSecondSliceLeftFamily,
     commuteGHalfSandwich_splitSuccLiftFamily,
     commuteGHalfSandwich_secondSliceLiftFamily,
-    splitSuccQuestionEquiv, splitSuccOutcomeEquiv, leftTensor_mul_leftTensor, mul_assoc]
+    splitSuccQuestionEquiv, splitSuccOutcomeEquiv]
 
 private lemma commuteGHalfSandwich_moveFamily_eq_moveStepTarget
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
-    (commuteGHalfSandwich_moveFamily params family (r + 1) q).outcome ogs =
+    (q : MoveQ params (r + 1))
+    (ogs : MoveO params (r + 1)) :
+    (commuteGHalfSandwich_moveFamily params family (r + 1) q).outcome
+      ogs =
       (commuteGHalfSandwich_moveStepTargetFamily params family r
         ((moveTailQuestionEquiv params r) q)).outcome
         ((moveTailOutcomeEquiv params r) ogs) := by
@@ -639,9 +684,10 @@ private lemma commuteGHalfSandwich_moveFamily_eq_moveStepTarget
   let G := (gHatIdxMeas params family (q.2.2 0)).outcome (ogs.2.2 0)
   calc
     (commuteGHalfSandwich_moveFamily params family (r + 1) q).outcome ogs
-      = leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) (T * G) := by
-          simp [commuteGHalfSandwich_moveFamily, moveTailQuestionEquiv, moveTailOutcomeEquiv,
-            A, B, T, G, gHatReverseHalfProductOutcomeOperator, leftTensor_mul_leftTensor, mul_assoc]
+      = leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B *
+          rightTensor (ι₁ := ι) (T * G) := by
+          simp [commuteGHalfSandwich_moveFamily,
+            A, B, T, G, gHatReverseHalfProductOutcomeOperator, leftTensor_mul_leftTensor]
     _ = leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B *
           (rightTensor (ι₁ := ι) T * rightTensor (ι₁ := ι) G) := by
             rw [rightTensor_mul_rightTensor]
@@ -652,26 +698,26 @@ private lemma commuteGHalfSandwich_moveFamily_eq_moveStepTarget
               moveTailOutcomeEquiv, A, B, T, G, mul_assoc]
 
 private def commuteGHalfSandwich_moveChainLiftQuestionEquiv (params : Parameters) (r : ℕ) :
-    ((SliceQuestion params × SliceQuestion params × PointTuple params r) × SliceQuestion params) ≃
-      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) :=
+    ((MoveQ params r) × SliceQuestion params) ≃
+      (MoveQ params (r + 1)) :=
   (firstSliceBackQuestionEquiv params r).trans (moveTailQuestionEquiv params r).symm
 
 private def commuteGHalfSandwich_moveChainLiftOutcomeEquiv
     (params : Parameters) [FieldModel params.q] (r : ℕ) :
-    ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) ≃
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :=
+    ((MoveO params r) × GHatOutcome params) ≃
+      (MoveO params (r + 1)) :=
   (firstSliceBackOutcomeEquiv params r).trans (moveTailOutcomeEquiv params r).symm
 
 private noncomputable def commuteGHalfSandwich_moveChainLiftFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
     (F : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (MoveQ params r)
+      (MoveO params r)
       (ι × ι)) :
     IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (MoveQ params (r + 1))
+      (MoveO params (r + 1))
       (ι × ι) :=
   fun q =>
     { outcome := fun ogs =>
@@ -687,30 +733,31 @@ private lemma commuteGHalfSandwich_moveChainLift
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι) (r : ℕ)
     (A B : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (MoveQ params r)
+      (MoveO params r)
       (ι × ι))
     (δ : Error)
     (hAB : SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       A B
       δ) :
     SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (uniformDistribution (MoveQ params (r + 1)))
       (commuteGHalfSandwich_moveChainLiftFamily params family r A)
       (commuteGHalfSandwich_moveChainLiftFamily params family r B)
       δ := by
   have hABfst :
       SDDOpRel ψbi
         (uniformDistribution
-          (((SliceQuestion params × SliceQuestion params × PointTuple params r)) × SliceQuestion params))
+          (((MoveQ params r)) ×
+              SliceQuestion params))
         (fun q => A q.1)
         (fun q => B q.1)
         δ :=
     sddOpRel_uniform_fst ψbi A B δ hAB
   have hABlift :
       SDDOpRel ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (uniformDistribution (MoveQ params (r + 1)))
         (fun q => A (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1))
         (fun q => B (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1))
         δ :=
@@ -718,8 +765,8 @@ private lemma commuteGHalfSandwich_moveChainLift
       (fun q => A q.1)
       (fun q => B q.1)
       δ).1 hABfst
-  let C : (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) →
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) → GHatOutcome params →
+  let C : (MoveQ params (r + 1)) →
+      (MoveO params r) → GHatOutcome params →
       MIPStarRE.Quantum.Op (ι × ι) :=
     fun q _ g₁ => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g₁)
   have hC :
@@ -734,8 +781,11 @@ private lemma commuteGHalfSandwich_moveChainLift
                 (gHatIdxMeas params family q.1).outcome g₁) := by
                   refine Finset.sum_congr rfl ?_
                   intro g₁ _
-                  rw [show (leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g₁))ᴴ =
-                      leftTensor (ι₂ := ι) (((gHatIdxMeas params family q.1).outcome g₁)ᴴ) by
+                  rw [show
+                      (leftTensor (ι₂ := ι)
+                        ((gHatIdxMeas params family q.1).outcome g₁))ᴴ =
+                        leftTensor (ι₂ := ι)
+                          (((gHatIdxMeas params family q.1).outcome g₁)ᴴ) by
                     simpa [leftTensor, opTensor] using
                       (conjTranspose_opTensor ((gHatIdxMeas params family q.1).outcome g₁)
                         (1 : MIPStarRE.Quantum.Op ι))]
@@ -754,56 +804,60 @@ private lemma commuteGHalfSandwich_moveChainLift
                 ((gHatIdxMeas params family q.1).toSubMeas)
             exact leftTensor_le_one (ι₂ := ι) (A := _) hinner
   let rawSource : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-      ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params)
+      (MoveQ params (r + 1))
+      ((MoveO params r) × GHatOutcome params)
       (ι × ι) :=
     fun q =>
       { outcome := fun ag => C q ag.1 ag.2 *
           (A (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1)).outcome ag.1
         total := ∑ ag :
-          ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params),
+          ((MoveO params r) ×
+              GHatOutcome params),
           C q ag.1 ag.2 *
-            (A (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1)).outcome ag.1 }
+            (A (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1)).outcome
+                ag.1 }
   let rawTarget : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-      ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params)
+      (MoveQ params (r + 1))
+      ((MoveO params r) × GHatOutcome params)
       (ι × ι) :=
     fun q =>
       { outcome := fun ag => C q ag.1 ag.2 *
           (B (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1)).outcome ag.1
         total := ∑ ag :
-          ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params),
+          ((MoveO params r) ×
+              GHatOutcome params),
           C q ag.1 ag.2 *
-            (B (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1)).outcome ag.1 }
+            (B (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1)).outcome
+                ag.1 }
   have hcab :=
     Preliminaries.cabApproxDelta_raw ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (uniformDistribution (MoveQ params (r + 1)))
       (fun q => A (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1))
       (fun q => B (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1))
       C δ hABlift hC
   have hreindex := CommutativityPoints.sddOpRel_reindex
     (commuteGHalfSandwich_moveChainLiftOutcomeEquiv params r)
     ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    (uniformDistribution (MoveQ params (r + 1)))
     rawSource rawTarget δ hcab
   let reindexedSource : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (MoveQ params (r + 1))
+      (MoveO params (r + 1))
       (ι × ι) :=
     fun q =>
       { outcome := fun a' =>
           (rawSource q).outcome ((commuteGHalfSandwich_moveChainLiftOutcomeEquiv params r).symm a')
         total := (rawSource q).total }
   let reindexedTarget : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (MoveQ params (r + 1))
+      (MoveO params (r + 1))
       (ι × ι) :=
     fun q =>
       { outcome := fun a' =>
           (rawTarget q).outcome ((commuteGHalfSandwich_moveChainLiftOutcomeEquiv params r).symm a')
         total := (rawTarget q).total }
   exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    (uniformDistribution (MoveQ params (r + 1)))
     reindexedSource reindexedTarget
     (commuteGHalfSandwich_moveChainLiftFamily params family r A)
     (commuteGHalfSandwich_moveChainLiftFamily params family r B)
@@ -823,10 +877,11 @@ private lemma commuteGHalfSandwich_moveChainLift
 private lemma commuteGHalfSandwich_moveChainLift_moveFamily_eq_moveStepMid
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (q : MoveQ params (r + 1))
+    (ogs : MoveO params (r + 1)) :
     (commuteGHalfSandwich_moveChainLiftFamily params family r
-      (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs =
+      (commuteGHalfSandwich_moveFamily params family r) q).outcome
+        ogs =
       (commuteGHalfSandwich_moveStepMidFamily params family r
         ((moveTailQuestionEquiv params r) q)).outcome
         ((moveTailOutcomeEquiv params r) ogs) := by
@@ -841,9 +896,11 @@ private lemma commuteGHalfSandwich_moveChainLift_moveFamily_eq_moveStepMid
       = leftTensor (ι₂ := ι) A *
           (leftTensor (ι₂ := ι) (B * G) * rightTensor (ι₁ := ι) T) := by
             simp [commuteGHalfSandwich_moveChainLiftFamily, commuteGHalfSandwich_moveFamily,
-              A, B, G, T, gHatReverseHalfProductOutcomeOperator,
-              leftTensor_mul_leftTensor, mul_assoc]
-    _ = (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) (B * G)) * rightTensor (ι₁ := ι) T := by
+              A, B, G, T,
+              leftTensor_mul_leftTensor]
+    _ =
+        (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) (B * G)) *
+          rightTensor (ι₁ := ι) T := by
           simp [mul_assoc]
     _ = leftTensor (ι₂ := ι) (A * (B * G)) * rightTensor (ι₁ := ι) T := by
           rw [leftTensor_mul_leftTensor]
@@ -864,15 +921,14 @@ private lemma commuteGHalfSandwich_moveChainLift_moveFamily_last
       (gHatSelfConsistencyRightFamily params family)
       (gHatSelfConsistencyError zeta)) :
     SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (uniformDistribution (MoveQ params (r + 1)))
       (commuteGHalfSandwich_moveChainLiftFamily params family r
         (commuteGHalfSandwich_moveFamily params family r))
       (commuteGHalfSandwich_moveFamily params family (r + 1))
       (gHatSelfConsistencyError zeta) := by
   have hmid :
       SDDOpRel ψbi
-        (uniformDistribution
-          (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (uniformDistribution (MoveQ params (r + 1)))
         (fun q => commuteGHalfSandwich_moveStepMidFamily params family r
           ((moveTailQuestionEquiv params r) q))
         (fun q => commuteGHalfSandwich_moveStepTargetFamily params family r
@@ -887,7 +943,7 @@ private lemma commuteGHalfSandwich_moveChainLift_moveFamily_last
       (commuteGHalfSandwich_moveStepMid_toTarget params ψbi family zeta r hsc)
   have hreindex := CommutativityPoints.sddOpRel_reindex (moveTailOutcomeEquiv params r).symm
     ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    (uniformDistribution (MoveQ params (r + 1)))
     (fun q => commuteGHalfSandwich_moveStepMidFamily params family r
       ((moveTailQuestionEquiv params r) q))
     (fun q => commuteGHalfSandwich_moveStepTargetFamily params family r
@@ -895,7 +951,7 @@ private lemma commuteGHalfSandwich_moveChainLift_moveFamily_last
     (gHatSelfConsistencyError zeta)
     hmid
   exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    (uniformDistribution (MoveQ params (r + 1)))
     _ _
     (commuteGHalfSandwich_moveChainLiftFamily params family r
       (commuteGHalfSandwich_moveFamily params family r))
@@ -913,8 +969,8 @@ private noncomputable def commuteGHalfSandwich_moveChainFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     (r : ℕ) → Fin (r + 1) → IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (MoveQ params r)
+      (MoveO params r)
       (ι × ι)
   | 0, _ => commuteGHalfSandwich_moveSourceFamily params family 0
   | r + 1, i =>
@@ -928,7 +984,8 @@ private lemma commuteGHalfSandwich_moveChainFamily_zero
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ r q ogs,
-      (commuteGHalfSandwich_moveChainFamily params family r 0 q).outcome ogs =
+      (commuteGHalfSandwich_moveChainFamily params family r 0 q).outcome
+        ogs =
         (commuteGHalfSandwich_moveSourceFamily params family r q).outcome ogs
   | 0, q, ogs => by rfl
   | r + 1, q, ogs => by
@@ -941,7 +998,8 @@ private lemma commuteGHalfSandwich_moveChainFamily_last
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ r q ogs,
-      (commuteGHalfSandwich_moveChainFamily params family r (Fin.last r) q).outcome ogs =
+      (commuteGHalfSandwich_moveChainFamily params family r (Fin.last r) q).outcome
+        ogs =
         (commuteGHalfSandwich_moveFamily params family r q).outcome ogs
   | 0, q, ogs => by
       simp [commuteGHalfSandwich_moveChainFamily,
@@ -962,14 +1020,15 @@ private lemma commuteGHalfSandwich_moveChain_step
       (gHatSelfConsistencyError zeta)) :
     ∀ r (i : Fin r),
       SDDOpRel ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+        (uniformDistribution (MoveQ params r))
         ((commuteGHalfSandwich_moveChainFamily params family r) i.castSucc)
         ((commuteGHalfSandwich_moveChainFamily params family r) i.succ)
         (gHatSelfConsistencyError zeta)
   | 0, i => Fin.elim0 i
   | r + 1, i => by
       by_cases hi : i.1 < r
-      · have hsmall := commuteGHalfSandwich_moveChain_step params ψbi family zeta hsc r ⟨i.1, hi⟩
+      · have hsmall :=
+          commuteGHalfSandwich_moveChain_step params ψbi family zeta hsc r ⟨i.1, hi⟩
         let j : Fin r := ⟨i.1, hi⟩
         have hsrc : i.1 < r + 1 := Nat.lt_trans hi (Nat.lt_succ_self r)
         simpa [commuteGHalfSandwich_moveChainFamily, hi,
@@ -982,10 +1041,12 @@ private lemma commuteGHalfSandwich_moveChain_step
       · have hilast : i.1 = r := by omega
         have hi_last : i = Fin.last r := Fin.ext hilast
         cases hi_last
-        have hlast := commuteGHalfSandwich_moveChainLift_moveFamily_last params ψbi family zeta r hsc
+        have hlast := commuteGHalfSandwich_moveChainLift_moveFamily_last params ψbi family zeta
+            r hsc
         simpa [commuteGHalfSandwich_moveChainFamily] using
           (CommutativityPoints.sddOpRel_congr_outcome ψbi
-            (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+            (uniformDistribution (SliceQuestion params × SliceQuestion params ×
+                PointTuple params (r + 1)))
             (commuteGHalfSandwich_moveChainLiftFamily params family r
               (commuteGHalfSandwich_moveFamily params family r))
             (commuteGHalfSandwich_moveFamily params family (r + 1))
@@ -1013,31 +1074,32 @@ private lemma commuteGHalfSandwich_move_chain
       (gHatSelfConsistencyRightFamily params family)
       (gHatSelfConsistencyError zeta)) :
     SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       (commuteGHalfSandwich_moveSourceFamily params family r)
       (commuteGHalfSandwich_moveFamily params family r)
-      ((r : Error) * ∑ i : Fin r, gHatSelfConsistencyError zeta) := by
+      ((r : Error) * ∑ _i : Fin r, gHatSelfConsistencyError zeta) := by
   cases r with
   | zero =>
       simpa using commuteGHalfSandwich_move_recursive_zero params ψbi family
   | succ r =>
       have hchain := Preliminaries.sddOpRel_chain
         ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (uniformDistribution (MoveQ params (r + 1)))
         (r + 1)
         (commuteGHalfSandwich_moveChainFamily params family (r + 1))
         (fun _ => gHatSelfConsistencyError zeta)
         (commuteGHalfSandwich_moveChain_step params ψbi family zeta hsc (r + 1))
       have hchain' :
           SDDOpRel ψbi
-            (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+            (uniformDistribution (SliceQuestion params × SliceQuestion params ×
+                PointTuple params (r + 1)))
             (commuteGHalfSandwich_moveChainFamily params family (r + 1) 0)
             (commuteGHalfSandwich_moveChainFamily params family (r + 1) (Fin.last (r + 1)))
             (((r + 1 : Error)) * ∑ i : Fin (r + 1), gHatSelfConsistencyError zeta) := by
         simpa using hchain
       simpa [Nat.cast_add, add_comm, add_left_comm, add_assoc] using
         (CommutativityPoints.sddOpRel_congr_outcome ψbi
-          (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+          (uniformDistribution (MoveQ params (r + 1)))
           (commuteGHalfSandwich_moveChainFamily params family (r + 1) 0)
           (commuteGHalfSandwich_moveChainFamily params family (r + 1) (Fin.last (r + 1)))
           (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
@@ -1052,22 +1114,22 @@ private lemma commuteGHalfSandwich_secondSliceLift
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι) (r : ℕ)
     (A B : IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (MoveQ params r)
+      (MoveO params r)
       (ι × ι))
     (δ : Error)
     (hAB : SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       A B
       δ) :
     SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (uniformDistribution (MoveQ params (r + 1)))
       (commuteGHalfSandwich_secondSliceLiftFamily params family r A)
       (commuteGHalfSandwich_secondSliceLiftFamily params family r B)
       δ := by
   let eQ :
-      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) ≃
-        (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) :=
+      (MoveQ params (r + 1)) ≃
+        (MoveQ params (r + 1)) :=
     { toFun := fun q => (q.2.1, q.1, q.2.2)
       invFun := fun q => (q.2.1, q.1, q.2.2)
       left_inv := by
@@ -1079,8 +1141,8 @@ private lemma commuteGHalfSandwich_secondSliceLift
         rcases q with ⟨x₁, x₂, xs⟩
         rfl }
   let eO :
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) ≃
-        (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :=
+      (MoveO params (r + 1)) ≃
+        (MoveO params (r + 1)) :=
     { toFun := fun ogs => (ogs.2.1, ogs.1, ogs.2.2)
       invFun := fun ogs => (ogs.2.1, ogs.1, ogs.2.2)
       left_inv := by
@@ -1095,7 +1157,7 @@ private lemma commuteGHalfSandwich_secondSliceLift
     commuteGHalfSandwich_moveChainLift params ψbi family r A B δ hAB
   have hswapQ :
       SDDOpRel ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (uniformDistribution (MoveQ params (r + 1)))
         (fun q =>
           commuteGHalfSandwich_moveChainLiftFamily params family r A (eQ.symm q))
         (fun q =>
@@ -1107,14 +1169,14 @@ private lemma commuteGHalfSandwich_secondSliceLift
       δ).1 hlift
   have hreindex := CommutativityPoints.sddOpRel_reindex eO
     ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    (uniformDistribution (MoveQ params (r + 1)))
     (fun q =>
       commuteGHalfSandwich_moveChainLiftFamily params family r A (eQ.symm q))
     (fun q =>
       commuteGHalfSandwich_moveChainLiftFamily params family r B (eQ.symm q))
     δ hswapQ
   exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    (uniformDistribution (MoveQ params (r + 1)))
     _ _
     (commuteGHalfSandwich_secondSliceLiftFamily params family r A)
     (commuteGHalfSandwich_secondSliceLiftFamily params family r B)
@@ -1131,8 +1193,8 @@ private noncomputable def commuteGHalfSandwich_moveBackChainFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
     Fin (r + 1) → IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (MoveQ params (r + 1))
+      (MoveO params (r + 1))
       (ι × ι)
   | i =>
       commuteGHalfSandwich_secondSliceLiftFamily params family r
@@ -1142,27 +1204,32 @@ private noncomputable def commuteGHalfSandwich_moveBackChainFamily
 private lemma commuteGHalfSandwich_moveBackChainFamily_last
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
-    (commuteGHalfSandwich_moveBackChainFamily params family r (Fin.last r) q).outcome ogs =
+    (q : MoveQ params (r + 1))
+    (ogs : MoveO params (r + 1)) :
+    (commuteGHalfSandwich_moveBackChainFamily params family r (Fin.last r) q).outcome
+      ogs =
       (commuteGHalfSandwich_recursiveSourceFamily params family (r + 1) q).outcome ogs := by
-  let q' : SliceQuestion params × SliceQuestion params × PointTuple params r :=
+  let q' : MoveQ params r :=
     (q.1, q.2.2 0, pointTupleTail q.2.2)
-  let ogs' : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r :=
+  let ogs' : MoveO params r :=
     (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
   have hzero :
       (commuteGHalfSandwich_secondSliceLiftFamily params family r
-        ((commuteGHalfSandwich_moveChainFamily params family r) 0) q).outcome ogs =
+        ((commuteGHalfSandwich_moveChainFamily params family r) 0) q).outcome
+          ogs =
         (commuteGHalfSandwich_recursiveSourceFamily params family (r + 1) q).outcome ogs := by
     calc
       (commuteGHalfSandwich_secondSliceLiftFamily params family r
         ((commuteGHalfSandwich_moveChainFamily params family r) 0) q).outcome ogs
-        = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+        = leftTensor (ι₂ := ι)
+                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
             (commuteGHalfSandwich_moveSourceFamily params family r q').outcome ogs' := by
               simpa [commuteGHalfSandwich_secondSliceLiftFamily, q', ogs'] using
                 congrArg
                   (fun X =>
-                    leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                    leftTensor (ι₂ := ι)
+                        ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+                      X)
                   (commuteGHalfSandwich_moveChainFamily_zero params family r q' ogs')
       _ = (commuteGHalfSandwich_recursiveSourceFamily params family (r + 1) q).outcome ogs := by
             exact commuteGHalfSandwich_secondSliceLift_moveSource params family r q ogs
@@ -1171,10 +1238,11 @@ private lemma commuteGHalfSandwich_moveBackChainFamily_last
 private lemma commuteGHalfSandwich_secondSliceLift_moveFamily_eq_swappedFrontMoveStepMid
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (q : MoveQ params (r + 1))
+    (ogs : MoveO params (r + 1)) :
     (commuteGHalfSandwich_secondSliceLiftFamily params family r
-      (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs =
+      (commuteGHalfSandwich_moveFamily params family r) q).outcome
+        ogs =
       (commuteGHalfSandwich_moveStepMidFamily params family r
         ((moveTailSwappedFrontQuestionEquiv params r) q)).outcome
         ((moveTailSwappedFrontOutcomeEquiv params r) ogs) := by
@@ -1189,8 +1257,10 @@ private lemma commuteGHalfSandwich_secondSliceLift_moveFamily_eq_swappedFrontMov
       = leftTensor (ι₂ := ι) A *
           (leftTensor (ι₂ := ι) (B * G) * rightTensor (ι₁ := ι) T) := by
             simp [commuteGHalfSandwich_secondSliceLiftFamily, commuteGHalfSandwich_moveFamily,
-              A, B, G, T, leftTensor_mul_leftTensor, mul_assoc]
-    _ = (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) (B * G)) * rightTensor (ι₁ := ι) T := by
+              A, B, G, T, leftTensor_mul_leftTensor]
+    _ =
+        (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) (B * G)) *
+          rightTensor (ι₁ := ι) T := by
           simp [mul_assoc]
     _ = leftTensor (ι₂ := ι) (A * (B * G)) * rightTensor (ι₁ := ι) T := by
           rw [leftTensor_mul_leftTensor]
@@ -1206,9 +1276,10 @@ private lemma commuteGHalfSandwich_secondSliceLift_moveFamily_eq_swappedFrontMov
 private lemma commuteGHalfSandwich_commute_eq_swappedFrontMoveStepTarget
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
-    (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs =
+    (q : MoveQ params (r + 1))
+    (ogs : MoveO params (r + 1)) :
+    (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome
+      ogs =
       (commuteGHalfSandwich_moveStepTargetFamily params family r
         ((moveTailSwappedFrontQuestionEquiv params r) q)).outcome
         ((moveTailSwappedFrontOutcomeEquiv params r) ogs) := by
@@ -1232,7 +1303,7 @@ private lemma commuteGHalfSandwich_moveBackChain_step
       (gHatSelfConsistencyError zeta)) :
     ∀ i : Fin r,
       SDDOpRel ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (uniformDistribution (MoveQ params (r + 1)))
         ((commuteGHalfSandwich_moveBackChainFamily params family r) i.castSucc)
         ((commuteGHalfSandwich_moveBackChainFamily params family r) i.succ)
         (gHatSelfConsistencyError zeta)
@@ -1245,7 +1316,7 @@ private lemma commuteGHalfSandwich_moveBackChain_step
         (gHatSelfConsistencyError zeta)
         hstep
       have hsymm := Preliminaries.sddOpRel_symm ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (uniformDistribution (MoveQ params (r + 1)))
         (commuteGHalfSandwich_secondSliceLiftFamily params family r
           ((commuteGHalfSandwich_moveChainFamily params family r) j.castSucc))
         (commuteGHalfSandwich_secondSliceLiftFamily params family r
@@ -1261,7 +1332,7 @@ private lemma commuteGHalfSandwich_moveBackChain_step
         dsimp [j]
         omega
       exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (uniformDistribution (MoveQ params (r + 1)))
         (commuteGHalfSandwich_secondSliceLiftFamily params family r
           ((commuteGHalfSandwich_moveChainFamily params family r) j.succ))
         (commuteGHalfSandwich_secondSliceLiftFamily params family r
@@ -1270,9 +1341,9 @@ private lemma commuteGHalfSandwich_moveBackChain_step
         ((commuteGHalfSandwich_moveBackChainFamily params family r) i.succ)
         (gHatSelfConsistencyError zeta)
         (fun q ogs => by
-          simpa [commuteGHalfSandwich_moveBackChainFamily, j, hsrc])
+          simp [commuteGHalfSandwich_moveBackChainFamily, j, hsrc])
         (fun q ogs => by
-          simpa [commuteGHalfSandwich_moveBackChainFamily, j, htgt])
+          simp [commuteGHalfSandwich_moveBackChainFamily, j, htgt])
         hsymm
 
 private lemma commuteGHalfSandwich_commute_to_moveBackChainFamily_zero
@@ -1286,20 +1357,20 @@ private lemma commuteGHalfSandwich_commute_to_moveBackChainFamily_zero
       (gHatSelfConsistencyRightFamily params family)
       (gHatSelfConsistencyError zeta)) :
     SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (uniformDistribution (MoveQ params (r + 1)))
       (commuteGHalfSandwich_commuteFamily params family (r + 1))
       ((commuteGHalfSandwich_moveBackChainFamily params family r) 0)
       (gHatSelfConsistencyError zeta) := by
   have htargetMid :
       SDDOpRel ψbi
         (uniformDistribution
-          (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+          (SliceQuestion params × SliceQuestion params × SliceQuestion params ×
+              PointTuple params r))
         (commuteGHalfSandwich_moveStepTargetFamily params family r)
         (commuteGHalfSandwich_moveStepMidFamily params family r)
         (gHatSelfConsistencyError zeta) :=
     Preliminaries.sddOpRel_symm ψbi
-      (uniformDistribution
-        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveTailQ params r))
       (commuteGHalfSandwich_moveStepMidFamily params family r)
       (commuteGHalfSandwich_moveStepTargetFamily params family r)
       (gHatSelfConsistencyError zeta)
@@ -1311,7 +1382,7 @@ private lemma commuteGHalfSandwich_commute_to_moveBackChainFamily_zero
       (gHatSelfConsistencyError zeta)).1 htargetMid
   have ho := CommutativityPoints.sddOpRel_reindex (moveTailSwappedFrontOutcomeEquiv params r).symm
     ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    (uniformDistribution (MoveQ params (r + 1)))
     (fun q => commuteGHalfSandwich_moveStepTargetFamily params family r
       ((moveTailSwappedFrontQuestionEquiv params r) q))
     (fun q => commuteGHalfSandwich_moveStepMidFamily params family r
@@ -1319,7 +1390,7 @@ private lemma commuteGHalfSandwich_commute_to_moveBackChainFamily_zero
     (gHatSelfConsistencyError zeta)
     hq
   exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    (uniformDistribution (MoveQ params (r + 1)))
     _ _
     (commuteGHalfSandwich_commuteFamily params family (r + 1))
     ((commuteGHalfSandwich_moveBackChainFamily params family r) 0)
@@ -1328,22 +1399,26 @@ private lemma commuteGHalfSandwich_commute_to_moveBackChainFamily_zero
       simpa using
         (commuteGHalfSandwich_commute_eq_swappedFrontMoveStepTarget params family r q ogs).symm)
     (fun q ogs => by
-      let q' : SliceQuestion params × SliceQuestion params × PointTuple params r :=
+      let q' : MoveQ params r :=
         (q.1, q.2.2 0, pointTupleTail q.2.2)
-      let ogs' : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r :=
+      let ogs' : MoveO params r :=
         (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
       have hlast :
-          (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs =
+          (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome
+            ogs =
             (commuteGHalfSandwich_secondSliceLiftFamily params family r
               (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
         calc
           (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs
-            = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+            = leftTensor (ι₂ := ι)
+                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
                 (commuteGHalfSandwich_moveFamily params family r q').outcome ogs' := by
                   simpa [commuteGHalfSandwich_moveBackChainFamily, q', ogs'] using
                     congrArg
                       (fun X =>
-                        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                        leftTensor (ι₂ := ι)
+                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1)
+                            * X)
                       (commuteGHalfSandwich_moveChainFamily_last params family r q' ogs')
           _ = (commuteGHalfSandwich_secondSliceLiftFamily params family r
                 (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
@@ -1363,22 +1438,27 @@ private lemma commuteGHalfSandwich_commute_to_moveBackChainFamily_zero
 private lemma commuteGHalfSandwich_moveBackChainFamily_zero_eq_secondSliceLift_moveFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
-    (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs =
+    (q : MoveQ params (r + 1))
+    (ogs : MoveO params (r + 1)) :
+    (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome
+      ogs =
       (commuteGHalfSandwich_secondSliceLiftFamily params family r
         (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
-  let q' : SliceQuestion params × SliceQuestion params × PointTuple params r :=
+  let q' : MoveQ params r :=
     (q.1, q.2.2 0, pointTupleTail q.2.2)
-  let ogs' : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r :=
+  let ogs' : MoveO params r :=
     (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
   calc
     (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs
-      = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+      = leftTensor (ι₂ := ι)
+                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           (commuteGHalfSandwich_moveFamily params family r q').outcome ogs' := by
             simpa [commuteGHalfSandwich_moveBackChainFamily, q', ogs'] using
               congrArg
-                (fun X => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                (fun X =>
+                  leftTensor (ι₂ := ι)
+                      ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+                    X)
                 (commuteGHalfSandwich_moveChainFamily_last params family r q' ogs')
     _ = (commuteGHalfSandwich_secondSliceLiftFamily params family r
           (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
@@ -1394,14 +1474,14 @@ private lemma commuteGHalfSandwich_postMoveFlatLength_pos
   induction r with
   | zero => simp [commuteGHalfSandwich_postMoveFlatLength]
   | succ r ih =>
-      simpa [commuteGHalfSandwich_postMoveFlatLength] using Nat.le_trans (by decide : 1 ≤ 3) ih
+      simp [commuteGHalfSandwich_postMoveFlatLength]
 
 private noncomputable def commuteGHalfSandwich_postMoveFlatFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     (r : ℕ) → Fin (commuteGHalfSandwich_postMoveFlatLength r + 1) → IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (MoveQ params r)
+      (MoveO params r)
       (ι × ι)
   | 0, i =>
       if i.1 = 0 then
@@ -1417,10 +1497,10 @@ private noncomputable def commuteGHalfSandwich_postMoveFlatFamily
         commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
           (commuteGHalfSandwich_splitSuccLiftFamily params r
             ((commuteGHalfSandwich_postMoveFlatFamily params family r)
-              ⟨i.1 - 2, by
-                have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 3 := by
-                  simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
-                omega⟩))
+                ⟨i.1 - 2, by
+                  have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 3 := by
+                    exact i.2
+                  omega⟩))
 
 private noncomputable def commuteGHalfSandwich_postMoveFlatError
     (params : Parameters) [FieldModel params.q]
@@ -1436,7 +1516,7 @@ private noncomputable def commuteGHalfSandwich_postMoveFlatError
         commuteGHalfSandwich_postMoveFlatError params gamma zeta r
           ⟨i.1 - 2, by
             have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
-              simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+              exact i.2
             omega⟩
 
 private lemma commuteGHalfSandwich_postMoveFlatError_sum
@@ -1445,12 +1525,13 @@ private lemma commuteGHalfSandwich_postMoveFlatError_sum
     ∀ r,
       ∑ i : Fin (commuteGHalfSandwich_postMoveFlatLength r),
         commuteGHalfSandwich_postMoveFlatError params gamma zeta r i =
-          (2 : Error) * (r : Error) * zeta + ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta
+          (2 : Error) * (r : Error) * zeta + ((r + 1 : ℕ) : Error)
+              * gHatCommutationError params gamma zeta
   | 0 => by
       simp [commuteGHalfSandwich_postMoveFlatLength, commuteGHalfSandwich_postMoveFlatError]
   | r + 1 => by
       have hone_lt : 1 < commuteGHalfSandwich_postMoveFlatLength (r + 1) := by
-        simp [commuteGHalfSandwich_postMoveFlatLength, commuteGHalfSandwich_postMoveFlatLength_pos]
+        simp [commuteGHalfSandwich_postMoveFlatLength]
       change ∑ i : Fin (commuteGHalfSandwich_postMoveFlatLength r + 2),
         commuteGHalfSandwich_postMoveFlatError params gamma zeta (r + 1) i = _
       rw [Fin.sum_univ_succ]
@@ -1467,8 +1548,8 @@ private noncomputable def commuteGHalfSandwich_flatChainFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
     Fin (commuteGHalfSandwich_flatChainLength r + 1) → IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (MoveQ params r)
+      (MoveO params r)
       (ι × ι)
   | i =>
       if hi : i.1 < r + 1 then
@@ -1497,13 +1578,13 @@ private lemma commuteGHalfSandwich_commuteFamily_zero_eq_recursiveTarget
     (family : IdxPolyFamily params ι)
     (q : SliceQuestion params × SliceQuestion params × PointTuple params 0)
     (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params 0) :
-    (commuteGHalfSandwich_commuteFamily params family 0 q).outcome ogs =
+    (commuteGHalfSandwich_commuteFamily params family 0 q).outcome
+      ogs =
       (commuteGHalfSandwich_recursiveTargetFamily params family 0 q).outcome ogs := by
   simp [commuteGHalfSandwich_commuteFamily, commuteGHalfSandwich_recursiveTargetFamily,
     headTailRotatedFamily, gHatHalfProductOutcomeOperator, gHatReverseHalfProductOutcomeOperator,
     rightTensor_one,
-    gHatRotatedHalfProductOutcomeOperator, leftTensor_mul_leftTensor,
-    rightTensor_mul_rightTensor, mul_assoc]
+     leftTensor_mul_leftTensor]
 
 private lemma commuteGHalfSandwich_postMoveFlatLength_eq
     (r : ℕ) :
@@ -1511,45 +1592,46 @@ private lemma commuteGHalfSandwich_postMoveFlatLength_eq
   induction r with
   | zero => rfl
   | succ r ih =>
-      simp [commuteGHalfSandwich_postMoveFlatLength, ih, Nat.mul_add, Nat.add_assoc,
+      simp [commuteGHalfSandwich_postMoveFlatLength, ih, Nat.mul_add,
         Nat.add_left_comm, Nat.add_comm]
 
 private lemma commuteGHalfSandwich_secondSliceLift_recursiveTarget
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (q : MoveQ params (r + 1))
+    (ogs : MoveO params (r + 1)) :
     (commuteGHalfSandwich_secondSliceLiftFamily params family r
-      (commuteGHalfSandwich_recursiveTargetFamily params family r) q).outcome ogs =
+      (commuteGHalfSandwich_recursiveTargetFamily params family r) q).outcome
+        ogs =
       (commuteGHalfSandwich_recursiveTargetFamily params family (r + 1) q).outcome ogs := by
   simp [commuteGHalfSandwich_secondSliceLiftFamily,
     commuteGHalfSandwich_recursiveTargetFamily, headTailRotatedFamily,
-    gHatHalfProductOutcomeOperator, gHatRotatedHalfProductOutcomeOperator,
+    gHatHalfProductOutcomeOperator,
     leftTensor_mul_leftTensor, mul_assoc]
 
 private lemma commuteGHalfSandwich_postMoveFlatFamily_zero_active
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
     ∀ r q ogs,
-      (commuteGHalfSandwich_postMoveFlatFamily params family r 0 q).outcome ogs =
+      (commuteGHalfSandwich_postMoveFlatFamily params family r 0 q).outcome
+        ogs =
         (commuteGHalfSandwich_moveFamily params family r q).outcome ogs
   | 0, q, ogs => by
       simp [commuteGHalfSandwich_postMoveFlatFamily, commuteGHalfSandwich_moveFamily,
-        commuteGHalfSandwich_recursiveTargetFamily, headTailRotatedFamily,
-        gHatHalfProductOutcomeOperator, gHatRotatedHalfProductOutcomeOperator,
-        leftTensor_mul_leftTensor, rightTensor_mul_rightTensor, mul_assoc]
+        leftTensor_mul_leftTensor]
   | r + 1, q, ogs => by
       simp [commuteGHalfSandwich_postMoveFlatFamily]
 
 private lemma commuteGHalfSandwich_postMoveFlatFamily_one_active
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (q : MoveQ params (r + 1))
+    (ogs : MoveO params (r + 1)) :
     (commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)
       ⟨1, by
         rw [commuteGHalfSandwich_postMoveFlatLength_eq]
-        omega⟩ q).outcome ogs =
+        omega⟩ q).outcome
+          ogs =
       (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs := by
   simp [commuteGHalfSandwich_postMoveFlatFamily]
 
@@ -1558,20 +1640,20 @@ private lemma commuteGHalfSandwich_postMoveFlatFamily_last_active
     (family : IdxPolyFamily params ι) :
     ∀ r q ogs,
       (commuteGHalfSandwich_postMoveFlatFamily params family r
-          (Fin.last (commuteGHalfSandwich_postMoveFlatLength r)) q).outcome ogs =
+          (Fin.last (commuteGHalfSandwich_postMoveFlatLength r)) q).outcome
+            ogs =
         (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs
   | 0, q, ogs => by
       simp [commuteGHalfSandwich_postMoveFlatFamily, commuteGHalfSandwich_postMoveFlatLength,
         commuteGHalfSandwich_recursiveTargetFamily, headTailRotatedFamily,
-        commuteGHalfSandwich_moveFamily, gHatHalfProductOutcomeOperator,
-        gHatRotatedHalfProductOutcomeOperator, leftTensor_mul_leftTensor,
-        rightTensor_mul_rightTensor, mul_assoc]
+         gHatHalfProductOutcomeOperator,
+         leftTensor_mul_leftTensor]
   | r + 1, q, ogs => by
       let q' : SliceQuestion params × PointTuple params (r + 1) := (q.1, q.2.2)
       let ogs' : GHatOutcome params × GHatTupleOutcome params (r + 1) := (ogs.1, ogs.2.2)
-      let q'' : SliceQuestion params × SliceQuestion params × PointTuple params r :=
+      let q'' : MoveQ params r :=
         (splitSuccQuestionEquiv params r) q'
-      let ogs'' : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r :=
+      let ogs'' : MoveO params r :=
         (splitSuccOutcomeEquiv params r) ogs'
       have hsmall :
           (commuteGHalfSandwich_postMoveFlatFamily params family r
@@ -1594,8 +1676,8 @@ private lemma commuteGHalfSandwich_postMoveFlatFamily_last_active
                 exact hlt⟩ : Fin (commuteGHalfSandwich_postMoveFlatLength r + 1)) =
               Fin.last (commuteGHalfSandwich_postMoveFlatLength r) := by
           ext
-          simp [Fin.last, commuteGHalfSandwich_postMoveFlatLength_eq, Nat.mul_add, Nat.add_assoc,
-            Nat.add_left_comm, Nat.add_comm]
+          simp [Fin.last, commuteGHalfSandwich_postMoveFlatLength_eq, Nat.mul_add,
+             Nat.add_comm]
         simpa [hlast_idx] using hsmall
       calc
         (commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)
@@ -1604,37 +1686,47 @@ private lemma commuteGHalfSandwich_postMoveFlatFamily_last_active
               (commuteGHalfSandwich_splitSuccLiftFamily params r
                 (commuteGHalfSandwich_postMoveFlatFamily params family r
                   ⟨2 * (r + 1) - 1, by
-                    have hlt : 2 * (r + 1) - 1 < commuteGHalfSandwich_postMoveFlatLength r + 1 := by
+                    have hlt :
+                        2 * (r + 1) - 1 < commuteGHalfSandwich_postMoveFlatLength r + 1 := by
                       rw [commuteGHalfSandwich_postMoveFlatLength_eq]
                       omega
                     exact hlt⟩)) q).outcome ogs := by
-                simp [commuteGHalfSandwich_postMoveFlatFamily, commuteGHalfSandwich_postMoveFlatLength_eq]
+                simp [commuteGHalfSandwich_postMoveFlatFamily,
+                    commuteGHalfSandwich_postMoveFlatLength_eq]
         _ = (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
               (commuteGHalfSandwich_splitSuccLiftFamily params r
                 (commuteGHalfSandwich_recursiveTargetFamily params family r)) q).outcome ogs := by
-                change leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+                change leftTensor (ι₂ := ι)
+                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
                     ((commuteGHalfSandwich_postMoveFlatFamily params family r
                         ⟨2 * (r + 1) - 1, by
-                          have hlt : 2 * (r + 1) - 1 < commuteGHalfSandwich_postMoveFlatLength r + 1 := by
+                          have hlt : 2 * (r + 1) - 1 < commuteGHalfSandwich_postMoveFlatLength r
+                              + 1 := by
                             rw [commuteGHalfSandwich_postMoveFlatLength_eq]
                             omega
                           exact hlt⟩ q'').outcome ogs'') =
-                  leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
-                    ((commuteGHalfSandwich_recursiveTargetFamily params family r q'').outcome ogs'')
+                  leftTensor (ι₂ := ι)
+                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+                    ((commuteGHalfSandwich_recursiveTargetFamily params family r q'').outcome
+                      ogs'')
                 exact congrArg
-                  (fun X => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                  (fun X =>
+                    leftTensor (ι₂ := ι)
+                      ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
                   hsmall'
         _ = (commuteGHalfSandwich_recursiveTargetFamily params family (r + 1) q).outcome ogs := by
-              exact (commuteGHalfSandwich_prefixSecondSliceLeft_splitSuccLift_eq_secondSliceLift params family r
+              exact (commuteGHalfSandwich_prefixSecondSliceLeft_splitSuccLift_eq_secondSliceLift
+                  params family r
                 (commuteGHalfSandwich_recursiveTargetFamily params family r) q ogs).trans
                   (commuteGHalfSandwich_secondSliceLift_recursiveTarget params family r q ogs)
 
 private lemma commuteGHalfSandwich_flatChainFamily_zero
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
-    (r : ℕ) (q : SliceQuestion params × SliceQuestion params × PointTuple params r)
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :
-    (commuteGHalfSandwich_flatChainFamily params family r 0 q).outcome ogs =
+    (r : ℕ) (q : MoveQ params r)
+    (ogs : MoveO params r) :
+    (commuteGHalfSandwich_flatChainFamily params family r 0 q).outcome
+      ogs =
       (commuteGHalfSandwich_moveSourceFamily params family r q).outcome ogs := by
   simp [commuteGHalfSandwich_flatChainFamily,
     commuteGHalfSandwich_moveChainFamily_zero params family r]
@@ -1669,10 +1761,11 @@ private lemma commuteGHalfSandwich_flatChainError_sum
 private lemma commuteGHalfSandwich_flatChainFamily_last
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
-    (r : ℕ) (q : SliceQuestion params × SliceQuestion params × PointTuple params r)
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :
+    (r : ℕ) (q : MoveQ params r)
+    (ogs : MoveO params r) :
     (commuteGHalfSandwich_flatChainFamily params family r
-      (Fin.last (commuteGHalfSandwich_flatChainLength r)) q).outcome ogs =
+      (Fin.last (commuteGHalfSandwich_flatChainLength r)) q).outcome
+        ogs =
       (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs := by
   have hnot : ¬ (commuteGHalfSandwich_flatChainLength r : ℕ) < r + 1 := by
     unfold commuteGHalfSandwich_flatChainLength
@@ -1713,7 +1806,7 @@ private lemma commuteGHalfSandwich_postMoveFlatStep
       (gHatCommutationError params gamma zeta)) :
     ∀ r (i : Fin (commuteGHalfSandwich_postMoveFlatLength r)),
       SDDOpRel ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+        (uniformDistribution (MoveQ params r))
         ((commuteGHalfSandwich_postMoveFlatFamily params family r) i.castSucc)
         ((commuteGHalfSandwich_postMoveFlatFamily params family r) i.succ)
         ((commuteGHalfSandwich_postMoveFlatError params gamma zeta r) i)
@@ -1728,27 +1821,34 @@ private lemma commuteGHalfSandwich_postMoveFlatStep
         (commuteGHalfSandwich_recursiveTargetFamily params family 0)
         (gHatCommutationError params gamma zeta)
         (fun _ _ => rfl)
-        (fun q ogs => commuteGHalfSandwich_commuteFamily_zero_eq_recursiveTarget params family q ogs)
+        (fun q ogs => commuteGHalfSandwich_commuteFamily_zero_eq_recursiveTarget params family
+            q ogs)
         hcomm0
   | r + 1, i => by
       by_cases hi0 : i.1 = 0
-      · have hcomm1 := commuteGHalfSandwich_step_commute params ψbi family gamma zeta (r + 1) hcom
+      · have hcomm1 := commuteGHalfSandwich_step_commute
+            params ψbi family gamma zeta (r + 1) hcom
         have hsrc_eq :
             ∀ q ogs,
-              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.castSucc q).outcome ogs =
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  i.castSucc q).outcome
+                ogs =
                 (commuteGHalfSandwich_moveFamily params family (r + 1) q).outcome ogs := by
           intro q ogs
-          simpa [commuteGHalfSandwich_postMoveFlatFamily, hi0]
+          simp [commuteGHalfSandwich_postMoveFlatFamily, hi0]
         have htgt_eq :
             ∀ q ogs,
-              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ q).outcome ogs =
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  i.succ q).outcome
+                ogs =
                 (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs := by
           intro q ogs
           have hi1 : i.1 + 1 = 1 := by omega
-          simpa [commuteGHalfSandwich_postMoveFlatFamily, hi0, hi1]
+          simp [commuteGHalfSandwich_postMoveFlatFamily, hi0]
         simpa [commuteGHalfSandwich_postMoveFlatError, hi0] using
           (CommutativityPoints.sddOpRel_congr_outcome ψbi
-            (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+            (uniformDistribution (SliceQuestion params × SliceQuestion params ×
+                PointTuple params (r + 1)))
             (commuteGHalfSandwich_moveFamily params family (r + 1))
             (commuteGHalfSandwich_commuteFamily params family (r + 1))
             ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.castSucc)
@@ -1758,17 +1858,23 @@ private lemma commuteGHalfSandwich_postMoveFlatStep
             (fun q ogs => (htgt_eq q ogs).symm)
             hcomm1)
       · by_cases hi1 : i.1 = 1
-        · have hzero := commuteGHalfSandwich_commute_to_moveBackChainFamily_zero params ψbi family zeta (r := r) hsc
+        · have hzero := commuteGHalfSandwich_commute_to_moveBackChainFamily_zero params ψbi
+            family zeta (r := r) hsc
           have hsrc_eq :
               ∀ q ogs,
-                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.castSucc q).outcome ogs =
+                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  i.castSucc q).outcome
+                  ogs =
                   (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs := by
             intro q ogs
-            simpa [commuteGHalfSandwich_postMoveFlatFamily, hi0, hi1]
+            simp [commuteGHalfSandwich_postMoveFlatFamily, hi1]
           have htgt_eq :
               ∀ q ogs,
-                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ q).outcome ogs =
-                  ((commuteGHalfSandwich_moveBackChainFamily params family r) 0 q).outcome ogs := by
+                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  i.succ q).outcome
+                  ogs =
+                  ((commuteGHalfSandwich_moveBackChainFamily params family r) 0 q).outcome
+                    ogs := by
             intro q ogs
             have hi2 : i.1 + 1 ≠ 0 := by omega
             have hi2' : i.1 + 1 ≠ 1 := by omega
@@ -1776,13 +1882,13 @@ private lemma commuteGHalfSandwich_postMoveFlatStep
             have hinner0 :
                 (⟨i.1 - 1, by
                     have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
-                      simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+                      exact i.2
                     omega⟩ : Fin (commuteGHalfSandwich_postMoveFlatLength r + 1)) = 0 := by
               apply Fin.ext
               simp [hinner0_nat]
-            let q' : SliceQuestion params × SliceQuestion params × PointTuple params r :=
+            let q' : MoveQ params r :=
               (q.1, q.2.2 0, pointTupleTail q.2.2)
-            let ogs' : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r :=
+            let ogs' : MoveO params r :=
               (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
             have hzero_active :
                 ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0 q').outcome ogs' =
@@ -1791,7 +1897,8 @@ private lemma commuteGHalfSandwich_postMoveFlatStep
             have hsecond_eq :
                 (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
                   (commuteGHalfSandwich_splitSuccLiftFamily params r
-                    ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0)) q).outcome ogs =
+                    ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0)) q).outcome
+                      ogs =
                   (commuteGHalfSandwich_secondSliceLiftFamily params family r
                     (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
               calc
@@ -1799,31 +1906,43 @@ private lemma commuteGHalfSandwich_postMoveFlatStep
                   (commuteGHalfSandwich_splitSuccLiftFamily params r
                     ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0)) q).outcome ogs
                     = (commuteGHalfSandwich_secondSliceLiftFamily params family r
-                        ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0) q).outcome ogs := by
-                          rw [commuteGHalfSandwich_prefixSecondSliceLeft_splitSuccLift_eq_secondSliceLift]
+                        ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0)
+                          q).outcome ogs := by
+                          rw [
+                  commuteGHalfSandwich_prefixSecondSliceLeft_splitSuccLift_eq_secondSliceLift
+                          ]
                 _ = (commuteGHalfSandwich_secondSliceLiftFamily params family r
-                      (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
-                    change leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
-                        (((commuteGHalfSandwich_postMoveFlatFamily params family r) 0 q').outcome ogs') = _
+                      (commuteGHalfSandwich_moveFamily params family r)
+                      q).outcome ogs := by
+                    change leftTensor (ι₂ := ι)
+                      ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+                        (((commuteGHalfSandwich_postMoveFlatFamily params family r) 0
+                          q').outcome ogs') = _
                     exact congrArg
-                      (fun X => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                      (fun X =>
+                        leftTensor (ι₂ := ι)
+                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
                       hzero_active
             calc
-              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ q).outcome ogs
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  i.succ q).outcome ogs
                 = (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
                     (commuteGHalfSandwich_splitSuccLiftFamily params r
-                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0)) q).outcome ogs := by
+                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0)) q).outcome
+                    ogs := by
                         conv_lhs => simp [commuteGHalfSandwich_postMoveFlatFamily, hi2, hi2']
-                        simpa [hi0, hinner0]
+                        simp [hi0, hinner0]
               _ = (commuteGHalfSandwich_secondSliceLiftFamily params family r
                     (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := hsecond_eq
-              _ = ((commuteGHalfSandwich_moveBackChainFamily params family r) 0 q).outcome ogs := by
+              _ = ((commuteGHalfSandwich_moveBackChainFamily params family r) 0 q).outcome
+                    ogs := by
                     simpa using
                       (commuteGHalfSandwich_moveBackChainFamily_zero_eq_secondSliceLift_moveFamily
                         params family r q ogs).symm
           simpa [commuteGHalfSandwich_postMoveFlatError, hi0, hi1] using
             (CommutativityPoints.sddOpRel_congr_outcome ψbi
-              (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+              (uniformDistribution (SliceQuestion params × SliceQuestion params ×
+                  PointTuple params (r + 1)))
               (commuteGHalfSandwich_commuteFamily params family (r + 1))
               ((commuteGHalfSandwich_moveBackChainFamily params family r) 0)
               ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.castSucc)
@@ -1835,9 +1954,10 @@ private lemma commuteGHalfSandwich_postMoveFlatStep
         · let j : Fin (commuteGHalfSandwich_postMoveFlatLength r) :=
             ⟨i.1 - 2, by
               have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
-                simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+                exact i.2
               omega⟩
-          have hsmall := commuteGHalfSandwich_postMoveFlatStep params ψbi family gamma zeta hsc hcom r j
+          have hsmall := commuteGHalfSandwich_postMoveFlatStep params ψbi family gamma zeta hsc
+              hcom r j
           have hprefix := commuteGHalfSandwich_prefixSecondSliceLeftLift params ψbi family (r + 1)
             (commuteGHalfSandwich_splitSuccLiftFamily params r
               ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.castSucc))
@@ -1851,20 +1971,26 @@ private lemma commuteGHalfSandwich_postMoveFlatStep
               hsmall)
           have hsrc_eq :
               ∀ q ogs,
-                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.castSucc q).outcome ogs =
+                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  i.castSucc q).outcome
+                  ogs =
                   (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
                     (commuteGHalfSandwich_splitSuccLiftFamily params r
-                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.castSucc)) q).outcome ogs := by
+                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.castSucc))
+                        q).outcome ogs := by
             intro q ogs
             have hsrc_not0 : i.1 ≠ 0 := hi0
             have hsrc_not1 : i.1 ≠ 1 := hi1
             simp [commuteGHalfSandwich_postMoveFlatFamily, hsrc_not0, hsrc_not1, j]
           have htgt_eq :
               ∀ q ogs,
-                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ q).outcome ogs =
+                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  i.succ q).outcome
+                  ogs =
                   (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
                     (commuteGHalfSandwich_splitSuccLiftFamily params r
-                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.succ)) q).outcome ogs := by
+                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.succ))
+                        q).outcome ogs := by
             intro q ogs
             have htgt_not0 : i.1 + 1 ≠ 0 := by omega
             have htgt_not1 : i.1 + 1 ≠ 1 := by omega
@@ -1872,39 +1998,46 @@ private lemma commuteGHalfSandwich_postMoveFlatStep
                 (j.succ : Fin (commuteGHalfSandwich_postMoveFlatLength r + 1)) =
                   ⟨i.1 - 1, by
                     have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
-                      simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+                      exact i.2
                     omega⟩ := by
               apply Fin.ext
               dsimp [j]
               omega
             calc
-              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ q).outcome ogs
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  i.succ q).outcome ogs
                 = (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
                     (commuteGHalfSandwich_splitSuccLiftFamily params r
                       ((commuteGHalfSandwich_postMoveFlatFamily params family r)
                         ⟨i.1 - 1, by
                           have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
-                            simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+                            exact i.2
                           omega⟩)) q).outcome ogs := by
-                        conv_lhs => simp [commuteGHalfSandwich_postMoveFlatFamily, htgt_not0, htgt_not1]
-                        simpa [hi0]
+                        conv_lhs => simp [commuteGHalfSandwich_postMoveFlatFamily, htgt_not0,
+                            htgt_not1]
+                        simp [hi0]
               _ = (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
                     (commuteGHalfSandwich_splitSuccLiftFamily params r
-                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.succ)) q).outcome ogs := by
+                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.succ))
+                        q).outcome ogs := by
                         have hidx :
                             ((commuteGHalfSandwich_postMoveFlatFamily params family r)
                               ⟨i.1 - 1, by
-                                have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
-                                  simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+                                have hi_lt :
+                                    i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
+                                  exact i.2
                                 omega⟩) =
-                              ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.succ) := by
+                              ((commuteGHalfSandwich_postMoveFlatFamily params family r)
+                                j.succ) := by
                                 exact congrArg
-                                  (fun idx => (commuteGHalfSandwich_postMoveFlatFamily params family r) idx)
+                                  (fun idx =>
+                                    (commuteGHalfSandwich_postMoveFlatFamily params family r) idx)
                                   hj_succ.symm
-                        simpa [hidx]
+                        simp [hidx]
           simpa [commuteGHalfSandwich_postMoveFlatError, hi0, hi1, j] using
             (CommutativityPoints.sddOpRel_congr_outcome ψbi
-              (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+              (uniformDistribution (SliceQuestion params × SliceQuestion params ×
+                  PointTuple params (r + 1)))
               (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
                 (commuteGHalfSandwich_splitSuccLiftFamily params r
                   ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.castSucc)))
@@ -1935,7 +2068,7 @@ private lemma commuteGHalfSandwich_flatChainStep
       (gHatCommutationError params gamma zeta)) :
     ∀ r (i : Fin (commuteGHalfSandwich_flatChainLength r)),
       SDDOpRel ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+        (uniformDistribution (MoveQ params r))
         ((commuteGHalfSandwich_flatChainFamily params family r) i.castSucc)
         ((commuteGHalfSandwich_flatChainFamily params family r) i.succ)
         ((commuteGHalfSandwich_flatChainError params gamma zeta r) i)
@@ -1951,23 +2084,30 @@ private lemma commuteGHalfSandwich_flatChainStep
         have hmove := commuteGHalfSandwich_moveChain_step params ψbi family zeta hsc (r + 1) imove
         have hsrc_eq :
             ∀ q ogs,
-              ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc q).outcome ogs =
-                ((commuteGHalfSandwich_moveChainFamily params family (r + 1)) imove.castSucc q).outcome ogs := by
+              ((commuteGHalfSandwich_flatChainFamily params family (r + 1))
+                  i.castSucc q).outcome
+                ogs =
+                ((commuteGHalfSandwich_moveChainFamily params family (r + 1))
+                  imove.castSucc q).outcome ogs := by
           intro q ogs
           have hsrc_le : i.1 ≤ r + 1 := by omega
           conv_lhs => simp [commuteGHalfSandwich_flatChainFamily, hsrc_le]
           rfl
         have htgt_eq :
             ∀ q ogs,
-              ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.succ q).outcome ogs =
-                ((commuteGHalfSandwich_moveChainFamily params family (r + 1)) imove.succ q).outcome ogs := by
+              ((commuteGHalfSandwich_flatChainFamily params family (r + 1))
+                  i.succ q).outcome
+                ogs =
+                ((commuteGHalfSandwich_moveChainFamily params family (r + 1))
+                  imove.succ q).outcome ogs := by
           intro q ogs
           have htgt_le : i.1 ≤ r := by omega
           conv_lhs => simp [commuteGHalfSandwich_flatChainFamily, htgt_le]
           rfl
         simpa [commuteGHalfSandwich_flatChainError, hi] using
           (CommutativityPoints.sddOpRel_congr_outcome ψbi
-            (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+            (uniformDistribution (SliceQuestion params × SliceQuestion params ×
+                PointTuple params (r + 1)))
             ((commuteGHalfSandwich_moveChainFamily params family (r + 1)) imove.castSucc)
             ((commuteGHalfSandwich_moveChainFamily params family (r + 1)) imove.succ)
             ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc)
@@ -1978,10 +2118,13 @@ private lemma commuteGHalfSandwich_flatChainStep
             hmove)
       · have hge : r + 1 ≤ i.1 := by omega
         by_cases hboundary : i.1 = r + 1
-        · have hcomm1 := commuteGHalfSandwich_step_commute params ψbi family gamma zeta (r + 1) hcom
+        · have hcomm1 := commuteGHalfSandwich_step_commute
+            params ψbi family gamma zeta (r + 1) hcom
           have hsrc_eq :
               ∀ q ogs,
-                ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc q).outcome ogs =
+                ((commuteGHalfSandwich_flatChainFamily params family (r + 1))
+                  i.castSucc q).outcome
+                  ogs =
                   (commuteGHalfSandwich_moveFamily params family (r + 1) q).outcome ogs := by
             intro q ogs
             have hsrc_le : i.1 ≤ r + 1 := by omega
@@ -1990,7 +2133,9 @@ private lemma commuteGHalfSandwich_flatChainStep
               commuteGHalfSandwich_moveChainFamily_last params family (r + 1) q ogs
           have htgt_eq :
               ∀ q ogs,
-                ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.succ q).outcome ogs =
+                ((commuteGHalfSandwich_flatChainFamily params family (r + 1))
+                  i.succ q).outcome
+                  ogs =
                   (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs := by
             intro q ogs
             have htgt_not : ¬ i.1 ≤ r := by omega
@@ -1998,7 +2143,8 @@ private lemma commuteGHalfSandwich_flatChainStep
               rw [commuteGHalfSandwich_postMoveFlatLength_eq]
               omega
             calc
-              ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.succ q).outcome ogs
+              ((commuteGHalfSandwich_flatChainFamily params family (r + 1))
+                  i.succ q).outcome ogs
                 = (commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)
                     ⟨i.1 - r, by
                       simpa [hboundary] using hone_lt⟩ q).outcome ogs := by
@@ -2012,14 +2158,19 @@ private lemma commuteGHalfSandwich_flatChainStep
                       apply Fin.ext
                       simp [hboundary]
                     exact congrArg
-                      (fun idx => ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) idx q).outcome ogs)
+                      (fun idx => ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  idx q).outcome ogs)
                       hone
-              _ = (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs := by
-                    exact commuteGHalfSandwich_postMoveFlatFamily_one_active params family (r := r) q ogs
+                  _ = (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome
+                    ogs := by
+                    exact
+                      commuteGHalfSandwich_postMoveFlatFamily_one_active
+                        params family (r := r) q ogs
           simpa [commuteGHalfSandwich_flatChainError, hi, hboundary,
             commuteGHalfSandwich_postMoveFlatError] using
             (CommutativityPoints.sddOpRel_congr_outcome ψbi
-              (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+              (uniformDistribution (SliceQuestion params × SliceQuestion params ×
+                  PointTuple params (r + 1)))
               (commuteGHalfSandwich_moveFamily params family (r + 1))
               (commuteGHalfSandwich_commuteFamily params family (r + 1))
               ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc)
@@ -2031,13 +2182,17 @@ private lemma commuteGHalfSandwich_flatChainStep
         · let j : Fin (commuteGHalfSandwich_postMoveFlatLength (r + 1)) :=
             ⟨i.1 - (r + 1), by
               have hi_lt : i.1 < (r + 1) + commuteGHalfSandwich_postMoveFlatLength (r + 1) := by
-                simpa [commuteGHalfSandwich_flatChainLength] using i.2
+                exact i.2
               omega⟩
-          have hsmall := commuteGHalfSandwich_postMoveFlatStep params ψbi family gamma zeta hsc hcom (r + 1) j
+          have hsmall := commuteGHalfSandwich_postMoveFlatStep params ψbi family gamma zeta hsc
+              hcom (r + 1) j
           have hsrc_eq :
               ∀ q ogs,
-                ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc q).outcome ogs =
-                  ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) j.castSucc q).outcome ogs := by
+                ((commuteGHalfSandwich_flatChainFamily params family (r + 1))
+                  i.castSucc q).outcome
+                  ogs =
+                  ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  j.castSucc q).outcome ogs := by
             intro q ogs
             have hsrc_not : ¬ i.1 ≤ r + 1 := by omega
             have hj_castSucc :
@@ -2048,12 +2203,16 @@ private lemma commuteGHalfSandwich_flatChainStep
               simp [j]
             conv_lhs => simp [commuteGHalfSandwich_flatChainFamily, hsrc_not]
             exact congrArg
-              (fun idx => ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) idx q).outcome ogs)
+              (fun idx => ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  idx q).outcome ogs)
               hj_castSucc
           have htgt_eq :
               ∀ q ogs,
-                ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.succ q).outcome ogs =
-                  ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) j.succ q).outcome ogs := by
+                ((commuteGHalfSandwich_flatChainFamily params family (r + 1))
+                  i.succ q).outcome
+                  ogs =
+                  ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                    j.succ q).outcome ogs := by
             intro q ogs
             have htgt_not : ¬ i.1 ≤ r := by omega
             have hge2 : r + 2 ≤ i.1 := by omega
@@ -2068,11 +2227,13 @@ private lemma commuteGHalfSandwich_flatChainStep
               simp [j, hval]
             conv_lhs => simp [commuteGHalfSandwich_flatChainFamily, htgt_not]
             exact congrArg
-              (fun idx => ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) idx q).outcome ogs)
+              (fun idx => ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))
+                  idx q).outcome ogs)
               hj_succ
           simpa [commuteGHalfSandwich_flatChainError, hi, hboundary, j] using
             (CommutativityPoints.sddOpRel_congr_outcome ψbi
-              (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+              (uniformDistribution (SliceQuestion params × SliceQuestion params ×
+                  PointTuple params (r + 1)))
               ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) j.castSucc)
               ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) j.succ)
               ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc)
@@ -2145,21 +2306,21 @@ lemma commuteGHalfSandwich_core
         hν3
     have hchain := Preliminaries.sddOpRel_chain
       ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (MoveQ params r))
       (commuteGHalfSandwich_flatChainLength r)
       (commuteGHalfSandwich_flatChainFamily params family r)
       (commuteGHalfSandwich_flatChainError params gamma zeta r)
       (commuteGHalfSandwich_flatChainStep params ψbi family gamma zeta hsc0 hcom0 r)
     have hsplit :
         SDDOpRel ψbi
-          (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+          (uniformDistribution (MoveQ params r))
           (commuteGHalfSandwich_moveSourceFamily params family r)
           (commuteGHalfSandwich_recursiveTargetFamily params family r)
           (((commuteGHalfSandwich_flatChainLength r : Error)) *
             ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
               commuteGHalfSandwich_flatChainError params gamma zeta r i) := by
       exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+        (uniformDistribution (MoveQ params r))
         ((commuteGHalfSandwich_flatChainFamily params family r) 0)
         ((commuteGHalfSandwich_flatChainFamily params family r)
           (Fin.last (commuteGHalfSandwich_flatChainLength r)))
@@ -2203,10 +2364,14 @@ lemma commuteGHalfSandwich_core
     have hsum :
         ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
             commuteGHalfSandwich_flatChainError params gamma zeta r i =
-          4 * (r : Error) * zeta + ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta :=
+          4 * (r : Error) * zeta +
+            ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta :=
       commuteGHalfSandwich_flatChainError_sum params gamma zeta r
-    have hlen_le : ((commuteGHalfSandwich_flatChainLength r : ℕ) : Error) ≤ 3 * (k : Error) := by
-      have hflat : ((commuteGHalfSandwich_flatChainLength r : ℕ) : Error) = 3 * (r : Error) + 1 := by
+    have hlen_le :
+        ((commuteGHalfSandwich_flatChainLength r : ℕ) : Error) ≤ 3 * (k : Error) := by
+      have hflat :
+          ((commuteGHalfSandwich_flatChainLength r : ℕ) : Error) =
+            3 * (r : Error) + 1 := by
         rw [commuteGHalfSandwich_flatChainLength, commuteGHalfSandwich_postMoveFlatLength_eq]
         norm_num [Nat.cast_add, Nat.cast_mul, Nat.cast_one]
         ring
@@ -2221,14 +2386,18 @@ lemma commuteGHalfSandwich_core
       have hcast_r1 : (((r + 1 : ℕ) : Error)) = (r : Error) + 1 := by
         norm_num [Nat.cast_add, Nat.cast_one]
       have hrewrite :
-          4 * ((r : Error) + 2) * zeta + ((r : Error) + 2) * gHatCommutationError params gamma zeta =
-            4 * (r : Error) * zeta + ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta +
+          4 * ((r : Error) + 2) * zeta + ((r : Error) + 2)
+              * gHatCommutationError params gamma zeta =
+            4 * (r : Error) * zeta + ((r + 1 : ℕ) : Error)
+                * gHatCommutationError params gamma zeta +
               (8 * zeta + gHatCommutationError params gamma zeta) := by
         rw [hcast_r1]
         ring
       nlinarith [hrewrite, hζextra, hνextra]
     have hsum_nonneg :
-        0 ≤ 4 * (r : Error) * zeta + ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta := by
+        0 ≤
+          4 * (r : Error) * zeta +
+            ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta := by
       nlinarith [hzeta_nonneg, hν3_nonneg]
     have hraw_bound :
         (((commuteGHalfSandwich_flatChainLength r : Error)) *

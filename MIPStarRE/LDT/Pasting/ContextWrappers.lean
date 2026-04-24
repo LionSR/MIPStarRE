@@ -97,9 +97,9 @@ theorem hAConsistency_submeas_of_context
           (constructedPastedSubMeas params ctx.family ctx.k))
         ctx.nu :=
   hAConsistency_submeas params ctx.strategy ctx.eps ctx.delta ctx.gamma
-    ctx.kappa ctx.zeta ctx.good ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
-    ctx.d_pos ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
-    ctx.k ctx.hk_pos ctx.hk
+    ctx.zeta ctx.good ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
+    ctx.d_pos ctx.family ctx.consistent ctx.selfConsistent ctx.bounded
+    ctx.k ctx.hk_pos
 
 /-- `lem:over-all-outcomes` restated against the standing pasting context. -/
 lemma overAllOutcomes_of_context
@@ -172,8 +172,7 @@ lemma fromHToG_of_context
       CommuteGHalfSandwichStatement params ctx.strategy.state ctx.family
         ctx.gamma ctx.zeta j) :
     FromHToGStatement params ctx.strategy ctx.strategy.state ctx.family
-      ctx.gamma ctx.zeta ctx.k :=
-  by
+      ctx.gamma ctx.zeta ctx.k := by
     have hgamma_nonneg : 0 ≤ ctx.gamma :=
       gamma_nonneg_of_isGood params.next ctx.strategy ctx.good
     have hzeta_nonneg : 0 ≤ ctx.zeta :=

@@ -3,9 +3,6 @@ import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.GlobalVariance.Defs.Core
 import MIPStarRE.LDT.Test.StrategyCore
 
-set_option linter.style.setOption false
-set_option linter.flexible false
-
 /-!
 # Section 10 — Definitions
 
@@ -230,7 +227,7 @@ noncomputable def pointPairSharedDiagonalLineDistribution (params : Parameters)
     by_cases hq : q ∈ Finset.univ.image (sharedDiagonalLineQuestionOfPointPair params)
     · have hqpos : 0 < (params.q : Error) := by
         exact_mod_cast params.hq
-      simp [hq]
+      simp only [hq, if_pos]
       positivity
     · simp [hq]
   outsideSupport := by
