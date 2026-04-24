@@ -1,0 +1,56 @@
+name: Badges
+
+on:
+  schedule:
+    # Refresh informational badges weekly on Sunday at 05:30 UTC.
+    - cron: '30 5 * * 0'
+  workflow_dispatch:
+
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  badges:
+    runs-on: ubuntu-latest
+    name: Generate Lean badges
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate badge JSON
+        run: python3 scripts/generate_badges.py --output-dir badge-output
+
+      - name: Checkout Pages branch
+        uses: actions/checkout@v6
+        with:
+          ref: github-pages
+          path: pages
+
+      - name: Update badges
+        run: |
+          mkdir -p pages/badges
+          cp badge-output/*.json pages/badges/
+
+      - name: Commit and push badges
+        working-directory: pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add badges
+          if git diff --cached --quiet; then
+            echo "No badge changes to deploy."
+          else
+            git commit -m "Update Lean badges"
+            git push origin HEAD:github-pages
+          fi
