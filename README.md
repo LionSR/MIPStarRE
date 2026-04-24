@@ -1,10 +1,10 @@
 # MIPStarRE
 
 [![Lean Action CI](https://github.com/LionSR/MIPStarRE/actions/workflows/lean_action_ci.yml/badge.svg)](https://github.com/LionSR/MIPStarRE/actions/workflows/lean_action_ci.yml)
-![sorries](https://img.shields.io/endpoint?url=https://lionsr.github.io/MIPStarRE/badges/sorries.json)
-![axioms](https://img.shields.io/endpoint?url=https://lionsr.github.io/MIPStarRE/badges/axioms.json)
-![Lean](https://img.shields.io/endpoint?url=https://lionsr.github.io/MIPStarRE/badges/lean.json)
-![Mathlib](https://img.shields.io/endpoint?url=https://lionsr.github.io/MIPStarRE/badges/mathlib.json)
+![sorries](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/sorries.json)
+![axioms](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/axioms.json)
+![Lean](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/lean.json)
+![Mathlib](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/mathlib.json)
 
 Formalization project for mathematics around $\mathrm{MIP}^*=\mathrm{RE}$.
 
