@@ -1,5 +1,6 @@
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
 import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
+import MIPStarRE.LDT.Pasting.Statements
 import MIPStarRE.LDT.Pasting.Bernoulli.Scalar
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 
@@ -194,9 +195,8 @@ private lemma cfc_bernoulliTailLowerAffine_eq
 
 The operator-level reduction is now fully internal: continuous functional
 calculus compares the Bernoulli-tail polynomial `F(X)` against an affine lower
-envelope. The only remaining live blocker is an explicit **scalar** Chernoff
-hypothesis, kept as a proposition parameter rather than a proof hole in order
-to satisfy the repository proof-integrity policy. -/
+envelope, and the scalar Hoeffding estimate is proved locally in
+`Bernoulli/Scalar.lean`. -/
 lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
     (hnorm : ψ.IsNormalized)
@@ -215,11 +215,7 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
            simp
          total_le_one := by
            exact hXleOne } : SubMeas Unit ι)
-      (1 - kappa))
-    (hScalarTail :
-      ∀ {p : Error}, (degree : Error) / (k : Error) ≤ p → p ≤ 1 →
-        1 - Real.exp (-(2 * ((p - (degree : Error) / (k : Error)) ^ (2 : ℕ)) * (k : Error))) ≤
-          scalarBernoulliTail k degree p) :
+      (1 - kappa)) :
     ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd hXleOne := by
   let expTerm : Error := Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2)
   have htail := bernoulliTailOperator_le_one k degree X hXpsd hXleOne
@@ -231,7 +227,7 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     have hx0 : 0 ≤ x := spectrum_nonneg_of_nonneg hXpsd hx
     have hx1 : x ≤ 1 := (CFC.le_one_iff (R := Error) X (ha := hXsa)).1 hXleOne x hx
     exact bernoulliTailLowerAffine_le_scalarBernoulliTail theta k degree hθ0 hθ1 hk
-      hScalarTail hx0 hx1
+      hx0 hx1
   have hContLower : ContinuousOn (bernoulliTailLowerAffine theta expTerm) (spectrum Error X) := by
     unfold bernoulliTailLowerAffine
     fun_prop

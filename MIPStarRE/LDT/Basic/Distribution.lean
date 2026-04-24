@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Basic.Parameters
+import MIPStarRE.Quantum.FiniteMatrix
 
 /-!
 # Distribution infrastructure for the low individual degree test
@@ -60,6 +61,13 @@ end Distribution.IsProbability
 /-- Average a scalar function against the stored finite support of a distribution. -/
 def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
   ∑ a ∈ 𝒟.support, 𝒟.weight a * f a
+
+/-- Weighted sum of operators over a distribution's finite support, using the same
+`support`/`weight` data as the scalar `avgOver`. -/
+noncomputable def averageOperatorOverDistribution {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
+  ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
 
 /-- The uniform distribution on a nonempty finite type. -/
 noncomputable def uniformDistribution (α : Type*)

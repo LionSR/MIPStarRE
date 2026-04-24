@@ -683,6 +683,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Consistency of the pasted measurement with the line measurement]\label{lem:h-b-consistency}
 	\lean{MIPStarRE.LDT.Pasting.hBConsistency}
+	\leanok
 	\uses{def:pasted-measurement, prop:ld-dnoteq, lem:ld-sandwich-line-one-point}
 	The pasted submeasurement satisfies
 	\[
@@ -1234,6 +1235,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Matrix Chernoff bound for the Bernoulli polynomial]\label{lem:chernoff-bernoulli-matrix}
 	\lean{MIPStarRE.LDT.Pasting.chernoffBernoulliMatrix}
+	\leanok
 	Let $0<\theta<1$ and integers $k,d>0$ with $k \ge 2d/\theta$. Define
 	\[
 		F(X) = \sum_{r=d+1}^k \binom{k}{r} X^r (I-X)^{k-r}.
@@ -1245,7 +1247,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		1 - \frac{\kappa}{1-\theta} - e^{-\theta^2 k/2}.
 	\]
 \end{lemma}
-\begin{proof}
+\begin{proof}\leanok
 	Let $\rho$ be the reduced state of $\ket{\psi}$ on one prover's subsystem, and write the eigendecomposition $X = \sum_i \lambda_i \ket{v_i}\bra{v_i}$. This defines a probability distribution $\mu(i)=\bra{v_i}\rho\ket{v_i}$, with
 	\[
 		\E_{i\sim\mu} \lambda_i = \Tr(X\rho) = \bra{\psi} X \ot I \ket{\psi} \ge 1-\kappa.
