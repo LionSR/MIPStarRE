@@ -3340,7 +3340,7 @@ theorem mainInductionPublicWrapper
             (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps)
     (hdiagonalWeightedBound :
       avgOver (uniformDistribution (Fq params))
-          (fun x => sliceDiagonalDirectionWeight params *
+          (fun x => sliceTransverseDirectionWeight params *
             (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma)
     (hrec :
       let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
