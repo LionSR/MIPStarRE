@@ -242,6 +242,7 @@ theorem ldPastingInInductionSection
     (_hgamma_le : gamma ≤ 1)
     (_hzeta_le : zeta ≤ 1)
     (_hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -255,7 +256,7 @@ theorem ldPastingInInductionSection
         eps delta gamma kappa zeta k := by
   have hldPasting :=
     Pasting.ldPasting params strategy eps delta gamma kappa zeta
-      hgood _hgamma_le _hzeta_le _hdq_le
+      hgood _hgamma_le _hzeta_le _hdq_le hd
       family hcomplete hcons hself hbound k hk_pos hk
   obtain ⟨H, _hHdef, hH⟩ := hldPasting
   refine ⟨H, ?_⟩
@@ -1842,6 +1843,7 @@ theorem PastingPackage.output
       SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg}
     (pkg : PastingPackage params strategy eps delta gamma k selfPkg)
     (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
     (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
@@ -1849,7 +1851,7 @@ theorem PastingPackage.output
         eps delta gamma pkg.kappa pkg.zeta k := by
   exact
     ldPastingInInductionSection params strategy eps delta gamma pkg.kappa pkg.zeta
-      hgood pkg.gamma_le_one pkg.zeta_le_one pkg.dq_le_q
+      hgood pkg.gamma_le_one pkg.zeta_le_one pkg.dq_le_q hd
       selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk_pos hk
 
 /-- Compose the four paper-faithful induction-step packages
@@ -1862,6 +1864,7 @@ theorem mainInductionFromPackages
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
     (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
     (hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k)
     (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
@@ -1889,7 +1892,7 @@ theorem mainInductionFromPackages
             eps delta gamma kappa zeta k := by
       simpa [family, kappa, zeta] using
         hpaste.output (params := params) (strategy := strategy)
-          (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hk_pos hk
+          (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hd hk_pos hk
     rcases hpasted with ⟨H, hH⟩
     exact
       ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
@@ -3236,6 +3239,7 @@ theorem mainInductionByRecursionOnM
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
     (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
     (hrec :
       ∀ x,
@@ -3287,7 +3291,7 @@ theorem mainInductionByRecursionOnM
         hgood hsmall hgamma_le hzeta_le hdq_le_q hrestrict hinduction hself hk
     exact
       mainInductionFromPackages params strategy eps delta gamma k
-        hgood hrestrict hinduction hself hpaste hk_pos hk
+        hgood hd hrestrict hinduction hself hpaste hk_pos hk
   · let G : Measurement (Polynomial params.next) ι :=
       trivialPolynomialMeasurement (ι := ι) params.next
     have hcons :
