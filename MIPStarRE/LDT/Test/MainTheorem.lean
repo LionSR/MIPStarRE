@@ -146,9 +146,9 @@ theorem classicalTestSoundness
 Whenever the envelope `mainFormalError params k eps` has already saturated past
 `1`, the three target `ConsRel` relations hold trivially because
 `bipartiteConsError` under a probability question distribution is bounded by
-`1`. This is the Lean counterpart of the paper's observation that the bound it
-is proving is trivial when the error scale exceeds `1` (see
-`references/ldt-paper/inductive_step.tex:415`).
+`1`. This is in the spirit of the paper's observation (see the proof of
+`thm:main-induction` in `references/ldt-paper/inductive_step.tex`) that the
+bound it is proving is vacuous whenever the error scale is at least `1`.
 
 In the `mainFormal` assembly this wrapper handles the regime
 `params.m * params.d ≤ k < 400 * params.m * params.d`, where the Section 6 /
@@ -160,9 +160,10 @@ public induction/pasting wrappers (`mainInductionByRecursionOnM` in
 `mainFormal` from the envelope inflation chain already packaged by
 `errorCascade_le_mainFormalError`; see TODO(#634).
 
-Witness choice: the `default` projective measurement concentrates all mass on
-the distinguished polynomial, yielding valid `ProjMeas` instances whose role is
-purely to witness the existential in the trivial regime. -/
+Witness choice: we pick an arbitrary `ProjMeas` via `default` — the proof only
+needs the generic bound `bipartiteConsError ≤ 1`, not any specific
+distributional property of the witness, so the lemma is insensitive to how the
+ambient `Inhabited (ProjMeas …)` instance is realized. -/
 theorem mainFormal_trivial_witness
     (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι)
@@ -186,12 +187,8 @@ theorem mainFormal_trivial_witness
     ⟨⟨0, by intro i; simp [MvPolynomial.degreeOf_zero]⟩⟩
   let trivialG : ProjMeas (Polynomial params) ι := default
   refine ⟨trivialG, trivialG, ?_, ?_, ?_⟩
-  · exact ⟨le_trans
-      (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized _ _) herr⟩
-  · exact ⟨le_trans
-      (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized _ _) herr⟩
-  · exact ⟨le_trans
-      (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized _ _) herr⟩
+  all_goals exact ⟨le_trans
+    (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized _ _) herr⟩
 
 /--
 `thm:main-formal` from `test_definition.tex`.
@@ -211,9 +208,10 @@ The planned assembly case-splits on `k`:
   the still-pending Section 6 public wrapper tracked by #630) to discharge the
   three `ConsRel` targets through the paper's cascade.
 * Regime `params.m * params.d ≤ k < 400 * params.m * params.d`: the final
-  envelope `mainFormalError params k eps` saturates past `1` (paper
-  observation from `references/ldt-paper/inductive_step.tex:415`), and
-  `mainFormal_trivial_witness` supplies the witness directly.
+  envelope `mainFormalError params k eps` saturates past `1` (in the spirit of
+  the paper's standard trivial-case observation in the proof of
+  `thm:main-induction`), and `mainFormal_trivial_witness` supplies the witness
+  directly.
 
 Fixes #137, #239.
 -/
