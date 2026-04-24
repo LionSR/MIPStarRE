@@ -66,11 +66,10 @@ lemma card_mul_sum_small_le {α : Type*} {L S : Finset α}
 
 /-- **Partition-total form of the pairwise bound.**
 
-If `L ∪ S = univ` (i.e. `S = Lᶜ`), the paper's `r · ∑_{Small} o ≤ |Small| · ∑ o`
-follows from `card_mul_sum_small_le` together with nonnegativity. -/
+If `S = Lᶜ`, the paper's `r · ∑_{Small} o ≤ |Small| · ∑ o` follows from
+`card_mul_sum_small_le` after splitting `∑ x, f x = ∑_L f + ∑_{Lᶜ} f`. -/
 lemma card_univ_mul_sum_compl_le {α : Type*} [Fintype α] [DecidableEq α]
     (L : Finset α) {f : α → ℝ}
-    (hf_nonneg : ∀ x, 0 ≤ f x)
     (hf : ∀ s ∈ (Lᶜ : Finset α), ∀ l ∈ L, f s ≤ f l) :
     (Fintype.card α : ℝ) * (∑ s ∈ (Lᶜ : Finset α), f s) ≤
       (Lᶜ.card : ℝ) * (∑ x, f x) := by
@@ -82,8 +81,6 @@ lemma card_univ_mul_sum_compl_le {α : Type*} [Fintype α] [DecidableEq α]
     have := Finset.sum_add_sum_compl (s := L) (f := f)
     linarith
   have hbase := card_mul_sum_small_le (L := L) (S := (Lᶜ : Finset α)) (f := f) hf
-  have hSsum_nonneg : 0 ≤ ∑ s ∈ (Lᶜ : Finset α), f s :=
-    Finset.sum_nonneg (fun x _ => hf_nonneg x)
   calc
     (Fintype.card α : ℝ) * (∑ s ∈ (Lᶜ : Finset α), f s)
         = ((L.card : ℝ) + (Lᶜ.card : ℝ)) * (∑ s ∈ (Lᶜ : Finset α), f s) := by
@@ -100,23 +97,22 @@ lemma card_univ_mul_sum_compl_le {α : Type*} [Fintype α] [DecidableEq α]
 
 Assuming the paper's inputs:
 
-* `L.card = d` with `0 < d < |α|`,
+* `L.card = d` with `d < |α|`,
 * `|α| ≤ (1 + 2√ζ) · d`,
 * every `Small = Lᶜ` entry has value at most every `Large = L` entry,
 * `∑ x, f x ≤ 1 + 2√ζ`,
 * `0 ≤ ζ ≤ 1/4`,
 
-this yields `∑_{Small} f ≤ 4√ζ`, matching `eq:small-overlaps` in the paper.
--/
+this yields `∑_{Small} f ≤ 4√ζ`, matching `eq:small-overlaps` in the paper. The
+Lean statement is slightly stronger than the paper's: it does not need `f ≥ 0`,
+since the ordering hypothesis and partition-total estimate already suffice. -/
 lemma sum_small_le_four_sqrt {α : Type*} [Fintype α] [DecidableEq α]
     (L : Finset α)
     {f : α → ℝ}
     {d : ℕ} {ζ : ℝ}
     (hL_card : L.card = d)
-    (hd_pos : 0 < d)
     (hcard_gt : d < Fintype.card α)
     (hr_bound : (Fintype.card α : ℝ) ≤ (1 + 2 * Real.sqrt ζ) * d)
-    (hf_nonneg : ∀ x, 0 ≤ f x)
     (hf_ordering : ∀ s ∈ (Lᶜ : Finset α), ∀ l ∈ L, f s ≤ f l)
     (htotal : (∑ x, f x) ≤ 1 + 2 * Real.sqrt ζ)
     (hζ_nonneg : 0 ≤ ζ)
@@ -138,7 +134,7 @@ lemma sum_small_le_four_sqrt {α : Type*} [Fintype α] [DecidableEq α]
     have hL : (L.card : ℝ) = (d : ℝ) := by exact_mod_cast hL_card
     linarith
   have hLc_nonneg : (0 : ℝ) ≤ (Lᶜ.card : ℝ) := by exact_mod_cast Nat.zero_le _
-  have hpart := card_univ_mul_sum_compl_le (α := α) L hf_nonneg hf_ordering
+  have hpart := card_univ_mul_sum_compl_le (α := α) L hf_ordering
   have hr_real_pos : (0 : ℝ) < (Fintype.card α : ℝ) := by exact_mod_cast hr_pos
   have htotal_nonneg : 0 ≤ 1 + 2 * Real.sqrt ζ := by positivity
   have hSsum_le_frac : ∑ s ∈ (Lᶜ : Finset α), f s ≤
