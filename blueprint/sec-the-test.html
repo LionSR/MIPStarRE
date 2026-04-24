@@ -828,6 +828,83 @@
 
   </div>
 </div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:main-formal-k-boundary">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">2.12</span>
+    <span class="remark_thmtitle">\(k\)-bound boundary for the public theorem</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-the-test.html#rem:main-formal-k-boundary">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-the-test.html#thm:main-formal">Theorem 2.11</a></li>
+          
+          <li><a href="sec-induction.html#thm:error-cascade-main-formal">Theorem 10.14</a></li>
+          
+          <li><a href="sec-the-test.html#def:projective-strategy">Definition 2.5</a></li>
+          
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.15</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p>   The public hypothesis \(k \ge md\) is paper-faithful and intentionally weaker than the \(k \ge 400\, md\) hypothesis used by the Section&#160;6 / pasting-side wrappers (see the statement of ??thm:ld-pasting in Chapter&#160;7 of <span class="cite">
+	[
+</span>). The Lean assembly of ??thm:main-formal reconciles the two by a case split on \(k\): </p>
+<ul class="itemize">
+  <li><p>In the regime \(400\, md \le k\), the induction and pasting wrappers apply directly and the paper’s cascade of error bounds is absorbed by \(\nu = \mainFormalError \) through ??thm:error-cascade-main-formal. </p>
+</li>
+  <li><p>In the regime \(md \le k {\lt} 400\, md\), the bound \(1 \le \mainFormalError \) already holds (the paper’s standard observation from the proof of ??thm:main-induction, where \(\nu \ge 1\) makes the conclusion vacuous), and a trivial projective measurement witnesses the three \(\simeq _\nu \) statements. The Lean helper <span class="ttfamily">mainFormal_trivial_witness</span> records this regime as a standalone lemma so the <span class="ttfamily">mainFormal</span> proof can invoke it without re-deriving the triviality at each call site. </p>
+</li>
+</ul>
+<p> Consequently, no arithmetic lemma deriving \(400\, md \le k\) from \(md \le k\) is ever introduced; the boundary is handled by the case split above. </p>
+
+  </div>
+</div>
 
 </div> <!--main-text -->
 </div> <!-- content-wrapper -->
