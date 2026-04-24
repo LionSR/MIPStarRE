@@ -49,7 +49,7 @@ _FILE_RE = re.compile(r"\b(MIPStarRE(?:/[A-Za-z0-9_.\-]+)*\.lean)(?::(\d+))?")
 # ``MIPStarRE/...`` citations before scanning so we don't greedily match the
 # repo-name prefix (``.../MIPStarRE/blob/main/...``) as part of the path.
 _GITHUB_BLOB_RE = re.compile(
-    r"https?://github\.com/[^/\s]+/[^/\s]+/blob/[^/\s]+/"
+    r"https?://github\.com/[^/\s]+/[^/\s]+/blob/[^\s#]+?/"
     r"(MIPStarRE(?:/[A-Za-z0-9_.\-]+)*\.lean)(?:#L(\d+)(?:-L\d+)?)?"
 )
 
