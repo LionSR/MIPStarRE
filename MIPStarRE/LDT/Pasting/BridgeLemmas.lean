@@ -3254,6 +3254,40 @@ private noncomputable def hBConsistencyBadMass
           else 0)
         ((verticalLineMeasurementFamily params strategy u).outcome f))
 
+private noncomputable def ldSandwichLineOnePointRightMeasurement
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (i : Fin k) (q : SandwichedLineQuestion params k) :
+    Measurement (Option (Fq params)) ι where
+  toSubMeas := ((ldSandwichLineOnePointRightFamily params strategy family k i.1) q)
+  total_eq_one := by
+    let ℓ : AxisParallelLine params.next :=
+      { base := appendPoint params q.1 zeroCoord
+        direction := lastCoord params }
+    simpa [ldSandwichLineOnePointRightFamily, verticalLineMeasurementFamily, i.2,
+      postprocess_total, ℓ] using (strategy.axisParallelMeasurement ℓ).total_eq_one
+
+private lemma ldSandwichLineOnePointRightMeasurement_outcome_none_eq_zero
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (i : Fin k) (q : SandwichedLineQuestion params k) :
+    (ldSandwichLineOnePointRightMeasurement params strategy family i q).outcome none = 0 := by
+  simp [ldSandwichLineOnePointRightMeasurement, ldSandwichLineOnePointRightFamily,
+    postprocess, i.2]
+
+private lemma ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (i : Fin k) (q : SandwichedLineQuestion params k) (a : Fq params) :
+    (ldSandwichLineOnePointRightMeasurement params strategy family i q).outcome (some a) =
+      ∑ f : AxisLinePolynomial params.next,
+        if f (q.2 i) = a then (verticalLineMeasurementFamily params strategy q.1).outcome f else 0 := by
+  simp [ldSandwichLineOnePointRightMeasurement, ldSandwichLineOnePointRightFamily,
+    postprocess, i.2, Finset.sum_filter]
+
 private lemma grouped_coordinate_mismatch_le_left_falseOutcome
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -3300,6 +3334,280 @@ private lemma grouped_coordinate_mismatch_le_left_falseOutcome
         (gHatSandwichFamily params family k xs).outcome_pos gs
       simp [hm, hneq, hnonneg]
     · simp [hm, hneq]
+
+private lemma hBConsistencyCoordMass_le_linePointDefect
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) (xs : PointTuple params k)
+    (i : Fin k) :
+    (∑ f : AxisLinePolynomial params.next,
+      ev strategy.state
+        (opTensor
+          (∑ gs : GHatTupleOutcome params k,
+            if ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+              (interpolationEligibleSandwichFamily params family k xs).outcome gs
+            else 0)
+          ((verticalLineMeasurementFamily params strategy u).outcome f)))
+      ≤ qBipartiteConsDefect strategy.state
+          ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) (u, xs))
+          ((ldSandwichLineOnePointRightFamily params strategy family k i.1) (u, xs)) := by
+  let q : SandwichedLineQuestion params k := (u, xs)
+  let A := ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) q)
+  let Bm := ldSandwichLineOnePointRightMeasurement params strategy family i q
+  let leftFalse : Fq params → MIPStarRE.Quantum.Op ι := fun a =>
+    (postprocess A (fun o => decide (o = some a))).outcome false
+  have hstep :
+      ∀ f : AxisLinePolynomial params.next,
+        ev strategy.state
+          (opTensor
+            (∑ gs : GHatTupleOutcome params k,
+              if ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+                (interpolationEligibleSandwichFamily params family k xs).outcome gs
+              else 0)
+            ((verticalLineMeasurementFamily params strategy u).outcome f))
+          ≤ ev strategy.state
+              (opTensor (leftFalse (f (xs i)))
+                ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+    intro f
+    exact ev_mono strategy.state _ _ <|
+      opTensor_mono_left
+        (grouped_coordinate_mismatch_le_left_falseOutcome params strategy family u xs i (f (xs i)))
+        ((verticalLineMeasurementFamily params strategy u).outcome_pos f)
+  have hgrouped :
+      (∑ f : AxisLinePolynomial params.next,
+        ev strategy.state
+          (opTensor (leftFalse (f (xs i)))
+            ((verticalLineMeasurementFamily params strategy u).outcome f)))
+        = ∑ a : Fq params,
+            ev strategy.state
+              (opTensor (leftFalse a) (Bm.outcome (some a))) := by
+    calc
+      (∑ f : AxisLinePolynomial params.next,
+        ev strategy.state
+          (opTensor (leftFalse (f (xs i)))
+            ((verticalLineMeasurementFamily params strategy u).outcome f)))
+        = ∑ f : AxisLinePolynomial params.next,
+            ∑ a : Fq params,
+              if f (xs i) = a then
+                ev strategy.state
+                  (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+              else (0 : Error) := by
+              refine Finset.sum_congr rfl ?_
+              intro f _
+              have hsingle :
+                  (∑ a : Fq params,
+                    if f (xs i) = a then
+                      ev strategy.state
+                        (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+                    else (0 : Error)) =
+                  ev strategy.state
+                    (opTensor (leftFalse (f (xs i))) ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+                simpa using (show
+                  (∑ a : Fq params,
+                    if f (xs i) = a then
+                      ev strategy.state
+                        (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+                    else (0 : Error)) =
+                  ev strategy.state
+                    (opTensor (leftFalse (f (xs i))) ((verticalLineMeasurementFamily params strategy u).outcome f)) by
+                    simp)
+              simpa using hsingle.symm
+      _ = ∑ a : Fq params,
+            ∑ f : AxisLinePolynomial params.next,
+              if f (xs i) = a then
+                ev strategy.state
+                  (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+              else (0 : Error) := by
+              rw [Finset.sum_comm]
+      _ = ∑ a : Fq params,
+            ev strategy.state
+              (opTensor (leftFalse a) (Bm.outcome (some a))) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              have hgroup :
+                  (∑ f : AxisLinePolynomial params.next,
+                    if f (xs i) = a then
+                      ev strategy.state
+                        (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+                    else (0 : Error))
+                    = ∑ f : AxisLinePolynomial params.next,
+                        ev strategy.state
+                          (opTensor (leftFalse a)
+                            (if f (xs i) = a then
+                              (verticalLineMeasurementFamily params strategy u).outcome f
+                            else 0)) := by
+                      refine Finset.sum_congr rfl ?_
+                      intro f _
+                      by_cases hf : f (xs i) = a
+                      · simp [hf]
+                      · simp [hf, opTensor, ev]
+              rw [hgroup, ← ev_finset_sum, ← opTensor_sum_right_local]
+              rw [ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum]
+  have hdefect_expand :
+      qBipartiteConsDefect strategy.state A Bm.toSubMeas =
+        qBipartiteConsDefect strategy.state
+          ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) q)
+          ((ldSandwichLineOnePointRightFamily params strategy family k i.1) q) := by
+    rfl
+  calc
+    (∑ f : AxisLinePolynomial params.next,
+      ev strategy.state
+        (opTensor
+          (∑ gs : GHatTupleOutcome params k,
+            if ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+              (interpolationEligibleSandwichFamily params family k xs).outcome gs
+            else 0)
+          ((verticalLineMeasurementFamily params strategy u).outcome f)))
+      ≤ ∑ f : AxisLinePolynomial params.next,
+          ev strategy.state
+            (opTensor (leftFalse (f (xs i)))
+              ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+            exact Finset.sum_le_sum fun f _ => hstep f
+    _ = ∑ a : Fq params,
+          ev strategy.state
+            (opTensor (leftFalse a) (Bm.outcome (some a))) := hgrouped
+    _ = ∑ a : Fq params,
+          qBipartiteConsDefect strategy.state
+            (postprocess A (fun o => decide (o = some a)))
+            (singleOutcomeRightSubMeas Bm.toSubMeas (some a)) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            symm
+            exact qBipartiteConsDefect_postprocess_eq_singleOutcome strategy.state A Bm.toSubMeas (some a)
+    _ ≤ qBipartiteConsDefect strategy.state A Bm.toSubMeas := by
+            rw [qBipartiteConsDefect_eq_sum_singleOutcome (B := Bm), Fintype.sum_option]
+            have hnone_nonneg :
+                0 ≤ qBipartiteConsDefect strategy.state
+                  (postprocess A (fun o => decide (o = none)))
+                  (singleOutcomeRightSubMeas Bm.toSubMeas none) :=
+              qBipartiteConsDefect_nonneg strategy.state _ _
+            linarith
+    _ = qBipartiteConsDefect strategy.state
+          ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) q)
+          ((ldSandwichLineOnePointRightFamily params strategy family k i.1) q) := hdefect_expand
+
+private lemma hBConsistencyBadMass_le_linePointDefectSum
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) (xs : PointTuple params k) :
+    hBConsistencyBadMass params strategy family u xs
+      ≤ ∑ i : Fin k,
+          qBipartiteConsDefect strategy.state
+            ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) (u, xs))
+            ((ldSandwichLineOnePointRightFamily params strategy family k i.1) (u, xs)) := by
+  calc
+    hBConsistencyBadMass params strategy family u xs
+      ≤ ∑ f : AxisLinePolynomial params.next,
+          ev strategy.state
+            (opTensor
+              (∑ i : Fin k,
+                ∑ gs : GHatTupleOutcome params k,
+                  if ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+                    (interpolationEligibleSandwichFamily params family k xs).outcome gs
+                  else 0)
+              ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+            unfold hBConsistencyBadMass
+            refine Finset.sum_le_sum ?_
+            intro f _
+            apply ev_mono strategy.state _ _
+            exact opTensor_mono_left
+              (interpolationEligibleSandwich_exists_mismatch_sum_le_sum params family u xs f)
+              ((verticalLineMeasurementFamily params strategy u).outcome_pos f)
+    _ = ∑ i : Fin k,
+          ∑ f : AxisLinePolynomial params.next,
+            ev strategy.state
+              (opTensor
+                (∑ gs : GHatTupleOutcome params k,
+                  if ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+                    (interpolationEligibleSandwichFamily params family k xs).outcome gs
+                  else 0)
+                ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+            rw [Finset.sum_comm]
+            refine Finset.sum_congr rfl ?_
+            intro f _
+            rw [opTensor_sum_left_local, ev_finset_sum]
+    _ ≤ ∑ i : Fin k,
+          qBipartiteConsDefect strategy.state
+            ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) (u, xs))
+            ((ldSandwichLineOnePointRightFamily params strategy family k i.1) (u, xs)) := by
+            refine Finset.sum_le_sum ?_
+            intro i _
+            exact hBConsistencyCoordMass_le_linePointDefect params strategy family u xs i
+
+private lemma hBConsistencyBadMass_nonneg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) (xs : PointTuple params k) :
+    0 ≤ hBConsistencyBadMass params strategy family u xs := by
+  unfold hBConsistencyBadMass
+  refine Finset.sum_nonneg ?_
+  intro f _
+  apply ev_nonneg_of_psd strategy.state _
+  exact opTensor_nonneg
+    (by
+      refine Finset.sum_nonneg ?_
+      intro gs _
+      by_cases hbad : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)
+      · simp [hbad, (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs]
+      · simp [hbad])
+    ((verticalLineMeasurementFamily params strategy u).outcome_pos f)
+
+private lemma hBConsistencyBadMass_le_one
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) (xs : PointTuple params k) :
+    hBConsistencyBadMass params strategy family u xs ≤ 1 := by
+  let T : MIPStarRE.Quantum.Op ι := (interpolationEligibleSandwichFamily params family k xs).total
+  let L : AxisLinePolynomial params.next → MIPStarRE.Quantum.Op ι := fun f =>
+    ∑ gs : GHatTupleOutcome params k,
+      if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+        (interpolationEligibleSandwichFamily params family k xs).outcome gs
+      else 0
+  have hLle : ∀ f : AxisLinePolynomial params.next, L f ≤ T := by
+    intro f
+    calc
+      L f ≤ ∑ gs : GHatTupleOutcome params k,
+          (interpolationEligibleSandwichFamily params family k xs).outcome gs := by
+            unfold L
+            refine Finset.sum_le_sum ?_
+            intro gs _
+            by_cases hbad : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)
+            · simp [hbad]
+            · simp [hbad, (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs]
+      _ = T := by
+            simpa [T] using (interpolationEligibleSandwichFamily params family k xs).sum_eq_total
+  have hsum_le :
+      hBConsistencyBadMass params strategy family u xs ≤
+        ∑ f : AxisLinePolynomial params.next,
+          ev strategy.state (opTensor T ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+    unfold hBConsistencyBadMass
+    refine Finset.sum_le_sum ?_
+    intro f _
+    exact ev_mono strategy.state _ _ <|
+      opTensor_mono_left (hLle f) ((verticalLineMeasurementFamily params strategy u).outcome_pos f)
+  have htotal_eq_one : (verticalLineMeasurementFamily params strategy u).total = 1 := by
+    let ℓ : AxisParallelLine params.next :=
+      { base := appendPoint params u zeroCoord
+        direction := lastCoord params }
+    simpa [verticalLineMeasurementFamily, ℓ] using (strategy.axisParallelMeasurement ℓ).total_eq_one
+  calc
+    hBConsistencyBadMass params strategy family u xs
+      ≤ ∑ f : AxisLinePolynomial params.next,
+          ev strategy.state (opTensor T ((verticalLineMeasurementFamily params strategy u).outcome f)) := hsum_le
+    _ = ev strategy.state (opTensor T (verticalLineMeasurementFamily params strategy u).total) := by
+          rw [← ev_finset_sum, ← opTensor_sum_right_local]
+          rw [(verticalLineMeasurementFamily params strategy u).sum_eq_total]
+    _ = ev strategy.state (opTensor T (1 : MIPStarRE.Quantum.Op ι)) := by rw [htotal_eq_one]
+    _ ≤ 1 := by
+          have hTle : T ≤ 1 := by simpa [T] using (interpolationEligibleSandwichFamily params family k xs).total_le_one
+          have hop : opTensor T (1 : MIPStarRE.Quantum.Op ι) ≤ 1 := by
+            simpa [leftTensor] using leftTensor_le_one (ι₂ := ι) (A := T) hTle
+          simpa [ev_one_of_isNormalized strategy.state strategy.isNormalized] using
+            (ev_mono strategy.state _ _ hop)
 
 private lemma postprocess_restrictSubMeas_outcome
     {α β : Type*} [Fintype α] [Fintype β] [DecidableEq β]
@@ -3865,6 +4173,213 @@ private lemma hBConsistencyError_eq_k_mul_ldSandwichLineOnePointError_add
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) := by
   simp [hBConsistencyError, ldSandwichLineOnePointError]
   ring
+
+private lemma avgOver_sum_fin
+    {α : Type*} (𝒟 : Distribution α) (k : ℕ) (f : α → Fin k → Error) :
+    avgOver 𝒟 (fun a => ∑ i : Fin k, f a i) =
+      ∑ i : Fin k, avgOver 𝒟 (fun a => f a i) := by
+  unfold avgOver
+  calc
+    ∑ a ∈ 𝒟.support, 𝒟.weight a * ∑ i : Fin k, f a i
+      = ∑ a ∈ 𝒟.support, ∑ i : Fin k, 𝒟.weight a * f a i := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [Finset.mul_sum]
+    _ = ∑ i : Fin k, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a i := by
+          rw [Finset.sum_comm]
+
+private lemma one_div_q_le_rpow_degreeRatio
+    (params : Parameters) [FieldModel params.q]
+    (hd : 0 < params.d) :
+    1 / (params.q : Error)
+      ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
+  let x : Error := ((params.d : Error) / (params.q : Error))
+  have hq_pos : 0 < (params.q : Error) := by exact_mod_cast params.hq
+  have hx_nonneg : 0 ≤ x := by positivity
+  have hqx : 1 / (params.q : Error) ≤ x := by
+    have hd_ge_one : (1 : Error) ≤ (params.d : Error) := by exact_mod_cast hd
+    simpa [x] using div_le_div_of_nonneg_right hd_ge_one hq_pos.le
+  by_cases hx_le_one : x ≤ 1
+  · have hx_le_rpow : x ≤ Real.rpow x (1 / (32 : Error)) := by
+      simpa [Real.rpow_one] using
+        (Real.rpow_le_rpow_of_exponent_ge' hx_nonneg hx_le_one (by norm_num : 0 ≤ (1 / (32 : Error)))
+          (by norm_num : (1 / (32 : Error)) ≤ (1 : Error)))
+    exact le_trans hqx hx_le_rpow
+  · have h1_le_x : (1 : Error) ≤ x := le_of_not_ge hx_le_one
+    have hq_le_one : 1 / (params.q : Error) ≤ 1 := by
+      have hq_ge_one : (1 : Error) ≤ (params.q : Error) := by exact_mod_cast params.hq
+      have hq_ne : (params.q : Error) ≠ 0 := by positivity
+      field_simp [hq_ne]
+      nlinarith
+    have h1_le_rpow : (1 : Error) ≤ Real.rpow x (1 / (32 : Error)) := by
+      simpa [Real.rpow_one] using
+        (Real.rpow_le_rpow (show 0 ≤ (1 : Error) by positivity) h1_le_x (show 0 ≤ (1 / (32 : Error)) by positivity))
+    exact le_trans hq_le_one h1_le_rpow
+
+private lemma dnoteq_term_le_hBConsistency_extra
+    (params : Parameters) [FieldModel params.q]
+    (eps delta gamma zeta : Error)
+    (k : ℕ)
+    (hd : 0 < params.d)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta) :
+    ((k : Error) ^ (2 : ℕ)) / (params.q : Error)
+      ≤ ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+          (Real.rpow eps (1 / (32 : Error)) +
+            Real.rpow delta (1 / (32 : Error)) +
+            Real.rpow gamma (1 / (32 : Error)) +
+            Real.rpow zeta (1 / (32 : Error)) +
+            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) := by
+  let S : Error :=
+    Real.rpow eps (1 / (32 : Error)) +
+      Real.rpow delta (1 / (32 : Error)) +
+      Real.rpow gamma (1 / (32 : Error)) +
+      Real.rpow zeta (1 / (32 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))
+  have hqterm : 1 / (params.q : Error) ≤ S := by
+    have hlast := one_div_q_le_rpow_degreeRatio params hd
+    have hS_nonneg : 0 ≤ S := by
+      dsimp [S]
+      positivity [heps_nonneg, hdelta_nonneg, hgamma_nonneg, hzeta_nonneg]
+    have htail_nonneg :
+        0 ≤ Real.rpow eps (1 / (32 : Error)) +
+            Real.rpow delta (1 / (32 : Error)) +
+            Real.rpow gamma (1 / (32 : Error)) +
+            Real.rpow zeta (1 / (32 : Error)) := by
+      positivity [heps_nonneg, hdelta_nonneg, hgamma_nonneg, hzeta_nonneg]
+    dsimp [S] at *
+    nlinarith
+  have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
+    exact_mod_cast (Nat.succ_le_of_lt params.hm)
+  have hS_le_mS : S ≤ (params.m : Error) * S := by
+    have hS_nonneg : 0 ≤ S := by
+      dsimp [S]
+      positivity [heps_nonneg, hdelta_nonneg, hgamma_nonneg, hzeta_nonneg]
+    nlinarith
+  have hqterm' : 1 / (params.q : Error) ≤ (params.m : Error) * S :=
+    le_trans hqterm hS_le_mS
+  have hk_nonneg : 0 ≤ ((k : Error) ^ (2 : ℕ)) := by positivity
+  have hmul := mul_le_mul_of_nonneg_left hqterm' hk_nonneg
+  simpa [S, div_eq_mul_inv, mul_assoc, mul_left_comm, mul_comm] using hmul
+
+private lemma hBConsistency_error_bound
+    (params : Parameters) [FieldModel params.q]
+    (eps delta gamma zeta : Error)
+    (k : ℕ)
+    (hd : 0 < params.d)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta) :
+    (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k +
+        ((k : Error) ^ (2 : ℕ)) / (params.q : Error)
+      ≤ hBConsistencyError params eps delta gamma zeta k := by
+  rw [hBConsistencyError_eq_k_mul_ldSandwichLineOnePointError_add]
+  have hextra := dnoteq_term_le_hBConsistency_extra params eps delta gamma zeta k hd
+    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+  linarith
+
+private lemma avgOver_distinct_pasted_defect_le_badMass
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) :
+    avgOver (distinctTupleDistribution params k) (fun xs =>
+      qBipartiteConsDefect strategy.state
+        (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+        (verticalLineMeasurementFamily params strategy u))
+      ≤ avgOver (distinctTupleDistribution params k) (fun xs =>
+          hBConsistencyBadMass params strategy family u xs) := by
+  unfold avgOver distinctTupleDistribution
+  refine Finset.sum_le_sum ?_
+  intro xs _
+  by_cases hxs : Function.Injective xs
+  · simp [distinctTupleDistribution, hxs]
+    exact mul_le_mul_of_nonneg_left
+      (pastedInterpolation_verticalLine_defect_le_badMass params strategy family u xs hxs)
+      (by positivity)
+  · simp [distinctTupleDistribution, hxs]
+
+private lemma avgOver_distinct_badMass_le_avgOver_uniform_badMass_add_dnoteq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) :
+    avgOver (distinctTupleDistribution params k) (fun xs =>
+      hBConsistencyBadMass params strategy family u xs)
+      ≤ avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs) +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+  calc
+    avgOver (distinctTupleDistribution params k) (fun xs =>
+        hBConsistencyBadMass params strategy family u xs)
+      ≤ avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs) +
+          totalVariationDistance
+            (uniformDistribution (PointTuple params k))
+            (distinctTupleDistribution params k) := by
+            exact avgOver_distinct_bounded_le_avgOver_uniform_add_tv_of_any_k params k
+              (fun xs => hBConsistencyBadMass params strategy family u xs)
+              (fun xs => hBConsistencyBadMass_nonneg params strategy family u xs)
+              (fun xs => hBConsistencyBadMass_le_one params strategy family u xs)
+    _ ≤ avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs) +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+            gcongr
+            exact ldDnoteq params k
+
+private lemma avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error)
+    (k : ℕ)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    avgOver (uniformDistribution (Point params)) (fun u =>
+      avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+        hBConsistencyBadMass params strategy family u xs))
+      ≤ (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k := by
+  let defect : Fin k → SandwichedLineQuestion params k → Error := fun i q =>
+    qBipartiteConsDefect strategy.state
+      ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) q)
+      ((ldSandwichLineOnePointRightFamily params strategy family k i.1) q)
+  calc
+    avgOver (uniformDistribution (Point params)) (fun u =>
+      avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+        hBConsistencyBadMass params strategy family u xs))
+      ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            ∑ i : Fin k, defect i (u, xs))) := by
+            exact avgOver_mono _ _ _ (fun u =>
+              avgOver_mono _ _ _ (fun xs =>
+                hBConsistencyBadMass_le_linePointDefectSum params strategy family u xs))
+    _ = avgOver (uniformDistribution (Point params)) (fun u =>
+          ∑ i : Fin k,
+            avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u, xs))) := by
+          apply avgOver_congr
+          intro u
+          exact avgOver_sum_fin (uniformDistribution (PointTuple params k)) k (fun xs i => defect i (u, xs))
+    _ = ∑ i : Fin k,
+          avgOver (uniformDistribution (Point params)) (fun u =>
+            avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u, xs))) := by
+          exact (avgOver_sum_fin (uniformDistribution (Point params)) k
+            (fun u i => avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u, xs))))
+    _ = ∑ i : Fin k,
+          avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q => defect i q) := by
+          refine Finset.sum_congr rfl ?_
+          intro i _
+          simpa [SandwichedLineQuestion] using
+            (avgOver_uniform_prod (f := fun u xs => defect i (u, xs))).symm
+    _ ≤ ∑ i : Fin k, ldSandwichLineOnePointError params eps delta gamma zeta k := by
+          refine Finset.sum_le_sum ?_
+          intro i _
+          exact (hline i.1 i.2).linePointComparison.offDiagonalBound
+    _ = (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k := by
+          simp
 
 /- private lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get
     (params : Parameters) [FieldModel params.q]
@@ -7197,6 +7712,7 @@ private lemma hBConsistency_core
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -7211,22 +7727,76 @@ private lemma hBConsistency_core
         (constructedPastedSubMeas params family k))
       (verticalLineMeasurementFamily params strategy)
       (hBConsistencyError params eps delta gamma zeta k) := by
-  /-
-  After `ldSandwichLineOnePoint_core`, the remaining work is the outcome-side
-  expansion of `constructedPastedSubMeas`:
-  * rewrite the pasted interpolation family as a sum over globally consistent
-    eligible tuples;
-  * use that, for a globally consistent tuple and a disagreeing line polynomial,
-    some active coordinate must violate the `ldSandwichLineOnePoint` predicate;
-  * pay the `ldDnoteq` distinct-vs-uniform cost and union-bound over the
-    offending coordinate.
-
-  The genuine remaining technical blocker is the missing interpolation
-  correctness API for `interpolateCompletedSlices`: we still need lemmas showing
-  that the canonical interpolant chosen by `interpolateCompletedSlices` agrees
-  with each supported completed slice whenever the tuple is globally consistent.
-  -/
-  sorry
+  constructor
+  have heps_nonneg : 0 ≤ eps := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params.next))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy))
+      hgood.axisParallelTest
+  have hdelta_nonneg : 0 ≤ delta := by
+    exact le_trans
+      (bipartiteSSCError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      hgood.selfConsistencyTest
+  have hgamma_nonneg : 0 ≤ gamma := by
+    have : 0 ≤ strategy.diagonalFailureProbability := by
+      unfold SymStrat.diagonalFailureProbability
+      exact mul_nonneg (by positivity)
+        (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
+    exact le_trans this hgood.diagonalLineTest
+  have hzeta_nonneg : 0 ≤ zeta := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        family.evaluatedAtNextPoint)
+      hcons.pointConsistency.offDiagonalBound
+  calc
+    bipartiteConsError strategy.state
+        (uniformDistribution (VerticalLineQuestion params))
+        (hRestrictionToVerticalLine params (constructedPastedSubMeas params family k))
+        (verticalLineMeasurementFamily params strategy)
+      = avgOver (uniformDistribution (Point params)) (fun u =>
+          qBipartiteConsDefect strategy.state
+            (hRestrictionToVerticalLine params (constructedPastedSubMeas params family k) u)
+            (verticalLineMeasurementFamily params strategy u)) := by
+            rfl
+    _ ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (distinctTupleDistribution params k) (fun xs =>
+            qBipartiteConsDefect strategy.state
+              (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+              (verticalLineMeasurementFamily params strategy u))) := by
+            exact avgOver_mono _ _ _ (fun u =>
+              hBConsistency_fixed_u_defect_le_avgOver_distinct params strategy family k u)
+    _ ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (distinctTupleDistribution params k) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs)) := by
+            exact avgOver_mono _ _ _ (fun u =>
+              avgOver_distinct_pasted_defect_le_badMass params strategy family u)
+    _ ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs) +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error)) := by
+            exact avgOver_mono _ _ _ (fun u =>
+              avgOver_distinct_badMass_le_avgOver_uniform_badMass_add_dnoteq params strategy family u)
+    _ = avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs)) +
+        ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+            rw [avgOver_add]
+            simpa using avgOver_uniform_const (α := Point params)
+              (((k : Error) ^ (2 : ℕ)) / (params.q : Error))
+    _ ≤ (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+            gcongr
+            exact avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
+              params strategy family eps delta gamma zeta k hline
+    _ ≤ hBConsistencyError params eps delta gamma zeta k := by
+            exact hBConsistency_error_bound params eps delta gamma zeta k hd
+              heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
 
 /-- `lem:h-b-consistency`. -/
 lemma hBConsistency
@@ -7235,6 +7805,7 @@ lemma hBConsistency
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -7246,7 +7817,7 @@ lemma hBConsistency
     HBConsistencyStatement params strategy family
         eps delta gamma zeta k := by
   exact ⟨hBConsistency_core params strategy eps delta gamma zeta
-    hgood family hcons hself hbound k hline⟩
+    hgood hd family hcons hself hbound k hline⟩
 
 /-- Transport the vertical-line consistency statement from restricted points
 `u : Point params` to ambient points `appendPoint params u x`. -/
@@ -7526,6 +8097,7 @@ theorem hAConsistency_submeas
     (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
     (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -7583,7 +8155,7 @@ theorem hAConsistency_submeas
       hgood hgamma_le hzeta_le hdq_le
       family hcons hself hbound hfacts k i hi
   have hHB := hBConsistency params strategy eps delta gamma zeta
-    hgood family hcons hself hbound k hline
+    hgood hd family hcons hself hbound k hline
   have hgamma_nonneg : 0 ≤ gamma := by
     have : 0 ≤ strategy.diagonalFailureProbability := by
       unfold SymStrat.diagonalFailureProbability

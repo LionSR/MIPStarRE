@@ -234,17 +234,34 @@ where
 \end{lemma}
 ```
 
-### Remaining Lean Work
+### Current Lean Status
 
-Once `ldSandwichLineOnePoint` is available, the remaining Lean work is mostly transport and
-averaging:
+`hBConsistency_core` is now proved in the monolithic target.
 
-1. Expand `constructedPastedSubMeas` through the distinct-tuple average.
-2. Use the interpolation-support correctness lemmas to show that a globally consistent eligible
-   tuple disagrees with a line polynomial only if some active coordinate violates the one-point
-   predicate.
-3. Pay the `ldDnoteq` cost to pass from distinct to uniform tuples.
-4. Union-bound over coordinates and use `hline`.
+The compiled helper stack used for it is:
+
+- `hBConsistencyCoordMass_le_linePointDefect`
+- `hBConsistencyBadMass_le_linePointDefectSum`
+- `hBConsistencyBadMass_nonneg`
+- `hBConsistencyBadMass_le_one`
+- `avgOver_sum_fin`
+- `avgOver_distinct_pasted_defect_le_badMass`
+- `avgOver_distinct_badMass_le_avgOver_uniform_badMass_add_dnoteq`
+- `avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError`
+- `one_div_q_le_rpow_degreeRatio`
+- `dnoteq_term_le_hBConsistency_extra`
+- `hBConsistency_error_bound`
+
+The proof now follows the paper almost verbatim:
+
+1. rewrite `constructedPastedSubMeas` through the distinct-tuple average
+2. dominate the pasted-interpolation defect by bad-event mass
+3. pass distinct tuples to uniform tuples via `ldDnoteq`, paying the `k^2 / q` cost once
+4. union-bound over coordinates and apply `hline`
+5. absorb `k * ν_5 + k^2 / q` into `ν_6`
+
+Because the final absorption uses the paper step `1/q <= (d/q)^(1/32)`, the local Section 12
+consistency path now explicitly carries `0 < params.d`.
 
 The historical split helper stack worth porting is now more specific.
 
@@ -258,11 +275,13 @@ The historical split helper stack worth porting is now more specific.
 - `interpolateCompletedSlices_restrictAtHeight_eq_get_of_mem_supportSubset`
 - `tupleInterpolatedVerticalLine`
 
-#### Still to port before `hBConsistency_core`
+#### Remaining blocker before the rest of Section 12 closes
 
-- `BadLineEvent` and the bad-mass transport lemmas
-- option-lift / average transport lemmas for converting fixed-`u` defects into the
-  final averaged `ConsRel`
+`ldSandwichLineOnePoint_core` is still open. With `hBConsistency_core` done, the only remaining
+live theorem holes in `BridgeLemmas.lean` are:
+
+- `ldSandwichLineOnePoint_core`
+- `overAllOutcomes`
 
 #### Expected final proof spine for `hBConsistency_core`
 
