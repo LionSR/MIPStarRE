@@ -3313,7 +3313,7 @@ theorem mainInductionByRecursionOnM
 This public successor-step wrapper combines the five explicit Section 6 inputs
 tracked by issues #631–#633:
 1. the weighted restricted-axis and restricted-diagonal bounds feeding
-   `restrictedProbabilities`,
+   `RestrictedProbabilitiesStatement.ofWeightedBounds`,
 2. `SliceRestrictionPackage.ofRestrictedProbabilities`,
 3. the slice-wise recursion witnesses used by `PerSliceInductionPackage.ofRecursion`,
 4. the explicit `hselfProducer` boundary input packaging the outputs of
