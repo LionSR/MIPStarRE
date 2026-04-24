@@ -1645,32 +1645,25 @@ lemma weighted_diagonal_bound
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     avgOver (uniformDistribution (Fq params))
-        (fun x => sliceDiagonalDirectionWeight params *
+        (fun x => sliceTransverseDirectionWeight params *
           (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma := by
-  have hweighted :
-      sliceDiagonalDirectionWeight params *
-          avgOver (uniformDistribution (Fin params.m))
-            (fun j => diagonalIndexError params strategy (embedCoord params j)) ≤
-        avgOver (uniformDistribution (Fin params.next.m))
-          (diagonalIndexError params strategy) := by
-    simpa [sliceDiagonalDirectionWeight] using
-      (weighted_embedded_average_le_full_average params
-        (f := diagonalIndexError params strategy)
-        (hf := diagonalIndexError_nonneg params strategy))
   calc
     avgOver (uniformDistribution (Fq params))
-        (fun x => sliceDiagonalDirectionWeight params *
+        (fun x => sliceTransverseDirectionWeight params *
           (xRestrictedStrategy params strategy x).diagonalFailureProbability)
-      = sliceDiagonalDirectionWeight params *
+      = sliceTransverseDirectionWeight params *
           avgOver (uniformDistribution (Fq params))
             (fun x => (xRestrictedStrategy params strategy x).diagonalFailureProbability) := by
               rw [avgOver_const_mul]
-    _ = sliceDiagonalDirectionWeight params *
+    _ = sliceTransverseDirectionWeight params *
           avgOver (uniformDistribution (Fin params.m))
             (fun j => diagonalIndexError params strategy (embedCoord params j)) := by
               rw [averageRestrictedDiagonalFailure_eq_embeddedDiagonalIndices params strategy]
     _ ≤ avgOver (uniformDistribution (Fin params.next.m))
-          (diagonalIndexError params strategy) := hweighted
+          (diagonalIndexError params strategy) :=
+        weighted_embedded_average_le_full_average params
+          (f := diagonalIndexError params strategy)
+          (hf := diagonalIndexError_nonneg params strategy)
     _ = strategy.diagonalFailureProbability :=
         diagonalFailure_eq_average_indexError params strategy
     _ ≤ gamma := hgood.diagonalLineTest
@@ -1699,14 +1692,6 @@ private lemma weighted_bound_to_average
           symm
           exact hcancel
     _ ≤ sliceConditioningLoss params * b := hmul
-
-private lemma weighted_diagonal_bound_to_average
-    (params : Parameters)
-    {a b : Error}
-    (h : sliceDiagonalDirectionWeight params * a ≤ b) :
-    a ≤ sliceDiagonalConditioningLoss params * b := by
-  simpa [sliceDiagonalDirectionWeight, sliceDiagonalConditioningLoss] using
-    weighted_bound_to_average params h
 
 /-- Package weighted restricted axis/diagonal bounds into the public
 `RestrictedProbabilitiesStatement`. -/
