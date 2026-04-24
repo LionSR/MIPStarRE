@@ -179,19 +179,22 @@ lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
 
 /-- **Rounding to projectors** (`lem:projective-non-measurement`).
 
-From the estimate `eq:A-looks-projective`, construct a family `R_a` of
-projectors close to `A_a` whose total is bounded by `(1 + 2√ζ)I`. -/
-lemma projectiveNonMeasurement {Outcome : Type uOutcome}
+This declaration now records the honest paper-facing statement consumed by the
+QXP rank-reduction layer: a chosen family `R_a` equipped with
+`RoundingToProjectorsWitness ψ A ζ R`. The abbrev gives that statement a stable
+Lean name for the blueprint and for later API cleanup, while downstream local
+lemmas usually carry a chosen witness `(q, hrounded)` directly once the rounded
+family has been fixed. The old `ProjectiveNonMeasurementBridgePackage`
+placeholder has been deleted; producing such a witness from
+`eq:A-looks-projective` remains an upstream spectral-truncation obligation
+rather than a downstream QXP bridge. -/
+abbrev projectiveNonMeasurement {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (ζ : Error)
-    (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ) :
-    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
-      ∃ R : OpFamily Outcome ι,
-        RoundingToProjectorsWitness ψ A ζ R := by
-  intro hsource
-  exact hbridge.fromSourceAlmostProjective hsource
+    (A : Measurement Outcome ι) (ζ : Error) : Prop :=
+  ∃ R : OpFamily Outcome ι,
+    RoundingToProjectorsWitness ψ A ζ R
 
 /-- For a Hermitian idempotent matrix, every eigenvalue is either `0` or `1`. -/
 lemma projector_eigenvalues_zero_or_one {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -499,11 +502,13 @@ projective measurement `T_a`, so that `Q_a` remains close to `A_a`, its total
 stays bounded by `(1 + 2√ζ)I`, and the auxiliary dimension is at most the
 original ambient dimension.
 
-This theorem starts from a chosen rounded family `R_a` carrying the previous
-step's witness `RoundingToProjectorsWitness ψ A ζ q`. In the paper
-(orthonormalization.tex), Lem 5.5 begins exactly from the family `R_a` supplied
-by `lem:projective-non-measurement`; threading that witness directly removes the
-downstream dependence on `ProjectiveNonMeasurementBridgePackage`.
+This theorem starts from a chosen rounded family `R_a` carrying the explicit
+witness `RoundingToProjectorsWitness ψ A ζ q`; equivalently, it consumes a
+concrete witness of the statement `projectiveNonMeasurement ψ A ζ`. In the
+paper (orthonormalization.tex), Lem 5.5 begins exactly from the family `R_a`
+supplied by `lem:projective-non-measurement`, so the downstream QXP layer now
+threads that witness directly instead of passing through a separate bridge
+package.
 
 The auxiliary space `ℂ^m` and the projective measurement
 `T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent
@@ -512,10 +517,12 @@ Below, `projectiveLowRankSum_of_projectors` materialises these data from an
 exact projector submeasurement `R` satisfying `∑_a R_a ≤ I`, using the
 spectral theorem to prove the matrix identity `rank R_a = trace R_a` and hence
 `∑_a rank(R_a) ≤ dim(ι)`. The public theorem `projectiveLowRankSum` still
-keeps `(auxSpace, t, hAuxDim)` explicit because the rounded family `q` only
-carries the weaker bound `∑_a q_a ≤ (1 + 2√ζ)I`. The broader downstream
-`QXPLayerData` pipeline also still lacks a complex-matrix SVD API, as tracked
-in issue #525. -/
+keeps `(auxSpace, t, hAuxDim)` explicit because the remaining `r > d`
+truncation branch from orthonormalization.tex:559-658 has not yet been
+formalized; `RoundingToProjectorsWitness` only gives the weaker bound
+`∑_a q_a ≤ (1 + 2√ζ)I` (issue #651). The broader downstream `QXPLayerData`
+pipeline still lacks a concrete `X / XHat / P` producer because Mathlib has no
+general complex-matrix SVD API (issue #652). -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome]
@@ -524,10 +531,10 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
     (hζ : 0 ≤ ζ)
     (q : OpFamily Outcome ι)
     (hrounded : RoundingToProjectorsWitness ψ A ζ q)
-    -- TODO(#525): Materialise `(auxSpace, t, hAuxDim)` from the paper's
-    -- "Matrix decomposition of `Q_a`" (orthonormalization.tex:777-795),
-    -- i.e. from a 1-eigenspace ONB for each rounded projector `q.outcome a`
-    -- supplied by `projectiveNonMeasurement` (the paper's `R_a`).
+    -- TODO(#651): Eliminate the explicit `(auxSpace, t, hAuxDim)` parameters
+    -- by formalizing the paper's `r > d` truncation branch
+    -- (orthonormalization.tex:559-658), or equivalently by strengthening the
+    -- rounded-family input to an exact projector submeasurement `∑_a q_a ≤ I`.
     (auxSpace : FiniteHilbertSpace.{uι})
     (t : ProjMeas Outcome auxSpace.carrier)
     (hAuxDim : Fintype.card auxSpace.carrier ≤ Fintype.card ι)

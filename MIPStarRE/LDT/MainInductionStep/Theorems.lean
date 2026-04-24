@@ -155,6 +155,81 @@ theorem selfImprovementInInductionSection
           GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
         simpa using hdom' }
 
+/-- Package the slice-wise outputs feeding `selfImprovementInInductionSection`
+into the bookkeeping object expected by the later induction-step assembly.
+
+Because `xRestrictedStrategy params strategy x` is only a
+`RestrictedSymStrat params ι` rather than a full `SymStrat params ι`, the
+restricted-strategy outputs are supplied directly as the six paper-faithful
+fields recorded by `SelfImprovementPackage`. -/
+noncomputable def SelfImprovementPackage.ofSelfImprovementInInductionSection
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (hslice :
+      ∀ x,
+        ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+          CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
+            ((1 - inductionPkg.sliceError x) -
+              sliceSelfImprovementError params restrictionPkg x) ∧
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+            (polynomialEvaluationFamily params H.toSubMeas)
+            (sliceSelfImprovementError params restrictionPkg x) ∧
+          BipartiteSSCRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily H.toSubMeas)
+            (sliceSelfImprovementError params restrictionPkg x) ∧
+          SDDRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
+            (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
+            (sliceSelfImprovementError params restrictionPkg x) ∧
+          tensorFailureExpectation strategy.state Z H.toSubMeas ≤
+            sliceSelfImprovementError params restrictionPkg x ∧
+          (∀ h : Polynomial params,
+            IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h ≤ Z)) :
+    SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg := by
+  classical
+  let sliceProj : Fq params → ProjSubMeas (Polynomial params) ι :=
+    fun x => Classical.choose (hslice x)
+  let sliceWitness : Fq params → MIPStarRE.Quantum.Op ι :=
+    fun x => Classical.choose (Classical.choose_spec (hslice x))
+  have hslice_props :
+      ∀ x,
+        CompletenessAtLeast strategy.state (sliceProj x).toSubMeas.liftLeft
+          ((1 - inductionPkg.sliceError x) -
+            sliceSelfImprovementError params restrictionPkg x) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+          (polynomialEvaluationFamily params (sliceProj x).toSubMeas)
+          (sliceSelfImprovementError params restrictionPkg x) ∧
+        BipartiteSSCRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily (sliceProj x).toSubMeas)
+          (sliceSelfImprovementError params restrictionPkg x) ∧
+        SDDRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) (sliceProj x).toSubMeas))
+          (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) (sliceProj x).toSubMeas))
+          (sliceSelfImprovementError params restrictionPkg x) ∧
+        tensorFailureExpectation strategy.state (sliceWitness x) (sliceProj x).toSubMeas ≤
+          sliceSelfImprovementError params restrictionPkg x ∧
+        (∀ h : Polynomial params,
+          IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h ≤ sliceWitness x) := by
+    intro x
+    simpa [sliceProj, sliceWitness] using
+      (Classical.choose_spec (Classical.choose_spec (hslice x)))
+  exact
+    { sliceProj := sliceProj
+      sliceWitness := sliceWitness
+      completeness := fun x => (hslice_props x).1
+      pointConsistency := fun x => (hslice_props x).2.1
+      strongSelfConsistency := fun x => (hslice_props x).2.2.1
+      selfCloseness := fun x => (hslice_props x).2.2.2.1
+      bounded := fun x => (hslice_props x).2.2.2.2.1
+      dominatesAveragePointOperator := fun x h => (hslice_props x).2.2.2.2.2 h }
+
 /-- `thm:ld-pasting-in-induction-section`. -/
 -- NOTE: `FieldModel.{0}` is needed to match the universe at which
 -- `Pasting.ldPasting` was elaborated. See PR #288 discussion.
@@ -1647,7 +1722,7 @@ lemma RestrictedProbabilitiesStatement.ofWeightedBounds
             (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps)
     (hdiagonalWeightedBound :
       avgOver (uniformDistribution (Fq params))
-          (fun x => sliceDiagonalDirectionWeight params *
+          (fun x => sliceTransverseDirectionWeight params *
             (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma) :
     RestrictedProbabilitiesStatement params strategy eps delta gamma := by
   let profile : RestrictedFailureProfile params strategy :=
@@ -1660,27 +1735,25 @@ lemma RestrictedProbabilitiesStatement.ofWeightedBounds
       restrictedGood := by
         intro x
         exact ⟨le_rfl, le_rfl, le_rfl⟩ }
-  refine ⟨profile, ?_⟩
   have haxis_weighted_avg :
       sliceTransverseDirectionWeight params *
           averageRestrictedAxisParallelError params profile ≤ eps := by
     simpa [profile, averageRestrictedAxisParallelError, avgOver_const_mul] using
       haxisWeightedBound
   have hdiag_weighted_avg :
-      sliceDiagonalDirectionWeight params *
+      sliceTransverseDirectionWeight params *
           averageRestrictedDiagonalError params profile ≤ gamma := by
     simpa [profile, averageRestrictedDiagonalError, avgOver_const_mul] using
       hdiagonalWeightedBound
-  refine ⟨haxisWeightedBound, ?_, ?_, hdiagonalWeightedBound, ?_,
-    haxis_weighted_avg, hdiag_weighted_avg⟩
-  · exact weighted_bound_to_average params haxis_weighted_avg
+  refine ⟨profile, ?_⟩
+  refine ⟨weighted_bound_to_average params haxis_weighted_avg, ?_, ?_⟩
   · calc
       averageRestrictedSelfConsistencyError params profile
         = strategy.selfConsistencyFailureProbability := by
             simpa [profile, averageRestrictedSelfConsistencyError] using
               selfConsistencyRestrictedAverage_eq params strategy
       _ ≤ delta := hgood.selfConsistencyTest
-  · exact weighted_diagonal_bound_to_average params hdiag_weighted_avg
+  · exact weighted_bound_to_average params hdiag_weighted_avg
 
 /-- `lem:restricted-probabilities`. -/
 lemma restrictedProbabilities
@@ -1709,26 +1782,7 @@ noncomputable def SliceRestrictionPackage.ofRestrictedProbabilities
   classical
   let profile := Classical.choose hrestricted.profileExists
   let hprofile := Classical.choose_spec hrestricted.profileExists
-  have haxisAverage :
-      averageRestrictedAxisParallelError params profile ≤
-        sliceConditioningLoss params * eps := by
-    rcases hprofile with
-      ⟨_haxisWeighted, haxisAverage, _hselfAverage, _hdiagWeighted,
-        _hdiagAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
-    exact haxisAverage
-  have hselfAverage :
-      averageRestrictedSelfConsistencyError params profile ≤ delta := by
-    rcases hprofile with
-      ⟨_haxisWeighted, _haxisAverage, hselfAverage, _hdiagWeighted,
-        _hdiagAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
-    exact hselfAverage
-  have hdiagonalAverage :
-      averageRestrictedDiagonalError params profile ≤
-        sliceDiagonalConditioningLoss params * gamma := by
-    rcases hprofile with
-      ⟨_haxisWeighted, _haxisAverage, _hselfAverage, _hdiagWeighted,
-        hdiagonalAverage, _haxisWeightedAvg, _hdiagWeightedAvg⟩
-    exact hdiagonalAverage
+  rcases hprofile with ⟨haxisAverage, hselfAverage, hdiagonalAverage⟩
   exact
     { profile := profile
       axisAverageBound := haxisAverage
@@ -2089,7 +2143,7 @@ private lemma average_sliceMainInductionNu_le
     exact Real.rpow_le_rpow hself_nonneg hrestrict.selfAverageBound (by positivity)
   have hdiag_rpow_le :
       Real.rpow (averageRestrictedDiagonalError params hrestrict.profile) (1 / (1024 : Error)) ≤
-        Real.rpow (sliceDiagonalConditioningLoss params * gamma) (1 / (1024 : Error)) := by
+        Real.rpow (sliceConditioningLoss params * gamma) (1 / (1024 : Error)) := by
     exact Real.rpow_le_rpow hdiag_nonneg hrestrict.diagonalAverageBound (by positivity)
   have haxis_term :
       ((params.m : Error) ^ (2 : ℕ)) *
@@ -2117,7 +2171,7 @@ private lemma average_sliceMainInductionNu_le
         ((params.next.m : Error) ^ (2 : ℕ)) * Real.rpow gamma (1 / (1024 : Error)) := by
     have htmp := mul_le_mul_of_nonneg_left (le_trans hdiag_avg hdiag_rpow_le)
       (by positivity : 0 ≤ ((params.m : Error) ^ (2 : ℕ)))
-    simpa [sliceDiagonalConditioningLoss] using le_trans htmp
+    exact le_trans htmp
       (m_sq_mul_sliceConditioningLoss_rpow_le_next_sq_mul_rpow params hgamma_nonneg (by positivity)
         (by norm_num : (1 / (1024 : Error)) ≤ 1))
   have hratio_term :
@@ -3177,11 +3231,12 @@ self-improvement package, this theorem executes the remaining
 `restrict → induct → self-improve → paste` assembly and returns the
 higher-dimensional point-consistency conclusion.
 
-Note: `hselfProducer` remains an explicit input because the current development
-still lacks the public hand-off from `selfImprovementInInductionSection` to the
-restricted-strategy objects recorded in `SelfImprovementPackage`; the
-restricted-probabilities boundary is now exposed separately via
-`restrictedProbabilities`. That remaining wrapper work is tracked by TODO(#630). -/
+Note: `SelfImprovementPackage.ofSelfImprovementInInductionSection` now packages
+slice-wise restricted-strategy self-improvement outputs once they are supplied,
+and the restricted-probabilities boundary is now exposed separately via
+`restrictedProbabilities`, but `hselfProducer` remains an explicit input because
+the current development still lacks the final assembler connecting those outputs.
+That remaining wrapper work is tracked by TODO(#630). -/
 theorem mainInductionByRecursionOnM
     (params : Parameters)
     [FieldModel.{0} params.q]

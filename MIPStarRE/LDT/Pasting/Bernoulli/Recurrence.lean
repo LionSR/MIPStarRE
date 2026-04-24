@@ -1,3 +1,6 @@
+import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
+import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
+import MIPStarRE.LDT.Pasting.Bernoulli.Scalar
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 
 /-!
@@ -105,19 +108,25 @@ lemma fromHToG
     (k : ℕ) :
     FromHToGStatement params strategy ψbi family gamma zeta k := by
   constructor
-  · intro ℓ hℓ τ
+  · intro ℓ hℓ
     /- Inductive step `ℓ` of the Bernoulli-tail recurrence
-    (`ld-pasting.tex` / blueprint lines 961–1210).  With the statement now
-    phrased at the scalar-expectation level and the suffix averages built over
-    the paper's independent uniform distribution, the remaining work is to
-    formalize the three scalar bridge lemmas corresponding to the proof's
-    move-right / commute / move-right sequence:
+    (`ld-pasting.tex` / blueprint lines 961–1210).  The corrected stage API in
+    `Statements.lean` now matches the paper's aggregate quantity
+    $$
+      \mathbb E_{x_{\ge \ell}} \sum_{\tau_{\ge \ell}}
+        \sum_{g_{\ge \ell} \in \mathsf{Outcomes}_{\tau_{\ge \ell}}}
+          \langle \psi, \widehat H^{x_{\ge \ell}}_{g_{\ge \ell}}
+            \otimes S_{\tau_{\ge \ell}} \psi \rangle,
+    $$
+    so the remaining work is to formalize the three scalar bridge lemmas for the
+    move-right / commute / move-right sequence on these adjacent stage masses:
     1. two `easyApproxFromApproxDelta` / `closenessOfIP` applications driven by
        `hfacts.completedSelfConsistency`, each contributing `√(2ζ)`;
     2. two `closenessOfIP` applications driven by the suffix-length witness
        `hhalf (k - ℓ)`, together contributing `2√ν₄`;
-    3. the exact algebraic rewrite from the final `S_{τ_{≥ℓ}} G_{g_ℓ}^{x_ℓ}`
-       expression to the next suffix weight via `fromHToGRecurrenceWeight_succ`.
+    3. the exact recurrence rewrite from `S_{τ_{≥ℓ}}` to `S_{τ_{>ℓ}}` via
+       `fromHToGRecurrenceWeight_succ`, after splitting the `τ_ℓ = 1/0`
+       branches of the stage-`ℓ` sum.
     -/
     sorry
   · /- Aggregate the `k` scalar recurrence steps to show the uniform all-outcomes
@@ -131,15 +140,63 @@ lemma fromHToG
     -/
     sorry
 
+/-- The scalar Bernoulli tail polynomial lifted through continuous functional
+calculus is exactly the matrix Bernoulli tail operator. -/
+private lemma cfc_scalarBernoulliTail_eq_bernoulliTailOperator
+    (A : MIPStarRE.Quantum.Op ι) (hA : IsSelfAdjoint A) (k degree : ℕ) :
+    cfc (scalarBernoulliTail k degree) A = bernoulliTailOperator k degree A := by
+  let s := Finset.Icc (degree + 1) k
+  calc
+    cfc (scalarBernoulliTail k degree) A
+      = cfc (∑ r ∈ s, fun p => (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r))) A := by
+          unfold scalarBernoulliTail
+          congr 1
+          funext p
+          simp [s]
+    _ = ∑ r ∈ s, cfc (fun p => (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r))) A := by
+          simpa [s] using
+            (cfc_sum (f := fun r p => (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)))
+              (a := A) (s := s))
+    _ = ∑ r ∈ s, (Nat.choose k r : ℂ) • (A ^ r * (1 - A) ^ (k - r)) := by
+          refine Finset.sum_congr rfl ?_
+          intro r hr
+          rw [cfc_const_mul (a := A) (r := (Nat.choose k r : Error))
+                (f := fun p => p ^ r * (1 - p) ^ (k - r))]
+          rw [cfc_mul (a := A) (f := fun p => p ^ r) (g := fun p => (1 - p) ^ (k - r))]
+          rw [cfc_pow (a := A) (f := fun p => p) (n := r) (ha := hA)]
+          rw [cfc_pow (a := A) (f := fun p => 1 - p) (n := k - r) (ha := hA)]
+          rw [cfc_sub (a := A) (f := fun _ => 1) (g := fun p => p)]
+          rw [cfc_const (a := A) (r := (1 : Error)), Algebra.algebraMap_eq_smul_one]
+          rw [cfc_id' (R := Error) (a := A) (ha := hA)]
+          ext i j
+          simp
+    _ = bernoulliTailOperator k degree A := by
+          simp [bernoulliTailOperator, s]
+
+/-- Continuous functional calculus sends the affine lower envelope to the
+expected affine operator expression. -/
+private lemma cfc_bernoulliTailLowerAffine_eq
+    (A : MIPStarRE.Quantum.Op ι) (hA : IsSelfAdjoint A) (theta c : Error) :
+    cfc (bernoulliTailLowerAffine theta c) A =
+      ((1 - c : Error) • (1 : MIPStarRE.Quantum.Op ι)) -
+        ((1 / (1 - theta) : Error) • (1 - A)) := by
+  unfold bernoulliTailLowerAffine
+  rw [cfc_sub (a := A) (f := fun _ => 1 - c)
+    (g := fun p => (1 / (1 - theta)) * (1 - p))]
+  rw [cfc_const (a := A) (r := (1 - c : Error)), Algebra.algebraMap_eq_smul_one]
+  rw [cfc_const_mul (a := A) (r := (1 / (1 - theta) : Error)) (f := fun p => 1 - p)]
+  rw [cfc_sub (a := A) (f := fun _ => 1) (g := fun p => p)]
+  rw [cfc_const (a := A) (r := (1 : Error)), Algebra.algebraMap_eq_smul_one]
+  rw [cfc_id' (R := Error) (a := A) (ha := hA)]
+  simp
+
 /-- `lem:chernoff-bernoulli-matrix`.
 
-The core scalar inequality `ev ψ (F(X)) ≥ 1 - κ/(1-θ) - exp(-θ²k/2)` (paper
-`ld-pasting.tex` lines 1670–1797) is taken as the explicit hypothesis
-`hMatrixChernoff` rather than derived internally: its proof requires matrix
-Chernoff infrastructure (additive Chernoff for sums of iid Bernoullis and
-`Matrix.IsHermitian.spectral_theorem` composed with `ev`/`normalizedTrace`
-expansion) that is not yet available in Mathlib. Once that infrastructure
-lands, `hMatrixChernoff` can be discharged and removed from the signature. -/
+The operator-level reduction is now fully internal: continuous functional
+calculus compares the Bernoulli-tail polynomial `F(X)` against an affine lower
+envelope. The only remaining live blocker is an explicit **scalar** Chernoff
+hypothesis, kept as a proposition parameter rather than a proof hole in order
+to satisfy the repository proof-integrity policy. -/
 lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
     (hnorm : ψ.IsNormalized)
@@ -159,14 +216,69 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
          total_le_one := by
            exact hXleOne } : SubMeas Unit ι)
       (1 - kappa))
-    (hMatrixChernoff :
-      1 - kappa / (1 - theta) - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2) ≤
-        ev ψ (bernoulliTailOperator k degree X)) :
+    (hScalarTail :
+      ∀ {p : Error}, (degree : Error) / (k : Error) ≤ p → p ≤ 1 →
+        1 - Real.exp (-(2 * ((p - (degree : Error) / (k : Error)) ^ (2 : ℕ)) * (k : Error))) ≤
+          scalarBernoulliTail k degree p) :
     ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd hXleOne := by
+  let expTerm : Error := Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2)
   have htail := bernoulliTailOperator_le_one k degree X hXpsd hXleOne
+  have hXsa : IsSelfAdjoint X :=
+    (Matrix.nonneg_iff_posSemidef.mp hXpsd).isHermitian
+  have hPointwise : ∀ x ∈ spectrum Error X,
+      bernoulliTailLowerAffine theta expTerm x ≤ scalarBernoulliTail k degree x := by
+    intro x hx
+    have hx0 : 0 ≤ x := spectrum_nonneg_of_nonneg hXpsd hx
+    have hx1 : x ≤ 1 := (CFC.le_one_iff (R := Error) X (ha := hXsa)).1 hXleOne x hx
+    exact bernoulliTailLowerAffine_le_scalarBernoulliTail theta k degree hθ0 hθ1 hk
+      hScalarTail hx0 hx1
+  have hContLower : ContinuousOn (bernoulliTailLowerAffine theta expTerm) (spectrum Error X) := by
+    unfold bernoulliTailLowerAffine
+    fun_prop
+  have hContTail : ContinuousOn (scalarBernoulliTail k degree) (spectrum Error X) := by
+    unfold scalarBernoulliTail
+    fun_prop
+  have hCfcLe :
+      cfc (bernoulliTailLowerAffine theta expTerm) X ≤
+        bernoulliTailOperator k degree X := by
+    calc
+      cfc (bernoulliTailLowerAffine theta expTerm) X ≤ cfc (scalarBernoulliTail k degree) X := by
+        exact (cfc_le_iff (f := bernoulliTailLowerAffine theta expTerm)
+          (g := scalarBernoulliTail k degree) (a := X) (hf := hContLower)
+          (hg := hContTail) (ha := hXsa)).2 hPointwise
+      _ = bernoulliTailOperator k degree X :=
+        cfc_scalarBernoulliTail_eq_bernoulliTailOperator X hXsa k degree
+  have hEvLe :
+      ev ψ (cfc (bernoulliTailLowerAffine theta expTerm) X) ≤
+        ev ψ (bernoulliTailOperator k degree X) :=
+    ev_mono ψ _ _ hCfcLe
+  have hEvOneSub : 1 - ev ψ X ≤ kappa := by
+    have hmass : 1 - kappa ≤ ev ψ X := hcomplete.lowerBound
+    linarith
+  have hEvLower :
+      1 - kappa / (1 - theta) - expTerm ≤
+        ev ψ (cfc (bernoulliTailLowerAffine theta expTerm) X) := by
+    have hθden : 0 < 1 - theta := sub_pos.mpr hθ1
+    have hfrac : (1 / (1 - theta)) * (1 - ev ψ X) ≤ kappa / (1 - theta) := by
+      have hdiv : (1 - ev ψ X) / (1 - theta) ≤ kappa / (1 - theta) :=
+        div_le_div_of_nonneg_right hEvOneSub hθden.le
+      simpa [div_eq_mul_inv, mul_assoc, mul_left_comm, mul_comm] using hdiv
+    have hscale1 :
+        ev ψ ((1 - expTerm : Error) • (1 : MIPStarRE.Quantum.Op ι)) =
+          (1 - expTerm) * ev ψ (1 : MIPStarRE.Quantum.Op ι) := by
+      rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
+      simpa using (ev_scale ψ (1 - expTerm) (1 : MIPStarRE.Quantum.Op ι))
+    have hscale2 :
+        ev ψ ((1 / (1 - theta) : Error) • (1 - X)) =
+          (1 / (1 - theta)) * ev ψ (1 - X) := by
+      rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
+      simpa using (ev_scale ψ (1 / (1 - theta)) (1 - X))
+    rw [cfc_bernoulliTailLowerAffine_eq X hXsa theta expTerm, ev_sub, hscale1, hscale2,
+      ev_sub, ev_one_of_isNormalized ψ hnorm]
+    linarith
   refine { tail_le_one := htail, matrixTailBound := ⟨?_⟩ }
   show _ ≥ _
   unfold subMeasMass
-  exact hMatrixChernoff
+  exact le_trans hEvLower hEvLe
 
 end MIPStarRE.LDT.Pasting

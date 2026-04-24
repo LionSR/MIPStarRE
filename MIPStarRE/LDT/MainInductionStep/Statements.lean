@@ -128,29 +128,22 @@ abbrev PastingBoundednessInput (params : Parameters)
 
 /-- Bookkeeping package for the restricted-probabilities lemma.
 
-The self-consistency branch is formalized directly. The axis-parallel and
-diagonal conditioning bounds now appear as explicit theorem hypotheses rather
-than a dedicated bridge-package structure. -/
+This packages a slice-wise error profile together with the three averaged bounds
+that appear in the paper: the axis-parallel and diagonal branches both incur the
+same conditioning loss `((m + 1) / m)`, while the self-consistency branch
+restricts exactly. -/
 structure RestrictedProbabilitiesStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error) : Prop where
-  /-- There is a slice-wise error profile satisfying all averaged restricted bounds. -/
+  /-- There is a slice-wise error profile realizing the three averaged restricted bounds. -/
   profileExists :
     ∃ profile : RestrictedFailureProfile params strategy,
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params * profile.axisParallel x) ≤ eps ∧
-        averageRestrictedAxisParallelError params profile
-          ≤ sliceConditioningLoss params * eps ∧
+      averageRestrictedAxisParallelError params profile ≤
+          sliceConditioningLoss params * eps ∧
         averageRestrictedSelfConsistencyError params profile ≤ delta ∧
-        avgOver (uniformDistribution (Fq params))
-          (fun x => sliceDiagonalDirectionWeight params * profile.diagonal x) ≤ gamma ∧
-        averageRestrictedDiagonalError params profile
-          ≤ sliceDiagonalConditioningLoss params * gamma ∧
-        sliceTransverseDirectionWeight params *
-          averageRestrictedAxisParallelError params profile ≤ eps ∧
-        sliceDiagonalDirectionWeight params *
-          averageRestrictedDiagonalError params profile ≤ gamma
+        averageRestrictedDiagonalError params profile ≤
+          sliceConditioningLoss params * gamma
 
 /-- Bookkeeping package for the slice-restriction step of `thm:main-induction`.
 
@@ -172,7 +165,7 @@ structure SliceRestrictionPackage (params : Parameters)
   /-- Averaged diagonal slice error bound. -/
   diagonalAverageBound :
     averageRestrictedDiagonalError params profile ≤
-      sliceDiagonalConditioningLoss params * gamma
+      sliceConditioningLoss params * gamma
 
 /-- Explicit per-slice output of the inductive hypothesis.
 

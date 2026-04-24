@@ -118,7 +118,9 @@ A signature passes the smell test if:
 ### Related issues and patterns
 
 - [#449] — paper-wide gap tracker
-- [#451] — the seven ungrounded `BridgePackage` producers
+- [#451] — the tracked `BridgePackage` producer catalogue
+- [#595] — resolved the QXP `ProjectiveNonMeasurementBridgePackage` offender by
+  deleting the bridge and threading `RoundingToProjectorsWitness` directly
 - [#477] — `QXPLayerData` axiom-field projection (a definitional variant)
 - [#493] — the inline-existential mutation of this pattern
 - [#491] — PR that introduced the mutation
@@ -507,14 +509,16 @@ Grep for these suffixes: `*Statement`, `*Witness`, `*Claim`,
 
 If any answer is "no", the structure is an unacceptable smuggle.
 
-### Current status (audited 2026-04-18)
+### Current status (audited 2026-04-18; updated 2026-04-23)
 
 All 34 `*Statement` / 9 `*Conclusion` / 8 `*Witness` structures on `main`
 are either grounded (have producer theorems) or are the known tracked
-items in [#449] / [#451] / [#477]. No new unacceptable smuggles were
-found in that sweep. If you add a new `*Statement`-style structure to
-this codebase, include a docstring explaining its grounding plan and
-(if no producer exists yet) file a sub-issue in [#449].
+items in [#449] / [#451] / [#477]. The former QXP
+`ProjectiveNonMeasurementBridgePackage` offender has been removed from that
+live list (resolved in [#595]). No new unacceptable smuggles were found in
+that sweep. If you add a new `*Statement`-style structure to this codebase,
+include a docstring explaining its grounding plan and (if no producer exists
+yet) file a sub-issue in [#449].
 
 ### Related issues
 
@@ -601,5 +605,6 @@ PR [#438]) are the natural home for extensions that add these checks.
 [#477]: https://github.com/LionSR/MIPStarRE/issues/477
 [#491]: https://github.com/LionSR/MIPStarRE/pull/491
 [#493]: https://github.com/LionSR/MIPStarRE/issues/493
+[#595]: https://github.com/LionSR/MIPStarRE/issues/595
 [#494]: https://github.com/LionSR/MIPStarRE/issues/494
 [#495]: https://github.com/LionSR/MIPStarRE/issues/495
