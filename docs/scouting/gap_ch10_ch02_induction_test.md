@@ -49,14 +49,12 @@ The Lean state is more incomplete than the blueprint alone suggests:
 - `MIPStarRE.LDT.MainInductionStep.mainInduction`, `selfImprovementInInductionSection`, `ldPastingInInductionSection`, and `restrictedProbabilities` are all still `sorry`.
 - The two deepest downstream dependencies of the Chapter 10 proof are also still incomplete: `SelfImprovement.selfImprovement` and `MakingMeasurementsProjective.orthonormalizationMainLemma`, and the global pasting development still has many `sorry`s.
 
-Most important structural mismatch:
+Most important structural mismatch in the original scout (resolved in #593):
 
-- The paper and blueprint treat the restricted diagonal-line measurement as a genuine projective measurement for the `(m,q,d)` slice game.
-- The current Lean modeling weakens this to a projective submeasurement:
-  `RestrictedSymStrat.diagonalMeasurement : IdxProjSubMeas ...`
-  in `MIPStarRE/LDT/MainInductionStep/Defs.lean`.
-- Correspondingly, `RestrictedProbabilitiesStatement` weakens the diagonal averaging bounds to a `1/q`-weighted statement via `sliceDiagonalDirectionWeight` and `sliceDiagonalConditioningLoss`, instead of the paper/blueprint factor `((m+1)/m)`.
-- This is not just expository compression; it is a genuine modeling gap between the current Lean encoding and the paper/blueprint induction step.
+- At scout time, the paper and blueprint treated the restricted diagonal-line measurement as a genuine projective measurement for the `(m,q,d)` slice game, while Lean weakened it to a projective submeasurement `RestrictedSymStrat.diagonalMeasurement : IdxProjSubMeas ...` in `MIPStarRE/LDT/MainInductionStep/Defs.lean`.
+- At scout time, `RestrictedProbabilitiesStatement` also weakened the diagonal averaging bounds to a `1/q`-weighted statement via `sliceDiagonalDirectionWeight` and `sliceDiagonalConditioningLoss`, instead of the paper/blueprint factor `((m+1)/m)`.
+- Issue #593 resolves this historical mismatch by upgrading the restricted diagonal branch to a genuine measurement encoding and by using the shared paper-faithful conditioning factor `((m+1)/m)` for both the axis-parallel and diagonal branches.
+- The remaining Chapter 10 blockers are the unfinished theorem proofs listed above, not this diagonal-branch packaging issue.
 
 ## Key Missing Labels
 
@@ -415,63 +413,40 @@ Real gaps:
 
 1. The local wrapper theorems are not proved.
 2. The proof-step equations from the paper are not packaged into Lean helper lemmas.
-3. The restricted diagonal branch is modeled differently from the paper/blueprint.
 
-## The Important Structural Lean Divergence
+Historical note (resolved in #593): the restricted diagonal branch had been modeled differently from the paper/blueprint.
 
-This is the most serious technical mismatch I found.
+## Historical structural Lean divergence (resolved in #593)
 
-### A. Restricted diagonal measurement is only a submeasurement in Lean
+This was the most serious technical mismatch in the original scout. It is now resolved in #593, so the discussion below is retained only as historical context.
 
-Paper / blueprint:
+### A. Restricted diagonal measurement was only a submeasurement in Lean
 
-- The restricted strategy is again a symmetric strategy for the `(m,q,d)` test.
-- In particular, the restricted diagonal family is still a projective measurement.
+Historical scout state:
 
-Lean:
+- The paper and blueprint package the restricted strategy as a symmetric strategy for the `(m,q,d)` test, so the restricted diagonal family is again a projective measurement.
+- At scout time, Lean instead stored `RestrictedSymStrat.diagonalMeasurement` as `IdxProjSubMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι` in `MIPStarRE/LDT/MainInductionStep/Defs.lean`.
 
-- `RestrictedSymStrat.diagonalMeasurement` is only
-  `IdxProjSubMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι`
-  in `MIPStarRE/LDT/MainInductionStep/Defs.lean:34-40`.
-- The code comment explains why:
-  the ambient measurement answers have degree up to `(m+1)d`, while the honest restricted image only captures the degree-`md` part.
+Update — resolved in #593:
 
-Impact:
+- `RestrictedSymStrat.diagonalMeasurement` is now a genuine `IdxProjMeas ...`.
+- `restrictDiagonalMeasurement` now re-embeds the restricted answers into the honest slice answer space, so the restricted slice is again packaged as a strategy for the `(m,q,d)` test.
 
-- This is stronger than a proof gap; it is a model gap.
-- It means the Lean restricted slice is not literally a strategy for the same test object used elsewhere.
+### B. The diagonal restriction probability used the wrong constants for the paper's statement
 
-### B. The diagonal restriction probability is wrong for the paper's statement
+Historical scout state:
 
-Paper / blueprint:
-
-- `lem:restricted-probabilities` gives
+- The paper's `lem:restricted-probabilities` and the blueprint both use the diagonal average bound
   \[
   \E_x \gamma_x \le \frac{m+1}{m}\gamma.
   \]
+- At scout time, Lean instead used the diagonal-only surrogates `sliceDiagonalDirectionWeight = 1 / q` and `sliceDiagonalConditioningLoss = q`, so `RestrictedProbabilitiesStatement` asked for a different weighted diagonal bound.
 
-Lean:
+Update — resolved in #593:
 
-- `sliceDiagonalDirectionWeight = 1 / q`
-  and `sliceDiagonalConditioningLoss = q`
-  in `MIPStarRE/LDT/MainInductionStep/Defs.lean:325-334`.
-- `RestrictedProbabilitiesStatement` therefore asks for
-  weighted diagonal bounds using these `q`-based constants
-  in `MIPStarRE/LDT/MainInductionStep/Statements.lean:112-119`.
-
-Why this matters:
-
-- The paper's diagonal test samples an index `i` and a direction vector whose last `m-i` coordinates are zero.
-- The current Lean `DiagonalTestSample` is simply
-  `Point params × (Point params × Fq params)`
-  in `MIPStarRE/LDT/Test/Strategy.lean:55-56`,
-  i.e. an unrestricted direction-point encoding.
-- The comment in `MainInductionStep/Defs.lean:325-333` explicitly acknowledges this mismatch.
-
-Bottom line:
-
-- As written, the Lean restricted-probabilities statement does not match the paper/blueprint theorem.
-- This needs a design decision before the induction proof can honestly match the source.
+- The diagonal-only surrogates `sliceDiagonalDirectionWeight` and `sliceDiagonalConditioningLoss` were removed.
+- `RestrictedProbabilitiesStatement` now uses the shared paper/blueprint factors `sliceTransverseDirectionWeight = m / (m + 1)` and `sliceConditioningLoss = (m + 1) / m` for the diagonal branch as well.
+- Consequently, this is no longer a live design blocker for the restricted-probabilities layer; the remaining blockers are the unfinished theorem proofs listed elsewhere in this file.
 
 ## Dependency Picture for the Missing Chapter 10 Work
 
@@ -504,7 +479,7 @@ For the Chapter 10 formalization to close in a paper-faithful way, the critical 
    - Lean stub additionally blocked by import-cycle issues
 
 7. `lem:restricted-probabilities`
-   - paper/blueprint statement not yet matched by Lean because of the diagonal-test encoding mismatch
+   - paper/blueprint statement-level mismatch resolved in #593; the remaining work is the proof and downstream Chapter 10 assembly
 
 8. `thm:main-induction`
    - depends on all of the above and on the arithmetic steps `\zeta \le \nu` and the final `σ^*` bound
@@ -514,13 +489,12 @@ For the Chapter 10 formalization to close in a paper-faithful way, the critical 
 
 ## Recommended Next Actions
 
-If the goal is to unblock the induction/test chapters cleanly, the most efficient order is:
+After the statement-level diagonal-branch fix in #593, the most efficient remaining order is:
 
-1. Decide whether to change the Lean diagonal-test encoding so that the restricted diagonal branch matches the paper/blueprint.
-2. Add a named Lean theorem for `lem:good-strategy-characterization`.
-3. Finish `orthonormalizationMainLemma`.
-4. Finish `SelfImprovement.selfImprovement`.
-5. Refactor imports so the local induction wrapper can call the global pasting theorem without a cycle.
-6. Only then attack `MainInductionStep.mainInduction` and `Test.mainFormal`, using the paper's labeled equations as the proof skeleton.
+1. Add a named Lean theorem for `lem:good-strategy-characterization`.
+2. Finish `orthonormalizationMainLemma`.
+3. Finish `SelfImprovement.selfImprovement`.
+4. Refactor imports so the local induction wrapper can call the global pasting theorem without a cycle.
+5. Only then attack `MainInductionStep.mainInduction` and `Test.mainFormal`, using the paper's labeled equations as the proof skeleton.
 
-Without step 1, the Chapter 10 Lean statements are not just incomplete; they are presently proving a slightly different slice-analysis problem on the diagonal branch.
+Without step 1, the Chapter 10 Lean development still lacks the reusable entry point that packages the paper's good-strategy hypotheses for the downstream induction wrappers.
