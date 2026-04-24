@@ -14,6 +14,7 @@ Lean:
 - `MIPStarRE/LDT/Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean`
 - `MIPStarRE/LDT/Pasting/BridgeLemmas/CommuteGHalfSandwich.lean`
 - `MIPStarRE/LDT/Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup.lean`
+- `MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation.lean`
 - `MIPStarRE/LDT/Pasting/Sandwich/GHatSandwich.lean`
 - `MIPStarRE/LDT/Pasting/Sandwich/Switcheroo.lean`
 - `MIPStarRE/LDT/Pasting/Core.lean`
@@ -22,65 +23,57 @@ Lean:
 
 ## Executive summary
 
-I did **not** close the final proof obligation. I did, however, refactor
-`ldSandwichLineOnePoint_core` so the top-level theorem no longer ends in a raw
-`sorry`. The remaining gap is now isolated to a single helper lemma:
+This PR is now intentionally **docs-only**.
 
-```lean
-private lemma ldSandwichLineOnePoint_matchMass_lower_bound ...
-```
+I explored a local refactor that tried to replace the monolithic
+`ldSandwichLineOnePoint_core` `sorry` by a more paper-faithful scalar helper, but
+that Lean scaffold was backed out from this branch after review. So the current
+branch does **not** modify
+`MIPStarRE/LDT/Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean`.
 
-This helper is the exact scalar lower bound that the paper proves after
-rewriting the consistency defect as
-$1 - \mathbb{E}[\text{match mass}]$ for two honest measurements.
+As of the rebased head:
 
-So the remaining work is now paper-faithful and local:
+- the branch version of `LdSandwichLineOnePoint.lean` matches `origin/main`;
+- the file still has exactly one `sorry`, namely the pre-existing hole in
+  `ldSandwichLineOnePoint_core`;
+- there are no new `axiom`s and no duplicate local measurement-packaging
+  helpers in the branch.
 
-1. convert the left/right families into measurements,
-2. rewrite `ConsRel` as an averaged match-mass lower bound,
-3. prove that lower bound by the paper's delete-coordinates $+$ two
-   Cauchy–Schwarz transports $+$ prefix collapse $+$ `ldGbcon` chain.
+So issue #705 remains the actual proof follow-up. What survives from the local
+exploration is the dependency map below: the remaining work should naturally be
+organized around a scalar match-mass lower bound after rewriting the one-point
+consistency defect.
 
-## What was landed in Lean
+## Current Lean status
 
-The file now contains three proved structural helpers:
+The current public Lean file already contains the endpoint reduction helpers
 
-1. `ldSandwichLineOnePointLeftMeasurement`
-   - packages the left family as a genuine measurement
-   - uses `gHatSandwichFamily` total $= I$
+- `ldSandwichLineOnePoint_endpoint_ldGbcon`, and
+- `ldSandwichLineOnePoint_oneQuestion_ldGbcon`,
 
-2. `ldSandwichLineOnePointRightMeasurementLocal`
-   - local measurement packaging for the right family
-   - intentionally named with `_Local` to avoid colliding with the public helper
-     already defined in `LineInterpolation.lean`
+which reduce the final one-point endpoint comparison to `ldGbcon`.
 
-3. `qBipartiteConsDefect_of_measurements_local`
-   - rewrites questionwise consistency defect for two measurements as
-     $$
-     q\mathrm{Cons}(A,B) = \langle \psi, I \psi \rangle - \mathrm{match}(A,B)
-     $$
-   - specialized in
-     `ldSandwichLineOnePoint_defect_eq_one_sub_matchMass`
+What is still missing is the middle part of the paper proof inside
+`ldSandwichLineOnePoint_core`: delete the coordinates to the right of `i`, do
+both Cauchy--Schwarz transports across `commuteGHalfSandwich`, collapse the
+remaining prefix factor, and then feed the result into the existing endpoint
+lemmas above.
 
-Using those lemmas, `ldSandwichLineOnePoint_core` is now a short reduction:
+If a future proof refactor needs the right one-point family packaged as a
+`Measurement`, it should **reuse** the existing
+`ldSandwichLineOnePointRightMeasurement` from
+`BridgeLemmas/LineInterpolation.lean` rather than reintroducing a local copy.
 
-- define the averaged match mass,
-- call `ldSandwichLineOnePoint_matchMass_lower_bound`,
-- rewrite the averaged defect as $1 - \mathbb{E}[\text{match mass}]$,
-- finish by linear arithmetic.
+## Remaining obligation: paper-faithful dependency map
 
-## Remaining obligation: dependency map
-
-The still-open helper
-`ldSandwichLineOnePoint_matchMass_lower_bound` should follow the paper in the
+The remaining proof of `ldSandwichLineOnePoint_core` appears to break into the
 following four substeps.
 
 ### A. Delete coordinates to the right of `i`
 
 Target shape:
 
-- reduce the averaged match mass on
-  `SandwichedLineQuestion params k`
+- reduce the averaged quantity on `SandwichedLineQuestion params k`
 - to the same expression using only the prefix of length `i + 1`
 
 Paper reference: `eq:delete-extraneous-coordinates`.
@@ -92,7 +85,7 @@ Likely ingredients:
 - projectivity of `gHatIdxMeas` outcomes
 - finite-sum reindexing over tuple outcomes
 
-### B. First Cauchy–Schwarz transport
+### B. First Cauchy--Schwarz transport
 
 Paper reference: `eq:gonna-need-a-bigger-cauchy-schwarz`.
 
@@ -106,7 +99,7 @@ Needed Lean ingredients:
   - `gHatReverseHalfProduct_sum_adjoint_mul_le_one`
   - `leftTensor_rightTensor_sum_adjoint_mul_le_one`
 
-### C. Second Cauchy–Schwarz transport
+### C. Second Cauchy--Schwarz transport
 
 Paper reference: `eq:even-bigger-CS`.
 
@@ -135,24 +128,38 @@ Likely ingredients:
 - `ldSandwichLineOnePoint_oneQuestion_ldGbcon`
 - `ldGbcon`
 
-## Suggested follow-up lemma split
+## Suggested follow-up helper split for #705
 
-If someone wants to finish the proof incrementally, the cleanest split seems to
-be:
+If someone wants to revive the proof refactor in a dedicated proof PR, the
+cleanest split seems to be:
 
-1. `ldSandwichLineOnePoint_delete_extraneous_matchMass`
-   - handles step A only
-2. `ldSandwichLineOnePoint_matchMass_after_commuting`
-   - packages steps B--D into the final lower bound
+1. `ldSandwichLineOnePoint_defect_eq_one_sub_matchMass`
+   - rewrite the one-point consistency defect as $1 - \text{matchMass}$
+2. `ldSandwichLineOnePoint_delete_extraneous_matchMass`
+   - handle step A only
+3. `ldSandwichLineOnePoint_matchMass_after_commuting`
+   - package steps B--D into the final lower bound
 
-That would keep each missing proof aligned with a contiguous paper chunk.
+This keeps each missing argument aligned with a contiguous paper chunk.
 
-## Why this refactor is still useful
+A review-sensitive partial PR should **not** move the existing `sorry` unless it
+also finishes the proof. If an intermediate placeholder is ever unavoidable, it
+should live in a dedicated private `_placeholder`-style lemma with an explicit
+`TODO(#705)` marker rather than being hidden inside a larger refactor.
 
-Before this session, the file ended in a monolithic top-level `sorry` with the
-whole paper proof implicit.
+## Why this scouting note is still useful
 
-After the refactor, the theorem statement and public wrapper are stable, the
-questionwise defect has been reduced to the right scalar quantity, and the only
-remaining gap is a single helper whose statement matches the paper's real work.
-That should make the eventual closure substantially easier to review and debug.
+Even without landing the abandoned Lean scaffold, this note records the real
+paper-to-Lean dependency chain for `lem:ld-sandwich-line-one-point` and narrows
+#705 to a short list of concrete ingredients:
+
+- the two Cauchy--Schwarz transport lemmas,
+- the `CommuteGHalfSandwich` repeated-commutation witness,
+- the prefix-collapse completeness identities, and
+- the already-available one-point `ldGbcon` endpoint bridge.
+
+It also records two review constraints that any future proof PR should respect:
+
+1. reuse `ldSandwichLineOnePointRightMeasurement` instead of duplicating local
+   measurement packaging, and
+2. keep the `sorry` count unchanged unless the proof is actually completed.
