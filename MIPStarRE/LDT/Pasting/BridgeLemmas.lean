@@ -4247,8 +4247,14 @@ private lemma dnoteq_term_le_hBConsistency_extra
         0 ≤ Real.rpow eps (1 / (32 : Error)) +
             Real.rpow delta (1 / (32 : Error)) +
             Real.rpow gamma (1 / (32 : Error)) +
-            Real.rpow zeta (1 / (32 : Error)) := by
-      positivity [heps_nonneg, hdelta_nonneg, hgamma_nonneg, hzeta_nonneg]
+            Real.rpow zeta (1 / (32 : Error)) :=
+      add_nonneg
+        (add_nonneg
+          (add_nonneg
+            (Real.rpow_nonneg heps_nonneg _)
+            (Real.rpow_nonneg hdelta_nonneg _))
+          (Real.rpow_nonneg hgamma_nonneg _))
+        (Real.rpow_nonneg hzeta_nonneg _)
     dsimp [S] at *
     nlinarith
   have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
@@ -8313,8 +8319,7 @@ lemma overAllOutcomes
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
-  constructor -- OverAllOutcomesStatement
-  constructor -- SDDRel
+  refine ⟨?_⟩
   /- Paper: `lem:over-all-outcomes` (ld-pasting.tex §9.4, lines 1140–1289).
   Expand pasted-measurement total mass over all outcome types τ with |τ| ≥ d+1.
   Steps: (1) expand over distinct k-tuples via `distinctTupleDistribution`,
