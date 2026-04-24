@@ -545,52 +545,6 @@ private def gHatTupleOutcomeConsEquiv' (params : Parameters) [FieldModel params.
     cases p
     rfl
 
-private def pointTuplePrefix (params : Parameters) (m n : ℕ) :
-    PointTuple params (m + n) → PointTuple params m :=
-  fun xs i => xs (Fin.castAdd n i)
-
-private def pointTupleSuffix (params : Parameters) (m n : ℕ) :
-    PointTuple params (m + n) → PointTuple params n :=
-  fun xs i => xs (Fin.natAdd m i)
-
-private def gHatTupleOutcomePrefix
-    (params : Parameters) [FieldModel params.q] (m n : ℕ) :
-    GHatTupleOutcome params (m + n) → GHatTupleOutcome params m :=
-  fun gs i => gs (Fin.castAdd n i)
-
-private def gHatTupleOutcomeSuffix
-    (params : Parameters) [FieldModel params.q] (m n : ℕ) :
-    GHatTupleOutcome params (m + n) → GHatTupleOutcome params n :=
-  fun gs i => gs (Fin.natAdd m i)
-
-@[simp] private lemma pointTuplePrefix_append
-    (params : Parameters) (m n : ℕ)
-    (xs : PointTuple params m) (ys : PointTuple params n) :
-    pointTuplePrefix params m n (Fin.append xs ys) = xs := by
-  funext i
-  simp [pointTuplePrefix]
-
-@[simp] private lemma pointTupleSuffix_append
-    (params : Parameters) (m n : ℕ)
-    (xs : PointTuple params m) (ys : PointTuple params n) :
-    pointTupleSuffix params m n (Fin.append xs ys) = ys := by
-  funext i
-  simp [pointTupleSuffix]
-
-@[simp] private lemma gHatTupleOutcomePrefix_append
-    (params : Parameters) [FieldModel params.q] (m n : ℕ)
-    (gs₁ : GHatTupleOutcome params m) (gs₂ : GHatTupleOutcome params n) :
-    gHatTupleOutcomePrefix params m n (Fin.append gs₁ gs₂) = gs₁ := by
-  funext i
-  simp [gHatTupleOutcomePrefix]
-
-@[simp] private lemma gHatTupleOutcomeSuffix_append
-    (params : Parameters) [FieldModel params.q] (m n : ℕ)
-    (gs₁ : GHatTupleOutcome params m) (gs₂ : GHatTupleOutcome params n) :
-    gHatTupleOutcomeSuffix params m n (Fin.append gs₁ gs₂) = gs₂ := by
-  funext i
-  simp [gHatTupleOutcomeSuffix]
-
 private lemma conjTranspose_mul_mono_local
     {X Y Z : MIPStarRE.Quantum.Op ι}
     (hXY : X ≤ Y) :
@@ -2417,53 +2371,6 @@ private lemma leftTensor_rightTensor_sum_adjoint_mul_le_one
           rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ prefixTerm]
     _ ≤ 1 := by
           exact leftTensor_le_one (ι₂ := ι) (A := _) hprefix
-
-private lemma gHatHalfProduct_reverseHalfProduct_sum_adjoint_mul_le_one
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    (m n : ℕ)
-    (xs : PointTuple params (m + n)) :
-    ∑ ag : GHatTupleOutcome params m × GHatTupleOutcome params n,
-        (leftTensor (ι₂ := ι)
-            (gHatHalfProductOutcomeOperator params family m
-              (pointTuplePrefix params m n xs) ag.1) *
-          rightTensor (ι₁ := ι)
-            (gHatReverseHalfProductOutcomeOperator params family n
-              (pointTupleSuffix params m n xs) ag.2))ᴴ *
-          (leftTensor (ι₂ := ι)
-            (gHatHalfProductOutcomeOperator params family m
-              (pointTuplePrefix params m n xs) ag.1) *
-            rightTensor (ι₁ := ι)
-              (gHatReverseHalfProductOutcomeOperator params family n
-                (pointTupleSuffix params m n xs) ag.2)) ≤ 1 := by
-  have hprefix :
-      ∑ gs : GHatTupleOutcome params m,
-          (gHatHalfProductOutcomeOperator params family m
-              (pointTuplePrefix params m n xs) gs)ᴴ *
-            gHatHalfProductOutcomeOperator params family m
-              (pointTuplePrefix params m n xs) gs ≤ 1 := by
-    simpa using
-      gHatHalfProduct_sum_adjoint_mul_le_one params family m
-        (pointTuplePrefix params m n xs)
-  have htail :
-      ∑ gs : GHatTupleOutcome params n,
-          (gHatReverseHalfProductOutcomeOperator params family n
-              (pointTupleSuffix params m n xs) gs)ᴴ *
-            gHatReverseHalfProductOutcomeOperator params family n
-              (pointTupleSuffix params m n xs) gs ≤ 1 := by
-    simpa using
-      gHatReverseHalfProduct_sum_adjoint_mul_le_one params family n
-        (pointTupleSuffix params m n xs)
-  simpa using
-    (leftTensor_rightTensor_sum_adjoint_mul_le_one
-      (ι := ι)
-      (prefixOp := fun gs : GHatTupleOutcome params m =>
-        gHatHalfProductOutcomeOperator params family m
-          (pointTuplePrefix params m n xs) gs)
-      (tailOp := fun gs : GHatTupleOutcome params n =>
-        gHatReverseHalfProductOutcomeOperator params family n
-          (pointTupleSuffix params m n xs) gs)
-      hprefix htail)
 
 private lemma commuteGHalfSandwich_moveStepMid_toTarget
     (params : Parameters) [FieldModel params.q]
