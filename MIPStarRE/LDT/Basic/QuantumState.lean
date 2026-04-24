@@ -16,7 +16,12 @@ namespace MIPStarRE.LDT
 There is intentionally no global `Inhabited` instance: the zero matrix is PSD but
 not a physical state of unit trace, so an ambient default would silently
 trivialize later statements. Use `IsNormalized` to additionally require
-`τ(ρ) = 1`. -/
+`τ(ρ) = 1`.
+
+This remains the ambient state space for the current LDT development: strategy
+packages in `LDT/Test/StrategyCore.lean`, the SWAP-symmetry API `PermInvState`,
+and the expectation-value lemmas in `LDT/Basic/OperatorExpectations.lean` are all
+stated for arbitrary density matrices, not only pure states. -/
 structure QuantumState (ι : Type*) [Fintype ι] [DecidableEq ι] where
   density : MIPStarRE.Quantum.Op ι := 0
   density_psd : 0 ≤ density := by positivity
@@ -32,14 +37,136 @@ theorem QuantumState.IsNormalized.nonempty {ι : Type*} [Fintype ι] [DecidableE
     {ψ : QuantumState ι} (hψ : ψ.IsNormalized) : Nonempty ι := by
   by_contra h
   rw [not_nonempty_iff] at h
-  apply (zero_ne_one (α := ℂ))
-  simp [QuantumState.IsNormalized, MIPStarRE.Quantum.normalizedTrace,
-    Matrix.trace_eq_zero_of_isEmpty] at hψ
+  letI := h
+  rw [QuantumState.IsNormalized] at hψ
+  have hzero : MIPStarRE.Quantum.normalizedTrace ψ.density = 0 := by
+    simp [MIPStarRE.Quantum.normalizedTrace]
+  exact zero_ne_one (hzero.symm.trans hψ)
+
+/-- The scaled rank-one density matrix attached to a state vector.
+
+Because this development uses the normalized trace `τ(A) = tr(A) / dim`, the
+quantum state represented by a unit vector `ψ` is `dim · |ψ⟩⟨ψ|` rather than the
+raw projector `|ψ⟩⟨ψ|`. This scaling makes `τ(ρ) = 1` and keeps `ev` aligned
+with the paper's bra-ket expectations. -/
+noncomputable def pureDensity {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : ι → ℂ) : MIPStarRE.Quantum.Op ι :=
+  (Fintype.card ι : ℂ) • Matrix.vecMulVec ψ (star ψ)
+
+/-- Swap the two tensor coordinates of a bipartite state vector. -/
+def swapVector {ι : Type*} (ψ : ι × ι → ℂ) : ι × ι → ℂ :=
+  fun ij => ψ (ij.2, ij.1)
+
+/-- A pure-state witness as a unit vector in the ambient finite Hilbert space.
+
+The associated density matrix is `pureDensity ψ.vector = dim · |ψ⟩⟨ψ|`, so that
+coercing to `QuantumState` preserves the paper's scalar `⟨ψ|X|ψ⟩` formulas
+despite our use of the normalized trace. -/
+structure PureState (ι : Type*) [Fintype ι] [DecidableEq ι] [Nonempty ι] where
+  vector : ι → ℂ
+  unit : star vector ⬝ᵥ vector = 1
+
+namespace PureState
+
+/-- The density matrix represented by a pure-state witness. -/
+noncomputable def density {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : PureState ι) : MIPStarRE.Quantum.Op ι :=
+  pureDensity ψ.vector
+
+theorem density_psd {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : PureState ι) :
+    0 ≤ ψ.density := by
+  refine Matrix.nonneg_iff_posSemidef.mpr ?_
+  exact (Matrix.posSemidef_vecMulVec_self_star ψ.vector).smul
+    (by positivity : 0 ≤ (Fintype.card ι : ℂ))
+
+noncomputable def toQuantumState {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : PureState ι) : QuantumState ι where
+  density := ψ.density
+  density_psd := ψ.density_psd
+
+noncomputable instance {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι] :
+    Coe (PureState ι) (QuantumState ι) where
+  coe := toQuantumState
+
+@[simp] theorem coe_density {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : PureState ι) :
+    (ψ : QuantumState ι).density = ψ.density := rfl
+
+theorem normalizedTrace_density {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : PureState ι) :
+    MIPStarRE.Quantum.normalizedTrace ψ.density = 1 := by
+  have hcard : (Fintype.card ι : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
+  unfold density pureDensity MIPStarRE.Quantum.normalizedTrace
+  rw [Matrix.trace_smul, Matrix.trace_vecMulVec, dotProduct_comm, ψ.unit]
+  change ((Fintype.card ι : ℂ) * 1) / (Fintype.card ι : ℂ) = 1
+  rw [mul_one, div_self hcard]
+
+theorem toQuantumState_isNormalized {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : PureState ι) :
+    (ψ : QuantumState ι).IsNormalized := by
+  simpa [QuantumState.IsNormalized] using ψ.normalizedTrace_density
+
+theorem normalizedTrace_density_mul {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : PureState ι) (X : MIPStarRE.Quantum.Op ι) :
+    MIPStarRE.Quantum.normalizedTrace ((ψ : QuantumState ι).density * X) =
+      star ψ.vector ⬝ᵥ (X *ᵥ ψ.vector) := by
+  have hcard : (Fintype.card ι : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
+  calc
+    MIPStarRE.Quantum.normalizedTrace ((ψ : QuantumState ι).density * X)
+      = MIPStarRE.Quantum.normalizedTrace (X * (ψ : QuantumState ι).density) := by
+          rw [MIPStarRE.Quantum.normalizedTrace_mul_comm]
+    _ = MIPStarRE.Quantum.normalizedTrace (X * ψ.density) := by rfl
+    _ = MIPStarRE.Quantum.normalizedTrace
+          ((Fintype.card ι : ℂ) • (X * Matrix.vecMulVec ψ.vector (star ψ.vector))) := by
+          simp [density, pureDensity]
+    _ = (Fintype.card ι : ℂ) *
+          MIPStarRE.Quantum.normalizedTrace (X * Matrix.vecMulVec ψ.vector (star ψ.vector)) := by
+          rw [MIPStarRE.Quantum.normalizedTrace_smul]
+    _ = (Fintype.card ι : ℂ) *
+          (((X * Matrix.vecMulVec ψ.vector (star ψ.vector)).trace) /
+            (Fintype.card ι : ℂ)) := by
+          simp [MIPStarRE.Quantum.normalizedTrace]
+    _ = (Fintype.card ι : ℂ) *
+          (((Matrix.vecMulVec (X *ᵥ ψ.vector) (star ψ.vector)).trace) /
+            (Fintype.card ι : ℂ)) := by
+          rw [Matrix.mul_vecMulVec]
+    _ = (Fintype.card ι : ℂ) *
+          (((X *ᵥ ψ.vector) ⬝ᵥ star ψ.vector) / (Fintype.card ι : ℂ)) := by
+          rw [Matrix.trace_vecMulVec]
+    _ = (X *ᵥ ψ.vector) ⬝ᵥ star ψ.vector := by
+          field_simp [hcard]
+    _ = star ψ.vector ⬝ᵥ (X *ᵥ ψ.vector) := by
+          rw [dotProduct_comm]
+
+/-- Vector-level SWAP invariance for a bipartite pure-state witness.
+
+This is stronger than density-level SWAP invariance: it records the paper's
+honest vector symmetry and rules out antisymmetric vectors, even though those
+vectors define SWAP-invariant density matrices. -/
+def IsSwapInvariant {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : PureState (ι × ι)) : Prop :=
+  swapVector ψ.vector = ψ.vector
+
+end PureState
+
+@[simp] theorem swapVector_swapVector {ι : Type*} (ψ : ι × ι → ℂ) :
+    swapVector (swapVector ψ) = ψ := by
+  funext ij
+  rcases ij with ⟨i, j⟩
+  rfl
 
 /-- The expectation `Re τ(ψ X)`. Dimensions match by construction. -/
 noncomputable def ev {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) : Error :=
   Complex.re <| MIPStarRE.Quantum.normalizedTrace (ψ.density * X)
+
+theorem PureState.ev_eq_re_inner {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : PureState ι) (X : MIPStarRE.Quantum.Op ι) :
+    ev (ψ : QuantumState ι) X =
+      Complex.re (star ψ.vector ⬝ᵥ (X *ᵥ ψ.vector)) := by
+  unfold ev
+  rw [ψ.normalizedTrace_density_mul]
 
 /-- Tensor product of two operators via Kronecker product. -/
 abbrev opTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]

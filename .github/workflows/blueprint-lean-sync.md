@@ -40,7 +40,7 @@ tools:
 safe-outputs:
   create-pull-request:
     title-prefix: "[blueprint-sync] "
-    labels: [blueprint, automation]
+    labels: [blueprint, blueprint-sync]
     if-no-changes: "warn"
     expires: 7d
   noop:

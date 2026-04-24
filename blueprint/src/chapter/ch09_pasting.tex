@@ -80,12 +80,23 @@ The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, o
 	\eps,\delta,\gamma,\zeta,d/q \le 1.
 \]
 
+\begin{definition}[Standing pasting context]\label{def:ld-pasting-context}
+	\uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
+	The standing pasting context consists of the data and hypotheses from
+	Theorem~\ref{thm:ld-pasting}: an $(\eps,\delta,\gamma)$-good symmetric strategy
+	$(\psi,A,B,L)$ for the $(m+1,q,d)$ low individual degree test, a family of
+	projective submeasurements $\{G^x\}_{x \in \F_q}$ in $\polysub{m}{q}{d}$
+	satisfying \ref{item:ld-pasting-completeness}--\ref{item:ld-pasting-boundedness},
+	an integer $k \ge 400md$, and the quantities $\nu$ and $\sigma$ defined there.
+\end{definition}
+
 \subsection{From Measurements to Submeasurements}
 
 In the remainder of the chapter we only use the axis-parallel lines test in the
 last coordinate direction. We therefore write $B_f^u$ for the line measurement
 on the line $\{(u,x)\mid x\in\F_q\}$ and first record the consistency relations
-that follow formally from the hypotheses of Theorem~\ref{thm:ld-pasting}.
+that follow formally from the standing pasting context of
+Definition~\ref{def:ld-pasting-context}.
 
 Conditioning the low individual degree test on the last coordinate direction gives, on average over $(u,x) \sim \F_q^{m+1}$,
 \[
@@ -123,8 +134,9 @@ where
 \begin{lemma}[Slice measurements are consistent with line answers]\label{lem:ld-gbcon}
 	\lean{MIPStarRE.LDT.Pasting.ldGbcon}
 	\leanok
-	\uses{prop:simeq-to-approx, prop:triangle-inequality-for-approx_delta, prop:triangle-sub}
-	Under the hypotheses of Theorem~\ref{thm:ld-pasting}, set
+	\uses{def:ld-pasting-context, prop:simeq-to-approx,
+	      prop:triangle-inequality-for-approx_delta, prop:triangle-sub}
+	In the standing pasting context of Definition~\ref{def:ld-pasting-context}, set
 	\[
 		\nu_1 = \zeta + \sqrt{8m\eps+4\delta}.
 	\]
@@ -139,8 +151,11 @@ where
 
 \begin{lemma}[Pasted submeasurement]\label{lem:ld-pasting-sub-measurement}
 	\lean{MIPStarRE.LDT.Pasting.ldPastingSubMeas}
-	\uses{def:polymeasurements, def:simeq, def:pasted-measurement}
-	Under the hypotheses of Theorem~\ref{thm:ld-pasting}, there exists a submeasurement $H \in \polysub{m+1}{q}{d}$ with the following properties.
+	\uses{def:ld-pasting-context, def:polymeasurements, def:simeq,
+	      def:pasted-measurement}
+	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
+	there exists a submeasurement $H \in \polysub{m+1}{q}{d}$ with the following
+	properties.
 	\begin{enumerate}
 		\item (Consistency with $A$): \label{item:ld-pasting-N-consistency-sub-measurement}
 		      On average over $u \sim \F_q^{m+1}$,
@@ -310,8 +325,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \begin{lemma}[Strong self-consistency of the complete part]\label{lem:g-complete-self-consistency}
 	\lean{MIPStarRE.LDT.Pasting.gCompleteSelfConsistency}
 	\leanok
-	\uses{prop:two-notions-of-self-consistency}
-	Under the hypotheses of Theorem~\ref{thm:ld-pasting},
+	\uses{def:ld-pasting-context, prop:two-notions-of-self-consistency}
+	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
 	\[
 		G^x \ot I \approx_\zeta I \ot G^x.
 	\]
@@ -337,8 +352,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \begin{corollary}[Strong self-consistency of the incomplete part]\label{cor:g-bot-self-consistency}
 	\lean{MIPStarRE.LDT.Pasting.gBotSelfConsistency}
 	\leanok
-	\uses{lem:g-complete-self-consistency}
-	Under the hypotheses of Theorem~\ref{thm:ld-pasting},
+	\uses{def:ld-pasting-context, lem:g-complete-self-consistency}
+	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
 	\[
 		G_\bot^x \ot I \approx_\zeta I \ot G_\bot^x.
 	\]
@@ -474,8 +489,10 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{corollary}[Commutativity of the complete part]\label{cor:commuting-with-G-complete}
 	\lean{MIPStarRE.LDT.Pasting.commutingWithGComplete}
-	\uses{thm:com-main, lem:commutativity-switcheroo, lem:g-complete-self-consistency}
-	Under the hypotheses of Theorem~\ref{thm:ld-pasting}, the following commutation relations hold:
+	\uses{def:ld-pasting-context, thm:com-main, lem:commutativity-switcheroo,
+	      lem:g-complete-self-consistency}
+	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
+	the following commutation relations hold:
 	\[
 		G_g^x G^y \ot I \approx_{\nu_2} G^y G_g^x \ot I,
 		\qquad
@@ -513,8 +530,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \begin{corollary}[Commutativity of the incomplete part]\label{cor:commuting-with-G-incomplete}
 	\lean{MIPStarRE.LDT.Pasting.commutingWithGIncomplete}
 	\leanok
-	\uses{cor:commuting-with-G-complete}
-	Under the hypotheses of Theorem~\ref{thm:ld-pasting},
+	\uses{def:ld-pasting-context, cor:commuting-with-G-complete}
+	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
 	\[
 		G_g^x G_\bot^y \ot I \approx_{\nu_2} G_\bot^y G_g^x \ot I,
 		\qquad
@@ -997,6 +1014,11 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\bra{\psi} \widehat H_{g_{>\ell}}^{x_{>\ell}} \ot S_{\tau_{>\ell}} \ket{\psi}.
 		\label{eq:i-think-this-is-what-i'm-supposed-to-prove-2}
 	\end{align}
+	\begin{remark}[Lean proof-stage notation]
+		\lean{MIPStarRE.LDT.Pasting.averagedSandwichByTypeSubMeas, MIPStarRE.LDT.Pasting.fromHToGTailStageFamily, MIPStarRE.LDT.Pasting.fromHToGTailStageMass, MIPStarRE.LDT.Pasting.fromHToGStageMass, MIPStarRE.LDT.Pasting.fromHToGBernoulliTailMass}
+		\leanok
+		In Lean, the type-restricted averaged submeasurement, the per-tail operator/mass, the aggregated stage quantity, and the final Bernoulli-tail scalar from this proof are recorded by the declarations above. Their indexing is shifted to the repository's 0-based convention: Lean stage $\ell$ is the paper's stage $\ell+1$.
+	\end{remark}
 	The operators $S_{\tau_{\ge \ell}}$ are Hermitian and positive semidefinite, and
 	\begin{align}
 		S_{\tau_{\ge \ell}}

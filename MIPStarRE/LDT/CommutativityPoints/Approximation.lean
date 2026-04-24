@@ -19,11 +19,6 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 open scoped Matrix MatrixOrder ComplexOrder BigOperators
 
--- pointDiagonalLineQuestionEquiv removed: the diagonal test now uses
--- RestrictedDiagonalSample (indexed by restriction index j) instead
--- of the old DiagonalTestSample.
--- TODO(#306): Rebuild the equivalence for the restricted diagonal test.
-
 /-- The final restriction index, corresponding to the paper's `m`-restricted
 diagonal-lines test. -/
 private def lastRestrictionIndex (params : Parameters) : Fin params.m :=
@@ -78,6 +73,8 @@ private lemma lastRestrictionIndex_val_succ
   dsimp [lastRestrictionIndex]
   omega
 
+/-- At the final restriction index, a restricted diagonal direction records all
+`m` coordinates, so it is equivalent to an unrestricted point of `Point params`. -/
 private noncomputable def lastRestrictedDirectionEquiv
     (params : Parameters)
     [FieldModel params.q] :
@@ -100,7 +97,8 @@ private noncomputable def lastRestrictedDirectionEquiv
         (⟨i.val, Nat.lt_succ_of_le hle⟩ : Fin ((lastRestrictionIndex params).val + 1)) = i := by
       ext
       rfl
-    simpa [extendRestrictedDirection, hle] using congrArg free hidx
+    rw [← hidx]
+    simp [extendRestrictedDirection, hle]
   right_inv := by
     intro direction
     funext k
@@ -113,8 +111,12 @@ private noncomputable def lastRestrictedDirectionEquiv
             omega⟩ : Fin params.m) = k := by
       ext
       rfl
-    simpa [extendRestrictedDirection, hk] using congrArg direction hidx
+    rw [← hidx]
+    simp [extendRestrictedDirection, hk]
 
+/-- At the final restriction index, a restricted diagonal sample is exactly a
+full diagonal line: the sample point becomes the base point and the restricted
+direction determines all line coefficients. -/
 private noncomputable def lastRestrictedSampleEquivDiagonalLine
     (params : Parameters)
     [FieldModel params.q] :
@@ -138,7 +140,8 @@ private noncomputable def lastRestrictedSampleEquivDiagonalLine
         (⟨i.val, Nat.lt_succ_of_le hle⟩ : Fin ((lastRestrictionIndex params).val + 1)) = i := by
       ext
       rfl
-    simpa [lastRestrictedDirectionEquiv, extendRestrictedDirection, hle] using congrArg free hidx
+    rw [← hidx]
+    simp [lastRestrictedDirectionEquiv, extendRestrictedDirection, hle]
   right_inv := by
     rintro ⟨base, direction⟩
     change
@@ -159,9 +162,13 @@ private noncomputable def lastRestrictedSampleEquivDiagonalLine
             omega⟩ : Fin params.m) = k := by
       ext
       rfl
-    simpa [lastRestrictedDirectionEquiv, extendRestrictedDirection, hk] using
-      congrArg direction hidx
+    rw [← hidx]
+    simp [extendRestrictedDirection, hk]
 
+/-- Rebase the last restricted diagonal sample so that its distinguished base
+point appears at the queried parameter. This identifies the corrected diagonal
+test sample space with the shared point-with-diagonal-line questions used in
+the commutativity-at-points argument. -/
 private noncomputable def rebasedLastRestrictedQuestionEquiv
     (params : Parameters)
     [FieldModel params.q] :
@@ -180,6 +187,9 @@ private noncomputable def rebasedLastRestrictedQuestionEquiv
     rintro ⟨ℓ, t⟩
     simp [DiagonalLine.rebaseAt_rebase, addCoord_subCoord_right]
 
+/-- Evaluate each restricted diagonal measurement at the distinguished base
+parameter `zeroCoord`, matching the corrected paper definition of the diagonal
+branch. -/
 private noncomputable def rawDiagonalLineAnswerFamily
     (params : Parameters)
     [FieldModel params.q]
@@ -192,13 +202,13 @@ private noncomputable def rawDiagonalLineAnswerFamily
       ((strategy.diagonalMeasurement { base := s.1, direction := v }).toSubMeas)
       (· zeroCoord)
 
-/-- TODO(#306): Consistency transfer for the corrected restricted diagonal test.
+/-- Consistency transfer for the corrected diagonal branch at the final
+restriction index.
 
-This proof gap is intentional tracking for the diagonal-test definition fix:
-the old proof used `DiagonalTestSample` with unrestricted directions, while the
-corrected statement uses `RestrictedDiagonalSample` with restricted directions
-and base-point evaluation. The previous proof therefore established the wrong
-sample space for the paper-corrected test. -/
+The corrected test samples a restricted diagonal line and compares the point
+measurement at its distinguished base point with the diagonal measurement
+postprocessed by evaluation at `zeroCoord`. The global diagonal-line test bound
+therefore controls this last restricted slice in particular. -/
 private lemma sampledDiagonalLineConsistency
     (params : Parameters)
     [FieldModel params.q]
@@ -246,13 +256,12 @@ private lemma sampledDiagonalLineConsistency
   refine ⟨?_⟩
   simpa [j, err, restrictedDiagonalLinesConsistencyError] using hj_le
 
-/-- TODO(#306): SDD approximation transfer for the corrected restricted diagonal test.
+/-- Convert the corrected restricted diagonal consistency estimate into the
+corresponding SDD approximation bound.
 
-This proof gap is intentional tracking for the diagonal-test definition fix:
-the old proof used `DiagonalTestSample` with unrestricted directions, while the
-corrected statement uses `RestrictedDiagonalSample` with restricted directions
-and base-point evaluation. The previous proof therefore established the wrong
-sample space for the paper-corrected test. -/
+This is the final-slice version of the diagonal branch that feeds the
+commutativity-at-points argument. It packages the consistency estimate through
+`Preliminaries.simeqToApprox`. -/
 private lemma sampledDiagonalLineApproximation
     (params : Parameters)
     [FieldModel params.q]
@@ -306,8 +315,12 @@ private lemma sampledDiagonalLineApproximation
     IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
     happrox.leftRightSquaredDistanceBound
 
-/-- TODO(#306): Transport the corrected restricted diagonal approximation to
-the shared line-plus-parameter distribution used by the commutativity proof. -/
+/-- Transport the corrected restricted-diagonal approximation bound to the
+shared point-with-diagonal-line distribution used downstream.
+
+The reindexing runs through `rebasedLastRestrictedQuestionEquiv`, which turns a
+restricted sample together with an evaluation parameter into the corresponding
+rebased diagonal-line question. -/
 lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
     (params : Parameters)
     [FieldModel params.q]

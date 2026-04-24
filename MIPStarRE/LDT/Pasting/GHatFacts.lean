@@ -62,8 +62,6 @@ private lemma qSDDCore_option_pair_decompose
   rw [hss]
   simp [SS, add_assoc, add_left_comm, add_comm]
 
-set_option maxHeartbeats 2000000 in
--- Combines four self-consistency + commutation witnesses with heavy unfolding.
 /-- `cor:G-hat-facts`. -/
 theorem gHatFacts
     (params : Parameters)

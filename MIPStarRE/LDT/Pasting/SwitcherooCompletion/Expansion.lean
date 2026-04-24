@@ -412,9 +412,9 @@ lemma switcherooLeftFrontCoreScalar_eq_leftTensor_mul_leftTensor
   rw [leftTensor_mul_leftTensor]
   exact congrArg (fun X => ev ψbi (leftTensor (ι₂ := ι) X)) hcollapse.symm
 
-set_option maxHeartbeats 200000 in
 -- The explicit left-front contraction proof still expands several product-indexed sums,
--- but the expensive pointwise normalizations now live in reusable helper lemmas.
+-- but the expensive pointwise normalizations now live in reusable helper lemmas,
+-- so it now elaborates within the default heartbeat budget.
 /-- The final `sqrt chi` step in the fourth-term switcheroo chain. -/
 lemma switcherooLeftFront_close_firstSplitCore
     {Outcome : Type*} [Fintype Outcome]
@@ -518,9 +518,6 @@ lemma switcherooLeftFront_close_firstSplitCore
     simpa using hclose
   simpa [hleft', hright', abs_sub_comm] using hclose'
 
-set_option maxHeartbeats 3000000 in
--- Expanding `qSDDOp` into four averaged scalar terms over a slice-pair question
--- generates a large normalization expression that otherwise exceeds heartbeats.
 /-- Average the single-question four-term `qSDDOp` expansion over the
 slice-pair distribution. -/
 lemma switcherooAggregate_qSDDOp_expand_avg
@@ -537,6 +534,8 @@ lemma switcherooAggregate_qSDDOp_expand_avg
         switcherooAggregateSecondTerm params ψbi family M -
         switcherooAggregateThirdTerm params ψbi family M -
         switcherooAggregateFourthTerm params ψbi family M := by
+  let 𝒟q : Distribution (SlicePairQuestion params) :=
+    uniformDistribution (SlicePairQuestion params)
   let A : SlicePairQuestion params → Error := fun q =>
     ∑ o : Outcome,
       ev ψbi
@@ -567,33 +566,44 @@ lemma switcherooAggregate_qSDDOp_expand_avg
             (M q.2).outcome o *
             (completePartSubMeas params family q.1).total *
             (M q.2).outcome o))
+  have hA :
+      avgOver 𝒟q A = switcherooAggregateFirstTerm params ψbi family M := by
+    rfl
+  have hB :
+      avgOver 𝒟q B = switcherooAggregateSecondTerm params ψbi family M := by
+    rfl
+  have hC :
+      avgOver 𝒟q C = switcherooAggregateThirdTerm params ψbi family M := by
+    rfl
+  have hD :
+      avgOver 𝒟q D = switcherooAggregateFourthTerm params ψbi family M := by
+    rfl
+  change avgOver 𝒟q
+      (fun q => qSDDOp ψbi
+        (switcherooAggregateLeft params family M q)
+        (switcherooAggregateRight params family M q)) = _
   calc
-    avgOver (uniformDistribution (SlicePairQuestion params))
+    avgOver 𝒟q
         (fun q => qSDDOp ψbi
           (switcherooAggregateLeft params family M q)
           (switcherooAggregateRight params family M q))
-      = avgOver (uniformDistribution (SlicePairQuestion params))
-          (fun q => A q + B q - C q - D q) := by
-              apply avgOver_congr
-              intro q
-              rw [switcherooAggregate_qSDDOp_expand]
-              simp [A, B, C, D, Finset.sum_add_distrib, Finset.sum_sub_distrib]
-    _ = avgOver (uniformDistribution (SlicePairQuestion params)) A +
-          avgOver (uniformDistribution (SlicePairQuestion params)) B -
-          avgOver (uniformDistribution (SlicePairQuestion params)) C -
-          avgOver (uniformDistribution (SlicePairQuestion params)) D := by
-            rw [show (fun q => A q + B q - C q - D q) =
-                fun q => (A q + B q) + ((-1 : Error) * C q + (-1 : Error) * D q) by
-                  funext q
-                  ring]
-            rw [avgOver_add, avgOver_add, avgOver_add, avgOver_const_mul, avgOver_const_mul]
-            simp [sub_eq_add_neg]
-            ring
+      = avgOver 𝒟q (fun q => A q + B q - C q - D q) := by
+          apply avgOver_congr
+          intro q
+          rw [switcherooAggregate_qSDDOp_expand]
+          simp [A, B, C, D, Finset.sum_add_distrib, Finset.sum_sub_distrib]
+    _ = avgOver 𝒟q A + avgOver 𝒟q B - avgOver 𝒟q C - avgOver 𝒟q D := by
+          rw [show (fun q => A q + B q - C q - D q) =
+              fun q => (A q + B q) + ((-1 : Error) * C q + (-1 : Error) * D q) by
+                funext q
+                ring]
+          rw [avgOver_add, avgOver_add, avgOver_add, avgOver_const_mul, avgOver_const_mul]
+          simp [sub_eq_add_neg]
+          ring
     _ = switcherooAggregateFirstTerm params ψbi family M +
           switcherooAggregateSecondTerm params ψbi family M -
           switcherooAggregateThirdTerm params ψbi family M -
           switcherooAggregateFourthTerm params ψbi family M := by
-            simp [switcherooAggregateFirstTerm, switcherooAggregateSecondTerm,
-              switcherooAggregateThirdTerm, switcherooAggregateFourthTerm, A, B, C, D]
+          rw [hA, hB, hC, hD]
 
 end MIPStarRE.LDT.Pasting

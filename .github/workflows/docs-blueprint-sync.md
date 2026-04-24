@@ -39,7 +39,7 @@ tools:
 safe-outputs:
   create-pull-request:
     title-prefix: "[docs-sync] "
-    labels: [documentation, automation]
+    labels: [documentation, cleanup]
     if-no-changes: "warn"
     expires: 7d
   noop:

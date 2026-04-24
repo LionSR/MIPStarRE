@@ -2,6 +2,16 @@
 
 Date: 2026-04-02
 
+> Update (2026-04-23): this scouting report predates the split of
+> `MakingMeasurementsProjective/Theorems.lean` into
+> `MakingMeasurementsProjective/Projectivization.lean` and
+> `MakingMeasurementsProjective/Orthonormalization.lean`. The issue-#301
+> blocker discussed here is resolved on current `main`: both
+> `spectralTruncateAlmostProjective` and `orthonormalization` are proved and
+> compile cleanly. Read the remaining discussion below as historical guidance
+> about the underlying matrix-proof spine, not as a live blocker report for
+> those two declarations.
+
 Repository/toolchain inspected:
 
 - `lean-toolchain` is `leanprover/lean4:v4.28.0`.

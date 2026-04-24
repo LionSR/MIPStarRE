@@ -21,6 +21,7 @@ type(scope): short description
 | `fix`      | Bug fix (broken proof, wrong identifier, etc.)    |
 | `refactor` | Restructuring without changing API surface        |
 | `docs`     | Documentation or blueprint changes only           |
+| `style`    | Formatting, naming, or docstring cleanup only     |
 | `ci`       | CI/CD workflow changes                            |
 | `chore`    | Dependency bumps, linting, toolchain updates      |
 
@@ -82,13 +83,24 @@ Three issue templates are available in `.github/ISSUE_TEMPLATE/`:
 
 ### Formalization issues
 
-Use a descriptive title that names the mathematical content:
+Use a descriptive, **bracket-free** title that names the mathematical content:
 
 ```
-LDT Section 7: self-improvement step for quantum strategies
+Chapter 9 — finish the sandwich-chain corollaries in BridgeLemmas
 ```
 
-Label with **area** + **arXiv paper** + **topic** as applicable.
+Avoid prefixes like `[Chapter 9] ...`: bot-generated branch names inherit those
+characters, and `]` breaks part of the PR automation stack. See
+[`pr_review_management.md`](pr_review_management.md) for the rationale.
+
+For formalization issues, usually start with `formalization` + `2009.12982`,
+then add the most specific live chapter/workstream labels that apply (for
+example `ldt-basic`, `preliminaries`, `commutativity`, `pasting`,
+`main-induction`, `proof`, `proof-infra`, `statement-fix`,
+`sorry-elimination`, `mismatch`, `follow-up`, `blueprint`, or
+`blueprint-sync`). Documentation-only or tooling issues should use
+`documentation`, `ci`, `cleanup`, and/or `refactor` instead of
+`formalization`.
 
 ### Multi-part work
 
@@ -101,33 +113,35 @@ LDT 2/5: Self-improvement step
 ...
 ```
 
-The tracking issue lists each sub-issue using a **native GitHub tasklist** block
-so that child issues display "Tracked by #N" in their sidebar:
+Attach tracked issues as **GitHub sub-issues** of the umbrella issue so GitHub
+shows native progress, relationship navigation, and "Tracked by #N" links. The
+issue body can keep a short human-readable index, but markdown checkboxes and
+retired fenced tasklist blocks do not create native sub-issue relationships:
 
-````markdown
-```[tasklist]
+```markdown
 ### Tasks
-- [ ] #101
-- [ ] #102
-- [ ] #103
+- #101
+- #102
+- #103
 ```
-````
 
-**Important:** Each `- [ ]` line must contain *only* the issue reference (`#N`).
-Do not add descriptions on the same line — put those in the sub-issue titles or
-in prose above the tasklist block. Items that are not issue references (plain text
-TODOs) cannot go inside the tasklist block; list them as ordinary checkboxes
-outside it.
+Use the issue sidebar's **Add sub-issue** control, or the REST endpoint
+`POST /repos/{owner}/{repo}/issues/{issue_number}/sub_issues`, to create the
+actual relationship. Put descriptions in the sub-issue titles or in prose above
+the index.
 
 ### Tracking issues
 
 Use the **Tracking Issue** template (`.github/ISSUE_TEMPLATE/tracking-issue.yml`).
-Label with `tracking`. The `tracking-issue-sync` workflow will automatically:
+Label with `tracking`; add `chapter-tracking` for the long-lived chapter
+overview trackers. The `tracking-issue-sync` workflow will automatically:
 
-- Check boxes when referenced issues are closed (including auto-closure by merged PRs).
-- Uncheck boxes when referenced issues are reopened.
-- Post progress comments on linked issues when PRs merge (what was done, what remains).
-- Add the `all-resolved` label when every task is complete.
+- Rely on GitHub's native sub-issue progress instead of editing body checkboxes.
+- Post progress comments on linked issues when PRs merge.
+- Suggest or create `follow-up` issues for genuine deferred work called out by merged PRs.
+
+The repository does not currently use a live `all-resolved` label, so do not
+add one manually.
 
 ### Pinned issues
 
@@ -174,42 +188,65 @@ locally.
 
 ## 4. Label Taxonomy
 
-### Area labels
+This section mirrors the labels that currently exist in the GitHub repository.
+If this file and `gh label list` diverge, treat GitHub as the source of truth
+and update this guide in the same PR. Most formalization issues combine
+`formalization` + `2009.12982` with one or more chapter/workstream labels.
+Documentation- or tooling-only issues usually skip the paper label. Do **not**
+apply legacy labels such as `self-improvement`, `expansion-graph`,
+`quantum-foundations`, or `automation`: those names are not part of the live
+label set.
 
-| Label            | Description                                |
-|------------------|--------------------------------------------|
-| `formalization`  | Lean 4 formalization task                  |
-| `infrastructure` | Definitions and basic lemmas               |
-| `documentation`  | Improvements or additions to documentation |
-| `ci`             | CI/CD workflow changes                     |
-| `cleanup`        | Code cleanup and style fixes               |
+### Core work-type labels
+
+| Label            | Description                                                |
+|------------------|------------------------------------------------------------|
+| `formalization`  | Lean formalization task                                    |
+| `documentation`  | Documentation-only work                                    |
+| `infrastructure` | Foundational definitions, shared APIs, or supporting layers |
+| `cleanup`        | Small cleanup, consistency, or style fix                   |
+| `refactor`       | Structural change without intended behavior change         |
+| `ci`             | CI/CD workflow or repository automation change             |
+
+### Chapter / workstream labels
+
+| Label               | Description                                                     |
+|---------------------|-----------------------------------------------------------------|
+| `ldt-basic`         | Early LDT definitions and low-degree-test scaffolding           |
+| `preliminaries`     | Preliminaries chapter / section work                            |
+| `commutativity`     | Commutativity chapters and related lemmas                       |
+| `pasting`           | Pasting chapter and downstream chains                           |
+| `main-induction`    | Main induction step                                             |
+| `proof`             | Issue is primarily about proving an existing result             |
+| `proof-infra`       | Intermediate lemmas or scaffolding that mainly support proofs   |
+| `sorry-elimination` | Explicitly aimed at discharging remaining `sorry` sites         |
+| `statement-fix`     | Paper-to-Lean statement correction / weakening / realignment    |
+| `mismatch`          | Explicit paper-code mismatch audit or repair                    |
+| `blueprint`         | Blueprint authoring or blueprint-expansion work                 |
+| `blueprint-sync`    | Blueprint ↔ Lean synchronization task                           |
 
 ### Paper labels
 
-| Label         | Description                                                        |
-|---------------|--------------------------------------------------------------------|
-| `2009.12982`  | arXiv:2009.12982 -- Quantum soundness of the classical low individual degree test |
+| Label        | Description                                          |
+|--------------|------------------------------------------------------|
+| `2009.12982` | The main LDT paper tracked in this repository        |
 
-### Topic labels
+### Tracking / follow-up labels
 
-| Label               | Description                                                           |
-|----------------------|-----------------------------------------------------------------------|
-| `ldt-basic`          | LDT preliminaries and basic definitions                               |
-| `self-improvement`   | Self-improvement step for quantum strategies                          |
-| `pasting`            | Pasting lemma for quantum strategies                                  |
-| `main-induction`     | Main induction step of the LDT soundness proof                       |
-| `commutativity`      | Commutativity of quantum measurements                                 |
-| `expansion-graph`    | Expansion properties of hypercube graphs                              |
-| `quantum-foundations`| Quantum measurements, outcome families, finite matrices               |
+| Label              | Description                                           |
+|--------------------|-------------------------------------------------------|
+| `tracking`         | Umbrella tracking issue                               |
+| `chapter-tracking` | Long-lived chapter progress tracker                   |
+| `follow-up`        | Deferred or newly discovered work split out of a PR   |
+| `campaign-5`       | Historical label for the session-5 campaign issues    |
 
-### Workflow labels
+### Automation / operational labels
 
-| Label            | Description                                    |
-|------------------|------------------------------------------------|
-| `tracking`       | Tracking issue for a formalization area         |
-| `blueprint-sync` | Blueprint out of sync with Lean code            |
-| `automation`     | Automated documentation/sync PR                 |
-| `follow-up`      | Follow-up work identified from a merged PR      |
+| Label             | Description                                           |
+|-------------------|-------------------------------------------------------|
+| `auto-fix-claude` | Automation-managed issue queue for Claude follow-ups  |
+| `codex`           | Automation-managed issue or PR bookkeeping            |
+| `standup`         | Daily standup summary issues                          |
 
 ### Standard GitHub labels
 
@@ -343,7 +380,7 @@ The following workflows run automatically:
 |----------|---------|-------------|
 | **Lean CI** (`lean_action_ci.yml`) | Push to `main`, PRs touching `.lean`/`lakefile.toml`/`lean-toolchain` | Runs `lake build` with Mathlib cache |
 | **Claude Code Review** (`claude-code-review.yml`) | PR opened/synced/reopened touching `.lean`, `.tex`, `lakefile.toml`, `lean-toolchain` | Automated review for sorrys, Mathlib style, type safety, performance, modularity, documentation |
-| **Issue Tracker** (`tracking-issue-sync.yml`) | Issue closed/reopened; PR merged/opened; review submitted | Updates tracking-issue checkboxes (checks on close, unchecks on reopen), posts progress comments on linked issues when PRs merge, scans merged PRs for follow-ups (deferred review feedback, new `sorry` markers, missing blueprint tags), creates follow-up issues with `follow-up` label, adds `all-resolved` when all tasks complete |
+| **Issue Tracker** (`tracking-issue-sync.yml`) | Issue closed/reopened; PR merged/opened | Uses native sub-issue progress for tracking status, posts progress comments on linked issues when PRs merge, scans merged PRs for genuine deferred work, and creates `follow-up` issues when needed |
 | **Blueprint Lint** (`lint-blueprint.yml`) | PRs touching blueprint files | Validates LaTeX blueprint for broken labels and references |
 | **Docs & Blueprint Sync** (`docs-blueprint-sync.md`) | Daily (weekdays) + manual dispatch | Detects stale documentation and opens a sync PR if needed |
 | **Lean Audit** (`lean-audit.yml`) | On demand | Audits Lean code for style and correctness |

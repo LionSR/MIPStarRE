@@ -79,7 +79,8 @@
 \end{lemma}
 \begin{proof}
 	\leanok
-	This is Lemma~\ref{prop:fourier-fact-vector} applied to $v=\beta-\alpha$; both sides are anchored at the same Lean declaration so no additional \texttt{\textbackslash uses} edge is needed.
+	\uses{prop:fourier-fact-vector}
+	This is Lemma~\ref{prop:fourier-fact-vector} applied to $v=\beta-\alpha$.
 \end{proof}
 
 \begin{lemma}[Eigenvectors of the hypercube graph]\label{prop:eigenvectors}

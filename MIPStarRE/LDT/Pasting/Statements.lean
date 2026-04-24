@@ -122,7 +122,11 @@ noncomputable def fromHToGRecurrenceError (params : Parameters)
   2 * Real.rpow (2 * zeta) (1 / (2 : Error)) +
     2 * Real.rpow (commuteGHalfSandwichError params gamma zeta k) (1 / (2 : Error))
 
-/-- Output package for `thm:ld-pasting`. -/
+/-- Analytic conclusion for `thm:ld-pasting` once a witness `H` has been fixed.
+
+The theorem `ldPasting` separately records that the chosen witness is the
+canonical construction `constructedPastedMeasurement params family k`, so this
+structure stores only the paper-facing quantitative conclusion. -/
 structure LdPastingConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -130,8 +134,6 @@ structure LdPastingConclusion (params : Parameters)
     (H : Measurement (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   largeEnough : 400 * params.m * params.d ≤ k
-  constructedMeasurement :
-    H = constructedPastedMeasurement params family k
   -- Naming note: this is not a `ν` field from the paper. The point-consistency
   -- bound here continues to use the induction-section error term, while `ν`
   -- tracks the completeness loss below.
@@ -142,7 +144,12 @@ structure LdPastingConclusion (params : Parameters)
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta)
 
-/-- Output package for `lem:ld-pasting-sub-measurement`. -/
+/-- Analytic conclusion for `lem:ld-pasting-sub-measurement` once a witness `H`
+has been fixed.
+
+The theorem `ldPastingSubMeas` separately records that the chosen witness is the
+canonical construction `constructedPastedSubMeas params family k`, so this
+structure stores only the quantitative properties proved about that witness. -/
 structure LdPastingSubMeasConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -150,8 +157,6 @@ structure LdPastingSubMeasConclusion (params : Parameters)
     (H : SubMeas (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
   largeEnough : 400 * params.m * params.d ≤ k
-  constructedSubMeas :
-    H = constructedPastedSubMeas params family k
   -- Naming note: this is not a `ν` field from the paper. The point-consistency
   -- bound here is the paper's intermediate `ν`, while the completeness field
   -- carries the missing-mass term needed for the final `σ` after completion.
@@ -337,21 +342,97 @@ structure HBConsistencyStatement (params : Parameters)
       (verticalLineMeasurementFamily params strategy)
       (hBConsistencyError params eps delta gamma zeta k)
 
-/-- Output package for `lem:over-all-outcomes`. -/
+/-- Scalar expectation of the pasted submeasurement mass appearing on the
+left-hand side of `lem:over-all-outcomes`. -/
+noncomputable def overAllOutcomesPastedMass (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) : Error :=
+  subMeasMass strategy.state ((constructedPastedSubMeas params family k).liftLeft)
+
+/-- Scalar expectation of the all-outcomes expansion on the right-hand side of
+`lem:over-all-outcomes`. -/
+noncomputable def overAllOutcomesExpansionMass (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) : Error :=
+  subMeasMass strategy.state ((IdxSubMeas.liftLeft
+    (allOutcomesExpansionFamily params strategy family k)) ())
+
+/-- Output package for `lem:over-all-outcomes`.
+
+The paper's displayed statement is a scalar approximation of expectation values,
+not a stronger `≈_δ` relation between already-collapsed `Unit`-indexed
+submeasurements.  Accordingly, this bundle stores only the absolute-value bound
+between the pasted mass and the all-outcomes expansion mass. -/
 structure OverAllOutcomesStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (eps delta gamma zeta : Error) (k : ℕ) : Prop where
   totalOutcomeExpansion :
-    SDDRel strategy.state (uniformDistribution Unit)
-      (IdxSubMeas.liftLeft
-        (constructedPastedMeasurementTotal params family k))
-      (IdxSubMeas.liftLeft
-        (allOutcomesExpansionFamily params strategy family k))
-      (overAllOutcomesError params eps delta gamma zeta k)
+    |overAllOutcomesPastedMass params strategy family k -
+        overAllOutcomesExpansionMass params strategy family k| ≤
+      overAllOutcomesError params eps delta gamma zeta k
 
-/-- Output package for `lem:from-H-to-G`. -/
+/-- Scalar expectation of one per-tail contribution in `lem:from-H-to-G`.
+
+This is the single-`τ_{≥ℓ}` term appearing inside the aggregate stage mass from
+`references/ldt-paper/ld-pasting.tex`, equation
+`eq:i-think-this-is-what-i'm-supposed-to-prove-2` (lines 1386–1391), and the
+mirrored blueprint discussion in `blueprint/src/chapter/ch09_pasting.tex`.
+The parameter `prefixLen` is the Lean 0-based stage index. In the ambient
+`k`-step recurrence, the remaining tail length is `tailLen = k - prefixLen`. -/
+noncomputable def fromHToGTailStageMass (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) : Error :=
+  ev ψbi (((IdxOpFamily.liftLeft
+    (fromHToGTailStageFamily params family prefixLen τtail)) ()).total)
+
+/-- Scalar expectation of the full Lean stage-`ℓ` quantity from `lem:from-H-to-G`.
+
+This is the aggregate quantity displayed in
+`references/ldt-paper/ld-pasting.tex`, equation
+`eq:i-think-this-is-what-i'm-supposed-to-prove-2` (lines 1386–1391), and in the
+matching blueprint section `blueprint/src/chapter/ch09_pasting.tex`.
+Lean uses 0-based indexing: stage `ℓ` here corresponds to the paper's stage
+`ℓ + 1`, so the remaining tail has length `k - ℓ`. Accordingly, this sums over
+all remaining tail types `τ_{≥ℓ} ∈ {0,1}^{k-ℓ}`, while the next Lean stage
+`ℓ + 1` sums over the shorter tails `τ_{>ℓ}`. -/
+noncomputable def fromHToGStageMass (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) : Error :=
+  ∑ τtail : GHatType (k - ℓ),
+    fromHToGTailStageMass params ψbi family ℓ τtail
+
+/-- Scalar expectation of the left-hand side of `lem:from-H-to-G`, i.e. the
+uniform average of the eligible pasted-sandwich total mass. -/
+noncomputable def fromHToGAllOutcomesMass (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k : ℕ) : Error :=
+  subMeasMass ψbi ((IdxSubMeas.liftLeft
+    (allOutcomesExpansionFamily params strategy family k)) ())
+
+/-- Scalar expectation of the Bernoulli-tail polynomial `F(G)` on the bipartite
+state from `lem:from-H-to-G`. -/
+noncomputable def fromHToGBernoulliTailMass (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k : ℕ) : Error :=
+  subMeasMass ψbi ((IdxSubMeas.liftLeft
+    (bernoulliTailFromFamily params family k)) ())
+
+/-- Output package for `lem:from-H-to-G`.
+
+The paper's displayed statement is a scalar approximation of expectation values,
+not a new `≈_δ` relation between submeasurements.  Accordingly, this bundle
+stores the adjacent stage-mass inequalities and the final all-outcomes vs.
+Bernoulli-tail comparison. -/
 structure FromHToGStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -359,20 +440,14 @@ structure FromHToGStatement (params : Parameters)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceStep :
-    ∀ ℓ : ℕ, ℓ < k → ∀ (τ : GHatType k),
-      SDDOpRel ψbi (uniformDistribution Unit)
-        (IdxOpFamily.liftLeft
-          (fromHToGRecurrenceLeftFamily params strategy family k ℓ τ))
-        (IdxOpFamily.liftLeft
-          (fromHToGRecurrenceRightFamily params strategy family k ℓ τ))
-        (fromHToGRecurrenceError params gamma zeta k)
+    ∀ ℓ : ℕ, ℓ < k →
+      |fromHToGStageMass params ψbi family k ℓ -
+          fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
+        fromHToGRecurrenceError params gamma zeta k
   bernoulliPolynomialRewrite :
-    SDDRel ψbi (uniformDistribution Unit)
-      (IdxSubMeas.liftLeft
-        (allOutcomesExpansionFamily params strategy family k))
-      (IdxSubMeas.liftLeft
-        (bernoulliTailFromFamily params family k))
-      (fromHToGError params gamma zeta k)
+    |fromHToGAllOutcomesMass params strategy ψbi family k -
+        fromHToGBernoulliTailMass params ψbi family k| ≤
+      fromHToGError params gamma zeta k
 
 /-- Output package for `lem:chernoff-bernoulli-matrix`. -/
 structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableEq ι]

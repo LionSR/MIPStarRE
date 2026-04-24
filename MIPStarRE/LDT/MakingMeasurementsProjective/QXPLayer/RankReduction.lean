@@ -182,20 +182,22 @@ lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
 
 /-- **Rounding to projectors** (`lem:projective-non-measurement`).
 
-From the estimate `eq:A-looks-projective`, construct a family `R_a` of
-projectors close to `A_a` whose total is bounded by `(1 + 2√ζ)I`. -/
-lemma projectiveNonMeasurement {Outcome : Type uOutcome}
+This declaration now records the honest paper-facing statement consumed by the
+QXP rank-reduction layer: a chosen family `R_a` equipped with
+`RoundingToProjectorsWitness ψ A ζ R`. The abbrev gives that statement a stable
+Lean name for the blueprint and for later API cleanup, while downstream local
+lemmas usually carry a chosen witness `(q, hrounded)` directly once the rounded
+family has been fixed. The old `ProjectiveNonMeasurementBridgePackage`
+placeholder has been deleted; producing such a witness from
+`eq:A-looks-projective` remains an upstream spectral-truncation obligation
+rather than a downstream QXP bridge. -/
+abbrev projectiveNonMeasurement {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (ζ : Error)
-    (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ) :
-    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) →
-      ∃ R : OpFamily Outcome ι,
-        RoundingToProjectorsWitness ψ A ζ R := by
-  intro hsource
-  rcases hbridge.fromSourceAlmostProjective hsource with ⟨R, hR, _⟩
-  exact ⟨R, hR⟩
+    (A : Measurement Outcome ι) (ζ : Error) : Prop :=
+  ∃ R : OpFamily Outcome ι,
+    RoundingToProjectorsWitness ψ A ζ R
 
 /-- For a Hermitian idempotent matrix, every eigenvalue is either `0` or `1`. -/
 lemma projector_eigenvalues_zero_or_one {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -232,9 +234,10 @@ lemma projector_eigenvalues_zero_or_one {ι : Type*} [Fintype ι] [DecidableEq �
     linarith
 
 /-- The trace of a finite-dimensional orthogonal projector equals its rank. -/
-lemma trace_eq_rank_of_isProj {ι : Type*} [Fintype ι] [DecidableEq ι]
+lemma trace_eq_rank_of_isProj {ι : Type*} [Fintype ι]
     (P : MIPStarRE.Quantum.Op ι) (hP : MIPStarRE.Quantum.IsProj P) :
     P.trace = (P.rank : ℂ) := by
+  classical
   let p : ι → Prop := fun i => hP.isHermitian.eigenvalues i ≠ 0
   let indicator : ι → ℕ := fun i => if p i then 1 else 0
   have hp_nat : Fintype.card {i // p i} = ∑ i, indicator i := by
@@ -398,7 +401,7 @@ lifted finite-enumeration model. If all ranks vanish, then that carrier is
 empty, but `FiniteHilbertSpace` requires a nonempty carrier; in that degenerate
 branch we fall back to the one-point space `ULift Unit`. -/
 lemma projectiveLowRankSum_auxData_of_projectors {Outcome : Type uOutcome}
-    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
+    [Fintype Outcome] [Nonempty Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (R : Outcome → MIPStarRE.Quantum.Op ι)
     (hproj : ∀ a, MIPStarRE.Quantum.IsProj (R a))
@@ -429,13 +432,12 @@ lemma projectiveLowRankSum_auxData_of_projectors {Outcome : Type uOutcome}
 projector submeasurement `∑_a R_a ≤ I`. -/
 lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
+    [Fintype Outcome] [Nonempty Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 ≤ ζ)
     (R : OpFamily Outcome ι)
     (hR : RoundingToProjectorsWitness ψ A ζ R)
-    (hsum_total : ∑ a, R.outcome a = R.total)
     (hsum_le_one : ∑ a, R.outcome a ≤ (1 : MIPStarRE.Quantum.Op ι))
     (source_almost_projective :
       ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
@@ -456,7 +458,7 @@ lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
     have hproj := hR.projective a
     simpa [hproj.isHermitian.eq, hproj.idempotent] using
       (Matrix.posSemidef_conjTranspose_mul_self (R.outcome a)).nonneg
-  · simpa [Qa, QTotal, data] using hsum_total
+  · simpa [Qa, QTotal, data] using hR.sum_eq_total
   · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily R)
       (2 * spectralTruncationError ζ) (roundingToProjectiveError ζ)
@@ -481,7 +483,7 @@ spectral construction in the nonempty case. -/
 private lemma rankReduction_emptyOutcome
     {Outcome : Type uOutcome} {ι : Type uι}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    [Fintype Outcome] [DecidableEq Outcome] [IsEmpty Outcome]
+    [Fintype Outcome] [IsEmpty Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error) :
     ∃ data : QLayerData Outcome ι,
@@ -503,30 +505,39 @@ projective measurement `T_a`, so that `Q_a` remains close to `A_a`, its total
 stays bounded by `(1 + 2√ζ)I`, and the auxiliary dimension is at most the
 original ambient dimension.
 
-The auxiliary-space-and-`T` data `(auxSpace, t, hAuxDim)` is taken as explicit
-caller-supplied parameters rather than via a dedicated `*BridgePackage` wrapper.
-In the paper (orthonormalization.tex), Lem 5.5 itself only produces `{Q_a}`;
-the auxiliary space `ℂ^m` and the projective measurement
+This theorem starts from a chosen rounded family `R_a` carrying the explicit
+witness `RoundingToProjectorsWitness ψ A ζ q`; equivalently, it consumes a
+concrete witness of the statement `projectiveNonMeasurement ψ A ζ`. In the
+paper (orthonormalization.tex), Lem 5.5 begins exactly from the family `R_a`
+supplied by `lem:projective-non-measurement`, so the downstream QXP layer now
+threads that witness directly instead of passing through a separate bridge
+package.
+
+The auxiliary space `ℂ^m` and the projective measurement
 `T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent
 "Matrix decomposition of `Q_a`" definition (orthonormalization.tex:777-795).
 Below, `projectiveLowRankSum_of_projectors` materialises these data from an
 exact projector submeasurement `R` satisfying `∑_a R_a ≤ I`, using the
 spectral theorem to prove the matrix identity `rank R_a = trace R_a` and hence
-`∑_a rank(R_a) ≤ dim(ι)`. The public theorem `projectiveLowRankSum` still keeps
-`(auxSpace, t, hAuxDim)` explicit because `hbridge` only supplies the weaker
-bound `∑_a R_a ≤ (1 + 2√ζ)I`. The broader downstream `QXPLayerData` pipeline
-also still lacks a complex-matrix SVD API, as tracked in issue #525. -/
+`∑_a rank(R_a) ≤ dim(ι)`. The public theorem `projectiveLowRankSum` still
+keeps `(auxSpace, t, hAuxDim)` explicit because the remaining `r > d`
+truncation branch from orthonormalization.tex:559-658 has not yet been
+formalized; `RoundingToProjectorsWitness` only gives the weaker bound
+`∑_a q_a ≤ (1 + 2√ζ)I` (issue #651). The broader downstream `QXPLayerData`
+pipeline still lacks a concrete `X / XHat / P` producer because Mathlib has no
+general complex-matrix SVD API (issue #652). -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 ≤ ζ)
-    (hbridge : ProjectiveNonMeasurementBridgePackage ψ A ζ)
-    -- TODO(#525): Materialise `(auxSpace, t, hAuxDim)` from the paper's
-    -- "Matrix decomposition of `Q_a`" (orthonormalization.tex:777-795),
-    -- i.e. from a 1-eigenspace ONB for each rounded projector `q.outcome a`
-    -- produced by `hbridge.fromSourceAlmostProjective` (the paper's `R_a`).
+    (q : OpFamily Outcome ι)
+    (hrounded : RoundingToProjectorsWitness ψ A ζ q)
+    -- TODO(#651): Eliminate the explicit `(auxSpace, t, hAuxDim)` parameters
+    -- by formalizing the paper's `r > d` truncation branch
+    -- (orthonormalization.tex:559-658), or equivalently by strengthening the
+    -- rounded-family input to an exact projector submeasurement `∑_a q_a ≤ I`.
     (auxSpace : FiniteHilbertSpace.{uι})
     (t : ProjMeas Outcome auxSpace.carrier)
     (hAuxDim : Fintype.card auxSpace.carrier ≤ Fintype.card ι)
@@ -536,8 +547,7 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
       RankReductionWitness ψ A ζ data := by
   classical
   by_cases hOutcome : Nonempty Outcome
-  · obtain ⟨q, hrounded, hsum⟩ := hbridge.fromSourceAlmostProjective source_almost_projective
-    let data : QLayerData Outcome ι :=
+  · let data : QLayerData Outcome ι :=
       { auxSpace := auxSpace
         q := q
         t := t }
@@ -549,7 +559,7 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
       have hproj := hrounded.projective a
       simpa [hproj.isHermitian.eq, hproj.idempotent] using
         (Matrix.posSemidef_conjTranspose_mul_self (q.outcome a)).nonneg
-    · simpa [Qa, QTotal, data] using hsum
+    · simpa [Qa, QTotal, data] using hrounded.sum_eq_total
     · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
         (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily q)
         (2 * spectralTruncationError ζ) (roundingToProjectiveError ζ)

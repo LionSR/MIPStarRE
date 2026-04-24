@@ -14,10 +14,27 @@ Files reviewed:
 - `MIPStarRE/LDT/GlobalVariance/MatrixRealization.lean`
 - `MIPStarRE/LDT/GlobalVariance/Theorems.lean`
 
-Build check:
+At the time of this audit, the Chapter 5 expansion side still lived in the
+monolithic files `ExpansionHypercubeGraph/Defs.lean` and
+`ExpansionHypercubeGraph/Theorems.lean`. On current `main`, those modules have
+been split into `ExpansionHypercubeGraph/Defs/{Core,Fourier,Characters}.lean`
+and `ExpansionHypercubeGraph/Theorems/{Foundations,Matrix,Results}.lean`.
 
-- `lake build MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems` succeeds, with `sorry` warnings in `ExpansionHypercubeGraph/Theorems.lean`.
-- `lake build MIPStarRE.LDT.GlobalVariance.Theorems` succeeds, with `sorry` warnings in both `ExpansionHypercubeGraph/Theorems.lean` and `GlobalVariance/Theorems.lean`.
+Historical build check at audit time:
+
+- `lake build MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems` succeeded, with `sorry` warnings in the then-monolithic `ExpansionHypercubeGraph/Theorems.lean`.
+- `lake build MIPStarRE.LDT.GlobalVariance.Theorems` succeeded, with `sorry` warnings in the then-monolithic `ExpansionHypercubeGraph/Theorems.lean` and `GlobalVariance/Theorems.lean`.
+
+> **Update (2026-04-23):** The specific Chapter 5 debts targeted by old issue
+> #452 are no longer current on `main`. In particular, the old
+> `EigenvectorsStatement` / `LaplacianSpectralGapStatement` wrappers were
+> removed, `fourierBasisInnerProduct` is now derived from the actual Fourier
+> basis, `matrixLocalRewrite` / `matrixGlobalRewrite` / `matrixLocalToGlobal`
+> are proved, and `globalRewrite` now uses the operational
+> `canonicalGlobalVarianceDecomposition` witness rather than `default`. The
+> broader memo below should therefore be read as a historical scouting snapshot
+> except where it explicitly calls out still-live Chapter 6 global-variance
+> debt.
 
 ## Executive summary
 
@@ -25,8 +42,8 @@ Build check:
 - The paper has 22 labels in `expansion.tex`; 12 of them reappear verbatim in the blueprint and 10 do not.
 - The missing labels are almost entirely proof-granularity artifacts: section labels, item labels inside propositions, and intermediate equations.
 - The blueprint statements generally match the paper statements well, but the proofs are much more compressed and omit several nontrivial intermediate equalities that matter for a Lean implementation.
-- On the Lean side, the Fourier/spectral setup in `ExpansionHypercubeGraph/Defs.lean` is fairly substantial and free of `sorry`, but the chapter-level theorem layer still has key `sorry` gaps.
-- `GlobalVariance/Defs.lean` has a good abstract API, but the theorem layer still has many `sorry` sites, and the matrix-realization layer is a deliberate placeholder in a few places rather than a literal transcription of the paper.
+- Historical note: on the Lean side, the Fourier/spectral setup in the then-monolithic `ExpansionHypercubeGraph/Defs.lean` was already substantial and free of `sorry`, while the theorem layer still had key `sorry` gaps. On current `main`, the issue-452-specific Chapter 5 theorem debts discussed below are resolved in the split files `Defs/Fourier.lean` and `Theorems/{Foundations,Matrix,Results}.lean`.
+- On current `main`, `GlobalVariance/Defs.lean` still has a good abstract API, but the theorem layer still has many `sorry` sites, and the matrix-realization layer is still a deliberate placeholder in a few places rather than a literal transcription of the paper.
 
 ## 1. Expansion in the hypercube graph
 
@@ -150,59 +167,73 @@ Gap:
 
 ### 1.4 Lean coverage and proof-structure assessment
 
-#### `MIPStarRE/LDT/ExpansionHypercubeGraph/Defs.lean`
+> **Historical snapshot.** This subsection records the state of the Chapter 5
+> Lean files at the time of the original audit, before the later file split and
+> proof-completion work. On current `main`, the monolithic files
+> `ExpansionHypercubeGraph/Defs.lean` and `ExpansionHypercubeGraph/Theorems.lean`
+> have been split into `Defs/{Core,Fourier,Characters}.lean` and
+> `Theorems/{Foundations,Matrix,Results}.lean`.
 
-What is present:
+#### Historical monolithic path: `MIPStarRE/LDT/ExpansionHypercubeGraph/Defs.lean`
+Current descendants on `main`: `Defs/Core.lean`, `Defs/Fourier.lean`, `Defs/Characters.lean`
+
+What was present at audit time:
 
 - The basic graph/distribution objects are defined: `rerandomizeCoord`, `independentPointPair`, `adjacency`, `laplacian`, `localVariance`, `globalVariance`.
 - Fourier objects are defined explicitly: `addCharFq`, `dotProductFq`, `fourierBasisState`, `adjacencyEigenvalue`, `laplacianEigenvalue`, `hypercubeSpectralGap`.
 - Theorems `eigenvectors` and `laplacianSpectralGap` are fully proved without `sorry`.
 
-Where the proof structure matches the paper:
+Where the proof structure matched the paper at audit time:
 
 - The eigenvector calculation really does go through the adjacency matrix action and the rerandomization update sum.
 - The proof uses supporting character-sum lemmas in the same general way as the paper's Fourier argument.
 - The spectral gap proof packages the relation between adjacency and Laplacian eigenvalues and identifies the gap at Hamming weight `1`.
 
-Where it diverges from the paper:
+Where it diverged from the paper at audit time:
 
 - `laplacianRewrite` is not proved by expansion of marginals as in the paper; `laplacianDifferenceForm` is simply defined to be `laplacian`, so the theorem in `Theorems.lean` is `rfl`.
-- `fourierBasisInnerProduct` is itself defined as `if α = β then 1 else 0`, and `eigenvectors.orthonormality` is proved by `rfl`. So the orthogonality statement is packaged, but not derived from the actual vector formula `fourierBasisState`.
+- Historical note (resolved on current `main`): `fourierBasisInnerProduct` was itself defined as `if α = β then 1 else 0`, and `eigenvectors.orthonormality` was proved by `rfl`. On current `main`, this orthogonality statement is derived from the actual vector formula in `Defs/Fourier.lean`.
 - `laplacianSpectralGap` does not literally state "`\lambda_1 = 0` and `\lambda_2 = 1/(mM)`"; instead it provides a more usable package:
   - `eigenvalueRelation`
   - `positiveModesLowerBound`
   - `unitWeightModesAttainGap`
   This is enough for the later expansion argument, but it is not a direct formalization of the paper's sorted-spectrum statement.
 
-#### `MIPStarRE/LDT/ExpansionHypercubeGraph/MatrixRealization.lean`
+#### Historical path (still current): `MIPStarRE/LDT/ExpansionHypercubeGraph/MatrixRealization.lean`
 
-What is present:
+What was present at audit time:
 
 - Concrete matrix-level versions of local/global variance, the combined operator, and the trace witnesses.
 - Matrix statement packages `MatrixLocalRewriteStatement` and `MatrixGlobalRewriteStatement`.
 
-Gap relative to the paper:
+Historical gap relative to the paper:
 
-- The matrix layer records the trace witnesses but does not prove the rewrite lemmas.
-- The global trace witness is phrased via the orthogonal projector `I - |φ_0><φ_0|`, not via an explicit decomposition `|φ_\perp> \ot A_\perp`.
+- The matrix layer recorded the trace witnesses but did not yet prove the rewrite lemmas.
+- The global trace witness was phrased via the orthogonal projector `I - |φ_0><φ_0|`, not via an explicit decomposition `|φ_\perp> \ot A_\perp`.
 
-#### `MIPStarRE/LDT/ExpansionHypercubeGraph/Theorems.lean`
+Current status (2026-04-23):
 
-`sorry` sites:
+- The rewrite lemmas are now proved in `ExpansionHypercubeGraph/Theorems/Results.lean`.
+- The remaining representational difference discussed here is the projector-form witness rather than a literal `|φ_\perp> \ot A_\perp` tensor factor.
 
-- `matrixLocalToGlobal` at line 90
-- `matrixLocalRewrite` at line 96
-- `matrixGlobalRewrite` at line 102
+#### Historical monolithic path: `MIPStarRE/LDT/ExpansionHypercubeGraph/Theorems.lean`
+Current descendants on `main`: `Theorems/Foundations.lean`, `Theorems/Matrix.lean`, `Theorems/Results.lean`
+
+Historical `sorry` sites before the theorem split:
+
+- `matrixLocalToGlobal` (now in `ExpansionHypercubeGraph/Theorems/Results.lean`; line 90 of the old monolithic file)
+- `matrixLocalRewrite` (now in `ExpansionHypercubeGraph/Theorems/Results.lean`; line 96 of the old monolithic file)
+- `matrixGlobalRewrite` (now in `ExpansionHypercubeGraph/Theorems/Results.lean`; line 102 of the old monolithic file)
 
 Consequences:
 
-- The public chapter theorems `localToGlobal`, `localRewrite`, and `globalRewrite` are only wrappers around these unfinished matrix lemmas.
-- So the blueprint-facing theorems exist and compile, but the core proofs for the chapter are still missing.
+- Historical note: at the time of this audit, the public chapter theorems `localToGlobal`, `localRewrite`, and `globalRewrite` were only wrappers around unfinished matrix lemmas.
+- Current status (2026-04-23): these matrix lemmas are now proved, so the blueprint-facing theorems are no longer scaffolding.
 
 Proof-structure match assessment:
 
 - `localToGlobal` wrapper matches the paper's intended structure: reduce to a matrix model, then compare local and global forms.
-- `globalRewrite` is materially weaker than the paper's proof structure. The statement only asks for existence of a decomposition, and the wrapper uses `default` as a witness because the underlying theorem only proves equality of trace forms, not a concrete decomposition tied to `A_{\mathrm{comb}} = |φ_0> \ot A_0 + |φ_\perp> \ot A_\perp`.
+- Historical note: the old `globalRewrite` mismatch is resolved on current `main`. The theorem still packages the paper's displayed decomposition as `∃ decomp`, but the witness is now `canonicalGlobalVarianceDecomposition params A`, and `globalVarianceTraceWitness` consumes that centered-family decomposition rather than `default`.
 
 ### 1.5 Nontrivial intermediate equations in the paper
 
@@ -413,8 +444,8 @@ The main blueprint gap is proof granularity:
 Expansion chapter:
 
 - Definitions and spectral infrastructure are fairly advanced.
-- The chapter's main Fourier/spectral content is partially formalized in `Defs.lean`.
-- The actual chapter theorem wrappers still depend on three matrix-level `sorry`s.
+- Historical note: at audit time, the chapter's main Fourier/spectral content lived in the monolithic `Defs.lean` and the theorem wrappers still depended on three matrix-level `sorry`s.
+- Current status (2026-04-23): those Chapter 5 theorem `sorry`s are resolved in the split files `Defs/Fourier.lean` and `Theorems/{Foundations,Matrix,Results}.lean`.
 
 Variance chapter:
 
@@ -424,14 +455,14 @@ Variance chapter:
 
 ### Priority gaps if the goal is to close Chapters 05-06
 
-1. Finish the matrix realization proofs in `ExpansionHypercubeGraph/Theorems.lean`:
-   - `matrixLocalRewrite`
-   - `matrixGlobalRewrite`
-   - `matrixLocalToGlobal`
+1. ~~Finish the matrix realization proofs in the Chapter 5 theorem layer (historically `ExpansionHypercubeGraph/Theorems.lean`, now `ExpansionHypercubeGraph/Theorems/Results.lean`)~~ **Resolved on current `main`**:
+   - ~~`matrixLocalRewrite`~~
+   - ~~`matrixGlobalRewrite`~~
+   - ~~`matrixLocalToGlobal`~~
 
-2. Strengthen the expansion-side formalization so it matches the paper more literally:
-   - derive orthogonality from `fourierBasisState`, rather than defining `fourierBasisInnerProduct` by fiat
-   - connect `globalRewrite` to an actual decomposition witness instead of `default`
+2. ~~Strengthen the expansion-side formalization so it matches the paper more literally~~ **Resolved for the old Chapter 5 blocker**:
+   - ~~derive orthogonality from `fourierBasisState`, rather than defining `fourierBasisInnerProduct` by fiat~~
+   - ~~connect `globalRewrite` to an actual decomposition witness instead of `default`~~
 
 3. Replace placeholders in `GlobalVariance/MatrixRealization.lean`:
    - use the actual square root `(G_g)^{1/2}`

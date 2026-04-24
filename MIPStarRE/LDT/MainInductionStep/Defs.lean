@@ -167,7 +167,10 @@ structure IsGood {params : Parameters}
 
 end RestrictedSymStrat
 
-private def axisLinePolynomialEquiv (params : Parameters) [FieldModel params.q] (x : Fq params) :
+/-- Equivalence between slice and ambient axis-line polynomials at a fixed height `x`:
+`liftAxisAnswer` sends a slice polynomial to its ambient lift, with
+`AxisLinePolynomial.restrictAtHeight` as inverse. -/
+def axisLinePolynomialEquiv (params : Parameters) [FieldModel params.q] (x : Fq params) :
     AxisLinePolynomial params ≃ AxisLinePolynomial params.next where
   toFun := liftAxisAnswer params x
   invFun := fun f => AxisLinePolynomial.restrictAtHeight params f x
@@ -217,16 +220,6 @@ noncomputable def restrictAxisParallelMeasurement (params : Parameters) [FieldMo
           rfl }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
-@[simp] private theorem reparamAtEquiv_symm_liftAxisAnswer
-    (params : Parameters) [FieldModel params.q]
-    (x t : Fq params) (f : AxisLinePolynomial params) :
-    ((AxisLinePolynomial.reparamAtEquiv (params := params.next) t).symm
-        (liftAxisAnswer params x f)) =
-      liftAxisAnswer params x
-        (((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm) f) := by
-  apply AxisLinePolynomial.ext
-  rfl
-
 private theorem restrictAxisParallelMeasurement_transportInvariant
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
@@ -262,7 +255,7 @@ private theorem restrictAxisParallelMeasurement_transportInvariant
     _ = (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).outcome
           (liftAxisAnswer params x
             (((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm) a)) := by
-            simp
+            simp [liftAxisAnswer]
     _ = (restrictAxisParallelMeasurement params strategy x ℓ).outcome
           (((AxisLinePolynomial.reparamAtEquiv (params := params) t).symm) a) := by
             rfl
@@ -440,22 +433,12 @@ noncomputable def tensorFailureExpectation {Outcome : Type*}
 noncomputable def sliceTransverseDirectionWeight (params : Parameters) : Error :=
   (params.m : Error) / (((params.m + 1 : ℕ) : Error))
 
-/-- Reciprocal loss incurred when conditioning away the new axis direction. -/
+/-- Reciprocal loss incurred when conditioning away the new axis direction.
+
+In `lem:restricted-probabilities`, the axis-parallel and diagonal branches use
+this same conditioning step, so both averaged slice bounds carry the paper's
+common factor `((m + 1) / m)`. -/
 noncomputable def sliceConditioningLoss (params : Parameters) : Error :=
   (((params.m + 1 : ℕ) : Error) / (params.m : Error))
-
-/-- The paper-faithful diagonal conditioning weight matches the axis-parallel
-branch: one conditions away the new coordinate direction, which occurs with
-probability `m / (m + 1)`.
-
-Note: `references/ldt-paper/inductive_step.tex` uses the same `((m + 1) / m)`
-loss for both the axis-parallel and diagonal branches (around line 374). The
-earlier `q`-based model was only a temporary placeholder. -/
-noncomputable def sliceDiagonalDirectionWeight (params : Parameters) : Error :=
-  sliceTransverseDirectionWeight params
-
-/-- Reciprocal loss incurred by the paper-faithful diagonal conditioning step. -/
-noncomputable def sliceDiagonalConditioningLoss (params : Parameters) : Error :=
-  sliceConditioningLoss params
 
 end MIPStarRE.LDT.MainInductionStep

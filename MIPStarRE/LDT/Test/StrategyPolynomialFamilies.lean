@@ -18,25 +18,67 @@ namespace MIPStarRE.LDT
 The `witness` and `dominationTarget` fields store the per-slice PSD operator
 `Z^x` and per-slice, per-polynomial operator `E_u A^{u,x}_{g(u)}` appearing in
 the paper's boundedness hypothesis (`references/ldt-paper/commutativity-G.tex`,
-item `data-processed-boundedness`). Their stored defaults use the slice
-submeasurement itself — `total` dominates every per-polynomial outcome — which
-is PSD, non-vacuous, and satisfies `sliceOpPSD` and `sliceDominatesTarget`
-without any additional hypothesis.
+item `data-processed-boundedness`). We store these operators explicitly rather
+than hiding them behind ambient defaults, so each constructor must choose an
+honest witness/target pair.
 
-Callers with access to a symmetric strategy should prefer the paper-faithful
-smart constructor `ofSymStrat`, which ties `dominationTarget` to the averaged
-slice-point evaluation operator `E_u A^{u,x}_{g(u)}` from the paper. -/
+Callers without access to an ambient strategy can use `ofSliceMeas`, which takes
+`Z^x := ∑_g G^x_g` and `dominationTarget x g := G^x_g`. Callers with access to a
+symmetric strategy should prefer the paper-facing constructor `ofSymStrat`,
+which derives both fields from the strategy itself. -/
 structure IdxPolyFamily (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   meas : IdxProjSubMeas (Fq params) (Polynomial params) ι
-  witness : Fq params → MIPStarRE.Quantum.Op ι := fun x => (meas x).toSubMeas.total
-  dominationTarget : Fq params → Polynomial params → MIPStarRE.Quantum.Op ι :=
-    fun x g => (meas x).toSubMeas.outcome g
+  witness : Fq params → MIPStarRE.Quantum.Op ι
+  dominationTarget : Fq params → Polynomial params → MIPStarRE.Quantum.Op ι
 
 -- NOTE: no global `Inhabited` instance for `IdxPolyFamily`; without an actual
 -- slice family, any default would be a degenerate zero-family placeholder.
 
 namespace IdxPolyFamily
+
+/-- Honest local constructor when only the slice family `x ↦ G^x` is available.
+
+This uses the slice total `∑_g G^x_g` as the witness operator and the concrete
+outcome `G^x_g` as the domination target. -/
+def ofSliceMeas {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι) :
+    IdxPolyFamily params ι where
+  meas := meas
+  witness := fun x => (meas x).toSubMeas.total
+  dominationTarget := fun x g => (meas x).toSubMeas.outcome g
+
+@[simp] lemma ofSliceMeas_meas {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι) :
+    (ofSliceMeas meas).meas = meas := rfl
+
+@[simp] lemma ofSliceMeas_witness {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (x : Fq params) :
+    (ofSliceMeas meas).witness x = (meas x).toSubMeas.total := rfl
+
+@[simp] lemma ofSliceMeas_dominationTarget {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (x : Fq params) (g : Polynomial params) :
+    (ofSliceMeas meas).dominationTarget x g = (meas x).toSubMeas.outcome g := rfl
+
+theorem ofSliceMeas_dominationTarget_le_witness {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (x : Fq params) (g : Polynomial params) :
+    (ofSliceMeas meas).dominationTarget x g ≤ (ofSliceMeas meas).witness x := by
+  simpa using ((meas x).toSubMeas.outcome_le_total g)
+
+theorem ofSliceMeas_sliceDominatesTarget {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (x : Fq params) (g : Polynomial params) :
+    0 ≤ (ofSliceMeas meas).witness x - (ofSliceMeas meas).dominationTarget x g := by
+  exact sub_nonneg.mpr (ofSliceMeas_dominationTarget_le_witness meas x g)
 
 /-- The averaged submeasurement `G = E_x G^x`: average the slice
 measurements over the uniform distribution on slice heights `x ∈ F_q`. -/
@@ -118,19 +160,76 @@ noncomputable def averagedSlicePointEvaluationOperator {params : Parameters}
   averageOperatorOverDistribution' (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
 
-/-- Paper-faithful smart constructor: bundle a slice submeasurement with a
-symmetric strategy to obtain the `IdxPolyFamily` whose `dominationTarget` is the
-averaged slice-point evaluation operator `E_u A^{u,x}_{g(u)}` from
-`references/ldt-paper/commutativity-G.tex`. The `witness` field is set to the
-identity operator, which is a valid PSD upper bound on every `dominationTarget`
-slice (the paper only requires such a `Z^x` to exist). -/
+/-- Slice-wise averaged total operator `E_u \sum_a A^{u,x}_a`.
+
+For a genuine symmetric strategy this simplifies to `1`, but keeping the
+strategy-shaped formula explicit records where the witness comes from. -/
+noncomputable def averagedSliceTotalOperator {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι) (x : Fq params) : MIPStarRE.Quantum.Op ι :=
+  averageOperatorOverDistribution' (uniformDistribution (Point params))
+    (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.total)
+
+theorem averagedSliceTotalOperator_nonneg {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    0 ≤ averagedSliceTotalOperator strategy x := by
+  unfold averagedSliceTotalOperator averageOperatorOverDistribution'
+  exact Finset.sum_nonneg fun u _ =>
+    smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
+      ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.total_nonneg)
+
+@[simp] theorem averagedSliceTotalOperator_eq_one {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    averagedSliceTotalOperator strategy x = 1 := by
+  unfold averagedSliceTotalOperator averageOperatorOverDistribution'
+  calc
+    ∑ u ∈ (uniformDistribution (Point params)).support,
+        (uniformDistribution (Point params)).weight u •
+          (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.total
+      = ∑ u ∈ (uniformDistribution (Point params)).support,
+          (uniformDistribution (Point params)).weight u • (1 : MIPStarRE.Quantum.Op ι) := by
+            apply Finset.sum_congr rfl
+            intro u _
+            have htotal :
+                (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.total =
+                  (1 : MIPStarRE.Quantum.Op ι) := by
+              simpa using (strategy.pointMeasurement (appendPoint params u x)).total_eq_one
+            rw [htotal]
+    _ = (∑ u ∈ (uniformDistribution (Point params)).support,
+          (uniformDistribution (Point params)).weight u) • (1 : MIPStarRE.Quantum.Op ι) := by
+          rw [Finset.sum_smul]
+    _ = 1 := by
+          rw [uniformDistribution_weight_sum_eq_one (Point params), one_smul]
+
+theorem averagedSlicePointEvaluationOperator_le_averagedSliceTotalOperator
+    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι) (x : Fq params) (g : Polynomial params) :
+    averagedSlicePointEvaluationOperator strategy x g ≤ averagedSliceTotalOperator strategy x := by
+  unfold averagedSlicePointEvaluationOperator averagedSliceTotalOperator averageOperatorOverDistribution'
+  exact Finset.sum_le_sum fun u _ =>
+    smul_le_smul_of_nonneg_left
+      ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome_le_total (g u))
+      ((uniformDistribution (Point params)).nonnegative u)
+
+/-- Paper-facing constructor: bundle a slice submeasurement with a symmetric
+strategy so that both the domination target and the witness are derived from the
+strategy itself.
+
+Concretely, `dominationTarget x g` is the averaged slice-point evaluation
+operator `E_u A^{u,x}_{g(u)}` from `references/ldt-paper/commutativity-G.tex`,
+and `witness x` is the corresponding averaged slice-total operator
+`E_u \sum_a A^{u,x}_a`. Since point measurements are genuine measurements, this
+witness simplifies to `1`, but its stored definition keeps the provenance
+explicit. -/
 noncomputable def ofSymStrat {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι)
     (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι) :
     IdxPolyFamily params ι where
   meas := meas
-  witness := fun _ => 1
+  witness := averagedSliceTotalOperator strategy
   dominationTarget := fun x g => averagedSlicePointEvaluationOperator strategy x g
 
 @[simp] lemma ofSymStrat_meas {params : Parameters} [FieldModel params.q]
@@ -139,12 +238,20 @@ noncomputable def ofSymStrat {params : Parameters} [FieldModel params.q]
     (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι) :
     (ofSymStrat strategy meas).meas = meas := rfl
 
+theorem ofSymStrat_witness_eq_averagedSliceTotalOperator {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι)
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (x : Fq params) :
+    (ofSymStrat strategy meas).witness x = averagedSliceTotalOperator strategy x := rfl
+
 @[simp] lemma ofSymStrat_witness {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι)
     (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
     (x : Fq params) :
-    (ofSymStrat strategy meas).witness x = 1 := rfl
+    (ofSymStrat strategy meas).witness x = 1 := by
+  simp [ofSymStrat_witness_eq_averagedSliceTotalOperator]
 
 @[simp] lemma ofSymStrat_dominationTarget {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -153,6 +260,23 @@ noncomputable def ofSymStrat {params : Parameters} [FieldModel params.q]
     (x : Fq params) (g : Polynomial params) :
     (ofSymStrat strategy meas).dominationTarget x g =
       averagedSlicePointEvaluationOperator strategy x g := rfl
+
+theorem ofSymStrat_dominationTarget_le_witness {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι)
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (x : Fq params) (g : Polynomial params) :
+    (ofSymStrat strategy meas).dominationTarget x g ≤ (ofSymStrat strategy meas).witness x := by
+  simpa [ofSymStrat_witness_eq_averagedSliceTotalOperator] using
+    averagedSlicePointEvaluationOperator_le_averagedSliceTotalOperator strategy x g
+
+theorem ofSymStrat_sliceDominatesTarget {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι)
+    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (x : Fq params) (g : Polynomial params) :
+    0 ≤ (ofSymStrat strategy meas).witness x - (ofSymStrat strategy meas).dominationTarget x g := by
+  exact sub_nonneg.mpr (ofSymStrat_dominationTarget_le_witness strategy meas x g)
 
 structure Complete {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
