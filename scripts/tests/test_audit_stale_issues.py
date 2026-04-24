@@ -152,6 +152,20 @@ class LineIsSorryTests(unittest.TestCase):
             f.write_text("only one line\n")
             self.assertIsNone(line_is_sorry(f, 9))
 
+    def test_ignores_sorry_in_line_comment(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            f = root / "x.lean"
+            f.write_text("theorem a : 1 = 1 := rfl -- was sorry\n")
+            self.assertFalse(line_is_sorry(f, 1))
+
+    def test_sees_sorry_before_trailing_comment(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            f = root / "x.lean"
+            f.write_text("theorem b : True := by sorry -- TODO close\n")
+            self.assertTrue(line_is_sorry(f, 1))
+
 
 class AuditIssueTests(unittest.TestCase):
     def test_flags_missing_file_missing_decl_and_resolved_sorry(self) -> None:
@@ -184,6 +198,24 @@ class AuditIssueTests(unittest.TestCase):
                 [("MIPStarRE/LDT/Fake/Live.lean", 6)],
             )
             self.assertEqual(report.missing_decls, ["ghost_lemma"])
+
+    def test_flags_out_of_range_line_as_stale(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _make_fake_repo(root)
+            decl_index = build_decl_index(root / "MIPStarRE")
+            issue = {
+                "number": 99,
+                "title": "past-EOF citation",
+                "url": "",
+                "body": "Out of range: `MIPStarRE/LDT/Fake/Live.lean:9999`.",
+            }
+            report = audit_issue(issue, root, decl_index)
+            self.assertTrue(report.is_flagged)
+            self.assertEqual(
+                report.non_sorry_lines,
+                [("MIPStarRE/LDT/Fake/Live.lean", 9999)],
+            )
 
     def test_not_flagged_when_all_citations_resolve(self) -> None:
         with tempfile.TemporaryDirectory() as td:
@@ -229,12 +261,14 @@ class RenderReportTests(unittest.TestCase):
 
 
 class SelfTestCLITests(unittest.TestCase):
-    def test_self_test_passes_on_real_repo(self) -> None:
-        repo_root = SCRIPT_DIR.parent
-        exit_code = main(
-            ["--repo-root", str(repo_root), "--self-test"]
-        )
-        self.assertEqual(exit_code, 0)
+    def test_self_test_passes_on_fake_repo(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _make_fake_repo(root)
+            exit_code = main(
+                ["--repo-root", str(root), "--self-test"]
+            )
+            self.assertEqual(exit_code, 0)
 
 
 if __name__ == "__main__":

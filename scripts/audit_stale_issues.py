@@ -167,8 +167,8 @@ def extract_decl_citations(body: str) -> list[DeclCitation]:
         name = m.group(1)
         if name in _DECL_STOPLIST or name in seen:
             continue
-        # Require at least one lowercase or digit — pure UPPER backtick items
-        # (e.g. `SDDRel`) are fine, but we drop obvious sentence starts like
+        # Require at least one lowercase or digit; purely uppercase backtick
+        # items are dropped, which helps exclude obvious sentence starts like
         # `The`.  This is a soft filter.
         if not any(c.islower() or c.isdigit() for c in name):
             continue
@@ -200,7 +200,9 @@ def line_is_sorry(path: Path, line_no: int) -> bool | None:
     """Return True/False if ``path:line_no`` still contains a ``sorry``/``admit``.
 
     Returns ``None`` if the file can't be read or the line number is out of
-    range.
+    range.  Single-line ``--`` comments are stripped before matching so that
+    commented-out mentions (``-- sorry``) don't masquerade as active sorry
+    sites.
     """
     try:
         text = path.read_text(errors="replace")
@@ -209,7 +211,8 @@ def line_is_sorry(path: Path, line_no: int) -> bool | None:
     lines = text.splitlines()
     if line_no < 1 or line_no > len(lines):
         return None
-    return _SORRY_LINE_RE.search(lines[line_no - 1]) is not None
+    line = lines[line_no - 1].split("--", 1)[0]
+    return _SORRY_LINE_RE.search(line) is not None
 
 
 # ---------------------------------------------------------------------------
@@ -243,7 +246,11 @@ def audit_issue(
             continue
         if fc.line is not None:
             sorry = line_is_sorry(full, fc.line)
-            if sorry is False:
+            # Treat both an explicit "no sorry on this line" (False) and an
+            # out-of-range line number (None) as stale: trackers drift as
+            # files are edited, and a citation past EOF is exactly the kind
+            # of stale reference this audit is meant to surface.
+            if sorry is not True:
                 report.non_sorry_lines.append((fc.path, fc.line))
 
     for dc in decl_cites:
