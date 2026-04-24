@@ -1206,7 +1206,6 @@ private lemma gHatPairProduct_sddOpRel_quadFirstTwo
 private lemma commuteGHalfSandwich_error_bound
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error) (k : ℕ)
-    (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_nonneg : 0 ≤ zeta)
     (hzeta_le : zeta ≤ 1) :
     3 * (k : Error) *
@@ -1216,12 +1215,24 @@ private lemma commuteGHalfSandwich_error_bound
     Real.rpow gamma (1 / (16 : Error)) +
       Real.rpow zeta (1 / (16 : Error)) +
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
+  have hγterm_nonneg : 0 ≤ Real.rpow gamma (1 / (16 : Error)) := by
+    by_cases hγ : 0 ≤ gamma
+    · exact Real.rpow_nonneg hγ _
+    · have hγlt : gamma < 0 := lt_of_not_ge hγ
+      have hnegexpr : 0 ≤ gamma ^ (1 / (16 : Error)) := by
+        rw [Real.rpow_def_of_neg hγlt]
+        refine mul_nonneg (by positivity) ?_
+        have hcos_pos : 0 < Real.cos ((1 / (16 : Error)) * Real.pi) := by
+          apply Real.cos_pos_of_mem_Ioo
+          constructor <;> nlinarith [Real.pi_pos]
+        simpa [mul_comm] using hcos_pos.le
+      simpa using hnegexpr
   have hS_nonneg : 0 ≤ S := by
     have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
     dsimp [S]
     exact add_nonneg
       (add_nonneg
-        (Real.rpow_nonneg hgamma_nonneg (1 / (16 : Error)))
+        hγterm_nonneg
         (Real.rpow_nonneg hzeta_nonneg (1 / (16 : Error))))
       (Real.rpow_nonneg hratio_nonneg (1 / (16 : Error)))
   have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
@@ -1232,12 +1243,26 @@ private lemma commuteGHalfSandwich_error_bound
       (Real.rpow_le_rpow_of_exponent_ge' hzeta_nonneg hzeta_le (by norm_num) hpow)
   have hzeta_term : zeta ≤ (params.m : Error) * S := by
     have hroot_le : Real.rpow zeta (1 / (16 : Error)) ≤ S := by
-      dsimp [S]
-      nlinarith [Real.rpow_nonneg hgamma_nonneg (1 / (16 : Error)),
-        Real.rpow_nonneg hzeta_nonneg (1 / (16 : Error)),
-        Real.rpow_nonneg
-          (by positivity : 0 ≤ ((params.d : Error) / (params.q : Error)))
-          (1 / (16 : Error))]
+      have hratio_nonneg :
+          0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
+        exact Real.rpow_nonneg (by positivity : 0 ≤ ((params.d : Error) / (params.q : Error))) _
+      have hsum1 :
+          Real.rpow zeta (1 / (16 : Error)) ≤
+            Real.rpow zeta (1 / (16 : Error)) +
+              Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
+        nlinarith [hratio_nonneg]
+      have hsum2 :
+          Real.rpow zeta (1 / (16 : Error)) +
+              Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) ≤ S := by
+        have :
+            Real.rpow zeta (1 / (16 : Error)) +
+                Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) ≤
+              Real.rpow gamma (1 / (16 : Error)) +
+                (Real.rpow zeta (1 / (16 : Error)) +
+                  Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))) := by
+          nlinarith [hγterm_nonneg]
+        simpa [S, add_assoc, add_left_comm, add_comm] using this
+      exact le_trans hsum1 hsum2
     have hm_mul : Real.rpow zeta (1 / (16 : Error)) ≤ (params.m : Error) * S := by
       have : S ≤ (params.m : Error) * S := by
         nlinarith
@@ -1487,33 +1512,6 @@ private def moveTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r 
     | succ j => rfl
   right_inv og := by
     cases og
-    rfl
-
-
-/-- Swap the first two `SliceQuestion` entries, leaving the tail tuple untouched. -/
-private def swapFirstTwoQuestionEquiv (params : Parameters) (r : ℕ) :
-    (SliceQuestion params × SliceQuestion params × PointTuple params r) ≃
-      (SliceQuestion params × SliceQuestion params × PointTuple params r) where
-  toFun q := (q.2.1, q.1, q.2.2)
-  invFun q := (q.2.1, q.1, q.2.2)
-  left_inv q := by
-    rcases q with ⟨x₁, x₂, xs⟩
-    rfl
-  right_inv q := by
-    rcases q with ⟨x₁, x₂, xs⟩
-    rfl
-
-/-- Swap the first two `GHatOutcome` entries, leaving the tail tuple untouched. -/
-private def swapFirstTwoOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
-    (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) ≃
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
-  toFun og := (og.2.1, og.1, og.2.2)
-  invFun og := (og.2.1, og.1, og.2.2)
-  left_inv og := by
-    rcases og with ⟨g₁, g₂, gs⟩
-    rfl
-  right_inv og := by
-    rcases og with ⟨g₁, g₂, gs⟩
     rfl
 
 private def firstSliceBackQuestionEquiv (params : Parameters) (r : ℕ) :
@@ -1859,186 +1857,6 @@ private lemma commuteGHalfSandwich_move_recursive_zero
           ((Fintype.card (Polynomial params) : Error) + 1) * ev ψbi 0) = 0 := by
     simp [avgOver, uniformDistribution, ev_zero]
   nlinarith [hzero]
-
-
-private lemma commuteGHalfSandwich_moveStepSource_eq_split
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
-    (commuteGHalfSandwich_moveSourceFamily params family (r + 1) q).outcome ogs =
-      (commuteGHalfSandwich_moveStepSourceFamily params family r
-        ((moveTailQuestionEquiv params r) q)).outcome
-        ((moveTailOutcomeEquiv params r) ogs) := by
-  simp [moveTailQuestionEquiv, moveTailOutcomeEquiv,
-    commuteGHalfSandwich_moveSourceFamily,
-    commuteGHalfSandwich_moveStepSourceFamily,
-    gHatHalfProductOutcomeOperator,
-    leftTensor_mul_leftTensor, mul_assoc]
-
-private lemma commuteGHalfSandwich_moveStepTarget_eq_split
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
-    (commuteGHalfSandwich_moveFamily params family (r + 1) q).outcome ogs =
-      (commuteGHalfSandwich_moveStepTargetFamily params family r
-        ((moveTailQuestionEquiv params r) q)).outcome
-        ((moveTailOutcomeEquiv params r) ogs) := by
-  simp [moveTailQuestionEquiv, moveTailOutcomeEquiv,
-    commuteGHalfSandwich_moveFamily,
-    commuteGHalfSandwich_moveStepTargetFamily,
-    gHatReverseHalfProductOutcomeOperator,
-    leftTensor_mul_leftTensor, rightTensor_mul_rightTensor, mul_assoc]
-
-private lemma commuteGHalfSandwich_moveStep_iff
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι) (r : ℕ) (δ : Error) :
-    SDDOpRel ψbi
-      (uniformDistribution
-        (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
-      (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
-      (commuteGHalfSandwich_moveFamily params family (r + 1))
-      δ ↔
-    SDDOpRel ψbi
-      (uniformDistribution
-        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (commuteGHalfSandwich_moveStepSourceFamily params family r)
-      (commuteGHalfSandwich_moveStepTargetFamily params family r)
-      δ := by
-  constructor
-  · intro h
-    have hq :=
-      (sddOpRel_uniform_equiv (moveTailQuestionEquiv params r) ψbi
-        (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
-        (commuteGHalfSandwich_moveFamily params family (r + 1)) δ).1 h
-    have ho := CommutativityPoints.sddOpRel_reindex (moveTailOutcomeEquiv params r)
-      ψbi
-      (uniformDistribution
-        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (fun q => commuteGHalfSandwich_moveSourceFamily params family (r + 1)
-        ((moveTailQuestionEquiv params r).symm q))
-      (fun q => commuteGHalfSandwich_moveFamily params family (r + 1)
-        ((moveTailQuestionEquiv params r).symm q))
-      δ hq
-    exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-      (uniformDistribution
-        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
-      _ _
-      (commuteGHalfSandwich_moveStepSourceFamily params family r)
-      (commuteGHalfSandwich_moveStepTargetFamily params family r)
-      δ
-      (fun q ogs => by
-        simpa [moveTailQuestionEquiv, moveTailOutcomeEquiv] using
-          commuteGHalfSandwich_moveStepSource_eq_split params family r
-            ((moveTailQuestionEquiv params r).symm q)
-            ((moveTailOutcomeEquiv params r).symm ogs))
-      (fun q ogs => by
-        simpa [moveTailQuestionEquiv, moveTailOutcomeEquiv] using
-          commuteGHalfSandwich_moveStepTarget_eq_split params family r
-            ((moveTailQuestionEquiv params r).symm q)
-            ((moveTailOutcomeEquiv params r).symm ogs))
-      ho
-  · intro h
-    have ho := CommutativityPoints.sddOpRel_reindex (moveTailOutcomeEquiv params r).symm
-      ψbi
-      (uniformDistribution
-        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (commuteGHalfSandwich_moveStepSourceFamily params family r)
-      (commuteGHalfSandwich_moveStepTargetFamily params family r)
-      δ h
-    have hq := CommutativityPoints.sddOpRel_congr_outcome ψbi
-      (uniformDistribution
-        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
-      _ _
-      (fun q => commuteGHalfSandwich_moveSourceFamily params family (r + 1)
-        ((moveTailQuestionEquiv params r).symm q))
-      (fun q => commuteGHalfSandwich_moveFamily params family (r + 1)
-        ((moveTailQuestionEquiv params r).symm q))
-      δ
-      (fun q ogs => by
-        simpa [moveTailQuestionEquiv, moveTailOutcomeEquiv] using
-          (commuteGHalfSandwich_moveStepSource_eq_split params family r
-            ((moveTailQuestionEquiv params r).symm q)
-            ogs).symm)
-      (fun q ogs => by
-        simpa [moveTailQuestionEquiv, moveTailOutcomeEquiv] using
-          (commuteGHalfSandwich_moveStepTarget_eq_split params family r
-            ((moveTailQuestionEquiv params r).symm q)
-            ogs).symm)
-      ho
-    exact (sddOpRel_uniform_equiv (moveTailQuestionEquiv params r) ψbi
-      (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
-      (commuteGHalfSandwich_moveFamily params family (r + 1)) δ).2 hq
-
-/-- Swap the first two completed-slice slots in the move stage, turning the
-`move` family pair into the `moveBack`/`commute` pair used in the flat chain. -/
-private lemma commuteGHalfSandwich_moveStage_swap
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι) (r : ℕ) (δ : Error)
-    (hmove : SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (commuteGHalfSandwich_moveSourceFamily params family r)
-      (commuteGHalfSandwich_moveFamily params family r)
-      δ) :
-    SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (commuteGHalfSandwich_moveBackFamily params family r)
-      (commuteGHalfSandwich_commuteFamily params family r)
-      δ := by
-  have hq :=
-    (sddOpRel_uniform_equiv (swapFirstTwoQuestionEquiv params r) ψbi
-      (commuteGHalfSandwich_moveSourceFamily params family r)
-      (commuteGHalfSandwich_moveFamily params family r)
-      δ).1 hmove
-  have ho := CommutativityPoints.sddOpRel_reindex (swapFirstTwoOutcomeEquiv params r)
-    ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-    (fun q => commuteGHalfSandwich_moveSourceFamily params family r
-      ((swapFirstTwoQuestionEquiv params r).symm q))
-    (fun q => commuteGHalfSandwich_moveFamily params family r
-      ((swapFirstTwoQuestionEquiv params r).symm q))
-    δ hq
-  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-    _ _
-    (commuteGHalfSandwich_moveBackFamily params family r)
-    (commuteGHalfSandwich_commuteFamily params family r)
-    δ
-    (fun q ogs => by
-      simp [swapFirstTwoQuestionEquiv, swapFirstTwoOutcomeEquiv,
-        commuteGHalfSandwich_moveBackFamily,
-        commuteGHalfSandwich_moveSourceFamily,
-        leftTensor_mul_leftTensor, mul_assoc])
-    (fun q ogs => by
-      simp [swapFirstTwoQuestionEquiv, swapFirstTwoOutcomeEquiv,
-        commuteGHalfSandwich_commuteFamily,
-        commuteGHalfSandwich_moveFamily,
-        leftTensor_mul_leftTensor, rightTensor_mul_rightTensor, mul_assoc])
-    ho
-
-private lemma commuteGHalfSandwich_moveBackStage
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι) (r : ℕ) (δ : Error)
-    (hmove : SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (commuteGHalfSandwich_moveSourceFamily params family r)
-      (commuteGHalfSandwich_moveFamily params family r)
-      δ) :
-    SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (commuteGHalfSandwich_commuteFamily params family r)
-      (commuteGHalfSandwich_moveBackFamily params family r)
-      δ := by
-  exact Preliminaries.sddOpRel_symm ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-    (commuteGHalfSandwich_moveBackFamily params family r)
-    (commuteGHalfSandwich_commuteFamily params family r)
-    δ
-    (commuteGHalfSandwich_moveStage_swap params ψbi family r δ hmove)
 
 private def pointTupleOneEquiv (params : Parameters) :
     PointTuple params 1 ≃ SliceQuestion params where
@@ -2473,43 +2291,6 @@ private lemma commuteGHalfSandwich_moveStepMid_toTarget
     )
     hreindex
 
-private lemma commuteGHalfSandwich_moveStage_succ
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (zeta : Error) (r : ℕ) (δ : Error)
-    (hmove : SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (commuteGHalfSandwich_moveSourceFamily params family r)
-      (commuteGHalfSandwich_moveFamily params family r)
-      δ)
-    (hsc : SDDRel ψbi
-      (uniformDistribution (SliceQuestion params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family)
-      (gHatSelfConsistencyError zeta)) :
-    SDDOpRel ψbi
-      (uniformDistribution
-        (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
-      (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
-      (commuteGHalfSandwich_moveFamily params family (r + 1))
-      (2 * (δ + gHatSelfConsistencyError zeta)) := by
-  have hmid :=
-    commuteGHalfSandwich_prefixFirstSliceLeft_move params ψbi family r δ hmove
-  have htarget :=
-    commuteGHalfSandwich_moveStepMid_toTarget params ψbi family zeta r hsc
-  have hstep := Preliminaries.sddOpRel_triangle ψbi
-    (uniformDistribution
-      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
-    (commuteGHalfSandwich_moveStepSourceFamily params family r)
-    (commuteGHalfSandwich_moveStepMidFamily params family r)
-    (commuteGHalfSandwich_moveStepTargetFamily params family r)
-    δ
-    (gHatSelfConsistencyError zeta)
-    hmid htarget
-  exact (commuteGHalfSandwich_moveStep_iff params ψbi family r
-    (2 * (δ + gHatSelfConsistencyError zeta))).2 hstep
-
 private lemma axisLinePolynomial_ne_gives_support_eval_ne
     (params : Parameters) [FieldModel params.q]
     {k : ℕ} (xs : PointTuple params k)
@@ -2587,6 +2368,2032 @@ private lemma nonglobal_gives_slice_mismatch_against_interpolant
   refine ⟨hStar, ?_⟩
   intro i hiSome
   exact congrArg Polynomial.poly (hcontra i hiSome)
+
+/-- Compatibility alias for the chosen `d+1` interpolation support inside `gHatTupleSupport`. -/
+private noncomputable def interpolationSupportSubset
+    {params : Parameters} [FieldModel params.q]
+    {k : ℕ} (gs : GHatTupleOutcome params k)
+    (hEligible : InterpolationEligible params gs) : Finset (Fin k) :=
+  (interpolationSupportWitness gs hEligible).support
+
+private lemma interpolationSupportSubset_subset
+    {params : Parameters} [FieldModel params.q]
+    {k : ℕ} (gs : GHatTupleOutcome params k)
+    (hEligible : InterpolationEligible params gs) :
+    interpolationSupportSubset gs hEligible ⊆ gHatTupleSupport gs := by
+  simpa [interpolationSupportSubset] using
+    (interpolationSupportWitness gs hEligible).subset_support
+
+private lemma interpolationSupportSubset_card
+    {params : Parameters} [FieldModel params.q]
+    {k : ℕ} (gs : GHatTupleOutcome params k)
+    (hEligible : InterpolationEligible params gs) :
+    (interpolationSupportSubset gs hEligible).card = params.d + 1 := by
+  simpa [interpolationSupportSubset] using
+    (interpolationSupportWitness gs hEligible).card_eq
+
+private lemma restrictToAxisParallelLine_apply
+    (params : Parameters) [FieldModel params.q]
+    (h : Polynomial params.next)
+    (ℓ : AxisParallelLine params.next)
+    (t : Fq params.next) :
+    (Polynomial.restrictToAxisParallelLine params.next h ℓ) t =
+      h (AxisParallelLine.pointAt ℓ t) := by
+  have haxis :
+      (fun i => _root_.Polynomial.eval (decodeScalar t)
+          (Polynomial.axisCoordinatePolynomial params.next ℓ i)) =
+        decodePoint (AxisParallelLine.pointAt ℓ t) := by
+    funext i
+    by_cases hi : i = ℓ.direction
+    · subst hi
+      simpa [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
+        addCoord, decodePoint, decode_encodeScalar, _root_.Polynomial.eval_add,
+        _root_.Polynomial.eval_C, _root_.Polynomial.eval_X]
+    · simpa [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
+        hi, decodePoint, _root_.Polynomial.eval_C]
+  have hconst :
+      (Polynomial.evalRingHom (decodeScalar t)).comp _root_.Polynomial.C = RingHom.id _ := by
+    ext a
+    simp
+  calc
+    (Polynomial.restrictToAxisParallelLine params.next h ℓ) t
+      = encodeScalar
+          (MvPolynomial.eval₂
+            ((Polynomial.evalRingHom (decodeScalar t)).comp _root_.Polynomial.C)
+            (fun i => _root_.Polynomial.eval (decodeScalar t)
+              (Polynomial.axisCoordinatePolynomial params.next ℓ i))
+            h.poly) := by
+              simp [Polynomial.restrictToAxisParallelLine, AxisLinePolynomial.toFun,
+                evalLinePolynomialModel]
+              rw [MvPolynomial.polynomial_eval_eval₂]
+    _ = encodeScalar
+          (MvPolynomial.eval₂ (RingHom.id _)
+            (decodePoint (AxisParallelLine.pointAt ℓ t)) h.poly) := by
+              rw [hconst]
+              simpa using congrArg
+                (fun g => encodeScalar (MvPolynomial.eval₂ (RingHom.id _) g h.poly)) haxis
+    _ = h (AxisParallelLine.pointAt ℓ t) := by
+          rfl
+
+private lemma restrictToVerticalLine_eval_eq_restrictAtHeight_eval
+    (params : Parameters) [FieldModel params.q]
+    (h : Polynomial params.next)
+    (u : Point params)
+    (x : Fq params) :
+    (Polynomial.restrictToAxisParallelLine params.next h
+        ({ base := appendPoint params u zeroCoord
+         , direction := lastCoord params } : AxisParallelLine params.next)) x =
+      (Polynomial.restrictAtHeight params h x) u := by
+  let coord := Polynomial.restrictAtHeightCoordinateMap params x
+  have hconst :
+      (MvPolynomial.eval (decodePoint u)).comp MvPolynomial.C = RingHom.id _ := by
+    ext r
+    simp
+  have hcoord :
+      (fun i => MvPolynomial.eval (decodePoint u) (coord i)) =
+        decodePoint (appendPoint params u x) := by
+    funext i
+    by_cases hi : i.1 < params.m
+    · simp [coord, Polynomial.restrictAtHeightCoordinateMap, decodePoint, appendPoint, hi]
+      rfl
+    · simp [coord, Polynomial.restrictAtHeightCoordinateMap, decodePoint, appendPoint, hi]
+      rfl
+  have hEval := MvPolynomial.eval_eval₂ (x := decodePoint u)
+    (f := MvPolynomial.C) (g := coord) (p := h.poly)
+  calc
+    (Polynomial.restrictToAxisParallelLine params.next h
+        ({ base := appendPoint params u zeroCoord
+         , direction := lastCoord params } : AxisParallelLine params.next)) x
+      = h (appendPoint params u x) := by
+          rw [restrictToAxisParallelLine_apply]
+          exact congrArg (fun y => h y) (verticalLine_pointAt_appendPoint params u x)
+    _ = (Polynomial.restrictAtHeight params h x) u := by
+          symm
+          calc
+            (Polynomial.restrictAtHeight params h x) u
+              = encodeScalar
+                  (MvPolynomial.eval (decodePoint u)
+                    (MvPolynomial.eval₂Hom MvPolynomial.C coord h.poly)) := by
+                      rfl
+            _ = encodeScalar
+                  (MvPolynomial.eval₂
+                    ((MvPolynomial.eval (decodePoint u)).comp MvPolynomial.C)
+                    (fun i => MvPolynomial.eval (decodePoint u) (coord i)) h.poly) := by
+                      simpa using congrArg encodeScalar hEval
+            _ = encodeScalar
+                  (MvPolynomial.eval₂ (RingHom.id _)
+                    (decodePoint (appendPoint params u x)) h.poly) := by
+                      rw [hconst]
+                      simpa using congrArg
+                        (fun g => encodeScalar (MvPolynomial.eval₂ (RingHom.id _) g h.poly)) hcoord
+             _ = h (appendPoint params u x) := by
+                   rfl
+
+private lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (σ : Finset (Fin k))
+    (hσsubset : σ ⊆ gHatTupleSupport gs)
+    (hσcard : σ.card = params.d + 1)
+    {i : Fin k} (hi : i ∈ σ) :
+    MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+      (interpolateCompletedSlicesFromSupport params xs gs σ hσsubset hσcard).poly =
+      ((gs i).get (by simpa [gHatTupleSupport] using hσsubset hi)).poly := by
+  let v : Fin k → Scalar params.next := fun j => decodeScalar (xs j)
+  have hvinj : Set.InjOn v (↑σ : Set (Fin k)) := by
+    intro a ha b hb hab
+    apply hxs
+    simpa [v] using congrArg encodeScalar hab
+  have hcomp :
+      ((MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+        MvPolynomial.C) = MvPolynomial.C := by
+    ext r
+    simp
+  have hx :
+      MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.X (lastCoord params)) =
+        MvPolynomial.C (decodeScalar (xs i)) := by
+    simp [Polynomial.restrictAtHeightCoordinateMap, lastCoord]
+  unfold interpolateCompletedSlicesFromSupport
+  rw [map_sum, Finset.sum_eq_single ⟨i, hi⟩]
+  · simp_rw [map_mul]
+    have hslice :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSlicePoly gs i (hσsubset hi)).poly) =
+          (extractSlicePoly gs i (hσsubset hi)).poly := by
+      rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
+      have hmap :
+          Polynomial.restrictAtHeightCoordinateMap params (xs i) ∘ embedCoord params =
+            MvPolynomial.X := by
+        funext j
+        simp [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord]
+      rw [hmap, MvPolynomial.bind₁_X_left]
+      rfl
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))) = 1 := by
+      calc
+        MvPolynomial.eval₂Hom MvPolynomial.C
+            (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+            (_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+              (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))
+          = _root_.Polynomial.eval₂
+              (((MvPolynomial.eval₂Hom MvPolynomial.C
+                  (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                MvPolynomial.C))
+              (MvPolynomial.eval₂Hom MvPolynomial.C
+                (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+                (MvPolynomial.X (lastCoord params)))
+              (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i) := by
+                simpa using (_root_.Polynomial.hom_eval₂
+                  (p := Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i)
+                  (f := MvPolynomial.C)
+                  (g := MvPolynomial.eval₂Hom MvPolynomial.C
+                    (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+                  (x := MvPolynomial.X (lastCoord params)))
+        _ = _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.C (decodeScalar (xs i)))
+              (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i) := by
+                calc
+                  _root_.Polynomial.eval₂
+                      ((MvPolynomial.eval₂Hom MvPolynomial.C
+                          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                        MvPolynomial.C)
+                      ((MvPolynomial.eval₂Hom MvPolynomial.C
+                          (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+                        (MvPolynomial.X (lastCoord params)))
+                      (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i)
+                      = _root_.Polynomial.eval₂
+                          ((MvPolynomial.eval₂Hom MvPolynomial.C
+                              (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                            MvPolynomial.C)
+                          (MvPolynomial.C (decodeScalar (xs i)))
+                          (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i) := by
+                            simpa using congrArg
+                              (fun x =>
+                                _root_.Polynomial.eval₂
+                                  ((MvPolynomial.eval₂Hom MvPolynomial.C
+                                      (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                                    MvPolynomial.C)
+                                  x (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))
+                              hx
+                  _ = _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.C (decodeScalar (xs i)))
+                        (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i) := by
+                          simpa [MvPolynomial.eval₂Hom] using congrArg
+                            (fun F =>
+                              _root_.Polynomial.eval₂ F (MvPolynomial.C (decodeScalar (xs i)))
+                                (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))
+                            hcomp
+        _ = 1 := by
+              rw [_root_.Polynomial.eval₂_at_apply]
+              simpa using congrArg
+                (fun x : Scalar params => (MvPolynomial.C x : PolynomialModel params))
+                (Lagrange.eval_basis_self hvinj hi)
+    rw [hLi, hslice]
+    simpa [extractSlicePoly]
+  · intro j hj hji
+    have hji' : j.1 ≠ i := by
+      intro hEq
+      apply hji
+      exact Subtype.ext hEq
+    simp_rw [map_mul]
+    have hslice :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params) (extractSlicePoly gs j.1 (hσsubset j.2)).poly) =
+          (extractSlicePoly gs j.1 (hσsubset j.2)).poly := by
+      rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
+      have hmap :
+          Polynomial.restrictAtHeightCoordinateMap params (xs i) ∘ embedCoord params =
+            MvPolynomial.X := by
+        funext m
+        simp [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord]
+      rw [hmap, MvPolynomial.bind₁_X_left]
+      rfl
+    have hLi :
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1))) = 0 := by
+      calc
+        MvPolynomial.eval₂Hom MvPolynomial.C
+            (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+            (_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+              (Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1))
+          = _root_.Polynomial.eval₂
+              (((MvPolynomial.eval₂Hom MvPolynomial.C
+                  (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                MvPolynomial.C))
+              (MvPolynomial.eval₂Hom MvPolynomial.C
+                (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+                (MvPolynomial.X (lastCoord params)))
+              (Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1) := by
+                simpa using (_root_.Polynomial.hom_eval₂
+                  (p := Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1)
+                  (f := MvPolynomial.C)
+                  (g := MvPolynomial.eval₂Hom MvPolynomial.C
+                    (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+                  (x := MvPolynomial.X (lastCoord params)))
+        _ = _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.C (decodeScalar (xs i)))
+              (Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1) := by
+                calc
+                  _root_.Polynomial.eval₂
+                      ((MvPolynomial.eval₂Hom MvPolynomial.C
+                          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                        MvPolynomial.C)
+                      ((MvPolynomial.eval₂Hom MvPolynomial.C
+                          (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+                        (MvPolynomial.X (lastCoord params)))
+                      (Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1)
+                      = _root_.Polynomial.eval₂
+                          ((MvPolynomial.eval₂Hom MvPolynomial.C
+                              (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                            MvPolynomial.C)
+                          (MvPolynomial.C (decodeScalar (xs i)))
+                          (Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1) := by
+                            simpa using congrArg
+                              (fun x =>
+                                _root_.Polynomial.eval₂
+                                  ((MvPolynomial.eval₂Hom MvPolynomial.C
+                                      (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                                    MvPolynomial.C)
+                                  x (Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1))
+                              hx
+                  _ = _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.C (decodeScalar (xs i)))
+                        (Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1) := by
+                          simpa [MvPolynomial.eval₂Hom] using congrArg
+                            (fun F =>
+                              _root_.Polynomial.eval₂ F (MvPolynomial.C (decodeScalar (xs i)))
+                                (Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1))
+                            hcomp
+        _ = 0 := by
+              have hbasis :
+                  (Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1).eval
+                    (decodeScalar (xs i)) = 0 := by
+                simpa using
+                  (Lagrange.eval_basis_of_ne
+                    (s := σ) (v := fun j' : Fin k => decodeScalar (xs j'))
+                    (i := j.1) (j := i) hji' hi)
+              rw [_root_.Polynomial.eval₂_at_apply]
+              simpa using congrArg
+                (fun x : Scalar params => (MvPolynomial.C x : PolynomialModel params))
+                hbasis
+    rw [hLi, hslice]
+    simp
+  · intro hnot
+    exact (hnot (by simpa : ((⟨i, hi⟩ : {x // x ∈ σ}) ∈ σ.attach))).elim
+
+private lemma interpolateCompletedSlices_restrictAtHeight_eq_get_of_mem_supportSubset
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ} (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (hEligible : InterpolationEligible params gs)
+    {i : Fin k} (hi : i ∈ interpolationSupportSubset gs hEligible) :
+    (Polynomial.restrictAtHeight params
+      (interpolateCompletedSlices params k xs gs) (xs i)).poly =
+      ((gs i).get (by
+        have hisup : i ∈ gHatTupleSupport gs :=
+          interpolationSupportSubset_subset gs hEligible hi
+        simpa [gHatTupleSupport] using hisup)).poly := by
+  classical
+  let σ := interpolationSupportSubset gs hEligible
+  have hσcard : σ.card = params.d + 1 := interpolationSupportSubset_card gs hEligible
+  cases k with
+  | zero => cases i.2
+  | succ k =>
+      simpa [interpolateCompletedSlices, hEligible, σ, hσcard, Polynomial.restrictAtHeight] using
+        interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
+          params xs hxs gs σ
+          (interpolationSupportSubset_subset gs hEligible) hσcard hi
+
+private noncomputable def tupleInterpolatedVerticalLine
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k) : AxisLinePolynomial params.next :=
+  Polynomial.restrictToAxisParallelLine params.next
+    (interpolateCompletedSlices params k xs gs)
+    ({ base := appendPoint params u zeroCoord
+     , direction := lastCoord params } : AxisParallelLine params.next)
+
+private lemma evaluateAt_averageIdxSubMeas
+    (params : Parameters) [FieldModel params.q]
+    {Question : Type*} [DecidableEq Question]
+    (u : Point params)
+    (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question (Polynomial params) ι)
+    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1) :
+    evaluateAt params u (averageIdxSubMeas 𝒟 A h𝒟) =
+      averageIdxSubMeas 𝒟 (fun q => evaluateAt params u (A q)) h𝒟 := by
+  classical
+  refine SubMeas.ext ?_ ?_
+  · intro a
+    simp [evaluateAt, postprocess, averageIdxSubMeas, averageOperatorOverDistribution,
+      Finset.sum_filter, Finset.sum_comm, Finset.smul_sum]
+  · simp [evaluateAt, postprocess, averageIdxSubMeas, averageOperatorOverDistribution]
+
+private lemma hRestrictionToVerticalLine_averageIdxSubMeas
+    (params : Parameters) [FieldModel params.q]
+    {Question : Type*} [DecidableEq Question]
+    (u : Point params)
+    (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question (Polynomial params.next) ι)
+    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1) :
+    hRestrictionToVerticalLine params (averageIdxSubMeas 𝒟 A h𝒟) u =
+      averageIdxSubMeas 𝒟 (fun q => hRestrictionToVerticalLine params (A q) u) h𝒟 := by
+  classical
+  refine SubMeas.ext ?_ ?_
+  · intro f
+    simp [hRestrictionToVerticalLine, postprocess, averageIdxSubMeas,
+      averageOperatorOverDistribution, Finset.sum_filter, Finset.sum_comm,
+      Finset.smul_sum]
+  · simp [hRestrictionToVerticalLine, postprocess, averageIdxSubMeas,
+      averageOperatorOverDistribution]
+
+private def BadLineEvent
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k)
+    (f : AxisLinePolynomial params.next) : Prop :=
+  ¬ InterpolationEligible params gs ∨
+    ¬ IsGloballyConsistent params xs gs ∨
+      ∃ i : Fin k,
+        Option.map (fun g : Polynomial params => g u) (gs i) ≠ some (f (xs i))
+
+private lemma badLineEvent_of_not_interpolationEligible
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k)
+    (f : AxisLinePolynomial params.next)
+    (hk : params.d + 1 ≤ k)
+    (hNot : ¬ InterpolationEligible params gs) :
+    BadLineEvent params u xs gs f := by
+  let _ := hk
+  refine Or.inl hNot
+
+private lemma badLineEvent_of_nonglobal
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k)
+    (f : AxisLinePolynomial params.next)
+    (hNGlobal : ¬ IsGloballyConsistent params xs gs) :
+    BadLineEvent params u xs gs f := by
+  rcases nonglobal_gives_slice_mismatch_against_interpolant params xs gs hNGlobal with
+    ⟨i, hiSome, hslice⟩
+  exact Or.inr <| Or.inl hNGlobal
+
+private lemma badLineEvent_of_eval_mismatch
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k)
+    (f : AxisLinePolynomial params.next)
+    (hmismatch :
+      ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)) :
+    BadLineEvent params u xs gs f := by
+  exact Or.inr <| Or.inr <|
+    exists_onePoint_family_witness_of_eval_mismatch params u xs gs hmismatch
+
+private lemma tupleInterpolatedVerticalLine_eq_of_not_badLineEvent
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (f : AxisLinePolynomial params.next)
+    (hNotBad : ¬ BadLineEvent params u xs gs f) :
+    tupleInterpolatedVerticalLine params u xs gs = f := by
+  classical
+  have hEligible : InterpolationEligible params gs := by
+    by_contra hNot
+    exact hNotBad (Or.inl hNot)
+  by_contra hne
+  let σ := interpolationSupportSubset gs hEligible
+  have hσcard : σ.card = params.d + 1 := interpolationSupportSubset_card gs hEligible
+  rcases axisLinePolynomial_ne_gives_support_eval_ne params xs hxs σ hσcard hne with
+    ⟨i, hiσ, hEvalNe⟩
+  have hiSupport : i ∈ gHatTupleSupport gs := interpolationSupportSubset_subset gs hEligible hiσ
+  have hiSome : (gs i).isSome = true := by
+    simpa [gHatTupleSupport] using hiSupport
+  have hslicePoly :
+      (Polynomial.restrictAtHeight params
+        (interpolateCompletedSlices params k xs gs) (xs i)).poly =
+      ((gs i).get hiSome).poly := by
+    simpa [hiSome] using
+      interpolateCompletedSlices_restrictAtHeight_eq_get_of_mem_supportSubset
+        params xs hxs gs hEligible hiσ
+  have hsliceEval :
+      (Polynomial.restrictAtHeight params
+        (interpolateCompletedSlices params k xs gs) (xs i)) u =
+      ((gs i).get hiSome) u := by
+    simpa using congrArg
+      (fun p : PolynomialModel params => encodeScalar (MvPolynomial.eval (decodePoint u) p))
+      hslicePoly
+  have hlineEval : tupleInterpolatedVerticalLine params u xs gs (xs i) = ((gs i).get hiSome) u := by
+    calc
+      tupleInterpolatedVerticalLine params u xs gs (xs i)
+        = (Polynomial.restrictAtHeight params
+            (interpolateCompletedSlices params k xs gs) (xs i)) u := by
+              simpa [tupleInterpolatedVerticalLine] using
+                restrictToVerticalLine_eval_eq_restrictAtHeight_eval
+                  params (interpolateCompletedSlices params k xs gs) u (xs i)
+      _ = ((gs i).get hiSome) u := hsliceEval
+  have hmismatch :
+      ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) := by
+    refine ⟨i, hiSome, ?_⟩
+    simpa [hlineEval] using hEvalNe
+  exact hNotBad (badLineEvent_of_eval_mismatch params u xs gs f hmismatch)
+
+private lemma tupleInterpolatedVerticalLine_ne_gives_exists_some_eval_mismatch
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (hEligible : InterpolationEligible params gs)
+    (hGlobal : IsGloballyConsistent params xs gs)
+    (f : AxisLinePolynomial params.next)
+    (hne : tupleInterpolatedVerticalLine params u xs gs ≠ f) :
+    ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) := by
+  let σ := interpolationSupportSubset gs hEligible
+  have hσcard : σ.card = params.d + 1 := interpolationSupportSubset_card gs hEligible
+  rcases axisLinePolynomial_ne_gives_support_eval_ne params xs hxs σ hσcard hne with
+    ⟨i, hiσ, hEvalNe⟩
+  have hiSupport : i ∈ gHatTupleSupport gs := interpolationSupportSubset_subset gs hEligible hiσ
+  have hiSome : (gs i).isSome = true := by
+    simpa [gHatTupleSupport] using hiSupport
+  have hslicePoly :
+      (Polynomial.restrictAtHeight params
+        (interpolateCompletedSlices params k xs gs) (xs i)).poly =
+      ((gs i).get hiSome).poly := by
+    simpa [hiSome] using
+      interpolateCompletedSlices_restrictAtHeight_eq_get_of_mem_supportSubset
+        params xs hxs gs hEligible hiσ
+  have hsliceEval :
+      (Polynomial.restrictAtHeight params
+        (interpolateCompletedSlices params k xs gs) (xs i)) u =
+      ((gs i).get hiSome) u := by
+    simpa using congrArg
+      (fun p : PolynomialModel params => encodeScalar (MvPolynomial.eval (decodePoint u) p))
+      hslicePoly
+  have hlineEval : tupleInterpolatedVerticalLine params u xs gs (xs i) = ((gs i).get hiSome) u := by
+    calc
+      tupleInterpolatedVerticalLine params u xs gs (xs i)
+        = (Polynomial.restrictAtHeight params
+            (interpolateCompletedSlices params k xs gs) (xs i)) u := by
+              simpa [tupleInterpolatedVerticalLine] using
+                restrictToVerticalLine_eval_eq_restrictAtHeight_eval
+                  params (interpolateCompletedSlices params k xs gs) u (xs i)
+      _ = ((gs i).get hiSome) u := hsliceEval
+  refine ⟨i, hiSome, ?_⟩
+  simpa [hlineEval] using hEvalNe
+
+private lemma interpolationEligibleSandwich_mismatch_sum_mono
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (f : AxisLinePolynomial params.next) :
+    ∑ gs : GHatTupleOutcome params k,
+        (if IsGloballyConsistent params xs gs ∧ tupleInterpolatedVerticalLine params u xs gs ≠ f then
+          (interpolationEligibleSandwichFamily params family k xs).outcome gs
+        else 0)
+      ≤
+      ∑ gs : GHatTupleOutcome params k,
+        (if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+            ((gs i).get hiSome) u ≠ f (xs i) then
+          (interpolationEligibleSandwichFamily params family k xs).outcome gs
+        else 0) := by
+  refine Finset.sum_le_sum ?_
+  intro gs _
+  by_cases hglob : IsGloballyConsistent params xs gs
+  · by_cases hneq : tupleInterpolatedVerticalLine params u xs gs ≠ f
+    · by_cases hEligible : InterpolationEligible params gs
+      · rcases tupleInterpolatedVerticalLine_ne_gives_exists_some_eval_mismatch
+          params u xs hxs gs hEligible hglob f hneq with ⟨i, hiSome, hm⟩
+        have hright :
+            ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) :=
+          ⟨i, hiSome, hm⟩
+        simp [hglob, hneq, hEligible, hright]
+      · simp [interpolationEligibleSandwichFamily, restrictSubMeas, hEligible, hglob, hneq]
+    · by_cases hright : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)
+      · have hnonneg : 0 ≤ (interpolationEligibleSandwichFamily params family k xs).outcome gs :=
+          (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs
+        simp [hglob, hneq, hright, hnonneg]
+      · simp [hglob, hneq, hright]
+  · by_cases hright : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)
+    · have hnonneg : 0 ≤ (interpolationEligibleSandwichFamily params family k xs).outcome gs :=
+        (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs
+      simp [hglob, hright, hnonneg]
+    · simp [hglob, hright]
+
+private lemma interpolationEligibleSandwich_exists_mismatch_sum_le_sum
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (f : AxisLinePolynomial params.next) :
+    (∑ gs : GHatTupleOutcome params k,
+        if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+            ((gs i).get hiSome) u ≠ f (xs i) then
+          (interpolationEligibleSandwichFamily params family k xs).outcome gs
+        else 0)
+      ≤
+      ∑ i : Fin k,
+        ∑ gs : GHatTupleOutcome params k,
+          if ∃ hiSome : (gs i).isSome = true,
+              ((gs i).get hiSome) u ≠ f (xs i) then
+            (interpolationEligibleSandwichFamily params family k xs).outcome gs
+          else 0 := by
+  classical
+  calc
+    (∑ gs : GHatTupleOutcome params k,
+        if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+            ((gs i).get hiSome) u ≠ f (xs i) then
+          (interpolationEligibleSandwichFamily params family k xs).outcome gs
+        else 0)
+      ≤ ∑ gs : GHatTupleOutcome params k,
+          ∑ j : Fin k,
+            if ∃ hiSome : (gs j).isSome = true,
+                ((gs j).get hiSome) u ≠ f (xs j) then
+              (interpolationEligibleSandwichFamily params family k xs).outcome gs
+            else 0 := by
+            exact Finset.sum_le_sum (fun (gs : GHatTupleOutcome params k) _ => by
+              let P : Fin k → Prop := fun i =>
+                ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)
+              let T : Fin k → MIPStarRE.Quantum.Op ι := fun j =>
+                if P j then (interpolationEligibleSandwichFamily params family k xs).outcome gs
+                else (0 : MIPStarRE.Quantum.Op ι)
+              change
+                (if ∃ i : Fin k, P i then (interpolationEligibleSandwichFamily params family k xs).outcome gs
+                  else (0 : MIPStarRE.Quantum.Op ι)) ≤
+                ∑ j : Fin k, T j
+              have hT_nonneg : ∀ j : Fin k, 0 ≤ T j := by
+                intro j
+                by_cases hP : P j <;>
+                  simp [T, hP, (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs]
+              by_cases hExists : ∃ i : Fin k, P i
+              · rcases hExists with ⟨i, hi⟩
+                have hExists' : ∃ i : Fin k, P i := ⟨i, hi⟩
+                have hsingle :
+                    (interpolationEligibleSandwichFamily params family k xs).outcome gs ≤ ∑ j : Fin k, T j := by
+                  calc
+                    (interpolationEligibleSandwichFamily params family k xs).outcome gs = T i := by
+                      simp [T, hi]
+                    _ ≤ ∑ j : Fin k, T j := by
+                      exact Finset.single_le_sum (fun j _ => hT_nonneg j)
+                        (by simp : i ∈ (Finset.univ : Finset (Fin k)))
+                simpa [P, hExists'] using hsingle
+              · have hnonneg_sum :
+                    0 ≤ ∑ j : Fin k, T j := by
+                  exact Finset.sum_nonneg fun j _ => hT_nonneg j
+                simpa [P, hExists] using hnonneg_sum)
+    _ = ∑ i : Fin k,
+          ∑ gs : GHatTupleOutcome params k,
+            if ∃ hiSome : (gs i).isSome = true,
+                ((gs i).get hiSome) u ≠ f (xs i) then
+              (interpolationEligibleSandwichFamily params family k xs).outcome gs
+            else 0 := by
+            rw [Finset.sum_comm]
+
+private lemma pastedInterpolation_verticalLine_singleOutcome_postprocess
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (k : ℕ)
+    (u : Point params)
+    (xs : PointTuple params k)
+    (f : AxisLinePolynomial params.next) :
+    postprocess
+      (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+      (fun h => decide (h = f)) =
+    postprocess
+      (restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
+        (IsGloballyConsistent params xs))
+      (fun gs => decide (tupleInterpolatedVerticalLine params u xs gs = f)) := by
+  rw [pastedInterpolationFamily, hRestrictionToVerticalLine]
+  rw [postprocess_postprocess, postprocess_postprocess]
+  congr 1
+
+private noncomputable def singleOutcomeRightSubMeas
+    {Outcome : Type*} [Fintype Outcome]
+    (B : SubMeas Outcome ι) (a0 : Outcome) : SubMeas Bool ι where
+  outcome
+    | true => B.outcome a0
+    | false => 0
+  total := B.outcome a0
+  outcome_pos := by
+    intro b
+    cases b <;> simp [B.outcome_pos a0]
+  sum_eq_total := by simp
+  total_le_one := le_trans (B.outcome_le_total a0) B.total_le_one
+
+private lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true_local
+    (ψ : QuantumState (ι × ι))
+    (A B : SubMeas Bool ι)
+    (hfalse : B.outcome false = 0)
+    (htrue : B.outcome true = B.total) :
+    qBipartiteConsDefect ψ A B = ev ψ (opTensor (A.outcome false) B.total) := by
+  have hsumA : A.outcome false + A.outcome true = A.total := by
+    simpa [add_comm] using A.sum_eq_total
+  have hnonneg : 0 ≤ ev ψ (opTensor (A.outcome false) B.total) := by
+    exact ev_nonneg_of_psd ψ _ <| opTensor_nonneg (A.outcome_pos false) B.total_nonneg
+  unfold qBipartiteConsDefect qBipartiteMatchMass
+  simp only [Fintype.univ_bool, Finset.mem_singleton, Bool.true_eq_false,
+    not_false_eq_true, Finset.sum_insert, Finset.sum_singleton]
+  have hexpr :
+      ev ψ (opTensor A.total B.total) -
+          (ev ψ (opTensor (A.outcome true) (B.outcome true)) +
+            ev ψ (opTensor (A.outcome false) (B.outcome false))) =
+        ev ψ (opTensor (A.outcome false) B.total) := by
+    calc
+      ev ψ (opTensor A.total B.total) -
+          (ev ψ (opTensor (A.outcome true) (B.outcome true)) +
+            ev ψ (opTensor (A.outcome false) (B.outcome false)))
+        = ev ψ (opTensor (A.outcome false + A.outcome true) B.total) -
+            (ev ψ (opTensor (A.outcome true) B.total) +
+              ev ψ (opTensor (A.outcome false) 0)) := by
+              rw [hsumA, htrue, hfalse]
+      _ = ev ψ (opTensor (A.outcome false) B.total +
+            opTensor (A.outcome true) B.total) -
+            (ev ψ (opTensor (A.outcome true) B.total) +
+              ev ψ (opTensor (A.outcome false) 0)) := by
+              rw [show opTensor (A.outcome false + A.outcome true) B.total =
+                    opTensor (A.outcome false) B.total +
+                      opTensor (A.outcome true) B.total from
+                  Matrix.add_kronecker _ _ _]
+      _ = ev ψ (opTensor (A.outcome false) B.total) := by
+            have hfalse_zero : ev ψ (opTensor (A.outcome false) 0) = 0 := by
+              simp [opTensor, ev]
+            nlinarith [
+              ev_add ψ (opTensor (A.outcome false) B.total)
+                (opTensor (A.outcome true) B.total),
+              hfalse_zero]
+  calc
+    max 0
+        (ev ψ (opTensor A.total B.total) -
+          (ev ψ (opTensor (A.outcome true) (B.outcome true)) +
+            ev ψ (opTensor (A.outcome false) (B.outcome false))))
+      = max 0 (ev ψ (opTensor (A.outcome false) B.total)) := by
+          rw [hexpr]
+    _ = ev ψ (opTensor (A.outcome false) B.total) := by
+          rw [max_eq_right hnonneg]
+
+private lemma qBipartiteConsDefect_postprocess_eq_singleOutcome
+    {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι))
+    (A B : SubMeas Outcome ι) (a0 : Outcome) :
+    qBipartiteConsDefect ψ (postprocess A (fun a => decide (a = a0)))
+      (singleOutcomeRightSubMeas B a0) =
+        ev ψ (opTensor ((postprocess A (fun a => decide (a = a0))).outcome false) (B.outcome a0)) := by
+  refine qBipartiteConsDefect_eq_false_mass_of_bool_right_true_local ψ
+    (postprocess A (fun a => decide (a = a0))) (singleOutcomeRightSubMeas B a0) ?_ ?_
+  · rfl
+  · rfl
+
+private lemma postprocess_decide_eq_true_outcome
+    {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
+    (A : SubMeas Outcome ι) (a0 : Outcome) :
+    (postprocess A (fun a => decide (a = a0))).outcome true = A.outcome a0 := by
+  simp [postprocess, Finset.sum_filter]
+
+private lemma postprocess_decide_false_add_true_eq_total
+    {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
+    (A : SubMeas Outcome ι) (a0 : Outcome) :
+    (postprocess A (fun a => decide (a = a0))).outcome false + A.outcome a0 = A.total := by
+  have hsum := (postprocess A (fun a => decide (a = a0))).sum_eq_total
+  simpa [Bool.forall_bool, add_comm, postprocess_decide_eq_true_outcome] using hsum
+
+private lemma postprocess_decide_eq_false_outcome
+    {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
+    (A : SubMeas Outcome ι) (a0 : Outcome) :
+    (postprocess A (fun a => decide (a = a0))).outcome false =
+      A.total - A.outcome a0 := by
+  exact eq_sub_iff_add_eq.mpr (postprocess_decide_false_add_true_eq_total A a0)
+
+private lemma opTensor_smul_right_local
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (c : Error)
+    (A : MIPStarRE.Quantum.Op ιA)
+    (B : MIPStarRE.Quantum.Op ιB) :
+    opTensor A ((c : ℂ) • B) = (c : ℂ) • opTensor A B := by
+  ext x y
+  simp [opTensor, mul_comm, mul_left_comm, mul_assoc]
+
+private lemma opTensor_add_left_local
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A B : MIPStarRE.Quantum.Op ιA)
+    (C : MIPStarRE.Quantum.Op ιB) :
+    opTensor (A + B) C = opTensor A C + opTensor B C := by
+  ext i j
+  simp [opTensor, add_mul]
+
+private lemma opTensor_add_right_local
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : MIPStarRE.Quantum.Op ιA)
+    (B C : MIPStarRE.Quantum.Op ιB) :
+    opTensor A (B + C) = opTensor A B + opTensor A C := by
+  ext i j
+  simp [opTensor, mul_add]
+
+private lemma opTensor_sum_left_local
+    {α ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (s : Finset α)
+    (f : α → MIPStarRE.Quantum.Op ιA)
+    (B : MIPStarRE.Quantum.Op ιB) :
+    opTensor (∑ a ∈ s, f a) B = ∑ a ∈ s, opTensor (f a) B := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [opTensor]
+  | @insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_left_local, ih]
+
+private lemma opTensor_sum_right_local
+    {α ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : MIPStarRE.Quantum.Op ιA)
+    (s : Finset α)
+    (f : α → MIPStarRE.Quantum.Op ιB) :
+    opTensor A (∑ a ∈ s, f a) = ∑ a ∈ s, opTensor A (f a) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [opTensor]
+  | @insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_right_local, ih]
+
+private lemma qBipartiteConsDefect_eq_sum_singleOutcome
+    {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι))
+    (A : SubMeas Outcome ι)
+    (B : Measurement Outcome ι) :
+    qBipartiteConsDefect ψ A B.toSubMeas =
+      ∑ a0 : Outcome,
+        qBipartiteConsDefect ψ (postprocess A (fun a => decide (a = a0)))
+          (singleOutcomeRightSubMeas B.toSubMeas a0) := by
+  have hsingle_term : ∀ a0 : Outcome,
+      ev ψ (opTensor A.total (B.outcome a0)) =
+        qBipartiteConsDefect ψ (postprocess A (fun a => decide (a = a0)))
+          (singleOutcomeRightSubMeas B.toSubMeas a0) +
+          ev ψ (opTensor (A.outcome a0) (B.outcome a0)) := by
+    intro a0
+    calc
+      ev ψ (opTensor A.total (B.outcome a0))
+        = ev ψ (opTensor ((postprocess A (fun a => decide (a = a0))).outcome false + A.outcome a0)
+            (B.outcome a0)) := by
+              rw [postprocess_decide_false_add_true_eq_total]
+      _ = ev ψ
+            (opTensor ((postprocess A (fun a => decide (a = a0))).outcome false) (B.outcome a0) +
+              opTensor (A.outcome a0) (B.outcome a0)) := by
+              rw [opTensor_add_left_local]
+      _ = qBipartiteConsDefect ψ (postprocess A (fun a => decide (a = a0)))
+            (singleOutcomeRightSubMeas B.toSubMeas a0) +
+          ev ψ (opTensor (A.outcome a0) (B.outcome a0)) := by
+            rw [ev_add, qBipartiteConsDefect_postprocess_eq_singleOutcome]
+  have htotal_sum :
+      ev ψ (opTensor A.total B.toSubMeas.total) =
+        ∑ a0 : Outcome, ev ψ (opTensor A.total (B.outcome a0)) := by
+    rw [← B.sum_eq_total]
+    rw [opTensor_sum_right_local, ev_finset_sum]
+  have hdecomp :
+      ev ψ (opTensor A.total B.toSubMeas.total) - qBipartiteMatchMass ψ A B.toSubMeas =
+        ∑ a0 : Outcome,
+          qBipartiteConsDefect ψ (postprocess A (fun a => decide (a = a0)))
+            (singleOutcomeRightSubMeas B.toSubMeas a0) := by
+    rw [htotal_sum, qBipartiteMatchMass]
+    calc
+      ∑ a0 : Outcome, ev ψ (opTensor A.total (B.outcome a0)) -
+          ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a))
+        = (∑ a0 : Outcome,
+            (qBipartiteConsDefect ψ (postprocess A (fun a => decide (a = a0)))
+              (singleOutcomeRightSubMeas B.toSubMeas a0) +
+              ev ψ (opTensor (A.outcome a0) (B.outcome a0)))) -
+            ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
+              refine congrArg (fun t => t - ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a))) ?_
+              exact Finset.sum_congr rfl fun a _ => hsingle_term a
+      _ = ∑ a0 : Outcome,
+            qBipartiteConsDefect ψ (postprocess A (fun a => decide (a = a0)))
+              (singleOutcomeRightSubMeas B.toSubMeas a0) := by
+            rw [Finset.sum_add_distrib]
+            ring
+  have hnonneg :
+      0 ≤ ∑ a0 : Outcome,
+        qBipartiteConsDefect ψ (postprocess A (fun a => decide (a = a0)))
+          (singleOutcomeRightSubMeas B.toSubMeas a0) := by
+    exact Finset.sum_nonneg fun a0 _ =>
+      qBipartiteConsDefect_nonneg ψ _ _
+  rw [qBipartiteConsDefect, hdecomp, max_eq_right hnonneg]
+
+private noncomputable def hBConsistencyBadMass
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k) : Error :=
+  ∑ f : AxisLinePolynomial params.next,
+    ev strategy.state
+      (opTensor
+        (∑ gs : GHatTupleOutcome params k,
+        if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+              ((gs i).get hiSome) u ≠ f (xs i) then
+            (interpolationEligibleSandwichFamily params family k xs).outcome gs
+          else 0)
+        ((verticalLineMeasurementFamily params strategy u).outcome f))
+
+private noncomputable def ldSandwichLineOnePointRightMeasurement
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (i : Fin k) (q : SandwichedLineQuestion params k) :
+    Measurement (Option (Fq params)) ι where
+  toSubMeas := ((ldSandwichLineOnePointRightFamily params strategy family k i.1) q)
+  total_eq_one := by
+    let ℓ : AxisParallelLine params.next :=
+      { base := appendPoint params q.1 zeroCoord
+        direction := lastCoord params }
+    simpa [ldSandwichLineOnePointRightFamily, verticalLineMeasurementFamily, i.2,
+      postprocess_total, ℓ] using (strategy.axisParallelMeasurement ℓ).total_eq_one
+
+private lemma ldSandwichLineOnePointRightMeasurement_outcome_none_eq_zero
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (i : Fin k) (q : SandwichedLineQuestion params k) :
+    (ldSandwichLineOnePointRightMeasurement params strategy family i q).outcome none = 0 := by
+  simp [ldSandwichLineOnePointRightMeasurement, ldSandwichLineOnePointRightFamily,
+    postprocess, i.2]
+
+private lemma ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (i : Fin k) (q : SandwichedLineQuestion params k) (a : Fq params) :
+    (ldSandwichLineOnePointRightMeasurement params strategy family i q).outcome (some a) =
+      ∑ f : AxisLinePolynomial params.next,
+        if f (q.2 i) = a then (verticalLineMeasurementFamily params strategy q.1).outcome f else 0 := by
+  simp [ldSandwichLineOnePointRightMeasurement, ldSandwichLineOnePointRightFamily,
+    postprocess, i.2, Finset.sum_filter]
+
+private lemma grouped_coordinate_mismatch_le_left_falseOutcome
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) (xs : PointTuple params k)
+    (i : Fin k) (a : Fq params) :
+    (∑ gs : GHatTupleOutcome params k,
+      if ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ a then
+        (interpolationEligibleSandwichFamily params family k xs).outcome gs
+      else 0)
+    ≤
+    (postprocess
+      ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) (u, xs))
+      (fun o => decide (o = some a))).outcome false := by
+  have hrewrite :
+      (postprocess
+        ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) (u, xs))
+        (fun o => decide (o = some a))).outcome false =
+        ∑ gs : GHatTupleOutcome params k,
+          if Option.map (fun g : Polynomial params => g u) (gs i) ≠ some a then
+            (gHatSandwichFamily params family k xs).outcome gs
+          else 0 := by
+    rw [ldSandwichLineOnePointLeftFamily, postprocess_postprocess]
+    simp [postprocess, Function.comp, i.2, Finset.sum_filter]
+  rw [hrewrite]
+  refine Finset.sum_le_sum ?_
+  intro gs _
+  by_cases hm : ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ a
+  · have hneq : Option.map (fun g : Polynomial params => g u) (gs i) ≠ some a := by
+      rcases hm with ⟨hiSome, hne⟩
+      cases hgi : gs i with
+      | none =>
+          simp [Option.isSome, hgi] at hiSome
+      | some g =>
+          simp [hgi] at hiSome
+          simpa [hgi] using hne
+    by_cases hEligible : InterpolationEligible params gs
+    · simp [interpolationEligibleSandwichFamily, restrictSubMeas, hm, hneq, hEligible]
+    · have hnonneg : 0 ≤ (gHatSandwichFamily params family k xs).outcome gs :=
+        (gHatSandwichFamily params family k xs).outcome_pos gs
+      simp [interpolationEligibleSandwichFamily, restrictSubMeas, hm, hneq, hEligible, hnonneg]
+  · by_cases hneq : Option.map (fun g : Polynomial params => g u) (gs i) ≠ some a
+    · have hnonneg : 0 ≤ (gHatSandwichFamily params family k xs).outcome gs :=
+        (gHatSandwichFamily params family k xs).outcome_pos gs
+      simp [hm, hneq, hnonneg]
+    · simp [hm, hneq]
+
+private lemma hBConsistencyCoordMass_le_linePointDefect
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) (xs : PointTuple params k)
+    (i : Fin k) :
+    (∑ f : AxisLinePolynomial params.next,
+      ev strategy.state
+        (opTensor
+          (∑ gs : GHatTupleOutcome params k,
+            if ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+              (interpolationEligibleSandwichFamily params family k xs).outcome gs
+            else 0)
+          ((verticalLineMeasurementFamily params strategy u).outcome f)))
+      ≤ qBipartiteConsDefect strategy.state
+          ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) (u, xs))
+          ((ldSandwichLineOnePointRightFamily params strategy family k i.1) (u, xs)) := by
+  let q : SandwichedLineQuestion params k := (u, xs)
+  let A := ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) q)
+  let Bm := ldSandwichLineOnePointRightMeasurement params strategy family i q
+  let leftFalse : Fq params → MIPStarRE.Quantum.Op ι := fun a =>
+    (postprocess A (fun o => decide (o = some a))).outcome false
+  have hstep :
+      ∀ f : AxisLinePolynomial params.next,
+        ev strategy.state
+          (opTensor
+            (∑ gs : GHatTupleOutcome params k,
+              if ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+                (interpolationEligibleSandwichFamily params family k xs).outcome gs
+              else 0)
+            ((verticalLineMeasurementFamily params strategy u).outcome f))
+          ≤ ev strategy.state
+              (opTensor (leftFalse (f (xs i)))
+                ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+    intro f
+    exact ev_mono strategy.state _ _ <|
+      opTensor_mono_left
+        (grouped_coordinate_mismatch_le_left_falseOutcome params strategy family u xs i (f (xs i)))
+        ((verticalLineMeasurementFamily params strategy u).outcome_pos f)
+  have hgrouped :
+      (∑ f : AxisLinePolynomial params.next,
+        ev strategy.state
+          (opTensor (leftFalse (f (xs i)))
+            ((verticalLineMeasurementFamily params strategy u).outcome f)))
+        = ∑ a : Fq params,
+            ev strategy.state
+              (opTensor (leftFalse a) (Bm.outcome (some a))) := by
+    calc
+      (∑ f : AxisLinePolynomial params.next,
+        ev strategy.state
+          (opTensor (leftFalse (f (xs i)))
+            ((verticalLineMeasurementFamily params strategy u).outcome f)))
+        = ∑ f : AxisLinePolynomial params.next,
+            ∑ a : Fq params,
+              if f (xs i) = a then
+                ev strategy.state
+                  (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+              else (0 : Error) := by
+              refine Finset.sum_congr rfl ?_
+              intro f _
+              have hsingle :
+                  (∑ a : Fq params,
+                    if f (xs i) = a then
+                      ev strategy.state
+                        (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+                    else (0 : Error)) =
+                  ev strategy.state
+                    (opTensor (leftFalse (f (xs i))) ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+                simpa using (show
+                  (∑ a : Fq params,
+                    if f (xs i) = a then
+                      ev strategy.state
+                        (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+                    else (0 : Error)) =
+                  ev strategy.state
+                    (opTensor (leftFalse (f (xs i))) ((verticalLineMeasurementFamily params strategy u).outcome f)) by
+                    simp)
+              simpa using hsingle.symm
+      _ = ∑ a : Fq params,
+            ∑ f : AxisLinePolynomial params.next,
+              if f (xs i) = a then
+                ev strategy.state
+                  (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+              else (0 : Error) := by
+              rw [Finset.sum_comm]
+      _ = ∑ a : Fq params,
+            ev strategy.state
+              (opTensor (leftFalse a) (Bm.outcome (some a))) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              have hgroup :
+                  (∑ f : AxisLinePolynomial params.next,
+                    if f (xs i) = a then
+                      ev strategy.state
+                        (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+                    else (0 : Error))
+                    = ∑ f : AxisLinePolynomial params.next,
+                        ev strategy.state
+                          (opTensor (leftFalse a)
+                            (if f (xs i) = a then
+                              (verticalLineMeasurementFamily params strategy u).outcome f
+                            else 0)) := by
+                      refine Finset.sum_congr rfl ?_
+                      intro f _
+                      by_cases hf : f (xs i) = a
+                      · simp [hf]
+                      · simp [hf, opTensor, ev]
+              rw [hgroup, ← ev_finset_sum, ← opTensor_sum_right_local]
+              rw [ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum]
+  have hdefect_expand :
+      qBipartiteConsDefect strategy.state A Bm.toSubMeas =
+        qBipartiteConsDefect strategy.state
+          ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) q)
+          ((ldSandwichLineOnePointRightFamily params strategy family k i.1) q) := by
+    rfl
+  calc
+    (∑ f : AxisLinePolynomial params.next,
+      ev strategy.state
+        (opTensor
+          (∑ gs : GHatTupleOutcome params k,
+            if ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+              (interpolationEligibleSandwichFamily params family k xs).outcome gs
+            else 0)
+          ((verticalLineMeasurementFamily params strategy u).outcome f)))
+      ≤ ∑ f : AxisLinePolynomial params.next,
+          ev strategy.state
+            (opTensor (leftFalse (f (xs i)))
+              ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+            exact Finset.sum_le_sum fun f _ => hstep f
+    _ = ∑ a : Fq params,
+          ev strategy.state
+            (opTensor (leftFalse a) (Bm.outcome (some a))) := hgrouped
+    _ = ∑ a : Fq params,
+          qBipartiteConsDefect strategy.state
+            (postprocess A (fun o => decide (o = some a)))
+            (singleOutcomeRightSubMeas Bm.toSubMeas (some a)) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            symm
+            exact qBipartiteConsDefect_postprocess_eq_singleOutcome strategy.state A Bm.toSubMeas (some a)
+    _ ≤ qBipartiteConsDefect strategy.state A Bm.toSubMeas := by
+            rw [qBipartiteConsDefect_eq_sum_singleOutcome (B := Bm), Fintype.sum_option]
+            have hnone_nonneg :
+                0 ≤ qBipartiteConsDefect strategy.state
+                  (postprocess A (fun o => decide (o = none)))
+                  (singleOutcomeRightSubMeas Bm.toSubMeas none) :=
+              qBipartiteConsDefect_nonneg strategy.state _ _
+            linarith
+    _ = qBipartiteConsDefect strategy.state
+          ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) q)
+          ((ldSandwichLineOnePointRightFamily params strategy family k i.1) q) := hdefect_expand
+
+private lemma hBConsistencyBadMass_le_linePointDefectSum
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) (xs : PointTuple params k) :
+    hBConsistencyBadMass params strategy family u xs
+      ≤ ∑ i : Fin k,
+          qBipartiteConsDefect strategy.state
+            ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) (u, xs))
+            ((ldSandwichLineOnePointRightFamily params strategy family k i.1) (u, xs)) := by
+  calc
+    hBConsistencyBadMass params strategy family u xs
+      ≤ ∑ f : AxisLinePolynomial params.next,
+          ev strategy.state
+            (opTensor
+              (∑ i : Fin k,
+                ∑ gs : GHatTupleOutcome params k,
+                  if ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+                    (interpolationEligibleSandwichFamily params family k xs).outcome gs
+                  else 0)
+              ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+            unfold hBConsistencyBadMass
+            refine Finset.sum_le_sum ?_
+            intro f _
+            apply ev_mono strategy.state _ _
+            exact opTensor_mono_left
+              (interpolationEligibleSandwich_exists_mismatch_sum_le_sum params family u xs f)
+              ((verticalLineMeasurementFamily params strategy u).outcome_pos f)
+    _ = ∑ i : Fin k,
+          ∑ f : AxisLinePolynomial params.next,
+            ev strategy.state
+              (opTensor
+                (∑ gs : GHatTupleOutcome params k,
+                  if ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+                    (interpolationEligibleSandwichFamily params family k xs).outcome gs
+                  else 0)
+                ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+            rw [Finset.sum_comm]
+            refine Finset.sum_congr rfl ?_
+            intro f _
+            rw [opTensor_sum_left_local, ev_finset_sum]
+    _ ≤ ∑ i : Fin k,
+          qBipartiteConsDefect strategy.state
+            ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) (u, xs))
+            ((ldSandwichLineOnePointRightFamily params strategy family k i.1) (u, xs)) := by
+            refine Finset.sum_le_sum ?_
+            intro i _
+            exact hBConsistencyCoordMass_le_linePointDefect params strategy family u xs i
+
+private lemma hBConsistencyBadMass_nonneg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) (xs : PointTuple params k) :
+    0 ≤ hBConsistencyBadMass params strategy family u xs := by
+  unfold hBConsistencyBadMass
+  refine Finset.sum_nonneg ?_
+  intro f _
+  apply ev_nonneg_of_psd strategy.state _
+  exact opTensor_nonneg
+    (by
+      refine Finset.sum_nonneg ?_
+      intro gs _
+      by_cases hbad : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)
+      · simp [hbad, (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs]
+      · simp [hbad])
+    ((verticalLineMeasurementFamily params strategy u).outcome_pos f)
+
+private lemma hBConsistencyBadMass_le_one
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) (xs : PointTuple params k) :
+    hBConsistencyBadMass params strategy family u xs ≤ 1 := by
+  let T : MIPStarRE.Quantum.Op ι := (interpolationEligibleSandwichFamily params family k xs).total
+  let L : AxisLinePolynomial params.next → MIPStarRE.Quantum.Op ι := fun f =>
+    ∑ gs : GHatTupleOutcome params k,
+      if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
+        (interpolationEligibleSandwichFamily params family k xs).outcome gs
+      else 0
+  have hLle : ∀ f : AxisLinePolynomial params.next, L f ≤ T := by
+    intro f
+    calc
+      L f ≤ ∑ gs : GHatTupleOutcome params k,
+          (interpolationEligibleSandwichFamily params family k xs).outcome gs := by
+            unfold L
+            refine Finset.sum_le_sum ?_
+            intro gs _
+            by_cases hbad : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)
+            · simp [hbad]
+            · simp [hbad, (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs]
+      _ = T := by
+            simpa [T] using (interpolationEligibleSandwichFamily params family k xs).sum_eq_total
+  have hsum_le :
+      hBConsistencyBadMass params strategy family u xs ≤
+        ∑ f : AxisLinePolynomial params.next,
+          ev strategy.state (opTensor T ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+    unfold hBConsistencyBadMass
+    refine Finset.sum_le_sum ?_
+    intro f _
+    exact ev_mono strategy.state _ _ <|
+      opTensor_mono_left (hLle f) ((verticalLineMeasurementFamily params strategy u).outcome_pos f)
+  have htotal_eq_one : (verticalLineMeasurementFamily params strategy u).total = 1 := by
+    let ℓ : AxisParallelLine params.next :=
+      { base := appendPoint params u zeroCoord
+        direction := lastCoord params }
+    simpa [verticalLineMeasurementFamily, ℓ] using (strategy.axisParallelMeasurement ℓ).total_eq_one
+  calc
+    hBConsistencyBadMass params strategy family u xs
+      ≤ ∑ f : AxisLinePolynomial params.next,
+          ev strategy.state (opTensor T ((verticalLineMeasurementFamily params strategy u).outcome f)) := hsum_le
+    _ = ev strategy.state (opTensor T (verticalLineMeasurementFamily params strategy u).total) := by
+          rw [← ev_finset_sum, ← opTensor_sum_right_local]
+          rw [(verticalLineMeasurementFamily params strategy u).sum_eq_total]
+    _ = ev strategy.state (opTensor T (1 : MIPStarRE.Quantum.Op ι)) := by rw [htotal_eq_one]
+    _ ≤ 1 := by
+          have hTle : T ≤ 1 := by simpa [T] using (interpolationEligibleSandwichFamily params family k xs).total_le_one
+          have hop : opTensor T (1 : MIPStarRE.Quantum.Op ι) ≤ 1 := by
+            simpa [leftTensor] using leftTensor_le_one (ι₂ := ι) (A := T) hTle
+          simpa [ev_one_of_isNormalized strategy.state strategy.isNormalized] using
+            (ev_mono strategy.state _ _ hop)
+
+private lemma postprocess_restrictSubMeas_outcome
+    {α β : Type*} [Fintype α] [Fintype β] [DecidableEq β]
+    (A : SubMeas α ι) (p : α → Prop) [DecidablePred p]
+    (f : α → β) (b : β) :
+    (postprocess (restrictSubMeas A p) f).outcome b =
+      ∑ a : α, if p a ∧ f a = b then A.outcome a else 0 := by
+  classical
+  ext i j
+  simp [postprocess, restrictSubMeas, Matrix.sum_apply, Finset.sum_filter, and_left_comm,
+    and_assoc]
+  refine Finset.sum_congr rfl ?_
+  intro c _
+  by_cases hf : f c = b <;> by_cases hp : p c <;>
+    simp [hf, hp, and_left_comm, and_assoc]
+
+private lemma pastedInterpolation_verticalLine_defect_le_badMass
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (hxs : Function.Injective xs) :
+    qBipartiteConsDefect strategy.state
+      (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+      (verticalLineMeasurementFamily params strategy u)
+      ≤ hBConsistencyBadMass params strategy family u xs := by
+  let ℓ : AxisParallelLine params.next :=
+    { base := appendPoint params u zeroCoord
+      direction := lastCoord params }
+  let Bm : Measurement (AxisLinePolynomial params.next) ι :=
+    (strategy.axisParallelMeasurement ℓ).toMeasurement
+  have hB : Bm.toSubMeas = verticalLineMeasurementFamily params strategy u := by
+    simp [Bm, ℓ, verticalLineMeasurementFamily]
+  rw [← hB, qBipartiteConsDefect_eq_sum_singleOutcome (B := Bm)]
+  exact Finset.sum_le_sum (fun f _ => by
+    calc
+      qBipartiteConsDefect strategy.state
+          (postprocess (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+            (fun h => decide (h = f)))
+          (singleOutcomeRightSubMeas Bm.toSubMeas f)
+        = ev strategy.state
+            (opTensor
+              ((postprocess (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+                (fun h => decide (h = f))).outcome false)
+              (Bm.outcome f)) := by
+                rw [qBipartiteConsDefect_postprocess_eq_singleOutcome]
+      _ = ev strategy.state
+            (opTensor
+              (∑ gs : GHatTupleOutcome params k,
+                if IsGloballyConsistent params xs gs ∧ tupleInterpolatedVerticalLine params u xs gs ≠ f then
+                  (interpolationEligibleSandwichFamily params family k xs).outcome gs
+                else 0)
+              (Bm.outcome f)) := by
+                rw [pastedInterpolation_verticalLine_singleOutcome_postprocess,
+                  postprocess_restrictSubMeas_outcome]
+                simp [decide_eq_false_iff_not]
+      _ ≤ ev strategy.state
+            (opTensor
+              (∑ gs : GHatTupleOutcome params k,
+                if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+                    ((gs i).get hiSome) u ≠ f (xs i) then
+                  (interpolationEligibleSandwichFamily params family k xs).outcome gs
+                else 0)
+              (Bm.outcome f)) := by
+                apply ev_mono strategy.state _ _
+                exact opTensor_mono_left
+                  (interpolationEligibleSandwich_mismatch_sum_mono params family u xs hxs f)
+                  (Bm.outcome_pos f)
+      _ = ev strategy.state
+            (opTensor
+              (∑ gs : GHatTupleOutcome params k,
+                if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+                    ((gs i).get hiSome) u ≠ f (xs i) then
+                  (interpolationEligibleSandwichFamily params family k xs).outcome gs
+                else 0)
+              ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+                simp [hB])
+
+private lemma opTensor_smul_left
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (c : Error)
+    (A : MIPStarRE.Quantum.Op ιA)
+    (B : MIPStarRE.Quantum.Op ιB) :
+    opTensor ((c : ℂ) • A) B = (c : ℂ) • opTensor A B := by
+  ext x y
+  simp [opTensor, mul_comm, mul_left_comm]
+
+private lemma opTensor_sum_left
+    {α ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (s : Finset α)
+    (f : α → MIPStarRE.Quantum.Op ιA)
+    (B : MIPStarRE.Quantum.Op ιB) :
+    opTensor (∑ a ∈ s, f a) B = ∑ a ∈ s, opTensor (f a) B := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [opTensor]
+  | @insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_left_local, ih]
+
+private lemma opTensor_averageOperatorOverDistribution_left
+    {Question ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (𝒟 : Distribution Question)
+    (A : Question → MIPStarRE.Quantum.Op ιA)
+    (B : MIPStarRE.Quantum.Op ιB) :
+    opTensor (averageOperatorOverDistribution 𝒟 A) B =
+      averageOperatorOverDistribution 𝒟 (fun q => opTensor (A q) B) := by
+  classical
+  unfold averageOperatorOverDistribution
+  rw [opTensor_sum_left]
+  refine Finset.sum_congr rfl ?_
+  intro q _
+  simpa using opTensor_smul_left (c := 𝒟.weight q) (A := A q) (B := B)
+
+private lemma avgOver_sub
+    {α : Type*}
+    (𝒟 : Distribution α)
+    (f g : α → Error) :
+    avgOver 𝒟 (fun a => f a - g a) = avgOver 𝒟 f - avgOver 𝒟 g := by
+  unfold avgOver
+  simp_rw [mul_sub]
+  rw [Finset.sum_sub_distrib]
+
+private lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv
+    (params : Parameters) [FieldModel params.q]
+    (k : ℕ) (hk : k ≤ params.q)
+    (F : PointTuple params k → Error)
+    (hF_nonneg : ∀ xs, 0 ≤ F xs)
+    (hF_le_one : ∀ xs, F xs ≤ 1) :
+    avgOver (distinctTupleDistribution params k) F
+      ≤ avgOver (uniformDistribution (PointTuple params k)) F
+        + totalVariationDistance
+            (uniformDistribution (PointTuple params k))
+            (distinctTupleDistribution params k) := by
+  classical
+  let support : Finset (PointTuple params k) :=
+    Finset.univ.filter fun xs : PointTuple params k => Function.Injective xs
+  let bad : Finset (PointTuple params k) :=
+    { xs ∈ Finset.univ | ¬ Function.Injective xs }
+  have hsupport_card : support.card = params.q.descFactorial k := by
+    rw [← Fintype.card_coe]
+    let e : { xs : PointTuple params k // Function.Injective xs } ≃ (Fin k ↪ Fq params) :=
+      Equiv.subtypeInjectiveEquivEmbedding (Fin k) (Fq params)
+    simpa [support, Finset.mem_filter] using
+      (Fintype.card_congr e).trans Fintype.card_embedding_eq
+  have hqpow_ne : ((params.q : Error) ^ k) ≠ 0 := by
+    have hq_ne : (params.q : Error) ≠ 0 := by
+      exact_mod_cast (Nat.ne_of_gt params.hq)
+    exact pow_ne_zero k hq_ne
+  have hsupport_nonempty : support.Nonempty := by
+    refine ⟨fun i => ⟨i.1, Nat.lt_of_lt_of_le i.2 hk⟩, ?_⟩
+    refine Finset.mem_filter.mpr ?_
+    constructor
+    · simp
+    · intro i j hij
+      exact Fin.ext (by simpa using congrArg Fin.val hij)
+  have hsupport_card_ne : support.card ≠ 0 := Finset.card_ne_zero.mpr hsupport_nonempty
+  have hsupport_pos : 0 < (support.card : Error) := by
+    exact_mod_cast Nat.pos_of_ne_zero hsupport_card_ne
+  have hsupport_le_pow_nat : support.card ≤ params.q ^ k := by
+    rw [hsupport_card]
+    exact Nat.descFactorial_le_pow _ _
+  have hweight_le :
+      1 / ((params.q : Error) ^ k) ≤ 1 / (support.card : Error) := by
+    exact one_div_le_one_div_of_le hsupport_pos (by exact_mod_cast hsupport_le_pow_nat)
+  have hpartition_card :
+      support.card + bad.card = params.q ^ k := by
+    simpa [support, bad, PointTuple, Fintype.card_fun, Fintype.card_fin] using
+      (Finset.card_filter_add_card_filter_not
+        (s := (Finset.univ : Finset (PointTuple params k)))
+        (p := fun xs : PointTuple params k => Function.Injective xs))
+  have hpartition_cast :
+      (support.card : Error) + bad.card = (params.q : Error) ^ k := by
+    exact_mod_cast hpartition_card
+  have hdisj : Disjoint support bad := by
+    simpa [support, bad] using
+      (Finset.disjoint_filter_filter_not
+        (Finset.univ : Finset (PointTuple params k))
+        (Finset.univ : Finset (PointTuple params k))
+        (fun xs : PointTuple params k => Function.Injective xs))
+  have huniform_support :
+      (uniformDistribution (PointTuple params k)).support = support ∪ bad := by
+    simp [uniformDistribution, support, bad, Finset.filter_union_filter_not_eq]
+  have hgood :
+      ∑ xs ∈ support,
+        |(uniformDistribution (PointTuple params k)).weight xs
+          - (distinctTupleDistribution params k).weight xs|
+        = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
+    have hconst :
+        ∀ xs ∈ support,
+          |(uniformDistribution (PointTuple params k)).weight xs
+            - (distinctTupleDistribution params k).weight xs|
+            = (1 / (support.card : Error)) - (1 / ((params.q : Error) ^ k)) := by
+      intro xs hxs
+      rw [show (uniformDistribution (PointTuple params k)).weight xs =
+          1 / ((params.q : Error) ^ k) by
+            simp [uniformDistribution, PointTuple, Fintype.card_fin]]
+      rw [show (distinctTupleDistribution params k).weight xs =
+          if xs ∈ support then 1 / (support.card : Error) else 0 by
+            simp [distinctTupleDistribution, support]]
+      rw [if_pos hxs]
+      rw [abs_of_nonpos (sub_nonpos.mpr hweight_le)]
+      ring
+    calc
+      ∑ xs ∈ support,
+          |(uniformDistribution (PointTuple params k)).weight xs
+            - (distinctTupleDistribution params k).weight xs|
+        = ∑ xs ∈ support, ((1 / (support.card : Error)) - (1 / ((params.q : Error) ^ k))) := by
+            exact Finset.sum_congr rfl hconst
+      _ = (support.card : Error) * ((1 / (support.card : Error)) - (1 / ((params.q : Error) ^ k))) := by
+            rw [Finset.sum_const, nsmul_eq_mul]
+      _ = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
+            field_simp [hsupport_card_ne, hqpow_ne]
+  have htv_eq :
+      totalVariationDistance (uniformDistribution (PointTuple params k))
+          (distinctTupleDistribution params k)
+        = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
+    have hsupp_union :
+        (uniformDistribution (PointTuple params k)).support
+          ∪ (distinctTupleDistribution params k).support
+          = support ∪ bad := by
+      simp [uniformDistribution, distinctTupleDistribution, support, bad,
+        Finset.filter_union_filter_not_eq]
+    have hbad :
+        ∑ xs ∈ bad,
+          |(uniformDistribution (PointTuple params k)).weight xs
+            - (distinctTupleDistribution params k).weight xs|
+          = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
+      calc
+        ∑ xs ∈ bad,
+            |(uniformDistribution (PointTuple params k)).weight xs
+              - (distinctTupleDistribution params k).weight xs|
+          = ∑ xs ∈ bad, (1 / ((params.q : Error) ^ k)) := by
+              apply Finset.sum_congr rfl
+              intro xs hxs
+              have hnotinj : ¬ Function.Injective xs := (Finset.mem_filter.mp hxs).2
+              rw [show (uniformDistribution (PointTuple params k)).weight xs =
+                  1 / ((params.q : Error) ^ k) by
+                    simp [uniformDistribution, PointTuple, Fintype.card_fin]]
+              rw [show (distinctTupleDistribution params k).weight xs =
+                  if xs ∈ support then 1 / (support.card : Error) else 0 by
+                    simp [distinctTupleDistribution, support]]
+              rw [if_neg fun hmem => hnotinj ((Finset.mem_filter.mp hmem).2)]
+              simp
+        _ = (bad.card : Error) / ((params.q : Error) ^ k) := by
+              simp [div_eq_mul_inv]
+        _ = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
+              field_simp [hqpow_ne]
+              nlinarith [hpartition_cast]
+    rw [totalVariationDistance, hsupp_union, Finset.sum_union hdisj]
+    simp [hgood, hbad]
+    ring
+  have hsupport_term :
+      avgOver (distinctTupleDistribution params k) F ≤
+        ∑ xs ∈ support, (uniformDistribution (PointTuple params k)).weight xs * F xs +
+          totalVariationDistance (uniformDistribution (PointTuple params k)) (distinctTupleDistribution params k) := by
+    calc
+      avgOver (distinctTupleDistribution params k) F
+        = ∑ xs ∈ support, (distinctTupleDistribution params k).weight xs * F xs := by
+            simp [avgOver, distinctTupleDistribution, support]
+      _ ≤ ∑ xs ∈ support,
+            ((uniformDistribution (PointTuple params k)).weight xs * F xs +
+              |(uniformDistribution (PointTuple params k)).weight xs -
+                (distinctTupleDistribution params k).weight xs|) := by
+            refine Finset.sum_le_sum ?_
+            intro xs hxs
+            have hFx_le := hF_le_one xs
+            have hw :
+                (uniformDistribution (PointTuple params k)).weight xs ≤
+                  (distinctTupleDistribution params k).weight xs := by
+              rw [show (uniformDistribution (PointTuple params k)).weight xs =
+                  1 / ((params.q : Error) ^ k) by
+                    simp [uniformDistribution, PointTuple, Fintype.card_fin]]
+              rw [show (distinctTupleDistribution params k).weight xs =
+                  if xs ∈ support then 1 / (support.card : Error) else 0 by
+                    simp [distinctTupleDistribution, support]]
+              rw [if_pos hxs]
+              exact hweight_le
+            have habs :
+                |(uniformDistribution (PointTuple params k)).weight xs -
+                    (distinctTupleDistribution params k).weight xs| =
+                  (distinctTupleDistribution params k).weight xs -
+                    (uniformDistribution (PointTuple params k)).weight xs := by
+              rw [abs_of_nonpos (sub_nonpos.mpr hw)]
+              ring
+            have hdelta_nonneg :
+                0 ≤ (distinctTupleDistribution params k).weight xs -
+                    (uniformDistribution (PointTuple params k)).weight xs := by
+              linarith
+            have hmul :
+                ((distinctTupleDistribution params k).weight xs -
+                    (uniformDistribution (PointTuple params k)).weight xs) * F xs ≤
+                  (distinctTupleDistribution params k).weight xs -
+                    (uniformDistribution (PointTuple params k)).weight xs := by
+              have := mul_le_mul_of_nonneg_left hFx_le hdelta_nonneg
+              simpa [one_mul] using this
+            have hsplit :
+                (distinctTupleDistribution params k).weight xs * F xs =
+                  (uniformDistribution (PointTuple params k)).weight xs * F xs +
+                    ((distinctTupleDistribution params k).weight xs -
+                      (uniformDistribution (PointTuple params k)).weight xs) * F xs := by
+              ring
+            rw [hsplit]
+            rw [habs]
+            linarith
+      _ = ∑ xs ∈ support, (uniformDistribution (PointTuple params k)).weight xs * F xs +
+            ∑ xs ∈ support,
+              |(uniformDistribution (PointTuple params k)).weight xs -
+                (distinctTupleDistribution params k).weight xs| := by
+            rw [Finset.sum_add_distrib]
+      _ = ∑ xs ∈ support, (uniformDistribution (PointTuple params k)).weight xs * F xs +
+            totalVariationDistance (uniformDistribution (PointTuple params k)) (distinctTupleDistribution params k) := by
+            rw [hgood, htv_eq]
+  have hsupport_le_uniform :
+      ∑ xs ∈ support, (uniformDistribution (PointTuple params k)).weight xs * F xs ≤
+        avgOver (uniformDistribution (PointTuple params k)) F := by
+    have hbad_nonneg :
+        0 ≤ ∑ xs ∈ bad, (uniformDistribution (PointTuple params k)).weight xs * F xs := by
+      exact Finset.sum_nonneg fun xs _ =>
+        mul_nonneg ((uniformDistribution (PointTuple params k)).nonnegative xs) (hF_nonneg xs)
+    calc
+      ∑ xs ∈ support, (uniformDistribution (PointTuple params k)).weight xs * F xs
+        ≤ ∑ xs ∈ support, (uniformDistribution (PointTuple params k)).weight xs * F xs +
+            ∑ xs ∈ bad, (uniformDistribution (PointTuple params k)).weight xs * F xs := by
+              linarith
+      _ = avgOver (uniformDistribution (PointTuple params k)) F := by
+            rw [avgOver, huniform_support, Finset.sum_union hdisj]
+  calc
+    avgOver (distinctTupleDistribution params k) F
+      ≤ ∑ xs ∈ support, (uniformDistribution (PointTuple params k)).weight xs * F xs +
+          totalVariationDistance (uniformDistribution (PointTuple params k)) (distinctTupleDistribution params k) := hsupport_term
+    _ ≤ avgOver (uniformDistribution (PointTuple params k)) F +
+          totalVariationDistance (uniformDistribution (PointTuple params k)) (distinctTupleDistribution params k) := by
+            linarith [hsupport_le_uniform]
+
+private lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv_of_any_k
+    (params : Parameters) [FieldModel params.q]
+    (k : ℕ)
+    (F : PointTuple params k → Error)
+    (hF_nonneg : ∀ xs, 0 ≤ F xs)
+    (hF_le_one : ∀ xs, F xs ≤ 1) :
+    avgOver (distinctTupleDistribution params k) F
+      ≤ avgOver (uniformDistribution (PointTuple params k)) F
+        + totalVariationDistance
+            (uniformDistribution (PointTuple params k))
+            (distinctTupleDistribution params k) := by
+  classical
+  by_cases hk : k ≤ params.q
+  · exact avgOver_distinct_bounded_le_avgOver_uniform_add_tv params k hk F hF_nonneg hF_le_one
+  · have hkq : params.q < k := lt_of_not_ge hk
+    let support : Finset (PointTuple params k) :=
+      Finset.univ.filter fun xs : PointTuple params k => Function.Injective xs
+    have hsupport_card : support.card = params.q.descFactorial k := by
+      rw [← Fintype.card_coe]
+      let e : { xs : PointTuple params k // Function.Injective xs } ≃ (Fin k ↪ Fq params) :=
+        Equiv.subtypeInjectiveEquivEmbedding (Fin k) (Fq params)
+      simpa [support, Finset.mem_filter] using
+        (Fintype.card_congr e).trans Fintype.card_embedding_eq
+    have hsupport_empty : support = ∅ := by
+      apply Finset.card_eq_zero.mp
+      rw [hsupport_card]
+      exact Nat.descFactorial_eq_zero_iff_lt.mpr hkq
+    have hdistinct_zero : avgOver (distinctTupleDistribution params k) F = 0 := by
+      unfold avgOver
+      simp [distinctTupleDistribution, support, hsupport_empty]
+    have hright_nonneg :
+        0 ≤ avgOver (uniformDistribution (PointTuple params k)) F +
+            totalVariationDistance
+              (uniformDistribution (PointTuple params k))
+              (distinctTupleDistribution params k) := by
+      have hunif_nonneg : 0 ≤ avgOver (uniformDistribution (PointTuple params k)) F := by
+        unfold avgOver
+        exact Finset.sum_nonneg fun xs _ =>
+          mul_nonneg ((uniformDistribution (PointTuple params k)).nonnegative xs) (hF_nonneg xs)
+      have htv_nonneg :
+          0 ≤ totalVariationDistance
+            (uniformDistribution (PointTuple params k))
+            (distinctTupleDistribution params k) := by
+        unfold totalVariationDistance
+        positivity
+      linarith
+    rw [hdistinct_zero]
+    exact hright_nonneg
+
+private lemma max_zero_add_le
+    (a t : Error) (ha : 0 ≤ a) :
+    max 0 (a + t) ≤ a + max 0 t := by
+  by_cases ht : 0 ≤ t
+  · rw [max_eq_right (add_nonneg ha ht), max_eq_right ht]
+  · have ht' : t ≤ 0 := le_of_not_ge ht
+    by_cases hat : 0 ≤ a + t
+    · rw [max_eq_right hat, max_eq_left ht']
+      linarith
+    · have hat' : a + t ≤ 0 := le_of_not_ge hat
+      rw [max_eq_left hat', max_eq_left ht']
+      linarith
+
+private lemma max_zero_mul_add_le
+    (w a t : Error)
+    (hw : 0 ≤ w) :
+    max 0 (w * a + t) ≤ w * max 0 a + max 0 t := by
+  have hwa : w * a ≤ w * max 0 a := by
+    exact mul_le_mul_of_nonneg_left (le_max_right 0 a) hw
+  calc
+    max 0 (w * a + t) ≤ max 0 (w * max 0 a + t) := by
+      have hadd : w * a + t ≤ w * max 0 a + t := by linarith
+      exact max_le_max le_rfl hadd
+    _ ≤ w * max 0 a + max 0 t := by
+      exact max_zero_add_le (w * max 0 a) t (mul_nonneg hw (by positivity))
+
+private lemma max_zero_avgOver_le_avgOver_max_zero
+    {α : Type*}
+    (𝒟 : Distribution α)
+    (f : α → Error) :
+    max 0 (avgOver 𝒟 f) ≤ avgOver 𝒟 (fun a => max 0 (f a)) := by
+  classical
+  unfold avgOver
+  induction 𝒟.support using Finset.induction_on with
+  | empty => simp
+  | @insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha]
+      calc
+        max 0 (𝒟.weight a * f a + ∑ x ∈ s, 𝒟.weight x * f x)
+          ≤ 𝒟.weight a * max 0 (f a) + max 0 (∑ x ∈ s, 𝒟.weight x * f x) := by
+              exact max_zero_mul_add_le (𝒟.weight a) (f a)
+                (∑ x ∈ s, 𝒟.weight x * f x) (𝒟.nonnegative a)
+        _ ≤ 𝒟.weight a * max 0 (f a) + ∑ x ∈ s, 𝒟.weight x * max 0 (f x) := by
+              simpa [add_comm, add_left_comm, add_assoc] using
+                add_le_add_right ih (𝒟.weight a * max 0 (f a))
+
+private lemma qBipartiteMatchMass_averageIdxSubMeas_left
+    {Question Outcome : Type*}
+    [DecidableEq Question] [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι)
+    (B : SubMeas Outcome ι)
+    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1) :
+    qBipartiteMatchMass ψ (averageIdxSubMeas 𝒟 A h𝒟) B =
+      avgOver 𝒟 (fun q => qBipartiteMatchMass ψ (A q) B) := by
+  classical
+  unfold qBipartiteMatchMass avgOver averageIdxSubMeas
+  calc
+    ∑ a,
+        ev ψ
+          (opTensor (averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a))
+            (B.outcome a))
+      = ∑ a,
+          ev ψ
+            (averageOperatorOverDistribution 𝒟
+              (fun q => opTensor ((A q).outcome a) (B.outcome a))) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              exact congrArg (ev ψ)
+                (opTensor_averageOperatorOverDistribution_left 𝒟
+                  (fun q => (A q).outcome a) (B.outcome a))
+    _ = ∑ a, ∑ q ∈ 𝒟.support, 𝒟.weight q * ev ψ (opTensor ((A q).outcome a) (B.outcome a)) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          unfold averageOperatorOverDistribution
+          rw [ev_finset_sum]
+          refine Finset.sum_congr rfl ?_
+          intro q _
+          simpa using ev_scale ψ (𝒟.weight q)
+            (opTensor ((A q).outcome a) (B.outcome a))
+    _ = ∑ q ∈ 𝒟.support, ∑ a, 𝒟.weight q * ev ψ (opTensor ((A q).outcome a) (B.outcome a)) := by
+          rw [Finset.sum_comm]
+    _ = ∑ q ∈ 𝒟.support, 𝒟.weight q * ∑ a, ev ψ (opTensor ((A q).outcome a) (B.outcome a)) := by
+          refine Finset.sum_congr rfl ?_
+          intro q _
+          rw [← Finset.mul_sum]
+    _ = avgOver 𝒟 (fun q => qBipartiteMatchMass ψ (A q) B) := by
+          simp [avgOver, qBipartiteMatchMass]
+
+private lemma ev_opTensor_total_averageIdxSubMeas_left
+    {Question Outcome : Type*}
+    [DecidableEq Question] [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι)
+    (B : SubMeas Outcome ι)
+    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1) :
+    ev ψ (opTensor (averageIdxSubMeas 𝒟 A h𝒟).total B.total) =
+      avgOver 𝒟 (fun q => ev ψ (opTensor (A q).total B.total)) := by
+  classical
+  unfold avgOver averageIdxSubMeas
+  rw [opTensor_sum_left]
+  rw [ev_finset_sum]
+  refine Finset.sum_congr rfl ?_
+  intro q _
+  have hsmul :
+      opTensor (𝒟.weight q • (A q).total) B.total =
+        (𝒟.weight q : ℂ) • opTensor (A q).total B.total :=
+    opTensor_smul_left (c := 𝒟.weight q) (A := (A q).total) (B := B.total)
+  rw [hsmul]
+  simpa using ev_scale ψ (𝒟.weight q) (opTensor (A q).total B.total)
+
+private lemma qBipartiteConsDefect_averageIdxSubMeas_left_le
+    {Question Outcome : Type*}
+    [DecidableEq Question] [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ι)
+    (B : SubMeas Outcome ι)
+    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1) :
+    qBipartiteConsDefect ψ (averageIdxSubMeas 𝒟 A h𝒟) B ≤
+      avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (A q) B) := by
+  have htotal := ev_opTensor_total_averageIdxSubMeas_left ψ 𝒟 A B h𝒟
+  have hmatch := qBipartiteMatchMass_averageIdxSubMeas_left ψ 𝒟 A B h𝒟
+  rw [qBipartiteConsDefect, htotal, hmatch]
+  rw [← avgOver_sub]
+  exact le_trans
+    (max_zero_avgOver_le_avgOver_max_zero 𝒟
+      (fun q => ev ψ (opTensor (A q).total B.total) - qBipartiteMatchMass ψ (A q) B)) <| by
+        refine avgOver_mono 𝒟 _ _ ?_
+        intro q
+        simp [qBipartiteConsDefect]
+
+private lemma hBConsistency_fixed_u_defect_le_avgOver_distinct
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (k : ℕ)
+    (u : Point params) :
+    qBipartiteConsDefect strategy.state
+      (hRestrictionToVerticalLine params (constructedPastedSubMeas params family k) u)
+      (verticalLineMeasurementFamily params strategy u) ≤
+        avgOver (distinctTupleDistribution params k)
+          (fun xs =>
+            qBipartiteConsDefect strategy.state
+              (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+              (verticalLineMeasurementFamily params strategy u)) := by
+  have hleft :
+      hRestrictionToVerticalLine params (constructedPastedSubMeas params family k) u =
+        averageIdxSubMeas
+          (distinctTupleDistribution params k)
+          (fun xs => hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+          (distinctTupleDistribution_weight_sum_le_one params k) := by
+    simpa [constructedPastedSubMeas] using
+      hRestrictionToVerticalLine_averageIdxSubMeas (params := params) u
+        (distinctTupleDistribution params k)
+        (pastedInterpolationFamily params family k)
+        (distinctTupleDistribution_weight_sum_le_one params k)
+  rw [hleft]
+  exact qBipartiteConsDefect_averageIdxSubMeas_left_le strategy.state
+    (distinctTupleDistribution params k)
+    (fun xs => hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+    (verticalLineMeasurementFamily params strategy u)
+    (distinctTupleDistribution_weight_sum_le_one params k)
+
+private lemma hBConsistencyError_eq_k_mul_ldSandwichLineOnePointError_add
+    (params : Parameters)
+    (eps delta gamma zeta : Error) (k : ℕ) :
+    hBConsistencyError params eps delta gamma zeta k =
+      (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k +
+        ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+          (Real.rpow eps (1 / (32 : Error)) +
+            Real.rpow delta (1 / (32 : Error)) +
+            Real.rpow gamma (1 / (32 : Error)) +
+            Real.rpow zeta (1 / (32 : Error)) +
+            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) := by
+  simp [hBConsistencyError, ldSandwichLineOnePointError]
+  ring
+
+private lemma avgOver_sum_fin
+    {α : Type*} (𝒟 : Distribution α) (k : ℕ) (f : α → Fin k → Error) :
+    avgOver 𝒟 (fun a => ∑ i : Fin k, f a i) =
+      ∑ i : Fin k, avgOver 𝒟 (fun a => f a i) := by
+  unfold avgOver
+  calc
+    ∑ a ∈ 𝒟.support, 𝒟.weight a * ∑ i : Fin k, f a i
+      = ∑ a ∈ 𝒟.support, ∑ i : Fin k, 𝒟.weight a * f a i := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [Finset.mul_sum]
+    _ = ∑ i : Fin k, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a i := by
+          rw [Finset.sum_comm]
+
+private lemma one_div_q_le_rpow_degreeRatio
+    (params : Parameters) [FieldModel params.q]
+    (hd : 0 < params.d) :
+    1 / (params.q : Error)
+      ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
+  let x : Error := ((params.d : Error) / (params.q : Error))
+  have hq_pos : 0 < (params.q : Error) := by exact_mod_cast params.hq
+  have hx_nonneg : 0 ≤ x := by positivity
+  have hqx : 1 / (params.q : Error) ≤ x := by
+    have hd_ge_one : (1 : Error) ≤ (params.d : Error) := by exact_mod_cast hd
+    simpa [x] using div_le_div_of_nonneg_right hd_ge_one hq_pos.le
+  by_cases hx_le_one : x ≤ 1
+  · have hx_le_rpow : x ≤ Real.rpow x (1 / (32 : Error)) := by
+      simpa [Real.rpow_one] using
+        (Real.rpow_le_rpow_of_exponent_ge' hx_nonneg hx_le_one (by norm_num : 0 ≤ (1 / (32 : Error)))
+          (by norm_num : (1 / (32 : Error)) ≤ (1 : Error)))
+    exact le_trans hqx hx_le_rpow
+  · have h1_le_x : (1 : Error) ≤ x := le_of_not_ge hx_le_one
+    have hq_le_one : 1 / (params.q : Error) ≤ 1 := by
+      have hq_ge_one : (1 : Error) ≤ (params.q : Error) := by exact_mod_cast params.hq
+      have hq_ne : (params.q : Error) ≠ 0 := by positivity
+      field_simp [hq_ne]
+      nlinarith
+    have h1_le_rpow : (1 : Error) ≤ Real.rpow x (1 / (32 : Error)) := by
+      simpa [Real.rpow_one] using
+        (Real.rpow_le_rpow (show 0 ≤ (1 : Error) by positivity) h1_le_x (show 0 ≤ (1 / (32 : Error)) by positivity))
+    exact le_trans hq_le_one h1_le_rpow
+
+private lemma dnoteq_term_le_hBConsistency_extra
+    (params : Parameters) [FieldModel params.q]
+    (eps delta gamma zeta : Error)
+    (k : ℕ)
+    (hd : 0 < params.d)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta) :
+    ((k : Error) ^ (2 : ℕ)) / (params.q : Error)
+      ≤ ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+          (Real.rpow eps (1 / (32 : Error)) +
+            Real.rpow delta (1 / (32 : Error)) +
+            Real.rpow gamma (1 / (32 : Error)) +
+            Real.rpow zeta (1 / (32 : Error)) +
+            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) := by
+  let S : Error :=
+    Real.rpow eps (1 / (32 : Error)) +
+      Real.rpow delta (1 / (32 : Error)) +
+      Real.rpow gamma (1 / (32 : Error)) +
+      Real.rpow zeta (1 / (32 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))
+  have hqterm : 1 / (params.q : Error) ≤ S := by
+    have hlast := one_div_q_le_rpow_degreeRatio params hd
+    have htail_nonneg :
+        0 ≤ Real.rpow eps (1 / (32 : Error)) +
+            Real.rpow delta (1 / (32 : Error)) +
+            Real.rpow gamma (1 / (32 : Error)) +
+            Real.rpow zeta (1 / (32 : Error)) :=
+      add_nonneg
+        (add_nonneg
+          (add_nonneg
+            (Real.rpow_nonneg heps_nonneg _)
+            (Real.rpow_nonneg hdelta_nonneg _))
+          (Real.rpow_nonneg hgamma_nonneg _))
+        (Real.rpow_nonneg hzeta_nonneg _)
+    dsimp [S] at *
+    nlinarith
+  have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
+    exact_mod_cast (Nat.succ_le_of_lt params.hm)
+  have hS_le_mS : S ≤ (params.m : Error) * S := by
+    have hS_nonneg : 0 ≤ S := by
+      dsimp [S]
+      positivity [heps_nonneg, hdelta_nonneg, hgamma_nonneg, hzeta_nonneg]
+    nlinarith
+  have hqterm' : 1 / (params.q : Error) ≤ (params.m : Error) * S :=
+    le_trans hqterm hS_le_mS
+  have hk_nonneg : 0 ≤ ((k : Error) ^ (2 : ℕ)) := by positivity
+  have hmul := mul_le_mul_of_nonneg_left hqterm' hk_nonneg
+  simpa [S, div_eq_mul_inv, mul_assoc, mul_left_comm, mul_comm] using hmul
+
+private lemma hBConsistency_error_bound
+    (params : Parameters) [FieldModel params.q]
+    (eps delta gamma zeta : Error)
+    (k : ℕ)
+    (hd : 0 < params.d)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta) :
+    (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k +
+        ((k : Error) ^ (2 : ℕ)) / (params.q : Error)
+      ≤ hBConsistencyError params eps delta gamma zeta k := by
+  rw [hBConsistencyError_eq_k_mul_ldSandwichLineOnePointError_add]
+  have hextra := dnoteq_term_le_hBConsistency_extra params eps delta gamma zeta k hd
+    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+  linarith
+
+private lemma avgOver_distinct_pasted_defect_le_badMass
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) :
+    avgOver (distinctTupleDistribution params k) (fun xs =>
+      qBipartiteConsDefect strategy.state
+        (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+        (verticalLineMeasurementFamily params strategy u))
+      ≤ avgOver (distinctTupleDistribution params k) (fun xs =>
+          hBConsistencyBadMass params strategy family u xs) := by
+  classical
+  let support : Finset (PointTuple params k) :=
+    Finset.univ.filter fun xs : PointTuple params k => Function.Injective xs
+  have hsupport : (distinctTupleDistribution params k).support = support := by
+    simp [distinctTupleDistribution, support]
+  have hweight :
+      ∀ xs, (distinctTupleDistribution params k).weight xs =
+        if xs ∈ support then 1 / (support.card : Error) else 0 := by
+    intro xs
+    simp [distinctTupleDistribution, support]
+  unfold avgOver
+  rw [hsupport]
+  simp_rw [hweight]
+  refine Finset.sum_le_sum ?_
+  intro xs hxs
+  have hinj : Function.Injective xs := (Finset.mem_filter.mp hxs).2
+  simp [hxs]
+  exact mul_le_mul_of_nonneg_left
+    (pastedInterpolation_verticalLine_defect_le_badMass params strategy family u xs hinj)
+    (by positivity)
+
+private lemma avgOver_distinct_badMass_le_avgOver_uniform_badMass_add_dnoteq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k : ℕ} (u : Point params) :
+    avgOver (distinctTupleDistribution params k) (fun xs =>
+      hBConsistencyBadMass params strategy family u xs)
+      ≤ avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs) +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+  calc
+    avgOver (distinctTupleDistribution params k) (fun xs =>
+        hBConsistencyBadMass params strategy family u xs)
+      ≤ avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs) +
+          totalVariationDistance
+            (uniformDistribution (PointTuple params k))
+            (distinctTupleDistribution params k) := by
+            exact avgOver_distinct_bounded_le_avgOver_uniform_add_tv_of_any_k params k
+              (fun xs => hBConsistencyBadMass params strategy family u xs)
+              (fun xs => hBConsistencyBadMass_nonneg params strategy family u xs)
+              (fun xs => hBConsistencyBadMass_le_one params strategy family u xs)
+    _ ≤ avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs) +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+            gcongr
+            exact ldDnoteq params k
+
+private lemma avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error)
+    (k : ℕ)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    avgOver (uniformDistribution (Point params)) (fun u =>
+      avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+        hBConsistencyBadMass params strategy family u xs))
+      ≤ (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k := by
+  let defect : Fin k → SandwichedLineQuestion params k → Error := fun i q =>
+    qBipartiteConsDefect strategy.state
+      ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) q)
+      ((ldSandwichLineOnePointRightFamily params strategy family k i.1) q)
+  calc
+    avgOver (uniformDistribution (Point params)) (fun u =>
+      avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+        hBConsistencyBadMass params strategy family u xs))
+      ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            ∑ i : Fin k, defect i (u, xs))) := by
+            exact avgOver_mono _ _ _ (fun u =>
+              avgOver_mono _ _ _ (fun xs =>
+                hBConsistencyBadMass_le_linePointDefectSum params strategy family u xs))
+    _ = avgOver (uniformDistribution (Point params)) (fun u =>
+          ∑ i : Fin k,
+            avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u, xs))) := by
+          apply avgOver_congr
+          intro u
+          exact avgOver_sum_fin (uniformDistribution (PointTuple params k)) k (fun xs i => defect i (u, xs))
+    _ = ∑ i : Fin k,
+          avgOver (uniformDistribution (Point params)) (fun u =>
+            avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u, xs))) := by
+          exact (avgOver_sum_fin (uniformDistribution (Point params)) k
+            (fun u i => avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u, xs))))
+    _ = ∑ i : Fin k,
+          avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q => defect i q) := by
+          refine Finset.sum_congr rfl ?_
+          intro i _
+          simpa [SandwichedLineQuestion] using
+            (avgOver_uniform_prod (f := fun u xs => defect i (u, xs))).symm
+    _ ≤ ∑ i : Fin k, ldSandwichLineOnePointError params eps delta gamma zeta k := by
+          refine Finset.sum_le_sum ?_
+          intro i _
+          exact (hline i.1 i.2).linePointComparison.offDiagonalBound
+    _ = (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k := by
+          simp
 
 /- private lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get
     (params : Parameters) [FieldModel params.q]
@@ -3486,31 +5293,6 @@ private lemma commuteGHalfSandwich_moveBack_eq_recursiveSource
   simp [commuteGHalfSandwich_moveBackFamily, commuteGHalfSandwich_recursiveSourceFamily,
     headTailOrderedFamily, leftTensor_mul_leftTensor, mul_assoc]
 
-private lemma commuteGHalfSandwich_moveBack_to_recursiveTarget
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι) (r : ℕ) (δ : Error)
-    (hrec : SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (commuteGHalfSandwich_recursiveSourceFamily params family r)
-      (commuteGHalfSandwich_recursiveTargetFamily params family r)
-      δ) :
-    SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (commuteGHalfSandwich_moveBackFamily params family r)
-      (commuteGHalfSandwich_recursiveTargetFamily params family r)
-      δ := by
-  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-    (commuteGHalfSandwich_recursiveSourceFamily params family r)
-    (commuteGHalfSandwich_recursiveTargetFamily params family r)
-    (commuteGHalfSandwich_moveBackFamily params family r)
-    (commuteGHalfSandwich_recursiveTargetFamily params family r)
-    δ
-    (fun q ogs => (commuteGHalfSandwich_moveBack_eq_recursiveSource params family r q ogs).symm)
-    (fun _ _ => rfl)
-    hrec
-
 private lemma commuteGHalfSandwich_recursiveTarget_eq_split
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
@@ -3760,110 +5542,646 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeft
         prefixTripleOutcomeEquiv, C])
     hreindex
 
+private def swappedFrontQuestionEquiv (params : Parameters) (r : ℕ) :
+    (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) ≃
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) where
+  toFun q := (q.2.1, q.1, q.2.2.1, q.2.2.2)
+  invFun q := (q.2.1, q.1, q.2.2.1, q.2.2.2)
+  left_inv q := by
+    rcases q with ⟨x₁, x₂, x₃, xs⟩
+    rfl
+  right_inv q := by
+    rcases q with ⟨x₁, x₂, x₃, xs⟩
+    rfl
 
-private lemma gHatSelfConsistencyError_nonneg_of_hsc
+private def swappedFrontOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
+    (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) ≃
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
+  toFun og := (og.2.1, og.1, og.2.2.1, og.2.2.2)
+  invFun og := (og.2.1, og.1, og.2.2.1, og.2.2.2)
+  left_inv og := by
+    rcases og with ⟨g₁, g₂, g₃, gs⟩
+    rfl
+  right_inv og := by
+    rcases og with ⟨g₁, g₂, g₃, gs⟩
+    rfl
+
+private def moveTailSwappedFrontQuestionEquiv (params : Parameters) (r : ℕ) :
+    (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) ≃
+      (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) :=
+  (moveTailQuestionEquiv params r).trans (swappedFrontQuestionEquiv params r)
+
+private def moveTailSwappedFrontOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
+    (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) ≃
+      (GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :=
+  (moveTailOutcomeEquiv params r).trans (swappedFrontOutcomeEquiv params r)
+
+private noncomputable def commuteGHalfSandwich_splitSuccLiftFamily
+    (params : Parameters) [FieldModel params.q]
+    (r : ℕ)
+    (F : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι)) :
+    IdxOpFamily
+      (SliceQuestion params × PointTuple params (r + 1))
+      (GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (ι × ι) :=
+  fun q =>
+    { outcome := fun ogs =>
+        (F ((splitSuccQuestionEquiv params r) q)).outcome ((splitSuccOutcomeEquiv params r) ogs)
+      total := (F ((splitSuccQuestionEquiv params r) q)).total }
+
+private noncomputable def commuteGHalfSandwich_prefixSecondSliceLeftFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (F : IdxOpFamily
+      (SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι)) :
+    IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι) :=
+  fun q =>
+    { outcome := fun ogs =>
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+          (F (q.1, q.2.2)).outcome (ogs.1, ogs.2.2)
+      total :=
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
+          (F (q.1, q.2.2)).total }
+
+private lemma commuteGHalfSandwich_prefixSecondSliceLeftLift
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (zeta : Error)
-    (hsc : SDDRel ψbi
-      (uniformDistribution (SliceQuestion params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family)
-      (gHatSelfConsistencyError zeta)) :
-    0 ≤ gHatSelfConsistencyError zeta := by
-  rcases hsc with ⟨hζ⟩
-  exact le_trans
-    (sddError_nonneg ψbi
-      (uniformDistribution (SliceQuestion params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family))
-    hζ
-
-private lemma zeta_nonneg_of_hsc
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (zeta : Error)
-    (hsc : SDDRel ψbi
-      (uniformDistribution (SliceQuestion params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family)
-      (gHatSelfConsistencyError zeta)) :
-    0 ≤ zeta := by
-  have hnonneg :=
-    gHatSelfConsistencyError_nonneg_of_hsc params ψbi family zeta hsc
-  simpa [gHatSelfConsistencyError] using hnonneg
-
-/-- The fixed paper exponent `1/16` keeps `Real.rpow` nonnegative even on the
-negative branch, because `cos (π / 16) > 0`. This lets the short-length
-`commuteGHalfSandwich` envelope proofs avoid threading an extra `0 ≤ gamma`
-hypothesis. -/
-private lemma rpow_oneSixteenth_nonneg (x : Error) :
-    0 ≤ Real.rpow x (1 / (16 : Error)) := by
-  simpa [Real.rpow_eq_pow] using (show 0 ≤ x ^ (1 / (16 : Error)) by
-    rcases le_or_gt 0 x with hx | hx
-    · exact Real.rpow_nonneg hx _
-    · rw [Real.rpow_def_of_neg hx]
-      have hexp_nonneg : 0 ≤ Real.exp (Real.log x * (1 / (16 : Error))) := by
-        exact le_of_lt (Real.exp_pos _)
-      have hmem : ((1 / (16 : Error)) * Real.pi) ∈ Set.Ioo (-(Real.pi / 2)) (Real.pi / 2) := by
-        constructor <;> have hpi_pos : 0 < Real.pi := Real.pi_pos <;> nlinarith
-      have hcos_nonneg : 0 ≤ Real.cos ((1 / (16 : Error)) * Real.pi) := by
-        exact le_of_lt (Real.cos_pos_of_mem_Ioo hmem)
-      exact mul_nonneg hexp_nonneg hcos_nonneg)
-
-private lemma zeta_le_gHatCommutationScale
-    (params : Parameters) [FieldModel params.q]
-    (gamma zeta : Error)
-    (hzeta_nonneg : 0 ≤ zeta)
-    (hzeta_le : zeta ≤ 1) :
-    zeta ≤ (params.m : Error) *
-      (Real.rpow gamma (1 / (16 : Error)) +
-        Real.rpow zeta (1 / (16 : Error)) +
-        Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))) := by
-  let S : Error :=
-    Real.rpow gamma (1 / (16 : Error)) +
-      Real.rpow zeta (1 / (16 : Error)) +
-      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
-  have hS_nonneg : 0 ≤ S := by
-    have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
-    dsimp [S]
-    exact add_nonneg
-      (add_nonneg
-        (rpow_oneSixteenth_nonneg gamma)
-        (Real.rpow_nonneg hzeta_nonneg (1 / (16 : Error))))
-      (Real.rpow_nonneg hratio_nonneg (1 / (16 : Error)))
-  have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
-    exact_mod_cast (Nat.succ_le_of_lt params.hm)
-  have hzeta_to_rpow : zeta ≤ Real.rpow zeta (1 / (16 : Error)) := by
-    have hpow : (1 / (16 : Error)) ≤ (1 : Error) := by norm_num
-    simpa [Real.rpow_one] using
-      (Real.rpow_le_rpow_of_exponent_ge' hzeta_nonneg hzeta_le (by norm_num) hpow)
-  have hroot_le : Real.rpow zeta (1 / (16 : Error)) ≤ S := by
-    have hgamma_rpow_nonneg : 0 ≤ Real.rpow gamma (1 / (16 : Error)) :=
-      rpow_oneSixteenth_nonneg gamma
-    have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
-    have hratio_rpow_nonneg :
-        0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
-      exact Real.rpow_nonneg hratio_nonneg (1 / (16 : Error))
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (A B : IdxOpFamily
+      (SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι))
+    (δ : Error)
+    (hAB : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × PointTuple params r))
+      A B
+      δ) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family r A)
+      (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family r B)
+      δ := by
+  have hABfst :
+      SDDOpRel ψbi
+        (uniformDistribution ((SliceQuestion params × PointTuple params r) × SliceQuestion params))
+        (fun q => A q.1)
+        (fun q => B q.1)
+        δ :=
+    sddOpRel_uniform_fst ψbi A B δ hAB
+  have hABtriple :
+      SDDOpRel ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+        (fun q => A (q.1, q.2.2))
+        (fun q => B (q.1, q.2.2))
+        δ :=
+    (sddOpRel_uniform_equiv (splitQuestionEquiv params r) ψbi
+      (fun q => A q.1)
+      (fun q => B q.1)
+      δ).1 hABfst
+  let C : (SliceQuestion params × SliceQuestion params × PointTuple params r) →
+      (GHatOutcome params × GHatTupleOutcome params r) → GHatOutcome params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q _ gy => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome gy)
+  have hC :
+      ∀ q a,
+        ∑ gy : GHatOutcome params, (C q a gy)ᴴ * C q a gy ≤ 1 := by
+    intro q a
     calc
-      Real.rpow zeta (1 / (16 : Error))
-        ≤ Real.rpow zeta (1 / (16 : Error)) + Real.rpow gamma (1 / (16 : Error)) := by
-            nlinarith
-      _ ≤ Real.rpow zeta (1 / (16 : Error)) + Real.rpow gamma (1 / (16 : Error)) +
-            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
-            nlinarith
-      _ = S := by
-            simp [S, add_assoc, add_comm]
-  have hscale : S ≤ (params.m : Error) * S := by
-    nlinarith
-  calc
-    zeta ≤ Real.rpow zeta (1 / (16 : Error)) := hzeta_to_rpow
-    _ ≤ S := hroot_le
-    _ ≤ (params.m : Error) * S := hscale
+      ∑ gy : GHatOutcome params, (C q a gy)ᴴ * C q a gy
+        = ∑ gy : GHatOutcome params,
+            leftTensor (ι₂ := ι)
+              ((((gHatIdxMeas params family q.2.1).outcome gy)ᴴ) *
+                (gHatIdxMeas params family q.2.1).outcome gy) := by
+                  refine Finset.sum_congr rfl ?_
+                  intro gy _
+                  rw [show (leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome gy))ᴴ =
+                      leftTensor (ι₂ := ι) (((gHatIdxMeas params family q.2.1).outcome gy)ᴴ) by
+                    simpa [leftTensor, opTensor] using
+                      (conjTranspose_opTensor ((gHatIdxMeas params family q.2.1).outcome gy)
+                        (1 : MIPStarRE.Quantum.Op ι))]
+                  simp [C, leftTensor_mul_leftTensor]
+      _ = leftTensor (ι₂ := ι)
+            (∑ gy : GHatOutcome params,
+              (((gHatIdxMeas params family q.2.1).outcome gy)ᴴ) *
+                (gHatIdxMeas params family q.2.1).outcome gy) := by
+                  rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ]
+      _ ≤ leftTensor (ι₂ := ι) (1 : MIPStarRE.Quantum.Op ι) := by
+            simpa using
+              opTensor_mono_left (ι₂ := ι) (B := (1 : MIPStarRE.Quantum.Op ι))
+                (CommutativityPoints.subMeas_sum_adjoint_mul_le_one
+                  ((gHatIdxMeas params family q.2.1).toSubMeas))
+                (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one)
+      _ = 1 := by simp [leftTensor]
+  let rawSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      ((GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) (ι × ι) :=
+    fun q =>
+      { outcome := fun ag => C q ag.1 ag.2 * (A (q.1, q.2.2)).outcome ag.1
+        total := ∑ ag : (GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params,
+          C q ag.1 ag.2 * (A (q.1, q.2.2)).outcome ag.1 }
+  let rawTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      ((GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) (ι × ι) :=
+    fun q =>
+      { outcome := fun ag => C q ag.1 ag.2 * (B (q.1, q.2.2)).outcome ag.1
+        total := ∑ ag : (GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params,
+          C q ag.1 ag.2 * (B (q.1, q.2.2)).outcome ag.1 }
+  have hcab :=
+    Preliminaries.cabApproxDelta_raw ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (fun q => A (q.1, q.2.2))
+      (fun q => B (q.1, q.2.2))
+      C δ hABtriple hC
+  have hreindex := CommutativityPoints.sddOpRel_reindex (prefixTripleOutcomeEquiv params r)
+    ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    rawSource rawTarget δ hcab
+  let reindexedSource : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun a' => (rawSource q).outcome ((prefixTripleOutcomeEquiv params r).symm a')
+        total := (rawSource q).total }
+  let reindexedTarget : IdxOpFamily (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) (ι × ι) :=
+    fun q =>
+      { outcome := fun a' => (rawTarget q).outcome ((prefixTripleOutcomeEquiv params r).symm a')
+        total := (rawTarget q).total }
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    reindexedSource reindexedTarget
+    (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family r A)
+    (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family r B)
+    δ
+    (fun q ogs => by
+      simp [reindexedSource, rawSource, commuteGHalfSandwich_prefixSecondSliceLeftFamily,
+        prefixTripleOutcomeEquiv, C])
+    (fun q ogs => by
+      simp [reindexedTarget, rawTarget, commuteGHalfSandwich_prefixSecondSliceLeftFamily,
+        prefixTripleOutcomeEquiv, C])
+    hreindex
 
-private lemma commuteGHalfSandwich_moveStage_one
+private lemma commuteGHalfSandwich_splitSuccLift
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (r : ℕ)
+    (A B : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι))
+    (δ : Error)
+    (hAB : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      A B
+      δ) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × PointTuple params (r + 1)))
+      (commuteGHalfSandwich_splitSuccLiftFamily params r A)
+      (commuteGHalfSandwich_splitSuccLiftFamily params r B)
+      δ := by
+  let A' : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun ogs => A q |>.outcome ((splitSuccOutcomeEquiv params r) ogs)
+        total := (A q).total }
+  let B' : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun ogs => B q |>.outcome ((splitSuccOutcomeEquiv params r) ogs)
+        total := (B q).total }
+  have ho := CommutativityPoints.sddOpRel_reindex (splitSuccOutcomeEquiv params r).symm
+    ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    A B δ hAB
+  have hq := CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+    _ _
+    A' B'
+    δ
+    (fun _ _ => rfl)
+    (fun _ _ => rfl)
+    ho
+  let A'' : IdxOpFamily
+      (SliceQuestion params × PointTuple params (r + 1))
+      (GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (ι × ι) :=
+    fun q => A' ((splitSuccQuestionEquiv params r) q)
+  let B'' : IdxOpFamily
+      (SliceQuestion params × PointTuple params (r + 1))
+      (GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (ι × ι) :=
+    fun q => B' ((splitSuccQuestionEquiv params r) q)
+  have hsplit :=
+    (sddOpRel_uniform_equiv (splitSuccQuestionEquiv params r) ψbi A'' B'' δ).2 hq
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SliceQuestion params × PointTuple params (r + 1)))
+    A'' B''
+    (commuteGHalfSandwich_splitSuccLiftFamily params r A)
+    (commuteGHalfSandwich_splitSuccLiftFamily params r B)
+    δ
+    (fun _ _ => rfl)
+    (fun _ _ => rfl)
+    hsplit
+
+private lemma commuteGHalfSandwich_splitSuccLift_moveSource
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_splitSuccLiftFamily params r
+      (commuteGHalfSandwich_moveSourceFamily params family r) q).outcome ogs =
+      (headTailOrderedFamily params family (r + 1) q).outcome ogs := by
+  simpa [commuteGHalfSandwich_splitSuccLiftFamily, splitSuccQuestionEquiv, splitSuccOutcomeEquiv] using
+    commuteGHalfSandwich_moveSource_eq_split params family r
+      ((splitSuccQuestionEquiv params r) q)
+      ((splitSuccOutcomeEquiv params r) ogs)
+
+private noncomputable def commuteGHalfSandwich_secondSliceLiftFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (F : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι)) :
+    IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (ι × ι) :=
+  fun q =>
+    { outcome := fun ogs =>
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+          (F (q.1, q.2.2 0, pointTupleTail q.2.2)).outcome
+            (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
+      total :=
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
+          (F (q.1, q.2.2 0, pointTupleTail q.2.2)).total }
+
+private lemma commuteGHalfSandwich_secondSliceLift_moveSource
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_secondSliceLiftFamily params family r
+      (commuteGHalfSandwich_moveSourceFamily params family r) q).outcome ogs =
+      (commuteGHalfSandwich_recursiveSourceFamily params family (r + 1) q).outcome ogs := by
+  simp [commuteGHalfSandwich_secondSliceLiftFamily,
+    commuteGHalfSandwich_recursiveSourceFamily, commuteGHalfSandwich_moveSourceFamily,
+    headTailOrderedFamily, gHatHalfProductOutcomeOperator, leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_prefixSecondSliceLeft_splitSuccLift_eq_secondSliceLift
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (F : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι))
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+      (commuteGHalfSandwich_splitSuccLiftFamily params r F) q).outcome ogs =
+      (commuteGHalfSandwich_secondSliceLiftFamily params family r F q).outcome ogs := by
+  simp [commuteGHalfSandwich_prefixSecondSliceLeftFamily,
+    commuteGHalfSandwich_splitSuccLiftFamily,
+    commuteGHalfSandwich_secondSliceLiftFamily,
+    splitSuccQuestionEquiv, splitSuccOutcomeEquiv, leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_moveFamily_eq_moveStepTarget
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_moveFamily params family (r + 1) q).outcome ogs =
+      (commuteGHalfSandwich_moveStepTargetFamily params family r
+        ((moveTailQuestionEquiv params r) q)).outcome
+        ((moveTailOutcomeEquiv params r) ogs) := by
+  let A := (gHatIdxMeas params family q.1).outcome ogs.1
+  let B := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+  let T := gHatReverseHalfProductOutcomeOperator params family r
+    (pointTupleTail q.2.2) (gHatTupleOutcomeTail ogs.2.2)
+  let G := (gHatIdxMeas params family (q.2.2 0)).outcome (ogs.2.2 0)
+  calc
+    (commuteGHalfSandwich_moveFamily params family (r + 1) q).outcome ogs
+      = leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) (T * G) := by
+          simp [commuteGHalfSandwich_moveFamily, moveTailQuestionEquiv, moveTailOutcomeEquiv,
+            A, B, T, G, gHatReverseHalfProductOutcomeOperator, leftTensor_mul_leftTensor, mul_assoc]
+    _ = leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B *
+          (rightTensor (ι₁ := ι) T * rightTensor (ι₁ := ι) G) := by
+            rw [rightTensor_mul_rightTensor]
+    _ = (commuteGHalfSandwich_moveStepTargetFamily params family r
+          ((moveTailQuestionEquiv params r) q)).outcome
+          ((moveTailOutcomeEquiv params r) ogs) := by
+            simp [commuteGHalfSandwich_moveStepTargetFamily, moveTailQuestionEquiv,
+              moveTailOutcomeEquiv, A, B, T, G, mul_assoc]
+
+private def commuteGHalfSandwich_moveChainLiftQuestionEquiv (params : Parameters) (r : ℕ) :
+    ((SliceQuestion params × SliceQuestion params × PointTuple params r) × SliceQuestion params) ≃
+      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) :=
+  (firstSliceBackQuestionEquiv params r).trans (moveTailQuestionEquiv params r).symm
+
+private def commuteGHalfSandwich_moveChainLiftOutcomeEquiv
+    (params : Parameters) [FieldModel params.q] (r : ℕ) :
+    ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) ≃
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :=
+  (firstSliceBackOutcomeEquiv params r).trans (moveTailOutcomeEquiv params r).symm
+
+private noncomputable def commuteGHalfSandwich_moveChainLiftFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (F : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι)) :
+    IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (ι × ι) :=
+  fun q =>
+    { outcome := fun ogs =>
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome ogs.1) *
+          (F (q.2.1, q.2.2 0, pointTupleTail q.2.2)).outcome
+            (ogs.2.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
+      total :=
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
+          (F (q.2.1, q.2.2 0, pointTupleTail q.2.2)).total }
+
+private lemma commuteGHalfSandwich_moveChainLift
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (A B : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι))
+    (δ : Error)
+    (hAB : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      A B
+      δ) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (commuteGHalfSandwich_moveChainLiftFamily params family r A)
+      (commuteGHalfSandwich_moveChainLiftFamily params family r B)
+      δ := by
+  have hABfst :
+      SDDOpRel ψbi
+        (uniformDistribution
+          (((SliceQuestion params × SliceQuestion params × PointTuple params r)) × SliceQuestion params))
+        (fun q => A q.1)
+        (fun q => B q.1)
+        δ :=
+    sddOpRel_uniform_fst ψbi A B δ hAB
+  have hABlift :
+      SDDOpRel ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (fun q => A (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1))
+        (fun q => B (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1))
+        δ :=
+    (sddOpRel_uniform_equiv (commuteGHalfSandwich_moveChainLiftQuestionEquiv params r) ψbi
+      (fun q => A q.1)
+      (fun q => B q.1)
+      δ).1 hABfst
+  let C : (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) →
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) → GHatOutcome params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q _ g₁ => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g₁)
+  have hC :
+      ∀ q a,
+        ∑ g₁ : GHatOutcome params, (C q a g₁)ᴴ * C q a g₁ ≤ 1 := by
+    intro q a
+    calc
+      ∑ g₁ : GHatOutcome params, (C q a g₁)ᴴ * C q a g₁
+        = ∑ g₁ : GHatOutcome params,
+            leftTensor (ι₂ := ι)
+              ((((gHatIdxMeas params family q.1).outcome g₁)ᴴ) *
+                (gHatIdxMeas params family q.1).outcome g₁) := by
+                  refine Finset.sum_congr rfl ?_
+                  intro g₁ _
+                  rw [show (leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g₁))ᴴ =
+                      leftTensor (ι₂ := ι) (((gHatIdxMeas params family q.1).outcome g₁)ᴴ) by
+                    simpa [leftTensor, opTensor] using
+                      (conjTranspose_opTensor ((gHatIdxMeas params family q.1).outcome g₁)
+                        (1 : MIPStarRE.Quantum.Op ι))]
+                  simp [C, leftTensor_mul_leftTensor]
+      _ = leftTensor (ι₂ := ι)
+            (∑ g₁ : GHatOutcome params,
+              (((gHatIdxMeas params family q.1).outcome g₁)ᴴ) *
+                (gHatIdxMeas params family q.1).outcome g₁) := by
+                  rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ]
+      _ ≤ 1 := by
+            have hinner :
+                ∑ g₁ : GHatOutcome params,
+                    (((gHatIdxMeas params family q.1).outcome g₁)ᴴ) *
+                      (gHatIdxMeas params family q.1).outcome g₁ ≤ 1 :=
+              CommutativityPoints.subMeas_sum_adjoint_mul_le_one
+                ((gHatIdxMeas params family q.1).toSubMeas)
+            exact leftTensor_le_one (ι₂ := ι) (A := _) hinner
+  let rawSource : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+      ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params)
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun ag => C q ag.1 ag.2 *
+          (A (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1)).outcome ag.1
+        total := ∑ ag :
+          ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params),
+          C q ag.1 ag.2 *
+            (A (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1)).outcome ag.1 }
+  let rawTarget : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+      ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params)
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun ag => C q ag.1 ag.2 *
+          (B (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1)).outcome ag.1
+        total := ∑ ag :
+          ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params),
+          C q ag.1 ag.2 *
+            (B (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1)).outcome ag.1 }
+  have hcab :=
+    Preliminaries.cabApproxDelta_raw ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (fun q => A (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1))
+      (fun q => B (((commuteGHalfSandwich_moveChainLiftQuestionEquiv params r).symm q).1))
+      C δ hABlift hC
+  have hreindex := CommutativityPoints.sddOpRel_reindex
+    (commuteGHalfSandwich_moveChainLiftOutcomeEquiv params r)
+    ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    rawSource rawTarget δ hcab
+  let reindexedSource : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun a' =>
+          (rawSource q).outcome ((commuteGHalfSandwich_moveChainLiftOutcomeEquiv params r).symm a')
+        total := (rawSource q).total }
+  let reindexedTarget : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (ι × ι) :=
+    fun q =>
+      { outcome := fun a' =>
+          (rawTarget q).outcome ((commuteGHalfSandwich_moveChainLiftOutcomeEquiv params r).symm a')
+        total := (rawTarget q).total }
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    reindexedSource reindexedTarget
+    (commuteGHalfSandwich_moveChainLiftFamily params family r A)
+    (commuteGHalfSandwich_moveChainLiftFamily params family r B)
+    δ
+    (fun q ogs => by
+      simp [reindexedSource, rawSource, commuteGHalfSandwich_moveChainLiftOutcomeEquiv,
+        commuteGHalfSandwich_moveChainLiftQuestionEquiv, C,
+        commuteGHalfSandwich_moveChainLiftFamily, moveTailQuestionEquiv, moveTailOutcomeEquiv,
+        firstSliceBackQuestionEquiv, firstSliceBackOutcomeEquiv])
+    (fun q ogs => by
+      simp [reindexedTarget, rawTarget, commuteGHalfSandwich_moveChainLiftOutcomeEquiv,
+        commuteGHalfSandwich_moveChainLiftQuestionEquiv, C,
+        commuteGHalfSandwich_moveChainLiftFamily, moveTailQuestionEquiv, moveTailOutcomeEquiv,
+        firstSliceBackQuestionEquiv, firstSliceBackOutcomeEquiv])
+    hreindex
+
+private lemma commuteGHalfSandwich_moveChainLift_moveFamily_eq_moveStepMid
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_moveChainLiftFamily params family r
+      (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs =
+      (commuteGHalfSandwich_moveStepMidFamily params family r
+        ((moveTailQuestionEquiv params r) q)).outcome
+        ((moveTailOutcomeEquiv params r) ogs) := by
+  let A := (gHatIdxMeas params family q.1).outcome ogs.1
+  let B := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+  let G := (gHatIdxMeas params family (q.2.2 0)).outcome (ogs.2.2 0)
+  let T := gHatReverseHalfProductOutcomeOperator params family r
+    (pointTupleTail q.2.2) (gHatTupleOutcomeTail ogs.2.2)
+  calc
+    (commuteGHalfSandwich_moveChainLiftFamily params family r
+      (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs
+      = leftTensor (ι₂ := ι) A *
+          (leftTensor (ι₂ := ι) (B * G) * rightTensor (ι₁ := ι) T) := by
+            simp [commuteGHalfSandwich_moveChainLiftFamily, commuteGHalfSandwich_moveFamily,
+              A, B, G, T, gHatReverseHalfProductOutcomeOperator,
+              leftTensor_mul_leftTensor, mul_assoc]
+    _ = (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) (B * G)) * rightTensor (ι₁ := ι) T := by
+          simp [mul_assoc]
+    _ = leftTensor (ι₂ := ι) (A * (B * G)) * rightTensor (ι₁ := ι) T := by
+          rw [leftTensor_mul_leftTensor]
+    _ = (commuteGHalfSandwich_moveStepMidFamily params family r
+          ((moveTailQuestionEquiv params r) q)).outcome
+          ((moveTailOutcomeEquiv params r) ogs) := by
+            simp [commuteGHalfSandwich_moveStepMidFamily, moveTailQuestionEquiv,
+              moveTailOutcomeEquiv, A, B, G, T, leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_moveChainLift_moveFamily_last
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error) (r : ℕ)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (commuteGHalfSandwich_moveChainLiftFamily params family r
+        (commuteGHalfSandwich_moveFamily params family r))
+      (commuteGHalfSandwich_moveFamily params family (r + 1))
+      (gHatSelfConsistencyError zeta) := by
+  have hmid :
+      SDDOpRel ψbi
+        (uniformDistribution
+          (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (fun q => commuteGHalfSandwich_moveStepMidFamily params family r
+          ((moveTailQuestionEquiv params r) q))
+        (fun q => commuteGHalfSandwich_moveStepTargetFamily params family r
+          ((moveTailQuestionEquiv params r) q))
+        (gHatSelfConsistencyError zeta) :=
+    (sddOpRel_uniform_equiv (moveTailQuestionEquiv params r) ψbi
+      (fun q => commuteGHalfSandwich_moveStepMidFamily params family r
+        ((moveTailQuestionEquiv params r) q))
+      (fun q => commuteGHalfSandwich_moveStepTargetFamily params family r
+        ((moveTailQuestionEquiv params r) q))
+      (gHatSelfConsistencyError zeta)).2
+      (commuteGHalfSandwich_moveStepMid_toTarget params ψbi family zeta r hsc)
+  have hreindex := CommutativityPoints.sddOpRel_reindex (moveTailOutcomeEquiv params r).symm
+    ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    (fun q => commuteGHalfSandwich_moveStepMidFamily params family r
+      ((moveTailQuestionEquiv params r) q))
+    (fun q => commuteGHalfSandwich_moveStepTargetFamily params family r
+      ((moveTailQuestionEquiv params r) q))
+    (gHatSelfConsistencyError zeta)
+    hmid
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    _ _
+    (commuteGHalfSandwich_moveChainLiftFamily params family r
+      (commuteGHalfSandwich_moveFamily params family r))
+    (commuteGHalfSandwich_moveFamily params family (r + 1))
+    (gHatSelfConsistencyError zeta)
+    (fun q ogs => by
+      simpa [moveTailQuestionEquiv, moveTailOutcomeEquiv] using
+        (commuteGHalfSandwich_moveChainLift_moveFamily_eq_moveStepMid params family r q ogs).symm)
+    (fun q ogs => by
+      simpa [moveTailQuestionEquiv, moveTailOutcomeEquiv] using
+        (commuteGHalfSandwich_moveFamily_eq_moveStepTarget params family r q ogs).symm)
+    hreindex
+
+private noncomputable def commuteGHalfSandwich_moveChainFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    (r : ℕ) → Fin (r + 1) → IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι)
+  | 0, _ => commuteGHalfSandwich_moveSourceFamily params family 0
+  | r + 1, i =>
+      if hi : i.1 < r + 1 then
+        commuteGHalfSandwich_moveChainLiftFamily params family r
+          (commuteGHalfSandwich_moveChainFamily params family r ⟨i.1, hi⟩)
+      else
+        commuteGHalfSandwich_moveFamily params family (r + 1)
+
+private lemma commuteGHalfSandwich_moveChainFamily_zero
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    ∀ r q ogs,
+      (commuteGHalfSandwich_moveChainFamily params family r 0 q).outcome ogs =
+        (commuteGHalfSandwich_moveSourceFamily params family r q).outcome ogs
+  | 0, q, ogs => by rfl
+  | r + 1, q, ogs => by
+      simp [commuteGHalfSandwich_moveChainFamily, commuteGHalfSandwich_moveChainLiftFamily,
+        commuteGHalfSandwich_moveSourceFamily,
+        commuteGHalfSandwich_moveChainFamily_zero params family r,
+        gHatHalfProductOutcomeOperator, leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_moveChainFamily_last
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    ∀ r q ogs,
+      (commuteGHalfSandwich_moveChainFamily params family r (Fin.last r) q).outcome ogs =
+        (commuteGHalfSandwich_moveFamily params family r q).outcome ogs
+  | 0, q, ogs => by
+      simp [commuteGHalfSandwich_moveChainFamily,
+        commuteGHalfSandwich_moveSourceFamily, commuteGHalfSandwich_moveFamily,
+        gHatHalfProductOutcomeOperator, gHatReverseHalfProductOutcomeOperator]
+  | r + 1, q, ogs => by
+      simp [commuteGHalfSandwich_moveChainFamily]
+
+private lemma commuteGHalfSandwich_moveChain_step
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
@@ -3873,19 +6191,267 @@ private lemma commuteGHalfSandwich_moveStage_one
       (gHatSelfConsistencyLeftFamily params family)
       (gHatSelfConsistencyRightFamily params family)
       (gHatSelfConsistencyError zeta)) :
-    SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params 1))
-      (commuteGHalfSandwich_moveSourceFamily params family 1)
-      (commuteGHalfSandwich_moveFamily params family 1)
-      (4 * zeta) := by
-  have hzero := commuteGHalfSandwich_move_recursive_zero params ψbi family
-  have hsucc :=
-    commuteGHalfSandwich_moveStage_succ params ψbi family zeta 0 0 hzero hsc
-  convert hsucc using 1
-  simp [gHatSelfConsistencyError]
-  ring
+    ∀ r (i : Fin r),
+      SDDOpRel ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+        ((commuteGHalfSandwich_moveChainFamily params family r) i.castSucc)
+        ((commuteGHalfSandwich_moveChainFamily params family r) i.succ)
+        (gHatSelfConsistencyError zeta)
+  | 0, i => Fin.elim0 i
+  | r + 1, i => by
+      by_cases hi : i.1 < r
+      · have hsmall := commuteGHalfSandwich_moveChain_step params ψbi family zeta hsc r ⟨i.1, hi⟩
+        let j : Fin r := ⟨i.1, hi⟩
+        have hsrc : i.1 < r + 1 := Nat.lt_trans hi (Nat.lt_succ_self r)
+        simpa [commuteGHalfSandwich_moveChainFamily, hi,
+          hsrc, Nat.succ_lt_succ hi] using
+          commuteGHalfSandwich_moveChainLift params ψbi family r
+            ((commuteGHalfSandwich_moveChainFamily params family r) j.castSucc)
+            ((commuteGHalfSandwich_moveChainFamily params family r) j.succ)
+            (gHatSelfConsistencyError zeta)
+            hsmall
+      · have hilast : i.1 = r := by omega
+        have hi_last : i = Fin.last r := Fin.ext hilast
+        cases hi_last
+        have hlast := commuteGHalfSandwich_moveChainLift_moveFamily_last params ψbi family zeta r hsc
+        simpa [commuteGHalfSandwich_moveChainFamily] using
+          (CommutativityPoints.sddOpRel_congr_outcome ψbi
+            (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+            (commuteGHalfSandwich_moveChainLiftFamily params family r
+              (commuteGHalfSandwich_moveFamily params family r))
+            (commuteGHalfSandwich_moveFamily params family (r + 1))
+            (commuteGHalfSandwich_moveChainLiftFamily params family r
+              (commuteGHalfSandwich_moveChainFamily params family r (Fin.last r)))
+            (commuteGHalfSandwich_moveFamily params family (r + 1))
+            (gHatSelfConsistencyError zeta)
+            (fun q ogs => by
+              simp [commuteGHalfSandwich_moveChainLiftFamily,
+                commuteGHalfSandwich_moveChainFamily_last params family r
+                  (q.2.1, q.2.2 0, pointTupleTail q.2.2)
+                  (ogs.2.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)])
+            (fun _ _ => rfl)
+            hlast)
 
-private lemma commuteGHalfSandwich_moveStage_two
+private lemma commuteGHalfSandwich_move_chain
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (r : ℕ)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta)) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveSourceFamily params family r)
+      (commuteGHalfSandwich_moveFamily params family r)
+      ((r : Error) * ∑ i : Fin r, gHatSelfConsistencyError zeta) := by
+  cases r with
+  | zero =>
+      simpa using commuteGHalfSandwich_move_recursive_zero params ψbi family
+  | succ r =>
+      have hchain := Preliminaries.sddOpRel_chain
+        ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (r + 1)
+        (commuteGHalfSandwich_moveChainFamily params family (r + 1))
+        (fun _ => gHatSelfConsistencyError zeta)
+        (commuteGHalfSandwich_moveChain_step params ψbi family zeta hsc (r + 1))
+      have hchain' :
+          SDDOpRel ψbi
+            (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+            (commuteGHalfSandwich_moveChainFamily params family (r + 1) 0)
+            (commuteGHalfSandwich_moveChainFamily params family (r + 1) (Fin.last (r + 1)))
+            (((r + 1 : Error)) * ∑ i : Fin (r + 1), gHatSelfConsistencyError zeta) := by
+        simpa using hchain
+      simpa [Nat.cast_add, add_comm, add_left_comm, add_assoc] using
+        (CommutativityPoints.sddOpRel_congr_outcome ψbi
+          (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+          (commuteGHalfSandwich_moveChainFamily params family (r + 1) 0)
+          (commuteGHalfSandwich_moveChainFamily params family (r + 1) (Fin.last (r + 1)))
+          (commuteGHalfSandwich_moveSourceFamily params family (r + 1))
+          (commuteGHalfSandwich_moveFamily params family (r + 1))
+          (((r + 1 : Error)) * ∑ i : Fin (r + 1), gHatSelfConsistencyError zeta)
+          (commuteGHalfSandwich_moveChainFamily_zero params family (r + 1))
+          (commuteGHalfSandwich_moveChainFamily_last params family (r + 1))
+          hchain')
+
+private lemma commuteGHalfSandwich_secondSliceLift
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (A B : IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι))
+    (δ : Error)
+    (hAB : SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      A B
+      δ) :
+    SDDOpRel ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (commuteGHalfSandwich_secondSliceLiftFamily params family r A)
+      (commuteGHalfSandwich_secondSliceLiftFamily params family r B)
+      δ := by
+  let eQ :
+      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) ≃
+        (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) :=
+    { toFun := fun q => (q.2.1, q.1, q.2.2)
+      invFun := fun q => (q.2.1, q.1, q.2.2)
+      left_inv := by
+        intro q
+        rcases q with ⟨x₁, x₂, xs⟩
+        rfl
+      right_inv := by
+        intro q
+        rcases q with ⟨x₁, x₂, xs⟩
+        rfl }
+  let eO :
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) ≃
+        (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :=
+    { toFun := fun ogs => (ogs.2.1, ogs.1, ogs.2.2)
+      invFun := fun ogs => (ogs.2.1, ogs.1, ogs.2.2)
+      left_inv := by
+        intro ogs
+        rcases ogs with ⟨g₁, g₂, gs⟩
+        rfl
+      right_inv := by
+        intro ogs
+        rcases ogs with ⟨g₁, g₂, gs⟩
+        rfl }
+  have hlift :=
+    commuteGHalfSandwich_moveChainLift params ψbi family r A B δ hAB
+  have hswapQ :
+      SDDOpRel ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (fun q =>
+          commuteGHalfSandwich_moveChainLiftFamily params family r A (eQ.symm q))
+        (fun q =>
+          commuteGHalfSandwich_moveChainLiftFamily params family r B (eQ.symm q))
+        δ :=
+    (sddOpRel_uniform_equiv eQ ψbi
+      (commuteGHalfSandwich_moveChainLiftFamily params family r A)
+      (commuteGHalfSandwich_moveChainLiftFamily params family r B)
+      δ).1 hlift
+  have hreindex := CommutativityPoints.sddOpRel_reindex eO
+    ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    (fun q =>
+      commuteGHalfSandwich_moveChainLiftFamily params family r A (eQ.symm q))
+    (fun q =>
+      commuteGHalfSandwich_moveChainLiftFamily params family r B (eQ.symm q))
+    δ hswapQ
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    _ _
+    (commuteGHalfSandwich_secondSliceLiftFamily params family r A)
+    (commuteGHalfSandwich_secondSliceLiftFamily params family r B)
+    δ
+    (fun q ogs => by
+      simp [eQ, eO, commuteGHalfSandwich_moveChainLiftFamily,
+        commuteGHalfSandwich_secondSliceLiftFamily])
+    (fun q ogs => by
+      simp [eQ, eO, commuteGHalfSandwich_moveChainLiftFamily,
+        commuteGHalfSandwich_secondSliceLiftFamily])
+    hreindex
+
+private noncomputable def commuteGHalfSandwich_moveBackChainFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ) :
+    Fin (r + 1) → IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1))
+      (ι × ι)
+  | i =>
+      commuteGHalfSandwich_secondSliceLiftFamily params family r
+        ((commuteGHalfSandwich_moveChainFamily params family r)
+          ⟨r - i.1, by omega⟩)
+
+private lemma commuteGHalfSandwich_moveBackChainFamily_last
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_moveBackChainFamily params family r (Fin.last r) q).outcome ogs =
+      (commuteGHalfSandwich_recursiveSourceFamily params family (r + 1) q).outcome ogs := by
+  let q' : SliceQuestion params × SliceQuestion params × PointTuple params r :=
+    (q.1, q.2.2 0, pointTupleTail q.2.2)
+  let ogs' : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r :=
+    (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
+  have hzero :
+      (commuteGHalfSandwich_secondSliceLiftFamily params family r
+        ((commuteGHalfSandwich_moveChainFamily params family r) 0) q).outcome ogs =
+        (commuteGHalfSandwich_recursiveSourceFamily params family (r + 1) q).outcome ogs := by
+    calc
+      (commuteGHalfSandwich_secondSliceLiftFamily params family r
+        ((commuteGHalfSandwich_moveChainFamily params family r) 0) q).outcome ogs
+        = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+            (commuteGHalfSandwich_moveSourceFamily params family r q').outcome ogs' := by
+              simpa [commuteGHalfSandwich_secondSliceLiftFamily, q', ogs'] using
+                congrArg
+                  (fun X =>
+                    leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                  (commuteGHalfSandwich_moveChainFamily_zero params family r q' ogs')
+      _ = (commuteGHalfSandwich_recursiveSourceFamily params family (r + 1) q).outcome ogs := by
+            exact commuteGHalfSandwich_secondSliceLift_moveSource params family r q ogs
+  simpa [commuteGHalfSandwich_moveBackChainFamily] using hzero
+
+private lemma commuteGHalfSandwich_secondSliceLift_moveFamily_eq_swappedFrontMoveStepMid
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_secondSliceLiftFamily params family r
+      (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs =
+      (commuteGHalfSandwich_moveStepMidFamily params family r
+        ((moveTailSwappedFrontQuestionEquiv params r) q)).outcome
+        ((moveTailSwappedFrontOutcomeEquiv params r) ogs) := by
+  let A := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+  let B := (gHatIdxMeas params family q.1).outcome ogs.1
+  let G := (gHatIdxMeas params family (q.2.2 0)).outcome (ogs.2.2 0)
+  let T := gHatReverseHalfProductOutcomeOperator params family r
+    (pointTupleTail q.2.2) (gHatTupleOutcomeTail ogs.2.2)
+  calc
+    (commuteGHalfSandwich_secondSliceLiftFamily params family r
+      (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs
+      = leftTensor (ι₂ := ι) A *
+          (leftTensor (ι₂ := ι) (B * G) * rightTensor (ι₁ := ι) T) := by
+            simp [commuteGHalfSandwich_secondSliceLiftFamily, commuteGHalfSandwich_moveFamily,
+              A, B, G, T, leftTensor_mul_leftTensor, mul_assoc]
+    _ = (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) (B * G)) * rightTensor (ι₁ := ι) T := by
+          simp [mul_assoc]
+    _ = leftTensor (ι₂ := ι) (A * (B * G)) * rightTensor (ι₁ := ι) T := by
+          rw [leftTensor_mul_leftTensor]
+    _ = (commuteGHalfSandwich_moveStepMidFamily params family r
+          ((moveTailSwappedFrontQuestionEquiv params r) q)).outcome
+          ((moveTailSwappedFrontOutcomeEquiv params r) ogs) := by
+            simp [commuteGHalfSandwich_moveStepMidFamily,
+              moveTailSwappedFrontQuestionEquiv, moveTailSwappedFrontOutcomeEquiv,
+              moveTailQuestionEquiv, moveTailOutcomeEquiv,
+              swappedFrontQuestionEquiv, swappedFrontOutcomeEquiv,
+              A, B, G, T, leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_commute_eq_swappedFrontMoveStepTarget
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs =
+      (commuteGHalfSandwich_moveStepTargetFamily params family r
+        ((moveTailSwappedFrontQuestionEquiv params r) q)).outcome
+        ((moveTailSwappedFrontOutcomeEquiv params r) ogs) := by
+  simp [commuteGHalfSandwich_commuteFamily,
+    moveTailSwappedFrontQuestionEquiv, moveTailSwappedFrontOutcomeEquiv,
+    moveTailQuestionEquiv, moveTailOutcomeEquiv,
+    swappedFrontQuestionEquiv, swappedFrontOutcomeEquiv,
+    commuteGHalfSandwich_moveStepTargetFamily,
+    gHatReverseHalfProductOutcomeOperator, leftTensor_mul_leftTensor,
+    rightTensor_mul_rightTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_moveBackChain_step
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
@@ -3895,326 +6461,477 @@ private lemma commuteGHalfSandwich_moveStage_two
       (gHatSelfConsistencyLeftFamily params family)
       (gHatSelfConsistencyRightFamily params family)
       (gHatSelfConsistencyError zeta)) :
-    SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params 2))
-      (commuteGHalfSandwich_moveSourceFamily params family 2)
-      (commuteGHalfSandwich_moveFamily params family 2)
-      (12 * zeta) := by
-  have hone := commuteGHalfSandwich_moveStage_one params ψbi family zeta hsc
-  have hsucc :=
-    commuteGHalfSandwich_moveStage_succ params ψbi family zeta 1 (4 * zeta) hone hsc
-  convert hsucc using 1
-  simp [gHatSelfConsistencyError]
-  ring
+    ∀ i : Fin r,
+      SDDOpRel ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        ((commuteGHalfSandwich_moveBackChainFamily params family r) i.castSucc)
+        ((commuteGHalfSandwich_moveBackChainFamily params family r) i.succ)
+        (gHatSelfConsistencyError zeta)
+  | i => by
+      let j : Fin r := ⟨r - i.1 - 1, by omega⟩
+      have hstep := commuteGHalfSandwich_moveChain_step params ψbi family zeta hsc r j
+      have hlift := commuteGHalfSandwich_secondSliceLift params ψbi family r
+        ((commuteGHalfSandwich_moveChainFamily params family r) j.castSucc)
+        ((commuteGHalfSandwich_moveChainFamily params family r) j.succ)
+        (gHatSelfConsistencyError zeta)
+        hstep
+      have hsymm := Preliminaries.sddOpRel_symm ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (commuteGHalfSandwich_secondSliceLiftFamily params family r
+          ((commuteGHalfSandwich_moveChainFamily params family r) j.castSucc))
+        (commuteGHalfSandwich_secondSliceLiftFamily params family r
+          ((commuteGHalfSandwich_moveChainFamily params family r) j.succ))
+        (gHatSelfConsistencyError zeta)
+        hlift
+      have hsrc : (⟨r - i.1, by omega⟩ : Fin (r + 1)) = j.succ := by
+        apply Fin.ext
+        dsimp [j]
+        omega
+      have htgt : (⟨r - (i.1 + 1), by omega⟩ : Fin (r + 1)) = j.castSucc := by
+        apply Fin.ext
+        dsimp [j]
+        omega
+      exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+        (commuteGHalfSandwich_secondSliceLiftFamily params family r
+          ((commuteGHalfSandwich_moveChainFamily params family r) j.succ))
+        (commuteGHalfSandwich_secondSliceLiftFamily params family r
+          ((commuteGHalfSandwich_moveChainFamily params family r) j.castSucc))
+        ((commuteGHalfSandwich_moveBackChainFamily params family r) i.castSucc)
+        ((commuteGHalfSandwich_moveBackChainFamily params family r) i.succ)
+        (gHatSelfConsistencyError zeta)
+        (fun q ogs => by
+          simpa [commuteGHalfSandwich_moveBackChainFamily, j, hsrc])
+        (fun q ogs => by
+          simpa [commuteGHalfSandwich_moveBackChainFamily, j, htgt])
+        hsymm
 
-private lemma commuteGHalfSandwich_core_three_raw
+private lemma commuteGHalfSandwich_commute_to_moveBackChainFamily_zero
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
+    (zeta : Error) {r : ℕ}
     (hsc : SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
       (gHatSelfConsistencyLeftFamily params family)
       (gHatSelfConsistencyRightFamily params family)
-      (gHatSelfConsistencyError zeta))
-    (hcom : SDDOpRel ψbi
-      (uniformDistribution (SlicePairQuestion params))
-      (gHatPairProductLeft params family)
-      (gHatPairProductRight params family)
-      (gHatCommutationError params gamma zeta)) :
+      (gHatSelfConsistencyError zeta)) :
     SDDOpRel ψbi
-      (uniformDistribution (PointTuple params 3))
-      (gHatHalfSandwichLeft params family 3)
-      (gHatHalfSandwichRight params family 3)
-      (32 * zeta + 8 * gHatCommutationError params gamma zeta) := by
-  let ν3 := gHatCommutationError params gamma zeta
-  let Q := SliceQuestion params × SliceQuestion params × PointTuple params 1
-  have hsplit1 : SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × PointTuple params 1))
-      (headTailOrderedFamily params family 1)
-      (headTailRotatedFamily params family 1)
-      ν3 :=
-    (commuteGHalfSandwich_split_one_iff params ψbi family ν3).2 hcom
-  have hmove := commuteGHalfSandwich_moveStage_one params ψbi family zeta hsc
-  have hback :=
-    commuteGHalfSandwich_moveBackStage params ψbi family 1 (4 * zeta) hmove
-  have htail : SDDOpRel ψbi
-      (uniformDistribution Q)
-      (commuteGHalfSandwich_recursiveSourceFamily params family 1)
-      (commuteGHalfSandwich_recursiveTargetFamily params family 1)
-      ν3 := by
-    simpa [Q] using
-      commuteGHalfSandwich_prefixSecondSliceLeft params ψbi family 1 ν3 hsplit1
-  have htail' : SDDOpRel ψbi
-      (uniformDistribution Q)
-      (commuteGHalfSandwich_moveBackFamily params family 1)
-      (commuteGHalfSandwich_recursiveTargetFamily params family 1)
-      ν3 :=
-    commuteGHalfSandwich_moveBack_to_recursiveTarget params ψbi family 1 ν3 htail
-  let families : Fin 5 →
-      IdxOpFamily Q (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params 1) (ι × ι)
-    | ⟨0, _⟩ => commuteGHalfSandwich_moveSourceFamily params family 1
-    | ⟨1, _⟩ => commuteGHalfSandwich_moveFamily params family 1
-    | ⟨2, _⟩ => commuteGHalfSandwich_commuteFamily params family 1
-    | ⟨3, _⟩ => commuteGHalfSandwich_moveBackFamily params family 1
-    | ⟨4, _⟩ => commuteGHalfSandwich_recursiveTargetFamily params family 1
-  let errors : Fin 4 → Error
-    | ⟨0, _⟩ => 4 * zeta
-    | ⟨1, _⟩ => ν3
-    | ⟨2, _⟩ => 4 * zeta
-    | ⟨3, _⟩ => ν3
-  have hsteps : ∀ i : Fin 4,
-      SDDOpRel ψbi (uniformDistribution Q)
-        (families i.castSucc) (families i.succ) (errors i) := by
-    intro i
-    fin_cases i
-    · simpa [families, errors, Q] using hmove
-    · simpa [families, errors, Q, ν3] using
-        commuteGHalfSandwich_step_commute params ψbi family gamma zeta 1 hcom
-    · simpa [families, errors, Q] using hback
-    · simpa [families, errors, Q] using htail'
-  have hchain :=
-    Preliminaries.sddOpRel_chain ψbi (uniformDistribution Q) 4 families errors hsteps
-  have hsum_errors : ∑ i : Fin 4, errors i = 8 * zeta + 2 * ν3 := by
-    simp [errors, ν3, Fin.sum_univ_four]
-    ring
-  have hchain' : SDDOpRel ψbi
-      (uniformDistribution Q)
-      (commuteGHalfSandwich_moveSourceFamily params family 1)
-      (commuteGHalfSandwich_recursiveTargetFamily params family 1)
-      (32 * zeta + 8 * ν3) := by
-    have hmono := Preliminaries.sddOpRel_mono ψbi
-      (uniformDistribution Q)
-      (commuteGHalfSandwich_moveSourceFamily params family 1)
-      (commuteGHalfSandwich_recursiveTargetFamily params family 1)
-      ((4 : Error) * ∑ i : Fin 4, errors i)
-      (32 * zeta + 8 * ν3)
-      hchain
-      (by rw [hsum_errors]; linarith)
-    simpa [families, Q] using hmono
-  have hsplit2 : SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × PointTuple params 2))
-      (headTailOrderedFamily params family 2)
-      (headTailRotatedFamily params family 2)
-      (32 * zeta + 8 * ν3) := by
-    exact (commuteGHalfSandwich_split_succ_iff params ψbi family 1
-      (32 * zeta + 8 * ν3)).2 hchain'
-  exact (commuteGHalfSandwich_split_iff params ψbi family 2
-    (32 * zeta + 8 * ν3)).2 hsplit2
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+      (commuteGHalfSandwich_commuteFamily params family (r + 1))
+      ((commuteGHalfSandwich_moveBackChainFamily params family r) 0)
+      (gHatSelfConsistencyError zeta) := by
+  have htargetMid :
+      SDDOpRel ψbi
+        (uniformDistribution
+          (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+        (commuteGHalfSandwich_moveStepTargetFamily params family r)
+        (commuteGHalfSandwich_moveStepMidFamily params family r)
+        (gHatSelfConsistencyError zeta) :=
+    Preliminaries.sddOpRel_symm ψbi
+      (uniformDistribution
+        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_moveStepMidFamily params family r)
+      (commuteGHalfSandwich_moveStepTargetFamily params family r)
+      (gHatSelfConsistencyError zeta)
+      (commuteGHalfSandwich_moveStepMid_toTarget params ψbi family zeta r hsc)
+  have hq :=
+    (sddOpRel_uniform_equiv (moveTailSwappedFrontQuestionEquiv params r).symm ψbi
+      (commuteGHalfSandwich_moveStepTargetFamily params family r)
+      (commuteGHalfSandwich_moveStepMidFamily params family r)
+      (gHatSelfConsistencyError zeta)).1 htargetMid
+  have ho := CommutativityPoints.sddOpRel_reindex (moveTailSwappedFrontOutcomeEquiv params r).symm
+    ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    (fun q => commuteGHalfSandwich_moveStepTargetFamily params family r
+      ((moveTailSwappedFrontQuestionEquiv params r) q))
+    (fun q => commuteGHalfSandwich_moveStepMidFamily params family r
+      ((moveTailSwappedFrontQuestionEquiv params r) q))
+    (gHatSelfConsistencyError zeta)
+    hq
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+    _ _
+    (commuteGHalfSandwich_commuteFamily params family (r + 1))
+    ((commuteGHalfSandwich_moveBackChainFamily params family r) 0)
+    (gHatSelfConsistencyError zeta)
+    (fun q ogs => by
+      simpa using
+        (commuteGHalfSandwich_commute_eq_swappedFrontMoveStepTarget params family r q ogs).symm)
+    (fun q ogs => by
+      let q' : SliceQuestion params × SliceQuestion params × PointTuple params r :=
+        (q.1, q.2.2 0, pointTupleTail q.2.2)
+      let ogs' : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r :=
+        (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
+      have hlast :
+          (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs =
+            (commuteGHalfSandwich_secondSliceLiftFamily params family r
+              (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
+        calc
+          (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs
+            = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+                (commuteGHalfSandwich_moveFamily params family r q').outcome ogs' := by
+                  simpa [commuteGHalfSandwich_moveBackChainFamily, q', ogs'] using
+                    congrArg
+                      (fun X =>
+                        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                      (commuteGHalfSandwich_moveChainFamily_last params family r q' ogs')
+          _ = (commuteGHalfSandwich_secondSliceLiftFamily params family r
+                (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
+                rfl
+      calc
+        (commuteGHalfSandwich_moveStepMidFamily params family r
+          ((moveTailSwappedFrontQuestionEquiv params r) q)).outcome
+          ((moveTailSwappedFrontOutcomeEquiv params r) ogs)
+            = (commuteGHalfSandwich_secondSliceLiftFamily params family r
+                (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
+                  exact (commuteGHalfSandwich_secondSliceLift_moveFamily_eq_swappedFrontMoveStepMid
+                    params family r q ogs).symm
+        _ = (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs := by
+              simpa using hlast.symm)
+    ho
 
-private lemma commuteGHalfSandwich_core_three_error_le
+private lemma commuteGHalfSandwich_moveBackChainFamily_zero_eq_secondSliceLift_moveFamily
     (params : Parameters) [FieldModel params.q]
-    (gamma zeta : Error)
-    (hzeta_nonneg : 0 ≤ zeta)
-    (hzeta_le : zeta ≤ 1) :
-    32 * zeta + 8 * gHatCommutationError params gamma zeta ≤
-      commuteGHalfSandwichError params gamma zeta 3 := by
-  let S : Error :=
-    Real.rpow gamma (1 / (16 : Error)) +
-      Real.rpow zeta (1 / (16 : Error)) +
-      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
-  have hzeta_term : zeta ≤ (params.m : Error) * S := by
-    simpa [S] using
-      zeta_le_gHatCommutationScale params gamma zeta hzeta_nonneg hzeta_le
-  have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
-  have hS_nonneg : 0 ≤ S := by
-    dsimp [S]
-    exact add_nonneg
-      (add_nonneg
-        (rpow_oneSixteenth_nonneg gamma)
-        (Real.rpow_nonneg hzeta_nonneg (1 / (16 : Error))))
-      (Real.rpow_nonneg hratio_nonneg (1 / (16 : Error)))
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs =
+      (commuteGHalfSandwich_secondSliceLiftFamily params family r
+        (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
+  let q' : SliceQuestion params × SliceQuestion params × PointTuple params r :=
+    (q.1, q.2.2 0, pointTupleTail q.2.2)
+  let ogs' : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r :=
+    (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
   calc
-    32 * zeta + 8 * gHatCommutationError params gamma zeta
-      ≤ 32 * ((params.m : Error) * S) + 8 * gHatCommutationError params gamma zeta := by
-          gcongr
-    _ = 32 * ((params.m : Error) * S) + 8 * (138 * (params.m : Error) * S) := by
-          simp [gHatCommutationError, S]
-    _ = 1136 * (params.m : Error) * S := by ring
-    _ ≤ 426 * ((3 : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by
-          have hmS_nonneg : 0 ≤ (params.m : Error) * S := by
-            nlinarith [hS_nonneg]
-          norm_num
-          nlinarith
-    _ = commuteGHalfSandwichError params gamma zeta 3 := by
-          simp [commuteGHalfSandwichError, S]
+    (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs
+      = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+          (commuteGHalfSandwich_moveFamily params family r q').outcome ogs' := by
+            simpa [commuteGHalfSandwich_moveBackChainFamily, q', ogs'] using
+              congrArg
+                (fun X => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                (commuteGHalfSandwich_moveChainFamily_last params family r q' ogs')
+    _ = (commuteGHalfSandwich_secondSliceLiftFamily params family r
+          (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
+            rfl
 
-private lemma commuteGHalfSandwich_core_three
+private def commuteGHalfSandwich_postMoveFlatLength : ℕ → ℕ
+  | 0 => 1
+  | r + 1 => commuteGHalfSandwich_postMoveFlatLength r + 2
+
+private lemma commuteGHalfSandwich_postMoveFlatLength_pos
+    (r : ℕ) :
+    1 ≤ commuteGHalfSandwich_postMoveFlatLength r := by
+  induction r with
+  | zero => simp [commuteGHalfSandwich_postMoveFlatLength]
+  | succ r ih =>
+      simpa [commuteGHalfSandwich_postMoveFlatLength] using Nat.le_trans (by decide : 1 ≤ 3) ih
+
+private noncomputable def commuteGHalfSandwich_postMoveFlatFamily
     (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) :
+    (r : ℕ) → Fin (commuteGHalfSandwich_postMoveFlatLength r + 1) → IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι)
+  | 0, i =>
+      if i.1 = 0 then
+        commuteGHalfSandwich_moveFamily params family 0
+      else
+        commuteGHalfSandwich_recursiveTargetFamily params family 0
+  | r + 1, i =>
+      if i.1 = 0 then
+        commuteGHalfSandwich_moveFamily params family (r + 1)
+      else if i.1 = 1 then
+        commuteGHalfSandwich_commuteFamily params family (r + 1)
+      else
+        commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+          (commuteGHalfSandwich_splitSuccLiftFamily params r
+            ((commuteGHalfSandwich_postMoveFlatFamily params family r)
+              ⟨i.1 - 2, by
+                have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 3 := by
+                  simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+                omega⟩))
+
+private noncomputable def commuteGHalfSandwich_postMoveFlatError
+    (params : Parameters) [FieldModel params.q]
+    (gamma zeta : Error) :
+    (r : ℕ) → Fin (commuteGHalfSandwich_postMoveFlatLength r) → Error
+  | 0, _ => gHatCommutationError params gamma zeta
+  | r + 1, i =>
+      if hi0 : i.1 = 0 then
+        gHatCommutationError params gamma zeta
+      else if hi1 : i.1 = 1 then
+        gHatSelfConsistencyError zeta
+      else
+        commuteGHalfSandwich_postMoveFlatError params gamma zeta r
+          ⟨i.1 - 2, by
+            have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
+              simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+            omega⟩
+
+private lemma commuteGHalfSandwich_postMoveFlatError_sum
+    (params : Parameters) [FieldModel params.q]
+    (gamma zeta : Error) :
+    ∀ r,
+      ∑ i : Fin (commuteGHalfSandwich_postMoveFlatLength r),
+        commuteGHalfSandwich_postMoveFlatError params gamma zeta r i =
+          (2 : Error) * (r : Error) * zeta + ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta
+  | 0 => by
+      simp [commuteGHalfSandwich_postMoveFlatLength, commuteGHalfSandwich_postMoveFlatError]
+  | r + 1 => by
+      have hone_lt : 1 < commuteGHalfSandwich_postMoveFlatLength (r + 1) := by
+        simp [commuteGHalfSandwich_postMoveFlatLength, commuteGHalfSandwich_postMoveFlatLength_pos]
+      change ∑ i : Fin (commuteGHalfSandwich_postMoveFlatLength r + 2),
+        commuteGHalfSandwich_postMoveFlatError params gamma zeta (r + 1) i = _
+      rw [Fin.sum_univ_succ]
+      rw [Fin.sum_univ_succ]
+      simp [commuteGHalfSandwich_postMoveFlatError,
+        commuteGHalfSandwich_postMoveFlatError_sum params gamma zeta r,
+        gHatSelfConsistencyError, Nat.mod_eq_of_lt hone_lt]
+      ring
+
+private def commuteGHalfSandwich_flatChainLength (r : ℕ) : ℕ :=
+  r + commuteGHalfSandwich_postMoveFlatLength r
+
+private noncomputable def commuteGHalfSandwich_flatChainFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ) :
+    Fin (commuteGHalfSandwich_flatChainLength r + 1) → IdxOpFamily
+      (SliceQuestion params × SliceQuestion params × PointTuple params r)
+      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
+      (ι × ι)
+  | i =>
+      if hi : i.1 < r + 1 then
+        commuteGHalfSandwich_moveChainFamily params family r ⟨i.1, hi⟩
+      else
+        commuteGHalfSandwich_postMoveFlatFamily params family r
+          ⟨i.1 - r, by
+            have hi_lt : i.1 < r + commuteGHalfSandwich_postMoveFlatLength r + 1 := i.2
+            omega⟩
+
+private noncomputable def commuteGHalfSandwich_flatChainError
+    (params : Parameters) [FieldModel params.q]
+    (gamma zeta : Error) (r : ℕ) :
+    Fin (commuteGHalfSandwich_flatChainLength r) → Error
+  | i =>
+      if hi : i.1 < r then
+        gHatSelfConsistencyError zeta
+      else
+        commuteGHalfSandwich_postMoveFlatError params gamma zeta r
+          ⟨i.1 - r, by
+            have hi_lt : i.1 < r + commuteGHalfSandwich_postMoveFlatLength r := i.2
+            omega⟩
+
+private lemma commuteGHalfSandwich_commuteFamily_zero_eq_recursiveTarget
+    (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    (hzeta_le : zeta ≤ 1)
-    (hsc : SDDRel ψbi
-      (uniformDistribution (SliceQuestion params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family)
-      (gHatSelfConsistencyError zeta))
-    (hcom : SDDOpRel ψbi
-      (uniformDistribution (SlicePairQuestion params))
-      (gHatPairProductLeft params family)
-      (gHatPairProductRight params family)
-      (gHatCommutationError params gamma zeta)) :
-    SDDOpRel ψbi
-      (uniformDistribution (PointTuple params 3))
-      (gHatHalfSandwichLeft params family 3)
-      (gHatHalfSandwichRight params family 3)
-      (commuteGHalfSandwichError params gamma zeta 3) := by
-  have hraw :=
-    commuteGHalfSandwich_core_three_raw params ψbi family gamma zeta hsc hcom
-  have hzeta_nonneg := zeta_nonneg_of_hsc params ψbi family zeta hsc
-  exact Preliminaries.sddOpRel_mono ψbi
-    (uniformDistribution (PointTuple params 3))
-    (gHatHalfSandwichLeft params family 3)
-    (gHatHalfSandwichRight params family 3)
-    (32 * zeta + 8 * gHatCommutationError params gamma zeta)
-    (commuteGHalfSandwichError params gamma zeta 3)
-    hraw
-    (commuteGHalfSandwich_core_three_error_le params gamma zeta
-      hzeta_nonneg hzeta_le)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params 0)
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params 0) :
+    (commuteGHalfSandwich_commuteFamily params family 0 q).outcome ogs =
+      (commuteGHalfSandwich_recursiveTargetFamily params family 0 q).outcome ogs := by
+  simp [commuteGHalfSandwich_commuteFamily, commuteGHalfSandwich_recursiveTargetFamily,
+    headTailRotatedFamily, gHatHalfProductOutcomeOperator, gHatReverseHalfProductOutcomeOperator,
+    rightTensor_one,
+    gHatRotatedHalfProductOutcomeOperator, leftTensor_mul_leftTensor,
+    rightTensor_mul_rightTensor, mul_assoc]
 
-private lemma commuteGHalfSandwich_core_four_raw
+private lemma commuteGHalfSandwich_postMoveFlatLength_eq
+    (r : ℕ) :
+    commuteGHalfSandwich_postMoveFlatLength r = 2 * r + 1 := by
+  induction r with
+  | zero => rfl
+  | succ r ih =>
+      simp [commuteGHalfSandwich_postMoveFlatLength, ih, Nat.mul_add, Nat.add_assoc,
+        Nat.add_left_comm, Nat.add_comm]
+
+private lemma commuteGHalfSandwich_secondSliceLift_recursiveTarget
     (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_secondSliceLiftFamily params family r
+      (commuteGHalfSandwich_recursiveTargetFamily params family r) q).outcome ogs =
+      (commuteGHalfSandwich_recursiveTargetFamily params family (r + 1) q).outcome ogs := by
+  simp [commuteGHalfSandwich_secondSliceLiftFamily,
+    commuteGHalfSandwich_recursiveTargetFamily, headTailRotatedFamily,
+    gHatHalfProductOutcomeOperator, gHatRotatedHalfProductOutcomeOperator,
+    leftTensor_mul_leftTensor, mul_assoc]
+
+private lemma commuteGHalfSandwich_postMoveFlatFamily_zero_active
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    ∀ r q ogs,
+      (commuteGHalfSandwich_postMoveFlatFamily params family r 0 q).outcome ogs =
+        (commuteGHalfSandwich_moveFamily params family r q).outcome ogs
+  | 0, q, ogs => by
+      simp [commuteGHalfSandwich_postMoveFlatFamily, commuteGHalfSandwich_moveFamily,
+        commuteGHalfSandwich_recursiveTargetFamily, headTailRotatedFamily,
+        gHatHalfProductOutcomeOperator, gHatRotatedHalfProductOutcomeOperator,
+        leftTensor_mul_leftTensor, rightTensor_mul_rightTensor, mul_assoc]
+  | r + 1, q, ogs => by
+      simp [commuteGHalfSandwich_postMoveFlatFamily]
+
+private lemma commuteGHalfSandwich_postMoveFlatFamily_one_active
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (r : ℕ)
+    (q : SliceQuestion params × SliceQuestion params × PointTuple params (r + 1))
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) :
+    (commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)
+      ⟨1, by
+        rw [commuteGHalfSandwich_postMoveFlatLength_eq]
+        omega⟩ q).outcome ogs =
+      (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs := by
+  simp [commuteGHalfSandwich_postMoveFlatFamily]
+
+private lemma commuteGHalfSandwich_postMoveFlatFamily_last_active
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    ∀ r q ogs,
+      (commuteGHalfSandwich_postMoveFlatFamily params family r
+          (Fin.last (commuteGHalfSandwich_postMoveFlatLength r)) q).outcome ogs =
+        (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs
+  | 0, q, ogs => by
+      simp [commuteGHalfSandwich_postMoveFlatFamily, commuteGHalfSandwich_postMoveFlatLength,
+        commuteGHalfSandwich_recursiveTargetFamily, headTailRotatedFamily,
+        commuteGHalfSandwich_moveFamily, gHatHalfProductOutcomeOperator,
+        gHatRotatedHalfProductOutcomeOperator, leftTensor_mul_leftTensor,
+        rightTensor_mul_rightTensor, mul_assoc]
+  | r + 1, q, ogs => by
+      let q' : SliceQuestion params × PointTuple params (r + 1) := (q.1, q.2.2)
+      let ogs' : GHatOutcome params × GHatTupleOutcome params (r + 1) := (ogs.1, ogs.2.2)
+      let q'' : SliceQuestion params × SliceQuestion params × PointTuple params r :=
+        (splitSuccQuestionEquiv params r) q'
+      let ogs'' : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r :=
+        (splitSuccOutcomeEquiv params r) ogs'
+      have hsmall :
+          (commuteGHalfSandwich_postMoveFlatFamily params family r
+              (Fin.last (commuteGHalfSandwich_postMoveFlatLength r)) q'').outcome ogs'' =
+            (commuteGHalfSandwich_recursiveTargetFamily params family r
+              q'').outcome ogs'' := by
+        simpa using commuteGHalfSandwich_postMoveFlatFamily_last_active params family r
+          q'' ogs''
+      have hsmall' :
+          (commuteGHalfSandwich_postMoveFlatFamily params family r
+              ⟨2 * (r + 1) - 1, by
+                rw [commuteGHalfSandwich_postMoveFlatLength_eq]
+                omega⟩ q'').outcome ogs'' =
+            (commuteGHalfSandwich_recursiveTargetFamily params family r q'').outcome ogs'' := by
+        have hlast_idx :
+            (⟨2 * (r + 1) - 1, by
+                have hlt : 2 * (r + 1) - 1 < commuteGHalfSandwich_postMoveFlatLength r + 1 := by
+                  rw [commuteGHalfSandwich_postMoveFlatLength_eq]
+                  omega
+                exact hlt⟩ : Fin (commuteGHalfSandwich_postMoveFlatLength r + 1)) =
+              Fin.last (commuteGHalfSandwich_postMoveFlatLength r) := by
+          ext
+          simp [Fin.last, commuteGHalfSandwich_postMoveFlatLength_eq, Nat.mul_add, Nat.add_assoc,
+            Nat.add_left_comm, Nat.add_comm]
+        simpa [hlast_idx] using hsmall
+      calc
+        (commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)
+            (Fin.last (commuteGHalfSandwich_postMoveFlatLength (r + 1))) q).outcome ogs
+          = (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+              (commuteGHalfSandwich_splitSuccLiftFamily params r
+                (commuteGHalfSandwich_postMoveFlatFamily params family r
+                  ⟨2 * (r + 1) - 1, by
+                    have hlt : 2 * (r + 1) - 1 < commuteGHalfSandwich_postMoveFlatLength r + 1 := by
+                      rw [commuteGHalfSandwich_postMoveFlatLength_eq]
+                      omega
+                    exact hlt⟩)) q).outcome ogs := by
+                simp [commuteGHalfSandwich_postMoveFlatFamily, commuteGHalfSandwich_postMoveFlatLength_eq]
+        _ = (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+              (commuteGHalfSandwich_splitSuccLiftFamily params r
+                (commuteGHalfSandwich_recursiveTargetFamily params family r)) q).outcome ogs := by
+                change leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+                    ((commuteGHalfSandwich_postMoveFlatFamily params family r
+                        ⟨2 * (r + 1) - 1, by
+                          have hlt : 2 * (r + 1) - 1 < commuteGHalfSandwich_postMoveFlatLength r + 1 := by
+                            rw [commuteGHalfSandwich_postMoveFlatLength_eq]
+                            omega
+                          exact hlt⟩ q'').outcome ogs'') =
+                  leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+                    ((commuteGHalfSandwich_recursiveTargetFamily params family r q'').outcome ogs'')
+                exact congrArg
+                  (fun X => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                  hsmall'
+        _ = (commuteGHalfSandwich_recursiveTargetFamily params family (r + 1) q).outcome ogs := by
+              exact (commuteGHalfSandwich_prefixSecondSliceLeft_splitSuccLift_eq_secondSliceLift params family r
+                (commuteGHalfSandwich_recursiveTargetFamily params family r) q ogs).trans
+                  (commuteGHalfSandwich_secondSliceLift_recursiveTarget params family r q ogs)
+
+private lemma commuteGHalfSandwich_flatChainFamily_zero
+    (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    (hsc : SDDRel ψbi
-      (uniformDistribution (SliceQuestion params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family)
-      (gHatSelfConsistencyError zeta))
-    (hcom : SDDOpRel ψbi
-      (uniformDistribution (SlicePairQuestion params))
-      (gHatPairProductLeft params family)
-      (gHatPairProductRight params family)
-      (gHatCommutationError params gamma zeta)) :
-    SDDOpRel ψbi
-      (uniformDistribution (PointTuple params 4))
-      (gHatHalfSandwichLeft params family 4)
-      (gHatHalfSandwichRight params family 4)
-      (224 * zeta + 36 * gHatCommutationError params gamma zeta) := by
-  let ν3 := gHatCommutationError params gamma zeta
-  let E3 : Error := 32 * zeta + 8 * ν3
-  let Q := SliceQuestion params × SliceQuestion params × PointTuple params 2
-  have hmove := commuteGHalfSandwich_moveStage_two params ψbi family zeta hsc
-  have hback :=
-    commuteGHalfSandwich_moveBackStage params ψbi family 2 (12 * zeta) hmove
-  have hthree_raw :=
-    commuteGHalfSandwich_core_three_raw params ψbi family gamma zeta hsc hcom
-  have hsplit3 : SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × PointTuple params 2))
-      (headTailOrderedFamily params family 2)
-      (headTailRotatedFamily params family 2)
-      E3 := by
-    simpa [E3, ν3] using
-      (commuteGHalfSandwich_split_iff params ψbi family 2 E3).1 hthree_raw
-  have htail : SDDOpRel ψbi
-      (uniformDistribution Q)
-      (commuteGHalfSandwich_recursiveSourceFamily params family 2)
-      (commuteGHalfSandwich_recursiveTargetFamily params family 2)
-      E3 := by
-    simpa [Q] using
-      commuteGHalfSandwich_prefixSecondSliceLeft params ψbi family 2 E3 hsplit3
-  have htail' : SDDOpRel ψbi
-      (uniformDistribution Q)
-      (commuteGHalfSandwich_moveBackFamily params family 2)
-      (commuteGHalfSandwich_recursiveTargetFamily params family 2)
-      E3 :=
-    commuteGHalfSandwich_moveBack_to_recursiveTarget params ψbi family 2 E3 htail
-  let families : Fin 5 →
-      IdxOpFamily Q (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params 2) (ι × ι)
-    | ⟨0, _⟩ => commuteGHalfSandwich_moveSourceFamily params family 2
-    | ⟨1, _⟩ => commuteGHalfSandwich_moveFamily params family 2
-    | ⟨2, _⟩ => commuteGHalfSandwich_commuteFamily params family 2
-    | ⟨3, _⟩ => commuteGHalfSandwich_moveBackFamily params family 2
-    | ⟨4, _⟩ => commuteGHalfSandwich_recursiveTargetFamily params family 2
-  let errors : Fin 4 → Error
-    | ⟨0, _⟩ => 12 * zeta
-    | ⟨1, _⟩ => ν3
-    | ⟨2, _⟩ => 12 * zeta
-    | ⟨3, _⟩ => E3
-  have hsteps : ∀ i : Fin 4,
-      SDDOpRel ψbi (uniformDistribution Q)
-        (families i.castSucc) (families i.succ) (errors i) := by
-    intro i
-    fin_cases i
-    · simpa [families, errors, Q] using hmove
-    · simpa [families, errors, Q, ν3] using
-        commuteGHalfSandwich_step_commute params ψbi family gamma zeta 2 hcom
-    · simpa [families, errors, Q] using hback
-    · simpa [families, errors, Q] using htail'
-  have hchain :=
-    Preliminaries.sddOpRel_chain ψbi (uniformDistribution Q) 4 families errors hsteps
-  have hsum_errors : ∑ i : Fin 4, errors i = 56 * zeta + 9 * ν3 := by
-    simp [errors, E3, ν3, Fin.sum_univ_four]
-    ring
-  have hchain' : SDDOpRel ψbi
-      (uniformDistribution Q)
-      (commuteGHalfSandwich_moveSourceFamily params family 2)
-      (commuteGHalfSandwich_recursiveTargetFamily params family 2)
-      (224 * zeta + 36 * ν3) := by
-    have hmono := Preliminaries.sddOpRel_mono ψbi
-      (uniformDistribution Q)
-      (commuteGHalfSandwich_moveSourceFamily params family 2)
-      (commuteGHalfSandwich_recursiveTargetFamily params family 2)
-      ((4 : Error) * ∑ i : Fin 4, errors i)
-      (224 * zeta + 36 * ν3)
-      hchain
-      (by rw [hsum_errors]; linarith)
-    simpa [families, Q] using hmono
-  have hsplit4 : SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × PointTuple params 3))
-      (headTailOrderedFamily params family 3)
-      (headTailRotatedFamily params family 3)
-      (224 * zeta + 36 * ν3) := by
-    exact (commuteGHalfSandwich_split_succ_iff params ψbi family 2
-      (224 * zeta + 36 * ν3)).2 hchain'
-  exact (commuteGHalfSandwich_split_iff params ψbi family 3
-    (224 * zeta + 36 * ν3)).2 hsplit4
+    (r : ℕ) (q : SliceQuestion params × SliceQuestion params × PointTuple params r)
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :
+    (commuteGHalfSandwich_flatChainFamily params family r 0 q).outcome ogs =
+      (commuteGHalfSandwich_moveSourceFamily params family r q).outcome ogs := by
+  simp [commuteGHalfSandwich_flatChainFamily,
+    commuteGHalfSandwich_moveChainFamily_zero params family r]
 
-private lemma commuteGHalfSandwich_core_four_error_le
+private lemma commuteGHalfSandwich_flatChainError_sum
     (params : Parameters) [FieldModel params.q]
-    (gamma zeta : Error)
-    (hzeta_nonneg : 0 ≤ zeta)
-    (hzeta_le : zeta ≤ 1) :
-    224 * zeta + 36 * gHatCommutationError params gamma zeta ≤
-      commuteGHalfSandwichError params gamma zeta 4 := by
-  let S : Error :=
-    Real.rpow gamma (1 / (16 : Error)) +
-      Real.rpow zeta (1 / (16 : Error)) +
-      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
-  have hzeta_term : zeta ≤ (params.m : Error) * S := by
-    simpa [S] using
-      zeta_le_gHatCommutationScale params gamma zeta hzeta_nonneg hzeta_le
-  have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
-  have hS_nonneg : 0 ≤ S := by
-    dsimp [S]
-    exact add_nonneg
-      (add_nonneg
-        (rpow_oneSixteenth_nonneg gamma)
-        (Real.rpow_nonneg hzeta_nonneg (1 / (16 : Error))))
-      (Real.rpow_nonneg hratio_nonneg (1 / (16 : Error)))
+    (gamma zeta : Error) :
+    ∀ r,
+      ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
+        commuteGHalfSandwich_flatChainError params gamma zeta r i =
+          4 * (r : Error) * zeta + ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta
+  | 0 => by
+      simp [commuteGHalfSandwich_flatChainLength, commuteGHalfSandwich_flatChainError,
+        commuteGHalfSandwich_postMoveFlatError,
+        commuteGHalfSandwich_postMoveFlatLength]
+  | r + 1 => by
+      have hhead : ∀ x : Fin (r + 1), (x : ℕ) ≤ r := by
+        intro x
+        exact Nat.le_of_lt_succ x.is_lt
+      have htail : ∀ x : Fin (commuteGHalfSandwich_postMoveFlatLength (r + 1)),
+          ¬ r + 1 + (x : ℕ) ≤ r := by
+        intro x
+        omega
+      change ∑ i : Fin ((r + 1) + commuteGHalfSandwich_postMoveFlatLength (r + 1)),
+        commuteGHalfSandwich_flatChainError params gamma zeta (r + 1) i = _
+      rw [Fin.sum_univ_add]
+      simp [commuteGHalfSandwich_flatChainError,
+        commuteGHalfSandwich_postMoveFlatError_sum params gamma zeta (r + 1),
+        gHatSelfConsistencyError, hhead, htail]
+      ring
+
+private lemma commuteGHalfSandwich_flatChainFamily_last
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (r : ℕ) (q : SliceQuestion params × SliceQuestion params × PointTuple params r)
+    (ogs : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) :
+    (commuteGHalfSandwich_flatChainFamily params family r
+      (Fin.last (commuteGHalfSandwich_flatChainLength r)) q).outcome ogs =
+      (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs := by
+  have hnot : ¬ (commuteGHalfSandwich_flatChainLength r : ℕ) < r + 1 := by
+    unfold commuteGHalfSandwich_flatChainLength
+    rw [commuteGHalfSandwich_postMoveFlatLength_eq]
+    omega
+  have hidx :
+      (⟨commuteGHalfSandwich_flatChainLength r - r, by
+          unfold commuteGHalfSandwich_flatChainLength
+          rw [commuteGHalfSandwich_postMoveFlatLength_eq]
+          omega⟩ : Fin (commuteGHalfSandwich_postMoveFlatLength r + 1)) =
+        Fin.last (commuteGHalfSandwich_postMoveFlatLength r) := by
+    ext
+    simp [Fin.last, commuteGHalfSandwich_flatChainLength,
+      commuteGHalfSandwich_postMoveFlatLength_eq]
   calc
-    224 * zeta + 36 * gHatCommutationError params gamma zeta
-      ≤ 224 * ((params.m : Error) * S) + 36 * gHatCommutationError params gamma zeta := by
-          gcongr
-    _ = 224 * ((params.m : Error) * S) + 36 * (138 * (params.m : Error) * S) := by
-          simp [gHatCommutationError, S]
-    _ = 5192 * (params.m : Error) * S := by ring
-    _ ≤ 426 * ((4 : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by
-          have hmS_nonneg : 0 ≤ (params.m : Error) * S := by
-            nlinarith [hS_nonneg]
-          norm_num
-          nlinarith
-    _ = commuteGHalfSandwichError params gamma zeta 4 := by
-          simp [commuteGHalfSandwichError, S]
+    (commuteGHalfSandwich_flatChainFamily params family r
+        (Fin.last (commuteGHalfSandwich_flatChainLength r)) q).outcome ogs
+      = (commuteGHalfSandwich_postMoveFlatFamily params family r
+          (Fin.last (commuteGHalfSandwich_postMoveFlatLength r)) q).outcome ogs := by
+            simp [commuteGHalfSandwich_flatChainFamily, hnot, hidx]
+    _ = (commuteGHalfSandwich_recursiveTargetFamily params family r q).outcome ogs := by
+          exact commuteGHalfSandwich_postMoveFlatFamily_last_active params family r q ogs
 
-private lemma commuteGHalfSandwich_core_four
+private lemma commuteGHalfSandwich_postMoveFlatStep
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
-    (hzeta_le : zeta ≤ 1)
     (hsc : SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
       (gHatSelfConsistencyLeftFamily params family)
@@ -4225,23 +6942,376 @@ private lemma commuteGHalfSandwich_core_four
       (gHatPairProductLeft params family)
       (gHatPairProductRight params family)
       (gHatCommutationError params gamma zeta)) :
-    SDDOpRel ψbi
-      (uniformDistribution (PointTuple params 4))
-      (gHatHalfSandwichLeft params family 4)
-      (gHatHalfSandwichRight params family 4)
-      (commuteGHalfSandwichError params gamma zeta 4) := by
-  have hraw :=
-    commuteGHalfSandwich_core_four_raw params ψbi family gamma zeta hsc hcom
-  have hzeta_nonneg := zeta_nonneg_of_hsc params ψbi family zeta hsc
-  exact Preliminaries.sddOpRel_mono ψbi
-    (uniformDistribution (PointTuple params 4))
-    (gHatHalfSandwichLeft params family 4)
-    (gHatHalfSandwichRight params family 4)
-    (224 * zeta + 36 * gHatCommutationError params gamma zeta)
-    (commuteGHalfSandwichError params gamma zeta 4)
-    hraw
-    (commuteGHalfSandwich_core_four_error_le params gamma zeta
-      hzeta_nonneg hzeta_le)
+    ∀ r (i : Fin (commuteGHalfSandwich_postMoveFlatLength r)),
+      SDDOpRel ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+        ((commuteGHalfSandwich_postMoveFlatFamily params family r) i.castSucc)
+        ((commuteGHalfSandwich_postMoveFlatFamily params family r) i.succ)
+        ((commuteGHalfSandwich_postMoveFlatError params gamma zeta r) i)
+  | 0, i => by
+      fin_cases i
+      have hcomm0 := commuteGHalfSandwich_step_commute params ψbi family gamma zeta 0 hcom
+      exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params 0))
+        (commuteGHalfSandwich_moveFamily params family 0)
+        (commuteGHalfSandwich_commuteFamily params family 0)
+        (commuteGHalfSandwich_moveFamily params family 0)
+        (commuteGHalfSandwich_recursiveTargetFamily params family 0)
+        (gHatCommutationError params gamma zeta)
+        (fun _ _ => rfl)
+        (fun q ogs => commuteGHalfSandwich_commuteFamily_zero_eq_recursiveTarget params family q ogs)
+        hcomm0
+  | r + 1, i => by
+      by_cases hi0 : i.1 = 0
+      · have hcomm1 := commuteGHalfSandwich_step_commute params ψbi family gamma zeta (r + 1) hcom
+        have hsrc_eq :
+            ∀ q ogs,
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.castSucc q).outcome ogs =
+                (commuteGHalfSandwich_moveFamily params family (r + 1) q).outcome ogs := by
+          intro q ogs
+          simpa [commuteGHalfSandwich_postMoveFlatFamily, hi0]
+        have htgt_eq :
+            ∀ q ogs,
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ q).outcome ogs =
+                (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs := by
+          intro q ogs
+          have hi1 : i.1 + 1 = 1 := by omega
+          simpa [commuteGHalfSandwich_postMoveFlatFamily, hi0, hi1]
+        simpa [commuteGHalfSandwich_postMoveFlatError, hi0] using
+          (CommutativityPoints.sddOpRel_congr_outcome ψbi
+            (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+            (commuteGHalfSandwich_moveFamily params family (r + 1))
+            (commuteGHalfSandwich_commuteFamily params family (r + 1))
+            ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.castSucc)
+            ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ)
+            (gHatCommutationError params gamma zeta)
+            (fun q ogs => (hsrc_eq q ogs).symm)
+            (fun q ogs => (htgt_eq q ogs).symm)
+            hcomm1)
+      · by_cases hi1 : i.1 = 1
+        · have hzero := commuteGHalfSandwich_commute_to_moveBackChainFamily_zero params ψbi family zeta (r := r) hsc
+          have hsrc_eq :
+              ∀ q ogs,
+                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.castSucc q).outcome ogs =
+                  (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs := by
+            intro q ogs
+            simpa [commuteGHalfSandwich_postMoveFlatFamily, hi0, hi1]
+          have htgt_eq :
+              ∀ q ogs,
+                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ q).outcome ogs =
+                  ((commuteGHalfSandwich_moveBackChainFamily params family r) 0 q).outcome ogs := by
+            intro q ogs
+            have hi2 : i.1 + 1 ≠ 0 := by omega
+            have hi2' : i.1 + 1 ≠ 1 := by omega
+            have hinner0_nat : i.1 - 1 = 0 := by omega
+            have hinner0 :
+                (⟨i.1 - 1, by
+                    have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
+                      simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+                    omega⟩ : Fin (commuteGHalfSandwich_postMoveFlatLength r + 1)) = 0 := by
+              apply Fin.ext
+              simp [hinner0_nat]
+            let q' : SliceQuestion params × SliceQuestion params × PointTuple params r :=
+              (q.1, q.2.2 0, pointTupleTail q.2.2)
+            let ogs' : GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r :=
+              (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
+            have hzero_active :
+                ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0 q').outcome ogs' =
+                  (commuteGHalfSandwich_moveFamily params family r q').outcome ogs' :=
+              commuteGHalfSandwich_postMoveFlatFamily_zero_active params family r q' ogs'
+            have hsecond_eq :
+                (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+                  (commuteGHalfSandwich_splitSuccLiftFamily params r
+                    ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0)) q).outcome ogs =
+                  (commuteGHalfSandwich_secondSliceLiftFamily params family r
+                    (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
+              calc
+                (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+                  (commuteGHalfSandwich_splitSuccLiftFamily params r
+                    ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0)) q).outcome ogs
+                    = (commuteGHalfSandwich_secondSliceLiftFamily params family r
+                        ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0) q).outcome ogs := by
+                          rw [commuteGHalfSandwich_prefixSecondSliceLeft_splitSuccLift_eq_secondSliceLift]
+                _ = (commuteGHalfSandwich_secondSliceLiftFamily params family r
+                      (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
+                    change leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+                        (((commuteGHalfSandwich_postMoveFlatFamily params family r) 0 q').outcome ogs') = _
+                    exact congrArg
+                      (fun X => leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                      hzero_active
+            calc
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ q).outcome ogs
+                = (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+                    (commuteGHalfSandwich_splitSuccLiftFamily params r
+                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) 0)) q).outcome ogs := by
+                        conv_lhs => simp [commuteGHalfSandwich_postMoveFlatFamily, hi2, hi2']
+                        simpa [hi0, hinner0]
+              _ = (commuteGHalfSandwich_secondSliceLiftFamily params family r
+                    (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := hsecond_eq
+              _ = ((commuteGHalfSandwich_moveBackChainFamily params family r) 0 q).outcome ogs := by
+                    simpa using
+                      (commuteGHalfSandwich_moveBackChainFamily_zero_eq_secondSliceLift_moveFamily
+                        params family r q ogs).symm
+          simpa [commuteGHalfSandwich_postMoveFlatError, hi0, hi1] using
+            (CommutativityPoints.sddOpRel_congr_outcome ψbi
+              (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+              (commuteGHalfSandwich_commuteFamily params family (r + 1))
+              ((commuteGHalfSandwich_moveBackChainFamily params family r) 0)
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.castSucc)
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ)
+              (gHatSelfConsistencyError zeta)
+              (fun q ogs => (hsrc_eq q ogs).symm)
+              (fun q ogs => (htgt_eq q ogs).symm)
+              hzero)
+        · let j : Fin (commuteGHalfSandwich_postMoveFlatLength r) :=
+            ⟨i.1 - 2, by
+              have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
+                simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+              omega⟩
+          have hsmall := commuteGHalfSandwich_postMoveFlatStep params ψbi family gamma zeta hsc hcom r j
+          have hprefix := commuteGHalfSandwich_prefixSecondSliceLeftLift params ψbi family (r + 1)
+            (commuteGHalfSandwich_splitSuccLiftFamily params r
+              ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.castSucc))
+            (commuteGHalfSandwich_splitSuccLiftFamily params r
+              ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.succ))
+            ((commuteGHalfSandwich_postMoveFlatError params gamma zeta r) j)
+            (commuteGHalfSandwich_splitSuccLift params ψbi r
+              ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.castSucc)
+              ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.succ)
+              ((commuteGHalfSandwich_postMoveFlatError params gamma zeta r) j)
+              hsmall)
+          have hsrc_eq :
+              ∀ q ogs,
+                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.castSucc q).outcome ogs =
+                  (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+                    (commuteGHalfSandwich_splitSuccLiftFamily params r
+                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.castSucc)) q).outcome ogs := by
+            intro q ogs
+            have hsrc_not0 : i.1 ≠ 0 := hi0
+            have hsrc_not1 : i.1 ≠ 1 := hi1
+            simp [commuteGHalfSandwich_postMoveFlatFamily, hsrc_not0, hsrc_not1, j]
+          have htgt_eq :
+              ∀ q ogs,
+                ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ q).outcome ogs =
+                  (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+                    (commuteGHalfSandwich_splitSuccLiftFamily params r
+                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.succ)) q).outcome ogs := by
+            intro q ogs
+            have htgt_not0 : i.1 + 1 ≠ 0 := by omega
+            have htgt_not1 : i.1 + 1 ≠ 1 := by omega
+            have hj_succ :
+                (j.succ : Fin (commuteGHalfSandwich_postMoveFlatLength r + 1)) =
+                  ⟨i.1 - 1, by
+                    have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
+                      simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+                    omega⟩ := by
+              apply Fin.ext
+              dsimp [j]
+              omega
+            calc
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ q).outcome ogs
+                = (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+                    (commuteGHalfSandwich_splitSuccLiftFamily params r
+                      ((commuteGHalfSandwich_postMoveFlatFamily params family r)
+                        ⟨i.1 - 1, by
+                          have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
+                            simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+                          omega⟩)) q).outcome ogs := by
+                        conv_lhs => simp [commuteGHalfSandwich_postMoveFlatFamily, htgt_not0, htgt_not1]
+                        simpa [hi0]
+              _ = (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+                    (commuteGHalfSandwich_splitSuccLiftFamily params r
+                      ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.succ)) q).outcome ogs := by
+                        have hidx :
+                            ((commuteGHalfSandwich_postMoveFlatFamily params family r)
+                              ⟨i.1 - 1, by
+                                have hi_lt : i.1 < commuteGHalfSandwich_postMoveFlatLength r + 2 := by
+                                  simpa [commuteGHalfSandwich_postMoveFlatLength, Nat.add_assoc] using i.2
+                                omega⟩) =
+                              ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.succ) := by
+                                exact congrArg
+                                  (fun idx => (commuteGHalfSandwich_postMoveFlatFamily params family r) idx)
+                                  hj_succ.symm
+                        simpa [hidx]
+          simpa [commuteGHalfSandwich_postMoveFlatError, hi0, hi1, j] using
+            (CommutativityPoints.sddOpRel_congr_outcome ψbi
+              (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+              (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+                (commuteGHalfSandwich_splitSuccLiftFamily params r
+                  ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.castSucc)))
+              (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
+                (commuteGHalfSandwich_splitSuccLiftFamily params r
+                  ((commuteGHalfSandwich_postMoveFlatFamily params family r) j.succ)))
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.castSucc)
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) i.succ)
+              ((commuteGHalfSandwich_postMoveFlatError params gamma zeta r) j)
+              (fun q ogs => (hsrc_eq q ogs).symm)
+              (fun q ogs => (htgt_eq q ogs).symm)
+              hprefix)
+
+private lemma commuteGHalfSandwich_flatChainStep
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hsc : SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (gHatSelfConsistencyError zeta))
+    (hcom : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (gHatPairProductLeft params family)
+      (gHatPairProductRight params family)
+      (gHatCommutationError params gamma zeta)) :
+    ∀ r (i : Fin (commuteGHalfSandwich_flatChainLength r)),
+      SDDOpRel ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+        ((commuteGHalfSandwich_flatChainFamily params family r) i.castSucc)
+        ((commuteGHalfSandwich_flatChainFamily params family r) i.succ)
+        ((commuteGHalfSandwich_flatChainError params gamma zeta r) i)
+  | 0, i => by
+      fin_cases i
+      simpa [commuteGHalfSandwich_flatChainFamily, commuteGHalfSandwich_flatChainError,
+        commuteGHalfSandwich_postMoveFlatLength] using
+        commuteGHalfSandwich_postMoveFlatStep params ψbi family gamma zeta hsc hcom 0
+          ⟨0, by simp [commuteGHalfSandwich_postMoveFlatLength]⟩
+  | r + 1, i => by
+      by_cases hi : i.1 < r + 1
+      · let imove : Fin (r + 1) := ⟨i.1, hi⟩
+        have hmove := commuteGHalfSandwich_moveChain_step params ψbi family zeta hsc (r + 1) imove
+        have hsrc_eq :
+            ∀ q ogs,
+              ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc q).outcome ogs =
+                ((commuteGHalfSandwich_moveChainFamily params family (r + 1)) imove.castSucc q).outcome ogs := by
+          intro q ogs
+          have hsrc_le : i.1 ≤ r + 1 := by omega
+          conv_lhs => simp [commuteGHalfSandwich_flatChainFamily, hsrc_le]
+          rfl
+        have htgt_eq :
+            ∀ q ogs,
+              ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.succ q).outcome ogs =
+                ((commuteGHalfSandwich_moveChainFamily params family (r + 1)) imove.succ q).outcome ogs := by
+          intro q ogs
+          have htgt_le : i.1 ≤ r := by omega
+          conv_lhs => simp [commuteGHalfSandwich_flatChainFamily, htgt_le]
+          rfl
+        simpa [commuteGHalfSandwich_flatChainError, hi] using
+          (CommutativityPoints.sddOpRel_congr_outcome ψbi
+            (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+            ((commuteGHalfSandwich_moveChainFamily params family (r + 1)) imove.castSucc)
+            ((commuteGHalfSandwich_moveChainFamily params family (r + 1)) imove.succ)
+            ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc)
+            ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.succ)
+            (gHatSelfConsistencyError zeta)
+            (fun q ogs => (hsrc_eq q ogs).symm)
+            (fun q ogs => (htgt_eq q ogs).symm)
+            hmove)
+      · have hge : r + 1 ≤ i.1 := by omega
+        by_cases hboundary : i.1 = r + 1
+        · have hcomm1 := commuteGHalfSandwich_step_commute params ψbi family gamma zeta (r + 1) hcom
+          have hsrc_eq :
+              ∀ q ogs,
+                ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc q).outcome ogs =
+                  (commuteGHalfSandwich_moveFamily params family (r + 1) q).outcome ogs := by
+            intro q ogs
+            have hsrc_le : i.1 ≤ r + 1 := by omega
+            conv_lhs => simp [commuteGHalfSandwich_flatChainFamily, hsrc_le]
+            simpa [hboundary, Fin.last] using
+              commuteGHalfSandwich_moveChainFamily_last params family (r + 1) q ogs
+          have htgt_eq :
+              ∀ q ogs,
+                ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.succ q).outcome ogs =
+                  (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs := by
+            intro q ogs
+            have htgt_not : ¬ i.1 ≤ r := by omega
+            have hone_lt : 1 < commuteGHalfSandwich_postMoveFlatLength (r + 1) + 1 := by
+              rw [commuteGHalfSandwich_postMoveFlatLength_eq]
+              omega
+            calc
+              ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.succ q).outcome ogs
+                = (commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)
+                    ⟨i.1 - r, by
+                      simpa [hboundary] using hone_lt⟩ q).outcome ogs := by
+                        conv_lhs => simp [commuteGHalfSandwich_flatChainFamily, htgt_not]
+              _ = (commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)
+                    ⟨1, by exact hone_lt⟩ q).outcome ogs := by
+                    have hone :
+                        (⟨i.1 - r, by simpa [hboundary] using hone_lt⟩ :
+                          Fin (commuteGHalfSandwich_postMoveFlatLength (r + 1) + 1)) =
+                          ⟨1, by exact hone_lt⟩ := by
+                      apply Fin.ext
+                      simp [hboundary]
+                    exact congrArg
+                      (fun idx => ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) idx q).outcome ogs)
+                      hone
+              _ = (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs := by
+                    exact commuteGHalfSandwich_postMoveFlatFamily_one_active params family (r := r) q ogs
+          simpa [commuteGHalfSandwich_flatChainError, hi, hboundary,
+            commuteGHalfSandwich_postMoveFlatError] using
+            (CommutativityPoints.sddOpRel_congr_outcome ψbi
+              (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+              (commuteGHalfSandwich_moveFamily params family (r + 1))
+              (commuteGHalfSandwich_commuteFamily params family (r + 1))
+              ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc)
+              ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.succ)
+              (gHatCommutationError params gamma zeta)
+              (fun q ogs => (hsrc_eq q ogs).symm)
+              (fun q ogs => (htgt_eq q ogs).symm)
+              hcomm1)
+        · let j : Fin (commuteGHalfSandwich_postMoveFlatLength (r + 1)) :=
+            ⟨i.1 - (r + 1), by
+              have hi_lt : i.1 < (r + 1) + commuteGHalfSandwich_postMoveFlatLength (r + 1) := by
+                simpa [commuteGHalfSandwich_flatChainLength] using i.2
+              omega⟩
+          have hsmall := commuteGHalfSandwich_postMoveFlatStep params ψbi family gamma zeta hsc hcom (r + 1) j
+          have hsrc_eq :
+              ∀ q ogs,
+                ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc q).outcome ogs =
+                  ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) j.castSucc q).outcome ogs := by
+            intro q ogs
+            have hsrc_not : ¬ i.1 ≤ r + 1 := by omega
+            have hj_castSucc :
+                (⟨i.1 - (r + 1), by
+                    exact Nat.lt_trans j.2 (Nat.lt_succ_self _)⟩ :
+                  Fin (commuteGHalfSandwich_postMoveFlatLength (r + 1) + 1)) = j.castSucc := by
+              apply Fin.ext
+              simp [j]
+            conv_lhs => simp [commuteGHalfSandwich_flatChainFamily, hsrc_not]
+            exact congrArg
+              (fun idx => ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) idx q).outcome ogs)
+              hj_castSucc
+          have htgt_eq :
+              ∀ q ogs,
+                ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.succ q).outcome ogs =
+                  ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) j.succ q).outcome ogs := by
+            intro q ogs
+            have htgt_not : ¬ i.1 ≤ r := by omega
+            have hge2 : r + 2 ≤ i.1 := by omega
+            have hval : i.1 - r = (i.1 - (r + 1)) + 1 := by
+              omega
+            have hj_succ :
+                (⟨i.1 - r, by
+                    rw [hval]
+                    simpa [j] using j.succ.is_lt⟩ :
+                  Fin (commuteGHalfSandwich_postMoveFlatLength (r + 1) + 1)) = j.succ := by
+              apply Fin.ext
+              simp [j, hval]
+            conv_lhs => simp [commuteGHalfSandwich_flatChainFamily, htgt_not]
+            exact congrArg
+              (fun idx => ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) idx q).outcome ogs)
+              hj_succ
+          simpa [commuteGHalfSandwich_flatChainError, hi, hboundary, j] using
+            (CommutativityPoints.sddOpRel_congr_outcome ψbi
+              (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)))
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) j.castSucc)
+              ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1)) j.succ)
+              ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.castSucc)
+              ((commuteGHalfSandwich_flatChainFamily params family (r + 1)) i.succ)
+              ((commuteGHalfSandwich_postMoveFlatError params gamma zeta (r + 1)) j)
+              (fun q ogs => (hsrc_eq q ogs).symm)
+              (fun q ogs => (htgt_eq q ogs).symm)
+              hsmall)
 
 /-- Bridge: the staged move-commute-move chain for `commuteGHalfSandwich`.
 
@@ -4278,30 +7348,137 @@ private lemma commuteGHalfSandwich_core
   by_cases hk2 : k = 2
   · subst hk2
     exact commuteGHalfSandwich_core_two params ψbi family gamma zeta hcom
-  · by_cases hk3 : k = 3
-    · subst hk3
-      exact commuteGHalfSandwich_core_three params ψbi family gamma zeta hzeta_le hsc hcom
-    · by_cases hk4 : k = 4
-      · subst hk4
-        exact commuteGHalfSandwich_core_four params ψbi family gamma zeta hzeta_le hsc hcom
-      · have hk5 : 5 ≤ k := by omega
-        /-
-        New progress in this file now reaches the first two genuinely nontrivial
-        sandwich lengths: `commuteGHalfSandwich_core_three` and
-        `commuteGHalfSandwich_core_four` are fully proved from the staged
-        move/commute/move-back chain.
-
-        What still blocks the general `k ≥ 5` branch is the paper's full linear
-        flat-chain assembly: we still need an inductive package that iterates the
-        move/commute/move-back step for arbitrary tail length and then sums the
-        resulting `ζ`/`ν₃` contributions into the displayed
-        `426 k² m (γ^{1/16} + ζ^{1/16} + (d/q)^{1/16})` envelope.
-
-        Tracked separately by issue #639; the likely clean closure is to unify
-        the current `k = 3`/`k = 4` raw chains into one recursive flat-chain
-        lemma instead of duplicating the arithmetic case-by-case.
-        -/
-        sorry
+  · have hk3 : 3 ≤ k := by omega
+    let r : ℕ := k - 2
+    have hk_eq : k = r + 2 := by
+      dsimp [r]
+      omega
+    have hsc0 := hsc
+    have hcom0 := hcom
+    rcases hsc with ⟨hν2⟩
+    have hν2_nonneg : 0 ≤ gHatSelfConsistencyError zeta := by
+      exact le_trans
+        (avgOver_nonneg (uniformDistribution (SliceQuestion params))
+          (fun q => qSDD ψbi (gHatSelfConsistencyLeftFamily params family q)
+            (gHatSelfConsistencyRightFamily params family q))
+          (fun q => qSDD_nonneg ψbi _ _))
+        hν2
+    have hzeta_nonneg : 0 ≤ zeta := by
+      simpa [gHatSelfConsistencyError] using hν2_nonneg
+    rcases hcom with ⟨hν3⟩
+    have hν3_nonneg : 0 ≤ gHatCommutationError params gamma zeta := by
+      exact le_trans
+        (avgOver_nonneg (uniformDistribution (SlicePairQuestion params))
+          (fun q => qSDDOp ψbi (gHatPairProductLeft params family q)
+            (gHatPairProductRight params family q))
+          (fun q => Preliminaries.qSDDOp_nonneg ψbi _ _))
+        hν3
+    have hchain := Preliminaries.sddOpRel_chain
+      ψbi
+      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (commuteGHalfSandwich_flatChainLength r)
+      (commuteGHalfSandwich_flatChainFamily params family r)
+      (commuteGHalfSandwich_flatChainError params gamma zeta r)
+      (commuteGHalfSandwich_flatChainStep params ψbi family gamma zeta hsc0 hcom0 r)
+    have hsplit :
+        SDDOpRel ψbi
+          (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+          (commuteGHalfSandwich_moveSourceFamily params family r)
+          (commuteGHalfSandwich_recursiveTargetFamily params family r)
+          (((commuteGHalfSandwich_flatChainLength r : Error)) *
+            ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
+              commuteGHalfSandwich_flatChainError params gamma zeta r i) := by
+      exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+        (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
+        ((commuteGHalfSandwich_flatChainFamily params family r) 0)
+        ((commuteGHalfSandwich_flatChainFamily params family r)
+          (Fin.last (commuteGHalfSandwich_flatChainLength r)))
+        (commuteGHalfSandwich_moveSourceFamily params family r)
+        (commuteGHalfSandwich_recursiveTargetFamily params family r)
+        (((commuteGHalfSandwich_flatChainLength r : Error)) *
+          ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
+            commuteGHalfSandwich_flatChainError params gamma zeta r i)
+        (fun q ogs => by
+          simpa using commuteGHalfSandwich_flatChainFamily_zero params family r q ogs)
+        (fun q ogs => by
+          simpa using commuteGHalfSandwich_flatChainFamily_last params family r q ogs)
+        hchain
+    have hsplitOrdered :
+        SDDOpRel ψbi
+          (uniformDistribution (SliceQuestion params × PointTuple params (r + 1)))
+          (headTailOrderedFamily params family (r + 1))
+          (headTailRotatedFamily params family (r + 1))
+          (((commuteGHalfSandwich_flatChainLength r : Error)) *
+            ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
+              commuteGHalfSandwich_flatChainError params gamma zeta r i) :=
+      (commuteGHalfSandwich_split_succ_iff params ψbi family r
+        (((commuteGHalfSandwich_flatChainLength r : Error)) *
+          ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
+            commuteGHalfSandwich_flatChainError params gamma zeta r i)).2 hsplit
+    have hpoint :
+        SDDOpRel ψbi
+          (uniformDistribution (PointTuple params k))
+          (gHatHalfSandwichLeft params family k)
+          (gHatHalfSandwichRight params family k)
+          (((commuteGHalfSandwich_flatChainLength r : Error)) *
+            ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
+              commuteGHalfSandwich_flatChainError params gamma zeta r i) := by
+      rw [hk_eq]
+      exact (commuteGHalfSandwich_split_iff params ψbi family (r + 1)
+        (((commuteGHalfSandwich_flatChainLength r : Error)) *
+          ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
+            commuteGHalfSandwich_flatChainError params gamma zeta r i)).2 hsplitOrdered
+    have hkR : (k : Error) = (r : Error) + 2 := by
+      exact_mod_cast hk_eq
+    have hsum :
+        ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
+            commuteGHalfSandwich_flatChainError params gamma zeta r i =
+          4 * (r : Error) * zeta + ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta :=
+      commuteGHalfSandwich_flatChainError_sum params gamma zeta r
+    have hlen_le : ((commuteGHalfSandwich_flatChainLength r : ℕ) : Error) ≤ 3 * (k : Error) := by
+      have hflat : ((commuteGHalfSandwich_flatChainLength r : ℕ) : Error) = 3 * (r : Error) + 1 := by
+        rw [commuteGHalfSandwich_flatChainLength, commuteGHalfSandwich_postMoveFlatLength_eq]
+        norm_num [Nat.cast_add, Nat.cast_mul, Nat.cast_one]
+        ring
+      rw [hflat, hkR]
+      nlinarith
+    have hsum_le :
+        4 * (r : Error) * zeta + ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta
+          ≤ 4 * (k : Error) * zeta + (k : Error) * gHatCommutationError params gamma zeta := by
+      rw [hkR]
+      have hζextra : 0 ≤ 8 * zeta := by nlinarith [hzeta_nonneg]
+      have hνextra : 0 ≤ gHatCommutationError params gamma zeta := hν3_nonneg
+      have hcast_r1 : (((r + 1 : ℕ) : Error)) = (r : Error) + 1 := by
+        norm_num [Nat.cast_add, Nat.cast_one]
+      have hrewrite :
+          4 * ((r : Error) + 2) * zeta + ((r : Error) + 2) * gHatCommutationError params gamma zeta =
+            4 * (r : Error) * zeta + ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta +
+              (8 * zeta + gHatCommutationError params gamma zeta) := by
+        rw [hcast_r1]
+        ring
+      nlinarith [hrewrite, hζextra, hνextra]
+    have hsum_nonneg :
+        0 ≤ 4 * (r : Error) * zeta + ((r + 1 : ℕ) : Error) * gHatCommutationError params gamma zeta := by
+      nlinarith [hzeta_nonneg, hν3_nonneg]
+    have hraw_bound :
+        (((commuteGHalfSandwich_flatChainLength r : Error)) *
+            ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
+              commuteGHalfSandwich_flatChainError params gamma zeta r i)
+          ≤ 3 * (k : Error) *
+              (4 * (k : Error) * zeta + (k : Error) * gHatCommutationError params gamma zeta) := by
+      rw [hsum]
+      gcongr
+    exact Preliminaries.sddOpRel_mono ψbi
+      (uniformDistribution (PointTuple params k))
+      (gHatHalfSandwichLeft params family k)
+      (gHatHalfSandwichRight params family k)
+      (((commuteGHalfSandwich_flatChainLength r : Error)) *
+        ∑ i : Fin (commuteGHalfSandwich_flatChainLength r),
+          commuteGHalfSandwich_flatChainError params gamma zeta r i)
+      (commuteGHalfSandwichError params gamma zeta k)
+      hpoint
+      (le_trans hraw_bound
+        (commuteGHalfSandwich_error_bound params gamma zeta k hzeta_nonneg hzeta_le))
 
 /-- `lem:commute-g-half-sandwich`. -/
 lemma commuteGHalfSandwich
@@ -4400,6 +7577,138 @@ lemma ldSandwichLineOnePoint
     hgood hgamma_le hzeta_le hdq_le
     family hcons hself hbound hcomm k i hi⟩
 
+private noncomputable def postprocessMeasurement
+    {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (B : Measurement α ι) (f : α → β) : Measurement β ι where
+  toSubMeas := postprocess B.toSubMeas f
+  total_eq_one := by
+    simpa [postprocess_total] using B.total_eq_one
+
+private noncomputable def sandwichedLineQuestionOneEquiv
+    (params : Parameters) [FieldModel params.q] :
+    SandwichedLineQuestion params 1 ≃ Point params × Fq params where
+  toFun q := (q.1, (pointTupleOneEquiv params) q.2)
+  invFun ux := (ux.1, (pointTupleOneEquiv params).symm ux.2)
+  left_inv := by
+    rintro ⟨u, xs⟩
+    simpa using congrArg (fun y => (u, y)) ((pointTupleOneEquiv params).left_inv xs)
+  right_inv := by
+    rintro ⟨u, x⟩
+    simpa using congrArg (fun y => (u, y)) ((pointTupleOneEquiv params).right_inv x)
+
+private noncomputable def ldSandwichLineOnePointRightEndpointMeasurement
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (ux : Point params × Fq params) : Measurement (Fq params) ι := by
+  let ℓ : AxisParallelLine params.next :=
+    { base := appendPoint params ux.1 zeroCoord
+      direction := lastCoord params }
+  exact postprocessMeasurement (strategy.axisParallelMeasurement ℓ).toMeasurement (fun f => f ux.2)
+
+private lemma ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (ux : Point params × Fq params) :
+    (ldSandwichLineOnePointRightEndpointMeasurement params strategy ux).toSubMeas =
+      postprocess (verticalLineMeasurementFamily params strategy ux.1) (fun f => f ux.2) := by
+  simp [ldSandwichLineOnePointRightEndpointMeasurement, verticalLineMeasurementFamily,
+    postprocessMeasurement]
+
+private lemma ldSandwichLineOnePoint_endpoint_ldGbcon
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta) :
+    ConsRel strategy.state
+      (uniformDistribution (Point params × Fq params))
+      (fun ux => postprocess (evaluateAt params ux.1 ((family.meas ux.2).toSubMeas)) some)
+      (fun ux =>
+        postprocess (ldSandwichLineOnePointRightEndpointMeasurement params strategy ux).toSubMeas some)
+        (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+  have hgb := ldGbcon params strategy eps delta gamma zeta hgood family hcons
+  have hprod :
+      ConsRel strategy.state
+        (uniformDistribution (Point params × Fq params))
+        (fun ux =>
+          evaluateFiberFamilyAtNextPoint params (IdxProjSubMeas.toIdxSubMeas family.meas)
+            ((pointNextEquiv params).symm ux))
+        (fun ux =>
+          postprocess
+            (verticalLineMeasurementFamily params strategy
+              (truncatePoint params ((pointNextEquiv params).symm ux)))
+            (fun f => f (pointHeight params ((pointNextEquiv params).symm ux))))
+        (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+    exact (Preliminaries.consRel_uniform_equiv
+      (pointNextEquiv params)
+      strategy.state
+      (evaluateFiberFamilyAtNextPoint params (IdxProjSubMeas.toIdxSubMeas family.meas))
+      (fun u =>
+        postprocess
+          (verticalLineMeasurementFamily params strategy (truncatePoint params u))
+          (fun f => f (pointHeight params u)))
+      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))).1 hgb
+  have hprod' :
+      ConsRel strategy.state
+        (uniformDistribution (Point params × Fq params))
+        (fun ux => postprocess (evaluateAt params ux.1 ((family.meas ux.2).toSubMeas)) some)
+        (fun ux =>
+          postprocess
+            (postprocess (verticalLineMeasurementFamily params strategy ux.1) (fun f => f ux.2))
+            some)
+        (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+    have hproc :=
+      Preliminaries.consRelDataProcessing_questionDependent
+        strategy.state
+        (uniformDistribution (Point params × Fq params))
+        (fun ux =>
+          evaluateFiberFamilyAtNextPoint params (IdxProjSubMeas.toIdxSubMeas family.meas)
+            ((pointNextEquiv params).symm ux))
+        (fun ux =>
+          postprocess
+            (verticalLineMeasurementFamily params strategy
+              (truncatePoint params ((pointNextEquiv params).symm ux)))
+            (fun f => f (pointHeight params ((pointNextEquiv params).symm ux))))
+        (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))
+        (fun _ a => some a)
+        hprod
+    simpa [pointNextEquiv, evaluateFiberFamilyAtNextPoint, postprocess_postprocess] using hproc
+  simpa [ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas, postprocess_postprocess] using hprod'
+
+private lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta) :
+    ConsRel strategy.state
+      (uniformDistribution (SandwichedLineQuestion params 1))
+      (fun q =>
+        postprocess
+          (evaluateAt params q.1 ((family.meas ((pointTupleOneEquiv params) q.2)).toSubMeas))
+          some)
+      (ldSandwichLineOnePointRightFamily params strategy family 1 0)
+      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+  have hux := ldSandwichLineOnePoint_endpoint_ldGbcon
+    params strategy eps delta gamma zeta hgood family hcons
+  exact (Preliminaries.consRel_uniform_equiv
+    (sandwichedLineQuestionOneEquiv params)
+    strategy.state
+    (fun q =>
+      postprocess
+        (evaluateAt params q.1 ((family.meas ((pointTupleOneEquiv params) q.2)).toSubMeas))
+        some)
+    (ldSandwichLineOnePointRightFamily params strategy family 1 0)
+    (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))).2 <| by
+      simpa [sandwichedLineQuestionOneEquiv, pointTupleOneEquiv,
+        ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas,
+        ldSandwichLineOnePointRightFamily, postprocess_postprocess] using hux
+
 /-- Bridge: aggregate one-point consistency bounds over all slice indices,
 plus the distinct-tuple approximation error.
 
@@ -4417,6 +7726,7 @@ private lemma hBConsistency_core
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -4431,22 +7741,76 @@ private lemma hBConsistency_core
         (constructedPastedSubMeas params family k))
       (verticalLineMeasurementFamily params strategy)
       (hBConsistencyError params eps delta gamma zeta k) := by
-  /-
-  After `ldSandwichLineOnePoint_core`, the remaining work is the outcome-side
-  expansion of `constructedPastedSubMeas`:
-  * rewrite the pasted interpolation family as a sum over globally consistent
-    eligible tuples;
-  * use that, for a globally consistent tuple and a disagreeing line polynomial,
-    some active coordinate must violate the `ldSandwichLineOnePoint` predicate;
-  * pay the `ldDnoteq` distinct-vs-uniform cost and union-bound over the
-    offending coordinate.
-
-  The genuine remaining technical blocker is the missing interpolation
-  correctness API for `interpolateCompletedSlices`: we still need lemmas showing
-  that the canonical interpolant chosen by `interpolateCompletedSlices` agrees
-  with each supported completed slice whenever the tuple is globally consistent.
-  -/
-  sorry
+  constructor
+  have heps_nonneg : 0 ≤ eps := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params.next))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy))
+      hgood.axisParallelTest
+  have hdelta_nonneg : 0 ≤ delta := by
+    exact le_trans
+      (bipartiteSSCError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      hgood.selfConsistencyTest
+  have hgamma_nonneg : 0 ≤ gamma := by
+    have : 0 ≤ strategy.diagonalFailureProbability := by
+      unfold SymStrat.diagonalFailureProbability
+      exact mul_nonneg (by positivity)
+        (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
+    exact le_trans this hgood.diagonalLineTest
+  have hzeta_nonneg : 0 ≤ zeta := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        family.evaluatedAtNextPoint)
+      hcons.pointConsistency.offDiagonalBound
+  calc
+    bipartiteConsError strategy.state
+        (uniformDistribution (VerticalLineQuestion params))
+        (hRestrictionToVerticalLine params (constructedPastedSubMeas params family k))
+        (verticalLineMeasurementFamily params strategy)
+      = avgOver (uniformDistribution (Point params)) (fun u =>
+          qBipartiteConsDefect strategy.state
+            (hRestrictionToVerticalLine params (constructedPastedSubMeas params family k) u)
+            (verticalLineMeasurementFamily params strategy u)) := by
+            rfl
+    _ ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (distinctTupleDistribution params k) (fun xs =>
+            qBipartiteConsDefect strategy.state
+              (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+              (verticalLineMeasurementFamily params strategy u))) := by
+            exact avgOver_mono _ _ _ (fun u =>
+              hBConsistency_fixed_u_defect_le_avgOver_distinct params strategy family k u)
+    _ ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (distinctTupleDistribution params k) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs)) := by
+            exact avgOver_mono _ _ _ (fun u =>
+              avgOver_distinct_pasted_defect_le_badMass params strategy family u)
+    _ ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs) +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error)) := by
+            exact avgOver_mono _ _ _ (fun u =>
+              avgOver_distinct_badMass_le_avgOver_uniform_badMass_add_dnoteq params strategy family u)
+    _ = avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs)) +
+        ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+            rw [avgOver_add]
+            simpa using avgOver_uniform_const (α := Point params)
+              (((k : Error) ^ (2 : ℕ)) / (params.q : Error))
+    _ ≤ (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+            gcongr
+            exact avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
+              params strategy family eps delta gamma zeta k hline
+    _ ≤ hBConsistencyError params eps delta gamma zeta k := by
+            exact hBConsistency_error_bound params eps delta gamma zeta k hd
+              heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
 
 /-- `lem:h-b-consistency`. -/
 lemma hBConsistency
@@ -4455,6 +7819,7 @@ lemma hBConsistency
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -4466,7 +7831,7 @@ lemma hBConsistency
     HBConsistencyStatement params strategy family
         eps delta gamma zeta k := by
   exact ⟨hBConsistency_core params strategy eps delta gamma zeta
-    hgood family hcons hself hbound k hline⟩
+    hgood hd family hcons hself hbound k hline⟩
 
 /-- Transport the vertical-line consistency statement from restricted points
 `u : Point params` to ambient points `appendPoint params u x`. -/
@@ -4746,6 +8111,7 @@ theorem hAConsistency_submeas
     (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
     (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -4803,7 +8169,7 @@ theorem hAConsistency_submeas
       hgood hgamma_le hzeta_le hdq_le
       family hcons hself hbound hfacts k i hi
   have hHB := hBConsistency params strategy eps delta gamma zeta
-    hgood family hcons hself hbound k hline
+    hgood hd family hcons hself hbound k hline
   have hgamma_nonneg : 0 ≤ gamma := by
     have : 0 ≤ strategy.diagonalFailureProbability := by
       unfold SymStrat.diagonalFailureProbability
@@ -4961,20 +8327,14 @@ lemma overAllOutcomes
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
-  -- `OverAllOutcomesStatement` is a single-field wrapper around the scalar bound below.
   refine ⟨?_⟩
   /- Paper: `lem:over-all-outcomes` (ld-pasting.tex §9.4, lines 1140–1289).
-  The displayed statement is the scalar approximation
-  $$
-    \bra{\psi} H \ot I \ket{\psi}
-      \approx_{\nu_7}
-      \mathbb E_{x_1,\dots,x_k}
-        \sum_{\tau : |\tau| \ge d+1}
-        \sum_{g \in \mathsf{Outcomes}_\tau}
-          \bra{\psi} \widehat H^x_g \ot I \ket{\psi},
-  $$
-  so the Lean target now records that scalar mass difference directly rather than
-  an over-strong `SDDRel` on `Unit`-indexed totals.
+  Expand pasted-measurement total mass over all outcome types τ with |τ| ≥ d+1.
+  Steps: (1) expand over distinct k-tuples via `distinctTupleDistribution`,
+  (2) decompose by outcome type with |τ| ≥ d+1,
+  (3) remove global-polynomial restriction (Schwartz-Zippel: error md/q),
+  (4) swap distinct → uniform sampling (`prop:ld-dnoteq`: error 2k²/q),
+  (5) bound sandwich errors (`lem:ld-sandwich-line-one-point`: k × ν₅).
 
   Current blockers after the split audit:
   * the interpolation-to-global-polynomial correctness step still needs the
