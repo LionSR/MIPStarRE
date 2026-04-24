@@ -24,7 +24,7 @@ noncomputable def scalarBernoulliTail (k degree : ℕ) (p : Error) : Error :=
 
 /-- The complementary lower-tail sum `∑_{r=0}^d C(k,r) p^r (1-p)^(k-r)`. -/
 private noncomputable def scalarBernoulliLowerTail (k degree : ℕ) (p : Error) : Error :=
-  Finset.sum (Finset.range (degree + 1)) fun r =>
+  ∑ r ∈ Finset.range (degree + 1),
     (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r))
 
 /-- The affine lower envelope used in the matrix Chernoff reduction. -/
@@ -88,7 +88,7 @@ private lemma binomial_centered_mgf_eq
     (k : ℕ) {p t : Error} (hp0 : 0 ≤ p) (hp1 : p ≤ 1) :
     ProbabilityTheory.mgf (fun i : Fin (k + 1) => p * k - i)
       ((PMF.binomial ⟨p, hp0⟩ (by exact hp1) k).toMeasure) t =
-        Finset.sum (Finset.range (k + 1)) fun r =>
+        ∑ r ∈ Finset.range (k + 1),
           (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) *
             Real.exp (t * (p * k - r)) := by
   let pmf : PMF (Fin (k + 1)) := PMF.binomial ⟨p, hp0⟩ (by exact hp1) k
@@ -97,13 +97,13 @@ private lemma binomial_centered_mgf_eq
       = ∑ i : Fin (k + 1), (pmf i).toReal * Real.exp (t * (p * k - i)) := by
           rw [ProbabilityTheory.mgf, PMF.integral_eq_sum]
           simp [pmf, smul_eq_mul]
-    _ = Finset.sum (Finset.range (k + 1)) fun r =>
+    _ = ∑ r ∈ Finset.range (k + 1),
           (pmf (Fin.ofNat (k + 1) r)).toReal * Real.exp (t * (p * k - r)) := by
           simpa using (Fin.sum_univ_eq_sum_range
             (f := fun r =>
               (pmf (Fin.ofNat (k + 1) r)).toReal * Real.exp (t * (p * k - r)))
             (n := k + 1))
-    _ = Finset.sum (Finset.range (k + 1)) fun r =>
+    _ = ∑ r ∈ Finset.range (k + 1),
           (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) *
             Real.exp (t * (p * k - r)) := by
           refine Finset.sum_congr rfl ?_
@@ -145,12 +145,10 @@ private lemma binomial_centered_mgf_le
   let a : Error := p * Real.exp (t * (p - 1))
   let b : Error := (1 - p) * Real.exp (t * p)
   have hrewrite :
-      Finset.sum (Finset.range (k + 1))
-          (fun r =>
-            (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) *
-              Real.exp (t * (p * k - r))) =
-        Finset.sum (Finset.range (k + 1))
-          (fun r => (Nat.choose k r : Error) * (a ^ r * b ^ (k - r))) := by
+      (∑ r ∈ Finset.range (k + 1),
+        (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) *
+          Real.exp (t * (p * k - r))) =
+        ∑ r ∈ Finset.range (k + 1), (Nat.choose k r : Error) * (a ^ r * b ^ (k - r)) := by
     refine Finset.sum_congr rfl ?_
     intro r hr
     dsimp [a, b]
@@ -182,20 +180,17 @@ private lemma binomial_centered_mgf_le
       _ = (Nat.choose k r : Error) * (a ^ r * b ^ (k - r)) := by
               rfl
   have hpow :
-      Finset.sum (Finset.range (k + 1))
-          (fun r => (Nat.choose k r : Error) * (a ^ r * b ^ (k - r))) =
+      (∑ r ∈ Finset.range (k + 1), (Nat.choose k r : Error) * (a ^ r * b ^ (k - r))) =
         (a + b) ^ k := by
     simpa [mul_assoc, mul_left_comm, mul_comm] using (add_pow a b k).symm
   calc
     ProbabilityTheory.mgf (fun i : Fin (k + 1) => p * k - i)
         ((PMF.binomial ⟨p, hp0⟩ (by exact hp1) k).toMeasure) t
-      = Finset.sum (Finset.range (k + 1))
-          (fun r =>
-            (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) *
-              Real.exp (t * (p * k - r))) :=
+      = ∑ r ∈ Finset.range (k + 1),
+          (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) *
+            Real.exp (t * (p * k - r)) :=
         binomial_centered_mgf_eq k hp0 hp1
-    _ = Finset.sum (Finset.range (k + 1))
-          (fun r => (Nat.choose k r : Error) * (a ^ r * b ^ (k - r))) := hrewrite
+    _ = ∑ r ∈ Finset.range (k + 1), (Nat.choose k r : Error) * (a ^ r * b ^ (k - r)) := hrewrite
     _ = (a + b) ^ k := hpow
     _ ≤ (Real.exp (t ^ (2 : ℕ) / 8)) ^ k := by
           have ha_nonneg : 0 ≤ a := by
@@ -256,13 +251,13 @@ private lemma binomial_lowerTail_eq
           · simp [s, Finset.sum_filter]
           · intro i hi
             simpa using PMF.apply_ne_top pmf i
-    _ = Finset.sum (Finset.range (k + 1)) fun r =>
+    _ = ∑ r ∈ Finset.range (k + 1),
           if (r : Error) ≤ degree then (pmf (Fin.ofNat (k + 1) r)).toReal else 0 := by
           simpa using (Fin.sum_univ_eq_sum_range
             (f := fun r =>
               if (r : Error) ≤ degree then (pmf (Fin.ofNat (k + 1) r)).toReal else 0)
             (n := k + 1))
-    _ = Finset.sum (Finset.range (k + 1)) fun r => if r ≤ degree then f r else 0 := by
+    _ = ∑ r ∈ Finset.range (k + 1), if r ≤ degree then f r else 0 := by
           refine Finset.sum_congr rfl ?_
           intro r hr
           have hr' : r < k + 1 := Finset.mem_range.mp hr
@@ -274,18 +269,17 @@ private lemma binomial_lowerTail_eq
           · have hrd' : ¬ (r : Error) ≤ degree := by
               exact fun h => hrd (by exact_mod_cast h)
             rw [if_neg hrd', if_neg hrd]
-    _ = Finset.sum (Finset.range (degree + 1)) f := by
+    _ = ∑ r ∈ Finset.range (degree + 1), f r := by
           by_cases hdk : degree ≤ k
           · have hRange :
-                Finset.sum (Finset.range (degree + 1)) (fun r => if r ≤ degree then f r else 0) =
-                  Finset.sum (Finset.range (degree + 1)) f := by
+                (∑ r ∈ Finset.range (degree + 1), if r ≤ degree then f r else 0) =
+                  ∑ r ∈ Finset.range (degree + 1), f r := by
                 refine Finset.sum_congr rfl ?_
                 intro r hr
                 have hrle : r ≤ degree := Nat.le_of_lt_succ (Finset.mem_range.mp hr)
                 simp [hrle]
             have hIcoZero :
-                Finset.sum (Finset.Ico (degree + 1) (k + 1))
-                  (fun r => if r ≤ degree then f r else 0) = 0 := by
+                (∑ r ∈ Finset.Ico (degree + 1) (k + 1), if r ≤ degree then f r else 0) = 0 := by
                 refine Finset.sum_eq_zero ?_
                 intro r hr
                 have hlt : degree < r := (Finset.mem_Ico.mp hr).1
@@ -294,34 +288,35 @@ private lemma binomial_lowerTail_eq
               Finset.sum_range_add_sum_Ico (f := fun r => if r ≤ degree then f r else 0)
                 (h := Nat.succ_le_succ hdk)
             calc
-              Finset.sum (Finset.range (k + 1)) (fun r => if r ≤ degree then f r else 0)
+              (∑ r ∈ Finset.range (k + 1), if r ≤ degree then f r else 0)
                 =
-                  Finset.sum (Finset.range (degree + 1))
-                    (fun r => if r ≤ degree then f r else 0) := by
+                  ∑ r ∈ Finset.range (degree + 1), if r ≤ degree then f r else 0 := by
                       symm
                       rw [hIcoZero, add_zero] at hsplit
                       exact hsplit
-              _ = Finset.sum (Finset.range (degree + 1)) f := hRange
+              _ = ∑ r ∈ Finset.range (degree + 1), f r := hRange
           · have hdk' : k < degree := Nat.lt_of_not_ge hdk
             have hAll :
-                Finset.sum (Finset.range (k + 1)) (fun r => if r ≤ degree then f r else 0) =
-                  Finset.sum (Finset.range (k + 1)) f := by
+                (∑ r ∈ Finset.range (k + 1), if r ≤ degree then f r else 0) =
+                  ∑ r ∈ Finset.range (k + 1), f r := by
                 refine Finset.sum_congr rfl ?_
                 intro r hr
                 have hrle : r ≤ k := Nat.le_of_lt_succ (Finset.mem_range.mp hr)
                 have hrdeg : r ≤ degree := hrle.trans (Nat.le_of_lt hdk')
                 simp [hrdeg]
-            have hIcoZero : Finset.sum (Finset.Ico (k + 1) (degree + 1)) f = 0 := by
+            have hIcoZero : ∑ r ∈ Finset.Ico (k + 1) (degree + 1), f r = 0 := by
               refine Finset.sum_eq_zero ?_
               intro r hr
               have hklt : k < r := (Finset.mem_Ico.mp hr).1
-              simp [Nat.choose_eq_zero_of_lt hklt]
+              simp [f]
+              rw [Nat.choose_eq_zero_of_lt hklt]
+              simp
             have hsplit :=
               Finset.sum_range_add_sum_Ico (f := f) (h := Nat.succ_le_succ (Nat.le_of_lt hdk'))
             calc
-              Finset.sum (Finset.range (k + 1)) (fun r => if r ≤ degree then f r else 0)
-                = Finset.sum (Finset.range (k + 1)) f := hAll
-              _ = Finset.sum (Finset.range (degree + 1)) f := by
+              (∑ r ∈ Finset.range (k + 1), if r ≤ degree then f r else 0)
+                = ∑ r ∈ Finset.range (k + 1), f r := hAll
+              _ = ∑ r ∈ Finset.range (degree + 1), f r := by
                     rw [hIcoZero, add_zero] at hsplit
                     exact hsplit
     _ = scalarBernoulliLowerTail k degree p := by
@@ -401,11 +396,10 @@ private lemma scalarBernoulliLowerTail_add_scalarBernoulliTail
     scalarBernoulliLowerTail k degree p + scalarBernoulliTail k degree p = 1 := by
   let f : ℕ → Error := fun r =>
     (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r))
-  have hfull : Finset.sum (Finset.range (k + 1)) f = 1 := by
+  have hfull : ∑ r ∈ Finset.range (k + 1), f r = 1 := by
     calc
-      Finset.sum (Finset.range (k + 1)) f
-        = Finset.sum (Finset.range (k + 1))
-            (fun r => p ^ r * (1 - p) ^ (k - r) * Nat.choose k r) := by
+      ∑ r ∈ Finset.range (k + 1), f r
+        = ∑ r ∈ Finset.range (k + 1), p ^ r * (1 - p) ^ (k - r) * Nat.choose k r := by
               refine Finset.sum_congr rfl ?_
               intro r hr
               ring
@@ -415,7 +409,7 @@ private lemma scalarBernoulliLowerTail_add_scalarBernoulliTail
             ring
   by_cases hdk : degree ≤ k
   · have hTail :
-        Finset.sum (Finset.Ico (degree + 1) (k + 1)) f = scalarBernoulliTail k degree p := by
+        ∑ r ∈ Finset.Ico (degree + 1) (k + 1), f r = scalarBernoulliTail k degree p := by
       have hIco : Finset.Ico (degree + 1) (k + 1) = Finset.Icc (degree + 1) k := by
         ext r
         simp
@@ -423,10 +417,10 @@ private lemma scalarBernoulliLowerTail_add_scalarBernoulliTail
     calc
       scalarBernoulliLowerTail k degree p + scalarBernoulliTail k degree p
         =
-          Finset.sum (Finset.range (degree + 1)) f +
-            Finset.sum (Finset.Ico (degree + 1) (k + 1)) f := by
+          (∑ r ∈ Finset.range (degree + 1), f r) +
+            ∑ r ∈ Finset.Ico (degree + 1) (k + 1), f r := by
               rw [scalarBernoulliLowerTail, ← hTail]
-      _ = Finset.sum (Finset.range (k + 1)) f := by
+      _ = ∑ r ∈ Finset.range (k + 1), f r := by
             exact Finset.sum_range_add_sum_Ico (f := f) (h := Nat.succ_le_succ hdk)
       _ = 1 := hfull
   · have hdk' : k < degree := Nat.lt_of_not_ge hdk
@@ -437,18 +431,20 @@ private lemma scalarBernoulliLowerTail_add_scalarBernoulliTail
       have hr1 : degree + 1 ≤ r := (Finset.mem_Icc.mp hr).1
       have hr2 : r ≤ k := (Finset.mem_Icc.mp hr).2
       omega
-    have hIcoZero : Finset.sum (Finset.Ico (k + 1) (degree + 1)) f = 0 := by
+    have hIcoZero : ∑ r ∈ Finset.Ico (k + 1) (degree + 1), f r = 0 := by
       refine Finset.sum_eq_zero ?_
       intro r hr
       have hklt : k < r := (Finset.mem_Ico.mp hr).1
-      simp [Nat.choose_eq_zero_of_lt hklt]
+      simp [f]
+      rw [Nat.choose_eq_zero_of_lt hklt]
+      simp
     have hsplit :=
       Finset.sum_range_add_sum_Ico (f := f) (h := Nat.succ_le_succ (Nat.le_of_lt hdk'))
     calc
       scalarBernoulliLowerTail k degree p + scalarBernoulliTail k degree p
-        = Finset.sum (Finset.range (degree + 1)) f := by
+        = ∑ r ∈ Finset.range (degree + 1), f r := by
             rw [scalarBernoulliLowerTail, hTailZero, add_zero]
-      _ = Finset.sum (Finset.range (k + 1)) f := by
+      _ = ∑ r ∈ Finset.range (k + 1), f r := by
             rw [hIcoZero, add_zero] at hsplit
             exact hsplit.symm
       _ = 1 := hfull
