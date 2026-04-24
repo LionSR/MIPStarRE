@@ -545,6 +545,52 @@ private def gHatTupleOutcomeConsEquiv' (params : Parameters) [FieldModel params.
     cases p
     rfl
 
+private def pointTuplePrefix (params : Parameters) (m n : ℕ) :
+    PointTuple params (m + n) → PointTuple params m :=
+  fun xs i => xs (Fin.castAdd n i)
+
+private def pointTupleSuffix (params : Parameters) (m n : ℕ) :
+    PointTuple params (m + n) → PointTuple params n :=
+  fun xs i => xs (Fin.natAdd m i)
+
+private def gHatTupleOutcomePrefix
+    (params : Parameters) [FieldModel params.q] (m n : ℕ) :
+    GHatTupleOutcome params (m + n) → GHatTupleOutcome params m :=
+  fun gs i => gs (Fin.castAdd n i)
+
+private def gHatTupleOutcomeSuffix
+    (params : Parameters) [FieldModel params.q] (m n : ℕ) :
+    GHatTupleOutcome params (m + n) → GHatTupleOutcome params n :=
+  fun gs i => gs (Fin.natAdd m i)
+
+@[simp] private lemma pointTuplePrefix_append
+    (params : Parameters) (m n : ℕ)
+    (xs : PointTuple params m) (ys : PointTuple params n) :
+    pointTuplePrefix params m n (Fin.append xs ys) = xs := by
+  funext i
+  simp [pointTuplePrefix]
+
+@[simp] private lemma pointTupleSuffix_append
+    (params : Parameters) (m n : ℕ)
+    (xs : PointTuple params m) (ys : PointTuple params n) :
+    pointTupleSuffix params m n (Fin.append xs ys) = ys := by
+  funext i
+  simp [pointTupleSuffix]
+
+@[simp] private lemma gHatTupleOutcomePrefix_append
+    (params : Parameters) [FieldModel params.q] (m n : ℕ)
+    (gs₁ : GHatTupleOutcome params m) (gs₂ : GHatTupleOutcome params n) :
+    gHatTupleOutcomePrefix params m n (Fin.append gs₁ gs₂) = gs₁ := by
+  funext i
+  simp [gHatTupleOutcomePrefix]
+
+@[simp] private lemma gHatTupleOutcomeSuffix_append
+    (params : Parameters) [FieldModel params.q] (m n : ℕ)
+    (gs₁ : GHatTupleOutcome params m) (gs₂ : GHatTupleOutcome params n) :
+    gHatTupleOutcomeSuffix params m n (Fin.append gs₁ gs₂) = gs₂ := by
+  funext i
+  simp [gHatTupleOutcomeSuffix]
+
 private lemma conjTranspose_mul_mono_local
     {X Y Z : MIPStarRE.Quantum.Op ι}
     (hXY : X ≤ Y) :
@@ -1203,10 +1249,26 @@ private lemma gHatPairProduct_sddOpRel_quadFirstTwo
     (fun q => gHatPairProductRight params family q.1)
     (gHatCommutationError params gamma zeta)).1 hfst -/
 
+/-- The fixed paper exponent `1/16` keeps `Real.rpow` nonnegative even on the
+negative branch, because `cos (π / 16) > 0`. This lets the `commuteGHalfSandwich`
+error envelopes avoid threading an extra `0 ≤ gamma` hypothesis. -/
+private lemma rpow_oneSixteenth_nonneg (x : Error) :
+    0 ≤ Real.rpow x (1 / (16 : Error)) := by
+  simpa [Real.rpow_eq_pow] using (show 0 ≤ x ^ (1 / (16 : Error)) by
+    rcases le_or_gt 0 x with hx | hx
+    · exact Real.rpow_nonneg hx _
+    · rw [Real.rpow_def_of_neg hx]
+      have hexp_nonneg : 0 ≤ Real.exp (Real.log x * (1 / (16 : Error))) := by
+        exact le_of_lt (Real.exp_pos _)
+      have hmem : ((1 / (16 : Error)) * Real.pi) ∈ Set.Ioo (-(Real.pi / 2)) (Real.pi / 2) := by
+        constructor <;> have hpi_pos : 0 < Real.pi := Real.pi_pos <;> nlinarith
+      have hcos_nonneg : 0 ≤ Real.cos ((1 / (16 : Error)) * Real.pi) := by
+        exact le_of_lt (Real.cos_pos_of_mem_Ioo hmem)
+      exact mul_nonneg hexp_nonneg hcos_nonneg)
+
 private lemma commuteGHalfSandwich_error_bound
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error) (k : ℕ)
-    (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_nonneg : 0 ≤ zeta)
     (hzeta_le : zeta ≤ 1) :
     3 * (k : Error) *
@@ -1221,7 +1283,7 @@ private lemma commuteGHalfSandwich_error_bound
     dsimp [S]
     exact add_nonneg
       (add_nonneg
-        (Real.rpow_nonneg hgamma_nonneg (1 / (16 : Error)))
+        (rpow_oneSixteenth_nonneg gamma)
         (Real.rpow_nonneg hzeta_nonneg (1 / (16 : Error))))
       (Real.rpow_nonneg hratio_nonneg (1 / (16 : Error)))
   have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
@@ -1232,12 +1294,21 @@ private lemma commuteGHalfSandwich_error_bound
       (Real.rpow_le_rpow_of_exponent_ge' hzeta_nonneg hzeta_le (by norm_num) hpow)
   have hzeta_term : zeta ≤ (params.m : Error) * S := by
     have hroot_le : Real.rpow zeta (1 / (16 : Error)) ≤ S := by
-      dsimp [S]
-      nlinarith [Real.rpow_nonneg hgamma_nonneg (1 / (16 : Error)),
-        Real.rpow_nonneg hzeta_nonneg (1 / (16 : Error)),
-        Real.rpow_nonneg
-          (by positivity : 0 ≤ ((params.d : Error) / (params.q : Error)))
-          (1 / (16 : Error))]
+      have hgamma_rpow_nonneg : 0 ≤ Real.rpow gamma (1 / (16 : Error)) :=
+        rpow_oneSixteenth_nonneg gamma
+      have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
+      have hratio_rpow_nonneg :
+          0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
+        exact Real.rpow_nonneg hratio_nonneg (1 / (16 : Error))
+      calc
+        Real.rpow zeta (1 / (16 : Error))
+          ≤ Real.rpow zeta (1 / (16 : Error)) + Real.rpow gamma (1 / (16 : Error)) := by
+              nlinarith
+        _ ≤ Real.rpow zeta (1 / (16 : Error)) + Real.rpow gamma (1 / (16 : Error)) +
+              Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
+              nlinarith
+        _ = S := by
+              simp [S, add_assoc, add_comm]
     have hm_mul : Real.rpow zeta (1 / (16 : Error)) ≤ (params.m : Error) * S := by
       have : S ≤ (params.m : Error) * S := by
         nlinarith
@@ -2271,6 +2342,129 @@ private lemma gHatPairPrefix_sum_adjoint_mul_le_one
   rw [hEq] at hsum
   exact hsum
 
+private lemma leftTensor_rightTensor_sum_adjoint_mul_le_one
+    {α β : Type*}
+    [Fintype α] [DecidableEq α]
+    [Fintype β] [DecidableEq β]
+    (prefixOp : α → MIPStarRE.Quantum.Op ι)
+    (tailOp : β → MIPStarRE.Quantum.Op ι)
+    (hprefix : ∑ a : α, (prefixOp a)ᴴ * prefixOp a ≤ 1)
+    (htail : ∑ b : β, (tailOp b)ᴴ * tailOp b ≤ 1) :
+    ∑ ag : α × β,
+        (leftTensor (ι₂ := ι) (prefixOp ag.1) *
+            rightTensor (ι₁ := ι) (tailOp ag.2))ᴴ *
+          (leftTensor (ι₂ := ι) (prefixOp ag.1) *
+            rightTensor (ι₁ := ι) (tailOp ag.2)) ≤ 1 := by
+  let prefixTerm : α → MIPStarRE.Quantum.Op ι :=
+    fun a => (prefixOp a)ᴴ * prefixOp a
+  let tailTerm : β → MIPStarRE.Quantum.Op ι :=
+    fun b => (tailOp b)ᴴ * tailOp b
+  calc
+    ∑ ag : α × β,
+        (leftTensor (ι₂ := ι) (prefixOp ag.1) *
+            rightTensor (ι₁ := ι) (tailOp ag.2))ᴴ *
+          (leftTensor (ι₂ := ι) (prefixOp ag.1) *
+            rightTensor (ι₁ := ι) (tailOp ag.2))
+      = ∑ a : α, ∑ b : β,
+          leftTensor (ι₂ := ι) (prefixTerm a) *
+            rightTensor (ι₁ := ι) (tailTerm b) := by
+              rw [← Finset.univ_product_univ, Finset.sum_product]
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              refine Finset.sum_congr rfl ?_
+              intro b _
+              have hmul :
+                  leftTensor (ι₂ := ι) (prefixOp a) *
+                      rightTensor (ι₁ := ι) (tailOp b) =
+                    opTensor (prefixOp a) (tailOp b) := by
+                rw [leftTensor_mul_rightTensor_eq_opTensor]
+              calc
+                (leftTensor (ι₂ := ι) (prefixOp a) *
+                    rightTensor (ι₁ := ι) (tailOp b))ᴴ *
+                  (leftTensor (ι₂ := ι) (prefixOp a) *
+                    rightTensor (ι₁ := ι) (tailOp b))
+                  = (opTensor (prefixOp a) (tailOp b))ᴴ *
+                      opTensor (prefixOp a) (tailOp b) := by
+                        rw [hmul]
+                _ = opTensor ((prefixOp a)ᴴ) ((tailOp b)ᴴ) *
+                      opTensor (prefixOp a) (tailOp b) := by
+                        rw [conjTranspose_opTensor]
+                _ = leftTensor (ι₂ := ι) (prefixTerm a) *
+                      rightTensor (ι₁ := ι) (tailTerm b) := by
+                        simp [prefixTerm, tailTerm, opTensor_mul,
+                          leftTensor_mul_rightTensor_eq_opTensor]
+    _ = ∑ a : α,
+          leftTensor (ι₂ := ι) (prefixTerm a) *
+            rightTensor (ι₁ := ι) (∑ b : β, tailTerm b) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              rw [← rightTensor_finset_sum (ι₁ := ι) Finset.univ tailTerm,
+                ← Finset.mul_sum]
+    _ ≤ ∑ a : α, leftTensor (ι₂ := ι) (prefixTerm a) := by
+          refine Finset.sum_le_sum ?_
+          intro a _
+          have hprefix_nonneg : 0 ≤ prefixTerm a := by
+            change 0 ≤ star (prefixOp a) * prefixOp a
+            exact (CStarAlgebra.nonneg_iff_eq_star_mul_self).2 ⟨prefixOp a, rfl⟩
+          calc
+            leftTensor (ι₂ := ι) (prefixTerm a) *
+                rightTensor (ι₁ := ι) (∑ b : β, tailTerm b)
+              = opTensor (prefixTerm a) (∑ b : β, tailTerm b) := by
+                  rw [leftTensor_mul_rightTensor_eq_opTensor]
+            _ ≤ leftTensor (ι₂ := ι) (prefixTerm a) := by
+                  exact opTensor_le_leftTensor hprefix_nonneg htail
+    _ = leftTensor (ι₂ := ι) (∑ a : α, prefixTerm a) := by
+          rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ prefixTerm]
+    _ ≤ 1 := by
+          exact leftTensor_le_one (ι₂ := ι) (A := _) hprefix
+
+private lemma gHatHalfProduct_reverseHalfProduct_sum_adjoint_mul_le_one
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (m n : ℕ)
+    (xs : PointTuple params (m + n)) :
+    ∑ ag : GHatTupleOutcome params m × GHatTupleOutcome params n,
+        (leftTensor (ι₂ := ι)
+            (gHatHalfProductOutcomeOperator params family m
+              (pointTuplePrefix params m n xs) ag.1) *
+          rightTensor (ι₁ := ι)
+            (gHatReverseHalfProductOutcomeOperator params family n
+              (pointTupleSuffix params m n xs) ag.2))ᴴ *
+          (leftTensor (ι₂ := ι)
+            (gHatHalfProductOutcomeOperator params family m
+              (pointTuplePrefix params m n xs) ag.1) *
+            rightTensor (ι₁ := ι)
+              (gHatReverseHalfProductOutcomeOperator params family n
+                (pointTupleSuffix params m n xs) ag.2)) ≤ 1 := by
+  have hprefix :
+      ∑ gs : GHatTupleOutcome params m,
+          (gHatHalfProductOutcomeOperator params family m
+              (pointTuplePrefix params m n xs) gs)ᴴ *
+            gHatHalfProductOutcomeOperator params family m
+              (pointTuplePrefix params m n xs) gs ≤ 1 := by
+    simpa using
+      gHatHalfProduct_sum_adjoint_mul_le_one params family m
+        (pointTuplePrefix params m n xs)
+  have htail :
+      ∑ gs : GHatTupleOutcome params n,
+          (gHatReverseHalfProductOutcomeOperator params family n
+              (pointTupleSuffix params m n xs) gs)ᴴ *
+            gHatReverseHalfProductOutcomeOperator params family n
+              (pointTupleSuffix params m n xs) gs ≤ 1 := by
+    simpa using
+      gHatReverseHalfProduct_sum_adjoint_mul_le_one params family n
+        (pointTupleSuffix params m n xs)
+  simpa using
+    (leftTensor_rightTensor_sum_adjoint_mul_le_one
+      (ι := ι)
+      (prefixOp := fun gs : GHatTupleOutcome params m =>
+        gHatHalfProductOutcomeOperator params family m
+          (pointTuplePrefix params m n xs) gs)
+      (tailOp := fun gs : GHatTupleOutcome params n =>
+        gHatReverseHalfProductOutcomeOperator params family n
+          (pointTupleSuffix params m n xs) gs)
+      hprefix htail)
+
 private lemma commuteGHalfSandwich_moveStepMid_toTarget
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -2314,67 +2508,21 @@ private lemma commuteGHalfSandwich_moveStepMid_toTarget
     let pairProd : GHatOutcome params × GHatOutcome params → MIPStarRE.Quantum.Op ι :=
       fun og => ((gHatIdxMeas params family q.1).outcome og.1) *
         ((gHatIdxMeas params family q.2.1).outcome og.2)
-    let pairTerm : GHatOutcome params × GHatOutcome params → MIPStarRE.Quantum.Op ι :=
-      fun og => (pairProd og)ᴴ * pairProd og
     let tailOp : GHatTupleOutcome params r → MIPStarRE.Quantum.Op ι :=
       fun gs => gHatReverseHalfProductOutcomeOperator params family r q.2.2.2 gs
-    let tailTerm : GHatTupleOutcome params r → MIPStarRE.Quantum.Op ι :=
-      fun gs => (tailOp gs)ᴴ * tailOp gs
-    have hpair : ∑ og : GHatOutcome params × GHatOutcome params, pairTerm og ≤ 1 := by
-      simpa [pairProd, pairTerm] using
+    have hpair :
+        ∑ og : GHatOutcome params × GHatOutcome params,
+            (pairProd og)ᴴ * pairProd og ≤ 1 := by
+      simpa [pairProd] using
         gHatPairPrefix_sum_adjoint_mul_le_one params family (q.1, q.2.1)
-    have htail : ∑ gs : GHatTupleOutcome params r, tailTerm gs ≤ 1 := by
-      simpa [tailOp, tailTerm] using
+    have htail :
+        ∑ gs : GHatTupleOutcome params r,
+            (tailOp gs)ᴴ * tailOp gs ≤ 1 := by
+      simpa [tailOp] using
         gHatReverseHalfProduct_sum_adjoint_mul_le_one params family r q.2.2.2
-    calc
-      ∑ ag : ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r),
-          (C q a ag)ᴴ * C q a ag
-        = ∑ og : GHatOutcome params × GHatOutcome params,
-            ∑ gs : GHatTupleOutcome params r,
-              leftTensor (ι₂ := ι) (pairTerm og) * rightTensor (ι₁ := ι) (tailTerm gs) := by
-                rw [← Finset.univ_product_univ, Finset.sum_product]
-                refine Finset.sum_congr rfl ?_
-                intro og _
-                refine Finset.sum_congr rfl ?_
-                intro gs _
-                have hmul :
-                    leftTensor (ι₂ := ι) (pairProd og) * rightTensor (ι₁ := ι) (tailOp gs) =
-                      opTensor (pairProd og) (tailOp gs) := by
-                  rw [leftTensor_mul_rightTensor_eq_opTensor]
-                have hCeq : C q a (og, gs) = opTensor (pairProd og) (tailOp gs) := by
-                  simpa [C] using hmul
-                calc
-                  (C q a (og, gs))ᴴ * C q a (og, gs)
-                    = (opTensor (pairProd og) (tailOp gs))ᴴ * opTensor (pairProd og) (tailOp gs) := by
-                        rw [hCeq]
-                  _ = opTensor ((pairProd og)ᴴ) ((tailOp gs)ᴴ) * opTensor (pairProd og) (tailOp gs) := by
-                        rw [conjTranspose_opTensor]
-                  _ = leftTensor (ι₂ := ι) (pairTerm og) * rightTensor (ι₁ := ι) (tailTerm gs) := by
-                        simp [pairTerm, tailTerm, opTensor_mul, leftTensor_mul_rightTensor_eq_opTensor]
-      _ = ∑ og : GHatOutcome params × GHatOutcome params,
-            leftTensor (ι₂ := ι) (pairTerm og) *
-              rightTensor (ι₁ := ι) (∑ gs : GHatTupleOutcome params r, tailTerm gs) := by
-                refine Finset.sum_congr rfl ?_
-                intro og _
-                rw [← rightTensor_finset_sum (ι₁ := ι) Finset.univ tailTerm, ← Finset.mul_sum]
-      _ ≤ ∑ og : GHatOutcome params × GHatOutcome params, leftTensor (ι₂ := ι) (pairTerm og) := by
-            refine Finset.sum_le_sum ?_
-            intro og _
-            have hpair_nonneg : 0 ≤ pairTerm og := by
-              change 0 ≤ star (pairProd og) * pairProd og
-              exact (CStarAlgebra.nonneg_iff_eq_star_mul_self).2 ⟨pairProd og, rfl⟩
-            calc
-              leftTensor (ι₂ := ι) (pairTerm og) *
-                  rightTensor (ι₁ := ι) (∑ gs : GHatTupleOutcome params r, tailTerm gs)
-                = opTensor (pairTerm og) (∑ gs : GHatTupleOutcome params r, tailTerm gs) := by
-                    rw [leftTensor_mul_rightTensor_eq_opTensor]
-              _ ≤ leftTensor (ι₂ := ι) (pairTerm og) := by
-                    exact opTensor_le_leftTensor hpair_nonneg htail
-      _ = leftTensor (ι₂ := ι)
-            (∑ og : GHatOutcome params × GHatOutcome params, pairTerm og) := by
-              rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ pairTerm]
-      _ ≤ 1 := by
-            exact leftTensor_le_one (ι₂ := ι) (A := _) hpair
+    simpa [C, pairProd, tailOp] using
+      (leftTensor_rightTensor_sum_adjoint_mul_le_one
+        (ι := ι) (prefixOp := pairProd) (tailOp := tailOp) hpair htail)
   let rawSource : IdxOpFamily Q
       (GHatOutcome params × ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r))
       (ι × ι) :=
@@ -3794,24 +3942,6 @@ private lemma zeta_nonneg_of_hsc
   have hnonneg :=
     gHatSelfConsistencyError_nonneg_of_hsc params ψbi family zeta hsc
   simpa [gHatSelfConsistencyError] using hnonneg
-
-/-- The fixed paper exponent `1/16` keeps `Real.rpow` nonnegative even on the
-negative branch, because `cos (π / 16) > 0`. This lets the short-length
-`commuteGHalfSandwich` envelope proofs avoid threading an extra `0 ≤ gamma`
-hypothesis. -/
-private lemma rpow_oneSixteenth_nonneg (x : Error) :
-    0 ≤ Real.rpow x (1 / (16 : Error)) := by
-  simpa [Real.rpow_eq_pow] using (show 0 ≤ x ^ (1 / (16 : Error)) by
-    rcases le_or_gt 0 x with hx | hx
-    · exact Real.rpow_nonneg hx _
-    · rw [Real.rpow_def_of_neg hx]
-      have hexp_nonneg : 0 ≤ Real.exp (Real.log x * (1 / (16 : Error))) := by
-        exact le_of_lt (Real.exp_pos _)
-      have hmem : ((1 / (16 : Error)) * Real.pi) ∈ Set.Ioo (-(Real.pi / 2)) (Real.pi / 2) := by
-        constructor <;> have hpi_pos : 0 < Real.pi := Real.pi_pos <;> nlinarith
-      have hcos_nonneg : 0 ≤ Real.cos ((1 / (16 : Error)) * Real.pi) := by
-        exact le_of_lt (Real.cos_pos_of_mem_Ioo hmem)
-      exact mul_nonneg hexp_nonneg hcos_nonneg)
 
 private lemma zeta_le_gHatCommutationScale
     (params : Parameters) [FieldModel params.q]
