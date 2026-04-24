@@ -45,6 +45,14 @@ from typing import Iterable
 # leading ``\b`` keeps the match from starting mid-identifier.
 _FILE_RE = re.compile(r"\b(MIPStarRE(?:/[A-Za-z0-9_.\-]+)*\.lean)(?::(\d+))?")
 
+# GitHub blob URLs often appear in issue bodies; normalize them to plain
+# ``MIPStarRE/...`` citations before scanning so we don't greedily match the
+# repo-name prefix (``.../MIPStarRE/blob/main/...``) as part of the path.
+_GITHUB_BLOB_RE = re.compile(
+    r"https?://github\.com/[^/\s]+/[^/\s]+/blob/[^/\s]+/"
+    r"(MIPStarRE(?:/[A-Za-z0-9_.\-]+)*\.lean)(?:#L(\d+)(?:-L\d+)?)?"
+)
+
 # "line 141" / "Line 131" — used when a path is mentioned nearby without the
 # bare ``:LINE`` suffix (the common table-cell idiom in this repo's issues).
 _LINE_WORD_RE = re.compile(r"\bline\s+(\d{1,6})\b", re.IGNORECASE)
@@ -122,6 +130,17 @@ class IssueReport:
 # Citation extraction
 # ---------------------------------------------------------------------------
 
+def _normalize_github_blob_urls(body: str) -> str:
+    """Rewrite GitHub blob URLs to plain ``MIPStarRE/...[:LINE]`` citations."""
+
+    def repl(match: re.Match[str]) -> str:
+        path = match.group(1)
+        line = match.group(2)
+        return f"{path}:{line}" if line is not None else path
+
+    return _GITHUB_BLOB_RE.sub(repl, body)
+
+
 def extract_file_citations(body: str) -> list[FileCitation]:
     """Pull ``MIPStarRE/.../file.lean[:LINE]`` references out of ``body``.
 
@@ -130,7 +149,7 @@ def extract_file_citations(body: str) -> list[FileCitation]:
     ``line NNN`` on the same line as the path.
     """
     out: list[FileCitation] = []
-    for raw_line in body.splitlines():
+    for raw_line in _normalize_github_blob_urls(body).splitlines():
         paths_on_line = list(_FILE_RE.finditer(raw_line))
         if not paths_on_line:
             continue

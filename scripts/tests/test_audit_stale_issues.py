@@ -97,6 +97,16 @@ class ExtractFileCitationsTests(unittest.TestCase):
             ],
         )
 
+    def test_extracts_path_from_github_blob_url(self) -> None:
+        body = (
+            "See https://github.com/LionSR/MIPStarRE/blob/main/"
+            "MIPStarRE/LDT/Foo/Bar.lean#L141 for details."
+        )
+        self.assertEqual(
+            extract_file_citations(body),
+            [FileCitation(path="MIPStarRE/LDT/Foo/Bar.lean", line=141)],
+        )
+
 
 class ExtractDeclCitationsTests(unittest.TestCase):
     def test_extracts_backtick_identifiers(self) -> None:
