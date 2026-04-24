@@ -200,7 +200,8 @@ theorem averagedSlicePointEvaluationOperator_le_averagedSliceTotalOperator
     {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι) (x : Fq params) (g : Polynomial params) :
     averagedSlicePointEvaluationOperator strategy x g ≤ averagedSliceTotalOperator strategy x := by
-  unfold averagedSlicePointEvaluationOperator averagedSliceTotalOperator averageOperatorOverDistribution
+  unfold averagedSlicePointEvaluationOperator averagedSliceTotalOperator
+    averageOperatorOverDistribution
   exact Finset.sum_le_sum fun u _ =>
     smul_le_smul_of_nonneg_left
       ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome_le_total (g u))
