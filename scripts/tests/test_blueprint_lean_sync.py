@@ -276,6 +276,21 @@ class LeanokPlacementReportingTests(unittest.TestCase):
             },
         )
 
+    def test_leanok_placement_distinguishes_proof_only_from_both(self) -> None:
+        # ``proof_only`` is the style-guide-violating case: \leanok is in the
+        # proof block but not on the statement. It must not be conflated with
+        # ``both`` (fully formalized) just because proof_has_leanok is true.
+        proof_only_entry = BlueprintEntry(
+            file="src/chapter/ch04.tex",
+            line=10,
+            env_type="lemma",
+            label="lem:proof-only",
+            lean_decl="Foo.proofOnly",
+            has_leanok=False,
+            proof_has_leanok=True,
+        )
+        self.assertEqual(_leanok_placement(proof_only_entry), "proof_only")
+
     def test_missing_in_lean_entry_records_leanok_placement(self) -> None:
         # Construct a report where the \leanok-tagged entry has no matching
         # Lean declaration, so it lands in missing_in_lean / leanok_but_missing.
@@ -303,6 +318,32 @@ class LeanokPlacementReportingTests(unittest.TestCase):
         self.assertTrue(data["missing_in_lean"][0]["statement_leanok"])
         self.assertFalse(data["missing_in_lean"][0]["proof_leanok"])
         self.assertEqual(data["leanok_but_missing"][0]["leanok_placement"], "statement")
+
+    def test_missing_in_lean_preserves_has_leanok_statement_semantics(self) -> None:
+        # ``has_leanok`` must keep its pre-placement-aware meaning
+        # (statement-level only) so downstream consumers don't silently
+        # flip. ``has_any_leanok`` is the new broader signal.
+        proof_only_entry = BlueprintEntry(
+            file="src/chapter/ch04.tex",
+            line=10,
+            env_type="lemma",
+            label="lem:proof-only",
+            lean_decl="Foo.proofOnly",
+            has_leanok=False,
+            proof_has_leanok=True,
+        )
+        report = SyncReport(blueprint_entries=[proof_only_entry])
+        report.missing_in_lean = [proof_only_entry]
+
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td) / "report.json"
+            _write_json_report(report, out, Path(td))
+            data = json.loads(out.read_text())
+
+        entry = data["missing_in_lean"][0]
+        self.assertFalse(entry["has_leanok"])
+        self.assertTrue(entry["has_any_leanok"])
+        self.assertEqual(entry["leanok_placement"], "proof_only")
 
 
 if __name__ == "__main__":

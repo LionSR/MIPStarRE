@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import contextlib
+import io
 import sys
 import unittest
 from pathlib import Path
@@ -112,6 +114,9 @@ class LeanokPlacementClassificationTests(unittest.TestCase):
                 for decl in decls
             }
 
+        # ``audit_blueprint`` is chatty — its progress lines would spam the
+        # test runner's output and drown out real failures. Suppress stdout
+        # so only assertion failures break the silence.
         with (
             mock.patch(
                 "blueprint_leanok_axioms.collect_blueprint_entries",
@@ -125,6 +130,7 @@ class LeanokPlacementClassificationTests(unittest.TestCase):
                 "blueprint_leanok_axioms.run_decl_axiom_checks",
                 side_effect=fake_axiom_checks,
             ),
+            contextlib.redirect_stdout(io.StringIO()),
         ):
             return audit_blueprint(
                 Path("/tmp/fake-repo"),

@@ -703,17 +703,18 @@ def _chapter_stats(report: SyncReport) -> dict[str, dict]:
 
 
 def _leanok_placement(entry: BlueprintEntry) -> str:
-    """Return ``statement``, ``proof``, ``both``, or ``none`` for ``entry``.
+    """Return ``statement``, ``proof_only``, ``both``, or ``none`` for ``entry``.
 
     The four values correspond to the four ways ``\\leanok`` can be placed
     relative to the blueprint environment:
 
     * ``statement`` — inside the statement environment only: the Lean
       declaration exists and its statement matches the blueprint;
-    * ``proof`` — inside the proof environment only: the Lean proof is
-      claimed complete but the matching statement-level marker is missing
-      (a style-guide violation worth flagging, not a semantic claim on its
-      own);
+    * ``proof_only`` — inside the proof environment but **not** on the
+      statement: a style-guide violation worth flagging, not a semantic
+      proof-level completeness claim on its own (that would require
+      ``both``, since blueprint style requires a statement-level marker
+      whenever a proof-level one is present);
     * ``both`` — inside both: the declaration is fully formalized;
     * ``none`` — neither marker is present.
     """
@@ -722,7 +723,7 @@ def _leanok_placement(entry: BlueprintEntry) -> str:
     if entry.has_leanok:
         return "statement"
     if entry.proof_has_leanok:
-        return "proof"
+        return "proof_only"
     return "none"
 
 
@@ -874,7 +875,11 @@ def _write_json_report(report: SyncReport, path: Path, root: Path) -> None:
                 "decl": e.lean_decl,
                 "file": e.file,
                 "line": e.line,
-                "has_leanok": e.has_leanok or e.proof_has_leanok,
+                # ``has_leanok`` preserves the pre-placement-aware semantics
+                # (statement-level only) so existing consumers keep their
+                # meaning. ``has_any_leanok`` is the new broader signal.
+                "has_leanok": e.has_leanok,
+                "has_any_leanok": e.has_leanok or e.proof_has_leanok,
                 "statement_leanok": e.has_leanok,
                 "proof_leanok": e.proof_has_leanok,
                 "leanok_placement": _leanok_placement(e),

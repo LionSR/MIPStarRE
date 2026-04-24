@@ -512,35 +512,27 @@ def audit_blueprint(
             continue
 
         info = axiom_info.get(decl)
+        is_failure = has_leanok and severity_error
 
-        def _record(
-            reason: str,
-            *,
-            info: DeclAxiomInfo | None = None,
-            _decl: str = decl,
-            _entries: list[BlueprintEntry] = decl_entries,
-            _placement: str = placement,
-            _severity_error: bool = severity_error,
-            _has_leanok: bool = has_leanok,
-        ) -> None:
-            if _has_leanok and _severity_error:
+        def _record(reason: str, info: DeclAxiomInfo | None = None) -> None:
+            if is_failure:
                 failures.append(
                     DeclFailure(
-                        decl=_decl,
-                        entries=_entries,
+                        decl=decl,
+                        entries=decl_entries,
                         reason=reason,
                         info=info,
-                        placement=_placement,
+                        placement=placement,
                     )
                 )
             else:
                 warnings.append(
                     DeclWarning(
-                        decl=_decl,
-                        entries=_entries,
+                        decl=decl,
+                        entries=decl_entries,
                         reason=reason,
                         info=info,
-                        placement=_placement,
+                        placement=placement,
                     )
                 )
 
@@ -602,21 +594,18 @@ def _format_placement(placement: str) -> str:
 
 def print_audit(result: AuditResult) -> None:
     fail_count = len(result.failures)
-    statement_pass = sum(
-        1
-        for decl_entries in _group_entries_by_decl(result.entries).values()
-        if _decl_leanok_placement(decl_entries) == "statement"
+    grouped = _group_entries_by_decl(result.entries)
+    statement_only_count = sum(
+        1 for entries in grouped.values() if _decl_leanok_placement(entries) == "statement"
     )
-    proof_pass = sum(
-        1
-        for decl_entries in _group_entries_by_decl(result.entries).values()
-        if _decl_leanok_placement(decl_entries) == "proof"
+    proof_level_count = sum(
+        1 for entries in grouped.values() if _decl_leanok_placement(entries) == "proof"
     )
     print()
     print(
         f"PASS: {result.pass_count} decls, FAIL: {fail_count} decls "
-        f"(\\leanok placements seen: {statement_pass} statement-only, "
-        f"{proof_pass} with proof-level)"
+        f"(\\leanok placements seen: {statement_only_count} statement-only, "
+        f"{proof_level_count} with proof-level)"
     )
 
     if result.failures:
