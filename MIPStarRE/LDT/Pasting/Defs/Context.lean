@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MainInductionStep.Statements
+import MIPStarRE.LDT.MainInductionStep.Defs
 
 /-!
 # Section 12 — Standing pasting context
@@ -63,23 +63,23 @@ structure LdPastingContext (params : Parameters) [FieldModel params.q]
   /-- `(ε,δ,γ)`-goodness of the symmetric strategy. -/
   hgood : strategy.IsGood eps delta gamma
   /-- Small-parameter hypothesis `γ ≤ 1` used throughout Section 12. -/
-  hgamma_le : gamma ≤ 1
+  gamma_le_one : gamma ≤ 1
   /-- Small-parameter hypothesis `ζ ≤ 1` used throughout Section 12. -/
-  hzeta_le : zeta ≤ 1
+  zeta_le_one : zeta ≤ 1
   /-- Source-style low-degree inequality `d ≤ q`. -/
-  hdq_le : params.d ≤ params.q
+  dq_le_q : params.d ≤ params.q
   /-- Strict positivity `0 < d` required by the sandwich lemmas. -/
   hd : 0 < params.d
   /-- The slice-indexed polynomial family `{G^x}_{x ∈ 𝔽_q}`. -/
   family : IdxPolyFamily params ι
   /-- Averaged completeness of the slice family (`item:ld-pasting-completeness`). -/
-  hcomplete : family.Complete strategy.state kappa
+  complete : family.Complete strategy.state kappa
   /-- Averaged point-consistency (`item:ld-pasting-consistency`). -/
-  hcons : family.ConsistentWithPoints strategy zeta
+  consistent : family.ConsistentWithPoints strategy zeta
   /-- Averaged strong self-consistency (`item:ld-pasting-self-consistency`). -/
-  hself : family.StronglySelfConsistent strategy.state zeta
+  selfConsistent : family.StronglySelfConsistent strategy.state zeta
   /-- Averaged boundedness input (`item:ld-pasting-boundedness`). -/
-  hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta
+  bounded : IdxPolyFamily.SliceBoundednessInput strategy family zeta
   /-- Pasting iteration count `k`. -/
   k : ℕ
   /-- Positivity of the iteration count. -/

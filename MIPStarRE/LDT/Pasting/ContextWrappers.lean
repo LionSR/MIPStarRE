@@ -33,8 +33,8 @@ theorem ldPasting_of_context
         LdPastingConclusion params ctx.strategy ctx.family H
           ctx.eps ctx.delta ctx.gamma ctx.kappa ctx.zeta ctx.k :=
   ldPasting params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.kappa ctx.zeta
-    ctx.hgood ctx.hgamma_le ctx.hzeta_le ctx.hdq_le ctx.hd
-    ctx.family ctx.hcomplete ctx.hcons ctx.hself ctx.hbound
+    ctx.hgood ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
+    ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
     ctx.k ctx.hk_pos ctx.hk
 
 /-- `lem:ld-pasting-sub-measurement` restated against the standing pasting context. -/
@@ -46,8 +46,8 @@ lemma ldPastingSubMeas_of_context
         LdPastingSubMeasConclusion params ctx.strategy ctx.family H
           ctx.eps ctx.delta ctx.gamma ctx.kappa ctx.zeta ctx.k :=
   ldPastingSubMeas params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.kappa
-    ctx.zeta ctx.hgood ctx.hgamma_le ctx.hzeta_le ctx.hdq_le ctx.hd
-    ctx.family ctx.hcomplete ctx.hcons ctx.hself ctx.hbound
+    ctx.zeta ctx.hgood ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
+    ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
     ctx.k ctx.hk_pos ctx.hk
 
 /-- `cor:ld-pasting-N-completeness` restated against the standing pasting context. -/
@@ -55,12 +55,11 @@ theorem ldPastingNCompleteness_of_context
     (params : Parameters) [FieldModel params.q]
     (ctx : LdPastingContext params ι) :
     LdPastingNCompletenessStatement params ctx.strategy ctx.family ctx.kappa
-      (MainInductionStep.ldPastingInInductionNu params ctx.k
-        ctx.eps ctx.delta ctx.gamma ctx.zeta)
+      ctx.nu
       ctx.k :=
   ldPastingNCompleteness params ctx.strategy ctx.eps ctx.delta ctx.gamma
-    ctx.kappa ctx.zeta ctx.hgood ctx.hgamma_le ctx.hzeta_le ctx.hdq_le
-    ctx.family ctx.hcomplete ctx.hcons ctx.hself ctx.hbound
+    ctx.kappa ctx.zeta ctx.hgood ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
+    ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
     ctx.k ctx.hk_pos ctx.hk
 
 /-- `lem:ld-gbcon` restated against the standing pasting context. -/
@@ -78,7 +77,7 @@ theorem ldGbcon_of_context
       (ctx.zeta +
         Real.sqrt (8 * (params.m : Error) * ctx.eps + 4 * ctx.delta)) :=
   ldGbcon params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.zeta
-    ctx.hgood ctx.family ctx.hcons
+    ctx.hgood ctx.family ctx.consistent
 
 /-- `cor:h-a-consistency` (sub-measurement form) restated against the
 standing pasting context. -/
@@ -89,11 +88,10 @@ theorem hAConsistency_submeas_of_context
         (IdxProjMeas.toIdxSubMeas ctx.strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next
           (constructedPastedSubMeas params ctx.family ctx.k))
-        (MainInductionStep.ldPastingInInductionNu params ctx.k
-          ctx.eps ctx.delta ctx.gamma ctx.zeta) :=
+        ctx.nu :=
   hAConsistency_submeas params ctx.strategy ctx.eps ctx.delta ctx.gamma
-    ctx.kappa ctx.zeta ctx.hgood ctx.hgamma_le ctx.hzeta_le ctx.hdq_le ctx.hd
-    ctx.family ctx.hcomplete ctx.hcons ctx.hself ctx.hbound
+    ctx.kappa ctx.zeta ctx.hgood ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
+    ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
     ctx.k ctx.hk_pos ctx.hk
 
 /-- `lem:over-all-outcomes` restated against the standing pasting context. -/
@@ -103,8 +101,8 @@ lemma overAllOutcomes_of_context
     OverAllOutcomesStatement params ctx.strategy ctx.family
       ctx.eps ctx.delta ctx.gamma ctx.zeta ctx.k :=
   overAllOutcomes params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.zeta
-    ctx.hgood ctx.hgamma_le ctx.hzeta_le ctx.hdq_le
-    ctx.family ctx.hcons ctx.hself ctx.hbound ctx.k
+    ctx.hgood ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
+    ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k
 
 /-- `lem:h-b-consistency` restated against the standing pasting context.
 
@@ -119,7 +117,7 @@ lemma hBConsistency_of_context
     HBConsistencyStatement params ctx.strategy ctx.family
       ctx.eps ctx.delta ctx.gamma ctx.zeta ctx.k :=
   hBConsistency params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.zeta
-    ctx.hgood ctx.hd ctx.family ctx.hcons ctx.hself ctx.hbound ctx.k hline
+    ctx.hgood ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k hline
 
 /-- `lem:ld-sandwich-line-one-point` restated against the standing pasting
 context.
@@ -135,8 +133,8 @@ lemma ldSandwichLineOnePoint_of_context
     LdSandwichLineOnePointStatement params ctx.strategy ctx.family
       ctx.eps ctx.delta ctx.gamma ctx.zeta ctx.k i :=
   ldSandwichLineOnePoint params ctx.strategy ctx.eps ctx.delta ctx.gamma
-    ctx.zeta ctx.hgood ctx.hgamma_le ctx.hzeta_le ctx.hdq_le
-    ctx.family ctx.hcons ctx.hself ctx.hbound hfacts ctx.k i hi
+    ctx.zeta ctx.hgood ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
+    ctx.family ctx.consistent ctx.selfConsistent ctx.bounded hfacts ctx.k i hi
 
 /-- `lem:commute-g-half-sandwich` restated against the standing pasting
 context at the strategy-native bipartite state `ctx.strategy.state`.
@@ -151,7 +149,7 @@ lemma commuteGHalfSandwich_of_context
     CommuteGHalfSandwichStatement params ctx.strategy.state ctx.family
       ctx.gamma ctx.zeta k' :=
   commuteGHalfSandwich params ctx.strategy.state ctx.family ctx.gamma
-    ctx.zeta k' hk' ctx.hzeta_le hfacts
+    ctx.zeta k' hk' ctx.zeta_le_one hfacts
 
 /-- `lem:from-H-to-G` restated against the standing pasting context at the
 strategy-native bipartite state `ctx.strategy.state`.
@@ -185,13 +183,13 @@ theorem commutingWithGComplete_of_context
     (hgamma_nonneg : 0 ≤ ctx.gamma) (hzeta_nonneg : 0 ≤ ctx.zeta)
     (hcom : Commutativity.ComMainConclusion params ctx.strategy ctx.family G
       ctx.gamma ctx.zeta)
-    (hselfComplete :
+    (selfConsistentComplete :
       GCompleteSelfConsistencyStatement params ctx.strategy.state
         ctx.family ctx.zeta) :
     CommutingWithGCompleteStatement params ctx.strategy.state ctx.family
       ctx.gamma ctx.zeta :=
   commutingWithGComplete params ctx.strategy ctx.family G ctx.gamma ctx.zeta
-    hgamma_nonneg ctx.hgamma_le hzeta_nonneg ctx.hzeta_le ctx.hdq_le
-    hcom hselfComplete
+    hgamma_nonneg ctx.gamma_le_one hzeta_nonneg ctx.zeta_le_one ctx.dq_le_q
+    hcom selfConsistentComplete
 
 end MIPStarRE.LDT.Pasting
