@@ -104,7 +104,7 @@ Excerpt from `blueprint/src/chapter/ch08_commutativity.tex:8-19`:
 \end{proof}
 ```
 
-**Important current CI behavior.** The advisory Blueprint ↔ Lean sync check in [`docs/ci-blueprint-sync.md`](ci-blueprint-sync.md) currently treats *any* `\leanok` (statement-level or proof-level) as a claim that must be `sorryAx`-free; it does not yet enforce the placement distinction above. So placement still communicates review intent, but either marker can trigger the same CI error today.
+**Current CI behavior.** The advisory Blueprint ↔ Lean sync check in [`docs/ci-blueprint-sync.md`](ci-blueprint-sync.md) distinguishes the two placements. Only proof-level `\leanok` whose axiom closure contains `sorryAx` (or whose harness output cannot be parsed) is reported as an **error**. Statement-level-only `\leanok` with the same finding is downgraded to a **warning**, because statement-level does not claim proof completeness. Each audit line is annotated with the observed placement so reviewers can tell statement-sync work apart from proof-completion work.
 
 `leanblueprint` does not use distinct macro names for these two claims, so audits must distinguish them by environment context rather than by raw `\leanok` counts. A future split such as `\leanokstmt` / `\leanokproof` could make that distinction explicit, but that is only a possible later cleanup; the current convention is to keep `\leanok` and rely on placement.
 

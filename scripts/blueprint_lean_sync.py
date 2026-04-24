@@ -662,7 +662,22 @@ def run_sync(
 
 
 def _chapter_stats(report: SyncReport) -> dict[str, dict]:
-    """Per-chapter formalization progress."""
+    """Per-chapter formalization progress.
+
+    Each chapter dictionary distinguishes statement-level ``\\leanok`` from
+    proof-level ``\\leanok`` per the placement convention documented in
+    ``docs/blueprint_style_guide.md``:
+
+    * ``statement_formalized`` counts entries whose ``\\leanok`` sits inside
+      the ``theorem``/``lemma``/``definition`` environment body, i.e. the
+      Lean declaration exists and its statement matches the blueprint.
+    * ``proof_formalized`` counts entries whose ``\\leanok`` additionally
+      sits inside the matching ``proof`` environment, i.e. the Lean proof
+      is claimed complete.
+    * ``formalized`` is the legacy alias of ``statement_formalized`` and is
+      kept so existing downstream consumers (CI badges, pre-existing JSON
+      readers) continue to work.
+    """
     stats: dict[str, dict] = {}
     for entry in report.blueprint_entries:
         chapter = entry.file
@@ -670,6 +685,7 @@ def _chapter_stats(report: SyncReport) -> dict[str, dict]:
             stats[chapter] = {
                 "total": 0,
                 "formalized": 0,
+                "statement_formalized": 0,
                 "proof_formalized": 0,
                 "missing_lean": 0,
             }
@@ -678,11 +694,43 @@ def _chapter_stats(report: SyncReport) -> dict[str, dict]:
         found = entry.lean_decl in report.lean_decls
         if entry.has_leanok and found:
             s["formalized"] += 1
+            s["statement_formalized"] += 1
         if entry.proof_has_leanok and found:
             s["proof_formalized"] += 1
         if not found:
             s["missing_lean"] += 1
     return stats
+
+
+def _leanok_placement(entry: BlueprintEntry) -> str:
+    """Return ``statement``, ``proof``, ``both``, or ``none`` for ``entry``.
+
+    The four values correspond to the four ways ``\\leanok`` can be placed
+    relative to the blueprint environment:
+
+    * ``statement`` — inside the statement environment only: the Lean
+      declaration exists and its statement matches the blueprint;
+    * ``proof`` — inside the proof environment only: the Lean proof is
+      claimed complete but the matching statement-level marker is missing
+      (a style-guide violation worth flagging, not a semantic claim on its
+      own);
+    * ``both`` — inside both: the declaration is fully formalized;
+    * ``none`` — neither marker is present.
+    """
+    if entry.has_leanok and entry.proof_has_leanok:
+        return "both"
+    if entry.has_leanok:
+        return "statement"
+    if entry.proof_has_leanok:
+        return "proof"
+    return "none"
+
+
+def _format_leanok_tag(entry: BlueprintEntry) -> str:
+    placement = _leanok_placement(entry)
+    if placement == "none":
+        return ""
+    return f" [\\leanok: {placement}]"
 
 
 def _print_report(report: SyncReport, root: Path) -> None:
@@ -691,24 +739,46 @@ def _print_report(report: SyncReport, root: Path) -> None:
     print("  BLUEPRINT ↔ LEAN SYNC REPORT")
     print("=" * 70)
 
-    # Per-chapter stats
+    # Per-chapter stats. Statement-level and proof-level coverage are
+    # reported in separate columns so reviewers can tell statement-sync work
+    # apart from proof-completion work (see docs/blueprint_style_guide.md).
     stats = _chapter_stats(report)
     print()
     print("Per-chapter formalization progress:")
-    print(f"  {'Chapter':<50} {'Done':>5} / {'Total':>5}  {'%':>6}")
-    print("  " + "-" * 68)
-    total_done = 0
+    print(
+        f"  {'Chapter':<40} "
+        f"{'Stmt':>5} / {'Total':>5}  {'%':>5}    "
+        f"{'Proof':>5} / {'Total':>5}  {'%':>5}"
+    )
+    print("  " + "-" * 78)
+    total_stmt = 0
+    total_proof = 0
     total_all = 0
     for chapter in sorted(stats):
         s = stats[chapter]
-        pct = 100 * s["formalized"] / s["total"] if s["total"] else 0
+        stmt_pct = 100 * s["statement_formalized"] / s["total"] if s["total"] else 0
+        proof_pct = 100 * s["proof_formalized"] / s["total"] if s["total"] else 0
         short = chapter.replace("src/chapter/", "")
-        print(f"  {short:<50} {s['formalized']:>5} / {s['total']:>5}  {pct:>5.1f}%")
-        total_done += s["formalized"]
+        print(
+            f"  {short:<40} "
+            f"{s['statement_formalized']:>5} / {s['total']:>5}  {stmt_pct:>4.1f}%    "
+            f"{s['proof_formalized']:>5} / {s['total']:>5}  {proof_pct:>4.1f}%"
+        )
+        total_stmt += s["statement_formalized"]
+        total_proof += s["proof_formalized"]
         total_all += s["total"]
-    pct = 100 * total_done / total_all if total_all else 0
-    print("  " + "-" * 68)
-    print(f"  {'TOTAL':<50} {total_done:>5} / {total_all:>5}  {pct:>5.1f}%")
+    stmt_pct = 100 * total_stmt / total_all if total_all else 0
+    proof_pct = 100 * total_proof / total_all if total_all else 0
+    print("  " + "-" * 78)
+    print(
+        f"  {'TOTAL':<40} "
+        f"{total_stmt:>5} / {total_all:>5}  {stmt_pct:>4.1f}%    "
+        f"{total_proof:>5} / {total_all:>5}  {proof_pct:>4.1f}%"
+    )
+    print(
+        "  (Stmt = \\leanok inside the statement environment; "
+        "Proof = \\leanok inside the matching proof environment.)"
+    )
 
     # Missing in Lean
     if report.missing_in_lean:
@@ -718,7 +788,7 @@ def _print_report(report: SyncReport, root: Path) -> None:
         for entry in report.missing_in_lean:
             if entry.lean_decl not in seen:
                 seen.add(entry.lean_decl)
-                ok_tag = " [has \\leanok!]" if (entry.has_leanok or entry.proof_has_leanok) else ""
+                ok_tag = _format_leanok_tag(entry)
                 print(f"  ✗ {entry.lean_decl}{ok_tag}")
                 print(f"    {entry.file}:{entry.line} ({entry.env_type})")
 
@@ -730,7 +800,8 @@ def _print_report(report: SyncReport, root: Path) -> None:
         for entry in report.leanok_but_missing:
             if entry.lean_decl not in seen2:
                 seen2.add(entry.lean_decl)
-                print(f"  ⚠ {entry.lean_decl}  ({entry.file}:{entry.line})")
+                ok_tag = _format_leanok_tag(entry)
+                print(f"  ⚠ {entry.lean_decl}{ok_tag}  ({entry.file}:{entry.line})")
 
     # Stale lean_decls
     if report.stale_lean_decls:
@@ -771,16 +842,54 @@ def _print_report(report: SyncReport, root: Path) -> None:
 
 
 def _write_json_report(report: SyncReport, path: Path, root: Path) -> None:
+    statement_total = sum(1 for e in report.blueprint_entries if e.has_leanok)
+    proof_total = sum(1 for e in report.blueprint_entries if e.proof_has_leanok)
+    statement_found = sum(
+        1
+        for e in report.blueprint_entries
+        if e.has_leanok and e.lean_decl in report.lean_decls
+    )
+    proof_found = sum(
+        1
+        for e in report.blueprint_entries
+        if e.proof_has_leanok and e.lean_decl in report.lean_decls
+    )
     data = {
         "sync_ok": report.ok,
         "total_blueprint_refs": len(report.blueprint_entries),
         "total_lean_decls": len(report.lean_decls),
+        # Statement-level and proof-level \leanok totals are surfaced
+        # separately so downstream dashboards can distinguish
+        # "statement transcribed and matched" from "proof certified
+        # complete" without re-parsing the blueprint. See
+        # docs/blueprint_style_guide.md for the placement convention.
+        "leanok_totals": {
+            "statement_level": statement_total,
+            "proof_level": proof_total,
+            "statement_level_with_matching_lean_decl": statement_found,
+            "proof_level_with_matching_lean_decl": proof_found,
+        },
         "missing_in_lean": [
-            {"decl": e.lean_decl, "file": e.file, "line": e.line, "has_leanok": e.has_leanok}
+            {
+                "decl": e.lean_decl,
+                "file": e.file,
+                "line": e.line,
+                "has_leanok": e.has_leanok or e.proof_has_leanok,
+                "statement_leanok": e.has_leanok,
+                "proof_leanok": e.proof_has_leanok,
+                "leanok_placement": _leanok_placement(e),
+            }
             for e in report.missing_in_lean
         ],
         "leanok_but_missing": [
-            {"decl": e.lean_decl, "file": e.file, "line": e.line}
+            {
+                "decl": e.lean_decl,
+                "file": e.file,
+                "line": e.line,
+                "statement_leanok": e.has_leanok,
+                "proof_leanok": e.proof_has_leanok,
+                "leanok_placement": _leanok_placement(e),
+            }
             for e in report.leanok_but_missing
         ],
         "stale_lean_decls": report.stale_lean_decls,

@@ -15,21 +15,41 @@ or the toolchain files, and on manual dispatch.
 ## What it checks
 
 For every `\begin{theorem|lemma|proposition|corollary|definition}` block in
-`blueprint/src/chapter/*.tex` that contains `\lean{Name}`:
+`blueprint/src/chapter/*.tex` that contains `\lean{Name}`, the parser
+records two independent flags based on `\leanok` placement (see
+[`docs/blueprint_style_guide.md`](blueprint_style_guide.md)):
 
-| Condition                                           | Severity |
-|-----------------------------------------------------|----------|
-| `Name` is not a known Lean declaration, and the block has `\leanok` | error |
-| `Name` is not a known Lean declaration (no `\leanok`)               | warning |
-| Block has `\leanok` **and** the axiom closure of `Name` contains `sorryAx` | error |
-| Block has `\leanok` and `#print axioms Name` output could not be parsed (fail-safe) | error |
-| `#print axioms Name` output could not be parsed, no `\leanok`       | warning |
-| `Name` is sorry-free but the block has no `\leanok` anywhere        | warning |
+- **statement-level** — `\leanok` inside the statement environment body,
+  i.e. the Lean declaration exists and its statement matches the blueprint;
+- **proof-level** — `\leanok` inside the matching
+  `\begin{proof}…\end{proof}`, i.e. the Lean proof is claimed complete.
 
-Both statement-level `\leanok` (inside the environment body) and proof-level
-`\leanok` (inside the matching `\begin{proof}…\end{proof}`) are accepted. No
-distinction is drawn for this check — either form is considered a claim that
-the theorem statement is formalized.
+A declaration may have both, only one, or neither. The axiom-closure check
+then classifies findings by the strongest placement observed:
+
+| Condition                                                                                | Severity |
+|------------------------------------------------------------------------------------------|----------|
+| `Name` is not a known Lean declaration, and the block has **proof-level** `\leanok`       | error    |
+| `Name` is not a known Lean declaration, and the block has only **statement-level** `\leanok` | warning  |
+| `Name` is not a known Lean declaration (no `\leanok`)                                     | warning  |
+| Block has **proof-level** `\leanok` **and** the axiom closure of `Name` contains `sorryAx` | error    |
+| Block has only **statement-level** `\leanok` and the axiom closure of `Name` contains `sorryAx` | warning  |
+| Block has **proof-level** `\leanok` and `#print axioms Name` output could not be parsed (fail-safe) | error    |
+| Block has only **statement-level** `\leanok` and `#print axioms Name` output could not be parsed (fail-safe) | warning  |
+| `#print axioms Name` output could not be parsed, no `\leanok`                             | warning  |
+| `Name` is sorry-free but the block has no `\leanok` anywhere                              | warning  |
+
+The rationale for the statement-level downgrade is that statement-level
+`\leanok` only claims the Lean statement matches the blueprint; it is **not**
+a claim that the proof is complete. Flagging a `sorryAx` under a
+statement-level-only marker would be overclaiming a violation. Proof-level
+`\leanok` is the only placement that promises proof completeness, so that
+remains the hard-failure signal.
+
+Each failure and warning in the console output is annotated with its
+observed `\leanok` placement (`[\leanok: statement-level]` or
+`[\leanok: proof-level]`) so reviewers can distinguish statement-sync work
+from proof-completion work at a glance.
 
 The axiom closure is obtained by `lake env lean`-ing a throwaway harness that
 runs `#print axioms Name` for each unique declaration. Lines are attributed
@@ -94,5 +114,32 @@ a `\leanok`-tagged theorem with `sorry`, rerun, and confirm you see an
   appear in the Lean source tree. The two scripts are complementary:
   `blueprint_lean_sync.py` catches surface drift, `check_blueprint_sync.py`
   catches proof-level dishonesty.
+
+  Its per-chapter progress table and JSON report (`--report FILE`) expose
+  statement-level and proof-level coverage separately:
+
+  ```json
+  {
+    "leanok_totals": {
+      "statement_level": 42,
+      "proof_level": 17,
+      "statement_level_with_matching_lean_decl": 41,
+      "proof_level_with_matching_lean_decl": 17
+    },
+    "chapter_stats": {
+      "src/chapter/ch08_commutativity.tex": {
+        "total": 6,
+        "formalized": 6,
+        "statement_formalized": 6,
+        "proof_formalized": 3,
+        "missing_lean": 0
+      }
+    }
+  }
+  ```
+
+  The legacy `formalized` field is kept as an alias of
+  `statement_formalized` so existing consumers (badges, dashboards) keep
+  working.
 * [`docs/PROOF_INTEGRITY.md`](PROOF_INTEGRITY.md) — full blocker list
   (`sorry`, `native_decide`, unexplained `axiom`, …) enforced elsewhere.
