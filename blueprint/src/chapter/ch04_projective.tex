@@ -57,6 +57,7 @@
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
+	\leanok
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency
@@ -145,6 +146,7 @@
 
 \begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
+	\leanok
 	\uses{def:simeq, def:approx_delta}
 	Let $\ket{\psi}$ be a state, and let $A = \{A_a\}$ and $B = \{B_a\}$ be measurements such that
 	\[
@@ -383,6 +385,7 @@
 
 	\begin{lemma}[Rank reduction]\label{lem:projective-low-rank-sum}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum}
+		\leanok
 		There exists a set of projection matrices $\{Q_a\}$ such that
 		\begin{equation*}
 			A_a \ot I \approx_{12\sqrt{\zeta}} Q_a \ot I.
@@ -657,6 +660,7 @@
 
 	\begin{lemma}\label{lem:xa-t}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xa_t}
+		\leanok
 		For each $a$,
 		\[
 			X_a = T_a \cdot X.
@@ -778,6 +782,7 @@
 
 	\begin{lemma}[$P_a$ restated]\label{lem:pa-restated}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.paRestated}
+		\leanok
 		For each $a$,
 		\begin{equation*}
 			P_a = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.
