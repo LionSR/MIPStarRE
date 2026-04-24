@@ -742,8 +742,8 @@ lemma commuteGHalfSandwich_error_bound
     Real.rpow gamma (1 / (16 : Error)) +
       Real.rpow zeta (1 / (16 : Error)) +
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
-  have hγterm_nonneg : 0 ≤ Real.rpow gamma (1 / (16 : Error)) := by
-    exact rpow_oneSixteenth_nonneg gamma
+  have hγterm_nonneg : 0 ≤ Real.rpow gamma (1 / (16 : Error)) :=
+    rpow_oneSixteenth_nonneg gamma
   have hS_nonneg : 0 ≤ S := by
     have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by positivity
     dsimp [S]
@@ -1599,6 +1599,10 @@ lemma gHatPairPrefix_sum_adjoint_mul_le_one
   rw [hEq] at hsum
   exact hsum
 
+/-- Generic tensor-contraction bound: if `prefixOp : α → Op ι` and
+`tailOp : β → Op ι` each satisfy `∑ (·)ᴴ * (·) ≤ 1`, then the joint family
+`leftTensor (prefixOp a) * rightTensor (tailOp b)` on `α × β` also satisfies
+`∑ (·)ᴴ * (·) ≤ 1` on the bipartite space. -/
 lemma leftTensor_rightTensor_sum_adjoint_mul_le_one
     {α β : Type*}
     [Fintype α] [DecidableEq α]
