@@ -113,23 +113,22 @@ LDT 2/5: Self-improvement step
 ...
 ```
 
-The tracking issue lists each sub-issue using a **native GitHub tasklist** block
-so that child issues display "Tracked by #N" in their sidebar:
+Attach tracked issues as **GitHub sub-issues** of the umbrella issue so GitHub
+shows native progress, relationship navigation, and "Tracked by #N" links. The
+issue body can keep a short human-readable index, but markdown checkboxes and
+retired fenced tasklist blocks do not create native sub-issue relationships:
 
-````markdown
-```[tasklist]
+```markdown
 ### Tasks
-- [ ] #101
-- [ ] #102
-- [ ] #103
+- #101
+- #102
+- #103
 ```
-````
 
-**Important:** Each `- [ ]` line must contain *only* the issue reference (`#N`).
-Do not add descriptions on the same line — put those in the sub-issue titles or
-in prose above the tasklist block. Items that are not issue references (plain text
-TODOs) cannot go inside the tasklist block; list them as ordinary checkboxes
-outside it.
+Use the issue sidebar's **Add sub-issue** control, or the REST endpoint
+`POST /repos/{owner}/{repo}/issues/{issue_number}/sub_issues`, to create the
+actual relationship. Put descriptions in the sub-issue titles or in prose above
+the index.
 
 ### Tracking issues
 
@@ -137,8 +136,7 @@ Use the **Tracking Issue** template (`.github/ISSUE_TEMPLATE/tracking-issue.yml`
 Label with `tracking`; add `chapter-tracking` for the long-lived chapter
 overview trackers. The `tracking-issue-sync` workflow will automatically:
 
-- Check boxes when referenced issues are closed (including auto-closure by merged PRs).
-- Uncheck boxes when referenced issues are reopened.
+- Rely on GitHub's native sub-issue progress instead of editing body checkboxes.
 - Post progress comments on linked issues when PRs merge.
 - Suggest or create `follow-up` issues for genuine deferred work called out by merged PRs.
 
@@ -382,7 +380,7 @@ The following workflows run automatically:
 |----------|---------|-------------|
 | **Lean CI** (`lean_action_ci.yml`) | Push to `main`, PRs touching `.lean`/`lakefile.toml`/`lean-toolchain` | Runs `lake build` with Mathlib cache |
 | **Claude Code Review** (`claude-code-review.yml`) | PR opened/synced/reopened touching `.lean`, `.tex`, `lakefile.toml`, `lean-toolchain` | Automated review for sorrys, Mathlib style, type safety, performance, modularity, documentation |
-| **Issue Tracker** (`tracking-issue-sync.yml`) | Issue closed/reopened; PR merged/opened | Updates tracking-issue checkboxes (checks on close, unchecks on reopen), posts progress comments on linked issues when PRs merge, scans merged PRs for genuine deferred work, and creates `follow-up` issues when needed |
+| **Issue Tracker** (`tracking-issue-sync.yml`) | Issue closed/reopened; PR merged/opened | Uses native sub-issue progress for tracking status, posts progress comments on linked issues when PRs merge, scans merged PRs for genuine deferred work, and creates `follow-up` issues when needed |
 | **Blueprint Lint** (`lint-blueprint.yml`) | PRs touching blueprint files | Validates LaTeX blueprint for broken labels and references |
 | **Docs & Blueprint Sync** (`docs-blueprint-sync.md`) | Daily (weekdays) + manual dispatch | Detects stale documentation and opens a sync PR if needed |
 | **Lean Audit** (`lean-audit.yml`) | On demand | Audits Lean code for style and correctness |
