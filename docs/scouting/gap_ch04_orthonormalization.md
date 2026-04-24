@@ -2,6 +2,16 @@
 
 Date: 2026-04-04
 
+> Update (2026-04-23): the specific blocker tracked by issue #301 is now
+> resolved on `main`. The old `Theorems.lean` sites referenced in this report
+> were split across `MakingMeasurementsProjective/Projectivization.lean` and
+> `MakingMeasurementsProjective/Orthonormalization.lean`, and the current
+> declarations `spectralTruncateAlmostProjective` and `orthonormalization`
+> both compile cleanly without `sorry`. Treat the detailed status tables below
+> as a historical snapshot from 2026-04-04; the remaining live Chapter 4 gap
+> is the deeper `Q/X/\widehat X/P` proof spine, not those two wrapper
+> declarations.
+
 Files read carefully:
 
 - `references/ldt-paper/orthonormalization.tex`
