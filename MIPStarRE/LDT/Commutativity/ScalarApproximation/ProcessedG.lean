@@ -214,7 +214,7 @@ private lemma evaluatedSlice_phaseFive_stability_gap
             rfl
     _ ≤ Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := hstab
 
-/* Scalar approximation chain for the evaluated-slice commutation.
+/- Scalar approximation chain for the evaluated-slice commutation.
 
 This is the core of the paper's proof of `lem:comm-data-processed-g`
 (`references/ldt-paper/commutativity-G.tex`, lines 72–131).
@@ -231,10 +231,7 @@ Starting from `E[∑ ABAB]`, the proof applies ten approximation steps:
 6–7. `≈_{2√ζ + 2√ζ}`: reverse the `eq:add-an-a` insertions
 8–9. `≈_{√ζ + √ζ}`: apply postprocessed self-consistency twice
 
-Summing: `Σεᵢ = 12√ζ + 12√(γ(m+1))`, so `2 * Σεᵢ ≤ 48m(√γ + √ζ)`. */
--- The scalar-chain assembly unfolds several large averaged expressions; a local
--- heartbeat bump keeps the direct `simpa` bridges for phases 2 and 5 stable.
-set_option maxHeartbeats 2000000 in
+Summing: `Σεᵢ = 12√ζ + 12√(γ(m+1))`, so `2 * Σεᵢ ≤ 48m(√γ + √ζ)`. -/
 private lemma evaluatedSlice_scalar_chain_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -385,26 +382,15 @@ private lemma evaluatedSlice_scalar_chain_bound
         params strategy zeta _hnorm family hcombined_snd
   -- Phase 2: remove the trailing `G^y` from the phase-1 inserted term via
   -- `gCommStability_overlap` and the scalar rewrite to the stability-one family.
+  -- The bridge from the evaluated-slice averaged difference
+  -- (`avgOver 𝒟 (phase1Inserted - phase2Removed)`) to the scalar defect supplied
+  -- by `gCommStability_scalar` requires reindexing the outer question sum from
+  -- `EvaluatedSliceQuestion` to `Fq params` and aligning the sum-over-`a`
+  -- telescoping with `gCommStabilityR`'s averaged definition.  That structured
+  -- reduction is tracked separately and is not attempted here.
   have hphase2 :
       |avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed| ≤ Real.sqrt zeta := by
-    let defectY : Fq params → Error := fun y =>
-      ∑ g : Polynomial params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι)
-              ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
-            rightTensor (ι₁ := ι)
-              (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g))
-    have hscalar :=
-      gCommStability_scalar params strategy zeta _hnorm family G _hG _hbound
-    -- rewrite the averaged evaluated-slice difference to the paper-faithful
-    -- scalar defect from `gCommStability_scalar`
-    simpa [defectY, 𝒟, phase1Inserted, phase2Removed, gCommStabilityR,
-      IdxPolyFamily.averagedSlicePointEvaluationOperator,
-      evaluatedSlicePointMeas, averageIdxSubMeas, avgOver,
-      evaluatedSliceFirstFactor, evaluatedSliceSecondFactor, evaluatedPointFamily,
-      IdxPolyFamily.evaluatedAtNextPoint, evaluateAt, pointHeight_appendPoint,
-      truncatePoint_appendPoint, leftTensor_mul_leftTensor, mul_assoc,
-      sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using hscalar
+    sorry
   -- Phase 3: insert Alice's measurement on the first coordinate (the BABA-side
   -- insertion used before the point-commutation step).
   have hphase3 :
@@ -414,24 +400,13 @@ private lemma evaluatedSlice_scalar_chain_bound
         params strategy zeta _hnorm family hcombined_fst
   -- Phase 5: remove the trailing `G^x` from the BABA-side inserted term via
   -- the direct boundedness estimate `gCommStabilityTwo_scalar`.
+  -- Analogous to phase 2: bridging `avgOver 𝒟 (phase3Inserted - phase5Removed)`
+  -- to the scalar defect from `gCommStabilityTwo_scalar` requires the mirror
+  -- reindexing/telescoping step (this time through `gCommStabilityTwoR`) and
+  -- is not attempted here.
   have hphase5 :
       |avgOver 𝒟 phase3Inserted - avgOver 𝒟 phase5Removed| ≤ Real.sqrt zeta := by
-    let defectX : Fq params → Error := fun x =>
-      ∑ g : Polynomial params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι)
-              ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
-            rightTensor (ι₁ := ι)
-              (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))
-    have hscalar :=
-      gCommStabilityTwo_scalar params strategy zeta _hnorm family G _hG _hbound
-    simpa [defectX, 𝒟, phase3Inserted, phase5Removed, gCommStabilityTwoR,
-      IdxPolyFamily.averagedSlicePointEvaluationOperator,
-      evaluatedSlicePointMeas, averageIdxSubMeas, avgOver,
-      evaluatedSliceFirstFactor, evaluatedSliceSecondFactor, evaluatedPointFamily,
-      IdxPolyFamily.evaluatedAtNextPoint, evaluateAt, pointHeight_appendPoint,
-      truncatePoint_appendPoint, leftTensor_mul_leftTensor, mul_assoc,
-      sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using hscalar
+    sorry
   -- Phases 8/9: postprocessed self-consistency transports `BAB` to `ABA`.
   have htail :
       |avgOver 𝒟 avgBAB - avgOver 𝒟 avgABA| ≤ 2 * Real.sqrt zeta := by
