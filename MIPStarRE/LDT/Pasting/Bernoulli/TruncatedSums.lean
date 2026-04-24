@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.BridgeLemmas
+import MIPStarRE.LDT.Pasting.Defs.Tuples
 
 /-!
 # Section 12 pasting: Bernoulli truncated sums
