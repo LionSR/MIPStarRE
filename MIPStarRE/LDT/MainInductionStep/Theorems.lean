@@ -150,7 +150,7 @@ theorem selfImprovementInInductionSection
         rw [havg]
         have hdom' := hdom
         simp [SelfImprovement.sdpDualSlackOperator, SelfImprovement.averagedPointOperator,
-          ExpansionHypercubeGraph.averageOperatorOverDistribution,
+          averageOperatorOverDistribution,
           GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
         simpa using hdom' }
 

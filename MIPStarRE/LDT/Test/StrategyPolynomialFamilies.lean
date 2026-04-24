@@ -135,20 +135,13 @@ noncomputable def evaluatedAtNextPoint {params : Parameters} [FieldModel params.
     evaluateAt params (truncatePoint params u)
       ((family.meas (pointHeight params u)).toSubMeas)
 
-/-- Weighted sum of operators over a distribution's finite support. -/
-private noncomputable def averageOperatorOverDistribution' {α : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) :
-    MIPStarRE.Quantum.Op ι :=
-  ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
-
 /-- Averaged point operator `E_u A^u_{h(u)}` appearing in source-style
 boundedness assumptions. -/
 noncomputable def averagedPointEvaluationOperator {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params ι) (h : Polynomial params) :
     MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution' (uniformDistribution (Point params))
+  averageOperatorOverDistribution (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement u).toSubMeas.outcome (h u))
 
 /-- Slice-wise averaged point operator `E_u A^{u,x}_{g(u)}` from the paper's
@@ -157,7 +150,7 @@ noncomputable def averagedSlicePointEvaluationOperator {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι)
     (x : Fq params) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution' (uniformDistribution (Point params))
+  averageOperatorOverDistribution (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
 
 /-- Slice-wise averaged total operator `E_u \sum_a A^{u,x}_a`.
@@ -167,14 +160,14 @@ strategy-shaped formula explicit records where the witness comes from. -/
 noncomputable def averagedSliceTotalOperator {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι) (x : Fq params) : MIPStarRE.Quantum.Op ι :=
-  averageOperatorOverDistribution' (uniformDistribution (Point params))
+  averageOperatorOverDistribution (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.total)
 
 theorem averagedSliceTotalOperator_nonneg {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι) (x : Fq params) :
     0 ≤ averagedSliceTotalOperator strategy x := by
-  unfold averagedSliceTotalOperator averageOperatorOverDistribution'
+  unfold averagedSliceTotalOperator averageOperatorOverDistribution
   exact Finset.sum_nonneg fun u _ =>
     smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
       ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.total_nonneg)
@@ -183,7 +176,7 @@ theorem averagedSliceTotalOperator_nonneg {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι) (x : Fq params) :
     averagedSliceTotalOperator strategy x = 1 := by
-  unfold averagedSliceTotalOperator averageOperatorOverDistribution'
+  unfold averagedSliceTotalOperator averageOperatorOverDistribution
   calc
     ∑ u ∈ (uniformDistribution (Point params)).support,
         (uniformDistribution (Point params)).weight u •
@@ -207,7 +200,7 @@ theorem averagedSlicePointEvaluationOperator_le_averagedSliceTotalOperator
     {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι) (x : Fq params) (g : Polynomial params) :
     averagedSlicePointEvaluationOperator strategy x g ≤ averagedSliceTotalOperator strategy x := by
-  unfold averagedSlicePointEvaluationOperator averagedSliceTotalOperator averageOperatorOverDistribution'
+  unfold averagedSlicePointEvaluationOperator averagedSliceTotalOperator averageOperatorOverDistribution
   exact Finset.sum_le_sum fun u _ =>
     smul_le_smul_of_nonneg_left
       ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome_le_total (g u))
