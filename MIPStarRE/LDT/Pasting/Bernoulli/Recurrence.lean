@@ -108,38 +108,28 @@ lemma fromHToG
       CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
     (k : ℕ) :
     FromHToGStatement params strategy ψbi family gamma zeta k := by
-  constructor
-  · intro ℓ hℓ
-    /- Inductive step `ℓ` of the Bernoulli-tail recurrence
-    (`ld-pasting.tex` / blueprint lines 961–1210).  The corrected stage API in
-    `Statements.lean` now matches the paper's aggregate quantity
-    $$
-      \mathbb E_{x_{\ge \ell}} \sum_{\tau_{\ge \ell}}
-        \sum_{g_{\ge \ell} \in \mathsf{Outcomes}_{\tau_{\ge \ell}}}
-          \langle \psi, \widehat H^{x_{\ge \ell}}_{g_{\ge \ell}}
-            \otimes S_{\tau_{\ge \ell}} \psi \rangle,
-    $$
-    so the remaining work is to formalize the three scalar bridge lemmas for the
-    move-right / commute / move-right sequence on these adjacent stage masses:
-    1. two `easyApproxFromApproxDelta` / `closenessOfIP` applications driven by
-       `hfacts.completedSelfConsistency`, each contributing `√(2ζ)`;
-    2. two `closenessOfIP` applications driven by the suffix-length witness
-       `hhalf (k - ℓ)`, together contributing `2√ν₄`;
-    3. the exact recurrence rewrite from `S_{τ_{≥ℓ}}` to `S_{τ_{>ℓ}}` via
-       `fromHToGRecurrenceWeight_succ`, after splitting the `τ_ℓ = 1/0`
-       branches of the stage-`ℓ` sum.
-    -/
-    sorry
-  · /- Aggregate the `k` scalar recurrence steps to show the uniform all-outcomes
-    expansion equals the Bernoulli polynomial up to `ν₈`.  After the per-step
-    scalar bridge above is formalized, the remaining endpoint work is:
-    1. identify stage `0` with `fromHToGAllOutcomesMass`;
-    2. identify stage `k` with `fromHToGBernoulliTailMass` using the
-       `truncatedTypeSums` polynomial;
-    3. telescope over `ℓ = 0, …, k - 1` and sum the per-step errors, then use
-       the displayed bound `k * fromHToGRecurrenceError ≤ fromHToGError`.
-    -/
-    sorry
+  /- Remaining work from #673, stated at the single live proof gap.
+
+     Paper / blueprint anchor:
+     * `references/ldt-paper/ld-pasting.tex`, proof of `lem:from-H-to-G`
+       (roughly lines 1379–1664 in the current source);
+     * `blueprint/src/chapter/ch09_pasting.tex`, proof of `lem:from-H-to-G`
+       (roughly lines 979–1233 in the current source).
+
+     What remains to formalize:
+     1. prove each adjacent-stage recurrence step by the paper's
+        move-right / commute / move-right chain, using two
+        `easyApproxFromApproxDelta` / `closenessOfIP` moves from
+        `hfacts.completedSelfConsistency`, then two suffix-commutation moves from
+        `hhalf (k - ℓ)`, and finally the exact branch split via
+        `fromHToGRecurrenceWeight_succ`;
+     2. identify Lean stage `0` with `fromHToGAllOutcomesMass`;
+     3. identify Lean stage `k` with `fromHToGBernoulliTailMass` through the
+        `truncatedTypeSums` polynomial;
+     4. telescope the `k` adjacent-stage errors and discharge the displayed
+        arithmetic bound `k * fromHToGRecurrenceError ≤ fromHToGError`.
+  -/
+  sorry
 
 /-- The scalar Bernoulli tail polynomial lifted through continuous functional
 calculus is exactly the matrix Bernoulli tail operator. -/
