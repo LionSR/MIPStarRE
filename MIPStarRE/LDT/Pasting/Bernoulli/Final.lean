@@ -103,8 +103,8 @@ supplied explicitly.
 This packages the downstream scalar algebra after `lem:over-all-outcomes` and
 `lem:from-H-to-G`. The hypothesis `htail` is exactly the `θ = 1 / (200m)`
 specialization of `lem:chernoff-bernoulli-matrix` for the averaged complete
-operator `G = \mathbb E_x \sum_g G^x_g`; issue #597 tracks deriving that lower
-bound internally. -/
+operator `G = \mathbb E_x \sum_g G^x_g`; issue #642 tracks proving the
+scalar Bernoulli/Hoeffding tail bound consumed by that specialization. -/
 theorem ldPastingNCompleteness_of_tailLowerBound
     (params : Parameters)
     [FieldModel params.q]
@@ -231,8 +231,9 @@ theorem ldPastingNCompleteness
     /- Paper: this is the downstream Bernoulli-tail lower bound obtained by
     specializing `lem:chernoff-bernoulli-matrix` to `θ = 1/(200m)` and the
     averaged complete operator `G`.  The surrounding completeness chain is now
-    reduced to this single scalar input; issue #597 tracks the missing spectral /
-    Chernoff infrastructure needed to derive it inside Lean. -/
+    reduced to this single scalar input; issue #642 tracks the missing scalar
+    Bernoulli/Hoeffding bound (consumed by `chernoffBernoulliMatrix` via its
+    `hScalarTail` parameter) needed to derive it inside Lean. -/
     sorry
   exact ldPastingNCompleteness_of_tailLowerBound params strategy
     eps delta gamma kappa zeta hgood hgamma_le hzeta_le hdq_le
