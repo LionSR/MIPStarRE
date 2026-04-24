@@ -695,7 +695,7 @@ def _chapter_stats(report: SyncReport) -> dict[str, dict]:
         if entry.has_leanok and found:
             s["formalized"] += 1
             s["statement_formalized"] += 1
-        if entry.proof_has_leanok and found:
+        if entry.has_leanok and entry.proof_has_leanok and found:
             s["proof_formalized"] += 1
         if not found:
             s["missing_lean"] += 1
@@ -748,8 +748,8 @@ def _print_report(report: SyncReport, root: Path) -> None:
     print("Per-chapter formalization progress:")
     print(
         f"  {'Chapter':<40} "
-        f"{'Stmt':>5} / {'Total':>5}  {'%':>5}    "
-        f"{'Proof':>5} / {'Total':>5}  {'%':>5}"
+        f"{'Stmt':>5} / {'Total':>5}  {'%':>6}    "
+        f"{'Proof':>5} / {'Total':>5}  {'%':>6}"
     )
     print("  " + "-" * 78)
     total_stmt = 0
@@ -762,8 +762,8 @@ def _print_report(report: SyncReport, root: Path) -> None:
         short = chapter.replace("src/chapter/", "")
         print(
             f"  {short:<40} "
-            f"{s['statement_formalized']:>5} / {s['total']:>5}  {stmt_pct:>4.1f}%    "
-            f"{s['proof_formalized']:>5} / {s['total']:>5}  {proof_pct:>4.1f}%"
+            f"{s['statement_formalized']:>5} / {s['total']:>5}  {stmt_pct:>5.1f}%    "
+            f"{s['proof_formalized']:>5} / {s['total']:>5}  {proof_pct:>5.1f}%"
         )
         total_stmt += s["statement_formalized"]
         total_proof += s["proof_formalized"]
@@ -773,8 +773,8 @@ def _print_report(report: SyncReport, root: Path) -> None:
     print("  " + "-" * 78)
     print(
         f"  {'TOTAL':<40} "
-        f"{total_stmt:>5} / {total_all:>5}  {stmt_pct:>4.1f}%    "
-        f"{total_proof:>5} / {total_all:>5}  {proof_pct:>4.1f}%"
+        f"{total_stmt:>5} / {total_all:>5}  {stmt_pct:>5.1f}%    "
+        f"{total_proof:>5} / {total_all:>5}  {proof_pct:>5.1f}%"
     )
     print(
         "  (Stmt = \\leanok inside the statement environment; "

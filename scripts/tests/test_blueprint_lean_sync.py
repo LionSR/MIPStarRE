@@ -291,6 +291,25 @@ class LeanokPlacementReportingTests(unittest.TestCase):
         )
         self.assertEqual(_leanok_placement(proof_only_entry), "proof_only")
 
+    def test_proof_only_entry_does_not_count_as_proof_formalized(self) -> None:
+        proof_only_entry = BlueprintEntry(
+            file="src/chapter/ch04.tex",
+            line=10,
+            env_type="lemma",
+            label="lem:proof-only",
+            lean_decl="Foo.proofOnly",
+            has_leanok=False,
+            proof_has_leanok=True,
+        )
+        report = SyncReport(
+            blueprint_entries=[proof_only_entry],
+            lean_decls={"Foo.proofOnly": self._fake_decl("Foo.proofOnly")},
+        )
+        stats = _chapter_stats(report)
+        ch04 = stats["src/chapter/ch04.tex"]
+        self.assertEqual(ch04["statement_formalized"], 0)
+        self.assertEqual(ch04["proof_formalized"], 0)
+
     def test_missing_in_lean_entry_records_leanok_placement(self) -> None:
         # Construct a report where the \leanok-tagged entry has no matching
         # Lean declaration, so it lands in missing_in_lean / leanok_but_missing.
