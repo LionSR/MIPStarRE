@@ -4240,9 +4240,6 @@ private lemma dnoteq_term_le_hBConsistency_extra
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))
   have hqterm : 1 / (params.q : Error) ≤ S := by
     have hlast := one_div_q_le_rpow_degreeRatio params hd
-    have hS_nonneg : 0 ≤ S := by
-      dsimp [S]
-      positivity [heps_nonneg, hdelta_nonneg, hgamma_nonneg, hzeta_nonneg]
     have htail_nonneg :
         0 ≤ Real.rpow eps (1 / (32 : Error)) +
             Real.rpow delta (1 / (32 : Error)) +
@@ -4298,15 +4295,26 @@ private lemma avgOver_distinct_pasted_defect_le_badMass
         (verticalLineMeasurementFamily params strategy u))
       ≤ avgOver (distinctTupleDistribution params k) (fun xs =>
           hBConsistencyBadMass params strategy family u xs) := by
-  unfold avgOver distinctTupleDistribution
+  classical
+  let support : Finset (PointTuple params k) :=
+    Finset.univ.filter fun xs : PointTuple params k => Function.Injective xs
+  have hsupport : (distinctTupleDistribution params k).support = support := by
+    simp [distinctTupleDistribution, support]
+  have hweight :
+      ∀ xs, (distinctTupleDistribution params k).weight xs =
+        if xs ∈ support then 1 / (support.card : Error) else 0 := by
+    intro xs
+    simp [distinctTupleDistribution, support]
+  unfold avgOver
+  rw [hsupport]
+  simp_rw [hweight]
   refine Finset.sum_le_sum ?_
-  intro xs _
-  by_cases hxs : Function.Injective xs
-  · simp [distinctTupleDistribution, hxs]
-    exact mul_le_mul_of_nonneg_left
-      (pastedInterpolation_verticalLine_defect_le_badMass params strategy family u xs hxs)
-      (by positivity)
-  · simp [distinctTupleDistribution, hxs]
+  intro xs hxs
+  have hinj : Function.Injective xs := (Finset.mem_filter.mp hxs).2
+  simp [hxs]
+  exact mul_le_mul_of_nonneg_left
+    (pastedInterpolation_verticalLine_defect_le_badMass params strategy family u xs hinj)
+    (by positivity)
 
 private lemma avgOver_distinct_badMass_le_avgOver_uniform_badMass_add_dnoteq
     (params : Parameters) [FieldModel params.q]
