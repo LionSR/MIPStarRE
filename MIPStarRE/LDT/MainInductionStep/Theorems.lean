@@ -3326,6 +3326,10 @@ data, this wrapper keeps `hselfProducer` as an honest input rather than
 reintroducing a conclusion-shaped public premise. The conclusion exposes only
 the global measurement witness needed downstream by
 `MIPStarRE.LDT.Test.MainTheorem`. -/
+-- NOTE: The `hrestrict` expression below is intentionally repeated in the
+-- `hrec` binder, the `hselfProducer` binder, and the proof body. Keeping those
+-- three occurrences byte-for-byte identical lets Lean reuse `hrec` and
+-- `hselfProducer` directly by definitional equality.
 theorem mainInductionPublicWrapper
     (params : Parameters)
     [FieldModel.{0} params.q]
