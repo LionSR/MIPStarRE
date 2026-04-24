@@ -519,10 +519,16 @@ spectral theorem to prove the matrix identity `rank R_a = trace R_a` and hence
 `∑_a rank(R_a) ≤ dim(ι)`. The public theorem `projectiveLowRankSum` still
 keeps `(auxSpace, t, hAuxDim)` explicit because the remaining `r > d`
 truncation branch from orthonormalization.tex:559-658 has not yet been
-formalized; `RoundingToProjectorsWitness` only gives the weaker bound
-`∑_a q_a ≤ (1 + 2√ζ)I` (issue #651). The broader downstream `QXPLayerData`
-pipeline still lacks a concrete `X / XHat / P` producer because Mathlib has no
-general complex-matrix SVD API (issue #652). -/
+fully formalized; `RoundingToProjectorsWitness` only gives the weaker bound
+`∑_a q_a ≤ (1 + 2√ζ)I` (issue #651). The combinatorial core of that
+truncation argument — the pairwise "Large/Small" double-counting bound and
+the resulting `4√ζ` overlap estimate — is factored out in
+`QXPLayer/TruncationCombinatorics.lean`; the remaining gap is the per-
+projector orthonormal range decomposition `R_a = ∑_i |v_{a,i}⟩⟨v_{a,i}|`
+needed to instantiate the `Large/Small` index set and to build `Q_a` as a
+genuine matrix. The broader downstream `QXPLayerData` pipeline still lacks
+a concrete `X / XHat / P` producer because Mathlib has no general complex-
+matrix SVD API (issue #652). -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome]

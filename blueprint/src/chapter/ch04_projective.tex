@@ -358,6 +358,29 @@
 		where the last estimate uses $\delta \leq 1/2$. Setting $\delta=\sqrt{\zeta}$ gives the claim, and \ref{eq:assumption-on-zeta} ensures $\delta \leq 1/2$.
 	\end{proof}
 
+	\begin{lemma}[Combinatorial averaging for the $r > d$ branch]\label{lem:small-overlap-averaging}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_mul_sum_small_le,
+			MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_univ_mul_sum_compl_le,
+			MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.sum_small_le_four_sqrt}
+		\leanok
+		Let $f : \alpha \to \mathbb{R}$ be a function on a finite index set $\alpha$ with
+		$|\alpha| = r$, and let $L \subseteq \alpha$ with $|L| = d$ and $d < r$. Write
+		$S = L^\complement$ and assume $f(s) \leq f(l)$ for every $s \in S$ and $l \in L$.
+		Then the pairwise double-counting inequality
+		\[
+			|L|\, \sum_{s \in S} f(s) \leq |S|\, \sum_{l \in L} f(l)
+		\]
+		holds, and hence also
+		\[
+			r\, \sum_{s \in S} f(s) \leq |S|\, \sum_{x \in \alpha} f(x).
+		\]
+		If in addition $r \leq (1+2\sqrt{\zeta})\,d$, $\sum_{x \in \alpha} f(x) \leq
+		1 + 2\sqrt{\zeta}$, and $0 \leq \zeta \leq 1/4$, then
+		\[
+			\sum_{s \in S} f(s) \leq 4\sqrt{\zeta}.
+		\]
+	\end{lemma}
+
 	\begin{lemma}[Rank reduction]\label{lem:projective-low-rank-sum}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum}
 		There exists a set of projection matrices $\{Q_a\}$ such that
@@ -374,7 +397,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
-		\uses{lem:projective-non-measurement, prop:triangle-inequality-for-approx_delta}
+		\uses{lem:projective-non-measurement, lem:small-overlap-averaging, prop:triangle-inequality-for-approx_delta}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_projectors}
 		Let $\{R_a\}$ be given by \ref{lem:projective-non-measurement}. Write $r_a=\mathrm{rank}(R_a)$ and $r=\sum_a r_a$. If $r \leq d$, take $Q_a=R_a$. Otherwise,
 		\begin{equation}\label{eq:bound-on-r}
