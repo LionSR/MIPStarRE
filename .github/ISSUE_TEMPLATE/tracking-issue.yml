@@ -7,7 +7,9 @@ body:
       value: |
         ## Tracking Issue
         Use this template to create an issue that tracks progress across multiple related issues and PRs.
-        List each sub-task inside a native tasklist block so GitHub shows "Tracked by" on child issues.
+        Attach each tracked issue as a GitHub sub-issue after creating the
+        parent. The body can keep a readable index, but markdown checkboxes and
+        retired tasklist fences do not create native sub-issue relationships.
 
   - type: input
     id: area
@@ -30,24 +32,20 @@ body:
   - type: textarea
     id: tasks
     attributes:
-      label: Tracked Tasks
+      label: Sub-Issue Index
       description: |
-        List issues/PRs to track using a native tasklist block.
-        Each line must contain only the issue reference (no descriptions).
-        The workflow will automatically update checkboxes when issues are closed or PRs are merged.
+        List issue references that should be attached as GitHub sub-issues.
+        After creation, add them through the issue sidebar or the sub-issues API.
+        This field is a readable index only.
       value: |
-        ```[tasklist]
         ### Tasks
-        - [ ] #
-        - [ ] #
-        - [ ] #
-        ```
+        - #
+        - #
+        - #
       placeholder: |
-        ```[tasklist]
         ### Tasks
-        - [ ] #42
-        - [ ] #43
-        ```
+        - #42
+        - #43
     validations:
       required: true
 
