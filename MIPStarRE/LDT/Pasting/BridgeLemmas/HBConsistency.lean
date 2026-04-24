@@ -1,0 +1,149 @@
+import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint
+import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation
+
+/-!
+# Section 12 pasting: H-B consistency
+
+Aggregation bridge proving `lem:h-b-consistency` from the one-point line consistency statements.
+
+## References
+
+- `references/ldt-paper/ld-pasting.tex`
+- `blueprint/src/chapter/ch09_pasting.tex`
+-/
+
+namespace MIPStarRE.LDT.Pasting
+
+open MIPStarRE.LDT
+open MIPStarRE.LDT.ExpansionHypercubeGraph
+open MIPStarRE.LDT.CommutativityPoints
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- Bridge: aggregate one-point consistency bounds over all slice indices,
+plus the distinct-tuple approximation error.
+
+Paper reference: `lem:h-b-consistency` proof in `ld-pasting.tex`
+lines 1050–1091.
+
+Steps:
+1. Expand using degree constraints to find eligible index `i`
+2. Switch from independent to distinct samples (`prop:ld-dnoteq`, cost `k²/q`)
+3. Union bound over `k` indices, each contributing `ν₅`
+4. Total: `k·ν₅ + k²/q ≤ 44k²m(...)` -/
+private lemma hBConsistency_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    ConsRel strategy.state
+      (uniformDistribution (VerticalLineQuestion params))
+      (hRestrictionToVerticalLine params
+        (constructedPastedSubMeas params family k))
+      (verticalLineMeasurementFamily params strategy)
+      (hBConsistencyError params eps delta gamma zeta k) := by
+  constructor
+  have heps_nonneg : 0 ≤ eps := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params.next))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy))
+      hgood.axisParallelTest
+  have hdelta_nonneg : 0 ≤ delta := by
+    exact le_trans
+      (bipartiteSSCError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      hgood.selfConsistencyTest
+  have hgamma_nonneg : 0 ≤ gamma := by
+    have : 0 ≤ strategy.diagonalFailureProbability := by
+      unfold SymStrat.diagonalFailureProbability
+      exact mul_nonneg (by positivity)
+        (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
+    exact le_trans this hgood.diagonalLineTest
+  have hzeta_nonneg : 0 ≤ zeta := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        family.evaluatedAtNextPoint)
+      hcons.pointConsistency.offDiagonalBound
+  calc
+    bipartiteConsError strategy.state
+        (uniformDistribution (VerticalLineQuestion params))
+        (hRestrictionToVerticalLine params (constructedPastedSubMeas params family k))
+        (verticalLineMeasurementFamily params strategy)
+      = avgOver (uniformDistribution (Point params)) (fun u =>
+          qBipartiteConsDefect strategy.state
+            (hRestrictionToVerticalLine params (constructedPastedSubMeas params family k) u)
+            (verticalLineMeasurementFamily params strategy u)) := by
+            rfl
+    _ ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (distinctTupleDistribution params k) (fun xs =>
+            qBipartiteConsDefect strategy.state
+              (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+              (verticalLineMeasurementFamily params strategy u))) := by
+            exact avgOver_mono _ _ _ (fun u =>
+              hBConsistency_fixed_u_defect_le_avgOver_distinct params strategy family k u)
+    _ ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (distinctTupleDistribution params k) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs)) := by
+            exact avgOver_mono _ _ _ (fun u =>
+              avgOver_distinct_pasted_defect_le_badMass params strategy family u)
+    _ ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs) +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error)) := by
+            exact avgOver_mono _ _ _ (fun u =>
+              avgOver_distinct_badMass_le_avgOver_uniform_badMass_add_dnoteq params strategy family u)
+    _ = avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs)) +
+        ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+            rw [avgOver_add]
+            simpa using avgOver_uniform_const (α := Point params)
+              (((k : Error) ^ (2 : ℕ)) / (params.q : Error))
+    _ ≤ (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+            gcongr
+            exact avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
+              params strategy family eps delta gamma zeta k hline
+    _ ≤ hBConsistencyError params eps delta gamma zeta k := by
+            exact hBConsistency_error_bound params eps delta gamma zeta k hd
+              heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+
+/-- `lem:h-b-consistency`. -/
+lemma hBConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    HBConsistencyStatement params strategy family
+        eps delta gamma zeta k := by
+  exact ⟨hBConsistency_core params strategy eps delta gamma zeta
+    hgood hd family hcons hself hbound k hline⟩
+
+
+end MIPStarRE.LDT.Pasting

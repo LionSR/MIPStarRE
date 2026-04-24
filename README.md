@@ -12,148 +12,110 @@ Formalization project for mathematics around $\mathrm{MIP}^*=\mathrm{RE}$.
 
 The current active proof-following track is:
 
-- arXiv:2009.12982, *Quantum soundness of the classical low individual degree test*
+- arXiv:2009.12982, *Quantum soundness of the classical low individual degree test* (LDT).
 
-Inside the repo, the working paper source for this track is the modular mirror:
+The in-repo paper source mirror lives at `references/ldt-paper/`.
 
-- `references/ldt-paper/`
+The older 2111 tensor-code track is **preserved** as a blueprint snapshot only (see `blueprint/legacy/`) and is no longer the active source of truth.
 
-The older 2111 tensor-code track is **preserved**, but it is no longer the active source of truth.
+## Source-of-truth order (LDT)
 
-## Current source of truth
+When working on the active track, consult these locations in this order:
 
-For the active LDT track, use these files in this order:
+1. **`references/ldt-paper/`** — in-repo TeX source mirror for the paper. This is the mathematical ground truth.
+2. **`blueprint/src/chapter/`** — active, dependency-tracked LaTeX blueprint with Lean cross-references (`\lean{}`, `\leanok`).
+3. **`MIPStarRE/`** — Lean scaffold that matches the blueprint. Declarations in `MIPStarRE.LDT.*` are cross-referenced from the blueprint.
 
-1. `references/ldt-paper/` — in-repo TeX source mirror for the paper
-2. `blueprint/src/` — active dependency-tracked blueprint
-3. `MIPStarRE/Paper2009LDT/` — Lean naming/matching scaffold
-4. `docs/20260320_ldt_source_map.md` — current source-file / theorem-ownership map
-5. `docs/20260320_ldt_blueprint_dependency_review.md` — dated dependency-review snapshot for context, not the canonical source of truth
+Supporting notes:
 
-The current blueprint is organized by **theorem ownership and proof dependency**, not by raw TeX input order.
+- `docs/audit/20260320_ldt_source_map.md` — source-file / theorem-ownership map
+- `docs/audit/20260320_ldt_blueprint_dependency_review.md` — dated dependency-review snapshot (context, not canonical)
 
-## Current repository state
+The blueprint is organized by **theorem ownership and proof dependency**, not by raw TeX input order.
 
-The repo now contains three distinct layers.
+## Repository layout
 
-### 1. Active LDT blueprint
+```
+MIPStarRE/
+├── Quantum/               # Reusable matrix / measurement infrastructure
+│   ├── FiniteMatrix.lean
+│   └── Measurement.lean
+└── LDT/                   # Low individual degree test (13 submodules)
+    ├── Basic/
+    ├── Test/
+    ├── Preliminaries/
+    ├── MakingMeasurementsProjective/
+    ├── MainInductionStep/
+    ├── ExpansionHypercubeGraph/
+    ├── GlobalVariance/
+    ├── SelfImprovement/
+    ├── CommutativityPoints/
+    ├── Commutativity/
+    └── Pasting/
+```
 
-- `blueprint/src/content.tex` is now a router.
-- The active chapter files live under `blueprint/src/chapter/`.
-- The blueprint targets the low-individual-degree paper and links to declarations in `MIPStarRE.Paper2009LDT.*`.
+Each LDT submodule typically contains `Defs.lean` and `Theorems.lean`. The root module `MIPStarRE.lean` re-exports `MIPStarRE.Quantum` and `MIPStarRE.LDT`.
 
-### 2. Active Lean matching scaffold
+Top-level directories:
 
-- `MIPStarRE/Paper2009LDT/` contains section-by-section Lean files for Sections 3--12.
-- This is currently a **matching scaffold**:
-  - lightweight paper-local definitions,
-  - theorem statements present,
-  - proofs mostly `by sorry`.
-- The purpose of this layer is to stabilize declaration names and match the blueprint before proof filling.
-
-### 3. Preserved legacy material
-
-- `blueprint/legacy/content_2111_strict_20260320.tex`
-- `blueprint/legacy/references_2111_strict_20260320.bib`
-- `MIPStarRE/Paper2111/`
-- archived 2111 notes under `docs/`, including `docs/20260308_strict_2111_roadmap.md`, `docs/20260308_strict_2111_effort_estimate.md`, `docs/20260308_lean_quantuminfo_reuse_2111.md`, and `docs/20260307_mathlib_api_2111.md`
-
-These preserve the earlier 2111 work and should not be treated as the active track.
+- `MIPStarRE/` — Lean source (see above)
+- `blueprint/src/` — active LDT blueprint (chapters under `blueprint/src/chapter/`)
+- `blueprint/legacy/` — preserved 2111 blueprint snapshots
+- `references/ldt-paper/` — in-repo TeX source for the LDT paper
+- `docs/` — contributor guides, style, naming, proof integrity, CI notes
+- `docs/audit/` — dated chapter-by-chapter dependency-scouting reports
 
 ## Recommended proof-filling order
 
 The source-file order is not the proof-dependency order. The recommended implementation order is:
 
-1. Sections 3--4: test setup and preliminaries
+1. Sections 3–4: test setup and preliminaries
 2. Section 5: making measurements projective
-3. Sections 7--8: expansion and global variance
+3. Sections 7–8: expansion and global variance
 4. Section 9: self-improvement
-5. Sections 10--11: commutativity
+5. Sections 10–11: commutativity
 6. Section 12: pasting
 7. Section 6: main induction wrapper
 
-This is the order suggested by the rebuilt blueprint and the independent dependency review.
-
-## Dependency picture
-
-A first dependency audit is recorded in:
-
-- `docs/20260320_ldt_blueprint_dependency_review.md`
-
-Short version:
-
-### Likely already supported reasonably well by Mathlib
-- finite-dimensional complex matrices
-- Hermitian / PSD operators
-- trace identities
-- Hermitian spectral theorem
-- positive square roots / continuous functional calculus
-- finite fields, Frobenius, trace
-- additive characters / finite-field Fourier ingredients
-- some scalar probability and binomial concentration tools
-
-### Likely requiring thin local wrappers
-- paper-specific measurement postprocessing and completion
-- the relations $\simeq_\delta$, $\approx_\delta$, and strong self-consistency
-- hypercube operator normalization
-- sandwiched-product constructions and completed families like $\widehat G$
-- operator-polynomial notation used in pasting
-
-### Likely requiring substantial local development
-- POVM / Naimark infrastructure
-- the SVD-based orthonormalization chain in Section 5
-- SDP duality / complementary slackness in Section 9
-- weighted hypercube spectral package in the paper's normalization
-- matrix Chernoff in Section 12
-- the paper's exact Schwartz--Zippel wrappers
-
-## Important architectural note
-
-The current `Paper2009LDT` Lean files are a **bridge layer**, not yet the final semantic foundation.
-
-The likely long-term direction is to rebase the semantic development onto the existing honest matrix/measurement layer already in the repo:
-
-- `MIPStarRE/Quantum/FiniteMatrix.lean`
-- `MIPStarRE/Quantum/Measurement.lean`
-- `MIPStarRE/Quantum/OutcomeFamily.lean`
-
-So the present scaffold should be read as:
-
-- blueprint-matching names first,
-- semantic rebase next,
-- proofs after that.
-
-## Repository layout
-
-- `MIPStarRE/Quantum/` — reusable matrix / measurement infrastructure
-- `MIPStarRE/Codes/` — coding-theoretic infrastructure
-- `MIPStarRE/Games/` — game/test geometry and related scaffolding
-- `MIPStarRE/Paper2009LDT/` — active paper-local scaffold for the LDT paper
-- `MIPStarRE/Paper2111/` — preserved older 2111 track
-- `blueprint/` — active blueprint and legacy blueprint snapshots
-- `docs/` — source maps, dependency reviews, and planning notes
-- `references/` — in-repo paper sources and bibliographic material
-
 ## Build
+
+**Toolchain**: See `lean-toolchain` and `lakefile.toml` for the pinned Lean and Mathlib versions.
 
 From the repo root:
 
 ```bash
+# First-time setup: fetch the Mathlib cache, then build
 lake exe cache get
 lake build
+
+# Type-check a single file (fastest iteration loop)
+lake env lean MIPStarRE/LDT/SelfImprovement/Defs.lean
+
+# Check declarations referenced from the blueprint
+lake exe checkdecls blueprint/lean_decls
 ```
 
-Blueprint commands are run from the repo root with the local Python tool path available, e.g.
+Blueprint commands (from the repo root, with `leanblueprint` on your `PATH`):
 
 ```bash
-PATH="$HOME/Library/Python/3.9/bin:$PATH" leanblueprint pdf
-PATH="$HOME/Library/Python/3.9/bin:$PATH" leanblueprint web
+leanblueprint pdf    # PDF output
+leanblueprint web    # HTML output
 ```
 
-## Current status summary
+## Contributing
 
-- active blueprint rebuilt for the LDT paper
-- `Paper2009LDT` Lean scaffold added
-- blueprint-to-Lean naming pass completed
-- `lake build` passes
-- next major step: semantic rebase of Sections 3--4, then dependency-ordered proof filling
+Start with [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) for PR/issue conventions and the review checklist. Key references:
+
+| File | Purpose |
+|------|---------|
+| `docs/CONTRIBUTING.md` | PR format, issue templates, label taxonomy, review checklist |
+| `docs/PROOF_INTEGRITY.md` | Blocker / warning patterns for proof correctness |
+| `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
+| `docs/naming.md` | Mathlib naming conventions (70+ rules, symbol dictionary) |
+| `docs/doc.md` | Documentation standards (module headers, docstrings) |
+| `docs/blueprint_style_guide.md` | Blueprint notation and section conventions |
+| `docs/pr-review.md` | Detailed PR review guidelines |
+| `docs/ci-automation.md` | CI/CD workflow details |
+| `docs/audit/` | Chapter-by-chapter Mathlib dependency scouting reports |
+
+When adding or completing a declaration, update the corresponding blueprint entry in `blueprint/src/chapter/`: add `\lean{DeclName}` and `\leanok` for new results, or `\leanok` on `\begin{proof}` for newly proven results.

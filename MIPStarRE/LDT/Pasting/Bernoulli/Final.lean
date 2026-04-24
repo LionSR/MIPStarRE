@@ -1,4 +1,7 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
+import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
+import MIPStarRE.LDT.Pasting.BridgeLemmas.HAConsistency
+import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes
 
 /-!
 # Section 12 pasting: final pasting theorems
@@ -248,6 +251,7 @@ lemma ldPastingSubMeas
     (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
     (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -262,7 +266,7 @@ lemma ldPastingSubMeas
   refine ⟨constructedPastedSubMeas params family k, rfl, ?_⟩
   have hconsistency :=
     hAConsistency_submeas params strategy eps delta gamma kappa zeta
-      hgood hgamma_le hzeta_le hdq_le
+      hgood hgamma_le hzeta_le hdq_le hd
       family hcomplete hcons hself hbound k hk_pos hk
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
@@ -283,6 +287,7 @@ theorem ldPasting
     (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
     (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -297,7 +302,7 @@ theorem ldPasting
   refine ⟨constructedPastedMeasurement params family k, rfl, ?_⟩
   have hsubmeasConsistency :=
     hAConsistency_submeas params strategy eps delta gamma kappa zeta
-      hgood hgamma_le hzeta_le hdq_le
+      hgood hgamma_le hzeta_le hdq_le hd
       family hcomplete hcons hself hbound k hk_pos hk
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
