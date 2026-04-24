@@ -1,18 +1,36 @@
 #!/usr/bin/env bash
 # Shared deploy logic for pushing to the Pages branch.
-# Usage: ./scripts/deploy-to-gh-pages.sh [--with-docs] [--ci]
+# Usage: ./scripts/deploy-to-gh-pages.sh [--with-docs] [--badges-dir DIR] [--badges-only] [--ci]
 #
 # --with-docs   Also deploy API docs from docbuild/.lake/build/doc (fails if missing)
+# --badges-dir  Also deploy Shields.io endpoint JSON files from DIR to badges/
+# --badges-only Deploy only badges, skipping blueprint, homepage, and docs
 # --ci          Use github-actions[bot] as committer instead of local git config
 set -euo pipefail
 
 WITH_DOCS=false
+BADGES_ONLY=false
 CI_MODE=false
-for arg in "$@"; do
-  case $arg in
+BADGES_DIR=""
+while [ "$#" -gt 0 ]; do
+  case $1 in
     --with-docs) WITH_DOCS=true ;;
+    --badges-only) BADGES_ONLY=true ;;
+    --badges-dir)
+      if [ "$#" -lt 2 ]; then
+        echo "::error::--badges-dir requires a directory argument"
+        exit 1
+      fi
+      BADGES_DIR="$2"
+      shift
+      ;;
     --ci) CI_MODE=true ;;
+    *)
+      echo "::error::unknown argument: $1"
+      exit 1
+      ;;
   esac
+  shift
 done
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -36,22 +54,36 @@ fi
 echo "==> Cloning $TARGET_BRANCH branch..."
 git clone --branch "$TARGET_BRANCH" --single-branch --depth 1 "$REPO_URL" "$WORK_DIR/site"
 
-# Update blueprint
-echo "==> Updating blueprint..."
-rm -rf "$WORK_DIR/site/blueprint"
-mkdir -p "$WORK_DIR/site/blueprint"
-cp -r "$REPO_ROOT/blueprint/web/." "$WORK_DIR/site/blueprint/"
-# Copy fresh PDF if available; leave existing PDF untouched otherwise
-if [ -f "$REPO_ROOT/blueprint/print/print.pdf" ]; then
-  cp "$REPO_ROOT/blueprint/print/print.pdf" "$WORK_DIR/site/blueprint.pdf"
+if [ "$BADGES_ONLY" != true ]; then
+  # Update blueprint
+  echo "==> Updating blueprint..."
+  rm -rf "$WORK_DIR/site/blueprint"
+  mkdir -p "$WORK_DIR/site/blueprint"
+  cp -r "$REPO_ROOT/blueprint/web/." "$WORK_DIR/site/blueprint/"
+  # Copy fresh PDF if available; leave existing PDF untouched otherwise
+  if [ -f "$REPO_ROOT/blueprint/print/print.pdf" ]; then
+    cp "$REPO_ROOT/blueprint/print/print.pdf" "$WORK_DIR/site/blueprint.pdf"
+  fi
+
+  # Update homepage (remove all homepage files first, then copy fresh)
+  echo "==> Updating homepage..."
+  rm -rf "$WORK_DIR/site/_layouts" "$WORK_DIR/site/assets" \
+         "$WORK_DIR/site/_config.yml" "$WORK_DIR/site/index.md" \
+         "$WORK_DIR/site/404.html" "$WORK_DIR/site/Gemfile"
+  cp -r "$REPO_ROOT/home_page/." "$WORK_DIR/site/"
 fi
 
-# Update homepage (remove all homepage files first, then copy fresh)
-echo "==> Updating homepage..."
-rm -rf "$WORK_DIR/site/_layouts" "$WORK_DIR/site/assets" \
-       "$WORK_DIR/site/_config.yml" "$WORK_DIR/site/index.md" \
-       "$WORK_DIR/site/404.html" "$WORK_DIR/site/Gemfile"
-cp -r "$REPO_ROOT/home_page/." "$WORK_DIR/site/"
+# Update badge endpoint files
+if [ -n "$BADGES_DIR" ]; then
+  if [ ! -d "$BADGES_DIR" ]; then
+    echo "::error::Badge directory not found: $BADGES_DIR"
+    exit 1
+  fi
+  echo "==> Updating badges..."
+  rm -rf "$WORK_DIR/site/badges"
+  mkdir -p "$WORK_DIR/site/badges"
+  cp -r "$BADGES_DIR/." "$WORK_DIR/site/badges/"
+fi
 
 # Update API docs (only with --with-docs)
 if [ "$WITH_DOCS" = true ]; then
@@ -81,6 +113,7 @@ if git diff --cached --quiet; then
 else
   MSG="Update blueprint"
   [ "$WITH_DOCS" = true ] && MSG="Full docs update"
+  [ "$BADGES_ONLY" = true ] && MSG="Update Lean badges"
   git commit -m "$MSG ($(date -u '+%Y-%m-%d %H:%M UTC'))"
   git push origin "$TARGET_BRANCH"
   echo "==> Deployed!"

@@ -12,7 +12,12 @@ from pathlib import Path
 
 
 SORRY_RE = re.compile(r"\bsorry\b")
-AXIOM_RE = re.compile(r"(?m)^\s*axiom\s+[A-Za-z_]")
+AXIOM_RE = re.compile(
+    r"(?m)^\s*"
+    r"(?:@\[[^\]\n]*(?:\n\s*[^\]\n]*)*\]\s*)*"
+    r"(?:(?:private|protected|noncomputable|unsafe|partial)\s+)*"
+    r"axiom\s+[A-Za-z_]"
+)
 
 
 def tracked_lean_files(repo_root: Path) -> list[Path]:
