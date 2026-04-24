@@ -90,8 +90,8 @@ jobs:
 
             ### Tracking Issues
 
-            Tracking issues have the `tracking` label and use **native GitHub
-            sub-issues** for progress tracking:
+            Tracking issues have the `tracking` label and use
+            **native GitHub sub-issues** for progress tracking:
 
             ```markdown
             ### Tasks
@@ -223,7 +223,7 @@ jobs:
             3. Suggest next steps for each tracking issue (see §5 below).
             4. **Comment on each tracking issue** (check recent comments
                first to avoid duplicates — Key Rules §3) with a summary:
-               the PR title, what it accomplished, current task progress,
+               the PR title, what it accomplished, current sub-issue progress,
                and a follow-up suggestion. Example:
                "📦 PR #X (*title*) merged. <what was done>. [X/Y sub-issues
                complete]
