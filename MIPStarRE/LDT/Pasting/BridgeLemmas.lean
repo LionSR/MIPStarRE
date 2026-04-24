@@ -4441,10 +4441,18 @@ private lemma hBConsistency_core
   * pay the `ldDnoteq` distinct-vs-uniform cost and union-bound over the
     offending coordinate.
 
-  The genuine remaining technical blocker is the missing interpolation
-  correctness API for `interpolateCompletedSlices`: we still need lemmas showing
-  that the canonical interpolant chosen by `interpolateCompletedSlices` agrees
-  with each supported completed slice whenever the tuple is globally consistent.
+  Interpolation correctness is now available as
+  `interpolateCompletedSlicesFromSupport_restrictAtHeight_of_mem` (see
+  `Defs/Interpolation.lean`): for every `i ∈ σ` in the interpolation support
+  (chosen by `interpolationSupportWitness`, giving `d + 1` distinct nodes), the
+  canonical Lagrange interpolant's restriction at height `xs i` matches the slice
+  polynomial `(gs i).get _`. Combined with the existing
+  `nonglobal_gives_slice_mismatch_against_interpolant`, this gives the shape
+  needed for the offending-coordinate argument.
+
+  The remaining blockers in this proof are downstream: the flat-chain induction
+  for `commuteGHalfSandwich_core` (tracked in #639), plus the full
+  `ldSandwichLineOnePoint` aggregation.
   -/
   sorry
 
@@ -4976,10 +4984,15 @@ lemma overAllOutcomes
   so the Lean target now records that scalar mass difference directly rather than
   an over-strong `SDDRel` on `Unit`-indexed totals.
 
-  Current blockers after the split audit:
-  * the interpolation-to-global-polynomial correctness step still needs the
-    missing `Defs/Interpolation` comparison lemmas in the exact shapes consumed
-    here;
+  Interpolation correctness is now available as
+  `interpolateCompletedSlicesFromSupport_restrictAtHeight_of_mem` (see
+  `Defs/Interpolation.lean`): it establishes that on the canonical `d + 1`-node
+  interpolation support `σ` chosen by `interpolationSupportWitness`, the
+  Lagrange interpolant agrees with every `gᵢ` for `i ∈ σ`. Together with
+  `nonglobal_gives_slice_mismatch_against_interpolant` this is the API used by
+  the paper's "unique $h^*$ interpolates $g_1, \ldots, g_{d+1}$" step.
+
+  Current remaining blockers after the split audit:
   * the final sandwich aggregation still depends on `ldSandwichLineOnePoint`.
     The old `ldGbcon` / swap-orientation blocker is gone, but the two local
     Cauchy–Schwarz transport steps in `ldSandwichLineOnePoint_core` are still

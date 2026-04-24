@@ -252,4 +252,98 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
         _ ≤ params.d + 0 := Nat.add_le_add hLiMv hslice_zero
         _ = params.d := by simp
 
+/-- **Lagrange interpolation correctness on the support.**
+
+Restricting `interpolateCompletedSlicesFromSupport` at the height `xs i` for `i ∈ σ`
+recovers the completed slice polynomial `(gs i).get _`. This is the defining property
+of Lagrange interpolation: with `d+1` distinct nodes `xs j` for `j ∈ σ`, the canonical
+interpolant agrees with the interpolating values exactly at those nodes.
+
+The proof collapses the sum via `Finset.sum_eq_single` at `⟨i, hi⟩`: the Lagrange basis
+polynomial `Lⱼ` evaluates to `1` at `v i = decodeScalar (xs i)` when `j = i`, and to `0`
+otherwise, and the `rename` + `eval₂Hom` simplification on each slice term returns the
+original slice polynomial.
+
+This lemma is the core reusable interpolation-correctness API used by
+`hBConsistency_core` and `overAllOutcomes`: their paper arguments hinge on the
+interpolant agreeing with each of the `d+1` genuine outcomes in the interpolation
+support. -/
+theorem interpolateCompletedSlicesFromSupport_restrictAtHeight_of_mem
+    (params : Parameters) [FieldModel params.q] {k : ℕ}
+    (xs : PointTuple params k) (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (σ : Finset (Fin k))
+    (hσsupport : σ ⊆ gHatTupleSupport gs)
+    (hσcard : σ.card = params.d + 1)
+    {i : Fin k} (hi : i ∈ σ) :
+    (Polynomial.restrictAtHeight params
+        (interpolateCompletedSlicesFromSupport params xs gs σ hσsupport hσcard)
+        (xs i)).poly =
+      (extractSlicePoly gs i (hσsupport hi)).poly := by
+  classical
+  have hvinj : Set.InjOn (fun j : Fin k => decodeScalar (xs j)) (↑σ : Set (Fin k)) := by
+    intro a _ b _ hab
+    apply hxs
+    have := congrArg (encodeScalar (params := params)) hab
+    simpa using this
+  have hcomp :
+      ((MvPolynomial.eval₂Hom
+          (MvPolynomial.C : Scalar params →+* PolynomialModel params)
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+        MvPolynomial.C) = MvPolynomial.C := by
+    ext r; simp
+  have hxLast :
+      MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.X (lastCoord params) : PolynomialModel params.next) =
+        (MvPolynomial.C (decodeScalar (xs i)) : PolynomialModel params) := by
+    rw [MvPolynomial.eval₂Hom_X']
+    unfold Polynomial.restrictAtHeightCoordinateMap lastCoord
+    simp
+  have hcoord_on_embed :
+      Polynomial.restrictAtHeightCoordinateMap params (xs i) ∘ embedCoord params =
+        (MvPolynomial.X : Fin params.m → PolynomialModel params) := by
+    funext j
+    simp [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord]
+  have hLi (idx : Fin k) :
+      MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          ((Lagrange.basis σ (fun j => decodeScalar (xs j)) idx).eval₂ MvPolynomial.C
+            (MvPolynomial.X (lastCoord params))) =
+        (MvPolynomial.C
+            ((Lagrange.basis σ (fun j => decodeScalar (xs j)) idx).eval
+              (decodeScalar (xs i))) :
+          PolynomialModel params) := by
+    rw [_root_.Polynomial.hom_eval₂
+      (p := Lagrange.basis σ (fun j => decodeScalar (xs j)) idx)
+      (f := MvPolynomial.C)
+      (g := MvPolynomial.eval₂Hom MvPolynomial.C
+        (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+      (x := MvPolynomial.X (lastCoord params))]
+    rw [hcomp, hxLast, _root_.Polynomial.eval₂_at_apply]
+  have hrename (j : Fin k) (hj : j ∈ σ) :
+      MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          (MvPolynomial.rename (embedCoord params)
+            (extractSlicePoly gs j (hσsupport hj)).poly) =
+        (extractSlicePoly gs j (hσsupport hj)).poly := by
+    rw [MvPolynomial.eval₂Hom_rename, hcoord_on_embed]
+    exact MvPolynomial.eval₂_eta _
+  change MvPolynomial.eval₂Hom MvPolynomial.C
+      (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+      (∑ idx ∈ σ.attach,
+        ((Lagrange.basis σ (fun j => decodeScalar (xs j)) idx.1).eval₂ MvPolynomial.C
+            (MvPolynomial.X (lastCoord params))) *
+          (MvPolynomial.rename (embedCoord params)
+            (extractSlicePoly gs idx.1 (hσsupport idx.2)).poly)) = _
+  rw [map_sum]
+  refine (Finset.sum_eq_single_of_mem (⟨i, hi⟩ : { j // j ∈ σ })
+    (Finset.mem_attach σ _) ?_).trans ?_
+  · rintro ⟨j, hjσ⟩ _hmem hne
+    rw [map_mul, hLi j, hrename j hjσ]
+    have hne' : j ≠ i := fun heq => hne (Subtype.ext heq)
+    simp [Lagrange.eval_basis_of_ne hne' hi]
+  · rw [map_mul, hLi i, hrename i hi]
+    simp [Lagrange.eval_basis_self hvinj hi]
+
 end MIPStarRE.LDT.Pasting
