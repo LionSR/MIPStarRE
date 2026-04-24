@@ -375,25 +375,38 @@ structure OverAllOutcomesStatement (params : Parameters)
         overAllOutcomesExpansionMass params strategy family k| ≤
       overAllOutcomesError params eps delta gamma zeta k
 
-/-- Scalar expectation of the stage-`ℓ` left recurrence operator from
-`lem:from-H-to-G`. -/
-noncomputable def fromHToGRecurrenceLeftMass (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : Error :=
-  ev ψbi (((IdxOpFamily.liftLeft
-    (fromHToGRecurrenceLeftFamily params strategy family k ℓ τ)) ()).total)
+/-- Scalar expectation of one per-tail contribution in `lem:from-H-to-G`.
 
-/-- Scalar expectation of the stage-`ℓ` right recurrence operator from
-`lem:from-H-to-G`. -/
-noncomputable def fromHToGRecurrenceRightMass (params : Parameters)
+This is the single-`τ_{≥ℓ}` term appearing inside the aggregate stage mass from
+`references/ldt-paper/ld-pasting.tex`, equation
+`eq:i-think-this-is-what-i'm-supposed-to-prove-2` (lines 1386–1391), and the
+mirrored blueprint discussion in `blueprint/src/chapter/ch09_pasting.tex`.
+The parameter `prefixLen` is the Lean 0-based stage index. In the ambient
+`k`-step recurrence, the remaining tail length is `tailLen = k - prefixLen`. -/
+noncomputable def fromHToGTailStageMass (params : Parameters)
     [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι) (k ℓ : ℕ) (τ : GHatType k) : Error :=
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) : Error :=
   ev ψbi (((IdxOpFamily.liftLeft
-    (fromHToGRecurrenceRightFamily params strategy family k ℓ τ)) ()).total)
+    (fromHToGTailStageFamily params family prefixLen τtail)) ()).total)
+
+/-- Scalar expectation of the full Lean stage-`ℓ` quantity from `lem:from-H-to-G`.
+
+This is the aggregate quantity displayed in
+`references/ldt-paper/ld-pasting.tex`, equation
+`eq:i-think-this-is-what-i'm-supposed-to-prove-2` (lines 1386–1391), and in the
+matching blueprint section `blueprint/src/chapter/ch09_pasting.tex`.
+Lean uses 0-based indexing: stage `ℓ` here corresponds to the paper's stage
+`ℓ + 1`, so the remaining tail has length `k - ℓ`. Accordingly, this sums over
+all remaining tail types `τ_{≥ℓ} ∈ {0,1}^{k-ℓ}`, while the next Lean stage
+`ℓ + 1` sums over the shorter tails `τ_{>ℓ}`. -/
+noncomputable def fromHToGStageMass (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) : Error :=
+  ∑ τtail : GHatType (k - ℓ),
+    fromHToGTailStageMass params ψbi family ℓ τtail
 
 /-- Scalar expectation of the left-hand side of `lem:from-H-to-G`, i.e. the
 uniform average of the eligible pasted-sandwich total mass. -/
@@ -418,7 +431,8 @@ noncomputable def fromHToGBernoulliTailMass (params : Parameters)
 
 The paper's displayed statement is a scalar approximation of expectation values,
 not a new `≈_δ` relation between submeasurements.  Accordingly, this bundle
-stores the per-step and final absolute-value inequalities for those masses. -/
+stores the adjacent stage-mass inequalities and the final all-outcomes vs.
+Bernoulli-tail comparison. -/
 structure FromHToGStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -426,9 +440,9 @@ structure FromHToGStatement (params : Parameters)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceStep :
-    ∀ ℓ : ℕ, ℓ < k → ∀ (τ : GHatType k),
-      |fromHToGRecurrenceLeftMass params strategy ψbi family k ℓ τ -
-          fromHToGRecurrenceRightMass params strategy ψbi family k ℓ τ| ≤
+    ∀ ℓ : ℕ, ℓ < k →
+      |fromHToGStageMass params ψbi family k ℓ -
+          fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
         fromHToGRecurrenceError params gamma zeta k
   bernoulliPolynomialRewrite :
     |fromHToGAllOutcomesMass params strategy ψbi family k -
