@@ -214,7 +214,7 @@ private lemma evaluatedSlice_phaseFive_stability_gap
             rfl
     _ ≤ Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := hstab
 
-/-- Scalar approximation chain for the evaluated-slice commutation.
+/* Scalar approximation chain for the evaluated-slice commutation.
 
 This is the core of the paper's proof of `lem:comm-data-processed-g`
 (`references/ldt-paper/commutativity-G.tex`, lines 72–131).
@@ -231,7 +231,10 @@ Starting from `E[∑ ABAB]`, the proof applies ten approximation steps:
 6–7. `≈_{2√ζ + 2√ζ}`: reverse the `eq:add-an-a` insertions
 8–9. `≈_{√ζ + √ζ}`: apply postprocessed self-consistency twice
 
-Summing: `Σεᵢ = 12√ζ + 12√(γ(m+1))`, so `2 * Σεᵢ ≤ 48m(√γ + √ζ)`. -/
+Summing: `Σεᵢ = 12√ζ + 12√(γ(m+1))`, so `2 * Σεᵢ ≤ 48m(√γ + √ζ)`. */
+-- The scalar-chain assembly unfolds several large averaged expressions; a local
+-- heartbeat bump keeps the direct `simpa` bridges for phases 2 and 5 stable.
+set_option maxHeartbeats 2000000 in
 private lemma evaluatedSlice_scalar_chain_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -435,12 +438,98 @@ private lemma evaluatedSlice_scalar_chain_bound
     simpa [𝒟, avgBAB, avgABA] using
       evaluatedSlice_phaseEightNine_tail_bound
         params strategy zeta _hnorm family _hpostSSC
-  -- Final assembly: combine the phase bounds by triangle inequalities and
-  -- conclude the displayed error estimate.
+  -- ── Final assembly (hassemble) ────────────────────────────────────────────
+  -- Strategy: use the exact swap symmetry to reduce to the BABA-side chain.
+  --
+  --   2*(avgABA − avgABAB)
+  --     = 2*(avgBAB − avgBABA)     [exact: avgABA = avgBAB, avgABAB = avgBABA]
+  --     ≤ 2*(|avgBAB − phase5Removed|          ≤ 2√ζ, hphase67_fst
+  --         + |phase5Removed − phase3Inserted|  ≤ √ζ,  hphase5
+  --         + |phase3Inserted − avgBABA|         ≤ 2√ζ, hphase3)
+  --     = 2 * 5√ζ = 10√ζ
+  --     ≤ 48·m·(√γ + √ζ) = commDataProcessedGError
+  --
   have hassemble :
       2 * (avgOver 𝒟 avgABA - avgOver 𝒟 avgABAB) ≤
         commDataProcessedGError params gamma zeta := by
-    sorry
+    -- Exact swap symmetry (from evaluatedSliceCommutation_avg_swap_terms)
+    have hswap := evaluatedSliceCommutation_avg_swap_terms params strategy family
+    -- avgABA = avgBAB (exact)
+    have hBABeqABA : avgOver 𝒟 avgBAB = avgOver 𝒟 avgABA := hswap.1
+    -- avgABAB = avgBABA (exact)
+    have hBABAeqABAB : avgOver 𝒟 avgBABA = avgOver 𝒟 avgABAB := hswap.2
+    -- Rewrite goal to BABA-side
+    have hrw : 2 * (avgOver 𝒟 avgABA - avgOver 𝒟 avgABAB) =
+        2 * (avgOver 𝒟 avgBAB - avgOver 𝒟 avgBABA) := by
+      linarith
+    rw [hrw]
+    -- Phase 6/7 (missing): reverse-insertion at the first coordinate.
+    -- This bound should follow from closenessOfIP applied to hpostSSC_fst
+    -- (mirroring evaluatedSlice_phaseThree_insert_bound but going from
+    -- avgBAB → phase5Removed instead of from avgBABA → phase3Inserted).
+    -- Reference: phases 6/7 of the paper's chain (eq:gonna-cite-this-in-just-a-bit).
+    have hphase67_fst :
+        |avgOver 𝒟 avgBAB - avgOver 𝒟 phase5Removed| ≤ 2 * Real.sqrt zeta := by
+      sorry
+    -- Triangle-inequality chain: |avgBAB − avgBABA| ≤ 5√ζ
+    have hchain :
+        |avgOver 𝒟 avgBAB - avgOver 𝒟 avgBABA| ≤ 5 * Real.sqrt zeta := by
+      -- Use calc to avoid whnf unification issues with rwa [abs_sub_comm]
+      have h35_comm : |avgOver 𝒟 phase5Removed - avgOver 𝒟 phase3Inserted| ≤
+          Real.sqrt zeta :=
+        (abs_sub_comm (avgOver 𝒟 phase5Removed) (avgOver 𝒟 phase3Inserted)).symm ▸ hphase5
+      have h3_comm : |avgOver 𝒟 phase3Inserted - avgOver 𝒟 avgBABA| ≤
+          2 * Real.sqrt zeta :=
+        (abs_sub_comm (avgOver 𝒟 phase3Inserted) (avgOver 𝒟 avgBABA)).symm ▸ hphase3
+      have hstep2 : |avgOver 𝒟 phase5Removed - avgOver 𝒟 avgBABA| ≤
+          Real.sqrt zeta + 2 * Real.sqrt zeta :=
+        le_trans (abs_sub_le _ (avgOver 𝒟 phase3Inserted) _)
+          (add_le_add h35_comm h3_comm)
+      calc |avgOver 𝒟 avgBAB - avgOver 𝒟 avgBABA|
+          ≤ |avgOver 𝒟 avgBAB - avgOver 𝒟 phase5Removed| +
+              |avgOver 𝒟 phase5Removed - avgOver 𝒟 avgBABA| :=
+                abs_sub_le _ _ _
+        _ ≤ 2 * Real.sqrt zeta + (Real.sqrt zeta + 2 * Real.sqrt zeta) :=
+                add_le_add hphase67_fst hstep2
+        _ = 5 * Real.sqrt zeta := by ring
+    -- Convert absolute value to one-sided bound
+    have h10 : 2 * (avgOver 𝒟 avgBAB - avgOver 𝒟 avgBABA) ≤
+        10 * Real.sqrt zeta := by
+      have hle : avgOver 𝒟 avgBAB - avgOver 𝒟 avgBABA ≤ 5 * Real.sqrt zeta :=
+        le_trans (le_abs_self _) hchain
+      linarith
+    -- Arithmetic: 10√ζ ≤ 48·m·(√γ + √ζ) = commDataProcessedGError
+    calc 2 * (avgOver 𝒟 avgBAB - avgOver 𝒟 avgBABA)
+        ≤ 10 * Real.sqrt zeta := h10
+      _ ≤ commDataProcessedGError params gamma zeta := by
+            -- Extract nonnegativity of gamma and zeta from the hypotheses
+            have hgamma_nonneg : 0 ≤ gamma := by
+              have hdfp : 0 ≤ strategy.diagonalFailureProbability := by
+                unfold SymStrat.diagonalFailureProbability
+                exact mul_nonneg (by positivity)
+                  (Finset.sum_nonneg fun j _ =>
+                    bipartiteConsError_nonneg strategy.state _ _ _)
+              exact le_trans hdfp _hgood.diagonalLineTest
+            have hzeta_nonneg : 0 ≤ zeta :=
+              le_trans (sddError_nonneg strategy.state
+                (uniformDistribution (Point params.next))
+                (evaluatedPointFamilyLeft params family)
+                (evaluatedPointFamilyRight params family)) _hpostSSC.squaredDistanceBound
+            unfold commDataProcessedGError
+            rw [Real.sqrt_eq_rpow]
+            -- After rw, goal has zeta ^ (1/2) on LHS, Real.rpow on RHS.
+            -- Use `change` to normalize everything to Real.rpow form.
+            change 10 * Real.rpow zeta (1 / (2 : ℝ)) ≤
+              48 * (params.m : ℝ) *
+                (Real.rpow gamma (1 / (2 : ℝ)) + Real.rpow zeta (1 / (2 : ℝ)))
+            have hm : 1 ≤ (params.m : ℝ) := by exact_mod_cast params.hm
+            have hm_nonneg : (0 : ℝ) ≤ (params.m : ℝ) := Nat.cast_nonneg _
+            have hg : (0 : ℝ) ≤ Real.rpow gamma (1 / (2 : ℝ)) :=
+              Real.rpow_nonneg hgamma_nonneg _
+            have hz : (0 : ℝ) ≤ Real.rpow zeta (1 / (2 : ℝ)) :=
+              Real.rpow_nonneg hzeta_nonneg _
+            nlinarith [mul_nonneg (by linarith : (0:ℝ) ≤ (params.m : ℝ) - 1) hz,
+                       mul_nonneg (mul_nonneg (by norm_num : (0:ℝ) ≤ 48) hm_nonneg) hg]
   simpa [𝒟, avgABA, avgABAB] using hassemble
 
 /-- `lem:comm-data-processed-g`. -/
