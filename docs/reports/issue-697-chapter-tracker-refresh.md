@@ -4,7 +4,7 @@ Audit date: 2026-04-24
 
 Scope: one-time sweep across the chapter-tracker umbrellas and the cross-cutting trackers to
 drop stale closed-issue references from the human-readable indexes and repoint each umbrella
-at the currently-open leaf issues on `main`. See `#656` for the recurring periodic audit.
+at the currently-open leaf issues on `main`. See #656 for the recurring periodic audit.
 
 ## Method
 
@@ -16,7 +16,7 @@ at the currently-open leaf issues on `main`. See `#656` for the recurring period
 4. Added the four new sibling leaf issues filed alongside this sweep (#693, #694, #695, #696)
    under their owning umbrellas.
 5. Added already-open leaf issues that currently own chapter work but were previously not
-   linked from the umbrella (for example the Section-6 wrapper chain on `#104`).
+   linked from the umbrella (for example the Section-6 wrapper chain on #104).
 6. Left the Notes sections intact where the referenced PR / issue is still relevant; trimmed
    only the sentences that pointed at closed work as if it were still live.
 
