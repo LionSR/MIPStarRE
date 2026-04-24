@@ -1,5 +1,12 @@
 import MIPStarRE.LDT.Pasting.SwitcherooContraction
 
+set_option linter.style.setOption false
+set_option linter.style.maxHeartbeats false
+set_option linter.unusedDecidableInType false
+set_option linter.unusedFintypeInType false
+set_option linter.unusedSectionVars false
+set_option linter.unusedVariables false
+
 /-!
 # Section 12 pasting: switcheroo completion bounds
 

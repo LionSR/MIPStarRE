@@ -3,6 +3,12 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
+set_option linter.style.setOption false
+set_option linter.flexible false
+set_option linter.unusedDecidableInType false
+set_option linter.unusedFintypeInType false
+set_option linter.unusedSimpArgs false
+
 /-!
 # Section 5 — Naimark core
 

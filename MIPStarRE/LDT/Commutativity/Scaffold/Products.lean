@@ -1,5 +1,8 @@
 import MIPStarRE.LDT.Commutativity.Scaffold.Symmetry
 
+set_option linter.style.setOption false
+set_option linter.unnecessarySimpa false
+
 /-!
 # Section 11 commutativity: scaffold product lemmas
 

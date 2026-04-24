@@ -1,5 +1,9 @@
 import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 
+set_option linter.style.setOption false
+set_option linter.flexible false
+set_option linter.unnecessarySimpa false
+
 /-!
 # Section 10 commutativity points: shared-line helpers
 

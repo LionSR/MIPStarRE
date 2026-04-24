@@ -1,5 +1,8 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 
+set_option linter.style.setOption false
+set_option linter.unusedVariables false
+
 /-!
 # Section 12 pasting: Bernoulli recurrence bridge
 

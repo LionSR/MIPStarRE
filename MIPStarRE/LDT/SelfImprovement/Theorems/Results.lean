@@ -2,6 +2,10 @@ import MIPStarRE.LDT.GlobalVariance.Theorems.Results
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
+set_option linter.style.setOption false
+set_option linter.style.longLine false
+set_option linter.style.maxHeartbeats false
+
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT

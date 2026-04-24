@@ -108,6 +108,8 @@ def rebaseAt {params : Parameters} [FieldModel params.q]
   ext i
   simp [rebaseAt, pointAt, addPoint, smulPoint, addCoord, mulCoord, zeroCoord]
 
+set_option linter.style.setOption false
+set_option linter.flexible false in
 theorem rebaseAt_pointAt {params : Parameters} [FieldModel params.q]
     (ℓ : DiagonalLine params) (t s : Fq params) :
     (rebaseAt ℓ t).pointAt s = ℓ.pointAt (addCoord t s) := by
@@ -155,6 +157,7 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
   base := appendPoint params ℓ.base x
   direction := appendPoint params ℓ.direction zeroCoord
 
+set_option linter.flexible false in
 @[simp] theorem appendAtHeight_rebaseAt {params : Parameters} [FieldModel params.q]
     (ℓ : DiagonalLine params) (t x : Fq params) :
     appendAtHeight params (rebaseAt ℓ t) x =

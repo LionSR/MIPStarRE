@@ -1,5 +1,9 @@
 import MIPStarRE.LDT.Pasting.Core
 
+set_option linter.style.setOption false
+set_option linter.unusedDecidableInType false
+set_option linter.unusedSimpArgs false
+
 /-!
 # Section 12 pasting: switcheroo infrastructure
 

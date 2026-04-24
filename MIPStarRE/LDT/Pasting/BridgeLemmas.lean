@@ -3,6 +3,16 @@ import MIPStarRE.LDT.Pasting.Core
 import MIPStarRE.LDT.Basic.LowDegreePolynomial
 import MIPStarRE.LDT.Preliminaries.Triangles
 
+set_option linter.style.setOption false
+set_option linter.flexible false
+set_option linter.style.longLine false
+set_option linter.style.show false
+set_option linter.unnecessarySimpa false
+set_option linter.unusedDecidableInType false
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Section 12 pasting: sandwich-chain bridge lemmas
 

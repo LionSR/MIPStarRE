@@ -2,6 +2,9 @@ import MIPStarRE.LDT.GlobalVariance.Defs.Families
 import MIPStarRE.LDT.MainInductionStep.Defs
 import MIPStarRE.LDT.Preliminaries.Defs
 
+set_option linter.style.setOption false
+set_option linter.unusedFintypeInType false
+
 /-!
 # Section 9 — Definitions
 

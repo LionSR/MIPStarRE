@@ -1,5 +1,8 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas
 
+set_option linter.style.setOption false
+set_option linter.unnecessarySimpa false
+
 /-!
 # Section 12 pasting: Bernoulli truncated sums
 

@@ -8,6 +8,9 @@ import MIPStarRE.LDT.Pasting.Theorems
 -- Used by `selfImprovementInInductionSection`.
 import MIPStarRE.LDT.SelfImprovement.Theorems
 
+set_option linter.style.setOption false
+set_option linter.unnecessarySimpa false
+
 /-!
 # Section 6 — Theorems
 
