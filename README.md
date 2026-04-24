@@ -79,7 +79,7 @@ The source-file order is not the proof-dependency order. The recommended impleme
 
 ## Build
 
-**Toolchain**: Lean 4.28.0 + Mathlib v4.28.0 (pinned in `lean-toolchain` and `lakefile.toml`).
+**Toolchain**: See `lean-toolchain` and `lakefile.toml` for the pinned Lean and Mathlib versions.
 
 From the repo root:
 
@@ -92,7 +92,7 @@ lake build
 lake env lean MIPStarRE/LDT/SelfImprovement/Defs.lean
 
 # Check declarations referenced from the blueprint
-lake exe checkdecls
+lake exe checkdecls blueprint/lean_decls
 ```
 
 Blueprint commands (from the repo root, with `leanblueprint` on your `PATH`):
