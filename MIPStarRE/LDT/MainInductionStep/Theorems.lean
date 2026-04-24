@@ -256,7 +256,7 @@ theorem ldPastingInInductionSection
         eps delta gamma kappa zeta k := by
   have hldPasting :=
     Pasting.ldPasting params strategy eps delta gamma kappa zeta
-      hgood _hgamma_le _hzeta_le _hdq_le
+      hgood _hgamma_le _hzeta_le _hdq_le hd
       family hcomplete hcons hself hbound k hk_pos hk
   obtain ⟨H, _hHdef, hH⟩ := hldPasting
   refine ⟨H, ?_⟩
@@ -3345,7 +3345,8 @@ theorem mainInductionPublicWrapper
     (hrec :
       let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
         SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
-          (restrictedProbabilities params strategy eps delta gamma hgood)
+          (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
+            hgood haxisWeightedBound hdiagonalWeightedBound)
       ∀ x,
         ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
           ConsRel strategy.state (uniformDistribution (Point params))
@@ -3360,7 +3361,8 @@ theorem mainInductionPublicWrapper
     (hselfProducer :
       let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
         SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
-          (restrictedProbabilities params strategy eps delta gamma hgood)
+          (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
+            hgood haxisWeightedBound hdiagonalWeightedBound)
       ∀ hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k,
         SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
     (hk_pos : 1 ≤ k)
@@ -3372,8 +3374,8 @@ theorem mainInductionPublicWrapper
         (mainInductionError params.next k eps delta gamma) := by
   let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
     SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
-      (restrictedProbabilities params strategy eps delta gamma hgood
-        haxisWeightedBound hdiagonalWeightedBound)
+      (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
+        hgood haxisWeightedBound hdiagonalWeightedBound)
   exact
     mainInductionByRecursionOnM params strategy eps delta gamma k hgood hd hrestrict hrec
       hselfProducer hk_pos hk
