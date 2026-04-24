@@ -61,7 +61,7 @@ structure LdPastingContext (params : Parameters) [FieldModel params.q]
   /-- Averaged self-improvement / pasting interface parameter `ζ`. -/
   zeta : Error
   /-- `(ε,δ,γ)`-goodness of the symmetric strategy. -/
-  hgood : strategy.IsGood eps delta gamma
+  good : strategy.IsGood eps delta gamma
   /-- Small-parameter hypothesis `γ ≤ 1` used throughout Section 12. -/
   gamma_le_one : gamma ≤ 1
   /-- Small-parameter hypothesis `ζ ≤ 1` used throughout Section 12. -/
@@ -69,7 +69,7 @@ structure LdPastingContext (params : Parameters) [FieldModel params.q]
   /-- Source-style low-degree inequality `d ≤ q`. -/
   dq_le_q : params.d ≤ params.q
   /-- Strict positivity `0 < d` required by the sandwich lemmas. -/
-  hd : 0 < params.d
+  d_pos : 0 < params.d
   /-- The slice-indexed polynomial family `{G^x}_{x ∈ 𝔽_q}`. -/
   family : IdxPolyFamily params ι
   /-- Averaged completeness of the slice family (`item:ld-pasting-completeness`). -/
