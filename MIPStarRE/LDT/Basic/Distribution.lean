@@ -201,6 +201,24 @@ theorem avgOver_uniform_const {α : Type*}
   simpa [uniformProbabilityDistribution] using
     (ProbabilityDistribution.avgOver_const (uniformProbabilityDistribution α) c)
 
+/-- A uniform average is bounded by any nonnegative pointwise upper bound. -/
+theorem avgOver_uniform_le_of_pointwise_le {α : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    (f : α → Error) (δ : Error) (hδ_nonneg : 0 ≤ δ)
+    (hf : ∀ a, f a ≤ δ) :
+    avgOver (uniformDistribution α) f ≤ δ := by
+  calc
+    avgOver (uniformDistribution α) f
+      ≤ avgOver (uniformDistribution α) (fun _ => δ) := by
+          exact avgOver_mono _ _ _ hf
+    _ = (∑ a ∈ (uniformDistribution α).support,
+          (uniformDistribution α).weight a) * δ := by
+          simp [avgOver, Finset.sum_mul]
+    _ ≤ 1 * δ := by
+          exact mul_le_mul_of_nonneg_right
+            (uniformDistribution_weight_sum_le_one α) hδ_nonneg
+    _ = δ := by ring
+
 /-- Reindexing a uniform average along an equivalence preserves its value. -/
 theorem avgOver_uniform_equiv
     {α β : Type*}
