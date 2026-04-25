@@ -87,6 +87,116 @@ theorem fromHToGRecurrenceWeight_succ
           (1 - family.averagedSubMeas.total) :=
   (fromHToGRecurrenceWeight_recurrence params family prefixLen τtail).2.2.2
 
+/-- Telescoping for a scalar chain indexed by natural numbers.
+
+This is the purely real-analysis part of the last step in `lem:from-H-to-G`:
+if each adjacent stage changes by at most `e`, then the first and last stages are
+within `k * e`.  The lemma is independent of the operator-valued Bernoulli
+recurrence, so it can be reused once the remaining stage bridge is supplied. -/
+private lemma abs_telescope_nat (f : ℕ → Error) (e : Error) :
+    ∀ k : ℕ,
+      (∀ ℓ : ℕ, ℓ < k → |f ℓ - f (ℓ + 1)| ≤ e) →
+        |f 0 - f k| ≤ (k : Error) * e
+  | 0, _ => by simp
+  | k + 1, hstep => by
+      have hprev : |f 0 - f k| ≤ (k : Error) * e :=
+        abs_telescope_nat f e k
+          (fun ℓ hℓ => hstep ℓ (Nat.lt_trans hℓ (Nat.lt_succ_self k)))
+      have hlast : |f k - f (k + 1)| ≤ e := hstep k (Nat.lt_succ_self k)
+      have htri :
+          |f 0 - f (k + 1)| ≤ |f 0 - f k| + |f k - f (k + 1)| :=
+        abs_sub_le (f 0) (f k) (f (k + 1))
+      calc
+        |f 0 - f (k + 1)| ≤ |f 0 - f k| + |f k - f (k + 1)| := htri
+        _ ≤ (k : Error) * e + e := add_le_add hprev hlast
+        _ = ((k + 1 : ℕ) : Error) * e := by
+              rw [show ((k + 1 : ℕ) : Error) = (k : Error) + 1 by norm_num]
+              ring
+
+/-- The adjacent-stage recurrence fields imply the scalar first-to-last
+`telescope` bound for the `fromHToG` stage masses. -/
+private lemma fromHToGStageMass_telescope
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (k : ℕ)
+    (hstep : ∀ ℓ : ℕ, ℓ < k →
+      |fromHToGStageMass params ψbi family k ℓ -
+          fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
+        fromHToGRecurrenceError params gamma zeta k) :
+    |fromHToGStageMass params ψbi family k 0 -
+        fromHToGStageMass params ψbi family k k| ≤
+      (k : Error) * fromHToGRecurrenceError params gamma zeta k :=
+  abs_telescope_nat
+    (fun ℓ => fromHToGStageMass params ψbi family k ℓ)
+    (fromHToGRecurrenceError params gamma zeta k) k hstep
+
+/-- Reduce the final scalar `fromHToG` conclusion to the three paper-local
+bridge facts: identify the Lean stage `0`, identify the Lean stage `k`, and
+absorb the telescoped adjacent-stage loss into the displayed error term. -/
+private lemma fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (k : ℕ)
+    (hstep : ∀ ℓ : ℕ, ℓ < k →
+      |fromHToGStageMass params ψbi family k ℓ -
+          fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
+        fromHToGRecurrenceError params gamma zeta k)
+    (hstage0 :
+      fromHToGStageMass params ψbi family k 0 =
+        fromHToGAllOutcomesMass params strategy ψbi family k)
+    (hstagek :
+      fromHToGStageMass params ψbi family k k =
+        fromHToGBernoulliTailMass params ψbi family k)
+    (herror :
+      (k : Error) * fromHToGRecurrenceError params gamma zeta k ≤
+        fromHToGError params gamma zeta k) :
+    |fromHToGAllOutcomesMass params strategy ψbi family k -
+        fromHToGBernoulliTailMass params ψbi family k| ≤
+      fromHToGError params gamma zeta k := by
+  have htelescope :=
+    fromHToGStageMass_telescope params ψbi family gamma zeta k hstep
+  have hmass :
+      |fromHToGAllOutcomesMass params strategy ψbi family k -
+          fromHToGBernoulliTailMass params ψbi family k| ≤
+        (k : Error) * fromHToGRecurrenceError params gamma zeta k := by
+    simpa [hstage0, hstagek] using htelescope
+  exact le_trans hmass herror
+
+/-- The residual, paper-specific stage facts still needed for `fromHToG`.
+
+This deliberately does not duplicate the public theorem: the telescope from these
+facts to `FromHToGStatement.bernoulliPolynomialRewrite` is already proved by
+`fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.  What remains here is
+the operator/scalar bridge from `cor:G-hat-facts` and
+`lem:commute-g-half-sandwich`, the endpoint identifications of stages `0` and
+`k`, and the final displayed arithmetic comparison of error terms. -/
+private structure FromHToGResidualStageFacts
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (k : ℕ) : Prop where
+  recurrenceStep :
+    ∀ ℓ : ℕ, ℓ < k →
+      |fromHToGStageMass params ψbi family k ℓ -
+          fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
+        fromHToGRecurrenceError params gamma zeta k
+  stageZero_eq :
+    fromHToGStageMass params ψbi family k 0 =
+      fromHToGAllOutcomesMass params strategy ψbi family k
+  stageK_eq :
+    fromHToGStageMass params ψbi family k k =
+      fromHToGBernoulliTailMass params ψbi family k
+  recurrenceError_le :
+    (k : Error) * fromHToGRecurrenceError params gamma zeta k ≤
+      fromHToGError params gamma zeta k
+
 /-- `lem:from-H-to-G`.
 
 The proof of the paper's Bernoulli-recurrence lemma uses exactly the two named
@@ -108,28 +218,41 @@ lemma fromHToG
       CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
     (k : ℕ) :
     FromHToGStatement params strategy ψbi family gamma zeta k := by
-  /- Remaining work from #673, stated at the single live proof gap.
+  have hresidual :
+      FromHToGResidualStageFacts params strategy ψbi family gamma zeta k := by
+    /- Remaining work from #707, now narrowed to the paper-specific stage facts.
 
-     Paper / blueprint anchor:
-     * `references/ldt-paper/ld-pasting.tex`, proof of `lem:from-H-to-G`
-       (roughly lines 1379–1664 in the current source);
-     * `blueprint/src/chapter/ch09_pasting.tex`, proof of `lem:from-H-to-G`
-       (roughly lines 979–1233 in the current source).
+       Paper / blueprint anchor:
+       * `references/ldt-paper/ld-pasting.tex`, proof of `lem:from-H-to-G`
+         (roughly lines 1379–1664 in the current source);
+       * `blueprint/src/chapter/ch09_pasting.tex`, proof of `lem:from-H-to-G`
+         (roughly lines 979–1233 in the current source).
 
-     What remains to formalize:
-     1. prove each adjacent-stage recurrence step by the paper's
-        move-right / commute / move-right chain, using two
-        `easyApproxFromApproxDelta` / `closenessOfIP` moves from
-        `hfacts.completedSelfConsistency`, then two suffix-commutation moves from
-        `hhalf (k - ℓ)`, and finally the exact branch split via
-        `fromHToGRecurrenceWeight_succ`;
-     2. identify Lean stage `0` with `fromHToGAllOutcomesMass`;
-     3. identify Lean stage `k` with `fromHToGBernoulliTailMass` through the
-        `truncatedTypeSums` polynomial;
-     4. telescope the `k` adjacent-stage errors and discharge the displayed
-        arithmetic bound `k * fromHToGRecurrenceError ≤ fromHToGError`.
-  -/
-  sorry
+       What remains to formalize after this file's telescope reduction:
+       1. prove each adjacent-stage recurrence step by the paper's
+          move-right / commute / move-right chain, using two
+          `easyApproxFromApproxDelta` / `closenessOfIP` moves from
+          `hfacts.completedSelfConsistency`, then two suffix-commutation moves from
+          `hhalf (k - ℓ)`, and finally the exact branch split via
+          `fromHToGRecurrenceWeight_succ`;
+       2. identify Lean stage `0` with `fromHToGAllOutcomesMass`;
+       3. identify Lean stage `k` with `fromHToGBernoulliTailMass` through the
+          `truncatedTypeSums` polynomial;
+       4. discharge the displayed arithmetic comparison
+          `k * fromHToGRecurrenceError ≤ fromHToGError`.
+
+       The generic telescoping step from these facts to
+       `bernoulliPolynomialRewrite` is now proved above in
+       `fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.
+    -/
+    have _ := hfacts.completedSelfConsistency
+    have _ := hhalf
+    sorry
+  refine ⟨hresidual.recurrenceStep, ?_⟩
+  exact fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
+    params strategy ψbi family gamma zeta k
+    hresidual.recurrenceStep hresidual.stageZero_eq hresidual.stageK_eq
+    hresidual.recurrenceError_le
 
 /-- The scalar Bernoulli tail polynomial lifted through continuous functional
 calculus is exactly the matrix Bernoulli tail operator. -/
