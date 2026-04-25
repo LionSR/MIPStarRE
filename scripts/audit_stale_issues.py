@@ -75,6 +75,9 @@ _DECL_DEFN_RE = re.compile(
     re.MULTILINE,
 )
 
+_NAMESPACE_RE = re.compile(r"^\s*namespace\s+([A-Za-z_][\w.']*)\b")
+_END_NAMESPACE_RE = re.compile(r"^\s*end(?:\s+([A-Za-z_][\w.']*))?\s*(?:--.*)?$")
+
 # Sorry markers we count as "still unproven".
 _SORRY_LINE_RE = re.compile(r"\b(sorry|admit)\b")
 
@@ -201,18 +204,43 @@ def extract_decl_citations(body: str) -> list[DeclCitation]:
 # ---------------------------------------------------------------------------
 
 def build_decl_index(lean_root: Path) -> set[str]:
-    """Collect short (unqualified) names of declarations under ``lean_root``."""
-    short_names: set[str] = set()
+    """Collect declaration names under ``lean_root``.
+
+    The index stores both short names (for unqualified issue citations) and the
+    namespace-qualified names visible from simple ``namespace ...`` blocks.  A
+    cited qualified name is later matched exactly, so ``Foo.bar`` cannot be
+    silently satisfied by some unrelated short declaration named ``bar``.
+    """
+    names: set[str] = set()
     for path in sorted(lean_root.rglob("*.lean")):
         try:
             text = path.read_text(errors="replace")
         except OSError:
             continue
-        for m in _DECL_DEFN_RE.finditer(text):
-            qualified = m.group(1)
-            short_names.add(qualified.rsplit(".", 1)[-1])
-            short_names.add(qualified)
-    return short_names
+        namespace_stack: list[str] = []
+        for line in text.splitlines():
+            if m := _NAMESPACE_RE.match(line):
+                namespace_stack.extend(m.group(1).split("."))
+                continue
+            if m := _END_NAMESPACE_RE.match(line):
+                end_name = m.group(1)
+                if end_name:
+                    parts = end_name.split(".")
+                    if namespace_stack[-len(parts):] == parts:
+                        del namespace_stack[-len(parts):]
+                    elif namespace_stack:
+                        namespace_stack.pop()
+                elif namespace_stack:
+                    namespace_stack.pop()
+                continue
+            if m := _DECL_DEFN_RE.match(line):
+                declared = m.group(1)
+                short = declared.rsplit(".", 1)[-1]
+                names.add(short)
+                names.add(declared)
+                if "." not in declared and namespace_stack:
+                    names.add(".".join([*namespace_stack, declared]))
+    return names
 
 
 def line_is_sorry(path: Path, line_no: int) -> bool | None:
@@ -291,9 +319,16 @@ def audit_issue(
                 report.non_sorry_lines.append((fc.path, fc.line))
 
     for dc in decl_cites:
-        short = dc.name.rsplit(".", 1)[-1]
-        if dc.name not in decl_index and short not in decl_index:
-            report.missing_decls.append(dc.name)
+        if "." in dc.name:
+            # Qualified citations are meant to disambiguate.  Require an exact
+            # qualified-name match instead of accepting any declaration with the
+            # same final component.
+            if dc.name not in decl_index:
+                report.missing_decls.append(dc.name)
+        else:
+            short = dc.name.rsplit(".", 1)[-1]
+            if dc.name not in decl_index and short not in decl_index:
+                report.missing_decls.append(dc.name)
 
     return report
 

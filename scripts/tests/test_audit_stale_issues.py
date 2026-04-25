@@ -152,7 +152,9 @@ class BuildDeclIndexTests(unittest.TestCase):
             _make_fake_repo(root)
             index = build_decl_index(root / "MIPStarRE")
             self.assertIn("live_theorem", index)
+            self.assertIn("Fake.live_theorem", index)
             self.assertIn("liveDef", index)
+            self.assertIn("Fake.liveDef", index)
             self.assertIn("still_open", index)
 
 
@@ -272,11 +274,29 @@ class AuditIssueTests(unittest.TestCase):
                 "url": "",
                 "body": (
                     "Line `MIPStarRE/LDT/Fake/Live.lean:13` is still a sorry "
-                    "for `still_open`."
+                    "for `still_open` and `Fake.live_theorem` exists."
                 ),
             }
             report = audit_issue(issue, root, decl_index)
             self.assertFalse(report.is_flagged)
+
+    def test_qualified_decl_citation_requires_exact_match(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _make_fake_repo(root)
+            decl_index = build_decl_index(root / "MIPStarRE")
+            issue = {
+                "number": 101,
+                "title": "qualified stale decl",
+                "url": "",
+                "body": (
+                    "The short name exists as `live_theorem`, but "
+                    "the qualified citation `Other.live_theorem` is stale."
+                ),
+            }
+            report = audit_issue(issue, root, decl_index)
+            self.assertTrue(report.is_flagged)
+            self.assertEqual(report.missing_decls, ["Other.live_theorem"])
 
 
 class RenderReportTests(unittest.TestCase):
