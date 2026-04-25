@@ -287,7 +287,7 @@ For incident line questions, the right event `f = g|_ℓ` is a subevent of the
 left event `f(u)=g(u)`.  Since `B^ℓ` is projective, the squared difference is
 exactly the residual line-collision event `f(u)=g(u) ∧ f≠g|_ℓ`, with the
 right-register square root collapsed to `G_g`. -/
-lemma generalizeBDeviationAtPolynomial_eq_collisionResidualAtPolynomial
+lemma generalizeBDeviationAtPolynomial_eq_collisionResidual
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -295,8 +295,8 @@ lemma generalizeBDeviationAtPolynomial_eq_collisionResidualAtPolynomial
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) :
     generalizeBDeviationAtPolynomial params strategy ψbi G g =
-      generalizeBCollisionResidualAtPolynomial params strategy ψbi G g := by
-  unfold generalizeBDeviationAtPolynomial generalizeBCollisionResidualAtPolynomial
+      generalizeBCollisionResidual params strategy ψbi G g := by
+  unfold generalizeBDeviationAtPolynomial generalizeBCollisionResidual
   apply MIPStarRE.LDT.avgOver_congr_on_support
   intro qu hqu
   have hline : pointOnLine (params := params) qu := by
@@ -736,22 +736,22 @@ private lemma generalizeBLineCollisionCoefficient_le
 This proves the Schwartz--Zippel and normalization parts of the residual estimate
 from `expansion.tex`, lines 286--288.  The only remaining issue #753 work is the
 finite reindexing identity equating
-`generalizeBCollisionResidualAtPolynomial` with
-`generalizeBLineCollisionExpansionAtPolynomial`. -/
-lemma generalizeBLineCollisionExpansionAtPolynomial_le_generalizeBError
+`generalizeBCollisionResidual` with
+`generalizeBLineCollisionExpansion`. -/
+lemma generalizeBLineCollisionExpansion_le_error
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) :
-    generalizeBLineCollisionExpansionAtPolynomial params strategy strategy.state G g ≤
+    generalizeBLineCollisionExpansion params strategy strategy.state G g ≤
       generalizeBError params := by
   classical
   let δ := generalizeBError params
   have hδ_nonneg : 0 ≤ δ := by
     dsimp [δ, generalizeBError]
     positivity
-  unfold generalizeBLineCollisionExpansionAtPolynomial
+  unfold generalizeBLineCollisionExpansion
   calc
     avgOver (uniformDistribution (AxisParallelLine params))
       (fun ℓ =>
@@ -803,19 +803,19 @@ reindexing identity.
 TODO(#753): prove the equality hypothesis by expanding
 `ProjMeas.postprocess`, rewriting the incident-pair distribution as a uniform
 line/parameter average, and commuting the finite sums. -/
-lemma generalizeBCollisionResidualAtPolynomial_le_of_lineCollisionExpansion_eq
+lemma generalizeBCollisionResidual_le_of_lineExpansion_eq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params)
     (hreindex :
-      generalizeBCollisionResidualAtPolynomial params strategy strategy.state G g =
-        generalizeBLineCollisionExpansionAtPolynomial params strategy strategy.state G g) :
-    generalizeBCollisionResidualAtPolynomial params strategy strategy.state G g ≤
+      generalizeBCollisionResidual params strategy strategy.state G g =
+        generalizeBLineCollisionExpansion params strategy strategy.state G g) :
+    generalizeBCollisionResidual params strategy strategy.state G g ≤
       generalizeBError params := by
   rw [hreindex]
-  exact generalizeBLineCollisionExpansionAtPolynomial_le_generalizeBError params strategy G g
+  exact generalizeBLineCollisionExpansion_le_error params strategy G g
 
 /-- Strategy-state reduction for `lem:generalize-b` after the projective expansion.
 
@@ -830,12 +830,12 @@ lemma generalizeBFromCollisionResidual
     (G : SubMeas (Polynomial params) ι)
     (hcollision :
       ∀ g : Polynomial params,
-        generalizeBCollisionResidualAtPolynomial params strategy strategy.state G g ≤
+        generalizeBCollisionResidual params strategy strategy.state G g ≤
           generalizeBError params) :
     GeneralizeBStatement params strategy strategy.state G := by
   refine generalizeB_of_pointwise params strategy G strategy.state ?_
   intro g
-  rw [generalizeBDeviationAtPolynomial_eq_collisionResidualAtPolynomial]
+  rw [generalizeBDeviationAtPolynomial_eq_collisionResidual]
   exact hcollision g
 
 /-- Strategy-state reduction for `lem:generalize-b` from the explicit line/parameter
@@ -851,12 +851,12 @@ lemma generalizeBFromLineCollisionExpansion
     (G : SubMeas (Polynomial params) ι)
     (hreindex :
       ∀ g : Polynomial params,
-        generalizeBCollisionResidualAtPolynomial params strategy strategy.state G g =
-          generalizeBLineCollisionExpansionAtPolynomial params strategy strategy.state G g) :
+        generalizeBCollisionResidual params strategy strategy.state G g =
+          generalizeBLineCollisionExpansion params strategy strategy.state G g) :
     GeneralizeBStatement params strategy strategy.state G := by
   refine generalizeBFromCollisionResidual params strategy G ?_
   intro g
-  exact generalizeBCollisionResidualAtPolynomial_le_of_lineCollisionExpansion_eq
+  exact generalizeBCollisionResidual_le_of_lineExpansion_eq
     params strategy G g (hreindex g)
 
 /-- Legacy wrapper for `lem:local-variance-of-points` with arbitrary bipartite
