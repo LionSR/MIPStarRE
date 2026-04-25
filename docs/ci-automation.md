@@ -12,6 +12,7 @@ This repository uses [Claude Code](https://docs.anthropic.com/en/docs/claude-cod
   - [Claude Code Review](#claude-code-review-claude-code-reviewyml)
   - [CI Failure Auto-Fix](#ci-failure-auto-fix-ci-failure-auto-fixyml)
   - [Lean Linter-Warning Sweep](#lean-linter-warning-sweep-lean-linter-warning-sweepyml)
+  - [README Freshness Audit](#readme-freshness-audit-readme-freshness-audityml)
   - [Blueprint Auto-Fix](#blueprint-auto-fix-blueprint-auto-fixyml)
   - [Review Comment Auto-Fix](#review-comment-auto-fix-pr-review-auto-fixyml)
   - [Claude Mention Handler](#claude-mention-handler-claudeyml)
@@ -198,6 +199,29 @@ follow-up must preserve the Lean file-order convention: `set_option` directives
 go after the module docstring and before the imports/body that depend on them.
 The sweep is strictly for linter/unused-instance hygiene, not proof changes or
 `sorry` removal.
+
+### README Freshness Audit (`readme-freshness-audit.yml`)
+
+**What it does**: Runs a weekly report-only audit of `README.md` so the
+repository overview does not drift from the current layout. The audit checks
+local README path references, the documented `MIPStarRE/LDT/` submodule count,
+and hard-coded Lean / Mathlib version mentions against `lean-toolchain` and
+`lakefile.toml`.
+
+**When it runs**: Every Monday at 09:30 UTC, after the stale-issue and Lean
+linter-warning maintenance sweeps, and on manual `workflow_dispatch`.
+
+**Why it is report-only**: Issue #671 asks for weekly README synchronization,
+but the safe repository convention for scheduled maintenance jobs is to avoid
+write-token PR creation unless explicitly needed. The workflow keeps
+`contents: read`, uploads JSON/text artifacts, and leaves any README edit to a
+focused documentation PR after human review.
+
+**Local command**:
+
+```bash
+python3 scripts/audit_readme_freshness.py --root . --readme README.md
+```
 
 ### Blueprint Auto-Fix (`blueprint-auto-fix.yml`)
 
