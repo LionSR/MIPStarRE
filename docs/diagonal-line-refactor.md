@@ -1,96 +1,115 @@
-# Diagonal-line rebasing refactor plan
+# Diagonal-line rebasing refactor status
 
 Issue: #529  
-Related PRs: #520, #371
+Related PRs: #371, #520, #548, #574
 
 ## Verdict
 
-This change takes **Option B** (explicit measurement transport), but in a
-**scouting-first** form.
+Issue #529 is now complete on `main`.
 
-A quotient-based redesign of `DiagonalLine` would require a broad reindexing
-pass across many files:
+The repository took **Option B** (explicit measurement transport with
+transport-covariant wrappers), not the quotient redesign of `DiagonalLine`.
+The work landed in two merged PRs:
+
+1. **#548** — added the reusable measurement-transport scaffolding.
+2. **#574** — migrated `SymStrat` / `ProjStrat` to covariant wrappers and
+   removed the standalone rebasing-invariance fields.
+
+This document is now a status record of that design choice, rather than a
+forward-looking migration plan.
+
+## Why the quotient route was not taken
+
+A quotient-based redesign of `DiagonalLine` would have forced a much broader
+reindexing sweep through many live consumers across:
 
 - `LDT/Basic/`
 - `LDT/Test/`
 - `LDT/MainInductionStep/`
 - `LDT/CommutativityPoints/`
 
-The scouting pass found well over ten live `DiagonalLine` consumers, plus the
-same parametrized-line phenomenon for `AxisParallelLine`. So the first useful
-step is to make the transport API explicit and reusable before changing the
-strategy structures.
+The same parametrized-line phenomenon also appears for `AxisParallelLine`, so a
+scouting pass favored making the transport API explicit first and then bundling
+covariance into the measurement types.
 
-## What lands in this PR
+## What landed
 
-1. **Outcome transport for measurements along an equivalence**
-   - `SubMeas.transport`
-   - `Measurement.transport`
-   - `ProjSubMeas.transport`
-   - `ProjMeas.transport`
-   - `SubMeas.postprocess_transport`
+### 1. Outcome transport along equivalences
 
-2. **Answer-side rebasing equivalences**
-   - `AxisLinePolynomial.reparamAtEquiv`
-   - `DiagonalLinePolynomial.reparamAtEquiv`
+The reusable transport layer now includes:
 
-3. **Question-side measurement transport helpers**
-   - `AxisParallelLine.transportMeasurement`
-   - `DiagonalLine.transportMeasurement`
+- `SubMeas.transport`
+- `Measurement.transport`
+- `ProjSubMeas.transport`
+- `ProjMeas.transport`
+- `SubMeas.postprocess_transport`
 
-4. **Stronger transport-level invariance predicates**
-   - `AxisParallelMeasurementTransportInvariant`
-   - `DiagonalMeasurementTransportInvariant`
+### 2. Answer-side rebasing equivalences
 
-   Each stronger predicate implies the existing evaluation-level predicate:
-   - `AxisParallelMeasurementTransportInvariant.toEvaluationReparamInvariant`
-   - `DiagonalMeasurementTransportInvariant.toEvaluationReparamInvariant`
+The answer types now expose rebasing equivalences:
 
-## Why this is the right intermediate API
+- `AxisLinePolynomial.reparamAtEquiv`
+- `DiagonalLinePolynomial.reparamAtEquiv`
 
-The old predicates only say that two **postprocessed** measurements agree after
-reading answers at `0` versus at the rebasing parameter $t$. They do **not**
-identify the underlying projective measurement outcome-by-outcome.
+### 3. Question-side transport helpers
 
-The new transport API records the stronger statement that the rebased question
-literally carries the transported measurement:
+Line-indexed measurements can be transported directly along rebasing via:
 
-$$
-M(\operatorname{rebaseAt}(\ell,t))
-  = \operatorname{transportMeasurement}(M(\ell), t).
-$$
+- `AxisParallelLine.transportMeasurement`
+- `DiagonalLine.transportMeasurement`
 
-That is the form needed for a future covariant-wrapper API.
+### 4. Transport-level covariance predicates and wrappers
 
-## Planned follow-up migration
+The stronger transport-fixed-point laws are:
 
-A follow-up PR can now replace the raw fields
+- `AxisParallelMeasurementTransportInvariant`
+- `DiagonalMeasurementTransportInvariant`
 
-- `SymStrat.axisParallelMeasurement`
-- `SymStrat.diagonalMeasurement`
-- `ProjStrat.axisParallelMeasurementA/B`
-- `ProjStrat.diagonalMeasurementA/B`
+These are bundled into the wrapper types:
 
-with covariant measurement wrappers that package
+- `AxisParallelCovariantMeasurement`
+- `DiagonalCovariantMeasurement`
 
-- the indexed projective measurement family, and
-- the corresponding transport-fixed-point law.
+The line-measurement fields of `SymStrat` and `ProjStrat` now use those wrapper
+structures directly.
 
-At that point, the standalone structural fields
+### 5. Derived evaluation-level invariance lemmas
 
-- `axisParallelReparamInvariant`
-- `diagonalReparamInvariant`
-- `axisParallelReparamInvariantA/B`
-- `diagonalReparamInvariantA/B`
+The older evaluation-at-`zeroCoord` predicates remain available as derived
+consequences:
 
-can be deleted, and theorem statements such as `commutativityPoints` will no
-longer mention separate rebasing hypotheses.
+- `AxisParallelMeasurementTransportInvariant.toEvaluationReparamInvariant`
+- `DiagonalMeasurementTransportInvariant.toEvaluationReparamInvariant`
+- `AxisParallelCovariantMeasurement.reparamInvariant`
+- `DiagonalCovariantMeasurement.reparamInvariant`
 
-## Non-goals of this PR
+## Statement-level outcome
 
-- No quotient of `DiagonalLine`
-- No mass rewrite of question products such as `DiagonalLine params × Fq params`
-- No theorem statement churn in `SymStrat`, `ProjStrat`, or `commutativityPoints`
+The follow-up migration promised by the original scouting note has already
+landed.
 
-This keeps the foundational change reviewable while making the next migration
-mechanical rather than speculative.
+In particular:
+
+- `SymStrat` and `ProjStrat` no longer carry standalone
+  `axisParallelReparamInvariant*` / `diagonalReparamInvariant*` fields.
+- `AxisParallelLine` and `DiagonalLine` are treated in parallel under the same
+  transport-covariant pattern.
+- `SymStrat.IsGood` now contains exactly the three paper-facing goodness bounds:
+  `axisParallelTest`, `selfConsistencyTest`, and `diagonalLineTest`.
+- The Lean entry point `commutativityPoints` now has the intended paper-faithful
+  hypothesis shape: the rebasing covariance is structural data inside the
+  strategy, not an extra theorem argument.
+
+## Historical note
+
+Issue #529 began as a design question about how to make diagonal-line
+reparametrization invariance part of the API rather than an external predicate.
+The current repository answer is:
+
+- keep the concrete line types,
+- make rebasing transport explicit,
+- package covariance with the measurement families, and
+- recover the older evaluation-level formulas as lemmas when needed.
+
+That staging avoided a quotient-heavy rewrite while still eliminating the stale
+statement-level mismatch that motivated the issue.
