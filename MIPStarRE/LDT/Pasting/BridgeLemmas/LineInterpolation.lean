@@ -1909,16 +1909,8 @@ lemma hBConsistencyError_eq_k_mul_ldSandwichLineOnePointError_add
 lemma avgOver_sum_fin
     {α : Type*} (𝒟 : Distribution α) (k : ℕ) (f : α → Fin k → Error) :
     avgOver 𝒟 (fun a => ∑ i : Fin k, f a i) =
-      ∑ i : Fin k, avgOver 𝒟 (fun a => f a i) := by
-  unfold avgOver
-  calc
-    ∑ a ∈ 𝒟.support, 𝒟.weight a * ∑ i : Fin k, f a i
-      = ∑ a ∈ 𝒟.support, ∑ i : Fin k, 𝒟.weight a * f a i := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [Finset.mul_sum]
-    _ = ∑ i : Fin k, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a i := by
-          rw [Finset.sum_comm]
+      ∑ i : Fin k, avgOver 𝒟 (fun a => f a i) :=
+  avgOver_sum 𝒟 f
 
 lemma one_div_q_le_rpow_degreeRatio
     (params : Parameters) [FieldModel params.q]
