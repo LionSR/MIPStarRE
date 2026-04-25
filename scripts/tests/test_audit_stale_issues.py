@@ -46,6 +46,9 @@ def _make_fake_repo(root: Path) -> None:
             /-- Another live declaration. -/
             def liveDef : Nat := 0
 
+            /-- A dotted declaration inside the current namespace. -/
+            theorem Sub.named : True := by trivial
+
             /-- A sorry we still ship. -/
             theorem still_open : True := by
               sorry
@@ -155,6 +158,8 @@ class BuildDeclIndexTests(unittest.TestCase):
             self.assertIn("Fake.live_theorem", index)
             self.assertIn("liveDef", index)
             self.assertIn("Fake.liveDef", index)
+            self.assertIn("Sub.named", index)
+            self.assertIn("Fake.Sub.named", index)
             self.assertIn("still_open", index)
 
 
@@ -273,8 +278,9 @@ class AuditIssueTests(unittest.TestCase):
                 "title": "ok",
                 "url": "",
                 "body": (
-                    "Line `MIPStarRE/LDT/Fake/Live.lean:13` is still a sorry "
-                    "for `still_open` and `Fake.live_theorem` exists."
+                    "Line `MIPStarRE/LDT/Fake/Live.lean:16` is still a sorry "
+                    "for `still_open`, `Fake.live_theorem`, and "
+                    "`Fake.Sub.named` exist."
                 ),
             }
             report = audit_issue(issue, root, decl_index)

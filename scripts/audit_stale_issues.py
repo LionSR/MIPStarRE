@@ -238,7 +238,7 @@ def build_decl_index(lean_root: Path) -> set[str]:
                 short = declared.rsplit(".", 1)[-1]
                 names.add(short)
                 names.add(declared)
-                if "." not in declared and namespace_stack:
+                if namespace_stack:
                     names.add(".".join([*namespace_stack, declared]))
     return names
 
