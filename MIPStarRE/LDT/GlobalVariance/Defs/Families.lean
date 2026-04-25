@@ -394,6 +394,17 @@ noncomputable def globalVarianceDeviation (params : Parameters) [FieldModel para
 noncomputable def generalizeBError (params : Parameters) : Error :=
   ((params.m : Error) * (params.d : Error)) / (params.q : Error)
 
+/-- The sharp sum of the six displayed transport errors in
+`lem:local-variance-of-points`, before the paper applies the multi-step
+triangle inequality.
+
+The six steps in `references/ldt-paper/expansion.tex`, lines 305--311 have
+errors `2δ`, `2ε`, `md/q`, `md/q`, `2ε`, and `2δ`, so the chain contributes
+`4ε + 4δ + 2md/q`. -/
+noncomputable def localVarianceTransportChainError (params : Parameters)
+    (eps delta : Error) : Error :=
+  4 * eps + 4 * delta + 2 * generalizeBError params
+
 /-- The displayed error term in `lem:local-variance-of-points`. -/
 noncomputable def localVarianceOfPointsError (params : Parameters)
     (eps delta : Error) : Error :=

@@ -859,6 +859,81 @@ lemma generalizeBFromLineCollisionExpansion
   exact generalizeBCollisionResidual_le_of_lineExpansion_eq
     params strategy G g (hreindex g)
 
+/-- The reverse `lem:generalize-b` step used at
+`references/ldt-paper/expansion.tex`, line 309.
+
+The paper first moves from the evaluated line event to the exact restriction
+(line 308), then uses the same estimate in the reverse direction at the second
+sampled point (line 309).  The squared-distance expression is unchanged by
+swapping the two endpoints, because `(Y - X) = -(X - Y)`. -/
+lemma generalizeBReversePointwiseBound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (ψbi : QuantumState (ι × ι))
+    (G : SubMeas (Polynomial params) ι)
+    (hgen : GeneralizeBStatement params strategy ψbi G)
+    (g : Polynomial params) :
+    avgOver (axisParallelLineQuestionDistribution params)
+      (fun qu =>
+        let D := weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu -
+          weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu
+        ev ψbi (Dᴴ * D)) ≤ generalizeBError params := by
+  calc
+    avgOver (axisParallelLineQuestionDistribution params)
+        (fun qu =>
+          let D := weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu -
+            weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu
+          ev ψbi (Dᴴ * D))
+      = generalizeBDeviationAtPolynomial params strategy ψbi G g := by
+          unfold generalizeBDeviationAtPolynomial
+          apply avgOver_congr
+          intro qu
+          dsimp only
+          let X := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu
+          let Y := weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
+          have hdiff : Y - X = -(X - Y) := by
+            simp [X, Y]
+          have hconjDiff : Yᴴ - Xᴴ = -(Xᴴ - Yᴴ) := by
+            abel
+          have hsqExpanded : (Yᴴ - Xᴴ) * (Y - X) = (Xᴴ - Yᴴ) * (X - Y) := by
+            calc
+              (Yᴴ - Xᴴ) * (Y - X) =
+                  (-(Xᴴ - Yᴴ)) * (Y - X) := by
+                rw [hconjDiff]
+              _ = (-(Xᴴ - Yᴴ)) * (-(X - Y)) := by rw [hdiff]
+              _ = (Xᴴ - Yᴴ) * (X - Y) := by
+                  rw [neg_mul, mul_neg, neg_neg]
+          calc
+            ev ψbi (((Y - X)ᴴ) * (Y - X)) =
+                ev ψbi ((Yᴴ - Xᴴ) * (Y - X)) := by simp
+            _ = ev ψbi ((Xᴴ - Yᴴ) * (X - Y)) := by
+                exact congrArg (ev ψbi) hsqExpanded
+            _ = ev ψbi (((X - Y)ᴴ) * (X - Y)) := by simp
+    _ ≤ generalizeBError params := hgen.pointwiseNormBound g
+
+/-- The six displayed edge-transport errors are absorbed by the paper's
+`24(ε + δ + md/q)` slack from `lem:local-variance-of-points`.
+
+This is only the scalar arithmetic after the six estimates at
+`references/ldt-paper/expansion.tex`, lines 305--311; it does not assert the
+transport estimates themselves. -/
+lemma localVarianceTransportChainError_le_localVarianceOfPointsError
+    (params : Parameters)
+    [FieldModel params.q]
+    {eps delta gamma : Error}
+    (strategy : SymStrat params ι)
+    (hgood : strategy.IsGood eps delta gamma) :
+    localVarianceTransportChainError params eps delta ≤
+      localVarianceOfPointsError params eps delta := by
+  have heps_nonneg := eps_nonneg_of_isGood params strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params strategy hgood
+  have hgen_nonneg : 0 ≤ generalizeBError params := by
+    dsimp [generalizeBError]
+    positivity
+  dsimp [localVarianceTransportChainError, localVarianceOfPointsError]
+  nlinarith
+
 /-- Legacy wrapper for `lem:local-variance-of-points` with arbitrary bipartite
 state and both pointwise bounds supplied explicitly.
 
@@ -1031,6 +1106,52 @@ lemma globalVarianceOfPointsFromLocalDeviation
           avgOver_polynomialDistribution_le_of_pointwise params
             (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
             (globalVarianceOfPointsError params eps delta) hglobalVariance }
+
+/-- Strategy-state reduction for `lem:local-variance-of-points` from the sharper
+six-step transport-chain bound.
+
+This replaces the final displayed edge estimate by the exact sum of the six
+paper steps (`2δ + 2ε + md/q + md/q + 2ε + 2δ`), leaving the genuine transport
+work as the named residual
+`∀ g, localVarianceDeviationAtPolynomial … g ≤ localVarianceTransportChainError …`.
+The absorption into the public `24(ε + δ + md/q)` statement is proved above. -/
+lemma localVarianceOfPointsFromTransportChainBound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι)
+    (hchain :
+      ∀ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy strategy.state G g ≤
+          localVarianceTransportChainError params eps delta) :
+    LocalVarianceOfPointsStatement params strategy strategy.state G eps delta := by
+  refine localVarianceOfPointsFromEdgeDeviation params strategy eps delta G ?_
+  intro g
+  exact le_trans (hchain g)
+    (localVarianceTransportChainError_le_localVarianceOfPointsError
+      params strategy hgood)
+
+/-- Strategy-state global-variance reduction from the sharper six-step
+local-variance transport-chain bound. -/
+lemma globalVarianceOfPointsFromTransportChainBound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι)
+    (hchain :
+      ∀ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy strategy.state G g ≤
+          localVarianceTransportChainError params eps delta) :
+    GlobalVarianceOfPointsStatement params strategy strategy.state G eps delta := by
+  refine globalVarianceOfPointsFromLocalDeviation params strategy eps delta G ?_
+  intro g
+  exact le_trans (hchain g)
+    (localVarianceTransportChainError_le_localVarianceOfPointsError
+      params strategy hgood)
 
 /-- Legacy wrapper for `lem:global-variance-of-points` with arbitrary bipartite
 state and the independent-points norm bound supplied explicitly.

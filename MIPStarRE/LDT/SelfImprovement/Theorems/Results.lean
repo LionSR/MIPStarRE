@@ -92,29 +92,31 @@ lemma sdp
 /-- Reduced version of `lem:add-in-u`.
 
 This currently keeps only the global-variance consequence used downstream. It
-now derives that consequence from the single edgewise GlobalVariance estimate
-via `globalVarianceOfPointsFromLocalDeviation`. The `gamma` and `_hgood`
-arguments are intentionally retained so this reduced wrapper still matches the
-surrounding self-improvement API and can be strengthened back to the full paper
-statement without another caller-wide signature change. The selection-dependent
-transfer inequality from the paper, together with its dependence on an auxiliary
-family `M` and the averaged family `H`, is not yet formalized here. -/
+now derives that consequence from the sharper six-step edge-transport chain
+bound via `globalVarianceOfPointsFromTransportChainBound`. The `gamma` and
+`hgood` arguments are intentionally retained so this reduced wrapper still
+matches the surrounding self-improvement API and can be strengthened back to the
+full paper statement without another caller-wide signature change. The
+selection-dependent transfer inequality from the paper, together with its
+dependence on an auxiliary family `M` and the averaged family `H`, is not yet
+formalized here. -/
 lemma addInU
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
+    (hgood : strategy.IsGood eps delta gamma)
     (T : Measurement (Polynomial params) ι)
-    (hlocalDev :
+    (hlocalChain :
       ∀ g : Polynomial params,
         localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
-          localVarianceOfPointsError params eps delta) :
+          localVarianceTransportChainError params eps delta) :
     AddInUStatement params strategy T eps delta := by
   refine
     { varianceBound := ?_ }
   let hglobalVariance :=
-    globalVarianceOfPointsFromLocalDeviation params strategy eps delta T.toSubMeas hlocalDev
+    globalVarianceOfPointsFromTransportChainBound params strategy eps delta gamma hgood
+      T.toSubMeas hlocalChain
   simpa [selfImprovementVarianceError] using
     hglobalVariance.averagedGlobalVarianceBound
 
@@ -154,11 +156,11 @@ lemma selfImprovementHelper
       positiveSemidefiniteWitness := hsdp.dualPositive
       dualDominatesAveragedPoint := hsdp.dualFeasible }
   · simpa [T] using hsdp
-  · have hlocalDev := hglobalVarianceProofInputs T
+  · have hlocalChain := hglobalVarianceProofInputs T
     -- This is the remaining surfaced GlobalVariance analytic obligation. The
     -- algebraic local-to-global reduction is now formalized in
-    -- `globalVarianceOfPointsFromLocalDeviation`.
-    exact addInU params strategy eps delta gamma hgood T hlocalDev
+    -- `globalVarianceOfPointsFromTransportChainBound`.
+    exact addInU params strategy eps delta gamma hgood T hlocalChain
 
 set_option maxHeartbeats 800000 in
 /-- `thm:self-improvement`.

@@ -6,7 +6,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 
 
 \begin{lemma}[Replacing a line answer by a fixed polynomial]\label{lem:generalize-b}
-	\lean{MIPStarRE.LDT.GlobalVariance.generalizeB, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual, MIPStarRE.LDT.GlobalVariance.generalizeBFromCollisionResidual, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_lineExpansion_eq, MIPStarRE.LDT.GlobalVariance.generalizeBFromLineCollisionExpansion}
+	\lean{MIPStarRE.LDT.GlobalVariance.generalizeB, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual, MIPStarRE.LDT.GlobalVariance.generalizeBFromCollisionResidual, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_lineExpansion_eq, MIPStarRE.LDT.GlobalVariance.generalizeBFromLineCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBReversePointwiseBound}
 	\leanok
 	\uses{def:polymeasurements, lem:schwartz-zippel-individual, lem:axis-line-polynomial-agreement-mdq}
 	Let $G \in \polysub{m}{q}{d}$. On the axis-parallel line-test distribution,
@@ -22,7 +22,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{proof}
 
 \begin{lemma}[Local variance of the points measurements]\label{lem:local-variance-of-points}
-	\lean{MIPStarRE.LDT.GlobalVariance.localVarianceOfPoints}
+	\lean{MIPStarRE.LDT.GlobalVariance.localVarianceOfPoints, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainError, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainError_le_localVarianceOfPointsError, MIPStarRE.LDT.GlobalVariance.localVarianceOfPointsFromTransportChainBound, MIPStarRE.LDT.GlobalVariance.globalVarianceOfPointsFromTransportChainBound}
 	\leanok
 	\uses{lem:good-strategy-characterization, prop:simeq-to-approx, lem:generalize-b, prop:triangle-inequality-for-approx_delta}
 	Let $G \in \polysub{m}{q}{d}$. On the hypercube edge distribution $(u,v) \sim C$,
