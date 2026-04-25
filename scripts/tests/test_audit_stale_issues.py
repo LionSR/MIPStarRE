@@ -63,6 +63,16 @@ def _make_fake_repo(root: Path) -> None:
             /-- A declaration after closing a named section. -/
             theorem afterNamedSection : True := by trivial
 
+            section
+
+            /-- A declaration inside an unnamed section. -/
+            theorem inAnonymousSection : True := by trivial
+
+            end
+
+            /-- A declaration after closing an unnamed section. -/
+            theorem afterAnonymousSection : True := by trivial
+
             end Fake
             """
         )
@@ -173,6 +183,8 @@ class BuildDeclIndexTests(unittest.TestCase):
             self.assertIn("still_open", index)
             self.assertIn("afterNamedSection", index)
             self.assertIn("Fake.afterNamedSection", index)
+            self.assertIn("afterAnonymousSection", index)
+            self.assertIn("Fake.afterAnonymousSection", index)
 
 
 class LineIsSorryTests(unittest.TestCase):

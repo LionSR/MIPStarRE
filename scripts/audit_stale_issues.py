@@ -230,8 +230,10 @@ def build_decl_index(lean_root: Path) -> set[str]:
                         del namespace_stack[-len(parts):]
                     # Otherwise this is likely closing a named section, not a
                     # tracked namespace; leave the namespace stack unchanged.
-                elif namespace_stack:
-                    namespace_stack.pop()
+                # An anonymous ``end`` is ambiguous: in this repo it commonly
+                # closes an unnamed ``section`` inside a namespace.  Do not pop
+                # the namespace stack unless Lean text explicitly names the
+                # namespace being closed.
                 continue
             if m := _DECL_DEFN_RE.match(line):
                 declared = m.group(1)
