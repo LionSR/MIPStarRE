@@ -59,16 +59,15 @@ lemma qaRestated {Outcome : Type*}
 
 /-- **`X` squared** (`lem:X-squared`).
 
-Identifies both Gram matrices of `X` with the paper's SVD data and the total
-operator `Q`. -/
+Identifies the right Gram matrix of `X` with the total operator `Q`.  This is
+the only part of the paper's SVD bookkeeping used by the downstream
+`P`-vs-`Q` algebra. -/
 lemma xSquared {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (data : QXPLayerData Outcome ι) :
-    data.x * data.xᴴ = data.u * (data.sigmaLeft * data.sigmaLeft) * data.uᴴ ∧
-      data.xᴴ * data.x = QTotal data.qLayer ∧
-      QTotal data.qLayer = data.v * (data.sigmaRight * data.sigmaRight) * data.vᴴ := by
-  exact ⟨data.x_gram_left_svd, data.x_gram_right, data.q_total_svd⟩
+    data.xᴴ * data.x = QTotal data.qLayer := by
+  exact data.x_gram_right
 
 /-- **`X`-expression to `Q`-expression** (`lem:X-expression-to-Q-expression`).
 
@@ -162,15 +161,16 @@ lemma xHatSquared {Outcome : Type*}
 
 /-- **`X` times `XHat`** (`lem:X-times-X-hat`).
 
-Relates the mixed products `X XHat†` and `X† XHat` to the SVD data and to
-`sqrt Q`. -/
+Relates the surviving mixed product `X† XHat` to `sqrt Q`.  The complementary
+`X XHat†` formula from the paper is not stored as an SVD field; the later
+proofs derive the properties they need algebraically from this identity and the
+coisometry of `XHat`. -/
 lemma xTimesXHat {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (data : QXPLayerData Outcome ι) :
-    data.x * data.xHatᴴ = data.u * data.sigmaLeft * data.uᴴ ∧
-      data.xᴴ * data.xHat = CFC.sqrt (QTotal data.qLayer) := by
-  exact ⟨data.xHat_left_svd, data.xHat_mixed⟩
+    data.xᴴ * data.xHat = CFC.sqrt (QTotal data.qLayer) := by
+  exact data.xHat_mixed
 
 private lemma xHat_mixed_adjoint {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]

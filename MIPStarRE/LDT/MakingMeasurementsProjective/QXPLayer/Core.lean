@@ -125,26 +125,23 @@ noncomputable def pFamilyFromXHat {Outcome : Type*} [Fintype Outcome]
   total := ∑ a, xHatᴴ * Ta qLayer a * xHat
 
 /-- Data for the paper's `X/XHat/P` layer built on top of `Q_a` and the
-auxiliary projectors `T_a`.  The square matrices `u`, `v`, `sigmaLeft`,
-and `sigmaRight` are placeholders for the SVD objects appearing in the paper's
-formulas. -/
+auxiliary projectors `T_a`.
+
+The local API deliberately stores only the primitive identities used by the
+subsequent `P`-vs-`Q` arguments.  Earlier versions also carried explicit SVD
+matrices for `X * Xᴴ`, `Xᴴ * X`, and `X * XHatᴴ`; those fields required a
+general rectangular complex-matrix SVD producer that is not available in the
+current Mathlib toolchain and was not consumed by the downstream proofs. -/
 structure QXPLayerData (Outcome : Type uOutcome) [Fintype Outcome]
     (ι : Type uι) [Fintype ι] [DecidableEq ι] where
   qLayer : QLayerData Outcome ι
   x : Matrix qLayer.auxSpace.carrier ι ℂ
   xHat : Matrix qLayer.auxSpace.carrier ι ℂ
-  u : MatrixOperator qLayer.auxSpace
-  v : MIPStarRE.Quantum.Op ι
-  sigmaLeft : MatrixOperator qLayer.auxSpace
-  sigmaRight : MIPStarRE.Quantum.Op ι
   qa_eq : ∀ a : Outcome, qLayer.q.outcome a = xᴴ * Ta qLayer a * x
   qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (qLayer.q.outcome a)
   xHat_coisometry : xHat * xHatᴴ = 1
   x_gram_right : xᴴ * x = QTotal qLayer
-  x_gram_left_svd : x * xᴴ = u * (sigmaLeft * sigmaLeft) * uᴴ
-  q_total_svd : QTotal qLayer = v * (sigmaRight * sigmaRight) * vᴴ
   xHat_mixed : xᴴ * xHat = CFC.sqrt (QTotal qLayer)
-  xHat_left_svd : x * xHatᴴ = u * sigmaLeft * uᴴ
   /-- We store the paper's final `P`-vs-`Q` estimate on the witness package so
   a chosen `X/XHat/P` decomposition carries its own comparison bound. The
   public interface remains `pQApprox`, which is the only place this field is
@@ -195,8 +192,9 @@ abbrev matrixDecompositionQ (Outcome : Type*) [Fintype Outcome]
 
 /-- Paper label `def:svd-of-X`.
 
-The singular-value-decomposition scaffolding for the `X/XHat/P` layer is stored
-in `QXPLayerData`. -/
+The paper describes this stage via an SVD of `X`; the Lean API records the
+constructive `X/XHat/P` identities needed downstream, avoiding an explicit
+rectangular complex-SVD package. -/
 abbrev svdOfX (Outcome : Type*) [Fintype Outcome]
     (ι : Type*) [Fintype ι] [DecidableEq ι] :=
   QXPLayerData Outcome ι

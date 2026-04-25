@@ -818,9 +818,10 @@ the paper's `r > d` truncation branch from orthonormalization.tex:559-658: it
 chooses the top-overlap `Large` set, assembles the truncated projectors from
 `MIPStarRE.Quantum.IsProj.rangeONB`, proves the `4√ζ` truncation error, and
 then builds the finite auxiliary projective measurement from the resulting rank
-bound. The broader downstream `QXPLayerData` pipeline still lacks a concrete
-`X / XHat / P` producer because Mathlib has no general complex-matrix SVD API
-(issue #652). -/
+bound. The broader downstream `QXPLayerData` producer is intentionally separated
+from this rank-reduction theorem: its API now asks only for the primitive
+`X / XHat / P` identities used later, rather than for explicit rectangular
+complex-SVD matrices. -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome]
