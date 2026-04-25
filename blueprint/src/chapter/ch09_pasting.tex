@@ -5,6 +5,10 @@
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting}
 	\lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection, MIPStarRE.LDT.Pasting.ldPasting}
+	% Lean-local gap: `Pasting.ldPasting` (and its induction-section wrapper)
+	% transitively depends on `ldPastingNCompleteness`, whose proof still has
+	% `sorry` at `Pasting/Bernoulli/Final.lean:247`. Restore the blueprint-ok marker once
+	% that Bernoulli-tail bound is closed (issue #673).
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
 	\begin{enumerate}
@@ -153,6 +157,9 @@ where
 
 \begin{lemma}[Pasted submeasurement]\label{lem:ld-pasting-sub-measurement}
 	\lean{MIPStarRE.LDT.Pasting.ldPastingSubMeas}
+	% Lean-local gap: `ldPastingSubMeas` shares the
+	% `ldPastingNCompleteness`-via-`Final.lean:247` sorry chain as
+	% `ldPasting`, so its axiom closure still contains `sorryAx`.
 	\uses{def:ld-pasting-context, def:polymeasurements, def:simeq,
 	      def:pasted-measurement}
 	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
@@ -492,6 +499,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{corollary}[Commutativity of the complete part]\label{cor:commuting-with-G-complete}
 	\lean{MIPStarRE.LDT.Pasting.commutingWithGComplete}
+	\leanok
 	\uses{def:ld-pasting-context, thm:com-main, lem:commutativity-switcheroo,
 	      lem:g-complete-self-consistency}
 	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
@@ -589,6 +597,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Commuting past multiple completed measurements]\label{lem:commute-g-half-sandwich}
 	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich}
+	\leanok
 	\uses{cor:G-hat-facts, prop:triangle-inequality-for-approx_delta}
 	For every $k \ge 2$,
 	\[
@@ -612,6 +621,9 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Consistency of the sandwiched measurement with one line value]\label{lem:ld-sandwich-line-one-point}
 	\lean{MIPStarRE.LDT.Pasting.ldSandwichLineOnePoint}
+	% Lean-local gap: `ldSandwichLineOnePoint` is a thin wrapper over a private
+	% `ldSandwichLineOnePoint_core` whose body still contains `sorry`
+	% (`Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean:73`).
 	\uses{lem:commute-g-half-sandwich, lem:ld-gbcon}
 	For any $1 \le i \le k$,
 	\[
@@ -739,6 +751,9 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{corollary}[Consistency of $H$ with $A$]\label{cor:h-a-consistency}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas}
+	% Lean-local gap: `hAConsistency_submeas` calls both
+	% `Commutativity.comMain` and `ldSandwichLineOnePoint`, so its closure
+	% inherits the corresponding `sorryAx` flags.
 	\uses{lem:h-b-consistency}
 	On average over $(u,x) \sim \F_q^{m+1}$,
 	\[
@@ -805,6 +820,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Summing over all outcomes]\label{lem:over-all-outcomes}
 	\lean{MIPStarRE.LDT.Pasting.overAllOutcomes}
+	% Lean-local gap: `overAllOutcomes` currently has `sorry` as its entire
+	% proof body (`Pasting/BridgeLemmas/OverAllOutcomes.lean:64`).
 	\uses{def:outcomes-by-type, prop:ld-dnoteq, lem:ld-sandwich-line-one-point, lem:schwartz-zippel-individual}
 	If $x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
 	\[
@@ -944,6 +961,9 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[From the pasted sum to a polynomial in $G$]\label{lem:from-H-to-G}
 	\lean{MIPStarRE.LDT.Pasting.fromHToG}
+	% Lean-local gap: `fromHToG`'s entire proof body is `sorry`
+	% (`Pasting/Bernoulli/Recurrence.lean:132`); the recurrence telescope
+	% is open per issue #673.
 	\uses{cor:G-hat-facts, lem:commute-g-half-sandwich, def:pasted-measurement, def:truncated-type-sums, lem:truncated-type-sum-recurrence}
 	Let $\ket{\psi_{\mathrm{bi}}}$ be a bipartite state on $\iota \otimes \iota$.  If
 	$x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
