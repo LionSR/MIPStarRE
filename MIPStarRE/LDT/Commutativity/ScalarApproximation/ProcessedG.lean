@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.Phase67Residual
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
 import MIPStarRE.LDT.Commutativity.GCommStability
 
@@ -735,14 +736,8 @@ private lemma evaluatedSlice_scalar_chain_bound
               ((evaluatedSliceSecondFactor params family q).outcome b) *
               ((evaluatedSliceFirstFactor params family q).outcome a)) *
           rightTensor (ι₁ := ι) ((evaluatedSlicePointMeas params strategy q.2).outcome b))
-  let phase5Removed : EvaluatedSliceQuestion params → Error := fun q =>
-    ∑ a : Fq params, ∑ b : Fq params,
-      ev strategy.state
-        (leftTensor (ι₂ := ι)
-            (((evaluatedSliceSecondFactor params family q).outcome b) *
-              ((evaluatedSliceFirstFactor params family q).outcome a) *
-              ((evaluatedSliceSecondFactor params family q).outcome b)) *
-          rightTensor (ι₁ := ι) ((evaluatedSlicePointMeas params strategy q.1).outcome a))
+  let phase5Removed : EvaluatedSliceQuestion params → Error :=
+    evaluatedSlicePhaseFiveRemoved params strategy family
   -- Phase 1: `eq:gcom8 -> eq:apply-add-an-a-once`.
   have hphase1 :
       |avgOver 𝒟 avgABAB - avgOver 𝒟 phase1Inserted| ≤ 2 * Real.sqrt zeta := by
@@ -858,19 +853,26 @@ private lemma evaluatedSlice_scalar_chain_bound
     -- live target below: routing through that term reintroduces the global
     -- `|avgBAB - avgBABA|` quantity that this chain is trying to bound.
     --
-    -- The honest residual is the reverse `eq:add-an-a` bridge on the first
-    -- coordinate.  One should instantiate `closenessOfIP` with `hcombined_fst`
-    -- (the `G^{u,x}_a ⊗ I ≈ G^x ⊗ A^{u,x}_a` control) and a `BAB`-side
-    -- sandwich family, then prove the algebraic identifications of the two
-    -- resulting scalar averages with `avgBAB` and `phase5Removed`.  This exact
-    -- residual is tracked in issue #732.
+    -- A naive `hcombined_fst` / `closenessOfIP` attempt here is not the missing
+    -- BAB-side bridge: it reproduces the already formalized BABA-side phase-3
+    -- insertion `avgBABA -> phase3Inserted`.  Encoding exact endpoint
+    -- identifications with `avgBAB` and `phase5Removed` would assert false
+    -- equalities.  The honest residual is therefore the live BAB-side endpoint
+    -- comparison named below.
     -- Reference: the single reverse `eq:add-an-a` on the first coordinate,
     -- the BAB-side analogue of `eq:apply-add-an-a-once` (paper line 76).
     -- The BABA-side counterpart is the first reverse move in lines 99--101 and
     -- is already represented here by `hphase3` / `evaluatedSlice_phaseThree_insert_bound`.
     have hphase67_fst :
         |avgOver 𝒟 avgBAB - avgOver 𝒟 phase5Removed| ≤ 2 * Real.sqrt zeta := by
-      sorry
+      have hphase67_endpoint :
+          evaluatedSlicePhase67FirstReverseEndpointResidual params strategy family zeta := by
+        -- TODO(#732): prove the live BAB-side first-coordinate reverse
+        -- `eq:add-an-a` endpoint comparison, or adjust the scalar-chain
+        -- orientation so this residual has paper-faithful endpoints.
+        sorry
+      simpa [evaluatedSlicePhase67FirstReverseEndpointResidual, 𝒟, avgBAB,
+        phase5Removed] using hphase67_endpoint
     -- Triangle-inequality chain: |avgBAB − avgBABA| ≤ 5√ζ
     have hchain :
         |avgOver 𝒟 avgBAB - avgOver 𝒟 avgBABA| ≤ 5 * Real.sqrt zeta := by
