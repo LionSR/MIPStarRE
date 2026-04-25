@@ -93,7 +93,10 @@ lemma sdp
 
 This currently keeps only the global-variance consequence used downstream. It
 now derives that consequence from the single edgewise GlobalVariance estimate
-via `globalVarianceOfPointsFromLocalDeviation`. The selection-dependent
+via `globalVarianceOfPointsFromLocalDeviation`. The `gamma` and `_hgood`
+arguments are intentionally retained so this reduced wrapper still matches the
+surrounding self-improvement API and can be strengthened back to the full paper
+statement without another caller-wide signature change. The selection-dependent
 transfer inequality from the paper, together with its dependence on an auxiliary
 family `M` and the averaged family `H`, is not yet formalized here. -/
 lemma addInU
