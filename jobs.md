@@ -227,12 +227,15 @@ Last updated: 2026-04-23
 ## Active Commutativity Wave
 - **Owner**: OpenCode
 - **Scope**: `MIPStarRE/LDT/Commutativity/*.lean`
-- **Live executable sorrys in scope**: 7
+- **Live executable sorrys in scope**: 5
 - **Current live targets**:
-  - `Commutativity/ScalarApproximation/ProcessedG.lean`: `evaluatedSlice_scalar_chain_bound` (temporarily split into local phase placeholders `hphase2`, `hphase4`, `hphase5`, `hphase67`, `hassemble` on branch `fix-processedg-sorries`)
+  - `Commutativity/ScalarApproximation/ProcessedG.lean`:
+    `evaluatedSlice_scalar_chain_bound` (temporarily split into local phase facts
+    `hphase1`, `hphase2`, `hphase3`, `hphase5`, `htail`, `hphase67_fst`,
+    `hassemble`; live local placeholders are `hphase2`, `hphase5`, and
+    `hphase67_fst`)
   - `Commutativity/Main/Auxiliary.lean`: `fullSlice_scalar_marginalize_x`
   - `Commutativity/Main/Auxiliary.lean`: `fullSlice_scalar_marginalize_y`
-  - `Commutativity/Main/Auxiliary.lean`: `fullSlice_closenessOfIP_CAB_hEval`
 - **Status**: IN PROGRESS
 - **Dependency chain**:
   - `MIPStarRE.LDT.Commutativity.normalizationCondition_sandwich_bound`
@@ -245,13 +248,11 @@ Last updated: 2026-04-23
   - `MIPStarRE.LDT.Commutativity.commDataProcessedG`
   - `MIPStarRE.LDT.Commutativity.comMain`
 - **Priority order**:
-  1. discharge the two transport lemmas already covered by existing normalization / swap infrastructure
-  2. assemble `evaluatedSlice_scalar_chain_bound` from the existing phase lemmas
-  3. prove the two Schwartz-Zippel marginalization lemmas in `Main.lean`
-  4. close the evaluated-side `closenessOfIP` chain in `Main.lean`
-  5. update `blueprint/src/chapter/ch08_commutativity.tex`
-  6. verify no `sorry`s remain in `MIPStarRE/LDT/Commutativity`
-  7. run `lake build`
+  1. assemble `evaluatedSlice_scalar_chain_bound` from the existing phase lemmas
+  2. prove the two Schwartz-Zippel marginalization lemmas in `Main.lean`
+  3. update `blueprint/src/chapter/ch08_commutativity.tex`
+  4. verify no `sorry`s remain in `MIPStarRE/LDT/Commutativity`
+  5. run `lake build`
 - **Checklist**:
   - [x] Survey all `sorry`s in `MIPStarRE/LDT/Commutativity`
   - [x] Read `docs/proof-hints.md`
@@ -263,19 +264,30 @@ Last updated: 2026-04-23
   - [ ] Prove `evaluatedSlice_scalar_chain_bound`
   - [ ] Prove `fullSlice_scalar_marginalize_x`
   - [ ] Prove `fullSlice_scalar_marginalize_y`
-  - [ ] Prove `fullSlice_closenessOfIP_CAB_hEval`
+  - [x] Prove `fullSlice_closenessOfIP_CAB_hEval`
   - [ ] Verify no `sorry`s remain in `MIPStarRE/LDT/Commutativity`
   - [ ] Add `\leanok` / `\uses` updates in `ch08_commutativity.tex`
   - [ ] Run `lake build`
 - **Completed on this pass**:
   - started branch `fix-processedg-sorries` for the remaining `ProcessedG.lean` scalar-chain proof
-  - created `outline-fix-processedg-sorries.md` with the copied `commutativity-G.tex` fragment, the phase-by-phase informal reasoning, and the Lean formalization plan
-  - replaced the single terminal `sorry` in `Commutativity/ScalarApproximation/ProcessedG.lean` by a phase-structured scaffold: local averages (`avgABAB`, `avgABA`, `avgBABA`, `avgBAB`), the `consSubMeas`-derived first/second-coordinate controls, explicit phase-1 and phase-3 inserted terms, and temporary local placeholder subgoals `hphase2`, `hphase4`, `hphase5`, `hphase67`, and `hassemble`
+  - used a temporary branch-local outline for the copied `commutativity-G.tex`
+    fragment, phase-by-phase informal reasoning, and Lean formalization plan; the
+    repo-root outline file has since been removed as non-load-bearing planning
+    material
+  - replaced the single terminal `sorry` in
+    `Commutativity/ScalarApproximation/ProcessedG.lean` by a phase-structured
+    scaffold: local averages (`avgABAB`, `avgABA`, `avgBABA`, `avgBAB`), the
+    `consSubMeas`-derived first/second-coordinate controls, explicit phase-1 and
+    phase-3 inserted terms, and local phase facts `hphase1`, `hphase2`,
+    `hphase3`, `hphase5`, `htail`, `hphase67_fst`, and `hassemble`
   - verified `lake env lean MIPStarRE/LDT/Commutativity/ScalarApproximation/ProcessedG.lean` still elaborates, now with the temporary scaffold `sorry`s only
   - re-surveyed the split commutativity module and confirmed the live `sorry`s now sit in `Main/Auxiliary.lean` and the temporarily scaffolded `ScalarApproximation/ProcessedG.lean` rather than the old monolithic `Theorems.lean`
   - read `docs/proof-hints.md`, `references/ldt-paper/commutativity-G.tex`, and `blueprint/src/chapter/ch08_commutativity.tex` against the current Lean layout
   - confirmed the lowest-risk first moves are to reuse the existing normalization-condition API from `Commutativity/Defs.lean` and to mirror the already-proved evaluated-slice swap argument for the full-slice `qSDDOp` identity
-  - confirmed `evaluatedSlice_scalar_chain_bound` is now a proof-assembly task: the phase-1, phase-3, phase-4, phase-5, phase-8/9, and stability scalar-gap helpers already exist and compile
+  - confirmed `evaluatedSlice_scalar_chain_bound` is now a proof-assembly task:
+    the phase-1, phase-3, phase-5, phase-8/9, and stability scalar-defect
+    helpers already exist and compile; the paper's phase-4 swap-symmetry move is
+    absorbed in the assembly
   - proved `normalizationCondition_sandwich_bound` directly from the existing `normalizationConditionSquareFamily` API in `Commutativity/Defs.lean`
   - proved `fullSliceCommutation_qSDDOp_avg_eq` by expanding the full-slice `qSDDOp`, reindexing the joint `(question, outcome)` average by the simultaneous swap equivalence, and collapsing the averaged `BAB/BABA` terms to `ABA/ABAB`
   - exposed `Commutativity.fullPolynomial_agreement_avg_le_mdq` from `Scaffold.lean` so the remaining `md/q` transport lemmas can reuse the existing Schwartz-Zippel package once their statements line up with the paper argument
@@ -293,7 +305,8 @@ Last updated: 2026-04-23
   - remaining work in this refactor:
     - finish the direct pointwise scalar Cauchy-Schwarz proof in `GCommStability.lean`
     - move the scalar-chain theorem / `commDataProcessedG` assembly onto the new paper-faithful scalar lemmas
-    - then return to the three `Main.lean` transport sorries with the stronger evaluated-side theorem available
+    - then return to the two `Main/Auxiliary.lean` transport sorries with the
+      stronger evaluated-side theorem available
 
 ## Active Pasting Wave
 - **Owner**: OpenCode
