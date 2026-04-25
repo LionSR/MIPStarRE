@@ -857,20 +857,27 @@ private lemma evaluatedSlice_scalar_chain_bound
     -- BAB-side bridge: it reproduces the already formalized BABA-side phase-3
     -- insertion `avgBABA -> phase3Inserted`.  Encoding exact endpoint
     -- identifications with `avgBAB` and `phase5Removed` would assert false
-    -- equalities.  The honest residual is therefore the live BAB-side endpoint
-    -- comparison named below.
+    -- equalities.  The monotonicity lemma in `Phase67Residual` proves the easy
+    -- half: `phase5Removed ≤ avgBAB`, because the inserted right-register point
+    -- outcome is bounded by `1`.  Thus the honest remaining bridge is the
+    -- one-sided missing-mass bound named below.
     -- Reference: the single reverse `eq:add-an-a` on the first coordinate,
     -- the BAB-side analogue of `eq:apply-add-an-a-once` (paper line 76).
     -- The BABA-side counterpart is the first reverse move in lines 99--101 and
     -- is already represented here by `hphase3` / `evaluatedSlice_phaseThree_insert_bound`.
     have hphase67_fst :
         |avgOver 𝒟 avgBAB - avgOver 𝒟 phase5Removed| ≤ 2 * Real.sqrt zeta := by
-      have hphase67_endpoint :
-          evaluatedSlicePhase67FirstReverseEndpointResidual params strategy family zeta := by
-        -- TODO(#732): prove the live BAB-side first-coordinate reverse
-        -- `eq:add-an-a` endpoint comparison, or adjust the scalar-chain
-        -- orientation so this residual has paper-faithful endpoints.
+      have hphase67_gap :
+          evaluatedSlicePhase67FirstReverseGapResidual params strategy family zeta := by
+        -- TODO(#759/#732): prove the live BAB-side first-coordinate reverse
+        -- `eq:add-an-a` missing-mass estimate.  The opposite inequality is now
+        -- formalized by `evaluatedSlicePhaseFiveRemoved_sumBabTerm_avg`, so this
+        -- residual is strictly one-sided rather than an absolute-value endpoint.
         sorry
+      have hphase67_endpoint :
+          evaluatedSlicePhase67FirstReverseEndpointResidual params strategy family zeta :=
+        evaluatedSlicePhase67FirstReverseEndpointResidual_of_gap
+          params strategy family zeta hphase67_gap
       simpa [evaluatedSlicePhase67FirstReverseEndpointResidual, 𝒟, avgBAB,
         phase5Removed] using hphase67_endpoint
     -- Triangle-inequality chain: |avgBAB − avgBABA| ≤ 5√ζ
