@@ -229,9 +229,11 @@ are true:
    `admit`, `axiom`, `unsafe`, `native_decide`, `unsafeCast`, `unsafeCoerce`,
    `lcProof`, `ofReduceBool`, or `ofReduceNat`.
 
-The workflow then re-runs `lake build -q --log-level=info`, commits the guarded
-diff to `autofix/lean-linter-warning-sweep-<run-id>-<run-attempt>`, opens a PR, and adds the
-`auto-fix-claude`, `cleanup`, `formalization`, `2009.12982`, `ci`, and
+The workflow then re-runs `lake build -q --log-level=info`, re-checks that the
+post-validation diff still has the same tracked Lean-file list and no forbidden
+proof-integrity tokens, stages only that guarded file list, commits to
+`autofix/lean-linter-warning-sweep-<run-id>-<run-attempt>`, opens a PR, and adds
+the `auto-fix-claude`, `cleanup`, `formalization`, `2009.12982`, `ci`, and
 `infrastructure` labels. It is intentionally not triggered on `pull_request`,
 so untrusted PR contexts cannot access the write token or Claude secret.
 

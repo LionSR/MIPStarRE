@@ -219,13 +219,50 @@ jobs:
           # repository-wide warning hygiene.
           lake build -q --log-level=info
 
+      - name: Re-check diff after validation
+        if: steps.diff_guard.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          changed_files_path="$RUNNER_TEMP/lean-linter-warning-autofix-changed-files.txt"
+
+          untracked_files=$(git ls-files --others --exclude-standard)
+          if [ -n "$untracked_files" ]; then
+            echo "::error::Validation created untracked files; refusing to open an automated PR."
+            printf '%s\n' "$untracked_files"
+            exit 1
+          fi
+
+          deleted_files=$(git diff --name-only --diff-filter=D)
+          if [ -n "$deleted_files" ]; then
+            echo "::error::Validation deleted files; refusing to open an automated PR."
+            printf '%s\n' "$deleted_files"
+            exit 1
+          fi
+
+          after_files="$RUNNER_TEMP/lean-linter-warning-autofix-changed-files-after-validation.txt"
+          git diff --name-only > "$after_files"
+          if ! cmp -s "$changed_files_path" "$after_files"; then
+            echo "::error::Validation changed the guarded diff file list; refusing to open an automated PR."
+            echo "Before validation:"
+            cat "$changed_files_path"
+            echo "After validation:"
+            cat "$after_files"
+            exit 1
+          fi
+
+          if git diff --unified=0 | grep -E '^\+[^+]' | grep -E '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe|native_decide|unsafeCast|unsafeCoerce|lcProof|ofReduceBool|ofReduceNat)([^[:alnum:]_]|$)'; then
+            echo "::error::Validation left a forbidden proof-integrity token in the diff."
+            exit 1
+          fi
+
       - name: Commit and push auto-fix branch
         if: steps.diff_guard.outputs.changed == 'true'
         env:
           BRANCH: ${{ steps.branch.outputs.branch }}
         run: |
           set -euo pipefail
-          git add -A
+          changed_files_path="$RUNNER_TEMP/lean-linter-warning-autofix-changed-files.txt"
+          git add --pathspec-from-file="$changed_files_path"
           git commit -m "[claude-auto-fix] clean Lean linter warnings"
           git push --set-upstream origin "$BRANCH"
 
