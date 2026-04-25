@@ -560,7 +560,7 @@ private lemma sandwichTensor_residual_sum_le_one
 
 /-- Schwartz-Zippel controls the factored polynomial-collision tensor residual.
 
-This is the reusable scalar half of paper `eq:gcom4-diff`: after the expansion has
+This is the local scalar half of paper `eq:gcom4-diff`: after the expansion has
 separated the random point average into
 `E_u 1[g(u)=g'(u)]`, each off-diagonal coefficient is bounded by `m d / q`, and
 `sandwichTensor_residual_sum_le_one` bounds the remaining PSD tensor sum. -/
@@ -647,8 +647,8 @@ private noncomputable def fullSliceBABA_xCollisionFactored
 
 /-- The Schwartz-Zippel/PSD bound for the x-marginalization collision residual.
 
-This is the proved hard estimate needed by `fullSliceBABA_tensor_marginalize_x`;
-the only remaining work for that final lemma is the algebraic expansion equating
+This is the proved hard estimate needed by the eventual x-marginalization tensor
+lemma tracked in #730; the only remaining work is the algebraic expansion equating
 the absolute difference of tensor averages with `fullSliceBABA_xCollisionFactored`
 (averaged over `x,y`). -/
 private lemma fullSliceBABA_xCollisionFactored_le_mdq
@@ -685,9 +685,9 @@ private noncomputable def fullSliceABAB_yCollisionFactored
 
 /-- The Schwartz-Zippel/PSD bound for the y-marginalization collision residual.
 
-This is the proved hard estimate needed by `fullSliceABABB_tensor_marginalize_y`;
-the remaining final-lemma work is the postprocessing expansion from the tensor
-averages to `fullSliceABAB_yCollisionFactored`. -/
+This is the proved hard estimate needed by the eventual y-marginalization tensor
+lemma tracked in #730; the remaining final-lemma work is the postprocessing
+expansion from the tensor averages to `fullSliceABAB_yCollisionFactored`. -/
 private lemma fullSliceABAB_yCollisionFactored_le_mdq
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
