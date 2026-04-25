@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
+import MIPStarRE.LDT.Pasting.Defs.Tuples
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
 import MIPStarRE.LDT.Pasting.BridgeLemmas.HAConsistency
 import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes
@@ -99,49 +100,6 @@ private lemma overAllOutcomesError_add_fromHToGError_le_ldPastingNu
     _ = MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta := by
           simp [MainInductionStep.ldPastingInInductionNu, kE, mE, fullSum,
             epsTerm, deltaTerm, gammaTerm, zetaTerm, dqTerm, ratio]
-
-/-- Subtracting a left-placed operator from the bipartite identity is the left
-placement of the local complement. -/
-private lemma leftTensor_sub_one (A : MIPStarRE.Quantum.Op ι) :
-    (1 : MIPStarRE.Quantum.Op (ι × ι)) - leftTensor (ι₂ := ι) A =
-      leftTensor (ι₂ := ι) (1 - A) := by
-  rw [← leftTensor_one (ι₁ := ι) (ι₂ := ι)]
-  ext x y
-  cases x with
-  | mk x1 x2 =>
-  cases y with
-  | mk y1 y2 =>
-  simp [leftTensor, Matrix.one_apply]
-  split_ifs <;> simp_all
-
-/-- Scalar multiplication commutes with left tensor placement. -/
-private lemma leftTensor_smul (c : ℂ) (A : MIPStarRE.Quantum.Op ι) :
-    c • leftTensor (ι₂ := ι) A = leftTensor (ι₂ := ι) (c • A) := by
-  ext x y
-  simp [leftTensor]
-  ring
-
-/-- Powers commute with left tensor placement. -/
-private lemma leftTensor_pow (A : MIPStarRE.Quantum.Op ι) (n : ℕ) :
-    (leftTensor (ι₂ := ι) A) ^ n = leftTensor (ι₂ := ι) (A ^ n) := by
-  induction n with
-  | zero => simpa using (leftTensor_one (ι₁ := ι) (ι₂ := ι)).symm
-  | succ n ih =>
-      rw [pow_succ, pow_succ, ih, leftTensor_mul_leftTensor]
-
-/-- The Bernoulli-tail polynomial commutes with left tensor placement. -/
-private lemma bernoulliTailOperator_leftTensor (A : MIPStarRE.Quantum.Op ι)
-    (k degree : ℕ) :
-    bernoulliTailOperator k degree (leftTensor (ι₂ := ι) A) =
-      leftTensor (ι₂ := ι) (bernoulliTailOperator k degree A) := by
-  unfold bernoulliTailOperator
-  rw [← leftTensor_finset_sum (ι₂ := ι) (Finset.Icc (degree + 1) k)
-    (fun r => (Nat.choose k r : ℂ) • (A ^ r * (1 - A) ^ (k - r)))]
-  refine Finset.sum_congr rfl ?_
-  intro r _hr
-  rw [leftTensor_pow, leftTensor_sub_one, leftTensor_pow, leftTensor_mul_leftTensor]
-  exact leftTensor_smul (ι := ι) (Nat.choose k r : ℂ)
-    (A ^ r * (1 - A) ^ (k - r))
 
 /-- Positivity of the paper's choice `θ = 1/(200m)`. -/
 private lemma ldPasting_theta_pos (params : Parameters) :

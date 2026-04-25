@@ -254,6 +254,25 @@ theorem leftTensor_mul_leftTensor
     (Matrix.mul_kronecker_mul
       A B (1 : MIPStarRE.Quantum.Op ι₂) (1 : MIPStarRE.Quantum.Op ι₂)).symm
 
+/-- Scalar multiplication commutes with left tensor placement. -/
+theorem leftTensor_smul
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (c : ℂ) (A : MIPStarRE.Quantum.Op ι₁) :
+    c • leftTensor (ι₂ := ι₂) A = leftTensor (ι₂ := ι₂) (c • A) := by
+  ext x y
+  simp [leftTensor]
+  ring
+
+/-- Powers commute with left tensor placement. -/
+theorem leftTensor_pow
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A : MIPStarRE.Quantum.Op ι₁) (n : ℕ) :
+    (leftTensor (ι₂ := ι₂) A) ^ n = leftTensor (ι₂ := ι₂) (A ^ n) := by
+  induction n with
+  | zero => simpa using (leftTensor_one (ι₁ := ι₁) (ι₂ := ι₂)).symm
+  | succ n ih =>
+      rw [pow_succ, pow_succ, ih, leftTensor_mul_leftTensor]
+
 /-- `rightTensor A * rightTensor B = rightTensor (A * B)`. -/
 theorem rightTensor_mul_rightTensor
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
@@ -285,6 +304,15 @@ theorem opTensor_sub_left
     opTensor A C - opTensor B C = opTensor (A - B) C := by
   simpa [opTensor] using
     MIPStarRE.Quantum.kronecker_sub_left (A₁ := A) (A₂ := B) (B := C)
+
+/-- Left tensor placement commutes with subtraction. -/
+theorem leftTensor_sub
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A B : MIPStarRE.Quantum.Op ι₁) :
+    leftTensor (ι₂ := ι₂) A - leftTensor (ι₂ := ι₂) B =
+      leftTensor (ι₂ := ι₂) (A - B) := by
+  simpa [leftTensor] using
+    (opTensor_sub_left (ι₁ := ι₁) (ι₂ := ι₂) A B (1 : MIPStarRE.Quantum.Op ι₂))
 
 
 end MIPStarRE.LDT
