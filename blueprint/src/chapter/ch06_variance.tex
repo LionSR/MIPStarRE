@@ -6,9 +6,9 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 
 
 \begin{lemma}[Replacing a line answer by a fixed polynomial]\label{lem:generalize-b}
-	\lean{MIPStarRE.LDT.GlobalVariance.generalizeB, MIPStarRE.LDT.GlobalVariance.generalizeBFromCollisionResidual}
+	\lean{MIPStarRE.LDT.GlobalVariance.generalizeB, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidualAtPolynomial, MIPStarRE.LDT.GlobalVariance.generalizeBFromCollisionResidual, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansionAtPolynomial, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansionAtPolynomial_le_generalizeBError, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidualAtPolynomial_le_of_lineCollisionExpansion_eq, MIPStarRE.LDT.GlobalVariance.generalizeBFromLineCollisionExpansion}
 	\leanok
-	\uses{def:polymeasurements, lem:schwartz-zippel-individual}
+	\uses{def:polymeasurements, lem:schwartz-zippel-individual, lem:axis-line-polynomial-agreement-mdq}
 	Let $G \in \polysub{m}{q}{d}$. On the axis-parallel line-test distribution,
 	\[
 		B^{\ell}_{[f(u)=g(u)]} \ot (G_g)^{1/2}
@@ -17,8 +17,8 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 	\]
 \end{lemma}
 \begin{proof}
-	\uses{lem:schwartz-zippel-individual}
-	Expand the $\approx_{md/q}$ norm on the weighted vector $(I\ot (G_g)^{1/2})\ket{\psi}$. Because $B^\ell$ is a projective measurement, only those line polynomials $f$ with $f\ne g|_\ell$ and $f(u)=g(u)$ contribute. Lemma~\ref{lem:schwartz-zippel-individual} bounds the probability of this event by $md/q$, and the remaining operator sum is bounded by the fact that $G$ is a submeasurement.
+	\uses{lem:schwartz-zippel-individual, lem:axis-line-polynomial-agreement-mdq}
+	Expand the $\approx_{md/q}$ norm on the weighted vector $(I\ot (G_g)^{1/2})\ket{\psi}$. Because $B^\ell$ is a projective measurement, only those line polynomials $f$ with $f\ne g|_\ell$ and $f(u)=g(u)$ contribute. Lemma~\ref{lem:axis-line-polynomial-agreement-mdq} is the univariate Schwartz--Zippel wrapper used in Lean for this line-restriction event; it supplies the paper's $md/q$ loss, and the remaining operator sum is bounded by the fact that $G$ is a submeasurement.
 \end{proof}
 
 \begin{lemma}[Local variance of the points measurements]\label{lem:local-variance-of-points}
