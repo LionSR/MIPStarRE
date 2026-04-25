@@ -287,6 +287,245 @@ private lemma fromHToGStageMass_terminal_eq
     one_mul, Finset.sum_singleton]
   exact congrArg (fun A : MIPStarRE.Quantum.Op ι => ev ψbi (leftTensor (ι₂ := ι) A)) hweight
 
+/-- At prefix length zero, the recurrence weight is exactly the eligibility
+indicator for the remaining type: the empty prefix contributes the identity when
+`|τtail| ≥ d + 1`, and contributes zero otherwise. -/
+private lemma fromHToG_truncatedTypeSums_zero_eq_indicator
+    (G : MIPStarRE.Quantum.Op ι) (d : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) :
+    truncatedTypeSums G d 0 τtail =
+      if d + 1 ≤ gHatTypeWeight τtail then 1 else 0 := by
+  simp [truncatedTypeSums, gHatTypeOperator, gHatTypeWeight]
+
+/-- Membership in `outcomesByType τ` is the same as having tuple type `τ`. -/
+private lemma fromHToG_outcomesByType_iff_type_eq
+    {params : Parameters} [FieldModel params.q] {k : ℕ}
+    (gs : GHatTupleOutcome params k) (τ : GHatType k) :
+    gs ∈ outcomesByType τ ↔ gHatTupleType gs = τ := by
+  constructor
+  · intro h
+    funext i
+    exact h i
+  · intro h i
+    exact congrFun h i
+
+/-- Interpolation eligibility depends only on the Boolean type of a completed-slice
+tuple. -/
+private lemma fromHToG_interpolationEligible_iff_type_weight
+    (params : Parameters) [FieldModel params.q] {k : ℕ}
+    (gs : GHatTupleOutcome params k) :
+    InterpolationEligible params gs ↔
+      params.d + 1 ≤ gHatTypeWeight (gHatTupleType gs) := by
+  simp [InterpolationEligible, gHatTupleHammingWeight, gHatTupleSupport,
+    gHatTypeWeight, gHatTupleType]
+
+/-- Split the eligible sandwich total into a sum over exact Boolean outcome types. -/
+private lemma fromHToG_interpolationEligibleSandwich_total_eq_type_sum
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ) (xs : PointTuple params k) :
+    (interpolationEligibleSandwichFamily params family k xs).total =
+      ∑ τ : GHatType k,
+        if params.d + 1 ≤ gHatTypeWeight τ then
+          ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)) with
+            gHatTupleType gs = τ,
+            (gHatSandwichFamily params family k xs).outcome gs
+        else 0 := by
+  classical
+  let A : GHatTupleOutcome params k → MIPStarRE.Quantum.Op ι :=
+    fun gs => (gHatSandwichFamily params family k xs).outcome gs
+  have hpartition :
+      (∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)) with
+          InterpolationEligible params gs, A gs) =
+        ∑ τ : GHatType k,
+          if params.d + 1 ≤ gHatTypeWeight τ then
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)) with
+              gHatTupleType gs = τ, A gs
+          else 0 := by
+    calc
+      (∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)) with
+          InterpolationEligible params gs, A gs)
+        = ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)),
+            if InterpolationEligible params gs then A gs else 0 := by
+            rw [Finset.sum_filter]
+      _ = ∑ τ : GHatType k,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)) with
+              gHatTupleType gs = τ,
+              if InterpolationEligible params gs then A gs else 0 := by
+            exact (Finset.sum_fiberwise
+              (Finset.univ : Finset (GHatTupleOutcome params k))
+              (fun gs => gHatTupleType gs)
+              (fun gs => if InterpolationEligible params gs then A gs else 0)).symm
+      _ = ∑ τ : GHatType k,
+          if params.d + 1 ≤ gHatTypeWeight τ then
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)) with
+              gHatTupleType gs = τ, A gs
+          else 0 := by
+          refine Finset.sum_congr rfl ?_
+          intro τ _
+          by_cases hτ : params.d + 1 ≤ gHatTypeWeight τ
+          · rw [if_pos hτ]
+            refine Finset.sum_congr rfl ?_
+            intro gs hgs
+            simp only [Finset.mem_filter] at hgs
+            have htype : gHatTupleType gs = τ := hgs.2
+            have helig : InterpolationEligible params gs := by
+              rw [fromHToG_interpolationEligible_iff_type_weight params gs]
+              simpa [htype] using hτ
+            rw [if_pos helig]
+          · rw [if_neg hτ]
+            refine Finset.sum_eq_zero ?_
+            intro gs hgs
+            simp only [Finset.mem_filter] at hgs
+            have htype : gHatTupleType gs = τ := hgs.2
+            have hnot : ¬ InterpolationEligible params gs := by
+              intro helig
+              have hw := (fromHToG_interpolationEligible_iff_type_weight params gs).1 helig
+              exact hτ (by simpa [htype] using hw)
+            rw [if_neg hnot]
+  simpa [interpolationEligibleSandwichFamily, restrictSubMeas, A] using hpartition
+
+/-- The per-type averaged sandwich total is the uniform average of the exact-type
+fibers of `gHatSandwichFamily`. -/
+private lemma fromHToG_averagedSandwichByType_total_eq_type_sum
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ) (τ : GHatType k) :
+    (averagedSandwichByTypeSubMeas params family k τ).total =
+      ∑ xs ∈ (uniformDistribution (PointTuple params k)).support,
+        (uniformDistribution (PointTuple params k)).weight xs •
+          (∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)) with
+            gHatTupleType gs = τ,
+            (gHatSandwichFamily params family k xs).outcome gs) := by
+  classical
+  unfold averagedSandwichByTypeSubMeas averageIdxSubMeas averageOperatorOverDistribution
+  simp only
+  refine Finset.sum_congr rfl ?_
+  intro xs _hxs
+  congr 1
+  simp [restrictSubMeas, postprocess, fromHToG_outcomesByType_iff_type_eq]
+
+/-- The eligible averaged sandwich total is the sum of the eligible exact-type
+averaged totals.  This is the exact stage-`0` bookkeeping identity used in
+`lem:from-H-to-G`. -/
+private lemma fromHToG_averagedEligibleSandwich_total_eq_type_sum
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (k : ℕ) :
+    (averagedEligibleSandwichSubMeas params family k).total =
+      ∑ τ : GHatType k,
+        if params.d + 1 ≤ gHatTypeWeight τ then
+          (averagedSandwichByTypeSubMeas params family k τ).total
+        else 0 := by
+  classical
+  unfold averagedEligibleSandwichSubMeas averageIdxSubMeas averageOperatorOverDistribution
+  simp only
+  calc
+    (∑ a ∈ (uniformDistribution (PointTuple params k)).support,
+        (uniformDistribution (PointTuple params k)).weight a •
+          (interpolationEligibleSandwichFamily params family k a).total)
+      = ∑ a ∈ (uniformDistribution (PointTuple params k)).support,
+        (uniformDistribution (PointTuple params k)).weight a •
+          (∑ τ : GHatType k,
+            if params.d + 1 ≤ gHatTypeWeight τ then
+              ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)) with
+                gHatTupleType gs = τ,
+                (gHatSandwichFamily params family k a).outcome gs
+            else 0) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _ha
+          rw [fromHToG_interpolationEligibleSandwich_total_eq_type_sum]
+    _ = ∑ a ∈ (uniformDistribution (PointTuple params k)).support,
+          ∑ τ : GHatType k,
+            (uniformDistribution (PointTuple params k)).weight a •
+              (if params.d + 1 ≤ gHatTypeWeight τ then
+                ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)) with
+                  gHatTupleType gs = τ,
+                  (gHatSandwichFamily params family k a).outcome gs
+              else 0) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _ha
+          rw [Finset.smul_sum]
+    _ = ∑ τ : GHatType k,
+        ∑ a ∈ (uniformDistribution (PointTuple params k)).support,
+            (uniformDistribution (PointTuple params k)).weight a •
+              (if params.d + 1 ≤ gHatTypeWeight τ then
+                ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)) with
+                  gHatTupleType gs = τ,
+                  (gHatSandwichFamily params family k a).outcome gs
+              else 0) := by
+          rw [Finset.sum_comm]
+    _ = ∑ τ : GHatType k,
+        if params.d + 1 ≤ gHatTypeWeight τ then
+          ∑ a ∈ (uniformDistribution (PointTuple params k)).support,
+            (uniformDistribution (PointTuple params k)).weight a •
+              (∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params k)) with
+                gHatTupleType gs = τ,
+                (gHatSandwichFamily params family k a).outcome gs)
+        else 0 := by
+          refine Finset.sum_congr rfl ?_
+          intro τ _hτmem
+          by_cases hτ : params.d + 1 ≤ gHatTypeWeight τ <;> simp [hτ]
+    _ = ∑ τ : GHatType k,
+        if params.d + 1 ≤ gHatTypeWeight τ then
+          (averagedSandwichByTypeSubMeas params family k τ).total
+        else 0 := by
+          refine Finset.sum_congr rfl ?_
+          intro τ _hτ
+          by_cases hτelig : params.d + 1 ≤ gHatTypeWeight τ <;>
+            simp [hτelig, fromHToG_averagedSandwichByType_total_eq_type_sum]
+
+/-- Stage `0` of the Lean recurrence is exactly the all-outcomes expansion mass:
+the zero-prefix recurrence weight is the eligibility indicator, and the exact-type
+fibers partition the eligible sandwich total. -/
+private lemma fromHToGStageMass_zero_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k : ℕ) :
+    fromHToGStageMass params ψbi family k 0 =
+      fromHToGAllOutcomesMass params strategy ψbi family k := by
+  classical
+  have htotal := fromHToG_averagedEligibleSandwich_total_eq_type_sum params family k
+  unfold fromHToGStageMass fromHToGTailStageMass fromHToGAllOutcomesMass subMeasMass
+  simp only [Nat.sub_zero, IdxOpFamily.liftLeft, OpFamily.leftPlacedOpFamily,
+    fromHToGTailStageFamily, fromHToGRecurrenceWeight, IdxSubMeas.liftLeft,
+    allOutcomesExpansionFamily, pastedMeasurementTotal, constSubMeasFamily,
+    mkLeftPlacedSubMeas_total]
+  change (∑ τ : GHatType k,
+      ev ψbi (leftTensor (ι₂ := ι)
+        ((averagedSandwichByTypeSubMeas params family k τ).total *
+          truncatedTypeSums family.averagedSubMeas.total params.d 0 τ))) =
+    ev ψbi (leftTensor (ι₂ := ι) (averagedEligibleSandwichSubMeas params family k).total)
+  rw [htotal]
+  simp only [fromHToG_truncatedTypeSums_zero_eq_indicator]
+  simp only [mul_ite, mul_one, mul_zero]
+  calc
+    (∑ τ : GHatType k,
+        ev ψbi (leftTensor (ι₂ := ι)
+          (if params.d + 1 ≤ gHatTypeWeight τ then
+            (averagedSandwichByTypeSubMeas params family k τ).total
+          else 0)))
+      = ev ψbi (∑ τ : GHatType k,
+          leftTensor (ι₂ := ι)
+            (if params.d + 1 ≤ gHatTypeWeight τ then
+              (averagedSandwichByTypeSubMeas params family k τ).total
+            else 0)) := by
+          exact (ev_sum ψbi (fun τ : GHatType k =>
+            leftTensor (ι₂ := ι)
+              (if params.d + 1 ≤ gHatTypeWeight τ then
+                (averagedSandwichByTypeSubMeas params family k τ).total
+              else 0))).symm
+    _ = ev ψbi (leftTensor (ι₂ := ι)
+        (∑ τ : GHatType k,
+          if params.d + 1 ≤ gHatTypeWeight τ then
+            (averagedSandwichByTypeSubMeas params family k τ).total
+          else 0)) := by
+          simpa using congrArg (ev ψbi)
+            (MIPStarRE.LDT.leftTensor_finset_sum (ι₂ := ι)
+              (Finset.univ : Finset (GHatType k))
+              (fun τ : GHatType k =>
+                if params.d + 1 ≤ gHatTypeWeight τ then
+                  (averagedSandwichByTypeSubMeas params family k τ).total
+                else 0))
+
 /-- Telescoping for a scalar chain indexed by natural numbers.
 
 This is the purely real-analysis part of the last step in `lem:from-H-to-G`:
@@ -372,14 +611,13 @@ private lemma fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
 This deliberately does not duplicate the public theorem: the telescope from these
 facts to `FromHToGStatement.bernoulliPolynomialRewrite` is already proved by
 `fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.  The terminal stage
-`k` is now identified exactly by `fromHToGStageMass_terminal_eq`; what remains
-here is the operator/scalar bridge from `cor:G-hat-facts` and
-`lem:commute-g-half-sandwich`, the stage-`0` all-outcomes identification, and the
-final displayed arithmetic comparison of error terms. -/
+`k` is identified exactly by `fromHToGStageMass_terminal_eq`, and stage `0` is
+identified exactly by `fromHToGStageMass_zero_eq`; what remains here is the
+operator/scalar bridge from `cor:G-hat-facts` and `lem:commute-g-half-sandwich`,
+and the final displayed arithmetic comparison of error terms. -/
 private structure FromHToGResidualStageFacts
     (params : Parameters)
     [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
@@ -388,9 +626,6 @@ private structure FromHToGResidualStageFacts
       |fromHToGStageMass params ψbi family k ℓ -
           fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
         fromHToGRecurrenceError params gamma zeta k
-  stageZero_eq :
-    fromHToGStageMass params ψbi family k 0 =
-      fromHToGAllOutcomesMass params strategy ψbi family k
   recurrenceError_le :
     (k : Error) * fromHToGRecurrenceError params gamma zeta k ≤
       fromHToGError params gamma zeta k
@@ -417,7 +652,7 @@ lemma fromHToG
     (k : ℕ) :
     FromHToGStatement params strategy ψbi family gamma zeta k := by
   have hresidual :
-      FromHToGResidualStageFacts params strategy ψbi family gamma zeta k := by
+      FromHToGResidualStageFacts params ψbi family gamma zeta k := by
     /- Remaining work from #707, now narrowed to the paper-specific stage facts.
 
        Paper / blueprint anchor:
@@ -433,13 +668,12 @@ lemma fromHToG
           `hfacts.completedSelfConsistency`, then two suffix-commutation moves from
           `hhalf (k - ℓ)`, and finally the exact branch split via
           `fromHToGRecurrenceWeight_succ`;
-       2. identify Lean stage `0` with `fromHToGAllOutcomesMass`;
-       3. discharge the displayed arithmetic comparison
+       2. discharge the displayed arithmetic comparison
           `k * fromHToGRecurrenceError ≤ fromHToGError`.
 
-       The former terminal-stage endpoint is closed above by
-       `fromHToGStageMass_terminal_eq`: the empty suffix has total identity and
-       `truncatedTypeSums` at prefix length `k` is the Bernoulli-tail operator.
+       The former endpoint residuals are closed above: stage `0` by
+       `fromHToGStageMass_zero_eq`, and terminal stage `k` by
+       `fromHToGStageMass_terminal_eq`.
 
        The generic telescoping step from these facts to
        `bernoulliPolynomialRewrite` is now proved above in
@@ -453,7 +687,8 @@ lemma fromHToG
   refine ⟨hresidual.recurrenceStep, ?_⟩
   exact fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
     params strategy ψbi family gamma zeta k
-    hresidual.recurrenceStep hresidual.stageZero_eq
+    hresidual.recurrenceStep
+    (fromHToGStageMass_zero_eq params strategy ψbi family k)
     (fromHToGStageMass_terminal_eq params ψbi family k)
     hresidual.recurrenceError_le
 
