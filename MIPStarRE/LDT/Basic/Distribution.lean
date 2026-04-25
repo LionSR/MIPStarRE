@@ -182,6 +182,62 @@ theorem avgOver_const_of_isProbability {α : Type*} (𝒟 : Distribution α)
     _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) * c := by rw [← Finset.sum_mul]
     _ = c := by rw [h𝒟.weight_sum_eq_one, one_mul]
 
+namespace Distribution.IsProbability
+
+/-- A supportwise upper bound also bounds the average of a probability distribution.
+This packages the paper convention that expectations are taken against genuine
+probability distributions, while still allowing `Distribution` itself to carry a
+larger ambient type than its explicit support. -/
+theorem avgOverLeOfForallSupportLe {α : Type*} {𝒟 : Distribution α}
+    (h𝒟 : 𝒟.IsProbability) (f : α → Error) (δ : Error)
+    (hf : ∀ a, a ∈ 𝒟.support → f a ≤ δ) :
+    avgOver 𝒟 f ≤ δ := by
+  calc
+    avgOver 𝒟 f ≤ avgOver 𝒟 (fun _ : α => δ) := by
+      unfold avgOver
+      exact Finset.sum_le_sum fun a ha =>
+        mul_le_mul_of_nonneg_left (hf a ha) (𝒟.nonnegative a)
+    _ = δ := avgOver_const_of_isProbability 𝒟 h𝒟 δ
+
+/-- A supportwise lower bound also bounds the average of a probability distribution
+from below. -/
+theorem leAvgOverOfForallSupportLe {α : Type*} {𝒟 : Distribution α}
+    (h𝒟 : 𝒟.IsProbability) (f : α → Error) (δ : Error)
+    (hf : ∀ a, a ∈ 𝒟.support → δ ≤ f a) :
+    δ ≤ avgOver 𝒟 f := by
+  calc
+    δ = avgOver 𝒟 (fun _ : α => δ) := by
+      exact (avgOver_const_of_isProbability 𝒟 h𝒟 δ).symm
+    _ ≤ avgOver 𝒟 f := by
+      unfold avgOver
+      exact Finset.sum_le_sum fun a ha =>
+        mul_le_mul_of_nonneg_left (hf a ha) (𝒟.nonnegative a)
+
+/-- If a scalar function is bounded in absolute value on the explicit support of a
+probability distribution, then its weighted average has the same absolute-value
+bound. -/
+theorem absAvgOverLeOfForallSupportAbsLe {α : Type*} {𝒟 : Distribution α}
+    (h𝒟 : 𝒟.IsProbability) (f : α → Error) (δ : Error)
+    (hf : ∀ a, a ∈ 𝒟.support → |f a| ≤ δ) :
+    |avgOver 𝒟 f| ≤ δ := by
+  calc
+    |avgOver 𝒟 f|
+        = |∑ a ∈ 𝒟.support, 𝒟.weight a * f a| := rfl
+    _ ≤ ∑ a ∈ 𝒟.support, |𝒟.weight a * f a| :=
+        Finset.abs_sum_le_sum_abs (fun a => 𝒟.weight a * f a) 𝒟.support
+    _ = ∑ a ∈ 𝒟.support, 𝒟.weight a * |f a| := by
+        refine Finset.sum_congr rfl ?_
+        intro a _
+        rw [abs_mul, abs_of_nonneg (𝒟.nonnegative a)]
+    _ ≤ ∑ a ∈ 𝒟.support, 𝒟.weight a * δ := by
+        exact Finset.sum_le_sum fun a ha =>
+          mul_le_mul_of_nonneg_left (hf a ha) (𝒟.nonnegative a)
+    _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) * δ := by
+        rw [← Finset.sum_mul]
+    _ = δ := by rw [h𝒟.weight_sum_eq_one, one_mul]
+
+end Distribution.IsProbability
+
 namespace ProbabilityDistribution
 
 /-- Unpack the equality form of the bundled probability invariant. -/
