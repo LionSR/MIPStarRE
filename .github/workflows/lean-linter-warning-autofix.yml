@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       base_ref:
-        description: Branch, tag, or SHA to scan before creating the auto-fix branch.
+        description: Ref to scan. PR creation is guarded to the main branch; non-main refs are report-only.
         required: true
         default: main
       create_pr:
@@ -36,6 +36,17 @@ jobs:
           ref: ${{ inputs.base_ref }}
           fetch-depth: 10
           token: ${{ secrets.BOT_PAT || github.token }}
+
+      - name: Validate dispatch inputs
+        env:
+          BASE_REF: ${{ inputs.base_ref }}
+          CREATE_PR: ${{ inputs.create_pr }}
+        run: |
+          set -euo pipefail
+          if [ "$CREATE_PR" = "true" ] && [ "$BASE_REF" != "main" ]; then
+            echo "::error::create_pr=true is only supported with base_ref=main. Re-run with create_pr=false for report-only scans of tags, SHAs, or non-main branches."
+            exit 1
+          fi
 
       - name: Set up Lean toolchain and cache
         uses: ./.github/actions/setup-lean
@@ -140,7 +151,7 @@ jobs:
             Task:
             1. Read the warning report files above and fix only the Lean linter/unused-instance warnings they list.
             2. Keep the diff minimal. Do not touch LaTeX, blueprint files, documentation, generated files, or unrelated Lean code.
-            3. Do not change theorem statements, mathematical definitions, proof strategy, or paper-facing constants. Do not remove or add `sorry`, `admit`, `axiom`, `unsafe`, or `native_decide`.
+            3. Do not change theorem statements, mathematical definitions, proof strategy, or paper-facing constants. Do not remove or add `sorry`, `admit`, `axiom`, `unsafe`, `native_decide`, `unsafeCast`, `unsafeCoerce`, `lcProof`, `ofReduceBool`, or `ofReduceNat`.
             4. When adding `set_option linter.<name> false`, put it after the module docstring and before imports/body that depend on it. Prefer local proof cleanup over new global suppressions when that is obviously safe.
             5. Validate touched Lean files when practical; if validation is too broad or slow, leave a clear note in the final message.
             6. Do not commit or push. Leave any edits in the working tree. Later workflow steps will check the diff, commit, push, and open a PR only if the diff is non-empty and passes guards.
@@ -150,7 +161,7 @@ jobs:
           claude_args: |
             --model claude-opus-4-7
             --allowedTools "Read,Edit,Glob,Grep,Bash(python3 *),Bash(lake build),Bash(lake build *),Bash(lake env),Bash(lake env *),Bash(git diff *),Bash(git status),Bash(grep *),Bash(rg *)"
-            --append-system-prompt "This is a Lean 4 / Mathlib repository. Fix only the linter warnings listed in the supplied report, with minimal hygiene edits. Preserve proof integrity: no new sorry, admit, axioms, unsafeCast, native_decide on non-trivial goals, theorem-statement changes, mathematical-definition changes, or broad refactors. If a linter warning would require a substantive proof rewrite, leave it unchanged and mention that in the final response. Do not commit or push."
+            --append-system-prompt "This is a Lean 4 / Mathlib repository. Fix only the linter warnings listed in the supplied report, with minimal hygiene edits. Preserve proof integrity: no new sorry, admit, axioms, unsafe, unsafeCast, unsafeCoerce, native_decide, lcProof, ofReduceBool, ofReduceNat, theorem-statement changes, mathematical-definition changes, or broad refactors. If a linter warning would require a substantive proof rewrite, leave it unchanged and mention that in the final response. Do not commit or push."
 
       - name: Guard auto-fix diff
         if: steps.decide.outputs.run_claude == 'true'
@@ -193,7 +204,7 @@ jobs:
             esac
           done < "$changed_files_path"
 
-          if git diff --unified=0 | grep -E '^\+.*\b(sorry|admit|axiom|unsafe|native_decide)\b'; then
+          if git diff --unified=0 | grep -E '^\+[^+]' | grep -E '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe|native_decide|unsafeCast|unsafeCoerce|lcProof|ofReduceBool|ofReduceNat)([^[:alnum:]_]|$)'; then
             echo "::error::Auto-fix diff adds a forbidden proof-integrity token."
             exit 1
           fi
@@ -234,9 +245,9 @@ jobs:
             echo "This PR was created by the guarded Lean linter-warning auto-fix workflow."
             echo
             echo "## Safety notes"
-            echo "- Triggered manually from \`$BASE_REF\`; this workflow does not run on pull_request contexts."
-            echo "- The workflow skipped PR creation unless warnings were present and Claude produced a non-empty Lean-only diff."
-            echo "- The diff guard rejects non-Lean file changes and additions of forbidden proof-integrity tokens such as \`sorry\`, \`admit\`, \`axiom\`, \`unsafe\`, or \`native_decide\`."
+            echo "- Triggered manually from \`$BASE_REF\`; create-PR mode is guarded to \`base_ref=main\`, and this workflow does not run on pull_request contexts."
+            echo "- The workflow skipped PR creation unless the initial build succeeded, warnings were present, and Claude produced a non-empty Lean-only diff."
+            echo "- The diff guard rejects untracked files, deleted files, non-Lean file changes, and additions of forbidden proof-integrity tokens such as \`sorry\`, \`admit\`, \`axiom\`, \`unsafe\`, \`native_decide\`, \`unsafeCast\`, \`unsafeCoerce\`, \`lcProof\`, \`ofReduceBool\`, or \`ofReduceNat\`."
             echo "- Maintainers must still review the resulting cleanup for paper-faithfulness before merge."
             echo
             echo "## Warning report"
@@ -249,7 +260,7 @@ jobs:
           } > "$body_file"
 
           pr_url=$(gh pr create \
-            --base main \
+            --base "$BASE_REF" \
             --head "$BRANCH" \
             --title "chore: clean Lean linter warnings" \
             --body-file "$body_file")

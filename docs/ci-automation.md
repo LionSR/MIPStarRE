@@ -209,20 +209,25 @@ with `scripts/lean_linter_warning_report.py`, and then either stays in dry-run
 mode or asks Claude Code to apply linter-only Lean edits.
 
 **When it runs**: Only when a maintainer starts it manually. The default
-`create_pr: false` input is report-only. Set `create_pr: true` only after
+`create_pr: false` input is report-only, and non-`main` `base_ref` values are
+kept report-only. Set `create_pr: true` only with `base_ref: main`, after
 reviewing the latest scheduled report and deciding that the warning debt is
 small and mechanical enough for an auto-fix attempt.
 
 **PR creation guards**: The workflow opens a PR only when all of the following
 are true:
 
-1. the parsed warning count is nonzero;
-2. `create_pr` is `true`;
-3. `CLAUDE_CODE_OAUTH_TOKEN` is available to the workflow;
-4. Claude leaves a non-empty working-tree diff;
-5. every changed file is a Lean file; and
-6. the diff does not add forbidden proof-integrity tokens such as `sorry`,
-   `admit`, `axiom`, `unsafe`, or `native_decide`.
+1. the dispatch uses `base_ref: main` when `create_pr` is `true`;
+2. the initial Lean build succeeds;
+3. the parsed warning count is nonzero;
+4. `create_pr` is `true`;
+5. `CLAUDE_CODE_OAUTH_TOKEN` is available to the workflow;
+6. Claude leaves a non-empty working-tree diff;
+7. the working tree contains no untracked or deleted files;
+8. every changed file is a Lean file; and
+9. the diff does not add forbidden proof-integrity tokens such as `sorry`,
+   `admit`, `axiom`, `unsafe`, `native_decide`, `unsafeCast`, `unsafeCoerce`,
+   `lcProof`, `ofReduceBool`, or `ofReduceNat`.
 
 The workflow then re-runs `lake build -q --log-level=info`, commits the guarded
 diff to `autofix/lean-linter-warning-sweep-<run-id>`, opens a PR, and adds the
