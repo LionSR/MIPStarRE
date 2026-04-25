@@ -583,7 +583,6 @@ private lemma fromHToGTailStageMass_succ_weight_recurrence
   simp only [IdxOpFamily.liftLeft, OpFamily.leftPlacedOpFamily]
   rw [fromHToGRecurrenceWeight_succ]
 
-
 /-- Telescoping for a scalar chain indexed by natural numbers.
 
 This is the purely real-analysis part of the last step in `lem:from-H-to-G`:
