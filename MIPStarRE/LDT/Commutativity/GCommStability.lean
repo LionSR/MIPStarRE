@@ -140,6 +140,29 @@ private theorem storedResidual_nonneg
       (sub_nonneg.mpr (G x).total_le_one)
       (hbound.bounded.sliceOpPSD x)
 
+/-- Named scalar defect for the first paper stability claim.
+
+For fixed `y`, this is the collapsed scalar from `commutativity-G.tex`,
+equation `eq:bound-this-right-now!`: `gCommStabilityR` contains the averaged
+left-register sandwich `R_g^y = E_{u,x} \sum_a G_a^{u,x} G_g^y G_a^{u,x}`,
+the factor `(1 - (G y).total)` is the paper's left-register `(I - G^y)`, and
+`IdxPolyFamily.averagedSlicePointEvaluationOperator` is the right-register
+average `E_v A^{v,y}_{g(v)}`.  Thus each summand has tensor placement
+`(R_g^y (I-G^y)) ⊗ E_v A^{v,y}_{g(v)}`.  This is the scalar expression bounded
+by `gCommStability_scalar`, not the overlap `SDDOpRel` package. -/
+noncomputable def gCommStabilityScalarDefect
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (y : Fq params) : Error :=
+  ∑ g : Polynomial params,
+    ev strategy.state
+      (leftTensor (ι₂ := ι)
+          ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
+        rightTensor (ι₁ := ι)
+          (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g))
+
 private lemma gCommStability_scalar_pointwise_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -151,14 +174,10 @@ private lemma gCommStability_scalar_pointwise_bound
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     ∀ y : Fq params,
-      |∑ g : Polynomial params,
-          ev strategy.state
-            (leftTensor (ι₂ := ι)
-                ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
-              rightTensor (ι₁ := ι)
-                (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g))| ≤
+      |gCommStabilityScalarDefect params strategy family G y| ≤
         Real.sqrt (hbound.storedResidual G y) := by
   intro y
+  dsimp [gCommStabilityScalarDefect]
   let R := gCommStabilityR params family y
   let T : MIPStarRE.Quantum.Op ι := (G y).total
   let W : Polynomial params → MIPStarRE.Quantum.Op ι :=
@@ -420,40 +439,22 @@ theorem gCommStability_scalar
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    let defectY : Fq params → Error := fun y =>
-      ∑ g : Polynomial params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι)
-              ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
-            rightTensor (ι₁ := ι)
-              (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g))
-    |avgOver (uniformDistribution (Fq params)) defectY| ≤ Real.sqrt zeta := by
-  dsimp
+    |avgOver (uniformDistribution (Fq params))
+      (gCommStabilityScalarDefect params strategy family G)| ≤ Real.sqrt zeta := by
   have h𝒟 :
       ∑ y ∈ (uniformDistribution (Fq params)).support,
         (uniformDistribution (Fq params)).weight y ≤ 1 := by
     simpa using uniformDistribution_weight_sum_le_one (Fq params)
   calc
-    |avgOver (uniformDistribution (Fq params)) (fun y =>
-        ∑ g : Polynomial params,
-          ev strategy.state
-            (leftTensor (ι₂ := ι)
-                ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
-              rightTensor (ι₁ := ι)
-                (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g)))|
+    |avgOver (uniformDistribution (Fq params))
+        (gCommStabilityScalarDefect params strategy family G)|
       ≤ Real.sqrt
           (avgOver (uniformDistribution (Fq params))
             (fun y => hbound.storedResidual G y)) := by
           exact
             MIPStarRE.LDT.Preliminaries.avgOver_abs_le_sqrt_of_pointwise
               (uniformDistribution (Fq params))
-              (fun y =>
-                ∑ g : Polynomial params,
-                  ev strategy.state
-                    (leftTensor (ι₂ := ι)
-                        ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
-                      rightTensor (ι₁ := ι)
-                        (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g)))
+              (gCommStabilityScalarDefect params strategy family G)
               (fun y => hbound.storedResidual G y)
               (gCommStability_scalar_pointwise_bound
                 params strategy zeta hnorm family G hG hbound)
@@ -463,28 +464,6 @@ theorem gCommStability_scalar
     _ ≤ Real.sqrt zeta := by
           exact Real.sqrt_le_sqrt <|
             hbound.storedBoundedResidualBound G hG
-
-/-- Named scalar defect for the first paper stability claim.
-
-For fixed `y`, this is the collapsed version of
-`commutativity-G.tex`, equation `eq:bound-this-right-now!`: `gCommStabilityR`
-contains the averaged left-register sandwich
-`E_{u,x} \sum_a G_a^{u,x} G_g^y G_a^{u,x}`, and
-`IdxPolyFamily.averagedSlicePointEvaluationOperator` is the right-register
-average `E_v A^{v,y}_{g(v)}`.  This is the scalar expression bounded by
-`gCommStability_scalar`, not the overlap `SDDOpRel` package. -/
-noncomputable def gCommStabilityScalarDefect
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (y : Fq params) : Error :=
-  ∑ g : Polynomial params,
-    ev strategy.state
-      (leftTensor (ι₂ := ι)
-          ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
-        rightTensor (ι₁ := ι)
-          (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g))
 
 /-- Paper-facing scalar bound for `clm:g-comm-stability`.
 
@@ -562,6 +541,31 @@ private lemma gCommStabilityTwoR_first_factor_le_one
             leftTensor_le_one (ι₂ := ι) (gCommStabilityTwoR params family G x).total_le_one
     _ = 1 := ev_one_of_isNormalized strategy.state hnorm
 
+/-- Named scalar defect for the boundedness half of the second paper stability claim.
+
+For fixed `x`, this is the collapsed scalar from `commutativity-G.tex`, equation
+`eq:g-comm-stab7`, after the point-commutation step has put the point operators
+in the order used by the boundedness witness.  Concretely,
+`gCommStabilityTwoR` averages the left-register sandwich
+`E_{v,y} \sum_b G_b^{v,y} G_g^x G_b^{v,y}`, the factor
+`(1 - (G x).total)` is the paper's left-register `(I-G^x)`, and
+`IdxPolyFamily.averagedSlicePointEvaluationOperator` is the right-register
+average `E_u A^{u,x}_{g(u)}`.  Thus each summand has tensor placement
+`(R'_g{}^x (I-G^x)) ⊗ E_u A^{u,x}_{g(u)}`.  The `6√(γ(m+1))` transport loss is
+a separate estimate. -/
+noncomputable def gCommStabilityTwoScalarDefect
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (x : Fq params) : Error :=
+  ∑ g : Polynomial params,
+    ev strategy.state
+      (leftTensor (ι₂ := ι)
+          ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
+        rightTensor (ι₁ := ι)
+          (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))
+
 private lemma gCommStabilityTwo_scalar_pointwise_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -573,14 +577,10 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     ∀ x : Fq params,
-      |∑ g : Polynomial params,
-          ev strategy.state
-            (leftTensor (ι₂ := ι)
-                ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
-              rightTensor (ι₁ := ι)
-                (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))| ≤
+      |gCommStabilityTwoScalarDefect params strategy family G x| ≤
         Real.sqrt (hbound.storedResidual G x) := by
   intro x
+  dsimp [gCommStabilityTwoScalarDefect]
   let R := gCommStabilityTwoR params family G x
   let T : MIPStarRE.Quantum.Op ι := (G x).total
   let W : Polynomial params → MIPStarRE.Quantum.Op ι :=
@@ -842,40 +842,22 @@ theorem gCommStabilityTwo_scalar
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    let defectX : Fq params → Error := fun x =>
-      ∑ g : Polynomial params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι)
-              ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
-            rightTensor (ι₁ := ι)
-              (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))
-    |avgOver (uniformDistribution (Fq params)) defectX| ≤ Real.sqrt zeta := by
-  dsimp
+    |avgOver (uniformDistribution (Fq params))
+      (gCommStabilityTwoScalarDefect params strategy family G)| ≤ Real.sqrt zeta := by
   have h𝒟 :
       ∑ x ∈ (uniformDistribution (Fq params)).support,
         (uniformDistribution (Fq params)).weight x ≤ 1 := by
     simpa using uniformDistribution_weight_sum_le_one (Fq params)
   calc
-    |avgOver (uniformDistribution (Fq params)) (fun x =>
-        ∑ g : Polynomial params,
-          ev strategy.state
-            (leftTensor (ι₂ := ι)
-                ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
-              rightTensor (ι₁ := ι)
-                (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g)))|
+    |avgOver (uniformDistribution (Fq params))
+        (gCommStabilityTwoScalarDefect params strategy family G)|
       ≤ Real.sqrt
           (avgOver (uniformDistribution (Fq params))
             (fun x => hbound.storedResidual G x)) := by
           exact
             MIPStarRE.LDT.Preliminaries.avgOver_abs_le_sqrt_of_pointwise
               (uniformDistribution (Fq params))
-              (fun x =>
-                ∑ g : Polynomial params,
-                  ev strategy.state
-                    (leftTensor (ι₂ := ι)
-                        ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
-                      rightTensor (ι₁ := ι)
-                        (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g)))
+              (gCommStabilityTwoScalarDefect params strategy family G)
               (fun x => hbound.storedResidual G x)
               (gCommStabilityTwo_scalar_pointwise_bound
                 params strategy zeta hnorm family G hG hbound)
@@ -885,26 +867,6 @@ theorem gCommStabilityTwo_scalar
     _ ≤ Real.sqrt zeta := by
           exact Real.sqrt_le_sqrt <|
             hbound.storedBoundedResidualBound G hG
-
-/-- Named scalar defect for the boundedness half of the second paper stability claim.
-
-For fixed `x`, this is the collapsed version of `commutativity-G.tex`, equation
-`eq:g-comm-stab7`, after the point-commutation step has put the right-register
-point operators in the order used by the boundedness witness.  The definition
-keeps only the `Z^x` boundedness scalar; the `6√(γ(m+1))` transport loss is a
-separate estimate. -/
-noncomputable def gCommStabilityTwoScalarDefect
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (x : Fq params) : Error :=
-  ∑ g : Polynomial params,
-    ev strategy.state
-      (leftTensor (ι₂ := ι)
-          ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
-        rightTensor (ι₁ := ι)
-          (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))
 
 /-- Paper-facing boundedness part of `clm:g-comm-stability2`.
 
