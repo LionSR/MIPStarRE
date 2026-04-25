@@ -20,6 +20,8 @@ from blueprint_lean_sync import (  # noqa: E402
     SyncReport,
     _chapter_stats,
     _leanok_placement,
+    _line_has_leanok_marker,
+    _strip_tex_comment,
     _write_json_report,
     collect_blueprint_entries,
     find_orphan_leanok_tags,
@@ -114,6 +116,83 @@ class CollectBlueprintEntriesTests(unittest.TestCase):
             chapter_dir.mkdir(parents=True)
             (chapter_dir / "ch04_projective.tex").write_text(tex_source.strip() + "\n")
             return blueprint_lean_sync.collect_blueprint_entries(blueprint_src)
+
+    def test_strip_tex_comment_respects_escaped_percent_signs(self) -> None:
+        self.assertEqual(
+            _strip_tex_comment(r"active \% still active"),
+            r"active \% still active",
+        )
+        self.assertEqual(_strip_tex_comment(r"active \\% comment \leanok"), r"active \\")
+        self.assertEqual(_strip_tex_comment(r"active % comment \leanok"), "active ")
+
+    def test_line_has_leanok_marker_rejects_prose_mentions(self) -> None:
+        self.assertTrue(_line_has_leanok_marker(r"\leanok"))
+        self.assertTrue(_line_has_leanok_marker(r"\begin{proof}\leanok"))
+        self.assertTrue(_line_has_leanok_marker(r"\lean{Foo.bar}\leanok"))
+        self.assertFalse(_line_has_leanok_marker(r"This result is not marked \leanok."))
+
+    def test_comments_and_prose_do_not_create_leanok_markers(self) -> None:
+        entries = self._collect_entries(
+            r"""
+\begin{lemma}\label{lem:comment-only}
+  \lean{Foo.commentOnly}
+  % Restore \leanok once the proof is complete.
+\end{lemma}
+\begin{proof}
+  % Restore \leanok here too.
+\end{proof}
+
+\begin{lemma}\label{lem:prose-only}
+  \lean{Foo.proseOnly}
+  This result is not marked \leanok.
+\end{lemma}
+
+\begin{lemma}\label{lem:real-statement}
+  \lean{Foo.realStatement}\leanok % active marker; comment follows.
+\end{lemma}
+
+\begin{lemma}\label{lem:real-proof}
+  \lean{Foo.realProof}
+  \leanok
+\end{lemma}
+\begin{proof}\leanok % active proof marker; comment follows.
+  Proof.
+\end{proof}
+"""
+        )
+
+        by_decl = {entry.lean_decl: entry for entry in entries}
+        self.assertFalse(by_decl["Foo.commentOnly"].has_leanok)
+        self.assertFalse(by_decl["Foo.commentOnly"].proof_has_leanok)
+        self.assertFalse(by_decl["Foo.proseOnly"].has_leanok)
+        self.assertTrue(by_decl["Foo.realStatement"].has_leanok)
+        self.assertFalse(by_decl["Foo.realStatement"].proof_has_leanok)
+        self.assertTrue(by_decl["Foo.realProof"].has_leanok)
+        self.assertTrue(by_decl["Foo.realProof"].proof_has_leanok)
+
+    def test_orphan_detection_ignores_comment_and_prose_leanok_mentions(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            chapter_dir = root / "blueprint" / "src" / "chapter"
+            chapter_dir.mkdir(parents=True)
+            (chapter_dir / "ch01_comments.tex").write_text(
+                textwrap.dedent(
+                    r"""
+                    % \leanok outside should be a comment, not an orphan.
+                    This prose line mentions \leanok outside any statement.
+
+                    \begin{lemma}
+                    % \leanok before \lean{Foo.bar} should not be an orphan.
+                    \lean{Foo.bar}
+                    This result is not marked \leanok.
+                    \end{lemma}
+                    """
+                ).strip()
+                + "\n"
+            )
+
+            blueprint_src = root / "blueprint" / "src"
+            self.assertEqual(find_orphan_leanok_tags(blueprint_src), [])
 
     def test_nested_proof_credits_outer_proof_leanok(self) -> None:
         entries = self._collect_entries(
