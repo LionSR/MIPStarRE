@@ -134,6 +134,15 @@ theorem avgOver_congr {α : Type*} (𝒟 : Distribution α)
     avgOver 𝒟 f = avgOver 𝒟 g := by
   exact Finset.sum_congr rfl fun a _ => by rw [h a]
 
+/-- If two scalar functions agree on a distribution's explicit support, their
+averages agree.  This support-restricted form is useful for distributions whose
+support carries an invariant not available for all ambient values. -/
+theorem avgOver_congr_on_support {α : Type*} (𝒟 : Distribution α)
+    (f g : α → Error) (h : ∀ a, a ∈ 𝒟.support → f a = g a) :
+    avgOver 𝒟 f = avgOver 𝒟 g := by
+  simp only [avgOver]
+  exact Finset.sum_congr rfl fun a ha => by rw [h a ha]
+
 /-- Averaging a constant against a probability distribution returns that constant. -/
 theorem avgOver_const_of_isProbability {α : Type*} (𝒟 : Distribution α)
     (h𝒟 : 𝒟.IsProbability) (c : Error) :

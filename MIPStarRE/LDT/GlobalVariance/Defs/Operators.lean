@@ -124,24 +124,34 @@ noncomputable def generalizeBRightEventSubMeasAtPolynomial (params : Parameters)
       else
         none)
 
-/-- The residual `Option Unit` event from the proof of `lem:generalize-b`: axis-line
-answers that collide with `g` at the sampled point `u`, but are not the restricted
-polynomial `g|_ℓ`.  After the projective-measurement expansion, the squared
-difference is controlled by this collision event. -/
-noncomputable def generalizeBCollisionEventSubMeasAtPolynomial (params : Parameters)
+/-- The residual projective `Option Unit` event from the proof of
+`lem:generalize-b`: axis-line answers that collide with `g` at the sampled point
+`u`, but are not the restricted polynomial `g|_ℓ`.  After the
+projective-measurement expansion, the squared difference is controlled by this
+collision event. -/
+noncomputable def generalizeBCollisionEventProjMeasAtPolynomial (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) : SubMeas (Option Unit) ι :=
+    (qu : AxisParallelLineQuestion params) : ProjMeas (Option Unit) ι :=
   let (ℓ, u) := qu
   let gRestricted := Polynomial.restrictToAxisParallelLine params g ℓ
-  postprocess
-    ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+  ProjMeas.postprocess (strategy.axisParallelMeasurement ℓ)
     (fun f : AxisLinePolynomial params =>
       if f (axisParallelLineQuestionParameter qu) = g u ∧ f.poly ≠ gRestricted.poly then
         some ()
       else
         none)
+
+/-- The residual event above, forgetting projectivity to a submeasurement.  Keeping
+this definition as the `toSubMeas` of `generalizeBCollisionEventProjMeasAtPolynomial`
+prevents the projective and submeasurement views from drifting apart. -/
+noncomputable def generalizeBCollisionEventSubMeasAtPolynomial (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) : SubMeas (Option Unit) ι :=
+  (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).toSubMeas
 
 /-- The event operator for the residual line-collision event in `lem:generalize-b`. -/
 noncomputable def generalizeBCollisionOperatorAtPolynomial (params : Parameters)

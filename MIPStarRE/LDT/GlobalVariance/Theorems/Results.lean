@@ -127,12 +127,6 @@ private lemma weightedPointConditionedOperator_sq
   rw [polynomialWeightSqrtOperator_conjTranspose,
     polynomialWeightSqrtOperator_mul_self]
 
-private lemma avgOver_congr_on_support {α : Type*} (𝒟 : Distribution α)
-    (f g : α → Error) (h : ∀ a, a ∈ 𝒟.support → f a = g a) :
-    avgOver 𝒟 f = avgOver 𝒟 g := by
-  simp only [avgOver]
-  exact Finset.sum_congr rfl fun a ha => by rw [h a ha]
-
 private lemma weightedGeneralizeBOperator_sub
     (params : Parameters)
     [FieldModel params.q]
@@ -169,21 +163,6 @@ private lemma weightedGeneralizeBOperator_sq
   rw [polynomialWeightSqrtOperator_conjTranspose,
     polynomialWeightSqrtOperator_mul_self]
 
-private noncomputable def generalizeBCollisionEventProjMeasAtPolynomial
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) : ProjMeas (Option Unit) ι :=
-  let (ℓ, u) := qu
-  let gRestricted := Polynomial.restrictToAxisParallelLine params g ℓ
-  ProjMeas.postprocess (strategy.axisParallelMeasurement ℓ)
-    (fun f : AxisLinePolynomial params =>
-      if f (axisParallelLineQuestionParameter qu) = g u ∧ f.poly ≠ gRestricted.poly then
-        some ()
-      else
-        none)
-
 private lemma generalizeBCollisionOperatorAtPolynomial_proj
     (params : Parameters)
     [FieldModel params.q]
@@ -193,9 +172,12 @@ private lemma generalizeBCollisionOperatorAtPolynomial_proj
     generalizeBCollisionOperatorAtPolynomial params strategy g qu *
         generalizeBCollisionOperatorAtPolynomial params strategy g qu =
       generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
-  simpa [generalizeBCollisionOperatorAtPolynomial, generalizeBCollisionEventSubMeasAtPolynomial,
-    generalizeBCollisionEventProjMeasAtPolynomial] using
-      (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).proj (some ())
+  change (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome
+      (some ()) *
+    (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome
+      (some ()) =
+    (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome (some ())
+  exact (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).proj (some ())
 
 private lemma generalizeBCollisionOperatorAtPolynomial_conjTranspose
     (params : Parameters)
@@ -205,10 +187,11 @@ private lemma generalizeBCollisionOperatorAtPolynomial_conjTranspose
     (qu : AxisParallelLineQuestion params) :
     (generalizeBCollisionOperatorAtPolynomial params strategy g qu)ᴴ =
       generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
-  simpa [generalizeBCollisionOperatorAtPolynomial, generalizeBCollisionEventSubMeasAtPolynomial,
-    generalizeBCollisionEventProjMeasAtPolynomial] using
-      (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome_hermitian
-        (some ())
+  change ((generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome
+      (some ()))ᴴ =
+    (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome (some ())
+  exact (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome_hermitian
+    (some ())
 
 private lemma generalizeB_right_event_implies_left_event
     (params : Parameters)
@@ -248,17 +231,16 @@ private lemma generalizeBLeftOperator_eq_right_add_collision
     generalizeBCollisionEventSubMeasAtPolynomial
   cases qu with
   | mk ℓ u =>
-      simp only [postprocess, Finset.sum_filter, ne_eq]
+      simp only [generalizeBCollisionEventProjMeasAtPolynomial, ProjMeas.postprocess,
+        postprocess, Finset.sum_filter]
       rw [← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl ?_
-      intro x _hx
+      intro x _
       by_cases hq : x.poly = (Polynomial.restrictToAxisParallelLine params g ℓ).poly
       · have hp : x (axisParallelLineQuestionParameter (ℓ, u)) = g u := by
           exact generalizeB_right_event_implies_left_event params g (ℓ, u) hline x hq
         simp [hp, hq]
-      · by_cases hp : x (axisParallelLineQuestionParameter (ℓ, u)) = g u
-        · simp [hp, hq]
-        · simp [hp, hq]
+      · by_cases hp : x (axisParallelLineQuestionParameter (ℓ, u)) = g u <;> simp [hp, hq]
 
 private lemma generalizeBLeft_sub_right_eq_collision
     (params : Parameters)
@@ -320,18 +302,11 @@ lemma generalizeBDeviationAtPolynomial_eq_collisionResidualAtPolynomial
     generalizeBDeviationAtPolynomial params strategy ψbi G g =
       generalizeBCollisionResidualAtPolynomial params strategy ψbi G g := by
   unfold generalizeBDeviationAtPolynomial generalizeBCollisionResidualAtPolynomial
-  apply avgOver_congr_on_support
+  apply MIPStarRE.LDT.avgOver_congr_on_support
   intro qu hqu
   have hline : pointOnLine (params := params) qu := by
     simpa [axisParallelLineQuestionDistribution] using hqu
-  change
-    ev ψbi
-        (((weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
-              weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu)ᴴ) *
-          (weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
-            weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu)) =
-      ev ψbi (opTensor
-        (generalizeBCollisionOperatorAtPolynomial params strategy g qu) (G.outcome g))
+  dsimp only
   rw [generalizeBWeightedLineDifference_sq_eq_collision params strategy G g qu hline]
 
 /-- Move a left-register observable from the polynomial-weighted state
