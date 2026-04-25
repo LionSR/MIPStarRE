@@ -320,17 +320,19 @@ theorem rawVerticalLineAnswerFamily_eq_lifted
       _ = (liftedVerticalLineAnswerFamily params strategy u).total := by
               simp [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, verticalLine]
 
-/-- Explicit value extracted from the `i`-th completed slice outcome at the test point. -/
+/-- Explicit value extracted from the `i`-th genuine slice outcome at the test point.
+
+The paper's one-point sandwich comparison only sums over tuples with
+`g_i ≠ ⊥`; the `none` mass is therefore removed before postprocessing. -/
 noncomputable def ldSandwichLineOnePointLeftFamily (params : Parameters) [FieldModel params.q]
     (_strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (k i : ℕ) : IdxSubMeas (SandwichedLineQuestion params k) (Option (Fq params)) ι :=
   fun q =>
-    postprocess (gHatSandwichFamily params family k q.2) (fun gs =>
-      if h : i < k then
-        Option.map (fun g => g q.1) (gs ⟨i, h⟩)
-      else
-        none)
+    postprocess
+      (restrictSubMeas (gHatSandwichFamily params family k q.2)
+        (fun gs => if h : i < k then (gs ⟨i, h⟩).isSome = true else False))
+      (fun gs => if h : i < k then Option.map (fun g => g q.1) (gs ⟨i, h⟩) else none)
 
 /-- Explicit value extracted from the vertical line measurement `B^u` at the slice height `x_i`. -/
 noncomputable def ldSandwichLineOnePointRightFamily (params : Parameters) [FieldModel params.q]
