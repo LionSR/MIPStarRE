@@ -1,5 +1,8 @@
 import MIPStarRE.LDT.Pasting.SwitcherooSetup.Terms
 
+set_option linter.style.setOption false
+set_option linter.unusedSimpArgs false
+
 /-!
 # Section 12 pasting: switcheroo split contraction
 

@@ -172,6 +172,10 @@ private lemma constantModeProjectorMatrix_eq_fourierBasisProjector_zero (params 
   rw [hzero u, hzero v]
   simpa [mul_assoc] using (fourierBasis_norm_sq params).symm
 
+set_option linter.style.setOption false
+set_option linter.unnecessarySimpa false in
+set_option linter.unreachableTactic false in
+set_option linter.unusedTactic false in
 private lemma orthogonalModeProjectorMatrix_eq_sum (params : Parameters) :
     orthogonalModeProjectorMatrix params =
       ∑ α ∈ (Finset.univ.erase (0 : Point params)), fourierBasisProjector params α := by
@@ -256,6 +260,7 @@ private lemma matrixAdjacencyOperator_spectral_decomp (params : Parameters) :
           simp only [Pi.smul_apply] at hα
           simp [fourierBasisProjector, Matrix.vecMulVec_apply, hα, mul_assoc, mul_comm]
 
+set_option linter.unnecessarySimpa false in
 private lemma matrixLaplacianOperator_spectral_decomp (params : Parameters) :
     matrixLaplacianOperator params =
       ∑ α : Point params,
@@ -294,6 +299,9 @@ private lemma matrixLaplacianOperator_spectral_decomp (params : Parameters) :
           intro α _
           rw [hrel α]
 
+set_option linter.unnecessarySimpa false in
+set_option linter.unreachableTactic false in
+set_option linter.unusedTactic false in
 private lemma hypercubeSpectralGap_operator_posSemidef (params : Parameters) :
     (matrixLaplacianOperator params -
       ((hypercubeSpectralGap params : ℂ) • orthogonalModeProjectorMatrix params)).PosSemidef := by
@@ -428,6 +436,7 @@ lemma matrixTensorOperator_mono_left {H K : FiniteHilbertSpace}
     matrixTensorOperator A₁ B ≤ matrixTensorOperator A₂ B := by
   simpa [matrixTensorOperator] using MIPStarRE.Quantum.kronecker_mono_left hA hB
 
+set_option linter.flexible false in
 /-- Adjoint sandwiching is monotone in the middle factor. -/
 lemma conjTranspose_mul_mul_mono {H K : FiniteHilbertSpace}
     (M : RectangularMatrixOperator H K) {A B : MatrixOperator K} (hAB : A ≤ B) :

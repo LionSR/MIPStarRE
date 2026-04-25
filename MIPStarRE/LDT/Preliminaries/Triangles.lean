@@ -208,8 +208,8 @@ theorem triangleSub
           leftTensor (ι₂ := ι) ((A q).total) *
             rightTensor (ι₁ := ι) ((C q).total) by rfl]
       rw [(A q).total_eq_one]
-      simp [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight,
-        IdxMeas.toIdxSubMeas, leftTensor, rightTensor]
+      simp [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxMeas.toIdxSubMeas,
+        leftTensor, rightTensor]
     have hdefB :
         qConsDefect ψ (BL q) (CR q) = max 0 (overlap q - matchB q) := by
       unfold qConsDefect qMatchMass
@@ -220,8 +220,8 @@ theorem triangleSub
           leftTensor (ι₂ := ι) ((B q).total) *
             rightTensor (ι₁ := ι) ((C q).total) by rfl]
       rw [(B q).total_eq_one]
-      simp [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight,
-        IdxMeas.toIdxSubMeas, leftTensor, rightTensor]
+      simp [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxMeas.toIdxSubMeas,
+        leftTensor, rightTensor]
     calc
       qConsDefect ψ (BL q) (CR q)
         = max 0 ((overlap q - matchA q) + gap q) := by
@@ -351,8 +351,8 @@ theorem triangleSub_right
           leftTensor (ι₂ := ι) ((A q).total) *
             rightTensor (ι₁ := ι) ((B q).total) by rfl]
       rw [(B q).total_eq_one]
-      simp [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight,
-        IdxMeas.toIdxSubMeas, leftTensor, rightTensor]
+      simp [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxMeas.toIdxSubMeas,
+        leftTensor, rightTensor]
     have hdefD :
         qConsDefect ψ (AL q) (DR q) = max 0 (overlap q - matchD q) := by
       unfold qConsDefect qMatchMass
@@ -363,8 +363,8 @@ theorem triangleSub_right
           leftTensor (ι₂ := ι) ((A q).total) *
             rightTensor (ι₁ := ι) ((D q).total) by rfl]
       rw [(D q).total_eq_one]
-      simp [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight,
-        IdxMeas.toIdxSubMeas, leftTensor, rightTensor]
+      simp [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxMeas.toIdxSubMeas,
+        leftTensor, rightTensor]
     calc
       qConsDefect ψ (AL q) (DR q)
         = max 0 ((overlap q - matchB q) + gap q) := by

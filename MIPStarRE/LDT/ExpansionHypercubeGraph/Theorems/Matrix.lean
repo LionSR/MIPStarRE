@@ -1,5 +1,8 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Foundations
 
+set_option linter.style.setOption false
+set_option linter.unnecessarySimpa false
+
 /-!
 # Section 7 hypercube graph: matrix-realization theorems
 
@@ -68,10 +71,10 @@ private lemma orthogonalModeProjector_re_sum (params : Parameters)
             refine Finset.sum_congr rfl ?_
             intro v hv
             by_cases huv : u = v <;> simp [huv]
-      _ = Complex.re (z u u) := by
-            simpa using
-              (Finset.sum_ite_eq (s := (Finset.univ : Finset (Point params)))
-                (a := u) (b := fun v => Complex.re (z u v)))
+        _ = Complex.re (z u u) := by
+              simpa using
+                (Finset.sum_ite_eq (s := (Finset.univ : Finset (Point params)))
+                  (a := u) (b := fun v => Complex.re (z u v)))
   have hconst :
       ∑ u, ∑ v, Complex.re (((hypercubeVertexCount params : ℂ)⁻¹ * z u v)) =
         (hypercubeVertexCount params : Error)⁻¹ * ∑ u, ∑ v, Complex.re (z u v) := by
@@ -428,11 +431,11 @@ lemma matrixLocalVarianceTraceForm_eq_closedForm (params : Parameters)
                           · subst huv
                             simp [matrixExpectation, ev, matrixModelState, Complex.mul_re]
                           · simp [huv]
-                _ = (hypercubeVertexCount params : Error)⁻¹ *
-                      ev (matrixModelState model) ((model.family u)ᴴ * model.family u) := by
-                      simpa using
-                        (Finset.sum_ite_eq
-                          (s := (Finset.univ : Finset (Point params)))
+                  _ = (hypercubeVertexCount params : Error)⁻¹ *
+                        ev (matrixModelState model) ((model.family u)ᴴ * model.family u) := by
+                        simpa using
+                          (Finset.sum_ite_eq
+                            (s := (Finset.univ : Finset (Point params)))
                           (a := u)
                           (b := fun v =>
                             (hypercubeVertexCount params : Error)⁻¹ *

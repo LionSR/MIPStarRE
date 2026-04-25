@@ -1,5 +1,8 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems
 
+set_option linter.style.setOption false
+set_option linter.flexible false
+
 /-!
 # Section 10 — Definitions
 

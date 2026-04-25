@@ -3,6 +3,13 @@ import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Preliminaries.Theorems
 import MIPStarRE.LDT.Preliminaries.SelfConsistency
 
+set_option linter.style.setOption false
+set_option linter.flexible false
+set_option linter.unnecessarySimpa false
+set_option linter.unusedDecidableInType false
+set_option linter.unusedFintypeInType false
+set_option linter.unusedSectionVars false
+
 /-!
 # Section 12 pasting: core setup
 
