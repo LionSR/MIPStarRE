@@ -228,8 +228,8 @@ def build_decl_index(lean_root: Path) -> set[str]:
                     parts = end_name.split(".")
                     if namespace_stack[-len(parts):] == parts:
                         del namespace_stack[-len(parts):]
-                    elif namespace_stack:
-                        namespace_stack.pop()
+                    # Otherwise this is likely closing a named section, not a
+                    # tracked namespace; leave the namespace stack unchanged.
                 elif namespace_stack:
                     namespace_stack.pop()
                 continue
