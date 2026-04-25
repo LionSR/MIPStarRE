@@ -172,6 +172,15 @@ theorem avgOver_congr_on_support {α : Type*} (𝒟 : Distribution α)
   simp only [avgOver]
   exact Finset.sum_congr rfl fun a ha => by rw [h a ha]
 
+/-- Averaging preserves supportwise order when weights are nonnegative.  This is
+the support-restricted analogue of `avgOver_mono`. -/
+theorem avgOver_mono_on_support {α : Type*} (𝒟 : Distribution α)
+    (f g : α → Error) (h : ∀ a, a ∈ 𝒟.support → f a ≤ g a) :
+    avgOver 𝒟 f ≤ avgOver 𝒟 g := by
+  unfold avgOver
+  exact Finset.sum_le_sum fun a ha =>
+    mul_le_mul_of_nonneg_left (h a ha) (𝒟.nonnegative a)
+
 /-- Averaging a constant against a probability distribution returns that constant. -/
 theorem avgOver_const_of_isProbability {α : Type*} (𝒟 : Distribution α)
     (h𝒟 : 𝒟.IsProbability) (c : Error) :
@@ -188,20 +197,18 @@ namespace Distribution.IsProbability
 This packages the paper convention that expectations are taken against genuine
 probability distributions, while still allowing `Distribution` itself to carry a
 larger ambient type than its explicit support. -/
-theorem avgOverLeOfForallSupportLe {α : Type*} {𝒟 : Distribution α}
+theorem avgOver_le_of_forall_support_le {α : Type*} {𝒟 : Distribution α}
     (h𝒟 : 𝒟.IsProbability) (f : α → Error) (δ : Error)
     (hf : ∀ a, a ∈ 𝒟.support → f a ≤ δ) :
     avgOver 𝒟 f ≤ δ := by
   calc
     avgOver 𝒟 f ≤ avgOver 𝒟 (fun _ : α => δ) := by
-      unfold avgOver
-      exact Finset.sum_le_sum fun a ha =>
-        mul_le_mul_of_nonneg_left (hf a ha) (𝒟.nonnegative a)
+      exact avgOver_mono_on_support 𝒟 f (fun _ : α => δ) hf
     _ = δ := avgOver_const_of_isProbability 𝒟 h𝒟 δ
 
 /-- A supportwise lower bound also bounds the average of a probability distribution
 from below. -/
-theorem leAvgOverOfForallSupportLe {α : Type*} {𝒟 : Distribution α}
+theorem le_avgOver_of_forall_le_on_support {α : Type*} {𝒟 : Distribution α}
     (h𝒟 : 𝒟.IsProbability) (f : α → Error) (δ : Error)
     (hf : ∀ a, a ∈ 𝒟.support → δ ≤ f a) :
     δ ≤ avgOver 𝒟 f := by
@@ -209,20 +216,19 @@ theorem leAvgOverOfForallSupportLe {α : Type*} {𝒟 : Distribution α}
     δ = avgOver 𝒟 (fun _ : α => δ) := by
       exact (avgOver_const_of_isProbability 𝒟 h𝒟 δ).symm
     _ ≤ avgOver 𝒟 f := by
-      unfold avgOver
-      exact Finset.sum_le_sum fun a ha =>
-        mul_le_mul_of_nonneg_left (hf a ha) (𝒟.nonnegative a)
+      exact avgOver_mono_on_support 𝒟 (fun _ : α => δ) f hf
 
 /-- If a scalar function is bounded in absolute value on the explicit support of a
 probability distribution, then its weighted average has the same absolute-value
 bound. -/
-theorem absAvgOverLeOfForallSupportAbsLe {α : Type*} {𝒟 : Distribution α}
+theorem abs_avgOver_le_of_forall_support_abs_le {α : Type*} {𝒟 : Distribution α}
     (h𝒟 : 𝒟.IsProbability) (f : α → Error) (δ : Error)
     (hf : ∀ a, a ∈ 𝒟.support → |f a| ≤ δ) :
     |avgOver 𝒟 f| ≤ δ := by
   calc
     |avgOver 𝒟 f|
-        = |∑ a ∈ 𝒟.support, 𝒟.weight a * f a| := rfl
+        = |∑ a ∈ 𝒟.support, 𝒟.weight a * f a| := by
+          simp only [avgOver]
     _ ≤ ∑ a ∈ 𝒟.support, |𝒟.weight a * f a| :=
         Finset.abs_sum_le_sum_abs (fun a => 𝒟.weight a * f a) 𝒟.support
     _ = ∑ a ∈ 𝒟.support, 𝒟.weight a * |f a| := by
