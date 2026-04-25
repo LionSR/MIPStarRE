@@ -5,6 +5,14 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup
 
 Recursive move, commute, move-back, and flat-chain construction for the half-sandwich bridge.
 
+The generic branch uses the paper's single flat chain.  For `r = k - 2`, the first
+`r` edges move the leading `Ĝ` across the tail by self-consistency, and the
+post-move suffix contributes `2r + 1` further edges: one outer pairwise
+commutation, `r` recursively lifted commutations, and `r` move-back
+self-consistency edges.  Thus the composed chain has `3r + 1 = 3k - 5` edges
+and total elementary error `4r * ζ + (r + 1) * ν₃`, matching the bookkeeping in
+`lem:commute-g-half-sandwich`.
+
 ## References
 
 - `references/ldt-paper/ld-pasting.tex`
@@ -2076,11 +2084,12 @@ private lemma commuteGHalfSandwich_flatChainStep
 
 /-- Bridge: the staged move-commute-move chain for `commuteGHalfSandwich`.
 
-Constructs the sequence of `3k` intermediate bipartite operator families
-that arise from repeatedly moving `Ĝ₁` through the product
-`Ĝ₁ · Ĝ₂ · ⋯ · Ĝₖ` using self-consistency (move to right tensor,
-error `2ζ`) and pairwise commutation (swap past neighbor, error `ν₃`),
-then composes them via `sddOpRel_chain`.
+Constructs the sequence of `3k - 4` intermediate bipartite operator families
+joined by `3k - 5` elementary edges.  These edges repeatedly move `Ĝ₁` through
+the product `Ĝ₁ · Ĝ₂ · ⋯ · Ĝₖ` using self-consistency (move to right tensor,
+error `2ζ`) and pairwise commutation (swap past neighbor, error `ν₃`), then
+compose them in one call to `sddOpRel_chain`, avoiding the exponential loss from
+recursive macro-chain composition.
 
 Paper reference: `lem:commute-g-half-sandwich` computation in
 `ld-pasting.tex` lines 881–914. -/
