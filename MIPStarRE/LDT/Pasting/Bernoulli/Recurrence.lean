@@ -1,5 +1,6 @@
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
 import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
+import Mathlib.Data.Nat.Choose.Sum
 import MIPStarRE.LDT.Pasting.Statements
 import MIPStarRE.LDT.Pasting.Bernoulli.Scalar
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
@@ -87,6 +88,205 @@ theorem fromHToGRecurrenceWeight_succ
           (1 - family.averagedSubMeas.total) :=
   (fromHToGRecurrenceWeight_recurrence params family prefixLen τtail).2.2.2
 
+/-- Boolean type patterns are equivalent to their support finsets. -/
+private noncomputable def gHatTypeFinsetEquiv (k : ℕ) :
+    GHatType k ≃ Finset (Fin k) where
+  toFun τ := Finset.univ.filter fun i => τ i
+  invFun s := fun i => i ∈ s
+  left_inv τ := by
+    funext i
+    simp
+  right_inv s := by
+    ext i
+    simp
+
+private lemma fromHToG_gHatTypeWeight_of_finset {k : ℕ} (s : Finset (Fin k)) :
+    gHatTypeWeight (fun i : Fin k => i ∈ s) = s.card := by
+  unfold gHatTypeWeight
+  congr 1
+  ext i
+  simp
+
+private lemma fromHToG_gHatTypeOperator_of_finset
+    (G : MIPStarRE.Quantum.Op ι) {k : ℕ} (s : Finset (Fin k)) :
+    gHatTypeOperator G (fun i : Fin k => i ∈ s) =
+      G ^ s.card * (1 - G) ^ (k - s.card) := by
+  simp [gHatTypeOperator, fromHToG_gHatTypeWeight_of_finset]
+
+/-- Rewrite the terminal truncated type sum as a sum over support finsets. -/
+private lemma fromHToG_truncatedTypeSums_full_as_finset_sum
+    (G : MIPStarRE.Quantum.Op ι) (d k : ℕ) :
+    truncatedTypeSums G d k (default : GHatType 0) =
+      ∑ s : Finset (Fin k),
+        if d + 1 ≤ s.card then G ^ s.card * (1 - G) ^ (k - s.card) else 0 := by
+  unfold truncatedTypeSums
+  calc
+    (∑ τprefix : GHatType k,
+      if d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight (default : GHatType 0) then
+        gHatTypeOperator G τprefix
+      else 0)
+      = ∑ s : Finset (Fin k),
+          if d + 1 ≤ gHatTypeWeight ((gHatTypeFinsetEquiv k).symm s) +
+              gHatTypeWeight (default : GHatType 0) then
+            gHatTypeOperator G ((gHatTypeFinsetEquiv k).symm s)
+          else 0 := by
+          exact Fintype.sum_equiv (gHatTypeFinsetEquiv k)
+            (fun τ => if d + 1 ≤ gHatTypeWeight τ +
+                gHatTypeWeight (default : GHatType 0) then
+              gHatTypeOperator G τ
+            else 0)
+            (fun s => if d + 1 ≤ gHatTypeWeight ((gHatTypeFinsetEquiv k).symm s) +
+                gHatTypeWeight (default : GHatType 0) then
+              gHatTypeOperator G ((gHatTypeFinsetEquiv k).symm s)
+            else 0)
+            (by intro τ; simp)
+    _ = ∑ s : Finset (Fin k),
+        if d + 1 ≤ s.card then G ^ s.card * (1 - G) ^ (k - s.card) else 0 := by
+        refine Finset.sum_congr rfl ?_
+        intro s _
+        simp [gHatTypeFinsetEquiv, fromHToG_gHatTypeOperator_of_finset, gHatTypeWeight]
+
+/-- Group the terminal support-finset sum by cardinality, producing the binomial
+coefficients in the Bernoulli-tail polynomial.  The key combinatorial step is
+Mathlib's `Finset.sum_powerset_apply_card`, applied to `Finset.univ : Finset (Fin k)`. -/
+private lemma fromHToG_sum_finsets_by_card_indicator
+    (G : MIPStarRE.Quantum.Op ι) (d k : ℕ) :
+    (∑ s : Finset (Fin k),
+        if d + 1 ≤ s.card then G ^ s.card * (1 - G) ^ (k - s.card) else 0) =
+      ∑ r ∈ Finset.Icc (d + 1) k,
+        (Nat.choose k r : ℂ) • (G ^ r * (1 - G) ^ (k - r)) := by
+  classical
+  let F : ℕ → MIPStarRE.Quantum.Op ι := fun r =>
+    if d + 1 ≤ r then G ^ r * (1 - G) ^ (k - r) else 0
+  have hpow := Finset.sum_powerset_apply_card (x := (Finset.univ : Finset (Fin k))) F
+  have hleft :
+      (∑ s : Finset (Fin k), F s.card) =
+        ∑ s ∈ (Finset.univ : Finset (Fin k)).powerset, F s.card := by
+    rw [Finset.powerset_univ]
+  calc
+    (∑ s : Finset (Fin k),
+        if d + 1 ≤ s.card then G ^ s.card * (1 - G) ^ (k - s.card) else 0)
+      = ∑ s : Finset (Fin k), F s.card := by rfl
+    _ = ∑ s ∈ (Finset.univ : Finset (Fin k)).powerset, F s.card := hleft
+    _ = ∑ r ∈ Finset.range ((Finset.univ : Finset (Fin k)).card + 1),
+          (Finset.univ : Finset (Fin k)).card.choose r • F r := hpow
+    _ = ∑ r ∈ Finset.range (k + 1), Nat.choose k r • F r := by simp
+    _ = ∑ r ∈ Finset.Icc (d + 1) k, Nat.choose k r • F r := by
+      symm
+      refine Finset.sum_subset ?hsubset ?hzero
+      · intro r hr
+        simp only [Finset.mem_Icc, Finset.mem_range] at hr ⊢
+        exact Nat.lt_succ_of_le hr.2
+      · intro r hrange hrnot
+        simp only [Finset.mem_range, Finset.mem_Icc] at hrange hrnot
+        have hnot : ¬ d + 1 ≤ r := by
+          intro hdr
+          exact hrnot ⟨hdr, Nat.le_of_lt_succ hrange⟩
+        dsimp [F]
+        rw [if_neg hnot]
+        simp
+    _ = ∑ r ∈ Finset.Icc (d + 1) k,
+        (Nat.choose k r : ℂ) • (G ^ r * (1 - G) ^ (k - r)) := by
+      refine Finset.sum_congr rfl ?_
+      intro r hr
+      simp only [Finset.mem_Icc] at hr
+      have hdr : d + 1 ≤ r := hr.1
+      dsimp [F]
+      rw [if_pos hdr]
+      simp [Algebra.smul_def]
+
+/-- Terminal endpoint of the recurrence weight: after all `k` bits have been
+converted, the truncated type sum is exactly the Bernoulli-tail polynomial
+`F(G)`. -/
+private lemma fromHToG_truncatedTypeSums_full_eq_bernoulliTailOperator
+    (G : MIPStarRE.Quantum.Op ι) (d k : ℕ) :
+    truncatedTypeSums G d k (default : GHatType 0) =
+      bernoulliTailOperator k d G := by
+  calc
+    truncatedTypeSums G d k (default : GHatType 0)
+      = ∑ s : Finset (Fin k),
+          if d + 1 ≤ s.card then G ^ s.card * (1 - G) ^ (k - s.card) else 0 :=
+          fromHToG_truncatedTypeSums_full_as_finset_sum G d k
+    _ = bernoulliTailOperator k d G := by
+          rw [fromHToG_sum_finsets_by_card_indicator]
+          rfl
+
+/-- Operator-valued constant averages factor through the scalar distribution mass. -/
+private lemma averageOperatorOverDistribution_const {α : Type*}
+    (𝒟 : Distribution α) (A : MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution 𝒟 (fun _ : α => A) =
+      (∑ x ∈ 𝒟.support, 𝒟.weight x) • A := by
+  unfold averageOperatorOverDistribution
+  rw [Finset.sum_smul]
+
+private lemma fromHToG_averageOperator_uniform_const_one
+    (α : Type*) [Fintype α] [DecidableEq α] [Nonempty α] :
+    averageOperatorOverDistribution (uniformDistribution α)
+      (fun _ : α => (1 : MIPStarRE.Quantum.Op ι)) = 1 := by
+  rw [averageOperatorOverDistribution_const]
+  rw [uniformDistribution_weight_sum_eq_one, one_smul]
+
+/-- A zero-length type restriction of the sandwiched family has total identity.
+This isolates the `tailLen = 0` collapse of `outcomesByType`, `restrictSubMeas`,
+and the empty half-sandwich product. -/
+private lemma fromHToG_emptyRestrictedSandwichTotal_eq_one
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (xs : PointTuple params 0) (τ : GHatType 0) :
+    (postprocess
+      (@restrictSubMeas ι _ _ (GHatTupleOutcome params 0) _
+        (gHatSandwichFamily params family 0 xs)
+        (fun gs => gs ∈ outcomesByType τ)
+        (Classical.decPred (fun gs => gs ∈ outcomesByType τ)))
+      (fun _ => ())).total = 1 := by
+  simp only [restrictSubMeas, outcomesByType, IsEmpty.forall_iff, Set.setOf_true,
+    Set.mem_univ, ↓reduceIte, gHatSandwichFamily, gHatHalfProductOutcomeOperator,
+    Matrix.conjTranspose_one, mul_one, gHatHalfProductTotalOperator, Finset.univ_unique,
+    Finset.filter_true, Finset.sum_const, Finset.card_singleton, one_smul, postprocess_total]
+
+/-- The empty suffix sandwich has total identity. -/
+private lemma fromHToG_averagedSandwichByTypeSubMeas_zero_total_eq_one
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (τ : GHatType 0) :
+    (averagedSandwichByTypeSubMeas params family 0 τ).total = 1 := by
+  simp only [averagedSandwichByTypeSubMeas, averageIdxSubMeas]
+  rw [show (fun xs : PointTuple params 0 =>
+      (postprocess
+        (@restrictSubMeas ι _ _ (GHatTupleOutcome params 0) _
+          (gHatSandwichFamily params family 0 xs)
+          (fun gs => gs ∈ outcomesByType τ)
+          (Classical.decPred (fun gs => gs ∈ outcomesByType τ)))
+        (fun _ => ())).total) =
+      (fun _ : PointTuple params 0 => (1 : MIPStarRE.Quantum.Op ι)) by
+    funext xs
+    exact fromHToG_emptyRestrictedSandwichTotal_eq_one params family xs τ]
+  exact fromHToG_averageOperator_uniform_const_one (PointTuple params 0)
+
+/-- Terminal endpoint identification for the Lean `fromHToG` stage mass.  This
+closes the former residual field `stageK_eq`: at stage `k`, the tail is empty,
+the suffix sandwich contributes identity, and the recurrence weight is the
+Bernoulli-tail operator. -/
+private lemma fromHToGStageMass_terminal_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k : ℕ) :
+    fromHToGStageMass params ψbi family k k =
+      fromHToGBernoulliTailMass params ψbi family k := by
+  classical
+  have hweight :
+      truncatedTypeSums family.averagedSubMeas.total params.d k (default : GHatType 0) =
+        bernoulliTailOperator k params.d family.averagedSubMeas.total :=
+    fromHToG_truncatedTypeSums_full_eq_bernoulliTailOperator
+      family.averagedSubMeas.total params.d k
+  simp only [fromHToGStageMass, fromHToGTailStageMass, IdxOpFamily.liftLeft,
+    OpFamily.leftPlacedOpFamily, fromHToGTailStageFamily, fromHToGRecurrenceWeight,
+    fromHToGBernoulliTailMass, subMeasMass, IdxSubMeas.liftLeft,
+    bernoulliTailFromFamily, constSubMeasFamily, mkLeftPlacedSubMeas_total]
+  rw [Nat.sub_self]
+  simp only [Finset.univ_unique, fromHToG_averagedSandwichByTypeSubMeas_zero_total_eq_one,
+    one_mul, Finset.sum_singleton]
+  exact congrArg (fun A : MIPStarRE.Quantum.Op ι => ev ψbi (leftTensor (ι₂ := ι) A)) hweight
+
 /-- Telescoping for a scalar chain indexed by natural numbers.
 
 This is the purely real-analysis part of the last step in `lem:from-H-to-G`:
@@ -171,10 +371,11 @@ private lemma fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
 
 This deliberately does not duplicate the public theorem: the telescope from these
 facts to `FromHToGStatement.bernoulliPolynomialRewrite` is already proved by
-`fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.  What remains here is
-the operator/scalar bridge from `cor:G-hat-facts` and
-`lem:commute-g-half-sandwich`, the endpoint identifications of stages `0` and
-`k`, and the final displayed arithmetic comparison of error terms. -/
+`fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.  The terminal stage
+`k` is now identified exactly by `fromHToGStageMass_terminal_eq`; what remains
+here is the operator/scalar bridge from `cor:G-hat-facts` and
+`lem:commute-g-half-sandwich`, the stage-`0` all-outcomes identification, and the
+final displayed arithmetic comparison of error terms. -/
 private structure FromHToGResidualStageFacts
     (params : Parameters)
     [FieldModel params.q]
@@ -190,9 +391,6 @@ private structure FromHToGResidualStageFacts
   stageZero_eq :
     fromHToGStageMass params ψbi family k 0 =
       fromHToGAllOutcomesMass params strategy ψbi family k
-  stageK_eq :
-    fromHToGStageMass params ψbi family k k =
-      fromHToGBernoulliTailMass params ψbi family k
   recurrenceError_le :
     (k : Error) * fromHToGRecurrenceError params gamma zeta k ≤
       fromHToGError params gamma zeta k
@@ -236,10 +434,12 @@ lemma fromHToG
           `hhalf (k - ℓ)`, and finally the exact branch split via
           `fromHToGRecurrenceWeight_succ`;
        2. identify Lean stage `0` with `fromHToGAllOutcomesMass`;
-       3. identify Lean stage `k` with `fromHToGBernoulliTailMass` through the
-          `truncatedTypeSums` polynomial;
-       4. discharge the displayed arithmetic comparison
+       3. discharge the displayed arithmetic comparison
           `k * fromHToGRecurrenceError ≤ fromHToGError`.
+
+       The former terminal-stage endpoint is closed above by
+       `fromHToGStageMass_terminal_eq`: the empty suffix has total identity and
+       `truncatedTypeSums` at prefix length `k` is the Bernoulli-tail operator.
 
        The generic telescoping step from these facts to
        `bernoulliPolynomialRewrite` is now proved above in
@@ -253,7 +453,8 @@ lemma fromHToG
   refine ⟨hresidual.recurrenceStep, ?_⟩
   exact fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
     params strategy ψbi family gamma zeta k
-    hresidual.recurrenceStep hresidual.stageZero_eq hresidual.stageK_eq
+    hresidual.recurrenceStep hresidual.stageZero_eq
+    (fromHToGStageMass_terminal_eq params ψbi family k)
     hresidual.recurrenceError_le
 
 /-- The scalar Bernoulli tail polynomial lifted through continuous functional
