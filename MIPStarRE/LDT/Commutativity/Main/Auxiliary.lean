@@ -61,16 +61,13 @@ private lemma abs_sub_le_of_tensor_triangle
 
 /-- Tensor-triangle witnesses for the `x`-marginalization scalar wrapper.
 
-The three fields separate the two mathematical ingredients flagged by #720/#730:
-* `full_bridge` and `evaluated_bridge` are the two scalar↔tensor
-  `closenessOfIP` legs, consuming `hnorm` and `hself` through the FullSlice
-  bridge infrastructure from #735;
-* `tensor_marginalize` is the `BAB ⊗ A` Schwartz-Zippel tensor
-  marginalization, whose remaining finite-sum/postprocessing expansion is #730.
-
-The tensor endpoints themselves remain private to `Transport.FullSlice` per #713,
-so this witness is the narrow residual boundary until #730 exports the missing
-identity. -/
+This is the remaining first-term bridge for the current scalar API.  PR #750
+exports the staged `BAB ⊗ A` tensor marginalization used by the paper's quartic
+second-term chain, but that endpoint starts from the swapped quartic
+`fullSliceABABAvg`, whereas this public wrapper starts from the cubic
+`fullSliceABAAvg`.  Closing this witness therefore requires the paper's
+first-term switch-sandwich comparison, not another `eq:gcom4-diff` tensor
+expansion. -/
 private structure FullSliceScalarMarginalizeXTensorTriangle
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
@@ -87,9 +84,13 @@ private structure FullSliceScalarMarginalizeXTensorTriangle
 
 /-- Residual witness construction for the `x` side.
 
-Blocked exactly where the active #730 work sits: exporting/finishing the tensor
-marginalization identity and connecting it to the existing scalar↔tensor bridge
-endpoints from `Transport.FullSlice`. -/
+Still open after #750: the file-local `BAB ⊗ A` tensor marginalization controls
+the paper's quartic second term, while this statement compares the cubic first
+term `fullSliceABAAvg` with its evaluated analogue.  A paper-faithful closure
+should use the first-term switch-sandwich comparison from `commutativity-G.tex`
+lines 297--305, but that comparison costs `2√ζ`; the current `full_bridge` /
+`evaluated_bridge` fields only allow a single `√ζ`, so this residual also likely
+needs a widened budget or a different decomposition. -/
 private noncomputable def fullSliceScalarMarginalizeXTensorTriangleResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
@@ -97,9 +98,10 @@ private noncomputable def fullSliceScalarMarginalizeXTensorTriangleResidual
     (hnorm : strategy.state.IsNormalized)
     (hself : family.StronglySelfConsistent strategy.state zeta) :
     FullSliceScalarMarginalizeXTensorTriangle params strategy family zeta := by
-  -- The eventual proof should instantiate the hidden `BAB ⊗ A` tensor endpoints,
-  -- use the #735 `closenessOfIP` bridges for `full_bridge`/`evaluated_bridge`,
-  -- and use #730 for `tensor_marginalize`.
+  -- The current public scalar endpoint is the cubic first term
+  -- `fullSliceABAAvg`.  The paper's first-term switch-sandwich comparison spends
+  -- `2√ζ`, so keep the residual open rather than forcing it into the current
+  -- single-`√ζ` bridge fields.
   sorry
 
 /-- Paper `eq:evaluate-gcom-at-points` / `eq:gcom4-diff`
@@ -133,8 +135,13 @@ lemma fullSlice_scalar_marginalize_x
 /-- Tensor-triangle witnesses for the `y`-marginalization scalar wrapper.
 
 This is the y-side analogue of
-`FullSliceScalarMarginalizeXTensorTriangle`; here the tensor marginalization
-field is the `ABA ⊗ B` Schwartz-Zippel step from #730. -/
+`FullSliceScalarMarginalizeXTensorTriangle`.  The #750 staged tensor
+marginalization from `xEvaluatedFullSliceABABtensorAvg` to
+`evaluatedSliceABABtensorAvg` is now exported, but it cannot fill this structure
+as written: the preceding full-scalar-to-x-evaluated-tensor chain also contains
+an `md/q` Schwartz-Zippel loss, while `full_bridge` only permits a `√ζ` loss.
+The residual is therefore intentionally left uninstantiated until the y-side
+budget/structure is restated paper-faithfully. -/
 private structure FullSliceScalarMarginalizeYTensorTriangle
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
@@ -151,9 +158,13 @@ private structure FullSliceScalarMarginalizeYTensorTriangle
 
 /-- Residual witness construction for the `y` side.
 
-Blocked exactly on the #730 postprocessing expansion from the hidden `ABA ⊗ B`
-tensor endpoints to the proved y-collision residual in `Transport.FullSlice`,
-together with exposing the #735 scalar↔tensor bridge endpoints. -/
+The tempting assignment
+`fullTensor := xEvaluatedFullSliceABABtensorAvg` is deliberately *not* used:
+paper `commutativity-G.tex` lines 332--360 show that reaching that endpoint from
+`fullSliceABABAvg` costs `md/q + 3√ζ`, not the `√ζ` allowed by the
+`full_bridge` field.  Thus PR #750's y tensor marginalization is useful future
+API, but the current scalar wrapper remains a whole residual until its
+intermediate structure/budget is widened. -/
 private noncomputable def fullSliceScalarMarginalizeYTensorTriangleResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
@@ -161,9 +172,10 @@ private noncomputable def fullSliceScalarMarginalizeYTensorTriangleResidual
     (hnorm : strategy.state.IsNormalized)
     (hself : family.StronglySelfConsistent strategy.state zeta) :
     FullSliceScalarMarginalizeYTensorTriangle params strategy family zeta := by
-  -- The eventual proof should instantiate the hidden `ABA ⊗ B` tensor endpoints,
-  -- use the #735 `closenessOfIP` bridges for `full_bridge`/`evaluated_bridge`,
-  -- and use #730 for `tensor_marginalize`.
+  -- The current field types leave no honest way to use
+  -- `fullSliceABAB_tensor_marginalize_y` directly: the preceding x-stage already
+  -- spends a Schwartz-Zippel `md/q` loss.  Keep the endpoint choices open rather
+  -- than committing the residual to a false `√ζ` bridge.
   sorry
 
 /-- Paper `eq:evaluate-gcom-at-points-part-dos`
@@ -192,27 +204,15 @@ lemma fullSlice_scalar_marginalize_y
     (sqrtz := Real.sqrt zeta)
     tri.full_bridge tri.tensor_marginalize tri.evaluated_bridge
 
-/-- The evaluated-slice mixed term with a right-register copy of the second
-factor, i.e.
-`\(\mathbb E_{u,v,x,y} \sum_{a,b} \langle\psi,
-   G^x_{[g(u)=a]} G^y_{[h(v)=b]} G^x_{[g(u)=a]} \otimes G^y_{[h(v)=b]}\, \psi\rangle\)`.
+/-- Local alias for the evaluated-slice `ABA ⊗ B` endpoint.
 
-This remains a private `def` (rather than a local `let`) because the #720/#730
-transport bridge documentation reuses the same named intermediate scalar
-quantity. -/
-private noncomputable def evaluatedSliceSandwichedRightAvg
+The canonical definition now lives in `Transport.FullSlice` as
+`evaluatedSliceABABtensorAvg`; this private name is kept only to preserve the
+older wording in the evaluated-side transport proof below. -/
+private noncomputable abbrev evaluatedSliceSandwichedRightAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
-  avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-    (fun q =>
-      ∑ ab : EvaluatedSliceOutcome params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι)
-              (((evaluatedSliceFirstFactor params family q).outcome ab.1) *
-                ((evaluatedSliceSecondFactor params family q).outcome ab.2) *
-                ((evaluatedSliceFirstFactor params family q).outcome ab.1)) *
-            rightTensor (ι₁ := ι)
-              ((evaluatedSliceSecondFactor params family q).outcome ab.2)))
+  evaluatedSliceABABtensorAvg params strategy family
 
 /-- The evaluated-slice mixed term with only the linear ordered product on the
 left and the right-register copy of the second factor, i.e.

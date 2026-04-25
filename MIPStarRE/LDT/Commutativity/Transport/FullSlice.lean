@@ -422,8 +422,8 @@ to the right register.
 
 This intentionally mirrors the older private `evaluatedSliceSandwichedRightAvg`
 in `Commutativity/Main/Auxiliary.lean`; `Auxiliary` imports this file, so the
-shared tensor endpoint has to live here before #720 can consolidate callers. -/
-private noncomputable def evaluatedSliceABABtensorAvg
+shared tensor endpoint lives here for the #601 assembly boundary. -/
+noncomputable def evaluatedSliceABABtensorAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
   avgOver (uniformDistribution (EvaluatedSliceQuestion params))
