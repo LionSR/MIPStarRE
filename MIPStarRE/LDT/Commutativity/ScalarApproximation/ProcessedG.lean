@@ -439,10 +439,21 @@ private lemma evaluatedSlice_scalar_chain_bound
       linarith
     rw [hrw]
     -- Phase 6/7 (missing): reverse-insertion at the first coordinate.
-    -- This bound should follow from closenessOfIP applied to hpostSSC_fst
-    -- (mirroring evaluatedSlice_phaseThree_insert_bound but going from
-    -- avgBAB → phase5Removed instead of from avgBABA → phase3Inserted).
-    -- Reference: phases 6/7 of the paper's chain (eq:gonna-cite-this-in-just-a-bit).
+    -- The tempting postprocessed-self-consistency route via `hpostSSC_fst`
+    -- proves a different BABA-side tensor comparison and does **not** reduce the
+    -- live target below: routing through that term reintroduces the global
+    -- `|avgBAB - avgBABA|` quantity that this chain is trying to bound.
+    --
+    -- The honest residual is the reverse `eq:add-an-a` bridge on the first
+    -- coordinate.  One should instantiate `closenessOfIP` with `hcombined_fst`
+    -- (the `G^{u,x}_a ⊗ I ≈ G^x ⊗ A^{u,x}_a` control) and a `BAB`-side
+    -- sandwich family, then prove the algebraic identifications of the two
+    -- resulting scalar averages with `avgBAB` and `phase5Removed`.  This exact
+    -- residual is tracked in issue #732.
+    -- Reference: the single reverse `eq:add-an-a` on the first coordinate,
+    -- the BAB-side analogue of `eq:apply-add-an-a-once` (paper line 76).
+    -- The BABA-side counterpart is the first reverse move in lines 99--101 and
+    -- is already represented here by `hphase3` / `evaluatedSlice_phaseThree_insert_bound`.
     have hphase67_fst :
         |avgOver 𝒟 avgBAB - avgOver 𝒟 phase5Removed| ≤ 2 * Real.sqrt zeta := by
       sorry
