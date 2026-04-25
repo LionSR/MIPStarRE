@@ -100,7 +100,6 @@ private lemma overAllOutcomesError_add_fromHToGError_le_ldPastingNu
           simp [MainInductionStep.ldPastingInInductionNu, kE, mE, fullSum,
             epsTerm, deltaTerm, gammaTerm, zetaTerm, dqTerm, ratio]
 
-
 /-- Subtracting a left-placed operator from the bipartite identity is the left
 placement of the local complement. -/
 private lemma leftTensor_sub_one (A : MIPStarRE.Quantum.Op ι) :
