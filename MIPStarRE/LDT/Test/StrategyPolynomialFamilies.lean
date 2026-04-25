@@ -289,6 +289,22 @@ structure ConsistentWithPoints {params : Parameters} [FieldModel params.q]
       family.evaluatedAtNextPoint
       zeta
 
+/-- A family point-consistency witness forces the displayed point-consistency
+error parameter `ζ` to be nonnegative. -/
+theorem zeta_nonneg_of_consistentWithPoints {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {zeta : Error}
+    (hcons : family.ConsistentWithPoints strategy zeta) :
+    0 ≤ zeta := by
+  exact le_trans
+    (bipartiteConsError_nonneg strategy.state
+      (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      family.evaluatedAtNextPoint)
+    hcons.pointConsistency.offDiagonalBound
+
 structure StronglySelfConsistent {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
