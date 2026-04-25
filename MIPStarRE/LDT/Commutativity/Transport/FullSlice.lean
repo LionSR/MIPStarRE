@@ -631,7 +631,7 @@ private lemma polynomialCollision_sandwichTensor_le_mdq
 After expanding the first evaluated family in paper `eq:gcom4-diff`, the remaining
 error is this nonnegative sum over pairs of distinct polynomial outcomes whose
 values collide at the sampled point `u`. -/
-private noncomputable def fullSliceBABA_xCollisionFactored
+private noncomputable def fullSliceBABAxCollisionFactored
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (xy : FullSliceQuestion params) : Error :=
@@ -649,18 +649,18 @@ private noncomputable def fullSliceBABA_xCollisionFactored
 
 This is the proved hard estimate needed by the eventual x-marginalization tensor
 lemma tracked in #730; the only remaining work is the algebraic expansion equating
-the absolute difference of tensor averages with `fullSliceBABA_xCollisionFactored`
+the absolute difference of tensor averages with `fullSliceBABAxCollisionFactored`
 (averaged over `x,y`). -/
-private lemma fullSliceBABA_xCollisionFactored_le_mdq
+private lemma fullSliceBABAxCollisionFactored_le_mdq
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (hnorm : strategy.state.IsNormalized)
     (xy : FullSliceQuestion params) :
-    fullSliceBABA_xCollisionFactored params strategy family xy ≤
+    fullSliceBABAxCollisionFactored params strategy family xy ≤
       (params.m * params.d : Error) / params.q := by
   let A : SubMeas (Polynomial params) ι := (family.meas xy.1).toSubMeas
   let B : SubMeas (Polynomial params) ι := (family.meas xy.2).toSubMeas
-  simpa [fullSliceBABA_xCollisionFactored, A, B] using
+  simpa [fullSliceBABAxCollisionFactored, A, B] using
     polynomialCollision_sandwichTensor_le_mdq
       params strategy.state hnorm B A A
 
@@ -668,7 +668,7 @@ private lemma fullSliceBABA_xCollisionFactored_le_mdq
 
 Here the outer sandwich is the already x-evaluated family
 `G^x_[g(u)=a]`, while the colliding polynomial pair is on the `y` side. -/
-private noncomputable def fullSliceABAB_yCollisionFactored
+private noncomputable def fullSliceABAByCollisionFactored
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (u : Point params) (xy : FullSliceQuestion params) : Error :=
@@ -687,83 +687,85 @@ private noncomputable def fullSliceABAB_yCollisionFactored
 
 This is the proved hard estimate needed by the eventual y-marginalization tensor
 lemma tracked in #730; the remaining final-lemma work is the postprocessing
-expansion from the tensor averages to `fullSliceABAB_yCollisionFactored`. -/
-private lemma fullSliceABAB_yCollisionFactored_le_mdq
+expansion from the tensor averages to `fullSliceABAByCollisionFactored`. -/
+private lemma fullSliceABAByCollisionFactored_le_mdq
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (hnorm : strategy.state.IsNormalized)
     (u : Point params) (xy : FullSliceQuestion params) :
-    fullSliceABAB_yCollisionFactored params strategy family u xy ≤
+    fullSliceABAByCollisionFactored params strategy family u xy ≤
       (params.m * params.d : Error) / params.q := by
   let A : SubMeas (Fq params) ι :=
     evaluateAt params u ((family.meas xy.1).toSubMeas)
   let B : SubMeas (Polynomial params) ι := (family.meas xy.2).toSubMeas
-  simpa [fullSliceABAB_yCollisionFactored, A, B] using
+  simpa [fullSliceABAByCollisionFactored, A, B] using
     polynomialCollision_sandwichTensor_le_mdq
       params strategy.state hnorm A B B
+
+/-- A uniform average is bounded by any nonnegative pointwise upper bound.
+
+This local helper keeps the two tensor-collision averaged bounds below from
+repeating the same `avgOver_mono` and uniform-weight-sum argument. -/
+private lemma avgOver_uniform_le_of_pointwise_le
+    {α : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
+    (f : α → Error) (δ : Error) (hδ_nonneg : 0 ≤ δ)
+    (hf : ∀ a, f a ≤ δ) :
+    avgOver (uniformDistribution α) f ≤ δ := by
+  calc
+    avgOver (uniformDistribution α) f
+      ≤ avgOver (uniformDistribution α) (fun _ => δ) := by
+          exact avgOver_mono _ _ _ hf
+    _ = (∑ a ∈ (uniformDistribution α).support,
+          (uniformDistribution α).weight a) * δ := by
+          simp [avgOver, Finset.sum_mul]
+    _ ≤ 1 * δ := by
+          exact mul_le_mul_of_nonneg_right
+            (uniformDistribution_weight_sum_le_one α) hδ_nonneg
+    _ = δ := by ring
 
 /-- Averaged x-collision bound in the form needed by the eventual tensor
 marginalization theorem. The algebraic expansion from tensor-average difference
 to this collision expression remains the residual #719 proof step. -/
-private lemma fullSliceBABA_tensor_marginalize_x_collision_bound
+private lemma fullSliceBABATensorMarginalizeXCollisionBound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (hnorm : strategy.state.IsNormalized) :
     avgOver (uniformDistribution (FullSliceQuestion params))
-        (fun xy => fullSliceBABA_xCollisionFactored params strategy family xy) ≤
+        (fun xy => fullSliceBABAxCollisionFactored params strategy family xy) ≤
       (params.m * params.d : Error) / params.q := by
   let δ : Error := (params.m * params.d : Error) / params.q
   have hδ_nonneg : 0 ≤ δ := by
     exact div_nonneg (by positivity) (by positivity)
-  calc
-    avgOver (uniformDistribution (FullSliceQuestion params))
-        (fun xy => fullSliceBABA_xCollisionFactored params strategy family xy)
-      ≤ avgOver (uniformDistribution (FullSliceQuestion params)) (fun _ => δ) := by
-          apply avgOver_mono
-          intro xy
-          simpa [δ] using
-            fullSliceBABA_xCollisionFactored_le_mdq params strategy family hnorm xy
-    _ = (∑ xy ∈ (uniformDistribution (FullSliceQuestion params)).support,
-          (uniformDistribution (FullSliceQuestion params)).weight xy) * δ := by
-          simp [avgOver, Finset.sum_mul]
-    _ ≤ 1 * δ := by
-          exact mul_le_mul_of_nonneg_right
-            (uniformDistribution_weight_sum_le_one (FullSliceQuestion params)) hδ_nonneg
-    _ = (params.m * params.d : Error) / params.q := by
-          simp [δ]
+  exact avgOver_uniform_le_of_pointwise_le
+    (α := FullSliceQuestion params)
+    (fun xy => fullSliceBABAxCollisionFactored params strategy family xy)
+    δ hδ_nonneg
+    (by
+      intro xy
+      simpa [δ] using
+        fullSliceBABAxCollisionFactored_le_mdq params strategy family hnorm xy)
 
 /-- Averaged y-collision bound in the form needed by the eventual tensor
 marginalization theorem. This is the y-side analogue of
-`fullSliceBABA_tensor_marginalize_x_collision_bound`. -/
-private lemma fullSliceABAB_tensor_marginalize_y_collision_bound
+`fullSliceBABATensorMarginalizeXCollisionBound`. -/
+private lemma fullSliceABABTensorMarginalizeYCollisionBound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (hnorm : strategy.state.IsNormalized) :
     avgOver (uniformDistribution (Point params × FullSliceQuestion params))
-        (fun ux => fullSliceABAB_yCollisionFactored params strategy family ux.1 ux.2) ≤
+        (fun ux => fullSliceABAByCollisionFactored params strategy family ux.1 ux.2) ≤
       (params.m * params.d : Error) / params.q := by
   let δ : Error := (params.m * params.d : Error) / params.q
   have hδ_nonneg : 0 ≤ δ := by
     exact div_nonneg (by positivity) (by positivity)
-  calc
-    avgOver (uniformDistribution (Point params × FullSliceQuestion params))
-        (fun ux => fullSliceABAB_yCollisionFactored params strategy family ux.1 ux.2)
-      ≤ avgOver (uniformDistribution (Point params × FullSliceQuestion params))
-          (fun _ => δ) := by
-          apply avgOver_mono
-          intro ux
-          simpa [δ] using
-            fullSliceABAB_yCollisionFactored_le_mdq
-              params strategy family hnorm ux.1 ux.2
-    _ = (∑ ux ∈ (uniformDistribution (Point params × FullSliceQuestion params)).support,
-          (uniformDistribution (Point params × FullSliceQuestion params)).weight ux) * δ := by
-          simp [avgOver, Finset.sum_mul]
-    _ ≤ 1 * δ := by
-          exact mul_le_mul_of_nonneg_right
-            (uniformDistribution_weight_sum_le_one (Point params × FullSliceQuestion params))
-            hδ_nonneg
-    _ = (params.m * params.d : Error) / params.q := by
-          simp [δ]
+  exact avgOver_uniform_le_of_pointwise_le
+    (α := Point params × FullSliceQuestion params)
+    (fun ux => fullSliceABAByCollisionFactored params strategy family ux.1 ux.2)
+    δ hδ_nonneg
+    (by
+      intro ux
+      simpa [δ] using
+        fullSliceABAByCollisionFactored_le_mdq params strategy family hnorm ux.1 ux.2)
 
 /-- Paper `lem:normalization-condition` (`commutativity-G.tex` line 309).
 
