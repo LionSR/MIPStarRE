@@ -223,12 +223,16 @@ Writing `A_a := G^{u,x}_a` for the first evaluated factor and
 `C_{a,b} := D_b A_a D_b`.  The comparison moves the trailing first-factor copy
 from the left register to the right register: the scalar quartic term
 `D_b A_a D_b A_a ⊗ I` is compared with the tensor-split term
-`D_b A_a D_b ⊗ A_a`.  This is the direct `hpostSSC_fst` analogue of
-`evaluatedSlice_phaseThree_insert_bound`; the remaining `hphase67_fst` site in
+`D_b A_a D_b ⊗ A_a`.
+
+This packages the first postprocessed-self-consistency application after
+`eq:gonna-cite-this-in-just-a-bit` in `commutativity-G.tex`, lines 113–119,
+using `eq:new-fact-that-i-derived` through the lifted hypothesis
+`hpostSSC_fst`.  The remaining `hphase67_fst` site in
 `evaluatedSlice_scalar_chain_bound` additionally has to relate this honest
 postprocessed-family tensor term to the current `phase5Removed` term, whose
 right register is the strategy point measurement. -/
-private lemma evaluatedSlice_BABA_to_tensorFirst_bound
+private lemma evaluatedSlice_BABA_to_tensorFirst_postprocess_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (zeta : Error)
@@ -277,49 +281,7 @@ private lemma evaluatedSlice_BABA_to_tensorFirst_bound
   have hC :
       ∀ q, ∑ a : Fq params, (∑ b : Fq params, C q a b) * (∑ b : Fq params, C q a b)ᴴ ≤ 1 := by
     intro q
-    let P : SubMeas (Fq params) ι := evaluatedSliceFirstFactor params family q
-    let Q : ProjSubMeas (Fq params) ι := evaluatedSliceSecondProj params family q
-    let T : Fq params → MIPStarRE.Quantum.Op ι := fun a =>
-      ∑ b : Fq params,
-        ((evaluatedSliceSecondFactor params family q).outcome b) *
-          ((evaluatedSliceFirstFactor params family q).outcome a) *
-          ((evaluatedSliceSecondFactor params family q).outcome b)
-    have hnormalize :
-        (∑ a : Fq params, T a * (T a)ᴴ) =
-          normalizationConditionSquareOperator P Q := by
-      -- Localize the definitional bridge to the normalization-condition API:
-      -- `T a` is exactly the sandwiched family `Q_b P_a Q_b` summed over `b`.
-      simp [T, P, Q, normalizationConditionSquareOperator,
-        normalizationConditionSquareFamily,
-        normalizationConditionSandwichedTotalOperator,
-        normalizationConditionSandwichedTotalFamily,
-        normalizationConditionSandwichedFamily,
-        normalizationConditionSandwichedOperator,
-        evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
-        evaluatedSliceSecondProj, postprocess]
-    calc
-      ∑ a : Fq params,
-          (∑ b : Fq params, C q a b) * (∑ b : Fq params, C q a b)ᴴ
-        = ∑ a : Fq params, leftTensor (ι₂ := ι) (T a * (T a)ᴴ) := by
-            refine Finset.sum_congr rfl ?_
-            intro a _
-            have hsum :
-                (∑ b : Fq params, C q a b) = leftTensor (ι₂ := ι) (T a) := by
-              simp [C, T, leftTensor_finset_sum]
-            rw [hsum]
-            have hleft_adj :
-                (leftTensor (ι₂ := ι) (T a))ᴴ = leftTensor (ι₂ := ι) ((T a)ᴴ) := by
-              simpa [leftTensor, opTensor] using
-                (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι) (T a) (1 : MIPStarRE.Quantum.Op ι))
-            rw [hleft_adj, leftTensor_mul_leftTensor]
-      _ = leftTensor (ι₂ := ι) (∑ a : Fq params, T a * (T a)ᴴ) := by
-            rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a => T a * (T a)ᴴ)]
-      _ = leftTensor (ι₂ := ι) (normalizationConditionSquareOperator P Q) := by
-            rw [hnormalize]
-      _ ≤ 1 := by
-            exact leftTensor_le_one (ι₂ := ι) <| by
-              simpa [normalizationConditionSquareOperator] using
-                (normalizationConditionSquareFamily P Q).total_le_one
+    simpa [C] using evaluatedSlice_secondFactor_sandwich_leftTensor_bound params family q
   have hBABA :
       avgOver 𝒟
           (fun q => ∑ ab : EvaluatedSliceOutcome params,
@@ -371,6 +333,17 @@ private lemma evaluatedSlice_BABA_to_tensorFirst_bound
             ev strategy.state (C q a b * B q a))| := by
           rw [hBABA]
     _ ≤ Real.sqrt zeta := hclose
+
+/-- Pure real triangle-inequality bookkeeping for a scalar chain routed through
+one proved middle comparison and one residual bridge. -/
+private lemma abs_sub_le_two_mul_of_middle_bridge
+    {x y z w r : Error}
+    (hyz : |y - z| ≤ r)
+    (hbridge : |x - y| + |z - w| ≤ r) :
+    |x - w| ≤ 2 * r := by
+  have hxw : |x - w| ≤ |x - y| + |y - w| := abs_sub_le _ _ _
+  have hyw : |y - w| ≤ |y - z| + |z - w| := abs_sub_le _ _ _
+  nlinarith
 
 /- Scalar approximation chain for the evaluated-slice commutation.
 
@@ -612,26 +585,34 @@ private lemma evaluatedSlice_scalar_chain_bound
     have hphase67_tensorFirst :
         |avgOver 𝒟 avgBABA - avgOver 𝒟 phase67TensorFirst| ≤ Real.sqrt zeta := by
       simpa [𝒟, avgBABA, phase67TensorFirst] using
-        evaluatedSlice_BABA_to_tensorFirst_bound
+        evaluatedSlice_BABA_to_tensorFirst_postprocess_bound
           params strategy zeta _hnorm family hpostSSC_fst
     have hphase67_fst :
         |avgOver 𝒟 avgBAB - avgOver 𝒟 phase5Removed| ≤ 2 * Real.sqrt zeta := by
+      let babScalar := avgOver 𝒟 avgBAB
+      let babaScalar := avgOver 𝒟 avgBABA
+      let tensorScalar := avgOver 𝒟 phase67TensorFirst
+      let removedScalar := avgOver 𝒟 phase5Removed
+      have hpost : |babaScalar - tensorScalar| ≤ Real.sqrt zeta := by
+        simpa [babaScalar, tensorScalar] using hphase67_tensorFirst
       -- Residual bridge after consuming the proved tensor-first step.
-      -- The remaining proof should split the live target through
-      -- `phase67TensorFirst`.  One component is the swap/projectivity bookkeeping
-      -- that aligns the local `avgBAB` orientation with the `avgBABA` orientation
-      -- used by the tensor-first path.  The other component is the reverse
-      -- `eq:add-an-a` bridge on the first coordinate: replace the right-register
-      -- postprocessed-family copy `G^{u,x}_a` in `phase67TensorFirst` by the
-      -- strategy point-measurement copy `A^{u,x}_a` in `phase5Removed`, using
-      -- `hcombined_fst` and another `closenessOfIP` instantiation.
-      have hphase67_residual
-          (_htensor : |avgOver 𝒟 avgBABA - avgOver 𝒟 phase67TensorFirst| ≤
-            Real.sqrt zeta) :
-          |avgOver 𝒟 avgBAB - avgOver 𝒟 phase5Removed| ≤
-            2 * Real.sqrt zeta := by
+      -- What remains is strictly smaller than the original target: prove the
+      -- two other legs of the route through `phase67TensorFirst`.  The first
+      -- term is the swap/projectivity bookkeeping aligning the local `avgBAB`
+      -- orientation with the `avgBABA` orientation used by the tensor-first path.
+      -- The second term is the reverse `eq:add-an-a` bridge on the first
+      -- coordinate: replace the right-register postprocessed-family copy
+      -- `G^{u,x}_a` in `phase67TensorFirst` by the strategy point-measurement
+      -- copy `A^{u,x}_a` in `phase5Removed`, using `hcombined_fst` and another
+      -- `closenessOfIP` instantiation.
+      have hphase67_bridge :
+          |babScalar - babaScalar| + |tensorScalar - removedScalar| ≤
+            Real.sqrt zeta := by
         sorry
-      exact hphase67_residual hphase67_tensorFirst
+      simpa [babScalar, removedScalar] using
+        abs_sub_le_two_mul_of_middle_bridge
+          (x := babScalar) (y := babaScalar) (z := tensorScalar)
+          (w := removedScalar) (r := Real.sqrt zeta) hpost hphase67_bridge
     -- Triangle-inequality chain: |avgBAB − avgBABA| ≤ 5√ζ
     have hchain :
         |avgOver 𝒟 avgBAB - avgOver 𝒟 avgBABA| ≤ 5 * Real.sqrt zeta := by
