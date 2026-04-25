@@ -63,10 +63,10 @@ private lemma evaluatedSlicePhaseFiveRemoved_term_le_babTerm
       evaluatedSliceBABTerm params strategy family q (a, b) := by
   let A : SubMeas (Fq params) ι := evaluatedSliceFirstFactor params family q
   let B : SubMeas (Fq params) ι := evaluatedSliceSecondFactor params family q
-  let S : SubMeas (Fq params × Fq params) ι := sandwichByOuterSubMeas B A
   have hBAB_nonneg :
       0 ≤ B.outcome b * A.outcome a * B.outcome b := by
-    simpa [S, sandwichByOuterSubMeas] using (S.outcome_pos (b, a))
+    simpa [sandwichByOuterSubMeas] using
+      (sandwichByOuterSubMeas B A).outcome_pos (b, a)
   have hright_le_one :
       (evaluatedSlicePointMeas params strategy q.1).outcome a ≤
         (1 : MIPStarRE.Quantum.Op ι) :=
@@ -86,7 +86,7 @@ private lemma evaluatedSlicePhaseFiveRemoved_term_le_babTerm
 The inserted right-register point outcome can only decrease the `BAB` scalar
 summand.  Thus the remaining phase-67 bridge is a one-sided missing-mass bound,
 not a two-sided algebraic identification. -/
-lemma evaluatedSlicePhaseFiveRemoved_le_avgBAB_pointwise
+lemma evaluatedSlicePhaseFiveRemoved_le_sumBabTerm_pointwise
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
@@ -123,7 +123,7 @@ lemma evaluatedSlicePhaseFiveRemoved_le_avgBAB_pointwise
 This proves the easy half of the reverse-insertion endpoint: after inserting the
 right-register first-coordinate outcome, the scalar is no larger.  The live
 analytic task is therefore only to upper-bound the nonnegative gap. -/
-lemma evaluatedSlicePhaseFiveRemoved_avg_le_avgBAB
+lemma evaluatedSlicePhaseFiveRemoved_sumBabTerm_avg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) :
@@ -133,12 +133,12 @@ lemma evaluatedSlicePhaseFiveRemoved_avg_le_avgBAB
         (fun q => ∑ ab : EvaluatedSliceOutcome params,
           evaluatedSliceBABTerm params strategy family q ab) := by
   exact avgOver_mono _ _ _
-    (evaluatedSlicePhaseFiveRemoved_le_avgBAB_pointwise params strategy family)
+    (evaluatedSlicePhaseFiveRemoved_le_sumBabTerm_pointwise params strategy family)
 
 /-- The one-sided form of the remaining first-coordinate reverse `eq:add-an-a`
 endpoint.
 
-By `evaluatedSlicePhaseFiveRemoved_avg_le_avgBAB`, the absolute-value endpoint
+By `evaluatedSlicePhaseFiveRemoved_sumBabTerm_avg`, the absolute-value endpoint
 residual is equivalent to controlling the nonnegative missing mass from inserting
 the right-register first-coordinate outcome. -/
 def evaluatedSlicePhase67FirstReverseGapResidual
@@ -198,7 +198,7 @@ lemma evaluatedSlicePhase67FirstReverseEndpointResidual_of_gap
   let removed : Error := avgOver 𝒟 (evaluatedSlicePhaseFiveRemoved params strategy family)
   have hremoved_le : removed ≤ avgBAB := by
     simpa [avgBAB, removed, 𝒟] using
-      evaluatedSlicePhaseFiveRemoved_avg_le_avgBAB params strategy family
+      evaluatedSlicePhaseFiveRemoved_sumBabTerm_avg params strategy family
   have hnonneg : 0 ≤ avgBAB - removed := sub_nonneg.mpr hremoved_le
   have hgap' : avgBAB - removed ≤ 2 * Real.sqrt zeta := by
     simpa [evaluatedSlicePhase67FirstReverseGapResidual, avgBAB, removed, 𝒟] using hgap

@@ -871,7 +871,7 @@ private lemma evaluatedSlice_scalar_chain_bound
           evaluatedSlicePhase67FirstReverseGapResidual params strategy family zeta := by
         -- TODO(#759/#732): prove the live BAB-side first-coordinate reverse
         -- `eq:add-an-a` missing-mass estimate.  The opposite inequality is now
-        -- formalized by `evaluatedSlicePhaseFiveRemoved_avg_le_avgBAB`, so this
+        -- formalized by `evaluatedSlicePhaseFiveRemoved_sumBabTerm_avg`, so this
         -- residual is strictly one-sided rather than an absolute-value endpoint.
         sorry
       have hphase67_endpoint :
