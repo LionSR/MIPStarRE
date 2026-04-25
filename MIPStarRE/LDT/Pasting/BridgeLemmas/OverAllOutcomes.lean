@@ -203,12 +203,13 @@ private lemma interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
     (family : IdxPolyFamily params ι) {k : ℕ}
     (hnot : ¬ params.d + 1 ≤ k) (xs : PointTuple params k) :
     (interpolationEligibleSandwichFamily params family k xs).total = 0 := by
+  have hempty : (Finset.univ.filter (InterpolationEligible params) :
+      Finset (GHatTupleOutcome params k)) = ∅ := by
+    rw [Finset.filter_eq_empty_iff]
+    intro gs _ helig
+    exact not_interpolationEligible_of_not_d_add_one_le params hnot gs helig
   unfold interpolationEligibleSandwichFamily restrictSubMeas
-  apply Finset.sum_eq_zero
-  intro gs hgs
-  have helig : InterpolationEligible params gs := by
-    simpa using (Finset.mem_filter.mp hgs).2
-  exact False.elim ((not_interpolationEligible_of_not_d_add_one_le params hnot gs) helig)
+  simp [hempty]
 
 /-- With no eligible tuple, the all-outcomes local mass is zero. -/
 private lemma eligibleMass_eq_zero_of_not_d_add_one_le
