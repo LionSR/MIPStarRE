@@ -443,7 +443,7 @@ three consistency fields are exactly the native conclusions reached in
 * `eq:another-goal` (lines 182--185):
   $I \otimes A^{\mathrm B,u}_a \simeq_{\zeta_4}
     Q^{\mathrm A}_{[g(u)=a]} \otimes I$;
-* `eq:third-goal` after data processing (lines 159--166):
+* `eq:third-goal` (lines 159--166):
   $Q^{\mathrm A}_g \otimes I \simeq_{\zeta_3/2} I \otimes Q^{\mathrm B}_g$.
 
 The two bound fields record the already-formalized Step 8 absorption of
