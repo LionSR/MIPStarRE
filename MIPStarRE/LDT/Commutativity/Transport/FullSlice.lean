@@ -2320,32 +2320,11 @@ lemma xEvaluatedFullSliceABABtensor_to_evaluatedSliceABABAvg
       |evaluatedSliceABABtensorAvg params strategy family -
           evaluatedSliceABABAvg params strategy family| ≤ Real.sqrt zeta := by
     rwa [abs_sub_comm] at hevalBridge
-  have htri :
-      |xEvaluatedFullSliceABABtensorAvg params strategy family -
-          evaluatedSliceABABAvg params strategy family| ≤
-        |xEvaluatedFullSliceABABtensorAvg params strategy family -
-          evaluatedSliceABABtensorAvg params strategy family| +
-        |evaluatedSliceABABtensorAvg params strategy family -
-          evaluatedSliceABABAvg params strategy family| := by
-    have hdecomp :
-        xEvaluatedFullSliceABABtensorAvg params strategy family -
-            evaluatedSliceABABAvg params strategy family =
-          (xEvaluatedFullSliceABABtensorAvg params strategy family -
-            evaluatedSliceABABtensorAvg params strategy family) +
-          (evaluatedSliceABABtensorAvg params strategy family -
-            evaluatedSliceABABAvg params strategy family) := by
-      ring
-    calc
-      |xEvaluatedFullSliceABABtensorAvg params strategy family -
-          evaluatedSliceABABAvg params strategy family|
-        = |(xEvaluatedFullSliceABABtensorAvg params strategy family -
-            evaluatedSliceABABtensorAvg params strategy family) +
-          (evaluatedSliceABABtensorAvg params strategy family -
-            evaluatedSliceABABAvg params strategy family)| := by rw [hdecomp]
-      _ ≤ |xEvaluatedFullSliceABABtensorAvg params strategy family -
-            evaluatedSliceABABtensorAvg params strategy family| +
-          |evaluatedSliceABABtensorAvg params strategy family -
-            evaluatedSliceABABAvg params strategy family| := abs_add_le _ _
+  have htri :=
+    abs_sub_le
+      (xEvaluatedFullSliceABABtensorAvg params strategy family)
+      (evaluatedSliceABABtensorAvg params strategy family)
+      (evaluatedSliceABABAvg params strategy family)
   linarith
 
 /-- Paper `eq:gcomterms` (`commutativity-G.tex` lines 286-290).

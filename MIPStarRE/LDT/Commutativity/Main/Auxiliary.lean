@@ -132,17 +132,12 @@ lemma fullSlice_scalar_marginalize_x
     (sqrtz := Real.sqrt zeta)
     tri.full_bridge tri.tensor_marginalize tri.evaluated_bridge
 
-/-- A two-step real-line triangle helper for a named intermediate. -/
+/-- Triangle inequality with explicit bounds for an intermediate point. -/
 private lemma abs_sub_le_of_two_step
     {a b c e₁ e₂ : Error}
     (hab : |a - b| ≤ e₁) (hbc : |b - c| ≤ e₂) :
     |a - c| ≤ e₁ + e₂ := by
-  have htri : |a - c| ≤ |a - b| + |b - c| := by
-    have hdecomp : a - c = (a - b) + (b - c) := by ring
-    calc
-      |a - c| = |(a - b) + (b - c)| := by rw [hdecomp]
-      _ ≤ |a - b| + |b - c| := abs_add_le _ _
-  linarith
+  exact (abs_sub_le a b c).trans (add_le_add hab hbc)
 
 /-- Residual for the still-unproved prefix of the y-side second-term chain.
 
