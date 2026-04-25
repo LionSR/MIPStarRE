@@ -359,7 +359,8 @@
 	\end{proof}
 
 	\begin{lemma}[Combinatorial averaging for the $r > d$ branch]\label{lem:small-overlap-averaging}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_mul_sum_small_le,
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.exists_large_subset_ordered,
+			MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_mul_sum_small_le,
 			MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_univ_mul_sum_compl_le,
 			MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.sum_small_le_four_sqrt}
 		\leanok
@@ -383,6 +384,7 @@
 
 	\begin{lemma}[Rank reduction]\label{lem:projective-low-rank-sum}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum}
+		\leanok
 		There exists a set of projection matrices $\{Q_a\}$ such that
 		\begin{equation*}
 			A_a \ot I \approx_{12\sqrt{\zeta}} Q_a \ot I.
@@ -398,7 +400,9 @@
 	\end{lemma}
 	\begin{proof}
 		\uses{lem:projective-non-measurement, lem:small-overlap-averaging, prop:triangle-inequality-for-approx_delta}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_projectors}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_projectors,
+			MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_rank_bound,
+			MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_truncate}
 		Let $\{R_a\}$ be given by \ref{lem:projective-non-measurement}. Write $r_a=\mathrm{rank}(R_a)$ and $r=\sum_a r_a$. If $r \leq d$, take $Q_a=R_a$. Otherwise,
 		\begin{equation}\label{eq:bound-on-r}
 			r
