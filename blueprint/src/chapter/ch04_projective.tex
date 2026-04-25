@@ -57,14 +57,6 @@
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
-	\leanok
-	% Audit note: the Lean theorem is sorry-free but input-driven — it takes
-	% `OrthonormalizationInput \psi A \zeta` (bundling `SpectralTruncationInput`
-	% and `LeftLiftedProjectivizationRepairInput`) as a caller-supplied
-	% hypothesis. The paper's existence claim is only witnessed once a concrete
-	% producer of those inputs (the same `r > d` truncation branch as
-	% \ref{lem:projective-low-rank-sum}) is formalized; tracked by issues
-	% #651 / #652.
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency
@@ -153,12 +145,6 @@
 
 \begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
-	\leanok
-	% Audit note: the Lean lemma is sorry-free but input-driven — it consumes
-	% `hspectral` and `hrepair` as explicit hypotheses. The paper's existence
-	% claim still depends on a concrete producer of the spectral / repair
-	% witness data, same gap as \ref{lem:projective-low-rank-sum}; tracked
-	% by issues #651 / #652.
 	\uses{def:simeq, def:approx_delta}
 	Let $\ket{\psi}$ be a state, and let $A = \{A_a\}$ and $B = \{B_a\}$ be measurements such that
 	\[
@@ -397,14 +383,6 @@
 
 	\begin{lemma}[Rank reduction]\label{lem:projective-low-rank-sum}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum}
-		\leanok
-		% Audit note: the Lean lemma is sorry-free but input-driven — it takes
-		% the auxiliary space, `RoundingToProjectorsWitness`, truncation `t`, and
-		% `hAuxDim` as caller-supplied inputs. The paper's existence claim
-		% ("there exists a set of projection matrices $\{Q_a\}$") is only
-		% witnessed once a concrete producer of those inputs (the `r > d`
-		% truncation branch from `orthonormalization.tex:559-658`) is
-		% formalized; that work is tracked by issue #652.
 		There exists a set of projection matrices $\{Q_a\}$ such that
 		\begin{equation*}
 			A_a \ot I \approx_{12\sqrt{\zeta}} Q_a \ot I.
@@ -679,11 +657,6 @@
 
 	\begin{lemma}\label{lem:xa-t}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xa_t}
-		\leanok
-		% Audit note: the Lean lemma is a sorry-free `rfl`-style identity on
-		% top of `QXPLayerData`. The paper's claim is only fully witnessed once
-		% a concrete producer of `QXPLayerData` is supplied — currently blocked
-		% by the missing complex-matrix SVD API in Mathlib (issue #652).
 		For each $a$,
 		\[
 			X_a = T_a \cdot X.
@@ -805,11 +778,6 @@
 
 	\begin{lemma}[$P_a$ restated]\label{lem:pa-restated}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.paRestated}
-		\leanok
-		% Audit note: same input-driven posture as \ref{lem:xa-t} — a
-		% sorry-free identity on top of `QXPLayerData`, with the concrete
-		% producer of that structure still blocked on the complex-matrix SVD
-		% gap tracked by issue #652.
 		For each $a$,
 		\begin{equation*}
 			P_a = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.
