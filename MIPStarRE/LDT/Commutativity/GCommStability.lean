@@ -522,9 +522,12 @@ private lemma gCommStabilityTwoR_first_factor_le_one
 
 /-- Named scalar defect for the boundedness half of the second paper stability claim.
 
-For fixed `x`, this is the collapsed scalar from `commutativity-G.tex`, equation
-`eq:g-comm-stab7`, after the point-commutation step has put the point operators
-in the order used by the boundedness witness.  Concretely,
+For fixed `x`, this is the post-transport mirror analogue of
+`commutativity-G.tex`, equation `eq:bound-this-right-now!`, with the slice
+sandwich `R'^x_g` in place of `R^y_g`.  It is the scalar after the
+`commutativityPoints` transport and after collapsing the `b`-indexed
+left-register sandwich into `R'^x_g`; it is not literally the uncollapsed
+paper expression `eq:g-comm-stab7`.  Concretely,
 `gCommStabilityTwoR` averages the left-register sandwich
 `E_{v,y} \sum_b G_b^{v,y} G_g^x G_b^{v,y}`, the factor
 `(1 - (G x).total)` is the paper's left-register `(I-G^x)`, and
@@ -807,10 +810,12 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
 
 This is the `Z^x` boundedness half of
 `references/ldt-paper/commutativity-G.tex`, `clm:g-comm-stability2` (lines
-185--221), after the right-register point-commutation transport has produced
-the order `A_b^{v,y} A_a^{u,x}`.  The separate `6√(γ(m+1))` transport loss is
-not proved here; a full paper-budget theorem must combine this post-transport
-`√ζ` bound with the distinct `commutativityPoints` transport estimate. -/
+185--221), after the right-register point-commutation transport and after the
+`b`-indexed left-register sandwich is collapsed into
+`gCommStabilityTwoScalarDefect`.  It bounds the post-transport mirror scalar by
+`√ζ`.  The separate `6√(γ(m+1))` transport loss is not proved here; a full
+paper-budget theorem must combine this post-transport bound with the distinct
+`commutativityPoints` transport estimate. -/
 theorem gCommStabilityTwo_scalar
     (params : Parameters)
     [FieldModel params.q]
