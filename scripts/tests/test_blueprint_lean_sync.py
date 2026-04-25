@@ -310,6 +310,37 @@ class LeanokPlacementReportingTests(unittest.TestCase):
         self.assertEqual(ch04["statement_formalized"], 0)
         self.assertEqual(ch04["proof_formalized"], 0)
 
+    def test_split_entries_for_same_decl_count_as_proof_formalized(self) -> None:
+        entries = [
+            BlueprintEntry(
+                file="src/chapter/ch04.tex",
+                line=10,
+                env_type="lemma",
+                label="lem:split-statement",
+                lean_decl="Foo.split",
+                has_leanok=True,
+                proof_has_leanok=False,
+            ),
+            BlueprintEntry(
+                file="src/chapter/ch04.tex",
+                line=20,
+                env_type="remark",
+                label=None,
+                lean_decl="Foo.split",
+                has_leanok=False,
+                proof_has_leanok=True,
+            ),
+        ]
+        report = SyncReport(
+            blueprint_entries=entries,
+            lean_decls={"Foo.split": self._fake_decl("Foo.split")},
+        )
+        stats = _chapter_stats(report)
+        ch04 = stats["src/chapter/ch04.tex"]
+        self.assertEqual(ch04["total"], 2)
+        self.assertEqual(ch04["statement_formalized"], 1)
+        self.assertEqual(ch04["proof_formalized"], 1)
+
     def test_missing_in_lean_entry_records_leanok_placement(self) -> None:
         # Construct a report where the \leanok-tagged entry has no matching
         # Lean declaration, so it lands in missing_in_lean / leanok_but_missing.

@@ -662,7 +662,7 @@ def run_sync(
 
 
 def _chapter_stats(report: SyncReport) -> dict[str, dict]:
-    """Per-chapter formalization progress.
+    r"""Per-chapter formalization progress.
 
     Each chapter dictionary distinguishes statement-level ``\\leanok`` from
     proof-level ``\\leanok`` per the placement convention documented in
@@ -671,14 +671,17 @@ def _chapter_stats(report: SyncReport) -> dict[str, dict]:
     * ``statement_formalized`` counts entries whose ``\\leanok`` sits inside
       the ``theorem``/``lemma``/``definition`` environment body, i.e. the
       Lean declaration exists and its statement matches the blueprint.
-    * ``proof_formalized`` counts entries whose ``\\leanok`` additionally
-      sits inside the matching ``proof`` environment, i.e. the Lean proof
-      is claimed complete.
+    * ``proof_formalized`` counts declarations that have both a statement-level
+      and proof-level ``\leanok`` somewhere among their blueprint entries.  The
+      aggregation by declaration matters because ``collect_blueprint_entries``
+      can split a statement marker and its proof marker across adjacent entries
+      that repeat the same ``\lean{...}`` declaration.
     * ``formalized`` is the legacy alias of ``statement_formalized`` and is
       kept so existing downstream consumers (CI badges, pre-existing JSON
       readers) continue to work.
     """
     stats: dict[str, dict] = {}
+    decl_leanok: dict[str, dict[str, dict[str, bool]]] = {}
     for entry in report.blueprint_entries:
         chapter = entry.file
         if chapter not in stats:
@@ -689,16 +692,30 @@ def _chapter_stats(report: SyncReport) -> dict[str, dict]:
                 "proof_formalized": 0,
                 "missing_lean": 0,
             }
+            decl_leanok[chapter] = {}
         s = stats[chapter]
         s["total"] += 1
         found = entry.lean_decl in report.lean_decls
         if entry.has_leanok and found:
             s["formalized"] += 1
             s["statement_formalized"] += 1
-        if entry.has_leanok and entry.proof_has_leanok and found:
-            s["proof_formalized"] += 1
         if not found:
             s["missing_lean"] += 1
+
+        decl_state = decl_leanok[chapter].setdefault(
+            entry.lean_decl,
+            {"found": found, "statement": False, "proof": False},
+        )
+        decl_state["found"] = decl_state["found"] or found
+        decl_state["statement"] = decl_state["statement"] or entry.has_leanok
+        decl_state["proof"] = decl_state["proof"] or entry.proof_has_leanok
+
+    for chapter, decls in decl_leanok.items():
+        stats[chapter]["proof_formalized"] = sum(
+            1
+            for decl_state in decls.values()
+            if decl_state["found"] and decl_state["statement"] and decl_state["proof"]
+        )
     return stats
 
 
