@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.Preliminaries.Polynomials
+import Mathlib.Algebra.Polynomial.Roots
 
 /-!
 # Polynomial agreement bound (Step 5 hammer)
@@ -171,6 +172,134 @@ lemma polynomialAgreement_avg_le_mdq
           exact_mod_cast hsz
     _ = (params.m * params.d : Error) / params.q := by
           simp [scalar_card, div_eq_mul_inv]
+
+/-- Reindex evaluation equality for degree-`d` line polynomials from coded
+`Fq params` parameters to the scalar field used by Mathlib's univariate
+polynomial API. -/
+lemma axisLinePolynomialAgreement_avg_eq_scalarDomain
+    (params : Parameters) [FieldModel params.q]
+    (f h : AxisLinePolynomial params) :
+    avgOver (uniformDistribution (Fq params))
+      (fun t => if f t = h t then (1 : Error) else 0) =
+      avgOver (uniformDistribution (Scalar params))
+        (fun x =>
+          if _root_.Polynomial.eval x f.poly = _root_.Polynomial.eval x h.poly then
+            (1 : Error)
+          else 0) := by
+  let e : Fq params ≃ Scalar params := (FieldModel.equiv (q := params.q)).symm
+  calc
+    avgOver (uniformDistribution (Fq params))
+        (fun t => if f t = h t then (1 : Error) else 0)
+      = avgOver (uniformDistribution (Scalar params))
+          (fun x => if f (e.symm x) = h (e.symm x) then (1 : Error) else 0) := by
+            simpa [e] using
+              (avgOver_uniform_equiv e
+                (fun t : Fq params => if f t = h t then (1 : Error) else 0))
+    _ = avgOver (uniformDistribution (Scalar params))
+        (fun x =>
+          if _root_.Polynomial.eval x f.poly = _root_.Polynomial.eval x h.poly then
+            (1 : Error)
+          else 0) := by
+            apply avgOver_congr
+            intro x
+            by_cases hx : _root_.Polynomial.eval x f.poly = _root_.Polynomial.eval x h.poly
+            · have hdecode : decodeScalar (e.symm x) = x := by
+                simp [e, decodeScalar]
+              have hcoded : f (e.symm x) = h (e.symm x) := by
+                change encodeScalar (_root_.Polynomial.eval (decodeScalar (e.symm x)) f.poly) =
+                  encodeScalar (_root_.Polynomial.eval (decodeScalar (e.symm x)) h.poly)
+                simpa [hdecode] using congrArg encodeScalar hx
+              simp [hx, hcoded]
+            · have hdecode : decodeScalar (e.symm x) = x := by
+                simp [e, decodeScalar]
+              have hcoded : ¬ f (e.symm x) = h (e.symm x) := by
+                intro hEq
+                apply hx
+                have henc :
+                    encodeScalar (_root_.Polynomial.eval x f.poly) =
+                      encodeScalar (_root_.Polynomial.eval x h.poly) := by
+                  simpa [AxisLinePolynomial.toFun, evalLinePolynomialModel, hdecode] using hEq
+                exact (FieldModel.equiv (q := params.q)).injective henc
+              simp [hx, hcoded]
+
+/-- Schwartz--Zippel for two distinct degree-`d` axis-line answers, stated with
+the ambient `m*d/q` loss used in the LDT estimates.  The underlying univariate
+root count gives `d/q`, and `params.hm` deliberately pads it to the paper's
+ambient `m*d/q` loss. -/
+lemma axisLinePolynomialAgreement_avg_le_mdq
+    (params : Parameters) [FieldModel params.q]
+    (f h : AxisLinePolynomial params) (hneq : f.poly ≠ h.poly) :
+    avgOver (uniformDistribution (Fq params))
+      (fun t => if f t = h t then (1 : Error) else 0) ≤
+      (params.m * params.d : Error) / params.q := by
+  classical
+  let S : Finset (Scalar params) :=
+    Finset.univ.filter (fun x : Scalar params =>
+      _root_.Polynomial.eval x f.poly = _root_.Polynomial.eval x h.poly)
+  have hS_card_le : S.card ≤ params.d := by
+    have hsub_ne : f.poly - h.poly ≠ 0 := sub_ne_zero.mpr hneq
+    have hsubset : S.val ⊆ (f.poly - h.poly).roots := by
+      intro x hx
+      have hx_eval : _root_.Polynomial.eval x f.poly = _root_.Polynomial.eval x h.poly := by
+        simpa [S] using hx
+      have hxroot : _root_.Polynomial.IsRoot (f.poly - h.poly) x := by
+        rw [_root_.Polynomial.IsRoot.def, _root_.Polynomial.eval_sub, sub_eq_zero]
+        exact hx_eval
+      exact (_root_.Polynomial.mem_roots hsub_ne).2 hxroot
+    have hcard := _root_.Polynomial.card_le_degree_of_subset_roots (p := f.poly - h.poly)
+      (Z := S) hsubset
+    have hdeg : (f.poly - h.poly).natDegree ≤ max f.poly.natDegree h.poly.natDegree := by
+      simpa [sub_eq_add_neg, _root_.Polynomial.natDegree_neg] using
+        (_root_.Polynomial.natDegree_add_le f.poly (-h.poly))
+    exact le_trans hcard (le_trans hdeg (max_le f.degreeBounded h.degreeBounded))
+  have havg_scalar :
+      avgOver (uniformDistribution (Scalar params))
+        (fun x =>
+          if _root_.Polynomial.eval x f.poly = _root_.Polynomial.eval x h.poly then
+            (1 : Error)
+          else 0) =
+        (S.card : Error) / Fintype.card (Scalar params) := by
+    calc
+      avgOver (uniformDistribution (Scalar params))
+        (fun x =>
+          if _root_.Polynomial.eval x f.poly = _root_.Polynomial.eval x h.poly then
+            (1 : Error)
+          else 0)
+        = ∑ x : Scalar params,
+            if _root_.Polynomial.eval x f.poly = _root_.Polynomial.eval x h.poly then
+              (1 / (Fintype.card (Scalar params) : Error))
+            else 0 := by
+              simp [avgOver, uniformDistribution]
+      _ = ∑ x ∈ S, (1 / (Fintype.card (Scalar params) : Error)) := by
+              rw [← Finset.sum_filter]
+      _ = (S.card : Error) * (1 / (Fintype.card (Scalar params) : Error)) := by
+              simp
+      _ = (S.card : Error) / Fintype.card (Scalar params) := by ring
+  have hline :
+      (S.card : Error) / Fintype.card (Scalar params) ≤
+        (params.d : Error) / params.q := by
+    rw [scalar_card]
+    exact div_le_div_of_nonneg_right (by exact_mod_cast hS_card_le) (by positivity)
+  have hmd : (params.d : Error) / params.q ≤ (params.m * params.d : Error) / params.q := by
+    apply div_le_div_of_nonneg_right ?_ (by positivity)
+    have hm : (1 : Error) ≤ (params.m : Error) := by exact_mod_cast params.hm
+    have hd : 0 ≤ (params.d : Error) := by positivity
+    calc
+      (params.d : Error) = (1 : Error) * (params.d : Error) := by ring
+      _ ≤ (params.m : Error) * (params.d : Error) :=
+          mul_le_mul_of_nonneg_right hm hd
+      _ = (params.m * params.d : Error) := by norm_num
+  calc
+    avgOver (uniformDistribution (Fq params))
+      (fun t => if f t = h t then (1 : Error) else 0)
+      = avgOver (uniformDistribution (Scalar params))
+        (fun x =>
+          if _root_.Polynomial.eval x f.poly = _root_.Polynomial.eval x h.poly then
+            (1 : Error)
+          else 0) := axisLinePolynomialAgreement_avg_eq_scalarDomain params f h
+    _ = (S.card : Error) / Fintype.card (Scalar params) := havg_scalar
+    _ ≤ (params.d : Error) / params.q := hline
+    _ ≤ (params.m * params.d : Error) / params.q := hmd
 
 open Classical in
 /-- Tensor-form Schwartz-Zippel collision bound.

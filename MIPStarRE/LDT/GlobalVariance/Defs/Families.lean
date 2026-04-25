@@ -229,6 +229,33 @@ noncomputable def generalizeBCollisionResidualAtPolynomial (params : Parameters)
         (generalizeBCollisionOperatorAtPolynomial params strategy g qu)
         (G.outcome g)))
 
+/-- Explicit line/parameter expansion of the `lem:generalize-b` collision residual.
+
+This is the paper's `expansion.tex`, lines 286--288, after replacing an
+incident line question `(ℓ,u)` by a line `ℓ` and affine parameter `t` with
+`u = ℓ(t)`: the coefficient is the fraction of parameters where a line answer
+`f` both collides with `g|_ℓ` at `t` and is not equal to `g|_ℓ`.  Issue #753
+reduces the remaining residual work to proving that
+`generalizeBCollisionResidualAtPolynomial` is equal to this explicit expansion. -/
+noncomputable def generalizeBLineCollisionExpansionAtPolynomial (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (ψbi : QuantumState (ι × ι))
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) : Error :=
+  avgOver (uniformDistribution (AxisParallelLine params))
+    (fun ℓ =>
+      ∑ f : AxisLinePolynomial params,
+        avgOver (uniformDistribution (Fq params))
+          (fun t =>
+            if f t = (Polynomial.restrictToAxisParallelLine params g ℓ) t ∧
+                f.poly ≠ (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
+              (1 : Error)
+            else 0) *
+          ev ψbi (opTensor
+            ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f)
+            (G.outcome g)))
+
 private noncomputable def polynomialAverageUnitSubMeas (params : Parameters)
     [FieldModel params.q]
     (f : Polynomial params → MIPStarRE.Quantum.Op (ι × ι))

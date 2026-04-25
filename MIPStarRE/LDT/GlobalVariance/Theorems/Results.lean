@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
+import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 import MIPStarRE.LDT.GlobalVariance.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.Averaging
 import MIPStarRE.LDT.GlobalVariance.Theorems.Statements
@@ -6,6 +7,7 @@ import MIPStarRE.LDT.GlobalVariance.Theorems.Statements
 namespace MIPStarRE.LDT.GlobalVariance
 
 open MIPStarRE.LDT
+open MIPStarRE.LDT.Preliminaries
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -646,6 +648,182 @@ lemma generalizeB
   -- hypothesis.
   exact generalizeB_of_pointwise params strategy G ψbi hpoint
 
+private lemma generalizeBLineCollisionTensorMass_nonneg
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
+    0 ≤ ev strategy.state (opTensor ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f)
+      (G.outcome g)) := by
+  simpa [leftTensor_mul_rightTensor_eq_opTensor] using
+    ev_leftTensor_mul_rightTensor_nonneg strategy.state
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome_pos f)
+      (G.outcome_pos g)
+
+/-- The total tensor mass left after summing over line answers is at most one.
+
+This is the normalization half of `expansion.tex`, lines 286--288: the
+left-register line measurement sums to its total operator, the right-register
+operator is the single submeasurement outcome `G_g ≤ 1`, and the strategy state
+is normalized. -/
+private lemma generalizeBLineCollisionTensorMass_sum_le_one
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) (ℓ : AxisParallelLine params) :
+    (∑ f : AxisLinePolynomial params,
+      ev strategy.state (opTensor ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f)
+        (G.outcome g))) ≤ 1 := by
+  let B := (strategy.axisParallelMeasurement ℓ).toSubMeas
+  calc
+    (∑ f : AxisLinePolynomial params,
+      ev strategy.state (opTensor (B.outcome f) (G.outcome g)))
+      = ev strategy.state (∑ f : AxisLinePolynomial params,
+          opTensor (B.outcome f) (G.outcome g)) := by
+          rw [ev_sum]
+    _ = ev strategy.state (leftTensor (ι₂ := ι) B.total *
+          rightTensor (ι₁ := ι) (G.outcome g)) := by
+          congr 1
+          calc
+            (∑ f : AxisLinePolynomial params, opTensor (B.outcome f) (G.outcome g))
+              = ∑ f : AxisLinePolynomial params,
+                  leftTensor (ι₂ := ι) (B.outcome f) *
+                    rightTensor (ι₁ := ι) (G.outcome g) := by
+                    simp [leftTensor_mul_rightTensor_eq_opTensor]
+            _ = (∑ f : AxisLinePolynomial params, leftTensor (ι₂ := ι) (B.outcome f)) *
+                  rightTensor (ι₁ := ι) (G.outcome g) := by
+                    rw [Finset.sum_mul]
+            _ = leftTensor (ι₂ := ι) B.total * rightTensor (ι₁ := ι) (G.outcome g) := by
+                    rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ B.outcome]
+                    rw [B.sum_eq_total]
+    _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+          apply ev_mono strategy.state _ _
+          calc
+            leftTensor (ι₂ := ι) B.total * rightTensor (ι₁ := ι) (G.outcome g)
+              = opTensor B.total (G.outcome g) := by
+                  rw [leftTensor_mul_rightTensor_eq_opTensor]
+            _ ≤ leftTensor (ι₂ := ι) B.total :=
+                  opTensor_le_leftTensor (SubMeas.total_nonneg B) (SubMeas.outcome_le_one G g)
+            _ ≤ 1 := leftTensor_le_one (ι₂ := ι) B.total_le_one
+    _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
+
+private lemma generalizeBLineCollisionCoefficient_le
+    (params : Parameters)
+    [FieldModel params.q]
+    (g : Polynomial params) (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
+    avgOver (uniformDistribution (Fq params))
+      (fun t =>
+        if f t = (Polynomial.restrictToAxisParallelLine params g ℓ) t ∧
+            f.poly ≠ (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
+          (1 : Error)
+        else 0) ≤ generalizeBError params := by
+  classical
+  let h := Polynomial.restrictToAxisParallelLine params g ℓ
+  let δ := generalizeBError params
+  have hδ_nonneg : 0 ≤ δ := by
+    dsimp [δ, generalizeBError]
+    positivity
+  by_cases hneq : f.poly ≠ h.poly
+  · have hline := axisLinePolynomialAgreement_avg_le_mdq params f h hneq
+    simpa [h, δ, generalizeBError, hneq] using hline
+  · rw [show
+        avgOver (uniformDistribution (Fq params))
+          (fun t =>
+            if f t = (Polynomial.restrictToAxisParallelLine params g ℓ) t ∧
+                f.poly ≠ (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
+              (1 : Error)
+            else 0) = 0 by
+          simpa [h, hneq] using (avgOver_zero (uniformDistribution (Fq params)))]
+    exact hδ_nonneg
+
+/-- The explicit line/parameter collision expansion is bounded by `m*d/q`.
+
+This proves the Schwartz--Zippel and normalization parts of the residual estimate
+from `expansion.tex`, lines 286--288.  The only remaining issue #753 work is the
+finite reindexing identity equating
+`generalizeBCollisionResidualAtPolynomial` with
+`generalizeBLineCollisionExpansionAtPolynomial`. -/
+lemma generalizeBLineCollisionExpansionAtPolynomial_le_generalizeBError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) :
+    generalizeBLineCollisionExpansionAtPolynomial params strategy strategy.state G g ≤
+      generalizeBError params := by
+  classical
+  let δ := generalizeBError params
+  have hδ_nonneg : 0 ≤ δ := by
+    dsimp [δ, generalizeBError]
+    positivity
+  unfold generalizeBLineCollisionExpansionAtPolynomial
+  calc
+    avgOver (uniformDistribution (AxisParallelLine params))
+      (fun ℓ =>
+        ∑ f : AxisLinePolynomial params,
+          avgOver (uniformDistribution (Fq params))
+            (fun t =>
+              if f t = (Polynomial.restrictToAxisParallelLine params g ℓ) t ∧
+                  f.poly ≠ (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
+                (1 : Error)
+              else 0) *
+            ev strategy.state (opTensor
+              ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f)
+              (G.outcome g)))
+      ≤ avgOver (uniformDistribution (AxisParallelLine params))
+          (fun ℓ =>
+            ∑ f : AxisLinePolynomial params,
+              δ * ev strategy.state (opTensor
+                ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f)
+                (G.outcome g))) := by
+            refine avgOver_mono _ _ _ ?_
+            intro ℓ
+            refine Finset.sum_le_sum ?_
+            intro f _
+            exact mul_le_mul_of_nonneg_right
+              (by simpa [δ] using generalizeBLineCollisionCoefficient_le params g ℓ f)
+              (generalizeBLineCollisionTensorMass_nonneg params strategy G g ℓ f)
+    _ = avgOver (uniformDistribution (AxisParallelLine params))
+          (fun ℓ => δ * ∑ f : AxisLinePolynomial params,
+            ev strategy.state (opTensor
+              ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f)
+              (G.outcome g))) := by
+            apply avgOver_congr
+            intro ℓ
+            rw [Finset.mul_sum]
+    _ ≤ avgOver (uniformDistribution (AxisParallelLine params))
+          (fun _ℓ => δ * 1) := by
+            refine avgOver_mono _ _ _ ?_
+            intro ℓ
+            exact mul_le_mul_of_nonneg_left
+              (generalizeBLineCollisionTensorMass_sum_le_one params strategy G g ℓ)
+              hδ_nonneg
+    _ = δ := by
+            simpa using (avgOver_uniform_const (α := AxisParallelLine params) (c := δ))
+    _ = generalizeBError params := rfl
+
+/-- Strict reduction of the collision-residual estimate to the remaining finite
+reindexing identity.
+
+TODO(#753): prove the equality hypothesis by expanding
+`ProjMeas.postprocess`, rewriting the incident-pair distribution as a uniform
+line/parameter average, and commuting the finite sums. -/
+lemma generalizeBCollisionResidualAtPolynomial_le_of_lineCollisionExpansion_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params)
+    (hreindex :
+      generalizeBCollisionResidualAtPolynomial params strategy strategy.state G g =
+        generalizeBLineCollisionExpansionAtPolynomial params strategy strategy.state G g) :
+    generalizeBCollisionResidualAtPolynomial params strategy strategy.state G g ≤
+      generalizeBError params := by
+  rw [hreindex]
+  exact generalizeBLineCollisionExpansionAtPolynomial_le_generalizeBError params strategy G g
+
 /-- Strategy-state reduction for `lem:generalize-b` after the projective expansion.
 
 This theorem removes the conclusion-shaped pointwise norm hypothesis from the
@@ -666,6 +844,27 @@ lemma generalizeBFromCollisionResidual
   intro g
   rw [generalizeBDeviationAtPolynomial_eq_collisionResidualAtPolynomial]
   exact hcollision g
+
+/-- Strategy-state reduction for `lem:generalize-b` from the explicit line/parameter
+collision expansion.
+
+This packages the strict #753 reduction: once the finite reindexing equality is
+proved, the Schwartz--Zippel coefficient bound and tensor normalization bound
+above supply the required collision residual estimate. -/
+lemma generalizeBFromLineCollisionExpansion
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (hreindex :
+      ∀ g : Polynomial params,
+        generalizeBCollisionResidualAtPolynomial params strategy strategy.state G g =
+          generalizeBLineCollisionExpansionAtPolynomial params strategy strategy.state G g) :
+    GeneralizeBStatement params strategy strategy.state G := by
+  refine generalizeBFromCollisionResidual params strategy G ?_
+  intro g
+  exact generalizeBCollisionResidualAtPolynomial_le_of_lineCollisionExpansion_eq
+    params strategy G g (hreindex g)
 
 /-- Legacy wrapper for `lem:local-variance-of-points` with arbitrary bipartite
 state and both pointwise bounds supplied explicitly.

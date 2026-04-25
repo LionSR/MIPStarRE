@@ -130,6 +130,20 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 	Transport along the equivalence between coded $\F_q$ points and the underlying scalar function space, then apply Lemma~\ref{lem:schwartz-zippel-individual}.
 \end{proof}
 
+\begin{lemma}[Axis-line polynomial agreement bound]\label{lem:axis-line-polynomial-agreement-mdq}
+	\lean{MIPStarRE.LDT.Preliminaries.axisLinePolynomialAgreement_avg_eq_scalarDomain, MIPStarRE.LDT.Preliminaries.axisLinePolynomialAgreement_avg_le_mdq}
+	\leanok
+	Let $f,h : \mathrm{AxisLinePolynomial}\,\mathrm{params}$ be two line-polynomial outcomes with distinct underlying polynomials. Then
+	\[
+		\E_{t \sim \F_q}\bigl[\mathbf{1}[f(t)=h(t)]\bigr] \le \frac{md}{q}.
+	\]
+	The native univariate root-counting bound is $d/q$; the statement deliberately pads this to the paper's ambient $md/q$ loss for Section~\ref{lem:generalize-b}.
+\end{lemma}
+\begin{proof}
+	\leanok
+	Reindex coded line parameters to the scalar field, count the roots of the nonzero univariate polynomial $f-h$, and use $m\ge 1$ to pad $d/q$ to $md/q$.
+\end{proof}
+
 \begin{definition}[Measurements and submeasurements]\label{def:submeasurement}
 	\lean{MIPStarRE.LDT.SubMeas, MIPStarRE.LDT.Measurement, MIPStarRE.LDT.ProjSubMeas}
 	\leanok
