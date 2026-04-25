@@ -34,15 +34,20 @@ The tool is **report-only** — it never edits or closes issues and never
 posts comments.  Its output is intended for human review by a maintainer
 doing periodic triage before launching a proof-closing round.
 
-## Why a script, not a live workflow
+## Offline-first inputs and scheduled audit
 
-Authenticated `gh` calls in CI are awkward (the default `GITHUB_TOKEN`
-can list issues but rate-limits across large repos, and the script is
-most useful to run locally alongside other maintenance scripts).  The
-script therefore reads pre-exported JSON from `gh issue list`.  Running
-it on a CI schedule remains a possible follow-up (see
-[`docs/ci-automation.md`](ci-automation.md)), but the v1 is deliberately
-offline-friendly.
+The script reads pre-exported JSON from `gh issue list` instead of calling
+GitHub directly.  That keeps the audit easy to run locally, easy to test
+without credentials, and safe to wrap in automation.
+
+The weekly GitHub Actions wrapper
+[`.github/workflows/stale-issue-audit.yml`](../.github/workflows/stale-issue-audit.yml)
+automates exactly that documented export-and-audit sequence: it lists open
+issues with `gh issue list`, writes a JSON audit report, and uploads the
+report as an artifact only when at least one stale citation is flagged.  The
+workflow has read-only `contents` and `issues` permissions and preserves the
+script's report-only contract: it never closes, labels, edits, or comments on
+issues.
 
 ## Usage
 
@@ -116,7 +121,8 @@ and suitable for downstream automation.
 
 ## Recommended cadence and follow-up
 
-1. Run the audit before kicking off a new proof-closing round (monthly
+1. Let the scheduled GitHub Actions workflow run weekly, and also run the
+   audit manually before kicking off a new proof-closing round (monthly
    or before a campaign, whichever is sooner).
 2. For each flagged issue, open it and decide:
    - close it as resolved, optionally with a comment like
