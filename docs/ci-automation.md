@@ -11,6 +11,7 @@ This repository uses [Claude Code](https://docs.anthropic.com/en/docs/claude-cod
 - [Workflow Reference](#workflow-reference)
   - [Claude Code Review](#claude-code-review-claude-code-reviewyml)
   - [CI Failure Auto-Fix](#ci-failure-auto-fix-ci-failure-auto-fixyml)
+  - [Lean Linter-Warning Sweep](#lean-linter-warning-sweep-lean-linter-warning-sweepyml)
   - [Blueprint Auto-Fix](#blueprint-auto-fix-blueprint-auto-fixyml)
   - [Review Comment Auto-Fix](#review-comment-auto-fix-pr-review-auto-fixyml)
   - [Claude Mention Handler](#claude-mention-handler-claudeyml)
@@ -169,6 +170,35 @@ Here is exactly what happens:
 
 ---
 
+### Lean Linter-Warning Sweep (`lean-linter-warning-sweep.yml`)
+
+**What it does**: Runs a weekly report-only Lean build that captures compiler
+and linter warnings before they accumulate into a large cleanup PR. The workflow
+uploads the raw build log plus JSON/text warning summaries as artifacts.
+
+**When it runs**: Every Monday at 09:00 UTC, aligned with the standup window,
+and on manual `workflow_dispatch`.
+
+**What it runs**: `lake exe cache get && lake build -q --log-level=info` against
+current `main`, then parses warning lines for common linter categories such as
+`style.setOption`, `flexible`, `unnecessarySimpa`, `unusedDecidableInType`,
+`unusedFintypeInType`, and `unusedSimpArgs`.
+
+**Why it is report-only**: The existing auto-fix loop is PR-driven: it reacts to
+CI failures and review comments on same-repository PR branches. A scheduled job
+that creates cleanup PRs would need explicit write-token and Claude credentials,
+and it would also need guards against weekly empty PRs. Until that safe PR
+creation path exists, the scheduled sweep keeps `contents: read` permissions and
+only reports warning debt for maintainers to triage.
+
+**Follow-up convention**: If the report shows non-trivial cleanup, open a normal
+cleanup PR with the `auto-fix-claude`, `cleanup`, `formalization`, `2009.12982`,
+`ci`, and `infrastructure` labels as appropriate. Any automated or manual
+follow-up must preserve the Lean file-order convention: `set_option` directives
+go after the module docstring and before the imports/body that depend on them.
+The sweep is strictly for linter/unused-instance hygiene, not proof changes or
+`sorry` removal.
+
 ### Blueprint Auto-Fix (`blueprint-auto-fix.yml`)
 
 **What it does**: When the blueprint linter fails on a PR, this workflow reads the error logs and asks Claude to fix the LaTeX.
@@ -270,6 +300,17 @@ CI logs and review comments are untrusted input — they could contain text desi
 
 CI-failure and blueprint auto-fix workflows run automatically on every PR. No setup needed. When CI fails, Claude will attempt a fix and push it.
 
+### To review weekly linter-warning debt
+
+1. Open **Actions → Lean linter-warning sweep**.
+2. Download the `lean-linter-warning-sweep-report` artifact from the latest
+   scheduled or manual run.
+3. If the warnings are mechanical and non-trivial, open a focused cleanup PR
+   rather than editing `main` directly. Add the same maintenance labels used by
+   the linter-warning cleanup issues, especially `auto-fix-claude`, so the
+   existing PR review-fix loop can help with review nits.
+4. Do not create an empty weekly PR when the report has no warnings.
+
 ### To enable the review-fix loop
 
 1. Add the `auto-fix-claude` label to your PR
@@ -312,7 +353,11 @@ Each workflow requests only the GitHub token permissions it needs:
 | `issues` | write | write | write | write | write |
 | `id-token` | write | write | write | write | write |
 
-The code review workflow only needs `contents: read` because it does not push code — it only reads the diff and posts comments. All other workflows need `contents: write` because they push fix commits.
+The code review workflow only needs `contents: read` because it does not push
+code — it only reads the diff and posts comments. All other auto-fix workflows
+need `contents: write` because they push fix commits. Periodic report-only
+maintenance sweeps, including the Lean linter-warning sweep, intentionally stay
+read-only and upload artifacts instead of editing issues or branches.
 
 ---
 
@@ -333,6 +378,14 @@ The review-fix loop is gated on the `auto-fix-claude` label. To change the label
 ### Model
 
 All workflows use `claude-opus-4-6`, configured via `--model` in the `claude_args` parameter of each workflow file.
+
+### Linter-warning sweep cadence and categories
+
+The weekly Lean linter-warning sweep cadence is configured in
+`.github/workflows/lean-linter-warning-sweep.yml` with a Monday 09:00 UTC cron.
+If Lean adds new warning families worth highlighting, extend the
+`known_linter_names` list in that workflow's summary step; unknown warning lines
+are still reported under `other`.
 
 ### Lean plugins
 

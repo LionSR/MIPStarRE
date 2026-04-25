@@ -1,0 +1,166 @@
+name: Lean linter-warning sweep
+
+on:
+  schedule:
+    # Report-only Lean linter-warning sweep, aligned with the Monday standup window.
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: lean-linter-warning-sweep
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    name: Capture Lean linter warnings
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Lean toolchain and cache
+        uses: ./.github/actions/setup-lean
+
+      - name: Run Lean build and capture warnings
+        run: |
+          set -euo pipefail
+          log_file="$RUNNER_TEMP/lean-linter-warning-sweep.log"
+
+          # The sweep intentionally mirrors the command requested in issue #723.
+          # It is report-only: warnings are summarized below and uploaded as an
+          # artifact, but this workflow does not open or edit pull requests.
+          {
+            lake exe cache get
+            lake build -q --log-level=info
+          } 2>&1 | tee "$log_file"
+
+      - name: Summarize linter warnings
+        if: always()
+        env:
+          REPORT_PREFIX: ${{ runner.temp }}/lean-linter-warning-sweep
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from collections import Counter
+          from pathlib import Path
+
+          prefix = Path(os.environ["REPORT_PREFIX"])
+          log_path = prefix.with_suffix(".log")
+          json_path = prefix.with_suffix(".json")
+          txt_path = prefix.with_suffix(".txt")
+
+          known_linter_names = [
+              "style.setOption",
+              "flexible",
+              "unnecessarySimpa",
+              "unusedDecidableInType",
+              "unusedFintypeInType",
+              "unusedSimpArgs",
+              "unusedVariables",
+              "unreachableTactic",
+              "simpNF",
+              "omegaNF",
+              "dupNamespace",
+              "docPrime",
+          ]
+          warning_re = re.compile(
+              r"^(?P<path>[^:\n]+\.lean):(?P<line>\d+):(?P<col>\d+): warning: (?P<message>.*)$"
+          )
+
+          if not log_path.exists():
+              log_path.touch()
+
+          warnings = []
+          if log_path.exists():
+              for raw_line in log_path.read_text(encoding="utf-8", errors="replace").splitlines():
+                  match = warning_re.match(raw_line)
+                  if not match:
+                      continue
+                  message = match.group("message")
+                  category = next(
+                      (name for name in known_linter_names if name in message),
+                      "other",
+                  )
+                  warnings.append({
+                      "path": match.group("path"),
+                      "line": int(match.group("line")),
+                      "column": int(match.group("col")),
+                      "category": category,
+                      "message": message,
+                      "raw": raw_line,
+                  })
+
+          counts = Counter(warning["category"] for warning in warnings)
+          report = {
+              "warning_count": len(warnings),
+              "category_counts": dict(sorted(counts.items())),
+              "warnings": warnings,
+          }
+          json_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+
+          lines = [
+              "Lean linter-warning sweep report",
+              "=================================",
+              f"warnings found: {len(warnings)}",
+              "",
+              "category counts:",
+          ]
+          if counts:
+              for category, count in sorted(counts.items()):
+                  lines.append(f"  - {category}: {count}")
+          else:
+              lines.append("  - none")
+          lines.extend(["", "warnings:"])
+          if warnings:
+              for warning in warnings:
+                  lines.append(
+                      f"  - {warning['path']}:{warning['line']}:{warning['column']} "
+                      f"[{warning['category']}] {warning['message']}"
+                  )
+          else:
+              lines.append("  - none")
+          txt_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+          summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          with summary_path.open("a", encoding="utf-8") as summary:
+              summary.write("## Lean linter-warning sweep\n\n")
+              summary.write(
+                  "This scheduled workflow is report-only. It captures Lean compiler "
+                  "warnings from `lake exe cache get && lake build -q --log-level=info` "
+                  "and uploads the report for maintainers to triage.\n\n"
+              )
+              summary.write(
+                  "A future auto-fix PR wrapper should only run with explicit write-token "
+                  "support and must preserve the project file-order convention: "
+                  "`set_option` directives go after the module docstring.\n\n"
+              )
+              summary.write(f"- Warnings found: {len(warnings)}\n")
+              if counts:
+                  summary.write("- Categories: " + ", ".join(
+                      f"{category}={count}" for category, count in sorted(counts.items())
+                  ) + "\n")
+              if warnings:
+                  summary.write("\n```text\n")
+                  preview = lines[:120]
+                  summary.write("\n".join(preview))
+                  if len(lines) > len(preview):
+                      summary.write("\n... truncated; see artifact for full report")
+                  summary.write("\n```\n")
+          PY
+
+      - name: Upload linter-warning report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lean-linter-warning-sweep-report
+          path: |
+            ${{ runner.temp }}/lean-linter-warning-sweep.log
+            ${{ runner.temp }}/lean-linter-warning-sweep.json
+            ${{ runner.temp }}/lean-linter-warning-sweep.txt
+          if-no-files-found: error
