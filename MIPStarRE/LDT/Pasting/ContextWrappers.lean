@@ -66,7 +66,7 @@ theorem ldPastingNCompleteness_of_context
       ctx.k :=
   ldPastingNCompleteness params ctx.strategy ctx.eps ctx.delta ctx.gamma
     ctx.kappa ctx.zeta ctx.good ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
-    ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
+    ctx.d_pos ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
     ctx.k ctx.hk_pos ctx.hk
 
 /-- `lem:ld-gbcon` restated against the standing pasting context. -/
@@ -108,7 +108,7 @@ lemma overAllOutcomes_of_context
     OverAllOutcomesStatement params ctx.strategy ctx.family
       ctx.eps ctx.delta ctx.gamma ctx.zeta ctx.k :=
   overAllOutcomes params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.zeta
-    ctx.good ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
+    ctx.good ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q ctx.d_pos
     ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k
 
 /-- `lem:h-b-consistency` restated against the standing pasting context.
