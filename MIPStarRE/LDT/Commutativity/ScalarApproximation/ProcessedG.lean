@@ -231,6 +231,266 @@ private lemma evaluatedPointFamily_total_eq_G_total
   simp [evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
     postprocess_total, hG]
 
+private lemma postprocess_sandwichByOuter_prod_snd_outcome
+    {α β : Type*} [Fintype α] [Fintype β]
+    (A : SubMeas α ι) (B : SubMeas β ι) (b : β) :
+    (postprocess (sandwichByOuterSubMeas A B) Prod.snd).outcome b =
+      ∑ a : α, A.outcome a * B.outcome b * A.outcome a := by
+  classical
+  have hfilter :
+      (Finset.univ.filter (fun ab : α × β => ab.2 = b)) =
+        (Finset.univ.image (fun a : α => (a, b))) := by
+    ext ab
+    constructor
+    · intro hab
+      rcases Finset.mem_filter.mp hab with ⟨_, hb⟩
+      rcases ab with ⟨a, b'⟩
+      change b' = b at hb
+      subst b'
+      exact Finset.mem_image.mpr ⟨a, Finset.mem_univ a, rfl⟩
+    · intro hab
+      rcases Finset.mem_image.mp hab with ⟨a, _, rfl⟩
+      simp
+  calc
+    (postprocess (sandwichByOuterSubMeas A B) Prod.snd).outcome b =
+        ∑ ab ∈ (Finset.univ.filter (fun ab : α × β => ab.2 = b)),
+          A.outcome ab.1 * B.outcome ab.2 * A.outcome ab.1 := by
+          simp [postprocess, sandwichByOuterSubMeas]
+    _ = ∑ ab ∈ (Finset.univ.image (fun a : α => (a, b))),
+          A.outcome ab.1 * B.outcome ab.2 * A.outcome ab.1 := by
+          rw [hfilter]
+    _ = ∑ a : α, A.outcome a * B.outcome b * A.outcome a := by
+          rw [Finset.sum_image]
+          intro a _ a' _ h
+          exact congrArg Prod.fst h
+
+private lemma leftTensor_mul_rightTensor_smul_left
+    (c : Error) (A B : MIPStarRE.Quantum.Op ι) :
+    leftTensor (ι₂ := ι) ((c : ℂ) • A) * rightTensor (ι₁ := ι) B =
+      (c : ℂ) • (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) B) := by
+  rw [leftTensor_mul_rightTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
+  simpa [opTensor] using Matrix.smul_kronecker (c : ℂ) A B
+
+private lemma leftTensor_mul_rightTensor_smul_right
+    (c : Error) (A B : MIPStarRE.Quantum.Op ι) :
+    leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) ((c : ℂ) • B) =
+      (c : ℂ) • (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) B) := by
+  rw [leftTensor_mul_rightTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
+  simpa [opTensor] using Matrix.kronecker_smul (c : ℂ) A B
+
+private lemma leftTensor_mul_rightTensor_real_smul_left
+    (c : Error) (A B : MIPStarRE.Quantum.Op ι) :
+    leftTensor (ι₂ := ι) (c • A) * rightTensor (ι₁ := ι) B =
+      (c : ℂ) • (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) B) := by
+  rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
+  exact leftTensor_mul_rightTensor_smul_left c A B
+
+private lemma leftTensor_mul_rightTensor_real_smul_right
+    (c : Error) (A B : MIPStarRE.Quantum.Op ι) :
+    leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) (c • B) =
+      (c : ℂ) • (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) B) := by
+  rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
+  exact leftTensor_mul_rightTensor_smul_right c A B
+
+private lemma ev_real_smul
+    (ψ : QuantumState (ι × ι)) (c : Error) (X : MIPStarRE.Quantum.Op (ι × ι)) :
+    ev ψ (c • X) = c * ev ψ X := by
+  rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
+  simpa using ev_scale ψ c X
+
+private lemma avgOver_avgOver_phaseTwo_linear
+    {Q V Γ Aidx : Type*} [Fintype Γ] [Fintype Aidx]
+    (𝒟Q : Distribution Q) (𝒟V : Distribution V)
+    (ψ : QuantumState (ι × ι))
+    (F : Q → Γ → Aidx → MIPStarRE.Quantum.Op ι)
+    (P : Γ → V → MIPStarRE.Quantum.Op ι)
+    (R : MIPStarRE.Quantum.Op ι) :
+    avgOver 𝒟V (fun v =>
+        avgOver 𝒟Q (fun q =>
+          ∑ g : Γ, ∑ a : Aidx,
+            ev ψ (leftTensor (ι₂ := ι) (F q g a * R) *
+              rightTensor (ι₁ := ι) (P g v)))) =
+      ∑ g : Γ,
+        ev ψ
+          (leftTensor (ι₂ := ι)
+              ((averageOperatorOverDistribution 𝒟Q (fun q => ∑ a : Aidx, F q g a)) * R) *
+            rightTensor (ι₁ := ι)
+              (averageOperatorOverDistribution 𝒟V (fun v => P g v))) := by
+  classical
+  let T : Q → V → Γ → Aidx → Error := fun q v g a =>
+    ev ψ (leftTensor (ι₂ := ι) (F q g a * R) *
+      rightTensor (ι₁ := ι) (P g v)) * (𝒟Q.weight q * 𝒟V.weight v)
+  have hreorder :
+      (∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ g : Γ, ∑ a : Aidx, T q v g a) =
+        ∑ g : Γ, ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := by
+    calc
+      (∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ g : Γ, ∑ a : Aidx, T q v g a)
+          = ∑ v ∈ 𝒟V.support, ∑ g : Γ, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := by
+            refine Finset.sum_congr rfl ?_
+            intro v _
+            rw [Finset.sum_comm]
+      _ = ∑ g : Γ, ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := by
+            rw [Finset.sum_comm]
+  calc
+    avgOver 𝒟V (fun v =>
+        avgOver 𝒟Q (fun q =>
+          ∑ g : Γ, ∑ a : Aidx,
+            ev ψ (leftTensor (ι₂ := ι) (F q g a * R) *
+              rightTensor (ι₁ := ι) (P g v))))
+        = ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ g : Γ, ∑ a : Aidx, T q v g a := by
+          simp [avgOver, T, Finset.mul_sum, mul_assoc, mul_comm]
+    _ = ∑ g : Γ, ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := hreorder
+    _ = ∑ g : Γ,
+        ev ψ
+          (leftTensor (ι₂ := ι)
+              ((averageOperatorOverDistribution 𝒟Q (fun q => ∑ a : Aidx, F q g a)) * R) *
+            rightTensor (ι₁ := ι)
+              (averageOperatorOverDistribution 𝒟V (fun v => P g v))) := by
+          simp [T, averageOperatorOverDistribution, ev_finset_sum, ev_real_smul,
+            ← leftTensor_finset_sum, ← rightTensor_finset_sum,
+            Finset.smul_sum, Finset.sum_mul, Finset.mul_sum,
+            leftTensor_mul_rightTensor_real_smul_left, leftTensor_mul_rightTensor_real_smul_right,
+            mul_assoc, mul_comm]
+
+private lemma ev_leftTensor_mul_middle_finset_sum
+    {α : Type*} (s : Finset α)
+    (ψ : QuantumState (ι × ι))
+    (A C R D : MIPStarRE.Quantum.Op ι)
+    (B : α → MIPStarRE.Quantum.Op ι) :
+    ev ψ
+        (leftTensor (ι₂ := ι) (((A * (∑ x ∈ s, B x) * C) * R)) *
+          rightTensor (ι₁ := ι) D) =
+      ∑ x ∈ s,
+        ev ψ
+          (leftTensor (ι₂ := ι) (((A * B x * C) * R)) *
+            rightTensor (ι₁ := ι) D) := by
+  classical
+  have hinner :
+      ((A * (∑ x ∈ s, B x) * C) * R) =
+        ∑ x ∈ s, ((A * B x * C) * R) := by
+    simp [Matrix.mul_sum, Finset.sum_mul, mul_assoc]
+  calc
+    ev ψ
+        (leftTensor (ι₂ := ι) (((A * (∑ x ∈ s, B x) * C) * R)) *
+          rightTensor (ι₁ := ι) D)
+        = ev ψ
+            (leftTensor (ι₂ := ι) (∑ x ∈ s, ((A * B x * C) * R)) *
+              rightTensor (ι₁ := ι) D) := by rw [hinner]
+    _ = ev ψ
+          ((∑ x ∈ s, leftTensor (ι₂ := ι) (((A * B x * C) * R))) *
+            rightTensor (ι₁ := ι) D) := by
+          rw [leftTensor_finset_sum (ι₂ := ι)]
+    _ = ev ψ
+          (∑ x ∈ s,
+            leftTensor (ι₂ := ι) (((A * B x * C) * R) ) *
+              rightTensor (ι₁ := ι) D) := by
+          rw [Finset.sum_mul]
+    _ = ∑ x ∈ s,
+          ev ψ
+            (leftTensor (ι₂ := ι) (((A * B x * C) * R)) *
+              rightTensor (ι₁ := ι) D) := by
+          rw [ev_finset_sum]
+
+set_option maxHeartbeats 2000000 in
+-- The pointwise phase-2 fiber collapse expands a postprocessed slice outcome inside
+-- a sandwiched tensor expectation; the explicit finite-sum linearity proof is
+-- heartbeat-heavy but keeps the #714 marginalization residual transparent.
+private lemma evaluatedSlicePhaseTwoQuestionDefect_append_eq_sum_poly
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (q1 : Point params.next) (v : Point params) (y : Fq params) :
+    evaluatedSlicePhaseTwoQuestionDefect params strategy family G
+        (q1, appendPoint params v y) =
+      ∑ g : Polynomial params, ∑ a : Fq params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((((evaluatedPointFamily params family q1).outcome a) *
+                ((family.meas y).toSubMeas.outcome g) *
+                ((evaluatedPointFamily params family q1).outcome a)) *
+                (1 - (G y).total)) *
+            rightTensor (ι₁ := ι)
+              ((strategy.pointMeasurement (appendPoint params v y)).outcome (g v))) := by
+  classical
+  let E : Fq params → MIPStarRE.Quantum.Op ι :=
+    fun a => (evaluatedPointFamily params family q1).outcome a
+  let Y : Polynomial params → MIPStarRE.Quantum.Op ι :=
+    fun g => ((family.meas y).toSubMeas.outcome g)
+  let P : Fq params → MIPStarRE.Quantum.Op ι :=
+    fun b => (strategy.pointMeasurement (appendPoint params v y)).outcome b
+  let R : MIPStarRE.Quantum.Op ι := 1 - (G y).total
+  have hcollapse :
+      (∑ b : Fq params, ∑ a : Fq params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              (((E a * (∑ g ∈ (Finset.univ : Finset (Polynomial params)).filter
+                  (fun g => g v = b), Y g) * E a) * R)) *
+            rightTensor (ι₁ := ι) (P b))) =
+      ∑ g : Polynomial params, ∑ a : Fq params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι) (((E a * Y g * E a) * R)) *
+            rightTensor (ι₁ := ι) (P (g v))) := by
+    calc
+      (∑ b : Fq params, ∑ a : Fq params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              (((E a * (∑ g ∈ (Finset.univ : Finset (Polynomial params)).filter
+                  (fun g => g v = b), Y g) * E a) * R)) *
+            rightTensor (ι₁ := ι) (P b)))
+          = ∑ b : Fq params, ∑ a : Fq params,
+              ∑ g ∈ (Finset.univ : Finset (Polynomial params)).filter (fun g => g v = b),
+                ev strategy.state
+                  (leftTensor (ι₂ := ι) (((E a * Y g * E a) * R)) *
+                    rightTensor (ι₁ := ι) (P b)) := by
+              refine Finset.sum_congr rfl ?_
+              intro b _
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              rw [ev_leftTensor_mul_middle_finset_sum
+                (ι := ι)
+                (s := (Finset.univ : Finset (Polynomial params)).filter (fun g => g v = b))
+                (ψ := strategy.state) (A := E a) (C := E a) (R := R)
+                (D := P b) (B := Y)]
+      _ = ∑ b : Fq params,
+            ∑ g ∈ (Finset.univ : Finset (Polynomial params)).filter (fun g => g v = b),
+              ∑ a : Fq params,
+                ev strategy.state
+                  (leftTensor (ι₂ := ι) (((E a * Y g * E a) * R)) *
+                    rightTensor (ι₁ := ι) (P b)) := by
+              refine Finset.sum_congr rfl ?_
+              intro b _
+              rw [Finset.sum_comm]
+      _ = ∑ b : Fq params,
+            ∑ g ∈ (Finset.univ : Finset (Polynomial params)).filter (fun g => g v = b),
+              ∑ a : Fq params,
+                ev strategy.state
+                  (leftTensor (ι₂ := ι) (((E a * Y g * E a) * R)) *
+                    rightTensor (ι₁ := ι) (P (g v))) := by
+              refine Finset.sum_congr rfl ?_
+              intro b _
+              refine Finset.sum_congr rfl ?_
+              intro g hg
+              have hgv : g v = b := (Finset.mem_filter.mp hg).2
+              rw [hgv]
+      _ = ∑ g : Polynomial params, ∑ a : Fq params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι) (((E a * Y g * E a) * R)) *
+                rightTensor (ι₁ := ι) (P (g v))) := by
+              simpa using
+                (Finset.sum_fiberwise (Finset.univ : Finset (Polynomial params))
+                  (fun g : Polynomial params => g v)
+                  (fun g : Polynomial params =>
+                    ∑ a : Fq params,
+                      ev strategy.state
+                        (leftTensor (ι₂ := ι) (((E a * Y g * E a) * R)) *
+                          rightTensor (ι₁ := ι) (P (g v)))))
+  simpa [E, Y, P, R, evaluatedSlicePhaseTwoQuestionDefect,
+    evaluatedSliceFirstFactor, evaluatedSliceSecondFactor, evaluatedSlicePointMeas,
+    evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
+    postprocess, pointHeight_appendPoint, truncatePoint_appendPoint, Parameters.next,
+    mul_assoc] using hcollapse
+
 /-- Pointwise algebra for the phase-2 subtraction.
 
 After expanding `totalSandwichFamily`, the inserted summand has the extra factor
@@ -746,14 +1006,13 @@ private lemma evaluatedSlice_scalar_chain_bound
         params strategy zeta _hnorm family hcombined_snd
   -- Phase 2: remove the trailing `G^y` from the phase-1 inserted term via the
   -- direct boundedness estimate `gCommStability_scalar`.
-  -- The analytic part is now closed by `evaluatedSlice_phaseTwo_stability_defect_bound`,
-  -- and the sign/algebra expansion is proved by
-  -- `evaluatedSlice_phaseTwo_avg_diff_eq_neg_questionDefect`.  The remaining #714
-  -- work is the exact finite marginalization from the question-level defect to
-  -- `evaluatedSlicePhaseTwoStabilityDefect`: use
-  -- `avgOver_uniform_pointNext_decompose` to decompose the sampled second point as
-  -- `(v,y)`, use the postprocessing-fiber identity `∑_b ∑_{g : g(v)=b} = ∑_g`,
-  -- and average the first sampled point into `gCommStabilityR`.
+  -- The analytic part is closed by `evaluatedSlice_phaseTwo_stability_defect_bound`,
+  -- the sign/algebra expansion is proved by
+  -- `evaluatedSlice_phaseTwo_avg_diff_eq_neg_questionDefect`, and the finite
+  -- marginalization below identifies the question-level defect with
+  -- `evaluatedSlicePhaseTwoStabilityDefect`: decompose the sampled second point as
+  -- `(v,y)`, collapse the postprocessing fibers `∑_b ∑_{g : g(v)=b}` to `∑_g`,
+  -- then average the first sampled point into `gCommStabilityR`.
   have hphase2 :
       |avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed| ≤ Real.sqrt zeta := by
     have hdefect :=
@@ -767,9 +1026,98 @@ private lemma evaluatedSlice_scalar_chain_bound
           params strategy family G _hG
     have hbridge :
         evaluatedSlicePhaseTwoReindexingResidual params strategy family G := by
-      -- TODO(#714): prove the finite marginalization/fiber equality described above
-      -- and finish by applying `hdefect`.
-      sorry
+      classical
+      let defect := evaluatedSlicePhaseTwoQuestionDefect params strategy family G
+      have hprod :
+          avgOver (uniformDistribution (EvaluatedSliceQuestion params)) defect =
+          avgOver (uniformDistribution (Point params.next))
+            (fun q2 => avgOver (uniformDistribution (Point params.next))
+              (fun q1 => defect (q1, q2))) := by
+        calc
+          avgOver (uniformDistribution (EvaluatedSliceQuestion params)) defect =
+              avgOver (uniformDistribution (Point params.next × Point params.next))
+                (fun qq => defect qq) := by
+                rfl
+          _ = avgOver (uniformDistribution (Point params.next × Point params.next))
+                (fun qq => defect (qq.2, qq.1)) := by
+                simpa using
+                  (avgOver_uniform_equiv
+                    (e := Equiv.prodComm (Point params.next) (Point params.next))
+                    (f := fun qq : Point params.next × Point params.next => defect qq))
+          _ = avgOver (uniformDistribution (Point params.next))
+                (fun q2 => avgOver (uniformDistribution (Point params.next))
+                  (fun q1 => defect (q1, q2))) := by
+                simpa using
+                  (avgOver_uniform_prod (α := Point params.next) (β := Point params.next)
+                    (f := fun q2 q1 => defect (q1, q2)))
+      have hdecomposeSecond :
+          avgOver (uniformDistribution (Point params.next))
+            (fun q2 => avgOver (uniformDistribution (Point params.next))
+              (fun q1 => defect (q1, q2))) =
+          avgOver (uniformDistribution (Fq params))
+            (fun y => avgOver (uniformDistribution (Point params))
+              (fun v => avgOver (uniformDistribution (Point params.next))
+                (fun q1 => defect (q1, appendPoint params v y)))) := by
+        simpa using
+          (avgOver_uniform_pointNext_decompose (params := params)
+            (f := fun q2 => avgOver (uniformDistribution (Point params.next))
+              (fun q1 => defect (q1, q2))))
+      have hbody :
+          ∀ y : Fq params,
+            avgOver (uniformDistribution (Point params))
+              (fun v => avgOver (uniformDistribution (Point params.next))
+                (fun q1 => defect (q1, appendPoint params v y))) =
+            evaluatedSlicePhaseTwoStabilityDefect params strategy family G y := by
+        intro y
+        let Ffun : Point params.next → Polynomial params → Fq params → MIPStarRE.Quantum.Op ι :=
+          fun q1 g a =>
+            (evaluatedPointFamily params family q1).outcome a *
+              ((family.meas y).toSubMeas.outcome g) *
+              (evaluatedPointFamily params family q1).outcome a
+        let Pfun : Polynomial params → Point params → MIPStarRE.Quantum.Op ι :=
+          fun g v => (strategy.pointMeasurement (appendPoint params v y)).outcome (g v)
+        let R : MIPStarRE.Quantum.Op ι := 1 - (G y).total
+        calc
+          avgOver (uniformDistribution (Point params))
+              (fun v => avgOver (uniformDistribution (Point params.next))
+                (fun q1 => defect (q1, appendPoint params v y))) =
+            avgOver (uniformDistribution (Point params))
+              (fun v => avgOver (uniformDistribution (Point params.next))
+                (fun q1 => ∑ g : Polynomial params, ∑ a : Fq params,
+                  ev strategy.state
+                    (leftTensor (ι₂ := ι) (Ffun q1 g a * R) *
+                      rightTensor (ι₁ := ι) (Pfun g v)))) := by
+              apply avgOver_congr
+              intro v
+              apply avgOver_congr
+              intro q1
+              simpa [defect, Ffun, Pfun, R] using
+                evaluatedSlicePhaseTwoQuestionDefect_append_eq_sum_poly
+                  params strategy family G q1 v y
+          _ = ∑ g : Polynomial params,
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                      ((averageOperatorOverDistribution (uniformDistribution (Point params.next))
+                        (fun q1 => ∑ a : Fq params, Ffun q1 g a)) * R) *
+                    rightTensor (ι₁ := ι)
+                      (averageOperatorOverDistribution (uniformDistribution (Point params))
+                        (fun v => Pfun g v))) := by
+              exact avgOver_avgOver_phaseTwo_linear
+                (𝒟Q := uniformDistribution (Point params.next))
+                (𝒟V := uniformDistribution (Point params))
+                (ψ := strategy.state) (F := Ffun) (P := Pfun) (R := R)
+          _ = evaluatedSlicePhaseTwoStabilityDefect params strategy family G y := by
+              simp [evaluatedSlicePhaseTwoStabilityDefect, gCommStabilityR,
+                IdxPolyFamily.averagedSlicePointEvaluationOperator, averageIdxSubMeas,
+                averageOperatorOverDistribution, evaluatedPointFamily,
+                IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
+                postprocess_sandwichByOuter_prod_snd_outcome, Ffun, Pfun, R,
+                Parameters.next]
+      unfold evaluatedSlicePhaseTwoReindexingResidual
+      rw [hprod, hdecomposeSecond]
+      apply avgOver_congr
+      intro y
+      exact hbody y
     have hrewrite :
         avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed =
           -avgOver (uniformDistribution (Fq params))
