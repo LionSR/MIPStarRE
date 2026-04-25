@@ -12,6 +12,7 @@ This repository uses [Claude Code](https://docs.anthropic.com/en/docs/claude-cod
   - [Claude Code Review](#claude-code-review-claude-code-reviewyml)
   - [CI Failure Auto-Fix](#ci-failure-auto-fix-ci-failure-auto-fixyml)
   - [Lean Linter-Warning Sweep](#lean-linter-warning-sweep-lean-linter-warning-sweepyml)
+  - [Lean Linter-Warning Auto-Fix](#lean-linter-warning-auto-fix-lean-linter-warning-autofixyml)
   - [README Freshness Audit](#readme-freshness-audit-readme-freshness-audityml)
   - [Blueprint Auto-Fix](#blueprint-auto-fix-blueprint-auto-fixyml)
   - [Review Comment Auto-Fix](#review-comment-auto-fix-pr-review-auto-fixyml)
@@ -186,11 +187,10 @@ current `main`, then parses warning lines for common linter categories such as
 `unusedFintypeInType`, and `unusedSimpArgs`.
 
 **Why it is report-only**: The existing auto-fix loop is PR-driven: it reacts to
-CI failures and review comments on same-repository PR branches. A scheduled job
-that creates cleanup PRs would need explicit write-token and Claude credentials,
-and it would also need guards against weekly empty PRs. Until that safe PR
-creation path exists, the scheduled sweep keeps `contents: read` permissions and
-only reports warning debt for maintainers to triage.
+CI failures and review comments on same-repository PR branches. The scheduled
+sweep keeps `contents: read` permissions and only reports warning debt for
+maintainers to triage. Use the guarded manual auto-fix wrapper below when the
+report shows a focused cleanup worth attempting.
 
 **Follow-up convention**: If the report shows non-trivial cleanup, open a normal
 cleanup PR with the `auto-fix-claude`, `cleanup`, `formalization`, `2009.12982`,
@@ -199,6 +199,49 @@ follow-up must preserve the Lean file-order convention: `set_option` directives
 go after the module docstring and before the imports/body that depend on them.
 The sweep is strictly for linter/unused-instance hygiene, not proof changes or
 `sorry` removal.
+
+### Lean Linter-Warning Auto-Fix (`lean-linter-warning-autofix.yml`)
+
+**What it does**: Provides an explicit `workflow_dispatch` wrapper for the
+weekly linter-warning report. It re-runs the same
+`lake exe cache get && lake build -q --log-level=info` command, parses the log
+with `scripts/lean_linter_warning_report.py`, and then either stays in dry-run
+mode or asks Claude Code to apply linter-only Lean edits.
+
+**When it runs**: Only when a maintainer starts it manually. The default
+`create_pr: false` input is report-only, and non-`main` `base_ref` values are
+kept report-only. Set `create_pr: true` only with `base_ref: main`, after
+reviewing the latest scheduled report and deciding that the warning debt is
+small and mechanical enough for an auto-fix attempt.
+
+**PR creation guards**: The workflow opens a PR only when all of the following
+are true:
+
+1. the dispatch uses `base_ref: main` when `create_pr` is `true`;
+2. the initial Lean build succeeds;
+3. the parsed warning count is nonzero;
+4. `create_pr` is `true`;
+5. `CLAUDE_CODE_OAUTH_TOKEN` is available to the workflow;
+6. Claude leaves a non-empty working-tree diff;
+7. the working tree contains no untracked or deleted files;
+8. every changed file is a Lean file; and
+9. the diff does not add forbidden proof-integrity tokens such as `sorry`,
+   `admit`, `axiom`, `unsafe`, `native_decide`, `unsafeCast`, `unsafeCoerce`,
+   `lcProof`, `ofReduceBool`, or `ofReduceNat`.
+
+The workflow then re-runs `lake build -q --log-level=info`, re-checks that the
+post-validation diff still has the same tracked Lean-file list and no forbidden
+proof-integrity tokens, stages only that guarded file list, commits to
+`autofix/lean-linter-warning-sweep-<run-id>-<run-attempt>`, opens a PR, and adds
+the `auto-fix-claude`, `cleanup`, `formalization`, `2009.12982`, `ci`, and
+`infrastructure` labels. It is intentionally not triggered on `pull_request`,
+so untrusted PR contexts cannot access the write token or Claude secret.
+
+**Review policy**: Auto-fix PRs remain ordinary PRs. Reviewers must check that
+any Lean cleanup is paper-faithful before merge; the workflow guards prevent
+obvious integrity failures but do not replace mathematical review. If a warning
+would require a substantive proof rewrite or theorem-statement change, leave it
+for a human-authored proof PR instead of the linter auto-fix wrapper.
 
 ### README Freshness Audit (`readme-freshness-audit.yml`)
 
@@ -329,11 +372,13 @@ CI-failure and blueprint auto-fix workflows run automatically on every PR. No se
 1. Open **Actions → Lean linter-warning sweep**.
 2. Download the `lean-linter-warning-sweep-report` artifact from the latest
    scheduled or manual run.
-3. If the warnings are mechanical and non-trivial, open a focused cleanup PR
-   rather than editing `main` directly. Add the same maintenance labels used by
-   the linter-warning cleanup issues, especially `auto-fix-claude`, so the
-   existing PR review-fix loop can help with review nits.
-4. Do not create an empty weekly PR when the report has no warnings.
+3. If the warnings are mechanical and non-trivial, either open a focused
+   cleanup PR manually or run **Actions → Lean linter-warning auto-fix** with
+   `create_pr: true`. The auto-fix wrapper uses the same parser, skips when the
+   report is empty, and labels any created PR with the maintenance labels used by
+   the linter-warning cleanup issues.
+4. Do not create an empty weekly PR when the report has no warnings, and always
+   review auto-fix PRs for paper-faithfulness before merge.
 
 ### To enable the review-fix loop
 
@@ -378,10 +423,13 @@ Each workflow requests only the GitHub token permissions it needs:
 | `id-token` | write | write | write | write | write |
 
 The code review workflow only needs `contents: read` because it does not push
-code — it only reads the diff and posts comments. All other auto-fix workflows
-need `contents: write` because they push fix commits. Periodic report-only
-maintenance sweeps, including the Lean linter-warning sweep, intentionally stay
-read-only and upload artifacts instead of editing issues or branches.
+code — it only reads the diff and posts comments. Auto-fix workflows that push
+fix commits need `contents: write`. Periodic report-only maintenance sweeps,
+including the Lean linter-warning sweep, intentionally stay read-only and upload
+artifacts instead of editing issues or branches. The Lean linter-warning
+auto-fix wrapper is manually dispatched only; it requests write permissions so
+it can create `autofix/lean-linter-warning-sweep-*` branches and PRs, but it is
+not available on `pull_request` events.
 
 ---
 
