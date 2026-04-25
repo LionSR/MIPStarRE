@@ -709,18 +709,14 @@ private lemma fullSlice_selfConsistency_snd_bound
 /-- Evaluated-slice point self-consistency pulled to the first coordinate of an
 evaluated-slice question.
 
-The input is stated as the already-postprocessed point-level self-consistency
-relation.  Deriving that relation from `IdxPolyFamily.StronglySelfConsistent`
-is isolated as the follow-up postprocessing/data-processing bridge #734. -/
+The point-level input needed by the averaged `closenessOfIP` bridge is derived
+from slice strong self-consistency by
+`evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent`. -/
 private lemma evaluatedSlice_selfConsistency_fst_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error)
-    (hpoint : SDDRel strategy.state
-      (uniformDistribution (Point params.next))
-      (evaluatedPointFamilyLeft params family)
-      (evaluatedPointFamilyRight params family)
-      zeta) :
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
     avgOver (uniformDistribution (EvaluatedSliceQuestion params))
         (fun q =>
           qSDDCore strategy.state
@@ -729,6 +725,9 @@ private lemma evaluatedSlice_selfConsistency_fst_bound
             (fun a : Fq params =>
               rightTensor (ι₁ := ι) ((evaluatedSliceFirstFactor params family q).outcome a))) ≤
       zeta := by
+  have hpoint :=
+    evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
+      params strategy family zeta hself
   have hfst :=
     avgOver_uniform_fst (α := Point params.next) (β := Point params.next)
       (f := fun u =>
@@ -763,11 +762,7 @@ private lemma evaluatedSlice_selfConsistency_snd_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error)
-    (hpoint : SDDRel strategy.state
-      (uniformDistribution (Point params.next))
-      (evaluatedPointFamilyLeft params family)
-      (evaluatedPointFamilyRight params family)
-      zeta) :
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
     avgOver (uniformDistribution (EvaluatedSliceQuestion params))
         (fun q =>
           qSDDCore strategy.state
@@ -776,6 +771,9 @@ private lemma evaluatedSlice_selfConsistency_snd_bound
             (fun b : Fq params =>
               rightTensor (ι₁ := ι) ((evaluatedSliceSecondFactor params family q).outcome b))) ≤
       zeta := by
+  have hpoint :=
+    evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
+      params strategy family zeta hself
   have hsnd :=
     avgOver_uniform_snd (α := Point params.next) (β := Point params.next)
       (f := fun u =>
@@ -1226,20 +1224,16 @@ private lemma fullSliceABAB_scalar_to_ABABtensor
 /-- Evaluated-slice scalar-to-tensor bridge for the first approximation after
 `eq:evaluate-gcom-at-points` (`commutativity-G.tex` lines 356-365).
 
-This is the evaluated analogue of `fullSliceABAB_scalar_to_BABAtensor`.  It uses
-point-level self-consistency for the already evaluated/postprocessed family as
-an explicit hypothesis; deriving that hypothesis from slice strong
-self-consistency is the follow-up postprocessing bridge #734. -/
+This is the evaluated analogue of `fullSliceABAB_scalar_to_BABAtensor`.  The
+point-level self-consistency for the already evaluated/postprocessed family is
+now derived from slice strong self-consistency by
+`evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent`. -/
 private lemma evaluatedSliceABAB_scalar_to_BABAtensor
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error)
     (hnorm : strategy.state.IsNormalized)
-    (hpoint : SDDRel strategy.state
-      (uniformDistribution (Point params.next))
-      (evaluatedPointFamilyLeft params family)
-      (evaluatedPointFamilyRight params family)
-      zeta) :
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
     |evaluatedSliceABABAvg params strategy family -
         evaluatedSliceBABAtensorAvg params strategy family| ≤ Real.sqrt zeta := by
   let 𝒟 : Distribution (EvaluatedSliceQuestion params) :=
@@ -1259,7 +1253,7 @@ private lemma evaluatedSliceABAB_scalar_to_BABAtensor
     simpa [𝒟] using uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
   have hAB : avgOver 𝒟 (fun q => qSDDCore strategy.state (A q) (B q)) ≤ zeta := by
     simpa [𝒟, A, B] using
-      evaluatedSlice_selfConsistency_fst_bound params strategy family zeta hpoint
+      evaluatedSlice_selfConsistency_fst_bound params strategy family zeta hself
   have hC :
       ∀ q,
         ∑ a : Fq params,
@@ -1337,11 +1331,7 @@ private lemma evaluatedSliceABAB_scalar_to_ABABtensor
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error)
     (hnorm : strategy.state.IsNormalized)
-    (hpoint : SDDRel strategy.state
-      (uniformDistribution (Point params.next))
-      (evaluatedPointFamilyLeft params family)
-      (evaluatedPointFamilyRight params family)
-      zeta) :
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
     |evaluatedSliceABABAvg params strategy family -
         evaluatedSliceABABtensorAvg params strategy family| ≤ Real.sqrt zeta := by
   let 𝒟 : Distribution (EvaluatedSliceQuestion params) :=
@@ -1361,7 +1351,7 @@ private lemma evaluatedSliceABAB_scalar_to_ABABtensor
     simpa [𝒟] using uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
   have hAB : avgOver 𝒟 (fun q => qSDDCore strategy.state (A q) (B q)) ≤ zeta := by
     simpa [𝒟, A, B] using
-      evaluatedSlice_selfConsistency_snd_bound params strategy family zeta hpoint
+      evaluatedSlice_selfConsistency_snd_bound params strategy family zeta hself
   have hC :
       ∀ q,
         ∑ b : Fq params,
