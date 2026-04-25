@@ -3226,9 +3226,11 @@ self-improvement package, this theorem executes the remaining
 `restrict → induct → self-improve → paste` assembly and returns the
 higher-dimensional point-consistency conclusion.
 
-Note: `SelfImprovementPackage.ofSelfImprovementInInductionSection` now packages
+Note: this is the internal assembly theorem. The public boundary wrapper is
+`mainInductionPublicWrapper`.
+`SelfImprovementPackage.ofSelfImprovementInInductionSection` now packages
 slice-wise restricted-strategy self-improvement outputs once they are supplied,
-and the restricted-probabilities boundary is now exposed separately via
+and the restricted-probabilities boundary is exposed separately via
 `restrictedProbabilities`, but `hselfProducer` remains an explicit input because
 the current development still lacks the final assembler connecting those outputs.
 That remaining wrapper work is tracked by TODO(#630). -/
@@ -3305,5 +3307,81 @@ theorem mainInductionByRecursionOnM
     exact
       mainInductionOfWitness params.next strategy eps delta gamma k
         ⟨1, G, hcons, le_of_not_gt hsmall⟩
+
+/-- `thm:main-induction-public-wrapper`.
+
+This public successor-step wrapper combines the five explicit Section 6 inputs
+tracked by issues #631–#633:
+1. the weighted restricted-axis and restricted-diagonal bounds feeding
+   `RestrictedProbabilitiesStatement.ofWeightedBounds`,
+2. `SliceRestrictionPackage.ofRestrictedProbabilities`,
+3. the slice-wise recursion witnesses used by `PerSliceInductionPackage.ofRecursion`,
+4. the explicit `hselfProducer` boundary input packaging the outputs of
+   `selfImprovementInInductionSection`, and
+5. `mainInductionByRecursionOnM`.
+
+Because issue #632 has not yet produced a canonical theorem turning the
+restricted-strategy self-improvement outputs into `SelfImprovementPackage`
+data, this wrapper keeps `hselfProducer` as an honest input rather than
+reintroducing a conclusion-shaped public premise. The conclusion exposes only
+the global measurement witness needed downstream by
+`MIPStarRE.LDT.Test.MainTheorem`. -/
+-- NOTE: The `hrestrict` expression below is intentionally repeated in the
+-- `hrec` binder, the `hselfProducer` binder, and the proof body. Keeping those
+-- three occurrences byte-for-byte identical lets Lean reuse `hrec` and
+-- `hselfProducer` directly by definitional equality.
+theorem mainInductionPublicWrapper
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
+    (haxisWeightedBound :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params *
+            (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps)
+    (hdiagonalWeightedBound :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params *
+            (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma)
+    (hrec :
+      let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
+        SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
+          (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
+            hgood haxisWeightedBound hdiagonalWeightedBound)
+      ∀ x,
+        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+            (polynomialEvaluationFamily params G.toSubMeas)
+            error ∧
+          error ≤
+            mainInductionError params k
+              (hrestrict.profile.axisParallel x)
+              (hrestrict.profile.selfConsistency x)
+              (hrestrict.profile.diagonal x))
+    (hselfProducer :
+      let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
+        SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
+          (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
+            hgood haxisWeightedBound hdiagonalWeightedBound)
+      ∀ hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k,
+        SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
+    (hk_pos : 1 ≤ k)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
+    SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
+      (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
+        hgood haxisWeightedBound hdiagonalWeightedBound)
+  exact
+    mainInductionByRecursionOnM params strategy eps delta gamma k hgood hd hrestrict hrec
+      hselfProducer hk_pos hk
 
 end MIPStarRE.LDT.MainInductionStep
