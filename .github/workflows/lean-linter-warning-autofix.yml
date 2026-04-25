@@ -190,7 +190,6 @@ jobs:
             exit 1
           fi
 
-          echo "changed=true" >> "$GITHUB_OUTPUT"
           changed_files_path="$RUNNER_TEMP/lean-linter-warning-autofix-changed-files.txt"
           git diff --name-only > "$changed_files_path"
           echo "Changed files:"
@@ -209,6 +208,8 @@ jobs:
             echo "::error::Auto-fix diff adds a forbidden proof-integrity token."
             exit 1
           fi
+
+          echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Validate auto-fix branch
         if: steps.diff_guard.outputs.changed == 'true'
