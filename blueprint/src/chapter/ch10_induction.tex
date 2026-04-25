@@ -329,16 +329,35 @@
 \end{proof}
 
 \begin{definition}[Lean successor-boundary aliases for the Section 3 proof]\label{def:main-formal-successor-boundary}
-	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictionPackage, MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSlices, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementProducer, MIPStarRE.LDT.Test.MainFormalSuccessorBoundary}
+	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictionPackage, MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSlices, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementProducer, MIPStarRE.LDT.Test.MainFormalSuccessorBoundary, MIPStarRE.LDT.Test.mainFormalSuccessorAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorDiagonalWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofRecursiveSelfImprovement}
 	\leanok
 	\uses{lem:symmetrization-bridge, thm:main-induction-public-wrapper}
-	These Lean-only aliases name the remaining successor-case data that
-	Theorem~\ref{thm:main-formal} must still produce before it can invoke
-	Proposition~\ref{thm:main-induction-public-wrapper}: the weighted restricted-axis
-	bound, the weighted restricted-diagonal bound, the extracted restriction
-	package, the recursive slice witnesses, the restricted-strategy
-	self-improvement producer, and their bundled boundary package.
+	These Lean-only aliases name the successor-case data that
+	Theorem~\ref{thm:main-formal} uses to invoke
+	Proposition~\ref{thm:main-induction-public-wrapper}. The public weighted-bound
+	helper lemmas discharge the weighted restricted-axis and restricted-diagonal
+	fields from the symmetrized passing strategy; the remaining external inputs are
+	the recursive slice witnesses, the restricted-strategy self-improvement
+	producer, and their bundled boundary package.
 \end{definition}
+
+\begin{proposition}[Lean successor handoff for the Section 3 proof]\label{lem:main-formal-successor-handoff}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorMainInductionPublicWrapper}
+	\leanok
+	\uses{def:main-formal-successor-boundary, lem:symmetrization-bridge, thm:main-induction-public-wrapper}
+	This Lean-only specialization applies Proposition~\ref{thm:main-induction-public-wrapper}
+	to the role-register symmetrization used in Theorem~\ref{thm:main-formal}. Given
+	the bundled successor boundary, the Section~6 side condition
+	$400\,m d \le k$, and the matching base-universe field-model instance, it
+	returns the symmetrized global polynomial measurement that the later
+	unsymmetrization and completion transports consume.
+\end{proposition}
+\begin{proof}
+	It is the direct application of
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper} after
+	instantiating Lemma~\ref{lem:symmetrization-bridge} at
+	$(3\eps,3\eps,3\eps)$ and unpacking the bundled successor-boundary fields.
+\end{proof}
 
 \begin{definition}[Final error envelope]\label{def:main-formal-envelope}
 	\lean{MIPStarRE.LDT.Test.mainFormalEnvelope}\leanok
