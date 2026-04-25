@@ -1,4 +1,6 @@
+import MIPStarRE.LDT.MainInductionStep
 import MIPStarRE.LDT.Test.ErrorCascade
+import MIPStarRE.LDT.Test.SymmetrizationBridge
 
 /-!
 # Section 3 — Main theorem
@@ -190,6 +192,152 @@ theorem mainFormal_trivial_witness
   all_goals exact ⟨le_trans
     (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized _ _) herr⟩
 
+/-- Step 1 + Section 6 base case for `mainFormal`.
+
+If the ambient test dimension is `m = 1`, Step 1 symmetrizes the original
+projective strategy and `MainInductionStep.mainInductionBaseCase` supplies the
+Section 6 global polynomial measurement on the role-register symmetrized
+strategy. This packages that handoff in the exact form consumed later by
+`mainFormal`. -/
+theorem strategySymmetrization_mainInductionBaseCase
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hm1 : params.m = 1) :
+    ∃ G : Measurement (Polynomial params) (Role × ι),
+      ConsRel (strategy.strategySymmetrization).state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        (MainInductionStep.mainInductionError params k
+          (3 * eps) (3 * eps) (3 * eps)) := by
+  exact
+    MainInductionStep.mainInductionBaseCase params
+      (strategy := strategy.strategySymmetrization)
+      (eps := 3 * eps) (delta := 3 * eps) (gamma := 3 * eps) (k := k) hm1
+      (ProjStrat.strategySymmetrization_isGood_three_mul
+        (strategy := strategy) (eps := eps) hpass)
+
+/-- Weighted restricted-axis input expected by the Section 6 successor wrapper
+on the role-register symmetrization. -/
+def MainFormalSuccessorAxisWeightedBound (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error) : Prop :=
+  avgOver (uniformDistribution (Fq params))
+    (fun x => MainInductionStep.sliceTransverseDirectionWeight params *
+      (MainInductionStep.xRestrictedStrategy params
+        strategy.strategySymmetrization x).axisParallelFailureProbability) ≤
+    3 * eps
+
+/-- Weighted restricted-diagonal input expected by the Section 6 successor
+wrapper on the role-register symmetrization.
+
+Per `lem:restricted-probabilities` (see `docs/audit/lean_code_audit.md`) the
+paper's slice argument uses the same transverse-direction factor `m / (m + 1)`
+for both the axis-parallel and diagonal branches. `restrictedProbabilities`
+therefore expects `sliceTransverseDirectionWeight` on both weighted bounds. -/
+def MainFormalSuccessorDiagonalWeightedBound (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error) : Prop :=
+  avgOver (uniformDistribution (Fq params))
+    (fun x => MainInductionStep.sliceTransverseDirectionWeight params *
+      (MainInductionStep.xRestrictedStrategy params
+        strategy.strategySymmetrization x).diagonalFailureProbability) ≤
+    3 * eps
+
+/-- The restricted-probability package on the role-register symmetrization used
+in the successor branch of `mainFormal`. -/
+noncomputable def mainFormalSuccessorRestrictionPackage
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound : MainFormalSuccessorDiagonalWeightedBound params strategy eps) :
+    MainInductionStep.SliceRestrictionPackage params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) :=
+  MainInductionStep.mainInductionPublicRestrictionPackage
+    params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
+    (ProjStrat.strategySymmetrization_isGood_three_mul
+      (strategy := strategy) (eps := eps) hpass)
+    haxisWeightedBound hdiagonalWeightedBound
+
+/-- Successor-case recursive slice witnesses expected by the public Section 6
+boundary wrapper. -/
+def MainFormalSuccessorRecursiveSlices (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorDiagonalWeightedBound params strategy eps) : Prop :=
+  let hrestrict :=
+    mainFormalSuccessorRestrictionPackage params strategy eps hpass
+      haxisWeightedBound hdiagonalWeightedBound
+  ∀ x,
+    ∃ error : Error, ∃ G : Measurement (Polynomial params) (Role × ι),
+      ConsRel (strategy.strategySymmetrization).state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas
+          (MainInductionStep.xRestrictedStrategy params
+            strategy.strategySymmetrization x).pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        error ∧
+      error ≤
+        MainInductionStep.mainInductionError params k
+          (hrestrict.profile.axisParallel x)
+          (hrestrict.profile.selfConsistency x)
+          (hrestrict.profile.diagonal x)
+
+/-- Successor-case restricted-strategy self-improvement producer expected by the
+public Section 6 boundary wrapper. -/
+def MainFormalSuccessorSelfImprovementProducer (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorDiagonalWeightedBound params strategy eps) : Type _ :=
+  let hrestrict :=
+    mainFormalSuccessorRestrictionPackage params strategy eps hpass
+      haxisWeightedBound hdiagonalWeightedBound
+  ∀ hinduction :
+    MainInductionStep.PerSliceInductionPackage params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k,
+    MainInductionStep.SelfImprovementPackage params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
+      hrestrict hinduction
+
+/-- Successor-case Section 6 boundary inputs for `mainFormal`.
+
+Assume the ambient projective strategy lives over `params.next`. Step 1 already
+turns `hpass` into the `(3 * eps, 3 * eps, 3 * eps)`-good role-register
+symmetrization `strategy.strategySymmetrization`. What still remains to apply
+`MainInductionStep.mainInductionPublicWrapper` are exactly the public Section 6
+inputs tracked by issues #631 and #632:
+1. weighted restricted-axis and restricted-diagonal bounds,
+2. recursive slice witnesses for the restricted strategies, and
+3. a restricted-strategy self-improvement producer.
+
+Bundling them into a single named boundary package gives the successor branch
+of `mainFormal` one honest issue-#634 interface, rather than four independent
+hypothesis holes. -/
+structure MainFormalSuccessorBoundary (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
+  axisWeightedBound :
+    MainFormalSuccessorAxisWeightedBound params strategy eps
+  diagonalWeightedBound :
+    MainFormalSuccessorDiagonalWeightedBound params strategy eps
+  recursiveSlices :
+    MainFormalSuccessorRecursiveSlices params strategy eps hpass k
+      axisWeightedBound diagonalWeightedBound
+  selfImprovementProducer :
+    MainFormalSuccessorSelfImprovementProducer params strategy eps hpass k
+      axisWeightedBound diagonalWeightedBound
+
 /--
 `thm:main-formal` from `test_definition.tex`.
 
@@ -203,10 +351,12 @@ the public hypothesis is `params.m * params.d ≤ k`, not the stronger
 `400 * params.m * params.d ≤ k` used by the Section 6 / Pasting-side wrappers.
 The planned assembly case-splits on `k`:
 
-* Regime `400 * params.m * params.d ≤ k`: invoke the induction / pasting
-  wrappers (`MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM` and
-  the still-pending Section 6 public wrapper tracked by #630) to discharge the
-  three `ConsRel` targets through the paper's cascade.
+* Regime `400 * params.m * params.d ≤ k`: invoke the public Section 6
+  wrapper `MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper`,
+  using the base-case handoff
+  `strategySymmetrization_mainInductionBaseCase` and the successor-boundary
+  package `MainFormalSuccessorBoundary`, to discharge the three `ConsRel`
+  targets through the paper's cascade.
 * Regime `params.m * params.d ≤ k < 400 * params.m * params.d`: the final
   envelope `mainFormalError params k eps` saturates past `1` (in the spirit of
   the paper's standard trivial-case observation in the proof of
@@ -257,7 +407,6 @@ theorem mainFormal
   --   bounds with `params.m * params.d ≤ k` and `0 < k` to conclude
   --   `1 ≤ mainFormalError params k eps`, then invoke
   --   `mainFormal_trivial_witness`.
-
   sorry
 
 end Test
