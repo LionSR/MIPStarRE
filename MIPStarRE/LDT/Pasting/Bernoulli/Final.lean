@@ -122,6 +122,7 @@ theorem ldPastingNCompleteness_of_tailLowerBound
     (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
     (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
@@ -137,7 +138,7 @@ theorem ldPastingNCompleteness_of_tailLowerBound
       (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
   let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
   have hOAO := overAllOutcomes params strategy eps delta gamma zeta
-    hgood hgamma_le hzeta_le hdq_le family hcons hself hbound k
+    hgood hgamma_le hzeta_le hdq_le hd family hcons hself hbound k
   have heps_nonneg : 0 ≤ eps :=
     eps_nonneg_of_isGood params.next strategy hgood
   have hdelta_nonneg : 0 ≤ delta :=
@@ -222,6 +223,7 @@ theorem ldPastingNCompleteness
     (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
     (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -243,10 +245,12 @@ theorem ldPastingNCompleteness
     `κ · (1 + 1/(100m)) + exp(-k / (80000 m²))`.  The surrounding completeness
     chain is reduced to this single specialization step; its only remaining
     input is `chernoffBernoulliMatrix`'s `hScalarTail` hypothesis (the scalar
-    Bernoulli/Hoeffding bound), which issue #642 tracks proving internally. -/
+    Bernoulli/Hoeffding bound), which issue #642 tracks proving internally.
+    The `hd` hypothesis is threaded for the earlier `overAllOutcomes` call, not
+    for this scalar Bernoulli-tail step. -/
     sorry
   exact ldPastingNCompleteness_of_tailLowerBound params strategy
-    eps delta gamma kappa zeta hgood hgamma_le hzeta_le hdq_le
+    eps delta gamma kappa zeta hgood hgamma_le hzeta_le hdq_le hd
     family hcons hself hbound k hk_pos hk htail
 
 /-- `lem:ld-pasting-sub-measurement`. -/
@@ -278,7 +282,7 @@ lemma ldPastingSubMeas
       family hcomplete hcons hself hbound k hk_pos hk
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
-      hgood hgamma_le hzeta_le hdq_le
+      hgood hgamma_le hzeta_le hdq_le hd
       family hcomplete hcons hself hbound k hk_pos hk
   exact
     { largeEnough := hk
@@ -314,7 +318,7 @@ theorem ldPasting
       family hcomplete hcons hself hbound k hk_pos hk
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
-      hgood hgamma_le hzeta_le hdq_le
+      hgood hgamma_le hzeta_le hdq_le hd
       family hcomplete hcons hself hbound k hk_pos hk
   have hconsistency :=
     hAConsistency_completed params strategy eps delta gamma kappa zeta

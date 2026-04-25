@@ -324,6 +324,19 @@ noncomputable def restrictSubMeas {α : Type*} [Fintype α]
           rw [A.sum_eq_total]
         _ ≤ 1 := A.total_le_one }
 
+/-- Restricting a submeasurement can only decrease its total operator. -/
+lemma restrictSubMeas_total_le_total {α : Type*} [Fintype α]
+    (A : SubMeas α ι) (p : α → Prop) [DecidablePred p] :
+    (restrictSubMeas A p).total ≤ A.total := by
+  calc
+    (restrictSubMeas A p).total = ∑ a ∈ Finset.univ.filter p, A.outcome a := by
+      rfl
+    _ ≤ ∑ a : α, A.outcome a := by
+      exact Finset.sum_le_univ_sum_of_nonneg
+        (s := Finset.univ.filter p)
+        (w := fun a => A.outcome_pos a)
+    _ = A.total := A.sum_eq_total
+
 /-- Restrict the sandwiched completed-slice family to tuples with support of size at
 least `d + 1`, matching the `|τ| ≥ d+1` filter in the paper before interpolation. -/
 noncomputable def interpolationEligibleSandwichFamily (params : Parameters) [FieldModel params.q]

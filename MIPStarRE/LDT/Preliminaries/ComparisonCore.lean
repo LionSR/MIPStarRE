@@ -9,6 +9,23 @@ Core comparison lemmas and measurement-agreement translations extracted from
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
+namespace MIPStarRE.LDT.ConsRel
+
+/-- Monotonicity of `ConsRel` in the allowed error parameter. -/
+lemma mono {Question Outcome : Type*} {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    {ψ : QuantumState (ιA × ιB)} {𝒟 : Distribution Question}
+    {A : IdxSubMeas Question Outcome ιA}
+    {B : IdxSubMeas Question Outcome ιB}
+    {δ δ' : Error} (hδ : δ ≤ δ') :
+    _root_.MIPStarRE.LDT.ConsRel ψ 𝒟 A B δ →
+      _root_.MIPStarRE.LDT.ConsRel ψ 𝒟 A B δ' := by
+  intro h
+  exact ⟨le_trans h.offDiagonalBound hδ⟩
+
+end MIPStarRE.LDT.ConsRel
+
 namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT

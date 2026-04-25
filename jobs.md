@@ -298,8 +298,8 @@ Last updated: 2026-04-23
 ## Active Pasting Wave
 - **Owner**: OpenCode
 - **Scope**: `MIPStarRE/LDT/Pasting/*.lean`
-- **Live executable sorrys in scope**: 6
-- **Current live target**: `MIPStarRE/LDT/Pasting/BridgeLemmas.lean`
+- **Live executable sorrys in scope**: 5
+- **Current live target**: `MIPStarRE/LDT/Pasting/BridgeLemmas/`
 - **Status**: IN PROGRESS
 - **Dependency chain**:
   - `ldGbcon`
@@ -328,9 +328,9 @@ Last updated: 2026-04-23
   - [x] Eliminate `ldGbcon`
   - [x] Eliminate `commuteGHalfSandwich`
   - [ ] Eliminate `ldSandwichLineOnePoint`
-  - [ ] Eliminate `hBConsistency`
+  - [x] Eliminate `hBConsistency`
   - [x] Repair the `hAConsistency_*` statement split to match the paper (`ν` before completion, `σ` after completion)
-  - [ ] Eliminate `hAConsistency`
+  - [x] Eliminate `hAConsistency`
   - [ ] Eliminate `overAllOutcomes`
   - [x] Eliminate `truncatedTypeSumRecurrence`
   - [ ] Eliminate `fromHToG`
@@ -339,6 +339,19 @@ Last updated: 2026-04-23
   - [ ] Add/update `\leanok` tags in `blueprint/src/chapter/ch09_pasting.tex`
   - [ ] Run `lake build`
 - **Completed on this pass**:
+  - repaired the Lean surface of `ldSandwichLineOnePointLeftFamily` so the one-point
+    comparison removes `none` / `⊥` outcomes before postprocessing, matching the
+    paper's `g_i ≠ \bot` summation and preserving the downstream bad-mass helpers
+  - threaded the explicit positive-degree hypothesis `0 < params.d` into
+    `overAllOutcomes`, `ldPastingNCompleteness_of_tailLowerBound`, and
+    `ldPastingNCompleteness`; `mainFormal` already carried this hypothesis
+  - rebuilt `MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes` successfully after
+    the surface repair, and rechecked `MIPStarRE/LDT/Pasting/Bernoulli/Final.lean`
+    with only its existing Bernoulli-tail `sorry`
+  - confirmed the remaining local proof blockers are no longer statement-surface
+    mismatches: `ldSandwichLineOnePoint_core` needs the two Cauchy--Schwarz
+    transports from `commuteGHalfSandwich`, while `overAllOutcomes` needs the
+    scalar nonglobal-loss helper combining line-point bad-mass and Schwartz--Zippel
   - ported the proved `ldGbcon` machinery into the active split leaf `MIPStarRE/LDT/Pasting/Core/Bounds.lean`, including the public reusable theorem `pointVerticalLineSdd`
   - converted `MIPStarRE/LDT/Pasting/SwitcherooCompletion/Switcheroo.lean` into a re-export wrapper of the finished top-level `SwitcherooCompletion` implementation, removing that split-leaf `sorry`
   - added the helper lemmas `postprocess_postprocess`, `restrictToAxisParallelLine_eval_at_pointHeight`, `postprocess_hRestrictionToVerticalLine_eq_evaluateAt`, and `consRel_uniform_fst` in `BridgeLemmas.lean` to support the paper-faithful proof of `hAConsistency_submeas_core`
