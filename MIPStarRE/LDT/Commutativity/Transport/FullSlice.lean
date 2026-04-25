@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Transport.Pullback
+import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
 /-!
 # Section 11 commutativity: full-slice transport
@@ -406,6 +407,363 @@ private noncomputable def fullSliceABABtensorAvg
                 (family.meas xy.1).toSubMeas.outcome gh.1) *
             rightTensor (ι₁ := ι)
               ((family.meas xy.2).toSubMeas.outcome gh.2)))
+
+/-- A single summand in the tensor-form Schwartz-Zippel residual is nonnegative.
+
+This is the PSD core behind paper `eq:gcom4-diff`: the left register is a
+sandwich `O_i P_j O_i`, hence PSD, and the right-register outcome is PSD. -/
+private lemma sandwichTensorSummand_nonneg
+    {α β γ : Type*} [Fintype α] [Fintype β] [Fintype γ]
+    (ψ : QuantumState (ι × ι))
+    (Outer : SubMeas β ι) (Inner : SubMeas α ι) (Right : SubMeas γ ι)
+    (o : β) (i : α) (r : γ) :
+    0 ≤ ev ψ
+      (leftTensor (ι₂ := ι)
+          (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
+        rightTensor (ι₁ := ι) (Right.outcome r)) := by
+  rw [leftTensor_mul_rightTensor_eq_opTensor]
+  exact ev_nonneg_of_psd ψ _ <|
+    opTensor_nonneg
+      (MIPStarRE.Quantum.sandwich_nonneg
+        (Inner.outcome_pos i) (Outer.outcome_hermitian o))
+      (Right.outcome_pos r)
+
+/-- The residual tensor sum left after replacing a polynomial outcome by an
+independent polynomial outcome is at most one in a normalized state.
+
+For submeasurements `Outer`, `Inner`, and `Right`, the operator under the sum is
+
+`∑_{i,r,o} (Outer_o Inner_i Outer_o) ⊗ Right_r
+ = (∑_o Outer_o Inner.total Outer_o) ⊗ Right.total`.
+
+The first factor is the total of `sandwichByOuterSubMeas Outer Inner`, and the
+second is bounded by `1`; hence the tensor is bounded by `I`. This is the
+operator-order half of the paper's "because `G` is a sub-measurement" line. -/
+private lemma sandwichTensor_residual_sum_le_one
+    {α β γ : Type*} [Fintype α] [Fintype β] [Fintype γ]
+    (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized)
+    (Outer : SubMeas β ι) (Inner : SubMeas α ι) (Right : SubMeas γ ι) :
+    (∑ ir : α × γ, ∑ o : β,
+        ev ψ
+          (leftTensor (ι₂ := ι)
+              (Outer.outcome o * Inner.outcome ir.1 * Outer.outcome o) *
+            rightTensor (ι₁ := ι) (Right.outcome ir.2))) ≤ 1 := by
+  let S := sandwichByOuterSubMeas Outer Inner
+  have hop_sum :
+      (∑ ir : α × γ, ∑ o : β,
+          leftTensor (ι₂ := ι)
+              (Outer.outcome o * Inner.outcome ir.1 * Outer.outcome o) *
+            rightTensor (ι₁ := ι) (Right.outcome ir.2)) =
+        leftTensor (ι₂ := ι) S.total * rightTensor (ι₁ := ι) Right.total := by
+    calc
+      (∑ ir : α × γ, ∑ o : β,
+          leftTensor (ι₂ := ι)
+              (Outer.outcome o * Inner.outcome ir.1 * Outer.outcome o) *
+            rightTensor (ι₁ := ι) (Right.outcome ir.2))
+        = ∑ i : α, ∑ r : γ, ∑ o : β,
+            leftTensor (ι₂ := ι)
+                (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
+              rightTensor (ι₁ := ι) (Right.outcome r) := by
+            rw [Fintype.sum_prod_type]
+      _ = ∑ i : α, ∑ o : β,
+            leftTensor (ι₂ := ι)
+                (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
+              rightTensor (ι₁ := ι) Right.total := by
+            refine Finset.sum_congr rfl ?_
+            intro i _
+            calc
+              (∑ r : γ, ∑ o : β,
+                  leftTensor (ι₂ := ι)
+                      (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
+                    rightTensor (ι₁ := ι) (Right.outcome r))
+                = ∑ o : β, ∑ r : γ,
+                    leftTensor (ι₂ := ι)
+                        (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
+                      rightTensor (ι₁ := ι) (Right.outcome r) := by
+                    rw [Finset.sum_comm]
+              _ = ∑ o : β,
+                    leftTensor (ι₂ := ι)
+                        (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
+                      rightTensor (ι₁ := ι) Right.total := by
+                    refine Finset.sum_congr rfl ?_
+                    intro o _
+                    rw [← Matrix.mul_sum]
+                    rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ Right.outcome]
+                    rw [Right.sum_eq_total]
+      _ = (∑ i : α, ∑ o : β,
+            leftTensor (ι₂ := ι)
+              (Outer.outcome o * Inner.outcome i * Outer.outcome o)) *
+            rightTensor (ι₁ := ι) Right.total := by
+            rw [Finset.sum_mul]
+            refine Finset.sum_congr rfl ?_
+            intro i _
+            rw [Finset.sum_mul]
+      _ = leftTensor (ι₂ := ι) S.total * rightTensor (ι₁ := ι) Right.total := by
+            congr 1
+            calc
+              ∑ i : α, ∑ o : β,
+                  leftTensor (ι₂ := ι)
+                    (Outer.outcome o * Inner.outcome i * Outer.outcome o)
+                = ∑ o : β, ∑ i : α,
+                    leftTensor (ι₂ := ι)
+                      (Outer.outcome o * Inner.outcome i * Outer.outcome o) := by
+                    rw [Finset.sum_comm]
+              _ = ∑ o : β,
+                    leftTensor (ι₂ := ι)
+                      (∑ i : α,
+                        Outer.outcome o * Inner.outcome i * Outer.outcome o) := by
+                    refine Finset.sum_congr rfl ?_
+                    intro o _
+                    rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ]
+              _ = leftTensor (ι₂ := ι)
+                    (∑ o : β, ∑ i : α,
+                      Outer.outcome o * Inner.outcome i * Outer.outcome o) := by
+                    rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ]
+              _ = leftTensor (ι₂ := ι) S.total := by
+                    congr 1
+                    calc
+                      ∑ o : β, ∑ i : α,
+                          Outer.outcome o * Inner.outcome i * Outer.outcome o
+                        = ∑ o : β,
+                            Outer.outcome o * Inner.total * Outer.outcome o := by
+                            refine Finset.sum_congr rfl ?_
+                            intro o _
+                            rw [← Matrix.sum_mul, ← Matrix.mul_sum, Inner.sum_eq_total]
+                      _ = S.total := by
+                            rfl
+  calc
+    (∑ ir : α × γ, ∑ o : β,
+        ev ψ
+          (leftTensor (ι₂ := ι)
+              (Outer.outcome o * Inner.outcome ir.1 * Outer.outcome o) *
+            rightTensor (ι₁ := ι) (Right.outcome ir.2)))
+      = ev ψ (∑ ir : α × γ, ∑ o : β,
+          leftTensor (ι₂ := ι)
+              (Outer.outcome o * Inner.outcome ir.1 * Outer.outcome o) *
+            rightTensor (ι₁ := ι) (Right.outcome ir.2)) := by
+          rw [ev_sum]
+          refine Finset.sum_congr rfl ?_
+          intro ir _
+          rw [ev_sum]
+    _ = ev ψ (leftTensor (ι₂ := ι) S.total * rightTensor (ι₁ := ι) Right.total) := by
+          rw [hop_sum]
+    _ ≤ ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+          apply ev_mono ψ _ _
+          calc
+            leftTensor (ι₂ := ι) S.total * rightTensor (ι₁ := ι) Right.total
+              = opTensor S.total Right.total := by
+                rw [leftTensor_mul_rightTensor_eq_opTensor]
+            _ ≤ leftTensor (ι₂ := ι) S.total :=
+                opTensor_le_leftTensor (SubMeas.total_nonneg S) Right.total_le_one
+            _ ≤ 1 := leftTensor_le_one (ι₂ := ι) S.total_le_one
+    _ = 1 := ev_one_of_isNormalized ψ hnorm
+
+/-- Schwartz-Zippel controls the factored polynomial-collision tensor residual.
+
+This is the reusable scalar half of paper `eq:gcom4-diff`: after the expansion has
+separated the random point average into
+`E_u 1[g(u)=g'(u)]`, each off-diagonal coefficient is bounded by `m d / q`, and
+`sandwichTensor_residual_sum_le_one` bounds the remaining PSD tensor sum. -/
+private lemma polynomialCollision_sandwichTensor_le_mdq
+    {β : Type*} [Fintype β]
+    (params : Parameters) [FieldModel params.q]
+    (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized)
+    (Outer : SubMeas β ι)
+    (Inner Right : SubMeas (Polynomial params) ι) :
+    (∑ gg : Polynomial params × Polynomial params, ∑ o : β,
+        (if gg.1 = gg.2 then 0 else
+          avgOver (uniformDistribution (Point params))
+            (fun u => if gg.1 u = gg.2 u then (1 : Error) else 0)) *
+          ev ψ
+            (leftTensor (ι₂ := ι)
+                (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
+              rightTensor (ι₁ := ι) (Right.outcome gg.2))) ≤
+      (params.m * params.d : Error) / params.q := by
+  let δ : Error := (params.m * params.d : Error) / params.q
+  have hδ_nonneg : 0 ≤ δ := by
+    exact div_nonneg (by positivity) (by positivity)
+  have hcoef_le (gg : Polynomial params × Polynomial params) :
+      (if gg.1 = gg.2 then 0 else
+          avgOver (uniformDistribution (Point params))
+            (fun u => if gg.1 u = gg.2 u then (1 : Error) else 0)) ≤ δ := by
+    by_cases hEq : gg.1 = gg.2
+    · simp [hEq, hδ_nonneg, δ]
+    · simpa [hEq, δ] using
+        MIPStarRE.LDT.Preliminaries.polynomialAgreement_avg_le_mdq
+          params gg.1 gg.2 hEq
+  calc
+    (∑ gg : Polynomial params × Polynomial params, ∑ o : β,
+        (if gg.1 = gg.2 then 0 else
+          avgOver (uniformDistribution (Point params))
+            (fun u => if gg.1 u = gg.2 u then (1 : Error) else 0)) *
+          ev ψ
+            (leftTensor (ι₂ := ι)
+                (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
+              rightTensor (ι₁ := ι) (Right.outcome gg.2)))
+      ≤ ∑ gg : Polynomial params × Polynomial params, ∑ o : β,
+          δ * ev ψ
+            (leftTensor (ι₂ := ι)
+                (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
+              rightTensor (ι₁ := ι) (Right.outcome gg.2)) := by
+          refine Finset.sum_le_sum ?_
+          intro gg _
+          refine Finset.sum_le_sum ?_
+          intro o _
+          exact mul_le_mul_of_nonneg_right (hcoef_le gg)
+            (sandwichTensorSummand_nonneg ψ Outer Inner Right o gg.1 gg.2)
+    _ = δ * (∑ gg : Polynomial params × Polynomial params, ∑ o : β,
+          ev ψ
+            (leftTensor (ι₂ := ι)
+                (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
+              rightTensor (ι₁ := ι) (Right.outcome gg.2))) := by
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl ?_
+          intro gg _
+          rw [Finset.mul_sum]
+    _ ≤ δ * 1 := by
+          exact mul_le_mul_of_nonneg_left
+            (sandwichTensor_residual_sum_le_one ψ hnorm Outer Inner Right) hδ_nonneg
+    _ = (params.m * params.d : Error) / params.q := by
+          simp [δ]
+
+/-- Factored collision residual for the x-marginalization tensor step.
+
+After expanding the first evaluated family in paper `eq:gcom4-diff`, the remaining
+error is this nonnegative sum over pairs of distinct polynomial outcomes whose
+values collide at the sampled point `u`. -/
+private noncomputable def fullSliceBABA_xCollisionFactored
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (xy : FullSliceQuestion params) : Error :=
+  let A : SubMeas (Polynomial params) ι := (family.meas xy.1).toSubMeas
+  let B : SubMeas (Polynomial params) ι := (family.meas xy.2).toSubMeas
+  ∑ gg : Polynomial params × Polynomial params, ∑ h : Polynomial params,
+    (if gg.1 = gg.2 then 0 else
+      avgOver (uniformDistribution (Point params))
+        (fun u => if gg.1 u = gg.2 u then (1 : Error) else 0)) *
+      ev strategy.state
+        (leftTensor (ι₂ := ι) (B.outcome h * A.outcome gg.1 * B.outcome h) *
+          rightTensor (ι₁ := ι) (A.outcome gg.2))
+
+/-- The Schwartz-Zippel/PSD bound for the x-marginalization collision residual.
+
+This is the proved hard estimate needed by `fullSliceBABA_tensor_marginalize_x`;
+the only remaining work for that final lemma is the algebraic expansion equating
+the absolute difference of tensor averages with `fullSliceBABA_xCollisionFactored`
+(averaged over `x,y`). -/
+private lemma fullSliceBABA_xCollisionFactored_le_mdq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (hnorm : strategy.state.IsNormalized)
+    (xy : FullSliceQuestion params) :
+    fullSliceBABA_xCollisionFactored params strategy family xy ≤
+      (params.m * params.d : Error) / params.q := by
+  let A : SubMeas (Polynomial params) ι := (family.meas xy.1).toSubMeas
+  let B : SubMeas (Polynomial params) ι := (family.meas xy.2).toSubMeas
+  simpa [fullSliceBABA_xCollisionFactored, A, B] using
+    polynomialCollision_sandwichTensor_le_mdq
+      params strategy.state hnorm B A A
+
+/-- Factored collision residual for the y-marginalization tensor step.
+
+Here the outer sandwich is the already x-evaluated family
+`G^x_[g(u)=a]`, while the colliding polynomial pair is on the `y` side. -/
+private noncomputable def fullSliceABAB_yCollisionFactored
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (u : Point params) (xy : FullSliceQuestion params) : Error :=
+  let A : SubMeas (Fq params) ι :=
+    evaluateAt params u ((family.meas xy.1).toSubMeas)
+  let B : SubMeas (Polynomial params) ι := (family.meas xy.2).toSubMeas
+  ∑ hh : Polynomial params × Polynomial params, ∑ a : Fq params,
+    (if hh.1 = hh.2 then 0 else
+      avgOver (uniformDistribution (Point params))
+        (fun v => if hh.1 v = hh.2 v then (1 : Error) else 0)) *
+      ev strategy.state
+        (leftTensor (ι₂ := ι) (A.outcome a * B.outcome hh.1 * A.outcome a) *
+          rightTensor (ι₁ := ι) (B.outcome hh.2))
+
+/-- The Schwartz-Zippel/PSD bound for the y-marginalization collision residual.
+
+This is the proved hard estimate needed by `fullSliceABABB_tensor_marginalize_y`;
+the remaining final-lemma work is the postprocessing expansion from the tensor
+averages to `fullSliceABAB_yCollisionFactored`. -/
+private lemma fullSliceABAB_yCollisionFactored_le_mdq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (hnorm : strategy.state.IsNormalized)
+    (u : Point params) (xy : FullSliceQuestion params) :
+    fullSliceABAB_yCollisionFactored params strategy family u xy ≤
+      (params.m * params.d : Error) / params.q := by
+  let A : SubMeas (Fq params) ι :=
+    evaluateAt params u ((family.meas xy.1).toSubMeas)
+  let B : SubMeas (Polynomial params) ι := (family.meas xy.2).toSubMeas
+  simpa [fullSliceABAB_yCollisionFactored, A, B] using
+    polynomialCollision_sandwichTensor_le_mdq
+      params strategy.state hnorm A B B
+
+/-- Averaged x-collision bound in the form needed by the eventual tensor
+marginalization theorem. The algebraic expansion from tensor-average difference
+to this collision expression remains the residual #719 proof step. -/
+private lemma fullSliceBABA_tensor_marginalize_x_collision_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (hnorm : strategy.state.IsNormalized) :
+    avgOver (uniformDistribution (FullSliceQuestion params))
+        (fun xy => fullSliceBABA_xCollisionFactored params strategy family xy) ≤
+      (params.m * params.d : Error) / params.q := by
+  let δ : Error := (params.m * params.d : Error) / params.q
+  have hδ_nonneg : 0 ≤ δ := by
+    exact div_nonneg (by positivity) (by positivity)
+  calc
+    avgOver (uniformDistribution (FullSliceQuestion params))
+        (fun xy => fullSliceBABA_xCollisionFactored params strategy family xy)
+      ≤ avgOver (uniformDistribution (FullSliceQuestion params)) (fun _ => δ) := by
+          apply avgOver_mono
+          intro xy
+          simpa [δ] using
+            fullSliceBABA_xCollisionFactored_le_mdq params strategy family hnorm xy
+    _ = (∑ xy ∈ (uniformDistribution (FullSliceQuestion params)).support,
+          (uniformDistribution (FullSliceQuestion params)).weight xy) * δ := by
+          simp [avgOver, Finset.sum_mul]
+    _ ≤ 1 * δ := by
+          exact mul_le_mul_of_nonneg_right
+            (uniformDistribution_weight_sum_le_one (FullSliceQuestion params)) hδ_nonneg
+    _ = (params.m * params.d : Error) / params.q := by
+          simp [δ]
+
+/-- Averaged y-collision bound in the form needed by the eventual tensor
+marginalization theorem. This is the y-side analogue of
+`fullSliceBABA_tensor_marginalize_x_collision_bound`. -/
+private lemma fullSliceABAB_tensor_marginalize_y_collision_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (hnorm : strategy.state.IsNormalized) :
+    avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+        (fun ux => fullSliceABAB_yCollisionFactored params strategy family ux.1 ux.2) ≤
+      (params.m * params.d : Error) / params.q := by
+  let δ : Error := (params.m * params.d : Error) / params.q
+  have hδ_nonneg : 0 ≤ δ := by
+    exact div_nonneg (by positivity) (by positivity)
+  calc
+    avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+        (fun ux => fullSliceABAB_yCollisionFactored params strategy family ux.1 ux.2)
+      ≤ avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+          (fun _ => δ) := by
+          apply avgOver_mono
+          intro ux
+          simpa [δ] using
+            fullSliceABAB_yCollisionFactored_le_mdq
+              params strategy family hnorm ux.1 ux.2
+    _ = (∑ ux ∈ (uniformDistribution (Point params × FullSliceQuestion params)).support,
+          (uniformDistribution (Point params × FullSliceQuestion params)).weight ux) * δ := by
+          simp [avgOver, Finset.sum_mul]
+    _ ≤ 1 * δ := by
+          exact mul_le_mul_of_nonneg_right
+            (uniformDistribution_weight_sum_le_one (Point params × FullSliceQuestion params))
+            hδ_nonneg
+    _ = (params.m * params.d : Error) / params.q := by
+          simp [δ]
 
 /-- Paper `lem:normalization-condition` (`commutativity-G.tex` line 309).
 
