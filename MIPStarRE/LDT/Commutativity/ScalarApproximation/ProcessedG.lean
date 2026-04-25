@@ -217,9 +217,13 @@ private lemma evaluatedSlice_phaseFive_stability_gap
 /-- The first-coordinate postprocessed self-consistency step that `closenessOfIP`
 actually supplies for the BABA-side scalar chain.
 
-With `A_a = G^{u,x}_a` and `B_b = G^{v,y}_b`, this compares the scalar
-quartic term `B_b A_a B_b A_a ⊗ I` with the tensor-split term
-`B_b A_a B_b ⊗ A_a`.  This is the direct `hpostSSC_fst` analogue of
+Writing `A_a := G^{u,x}_a` for the first evaluated factor and
+`D_b := G^{v,y}_b` for the second one, the proof's `closenessOfIP` notation has
+`B` as the right-register copy of `A_a`, while the auxiliary sandwich family is
+`C_{a,b} := D_b A_a D_b`.  The comparison moves the trailing first-factor copy
+from the left register to the right register: the scalar quartic term
+`D_b A_a D_b A_a ⊗ I` is compared with the tensor-split term
+`D_b A_a D_b ⊗ A_a`.  This is the direct `hpostSSC_fst` analogue of
 `evaluatedSlice_phaseThree_insert_bound`; the remaining `hphase67_fst` site in
 `evaluatedSlice_scalar_chain_bound` additionally has to relate this honest
 postprocessed-family tensor term to the current `phase5Removed` term, whose
