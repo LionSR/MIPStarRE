@@ -217,7 +217,7 @@ noncomputable def generalizeBDeviation (params : Parameters) [FieldModel params.
 measurement in `lem:generalize-b` and moving the polynomial weight from
 `(G_g)^{1/2}` to `G_g`.  The remaining unproved analytic step is to bound this
 quantity by Schwartz--Zippel and the submeasurement property of `G`. -/
-noncomputable def generalizeBCollisionResidualAtPolynomial (params : Parameters)
+noncomputable def generalizeBCollisionResidual (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (ψbi : QuantumState (ι × ι))
@@ -236,8 +236,8 @@ incident line question `(ℓ,u)` by a line `ℓ` and affine parameter `t` with
 `u = ℓ(t)`: the coefficient is the fraction of parameters where a line answer
 `f` both collides with `g|_ℓ` at `t` and is not equal to `g|_ℓ`.  Issue #753
 reduces the remaining residual work to proving that
-`generalizeBCollisionResidualAtPolynomial` is equal to this explicit expansion. -/
-noncomputable def generalizeBLineCollisionExpansionAtPolynomial (params : Parameters)
+`generalizeBCollisionResidual` is equal to this explicit expansion. -/
+noncomputable def generalizeBLineCollisionExpansion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (ψbi : QuantumState (ι × ι))
