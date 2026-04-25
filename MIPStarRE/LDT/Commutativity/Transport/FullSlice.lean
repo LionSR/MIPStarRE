@@ -382,7 +382,11 @@ private noncomputable def evaluatedSliceBABAtensorAvg
 The manifestly-PSD tensor-form partner of `fullSliceABABAvg` reached from it by
 `closenessOfIP` (moving the trailing `G^y_h` factor from the left register to
 the right). Each summand factors as `V† V` with
-`V = (G^y_h G^x_g) ⊗ √(G^y_h)`. Private per #713. -/
+`V = (G^y_h G^x_g) ⊗ √(G^y_h)`. Private per #713.
+
+The evaluated-side analogue is `evaluatedSliceSandwichedRightAvg` in
+`MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean`, which predates this PR and is
+already used by the linear/sandwiched right-register transport bridge. -/
 private noncomputable def fullSliceABABBtensorAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
@@ -396,27 +400,6 @@ private noncomputable def fullSliceABABBtensorAvg
                 (family.meas xy.1).toSubMeas.outcome gh.1) *
             rightTensor (ι₁ := ι)
               ((family.meas xy.2).toSubMeas.outcome gh.2)))
-
-/-- Evaluated-slice `ABA ⊗ B` tensor average
-(evaluated-side analogue of `fullSliceABABBtensorAvg`):
-`E_{u,v,x,y} ∑_{a,b} ⟨ψ|
-   G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a] ⊗ G^y_[h(v)=b] |ψ⟩`.
-
-Evaluated-side partner used by `evaluatedSliceABAB_scalar_to_tensor` and the
-y-side tensor-form Schwartz–Zippel marginalization. Private per #713. -/
-private noncomputable def evaluatedSliceABABBtensorAvg
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
-  avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-    (fun q =>
-      ∑ ab : EvaluatedSliceOutcome params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι)
-              ((evaluatedSliceFirstFactor params family q).outcome ab.1 *
-                (evaluatedSliceSecondFactor params family q).outcome ab.2 *
-                (evaluatedSliceFirstFactor params family q).outcome ab.1) *
-            rightTensor (ι₁ := ι)
-              ((evaluatedSliceSecondFactor params family q).outcome ab.2)))
 
 /-- Paper `lem:normalization-condition` (`commutativity-G.tex` line 309).
 
