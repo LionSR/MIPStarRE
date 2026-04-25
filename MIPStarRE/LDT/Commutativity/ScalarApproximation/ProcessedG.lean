@@ -450,8 +450,10 @@ private lemma evaluatedSlice_scalar_chain_bound
     -- sandwich family, then prove the algebraic identifications of the two
     -- resulting scalar averages with `avgBAB` and `phase5Removed`.  This exact
     -- residual is tracked in issue #732.
-    -- Reference: `commutativity-G.tex` lines 98--104, the two reverse
-    -- `eq:add-an-a` moves leading to `eq:gonna-cite-this-in-just-a-bit`.
+    -- Reference: the single reverse `eq:add-an-a` on the first coordinate,
+    -- the BAB-side analogue of `eq:apply-add-an-a-once` (paper line 76).
+    -- The BABA-side counterpart is already discharged by `hphase3` via
+    -- `evaluatedSlice_phaseThree_insert_bound`.
     have hphase67_fst :
         |avgOver 𝒟 avgBAB - avgOver 𝒟 phase5Removed| ≤ 2 * Real.sqrt zeta := by
       sorry
