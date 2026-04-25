@@ -821,8 +821,10 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Summing over all outcomes]\label{lem:over-all-outcomes}
 	\lean{MIPStarRE.LDT.Pasting.overAllOutcomes}
-	% Lean-local gap: `overAllOutcomes` currently has `sorry` as its entire
-	% proof body (`Pasting/BridgeLemmas/OverAllOutcomes.lean:64`).
+	% Lean-local gap: the public wrapper is reduced to the private residual
+	% `overAllOutcomes_distinct_nonglobal_mass_bound` in
+	% `Pasting/BridgeLemmas/OverAllOutcomes.lean`, matching the paper's
+	% nonglobal-indicator aggregation at `ld-pasting.tex` lines 1174--1275.
 	\uses{def:outcomes-by-type, prop:ld-dnoteq, lem:ld-sandwich-line-one-point, lem:schwartz-zippel-individual}
 	If $x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
 	\[
