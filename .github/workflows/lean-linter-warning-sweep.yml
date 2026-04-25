@@ -82,17 +82,33 @@ jobs:
           if not log_path.exists():
               log_path.touch()
 
+          linter_note_re = re.compile(r"set_option\s+linter\.([A-Za-z0-9_.]+)\s+false")
+
+          def warning_category(message: str, note_lines: list[str]) -> str:
+              note_text = "\n".join(note_lines)
+              note_match = linter_note_re.search(note_text)
+              if note_match:
+                  return note_match.group(1)
+              return next(
+                  (name for name in known_linter_names if name in message),
+                  "other",
+              )
+
           warnings = []
           if log_path.exists():
-              for raw_line in log_path.read_text(encoding="utf-8", errors="replace").splitlines():
+              raw_lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
+              for index, raw_line in enumerate(raw_lines):
                   match = warning_re.match(raw_line)
                   if not match:
                       continue
                   message = match.group("message")
-                  category = next(
-                      (name for name in known_linter_names if name in message),
-                      "other",
-                  )
+                  note_lines = []
+                  for follow in raw_lines[index + 1:]:
+                      if warning_re.match(follow):
+                          break
+                      if "set_option linter." in follow:
+                          note_lines.append(follow)
+                  category = warning_category(message, note_lines)
                   warnings.append({
                       "path": match.group("path"),
                       "line": int(match.group("line")),
