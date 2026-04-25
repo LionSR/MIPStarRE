@@ -28,8 +28,6 @@ This module is the first low-risk step of the staged refactor outlined in
 
 namespace MIPStarRE.LDT
 
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
-
 /-- Paper-faithful two-space projective strategy data.
 
 This matches the paper's `def:general-projective-strategy`: Alice's and Bob's
