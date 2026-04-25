@@ -2,9 +2,13 @@
 
 Audit date: 2026-04-24
 
+Status update: this report is a dated snapshot, not the current chapter-tracker source of
+truth. Several issues listed below as open have since closed, and the recurring stale-issue
+audit introduced by #656 / #736 now owns fresh live-state checks.
+
 Scope: one-time sweep across the chapter-tracker umbrellas and the cross-cutting trackers to
 drop stale closed-issue references from the human-readable indexes and repoint each umbrella
-at the currently-open leaf issues on `main`. See #656 for the recurring periodic audit.
+at the issues that were open on `main` at the audit date.
 
 ## Method
 
