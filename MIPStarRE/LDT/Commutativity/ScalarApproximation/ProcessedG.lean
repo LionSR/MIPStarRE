@@ -214,6 +214,154 @@ private lemma evaluatedSlice_phaseFive_stability_gap
             rfl
     _ ≤ Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := hstab
 
+/-- The first-coordinate postprocessed self-consistency step that `closenessOfIP`
+actually supplies for the BABA-side scalar chain.
+
+With `A_a = G^{u,x}_a` and `B_b = G^{v,y}_b`, this compares the scalar
+quartic term `B_b A_a B_b A_a ⊗ I` with the tensor-split term
+`B_b A_a B_b ⊗ A_a`.  This is the direct `hpostSSC_fst` analogue of
+`evaluatedSlice_phaseThree_insert_bound`; the remaining `hphase67_fst` site in
+`evaluatedSlice_scalar_chain_bound` additionally has to relate this honest
+postprocessed-family tensor term to the current `phase5Removed` term, whose
+right register is the strategy point measurement. -/
+private lemma evaluatedSlice_BABA_to_tensorFirst_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (hpostSSC_fst : SDDRel strategy.state
+      (uniformDistribution (EvaluatedSliceQuestion params))
+      (fun q => evaluatedPointFamilyLeft params family q.1)
+      (fun q => evaluatedPointFamilyRight params family q.1)
+      zeta) :
+    let 𝒟 := uniformDistribution (EvaluatedSliceQuestion params)
+    let tensorFirst : EvaluatedSliceQuestion params → Error := fun q =>
+      ∑ a : Fq params, ∑ b : Fq params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              (((evaluatedSliceSecondFactor params family q).outcome b) *
+                ((evaluatedSliceFirstFactor params family q).outcome a) *
+                ((evaluatedSliceSecondFactor params family q).outcome b)) *
+            rightTensor (ι₁ := ι)
+              ((evaluatedSliceFirstFactor params family q).outcome a))
+    |avgOver 𝒟
+        (fun q => ∑ ab : EvaluatedSliceOutcome params,
+          evaluatedSliceBABATerm params strategy family q ab) -
+      avgOver 𝒟 tensorFirst| ≤ Real.sqrt zeta := by
+  let 𝒟 : Distribution (EvaluatedSliceQuestion params) :=
+    uniformDistribution (EvaluatedSliceQuestion params)
+  let A : EvaluatedSliceQuestion params → Fq params → MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q a => leftTensor (ι₂ := ι) ((evaluatedSliceFirstFactor params family q).outcome a)
+  let B : EvaluatedSliceQuestion params → Fq params → MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q a => rightTensor (ι₁ := ι) ((evaluatedSliceFirstFactor params family q).outcome a)
+  let C : EvaluatedSliceQuestion params → Fq params → Fq params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q a b =>
+      leftTensor (ι₂ := ι)
+        (((evaluatedSliceSecondFactor params family q).outcome b) *
+          ((evaluatedSliceFirstFactor params family q).outcome a) *
+          ((evaluatedSliceSecondFactor params family q).outcome b))
+  have h𝒟 :
+      ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1 := by
+    simpa [𝒟] using
+      uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
+  have hAB :
+      avgOver 𝒟 (fun q => qSDDCore strategy.state (A q) (B q)) ≤ zeta := by
+    simpa [𝒟, A, B, qSDD, evaluatedPointFamilyLeft, evaluatedPointFamilyRight,
+      evaluatedSliceFirstFactor] using hpostSSC_fst.squaredDistanceBound
+  have hC :
+      ∀ q, ∑ a : Fq params, (∑ b : Fq params, C q a b) * (∑ b : Fq params, C q a b)ᴴ ≤ 1 := by
+    intro q
+    let P : SubMeas (Fq params) ι := evaluatedSliceFirstFactor params family q
+    let Q : ProjSubMeas (Fq params) ι := evaluatedSliceSecondProj params family q
+    let T : Fq params → MIPStarRE.Quantum.Op ι := fun a =>
+      ∑ b : Fq params,
+        ((evaluatedSliceSecondFactor params family q).outcome b) *
+          ((evaluatedSliceFirstFactor params family q).outcome a) *
+          ((evaluatedSliceSecondFactor params family q).outcome b)
+    calc
+      ∑ a : Fq params,
+          (∑ b : Fq params, C q a b) * (∑ b : Fq params, C q a b)ᴴ
+        = ∑ a : Fq params, leftTensor (ι₂ := ι) (T a * (T a)ᴴ) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            have hsum :
+                (∑ b : Fq params, C q a b) = leftTensor (ι₂ := ι) (T a) := by
+              simp [C, T, leftTensor_finset_sum]
+            rw [hsum]
+            have hleft_adj :
+                (leftTensor (ι₂ := ι) (T a))ᴴ = leftTensor (ι₂ := ι) ((T a)ᴴ) := by
+              simpa [leftTensor, opTensor] using
+                (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι) (T a) (1 : MIPStarRE.Quantum.Op ι))
+            rw [hleft_adj, leftTensor_mul_leftTensor]
+      _ = leftTensor (ι₂ := ι) (∑ a : Fq params, T a * (T a)ᴴ) := by
+            rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a => T a * (T a)ᴴ)]
+      _ = leftTensor (ι₂ := ι) (normalizationConditionSquareOperator P Q) := by
+            simp [T, P, Q, normalizationConditionSquareOperator,
+              normalizationConditionSquareFamily,
+              normalizationConditionSandwichedTotalOperator,
+              normalizationConditionSandwichedTotalFamily,
+              normalizationConditionSandwichedFamily,
+              normalizationConditionSandwichedOperator,
+              evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
+              evaluatedSliceSecondProj, postprocess]
+      _ ≤ 1 := by
+            exact leftTensor_le_one (ι₂ := ι) <| by
+              simpa [normalizationConditionSquareOperator] using
+                (normalizationConditionSquareFamily P Q).total_le_one
+  have hBABA :
+      avgOver 𝒟
+          (fun q => ∑ ab : EvaluatedSliceOutcome params,
+            evaluatedSliceBABATerm params strategy family q ab) =
+        avgOver 𝒟
+          (fun q => ∑ a : Fq params, ∑ b : Fq params,
+            ev strategy.state (C q a b * A q a)) := by
+    apply avgOver_congr
+    intro q
+    calc
+      ∑ ab : EvaluatedSliceOutcome params, evaluatedSliceBABATerm params strategy family q ab
+        = ∑ a : Fq params, ∑ b : Fq params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                (((evaluatedSliceSecondFactor params family q).outcome b) *
+                  ((evaluatedSliceFirstFactor params family q).outcome a) *
+                  ((evaluatedSliceSecondFactor params family q).outcome b) *
+                  ((evaluatedSliceFirstFactor params family q).outcome a))) := by
+              simpa [evaluatedSliceBABATerm, leftTensor_mul_leftTensor, mul_assoc] using
+                (Fintype.sum_prod_type' (f := fun a : Fq params => fun b : Fq params =>
+                  ev strategy.state
+                    (leftTensor (ι₂ := ι)
+                      (((evaluatedSliceSecondFactor params family q).outcome b) *
+                        ((evaluatedSliceFirstFactor params family q).outcome a) *
+                        ((evaluatedSliceSecondFactor params family q).outcome b) *
+                        ((evaluatedSliceFirstFactor params family q).outcome a)))))
+      _ = ∑ a : Fq params, ∑ b : Fq params,
+            ev strategy.state (C q a b * A q a) := by
+              simp [A, C, leftTensor_mul_leftTensor, mul_assoc]
+  have hclose :=
+    MIPStarRE.LDT.Preliminaries.closenessOfIP
+      strategy.state hnorm 𝒟 h𝒟 A B C zeta hAB hC
+  calc
+    |avgOver 𝒟
+        (fun q => ∑ ab : EvaluatedSliceOutcome params,
+          evaluatedSliceBABATerm params strategy family q ab) -
+      avgOver 𝒟
+        (fun q => ∑ a : Fq params, ∑ b : Fq params,
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+                (((evaluatedSliceSecondFactor params family q).outcome b) *
+                  ((evaluatedSliceFirstFactor params family q).outcome a) *
+                  ((evaluatedSliceSecondFactor params family q).outcome b)) *
+              rightTensor (ι₁ := ι)
+                ((evaluatedSliceFirstFactor params family q).outcome a)))| =
+        |avgOver 𝒟 (fun q => ∑ a : Fq params, ∑ b : Fq params,
+            ev strategy.state (C q a b * A q a)) -
+          avgOver 𝒟 (fun q => ∑ a : Fq params, ∑ b : Fq params,
+            ev strategy.state (C q a b * B q a))| := by
+          rw [hBABA]
+    _ ≤ Real.sqrt zeta := hclose
+
 /- Scalar approximation chain for the evaluated-slice commutation.
 
 This is the core of the paper's proof of `lem:comm-data-processed-g`
@@ -439,10 +587,16 @@ private lemma evaluatedSlice_scalar_chain_bound
       linarith
     rw [hrw]
     -- Phase 6/7 (missing): reverse-insertion at the first coordinate.
-    -- This bound should follow from closenessOfIP applied to hpostSSC_fst
-    -- (mirroring evaluatedSlice_phaseThree_insert_bound but going from
-    -- avgBAB → phase5Removed instead of from avgBABA → phase3Inserted).
-    -- Reference: phases 6/7 of the paper's chain (eq:gonna-cite-this-in-just-a-bit).
+    -- The direct `closenessOfIP` consequence of `hpostSSC_fst` is now isolated
+    -- as `evaluatedSlice_BABA_to_tensorFirst_bound` above.  That proved step is
+    -- the honest postprocessed-family comparison
+    --   `avgBABA ≈ BAB ⊗ G^{u,x}_a` with error `√ζ`.
+    -- The local target below is stronger/misaligned: it compares `avgBAB` with
+    -- `phase5Removed`, whose right register is the strategy point measurement
+    -- `A^{u,x}_a`, not the postprocessed family `G^{u,x}_a`.  Closing this last
+    -- inequality requires an additional bridge from the paper tensor path to
+    -- the current point-measurement tensor term.
+    -- Reference: commutativity-G.tex lines 113-121.
     have hphase67_fst :
         |avgOver 𝒟 avgBAB - avgOver 𝒟 phase5Removed| ≤ 2 * Real.sqrt zeta := by
       sorry
