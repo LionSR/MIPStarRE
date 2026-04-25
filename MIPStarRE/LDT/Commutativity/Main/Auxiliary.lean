@@ -22,70 +22,184 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- A real-line triangle helper for the #713 hybrid scalar/tensor route.
+
+If the scalar full endpoint is within `sqrtz` of a full tensor endpoint, the two
+tensor endpoints are within `mdq`, and the evaluated scalar endpoint is within
+`sqrtz` of the evaluated tensor endpoint, then the scalar endpoints are within
+`mdq + 2 * sqrtz`. -/
+private lemma abs_sub_le_of_tensor_triangle
+    {fullScalar evalScalar fullTensor evalTensor mdq sqrtz : Error}
+    (hfull : |fullScalar - fullTensor| ≤ sqrtz)
+    (htensor : |fullTensor - evalTensor| ≤ mdq)
+    (heval : |evalScalar - evalTensor| ≤ sqrtz) :
+    |fullScalar - evalScalar| ≤ mdq + 2 * sqrtz := by
+  have heval' : |evalTensor - evalScalar| ≤ sqrtz := by
+    rwa [abs_sub_comm]
+  have htri :
+      |fullScalar - evalScalar| ≤
+        |fullScalar - fullTensor| + |fullTensor - evalTensor| +
+          |evalTensor - evalScalar| := by
+    have hdecomp :
+        fullScalar - evalScalar =
+          (fullScalar - fullTensor) + (fullTensor - evalTensor) +
+            (evalTensor - evalScalar) := by
+      ring
+    calc
+      |fullScalar - evalScalar|
+        = |(fullScalar - fullTensor) + (fullTensor - evalTensor) +
+            (evalTensor - evalScalar)| := by rw [hdecomp]
+      _ ≤ |(fullScalar - fullTensor) + (fullTensor - evalTensor)| +
+            |evalTensor - evalScalar| := abs_add_le _ _
+      _ ≤ (|fullScalar - fullTensor| + |fullTensor - evalTensor|) +
+            |evalTensor - evalScalar| := by
+          gcongr
+          exact abs_add_le _ _
+      _ = |fullScalar - fullTensor| + |fullTensor - evalTensor| +
+            |evalTensor - evalScalar| := by ring
+  linarith
+
+/-- Tensor-triangle witnesses for the `x`-marginalization scalar wrapper.
+
+The three fields separate the two mathematical ingredients flagged by #720/#730:
+* `full_bridge` and `evaluated_bridge` are the two scalar↔tensor
+  `closenessOfIP` legs, consuming `hnorm` and `hself` through the FullSlice
+  bridge infrastructure from #735;
+* `tensor_marginalize` is the `BAB ⊗ A` Schwartz-Zippel tensor
+  marginalization, whose remaining finite-sum/postprocessing expansion is #730.
+
+The tensor endpoints themselves remain private to `Transport.FullSlice` per #713,
+so this witness is the narrow residual boundary until #730 exports the missing
+identity. -/
+private structure FullSliceScalarMarginalizeXTensorTriangle
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error) where
+  fullTensor : Error
+  evaluatedTensor : Error
+  full_bridge :
+    |fullSliceABAAvg params strategy family - fullTensor| ≤ Real.sqrt zeta
+  tensor_marginalize :
+    |fullTensor - evaluatedTensor| ≤
+      (↑params.m : Error) * ↑params.d / ↑params.q
+  evaluated_bridge :
+    |evaluatedSliceABAAvg params strategy family - evaluatedTensor| ≤ Real.sqrt zeta
+
+/-- Residual witness construction for the `x` side.
+
+Blocked exactly where the active #730 work sits: exporting/finishing the tensor
+marginalization identity and connecting it to the existing scalar↔tensor bridge
+endpoints from `Transport.FullSlice`. -/
+private noncomputable def fullSliceScalarMarginalizeXTensorTriangleResidual
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    FullSliceScalarMarginalizeXTensorTriangle params strategy family zeta := by
+  -- The eventual proof should instantiate the hidden `BAB ⊗ A` tensor endpoints,
+  -- use the #735 `closenessOfIP` bridges for `full_bridge`/`evaluated_bridge`,
+  -- and use #730 for `tensor_marginalize`.
+  sorry
+
 /-- Paper `eq:evaluate-gcom-at-points` / `eq:gcom4-diff`
-(`commutativity-G.tex` lines 339-354).
+(`commutativity-G.tex` lines 339-354), in the scalar public API chosen by #713.
 
-Schwartz-Zippel marginalization on the `x` variable: replacing the full
-polynomial sum `∑_g G^x_g` by the point-evaluated sum `E_u ∑_a G^x_[g(u)=a]`
-inside the ABA term costs at most `params.m · params.d / params.q`.
-
-TODO(#361): the paper's `md/q` step is manifestly PSD on the tensor-form
-comparison `BAB ⊗ A` (paper `eq:gcom4-diff`), but the current Lean stub is
-phrased on the scalar `ABA ⊗ I` average.  So the direct positivity argument does
-not apply verbatim here.  To close this theorem, we likely need either:
-1. a bridge from `fullSliceABAAvg` / `evaluatedSliceABAAvg` to the paper's PSD
-   tensor form; after that bridge, the old tactical step should still be to
-   apply `polynomialAgreement_avg_le_mdq` (or directly
-   `schwartzZippel_individualDegree`) to the off-diagonal collision term
-   `1[g(u) = g'(u)]`, then bound the remaining fiber sum by the
-   sub-measurement property of `G^x`, or
-2. a genuinely new operator bound for the `ABA ⊗ I` difference.
--/
+Schwartz-Zippel marginalization on the `x` variable after the scalar↔tensor
+bridges: replacing the full polynomial sum by the point-evaluated sum costs at
+most `(params.m · params.d) / params.q + 2√ζ`.  The extra `2√ζ` is the price of
+the two `closenessOfIP` legs in the hybrid scalar/tensor triangle. -/
 lemma fullSlice_scalar_marginalize_x
     (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
     |fullSliceABAAvg params strategy family -
         evaluatedSliceABAAvg params strategy family| ≤
-      (↑params.m : Error) * ↑params.d / ↑params.q := by
+      (↑params.m : Error) * ↑params.d / ↑params.q + 2 * Real.sqrt zeta := by
+  let tri :=
+    fullSliceScalarMarginalizeXTensorTriangleResidual
+      params strategy family zeta hnorm hself
+  exact abs_sub_le_of_tensor_triangle
+    (fullScalar := fullSliceABAAvg params strategy family)
+    (evalScalar := evaluatedSliceABAAvg params strategy family)
+    (fullTensor := tri.fullTensor)
+    (evalTensor := tri.evaluatedTensor)
+    (mdq := (↑params.m : Error) * ↑params.d / ↑params.q)
+    (sqrtz := Real.sqrt zeta)
+    tri.full_bridge tri.tensor_marginalize tri.evaluated_bridge
+
+/-- Tensor-triangle witnesses for the `y`-marginalization scalar wrapper.
+
+This is the y-side analogue of
+`FullSliceScalarMarginalizeXTensorTriangle`; here the tensor marginalization
+field is the `ABA ⊗ B` Schwartz-Zippel step from #730. -/
+private structure FullSliceScalarMarginalizeYTensorTriangle
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error) where
+  fullTensor : Error
+  evaluatedTensor : Error
+  full_bridge :
+    |fullSliceABABAvg params strategy family - fullTensor| ≤ Real.sqrt zeta
+  tensor_marginalize :
+    |fullTensor - evaluatedTensor| ≤
+      (↑params.m : Error) * ↑params.d / ↑params.q
+  evaluated_bridge :
+    |evaluatedSliceABABAvg params strategy family - evaluatedTensor| ≤ Real.sqrt zeta
+
+/-- Residual witness construction for the `y` side.
+
+Blocked exactly on the #730 postprocessing expansion from the hidden `ABA ⊗ B`
+tensor endpoints to the proved y-collision residual in `Transport.FullSlice`,
+together with exposing the #735 scalar↔tensor bridge endpoints. -/
+private noncomputable def fullSliceScalarMarginalizeYTensorTriangleResidual
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    FullSliceScalarMarginalizeYTensorTriangle params strategy family zeta := by
+  -- The eventual proof should instantiate the hidden `ABA ⊗ B` tensor endpoints,
+  -- use the #735 `closenessOfIP` bridges for `full_bridge`/`evaluated_bridge`,
+  -- and use #730 for `tensor_marginalize`.
   sorry
 
 /-- Paper `eq:evaluate-gcom-at-points-part-dos`
-(`commutativity-G.tex` lines 369-385).
+(`commutativity-G.tex` lines 369-385), in the scalar public API chosen by #713.
 
-Schwartz-Zippel marginalization on the `y` variable: replacing the full
-polynomial sum `∑_h G^y_h` by the point-evaluated sum `E_v ∑_b G^y_[h(v)=b]`
-inside the ABAB term costs at most `params.m · params.d / params.q`.  Symmetric
-in structure to `fullSlice_scalar_marginalize_x`; the paper's difference-
-expression label at line 379 is idiosyncratic, so we cite the enclosing
-approximation statement.
-
-TODO(#361): as for `fullSlice_scalar_marginalize_x`, the paper's
-Schwartz-Zippel argument is manifestly PSD on the tensor-form `ABA ⊗ B`, while
-this Lean stub is phrased on `ABAB ⊗ I`.  So the clean paper-faithful route is
-to first bridge to the tensor form; after that bridge, one should again apply
-`polynomialAgreement_avg_le_mdq` (or directly
-`schwartzZippel_individualDegree`) to the off-diagonal collision term
-`1[h(v) = h'(v)]`, then use the sub-measurement property of `G^y` to control
-the remaining fiber sum.  Also, as with the former `x`-marginalization stub,
-any honest scalar bound must carry an explicit normalization hypothesis because
-`fullSliceABABAvg` and `evaluatedSliceABABAvg` scale linearly with the density
-matrix. -/
+Schwartz-Zippel marginalization on the `y` variable after the scalar↔tensor
+bridges costs at most `(params.m · params.d) / params.q + 2√ζ`. -/
 lemma fullSlice_scalar_marginalize_y
     (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
     |fullSliceABABAvg params strategy family -
         evaluatedSliceABABAvg params strategy family| ≤
-      (↑params.m : Error) * ↑params.d / ↑params.q := by
-  sorry
+      (↑params.m : Error) * ↑params.d / ↑params.q + 2 * Real.sqrt zeta := by
+  let tri :=
+    fullSliceScalarMarginalizeYTensorTriangleResidual
+      params strategy family zeta hnorm hself
+  exact abs_sub_le_of_tensor_triangle
+    (fullScalar := fullSliceABABAvg params strategy family)
+    (evalScalar := evaluatedSliceABABAvg params strategy family)
+    (fullTensor := tri.fullTensor)
+    (evalTensor := tri.evaluatedTensor)
+    (mdq := (↑params.m : Error) * ↑params.d / ↑params.q)
+    (sqrtz := Real.sqrt zeta)
+    tri.full_bridge tri.tensor_marginalize tri.evaluated_bridge
 
 /-- The evaluated-slice mixed term with a right-register copy of the second
 factor, i.e.
 `\(\mathbb E_{u,v,x,y} \sum_{a,b} \langle\psi,
    G^x_{[g(u)=a]} G^y_{[h(v)=b]} G^x_{[g(u)=a]} \otimes G^y_{[h(v)=b]}\, \psi\rangle\)`.
 
-This remains a private `def` (rather than a local `let`) because the remaining
-`TODO(#361)` transport bridges are expected to reuse the same named intermediate
-scalar quantities. -/
+This remains a private `def` (rather than a local `let`) because the #720/#730
+transport bridge documentation reuses the same named intermediate scalar
+quantity. -/
 private noncomputable def evaluatedSliceSandwichedRightAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
@@ -106,8 +220,8 @@ left and the right-register copy of the second factor, i.e.
    G^x_{[g(u)=a]} G^y_{[h(v)=b]} \otimes G^y_{[h(v)=b]}\, \psi\rangle\)`.
 
 As with `evaluatedSliceSandwichedRightAvg`, we keep this as a private named
-intermediate because the remaining evaluated-side `TODO(#361)` bridges are
-expected to reference the same quantity. -/
+intermediate because the evaluated-side transport documentation references the
+same quantity. -/
 private noncomputable def evaluatedSliceLinearRightAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
@@ -591,25 +705,23 @@ private lemma zero_to_evaluatedSliceProductRight_le_one
             simp [avgOver]
     _ ≤ 1 := uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
 
-/-- Combined `closenessOfIP` chain on the evaluated side
-(`commutativity-G.tex` lines 301, 334, 359-360, 394, 396).
+/-- Strong evaluated-side `hEval` transport bound.
 
-The current proof takes the direct evaluated-side route suggested in the TODO:
-transport `hEval` to `evaluatedSliceProductLeft/Right`, rewrite the resulting
-`SDDOpRel` via `evaluatedSliceCommutation_qSDDOp_avg_eq`, and combine it with
-the a priori normalized-state bound `sddErrorOp ≤ 4` for the evaluated product
-families.  This already yields the stronger estimate
-`|evaluatedSliceABAAvg - evaluatedSliceABABAvg| ≤ √ν`; we keep the paper's
-`6√ζ + √ν` envelope here so the downstream transport arithmetic can continue to
-quote the displayed bound verbatim. -/
-lemma fullSlice_closenessOfIP_CAB_hEval
+The direct evaluated-side route transports `hEval` to
+`evaluatedSliceProductLeft/Right`, rewrites the resulting `SDDOpRel` via
+`evaluatedSliceCommutation_qSDDOp_avg_eq`, and combines it with the a priori
+normalized-state bound `sddErrorOp ≤ 4` for the evaluated product families.  It
+yields the sharper estimate
+`|evaluatedSliceABAAvg - evaluatedSliceABABAvg| ≤ √ν`, where
+`ν = commDataProcessedGError params gamma zeta`.  The paper-envelope wrapper
+`fullSlice_closenessOfIP_CAB_hEval` below recovers the older `6√ζ + √ν`
+statement when that displayed Section 11 bound is convenient. -/
+lemma fullSlice_closenessOfIP_CAB_hEval_sqrt
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     (hnorm : strategy.state.IsNormalized)
-    (_hgamma_nonneg : 0 ≤ gamma) (_hzeta_nonneg : 0 ≤ zeta)
-    (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hEval :
+    (hEval :
       SDDOpRel strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
         (evaluatedFromFullSliceProductLeft params strategy family)
@@ -617,15 +729,14 @@ lemma fullSlice_closenessOfIP_CAB_hEval
         (commDataProcessedGError params gamma zeta)) :
     |evaluatedSliceABAAvg params strategy family -
         evaluatedSliceABABAvg params strategy family| ≤
-      6 * Real.sqrt zeta +
-        Real.sqrt (commDataProcessedGError params gamma zeta) := by
+      Real.sqrt (commDataProcessedGError params gamma zeta) := by
   let δ := commDataProcessedGError params gamma zeta
   let d : Error :=
     evaluatedSliceABAAvg params strategy family -
       evaluatedSliceABABAvg params strategy family
   have hEval' :=
     evaluatedSliceCommutation_of_evaluationSpecialization
-      params strategy family δ _hEval
+      params strategy family δ hEval
   have hδ :
       sddErrorOp strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
@@ -695,12 +806,38 @@ lemma fullSlice_closenessOfIP_CAB_hEval
           dsimp [d]
           exact abs_of_nonneg hd_nonneg
     _ ≤ Real.sqrt δ := hd_le_sqrt
-    _ ≤ 6 * Real.sqrt zeta + Real.sqrt δ := by
+    _ = Real.sqrt (commDataProcessedGError params gamma zeta) := by
+          rfl
+
+/-- Combined `closenessOfIP` chain on the evaluated side
+(`commutativity-G.tex` lines 301, 334, 359-360, 394, 396), stated with the
+paper's displayed `6√ζ + √ν` envelope. -/
+lemma fullSlice_closenessOfIP_CAB_hEval
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hEval :
+      SDDOpRel strategy.state
+        (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedFromFullSliceProductLeft params strategy family)
+        (evaluatedFromFullSliceProductRight params strategy family)
+        (commDataProcessedGError params gamma zeta)) :
+    |evaluatedSliceABAAvg params strategy family -
+        evaluatedSliceABABAvg params strategy family| ≤
+      6 * Real.sqrt zeta +
+        Real.sqrt (commDataProcessedGError params gamma zeta) := by
+  have h :=
+    fullSlice_closenessOfIP_CAB_hEval_sqrt params strategy family gamma zeta
+      hnorm hEval
+  calc
+    |evaluatedSliceABAAvg params strategy family -
+        evaluatedSliceABABAvg params strategy family|
+      ≤ Real.sqrt (commDataProcessedGError params gamma zeta) := h
+    _ ≤ 6 * Real.sqrt zeta +
+          Real.sqrt (commDataProcessedGError params gamma zeta) := by
           have hz : 0 ≤ 6 * Real.sqrt zeta := by positivity
           linarith
-    _ = 6 * Real.sqrt zeta +
-          Real.sqrt (commDataProcessedGError params gamma zeta) := by
-          rfl
 
 
 end MIPStarRE.LDT.Commutativity
