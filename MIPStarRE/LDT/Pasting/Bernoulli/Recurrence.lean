@@ -94,7 +94,7 @@ private noncomputable def gHatTypeFinsetEquiv (k : ℕ) :
   toFun τ := Finset.univ.filter fun i => τ i
   invFun s := fun i => i ∈ s
   left_inv τ := by
-    funext i
+    ext i
     simp
   right_inv s := by
     ext i
@@ -102,10 +102,7 @@ private noncomputable def gHatTypeFinsetEquiv (k : ℕ) :
 
 private lemma fromHToG_gHatTypeWeight_of_finset {k : ℕ} (s : Finset (Fin k)) :
     gHatTypeWeight (fun i : Fin k => i ∈ s) = s.card := by
-  unfold gHatTypeWeight
-  congr 1
-  ext i
-  simp
+  simp [gHatTypeWeight]
 
 private lemma fromHToG_gHatTypeOperator_of_finset
     (G : MIPStarRE.Quantum.Op ι) {k : ℕ} (s : Finset (Fin k)) :
@@ -301,12 +298,7 @@ private lemma fromHToG_outcomesByType_iff_type_eq
     {params : Parameters} [FieldModel params.q] {k : ℕ}
     (gs : GHatTupleOutcome params k) (τ : GHatType k) :
     gs ∈ outcomesByType τ ↔ gHatTupleType gs = τ := by
-  constructor
-  · intro h
-    funext i
-    exact h i
-  · intro h i
-    exact congrFun h i
+  simp [outcomesByType, gHatTupleType, funext_iff]
 
 /-- Interpolation eligibility depends only on the Boolean type of a completed-slice
 tuple. -/
@@ -395,8 +387,8 @@ private lemma fromHToG_averagedSandwichByType_total_eq_type_sum
             gHatTupleType gs = τ,
             (gHatSandwichFamily params family k xs).outcome gs) := by
   classical
-  unfold averagedSandwichByTypeSubMeas averageIdxSubMeas averageOperatorOverDistribution
-  simp only
+  simp only [averagedSandwichByTypeSubMeas, averageIdxSubMeas,
+    averageOperatorOverDistribution]
   refine Finset.sum_congr rfl ?_
   intro xs _hxs
   congr 1
@@ -414,8 +406,8 @@ private lemma fromHToG_averagedEligibleSandwich_total_eq_type_sum
           (averagedSandwichByTypeSubMeas params family k τ).total
         else 0 := by
   classical
-  unfold averagedEligibleSandwichSubMeas averageIdxSubMeas averageOperatorOverDistribution
-  simp only
+  simp only [averagedEligibleSandwichSubMeas, averageIdxSubMeas,
+    averageOperatorOverDistribution]
   calc
     (∑ a ∈ (uniformDistribution (PointTuple params k)).support,
         (uniformDistribution (PointTuple params k)).weight a •
@@ -571,9 +563,9 @@ private lemma fromHToGStageMass_telescope
     (fun ℓ => fromHToGStageMass params ψbi family k ℓ)
     (fromHToGRecurrenceError params gamma zeta k) k hstep
 
-/-- Reduce the final scalar `fromHToG` conclusion to the three paper-local
-bridge facts: identify the Lean stage `0`, identify the Lean stage `k`, and
-absorb the telescoped adjacent-stage loss into the displayed error term. -/
+/-- Reduce the final scalar `fromHToG` conclusion to the paper-local stage facts:
+the adjacent-stage recurrence, the Lean stage `0` and stage `k` endpoint
+identifications, and the scalar absorption into the displayed error term. -/
 private lemma fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
     (params : Parameters)
     [FieldModel params.q]
