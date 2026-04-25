@@ -238,6 +238,24 @@ def line_is_sorry(path: Path, line_no: int) -> bool | None:
 # Audit driver
 # ---------------------------------------------------------------------------
 
+def _repo_file_path(repo_root: Path, citation_path: str) -> Path | None:
+    """Resolve a cited file path, rejecting paths that escape ``repo_root``.
+
+    Issue text is untrusted input.  The path regex intentionally recognizes
+    broad ``MIPStarRE/...``-shaped strings, so normalize away any ``..``
+    segments before opening the file.  A citation that resolves outside the
+    checkout is treated as an invalid/missing in-repository file instead of
+    letting the audit inspect arbitrary host files.
+    """
+    root = repo_root.resolve()
+    candidate = (root / citation_path).resolve(strict=False)
+    try:
+        candidate.relative_to(root)
+    except ValueError:
+        return None
+    return candidate
+
+
 def audit_issue(
     issue: dict,
     repo_root: Path,
@@ -257,8 +275,8 @@ def audit_issue(
     report.decl_citations = len(decl_cites)
 
     for fc in file_cites:
-        full = repo_root / fc.path
-        if not full.is_file():
+        full = _repo_file_path(repo_root, fc.path)
+        if full is None or not full.is_file():
             report.missing_files.append(
                 fc.path if fc.line is None else f"{fc.path}:{fc.line}"
             )

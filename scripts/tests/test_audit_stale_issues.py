@@ -237,6 +237,30 @@ class AuditIssueTests(unittest.TestCase):
                 [("MIPStarRE/LDT/Fake/Live.lean", 9999)],
             )
 
+    def test_flags_file_citation_that_escapes_repo_root(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            outer = Path(td)
+            root = outer / "repo"
+            root.mkdir()
+            _make_fake_repo(root)
+            # The escaped file really exists and contains a sorry.  The audit
+            # must still reject it instead of inspecting files outside root.
+            (outer / "secret.lean").write_text("theorem ok : True := by\n  sorry\n")
+            decl_index = build_decl_index(root / "MIPStarRE")
+            issue = {
+                "number": 100,
+                "title": "path escape",
+                "url": "",
+                "body": "Escapes checkout: `MIPStarRE/../../secret.lean:2`.",
+            }
+            report = audit_issue(issue, root, decl_index)
+            self.assertTrue(report.is_flagged)
+            self.assertEqual(
+                report.missing_files,
+                ["MIPStarRE/../../secret.lean:2"],
+            )
+            self.assertEqual(report.non_sorry_lines, [])
+
     def test_not_flagged_when_all_citations_resolve(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
