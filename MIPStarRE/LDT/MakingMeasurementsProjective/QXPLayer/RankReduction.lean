@@ -182,8 +182,8 @@ lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
   dsimp [spectralTruncationError]
   exact Real.rpow_nonneg hζ _
 
-/-- The spectral truncation error is `√ζ` on nonnegative inputs. -/
-lemma spectralTruncationError_eq_sqrt {ζ : Error} (_hζ : 0 ≤ ζ) :
+/-- The spectral truncation error is `√ζ`. -/
+lemma spectralTruncationError_eq_sqrt (ζ : Error) :
     spectralTruncationError ζ = Real.sqrt ζ := by
   simp [spectralTruncationError, Real.sqrt_eq_rpow]
 
@@ -585,7 +585,7 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
           (1 : MIPStarRE.Quantum.Op ι) := by
       simpa [hR.sum_eq_total] using hR.total_le
     have hspectral_sqrt : spectralTruncationError ζ = Real.sqrt ζ :=
-      spectralTruncationError_eq_sqrt hζ
+      spectralTruncationError_eq_sqrt ζ
     have hr_bound : (Fintype.card Idx : Error) ≤ (1 + 2 * Real.sqrt ζ) * d := by
       have hcard_idx : Fintype.card Idx = ∑ a, (R.outcome a).rank := by
         simp [Idx, Fintype.card_sigma]

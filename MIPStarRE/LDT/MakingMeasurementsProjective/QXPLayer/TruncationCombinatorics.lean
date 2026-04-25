@@ -54,7 +54,6 @@ lemma exists_large_subset_ordered {α : Type*} [Fintype α] [DecidableEq α]
       (Finset.powersetCard_nonempty_of_le (s := (Finset.univ : Finset α)) hd)
   obtain ⟨L, hLmem, hLmax⟩ :=
     Finset.exists_max_image candidates (fun T : Finset α => ∑ x ∈ T, f x) hcandidates
-  have hL_sub : L ⊆ (Finset.univ : Finset α) := (Finset.mem_powersetCard.mp hLmem).1
   have hL_card : L.card = d := (Finset.mem_powersetCard.mp hLmem).2
   refine ⟨L, hL_card, ?_⟩
   intro s hs l hl
