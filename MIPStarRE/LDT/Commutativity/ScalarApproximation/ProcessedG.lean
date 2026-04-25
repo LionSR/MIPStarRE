@@ -73,8 +73,11 @@ conceptually into the following four phases.
 Error: `2√ζ + √ζ`.
 
 **Phase 2** (eq:gcom9 → eq:gcom10): insert Bob's second measurement,
-swap via `commutativityPoints`, apply `clm:g-comm-stability2` to
-remove trailing `G^x`.
+swap via `commutativityPoints`, then apply the boundedness part of
+`clm:g-comm-stability2` to remove trailing `G^x`.  The paper states
+`clm:g-comm-stability2` with an additional internal `6√(γ(m+1))` point-swap
+loss; the local `hphase5` step below keeps that contribution split off and
+uses only the `√ζ` boundedness estimate.
 Error: `2√ζ + 6√(γ(m+1)) + √ζ + 6√(γ(m+1))`.
 
 **Phase 3** (eq:gcom10 → eq:gonna-cite-this-in-just-a-bit): reverse the
@@ -214,6 +217,47 @@ private lemma evaluatedSlice_phaseFive_stability_gap
             rfl
     _ ≤ Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := hstab
 
+/-- The scalar defect controlled by `gCommStabilityTwo_scalar` after averaging out
+all evaluated-slice variables except the slice height `x`.
+
+This is the paper's boundedness witness term for `clm:g-comm-stability2`: for a
+fixed `x`, `gCommStabilityTwoR params family G x` averages the left-register
+sandwich `G^{v,y}_b G^x_g G^{v,y}_b`, while
+`IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g` averages the
+right-register point answer `A^{u,x}_{g(u)}` over the tail point `u`. -/
+private noncomputable def evaluatedSlicePhaseFiveStabilityDefect
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (x : Fq params) : Error :=
+  ∑ g : Polynomial params,
+    ev strategy.state
+      (leftTensor (ι₂ := ι)
+          ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
+        rightTensor (ι₁ := ι)
+          (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))
+
+/-- Direct `√ζ` control of the phase-5 stability defect.
+
+No `γ` term is folded into this bound: the `6√(γ(m+1))` contribution in the
+paper's lines 86--93 is the separate point-measurement swap step.  Once the
+phase-5 scalar difference is reindexed into the defect above, the boundedness
+hypothesis gives the displayed `√ζ` estimate exactly. -/
+private lemma evaluatedSlice_phaseFive_stability_defect_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    |avgOver (uniformDistribution (Fq params))
+      (evaluatedSlicePhaseFiveStabilityDefect params strategy family G)| ≤ Real.sqrt zeta := by
+  simpa [evaluatedSlicePhaseFiveStabilityDefect] using
+    (gCommStabilityTwo_scalar params strategy zeta hnorm family G hG hbound)
+
 /- Scalar approximation chain for the evaluated-slice commutation.
 
 This is the core of the paper's proof of `lem:comm-data-processed-g`
@@ -226,8 +270,10 @@ Starting from `E[∑ ABAB]`, the proof applies ten approximation steps:
    `eq:add-an-a`
 4. `≈_{6√(γ(m+1))}`: swap Bob's measurements via `closenessOfIP` +
    `commutativityPoints`
-5. `≈_{√ζ + 6√(γ(m+1))}`: remove trailing `G^x`
-   (`clm:g-comm-stability2`)
+5a. `≈_{6√(γ(m+1))}`: the point-measurement swap contribution internal
+    to the paper's `clm:g-comm-stability2` accounting
+5b. `≈_{√ζ}`: remove trailing `G^x` by the boundedness part of
+    `gCommStabilityTwo_scalar` (this is the local `hphase5` step below)
 6–7. `≈_{2√ζ + 2√ζ}`: reverse the `eq:add-an-a` insertions
 8–9. `≈_{√ζ + √ζ}`: apply postprocessed self-consistency twice
 
@@ -400,12 +446,22 @@ private lemma evaluatedSlice_scalar_chain_bound
         params strategy zeta _hnorm family hcombined_fst
   -- Phase 5: remove the trailing `G^x` from the BABA-side inserted term via
   -- the direct boundedness estimate `gCommStabilityTwo_scalar`.
-  -- Analogous to phase 2: bridging `avgOver 𝒟 (phase3Inserted - phase5Removed)`
-  -- to the scalar defect from `gCommStabilityTwo_scalar` requires the mirror
-  -- reindexing/telescoping step (this time through `gCommStabilityTwoR`) and
-  -- is not attempted here.
+  -- The analytic part is now closed by `evaluatedSlice_phaseFive_stability_defect_bound`;
+  -- the remaining #715 work is the exact finite reindexing/sign equality from
+  -- `avgOver 𝒟 (phase3Inserted - phase5Removed)` to the negative of
+  -- `evaluatedSlicePhaseFiveStabilityDefect`.  Concretely, this residual expands
+  -- `totalSandwichFamily`, decomposes each `Point params.next` as `(u,x)`, uses the
+  -- postprocessing-fiber identity `∑_a ∑_{g : g(u)=a} = ∑_g`, and accounts for
+  -- `B A B * (G^x - 1) = - B A B * (1 - G^x)`.  This keeps the phase-4
+  -- `6√(γ(m+1))` contribution split off rather than folding it into this `√ζ`
+  -- boundedness step.
   have hphase5 :
       |avgOver 𝒟 phase3Inserted - avgOver 𝒟 phase5Removed| ≤ Real.sqrt zeta := by
+    have _hdefect :=
+      evaluatedSlice_phaseFive_stability_defect_bound
+        params strategy zeta _hnorm family G _hG _hbound
+    -- TODO(#715): prove the finite reindexing/sign equality described above and
+    -- finish by applying `_hdefect`.
     sorry
   -- Phases 8/9: postprocessed self-consistency transports `BAB` to `ABA`.
   have htail :
