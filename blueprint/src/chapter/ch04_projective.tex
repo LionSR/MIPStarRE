@@ -619,18 +619,15 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX}
 		\leanok
 		\uses{def:matrix-decomposition-Q}
-		Let
+		The paper presents this step by choosing a singular value decomposition
 		\[
-			X = U \cdot \Sigma_{m \times d} \cdot V^\dagger
+			X = U \cdot \Sigma_{m \times d} \cdot V^\dagger.
 		\]
-		be the singular value decomposition of $X$. Thus $U$ is an $m \times m$ unitary matrix,
-		$V$ is a $d \times d$ unitary matrix, and $\Sigma_{m \times d}$ is an
-		$m \times d$ diagonal matrix with nonnegative real entries on its diagonal.
-
-		For positive integers $h$ and $w$, write $I_{h \times w}$ for the $h \times w$ matrix
-		with $1$'s on its diagonal and $0$'s elsewhere. For integers $h,w \geq m$, write
-		$\Sigma_{h \times w}$ for the $h \times w$ diagonal matrix whose diagonal agrees with
-		that of $\Sigma_{m \times d}$ and is zero elsewhere.
+		The Lean interface deliberately records only the downstream consequences of this choice:
+		the matrices $X$ and $\widehat X$, the identities $X^\dagger X=Q$,
+		$\widehat X\widehat X^\dagger=I$, and $X^\dagger\widehat X=\sqrt Q$, together
+		with the $Q_a=X^\dagger T_aX$ restatement.  No explicit rectangular complex-SVD
+		matrices $U,V,\Sigma$ are stored in `QXPLayerData`.
 	\end{definition}
 
 	\begin{remark}\label{rem:motivation-for-P}
@@ -648,11 +645,12 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveP}
 		\leanok
 		\uses{def:matrix-decomposition-Q, def:svd-of-X}
-		Define
+		The paper defines
 		\[
 			\widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger.
 		\]
-		For each $a$, define
+		In Lean, $\widehat X$ is the matrix component `xHat` of the reduced
+		`QXPLayerData` package. For each $a$, define
 		\[
 			\widehat{X}_a = T_a \cdot \widehat{X},
 			\qquad
@@ -707,26 +705,12 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xSquared}
 		\leanok
 		\begin{equation*}
-			X \cdot X^\dagger = U \cdot (\Sigma_{m \times m})^2 \cdot U^\dagger,
-			\quad
-			\text{and}
-			\quad
-			X^\dagger \cdot X = Q = V \cdot (\Sigma_{d \times d})^2 \cdot V^\dagger.
+			X^\dagger \cdot X = Q.
 		\end{equation*}
 	\end{lemma}
-	% No proof-level marker here: the Lean declaration only projects the stored
-	% singular-value data of the chosen $X/\widehat X/P$ witness.
 	\begin{proof}
 		\uses{lem:qa-restated}
-		The first identity is the standard computation from the singular value decomposition:
-		\[
-			X \cdot X^\dagger
-			=
-			(U \cdot \Sigma_{m \times d} \cdot V^\dagger)(U \cdot \Sigma_{m \times d} \cdot V^\dagger)^\dagger
-			=
-			U \cdot (\Sigma_{m \times m})^2 \cdot U^\dagger.
-		\]
-		For the second, use that $T$ is a measurement and then \ref{lem:qa-restated}:
+		Use that $T$ is a measurement and then \ref{lem:qa-restated}:
 		\[
 			X^\dagger \cdot X
 			=
@@ -736,12 +720,9 @@
 			=
 			Q.
 		\]
-		Computing again from the singular value decomposition gives
-		\[
-			X^\dagger \cdot X
-			=
-			V \cdot (\Sigma_{d \times d})^2 \cdot V^\dagger.
-		\]
+		The additional paper identities involving $U,V,\Sigma$ are the usual SVD
+		computations, but they are not stored in the Lean API because they are not used
+		by the downstream proof.
 	\end{proof}
 
 	\begin{lemma}\label{lem:X-expression-to-Q-expression}
@@ -811,57 +792,27 @@
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
 		\end{equation*}
 	\end{lemma}
-	% No proof-level marker here: the Lean declaration only projects the stored
-	% coisometry identity of $\widehat X$.
 	\begin{proof}
-		Multiply out the definition of $\widehat X$ and use the unitarity of $U$ and $V$:
-		\[
-			\widehat{X} \cdot \widehat{X}^\dagger
-			=
-			(U \cdot I_{m \times d} \cdot V^\dagger)(U \cdot I_{m \times d} \cdot V^\dagger)^\dagger
-			=
-			U \cdot I_{m \times m} \cdot U^\dagger
-			=
-			I_{m \times m}.
-		\]
+		The paper proves this by multiplying out
+		$\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger$ and using the unitarity of
+		$U$ and $V$.  In Lean, the coisometry identity is one of the primitive
+		consequences recorded in the reduced `QXPLayerData` package.
 	\end{proof}
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat}
 		\leanok
 		\begin{equation*}
-			X \cdot \widehat{X}^\dagger = U \cdot \Sigma_{m \times m} \cdot U^\dagger,
-			\quad
-			\text{and}
-			\quad
 			X^\dagger \cdot \widehat{X} = \sqrt{Q}.
 		\end{equation*}
 	\end{lemma}
-	% No proof-level marker here: the Lean declaration only projects the stored
-	% mixed-product identities of the chosen $X/\widehat X/P$ witness.
 	\begin{proof}
 		\uses{lem:X-squared}
-		The first identity follows directly from the singular value decomposition:
-		\[
-			X \cdot \widehat{X}^\dagger
-			=
-			(U \cdot \Sigma_{m \times d} \cdot V^\dagger)(U \cdot I_{m \times d} \cdot V^\dagger)^\dagger
-			=
-			U \cdot \Sigma_{m \times m} \cdot U^\dagger.
-		\]
-		Similarly,
-		\[
-			X^\dagger \cdot \widehat{X}
-			=
-			(U \cdot \Sigma_{m \times d} \cdot V^\dagger)^\dagger (U \cdot I_{m \times d} \cdot V^\dagger)
-			=
-			V \cdot \Sigma_{d \times d} \cdot V^\dagger.
-		\]
-		By \ref{lem:X-squared}, this is the positive square root of
-		\[
-			V \cdot (\Sigma_{d \times d})^2 \cdot V^\dagger = Q,
-		\]
-		so $X^\dagger \cdot \widehat X = \sqrt Q$.
+		The paper obtains this from the SVD formula for $X$ and the definition of
+		$\widehat X$.  The Lean proof records this as the primitive mixed-product
+		identity in `QXPLayerData`, which is exactly the part needed in
+		\ref{lem:squared-difference} and \ref{lem:P-Q-approx}.  The companion paper
+		identity for $X\widehat X^\dagger$ is not stored explicitly.
 	\end{proof}
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}
@@ -873,24 +824,12 @@
 	\end{lemma}
 	\begin{proof}
 		\uses{lem:X-squared, lem:X-hat-squared, lem:X-times-X-hat}
-		By \ref{lem:X-squared}, \ref{lem:X-hat-squared}, and \ref{lem:X-times-X-hat},
-		\[
-			(X-\widehat X)(X-\widehat X)^\dagger
-			=
-			U \cdot (\Sigma_{m \times m}-I_{m \times m})^2 \cdot U^\dagger.
-		\]
-		Since $\Sigma_{m \times m}$ commutes with $I_{m \times m}$,
-		\[
-			(\Sigma_{m \times m}-I_{m \times m})^2
-			\leq
-			(\Sigma_{m \times m}^2-I_{m \times m})^2.
-		\]
-		Conjugating by $U$ and using \ref{lem:X-squared} gives
-		\[
-			(X-\widehat X)(X-\widehat X)^\dagger
-			\leq
-			(X \cdot X^\dagger - I_{m \times m})^2.
-		\]
+		The paper diagonalizes the positive operator $X\widehat X^\dagger$ using the
+		SVD notation.  The Lean proof avoids storing that SVD explicitly: set
+		$Y=X\widehat X^\dagger$.  The primitive identities imply that $Y$ is
+		hermitian, nonnegative, and satisfies $Y^2=XX^\dagger$.  Hence
+		$(X-\widehat X)(X-\widehat X)^\dagger=(Y-I)^2$, and positivity of $Y$ gives
+		$(Y-I)^2\leq(Y^2-I)^2=(XX^\dagger-I)^2$.
 	\end{proof}
 
 	\begin{lemma}[Projectivity of~$P$]\label{lem:P-projectivity}
@@ -923,10 +862,11 @@
 			Q_a \ot I \approx_{30\zeta^{1/4}} P_a \ot I.
 		\end{equation*}
 	\end{lemma}
-	% No proof-level marker here: the Lean declaration only projects the stored
-	% comparison bound between $P$ and $Q$ from the chosen witness.
 	\begin{proof}
 		\uses{lem:projective-low-rank-sum, lem:q-almost-projective, lem:sqrt-Q-completeness, lem:xa-t, lem:qa-restated, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity}
+		The Lean proof follows this argument directly from the primitive
+		$X/\widehat X/P$ identities; the $30\zeta^{1/4}$ estimate is no longer stored
+		as a field of `QXPLayerData`.
 		The quantity to bound is
 		\begin{equation}\label{eq:P-Q-thing-to-bound}
 			\sum_a \bra{\psi} (Q_a-P_a)^2 \ot I \ket{\psi}

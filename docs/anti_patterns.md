@@ -121,7 +121,7 @@ A signature passes the smell test if:
 - [#451] — the tracked `BridgePackage` producer catalogue
 - [#595] — resolved the QXP `ProjectiveNonMeasurementBridgePackage` offender by
   deleting the bridge and threading `RoundingToProjectorsWitness` directly
-- [#477] — `QXPLayerData` axiom-field projection (a definitional variant)
+- [#477] — resolved `QXPLayerData` axiom-field projection (a definitional variant)
 - [#493] — the inline-existential mutation of this pattern
 - [#491] — PR that introduced the mutation
 
@@ -213,7 +213,7 @@ just name a compound expression?**
 
 ### Related issues
 
-- [#477] — `QXPLayerData` field projections (Ch4 SVD as axiom fields)
+- [#477] — resolved `QXPLayerData` field projections (Ch4 SVD as axiom fields)
 - [#494] — the Fourier case and other candidates
 
 ---
@@ -509,13 +509,15 @@ Grep for these suffixes: `*Statement`, `*Witness`, `*Claim`,
 
 If any answer is "no", the structure is an unacceptable smuggle.
 
-### Current status (audited 2026-04-18; updated 2026-04-23)
+### Current status (audited 2026-04-18; updated 2026-04-25)
 
 All 34 `*Statement` / 9 `*Conclusion` / 8 `*Witness` structures on `main`
 are either grounded (have producer theorems) or are the known tracked
-items in [#449] / [#451] / [#477]. The former QXP
+items in [#449] / [#451]. The former QXP
 `ProjectiveNonMeasurementBridgePackage` offender has been removed from that
-live list (resolved in [#595]). No new unacceptable smuggles were found in
+live list (resolved in [#595]), and the old `QXPLayerData` SVD / `pQApprox`
+field-projection offender has been removed by the reduced primitive API and
+real `pQApprox` proof (issue [#652]). No new unacceptable smuggles were found in
 that sweep. If you add a new `*Statement`-style structure to this codebase,
 include a docstring explaining its grounding plan and (if no producer exists
 yet) file a sub-issue in [#449].
@@ -606,5 +608,6 @@ PR [#438]) are the natural home for extensions that add these checks.
 [#491]: https://github.com/LionSR/MIPStarRE/pull/491
 [#493]: https://github.com/LionSR/MIPStarRE/issues/493
 [#595]: https://github.com/LionSR/MIPStarRE/issues/595
+[#652]: https://github.com/LionSR/MIPStarRE/issues/652
 [#494]: https://github.com/LionSR/MIPStarRE/issues/494
 [#495]: https://github.com/LionSR/MIPStarRE/issues/495

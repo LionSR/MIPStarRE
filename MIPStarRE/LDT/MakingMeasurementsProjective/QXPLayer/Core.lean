@@ -142,17 +142,6 @@ structure QXPLayerData (Outcome : Type uOutcome) [Fintype Outcome]
   xHat_coisometry : xHat * xHatᴴ = 1
   x_gram_right : xᴴ * x = QTotal qLayer
   xHat_mixed : xᴴ * xHat = CFC.sqrt (QTotal qLayer)
-  /-- We store the paper's final `P`-vs-`Q` estimate on the witness package so
-  a chosen `X/XHat/P` decomposition carries its own comparison bound. The
-  public interface remains `pQApprox`, which is the only place this field is
-  projected out. -/
-  pQApprox_bound :
-    ∀ (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error),
-      RankReductionWitness ψ A ζ qLayer →
-        SDDOpRel ψ (uniformDistribution Unit)
-          (constOpFamily qLayer.q)
-          (constOpFamily (pFamilyFromXHat qLayer xHat))
-          (30 * zetaQuarterRoot ζ)
 
 /-- The paper's matrix `X_a = T_a · X`. -/
 def Xa {Outcome : Type*} [Fintype Outcome]
