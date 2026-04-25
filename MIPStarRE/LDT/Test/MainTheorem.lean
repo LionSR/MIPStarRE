@@ -431,6 +431,91 @@ theorem mainFormalSuccessorMainInductionPublicWrapper
     boundary.selfImprovementProducer
     hk_pos hk
 
+/-- Paper-native final targets for the remaining `mainFormal` assembly.
+
+This structure deliberately stops before the final error-envelope weakening. Its
+three consistency fields are exactly the native conclusions reached in
+`references/ldt-paper/inductive_step.tex`:
+
+* `eq:one-goal` (lines 175--181):
+  $A^{\mathrm A,u}_a \otimes I \simeq_{\zeta_4}
+    I \otimes Q^{\mathrm B}_{[g(u)=a]}$;
+* `eq:another-goal` (lines 182--185):
+  $I \otimes A^{\mathrm B,u}_a \simeq_{\zeta_4}
+    Q^{\mathrm A}_{[g(u)=a]} \otimes I$;
+* `eq:third-goal` after data processing (lines 159--166):
+  $Q^{\mathrm A}_g \otimes I \simeq_{\zeta_3/2} I \otimes Q^{\mathrm B}_g$.
+
+The two bound fields record the already-formalized Step 8 absorption of
+`\zeta_4` and `\zeta_3/2` into `mainFormalError`. Constructing this package from
+Section 6 and the unsymmetrization / Schwartz--Zippel / projectivization chain is
+the live residual; the projection theorem below is only the final paper-faithful
+packaging step. -/
+structure MainFormalNativeTargets
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ) where
+  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
+  leftMeasurement : ProjMeas (Polynomial params) ι
+  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
+  rightMeasurement : ProjMeas (Polynomial params) ι
+  /-- The paper's self-consistency error `\zeta_3`. -/
+  zeta3 : Error
+  /-- The paper's two point-consistency error `\zeta_4`. -/
+  zeta4 : Error
+  /-- Native form of `eq:one-goal`, before weakening to `mainFormalError`. -/
+  pointAConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      zeta4
+  /-- Native form of `eq:another-goal`, before weakening to `mainFormalError`. -/
+  pointBConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      zeta4
+  /-- Native data-processed form of `eq:third-goal`. -/
+  selfConsistency :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily leftMeasurement.toSubMeas)
+      (constSubMeasFamily rightMeasurement.toSubMeas)
+      (zeta3 / 2)
+  /-- Step 8 scalar absorption for the two point-consistency targets. -/
+  pointErrorLe : zeta4 ≤ mainFormalError params k eps
+  /-- Step 8 scalar absorption for the self-consistency target. -/
+  selfErrorLe : zeta3 / 2 ≤ mainFormalError params k eps
+
+namespace MainFormalNativeTargets
+
+/-- Final packaging step for `thm:main-formal` once the paper-native targets have
+been constructed. This only weakens the native `\zeta_4` and `\zeta_3/2` bounds to
+`mainFormalError` using `ConsRel.mono`; all substantive transport work is in the
+construction of `MainFormalNativeTargets`. -/
+theorem toMainFormal {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    (targets : MainFormalNativeTargets params strategy eps k) :
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params G_A.toSubMeas)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
+          (mainFormalError params k eps) := by
+  refine ⟨targets.leftMeasurement, targets.rightMeasurement, ?_, ?_, ?_⟩
+  · exact ConsRel.mono targets.pointErrorLe targets.pointAConsistency
+  · exact ConsRel.mono targets.pointErrorLe targets.pointBConsistency
+  · exact ConsRel.mono targets.selfErrorLe targets.selfConsistency
+
+end MainFormalNativeTargets
+
 /--
 `thm:main-formal` from `test_definition.tex`.
 
@@ -480,8 +565,8 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  -- TODO(#634-residual): The induction-side handoffs needed by the final
-  -- `mainFormal` assembly are now standalone checked declarations:
+  -- TODO(#422): The induction-side handoffs needed by the final
+  -- `mainFormal` assembly are standalone checked declarations:
   -- * base branch: `strategySymmetrization_mainInductionBaseCase`,
   -- * weighted successor boundary fields:
   --   `mainFormalSuccessorAxisWeightedBound_ofPass` and
@@ -490,17 +575,19 @@ theorem mainFormal
   --   `mainFormalSuccessorMainInductionPublicWrapper`, and
   -- * vacuous branch: `mainFormal_trivial_witness`.
   --
-  -- What remains at this original `mainFormal` sorry site is the genuine final
-  -- paper assembly: split the public `k ≥ md` hypothesis into the
-  -- `400 * m * d ≤ k` wrapper regime and the vacuous regime, transport a
-  -- successor branch through the predecessor/successor parameter equality,
-  -- produce the recursive-slice and restricted-self-improvement boundary data,
-  -- and run the unsymmetrization, Schwartz--Zippel, and
-  -- orthonormalization/projectivization transports into the three displayed
-  -- `ConsRel` conclusions. The scalar absorption will use
-  -- `errorCascade_le_mainFormalError`, while the small-`k` branch will invoke
-  -- `mainFormal_trivial_witness`.
-  sorry
+  -- The remaining paper-faithful target is now named by
+  -- `MainFormalNativeTargets`: construct the projective measurements
+  -- `Q^A,Q^B` and the native `ζ₄`, `ζ₄`, and `ζ₃/2` consistency bounds from
+  -- `inductive_step.tex` lines 159--185, then use the Step 8 absorption fields
+  -- to weaken them to `mainFormalError`. Producing that package still depends on
+  -- the active upstream transport and pasting residuals: the role
+  -- unsymmetrization bridge (#424), the full-slice transport chain (#601), the
+  -- remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
+  -- aggregation (#672), and the ProcessedG scalar residual follow-ups #714,
+  -- #715, #732, and #759.
+  have targets : MainFormalNativeTargets params strategy eps k := by
+    sorry
+  exact MainFormalNativeTargets.toMainFormal targets
 
 end Test
 

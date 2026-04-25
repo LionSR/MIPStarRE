@@ -607,6 +607,12 @@
 		I \ot A_a^{\mathrm B,u} \simeq_{\zeta_4} Q_{[g(u)=a]}^{\mathrm A} \ot I.
 	\end{equation}
 
+	The Lean residual package
+	\lean{MIPStarRE.LDT.Test.MainFormalNativeTargets} records exactly these three
+	native targets at errors $\zeta_4$, $\zeta_4$, and $\zeta_3/2$;
+	\lean{MIPStarRE.LDT.Test.MainFormalNativeTargets.toMainFormal} is only the
+	final weakening from those native targets to the theorem's common error envelope.
+
 	With $E$ as in Definition~\ref{def:main-formal-envelope}, the quantities $\sigma,\zeta_1,\zeta_2,\zeta_3,\zeta_4$ form the cascade of Definition~\ref{def:main-formal-error-cascade}. Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal} package the final inflation to the scale $100000k^2m^4 E$. The underlying paper estimates are:
 	\[
 		\sigma \le 10000k^2m^4\left(\eps^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).
