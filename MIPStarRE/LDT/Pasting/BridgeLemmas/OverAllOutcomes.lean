@@ -20,6 +20,31 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- The common nonnegative error-sum with exponent `1/32` used by the
+Section 12 displayed error terms. -/
+private lemma oneThirtySecondErrorSum_nonneg
+    (params : Parameters) [FieldModel params.q]
+    (eps delta gamma zeta : Error)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta) :
+    0 ≤ Real.rpow eps (1 / (32 : Error)) +
+      Real.rpow delta (1 / (32 : Error)) +
+      Real.rpow gamma (1 / (32 : Error)) +
+      Real.rpow zeta (1 / (32 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
+  have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
+    positivity
+  exact add_nonneg
+    (add_nonneg
+      (add_nonneg
+        (add_nonneg (Real.rpow_nonneg heps_nonneg _)
+          (Real.rpow_nonneg hdelta_nonneg _))
+        (Real.rpow_nonneg hgamma_nonneg _))
+      (Real.rpow_nonneg hzeta_nonneg _))
+    (Real.rpow_nonneg hratio_nonneg _)
+
 /-- The `hBConsistency` error term is one summand of the over-all-outcomes error. -/
 private lemma hBConsistencyError_le_overAllOutcomesError
     (params : Parameters) [FieldModel params.q]
@@ -30,22 +55,8 @@ private lemma hBConsistencyError_le_overAllOutcomesError
     (hzeta_nonneg : 0 ≤ zeta) :
     hBConsistencyError params eps delta gamma zeta k ≤
       overAllOutcomesError params eps delta gamma zeta k := by
-  have hratio_nonneg : 0 ≤ (params.d : Error) / (params.q : Error) := by
-    positivity
-  have hsum_nonneg :
-      0 ≤ Real.rpow eps (1 / (32 : Error)) +
-        Real.rpow delta (1 / (32 : Error)) +
-        Real.rpow gamma (1 / (32 : Error)) +
-        Real.rpow zeta (1 / (32 : Error)) +
-        Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
-    exact add_nonneg
-      (add_nonneg
-        (add_nonneg
-          (add_nonneg (Real.rpow_nonneg heps_nonneg _)
-            (Real.rpow_nonneg hdelta_nonneg _))
-          (Real.rpow_nonneg hgamma_nonneg _))
-        (Real.rpow_nonneg hzeta_nonneg _))
-      (Real.rpow_nonneg hratio_nonneg _)
+  have hsum_nonneg := oneThirtySecondErrorSum_nonneg params eps delta gamma zeta
+    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
   simp [hBConsistencyError, overAllOutcomesError]
   gcongr
   norm_num
@@ -286,6 +297,85 @@ private lemma overAllOutcomes_pasted_sub_expansion_le_dnoteq
   rw [overAllOutcomesExpansionMass_eq_avg_uniform_eligible]
   linarith
 
+/-- Nonnegativity of the displayed one-point sandwich error term. -/
+private lemma ldSandwichLineOnePointError_nonneg
+    (params : Parameters) [FieldModel params.q]
+    (eps delta gamma zeta : Error) (k : ℕ)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta) :
+    0 ≤ ldSandwichLineOnePointError params eps delta gamma zeta k := by
+  have hsum_nonneg := oneThirtySecondErrorSum_nonneg params eps delta gamma zeta
+    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+  unfold ldSandwichLineOnePointError
+  exact mul_nonneg (by positivity) hsum_nonneg
+
+/-- The distinctness loss is already absorbed by the displayed
+`lem:over-all-outcomes` error term. -/
+private lemma dnoteq_term_le_overAllOutcomesError
+    (params : Parameters) [FieldModel params.q]
+    (eps delta gamma zeta : Error) (k : ℕ)
+    (hd : 0 < params.d)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta) :
+    ((k : Error) ^ (2 : ℕ)) / (params.q : Error) ≤
+      overAllOutcomesError params eps delta gamma zeta k := by
+  have hhb := hBConsistency_error_bound params eps delta gamma zeta k hd
+    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+  have hld_nonneg :
+      0 ≤ (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k :=
+    mul_nonneg (by positivity)
+      (ldSandwichLineOnePointError_nonneg params eps delta gamma zeta k
+        heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg)
+  have hdnoteq_le_hB :
+      ((k : Error) ^ (2 : ℕ)) / (params.q : Error) ≤
+        hBConsistencyError params eps delta gamma zeta k := by
+    linarith
+  exact le_trans hdnoteq_le_hB
+    (hBConsistencyError_le_overAllOutcomesError params eps delta gamma zeta k
+      heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg)
+
+/-- Reduction of `lem:over-all-outcomes` to the one remaining reverse mass
+comparison.
+
+The forward direction
+`overAllOutcomesPastedMass - overAllOutcomesExpansionMass` is now discharged by
+expanding the pasted mass over distinct tuples, forgetting global consistency,
+and paying only `ldDnoteq`.  Thus the only remaining mathematical obligation is
+bounding the reverse loss
+`overAllOutcomesExpansionMass - overAllOutcomesPastedMass`, which is the part of
+`ld-pasting.tex` that still needs the completed `ldSandwichLineOnePoint`
+aggregation. -/
+private lemma overAllOutcomes_of_reverse_mass_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error) (k : ℕ)
+    (hd : 0 < params.d)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hreverse :
+      overAllOutcomesExpansionMass params strategy family k -
+          overAllOutcomesPastedMass params strategy family k ≤
+        overAllOutcomesError params eps delta gamma zeta k) :
+    OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
+  refine ⟨?_⟩
+  have hforward_dnoteq := overAllOutcomes_pasted_sub_expansion_le_dnoteq
+    params strategy family k
+  have hforward :
+      overAllOutcomesPastedMass params strategy family k -
+          overAllOutcomesExpansionMass params strategy family k ≤
+        overAllOutcomesError params eps delta gamma zeta k := by
+    exact le_trans hforward_dnoteq
+      (dnoteq_term_le_overAllOutcomesError params eps delta gamma zeta k hd
+        heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg)
+  exact abs_le.mpr ⟨by linarith, hforward⟩
+
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
     (params : Parameters)
@@ -303,36 +393,39 @@ lemma overAllOutcomes
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
-  refine ⟨?_⟩
-  /- Paper: `lem:over-all-outcomes` (ld-pasting.tex §9.4, lines 1140–1289).
-  Expand pasted-measurement total mass over all outcome types τ with |τ| ≥ d+1.
-  Steps: (1) expand over distinct k-tuples via `distinctTupleDistribution`,
-  (2) decompose by outcome type with |τ| ≥ d+1,
-  (3) remove global-polynomial restriction (Schwartz-Zippel: error md/q),
-  (4) swap distinct → uniform sampling (`prop:ld-dnoteq`: error 2k²/q),
-  (5) bound sandwich errors (`lem:ld-sandwich-line-one-point`: k × ν₅).
+  have heps_nonneg : 0 ≤ eps :=
+    eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg : 0 ≤ delta :=
+    delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg : 0 ≤ gamma :=
+    gamma_nonneg_of_isGood params.next strategy hgood
+  have hzeta_nonneg : 0 ≤ zeta :=
+    IdxPolyFamily.zeta_nonneg_of_consistentWithPoints strategy family hcons
+  have hreverse :
+      overAllOutcomesExpansionMass params strategy family k -
+          overAllOutcomesPastedMass params strategy family k ≤
+        overAllOutcomesError params eps delta gamma zeta k := by
+    /- Paper: `lem:over-all-outcomes` (ld-pasting.tex §9.4, lines 1140–1289).
+    The easy direction of the absolute-value bound has now been factored through
+    `overAllOutcomes_of_reverse_mass_bound`: expanding the pasted mass, dropping
+    the global-consistency restriction, and swapping distinct tuples to uniform
+    tuples costs only `ldDnoteq`, which is absorbed by
+    `dnoteq_term_le_overAllOutcomesError`.
 
-  The hypotheses `hdq_le` and `hd` are already on the signature to keep downstream
-  callers stable; the Schwartz-Zippel/global-polynomial comparison in steps
-  (2)--(4) is where they are intended to be consumed.
-
-  Interpolation correctness is already available as
-  `interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem`
-  in `BridgeLemmas/LineInterpolation.lean`: after unfolding
-  `Polynomial.restrictAtHeight` / `extractSlicePoly`, it gives the same fact
-  that on the canonical `d + 1`-node interpolation support `σ` chosen by
-  `interpolationSupportWitness`, the Lagrange interpolant agrees with every
-  `gᵢ` for `i ∈ σ`. Together with
-  `nonglobal_gives_slice_mismatch_against_interpolant` this is the API used by
-  the paper's "unique $h^*$ interpolates $g_1, \ldots, g_{d+1}$" step.
-
-  Current remaining blockers after the split audit:
-  * the final sandwich aggregation still depends on `ldSandwichLineOnePoint`.
-    The old `ldGbcon` / swap-orientation blocker is gone, but the two local
-    Cauchy–Schwarz transport steps in `ldSandwichLineOnePoint_core` are still
-    open.
-  -/
-  sorry
+    The remaining reverse direction is the true downstream blocker.  It is the
+    paper's aggregation step over outcome types `τ` with `|τ| ≥ d+1`, using the
+    interpolation-correctness API
+    `interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem`
+    and `nonglobal_gives_slice_mismatch_against_interpolant` from
+    `BridgeLemmas/LineInterpolation.lean`, followed by the still-open
+    `ldSandwichLineOnePoint` local transport/aggregation bound.  In particular,
+    `hBConsistency_core` already consumes the interpolation API via
+    `hBConsistencyBadMass_le_linePointDefectSum`; the residual here is no longer
+    an interpolation API gap but the reverse mass comparison above. -/
+    sorry
+  exact overAllOutcomes_of_reverse_mass_bound params strategy family
+    eps delta gamma zeta k hd heps_nonneg hdelta_nonneg hgamma_nonneg
+    hzeta_nonneg hreverse
 
 
 end MIPStarRE.LDT.Pasting
