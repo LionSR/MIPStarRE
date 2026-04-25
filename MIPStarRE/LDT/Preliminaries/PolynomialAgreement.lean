@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.Distribution
+import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.Preliminaries.Polynomials
 
 /-!
@@ -171,5 +171,74 @@ lemma polynomialAgreement_avg_le_mdq
           exact_mod_cast hsz
     _ = (params.m * params.d : Error) / params.q := by
           simp [scalar_card, div_eq_mul_inv]
+
+open Classical in
+/-- Tensor-form Schwartz-Zippel collision bound.
+
+For each off-diagonal pair of polynomial outcomes, the point-collision
+coefficient is bounded by `params.m * params.d / params.q` via
+`polynomialAgreement_avg_le_mdq`. The remaining tensor residual is bounded by
+`1` using `sandwichTensor_residual_sum_le_one`, so the whole nonnegative
+collision sum has the same `m d / q` bound. -/
+lemma polynomialCollision_sandwichTensor_le_mdq
+    {ι β : Type*} [Fintype ι] [DecidableEq ι] [Fintype β]
+    (params : Parameters) [FieldModel params.q]
+    (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized)
+    (Outer : SubMeas β ι)
+    (Inner Right : SubMeas (Polynomial params) ι) :
+    (∑ gg : Polynomial params × Polynomial params, ∑ o : β,
+        (if gg.1 = gg.2 then 0 else
+          avgOver (uniformDistribution (Point params))
+            (fun u => if gg.1 u = gg.2 u then (1 : Error) else 0)) *
+          ev ψ
+            (leftTensor (ι₂ := ι)
+                (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
+              rightTensor (ι₁ := ι) (Right.outcome gg.2))) ≤
+      (params.m * params.d : Error) / params.q := by
+  let δ : Error := (params.m * params.d : Error) / params.q
+  have hδ_nonneg : 0 ≤ δ := by
+    exact div_nonneg (by positivity) (by positivity)
+  have hcoef_le (gg : Polynomial params × Polynomial params) :
+      (if gg.1 = gg.2 then 0 else
+          avgOver (uniformDistribution (Point params))
+            (fun u => if gg.1 u = gg.2 u then (1 : Error) else 0)) ≤ δ := by
+    by_cases hEq : gg.1 = gg.2
+    · simp [hEq, hδ_nonneg, δ]
+    · simpa [hEq, δ] using
+        polynomialAgreement_avg_le_mdq params gg.1 gg.2 hEq
+  calc
+    (∑ gg : Polynomial params × Polynomial params, ∑ o : β,
+        (if gg.1 = gg.2 then 0 else
+          avgOver (uniformDistribution (Point params))
+            (fun u => if gg.1 u = gg.2 u then (1 : Error) else 0)) *
+          ev ψ
+            (leftTensor (ι₂ := ι)
+                (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
+              rightTensor (ι₁ := ι) (Right.outcome gg.2)))
+      ≤ ∑ gg : Polynomial params × Polynomial params, ∑ o : β,
+          δ * ev ψ
+            (leftTensor (ι₂ := ι)
+                (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
+              rightTensor (ι₁ := ι) (Right.outcome gg.2)) := by
+          refine Finset.sum_le_sum ?_
+          intro gg _
+          refine Finset.sum_le_sum ?_
+          intro o _
+          exact mul_le_mul_of_nonneg_right (hcoef_le gg)
+            (sandwichTensorSummand_nonneg ψ Outer Inner Right o gg.1 gg.2)
+    _ = δ * (∑ gg : Polynomial params × Polynomial params, ∑ o : β,
+          ev ψ
+            (leftTensor (ι₂ := ι)
+                (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
+              rightTensor (ι₁ := ι) (Right.outcome gg.2))) := by
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl ?_
+          intro gg _
+          rw [Finset.mul_sum]
+    _ ≤ δ * 1 := by
+          exact mul_le_mul_of_nonneg_left
+            (sandwichTensor_residual_sum_le_one ψ hnorm Outer Inner Right) hδ_nonneg
+    _ = (params.m * params.d : Error) / params.q := by
+          simp [δ]
 
 end MIPStarRE.LDT.Preliminaries
