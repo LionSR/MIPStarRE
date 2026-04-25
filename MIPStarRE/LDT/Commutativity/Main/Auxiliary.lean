@@ -136,8 +136,8 @@ lemma fullSlice_scalar_marginalize_x
 private lemma abs_sub_le_of_two_step
     {a b c e₁ e₂ : Error}
     (hab : |a - b| ≤ e₁) (hbc : |b - c| ≤ e₂) :
-    |a - c| ≤ e₁ + e₂ := by
-  exact (abs_sub_le a b c).trans (add_le_add hab hbc)
+    |a - c| ≤ e₁ + e₂ :=
+  (abs_sub_le a b c).trans (add_le_add hab hbc)
 
 /-- Residual for the still-unproved prefix of the y-side second-term chain.
 
@@ -176,8 +176,10 @@ private noncomputable def fullSliceScalarMarginalizeYPrefixResidual
 /-- Paper-faithful second-term transport bound.
 
 The first prefix (paper lines 332--360) costs `md/q + 3√ζ`; the proved y-tail
-(paper lines 369--385 and 396--406) costs `md/q + √ζ`.  Thus the whole scalar
-second-term comparison costs `2·md/q + 4√ζ`. -/
+uses y-Schwartz--Zippel marginalization (paper lines 369--385) plus the `√ζ`
+scalar↔tensor bridge that is the doubly-evaluated analogue of paper line 360,
+for a total `md/q + √ζ`. Thus the whole scalar second-term comparison costs
+`2·md/q + 4√ζ`. -/
 lemma fullSlice_scalar_marginalize_y
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
