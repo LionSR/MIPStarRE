@@ -91,35 +91,27 @@ lemma sdp
 
 /-- Reduced version of `lem:add-in-u`.
 
-This currently keeps only the global-variance consequence used downstream. The
-selection-dependent transfer inequality from the paper, together with its
-dependence on an auxiliary family `M` and the averaged family `H`, is not yet
-formalized here. -/
+This currently keeps only the global-variance consequence used downstream. It
+now derives that consequence from the single edgewise GlobalVariance estimate
+via `globalVarianceOfPointsFromLocalDeviation`. The selection-dependent
+transfer inequality from the paper, together with its dependence on an auxiliary
+family `M` and the averaged family `H`, is not yet formalized here. -/
 lemma addInU
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (_hgood : strategy.IsGood eps delta gamma)
     (T : Measurement (Polynomial params) ι)
     (hlocalDev :
       ∀ g : Polynomial params,
         localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
-          localVarianceOfPointsError params eps delta)
-    (hlocalVar :
-      ∀ g : Polynomial params,
-        pointConditionedLocalVarianceAtPolynomial params strategy T.toSubMeas g ≤
-          localVarianceOfPointsError params eps delta)
-    (hglobalDev :
-      ∀ g : Polynomial params,
-        globalVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
-          globalVarianceOfPointsError params eps delta) :
+          localVarianceOfPointsError params eps delta) :
     AddInUStatement params strategy T eps delta := by
   refine
     { varianceBound := ?_ }
   let hglobalVariance :=
-    globalVarianceOfPoints params strategy eps delta gamma hgood T.toSubMeas strategy.state
-      hlocalDev hlocalVar hglobalDev
+    globalVarianceOfPointsFromLocalDeviation params strategy eps delta T.toSubMeas hlocalDev
   simpa [selfImprovementVarianceError] using
     hglobalVariance.averagedGlobalVarianceBound
 
@@ -159,12 +151,11 @@ lemma selfImprovementHelper
       positiveSemidefiniteWitness := hsdp.dualPositive
       dualDominatesAveragedPoint := hsdp.dualFeasible }
   · simpa [T] using hsdp
-  · rcases hglobalVarianceProofInputs T with
-      ⟨hlocalDev, hlocalVar, hglobalDev⟩
-    -- These are the surfaced GlobalVariance analytic obligations. The wrapper
-    -- proofs consume them here until the Section 8 estimates are formalized
-    -- directly.
-    exact addInU params strategy eps delta gamma hgood T hlocalDev hlocalVar hglobalDev
+  · have hlocalDev := hglobalVarianceProofInputs T
+    -- This is the remaining surfaced GlobalVariance analytic obligation. The
+    -- algebraic local-to-global reduction is now formalized in
+    -- `globalVarianceOfPointsFromLocalDeviation`.
+    exact addInU params strategy eps delta gamma hgood T hlocalDev
 
 set_option maxHeartbeats 800000 in
 /-- `thm:self-improvement`.

@@ -287,20 +287,19 @@ structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
       (leftTensor (ι₂ := ι) Z)
       (selfImprovementError params eps delta)
 
-/-- The GlobalVariance pointwise estimates consumed by the reduced
-`selfImprovementHelper` wrapper. -/
+/-- The remaining GlobalVariance pointwise estimate consumed by the reduced
+`selfImprovementHelper` wrapper.
+
+The local-variance and independent-points global-variance consequences are now
+formalized algebraic reductions from this edgewise norm bound in
+`GlobalVariance.localVarianceOfPointsFromEdgeDeviation` and
+`GlobalVariance.globalVarianceOfPointsFromLocalDeviation`. -/
 abbrev GlobalVarianceProofInputs (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta : Error) : Prop :=
   ∀ T : Measurement (Polynomial params) ι,
-    (∀ g : Polynomial params,
+    ∀ g : Polynomial params,
       localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
-        localVarianceOfPointsError params eps delta) ∧
-    (∀ g : Polynomial params,
-      pointConditionedLocalVarianceAtPolynomial params strategy T.toSubMeas g ≤
-        localVarianceOfPointsError params eps delta) ∧
-    (∀ g : Polynomial params,
-      globalVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
-        globalVarianceOfPointsError params eps delta)
+        localVarianceOfPointsError params eps delta
 
 /-- The helper-stage strong self-consistency input still missing from the
 reduced wrapper chain. -/
