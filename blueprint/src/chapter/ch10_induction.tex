@@ -90,6 +90,10 @@
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
   \lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection}
+  % Lean-local gap: `ldPastingInInductionSection` wraps `Pasting.ldPasting`,
+  % whose closure still contains `sorryAx` via `ldPastingNCompleteness`
+  % (`Pasting/Bernoulli/Final.lean:247`). Same root cause as the ch09
+  % `thm:ld-pasting` tag; restore once that sorry is closed.
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
   \begin{enumerate}
@@ -282,6 +286,22 @@
 		\le (m+1)^2\left(\nu+e^{-k/(80000(m+1)^2)}\right),
 	\]
 	which is exactly the bound required for dimension $m+1$.
+\end{proof}
+
+\begin{proposition}[Public Lean wrapper for the successor-step assembly]\label{thm:main-induction-public-wrapper}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}
+	% `RestrictedProbabilitiesStatement.ofWeightedBounds` has no separate blueprint
+	% label yet, so `\uses{lem:restricted-probabilities}` is the closest available
+	% placeholder for the explicit restricted-probabilities package constructor.
+	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, thm:main-induction}
+	This Lean-only wrapper packages the five explicit successor-step ingredients used in the proof of Theorem~\ref{thm:main-induction}: the weighted slice bounds feeding the explicit restricted-probabilities package constructor underlying Lemma~\ref{lem:restricted-probabilities}, the extracted slice-restriction package, the per-slice recursive witnesses, the producer for the corresponding self-improvement package, and the recursion-to-pasting assembly. Under those hypotheses it returns a measurement $G \in \polymeas{m+1}{q}{d}$ satisfying the same consistency conclusion as Theorem~\ref{thm:main-induction}, but without exposing the intermediate bookkeeping packages at the public boundary.
+\end{proposition}
+\begin{proof}
+	% Same placeholder note as above: the proof packages the weighted bounds via
+	% `RestrictedProbabilitiesStatement.ofWeightedBounds`, which currently has no
+	% dedicated blueprint label of its own.
+	\uses{lem:restricted-probabilities}
+	This is a Lean-only assembly corollary. One first feeds the weighted slice bounds into the explicit restricted-probabilities package constructor underlying Lemma~\ref{lem:restricted-probabilities} in order to extract the restricted failure profile, packages the recursive slice witnesses, invokes the explicit self-improvement producer on that slice data, and then applies \lean{MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}, which already returns the displayed error parameter directly.
 \end{proof}
 
 \section{Proof of the main formal theorem}

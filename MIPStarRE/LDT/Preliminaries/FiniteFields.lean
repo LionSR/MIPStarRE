@@ -83,12 +83,14 @@ variable {F : Type*} [Field F] [Fintype F] [DecidableEq F] [Algebra (ZMod p) F]
 noncomputable abbrev ffChar : AddChar F ℂ :=
   (ZMod.stdAddChar (N := p)).compAddMonoidHom (Algebra.trace (ZMod p) F).toAddMonoidHom
 
+omit [Fintype F] [DecidableEq F] in
 @[simp] theorem ffChar_apply (x : F) :
     ffChar (p := p) (F := F) x =
       ZMod.stdAddChar (N := p) (ffTrace (p := p) (F := F) x) :=
   rfl
 
-private theorem ffTrace_nondegenerate (a : F) (ha : a ≠ 0) :
+omit [Fintype F] [DecidableEq F] in
+private theorem ffTrace_nondegenerate [Finite F] (a : F) (ha : a ≠ 0) :
     ∃ b : F, ffTrace (p := p) (F := F) (a * b) ≠ 0 := by
   haveI : CharP F p := (Algebra.charP_iff (ZMod p) F p).mp (ZMod.charP p)
   have hp : p = ringChar F := by
@@ -96,7 +98,8 @@ private theorem ffTrace_nondegenerate (a : F) (ha : a ≠ 0) :
   subst p
   simpa [ffTrace] using (FiniteField.trace_to_zmod_nondegenerate F (a := a) ha)
 
-private theorem ffChar_ne_zero : ffChar (p := p) (F := F) ≠ 0 := by
+omit [Fintype F] [DecidableEq F] in
+private theorem ffChar_ne_zero [Finite F] : ffChar (p := p) (F := F) ≠ 0 := by
   rw [AddChar.ne_zero_iff]
   obtain ⟨a, ha0⟩ :=
     ffTrace_nondegenerate (p := p) (F := F) (a := (1 : F)) one_ne_zero
@@ -107,11 +110,13 @@ private theorem ffChar_ne_zero : ffChar (p := p) (F := F) ≠ 0 := by
   intro h
   exact ha ((AddChar.IsPrimitive.zmod_char_eq_one_iff p (ZMod.isPrimitive_stdAddChar p) _).mp h)
 
-private theorem ff_char_is_primitive : (ffChar (p := p) (F := F)).IsPrimitive := by
+omit [Fintype F] [DecidableEq F] in
+private theorem ff_char_is_primitive [Finite F] : (ffChar (p := p) (F := F)).IsPrimitive := by
   apply AddChar.IsPrimitive.of_ne_one
   simpa using (ffChar_ne_zero (p := p) (F := F))
 
-private theorem ff_char_mulShift_ne_zero {a : F} (ha : a ≠ 0) :
+omit [Fintype F] [DecidableEq F] in
+private theorem ff_char_mulShift_ne_zero [Finite F] {a : F} (ha : a ≠ 0) :
     (ffChar (p := p) (F := F)).mulShift a ≠ 0 := by
   simpa using (ff_char_is_primitive (p := p) (F := F) ha)
 
@@ -156,11 +161,13 @@ noncomputable def ffVecChar (v : Fin m → F) : AddChar (Fin m → F) ℂ :=
         intro u w
         simp [ffDotProduct, add_mul, Finset.sum_add_distrib] }
 
+omit [Fintype F] [DecidableEq F] in
 @[simp] theorem ffVecChar_apply (u v : Fin m → F) :
     ffVecChar (p := p) (F := F) v u =
       ffChar (p := p) (F := F) (ffDotProduct u v) :=
   rfl
 
+omit [Fintype F] [DecidableEq F] in
 private theorem ff_dotProduct_single (i : Fin m) (a : F) (v : Fin m → F) :
     ffDotProduct (Pi.single i a) v = a * v i := by
   unfold ffDotProduct
@@ -171,16 +178,19 @@ private theorem ff_dotProduct_single (i : Fin m) (a : F) (v : Fin m → F) :
   · intro hi
     exact (hi (by simp)).elim
 
+omit [Fintype F] [DecidableEq F] in
 private theorem exists_nonzero_coordinate {v : Fin m → F} (hv : v ≠ 0) :
     ∃ i, v i ≠ 0 := by
   simpa [funext_iff] using hv
 
+omit [Fintype F] [DecidableEq F] in
 @[simp] private theorem ffVecChar_zero :
     ffVecChar (p := p) (F := F) (0 : Fin m → F) = 0 := by
   ext u
   simp [ffVecChar, ffDotProduct]
 
-private theorem ffVecChar_ne_zero {v : Fin m → F} (hv : v ≠ 0) :
+omit [Fintype F] [DecidableEq F] in
+private theorem ffVecChar_ne_zero [Finite F] {v : Fin m → F} (hv : v ≠ 0) :
     ffVecChar (p := p) (F := F) v ≠ 0 := by
   rw [AddChar.ne_zero_iff]
   rcases exists_nonzero_coordinate (F := F) hv with ⟨i, hi⟩

@@ -2,6 +2,9 @@ import MIPStarRE.LDT.Basic.Parameters
 import MIPStarRE.LDT.CommutativityPoints.Defs
 import MIPStarRE.LDT.Preliminaries.Theorems
 
+set_option linter.style.setOption false
+set_option linter.unnecessarySimpa false
+
 /-!
 # Section 10 — commutativity points approximation layer
 

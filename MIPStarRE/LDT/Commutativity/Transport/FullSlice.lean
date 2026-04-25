@@ -332,6 +332,81 @@ noncomputable def evaluatedSliceABABAvg
       ∑ ab : EvaluatedSliceOutcome params,
         evaluatedSliceABABTerm params strategy family q ab)
 
+/-- Full-slice `BAB ⊗ A` tensor average
+(paper `eq:gcom4` RHS, `commutativity-G.tex` line 334):
+`E_{x,y} ∑_{g,h} ⟨ψ| G^y_h G^x_g G^y_h ⊗ G^x_g |ψ⟩`.
+
+This is the manifestly-PSD tensor-form partner of `fullSliceABAAvg` used by the
+marginalization step: each summand factors as `V† V` with
+`V = (G^x_g G^y_h) ⊗ √(G^x_g)`, so the outer absolute value drops and the
+Schwartz–Zippel collision bound applies per outcome. Private per architecture
+decision #713 (scalar public API, tensor-form machinery internal). -/
+private noncomputable def fullSliceBABAtensorAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (FullSliceQuestion params))
+    (fun xy =>
+      ∑ gh : FullSliceOutcome params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((family.meas xy.2).toSubMeas.outcome gh.2 *
+                (family.meas xy.1).toSubMeas.outcome gh.1 *
+                (family.meas xy.2).toSubMeas.outcome gh.2) *
+            rightTensor (ι₁ := ι)
+              ((family.meas xy.1).toSubMeas.outcome gh.1)))
+
+/-- Evaluated-slice `BAB ⊗ A` tensor average
+(evaluated-side analogue of `fullSliceBABAtensorAvg`):
+`E_{u,v,x,y} ∑_{a,b} ⟨ψ|
+   G^y_[h(v)=b] G^x_[g(u)=a] G^y_[h(v)=b] ⊗ G^x_[g(u)=a] |ψ⟩`.
+
+Evaluated-side partner used by `evaluatedSliceABA_scalar_to_tensor` and the
+tensor-form Schwartz–Zippel marginalization. Private per #713. -/
+private noncomputable def evaluatedSliceBABAtensorAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+    (fun q =>
+      ∑ ab : EvaluatedSliceOutcome params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((evaluatedSliceSecondFactor params family q).outcome ab.2 *
+                (evaluatedSliceFirstFactor params family q).outcome ab.1 *
+                (evaluatedSliceSecondFactor params family q).outcome ab.2) *
+            rightTensor (ι₁ := ι)
+              ((evaluatedSliceFirstFactor params family q).outcome ab.1)))
+
+/-- Full-slice `ABA ⊗ B` tensor average (y-side analogue):
+`E_{x,y} ∑_{g,h} ⟨ψ| G^x_g G^y_h G^x_g ⊗ G^y_h |ψ⟩`.
+
+Naming convention (consistent with the sibling `fullSliceBABAtensorAvg` for
+`BAB ⊗ A`): the four-letter operator string `ABAB` decomposes as left register
+`ABA` followed by right register `B`. This is *not* the same operator as the
+scalar `fullSliceABABAvg`, whose left register is the full quartic
+`G^x_g G^y_h G^x_g G^y_h`; the `tensorAvg` suffix marks the tensor split.
+
+The manifestly-PSD tensor-form partner of `fullSliceABABAvg` reached from it by
+`closenessOfIP` (moving the trailing `G^y_h` factor from the left register to
+the right). Each summand factors as `V† V` with
+`V = (G^y_h G^x_g) ⊗ √(G^y_h)`. Private per #713.
+
+The evaluated-side analogue is `evaluatedSliceSandwichedRightAvg` in
+`MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean`, which predates this PR and is
+already used by the linear/sandwiched right-register transport bridge. -/
+private noncomputable def fullSliceABABtensorAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (FullSliceQuestion params))
+    (fun xy =>
+      ∑ gh : FullSliceOutcome params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((family.meas xy.1).toSubMeas.outcome gh.1 *
+                (family.meas xy.2).toSubMeas.outcome gh.2 *
+                (family.meas xy.1).toSubMeas.outcome gh.1) *
+            rightTensor (ι₁ := ι)
+              ((family.meas xy.2).toSubMeas.outcome gh.2)))
+
 /-- Paper `lem:normalization-condition` (`commutativity-G.tex` line 309).
 
 For a sub-measurement `P` and projective sub-measurement `Q`, the sandwiched

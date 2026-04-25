@@ -1,5 +1,8 @@
 import MIPStarRE.LDT.Pasting.CommutingWithG
 
+set_option linter.style.setOption false
+set_option linter.unusedSimpArgs false
+
 /-!
 # Section 12 pasting: G-hat facts
 
@@ -15,8 +18,24 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-set_option maxHeartbeats 2000000 in
--- Large Finset.sum_option + simp unfolding across four quadrants.
+/-- A sum over `Option α × Option β` of a four-way match pattern decomposes into
+the four quadrant contributions. This isolates the `Option × Option` combinatorics
+from the algebraic content of callers like `qSDDCore_option_pair_decompose`. -/
+private lemma sum_option_pair_match
+    {α β M : Type*} [Fintype α] [Fintype β] [AddCommMonoid M]
+    (fss : α × β → M) (fsn : α → M) (fns : β → M) (fnn : M) :
+    (∑ ab : Option α × Option β,
+        (match ab.1, ab.2 with
+          | some a, some b => fss (a, b)
+          | some a, none => fsn a
+          | none, some b => fns b
+          | none, none => fnn)) =
+      (∑ p : α × β, fss p) + (∑ a : α, fsn a) + (∑ b : β, fns b) + fnn := by
+  rw [Fintype.sum_prod_type, Fintype.sum_option]
+  simp_rw [Fintype.sum_option]
+  rw [Finset.sum_add_distrib, ← Fintype.sum_prod_type']
+  abel
+
 /-- Split the `Option × Option` squared-distance defect into its four quadrants. -/
 private lemma qSDDCore_option_pair_decompose
     {α β : Type*} [Fintype α] [Fintype β]
@@ -42,22 +61,52 @@ private lemma qSDDCore_option_pair_decompose
         qSDDCore ψ Lsn Rsn +
         qSDDCore ψ Lns Rns +
         qSDDCore ψ Lnn Rnn := by
+  -- Rewrite each summand so the match on `(ab.1, ab.2)` sits at the outermost
+  -- position. This lets us discharge the combinatorics via `sum_option_pair_match`
+  -- without re-expanding the algebraic payload four times.
+  have hsummand :
+      ∀ ab : Option α × Option β,
+        ev ψ
+            (((match ab.1, ab.2 with
+                | some a, some b => Lss (a, b)
+                | some a, none => Lsn a
+                | none, some b => Lns b
+                | none, none => Lnn ()) -
+              (match ab.1, ab.2 with
+                | some a, some b => Rss (a, b)
+                | some a, none => Rsn a
+                | none, some b => Rns b
+                | none, none => Rnn ()))ᴴ *
+            ((match ab.1, ab.2 with
+                | some a, some b => Lss (a, b)
+                | some a, none => Lsn a
+                | none, some b => Lns b
+                | none, none => Lnn ()) -
+              (match ab.1, ab.2 with
+                | some a, some b => Rss (a, b)
+                | some a, none => Rsn a
+                | none, some b => Rns b
+                | none, none => Rnn ()))) =
+          (match ab.1, ab.2 with
+            | some a, some b =>
+                ev ψ ((Lss (a, b) - Rss (a, b))ᴴ * (Lss (a, b) - Rss (a, b)))
+            | some a, none =>
+                ev ψ ((Lsn a - Rsn a)ᴴ * (Lsn a - Rsn a))
+            | none, some b =>
+                ev ψ ((Lns b - Rns b)ᴴ * (Lns b - Rns b))
+            | none, none =>
+                ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ()))) := by
+    rintro ⟨a, b⟩
+    cases a <;> cases b <;> rfl
   unfold qSDDCore
-  rw [Fintype.sum_prod_type, Fintype.sum_option]
-  simp_rw [Fintype.sum_option]
-  rw [Finset.sum_add_distrib]
-  let SS : α × β → Error := fun a =>
-    ev ψ ((Lss a - Rss a)ᴴ * (Lss a - Rss a))
-  have hss :
-      (∑ x, ∑ x_1, ev ψ ((Lss (x, x_1) - Rss (x, x_1))ᴴ * (Lss (x, x_1) - Rss (x, x_1)))) =
-        ∑ a : α × β, SS a := by
-    symm
-    simpa [SS] using
-      (Fintype.sum_prod_type'
-        (f := fun x x_1 =>
-          ev ψ ((Lss (x, x_1) - Rss (x, x_1))ᴴ * (Lss (x, x_1) - Rss (x, x_1)))))
-  rw [hss]
-  simp [SS, add_assoc, add_left_comm, add_comm]
+  simp_rw [hsummand]
+  rw [sum_option_pair_match
+        (fss := fun p => ev ψ ((Lss p - Rss p)ᴴ * (Lss p - Rss p)))
+        (fsn := fun a => ev ψ ((Lsn a - Rsn a)ᴴ * (Lsn a - Rsn a)))
+        (fns := fun b => ev ψ ((Lns b - Rns b)ᴴ * (Lns b - Rns b)))
+        (fnn := ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ())))]
+  rw [show (∑ u : Unit, ev ψ ((Lnn u - Rnn u)ᴴ * (Lnn u - Rnn u))) =
+        ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ())) from Fintype.sum_unique _]
 
 /-- `cor:G-hat-facts`. -/
 theorem gHatFacts

@@ -1831,15 +1831,12 @@ lemma ev_opTensor_total_averageIdxSubMeas_left
       avgOver 𝒟 (fun q => ev ψ (opTensor (A q).total B.total)) := by
   classical
   unfold avgOver averageIdxSubMeas
-  rw [opTensor_sum_left]
+  change ev ψ (opTensor (averageOperatorOverDistribution 𝒟 (fun q => (A q).total)) B.total) = _
+  rw [opTensor_averageOperatorOverDistribution_left]
+  unfold averageOperatorOverDistribution
   rw [ev_finset_sum]
   refine Finset.sum_congr rfl ?_
   intro q _
-  have hsmul :
-      opTensor (𝒟.weight q • (A q).total) B.total =
-        (𝒟.weight q : ℂ) • opTensor (A q).total B.total :=
-    opTensor_smul_left (c := 𝒟.weight q) (A := (A q).total) (B := B.total)
-  rw [hsmul]
   simpa using ev_scale ψ (𝒟.weight q) (opTensor (A q).total B.total)
 
 lemma qBipartiteConsDefect_averageIdxSubMeas_left_le

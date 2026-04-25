@@ -135,13 +135,13 @@ lemma evaluateAt_completeAtOutcome
           ∑ h ∈ Finset.univ.filter (fun g : Polynomial params => g u = b),
             (completeAtOutcome H h0).toSubMeas.outcome h := by
       ext i j
-      simp [evaluateAt, postprocess]
+      simp only [evaluateAt, postprocess]
       convert rfl
     have hEval :
         (evaluateAt params u H).outcome b =
           ∑ h ∈ Finset.univ.filter (fun g : Polynomial params => g u = b), H.outcome h := by
       ext i j
-      simp [evaluateAt, postprocess]
+      simp only [evaluateAt, postprocess]
       convert rfl
     calc
       L.outcome b = ∑ h ∈ S, if hh : h = h0 then H.outcome h + R else H.outcome h := by

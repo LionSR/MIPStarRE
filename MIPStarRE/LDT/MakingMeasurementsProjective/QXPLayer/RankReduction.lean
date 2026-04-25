@@ -1,5 +1,10 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.TruncationCombinatorics
+import MIPStarRE.Quantum.ProjectorONB
 import Mathlib.Analysis.Matrix.Spectrum
+
+set_option linter.style.setOption false
+set_option linter.unusedDecidableInType false
 
 /-!
 # Section 5 — Q/X/XHat/P rank reduction
@@ -177,6 +182,11 @@ lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
   dsimp [spectralTruncationError]
   exact Real.rpow_nonneg hζ _
 
+/-- The spectral truncation error is `√ζ`. -/
+lemma spectralTruncationError_eq_sqrt (ζ : Error) :
+    spectralTruncationError ζ = Real.sqrt ζ := by
+  simp [spectralTruncationError, Real.sqrt_eq_rpow]
+
 /-- **Rounding to projectors** (`lem:projective-non-measurement`).
 
 This declaration now records the honest paper-facing statement consumed by the
@@ -196,40 +206,6 @@ abbrev projectiveNonMeasurement {Outcome : Type uOutcome}
   ∃ R : OpFamily Outcome ι,
     RoundingToProjectorsWitness ψ A ζ R
 
-/-- For a Hermitian idempotent matrix, every eigenvalue is either `0` or `1`. -/
-lemma projector_eigenvalues_zero_or_one {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (P : MIPStarRE.Quantum.Op ι) (hP : MIPStarRE.Quantum.IsProj P) (i : ι) :
-    hP.isHermitian.eigenvalues i = 0 ∨ hP.isHermitian.eigenvalues i = 1 := by
-  let v : ι → ℂ := (hP.isHermitian.eigenvectorBasis i).ofLp
-  have hv_ne : v ≠ 0 := by
-    change (hP.isHermitian.eigenvectorBasis i).ofLp ≠ 0
-    simpa using hP.isHermitian.eigenvectorBasis.orthonormal.ne_zero i
-  have hmul1 : P *ᵥ v = hP.isHermitian.eigenvalues i • v := by
-    simpa [v] using hP.isHermitian.mulVec_eigenvectorBasis i
-  have hmul2 : P *ᵥ (P *ᵥ v) = P *ᵥ v := by
-    simp [v, hP.idempotent]
-  have hscalar : hP.isHermitian.eigenvalues i * hP.isHermitian.eigenvalues i =
-      hP.isHermitian.eigenvalues i := by
-    have htmp : (hP.isHermitian.eigenvalues i * hP.isHermitian.eigenvalues i) • v =
-        hP.isHermitian.eigenvalues i • v := by
-      calc
-        (hP.isHermitian.eigenvalues i * hP.isHermitian.eigenvalues i) • v
-            = hP.isHermitian.eigenvalues i •
-                (hP.isHermitian.eigenvalues i • v) := by simp [mul_smul]
-        _ = hP.isHermitian.eigenvalues i • (P *ᵥ v) := by rw [hmul1]
-        _ = P *ᵥ (hP.isHermitian.eigenvalues i • v) := by
-              rw [Matrix.mulVec_smul]
-        _ = P *ᵥ (P *ᵥ v) := by rw [hmul1]
-        _ = P *ᵥ v := hmul2
-        _ = hP.isHermitian.eigenvalues i • v := hmul1
-    exact (smul_left_injective ℝ hv_ne) htmp
-  have hfactor : hP.isHermitian.eigenvalues i * (hP.isHermitian.eigenvalues i - 1) = 0 := by
-    nlinarith [hscalar]
-  rcases mul_eq_zero.mp hfactor with hzero | hone
-  · exact Or.inl hzero
-  · right
-    linarith
-
 /-- The trace of a finite-dimensional orthogonal projector equals its rank. -/
 lemma trace_eq_rank_of_isProj {ι : Type*} [Fintype ι]
     (P : MIPStarRE.Quantum.Op ι) (hP : MIPStarRE.Quantum.IsProj P) :
@@ -244,7 +220,7 @@ lemma trace_eq_rank_of_isProj {ι : Type*} [Fintype ι]
     exact_mod_cast hp_nat
   have h_indicator : ∀ i, (indicator i : ℂ) = (hP.isHermitian.eigenvalues i : ℂ) := by
     intro i
-    rcases projector_eigenvalues_zero_or_one P hP i with hzero | hone
+    rcases MIPStarRE.Quantum.IsProj.eigenvalues_zero_or_one P hP i with hzero | hone
     · simp [p, indicator, hzero]
     · simp [p, indicator, hone]
   calc
@@ -279,6 +255,31 @@ lemma sum_rank_le_card_of_projectors_le_one {Outcome : Type*} [Fintype Outcome]
   have hreal_bound : ((∑ a, (R a).rank : ℕ) : ℝ) ≤ Fintype.card ι := by
     simpa [htrace_rank] using hreal_bound'
   exact_mod_cast hreal_bound
+
+/-- If a family of projectors sums to at most `c • I`, then the sum of their
+ranks is at most `c` times the ambient dimension. -/
+lemma sum_rank_le_scalar_mul_card_of_projectors_le {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (R : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a, MIPStarRE.Quantum.IsProj (R a))
+    (c : Error)
+    (htotal_le : (∑ a, R a) ≤ ((c : ℂ) • (1 : MIPStarRE.Quantum.Op ι))) :
+    ((∑ a, (R a).rank : ℕ) : Error) ≤ c * Fintype.card ι := by
+  have hpsd : (((c : ℂ) • (1 : MIPStarRE.Quantum.Op ι)) - ∑ a, R a).PosSemidef :=
+    (Matrix.le_iff).mp htotal_le
+  have htrace_nonneg : (0 : ℂ) ≤ (((c : ℂ) • (1 : MIPStarRE.Quantum.Op ι)) -
+      ∑ a, R a).trace := hpsd.trace_nonneg
+  have hreal_nonneg : 0 ≤ Complex.re ((((c : ℂ) • (1 : MIPStarRE.Quantum.Op ι)) -
+      ∑ a, R a).trace) := (Complex.nonneg_iff.mp htrace_nonneg).1
+  have htrace_rank : (∑ a, Complex.re (Matrix.trace (R a))) = ∑ a, ((R a).rank : ℝ) := by
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    rw [trace_eq_rank_of_isProj (R a) (hproj a)]
+    simp
+  have hreal_bound' : ∑ a, Complex.re (Matrix.trace (R a)) ≤ c * Fintype.card ι := by
+    simpa [Matrix.trace_sub, Matrix.trace_one, Matrix.trace_sum, Matrix.trace_smul,
+      Complex.ofReal_mul] using hreal_nonneg
+  simpa [htrace_rank] using hreal_bound'
 
 namespace FiniteHilbertSpace
 
@@ -391,6 +392,45 @@ lemma sigmaFinCard_le_of_projectors {Outcome : Type*} [Fintype Outcome]
   simp only [Fintype.card_fin]
   exact sum_rank_le_card_of_projectors_le_one R hproj htotal_le_one
 
+/-- The lifted finite-enumeration model of `Σ a, Fin (m a)` has cardinality
+bounded by the ambient dimension whenever the total multiplicity is bounded. -/
+lemma sigmaFinCard_le_of_sum_le {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι]
+    (m : Outcome → ℕ)
+    (hm : ∑ a, m a ≤ Fintype.card ι) :
+    Fintype.card (FiniteHilbertSpace.sigmaFinCarrier m) ≤ Fintype.card ι := by
+  rw [← Fintype.card_congr (sigmaFinCarrierEquiv (m := m))]
+  rw [Fintype.card_sigma]
+  simp only [Fintype.card_fin]
+  exact hm
+
+/-- Concrete auxiliary-space producer from a direct total-rank bound. -/
+lemma projectiveLowRankSum_auxData_of_rank_bound {Outcome : Type uOutcome}
+    [Fintype Outcome] [Nonempty Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (m : Outcome → ℕ)
+    (hm : ∑ a, m a ≤ Fintype.card ι) :
+    ∃ auxSpace : FiniteHilbertSpace.{uι}, ∃ t : ProjMeas Outcome auxSpace.carrier,
+      t.total = 1 ∧ Fintype.card auxSpace.carrier ≤ Fintype.card ι := by
+  classical
+  by_cases hsigma : Nonempty (FiniteHilbertSpace.sigmaFinCarrier m)
+  · letI := hsigma
+    let auxSpace : FiniteHilbertSpace.{uι} := FiniteHilbertSpace.sigmaFin m
+    refine ⟨auxSpace, sigmaFinProjMeas m, ?_⟩
+    refine ⟨rfl, ?_⟩
+    simpa [auxSpace, FiniteHilbertSpace.sigmaFin, Fintype.card_ulift] using
+      sigmaFinCard_le_of_sum_le (ι := ι) m hm
+  · let a0 : Outcome := Classical.choice (inferInstance : Nonempty Outcome)
+    let auxSpace : FiniteHilbertSpace.{uι} :=
+      { carrier := ULift.{uι} Unit
+        instFintype := inferInstance
+        instDecidableEq := inferInstance
+        instNonempty := inferInstance }
+    refine ⟨auxSpace, pointProjMeas a0, ?_⟩
+    refine ⟨rfl, ?_⟩
+    have hcard_pos : 0 < Fintype.card ι := Fintype.card_pos_iff.mpr inferInstance
+    simpa [auxSpace] using Nat.succ_le_of_lt hcard_pos
+
 /-- Concrete auxiliary-space producer for the exact-projector case.
 
 When the honest sigma-carrier `Σ a, Fin (rank R_a)` is nonempty, we use its
@@ -407,23 +447,8 @@ lemma projectiveLowRankSum_auxData_of_projectors {Outcome : Type uOutcome}
       t.total = 1 ∧ Fintype.card auxSpace.carrier ≤ Fintype.card ι := by
   classical
   let m : Outcome → ℕ := fun a => (R a).rank
-  by_cases hsigma : Nonempty (FiniteHilbertSpace.sigmaFinCarrier m)
-  · letI := hsigma
-    let auxSpace : FiniteHilbertSpace.{uι} := FiniteHilbertSpace.sigmaFin m
-    refine ⟨auxSpace, sigmaFinProjMeas m, ?_⟩
-    refine ⟨rfl, ?_⟩
-    simpa [auxSpace, FiniteHilbertSpace.sigmaFin, m, Fintype.card_ulift] using
-      sigmaFinCard_le_of_projectors (R := R) hproj htotal_le_one
-  · let a0 : Outcome := Classical.choice (inferInstance : Nonempty Outcome)
-    let auxSpace : FiniteHilbertSpace.{uι} :=
-      { carrier := ULift.{uι} Unit
-        instFintype := inferInstance
-        instDecidableEq := inferInstance
-        instNonempty := inferInstance }
-    refine ⟨auxSpace, pointProjMeas a0, ?_⟩
-    refine ⟨rfl, ?_⟩
-    have hcard_pos : 0 < Fintype.card ι := Fintype.card_pos_iff.mpr inferInstance
-    simpa [auxSpace] using Nat.succ_le_of_lt hcard_pos
+  exact projectiveLowRankSum_auxData_of_rank_bound (m := m)
+    (by simpa [m] using sum_rank_le_card_of_projectors_le_one R hproj htotal_le_one)
 
 /-- Concrete rank-reduction producer once the rounded family is already an exact
 projector submeasurement `∑_a R_a ≤ I`. -/
@@ -469,6 +494,281 @@ lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
       _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
           (1 : MIPStarRE.Quantum.Op ι) := hR.total_le
 
+/-- Concrete rank-reduction producer once the rounded projectors already have
+total rank at most the ambient dimension. This is the `r ≤ d` branch of the
+paper's rank-reduction proof, and is also the final packaging step after the
+`r > d` truncation branch constructs its lower-rank family. -/
+lemma projectiveLowRankSum_of_rank_bound {Outcome : Type uOutcome}
+    {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    [Fintype Outcome] [Nonempty Outcome]
+    (ψ : QuantumState ι)
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hζ : 0 ≤ ζ)
+    (R : OpFamily Outcome ι)
+    (hR : RoundingToProjectorsWitness ψ A ζ R)
+    (hrank : ∑ a, (R.outcome a).rank ≤ Fintype.card ι)
+    (source_almost_projective :
+      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
+    ∃ data : QLayerData Outcome ι,
+      RankReductionWitness ψ A ζ data := by
+  obtain ⟨auxSpace, t, _, hAuxDim⟩ :=
+    projectiveLowRankSum_auxData_of_rank_bound
+      (m := fun a : Outcome => (R.outcome a).rank) hrank
+  let data : QLayerData Outcome ι :=
+    { auxSpace := auxSpace
+      q := R
+      t := t }
+  refine ⟨data, ?_⟩
+  refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, hAuxDim⟩
+  · intro a
+    exact hR.projective a
+  · intro a
+    have hproj := hR.projective a
+    simpa [hproj.isHermitian.eq, hproj.idempotent] using
+      (Matrix.posSemidef_conjTranspose_mul_self (R.outcome a)).nonneg
+  · simpa [Qa, QTotal, data] using hR.sum_eq_total
+  · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
+      (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily R)
+      (2 * spectralTruncationError ζ) (roundingToProjectiveError ζ)
+      hR.closeness
+      (by
+        have hε_nonneg : 0 ≤ spectralTruncationError ζ := spectralTruncationError_nonneg hζ
+        dsimp [roundingToProjectiveError]
+        exact mul_le_mul_of_nonneg_right (by norm_num : (2 : Error) ≤ 12) hε_nonneg)
+  · calc
+      QTotal data = R.total := rfl
+      _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
+          (1 : MIPStarRE.Quantum.Op ι) := hR.total_le
+
+set_option maxHeartbeats 1000000 in
+-- The dependent sigma-indexed truncation proof combines several large finite-sum rewrites.
+/-- Construct the rank-reduced projector family in the `r > d` truncation
+branch, starting from the rounded projectors `R_a`. -/
+lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
+    {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    [Fintype Outcome] [Nonempty Outcome]
+    (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hζ : 0 ≤ ζ) (hζ_le : ζ ≤ 1 / 4)
+    (R : OpFamily Outcome ι)
+    (hR : RoundingToProjectorsWitness ψ A ζ R)
+    (source_almost_projective :
+      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
+    ∃ data : QLayerData Outcome ι,
+      RankReductionWitness ψ A ζ data := by
+  classical
+  let d : ℕ := Fintype.card ι
+  let Idx : Type uOutcome := Σ a : Outcome, Fin (R.outcome a).rank
+  letI : Fintype Idx := inferInstance
+  letI : DecidableEq Idx := Classical.decEq Idx
+  by_cases hr : Fintype.card Idx ≤ d
+  · have hrank : ∑ a, (R.outcome a).rank ≤ Fintype.card ι := by
+      simpa [Idx, d, Fintype.card_sigma] using hr
+    exact projectiveLowRankSum_of_rank_bound ψ A ζ hζ R hR hrank source_almost_projective
+  · have hcard_gt : d < Fintype.card Idx := Nat.lt_of_not_ge hr
+    let onb : (a : Outcome) →
+        MIPStarRE.Quantum.ProjectorRangeONB (R.outcome a) (hR.projective a) :=
+      fun a => MIPStarRE.Quantum.IsProj.rangeONB (R.outcome a) (hR.projective a)
+    let rankOne : Idx → MIPStarRE.Quantum.Op ι := fun x => (onb x.1).rankOne x.2
+    let overlap : Idx → Error := fun x => ev ψ (rankOne x)
+    have hd_le : d ≤ Fintype.card Idx := le_of_lt hcard_gt
+    obtain ⟨Large, hLarge_card, hLarge_order⟩ :=
+      Truncation.exists_large_subset_ordered (α := Idx) overlap hd_le
+    let fiber : (a : Outcome) → Finset (Fin (R.outcome a).rank) := fun a =>
+      (Finset.univ : Finset (Fin (R.outcome a).rank)).filter
+        (fun i => (⟨a, i⟩ : Idx) ∈ Large)
+    let Q : OpFamily Outcome ι :=
+      { outcome := fun a => (onb a).subprojector (fiber a)
+        total := ∑ a, (onb a).subprojector (fiber a) }
+    have hRsum_le : (∑ a, R.outcome a) ≤
+        (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
+          (1 : MIPStarRE.Quantum.Op ι) := by
+      simpa [hR.sum_eq_total] using hR.total_le
+    have hspectral_sqrt : spectralTruncationError ζ = Real.sqrt ζ :=
+      spectralTruncationError_eq_sqrt ζ
+    have hr_bound : (Fintype.card Idx : Error) ≤ (1 + 2 * Real.sqrt ζ) * d := by
+      have hcard_idx : Fintype.card Idx = ∑ a, (R.outcome a).rank := by
+        simp [Idx, Fintype.card_sigma]
+      have hRsum_le_for_rank : (∑ a, R.outcome a) ≤
+          ((((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) •
+            (1 : MIPStarRE.Quantum.Op ι)) := by
+        simpa using hRsum_le
+      have hrank_bound :=
+        sum_rank_le_scalar_mul_card_of_projectors_le (R := R.outcome)
+          (hproj := hR.projective)
+          (c := 1 + 2 * spectralTruncationError ζ) hRsum_le_for_rank
+      rw [show (Fintype.card Idx : Error) = ((∑ a, (R.outcome a).rank : ℕ) : Error) by
+        exact_mod_cast hcard_idx]
+      simpa [d, hspectral_sqrt] using hrank_bound
+    have hLarge_sigma :
+        Large = (Finset.univ : Finset Outcome).sigma (fun a => fiber a) := by
+      ext x
+      rcases x with ⟨a, i⟩
+      constructor
+      · intro h
+        exact Finset.mem_sigma.mpr ⟨Finset.mem_univ a, by simp [fiber, h]⟩
+      · intro h
+        rcases Finset.mem_sigma.mp h with ⟨_, hi⟩
+        simpa [fiber] using hi
+    have hLarge_card_sum : Large.card = ∑ a, (fiber a).card := by
+      rw [hLarge_sigma]
+      change (Multiset.card (Multiset.sigma Finset.univ.val fun a => (fiber a).val)) =
+        ∑ a, (fiber a).card
+      rw [Multiset.card_sigma]
+      rfl
+    have hrankQ : ∑ a, (Q.outcome a).rank ≤ Fintype.card ι := by
+      have hsum_rank : ∑ a, (Q.outcome a).rank = ∑ a, (fiber a).card := by
+        refine Finset.sum_congr rfl ?_
+        intro a _
+        simp [Q, MIPStarRE.Quantum.ProjectorRangeONB.subprojector_rank]
+      calc
+        ∑ a, (Q.outcome a).rank = ∑ a, (fiber a).card := hsum_rank
+        _ = Large.card := hLarge_card_sum.symm
+        _ = Fintype.card ι := by simpa [d] using hLarge_card
+        _ ≤ Fintype.card ι := le_rfl
+    have htotal_overlap : (∑ x : Idx, overlap x) ≤ 1 + 2 * Real.sqrt ζ := by
+      have hoverlap_eq_ev_sum : (∑ x : Idx, overlap x) = ev ψ (∑ a, R.outcome a) := by
+        calc
+          ∑ x : Idx, overlap x = ∑ a : Outcome, ∑ i : Fin (R.outcome a).rank,
+              ev ψ ((onb a).rankOne i) := by
+                simp [Idx, overlap, rankOne, Fintype.sum_sigma]
+          _ = ∑ a : Outcome, ev ψ (R.outcome a) := by
+                refine Finset.sum_congr rfl ?_
+                intro a _
+                rw [← ev_sum ψ (fun i : Fin (R.outcome a).rank => (onb a).rankOne i)]
+                simpa [MIPStarRE.Quantum.ProjectorRangeONB.rankOne] using
+                  congrArg (ev ψ) (onb a).decomposition.symm
+          _ = ev ψ (∑ a, R.outcome a) := by
+                rw [ev_sum]
+      have hev_le : ev ψ (∑ a, R.outcome a) ≤
+          ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
+            (1 : MIPStarRE.Quantum.Op ι)) := ev_mono ψ _ _ hRsum_le
+      calc
+        ∑ x : Idx, overlap x = ev ψ (∑ a, R.outcome a) := hoverlap_eq_ev_sum
+        _ ≤ ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
+            (1 : MIPStarRE.Quantum.Op ι)) := hev_le
+        _ = 1 + 2 * Real.sqrt ζ := by
+              have hscalar : ((((1 : Error) : ℂ) + (2 : ℂ) *
+                    ((spectralTruncationError ζ : Error) : ℂ))) =
+                  (((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) := by
+                norm_num
+              have hsmul : ((((1 : Error) : ℂ) + (2 : ℂ) *
+                    ((spectralTruncationError ζ : Error) : ℂ)) •
+                    (1 : MIPStarRE.Quantum.Op ι)) =
+                  ((((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) •
+                    (1 : MIPStarRE.Quantum.Op ι)) := by
+                rw [hscalar]
+              calc
+                ev ψ ((((1 : Error) : ℂ) + (2 : ℂ) *
+                    ((spectralTruncationError ζ : Error) : ℂ)) •
+                    (1 : MIPStarRE.Quantum.Op ι))
+                    = ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) •
+                        (1 : MIPStarRE.Quantum.Op ι)) := by rw [hsmul]
+                _ = (1 + 2 * spectralTruncationError ζ) *
+                    ev ψ (1 : MIPStarRE.Quantum.Op ι) :=
+                      ev_scale ψ (1 + 2 * spectralTruncationError ζ)
+                        (1 : MIPStarRE.Quantum.Op ι)
+                _ = 1 + 2 * Real.sqrt ζ := by
+                      rw [ev_one_of_isNormalized ψ hψ, hspectral_sqrt]
+                      ring
+    have hsmall : (∑ x ∈ (Largeᶜ : Finset Idx), overlap x) ≤ 4 * Real.sqrt ζ :=
+      Truncation.sum_small_le_four_sqrt (α := Idx) Large
+        (hL_card := hLarge_card) (hcard_gt := hcard_gt) (hr_bound := hr_bound)
+        (hf_ordering := hLarge_order) (htotal := htotal_overlap)
+        (hζ_nonneg := hζ) (hζ_le := hζ_le)
+    have hLarge_compl_sigma :
+        (Largeᶜ : Finset Idx) = (Finset.univ : Finset Outcome).sigma
+          (fun a => (fiber a)ᶜ) := by
+      ext x
+      rcases x with ⟨a, i⟩
+      constructor
+      · intro h
+        exact Finset.mem_sigma.mpr ⟨Finset.mem_univ a, by simpa [fiber] using h⟩
+      · intro h
+        rcases Finset.mem_sigma.mp h with ⟨_, hi⟩
+        simpa [fiber] using hi
+    have hqSDD_RQ : qSDDOp ψ R Q = ∑ x ∈ (Largeᶜ : Finset Idx), overlap x := by
+      unfold qSDDOp qSDDCore
+      calc
+        ∑ a : Outcome,
+            ev ψ (((R.outcome a - Q.outcome a)ᴴ) * (R.outcome a - Q.outcome a))
+            = ∑ a : Outcome,
+                ev ψ ((onb a).subprojector
+                  ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank))) := by
+                refine Finset.sum_congr rfl ?_
+                intro a _
+                have hdiff := (onb a).subprojector_diff_eq_compl (fiber a)
+                have hproj := (onb a).subprojector_isProj
+                  ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank))
+                rw [show R.outcome a - Q.outcome a =
+                    (onb a).subprojector ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)) by
+                      simpa [Q] using hdiff]
+                simp [hproj.isHermitian.eq, hproj.idempotent]
+        _ = ∑ a : Outcome, ∑ i ∈ ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)),
+              ev ψ ((onb a).rankOne i) := by
+                refine Finset.sum_congr rfl ?_
+                intro a _
+                change ev ψ (∑ i ∈ ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)),
+                    (onb a).rankOne i) =
+                  ∑ i ∈ ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)),
+                    ev ψ ((onb a).rankOne i)
+                rw [ev_finset_sum]
+        _ = ∑ x ∈ (Largeᶜ : Finset Idx), overlap x := by
+                rw [hLarge_compl_sigma]
+                rw [Finset.sum_sigma]
+    have hRQ : SDDOpRel ψ (uniformDistribution Unit) (constOpFamily R) (constOpFamily Q)
+        (4 * spectralTruncationError ζ) := by
+      have hcore : qSDDOp ψ R Q ≤ 4 * spectralTruncationError ζ := by
+        calc
+          qSDDOp ψ R Q = ∑ x ∈ (Largeᶜ : Finset Idx), overlap x := hqSDD_RQ
+          _ ≤ 4 * Real.sqrt ζ := hsmall
+          _ = 4 * spectralTruncationError ζ := by rw [hspectral_sqrt]
+      constructor
+      simpa [sddErrorOp, avgOver, uniformDistribution, constOpFamily] using hcore
+    have hAQ : SDDOpRel ψ (uniformDistribution Unit)
+        (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily Q)
+        (roundingToProjectiveError ζ) := by
+      have htri := MIPStarRE.LDT.Preliminaries.sddOpRel_triangle ψ (uniformDistribution Unit)
+        (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily R) (constOpFamily Q)
+        (2 * spectralTruncationError ζ) (4 * spectralTruncationError ζ)
+        hR.closeness hRQ
+      refine MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
+        (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily Q)
+        (2 * (2 * spectralTruncationError ζ + 4 * spectralTruncationError ζ))
+        (roundingToProjectiveError ζ) htri ?_
+      dsimp [roundingToProjectiveError, spectralTruncationError]
+      ring_nf
+      exact le_rfl
+    have hQtotal_le : Q.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
+        (1 : MIPStarRE.Quantum.Op ι) := by
+      have hpoint : ∀ a, Q.outcome a ≤ R.outcome a := by
+        intro a
+        simpa [Q] using (onb a).subprojector_le (fiber a)
+      calc
+        Q.total = ∑ a, Q.outcome a := rfl
+        _ ≤ ∑ a, R.outcome a := Finset.sum_le_sum fun a _ => hpoint a
+        _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
+            (1 : MIPStarRE.Quantum.Op ι) := hRsum_le
+    obtain ⟨auxSpace, t, _, hAuxDim⟩ :=
+      projectiveLowRankSum_auxData_of_rank_bound
+        (m := fun a : Outcome => (Q.outcome a).rank) hrankQ
+    let data : QLayerData Outcome ι :=
+      { auxSpace := auxSpace
+        q := Q
+        t := t }
+    refine ⟨data, ?_⟩
+    refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, hAuxDim⟩
+    · intro a
+      simpa [Q, Qa, data] using (onb a).subprojector_isProj (fiber a)
+    · intro a
+      have hproj : MIPStarRE.Quantum.IsProj (Q.outcome a) := by
+        simpa [Q] using (onb a).subprojector_isProj (fiber a)
+      simpa [Qa, data, hproj.isHermitian.eq, hproj.idempotent] using
+        (Matrix.posSemidef_conjTranspose_mul_self (Q.outcome a)).nonneg
+    · simp [Qa, QTotal, data, Q]
+    · simpa [data] using hAQ
+    · simpa [QTotal, data] using hQtotal_le
+
 /-- **Degenerate empty-outcome branch** for `lem:projective-low-rank-sum`.
 
 In `references/ldt-paper/orthonormalization.tex`, lines 540-658, the rank-
@@ -513,63 +813,32 @@ package.
 The auxiliary space `ℂ^m` and the projective measurement
 `T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent
 "Matrix decomposition of `Q_a`" definition (orthonormalization.tex:777-795).
-Below, `projectiveLowRankSum_of_projectors` materialises these data from an
-exact projector submeasurement `R` satisfying `∑_a R_a ≤ I`, using the
-spectral theorem to prove the matrix identity `rank R_a = trace R_a` and hence
-`∑_a rank(R_a) ≤ dim(ι)`. The public theorem `projectiveLowRankSum` still
-keeps `(auxSpace, t, hAuxDim)` explicit because the remaining `r > d`
-truncation branch from orthonormalization.tex:559-658 has not yet been
-formalized; `RoundingToProjectorsWitness` only gives the weaker bound
-`∑_a q_a ≤ (1 + 2√ζ)I` (issue #651). The broader downstream `QXPLayerData`
-pipeline still lacks a concrete `X / XHat / P` producer because Mathlib has no
-general complex-matrix SVD API (issue #652). -/
+The proof uses the `r ≤ d` rank-bound branch directly and otherwise performs
+the paper's `r > d` truncation branch from orthonormalization.tex:559-658: it
+chooses the top-overlap `Large` set, assembles the truncated projectors from
+`MIPStarRE.Quantum.IsProj.rangeONB`, proves the `4√ζ` truncation error, and
+then builds the finite auxiliary projective measurement from the resulting rank
+bound. The broader downstream `QXPLayerData` pipeline still lacks a concrete
+`X / XHat / P` producer because Mathlib has no general complex-matrix SVD API
+(issue #652). -/
 lemma projectiveLowRankSum {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome]
     (ψ : QuantumState ι)
     (A : Measurement Outcome ι) (ζ : Error)
-    (hζ : 0 ≤ ζ)
+    (hψ : ψ.IsNormalized)
+    (hζ : 0 ≤ ζ) (hζ_le : ζ ≤ 1 / 4)
     (q : OpFamily Outcome ι)
     (hrounded : RoundingToProjectorsWitness ψ A ζ q)
-    -- TODO(#651): Eliminate the explicit `(auxSpace, t, hAuxDim)` parameters
-    -- by formalizing the paper's `r > d` truncation branch
-    -- (orthonormalization.tex:559-658), or equivalently by strengthening the
-    -- rounded-family input to an exact projector submeasurement `∑_a q_a ≤ I`.
-    (auxSpace : FiniteHilbertSpace.{uι})
-    (t : ProjMeas Outcome auxSpace.carrier)
-    (hAuxDim : Fintype.card auxSpace.carrier ≤ Fintype.card ι)
     (source_almost_projective :
       ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
       RankReductionWitness ψ A ζ data := by
   classical
   by_cases hOutcome : Nonempty Outcome
-  · let data : QLayerData Outcome ι :=
-      { auxSpace := auxSpace
-        q := q
-        t := t }
-    refine ⟨data, ?_⟩
-    refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_⟩
-    · intro a
-      exact hrounded.projective a
-    · intro a
-      have hproj := hrounded.projective a
-      simpa [hproj.isHermitian.eq, hproj.idempotent] using
-        (Matrix.posSemidef_conjTranspose_mul_self (q.outcome a)).nonneg
-    · simpa [Qa, QTotal, data] using hrounded.sum_eq_total
-    · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
-        (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily q)
-        (2 * spectralTruncationError ζ) (roundingToProjectiveError ζ)
-        hrounded.closeness
-        (by
-          have hε_nonneg : 0 ≤ spectralTruncationError ζ := spectralTruncationError_nonneg hζ
-          dsimp [roundingToProjectiveError]
-          exact mul_le_mul_of_nonneg_right (by norm_num : (2 : Error) ≤ 12) hε_nonneg)
-    · calc
-        QTotal data = q.total := rfl
-        _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
-            (1 : MIPStarRE.Quantum.Op ι) := hrounded.total_le
-    · exact hAuxDim
+  · letI : Nonempty Outcome := hOutcome
+    exact projectiveLowRankSum_truncate ψ hψ A ζ hζ hζ_le q hrounded
+      source_almost_projective
   · letI : IsEmpty Outcome := not_nonempty_iff.mp hOutcome
     exact rankReduction_emptyOutcome (ψ := ψ) (A := A) (ζ := ζ)
 

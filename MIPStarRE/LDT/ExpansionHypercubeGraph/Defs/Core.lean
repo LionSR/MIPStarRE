@@ -156,13 +156,6 @@ noncomputable def independentPointPair (params : Parameters) :
       intro uv huv
       exact False.elim (huv (Finset.mem_univ uv)) }
 
-/-- Weighted sum of operators over a distribution's finite support,
-using the same `support`/`weight` data as the scalar `avgOver`. -/
-noncomputable def averageOperatorOverDistribution {α : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
-  ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
-
 /-- An honest finite matrix register for the hypercube vertices. -/
 def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
   carrier := Point params
