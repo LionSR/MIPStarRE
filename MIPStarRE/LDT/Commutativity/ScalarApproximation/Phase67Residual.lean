@@ -41,6 +41,118 @@ noncomputable def evaluatedSlicePhaseFiveRemoved
         rightTensor (ι₁ := ι)
           ((evaluatedSlicePointMeas params strategy q.1).outcome a))
 
+/-- A single phase-5-removed summand is bounded above by the corresponding
+`BAB` summand before the right-register outcome is inserted.
+
+This is the one direction that follows purely from positivity: the left-register
+sandwich `B_b A_a B_b` is positive, and the inserted right-register point
+measurement outcome is bounded by `1`. -/
+private lemma evaluatedSlicePhaseFiveRemoved_term_le_babTerm
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (q : EvaluatedSliceQuestion params)
+    (a b : Fq params) :
+    ev strategy.state
+        (leftTensor (ι₂ := ι)
+            (((evaluatedSliceSecondFactor params family q).outcome b) *
+              ((evaluatedSliceFirstFactor params family q).outcome a) *
+              ((evaluatedSliceSecondFactor params family q).outcome b)) *
+          rightTensor (ι₁ := ι)
+            ((evaluatedSlicePointMeas params strategy q.1).outcome a)) ≤
+      evaluatedSliceBABTerm params strategy family q (a, b) := by
+  let A : SubMeas (Fq params) ι := evaluatedSliceFirstFactor params family q
+  let B : SubMeas (Fq params) ι := evaluatedSliceSecondFactor params family q
+  let S : SubMeas (Fq params × Fq params) ι := sandwichByOuterSubMeas B A
+  have hBAB_nonneg :
+      0 ≤ B.outcome b * A.outcome a * B.outcome b := by
+    simpa [S, sandwichByOuterSubMeas] using (S.outcome_pos (b, a))
+  have hright_le_one :
+      (evaluatedSlicePointMeas params strategy q.1).outcome a ≤
+        (1 : MIPStarRE.Quantum.Op ι) :=
+    Measurement.outcome_le_one (evaluatedSlicePointMeas params strategy q.1) a
+  have hop_le :
+      leftTensor (ι₂ := ι) (B.outcome b * A.outcome a * B.outcome b) *
+          rightTensor (ι₁ := ι)
+            ((evaluatedSlicePointMeas params strategy q.1).outcome a) ≤
+        leftTensor (ι₂ := ι) (B.outcome b * A.outcome a * B.outcome b) := by
+    simpa [leftTensor_mul_rightTensor_eq_opTensor] using
+      (opTensor_le_leftTensor (ι₂ := ι) hBAB_nonneg hright_le_one)
+  simpa [evaluatedSliceBABTerm, A, B] using
+    (ev_mono strategy.state _ _ hop_le)
+
+/-- Pointwise monotonicity of the phase-5-removed endpoint.
+
+The inserted right-register point outcome can only decrease the `BAB` scalar
+summand.  Thus the remaining phase-67 bridge is a one-sided missing-mass bound,
+not a two-sided algebraic identification. -/
+lemma evaluatedSlicePhaseFiveRemoved_le_avgBAB_pointwise
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (q : EvaluatedSliceQuestion params) :
+    evaluatedSlicePhaseFiveRemoved params strategy family q ≤
+      ∑ ab : EvaluatedSliceOutcome params,
+        evaluatedSliceBABTerm params strategy family q ab := by
+  calc
+    evaluatedSlicePhaseFiveRemoved params strategy family q
+        = ∑ a : Fq params, ∑ b : Fq params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  (((evaluatedSliceSecondFactor params family q).outcome b) *
+                    ((evaluatedSliceFirstFactor params family q).outcome a) *
+                    ((evaluatedSliceSecondFactor params family q).outcome b)) *
+                rightTensor (ι₁ := ι)
+                  ((evaluatedSlicePointMeas params strategy q.1).outcome a)) := rfl
+    _ ≤ ∑ a : Fq params, ∑ b : Fq params,
+          evaluatedSliceBABTerm params strategy family q (a, b) := by
+        refine Finset.sum_le_sum ?_
+        intro a _
+        refine Finset.sum_le_sum ?_
+        intro b _
+        exact evaluatedSlicePhaseFiveRemoved_term_le_babTerm params strategy family q a b
+    _ = ∑ ab : EvaluatedSliceOutcome params,
+          evaluatedSliceBABTerm params strategy family q ab := by
+        simpa using
+          (Fintype.sum_prod_type
+            (f := fun ab : Fq params × Fq params =>
+              evaluatedSliceBABTerm params strategy family q ab)).symm
+
+/-- Averaged monotonicity of the phase-5-removed endpoint.
+
+This proves the easy half of the reverse-insertion endpoint: after inserting the
+right-register first-coordinate outcome, the scalar is no larger.  The live
+analytic task is therefore only to upper-bound the nonnegative gap. -/
+lemma evaluatedSlicePhaseFiveRemoved_avg_le_avgBAB
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) :
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedSlicePhaseFiveRemoved params strategy family) ≤
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q => ∑ ab : EvaluatedSliceOutcome params,
+          evaluatedSliceBABTerm params strategy family q ab) := by
+  exact avgOver_mono _ _ _
+    (evaluatedSlicePhaseFiveRemoved_le_avgBAB_pointwise params strategy family)
+
+/-- The one-sided form of the remaining first-coordinate reverse `eq:add-an-a`
+endpoint.
+
+By `evaluatedSlicePhaseFiveRemoved_avg_le_avgBAB`, the absolute-value endpoint
+residual is equivalent to controlling the nonnegative missing mass from inserting
+the right-register first-coordinate outcome. -/
+def evaluatedSlicePhase67FirstReverseGapResidual
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (zeta : Error) : Prop :=
+  let 𝒟 := uniformDistribution (EvaluatedSliceQuestion params)
+  avgOver 𝒟
+      (fun q => ∑ ab : EvaluatedSliceOutcome params,
+        evaluatedSliceBABTerm params strategy family q ab) -
+    avgOver 𝒟 (evaluatedSlicePhaseFiveRemoved params strategy family) ≤
+    2 * Real.sqrt zeta
+
 /-- The honest remaining first-coordinate reverse `eq:add-an-a` residual.
 
 Formal scalar shape:
@@ -52,7 +164,9 @@ This is the BAB-side analogue of `eq:apply-add-an-a-once`
 route instead reproduces the already-formalized BABA-side phase-3 endpoint, so
 closing issue #732 requires proving this BAB-side endpoint comparison directly
 or adjusting the scalar-chain orientation so the first-coordinate reverse step
-has paper-faithful endpoints. -/
+has paper-faithful endpoints.  The monotonicity lemma above narrows this to the
+one-sided missing-mass residual
+`evaluatedSlicePhase67FirstReverseGapResidual`. -/
 def evaluatedSlicePhase67FirstReverseEndpointResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -64,5 +178,32 @@ def evaluatedSlicePhase67FirstReverseEndpointResidual
         evaluatedSliceBABTerm params strategy family q ab) -
     avgOver 𝒟 (evaluatedSlicePhaseFiveRemoved params strategy family)| ≤
     2 * Real.sqrt zeta
+
+/-- A one-sided phase-67 gap bound implies the absolute-value endpoint residual.
+
+The proof uses only the monotonicity of the inserted right-register outcome; it
+contains no analytic estimate. -/
+lemma evaluatedSlicePhase67FirstReverseEndpointResidual_of_gap
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hgap : evaluatedSlicePhase67FirstReverseGapResidual params strategy family zeta) :
+    evaluatedSlicePhase67FirstReverseEndpointResidual params strategy family zeta := by
+  let 𝒟 := uniformDistribution (EvaluatedSliceQuestion params)
+  let avgBAB : Error :=
+    avgOver 𝒟
+      (fun q => ∑ ab : EvaluatedSliceOutcome params,
+        evaluatedSliceBABTerm params strategy family q ab)
+  let removed : Error := avgOver 𝒟 (evaluatedSlicePhaseFiveRemoved params strategy family)
+  have hremoved_le : removed ≤ avgBAB := by
+    simpa [avgBAB, removed, 𝒟] using
+      evaluatedSlicePhaseFiveRemoved_avg_le_avgBAB params strategy family
+  have hnonneg : 0 ≤ avgBAB - removed := sub_nonneg.mpr hremoved_le
+  have hgap' : avgBAB - removed ≤ 2 * Real.sqrt zeta := by
+    simpa [evaluatedSlicePhase67FirstReverseGapResidual, avgBAB, removed, 𝒟] using hgap
+  calc
+    |avgBAB - removed| = avgBAB - removed := abs_of_nonneg hnonneg
+    _ ≤ 2 * Real.sqrt zeta := hgap'
 
 end MIPStarRE.LDT.Commutativity
