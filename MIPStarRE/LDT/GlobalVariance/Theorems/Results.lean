@@ -912,10 +912,11 @@ lemma generalizeBReversePointwiseBound
             _ = ev ψbi (((X - Y)ᴴ) * (X - Y)) := by simp
     _ ≤ generalizeBError params := hgen.pointwiseNormBound g
 
-/-- The six displayed edge-transport errors are absorbed by the paper's
+/-- The post-triangle six-step transport error is absorbed by the paper's
 `24(ε + δ + md/q)` slack from `lem:local-variance-of-points`.
 
-This is only the scalar arithmetic after the six estimates at
+This is only the scalar arithmetic after applying
+`prop:triangle-inequality-for-approx_delta` with `k = 6` to the estimates at
 `references/ldt-paper/expansion.tex`, lines 305--311; it does not assert the
 transport estimates themselves. -/
 lemma localVarianceTransportChainError_le_localVarianceOfPointsError
@@ -932,7 +933,7 @@ lemma localVarianceTransportChainError_le_localVarianceOfPointsError
     dsimp [generalizeBError]
     positivity
   dsimp [localVarianceTransportChainError, localVarianceOfPointsError]
-  nlinarith
+  linarith
 
 /-- Legacy wrapper for `lem:local-variance-of-points` with arbitrary bipartite
 state and both pointwise bounds supplied explicitly.
@@ -1107,12 +1108,12 @@ lemma globalVarianceOfPointsFromLocalDeviation
             (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
             (globalVarianceOfPointsError params eps delta) hglobalVariance }
 
-/-- Strategy-state reduction for `lem:local-variance-of-points` from the sharper
-six-step transport-chain bound.
+/-- Strategy-state reduction for `lem:local-variance-of-points` from the
+post-triangle six-step transport-chain bound.
 
-This replaces the final displayed edge estimate by the exact sum of the six
-paper steps (`2δ + 2ε + md/q + md/q + 2ε + 2δ`), leaving the genuine transport
-work as the named residual
+This replaces the final displayed edge estimate by the residual produced after
+applying `prop:triangle-inequality-for-approx_delta` with `k = 6` to the six
+paper steps (`2δ + 2ε + md/q + md/q + 2ε + 2δ`).  Thus the named residual is
 `∀ g, localVarianceDeviationAtPolynomial … g ≤ localVarianceTransportChainError …`.
 The absorption into the public `24(ε + δ + md/q)` statement is proved above. -/
 lemma localVarianceOfPointsFromTransportChainBound
@@ -1133,7 +1134,7 @@ lemma localVarianceOfPointsFromTransportChainBound
     (localVarianceTransportChainError_le_localVarianceOfPointsError
       params strategy hgood)
 
-/-- Strategy-state global-variance reduction from the sharper six-step
+/-- Strategy-state global-variance reduction from the post-triangle six-step
 local-variance transport-chain bound. -/
 lemma globalVarianceOfPointsFromTransportChainBound
     (params : Parameters)

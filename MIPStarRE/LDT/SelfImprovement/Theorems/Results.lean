@@ -92,8 +92,8 @@ lemma sdp
 /-- Reduced version of `lem:add-in-u`.
 
 This currently keeps only the global-variance consequence used downstream. It
-now derives that consequence from the sharper six-step edge-transport chain
-bound via `globalVarianceOfPointsFromTransportChainBound`. The `gamma` and
+now derives that consequence from the post-triangle six-step edge-transport
+chain bound via `globalVarianceOfPointsFromTransportChainBound`. The `gamma` and
 `hgood` arguments are intentionally retained so this reduced wrapper still
 matches the surrounding self-improvement API and can be strengthened back to the
 full paper statement without another caller-wide signature change. The

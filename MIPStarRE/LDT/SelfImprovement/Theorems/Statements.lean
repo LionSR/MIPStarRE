@@ -292,8 +292,8 @@ structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
 
 The local-variance and independent-points global-variance consequences are now
 formalized algebraic reductions from this edgewise norm bound.  The bound is
-recorded with the sharper six-step transport-chain error
-`localVarianceTransportChainError` (`4ε + 4δ + 2md/q`); the public
+recorded with the post-triangle six-step transport-chain error
+`localVarianceTransportChainError`, i.e. `6 * (4ε + 4δ + 2md/q)`; the public
 `24(ε + δ + md/q)` statement is recovered by
 `GlobalVariance.localVarianceOfPointsFromTransportChainBound` and
 `GlobalVariance.globalVarianceOfPointsFromTransportChainBound`. -/
