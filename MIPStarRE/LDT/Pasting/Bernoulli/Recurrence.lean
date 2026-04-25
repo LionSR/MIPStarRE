@@ -606,16 +606,13 @@ private lemma fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
     simpa [hstage0, hstagek] using htelescope
   exact le_trans hmass herror
 
-/-- The residual, paper-specific stage facts still needed for `fromHToG`.
+/-- The remaining adjacent-stage operator/scalar bridge for `fromHToG`.
 
-This deliberately does not duplicate the public theorem: the telescope from these
-facts to `FromHToGStatement.bernoulliPolynomialRewrite` is already proved by
-`fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.  The terminal stage
-`k` is identified exactly by `fromHToGStageMass_terminal_eq`, and stage `0` is
-identified exactly by `fromHToGStageMass_zero_eq`; what remains here is the
-operator/scalar bridge from `cor:G-hat-facts` and `lem:commute-g-half-sandwich`,
-and the final displayed arithmetic comparison of error terms. -/
-private structure FromHToGResidualStageFacts
+The endpoint identifications and generic telescope are already proved above;
+this package isolates the substantive paper step: one adjacent-stage move using
+`cor:G-hat-facts`, `lem:commute-g-half-sandwich`, and the exact recurrence for
+`fromHToGRecurrenceWeight`. -/
+private structure FromHToGAdjacentStageFacts
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -626,9 +623,64 @@ private structure FromHToGResidualStageFacts
       |fromHToGStageMass params ψbi family k ℓ -
           fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
         fromHToGRecurrenceError params gamma zeta k
+
+/-- The scalar arithmetic absorption still needed after telescoping the adjacent
+`fromHToG` recurrence steps. -/
+private structure FromHToGErrorAbsorptionFacts
+    (params : Parameters) (gamma zeta : Error) (k : ℕ) : Prop where
   recurrenceError_le :
     (k : Error) * fromHToGRecurrenceError params gamma zeta k ≤
       fromHToGError params gamma zeta k
+
+/-- The arithmetic absorption is not a parameter-free theorem of the displayed
+error *definitions alone*.
+
+For example, with `m = 1`, `q = 2`, `d = 0`, `γ = 1`, `ζ = 0`, and `k = 2`,
+the left-hand side is `4 * sqrt (426 * 2^2)`, which is already larger than the
+right-hand side `46 * 2`.  Thus the remaining scalar field below is deliberately
+kept as a separate residual from the adjacent-stage operator bridge: closing it
+requires either sharper recurrence bookkeeping (matching the paper's line
+`references/ldt-paper/ld-pasting.tex:1372--1375`) or extra hypotheses, not a
+standalone monotonicity lemma over the current definitions. -/
+private lemma fromHToG_errorAbsorption_not_purely_scalar :
+    ¬ (∀ (params : Parameters) (gamma zeta : Error) (k : ℕ),
+      (k : Error) * fromHToGRecurrenceError params gamma zeta k ≤
+        fromHToGError params gamma zeta k) := by
+  intro h
+  let params : Parameters := Parameters.ofPrime 1 2 0 (by decide) (by norm_num)
+  have hbad := h params 1 0 2
+  have hgt :
+      fromHToGError params 1 0 2 <
+        (2 : Error) * fromHToGRecurrenceError params 1 0 2 := by
+    change fromHToGError (Parameters.ofPrime 1 2 0 (by decide) (by norm_num)) 1 0 2 <
+      (2 : Error) *
+        fromHToGRecurrenceError (Parameters.ofPrime 1 2 0 (by decide) (by norm_num)) 1 0 2
+    norm_num [fromHToGRecurrenceError, fromHToGError, commuteGHalfSandwichError,
+      Parameters.ofPrime]
+    rw [← Real.sqrt_eq_rpow (1704 : Error)]
+    have hsqrt_gt : (23 : Error) < Real.sqrt (1704 : Error) := by
+      rw [Real.lt_sqrt (by norm_num : (0 : Error) ≤ 23)]
+      norm_num
+    nlinarith
+  exact not_le_of_gt hgt hbad
+
+/-- The residual, paper-specific facts still needed for `fromHToG`.
+
+This deliberately does not duplicate the public theorem: the telescope from these
+facts to `FromHToGStatement.bernoulliPolynomialRewrite` is already proved by
+`fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.  The terminal stage
+`k` is identified exactly by `fromHToGStageMass_terminal_eq`, and stage `0` is
+identified exactly by `fromHToGStageMass_zero_eq`; what remains is split into two
+private subpackages: the adjacent-stage operator/scalar bridge and the separate
+arithmetic absorption diagnosed above. -/
+private structure FromHToGResidualStageFacts
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (k : ℕ) : Prop where
+  adjacent : FromHToGAdjacentStageFacts params ψbi family gamma zeta k
+  arithmetic : FromHToGErrorAbsorptionFacts params gamma zeta k
 
 /-- `lem:from-H-to-G`.
 
@@ -662,14 +714,17 @@ lemma fromHToG
          (roughly lines 979–1233 in the current source).
 
        What remains to formalize after this file's telescope reduction:
-       1. prove each adjacent-stage recurrence step by the paper's
-          move-right / commute / move-right chain, using two
-          `easyApproxFromApproxDelta` / `closenessOfIP` moves from
+       1. fill `FromHToGAdjacentStageFacts` by proving each adjacent-stage
+          recurrence step via the paper's move-right / commute / move-right chain,
+          using two `easyApproxFromApproxDelta` / `closenessOfIP` moves from
           `hfacts.completedSelfConsistency`, then two suffix-commutation moves from
           `hhalf (k - ℓ)`, and finally the exact branch split via
           `fromHToGRecurrenceWeight_succ`;
-       2. discharge the displayed arithmetic comparison
-          `k * fromHToGRecurrenceError ≤ fromHToGError`.
+       2. fill `FromHToGErrorAbsorptionFacts` by resolving the separate displayed
+          arithmetic comparison `k * fromHToGRecurrenceError ≤ fromHToGError`.
+          The lemma `fromHToG_errorAbsorption_not_purely_scalar` above records why
+          this is not just a standalone scalar monotonicity proof from the current
+          error definitions.
 
        The former endpoint residuals are closed above: stage `0` by
        `fromHToGStageMass_zero_eq`, and terminal stage `k` by
@@ -684,13 +739,13 @@ lemma fromHToG
     have _ := hfacts.completedSelfConsistency
     have _ := hhalf
     sorry
-  refine ⟨hresidual.recurrenceStep, ?_⟩
+  refine ⟨hresidual.adjacent.recurrenceStep, ?_⟩
   exact fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
     params strategy ψbi family gamma zeta k
-    hresidual.recurrenceStep
+    hresidual.adjacent.recurrenceStep
     (fromHToGStageMass_zero_eq params strategy ψbi family k)
     (fromHToGStageMass_terminal_eq params ψbi family k)
-    hresidual.recurrenceError_le
+    hresidual.arithmetic.recurrenceError_le
 
 /-- The scalar Bernoulli tail polynomial lifted through continuous functional
 calculus is exactly the matrix Bernoulli tail operator. -/
