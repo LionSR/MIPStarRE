@@ -189,7 +189,9 @@ python3 scripts/audit_stale_issues.py --issues /tmp/open-issues.json
 ```
 
 The tool is report-only. Human review decides which flags warrant closing
-the issue, updating its body, or dismissing as a false positive. See
+the issue, updating its body, or dismissing as a false positive. A weekly
+read-only GitHub Actions wrapper runs the same export-and-audit sequence and
+uploads an artifact only when citations are flagged. See
 [`docs/stale_issue_audit.md`](stale_issue_audit.md) for the full workflow.
 
 ---
