@@ -123,9 +123,10 @@ jobs:
         id: branch
         env:
           RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
         run: |
           set -euo pipefail
-          branch="autofix/lean-linter-warning-sweep-${RUN_ID}"
+          branch="autofix/lean-linter-warning-sweep-${RUN_ID}-${RUN_ATTEMPT}"
           git config user.email "claude[bot]@users.noreply.github.com"
           git config user.name "claude[bot]"
           git checkout -B "$branch"
