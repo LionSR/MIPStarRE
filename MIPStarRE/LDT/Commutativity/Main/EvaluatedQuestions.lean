@@ -77,7 +77,7 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
     --     (each ≤ md/q + 2√ζ)
     -- (b) The evaluated commutation via the strong `hEval` transport
     --     (≤ √(commDataProcessedGError))
-    -- giving total ≤ 8√ζ + 4md/q + 2√(commDataProcessedGError).
+    -- giving total ≤ 12√ζ + 6md/q + 2√(commDataProcessedGError).
     --
     -- Proof sketch:
     -- * Expand qSDDOp into quartic trace terms
@@ -115,7 +115,7 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
       -- * `fullSlice_closenessOfIP_CAB_hEval_sqrt`: the direct evaluated-side
       --   route gives `|evalABA − evalABAB| ≤ √ν`.
       -- Summing gives `|fullABA − fullABAB| ≤ 6√ζ + 3(md/q) + √ν`,
-      -- and multiplying by `2` produces `8√ζ + 4(md/q) + 2√ν`.
+      -- and multiplying by `2` produces `12√ζ + 6(md/q) + 2√ν`.
       have hExpand :=
         fullSliceCommutation_qSDDOp_avg_eq params strategy family
       have hMargX :=
