@@ -275,6 +275,7 @@ private lemma fromHToGBernoulliTailMass_lower_bound
       ev_mono strategy.state _ _ hle
   have hkappa_nonneg : 0 ≤ kappa := by
     have hlower := hcomplete.averageCompleteness.lowerBound
+    have hupper := hmass_le_one
     linarith
   have hcoef :
       kappa / (1 - 1 / (200 * (params.m : Error))) ≤
