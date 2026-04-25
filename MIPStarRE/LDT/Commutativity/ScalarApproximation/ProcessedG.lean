@@ -214,6 +214,11 @@ private noncomputable def evaluatedSlicePhaseTwoQuestionDefect
             (1 - (G (pointHeight params q.2)).total)) *
         rightTensor (ι₁ := ι) ((evaluatedSlicePointMeas params strategy q.2).outcome b))
 
+/-- The evaluated point family has the same total as the underlying slice
+measurement `G` at the sampled height.
+
+This unfolds `evaluatedPointFamily` as postprocessing of `family.meas y`; the
+postprocessing total is unchanged, and `hG` identifies the slice with `G y`. -/
 private lemma evaluatedPointFamily_total_eq_G_total
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -225,6 +230,12 @@ private lemma evaluatedPointFamily_total_eq_G_total
   simp [evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
     postprocess_total, hG]
 
+/-- Pointwise algebra for the phase-2 subtraction.
+
+After expanding `totalSandwichFamily`, the inserted summand has the extra factor
+`G^y.total` on the left register.  This lemma rewrites the difference with the
+removed summand as the negative defect, using the noncommutative identity
+`S * T - S = -(S * (1 - T))`. -/
 private lemma evaluatedSlice_phaseTwo_term_diff
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -310,6 +321,12 @@ private lemma evaluatedSlice_phaseTwo_term_diff
     (ev_scale strategy.state (-1)
       (leftTensor (ι₂ := ι) (S * (1 - T)) * rightTensor (ι₁ := ι) P))
 
+/-- Average the pointwise phase-2 algebra over evaluated-slice questions.
+
+This proves the advertised sign rewrite
+`avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed = -avgOver 𝒟 questionDefect`.
+It leaves only the finite marginalization from the question-level defect to the
+one-dimensional `evaluatedSlicePhaseTwoStabilityDefect`. -/
 private lemma evaluatedSlice_phaseTwo_avg_diff_eq_neg_questionDefect
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
