@@ -627,8 +627,8 @@ private lemma hBConsistencyError_add_mdq_add_dnoteq_le_overAllOutcomesError
               exact mul_le_mul_of_nonneg_left hR_le_S hfactor_nonneg
         _ = 2 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by ring
     exact le_trans hsum hRS
-  dsimp [hBConsistencyError, overAllOutcomesError, S, R] at *
-  nlinarith
+  dsimp only [hBConsistencyError, overAllOutcomesError]
+  linarith [hsmall]
 
 /-- If the distinct nonglobal mass is bounded by the paper's local
 `k·ν₅ + k²/q + md/q` comparison, then the reverse half of
@@ -677,10 +677,11 @@ eligible sandwich mass, insert the vertical-line measurement, use
 failure of the line-consistency indicator, and finally apply the
 Schwartz--Zippel `md/q` bound to the indicator term.
 
-The interpolation correctness inputs used by this paper step already exist as
-`interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem` and
-`nonglobal_gives_slice_mismatch_against_interpolant`; the surviving unproved
-piece is their aggregation with the one-point line comparison. -/
+The local interpolation correctness inputs for this paper step are already
+available as `interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem`
+and `nonglobal_gives_slice_mismatch_against_interpolant`; the surviving unproved
+piece is the finite-sum aggregation that combines those inputs with the
+one-point line comparison. -/
 private lemma overAllOutcomes_distinct_nonglobal_mass_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
