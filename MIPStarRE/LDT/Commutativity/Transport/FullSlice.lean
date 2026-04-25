@@ -2301,8 +2301,10 @@ scalar quartic.
 
 This packages the paper steps after the x-stage has already reached
 `xEvaluatedFullSliceABABtensorAvg`: y-Schwartz-Zippel marginalization
-(`commutativity-G.tex` lines 369--385) followed by the final `√ζ`
-scalar↔tensor bridge (lines 396--406). -/
+(`commutativity-G.tex` lines 369--385) followed by the `√ζ`
+`closenessOfIP` move that swaps a trailing `G^y_{[h(v)=b]}` between the
+scalar quartic and the `ABA ⊗ B` tensor -- the doubly-evaluated analogue
+of paper line 360, exposed via `evaluatedSliceABAB_scalar_to_ABABtensor`. -/
 lemma xEvaluatedFullSliceABABtensor_to_evaluatedSliceABABAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
