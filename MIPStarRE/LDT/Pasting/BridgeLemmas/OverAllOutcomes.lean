@@ -45,10 +45,17 @@ lemma overAllOutcomes
   (4) swap distinct → uniform sampling (`prop:ld-dnoteq`: error 2k²/q),
   (5) bound sandwich errors (`lem:ld-sandwich-line-one-point`: k × ν₅).
 
-  Current blockers after the split audit:
-  * the interpolation-to-global-polynomial correctness step still needs the
-    missing `Defs/Interpolation` comparison lemmas in the exact shapes consumed
-    here;
+  Interpolation correctness is already available as
+  `interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem`
+  in `BridgeLemmas/LineInterpolation.lean`: after unfolding
+  `Polynomial.restrictAtHeight` / `extractSlicePoly`, it gives the same fact
+  that on the canonical `d + 1`-node interpolation support `σ` chosen by
+  `interpolationSupportWitness`, the Lagrange interpolant agrees with every
+  `gᵢ` for `i ∈ σ`. Together with
+  `nonglobal_gives_slice_mismatch_against_interpolant` this is the API used by
+  the paper's "unique $h^*$ interpolates $g_1, \ldots, g_{d+1}$" step.
+
+  Current remaining blockers after the split audit:
   * the final sandwich aggregation still depends on `ldSandwichLineOnePoint`.
     The old `ldGbcon` / swap-orientation blocker is gone, but the two local
     Cauchy–Schwarz transport steps in `ldSandwichLineOnePoint_core` are still
