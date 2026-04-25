@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
+import MIPStarRE.LDT.Pasting.Defs.Tuples
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
 import MIPStarRE.LDT.Pasting.BridgeLemmas.HAConsistency
 import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes
@@ -100,6 +101,150 @@ private lemma overAllOutcomesError_add_fromHToGError_le_ldPastingNu
           simp [MainInductionStep.ldPastingInInductionNu, kE, mE, fullSum,
             epsTerm, deltaTerm, gammaTerm, zetaTerm, dqTerm, ratio]
 
+/-- Positivity of the paper's choice `θ = 1/(200m)`. -/
+private lemma ldPasting_theta_pos (params : Parameters) :
+    (0 : Error) < 1 / (200 * (params.m : Error)) := by
+  have hm_pos : (0 : Error) < (params.m : Error) := by exact_mod_cast params.hm
+  positivity
+
+/-- The paper's choice `θ = 1/(200m)` is strictly below `1`. -/
+private lemma ldPasting_theta_lt_one (params : Parameters) :
+    (1 / (200 * (params.m : Error)) : Error) < 1 := by
+  have hm_pos : (0 : Error) < (params.m : Error) := by exact_mod_cast params.hm
+  have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
+    exact_mod_cast (Nat.succ_le_of_lt params.hm)
+  have hden_pos : (0 : Error) < 200 * (params.m : Error) := by positivity
+  field_simp [hden_pos.ne']
+  nlinarith
+
+/-- Paper arithmetic: for `θ = 1/(200m)`,
+`1/(1-θ) ≤ 1 + 1/(100m)`. -/
+private lemma ldPasting_theta_inv_le (params : Parameters) :
+    (1 / (1 - 1 / (200 * (params.m : Error))) : Error) ≤
+      1 + 1 / (100 * (params.m : Error)) := by
+  have hm_pos : (0 : Error) < (params.m : Error) := by exact_mod_cast params.hm
+  have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
+    exact_mod_cast (Nat.succ_le_of_lt params.hm)
+  have hden200_pos : 0 < 200 * (params.m : Error) := by positivity
+  have hden100_pos : 0 < 100 * (params.m : Error) := by positivity
+  have hdenMinus_pos : 0 < 200 * (params.m : Error) - 1 := by nlinarith
+  have hdenMinus_ge : 100 * (params.m : Error) ≤ 200 * (params.m : Error) - 1 := by
+    nlinarith
+  calc
+    (1 / (1 - 1 / (200 * (params.m : Error))) : Error)
+        = (200 * (params.m : Error)) / (200 * (params.m : Error) - 1) := by
+            field_simp [hden200_pos.ne', hdenMinus_pos.ne']
+    _ = 1 + 1 / (200 * (params.m : Error) - 1) := by
+            field_simp [hdenMinus_pos.ne']
+            nlinarith
+    _ ≤ 1 + 1 / (100 * (params.m : Error)) := by
+            gcongr
+
+/-- Paper arithmetic: the matrix-Chernoff exponential at `θ = 1/(200m)` is the
+stated `exp(-k/(80000m²))` term. -/
+private lemma ldPasting_chernoff_exponent_eq (params : Parameters) (k : ℕ) :
+    -(((1 / (200 * (params.m : Error))) ^ (2 : ℕ)) * (k : Error)) / 2 =
+      -((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))) := by
+  have hm_pos : (0 : Error) < (params.m : Error) := by exact_mod_cast params.hm
+  have hden_pos : (0 : Error) < 200 * (params.m : Error) := by positivity
+  have hden2_pos : (0 : Error) < 80000 * ((params.m : Error) ^ (2 : ℕ)) := by positivity
+  field_simp [hden_pos.ne', hden2_pos.ne']
+  ring
+
+/-- The public size assumption `k ≥ 400md` implies the matrix-Chernoff size
+condition `k ≥ 2d/θ` at `θ = 1/(200m)`. -/
+private lemma ldPasting_chernoff_size (params : Parameters) (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
+    (2 * (params.d : Error)) / (1 / (200 * (params.m : Error))) ≤ (k : Error) := by
+  have hm_pos : (0 : Error) < (params.m : Error) := by exact_mod_cast params.hm
+  have hden_pos : (0 : Error) < 200 * (params.m : Error) := by positivity
+  have hkE : (400 * params.m * params.d : Error) ≤ (k : Error) := by exact_mod_cast hk
+  field_simp [hden_pos.ne']
+  nlinarith
+
+/-- Specialize `lem:chernoff-bernoulli-matrix` to the averaged complete operator
+`G = 𝔼_x ∑_g G^x_g` and the paper's `θ = 1/(200m)`.
+
+This is the previously residual Bernoulli-tail lower-bound step in
+`cor:ld-pasting-N-completeness`: the matrix Chernoff lemma is applied on the left
+register to `G ⊗ I`, then `bernoulliTailOperator_leftTensor` identifies its
+conclusion with `fromHToGBernoulliTailMass`. -/
+private lemma fromHToGBernoulliTailMass_lower_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (kappa : Error)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
+    1 - kappa * (1 + 1 / (100 * (params.m : Error))) -
+        Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) ≤
+      fromHToGBernoulliTailMass params strategy.state family k := by
+  let G : MIPStarRE.Quantum.Op ι := (IdxPolyFamily.averagedSubMeas family).total
+  let X : MIPStarRE.Quantum.Op (ι × ι) := leftTensor (ι₂ := ι) G
+  have hGpsd : 0 ≤ G := (IdxPolyFamily.averagedSubMeas family).total_nonneg
+  have hGle : G ≤ 1 := (IdxPolyFamily.averagedSubMeas family).total_le_one
+  have hXpsd : 0 ≤ X := by
+    dsimp [X]
+    exact leftTensor_nonneg (ι₂ := ι) hGpsd
+  have hXle : X ≤ 1 := by
+    dsimp [X]
+    exact leftTensor_le_one (ι₂ := ι) hGle
+  have hbase :
+      CompletenessAtLeast strategy.state
+        ({ outcome := fun _ : Unit => X
+           total := X
+           outcome_pos := by intro _; exact hXpsd
+           sum_eq_total := by simp
+           total_le_one := hXle } : SubMeas Unit (ι × ι))
+        (1 - kappa) := by
+    refine ⟨?_⟩
+    simpa [subMeasMass, X, G, SubMeas.liftLeft] using hcomplete.averageCompleteness.lowerBound
+  have hchern := chernoffBernoulliMatrix strategy.state strategy.isNormalized
+    (1 / (200 * (params.m : Error))) k params.d X kappa
+    (ldPasting_theta_pos params) (ldPasting_theta_lt_one params)
+    (ldPasting_chernoff_size params k hk) hXpsd hXle hbase
+  have hmassLower := hchern.matrixTailBound.lowerBound
+  have hmass_eq :
+      subMeasMass strategy.state
+        ({ outcome := fun _ : Unit => bernoulliTailOperator k params.d X
+           total := bernoulliTailOperator k params.d X
+           outcome_pos := by
+             intro _
+             exact bernoulliTailOperator_nonneg k params.d X hXpsd hXle
+           sum_eq_total := by simp
+           total_le_one := hchern.tail_le_one } : SubMeas Unit (ι × ι)) =
+        fromHToGBernoulliTailMass params strategy.state family k := by
+    simp [fromHToGBernoulliTailMass, bernoulliTailFromFamily, subMeasMass,
+      IdxSubMeas.liftLeft, constSubMeasFamily, X, G, bernoulliTailOperator_leftTensor]
+  have htailMass :
+      1 - kappa / (1 - 1 / (200 * (params.m : Error))) -
+          Real.exp (-(((1 / (200 * (params.m : Error))) ^ (2 : ℕ)) * (k : Error)) / 2) ≤
+        fromHToGBernoulliTailMass params strategy.state family k := by
+    simpa [hmass_eq] using hmassLower
+  have hmass_le_one : subMeasMass strategy.state family.averagedSubMeas.liftLeft ≤ 1 := by
+    unfold subMeasMass SubMeas.liftLeft
+    have hle : leftTensor (ι₂ := ι) (IdxPolyFamily.averagedSubMeas family).total ≤
+        (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+      exact leftTensor_le_one (ι₂ := ι) (IdxPolyFamily.averagedSubMeas family).total_le_one
+    simpa [ev_one_of_isNormalized strategy.state strategy.isNormalized] using
+      ev_mono strategy.state _ _ hle
+  have hkappa_nonneg : 0 ≤ kappa := by
+    have hlower := hcomplete.averageCompleteness.lowerBound
+    have hupper := hmass_le_one
+    linarith
+  have hcoef :
+      kappa / (1 - 1 / (200 * (params.m : Error))) ≤
+        kappa * (1 + 1 / (100 * (params.m : Error))) := by
+    have := mul_le_mul_of_nonneg_left (ldPasting_theta_inv_le params) hkappa_nonneg
+    simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using this
+  have hexp :
+      Real.exp (-(((1 / (200 * (params.m : Error))) ^ (2 : ℕ)) * (k : Error)) / 2) =
+        Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
+    rw [ldPasting_chernoff_exponent_eq]
+  linarith
+
 /-- `cor:ld-pasting-N-completeness` once the Bernoulli-tail lower bound is
 supplied explicitly.
 
@@ -108,11 +253,7 @@ This packages the downstream scalar algebra after `lem:over-all-outcomes` and
 specialization of `lem:chernoff-bernoulli-matrix` for the averaged complete
 operator `G = \mathbb E_x \sum_g G^x_g`, repackaged as the concrete
 `fromHToGBernoulliTailMass` lower bound with error
-`κ · (1 + 1/(100m)) + exp(-k / (80000 m²))`. Discharging that specialization
-additionally requires the scalar Bernoulli/Hoeffding input currently carried
-as `chernoffBernoulliMatrix`'s `hScalarTail` hypothesis; issue #642 tracks
-proving that scalar step internally so the specialization becomes
-unconditional. -/
+`κ · (1 + 1/(100m)) + exp(-k / (80000 m²))`. -/
 theorem ldPastingNCompleteness_of_tailLowerBound
     (params : Parameters)
     [FieldModel params.q]
@@ -238,17 +379,7 @@ theorem ldPastingNCompleteness
       1 - kappa * (1 + 1 / (100 * (params.m : Error))) -
           Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) ≤
         fromHToGBernoulliTailMass params strategy.state family k := by
-    /- Paper: this is the downstream Bernoulli-tail lower bound obtained by
-    specializing `lem:chernoff-bernoulli-matrix` to `θ = 1/(200m)` and the
-    averaged complete operator `G`, then repackaging its conclusion into
-    `fromHToGBernoulliTailMass` with error
-    `κ · (1 + 1/(100m)) + exp(-k / (80000 m²))`.  The surrounding completeness
-    chain is reduced to this single specialization step; its only remaining
-    input is `chernoffBernoulliMatrix`'s `hScalarTail` hypothesis (the scalar
-    Bernoulli/Hoeffding bound), which issue #642 tracks proving internally.
-    The `hd` hypothesis is threaded for the earlier `overAllOutcomes` call, not
-    for this scalar Bernoulli-tail step. -/
-    sorry
+    exact fromHToGBernoulliTailMass_lower_bound params strategy kappa family hcomplete k hk
   exact ldPastingNCompleteness_of_tailLowerBound params strategy
     eps delta gamma kappa zeta hgood hgamma_le hzeta_le hdq_le hd
     family hcons hself hbound k hk_pos hk htail

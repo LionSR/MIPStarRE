@@ -87,13 +87,6 @@ private lemma polynomialWeightSqrtOperator_mul_self
   simpa [polynomialWeightSqrtOperator] using
     CFC.sqrt_mul_sqrt_self (G.outcome g) (G.outcome_pos g)
 
-private lemma leftTensor_sub
-    {A B : MIPStarRE.Quantum.Op ι} :
-    leftTensor (ι₂ := ι) A - leftTensor (ι₂ := ι) B =
-      leftTensor (ι₂ := ι) (A - B) := by
-  simpa [leftTensor] using
-    (opTensor_sub_left (ι₁ := ι) (ι₂ := ι) A B (1 : MIPStarRE.Quantum.Op ι))
-
 private lemma weightedPointConditionedOperator_sub
     (params : Parameters)
     [FieldModel params.q]

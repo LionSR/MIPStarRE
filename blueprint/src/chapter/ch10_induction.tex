@@ -91,9 +91,9 @@
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
   \lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection}
   % Lean-local gap: `ldPastingInInductionSection` wraps `Pasting.ldPasting`,
-  % whose closure still contains `sorryAx` via `ldPastingNCompleteness`
-  % (`Pasting/Bernoulli/Final.lean:247`). Same root cause as the ch09
-  % `thm:ld-pasting` tag; restore once that sorry is closed.
+  % whose closure still contains `sorryAx` through the upstream
+  % `overAllOutcomes` and `fromHToG` residuals. The former
+  % `Pasting/Bernoulli/Final.lean` Bernoulli-tail gap is closed.
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
   \begin{enumerate}
