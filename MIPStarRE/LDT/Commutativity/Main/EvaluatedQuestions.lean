@@ -73,11 +73,11 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
     obtain ⟨hgamma_le, hzeta_le, hdq_le⟩ := hsmall
     -- Step 1: The Schwartz-Zippel transport.
     -- Bound the full-product sddErrorOp by corrections from:
-    -- (a) Two Schwartz-Zippel marginalizations (each ≤ md/q)
-    -- (b) Multiple closenessOfIP applications (each ≤ √ζ)
-    -- (c) The evaluated commutation via closenessOfIP
+    -- (a) Two hybrid Schwartz-Zippel marginalizations
+    --     (each ≤ md/q + 2√ζ)
+    -- (b) The evaluated commutation via the strong `hEval` transport
     --     (≤ √(commDataProcessedGError))
-    -- giving total ≤ 12√ζ + 4md/q + 2√(commDataProcessedGError).
+    -- giving total ≤ 8√ζ + 4md/q + 2√(commDataProcessedGError).
     --
     -- Proof sketch:
     -- * Expand qSDDOp into quartic trace terms
@@ -96,7 +96,7 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
             (fullSliceQuestionOfEvaluatedSlice params q))
           (fun q => fullSliceProductRight params strategy family
             (fullSliceQuestionOfEvaluatedSlice params q)) ≤
-        12 * Real.sqrt zeta +
+        8 * Real.sqrt zeta +
           4 * (↑params.m * ↑params.d / ↑params.q) +
           2 * Real.sqrt
             (commDataProcessedGError params gamma zeta) := by
@@ -107,25 +107,21 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
       --     `|fullABA − fullABAB|
       --        ≤ |fullABA − evalABA| + |evalABA − evalABAB|
       --          + |evalABAB − fullABAB|`
-      -- * `fullSlice_scalar_marginalize_x`: `|fullABA − evalABA| ≤ md/q`
-      --   (paper line 342).
-      -- * `fullSlice_scalar_marginalize_y`: `|fullABAB − evalABAB| ≤ md/q`
-      --   (paper line 373).
-      -- * `fullSlice_closenessOfIP_CAB_hEval`: using `hEval` and the six
-      --   `closenessOfIP` steps on the evaluated side,
-      --   `|evalABA − evalABAB| ≤ 6√ζ + √ν` (paper lines 301, 334, 359-360,
-      --   394, 396).
-      -- Summing gives `|fullABA − fullABAB| ≤ 6√ζ + 2(md/q) + √ν`,
-      -- and multiplying by `2` produces `12√ζ + 4(md/q) + 2√ν`.
+      -- * `fullSlice_scalar_marginalize_x` and `_y`: each scalar public
+      --   marginalization costs `md/q + 2√ζ` after the #713 tensor bridge.
+      -- * `fullSlice_closenessOfIP_CAB_hEval_sqrt`: the direct evaluated-side
+      --   route gives `|evalABA − evalABAB| ≤ √ν`.
+      -- Summing gives `|fullABA − fullABAB| ≤ 4√ζ + 2(md/q) + √ν`,
+      -- and multiplying by `2` produces `8√ζ + 4(md/q) + 2√ν`.
       have hExpand :=
         fullSliceCommutation_qSDDOp_avg_eq params strategy family
       have hMargX :=
-        fullSlice_scalar_marginalize_x params strategy family
+        fullSlice_scalar_marginalize_x params strategy family zeta hnorm _hself
       have hMargY :=
-        fullSlice_scalar_marginalize_y params strategy family
+        fullSlice_scalar_marginalize_y params strategy family zeta hnorm _hself
       have hClose :=
-        fullSlice_closenessOfIP_CAB_hEval params strategy family gamma zeta
-          hnorm hgamma_nonneg hzeta_nonneg _hself hEval
+        fullSlice_closenessOfIP_CAB_hEval_sqrt params strategy family gamma zeta
+          hnorm hEval
       -- Triangle inequality on the three intermediate quantities.
       have hTri :
           |fullSliceABAAvg params strategy family -
@@ -175,7 +171,8 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
       have hMargY' :
           |evaluatedSliceABABAvg params strategy family -
               fullSliceABABAvg params strategy family| ≤
-            (↑params.m : Error) * ↑params.d / ↑params.q := by
+            (↑params.m : Error) * ↑params.d / ↑params.q +
+              2 * Real.sqrt zeta := by
         rw [abs_sub_comm]
         exact hMargY
       -- `sddErrorOp = 2 · (fullABA − fullABAB) ≤ 2 · |fullABA − fullABAB|`.
@@ -213,30 +210,31 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
                     fullSliceABABAvg params strategy family|) := by
               linarith [hTri]
         _ ≤ 2 *
-              (((↑params.m : Error) * ↑params.d / ↑params.q) +
-                (6 * Real.sqrt zeta +
-                  Real.sqrt
-                    (commDataProcessedGError params gamma zeta)) +
-                ((↑params.m : Error) * ↑params.d / ↑params.q)) := by
+              (((↑params.m : Error) * ↑params.d / ↑params.q +
+                  2 * Real.sqrt zeta) +
+                Real.sqrt
+                  (commDataProcessedGError params gamma zeta) +
+                ((↑params.m : Error) * ↑params.d / ↑params.q +
+                  2 * Real.sqrt zeta)) := by
               linarith [hMargX, hMargY', hClose]
-        _ = 12 * Real.sqrt zeta +
+        _ = 8 * Real.sqrt zeta +
               4 * (↑params.m * ↑params.d / ↑params.q) +
               2 * Real.sqrt
                 (commDataProcessedGError params gamma zeta) := by ring
     -- Step 2: Error arithmetic (using small-parameter hypotheses).
     -- Show:
-    --   12√ζ + 4md/q + 2√(48m(√γ + √ζ))
+    --   8√ζ + 4md/q + 2√(48m(√γ + √ζ))
     --     ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
     --
     -- Key estimates (all require γ, ζ, d/q ≤ 1):
     -- * 2√(48m(√γ + √ζ)) ≤ 2√(48m)(γ^¼ + ζ^¼) ≤ 14m(γ^¼ + ζ^¼)
     --   using √(a+b) ≤ √a + √b and √m ≤ m (for m ≥ 1)
-    -- * 12√ζ ≤ 12ζ^¼ ≤ 12m·ζ^¼ (ζ ≤ 1 ⇒ ζ^½ ≤ ζ^¼; m ≥ 1)
+    -- * 8√ζ ≤ 16m·ζ^¼ (ζ ≤ 1 ⇒ ζ^½ ≤ ζ^¼; m ≥ 1)
     -- * 4md/q ≤ 4m(d/q)^¼ (d/q ≤ 1 ⇒ x ≤ x^¼)
-    -- * Total: 14m·γ^¼ + 26m·ζ^¼ + 4m·(d/q)^¼
+    -- * Total: 14m·γ^¼ + 30m·ζ^¼ + 4m·(d/q)^¼
     --         ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
     have hArith :
-        12 * Real.sqrt zeta +
+        8 * Real.sqrt zeta +
           4 * (↑params.m * ↑params.d / ↑params.q) +
           2 * Real.sqrt
             (commDataProcessedGError params gamma zeta) ≤
@@ -347,7 +345,7 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
         apply Real.sqrt_le_sqrt
         nlinarith [hm_ge]
       -- Combine the three parts
-      have hA : 12 * Real.sqrt zeta ≤
+      have hA : 8 * Real.sqrt zeta ≤
           16 * ↑params.m *
             Real.rpow zeta (1 / (4 : Error)) := by
         nlinarith [h_sqrt_z, hm_ge, hz4]
