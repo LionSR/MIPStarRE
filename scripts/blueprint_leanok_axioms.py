@@ -56,22 +56,34 @@ class DeclAxiomInfo:
 
 @dataclass
 class DeclFailure:
-    """A failing blueprint declaration tagged with ``\\leanok``."""
+    """A failing blueprint declaration tagged with ``\\leanok``.
+
+    ``placement`` records the strongest ``\\leanok`` placement observed for
+    the declaration across all of its blueprint entries: ``"proof"``,
+    ``"statement"``, or ``"none"``. Failures only arise from proof-level
+    claims; statement-level-only decls produce warnings instead.
+    """
 
     decl: str
     entries: list[BlueprintEntry]
     reason: str
     info: DeclAxiomInfo | None = None
+    placement: str = "none"
 
 
 @dataclass
 class DeclWarning:
-    """A non-fatal blueprint/Lean discrepancy."""
+    """A non-fatal blueprint/Lean discrepancy.
+
+    ``placement`` mirrors :class:`DeclFailure` so callers can tell a
+    statement-level-only sorry warning apart from a missing-tag warning.
+    """
 
     decl: str
     entries: list[BlueprintEntry]
     reason: str
     info: DeclAxiomInfo | None = None
+    placement: str = "none"
 
 
 @dataclass
@@ -105,6 +117,30 @@ def _group_entries_by_decl(entries: list[BlueprintEntry]) -> dict[str, list[Blue
 
 def _decl_has_any_leanok(entries: list[BlueprintEntry]) -> bool:
     return any(_entry_has_leanok(entry) for entry in entries)
+
+
+def _decl_leanok_placement(entries: list[BlueprintEntry]) -> str:
+    """Classify a declaration's strongest ``\\leanok`` claim across ``entries``.
+
+    Following ``docs/blueprint_style_guide.md``:
+
+    * ``proof`` — at least one entry carries proof-level ``\\leanok``. This
+      is the only placement that claims the Lean proof is complete, so the
+      axiom-closure check *must* fail on ``sorryAx`` for these decls.
+    * ``statement`` — at least one entry carries statement-level
+      ``\\leanok`` but none carries proof-level. The Lean declaration
+      exists and its statement matches; the proof is not claimed complete,
+      so a ``sorryAx`` finding is reported as a warning rather than a
+      hard error.
+    * ``none`` — no ``\\leanok`` anywhere.
+    """
+    has_proof = any(entry.proof_has_leanok for entry in entries)
+    if has_proof:
+        return "proof"
+    has_statement = any(entry.has_leanok for entry in entries)
+    if has_statement:
+        return "statement"
+    return "none"
 
 
 def module_name_from_decl(decl: LeanDecl) -> str:
@@ -466,57 +502,74 @@ def audit_blueprint(
     pass_count = 0
 
     for decl, decl_entries in entries_by_decl.items():
-        has_leanok = _decl_has_any_leanok(decl_entries)
+        placement = _decl_leanok_placement(decl_entries)
+        has_leanok = placement != "none"
+        # Only proof-level \leanok claims proof completeness, so only
+        # proof-level findings should hard-fail. Statement-level-only
+        # findings downgrade to warnings — see docs/ci-blueprint-sync.md.
+        severity_error = placement == "proof"
         if not has_leanok and not warn_missing_leanok:
             continue
 
         info = axiom_info.get(decl)
+        is_failure = has_leanok and severity_error
+
+        def _record(reason: str, info: DeclAxiomInfo | None = None) -> None:
+            if is_failure:
+                failures.append(
+                    DeclFailure(
+                        decl=decl,
+                        entries=decl_entries,
+                        reason=reason,
+                        info=info,
+                        placement=placement,
+                    )
+                )
+            else:
+                warnings.append(
+                    DeclWarning(
+                        decl=decl,
+                        entries=decl_entries,
+                        reason=reason,
+                        info=info,
+                        placement=placement,
+                    )
+                )
 
         if decl not in lean_decls:
-            reason = "blueprint references a declaration that was not found in the Lean source tree."
-            if has_leanok:
-                failures.append(DeclFailure(decl=decl, entries=decl_entries, reason=reason))
-            else:
-                warnings.append(DeclWarning(decl=decl, entries=decl_entries, reason=reason))
+            _record("blueprint references a declaration that was not found in the Lean source tree.")
             continue
 
         if info is None:
-            reason = "internal error: declaration was not scheduled for axiom checking."
-            if has_leanok:
-                failures.append(DeclFailure(decl=decl, entries=decl_entries, reason=reason))
-            else:
-                warnings.append(DeclWarning(decl=decl, entries=decl_entries, reason=reason))
+            _record("internal error: declaration was not scheduled for axiom checking.")
             continue
 
         if info.harness_error:
-            if has_leanok:
-                failures.append(DeclFailure(decl=decl, entries=decl_entries, reason=info.harness_error, info=info))
-            else:
-                warnings.append(DeclWarning(decl=decl, entries=decl_entries, reason=info.harness_error, info=info))
+            _record(info.harness_error, info=info)
             continue
 
         if not info.exists:
-            reason = (
-                "`#print axioms` could not resolve the declaration after importing its defining module."
+            _record(
+                "`#print axioms` could not resolve the declaration after importing its defining module.",
+                info=info,
             )
-            if has_leanok:
-                failures.append(DeclFailure(decl=decl, entries=decl_entries, reason=reason, info=info))
-            else:
-                warnings.append(DeclWarning(decl=decl, entries=decl_entries, reason=reason, info=info))
             continue
 
         if info.parse_error:
-            reason = "could not parse `#print axioms` output (fail-safe)."
-            if has_leanok:
-                failures.append(DeclFailure(decl=decl, entries=decl_entries, reason=reason, info=info))
-            else:
-                warnings.append(DeclWarning(decl=decl, entries=decl_entries, reason=reason, info=info))
+            _record("could not parse `#print axioms` output (fail-safe).", info=info)
             continue
 
         if has_leanok:
             if info.sorry:
-                reason = "transitive axiom closure includes sorryAx."
-                failures.append(DeclFailure(decl=decl, entries=decl_entries, reason=reason, info=info))
+                if placement == "proof":
+                    reason = "transitive axiom closure includes sorryAx."
+                else:
+                    reason = (
+                        "transitive axiom closure includes sorryAx, but the blueprint entry only "
+                        "carries statement-level \\leanok so this is reported as a warning "
+                        "(no proof-level completeness claim was made)."
+                    )
+                _record(reason, info=info)
             else:
                 pass_count += 1
         elif not info.sorry:
@@ -526,23 +579,41 @@ def audit_blueprint(
                     entries=decl_entries,
                     reason="declaration is sorry-free in Lean but the blueprint lacks any `\\leanok` tag.",
                     info=info,
+                    placement=placement,
                 )
             )
 
     return AuditResult(entries=entries, pass_count=pass_count, failures=failures, warnings=warnings)
 
 
+def _format_placement(placement: str) -> str:
+    if placement in ("statement", "proof"):
+        return f" [\\leanok: {placement}-level]"
+    return ""
+
+
 def print_audit(result: AuditResult) -> None:
     fail_count = len(result.failures)
+    grouped = _group_entries_by_decl(result.entries)
+    statement_only_count = sum(
+        1 for entries in grouped.values() if _decl_leanok_placement(entries) == "statement"
+    )
+    proof_level_count = sum(
+        1 for entries in grouped.values() if _decl_leanok_placement(entries) == "proof"
+    )
     print()
-    print(f"PASS: {result.pass_count} decls, FAIL: {fail_count} decls")
+    print(
+        f"PASS: {result.pass_count} decls, FAIL: {fail_count} decls "
+        f"(\\leanok placements seen: {statement_only_count} statement-only, "
+        f"{proof_level_count} with proof-level)"
+    )
 
     if result.failures:
         print()
-        print("FAILURES:")
+        print("FAILURES (proof-level \\leanok claims):")
         for failure in result.failures:
             locations = _format_locations(failure.entries)
-            print(f"  - {failure.decl}")
+            print(f"  - {failure.decl}{_format_placement(failure.placement)}")
             print(f"    locations: {locations}")
             print(f"    reason: {failure.reason}")
             if failure.info and failure.info.axioms:
@@ -558,7 +629,7 @@ def print_audit(result: AuditResult) -> None:
         print(f"WARN: {len(result.warnings)} declaration(s)")
         for warning in result.warnings:
             locations = _format_locations(warning.entries)
-            print(f"  - {warning.decl}")
+            print(f"  - {warning.decl}{_format_placement(warning.placement)}")
             print(f"    locations: {locations}")
             print(f"    reason: {warning.reason}")
             if warning.info and warning.info.axioms:
@@ -571,7 +642,7 @@ def print_audit(result: AuditResult) -> None:
 
     if not result.failures:
         print()
-        print("No \\leanok-tagged declarations depend on sorryAx.")
+        print("No proof-level \\leanok-tagged declarations depend on sorryAx.")
 
 
 def main() -> int:
