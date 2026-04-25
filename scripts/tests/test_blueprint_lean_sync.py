@@ -312,6 +312,40 @@ class LeanokPlacementReportingTests(unittest.TestCase):
         self.assertEqual(ch04["statement_formalized"], 0)
         self.assertEqual(ch04["proof_formalized"], 0)
 
+    def test_definition_entries_do_not_deflate_proof_coverage(self) -> None:
+        entries = [
+            BlueprintEntry(
+                file="src/chapter/ch04.tex",
+                line=10,
+                env_type="definition",
+                label="def:only",
+                lean_decl="Foo.definitionOnly",
+                has_leanok=True,
+                proof_has_leanok=False,
+            ),
+            BlueprintEntry(
+                file="src/chapter/ch04.tex",
+                line=20,
+                env_type="lemma",
+                label="lem:full",
+                lean_decl="Foo.fullLemma",
+                has_leanok=True,
+                proof_has_leanok=True,
+            ),
+        ]
+        report = SyncReport(
+            blueprint_entries=entries,
+            lean_decls={
+                entry.lean_decl: self._fake_decl(entry.lean_decl) for entry in entries
+            },
+        )
+        stats = _chapter_stats(report)
+        ch04 = stats["src/chapter/ch04.tex"]
+        self.assertEqual(ch04["total"], 2)
+        self.assertEqual(ch04["statement_formalized"], 2)
+        self.assertEqual(ch04["proof_total"], 1)
+        self.assertEqual(ch04["proof_formalized"], 1)
+
     def test_split_entries_for_same_decl_count_as_proof_formalized(self) -> None:
         entries = [
             BlueprintEntry(

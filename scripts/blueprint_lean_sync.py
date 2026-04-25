@@ -661,6 +661,21 @@ def run_sync(
     return report
 
 
+
+_PROOF_BEARING_ENV_TYPES = {"theorem", "lemma", "proposition", "corollary"}
+
+
+def _is_proof_relevant_entry(entry: BlueprintEntry) -> bool:
+    r"""Return whether ``entry`` belongs in proof-coverage denominators.
+
+    Definitions are intentionally statement-level objects in the blueprint: they
+    can be transcribed with statement-level ``\leanok`` but do not have proof
+    blocks.  The proof denominator therefore counts theorem-like declarations
+    (and any entry that actually carries a proof marker), not every Lean ref.
+    """
+    return entry.env_type in _PROOF_BEARING_ENV_TYPES or entry.proof_has_leanok
+
+
 def _chapter_stats(report: SyncReport) -> dict[str, dict]:
     r"""Per-chapter formalization progress.
 
@@ -678,7 +693,8 @@ def _chapter_stats(report: SyncReport) -> dict[str, dict]:
       that repeat the same ``\lean{...}`` declaration.
     * ``proof_total`` is the declaration-level denominator for proof coverage;
       it intentionally differs from entry-level ``total`` so split entries do
-      not divide a declaration-level numerator by an entry-level denominator.
+      not divide a declaration-level numerator by an entry-level denominator,
+      and it excludes definitions/remarks that do not have proof blocks.
     * ``formalized`` is the legacy alias of ``statement_formalized`` and is
       kept so existing downstream consumers (CI badges, pre-existing JSON
       readers) continue to work.
@@ -708,14 +724,24 @@ def _chapter_stats(report: SyncReport) -> dict[str, dict]:
 
         decl_state = decl_leanok[chapter].setdefault(
             entry.lean_decl,
-            {"found": found, "statement": False, "proof": False},
+            {
+                "found": found,
+                "statement": False,
+                "proof": False,
+                "proof_relevant": False,
+            },
         )
         decl_state["found"] = decl_state["found"] or found
         decl_state["statement"] = decl_state["statement"] or entry.has_leanok
         decl_state["proof"] = decl_state["proof"] or entry.proof_has_leanok
+        decl_state["proof_relevant"] = (
+            decl_state["proof_relevant"] or _is_proof_relevant_entry(entry)
+        )
 
     for chapter, decls in decl_leanok.items():
-        stats[chapter]["proof_total"] = len(decls)
+        stats[chapter]["proof_total"] = sum(
+            1 for decl_state in decls.values() if decl_state["proof_relevant"]
+        )
         stats[chapter]["proof_formalized"] = sum(
             1
             for decl_state in decls.values()
