@@ -49,132 +49,19 @@ jobs:
         env:
           REPORT_PREFIX: ${{ runner.temp }}/lean-linter-warning-sweep
         run: |
-          python3 - <<'PY'
-          import json
-          import os
-          import re
-          from collections import Counter
-          from pathlib import Path
+          python3 scripts/lean_linter_warning_report.py \
+            --log "$REPORT_PREFIX.log" \
+            --json "$REPORT_PREFIX.json" \
+            --text "$REPORT_PREFIX.txt" \
+            --github-summary "$GITHUB_STEP_SUMMARY"
 
-          prefix = Path(os.environ["REPORT_PREFIX"])
-          log_path = prefix.with_suffix(".log")
-          json_path = prefix.with_suffix(".json")
-          txt_path = prefix.with_suffix(".txt")
-
-          known_linter_names = [
-              "style.setOption",
-              "flexible",
-              "unnecessarySimpa",
-              "unusedDecidableInType",
-              "unusedFintypeInType",
-              "unusedSimpArgs",
-              "unusedVariables",
-              "unreachableTactic",
-              "simpNF",
-              "omegaNF",
-              "dupNamespace",
-              "docPrime",
-          ]
-          warning_re = re.compile(
-              r"^(?P<path>[^:\n]+\.lean):(?P<line>\d+):(?P<col>\d+): warning: (?P<message>.*)$"
-          )
-
-          if not log_path.exists():
-              log_path.touch()
-
-          linter_note_re = re.compile(r"set_option\s+linter\.([A-Za-z0-9_.]+)\s+false")
-
-          def warning_category(message: str, note_lines: list[str]) -> str:
-              note_text = "\n".join(note_lines)
-              note_match = linter_note_re.search(note_text)
-              if note_match:
-                  return note_match.group(1)
-              return next(
-                  (name for name in known_linter_names if name in message),
-                  "other",
-              )
-
-          warnings = []
-          if log_path.exists():
-              raw_lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
-              for index, raw_line in enumerate(raw_lines):
-                  match = warning_re.match(raw_line)
-                  if not match:
-                      continue
-                  message = match.group("message")
-                  note_lines = []
-                  for follow in raw_lines[index + 1:]:
-                      if warning_re.match(follow):
-                          break
-                      if "set_option linter." in follow:
-                          note_lines.append(follow)
-                  category = warning_category(message, note_lines)
-                  warnings.append({
-                      "path": match.group("path"),
-                      "line": int(match.group("line")),
-                      "column": int(match.group("col")),
-                      "category": category,
-                      "message": message,
-                      "raw": raw_line,
-                  })
-
-          counts = Counter(warning["category"] for warning in warnings)
-          report = {
-              "warning_count": len(warnings),
-              "category_counts": dict(sorted(counts.items())),
-              "warnings": warnings,
-          }
-          json_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-
-          lines = [
-              "Lean linter-warning sweep report",
-              "=================================",
-              f"warnings found: {len(warnings)}",
-              "",
-              "category counts:",
-          ]
-          if counts:
-              for category, count in sorted(counts.items()):
-                  lines.append(f"  - {category}: {count}")
-          else:
-              lines.append("  - none")
-          lines.extend(["", "warnings:"])
-          if warnings:
-              for warning in warnings:
-                  lines.append(
-                      f"  - {warning['path']}:{warning['line']}:{warning['column']} "
-                      f"[{warning['category']}] {warning['message']}"
-                  )
-          else:
-              lines.append("  - none")
-          txt_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-          summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
-          with summary_path.open("a", encoding="utf-8") as summary:
-              summary.write("## Lean linter-warning sweep\n\n")
-              summary.write(
-                  "This scheduled workflow is report-only. It captures Lean compiler "
-                  "warnings from `lake exe cache get && lake build -q --log-level=info` "
-                  "and uploads the report for maintainers to triage.\n\n"
-              )
-              summary.write(
-                  "A future auto-fix PR wrapper should only run with explicit write-token "
-                  "support and must preserve the project file-order convention: "
-                  "`set_option` directives go after the module docstring.\n\n"
-              )
-              summary.write(f"- Warnings found: {len(warnings)}\n")
-              if counts:
-                  summary.write("- Categories: " + ", ".join(
-                      f"{category}={count}" for category, count in sorted(counts.items())
-                  ) + "\n")
-              if warnings:
-                  summary.write("\n```text\n")
-                  preview = lines[:120]
-                  summary.write("\n".join(preview))
-                  if len(lines) > len(preview):
-                      summary.write("\n... truncated; see artifact for full report")
-                  summary.write("\n```\n")
-          PY
+          {
+            echo
+            echo "A manual auto-fix wrapper is available in"
+            echo "\`.github/workflows/lean-linter-warning-autofix.yml\`."
+            echo "It only creates a PR when explicitly dispatched in write mode,"
+            echo "when warnings are present, and when Claude produces a non-empty diff."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload linter-warning report
         if: always()
