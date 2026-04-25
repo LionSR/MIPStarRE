@@ -577,19 +577,13 @@ lemma globalVarianceOfPointsFromLocalDeviation
   have hglobalNorm :
       ∀ g : Polynomial params,
         globalVarianceDeviationAtPolynomial params strategy strategy.state G g ≤
-          globalVarianceOfPointsError params eps delta := by
-    intro g
-    calc
-      globalVarianceDeviationAtPolynomial params strategy strategy.state G g
-          ≤ (params.m : Error) *
-              localVarianceDeviationAtPolynomial params strategy strategy.state G g :=
-            globalVarianceDeviationAtPolynomial_le_m_localVarianceDeviationAtPolynomial
-              params strategy G g
-      _ ≤ (params.m : Error) * localVarianceOfPointsError params eps delta := by
-            exact mul_le_mul_of_nonneg_left (hlocalDev g) (by positivity)
-      _ = globalVarianceOfPointsError params eps delta := by
-            simp [globalVarianceOfPointsError, localVarianceOfPointsError]
-            ring
+          globalVarianceOfPointsError params eps delta :=
+    globalVarianceOfPoints_bound_of_local params eps delta
+      (fun g => globalVarianceDeviationAtPolynomial params strategy strategy.state G g)
+      (fun g => localVarianceDeviationAtPolynomial params strategy strategy.state G g)
+      (globalVarianceDeviationAtPolynomial_le_m_localVarianceDeviationAtPolynomial
+        params strategy G)
+      hlocalDev
   have hglobalVariance :
       ∀ g : Polynomial params,
         pointConditionedGlobalVarianceAtPolynomial params strategy G g ≤
