@@ -762,12 +762,77 @@
 
   </div>
 </div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:axis-line-polynomial-agreement-mdq">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">3.9</span>
+    <span class="lemma_thmtitle">Axis-line polynomial agreement bound</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-prelims.html#lem:axis-line-polynomial-agreement-mdq">#</a>
+    
+    <a class="icon proof" href="sec-prelims.html#a0000000047"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.axisLinePolynomialAgreement_avg_eq_scalarDomain" class="lean_decl">MIPStarRE.LDT.Preliminaries.axisLinePolynomialAgreement_avg_eq_scalarDomain</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.axisLinePolynomialAgreement_avg_le_mdq" class="lean_decl">MIPStarRE.LDT.Preliminaries.axisLinePolynomialAgreement_avg_le_mdq</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  Let \(f,h : \mathrm{AxisLinePolynomial}\, \mathrm{params}\) be two line-polynomial outcomes with distinct underlying polynomials. Then </p>
+<div class="displaymath" id="a0000000048">
+  \[  \mathbb {E}_{t \sim \mathbb {F}_q}\bigl[\mathbf{1}[f(t)=h(t)]\bigr] \le \frac{md}{q}.  \]
+</div>
+<p> The native univariate root-counting bound is \(d/q\); the statement deliberately pads this to the paper’s ambient \(md/q\) loss for Section&#160;<a href="sec-variance.html#lem:generalize-b">6.1</a>. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000047">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Reindex coded line parameters to the scalar field, count the roots of the nonzero univariate polynomial \(f-h\), and use \(m\ge 1\) to pad \(d/q\) to \(md/q\). </p>
+
+  </div>
+</div>
 <div class="definition_thmwrapper theorem-style-definition" id="def:submeasurement">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">3.9</span>
+    <span class="definition_thmlabel">3.10</span>
     <span class="definition_thmtitle">Measurements and submeasurements</span>
     <div class="thm_header_extras">
 
@@ -815,7 +880,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">3.10</span>
+    <span class="definition_thmlabel">3.11</span>
     <span class="definition_thmtitle">Low-degree polynomial measurements</span>
     <div class="thm_header_extras">
 
@@ -841,7 +906,7 @@
           
           <li><a href="sec-prelims.html#def:polyfunc">Definition 3.4</a></li>
           
-          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.9</a></li>
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.10</a></li>
           
         </ul>
     
@@ -885,7 +950,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">3.11</span>
+    <span class="definition_thmlabel">3.12</span>
     <span class="definition_thmtitle">Post-processing</span>
     <div class="thm_header_extras">
 
@@ -909,7 +974,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.9</a></li>
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.10</a></li>
           
         </ul>
     
@@ -941,7 +1006,7 @@
   </div>
   <div class="definition_thmcontent">
   <p>   Let \(A=\{ A_a\} _{a \in \mathcal A}\) be a family of operators and let \(f\colon \mathcal A \to \mathcal B\). The post-processed family \(A_{[f(a)=b]}\) is defined by </p>
-<div class="displaymath" id="a0000000047">
+<div class="displaymath" id="a0000000049">
   \[  A_{[f(a)=b]} = \sum _{a\,  :\,  f(a)=b} A_a.  \]
 </div>
 
@@ -952,7 +1017,7 @@
     <span class="proposition_thmcaption">
     Proposition
     </span>
-    <span class="proposition_thmlabel">3.12</span>
+    <span class="proposition_thmlabel">3.13</span>
     <span class="proposition_thmtitle">Post-processing preserves measurements</span>
     <div class="thm_header_extras">
 
@@ -963,7 +1028,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:post-processing-preserves">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000048"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000050"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -979,9 +1044,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:post-processing">Definition 3.11</a></li>
+          <li><a href="sec-prelims.html#def:post-processing">Definition 3.12</a></li>
           
-          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.9</a></li>
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.10</a></li>
           
         </ul>
     
@@ -1013,14 +1078,14 @@
   </div>
   <div class="proposition_thmcontent">
   <p>   Let \(A=\{ A_a\} _{a \in \mathcal A}\) be a family of operators and let \(f\colon \mathcal A \to \mathcal B\). Then </p>
-<div class="displaymath" id="a0000000049">
+<div class="displaymath" id="a0000000051">
   \[  \sum _a A_a = \sum _b A_{[f(a)=b]}.  \]
 </div>
 <p> Consequently, if \(\{ A_a\} \) is a submeasurement, respectively a measurement, then \(\{ A_{[f(a)=b]}\} \) is again a submeasurement, respectively a measurement. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000048">
+<div class="proof_wrapper" id="a0000000050">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1037,7 +1102,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">3.13</span>
+    <span class="remark_thmlabel">3.14</span>
     <span class="remark_thmtitle">Post-processing notation</span>
     <div class="thm_header_extras">
 
@@ -1052,7 +1117,7 @@
   </div>
   <div class="remark_thmcontent">
   <p> In the notation \(A_{[f(a)=b]}\), the measurement outcome is the variable to which the function is applied. For example, if \(G=\{ G_g\}  \in \mathrm{PolySub}(m,q,d)\) and \(u \in \mathbb {F}_q^m\), then </p>
-<div class="displaymath" id="a0000000050">
+<div class="displaymath" id="a0000000052">
   \[  G_{[g(u)=a]} = \sum _{g\, :\, g(u)=a} G_g.  \]
 </div>
 <p> Here \(g\) is the measurement outcome, and \(u\) is the evaluation point. </p>
@@ -1064,7 +1129,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">3.14</span>
+    <span class="definition_thmlabel">3.15</span>
     <span class="definition_thmtitle">Completion of a submeasurement</span>
     <div class="thm_header_extras">
 
@@ -1088,7 +1153,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.9</a></li>
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.10</a></li>
           
         </ul>
     
@@ -1130,7 +1195,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">3.15</span>
+    <span class="definition_thmlabel">3.16</span>
     <span class="definition_thmtitle">Consistency</span>
     <div class="thm_header_extras">
 
@@ -1166,7 +1231,7 @@
   </div>
   <div class="definition_thmcontent">
   <p>  Let \(\lvert \psi  \rangle  \in \mathcal H_{\mathrm A} \otimes \mathcal H_{\mathrm B}\). Let \(A=\{ A_a^x\} \) and \(B=\{ B_a^x\} \) be submeasurements with the same answer set, and let \(\mathcal D\) be a distribution on the question set. We write </p>
-<div class="displaymath" id="a0000000051">
+<div class="displaymath" id="a0000000053">
   \[  A_a^x \otimes I \simeq _\delta I \otimes B_a^x  \]
 </div>
 <p> when </p>
@@ -1186,7 +1251,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.16</span>
+    <span class="lemma_thmlabel">3.17</span>
     <span class="lemma_thmtitle">Characterization of a good symmetric strategy</span>
     <div class="thm_header_extras">
 
@@ -1197,7 +1262,7 @@
 
     <a class="icon proof" href="sec-prelims.html#lem:good-strategy-characterization">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000052"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000054"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1215,9 +1280,9 @@
           
           <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
           
-          <li><a href="sec-prelims.html#def:simeq">Definition 3.15</a></li>
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
-          <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.17</a></li>
+          <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.18</a></li>
           
         </ul>
     
@@ -1249,13 +1314,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   A symmetric projective strategy \((\psi ,A,B,L)\) is \((\varepsilon ,\delta ,\gamma )\)-good if and only if the following hold on the relevant test distributions: </p>
-<div class="displaymath" id="a0000000053">
+<div class="displaymath" id="a0000000055">
   \[  A_a^u \otimes I \simeq _\varepsilon I \otimes B^{\ell }_{[f(u)=a]}, \qquad A_a^u \otimes I \simeq _\delta I \otimes A_a^u, \qquad A_a^u \otimes I \simeq _\gamma I \otimes L^{\ell }_{[f(u)=a]}.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000052">
+<div class="proof_wrapper" id="a0000000054">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1263,7 +1328,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Each subtest accepts exactly when the two measurement outcomes agree. Because the relevant families are measurements, Lemma&#160;<a href="sec-prelims.html#prop:simeq-for-measurements">3.17</a> rewrites those acceptance probabilities as consistency bounds. </p>
+  <p>Each subtest accepts exactly when the two measurement outcomes agree. Because the relevant families are measurements, Lemma&#160;<a href="sec-prelims.html#prop:simeq-for-measurements">3.18</a> rewrites those acceptance probabilities as consistency bounds. </p>
 
   </div>
 </div>
@@ -1272,7 +1337,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.17</span>
+    <span class="lemma_thmlabel">3.18</span>
     <span class="lemma_thmtitle">Consistency for measurements</span>
     <div class="thm_header_extras">
 
@@ -1283,7 +1348,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:simeq-for-measurements">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000054"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000056"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1299,7 +1364,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:simeq">Definition 3.15</a></li>
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
         </ul>
     
@@ -1331,13 +1396,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   If \(A=\{ A_a^x\} \) and \(B=\{ B_a^x\} \) are measurements, then </p>
-<div class="displaymath" id="a0000000055">
+<div class="displaymath" id="a0000000057">
   \[  A_a^x \otimes I \simeq _\delta I \otimes B_a^x \qquad \text{if and only if}\qquad \mathbb {E}_x \sum _a \langle \psi  \rvert  A_a^x \otimes B_a^x \lvert \psi  \rangle  \ge 1-\delta .  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000054">
+<div class="proof_wrapper" id="a0000000056">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1354,7 +1419,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">3.18</span>
+    <span class="definition_thmlabel">3.19</span>
     <span class="definition_thmtitle">State-dependent distance</span>
     <div class="thm_header_extras">
 
@@ -1390,11 +1455,11 @@
   </div>
   <div class="definition_thmcontent">
   <p>  Let \(\lvert \psi  \rangle  \in \mathcal H\), let \(A=\{ A_a^x\} \) and \(B=\{ B_a^x\} \) be families of operators on \(\mathcal H\), and let \(\mathcal D\) be a distribution on the question set. We write </p>
-<div class="displaymath" id="a0000000056">
+<div class="displaymath" id="a0000000058">
   \[  A_a^x \approx _\delta B_a^x  \]
 </div>
 <p> when </p>
-<div class="displaymath" id="a0000000057">
+<div class="displaymath" id="a0000000059">
   \[  \mathbb {E}_{x \sim \mathcal D} \sum _a \lVert (A_a^x-B_a^x)\lvert \psi  \rangle  \rVert ^2 \le \delta .  \]
 </div>
 
@@ -1414,7 +1479,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.19</span>
+    <span class="lemma_thmlabel">3.20</span>
     <span class="lemma_thmtitle">Transferring consistency through state-dependent distance</span>
     <div class="thm_header_extras">
 
@@ -1425,7 +1490,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:triangle-sub">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000058"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000060"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1441,11 +1506,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:simeq">Definition 3.15</a></li>
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.17</a></li>
+          <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.18</a></li>
           
         </ul>
     
@@ -1477,13 +1542,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Let \(A=\{ A_a^x\} \) and \(B=\{ B_a^x\} \) be measurements and let \(C=\{ C_a^x\} \) be a submeasurement. If \(A_a^x \otimes I \simeq _\delta I \otimes C_a^x\) and \(A_a^x \otimes I \approx _\varepsilon B_a^x \otimes I\), then </p>
-<div class="displaymath" id="a0000000059">
+<div class="displaymath" id="a0000000061">
   \[  B_a^x \otimes I \simeq _{\delta +\sqrt\varepsilon } I \otimes C_a^x.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000058">
+<div class="proof_wrapper" id="a0000000060">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1500,7 +1565,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.20</span>
+    <span class="lemma_thmlabel">3.21</span>
     <span class="lemma_thmtitle">Consistency implies state-dependent distance for measurements</span>
     <div class="thm_header_extras">
 
@@ -1511,7 +1576,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:simeq-to-approx">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000060"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000062"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1527,11 +1592,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:simeq">Definition 3.15</a></li>
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.17</a></li>
+          <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.18</a></li>
           
         </ul>
     
@@ -1565,14 +1630,14 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   If \(A\) and \(B\) are measurements and \(A_a^x \otimes I \simeq _\delta I \otimes B_a^x\), then </p>
-<div class="displaymath" id="a0000000061">
+<div class="displaymath" id="a0000000063">
   \[  A_a^x \otimes I \approx _{2\delta } I \otimes B_a^x.  \]
 </div>
 <p> If both measurements are projective, the converse also holds: if \(A_a^x \otimes I \approx _{2\delta } I \otimes B_a^x\) then \(A_a^x \otimes I \simeq _\delta I \otimes B_a^x\). </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000060">
+<div class="proof_wrapper" id="a0000000062">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1580,7 +1645,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Expand the squared norm of \((A_a^x \otimes I - I \otimes B_a^x)\lvert \psi  \rangle \) and use the diagonal-overlap formula from Lemma&#160;<a href="sec-prelims.html#prop:simeq-for-measurements">3.17</a>; projectivity turns the diagonal inequality into an equality, giving the converse. </p>
+  <p>Expand the squared norm of \((A_a^x \otimes I - I \otimes B_a^x)\lvert \psi  \rangle \) and use the diagonal-overlap formula from Lemma&#160;<a href="sec-prelims.html#prop:simeq-for-measurements">3.18</a>; projectivity turns the diagonal inequality into an equality, giving the converse. </p>
 
   </div>
 </div>
@@ -1589,7 +1654,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">3.21</span>
+    <span class="remark_thmlabel">3.22</span>
     <div class="thm_header_extras">
 
         </div>
@@ -1603,7 +1668,7 @@
   </div>
   <div class="remark_thmcontent">
   <p> The implication above does not extend to submeasurements. For example, if \(A_a^x=0\) for all \(a\), then \(A_a^x \otimes I \simeq _0 I \otimes B_a^x\), but </p>
-<div class="displaymath" id="a0000000062">
+<div class="displaymath" id="a0000000064">
   \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \lVert (A^{{\boldsymbol {x}}}_a \otimes I - I \otimes B^{{\boldsymbol {x}}}_a)\lvert \psi  \rangle  \rVert ^2 = \mathbb {E}_{{\boldsymbol {x}}} \sum _a \lVert (I \otimes B^{{\boldsymbol {x}}}_a)\lvert \psi  \rangle  \rVert ^2,  \]
 </div>
 <p> which is nonzero unless \((I \otimes B_a^x)\lvert \psi  \rangle =0\) for all \(x\) and \(a\). </p>
@@ -1617,7 +1682,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">3.22</span>
+    <span class="theorem_thmlabel">3.23</span>
     <span class="theorem_thmtitle">Closeness of inner products</span>
     <div class="thm_header_extras">
 
@@ -1628,7 +1693,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:closeness-of-ip">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000063"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000065"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1644,7 +1709,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
         </ul>
     
@@ -1678,7 +1743,7 @@
   </div>
   <div class="theorem_thmcontent">
   <p>   Let \(\{ A^x_a\} \), \(\{ B^x_a\} \), and \(\{ C^x_{a,b}\} \) be matrices. Suppose that \(A^x_a \approx _\gamma B^x_a\) and that for all&#160;\(x\), </p>
-<div class="displaymath" id="a0000000064">
+<div class="displaymath" id="a0000000066">
   \[  \sum _a \Big(\sum _b C^x_{a,b}\Big) \Big(\sum _b C^x_{a,b}\Big)^\dagger \le I.  \]
 </div>
 <p> Then </p>
@@ -1691,7 +1756,7 @@
 </p>
 </div>
 <p> Similarly, suppose that \((A^x_a)^\dagger \approx _\gamma (B^x_a)^\dagger \) and that for all&#160;\(x\), </p>
-<div class="displaymath" id="a0000000065">
+<div class="displaymath" id="a0000000067">
   \[  \sum _a \Big(\sum _b C^x_{a,b}\Big)^\dagger \Big(\sum _b C^x_{a,b}\Big) \le I.  \]
 </div>
 <p> Then </p>
@@ -1706,7 +1771,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000063">
+<div class="proof_wrapper" id="a0000000065">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1715,15 +1780,15 @@
   </div>
   <div class="proof_content">
   <p>To prove <a href="sec-prelims.html#eq:closeness3" class="eqref">4</a>, write the difference as </p>
-<div class="displaymath" id="a0000000066">
+<div class="displaymath" id="a0000000068">
   \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  \Big(\sum _b C^{\boldsymbol {x}}_{a,b}\Big) (A^{\boldsymbol {x}}_a-B^{\boldsymbol {x}}_a) \lvert \psi  \rangle .  \]
 </div>
 <p> Cauchy–Schwarz bounds its magnitude by </p>
-<div class="displaymath" id="a0000000067">
+<div class="displaymath" id="a0000000069">
   \[  \Big( \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  \Big(\sum _b C^{{\boldsymbol {x}}}_{a,b}\Big)\Big(\sum _b C^{{\boldsymbol {x}}}_{a,b}\Big)^\dagger \lvert \psi  \rangle  \Big)^{1/2} \Big( \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a)^\dagger (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a) \lvert \psi  \rangle  \Big)^{1/2},  \]
 </div>
 <p> and the two hypotheses bound these factors by \(1\) and \(\sqrt{\gamma }\) respectively. For <a href="sec-prelims.html#eq:closeness4" class="eqref">5</a>, rewrite the difference as </p>
-<div class="displaymath" id="a0000000068">
+<div class="displaymath" id="a0000000070">
   \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _{a,b} \langle \psi  \rvert  (C^{{\boldsymbol {x}}}_{a,b})^\dagger \big((A^{{\boldsymbol {x}}}_a)^\dagger -(B^{{\boldsymbol {x}}}_a)^\dagger \big) \lvert \psi  \rangle ,  \]
 </div>
 <p> and apply <a href="sec-prelims.html#eq:closeness3" class="eqref">4</a> to the adjoint families. </p>
@@ -1735,7 +1800,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">3.23</span>
+    <span class="theorem_thmlabel">3.24</span>
     <div class="thm_header_extras">
 
     
@@ -1745,7 +1810,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:easy-approx-from-approx-delta">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000069"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000071"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1761,9 +1826,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.9</a></li>
+          <li><a href="sec-prelims.html#def:submeasurement">Definition 3.10</a></li>
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
         </ul>
     
@@ -1795,13 +1860,13 @@
   </div>
   <div class="theorem_thmcontent">
   <p>   Let \(A = \{ A^x_a\} \), \(B = \{ B^x_a\} \), and \(C = \{ C^x_a\} \) be submeasurements such that \(A^x_a \approx _{\delta } B^x_a\). Then </p>
-<div class="displaymath" id="a0000000070">
+<div class="displaymath" id="a0000000072">
   \begin{equation*}  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{{\boldsymbol {x}}}_a C^{{\boldsymbol {x}}}_a \lvert \psi  \rangle  \approx _{\sqrt{\delta }} \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  B^{{\boldsymbol {x}}}_a C^{{\boldsymbol {x}}}_a \lvert \psi  \rangle . \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000069">
+<div class="proof_wrapper" id="a0000000071">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1810,11 +1875,11 @@
   </div>
   <div class="proof_content">
   <p>The difference has magnitude </p>
-<div class="displaymath" id="a0000000071">
+<div class="displaymath" id="a0000000073">
   \[  \Big| \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a) C^{{\boldsymbol {x}}}_a \lvert \psi  \rangle \Big|.  \]
 </div>
 <p> By Cauchy–Schwarz this is at most </p>
-<div class="displaymath" id="a0000000072">
+<div class="displaymath" id="a0000000074">
   \[  \Big(\mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a)^2 \lvert \psi  \rangle \Big)^{1/2} \Big(\mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (C^{{\boldsymbol {x}}}_a)^2 \lvert \psi  \rangle \Big)^{1/2}.  \]
 </div>
 <p> The first factor is at most \(\sqrt{\delta }\) by hypothesis, and the second is at most \(1\) because \(C\) is a submeasurement. </p>
@@ -1826,7 +1891,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">3.24</span>
+    <span class="theorem_thmlabel">3.25</span>
     <div class="thm_header_extras">
 
     
@@ -1836,7 +1901,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:cab-approx-delta">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000073"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000075"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1852,7 +1917,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
         </ul>
     
@@ -1884,17 +1949,17 @@
   </div>
   <div class="theorem_thmcontent">
   <p>   Let \(\{ A^x_a\} \), \(\{ B^x_a\} \), and \(\{ C^x_{a,b}\} \) be matrices. Suppose that \(A^{x}_a \approx _\delta B^{x}_a\) and that for all \(x\) and \(a\), </p>
-<div class="displaymath" id="a0000000074">
+<div class="displaymath" id="a0000000076">
   \[  \sum _b (C^{x}_{a,b})^\dagger (C^{x}_{a,b}) \leq I.  \]
 </div>
 <p> Then </p>
-<div class="displaymath" id="a0000000075">
+<div class="displaymath" id="a0000000077">
   \[  C^{x}_{a,b} A^x_{a} \approx _{\delta } C^{x}_{a,b} B^{x}_a.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000073">
+<div class="proof_wrapper" id="a0000000075">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1903,11 +1968,11 @@
   </div>
   <div class="proof_content">
   <p>The error term is </p>
-<div class="displaymath" id="a0000000076">
+<div class="displaymath" id="a0000000078">
   \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _{a,b} \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a)^\dagger (C^{{\boldsymbol {x}}}_{a,b})^\dagger C^{{\boldsymbol {x}}}_{a,b} (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a) \lvert \psi  \rangle .  \]
 </div>
 <p> Using \(\sum _b (C^{x}_{a,b})^\dagger (C^{x}_{a,b}) \le I\), this is bounded by </p>
-<div class="displaymath" id="a0000000077">
+<div class="displaymath" id="a0000000079">
   \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a)^\dagger (A^{{\boldsymbol {x}}}_a - B^{{\boldsymbol {x}}}_a) \lvert \psi  \rangle  \le \delta .  \]
 </div>
 
@@ -1918,7 +1983,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.25</span>
+    <span class="lemma_thmlabel">3.26</span>
     <span class="lemma_thmtitle">Triangle inequality for vectors squared</span>
     <div class="thm_header_extras">
 
@@ -1929,7 +1994,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000078"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000080"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1957,13 +2022,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For vectors \(\lvert \psi _1 \rangle ,\dots ,\lvert \psi _k \rangle \), </p>
-<div class="displaymath" id="a0000000079">
+<div class="displaymath" id="a0000000081">
   \[  \bigl\lVert \lvert \psi _1 \rangle +\cdots +\lvert \psi _k \rangle  \bigr\rVert ^2 \le k(\lVert \lvert \psi _1 \rangle \rVert ^2+\cdots +\lVert \lvert \psi _k \rangle \rVert ^2).  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000078">
+<div class="proof_wrapper" id="a0000000080">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1989,7 +2054,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.26</span>
+    <span class="lemma_thmlabel">3.27</span>
     <span class="lemma_thmtitle">Triangle inequality for \(\approx _\delta \)</span>
     <div class="thm_header_extras">
 
@@ -2000,7 +2065,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000080"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000082"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2016,9 +2081,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">Lemma 3.25</a></li>
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">Lemma 3.26</a></li>
           
         </ul>
     
@@ -2050,13 +2115,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Suppose \((A_i)_a^x \approx _{\delta _i} (A_{i+1})_a^x\) for \(i=1,\dots ,k\). Then </p>
-<div class="displaymath" id="a0000000081">
+<div class="displaymath" id="a0000000083">
   \[  (A_1)_a^x \approx _{k(\delta _1+\cdots +\delta _k)} (A_{k+1})_a^x.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000080">
+<div class="proof_wrapper" id="a0000000082">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2064,7 +2129,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Expand \((A_1-A_{k+1})\lvert \psi  \rangle \) as a telescoping sum and apply Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">3.25</a>. </p>
+  <p>Expand \((A_1-A_{k+1})\lvert \psi  \rangle \) as a telescoping sum and apply Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">3.26</a>. </p>
 
   </div>
 </div>
@@ -2073,7 +2138,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.27</span>
+    <span class="lemma_thmlabel">3.28</span>
     <span class="lemma_thmtitle">Triangle inequality for \(\simeq _\delta \)</span>
     <div class="thm_header_extras">
 
@@ -2084,7 +2149,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:simeq-triangle-inequality">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000082"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000084"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2100,11 +2165,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#prop:simeq-to-approx">Lemma 3.20</a></li>
+          <li><a href="sec-prelims.html#prop:simeq-to-approx">Lemma 3.21</a></li>
           
-          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.26</a></li>
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.27</a></li>
           
-          <li><a href="sec-prelims.html#prop:triangle-sub">Lemma 3.19</a></li>
+          <li><a href="sec-prelims.html#prop:triangle-sub">Lemma 3.20</a></li>
           
         </ul>
     
@@ -2136,13 +2201,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Suppose \(A_a^x \otimes I \simeq _\varepsilon I \otimes B_a^x\), \(C_a^x \otimes I \simeq _\delta I \otimes B_a^x\), and \(C_a^x \otimes I \simeq _\gamma I \otimes D_a^x\), where all four families are measurements. Then </p>
-<div class="displaymath" id="a0000000083">
+<div class="displaymath" id="a0000000085">
   \[  A_a^x \otimes I \simeq _{\varepsilon + 2\sqrt{\delta +\gamma }} I \otimes D_a^x.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000082">
+<div class="proof_wrapper" id="a0000000084">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2150,7 +2215,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Convert the two consistencies involving \(C\) to state-dependent distance, compose them by the triangle inequality, and transfer the result back to consistency by Lemma&#160;<a href="sec-prelims.html#prop:triangle-sub">3.19</a>. </p>
+  <p>Convert the two consistencies involving \(C\) to state-dependent distance, compose them by the triangle inequality, and transfer the result back to consistency by Lemma&#160;<a href="sec-prelims.html#prop:triangle-sub">3.20</a>. </p>
 
   </div>
 </div>
@@ -2159,7 +2224,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.28</span>
+    <span class="lemma_thmlabel">3.29</span>
     <span class="lemma_thmtitle">Data processing for consistency</span>
     <div class="thm_header_extras">
 
@@ -2170,7 +2235,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:simeq-data-processing">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000084"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000086"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2186,9 +2251,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:post-processing">Definition 3.11</a></li>
+          <li><a href="sec-prelims.html#def:post-processing">Definition 3.12</a></li>
           
-          <li><a href="sec-prelims.html#def:simeq">Definition 3.15</a></li>
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
         </ul>
     
@@ -2220,13 +2285,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   If \(A=\{ A_a^x\} \) and \(B=\{ B_a^x\} \) are measurements such that \(A_a^x \otimes I \simeq _\delta I \otimes B_a^x\), and \(f\) is a map on the answer set, then </p>
-<div class="displaymath" id="a0000000085">
+<div class="displaymath" id="a0000000087">
   \[  A_{[f(a)=b]}^x \otimes I \simeq _\delta I \otimes B_{[f(a)=b]}^x.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000084">
+<div class="proof_wrapper" id="a0000000086">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2243,7 +2308,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.29</span>
+    <span class="lemma_thmlabel">3.30</span>
     <span class="lemma_thmtitle">Consistency controls a submeasurement</span>
     <div class="thm_header_extras">
 
@@ -2254,7 +2319,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:cons-sub-meas">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000086"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000088"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2270,11 +2335,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:simeq">Definition 3.15</a></li>
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.26</a></li>
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.27</a></li>
           
         </ul>
     
@@ -2315,13 +2380,13 @@
 </p>
 </div>
 <p> where \(A^x=\sum _a A_a^x\). In particular, </p>
-<div class="displaymath" id="a0000000087">
+<div class="displaymath" id="a0000000089">
   \[  A_a^x \otimes I \approx _{4\gamma } A^x \otimes B_a^x.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000086">
+<div class="proof_wrapper" id="a0000000088">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2330,14 +2395,14 @@
   </div>
   <div class="proof_content">
   <p>For the first approximation in <a href="sec-prelims.html#eq:closeness5" class="eqref">7</a>, bound </p>
-<div class="displaymath" id="a0000000088">
+<div class="displaymath" id="a0000000090">
   \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  \bigl(A^{{\boldsymbol {x}}}_a \otimes (I-B^{{\boldsymbol {x}}}_a)\bigr)^2 \lvert \psi  \rangle   \]
 </div>
 <p> by the inconsistency between \(A\) and \(B\). The second approximation is identical, applied to </p>
-<div class="displaymath" id="a0000000089">
+<div class="displaymath" id="a0000000091">
   \[  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  \bigl((A^{\boldsymbol {x}}-A^{\boldsymbol {x}}_a)\otimes B^{\boldsymbol {x}}_a\bigr)^2 \lvert \psi  \rangle .  \]
 </div>
-<p> Then compose the two bounds with Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.26</a>. </p>
+<p> Then compose the two bounds with Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.27</a>. </p>
 
   </div>
 </div>
@@ -2346,7 +2411,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.30</span>
+    <span class="lemma_thmlabel">3.31</span>
     <span class="lemma_thmtitle">Switch-sandwich</span>
     <div class="thm_header_extras">
 
@@ -2357,7 +2422,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:switch-sandwich">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000090"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000092"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2373,7 +2438,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
         </ul>
     
@@ -2425,7 +2490,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000090">
+<div class="proof_wrapper" id="a0000000092">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2452,7 +2517,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.31</span>
+    <span class="lemma_thmlabel">3.32</span>
     <span class="lemma_thmtitle">Completeness transfer to a projective approximation</span>
     <div class="thm_header_extras">
 
@@ -2463,7 +2528,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:completeness-transfer-projective-P">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000091"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000093"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2479,9 +2544,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.23</a></li>
+          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.24</a></li>
           
         </ul>
     
@@ -2513,13 +2578,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Let \(A=\{ A_a^x\} \) be a submeasurement and \(P=\{ P_a^x\} \) a projective submeasurement such that \(A_a^x \otimes I \approx _\varepsilon P_a^x \otimes I\). Then </p>
-<div class="displaymath" id="a0000000092">
+<div class="displaymath" id="a0000000094">
   \[  \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  \ge \langle \psi  \rvert  P \otimes I \lvert \psi  \rangle  - 2\sqrt\varepsilon .  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000091">
+<div class="proof_wrapper" id="a0000000093">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2528,10 +2593,10 @@
   </div>
   <div class="proof_content">
   <p>Since \(P\) is projective, </p>
-<div class="displaymath" id="a0000000093">
+<div class="displaymath" id="a0000000095">
   \[  \langle \psi  \rvert  P \otimes I \lvert \psi  \rangle  = \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (P^{{\boldsymbol {x}}}_a)^2 \otimes I \lvert \psi  \rangle .  \]
 </div>
-<p> Apply Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.23</a> twice to replace \((P^{\boldsymbol {x}}_a)^2\) first by \(A^{\boldsymbol {x}}_aP^{\boldsymbol {x}}_a\) and then by \((A^{\boldsymbol {x}}_a)^2\), and conclude with \((A_a^{\boldsymbol {x}})^2 \le A_a^{\boldsymbol {x}}\). </p>
+<p> Apply Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.24</a> twice to replace \((P^{\boldsymbol {x}}_a)^2\) first by \(A^{\boldsymbol {x}}_aP^{\boldsymbol {x}}_a\) and then by \((A^{\boldsymbol {x}}_a)^2\), and conclude with \((A_a^{\boldsymbol {x}})^2 \le A_a^{\boldsymbol {x}}\). </p>
 
   </div>
 </div>
@@ -2540,7 +2605,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">3.32</span>
+    <span class="definition_thmlabel">3.33</span>
     <span class="definition_thmtitle">Strong self-consistency</span>
     <div class="thm_header_extras">
 
@@ -2578,7 +2643,7 @@
   </div>
   <div class="definition_thmcontent">
   <p>  Let \(\lvert \psi  \rangle \) be permutation-invariant and let \(A=\{ A_a^x\} \) be a submeasurement. We say that \(A\) is \(\delta \)-strongly self-consistent when </p>
-<div class="displaymath" id="a0000000094">
+<div class="displaymath" id="a0000000096">
   \[  \mathbb {E}_x \sum _a \langle \psi  \rvert  A_a^x \otimes A_a^x \lvert \psi  \rangle  \ge \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \delta .  \]
 </div>
 
@@ -2589,7 +2654,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.33</span>
+    <span class="lemma_thmlabel">3.34</span>
     <span class="lemma_thmtitle">Strong self-consistency implies ordinary self-consistency</span>
     <div class="thm_header_extras">
 
@@ -2600,7 +2665,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:other-two-notions-of-self-consistency">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000095"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000097"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2616,9 +2681,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.32</a></li>
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.33</a></li>
           
-          <li><a href="sec-prelims.html#def:simeq">Definition 3.15</a></li>
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
         </ul>
     
@@ -2653,7 +2718,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000095">
+<div class="proof_wrapper" id="a0000000097">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2670,7 +2735,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.34</span>
+    <span class="lemma_thmlabel">3.35</span>
     <span class="lemma_thmtitle">Strong self-consistency and state-dependent distance</span>
     <div class="thm_header_extras">
 
@@ -2681,7 +2746,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:two-notions-of-self-consistency">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000096"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000098"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2697,9 +2762,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.32</a></li>
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.33</a></li>
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
         </ul>
     
@@ -2731,14 +2796,14 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   If \(A\) is \(\delta \)-strongly self-consistent, then </p>
-<div class="displaymath" id="a0000000097">
+<div class="displaymath" id="a0000000099">
   \[  A_a^x \otimes I \approx _{2\delta } I \otimes A_a^x.  \]
 </div>
 <p> If \(A\) is projective, the converse also holds. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000096">
+<div class="proof_wrapper" id="a0000000098">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2747,7 +2812,7 @@
   </div>
   <div class="proof_content">
   <p>Expanding the squared norm gives </p>
-<div class="displaymath" id="a0000000098">
+<div class="displaymath" id="a0000000100">
   \begin{align} &  \mathbb {E}_{{\boldsymbol {x}}} \sum _a \lVert (A^{{\boldsymbol {x}}}_a \otimes I - I \otimes A^{{\boldsymbol {x}}}_a)\lvert \psi  \rangle \rVert ^2 \nonumber \\ =~  &  2\cdot \Big( \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  (A^{{\boldsymbol {x}}}_a)^2 \otimes I \lvert \psi  \rangle  - \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{{\boldsymbol {x}}}_a \otimes A^{{\boldsymbol {x}}}_a \lvert \psi  \rangle \Big) \nonumber \\ \leq ~  &  2\cdot \Big( \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{{\boldsymbol {x}}}_a \otimes I \lvert \psi  \rangle  - \mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{{\boldsymbol {x}}}_a \otimes A^{{\boldsymbol {x}}}_a \lvert \psi  \rangle \Big). \label{eq:here's-where-projectivity-would-help} \end{align}
 </div>
 <p> The strong self-consistency bound controls the last line by \(2\delta \). If \(A\) is projective, then <a href="sec-prelims.html#eq:here's-where-projectivity-would-help" class="eqref">11</a> is an equality, which gives the converse. </p>
@@ -2759,7 +2824,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.35</span>
+    <span class="lemma_thmlabel">3.36</span>
     <span class="lemma_thmtitle">Post-processing preserves strong self-consistency</span>
     <div class="thm_header_extras">
 
@@ -2770,7 +2835,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:two-notions-of-self-consistency-after-evaluation">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000099"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000101"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2786,11 +2851,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:post-processing">Definition 3.11</a></li>
+          <li><a href="sec-prelims.html#def:post-processing">Definition 3.12</a></li>
           
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.32</a></li>
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.33</a></li>
           
-          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency">Lemma 3.34</a></li>
+          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency">Lemma 3.35</a></li>
           
         </ul>
     
@@ -2822,13 +2887,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   If \(A\) is \(\delta \)-strongly self-consistent and \(f\) is a function on its answer set, then </p>
-<div class="displaymath" id="a0000000100">
+<div class="displaymath" id="a0000000102">
   \[  A_{[f(a)=b]}^x \otimes I \approx _{2\delta } I \otimes A_{[f(a)=b]}^x.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000099">
+<div class="proof_wrapper" id="a0000000101">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2836,8 +2901,8 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>The same computation as in Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.34</a> gives </p>
-<div class="displaymath" id="a0000000101">
+  <p>The same computation as in Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.35</a> gives </p>
+<div class="displaymath" id="a0000000103">
   \begin{align} &  \mathbb {E}_{{\boldsymbol {x}}} \sum _b \lVert (A^{{\boldsymbol {x}}}_{[f(a)=b]} \otimes I - I \otimes A^{{\boldsymbol {x}}}_{[f(a)=b]}) \lvert \psi  \rangle \rVert ^2 \nonumber \\ \leq ~  &  2\cdot \Big( \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \mathbb {E}_{{\boldsymbol {x}}} \sum _b \langle \psi  \rvert  A^{{\boldsymbol {x}}}_{[f(a)=b]} \otimes A^{{\boldsymbol {x}}}_{[f(a)=b]} \lvert \psi  \rangle \Big). \label{eq:finishing-this-up} \end{align}
 </div>
 <p> The post-processed diagonal term dominates \(\mathbb {E}_{{\boldsymbol {x}}} \sum _a \langle \psi  \rvert  A^{\boldsymbol {x}}_a \otimes A^{\boldsymbol {x}}_a \lvert \psi  \rangle \), so strong self-consistency bounds <a href="sec-prelims.html#eq:finishing-this-up" class="eqref">12</a> by \(2\delta \). </p>
@@ -2849,7 +2914,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.36</span>
+    <span class="lemma_thmlabel">3.37</span>
     <span class="lemma_thmtitle">Completeness transfer for a strongly self-consistent approximation</span>
     <div class="thm_header_extras">
 
@@ -2860,7 +2925,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:completeness-transfer-self-consistent-A">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000102"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000104"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2876,11 +2941,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.32</a></li>
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.33</a></li>
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.23</a></li>
+          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.24</a></li>
           
         </ul>
     
@@ -2912,13 +2977,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Let \(A\) be a \(\delta \)-strongly self-consistent submeasurement and let \(B\) be a submeasurement such that \(A_a^x \otimes I \approx _\varepsilon B_a^x \otimes I\). Then </p>
-<div class="displaymath" id="a0000000103">
+<div class="displaymath" id="a0000000105">
   \[  \langle \psi  \rvert  B \otimes I \lvert \psi  \rangle  \ge \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \delta - 2\sqrt\varepsilon .  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000102">
+<div class="proof_wrapper" id="a0000000104">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2926,7 +2991,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Bound \(\langle \psi  \rvert  B \otimes I \lvert \psi  \rangle \) from below by \(\mathbb {E}_{{\boldsymbol {x}}}\sum _a \langle \psi  \rvert  B^{\boldsymbol {x}}_a \otimes B^{\boldsymbol {x}}_a \lvert \psi  \rangle \). Then apply Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.23</a> twice to replace this by \(\mathbb {E}_{{\boldsymbol {x}}}\sum _a \langle \psi  \rvert  A^{\boldsymbol {x}}_a \otimes A^{\boldsymbol {x}}_a \lvert \psi  \rangle \), and finish with strong self-consistency of \(A\). </p>
+  <p>Bound \(\langle \psi  \rvert  B \otimes I \lvert \psi  \rangle \) from below by \(\mathbb {E}_{{\boldsymbol {x}}}\sum _a \langle \psi  \rvert  B^{\boldsymbol {x}}_a \otimes B^{\boldsymbol {x}}_a \lvert \psi  \rangle \). Then apply Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.24</a> twice to replace this by \(\mathbb {E}_{{\boldsymbol {x}}}\sum _a \langle \psi  \rvert  A^{\boldsymbol {x}}_a \otimes A^{\boldsymbol {x}}_a \lvert \psi  \rangle \), and finish with strong self-consistency of \(A\). </p>
 
   </div>
 </div>
@@ -2935,7 +3000,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.37</span>
+    <span class="lemma_thmlabel">3.38</span>
     <span class="lemma_thmtitle">Self-consistency implies data-processing closeness</span>
     <div class="thm_header_extras">
 
@@ -2946,7 +3011,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:self-consistency-implies-data-processing">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000104"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000106"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2962,19 +3027,19 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:post-processing">Definition 3.11</a></li>
+          <li><a href="sec-prelims.html#def:post-processing">Definition 3.12</a></li>
           
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.32</a></li>
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.33</a></li>
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency-after-evaluation">Lemma 3.35</a></li>
+          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency-after-evaluation">Lemma 3.36</a></li>
           
-          <li><a href="sec-prelims.html#prop:completeness-transfer-projective-P">Lemma 3.31</a></li>
+          <li><a href="sec-prelims.html#prop:completeness-transfer-projective-P">Lemma 3.32</a></li>
           
-          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.23</a></li>
+          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.24</a></li>
           
-          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.26</a></li>
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.27</a></li>
           
         </ul>
     
@@ -3006,13 +3071,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Let \(A\) be a \(\delta \)-strongly self-consistent submeasurement and let \(P\) be a projective submeasurement such that \(P_a^x \otimes I \approx _\varepsilon A_a^x \otimes I\). Then for every function \(f\), </p>
-<div class="displaymath" id="a0000000105">
+<div class="displaymath" id="a0000000107">
   \[  P_{[f(a)=b]}^x \otimes I \approx _{8\delta + 8\sqrt\varepsilon } A_{[f(a)=b]}^x \otimes I.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000104">
+<div class="proof_wrapper" id="a0000000106">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -3030,14 +3095,14 @@
 </p>
 </div>
 <p> Expanding the squared norm and using projectivity gives </p>
-<div class="displaymath" id="a0000000106">
+<div class="displaymath" id="a0000000108">
   \begin{align} &  \mathbb {E}_{{\boldsymbol {x}}} \sum _b \lVert (P^{{\boldsymbol {x}}}_{[f(a)=b]} \otimes I - I \otimes A_{[f(a)=b]}^{{\boldsymbol {x}}}) \lvert \psi  \rangle  \rVert ^2 \nonumber \\ \leq ~  &  \langle \psi  \rvert  P \otimes I \lvert \psi  \rangle  + \langle \psi  \rvert  I \otimes A \lvert \psi  \rangle  - 2\cdot \mathbb {E}_{{\boldsymbol {x}}} \sum _b \langle \psi  \rvert  P^{{\boldsymbol {x}}}_{[f(a)=b]} \otimes A^{{\boldsymbol {x}}}_{[f(a)=b]} \lvert \psi  \rangle . \label{eq:gonna-handle-third-term} \end{align}
 </div>
-<p> Proposition&#160;<a href="sec-prelims.html#prop:completeness-transfer-projective-P">3.31</a> bounds the first term by \(\langle \psi  \rvert  A \otimes I \lvert \psi  \rangle +2\sqrt{\varepsilon }\), and Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.23</a> together with strong self-consistency bounds the third term below by \(\langle \psi  \rvert  A \otimes I \lvert \psi  \rangle -\delta -\sqrt{\varepsilon }\). Substituting into <a href="sec-prelims.html#eq:gonna-handle-third-term" class="eqref">14</a> yields <a href="sec-prelims.html#eq:what-we-want-to-prove-but-on-wrong-side" class="eqref">13</a>. Now combine <a href="sec-prelims.html#eq:what-we-want-to-prove-but-on-wrong-side" class="eqref">13</a> with </p>
-<div class="displaymath" id="a0000000107">
+<p> Proposition&#160;<a href="sec-prelims.html#prop:completeness-transfer-projective-P">3.32</a> bounds the first term by \(\langle \psi  \rvert  A \otimes I \lvert \psi  \rangle +2\sqrt{\varepsilon }\), and Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.24</a> together with strong self-consistency bounds the third term below by \(\langle \psi  \rvert  A \otimes I \lvert \psi  \rangle -\delta -\sqrt{\varepsilon }\). Substituting into <a href="sec-prelims.html#eq:gonna-handle-third-term" class="eqref">14</a> yields <a href="sec-prelims.html#eq:what-we-want-to-prove-but-on-wrong-side" class="eqref">13</a>. Now combine <a href="sec-prelims.html#eq:what-we-want-to-prove-but-on-wrong-side" class="eqref">13</a> with </p>
+<div class="displaymath" id="a0000000109">
   \[  A^x_{[f(a)=b]} \otimes I \approx _{2\delta } I \otimes A^x_{[f(a)=b]}  \]
 </div>
-<p> from Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency-after-evaluation">3.35</a>, and conclude by Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.26</a>. </p>
+<p> from Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency-after-evaluation">3.36</a>, and conclude by Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.27</a>. </p>
 
   </div>
 </div>
@@ -3046,7 +3111,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.38</span>
+    <span class="lemma_thmlabel">3.39</span>
     <span class="lemma_thmtitle">Self-consistency moves one copy to the same side</span>
     <div class="thm_header_extras">
 
@@ -3057,7 +3122,7 @@
 
     <a class="icon proof" href="sec-prelims.html#lem:self-consistency-same-side-square">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000108"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000110"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -3073,7 +3138,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.32</a></li>
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.33</a></li>
           
         </ul>
     
@@ -3105,13 +3170,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Let \(A=\{ A_a\} \) be a \(\zeta \)-strongly self-consistent submeasurement. Then </p>
-<div class="displaymath" id="a0000000109">
+<div class="displaymath" id="a0000000111">
   \[  \sum _a \langle \psi  \rvert  A_a^2 \otimes I \lvert \psi  \rangle  \ge \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  - \zeta .  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000108">
+<div class="proof_wrapper" id="a0000000110">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -3128,7 +3193,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.39</span>
+    <span class="lemma_thmlabel">3.40</span>
     <span class="lemma_thmtitle">Bounding the missing mass of a close submeasurement</span>
     <div class="thm_header_extras">
 
@@ -3139,7 +3204,7 @@
 
     <a class="icon proof" href="sec-prelims.html#lem:completion-missing-mass-bound">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000110"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000112"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -3155,11 +3220,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.32</a></li>
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.33</a></li>
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-prelims.html#lem:self-consistency-same-side-square">Lemma 3.38</a></li>
+          <li><a href="sec-prelims.html#lem:self-consistency-same-side-square">Lemma 3.39</a></li>
           
         </ul>
     
@@ -3191,13 +3256,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Let \(A=\{ A_a\} \) be a measurement that is \(\zeta \)-strongly self-consistent, and let \(B=\{ B_a\} \) be a submeasurement such that \(A_a \otimes I \approx _\delta B_a \otimes I\). Writing \(B=\sum _a B_a\), one has </p>
-<div class="displaymath" id="a0000000111">
+<div class="displaymath" id="a0000000113">
   \[  \lVert (I-B) \otimes I\lvert \psi  \rangle  \rVert ^2 \le 2\sqrt\delta + \zeta .  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000110">
+<div class="proof_wrapper" id="a0000000112">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -3205,7 +3270,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Since \(0 \le I-B \le I\), the left-hand side is at most \(1-\langle \psi  \rvert  B \otimes I \lvert \psi  \rangle \). Compare \(\sum _a \langle \psi  \rvert  B_a^2 \otimes I \lvert \psi  \rangle \) with \(\sum _a \langle \psi  \rvert  A_a B_a \otimes I \lvert \psi  \rangle \) and then with \(\sum _a \langle \psi  \rvert  A_a^2 \otimes I \lvert \psi  \rangle \) using the \(\approx _\delta \) hypothesis, and finish with Lemma&#160;<a href="sec-prelims.html#lem:self-consistency-same-side-square">3.38</a>. </p>
+  <p>Since \(0 \le I-B \le I\), the left-hand side is at most \(1-\langle \psi  \rvert  B \otimes I \lvert \psi  \rangle \). Compare \(\sum _a \langle \psi  \rvert  B_a^2 \otimes I \lvert \psi  \rangle \) with \(\sum _a \langle \psi  \rvert  A_a B_a \otimes I \lvert \psi  \rangle \) and then with \(\sum _a \langle \psi  \rvert  A_a^2 \otimes I \lvert \psi  \rangle \) using the \(\approx _\delta \) hypothesis, and finish with Lemma&#160;<a href="sec-prelims.html#lem:self-consistency-same-side-square">3.39</a>. </p>
 
   </div>
 </div>
@@ -3214,7 +3279,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">3.40</span>
+    <span class="lemma_thmlabel">3.41</span>
     <span class="lemma_thmtitle">Completing a close submeasurement to a full measurement</span>
     <div class="thm_header_extras">
 
@@ -3225,7 +3290,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:completing-to-measurement">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000112"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000114"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -3241,17 +3306,17 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#def:measurement-completion">Definition 3.14</a></li>
+          <li><a href="sec-prelims.html#def:measurement-completion">Definition 3.15</a></li>
           
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.32</a></li>
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.33</a></li>
           
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.18</a></li>
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">Lemma 3.25</a></li>
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">Lemma 3.26</a></li>
           
-          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.23</a></li>
+          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.24</a></li>
           
-          <li><a href="sec-prelims.html#prop:cool-prop">Theorem 3.41</a></li>
+          <li><a href="sec-prelims.html#prop:cool-prop">Theorem 3.42</a></li>
           
         </ul>
     
@@ -3283,7 +3348,7 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Let \(A=\{ A_a\} \) be a measurement that is \(\zeta \)-strongly self-consistent, let \(B=\{ B_a\} \) be a submeasurement such that \(A_a \otimes I \approx _\delta B_a \otimes I\), and let \(C\) be the measurement obtained by adding the missing mass \(I-B\) to one distinguished answer \(a^*\). Then </p>
-<div class="displaymath" id="a0000000113">
+<div class="displaymath" id="a0000000115">
   \[  A_a \otimes I \approx _{2\delta + 4\sqrt\delta + 2\zeta } C_a \otimes I.  \]
 </div>
 
@@ -3294,7 +3359,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">3.41</span>
+    <span class="theorem_thmlabel">3.42</span>
     <div class="thm_header_extras">
 
     
@@ -3304,7 +3369,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:cool-prop">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000114"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000116"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -3320,9 +3385,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-prelims.html#lem:self-consistency-same-side-square">Lemma 3.38</a></li>
+          <li><a href="sec-prelims.html#lem:self-consistency-same-side-square">Lemma 3.39</a></li>
           
-          <li><a href="sec-prelims.html#lem:self-consistency-same-side-square">Lemma 3.38</a></li>
+          <li><a href="sec-prelims.html#lem:self-consistency-same-side-square">Lemma 3.39</a></li>
           
         </ul>
     
@@ -3353,14 +3418,14 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>   This is the same statement as Lemma&#160;<a href="sec-prelims.html#lem:self-consistency-same-side-square">3.38</a>: for a \(\zeta \)-strongly self-consistent submeasurement \(A\), </p>
-<div class="displaymath" id="a0000000115">
+  <p>   This is the same statement as Lemma&#160;<a href="sec-prelims.html#lem:self-consistency-same-side-square">3.39</a>: for a \(\zeta \)-strongly self-consistent submeasurement \(A\), </p>
+<div class="displaymath" id="a0000000117">
   \[  \sum _a \langle \psi  \rvert  (A_a)^2 \otimes I \lvert \psi  \rangle  \geq \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  -\zeta .  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000114">
+<div class="proof_wrapper" id="a0000000116">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -3368,36 +3433,36 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Immediate from Lemma&#160;<a href="sec-prelims.html#lem:self-consistency-same-side-square">3.38</a>. </p>
+  <p> Immediate from Lemma&#160;<a href="sec-prelims.html#lem:self-consistency-same-side-square">3.39</a>. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000112">
+<div class="proof_wrapper" id="a0000000114">
   <div class="proof_heading">
     <span class="proof_caption">
-    Proof of <a href="sec-prelims.html#prop:completing-to-measurement">3.40</a>
+    Proof of <a href="sec-prelims.html#prop:completing-to-measurement">3.41</a>
     </span>
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>  By Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">3.25</a>, </p>
-<div class="displaymath" id="a0000000116">
+  <p>  By Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">3.26</a>, </p>
+<div class="displaymath" id="a0000000118">
   \[  \sum _a \lVert (A_a-C_a)\otimes I \lvert \psi  \rangle  \rVert ^2 \leq 2\delta + 2 \cdot \lVert (I-B)\otimes I \lvert \psi  \rangle \rVert ^2.  \]
 </div>
 <p> It remains to bound the residual term. Since \(0 \le I-B \le I\), </p>
 <div class="displaymath" id="eq:to-return-later-whatevs">
   \begin{align}  \lVert (I-B) \otimes I \lvert \psi  \rangle \rVert ^2 &  \leq 1 -\sum _a \langle \psi  \rvert  B_a^2 \otimes I \lvert \psi  \rangle . \label{eq:to-return-later-whatevs} \end{align}
 </div>
-<p> By Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.23</a>, </p>
-<div class="displaymath" id="a0000000117">
+<p> By Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.24</a>, </p>
+<div class="displaymath" id="a0000000119">
   \[  \sum _a \langle \psi  \rvert  B_a^2 \otimes I \lvert \psi  \rangle  \approx _{\sqrt{\delta }} \sum _a \langle \psi  \rvert  (A_a B_a)\otimes I \lvert \psi  \rangle  \approx _{\sqrt{\delta }} \sum _a \langle \psi  \rvert  A_a^2\otimes I \lvert \psi  \rangle .  \]
 </div>
-<p> Proposition&#160;<a href="sec-prelims.html#prop:cool-prop">3.41</a> gives </p>
-<div class="displaymath" id="a0000000118">
+<p> Proposition&#160;<a href="sec-prelims.html#prop:cool-prop">3.42</a> gives </p>
+<div class="displaymath" id="a0000000120">
   \[  \sum _a \langle \psi  \rvert  A_a^2\otimes I \lvert \psi  \rangle  \geq \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \zeta = 1-\zeta .  \]
 </div>
 <p> Hence <a href="sec-prelims.html#eq:to-return-later-whatevs" class="eqref">15</a> implies </p>
-<div class="displaymath" id="a0000000119">
+<div class="displaymath" id="a0000000121">
   \[  \lVert (I-B) \otimes I \lvert \psi  \rangle \rVert ^2 \le 2\sqrt\delta + \zeta .  \]
 </div>
 <p> Substituting this into the first bound proves the claim. </p>
