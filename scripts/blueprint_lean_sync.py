@@ -51,7 +51,7 @@ _NAMESPACE_CLOSE_RE = re.compile(r"^\s*end\s+([\w.]+)", re.MULTILINE)
 _BARE_END_RE = re.compile(r"^\s*end\s*$", re.MULTILINE)
 
 _TEX_LEAN_RE = re.compile(r"\\lean\{([^}]+)\}")
-_TEX_LEANOK_RE = re.compile(r"\\leanok")
+_TEX_LEANOK_RE = re.compile(r"\\leanok\b")
 _TEX_ENV_BEGIN_RE = re.compile(
     r"\\begin\{(definition|theorem|lemma|proposition|corollary|remark|example)\}"
     r"(?:\[.*?\])?"
@@ -62,6 +62,63 @@ _TEX_ENV_END_RE = re.compile(
 )
 _TEX_PROOF_BEGIN_RE = re.compile(r"\\begin\{proof\}")
 _TEX_PROOF_END_RE = re.compile(r"\\end\{proof\}")
+
+
+def _strip_tex_comment(line: str) -> str:
+    r"""Return the active TeX prefix before the first unescaped ``%``.
+
+    TeX comments start at an unescaped percent sign. A percent sign preceded
+    by an odd-length run of backslashes is the literal ``\%`` token and must
+    not truncate the line; an even-length run leaves the ``%`` unescaped (for
+    example ``\\%`` starts a comment after a line-break command). Keeping this
+    logic central prevents explanatory comments such as ``% restore \leanok``
+    from being mistaken for active blueprint markers while preserving normal
+    line-number accounting in the caller.
+    """
+
+    for idx, char in enumerate(line):
+        if char != "%":
+            continue
+        backslashes = 0
+        j = idx - 1
+        while j >= 0 and line[j] == "\\":
+            backslashes += 1
+            j -= 1
+        if backslashes % 2 == 0:
+            return line[:idx]
+    return line
+
+
+def _line_has_leanok_marker(line: str) -> bool:
+    r"""Return whether ``line`` contains an active ``\leanok`` marker.
+
+    ``\leanok`` is a structural marker, not prose. Besides stripping TeX
+    comments before this predicate is called, we require the non-comment line
+    to consist only of the marker plus structural blueprint macros that are
+    known to share marker lines in the existing sources (``\lean{...}``,
+    ``\uses{...}``, labels, and proof/environment openings). This keeps
+    explanatory prose like ``not marked \leanok`` from being counted while
+    still accepting the historical compact form ``\lean{Decl}\leanok`` and
+    ``\begin{proof}\leanok``.
+    """
+
+    if not _TEX_LEANOK_RE.search(line):
+        return False
+
+    cleaned = _TEX_LEANOK_RE.sub("", line)
+    structural_patterns = [
+        r"\\lean\{[^}]*\}",
+        r"\\uses\{[^}]*\}",
+        r"\\label\{[^}]*\}",
+        r"\\begin\{proof\}(?:\[[^\]]*\])?",
+        (
+            r"\\begin\{(?:definition|theorem|lemma|proposition|corollary|remark|example)\}"
+            r"(?:\[[^\]]*\])?"
+        ),
+    ]
+    for pattern in structural_patterns:
+        cleaned = re.sub(pattern, "", cleaned)
+    return cleaned.strip() == ""
 
 
 # ---------------------------------------------------------------------------
@@ -289,7 +346,9 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
         proof_stack: list[ProofFrame] = []
         last_env: dict | None = None  # last closed environment with \lean{} refs
 
-        for i, line in enumerate(lines, 1):
+        for i, raw_line in enumerate(lines, 1):
+            line = _strip_tex_comment(raw_line)
+
             # Check for environment begin
             m = _TEX_ENV_BEGIN_RE.search(line)
             if m:
@@ -299,7 +358,7 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
                     "file": str(tex_file.relative_to(blueprint_src.parent)),
                     "line": i,
                     "lean_decls": [],
-                    "has_leanok": bool(_TEX_LEANOK_RE.search(line)),
+                    "has_leanok": _line_has_leanok_marker(line),
                 }
                 env_stack.append(env)
                 # Check rest of line for \lean{} and \leanok
@@ -342,7 +401,7 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
                     ProofFrame(
                         attach_entry_start=last_env.get("_entry_start") if last_env else None,
                         attach_entry_end=last_env.get("_entry_end") if last_env else None,
-                        has_leanok=bool(_TEX_LEANOK_RE.search(line)),
+                        has_leanok=_line_has_leanok_marker(line),
                     )
                 )
                 continue
@@ -356,12 +415,12 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
                         decl = decl.strip()
                         if decl:
                             env_stack[-1]["lean_decls"].append(decl)
-                if _TEX_LEANOK_RE.search(line):
+                if _line_has_leanok_marker(line):
                     env_stack[-1]["has_leanok"] = True
                     continue
 
-            # Inside a proof block: detect \leanok on its own line
-            if proof_stack and _TEX_LEANOK_RE.search(line):
+            # Inside a proof block: detect an active proof-level \leanok marker.
+            if proof_stack and _line_has_leanok_marker(line):
                 proof_stack[-1].has_leanok = True
                 continue
 
@@ -415,7 +474,8 @@ def find_orphan_leanok_tags(blueprint_src: Path) -> list[OrphanLeanok]:
         proof_has_lean_context = False
         pending_proof_has_lean = False
 
-        for i, line in enumerate(tex_file.read_text(errors="replace").splitlines(), 1):
+        for i, raw_line in enumerate(tex_file.read_text(errors="replace").splitlines(), 1):
+            line = _strip_tex_comment(raw_line)
             for token in token_re.finditer(line):
                 text = token.group(0)
                 if text.startswith("\\begin{proof}"):
@@ -447,6 +507,8 @@ def find_orphan_leanok_tags(blueprint_src: Path) -> list[OrphanLeanok]:
                         pending_proof_has_lean = True
                     continue
                 if text == "\\leanok":
+                    if not _line_has_leanok_marker(line):
+                        continue
                     if env_stack:
                         if not env_stack[-1]["has_lean"]:
                             orphans.append(OrphanLeanok(file=rel, line=i, context="statement"))
