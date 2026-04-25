@@ -30,7 +30,7 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
     (gamma zeta : Error)
     (hnorm : strategy.state.IsNormalized)
     (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
-    (_hself : family.StronglySelfConsistent strategy.state zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
     (hEval :
       SDDOpRel strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
@@ -116,9 +116,9 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
       have hExpand :=
         fullSliceCommutation_qSDDOp_avg_eq params strategy family
       have hMargX :=
-        fullSlice_scalar_marginalize_x params strategy family zeta hnorm _hself
+        fullSlice_scalar_marginalize_x params strategy family zeta hnorm hself
       have hMargY :=
-        fullSlice_scalar_marginalize_y params strategy family zeta hnorm _hself
+        fullSlice_scalar_marginalize_y params strategy family zeta hnorm hself
       have hClose :=
         fullSlice_closenessOfIP_CAB_hEval_sqrt params strategy family gamma zeta
           hnorm hEval

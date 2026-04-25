@@ -90,7 +90,7 @@ private structure FullSliceScalarMarginalizeXTensorTriangle
 Blocked exactly where the active #730 work sits: exporting/finishing the tensor
 marginalization identity and connecting it to the existing scalar↔tensor bridge
 endpoints from `Transport.FullSlice`. -/
-private noncomputable def fullSlice_scalar_marginalize_x_tensor_triangle_residual
+private noncomputable def fullSliceScalarMarginalizeXTensorTriangleResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error)
@@ -119,7 +119,7 @@ lemma fullSlice_scalar_marginalize_x
         evaluatedSliceABAAvg params strategy family| ≤
       (↑params.m : Error) * ↑params.d / ↑params.q + 2 * Real.sqrt zeta := by
   let tri :=
-    fullSlice_scalar_marginalize_x_tensor_triangle_residual
+    fullSliceScalarMarginalizeXTensorTriangleResidual
       params strategy family zeta hnorm hself
   exact abs_sub_le_of_tensor_triangle
     (fullScalar := fullSliceABAAvg params strategy family)
@@ -154,7 +154,7 @@ private structure FullSliceScalarMarginalizeYTensorTriangle
 Blocked exactly on the #730 postprocessing expansion from the hidden `ABA ⊗ B`
 tensor endpoints to the proved y-collision residual in `Transport.FullSlice`,
 together with exposing the #735 scalar↔tensor bridge endpoints. -/
-private noncomputable def fullSlice_scalar_marginalize_y_tensor_triangle_residual
+private noncomputable def fullSliceScalarMarginalizeYTensorTriangleResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error)
@@ -181,7 +181,7 @@ lemma fullSlice_scalar_marginalize_y
         evaluatedSliceABABAvg params strategy family| ≤
       (↑params.m : Error) * ↑params.d / ↑params.q + 2 * Real.sqrt zeta := by
   let tri :=
-    fullSlice_scalar_marginalize_y_tensor_triangle_residual
+    fullSliceScalarMarginalizeYTensorTriangleResidual
       params strategy family zeta hnorm hself
   exact abs_sub_le_of_tensor_triangle
     (fullScalar := fullSliceABABAvg params strategy family)
@@ -721,7 +721,7 @@ lemma fullSlice_closenessOfIP_CAB_hEval_sqrt
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     (hnorm : strategy.state.IsNormalized)
-    (_hEval :
+    (hEval :
       SDDOpRel strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
         (evaluatedFromFullSliceProductLeft params strategy family)
@@ -736,7 +736,7 @@ lemma fullSlice_closenessOfIP_CAB_hEval_sqrt
       evaluatedSliceABABAvg params strategy family
   have hEval' :=
     evaluatedSliceCommutation_of_evaluationSpecialization
-      params strategy family δ _hEval
+      params strategy family δ hEval
   have hδ :
       sddErrorOp strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
