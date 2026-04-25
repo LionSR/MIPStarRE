@@ -1592,12 +1592,11 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>   Let </p>
+  <p>   The paper presents this step by choosing a singular value decomposition </p>
 <div class="displaymath" id="a0000000197">
-  \[  X = U \cdot \Sigma _{m \times d} \cdot V^\dagger  \]
+  \[  X = U \cdot \Sigma _{m \times d} \cdot V^\dagger .  \]
 </div>
-<p> be the singular value decomposition of \(X\). Thus \(U\) is an \(m \times m\) unitary matrix, \(V\) is a \(d \times d\) unitary matrix, and \(\Sigma _{m \times d}\) is an \(m \times d\) diagonal matrix with nonnegative real entries on its diagonal. </p>
-<p>For positive integers \(h\) and \(w\), write \(I_{h \times w}\) for the \(h \times w\) matrix with \(1\)’s on its diagonal and \(0\)’s elsewhere. For integers \(h,w \geq m\), write \(\Sigma _{h \times w}\) for the \(h \times w\) diagonal matrix whose diagonal agrees with that of \(\Sigma _{m \times d}\) and is zero elsewhere. </p>
+<p> The Lean interface deliberately records only the downstream consequences of this choice: the matrices \(X\) and \(\widehat X\), the identities \(X^\dagger X=Q\), \(\widehat X\widehat X^\dagger =I\), and \(X^\dagger \widehat X=\sqrt Q\), together with the \(Q_a=X^\dagger T_aX\) restatement. No explicit rectangular complex-SVD matrices \(U,V,\Sigma \) are stored in ‘QXPLayerData‘. </p>
 
   </div>
 </div>
@@ -1689,11 +1688,11 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>   Define </p>
+  <p>   The paper defines </p>
 <div class="displaymath" id="a0000000199">
   \[  \widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger .  \]
 </div>
-<p> For each \(a\), define </p>
+<p> In Lean, \(\widehat X\) is the matrix component ‘xHat‘ of the reduced ‘QXPLayerData‘ package. For each \(a\), define </p>
 <div class="displaymath" id="a0000000200">
   \[  \widehat{X}_a = T_a \cdot \widehat{X}, \qquad P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a.  \]
 </div>
@@ -1868,7 +1867,7 @@
   <div class="lemma_thmcontent">
   
 <div class="displaymath" id="a0000000208">
-  \begin{equation*}  X \cdot X^\dagger = U \cdot (\Sigma _{m \times m})^2 \cdot U^\dagger , \quad \text{and} \quad X^\dagger \cdot X = Q = V \cdot (\Sigma _{d \times d})^2 \cdot V^\dagger . \end{equation*}
+  \begin{equation*}  X^\dagger \cdot X = Q. \end{equation*}
 </div>
 
   </div>
@@ -1881,18 +1880,11 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The first identity is the standard computation from the singular value decomposition: </p>
+  <p> Use that \(T\) is a measurement and then <a href="chap-projective.html#lem:qa-restated">4.20</a>: </p>
 <div class="displaymath" id="a0000000209">
-  \[  X \cdot X^\dagger = (U \cdot \Sigma _{m \times d} \cdot V^\dagger )(U \cdot \Sigma _{m \times d} \cdot V^\dagger )^\dagger = U \cdot (\Sigma _{m \times m})^2 \cdot U^\dagger .  \]
-</div>
-<p> For the second, use that \(T\) is a measurement and then <a href="chap-projective.html#lem:qa-restated">4.20</a>: </p>
-<div class="displaymath" id="a0000000210">
   \[  X^\dagger \cdot X = \sum _a X^\dagger \cdot T_a \cdot X = \sum _a Q_a = Q.  \]
 </div>
-<p> Computing again from the singular value decomposition gives </p>
-<div class="displaymath" id="a0000000211">
-  \[  X^\dagger \cdot X = V \cdot (\Sigma _{d \times d})^2 \cdot V^\dagger .  \]
-</div>
+<p> The additional paper identities involving \(U,V,\Sigma \) are the usual SVD computations, but they are not stored in the Lean API because they are not used by the downstream proof. </p>
 
   </div>
 </div>
@@ -1909,7 +1901,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:X-expression-to-Q-expression">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000212"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000210"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1937,13 +1929,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For each \(a\), </p>
-<div class="displaymath" id="a0000000213">
+<div class="displaymath" id="a0000000211">
   \begin{equation*}  X_a^\dagger \cdot (X \cdot X^\dagger - I_{m \times m})^2 \cdot X_a = Q_a \cdot Q \cdot Q_a - Q_a. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000212">
+<div class="proof_wrapper" id="a0000000210">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1952,15 +1944,15 @@
   </div>
   <div class="proof_content">
   <p> Expand the square and apply <a href="chap-projective.html#lem:X-squared">4.21</a> and <a href="chap-projective.html#lem:qa-restated">4.20</a> term by term: </p>
-<div class="displaymath" id="a0000000214">
+<div class="displaymath" id="a0000000212">
   \[  X_a^\dagger (X \cdot X^\dagger \cdot X \cdot X^\dagger ) X_a = Q_a \cdot Q \cdot Q_a,  \]
 </div>
 <p> while </p>
-<div class="displaymath" id="a0000000215">
+<div class="displaymath" id="a0000000213">
   \[  X_a^\dagger (X \cdot X^\dagger ) X_a = (X_a^\dagger \cdot X)(X^\dagger \cdot X_a) = Q_a \cdot Q_a = Q_a,  \]
 </div>
 <p> and \(X_a^\dagger I_{m \times m} X_a = X_a^\dagger X_a = Q_a\). Substituting these identities into </p>
-<div class="displaymath" id="a0000000216">
+<div class="displaymath" id="a0000000214">
   \[  (X \cdot X^\dagger - I_{m \times m})^2 = X \cdot X^\dagger \cdot X \cdot X^\dagger - 2X \cdot X^\dagger + I_{m \times m}  \]
 </div>
 <p> gives the claim. </p>
@@ -1981,7 +1973,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:pa-restated">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000217"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000215"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2009,13 +2001,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For each \(a\), </p>
-<div class="displaymath" id="a0000000218">
+<div class="displaymath" id="a0000000216">
   \begin{equation*}  P_a = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000217">
+<div class="proof_wrapper" id="a0000000215">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2024,7 +2016,7 @@
   </div>
   <div class="proof_content">
   <p> Since \(T\) is projective, </p>
-<div class="displaymath" id="a0000000219">
+<div class="displaymath" id="a0000000217">
   \[  P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a = (\widehat{X}^\dagger \cdot T_a)(T_a \cdot \widehat{X}) = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.  \]
 </div>
 
@@ -2044,7 +2036,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:X-hat-squared">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000220"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000218"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2072,13 +2064,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000221">
+<div class="displaymath" id="a0000000219">
   \begin{equation*}  \widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000220">
+<div class="proof_wrapper" id="a0000000218">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2086,10 +2078,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Multiply out the definition of \(\widehat X\) and use the unitarity of \(U\) and \(V\): </p>
-<div class="displaymath" id="a0000000222">
-  \[  \widehat{X} \cdot \widehat{X}^\dagger = (U \cdot I_{m \times d} \cdot V^\dagger )(U \cdot I_{m \times d} \cdot V^\dagger )^\dagger = U \cdot I_{m \times m} \cdot U^\dagger = I_{m \times m}.  \]
-</div>
+  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). In Lean, the coisometry identity is one of the primitive consequences recorded in the reduced ‘QXPLayerData‘ package. </p>
 
   </div>
 </div>
@@ -2107,7 +2096,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:X-times-X-hat">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000223"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000220"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2135,13 +2124,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000224">
-  \begin{equation*}  X \cdot \widehat{X}^\dagger = U \cdot \Sigma _{m \times m} \cdot U^\dagger , \quad \text{and} \quad X^\dagger \cdot \widehat{X} = \sqrt{Q}. \end{equation*}
+<div class="displaymath" id="a0000000221">
+  \begin{equation*}  X^\dagger \cdot \widehat{X} = \sqrt{Q}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000223">
+<div class="proof_wrapper" id="a0000000220">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2149,19 +2138,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The first identity follows directly from the singular value decomposition: </p>
-<div class="displaymath" id="a0000000225">
-  \[  X \cdot \widehat{X}^\dagger = (U \cdot \Sigma _{m \times d} \cdot V^\dagger )(U \cdot I_{m \times d} \cdot V^\dagger )^\dagger = U \cdot \Sigma _{m \times m} \cdot U^\dagger .  \]
-</div>
-<p> Similarly, </p>
-<div class="displaymath" id="a0000000226">
-  \[  X^\dagger \cdot \widehat{X} = (U \cdot \Sigma _{m \times d} \cdot V^\dagger )^\dagger (U \cdot I_{m \times d} \cdot V^\dagger ) = V \cdot \Sigma _{d \times d} \cdot V^\dagger .  \]
-</div>
-<p> By <a href="chap-projective.html#lem:X-squared">4.21</a>, this is the positive square root of </p>
-<div class="displaymath" id="a0000000227">
-  \[  V \cdot (\Sigma _{d \times d})^2 \cdot V^\dagger = Q,  \]
-</div>
-<p> so \(X^\dagger \cdot \widehat X = \sqrt Q\). </p>
+  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The Lean proof records this as the primitive mixed-product identity in ‘QXPLayerData‘, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.26</a> and <a href="chap-projective.html#lem:P-Q-approx">4.28</a>. The companion paper identity for \(X\widehat X^\dagger \) is not stored explicitly. </p>
 
   </div>
 </div>
@@ -2179,7 +2156,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:squared-difference">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000228"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000222"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2207,13 +2184,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000229">
+<div class="displaymath" id="a0000000223">
   \begin{equation*}  (X - \widehat{X}) \cdot (X - \widehat{X})^\dagger \leq (X \cdot X^\dagger - I_{m \times m})^2. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000228">
+<div class="proof_wrapper" id="a0000000222">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2221,18 +2198,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> By <a href="chap-projective.html#lem:X-squared">4.21</a>, <a href="chap-projective.html#lem:X-hat-squared">4.24</a>, and <a href="chap-projective.html#lem:X-times-X-hat">4.25</a>, </p>
-<div class="displaymath" id="a0000000230">
-  \[  (X-\widehat X)(X-\widehat X)^\dagger = U \cdot (\Sigma _{m \times m}-I_{m \times m})^2 \cdot U^\dagger .  \]
-</div>
-<p> Since \(\Sigma _{m \times m}\) commutes with \(I_{m \times m}\), </p>
-<div class="displaymath" id="a0000000231">
-  \[  (\Sigma _{m \times m}-I_{m \times m})^2 \leq (\Sigma _{m \times m}^2-I_{m \times m})^2.  \]
-</div>
-<p> Conjugating by \(U\) and using <a href="chap-projective.html#lem:X-squared">4.21</a> gives </p>
-<div class="displaymath" id="a0000000232">
-  \[  (X-\widehat X)(X-\widehat X)^\dagger \leq (X \cdot X^\dagger - I_{m \times m})^2.  \]
-</div>
+  <p> The paper diagonalizes the positive operator \(X\widehat X^\dagger \) using the SVD notation. The Lean proof avoids storing that SVD explicitly: set \(Y=X\widehat X^\dagger \). The primitive identities imply that \(Y\) is hermitian, nonnegative, and satisfies \(Y^2=XX^\dagger \). Hence \((X-\widehat X)(X-\widehat X)^\dagger =(Y-I)^2\), and positivity of \(Y\) gives \((Y-I)^2\leq (Y^2-I)^2=(XX^\dagger -I)^2\). </p>
 
   </div>
 </div>
@@ -2250,7 +2216,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:P-projectivity">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000233"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000224"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2281,7 +2247,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000233">
+<div class="proof_wrapper" id="a0000000224">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2290,7 +2256,7 @@
   </div>
   <div class="proof_content">
   <p> For outcomes \(a,b\), </p>
-<div class="displaymath" id="a0000000234">
+<div class="displaymath" id="a0000000225">
   \begin{align*}  P_a \cdot P_b &  = (\widehat{X}^\dagger \cdot T_a \cdot \widehat{X}) (\widehat{X}^\dagger \cdot T_b \cdot \widehat{X}) \\ &  = \widehat{X}^\dagger \cdot T_a \cdot I_{m \times m} \cdot T_b \cdot \widehat{X} \\ &  = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} \cdot \mathbf{1}\! \left[[\right]a=b] \\ &  = P_a \cdot \mathbf{1}\! \left[[\right]a=b], \end{align*}
 </div>
 <p> where the second line uses <a href="chap-projective.html#lem:X-hat-squared">4.24</a>, the third uses that \(T\) is projective, and the last uses <a href="chap-projective.html#lem:pa-restated">4.23</a>. Summing over \(a\) shows \(\sum _a P_a \leq I\), so \(P\) is a projective sub-measurement. </p>
@@ -2311,7 +2277,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:P-Q-approx">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000235"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000226"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2339,13 +2305,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000236">
+<div class="displaymath" id="a0000000227">
   \begin{equation*}  Q_a \otimes I \approx _{30\zeta ^{1/4}} P_a \otimes I. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000235">
+<div class="proof_wrapper" id="a0000000226">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2353,7 +2319,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The quantity to bound is </p>
+  <p> The Lean proof follows this argument directly from the primitive \(X/\widehat X/P\) identities; the \(30\zeta ^{1/4}\) estimate is no longer stored as a field of ‘QXPLayerData‘. The quantity to bound is </p>
 <div class="equation" id="eq:P-Q-thing-to-bound">
 <p>
   <div class="equation_content">
@@ -2373,7 +2339,7 @@
 </p>
 </div>
 <p> By <a href="chap-projective.html#lem:qa-restated">4.20</a>, </p>
-<div class="displaymath" id="a0000000237">
+<div class="displaymath" id="a0000000228">
   \[  \sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle  = \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot X \cdot P_a) \otimes I \lvert \psi  \rangle .  \]
 </div>
 <p> The main estimate is </p>
@@ -2386,39 +2352,39 @@
 </p>
 </div>
 <p> This follows by Cauchy–Schwarz: </p>
-<div class="displaymath" id="a0000000238">
+<div class="displaymath" id="a0000000229">
   \[  \Big|\sum _a \langle \psi  \rvert  ((X_a^\dagger \cdot (X-\widehat X)) \otimes I)\cdot (P_a \otimes I)\lvert \psi  \rangle \Big|  \]
 </div>
 <p> is bounded by the square root of </p>
-<div class="displaymath" id="a0000000239">
+<div class="displaymath" id="a0000000230">
   \[  \sum _a \langle \psi  \rvert  \big(X_a^\dagger \cdot (X-\widehat X)(X-\widehat X)^\dagger \cdot X_a\big)\otimes I \lvert \psi  \rangle ,  \]
 </div>
 <p> times the square root of \(\sum _a \langle \psi  \rvert (P_a)^2 \otimes I \lvert \psi  \rangle  \leq 1\). The first factor is at most \(4\sqrt{\zeta }\) by <a href="chap-projective.html#lem:squared-difference">4.26</a>, <a href="chap-projective.html#lem:X-expression-to-Q-expression">4.22</a>, and <a href="chap-projective.html#lem:q-almost-projective">4.14</a>, so the total error is at most \(2\zeta ^{1/4}\). </p>
 <p>The right-hand side of <a href="chap-projective.html#eq:add-a-hat">13</a> is real, because </p>
-<div class="displaymath" id="a0000000240">
+<div class="displaymath" id="a0000000231">
   \[  \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot \widehat{X} \cdot P_a)\otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  (X^\dagger \cdot \widehat{X}) \otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle ,  \]
 </div>
 <p> where the first equality uses <a href="chap-projective.html#lem:xa-t">4.19</a>, <a href="chap-projective.html#lem:pa-restated">4.23</a>, and <a href="chap-projective.html#lem:X-hat-squared">4.24</a> and that \(T\) is a measurement, and the second uses <a href="chap-projective.html#lem:X-times-X-hat">4.25</a>. Hence <a href="chap-projective.html#lem:sqrt-Q-completeness">4.13</a> and <a href="chap-projective.html#eq:add-a-hat">13</a> imply </p>
-<div class="displaymath" id="a0000000241">
+<div class="displaymath" id="a0000000232">
   \[  \mathfrak {R}\Big(\sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle \Big) \geq 1-14\zeta ^{1/4}.  \]
 </div>
 <p> Substituting this into <a href="chap-projective.html#eq:complex-conjugates">12</a> and then into <a href="chap-projective.html#eq:P-Q-thing-to-bound">11</a> gives </p>
-<div class="displaymath" id="a0000000242">
+<div class="displaymath" id="a0000000233">
   \[  \sum _a \langle \psi  \rvert  (Q_a-P_a)^2 \otimes I \lvert \psi  \rangle  \leq (1+2\sqrt{\zeta }) + 1 - 2(1-14\zeta ^{1/4}) = 2\sqrt{\zeta } + 28\zeta ^{1/4} \leq 30\zeta ^{1/4}.  \]
 </div>
 
   </div>
 </div>
 <p>Finally, <a href="chap-projective.html#lem:projective-low-rank-sum">4.11</a> gives </p>
-<div class="displaymath" id="a0000000243">
+<div class="displaymath" id="a0000000234">
   \[  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I,  \]
 </div>
 <p> and <a href="chap-projective.html#lem:P-Q-approx">4.28</a> gives </p>
-<div class="displaymath" id="a0000000244">
+<div class="displaymath" id="a0000000235">
   \[  Q_a \otimes I \approx _{30\zeta ^{1/4}} P_a \otimes I.  \]
 </div>
 <p> The triangle inequality for \(\approx _\delta \) yields </p>
-<div class="displaymath" id="a0000000245">
+<div class="displaymath" id="a0000000236">
   \[  A_a \otimes I \approx _{84\zeta ^{1/4}} P_a \otimes I.  \]
 </div>
 
