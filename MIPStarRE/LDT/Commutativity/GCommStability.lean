@@ -402,6 +402,14 @@ private lemma gCommStability_scalar_pointwise_bound
           · exact Real.sqrt_nonneg _
     _ = Real.sqrt (hbound.storedResidual G y) := by simp
 
+/-- Direct boundedness proof for the first paper scalar stability estimate.
+
+This is the Cauchy--Schwarz/`Z^y` part of
+`references/ldt-paper/commutativity-G.tex`, `clm:g-comm-stability` (lines
+135--179).  It is intentionally separate from the overlap-style
+`gCommStability_overlap` theorem: the overlap theorem bounds an internal
+`SDDOpRel` package, while this theorem uses `SliceBoundednessInput` to control
+the paper scalar defect after the finite marginalization/reindexing step. -/
 theorem gCommStability_scalar
     (params : Parameters)
     [FieldModel params.q]
@@ -455,6 +463,49 @@ theorem gCommStability_scalar
     _ ≤ Real.sqrt zeta := by
           exact Real.sqrt_le_sqrt <|
             hbound.storedBoundedResidualBound G hG
+
+/-- Named scalar defect for the first paper stability claim.
+
+For fixed `y`, this is the collapsed version of
+`commutativity-G.tex`, equation `eq:bound-this-right-now!`: `gCommStabilityR`
+contains the averaged left-register sandwich
+`E_{u,x} \sum_a G_a^{u,x} G_g^y G_a^{u,x}`, and
+`IdxPolyFamily.averagedSlicePointEvaluationOperator` is the right-register
+average `E_v A^{v,y}_{g(v)}`.  This is the scalar expression bounded by
+`gCommStability_scalar`, not the overlap `SDDOpRel` package. -/
+noncomputable def gCommStabilityScalarDefect
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (y : Fq params) : Error :=
+  ∑ g : Polynomial params,
+    ev strategy.state
+      (leftTensor (ι₂ := ι)
+          ((gCommStabilityR params family y).outcome g * (1 - (G y).total)) *
+        rightTensor (ι₁ := ι)
+          (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g))
+
+/-- Paper-facing scalar bound for `clm:g-comm-stability`.
+
+This wrapper exposes `gCommStability_scalar` with a named defect so downstream
+scalar-chain proofs can cite the paper boundedness claim without passing through
+the internal overlap families `commDataProcessedGStabilityOneLeft` and
+`commDataProcessedGStabilityOneRight`. -/
+theorem gCommStabilityScalarDefectBound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    |avgOver (uniformDistribution (Fq params))
+      (gCommStabilityScalarDefect params strategy family G)| ≤ Real.sqrt zeta := by
+  simpa [gCommStabilityScalarDefect] using
+    (gCommStability_scalar params strategy zeta hnorm family G hG hbound)
 
 /-- The paper's mirrored slice submeasurement
 `R'^x_g = E_{v,y} \sum_b G^{v,y}_b G^x_g G^{v,y}_b`. -/
@@ -773,6 +824,14 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
           · exact Real.sqrt_nonneg _
     _ = Real.sqrt (hbound.storedResidual G x) := by simp
 
+/-- Direct boundedness proof for the second paper scalar stability estimate.
+
+This is the `Z^x` boundedness half of
+`references/ldt-paper/commutativity-G.tex`, `clm:g-comm-stability2` (lines
+185--221), after the right-register point-commutation transport has produced
+the order `A_b^{v,y} A_a^{u,x}`.  The separate `6√(γ(m+1))` transport loss is
+not proved here; `gCommStabilityTwoScalarDefectBoundWithPaperSlack` below
+relaxes this `√ζ` estimate to the paper's displayed error budget. -/
 theorem gCommStabilityTwo_scalar
     (params : Parameters)
     [FieldModel params.q]
@@ -826,5 +885,71 @@ theorem gCommStabilityTwo_scalar
     _ ≤ Real.sqrt zeta := by
           exact Real.sqrt_le_sqrt <|
             hbound.storedBoundedResidualBound G hG
+
+/-- Named scalar defect for the boundedness half of the second paper stability claim.
+
+For fixed `x`, this is the collapsed version of `commutativity-G.tex`, equation
+`eq:g-comm-stab7`, after the point-commutation step has put the right-register
+point operators in the order used by the boundedness witness.  The definition
+keeps only the `Z^x` boundedness scalar; the `6√(γ(m+1))` transport loss is a
+separate estimate. -/
+noncomputable def gCommStabilityTwoScalarDefect
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (x : Fq params) : Error :=
+  ∑ g : Polynomial params,
+    ev strategy.state
+      (leftTensor (ι₂ := ι)
+          ((gCommStabilityTwoR params family G x).outcome g * (1 - (G x).total)) *
+        rightTensor (ι₁ := ι)
+          (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))
+
+/-- Paper-facing boundedness part of `clm:g-comm-stability2`.
+
+This exposes `gCommStabilityTwo_scalar` with a named defect.  It intentionally
+has only the `√ζ` bound: the `6√(γ(m+1))` term in the paper comes from the
+preceding `commutativityPoints` transport, not from the boundedness argument. -/
+theorem gCommStabilityTwoScalarDefectBound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    |avgOver (uniformDistribution (Fq params))
+      (gCommStabilityTwoScalarDefect params strategy family G)| ≤ Real.sqrt zeta := by
+  simpa [gCommStabilityTwoScalarDefect] using
+    (gCommStabilityTwo_scalar params strategy zeta hnorm family G hG hbound)
+
+/-- The same second scalar bound relaxed to the paper's displayed error budget.
+
+Use this wrapper at sites that account for the `commutativityPoints` transport
+loss and want an endpoint with the full `√ζ + 6√(γ(m+1))` allowance from
+`clm:g-comm-stability2`.  The proof merely adds nonnegative slack; it does not
+claim that the overlap `SDDOpRel` package proves the paper scalar transport. -/
+theorem gCommStabilityTwoScalarDefectBoundWithPaperSlack
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    |avgOver (uniformDistribution (Fq params))
+      (gCommStabilityTwoScalarDefect params strategy family G)| ≤
+        Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
+  have hbase :=
+    gCommStabilityTwoScalarDefectBound params strategy zeta hnorm family G hG hbound
+  have hextra_nonneg :
+      0 ≤ 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
+    positivity
+  linarith
 
 end MIPStarRE.LDT.Commutativity
