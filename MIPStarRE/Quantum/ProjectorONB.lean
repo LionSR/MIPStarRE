@@ -103,6 +103,33 @@ lemma IsProj.eq_sum_nonzero_eigenvector_projectors (P : Op ι) (hP : IsProj P) :
           rw [← Finset.sum_subtype_eq_sum_filter]
           simp [p]
 
+/-- The trace of a finite-dimensional orthogonal projector equals its rank. -/
+lemma IsProj.trace_eq_rank (Q : Op ι) (hQ : IsProj Q) :
+    Q.trace = (Q.rank : ℂ) := by
+  classical
+  let p : ι → Prop := fun i => hQ.isHermitian.eigenvalues i ≠ 0
+  let indicator : ι → ℕ := fun i => if p i then 1 else 0
+  have hp_nat : Fintype.card {i // p i} = ∑ i, indicator i := by
+    rw [Fintype.card_subtype p]
+    simpa [p, indicator] using Finset.card_filter p (Finset.univ : Finset ι)
+  have hp_complex : (Fintype.card {i // p i} : ℂ) = ∑ i, (indicator i : ℂ) := by
+    exact_mod_cast hp_nat
+  have h_indicator : ∀ i, (indicator i : ℂ) = (hQ.isHermitian.eigenvalues i : ℂ) := by
+    intro i
+    rcases hQ.eigenvalues_zero_or_one Q i with hzero | hone
+    · simp [p, indicator, hzero]
+    · simp [p, indicator, hone]
+  calc
+    Q.trace = ∑ i, (hQ.isHermitian.eigenvalues i : ℂ) :=
+      hQ.isHermitian.trace_eq_sum_eigenvalues
+    _ = ∑ i, (indicator i : ℂ) := by
+          refine Finset.sum_congr rfl ?_
+          intro i _
+          symm
+          exact h_indicator i
+    _ = Fintype.card {i // p i} := by symm; exact hp_complex
+    _ = (Q.rank : ℂ) := by rw [hQ.isHermitian.rank_eq_card_non_zero_eigs]
+
 /-- A rank-indexed orthonormal basis of the range of a projector, packaged with
 the corresponding rank-one decomposition. -/
 structure ProjectorRangeONB (P : Op ι) (hP : IsProj P) where
@@ -180,33 +207,6 @@ lemma subprojector_isProj (S : Finset (Fin P.rank)) :
     IsProj (b.subprojector S) where
   isHermitian := b.subprojector_isHermitian S
   idempotent := b.subprojector_idempotent S
-
-/-- The trace of a finite-dimensional orthogonal projector equals its rank. -/
-lemma IsProj.trace_eq_rank (Q : Op ι) (hQ : IsProj Q) :
-    Q.trace = (Q.rank : ℂ) := by
-  classical
-  let p : ι → Prop := fun i => hQ.isHermitian.eigenvalues i ≠ 0
-  let indicator : ι → ℕ := fun i => if p i then 1 else 0
-  have hp_nat : Fintype.card {i // p i} = ∑ i, indicator i := by
-    rw [Fintype.card_subtype p]
-    simpa [p, indicator] using Finset.card_filter p (Finset.univ : Finset ι)
-  have hp_complex : (Fintype.card {i // p i} : ℂ) = ∑ i, (indicator i : ℂ) := by
-    exact_mod_cast hp_nat
-  have h_indicator : ∀ i, (indicator i : ℂ) = (hQ.isHermitian.eigenvalues i : ℂ) := by
-    intro i
-    rcases hQ.eigenvalues_zero_or_one Q i with hzero | hone
-    · simp [p, indicator, hzero]
-    · simp [p, indicator, hone]
-  calc
-    Q.trace = ∑ i, (hQ.isHermitian.eigenvalues i : ℂ) :=
-      hQ.isHermitian.trace_eq_sum_eigenvalues
-    _ = ∑ i, (indicator i : ℂ) := by
-          refine Finset.sum_congr rfl ?_
-          intro i _
-          symm
-          exact h_indicator i
-    _ = Fintype.card {i // p i} := by symm; exact hp_complex
-    _ = (Q.rank : ℂ) := by rw [hQ.isHermitian.rank_eq_card_non_zero_eigs]
 
 /-- The partial projector's trace is the number of selected vectors. -/
 lemma subprojector_trace (S : Finset (Fin P.rank)) :
