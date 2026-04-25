@@ -206,33 +206,6 @@ abbrev projectiveNonMeasurement {Outcome : Type uOutcome}
   ∃ R : OpFamily Outcome ι,
     RoundingToProjectorsWitness ψ A ζ R
 
-/-- The trace of a finite-dimensional orthogonal projector equals its rank. -/
-lemma trace_eq_rank_of_isProj {ι : Type*} [Fintype ι]
-    (P : MIPStarRE.Quantum.Op ι) (hP : MIPStarRE.Quantum.IsProj P) :
-    P.trace = (P.rank : ℂ) := by
-  classical
-  let p : ι → Prop := fun i => hP.isHermitian.eigenvalues i ≠ 0
-  let indicator : ι → ℕ := fun i => if p i then 1 else 0
-  have hp_nat : Fintype.card {i // p i} = ∑ i, indicator i := by
-    rw [Fintype.card_subtype p]
-    simpa [p, indicator] using Finset.card_filter p (Finset.univ : Finset ι)
-  have hp_complex : (Fintype.card {i // p i} : ℂ) = ∑ i, (indicator i : ℂ) := by
-    exact_mod_cast hp_nat
-  have h_indicator : ∀ i, (indicator i : ℂ) = (hP.isHermitian.eigenvalues i : ℂ) := by
-    intro i
-    rcases MIPStarRE.Quantum.IsProj.eigenvalues_zero_or_one P hP i with hzero | hone
-    · simp [p, indicator, hzero]
-    · simp [p, indicator, hone]
-  calc
-    P.trace = ∑ i, (hP.isHermitian.eigenvalues i : ℂ) := hP.isHermitian.trace_eq_sum_eigenvalues
-    _ = ∑ i, (indicator i : ℂ) := by
-          refine Finset.sum_congr rfl ?_
-          intro i _
-          symm
-          exact h_indicator i
-    _ = Fintype.card {i // p i} := by symm; exact hp_complex
-    _ = (P.rank : ℂ) := by rw [hP.isHermitian.rank_eq_card_non_zero_eigs]
-
 /-- If a family of projectors sums to at most the identity, then the sum of their
 ranks is at most the ambient dimension. -/
 lemma sum_rank_le_card_of_projectors_le_one {Outcome : Type*} [Fintype Outcome]
@@ -248,7 +221,7 @@ lemma sum_rank_le_card_of_projectors_le_one {Outcome : Type*} [Fintype Outcome]
   have htrace_rank : (∑ a, Complex.re (Matrix.trace (R a))) = ∑ a, ((R a).rank : ℝ) := by
     refine Finset.sum_congr rfl ?_
     intro a _
-    rw [trace_eq_rank_of_isProj (R a) (hproj a)]
+    rw [MIPStarRE.Quantum.IsProj.trace_eq_rank (R a) (hproj a)]
     simp
   have hreal_bound' : ∑ a, Complex.re (Matrix.trace (R a)) ≤ Fintype.card ι := by
     simpa [Matrix.trace_sub, Matrix.trace_one, Matrix.trace_sum] using hreal_nonneg
@@ -274,7 +247,7 @@ lemma sum_rank_le_scalar_mul_card_of_projectors_le {Outcome : Type*} [Fintype Ou
   have htrace_rank : (∑ a, Complex.re (Matrix.trace (R a))) = ∑ a, ((R a).rank : ℝ) := by
     refine Finset.sum_congr rfl ?_
     intro a _
-    rw [trace_eq_rank_of_isProj (R a) (hproj a)]
+    rw [MIPStarRE.Quantum.IsProj.trace_eq_rank (R a) (hproj a)]
     simp
   have hreal_bound' : ∑ a, Complex.re (Matrix.trace (R a)) ≤ c * Fintype.card ι := by
     simpa [Matrix.trace_sub, Matrix.trace_one, Matrix.trace_sum, Matrix.trace_smul,
@@ -451,7 +424,11 @@ lemma projectiveLowRankSum_auxData_of_projectors {Outcome : Type uOutcome}
     (by simpa [m] using sum_rank_le_card_of_projectors_le_one R hproj htotal_le_one)
 
 /-- Concrete rank-reduction producer once the rounded family is already an exact
-projector submeasurement `∑_a R_a ≤ I`. -/
+projector submeasurement `∑_a R_a ≤ I`.
+
+This exact-projector branch is currently kept for the blueprint cross-reference
+to the paper-facing `r ≤ d` packaging; the public theorem routes through
+`projectiveLowRankSum_of_rank_bound` after #726. -/
 lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome] [Nonempty Outcome]
@@ -540,8 +517,108 @@ lemma projectiveLowRankSum_of_rank_bound {Outcome : Type uOutcome}
       _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
           (1 : MIPStarRE.Quantum.Op ι) := hR.total_le
 
-set_option maxHeartbeats 1000000 in
--- The dependent sigma-indexed truncation proof combines several large finite-sum rewrites.
+/-- Sum the rank-one spectral overlaps of all rounded projectors back into
+`ev ψ (∑_a R_a)`.  This isolates the dependent-sigma rewrite used in the
+`r > d` truncation branch of `projectiveLowRankSum`. -/
+private lemma projectiveLowRankSum_truncationOverlap_eq_ev_sum {Outcome : Type uOutcome}
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (R : OpFamily Outcome ι)
+    (hproj : ∀ a, MIPStarRE.Quantum.IsProj (R.outcome a))
+    (onb : (a : Outcome) →
+      MIPStarRE.Quantum.ProjectorRangeONB (R.outcome a) (hproj a)) :
+    (∑ x : (Σ a : Outcome, Fin (R.outcome a).rank),
+        ev ψ ((onb x.1).rankOne x.2)) =
+      ev ψ (∑ a, R.outcome a) := by
+  classical
+  calc
+    (∑ x : (Σ a : Outcome, Fin (R.outcome a).rank),
+        ev ψ ((onb x.1).rankOne x.2))
+        = ∑ a : Outcome, ∑ i : Fin (R.outcome a).rank,
+            ev ψ ((onb a).rankOne i) := by
+          rw [Fintype.sum_sigma]
+    _ = ∑ a : Outcome, ev ψ (R.outcome a) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [← ev_sum ψ (fun i : Fin (R.outcome a).rank => (onb a).rankOne i)]
+          simpa [MIPStarRE.Quantum.ProjectorRangeONB.rankOne] using
+            congrArg (ev ψ) (onb a).decomposition.symm
+    _ = ev ψ (∑ a, R.outcome a) := by
+          rw [ev_sum]
+
+/-- Evaluate the scalar total bound from the rounding witness on a normalized
+state, rewriting the spectral truncation error as `√ζ`. -/
+private lemma projectiveLowRankSum_eval_totalBound {ι : Type uι}
+    [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (hψ : ψ.IsNormalized) (ζ : Error) :
+    ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) •
+      (1 : MIPStarRE.Quantum.Op ι)) =
+      1 + 2 * Real.sqrt ζ := by
+  calc
+    ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) •
+        (1 : MIPStarRE.Quantum.Op ι))
+        = (1 + 2 * spectralTruncationError ζ) *
+            ev ψ (1 : MIPStarRE.Quantum.Op ι) :=
+          ev_scale ψ (1 + 2 * spectralTruncationError ζ)
+            (1 : MIPStarRE.Quantum.Op ι)
+    _ = 1 + 2 * Real.sqrt ζ := by
+          rw [ev_one_of_isNormalized ψ hψ, spectralTruncationError_eq_sqrt ζ]
+          ring
+
+/-- The squared-distance defect between the rounded family `R` and its truncated
+subprojector family is exactly the discarded rank-one overlap mass. -/
+private lemma projectiveLowRankSum_qSDD_truncation_eq_compl_overlap
+    {Outcome : Type uOutcome} {ι : Type uι}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (R : OpFamily Outcome ι)
+    (hproj : ∀ a, MIPStarRE.Quantum.IsProj (R.outcome a))
+    [DecidableEq (Σ a : Outcome, Fin (R.outcome a).rank)]
+    (onb : (a : Outcome) →
+      MIPStarRE.Quantum.ProjectorRangeONB (R.outcome a) (hproj a))
+    (Large : Finset (Σ a : Outcome, Fin (R.outcome a).rank))
+    (fiber : (a : Outcome) → Finset (Fin (R.outcome a).rank))
+    (hLarge_compl_sigma :
+      (Largeᶜ : Finset (Σ a : Outcome, Fin (R.outcome a).rank)) =
+        (Finset.univ : Finset Outcome).sigma (fun a => (fiber a)ᶜ)) :
+    qSDDOp ψ R
+      ({ outcome := fun a => (onb a).subprojector (fiber a)
+         total := ∑ a, (onb a).subprojector (fiber a) } : OpFamily Outcome ι) =
+      ∑ x ∈ (Largeᶜ : Finset (Σ a : Outcome, Fin (R.outcome a).rank)),
+        ev ψ ((onb x.1).rankOne x.2) := by
+  classical
+  unfold qSDDOp qSDDCore
+  calc
+    ∑ a : Outcome,
+        ev ψ (((R.outcome a - (onb a).subprojector (fiber a))ᴴ) *
+          (R.outcome a - (onb a).subprojector (fiber a)))
+        = ∑ a : Outcome,
+            ev ψ ((onb a).subprojector
+              ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank))) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          have hdiff := (onb a).subprojector_diff_eq_compl (fiber a)
+          have hproj_sub := (onb a).subprojector_isProj
+            ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank))
+          rw [show R.outcome a - (onb a).subprojector (fiber a) =
+              (onb a).subprojector ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)) by
+                simpa using hdiff]
+          simp [hproj_sub.isHermitian.eq, hproj_sub.idempotent]
+    _ = ∑ a : Outcome, ∑ i ∈ ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)),
+          ev ψ ((onb a).rankOne i) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          change ev ψ (∑ i ∈ ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)),
+              (onb a).rankOne i) =
+            ∑ i ∈ ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)),
+              ev ψ ((onb a).rankOne i)
+          rw [ev_finset_sum]
+    _ = ∑ x ∈ (Largeᶜ : Finset (Σ a : Outcome, Fin (R.outcome a).rank)),
+          ev ψ ((onb x.1).rankOne x.2) := by
+          rw [hLarge_compl_sigma]
+          rw [Finset.sum_sigma]
+
 /-- Construct the rank-reduced projector family in the `r > d` truncation
 branch, starting from the rounded projectors `R_a`. -/
 lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
@@ -628,18 +705,9 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
         _ ≤ Fintype.card ι := le_rfl
     have htotal_overlap : (∑ x : Idx, overlap x) ≤ 1 + 2 * Real.sqrt ζ := by
       have hoverlap_eq_ev_sum : (∑ x : Idx, overlap x) = ev ψ (∑ a, R.outcome a) := by
-        calc
-          ∑ x : Idx, overlap x = ∑ a : Outcome, ∑ i : Fin (R.outcome a).rank,
-              ev ψ ((onb a).rankOne i) := by
-                simp [Idx, overlap, rankOne, Fintype.sum_sigma]
-          _ = ∑ a : Outcome, ev ψ (R.outcome a) := by
-                refine Finset.sum_congr rfl ?_
-                intro a _
-                rw [← ev_sum ψ (fun i : Fin (R.outcome a).rank => (onb a).rankOne i)]
-                simpa [MIPStarRE.Quantum.ProjectorRangeONB.rankOne] using
-                  congrArg (ev ψ) (onb a).decomposition.symm
-          _ = ev ψ (∑ a, R.outcome a) := by
-                rw [ev_sum]
+        simpa [Idx, overlap, rankOne] using
+          (projectiveLowRankSum_truncationOverlap_eq_ev_sum
+            (ψ := ψ) (R := R) (hproj := hR.projective) (onb := onb))
       have hev_le : ev ψ (∑ a, R.outcome a) ≤
           ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
             (1 : MIPStarRE.Quantum.Op ι)) := ev_mono ψ _ _ hRsum_le
@@ -648,29 +716,8 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
         _ ≤ ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
             (1 : MIPStarRE.Quantum.Op ι)) := hev_le
         _ = 1 + 2 * Real.sqrt ζ := by
-              have hscalar : ((((1 : Error) : ℂ) + (2 : ℂ) *
-                    ((spectralTruncationError ζ : Error) : ℂ))) =
-                  (((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) := by
-                norm_num
-              have hsmul : ((((1 : Error) : ℂ) + (2 : ℂ) *
-                    ((spectralTruncationError ζ : Error) : ℂ)) •
-                    (1 : MIPStarRE.Quantum.Op ι)) =
-                  ((((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) •
-                    (1 : MIPStarRE.Quantum.Op ι)) := by
-                rw [hscalar]
-              calc
-                ev ψ ((((1 : Error) : ℂ) + (2 : ℂ) *
-                    ((spectralTruncationError ζ : Error) : ℂ)) •
-                    (1 : MIPStarRE.Quantum.Op ι))
-                    = ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) •
-                        (1 : MIPStarRE.Quantum.Op ι)) := by rw [hsmul]
-                _ = (1 + 2 * spectralTruncationError ζ) *
-                    ev ψ (1 : MIPStarRE.Quantum.Op ι) :=
-                      ev_scale ψ (1 + 2 * spectralTruncationError ζ)
-                        (1 : MIPStarRE.Quantum.Op ι)
-                _ = 1 + 2 * Real.sqrt ζ := by
-                      rw [ev_one_of_isNormalized ψ hψ, hspectral_sqrt]
-                      ring
+              simpa using projectiveLowRankSum_eval_totalBound
+                (ψ := ψ) (hψ := hψ) (ζ := ζ)
     have hsmall : (∑ x ∈ (Largeᶜ : Finset Idx), overlap x) ≤ 4 * Real.sqrt ζ :=
       Truncation.sum_small_le_four_sqrt (α := Idx) Large
         (hL_card := hLarge_card) (hcard_gt := hcard_gt) (hr_bound := hr_bound)
@@ -688,34 +735,11 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
         rcases Finset.mem_sigma.mp h with ⟨_, hi⟩
         simpa [fiber] using hi
     have hqSDD_RQ : qSDDOp ψ R Q = ∑ x ∈ (Largeᶜ : Finset Idx), overlap x := by
-      unfold qSDDOp qSDDCore
-      calc
-        ∑ a : Outcome,
-            ev ψ (((R.outcome a - Q.outcome a)ᴴ) * (R.outcome a - Q.outcome a))
-            = ∑ a : Outcome,
-                ev ψ ((onb a).subprojector
-                  ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank))) := by
-                refine Finset.sum_congr rfl ?_
-                intro a _
-                have hdiff := (onb a).subprojector_diff_eq_compl (fiber a)
-                have hproj := (onb a).subprojector_isProj
-                  ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank))
-                rw [show R.outcome a - Q.outcome a =
-                    (onb a).subprojector ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)) by
-                      simpa [Q] using hdiff]
-                simp [hproj.isHermitian.eq, hproj.idempotent]
-        _ = ∑ a : Outcome, ∑ i ∈ ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)),
-              ev ψ ((onb a).rankOne i) := by
-                refine Finset.sum_congr rfl ?_
-                intro a _
-                change ev ψ (∑ i ∈ ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)),
-                    (onb a).rankOne i) =
-                  ∑ i ∈ ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)),
-                    ev ψ ((onb a).rankOne i)
-                rw [ev_finset_sum]
-        _ = ∑ x ∈ (Largeᶜ : Finset Idx), overlap x := by
-                rw [hLarge_compl_sigma]
-                rw [Finset.sum_sigma]
+      simpa [Q, Idx, overlap, rankOne] using
+        (projectiveLowRankSum_qSDD_truncation_eq_compl_overlap
+          (ψ := ψ) (R := R) (hproj := hR.projective) (onb := onb)
+          (Large := Large) (fiber := fiber)
+          (hLarge_compl_sigma := hLarge_compl_sigma))
     have hRQ : SDDOpRel ψ (uniformDistribution Unit) (constOpFamily R) (constOpFamily Q)
         (4 * spectralTruncationError ζ) := by
       have hcore : qSDDOp ψ R Q ≤ 4 * spectralTruncationError ζ := by
