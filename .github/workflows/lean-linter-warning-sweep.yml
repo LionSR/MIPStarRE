@@ -38,6 +38,12 @@ jobs:
             lake build -q --log-level=info
           } 2>&1 | tee "$log_file"
 
+      - name: Set up Python for warning summary
+        if: always()
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Summarize linter warnings
         if: always()
         env:
