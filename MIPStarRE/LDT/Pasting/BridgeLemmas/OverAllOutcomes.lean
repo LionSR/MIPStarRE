@@ -20,6 +20,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- The `hBConsistency` error term is one summand of the over-all-outcomes error. -/
 private lemma hBConsistencyError_le_overAllOutcomesError
     (params : Parameters) [FieldModel params.q]
     (eps delta gamma zeta : Error) (k : ℕ)
@@ -49,6 +50,7 @@ private lemma hBConsistencyError_le_overAllOutcomesError
   gcongr
   norm_num
 
+/-- Evaluate a weighted sum placed on Alice's tensor factor term by term. -/
 private lemma ev_leftTensor_weighted_sum
     {Question : Type*}
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
@@ -67,19 +69,7 @@ private lemma ev_leftTensor_weighted_sum
     simp [leftTensor, mul_assoc]]
   rw [ev_scale]
 
-private lemma restrictSubMeas_total_le_total
-    {α : Type*} [Fintype α]
-    (A : SubMeas α ι) (p : α → Prop) [DecidablePred p] :
-    (restrictSubMeas A p).total ≤ A.total := by
-  calc
-    (restrictSubMeas A p).total = ∑ a ∈ Finset.univ.filter p, A.outcome a := by
-      rfl
-    _ ≤ ∑ a : α, A.outcome a := by
-      exact Finset.sum_le_univ_sum_of_nonneg
-        (s := Finset.univ.filter p)
-        (w := fun a => A.outcome_pos a)
-    _ = A.total := A.sum_eq_total
-
+/-- Global interpolation eligibility has no more mass than raw interpolation eligibility. -/
 private lemma globalEligibleMass_le_eligibleMass
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -99,6 +89,7 @@ private lemma globalEligibleMass_le_eligibleMass
             (IsGloballyConsistent params xs))
           (show 0 ≤ (1 : MIPStarRE.Quantum.Op ι) by simp)))
 
+/-- Eligible interpolation mass is nonnegative for every point tuple. -/
 private lemma eligibleMass_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -110,6 +101,7 @@ private lemma eligibleMass_nonneg
     leftTensor_nonneg (ι₂ := ι)
       (SubMeas.total_nonneg (interpolationEligibleSandwichFamily params family k xs))
 
+/-- Eligible interpolation mass is at most one for every point tuple. -/
 private lemma eligibleMass_le_one
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -126,6 +118,7 @@ private lemma eligibleMass_le_one
   simpa [ev_one_of_isNormalized strategy.state strategy.isNormalized] using
     ev_mono strategy.state _ _ hle
 
+/-- Distinct tuple averaging is bounded by uniform averaging plus `ldDnoteq`. -/
 private lemma avgOver_distinct_eligibleMass_le_uniform_add_dnoteq
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -159,6 +152,7 @@ private lemma avgOver_distinct_eligibleMass_le_uniform_add_dnoteq
           gcongr
           exact ldDnoteq params k
 
+/-- Uniform tuple averaging is bounded by distinct averaging plus `ldDnoteq`. -/
 private lemma avgOver_uniform_eligibleMass_le_distinct_add_dnoteq
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -187,7 +181,9 @@ private lemma avgOver_uniform_eligibleMass_le_distinct_add_dnoteq
       linarith
     have hcomp := avgOver_distinct_bounded_le_avgOver_uniform_add_tv params k hk
       G hG_nonneg hG_le_one
-    have hDconst : avgOver (distinctTupleDistribution params k) (fun _ : PointTuple params k => 1) = 1 := by
+    have hDconst :
+        avgOver (distinctTupleDistribution params k) (fun _ : PointTuple params k => 1) =
+          1 := by
       unfold avgOver
       simpa using distinctTupleDistribution_weight_sum_eq_one_of_le params k hk
     have hUconst : avgOver (uniformDistribution (PointTuple params k))
@@ -229,6 +225,7 @@ private lemma avgOver_uniform_eligibleMass_le_distinct_add_dnoteq
     dsimp [F] at hUle hDnonneg ⊢
     linarith
 
+/-- The pasted mass is the distinct average of globally consistent eligible mass. -/
 private lemma overAllOutcomesPastedMass_eq_avg_distinct_global
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -245,6 +242,7 @@ private lemma overAllOutcomesPastedMass_eq_avg_distinct_global
       (restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
         (IsGloballyConsistent params xs)).total)
 
+/-- The expansion mass is the uniform average of eligible interpolation mass. -/
 private lemma overAllOutcomesExpansionMass_eq_avg_uniform_eligible
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -260,6 +258,7 @@ private lemma overAllOutcomesExpansionMass_eq_avg_uniform_eligible
   exact ev_leftTensor_weighted_sum strategy.state (uniformDistribution (PointTuple params k))
     (fun xs => (interpolationEligibleSandwichFamily params family k xs).total)
 
+/-- The pasted mass is bounded by distinct eligible interpolation mass. -/
 private lemma overAllOutcomesPastedMass_le_avg_distinct_eligible
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -272,6 +271,7 @@ private lemma overAllOutcomesPastedMass_le_avg_distinct_eligible
   exact avgOver_mono _ _ _ fun xs =>
     globalEligibleMass_le_eligibleMass params strategy family xs
 
+/-- The pasted-minus-expansion mass loss is bounded by the distinctness error. -/
 private lemma overAllOutcomes_pasted_sub_expansion_le_dnoteq
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -304,8 +304,6 @@ lemma overAllOutcomes
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
   refine ⟨?_⟩
-  let _ := hdq_le
-  let _ := hd
   /- Paper: `lem:over-all-outcomes` (ld-pasting.tex §9.4, lines 1140–1289).
   Expand pasted-measurement total mass over all outcome types τ with |τ| ≥ d+1.
   Steps: (1) expand over distinct k-tuples via `distinctTupleDistribution`,
@@ -315,6 +313,9 @@ lemma overAllOutcomes
   (5) bound sandwich errors (`lem:ld-sandwich-line-one-point`: k × ν₅).
 
   Current blockers after the split audit:
+  * `hdq_le` and `hd` are already on the signature to keep downstream callers stable;
+    the missing Schwartz-Zippel/global-polynomial comparison in steps (2)--(4) is
+    where they are intended to be consumed;
   * the interpolation-to-global-polynomial correctness step still needs the
     missing `Defs/Interpolation` comparison lemmas in the exact shapes consumed
     here;

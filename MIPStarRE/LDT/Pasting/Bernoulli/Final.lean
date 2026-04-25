@@ -237,7 +237,9 @@ theorem ldPastingNCompleteness
     specializing `lem:chernoff-bernoulli-matrix` to `θ = 1/(200m)` and the
     averaged complete operator `G`.  The surrounding completeness chain is now
     reduced to this single scalar input; issue #597 tracks the missing spectral /
-    Chernoff infrastructure needed to derive it inside Lean. -/
+    Chernoff infrastructure needed to derive it inside Lean.  The `hd` hypothesis
+    is threaded for the earlier `overAllOutcomes` call, not for this scalar
+    Bernoulli-tail step. -/
     sorry
   exact ldPastingNCompleteness_of_tailLowerBound params strategy
     eps delta gamma kappa zeta hgood hgamma_le hzeta_le hdq_le hd

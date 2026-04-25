@@ -20,15 +20,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma consRel_mono_local
-    {Question Outcome : Type*} [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome ι) {δ δ' : Error}
-    (hδ : δ ≤ δ') :
-    ConsRel ψ 𝒟 A B δ → ConsRel ψ 𝒟 A B δ' := by
-  intro h
-  exact ⟨le_trans h.offDiagonalBound hδ⟩
-
+/-- Turn a postprocessed submeasurement from a measurement into a measurement. -/
 private noncomputable def postprocessMeasurement
     {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
@@ -37,6 +29,7 @@ private noncomputable def postprocessMeasurement
   total_eq_one := by
     simpa [postprocess_total] using B.total_eq_one
 
+/-- A one-slice sandwiched-line question is equivalent to a point-height pair. -/
 private noncomputable def sandwichedLineQuestionOneEquiv
     (params : Parameters) [FieldModel params.q] :
     SandwichedLineQuestion params 1 ≃ Point params × Fq params where
@@ -49,6 +42,7 @@ private noncomputable def sandwichedLineQuestionOneEquiv
     rintro ⟨u, x⟩
     simp
 
+/-- Split a sandwiched-line question at one selected slice coordinate. -/
 private noncomputable def sandwichedLineQuestionSplitAtEquiv
     (params : Parameters) [FieldModel params.q]
     {k : ℕ} (i : Fin k) :
@@ -68,6 +62,7 @@ private noncomputable def sandwichedLineQuestionSplitAtEquiv
     funext j
     simp [j.2]
 
+/-- Split a sandwiched-line question into the prefix through `i` and the tail. -/
 private noncomputable def sandwichedLineQuestionPrefixEquiv
     (params : Parameters) [FieldModel params.q]
     {k i : ℕ} (hi : i < k) :
@@ -94,6 +89,7 @@ private noncomputable def sandwichedLineQuestionPrefixEquiv
       have hji : ¬ (j.1.1 ≤ i) := by omega
       simp [hji]
 
+/-- Reassociate a nested product so the prefix coordinate becomes first. -/
 private def prodPrefixReassocEquiv (α β γ : Type*) : ((α × β) × γ) ≃ β × (α × γ) where
   toFun q := (q.1.2, (q.1.1, q.2))
   invFun q := ((q.2.1, q.1), q.2.2)
@@ -104,6 +100,7 @@ private def prodPrefixReassocEquiv (α β γ : Type*) : ((α × β) × γ) ≃ �
     rintro ⟨b, a, c⟩
     rfl
 
+/-- View the prefix of a sandwiched-line question as the first product coordinate. -/
 private noncomputable def sandwichedLineQuestionPrefixFstEquiv
     (params : Parameters) [FieldModel params.q]
     {k i : ℕ} (hi : i < k) :
@@ -113,6 +110,7 @@ private noncomputable def sandwichedLineQuestionPrefixFstEquiv
     (prodPrefixReassocEquiv (Point params) (PointTuple params (i + 1))
       ({j : Fin k // i < j.1} → Fq params))
 
+/-- Rotate the last coordinate of a prefix tuple to the front. -/
 private def pointTupleLastFrontEquiv
     (params : Parameters) (i : ℕ) :
     PointTuple params (i + 1) ≃ PointTuple params (i + 1) where
@@ -146,6 +144,7 @@ private def pointTupleLastFrontEquiv
         simp only [hne, ↓reduceDIte, Fin.cons_succ]
         exact congrArg xs (Fin.ext rfl)
 
+/-- Rotate the last completed-slice outcome of a prefix tuple to the front. -/
 private def gHatTupleOutcomeLastFrontEquiv
     (params : Parameters) [FieldModel params.q] (i : ℕ) :
     GHatTupleOutcome params (i + 1) ≃ GHatTupleOutcome params (i + 1) where
@@ -209,7 +208,9 @@ private lemma ldSandwichLineOnePoint_endpoint_ldGbcon
       (uniformDistribution (Point params × Fq params))
       (fun ux => postprocess (evaluateAt params ux.1 ((family.meas ux.2).toSubMeas)) some)
       (fun ux =>
-        postprocess (ldSandwichLineOnePointRightEndpointMeasurement params strategy ux).toSubMeas some)
+        postprocess
+          (ldSandwichLineOnePointRightEndpointMeasurement params strategy ux).toSubMeas
+          some)
         (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
   have hgb := ldGbcon params strategy eps delta gamma zeta hgood family hcons
   have hprod :
@@ -258,7 +259,8 @@ private lemma ldSandwichLineOnePoint_endpoint_ldGbcon
         (fun _ a => some a)
         hprod
     simpa [pointNextEquiv, evaluateFiberFamilyAtNextPoint, postprocess_postprocess] using hproc
-  simpa [ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas, postprocess_postprocess] using hprod'
+  simpa [ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas, postprocess_postprocess]
+    using hprod'
 
 private lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
     (params : Parameters)
@@ -336,7 +338,9 @@ private lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
       (fun ux : Point params × Fq params =>
         postprocess (evaluateAt params ux.1 ((family.meas ux.2).toSubMeas)) some)
       (fun ux : Point params × Fq params =>
-        postprocess (ldSandwichLineOnePointRightEndpointMeasurement params strategy ux).toSubMeas some)
+        postprocess
+          (ldSandwichLineOnePointRightEndpointMeasurement params strategy ux).toSubMeas
+          some)
       (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) hbase
   have hlift :=
     (Preliminaries.consRel_uniform_equiv e strategy.state endpointLeft endpointRight
@@ -859,6 +863,7 @@ private lemma ldSandwichLineOnePoint_endpoint_error_le
       _ = 43 * (k : Error) * (params.m : Error) * S := by ring
   exact le_trans hsmall (by simpa [ldSandwichLineOnePointError, S] using hbig)
 
+/-- The original one-point left family restricted to the prefix through coordinate `i`. -/
 private noncomputable def ldSandwichLineOnePointPrefixOriginalFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -872,6 +877,7 @@ private noncomputable def ldSandwichLineOnePointPrefixOriginalFamily
       (fun gs => Option.map (fun g : Polynomial params => g q.1)
         (gs ⟨i, Nat.lt_succ_self i⟩))
 
+/-- The prefix family after rotating the selected coordinate to the front. -/
 private noncomputable def ldSandwichLineOnePointPrefixMovedFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -885,6 +891,7 @@ private noncomputable def ldSandwichLineOnePointPrefixMovedFamily
         (fun gs => (gs 0).isSome = true))
       (fun gs => Option.map (fun g : Polynomial params => g q.1) (gs 0))
 
+/-- Rotating the selected coordinate to the front reduces the prefix family to `ldGbcon`. -/
 private lemma ldSandwichLineOnePointPrefixMoved_eq_endpoint
     (params : Parameters)
     [FieldModel params.q]
@@ -911,6 +918,7 @@ private lemma ldSandwichLineOnePointPrefixMoved_eq_endpoint
     simpa using congrFun hzero hq
   simpa [ldSandwichLineOnePointPrefixMovedFamily, hq, xs, xsTail] using hlocal
 
+/-- The global one-point left family at its last prefix index is the prefix family. -/
 private lemma ldSandwichLineOnePointLeftFamily_self_eq_prefixOriginal
     (params : Parameters)
     [FieldModel params.q]
@@ -922,6 +930,7 @@ private lemma ldSandwichLineOnePointLeftFamily_self_eq_prefixOriginal
   funext q
   simp [ldSandwichLineOnePointLeftFamily, ldSandwichLineOnePointPrefixOriginalFamily]
 
+/-- Endpoint consistency for the rotated prefix family. -/
 private lemma ldSandwichLineOnePointPrefixMoved_consRel_endpoint
     (params : Parameters)
     [FieldModel params.q]
@@ -940,6 +949,7 @@ private lemma ldSandwichLineOnePointPrefixMoved_consRel_endpoint
     params strategy eps delta gamma zeta hgood family hcons k i hi
   simpa [ldSandwichLineOnePointPrefixMoved_eq_endpoint params strategy family hi] using hend
 
+/-- Raw commutation for the nonempty prefix before adding the remaining question tail. -/
 private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation
     (params : Parameters)
     [FieldModel params.q]
@@ -954,9 +964,11 @@ private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation
       (gHatHalfSandwichLeft params family (i + 1))
       (gHatHalfSandwichRight params family (i + 1))
       (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
+  -- `hi0` is used by `omega` to turn `i ≠ 0` into `2 ≤ i + 1`.
   have hi_succ : 2 ≤ i + 1 := by omega
   exact (hcomm (i + 1) hi_succ).repeatedCommutation
 
+/-- Raw commutation after rotating the last prefix coordinate to the front. -/
 private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_reindexed
     (params : Parameters)
     [FieldModel params.q]
@@ -982,6 +994,7 @@ private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_reindexed
     (gHatHalfSandwichRight params family (i + 1))
     (commuteGHalfSandwichError params gamma zeta (i + 1))).1 hraw
 
+/-- Left-placed raw half-sandwich family for the rotated prefix. -/
 private noncomputable def ldSandwichLineOnePointPrefixMovedRawLeftFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -991,6 +1004,7 @@ private noncomputable def ldSandwichLineOnePointPrefixMovedRawLeftFamily
     gHatHalfSandwichLeft params family (i + 1)
       ((pointTupleLastFrontEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))
 
+/-- Right cyclic raw half-sandwich family for the rotated prefix. -/
 private noncomputable def ldSandwichLineOnePointPrefixMovedRawRightFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -1000,6 +1014,7 @@ private noncomputable def ldSandwichLineOnePointPrefixMovedRawRightFamily
     gHatHalfSandwichRight params family (i + 1)
       ((pointTupleLastFrontEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))
 
+/-- Lift raw prefix commutation from the prefix tuple to the full sandwiched question. -/
 private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_full
     (params : Parameters)
     [FieldModel params.q]
@@ -1039,6 +1054,7 @@ private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_full
     (fun qr => B qr.1)
     (commuteGHalfSandwichError params gamma zeta (i + 1))).1 hprod
 
+/-- Rotated-prefix raw left family reindexed back to the original outcome order. -/
 private noncomputable def ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -1050,6 +1066,7 @@ private noncomputable def ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcom
           ((gHatTupleOutcomeLastFrontEquiv params i) gs)
       total := (ldSandwichLineOnePointPrefixMovedRawLeftFamily params family hi q).total }
 
+/-- Rotated-prefix raw right family reindexed back to the original outcome order. -/
 private noncomputable def ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -1061,6 +1078,7 @@ private noncomputable def ldSandwichLineOnePointPrefixMovedRawRightOriginalOutco
           ((gHatTupleOutcomeLastFrontEquiv params i) gs)
       total := (ldSandwichLineOnePointPrefixMovedRawRightFamily params family hi q).total }
 
+/-- Raw prefix commutation stated in the original outcome indexing. -/
 private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_originalOutcome
     (params : Parameters)
     [FieldModel params.q]
@@ -1087,6 +1105,7 @@ private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_originalOutcome
       (commuteGHalfSandwichError params gamma zeta (i + 1))
       hfull
 
+/-- Expand a half-product into the prefix product times the last slice operator. -/
 private lemma gHatHalfProduct_prefix_mul_last
     (params : Parameters)
     [FieldModel params.q]
@@ -1111,6 +1130,7 @@ private lemma gHatHalfProduct_prefix_mul_last
       simp [gHatHalfProductOutcomeOperator, pointTupleTail, gHatTupleOutcomeTail, mul_assoc]
       congr
 
+/-- Rotating the last coordinate to the front matches the cyclic half-product. -/
 private lemma gHatRotatedHalfProduct_lastFront_eq_halfProduct
     (params : Parameters)
     [FieldModel params.q]
@@ -1133,6 +1153,7 @@ private lemma gHatRotatedHalfProduct_lastFront_eq_halfProduct
         gHatRotatedHalfProductOutcomeOperator]
       exact hprefix.symm
 
+/-- The reindexed rotated raw right outcome is the original prefix half-product. -/
 private lemma ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcome_eq_prefixHalf
     (params : Parameters)
     [FieldModel params.q]
@@ -1147,6 +1168,51 @@ private lemma ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcome_eq_prefix
   simp [ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily,
     ldSandwichLineOnePointPrefixMovedRawRightFamily, gHatHalfSandwichRight,
     gHatRotatedHalfProduct_lastFront_eq_halfProduct, OpFamily.leftPlacedOpFamily]
+
+/-- Named remaining gap for the nonzero-coordinate branch of
+`lem:ld-sandwich-line-one-point`.
+
+This isolates the paper's two Cauchy-Schwarz transports across the nonempty
+prefix `Ghat_<i`.  The statement deliberately consumes both the raw
+half-sandwich commutation input and the moved-endpoint `ldGbcon` reduction, so
+the public core proof no longer drops those intermediate facts before the hole. -/
+private lemma ldSandwichLineOnePoint_nonzero_prefix_transport
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (family : IdxPolyFamily params ι)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
+    (hprefixRaw :
+      SDDOpRel strategy.state
+        (uniformDistribution (SandwichedLineQuestion params k))
+        (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily params family hi)
+        (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily params family hi)
+        (commuteGHalfSandwichError params gamma zeta (i + 1)))
+    (hmovedEndpoint :
+      ConsRel strategy.state
+        (uniformDistribution (SandwichedLineQuestion params k))
+        (ldSandwichLineOnePointPrefixMovedFamily params family hi)
+        (ldSandwichLineOnePointRightFamily params strategy family k i)
+        (zeta + Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1))) :
+    ConsRel strategy.state
+      (uniformDistribution (SandwichedLineQuestion params k))
+      (ldSandwichLineOnePointLeftFamily params strategy family k i)
+      (ldSandwichLineOnePointRightFamily params strategy family k i)
+      (ldSandwichLineOnePointError params eps delta gamma zeta k) := by
+  /- Paper: `ld-pasting.tex` lines 945--1024.  The remaining proof must:
+  * compare the original prefix family with the moved-prefix endpoint family using
+    `hprefixRaw` and two Cauchy-Schwarz transports;
+  * use `hself`/`hbound` and the smallness hypotheses to control the transported
+    endpoint loss;
+  * finish by monotonicity into `ldSandwichLineOnePointError`.
+  -/
+  sorry
 
 /-- Bridge: Cauchy-Schwarz sandwich elimination for one-point consistency.
 
@@ -1239,10 +1305,7 @@ private lemma ldSandwichLineOnePoint_core
           (zeta + Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta')) := by
       simpa [ldSandwichLineOnePointLeftFamily_zero_eq_endpoint params strategy family hi,
         eps', delta'] using hend
-    exact consRel_mono_local strategy.state
-      (uniformDistribution (SandwichedLineQuestion params k))
-      (ldSandwichLineOnePointLeftFamily params strategy family k 0)
-      (ldSandwichLineOnePointRightFamily params strategy family k 0)
+    exact ConsRel.mono
       (ldSandwichLineOnePoint_endpoint_error_le params eps delta gamma zeta k hk_pos
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le)
       hzero
@@ -1269,7 +1332,17 @@ private lemma ldSandwichLineOnePoint_core
       · exact le_min hgood.selfConsistencyTest hself_le_one
     have hmovedEndpoint := ldSandwichLineOnePointPrefixMoved_consRel_endpoint
       params strategy eps' delta' gamma zeta hgood_small family hcons hi
-    sorry
+    have hmovedEndpoint' :
+        ConsRel strategy.state
+          (uniformDistribution (SandwichedLineQuestion params k))
+          (ldSandwichLineOnePointPrefixMovedFamily params family hi)
+          (ldSandwichLineOnePointRightFamily params strategy family k i)
+          (zeta + Real.sqrt (8 * (params.m : Error) * min eps 1 +
+            4 * min delta 1)) := by
+      simpa [eps', delta'] using hmovedEndpoint
+    exact ldSandwichLineOnePoint_nonzero_prefix_transport
+      params strategy eps delta gamma zeta hgamma_le hzeta_le hdq_le family hself hbound
+      hi hi0 hprefixRaw hmovedEndpoint'
 
 /-- `lem:ld-sandwich-line-one-point`. -/
 lemma ldSandwichLineOnePoint
