@@ -376,8 +376,14 @@ private noncomputable def evaluatedSliceBABAtensorAvg
             rightTensor (ι₁ := ι)
               ((evaluatedSliceFirstFactor params family q).outcome ab.1)))
 
-/-- Full-slice `ABA ⊗ B` tensor average (y-side analogue, `ABAB ⊗ B` direction):
+/-- Full-slice `ABA ⊗ B` tensor average (y-side analogue):
 `E_{x,y} ∑_{g,h} ⟨ψ| G^x_g G^y_h G^x_g ⊗ G^y_h |ψ⟩`.
+
+Naming convention (consistent with the sibling `fullSliceBABAtensorAvg` for
+`BAB ⊗ A`): the four-letter operator string `ABAB` decomposes as left register
+`ABA` followed by right register `B`. This is *not* the same operator as the
+scalar `fullSliceABABAvg`, whose left register is the full quartic
+`G^x_g G^y_h G^x_g G^y_h`; the `tensorAvg` suffix marks the tensor split.
 
 The manifestly-PSD tensor-form partner of `fullSliceABABAvg` reached from it by
 `closenessOfIP` (moving the trailing `G^y_h` factor from the left register to
@@ -387,7 +393,7 @@ the right). Each summand factors as `V† V` with
 The evaluated-side analogue is `evaluatedSliceSandwichedRightAvg` in
 `MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean`, which predates this PR and is
 already used by the linear/sandwiched right-register transport bridge. -/
-private noncomputable def fullSliceABABBtensorAvg
+private noncomputable def fullSliceABABtensorAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
   avgOver (uniformDistribution (FullSliceQuestion params))
