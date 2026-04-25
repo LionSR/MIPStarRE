@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Transport.Pullback
+import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
 /-!
@@ -417,7 +418,11 @@ private noncomputable def fullSliceABABtensorAvg
 This is the second tensor-form endpoint in paper `commutativity-G.tex` lines
 356-360.  The scalar-to-tensor bridge `evaluatedSliceABAB_scalar_to_ABABtensor`
 reaches it by moving the trailing `G^y_[h(v)=b]` factor from the left register
-to the right register. -/
+to the right register.
+
+This intentionally mirrors the older private `evaluatedSliceSandwichedRightAvg`
+in `Commutativity/Main/Auxiliary.lean`; `Auxiliary` imports this file, so the
+shared tensor endpoint has to live here before #720 can consolidate callers. -/
 private noncomputable def evaluatedSliceABABtensorAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
@@ -1016,63 +1021,6 @@ private lemma fullSliceCommutation_avg_swap_terms
               exact avgOver_sum_eq_card_mul_avgOver_prod
                 (fun q gh => fullSliceABABTerm params strategy family q gh)
 
-/-- Evaluated-slice version of the averaged `BABA = ABAB` swap, kept local so
-`Transport.FullSlice` does not need to import the heavier evaluated-commutation
-average module just for this symmetry. -/
-private lemma evaluatedSliceCommutation_avg_BABA_eq_ABAB_local
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q => ∑ ab : EvaluatedSliceOutcome params,
-          evaluatedSliceBABATerm params strategy family q ab) =
-      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q => ∑ ab : EvaluatedSliceOutcome params,
-          evaluatedSliceABABTerm params strategy family q ab) := by
-  let Q := EvaluatedSliceQuestion params
-  let O := EvaluatedSliceOutcome params
-  let e : (Q × O) ≃ (Q × O) :=
-    { toFun := fun z => ((z.1.2, z.1.1), (z.2.2, z.2.1))
-      invFun := fun z => ((z.1.2, z.1.1), (z.2.2, z.2.1))
-      left_inv := by
-        rintro ⟨⟨u, v⟩, ⟨a, b⟩⟩
-        rfl
-      right_inv := by
-        rintro ⟨⟨u, v⟩, ⟨a, b⟩⟩
-        rfl }
-  have hpair :
-      avgOver (uniformDistribution (Q × O))
-          (fun z => evaluatedSliceBABATerm params strategy family z.1 z.2) =
-        avgOver (uniformDistribution (Q × O))
-          (fun z => evaluatedSliceABABTerm params strategy family z.1 z.2) := by
-    calc
-      avgOver (uniformDistribution (Q × O))
-          (fun z => evaluatedSliceBABATerm params strategy family z.1 z.2)
-        = avgOver (uniformDistribution (Q × O))
-            (fun z => evaluatedSliceBABATerm params strategy family (e.symm z).1 (e.symm z).2) := by
-              simpa using
-                (avgOver_uniform_equiv e
-                  (fun z : Q × O => evaluatedSliceBABATerm params strategy family z.1 z.2))
-      _ = avgOver (uniformDistribution (Q × O))
-            (fun z => evaluatedSliceABABTerm params strategy family z.1 z.2) := by
-              apply avgOver_congr
-              rintro ⟨⟨u, v⟩, ⟨a, b⟩⟩
-              simp [e, evaluatedSliceBABATerm, evaluatedSliceABABTerm]
-  calc
-    avgOver (uniformDistribution Q)
-        (fun q => ∑ ab : O, evaluatedSliceBABATerm params strategy family q ab)
-      = (Fintype.card O : Error) * avgOver (uniformDistribution (Q × O))
-          (fun z => evaluatedSliceBABATerm params strategy family z.1 z.2) := by
-            exact avgOver_sum_eq_card_mul_avgOver_prod
-              (fun q ab => evaluatedSliceBABATerm params strategy family q ab)
-    _ = (Fintype.card O : Error) * avgOver (uniformDistribution (Q × O))
-          (fun z => evaluatedSliceABABTerm params strategy family z.1 z.2) := by
-            rw [hpair]
-    _ = avgOver (uniformDistribution Q)
-        (fun q => ∑ ab : O, evaluatedSliceABABTerm params strategy family q ab) := by
-            symm
-            exact avgOver_sum_eq_card_mul_avgOver_prod
-              (fun q ab => evaluatedSliceABABTerm params strategy family q ab)
-
 /-- Scalar-to-tensor bridge for paper `eq:gcom4`
 (`commutativity-G.tex` lines 332-337).
 
@@ -1155,7 +1103,15 @@ private lemma fullSliceABAB_scalar_to_BABAtensor
     unfold fullSliceBABAtensorAvg
     apply avgOver_congr
     intro xy
-    rw [Fintype.sum_prod_type]
+    simpa [C, B] using
+      (Fintype.sum_prod_type' (f := fun g : Polynomial params => fun h : Polynomial params =>
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((family.meas xy.2).toSubMeas.outcome h *
+                (family.meas xy.1).toSubMeas.outcome g *
+                (family.meas xy.2).toSubMeas.outcome h) *
+            rightTensor (ι₁ := ι)
+              ((family.meas xy.1).toSubMeas.outcome g)))).symm
   calc
     |fullSliceABABAvg params strategy family - fullSliceBABAtensorAvg params strategy family|
       = |avgOver 𝒟
@@ -1232,8 +1188,30 @@ private lemma fullSliceABAB_scalar_to_ABABtensor
     unfold fullSliceABABtensorAvg
     apply avgOver_congr
     intro xy
-    rw [Fintype.sum_prod_type]
-    rw [Finset.sum_comm]
+    calc
+      ∑ h : Polynomial params, ∑ g : Polynomial params,
+          ev strategy.state (C xy h g * B xy h)
+        = ∑ g : Polynomial params, ∑ h : Polynomial params,
+            ev strategy.state (C xy h g * B xy h) := by
+            rw [Finset.sum_comm]
+      _ = ∑ gh : FullSliceOutcome params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  ((family.meas xy.1).toSubMeas.outcome gh.1 *
+                    (family.meas xy.2).toSubMeas.outcome gh.2 *
+                    (family.meas xy.1).toSubMeas.outcome gh.1) *
+                rightTensor (ι₁ := ι)
+                  ((family.meas xy.2).toSubMeas.outcome gh.2)) := by
+            simpa [C, B] using
+              (Fintype.sum_prod_type' (f := fun g : Polynomial params =>
+                fun h : Polynomial params =>
+                  ev strategy.state
+                    (leftTensor (ι₂ := ι)
+                        ((family.meas xy.1).toSubMeas.outcome g *
+                          (family.meas xy.2).toSubMeas.outcome h *
+                          (family.meas xy.1).toSubMeas.outcome g) *
+                      rightTensor (ι₁ := ι)
+                        ((family.meas xy.2).toSubMeas.outcome h)))).symm
   calc
     |fullSliceABABAvg params strategy family - fullSliceABABtensorAvg params strategy family|
       = |avgOver 𝒟
@@ -1294,8 +1272,7 @@ private lemma evaluatedSliceABAB_scalar_to_BABAtensor
   have hclose :=
     MIPStarRE.LDT.Preliminaries.closenessOfIP
       strategy.state hnorm 𝒟 h𝒟 A B C zeta hAB hC
-  have hBABA_to_ABAB :=
-    evaluatedSliceCommutation_avg_BABA_eq_ABAB_local params strategy family
+  have hBABA_to_ABAB := (evaluatedSliceCommutation_avg_swap_terms params strategy family).2
   have hScalar :
       avgOver 𝒟
           (fun q => ∑ a : Fq params, ∑ b : Fq params,
@@ -1331,7 +1308,15 @@ private lemma evaluatedSliceABAB_scalar_to_BABAtensor
     unfold evaluatedSliceBABAtensorAvg
     apply avgOver_congr
     intro q
-    rw [Fintype.sum_prod_type]
+    simpa [C, B, evaluatedSliceFirstFactor, evaluatedSliceSecondFactor] using
+      (Fintype.sum_prod_type' (f := fun a : Fq params => fun b : Fq params =>
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((evaluatedSliceSecondFactor params family q).outcome b *
+                (evaluatedSliceFirstFactor params family q).outcome a *
+                (evaluatedSliceSecondFactor params family q).outcome b) *
+            rightTensor (ι₁ := ι)
+              ((evaluatedSliceFirstFactor params family q).outcome a)))).symm
   calc
     |evaluatedSliceABABAvg params strategy family -
         evaluatedSliceBABAtensorAvg params strategy family|
@@ -1413,8 +1398,29 @@ private lemma evaluatedSliceABAB_scalar_to_ABABtensor
     unfold evaluatedSliceABABtensorAvg
     apply avgOver_congr
     intro q
-    rw [Fintype.sum_prod_type]
-    rw [Finset.sum_comm]
+    calc
+      ∑ b : Fq params, ∑ a : Fq params,
+          ev strategy.state (C q b a * B q b)
+        = ∑ a : Fq params, ∑ b : Fq params,
+            ev strategy.state (C q b a * B q b) := by
+            rw [Finset.sum_comm]
+      _ = ∑ ab : EvaluatedSliceOutcome params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  ((evaluatedSliceFirstFactor params family q).outcome ab.1 *
+                    (evaluatedSliceSecondFactor params family q).outcome ab.2 *
+                    (evaluatedSliceFirstFactor params family q).outcome ab.1) *
+                rightTensor (ι₁ := ι)
+                  ((evaluatedSliceSecondFactor params family q).outcome ab.2)) := by
+            simpa [C, B, evaluatedSliceFirstFactor, evaluatedSliceSecondFactor] using
+              (Fintype.sum_prod_type' (f := fun a : Fq params => fun b : Fq params =>
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                      ((evaluatedSliceFirstFactor params family q).outcome a *
+                        (evaluatedSliceSecondFactor params family q).outcome b *
+                        (evaluatedSliceFirstFactor params family q).outcome a) *
+                    rightTensor (ι₁ := ι)
+                      ((evaluatedSliceSecondFactor params family q).outcome b)))).symm
   calc
     |evaluatedSliceABABAvg params strategy family -
         evaluatedSliceABABtensorAvg params strategy family|
