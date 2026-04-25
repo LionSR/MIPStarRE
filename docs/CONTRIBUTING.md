@@ -175,6 +175,23 @@ locally.
 
 [ci-sync]: ci-blueprint-sync.md
 
+### Stale-issue audits
+
+Issues that cite specific `sorry` sites, file/line locations, or declaration
+names drift out of date as `main` moves. Before kicking off a proof-closing
+round (or periodically as maintenance), run the audit script to list
+open issues whose citations no longer resolve:
+
+```bash
+gh issue list --repo LionSR/MIPStarRE --state open --limit 500 \
+  --json number,title,body,url,labels > /tmp/open-issues.json
+python3 scripts/audit_stale_issues.py --issues /tmp/open-issues.json
+```
+
+The tool is report-only. Human review decides which flags warrant closing
+the issue, updating its body, or dismissing as a false positive. See
+[`docs/stale_issue_audit.md`](stale_issue_audit.md) for the full workflow.
+
 ---
 
 ## 3. Commit Messages
