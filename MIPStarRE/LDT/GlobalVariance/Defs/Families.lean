@@ -213,6 +213,22 @@ noncomputable def generalizeBDeviation (params : Parameters) [FieldModel params.
   avgOver (polynomialDistribution params)
     (fun g => generalizeBDeviationAtPolynomial params strategy ψbi G g)
 
+/-- The line-collision residual obtained after expanding the projective line
+measurement in `lem:generalize-b` and moving the polynomial weight from
+`(G_g)^{1/2}` to `G_g`.  The remaining unproved analytic step is to bound this
+quantity by Schwartz--Zippel and the submeasurement property of `G`. -/
+noncomputable def generalizeBCollisionResidualAtPolynomial (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (ψbi : QuantumState (ι × ι))
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) : Error :=
+  avgOver (axisParallelLineQuestionDistribution params)
+    (fun qu =>
+      ev ψbi (opTensor
+        (generalizeBCollisionOperatorAtPolynomial params strategy g qu)
+        (G.outcome g)))
+
 private noncomputable def polynomialAverageUnitSubMeas (params : Parameters)
     [FieldModel params.q]
     (f : Polynomial params → MIPStarRE.Quantum.Op (ι × ι))

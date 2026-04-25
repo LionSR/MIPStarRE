@@ -124,6 +124,33 @@ noncomputable def generalizeBRightEventSubMeasAtPolynomial (params : Parameters)
       else
         none)
 
+/-- The residual `Option Unit` event from the proof of `lem:generalize-b`: axis-line
+answers that collide with `g` at the sampled point `u`, but are not the restricted
+polynomial `g|_ℓ`.  After the projective-measurement expansion, the squared
+difference is controlled by this collision event. -/
+noncomputable def generalizeBCollisionEventSubMeasAtPolynomial (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) : SubMeas (Option Unit) ι :=
+  let (ℓ, u) := qu
+  let gRestricted := Polynomial.restrictToAxisParallelLine params g ℓ
+  postprocess
+    ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+    (fun f : AxisLinePolynomial params =>
+      if f (axisParallelLineQuestionParameter qu) = g u ∧ f.poly ≠ gRestricted.poly then
+        some ()
+      else
+        none)
+
+/-- The event operator for the residual line-collision event in `lem:generalize-b`. -/
+noncomputable def generalizeBCollisionOperatorAtPolynomial (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) : MIPStarRE.Quantum.Op ι :=
+  (generalizeBCollisionEventSubMeasAtPolynomial params strategy g qu).outcome (some ())
+
 /-- The event operator `B^ℓ_{[f(u)=g(u)]}`: sum of axis-line measurement
 outcomes `f` that evaluate to the same value as `g` at point `u`. -/
 noncomputable def generalizeBLeftOperatorAtPolynomial (params : Parameters)

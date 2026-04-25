@@ -127,6 +127,213 @@ private lemma weightedPointConditionedOperator_sq
   rw [polynomialWeightSqrtOperator_conjTranspose,
     polynomialWeightSqrtOperator_mul_self]
 
+private lemma avgOver_congr_on_support {α : Type*} (𝒟 : Distribution α)
+    (f g : α → Error) (h : ∀ a, a ∈ 𝒟.support → f a = g a) :
+    avgOver 𝒟 f = avgOver 𝒟 g := by
+  simp only [avgOver]
+  exact Finset.sum_congr rfl fun a ha => by rw [h a ha]
+
+private lemma weightedGeneralizeBOperator_sub
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
+        weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu =
+      opTensor
+        (generalizeBLeftOperatorAtPolynomial params strategy g qu -
+          generalizeBRightOperatorAtPolynomial params strategy g qu)
+        (polynomialWeightSqrtOperator params G g) := by
+  simp [weightedGeneralizeBLeftOperatorAtPolynomial,
+    weightedGeneralizeBRightOperatorAtPolynomial, opTensor_sub_left]
+
+private lemma weightedGeneralizeBOperator_sq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    let D := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
+        weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
+    Dᴴ * D =
+      opTensor
+        (((generalizeBLeftOperatorAtPolynomial params strategy g qu -
+          generalizeBRightOperatorAtPolynomial params strategy g qu)ᴴ) *
+            (generalizeBLeftOperatorAtPolynomial params strategy g qu -
+              generalizeBRightOperatorAtPolynomial params strategy g qu))
+        (G.outcome g) := by
+  dsimp only
+  rw [weightedGeneralizeBOperator_sub]
+  rw [conjTranspose_opTensor, opTensor_mul]
+  rw [polynomialWeightSqrtOperator_conjTranspose,
+    polynomialWeightSqrtOperator_mul_self]
+
+private noncomputable def generalizeBCollisionEventProjMeasAtPolynomial
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) : ProjMeas (Option Unit) ι :=
+  let (ℓ, u) := qu
+  let gRestricted := Polynomial.restrictToAxisParallelLine params g ℓ
+  ProjMeas.postprocess (strategy.axisParallelMeasurement ℓ)
+    (fun f : AxisLinePolynomial params =>
+      if f (axisParallelLineQuestionParameter qu) = g u ∧ f.poly ≠ gRestricted.poly then
+        some ()
+      else
+        none)
+
+private lemma generalizeBCollisionOperatorAtPolynomial_proj
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    generalizeBCollisionOperatorAtPolynomial params strategy g qu *
+        generalizeBCollisionOperatorAtPolynomial params strategy g qu =
+      generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
+  simpa [generalizeBCollisionOperatorAtPolynomial, generalizeBCollisionEventSubMeasAtPolynomial,
+    generalizeBCollisionEventProjMeasAtPolynomial] using
+      (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).proj (some ())
+
+private lemma generalizeBCollisionOperatorAtPolynomial_conjTranspose
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params) :
+    (generalizeBCollisionOperatorAtPolynomial params strategy g qu)ᴴ =
+      generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
+  simpa [generalizeBCollisionOperatorAtPolynomial, generalizeBCollisionEventSubMeasAtPolynomial,
+    generalizeBCollisionEventProjMeasAtPolynomial] using
+      (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome_hermitian
+        (some ())
+
+private lemma generalizeB_right_event_implies_left_event
+    (params : Parameters)
+    [FieldModel params.q]
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params)
+    (hline : pointOnLine (params := params) qu)
+    (f : AxisLinePolynomial params)
+    (hf : f.poly = (Polynomial.restrictToAxisParallelLine params g qu.1).poly) :
+    f (axisParallelLineQuestionParameter qu) = g qu.2 := by
+  rcases hline with ⟨t, ht⟩
+  have hparam : axisParallelLineQuestionParameter qu = t := by
+    cases qu with
+    | mk ℓ u =>
+        dsimp at ht ⊢
+        subst ht
+        simp
+  have hf_eq : f = Polynomial.restrictToAxisParallelLine params g qu.1 :=
+    AxisLinePolynomial.ext hf
+  rw [hf_eq, hparam]
+  simp [ht]
+
+private lemma generalizeBLeftOperator_eq_right_add_collision
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params)
+    (hline : pointOnLine (params := params) qu) :
+    generalizeBLeftOperatorAtPolynomial params strategy g qu =
+      generalizeBRightOperatorAtPolynomial params strategy g qu +
+        generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
+  classical
+  unfold generalizeBLeftOperatorAtPolynomial generalizeBRightOperatorAtPolynomial
+    generalizeBCollisionOperatorAtPolynomial
+  unfold generalizeBLeftEventSubMeasAtPolynomial generalizeBRightEventSubMeasAtPolynomial
+    generalizeBCollisionEventSubMeasAtPolynomial
+  cases qu with
+  | mk ℓ u =>
+      simp only [postprocess, Finset.sum_filter, ne_eq]
+      rw [← Finset.sum_add_distrib]
+      refine Finset.sum_congr rfl ?_
+      intro x _hx
+      by_cases hq : x.poly = (Polynomial.restrictToAxisParallelLine params g ℓ).poly
+      · have hp : x (axisParallelLineQuestionParameter (ℓ, u)) = g u := by
+          exact generalizeB_right_event_implies_left_event params g (ℓ, u) hline x hq
+        simp [hp, hq]
+      · by_cases hp : x (axisParallelLineQuestionParameter (ℓ, u)) = g u
+        · simp [hp, hq]
+        · simp [hp, hq]
+
+private lemma generalizeBLeft_sub_right_eq_collision
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params)
+    (hline : pointOnLine (params := params) qu) :
+    generalizeBLeftOperatorAtPolynomial params strategy g qu -
+        generalizeBRightOperatorAtPolynomial params strategy g qu =
+      generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
+  rw [generalizeBLeftOperator_eq_right_add_collision params strategy g qu hline]
+  abel
+
+private lemma generalizeBLineDifference_sq_eq_collision
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params)
+    (hline : pointOnLine (params := params) qu) :
+    ((generalizeBLeftOperatorAtPolynomial params strategy g qu -
+        generalizeBRightOperatorAtPolynomial params strategy g qu)ᴴ) *
+        (generalizeBLeftOperatorAtPolynomial params strategy g qu -
+          generalizeBRightOperatorAtPolynomial params strategy g qu) =
+      generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
+  rw [generalizeBLeft_sub_right_eq_collision params strategy g qu hline]
+  rw [generalizeBCollisionOperatorAtPolynomial_conjTranspose,
+    generalizeBCollisionOperatorAtPolynomial_proj]
+
+private lemma generalizeBWeightedLineDifference_sq_eq_collision
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params)
+    (qu : AxisParallelLineQuestion params)
+    (hline : pointOnLine (params := params) qu) :
+    let D := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
+        weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
+    Dᴴ * D =
+      opTensor (generalizeBCollisionOperatorAtPolynomial params strategy g qu) (G.outcome g) := by
+  dsimp only
+  rw [weightedGeneralizeBOperator_sq]
+  rw [generalizeBLineDifference_sq_eq_collision params strategy g qu hline]
+
+/-- Projective expansion for the pointwise `lem:generalize-b` deviation.
+
+For incident line questions, the right event `f = g|_ℓ` is a subevent of the
+left event `f(u)=g(u)`.  Since `B^ℓ` is projective, the squared difference is
+exactly the residual line-collision event `f(u)=g(u) ∧ f≠g|_ℓ`, with the
+right-register square root collapsed to `G_g`. -/
+lemma generalizeBDeviationAtPolynomial_eq_collisionResidualAtPolynomial
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (ψbi : QuantumState (ι × ι))
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) :
+    generalizeBDeviationAtPolynomial params strategy ψbi G g =
+      generalizeBCollisionResidualAtPolynomial params strategy ψbi G g := by
+  unfold generalizeBDeviationAtPolynomial generalizeBCollisionResidualAtPolynomial
+  apply avgOver_congr_on_support
+  intro qu hqu
+  have hline : pointOnLine (params := params) qu := by
+    simpa [axisParallelLineQuestionDistribution] using hqu
+  change
+    ev ψbi
+        (((weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
+              weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu)ᴴ) *
+          (weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
+            weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu)) =
+      ev ψbi (opTensor
+        (generalizeBCollisionOperatorAtPolynomial params strategy g qu) (G.outcome g))
+  rw [generalizeBWeightedLineDifference_sq_eq_collision params strategy G g qu hline]
+
 /-- Move a left-register observable from the polynomial-weighted state
 `(I ⊗ √G_g) ρ (I ⊗ √G_g)ᴴ` back to the original bipartite state. -/
 private lemma weightedPolynomialState_ev_leftTensor
@@ -410,22 +617,16 @@ private lemma matrixGlobalVarianceOfPoints_from_local
 
 /-! ## Abstract theorem wrappers -/
 
-/-- `lem:generalize-b`. -/
-lemma generalizeB
+private lemma generalizeB_of_pointwise
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (_eps _delta _gamma : Error)
-    (_hgood : strategy.IsGood _eps _delta _gamma)
     (G : SubMeas (Polynomial params) ι)
     (ψbi : QuantumState (ι × ι))
     (hpoint :
       ∀ g : Polynomial params,
         generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params) :
     GeneralizeBStatement params strategy ψbi G := by
-  -- The analytic pointwise estimate is an explicit input here. In the
-  -- self-improvement pipeline it is supplied as an explicit theorem
-  -- hypothesis.
   refine
     { aggregateFamilyComparison := by
         exact sddRel_unit_family_of_pointwise ψbi
@@ -451,6 +652,45 @@ lemma generalizeB
           avgOver_polynomialDistribution_le_of_pointwise params
             (fun g => generalizeBDeviationAtPolynomial params strategy ψbi G g)
             (generalizeBError params) hpoint }
+
+/-- `lem:generalize-b`. -/
+lemma generalizeB
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (_eps _delta _gamma : Error)
+    (_hgood : strategy.IsGood _eps _delta _gamma)
+    (G : SubMeas (Polynomial params) ι)
+    (ψbi : QuantumState (ι × ι))
+    (hpoint :
+      ∀ g : Polynomial params,
+        generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params) :
+    GeneralizeBStatement params strategy ψbi G := by
+  -- The analytic pointwise estimate is an explicit input here. In the
+  -- self-improvement pipeline it is supplied as an explicit theorem
+  -- hypothesis.
+  exact generalizeB_of_pointwise params strategy G ψbi hpoint
+
+/-- Strategy-state reduction for `lem:generalize-b` after the projective expansion.
+
+This theorem removes the conclusion-shaped pointwise norm hypothesis from the
+legacy wrapper.  The remaining input is the explicit line-collision residual
+whose proof is the Schwartz--Zippel averaging step from
+`expansion.tex`, lines 286--288. -/
+lemma generalizeBFromCollisionResidual
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (hcollision :
+      ∀ g : Polynomial params,
+        generalizeBCollisionResidualAtPolynomial params strategy strategy.state G g ≤
+          generalizeBError params) :
+    GeneralizeBStatement params strategy strategy.state G := by
+  refine generalizeB_of_pointwise params strategy G strategy.state ?_
+  intro g
+  rw [generalizeBDeviationAtPolynomial_eq_collisionResidualAtPolynomial]
+  exact hcollision g
 
 /-- Legacy wrapper for `lem:local-variance-of-points` with arbitrary bipartite
 state and both pointwise bounds supplied explicitly.
