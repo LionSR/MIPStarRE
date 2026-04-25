@@ -465,27 +465,6 @@ theorem gCommStability_scalar
           exact Real.sqrt_le_sqrt <|
             hbound.storedBoundedResidualBound G hG
 
-/-- Paper-facing scalar bound for `clm:g-comm-stability`.
-
-This wrapper exposes `gCommStability_scalar` with a named defect so downstream
-scalar-chain proofs can cite the paper boundedness claim without passing through
-the internal overlap families `commDataProcessedGStabilityOneLeft` and
-`commDataProcessedGStabilityOneRight`. -/
-theorem gCommStabilityScalarDefectBound
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    |avgOver (uniformDistribution (Fq params))
-      (gCommStabilityScalarDefect params strategy family G)| ≤ Real.sqrt zeta := by
-  simpa [gCommStabilityScalarDefect] using
-    (gCommStability_scalar params strategy zeta hnorm family G hG hbound)
-
 /-- The paper's mirrored slice submeasurement
 `R'^x_g = E_{v,y} \sum_b G^{v,y}_b G^x_g G^{v,y}_b`. -/
 noncomputable def gCommStabilityTwoR
@@ -830,8 +809,8 @@ This is the `Z^x` boundedness half of
 `references/ldt-paper/commutativity-G.tex`, `clm:g-comm-stability2` (lines
 185--221), after the right-register point-commutation transport has produced
 the order `A_b^{v,y} A_a^{u,x}`.  The separate `6√(γ(m+1))` transport loss is
-not proved here; `gCommStabilityTwoScalarDefectBoundWithPaperSlack` below
-relaxes this `√ζ` estimate to the paper's displayed error budget. -/
+not proved here; a full paper-budget theorem must combine this post-transport
+`√ζ` bound with the distinct `commutativityPoints` transport estimate. -/
 theorem gCommStabilityTwo_scalar
     (params : Parameters)
     [FieldModel params.q]
@@ -867,51 +846,5 @@ theorem gCommStabilityTwo_scalar
     _ ≤ Real.sqrt zeta := by
           exact Real.sqrt_le_sqrt <|
             hbound.storedBoundedResidualBound G hG
-
-/-- Paper-facing boundedness part of `clm:g-comm-stability2`.
-
-This exposes `gCommStabilityTwo_scalar` with a named defect.  It intentionally
-has only the `√ζ` bound: the `6√(γ(m+1))` term in the paper comes from the
-preceding `commutativityPoints` transport, not from the boundedness argument. -/
-theorem gCommStabilityTwoScalarDefectBound
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    |avgOver (uniformDistribution (Fq params))
-      (gCommStabilityTwoScalarDefect params strategy family G)| ≤ Real.sqrt zeta := by
-  simpa [gCommStabilityTwoScalarDefect] using
-    (gCommStabilityTwo_scalar params strategy zeta hnorm family G hG hbound)
-
-/-- The same second scalar bound relaxed to the paper's displayed error budget.
-
-Use this wrapper at sites that account for the `commutativityPoints` transport
-loss and want an endpoint with the full `√ζ + 6√(γ(m+1))` allowance from
-`clm:g-comm-stability2`.  The proof merely adds nonnegative slack; it does not
-claim that the overlap `SDDOpRel` package proves the paper scalar transport. -/
-theorem gCommStabilityTwoScalarDefectBoundWithPaperSlack
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (gamma zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    |avgOver (uniformDistribution (Fq params))
-      (gCommStabilityTwoScalarDefect params strategy family G)| ≤
-        Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
-  have hbase :=
-    gCommStabilityTwoScalarDefectBound params strategy zeta hnorm family G hG hbound
-  have hextra_nonneg :
-      0 ≤ 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
-    positivity
-  linarith
 
 end MIPStarRE.LDT.Commutativity
