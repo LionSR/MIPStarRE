@@ -128,6 +128,35 @@ theorem avgOver_const_mul {α : Type*} (𝒟 : Distribution α)
           rw [Finset.mul_sum]
     _ = c * avgOver 𝒟 f := rfl
 
+/-- Averaging commutes with scalar multiplication on the right. -/
+theorem avgOver_mul_const {α : Type*} (𝒟 : Distribution α)
+    (f : α → Error) (c : Error) :
+    avgOver 𝒟 (fun a => f a * c) = avgOver 𝒟 f * c := by
+  unfold avgOver
+  calc
+    ∑ a ∈ 𝒟.support, 𝒟.weight a * (f a * c)
+      = ∑ a ∈ 𝒟.support, (𝒟.weight a * f a) * c := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          ring
+    _ = (∑ a ∈ 𝒟.support, 𝒟.weight a * f a) * c := by
+          rw [Finset.sum_mul]
+
+/-- Pull a finite outcome sum through an average. -/
+theorem avgOver_sum {α β : Type*} [Fintype β]
+    (𝒟 : Distribution α) (f : α → β → Error) :
+    avgOver 𝒟 (fun a => ∑ b : β, f a b) =
+      ∑ b : β, avgOver 𝒟 (fun a => f a b) := by
+  unfold avgOver
+  calc
+    ∑ a ∈ 𝒟.support, 𝒟.weight a * ∑ b : β, f a b
+      = ∑ a ∈ 𝒟.support, ∑ b : β, 𝒟.weight a * f a b := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [Finset.mul_sum]
+    _ = ∑ b : β, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a b := by
+          rw [Finset.sum_comm]
+
 /-- If `f = g` pointwise, their averages agree. -/
 theorem avgOver_congr {α : Type*} (𝒟 : Distribution α)
     (f g : α → Error) (h : ∀ a, f a = g a) :

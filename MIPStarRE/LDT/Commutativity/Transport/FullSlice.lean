@@ -717,30 +717,28 @@ private lemma ev_sandwichTensor_indicator_expand
 /-- Sum over the postprocessed outcome label of two matching indicators. -/
 private lemma postprocess_collision_coeff_sum
     {α κ : Type*} [Fintype κ] [DecidableEq κ]
-    (f : α → κ) (a₁ a₂ : α) (t : Error) :
+    (f : α → κ) (a₁ a₂ : α) :
     (∑ k : κ,
-        (if f a₁ = k then if f a₂ = k then (1 : Error) else 0 else 0) * t) =
-      (if f a₁ = f a₂ then (1 : Error) else 0) * t := by
+        if f a₁ = k then if f a₂ = k then (1 : Error) else 0 else 0) =
+      (if f a₁ = f a₂ then (1 : Error) else 0) := by
   classical
   by_cases h : f a₁ = f a₂
   · calc
       (∑ k : κ,
-          (if f a₁ = k then if f a₂ = k then (1 : Error) else 0 else 0) * t)
-        = ∑ k : κ, (if f a₁ = k then (1 : Error) else 0) * t := by
+          if f a₁ = k then if f a₂ = k then (1 : Error) else 0 else 0)
+        = ∑ k : κ, if f a₁ = k then (1 : Error) else 0 := by
             refine Finset.sum_congr rfl ?_
             intro k _
             by_cases hk : f a₁ = k
             · have hk₂ : f a₂ = k := h.symm.trans hk
               simp [hk, hk₂]
             · simp [hk]
-      _ = (∑ k : κ, if f a₁ = k then (1 : Error) else 0) * t := by
-            rw [Finset.sum_mul]
-      _ = (1 : Error) * t := by
+      _ = (1 : Error) := by
             rw [Fintype.sum_ite_eq]
-      _ = (if f a₁ = f a₂ then (1 : Error) else 0) * t := by simp [h]
+      _ = if f a₁ = f a₂ then (1 : Error) else 0 := by simp [h]
   · have hzero :
         ∀ k : κ,
-          (if f a₁ = k then if f a₂ = k then (1 : Error) else 0 else 0) * t = 0 := by
+          (if f a₁ = k then if f a₂ = k then (1 : Error) else 0 else 0) = 0 := by
       intro k
       by_cases h₁ : f a₁ = k
       · by_cases h₂ : f a₂ = k
@@ -749,9 +747,9 @@ private lemma postprocess_collision_coeff_sum
       · simp [h₁]
     calc
       (∑ k : κ,
-          (if f a₁ = k then if f a₂ = k then (1 : Error) else 0 else 0) * t) = 0 := by
+          if f a₁ = k then if f a₂ = k then (1 : Error) else 0 else 0) = 0 := by
             exact Finset.sum_eq_zero (fun k _ => hzero k)
-      _ = (if f a₁ = f a₂ then (1 : Error) else 0) * t := by simp [h]
+      _ = if f a₁ = f a₂ then (1 : Error) else 0 := by simp [h]
 
 /-- Expand a postprocessed tensor sandwich into the pair-collision expression for
 one fixed sample. -/
@@ -820,40 +818,32 @@ private lemma postprocess_sandwichTensor_expand
           intro b _
           refine Finset.sum_congr rfl ?_
           intro aa _
-          exact postprocess_collision_coeff_sum f aa.1 aa.2 _
+          calc
+            (∑ k : κ,
+                (if f aa.1 = k then if f aa.2 = k then (1 : Error) else 0 else 0) *
+                  ev ψ
+                    (leftTensor (ι₂ := ι)
+                        (B.outcome b * A.outcome aa.1 * B.outcome b) *
+                      rightTensor (ι₁ := ι) (A.outcome aa.2)))
+              = (∑ k : κ,
+                  if f aa.1 = k then if f aa.2 = k then (1 : Error) else 0 else 0) *
+                    ev ψ
+                      (leftTensor (ι₂ := ι)
+                          (B.outcome b * A.outcome aa.1 * B.outcome b) *
+                        rightTensor (ι₁ := ι) (A.outcome aa.2)) := by
+                  rw [Finset.sum_mul]
+            _ = (if f aa.1 = f aa.2 then (1 : Error) else 0) *
+                    ev ψ
+                      (leftTensor (ι₂ := ι)
+                          (B.outcome b * A.outcome aa.1 * B.outcome b) *
+                        rightTensor (ι₁ := ι) (A.outcome aa.2)) := by
+                  rw [postprocess_collision_coeff_sum f aa.1 aa.2]
     _ = ∑ aa : α × α, ∑ b : β,
       (if f aa.1 = f aa.2 then (1 : Error) else 0) *
         ev ψ
           (leftTensor (ι₂ := ι) (B.outcome b * A.outcome aa.1 * B.outcome b) *
             rightTensor (ι₁ := ι) (A.outcome aa.2)) := by
           rw [Finset.sum_comm]
-
-/-- Pull a finite outcome sum through an arbitrary average. -/
-private lemma avgOver_sum_private {α β : Type*} [Fintype β]
-    (𝒟 : Distribution α) (f : α → β → Error) :
-    avgOver 𝒟 (fun a => ∑ b : β, f a b) =
-      ∑ b : β, avgOver 𝒟 (fun a => f a b) := by
-  unfold avgOver
-  calc
-    ∑ a ∈ 𝒟.support, 𝒟.weight a * ∑ b : β, f a b
-      = ∑ a ∈ 𝒟.support, ∑ b : β, 𝒟.weight a * f a b := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [Finset.mul_sum]
-    _ = ∑ b : β, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a b := by
-          rw [Finset.sum_comm]
-
-/-- Pull a scalar that is constant in the averaged variable out to the right. -/
-private lemma avgOver_mul_const_private {α : Type*}
-    (𝒟 : Distribution α) (f : α → Error) (c : Error) :
-    avgOver 𝒟 (fun a => f a * c) = avgOver 𝒟 f * c := by
-  calc
-    avgOver 𝒟 (fun a => f a * c) = avgOver 𝒟 (fun a => c * f a) := by
-      apply avgOver_congr
-      intro a
-      ring
-    _ = c * avgOver 𝒟 f := avgOver_const_mul 𝒟 c f
-    _ = avgOver 𝒟 f * c := by ring
 
 /-- Summing a pair-indexed expression against the diagonal indicator leaves the
 ordinary diagonal sum. -/
@@ -934,16 +924,16 @@ private lemma avg_postprocess_sandwichTensor_eq_diag_add_collision
           avgOver 𝒟
             (fun s =>
               (if eval s aa.1 = eval s aa.2 then (1 : Error) else 0) * T aa b) := by
-          rw [avgOver_sum_private]
+          rw [avgOver_sum]
           refine Finset.sum_congr rfl ?_
           intro aa _
-          rw [avgOver_sum_private]
+          rw [avgOver_sum]
     _ = ∑ aa : α × α, ∑ b : β, c aa * T aa b := by
           refine Finset.sum_congr rfl ?_
           intro aa _
           refine Finset.sum_congr rfl ?_
           intro b _
-          exact avgOver_mul_const_private 𝒟
+          exact avgOver_mul_const 𝒟
             (fun s => if eval s aa.1 = eval s aa.2 then (1 : Error) else 0) (T aa b)
     _ = (∑ aa : α × α, ∑ b : β,
           (if aa.1 = aa.2 then (1 : Error) else 0) * T aa b) +
@@ -1135,7 +1125,9 @@ private lemma fullSliceBABAtensor_xEvaluation_eq_full_add_collision
 /-- X-side tensor marginalization bound for paper `eq:gcom4-diff`.
 
 This staged statement compares the full `BAB ⊗ A` tensor average to the
-intermediate where only the `x` polynomial outcome has been evaluated at `u`. -/
+intermediate where only the `x` polynomial outcome has been evaluated at `u`.
+It is the Lean-local tensor form of the Schwartz-Zippel step labelled
+`eq:gcom4-diff` in the proof of blueprint theorem `thm:com-main`. -/
 private lemma fullSliceBABA_tensor_marginalize_x
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
@@ -1406,7 +1398,11 @@ private lemma evaluatedSliceABABtensor_yEvaluation_eq_xFull_add_collision
           (fun ux => fullSliceABAByCollisionFactored params strategy family ux.1 ux.2) := by
           rw [hdiag]
 
-/-- Y-side tensor marginalization bound for the `ABABtensor` endpoint. -/
+/-- Y-side tensor marginalization bound for the `ABABtensor` endpoint.
+
+This is the Lean-local tensor form of the Schwartz-Zippel step labelled
+`eq:numbering-system-diff` after `eq:evaluate-gcom-at-points-part-dos` in the
+proof of blueprint theorem `thm:com-main`. -/
 private lemma fullSliceABAB_tensor_marginalize_y
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
