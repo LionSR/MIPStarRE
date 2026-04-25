@@ -118,7 +118,7 @@ private lemma globalEligibleMass_le_eligibleMass
 /-- A submeasurement total splits into a restriction to `p` and its complement. -/
 private lemma restrictSubMeas_total_add_not
     {α : Type*} [Fintype α] (A : SubMeas α ι)
-    (p : α → Prop) [DecidablePred p] [DecidablePred fun a => ¬ p a] :
+    (p : α → Prop) [DecidablePred p] :
     (restrictSubMeas A p).total + (restrictSubMeas A (fun a => ¬ p a)).total =
       A.total := by
   unfold restrictSubMeas
@@ -128,8 +128,7 @@ private lemma restrictSubMeas_total_add_not
 /-- Scalar mass splits into globally consistent and nonglobal parts. -/
 private lemma subMeasMass_restrict_add_not
     {α : Type*} [Fintype α] (ψ : QuantumState (ι × ι))
-    (A : SubMeas α ι) (p : α → Prop) [DecidablePred p]
-    [DecidablePred fun a => ¬ p a] :
+    (A : SubMeas α ι) (p : α → Prop) [DecidablePred p] :
     subMeasMass ψ A.liftLeft =
       subMeasMass ψ ((restrictSubMeas A p).liftLeft) +
         subMeasMass ψ ((restrictSubMeas A (fun a => ¬ p a)).liftLeft) := by
@@ -198,6 +197,19 @@ private lemma not_interpolationEligible_of_not_d_add_one_le
     simpa [Fintype.card_fin] using Finset.card_le_univ (gHatTupleSupport gs)
   exact hnot (le_trans hEligible hweight_le)
 
+/-- If `k < d+1`, the interpolation-eligible sandwich total vanishes. -/
+private lemma interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) {k : ℕ}
+    (hnot : ¬ params.d + 1 ≤ k) (xs : PointTuple params k) :
+    (interpolationEligibleSandwichFamily params family k xs).total = 0 := by
+  unfold interpolationEligibleSandwichFamily restrictSubMeas
+  apply Finset.sum_eq_zero
+  intro gs hgs
+  have helig : InterpolationEligible params gs := by
+    simpa using (Finset.mem_filter.mp hgs).2
+  exact False.elim ((not_interpolationEligible_of_not_d_add_one_le params hnot gs) helig)
+
 /-- With no eligible tuple, the all-outcomes local mass is zero. -/
 private lemma eligibleMass_eq_zero_of_not_d_add_one_le
     (params : Parameters) [FieldModel params.q]
@@ -206,13 +218,8 @@ private lemma eligibleMass_eq_zero_of_not_d_add_one_le
     (hnot : ¬ params.d + 1 ≤ k) (xs : PointTuple params k) :
     subMeasMass strategy.state
       ((interpolationEligibleSandwichFamily params family k xs).liftLeft) = 0 := by
-  have htotal : (interpolationEligibleSandwichFamily params family k xs).total = 0 := by
-    unfold interpolationEligibleSandwichFamily restrictSubMeas
-    apply Finset.sum_eq_zero
-    intro gs hgs
-    have helig : InterpolationEligible params gs := by
-      simpa using (Finset.mem_filter.mp hgs).2
-    exact False.elim ((not_interpolationEligible_of_not_d_add_one_le params hnot gs) helig)
+  have htotal := interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
+    params family hnot xs
   simp [subMeasMass, SubMeas.liftLeft, htotal, leftTensor, ev]
 
 /-- With no eligible tuple, the pasted/global local mass is zero. -/
@@ -224,13 +231,8 @@ private lemma globalEligibleMass_eq_zero_of_not_d_add_one_le
     subMeasMass strategy.state
         ((restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
           (IsGloballyConsistent params xs)).liftLeft) = 0 := by
-  have heligible_total : (interpolationEligibleSandwichFamily params family k xs).total = 0 := by
-    unfold interpolationEligibleSandwichFamily restrictSubMeas
-    apply Finset.sum_eq_zero
-    intro gs hgs
-    have helig : InterpolationEligible params gs := by
-      simpa using (Finset.mem_filter.mp hgs).2
-    exact False.elim ((not_interpolationEligible_of_not_d_add_one_le params hnot gs) helig)
+  have heligible_total := interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
+    params family hnot xs
   have htotal : (restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
       (IsGloballyConsistent params xs)).total = 0 := by
     have hle := restrictSubMeas_total_le_total
