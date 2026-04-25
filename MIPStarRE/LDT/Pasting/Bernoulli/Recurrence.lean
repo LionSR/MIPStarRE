@@ -110,7 +110,7 @@ private lemma abs_telescope_nat (f : ℕ → Error) (e : Error) :
         |f 0 - f (k + 1)| ≤ |f 0 - f k| + |f k - f (k + 1)| := htri
         _ ≤ (k : Error) * e + e := add_le_add hprev hlast
         _ = ((k + 1 : ℕ) : Error) * e := by
-              rw [show ((k + 1 : ℕ) : Error) = (k : Error) + 1 by norm_num]
+              push_cast
               ring
 
 /-- The adjacent-stage recurrence fields imply the scalar first-to-last
@@ -245,6 +245,8 @@ lemma fromHToG
        `bernoulliPolynomialRewrite` is now proved above in
        `fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.
     -/
+    -- Keep the two paper inputs visible at the residual proof site: future work
+    -- should use them for the self-consistency and suffix-commutation moves above.
     have _ := hfacts.completedSelfConsistency
     have _ := hhalf
     sorry
