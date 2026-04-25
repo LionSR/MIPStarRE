@@ -386,6 +386,13 @@
 	\begin{lemma}[Rank reduction]\label{lem:projective-low-rank-sum}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum}
 		\leanok
+		% Audit note: the Lean lemma is sorry-free but input-driven — it takes
+		% the auxiliary space, `RoundingToProjectorsWitness`, truncation `t`, and
+		% `hAuxDim` as caller-supplied inputs. The paper's existence claim
+		% ("there exists a set of projection matrices $\{Q_a\}$") is only
+		% witnessed once a concrete producer of those inputs (the `r > d`
+		% truncation branch from `orthonormalization.tex:559-658`) is
+		% formalized; that work is tracked by issue #652.
 		There exists a set of projection matrices $\{Q_a\}$ such that
 		\begin{equation*}
 			A_a \ot I \approx_{12\sqrt{\zeta}} Q_a \ot I.
