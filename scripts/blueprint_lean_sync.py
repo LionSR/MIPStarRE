@@ -676,6 +676,9 @@ def _chapter_stats(report: SyncReport) -> dict[str, dict]:
       aggregation by declaration matters because ``collect_blueprint_entries``
       can split a statement marker and its proof marker across adjacent entries
       that repeat the same ``\lean{...}`` declaration.
+    * ``proof_total`` is the declaration-level denominator for proof coverage;
+      it intentionally differs from entry-level ``total`` so split entries do
+      not divide a declaration-level numerator by an entry-level denominator.
     * ``formalized`` is the legacy alias of ``statement_formalized`` and is
       kept so existing downstream consumers (CI badges, pre-existing JSON
       readers) continue to work.
@@ -690,6 +693,7 @@ def _chapter_stats(report: SyncReport) -> dict[str, dict]:
                 "formalized": 0,
                 "statement_formalized": 0,
                 "proof_formalized": 0,
+                "proof_total": 0,
                 "missing_lean": 0,
             }
             decl_leanok[chapter] = {}
@@ -711,6 +715,7 @@ def _chapter_stats(report: SyncReport) -> dict[str, dict]:
         decl_state["proof"] = decl_state["proof"] or entry.proof_has_leanok
 
     for chapter, decls in decl_leanok.items():
+        stats[chapter]["proof_total"] = len(decls)
         stats[chapter]["proof_formalized"] = sum(
             1
             for decl_state in decls.values()
@@ -766,36 +771,42 @@ def _print_report(report: SyncReport, root: Path) -> None:
     print(
         f"  {'Chapter':<40} "
         f"{'Stmt':>5} / {'Total':>5}  {'%':>6}    "
-        f"{'Proof':>5} / {'Total':>5}  {'%':>6}"
+        f"{'Proof':>5} / {'Decls':>5}  {'%':>6}"
     )
     print("  " + "-" * 78)
     total_stmt = 0
     total_proof = 0
+    total_proof_all = 0
     total_all = 0
     for chapter in sorted(stats):
         s = stats[chapter]
         stmt_pct = 100 * s["statement_formalized"] / s["total"] if s["total"] else 0
-        proof_pct = 100 * s["proof_formalized"] / s["total"] if s["total"] else 0
+        proof_pct = (
+            100 * s["proof_formalized"] / s["proof_total"]
+            if s["proof_total"]
+            else 0
+        )
         short = chapter.replace("src/chapter/", "")
         print(
             f"  {short:<40} "
             f"{s['statement_formalized']:>5} / {s['total']:>5}  {stmt_pct:>5.1f}%    "
-            f"{s['proof_formalized']:>5} / {s['total']:>5}  {proof_pct:>5.1f}%"
+            f"{s['proof_formalized']:>5} / {s['proof_total']:>5}  {proof_pct:>5.1f}%"
         )
         total_stmt += s["statement_formalized"]
         total_proof += s["proof_formalized"]
+        total_proof_all += s["proof_total"]
         total_all += s["total"]
     stmt_pct = 100 * total_stmt / total_all if total_all else 0
-    proof_pct = 100 * total_proof / total_all if total_all else 0
+    proof_pct = 100 * total_proof / total_proof_all if total_proof_all else 0
     print("  " + "-" * 78)
     print(
         f"  {'TOTAL':<40} "
         f"{total_stmt:>5} / {total_all:>5}  {stmt_pct:>5.1f}%    "
-        f"{total_proof:>5} / {total_all:>5}  {proof_pct:>5.1f}%"
+        f"{total_proof:>5} / {total_proof_all:>5}  {proof_pct:>5.1f}%"
     )
     print(
-        "  (Stmt = \\leanok inside the statement environment; "
-        "Proof = \\leanok inside the matching proof environment.)"
+        "  (Stmt = entry-level \\leanok inside the statement environment; "
+        "Proof = declaration-level statement+proof \\leanok.)"
     )
 
     # Missing in Lean

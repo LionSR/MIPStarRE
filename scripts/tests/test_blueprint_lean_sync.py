@@ -236,6 +236,7 @@ class LeanokPlacementReportingTests(unittest.TestCase):
         self.assertEqual(ch04["total"], 2)
         self.assertEqual(ch04["statement_formalized"], 1)
         self.assertEqual(ch04["proof_formalized"], 0)
+        self.assertEqual(ch04["proof_total"], 2)
         # Legacy alias must stay in lockstep with statement_formalized.
         self.assertEqual(ch04["formalized"], ch04["statement_formalized"])
 
@@ -243,6 +244,7 @@ class LeanokPlacementReportingTests(unittest.TestCase):
         self.assertEqual(ch08["total"], 1)
         self.assertEqual(ch08["statement_formalized"], 1)
         self.assertEqual(ch08["proof_formalized"], 1)
+        self.assertEqual(ch08["proof_total"], 1)
 
     def test_json_report_exposes_leanok_totals_and_per_entry_placement(self) -> None:
         report = self._entries_report()
@@ -338,6 +340,7 @@ class LeanokPlacementReportingTests(unittest.TestCase):
         stats = _chapter_stats(report)
         ch04 = stats["src/chapter/ch04.tex"]
         self.assertEqual(ch04["total"], 2)
+        self.assertEqual(ch04["proof_total"], 1)
         self.assertEqual(ch04["statement_formalized"], 1)
         self.assertEqual(ch04["proof_formalized"], 1)
 
