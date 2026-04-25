@@ -210,20 +210,21 @@ private lemma pointConditioned_leftTensor_sq
   rw [hct]
   rw [leftTensor_mul_leftTensor]
 
-/-- The edgewise weighted squared-difference expression is exactly twice the
-local variance of the point-conditioned family on the weighted state. This is
-`eq:equivalent-local-variance` unpacked at a fixed polynomial. -/
-lemma localVarianceDeviationAtPolynomial_eq_two_pointConditionedLocalVarianceAtPolynomial
+private lemma weightedNormDeviation_eq_pointConditionedDifferenceAvg
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) :
-    localVarianceDeviationAtPolynomial params strategy strategy.state G g =
-      2 * pointConditionedLocalVarianceAtPolynomial params strategy G g := by
-  unfold localVarianceDeviationAtPolynomial pointConditionedLocalVarianceAtPolynomial localVariance
-  rw [← mul_assoc]
-  rw [show (2 : Error) * (1 / 2 : Error) = 1 by norm_num]
-  rw [one_mul]
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params)
+    (𝒟 : Distribution (Point params × Point params)) :
+    avgOver 𝒟 (fun uv =>
+        let D := weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1 -
+          weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2
+        ev strategy.state (Dᴴ * D)) =
+      avgOver 𝒟 (fun uv =>
+        ev (weightedPolynomialState params strategy G g)
+          (pointDifferenceSquaredOperator
+            (fun u => leftTensor (ι₂ := ι)
+              (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)) uv.1 uv.2)) := by
   apply avgOver_congr
   intro uv
   change
@@ -241,6 +242,23 @@ lemma localVarianceDeviationAtPolynomial_eq_two_pointConditionedLocalVarianceAtP
   rw [← weightedPolynomialState_ev_leftTensor]
   rw [pointConditioned_leftTensor_sq]
 
+/-- The edgewise weighted squared-difference expression is exactly twice the
+local variance of the point-conditioned family on the weighted state. This is
+`eq:equivalent-local-variance` unpacked at a fixed polynomial. -/
+lemma localVarianceDeviationAtPolynomial_eq_two_pointConditionedLocalVarianceAtPolynomial
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) :
+    localVarianceDeviationAtPolynomial params strategy strategy.state G g =
+      2 * pointConditionedLocalVarianceAtPolynomial params strategy G g := by
+  unfold localVarianceDeviationAtPolynomial pointConditionedLocalVarianceAtPolynomial localVariance
+  rw [← mul_assoc]
+  rw [show (2 : Error) * (1 / 2 : Error) = 1 by norm_num]
+  rw [one_mul]
+  exact weightedNormDeviation_eq_pointConditionedDifferenceAvg params strategy G g
+    (rerandomizeCoord params)
+
 /-- The independent-points weighted squared-difference expression is exactly
 twice the global variance of the point-conditioned family on the weighted state. -/
 lemma globalVarianceDeviationAtPolynomial_eq_two_pointConditionedGlobalVarianceAtPolynomial
@@ -255,22 +273,8 @@ lemma globalVarianceDeviationAtPolynomial_eq_two_pointConditionedGlobalVarianceA
   rw [← mul_assoc]
   rw [show (2 : Error) * (1 / 2 : Error) = 1 by norm_num]
   rw [one_mul]
-  apply avgOver_congr
-  intro uv
-  change
-    ev strategy.state
-        (((weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1 -
-            weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)ᴴ) *
-          (weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1 -
-            weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)) =
-      ev (weightedPolynomialState params strategy G g)
-        (pointDifferenceSquaredOperator
-          (fun u => leftTensor (ι₂ := ι)
-            (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)) uv.1 uv.2)
-  rw [weightedPointConditionedOperator_sq]
-  unfold pointDifferenceSquaredOperator
-  rw [← weightedPolynomialState_ev_leftTensor]
-  rw [pointConditioned_leftTensor_sq]
+  exact weightedNormDeviation_eq_pointConditionedDifferenceAvg params strategy G g
+    (independentPointPair params)
 
 private lemma pointConditionedLocalVarianceAtPolynomial_nonneg
     (params : Parameters)
@@ -305,7 +309,7 @@ lemma pointConditionedLocalVarianceAtPolynomial_le_of_deviation
     pointConditionedLocalVarianceAtPolynomial params strategy G g
         ≤ localVarianceDeviationAtPolynomial params strategy strategy.state G g := by
           rw [heq]
-          nlinarith
+          linarith
     _ ≤ η := hdev
 
 /-- Pointwise local-to-global transfer for the paper's weighted squared-norm
