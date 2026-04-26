@@ -157,6 +157,20 @@ theorem avgOver_sum {α β : Type*} [Fintype β]
     _ = ∑ b : β, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a b := by
           rw [Finset.sum_comm]
 
+/-- Fubini swap for two nested finite-support distribution averages. -/
+theorem avgOver_comm {α β : Type*} (𝒟α : Distribution α) (𝒟β : Distribution β)
+    (f : α → β → Error) :
+    avgOver 𝒟α (fun a => avgOver 𝒟β (f a)) =
+      avgOver 𝒟β (fun b => avgOver 𝒟α (fun a => f a b)) := by
+  unfold avgOver
+  simp_rw [Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl ?_
+  intro b _
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  ring
+
 /-- If `f = g` pointwise, their averages agree. -/
 theorem avgOver_congr {α : Type*} (𝒟 : Distribution α)
     (f g : α → Error) (h : ∀ a, f a = g a) :
