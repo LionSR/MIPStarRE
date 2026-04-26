@@ -36,6 +36,7 @@ _DECL_RE = re.compile(
     r"(theorem|lemma)\s+([A-Za-z_][A-Za-z0-9_.'?]*)\b"
 )
 _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.'?]*")
+_BINDER_NAME_RE = re.compile(r"[^\s:,]+")
 _ALLOWED_WITNESS_ADAPTER_RE = re.compile(
     r"(?:Of|From)Witness$"
 )
@@ -364,7 +365,7 @@ def _extract_binders(prefix: str, *, file_text: str, file_start: int) -> tuple[B
             colon = _find_top_level_char(body, ":")
             if colon is not None:
                 raw_names = body[:colon].strip()
-                names = tuple(_TOKEN_RE.findall(raw_names))
+                names = tuple(_BINDER_NAME_RE.findall(raw_names))
                 type_text = body[colon + 1:].strip()
                 if names and type_text:
                     binders.append(Binder(

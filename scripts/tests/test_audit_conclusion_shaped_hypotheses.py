@@ -260,6 +260,23 @@ class AuditHeuristicTests(unittest.TestCase):
             self.assertEqual(finding.binder, "hwitness")
             self.assertFalse(finding.allowed_helper)
 
+    def test_flags_unicode_named_existential_hypothesis(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = self._write_fake(
+                root,
+                """\
+                theorem unicodeBinder
+                    (σ : ∃ G : Measurement, ConsRel G) :
+                    ∃ G : Measurement, ConsRel G := by
+                  sorry
+                """,
+            )
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].decl, "unicodeBinder")
+            self.assertEqual(result.review_findings[0].binder, "σ")
+
     def test_witness_adapter_name_is_allowed_but_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
