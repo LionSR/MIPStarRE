@@ -821,14 +821,12 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Summing over all outcomes]\label{lem:over-all-outcomes}
 	\lean{MIPStarRE.LDT.Pasting.overAllOutcomes}
-	% Lean-local gap: the one-point line-mismatch aggregation, the
-	% vertical-measurement insertion / finite-sum split, and the
-	% consistency-indicator summation in
-	% `Pasting/BridgeLemmas/OverAllOutcomes.lean` are proved.  The surviving
-	% private residual is
-	% `overAllOutcomes_distinct_lineConsistent_indicator_mass_le_mdq`, the
-	% line-consistent Schwartz--Zippel aggregation at `ld-pasting.tex` lines
-	% 1235--1275.
+	% Lean status: the one-point line-mismatch aggregation,
+	% vertical-measurement insertion / finite-sum split, consistency-indicator
+	% summation, and line-consistent Schwartz--Zippel aggregation in
+	% `Pasting/BridgeLemmas/OverAllOutcomes.lean` are proved.  This lemma still
+	% intentionally depends on the upstream
+	% `lem:ld-sandwich-line-one-point` completeness-chain input.
 	\uses{def:outcomes-by-type, prop:ld-dnoteq, lem:ld-sandwich-line-one-point, lem:schwartz-zippel-individual}
 	If $x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
 	\[

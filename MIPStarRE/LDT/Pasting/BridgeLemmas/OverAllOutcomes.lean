@@ -1039,49 +1039,343 @@ private lemma overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_lineC
           rw [avgOver_add]
           rfl
 
-/-- The remaining Schwartz--Zippel residual after the insertion and bad-line
-finite-sum split have been proved.
+
+/-- A line answer matching every supported completed slice agrees with the vertical
+line induced by the interpolant chosen from the interpolation support.
+
+This is the uniqueness step in `ld-pasting.tex` lines 1245--1255: once the
+`d+1` support slices determine `h*`, any degree-`d` vertical-line answer matching
+all supported slices at `u` must be the restriction of `h*` to that line. -/
+private lemma tupleInterpolatedVerticalLine_eq_of_no_supported_mismatch
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (u : Point params)
+    (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (hEligible : InterpolationEligible params gs)
+    (f : AxisLinePolynomial params.next)
+    (hNoMismatch : ¬ (∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+      ((gs i).get hiSome) u ≠ f (xs i))) :
+    tupleInterpolatedVerticalLine params u xs gs = f := by
+  classical
+  by_contra hne
+  let σ := interpolationSupportSubset gs hEligible
+  have hσcard : σ.card = params.d + 1 := interpolationSupportSubset_card gs hEligible
+  rcases axisLinePolynomial_ne_gives_support_eval_ne params xs hxs σ hσcard hne with
+    ⟨i, hiσ, hEvalNe⟩
+  have hiSupport : i ∈ gHatTupleSupport gs := interpolationSupportSubset_subset gs hEligible hiσ
+  have hiSome : (gs i).isSome = true := by
+    simpa [gHatTupleSupport] using hiSupport
+  have hslicePoly :
+      (Polynomial.restrictAtHeight params
+        (interpolateCompletedSlices params k xs gs) (xs i)).poly =
+      ((gs i).get hiSome).poly := by
+    simpa [hiSome] using
+      interpolateCompletedSlices_restrictAtHeight_eq_get_of_mem_supportSubset
+        params xs hxs gs hEligible hiσ
+  have hsliceEval :
+      (Polynomial.restrictAtHeight params
+        (interpolateCompletedSlices params k xs gs) (xs i)) u =
+      ((gs i).get hiSome) u := by
+    simpa using congrArg
+      (fun p : PolynomialModel params => encodeScalar (MvPolynomial.eval (decodePoint u) p))
+      hslicePoly
+  have hlineEval :
+      tupleInterpolatedVerticalLine params u xs gs (xs i) = ((gs i).get hiSome) u := by
+    calc
+      tupleInterpolatedVerticalLine params u xs gs (xs i)
+        = (Polynomial.restrictAtHeight params
+            (interpolateCompletedSlices params k xs gs) (xs i)) u := by
+              simpa [tupleInterpolatedVerticalLine] using
+                restrictToVerticalLine_eval_eq_restrictAtHeight_eval
+                  params (interpolateCompletedSlices params k xs gs) u (xs i)
+      _ = ((gs i).get hiSome) u := hsliceEval
+  have hmismatch : ((gs i).get hiSome) u ≠ f (xs i) := by
+    intro hEq
+    exact hEvalNe (hlineEval.trans hEq)
+  exact hNoMismatch ⟨i, hiSome, hmismatch⟩
+
+/-- For a fixed distinct tuple and interpolation-eligible nonglobal outcome, the
+probability (over the vertical-line base point `u`) of the line-consistency
+indicator is bounded by the paper's `md/q` Schwartz--Zippel term.
+
+This formalizes `ld-pasting.tex` lines 1256--1265: nonglobality gives a supported
+slice where `gᵢ` differs from the interpolant `h*`; line consistency forces
+agreement at the sampled `u`, and `Preliminaries.polynomialAgreement_avg_le_mdq`
+bounds that agreement probability. -/
+private lemma lineConsistentIndicator_probability_le_mdq
+    (params : Parameters) [FieldModel params.q]
+    {k : ℕ}
+    (xs : PointTuple params k)
+    (hxs : Function.Injective xs)
+    (gs : GHatTupleOutcome params k)
+    (hEligible : InterpolationEligible params gs) :
+    avgOver (uniformDistribution (Point params)) (fun u =>
+        if (¬ IsGloballyConsistent params xs gs) ∧
+            ∃ f : AxisLinePolynomial params.next,
+              ¬ (∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+                ((gs i).get hiSome) u ≠ f (xs i)) then
+          (1 : Error)
+        else 0) ≤
+      ((params.m * params.d : ℕ) : Error) / (params.q : Error) := by
+  classical
+  let δ : Error := ((params.m * params.d : ℕ) : Error) / (params.q : Error)
+  have hδ_nonneg : 0 ≤ δ := by
+    dsimp [δ]
+    positivity
+  by_cases hGlobal : IsGloballyConsistent params xs gs
+  · calc
+      avgOver (uniformDistribution (Point params)) (fun u =>
+          if (¬ IsGloballyConsistent params xs gs) ∧
+              ∃ f : AxisLinePolynomial params.next,
+                ¬ (∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+                  ((gs i).get hiSome) u ≠ f (xs i)) then
+            (1 : Error)
+          else 0) = 0 := by
+            simp [hGlobal, avgOver_zero]
+      _ ≤ ((params.m * params.d : ℕ) : Error) / (params.q : Error) := hδ_nonneg
+  · rcases nonglobal_gives_slice_mismatch_against_interpolant params xs gs hGlobal with
+      ⟨i, hiSome, hsliceNe⟩
+    let hStarSlice : Polynomial params :=
+      Polynomial.restrictAtHeight params (interpolateCompletedSlices params k xs gs) (xs i)
+    have hneq : (gs i).get hiSome ≠ hStarSlice := by
+      intro hEq
+      exact hsliceNe (by simpa [hStarSlice] using hEq.symm)
+    have hpoint : ∀ u : Point params,
+        (if (¬ IsGloballyConsistent params xs gs) ∧
+            ∃ f : AxisLinePolynomial params.next,
+              ¬ (∃ j : Fin k, ∃ hjSome : (gs j).isSome = true,
+                ((gs j).get hjSome) u ≠ f (xs j)) then
+          (1 : Error)
+        else 0) ≤
+          if ((gs i).get hiSome) u = hStarSlice u then (1 : Error) else 0 := by
+      intro u
+      by_cases hCons : (¬ IsGloballyConsistent params xs gs) ∧
+          ∃ f : AxisLinePolynomial params.next,
+            ¬ (∃ j : Fin k, ∃ hjSome : (gs j).isSome = true,
+              ((gs j).get hjSome) u ≠ f (xs j))
+      · rcases hCons.2 with ⟨f, hNoMismatch⟩
+        have hLine := tupleInterpolatedVerticalLine_eq_of_no_supported_mismatch
+          params u xs hxs gs hEligible f hNoMismatch
+        have htupleEval :
+            tupleInterpolatedVerticalLine params u xs gs (xs i) = hStarSlice u := by
+          dsimp [hStarSlice]
+          simpa [tupleInterpolatedVerticalLine] using
+            restrictToVerticalLine_eval_eq_restrictAtHeight_eval
+              params (interpolateCompletedSlices params k xs gs) u (xs i)
+        have hsliceEq : ((gs i).get hiSome) u = hStarSlice u := by
+          have hnotNe : ¬ ((gs i).get hiSome) u ≠ f (xs i) := by
+            intro hne
+            exact hNoMismatch ⟨i, hiSome, hne⟩
+          have hgf : ((gs i).get hiSome) u = f (xs i) := by
+            by_contra hne
+            exact hnotNe hne
+          calc
+            ((gs i).get hiSome) u = f (xs i) := hgf
+            _ = tupleInterpolatedVerticalLine params u xs gs (xs i) := by rw [← hLine]
+            _ = hStarSlice u := htupleEval
+        rw [if_pos hCons, if_pos hsliceEq]
+      · rw [if_neg hCons]
+        by_cases hEq : ((gs i).get hiSome) u = hStarSlice u <;> simp [hEq]
+    calc
+      avgOver (uniformDistribution (Point params)) (fun u =>
+          if (¬ IsGloballyConsistent params xs gs) ∧
+              ∃ f : AxisLinePolynomial params.next,
+                ¬ (∃ j : Fin k, ∃ hjSome : (gs j).isSome = true,
+                  ((gs j).get hjSome) u ≠ f (xs j)) then
+            (1 : Error)
+          else 0)
+        ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+            if ((gs i).get hiSome) u = hStarSlice u then (1 : Error) else 0) := by
+            exact avgOver_mono _ _ _ hpoint
+      _ ≤ δ := by
+            simpa [δ, hStarSlice] using
+              Preliminaries.polynomialAgreement_avg_le_mdq
+                params ((gs i).get hiSome) hStarSlice hneq
+
+/-- Expand an averaged restricted lifted submeasurement into per-outcome masses
+weighted by the probability of the restricting predicate. -/
+private lemma avgOver_subMeasMass_restrict_liftLeft_eq_sum_coeff
+    {Question Outcome : Type*} [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (𝒟 : Distribution Question)
+    (A : SubMeas Outcome ι)
+    (P : Question → Outcome → Prop) [∀ q, DecidablePred (P q)] :
+    avgOver 𝒟 (fun q => subMeasMass ψ ((restrictSubMeas A (P q)).liftLeft)) =
+      ∑ a : Outcome,
+        avgOver 𝒟 (fun q => if P q a then (1 : Error) else 0) *
+          ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) := by
+  classical
+  calc
+    avgOver 𝒟 (fun q => subMeasMass ψ ((restrictSubMeas A (P q)).liftLeft))
+      = avgOver 𝒟 (fun q =>
+          ∑ a : Outcome,
+            if P q a then ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) else 0) := by
+          apply avgOver_congr
+          intro q
+          unfold subMeasMass SubMeas.liftLeft restrictSubMeas
+          rw [mkLeftPlacedSubMeas_total]
+          rw [← leftTensor_finset_sum (ι₂ := ι)
+            (Finset.univ.filter (P q)) (fun a => A.outcome a)]
+          rw [ev_finset_sum]
+          rw [Finset.sum_filter]
+    _ = ∑ a : Outcome,
+        avgOver 𝒟 (fun q =>
+          if P q a then ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) else 0) :=
+          avgOver_sum 𝒟 (fun q a =>
+            if P q a then ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) else 0)
+    _ = ∑ a : Outcome,
+        avgOver 𝒟 (fun q => (if P q a then (1 : Error) else 0) *
+          ev ψ (leftTensor (ι₂ := ι) (A.outcome a))) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          apply avgOver_congr
+          intro q
+          by_cases hp : P q a <;> simp [hp]
+    _ = ∑ a : Outcome,
+        avgOver 𝒟 (fun q => if P q a then (1 : Error) else 0) *
+          ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [avgOver_mul_const]
+
+/-- Sum of the per-outcome Alice-side masses of a submeasurement. -/
+private lemma subMeasMass_liftLeft_eq_sum_outcome
+    {Outcome : Type*} [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (A : SubMeas Outcome ι) :
+    subMeasMass ψ A.liftLeft =
+      ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) := by
+  calc
+    subMeasMass ψ A.liftLeft = ev ψ (leftTensor (ι₂ := ι) A.total) := rfl
+    _ = ev ψ (leftTensor (ι₂ := ι) (∑ a : Outcome, A.outcome a)) := by
+          rw [A.sum_eq_total]
+    _ = ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) := by
+          rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a => A.outcome a)]
+          rw [ev_finset_sum]
+
+/-- Fixed-distinct-tuple form of the line-consistent Schwartz--Zippel bound. -/
+private lemma lineConsistentIndicatorLocal_avg_le_mdq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) {k : ℕ}
+    (xs : PointTuple params k)
+    (hxs : Function.Injective xs) :
+    avgOver (uniformDistribution (Point params)) (fun u =>
+        overAllOutcomesLineConsistentIndicatorLocal params strategy family u xs) ≤
+      ((params.m * params.d : ℕ) : Error) / (params.q : Error) := by
+  classical
+  let δ : Error := ((params.m * params.d : ℕ) : Error) / (params.q : Error)
+  let A := interpolationEligibleSandwichFamily params family k xs
+  let P : Point params → GHatTupleOutcome params k → Prop := fun u gs =>
+    (¬ IsGloballyConsistent params xs gs) ∧
+      ∃ f : AxisLinePolynomial params.next,
+        ¬ (∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+          ((gs i).get hiSome) u ≠ f (xs i))
+  have hδ_nonneg : 0 ≤ δ := by
+    dsimp [δ]
+    positivity
+  have hmass_nonneg : ∀ gs : GHatTupleOutcome params k,
+      0 ≤ ev strategy.state (leftTensor (ι₂ := ι) (A.outcome gs)) := by
+    intro gs
+    exact ev_nonneg_of_psd strategy.state _ <|
+      leftTensor_nonneg (ι₂ := ι) (A.outcome_pos gs)
+  calc
+    avgOver (uniformDistribution (Point params)) (fun u =>
+        overAllOutcomesLineConsistentIndicatorLocal params strategy family u xs)
+      = ∑ gs : GHatTupleOutcome params k,
+          avgOver (uniformDistribution (Point params))
+            (fun u => if P u gs then (1 : Error) else 0) *
+            ev strategy.state (leftTensor (ι₂ := ι) (A.outcome gs)) := by
+          unfold overAllOutcomesLineConsistentIndicatorLocal
+          dsimp [A, P]
+          exact avgOver_subMeasMass_restrict_liftLeft_eq_sum_coeff
+            strategy.state (uniformDistribution (Point params)) A P
+    _ ≤ ∑ gs : GHatTupleOutcome params k,
+          δ * ev strategy.state (leftTensor (ι₂ := ι) (A.outcome gs)) := by
+          refine Finset.sum_le_sum ?_
+          intro gs _
+          by_cases hEligible : InterpolationEligible params gs
+          · have hprob := lineConsistentIndicator_probability_le_mdq
+              params xs hxs gs hEligible
+            exact mul_le_mul_of_nonneg_right (by simpa [P, δ] using hprob)
+              (hmass_nonneg gs)
+          · have hAout : A.outcome gs = 0 := by
+              simp [A, interpolationEligibleSandwichFamily, restrictSubMeas, hEligible]
+            simp [hAout, leftTensor, ev]
+    _ = δ * ∑ gs : GHatTupleOutcome params k,
+          ev strategy.state (leftTensor (ι₂ := ι) (A.outcome gs)) := by
+          rw [Finset.mul_sum]
+    _ = δ * subMeasMass strategy.state A.liftLeft := by
+          rw [subMeasMass_liftLeft_eq_sum_outcome]
+    _ ≤ δ * 1 := by
+          exact mul_le_mul_of_nonneg_left
+            (eligibleMass_le_one params strategy family xs) hδ_nonneg
+    _ = ((params.m * params.d : ℕ) : Error) / (params.q : Error) := by
+          simp [δ]
+
+/-- The line-consistent Schwartz--Zippel aggregation after the insertion and
+bad-line finite-sum split.
 
 Paper anchor: `ld-pasting.tex` lines 1235--1275.  For every distinct tuple `xs`,
 interpolation-eligible nonglobal outcome `gs`, and line-consistent answer `f`, the
 paper chooses the interpolant `h*`; nonglobality gives a supported coordinate
 where `gᵢ ≠ h*|_{xsᵢ}`, and Schwartz--Zippel bounds the probability over `u` that
-this disagreement vanishes by `md/q`.  This is now the only local residual left in
-issue #672. -/
+this disagreement vanishes by `md/q`. -/
 private lemma overAllOutcomes_distinct_lineConsistent_indicator_mass_le_mdq
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (k : ℕ)
-    (hkEligible : params.d + 1 ≤ k) :
+    (family : IdxPolyFamily params ι) (k : ℕ) :
     overAllOutcomesDistinctLineConsistentIndicatorMass params strategy family k ≤
       ((params.m * params.d : ℕ) : Error) / (params.q : Error) := by
-  /- TODO(#672): finish the line-consistent Schwartz--Zippel aggregation.
+  classical
+  let δ : Error := ((params.m * params.d : ℕ) : Error) / (params.q : Error)
+  have hδ_nonneg : 0 ≤ δ := by
+    dsimp [δ]
+    positivity
+  unfold overAllOutcomesDistinctLineConsistentIndicatorMass
+  rw [avgOver_commute (uniformDistribution (Point params))
+    (distinctTupleDistribution params k)
+    (fun u xs => overAllOutcomesLineConsistentIndicatorLocal params strategy family u xs)]
+  calc
+    avgOver (distinctTupleDistribution params k) (fun xs =>
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          overAllOutcomesLineConsistentIndicatorLocal params strategy family u xs))
+      ≤ avgOver (distinctTupleDistribution params k) (fun _ => δ) := by
+          refine avgOver_mono_on_support (distinctTupleDistribution params k) _ _ ?_
+          intro xs hxs_mem
+          have hxs : Function.Injective xs := by
+            simpa [distinctTupleDistribution] using hxs_mem
+          simpa [δ] using
+            lineConsistentIndicatorLocal_avg_le_mdq params strategy family xs hxs
+    _ ≤ δ := by
+          unfold avgOver
+          calc
+            ∑ xs ∈ (distinctTupleDistribution params k).support,
+                (distinctTupleDistribution params k).weight xs * δ
+              = (∑ xs ∈ (distinctTupleDistribution params k).support,
+                  (distinctTupleDistribution params k).weight xs) * δ := by
+                  rw [← Finset.sum_mul]
+            _ ≤ 1 * δ := by
+                  exact mul_le_mul_of_nonneg_right
+                    (distinctTupleDistribution_weight_sum_le_one params k) hδ_nonneg
+            _ = δ := by ring
+    _ = ((params.m * params.d : ℕ) : Error) / (params.q : Error) := by
+          rfl
 
-  The insertion of `B`, the split into bad-line vs. line-consistent cases, the
-  conversion to the consistency indicator, and the summation of the inserted
-  measurement from `ld-pasting.tex` lines 1174--1232 are now proved above.  What
-  remains is exactly lines 1235--1275: for each nonglobal eligible tuple, extract
-  the disagreeing slice against `interpolateCompletedSlices params k xs gs`, use
-  the `d+1` support points to identify any line-consistent `f` with
-  `tupleInterpolatedVerticalLine`, then apply
-  `Preliminaries.polynomialAgreement_avg_le_mdq` to the two distinct
-  `Polynomial params` slice restrictions. -/
-  sorry
-
-/-- The surviving local finite-sum/SZ residual after the one-point line-mismatch
+/-- The local finite-sum/SZ comparison after the one-point line-mismatch
 aggregation has been separated off.
 
-The insertion and finite-sum split from `ld-pasting.tex` lines 1174--1228 are now
+The insertion and finite-sum split from `ld-pasting.tex` lines 1174--1228 are
 proved by `overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_lineConsistent`.
-Thus this wrapper reduces the older residual to the narrower line-consistent
-Schwartz--Zippel statement
-`overAllOutcomes_distinct_lineConsistent_indicator_mass_le_mdq`, corresponding to
-lines 1235--1275. -/
+The line-consistent remainder is exactly the Schwartz--Zippel aggregation proved
+by `overAllOutcomes_distinct_lineConsistent_indicator_mass_le_mdq`, corresponding
+to lines 1235--1275. -/
 private lemma overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_mdq
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (k : ℕ)
-    (hkEligible : params.d + 1 ≤ k) :
+    (family : IdxPolyFamily params ι) (k : ℕ) :
     overAllOutcomesDistinctNonglobalMass params strategy family k ≤
       overAllOutcomesDistinctBadLineMass params strategy family k +
         ((params.m * params.d : ℕ) : Error) / (params.q : Error) := by
@@ -1092,7 +1386,7 @@ private lemma overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_mdq
     params strategy family k
   have hsz :=
     overAllOutcomes_distinct_lineConsistent_indicator_mass_le_mdq
-      params strategy family k hkEligible
+      params strategy family k
   linarith
 
 /-- If the distinct nonglobal mass is bounded by the paper's local
@@ -1133,13 +1427,11 @@ private lemma overAllOutcomes_reverse_mass_bound_of_nonglobal_mass_bound
     heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
   linarith
 
-/-- The remaining paper-local mass comparison after the algebraic reductions.
+/-- The paper-local nonglobal mass comparison after the algebraic reductions.
 
-The one-point line-comparison aggregation from `ld-pasting.tex` lines
-1186--1202 is now proved by
-`overAllOutcomes_distinct_bad_line_mass_le_hBConsistencyError`.  Consequently this
-wrapper reduces the former issue #672 residual to the purely local
-insertion/Schwartz--Zippel statement
+The one-point line-comparison aggregation from `ld-pasting.tex` lines 1186--1202
+is proved by `overAllOutcomes_distinct_bad_line_mass_le_hBConsistencyError`, and
+the remaining insertion/Schwartz--Zippel estimate is
 `overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_mdq`. -/
 private lemma overAllOutcomes_distinct_nonglobal_mass_bound
     (params : Parameters) [FieldModel params.q]
@@ -1147,7 +1439,6 @@ private lemma overAllOutcomes_distinct_nonglobal_mass_bound
     (family : IdxPolyFamily params ι)
     (eps delta gamma zeta : Error) (k : ℕ)
     (hd : 0 < params.d)
-    (hkEligible : params.d + 1 ≤ k)
     (heps_nonneg : 0 ≤ eps)
     (hdelta_nonneg : 0 ≤ delta)
     (hgamma_nonneg : 0 ≤ gamma)
@@ -1160,7 +1451,7 @@ private lemma overAllOutcomes_distinct_nonglobal_mass_bound
         ((params.m * params.d : ℕ) : Error) / (params.q : Error) := by
   have hlocal :=
     overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_mdq
-      params strategy family k hkEligible
+      params strategy family k
   have hbad :=
     overAllOutcomes_distinct_bad_line_mass_le_hBConsistencyError
       params strategy family eps delta gamma zeta k hd
@@ -1263,7 +1554,7 @@ lemma overAllOutcomes
         exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
           hgood hgamma_le hzeta_le hdq_le family hcons hself hbound hfacts k i hi
       have hnonglobal := overAllOutcomes_distinct_nonglobal_mass_bound
-        params strategy family eps delta gamma zeta k hd hkEligible
+        params strategy family eps delta gamma zeta k hd
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
       exact overAllOutcomes_reverse_mass_bound_of_nonglobal_mass_bound
         params strategy family eps delta gamma zeta k hd hdq_le hkEligible
