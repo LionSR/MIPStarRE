@@ -364,6 +364,37 @@ def _find_top_level_token(text: str, token: str) -> int | None:
     return None
 
 
+def _find_top_level_forall(text: str) -> int | None:
+    """Return the first top-level ``∀`` / ``forall`` token in ``text``."""
+    stack: list[str] = []
+    i = 0
+    while i < len(text):
+        ch = text[i]
+        if ch == "-" and i + 1 < len(text) and text[i + 1] == "-":
+            newline = text.find("\n", i + 2)
+            if newline == -1:
+                return None
+            i = newline + 1
+            continue
+        if ch == "/" and i + 1 < len(text) and text[i + 1] == "-":
+            end = _skip_block_comment(text, i)
+            if end is None:
+                return None
+            i = end
+            continue
+        string_end = _skip_string_like(text, i)
+        if string_end is not None:
+            i = string_end
+            continue
+        if not stack and (
+            text.startswith("∀", i) or _starts_keyword(text, i, "forall")
+        ):
+            return i
+        _advance_depth(ch, stack)
+        i += 1
+    return None
+
+
 def _find_matching_group(text: str, start: int) -> int | None:
     """Return the closing offset for the group opened at ``start``.
 
@@ -484,9 +515,54 @@ def _contains_existential(text: str) -> bool:
     return "∃" in text or bool(re.search(r"\bExists\b", text))
 
 
+def _first_code_pos(text: str) -> int | None:
+    """Return the first non-whitespace, non-comment code offset in ``text``."""
+    i = 0
+    while i < len(text):
+        if text[i].isspace():
+            i += 1
+            continue
+        if text.startswith("--", i):
+            newline = text.find("\n", i + 2)
+            if newline == -1:
+                return None
+            i = newline + 1
+            continue
+        if text.startswith("/-", i):
+            end = _skip_block_comment(text, i)
+            if end is None:
+                return None
+            i = end
+            continue
+        return i
+    return None
+
+
+def _clean_semantic_text(text: str) -> str:
+    """Mask comments and strings before semantic token/existential checks."""
+    return _mask_lean_non_code(text)
+
+
 def _contains_forall(text: str) -> bool:
-    if "∀" in text or bool(re.search(r"\bforall\b", text)):
-        return True
+    """Return whether ``text`` is a producer context skipped in default mode.
+
+    Only a leading/top-level ``∀`` / ``forall`` binder, or a top-level arrow
+    whose codomain contains an existential, counts as a producer.  Quantifiers
+    nested inside conjuncts or other subexpressions should not suppress A1
+    findings for a separate top-level existential hypothesis.
+    """
+    text = _clean_semantic_text(text)
+    first = _first_code_pos(text)
+    forall_pos = _find_top_level_forall(text)
+    if first is not None and forall_pos is not None:
+        starts_with_forall = forall_pos == first
+        starts_with_let = (
+            _starts_keyword(text, first, "let")
+            or _starts_keyword(text, first, "letI")
+        )
+        if starts_with_forall or starts_with_let:
+            return _contains_existential(text[forall_pos:])
+
     unicode_arrow = _find_top_level_token(text, "→")
     if unicode_arrow is not None:
         return _contains_existential(text[unicode_arrow + len("→"):])
@@ -523,16 +599,18 @@ def audit_declaration(
     include_forall: bool,
 ) -> list[Finding]:
     """Audit one declaration for inline existential hypotheses."""
-    conclusion_tokens = salient_tokens(decl.conclusion)
-    if not _contains_existential(decl.conclusion) or len(conclusion_tokens) < min_common:
+    conclusion_text = _clean_semantic_text(decl.conclusion)
+    conclusion_tokens = salient_tokens(conclusion_text)
+    if not _contains_existential(conclusion_text) or len(conclusion_tokens) < min_common:
         return []
     out: list[Finding] = []
     for binder in decl.binders:
-        if not _contains_existential(binder.type_text):
+        binder_text = _clean_semantic_text(binder.type_text)
+        if not _contains_existential(binder_text):
             continue
-        if not include_forall and _contains_forall(binder.type_text):
+        if not include_forall and _contains_forall(binder_text):
             continue
-        binder_tokens = salient_tokens(binder.type_text)
+        binder_tokens = salient_tokens(binder_text)
         common = tuple(sorted(conclusion_tokens & binder_tokens))
         coverage = len(common) / len(conclusion_tokens)
         if len(common) < min_common or coverage < min_coverage:

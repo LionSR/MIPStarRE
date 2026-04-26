@@ -483,6 +483,46 @@ class AuditHeuristicTests(unittest.TestCase):
             self.assertEqual(result.review_findings[0].decl, "mainInductionProofWitness")
             self.assertEqual(len(result.allowed_findings), 0)
 
+    def test_nested_forall_conjunct_does_not_skip_existential_hypothesis(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = self._write_fake(
+                root,
+                """\
+                theorem nestedForallStillBad
+                    (hrec :
+                      (∀ x : Nat, x = x) ∧
+                        (forall y : Nat, y = y) ∧
+                        ∃ G : Measurement, ConsRel G) :
+                    ∃ G : Measurement, ConsRel G := by
+                  sorry
+                """,
+            )
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].decl, "nestedForallStillBad")
+
+    def test_conclusion_comments_do_not_create_existential_findings(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = self._write_fake(
+                root,
+                """\
+                theorem lineCommentConclusion
+                    (h : ∃ G : Measurement, ConsRel G) :
+                    True -- ∃ G : Measurement, ConsRel G
+                    := by
+                  trivial
+
+                theorem blockCommentConclusion
+                    (h : ∃ G : Measurement, ConsRel G) :
+                    True /- ∃ G : Measurement, ConsRel G -/ := by
+                  trivial
+                """,
+            )
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(result.findings, ())
+
     def test_skips_forall_producers_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
