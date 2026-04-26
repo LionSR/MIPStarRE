@@ -480,20 +480,20 @@
 	This is the direct packaging of Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal}. The Lean declaration uses the explicit equalities naming $\sigma,\zeta_1,\zeta_2,\zeta_3$ as the corresponding cascade expressions.
 \end{proof}
 
-\begin{remark}[Lean Step 5 residual interface]\label{rem:main-formal-step5-sz-residual}
+\begin{remark}[Lean Step 5 expansion theorem]\label{rem:main-formal-step5-sz-residual}
 	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollision_sandwichTensor_le_mdq}
 	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass}
 	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass_le_mdq}
 	\lean{MIPStarRE.LDT.Test.MainFormalStep5ExpansionResidual}
+	\lean{MIPStarRE.LDT.Test.mainFormalStep5_expansionResidual}
 	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionResidual}
 	\uses{lem:schwartz-zippel-individual, thm:main-formal}
 	For the Step~5 passage below, Lean now names the weighted polynomial-collision
-	mass and proves its $md/q$ bound by specializing the existing tensor
-	Schwartz--Zippel helper.  The only remaining Step~5 residual is the explicit
-	expansion/reindexing statement that compares the evaluated consistency defect
-	with the full-polynomial defect plus that collision mass.
-\tagged{TODO}{This is a bridge/residual interface, not a completed proof of the
-	Step~5 passage.}
+	mass, proves its $md/q$ bound by specializing the existing tensor
+	Schwartz--Zippel helper, and proves the algebraic expansion/reindexing
+	statement comparing the evaluated consistency defect with the full-polynomial
+	defect plus that collision mass. The wrapper for Step~5 therefore no longer
+	takes the expansion statement as an external hypothesis.
 \end{remark}
 
 \begin{remark}[Lean residual packages for the main-formal assembly]\label{rem:main-formal-lean-residual-packages}
@@ -582,8 +582,9 @@ contains that transport residual.
 	\]
 	The Lean Step~5 wrapper
 	\lean{MIPStarRE.LDT.Test.MainFormalStep5ExpansionResidual}
+	\lean{MIPStarRE.LDT.Test.mainFormalStep5_expansionResidual}
 	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionResidual}
-	separates the remaining expansion/reindexing obligation from the checked
+	formalizes this expansion/reindexing step and combines it with the checked
 	Schwartz--Zippel tensor bound
 	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass_le_mdq}.
 
