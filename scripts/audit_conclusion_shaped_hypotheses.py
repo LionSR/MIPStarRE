@@ -172,16 +172,22 @@ def _spaces_preserving_newlines(fragment: str) -> str:
     return "".join("\n" if ch == "\n" else " " for ch in fragment)
 
 
-def _mask_lean_comments(text: str) -> str:
-    """Mask Lean comments before regex declaration matching.
+def _mask_lean_non_code(text: str) -> str:
+    """Mask Lean comments and strings before regex declaration matching.
 
     The parser uses regexes for declaration starts but then slices the original
-    source by offset.  Replacing comment contents with spaces preserves offsets
-    while preventing commented-out theorem headers from being scanned.
+    source by offset.  Replacing non-code text with spaces preserves offsets
+    while preventing commented-out or string-literal theorem headers from being
+    scanned.
     """
     chunks: list[str] = []
     i = 0
     while i < len(text):
+        if text[i] == '"':
+            end = _skip_string_literal(text, i)
+            chunks.append(_spaces_preserving_newlines(text[i:end]))
+            i = end
+            continue
         if text.startswith("--", i):
             newline = text.find("\n", i + 2)
             end = len(text) if newline == -1 else newline
@@ -262,6 +268,34 @@ def _find_top_level_char(text: str, target: str) -> int | None:
     return None
 
 
+def _find_top_level_token(text: str, token: str) -> int | None:
+    """Return the first top-level occurrence of ``token`` in ``text``."""
+    stack: list[str] = []
+    i = 0
+    while i < len(text):
+        ch = text[i]
+        if ch == "-" and i + 1 < len(text) and text[i + 1] == "-":
+            newline = text.find("\n", i + 2)
+            if newline == -1:
+                return None
+            i = newline + 1
+            continue
+        if ch == "/" and i + 1 < len(text) and text[i + 1] == "-":
+            end = _skip_block_comment(text, i)
+            if end is None:
+                return None
+            i = end
+            continue
+        if ch == '"':
+            i = _skip_string_literal(text, i)
+            continue
+        if not stack and text.startswith(token, i):
+            return i
+        _advance_depth(ch, stack)
+        i += 1
+    return None
+
+
 def _find_matching_group(text: str, start: int) -> int | None:
     """Return the closing offset for the group opened at ``start``."""
     opener = text[start]
@@ -323,7 +357,7 @@ def parse_declarations(path: Path, *, root: Path | None = None) -> list[LeanDecl
     else:
         rel = str(path)
     out: list[LeanDecl] = []
-    match_text = _mask_lean_comments(text)
+    match_text = _mask_lean_non_code(text)
     for match in _DECL_RE.finditer(match_text):
         header_end = _find_header_end(text, match.end())
         if header_end is None:
@@ -350,12 +384,15 @@ def _contains_existential(text: str) -> bool:
 
 
 def _contains_forall(text: str) -> bool:
-    return (
-        "∀" in text
-        or bool(re.search(r"\bforall\b", text))
-        or ("→" in text and _contains_existential(text.split("→", 1)[1]))
-        or ("->" in text and _contains_existential(text.split("->", 1)[1]))
-    )
+    if "∀" in text or bool(re.search(r"\bforall\b", text)):
+        return True
+    unicode_arrow = _find_top_level_token(text, "→")
+    if unicode_arrow is not None:
+        return _contains_existential(text[unicode_arrow + len("→"):])
+    ascii_arrow = _find_top_level_token(text, "->")
+    if ascii_arrow is not None:
+        return _contains_existential(text[ascii_arrow + len("->"):])
+    return False
 
 
 def salient_tokens(text: str) -> set[str]:
