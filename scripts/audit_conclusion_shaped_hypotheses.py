@@ -297,21 +297,37 @@ def _find_top_level_token(text: str, token: str) -> int | None:
 
 
 def _find_matching_group(text: str, start: int) -> int | None:
-    """Return the closing offset for the group opened at ``start``."""
+    """Return the closing offset for the group opened at ``start``.
+
+    Comments and strings inside binder types are ignored so bracket-like
+    characters in documentation do not create phantom binder nesting.
+    """
     opener = text[start]
-    closer = _OPEN_TO_CLOSE[opener]
     stack = [opener]
     i = start + 1
     while i < len(text):
         ch = text[i]
+        if ch == "-" and i + 1 < len(text) and text[i + 1] == "-":
+            newline = text.find("\n", i + 2)
+            if newline == -1:
+                return None
+            i = newline + 1
+            continue
+        if ch == "/" and i + 1 < len(text) and text[i + 1] == "-":
+            end = _skip_block_comment(text, i)
+            if end is None:
+                return None
+            i = end
+            continue
+        if ch == '"':
+            i = _skip_string_literal(text, i)
+            continue
         if ch in _OPEN_TO_CLOSE:
             stack.append(ch)
-        elif ch == closer and stack and stack[-1] == opener:
+        elif ch in _CLOSE_TO_OPEN and stack and stack[-1] == _CLOSE_TO_OPEN[ch]:
             stack.pop()
             if not stack:
                 return i
-        elif ch in _CLOSE_TO_OPEN and stack and stack[-1] == _CLOSE_TO_OPEN[ch]:
-            stack.pop()
         i += 1
     return None
 
@@ -321,6 +337,21 @@ def _extract_binders(prefix: str, *, file_text: str, file_start: int) -> tuple[B
     binders: list[Binder] = []
     i = 0
     while i < len(prefix):
+        if prefix.startswith("--", i):
+            newline = prefix.find("\n", i + 2)
+            if newline == -1:
+                break
+            i = newline + 1
+            continue
+        if prefix.startswith("/-", i):
+            end_comment = _skip_block_comment(prefix, i)
+            if end_comment is None:
+                break
+            i = end_comment
+            continue
+        if prefix[i] == '"':
+            i = _skip_string_literal(prefix, i)
+            continue
         if prefix[i] not in "({[":
             i += 1
             continue
