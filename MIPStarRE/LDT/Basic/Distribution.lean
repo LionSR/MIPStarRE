@@ -387,6 +387,27 @@ theorem avgOver_uniform_prod
           (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
             simp [avgOver, uniformDistribution]
 
+/-- Swap two nested uniform averages over finite nonempty types. -/
+theorem avgOver_uniform_comm
+    {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α → β → Error) :
+    avgOver (uniformDistribution α) (fun a => avgOver (uniformDistribution β) (f a)) =
+      avgOver (uniformDistribution β) (fun b => avgOver (uniformDistribution α)
+        (fun a => f a b)) := by
+  calc
+    avgOver (uniformDistribution α) (fun a => avgOver (uniformDistribution β) (f a))
+        = avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) := by
+          exact (avgOver_uniform_prod (α := α) (β := β) (f := f)).symm
+    _ = avgOver (uniformDistribution (β × α)) (fun ba => f ba.2 ba.1) := by
+          simpa using
+            (avgOver_uniform_equiv (e := Equiv.prodComm α β)
+              (f := fun ab : α × β => f ab.1 ab.2))
+    _ = avgOver (uniformDistribution β) (fun b => avgOver (uniformDistribution α)
+          (fun a => f a b)) := by
+          exact avgOver_uniform_prod (α := β) (β := α) (f := fun b a => f a b)
+
 /-- Averaging a function depending only on the first coordinate marginalizes a uniform product. -/
 theorem avgOver_uniform_fst {α β : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α]

@@ -314,5 +314,103 @@ theorem leftTensor_sub
   simpa [leftTensor] using
     (opTensor_sub_left (ι₁ := ι₁) (ι₂ := ι₂) A B (1 : MIPStarRE.Quantum.Op ι₂))
 
+/-- `opTensor` is linear in the left factor: real scalar multiplication. -/
+theorem opTensor_smul_left_error
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (c : Error) (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    opTensor (c • A) B = c • opTensor A B := by
+  ext x y
+  simp [opTensor, mul_comm, mul_left_comm]
+
+/-- `opTensor` is linear in the right factor: real scalar multiplication. -/
+theorem opTensor_smul_right_error
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (c : Error) (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    opTensor A (c • B) = c • opTensor A B := by
+  ext x y
+  simp [opTensor, mul_comm, mul_left_comm]
+
+/-- Compatibility form of right-factor real scalar linearity with an explicit complex cast. -/
+theorem opTensor_smul_right_local
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (c : Error) (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    opTensor A ((c : ℂ) • B) = (c : ℂ) • opTensor A B := by
+  ext x y
+  simp [opTensor, mul_comm, mul_left_comm]
+
+/-- `opTensor` is additive in the left factor. -/
+theorem opTensor_add_left_local
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A B : MIPStarRE.Quantum.Op ι₁) (C : MIPStarRE.Quantum.Op ι₂) :
+    opTensor (A + B) C = opTensor A C + opTensor B C := by
+  ext x y
+  simp [opTensor, add_mul]
+
+/-- `opTensor` is additive in the right factor. -/
+theorem opTensor_add_right_local
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A : MIPStarRE.Quantum.Op ι₁) (B C : MIPStarRE.Quantum.Op ι₂) :
+    opTensor A (B + C) = opTensor A B + opTensor A C := by
+  ext x y
+  simp [opTensor, mul_add]
+
+/-- Pull a finite sum out of the left factor of `opTensor`. -/
+theorem opTensor_sum_left_finset
+    {α ι₁ ι₂ : Type*}
+    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    opTensor (∑ a ∈ s, f a) B = ∑ a ∈ s, opTensor (f a) B := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [opTensor]
+  | @insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_left_local, ih]
+
+/-- Pull a finite sum out of the right factor of `opTensor`. -/
+theorem opTensor_sum_right_finset
+    {α ι₁ ι₂ : Type*}
+    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A : MIPStarRE.Quantum.Op ι₁) (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₂) :
+    opTensor A (∑ a ∈ s, f a) = ∑ a ∈ s, opTensor A (f a) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [opTensor]
+  | @insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_right_local, ih]
+
+/-- Compatibility alias for pulling a finite sum out of the left factor of `opTensor`. -/
+theorem opTensor_sum_left_local
+    {α ι₁ ι₂ : Type*}
+    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    opTensor (∑ a ∈ s, f a) B = ∑ a ∈ s, opTensor (f a) B :=
+  opTensor_sum_left_finset s f B
+
+/-- Compatibility alias for pulling a finite sum out of the right factor of `opTensor`. -/
+theorem opTensor_sum_right_local
+    {α ι₁ ι₂ : Type*}
+    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A : MIPStarRE.Quantum.Op ι₁) (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₂) :
+    opTensor A (∑ a ∈ s, f a) = ∑ a ∈ s, opTensor A (f a) :=
+  opTensor_sum_right_finset A s f
+
+/-- Pull an unindexed finite-type sum out of the left factor of `opTensor`. -/
+theorem opTensor_sum_left_univ
+    {α ι₁ ι₂ : Type*} [Fintype α]
+    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (f : α → MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    opTensor (∑ a : α, f a) B = ∑ a : α, opTensor (f a) B := by
+  classical
+  simpa using opTensor_sum_left_finset (s := (Finset.univ : Finset α)) (f := f) (B := B)
+
+/-- Pull an unindexed finite-type sum out of the right factor of `opTensor`. -/
+theorem opTensor_sum_right_univ
+    {α ι₁ ι₂ : Type*} [Fintype α]
+    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A : MIPStarRE.Quantum.Op ι₁) (f : α → MIPStarRE.Quantum.Op ι₂) :
+    opTensor A (∑ a : α, f a) = ∑ a : α, opTensor A (f a) := by
+  classical
+  simpa using opTensor_sum_right_finset (A := A) (s := (Finset.univ : Finset α)) (f := f)
+
 
 end MIPStarRE.LDT

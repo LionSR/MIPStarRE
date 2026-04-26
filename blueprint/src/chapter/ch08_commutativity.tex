@@ -261,9 +261,10 @@
 \begin{theorem}[Commutativity of~$G$]\label{thm:com-main}
 	\lean{MIPStarRE.LDT.Commutativity.comMain}
 	% Lean-local gap: `comMain`'s axiom closure currently includes `sorryAx`
-	% via `commDataProcessedG` (sorrys at
-	% `Commutativity/ScalarApproximation/ProcessedG.lean:393, 409, 448`) and
-	% the `Commutativity/Main/Auxiliary.lean` residuals
+	% via `commDataProcessedG` (remaining local sorrys at
+	% `Commutativity/ScalarApproximation/ProcessedG.lean:1360` for the phase-2
+	% reindexing residual and `ProcessedG.lean:1494` for the phase-6/7 first-reverse
+	% endpoint), plus the `Commutativity/Main/Auxiliary.lean` residuals
 	% `fullSliceScalarMarginalizeXTensorTriangleResidual` and
 	% `fullSliceScalarMarginalizeYPrefixResidual`. Add the blueprint-ok marker once
 	% those are closed.

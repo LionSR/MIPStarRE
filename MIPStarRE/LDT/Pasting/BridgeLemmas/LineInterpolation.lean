@@ -855,55 +855,6 @@ lemma postprocess_decide_eq_false_outcome
       A.total - A.outcome a0 := by
   exact eq_sub_iff_add_eq.mpr (postprocess_decide_false_add_true_eq_total A a0)
 
-lemma opTensor_smul_right_local
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (c : Error)
-    (A : MIPStarRE.Quantum.Op ιA)
-    (B : MIPStarRE.Quantum.Op ιB) :
-    opTensor A ((c : ℂ) • B) = (c : ℂ) • opTensor A B := by
-  ext x y
-  simp [opTensor, mul_comm, mul_left_comm, mul_assoc]
-
-lemma opTensor_add_left_local
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A B : MIPStarRE.Quantum.Op ιA)
-    (C : MIPStarRE.Quantum.Op ιB) :
-    opTensor (A + B) C = opTensor A C + opTensor B C := by
-  ext i j
-  simp [opTensor, add_mul]
-
-lemma opTensor_add_right_local
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : MIPStarRE.Quantum.Op ιA)
-    (B C : MIPStarRE.Quantum.Op ιB) :
-    opTensor A (B + C) = opTensor A B + opTensor A C := by
-  ext i j
-  simp [opTensor, mul_add]
-
-lemma opTensor_sum_left_local
-    {α ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (s : Finset α)
-    (f : α → MIPStarRE.Quantum.Op ιA)
-    (B : MIPStarRE.Quantum.Op ιB) :
-    opTensor (∑ a ∈ s, f a) B = ∑ a ∈ s, opTensor (f a) B := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp [opTensor]
-  | @insert a s ha ih =>
-      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_left_local, ih]
-
-lemma opTensor_sum_right_local
-    {α ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : MIPStarRE.Quantum.Op ιA)
-    (s : Finset α)
-    (f : α → MIPStarRE.Quantum.Op ιB) :
-    opTensor A (∑ a ∈ s, f a) = ∑ a ∈ s, opTensor A (f a) := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp [opTensor]
-  | @insert a s ha ih =>
-      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_right_local, ih]
-
 lemma qBipartiteConsDefect_eq_sum_singleOutcome
     {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ι × ι))
