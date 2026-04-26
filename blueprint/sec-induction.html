@@ -1359,12 +1359,76 @@
 
   </div>
 </div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:main-formal-unsymmetrization-bridge">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">10.13</span>
+    <span class="remark_thmtitle">Lean measurement-unsymmetrization bridge</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-induction.html#rem:main-formal-unsymmetrization-bridge">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-induction.html#lem:main-formal-successor-handoff">Proposition 10.12</a></li>
+          
+          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.9</a></li>
+          
+          <li><a href="sec-the-test.html#thm:main-formal">Theorem 2.11</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p>          Lean now isolates the Step&#160;3 extraction from <span class="ttfamily">inductive_step.tex</span> lines 84–108. The principal-block map <span class="ttfamily">extractRoleBlock</span> turns a role-register POVM \(G\) into the two POVMs \(G^{\mathrm A}\) and \(G^{\mathrm B}\) on the original prover space and proves that point-evaluation postprocessing commutes with this extraction. The two round-trip lemmas identify the \(A\) and \(B\) blocks of the symmetrized point measurement with the original prover point measurements. The remaining analytic factor-two estimates <a href="sec-induction.html#eq:cons-a" class="eqref">4</a> and <a href="sec-induction.html#eq:cons-b" class="eqref">5</a> are named by <span class="ttfamily">UnsymmetrizationBridgePackage</span>; no projectivity of arbitrary principal blocks is claimed, matching the paper’s later projectivization step. </p>
+
+  </div>
+</div>
 <div class="definition_thmwrapper theorem-style-definition" id="def:main-formal-envelope">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.13</span>
+    <span class="definition_thmlabel">10.14</span>
     <span class="definition_thmtitle">Final error envelope</span>
     <div class="thm_header_extras">
 
@@ -1411,7 +1475,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.14</span>
+    <span class="theorem_thmlabel">10.15</span>
     <span class="theorem_thmtitle">Basic facts about the final error envelope</span>
     <div class="thm_header_extras">
 
@@ -1438,7 +1502,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.13</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.14</a></li>
           
         </ul>
     
@@ -1496,7 +1560,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.15</span>
+    <span class="definition_thmlabel">10.16</span>
     <span class="definition_thmtitle">Cascade parameters and standing hypotheses</span>
     <div class="thm_header_extras">
 
@@ -1520,7 +1584,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.13</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.14</a></li>
           
         </ul>
     
@@ -1576,7 +1640,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.16</span>
+    <span class="theorem_thmlabel">10.17</span>
     <span class="theorem_thmtitle">Bound for the first cascade term</span>
     <div class="thm_header_extras">
 
@@ -1603,9 +1667,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.13</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.14</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.15</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.16</a></li>
           
         </ul>
     
@@ -1664,7 +1728,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.17</span>
+    <span class="theorem_thmlabel">10.18</span>
     <span class="theorem_thmtitle">Cascade bounds for the later cascade terms</span>
     <div class="thm_header_extras">
 
@@ -1691,11 +1755,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.13</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.14</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.15</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.16</a></li>
           
-          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.16</a></li>
+          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.17</a></li>
           
         </ul>
     
@@ -1770,7 +1834,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.18</span>
+    <span class="theorem_thmlabel">10.19</span>
     <span class="theorem_thmtitle">Consolidated error cascade</span>
     <div class="thm_header_extras">
 
@@ -1797,13 +1861,13 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.13</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.14</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.15</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.16</a></li>
           
-          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.16</a></li>
+          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.17</a></li>
           
-          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.17</a></li>
+          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.18</a></li>
           
         </ul>
     
@@ -1861,7 +1925,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>This is the direct packaging of Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.16</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.17</a>. The Lean declaration uses the explicit equalities naming \(\sigma ,\zeta _1,\zeta _2,\zeta _3\) as the corresponding cascade expressions. </p>
+  <p>This is the direct packaging of Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.17</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.18</a>. The Lean declaration uses the explicit equalities naming \(\sigma ,\zeta _1,\zeta _2,\zeta _3\) as the corresponding cascade expressions. </p>
 
   </div>
 </div>
@@ -1870,7 +1934,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.19</span>
+    <span class="remark_thmlabel">10.20</span>
     <span class="remark_thmtitle">Lean Step 5 expansion theorem</span>
     <div class="thm_header_extras">
 
@@ -1932,7 +1996,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.20</span>
+    <span class="remark_thmlabel">10.21</span>
     <span class="remark_thmtitle">Lean residual packages for the main-formal assembly</span>
     <div class="thm_header_extras">
 
@@ -1954,9 +2018,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#thm:error-cascade-main-formal">Theorem 10.18</a></li>
+          <li><a href="sec-induction.html#thm:error-cascade-main-formal">Theorem 10.19</a></li>
           
-          <li><a href="sec-induction.html#thm:main-formal-envelope-basics">Theorem 10.14</a></li>
+          <li><a href="sec-induction.html#thm:main-formal-envelope-basics">Theorem 10.15</a></li>
           
         </ul>
     
@@ -2130,8 +2194,8 @@
   <span class="equation_label">12</span>
 </p>
 </div>
-<p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-residual-packages">10.20</a> records the Lean residual packages that separate the scalar cascade and the Step&#160;5 Schwartz–Zippel handoff from the remaining projective-stage transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the Step&#160;5 wrapper now turns the evaluated estimate at line&#160;116 into full-polynomial consistency at \(\zeta _1\). The remaining residual is the projective-stage construction: the two \(\zeta _4\) point-consistency goals and the line-156 \(\approx _{\zeta _3}\) bridge whose projective converse gives the \(\zeta _3/2\) self-consistency target. </p>
-<p>With \(E\) as in Definition&#160;<a href="sec-induction.html#def:main-formal-envelope">10.13</a>, the quantities \(\sigma ,\zeta _1,\zeta _2,\zeta _3,\zeta _4\) form the cascade of Definition&#160;<a href="sec-induction.html#def:main-formal-error-cascade">10.15</a>. Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.16</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.17</a> package the final inflation to the scale \(100000k^2m^4 E\). The underlying paper estimates are: </p>
+<p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-residual-packages">10.21</a> records the Lean residual packages that separate the scalar cascade and the Step&#160;5 Schwartz–Zippel handoff from the remaining projective-stage transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the Step&#160;5 wrapper now turns the evaluated estimate at line&#160;116 into full-polynomial consistency at \(\zeta _1\). The remaining residual is the projective-stage construction: the two \(\zeta _4\) point-consistency goals and the line-156 \(\approx _{\zeta _3}\) bridge whose projective converse gives the \(\zeta _3/2\) self-consistency target. </p>
+<p>With \(E\) as in Definition&#160;<a href="sec-induction.html#def:main-formal-envelope">10.14</a>, the quantities \(\sigma ,\zeta _1,\zeta _2,\zeta _3,\zeta _4\) form the cascade of Definition&#160;<a href="sec-induction.html#def:main-formal-error-cascade">10.16</a>. Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.17</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.18</a> package the final inflation to the scale \(100000k^2m^4 E\). The underlying paper estimates are: </p>
 <div class="displaymath" id="a0000000605">
   \[  \sigma \le 10000k^2m^4\left(\varepsilon ^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).  \]
 </div>
