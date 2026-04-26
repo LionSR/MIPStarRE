@@ -47,6 +47,39 @@ class ParseDeclarationTests(unittest.TestCase):
             self.assertIn("∃ H", decls[0].conclusion)
             self.assertEqual(decls[0].binders[1].name, "hrec")
 
+    def test_header_line_ignores_preceding_masked_whitespace(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            source = textwrap.dedent(
+                """\
+                /--
+                A doc comment with enough text to be masked.
+                -/
+
+                def snippet := "
+                theorem maskedStringHeader
+                    (h : ∃ G : Measurement, ConsRel G) :
+                    ∃ G : Measurement, ConsRel G := by
+                  sorry
+                "
+
+                theorem documentedBad
+                    (h : ∃ G : Measurement, ConsRel G) :
+                    ∃ G : Measurement, ConsRel G := by
+                  sorry
+                """
+            )
+            mod.write_text(source, encoding="utf-8")
+            theorem_line = source.splitlines().index("theorem documentedBad") + 1
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["documentedBad"])
+            self.assertEqual(decls[0].line, theorem_line)
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].line, theorem_line)
+
     def test_header_parser_accepts_inline_attributes(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

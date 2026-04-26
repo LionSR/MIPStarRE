@@ -30,9 +30,9 @@ from typing import Iterable, Sequence
 
 
 _DECL_RE = re.compile(
-    r"(?m)^\s*"
-    r"(?:(?:private|protected|noncomputable|unsafe|nonrec)\s+)*"
-    r"(theorem|lemma)\s+([^\s:({\[]+)(?=\s|$|[:({\[])"
+    r"(?m)^[ \t]*"
+    r"(?:(?:private|protected|noncomputable|unsafe|nonrec)[ \t]+)*"
+    r"(theorem|lemma)[ \t]+([^\s:({\[]+)(?=\s|$|[:({\[])"
 )
 _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.'?]*")
 _BINDER_NAME_RE = re.compile(r"[^\s:,]+")
