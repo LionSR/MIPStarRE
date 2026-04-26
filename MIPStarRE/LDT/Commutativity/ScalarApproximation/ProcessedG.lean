@@ -12,27 +12,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Swap two nested uniform averages. -/
-private lemma avgOver_uniform_comm
-    {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (f : α → β → Error) :
-    avgOver (uniformDistribution α) (fun a => avgOver (uniformDistribution β) (f a)) =
-      avgOver (uniformDistribution β) (fun b => avgOver (uniformDistribution α)
-        (fun a => f a b)) := by
-  calc
-    avgOver (uniformDistribution α) (fun a => avgOver (uniformDistribution β) (f a))
-        = avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) := by
-          exact (avgOver_uniform_prod (α := α) (β := β) (f := f)).symm
-    _ = avgOver (uniformDistribution (β × α)) (fun ba => f ba.2 ba.1) := by
-          simpa using
-            (avgOver_uniform_equiv (e := Equiv.prodComm α β)
-              (f := fun ab : α × β => f ab.1 ab.2))
-    _ = avgOver (uniformDistribution β) (fun b => avgOver (uniformDistribution α)
-          (fun a => f a b)) := by
-          exact avgOver_uniform_prod (α := β) (β := α) (f := fun b a => f a b)
-
 private lemma avgOver_uniform_pointNext_decompose
     (params : Parameters) [FieldModel params.q]
     (f : Point params.next → Error) :
@@ -940,76 +919,11 @@ private lemma postprocess_sandwichByOuterSubMeas_snd_outcome
   classical
   simp [postprocess, sandwichByOuterSubMeas, Finset.sum_filter, Fintype.sum_prod_type]
 
-private lemma opTensor_smul_left_error
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (c : Error) (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
-    opTensor (c • A) B = c • opTensor A B := by
-  ext x y
-  simp [opTensor, mul_comm, mul_left_comm]
-
-private lemma opTensor_smul_right_error
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (c : Error) (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
-    opTensor A (c • B) = c • opTensor A B := by
-  ext x y
-  simp [opTensor, mul_comm, mul_left_comm]
-
+/-- Real scalar multiplication pulls out of expectations. -/
 private lemma ev_smul_error {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (c : Error) (X : MIPStarRE.Quantum.Op ι) :
     ev ψ (c • X) = c * ev ψ X := by
   simpa using ev_scale ψ c X
-
-private lemma opTensor_add_left_local
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A B : MIPStarRE.Quantum.Op ιA) (C : MIPStarRE.Quantum.Op ιB) :
-    opTensor (A + B) C = opTensor A C + opTensor B C := by
-  ext x y
-  simp [opTensor, add_mul]
-
-private lemma opTensor_add_right_local
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : MIPStarRE.Quantum.Op ιA) (B C : MIPStarRE.Quantum.Op ιB) :
-    opTensor A (B + C) = opTensor A B + opTensor A C := by
-  ext x y
-  simp [opTensor, mul_add]
-
-private lemma opTensor_sum_left_finset
-    {α ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (s : Finset α) (f : α → MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
-    opTensor (∑ a ∈ s, f a) B = ∑ a ∈ s, opTensor (f a) B := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp [opTensor]
-  | @insert a s ha ih =>
-      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_left_local, ih]
-
-private lemma opTensor_sum_right_finset
-    {α ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : MIPStarRE.Quantum.Op ιA) (s : Finset α) (f : α → MIPStarRE.Quantum.Op ιB) :
-    opTensor A (∑ a ∈ s, f a) = ∑ a ∈ s, opTensor A (f a) := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp [opTensor]
-  | @insert a s ha ih =>
-      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_right_local, ih]
-
-private lemma opTensor_sum_left_univ
-    {α ιA ιB : Type*} [Fintype α]
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (f : α → MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
-    opTensor (∑ a : α, f a) B = ∑ a : α, opTensor (f a) B := by
-  classical
-  simpa using opTensor_sum_left_finset (s := (Finset.univ : Finset α)) (f := f) (B := B)
-
-private lemma opTensor_sum_right_univ
-    {α ιA ιB : Type*} [Fintype α]
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : MIPStarRE.Quantum.Op ιA) (f : α → MIPStarRE.Quantum.Op ιB) :
-    opTensor A (∑ a : α, f a) = ∑ a : α, opTensor A (f a) := by
-  classical
-  simpa using opTensor_sum_right_finset (A := A) (s := (Finset.univ : Finset α)) (f := f)
 
 /-- Move the first finite sum past the third while keeping the second and fourth fixed. -/
 private lemma phaseFive_sum_comm_four
