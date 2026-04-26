@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
-import MIPStarRE.LDT.Basic.SubMeasurement
+import MIPStarRE.LDT.Basic.MeasurementLift
 import MIPStarRE.LDT.Test.Defs
 
 /-!

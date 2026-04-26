@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.SwitcherooSetup
+import MIPStarRE.LDT.Pasting.SwitcherooSetup.Terms
 
 set_option linter.style.setOption false
 set_option linter.unusedSimpArgs false

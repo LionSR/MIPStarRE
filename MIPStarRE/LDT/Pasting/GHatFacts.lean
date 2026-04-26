@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.CommutingWithG
+import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 
 set_option linter.style.setOption false
 set_option linter.unusedSimpArgs false

@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
-import MIPStarRE.LDT.Basic.SubMeasurement
+import MIPStarRE.LDT.Basic.MeasurementLift
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 

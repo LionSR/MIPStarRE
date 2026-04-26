@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MainInductionStep.Defs
+import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 
 /-!
