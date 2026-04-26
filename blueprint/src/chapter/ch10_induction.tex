@@ -302,9 +302,10 @@
 
 \begin{lemma}[Role-register symmetrization bridge]\label{lem:symmetrization-bridge}
 	\lean{MIPStarRE.LDT.ProjStrat.strategySymmetrization, MIPStarRE.LDT.ProjStrat.strategySymmetrization_isGood_three_mul, MIPStarRE.LDT.ProjStrat.strategySymmetrization_isNormalized}
+	\lean{MIPStarRE.LDT.ProjStrat.StrategySymmetrizationPackage, MIPStarRE.LDT.ProjStrat.StrategySymmetrizationPackage.isGood_strategySymmetrization, MIPStarRE.LDT.ProjStrat.StrategySymmetrizationPackage.isNormalized_strategySymmetrization, MIPStarRE.LDT.ProjStrat.strategySymmetrizationPackage}
 	\leanok
 	\uses{def:projective-strategy, def:symmetric-projective-strategy, def:good-strategy}
-	Let $(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})$ be a projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Introducing a two-dimensional role register on each side and taking $(\psi_{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})$ as in paper Section~3 yields a symmetric projective strategy that is $(3\eps,3\eps,3\eps)$-good.
+	Let $(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})$ be a projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Introducing a two-dimensional role register on each side and taking $(\psi_{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})$ as in paper Section~3 yields a symmetric projective strategy that is $(3\eps,3\eps,3\eps)$-good. The Lean package records this symmetrized strategy together with its goodness and normalization proofs for later use by the proof of Theorem~\ref{thm:main-formal}.
 \end{lemma}
 \begin{proof}
 	\leanok
