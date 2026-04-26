@@ -158,7 +158,7 @@ theorem avgOver_sum {α β : Type*} [Fintype β]
           rw [Finset.sum_comm]
 
 /-- Fubini swap for two nested finite-support distribution averages. -/
-theorem avgOver_commute {α β : Type*} (𝒟α : Distribution α) (𝒟β : Distribution β)
+theorem avgOver_comm {α β : Type*} (𝒟α : Distribution α) (𝒟β : Distribution β)
     (f : α → β → Error) :
     avgOver 𝒟α (fun a => avgOver 𝒟β (f a)) =
       avgOver 𝒟β (fun b => avgOver 𝒟α (fun a => f a b)) := by
