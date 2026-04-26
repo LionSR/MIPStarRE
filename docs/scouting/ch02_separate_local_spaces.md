@@ -30,10 +30,10 @@ Lean:
 
 Coordination audit (2026-04-23 snapshot):
 
-- Open PR #641 touches `MIPStarRE/LDT/Test/StrategyFailures.lean`
-- Open PRs #646 and #649 touch `MIPStarRE/LDT/Test/MainTheorem.lean`
-- Open PRs #645 and #649 touch `MIPStarRE/LDT/MainInductionStep/*`
-- Open PRs #609 and #620 touch `MIPStarRE/LDT/Commutativity/*`
+- Then-open PR #641 touched `MIPStarRE/LDT/Test/StrategyFailures.lean`
+- Then-open PRs #646 and #649 touched `MIPStarRE/LDT/Test/MainTheorem.lean`
+- Then-open PRs #645 and #649 touched `MIPStarRE/LDT/MainInductionStep/*`
+- Then-open PRs #609 and #620 touched `MIPStarRE/LDT/Commutativity/*`
 
 ## Executive summary
 
