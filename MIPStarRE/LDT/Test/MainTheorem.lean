@@ -518,7 +518,7 @@ theorem mainFormalInductionNu_bound {params : Parameters} {k : ℕ} {eps : Error
 
 /-- If the unscaled Step 8 envelope is already at least `1`, then the public
 `mainFormalError` envelope is also at least `1`. -/
-private theorem mainFormalError_ge_one_of_one_le_envelope
+theorem mainFormalError_ge_one_of_one_le_envelope
     (params : Parameters) (k : ℕ) (eps : Error)
     (hk0 : 0 < k)
     (henv : 1 ≤ mainFormalEnvelope params k eps) :
@@ -542,7 +542,7 @@ private theorem mainFormalError_ge_one_of_one_le_envelope
 /-- If `ε > 1`, then the final error envelope has already saturated past `1`.
 This discharges the non-paper regime before invoking the paper's Step 8 cascade,
 which assumes `ε ≤ 1`. -/
-private theorem mainFormalError_ge_one_of_one_lt_eps
+theorem mainFormalError_ge_one_of_one_lt_eps
     (params : Parameters) (k : ℕ) {eps : Error}
     (hk0 : 0 < k) (heps : 1 < eps) :
     1 ≤ mainFormalError params k eps := by
@@ -562,7 +562,7 @@ private theorem mainFormalError_ge_one_of_one_lt_eps
 /-- If `d > q`, then the final error envelope has already saturated past `1`.
 Thus the nontrivial Step 8 branch may assume the paper's ambient `d/q ≤ 1`
 regime. -/
-private theorem mainFormalError_ge_one_of_q_lt_d
+theorem mainFormalError_ge_one_of_q_lt_d
     (params : Parameters) (k : ℕ) (eps : Error)
     (hk0 : 0 < k) (hepsNN : 0 ≤ eps)
     (hqd : (params.q : Error) < (params.d : Error)) :
