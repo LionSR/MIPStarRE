@@ -80,6 +80,38 @@ class ParseDeclarationTests(unittest.TestCase):
                 ["attributedBad", "attributedPrivateBad"],
             )
 
+    def test_header_parser_accepts_nonrec_modifiers(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    nonrec theorem nonrecTheoremBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+
+                    nonrec lemma nonrecLemmaBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual(
+                [decl.name for decl in decls],
+                ["nonrecTheoremBad", "nonrecLemmaBad"],
+            )
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(
+                [finding.decl for finding in result.review_findings],
+                ["nonrecTheoremBad", "nonrecLemmaBad"],
+            )
+
     def test_header_parser_accepts_multiline_attributes(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

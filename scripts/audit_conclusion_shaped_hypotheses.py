@@ -31,7 +31,7 @@ from typing import Iterable, Sequence
 
 _DECL_RE = re.compile(
     r"(?m)^\s*(?:@\[[^\]]*\]\s+)*"
-    r"(?:(?:private|protected|noncomputable|unsafe)\s+)*"
+    r"(?:(?:private|protected|noncomputable|unsafe|nonrec)\s+)*"
     r"(?:@\[[^\]]*\]\s+)*"
     r"(theorem|lemma)\s+([^\s:({\[]+)(?=\s|$|[:({\[])"
 )
