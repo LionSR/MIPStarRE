@@ -229,14 +229,35 @@ noncomputable def generalizeBCollisionResidual (params : Parameters)
         (generalizeBCollisionOperatorAtPolynomial params strategy g qu)
         (G.outcome g)))
 
-/-- Explicit line/parameter expansion of the `lem:generalize-b` collision residual.
+/-- Uniform line/parameter seed expansion of the `lem:generalize-b` collision residual.
 
 This is the paper's `expansion.tex`, lines 286--288, after replacing an
 incident line question `(ℓ,u)` by a line `ℓ` and affine parameter `t` with
-`u = ℓ(t)`: the coefficient is the fraction of parameters where a line answer
-`f` both collides with `g|_ℓ` at `t` and is not equal to `g|_ℓ`.  Issue #753
-reduces the remaining residual work to proving that
-`generalizeBCollisionResidual` is equal to this explicit expansion. -/
+`u = ℓ(t)`, but before commuting the finite average over `t` past the finite
+sum over line answers `f`.  Issue #753 is reduced to proving that
+`generalizeBCollisionResidual` is equal to this seed expansion. -/
+noncomputable def generalizeBSeedCollisionExpansion (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (ψbi : QuantumState (ι × ι))
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) : Error :=
+  avgOver (uniformDistribution (AxisParallelLine params × Fq params))
+    (fun ℓt =>
+      ∑ f : AxisLinePolynomial params,
+        (if f ℓt.2 = (Polynomial.restrictToAxisParallelLine params g ℓt.1) ℓt.2 ∧
+            f.poly ≠ (Polynomial.restrictToAxisParallelLine params g ℓt.1).poly then
+          (1 : Error)
+        else 0) *
+          ev ψbi (opTensor
+            ((strategy.axisParallelMeasurement ℓt.1).toSubMeas.outcome f)
+            (G.outcome g)))
+
+/-- Explicit line/parameter expansion of the `lem:generalize-b` collision residual.
+
+This is the commuted finite-sum form of `generalizeBSeedCollisionExpansion`: for
+fixed `ℓ` and `f`, the coefficient is the fraction of parameters where the line
+answer `f` both collides with `g|_ℓ` at `t` and is not equal to `g|_ℓ`. -/
 noncomputable def generalizeBLineCollisionExpansion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
