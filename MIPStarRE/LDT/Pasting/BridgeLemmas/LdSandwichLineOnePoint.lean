@@ -1924,17 +1924,6 @@ private noncomputable def qBipartiteLinearConsDefect {Outcome : Type*}
     (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) : Error :=
   ev ψ (opTensor A.total B.total) - qBipartiteMatchMass ψ A B
 
-private lemma max_zero_add_abs_le (x y : Error) :
-    max 0 (x + y) ≤ max 0 x + |y| := by
-  by_cases hxy : x + y < 0
-  · rw [max_eq_left_of_lt hxy]
-    positivity
-  · have hxy' : 0 ≤ x + y := le_of_not_gt hxy
-    rw [max_eq_right hxy']
-    have hx : x ≤ max 0 x := le_max_right _ _
-    have hy : y ≤ |y| := le_abs_self y
-    linarith
-
 /-- If the averaged linear consistency-defect gap is at most `η`, then the
 averaged `max 0` bipartite consistency error changes by at most `η`.
 
@@ -1965,7 +1954,7 @@ private lemma bipartiteConsError_le_of_linearDefect_gap
           let a : Error := qBipartiteLinearConsDefect ψ (A q) (C q)
           let b : Error := qBipartiteLinearConsDefect ψ (B q) (C q)
           have hmax : max 0 a ≤ max 0 b + |a - b| := by
-            have h := max_zero_add_abs_le b (a - b)
+            have h := Preliminaries.max_zero_add_le b (a - b)
             have hba : b + (a - b) = a := by ring
             simpa [hba] using h
           simpa [qBipartiteConsDefect, qBipartiteLinearConsDefect, a, b] using hmax
