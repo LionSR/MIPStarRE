@@ -12,6 +12,7 @@
 
 \begin{definition}[Low individual degree test]\label{def:low-individual-degree-test}
 	\lean{MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability, MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest}
+	\lean{MIPStarRE.LDT.BiProjStrat.lowIndividualDegreeFailureProbability, MIPStarRE.LDT.BiProjStrat.PassesLowIndividualDegreeTest}
 	\leanok
 	\uses{def:roles}
 	Fix integers $m,d \ge 0$ and a prime power $q$. The $(m,q,d)$ low individual degree test has three equally likely subtests.
@@ -39,8 +40,9 @@
 	% and $\mathcal H_{\mathrm B}$, whereas the same-space `ProjStrat` forces a common
 	% finite index type. The staged refactor tracked by Issue #560 / scouting doc
 	% `docs/scouting/ch02_separate_local_spaces.md` proceeds in three stages:
-	% Stage 1 (this PR) introduces the paper-faithful container `BiProjStrat ιA ιB`
-	% and the forgetful embedding `ProjStrat.toBiProjStrat`; Stage 2 builds a true
+	% Stage 1 (#676 and the #669 follow-up) introduces the paper-faithful container
+	% `BiProjStrat ιA ιB`, the forgetful embedding `ProjStrat.toBiProjStrat`, and
+	% the two-space low-individual-degree failure predicate; Stage 2 builds a true
 	% direct-sum role symmetrization to replace the same-space `Role × ι` target;
 	% Stage 3 migrates paper-facing statements (`SymStrat`, `mainFormal`) to the
 	% two-space API.
