@@ -1857,6 +1857,68 @@
 
   </div>
 </div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:main-formal-step5-sz-residual">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">10.19</span>
+    <span class="remark_thmtitle">Lean Step 5 residual interface</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-induction.html#rem:main-formal-step5-sz-residual">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#lem:schwartz-zippel-individual">Lemma 3.7</a></li>
+          
+          <li><a href="sec-the-test.html#thm:main-formal">Theorem 2.11</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p>       For the Step&#160;5 passage below, Lean now names the weighted polynomial-collision mass and proves its \(md/q\) bound by specializing the existing tensor Schwartz–Zippel helper. The only remaining Step&#160;5 residual is the explicit expansion/reindexing statement that compares the evaluated consistency defect with the full-polynomial defect plus that collision mass. </p>
+
+  </div>
+</div>
 <div class="proof_wrapper" id="a0000000028">
   <div class="proof_heading">
     <span class="proof_caption">
@@ -1920,6 +1982,7 @@
 <div class="displaymath" id="a0000000597">
   \[  \zeta _1 = 2\sigma + 2\sqrt{3\varepsilon +2\sigma } + \frac{md}{q}.  \]
 </div>
+<p> The Lean Step&#160;5 wrapper   separates the remaining expansion/reindexing obligation from the checked Schwartz–Zippel tensor bound . </p>
 <p>Apply Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.5</a> to <a href="sec-induction.html#eq:G-self-consistency">6</a>. This gives projective submeasurements \(P^{\mathrm A},P^{\mathrm B} \in \mathrm{PolySub}(m,q,d)\) with </p>
 <div class="displaymath" id="a0000000598">
   \[  G_g^{\mathrm A} \otimes I \approx _{100\zeta _1^{1/4}} P_g^{\mathrm A} \otimes I, \qquad I \otimes G_g^{\mathrm B} \approx _{100\zeta _1^{1/4}} I \otimes P_g^{\mathrm B}.  \]
