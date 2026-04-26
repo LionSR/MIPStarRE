@@ -33,7 +33,7 @@ _DECL_RE = re.compile(
     r"(?m)^\s*(?:@\[[^\]]*\]\s+)*"
     r"(?:(?:private|protected|noncomputable|unsafe)\s+)*"
     r"(?:@\[[^\]]*\]\s+)*"
-    r"(theorem|lemma)\s+([A-Za-z_][A-Za-z0-9_.'?]*)\b"
+    r"(theorem|lemma)\s+([^\s:({[]+)\b"
 )
 _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.'?]*")
 _BINDER_NAME_RE = re.compile(r"[^\s:,]+")

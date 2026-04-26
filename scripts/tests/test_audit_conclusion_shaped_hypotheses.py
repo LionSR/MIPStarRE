@@ -104,6 +104,28 @@ class ParseDeclarationTests(unittest.TestCase):
             self.assertEqual(len(result.review_findings), 1)
             self.assertEqual(result.review_findings[0].decl, "multilineAttributedBad")
 
+    def test_header_parser_accepts_unicode_declaration_names(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    theorem degreeOf_eval₂_C_X_le_natDegree
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["degreeOf_eval₂_C_X_le_natDegree"])
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].decl, "degreeOf_eval₂_C_X_le_natDegree")
+
     def test_header_parser_ignores_comment_colons_before_conclusion(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
