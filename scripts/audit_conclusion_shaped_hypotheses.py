@@ -37,7 +37,7 @@ _DECL_RE = re.compile(
 )
 _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.'?]*")
 _ALLOWED_WITNESS_ADAPTER_RE = re.compile(
-    r"(?:of|Of|from|From)Witness$"
+    r"(?:Of|From)Witness$"
 )
 
 # Tokens that usually name binders, Lean syntax, or ubiquitous typeclass
