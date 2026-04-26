@@ -412,44 +412,51 @@ lemma fullSlice_scalar_marginalize_x
       ≤ 2 * Real.sqrt zeta + 2 * Real.sqrt zeta := htri
     _ = 4 * Real.sqrt zeta := by ring
 
-/-- Residual for the still-unproved prefix of the y-side second-term chain.
+/-- Residual for the remaining first `closenessOfIP` leg in the y-side
+second-term prefix.
 
-The target is now paper-faithful: starting from the full scalar quartic
-`fullSliceABABAvg`, lines 332--360 first move through the `BAB ⊗ A` tensor form,
-spend the x-side Schwartz-Zippel loss, and then use two `closenessOfIP` bridges
-to reach the mixed endpoint `xEvaluatedFullSliceABABtensorAvg`.  This costs
-`md/q + 3√ζ`; the y-tail after this endpoint is exported by `Transport.FullSlice`. -/
-private structure FullSliceScalarMarginalizeYPrefixResidual
+The earlier prefix steps from `commutativity-G.tex` lines 332--354 are proved in
+`fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg`: `eq:gcom4` costs `√ζ` and
+`eq:gcom4-diff` costs `md/q`.  The second line-360 `closenessOfIP` bridge from
+`xEvaluatedFullSliceABABAvg` to `xEvaluatedFullSliceABABtensorAvg` is now proved
+in `xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg`.
+
+Thus this residual is only the first paper line-359 bridge from the
+x-evaluated `BAB ⊗ A` tensor endpoint to the scalar endpoint in the display from
+`eq:evaluate-gcom-at-points` to `eq:don't-understand-the-numbering-system`. -/
+private structure FullSliceScalarMarginalizeYFirstClosenessResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error) where
-  prefix_bound :
-    |fullSliceABABAvg params strategy family -
-        xEvaluatedFullSliceABABtensorAvg params strategy family| ≤
-      (↑params.m : Error) * ↑params.d / ↑params.q + 3 * Real.sqrt zeta
+  first_closeness :
+    |xEvaluatedSliceBABAtensorAvg params strategy family -
+        xEvaluatedFullSliceABABAvg params strategy family| ≤
+      Real.sqrt zeta
 
-/-- Remaining prefix witness for the `y` side.
+/-- Remaining first `closenessOfIP` witness for the `y` prefix.
 
-This is the only y-side proof gap left in this file after exposing the proved
-#750 tail.  It corresponds to paper `commutativity-G.tex` lines 332--360, not to
-the y-marginalization line 369--385. -/
-private noncomputable def fullSliceScalarMarginalizeYPrefixResidual
+This is now the only y-prefix proof gap left in this file.  It corresponds to
+paper `commutativity-G.tex` line 359, not to `eq:gcom4`, `eq:gcom4-diff`, the
+line-360 scalar-to-tensor bridge, or the y-marginalization lines 369--385. -/
+private noncomputable def fullSliceScalarMarginalizeYFirstClosenessResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error)
     (hnorm : strategy.state.IsNormalized)
     (hself : family.StronglySelfConsistent strategy.state zeta) :
-    FullSliceScalarMarginalizeYPrefixResidual params strategy family zeta := by
-  exact ⟨fullSliceABAB_to_xEvaluatedFullSliceABABtensorAvg
+    FullSliceScalarMarginalizeYFirstClosenessResidual params strategy family zeta := by
+  exact ⟨xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABAvg
     params strategy family zeta hnorm hself⟩
 
 /-- Paper-faithful second-term transport bound.
 
-The first prefix (paper lines 332--360) costs `md/q + 3√ζ`; the proved y-tail
-uses y-Schwartz--Zippel marginalization (paper lines 369--385) plus the `√ζ`
-scalar↔tensor bridge that is the doubly-evaluated analogue of paper line 360,
-for a total `md/q + √ζ`. Thus the whole scalar second-term comparison costs
-`2·md/q + 4√ζ`. -/
+The proved x-prefix (`eq:gcom4` plus `eq:gcom4-diff`, paper lines 332--354)
+costs `md/q + √ζ`; the remaining line-359 `closenessOfIP` residual costs `√ζ`;
+the line-360 scalar↔tensor bridge is proved in
+`xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg` and costs
+another `√ζ`; and the proved y-tail uses y-Schwartz--Zippel marginalization
+(paper lines 369--385) plus the `√ζ` doubly-evaluated scalar↔tensor bridge. Thus
+the whole scalar second-term comparison costs `2·md/q + 4√ζ`. -/
 lemma fullSlice_scalar_marginalize_y
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
@@ -459,17 +466,35 @@ lemma fullSlice_scalar_marginalize_y
     |fullSliceABABAvg params strategy family -
         evaluatedSliceABABAvg params strategy family| ≤
       (2 * ((↑params.m : Error) * ↑params.d / ↑params.q) + 4 * Real.sqrt zeta) := by
-  let yPrefix :=
-    fullSliceScalarMarginalizeYPrefixResidual
+  let yClose :=
+    fullSliceScalarMarginalizeYFirstClosenessResidual
+      params strategy family zeta hnorm hself
+  have hxPrefix :=
+    fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg
       params strategy family zeta hnorm hself
   have htail :=
     xEvaluatedFullSliceABABtensor_to_evaluatedSliceABABAvg
       params strategy family zeta hnorm hself
-  have h := abs_sub_le_of_two_step yPrefix.prefix_bound htail
+  have hsecond :=
+    xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg
+      params strategy family zeta hnorm hself
+  have hclose := abs_sub_le_of_two_step yClose.first_closeness hsecond
+  have hclose_bound :
+      |xEvaluatedSliceBABAtensorAvg params strategy family -
+          xEvaluatedFullSliceABABtensorAvg params strategy family| ≤
+        2 * Real.sqrt zeta := by
+    calc
+      |xEvaluatedSliceBABAtensorAvg params strategy family -
+          xEvaluatedFullSliceABABtensorAvg params strategy family|
+        ≤ Real.sqrt zeta + Real.sqrt zeta := hclose
+      _ = 2 * Real.sqrt zeta := by ring
+  have hprefix := abs_sub_le_of_two_step hxPrefix hclose_bound
+  have h := abs_sub_le_of_two_step hprefix htail
   calc
     |fullSliceABABAvg params strategy family -
         evaluatedSliceABABAvg params strategy family|
-      ≤ ((↑params.m : Error) * ↑params.d / ↑params.q + 3 * Real.sqrt zeta) +
+      ≤ (((↑params.m : Error) * ↑params.d / ↑params.q + Real.sqrt zeta) +
+          2 * Real.sqrt zeta) +
           ((↑params.m : Error) * ↑params.d / ↑params.q + Real.sqrt zeta) := h
     _ = 2 * ((↑params.m : Error) * ↑params.d / ↑params.q) +
           4 * Real.sqrt zeta := by ring
