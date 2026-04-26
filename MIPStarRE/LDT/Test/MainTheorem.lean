@@ -152,15 +152,12 @@ Whenever the envelope `mainFormalError params k eps` has already saturated past
 `thm:main-induction` in `references/ldt-paper/inductive_step.tex`) that the
 bound it is proving is vacuous whenever the error scale is at least `1`.
 
-In the `mainFormal` assembly this wrapper handles the regime
-`params.m * params.d ≤ k < 400 * params.m * params.d`, where the Section 6 /
-Pasting-side hypothesis `400 * params.m * params.d ≤ k` fails. The
-complementary regime `400 * params.m * params.d ≤ k` feeds directly into the
-public induction/pasting wrappers (`mainInductionByRecursionOnM` in
-`MIPStarRE.LDT.MainInductionStep`). The arithmetic bridge
-`1 ≤ mainFormalError params k eps` itself is discharged inside the proof of
-`mainFormal` from the envelope inflation chain already packaged by
-`errorCascade_le_mainFormalError`; see TODO(#634).
+In the `mainFormal` assembly this wrapper handles every vacuous envelope branch:
+in particular, the non-paper scalar regimes `ε > 1` or `d > q`, and the future
+small-`k` branch `params.m * params.d ≤ k < 400 * params.m * params.d` once the
+Section 6 / Pasting-side wrapper is threaded into the proof. The complementary
+non-vacuous branch `mainFormalError params k eps < 1` supplies the scalar
+hypotheses needed by the Step 8 cascade.
 
 Witness choice: we pick an arbitrary `ProjMeas` via `default` — the proof only
 needs the generic bound `bipartiteConsError ≤ 1`, not any specific
@@ -519,6 +516,96 @@ theorem mainFormalInductionNu_bound {params : Parameters} {k : ℕ} {eps : Error
     _ = 10000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
           (e + dq) := by ring
 
+/-- If the unscaled Step 8 envelope is already at least `1`, then the public
+`mainFormalError` envelope is also at least `1`. -/
+private theorem mainFormalError_ge_one_of_one_le_envelope
+    (params : Parameters) (k : ℕ) (eps : Error)
+    (hk0 : 0 < k)
+    (henv : 1 ≤ mainFormalEnvelope params k eps) :
+    1 ≤ mainFormalError params k eps := by
+  rw [mainFormalError_eq_envelope]
+  have hk : (1 : Error) ≤ (k : Error) := by exact_mod_cast hk0
+  have hm : (1 : Error) ≤ (params.m : Error) := by exact_mod_cast params.hm
+  have hk2 : (1 : Error) ≤ ((k : Error) ^ (2 : ℕ)) := by
+    simpa using one_le_pow₀ (n := (2 : ℕ)) hk
+  have hm4 : (1 : Error) ≤ ((params.m : Error) ^ (4 : ℕ)) := by
+    simpa using one_le_pow₀ (n := (4 : ℕ)) hm
+  have hcoeff :
+      (1 : Error) ≤ 100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by
+    nlinarith
+  have hcoeffNN :
+      0 ≤ 100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by
+    positivity
+  have hmul := mul_le_mul hcoeff henv (by norm_num : (0 : Error) ≤ 1) hcoeffNN
+  simpa using hmul
+
+/-- If `ε > 1`, then the final error envelope has already saturated past `1`.
+This discharges the non-paper regime before invoking the paper's Step 8 cascade,
+which assumes `ε ≤ 1`. -/
+private theorem mainFormalError_ge_one_of_one_lt_eps
+    (params : Parameters) (k : ℕ) {eps : Error}
+    (hk0 : 0 < k) (heps : 1 < eps) :
+    1 ≤ mainFormalError params k eps := by
+  have hepsPow : 1 ≤ Real.rpow eps (1 / (40000 : Error)) := by
+    exact Real.one_le_rpow heps.le (by positivity)
+  have hdqPowNN : 0 ≤ Real.rpow ((params.d : Error) / (params.q : Error))
+      (1 / (40000 : Error)) := by
+    exact Real.rpow_nonneg (div_nonneg (Nat.cast_nonneg _) params.q_cast_pos.le) _
+  have hExpNN :
+      0 ≤ Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))) :=
+    Real.exp_nonneg _
+  have henv : 1 ≤ mainFormalEnvelope params k eps := by
+    unfold mainFormalEnvelope
+    nlinarith
+  exact mainFormalError_ge_one_of_one_le_envelope params k eps hk0 henv
+
+/-- If `d > q`, then the final error envelope has already saturated past `1`.
+Thus the nontrivial Step 8 branch may assume the paper's ambient `d/q ≤ 1`
+regime. -/
+private theorem mainFormalError_ge_one_of_q_lt_d
+    (params : Parameters) (k : ℕ) (eps : Error)
+    (hk0 : 0 < k) (hepsNN : 0 ≤ eps)
+    (hqd : (params.q : Error) < (params.d : Error)) :
+    1 ≤ mainFormalError params k eps := by
+  have hdq_gt_one : 1 < (params.d : Error) / (params.q : Error) := by
+    exact (one_lt_div params.q_cast_pos).2 hqd
+  have hdqPow : 1 ≤ Real.rpow ((params.d : Error) / (params.q : Error))
+      (1 / (40000 : Error)) := by
+    exact Real.one_le_rpow hdq_gt_one.le (by positivity)
+  have hepsPowNN : 0 ≤ Real.rpow eps (1 / (40000 : Error)) :=
+    Real.rpow_nonneg hepsNN _
+  have hExpNN :
+      0 ≤ Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))) :=
+    Real.exp_nonneg _
+  have henv : 1 ≤ mainFormalEnvelope params k eps := by
+    unfold mainFormalEnvelope
+    nlinarith
+  exact mainFormalError_ge_one_of_one_le_envelope params k eps hk0 henv
+
+/-- In the non-vacuous branch of `mainFormal`, the standing scalar hypotheses of
+Step 8 follow from the theorem's basic positivity data.
+
+If either `ε > 1` or `d > q`, the final error `mainFormalError` is already at
+least `1`, so `mainFormal_trivial_witness` handles the theorem. Hence under
+`¬ 1 ≤ mainFormalError params k eps` we may safely enter the paper's cascade
+regime `0 ≤ ε ≤ 1` and `d/q ≤ 1`. -/
+theorem cascadeHypotheses_of_not_mainFormalError_ge_one
+    {params : Parameters} {k : ℕ} {eps : Error}
+    (hepsNN : 0 ≤ eps) (hk0 : 0 < k)
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
+    CascadeHypotheses params k eps where
+  hk := by exact_mod_cast hk0
+  hm := by exact_mod_cast params.hm
+  hepsNN := hepsNN
+  hepsOne := by
+    by_contra heps_not
+    exact hsmall (mainFormalError_ge_one_of_one_lt_eps params k hk0 (lt_of_not_ge heps_not))
+  hdq := by
+    by_contra hdq_not
+    exact hsmall (mainFormalError_ge_one_of_q_lt_d params k eps hk0 hepsNN
+      (lt_of_not_ge hdq_not))
+  hqPos := params.q_cast_pos
+
 /-- Scalar hypotheses for the Section 3 error cascade of `mainFormal`.
 
 This package is intentionally scalar-only. It does not assert any measurement
@@ -550,6 +637,17 @@ theorem ofCascadeHypotheses {params : Parameters} {eps : Error} {k : ℕ}
   cascadeHypotheses := h
   inductionNu_nonneg := mainFormalInductionNu_nonneg h
   inductionNu_bound := mainFormalInductionNu_bound h
+
+/-- Build the scalar package in the non-vacuous branch of `mainFormal`.
+
+The branch hypothesis `¬ 1 ≤ mainFormalError params k eps` rules out the
+non-paper regimes `ε > 1` and `d > q`, while `hepsNN` and `hk0` supply the
+remaining scalar positivity hypotheses. -/
+theorem ofNontrivialMainFormal {params : Parameters} {eps : Error} {k : ℕ}
+    (hepsNN : 0 ≤ eps) (hk0 : 0 < k)
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
+    MainFormalCascadeScalars params eps k :=
+  ofCascadeHypotheses (cascadeHypotheses_of_not_mainFormalError_ge_one hepsNN hk0 hsmall)
 
 /-- The paper's `σ`, built from the symmetrized main-induction `ν`. -/
 noncomputable def sigma {params : Parameters} {eps : Error} {k : ℕ}
@@ -642,6 +740,59 @@ structure MainFormalCascadeTargets
       (constSubMeasFamily leftMeasurement.toSubMeas)
       (constSubMeasFamily rightMeasurement.toSubMeas)
       (scalars.zeta3 / 2)
+
+/-- The transport-only part of the remaining Section 3 assembly once the scalar
+cascade has been discharged.
+
+Compared with `MainFormalCascadeTargets`, this package is parameterized by an
+already-constructed `MainFormalCascadeScalars`. It therefore records only the
+unsymmetrization, Schwartz--Zippel, and projectivization targets from
+`inductive_step.tex` lines 84--185. -/
+structure MainFormalCascadeTransportTargets
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
+  leftMeasurement : ProjMeas (Polynomial params) ι
+  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
+  rightMeasurement : ProjMeas (Polynomial params) ι
+  /-- Native form of `eq:one-goal` at the paper-defined `ζ₄`. -/
+  pointAConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      scalars.zeta4
+  /-- Native form of `eq:another-goal` at the paper-defined `ζ₄`. -/
+  pointBConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      scalars.zeta4
+  /-- Native form of `eq:third-goal` at the paper-defined `ζ₃/2`. -/
+  selfConsistency :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily leftMeasurement.toSubMeas)
+      (constSubMeasFamily rightMeasurement.toSubMeas)
+      (scalars.zeta3 / 2)
+
+namespace MainFormalCascadeTransportTargets
+
+/-- Add the already-discharged scalar package back to the transport-only targets. -/
+noncomputable def toCascadeTargets {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (targets : MainFormalCascadeTransportTargets params strategy eps k scalars) :
+    MainFormalCascadeTargets params strategy eps k where
+  scalars := scalars
+  leftMeasurement := targets.leftMeasurement
+  rightMeasurement := targets.rightMeasurement
+  pointAConsistency := targets.pointAConsistency
+  pointBConsistency := targets.pointBConsistency
+  selfConsistency := targets.selfConsistency
+
+end MainFormalCascadeTransportTargets
 
 /-- Paper-native final targets for the remaining `mainFormal` assembly.
 
@@ -764,13 +915,14 @@ The bipartite tensor placement follows the paper:
 The `k`-bound boundary matches the paper (`references/ldt-paper/test_definition.tex:183`):
 the public hypothesis is `params.m * params.d ≤ k`, not the stronger
 `400 * params.m * params.d ≤ k` used by the Section 6 / Pasting-side wrappers.
-The planned assembly case-splits on `k`:
+After first separating off the vacuous envelope branch, the planned assembly
+case-splits on `k`:
 
 * Regime `400 * params.m * params.d ≤ k`: invoke the public Section 6
   wrapper `MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper`,
   using the base-case handoff
   `strategySymmetrization_mainInductionBaseCase` and the successor-boundary
-  package `MainFormalSuccessorBoundary`, to discharge the three `ConsRel`
+  package `MainFormalSuccessorBoundary`, to discharge the three transport
   targets through the paper's cascade.
 * Regime `params.m * params.d ≤ k < 400 * params.m * params.d`: the final
   envelope `mainFormalError params k eps` saturates past `1` (in the spirit of
@@ -812,20 +964,26 @@ theorem mainFormal
   --   `mainFormalSuccessorMainInductionPublicWrapper`, and
   -- * vacuous branch: `mainFormal_trivial_witness`.
   --
-  -- The remaining paper-faithful target is now narrowed to
-  -- `MainFormalCascadeTargets`: construct the projective measurements
-  -- `Q^A,Q^B`, the scalar cascade hypotheses, and the native `ζ₄`, `ζ₄`, and
-  -- `ζ₃/2` consistency bounds from `inductive_step.tex` lines 159--185. The
-  -- checked wrapper `MainFormalCascadeTargets.toNativeTargets` then applies the
-  -- Step 8 absorption fields to weaken them to `mainFormalError`. Producing that
-  -- package still depends on the active upstream transport and pasting residuals:
-  -- the role unsymmetrization bridge (#424), the full-slice transport chain
-  -- (#601), the remaining `fromHToG` pasting bridge (#707), the reverse
-  -- `overAllOutcomes` aggregation (#672), and the ProcessedG scalar residual
-  -- follow-ups #714, #715, #732, and #759.
-  have cascadeTargets : MainFormalCascadeTargets params strategy eps k := by
-    sorry
-  exact MainFormalNativeTargets.toMainFormal cascadeTargets.toNativeTargets
+  -- The remaining paper-faithful target is now narrowed to the non-vacuous
+  -- transport-only package `MainFormalCascadeTransportTargets`. The scalar
+  -- cascade side conditions are discharged below: if `mainFormalError ≥ 1`, the
+  -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
+  -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the transport
+  -- package still depends on the active upstream residuals: the role
+  -- unsymmetrization bridge (#424), the full-slice transport chain (#601), the
+  -- remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
+  -- aggregation (#672), and the ProcessedG scalar follow-ups #714, #715, #732,
+  -- and #759.
+  by_cases herr : 1 ≤ mainFormalError params k eps
+  · exact mainFormal_trivial_witness params strategy eps k herr
+  · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
+    let scalars : MainFormalCascadeScalars params eps k :=
+      MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
+    have transportTargets :
+        MainFormalCascadeTransportTargets params strategy eps k scalars := by
+      sorry
+    exact MainFormalNativeTargets.toMainFormal
+      (transportTargets.toCascadeTargets.toNativeTargets)
 
 end Test
 
