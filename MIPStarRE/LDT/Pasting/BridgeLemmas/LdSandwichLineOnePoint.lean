@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
 
 /-!
@@ -1669,9 +1670,7 @@ private lemma ldSandwichLineOnePoint_endpoint_comm_error_le
     (hdelta_nonneg : 0 ≤ delta)
     (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_nonneg : 0 ≤ zeta)
-    (_hgamma_le : gamma ≤ 1)
-    (hzeta_le : zeta ≤ 1)
-    (_hdq_le : params.d ≤ params.q) :
+    (hzeta_le : zeta ≤ 1) :
     zeta + Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1) +
         2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta j) ≤
       ldSandwichLineOnePointError params eps delta gamma zeta k := by
@@ -1791,10 +1790,20 @@ private lemma ldSandwichLineOnePoint_endpoint_comm_error_le
         commuteGHalfSandwichError params gamma zeta j
             = 426 * ((j : Error) ^ (2 : ℕ)) * (params.m : Error) * sixteenthSum := by
               simp [commuteGHalfSandwichError, sixteenthSum]
+        _ ≤ 441 * ((j : Error) ^ (2 : ℕ)) * (params.m : Error) * sixteenthSum := by
+              have hcoef :
+                  426 * ((j : Error) ^ (2 : ℕ)) * (params.m : Error) ≤
+                    441 * ((j : Error) ^ (2 : ℕ)) * (params.m : Error) := by
+                have hbase : (426 : Error) ≤ 441 := by norm_num
+                have htail_nonneg : 0 ≤ ((j : Error) ^ (2 : ℕ)) * (params.m : Error) := by
+                  positivity
+                simpa [mul_assoc] using mul_le_mul_of_nonneg_right hbase htail_nonneg
+              exact mul_le_mul_of_nonneg_right hcoef hsixteenth_nonneg
         _ ≤ 441 * ((j : Error) ^ (2 : ℕ)) * (params.m : Error) *
               (thirtysecondSum ^ (2 : ℕ)) := by
-              gcongr
-              norm_num
+              have hcoef_nonneg : 0 ≤ 441 * ((j : Error) ^ (2 : ℕ)) * (params.m : Error) := by
+                positivity
+              exact mul_le_mul_of_nonneg_left hsixteenth_le_thirtysecond_sq hcoef_nonneg
         _ ≤ 441 * ((j : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
               (thirtysecondSum ^ (2 : ℕ)) := by
               gcongr
@@ -1963,12 +1972,8 @@ private lemma ldSandwichLineOnePoint_matchMass_lower_bound
     (hdelta_nonneg : 0 ≤ delta)
     (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_nonneg : 0 ≤ zeta)
-    (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
-    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
-    (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
     (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi)
     (hmovedEndpoint :
@@ -2015,7 +2020,7 @@ private lemma ldSandwichLineOnePoint_matchMass_lower_bound
   exact le_trans hprefix_le <|
     ldSandwichLineOnePoint_endpoint_comm_error_le
       params eps delta gamma zeta (Nat.succ_pos i) (Nat.succ_le_of_lt hi)
-      heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hgamma_le hzeta_le hdq_le
+      heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le
 
 /-- Package the scalar match-mass lower bound as the `ConsRel` needed by the
 public one-point bridge. -/
@@ -2028,12 +2033,8 @@ private lemma ldSandwichLineOnePoint_nonzero_prefix_transport
     (hdelta_nonneg : 0 ≤ delta)
     (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_nonneg : 0 ≤ zeta)
-    (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
-    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
     (hprefixRaw :
       SDDOpRel strategy.state
@@ -2085,8 +2086,8 @@ private lemma ldSandwichLineOnePoint_nonzero_prefix_transport
       rawRightEndpoint := hrawRightEndpoint }
   have hprefixBound := ldSandwichLineOnePoint_matchMass_lower_bound
     params strategy eps delta gamma zeta
-    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hgamma_le hzeta_le hdq_le
-    family hself hbound hi hi0 facts hmovedEndpoint
+    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le
+    family hi hi0 facts hmovedEndpoint
   exact ⟨by
     simpa [ldSandwichLineOnePointLeftFamily_eq_prefixOriginal params strategy family hi]
       using hprefixBound⟩
@@ -2112,13 +2113,9 @@ private lemma ldSandwichLineOnePoint_core
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
-    (hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (hcomm : ∀ j : ℕ, 2 ≤ j →
       CommuteGHalfSandwichStatement params strategy.state family
         gamma zeta j)
@@ -2128,35 +2125,35 @@ private lemma ldSandwichLineOnePoint_core
       (ldSandwichLineOnePointLeftFamily params strategy family k i)
       (ldSandwichLineOnePointRightFamily params strategy family k i)
       (ldSandwichLineOnePointError params eps delta gamma zeta k) := by
+  have heps_nonneg : 0 ≤ eps := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params.next))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy))
+      hgood.axisParallelTest
+  have hdelta_nonneg : 0 ≤ delta := by
+    exact le_trans
+      (bipartiteSSCError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      hgood.selfConsistencyTest
+  have hgamma_nonneg : 0 ≤ gamma := by
+    have hdiag_nonneg : 0 ≤ strategy.diagonalFailureProbability := by
+      unfold SymStrat.diagonalFailureProbability
+      exact mul_nonneg (by positivity)
+        (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
+    exact le_trans hdiag_nonneg hgood.diagonalLineTest
+  have hzeta_nonneg : 0 ≤ zeta := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        family.evaluatedAtNextPoint)
+      hcons.pointConsistency.offDiagonalBound
   by_cases hi0 : i = 0
   · subst i
     have hk_pos : 1 ≤ k := Nat.succ_le_of_lt hi
-    have heps_nonneg : 0 ≤ eps := by
-      exact le_trans
-        (bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (AxisParallelTestSample params.next))
-          (axisParallelPointAnswerFamily strategy)
-          (axisParallelLineAnswerFamily strategy))
-        hgood.axisParallelTest
-    have hdelta_nonneg : 0 ≤ delta := by
-      exact le_trans
-        (bipartiteSSCError_nonneg strategy.state
-          (uniformDistribution (Point params.next))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-        hgood.selfConsistencyTest
-    have hgamma_nonneg : 0 ≤ gamma := by
-      have : 0 ≤ strategy.diagonalFailureProbability := by
-        unfold SymStrat.diagonalFailureProbability
-        exact mul_nonneg (by positivity)
-          (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
-      exact le_trans this hgood.diagonalLineTest
-    have hzeta_nonneg : 0 ≤ zeta := by
-      exact le_trans
-        (bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (Point params.next))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-          family.evaluatedAtNextPoint)
-        hcons.pointConsistency.offDiagonalBound
     let eps' : Error := min eps 1
     let delta' : Error := min delta 1
     have haxis_le_one : strategy.axisParallelFailureProbability ≤ 1 := by
@@ -2217,36 +2214,10 @@ private lemma ldSandwichLineOnePoint_core
           (zeta + Real.sqrt (8 * (params.m : Error) * min eps 1 +
             4 * min delta 1)) := by
       simpa [eps', delta'] using hmovedEndpoint
-    have heps_nonneg : 0 ≤ eps := by
-      exact le_trans
-        (bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (AxisParallelTestSample params.next))
-          (axisParallelPointAnswerFamily strategy)
-          (axisParallelLineAnswerFamily strategy))
-        hgood.axisParallelTest
-    have hdelta_nonneg : 0 ≤ delta := by
-      exact le_trans
-        (bipartiteSSCError_nonneg strategy.state
-          (uniformDistribution (Point params.next))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-        hgood.selfConsistencyTest
-    have hgamma_nonneg : 0 ≤ gamma := by
-      have hdiag_nonneg : 0 ≤ strategy.diagonalFailureProbability := by
-        unfold SymStrat.diagonalFailureProbability
-        exact mul_nonneg (by positivity)
-          (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
-      exact le_trans hdiag_nonneg hgood.diagonalLineTest
-    have hzeta_nonneg : 0 ≤ zeta := by
-      exact le_trans
-        (bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (Point params.next))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-          family.evaluatedAtNextPoint)
-        hcons.pointConsistency.offDiagonalBound
     exact ldSandwichLineOnePoint_nonzero_prefix_transport
       params strategy eps delta gamma zeta
-      heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hgamma_le hzeta_le hdq_le
-      family hself hbound hi hi0 hprefixRaw hmovedEndpoint'
+      heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le
+      family hi hi0 hprefixRaw hmovedEndpoint'
 
 /-- `lem:ld-sandwich-line-one-point`. -/
 lemma ldSandwichLineOnePoint
@@ -2255,13 +2226,13 @@ lemma ldSandwichLineOnePoint
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (hgamma_le : gamma ≤ 1)
+    (_hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
-    (hdq_le : params.d ≤ params.q)
+    (_hdq_le : params.d ≤ params.q)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (_hself : family.StronglySelfConsistent strategy.state zeta)
+    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (hfacts : GHatFactsStatement params strategy.state family gamma zeta)
     (k i : ℕ)
     (hi : i < k) :
@@ -2275,8 +2246,7 @@ lemma ldSandwichLineOnePoint
     exact commuteGHalfSandwich params strategy.state family gamma zeta
       j hj hzeta_le hfacts
   exact ⟨ldSandwichLineOnePoint_core params strategy eps delta gamma zeta
-    hgood hgamma_le hzeta_le hdq_le
-    family hcons hself hbound hcomm k i hi⟩
+    hgood hzeta_le family hcons hcomm k i hi⟩
 
 
 end MIPStarRE.LDT.Pasting
