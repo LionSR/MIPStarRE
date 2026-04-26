@@ -129,6 +129,35 @@ class ParseDeclarationTests(unittest.TestCase):
             self.assertEqual(len(result.review_findings), 1)
             self.assertEqual(result.review_findings[0].decl, "nestedCommentBad")
 
+    def test_header_parser_ignores_commented_out_declarations(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    /-
+                    theorem commentedBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    -/
+
+                    -- theorem alsoCommented (h : ∃ G : Measurement, ConsRel G) :
+                    --   ∃ G : Measurement, ConsRel G := by sorry
+
+                    theorem realDecl : True := by
+                      trivial
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["realDecl"])
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(result.findings, ())
+
 
 class AuditHeuristicTests(unittest.TestCase):
     def _write_fake(self, root: Path, body: str) -> Path:
@@ -205,6 +234,23 @@ class AuditHeuristicTests(unittest.TestCase):
             self.assertEqual(len(result.review_findings), 0)
             self.assertEqual(len(result.allowed_findings), 1)
             self.assertTrue(result.allowed_findings[0].allowed_helper)
+
+    def test_proof_witness_substring_is_not_allowed_adapter(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = self._write_fake(
+                root,
+                """\
+                theorem mainInductionProofWitness
+                    (hwitness : ∃ G : Measurement, ConsRel G) :
+                    ∃ G : Measurement, ConsRel G := by
+                  sorry
+                """,
+            )
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].decl, "mainInductionProofWitness")
+            self.assertEqual(len(result.allowed_findings), 0)
 
     def test_skips_forall_producers_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as td:

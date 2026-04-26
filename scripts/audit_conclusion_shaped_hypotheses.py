@@ -37,7 +37,7 @@ _DECL_RE = re.compile(
 )
 _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.'?]*")
 _ALLOWED_WITNESS_ADAPTER_RE = re.compile(
-    r"(?:^|[A-Za-z0-9_])(?:of|Of|from|From)Witness(?:$|[A-Z_])"
+    r"(?:of|Of|from|From)Witness$"
 )
 
 # Tokens that usually name binders, Lean syntax, or ubiquitous typeclass
@@ -167,6 +167,40 @@ def _skip_string_literal(text: str, start: int) -> int:
     return i
 
 
+def _spaces_preserving_newlines(fragment: str) -> str:
+    """Replace non-newline characters by spaces, preserving offsets and lines."""
+    return "".join("\n" if ch == "\n" else " " for ch in fragment)
+
+
+def _mask_lean_comments(text: str) -> str:
+    """Mask Lean comments before regex declaration matching.
+
+    The parser uses regexes for declaration starts but then slices the original
+    source by offset.  Replacing comment contents with spaces preserves offsets
+    while preventing commented-out theorem headers from being scanned.
+    """
+    chunks: list[str] = []
+    i = 0
+    while i < len(text):
+        if text.startswith("--", i):
+            newline = text.find("\n", i + 2)
+            end = len(text) if newline == -1 else newline
+            chunks.append(_spaces_preserving_newlines(text[i:end]))
+            i = end
+            continue
+        if text.startswith("/-", i):
+            end = _skip_block_comment(text, i)
+            if end is None:
+                chunks.append(_spaces_preserving_newlines(text[i:]))
+                break
+            chunks.append(_spaces_preserving_newlines(text[i:end]))
+            i = end
+            continue
+        chunks.append(text[i])
+        i += 1
+    return "".join(chunks)
+
+
 def _find_header_end(text: str, start: int) -> int | None:
     """Return the offset of the top-level ``:=`` ending a declaration header."""
     stack: list[str] = []
@@ -289,7 +323,8 @@ def parse_declarations(path: Path, *, root: Path | None = None) -> list[LeanDecl
     else:
         rel = str(path)
     out: list[LeanDecl] = []
-    for match in _DECL_RE.finditer(text):
+    match_text = _mask_lean_comments(text)
+    for match in _DECL_RE.finditer(match_text):
         header_end = _find_header_end(text, match.end())
         if header_end is None:
             continue
