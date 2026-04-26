@@ -173,8 +173,14 @@ lemma fromHToG_of_context
         ctx.gamma ctx.zeta j) :
     FromHToGStatement params ctx.strategy ctx.strategy.state ctx.family
       ctx.gamma ctx.zeta ctx.k :=
-  fromHToG params ctx.strategy ctx.strategy.state ctx.family ctx.gamma
-    ctx.zeta hfacts hhalf ctx.k
+  by
+    have hgamma_nonneg : 0 ≤ ctx.gamma :=
+      gamma_nonneg_of_isGood params.next ctx.strategy ctx.good
+    have hzeta_nonneg : 0 ≤ ctx.zeta :=
+      IdxPolyFamily.zeta_nonneg_of_consistentWithPoints
+        ctx.strategy ctx.family ctx.consistent
+    exact fromHToG params ctx.strategy ctx.strategy.state ctx.family ctx.gamma
+      ctx.zeta hgamma_nonneg hzeta_nonneg ctx.zeta_le_one hfacts hhalf ctx.k
 
 /-- `cor:commuting-with-G-complete` restated against the standing pasting
 context.
