@@ -631,6 +631,74 @@ private lemma hBConsistencyError_add_mdq_add_dnoteq_le_overAllOutcomesError
   dsimp only [hBConsistencyError, overAllOutcomesError]
   linarith [hsmall]
 
+/-- The distinct-tuple line-mismatch mass that appears after inserting the
+vertical-line measurement in `ld-pasting.tex` lines 1178--1202.
+
+This is the part paid for by the already-available one-point line comparison
+statements.  The remaining `md/q` Schwartz--Zippel term is kept separate below. -/
+private noncomputable def overAllOutcomesDistinctBadLineMass
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ) : Error :=
+  avgOver (uniformDistribution (Point params)) (fun u =>
+    avgOver (distinctTupleDistribution params k) (fun xs =>
+      hBConsistencyBadMass params strategy family u xs))
+
+/-- The one-point line comparison hypotheses bound the inserted line-mismatch
+mass by the displayed `hBConsistency` error.
+
+Paper route: this is the aggregation in `ld-pasting.tex` lines 1186--1202,
+using `prop:ld-dnoteq` plus `lem:ld-sandwich-line-one-point`. -/
+private lemma overAllOutcomes_distinct_bad_line_mass_le_hBConsistencyError
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error) (k : ℕ)
+    (hd : 0 < params.d)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    overAllOutcomesDistinctBadLineMass params strategy family k ≤
+      hBConsistencyError params eps delta gamma zeta k := by
+  simpa [overAllOutcomesDistinctBadLineMass] using
+    avgOver_distinct_badMass_le_hBConsistencyError
+      params strategy family eps delta gamma zeta k hd
+      heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
+
+/-- The surviving local finite-sum/SZ residual after the one-point line-mismatch
+aggregation has been separated off.
+
+This is the remaining part of `ld-pasting.tex` lines 1174--1275: insert the
+vertical-line measurement, split into the line-mismatch mass and the
+line-consistent nonglobal mass, and bound the latter by `md/q` using the
+interpolant witness and Schwartz--Zippel.  Unlike the previous residual, this
+statement no longer mentions `lem:ld-sandwich-line-one-point`; its contribution
+is now proved by `overAllOutcomes_distinct_bad_line_mass_le_hBConsistencyError`. -/
+private lemma overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_mdq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (k : ℕ)
+    (hkEligible : params.d + 1 ≤ k) :
+    overAllOutcomesDistinctNonglobalMass params strategy family k ≤
+      overAllOutcomesDistinctBadLineMass params strategy family k +
+        ((params.m * params.d : ℕ) : Error) / (params.q : Error) := by
+  /- TODO(#672): finish the purely local insertion/Schwartz--Zippel aggregation.
+  Paper anchors:
+  * `ld-pasting.tex` lines 1174--1189 insert the vertical-line measurement and
+    split off the event that some supported slice disagrees with the line answer.
+  * lines 1204--1275 use the interpolation witness for each nonglobal eligible
+    tuple, then Schwartz--Zippel, to bound the remaining line-consistent mass by
+    `md/q`.
+
+  The one-point line-comparison payment from lines 1191--1202 is no longer part
+  of this residual; it is discharged separately above through
+  `overAllOutcomesDistinctBadLineMass`. -/
+  sorry
+
 /-- If the distinct nonglobal mass is bounded by the paper's local
 `k·ν₅ + k²/q + md/q` comparison, then the reverse half of
 `lem:over-all-outcomes` follows.
@@ -671,42 +739,37 @@ private lemma overAllOutcomes_reverse_mass_bound_of_nonglobal_mass_bound
 
 /-- The remaining paper-local mass comparison after the algebraic reductions.
 
-This is the exact formal residual for issue #672.  It corresponds to
-`ld-pasting.tex` lines 1174--1275: starting from the nonglobal part of the
-eligible sandwich mass, insert the vertical-line measurement, use
-`lem:ld-sandwich-line-one-point` (provided here as `hline`) to pay for the
-failure of the line-consistency indicator, and finally apply the
-Schwartz--Zippel `md/q` bound to the indicator term.
-
-The local interpolation correctness inputs for this paper step are already
-available as `interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem`
-and `nonglobal_gives_slice_mismatch_against_interpolant`; the surviving unproved
-piece is the finite-sum aggregation that combines those inputs with the
-one-point line comparison. -/
+The one-point line-comparison aggregation from `ld-pasting.tex` lines
+1186--1202 is now proved by
+`overAllOutcomes_distinct_bad_line_mass_le_hBConsistencyError`.  Consequently this
+wrapper reduces the former issue #672 residual to the purely local
+insertion/Schwartz--Zippel statement
+`overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_mdq`. -/
 private lemma overAllOutcomes_distinct_nonglobal_mass_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (eps delta gamma zeta : Error) (k : ℕ)
+    (hd : 0 < params.d)
     (hkEligible : params.d + 1 ≤ k)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
     (hline : ∀ i : ℕ, i < k →
       LdSandwichLineOnePointStatement params strategy family
         eps delta gamma zeta k i) :
     overAllOutcomesDistinctNonglobalMass params strategy family k ≤
       hBConsistencyError params eps delta gamma zeta k +
         ((params.m * params.d : ℕ) : Error) / (params.q : Error) := by
-  /- TODO(#672): prove the paper's reverse/local mass comparison.
-  Paper anchors:
-  * `ld-pasting.tex` lines 1174--1202 insert `B`, add the line-consistency
-    indicator, and pay `k²/q + k·ν₅` via `lem:ld-sandwich-line-one-point`.
-  * lines 1204--1275 bound the remaining indicator mass by `md/q` using the
-    interpolant witness and Schwartz--Zippel.
-
-  The hypothesis `hline` is deliberately the already-proved public one-point
-  statement, so the residual is no longer an interpolation API gap and no longer
-  the lower-level Cauchy--Schwarz proof inside `LdSandwichLineOnePoint.lean`;
-  it is exactly the finite-sum/indicator aggregation over nonglobal outcomes. -/
-  sorry
+  have hlocal :=
+    overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_mdq
+      params strategy family k hkEligible
+  have hbad :=
+    overAllOutcomes_distinct_bad_line_mass_le_hBConsistencyError
+      params strategy family eps delta gamma zeta k hd
+      heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
+  linarith
 
 /-- Reduction of `lem:over-all-outcomes` to the one remaining reverse mass
 comparison.
@@ -804,7 +867,8 @@ lemma overAllOutcomes
         exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
           hgood hgamma_le hzeta_le hdq_le family hcons hself hbound hfacts k i hi
       have hnonglobal := overAllOutcomes_distinct_nonglobal_mass_bound
-        params strategy family eps delta gamma zeta k hkEligible hline
+        params strategy family eps delta gamma zeta k hd hkEligible
+        heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
       exact overAllOutcomes_reverse_mass_bound_of_nonglobal_mass_bound
         params strategy family eps delta gamma zeta k hd hdq_le hkEligible
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hnonglobal

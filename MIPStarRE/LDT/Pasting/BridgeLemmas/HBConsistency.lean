@@ -41,8 +41,8 @@ private lemma hBConsistency_core
     (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (_hself : family.StronglySelfConsistent strategy.state zeta)
+    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hline : ∀ i : ℕ, i < k →
       LdSandwichLineOnePointStatement params strategy family
@@ -102,27 +102,10 @@ private lemma hBConsistency_core
             hBConsistencyBadMass params strategy family u xs)) := by
             exact avgOver_mono _ _ _ (fun u =>
               avgOver_distinct_pasted_defect_le_badMass params strategy family u)
-    _ ≤ avgOver (uniformDistribution (Point params)) (fun u =>
-          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
-            hBConsistencyBadMass params strategy family u xs) +
-          ((k : Error) ^ (2 : ℕ)) / (params.q : Error)) := by
-            exact avgOver_mono _ _ _ (fun u =>
-              avgOver_distinct_badMass_le_avgOver_uniform_badMass_add_dnoteq params strategy family u)
-    _ = avgOver (uniformDistribution (Point params)) (fun u =>
-          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
-            hBConsistencyBadMass params strategy family u xs)) +
-        ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
-            rw [avgOver_add]
-            simpa using avgOver_uniform_const (α := Point params)
-              (((k : Error) ^ (2 : ℕ)) / (params.q : Error))
-    _ ≤ (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k +
-          ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
-            gcongr
-            exact avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
-              params strategy family eps delta gamma zeta k hline
     _ ≤ hBConsistencyError params eps delta gamma zeta k := by
-            exact hBConsistency_error_bound params eps delta gamma zeta k hd
-              heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+            exact avgOver_distinct_badMass_le_hBConsistencyError
+              params strategy family eps delta gamma zeta k hd
+              heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
 
 /-- `lem:h-b-consistency`. -/
 lemma hBConsistency
