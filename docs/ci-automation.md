@@ -243,6 +243,30 @@ obvious integrity failures but do not replace mathematical review. If a warning
 would require a substantive proof rewrite or theorem-statement change, leave it
 for a human-authored proof PR instead of the linter auto-fix wrapper.
 
+**Scheduled write-mode policy**: Unattended scheduled PR creation is disabled.
+Do not add a `schedule:` trigger to `.github/workflows/lean-linter-warning-autofix.yml`,
+and do not make the report-only sweep open branches, unless a maintainer-approved
+policy PR also documents and preserves all of the following:
+
+- an explicit repository-variable opt-in, for example
+  `vars.LEAN_LINTER_AUTOFIX_CREATE_PR == 'true'`, with missing or false values
+  forcing dry-run/report-only behavior;
+- scheduled-workflow access to `CLAUDE_CODE_OAUTH_TOKEN` and to a write token
+  suitable for creating branches and PRs (`BOT_PAT` when branch protections or
+  organization rules make the default `github.token` insufficient);
+- narrowly scoped workflow permissions: `contents: write`,
+  `pull-requests: write`, `issues: write`, `actions: read`, and `id-token: write`
+  only if the Claude action still requires it;
+- the existing main-branch, nonzero-warning, successful-build, non-empty
+  Lean-only diff, no untracked/deleted files, no forbidden proof-integrity token,
+  post-validation recheck, guarded staging, and maintenance-label guards; and
+- a PR body/review checklist stating that human review for paper-faithfulness is
+  required before merge.
+
+Until those conditions are explicitly approved in a later PR, the Monday
+schedule remains report-only with `contents: read`, and the only write-capable
+linter-warning path is the manual `workflow_dispatch` wrapper described above.
+
 ### README Freshness Audit (`readme-freshness-audit.yml`)
 
 **What it does**: Runs a weekly report-only audit of `README.md` so the
