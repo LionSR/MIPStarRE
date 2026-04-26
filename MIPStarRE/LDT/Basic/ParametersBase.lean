@@ -89,6 +89,26 @@ def ofThree (m d : ℕ) (hm : 0 < m) : Parameters :=
 def ofFour (m d : ℕ) (hm : 0 < m) : Parameters :=
   ofPrimePower m 4 d 2 2 hm Nat.prime_two (by decide) (by decide)
 
+/-- Paper finite fields have at least two elements: `q = p^n` with `p` prime
+and `0 < n` (see `preliminaries.tex`, lines 17--19 and 89--93). -/
+theorem two_le_q (params : Parameters) : 2 ≤ params.q := by
+  obtain ⟨p, n, hp, hn, hq⟩ := params.hqPrimePower
+  rw [hq]
+  exact le_trans hp.two_le (Nat.le_self_pow (Nat.ne_of_gt hn) p)
+
+/-- The field-size parameter is strictly larger than `1`. -/
+theorem one_lt_q (params : Parameters) : 1 < params.q :=
+  lt_of_lt_of_le Nat.one_lt_two params.two_le_q
+
+/-- Positivity of the field-size parameter after casting to the repository's
+real-valued error scalar type. -/
+theorem q_cast_pos (params : Parameters) : 0 < (params.q : Error) :=
+  Nat.cast_pos.mpr params.hq
+
+/-- The real-valued field-size denominator is nonzero. -/
+theorem q_cast_ne_zero (params : Parameters) : (params.q : Error) ≠ 0 :=
+  ne_of_gt params.q_cast_pos
+
 end Parameters
 
 instance : Inhabited Parameters where
