@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Transport.Pullback
+import MIPStarRE.LDT.Commutativity.Scaffold.Products
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
@@ -496,6 +497,110 @@ noncomputable def xEvaluatedFullSliceABABtensorAvg
         ev strategy.state
           (leftTensor (ι₂ := ι) (A.outcome ah.1 * B.outcome ah.2 * A.outcome ah.1) *
             rightTensor (ι₁ := ι) (B.outcome ah.2)))
+
+/-- X-evaluated, y-full scalar `BABA` average used between the two paper
+line-356--360 `closenessOfIP` bridges. -/
+private noncomputable def xEvaluatedSliceBABAScalarAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+    (fun ux =>
+      let A : SubMeas (Fq params) ι :=
+        evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)
+      let B : SubMeas (Polynomial params) ι := (family.meas ux.2.2).toSubMeas
+      ∑ a : Fq params, ∑ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι) (B.outcome h * A.outcome a * B.outcome h * A.outcome a)))
+
+/-- The x-evaluated first factor as a projective submeasurement at mixed
+`(u, x, y)` data. -/
+private noncomputable def xEvaluatedFirstProj
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (ux : Point params × FullSliceQuestion params) :
+    ProjSubMeas (Fq params) ι :=
+  { toSubMeas := evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)
+    proj := by
+      intro a
+      simpa [evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
+        truncatePoint_appendPoint, pointHeight_appendPoint] using
+        evaluatedPointFamily_outcome_proj params family
+          (appendPoint params ux.1 ux.2.1) a }
+
+/-- Reindex mixed x-evaluated data `(u, x, y)` as `(appendPoint u x, y)`. -/
+private def xEvaluatedQuestionPointNextEquiv
+    (params : Parameters) [FieldModel params.q] :
+    Point params × FullSliceQuestion params ≃ Point params.next × Fq params where
+  toFun := fun ux => (appendPoint params ux.1 ux.2.1, ux.2.2)
+  invFun := fun wy => (truncatePoint params wy.1, (pointHeight params wy.1, wy.2))
+  left_inv := by
+    rintro ⟨u, x, y⟩
+    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
+  right_inv := by
+    rintro ⟨w, y⟩
+    exact Prod.ext ((pointNextEquiv params).left_inv w) rfl
+
+/-- Averaging mixed x-evaluated data and ignoring the full-y coordinate gives the
+uniform average over `Point params.next`. -/
+private lemma avgOver_xEvaluatedQuestion_to_pointNext
+    (params : Parameters) [FieldModel params.q]
+    (f : Point params.next → Error) :
+    avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+        (fun ux => f (appendPoint params ux.1 ux.2.1)) =
+      avgOver (uniformDistribution (Point params.next)) f := by
+  let e := xEvaluatedQuestionPointNextEquiv params
+  calc
+    avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+        (fun ux => f (appendPoint params ux.1 ux.2.1))
+      = avgOver (uniformDistribution (Point params.next × Fq params))
+          (fun wy => f (appendPoint params (truncatePoint params wy.1)
+            (pointHeight params wy.1))) := by
+          simpa [e, xEvaluatedQuestionPointNextEquiv] using
+            MIPStarRE.LDT.avgOver_uniform_equiv e
+              (fun ux : Point params × FullSliceQuestion params =>
+                f (appendPoint params ux.1 ux.2.1))
+    _ = avgOver (uniformDistribution (Point params.next × Fq params))
+          (fun wy => f wy.1) := by
+          apply avgOver_congr
+          intro wy
+          simpa [pointNextEquiv] using congrArg f ((pointNextEquiv params).left_inv wy.1)
+    _ = avgOver (uniformDistribution (Point params.next)) f := avgOver_uniform_fst f
+
+/-- Reindex `xEvaluatedSliceBABAtensorAvg` into the mixed `(u,x,y)` data order. -/
+private lemma xEvaluatedSliceBABAtensorAvg_eq_xFullData
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    xEvaluatedSliceBABAtensorAvg params strategy family =
+      avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+        (fun ux =>
+          let A : SubMeas (Fq params) ι :=
+            evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)
+          let B : SubMeas (Polynomial params) ι := (family.meas ux.2.2).toSubMeas
+          ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι) (B.outcome h * A.outcome a * B.outcome h) *
+                rightTensor (ι₁ := ι) (A.outcome a))) := by
+  classical
+  let term : Point params → FullSliceQuestion params → Error := fun u xy =>
+    let A : SubMeas (Fq params) ι := evaluateAt params u ((family.meas xy.1).toSubMeas)
+    let B : SubMeas (Polynomial params) ι := (family.meas xy.2).toSubMeas
+    ∑ a : Fq params, ∑ h : Polynomial params,
+      ev strategy.state
+        (leftTensor (ι₂ := ι) (B.outcome h * A.outcome a * B.outcome h) *
+          rightTensor (ι₁ := ι) (A.outcome a))
+  unfold xEvaluatedSliceBABAtensorAvg
+  calc
+    avgOver (uniformDistribution (FullSliceQuestion params))
+        (fun xy => avgOver (uniformDistribution (Point params)) (fun u => term u xy))
+      = avgOver (uniformDistribution (Point params))
+          (fun u => avgOver (uniformDistribution (FullSliceQuestion params))
+            (fun xy => term u xy)) := by
+          exact avgOver_uniform_comm (α := FullSliceQuestion params) (β := Point params)
+            (f := fun xy u => term u xy)
+    _ = avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+        (fun ux => term ux.1 ux.2) := by
+          exact (avgOver_uniform_prod (α := Point params) (β := FullSliceQuestion params)
+            (f := term)).symm
 
 /-- Reindex evaluated-slice questions as `((u, (x, y)), v)`.
 
@@ -1480,7 +1585,8 @@ private noncomputable def evaluateAtProjSubMeas
   toSubMeas := evaluateAt params u P.toSubMeas
   proj := by
     intro a
-    simpa [evaluateAt] using postprocess_proj_outcome P (fun g => g u) a
+    simpa [evaluateAt] using
+      postprocess_proj_outcome P (fun g => g u) a
 
 /-- Tensor-lifted form of `normalizationCondition_sandwich_bound`, used as the
 `C`-normalization hypothesis in `closenessOfIP`.
@@ -1521,6 +1627,46 @@ private lemma leftTensor_normalizationCondition_sandwich_bound
     _ ≤ 1 := by
           exact leftTensor_le_one (ι₂ := ι) <| by
             simpa [T] using normalizationCondition_sandwich_bound P Q
+
+/-- Adjoint-side tensor-lifted normalization condition used with
+`closenessOfIPAdjoint`. -/
+private lemma leftTensor_normalizationCondition_sandwich_adjoint_bound
+    {α β : Type*} [Fintype α] [Fintype β]
+    (P : SubMeas α ι) (Q : ProjSubMeas β ι) :
+    ∑ a : α,
+        (∑ b : β, leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b))ᴴ *
+          (∑ b : β, leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b)) ≤
+      1 := by
+  have hbase := leftTensor_normalizationCondition_sandwich_bound (ι := ι) P Q
+  have hherm : ∀ a : α,
+      (∑ b : β, leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b))ᴴ =
+        ∑ b : β, leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b) := by
+    intro a
+    rw [Matrix.conjTranspose_sum]
+    apply Finset.sum_congr rfl
+    intro b _
+    have hP : (P.outcome a)ᴴ = P.outcome a := P.outcome_hermitian a
+    have hQ : (Q.outcome b)ᴴ = Q.outcome b := Q.outcome_hermitian b
+    have hleftH :
+        (leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b))ᴴ =
+          leftTensor (ι₂ := ι) ((Q.outcome b * P.outcome a * Q.outcome b)ᴴ) := by
+      simpa [leftTensor, opTensor] using
+        (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι)
+          (Q.outcome b * P.outcome a * Q.outcome b)
+          (1 : MIPStarRE.Quantum.Op ι))
+    rw [hleftH]
+    simp [Matrix.conjTranspose_mul, hP, hQ, mul_assoc]
+  calc
+    ∑ a : α,
+        (∑ b : β, leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b))ᴴ *
+          (∑ b : β, leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b))
+      = ∑ a : α,
+          (∑ b : β, leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b)) *
+            (∑ b : β, leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b))ᴴ := by
+          apply Finset.sum_congr rfl
+          intro a _
+          rw [hherm a]
+    _ ≤ 1 := hbase
 
 /-- Full-slice strong self-consistency pulled to the first coordinate of a
 full-slice question.
@@ -1706,6 +1852,106 @@ private lemma evaluatedSlice_selfConsistency_snd_bound
               (evaluatedPointFamilyRight params family u)) := hsnd
     _ ≤ zeta := by
           simpa [sddError] using hpoint.squaredDistanceBound
+
+/-- Point-level self-consistency pulled to mixed `(u, x, y)` data for the already
+x-evaluated first coordinate. -/
+private lemma xEvaluated_selfConsistency_fst_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+        (fun ux =>
+          qSDDCore strategy.state
+            (fun a : Fq params => leftTensor (ι₂ := ι)
+              ((evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)).outcome a))
+            (fun a : Fq params => rightTensor (ι₁ := ι)
+              ((evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)).outcome a))) ≤
+      zeta := by
+  have hpoint := evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
+    params strategy family zeta hself
+  calc
+    avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+        (fun ux =>
+          qSDDCore strategy.state
+            (fun a : Fq params => leftTensor (ι₂ := ι)
+              ((evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)).outcome a))
+            (fun a : Fq params => rightTensor (ι₁ := ι)
+              ((evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)).outcome a)))
+      = avgOver (uniformDistribution (Point params.next))
+          (fun w =>
+            qSDDCore strategy.state
+              (fun a : Fq params => leftTensor (ι₂ := ι)
+                ((evaluatedPointFamily params family w).outcome a))
+              (fun a : Fq params => rightTensor (ι₁ := ι)
+                ((evaluatedPointFamily params family w).outcome a))) := by
+          simpa [evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
+            truncatePoint_appendPoint, pointHeight_appendPoint] using
+            avgOver_xEvaluatedQuestion_to_pointNext params
+              (fun w : Point params.next =>
+                qSDDCore strategy.state
+                  (fun a : Fq params => leftTensor (ι₂ := ι)
+                    ((evaluatedPointFamily params family w).outcome a))
+                  (fun a : Fq params => rightTensor (ι₁ := ι)
+                    ((evaluatedPointFamily params family w).outcome a)))
+    _ ≤ zeta := by
+          simpa [sddError, qSDD, evaluatedPointFamilyLeft, evaluatedPointFamilyRight]
+            using hpoint.squaredDistanceBound
+
+/-- Full-slice self-consistency pulled to the y coordinate of mixed `(u,x,y)`
+data, in the adjoint form required by `closenessOfIPAdjoint`. -/
+private lemma xEvaluated_selfConsistency_snd_adjoint_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+        (fun ux =>
+          qSDDCore strategy.state
+            (fun h : Polynomial params =>
+              (leftTensor (ι₂ := ι) ((family.meas ux.2.2).outcome h))ᴴ)
+            (fun h : Polynomial params =>
+              (rightTensor (ι₁ := ι) ((family.meas ux.2.2).outcome h))ᴴ)) ≤
+      zeta := by
+  have hfull := fullSlice_selfConsistency_snd_bound params strategy family zeta hself
+  calc
+    avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+        (fun ux =>
+          qSDDCore strategy.state
+            (fun h : Polynomial params =>
+              (leftTensor (ι₂ := ι) ((family.meas ux.2.2).outcome h))ᴴ)
+            (fun h : Polynomial params =>
+              (rightTensor (ι₁ := ι) ((family.meas ux.2.2).outcome h))ᴴ))
+      = avgOver (uniformDistribution (FullSliceQuestion params))
+          (fun xy =>
+            qSDDCore strategy.state
+              (fun h : Polynomial params =>
+                (leftTensor (ι₂ := ι) ((family.meas xy.2).outcome h))ᴴ)
+              (fun h : Polynomial params =>
+                (rightTensor (ι₁ := ι) ((family.meas xy.2).outcome h))ᴴ)) := by
+          exact avgOver_uniform_snd (α := Point params) (β := FullSliceQuestion params)
+            (f := fun xy =>
+              qSDDCore strategy.state
+                (fun h : Polynomial params =>
+                  (leftTensor (ι₂ := ι) ((family.meas xy.2).outcome h))ᴴ)
+                (fun h : Polynomial params =>
+                  (rightTensor (ι₁ := ι) ((family.meas xy.2).outcome h))ᴴ))
+    _ = avgOver (uniformDistribution (FullSliceQuestion params))
+          (fun xy =>
+            qSDDCore strategy.state
+              (fun h : Polynomial params =>
+                leftTensor (ι₂ := ι) ((family.meas xy.2).outcome h))
+              (fun h : Polynomial params =>
+                rightTensor (ι₁ := ι) ((family.meas xy.2).outcome h))) := by
+          apply avgOver_congr
+          intro xy
+          unfold qSDDCore
+          apply Finset.sum_congr rfl
+          intro h _
+          have hY : ((family.meas xy.2).outcome h)ᴴ = (family.meas xy.2).outcome h :=
+            (family.meas xy.2).outcome_hermitian h
+          simp [leftTensor, rightTensor, Matrix.conjTranspose_kronecker, hY]
+    _ ≤ zeta := hfull
 
 /-- Pull a finite outcome sum into a uniform average over the product space. -/
 private lemma avgOver_sum_eq_card_mul_avgOver_prod
@@ -2383,6 +2629,354 @@ private lemma evaluatedSliceABAB_scalar_to_BABAtensor
               ev strategy.state (C q a b * B q a))| := by
             rw [hScalar, hTensor]
     _ ≤ Real.sqrt zeta := hclose
+
+/-- First mixed bridge in paper lines 356--360: move the already x-evaluated
+outcome from the right tensor register back to the left register. -/
+private lemma xEvaluatedSliceBABAtensor_to_BABAScalar
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    |xEvaluatedSliceBABAtensorAvg params strategy family -
+        xEvaluatedSliceBABAScalarAvg params strategy family| ≤ Real.sqrt zeta := by
+  let 𝒟 : Distribution (Point params × FullSliceQuestion params) :=
+    uniformDistribution (Point params × FullSliceQuestion params)
+  let X : Point params × FullSliceQuestion params → SubMeas (Fq params) ι :=
+    fun ux => evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)
+  let Y : Point params × FullSliceQuestion params → SubMeas (Polynomial params) ι :=
+    fun ux => (family.meas ux.2.2).toSubMeas
+  let A : Point params × FullSliceQuestion params → Fq params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux a => leftTensor (ι₂ := ι) ((X ux).outcome a)
+  let B : Point params × FullSliceQuestion params → Fq params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux a => rightTensor (ι₁ := ι) ((X ux).outcome a)
+  let C : Point params × FullSliceQuestion params → Fq params → Polynomial params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux a h => leftTensor (ι₂ := ι)
+      ((Y ux).outcome h * (X ux).outcome a * (Y ux).outcome h)
+  have h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1 := by
+    simpa [𝒟] using uniformDistribution_weight_sum_le_one
+      (Point params × FullSliceQuestion params)
+  have hAB : avgOver 𝒟 (fun ux => qSDDCore strategy.state (A ux) (B ux)) ≤ zeta := by
+    simpa [𝒟, A, B, X] using
+      xEvaluated_selfConsistency_fst_bound params strategy family zeta hself
+  have hC :
+      ∀ ux,
+        ∑ a : Fq params,
+            (∑ h : Polynomial params, C ux a h) *
+              (∑ h : Polynomial params, C ux a h)ᴴ ≤ 1 := by
+    intro ux
+    simpa [C, X, Y] using
+      leftTensor_normalizationCondition_sandwich_bound
+        (ι := ι) (P := X ux) (Q := family.meas ux.2.2)
+  have hclose :=
+    MIPStarRE.LDT.Preliminaries.closenessOfIP
+      strategy.state hnorm 𝒟 h𝒟 A B C zeta hAB hC
+  have hScalar :
+      avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+        ev strategy.state (C ux a h * A ux a)) =
+        xEvaluatedSliceBABAScalarAvg params strategy family := by
+    unfold xEvaluatedSliceBABAScalarAvg
+    apply avgOver_congr
+    intro ux
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    refine Finset.sum_congr rfl ?_
+    intro h _
+    simp [A, C, X, Y, leftTensor_mul_leftTensor, mul_assoc]
+  have hTensor :
+      avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+        ev strategy.state (C ux a h * B ux a)) =
+        xEvaluatedSliceBABAtensorAvg params strategy family := by
+    rw [xEvaluatedSliceBABAtensorAvg_eq_xFullData params strategy family]
+  calc
+    |xEvaluatedSliceBABAtensorAvg params strategy family -
+        xEvaluatedSliceBABAScalarAvg params strategy family|
+      = |avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state (C ux a h * B ux a)) -
+          avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state (C ux a h * A ux a))| := by
+          rw [hTensor, hScalar]
+    _ = |avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state (C ux a h * A ux a)) -
+          avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state (C ux a h * B ux a))| := by
+          rw [abs_sub_comm]
+    _ ≤ Real.sqrt zeta := hclose
+
+/-- First mixed bridge in paper line 359: move the already x-evaluated outcome
+from the right tensor register back to the left register, yielding the public
+`xEvaluatedFullSliceABABAvg` scalar endpoint. -/
+lemma xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    |xEvaluatedSliceBABAtensorAvg params strategy family -
+        xEvaluatedFullSliceABABAvg params strategy family| ≤ Real.sqrt zeta := by
+  let 𝒟 : Distribution (Point params × FullSliceQuestion params) :=
+    uniformDistribution (Point params × FullSliceQuestion params)
+  let X : Point params × FullSliceQuestion params → SubMeas (Fq params) ι :=
+    fun ux => evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)
+  let Y : Point params × FullSliceQuestion params → SubMeas (Polynomial params) ι :=
+    fun ux => (family.meas ux.2.2).toSubMeas
+  let A : Point params × FullSliceQuestion params → Fq params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux a => leftTensor (ι₂ := ι) ((X ux).outcome a)
+  let B : Point params × FullSliceQuestion params → Fq params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux a => rightTensor (ι₁ := ι) ((X ux).outcome a)
+  let C : Point params × FullSliceQuestion params → Fq params → Polynomial params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux a h => leftTensor (ι₂ := ι)
+      ((Y ux).outcome h * (X ux).outcome a * (Y ux).outcome h)
+  have h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1 := by
+    simpa [𝒟] using uniformDistribution_weight_sum_le_one
+      (Point params × FullSliceQuestion params)
+  have hAB :
+      avgOver 𝒟
+        (fun ux => qSDDCore strategy.state (fun a => (A ux a)ᴴ) (fun a => (B ux a)ᴴ)) ≤
+        zeta := by
+    calc
+      avgOver 𝒟
+          (fun ux => qSDDCore strategy.state (fun a => (A ux a)ᴴ) (fun a => (B ux a)ᴴ))
+        = avgOver 𝒟 (fun ux => qSDDCore strategy.state (A ux) (B ux)) := by
+            apply avgOver_congr
+            intro ux
+            unfold qSDDCore
+            apply Finset.sum_congr rfl
+            intro a _
+            have hX : ((X ux).outcome a)ᴴ = (X ux).outcome a := (X ux).outcome_hermitian a
+            simp [A, B, leftTensor, rightTensor, Matrix.conjTranspose_kronecker, hX]
+      _ ≤ zeta := by
+            simpa [𝒟, A, B, X] using
+              xEvaluated_selfConsistency_fst_bound params strategy family zeta hself
+  have hC :
+      ∀ ux,
+        ∑ a : Fq params,
+            (∑ h : Polynomial params, C ux a h)ᴴ *
+              (∑ h : Polynomial params, C ux a h) ≤ 1 := by
+    intro ux
+    simpa [C, X, Y] using
+      leftTensor_normalizationCondition_sandwich_adjoint_bound
+        (ι := ι) (P := X ux) (Q := family.meas ux.2.2)
+  have hclose :=
+    MIPStarRE.LDT.Preliminaries.closenessOfIPAdjoint
+      strategy.state hnorm 𝒟 h𝒟 A B C zeta hAB hC
+  have hScalar :
+      avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+        ev strategy.state (A ux a * C ux a h)) =
+        xEvaluatedFullSliceABABAvg params strategy family := by
+    unfold xEvaluatedFullSliceABABAvg
+    apply avgOver_congr
+    intro ux
+    calc
+      ∑ a : Fq params, ∑ h : Polynomial params,
+          ev strategy.state (A ux a * C ux a h)
+        = ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                ((X ux).outcome a * (Y ux).outcome h * (X ux).outcome a *
+                  (Y ux).outcome h)) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            refine Finset.sum_congr rfl ?_
+            intro h _
+            simp [A, C, X, Y, leftTensor_mul_leftTensor, mul_assoc]
+      _ = ∑ ah : Fq params × Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                ((X ux).outcome ah.1 * (Y ux).outcome ah.2 * (X ux).outcome ah.1 *
+                  (Y ux).outcome ah.2)) := by
+            exact (Fintype.sum_prod_type' (f := fun a : Fq params =>
+              fun h : Polynomial params =>
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                    ((X ux).outcome a * (Y ux).outcome h * (X ux).outcome a *
+                      (Y ux).outcome h)))).symm
+  have hTensor :
+      avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+        ev strategy.state (B ux a * C ux a h)) =
+        xEvaluatedSliceBABAtensorAvg params strategy family := by
+    rw [xEvaluatedSliceBABAtensorAvg_eq_xFullData params strategy family]
+    apply avgOver_congr
+    intro ux
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    refine Finset.sum_congr rfl ?_
+    intro h _
+    rw [rightTensor_mul_leftTensor_eq_opTensor,
+      ← leftTensor_mul_rightTensor_eq_opTensor]
+  calc
+    |xEvaluatedSliceBABAtensorAvg params strategy family -
+        xEvaluatedFullSliceABABAvg params strategy family|
+      = |avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state (B ux a * C ux a h)) -
+          avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state (A ux a * C ux a h))| := by
+          rw [hTensor, hScalar]
+    _ = |avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state (A ux a * C ux a h)) -
+          avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state (B ux a * C ux a h))| := by
+          rw [abs_sub_comm]
+    _ ≤ Real.sqrt zeta := hclose
+
+/-- Second mixed bridge in paper lines 356--360: move the full-y outcome to the
+right tensor register. -/
+private lemma xEvaluatedSliceBABAScalar_to_xEvaluatedFullSliceABABtensor
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    |xEvaluatedSliceBABAScalarAvg params strategy family -
+        xEvaluatedFullSliceABABtensorAvg params strategy family| ≤ Real.sqrt zeta := by
+  let 𝒟 : Distribution (Point params × FullSliceQuestion params) :=
+    uniformDistribution (Point params × FullSliceQuestion params)
+  let X : Point params × FullSliceQuestion params → SubMeas (Fq params) ι :=
+    fun ux => evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)
+  let Y : Point params × FullSliceQuestion params → SubMeas (Polynomial params) ι :=
+    fun ux => (family.meas ux.2.2).toSubMeas
+  let A : Point params × FullSliceQuestion params → Polynomial params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux h => leftTensor (ι₂ := ι) ((Y ux).outcome h)
+  let B : Point params × FullSliceQuestion params → Polynomial params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux h => rightTensor (ι₁ := ι) ((Y ux).outcome h)
+  let C : Point params × FullSliceQuestion params → Polynomial params → Fq params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux h a => leftTensor (ι₂ := ι)
+      ((X ux).outcome a * (Y ux).outcome h * (X ux).outcome a)
+  have h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1 := by
+    simpa [𝒟] using uniformDistribution_weight_sum_le_one
+      (Point params × FullSliceQuestion params)
+  have hAB :
+      avgOver 𝒟
+        (fun ux => qSDDCore strategy.state (fun h => (A ux h)ᴴ) (fun h => (B ux h)ᴴ)) ≤
+        zeta := by
+    simpa [𝒟, A, B, Y] using
+      xEvaluated_selfConsistency_snd_adjoint_bound params strategy family zeta hself
+  have hC :
+      ∀ ux,
+        ∑ h : Polynomial params,
+            (∑ a : Fq params, C ux h a)ᴴ *
+              (∑ a : Fq params, C ux h a) ≤ 1 := by
+    intro ux
+    simpa [C, X, Y, xEvaluatedFirstProj] using
+      leftTensor_normalizationCondition_sandwich_adjoint_bound
+        (ι := ι) (P := Y ux) (Q := xEvaluatedFirstProj params family ux)
+  have hclose :=
+    MIPStarRE.LDT.Preliminaries.closenessOfIPAdjoint
+      strategy.state hnorm 𝒟 h𝒟 A B C zeta hAB hC
+  have hScalar :
+      avgOver 𝒟 (fun ux => ∑ h : Polynomial params, ∑ a : Fq params,
+        ev strategy.state (A ux h * C ux h a)) =
+        xEvaluatedSliceBABAScalarAvg params strategy family := by
+    unfold xEvaluatedSliceBABAScalarAvg
+    apply avgOver_congr
+    intro ux
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    refine Finset.sum_congr rfl ?_
+    intro h _
+    simp [A, C, X, Y, leftTensor_mul_leftTensor, mul_assoc]
+  have hTensor :
+      avgOver 𝒟 (fun ux => ∑ h : Polynomial params, ∑ a : Fq params,
+        ev strategy.state (B ux h * C ux h a)) =
+        xEvaluatedFullSliceABABtensorAvg params strategy family := by
+    unfold xEvaluatedFullSliceABABtensorAvg
+    apply avgOver_congr
+    intro ux
+    calc
+      ∑ h : Polynomial params, ∑ a : Fq params, ev strategy.state (B ux h * C ux h a)
+        = ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state (B ux h * C ux h a) := by
+            rw [Finset.sum_comm]
+      _ = ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι) ((X ux).outcome a * (Y ux).outcome h *
+                  (X ux).outcome a) *
+                rightTensor (ι₁ := ι) ((Y ux).outcome h)) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            refine Finset.sum_congr rfl ?_
+            intro h _
+            rw [rightTensor_mul_leftTensor_eq_opTensor,
+              ← leftTensor_mul_rightTensor_eq_opTensor]
+      _ = ∑ ah : Fq params × Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι) ((X ux).outcome ah.1 * (Y ux).outcome ah.2 *
+                  (X ux).outcome ah.1) *
+                rightTensor (ι₁ := ι) ((Y ux).outcome ah.2)) := by
+            exact (Fintype.sum_prod_type' (f := fun a : Fq params =>
+              fun h : Polynomial params =>
+                ev strategy.state
+                  (leftTensor (ι₂ := ι) ((X ux).outcome a * (Y ux).outcome h *
+                      (X ux).outcome a) *
+                    rightTensor (ι₁ := ι) ((Y ux).outcome h)))).symm
+  calc
+    |xEvaluatedSliceBABAScalarAvg params strategy family -
+        xEvaluatedFullSliceABABtensorAvg params strategy family|
+      = |avgOver 𝒟 (fun ux => ∑ h : Polynomial params, ∑ a : Fq params,
+            ev strategy.state (A ux h * C ux h a)) -
+          avgOver 𝒟 (fun ux => ∑ h : Polynomial params, ∑ a : Fq params,
+            ev strategy.state (B ux h * C ux h a))| := by
+          rw [hScalar, hTensor]
+    _ ≤ Real.sqrt zeta := hclose
+
+/-- Mixed bridge from the x-evaluated `BAB ⊗ A` tensor endpoint to the
+x-evaluated/y-full `ABA ⊗ B` tensor endpoint. -/
+private lemma xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABtensor
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    |xEvaluatedSliceBABAtensorAvg params strategy family -
+        xEvaluatedFullSliceABABtensorAvg params strategy family| ≤
+      2 * Real.sqrt zeta := by
+  have h1 := xEvaluatedSliceBABAtensor_to_BABAScalar
+    params strategy family zeta hnorm hself
+  have h2 := xEvaluatedSliceBABAScalar_to_xEvaluatedFullSliceABABtensor
+    params strategy family zeta hnorm hself
+  have htri := abs_sub_le
+    (xEvaluatedSliceBABAtensorAvg params strategy family)
+    (xEvaluatedSliceBABAScalarAvg params strategy family)
+    (xEvaluatedFullSliceABABtensorAvg params strategy family)
+  linarith
+
+/-- Full-slice prefix bound for the y-side scalar quartic.
+
+This packages the paper's first three y-prefix steps: the scalar-to-tensor
+`√ζ` bridge, the x-marginalization `md/q` step, and the mixed x-evaluated
+bridge to the `xEvaluatedFullSliceABABtensorAvg` endpoint. -/
+lemma fullSliceABAB_to_xEvaluatedFullSliceABABtensorAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    |fullSliceABABAvg params strategy family -
+        xEvaluatedFullSliceABABtensorAvg params strategy family| ≤
+      (↑params.m : Error) * ↑params.d / ↑params.q + 3 * Real.sqrt zeta := by
+  have h1 := fullSliceABAB_scalar_to_BABAtensor params strategy family zeta hnorm hself
+  have h2 := fullSliceBABA_tensor_marginalize_x params strategy family hnorm
+  have h3 := xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABtensor
+    params strategy family zeta hnorm hself
+  have htri := abs_sub_le
+    (fullSliceABABAvg params strategy family)
+    (fullSliceBABAtensorAvg params strategy family)
+    (xEvaluatedFullSliceABABtensorAvg params strategy family)
+  have hmid := abs_sub_le
+    (fullSliceBABAtensorAvg params strategy family)
+    (xEvaluatedSliceBABAtensorAvg params strategy family)
+    (xEvaluatedFullSliceABABtensorAvg params strategy family)
+  linarith
 
 /-- Evaluated-slice y-side scalar-to-tensor bridge: move the trailing
 `G^y_[h(v)=b]` in the scalar quartic to the right register, producing the tensor

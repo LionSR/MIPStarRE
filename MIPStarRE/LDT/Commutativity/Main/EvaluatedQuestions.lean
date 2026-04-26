@@ -73,11 +73,11 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
     obtain ⟨hgamma_le, hzeta_le, hdq_le⟩ := hsmall
     -- Step 1: The Schwartz-Zippel transport.
     -- Bound the full-product sddErrorOp by corrections from:
-    -- (a) Two hybrid Schwartz-Zippel marginalizations
-    --     (each ≤ md/q + 2√ζ)
+    -- (a) The x switch-sandwich transport (`4√ζ`) and the y scalar
+    --     marginalization (`2md/q + 4√ζ`)
     -- (b) The evaluated commutation via the strong `hEval` transport
     --     (≤ √(commDataProcessedGError))
-    -- giving total ≤ 12√ζ + 6md/q + 2√(commDataProcessedGError).
+    -- giving total ≤ 16√ζ + 4md/q + 2√(commDataProcessedGError).
     --
     -- Proof sketch:
     -- * Expand qSDDOp into quartic trace terms
@@ -96,8 +96,8 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
             (fullSliceQuestionOfEvaluatedSlice params q))
           (fun q => fullSliceProductRight params strategy family
             (fullSliceQuestionOfEvaluatedSlice params q)) ≤
-        12 * Real.sqrt zeta +
-          6 * (↑params.m * ↑params.d / ↑params.q) +
+        16 * Real.sqrt zeta +
+          4 * (↑params.m * ↑params.d / ↑params.q) +
           2 * Real.sqrt
             (commDataProcessedGError params gamma zeta) := by
       -- Compose the four scalar lemmas.  Paper chain:
@@ -107,16 +107,16 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
       --     `|fullABA − fullABAB|
       --        ≤ |fullABA − evalABA| + |evalABA − evalABAB|
       --          + |evalABAB − fullABAB|`
-      -- * `fullSlice_scalar_marginalize_x`: the current first-term scalar
-      --   wrapper costs `md/q + 2√ζ`.
+      -- * `fullSlice_scalar_marginalize_x`: the first-term switch-sandwich
+      --   wrapper costs `4√ζ`.
       -- * `fullSlice_scalar_marginalize_y`: the paper-faithful second-term
       --   wrapper now splits into the proved x-prefix `md/q + √ζ`, the remaining
       --   line-359 residual `√ζ`, the proved line-360 bridge `√ζ`, and the
       --   proved y-tail `md/q + √ζ`, for a total of `2md/q + 4√ζ`.
       -- * `fullSlice_closenessOfIP_CAB_hEval_sqrt`: the direct evaluated-side
       --   route gives `|evalABA − evalABAB| ≤ √ν`.
-      -- Summing gives `|fullABA − fullABAB| ≤ 6√ζ + 3(md/q) + √ν`,
-      -- and multiplying by `2` produces `12√ζ + 6(md/q) + 2√ν`.
+      -- Summing gives `|fullABA − fullABAB| ≤ 8√ζ + 2(md/q) + √ν`,
+      -- and multiplying by `2` produces `16√ζ + 4(md/q) + 2√ν`.
       have hExpand :=
         fullSliceCommutation_qSDDOp_avg_eq params strategy family
       have hMargX :=
@@ -214,32 +214,31 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
                     fullSliceABABAvg params strategy family|) := by
               linarith [hTri]
         _ ≤ 2 *
-              (((↑params.m : Error) * ↑params.d / ↑params.q +
-                  2 * Real.sqrt zeta) +
+              (4 * Real.sqrt zeta +
                 Real.sqrt
                   (commDataProcessedGError params gamma zeta) +
                 (2 * ((↑params.m : Error) * ↑params.d / ↑params.q) +
                   4 * Real.sqrt zeta)) := by
               linarith [hMargX, hMargY', hClose]
-        _ = 12 * Real.sqrt zeta +
-              6 * (↑params.m * ↑params.d / ↑params.q) +
+        _ = 16 * Real.sqrt zeta +
+              4 * (↑params.m * ↑params.d / ↑params.q) +
               2 * Real.sqrt
                 (commDataProcessedGError params gamma zeta) := by ring
     -- Step 2: Error arithmetic (using small-parameter hypotheses).
     -- Show:
-    --   12√ζ + 6md/q + 2√(48m(√γ + √ζ))
+    --   16√ζ + 4md/q + 2√(48m(√γ + √ζ))
     --     ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
     --
     -- Key estimates (all require γ, ζ, d/q ≤ 1):
     -- * 2√(48m(√γ + √ζ)) ≤ 2√(48m)(γ^¼ + ζ^¼) ≤ 14m(γ^¼ + ζ^¼)
     --   using √(a+b) ≤ √a + √b and √m ≤ m (for m ≥ 1)
-    -- * 12√ζ ≤ 16m·ζ^¼ (ζ ≤ 1 ⇒ ζ^½ ≤ ζ^¼; m ≥ 1)
-    -- * 6md/q ≤ 6m(d/q)^¼ (d/q ≤ 1 ⇒ x ≤ x^¼)
+    -- * 16√ζ ≤ 16m·ζ^¼ (ζ ≤ 1 ⇒ ζ^½ ≤ ζ^¼; m ≥ 1)
+    -- * 4md/q ≤ 6m(d/q)^¼ (d/q ≤ 1 ⇒ x ≤ x^¼)
     -- * Total: 14m·γ^¼ + 30m·ζ^¼ + 6m·(d/q)^¼
     --         ≤ 30m(γ^¼ + ζ^¼ + (d/q)^¼)
     have hArith :
-        12 * Real.sqrt zeta +
-          6 * (↑params.m * ↑params.d / ↑params.q) +
+        16 * Real.sqrt zeta +
+          4 * (↑params.m * ↑params.d / ↑params.q) +
           2 * Real.sqrt
             (commDataProcessedGError params gamma zeta) ≤
         comMainError params gamma zeta := by
@@ -349,12 +348,12 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
         apply Real.sqrt_le_sqrt
         nlinarith [hm_ge]
       -- Combine the three parts
-      have hA : 12 * Real.sqrt zeta ≤
+      have hA : 16 * Real.sqrt zeta ≤
           16 * ↑params.m *
             Real.rpow zeta (1 / (4 : Error)) := by
         nlinarith [h_sqrt_z, hm_ge, hz4]
       have hB :
-          6 * (↑params.m * ↑params.d / ↑params.q) ≤
+          4 * (↑params.m * ↑params.d / ↑params.q) ≤
           6 * ↑params.m * Real.rpow
             ((↑params.d : Error) / ↑params.q)
             (1 / (4 : Error)) := by
