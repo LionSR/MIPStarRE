@@ -135,6 +135,38 @@ def _advance_depth(ch: str, stack: list[str]) -> None:
         stack.pop()
 
 
+def _skip_block_comment(text: str, start: int) -> int | None:
+    """Return the offset after a Lean nested block comment starting at ``start``."""
+    depth = 1
+    i = start + 2
+    while i < len(text) - 1:
+        if text.startswith("/-", i):
+            depth += 1
+            i += 2
+            continue
+        if text.startswith("-/", i):
+            depth -= 1
+            i += 2
+            if depth == 0:
+                return i
+            continue
+        i += 1
+    return None
+
+
+def _skip_string_literal(text: str, start: int) -> int:
+    """Return the offset after a Lean string literal starting at ``start``."""
+    i = start + 1
+    while i < len(text):
+        if text[i] == "\\":
+            i += 2
+            continue
+        if text[i] == '"':
+            return i + 1
+        i += 1
+    return i
+
+
 def _find_header_end(text: str, start: int) -> int | None:
     """Return the offset of the top-level ``:=`` ending a declaration header."""
     stack: list[str] = []
@@ -148,21 +180,13 @@ def _find_header_end(text: str, start: int) -> int | None:
             i = newline + 1
             continue
         if ch == "/" and text[i + 1] == "-":
-            end = text.find("-/", i + 2)
-            if end == -1:
+            end = _skip_block_comment(text, i)
+            if end is None:
                 return None
-            i = end + 2
+            i = end
             continue
         if ch == '"':
-            i += 1
-            while i < len(text):
-                if text[i] == "\\":
-                    i += 2
-                    continue
-                if text[i] == '"':
-                    i += 1
-                    break
-                i += 1
+            i = _skip_string_literal(text, i)
             continue
         if not stack and text.startswith(":=", i):
             return i
@@ -189,21 +213,13 @@ def _find_top_level_char(text: str, target: str) -> int | None:
             i = newline + 1
             continue
         if ch == "/" and i + 1 < len(text) and text[i + 1] == "-":
-            end = text.find("-/", i + 2)
-            if end == -1:
+            end = _skip_block_comment(text, i)
+            if end is None:
                 return None
-            i = end + 2
+            i = end
             continue
         if ch == '"':
-            i += 1
-            while i < len(text):
-                if text[i] == "\\":
-                    i += 2
-                    continue
-                if text[i] == '"':
-                    i += 1
-                    break
-                i += 1
+            i = _skip_string_literal(text, i)
             continue
         if ch == target and not stack:
             return i

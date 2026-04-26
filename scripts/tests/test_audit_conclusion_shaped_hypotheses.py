@@ -105,6 +105,30 @@ class ParseDeclarationTests(unittest.TestCase):
             self.assertEqual(len(result.review_findings), 1)
             self.assertEqual(result.review_findings[0].decl, "commentColonBad")
 
+    def test_header_parser_ignores_nested_block_comment_terminators(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    theorem nestedCommentBad
+                        (h : ∃ G : Measurement, ConsRel G)
+                        /- outer /- inner -/ := still inside outer comment -/
+                        : ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["nestedCommentBad"])
+            self.assertIn("∃ G", decls[0].conclusion)
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].decl, "nestedCommentBad")
+
 
 class AuditHeuristicTests(unittest.TestCase):
     def _write_fake(self, root: Path, body: str) -> Path:
