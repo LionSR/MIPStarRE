@@ -1863,7 +1863,7 @@
     Remark
     </span>
     <span class="remark_thmlabel">10.19</span>
-    <span class="remark_thmtitle">Lean Step 5 residual interface</span>
+    <span class="remark_thmtitle">Lean Step 5 expansion theorem</span>
     <div class="thm_header_extras">
 
         </div>
@@ -1915,7 +1915,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>       For the Step&#160;5 passage below, Lean now names the weighted polynomial-collision mass and proves its \(md/q\) bound by specializing the existing tensor Schwartz–Zippel helper. The only remaining Step&#160;5 residual is the explicit expansion/reindexing statement that compares the evaluated consistency defect with the full-polynomial defect plus that collision mass. TODOThis is a bridge/residual interface, not a completed proof of the Step&#160;5 passage. </p>
+  <p>        For the Step&#160;5 passage below, Lean now names the weighted polynomial-collision mass, proves its \(md/q\) bound by specializing the existing tensor Schwartz–Zippel helper, and proves the algebraic expansion/reindexing statement comparing the evaluated consistency defect with the full-polynomial defect plus that collision mass. The wrapper for Step&#160;5 therefore no longer takes the expansion statement as an external hypothesis. </p>
 
   </div>
 </div>
@@ -2044,7 +2044,7 @@
 <div class="displaymath" id="a0000000597">
   \[  \zeta _1 = 2\sigma + 2\sqrt{3\varepsilon +2\sigma } + \frac{md}{q}.  \]
 </div>
-<p> The Lean Step&#160;5 wrapper   separates the remaining expansion/reindexing obligation from the checked Schwartz–Zippel tensor bound . </p>
+<p> The Lean Step&#160;5 wrapper    formalizes this expansion/reindexing step and combines it with the checked Schwartz–Zippel tensor bound . </p>
 <p>Apply Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.5</a> to <a href="sec-induction.html#eq:G-self-consistency">6</a>. This gives projective submeasurements \(P^{\mathrm A},P^{\mathrm B} \in \mathrm{PolySub}(m,q,d)\) with </p>
 <div class="displaymath" id="a0000000598">
   \[  G_g^{\mathrm A} \otimes I \approx _{100\zeta _1^{1/4}} P_g^{\mathrm A} \otimes I, \qquad I \otimes G_g^{\mathrm B} \approx _{100\zeta _1^{1/4}} I \otimes P_g^{\mathrm B}.  \]
