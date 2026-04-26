@@ -39,19 +39,53 @@ class ParseDeclarationTests(unittest.TestCase):
                         : ∃ H : Measurement, ConsRel H params := by
                       sorry
                     """
-                )
+                ),
+                encoding="utf-8",
             )
             decls = parse_declarations(mod, root=root)
             self.assertEqual([decl.name for decl in decls], ["wrapper"])
             self.assertIn("∃ H", decls[0].conclusion)
             self.assertEqual(decls[0].binders[1].name, "hrec")
 
+    def test_header_parser_accepts_inline_attributes(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    @[simp] theorem attributedBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+
+                    @[simp] private theorem attributedPrivateBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual(
+                [decl.name for decl in decls],
+                ["attributedBad", "attributedPrivateBad"],
+            )
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 2)
+            self.assertEqual(
+                [finding.decl for finding in result.review_findings],
+                ["attributedBad", "attributedPrivateBad"],
+            )
+
 
 class AuditHeuristicTests(unittest.TestCase):
     def _write_fake(self, root: Path, body: str) -> Path:
         mod = root / "MIPStarRE" / "Fake.lean"
         mod.parent.mkdir(exist_ok=True)
-        mod.write_text(textwrap.dedent(body))
+        mod.write_text(textwrap.dedent(body), encoding="utf-8")
         return mod
 
     def test_salient_tokens_keep_math_identifiers(self) -> None:
@@ -157,7 +191,8 @@ class MainTests(unittest.TestCase):
             mod.parent.mkdir()
             mod.write_text(
                 "theorem bad (h : ∃ G : Measurement, ConsRel G) : "
-                "∃ G : Measurement, ConsRel G := by sorry\n"
+                "∃ G : Measurement, ConsRel G := by sorry\n",
+                encoding="utf-8",
             )
             with redirect_stdout(io.StringIO()):
                 code = audit.main([
@@ -172,7 +207,8 @@ class MainTests(unittest.TestCase):
             mod.parent.mkdir()
             mod.write_text(
                 "theorem okOfWitness (h : ∃ G : Measurement, ConsRel G) : "
-                "∃ G : Measurement, ConsRel G := by sorry\n"
+                "∃ G : Measurement, ConsRel G := by sorry\n",
+                encoding="utf-8",
             )
             with redirect_stdout(io.StringIO()):
                 code = audit.main([

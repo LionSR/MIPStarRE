@@ -30,7 +30,9 @@ from typing import Iterable, Sequence
 
 
 _DECL_RE = re.compile(
-    r"(?m)^\s*(?:(?:private|protected|noncomputable|unsafe)\s+)*"
+    r"(?m)^\s*(?:@\[[^\]\n]*\]\s+)*"
+    r"(?:(?:private|protected|noncomputable|unsafe)\s+)*"
+    r"(?:@\[[^\]\n]*\]\s+)*"
     r"(theorem|lemma)\s+([A-Za-z_][A-Za-z0-9_.'?]*)\b"
 )
 _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.'?]*")
@@ -234,7 +236,7 @@ def _extract_binders(prefix: str, *, file_text: str, file_start: int) -> tuple[B
 
 def parse_declarations(path: Path, *, root: Path | None = None) -> list[LeanDecl]:
     """Parse theorem/lemma headers from ``path``."""
-    text = path.read_text(errors="replace")
+    text = path.read_text(encoding="utf-8", errors="replace")
     if root is not None:
         try:
             rel = str(path.resolve().relative_to(root.resolve()))
